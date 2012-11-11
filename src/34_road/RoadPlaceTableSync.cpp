@@ -27,6 +27,7 @@
 #include "CityTableSync.h"
 #include "Conversion.h"
 #include "GeographyModule.h"
+#include "DataSourceLinksField.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
@@ -175,8 +176,7 @@ namespace synthese
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getCity() ? object->getCity()->includes(*object) : false);
 			query.execute(transaction);

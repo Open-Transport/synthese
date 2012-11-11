@@ -24,7 +24,11 @@
 
 #include "StopAreaTableSync.hpp"
 
+#include "DataSourceLinksField.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
+#include "Session.h"
+#include "User.h"
 #include "CityTableSync.h"
 #include "SelectQuery.hpp"
 #include "ImportableTableSync.hpp"
@@ -167,11 +171,22 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Data source links
-				cp->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
-						env
-				)	);
+				if(&env == &Env::GetOfficialEnv())
+				{
+					cp->setDataSourceLinksWithRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
+							env
+					)	);
+				}
+				else
+				{
+					cp->setDataSourceLinksWithoutRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
+							env
+					)	);
+				}
 
 				// City
 				cp->setCity(NULL);
@@ -295,8 +310,7 @@ namespace synthese
 			// Data source links
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 
 			// Timetable name
@@ -342,6 +356,9 @@ namespace synthese
 				PTModule::GetGeneralStopsMatcher().remove(
 					cp->getFullName()
 				);
+
+				// Unregister data source links
+				cp->cleanDataSourceLinks(true);
 			}
 		}
 

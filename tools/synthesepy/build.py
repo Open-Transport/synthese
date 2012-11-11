@@ -42,7 +42,7 @@ REQUIRED_BOOST_MODULES = [
     'date_time', 'filesystem', 'iostreams', 'program_options',
     'regex', 'system', 'test', 'thread']
 
-MYSQL_VER = '5.5.25a'
+MYSQL_VER = '5.5.28'
 
 LIBSPATIALITE_DLLS = (
     ('spatialite-2.3.0/libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
@@ -228,7 +228,7 @@ class Builder(object):
 
         url = ('http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/'
             'mysql-{mysql_ver}-win{arch}.zip'.format(mysql_ver=MYSQL_VER, arch='x64' if self.env.c.x64 else '32'))
-        self._download(url, '80ad4487e09b9b6967c48188aafa888e' if self.env.c.x64 else 'todo')
+        self._download(url, '15b201507ab426a798f6e510d91708d9' if self.env.c.x64 else 'todo')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
         self.mysql_dir = join(self.env.c.thirdparty_dir, created_dir)
 
@@ -249,6 +249,11 @@ class Builder(object):
         url = 'http://www.bzip.org/1.0.6/{0}.tar.gz'.format(BZIP2_ARCHIVE)
         self._download(url, '00b516f4704d4a7cb50a1d97e6e8e15b')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
+        
+        ZLIB_ARCHIVE = 'zlib-1.2.7'
+        url = 'http://zlib.net/zlib-1.2.7.tar.gz'
+        self._download(url, '60df6a37c56e7c1366cca812414f7b85')
+        created_dir = self._extract(url, self.env.c.thirdparty_dir)
 
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
         self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
@@ -256,6 +261,14 @@ class Builder(object):
 
         self.boost_dir = join(self.env.c.thirdparty_dir, created_dir)
         self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
+
+        # Patch for zlib
+        zlibjam = join(self.boost_dir, "libs/iostreams/build/Jamfile.v2") 
+        s = open(zlibjam).read()
+        s = s.replace('gzio', '')
+        f = open(zlibjam, 'w')
+        f.write(s)
+        f.close()
 
         CURRENT_BOOST_BUILD_VER = 2
         boost_build_ver_path = join(
@@ -286,6 +299,8 @@ class Builder(object):
         args.extend(['--with-%s' % m for m in REQUIRED_BOOST_MODULES])
         args.append('-sBZIP2_SOURCE={}'.format(
             join(self.env.c.thirdparty_dir, BZIP2_ARCHIVE)))
+        args.append('-sZLIB_SOURCE={}'.format(
+            join(self.env.c.thirdparty_dir, ZLIB_ARCHIVE)))
 
         utils.call(args, cwd=self.boost_dir)
         open(boost_build_ver_path, 'wb').write(str(CURRENT_BOOST_BUILD_VER))

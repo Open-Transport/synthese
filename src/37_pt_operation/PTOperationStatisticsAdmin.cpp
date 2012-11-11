@@ -23,9 +23,12 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTOperationStatisticsAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTOperationModule.hpp"
+#include "User.h"
 #include "GlobalRight.h"
 #include "AdminFunctionRequest.hpp"
 #include "SearchFormHTMLTable.h"
@@ -135,12 +138,12 @@ namespace synthese
 
 		void PTOperationStatisticsAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			stream << "<h1>Requête</h1>";
 
-			AdminFunctionRequest<PTOperationStatisticsAdmin> searchRequest(request);
+			AdminFunctionRequest<PTOperationStatisticsAdmin> searchRequest(request, *this);
 
 			SearchFormHTMLTable rt(searchRequest.getHTMLForm());
 			stream << rt.open();
@@ -279,7 +282,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTOperationStatisticsAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

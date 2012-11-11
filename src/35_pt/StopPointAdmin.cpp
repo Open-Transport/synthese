@@ -31,6 +31,7 @@
 #include "CommercialLineAdmin.h"
 #include "DRTArea.hpp"
 #include "DRTAreaAdmin.hpp"
+#include "GeometryField.hpp"
 #include "HTMLMap.hpp"
 #include "ImportableAdmin.hpp"
 #include "JourneyPattern.hpp"
@@ -40,16 +41,17 @@
 #include "MapSource.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
 #include "PTModule.h"
 #include "PTPlaceAdmin.h"
 #include "PTRuleUserAdmin.hpp"
 #include "RoadPlaceTableSync.h"
-#include "StandardFields.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StopPointUpdateAction.hpp"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <boost/lexical_cast.hpp>
 #include <geos/geom/Point.h>
@@ -134,7 +136,7 @@ namespace synthese
 
 		void StopPointAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -251,7 +253,7 @@ namespace synthese
 
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<StopPointUpdateAction, StopPointAdmin> updateRequest(request);
+				AdminActionFunctionRequest<StopPointUpdateAction, StopPointAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());

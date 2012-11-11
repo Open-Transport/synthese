@@ -22,13 +22,18 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "DestinationTableSync.hpp"
+
+#include "DataSourceLinksField.hpp"
+#include "ImportableTableSync.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "ImportableTableSync.hpp"
+#include "Session.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -111,8 +116,7 @@ namespace synthese
 			query.addField(object->getComment());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.execute(transaction);
 		}

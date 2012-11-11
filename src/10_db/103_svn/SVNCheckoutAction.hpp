@@ -28,6 +28,8 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 
+#include "SVNRepository.hpp"
+
 namespace synthese
 {
 	namespace db
@@ -58,7 +60,7 @@ namespace synthese
 			private:
 				std::string _user;
 				std::string _password;
-				std::string _repoURL;
+				SVNRepository _repo;
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////
@@ -92,6 +94,9 @@ namespace synthese
 
 				//! @name Setters
 				//@{
+					void setUser(const std::string& value){ _user = value; }
+					void setPassword(const std::string& value){ _password = value; }
+					void setRepo(const SVNRepository& value){ _repo = value; }
 				//@}
 			};
 }	}	}

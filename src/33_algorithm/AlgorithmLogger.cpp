@@ -59,12 +59,12 @@ namespace synthese
 		):	_directory(dir),
 			_active(!dir.empty()),
 			_fileNumber(0),
-			_timeSlotJourneyPlannerTable(5, ResultHTMLTable::CSS_CLASS),
-			_journeyPlannerTable(13, ResultHTMLTable::CSS_CLASS),
 			_journeyPlannerStepTable(8, ResultHTMLTable::CSS_CLASS),
-			_journeyPlannerResult(NULL),
 			_journeyPlannerSearchNumber(0),
-			_timeSlotJourneyPlannerStepNumber(0)
+			_journeyPlannerTable(13, ResultHTMLTable::CSS_CLASS),
+			_journeyPlannerResult(NULL),
+			_timeSlotJourneyPlannerStepNumber(0),
+			_timeSlotJourneyPlannerTable(5, ResultHTMLTable::CSS_CLASS)
 		{}
 
 

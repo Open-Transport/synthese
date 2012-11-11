@@ -47,6 +47,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace server;
 	using namespace html;
 	using namespace util;
@@ -66,7 +67,7 @@ namespace synthese
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_PT_DATASOURCE_ID("ps");
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_DEFAULT_DISPLAY_TYPE_ID("dt");
 
-		bool IneoDepartureBoardsFileFormat::Importer_::_read( std::ostream& os, boost::optional<const admin::AdminRequest&> adminRequest ) const
+		bool IneoDepartureBoardsFileFormat::Importer_::_read( std::ostream& os, boost::optional<const server::Request&> adminRequest ) const
 		{
 			if(_database.empty() || !_ptDataSource.get())
 			{
@@ -219,7 +220,7 @@ namespace synthese
 
 
 
-		void IneoDepartureBoardsFileFormat::Importer_::displayAdmin( std::ostream& os, const admin::AdminRequest& request ) const
+		void IneoDepartureBoardsFileFormat::Importer_::displayAdmin( std::ostream& os, const server::Request& request ) const
 		{
 			os << "<h1>Paramètres</h1>";
 

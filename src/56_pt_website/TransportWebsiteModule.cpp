@@ -21,10 +21,10 @@
 */
 
 #include "TransportWebsiteModule.h"
-#include "GraphConstants.h"
-#include "FunctionWithSite.h"
-#include "Request.h"
+
 #include "Env.h"
+#include "GraphConstants.h"
+#include "Request.h"
 
 using namespace std;
 using namespace boost;
@@ -54,6 +54,20 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<TransportWebsiteModule>::End()
 		{
+		}
+
+
+
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::CloseThread(
+			
+			){
 		}
 	}
 

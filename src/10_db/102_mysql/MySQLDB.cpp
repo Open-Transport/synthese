@@ -21,20 +21,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// At the beginning (macro test)
+#include "ServerModule.h"
+
 #include "01_util/threads/Thread.h"
 #include "102_mysql/MySQLDB.hpp"
 #include "102_mysql/MySQLException.hpp"
 #include "102_mysql/MySQLResult.hpp"
 #include "DBModule.h"
+#include "DBRecord.hpp"
 #include "DBTransaction.hpp"
 #include "FactorableTemplate.h"
 #include "Log.h"
-#include "ServerModule.h"
+#include "UtilTypes.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <my_global.h>
-#include <mysql.h>
 #include <errmsg.h>
 
 using namespace std;
@@ -48,7 +50,7 @@ using boost::thread;
 namespace synthese
 {
 	using namespace db;
-	using util::Log;
+	using namespace util;
 
 	namespace
 	{
@@ -86,6 +88,10 @@ namespace synthese
 
 	namespace db
 	{
+		std::vector<MYSQL_STMT*> MySQLDB::_replaceStatements;
+		std::vector<MYSQL_STMT*> MySQLDB::_deleteStatements;
+
+
 		MySQLDB::MySQLDB() :
 			_connection(NULL),
 			_mysqlThreadInitialized(cleanupThread),
@@ -145,14 +151,10 @@ namespace synthese
 			initForStandaloneUse();
 
 			// TODO: is the thread deleted properly on module unload?
-
-			_modifEventsThread.reset(
-				new thread(
-					bind(
-						&MySQLDB::_modifEventsDispatcherThread,
-						this
-			)	)	);
-			server::ServerModule::AddThread(_modifEventsThread, "MySQL db modification events dispatcher");
+			//server::ServerModule::AddThread(
+			//	bind(&MySQLDB::_modifEventsDispatcherThread, this),
+			//	"MySQL db modification events dispatcher"
+			//);
 
 			DB::preInit();
 		}
@@ -183,20 +185,14 @@ namespace synthese
 
 		void MySQLDB::execTransaction(const DBTransaction& transaction)
 		{
-			std::stringstream ss;
-			ss << "START TRANSACTION;";
-			BOOST_FOREACH(const DBTransaction::Queries::value_type& querySql, transaction.getQueries())
+			_doExecUpdate("BEGIN");
+			RequestExecutor executor(*this);
+			BOOST_FOREACH(const DBTransaction::Queries::value_type& query, transaction.getQueries())
 			{
-				ss << querySql;
+				boost::apply_visitor( executor, query );
 			}
-			ss << "COMMIT;";
-			string sql(ss.str());
-			// Don't log SQL statements used for filling spatial_ref_sys which can be quite noisy.
-			if (sql.find("spatial_ref_sys") == sql.npos)
-			{
-				Log::GetInstance().trace("MySQLDB::execTransaction " + sql);
-			}
-			_doExecUpdate(sql);
+			_doExecUpdate("COMMIT");
+			
 			DB::_finishTransaction(transaction);
 		}
 
@@ -206,8 +202,9 @@ namespace synthese
 		{
 			_ensureThreadInitialized();
 
-			if (sql.find("spatial_ref_sys") == sql.npos)
-			{
+			if(	Log::GetInstance().getLevel() > Log::LEVEL_TRACE &&
+				sql.find("spatial_ref_sys") == sql.npos
+			){
 				Log::GetInstance().trace("MySQLDB::execUpdate " + sql);
 			}
 
@@ -313,6 +310,173 @@ namespace synthese
 
 
 
+		void MySQLDB::initPreparedStatements(
+		){
+			// Runs only once at the first thread creation
+			if(!_replaceStatements.empty())
+			{
+				return;
+			}
+
+			// Clear the statements
+			size_t tablesNumber(
+				DBModule::GetTablesById().rbegin()->first + 1
+			);
+			_replaceStatements.clear();
+			_replaceStatements.resize(tablesNumber, NULL);
+			_deleteStatements.clear();
+			_deleteStatements.resize(tablesNumber, NULL);
+
+			// Loop on tables
+			BOOST_FOREACH(const DBModule::TablesByIdMap::value_type& it, DBModule::GetTablesById())
+			{
+				// Replace statement
+				stringstream query;
+				query << "REPLACE INTO " << it.second->getFormat().NAME << " VALUES(";
+				bool first(true);
+				BOOST_FOREACH(const Field& field, it.second->getFieldsList())
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						query << ",";
+					}
+					if(field.isGeometry())
+					{
+						query << "GeomFromText(?)";
+					}
+					else
+					{
+						query << "?";
+					}
+				}
+				query << ")";
+				string queryStr(query.str());
+				MYSQL_STMT* stmt(
+					mysql_stmt_init(_connection)
+				);
+				mysql_stmt_prepare(
+					stmt,
+					queryStr.c_str(),
+					static_cast<int>(queryStr.size())
+				);
+				_replaceStatements[it.first] = stmt;
+
+				// Delete statement
+				stringstream deleteQuery;
+				deleteQuery << "DELETE FROM " << it.second->getFormat().NAME << " WHERE " << TABLE_COL_ID << "=?";
+				string deleteQueryStr(deleteQuery.str());
+				MYSQL_STMT* deleteStmt(
+					mysql_stmt_init(_connection)
+				);
+				mysql_stmt_prepare(
+					deleteStmt,
+					deleteQueryStr.c_str(),
+					static_cast<int>(deleteQueryStr.size())
+				);
+				_deleteStatements[it.first] = deleteStmt;
+			}
+		}
+
+
+
+		void MySQLDB::saveRecord(
+			const DBRecord& record
+		){
+			boost::recursive_mutex::scoped_lock lock(_connectionMutex);
+			size_t fieldsNumber(record.getTable()->getFieldsList().size());
+			MYSQL_BIND* bnd = new MYSQL_BIND[fieldsNumber];
+			my_bool* isNullArray = new my_bool[fieldsNumber];
+			unsigned long* lengthArray = new unsigned long[fieldsNumber];
+			memset(bnd, 0, fieldsNumber * sizeof(MYSQL_BIND));
+			memset(isNullArray, 0, fieldsNumber * sizeof(my_bool));
+			memset(lengthArray, 0, fieldsNumber * sizeof(unsigned long));
+			for(size_t i(0); i<fieldsNumber; ++i)
+			{
+				bnd[i].is_null = isNullArray+i;
+				bnd[i].length = lengthArray+i;
+				DBRecordCellBindConvertor visitor(*(bnd+i));
+				apply_visitor(visitor, record.getContent().at(i));
+			}
+			MYSQL_STMT* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
+			if(mysql_stmt_bind_param(stmt, bnd))
+			{
+				string errorMsg(mysql_stmt_error(stmt));
+				Log::GetInstance().warn(errorMsg);
+			}
+			else
+			{
+				bool ok(true);
+				for(size_t i(0); i<fieldsNumber; ++i)
+				{
+					unsigned long length(*bnd[i].length);
+					if(	length >= 10240)
+					{
+						for(size_t offset(0); offset<length; offset += 10240)
+						{
+							if(	mysql_stmt_send_long_data(
+									stmt,
+									i,
+									static_cast<char*>(bnd[i].buffer) + offset,
+									(offset + 10240 >=length) ? length-offset : 10240
+
+							)	){
+								Log::GetInstance().warn("Error sending data");
+								ok = false;
+								break;
+							}
+						}
+					}
+					if(!ok)
+					{
+						break;
+					}
+				}
+				if(ok)
+				{
+					if(mysql_stmt_execute(stmt))
+					{
+						string errorMsg(mysql_stmt_error(stmt));
+						Log::GetInstance().warn(errorMsg);
+					}
+				}
+			}
+			delete[] isNullArray;
+			delete[] lengthArray;
+			delete[] bnd;
+			mysql_stmt_reset(stmt);
+		}
+
+
+
+		void MySQLDB::deleteRow( util::RegistryKeyType id )
+		{
+			boost::recursive_mutex::scoped_lock lock(_connectionMutex);
+			MYSQL_BIND bnd[1];
+			memset(bnd, 0, sizeof(bnd));
+			DBRecordCellBindConvertor visitor(*bnd);
+			visitor(id);
+			MYSQL_STMT* stmt(_deleteStatements[decodeTableId(id)]);
+			if(mysql_stmt_bind_param(stmt, bnd))
+			{
+				string errorMsg(mysql_stmt_error(stmt));
+				Log::GetInstance().warn(errorMsg);
+			}
+			else
+			{
+				if(mysql_stmt_execute(stmt))
+				{
+					string errorMsg(mysql_stmt_error(stmt));
+					Log::GetInstance().warn(errorMsg);
+				}
+			}
+		}
+
+
+
 		std::string MySQLDB::getSQLType(FieldType fieldType)
 		{
 			// Important Note:
@@ -361,7 +525,7 @@ namespace synthese
 			case SQL_GEOM_POLYGON:
 				return "POLYGON";
 			case SQL_BLOB:
-				return "BLOB";
+				return "LONGBLOB";
 			}
 			return string();
 		}
@@ -459,7 +623,7 @@ namespace synthese
 				sql << fields[i].name;
 				sql << "\" " << getSQLType(fields[i].type);
 			}
-			sql << ");";
+			sql << ") DEFAULT CHARSET=utf8;";
 
 			// Add spatial indexes
 			// TODO: fix so that MySQL doesn't return this error:
@@ -782,5 +946,121 @@ namespace synthese
 				mysql_errno(_connection)
 			);
 		}
-	}
-}
+
+
+
+		void MySQLDB::removePreparedStatements()
+		{
+			// Do nothing
+		}
+
+
+
+		MySQLDB::DBRecordCellBindConvertor::DBRecordCellBindConvertor(
+			MYSQL_BIND& bnd
+		):	_bnd(bnd)
+		{}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const int& i ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_LONG;
+			_bnd.buffer = static_cast<void*>(const_cast<int*>(&i));
+		}
+
+		
+#ifndef _WINDOWS		
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_LONG;
+			_bnd.buffer = static_cast<void*>(const_cast<void*>(static_cast<const void*>(&s)));
+		}
+#endif
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const bool& d ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_TINY;
+			_bnd.buffer = static_cast<void*>(const_cast<bool*>(&d));
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const double& d ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_DOUBLE;
+			_bnd.buffer = static_cast<void*>(const_cast<double*>(&d));
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const util::RegistryKeyType& id ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_LONGLONG;
+			_bnd.buffer = static_cast<void*>(const_cast<RegistryKeyType*>(&id));
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const boost::optional<std::string>& str ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_BLOB;
+			if(str)
+			{
+				_bnd.buffer = static_cast<void*>(const_cast<char*>(str->c_str()));
+				*_bnd.length = str->size();
+			}
+			else
+			{
+				*_bnd.is_null = true;
+			}
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const boost::optional<Blob>& blob ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_BLOB;
+			if(blob)
+			{
+				_bnd.buffer = static_cast<void*>(const_cast<char*>(blob->first));
+				*_bnd.length = blob->second;
+			}
+			else
+			{
+				*_bnd.is_null = true;
+			}
+		}
+
+
+
+		MySQLDB::RequestExecutor::RequestExecutor( MySQLDB& db ):
+			_db(db)
+		{
+
+		}
+
+
+
+		void MySQLDB::RequestExecutor::operator()( const std::string& d )
+		{
+			_db._doExecUpdate(d);
+		}
+
+
+
+		void MySQLDB::RequestExecutor::operator()( const DBRecord& r )
+		{
+			_db.saveRecord(r);
+		}
+
+
+
+		void MySQLDB::RequestExecutor::operator()(
+			util::RegistryKeyType id
+		){
+			_db.deleteRow(id);
+		}
+}	}

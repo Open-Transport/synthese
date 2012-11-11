@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "RollingStockAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "RollingStock.hpp"
 #include "RollingStockUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
@@ -107,13 +110,13 @@ namespace synthese
 
 		void RollingStockAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<RollingStockUpdateAction, RollingStockAdmin> updateRequest(request);
+				AdminActionFunctionRequest<RollingStockUpdateAction, RollingStockAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setRollingStock(const_pointer_cast<RollingStock>(_rollingStock));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));

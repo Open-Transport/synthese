@@ -21,7 +21,15 @@ namespace synthese
 		    const std::string _serverHost;      //!< Server host.
 			const std::string _serverPort;              //!< Server port.
 		    const int _timeOut;                 //!< TCP time out in milliseconds. 0 means no timeout.
-			const bool	_outputHTTPHeaders;
+			const bool _outputHTTPHeaders;
+			const bool _acceptGzip;
+
+
+			std::string _send(
+				const std::string& url,
+				const std::string& postData,
+				const std::string& contentType
+			) const;
 
 		public:
 
@@ -29,7 +37,8 @@ namespace synthese
 				const std::string& serverHost,
 				const std::string serverPort = "8080",
 				int timeOut = 0,
-				bool outputHTTPHeaders = false
+				bool outputHTTPHeaders = false,
+				bool acceptGzip = true
 			);
 
 		    /**
@@ -50,14 +59,18 @@ namespace synthese
 
 
 		     */
-		    void request(
-				std::ostream& out,
-				const std::string& request
-			);
+			std::string get(
+				const std::string& url
+			) const;
 
+
+			std::string post(
+				const std::string& url,
+				const std::string& data,
+				std::string contentType = std::string()
+			) const;
 
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_SERVER_BASIC_CLIENT_h__

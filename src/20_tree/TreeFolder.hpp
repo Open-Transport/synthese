@@ -23,9 +23,12 @@
 #ifndef SYNTHESE_tree_TreeFolder_hpp__
 #define SYNTHESE_tree_TreeFolder_hpp__
 
+#include "NumericField.hpp"
 #include "Object.hpp"
 #include "Registrable.h"
 #include "Registry.h"
+#include "SchemaMacros.hpp"
+#include "StringField.hpp"
 #include "TreeFolderUpNode.hpp"
 #include "TreeFolderDownNodeInterface.hpp"
 

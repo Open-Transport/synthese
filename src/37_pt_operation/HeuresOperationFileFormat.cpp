@@ -78,6 +78,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace util;
 	using namespace impex;
 	using namespace pt;
@@ -169,7 +170,7 @@ namespace synthese
 			const path& filePath,
 			std::ostream& logStream,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> request
+			boost::optional<const server::Request&> request
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -199,7 +200,7 @@ namespace synthese
 
 					// Extraction of values
 					string name(
-						IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(
+						IConv(_dataSource.getCharset(), "UTF-8").convert(
 							boost::algorithm::trim_copy(line.substr(5, 50))
 					)	);
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
@@ -810,7 +811,7 @@ namespace synthese
 
 		void HeuresOperationFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const {
 
 			stream << "<h1>Horaires</h1>";

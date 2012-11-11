@@ -24,11 +24,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayScreenCPUTableSync.h"
+
 #include "DisplayScreenCPU.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
+#include "Session.h"
+#include "User.h"
 #include "Conversion.h"
 #include "StopArea.hpp"
 #include "Fetcher.h"

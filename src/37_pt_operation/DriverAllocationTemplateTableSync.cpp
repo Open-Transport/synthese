@@ -22,7 +22,6 @@
 
 #include "DriverAllocationTemplateTableSync.hpp"
 
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 
 #include <sstream>
@@ -39,7 +38,6 @@ namespace synthese
 	using namespace db;
 	using namespace pt;
 	using namespace pt_operation;
-	using namespace security;
 	using namespace util;
 
 
@@ -95,12 +93,7 @@ namespace synthese
 			DriverAllocationTemplate* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<DriverAllocationTemplateTableSync> query(*object);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			object->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

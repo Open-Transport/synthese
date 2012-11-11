@@ -20,13 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DBLogEntryTableSync.h"
+
 #include "DeleteQuery.hpp"
-#include "SelectQuery.hpp"
-#include "ReplaceQuery.h"
 #include "DBLog.h"
 #include "DBLogRight.h"
+#include "Profile.h"
+#include "PtimeField.hpp"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
 #include "UserTableSync.h"
-#include "DBLogEntryTableSync.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
@@ -151,7 +155,7 @@ namespace synthese
 			// Query
 			ReplaceQuery<DBLogEntryTableSync> query(*object);
 			query.addField(object->getLogKey());
-			query.addField(object->getDate());
+			query.addFrameworkField<PtimeField>(object->getDate());
 			query.addField(object->getUserId());
 			query.addField(static_cast<int>(object->getLevel()));
 			query.addField(content.str());

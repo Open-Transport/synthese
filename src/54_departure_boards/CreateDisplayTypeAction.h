@@ -24,6 +24,7 @@
 #define SYNTHESE_CreateDisplayTypeAction_H__
 
 #include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {

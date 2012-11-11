@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DepotAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
-#include "PTOperationModule.hpp"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
+#include "PTOperationModule.hpp"
+#include "User.h"
 #include "Depot.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "DepotUpdateAction.hpp"
@@ -48,7 +51,6 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace html;
 	using namespace db;
-	using namespace pt;
 	using namespace impex;
 
 	namespace util
@@ -109,12 +111,12 @@ namespace synthese
 
 		void DepotAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			stream << "<h1>Propriétés</h1>";
 
-			AdminActionFunctionRequest<DepotUpdateAction, DepotAdmin> updateRequest(request);
+			AdminActionFunctionRequest<DepotUpdateAction, DepotAdmin> updateRequest(request, *this);
 			updateRequest.getAction()->setDepot(const_pointer_cast<Depot>(_depot));
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update_form"));

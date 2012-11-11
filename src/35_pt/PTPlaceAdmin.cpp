@@ -32,6 +32,7 @@
 #include "CommercialLine.h"
 #include "DBModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
+#include "GeometryField.hpp"
 #include "HTMLMap.hpp"
 #include "ImportableAdmin.hpp"
 #include "JourneyPattern.hpp"
@@ -53,7 +54,7 @@
 #include "RemoveObjectAction.hpp"
 #include "ResultHTMLTable.h"
 #include "RoadPlaceTableSync.h"
-#include "StandardFields.hpp"
+#include "Session.h"
 #include "StaticActionRequest.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
@@ -66,6 +67,7 @@
 #include "StopPointTableSync.hpp"
 #include "StopPointUpdateAction.hpp"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -155,7 +157,7 @@ namespace synthese
 
 		void PTPlaceAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -306,7 +308,7 @@ namespace synthese
 					stream << map.getAddPointLink(stopPointAddRequest.getURL(), "Ajouter arrêt");
 
 
-					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request);
+					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request, *this);
 					updateRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 					stream << "<h1>Propriétés</h1>";
@@ -367,10 +369,10 @@ namespace synthese
 			{
 				AdminFunctionRequest<StopPointAdmin> openRequest(request);
 
-				AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> addRequest(request);
+				AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> addRequest(request, *this);
 				addRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
-				AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeRequest(request, *this);
 
 				HTMLForm f(addRequest.getHTMLForm());
 				stream << f.open();
@@ -507,7 +509,7 @@ namespace synthese
 				{
 					stream << "<h1>Propriétés</h1>";
 
-					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request);
+					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request, *this);
 					updateRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
@@ -519,9 +521,9 @@ namespace synthese
 
 				stream << "<h1>Transferts internes (correspondances)</h1>";
 				{
-					AdminActionFunctionRequest<StopAreaTransferAddAction,PTPlaceAdmin> addTransferRequest(request);
+					AdminActionFunctionRequest<StopAreaTransferAddAction,PTPlaceAdmin> addTransferRequest(request, *this);
 
-					AdminActionFunctionRequest<StopAreaTransferRemoveAction,PTPlaceAdmin> removeTransferRequest(request);
+					AdminActionFunctionRequest<StopAreaTransferRemoveAction,PTPlaceAdmin> removeTransferRequest(request, *this);
 
 					HTMLForm f(addTransferRequest.getHTMLForm("addtransfer"));
 					stream << f.open();
@@ -570,11 +572,11 @@ namespace synthese
 
 				if(_connectionPlace.get())
 				{
-					AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+					AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request, *this);
 
-					AdminActionFunctionRequest<JunctionUpdateAction,PTPlaceAdmin> addJunctionRequest(request);
+					AdminActionFunctionRequest<JunctionUpdateAction,PTPlaceAdmin> addJunctionRequest(request, *this);
 
-					AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeJunctionRequest(request);
+					AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeJunctionRequest(request, *this);
 
 					stream << "<h1>Transferts externes (jonctions)</h1>";
 
@@ -736,9 +738,9 @@ namespace synthese
 				c.push_back("Principal");
 				c.push_back("Actions");
 
-				AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeRequest(request, *this);
 
-				AdminActionFunctionRequest<PlaceAliasUpdateAction,PTPlaceAdmin> addRequest(request);
+				AdminActionFunctionRequest<PlaceAliasUpdateAction,PTPlaceAdmin> addRequest(request, *this);
 				addRequest.getAction()->setStopArea(_connectionPlace);
 
 				HTMLForm f(addRequest.getHTMLForm("addAlias"));
@@ -821,7 +823,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks PTPlaceAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

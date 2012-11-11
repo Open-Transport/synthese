@@ -23,7 +23,10 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTUseRuleAdmin.h"
+
+#include "Profile.h"
 #include "PTUseRulesAdmin.h"
+#include "User.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
@@ -104,10 +107,10 @@ namespace synthese
 
 		void PTUseRuleAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
-			AdminActionFunctionRequest<PTUseRuleUpdateAction,PTUseRuleAdmin> updateRequest(_request);
+			AdminActionFunctionRequest<PTUseRuleUpdateAction,PTUseRuleAdmin> updateRequest(_request, *this);
 			updateRequest.getAction()->setRule(const_pointer_cast<PTUseRule>(_rule));
 
 			stream << "<h1>Propriétés</h1>";

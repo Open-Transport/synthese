@@ -52,6 +52,7 @@ namespace synthese
 			MySQLDB* _db;
 			MYSQL_RES* _result;
 			mutable MYSQL_ROW _row;
+			mutable unsigned long* _lengths;
 
 			template<class T, T DEFAULT_VALUE>
 			T _getValue(int column) const;

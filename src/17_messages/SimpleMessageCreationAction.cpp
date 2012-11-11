@@ -22,9 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "SimpleMessageCreationAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "SimpleMessageCreationAction.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "MessagesRight.h"
 #include "Request.h"
 #include "MessagesLog.h"

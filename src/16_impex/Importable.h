@@ -29,7 +29,6 @@
 #include "Registrable.h"
 
 #include "Exception.h"
-#include "SimpleObjectField.hpp"
 #include "SchemaMacros.hpp"
 
 #include <string>
@@ -39,6 +38,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace impex
 	{
 		class DataSource;
@@ -151,42 +155,6 @@ namespace synthese
 			//@{
 			//@}
 		};
-
-
-		struct DataSourceLinks;
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	/// Pointers vector specialization
-	template<>
-	class ObjectField<impex::DataSourceLinks, void*>:
-		public SimpleObjectFieldDefinition<impex::DataSourceLinks>
-	{
-	public:
-		typedef void* Type;
-
-		static void UnSerialize(impex::Importable::DataSourceLinks& fieldObject, const std::string& text,	const util::Env& env);
-		static void LoadFromRecord(void*& fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
-		static std::string Serialize(const impex::Importable::DataSourceLinks& fieldObject, util::ParametersMap::SerializationFormat format);
-		static void SaveToParametersMap(
-			void*& fieldObject,
-			const ObjectBase& object,
-			util::ParametersMap& map,
-			const std::string& prefix,
-			boost::logic::tribool withFiles
-		);
-		static void SaveToFilesMap(
-			void*& fieldObject,
-			const ObjectBase& object,
-			FilesMap& map
-		);
-		static void GetLinkedObjectsIdsFromText(LinkedObjectsIds& list, const std::string& text);
-		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
-	};
-
-	namespace impex
-	{
-		FIELD_TYPE_EXTERNAL_DATA(DataSourceLinks);
 }	}
 
 #endif // SYNTHESE_Importable_h__

@@ -62,9 +62,15 @@ namespace synthese
 		*/
 		class Timetable:
 			public virtual util::Registrable,
-			public ObjectField<Timetable, boost::optional<Timetable&> >
+			public PointerField<Timetable, Timetable>
 		{
 		public:
+
+			struct Vector:
+				public PointersVectorField<Vector, Timetable>
+			{
+
+			};
 
 			/// Chosen registry class.
 			typedef util::Registry<Timetable>	Registry;

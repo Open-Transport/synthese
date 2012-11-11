@@ -23,6 +23,8 @@
 #include "Fetcher.h"
 #include "FactorableTemplate.h"
 
+#include "DBModule.h"
+
 #include <boost/optional.hpp>
 
 #ifndef SYNTHESE_db_FetcherTemplate_h__
@@ -76,7 +78,7 @@ namespace synthese
 				const BaseClass& object,
 				boost::optional<DBTransaction&> transaction
 			) const {
-				TableSync::RemoveRow(
+				DBModule::GetDB()->deleteStmt(
 					static_cast<const typename TableSync::ObjectType&>(object).getKey(),
 					transaction
 				);

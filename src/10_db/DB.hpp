@@ -30,6 +30,7 @@
 #include "DBTableSync.hpp"
 #include "Field.hpp"
 
+#include <boost/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -37,9 +38,9 @@
 // trigger will be compared against the one we fire, to check that we fire the same events.
 // It should be removed in the future, once we are sure the new trigger system works
 // as well as the database trigger one.
-#ifdef _DEBUG
-#define DO_VERIFY_TRIGGER_EVENTS 1
-#endif
+//#ifdef _DEBUG
+//#define DO_VERIFY_TRIGGER_EVENTS 0 //1
+//#endif
 
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 #include <boost/unordered_set.hpp>
@@ -47,12 +48,14 @@
 
 namespace synthese
 {
+	class ObjectBase;
 	class Exception;
 
 	namespace db
 	{
-		class DBTransaction;
 		class DB;
+		class DBRecord;
+		class DBTransaction;
 
 		typedef std::string SQLData;
 
@@ -149,6 +152,21 @@ namespace synthese
 			virtual void initForStandaloneUse() = 0;
 			virtual void preInit();
 			virtual void init();
+			virtual void initPreparedStatements() = 0;
+			virtual void removePreparedStatements() = 0;
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Executes a query which updates a blob field.
+			/// This should uses prepared statements instead of textual SQL query.
+			virtual void saveRecord(
+				const DBRecord& record
+			) = 0;
+
+			virtual void deleteRow(
+				util::RegistryKeyType id
+			) = 0;
+
 
 			virtual DBResultSPtr execQuery(const SQLData& sql) = 0;
 			virtual void execTransaction(const DBTransaction& transaction) = 0;
@@ -352,6 +370,22 @@ namespace synthese
 			/// @since 3.3.0
 			void _dispatchDBModifEvent(const DBModifEvent& modifEvent);
 
+		public:
+			void replaceStmt(
+				ObjectBase& o,
+				boost::optional<DBTransaction&> transaction
+			);
+
+			void replaceStmt(
+				util::RegistryKeyType objectId,
+				const DBRecord& r,
+				boost::optional<DBTransaction&> transaction
+			);
+
+			void deleteStmt(
+				util::RegistryKeyType objectId,
+				boost::optional<DBTransaction&> transaction
+			);
 		};
 	}
 }

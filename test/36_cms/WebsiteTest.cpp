@@ -97,6 +97,11 @@ BOOST_AUTO_TEST_CASE (WebsiteTest)
 	}
 
 	{
+		Website* s(CMSModule::GetSiteByURL("www.tutu.com", "/synthese/"));
+		BOOST_CHECK_EQUAL(s, &s3);
+	}
+
+	{
 		Website* s(CMSModule::GetSiteByURL("www.tutu.com", "/synthese/test.html"));
 		BOOST_CHECK_EQUAL(s, &s3);
 	}

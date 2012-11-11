@@ -23,11 +23,13 @@
 #ifndef SYNTHESE_timetable_TimetableRowGroup_hpp__
 #define SYNTHESE_timetable_TimetableRowGroup_hpp__
 
+#include "NumericField.hpp"
+#include "EnumObjectField.hpp"
 #include "Object.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 
-#include "EnumObjectField.hpp"
+#include "SchemaMacros.hpp"
 #include "Timetable.h"
 
 namespace synthese
@@ -43,11 +45,11 @@ namespace synthese
 			SufficientRow = 2
 		};
 
-		FIELD_TYPE(IsDeparture, bool)
-		FIELD_TYPE(IsArrival, bool)
-		FIELD_TYPE(Display, bool)
+		FIELD_BOOL(IsDeparture)
+		FIELD_BOOL(IsArrival)
+		FIELD_BOOL(Display)
 		FIELD_ENUM(TimetableRowRule, TimetableRowRuleEnum)
-		FIELD_TYPE(AutoRowsOrder, bool)
+		FIELD_BOOL(AutoRowsOrder)
 		
 
 		typedef boost::fusion::map<

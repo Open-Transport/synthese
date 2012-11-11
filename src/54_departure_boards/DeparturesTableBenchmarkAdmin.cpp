@@ -40,6 +40,7 @@
 #include "UpdateDisplayPreselectionParametersAction.h"
 #include "CPUGetWiredScreensFunction.h"
 #include "Profile.h"
+#include "User.h"
 
 #include <boost/foreach.hpp>
 
@@ -91,7 +92,7 @@ namespace synthese
 
 		void DeparturesTableBenchmarkAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			if(_doIt)
@@ -152,7 +153,7 @@ namespace synthese
 					duration = t2 - t0;
 				}
 
-				AdminFunctionRequest<DeparturesTableBenchmarkAdmin> reloadRequest(_request);
+				AdminFunctionRequest<DeparturesTableBenchmarkAdmin> reloadRequest(_request, *this);
 				reloadRequest.getPage()->_doIt = true;
 
 				stream << "<h1>Résultats</h1>";
@@ -229,7 +230,7 @@ namespace synthese
 			}
 			else
 			{
-				AdminRequest doRequest(_request,true);
+				AdminFunctionRequest<DeparturesTableBenchmarkAdmin> doRequest(_request, *this);
 
 				stream << "<p class=\"info\">Le lancement du benchmark peut affecter les performances du système durant le test. Etes-vous sûr de vouloir lancer le benchmark ?</p>";
 				HTMLForm f(doRequest.getHTMLForm());
@@ -261,7 +262,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DeparturesTableBenchmarkAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	dynamic_cast<const DeparturesTableModule*>(&module) && request.getUser() &&
@@ -277,7 +278,7 @@ namespace synthese
 
 		bool DeparturesTableBenchmarkAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			return true;
 		}

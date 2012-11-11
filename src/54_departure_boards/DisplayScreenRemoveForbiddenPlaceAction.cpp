@@ -21,8 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "DisplayScreenRemoveForbiddenPlaceAction.h"
+
 #include "DisplayScreenTableSync.h"
+#include "Profile.h"
+#include "Session.h"
 #include "StopAreaTableSync.hpp"
+#include "User.h"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"

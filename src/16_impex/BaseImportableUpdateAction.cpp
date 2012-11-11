@@ -21,7 +21,9 @@
 */
 
 #include "BaseImportableUpdateAction.hpp"
+
 #include "Action.h"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 
 using namespace std;
@@ -44,7 +46,7 @@ namespace synthese
 			{
 				map.insert(
 					PARAMETER_DATA_SOURCE_LINKS,
-					DataSourceLinks::Serialize(*_dataSourceLinks, map.getFormat())
+					DataSourceLinks::Serialize(*_dataSourceLinks)
 				);
 			}
 		}

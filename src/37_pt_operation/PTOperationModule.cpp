@@ -48,12 +48,6 @@ namespace synthese
 		template<> const GraphIdType GraphModuleTemplate<PTOperationModule>::GRAPH_ID(3);
 	}
 
-	namespace pt_operation
-	{
-		PTOperationModule::LinesAllowedVehicles PTOperationModule::_linesAllowedVehicles;
-		PTOperationModule::ServiceCompositions PTOperationModule::_serviceCompositions;
-	}
-
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<PTOperationModule>::NAME("Exploitation transport public");
@@ -69,53 +63,22 @@ namespace synthese
 		template<> void ModuleClassTemplate<PTOperationModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<PTOperationModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<PTOperationModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace pt_operation
 	{
-		void PTOperationModule::RegisterVehicle(const Vehicle& vehicle )
-		{
-			BOOST_FOREACH(const Vehicle::AllowedLines::value_type& line, vehicle.getAllowedLines())
-			{
-				_linesAllowedVehicles[line].insert(&vehicle);
-			}
-		}
-
-
-
-		void PTOperationModule::UnregisterVehicle(const Vehicle& vehicle )
-		{
-			BOOST_FOREACH(const Vehicle::AllowedLines::value_type& line, vehicle.getAllowedLines())
-			{
-				_linesAllowedVehicles[line].erase(&vehicle);
-			}
-		}
-
-
-
-		void PTOperationModule::RegisterComposition(const ServiceComposition& composition )
-		{
-			_serviceCompositions[composition.getService()].insert(&composition);
-		}
-
-
-
-		void PTOperationModule::UnregisterComposition(const ServiceComposition& composition )
-		{
-			_serviceCompositions[composition.getService()].erase(&composition);
-		}
-
-
-
-		PTOperationModule::ServiceCompositions::mapped_type PTOperationModule::GetCompositions(const ScheduledService& service )
-		{
-			return _serviceCompositions[&service];
-		}
-
-
-
-		PTOperationModule::LinesAllowedVehicles::mapped_type PTOperationModule::GetAllowedVehicles(const pt::CommercialLine& line )
-		{
-			return _linesAllowedVehicles[&line];
-		}
 }	}

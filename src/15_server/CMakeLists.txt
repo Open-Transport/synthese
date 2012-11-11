@@ -15,6 +15,8 @@ DynamicRequest.cpp
 DynamicRequest.h
 Function.cpp
 Function.h
+GlobalVariableUpdateAction.cpp
+GlobalVariableUpdateAction.hpp
 HtmlFormCalendarFieldInterfaceElement.cpp
 HtmlFormCalendarFieldInterfaceElement.h
 HtmlFormFieldInterfaceElement.cpp
@@ -95,8 +97,6 @@ target_link_libraries(15_server
   12_security
   13_dblog
   14_admin
-  # Forward dependencies:
-  #36_cms
 )
 
 install(TARGETS 15_server DESTINATION lib)

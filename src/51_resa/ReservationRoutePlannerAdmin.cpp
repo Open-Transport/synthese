@@ -29,6 +29,7 @@
 #include "PTServiceConfig.hpp"
 #include "ResaModule.h"
 #include "ResaRight.h"
+#include "User.h"
 #include "BookReservationAction.h"
 #include "NamedPlace.h"
 #include "AdminFunctionRequest.hpp"
@@ -186,7 +187,7 @@ namespace synthese
 
 		void ReservationRoutePlannerAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 
 			const Language& language(
@@ -215,7 +216,8 @@ namespace synthese
 			}
 
 			AdminActionFunctionRequest<BookReservationAction,ReservationRoutePlannerAdmin> resaRequest(
-				_request
+				_request,
+				*this
 			);
 			resaRequest.setActionWillCreateObject();
 			if(ResaModule::GetJourneyPlannerWebsite())
@@ -253,7 +255,7 @@ namespace synthese
 				}
 			}
 
-			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
+			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request, *this);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune départ", st.getForm().getTextInputAutoCompleteFromService(
@@ -391,7 +393,8 @@ namespace synthese
 				{
 					ap = ResaModule::GetJourneyPlannerWebsite()->getAccessParameters(
 						_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-						AccessParameters::AllowedPathClasses()
+						AccessParameters::AllowedPathClasses(),
+						AccessParameters::AllowedNetworks()
 					);
 				}
 				ap.setApproachSpeed(_effectiveApproachSpeed);
@@ -539,7 +542,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	dynamic_cast<const ResaModule*>(&module) &&
@@ -556,7 +559,7 @@ namespace synthese
 
 		bool ReservationRoutePlannerAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			return true;
 		}

@@ -49,9 +49,9 @@ namespace synthese
 			const date& lastDate,
 			date_duration step
 		):	Registrable(0),
-			_mutex(new recursive_mutex),
-			_firstActiveDate(firstDate)
+			_firstActiveDate(firstDate),
 			// last active date cannot be constructed at this time
+			_mutex(new recursive_mutex)
 		{
 			// Check pre-conditions in debug mode
 			assert(!firstDate.is_not_a_date());
@@ -124,9 +124,9 @@ namespace synthese
 			const Calendar& other
 		):	Registrable(0),
 			_markedDates(other._markedDates),
-			_mutex(new recursive_mutex),
 			_firstActiveDate(other._firstActiveDate),
-			_lastActiveDate(other._lastActiveDate)
+			_lastActiveDate(other._lastActiveDate),
+			_mutex(new recursive_mutex)
 		{}
 
 

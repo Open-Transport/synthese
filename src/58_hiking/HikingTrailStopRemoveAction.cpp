@@ -22,9 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "HikingTrailStopRemoveAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "HikingTrailStopRemoveAction.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "HikingRight.h"
 #include "Request.h"
 #include "HikingTrailTableSync.h"

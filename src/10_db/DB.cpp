@@ -22,14 +22,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "CoordinatesSystem.hpp"
 #include "DB.hpp"
+
+#include "CoordinatesSystem.hpp"
 #include "DBException.hpp"
+#include "DBInterSYNTHESE.hpp"
 #include "DBModule.h"
 #include "Factory.h"
+#include "InterSYNTHESEContent.hpp"
+#include "InterSYNTHESEModule.hpp"
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
 #include "Log.h"
+#include "ObjectBase.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
@@ -38,6 +43,7 @@
 #include <boost/functional/hash.hpp>
 #endif
 
+using namespace boost;
 using namespace std;
 using boost::shared_ptr;
 using boost::lexical_cast;
@@ -45,8 +51,8 @@ using boost::recursive_mutex;
 
 namespace synthese
 {
-	using util::Log;
-	using util::Factory;
+	using namespace inter_synthese;
+	using namespace util;
 
 	namespace db
 	{
@@ -432,5 +438,107 @@ namespace synthese
 				tableSync->rowsRemoved(this, rowIds);
 			}
 		}
-	}
-}
+
+
+
+		void DB::replaceStmt(
+			ObjectBase& o,
+			optional<DBTransaction&> transaction
+		){
+			// Query
+			DBRecord r(*DBModule::GetTableSync(o.getClassNumber()));
+			if(!o.getKey())
+			{
+				o.setKey(r.getTable()->getNewId());
+			}
+			r.setContent(o.toDBContent());
+
+			replaceStmt(o.getKey(), r, transaction);
+		}
+
+
+
+		void DB::replaceStmt(
+			util::RegistryKeyType id,
+			const DBRecord& r,
+			boost::optional<DBTransaction&> transaction
+		){
+			if(transaction)
+			{
+				transaction->addReplaceStmt(r);
+			}
+			else
+			{
+				saveRecord(r);
+			}
+			addDBModifEvent(
+				DBModifEvent(
+					r.getTable()->getFormat().NAME,
+					MODIF_INSERT,
+					id
+				),
+				transaction
+			);
+
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			checkModificationEvents();
+#endif
+
+			// Inter-SYNTHESE sync
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					DBInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(r.getTable()->getFormat().ID),
+					DBInterSYNTHESE::GetReplaceStmtContent(r)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					transaction
+				);
+			}
+		}
+
+
+
+		void DB::deleteStmt(
+			util::RegistryKeyType objectId,
+			boost::optional<DBTransaction&> transaction
+		){
+			RegistryTableType tableId(
+				decodeTableId(objectId)
+			);
+
+			if(transaction)
+			{
+				transaction->addDeleteStmt(objectId);
+			}
+			else
+			{
+				deleteRow(objectId);
+			}
+			addDBModifEvent(
+				DBModifEvent(
+					DBModule::GetTableSync(tableId)->getFormat().NAME,
+					MODIF_DELETE,
+					objectId
+				),
+				transaction
+			);
+
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			checkModificationEvents();
+#endif
+
+			// Inter-SYNTHESE sync
+			inter_synthese::InterSYNTHESEContent content(
+				DBInterSYNTHESE::FACTORY_KEY,
+				lexical_cast<string>(tableId),
+				DBInterSYNTHESE::GetDeleteStmtContent(objectId)
+			);
+			inter_synthese::InterSYNTHESEModule::Enqueue(
+				content,
+				transaction
+			);
+		}
+}	}

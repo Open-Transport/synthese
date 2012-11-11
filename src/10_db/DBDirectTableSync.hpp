@@ -92,6 +92,16 @@ namespace synthese
 			) const = 0;
 
 
+			typedef std::vector<boost::shared_ptr<util::Registrable> > RegistrableSearchResult;
+
+			virtual RegistrableSearchResult search(
+				const std::string& whereClause,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			) const = 0;
+
+
+
 			virtual const util::RegistryBase& getRegistry(
 				const util::Env& env
 			) const = 0;

@@ -88,6 +88,7 @@ namespace synthese
 		protected:
 			PathGroup*		_pathGroup;	//!< Up link : path group
 			PathClass*		_pathClass;	//!< Up link : path class
+			PathClass*		_pathNetwork;	//!< Up link : path network class
 			Edges			_edges; 	//!< Down link 1 : edges
 			ServiceSet		_services;	//!< Down link 2 : services
 			RankMap			_rankMap;	//!< Saves the first edge at each metric offset
@@ -107,6 +108,7 @@ namespace synthese
 				const Edges&		getEdges()		const { return _edges; }
 				Edges&				getEdges()			  { return _edges; }
 				PathClass*			getPathClass()	const { return _pathClass; }
+				PathClass*                      getPathNetwork()  const { return _pathNetwork; }
 				PathGroup*			getPathGroup()	const { return _pathGroup; }
 			//@}
 

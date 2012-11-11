@@ -132,6 +132,7 @@ namespace synthese
 				ResaModule::_basicProfile->cleanRights();
 				ResaModule::_basicProfile->addRight(r);
 				ProfileTableSync::Save(ResaModule::_basicProfile.get());
+				Log::GetInstance().debug("Basic resa profile checked");
 			}
 
 			// Autoresa profile
@@ -155,6 +156,7 @@ namespace synthese
 				r3->setPublicLevel(FORBIDDEN);
 				ResaModule::_autoresaProfile->addRight(r3);
 				ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
+				Log::GetInstance().debug("Autoresa resa profile checked");
 			}
 		}
 
@@ -164,6 +166,20 @@ namespace synthese
 		{
 			UnregisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER);
 			UnregisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE);
+		}
+
+
+
+		template<> void ModuleClassTemplate<ResaModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<ResaModule>::CloseThread(
+			
+			){
 		}
 	}
 
@@ -348,7 +364,7 @@ namespace synthese
 
 		void ResaModule::addAdminPageParameters(
 			ParametersMap& map,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			bool buttonIsAllowed(

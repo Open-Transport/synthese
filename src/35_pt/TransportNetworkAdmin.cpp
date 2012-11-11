@@ -40,6 +40,7 @@
 #include "TransportNetwork.h"
 #include "TransportNetworkRight.h"
 #include "TreeFolder.hpp"
+#include "User.h"
 #include "ScheduledService.h"
 #include "SearchFormHTMLTable.h"
 #include "CommercialLineUpdateAction.h"
@@ -111,12 +112,12 @@ namespace synthese
 
 		void TransportNetworkAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			// Search form
 			stream << "<h1>Recherche</h1>";
-			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(_request);
+			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(_request, *this);
 			HTMLForm sortedForm(searchRequest.getHTMLForm("search"));
 
 			getHTMLLineSearchForm(
@@ -154,9 +155,9 @@ namespace synthese
 
 			// Requests
 			AdminFunctionRequest<CommercialLineAdmin> lineOpenRequest(_request);
-			AdminActionFunctionRequest<RemoveObjectAction, TransportNetworkAdmin> lineRemoveRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, TransportNetworkAdmin> lineRemoveRequest(_request, *this);
 			AdminActionFunctionRequest<CommercialLineUpdateAction, CommercialLineAdmin> creationRequest(_request);
-			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
+			creationRequest.setActionFailedPage(getNewCopiedPage());
 			creationRequest.setActionWillCreateObject();
 			creationRequest.getAction()->setNetwork(
 				Env::GetOfficialEnv().getEditableSPtr(const_cast<TransportNetwork*>(getNodeRoot()))
@@ -215,7 +216,7 @@ namespace synthese
 				const TransportNetwork& network(*getRoot());
 
 				// Update request
-				AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setNetwork(
 					Env::GetOfficialEnv().getEditableSPtr(const_cast<TransportNetwork*>(getRoot()))
 				);
@@ -302,7 +303,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

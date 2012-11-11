@@ -118,7 +118,7 @@ namespace synthese
 		void BaseReservationActionAdmin::displayReservationForm(
 			std::ostream& stream,
 			html::HTMLForm& rf,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			HTMLTable rt(2,"propertysheet");
 

@@ -42,13 +42,13 @@
 
 #ifndef UNIX
 #include <geos/util/math.h>
+using namespace geos::util;
 #endif
 #include <sstream>
 #include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace geos::geom;
-using namespace geos::util;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::algorithm;
@@ -481,9 +481,9 @@ namespace synthese
 		//Sort stopPoint by distance to bbox,or by code operator.Sort by code operator is applied by default. 
 		StopPointsListFunction::SortableStopPoint::SortableStopPoint(const StopPoint * sp, int distanceToBboxCenter, bool isSortByDistanceToBboxCenter):
 			_sp(sp),
+			_opCode(_sp->getCodeBySources(), false),
 			_distanceToBboxCenter(distanceToBboxCenter),
-			_isSortByDistanceToBboxCenter(isSortByDistanceToBboxCenter),
-			_opCode(_sp->getCodeBySources(), false)
+			_isSortByDistanceToBboxCenter(isSortByDistanceToBboxCenter)
 		{
 		}
 

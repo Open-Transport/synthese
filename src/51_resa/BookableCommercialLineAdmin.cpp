@@ -81,7 +81,7 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace pt;
-	using namespace pt_operation;
+	using namespace vehicle;
 
 	namespace util
 	{
@@ -191,7 +191,7 @@ namespace synthese
 
 		void BookableCommercialLineAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -200,24 +200,24 @@ namespace synthese
 			{
 				// Rights
 				bool globalReadRight(
-					_request.isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
+					_request.getUser()->getProfile()->isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
 				);
 				bool globalDeleteRight(
-					_request.isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
+					_request.getUser()->getProfile()->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
 				);
 
 				// Requests
-				AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request);
+				AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request, *this);
 
-				AdminActionFunctionRequest<CancelReservationAction,BookableCommercialLineAdmin> cancelRequest(_request);
+				AdminActionFunctionRequest<CancelReservationAction,BookableCommercialLineAdmin> cancelRequest(_request, *this);
 
 				AdminFunctionRequest<ResaCustomerAdmin> customerRequest(_request);
 
-				AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request);
+				AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request, *this);
 
 				AdminFunctionRequest<ReservationAdmin> openReservationRequest(_request);
 
-				AdminActionFunctionRequest<ReservationUpdateAction, BookableCommercialLineAdmin> vehicleUpdateRquest(_request);
+				AdminActionFunctionRequest<ReservationUpdateAction, BookableCommercialLineAdmin> vehicleUpdateRquest(_request, *this);
 
 				// Local variables
 				ptime now(second_clock::local_time());
@@ -791,7 +791,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			const BookableCommercialLineAdmin* ba(
 				dynamic_cast<const BookableCommercialLineAdmin*>(&currentPage)
@@ -836,7 +836,7 @@ namespace synthese
 
 
 
-		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
+		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const server::Request& request ) const
 		{
 			if(!_line.get())
 			{
@@ -844,7 +844,7 @@ namespace synthese
 			}
 
 			return
-				request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()))
+				request.getUser()->getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()))
 			;
 		}
 

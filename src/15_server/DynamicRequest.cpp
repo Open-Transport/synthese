@@ -28,10 +28,13 @@
 #include "Function.h"
 #include "HTTPRequest.hpp"
 #include "RequestException.h"
+#include "ServerConstants.h"
+#include "Session.h"
 #include "SessionException.h"
 #include "User.h"
 #include "UserException.h"
 #include "UserTableSync.h"
+#include "WebPageDisplayFunction.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -40,6 +43,8 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace cms;
+	
 	namespace server
 	{
 		using namespace util;
@@ -219,7 +224,6 @@ namespace synthese
 			}
 
 			// Parameters
-			bool multipart(false);
 			it = httpRequest.headers.find("Content-Type");
 			if(it != httpRequest.headers.end())
 			{
@@ -232,23 +236,55 @@ namespace synthese
 					split(parts1, parts[1], is_any_of("="));
 					if(parts1.size() >= 2)
 					{
-						multipart = true;
 						_getPostParametersMap = ParametersMap(
 							httpRequest.postData,
 							parts1[1]
 						);
 					}
 				}
-			}
-			if(!multipart)
-			{
-				_getPostParametersMap = ParametersMap(httpRequest.postData);
+				else if(
+					parts.size() >= 1 &&
+					trim_copy(parts[0]) == "application/x-www-form-urlencoded"
+				){
+					_getPostParametersMap = ParametersMap(httpRequest.postData);
+				}
+				else
+				{
+					if(	parts.size() >= 1)
+					{
+						_getPostParametersMap.insert(
+							PARAMETER_POST_DATA_MIME_TYPE,
+							trim_copy(parts[0])
+						);
+					}
+					if(parts.size() >= 2)
+					{
+						vector<string> parts1;
+						split(parts1, parts[1], is_any_of("="));
+						if(parts1.size() >= 2 &&
+							trim_copy(parts1[0]) == "charset"
+						){
+							_getPostParametersMap.insert(
+								PARAMETER_POST_DATA_CHARSET,
+								parts1[1]
+							);
+						}
+					}
+					_getPostParametersMap.insert(
+						PARAMETER_POST_DATA,
+						httpRequest.postData
+					);
+				}
 			}
 			if(separator+1 < uri.length())
 			{
 				ParametersMap getMap(uri.substr(separator+1));
 				_getPostParametersMap.merge(getMap);
 			}
+			_getPostParametersMap.insert(
+				PARAMETER_CLIENT_ADDRESS,
+				httpRequest.ipaddr
+			);
 
 			// Cookies
 			_allParametersMap = _getPostParametersMap;
@@ -325,13 +361,13 @@ namespace synthese
 			}
 			if(functionName.empty() && _redirectAfterAction && !_clientURL.empty())
 			{
-				functionName = "page";
+				functionName = WebPageDisplayFunction::FACTORY_KEY;
 				_getPostParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
 				_allParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
-				_getPostParametersMap.insert("smart_url", _clientURL);
-				_getPostParametersMap.insert("host_name", _hostName);
-				_allParametersMap.insert("smart_url", _clientURL);
-				_allParametersMap.insert("host_name", _hostName);
+				_getPostParametersMap.insert(WebPageDisplayFunction::PARAMETER_SMART_URL, _clientURL);
+				_getPostParametersMap.insert(WebPageDisplayFunction::PARAMETER_HOST_NAME, _hostName);
+				_allParametersMap.insert(WebPageDisplayFunction::PARAMETER_SMART_URL, _clientURL);
+				_allParametersMap.insert(WebPageDisplayFunction::PARAMETER_HOST_NAME, _hostName);
 			}
 			if(!functionName.empty())
 			{

@@ -1,6 +1,6 @@
 
-/** CreateDisplayScreenAction class implementation.
-	@file CreateDisplayScreenAction.cpp
+/** DBLogPurgeAction class implementation.
+	@file DBLogPurgeAction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -21,11 +21,15 @@
 */
 
 #include "DBLogPurgeAction.h"
-#include "DBLog.h"
-#include "DBLogRight.h"
-#include "Request.h"
-#include "DBLogEntryTableSync.h"
+
 #include "ActionException.h"
+#include "DBLog.h"
+#include "DBLogEntryTableSync.h"
+#include "DBLogRight.h"
+#include "Profile.h"
+#include "Request.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

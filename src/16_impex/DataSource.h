@@ -26,8 +26,10 @@
 #ifndef SYNTHESE_DataSource_h__
 #define SYNTHESE_DataSource_h__
 
+#include "PointerField.hpp"
 #include "Registrable.h"
 #include "Registry.h"
+#include "PointersVectorField.hpp"
 
 #include <vector>
 #include <string>
@@ -62,9 +64,16 @@ namespace synthese
 		/// Sources with automated import refer to a FileFormat instance.
 		///
 		class DataSource:
-			public virtual util::Registrable
+			public virtual util::Registrable,
+			public PointerField<DataSource, DataSource>
 		{
 		public:
+			struct Vector:
+				public PointersVectorField<Vector, DataSource>
+			{
+
+			};
+
 			typedef util::Registry<DataSource> Registry;
 			static const util::RegistryTableType CLASS_NUMBER;
 

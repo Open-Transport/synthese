@@ -22,6 +22,8 @@
 #include "UserTableSync.h"
 
 #include "Conversion.h"
+#include "DataSourceLinksField.hpp"
+#include "DateField.hpp"
 #include "ImportableTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"
@@ -33,6 +35,7 @@
 #include "User.h"
 #include "SecurityRight.h"
 #include "SecurityLog.h"
+#include "Session.h"
 
 #include <sstream>
 
@@ -97,7 +100,7 @@ namespace synthese
 			Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
 			Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
 			Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
-			Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
+			Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_BOOLEAN),
 			Field(UserTableSync::COL_BIRTH_DATE, SQL_DATETIME),
 			Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
 			Field(UserTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
@@ -195,6 +198,10 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Unlink(
 			User* obj
 		){
+			if(Env::GetOfficialEnv().contains(*obj))
+			{
+				obj->cleanDataSourceLinks(true);
+			}
 		}
 
 
@@ -217,12 +224,11 @@ namespace synthese
 			query.addField(user->getEMail());
 			query.addField(user->getPhone());
 			query.addField(user->getConnectionAllowed());
-			query.addField(user->getBirthDate());
+			query.addFrameworkField<DateField>(user->getBirthDate());
 			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
 			query.addField(
 				DataSourceLinks::Serialize(
-					user->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					user->getDataSourceLinks()
 			)	);
 			query.addField(user->getSVNUsername());
 			query.addField(user->getSVNPassword());

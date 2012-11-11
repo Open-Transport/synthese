@@ -24,10 +24,12 @@
 
 #include "VehicleServicesListService.hpp"
 
+#include "DateField.hpp"
 #include "MimeTypes.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "SchedulesBasedService.h"
+#include "StringField.hpp"
 #include "VehicleService.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -35,6 +37,7 @@
 using namespace boost;
 using namespace std;
 using namespace boost::algorithm;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -75,11 +78,11 @@ namespace synthese
 
 			if(!_date.is_not_a_date())
 			{
-				Date::SaveToParametersMap(_date, map);
+				map.insert(Date::FIELD.name, Date::DateToString(_date));
 			}
 			if(!_name.empty())
 			{
-				Name::SaveToParametersMap(_name, map);
+				map.insert(Name::FIELD.name, _name);
 			}
 			return map;
 		}
@@ -89,7 +92,10 @@ namespace synthese
 		void VehicleServicesListService::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Date
-			Date::LoadFromRecord(_date, map);
+			if(!map.getDefault<string>(Date::FIELD.name).empty())
+			{
+				_date = from_string(map.get<string>(Date::FIELD.name));
+			}
 
 			// Page
 			_page = getPage(map.getDefault<string>(PARAMETER_PAGE));
@@ -101,7 +107,7 @@ namespace synthese
 			}
 
 			// Name
-			Name::LoadFromRecord(_name, map);
+			_name = map.getDefault<string>(Name::FIELD.name);
 		}
 
 

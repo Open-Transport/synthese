@@ -22,7 +22,6 @@
 
 #include "DriverActivityTableSync.hpp"
 
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 
 #include <sstream>
@@ -93,12 +92,7 @@ namespace synthese
 			DriverActivity* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<DriverActivityTableSync> query(*object);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			object->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

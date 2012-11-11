@@ -37,6 +37,7 @@
 #include "10_db/102_mysql/MySQLException.hpp"
 #endif
 
+#include <boost/thread.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
@@ -98,6 +99,8 @@ public:
 	virtual void setUpDb() const
 	{
 		boost::filesystem::remove(_dbPath);
+
+		DBModule::SetConnectionString(getConnectionString());
 	}
 };
 
@@ -188,6 +191,8 @@ public:
 
 		DBModule::GetDB()->execUpdate("DROP DATABASE IF EXISTS " + _dbName);
 		DBModule::GetDB()->execUpdate("CREATE DATABASE " + _dbName);
+
+		DBModule::GetDB()->initPreparedStatements();
 	}
 };
 
@@ -209,7 +214,9 @@ template <class K>
 class DBDummyTableSyncTemplate : public db::DBTableSyncTemplate<K>
 {
 public:
-	void rowsAdded(
+	 virtual synthese::FieldsList getFieldsList() const { return synthese::FieldsList(); }
+
+	 void rowsAdded(
 		db::DB* db,
 		const db::DBResultSPtr& rows
 	) {};

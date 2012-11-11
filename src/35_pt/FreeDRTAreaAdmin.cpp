@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "FreeDRTAreaAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "StaticActionRequest.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AjaxVectorFieldEditor.hpp"
@@ -120,7 +123,7 @@ namespace synthese
 
 		void FreeDRTAreaAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -220,7 +223,7 @@ namespace synthese
 
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<FreeDRTAreaUpdateAction, FreeDRTAreaAdmin> updateRequest(request);
+				AdminActionFunctionRequest<FreeDRTAreaUpdateAction, FreeDRTAreaAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setArea(const_pointer_cast<FreeDRTArea>(_area));
 
 				PropertiesHTMLTable propertiesTable(
@@ -239,10 +242,10 @@ namespace synthese
 			{
 				// Declarations
 				AdminFunctionRequest<FreeDRTTimeSlotAdmin> openRequest(request);
-				AdminActionFunctionRequest<RemoveObjectAction, FreeDRTAreaAdmin> removeRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, FreeDRTAreaAdmin> removeRequest(request, *this);
 
 				// Search for services
-				AdminFunctionRequest<FreeDRTAreaAdmin> searchRequest(request);
+				AdminFunctionRequest<FreeDRTAreaAdmin> searchRequest(request, *this);
 				FreeDRTTimeSlotTableSync::SearchResult services(
 					FreeDRTTimeSlotTableSync::Search(
 						Env::GetOfficialEnv(),
@@ -337,7 +340,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks FreeDRTAreaAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

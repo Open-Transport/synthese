@@ -16,12 +16,16 @@ DBInheritanceTableSyncTemplate.hpp
 DBInheritedNoSyncTableSyncTemplate.hpp
 DBInheritedRegistryTableSync.hpp
 DBInheritedTableSyncTemplate.hpp
+DBInterSYNTHESE.cpp
+DBInterSYNTHESE.hpp
 DBModule.cpp
 DBModule.gen.cpp
 DBModuleRegister.cpp
 DBModule.h
 DBModule.inc.cpp
 DBNoSyncTableSyncTemplate.hpp
+DBRecord.cpp
+DBRecord.hpp
 DBRegistryTableSyncTemplate.hpp
 DBResult.cpp
 DBResult.hpp
@@ -48,8 +52,12 @@ SelectQuery.hpp
 spatial_ref_sys_sql.inc.h
 SQLExpression.cpp
 SQLExpression.hpp
+SQLService.cpp
+SQLService.hpp
 SQLSingleOperatorExpression.cpp
 SQLSingleOperatorExpression.hpp
+TablesViewService.cpp
+TablesViewService.hpp
 UpdateQuery.cpp
 UpdateQuery.hpp
 )
@@ -67,6 +75,7 @@ target_link_libraries(10_db
   10_db_sqlite
   # Forward dependencies:
   #15_server
+  19_inter_synthese
   spatialite
 )
 

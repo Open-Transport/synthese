@@ -27,7 +27,6 @@
 
 #include "FactorableTemplate.h"
 #include "FunctionWithSite.h"
-#include "StandardFields.hpp"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 

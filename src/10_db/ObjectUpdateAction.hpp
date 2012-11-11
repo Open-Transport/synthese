@@ -29,6 +29,8 @@
 #include "FactorableTemplate.h"
 #include "ParametersMap.h"
 
+#include <boost/logic/tribool.hpp>
+
 namespace synthese
 {
 	class ObjectBase;
@@ -112,7 +114,7 @@ namespace synthese
 				template<class C>
 				void set(const typename C::Type& value)
 				{
-					C::SaveToParametersMap(value, _values, PARAMETER_FIELD_PREFIX);
+					C::SaveToParametersMap(value, *_object, _values, PARAMETER_FIELD_PREFIX, boost::logic::indeterminate);
 				}
 
 				/// All parameters version
@@ -121,7 +123,7 @@ namespace synthese
 					const typename C::Type& value,
 					const ObjectBase& object
 				){
-					C::SaveToParametersMap(value, object, _values, PARAMETER_FIELD_PREFIX);
+					C::SaveToParametersMap(value, object, _values, PARAMETER_FIELD_PREFIX, boost::logic::indeterminate);
 				}
 			//@}
 

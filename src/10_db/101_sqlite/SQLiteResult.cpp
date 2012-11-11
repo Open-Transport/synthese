@@ -103,10 +103,15 @@ namespace synthese
 		std::string SQLiteResult::getText(int column) const
 		{
 			ensurePosition();
-			const unsigned char* text = sqlite3_column_text(_statement, column);
-			if (!text)
-				return "";
-			return std::string(reinterpret_cast<const char*>(text));
+			sqlite3_value* value = sqlite3_column_value(_statement, column);
+			if(!value)
+			{
+				return string();
+			}
+			return string(
+				(char*) sqlite3_value_blob(value),
+				sqlite3_value_bytes(value)
+			);
 		}
 
 

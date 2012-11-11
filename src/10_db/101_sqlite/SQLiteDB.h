@@ -26,6 +26,7 @@
 
 #include "DB.hpp"
 #include "FactorableTemplate.h"
+#include "FrameworkTypes.hpp"
 
 #include <boost/filesystem/path.hpp>
 #include <boost/thread/tss.hpp>
@@ -36,6 +37,7 @@ namespace synthese
 {
 	namespace db
 	{
+		class DBRecord;
 		class DBTableSync;
 
 		typedef struct
@@ -62,6 +64,53 @@ namespace synthese
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			boost::recursive_mutex _updateMutex;
 #endif
+			typedef std::map<boost::thread::id, std::vector<sqlite3_stmt*> > ReplaceStatements; 
+			static ReplaceStatements _replaceStatements;
+			typedef std::map<boost::thread::id, std::vector<sqlite3_stmt*> > DeleteStatements;
+			static DeleteStatements _deleteStatements;
+
+			class DBRecordCellBindConvertor:
+				public boost::static_visitor<>
+			{
+				sqlite3_stmt& _stmt;
+				size_t _i;
+
+			public:
+				DBRecordCellBindConvertor(
+					sqlite3_stmt& stmt,
+					size_t i
+				);
+
+				void operator()(const int& i) const;
+				void operator()(const bool& i) const;
+				void operator()(const double& d) const;
+#ifndef _WINDOWS
+				void operator()(const size_t& s) const;
+#endif
+				void operator()(const util::RegistryKeyType& id) const;
+				void operator()(const boost::optional<std::string>& str) const;
+				void operator()(const boost::optional<Blob>& blob) const;
+			};
+
+			class RequestExecutor:
+				public boost::static_visitor<>
+			{
+				SQLiteDB& _db;
+
+			public:
+				RequestExecutor(
+					SQLiteDB& db
+				);
+
+				/// SQL
+				void operator()(const std::string& d);
+
+				/// Replace
+				void operator()(const DBRecord& r);
+
+				/// Delete
+				void operator()(util::RegistryKeyType id);
+			};
 
 		public:
 
@@ -70,6 +119,14 @@ namespace synthese
 
 			virtual void initForStandaloneUse();
 			virtual void preInit();
+			virtual void initPreparedStatements();
+			virtual void removePreparedStatements();
+			virtual void saveRecord(
+				const DBRecord& record
+			);
+			virtual void deleteRow(
+				util::RegistryKeyType id
+			);
 
 			virtual DBResultSPtr execQuery(const SQLData& sql);
 			virtual void execTransaction(

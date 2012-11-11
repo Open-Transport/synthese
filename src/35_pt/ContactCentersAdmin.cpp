@@ -26,8 +26,10 @@
 
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "ReservationContact.h"
 #include "ContactCenterAdmin.hpp"
 #include "ResultHTMLTable.h"
@@ -94,12 +96,12 @@ namespace synthese
 
 		void ContactCentersAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<ContactCenterAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, ContactCentersAdmin> deleteRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, ContactCentersAdmin> deleteRequest(request, *this);
 
 			AdminActionFunctionRequest<ContactCenterUpdateAction, ContactCenterAdmin> addRequest(request);
 			addRequest.setActionWillCreateObject();
@@ -159,7 +161,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ContactCentersAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -179,7 +181,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ContactCentersAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

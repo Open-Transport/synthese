@@ -24,12 +24,15 @@
 
 #include "ObjectSiteLinkTableSync.h"
 
-#include "SelectQuery.hpp"
-#include "PTServiceConfigTableSync.hpp"
 #include "CityTableSync.h"
+#include "Profile.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "ReplaceQuery.h"
-#include "UtilTypes.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
 #include "TransportWebsiteRight.h"
+#include "User.h"
+#include "UtilTypes.h"
 
 using namespace std;
 using namespace boost;

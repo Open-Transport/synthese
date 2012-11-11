@@ -26,6 +26,7 @@
 #include "AlgorithmLogger.hpp"
 #include "Edge.h"
 #include "HourPeriod.h"
+#include "Session.h"
 #include "MimeTypes.hpp"
 #include "ObjectNotFoundException.h"
 #include "PTServiceConfigTableSync.hpp"
@@ -228,6 +229,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_TICKET_NAME("ticket_name");
 		const string PTJourneyPlannerService::DATA_TICKET_PRICE("ticket_price");
 		const string PTJourneyPlannerService::DATA_TICKET_CURRENCY("ticket_currency");
+		const string PTJourneyPlannerService::DATA_DISTANCE = "distance";
 
 		// Cells
 		const string PTJourneyPlannerService::DATA_ODD_ROW("is_odd_row");
@@ -440,91 +442,111 @@ namespace synthese
 			{
 				/// TODO implement it
 			}
-			else if( // Two fields input
-				map.isDefined(PARAMETER_DEPARTURE_CITY_TEXT) &&
-				map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT) &&
-				map.isDefined(PARAMETER_ARRIVAL_CITY_TEXT) &&
-				map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT)
-			){
-				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
-				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
-				_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
-				_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
-				if(	(	!_originCityText.empty() || !_originPlaceText.empty()) &&
-					(	!_destinationCityText.empty() || !_destinationPlaceText.empty())
+			else
+			{
+				// Departure
+				if( // Two fields input
+					map.isDefined(PARAMETER_DEPARTURE_CITY_TEXT) &&
+					map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT)
 				){
-					if(_originCityText.empty())
+					_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
+					_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
+					if(!_originCityText.empty() || !_originPlaceText.empty())
 					{
-						RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_originPlaceText, 1));
-						if(!results.empty())
+						if(_originCityText.empty())
 						{
-							_departure_place = *results.begin();
-					}	}
-					else
-					{
-						_departure_place = _configuration.get() ?
-							_configuration->extendedFetchPlace(_originCityText, _originPlaceText) :
-							RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
-						;
-					}
-					if(_destinationCityText.empty())
-					{
-						RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_destinationPlaceText, 1));
-						if(!results.empty())
+							RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_originPlaceText, 1));
+							if(!results.empty())
+							{
+								_departure_place = *results.begin();
+						}	}
+						else
 						{
-							_arrival_place = *results.begin();
-					}	}
-					else
-					{
-						_arrival_place = _configuration.get() ?
-							_configuration->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
-							RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
-						;
+							_departure_place = _configuration.get() ?
+								_configuration->extendedFetchPlace(_originCityText, _originPlaceText) :
+								RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
+							;
+						}
 					}
 				}
-			}
-			// One field input
-			else if(
-				map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT) &&
-				map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT)
-			){
-				PlacesListService placesListService;
-				placesListService.setNumber(1);
+				// One field input
+				else if(map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT))
+				{
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
 
-				// Departure
-				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_DEPARTURE_CLASS_FILTER));
-				placesListService.setText(map.get<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
-				_departure_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.runWithoutOutput()
-				);
+					placesListService.setClassFilter(map.getDefault<string>(PARAMETER_DEPARTURE_CLASS_FILTER));
+					placesListService.setText(map.get<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
+					_departure_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
+				// XY input
+				else if(map.isDefined(PARAMETER_DEPARTURE_PLACE_XY))
+				{
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-				// Arrival
-				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_ARRIVAL_CLASS_FILTER));
-				placesListService.setText(map.get<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
-				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.runWithoutOutput()
-				);
-			}
-			// XY input
-			else if(
-				map.isDefined(PARAMETER_DEPARTURE_PLACE_XY) &&
-				map.isDefined(PARAMETER_ARRIVAL_PLACE_XY)
-			){
-				PlacesListService placesListService;
-				placesListService.setNumber(1);
-				placesListService.setCoordinatesSystem(_coordinatesSystem);
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY));
+					_departure_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 
-				// Departure
-				placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY));
-				_departure_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.runWithoutOutput()
-				);
+				// Destination
+				if( // Two fields input
+					map.isDefined(PARAMETER_ARRIVAL_CITY_TEXT) &&
+					map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT)
+				){
+					_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
+					_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
+					if(!_destinationCityText.empty() || !_destinationPlaceText.empty())
+					{
+						if(_destinationCityText.empty())
+						{
+							RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_destinationPlaceText, 1));
+							if(!results.empty())
+							{
+								_arrival_place = *results.begin();
+							}
+						}
+						else
+						{
+							_arrival_place = _configuration.get() ?
+								_configuration->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
+								RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
+							;
+						}
+					}
+				}
+				// One field input
+				else if(map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT))
+				{
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
 
-				// Arrival
-				placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY));
-				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.runWithoutOutput()
-				);
+					// Arrival
+					placesListService.setClassFilter(map.getDefault<string>(PARAMETER_ARRIVAL_CLASS_FILTER));
+					placesListService.setText(map.get<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
+					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
+				// XY input
+				else if(
+					map.isDefined(PARAMETER_DEPARTURE_PLACE_XY) &&
+					map.isDefined(PARAMETER_ARRIVAL_PLACE_XY)
+				){
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
+
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY));
+					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 			}
 
 			// Date parameters
@@ -544,11 +566,11 @@ namespace synthese
 
 					// Time period
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= _configuration->get<Periods>().size())
+					if (_periodId >= _configuration->get<HourPeriods>().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
-					_period = &_configuration->get<Periods>().at(_periodId);
+					_period = &_configuration->get<HourPeriods>().at(_periodId);
 				}
 				// 1abcde : optional bounds specification
 				else
@@ -611,7 +633,8 @@ namespace synthese
 			{
 				_accessParameters = _configuration->getAccessParameters(
 					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
-					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
+					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses(),
+					AccessParameters::AllowedNetworks()
 				);
 			}
 			else
@@ -1249,9 +1272,10 @@ namespace synthese
 			pm.insert(DATA_HANDICAPPED_FILTER, handicappedFilter);
 			pm.insert(DATA_BIKE_FILTER, bikeFilter);
 
-			// CO2 Emissions and Energy consumption
+			// CO2 Emissions, Energy consumption and total distance computation
 			double co2Emissions = 0;
 			double energyConsumption = 0;
+			double totalDistance = 0;
 			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 			{
 				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
@@ -1273,6 +1297,7 @@ namespace synthese
 				{
 					co2Emissions += distance * line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
 					energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+					totalDistance += distance;
 				}
 			}
 			// TODO : set precision outside of PTJourneyPlannerService
@@ -1282,6 +1307,7 @@ namespace synthese
 			cout.unsetf(ios::fixed);
 			pm.insert(DATA_CO2_EMISSIONS, sCO2Emissions.str());
 			pm.insert(DATA_ENERGY_CONSUMPTION, sEnergyConsumption.str());
+			pm.insert(DATA_DISTANCE, totalDistance);
 
 			// Fare calculation
 			typedef pair<vector<FareTicket>,double> Solution;
@@ -1581,7 +1607,7 @@ namespace synthese
 						const ServicePointer& nextLeg(*(it+1));
 						const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
 
-						if (nextRoad && nextRoad->getRoadPlace() == road->getRoadPlace())
+						if (nextRoad && (nextRoad->getRoadPlace() == road->getRoadPlace() || nextRoad->getRoadPlace()->getName() == road->getRoadPlace()->getName()))
 							continue;
 					}
 
@@ -1591,8 +1617,8 @@ namespace synthese
 					vector<shared_ptr<Geometry> > geometriesSPtr;
 					BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
 					{
-						distance += it->getDistance();
-						shared_ptr<LineString> geometry(it->getGeometry());
+						distance += itLeg->getDistance();
+						shared_ptr<LineString> geometry(itLeg->getGeometry());
 						if(geometry.get())
 						{
 							shared_ptr<Geometry> geometryProjected(

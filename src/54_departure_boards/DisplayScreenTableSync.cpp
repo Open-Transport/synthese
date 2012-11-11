@@ -25,23 +25,26 @@
 
 #include "DisplayScreenTableSync.h"
 
-#include "DeparturesTableModule.h"
-#include "DisplayTypeTableSync.h"
-#include "PlaceWithDisplayBoards.hpp"
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
-#include "SQLSingleOperatorExpression.hpp"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
-#include "LineStopTableSync.h"
+#include "DataSourceLinksField.hpp"
+#include "DeparturesTableModule.h"
+#include "DisplayTypeTableSync.h"
 #include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
+#include "PlaceWithDisplayBoards.hpp"
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
+#include "SQLSingleOperatorExpression.hpp"
+#include "User.h"
 #include "StopAreaTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
-#include "JourneyPattern.hpp"
 #include "DBLogEntryTableSync.h"
 #include "SentAlarm.h"
 #include "DisplayScreenCPU.h"
@@ -516,8 +519,7 @@ namespace synthese
 			query.addField(static_cast<int>(object->getSubScreenType()));
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getAllowCanceled());
 			query.execute(transaction);

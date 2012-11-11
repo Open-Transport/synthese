@@ -24,6 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayScreenCPUAdmin.h"
+
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUUpdateAction.h"
 #include "DisplayScreenCPUTableSync.h"
@@ -31,6 +32,7 @@
 #include "DeparturesTableModule.h"
 #include "AdminInterfaceElement.h"
 #include "StaticActionFunctionRequest.h"
+#include "User.h"
 #include "AdminParametersException.h"
 #include "ArrivalDepartureTableRight.h"
 #include "ArrivalDepartureTableLog.h"
@@ -124,14 +126,14 @@ namespace synthese
 
 		void DisplayScreenCPUAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
 			{
-				AdminActionFunctionRequest<DisplayScreenCPUUpdateAction, DisplayScreenCPUAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenCPUUpdateAction, DisplayScreenCPUAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setCPU(_cpu->getKey());
 
 				stream << "<h1>Propriétés</h1>";
@@ -151,11 +153,11 @@ namespace synthese
 			if (openTabContent(stream, TAB_MAINTENANCE))
 			{
 				// Update action
-				AdminActionFunctionRequest<DisplayScreenCPUMaintenanceUpdateAction,DisplayScreenCPUAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenCPUMaintenanceUpdateAction,DisplayScreenCPUAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setCPU(_cpu->getKey());
 
 				// Log search
-				AdminFunctionRequest<DisplayScreenCPUAdmin> searchRequest(_request);
+				AdminFunctionRequest<DisplayScreenCPUAdmin> searchRequest(_request, *this);
 
 				stream << "<h1>Paramètres de maintenance</h1>";
 
@@ -302,7 +304,7 @@ namespace synthese
 			// LOG TAB
 			if (openTabContent(stream, TAB_LOG))
 			{
-				_generalLogView.display(stream,	AdminRequest(_request, true));
+				_generalLogView.display(stream,	_request);
 			}
 			closeTabContent(stream);
 		}
@@ -369,7 +371,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPages( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
+		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::Request& request ) const
 		{
 			AdminInterfaceElement::PageLinks links;
 

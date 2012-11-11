@@ -84,7 +84,7 @@ namespace synthese
 		bool OSMFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
 			std::ostream& stream,
-			boost::optional<const admin::AdminRequest&> request
+			boost::optional<const server::Request&> request
 		) const {
 			NetworkPtr network;
 			boost::filesystem::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
@@ -488,7 +488,7 @@ namespace synthese
 
 		void OSMFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 			PropertiesHTMLTable t(reloadRequest.getHTMLForm());

@@ -26,6 +26,7 @@
 #include "DBModule.h"
 #include "LinkException.h"
 #include "DataSource.h"
+#include "DataSourceLinksField.hpp"
 #include "DataSourceTableSync.h"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
@@ -131,11 +132,10 @@ namespace synthese
 			ReplaceQuery<HouseTableSync> query(*object);
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getRoad()->getRoadPlace()->getKey() : RegistryKeyType(0));
-			query.addField(object->getHouseNumber() ? *(object->getHouseNumber()) : 0);
+			query.addField(object->getHouseNumber() ? static_cast<int>(*(object->getHouseNumber())) : 0);
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}

@@ -1,0 +1,48 @@
+set_source_groups()
+
+set(inter_synthese_SRCS
+InterSYNTHESEConfig.cpp
+InterSYNTHESEConfig.hpp
+InterSYNTHESEConfigTableSync.cpp
+InterSYNTHESEConfigTableSync.hpp
+InterSYNTHESEConfigItem.cpp
+InterSYNTHESEConfigItem.hpp
+InterSYNTHESEConfigItemTableSync.cpp
+InterSYNTHESEConfigItemTableSync.hpp
+InterSYNTHESEConfigsViewService.cpp
+InterSYNTHESEConfigsViewService.hpp
+InterSYNTHESEContent.cpp
+InterSYNTHESEContent.hpp
+InterSYNTHESEModule.cpp
+InterSYNTHESEModule.hpp
+InterSYNTHESEModule.gen.cpp
+InterSYNTHESEModule.inc.cpp
+InterSYNTHESEModuleRegister.cpp
+InterSYNTHESEQueue.cpp
+InterSYNTHESEQueue.hpp
+InterSYNTHESEQueueTableSync.cpp
+InterSYNTHESEQueueTableSync.hpp
+InterSYNTHESESlave.cpp
+InterSYNTHESESlave.hpp
+InterSYNTHESESlavesViewService.cpp
+InterSYNTHESESlavesViewService.hpp
+InterSYNTHESESlaveUpdateService.cpp
+InterSYNTHESESlaveUpdateService.hpp
+InterSYNTHESESlaveTableSync.cpp
+InterSYNTHESESlaveTableSync.hpp
+InterSYNTHESESyncTypeFactory.cpp
+InterSYNTHESESyncTypeFactory.hpp
+InterSYNTHESEUpdateAckService.cpp
+InterSYNTHESEUpdateAckService.hpp
+)
+
+set_source_files_properties(InterSYNTHESEModule.gen.cpp InterSYNTHESEModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
+
+add_library(19_inter_synthese ${inter_synthese_SRCS})
+
+target_link_libraries(19_inter_synthese
+  01_util
+  # 15_server
+)
+
+install(TARGETS 19_inter_synthese DESTINATION lib)

@@ -22,10 +22,12 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "SetSessionVariableAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "SetSessionVariableAction.hpp"
 #include "Request.h"
+#include "Session.h"
 
 using namespace std;
 

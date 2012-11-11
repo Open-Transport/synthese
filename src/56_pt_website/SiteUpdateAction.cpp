@@ -26,8 +26,11 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTServiceConfigTableSync.hpp"
+#include "Session.h"
 #include "TransportWebsiteRight.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost::gregorian;

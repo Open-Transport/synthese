@@ -38,6 +38,7 @@
 #include "PTServiceConfigTableSync.hpp"
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
+#include <geos/geom/LineString.h>
 
 #ifndef UNIX
 #include <geos/util/math.h>
@@ -110,7 +111,9 @@ namespace synthese
 			_coordinatesSystem(NULL),
 			_config(NULL),
 			_maxDistance(300)
-		{}
+		{
+			 _houseMap = new HouseMapType();
+		}
 
 
 
@@ -301,9 +304,6 @@ namespace synthese
 
 			if(!_coordinatesXY.empty())
 			{
-				// House map
-				HouseMapType houseMap;
-
 				//Best place, which is near the originPoint
 				shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
 				RoadChunkTableSync::SearchResult  roadChunks = RoadChunkTableSync::SearchByMaxDistance(
@@ -318,6 +318,10 @@ namespace synthese
 					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
 					MainRoadChunk::HouseNumber houseNumber(0);
 
+					// If road doesn't have a name, avoid return it.
+					if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
+						continue;
+
 					if(chunk.getLeftHouseNumberBounds() && chunk.getLeftHouseNumberBounds()->first != 0)
 					{
 						houseNumber = chunk.getLeftHouseNumberBounds()->first;
@@ -326,25 +330,33 @@ namespace synthese
 					{
 						houseNumber = chunk.getRightHouseNumberBounds()->first;
 					}
+					else if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
+						continue;
 
 					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
-					addHouse(houseMap, house);
 
+					string name;
+					if(houseNumber == 0)
+						name = chunk.getRoad()->getRoadPlace()->getName();
+					else
+						name = (house.get())->getName();
+
+					if(name == "")continue;
+
+					addHouse(&_houseMap,house, name);
 				}
 
 				// Best place
-				if(!houseMap.empty())
+				if(!_houseMap->empty())
 				{
 					int nbResult = 0;
 					vector<lexical_matcher::LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit > houseList, roadList;
-					vector<int> distanceHouseList, distanceRoadList;
+					vector<int> distanceHouseList;
 					set<string> insertedRoadName;
 
-					BOOST_FOREACH(const HouseMapType::value_type& it, houseMap)
+					BOOST_FOREACH(const HouseMapType::value_type& it, (*_houseMap))
 					{
 						shared_ptr<House> house = it.second;
-
-						PlacesListService*  placesListService = new PlacesListService();
 
 						if(house.get())
 						{
@@ -352,31 +364,25 @@ namespace synthese
 							if(*(house.get())->getHouseNumber() == 0)
 							{
 								//Don't insert same road twice
-								set<string>::iterator frenchIt = insertedRoadName.find((house.get())->getName());
+								string roadName = (house.get())->getRoadChunk()->getRoad()->getRoadPlace()->getName();
+								set<string>::iterator frenchIt = insertedRoadName.find(roadName);
 								if(frenchIt == insertedRoadName.end())
 								{
-									shared_ptr<ParametersMap> pm(new ParametersMap);
-
-									const City* city = (house.get())->getCity();
-									if(city)
-									{
-										LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult roadResult;
-
-										roadResult = city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
-											(house.get())->getName(),
-											1
-										);
-										if(!roadResult.empty())
-										{										
-											insertedRoadName.insert((house.get())->getName());
-											distanceRoadList.push_back(it.first.getDistanceToOriginPoint());
-											//Hack : levenstein and score are used to order results, so we change them to order by distance										
-											roadResult[0].score.levenshtein = it.first.getDistanceToOriginPoint();
-											roadResult[0].score.phoneticScore = 1;
-											roadList.push_back(roadResult[0]);
-											nbResult++;
-										}
-									}
+									LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit roadResult;
+									insertedRoadName.insert(roadName);
+									roadResult.key = roadName;
+									FrenchSentence::ComparisonScore score;
+									int distanceToOrigin = it.first.getDistanceToOriginPoint();
+									//Hack : levenstein and score are used to order results, so we change them to order by distance
+									score.levenshtein = distanceToOrigin;
+									score.phoneticScore = 1;
+									distanceHouseList.push_back(distanceToOrigin);
+									roadResult.score = score;
+									roadResult.value = dynamic_pointer_cast<NamedPlace,House>(house);
+									//Avoid house name like 0, xxx
+									house->setName(roadName);
+									houseList.push_back(roadResult);
+									nbResult++;
 								}
 							}
 							else
@@ -386,12 +392,13 @@ namespace synthese
 								houseResult.key = (house.get())->getName();
 								FrenchSentence::ComparisonScore score;
 								//Hack : levenstein and score are used to order results, so we change them to order by distance	
-								score.levenshtein = it.first.getDistanceToOriginPoint();
+								int distanceToOrigin = it.first.getDistanceToOriginPoint();
+								score.levenshtein = distanceToOrigin;
 								score.phoneticScore = 1;
 								houseResult.score = score;
 								houseResult.value = dynamic_pointer_cast<NamedPlace,House>(house);
 
-								distanceHouseList.push_back(it.first.getDistanceToOriginPoint());
+								distanceHouseList.push_back(distanceToOrigin);
 								houseList.push_back(houseResult);
 
 								nbResult++;
@@ -404,19 +411,6 @@ namespace synthese
 						}
 					}
 
-					if (!roadList.empty())
-					{
-						// Registration
-						shared_ptr<ParametersMap> pm(new ParametersMap);
-						_registerItems<NamedPlace>(
-							*pm,
-							roadList,
-							&distanceRoadList
-						);
-						
-						//Roads
-						result.insert(DATA_ROADS, pm);
-					}
 					if (!houseList.empty())
 					{
 						// Registration
@@ -1162,11 +1156,17 @@ namespace synthese
 							itemMap->get<RegistryKeyType>(
 								House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID
 					)	)	);
-					placeResult.value = static_pointer_cast<Place, House>(
-						roadPlace->getHouse(
-						itemMap->get<MainRoadChunk::HouseNumber>(
-								House::DATA_NUMBER
-					)	)	);
+					MainRoadChunk::HouseNumber houseNumber = itemMap->get<MainRoadChunk::HouseNumber>(House::DATA_NUMBER);
+					if(houseNumber != 0)
+					{
+						placeResult.value = static_pointer_cast<Place, House>(
+							roadPlace->getHouse(houseNumber)
+						);
+					}
+					else
+					{
+						placeResult.value = _houseMap->begin()->second;	
+					}
 				}
 			}
 
@@ -1174,15 +1174,16 @@ namespace synthese
 		}
 
 		//Sort house by distance to originPoint
-		PlacesListService::SortHouseByDistanceToOriginPoint::SortHouseByDistanceToOriginPoint(const House * house, int distanceToOriginPoint):
+		PlacesListService::SortHouseByDistanceToOriginPoint::SortHouseByDistanceToOriginPoint(const House * house, int distanceToOriginPoint, string name):
 			_house(house),
-			_distanceToOriginPoint(distanceToOriginPoint)
+			_distanceToOriginPoint(distanceToOriginPoint),
+			_name(name)
 		{
 		}
 
 		bool PlacesListService::SortHouseByDistanceToOriginPoint::operator<(SortHouseByDistanceToOriginPoint const &otherHouse) const
 		{
-			return _distanceToOriginPoint < otherHouse.getDistanceToOriginPoint();
+			return (_distanceToOriginPoint == otherHouse.getDistanceToOriginPoint() )? _name <  otherHouse.getName() :_distanceToOriginPoint < otherHouse.getDistanceToOriginPoint();
 		}
 
 		int PlacesListService::SortHouseByDistanceToOriginPoint::getDistanceToOriginPoint() const
@@ -1202,12 +1203,12 @@ namespace synthese
 
 			if(_originPoint && house.get())
 			{
-				shared_ptr<Point> gp = (house.get())->getGeometry();
+				shared_ptr<LineString> gp = (house.get())->getRoadChunk()->getGeometry();
 				shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
 
 				if(gp.get())
 				{
-					distanceToOriginPoint = sqrt(pow((gp->getX()-originPoint->getX()), 2) + pow((gp->getY()-originPoint->getY()), 2));
+					distanceToOriginPoint = gp->distance(originPoint.get());
 				}
 			}
 
@@ -1216,13 +1217,14 @@ namespace synthese
 		}
 
 		void PlacesListService::addHouse(
-				HouseMapType & houseMap,
-				const shared_ptr<House> & house
+				HouseMapType* const* houseMap,
+				const shared_ptr<House> & house,
+				string name
 			) const {
 
 			int distanceToOriginPoint = CalcDistanceToOriginPoint(house);
-			SortHouseByDistanceToOriginPoint keyHouse(house.get(), distanceToOriginPoint);
-			houseMap[keyHouse] = house;
+			SortHouseByDistanceToOriginPoint keyHouse(house.get(), distanceToOriginPoint, name);
+			(*houseMap)->insert(pair<const SortHouseByDistanceToOriginPoint,const shared_ptr<House> >(keyHouse,house));
 		}
 
 		void PlacesListService::_parseCoordinates() {

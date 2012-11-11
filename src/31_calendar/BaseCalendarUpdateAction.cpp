@@ -21,12 +21,17 @@
 */
 
 #include "BaseCalendarUpdateAction.hpp"
+
 #include "ActionException.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
 #include "DeleteQuery.hpp"
 #include "CalendarLinkTableSync.hpp"
 #include "CalendarLink.hpp"
+#include "Profile.h"
+#include "Request.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

@@ -23,7 +23,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "UserUpdateAction.h"
+
+#include "Profile.h"
 #include "SecurityRight.h"
+#include "Session.h"
 #include "UserTableSync.h"
 #include "ProfileTableSync.h"
 #include "ActionException.h"

@@ -23,12 +23,13 @@
 #ifndef SYNTHESE__Object_hpp__
 #define SYNTHESE__Object_hpp__
 
-#include "SimpleObjectField.hpp"
-#include "UtilTypes.h"
 #include "ObjectBase.hpp"
+#include "PointerField.hpp"
+
+#include "NumericField.hpp"
 #include "ParametersMap.h"
-#include "SchemaMacros.hpp"
-#include "StandardFields.hpp"
+#include "PointersVectorField.hpp"
+#include "UtilTypes.h"
 
 #include <string>
 #include <boost/fusion/container/map.hpp>
@@ -40,6 +41,7 @@
 #include <boost/fusion/include/map_fwd.hpp>
 #include <boost/fusion/include/prior.hpp>
 #include <boost/fusion/include/end.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -78,10 +80,17 @@ namespace synthese
 	template<class ObjectClass_, class Schema_>
 	class Object:
 		public ObjectBase,
-		public ObjectField<ObjectClass_, boost::optional<ObjectClass_&> >
+		public PointerField<ObjectClass_, ObjectClass_>
 	{
 	public:
-/*		template<class R>
+
+		struct Vector:
+			public PointersVectorField<Vector, ObjectClass_>
+		{
+
+		};
+
+	/*		template<class R>
 		struct GetFieldStruct
 		{
 			void operator()(FieldsList& l)
@@ -239,6 +248,13 @@ namespace synthese
 
 
 		//////////////////////////////////////////////////////////////////////////
+		/// Exports the content of the object into a DBContent object (to be stored in
+		/// the database).
+		virtual DBContent toDBContent() const;
+
+
+
+		//////////////////////////////////////////////////////////////////////////
 		/// Exports the content of the object into a FilesMap object (fields to store as files only).
 		/// @param map the FilesMap to fill
 		virtual void toFilesMap(
@@ -286,8 +302,8 @@ namespace synthese
 				Object<ObjectClass_, Schema_>& object,
 				const util::Env& env
 			):	_record(record),
-				_object(object),
-				_env(env)
+				_env(env),
+				_object(object)
 			{}
 
 			template <typename Pair>
@@ -334,6 +350,33 @@ namespace synthese
 
 
 		//////////////////////////////////////////////////////////////////////////
+		/// Operator which saves the object content to a cell.
+		struct ToDBContentOperator
+		{
+			DBContent& _content;
+			const Object<ObjectClass_, Schema_>& _object;
+
+			ToDBContentOperator(
+				DBContent& content,
+				const Object<ObjectClass_, Schema_>& object
+			):	_content(content),
+				_object(object)
+			{}
+
+			template <typename Pair>
+			void operator()(Pair& data) const
+			{
+				Pair::first_type::SaveToDBContent(
+					data.second,
+					static_cast<const ObjectBase&>(_object),
+					_content
+				);
+			}
+		};
+
+
+
+		//////////////////////////////////////////////////////////////////////////
 		/// Saves the object content into a parameters map
 		struct SaveFileOperator
 		{
@@ -363,13 +406,13 @@ namespace synthese
 		struct DynamicGetOperator
 		{
 			const std::string& _fieldKey;
-			mutable const void* & _result;
+			const void* & _result;
 
 			DynamicGetOperator(
 				const void* & result,
 				const std::string& fieldKey
-			):	_result(result),
-				_fieldKey(fieldKey)
+			):	_fieldKey(fieldKey),
+				_result(result)
 			{}
 
 			template <typename Pair>
@@ -399,8 +442,8 @@ namespace synthese
 			DynamicSetOperator(
 				const void* value,
 				const std::string& fieldKey
-			):	_value(value),
-				_fieldKey(fieldKey)
+			):	_fieldKey(fieldKey),
+				_value(value)
 			{}
 
 			template <typename Pair>
@@ -414,6 +457,17 @@ namespace synthese
 			}
 		};
 	};
+
+
+
+	template<class ObjectClass_, class Schema_>
+	DBContent synthese::Object<ObjectClass_, Schema_>::toDBContent() const
+	{
+		DBContent result;
+		ToDBContentOperator op(result, *this);
+		boost::fusion::for_each(_schema, op);
+		return result;
+	}
 
 
 

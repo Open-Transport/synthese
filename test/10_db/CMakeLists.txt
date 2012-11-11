@@ -10,16 +10,21 @@ include_directories("${PROJECT_SOURCE_DIR}/src/12_security")
 include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
+include_directories("${PROJECT_SOURCE_DIR}/src/19_inter_synthese")
 
 set(DEPS
-  59_road_journey_planner # from 56_pt_website
-  56_pt_website # from cms
-  36_cms # from admin
-  15_server # from db
+  geos
+  59_road_journey_planner
+  56_pt_website
+  11_cms
+  12_security
+  15_server
   16_impex
   54_departure_boards
   10_db
   00_framework
+  54_departure_boards
+  61_data_exchange
 )
 
 if(SYNTHESE_MYSQL_PARAMS)

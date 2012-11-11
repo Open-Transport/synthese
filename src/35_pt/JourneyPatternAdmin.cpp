@@ -34,6 +34,7 @@
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
 #include "DesignatedLinePhysicalStop.hpp"
+#include "GeometryField.hpp"
 #include "HTMLModule.h"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
@@ -49,10 +50,10 @@
 #include "ScheduledServiceTableSync.h"
 #include "ServiceAddAction.h"
 #include "ServiceAdmin.h"
-#include "StandardFields.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "PTRuleUserAdmin.hpp"
 #include "PropertiesHTMLTable.h"
 #include "RollingStockTableSync.hpp"
@@ -152,7 +153,7 @@ namespace synthese
 
 		void JourneyPatternAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 			map<const Service*, string> services;
 
@@ -196,14 +197,14 @@ namespace synthese
 				// Reservation
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
 
-				AdminActionFunctionRequest<RemoveObjectAction,JourneyPatternAdmin> lineStopRemoveAction(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,JourneyPatternAdmin> lineStopRemoveAction(_request, *this);
 
-				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request);
+				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request, *this);
 				lineStopAddAction.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				lineStopAddAction.getAction()->setWithSchedules(sservices.empty() && cservices.empty());
 				HTMLForm f(lineStopAddAction.getHTMLForm("add_journey_pattern_stop"));
 
-				AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> lineStopUpdateAction(_request);
+				AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> lineStopUpdateAction(_request, *this);
 
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
@@ -385,7 +386,7 @@ namespace synthese
 						// Internal service
 						stream << t.col(2);
 						stream << "Desserte interne : ";
-						AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> internalUpdateRequest(_request);
+						AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> internalUpdateRequest(_request, *this);
 						internalUpdateRequest.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
 						if(lineArea->getInternalService())
 						{
@@ -502,7 +503,7 @@ namespace synthese
 				// Rank check failed
 				if(!rankOk)
 				{
-					AdminActionFunctionRequest<JourneyPatternRankContinuityRestoreAction, JourneyPatternAdmin> fixRequest(_request);
+					AdminActionFunctionRequest<JourneyPatternRankContinuityRestoreAction, JourneyPatternAdmin> fixRequest(_request, *this);
 					fixRequest.getAction()->setJourneyPattern(_line);
 					stream <<
 						"<p class=\"info\">Les rangs des arrêts sont dicontinus. Cela constitue une corruption de la base de données. La " <<
@@ -597,14 +598,14 @@ namespace synthese
 			{
 				stream << "<h1>Services à horaire</h1>";
 
-				AdminFunctionRequest<JourneyPatternAdmin> searchRequest(_request);
+				AdminFunctionRequest<JourneyPatternAdmin> searchRequest(_request, *this);
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
 
-				AdminActionFunctionRequest<ServiceAddAction, JourneyPatternAdmin> newRequest(_request);
+				AdminActionFunctionRequest<ServiceAddAction, JourneyPatternAdmin> newRequest(_request, *this);
 				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(false);
 
-				AdminActionFunctionRequest<RemoveObjectAction, JourneyPatternAdmin> removeRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, JourneyPatternAdmin> removeRequest(_request, *this);
 
 				ActionResultHTMLTable::HeaderVector vs;
 				vs.push_back(make_pair(string(), "Num"));
@@ -673,16 +674,16 @@ namespace synthese
 			// TAB CONTINUOUS SERVICES
 			if (openTabContent(stream, TAB_CONTINUOUS_SERVICES))
 			{
-				AdminFunctionRequest<JourneyPatternAdmin> searchRequest(_request);
+				AdminFunctionRequest<JourneyPatternAdmin> searchRequest(_request, *this);
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
 
-				AdminActionFunctionRequest<ServiceAddAction, JourneyPatternAdmin> newRequest(_request);
+				AdminActionFunctionRequest<ServiceAddAction, JourneyPatternAdmin> newRequest(_request, *this);
 				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(true);
 
 				AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
 
-				AdminActionFunctionRequest<RemoveObjectAction, JourneyPatternAdmin> removeRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, JourneyPatternAdmin> removeRequest(_request, *this);
 
 				ActionResultHTMLTable::HeaderVector vc;
 				vc.push_back(make_pair(string(), "Num"));
@@ -758,7 +759,7 @@ namespace synthese
 				waybackMap.insert(make_pair(false, "Aller"));
 				waybackMap.insert(make_pair(true, "Retour"));
 
-				AdminActionFunctionRequest<JourneyPatternUpdateAction,JourneyPatternAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<JourneyPatternUpdateAction,JourneyPatternAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				PropertiesHTMLTable p(updateRequest.getHTMLForm());
 				stream << p.open();
@@ -972,7 +973,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks JourneyPatternAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

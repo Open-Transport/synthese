@@ -197,7 +197,7 @@ namespace synthese
 
 			void display(
 				std::ostream& stream,
-				const admin::AdminRequest& _request
+				const server::Request& _request
 			) const;
 
 			bool isAuthorized(
@@ -214,7 +214,7 @@ namespace synthese
 
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const;
 		};
 }	}

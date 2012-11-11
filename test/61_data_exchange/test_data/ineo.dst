@@ -1,0 +1,13 @@
+#===================================================================================
+#Génération du fichier neutre par export des données avec la configuration suivante :
+#	- Date de génération : 20120618
+#	- Compte Oracle de génération : ref
+#	- Période topologique modèle : 3
+#	- Nouvelle période topologique : 3
+#===================================================================================
+
+F: PT: NPT;
+ PT:3;
+
+F:DST:NDST;DSTB;DSTBL;DSTA;DSTAS;DSTG1;DSTG2;NDSTG;DST_CRF;DSTTTS;
+DST:107; ;Test 1;Test 1; ; ; ;107;0;Test 1;

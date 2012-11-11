@@ -20,19 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "TextTemplateTableSync.h"
 
 #include "Conversion.h"
-
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "MessagesLibraryLog.h"
 #include "MessagesLibraryRight.h"
-#include "TextTemplate.h"
-#include "TextTemplateTableSync.h"
-
 #include "ReplaceQuery.h"
+#include "Session.h"
+#include "TextTemplate.h"
+#include "User.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;

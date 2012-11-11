@@ -34,6 +34,7 @@
 #include "ObjectCreateAction.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "ProjectAddressAction.hpp"
 #include "PropertiesHTMLTable.h"
 #include "PTRoadsAdmin.h"
@@ -44,6 +45,7 @@
 #include "RoadModule.h"
 #include "RoadPlace.h"
 #include "StaticActionRequest.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -129,7 +131,7 @@ namespace synthese
 
 		void PublicPlaceAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -232,7 +234,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_ENTRANCES))
 			{
 				// Request
-				AdminActionFunctionRequest<RemoveObjectAction, PublicPlaceAdmin> removeEntranceRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, PublicPlaceAdmin> removeEntranceRequest(request, *this);
 				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
 
 				// Table
@@ -298,7 +300,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<ObjectUpdateAction, PublicPlaceAdmin> updateRequest(request);
+				AdminActionFunctionRequest<ObjectUpdateAction, PublicPlaceAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setObject(*_place);
 
 				// General properties
@@ -312,7 +314,7 @@ namespace synthese
 				stream << t.cell(
 					"Localité",
 					t.getForm().getTextInputAutoCompleteFromService(
-						ObjectUpdateAction::_GetInputName(NamedPlaceData::FIELDS[1].name),
+						ObjectUpdateAction::_GetInputName(NamedPlaceField::FIELDS[1].name),
 						_place->getCity() ? lexical_cast<string>(_place->getCity()->getKey()) : string(),
 						_place->getCity() ? _place->getCity()->getName() : string(),
 						pt_website::CityListFunction::FACTORY_KEY,
@@ -324,7 +326,7 @@ namespace synthese
 				stream << t.cell(
 					"Nom",
 					t.getForm().GetTextInput(
-						ObjectUpdateAction::_GetInputName(NamedPlaceData::FIELDS[0].name),
+						ObjectUpdateAction::_GetInputName(NamedPlaceField::FIELDS[0].name),
 						_place->getName()
 				)	);
 				stream << t.close();
@@ -346,7 +348,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PublicPlaceAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

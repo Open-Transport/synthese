@@ -27,7 +27,6 @@
 #include "Crossing.h"
 #include "ImportableTableSync.hpp"
 #include "PublicPlaceTableSync.h"
-#include "ReplaceQuery.h"
 #include "RoadChunkTableSync.h"
 #include "SelectQuery.hpp"
 
@@ -41,7 +40,6 @@ namespace synthese
 	using namespace db;
 	using namespace impex;
 	using namespace util;
-	using namespace security;
 	using namespace road;
 
 	namespace util
@@ -97,12 +95,7 @@ namespace synthese
 			PublicPlaceEntrance* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<PublicPlaceEntranceTableSync> query(*object);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			object->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

@@ -24,6 +24,12 @@
 #define SYNTHESE__ObjectFieldDefinition_hpp__
 
 #include "Field.hpp"
+#include "FilesMap.hpp"
+#include "MimeTypes.hpp"
+#include "ParametersMap.h"
+#include "Record.hpp"
+
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -43,6 +49,176 @@ namespace synthese
 		static const std::string& GetFieldKey()
 		{
 			return FIELD.name;
+		}
+
+
+
+		template<class T>
+		static void _LoadFromStringWithDefaultValue(
+			T& fieldObject,
+			const Record& record,
+			T (*reader)(const std::string&),
+			const T& default_value
+		){
+			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
+			{
+				try
+				{
+					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					fieldObject = text.empty() ? default_value : reader(text);
+				}
+				catch(...)
+				{
+					fieldObject = default_value;
+				}
+			}
+		}
+
+
+
+		template<class T>
+		static void _LoadFromStringWithDefaultValue(
+			T& fieldObject,
+			const Record& record,
+			T (*reader)(const std::string),
+			const T& default_value
+		){
+			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
+			{
+				try
+				{
+					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					fieldObject = text.empty() ? default_value : reader(text);
+				}
+				catch(...)
+				{
+					fieldObject = default_value;
+				}
+			}
+		}
+
+
+		template<class T>
+		static void _UpdateFromString(
+			T& fieldObject,
+			const Record& record,
+			void (T::*reader)(const std::string&)
+		){
+			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
+			{
+				try
+				{
+					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					(fieldObject.*reader)(text);
+				}
+				catch(...)
+				{
+				}
+			}
+		}
+
+
+
+		template<class T>
+		static void _SaveToFilesMap(
+			const T& fieldObject,
+			FilesMap& map,
+			std::string (*writer)(const T&)
+		){
+			if(SimpleObjectFieldDefinition<C>::FIELD.exportOnFile)
+			{
+				FilesMap::File item;
+				try
+				{
+					item.content = writer(fieldObject);
+				}
+				catch(...)
+				{
+				}
+				item.mimeType = util::MimeTypes::TEXT;
+				map.insert(
+					SimpleObjectFieldDefinition<C>::FIELD.name,
+					item
+				);
+			}
+		}
+
+
+
+		template<class T>
+		static void _SaveToFilesMap(
+			const T& fieldObject,
+			FilesMap& map,
+			std::string (T::*writer)() const
+		){
+			if(SimpleObjectFieldDefinition<C>::FIELD.exportOnFile)
+			{
+				FilesMap::File item;
+				try
+				{
+					item.content = (fieldObject.*writer)();
+				}
+				catch(...)
+				{
+				}
+				item.mimeType = util::MimeTypes::TEXT;
+				map.insert(
+					SimpleObjectFieldDefinition<C>::FIELD.name,
+					item
+				);
+			}
+		}
+
+
+
+		template<class T>
+		static void _SaveToParametersMap(
+			const T& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles,
+			std::string (*writer)(const T&)
+		){
+			if(	boost::logic::indeterminate(withFiles) ||
+				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
+			){
+				try
+				{
+					map.insert(
+						prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+						writer(fieldObject)
+					);
+				}
+				catch(...)
+				{
+				}
+			}
+		}
+
+
+
+		template<class T>
+		static void _SaveToParametersMap(
+			const T& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles,
+			std::string (T::*writer)() const
+		){
+			if(	boost::logic::indeterminate(withFiles) ||
+				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
+			){
+				try
+				{
+					map.insert(
+						prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+						(fieldObject.*writer)()
+					);
+				}
+				catch(...)
+				{
+				}
+			}
 		}
 	};
 }

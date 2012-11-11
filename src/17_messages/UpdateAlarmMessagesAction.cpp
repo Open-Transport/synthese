@@ -22,9 +22,13 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionException.h"
 #include "UpdateAlarmMessagesAction.h"
+
+#include "ActionException.h"
 #include "ObjectNotFoundException.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "MessagesModule.h"
 #include "Alarm.h"
 #include "AlarmTemplate.h"
@@ -89,7 +93,7 @@ namespace synthese
 			return map;
 		}
 
-		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
+		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Alarm
 			try
@@ -136,7 +140,7 @@ namespace synthese
 
 		void UpdateAlarmMessagesAction::run(
 			Request& request
-		) throw(ActionException) {
+		){
 
 			stringstream s;
 
@@ -212,7 +216,7 @@ namespace synthese
 
 		void UpdateAlarmMessagesAction::setAlarmId(
 			util::RegistryKeyType id
-		) throw(server::ActionException) {
+		){
 			try
 			{
 				_alarm = AlarmTableSync::GetEditable(id, *_env);

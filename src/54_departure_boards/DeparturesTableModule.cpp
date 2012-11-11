@@ -62,6 +62,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<DeparturesTableModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<DeparturesTableModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<DeparturesTableModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace departure_boards

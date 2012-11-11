@@ -20,17 +20,22 @@
 */
 
 #include "StopPointTableSync.hpp"
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
-#include "StopAreaTableSync.hpp"
-#include "CoordinatesSystem.hpp"
-#include "RoadChunkTableSync.h"
-#include "LinkException.h"
+
 #include "CityTableSync.h"
+#include "CoordinatesSystem.hpp"
 #include "CrossingTableSync.hpp"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
-#include "TransportNetworkRight.h"
+#include "LinkException.h"
+#include "Profile.h"
 #include "PTUseRuleTableSync.h"
+#include "ReplaceQuery.h"
+#include "RoadChunkTableSync.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
+#include "StopAreaTableSync.hpp"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Point.h>
@@ -242,8 +247,7 @@ namespace synthese
 			// Data source links
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 
 			// Projected point

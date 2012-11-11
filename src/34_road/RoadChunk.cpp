@@ -71,13 +71,13 @@ namespace synthese
 			double metricOffset,
 			double carSpeed
 		):	util::Registrable(id),
-			_carSpeed(carSpeed),
 			Edge(
 				street,
 				rankInRoad,
 				fromCrossing,
 				metricOffset
-			)
+			),
+			_carSpeed(carSpeed)
 		{
 			if(fromCrossing)
 			{

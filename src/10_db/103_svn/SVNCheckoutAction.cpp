@@ -54,6 +54,9 @@ namespace synthese
 			ParametersMap SVNCheckoutAction::getParametersMap() const
 			{
 				ParametersMap map;
+				map.insert(PARAMETER_PASSWORD, _password);
+				map.insert(PARAMETER_REPO_URL, _repo.getURL());
+				map.insert(PARAMETER_USER, _user);
 				return map;
 			}
 			
@@ -68,8 +71,8 @@ namespace synthese
 				_password = map.getDefault<string>(PARAMETER_PASSWORD);
 
 				// Repository URL
-				_repoURL = map.getDefault<string>(PARAMETER_REPO_URL);
-				if(_repoURL.empty())
+				_repo = SVNRepository(map.getDefault<string>(PARAMETER_REPO_URL));
+				if(_repo.getURL().empty())
 				{
 					throw ActionException("Repository URL must be non empty");
 				}
@@ -81,7 +84,7 @@ namespace synthese
 				Request& request
 			){
 				SVNWorkingCopy wc;
-				wc.setRepoURL(_repoURL);
+				wc.setRepo(_repo);
 				wc.checkout(_user, _password);
 
 				// Returns the id of the checked out object

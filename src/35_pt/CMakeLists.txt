@@ -95,20 +95,6 @@ FreeDRTTimeSlotTableSync.cpp
 FreeDRTTimeSlotTableSync.hpp
 FreeDRTTimeSlotUpdateAction.cpp
 FreeDRTTimeSlotUpdateAction.hpp
-HafasFileFormat.cpp
-HafasFileFormat.hpp
-HastusCSVFileFormat.cpp
-HastusCSVFileFormat.hpp
-IneoRealtimeUpdateAction.cpp
-IneoRealtimeUpdateAction.hpp
-HastusInterfaceFileFormat.cpp
-HastusInterfaceFileFormat.hpp
-HeuresFileFormat.cpp
-HeuresFileFormat.hpp
-IneoFileFormat.cpp
-IneoFileFormat.hpp
-IneoRealTimeFileFormat.cpp
-IneoRealTimeFileFormat.hpp
 JourneyPattern.cpp
 JourneyPattern.hpp
 JourneyPatternAddAction.cpp
@@ -163,8 +149,6 @@ NonConcurrencyRuleTableSync.cpp
 NonConcurrencyRuleTableSync.h
 NonPermanentService.cpp
 NonPermanentService.h
-OGTFileFormat.cpp
-OGTFileFormat.hpp
 PhysicalStopsCSVExportFunction.cpp
 PhysicalStopsCSVExportFunction.h
 PlaceAliasUpdateAction.cpp
@@ -174,10 +158,6 @@ ProjectAllStopPointsAction.hpp
 PTCitiesAdmin.cpp
 PTCitiesAdmin.h
 PTConstants.h
-PTDataCleanerFileFormat.cpp
-PTDataCleanerFileFormat.hpp
-PTFileFormat.cpp
-PTFileFormat.hpp
 PTModule.cpp
 PTModule.gen.cpp
 PTModule.h
@@ -255,8 +235,6 @@ ServiceQuotaTableSync.cpp
 ServiceQuotaTableSync.hpp
 ServiceQuotaUpdateAction.cpp
 ServiceQuotaUpdateAction.hpp
-ServicesCSVFileFormat.hpp
-ServicesCSVFileFormat.cpp
 ServiceTimetableUpdateAction.cpp
 ServiceTimetableUpdateAction.h
 ServiceUpdateAction.cpp
@@ -299,8 +277,6 @@ StopPointUpdateAction.cpp
 StopPointUpdateAction.hpp
 StopPointWFSType.cpp
 StopPointWFSType.hpp
-StopsShapeFileFormat.cpp
-StopsShapeFileFormat.hpp
 TransportNetwork.cpp
 TransportNetwork.h
 TransportNetworkAdmin.cpp
@@ -313,16 +289,6 @@ TransportNetworkUpdateAction.cpp
 TransportNetworkUpdateAction.hpp
 XmlBuilder.cpp
 XmlBuilder.h
-GTFSFileFormat.cpp
-GTFSFileFormat.hpp
-ObitiFileFormat.cpp
-ObitiFileFormat.hpp
-PegaseFileFormat.cpp
-PegaseFileFormat.hpp
-RTMFileFormat.cpp
-RTMFileFormat.hpp
-TridentFileFormat.cpp
-TridentFileFormat.h
 )
 
 
@@ -348,7 +314,7 @@ target_link_libraries(35_pt
   33_algorithm
   34_road
   # Forward dependencies:
-  #36_cms
+  #11_cms
   #39_map
   expat
 )

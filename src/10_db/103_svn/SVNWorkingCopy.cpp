@@ -1,6 +1,6 @@
 
-/** DumpFileFormat class implementation.
-	@file DumpFileFormat.cpp
+/** SVNWorkingCopy class implementation.
+	@file SVNWorkingCopy.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -27,17 +27,14 @@
 #include "DBTransaction.hpp"
 #include "ObjectBase.hpp"
 #include "PropertiesHTMLTable.h"
+#include "SchemaMacros.hpp"
+#include "SVNCommands.hpp"
 #include "SVNModule.hpp"
 
-#include <stdio.h>
-#ifdef WIN32
-#define popen _popen
-#define pclose _pclose
-#endif
 #include <fstream>
+#include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
@@ -52,51 +49,10 @@ namespace synthese
 	using namespace db;
 	using namespace db::svn;
 	using namespace server;
-
+	
 
 
 	FIELD_DEFINITION_OF_TYPE(db::svn::SVNWorkingCopy, "svn_url", SQL_TEXT)
-
-
-
-	template<>
-	void ObjectField<SVNWorkingCopy, SVNWorkingCopy>::UnSerialize(
-		SVNWorkingCopy& fieldObject,
-		const string& text,
-		const Env& env
-	){
-		fieldObject.setRepoURL(text);
-	}
-
-
-
-	template<>
-	string ObjectField<SVNWorkingCopy, SVNWorkingCopy>::Serialize(
-		const SVNWorkingCopy& fieldObject,
-		util::ParametersMap::SerializationFormat format
-	){
-		stringstream str;
-		if(format == ParametersMap::FORMAT_SQL)
-		{
-			str << "'";
-		}
-		str << fieldObject.getRepoURL();
-		if(format == ParametersMap::FORMAT_SQL)
-		{
-			str << "'";
-		}
-
-		return str.str();
-	}
-
-
-
-	template<>
-	void ObjectField<SVNWorkingCopy, SVNWorkingCopy>::GetLinkedObjectsIdsFromText(
-		LinkedObjectsIds& list,
-		const std::string& text
-	){
-	}
 
 
 
@@ -104,6 +60,10 @@ namespace synthese
 	{
 		namespace svn
 		{
+			using namespace SVNCommands;
+
+
+
 			SVNWorkingCopy::SVNWorkingCopy(
 			):	_object(NULL)
 			{}
@@ -258,7 +218,7 @@ namespace synthese
 					shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
 					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
 					{
-						throw Exception("Bad table");
+						throw synthese::Exception("Bad table");
 					}
 					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
 
@@ -580,173 +540,12 @@ namespace synthese
 
 
 
-			bool SVNWorkingCopy::_svnUpdate(
-				const std::string& user,
-				const std::string& password,
-				const boost::filesystem::path& localPath
-			){
-				_runSVN(
-					user,
-					password,
-					"up",
-					"\"" + localPath.file_string() + "\""
-				);
-
-				return true;
-			}
-
-
-
-			bool SVNWorkingCopy::_svnCommit(
-				const std::string& message,
-				const std::string& user,
-				const std::string& password,
-				const boost::filesystem::path& localPath
-			){
-				CommandOutput result(
-					_runSVN(
-						user,
-						password,
-						"ci",
-						" -m \""+ message +"\" \""+ localPath.file_string() + "\""
-				)	);
-				
-				return true;
-			}
-
-
-
-			void SVNWorkingCopy::_svnCheckout(
-				const std::string& user,
-				const std::string& password,
-				const std::string& url,
-				const boost::filesystem::path& localPath
-			){
-				CommandOutput result(
-					_runSVN(
-						user,
-						password,
-						"co",
-						url + " \"" + localPath.file_string() + "\""
-				)	);
-				if(result.first)
-				{
-					throw CommandException(result);
-				}
-			}
-
-
-
-			SVNWorkingCopy::CommandOutput SVNWorkingCopy::_runSVN(
-				const std::string& user,
-				const std::string& password,
-				const std::string& command,
-				const std::string& parameters
-			){
-				CommandOutput result(make_pair(1, string()));
-				stringstream cmd;
-				cmd << "svn " << command;
-				cmd << " --no-auth-cache";
-				cmd << " --non-interactive";
-				if(!user.empty())
-				{
-					cmd << " --username " << user;
-				}
-				if(!password.empty())
-				{
-					cmd << " --password " << password;
-				}
-				cmd << " " << parameters << " 2>&1";
-
-				stringstream response;
-				FILE* pipe = popen(cmd.str().c_str(), "r");
-				if(!pipe)
-				{
-					return result;
-				}
-				char buffer[128];
-				while(!feof(pipe))
-				{
-					if(fgets(buffer, 128, pipe) != NULL)
-					{
-						response << buffer;
-					}
-				}
-				result.first = pclose(pipe);
-				result.second = response.str();
-
-				return result;
-			}
-
-
-
-			void SVNWorkingCopy::_svnAdd(
-				const boost::filesystem::path& file
-			){
-
-				_runSVN(
-					string(),
-					string(),
-					"add",
-					"\"" + file.file_string() + "\""
-				);
-			}
-
-
-
-			void SVNWorkingCopy::_svnDelete(
-				const boost::filesystem::path& file
-			){
-				_runSVN(
-					string(),
-					string(),
-					"delete",
-					"--force \""+ file.file_string() + "\""
-				);
-			}
-
-
-
-			void SVNWorkingCopy::_svnMove(
-				const boost::filesystem::path& oldFile,
-				const boost::filesystem::path& newFile
-			){
-				_runSVN(
-					string(),
-					string(),
-					"move",
-					"\"" + oldFile.file_string() +"\" \""+ newFile.file_string() + "\""
-				);
-			}
-
-
-
-			void SVNWorkingCopy::_svnMkdir(
-				const std::string& user,
-				const std::string& password,
-				const std::string& url
-			){
-				CommandOutput result(
-					_runSVN(
-						user,
-						password,
-						"mkdir",
-						"-m \"Object creation\" "+ url
-				)	);
-				if(result.first)
-				{
-					throw CommandException(result);
-				}
-			}
-
-
-
 			void SVNWorkingCopy::create(
 				const std::string& user,
 				const std::string& password
 			) const	{
-				_svnMkdir(user, password, _repoURL);
-				_svnCheckout(user, password, _repoURL, _path);
+				_repo.mkdir(user, password);
+				_repo.checkout(user, password, _path);
 				_exportToWC();
 				_svnCommit("Object creation", user, password, _path);
 			}
@@ -770,7 +569,7 @@ namespace synthese
 			){
 				// Identification of the object id
 				RegistryKeyType id(0);
-				LsResult files(_svnLs(user, password, _repoURL));
+				LsResult files(_repo.ls(user, password));
 				BOOST_FOREACH(const string& file, files)
 				{
 					if(	file.size() > 10 &&
@@ -782,7 +581,7 @@ namespace synthese
 				}
 				if(!id)
 				{
-					throw Exception("Empty repository");
+					throw synthese::Exception("Empty repository");
 				}
 
 				// Determination of the working copy path
@@ -791,10 +590,10 @@ namespace synthese
 				// Check the precondition
 				if(exists(_path))
 				{
-					throw Exception("The local path already exists");
+					throw synthese::Exception("The local path already exists");
 				}
 
-				_svnCheckout(user, password, _repoURL, _path);
+				_repo.checkout(user, password, _path);
 				_importWC(true);
 			}
 
@@ -811,23 +610,6 @@ namespace synthese
 
 
 
-			SVNWorkingCopy::LsResult SVNWorkingCopy::_svnLs(
-				const std::string& user,
-				const std::string& password,
-				const std::string& url
-			){
-				CommandOutput ls(_runSVN(user, password, "ls", url));
-				if(ls.first)
-				{
-					throw Exception("Bad URL");
-				}
-				LsResult files;
-				split(files, ls.second, is_any_of("\n\r"), token_compress_on);
-				return files;
-			}
-
-
-
 			void SVNWorkingCopy::setObject( ObjectBase* value )
 			{
 				_object = value;
@@ -837,4 +619,86 @@ namespace synthese
 					_path = SVNModule::GetSVNWCRootPath() / keyStr;
 				}
 			}
+
+
+
+			void SVNWorkingCopy::from_string( const std::string& text )
+			{
+				setRepo(SVNRepository(text));
+			}
+
+
+
+			void SVNWorkingCopy::LoadFromRecord(
+				Type& fieldObject,
+				ObjectBase& object,
+				const Record& record,
+				const util::Env& env
+			){
+				SimpleObjectFieldDefinition<SVNWorkingCopy>::_UpdateFromString(
+					fieldObject,
+					record,
+					&SVNWorkingCopy::from_string
+				);
+			}
+
+
+
+			std::string SVNWorkingCopy::to_string() const
+			{
+				return getRepo().getURL();
+			}
+
+
+
+			void SVNWorkingCopy::SaveToFilesMap(
+				const SVNWorkingCopy& fieldObject,
+				const ObjectBase& object,
+				FilesMap& map
+			){
+				SimpleObjectFieldDefinition<SVNWorkingCopy>::_SaveToFilesMap(
+					fieldObject,
+					map,
+					&SVNWorkingCopy::to_string
+				);
+			}
+
+
+
+			void SVNWorkingCopy::SaveToParametersMap(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			){
+				SimpleObjectFieldDefinition<SVNWorkingCopy>::_SaveToParametersMap(
+					fieldObject,
+					map,
+					prefix,
+					withFiles,
+					&SVNWorkingCopy::to_string
+				);
+			}
+
+
+
+			void SVNWorkingCopy::SaveToDBContent(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				DBContent& content
+			){
+				boost::optional<std::string> text(
+					fieldObject.getRepo().getURL()
+				);
+				content.push_back(Cell(text));
+			}
+
+
+
+			void SVNWorkingCopy::GetLinkedObjectsIds( LinkedObjectsIds& list, const Record& record )
+			{
+
+			}
 }	}	}
+

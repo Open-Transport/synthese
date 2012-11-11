@@ -23,14 +23,18 @@
 */
 
 #include "CalendarTemplateTableSync.h"
-#include "CalendarTemplateElementTableSync.h"
 
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
-#include "SQLSingleOperatorExpression.hpp"
+#include "CalendarTemplateElementTableSync.h"
 #include "CalendarRight.h"
 #include "CalendarTemplateElementTableSync.h"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
+#include "SQLSingleOperatorExpression.hpp"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -154,8 +158,7 @@ namespace synthese
 			query.addField(static_cast<int>(object->getCategory()));
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getParent(true) ? object->getParent()->getKey() : 0);
 			query.execute(transaction);

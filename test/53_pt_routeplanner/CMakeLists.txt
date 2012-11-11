@@ -16,6 +16,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
 include_directories("${PROJECT_SOURCE_DIR}/src/17_messages")
 include_directories("${PROJECT_SOURCE_DIR}/src/18_graph")
+include_directories("${PROJECT_SOURCE_DIR}/src/19_inter_synthese")
 include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
 include_directories("${PROJECT_SOURCE_DIR}/src/31_calendar")
 include_directories("${PROJECT_SOURCE_DIR}/src/32_geography")
@@ -31,7 +32,9 @@ set(DEPS
   53_pt_journey_planner
   54_departure_boards
   51_resa # no dependency, missing?
-  36_cms # from 53_pt_journey_planner > 35_pt
+  11_cms # from 53_pt_journey_planner > 35_pt
+  54_departure_boards
+  61_data_exchange
 )
 
 boost_test(IntegralSearch "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
@@ -39,7 +42,7 @@ boost_test(PTRoutePlannerResult "${DEPS}")
 boost_test(RoutePlanner "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
 
 # This is not a test, but we'll keep it here for now.
-add_executable(ImportRoutePlannerTestData ImportRoutePlannerTestData.cpp RoutePlannerTestData.inc.hpp RoutePlannerTestData.hpp)
-target_link_libraries(ImportRoutePlannerTestData ${Boost_LIBRARIES} ${DEPS})
+# add_executable(ImportRoutePlannerTestData ImportRoutePlannerTestData.cpp RoutePlannerTestData.inc.hpp RoutePlannerTestData.hpp)
+# target_link_libraries(ImportRoutePlannerTestData ${Boost_LIBRARIES} ${DEPS})
 
-install(TARGETS ImportRoutePlannerTestData DESTINATION bin)
+# install(TARGETS ImportRoutePlannerTestData DESTINATION bin)

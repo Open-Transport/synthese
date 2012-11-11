@@ -2,8 +2,6 @@ set_source_groups()
 
 set(admin_SRCS
 AdminActionFunctionRequest.hpp
-AdminFunction.cpp
-AdminFunction.h
 AdminFunctionRequest.hpp
 AdminInterfaceElement.cpp
 AdminInterfaceElement.h
@@ -13,12 +11,14 @@ AdminModule.gen.cpp
 AdminModuleRegister.cpp
 AdminModule.h
 AdminModule.inc.cpp
+AdminPageDisplayService.cpp
+AdminPageDisplayService.hpp
 AdminParametersException.cpp
 AdminParametersException.h
+BaseAdminFunctionRequest.cpp
+BaseAdminFunctionRequest.hpp
 HomeAdmin.cpp
 HomeAdmin.h
-LoginAdmin.cpp
-LoginAdmin.hpp
 ModuleAdmin.cpp
 ModuleAdmin.h
 )
@@ -33,7 +33,7 @@ target_link_libraries(14_admin
   12_security
   # Forward dependencies:
   #15_server
-  #36_cms
+  #11_cms
 )
 
 install(TARGETS 14_admin DESTINATION lib)

@@ -26,11 +26,11 @@
 
 #include "ActionException.h"
 #include "Address.h"
+#include "GeometryField.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Request.h"
 #include "RoadChunkTableSync.h"
-#include "StandardFields.hpp"
 
 #include <geos/io/WKTReader.h>
 

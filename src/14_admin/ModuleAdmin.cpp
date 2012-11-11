@@ -23,11 +23,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ModuleAdmin.h"
-#include "HomeAdmin.h"
 #include "ModuleClass.h"
 #include "HTMLModule.h"
 #include "AdminParametersException.h"
-#include "AdminFunction.h"
 
 #include <boost/foreach.hpp>
 
@@ -104,9 +102,9 @@ namespace synthese
 
 		void ModuleAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
-			_moduleClass->displayAdmin(stream, request);
+			_moduleClass->displayAdmin(stream, request, *this);
 		}
 
 
@@ -121,7 +119,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -152,7 +150,7 @@ namespace synthese
 
 		bool ModuleAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			return true;
 		}

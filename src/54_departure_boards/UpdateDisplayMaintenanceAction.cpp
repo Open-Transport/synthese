@@ -25,6 +25,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "UpdateDisplayMaintenanceAction.h"
+
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "DisplayScreenTableSync.h"
 #include "ActionException.h"
 #include "ParametersMap.h"

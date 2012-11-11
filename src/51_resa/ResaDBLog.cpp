@@ -78,13 +78,13 @@ namespace synthese
 			if (tableId == UserTableSync::TABLE.ID)
 			{
 				AdminFunctionRequest<ResaCustomerAdmin> openRequest(
-					dynamic_cast<const AdminRequest& >(searchRequest)
+					dynamic_cast<const Request& >(searchRequest)
 				);
 
 				shared_ptr<const User> user(
 					UserTableSync::Get(
 						id,
-						*dynamic_cast<const AdminRequest& >(
+						*dynamic_cast<const Request& >(
 							searchRequest
 						).getFunction()->getEnv(),
 						FIELDS_ONLY_LOAD_LEVEL
@@ -247,7 +247,7 @@ namespace synthese
 			}
 
 			// Rights
-			bool writingRight(searchRequest.isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL));
+			bool writingRight(searchRequest.getUser()->getProfile()->isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL));
 
 			ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(lexical_cast<int>(content[ResaDBLog::COL_TYPE])));
 			shared_ptr<ReservationTransaction> tr;
@@ -384,12 +384,12 @@ namespace synthese
 					entry.getObjectId2() > 0
 				) try {
 					AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
-						dynamic_cast<const AdminRequest& >(searchRequest)
+						dynamic_cast<const Request& >(searchRequest)
 					);
 					openCallRequest.getPage()->setEntry(
 						DBLogEntryTableSync::Get(
 							entry.getObjectId2() > 0 ? entry.getObjectId2() : entry.getKey(),
-							*dynamic_cast<const AdminRequest& >(
+							*dynamic_cast<const Request& >(
 								searchRequest
 							).getFunction()->getEnv()
 					)	);

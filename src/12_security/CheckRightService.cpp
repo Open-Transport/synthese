@@ -24,6 +24,7 @@
 
 #include "CheckRightService.hpp"
 
+#include "Profile.h"
 #include "SecurityRight.h"
 #include "RequestException.h"
 #include "Request.h"

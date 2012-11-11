@@ -22,11 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "FreeDRTAreaTableSync.hpp"
+
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "Session.h"
+#include "User.h"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
 #include "StopAreaTableSync.hpp"
@@ -35,6 +37,7 @@
 #include "TransportNetworkRight.h"
 #include "PTUseRuleTableSync.h"
 
+#include <sstream>
 #include <boost/algorithm/string/split.hpp>
 
 using namespace std;
@@ -108,12 +111,14 @@ namespace synthese
 		){
 			// Commercial lines
 			object->setLine(NULL);
+			object->setNetwork(NULL);
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				RegistryKeyType commercialLineId(rows->getLongLong (FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID));
 				if(commercialLineId) try
 				{
 					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
+					object->setNetwork(cline->getNetwork());
 					object->setLine(cline);
 				}
 				catch(ObjectNotFoundException<CommercialLine>)

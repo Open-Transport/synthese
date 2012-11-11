@@ -59,6 +59,7 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace calendar;
+	using namespace data_exchange;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
@@ -232,7 +233,7 @@ namespace synthese
 			const boost::filesystem::path& filePath,
 			std::ostream& stream,
 			const string& key,
-			boost::optional<const admin::AdminRequest&> request
+			boost::optional<const server::Request&> request
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -674,7 +675,7 @@ namespace synthese
 				const shared_ptr<const DriverAllocation>& driverAllocation,
 				_driverAllocationsToRemove
 			){
-				DriverAllocationTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(driverAllocation->getKey(), transaction);
 			}
 
 			// Driver allocation templates removals
@@ -682,7 +683,7 @@ namespace synthese
 				const shared_ptr<const DriverAllocationTemplate>& driverAllocation,
 				_driverAllocationTemplatesToRemove
 			){
-				DriverAllocationTemplateTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(driverAllocation->getKey(), transaction);
 			}
 
 			// Driver services removals
@@ -690,7 +691,7 @@ namespace synthese
 				const shared_ptr<const DriverService>& driverService,
 				_driverServicesToRemove
 			){
-				DriverServiceTableSync::RemoveRow(driverService->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(driverService->getKey(), transaction);
 			}
 
 			// New driver services
@@ -792,7 +793,7 @@ namespace synthese
 					return;
 				}
 				vector<string> fields;
-				string utfLine(IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(trim_line.substr(separator+1)));
+				string utfLine(IConv(_dataSource.getCharset(), "UTF-8").convert(trim_line.substr(separator+1)));
 				split(fields, utfLine, is_any_of(SEP));
 				const vector<string>& cols(itFieldsMap->second);
 				for(size_t i=0; i<fields.size() && i<cols.size(); ++i)
@@ -821,7 +822,7 @@ namespace synthese
 
 		void IneoOperationFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			stream << "<h1>Fichiers</h1>";
 

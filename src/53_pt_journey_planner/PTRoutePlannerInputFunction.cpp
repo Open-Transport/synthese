@@ -134,7 +134,7 @@ namespace synthese
 
 			if(_field == FIELD_PERIOD)
 			{
-				const Periods::Type& periods(_config->get<Periods>());
+				const HourPeriods::Type& periods(_config->get<HourPeriods>());
 
 				size_t current(
 					_value.empty() ?

@@ -22,10 +22,15 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
-#include "ParametersMap.h"
 #include "StopAreaAddAction.h"
+
+#include "ActionException.h"
+#include "DataSourceLinksField.hpp"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "Session.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "Request.h"
 #include "StopAreaTableSync.hpp"
 #include "DBTransaction.hpp"
@@ -78,7 +83,7 @@ namespace synthese
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
 			map.insert(
 				PARAMETER_DATA_SOURCE_LINKS,
-				DataSourceLinks::Serialize(_dataSourceLinks, map.getFormat())
+				DataSourceLinks::Serialize(_dataSourceLinks)
 			);
 			return map;
 		}

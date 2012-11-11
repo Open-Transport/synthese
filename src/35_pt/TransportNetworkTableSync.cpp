@@ -21,13 +21,18 @@
 */
 
 #include "TransportNetworkTableSync.h"
+
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "DataSourceLinksField.hpp"
+#include "ImportableTableSync.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "ImportableTableSync.hpp"
-#include "TransportNetworkRight.h"
-#include "CommercialLineTableSync.h"
-#include "CalendarTemplateTableSync.h"
+#include "Session.h"
 #include "TransportNetwork.h"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -145,8 +150,7 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getDaysCalendarsParent() ? object->getDaysCalendarsParent()->getKey() : RegistryKeyType(0));
 			query.addField(object->getPeriodsCalendarsParent() ? object->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0));

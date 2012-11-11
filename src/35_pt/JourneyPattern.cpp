@@ -29,6 +29,7 @@
 #include "Log.h"
 #include "Registry.h"
 #include "RollingStock.hpp"
+#include "TransportNetwork.h"
 #include "Service.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
@@ -115,14 +116,20 @@ namespace synthese
 		{
 			return static_cast<RollingStock*>(_pathClass);
 		}
-
+		TransportNetwork*   JourneyPattern::getNetwork () const
+                {
+                        return static_cast<TransportNetwork*>(_pathNetwork);
+                }
 
 
 		void JourneyPattern::setRollingStock(RollingStock* rollingStock)
 		{
 			_pathClass = static_cast<PathClass*>(rollingStock);
 		}
-
+		void JourneyPattern::setNetwork(TransportNetwork* transportNetwork)
+                {
+                        _pathNetwork = static_cast<PathClass*>(transportNetwork);
+                }
 
 
 		void JourneyPattern::setWalkingLine (bool isWalkingLine)

@@ -25,15 +25,16 @@
 
 #include "Request.h"
 
-#include "RequestException.h"
-#include "ActionException.h"
-#include "Session.h"
-#include "SessionException.h"
 #include "Action.h"
-#include "Function.h"
+#include "ActionException.h"
 #include "Exception.h"
 #include "FactoryException.h"
+#include "Function.h"
 #include "Log.h"
+#include "RequestException.h"
+#include "Session.h"
+#include "SessionException.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -59,7 +60,7 @@ namespace synthese
 
 
 
-		const Request::CookiesMap& Request::getCookiesMap() const
+		const CookiesMap& Request::getCookiesMap() const
 		{
 			return _cookiesMap;
 		}

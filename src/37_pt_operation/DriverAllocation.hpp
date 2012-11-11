@@ -27,6 +27,10 @@
 
 #include "DriverActivity.hpp"
 #include "DriverAllocationTemplate.hpp"
+#include "MinutesField.hpp"
+#include "NumericField.hpp"
+#include "PointerField.hpp"
+#include "User.h"
 
 #include <vector>
 #include <boost/optional.hpp>
@@ -34,16 +38,11 @@
 
 namespace synthese
 {
-	namespace security
-	{
-		class User;
-	}
-
 	namespace pt_operation
 	{
-		FIELD_TYPE(Driver, boost::optional<security::User&>)
-		FIELD_TYPE(BoniAmount, double)
-		FIELD_TYPE(BoniTime, boost::posix_time::time_duration)
+		FIELD_POINTER(Driver, security::User)
+		FIELD_DOUBLE(BoniAmount)
+		FIELD_MINUTES(BoniTime)
 
 		typedef boost::fusion::map<
 			FIELD(Key),

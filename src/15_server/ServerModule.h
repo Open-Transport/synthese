@@ -36,9 +36,12 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #undef GetObject // due to WinGDI.h
+#undef VERSION // due to mysql.h
 
+#include "CallableByThread.hpp"
 #include "ModuleClassTemplate.hpp"
 #include "HTTPConnection.hpp"
+#include "ServerTypes.h"
 
 namespace synthese
 {
@@ -127,6 +130,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_SMTP_PORT;
 			static const std::string MODULE_PARAM_SESSION_MAX_DURATION;
 			static const std::string MODULE_PARAM_AUTO_LOGIN_USER;
+			static const std::string MODULE_PARAM_HTTP_TRACE_PATH;
+			static const std::string MODULE_PARAM_HTTP_FORCE_GZIP;
 
 			static const std::string VERSION;
 			static const std::string VERSION_INFO;
@@ -148,12 +153,17 @@ namespace synthese
 			static boost::recursive_mutex _threadManagementMutex;
 			static boost::posix_time::time_duration _sessionMaxDuration;
 			static std::string _autoLoginUser;
+			static boost::posix_time::ptime _serverStartingTime;
+			static boost::optional<boost::filesystem::path> _httpTracePath;
+			static bool _forceGZip;
 
 
 		public:
 			static boost::thread::id AddHTTPThread();
-			static void AddThread(
-				boost::shared_ptr<boost::thread> theThread,
+
+			template<class Callable>
+			static boost::shared_ptr<boost::thread> AddThread(
+				Callable func,
 				const std::string& description,
 				bool isHTTPThread = false
 			);
@@ -171,6 +181,8 @@ namespace synthese
 			static void RunHTTPServer();
 			static util::EMail GetEMailSender();
 			static const std::string& GetAutoLoginUser() { return _autoLoginUser; }
+			static void UpdateStartingTime();
+			static const boost::posix_time::ptime& GetStartingTime();
 
 			static boost::posix_time::time_duration GetSessionMaxDuration();
 
@@ -198,8 +210,41 @@ namespace synthese
 
 		private:
 			/// Sets headers in the given HTTPReply from the cookies stored in cookiesMap.
-			static void _SetCookieHeaders(HTTPReply& httpReply, const Request::CookiesMap& cookiesMap);
+			static void _SetCookieHeaders(
+				HTTPReply& httpReply,
+				const CookiesMap& cookiesMap
+			);
 		};
+
+
+
+		template<class Callable>
+		boost::shared_ptr<boost::thread> ServerModule::AddThread(
+			Callable func,
+			const std::string& description,
+			bool isHTTPThread /*= false */
+		){
+
+			boost::recursive_mutex::scoped_lock lock(_threadManagementMutex);
+
+			CallableByThread<Callable> bnd(func);
+
+			boost::shared_ptr<boost::thread> theThread(
+				new boost::thread(bnd)
+			);
+
+			ThreadInfo info;
+			info.status = ThreadInfo::THREAD_WAITING;
+			info.theThread = theThread;
+			info.lastChangeTime = boost::posix_time::microsec_clock::local_time();
+			info.description = description;
+			info.isHTTPThread = isHTTPThread;
+			_threads.insert(
+				std::make_pair(boost::lexical_cast<std::string>(theThread->get_id()), info)
+			);
+
+			return theThread;
+		}
 	}
 	/** @} */
 }

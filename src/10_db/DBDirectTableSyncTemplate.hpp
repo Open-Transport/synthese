@@ -100,6 +100,11 @@ namespace synthese
 				}
 			}
 
+
+			virtual FieldsList getFieldsList() const { return GetFieldsList(); }
+
+
+
 			////////////////////////////////////////////////////////////////////
 			/// Object fetcher, with read/write permissions.
 			///	@param key UID of the object
@@ -456,7 +461,71 @@ namespace synthese
 			) const {
 				return static_cast<const util::RegistryBase&>(env.getRegistry<T>());
 			}
+
+
+
+			virtual RegistrableSearchResult search(
+				const std::string& whereClause,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			) const;
 		};
+
+
+
+		template <class K, class T>
+		DBDirectTableSync::RegistrableSearchResult DBDirectTableSyncTemplate<K, T>::search(
+			const std::string& whereClause,
+			util::Env& env,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		) const	{
+
+			std::stringstream query;
+			query <<
+				"SELECT " << DBTableSyncTemplate<K>::GetFieldsGetter() <<
+				" FROM " << K::TABLE.NAME;
+			if(!whereClause.empty())
+			{
+				query << " WHERE " << whereClause;
+			}
+			RegistrableSearchResult result;
+			util::Registry<T>& registry(env.template getEditableRegistry<T>());
+			DBResultSPtr rows = DBModule::GetDB()->execQuery(query.str());
+			while (rows->next ())
+			{
+				util::RegistryKeyType key(rows->getKey());
+				try
+				{
+					if(registry.contains(key))
+					{
+						result.push_back(
+							boost::static_pointer_cast<util::Registrable, T>(
+								registry.getEditable(key)
+						)	);
+					}
+					else
+					{
+						boost::shared_ptr<T> object(
+							K::GetNewObject(rows)
+						);
+						registry.add(object);
+						Load(object.get(), rows, env, linkLevel);
+						result.push_back(
+							boost::static_pointer_cast<util::Registrable, T>(
+								object
+						)	);
+				}	}
+				catch(std::exception& e)
+				{
+					if(registry.contains(key))
+					{
+						registry.remove(key);
+					}
+					util::Log::GetInstance().warn("Skipped object in results load of " + query.str(), e);
+			}	}
+			return result;
+
+		}
 }	}
 
 #endif // SYNTHESE_db_DBDirectTableSyncTemplate_hpp__

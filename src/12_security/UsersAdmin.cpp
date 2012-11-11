@@ -23,10 +23,14 @@
 // At first to avoid the Windows bug "WinSock.h has already been included"
 #include "ServerModule.h"
 
-#include "SearchFormHTMLTable.h"
-#include "HTMLModule.h"
-#include "SecurityModule.h"
 #include "UserAdmin.h"
+
+#include "HTMLModule.h"
+#include "Profile.h"
+#include "SearchFormHTMLTable.h"
+#include "Session.h"
+#include "StaticActionFunctionRequest.h"
+#include "SecurityModule.h"
 #include "AddUserAction.h"
 #include "RemoveObjectAction.hpp"
 #include "ProfileTableSync.h"
@@ -35,9 +39,6 @@
 #include "SecurityRight.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "Session.h"
-#include "StaticActionFunctionRequest.h"
-
 #include "AdminModule.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
@@ -134,19 +135,19 @@ namespace synthese
 
 		void UsersAdmin::display(
 			std::ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 			// Request for search form
-			AdminFunctionRequest<UsersAdmin> searchRequest(_request);
+			AdminFunctionRequest<UsersAdmin> searchRequest(_request, *this);
 			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
 
 			// Request for add user action form
 			AdminActionFunctionRequest<AddUserAction, UserAdmin> addUserRequest(_request);
-			addUserRequest.getFunction()->setActionFailedPage<UsersAdmin>();
+			addUserRequest.setActionFailedPage<UsersAdmin>();
 			addUserRequest.setActionWillCreateObject();
 
 			// Request for delete action form
-			AdminActionFunctionRequest<RemoveObjectAction, UsersAdmin> deleteUserRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, UsersAdmin> deleteUserRequest(_request, *this);
 
 			// Request for user link
 			AdminFunctionRequest<UserAdmin> userRequest(_request);
@@ -241,7 +242,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -259,7 +260,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

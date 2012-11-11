@@ -21,7 +21,9 @@
 */
 
 #include "Object.hpp"
-#include "StandardFields.hpp"
+
+#include "SchemaMacros.hpp"
+#include "StringField.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -29,7 +31,7 @@ using namespace boost;
 using namespace synthese;
 using namespace synthese::util;
 
-FIELD_TYPE(DoubleField, double)
+FIELD_DOUBLE(DoubleField)
 template<> const Field SimpleObjectFieldDefinition<DoubleField>::FIELD = Field("double_field", SQL_DOUBLE, true);
 
 typedef boost::fusion::map<

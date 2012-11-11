@@ -203,9 +203,7 @@ namespace synthese
 
 			_displayDepartureStops = map.getDefault<bool>(PARAMETER_DISPLAY_DEPARTURE_STOPS, true);
 			_displayArrivalStops = map.getDefault<bool>(PARAMETER_DISPLAY_ARRIVAL_STOPS, true);
-
-			// TL specific default value
-			_displaySameStopAreaOnce = map.getDefault<bool>(PARAMETER_DISPLAY_SAME_STOP_AREA_ONCE, true);
+			_displaySameStopAreaOnce = map.getDefault<bool>(PARAMETER_DISPLAY_SAME_STOP_AREA_ONCE, false);
 		}
 
 

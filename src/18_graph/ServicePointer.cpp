@@ -320,4 +320,32 @@ namespace synthese
 				return shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 		}
+
+
+
+		bool ServicePointer::operator==( const ServicePointer& rhs ) const
+		{
+			return
+				_departureEdge == rhs._departureEdge &&
+				_departureTime == rhs._departureTime &&
+				_realTimeDepartureVertex == rhs._realTimeDepartureVertex &&
+				_theoreticalDepartureTime == rhs._theoreticalDepartureTime &&
+				_arrivalEdge == rhs._arrivalEdge &&
+				_arrivalTime == rhs._arrivalTime &&
+				_realTimeArrivalVertex == rhs._realTimeArrivalVertex &&
+				_theoreticalArrivalTime == rhs._theoreticalArrivalTime &&
+				_userClassRank == rhs._userClassRank &&
+				_RTData == rhs._RTData &&
+				_service == rhs._service &&
+				_originDateTime == rhs._originDateTime &&
+				_range == rhs._range &&
+				_canceled == rhs._canceled;
+		}
+
+
+
+		bool ServicePointer::operator!=( const ServicePointer& rhs ) const
+		{
+			return !operator==(rhs);
+		}
 }	}

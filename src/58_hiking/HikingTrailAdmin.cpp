@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "HikingTrailAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "HikingModule.h"
 #include "HikingRight.h"
 #include "HTMLModule.h"
@@ -103,7 +106,7 @@ namespace synthese
 
 		void HikingTrailAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -112,7 +115,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 				{
-					AdminActionFunctionRequest<HikingTrailUpdateAction,HikingTrailAdmin> updateRequest(_request);
+					AdminActionFunctionRequest<HikingTrailUpdateAction,HikingTrailAdmin> updateRequest(_request, *this);
 					updateRequest.getAction()->setTrail(const_pointer_cast<HikingTrail>(_trail));
 
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
@@ -129,10 +132,10 @@ namespace synthese
 
 				stream << "<h1>Arrêts</h1>";
 				{
-					AdminActionFunctionRequest<HikingTrailStopAddAction,HikingTrailAdmin> addRequest(_request);
+					AdminActionFunctionRequest<HikingTrailStopAddAction,HikingTrailAdmin> addRequest(_request, *this);
 					addRequest.getAction()->setTrail(const_pointer_cast<HikingTrail>(_trail));
 
-					AdminActionFunctionRequest<HikingTrailStopRemoveAction,HikingTrailAdmin> removeRequest(_request);
+					AdminActionFunctionRequest<HikingTrailStopRemoveAction,HikingTrailAdmin> removeRequest(_request, *this);
 					removeRequest.getAction()->setTrail(const_pointer_cast<HikingTrail>(_trail));
 
 					HTMLForm f(addRequest.getHTMLForm());

@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_admin_AdminActionFunctionRequest_hpp__
 #define SYNTHESE_admin_AdminActionFunctionRequest_hpp__
 
-#include "AdminFunction.h"
-#include "StaticActionFunctionRequest.h"
+#include "BaseAdminFunctionRequest.hpp"
+#include "StaticActionRequest.h"
 
 namespace synthese
 {
@@ -35,33 +35,29 @@ namespace synthese
 		*/
 		template<class A, class P>
 		class AdminActionFunctionRequest:
-			public server::StaticActionFunctionRequest<A, AdminFunction>
+			public server::StaticActionRequest<A>,
+			public BaseAdminFunctionRequest
 		{
 		public:
 			AdminActionFunctionRequest(
-				const server::StaticFunctionRequest<AdminFunction>& request
+				const server::Request& request,
+				const P& currentPage
 			):	server::Request(request),
-				server::StaticActionFunctionRequest<A, AdminFunction>(request, true)
+				server::StaticActionRequest<A>(request),
+				BaseAdminFunctionRequest(request, currentPage.getNewCopiedPage())
 			{
-				boost::shared_ptr<AdminInterfaceElement> page(request.getFunction()->getPage());
-				boost::shared_ptr<P> p;
-				if(page)
-				{
-					P* ppage(dynamic_cast<P*>(page.get()));
-					if(ppage)
-					{
-						p = ppage->getNewCopiedPage();
-					}
-					else
-					{
-						p = page->getNewPage<P>();
-					}
-				}
-				else
-				{
-					p.reset(new P);
-				}
-				this->getFunction()->setPage(p);
+				_redirectAfterAction = true;
+			}
+
+
+
+			AdminActionFunctionRequest(
+				const server::Request& request
+			):	server::Request(request),
+				server::StaticActionRequest<A>(request),
+				BaseAdminFunctionRequest(request, boost::shared_ptr<P>(new P))
+			{
+				_redirectAfterAction = true;
 			}
 
 
@@ -69,32 +65,11 @@ namespace synthese
 			boost::shared_ptr<P> getPage() const
 			{
 				return boost::static_pointer_cast<P, AdminInterfaceElement>(
-					this->getFunction()->getPage()
+					_page
 				);
 			}
-
-			boost::shared_ptr<AdminInterfaceElement> getActionFailedPage() const
-			{
-				return this->getFunction()->getActionFailedPage();
-			}
-
-
-
-			void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie)
-			{
-				this->getFunction()->setActionFailedPage(aie);
-			}
-
-
-
-			template<class T>
-			void setActionFailedPage()
-			{
-				this->getFunction()->setActionFailedPage<T>();
-			}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_admin_AdminActionFunctionRequest_hpp__
 

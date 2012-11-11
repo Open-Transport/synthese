@@ -29,6 +29,7 @@
 #include "DBTableSync.hpp"
 #include "DBException.hpp"
 #include "DBTransaction.hpp"
+#include "Env.h"
 #include "Factory.h"
 #include "Log.h"
 #include "ServerModule.h"
@@ -63,6 +64,8 @@ namespace synthese
 		DBModule::SubClassMap DBModule::_subClassMap;
 
 		time_duration DBModule::DURATION_BETWEEN_CONDITONAL_SYNCS = minutes(1);
+		const string DBModule::PARAMETER_NODE_ID = "node_id";
+		RegistryNodeType DBModule::_nodeId = 1;
 	}
 
 	namespace server
@@ -78,6 +81,8 @@ namespace synthese
 				throw DBException("No ConnectionInfo. DBModule::SetConnectionString() must be called");
 			}
 			DBModule::_Db.reset(util::Factory<DB>::create(DBModule::_ConnectionInfo->backend));
+
+			RegisterParameter(DBModule::PARAMETER_NODE_ID, "1", &DBModule::ParameterCallback);
 
 			DBModule::GetDB()->setConnectionInfo(DBModule::_ConnectionInfo);
 			DBModule::GetDB()->preInit();
@@ -105,21 +110,33 @@ namespace synthese
 
 			// DB initialization
 			DBModule::GetDB()->init();
+			DBModule::GetDB()->initPreparedStatements();
 
-			// Conditional tables load maintainer
-			shared_ptr<thread> theThread(
-				new thread(
-					&DBModule::UpdateConditionalTableSyncEnv
-			)	);
-			ServerModule::AddThread(theThread, "Conditional tables load maintainer");
+			// Conditional tables load maintainer thread
+			ServerModule::AddThread(&DBModule::UpdateConditionalTableSyncEnv, "Conditional tables load maintainer");
 		}
 
 
 
 		template<> void ModuleClassTemplate<DBModule>::End()
 		{
+			UnregisterParameter(DBModule::PARAMETER_NODE_ID);
 			DBModule::_ConnectionInfo.reset();
 			DBModule::_Db.reset();
+		}
+
+
+
+		template<> void ModuleClassTemplate<DBModule>::InitThread(
+		){
+			DBModule::GetDB()->initPreparedStatements();
+		}
+
+
+
+		template<> void ModuleClassTemplate<DBModule>::CloseThread(
+		){
+			DBModule::GetDB()->removePreparedStatements();
 		}
 	}
 
@@ -329,6 +346,24 @@ namespace synthese
 
 				// Next load in 1 minutes
 				this_thread::sleep(DURATION_BETWEEN_CONDITONAL_SYNCS);
+			}
+		}
+
+
+
+		void DBModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			if(name == PARAMETER_NODE_ID)
+			{
+				try
+				{
+					_nodeId = lexical_cast<RegistryNodeType>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
 			}
 		}
 }	}

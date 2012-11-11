@@ -64,7 +64,7 @@ namespace synthese
 
 			virtual const std::string& getTitle() const;
 
-			virtual const util::RegistryTableType getTableId() const;
+		virtual util::RegistryTableType getTableId() const;
 
 		public:
 			static const std::string TITLE;
@@ -121,7 +121,7 @@ namespace synthese
 		}
 
 		template<class T, class C>
-		const util::RegistryTableType synthese::messages::AlarmRecipientTemplate<T, C>::getTableId() const
+		util::RegistryTableType synthese::messages::AlarmRecipientTemplate<T, C>::getTableId() const
 		{
 			return T::TABLE.ID;
 		}

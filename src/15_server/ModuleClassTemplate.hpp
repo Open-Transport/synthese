@@ -47,6 +47,8 @@ namespace synthese
 			virtual void init() const { Init(); }
 			virtual void end() const { End(); }
 			virtual const std::string& getName() const { return NAME; }
+			virtual void initThread() const { InitThread(); }
+			virtual void closeThread() const { CloseThread(); }
 
 		public:
 			/** First step of initialization of the module.
@@ -55,6 +57,8 @@ namespace synthese
 			*/
 			static void PreInit();
 
+
+
 			/** Second step of initialization of the module.
 				This method is launched after PreInit is launched for each module.
 				Must be implemented for each instantiation.
@@ -62,11 +66,26 @@ namespace synthese
 			static void Init();
 
 
+
 			/** Ending of the module.
 				This method is launched when the server stops.
 				Must be implemented for each instantiation.
 			*/
 			static void End();
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Operations to do at thread creation.
+			/// @param thread the created thread
+			static void InitThread();
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Operations to do at thread deletion.
+			/// @param the deleted thread
+			static void CloseThread();
 		};
 	}
 }

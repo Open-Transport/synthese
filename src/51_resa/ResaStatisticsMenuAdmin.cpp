@@ -23,17 +23,19 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ResaStatisticsMenuAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
 #include "ResaStatisticsAdmin.h"
+#include "User.h"
 #include "CallStatisticsAdmin.h"
 #include "AdminFunctionRequest.hpp"
 #include "CommercialLineTableSync.h"
 #include "CommercialLine.h"
 #include "HTMLModule.h"
-#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -94,12 +96,12 @@ namespace synthese
 
 		void ResaStatisticsMenuAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			// Display
 			AdminFunctionRequest<CallStatisticsAdmin> openCallsRequest(request);
-			if(request.getFunction()->getPage()->isAuthorized(*request.getUser()))
+			if(isAuthorized(*request.getUser()))
 			{
 				stream << "<h1>Statistiques d'appels</h1>";
 				stream << "<p>" << HTMLModule::getLinkButton(openCallsRequest.getURL(), "Statistiques appels", string(), CallStatisticsAdmin::ICON) << "</p>";
@@ -119,7 +121,7 @@ namespace synthese
 			)	);
 
 			// Requests
-			AdminFunctionRequest<ResaStatisticsMenuAdmin> searchRequest(request);
+			AdminFunctionRequest<ResaStatisticsMenuAdmin> searchRequest(request, *this);
 
 			AdminFunctionRequest<ResaStatisticsAdmin> openRequest(request);
 
@@ -152,7 +154,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaStatisticsMenuAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -172,7 +174,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ResaStatisticsMenuAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

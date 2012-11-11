@@ -28,9 +28,15 @@
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
-#include <boost/thread.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/bind.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <boost/foreach.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <fstream>
 
 #ifdef UNIX
   #define DEFAULT_TEMP_DIR "/tmp"
@@ -49,7 +55,10 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::algorithm;
+using namespace boost::iostreams;
 using namespace boost::posix_time;
+using namespace boost::filesystem;
 
 namespace synthese
 {
@@ -68,7 +77,9 @@ namespace synthese
 		recursive_mutex ServerModule::_threadManagementMutex;
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
 		string ServerModule::_autoLoginUser("");
-
+		boost::posix_time::ptime ServerModule::_serverStartingTime(not_a_date_time);
+		optional<path> ServerModule::_httpTracePath;
+		bool ServerModule::_forceGZip(false);
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
 		const string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
@@ -77,6 +88,8 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 		const string ServerModule::MODULE_PARAM_AUTO_LOGIN_USER("auto_login_user");
+		const string ServerModule::MODULE_PARAM_HTTP_TRACE_PATH = "http_trace_path";
+		const string ServerModule::MODULE_PARAM_HTTP_FORCE_GZIP = "http_force_gzip";
 
 		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
 		const std::string ServerModule::VERSION_INFO(SYNTHESE_VERSION_INFO);
@@ -93,6 +106,8 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION, "30", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_AUTO_LOGIN_USER, "", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_HTTP_TRACE_PATH, "", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_HTTP_FORCE_GZIP, "", &ServerModule::ParameterCallback);
 		}
 
 
@@ -113,6 +128,7 @@ namespace synthese
 				ServerModule::_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
 				ServerModule::_acceptor.bind(endpoint);
 				ServerModule::_acceptor.listen();
+				ServerModule::UpdateStartingTime();
 				ServerModule::_acceptor.async_accept(
 					ServerModule::_new_connection->socket(),
 					bind(&ServerModule::HandleAccept, asio::placeholders::error)
@@ -150,8 +166,23 @@ namespace synthese
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION);
+			UnregisterParameter(ServerModule::MODULE_PARAM_HTTP_TRACE_PATH);
 
 			ServerModule::_io_service.stop();
+		}
+
+
+
+
+
+		template<> void ModuleClassTemplate<ServerModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<ServerModule>::CloseThread(
+		){
 		}
 
 
@@ -179,6 +210,21 @@ namespace synthese
 			if(name == MODULE_PARAM_AUTO_LOGIN_USER)
 			{
 				_autoLoginUser = value;
+			}
+			if(name == MODULE_PARAM_HTTP_TRACE_PATH)
+			{
+				if(value.empty())
+				{
+					_httpTracePath.reset();
+				}
+				else
+				{
+					_httpTracePath = value;
+				}
+			}
+			if(name == MODULE_PARAM_HTTP_FORCE_GZIP)
+			{
+				_forceGZip = (value == "1");
 			}
 		}
 
@@ -208,15 +254,80 @@ namespace synthese
 			try
 			{
 				Log::GetInstance ().debug ("Received request : " +
-					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" + (req.postData.empty() ? string() : " + "+ lexical_cast<string>(req.postData.size()) +" bytes of POST data : "+ req.postData.substr(0, 1000) ) );
+					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" +
+					(req.postData.empty() ?
+						string() :
+						" + "+ lexical_cast<string>(req.postData.size()) +" bytes of POST data : "+	replace_all_copy(req.postData.substr(0, 1000), "\r\n", string())
+					)
+				);
 
 				SetCurrentThreadAnalysing(req.uri + (req.postData.empty() ? string() : " + "+ req.postData.substr(0, 100)));
 				DynamicRequest request(req);
 
-				stringstream output;
-				request.run(output);
+				ptime now(microsec_clock::local_time());
+				auto_ptr<ofstream> of;
+				if(_httpTracePath)
+				{
+					stringstream dateDirName;
+					dateDirName <<
+						now.date().year() << "-" <<
+						setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+						setw(2) << setfill('0') << now.date().day()
+						;
+					stringstream fileName;
+					fileName <<
+						setw(2) << setfill('0') << now.time_of_day().hours() << "-" <<
+						setw(2) << setfill('0') << now.time_of_day().minutes() << "-" <<
+						setw(2) << setfill('0') << now.time_of_day().seconds() << "-" << now.time_of_day().fractional_seconds() <<
+						"_";
+					if(request.getFunction().get())
+					{
+						fileName << request.getFunction()->getFactoryKey();
+					}
+					fileName << ".log";
+					path p(*_httpTracePath);
+					p = p / dateDirName.str();
+					create_directories(p);
+					p = p / fileName.str();
+					of.reset(new ofstream(p.file_string().c_str()));
+					*of << "GET " << req.uri << "\n";
+					*of << "POST\n" << req.postData << "\n";
+				}
+
+				// GZip compression ?
+				bool gzipCompression(false);
+				HTTPRequest::Headers::const_iterator it(req.headers.find("Accept-Encoding"));
+				if(	it != req.headers.end() &&
+					!it->second.empty()
+				){
+					set<string> formats;
+					split(formats, it->second, is_any_of(","));
+					gzipCompression = (formats.find("gzip") != formats.end());
+				}
+
+				// Request run
+				stringstream ros;
+				request.run(ros);
+				
+				// Output
+				if(	_forceGZip ||
+					(	gzipCompression &&
+						req.ipaddr != "127.0.0.1" // Never compress for localhost use
+				)	){
+					stringstream os;
+					filtering_stream<output> fs;
+					fs.push(gzip_compressor());
+					fs.push(os);
+					boost::iostreams::copy(ros, fs);
+					fs.pop();
+					rep.content.append(os.str());
+					rep.headers.insert(make_pair("Content-Encoding", "gzip"));
+				}
+				else
+				{
+					rep.content.append(ros.str());
+				}
 				rep.status = HTTPReply::ok;
-				rep.content.append(output.str());
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
 				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType() + "; charset=utf-8"));
 				if(request.getFunction().get() && !request.getFunction()->getFileName().empty())
@@ -225,6 +336,13 @@ namespace synthese
 				}
 
 				_SetCookieHeaders(rep, request.getCookiesMap());
+
+				if(_httpTracePath)
+				{
+					*of << "\n\nRESPONSE\n\n";
+					*of << ros.str();
+					of.reset();
+				}
 			}
 			catch(Request::RedirectException& e)
 			{
@@ -292,7 +410,9 @@ namespace synthese
 			Threads::iterator it(_threads.find(key));
 			if(it == _threads.end()) return;
 			shared_ptr<thread> theThread(it->second.theThread);
+
 			_threads.erase(it);
+
 			theThread->interrupt();
 			Log::GetInstance ().info ("Attempted to kill the thread "+ key);
 			if(	autoRestart &&
@@ -368,31 +488,16 @@ namespace synthese
 
 
 
-		void ServerModule::AddThread(
-			shared_ptr<thread> theThread,
-			const std::string& description,
-			bool isHTTPThread
-		){
-			recursive_mutex::scoped_lock lock(_threadManagementMutex);
-			ThreadInfo info;
-			info.status = ThreadInfo::THREAD_WAITING;
-			info.theThread = theThread;
-			info.lastChangeTime = posix_time::microsec_clock::local_time();
-			info.description = description;
-			info.isHTTPThread = isHTTPThread;
-			_threads.insert(make_pair(lexical_cast<string>(theThread->get_id()), info));
-		}
-
-
-
 		boost::thread::id ServerModule::AddHTTPThread()
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+
 			shared_ptr<thread> theThread(
-				new thread(
-					bind(&asio::io_service::run, &ServerModule::_io_service)
+				AddThread(
+					bind(&asio::io_service::run, &ServerModule::_io_service),
+					"HTTP",
+					true
 			)	);
-			AddThread(theThread, "HTTP", true);
 			++_waitingThreads;
 			return theThread->get_id();
 		}
@@ -515,9 +620,9 @@ namespace synthese
 
 
 
-		void ServerModule::_SetCookieHeaders(HTTPReply& httpReply, const Request::CookiesMap& cookiesMap)
+		void ServerModule::_SetCookieHeaders(HTTPReply& httpReply, const CookiesMap& cookiesMap)
 		{
-			BOOST_FOREACH(const Request::CookiesMap::value_type &cookie, cookiesMap)
+			BOOST_FOREACH(const CookiesMap::value_type &cookie, cookiesMap)
 			{
 				// TODO: proper escaping of cookie values
 				httpReply.headers.insert(
@@ -528,5 +633,19 @@ namespace synthese
 					)
 				);
 			}
+		}
+
+
+
+		void ServerModule::UpdateStartingTime()
+		{
+			_serverStartingTime = second_clock::local_time();
+		}
+
+
+
+		const boost::posix_time::ptime& ServerModule::GetStartingTime()
+		{
+			return _serverStartingTime;
 		}
 }	}

@@ -27,9 +27,6 @@
 #include "MainRoadChunk.hpp"
 #include "Place.h"
 
-#include "ComplexObjectField.hpp"
-#include "SchemaMacros.hpp"
-
 #include <vector>
 #include <set>
 #include <boost/optional.hpp>
@@ -121,9 +118,6 @@ namespace synthese
 
 			//@}
 		};
-	}
-
-	FIELD_COMPLEX_TYPE_EXTERNAL_DATA(AddressData)
-}
+}	}
 
 #endif

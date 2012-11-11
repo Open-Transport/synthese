@@ -23,13 +23,17 @@
 */
 
 #include "TimetableRowTableSync.h"
+
+#include "DBModule.h"
+#include "DBResult.hpp"
+#include "Profile.h"
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "Session.h"
 #include "StopAreaTableSync.hpp"
-#include "DBModule.h"
-#include "DBResult.hpp"
 #include "TimetableRight.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

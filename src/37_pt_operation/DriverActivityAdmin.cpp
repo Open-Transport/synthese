@@ -30,7 +30,9 @@
 #include "ImportableAdmin.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -104,12 +106,12 @@ namespace synthese
 
 		void DriverActivityAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			stream << "<h1>Propriétés</h1>";
 
-			AdminActionFunctionRequest<ObjectUpdateAction, DriverActivityAdmin> updateRequest(request);
+			AdminActionFunctionRequest<ObjectUpdateAction, DriverActivityAdmin> updateRequest(request, *this);
 			updateRequest.getAction()->setObject(*_activity);
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update_form"));

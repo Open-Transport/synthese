@@ -23,8 +23,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "UpdateAlarmMessagesFromTemplateAction.h"
+
 #include "ActionException.h"
 #include "ObjectNotFoundException.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
 #include "Alarm.h"

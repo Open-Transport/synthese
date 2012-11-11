@@ -21,7 +21,15 @@
 */
 
 #include "PTUseRuleTableSync.h"
+
+#include "DaysField.hpp"
+#include "MinutesField.hpp"
+#include "Profile.h"
+#include "PtimeField.hpp"
 #include "PTUseRule.h"
+#include "Session.h"
+#include "TimeField.hpp"
+#include "User.h"
 #include "FareTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -190,11 +198,11 @@ namespace synthese
 			query.addField(object->getAccessCapacity() ? lexical_cast<string>(*object->getAccessCapacity()) : string());
 			query.addField(static_cast<int>(object->getReservationType()));
 			query.addField(object->getOriginIsReference());
-			query.addField(object->getMinDelayMinutes().total_seconds() / 60);
-			query.addField(static_cast<int>(object->getMinDelayDays().days()));
-			query.addField(object->getMaxDelayDays() ? object->getMaxDelayDays()->days() : 0);
-			query.addField(object->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(object->getHourDeadLine()));
-			query.addField(object->getReservationMinDepartureTime().is_not_a_date_time() ? string() : to_simple_string(object->getReservationMinDepartureTime()));
+			query.addFrameworkField<MinutesField>(object->getMinDelayMinutes());
+			query.addFrameworkField<DaysField>(object->getMinDelayDays());
+			query.addField(object->getMaxDelayDays() ? static_cast<int>(object->getMaxDelayDays()->days()) : int(0));
+			query.addFrameworkField<TimeField>(object->getHourDeadLine());
+			query.addFrameworkField<TimeField>(object->getReservationMinDepartureTime());
 			query.addField(PTUseRuleTableSync::SerializeForbiddenDays(object->getReservationForbiddenDays()));
 			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
 			query.addField(object->getForbiddenInDepartureBoards());

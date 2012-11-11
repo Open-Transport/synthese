@@ -75,13 +75,13 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const;
 
 
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const;
 
 			bool isAuthorized(

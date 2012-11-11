@@ -22,66 +22,66 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "HTMLForm.h"
-#include "HTMLTable.h"
-#include "HTMLList.h"
-#include "PropertiesHTMLTable.h"
-#include "StopAreaTableSync.hpp"
-#include "StopArea.hpp"
-#include "StopPoint.hpp"
+#include "DisplayAdmin.h"
+
+#include "AddDepartureStopToDisplayScreenAction.h"
+#include "AddForbiddenPlaceToDisplayScreenAction.h"
+#include "AddPreselectionPlaceToDisplayScreenAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
-#include "AdminInterfaceElement.h"
-#include "SentAlarm.h"
-#include "DisplayAdmin.h"
-#include "DeparturesTableModule.h"
-#include "DisplayScreen.h"
-#include "DisplayType.h"
-#include "UpdateDisplayScreenAction.h"
-#include "DisplayScreenTableSync.h"
-#include "UpdateDisplayPreselectionParametersAction.h"
-#include "AddPreselectionPlaceToDisplayScreenAction.h"
-#include "RemovePreselectionPlaceFromDisplayScreenAction.h"
-#include "UpdateAllStopsDisplayScreenAction.h"
-#include "AddDepartureStopToDisplayScreenAction.h"
-#include "AddForbiddenPlaceToDisplayScreenAction.h"
-#include "DisplayScreenAddDisplayedPlaceAction.h"
-#include "DisplayScreenRemovePhysicalStopAction.h"
-#include "DisplayScreenRemoveDisplayedPlaceAction.h"
-#include "DisplayScreenRemoveForbiddenPlaceAction.h"
-#include "DisplaySearchAdmin.h"
-#include "RemoveObjectAction.hpp"
-#include "DisplayScreenContentFunction.h"
+#include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"
-#include "UpdateDisplayMaintenanceAction.h"
+#include "City.h"
+#include "CommercialLine.h"
+#include "CreateDisplayScreenAction.h"
+#include "DeparturesTableModule.h"
 #include "DisplayMaintenanceLog.h"
 #include "DisplayMaintenanceRight.h"
-#include "05_html/Constants.h"
-#include "HTMLList.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
-#include "DisplayScreenCPUTableSync.h"
-#include "DisplayScreenCPU.h"
+#include "DisplayScreen.h"
+#include "DisplayScreenAddDisplayedPlaceAction.h"
 #include "DisplayScreenAppearanceUpdateAction.h"
-#include "DisplayTypeAdmin.h"
-#include "StopPointTableSync.hpp"
-#include "LineStopTableSync.h"
-#include "JourneyPattern.hpp"
-#include "CommercialLine.h"
-#include "ArrivalDepartureTableLog.h"
-#include "MessageAdmin.h"
-#include "SentScenario.h"
-#include "MessagesScenarioAdmin.h"
-#include "Interface.h"
+#include "DisplayScreenContentFunction.h"
+#include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUAdmin.h"
-#include "City.h"
+#include "DisplayScreenCPUTableSync.h"
+#include "DisplayScreenRemoveDisplayedPlaceAction.h"
+#include "DisplayScreenRemoveForbiddenPlaceAction.h"
+#include "DisplayScreenRemovePhysicalStopAction.h"
+#include "DisplayScreenTableSync.h"
 #include "DisplayScreenTransferDestinationAddAction.h"
 #include "DisplayScreenTransferDestinationRemoveAction.h"
-#include "Profile.h"
-#include "CreateDisplayScreenAction.h"
 #include "DisplayScreenUpdateDisplayedStopAreaAction.hpp"
+#include "DisplaySearchAdmin.h"
+#include "DisplayType.h"
+#include "DisplayTypeAdmin.h"
+#include "HTMLForm.h"
+#include "HTMLTable.h"
+#include "HTMLList.h"
+#include "Interface.h"
+#include "JourneyPattern.hpp"
+#include "LineStopTableSync.h"
+#include "MessageAdmin.h"
+#include "MessagesScenarioAdmin.h"
+#include "Profile.h"
+#include "PropertiesHTMLTable.h"
 #include "PTPlaceAdmin.h"
+#include "RemoveObjectAction.hpp"
+#include "RemovePreselectionPlaceFromDisplayScreenAction.h"
+#include "StopArea.hpp"
+#include "StopAreaTableSync.hpp"
+#include "StopPoint.hpp"
+#include "StopPointTableSync.hpp"
+#include "SentAlarm.h"
+#include "SentScenario.h"
+#include "UpdateAllStopsDisplayScreenAction.h"
+#include "UpdateDisplayMaintenanceAction.h"
+#include "UpdateDisplayPreselectionParametersAction.h"
+#include "UpdateDisplayScreenAction.h"
+#include "User.h"
+#include "05_html/Constants.h"
 
 #include <utility>
 #include <sstream>
@@ -170,7 +170,7 @@ namespace synthese
 
 		void DisplayAdmin::display(
 			std::ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			vector<pair<optional<DisplayScreen::SubScreenType>, string> > subscreenTypeFilterMap;
@@ -182,7 +182,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_TECHNICAL))
 			{
 				// Update request
-				AdminActionFunctionRequest<UpdateDisplayScreenAction,DisplayAdmin> updateDisplayRequest(_request);
+				AdminActionFunctionRequest<UpdateDisplayScreenAction,DisplayAdmin> updateDisplayRequest(_request, *this);
 				updateDisplayRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Delete the screen request
@@ -307,7 +307,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_MAINTENANCE))
 			{
 				// Update action
-				AdminActionFunctionRequest<UpdateDisplayMaintenanceAction,DisplayAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<UpdateDisplayMaintenanceAction,DisplayAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// View the display type
@@ -317,7 +317,7 @@ namespace synthese
 				);
 
 				// Log search
-				AdminFunctionRequest<DisplayAdmin> searchRequest(_request);
+				AdminFunctionRequest<DisplayAdmin> searchRequest(_request, *this);
 
 				stream << "<h1>Paramètres de maintenance</h1>";
 
@@ -440,47 +440,47 @@ namespace synthese
 			if (openTabContent(stream, TAB_CONTENT))
 			{
 				// Add display request
-				AdminActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,DisplayAdmin> addDisplayRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,DisplayAdmin> addDisplayRequest(_request, *this);
 				addDisplayRequest.getAction()->setScreen(_displayScreen);
 
 				// Remove displayed place request
-				AdminActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,DisplayAdmin> rmDisplayedRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,DisplayAdmin> rmDisplayedRequest(_request, *this);
 				rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
 
 				// Update request
-				AdminActionFunctionRequest<UpdateAllStopsDisplayScreenAction,DisplayAdmin> updateAllDisplayRequest(_request);
+				AdminActionFunctionRequest<UpdateAllStopsDisplayScreenAction,DisplayAdmin> updateAllDisplayRequest(_request, *this);
 				updateAllDisplayRequest.getAction()->setScreen(_displayScreen);
 
 				// Add physical request
-				AdminActionFunctionRequest<AddDepartureStopToDisplayScreenAction,DisplayAdmin> addPhysicalRequest(_request);
+				AdminActionFunctionRequest<AddDepartureStopToDisplayScreenAction,DisplayAdmin> addPhysicalRequest(_request, *this);
 				addPhysicalRequest.getAction()->setScreen(_displayScreen);
 
 				// Add preselection request
-				AdminActionFunctionRequest<AddPreselectionPlaceToDisplayScreenAction,DisplayAdmin> addPreselRequest(_request);
+				AdminActionFunctionRequest<AddPreselectionPlaceToDisplayScreenAction,DisplayAdmin> addPreselRequest(_request, *this);
 				addPreselRequest.getAction()->setScreen(_displayScreen);
 
 				// Add not to serve request
-				AdminActionFunctionRequest<AddForbiddenPlaceToDisplayScreenAction,DisplayAdmin> addNSRequest(_request);
+				AdminActionFunctionRequest<AddForbiddenPlaceToDisplayScreenAction,DisplayAdmin> addNSRequest(_request, *this);
 				addNSRequest.getAction()->setScreen(_displayScreen);
 
 				// Update preselection request
-				AdminActionFunctionRequest<UpdateDisplayPreselectionParametersAction,DisplayAdmin> updPreselRequest(_request);
+				AdminActionFunctionRequest<UpdateDisplayPreselectionParametersAction,DisplayAdmin> updPreselRequest(_request, *this);
 				updPreselRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Remove preselection stop request
-				AdminActionFunctionRequest<RemovePreselectionPlaceFromDisplayScreenAction,DisplayAdmin> rmPreselRequest(_request);
+				AdminActionFunctionRequest<RemovePreselectionPlaceFromDisplayScreenAction,DisplayAdmin> rmPreselRequest(_request, *this);
 				rmPreselRequest.getAction()->setScreen(_displayScreen);
 
 				// Remove physical stop request
-				AdminActionFunctionRequest<DisplayScreenRemovePhysicalStopAction,DisplayAdmin> rmPhysicalRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenRemovePhysicalStopAction,DisplayAdmin> rmPhysicalRequest(_request, *this);
 				rmPhysicalRequest.getAction()->setScreen(_displayScreen);
 
 				// Remove Forbidden place request
-				AdminActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,DisplayAdmin> rmForbiddenRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,DisplayAdmin> rmForbiddenRequest(_request, *this);
 				rmForbiddenRequest.getAction()->setScreen(_displayScreen);
 
 				// Change displayed stop area request
-				AdminActionFunctionRequest<DisplayScreenUpdateDisplayedStopAreaAction,DisplayAdmin> updateDisplayedPlaceRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenUpdateDisplayedStopAreaAction,DisplayAdmin> updateDisplayedPlaceRequest(_request, *this);
 				updateDisplayedPlaceRequest.getAction()->setScreen(const_pointer_cast<DisplayScreen>(_displayScreen));
 
 				vector<pair<optional<EndFilter>, string> > endFilterMap;
@@ -762,18 +762,20 @@ namespace synthese
 
 				stream << "<h1>Contenus inclus</h1>";
 
-				AdminFunctionRequest<DisplayAdmin> displayRequest(_request);
+				AdminFunctionRequest<DisplayAdmin> displayRequest(_request, *this);
 
 				AdminFunctionRequest<PTPlaceAdmin> displayPlaceRequest(_request);
 
 				AdminActionFunctionRequest<CreateDisplayScreenAction,DisplayAdmin> createDisplayRequest(
-					_request
+					_request,
+					*this
 				);
 				createDisplayRequest.setActionWillCreateObject();
 				createDisplayRequest.getAction()->setUp(_displayScreen);
 
 				AdminActionFunctionRequest<RemoveObjectAction,DisplayAdmin> removeDisplayRequest(
-					_request
+					_request,
+					*this
 				);
 
 				HTMLTable::ColsVector c;
@@ -826,7 +828,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_APPEARANCE))
 			{
 				// Properties Update request
-				AdminActionFunctionRequest<DisplayScreenAppearanceUpdateAction,DisplayAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<DisplayScreenAppearanceUpdateAction,DisplayAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Maps for particular select fields
@@ -870,11 +872,11 @@ namespace synthese
 				if(_displayScreen->getGenerationMethod() != DisplayScreen::ROUTE_PLANNING)
 				{
 					// Add display request
-					AdminActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,DisplayAdmin> addDisplayRequest(_request);
+					AdminActionFunctionRequest<DisplayScreenAddDisplayedPlaceAction,DisplayAdmin> addDisplayRequest(_request, *this);
 					addDisplayRequest.getAction()->setScreen(_displayScreen);
 
 					// Remove displayed place request
-					AdminActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,DisplayAdmin> rmDisplayedRequest(_request);
+					AdminActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,DisplayAdmin> rmDisplayedRequest(_request, *this);
 					rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
 
 					stream << "<h1>Affichage arrêts intermédiaires</h1>";
@@ -914,11 +916,11 @@ namespace synthese
 
 
 					// Add transfer request
-					AdminActionFunctionRequest<DisplayScreenTransferDestinationAddAction,DisplayAdmin> addTransferRequest(_request);
+					AdminActionFunctionRequest<DisplayScreenTransferDestinationAddAction,DisplayAdmin> addTransferRequest(_request, *this);
 					addTransferRequest.getAction()->setScreen(_displayScreen);
 
 					// Remove transfer place request
-					AdminActionFunctionRequest<DisplayScreenTransferDestinationRemoveAction,DisplayAdmin> rmTransferRequest(_request);
+					AdminActionFunctionRequest<DisplayScreenTransferDestinationRemoveAction,DisplayAdmin> rmTransferRequest(_request, *this);
 					rmTransferRequest.getAction()->setScreen(_displayScreen);
 
 					stream << "<h1>Affichage de correspondances</h1>";
@@ -1249,7 +1251,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DisplayAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			const DisplayAdmin* da(dynamic_cast<const DisplayAdmin*>(&currentPage));

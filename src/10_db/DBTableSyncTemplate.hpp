@@ -188,12 +188,9 @@ namespace synthese
 				static util::RegistryKeyType encodeUId(
 					util::RegistryObjectType objectId
 				){
-					static int nodeId = boost::lexical_cast<util::RegistryNodeType>(
-						server::ModuleClass::GetParameter("dbring_node_id", "1")
-					);
 					return util::encodeUId(
 						K::TABLE.ID,
-						nodeId,
+						DBModule::GetNodeId(),
 						objectId
 					);
 				}
@@ -365,19 +362,8 @@ namespace synthese
 					DBTableSyncTemplate<K>::LogRemoval(session, id);
 				}
 				DBTableSyncTemplate<K>::BeforeDelete(id, transaction);
-				DBTableSyncTemplate<K>::RemoveRow(id, transaction);
+				DBModule::GetDB()->deleteStmt(id, transaction);
 				DBTableSyncTemplate<K>::AfterDelete(id, transaction);
-			}
-
-
-
-			static void RemoveRow(
-				util::RegistryKeyType key,
-				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
-			){
-				DeleteQuery<K> query;
-				query.addWhereField(TABLE_COL_ID, key);
-				query.execute(transaction);
 			}
 		};
 

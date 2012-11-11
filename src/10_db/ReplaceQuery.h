@@ -23,8 +23,13 @@
 #ifndef SYNTHESE_db_ReplaceQuery_h__
 #define SYNTHESE_db_ReplaceQuery_h__
 
-#include "DBModule.h"
 #include "DB.hpp"
+#include "DBModule.h"
+#include "DBInterSYNTHESE.hpp"
+#include "DBRecord.hpp"
+#include "InterSYNTHESEContent.hpp"
+#include "InterSYNTHESEModule.hpp"
+#include "ParametersMap.h"
 #include "SQLExpression.hpp"
 
 #include <vector>
@@ -43,11 +48,8 @@ namespace synthese
 		class ReplaceQuery
 		{
 		private:
-			typedef std::vector<boost::shared_ptr<SQLExpression> > Fields;
-
-			Fields _fields;
 			util::RegistryKeyType _id;
-			bool _objectAdded;
+			DBContent _content;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -58,43 +60,17 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// If the id of the object is not defined, then the object is updated by
 			/// applying auto increment on it.
-			ReplaceQuery(typename TableSync::ObjectType& object) :
-				_objectAdded(false)
-			{
+			ReplaceQuery(
+				typename TableSync::ObjectType& object
+			){
 				if(object.getKey() == 0)
 				{
 					object.setKey(TableSync::getId());
-					_objectAdded = true;
 				}
 				_id = object.getKey();
+				_content.push_back(Cell(_id));
 			}
 
-
-
-			void setValues(util::ParametersMap& map)
-			{
-				assert(map.getFormat() == util::ParametersMap::FORMAT_SQL);
-
-				_id = map.get<util::RegistryKeyType>(TABLE_COL_ID);
-				BOOST_FOREACH(const FieldsList::value_type& field, TableSync::GetFieldsList())
-				{
-					if(field.name == TABLE_COL_ID)
-					{
-						continue;
-					}
-					if(map.isDefined(field.name))
-					{
-						_fields.push_back(
-							ValueExpression<RawSQL>::Get(
-								map.getValue(field.name)
-						)	);
-					}
-					else
-					{
-						addFieldNull();
-					}
-				}
-			}
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -110,14 +86,12 @@ namespace synthese
 			void addFieldNull();
 
 
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Adds an expression field to the query
-			/// @param value expression to add (pointer to SQLExpression object)
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			void addFieldExpression(boost::shared_ptr<SQLExpression> value);
+			template<template<class> class T>
+			void addFrameworkField(
+				const typename T<void>::Type& value
+			){
+				T<void>::SaveToDBContent(value, _content);
+			}
 
 
 
@@ -136,60 +110,33 @@ namespace synthese
 		template<class TableSync>
 		void synthese::db::ReplaceQuery<TableSync>::addFieldNull()
 		{
-			_fields.push_back(
-				NullExpression::Get()
+			_content.push_back(
+				Cell(boost::optional<std::string>())
 			);
 		}
-
-
-
-		template<class TableSync>
-		void synthese::db::ReplaceQuery<TableSync>::addFieldExpression( boost::shared_ptr<SQLExpression> value )
-		{
-			_fields.push_back(value);
-		}
-
-
 
 
 
 		template<class TableSync>
 		void ReplaceQuery<TableSync>::execute(boost::optional<DBTransaction&> transaction) const
 		{
-			std::stringstream query;
-			query
-				<< "REPLACE INTO " << TableSync::TABLE.NAME << " VALUES("
-				<< _id;
-			BOOST_FOREACH(const Fields::value_type& field, _fields)
-			{
-				query << std::fixed << "," << field->toString();
-			}
-			query << ");";
-			DB* db = DBModule::GetDB();
-			db->execUpdate(query.str(), transaction);
-
-			db->addDBModifEvent(
-				DB::DBModifEvent(
-					TableSync::TABLE.NAME,
-// TODO remove MODIF_UPDATE and _objectAdded attribute or find an other way to choose between the two types
-//					_objectAdded ? DB::MODIF_INSERT : DB::MODIF_UPDATE,
-					DB::MODIF_INSERT,
-					_id
-				),
+			DBRecord record(
+				*DBModule::GetTableSync(TableSync::TABLE.ID)
+			);
+			record.setContent(_content);
+			DBModule::GetDB()->replaceStmt(
+				_id,
+				record,
 				transaction
 			);
-
-#ifdef DO_VERIFY_TRIGGER_EVENTS
-			db->checkModificationEvents();
-#endif
 		}
 
 
 		template<class Table> template<class T>
 		void ReplaceQuery<Table>::addField(const T& value)
 		{
-			_fields.push_back(
-				ValueExpression<T>::Get(value)
+			_content.push_back(
+				Cell(value)
 			);
 		}
 	}

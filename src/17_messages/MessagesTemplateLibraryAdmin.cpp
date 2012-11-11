@@ -23,18 +23,17 @@
 */
 
 #include "MessagesTemplateLibraryAdmin.h"
+
 #include "MessagesModule.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
+#include "User.h"
 #include "HTMLList.h"
-
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
-
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
-
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 #include "UpdateTextTemplateAction.h"
@@ -114,23 +113,23 @@ namespace synthese
 
 		void MessagesTemplateLibraryAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			// Requests
-			AdminActionFunctionRequest<UpdateTextTemplateAction,MessagesTemplateLibraryAdmin> updateRequest(_request);
+			AdminActionFunctionRequest<UpdateTextTemplateAction,MessagesTemplateLibraryAdmin> updateRequest(_request, *this);
 
-			AdminActionFunctionRequest<RemoveObjectAction,MessagesTemplateLibraryAdmin> deleteRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction,MessagesTemplateLibraryAdmin> deleteRequest(_request, *this);
 
-			AdminActionFunctionRequest<TextTemplateAddAction,MessagesTemplateLibraryAdmin> addRequest(_request);
+			AdminActionFunctionRequest<TextTemplateAddAction,MessagesTemplateLibraryAdmin> addRequest(_request, *this);
 			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : RegistryKeyType(0));
 
-			AdminActionFunctionRequest<TextTemplateFolderUpdateAction,MessagesTemplateLibraryAdmin> updateFolderRequest(_request);
+			AdminActionFunctionRequest<TextTemplateFolderUpdateAction,MessagesTemplateLibraryAdmin> updateFolderRequest(_request, *this);
 
 
 			// Rights
-			bool updateRight(_request.isAuthorized<MessagesLibraryRight>(WRITE));
-			bool deleteRight(_request.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
+			bool updateRight(_request.getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE));
+			bool deleteRight(_request.getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT));
 
 			// Search
 			TextTemplateTableSync::SearchResult templates(
@@ -235,7 +234,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -252,7 +251,7 @@ namespace synthese
 
 		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			return true;
 		}

@@ -34,7 +34,21 @@ namespace synthese
 	{
 		void DBTransaction::addQuery(const string& sql)
 		{
-			_queries.push_back(sql);
+			_queries.push_back(Query(sql));
+		}
+
+
+
+		void DBTransaction::addReplaceStmt( const DBRecord& record )
+		{
+			_queries.push_back(Query(record));
+		}
+
+
+
+		void DBTransaction::addDeleteStmt(util::RegistryKeyType id)
+		{
+			_queries.push_back(Query(id));
 		}
 
 
@@ -62,6 +76,10 @@ namespace synthese
 
 		void DBTransaction::run(
 		){
+			if(_queries.empty())
+			{
+				return;
+			}
 			DBModule::GetDB()->execTransaction(*this);
 			_queries.clear();
 			_modifiedRows.clear();
@@ -69,16 +87,15 @@ namespace synthese
 
 
 
-		const DBTransaction::Queries DBTransaction::getQueries() const
+		const DBTransaction::Queries& DBTransaction::getQueries() const
 		{
 			return _queries;
 		}
 
 
 
-		const DBTransaction::DBModifEvents DBTransaction::getDBModifEvents() const
+		const DBTransaction::DBModifEvents& DBTransaction::getDBModifEvents() const
 		{
 			return _modifEvents;
 		}
-	}
-}
+}	}

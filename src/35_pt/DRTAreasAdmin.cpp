@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DRTAreasAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "DRTArea.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "ResultHTMLTable.h"
@@ -110,12 +113,12 @@ namespace synthese
 
 		void DRTAreasAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<DRTAreaAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, DRTAreasAdmin> deleteRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DRTAreasAdmin> deleteRequest(request, *this);
 
 			AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> addRequest(request);
 			addRequest.setActionWillCreateObject();
@@ -186,7 +189,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DRTAreasAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -206,7 +209,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DRTAreasAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

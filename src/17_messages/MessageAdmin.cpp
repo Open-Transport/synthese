@@ -22,9 +22,12 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "PropertiesHTMLTable.h"
-#include "HTMLTable.h"
 #include "MessageAdmin.h"
+
+#include "Profile.h"
+#include "PropertiesHTMLTable.h"
+#include "User.h"
+#include "HTMLTable.h"
 #include "MessagesModule.h"
 #include "MessagesTypes.h"
 #include "AlarmRecipient.h"
@@ -113,7 +116,7 @@ namespace synthese
 
 		void MessageAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -122,7 +125,7 @@ namespace synthese
 			{
 				stream << "<h1>Contenu</h1>";
 
-				AdminActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,MessageAdmin> templateRequest(_request);
+				AdminActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,MessageAdmin> templateRequest(_request, *this);
 				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				MessagesModule::Labels tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
@@ -136,7 +139,7 @@ namespace synthese
 					stream << "</p>" << fc.close();
 				}
 
-				AdminActionFunctionRequest<UpdateAlarmMessagesAction,MessageAdmin> updateMessagesRequest(_request);
+				AdminActionFunctionRequest<UpdateAlarmMessagesAction,MessageAdmin> updateMessagesRequest(_request, *this);
 				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
 
 				if(_alarm->getRawEditor())
@@ -167,7 +170,7 @@ namespace synthese
 					stream << TinyMCE::GetFakeFormWithInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage());
 				}
 
-				AdminActionFunctionRequest<UpdateAlarmMessagesAction, MessageAdmin> rawEditorUpdateRequest(_request);
+				AdminActionFunctionRequest<UpdateAlarmMessagesAction, MessageAdmin> rawEditorUpdateRequest(_request, *this);
 				rawEditorUpdateRequest.getAction()->setAlarm(const_pointer_cast<Alarm>(_alarm));
 				rawEditorUpdateRequest.getAction()->setRawEditor(!_alarm->getRawEditor());
 				stream <<
@@ -185,14 +188,14 @@ namespace synthese
 				// TAB STOPS
 				if (openTabContent(stream, recipient->getFactoryKey()))
 				{
-					AdminActionFunctionRequest<AlarmAddLinkAction,MessageAdmin> addRequest(_request);
+					AdminActionFunctionRequest<AlarmAddLinkAction,MessageAdmin> addRequest(_request, *this);
 					addRequest.getAction()->setAlarmId(_alarm->getKey());
 					addRequest.getAction()->setRecipientKey(recipient->getFactoryKey());
 
-					AdminActionFunctionRequest<AlarmRemoveLinkAction,MessageAdmin> removeRequest(_request);
+					AdminActionFunctionRequest<AlarmRemoveLinkAction,MessageAdmin> removeRequest(_request, *this);
 					removeRequest.getAction()->setAlarmId(_alarm->getKey());
 
-					AdminFunctionRequest<MessageAdmin> searchRequest(_request);
+					AdminFunctionRequest<MessageAdmin> searchRequest(_request, *this);
 					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
 				}
 			}
@@ -253,7 +256,7 @@ namespace synthese
 
 		bool MessageAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			const MessagesScenarioAdmin* ma(
 				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)

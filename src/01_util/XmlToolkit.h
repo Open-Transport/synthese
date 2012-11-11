@@ -24,102 +24,100 @@
 #ifndef SYNTHESE_UTIL_XMLTOOLKIT_H
 #define SYNTHESE_UTIL_XMLTOOLKIT_H
 
-#include <string>
-#include <iostream>
-
-#include <boost/logic/tribool.hpp>
-#include <boost/filesystem/path.hpp>
-
 #include "XmlParser.h"
 
-
+#include <iostream>
+#include <string>
+#include <boost/logic/tribool.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
-namespace util
-{
+	namespace util
+	{
+		/** Toolkit for XML related tasks.
+			@ingroup m01
+		*/
+		namespace XmlToolkit
+		{
 
-/** Toolkit for XML related tasks.
-@ingroup m01XML
-*/
-namespace XmlToolkit
-{
+			const char* CheckForRequiredAttr (XMLNode& node,
+								 const std::string& attrName);
 
-    const char* CheckForRequiredAttr (XMLNode& node,
-					     const std::string& attrName);
+			bool HasAttr (XMLNode& node,
+				  const std::string& attrName);
 
-    bool HasAttr (XMLNode& node,
-		  const std::string& attrName);
+			int GetChildNodeCount (XMLNode& node,
+					   const std::string& nodeName);
 
-    int GetChildNodeCount (XMLNode& node,
-			   const std::string& nodeName);
-
-    XMLNode GetChildNode (XMLNode& node,
-			  const std::string& nodeName,
-			  int index);
-
-
-    XMLNode ParseString (const std::string& str, const std::string& rootNodeTag);
-
-    XMLNode ParseFile (const boost::filesystem::path& file, const std::string& rootNodeTag);
+			XMLNode GetChildNode (XMLNode& node,
+					  const std::string& nodeName,
+					  int index);
 
 
-    std::string GetStringAttr (XMLNode& node,
-			       const std::string& attrName);
+			XMLNode ParseString (const std::string& str, const std::string& rootNodeTag);
 
-    std::string GetStringAttr (XMLNode& node,
-			       const std::string& attrName,
-			       const std::string& defaultValue);
+			XMLNode ParseFile (const boost::filesystem::path& file, const std::string& rootNodeTag);
 
-    bool GetBoolAttr (XMLNode& node,
-		      const std::string& attrName);
 
-    bool GetBoolAttr (XMLNode& node,
-		      const std::string& attrName,
-		      bool defaultValue);
+			std::string GetStringAttr (XMLNode& node,
+						   const std::string& attrName);
 
-    boost::logic::tribool GetTriboolAttr (XMLNode& node,
+			std::string GetStringAttr (XMLNode& node,
+						   const std::string& attrName,
+						   const std::string& defaultValue);
+
+			bool GetBoolAttr (XMLNode& node,
 					  const std::string& attrName);
 
-    boost::logic::tribool GetTriboolAttr (XMLNode& node,
+			bool GetBoolAttr (XMLNode& node,
 					  const std::string& attrName,
-					  boost::logic::tribool defaultValue);
+					  bool defaultValue);
 
-    int GetIntAttr (XMLNode& node,
-			   const std::string& attrName);
+			boost::logic::tribool GetTriboolAttr (XMLNode& node,
+							  const std::string& attrName);
 
-    int GetIntAttr (XMLNode& node,
-			   const std::string& attrName,
-			   int defaultValue);
+			boost::logic::tribool GetTriboolAttr (XMLNode& node,
+							  const std::string& attrName,
+							  boost::logic::tribool defaultValue);
 
-    long GetLongAttr (XMLNode& node, const std::string& attrName);
+			int GetIntAttr (XMLNode& node,
+					   const std::string& attrName);
 
-    long GetLongAttr (XMLNode& node,
-			     const std::string& attrName,
-			     long defaultValue);
+			int GetIntAttr (XMLNode& node,
+					   const std::string& attrName,
+					   int defaultValue);
 
-    long long GetLongLongAttr (XMLNode& node,
-				      const std::string& attrName);
+			long GetLongAttr (XMLNode& node, const std::string& attrName);
 
-    long long GetLongLongAttr (XMLNode& node,
-				      const std::string& attrName,
-				      long long defaultValue);
+			long GetLongAttr (XMLNode& node,
+						 const std::string& attrName,
+						 long defaultValue);
 
-    double GetDoubleAttr (XMLNode& node,
-				 const std::string& attrName);
+			long long GetLongLongAttr (XMLNode& node,
+							  const std::string& attrName);
 
-    double GetDoubleAttr (XMLNode& node,
-				 const std::string& attrName,
-				 double defaultValue);
+			long long GetLongLongAttr (XMLNode& node,
+							  const std::string& attrName,
+							  long long defaultValue);
+
+			double GetDoubleAttr (XMLNode& node,
+						 const std::string& attrName);
+
+			double GetDoubleAttr (XMLNode& node,
+						 const std::string& attrName,
+						 double defaultValue);
+
+			void ToXsdDateTime(
+				std::ostream& str,
+				const boost::posix_time::ptime& value
+			);
 
 
+			boost::posix_time::ptime GetXsdDateTime(
+				const std::string& str
+			);
+}	}	}
 
-}
-
-
-
-}
-
-}
 #endif
-

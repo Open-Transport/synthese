@@ -29,10 +29,16 @@
 #include <string>
 
 #include "FactoryBase.h"
-#include "AdminInterfaceElement.h"
+
+#include <boost/thread.hpp>
 
 namespace synthese
 {
+	namespace admin
+	{
+		class AdminInterfaceElement;
+	}
+
 	namespace util
 	{
 		class ParametersMap;
@@ -40,6 +46,8 @@ namespace synthese
 
 	namespace server
 	{
+		class Request;
+
 		////////////////////////////////////////////////////////////////////
 		/// Module class.
 		///	@ingroup m15
@@ -96,6 +104,8 @@ namespace synthese
 			virtual void init() const = 0;
 			virtual void end() const = 0;
 			virtual const std::string& getName() const = 0;
+			virtual void initThread() const = 0;
+			virtual void closeThread() const = 0;
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -109,7 +119,7 @@ namespace synthese
 			/// @since 3.2.0
 			virtual void addAdminPageParameters(
 				util::ParametersMap& map,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const;
 
 
@@ -123,7 +133,8 @@ namespace synthese
 
 			virtual void displayAdmin(
 				std::ostream& stream,
-				const admin::AdminRequest& request
+				const server::Request& request,
+				const admin::AdminInterfaceElement& currentPage
 			) const;
 		};
 }	}

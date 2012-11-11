@@ -19,19 +19,24 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "AdminInterfaceElement.h"
+
+#include "AdminPageDisplayService.hpp"
+#include "HomeAdmin.h"
+#include "HTMLModule.h"
+#include "ModuleAdmin.h"
+#include "ModuleClass.h"
+#include "Profile.h"
+#include "SecurityRight.h"
+#include "Session.h"
+#include "StaticFunctionRequest.h"
+#include "URI.hpp"
+#include "User.h"
+#include "UserAdmin.h"
+
+#include <assert.h>
 #include <sstream>
 #include <boost/foreach.hpp>
-#include <assert.h>
-
-#include "AdminInterfaceElement.h"
-#include "HTMLModule.h"
-#include "StaticFunctionRequest.h"
-#include "HomeAdmin.h"
-#include "Interface.h"
-#include "Profile.h"
-#include "User.h"
-#include "Session.h"
-
 
 using namespace std;
 using namespace boost;
@@ -46,16 +51,22 @@ namespace synthese
 
 	namespace admin
 	{
+		const string AdminInterfaceElement::DATA_ICON = "icon";
+		const string AdminInterfaceElement::DATA_TITLE = "title";
+		const string AdminInterfaceElement::DATA_URL = "url";
+
+
+
 		AdminInterfaceElement::AdminInterfaceElement(
-		):	_tabBuilded(false),
-			_currentTab(NULL)
+		):	_currentTab(NULL),
+			_tabBuilded(false)
 		{}
 
 
 
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -72,7 +83,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPagesOfModule(
 			const server::ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 			return PageLinks();
 		}
@@ -80,23 +91,28 @@ namespace synthese
 
 
 		void AdminInterfaceElement::_buildTree(
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			// Cleaning
 			_tree.subPages.clear();
-
-			// Initialisation
-			shared_ptr<HomeAdmin> homeAdmin(
-				getNewPage<HomeAdmin>()
-			);
-
+			_tree.isNodeOpened = true;
 			PageLinks position;
-			position.push_back(homeAdmin);
-			_tree = _buildTreeRecursion(homeAdmin, position, request);
-			if (dynamic_cast<const HomeAdmin*>(this))
+
+			// Modules list
+			_tree.page = getNewPage<HomeAdmin>();
+			position.push_back(_tree.page);
+
+			if(*_tree.page == *this)
 			{
 				_treePosition = position;
 			}
+
+			_tree.subPages.push_back(
+				_buildTreeRecursion(
+					_tree.page,
+					position,
+					request
+			)	);
 		}
 
 
@@ -116,7 +132,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
 			shared_ptr<const AdminInterfaceElement> adminPage,
 			PageLinks position,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 
 			// Local variables
@@ -140,7 +156,9 @@ namespace synthese
 					);
 
 					if (*link == *this)
+					{
 						subTree.isNodeOpened = true;
+					}
 
 					tree.subPages.push_back(subTree);
 					if (!tree.isNodeOpened)
@@ -162,8 +180,10 @@ namespace synthese
 			return tree;
 		}
 
+
+
 		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition(
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			if (_treePosition.empty())
 			{
@@ -172,8 +192,10 @@ namespace synthese
 			return _treePosition;
 		}
 
+
+
 		const AdminInterfaceElement::PageLinksTree& AdminInterfaceElement::getTree(
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const
 		{
 			if (_treePosition.empty())
@@ -187,7 +209,7 @@ namespace synthese
 
 		bool AdminInterfaceElement::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			return false;
 		}
@@ -196,7 +218,7 @@ namespace synthese
 
 		void AdminInterfaceElement::displayTabs(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			if (_tabs.empty()) return;
 
@@ -313,8 +335,8 @@ namespace synthese
 			string icon
 		):	_title(title),
 			_id(id),
-			_writePermission(writePermission),
-			_icon(icon)
+			_icon(icon),
+			_writePermission(writePermission)
 		{
 		}
 
@@ -392,6 +414,31 @@ namespace synthese
 				_theoreticalTreePosition = _getCurrentTreeBranch();
 			}
 			return *_theoreticalTreePosition;
+		}
+
+
+
+		void AdminInterfaceElement::toParametersMap(
+			ParametersMap& pm
+		) const {
+			// icon
+			pm.insert(DATA_ICON, getIcon());
+
+			// title
+			pm.insert(DATA_TITLE, getTitle());
+
+			// url
+			stringstream url;
+			url << AdminPageDisplayService::PARAMETER_PAGE << URI::PARAMETER_ASSIGNMENT << getFactoryKey();
+			const map<string,string> adminMap(getParametersMap().getMap());
+			for (map<string,string>::const_iterator it(adminMap.begin()); it != adminMap.end(); ++it)
+			{
+				url <<
+					URI::PARAMETER_SEPARATOR <<
+					it->first << URI::PARAMETER_ASSIGNMENT << it->second
+				;
+			}
+			pm.insert(DATA_URL, url.str());
 		}
 
 

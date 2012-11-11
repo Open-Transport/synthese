@@ -28,11 +28,14 @@
 #include "DBTransaction.hpp"
 #include "ParametersMap.h"
 #include "PlacesListService.hpp"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
 #include "StopArea.hpp"
 #include "TimetableRight.h"
 #include "TimetableRowGroupTableSync.hpp"
 #include "TimetableRowGroupItemTableSync.hpp"
+#include "User.h"
 
 using namespace boost;
 using namespace std;

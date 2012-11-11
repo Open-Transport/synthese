@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTUseRulesAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "PTUseRuleTableSync.h"
 #include "ActionResultHTMLTable.h"
 #include "PTUseRuleUpdateAction.hpp"
@@ -105,18 +108,18 @@ namespace synthese
 
 		void PTUseRulesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			stream << "<h1>Conditions de transport</h1>";
 
 			AdminActionFunctionRequest<PTUseRuleUpdateAction, PTUseRuleAdmin> creationRequest(_request);
 			creationRequest.setActionWillCreateObject();
-			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
+			creationRequest.setActionFailedPage(getNewCopiedPage());
 
 			AdminFunctionRequest<PTUseRuleAdmin> openRequest(_request);
 
-			AdminFunctionRequest<PTUseRulesAdmin> searchRequest(_request);
+			AdminFunctionRequest<PTUseRulesAdmin> searchRequest(_request, *this);
 
 			SearchFormHTMLTable st(searchRequest.getHTMLForm());
 			stream << st.open();
@@ -164,7 +167,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTUseRulesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -184,7 +187,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks PTUseRulesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

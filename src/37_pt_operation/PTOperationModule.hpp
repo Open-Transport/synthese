@@ -30,12 +30,6 @@
 
 namespace synthese
 {
-	namespace pt
-	{
-		class CommercialLine;
-		class ScheduledService;
-	}
-
 	//////////////////////////////////////////////////////////////////////////
 	/// 37 pt_operation Module namespace.
 	/// @image html uml_pt_operation.png
@@ -46,9 +40,6 @@ namespace synthese
 	/// @since 3.2.1
 	namespace pt_operation
 	{
-		class Vehicle;
-		class ServiceComposition;
-
 		/**	@defgroup m37Exceptions 37.01 Exceptions
 			@ingroup m37
 
@@ -94,22 +85,6 @@ namespace synthese
 		class PTOperationModule:
 			public graph::GraphModuleTemplate<PTOperationModule>
 		{
-		public:
-			typedef std::map<const pt::CommercialLine*, std::set<const Vehicle*> > LinesAllowedVehicles;
-			typedef std::map<const pt::ScheduledService*, std::set<const ServiceComposition*> > ServiceCompositions;
-
-		private:
-			static LinesAllowedVehicles _linesAllowedVehicles;
-			static ServiceCompositions _serviceCompositions;
-
-		public:
-			static void RegisterVehicle(const Vehicle& vehicle);
-			static void UnregisterVehicle(const Vehicle& vehicle);
-			static LinesAllowedVehicles::mapped_type GetAllowedVehicles(const pt::CommercialLine& line);
-
-			static void RegisterComposition(const ServiceComposition& composition);
-			static void UnregisterComposition(const ServiceComposition& composition);
-			static ServiceCompositions::mapped_type GetCompositions(const pt::ScheduledService& service);
 		};
 	}
 	/** @} */

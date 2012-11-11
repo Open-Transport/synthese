@@ -22,8 +22,12 @@
 
 
 #include "DbModuleConfigTableSync.h"
-#include "ServerAdminRight.h"
+
 #include "ModuleClass.h"
+#include "Profile.h"
+#include "ServerAdminRight.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 

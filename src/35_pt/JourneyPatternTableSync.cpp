@@ -20,13 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "JourneyPatternTableSync.hpp"
 
+#include "DataSourceLinksField.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "Session.h"
+#include "User.h"
 #include "GraphConstants.h"
 #include "CommercialLineTableSync.h"
-#include "JourneyPatternTableSync.hpp"
 #include "FareTableSync.h"
 #include "RollingStockTableSync.hpp"
 #include "DataSourceTableSync.h"
@@ -38,6 +41,8 @@
 #include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"
 #include "DestinationTableSync.hpp"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -92,7 +97,7 @@ namespace synthese
 			Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_TEXT),
 			Field(JourneyPatternTableSync::COL_MAIN, SQL_BOOLEAN),
 			Field(JourneyPatternTableSync::COL_PLANNED_LENGTH, SQL_DOUBLE),
 			Field()
@@ -129,6 +134,7 @@ namespace synthese
 			line->setWalkingLine (isWalkingLine);
 			line->setWayBack(rows->getBool(JourneyPatternTableSync::COL_WAYBACK));
 			line->setRollingStock(NULL);
+			line->setNetwork(NULL);
 			line->setCommercialLine(NULL);
 			line->cleanDataSourceLinks();
 			line->setMain(rows->getBool(JourneyPatternTableSync::COL_MAIN));
@@ -142,6 +148,7 @@ namespace synthese
 				{
 					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
 					line->setCommercialLine(cline);
+					line->setNetwork(cline->getNetwork());
 					cline->addPath(line);
 				}
 				catch(ObjectNotFoundException<CommercialLine>)
@@ -252,8 +259,7 @@ namespace synthese
 			query.addField(object->getWayBack());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getMain());
 			query.addField(object->getPlannedLength());
@@ -304,7 +310,7 @@ namespace synthese
 			LineStopTableSync::SearchResult edges(LineStopTableSync::Search(env, id));
 			BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& edge, edges)
 			{
-				LineStopTableSync::RemoveRow(edge->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(edge->getKey(), transaction);
 			}
 		}
 

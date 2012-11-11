@@ -26,17 +26,21 @@
 
 #include "ActionException.h"
 #include "CityTableSync.h"
+#include "DataSourceLinksField.hpp"
 #include "DBModule.h"
 #include "GeographyModule.h"
+#include "GeometryField.hpp"
 #include "ImportableTableSync.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
-#include "StandardFields.hpp"
+#include "Session.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <geos/geom/Point.h>
 #include <geos/io/WKTReader.h>
@@ -88,7 +92,7 @@ namespace synthese
 			}
 			map.insert(
 				PARAMETER_OPERATOR_CODE,
-				DataSourceLinks::Serialize(_operatorCode, map.getFormat())
+				DataSourceLinks::Serialize(_operatorCode)
 			);
 			if(_point.get() && !_point->isEmpty())
 			{

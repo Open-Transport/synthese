@@ -24,6 +24,7 @@
 
 #include "AccessParameters.h"
 #include "Edge.h"
+#include "DataSourceLinksField.hpp"
 #include "Registry.h"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
@@ -69,6 +70,7 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_DOC_URL("line_doc_url");
 		const string CommercialLine::DATA_LINE_TIMETABLE_ID("line_timetable_id");
 		const string CommercialLine::DATA_LINE_NETWORK_ID = "network_id";
+		const string CommercialLine::DATA_MAX_DISPLAY_DELAY = "max_display_delay";
 
 
 
@@ -78,7 +80,8 @@ namespace synthese
 			graph::PathGroup(key),
 			_reservationContact(NULL),
 			_calendarTemplate(NULL),
-			_timetableId(0)
+			_timetableId(0),
+			_displayDurationBeforeFirstDeparture(not_a_date_time)
 		{
 			// Default use rules
 			RuleUser::Rules rules(getRules());
@@ -217,7 +220,7 @@ namespace synthese
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,
 				getDataSourceLinks().size() == 1 ?
 				lexical_cast<string>(getDataSourceLinks().begin()->second) :
-				impex::DataSourceLinks::Serialize(getDataSourceLinks(), pm.getFormat())
+				impex::DataSourceLinks::Serialize(getDataSourceLinks())
 			);
 			if(getColor())
 			{
@@ -232,6 +235,10 @@ namespace synthese
 			pm.insert(prefix + "lineImage", getImage()); // For StopAreasList compatibility
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
 			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());
+			if(!_displayDurationBeforeFirstDeparture.is_not_a_date_time())
+			{
+				pm.insert(prefix + DATA_MAX_DISPLAY_DELAY, _displayDurationBeforeFirstDeparture.total_seconds()/60);
+			}
 		}
 
 

@@ -139,7 +139,7 @@ namespace synthese
 			/// @param request the current request
 			void _displaySubFoldersList(
 				std::ostream& stream,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const {
 
 				// Sub-folders load
@@ -152,7 +152,7 @@ namespace synthese
 
 				// Sub-folder creation request
 				typename admin::AdminActionFunctionRequest<db::ObjectCreateAction, AdminPageType> addFolderRequest(request);
-				//addFolderRequest.getFunction()->setActionFailedPage<AdminPageType>();
+				//addFolderRequest.setActionFailedPage<AdminPageType>();
 				addFolderRequest.getAction()->template set<Parent>(const_cast<TreeFolderUpNode*>(_node));
 				addFolderRequest.getAction()->template setTable<TreeFolder>();
 				addFolderRequest.setActionWillCreateObject();
@@ -223,7 +223,7 @@ namespace synthese
 			/// @param request the current request
 			void _displayFolderProperties(
 				std::ostream& stream,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const {
 
 				// No display if the page is not loaded on a folder

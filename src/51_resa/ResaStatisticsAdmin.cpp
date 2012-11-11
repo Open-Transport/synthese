@@ -23,10 +23,12 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ResaStatisticsAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
+#include "User.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "ResaStatisticsTableSync.h"
@@ -152,12 +154,12 @@ namespace synthese
 
 		void ResaStatisticsAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			stream << "<h1>Requête</h1>";
 
-			AdminFunctionRequest<ResaStatisticsAdmin> searchRequest(request);
+			AdminFunctionRequest<ResaStatisticsAdmin> searchRequest(request, *this);
 
 			SearchFormHTMLTable rt(searchRequest.getHTMLForm());
 			stream << rt.open();

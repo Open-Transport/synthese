@@ -26,10 +26,12 @@
 #define SYNTHESE_ServiceQuota_H
 
 #include "Object.hpp"
-#include "StandardFields.hpp"
-#include "UtilConstants.h"
-
+#include "NumericField.hpp"
+#include "PointerField.hpp"
 #include "ScheduledService.h"
+#include "SimpleMapField.hpp"
+
+#include "UtilConstants.h"
 
 #include <boost/date_time/gregorian/greg_duration.hpp>
 #include <boost/fusion/include/map.hpp>
@@ -39,9 +41,9 @@ namespace synthese
 	namespace pt
 	{
 		typedef std::map<boost::gregorian::date, int> QuotasMap;
-		FIELD_TYPE(Quotas, QuotasMap)
-		FIELD_TYPE(Service, boost::optional<ScheduledService&>)
-
+		FIELD_MAP(Quotas, QuotasMap)
+		FIELD_POINTER(Service, ScheduledService)
+		
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Service),

@@ -23,6 +23,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "SentScenarioInheritedTableSync.h"
+
+#include "DataSourceLinksField.hpp"
+#include "PtimeField.hpp"
 #include "SentScenario.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
@@ -161,15 +164,14 @@ namespace synthese
 			query.addField(0);
 			query.addField(obj->getIsEnabled());
 			query.addField(obj->getName());
-			query.addField(obj->getPeriodStart());
-			query.addField(obj->getPeriodEnd());
+			query.addFrameworkField<PtimeField>(obj->getPeriodStart());
+			query.addFrameworkField<PtimeField>(obj->getPeriodEnd());
 			query.addField(UNKNOWN_VALUE);
 			query.addField(vars.str());
 			query.addField(obj->getTemplate() ? obj->getTemplate()->getKey() : RegistryKeyType(0));
 			query.addField(
 				DataSourceLinks::Serialize(
-					obj->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					obj->getDataSourceLinks()
 			)	);
 			query.execute(transaction);
 

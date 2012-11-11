@@ -26,7 +26,8 @@
 #include "ImportableTemplate.hpp"
 #include "Calendar.h"
 #include "Named.h"
-#include "StandardFields.hpp"
+#include "PointerField.hpp"
+#include "PointersVectorField.hpp"
 
 namespace synthese
 {
@@ -48,7 +49,7 @@ namespace synthese
 			public impex::ImportableTemplate<DriverService>,
 			public calendar::Calendar,
 			public virtual util::Registrable,
-			public ObjectField<DriverService, boost::optional<DriverService&> >
+			public PointerField<DriverService, DriverService>
 		{
 		public:
 			static const std::string TAG_CHUNK;
@@ -68,6 +69,11 @@ namespace synthese
 			static const std::string VALUE_DEAD_RUN;
 			static const std::string VALUE_COMMERCIAL;
 
+			struct Vector:
+				public PointersVectorField<Vector, DriverService>
+			{
+
+			};
 
 			struct Chunk
 			{

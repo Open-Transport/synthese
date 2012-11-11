@@ -32,6 +32,7 @@ namespace synthese
 {
 	namespace util
 	{
+		const MimeType MimeTypes::CSS("text", "css", "css", "");
 		const MimeType MimeTypes::CSV("text", "csv", "csv", "");
 		const MimeType MimeTypes::HTML("text", "html", "html", "htm", "");
 		const MimeType MimeTypes::JSON("application", "json", "json", "");

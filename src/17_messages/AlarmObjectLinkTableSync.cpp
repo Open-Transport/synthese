@@ -21,10 +21,14 @@
 */
 
 #include "AlarmObjectLinkTableSync.h"
+
 #include "AlarmObjectLinkException.h"
 #include "AlarmRecipient.h"
 #include "AlarmObjectLink.h"
+#include "Profile.h"
 #include "SentAlarm.h"
+#include "Session.h"
+#include "User.h"
 #include "Registry.h"
 #include "AlarmTableSync.h"
 #include "LoadException.h"

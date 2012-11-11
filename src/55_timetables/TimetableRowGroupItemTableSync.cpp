@@ -24,7 +24,6 @@
 
 #include "DBResult.hpp"
 #include "RankUpdateQuery.hpp"
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "SQLSingleOperatorExpression.hpp"
 
@@ -41,7 +40,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,TimetableRowGroupItemTableSync>::FACTORY_KEY("55.10 Timetable items");
+		template<> const string FactorableTemplate<DBTableSync,TimetableRowGroupItemTableSync>::FACTORY_KEY("55.20 Timetable items");
 	}
 
 	namespace db
@@ -89,15 +88,10 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<TimetableRowGroupItemTableSync,TimetableRowGroupItem>::Save(
-			TimetableRowGroupItem* webPage,
+			TimetableRowGroupItem* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<TimetableRowGroupItemTableSync> query(*webPage);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			webPage->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

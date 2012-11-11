@@ -24,9 +24,10 @@
 #ifndef SYNTHESE_svn_SVNWorkingCopy_H
 #define SYNTHESE_svn_SVNWorkingCopy_H
 
-#include "SimpleObjectField.hpp"
-
 #include "Env.h"
+#include "FrameworkTypes.hpp"
+#include "SVNRepository.hpp"
+#include "SimpleObjectFieldDefinition.hpp"
 
 #include <iostream>
 #include <vector>
@@ -55,33 +56,15 @@ namespace synthese
 			///  - SVN backend
 			///	 - Inter-SYNTHESE service
 			class SVNWorkingCopy:
-				public ObjectField<SVNWorkingCopy, SVNWorkingCopy>
+				public SimpleObjectFieldDefinition<SVNWorkingCopy>
 			{
 			public:
 				typedef SVNWorkingCopy Type;
 
-				typedef std::pair<int, std::string> CommandOutput;
-
-				class CommandException:
-					public synthese::Exception
-				{
-					CommandOutput _commandOutput;
-
-				public:
-					CommandException(
-						const CommandOutput& commandOutput
-					):	synthese::Exception("Error on SVN command : " + commandOutput.second),
-						_commandOutput(commandOutput)
-					{}
-
-
-
-					const CommandOutput& getCommandOutput() const { return _commandOutput; }
-				};
 
 			private:
 				boost::filesystem::path _path; //<! The working copy path
-				std::string _repoURL; //<! The URL of the repository
+				SVNRepository _repo; // The repository
 				ObjectBase* _object; //<! The corresponding object in SYNTHESE
 
 				mutable util::Env _env;
@@ -111,104 +94,6 @@ namespace synthese
 
 
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Runs a SVN command through the svn binary.
-				static CommandOutput _runSVN(
-					const std::string& user,
-					const std::string& password,
-					const std::string& command,
-					const std::string& parameters
-				);
-
-				
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Updates the working copy from the repository.
-				/// @return false if there is at least one conflict
-				/// @warning this method does not check if the working copy is up to date
-				/// @pre the working copy must exist on the filesystem
-				/// @pre the repository URL must point to a valid SYNTHESE directory
-				static bool _svnUpdate(
-					const std::string& user,
-					const std::string& password,
-					const boost::filesystem::path& localPath
-				);
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Commits the content of the working copy into the repository.
-				/// @param message the the commit message
-				/// @return false is an update is necessary
-				/// @warning this method does not check if the working copy is up to date
-				/// @pre the working copy must exist on the filesystem
-				/// @pre the repository URL must point to a valid SYNTHESE directory
-				static bool _svnCommit(
-					const std::string& message,
-					const std::string& user,
-					const std::string& password,
-					const boost::filesystem::path& localPath
-				);
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Creates a directory in the repository.
-				/// @throw CommandException if the directory creation failed
-				static void _svnMkdir(
-					const std::string& user,
-					const std::string& password,
-					const std::string& url
-				);
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Checks out a repository into a working copy.
-				/// @throw CommandException if the checkout failed
-				static void _svnCheckout(
-					const std::string& user,
-					const std::string& password,
-					const std::string& url,
-					const boost::filesystem::path& localPath
-				);
-
-
-
-				typedef std::vector<std::string> LsResult;
-
-				static LsResult _svnLs(
-					const std::string& user,
-					const std::string& password,
-					const std::string& url
-				);
-
-
-
-				static void _svnCreate(
-					const std::string& user,
-					const std::string& password
-				);
-
-
-
-				static void _svnAdd(
-					const boost::filesystem::path& file
-				);
-
-
-
-				static void _svnDelete(
-					const boost::filesystem::path& file
-				);
-
-
-
-				static void _svnMove(
-					const boost::filesystem::path& oldFile,
-					const boost::filesystem::path& newFile
-				);
 
 
 
@@ -237,14 +122,14 @@ namespace synthese
 				//@{
 					ObjectBase* getObject() const { return _object; }
 					const boost::filesystem::path& getPath() const { return _path; }
-					const std::string& getRepoURL() const { return _repoURL; }
+					const SVNRepository& getRepo() const { return _repo; }
 				//@}
 
 				/// @name Setters
 				//@{
 					void setObject(ObjectBase* value);
 					void setPath(const boost::filesystem::path& value){ _path = value; }
-					void setRepoURL(const std::string& value){ _repoURL = value; }
+					void setRepo(const SVNRepository& value){ _repo = value; }
 				//@}
 
 				/// @name Services
@@ -284,6 +169,45 @@ namespace synthese
 						const std::string& password
 					);
 				//@}
+
+				void from_string(
+					const std::string& text
+				);
+
+				std::string to_string(
+				) const;
+
+				static void LoadFromRecord(
+					Type& fieldObject,
+					ObjectBase& object,
+					const Record& record,
+					const util::Env& env
+				);
+
+				static void SaveToFilesMap(
+					const Type& fieldObject,
+					const ObjectBase& object,
+					FilesMap& map
+				);
+
+				static void SaveToParametersMap(
+					const Type& fieldObject,
+					const ObjectBase& object,
+					util::ParametersMap& map,
+					const std::string& prefix,
+					boost::logic::tribool withFiles
+				);
+
+				static void SaveToDBContent(
+					const Type& fieldObject,
+					const ObjectBase& object,
+					DBContent& content
+				);
+
+				static void GetLinkedObjectsIds(
+					LinkedObjectsIds& list, 
+					const Record& record
+				);
 			};
 }	}	}
 

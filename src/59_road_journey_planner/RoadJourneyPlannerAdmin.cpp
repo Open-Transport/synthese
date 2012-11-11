@@ -129,7 +129,7 @@ namespace synthese
 
 		void RoadJourneyPlannerAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 
 			// Search form
@@ -144,7 +144,7 @@ namespace synthese
 				endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
 			}
 
-			AdminFunctionRequest<RoadJourneyPlannerAdmin> searchRequest(_request);
+			AdminFunctionRequest<RoadJourneyPlannerAdmin> searchRequest(_request, *this);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune d&eacute;part", st.getForm().getTextInput(
@@ -245,7 +245,7 @@ namespace synthese
 				//stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
 				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
 				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
-				stream << HTMLModule::GetHTMLJavascriptOpen("/map/vendor/OpenLayers/OpenLayers.js");
+				stream << HTMLModule::GetHTMLJavascriptOpen("/map/vendor/OpenLayers-2.11/OpenLayers.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("pedestrianroutemap.js");
 			}
 		}
@@ -263,7 +263,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks RoadJourneyPlannerAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	dynamic_cast<const RoadJourneyPlannerModule*>(&module) &&
@@ -280,7 +280,7 @@ namespace synthese
 
 		bool RoadJourneyPlannerAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			return true;
 		}

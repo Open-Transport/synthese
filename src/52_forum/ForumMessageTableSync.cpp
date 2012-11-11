@@ -22,13 +22,15 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "ForumMessageTableSync.hpp"
+
+#include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "ForumTopicTableSync.hpp"
 #include "UserTableSync.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -160,7 +162,7 @@ namespace synthese
 			query.addField(object->getUserEMail());
 			query.addField(object->getUserName());
 			query.addField(object->getUser() ? object->getUser()->getKey() : RegistryKeyType(0));
-			query.addField(object->getDate());
+			query.addFrameworkField<PtimeField>(object->getDate());
 			query.addField(object->getPublished());
 			query.addField(object->getIP());
 			query.execute(transaction);

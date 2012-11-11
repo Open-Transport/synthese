@@ -27,6 +27,7 @@
 #include "Edge.h"
 #include "HourPeriod.h"
 #include "ObjectNotFoundException.h"
+#include "Session.h"
 #include "JourneyPattern.hpp"
 #include "PlacesListService.hpp"
 #include "PTRoutePlannerResult.h"
@@ -129,6 +130,8 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_LOWEST_ARRIVAL_TIME = "ii";
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_DEPARTURE_TIME = "ha";
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME = "ia";
+		const string RoutePlannerFunction::PARAMETER_NETWORK_LIST = "nwl";
+		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_LIST = "tml";
 		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string RoutePlannerFunction::PARAMETER_MIN_MAX_DURATION_RATIO_FILTER = "min_max_duration_ratio_filter";
 		const string RoutePlannerFunction::PARAMETER_MIN_WAITING_TIME_FILTER = "min_waiting_time_filter";
@@ -256,6 +259,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_TICKET_NAME("ticket_name");
 		const string RoutePlannerFunction::DATA_TICKET_PRICE("ticket_price");
 		const string RoutePlannerFunction::DATA_TICKET_CURRENCY("ticket_currency");
+		const string RoutePlannerFunction::DATA_DISTANCE = "distance";
 
 		// Cells
 		const string RoutePlannerFunction::DATA_ODD_ROW("is_odd_row");
@@ -598,11 +602,11 @@ namespace synthese
 
 					// Time period
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= _config->get<Periods>().size())
+					if (_periodId >= _config->get<HourPeriods>().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
-					_period = &_config->get<Periods>().at(_periodId);
+					_period = &_config->get<HourPeriods>().at(_periodId);
 				}
 				// 1abcde : optional bounds specification
 				else
@@ -641,16 +645,57 @@ namespace synthese
 				throw RequestException(e.what());
 			}
 
+			AccessParameters::AllowedPathClasses allowedPathClasses;
 			try
 			{
 				// Rolling stock filter
 				if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
 				{
 					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+					allowedPathClasses = _rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses();
 				}
 			}
 			catch(ObjectNotFoundException<RollingStockFilter>&)
 			{
+			}
+
+			string rsStr(map.getDefault<string>(PARAMETER_ROLLING_STOCK_LIST));
+			try
+			{
+				if(!rsStr.empty())
+				{
+					vector<string> rsVect;
+					split(rsVect, rsStr, is_any_of(",; "));
+					allowedPathClasses.insert(0);
+					BOOST_FOREACH(string& rsItem, rsVect)
+					{
+						allowedPathClasses.insert(lexical_cast<RegistryKeyType>(rsItem));
+					}
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Rolling Stock List is unreadable");
+			}
+
+			AccessParameters::AllowedNetworks allowedNetworks;
+			string nwlStr(map.getDefault<string>(PARAMETER_NETWORK_LIST));
+			try
+			{
+				if(!nwlStr.empty())
+				{
+					vector<string> nwVect;
+					split(nwVect, nwlStr, is_any_of(",; "));
+					allowedNetworks.insert(0);
+					BOOST_FOREACH(string& nwItem, nwVect)
+					{
+						allowedNetworks.insert(lexical_cast<RegistryKeyType>(nwItem));
+					}
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Network List is unreadable");
 			}
 
 			// Max solutions number
@@ -664,12 +709,12 @@ namespace synthese
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
-			AccessParameters::AllowedPathClasses allowedPathClasses = _rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses();
 			if(_config)
 			{
 				_accessParameters = _config->getAccessParameters(
 					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
-					allowedPathClasses
+					allowedPathClasses,
+					allowedNetworks
 				);
 			}
 			else
@@ -677,19 +722,19 @@ namespace synthese
 				if(acint && *acint == USER_HANDICAPPED)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 300, posix_time::minutes(23), 0.556, boost::optional<size_t>(), allowedPathClasses
+						*acint, false, false, 300, posix_time::minutes(23), 0.556, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 				else if(acint && *acint == USER_BIKE)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 3000, posix_time::minutes(23), 4.167, boost::optional<size_t>(), allowedPathClasses
+						*acint, false, false, 3000, posix_time::minutes(23), 4.167, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 				else
 				{
 					_accessParameters = AccessParameters(
-						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, boost::optional<size_t>(), allowedPathClasses
+						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 			}
@@ -1263,9 +1308,10 @@ namespace synthese
 						stream << " continuousServiceDuration=\"" << journey.getContinuousServiceRange() << "\"";
 					}
 
-					// CO2 Emissions and Energy consumption
+					// CO2 Emissions, Energy consumption and total distance computation
 					double co2Emissions = 0;
 					double energyConsumption = 0;
+					double totalDistance = 0;
 					BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 					{
 						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
@@ -1287,10 +1333,12 @@ namespace synthese
 						{
 							co2Emissions += distance * line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
 							energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+							totalDistance += distance;
 						}
 					}
 					stream << " " << DATA_CO2_EMISSIONS << "=\"" << co2Emissions << "\"";
 					stream << " " << DATA_ENERGY_CONSUMPTION << "=\"" << energyConsumption << "\"";
+					stream << " " << DATA_DISTANCE << "=\"" << totalDistance << "\"";
 					stream << ">";
 
 					if(journey.getReservationCompliance(false) != false)
@@ -2868,9 +2916,10 @@ namespace synthese
 			pm.insert(DATA_HANDICAPPED_FILTER, handicappedFilter);
 			pm.insert(DATA_BIKE_FILTER, bikeFilter);
 
-			// CO2 Emissions and Energy consumption
+			// CO2 Emissions, Energy consumption and total distance computation
 			double co2Emissions = 0;
 			double energyConsumption = 0;
+			double totalDistance = 0;
 			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 			{
 				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
@@ -2892,6 +2941,7 @@ namespace synthese
 				{
 					co2Emissions += distance * line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
 					energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+					totalDistance += distance;
 				}
 			}
 			// TODO : set precision outside of RoutePlannerFunction
@@ -2901,6 +2951,7 @@ namespace synthese
 			cout.unsetf(ios::fixed);
 			pm.insert(DATA_CO2_EMISSIONS, sCO2Emissions.str());
 			pm.insert(DATA_ENERGY_CONSUMPTION, sEnergyConsumption.str());
+			pm.insert(DATA_DISTANCE, totalDistance);
 
 			// Fare calculation
 			if((_fareCalculation) && (_ticketCellPage.get()))
@@ -3223,7 +3274,7 @@ namespace synthese
 							const ServicePointer& nextLeg(*(it+1));
 							const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
 
-							if (nextRoad && nextRoad->getRoadPlace() == road->getRoadPlace())
+							if (nextRoad && (nextRoad->getRoadPlace() == road->getRoadPlace() || nextRoad->getRoadPlace()->getName() == road->getRoadPlace()->getName()))
 								continue;
 						}
 
@@ -3233,8 +3284,8 @@ namespace synthese
 						vector<shared_ptr<Geometry> > geometriesSPtr;
 						BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
 						{
-							distance += it->getDistance();
-							shared_ptr<LineString> geometry(it->getGeometry());
+							distance += itLeg->getDistance();
+							shared_ptr<LineString> geometry(itLeg->getGeometry());
 							if(geometry.get())
 							{
 								shared_ptr<Geometry> geometryProjected(

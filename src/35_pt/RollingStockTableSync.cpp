@@ -23,10 +23,15 @@
 */
 
 #include "RollingStockTableSync.hpp"
+
+#include "DataSourceLinksField.hpp"
+#include "ImportableTableSync.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "Session.h"
 #include "TransportNetworkRight.h"
-#include "ImportableTableSync.hpp"
+#include "User.h"
 
 #include <boost/foreach.hpp>
 
@@ -137,8 +142,7 @@ namespace synthese
 			query.addField(object->getEnergyConsumption());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.execute(transaction);
 		}

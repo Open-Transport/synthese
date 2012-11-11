@@ -29,7 +29,7 @@
 #include "FactorableTemplate.h"
 #include "ParametersMap.h"
 
-#include "SimpleObjectField.hpp"
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -112,7 +112,7 @@ namespace synthese
 				template<class C>
 				void set(const typename C::Type& value)
 				{
-					C::SaveToParametersMap(value, _values, PARAMETER_FIELD_PREFIX);
+					C::SaveToParametersMap(value, _values, PARAMETER_FIELD_PREFIX, boost::logic::indeterminate);
 				}
 
 				/// All parameters version

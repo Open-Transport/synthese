@@ -24,7 +24,6 @@
 
 #include "ServiceQuotaTableSync.hpp"
 
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "ObjectSiteLinkTableSync.h"
 
@@ -41,7 +40,6 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace db;
-	using namespace security;
 
 	namespace util
 	{
@@ -90,15 +88,10 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<ServiceQuotaTableSync,ServiceQuota>::Save(
-			ServiceQuota* site,
+			ServiceQuota* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<ServiceQuotaTableSync> query(*site);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			site->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

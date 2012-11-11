@@ -29,6 +29,8 @@
 #include "FactorableTemplate.h"
 #include "MessagesTypes.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace server
@@ -77,14 +79,14 @@ namespace synthese
 			*/
 			void _setFromParametersMap(
 				const util::ParametersMap& map
-			) throw(server::ActionException);
+			);
 
 		public:
 			/** Action to run, defined by each subclass.
 			*/
 			void run(
 				server::Request& request
-			) throw(server::ActionException);
+			);
 
 
 
@@ -95,7 +97,7 @@ namespace synthese
 			///	@date 2008
 			void setAlarmId(
 				util::RegistryKeyType id
-			) throw(server::ActionException);
+			);
 
 			virtual bool isAuthorized(const server::Session* session) const;
 

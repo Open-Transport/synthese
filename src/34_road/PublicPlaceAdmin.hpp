@@ -118,7 +118,7 @@ namespace synthese
 			///	@date 2012
 			void display(
 				std::ostream& stream,
-				const admin::AdminRequest& _request
+				const server::Request& _request
 			) const;
 
 
@@ -149,7 +149,7 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const server::ModuleClass& module,
 				const AdminInterfaceElement& currentPage,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const;
 
 

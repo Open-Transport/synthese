@@ -22,11 +22,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "SendPasswordAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "SendPasswordAction.h"
+#include "Profile.h"
 #include "ResaRight.h"
 #include "Request.h"
+#include "Session.h"
 #include "UserTableSync.h"
 #include "User.h"
 #include "ResaModule.h"

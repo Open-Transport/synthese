@@ -13,15 +13,17 @@ include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
 include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
-include_directories("${PROJECT_SOURCE_DIR}/src/36_cms")
+include_directories("${PROJECT_SOURCE_DIR}/src/11_cms")
 
 set(DEPS
   103_db_svn
   20_tree
   59_road_journey_planner # from 56_pt_website
   56_pt_website # from cms
+  11_cms # from pt
+  19_inter_synthese
   54_departure_boards
-  36_cms # from pt
+  61_data_exchange
 )
 
 boost_test(WebpageContent "${DEPS}")

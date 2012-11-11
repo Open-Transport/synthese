@@ -22,13 +22,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "UserFavoriteJourneyTableSync.h"
+
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "Session.h"
+#include "TransportWebsiteRight.h"
 #include "UserFavoriteJourney.h"
 #include "UserTableSync.h"
-#include "ReplaceQuery.h"
-#include "TransportWebsiteRight.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -109,19 +112,7 @@ namespace synthese
 		){
 			ReplaceQuery<UserFavoriteJourneyTableSync> query(*object);
 			query.addField(object->getUser() ? object->getUser()->getKey() : RegistryKeyType(0));
-			if (!object->getRank())
-			{
-				query.addFieldExpression(
-					SubQueryExpression::Get(
-						"SELECT MAX(" + UserFavoriteJourneyTableSync::COL_RANK + string(") +1 FROM ") +
-						UserFavoriteJourneyTableSync::TABLE.NAME + " WHERE " +
-						UserFavoriteJourneyTableSync::COL_USER_ID + "=" + lexical_cast<string>(object->getUser()->getKey())
-				)	);
-			}
-			else
-			{
-				query.addField(object->getRank());
-			}
+			query.addField(object->getRank());
 			query.addField(object->getOriginCityName());
 			query.addField(object->getOriginPlaceName());
 			query.addField(object->getDestinationCityName());

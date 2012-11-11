@@ -23,8 +23,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "CommercialLineAdmin.h"
+
 #include "TransportNetworkAdmin.h"
 #include "PTModule.h"
+#include "User.h"
 #include "NonConcurrencyRuleTableSync.h"
 #include "NonConcurrencyRule.h"
 #include "TransportNetwork.h"
@@ -74,6 +76,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
+//	using namespace data_exchange;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -158,7 +161,7 @@ namespace synthese
 
 		void CommercialLineAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 
 			////////////////////////////////////////////////////////////////////
@@ -186,10 +189,10 @@ namespace synthese
 
 				// Declarations
 				AdminFunctionRequest<FreeDRTAreaAdmin> openRequest(_request);
-				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request, *this);
 
 				// Search for areas
-				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
+				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request, *this);
 				FreeDRTAreaTableSync::SearchResult areas(
 					FreeDRTAreaTableSync::Search(
 						Env::GetOfficialEnv(),
@@ -311,7 +314,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<CommercialLineCalendarTemplateUpdateAction,CommercialLineAdmin> updateCalendarRequest(_request);
+				AdminActionFunctionRequest<CommercialLineCalendarTemplateUpdateAction,CommercialLineAdmin> updateCalendarRequest(_request, *this);
 				updateCalendarRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
 				PropertiesHTMLTable t(updateCalendarRequest.getHTMLForm());
 
@@ -387,7 +390,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<CommercialLineAdmin> openRequest(_request);
+					AdminFunctionRequest<CommercialLineAdmin> openRequest(_request, *this);
 					openRequest.getPage()->setControlCalendar(true);
 
 					stream <<
@@ -402,11 +405,11 @@ namespace synthese
 			// TAB NON CONCURRENCY
 			if (openTabContent(stream, TAB_NON_CONCURRENCY))
 			{
-				AdminActionFunctionRequest<NonConcurrencyRuleAddAction,CommercialLineAdmin> addRequest(_request);
+				AdminActionFunctionRequest<NonConcurrencyRuleAddAction,CommercialLineAdmin> addRequest(_request, *this);
 				addRequest.getAction()->setHiddenLine(_cline);
 
-				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
-				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request, *this);
+				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request, *this);
 
 				stream << "<h1>Lignes prioritaires</h1>";
 
@@ -474,7 +477,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
 				// The update request
-				AdminActionFunctionRequest<CommercialLineUpdateAction,CommercialLineAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<CommercialLineUpdateAction,CommercialLineAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
 
 				stream << "<h1>Propriétés</h1>";
@@ -579,7 +582,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -658,13 +661,13 @@ namespace synthese
 
 		void CommercialLineAdmin::_displayRoutes(
 			std::ostream& stream,
-			const admin::AdminRequest& request,
+			const server::Request& request,
 			bool wayBack
 		) const {
 			// Requests
-			AdminFunctionRequest<CommercialLineAdmin> searchRequest(request);
+			AdminFunctionRequest<CommercialLineAdmin> searchRequest(request, *this);
 
-			AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(request, *this);
 
 			// Search form
 			stream << "<h1>Recherche</h1>";
@@ -691,7 +694,7 @@ namespace synthese
 			)	);
 
 			AdminActionFunctionRequest<JourneyPatternAddAction,JourneyPatternAdmin> creationRequest(request);
-			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
+			creationRequest.setActionFailedPage(getNewCopiedPage());
 			creationRequest.setActionWillCreateObject();
 			creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
 

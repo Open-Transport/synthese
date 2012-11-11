@@ -20,11 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// Env
 #include "CommercialLineTableSync.h"
+
 #include "CommercialLine.h"
-#include "TransportNetworkTableSync.h"
+#include "DataSourceLinksField.hpp"
+#include "Profile.h"
+#include "Session.h"
 #include "TransportNetwork.h"
+#include "TransportNetworkTableSync.h"
+#include "User.h"
 #include "JourneyPatternTableSync.hpp"
 #include "TreeFolderTableSync.hpp"
 #include "Place.h"
@@ -192,11 +196,22 @@ namespace synthese
 			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 			object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 
-			object->setDataSourceLinksWithRegistration(
-				ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
-					env
-			)	);
+			if(&env == &Env::GetOfficialEnv())
+			{
+				object->setDataSourceLinksWithRegistration(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
+						env
+				)	);
+			}
+			else
+			{
+				object->setDataSourceLinksWithoutRegistration(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
+						env
+				)	);
+			}
 
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
@@ -324,6 +339,11 @@ namespace synthese
 			CommercialLine* obj
 		){
 			obj->setNullParent();
+
+			if(Env::GetOfficialEnv().contains(*obj))
+			{
+				obj->cleanDataSourceLinks(true);
+			}
 		}
 
 
@@ -361,8 +381,7 @@ namespace synthese
 			query.addField(optionalReservationPlaces.str());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?

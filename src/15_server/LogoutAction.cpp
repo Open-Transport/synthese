@@ -21,8 +21,10 @@
 */
 
 #include "LogoutAction.h"
-#include "Request.h"
+
 #include "ParametersMap.h"
+#include "Request.h"
+#include "Session.h"
 
 namespace synthese
 {
