@@ -12,7 +12,7 @@
 #include "HastusInterfaceFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
-#include "IneoRealtimeUpdateAction.hpp"
+#include "IneoRealTimeUpdateAction.hpp"
 #include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
 #include "ObitiFileFormat.hpp"
