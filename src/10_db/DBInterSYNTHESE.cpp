@@ -61,6 +61,8 @@ namespace synthese
 
 		bool DBInterSYNTHESE::sync( const std::string& parameter ) const
 		{
+			DB& db(*DBModule::GetDB());
+
 			size_t i(0);
 			for(; i<parameter.size() && parameter[i]!=FIELD_SEPARATOR[0]; ++i) ;
 			if(i == parameter.size())
@@ -76,7 +78,6 @@ namespace synthese
 					trim(sql);
 					if(sql.substr(0, 11) == "DELETE FROM")
 					{
-						DB& db(*DBModule::GetDB());
 						db.execUpdate(sql);
 					}
 					else if(sql.substr(0, 12) == "REPLACE INTO")
@@ -91,7 +92,6 @@ namespace synthese
 						{
 							RegistryKeyType id(lexical_cast<RegistryKeyType>(p[1]));
 						
-							DB& db(*DBModule::GetDB());
 							db.execUpdate(sql);
 
 							db.addDBModifEvent(
@@ -133,30 +133,11 @@ namespace synthese
 					string tableName(DBModule::GetTableSync(tableId)->getFormat().NAME);
 
 					// STMT execution
-					_transaction->addDeleteStmt(id);
-/*					DB& db(*DBModule::GetDB());
-					db.deleteRow(id);
-
-					db.addDBModifEvent(
-						DB::DBModifEvent(
-							tableName,
-							DB::MODIF_DELETE,
-							id
-						),
-						optional<DBTransaction&>()
+					db.deleteStmt(
+						id,
+						*_transaction
 					);
-
-					// Inter-SYNTHESE sync
-					inter_synthese::InterSYNTHESEContent iSContent(
-						DBInterSYNTHESE::FACTORY_KEY,
-						lexical_cast<string>(tableId),
-						DBInterSYNTHESE::GetDeleteStmtContent(id)
-					);
-					inter_synthese::InterSYNTHESEModule::Enqueue(
-						iSContent,
-						optional<DBTransaction&>()
-					);
-*/				}
+				}
 				catch(...)
 				{
 					return false;
@@ -294,31 +275,12 @@ namespace synthese
 
 					r.setContent(content);
 
-					_transaction->addReplaceStmt(r);
-					// STMT execution
-/*					DB& db(*DBModule::GetDB());
-					db.saveRecord(r);
-
-					db.addDBModifEvent(
-						DB::DBModifEvent(
-							tableName,
-							DB::MODIF_INSERT,
-							id
-						),
-						optional<DBTransaction&>()
+					db.replaceStmt(
+						id,
+						r,
+						*_transaction
 					);
-
-					// Inter-SYNTHESE sync
-					inter_synthese::InterSYNTHESEContent iSContent(
-						DBInterSYNTHESE::FACTORY_KEY,
-						lexical_cast<string>(tableId),
-						DBInterSYNTHESE::GetReplaceStmtContent(r)
-					);
-					inter_synthese::InterSYNTHESEModule::Enqueue(
-						iSContent,
-						optional<DBTransaction&>()
-					);
-*/				}
+				}
 				catch (DBException&)
 				{
 					return false;
