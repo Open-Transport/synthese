@@ -94,11 +94,11 @@ namespace synthese
 
 	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::AlarmLinks
 	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksAlarm =
-			std::map<const SentAlarm*, std::set<const DisplayScreen*> > ();
+			std::map<const SentAlarm*, std::map<const DisplayScreen*, const AlarmObjectLink*> > ();
 
 	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::ObjectLinks
 	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksObject =
-			std::map<const DisplayScreen*, std::set<const SentAlarm*> > ();
+			std::map<const DisplayScreen*, std::set<const AlarmObjectLink*> > ();
 
 		template<> const string AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
 
@@ -296,21 +296,27 @@ namespace synthese
 			return map;
 		}
 
-		void DisplayScreenAlarmRecipient::addObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
+		void DisplayScreenAlarmRecipient::addObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
 		{
 			try
 			{
-				add(Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(objectId).get(), alarm);
+				add(
+					*Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(objectId),
+					alarm
+				);
 			}
 			catch(...)
 			{
-				throw AlarmObjectLinkException(objectId, alarm->getKey(), "Display screen not found");
+				throw AlarmObjectLinkException(objectId, alarm.getAlarm()->getKey(), "Display screen not found");
 			}
 		}
 
-		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
+		void DisplayScreenAlarmRecipient::removeObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
 		{
-			remove(DisplayScreenTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
+			remove(
+				*DisplayScreenTableSync::Get(objectId, Env::GetOfficialEnv()),
+				alarm
+			);
 		}
 
 

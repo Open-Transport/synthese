@@ -112,7 +112,7 @@ namespace synthese
 			object->setHouseNumber(houseNumber);
 
 			// Road Place
-			boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(rows->getInt(HouseTableSync::COL_ROAD_PLACE_ID),env));
+			boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(rows->getLongLong(HouseTableSync::COL_ROAD_PLACE_ID),env));
 			object->setRoadChunkFromRoadPlace(roadPlace);
 		}
 
@@ -135,7 +135,7 @@ namespace synthese
 					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getRoad()->getRoadPlace()->getKey() : RegistryKeyType(0));
-			query.addField(object->getHouseNumber());
+			query.addField(object->getHouseNumber() ? static_cast<int>(*(object->getHouseNumber())) : 0);
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}

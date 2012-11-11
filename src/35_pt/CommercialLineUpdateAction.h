@@ -80,6 +80,7 @@ namespace synthese
 			static const std::string PARAMETER_MAP_URL;
 			static const std::string PARAMETER_DOC_URL;
 			static const std::string PARAMETER_TIMETABLE_ID;
+			static const std::string PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
 
 		private:
 			boost::shared_ptr<pt::CommercialLine> _line;
@@ -95,6 +96,7 @@ namespace synthese
 			boost::optional<std::string> _mapURL;
 			boost::optional<std::string> _docURL;
 			boost::optional<util::RegistryKeyType> _timetableId;
+			boost::optional<boost::posix_time::time_duration> _displayDurationBeforeFirstDeparture;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

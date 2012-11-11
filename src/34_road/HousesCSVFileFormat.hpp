@@ -115,7 +115,7 @@ namespace synthese
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
 					const std::string& key,
-					boost::optional<const server::Request&> request
+					boost::optional<const server::Request&> adminRequest
 				) const;
 
 				std::string _getValue(const std::size_t field) const;

@@ -60,7 +60,7 @@
 #include "DataSource.h"
 #include "DataSourceAdmin.h"
 #include "RemoveObjectAction.hpp"
-#include "TridentFileFormat.h"
+// #include "TridentFileFormat.h"
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
 #include "DRTArea.hpp"
@@ -76,7 +76,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace data_exchange;
+//	using namespace data_exchange;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -501,6 +501,12 @@ namespace synthese
 				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
 				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
 				stream << t.cell("Couleur (format XML #rrggbb)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toXMLColor() : string()));
+				stream << t.cell(
+					"Affichage avant premier départ (minutes)",
+					t.getForm().getTextInput(
+						CommercialLineUpdateAction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE,
+						_cline->getDisplayDurationBeforeFirstDeparture().is_not_a_date_time() ? string() : lexical_cast<string>(_cline->getDisplayDurationBeforeFirstDeparture().total_seconds() / 60)
+				)	);
 				stream << t.title("Réservation");
 				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
 				stream << t.title("URL Documents");
@@ -538,7 +544,7 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-				shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
+/*				shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
 				exporter->setLine(_cline);
 
 				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
@@ -551,7 +557,7 @@ namespace synthese
 				exporter->setWithTisseoExtension(true);
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "page_white_go.png");
 				stream << "</p>";
-			}
+*/			}
 
 			////////////////////////////////////////////////////////////////////
 			// END TABS

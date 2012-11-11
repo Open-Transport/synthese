@@ -185,6 +185,17 @@ namespace synthese
 					}
 				}
 
+				template<class T>
+				Links::mapped_type getLinkedObjects() const
+				{
+					Links::const_iterator it(_links.find(T::Registry::KEY));
+					if(it == _links.end())
+					{
+						return Links::mapped_type();
+					}
+					return it->second;
+				}
+
 				boost::shared_ptr<Importer> getImporter(util::Env& env) const;
 				bool canImport() const;
 				const CoordinatesSystem& getActualCoordinateSystem() const;

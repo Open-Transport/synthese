@@ -114,6 +114,7 @@ namespace synthese
 		bool MySQLResult::next() const
 		{
 			_row = mysql_fetch_row(_result);
+			_lengths = mysql_fetch_lengths(_result);
 			incrementPosition();
 			return _row != NULL;
 		}
@@ -142,8 +143,10 @@ namespace synthese
 			// TODO: what if result is not a string? Maybe convert with lexical_cast.
 			const char* text = _row[column];
 			if (!text)
-				return "";
-			return std::string(text);
+			{
+				return string();
+			}
+			return std::string(text, _lengths[column]);
 		}
 
 

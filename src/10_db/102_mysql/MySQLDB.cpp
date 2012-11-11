@@ -390,11 +390,14 @@ namespace synthese
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
 			MYSQL_BIND* bnd = new MYSQL_BIND[fieldsNumber];
 			my_bool* isNullArray = new my_bool[fieldsNumber];
+			unsigned long* lengthArray = new unsigned long[fieldsNumber];
 			memset(bnd, 0, fieldsNumber * sizeof(MYSQL_BIND));
 			memset(isNullArray, 0, fieldsNumber * sizeof(my_bool));
+			memset(lengthArray, 0, fieldsNumber * sizeof(unsigned long));
 			for(size_t i(0); i<fieldsNumber; ++i)
 			{
 				bnd[i].is_null = isNullArray+i;
+				bnd[i].length = lengthArray+i;
 				DBRecordCellBindConvertor visitor(*(bnd+i));
 				apply_visitor(visitor, record.getContent().at(i));
 			}
@@ -406,13 +409,45 @@ namespace synthese
 			}
 			else
 			{
-				if(mysql_stmt_execute(stmt))
+				bool ok(true);
+				for(size_t i(0); i<fieldsNumber; ++i)
 				{
-					string errorMsg(mysql_stmt_error(stmt));
-					Log::GetInstance().warn(errorMsg);
+					unsigned long length(*bnd[i].length);
+					if(	length >= 10240)
+					{
+						for(size_t offset(0); offset<length; offset += 10240)
+						{
+							if(	mysql_stmt_send_long_data(
+									stmt,
+									i,
+									static_cast<char*>(bnd[i].buffer) + offset,
+									(offset + 10240 >=length) ? length-offset : 10240
+
+							)	){
+								Log::GetInstance().warn("Error sending data");
+								ok = false;
+								break;
+							}
+						}
+					}
+					if(!ok)
+					{
+						break;
+					}
+				}
+				if(ok)
+				{
+					if(mysql_stmt_execute(stmt))
+					{
+						string errorMsg(mysql_stmt_error(stmt));
+						Log::GetInstance().warn(errorMsg);
+					}
 				}
 			}
-			delete bnd;
+			delete[] isNullArray;
+			delete[] lengthArray;
+			delete[] bnd;
+			mysql_stmt_reset(stmt);
 		}
 
 
@@ -490,7 +525,7 @@ namespace synthese
 			case SQL_GEOM_POLYGON:
 				return "POLYGON";
 			case SQL_BLOB:
-				return "BLOB";
+				return "LONGBLOB";
 			}
 			return string();
 		}
@@ -975,7 +1010,7 @@ namespace synthese
 			if(str)
 			{
 				_bnd.buffer = static_cast<void*>(const_cast<char*>(str->c_str()));
-				_bnd.buffer_length = static_cast<int>(str->size());
+				*_bnd.length = str->size();
 			}
 			else
 			{
@@ -991,7 +1026,7 @@ namespace synthese
 			if(blob)
 			{
 				_bnd.buffer = static_cast<void*>(const_cast<char*>(blob->first));
-				_bnd.buffer_length = static_cast<int>(blob->second);
+				*_bnd.length = blob->second;
 			}
 			else
 			{

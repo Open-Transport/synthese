@@ -25,8 +25,8 @@
 
 #include "Action.h"
 #include "DynamicRequest.h"
-#include "HTTPRequest.hpp"
 #include "Function.h"
+#include "HTTPRequest.hpp"
 #include "RequestException.h"
 #include "ServerConstants.h"
 #include "Session.h"

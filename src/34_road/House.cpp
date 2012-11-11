@@ -117,6 +117,10 @@ namespace synthese
 
 			EdgeProjector<MainRoadChunk*>::PathNearby projection(projector.projectEdge(*(this->getGeometry()->getCoordinate())));
 			this->setRoadChunk(projection.get<1>());
+			if(projection.get<1>())
+			{
+				projection.get<1>()->addHouse(*this);
+			}
 		}
 
 

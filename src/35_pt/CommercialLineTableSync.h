@@ -67,7 +67,7 @@ namespace synthese
 			static const std::string COL_MAP_URL;
 			static const std::string COL_DOC_URL;
 			static const std::string COL_TIMETABLE_ID;
-			static const std::string COL_MAX_DISPLAY_DELAY;
+			static const std::string COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
 
 
 

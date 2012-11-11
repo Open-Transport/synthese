@@ -32,6 +32,7 @@ namespace synthese
 	{
 		class MainRoadPart;
 		class ReverseRoadChunk;
+		class House;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// MainRoadChunk class.
@@ -47,6 +48,7 @@ namespace synthese
 			static const HouseNumber HouseNumber_MAX;
 
 			typedef boost::optional<std::pair<HouseNumber, HouseNumber> > HouseNumberBounds;
+			typedef std::map<HouseNumber, House*> Houses;
 
 			typedef enum {
 				ODD = 'O',
@@ -63,6 +65,8 @@ namespace synthese
 			HouseNumberBounds _rightHouseNumberBounds;
 			HouseNumberingPolicy _leftHouseNumberingPolicy;
 			HouseNumberingPolicy _rightHouseNumberingPolicy;
+
+			Houses _houses;
 
 			ReverseRoadChunk* _reverseRoadChunk;
 
@@ -104,6 +108,8 @@ namespace synthese
 				void setRightHouseNumberBounds(const HouseNumberBounds& value){ _rightHouseNumberBounds = value; }
 				void setLeftHouseNumberingPolicy(const HouseNumberingPolicy& value){ _leftHouseNumberingPolicy = value; }
 				void setRightHouseNumberingPolicy(const HouseNumberingPolicy& value){ _rightHouseNumberingPolicy = value; }
+				void addHouse(House& house);
+				void removeHouse(House& house);
 				void setReverseRoadChunk(ReverseRoadChunk * value){ _reverseRoadChunk = value; }
 			//@}
 
@@ -113,6 +119,7 @@ namespace synthese
 				const HouseNumberBounds& getRightHouseNumberBounds() const { return _rightHouseNumberBounds; }
 				const HouseNumberingPolicy& getLeftHouseNumberingPolicy() const { return _leftHouseNumberingPolicy; }
 				const HouseNumberingPolicy& getRightHouseNumberingPolicy() const { return _rightHouseNumberingPolicy; }
+				const Houses& getHouses() const { return _houses; }
 				ReverseRoadChunk* getReverseRoadChunk() const { return _reverseRoadChunk; }
 				MainRoadPart* getMainRoadPart() const;
 

@@ -75,11 +75,11 @@ namespace synthese
 
 		template<> AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::AlarmLinks
 		AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::_linksAlarm =
-			std::map<const SentAlarm*, std::set<const CommercialLine*> > ();
+			std::map<const SentAlarm*, std::map<const CommercialLine*, const AlarmObjectLink*> > ();
 
 		template<> AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::ObjectLinks
 		AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::_linksObject =
-			std::map<const CommercialLine*, std::set<const SentAlarm*> > ();
+			std::map<const CommercialLine*, std::set<const AlarmObjectLink*> > ();
 
 		template<> const string AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::TITLE("Lignes");
 
@@ -245,21 +245,29 @@ namespace synthese
 			return map;
 		}
 
-		void LineAlarmRecipient::addObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
+		void LineAlarmRecipient::addObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
 		{
 			try
 			{
-				add(Env::GetOfficialEnv().getRegistry<CommercialLine>().get(objectId).get(), alarm);
+				add(
+					*Env::GetOfficialEnv().getRegistry<CommercialLine>().get(objectId),
+					alarm
+				);
 			}
 			catch(...)
 			{
-				throw AlarmObjectLinkException(objectId, alarm->getKey(), "Line not found");
+				throw AlarmObjectLinkException(objectId, alarm.getAlarm()->getKey(), "Line not found");
 			}
 		}
 
-		void LineAlarmRecipient::removeObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
+
+
+		void LineAlarmRecipient::removeObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
 		{
-			remove(CommercialLineTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
+			remove(
+				*CommercialLineTableSync::Get(objectId, Env::GetOfficialEnv()),
+				alarm
+			);
 		}
 
 
