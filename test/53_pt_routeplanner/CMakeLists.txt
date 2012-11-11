@@ -30,6 +30,7 @@ set(DEPS
   59_road_journey_planner # from 53_pt_journey_planner > 56_pt_website
   56_pt_website # from 53_pt_journey_planner
   53_pt_journey_planner
+  54_departure_boards
   51_resa # no dependency, missing?
   11_cms # from 53_pt_journey_planner > 35_pt
   54_departure_boards

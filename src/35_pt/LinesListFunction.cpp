@@ -114,6 +114,8 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_STOP_AREA_TERMINUS_PAGE_ID ="terminus_page";
 		const string LinesListFunction::PARAMETER_DATE_FILTER = "date_filter";
 		const string LinesListFunction::PARAMETER_CALENDAR_FILTER = "calendar_filter";
+		const string LinesListFunction::PARAMETER_RUNS_SOON_FILTER = "runs_soon_filter";
+		const string LinesListFunction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER = "display_duration_before_first_departure_filter";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -449,7 +451,14 @@ namespace synthese
 			string dateFilterStr(map.getDefault<string>(PARAMETER_DATE_FILTER));
 			if(!dateFilterStr.empty())
 			{
-				_dateFilter = from_string(dateFilterStr);
+				if(dateFilterStr == "t")
+				{
+					_dateFilter = day_clock::local_day();
+				}
+				else
+				{
+					_dateFilter = from_string(dateFilterStr);
+				}
 			}
 
 			// Calendar template filter
@@ -474,6 +483,16 @@ namespace synthese
 				}
 
 			}
+
+
+			// Runs soon filter (TL specific default value)
+			long duration(map.getDefault<long>(PARAMETER_RUNS_SOON_FILTER, 180));
+			if(duration)
+			{
+				_runsSoonFilter = minutes(duration);
+			}
+
+			_displayDurationBeforeFirstDepartureFilter = map.getDefault<bool>(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER, false);
 		}
 
 
@@ -624,6 +643,21 @@ namespace synthese
 			// Calendar filter
 			if(	_calendarFilter &&
 				!line.runsOnCalendar(_calendarDaysFilter)
+			){
+				return false;
+			}
+
+			// Runs soon ?
+			if(	_runsSoonFilter &&
+				!line.runsSoon(*_runsSoonFilter)
+			){
+				return false;
+			}
+
+			// displayDurationBeforeFirstDepartureFilter
+			if(	_displayDurationBeforeFirstDepartureFilter &&
+				!line.getDisplayDurationBeforeFirstDeparture().is_not_a_date_time() &&
+				!line.runsSoon(line.getDisplayDurationBeforeFirstDeparture())
 			){
 				return false;
 			}
@@ -957,7 +991,8 @@ namespace synthese
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false),
 			_outputMessages(false),
-			_lettersBeforeNumbers(true)
+			_lettersBeforeNumbers(true),
+			_displayDurationBeforeFirstDepartureFilter(false)
 		{}
 
 

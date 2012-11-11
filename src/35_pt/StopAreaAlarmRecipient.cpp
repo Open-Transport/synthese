@@ -75,11 +75,11 @@ namespace synthese
 
 		template<> AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::AlarmLinks
 		AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::_linksAlarm =
-			std::map<const SentAlarm*, std::set<const StopArea*> > ();
+			std::map<const SentAlarm*, std::map<const StopArea*, const AlarmObjectLink*> > ();
 
 		template<> AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::ObjectLinks
 		AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::_linksObject =
-			std::map<const StopArea*, std::set<const SentAlarm*> > ();
+			std::map<const StopArea*, std::set<const AlarmObjectLink*> > ();
 
 		template<> const string AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::TITLE("Arrêts");
 
@@ -246,21 +246,27 @@ namespace synthese
 			return map;
 		}
 
-		void StopAreaAlarmRecipient::addObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
+		void StopAreaAlarmRecipient::addObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
 		{
 			try
 			{
-				add(Env::GetOfficialEnv().getRegistry<StopArea>().get(objectId).get(), alarm);
+				add(
+					*Env::GetOfficialEnv().getRegistry<StopArea>().get(objectId),
+					alarm
+				);
 			}
 			catch(...)
 			{
-				throw AlarmObjectLinkException(objectId, alarm->getKey(), "Line not found");
+				throw AlarmObjectLinkException(objectId, alarm.getAlarm()->getKey(), "Line not found");
 			}
 		}
 
-		void StopAreaAlarmRecipient::removeObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
+		void StopAreaAlarmRecipient::removeObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
 		{
-			remove(StopAreaTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
+			remove(
+				*StopAreaTableSync::Get(objectId, Env::GetOfficialEnv()),
+				alarm
+			);
 		}
 
 

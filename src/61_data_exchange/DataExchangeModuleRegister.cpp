@@ -12,6 +12,7 @@
 #include "HastusInterfaceFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
+#include "IneoRealtimeUpdateAction.hpp"
 #include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
 #include "ObitiFileFormat.hpp"
@@ -66,6 +67,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::HastusInterfaceFileFormat::integrate();
 	synthese::data_exchange::HeuresFileFormat::integrate();
 	synthese::data_exchange::IneoFileFormat::integrate();
+	synthese::data_exchange::IneoRealtimeUpdateAction::integrate();
 	synthese::data_exchange::IneoRealTimeFileFormat::integrate();
 	synthese::data_exchange::OGTFileFormat::integrate();
 	synthese::data_exchange::ObitiFileFormat::integrate();

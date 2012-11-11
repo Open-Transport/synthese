@@ -127,8 +127,7 @@ namespace synthese
 				std::string _mapURL;
 				std::string _docURL;
 				util::RegistryKeyType _timetableId;
-
-				boost::posix_time::time_duration _maxDisplayDelay;
+				boost::posix_time::time_duration _displayDurationBeforeFirstDeparture;
 			//@}
 
 			/// @name Mutexes
@@ -165,7 +164,7 @@ namespace synthese
 				const std::string& getMapURL() const { return _mapURL; }
 				const std::string& getDocURL() const { return _docURL; }
 				util::RegistryKeyType getTimetableId() const { return _timetableId; }
-				const boost::posix_time::time_duration& getMaxDisplayDelay() const { return _maxDisplayDelay; }
+				const boost::posix_time::time_duration& getDisplayDurationBeforeFirstDeparture() const { return _displayDurationBeforeFirstDeparture; }
 			//@}
 
 			//! @name Setters
@@ -182,7 +181,7 @@ namespace synthese
 				void setMapURL(const std::string& value){ _mapURL = value; }
 				void setDocURL(const std::string& value){ _docURL = value; }
 				void setTimetableId(util::RegistryKeyType value){ _timetableId = value; }
-				void setMaxDisplayDelay(const boost::posix_time::time_duration& value){ _maxDisplayDelay = value; }
+				void setDisplayDurationBeforeFirstDeparture(const boost::posix_time::time_duration& value){ _displayDurationBeforeFirstDeparture = value; }
 			//@}
 
 			/// @name Indices maintenance
@@ -277,6 +276,13 @@ namespace synthese
 				/// Checks if at least one service runs at least at one of the active dates
 				/// of the specified calendar.
 				bool runsOnCalendar(const calendar::Calendar& cal) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if at least one service runs in the next minutes.
+				/// @param when duration to check
+				bool runsSoon(const boost::posix_time::time_duration& when) const;
 			//@}
 
 			//! @name Modifiers

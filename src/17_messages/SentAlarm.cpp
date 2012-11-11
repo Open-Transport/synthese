@@ -114,7 +114,7 @@ namespace synthese
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
 			{
-				AlarmConflict thisConflictStatus = recipient->getConflictStatus(this);
+				AlarmConflict thisConflictStatus = recipient->getConflictStatus(*this);
 				if (thisConflictStatus > conflictStatus)
 					conflictStatus = thisConflictStatus;
 				if (conflictStatus == ALARM_CONFLICT)

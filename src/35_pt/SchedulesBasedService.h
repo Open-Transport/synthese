@@ -166,6 +166,11 @@ namespace synthese
 					boost::posix_time::time_duration arrivalSchedule
 				);
 
+				void setRealTimeSchedules(
+					const Schedules& departureSchedules,
+					const Schedules& arrivalSchedules
+				);
+
 
 				void _computeNextRTUpdate();
 

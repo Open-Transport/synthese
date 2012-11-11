@@ -22,6 +22,8 @@ set(data_exchange_SRCS
   IneoNCEConnection.hpp
   IneoRealTimeFileFormat.cpp
   IneoRealTimeFileFormat.hpp
+  IneoRealTimeUpdateAction.cpp
+  IneoRealTimeUpdateAction.hpp
   OGTFileFormat.cpp
   OGTFileFormat.hpp
   ObitiFileFormat.cpp
