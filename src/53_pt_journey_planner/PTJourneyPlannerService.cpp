@@ -943,9 +943,15 @@ namespace synthese
 						ptime lastDateTime(leg.getDepartureDateTime());
 						lastDateTime += it->getContinuousServiceRange();
 
-						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode);
+						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, sheetRows.end());
 
 						pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
+
+						if(itSheetRow == sheetRows.end())
+						{
+							Log::GetInstance().warn("Inconsistent sheet rows on journey planner");
+							break;
+						}
 
 						// Saving of the columns on each lines
 						shared_ptr<ParametersMap> cellPM(new ParametersMap);
@@ -977,10 +983,16 @@ namespace synthese
 								*placesList.rbegin()->place
 						)	);
 
-						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode);
+						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, sheetRows.end());
 
 						ptime lastDateTime(leg.getArrivalDateTime());
 						lastDateTime += it->getContinuousServiceRange();
+
+						if(itSheetRow == sheetRows.end())
+						{
+							Log::GetInstance().warn("Inconsistent sheet rows on journey planner");
+							break;
+						}
 
 						shared_ptr<ParametersMap> cellPM(new ParametersMap);
 						_displayScheduleCell(
@@ -1003,6 +1015,12 @@ namespace synthese
 				// Fill in the last cells
 				for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
 				{
+					if(itSheetRow == sheetRows.end())
+					{
+						Log::GetInstance().warn("Inconsistent sheet rows on journey planner");
+						break;
+					}
+
 					shared_ptr<ParametersMap> cellPM(new ParametersMap);
 					_displayScheduleCell(
 						*cellPM,
@@ -1143,10 +1161,17 @@ namespace synthese
 			PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator& itPlaces,
 			const NamedPlace& placeToSearch,
 			size_t columnNumber,
-			bool displayFoot
+			bool displayFoot,
+			PlacesContentVector::iterator itSheetRowEnd
 		) const {
 			for (; itPlaces != placesList.end() && itPlaces->place != &placeToSearch; ++itPlaces, ++itSheetRow)
 			{
+				if(itSheetRow == itSheetRowEnd)
+				{
+					Log::GetInstance().warn("Inconsistent sheet rows on journey planner");
+					return;
+				}
+
 				shared_ptr<ParametersMap> cellPM(new ParametersMap);
 				_displayScheduleCell(
 					*cellPM,

@@ -22,6 +22,8 @@
 
 #include "CommercialLine.h"
 
+#include "AccessParameters.h"
+#include "Edge.h"
 #include "DataSourceLinksField.hpp"
 #include "Registry.h"
 #include "GraphConstants.h"
@@ -39,6 +41,7 @@
 using namespace boost;
 using namespace std;
 using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -78,7 +81,7 @@ namespace synthese
 			_reservationContact(NULL),
 			_calendarTemplate(NULL),
 			_timetableId(0),
-			_maxDisplayDelay(not_a_date_time)
+			_displayDurationBeforeFirstDeparture(not_a_date_time)
 		{
 			// Default use rules
 			RuleUser::Rules rules(getRules());
@@ -232,9 +235,9 @@ namespace synthese
 			pm.insert(prefix + "lineImage", getImage()); // For StopAreasList compatibility
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
 			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());
-			if(!_maxDisplayDelay.is_not_a_date_time())
+			if(!_displayDurationBeforeFirstDeparture.is_not_a_date_time())
 			{
-				pm.insert(prefix + DATA_MAX_DISPLAY_DELAY, _maxDisplayDelay.total_seconds()/60);
+				pm.insert(prefix + DATA_MAX_DISPLAY_DELAY, _displayDurationBeforeFirstDeparture.total_seconds()/60);
 			}
 		}
 
@@ -353,6 +356,56 @@ namespace synthese
 					return true;
 				}
 			}
+			return false;
+		}
+
+
+
+		bool CommercialLine::runsSoon( const boost::posix_time::time_duration& when ) const
+		{
+			AccessParameters ap;
+			ptime now(second_clock::local_time());
+			ptime maxTime(now + when);
+			boost::optional<Edge::DepartureServiceIndex::Value> fakeIndex;
+			BOOST_FOREACH(Path* path, _paths)
+			{
+				if(path->getEdges().empty())
+				{
+					continue;
+				}
+
+				const Edge& edge(**path->getEdges().begin());
+				ServicePointer nextService(
+					edge.getNextService(
+						ap,
+						now,
+						maxTime,
+						false,
+						fakeIndex
+				)	);
+				if(nextService.getService())
+				{
+					return true;
+				}
+
+				BOOST_FOREACH(JourneyPatternCopy* subline, static_cast<JourneyPattern*>(path)->getSubLines())
+				{
+					const Edge& edge(**subline->getEdges().begin());
+					ServicePointer nextService(
+						edge.getNextService(
+							ap,
+							now,
+							maxTime,
+							false,
+							fakeIndex
+					)	);
+					if(nextService.getService())
+					{
+						return true;
+					}
+				}
+			}
+
 			return false;
 		}
 }	}

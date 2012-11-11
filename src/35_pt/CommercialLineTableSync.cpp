@@ -103,7 +103,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_MAP_URL("map_url");
 		const string CommercialLineTableSync::COL_DOC_URL("doc_url");
 		const string CommercialLineTableSync::COL_TIMETABLE_ID("timetable_id");
-		const string CommercialLineTableSync::COL_MAX_DISPLAY_DELAY("max_display_delay");
+		const string CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE = "display_duration_before_first_departure";
 	}
 
 	namespace db
@@ -133,7 +133,7 @@ namespace synthese
 			Field(CommercialLineTableSync::COL_MAP_URL, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
-			Field(CommercialLineTableSync::COL_MAX_DISPLAY_DELAY, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE, SQL_INTEGER),
 			Field()
 		};
 
@@ -173,6 +173,13 @@ namespace synthese
 			object->setDocURL(rows->getText(CommercialLineTableSync::COL_DOC_URL));
 			object->setTimetableId(rows->getLongLong(CommercialLineTableSync::COL_TIMETABLE_ID));
 
+			// Display duration before first departure
+			object->setDisplayDurationBeforeFirstDeparture(
+				rows->getText(CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE).empty() ?
+				time_duration(not_a_date_time) :
+				minutes(rows->getInt(CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE))
+			);
+
 			// Color
 			string color(rows->getText(CommercialLineTableSync::COL_COLOR));
 			if(!color.empty())
@@ -208,13 +215,6 @@ namespace synthese
 
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-
-			// Max display delay
-			object->setMaxDisplayDelay(time_duration(not_a_date_time));
-			if(rows->getInt(CommercialLineTableSync::COL_MAX_DISPLAY_DELAY) > 0)
-			{
-				object->setMaxDisplayDelay(minutes(rows->getInt(CommercialLineTableSync::COL_MAX_DISPLAY_DELAY)));
-			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -407,7 +407,11 @@ namespace synthese
 			query.addField(object->getMapURL());
 			query.addField(object->getDocURL());
 			query.addField(object->getTimetableId());
-			query.addField(object->getMaxDisplayDelay().is_not_a_date_time() ? string() : lexical_cast<string>(object->getMaxDisplayDelay().total_seconds()/60));
+			query.addField(
+				object->getDisplayDurationBeforeFirstDeparture().is_not_a_date_time() ?
+				string() :
+				lexical_cast<string>(object->getDisplayDurationBeforeFirstDeparture().total_seconds() / 60)
+			);
 			query.execute(transaction);
 		}
 

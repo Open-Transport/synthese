@@ -116,7 +116,7 @@ namespace synthese
 					static_cast<SentAlarm&>(*alarm).getScenario()
 				){
 					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-					ar->addObject(static_cast<SentAlarm*>(alarm.get()), object->getObjectId());
+					ar->addObject(*object, object->getObjectId());
 					MessagesModule::AddMessage(object->getObjectId(), static_cast<SentAlarm*>(alarm.get()));
 				}
 			}
@@ -144,7 +144,7 @@ namespace synthese
 				try
 				{
 					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-					ar->removeObject(static_cast<SentAlarm*>(object->getAlarm()), object->getObjectId());
+					ar->removeObject(*object, object->getObjectId());
 					MessagesModule::RemoveMessage(object->getObjectId(), static_cast<SentAlarm*>(object->getAlarm()));
 				}
 				catch(FactoryException<AlarmRecipient> e)
