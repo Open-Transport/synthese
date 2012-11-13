@@ -153,11 +153,13 @@ namespace synthese
 			);
 			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingService, existingServices)
 			{
-				if(!static_cast<ScheduledService*>(existingService.second)->isActive(today))
-				{
+				Importable* importableObject(existingService.second);
+				if(	!dynamic_cast<ScheduledService*>(importableObject) ||
+					!static_cast<ScheduledService*>(importableObject)->isActive(today)
+				){
 					continue;
 				}
-				servicesToRemove.insert(existingService.second->getKey());
+				servicesToRemove.insert(importableObject->getKey());
 			}
 
 			// Alarm object links

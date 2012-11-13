@@ -200,21 +200,6 @@ namespace synthese
 					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
 				}
 				ss->setRules(rules);
-
-				// Data source links
-				Importable::DataSourceLinks dsl(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(ScheduledServiceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				if(linkLevel > UP_LINKS_LOAD_LEVEL)
-				{
-					ss->setDataSourceLinksWithRegistration(dsl);
-				}
-				else
-				{
-					ss->setDataSourceLinksWithoutRegistration(dsl);
-				}
 			}
 
 			// Schedules
@@ -293,7 +278,25 @@ namespace synthese
 			// Registration in the line
 			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
-				ss->getRoute()->getCommercialLine()->registerService(*ss);
+				if(	ss->getRoute() &&
+					ss->getRoute()->getCommercialLine()
+				){
+					ss->getRoute()->getCommercialLine()->registerService(*ss);
+			}	}
+
+			// Data source links
+			Importable::DataSourceLinks dsl(
+				ImportableTableSync::GetDataSourceLinksFromSerializedString(
+					rows->getText(ScheduledServiceTableSync::COL_DATASOURCE_LINKS),
+					env
+			)	);
+			if(linkLevel > UP_LINKS_LOAD_LEVEL)
+			{
+				ss->setDataSourceLinksWithRegistration(dsl);
+			}
+			else
+			{
+				ss->setDataSourceLinksWithoutRegistration(dsl);
 			}
 		}
 
