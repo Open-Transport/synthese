@@ -1,0 +1,9 @@
+t025_sites(cient_url,default_page_template_id,end_date,host_name,id,name,start_date,svn_url)
+"/kiosk",
+"0",
+"",
+"",
+"7209660952084484",
+"Kiosk html",
+"",
+"https://extranet.rcsmobility.com/svn/synthese3/trunk/sites/kiosk"
