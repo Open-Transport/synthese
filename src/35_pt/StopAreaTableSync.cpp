@@ -170,24 +170,6 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Data source links
-				if(&env == &Env::GetOfficialEnv())
-				{
-					cp->setDataSourceLinksWithRegistration(
-						ImportableTableSync::GetDataSourceLinksFromSerializedString(
-							rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
-							env
-					)	);
-				}
-				else
-				{
-					cp->setDataSourceLinksWithoutRegistration(
-						ImportableTableSync::GetDataSourceLinksFromSerializedString(
-							rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
-							env
-					)	);
-				}
-
 				// City
 				cp->setCity(NULL);
 				RegistryKeyType cityId(
@@ -255,6 +237,24 @@ namespace synthese
 						cp->getFullName(),
 						env.getEditableSPtr(cp)
 					);
+				}
+
+				// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+				if(&env == &Env::GetOfficialEnv())
+				{
+					cp->setDataSourceLinksWithRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
+							env
+					)	);
+				}
+				else
+				{
+					cp->setDataSourceLinksWithoutRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
+							env
+					)	);
 				}
 			}
 		}

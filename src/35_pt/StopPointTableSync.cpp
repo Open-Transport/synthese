@@ -135,13 +135,6 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Data source links
-				object->setDataSourceLinksWithRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(StopPointTableSync::COL_OPERATOR_CODE),
-						env
-				)	);
-
 				// Stop area
 				try
 				{
@@ -195,6 +188,13 @@ namespace synthese
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in stop " + lexical_cast<string>(object->getKey()));
 				}	}
 				object->setRules(rules);
+
+				// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+				object->setDataSourceLinksWithRegistration(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(StopPointTableSync::COL_OPERATOR_CODE),
+						env
+				)	);
 			}
 		}
 

@@ -284,7 +284,7 @@ namespace synthese
 					ss->getRoute()->getCommercialLine()->registerService(*ss);
 			}	}
 
-			// Data source links
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
 			Importable::DataSourceLinks dsl(
 				ImportableTableSync::GetDataSourceLinksFromSerializedString(
 					rows->getText(ScheduledServiceTableSync::COL_DATASOURCE_LINKS),
