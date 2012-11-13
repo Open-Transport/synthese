@@ -242,14 +242,6 @@ namespace synthese
 				)	);
 				object->setAllowedLines(lineFilter);
 
-				// Datasource links
-				Importable::DataSourceLinks links(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(DisplayScreenTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				object->setDataSourceLinksWithRegistration(links);
-
 				// Up & root
 				RegistryKeyType upId(rows->getLongLong(DisplayScreenTableSync::COL_UP_ID));
 				if(upId > 0) try
@@ -392,6 +384,13 @@ namespace synthese
 					}
 				}
 
+				// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+				Importable::DataSourceLinks links(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(DisplayScreenTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				object->setDataSourceLinksWithRegistration(links);
 		}	}
 
 

@@ -692,4 +692,26 @@ namespace synthese
 				_vertices[rank] = NULL;
 			}
 		}
+
+
+
+		void SchedulesBasedService::setRealTimeVertices( const ServedVertices& value )
+		{
+			_RTVertices = value;
+		}
+
+
+
+		const SchedulesBasedService::ServedVertices& SchedulesBasedService::getVertices(
+			bool RTData
+		) const	{
+			if(RTData)
+			{
+				return _RTVertices;
+			}
+			else
+			{
+				return _vertices;
+			}
+		}
 }	}

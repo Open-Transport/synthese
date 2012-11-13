@@ -118,6 +118,8 @@
 
 #include "StopPointWFSType.hpp"
 
+#include "RealTimePTDataInterSYNTHESE.hpp"
+
 // Registries
 
 #include "Destination.hpp"
@@ -272,6 +274,8 @@ void synthese::pt::moduleRegister()
 
 	synthese::pt::LineAlarmRecipient::integrate();
 	synthese::pt::StopAreaAlarmRecipient::integrate();
+
+	synthese::pt::RealTimePTDataInterSYNTHESE::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::pt::Destination>();
