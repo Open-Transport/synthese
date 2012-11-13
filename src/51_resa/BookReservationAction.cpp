@@ -269,7 +269,8 @@ namespace synthese
 
 			// Seats number
 			_seatsNumber = map.getDefault<size_t>(PARAMETER_SEATS_NUMBER, 1);
-			if (_seatsNumber < 1 || _seatsNumber > 99)
+			/// TODO check seats number in UseRule ?
+			if (_seatsNumber < 1 || _seatsNumber > 499)
 			{
 				throw ActionException("Invalid seats number");
 			}
