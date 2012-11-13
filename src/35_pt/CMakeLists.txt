@@ -194,6 +194,8 @@ PTUseRuleTableSync.cpp
 PTUseRuleTableSync.h
 PTUseRuleUpdateAction.cpp
 PTUseRuleUpdateAction.hpp
+RealTimePTDataInterSYNTHESE.cpp
+RealTimePTDataInterSYNTHESE.hpp
 RealTimeUpdateFunction.cpp
 RealTimeUpdateFunction.h
 RealTimeUpdateScreenServiceInterfacePage.cpp
