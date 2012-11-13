@@ -87,6 +87,7 @@ namespace synthese
 			//@{
 				const Schedules& getDepartureSchedules(bool RTData) const;
 				const Schedules& getArrivalSchedules(bool RTData) const;
+				const ServedVertices& getVertices(bool RTData) const;
 				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}
 
@@ -189,6 +190,12 @@ namespace synthese
 				void setRealTimeVertex(
 					std::size_t rank,
 					const graph::Vertex* value
+				);
+
+
+
+				void setRealTimeVertices(
+					const ServedVertices& value
 				);
 
 

@@ -196,23 +196,6 @@ namespace synthese
 			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 			object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 
-			if(&env == &Env::GetOfficialEnv())
-			{
-				object->setDataSourceLinksWithRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
-						env
-				)	);
-			}
-			else
-			{
-				object->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
-						env
-				)	);
-			}
-
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 
@@ -330,6 +313,24 @@ namespace synthese
 				}
 			}
 			object->setRules(rules);
+
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+			if(&env == &Env::GetOfficialEnv())
+			{
+				object->setDataSourceLinksWithRegistration(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
+						env
+				)	);
+			}
+			else
+			{
+				object->setDataSourceLinksWithoutRegistration(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
+						env
+				)	);
+			}
 		}
 
 

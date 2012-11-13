@@ -122,7 +122,7 @@ namespace synthese
 				VehicleModule::RegisterVehicle(*object);
 			}
 
-			// Data source links
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				if(&env == &Env::GetOfficialEnv())

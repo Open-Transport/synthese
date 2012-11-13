@@ -170,7 +170,10 @@ namespace synthese
 				}
 			}
 
-			// Data source links
+			user->setSVNUsername(rows->getText(UserTableSync::COL_SVN_USERNAME));
+			user->setSVNPassword(rows->getText(UserTableSync::COL_SVN_PASSWORD));
+
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				if(&env == &Env::GetOfficialEnv())
@@ -190,8 +193,6 @@ namespace synthese
 					)	);
 				}
 			}
-			user->setSVNUsername(rows->getText(UserTableSync::COL_SVN_USERNAME));
-			user->setSVNPassword(rows->getText(UserTableSync::COL_SVN_PASSWORD));
 		}
 
 
