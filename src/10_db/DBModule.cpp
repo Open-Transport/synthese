@@ -154,7 +154,7 @@ namespace synthese
 			TablesByNameMap::const_iterator it(_tableSyncMap.find(tableName));
 			if (it == _tableSyncMap.end())
 			{
-				throw DBException("Table not found in database");
+				throw DBException("Table "+ tableName +" not found in database");
 			}
 			return it->second;
 		}
@@ -167,7 +167,7 @@ namespace synthese
 			TablesByIdMap::const_iterator it(_idTableSyncMap.find(tableId));
 			if (it == _idTableSyncMap.end())
 			{
-				throw DBException("Table not found in database");
+				throw DBException("Table "+ lexical_cast<string>(tableId) +" not found in database");
 			}
 			return it->second;
 		}
