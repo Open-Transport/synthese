@@ -530,10 +530,7 @@ namespace synthese
 				_result <<
 					0 << DBInterSYNTHESE::FIELD_SEPARATOR <<
 					blob->second << DBInterSYNTHESE::FIELD_SEPARATOR;
-				for(size_t i(0); i<blob->second; ++i)
-				{
-					_result.put(blob->first[i]);
-				}
+				_result.write(blob->first, blob->second);
 			}
 			else
 			{
