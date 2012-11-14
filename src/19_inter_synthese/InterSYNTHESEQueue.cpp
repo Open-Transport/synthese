@@ -35,7 +35,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(RequestTime, "request_time", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(ExpirationTime, "expiration_time", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(SyncType, "sync_type", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(SyncContent, "content", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(SyncContent, "content", SQL_BLOB)
 
 	namespace inter_synthese
 	{
