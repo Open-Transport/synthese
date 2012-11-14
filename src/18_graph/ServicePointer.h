@@ -190,6 +190,12 @@ namespace synthese
 				bool operator!=(const ServicePointer& rhs) const;
 
 
+				bool hysteresisCompare(
+					const ServicePointer& rhs,
+					const boost::posix_time::time_duration& hysteresis
+				) const;
+
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// @pre both departure edge and arrival edge must be defined

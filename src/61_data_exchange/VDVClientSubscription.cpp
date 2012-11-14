@@ -122,7 +122,7 @@ namespace synthese
 				{
 					_addings.insert(it1);
 				}
-				else if(it->second != it1.second)
+				else if(it->second.hysteresisCompare(it1.second, _hysteresis))
 				{
 					_deletions.insert(*it);
 					_addings.insert(it1);
