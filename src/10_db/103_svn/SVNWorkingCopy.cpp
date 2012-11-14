@@ -391,7 +391,7 @@ namespace synthese
 					}
 
 					// Dump value into file
-					ofstream fileStream(filePath.file_string().c_str());
+					ofstream fileStream(filePath.file_string().c_str(), std::ios_base::out | std::ios_base::binary);
 					fileStream << item.second.content;
 					fileStream.close();
 
