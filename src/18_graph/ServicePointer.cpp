@@ -348,4 +348,15 @@ namespace synthese
 		{
 			return !operator==(rhs);
 		}
+
+
+
+		bool ServicePointer::hysteresisCompare(
+			const ServicePointer& rhs,
+			const boost::posix_time::time_duration& hysteresis
+		) const {
+			return !operator==(rhs) &&
+				(	_departureTime - rhs._departureTime >= hysteresis ||
+					rhs._departureTime - _departureTime >= hysteresis);
+		}
 }	}
