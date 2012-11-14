@@ -272,7 +272,9 @@ namespace synthese
 				setw( 2 ) << setfill ( '0' ) <<
 				value.time_of_day().hours() << ":" <<
 				setw( 2 ) << setfill ( '0' ) <<
-				value.time_of_day().minutes () << ":00Z";
+				value.time_of_day().minutes () << ":" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				value.time_of_day().seconds() << "Z";
 		}
 
 
