@@ -185,7 +185,7 @@ namespace synthese
 						try
 						{
 							time_duration hysteresis(
-								minutes(
+								seconds(
 									lexical_cast<long>(hysteresisNode.getText())
 							)	);
 							subscription->setHysteresis(hysteresis);

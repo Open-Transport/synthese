@@ -119,15 +119,16 @@ namespace synthese
 
 		bool VDVClient::checkUpdate() const
 		{
+			bool result(false);
 			for(Subscriptions::const_iterator it(_subscriptions.begin()); it != _subscriptions.end(); ++it)
 			{
 				if(it->second->checkUpdate())
 				{
-					return true;
+					result = true;
 				}
 			}
 
-			return false;
+			return result;
 		}
 
 
