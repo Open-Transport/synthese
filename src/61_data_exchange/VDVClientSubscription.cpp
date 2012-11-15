@@ -118,13 +118,9 @@ namespace synthese
 			BOOST_FOREACH(const ServicesList::value_type& it1, _result)
 			{
 				ServicesList::const_iterator it(_lastResult.find(it1.first));
-				if(it == _lastResult.end())
-				{
-					_addings.insert(it1);
-				}
-				else if(it->second.hysteresisCompare(it1.second, _hysteresis))
-				{
-					_deletions.insert(*it);
+				if(	it == _lastResult.end() ||
+					it->second.hysteresisCompare(it1.second, _hysteresis)
+				){
 					_addings.insert(it1);
 				}
 			}
