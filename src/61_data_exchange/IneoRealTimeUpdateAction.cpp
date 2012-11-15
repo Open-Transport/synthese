@@ -165,6 +165,8 @@ namespace synthese
 			// Alarm object links
 			set<RegistryKeyType> alarmObjectLinksToRemove;
 
+			// Alarm object links
+			set<RegistryKeyType> messagesToRemove;
 
 			//////////////////////////////////////////////////////////////////////////
 			// Pre-loading objects from BDSI
@@ -508,14 +510,20 @@ namespace synthese
 						scenariosToRemove.erase(scenario->getKey());
 
 						// Message content
-						if(scenario->getMessages().size() != 1)
+						const SentScenario::Messages& messages(scenario->getMessages());
+						if(messages.size() != 1)
 						{
 							Log::GetInstance().warn(
 								"Corrupted message : scenario should contain one message : " + lexical_cast<string>(scenario->getKey())
 							);
-							continue;
+							
+							SentScenario::Messages::const_iterator it(messages.begin());
+							for(++it; it != messages.end(); ++it)
+							{
+								messagesToRemove.insert((*it)->getKey());
+							}
 						}
-						message = const_cast<SentAlarm*>(*scenario->getMessages().begin());
+						message = const_cast<SentAlarm*>(*messages.begin());
 						if(	message->getLongMessage() != programmation.content ||
 							message->getShortMessage() != programmation.messageTitle
 						){
@@ -823,6 +831,10 @@ namespace synthese
 				db.deleteStmt(id, transaction);
 			}
 			BOOST_FOREACH(RegistryKeyType id, scenariosToRemove)
+			{
+				db.deleteStmt(id, transaction);
+			}
+			BOOST_FOREACH(RegistryKeyType id, messagesToRemove)
 			{
 				db.deleteStmt(id, transaction);
 			}
