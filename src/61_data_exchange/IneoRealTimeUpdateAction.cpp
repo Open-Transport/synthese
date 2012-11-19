@@ -364,8 +364,9 @@ namespace synthese
 					}
 
 					// Horaires loop
-					time_duration now_plus_30(second_clock::local_time().time_of_day());
-					now_plus_30 += seconds(30);
+					time_duration now(second_clock::local_time().time_of_day());
+					time_duration now_plus_35(second_clock::local_time().time_of_day());
+					now_plus_35 += seconds(35);
 					do
 					{
 						int course_ref(horaireResult->getInt("course"));
@@ -390,11 +391,15 @@ namespace synthese
 							horaire.hta = duration_from_string(horaireResult->getText("hta"));
 
 							// Patch for bad schedules when the bus is at stop
-							if(	horaireResult->getText("etat_harr") == "R" &&
-								horaireResult->getText("etat_hdep") == "E" &&
-								horaire.hrd < now_plus_30
+							if(	(	(	horaireResult->getText("etat_harr") == "R" &&
+										horaireResult->getText("etat_hdep") == "E"
+									) || (
+										horaire.hrd > now
+									)
+								) &&
+								horaire.hrd <= now_plus_35
 							){
-								horaire.hrd = now_plus_30;
+								horaire.hrd = now_plus_35;
 							}
 						}
 
