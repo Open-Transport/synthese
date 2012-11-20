@@ -63,7 +63,7 @@ class Daemon(object):
 
     def _wait_until_ready(self):
         # TODO: make it an option?
-        WAIT_TIME_S = 4 * 60
+        WAIT_TIME_S = 10 * 60
         POLL_INTERVAL_S = 2
         for i in range(WAIT_TIME_S / POLL_INTERVAL_S):
             if not self.is_running():
