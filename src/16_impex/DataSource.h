@@ -159,7 +159,7 @@ namespace synthese
 					Links::iterator it(_links.find(T::Registry::KEY));
 					if(it != _links.end())
 					{
-						_links.erase(code);
+						it->second.erase(code);
 					}
 				}
 			//@}

@@ -194,14 +194,12 @@ namespace synthese
 		}
 
 
-		shared_recursive_mutex WebpageContent::_SharedMutex;
-
-
 
 		WebpageContent::WebpageContent(
 		):	_ignoreWhiteChars(false),
 			_mimeType(MimeTypes::HTML),
-			_doNotEvaluate(false)
+			_doNotEvaluate(false),
+			_sharedMutex(new synthese::util::shared_recursive_mutex)
 		{}
 
 
@@ -214,7 +212,8 @@ namespace synthese
 		):	_code(code),
 			_ignoreWhiteChars(ignoreWhiteChars),
 			_mimeType(mimeType),
-			_doNotEvaluate(doNotEvaluate)
+			_doNotEvaluate(doNotEvaluate),
+			_sharedMutex(new synthese::util::shared_recursive_mutex)
 		{
 			_updateNodes();
 		}
@@ -227,7 +226,8 @@ namespace synthese
 			std::set<std::string> termination
 		):	_ignoreWhiteChars(false),
 			_mimeType(MimeTypes::HTML),
-			_doNotEvaluate(false)
+			_doNotEvaluate(false),
+			_sharedMutex(new synthese::util::shared_recursive_mutex)
 		{
 			_parse(it, end, termination);
 		}
@@ -236,7 +236,7 @@ namespace synthese
 
 		void WebpageContent::_updateNodes()
 		{
-			boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
+			boost::unique_lock<shared_recursive_mutex> lock(*_sharedMutex);
 			if(_doNotEvaluate)
 			{
 				_nodes.clear();
@@ -533,7 +533,7 @@ namespace synthese
 			const Webpage& page,
 			util::ParametersMap& variables
 		) const	{
-			boost::shared_lock<shared_recursive_mutex> lock(_SharedMutex);
+			boost::shared_lock<shared_recursive_mutex> lock(*_sharedMutex);
 
 			Nodes::const_iterator itNode(_nodes.begin());
 			while(itNode != _nodes.end())
