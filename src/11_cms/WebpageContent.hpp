@@ -79,7 +79,7 @@ namespace synthese
 		private:
 			typedef std::vector<boost::shared_ptr<WebpageContentNode> > Nodes;
 			mutable Nodes _nodes;
-			static synthese::util::shared_recursive_mutex _SharedMutex;
+			boost::shared_ptr<util::shared_recursive_mutex> _sharedMutex;
 
 			void _updateNodes();
 
