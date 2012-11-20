@@ -117,6 +117,10 @@ namespace synthese
 				){
 					try
 					{
+						Log::GetInstance().debug(
+							"Inter-SYNTHESE : Attempt to sync with "+ _masterHost +":"+ _masterPort + " as slave id #"+ lexical_cast<string>(_slaveId)
+						);
+						
 						StaticFunctionRequest<InterSYNTHESESlaveUpdateService> r;
 						r.getFunction()->setSlaveId(_slaveId);
 						BasicClient c(
@@ -127,7 +131,13 @@ namespace synthese
 							c.get(r.getURL())
 						);
 
-						if(contentStr != InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC)
+						if(contentStr == InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC)
+						{
+							Log::GetInstance().debug(
+								"Inter-SYNTHESE : "+ _masterHost +":"+ _masterPort + " has no content to sync for slave id #"+ lexical_cast<string>(_slaveId)
+							);
+						}
+						else
 						{
 							bool ok(true);
 							typedef std::map<
@@ -194,6 +204,10 @@ namespace synthese
 
 							if(ok)
 							{
+								Log::GetInstance().debug(
+									"Inter-SYNTHESE : "+ _masterHost +":"+ _masterPort + " has sent "+ lexical_cast<string>(content.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
+								);
+
 								StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
 								ackRequest.getFunction()->setSlaveId(_slaveId);
 								if(!content.empty())
@@ -247,14 +261,20 @@ namespace synthese
 									if(interSYNTHESE.get())
 									{
 										interSYNTHESE->closeSync();
+										Log::GetInstance().debug(
+											"Inter-SYNTHESE : "+ _masterHost +":"+ _masterPort + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
+										);
 									}
 								}
 							}
 						}
 					}
-					catch(...)
+					catch(std::exception& e)
 					{
-						// Log
+						Log::GetInstance().warn(
+							"Inter-SYNTHESE : Synchronization with "+ _masterHost +":"+ _masterPort + " as slave id #"+ lexical_cast<string>(_slaveId) +" has failed",
+							e
+						);
 					}
 				}
 
