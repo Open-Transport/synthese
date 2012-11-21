@@ -35,6 +35,7 @@
 #include "ScheduledService.h"
 #include "ServerConstants.h"
 #include "Service.h"
+#include "StopPoint.hpp"
 #include "TransportNetwork.h"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
@@ -225,6 +226,25 @@ namespace synthese
 							serviceNumber += sp.getService()->getServiceNumber();
 						}
 						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
+						string direction;
+						if(jp.getDirectionObj())
+						{
+							direction = jp.getDirectionObj()->getDisplayedText();
+						}
+						else if(!jp.getDirection().empty())
+						{
+							direction = jp.getDirection();
+						}
+						trim(direction);
+						if(direction.empty())
+						{
+							direction = jp.getDestination()->getConnectionPlace()->getName26();
+						}
+						if(direction.empty())
+						{
+							direction = jp.getDestination()->getConnectionPlace()->getName();
+						}
+						direction = iconv.convert(direction);
 					
 						// XML generation
 						result <<
@@ -241,7 +261,7 @@ namespace synthese
 							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
-							"<RichtungsText>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
+							"<RichtungsText>" << direction << "</RichtungsText>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>" << 
 							"</AZBFahrtLoeschen>"
@@ -311,7 +331,26 @@ namespace synthese
 							serviceNumber += sp.getService()->getServiceNumber();
 						}
 						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
-					
+						string direction;
+						if(jp.getDirectionObj())
+						{
+							direction = jp.getDirectionObj()->getDisplayedText();
+						}
+						else if(!jp.getDirection().empty())
+						{
+							direction = jp.getDirection();
+						}
+						trim(direction);
+						if(direction.empty())
+						{
+							direction = jp.getDestination()->getConnectionPlace()->getName26();
+						}
+						if(direction.empty())
+						{
+							direction = jp.getDestination()->getConnectionPlace()->getName();
+						}
+						direction = iconv.convert(direction);
+
 						// XML generation
 						result << "<AZBFahrplanlage Zst=\"";
 						ToXsdDateTime(result, now);
@@ -326,7 +365,7 @@ namespace synthese
 							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
-							"<RichtungsText>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
+							"<RichtungsText>" << direction << "</RichtungsText>" <<
 							"<ZielHst>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</ZielHst>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>"
