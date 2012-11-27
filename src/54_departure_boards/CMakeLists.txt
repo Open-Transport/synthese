@@ -139,6 +139,8 @@ RoutePlanningTableGenerator.cpp
 RoutePlanningTableGenerator.h
 StandardArrivalDepartureTableGenerator.cpp
 StandardArrivalDepartureTableGenerator.h
+TransferLinesService.cpp
+TransferLinesService.hpp
 UpdateAllStopsDisplayScreenAction.cpp
 UpdateAllStopsDisplayScreenAction.h
 UpdateDisplayMaintenanceAction.cpp
