@@ -365,8 +365,12 @@ namespace synthese
 
 					// Horaires loop
 					time_duration now(second_clock::local_time().time_of_day());
+					const time_duration dayBreakTime(hours(3));
+
+					// Patch for mistake in real time departure of the vehicle from the stop
 					time_duration now_plus_35(second_clock::local_time().time_of_day());
 					now_plus_35 += seconds(35);
+
 					do
 					{
 						int course_ref(horaireResult->getInt("course"));
@@ -384,11 +388,36 @@ namespace synthese
 							)	);
 							horaire.ref = horaireResult->getInt("ref");
 							horaire.had = duration_from_string(horaireResult->getText("had"));
+							// Patch for schedules after midnight
+							if(horaire.had < dayBreakTime)
+							{
+								horaire.had += hours(24);
+							}
 							horaire.haa = duration_from_string(horaireResult->getText("haa"));
+							if(horaire.haa < dayBreakTime)
+							{
+								horaire.haa += hours(24);
+							}
 							horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
+							if(horaire.hrd < dayBreakTime)
+							{
+								horaire.hrd += hours(24);
+							}
 							horaire.hra = duration_from_string(horaireResult->getText("hra"));
+							if(horaire.hra < dayBreakTime)
+							{
+								horaire.hra += hours(24);
+							}
 							horaire.htd = duration_from_string(horaireResult->getText("htd"));
+							if(horaire.htd < dayBreakTime)
+							{
+								horaire.htd += hours(24);
+							}
 							horaire.hta = duration_from_string(horaireResult->getText("hta"));
+							if(horaire.hta < dayBreakTime)
+							{
+								horaire.hta += hours(24);
+							}
 
 							// Patch for bad schedules when the bus is at stop
 							if(	(	(	horaireResult->getText("etat_harr") == "R" &&
