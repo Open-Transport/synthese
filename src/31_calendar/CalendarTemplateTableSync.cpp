@@ -125,6 +125,7 @@ namespace synthese
 				)	);
 
 				// Parent
+				object->setParent(NULL);
 				try
 				{
 					RegistryKeyType id(rows->getLongLong(CalendarTemplateTableSync::COL_PARENT_ID));
@@ -134,16 +135,12 @@ namespace synthese
 							CalendarTemplateTableSync::GetEditable(rows->getLongLong(CalendarTemplateTableSync::COL_PARENT_ID), env, linkLevel).get()
 						);
 					}
-					else
-					{
-						object->setParent(NULL);
-					}
-					object->registerInParentOrRoot();
 				}
 				catch (ObjectNotFoundException<CalendarTemplate> e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + CalendarTemplateTableSync::COL_PARENT_ID, e);
 				}
+				object->registerInParentOrRoot();
 			}
 		}
 
