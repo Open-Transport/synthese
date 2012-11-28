@@ -232,20 +232,20 @@ namespace synthese
 						{
 							// Parsing of the nodes
 							WebpageContent parameterNodes(it, end, functionTermination);
+							string parameterNameStr(ParametersMap::Trim(parameterName.str()));
 
 							// Special template parameter
-							if(parameterName.str() == PARAMETER_TEMPLATE)
+							if(parameterNameStr == PARAMETER_TEMPLATE)
 							{
 								_inlineTemplate = parameterNodes;
 							}
-							else if(parameterName.str() == PARAMETER_REPEAT_PARAMETERS)
+							else if(parameterNameStr == PARAMETER_REPEAT_PARAMETERS)
 							{
 								_repeatParameters = true;
 							}
 							else
 							{
 								// Storage in template parameters if begins with VAR else in service parameters
-								string parameterNameStr(ParametersMap::Trim(parameterName.str()));
 								if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
 								{
 									_serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
