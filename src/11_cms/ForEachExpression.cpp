@@ -198,7 +198,8 @@ namespace synthese
 						baseParametersMap,
 						*item,
 						variables,
-						templatePage,
+						_sortUpTemplate.empty() ? _sortDownTemplate : _sortUpTemplate,
+						NULL,
 						rank,
 						itemsCount,
 						noRecursive
@@ -237,6 +238,7 @@ namespace synthese
 						baseParametersMap,
 						*item.second,
 						variables,
+						optional<const WebpageContent&>(),
 						templatePage,
 						rank,
 						itemsCount,
@@ -270,6 +272,7 @@ namespace synthese
 						baseParametersMap,
 						*item.second,
 						variables,
+						optional<const WebpageContent&>(),
 						templatePage,
 						rank,
 						itemsCount,
@@ -303,6 +306,7 @@ namespace synthese
 						baseParametersMap,
 						*item,
 						variables,
+						optional<const WebpageContent&>(),
 						templatePage,
 						rank,
 						itemsCount,
@@ -321,6 +325,7 @@ namespace synthese
 			const util::ParametersMap& baseParametersMap,
 			const util::ParametersMap& item,
 			util::ParametersMap& variables,
+			optional<const WebpageContent&> templateContent,
 			const Webpage* templatePage,
 			size_t& rank,
 			size_t itemsCount,
@@ -336,7 +341,11 @@ namespace synthese
 			}
 
 			// Display by a template page
-			if(templatePage)
+			if(templateContent)
+			{
+				templateContent->display(stream, request, pm, page, variables);
+			}
+			else if(templatePage)
 			{
 				templatePage->display(stream, request, pm, variables);
 			}
