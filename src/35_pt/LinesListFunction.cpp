@@ -485,8 +485,8 @@ namespace synthese
 			}
 
 
-			// Runs soon filter (TL specific default value)
-			long duration(map.getDefault<long>(PARAMETER_RUNS_SOON_FILTER, 180));
+			// Runs soon filter
+			long duration(map.getDefault<long>(PARAMETER_RUNS_SOON_FILTER, 0));
 			if(duration)
 			{
 				_runsSoonFilter = minutes(duration);
