@@ -85,6 +85,7 @@ namespace synthese
 				const util::ParametersMap& baseParametersMap,
 				const util::ParametersMap& item,
 				util::ParametersMap& variables,
+				boost::optional<const WebpageContent&> templateContent,
 				const Webpage* templatePage,
 				size_t& rank,
 				size_t itemsCount,
