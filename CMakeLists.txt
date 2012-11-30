@@ -1,6 +1,7 @@
 # 2.8.4 is required because of this issue: http://public.kitware.com/Bug/view.php?id=10356
 cmake_minimum_required(VERSION 2.8.4)
 
+
 # Version:
 set(VERSION_MAJOR 3)
 set(VERSION_MINOR 3)
