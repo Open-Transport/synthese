@@ -31,6 +31,7 @@ import sys
 import tarfile
 import urllib2
 import zipfile
+import re
 
 import synthesepy.test
 from synthesepy import utils
@@ -172,10 +173,12 @@ class Builder(object):
             cmake_version = subprocess.Popen(
                 [cmake_executable, '--version'], stdout=subprocess.PIPE
             ).communicate()[0].strip()
-            # TODO: allow greater versions.
-            if cmake_version.endswith(' ' + CMAKE_VERSION):
+            if self.extract_version_as_int(cmake_version, r".* (\d+).(\d+).(\d+)") >= \
+                    self.extract_version_as_int(CMAKE_VERSION):
                 log.info('Found system cmake')
                 return
+            else:
+                log.info('Warning, Your installed version of CMAKE is tool old.')
         log.info('Installing cmake')
 
         CMAKE_URL_BASE = 'http://www.cmake.org/files/v2.8/'
@@ -496,6 +499,14 @@ class Builder(object):
         tester.update_environment_for_cpp_tests()
         os.system("bash")
 
+    def extract_version_as_int(self, version_string, regexp = r"(\d+).(\d+).(\d+)"):
+        # Extract the version number
+        match = re.match(regexp, version_string)
+        if match and len(match.groups()) == 3:
+            # Concat the 3 numbers
+            return int(match.group(1))*10000 + int(match.group(2))*100 + int(match.group(3))
+        else:
+            log.info("Error, failed to extract the version number '" + version_string + "'")
 
 builder = None
 
