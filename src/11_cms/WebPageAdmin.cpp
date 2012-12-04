@@ -298,7 +298,10 @@ namespace synthese
 
 					AdminActionFunctionRequest<WebPageMoveAction, WebPageAdmin> moveRequest(request, *this);
 
-					WebPageAdmin::DisplaySubPages(stream, _page->getKey(), addRequest, deleteRequest, moveRequest, request);
+					AdminActionFunctionRequest<WebpageContentUploadAction, WebPageAdmin> uploadRequest(request, *this);
+					uploadRequest.getAction()->setUp(_page);
+
+					WebPageAdmin::DisplaySubPages(stream, _page->getKey(), addRequest, deleteRequest, moveRequest, uploadRequest, request);
 				}
 			}
 
@@ -522,6 +525,7 @@ namespace synthese
 			server::StaticActionRequest<WebPageAddAction>& createRequest,
 			server::StaticActionRequest<RemoveObjectAction>& deleteRequest,
 			server::StaticActionRequest<WebPageMoveAction>& moveRequest,
+			server::StaticActionRequest<WebpageContentUploadAction>& uploadRequest,
 			const server::Request& request
 		){
 
@@ -557,5 +561,12 @@ namespace synthese
 			stream << t.col(3) << f.getSubmitButton("Créer");
 			stream << t.close();
 			stream << f.close();
+
+			stream << "<h1>Téléchargement rapide</h1>";
+
+			PropertiesHTMLTable f2(uploadRequest.getHTMLForm("upload_creation"));
+			stream << f2.open();
+			stream << f2.cell("Fichier", f2.getForm().getFileInput(WebpageContentUploadAction::PARAMETER_CONTENT));
+			stream << f2.close();
 		}
 }	}
