@@ -42,11 +42,6 @@ BOOST_AUTO_TEST_CASE (WebsiteTest)
 {
 	WebPageDisplayFunction::integrate();
 
-	Website s1;
-	CMSModule::AddSite(s1);
-	BOOST_CHECK(s1.get<HostName>().empty());
-	BOOST_CHECK(s1.get<ClientURL>().empty());
-
 	Website s2;
 	s2.set<HostName>("www.toto.com");
 	CMSModule::AddSite(s2);
@@ -135,6 +130,61 @@ BOOST_AUTO_TEST_CASE (WebsiteTest)
 			dr.run(s);
 			BOOST_CHECK_EQUAL(f->getPage(), &p1s4);
 		}
+	}
+
+	Website s1;
+	CMSModule::AddSite(s1);
+	BOOST_CHECK(s1.get<HostName>().empty());
+	BOOST_CHECK(s1.get<ClientURL>().empty());
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.tutu.com", ""));
+		BOOST_CHECK_EQUAL(s, &s1);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.toto.com", "/"));
+		BOOST_CHECK_EQUAL(s, &s2);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.toto.com", "/toto"));
+		BOOST_CHECK_EQUAL(s, &s2);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.toto.com", "/toto/test.html"));
+		BOOST_CHECK_EQUAL(s, &s2);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.tutu.com", "/synthese"));
+		BOOST_CHECK_EQUAL(s, &s3);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.tutu.com", "/synthese/"));
+		BOOST_CHECK_EQUAL(s, &s3);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.tutu.com", "/synthese/test.html"));
+		BOOST_CHECK_EQUAL(s, &s3);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.toto.com", "/synthese"));
+		BOOST_CHECK_EQUAL(s, &s4);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.tutu.com", "/synthese/test.html"));
+		BOOST_CHECK_EQUAL(s, &s3);
+	}
+
+	{
+		Website* s(CMSModule::GetSiteByURL("www.tutu.com", "/toto"));
+		BOOST_CHECK_EQUAL(s, &s1);
 	}
 }
 
