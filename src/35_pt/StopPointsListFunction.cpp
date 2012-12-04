@@ -581,6 +581,12 @@ namespace synthese
 			bool spHaveZeroDestination = true;
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getDepartureEdges())
 			{
+				// Jump over junctions
+				if(!dynamic_cast<const LineStop*>(edge.second))
+				{
+					continue;
+				}
+
 				const LineStop* ls = static_cast<const LineStop*>(edge.second);
 
 				ptime departureDateTime = startDateTime;

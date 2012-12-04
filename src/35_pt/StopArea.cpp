@@ -162,6 +162,12 @@ namespace synthese
 					{
 						BOOST_FOREACH(const Vertex::Edges::value_type& edge, its.second->getDepartureEdges())
 						{
+							// Jump over junctions
+							if(!dynamic_cast<const JourneyPattern*>(edge.second))
+							{
+								continue;
+							}
+
 							const JourneyPattern* route(static_cast<const JourneyPattern*>(edge.first));
 							ScoresMap::iterator itl(
 								scores.find(route->getCommercialLine())
