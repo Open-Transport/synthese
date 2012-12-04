@@ -119,7 +119,8 @@ namespace synthese
 				BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, itStop.second->getDepartureEdges())
 				{
 					// Jump over routes from other lines
-					if(	static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine() !=
+					if(	!dynamic_cast<const JourneyPattern*>(itEdge.first) ||
+						static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine() !=
 						_line.get()
 					){
 						continue;

@@ -751,6 +751,12 @@ namespace synthese
 
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
+						// Jump over junctions
+						if(!dynamic_cast<const LineStop*>(edge.second))
+						{
+							continue;
+						}
+
 						const LineStop* ls = static_cast<const LineStop*>(edge.second);
 
 						const UseRule& useRule(ls->getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
