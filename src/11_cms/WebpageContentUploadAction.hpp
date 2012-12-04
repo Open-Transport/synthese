@@ -35,6 +35,7 @@ namespace synthese
 	namespace cms
 	{
 		class Webpage;
+		class Website;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Action : WebpageContentUploadAction.
@@ -55,9 +56,13 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_WEBPAGE_ID;
 			static const std::string PARAMETER_CONTENT;
+			static const std::string PARAMETER_UP_ID;
+			static const std::string PARAMETER_SITE_ID;
 
 		private:
 			boost::shared_ptr<Webpage> _page;
+			boost::shared_ptr<Webpage> _up;
+			boost::shared_ptr<Website> _site;
 			util::ParametersMap::File _file;
 
 		protected:
@@ -93,6 +98,8 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setPage(boost::shared_ptr<const Webpage> value) { _page = boost::const_pointer_cast<Webpage>(value); }
+				void setSite(boost::shared_ptr<const Website> value) { _site = boost::const_pointer_cast<Website>(value); }
+				void setUp(boost::shared_ptr<const Webpage> value) { _up = boost::const_pointer_cast<Webpage>(value); }
 			//@}
 		};
 	}

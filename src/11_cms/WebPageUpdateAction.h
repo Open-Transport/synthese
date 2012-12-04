@@ -50,6 +50,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_WEB_PAGE_ID;
 			static const std::string PARAMETER_UP_ID;
+			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_TEMPLATE_ID;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
@@ -86,6 +87,7 @@ namespace synthese
 			boost::optional<bool> _rawEditor;
 			boost::optional<std::string> _smartURLDefaultParameterName;
 			boost::optional<bool> _doNotEvaluate;
+			boost::optional<boost::shared_ptr<Website> > _site;
 
 			bool _decodeXMLEntitiesInContent;
 
@@ -128,6 +130,8 @@ namespace synthese
 			void setWebPage(boost::shared_ptr<Webpage> value);
 			void setdecodeXMLEntitiesInContent(bool value){ _decodeXMLEntitiesInContent = value; }
 			void setRawEditor(bool value){ _rawEditor = value; }
+			void setUp(boost::shared_ptr<Webpage> value){ _up = value; }
+			void setSite(boost::shared_ptr<Website> value) { _site = value; }
 		};
 }	}
 

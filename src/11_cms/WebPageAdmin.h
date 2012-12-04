@@ -46,6 +46,7 @@ namespace synthese
 	namespace cms
 	{
 		class WebPageAddAction;
+		class WebpageContentUploadAction;
 		class WebPageMoveAction;
 		class Webpage;
 
@@ -221,6 +222,7 @@ namespace synthese
 				server::StaticActionRequest<WebPageAddAction>& createRequest,
 				server::StaticActionRequest<db::RemoveObjectAction>& deleteRequest,
 				server::StaticActionRequest<WebPageMoveAction>& moveRequest,
+				server::StaticActionRequest<WebpageContentUploadAction>& uploadRequest,
 				const server::Request& request
 			);
 		};

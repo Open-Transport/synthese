@@ -29,6 +29,7 @@
 #include "Request.h"
 #include "WebPageTableSync.h"
 #include "DBTransaction.hpp"
+#include "WebsiteTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -50,6 +51,7 @@ namespace synthese
 	{
 		const string WebPageUpdateAction::PARAMETER_WEB_PAGE_ID = Action_PARAMETER_PREFIX + "wp";
 		const string WebPageUpdateAction::PARAMETER_UP_ID = Action_PARAMETER_PREFIX + "ui";
+		const string WebPageUpdateAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "_site_id";
 		const string WebPageUpdateAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
 		const string WebPageUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sd";
 		const string WebPageUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
@@ -79,6 +81,10 @@ namespace synthese
 			if(_up)
 			{
 				map.insert(PARAMETER_UP_ID, _up->get() ? (*_up)->getKey() : RegistryKeyType(0));
+			}
+			if(_site)
+			{
+				map.insert(PARAMETER_SITE_ID, _site->get() ? (*_site)->getKey() : RegistryKeyType(0));
 			}
 			if(_template)
 			{
@@ -136,13 +142,20 @@ namespace synthese
 
 		void WebPageUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			if(map.isDefined(PARAMETER_WEB_PAGE_ID))
 			{
-				_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
+				try
+				{
+					_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+					throw ActionException("No such page");
+				}
 			}
-			catch(ObjectNotFoundException<Webpage>&)
+			else
 			{
-				throw ActionException("No such page");
+				_page.reset(new Webpage);
 			}
 
 			// Up page
@@ -165,6 +178,22 @@ namespace synthese
 				catch(ObjectNotFoundException<Webpage>&)
 				{
 					throw ActionException("No such up page");
+				}
+			}
+
+			// Site
+			if(map.isDefined(PARAMETER_SITE_ID))
+			{
+				_site = shared_ptr<Website>();
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
+				if(id > 0)
+					try
+				{
+					_site = WebsiteTableSync::GetEditable(id, *_env);
+				}
+				catch(ObjectNotFoundException<Website>&)
+				{
+					throw ActionException("No such site");
 				}
 			}
 
@@ -296,23 +325,31 @@ namespace synthese
 			stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			// Moving the page into an other node of the tree
-			if(_up && _up->get() != _page->getParent())
+			if(_site)
 			{
-				// Deleting the old position of the tree
-				WebPageTableSync::ShiftRank(
-					_page->getRoot()->getKey(),
-					_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
-					_page->getRank(),
-					false,
-					transaction
-				);
+				_page->setRoot(_site->get());
+			}
+
+			// Moving the page into an other node of the tree
+			if(_up && _up->get() != _page->getParent(true))
+			{
+				if(_page->getParent(true))
+				{
+					// Deleting the old position of the tree
+					WebPageTableSync::ShiftRank(
+						_page->getRoot()->getKey(),
+						_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
+						_page->getRank(),
+						false,
+						transaction
+					);
+				}
 
 				// Giving the highest rank into the new branch
 				WebPageTableSync::SearchResult lastRankPage(
 					WebPageTableSync::Search(
 						*_env,
-						_page->getRoot()->getKey(),
+						(*_up)->getRoot()->getKey(),
 						_up->get() ? (*_up)->getKey() : RegistryKeyType(0),
 						optional<size_t>(),
 						0,
@@ -323,6 +360,11 @@ namespace synthese
 				)	);
 				_page->setRank(lastRankPage.empty() ? 0 : lastRankPage.front()->getRank() + 1);
 				_page->setParent(_up->get());
+
+				if(!_page->getRoot())
+				{
+					_page->setRoot((*_up)->getRoot());
+				}
 			}
 
 			if(_content1 || _mimeType || _ignoreWhiteChars || _doNotEvaluate)
@@ -405,6 +447,8 @@ namespace synthese
 
 			WebPageTableSync::Save(_page.get(), transaction);
 			transaction.run();
+
+
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
