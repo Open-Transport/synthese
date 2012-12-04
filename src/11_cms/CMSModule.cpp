@@ -174,12 +174,6 @@ namespace synthese
 		void CMSModule::AddSite(
 			Website& site
 		){
-			if(	site.get<HostName>().empty() &&
-				site.get<ClientURL>().empty()
-			){
-				return;
-			}
-
 			mutex::scoped_lock lock(_sitesByURLMutex);
 			_sitesByURL.insert(
 				make_pair(
@@ -273,6 +267,18 @@ namespace synthese
 						return it.second;
 					}
 				}
+			}
+
+			// Default site
+			SitesByURL::const_iterator it(
+				_sitesByURL.find(
+				make_pair(
+					string(),
+					string()
+			)	)	);
+			if(it != _sitesByURL.end())
+			{
+				return it->second;
 			}
 
 			return NULL;
