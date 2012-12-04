@@ -31,6 +31,7 @@
 #include "Session.h"
 #include "User.h"
 #include "WebPageTableSync.h"
+#include "WebsiteTableSync.hpp"
 
 using namespace boost;
 using namespace std;
@@ -48,6 +49,8 @@ namespace synthese
 	{
 		const string WebpageContentUploadAction::PARAMETER_WEBPAGE_ID = Action_PARAMETER_PREFIX + "_webpage_id";
 		const string WebpageContentUploadAction::PARAMETER_CONTENT = Action_PARAMETER_PREFIX + "_content";
+		const string WebpageContentUploadAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "_site_id";
+		const string WebpageContentUploadAction::PARAMETER_UP_ID = Action_PARAMETER_PREFIX + "_up_id";
 		
 		
 		
@@ -58,6 +61,14 @@ namespace synthese
 			{
 				map.insert(PARAMETER_WEBPAGE_ID, _page->getKey());
 			}
+			if(_site.get())
+			{
+				map.insert(PARAMETER_SITE_ID, _site->getKey());
+			}
+			if(_up.get())
+			{
+				map.insert(PARAMETER_UP_ID, _up->getKey());
+			}
 			return map;
 		}
 		
@@ -66,13 +77,71 @@ namespace synthese
 		void WebpageContentUploadAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// The page to update
-			try
+			if(map.getOptional<RegistryKeyType>(PARAMETER_WEBPAGE_ID))
 			{
-				_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEBPAGE_ID), *_env);
+				try
+				{
+					_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEBPAGE_ID), *_env);
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+					throw ActionException("Page not found");
+				}
 			}
-			catch(ObjectNotFoundException<Webpage>&)
+			else if(map.getOptional<RegistryKeyType>(PARAMETER_UP_ID))
 			{
-				throw ActionException("Page not found");
+				try
+				{
+					_up = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_UP_ID), *_env);
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+					throw ActionException("Up page not found");
+				}
+			}
+			else if(map.getOptional<RegistryKeyType>(PARAMETER_SITE_ID))
+			{
+				try
+				{
+					_site = WebsiteTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_SITE_ID), *_env);
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+					throw ActionException("Site not found");
+				}
+			}
+			if(!_page.get())
+			{
+				if(!_site.get() && !_up.get())
+				{
+					throw ActionException("Undefined page");
+				}
+				else
+				{
+					_page.reset(new Webpage);
+					WebPageTableSync::SearchResult result(
+						WebPageTableSync::Search(
+							Env::GetOfficialEnv(),
+							_up.get() ? _up->getRoot()->getKey() : _site->getKey(),
+							_up.get() ? _up->getKey() : RegistryKeyType(0),
+							optional<size_t>(),
+							0,
+							1,
+							true,
+							false,
+							false
+					)	);
+					_page->setRank(result.empty() ? 0 : (*result.begin())->getRank() + 1);
+					if(_up.get())
+					{
+						_page->setParent(_up.get());
+						_page->setRoot(_up->getRoot());
+					}
+					else
+					{
+						_page->setRoot(_site.get());
+					}
+				}
 			}
 
 			// The file to catch
@@ -101,10 +170,16 @@ namespace synthese
 				string smartURL;
 				if(_page->getParent() && !_page->getParent()->get<SmartURLPath>().empty())
 				{
-					smartURL = _page->getParent()->get<SmartURLPath>().empty() + "/";
+					smartURL = _page->getParent()->get<SmartURLPath>();
 				}
-				smartURL = smartURL + _file.filename;
+				smartURL += "/" + _file.filename;
 				_page->set<SmartURLPath>(smartURL);
+			}
+
+			// Update of the name if necessary
+			if(_page->get<Title>().empty())
+			{
+				_page->set<Title>(_file.filename);
 			}
 
 			// Do not use template to display uploaded files

@@ -52,6 +52,7 @@
 #include "WebsiteTableSync.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageMoveAction.hpp"
+#include "WebpageContentUploadAction.hpp"
 
 #include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -205,7 +206,10 @@ namespace synthese
 
 				AdminActionFunctionRequest<WebPageMoveAction, WebsiteAdmin> moveRequest(request, *this);
 
-				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, request);
+				AdminActionFunctionRequest<WebpageContentUploadAction, WebsiteAdmin> uploadRequest(request, *this);
+				uploadRequest.getAction()->setSite(_site);
+
+				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, uploadRequest, request);
 			}
 
 
