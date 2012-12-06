@@ -188,7 +188,7 @@ namespace synthese
 					bool first(true);
 					BOOST_FOREACH(const Calendar::DatesVector::value_type& date, bestAddings.getActiveDates())
 					{
-						strresult << (first ? string() : ",") << " " << date.day_number() << "/" << int(date.month()) << "/" << date.year();
+						strresult << (first ? string() : ",") << " " << int(date.day()) << "/" << int(date.month()) << "/" << date.year();
 						first=false;
 					}
 				}
@@ -203,7 +203,7 @@ namespace synthese
 					bool first(true);
 					BOOST_FOREACH(const Calendar::DatesVector::value_type& date, bestRemovals.getActiveDates())
 					{
-						strresult << (first ? string() : ",") << " " << date.day_number() << "/" << int(date.month()) << "/" << date.year();
+						strresult << (first ? string() : ",") << " " << int(date.day()) << "/" << int(date.month()) << "/" << date.year();
 						first=false;
 					}
 				}
@@ -222,7 +222,7 @@ namespace synthese
 			Calendar::DatesVector dates(calendar.getActiveDates());
 			BOOST_FOREACH(const Calendar::DatesVector::value_type& date, dates)
 			{
-				strresult << (first ? string() : ",") << " " << date.day_number() << "/" << int(date.month()) << "/" << date.year();
+				strresult << (first ? string() : ",") << " " << int(date.day()) << "/" << int(date.month()) << "/" << date.year();
 				first=false;
 			}
 			CalendarTemplate* nullCalendar(NULL);
