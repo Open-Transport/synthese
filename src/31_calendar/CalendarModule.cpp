@@ -108,6 +108,8 @@ namespace synthese
 			const Calendar& calendar
 		){
 			Value::const_iterator result(_value.end());
+
+			// Search for exact match
 			for(Value::const_iterator itCal(_value.begin()); itCal != _value.end(); ++itCal)
 			{
 				if(itCal->first != calendar)
@@ -133,13 +135,94 @@ namespace synthese
 					);
 			}
 
+			// Search for match with max 10 dates of difference 
+			size_t bestDifference(11);
+			Calendar bestAddings;
+			Calendar bestRemovals;
+			for(Value::const_iterator itCal(_value.begin()); itCal != _value.end(); ++itCal)
+			{
+				// Difference
+				Calendar commonDates(calendar);
+				commonDates &= itCal->first;
+				Calendar addings(itCal->first);
+				addings -= commonDates;
+				size_t addingsSize(addings.size());
+				if(addingsSize > 10)
+				{
+					continue;
+				}
+				Calendar removals(calendar);
+				removals -= commonDates;
+				size_t removalsSize(removals.size());
+				if(removalsSize + addingsSize > bestDifference)
+				{
+					continue;
+				}
+
+				if(	result == _value.end() ||
+					removalsSize + addingsSize < bestDifference ||
+					itCal->second->getCategory() < result->second->getCategory() ||
+					(	itCal->second->getCategory() == result->second->getCategory() &&
+						itCal->second->getName().size() < result->second->getName().size()
+				)	){
+					result = itCal;
+					bestDifference = removalsSize + addingsSize;
+					bestAddings = addings;
+					bestRemovals = removals;
+				}
+			}
+
+			if(result != _value.end())
+			{
+				stringstream strresult;
+				bool first(true);
+				strresult << result->second->getName();
+				if(bestAddings.size())
+				{
+					strresult << ", ainsi que le";
+					if(bestAddings.size() > 1)
+					{
+						strresult << "s";
+					}
+
+					bool first(true);
+					BOOST_FOREACH(const Calendar::DatesVector::value_type& date, bestAddings.getActiveDates())
+					{
+						strresult << (first ? string() : ",") << " " << date.day_number() << "/" << int(date.month()) << "/" << date.year();
+						first=false;
+					}
+				}
+				if(bestRemovals.size())
+				{
+					strresult << ", sauf le";
+					if(bestRemovals.size() > 1)
+					{
+						strresult << "s";
+					}
+
+					bool first(true);
+					BOOST_FOREACH(const Calendar::DatesVector::value_type& date, bestRemovals.getActiveDates())
+					{
+						strresult << (first ? string() : ",") << " " << date.day_number() << "/" << int(date.month()) << "/" << date.year();
+						first=false;
+					}
+				}
+				CalendarTemplate* nullCalendar(NULL);
+				return
+					make_pair(
+						nullCalendar,
+						strresult.str()
+					);
+			}
+
+
 			// If not template found, generation of a generic description text
 			stringstream strresult;
 			bool first(true);
 			Calendar::DatesVector dates(calendar.getActiveDates());
 			BOOST_FOREACH(const Calendar::DatesVector::value_type& date, dates)
 			{
-				strresult << (first ? string() : ",") << to_simple_string(date);
+				strresult << (first ? string() : ",") << " " << date.day_number() << "/" << int(date.month()) << "/" << date.year();
 				first=false;
 			}
 			CalendarTemplate* nullCalendar(NULL);
