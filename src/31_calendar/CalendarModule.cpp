@@ -161,10 +161,11 @@ namespace synthese
 
 				if(	result == _value.end() ||
 					removalsSize + addingsSize < bestDifference ||
-					itCal->second->getCategory() < result->second->getCategory() ||
-					(	itCal->second->getCategory() == result->second->getCategory() &&
-						itCal->second->getName().size() < result->second->getName().size()
-				)	){
+					(	removalsSize + addingsSize == bestDifference &&
+						(	itCal->second->getCategory() < result->second->getCategory() ||
+							(	itCal->second->getCategory() == result->second->getCategory() &&
+								itCal->second->getName().size() < result->second->getName().size()
+				)	)	)	){
 					result = itCal;
 					bestDifference = removalsSize + addingsSize;
 					bestAddings = addings;
