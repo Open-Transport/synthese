@@ -144,14 +144,14 @@ namespace synthese
 				// Difference
 				Calendar commonDates(calendar);
 				commonDates &= itCal->first;
-				Calendar addings(itCal->first);
+				Calendar addings(calendar);
 				addings -= commonDates;
 				size_t addingsSize(addings.size());
 				if(addingsSize > 10)
 				{
 					continue;
 				}
-				Calendar removals(calendar);
+				Calendar removals(itCal->first);
 				removals -= commonDates;
 				size_t removalsSize(removals.size());
 				if(removalsSize + addingsSize > bestDifference)
