@@ -89,6 +89,7 @@
 #include "JunctionUpdateAction.hpp"
 #include "NonConcurrencyRuleAddAction.h"
 #include "ScheduleRealTimeUpdateAction.h"
+#include "ScheduleRealTime2UpdateAction.h"
 #include "ServiceAddAction.h"
 #include "ServiceVertexUpdateAction.hpp"
 #include "ServiceVertexRealTimeUpdateAction.h"
@@ -248,6 +249,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PlaceAliasUpdateAction::integrate();
 	synthese::pt::PTUseRuleUpdateAction::integrate();
 	synthese::pt::ScheduleRealTimeUpdateAction::integrate();
+	synthese::pt::ScheduleRealTime2UpdateAction::integrate();
 	synthese::pt::ServiceAddAction::integrate();
 	synthese::pt::ServiceTimetableUpdateAction::integrate();
 	synthese::pt::ServiceUpdateAction::integrate();
