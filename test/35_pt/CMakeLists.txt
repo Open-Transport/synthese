@@ -41,3 +41,4 @@ set(DEPS
 boost_test(Edge "${DEPS}")
 boost_test(JourneyPatternCalendar "${DEPS}")
 boost_test(Service "${DEPS}")
+boost_test(ScheduleRealTime "${DEPS}")
