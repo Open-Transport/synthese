@@ -14,6 +14,9 @@ macro(boost_test name deps)
   if(DEFINED TESTS_ENV)
     set_tests_properties(${target} PROPERTIES ENVIRONMENT ${TESTS_ENV})
   endif()
+  if(UNIX)
+    set_target_properties(${target} PROPERTIES LINK_FLAGS -Wl,-no-as-needed)
+  endif()
 endmacro(boost_test)
 
 
