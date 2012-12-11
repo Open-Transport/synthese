@@ -31,12 +31,14 @@
 #include "ScheduledService.h"
 #include "SchedulesBasedService.h"
 #include "LineStop.h"
+#include "StopPoint.hpp"
 #include "DataSourceTableSync.h"
 #include "JourneyPattern.hpp"
+#include "StandardArrivalDepartureTableGenerator.h"
+#include "ArrivalDepartureTableGenerator.h"
 
 using namespace std;
 using namespace boost;
-
 using namespace boost::posix_time;
 
 namespace synthese
@@ -47,6 +49,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 	using namespace impex;
+	using namespace departure_boards;
 
 	namespace util
 	{
@@ -149,16 +152,13 @@ namespace synthese
 
 		void ScheduleRealTime2UpdateAction::run(Request& request)
 		{
-			posix_time::time_duration lateDuration;
 			bool atArrival;
 			// Calc the lateness
 			if(!_departureTime.is_not_a_date_time())
 			{
-				lateDuration = _departureTime - _service->getDepartureSchedules(false)[_lineStopRank];
 				atArrival = false;
 			} else if(!_arrivalTime.is_not_a_date_time())
 			{
-				lateDuration = _arrivalTime - _service->getArrivalSchedules(false)[_lineStopRank];
 				atArrival = true;
 			} else
 			{
@@ -166,52 +166,62 @@ namespace synthese
 				return;
 			}
 
-			_service->applyRealTimeLateDuration(
-				_lineStopRank,
-				lateDuration,
-				atArrival,
-				!atArrival,
-				true
-				);
-
-			//
-			// Resync the next services if needed
-			//
-
 			posix_time::time_duration ourTimeRef(
 				atArrival 
 				? _service->getArrivalBeginScheduleToIndex(true, _lineStopRank) 
 				: _service->getDepartureBeginScheduleToIndex(true, _lineStopRank)
 			);
-			const pt::JourneyPattern *jp(_service->getRoute());
-			BOOST_FOREACH(Service* nextService, jp->getServices())
-			{
-				// Do not process our service
-				if(nextService->getServiceNumber() == _service->getServiceNumber())
-				{
-					continue;
-				}
 
-				// Determine if this service is after our own and if so adjust it
+			posix_time::time_duration lateDuration(
+				atArrival 
+				? _arrivalTime - ourTimeRef
+				: _departureTime - ourTimeRef
+			);
+
+			ptime now(second_clock::local_time());
+
+			//
+			// Resync the all services that are between the old sceduled date and the
+			// new one for the given service and line stop.
+			//
+			const StopPoint *sp(static_cast<const StopPoint*>(_service->getRealTimeVertex(_lineStopRank)));
+			ArrivalDepartureTableGenerator::PhysicalStops ps;
+			ps.insert(make_pair(sp->getKey(), sp));
+			DeparturesTableDirection di(atArrival ? DISPLAY_ARRIVALS : DISPLAY_DEPARTURES);
+			EndFilter ef(WITH_PASSING);
+			LineFilter lf;
+			DisplayedPlacesList dp;
+			ForbiddenPlacesList fp;
+			StandardArrivalDepartureTableGenerator tdg(
+				ps,
+				di,
+				ef,
+				lf,
+				dp,
+				fp,
+				ptime(now.date(), ourTimeRef),
+				ptime(now.date(), (atArrival ? _arrivalTime : _departureTime)),
+				false
+			);
+
+			BOOST_FOREACH(const ArrivalDepartureList::value_type& itService, tdg.generate())
+			{
+				const SchedulesBasedService *nextService (dynamic_cast<const SchedulesBasedService*>(itService.first.getService()));
+
 				posix_time::time_duration theirTimeRef(
 					atArrival
 					? nextService->getArrivalBeginScheduleToIndex(true, _lineStopRank) 
 					: nextService->getDepartureBeginScheduleToIndex(true, _lineStopRank)
 				);
-				if(theirTimeRef <= ourTimeRef)
-				{
-					// Add an arbitrary fixed time between the current and next service
-					lateDuration = ourTimeRef - theirTimeRef + time_duration(0, 1, 0);
-					
-					dynamic_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
-						_lineStopRank,
-						lateDuration,
-						atArrival,
-						!atArrival,
-						true
-					);
-					ourTimeRef = theirTimeRef + lateDuration;
-				}
+
+				// Reschedule this service to the new given time 
+				const_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
+					_lineStopRank,
+					ourTimeRef + lateDuration - theirTimeRef,
+					atArrival,
+					!atArrival,
+					true
+				);
 			}
 		}
 
