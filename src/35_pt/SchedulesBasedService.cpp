@@ -714,4 +714,21 @@ namespace synthese
 				return _vertices;
 			}
 		}
+
+
+
+		bool SchedulesBasedService::comparePlannedStops( const ServedVertices& servedVertices ) const
+		{
+			return _vertices == servedVertices;
+		}
+
+
+
+		void SchedulesBasedService::setVertices( const ServedVertices& vertices )
+		{
+			for(size_t i(0); i<_path->getEdges().size(); ++i)
+			{
+				setVertex(i, vertices[i]);
+			}
+		}
 }	}

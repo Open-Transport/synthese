@@ -124,7 +124,8 @@ namespace synthese
 				pt::TransportNetwork& defaultNetwork,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				std::ostream& logStream,
+				boost::optional<const std::string&> secondId = boost::optional<const std::string&>()
 			);
 
 
@@ -134,7 +135,8 @@ namespace synthese
 				const std::string& id,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				std::ostream& logStream,
+				boost::optional<const std::string&> secondId = boost::optional<const std::string&>()
 			);
 
 
@@ -247,7 +249,8 @@ namespace synthese
 				boost::optional<const pt::StopPoint::Geometry*> geometry,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				std::ostream& logStream,
+				bool doNotUpdate = false
 			);
 
 
@@ -320,7 +323,8 @@ namespace synthese
 				std::ostream& logStream,
 				bool removeOldCodes,
 				bool updateMetricOffsetOnUpdate,
-				bool attemptToCopyExistingGeometries = true
+				bool attemptToCopyExistingGeometries = true,
+				bool allowDifferentStopPointsInSameStopArea = false
 			);
 
 
@@ -342,7 +346,8 @@ namespace synthese
 				util::Env& env,
 				std::ostream& logStream,
 				boost::optional<const std::string&> team = boost::optional<const std::string&>(),
-				boost::optional<const graph::RuleUser::Rules&> rules = boost::optional<const graph::RuleUser::Rules&>()
+				boost::optional<const graph::RuleUser::Rules&> rules = boost::optional<const graph::RuleUser::Rules&>(),
+				boost::optional<const pt::SchedulesBasedService::ServedVertices&> servedVertices = boost::optional<const pt::SchedulesBasedService::ServedVertices&>()
 			);
 
 

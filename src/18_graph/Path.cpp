@@ -302,7 +302,10 @@ namespace synthese
 					(*(insertionPosition - 1))->getSubEdges() :
 					(*_edges.rbegin())->getSubEdges()
 				);
-				previousEdge = *subEdges.rbegin();
+				if(!subEdges.empty())
+				{
+					previousEdge = *subEdges.rbegin();
+				}
 			}
 			Edge* nextEdge(NULL);
 			if(insertionPosition != _edges.end())
@@ -310,7 +313,10 @@ namespace synthese
 				Edge::SubEdges subEdges(
 					(*insertionPosition)->getSubEdges()
 				);
-				nextEdge = *subEdges.begin();
+				if(!subEdges.empty())
+				{
+					nextEdge = *subEdges.begin();
+				}
 			}
 			BOOST_FOREACH(Edge* subEdge, edge.getSubEdges())
 			{

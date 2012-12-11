@@ -127,24 +127,39 @@ namespace synthese
 				static const std::string FILE_UMSTEIGZ;
 
 				static const std::string PARAMETER_SHOW_STOPS_ONLY;
-				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_WAYBACK_BIT_POSITION;
 				static const std::string PARAMETER_IMPORT_FULL_SERVICES;
 				static const std::string PARAMETER_IMPORT_STOPS;
 				static const std::string PARAMETER_LINES_FILTER;
 
 			private:
+				struct LineFilter
+				{
+					static const std::string SEP_MAIN;
+					static const std::string SEP_FIELD;
+					static const std::string JOCKER;
+					
+					boost::shared_ptr<pt::TransportNetwork> network;
+					boost::optional<size_t> lineNumberStart;
+					boost::optional<size_t> lineNumberEnd;
+				};
+				typedef std::map<std::string, LineFilter> LinesFilter;
+
+				static LinesFilter GetLinesFilter(const std::string& s);
+				static std::string LinesFilterToString(const LinesFilter& value);
+
 				//! @name Parameters
 				//@{
-					boost::shared_ptr<pt::TransportNetwork> _network;
 					bool _showStopsOnly;
-					std::size_t _wayBackBitPosition;
+					size_t _wayBackBitPosition;
 					bool _importFullServices;
 					bool _importStops;
-					std::set<std::string> _linesFilter;
+					LinesFilter _linesFilter;
 				//@}
 
-				typedef std::map<int, calendar::Calendar> CalendarMap;
+				const LineFilter* _lineIsIncluded(const std::string& lineNumber) const;
+
+				typedef std::map<size_t, calendar::Calendar> CalendarMap;
 				struct Bahnhof
 				{
 					std::string operatorCode;
@@ -169,18 +184,20 @@ namespace synthese
 				{
 					struct CalendarUse
 					{
-						std::size_t calendarNumber;
+						size_t calendarNumber;
 						std::string startStopCode;
 						std::string endStopCode;
 					};
 
 					std::string number;
 					std::string lineNumber;
-					std::size_t version;
+					boost::optional<std::string> secondLineNumber;
+					size_t version;
 					std::vector<CalendarUse> calendars;
 					std::string transportModeCode;
 					boost::posix_time::time_duration continuousServiceRange;
 					boost::posix_time::time_duration continuousServiceWaitingTime;
+					const LineFilter* lineFilter;
 
 					// Served stops
 					struct Stop
