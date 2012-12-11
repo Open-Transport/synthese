@@ -639,7 +639,7 @@ namespace synthese
 					stream << t.col(7, string(), true) << "Jonctions au départ de " << _connectionPlace->getFullName();
 					BOOST_FOREACH(const shared_ptr<Junction>& junction, startings)
 					{
-						if(junction->getBack())
+						if(junction->getBack() || !junction->isValid())
 						{
 							continue;
 						}
@@ -669,7 +669,7 @@ namespace synthese
 					stream << t.col(7, string(), true) << "Jonctions vers " << _connectionPlace->getFullName();
 					BOOST_FOREACH(const shared_ptr<Junction>& junction, endings)
 					{
-						if(junction->getBack())
+						if(junction->getBack() || !junction->isValid())
 						{
 							continue;
 						}
