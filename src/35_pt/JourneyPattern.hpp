@@ -259,6 +259,7 @@ namespace synthese
 				bool operator==(const JourneyPattern& other) const;
 
 
+				bool compareStopAreas(const StopsWithDepartureArrivalAuthorization& stops) const;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks if the journey pattern calls at the specified city

@@ -179,6 +179,7 @@ namespace synthese
 				void generateIncrementalSchedules(boost::posix_time::time_duration firstSchedule);
 
 				bool comparePlannedSchedules(const Schedules& departure, const Schedules& arrival) const;
+				bool comparePlannedStops(const ServedVertices& servedVertices) const;
 
 
 			//! @name Update methods
@@ -248,6 +249,12 @@ namespace synthese
 				void setVertex(
 					size_t rank,
 					const graph::Vertex* value
+				);
+
+
+
+				void setVertices(
+					const ServedVertices& vertices
 				);
 
 			//@}

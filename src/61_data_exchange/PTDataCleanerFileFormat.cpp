@@ -336,32 +336,58 @@ namespace synthese
 			// Vehicle services
 			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
 			{
-				db.deleteStmt(vehicleService->getKey(), transaction);
+				VehicleServiceTableSync::Remove(
+					NULL, 
+					vehicleService->getKey(),
+					transaction,
+					false
+				);
 			}
 
 			BOOST_FOREACH(const shared_ptr<ScheduledService>& sservice, _scheduledServicesToRemove)
 			{
-				db.deleteStmt(sservice->getKey(), transaction);
+				ScheduledServiceTableSync::Remove(
+					NULL,
+					sservice->getKey(),
+					transaction,
+					false
+				);
 			}
 			BOOST_FOREACH(const shared_ptr<ContinuousService>& cservice, _continuousServicesToRemove)
 			{
-				db.deleteStmt(cservice->getKey(), transaction);
+				ContinuousServiceTableSync::Remove(
+					NULL,
+					cservice->getKey(),
+					transaction,
+					false
+				);
 			}
 			BOOST_FOREACH(const shared_ptr<JourneyPattern>& journeyPattern, _journeyPatternsToRemove)
 			{
-				BOOST_FOREACH(const Edge* edge, journeyPattern->getEdges())
-				{
-					db.deleteStmt(edge->getKey(), transaction);
-				}
-				db.deleteStmt(journeyPattern->getKey(), transaction);
+				JourneyPatternTableSync::Remove(
+					NULL,
+					journeyPattern->getKey(),
+					transaction,
+					false
+				);
 			}
 			BOOST_FOREACH(const shared_ptr<StopPoint>& stop, _stopsToRemove)
 			{
-				db.deleteStmt(stop->getKey(), transaction);
+				StopPointTableSync::Remove(
+					NULL,
+					stop->getKey(),
+					transaction,
+					false
+				);
 			}
 			BOOST_FOREACH(const shared_ptr<StopArea>& stopArea, _stopAreasToRemove)
 			{
-				db.deleteStmt(stopArea->getKey(), transaction);
+				StopAreaTableSync::Remove(
+					NULL,
+					stopArea->getKey(),
+					transaction,
+					false
+				);
 			}
 		}
 
@@ -399,13 +425,15 @@ namespace synthese
 				throw RequestException("No such calendar template");
 			}
 
+			date startDate(not_a_date_time);
+			date endDate(not_a_date_time);
 			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
 			{
-				_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
+				startDate = from_string(map.get<string>(PARAMETER_START_DATE));
 			}
 			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
 			{
-				_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
+				endDate = from_string(map.get<string>(PARAMETER_END_DATE));
 			}
 
 			_fromToday = map.getDefault<bool>(PARAMETER_FROM_TODAY, false);
@@ -415,28 +443,28 @@ namespace synthese
 			{
 				if(_calendarTemplate.get())
 				{
-					if(_startDate && _endDate)
+					if(!startDate.is_not_a_date() && endDate.is_not_a_date())
 					{
-						_calendar = _calendarTemplate->getResult(Calendar(*_startDate, *_endDate));
+						_calendar = _calendarTemplate->getResult(Calendar(startDate, endDate));
 					}
 					else if(_calendarTemplate->isLimited())
 					{
 						_calendar = _calendarTemplate->getResult();
-						if(_startDate)
+						if(!startDate.is_not_a_date())
 						{
-							_calendar &= Calendar(*_startDate, _calendar.getLastActiveDate());
+							_calendar &= Calendar(startDate, _calendar.getLastActiveDate());
 						}
-						if(_endDate)
+						if(!endDate.is_not_a_date())
 						{
-							_calendar &= Calendar(_calendar.getFirstActiveDate(), *_endDate);
+							_calendar &= Calendar(_calendar.getFirstActiveDate(), endDate);
 						}
 					}
 				}
 				else
 				{
-					if(_startDate && _endDate)
+					if(!startDate.is_not_a_date() && !endDate.is_not_a_date())
 					{
-						_calendar = Calendar(*_startDate, *_endDate);
+						_calendar = Calendar(startDate, endDate);
 					}
 				}
 			}
@@ -451,14 +479,6 @@ namespace synthese
 			if(_calendarTemplate.get())
 			{
 				result.insert(PARAMETER_CALENDAR_ID, _calendarTemplate->getKey());
-			}
-			if(_startDate)
-			{
-				result.insert(PARAMETER_START_DATE, *_startDate);
-			}
-			if(_endDate)
-			{
-				result.insert(PARAMETER_END_DATE, *_endDate);
 			}
 			result.insert(PARAMETER_FROM_TODAY, _fromToday);
 			result.insert(PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops);

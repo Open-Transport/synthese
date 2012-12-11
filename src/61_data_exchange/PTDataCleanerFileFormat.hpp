@@ -82,8 +82,6 @@ namespace synthese
 		protected:
 			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
 			calendar::Calendar _calendar;
-			boost::optional<boost::gregorian::date> _startDate;
-			boost::optional<boost::gregorian::date> _endDate;
 			bool _fromToday;
 			bool _cleanOldData;
 			bool _cleanUnusedStops;
@@ -103,8 +101,6 @@ namespace synthese
 
 		public:
 			void setCalendar(boost::shared_ptr<const calendar::CalendarTemplate> value){ _calendarTemplate = value; }
-			void setStartDate(boost::optional<boost::gregorian::date> value){ _startDate = value; }
-			void setEndDate(boost::optional<boost::gregorian::date> value){ _endDate = value; }
 			void setFromToday(bool value){ _fromToday = value; }
 			virtual void cleanObsoleteData(const boost::gregorian::date& firstDayToKeep) const;
 

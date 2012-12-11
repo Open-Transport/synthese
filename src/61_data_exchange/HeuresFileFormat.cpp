@@ -188,9 +188,9 @@ namespace synthese
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
-			if(!_startDate || !_endDate)
+			if(_calendar.empty())
 			{
-				throw RequestException("Start date and end date must be defined");
+				throw RequestException("Base calendar must be non empty");
 			}
 
 			if(key == FILE_POINTSARRETS)
@@ -542,7 +542,7 @@ namespace synthese
 			} // 3 : Services
 			else if (key == FILE_SERVICES)
 			{
-				if(!_startDate || !_endDate)
+				if(_calendar.empty())
 				{
 					stream << "ERR  : Start date or end date not defined<br />";
 					return false;
@@ -564,7 +564,7 @@ namespace synthese
 						days[i] = (line[i==0 ? 12 : i+5] == '1');
 					}
 					Calendar cal;
-					for(gregorian::date d(*_startDate); d<=*_endDate; d += gregorian::days(1))
+					BOOST_FOREACH(const date& d, _calendar.getActiveDates())
 					{
 						if(	((day7.isActive(d) || d.day_of_week() == 0) && days[0]) ||
 							(!day7.isActive(d) && d.day_of_week() != 0 && days[d.day_of_week()])
@@ -621,8 +621,8 @@ namespace synthese
 			stream << t.cell("Services", t.getForm().getTextInput(_getFileParameterName(FILE_SERVICES), _pathsMap[FILE_SERVICES].file_string()));
 			stream << t.title("Paramètres");
 			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate ? *_startDate : date(not_a_date_time)));
-			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
+			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _calendar.empty() ? date(not_a_date_time) : _calendar.getFirstActiveDate()));
+			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _calendar.empty() ? date(not_a_date_time) : _calendar.getLastActiveDate()));
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.cell("Source de données arrêts (si différente)", t.getForm().getTextInput(PARAMETER_STOPS_DATASOURCE_ID, _stopsDataSource.get() ? lexical_cast<string>(_stopsDataSource->getKey()) : string()));
 			stream << t.cell("Calendrier des jours fériés",

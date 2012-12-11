@@ -365,9 +365,11 @@ namespace synthese
 			boost::optional<const StopPoint::Geometry*> geometry,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			std::ostream& logStream,
+			bool doNotUpdate
 		){
 			// Load if possible
+			bool creation(false);
 			set<StopPoint*> result(GetStopPoints(stops, code, name, logStream, false));
 
 			// Creation if necessary
@@ -388,6 +390,7 @@ namespace synthese
 						env,
 						logStream
 				)	);
+				creation = true;
 			}
 			else
 			{
@@ -400,6 +403,11 @@ namespace synthese
 			}
 
 			// Update
+			if(!creation && doNotUpdate)
+			{
+				return result;
+			}
+
 			BOOST_FOREACH(StopPoint* stop, result)
 			{
 				if(name)
@@ -545,9 +553,10 @@ namespace synthese
 			TransportNetwork& defaultNetwork,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			std::ostream& logStream,
+			optional<const string&> secondId
 		){
-			CommercialLine* line(GetLine(lines, id, source, env, logStream));
+			CommercialLine* line(GetLine(lines, id, source, env, logStream, secondId));
 			if(!line)
 			{
 				line = new CommercialLine(CommercialLineTableSync::getId());
@@ -562,6 +571,10 @@ namespace synthese
 				line->setParent(defaultNetwork);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
+				if(secondId)
+				{
+					links.insert(make_pair(&source, *secondId));
+				}
 				line->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<CommercialLine>().add(shared_ptr<CommercialLine>(line));
 				lines.add(*line);
@@ -600,7 +613,8 @@ namespace synthese
 			std::ostream& logStream,
 			bool removeOldCodes,
 			bool updateMetricOffsetOnUpdate,
-			bool attemptToCopyExistingGeometries
+			bool attemptToCopyExistingGeometries,
+			bool allowDifferentStopPointsInSameStopArea
 		){
 			// Declaration
 			bool creation(false);
@@ -625,7 +639,9 @@ namespace synthese
 				if(	(!rollingStock || jp->getRollingStock() == rollingStock) &&
 					(!id || jp->hasCodeBySource(source, *id)) &&
 					(!rules || jp->getRules() == *rules) &&
-					*jp == servedStops
+					(	(allowDifferentStopPointsInSameStopArea && jp->compareStopAreas(servedStops)) ||
+						(!allowDifferentStopPointsInSameStopArea && *jp == servedStops)
+					)
 				){
 					if(!result)
 					{
@@ -807,7 +823,8 @@ namespace synthese
 			util::Env& env,
 			std::ostream& logStream,
 			boost::optional<const std::string&> team,
-			boost::optional<const graph::RuleUser::Rules&> rules
+			boost::optional<const graph::RuleUser::Rules&> rules,
+			boost::optional<const SchedulesBasedService::ServedVertices&> servedVertices
 		){
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
@@ -845,6 +862,7 @@ namespace synthese
 
 				if(	curService->getServiceNumber() == number &&
 					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
+					(!servedVertices || curService->comparePlannedStops(*servedVertices)) &&
 					(team ? curService->getTeam() == *team : true) &&
 					(rules ? curService->getRules() == *rules : true)
 				){
@@ -872,6 +890,11 @@ namespace synthese
 				if(rules)
 				{
 					result->setRules(*rules);
+				}
+
+				if(servedVertices)
+				{
+					result->setVertices(*servedVertices);
 				}
 
 				route.addService(*result, false);
@@ -1322,30 +1345,49 @@ namespace synthese
 			const std::string& id,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			std::ostream& logStream,
+			optional<const string&> secondId
 		){
 			CommercialLine* line(NULL);
 			if(lines.contains(id))
 			{
 				set<CommercialLine*> loadedLines(lines.get(id));
-				if(loadedLines.size() > 1)
+				// Second id
+				if(secondId)
 				{
-					logStream << "WARN : more than one line with key " << id << "<br />";
-				}
-				line = *loadedLines.begin();
-
-				if(line->getPaths().empty())
-				{
-					JourneyPatternTableSync::Search(env, line->getKey());
-					ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
-					ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
-					BOOST_FOREACH(const Path* route, line->getPaths())
+					BOOST_FOREACH(CommercialLine* loadedLine, loadedLines)
 					{
-						LineStopTableSync::Search(env, route->getKey());
+						if(loadedLine->hasCodeBySource(source, *secondId))
+						{
+							line = loadedLine;
+							break;
+						}
 					}
 				}
+				else
+				{
+					if(loadedLines.size() > 1)
+					{
+						logStream << "WARN : more than one line with key " << id << "<br />";
+					}
+					line = *loadedLines.begin();
+				}
 
-				logStream << "LOAD : Use of existing commercial line " << line->getKey() << " (" << line->getName() << ")<br />";
+				if(line)
+				{
+					if(line->getPaths().empty())
+					{
+						JourneyPatternTableSync::Search(env, line->getKey());
+						ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+						ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+						BOOST_FOREACH(const Path* route, line->getPaths())
+						{
+							LineStopTableSync::Search(env, route->getKey());
+						}
+					}
+
+					logStream << "LOAD : Use of existing commercial line " << line->getKey() << " (" << line->getName() << ")<br />";
+				}
 			}
 			return line;
 		}
