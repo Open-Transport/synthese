@@ -401,6 +401,47 @@ namespace synthese
 
 
 
+		bool JourneyPattern::compareStopAreas( const StopsWithDepartureArrivalAuthorization& stops ) const
+		{
+			if(getEdges().size() != stops.size())
+			{
+				return false;
+			}
+
+			size_t rank(0);
+			BOOST_FOREACH(const Edge* edge, getEdges())
+			{
+				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
+
+				// Check if a stop can be recognized
+				bool ok(false);
+				BOOST_FOREACH(const StopWithDepartureArrivalAuthorization::StopsSet::value_type& oStop, stop._stop)
+				{
+					if(oStop->getHub() == edge->getFromVertex()->getHub())
+					{
+						ok = true;
+						break;
+					}
+				}
+				if(!ok)
+				{
+					return false;
+				}
+
+				if( (rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure || edge->isArrival() != stop._arrival)) ||
+					(stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()) ||
+					stop._metricOffset && stop._metricOffset != edge->getMetricOffset()
+				){
+					return false;
+				}
+				++rank;
+			}
+
+			return true;
+		}
+
+
+
 		JourneyPattern::StopWithDepartureArrivalAuthorization::StopWithDepartureArrivalAuthorization(
 			const std::set<StopPoint*>& stop,
 			boost::optional<MetricOffset> metricOffset /*= boost::optional<MetricOffset>()*/,

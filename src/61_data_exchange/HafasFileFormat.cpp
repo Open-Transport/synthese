@@ -99,7 +99,6 @@ namespace synthese
 		const string HafasFileFormat::Importer_::FILE_METABHF = "metabhf";
 
 		const string HafasFileFormat::Importer_::PARAMETER_SHOW_STOPS_ONLY = "show_stops_only";
-		const string HafasFileFormat::Importer_::PARAMETER_NETWORK_ID = "network_id";
 		const string HafasFileFormat::Importer_::PARAMETER_WAYBACK_BIT_POSITION = "wayback_bit_position";
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_FULL_SERVICES = "import_full_services";
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_STOPS = "import_stops";
@@ -122,6 +121,129 @@ namespace synthese
 
 	namespace data_exchange
 	{
+		const std::string HafasFileFormat::Importer_::LineFilter::SEP_MAIN = ",";
+		const std::string HafasFileFormat::Importer_::LineFilter::SEP_FIELD = ":";
+		const std::string HafasFileFormat::Importer_::LineFilter::JOCKER = "*";
+
+
+
+		HafasFileFormat::Importer_::LinesFilter HafasFileFormat::Importer_::GetLinesFilter( const std::string& s )
+		{
+			LinesFilter result;
+			vector<string> filters;
+			split(filters, s, is_any_of(LineFilter::SEP_MAIN));
+			BOOST_FOREACH(const string& filter, filters)
+			{
+				vector<string> items;
+				split(items, filter, is_any_of(LineFilter::SEP_FIELD));
+				LineFilter lineFilter;
+				string pattern;
+
+				// Pattern
+				if(items.size() > 0)
+				{
+					pattern = items[0];
+				}
+				else
+				{
+					pattern = LineFilter::JOCKER;
+				}
+
+				// Network
+				if(items.size() > 1)
+				{
+					try
+					{
+						lineFilter.network = Env::GetOfficialEnv().getEditable<TransportNetwork>(
+							lexical_cast<RegistryKeyType>(items[1])
+						);
+					}
+					catch(...)
+					{
+						continue;
+					}
+				}
+
+				// Line number start
+				if(items.size() > 2 && !items[1].empty())
+				{
+					try
+					{
+						lineFilter.lineNumberStart = lexical_cast<size_t>(items[2]);
+					}
+					catch(bad_lexical_cast&)
+					{
+					}
+				}
+
+				// Line number end
+				if(items.size() > 3 && !items[2].empty())
+				{
+					try
+					{
+						lineFilter.lineNumberEnd = lexical_cast<size_t>(items[3]);
+					}
+					catch(bad_lexical_cast&)
+					{
+					}
+				}
+
+				// Insertion
+				result.insert(
+					make_pair(
+						pattern,
+						lineFilter
+				)	);
+			}
+			return result;
+		}
+
+
+
+		std::string HafasFileFormat::Importer_::LinesFilterToString(const LinesFilter& value)
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const LinesFilter::value_type& filter, value)
+			{
+				// Filters separator
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << LineFilter::SEP_MAIN;
+				}
+
+				// Pattern
+				s << filter.first << LineFilter::SEP_FIELD;
+
+				// Network
+				if(filter.second.network.get())
+				{
+					s << filter.second.network->getKey();
+				}
+				s << LineFilter::SEP_FIELD;
+
+				// Line number start
+				if(filter.second.lineNumberStart)
+				{
+					s << *filter.second.lineNumberStart;
+				}
+				s << LineFilter::SEP_FIELD;
+
+				// Line number end
+				if(filter.second.lineNumberStart)
+				{
+					s << *filter.second.lineNumberEnd;
+				}
+			}
+			return s.str();
+		}
+
+
+
 		bool HafasFileFormat::Importer_::_checkPathsMap() const
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ECKDATEN));
@@ -159,12 +281,9 @@ namespace synthese
 					StopPointTableSync::Save(stop.second.get(), transaction);
 				}
 			}
-			if(_network.get())
+			BOOST_FOREACH(Registry<CommercialLine>::value_type line, _env.getRegistry<CommercialLine>())
 			{
-				BOOST_FOREACH(Registry<CommercialLine>::value_type line, _env.getRegistry<CommercialLine>())
-				{
-					CommercialLineTableSync::Save(line.second.get(), transaction);
-				}
+				CommercialLineTableSync::Save(line.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
 			{
@@ -379,7 +498,7 @@ namespace synthese
 			else if(key == FILE_ECKDATEN)
 			{
 				// This file should already loaded at parameters reading
-				error = !_startDate || !_endDate;
+				error = _calendar.empty();
 
 			} // 2 : Nodes
 			else if(key == FILE_BITFELD)
@@ -389,10 +508,11 @@ namespace synthese
 					int id(lexical_cast<int>(_getField(0,6)));
 					string calendarString(_getField(7));
 
-					date curDate(*_startDate);
+					date curDate(_calendar.getFirstActiveDate());
 					bool first(true);
 
 					Calendar calendar;
+					date endDate(_calendar.getLastActiveDate());
 
 					BOOST_FOREACH(char c, calendarString)
 					{
@@ -405,7 +525,7 @@ namespace synthese
 						{
 							if(!first || i>=2)
 							{
-								if(curDate > _endDate)
+								if(curDate > endDate)
 								{
 									break;
 								}
@@ -417,7 +537,7 @@ namespace synthese
 							}
 							bits = bits << 1;
 						}
-						if(curDate > _endDate)
+						if(curDate > endDate)
 						{
 							break;
 						}
@@ -439,10 +559,45 @@ namespace synthese
 				{
 					if(_getField(0, 2) == "*Z") // New zug
 					{
+						// Check of the last zug
+						if(itZug != _zugs.end())
+						{
+							// Check of schedules
+							bool hasDeparture(false);
+							Zug::Stops::const_iterator itStop(itZug->stops.begin());
+							for(;itStop != itZug->stops.end(); ++itStop)
+							{
+								if(!itStop->departureTime.is_not_a_date_time())
+								{
+									hasDeparture = true;
+									break;
+								}
+							}
+							bool hasArrival(false);
+							if(hasDeparture)
+							{
+								for(++itStop; itStop != itZug->stops.end(); ++itStop)
+								{
+									if(!itStop->arrivalTime.is_not_a_date_time())
+									{
+										hasArrival = true;
+										break;
+									}
+								}
+							}
+							if(!hasDeparture || !hasArrival)
+							{
+								_zugs.pop_back();
+								itZug = _zugs.end();
+							}
+						}
+
 						// Line number filter
 						string lineNumber(_getField(9,6));
-						if(	!_linesFilter.empty() &&
-							_linesFilter.find(lineNumber) == _linesFilter.end()
+						const LineFilter* lineFilter(
+							_lineIsIncluded(lineNumber)
+						);
+						if(	!lineFilter
 						){
 							loadCurrentZug = false;
 							continue;
@@ -451,10 +606,18 @@ namespace synthese
 
 						// Load current zug
 						itZug = _zugs.insert(_zugs.end(), Zug());
+						itZug->lineFilter = lineFilter;
 						itZug->number = _getField(3,5);
 						itZug->lineNumber = lineNumber;
 						itZug->version = lexical_cast<size_t>(_getField(16, 2));
 						zugNumber = itZug->number +"/"+ lineNumber;
+						if(lineFilter->lineNumberStart && lineFilter->lineNumberEnd)
+						{
+							itZug->secondLineNumber = _getField(
+								*lineFilter->lineNumberStart,
+								*lineFilter->lineNumberEnd - *lineFilter->lineNumberStart + 1
+							);
+						}
 
 						// Continuous service
 						if(!_getField(21,4).empty())
@@ -541,6 +704,12 @@ namespace synthese
 							_gleisMap.find(
 								make_tuple(itZug->number, itZug->lineNumber, itZug->version)
 						)	);
+						if(itGleis == _gleisMap.end())
+						{
+							itGleis = _gleisMap.find(
+								make_tuple(itZug->number, itZug->lineNumber, 0)
+							);
+						}
 						if(itGleis != _gleisMap.end())
 						{
 							GleisMap::mapped_type::const_iterator itStopArea(
@@ -578,7 +747,7 @@ namespace synthese
 			stream << t.cell("Gleis", t.getForm().getTextInput(_getFileParameterName(FILE_GLEIS), _pathsMap[FILE_GLEIS].file_string()));
 			stream << t.cell("Koord", t.getForm().getTextInput(_getFileParameterName(FILE_KOORD), _pathsMap[FILE_KOORD].file_string()));
 			stream << t.cell("Eckdaten", t.getForm().getTextInput(_getFileParameterName(FILE_ECKDATEN), _pathsMap[FILE_ECKDATEN].file_string()));
-			stream << t.cell("Bitfeld", t.getForm().getTextInput(_getFileParameterName(FILE_BITFELD), _pathsMap[FILE_BITFELD].file_string()));
+			stream << t.cell("Bitfield", t.getForm().getTextInput(_getFileParameterName(FILE_BITFELD), _pathsMap[FILE_BITFELD].file_string()));
 			stream << t.cell("Zugdat", t.getForm().getTextInput(_getFileParameterName(FILE_ZUGDAT), _pathsMap[FILE_ZUGDAT].file_string()));
 			stream << t.cell("Umsteigb", t.getForm().getTextInput(_getFileParameterName(FILE_UMSTEIGB), _pathsMap[FILE_UMSTEIGB].file_string()));
 			stream << t.cell("Umsteigz", t.getForm().getTextInput(_getFileParameterName(FILE_UMSTEIGZ), _pathsMap[FILE_UMSTEIGZ].file_string()));
@@ -587,27 +756,10 @@ namespace synthese
 			stream << t.cell("Uniquement afficher liste d'arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_SHOW_STOPS_ONLY, _showStopsOnly));
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
 			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
-			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.cell("Position du chiffre aller retour", t.getForm().getTextInput(PARAMETER_WAYBACK_BIT_POSITION, lexical_cast<string>(_wayBackBitPosition)));
 			stream << t.cell("Importer les services complets", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_FULL_SERVICES, _importFullServices));
 			stream << t.cell("Importer les arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
-
-			// Lines filter
-			stringstream textValue;
-			bool first(true);
-			BOOST_FOREACH(const string& item, _linesFilter)
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					textValue << ",";
-				}
-				textValue << item;
-			}
-			stream << t.cell("Filtre lignes", t.getForm().getTextInput(PARAMETER_LINES_FILTER, textValue.str()));
+			stream << t.cell("Filtre lignes", t.getForm().getTextInput(PARAMETER_LINES_FILTER, LinesFilterToString(_linesFilter)));
 
 			stream << t.close();
 		}
@@ -620,12 +772,6 @@ namespace synthese
 
 			// Show stops only
 			pm.insert(PARAMETER_SHOW_STOPS_ONLY, _showStopsOnly);
-
-			// Network
-			if(_network.get())
-			{
-				pm.insert(PARAMETER_NETWORK_ID, _network->getKey());
-			}
 
 			// Wayback bit position
 			pm.insert(PARAMETER_WAYBACK_BIT_POSITION, _wayBackBitPosition);
@@ -641,6 +787,9 @@ namespace synthese
 			{
 				pm.insert(PARAMETER_IMPORT_STOPS, _importStops);
 			}
+
+			// Lines filter
+			pm.insert(PARAMETER_LINES_FILTER, LinesFilterToString(_linesFilter));
 
 			return pm;
 		}
@@ -663,15 +812,6 @@ namespace synthese
 			// Import stops
 			_importStops = pm.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
 
-			// Transport network
-			if(pm.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID, 0)) try
-			{
-				_network = TransportNetworkTableSync::GetEditable(pm.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
-			}
-			catch (ObjectNotFoundException<TransportNetwork>&)
-			{
-			}
-
 			// Import dates
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ECKDATEN));
 			if(it != _pathsMap.end())
@@ -686,36 +826,30 @@ namespace synthese
 				{
 					throw Exception("Inconsistent Eckdaten file");
 				}
-				_startDate = date(
+				date startDate(
 					lexical_cast<int>(_getField(6,4)),
 					lexical_cast<int>(_getField(3,2)),
 					lexical_cast<int>(_getField(0,2))
 				);
-				if(*_startDate < now && _fromToday)
+				if(startDate < now && _fromToday)
 				{
-					_startDate = now;
+					startDate = now;
 				}
 
 				if(!_loadLine())
 				{
 					throw Exception("Inconsistent Eckdaten file");
 				}
-				_endDate = date(
+				date endDate(
 					lexical_cast<int>(_getField(6,4)),
 					lexical_cast<int>(_getField(3,2)),
 					lexical_cast<int>(_getField(0,2))
 				);
+				_calendar = Calendar(startDate, endDate);
 			}
 
 			// Lines filter
-			string linesFilter(pm.getDefault<string>(PARAMETER_LINES_FILTER));
-			if(!linesFilter.empty())
-			{
-				vector<string> v;
-				split(v, linesFilter, is_any_of(","));
-				_linesFilter.clear();
-				copy(v.begin(), v.end(), inserter(_linesFilter, _linesFilter.end()));
-			}
+			_linesFilter = GetLinesFilter(pm.getDefault<string>(PARAMETER_LINES_FILTER));
 		}
 
 
@@ -1060,6 +1194,12 @@ namespace synthese
 						continue;
 					}
 
+					// Jump over existing stop areas
+					if(stopPoints.contains(bahnhof.operatorCode))
+					{
+						continue;
+					}
+
 					// City
 					City* city(NULL);
 					if(stopAreas.get(bahnhof.operatorCode).empty())
@@ -1196,15 +1336,26 @@ namespace synthese
 					}
 
 					// Stop area
-					set<StopArea*> stopAreasSet(
-						stopAreas.get(bahnhof.operatorCode)
+					StopArea* stopArea(NULL);
+					set<StopPoint*> stopPointsSet(
+						stopPoints.get(bahnhof.operatorCode)
 					);
-					if(stopAreasSet.size() > 1)
+					if(!stopPointsSet.empty())
 					{
-						_logger.log(Logger::WARN, "Multiple stop areas with code "+ bahnhof.operatorCode);
+						stopArea = const_cast<StopArea*>((*stopPointsSet.begin())->getConnectionPlace());
 					}
-					assert(!stopAreasSet.empty());
-					StopArea* stopArea(*stopAreasSet.begin());
+					else
+					{
+						set<StopArea*> stopAreasSet(
+							stopAreas.get(bahnhof.operatorCode)
+						);
+						if(stopAreasSet.size() > 1)
+						{
+							_logger.log(Logger::WARN, "Multiple stop areas with code "+ bahnhof.operatorCode);
+						}
+						assert(!stopAreasSet.empty());
+						stopArea = *stopAreasSet.begin();
+					}
 
 					// Gleis or not
 					if(bahnhof.gleisSet.empty())
@@ -1219,7 +1370,8 @@ namespace synthese
 							bahnhof.point.get() ? optional<const Point*>(bahnhof.point.get()) : optional<const Point*>(),
 							_dataSource,
 							_env,
-							os
+							os,
+							true
     					);
 					}
 					else
@@ -1287,193 +1439,271 @@ namespace synthese
 			}
 
 			// Services
-			Calendar mask;
-			for(date curDate(*_startDate); curDate <= *_endDate; curDate += days(1))
-			{
-				mask.setActive(curDate);
-			}
 			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 			ImportableTableSync::ObjectBySource<RollingStockTableSync> transportModes(_dataSource, _env);
 			BOOST_FOREACH(const Zug& zug, _zugs)
 			{
-				BOOST_FOREACH(const Zug::CalendarUse& calendarUse, zug.calendars)
+				// Line
+				CommercialLine* line(NULL);
+				line = PTFileFormat::CreateOrUpdateLine(
+					lines,
+					zug.lineNumber,
+					optional<const string&>(),
+					optional<const string&>(),
+					optional<RGBColor>(),
+					*zug.lineFilter->network,
+					_dataSource,
+					_env,
+					os
+				);
+				if(!line)
 				{
-					// Line
-					CommercialLine* line(NULL);
-					if(_network.get()) // Auto creation if network is defined
-					{
-						line = PTFileFormat::CreateOrUpdateLine(
-							lines,
-							zug.lineNumber,
-							optional<const string&>(),
-							optional<const string&>(),
-							optional<RGBColor>(),
-							*_network,
-							_dataSource,
-							_env,
-							os
-						);
-					}
-					else // Else only existing lines are imported
-					{
-						// Search for an existing line
-						line = PTFileFormat::GetLine(
-							lines,
-							zug.lineNumber,
-							_dataSource,
-							_env,
-							os
-						);
+					continue;
+				}
 
-						// If not found, zug is ignored
-						if(!line)
+				// Update of the name with the code if nothing else is defined
+				if(line->getName().empty())
+				{
+					line->setName(zug.lineNumber);
+				}
+
+				// Wayback
+				int numericServiceNumber(0);
+				try
+				{
+					numericServiceNumber = lexical_cast<int>(zug.number.substr(zug.number.size() - 1 - _wayBackBitPosition, 1));
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
+				bool wayBack = (numericServiceNumber % 2 == 1);
+
+				// Transport mode (can be NULL)
+				RollingStock* transportMode(
+					PTFileFormat::GetTransportMode(
+						transportModes,
+						zug.transportModeCode,
+						os
+				)	);
+
+				// Calendars
+				for(size_t i(zug.calendars.size()); i>0; --i)
+				{
+					for(size_t n(0); n<zug.calendars.size()-i+1; ++n)
+					{
+						Calendar mergedCalendar;
+						for(size_t m(n); m<n+i; ++m)
 						{
-							continue;
+							if(m == n)
+							{
+								mergedCalendar = _calendarMap[zug.calendars[m].calendarNumber];
+							}
+							else
+							{
+								mergedCalendar &= _calendarMap[zug.calendars[m].calendarNumber];
+							}
 						}
-					}
-
-
-					// Update of the name with the code if nothing else is defined
-					if(line->getName().empty())
-					{
-						line->setName(zug.lineNumber);
-					}
-
-					// Wayback
-					int numericServiceNumber(0);
-					try
-					{
-						numericServiceNumber = lexical_cast<int>(zug.number.substr(zug.number.size() - 1 - _wayBackBitPosition, 1));
-					}
-					catch(bad_lexical_cast&)
-					{
-					}
-					bool wayBack = (numericServiceNumber % 2 == 1);
-
-					// Transport mode (can be NULL)
-					RollingStock* transportMode(
-						PTFileFormat::GetTransportMode(
-							transportModes,
-							zug.transportModeCode,
-							os
-					)	);
-
-					// Stops
-					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
-					bool ignoreService(false);
-					bool inStop(false);
-					BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
-					{
-						if(zugStop.stopCode == calendarUse.startStopCode)
+						if(n>0)
 						{
-							inStop = true;
+							mergedCalendar -= _calendarMap[zug.calendars[n-1].calendarNumber];
 						}
-						if(!inStop)
+						if(n+i < zug.calendars.size())
+						{
+							mergedCalendar -= _calendarMap[zug.calendars[n+i].calendarNumber]; 
+						}
+						mergedCalendar &= _calendar;
+
+						// Jump over useless combinations
+						if(mergedCalendar.empty())
 						{
 							continue;
 						}
 
-						// Stop link
-						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-							zugStop.gleisCode.empty() ? stopPoints.get(zugStop.stopCode) : gleisStopPoint[make_pair(zugStop.stopCode, zugStop.gleisCode)],
-							boost::optional<graph::MetricOffset>(),
-							!zugStop.departureTime.is_not_a_date_time(),
-							!zugStop.arrivalTime.is_not_a_date_time()
-						);
+						// Route bounds
+						string startStopCode = zug.calendars[n].startStopCode;
+						string endStopCode = zug.calendars[n+i-1].endStopCode;
 
-						// Check if at least a stop was found
-						if(stop._stop.empty())
+						// Stops and schedules
+						ScheduledService::Schedules departures;
+						ScheduledService::Schedules arrivals;
+						JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
+						bool ignoreService(false);
+						bool inStop(false);
+						BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
 						{
-							_logger.log(Logger::WARN, "The stop "+ zugStop.stopCode +"/"+ zugStop.gleisCode +" was not found : the service "+ zug.number +"/"+ zug.lineNumber +" is ignored");
-							ignoreService = true;
-							break;
+							if(zugStop.stopCode == startStopCode)
+							{
+								inStop = true;
+							}
+							if(!inStop)
+							{
+								continue;
+							}
+
+							// Stop link
+							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
+								zugStop.gleisCode.empty() ? stopPoints.get(zugStop.stopCode) : gleisStopPoint[make_pair(zugStop.stopCode, zugStop.gleisCode)],
+								boost::optional<graph::MetricOffset>(),
+								!zugStop.departureTime.is_not_a_date_time(),
+								!zugStop.arrivalTime.is_not_a_date_time()
+							);
+
+							// Check if at least a stop was found
+							if(stop._stop.empty())
+							{
+								_logger.log(Logger::WARN, "The stop "+ zugStop.stopCode +"/"+ zugStop.gleisCode +" was not found : the service "+ zug.number +"/"+ zug.lineNumber +" is ignored");
+								ignoreService = true;
+								break;
+							}
+
+							// Storage
+							stops.push_back(stop);
+
+							// Schedules
+
+							departures.push_back(zugStop.departureTime.is_not_a_date_time() ? zugStop.arrivalTime : zugStop.departureTime);
+							arrivals.push_back(zugStop.arrivalTime.is_not_a_date_time() ? zugStop.departureTime : zugStop.arrivalTime);
+
+							if(zugStop.stopCode == endStopCode)
+							{
+								break;
+							}
+						}
+						if(ignoreService)
+						{
+							if(_importFullServices)
+							{
+								continue;
+							}
+							else
+							{
+								return false;
+							}
 						}
 
-						// Storage
-						stops.push_back(stop);
+						// Journey pattern
+						JourneyPattern* route(
+							PTFileFormat::CreateOrUpdateRoute(
+								*line,
+								optional<const string&>(),
+								optional<const string&>(),
+								optional<const string&>(),
+								optional<Destination*>(),
+								optional<const RuleUser::Rules&>(),
+								wayBack,
+								transportMode,
+								stops,
+								_dataSource,
+								_env,
+								os,
+								true,
+								true,
+								true,
+								true
+						)	);
 
-						if(zugStop.stopCode == calendarUse.endStopCode)
-						{
-							break;
-						}
-					}
-					if(ignoreService)
-					{
-						if(_importFullServices)
-						{
-							continue;
+						// Service
+						SchedulesBasedService* service(NULL);
+						if(	zug.continuousServiceRange.is_not_a_date_time() ||
+							zug.continuousServiceRange.total_seconds() == 0
+						){
+							SchedulesBasedService::ServedVertices vertices;
+							size_t stopRank(0);
+							BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& itStop, stops)
+							{
+								// Choosing the vertex in the same hub than in the path
+								const Vertex* vertex(route->getEdge(stopRank)->getFromVertex());
+								if(	itStop._stop.find(static_cast<StopPoint*>(route->getEdge(stopRank)->getFromVertex())) == itStop._stop.end())
+								{
+									BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet::value_type& itStopLink, itStop._stop)
+									{
+										if(vertex->getHub() == itStopLink->getHub())
+										{
+											vertex = itStopLink;
+											break;
+										}
+									}
+								}
+								vertices.push_back(vertex);
+								++stopRank;
+							}
+							service = PTFileFormat::CreateOrUpdateService(
+								*route,
+								departures,
+								arrivals,
+								zug.number,
+								_dataSource,
+								_env,
+								os,
+								optional<const string&>(),
+								optional<const RuleUser::Rules&>(),
+								optional<const SchedulesBasedService::ServedVertices&>(vertices)
+							);
 						}
 						else
 						{
-							return false;
+							service = PTFileFormat::CreateOrUpdateContinuousService(
+								*route,
+								departures,
+								arrivals,
+								zug.number,
+								zug.continuousServiceRange,
+								zug.continuousServiceWaitingTime,
+								_dataSource,
+								_env,
+								os
+							);
+						}
+
+						// Calendar
+						if(service)
+						{
+							*service |= mergedCalendar;
 						}
 					}
-
-					// Journey pattern
-					JourneyPattern* route(
-						PTFileFormat::CreateOrUpdateRoute(
-							*line,
-							optional<const string&>(),
-							optional<const string&>(),
-							optional<const string&>(),
-							optional<Destination*>(),
-							optional<const RuleUser::Rules&>(),
-							wayBack,
-							transportMode,
-							stops,
-							_dataSource,
-							_env,
-							os,
-							true,
-							true
-					)	);
-
-					// Schedules
-					ScheduledService::Schedules departures;
-					ScheduledService::Schedules arrivals;
-					BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
-					{
-						departures.push_back(zugStop.departureTime.is_not_a_date_time() ? zugStop.arrivalTime : zugStop.departureTime );
-						arrivals.push_back(zugStop.arrivalTime.is_not_a_date_time() ? zugStop.departureTime : zugStop.arrivalTime);
-					}
-
-					// Service
-					SchedulesBasedService* service(NULL);
-					if(	zug.continuousServiceRange.is_not_a_date_time() ||
-						zug.continuousServiceRange.total_seconds() == 0
-					){
-						service = PTFileFormat::CreateOrUpdateService(
-							*route,
-							departures,
-							arrivals,
-							zug.number,
-							_dataSource,
-							_env,
-							os
-						);
-					}
-					else
-					{
-						service = PTFileFormat::CreateOrUpdateContinuousService(
-							*route,
-							departures,
-							arrivals,
-							zug.number,
-							zug.continuousServiceRange,
-							zug.continuousServiceWaitingTime,
-							_dataSource,
-							_env,
-							os
-						);
-					}
-
-					// Calendar
-					if(service)
-					{
-						*service |= _calendarMap[calendarUse.calendarNumber];
-					}
-			}	}
+				}
+			}
 
 			return true;
+		}
+
+
+
+		const HafasFileFormat::Importer_::LineFilter* HafasFileFormat::Importer_::_lineIsIncluded(
+			const std::string& lineNumber
+		) const {
+
+			// No filter = import nothing
+			if(_linesFilter.empty())
+			{
+				return NULL;
+			}
+
+			// Exact matching
+			LinesFilter::const_iterator it(
+				_linesFilter.find(lineNumber)
+			);
+			if( it != _linesFilter.end())
+			{
+				return &it->second;
+			}
+
+			// Pattern matching
+			BOOST_FOREACH(const LinesFilter::value_type& item, _linesFilter)
+			{
+				// Pattern
+				const string& pattern(item.first);
+
+				// Filter analysis
+				if(	pattern[pattern.size()-1] == LineFilter::JOCKER[0] &&
+					(	pattern.size() == 1 ||
+						(	lineNumber.size() >= pattern.size()-1 &&
+							pattern.substr(0, pattern.size()-1) == lineNumber.substr(0, pattern.size()-1)
+				)	)	){
+					return &item.second;
+				}
+			}
+
+			return NULL;
 		}
 }	}
