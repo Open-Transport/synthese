@@ -137,83 +137,82 @@ public:
 	}
 };
 
+class TestAreaMap
+{
+private:
+	vector<boost::shared_ptr<StopArea> > _stopAreas;
+	vector<boost::shared_ptr<StopPoint> > _stopPoints;
+	size_t _numberOfStops;
+public:
+	TestAreaMap(
+		size_t numberOfStops
+	):	_numberOfStops(numberOfStops)
+	{
+		for(size_t i=0; i< _numberOfStops; ++i)
+		{
+			_stopAreas.push_back(boost::shared_ptr<StopArea>(new StopArea(0, true)));
+			_stopPoints.push_back(boost::shared_ptr<StopPoint>(new StopPoint(0, "", &*_stopAreas[i])));
+			_stopAreas[i]->addPhysicalStop(*_stopPoints[i]);
+		}
+	}
+	size_t getNumberOfStops()
+	{
+		return _numberOfStops;
+	}
+	vector<boost::shared_ptr<StopPoint> > getStopPoints()
+	{
+		return _stopPoints;
+	}
+};
+
+class TestJourney
+{
+private:
+	vector<boost::shared_ptr<DesignatedLinePhysicalStop> > _designatedLinePhysicalStops;
+	vector<boost::shared_ptr<StopPoint> > _stopPoints;
+	size_t _numberOfStops;
+public:
+	TestJourney(JourneyPattern &jp, TestAreaMap &testAreaMap):
+		_stopPoints(testAreaMap.getStopPoints()),
+		_numberOfStops(testAreaMap.getNumberOfStops())
+	{
+		for(size_t i=0; i< _numberOfStops; ++i)
+		{
+			_designatedLinePhysicalStops.push_back(
+				boost::shared_ptr<DesignatedLinePhysicalStop>(
+				new DesignatedLinePhysicalStop(0, &jp, i,
+				(i < _numberOfStops - 1 ? true : false), // Departure
+				(i > 0 ? true : false),  // Arrival
+				0, &*_stopPoints[i]))
+			);
+			jp.addEdge(*(_designatedLinePhysicalStops[i].get()));
+		}
+	}
+
+};
+
 BOOST_AUTO_TEST_CASE (test1)
 {
 
 	synthese::pt::moduleRegister();
 
+	TestAreaMap testAreaMap(8);
+	
 	JourneyPattern jp;
 	CommercialLine cl;
 	jp.setCommercialLine(&cl);
+	TestJourney tj1(jp, testAreaMap);
 
-	StopArea p1(0, true);
-	StopArea p2(0, false);
-	StopArea p3(0, false);
-	StopArea p4(0, false);
-	StopArea p5(0, true);
-	StopArea p6(0, true);
-	StopArea p7(0, false);
-	StopArea p8(0, false);
+	JourneyPattern jp2;
+	CommercialLine cl2;
+	jp2.setCommercialLine(&cl2);
+	TestJourney tj2(jp2, testAreaMap);
 
-	StopPoint s1(0, "s1", &p1);
-	StopPoint s2(0, "s1", &p2);
-	StopPoint s3(0, "s1", &p3);
-	StopPoint s4(0, "s1", &p4);
-	StopPoint s5(0, "s1", &p5);
-	StopPoint s6(0, "s1", &p6);
-	StopPoint s7(0, "s1", &p7);
-	StopPoint s8(0, "s1", &p8);
-
-	p1.addPhysicalStop(s1);
-	p2.addPhysicalStop(s2);
-	p3.addPhysicalStop(s3);
-	p4.addPhysicalStop(s4);
-	p5.addPhysicalStop(s5);
-	p6.addPhysicalStop(s6);
-	p7.addPhysicalStop(s7);
-	p8.addPhysicalStop(s8);
-
-	DesignatedLinePhysicalStop l1AD(0, &jp, 0, true, true, 0, &s1);
-	DesignatedLinePhysicalStop l2AD(0, &jp, 1, true, true, 0, &s2);
-	DesignatedLinePhysicalStop l3AD(0, &jp, 2, true, true, 0, &s3);
-	DesignatedLinePhysicalStop l4AD(0, &jp, 3, true, true, 0, &s4);
-	DesignatedLinePhysicalStop l5AD(0, &jp, 4, true, true, 0, &s5);
-	DesignatedLinePhysicalStop l6AD(0, &jp, 5, true, true, 0, &s6);
-	DesignatedLinePhysicalStop l7AD(0, &jp, 6, true, true, 0, &s7);
-	DesignatedLinePhysicalStop l8AD(0, &jp, 7, true, true, 0, &s8);
-
-	s1.addDepartureEdge(&l1AD);
-	s2.addDepartureEdge(&l2AD);
-	s3.addDepartureEdge(&l3AD);
-	s4.addDepartureEdge(&l4AD);
-	s5.addDepartureEdge(&l5AD);
-	s6.addDepartureEdge(&l6AD);
-	s7.addDepartureEdge(&l7AD);
-	s8.addDepartureEdge(&l8AD);
-
-	s1.addArrivalEdge(&l1AD);
-	s2.addArrivalEdge(&l2AD);
-	s3.addArrivalEdge(&l3AD);
-	s4.addArrivalEdge(&l4AD);
-	s5.addArrivalEdge(&l5AD);
-	s6.addArrivalEdge(&l6AD);
-	s7.addArrivalEdge(&l7AD);
-	s8.addArrivalEdge(&l8AD);
-
-	jp.addEdge(l1AD);
-	jp.addEdge(l2AD);
-	jp.addEdge(l3AD);
-	jp.addEdge(l4AD);
-	jp.addEdge(l5AD);
-	jp.addEdge(l6AD);
-	jp.addEdge(l7AD);
-	jp.addEdge(l8AD);
-
-	TestScheduledService tss1(4503599627370501ULL, "1", jp, time_duration(1,0,0));
-	TestScheduledService tss2(4503599627370502ULL, "2", jp, time_duration(2,0,0));
-	TestScheduledService tss3(4503599627370503ULL, "3", jp, time_duration(3,0,0));
-	TestScheduledService tss4(4503599627370504ULL, "4", jp, time_duration(4,0,0));
-	TestScheduledService tss5(4503599627370505ULL, "5", jp, time_duration(5,0,0));
+	TestScheduledService tss1(4503599627370501ULL, "1", jp,  time_duration(1,0,0));
+	TestScheduledService tss2(4503599627370502ULL, "2", jp2, time_duration(2,0,0));
+	TestScheduledService tss3(4503599627370503ULL, "3", jp,  time_duration(3,0,0));
+	TestScheduledService tss4(4503599627370504ULL, "4", jp2, time_duration(4,0,0));
+	TestScheduledService tss5(4503599627370505ULL, "5", jp,  time_duration(5,0,0));
 
 	{
 		HTTPRequest req;
