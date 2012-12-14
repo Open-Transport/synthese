@@ -78,7 +78,7 @@ namespace synthese
 					trim(sql);
 					if(sql.substr(0, 11) == "DELETE FROM")
 					{
-						db.execUpdate(sql);
+						db.execUpdate(sql, *_transaction);
 					}
 					else if(sql.substr(0, 12) == "REPLACE INTO")
 					{
@@ -92,7 +92,7 @@ namespace synthese
 						{
 							RegistryKeyType id(lexical_cast<RegistryKeyType>(p[1]));
 						
-							db.execUpdate(sql);
+							db.execUpdate(sql, *_transaction);
 
 							db.addDBModifEvent(
 								DB::DBModifEvent(
@@ -549,7 +549,7 @@ namespace synthese
 			const std::string& messagePerimeter
 		) const {
 			return configPerimeter == messagePerimeter &&
-				messagePerimeter != InterSYNTHESEQueue::TABLE_NAME;
+				messagePerimeter != lexical_cast<string>(InterSYNTHESEQueue::CLASS_NUMBER);
 		}
 
 
