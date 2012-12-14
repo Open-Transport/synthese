@@ -165,7 +165,7 @@ namespace synthese
 			// Alarm object links
 			set<RegistryKeyType> alarmObjectLinksToRemove;
 
-			// Alarm object links
+			// Alarms
 			set<RegistryKeyType> messagesToRemove;
 
 			//////////////////////////////////////////////////////////////////////////
