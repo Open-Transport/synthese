@@ -67,14 +67,14 @@ namespace synthese
 			@defgroup m19Logs 19.13 DB Logs
 			@ingroup m19
 
-			@defgroup m19 19 Graph
+			@defgroup m19 19 Inter SYNTHESE
 			@ingroup m1
 
 			@{
 		*/
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 19 Graph Module class.
+		/// 19 Inter SYNTHESE Module class.
 		///	@author Hugues Romain
 		class InterSYNTHESEModule:
 			public server::ModuleClassTemplate<InterSYNTHESEModule>
