@@ -159,7 +159,7 @@ namespace synthese
 			}
 
 			mutex::scoped_lock lock(_queueMutex);
-			if(isObsolete())
+			if(isObsolete() || get<InterSYNTHESEConfig>()->get<ForceDump>())
 			{
 				// Clean the obsolete queue items
 				DBTransaction deleteTransaction;
