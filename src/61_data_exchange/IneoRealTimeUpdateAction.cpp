@@ -461,8 +461,13 @@ namespace synthese
 					programmation.ref = ref;
 
 					programmation.content = result->getText("diffusion_msg");
+					replace_all(programmation.content, "\r", " ");
+					replace_all(programmation.content, "\n", " ");
+					replace_all(programmation.content, "  ", " ");
 					programmation.messageTitle = result->getText("nature_dst");
 					programmation.title = result->getText("titre");
+					programmation.active = (result->getText("actif") == "O");
+					programmation.priority = (result->getText("alternance") == "N");
 					programmation.startTime = ptime(
 						from_string(result->getText("date_deb")),
 						duration_from_string(result->getText("heure_deb"))
@@ -569,7 +574,8 @@ namespace synthese
 						}
 						message = const_cast<SentAlarm*>(*messages.begin());
 						if(	message->getLongMessage() != programmation.content ||
-							message->getShortMessage() != programmation.messageTitle
+							message->getShortMessage() != programmation.messageTitle ||
+							(message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
 						){
 							updatedMessage = ScenarioSentAlarmInheritedTableSync::GetEditable(
 								message->getKey(),
@@ -580,7 +586,8 @@ namespace synthese
 						// Scenario updates
 						if(	scenario->getName() != programmation.title ||
 							scenario->getPeriodStart() != programmation.startTime ||
-							scenario->getPeriodEnd() != programmation.endTime
+							scenario->getPeriodEnd() != programmation.endTime ||
+							scenario->getIsEnabled() != programmation.active
 						){
 							updatedScenario = SentScenarioInheritedTableSync::GetEditable(
 								scenario->getKey(),
@@ -593,12 +600,14 @@ namespace synthese
 					{
 						updatedMessage->setLongMessage(programmation.content);
 						updatedMessage->setShortMessage(programmation.messageTitle);
+						updatedMessage->setLevel(programmation.priority ? ALARM_LEVEL_WARNING : ALARM_LEVEL_INFO);
 					}
 					if(updatedScenario.get())
 					{
 						updatedScenario->setName(programmation.title);
 						updatedScenario->setPeriodStart(programmation.startTime);
 						updatedScenario->setPeriodEnd(programmation.endTime);
+						updatedScenario->setIsEnabled(programmation.active);
 					}
 
 
