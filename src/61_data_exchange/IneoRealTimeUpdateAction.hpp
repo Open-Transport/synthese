@@ -161,6 +161,8 @@ namespace synthese
 				std::string title;
 				boost::posix_time::ptime startTime;
 				boost::posix_time::ptime endTime;
+				bool active;
+				bool priority;
 
 				typedef std::vector<Destinataire> Destinataires;
 				Destinataires destinataires;
