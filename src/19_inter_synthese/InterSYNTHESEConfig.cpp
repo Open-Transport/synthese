@@ -40,6 +40,7 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(LinkBreakMinutes, "link_break_minutes", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(MaxQueriesNumber, "max_queries_number", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ForceDump, "force_dump", SQL_BOOLEAN)
 	
 	namespace inter_synthese
 	{
@@ -55,7 +56,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_VALUE_CONSTRUCTOR(LinkBreakMinutes, minutes(30)),
-					FIELD_VALUE_CONSTRUCTOR(MaxQueriesNumber, 5000)
+					FIELD_VALUE_CONSTRUCTOR(MaxQueriesNumber, 5000),
+					FIELD_VALUE_CONSTRUCTOR(ForceDump, false)
 			)	)
 		{
 		}
