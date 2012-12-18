@@ -223,8 +223,8 @@ ScheduledServiceTableSync.cpp
 ScheduledServiceTableSync.h
 ScheduleRealTimeUpdateAction.cpp
 ScheduleRealTimeUpdateAction.h
-ScheduleRealTime2UpdateAction.cpp
-ScheduleRealTime2UpdateAction.h
+ScheduleRealTimeUpdateService.cpp
+ScheduleRealTimeUpdateService.h
 SchedulesBasedService.cpp
 SchedulesBasedService.h
 ServiceAddAction.cpp
