@@ -1,6 +1,6 @@
 
-/** ScheduleRealTime2UpdateAction class implementation.
-	@file ScheduleRealTime2UpdateAction.cpp
+/** ScheduleRealTimeUpdateService class implementation.
+	@file ScheduleRealTimeUpdateService.cpp
 	@author Hugues
 	@date 2009
 
@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "ScheduleRealTime2UpdateAction.h"
+#include "ScheduleRealTimeUpdateService.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "Env.h"
@@ -53,26 +53,26 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::ScheduleRealTime2UpdateAction>::FACTORY_KEY("ScheduleRealTime2UpdateAction");
+		template<> const string FactorableTemplate<Function, pt::ScheduleRealTimeUpdateService>::FACTORY_KEY("ScheduleRealTimeUpdateService");
 	}
 
 	namespace pt
 	{
-		const string ScheduleRealTime2UpdateAction::PARAMETER_LINE_STOP_RANK = Action_PARAMETER_PREFIX + "ls";
-		const string ScheduleRealTime2UpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "se";
-		const string ScheduleRealTime2UpdateAction::PARAMETER_SERVICE_DATASOURCE_ID = Action_PARAMETER_PREFIX + "ds";
-		const string ScheduleRealTime2UpdateAction::PARAMETER_DEPARTURE_TIME = Action_PARAMETER_PREFIX + "dt";
-		const string ScheduleRealTime2UpdateAction::PARAMETER_ARRIVAL_TIME = Action_PARAMETER_PREFIX + "at";
+		const string ScheduleRealTimeUpdateService::PARAMETER_LINE_STOP_RANK = Action_PARAMETER_PREFIX + "ls";
+		const string ScheduleRealTimeUpdateService::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "se";
+		const string ScheduleRealTimeUpdateService::PARAMETER_SERVICE_DATASOURCE_ID = Action_PARAMETER_PREFIX + "ds";
+		const string ScheduleRealTimeUpdateService::PARAMETER_DEPARTURE_TIME = Action_PARAMETER_PREFIX + "dt";
+		const string ScheduleRealTimeUpdateService::PARAMETER_ARRIVAL_TIME = Action_PARAMETER_PREFIX + "at";
 
 
-		ScheduleRealTime2UpdateAction::ScheduleRealTime2UpdateAction():
+		ScheduleRealTimeUpdateService::ScheduleRealTimeUpdateService():
 			_departureTime(not_a_date_time),
 			_arrivalTime(not_a_date_time)
 		{}
 
 
 
-		ParametersMap ScheduleRealTime2UpdateAction::getParametersMap() const
+		ParametersMap ScheduleRealTimeUpdateService::_getParametersMap() const
 		{
 			ParametersMap map;
 			// This mode is deprecated
@@ -81,7 +81,7 @@ namespace synthese
 
 
 
-		void ScheduleRealTime2UpdateAction::_setFromParametersMap(const ParametersMap& map)
+		void ScheduleRealTimeUpdateService::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.getDefault<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID, 0))
 			{
@@ -149,9 +149,11 @@ namespace synthese
 		}
 
 
-
-		void ScheduleRealTime2UpdateAction::run(Request& request)
-		{
+		util::ParametersMap ScheduleRealTimeUpdateService::run(
+			std::ostream& stream,
+			const Request& request
+		) const {
+			ParametersMap pm;
 			bool atArrival;
 			// Calc the lateness
 			if(!_departureTime.is_not_a_date_time())
@@ -163,7 +165,7 @@ namespace synthese
 			} else
 			{
 				// Nothing to do
-				return;
+				return pm;
 			}
 
 			posix_time::time_duration ourTimeRef(
@@ -223,10 +225,11 @@ namespace synthese
 					true
 				);
 			}
+			return pm;
 		}
 
 
-		bool ScheduleRealTime2UpdateAction::isAuthorized(const Session* session
+		bool ScheduleRealTimeUpdateService::isAuthorized(const Session* session
 		) const {
 #if 1
 			return true;
@@ -235,9 +238,13 @@ namespace synthese
 #endif
 		}
 
+		std::string ScheduleRealTimeUpdateService::getOutputMimeType() const
+		{
+			return "text/javascript";
+		}
 
 
-		void ScheduleRealTime2UpdateAction::setService(
+		void ScheduleRealTimeUpdateService::setService(
 			boost::shared_ptr<const ScheduledService> service
 		){
 			_service = const_pointer_cast<ScheduledService>(service);
@@ -245,7 +252,7 @@ namespace synthese
 
 
 
-		void ScheduleRealTime2UpdateAction::setLineStopRank( std::size_t value )
+		void ScheduleRealTimeUpdateService::setLineStopRank( std::size_t value )
 		{
 			_lineStopRank = value;
 		}
