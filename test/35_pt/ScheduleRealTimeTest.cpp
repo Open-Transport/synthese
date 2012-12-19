@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE (test1)
 	{
 		HTTPRequest req;
 		req.headers.insert(make_pair("Host", "www.toto.com"));
-		req.uri = "?SERVICE=ScheduleRealTimeUpdateService&nr=1&actionParamse=4503599627370501&actionParamls=3&actionParamat=03:20:00";
+		req.uri = "?SERVICE=ScheduleRealTimeUpdateService&nr=1&se1=4503599627370501&ls=3&at1=03:20:00";
 		req.ipaddr = "127.0.0.1";
 		DynamicRequest dr(req);
 
