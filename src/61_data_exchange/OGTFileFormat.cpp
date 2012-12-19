@@ -166,7 +166,7 @@ namespace synthese
 					else
 					{
 						user_data->importTrip = true;
-						user_data->tripNumber = attributes["NUMBER"];
+						user_data->tripNumber = attributes["JOURNEY_DESC"];
 						user_data->arrivalSchedule = duration_from_string(attributes["ENTRY_TIME"]);
 						user_data->arrivalSchedules.push_back(user_data->arrivalSchedule);
 					}
