@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "SchedulesBasedService.h"
 
 namespace synthese
 {
@@ -138,12 +139,16 @@ namespace synthese
 				Chainage* chainage;
 				typedef std::vector<Horaire> Horaires;
 				Horaires horaires;
+				bool mapped;
 
 				pt::ScheduledService* syntheseService;
 
-				/// @pre the service is on a compatible journey planner (no check)
-				bool operator==(const pt::ScheduledService& op) const;
 				bool operator!=(const pt::ScheduledService& op) const;
+				bool operator==(const pt::ScheduledService& service) const;
+				bool operator==(const pt::SchedulesBasedService::Schedules& schedules) const;
+
+				bool mustBeImported() const;
+				void updateService(pt::ScheduledService& service) const;
 			};
 
 			struct Destinataire

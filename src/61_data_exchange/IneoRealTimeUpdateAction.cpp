@@ -28,6 +28,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmRecipientTemplate.h"
 #include "CommercialLine.h"
+#include "DataSourceTableSync.h"
 #include "Depot.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DisplayScreen.h"
@@ -144,22 +145,6 @@ namespace synthese
 			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingScenario, existingScenarios)
 			{
 				scenariosToRemove.insert(existingScenario.second->getKey());
-			}
-
-			// Services
-			set<RegistryKeyType> servicesToRemove;
-			DataSource::Links::mapped_type existingServices(
-				_realTimeDataSource->getLinkedObjects<ScheduledService>()
-			);
-			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingService, existingServices)
-			{
-				Importable* importableObject(existingService.second);
-				if(	!dynamic_cast<ScheduledService*>(importableObject) ||
-					!static_cast<ScheduledService*>(importableObject)->isActive(today)
-				){
-					continue;
-				}
-				servicesToRemove.insert(importableObject->getKey());
 			}
 
 			// Alarm object links
@@ -645,28 +630,35 @@ namespace synthese
 
 			// Services
 			{
-				// Loop on the services present in the database and link to existing or new services
-				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
+				// Management of the ref field
+				typedef vector<const Course*> ServicesToUpdate;
+				ServicesToUpdate servicesToUpdate; // Old = New
+				typedef map<string, const ScheduledService*> ServicesToRemove;
+				ServicesToRemove servicesToRemove; // Old
+
+				ServicesToUpdate servicesToLinkAndUpdate; // New
+				ServicesToUpdate servicesToMoveAndUpdate; // Old -> New
+
+				// Services
+				DataSource::Links::mapped_type existingServices(
+					_plannedDataSource->getLinkedObjects<ScheduledService>()
+				);
+				BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingService, existingServices)
 				{
-					const Course& course(itCourse.second);
+					servicesToRemove.insert(
+						make_pair(
+							existingService.first,
+							static_cast<ScheduledService*>(existingService.second)
+					)	);
+				}
 
-					// Jump over courses with incomplete chainages
-					if(course.horaires.size() != course.chainage->arretChns.size())
-					{
-						continue;
-					}
+				// Search for existing service with same key
+				// If found, take the service into servicesToUpdate and remove it from servicesToRemove
+				BOOST_FOREACH(Courses::value_type& itCourse, courses)
+				{
+					Course& course(itCourse.second);
 
-					// Jump over dead runs
-					bool deadRun(false);
-					BOOST_FOREACH(const Chainage::ArretChns::value_type& it, course.chainage->arretChns)
-					{
-						if(!it.arret->syntheseStop)
-						{
-							deadRun = true;
-							break;
-						}
-					}
-					if(deadRun)
+					if(!course.mustBeImported())
 					{
 						continue;
 					}
@@ -675,197 +667,250 @@ namespace synthese
 					ScheduledService* service(
 						_realTimeDataSource->getObjectByCode<ScheduledService>(lexical_cast<string>(course.ref))
 					);
-
-					// If found, check if the service corresponds to the data
-					if(service)
+					if(!service)
 					{
-						// Check of the chainage
-						JourneyPattern& jp(*static_cast<JourneyPattern*>(service->getPath()));
-						const Chainage& chainage(*course.chainage);
-						if(jp.getCommercialLine()->getKey() != chainage.ligne->syntheseLine->getKey() ||
-							jp.getEdges().size() != chainage.arretChns.size()
-						){
-							service = NULL;
-						}
-						else
+						continue;
+					}
+						
+					// Checks if the service and the course are matching
+					if(course != *service)
+					{
+						continue;
+					}
+
+					// OK the service is sent to simple update
+					course.syntheseService = service;
+					servicesToUpdate.push_back(&course);
+					servicesToRemove.erase(lexical_cast<string>(course.ref));
+				}
+
+				// Search for existing services with other key
+				// If found, take the service into servicesToMoveAndUpdate and remove it from servicesToRemove
+				BOOST_FOREACH(Courses::value_type& itCourse, courses)
+				{
+					Course& course(itCourse.second);
+
+					// Jump over already joined services
+					if( course.syntheseService ||
+						!course.mustBeImported()
+					){
+						continue;
+					}
+
+					// Loop on non linked services
+					BOOST_FOREACH(const ServicesToRemove::value_type& itService, servicesToRemove)
+					{
+						// Check if the service matches
+						if(	course != *itService.second)
 						{
-							for(size_t i(0); i<chainage.arretChns.size(); ++i)
+							continue;
+						}
+
+						// OK
+						course.syntheseService = const_cast<ScheduledService*>(itService.second);
+						servicesToMoveAndUpdate.push_back(&course);
+						servicesToRemove.erase(itService.first);
+						break;
+					}
+					if(course.syntheseService)
+					{
+						continue;
+					}
+
+					// If not found, attempt to find a non linked service
+					// Get SYNTHESE Journey pattern(s)
+					if(course.chainage->syntheseJourneyPatterns.empty())
+					{
+						BOOST_FOREACH(Path* path, course.chainage->ligne->syntheseLine->getPaths())
+						{
+							if(!dynamic_cast<JourneyPattern*>(path)
+							){
+								continue;
+							}
+
+							const JourneyPattern& jp(*static_cast<JourneyPattern*>(path));
+
+							if(	!jp.hasLinkWithSource(*_plannedDataSource) &&
+								!jp.hasLinkWithSource(*_realTimeDataSource)
+							){
+								continue;
+							}
+
+							if(	jp.getWayBack() != course.chainage->sens ||
+								jp.getEdges().size() != course.chainage->arretChns.size()
+							){
+								continue;
+							}
+
+							// Stops comparison
+							bool ok(true);
+							for(size_t i(0); i<course.chainage->arretChns.size(); ++i)
 							{
-								const graph::Edge* edge(jp.getEdge(i));
-								if(	!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ||
-									chainage.arretChns[i].arret->syntheseStop->getKey() != jp.getEdge(i)->getFromVertex()->getKey())
+								if(jp.getEdge(i)->getFromVertex()->getKey() != course.chainage->arretChns[i].arret->syntheseStop->getKey())
 								{
-									service = NULL;
+									ok = false;
 									break;
 								}
 							}
+							if(!ok)
+							{
+								continue;
+							}
+
+							// Register the journey pattern
+							course.chainage->syntheseJourneyPatterns.push_back(&jp);
+							BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, jp.getSubLines())
+							{
+								course.chainage->syntheseJourneyPatterns.push_back(subline);
+							}
 						}
 
-						// Check of the planned schedules
-						if(service)
+						// If no journey pattern was found, creation of a new journey pattern
+						if(course.chainage->syntheseJourneyPatterns.empty())
 						{
-							if(course != *service)
+							shared_ptr<JourneyPattern> jp(new JourneyPattern(JourneyPatternTableSync::getId()));
+							jp->setCommercialLine(course.chainage->ligne->syntheseLine);
+							jp->setWayBack(course.chainage->sens);
+							jp->setName(course.chainage->nom);
+							jp->addCodeBySource(
+								*_realTimeDataSource,
+								lexical_cast<string>(course.chainage->ref)
+							);
+							updatesEnv.getEditableRegistry<JourneyPattern>().add(jp);
+							course.chainage->syntheseJourneyPatterns.push_back(jp.get());
+
+							size_t rank(0);
+							BOOST_FOREACH(const Chainage::ArretChns::value_type& arretChn, course.chainage->arretChns)
 							{
-								service = NULL;
+								shared_ptr<DesignatedLinePhysicalStop> ls(
+									new DesignatedLinePhysicalStop(
+										LineStopTableSync::getId(),
+										jp.get(),
+										rank,
+										rank+1 < course.chainage->arretChns.size(),
+										rank > 0,
+										0,
+										arretChn.arret->syntheseStop,
+										arretChn.type != "N"
+								)	);
+								jp->addEdge(*ls);
+								updatesEnv.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
+								++rank;
 							}
 						}
 					}
 
-					// If service was not found, search for existing service
-					if(!service)
+					// Search for a service with the same planned schedules
+					BOOST_FOREACH(const JourneyPattern* route, course.chainage->syntheseJourneyPatterns)
 					{
-						// Get SYNTHESE Journey pattern(s)
-						if(course.chainage->syntheseJourneyPatterns.empty())
+						BOOST_FOREACH(Service* sservice, route->getServices())
 						{
-							BOOST_FOREACH(Path* path, course.chainage->ligne->syntheseLine->getPaths())
+							ScheduledService* service(
+								dynamic_cast<ScheduledService*>(sservice)
+							);
+							if(!service)
 							{
-								if(!dynamic_cast<JourneyPattern*>(path)
-								){
-									continue;
-								}
-
-								const JourneyPattern& jp(*static_cast<JourneyPattern*>(path));
-
-								if(	!jp.hasLinkWithSource(*_plannedDataSource) &&
-									!jp.hasLinkWithSource(*_realTimeDataSource)
-								){
-									continue;
-								}
-
-								if(	jp.getWayBack() != course.chainage->sens ||
-									jp.getEdges().size() != course.chainage->arretChns.size()
-								){
-									continue;
-								}
-
-								// Stops comparison
-								bool ok(true);
-								for(size_t i(0); i<course.chainage->arretChns.size(); ++i)
-								{
-									if(jp.getEdge(i)->getFromVertex()->getKey() != course.chainage->arretChns[i].arret->syntheseStop->getKey())
-									{
-										ok = false;
-										break;
-									}
-								}
-								if(!ok)
-								{
-									continue;
-								}
-
-								// Register the journey pattern
-								course.chainage->syntheseJourneyPatterns.push_back(&jp);
-								BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, jp.getSubLines())
-								{
-									course.chainage->syntheseJourneyPatterns.push_back(subline);
-								}
+								continue;
 							}
-
-							// If no journey pattern was found, creation of a new journey pattern
-							if(course.chainage->syntheseJourneyPatterns.empty())
-							{
-								shared_ptr<JourneyPattern> jp(new JourneyPattern(JourneyPatternTableSync::getId()));
-								jp->setCommercialLine(course.chainage->ligne->syntheseLine);
-								jp->setWayBack(course.chainage->sens);
-								jp->setName(course.chainage->nom);
-								jp->addCodeBySource(
-									*_realTimeDataSource,
-									lexical_cast<string>(course.chainage->ref)
-								);
-								updatesEnv.getEditableRegistry<JourneyPattern>().add(jp);
-								course.chainage->syntheseJourneyPatterns.push_back(jp.get());
-
-								size_t rank(0);
-								BOOST_FOREACH(const Chainage::ArretChns::value_type& arretChn, course.chainage->arretChns)
-								{
-									shared_ptr<DesignatedLinePhysicalStop> ls(
-										new DesignatedLinePhysicalStop(
-											LineStopTableSync::getId(),
-											jp.get(),
-											rank,
-											rank+1 < course.chainage->arretChns.size(),
-											rank > 0,
-											0,
-											arretChn.arret->syntheseStop,
-											arretChn.type != "N"
-									)	);
-									jp->addEdge(*ls);
-									updatesEnv.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
-									++rank;
-								}
-							}
-						}
-
-						// Search for a service with the same planned schedules
-						BOOST_FOREACH(const JourneyPattern* route, course.chainage->syntheseJourneyPatterns)
-						{
-							BOOST_FOREACH(Service* sservice, route->getServices())
-							{
-								service = dynamic_cast<ScheduledService*>(sservice);
-								if(!service)
-								{
-									continue;
-								}
-								if(	service->isActive(today) &&
-									course == *service
-								){
-									service->addCodeBySource(*_realTimeDataSource, lexical_cast<string>(course.ref));
-									break;
-								}
-								service = NULL;
-							}
-							if(service)
-							{
+							if(	service->isActive(today) &&
+								course == *service
+							){
+								course.syntheseService = service;
+								servicesToLinkAndUpdate.push_back(&course);
 								break;
 							}
 						}
-
-						// If no service was found creation of a new service
-						if(!service)
+						if(course.syntheseService)
 						{
-							const JourneyPattern* route(
-								*course.chainage->syntheseJourneyPatterns.begin()
-							);
-							service = new ScheduledService(
-								ScheduledServiceTableSync::getId(),
-								string(),
-								const_cast<JourneyPattern*>(route)
-							);
-							SchedulesBasedService::Schedules departureSchedules;
-							SchedulesBasedService::Schedules arrivalSchedules;
-							for(size_t i(0); i<course.horaires.size(); ++i)
-							{
-								if(!static_cast<const DesignatedLinePhysicalStop*>(route->getEdge(i))->getScheduleInput())
-								{
-									continue;
-								}
-
-								departureSchedules.push_back(course.horaires[i].htd);
-								arrivalSchedules.push_back(course.horaires[i].hta);
-							}
-							service->setSchedules(departureSchedules, arrivalSchedules, true);
-							service->setPath(const_cast<JourneyPattern*>(route));
-							service->addCodeBySource(*_realTimeDataSource, lexical_cast<string>(course.ref));
-							service->setActive(today);
-							//route->addService(*service, false);
-							updatesEnv.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
-						}
-						else
-						{
-							servicesToRemove.erase(service->getKey());
+							break;
 						}
 					}
+					if(course.syntheseService)
+					{
+						continue;
+					}
 
-					// Update of the real time schedules
+					// Creation
+					const JourneyPattern* route(
+						*course.chainage->syntheseJourneyPatterns.begin()
+						);
+					course.syntheseService = new ScheduledService(
+						ScheduledServiceTableSync::getId(),
+						string(),
+						const_cast<JourneyPattern*>(route)
+					);
 					SchedulesBasedService::Schedules departureSchedules;
 					SchedulesBasedService::Schedules arrivalSchedules;
 					for(size_t i(0); i<course.horaires.size(); ++i)
 					{
-						departureSchedules.push_back(course.horaires[i].hrd);
-						arrivalSchedules.push_back(course.horaires[i].hra);
-					}
-					service->setRealTimeSchedules(departureSchedules, arrivalSchedules);
+						if(!static_cast<const DesignatedLinePhysicalStop*>(route->getEdge(i))->getScheduleInput())
+						{
+							continue;
+						}
 
+						departureSchedules.push_back(course.horaires[i].htd);
+						arrivalSchedules.push_back(course.horaires[i].hta);
+					}
+					course.syntheseService->setSchedules(departureSchedules, arrivalSchedules, true);
+					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
+					course.syntheseService->addCodeBySource(*_realTimeDataSource, lexical_cast<string>(course.ref));
+					course.syntheseService->setActive(today);
+					updatesEnv.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(course.syntheseService));
+
+					servicesToLinkAndUpdate.push_back(&course);
+				}
+
+				DataSource* dataSourceOnUpdateEnv(
+					DataSourceTableSync::GetEditable(_realTimeDataSource->getKey(), updatesEnv).get()
+				);
+
+				// Loop on services to update
+				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToUpdate)
+				{
+					it->updateService(*it->syntheseService);
+				}
+
+				// Loop on services to move and update
+				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToMoveAndUpdate)
+				{
+					shared_ptr<ScheduledService> oldService(
+						ScheduledServiceTableSync::GetEditable(
+							it->syntheseService->getKey(),
+							updatesEnv
+					)	);
+					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
+					links.erase(dataSourceOnUpdateEnv);
+					oldService->setDataSourceLinksWithoutRegistration(links);
+					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
+					it->updateService(*it->syntheseService);
+				}
+
+				// Loop on services to link and update
+				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToLinkAndUpdate)
+				{
+					shared_ptr<ScheduledService> oldService(
+						ScheduledServiceTableSync::GetEditable(
+							it->syntheseService->getKey(),
+							updatesEnv
+					)	);
+					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
+					oldService->setDataSourceLinksWithoutRegistration(links);
+					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
+					it->updateService(*it->syntheseService);
+				}
+
+				// Remove services from today
+				BOOST_FOREACH(const ServicesToRemove::value_type& it, servicesToRemove)
+				{
+					shared_ptr<ScheduledService> oldService(
+						ScheduledServiceTableSync::GetEditable(
+							it.second->getKey(),
+							updatesEnv
+					)	);
+					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
+					links.erase(dataSourceOnUpdateEnv);
+					oldService->setDataSourceLinksWithoutRegistration(links);
+					oldService->setInactive(today);
 				}
 			}
 
@@ -881,15 +926,15 @@ namespace synthese
 			// Removals
 			BOOST_FOREACH(RegistryKeyType id, alarmObjectLinksToRemove)
 			{
-				db.deleteStmt(id, transaction);
+				DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(NULL, id, transaction, false);
 			}
 			BOOST_FOREACH(RegistryKeyType id, scenariosToRemove)
 			{
-				db.deleteStmt(id, transaction);
+				DBTableSyncTemplate<ScenarioTableSync>::Remove(NULL, id, transaction, false);
 			}
 			BOOST_FOREACH(RegistryKeyType id, messagesToRemove)
 			{
-				db.deleteStmt(id, transaction);
+				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
 
 			transaction.run();
@@ -912,33 +957,94 @@ namespace synthese
 
 
 
-		bool IneoRealTimeUpdateAction::Course::operator==( const pt::ScheduledService& op ) const
+		bool IneoRealTimeUpdateAction::Course::mustBeImported() const
 		{
+			// Jump over courses with incomplete chainages
+			if(horaires.size() != chainage->arretChns.size())
+			{
+				return false;
+			}
+
+			// Jump over dead runs
+			BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage->arretChns)
+			{
+				if(!it.arret->syntheseStop)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
+
+		bool IneoRealTimeUpdateAction::Course::operator==( const pt::ScheduledService& service ) const
+		{
+			// Basic route check
+			const JourneyPattern& jp(*static_cast<const JourneyPattern*>(service.getPath()));
+			if(	jp.getCommercialLine()->getKey() != chainage->ligne->syntheseLine->getKey() ||
+				jp.getEdges().size() != chainage->arretChns.size()
+			){
+				return false;
+			}
+
+			// Check of each stop
+			for(size_t i(0); i<chainage->arretChns.size(); ++i)
+			{
+				const graph::Edge* edge(jp.getEdge(i));
+				if(	!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ||
+					chainage->arretChns[i].arret->syntheseStop->getKey() != jp.getEdge(i)->getFromVertex()->getKey())
+				{
+					return false;
+				}
+			}
+
+			// Check of the planned schedules
 			for(size_t i(0); i<horaires.size(); ++i)
 			{
-				const DesignatedLinePhysicalStop& edge(*static_cast<const DesignatedLinePhysicalStop*>(op.getPath()->getEdge(i)));
+				const DesignatedLinePhysicalStop& edge(*static_cast<const DesignatedLinePhysicalStop*>(service.getPath()->getEdge(i)));
 				if(!edge.getScheduleInput())
 				{
 					continue;
 				}
 
 				if(	(	edge.isArrivalAllowed() &&
-						horaires[i].hta != op.getArrivalSchedule(false, i)
+					horaires[i].hta != service.getArrivalSchedule(false, i)
 				) || (
-						edge.isDepartureAllowed() &&
-						horaires[i].htd != op.getDepartureSchedule(false, i)
+					edge.isDepartureAllowed() &&
+					horaires[i].htd != service.getDepartureSchedule(false, i)
 				)	){
-					return false;
+						return false;
 				}
 			}
+
+			// OK the service matches
 			return true;
+		}
+
+
+
+
+
+		void IneoRealTimeUpdateAction::Course::updateService( pt::ScheduledService& service ) const
+		{
+			// Update of the real time schedules
+			SchedulesBasedService::Schedules departureSchedules;
+			SchedulesBasedService::Schedules arrivalSchedules;
+			for(size_t i(0); i<horaires.size(); ++i)
+			{
+				departureSchedules.push_back(horaires[i].hrd);
+				arrivalSchedules.push_back(horaires[i].hra);
+			}
+			service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
 		}
 
 
 
 		bool IneoRealTimeUpdateAction::Course::operator!=( const pt::ScheduledService& op ) const
 		{
-			return !(operator==(op));
+			return !operator==(op);
 		}
 }	}
 
