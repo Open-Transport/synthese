@@ -51,11 +51,14 @@ namespace synthese
 		const string ScenariosListFunction::PARAMETER_CMS_TEMPLATE_ID("p");
 		const string ScenariosListFunction::PARAMETER_FOLDER_ID("f");
 		const string ScenariosListFunction::PARAMETER_SHOW_TEMPLATES("t");
+		const string ScenariosListFunction::PARAMETER_CURRENTLY_DISPLAYED = "currently_displayed";
 
 		const string ScenariosListFunction::DATA_NAME("name");
 		const string ScenariosListFunction::DATA_START_DATE("start_date");
 		const string ScenariosListFunction::DATA_END_DATE("end_date");
 		const string ScenariosListFunction::DATA_FOLDER_ID("folder_id");
+
+		const string ScenariosListFunction::TAG_SCENARIO = "scenario";
 
 
 		ParametersMap ScenariosListFunction::_getParametersMap() const
@@ -97,6 +100,17 @@ namespace synthese
 					}
 				}
 			}
+			else
+			{
+				if(map.isDefined(PARAMETER_CURRENTLY_DISPLAYED))
+				{
+					_showCurrentlyDisplayed = map.get<bool>(PARAMETER_CURRENTLY_DISPLAYED);
+				}
+				else
+				{
+					_showCurrentlyDisplayed = indeterminate;
+				}
+			}
 
 			try
 			{
@@ -131,7 +145,9 @@ namespace synthese
 
 				BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& scenario, scenarios)
 				{
-					_displayScenarioTemplate(stream, request, *scenario);
+					shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
+					_displayScenarioTemplate(*scenario, *scenarioPM);
+					pm.insert(TAG_SCENARIO, scenarioPM);
 				}
 			}
 			else
@@ -141,13 +157,28 @@ namespace synthese
 					SentScenarioInheritedTableSync::Search(
 						*_env,
 						boost::optional<std::string>(),
-						_showCurrentlyDisplayed ? SentScenarioInheritedTableSync::BROADCAST_RUNNING : SentScenarioInheritedTableSync::FUTURE_BROADCAST,
+						indeterminate(_showCurrentlyDisplayed) ?
+							optional<SentScenarioInheritedTableSync::StatusSearch>() :
+							(	_showCurrentlyDisplayed ?
+								SentScenarioInheritedTableSync::BROADCAST_RUNNING :
+								SentScenarioInheritedTableSync::FUTURE_BROADCAST
+							),
 						now
 				)	);
 
 				BOOST_FOREACH(const shared_ptr<SentScenario>& message, scenarios)
 				{
-					_displaySentScenario(stream, request, *message);
+					shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
+					_displaySentScenario(*message, *scenarioPM);
+					pm.insert(TAG_SCENARIO, scenarioPM);
+				}
+			}
+
+			if(_cmsTemplate.get())
+			{
+				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, pm.getSubMaps(TAG_SCENARIO))
+				{
+					_cmsTemplate->display(stream, request, *item);
 				}
 			}
 
@@ -182,12 +213,9 @@ namespace synthese
 
 
 		void ScenariosListFunction::_displaySentScenario(
-			std::ostream& stream,
-			const server::Request& request,
-			const SentScenario& scenario
+			const SentScenario& scenario,
+			ParametersMap& pm
 		) const	{
-
-			ParametersMap pm(getTemplateParameters());
 
 			// roid
 			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());
@@ -206,19 +234,14 @@ namespace synthese
 			{
 				pm.insert(DATA_END_DATE, scenario.getPeriodEnd());
 			}
-
-			_cmsTemplate->display(stream, request, pm);
 		}
 
 
 
 		void ScenariosListFunction::_displayScenarioTemplate(
-			std::ostream& stream,
-			const server::Request& request,
-			const ScenarioTemplate& scenario
+			const ScenarioTemplate& scenario,
+			ParametersMap& pm
 		) const	{
-
-			ParametersMap pm(getTemplateParameters());
 
 			// roid
 			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());
@@ -231,7 +254,5 @@ namespace synthese
 			{
 				pm.insert(DATA_FOLDER_ID, scenario.getFolder()->getKey());
 			}
-
-			_cmsTemplate->display(stream, request, pm);
 		}
 }	}

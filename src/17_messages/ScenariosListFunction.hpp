@@ -28,6 +28,8 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
+#include <boost/logic/tribool.hpp>
+
 namespace synthese
 {
 	namespace cms
@@ -62,7 +64,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				bool _showTemplates;
-				bool _showCurrentlyDisplayed;
+				boost::logic::tribool _showCurrentlyDisplayed;
 				boost::shared_ptr<const ScenarioFolder> _parentFolder;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 			//@}
@@ -100,21 +102,20 @@ namespace synthese
 			/// Display of a sent scenario.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Sent-scenario
 			void _displaySentScenario(
-				std::ostream& stream,
-				const server::Request& request,
-				const SentScenario& scenario
+				const SentScenario& scenario,
+				util::ParametersMap& pm
 			) const;
 
 
 			static const std::string DATA_FOLDER_ID;
+			static const std::string TAG_SCENARIO;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a sent scenario.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Scenario-template
 			void _displayScenarioTemplate(
-				std::ostream& stream,
-				const server::Request& request,
-				const ScenarioTemplate& scenario
+				const ScenarioTemplate& scenario,
+				util::ParametersMap& pm
 			) const;
 
 		public:
