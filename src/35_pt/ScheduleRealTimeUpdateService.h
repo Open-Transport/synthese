@@ -28,6 +28,7 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 #include "ServicePointer.h"
+#include "StopArea.hpp"
 #include <boost/date_time/time_duration.hpp>
 
 namespace synthese
@@ -57,19 +58,27 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,ScheduleRealTimeUpdateService>
 		{
 		public:
-			static const std::string PARAMETER_SERVICE_DATASOURCE_ID;
-			static const std::string PARAMETER_SERVICE_ID;
+
 			static const std::string PARAMETER_LINE_STOP_RANK;
+			static const std::string PARAMETER_STOP_AREA_ID;
+			static const std::string PARAMETER_STOP_AREA_DATASOURCE_ID;
+			static const std::string PARAMETER_SERVICE_ID;
+			static const std::string PARAMETER_SERVICE_DATASOURCE_ID;
 			static const std::string PARAMETER_DEPARTURE_TIME;
 			static const std::string PARAMETER_ARRIVAL_TIME;
 
+
 		private:
-			boost::shared_ptr<ScheduledService> _service;
-			boost::shared_ptr<impex::DataSource> _dataSource;
+			struct Record
+			{
+				boost::shared_ptr<ScheduledService> service;
+				bool isArrival;
+				boost::posix_time::time_duration newTime;
+			};
+
+			boost::shared_ptr<StopArea> _stopArea;
 			std::size_t _lineStopRank;
-			boost::posix_time::time_duration _departureTime;
-			boost::posix_time::time_duration _arrivalTime;
-			std::string _serviceCodeBySource;
+			std::vector<Record> _records;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -119,7 +128,6 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setService(boost::shared_ptr<const ScheduledService> service);
 				void setLineStopRank(std::size_t value);
 			//@}
 		};
