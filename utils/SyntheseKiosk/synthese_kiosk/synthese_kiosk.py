@@ -559,7 +559,7 @@ class SyntheseKiosk(object):
             OFFLINE_POLL_INTERVAL_S = 10
 
             self._refresh_sched_event = self._sched.enter(
-                OFFLINE_POLL_INTERVAL_S, 1, self.refresh_displays ())
+                OFFLINE_POLL_INTERVAL_S, 1, self.refresh_displays, ())
 
     def update_config(self, old_config):
         if (self.config['debug'] != old_config['debug'] or
