@@ -225,38 +225,35 @@ namespace synthese
 			}
 
 			// messages
-			if(_messageTemplate.get())
+			vector<shared_ptr<Alarm> > v;
+
+			if (isTemplate)
 			{
-				vector<shared_ptr<Alarm> > v;
+				AlarmTemplateInheritedTableSync::SearchResult alarms(
+					AlarmTemplateInheritedTableSync::Search(*_env, _scenario->getKey())
+				);
+				BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
+				{
+					v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
+				}
+			}
+			else
+			{
+				ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
+					ScenarioSentAlarmInheritedTableSync::Search(*_env, _scenario->getKey())
+				);
+				BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
+				{
+					v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
+				}
+			}
 
-				if (isTemplate)
-				{
-					AlarmTemplateInheritedTableSync::SearchResult alarms(
-						AlarmTemplateInheritedTableSync::Search(*_env, _scenario->getKey())
-					);
-					BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
-					{
-						v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
-					}
-				}
-				else
-				{
-					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
-						ScenarioSentAlarmInheritedTableSync::Search(*_env, _scenario->getKey())
-					);
-					BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
-					{
-						v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
-					}
-				}
-
-				// Messages
-				BOOST_FOREACH(const shared_ptr<Alarm>& alarm, v)
-				{
-					shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
-					alarm->toParametersMap(*messagePM, false);
-					pm.insert(DATA_MESSAGE, messagePM);
-				}
+			// Messages
+			BOOST_FOREACH(const shared_ptr<Alarm>& alarm, v)
+			{
+				shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
+				alarm->toParametersMap(*messagePM, false);
+				pm.insert(DATA_MESSAGE, messagePM);
 			}
 
 			if(isTemplate)

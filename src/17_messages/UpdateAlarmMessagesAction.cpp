@@ -27,6 +27,7 @@
 #include "ActionException.h"
 #include "ObjectNotFoundException.h"
 #include "Profile.h"
+#include "ScenarioTableSync.h"
 #include "Session.h"
 #include "User.h"
 #include "MessagesModule.h"
@@ -64,6 +65,7 @@ namespace synthese
 		const string UpdateAlarmMessagesAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
 		const string UpdateAlarmMessagesAction::PARAMETER_RAW_EDITOR = Action_PARAMETER_PREFIX + "raw_editor";
 		const string UpdateAlarmMessagesAction::PARAMETER_DONE = Action_PARAMETER_PREFIX + "done";
+		const string UpdateAlarmMessagesAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "_scenario_id";
 
 
 
@@ -96,14 +98,38 @@ namespace synthese
 		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Alarm
-			try
+			if(map.getDefault<RegistryKeyType>(PARAMETER_ALARM_ID, 0))
 			{
-				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
+				try
+				{
+					setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
+				}
+				catch (ParametersMap::MissingParameterException& e)
+				{
+					throw ActionException(e, *this);
+				}
 			}
-			catch (ParametersMap::MissingParameterException& e)
+			else
 			{
-				throw ActionException(e, *this);
+				_alarm.reset(new SentAlarm);
 			}
+
+			// Scenario
+			if(map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_ID, 0))
+			{
+				try
+				{
+					_scenario = ScenarioTableSync::GetEditable(
+						map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
+						*_env
+					);
+				}
+				catch (ObjectNotFoundException<Scenario>&)
+				{
+					throw ActionException("Scenario not found");
+				}
+			}
+
 
 			// Type
 			if(map.isDefined(PARAMETER_TYPE))
@@ -155,6 +181,11 @@ namespace synthese
 				_alarm->setLevel(*_type);
 			}
 
+			if(_scenario)
+			{
+				_alarm->setScenario(_scenario->get());
+			}
+
 			// Short message
 			if(_shortMessage)
 			{
@@ -184,6 +215,11 @@ namespace synthese
 			}
 
 			AlarmTableSync::Save(_alarm.get());
+
+			if(request.getActionWillCreateObject())
+			{
+				request.setActionCreatedId(_alarm->getKey());
+			}
 
 			// Log
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())

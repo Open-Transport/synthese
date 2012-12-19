@@ -41,6 +41,7 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
+		class Scenario;
 
 		/** Message content update action class.
 
@@ -59,9 +60,11 @@ namespace synthese
 			static const std::string PARAMETER_ALARM_ID;
 			static const std::string PARAMETER_RAW_EDITOR;
 			static const std::string PARAMETER_DONE;
+			static const std::string PARAMETER_SCENARIO_ID;
 
 		private:
 			boost::shared_ptr<Alarm>		_alarm;
+			boost::optional<boost::shared_ptr<Scenario> >		_scenario;
 			boost::optional<AlarmLevel>		_type;
 			boost::optional<std::string> _shortMessage;
 			boost::optional<std::string> _longMessage;
