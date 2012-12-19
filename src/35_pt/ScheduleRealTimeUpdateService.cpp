@@ -211,6 +211,7 @@ namespace synthese
 			const Request& request
 		) const {
 			ParametersMap pm;
+			std::size_t lineStopRank(_lineStopRank);
 
 			if(_records.empty())
 			{
@@ -218,13 +219,23 @@ namespace synthese
 				return pm;
 			}
 
-			BOOST_FOREACH(Record record,	
-				_records ) 
+			BOOST_FOREACH(Record record, _records ) 
 			{
+				size_t i(0);
+				BOOST_FOREACH(const graph::Vertex *vertex, record.service->getVertices(true))
+				{
+					if(vertex->getHub() == _stopArea.get())
+					{
+						lineStopRank = i;
+						break;
+					}
+					i++;
+				}
+
 				posix_time::time_duration ourTimeRef(
 					record.isArrival 
-					? record.service->getArrivalBeginScheduleToIndex(true, _lineStopRank) 
-					: record.service->getDepartureBeginScheduleToIndex(true, _lineStopRank)
+					? record.service->getArrivalBeginScheduleToIndex(true, lineStopRank) 
+					: record.service->getDepartureBeginScheduleToIndex(true, lineStopRank)
 					);
 
 				posix_time::time_duration lateDuration(record.newTime - ourTimeRef);
@@ -232,10 +243,10 @@ namespace synthese
 				ptime now(second_clock::local_time());
 
 				//
-				// Resync the all services that are between the old sceduled date and the
+				// Resync the all services that are between the old scheduled date and the
 				// new one for the given service and line stop.
 				//
-				const StopPoint *sp(static_cast<const StopPoint*>(record.service->getRealTimeVertex(_lineStopRank)));
+				const StopPoint *sp(static_cast<const StopPoint*>(record.service->getRealTimeVertex(lineStopRank)));
 				ArrivalDepartureTableGenerator::PhysicalStops ps;
 				ps.insert(make_pair(sp->getKey(), sp));
 				DeparturesTableDirection di(record.isArrival ? DISPLAY_ARRIVALS : DISPLAY_DEPARTURES);
@@ -259,15 +270,27 @@ namespace synthese
 				{
 					const SchedulesBasedService *nextService (dynamic_cast<const SchedulesBasedService*>(itService.first.getService()));
 
+					size_t i(0);
+					BOOST_FOREACH(const graph::Vertex *vertex, nextService->getVertices(true))
+					{
+						if(vertex->getHub() == _stopArea.get())
+						{
+							lineStopRank = i;
+							break;
+						}
+						i++;
+					}
+
+
 					posix_time::time_duration theirTimeRef(
 						record.isArrival
-						? nextService->getArrivalBeginScheduleToIndex(true, _lineStopRank) 
-						: nextService->getDepartureBeginScheduleToIndex(true, _lineStopRank)
+						? nextService->getArrivalBeginScheduleToIndex(true, lineStopRank) 
+						: nextService->getDepartureBeginScheduleToIndex(true, lineStopRank)
 						);
 
 					// Reschedule this service to the new given time 
 					const_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
-						_lineStopRank,
+						lineStopRank,
 						ourTimeRef + lateDuration - theirTimeRef,
 						record.isArrival,
 						!record.isArrival,
