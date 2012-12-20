@@ -58,7 +58,9 @@ namespace synthese
 
 	namespace pt
 	{
+		// For test only
 		const string ScheduleRealTimeUpdateService::PARAMETER_LINE_STOP_RANK = "ls";
+
 		const string ScheduleRealTimeUpdateService::PARAMETER_STOP_AREA_ID = "sa";
 		const string ScheduleRealTimeUpdateService::PARAMETER_STOP_AREA_DATASOURCE_ID = "sads";
 		/// Warning, PARAMETER_SERVICE_ID is a list starting at se1 up to any number in sequence
@@ -182,8 +184,7 @@ namespace synthese
 					{
 						departureTime += hours(24);
 					}
-					record.newTime = departureTime;
-					record.isArrival = false;
+					record.departureTime = departureTime;
 				}
 				if(map.isDefined(PARAMETER_ARRIVAL_TIME + indexStr))
 				{
@@ -194,8 +195,7 @@ namespace synthese
 					{
 						arrivalTime += hours(24);
 					}
-					record.newTime = arrivalTime;
-					record.isArrival = true;
+					record.arrivalTime = arrivalTime;
 				}
 
 				if(gotOne)
@@ -221,24 +221,10 @@ namespace synthese
 
 			BOOST_FOREACH(Record record, _records ) 
 			{
-				size_t i(0);
-				BOOST_FOREACH(const graph::Vertex *vertex, record.service->getVertices(true))
+				if(_stopArea)
 				{
-					if(vertex->getHub() == _stopArea.get())
-					{
-						lineStopRank = i;
-						break;
-					}
-					i++;
+					lineStopRank = _getStopRankByService(record.service.get());
 				}
-
-				posix_time::time_duration ourTimeRef(
-					record.isArrival 
-					? record.service->getArrivalBeginScheduleToIndex(true, lineStopRank) 
-					: record.service->getDepartureBeginScheduleToIndex(true, lineStopRank)
-					);
-
-				posix_time::time_duration lateDuration(record.newTime - ourTimeRef);
 
 				ptime now(second_clock::local_time());
 
@@ -249,7 +235,7 @@ namespace synthese
 				const StopPoint *sp(static_cast<const StopPoint*>(record.service->getRealTimeVertex(lineStopRank)));
 				ArrivalDepartureTableGenerator::PhysicalStops ps;
 				ps.insert(make_pair(sp->getKey(), sp));
-				DeparturesTableDirection di(record.isArrival ? DISPLAY_ARRIVALS : DISPLAY_DEPARTURES);
+				DeparturesTableDirection di(DISPLAY_ARRIVALS);
 				EndFilter ef(WITH_PASSING);
 				LineFilter lf;
 				DisplayedPlacesList dp;
@@ -261,8 +247,8 @@ namespace synthese
 					lf,
 					dp,
 					fp,
-					ptime(now.date(), ourTimeRef),
-					ptime(now.date(), record.newTime),
+					ptime(now.date(), record.service->getArrivalBeginScheduleToIndex(true, lineStopRank)),
+					ptime(now.date(), record.departureTime),
 					false
 					);
 
@@ -270,30 +256,30 @@ namespace synthese
 				{
 					const SchedulesBasedService *nextService (dynamic_cast<const SchedulesBasedService*>(itService.first.getService()));
 
-					size_t i(0);
-					BOOST_FOREACH(const graph::Vertex *vertex, nextService->getVertices(true))
+					if(_stopArea)
 					{
-						if(vertex->getHub() == _stopArea.get())
-						{
-							lineStopRank = i;
-							break;
-						}
-						i++;
+						lineStopRank = _getStopRankByService(nextService);
 					}
-
-
-					posix_time::time_duration theirTimeRef(
-						record.isArrival
-						? nextService->getArrivalBeginScheduleToIndex(true, lineStopRank) 
-						: nextService->getDepartureBeginScheduleToIndex(true, lineStopRank)
-						);
+					posix_time::time_duration theirArrivalTimeRef(
+						nextService->getArrivalBeginScheduleToIndex(true, lineStopRank)
+					);
+					posix_time::time_duration theirDepartureTimeRef(
+						nextService->getDepartureBeginScheduleToIndex(true, lineStopRank)
+					);
 
 					// Reschedule this service to the new given time 
 					const_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
 						lineStopRank,
-						ourTimeRef + lateDuration - theirTimeRef,
-						record.isArrival,
-						!record.isArrival,
+						record.arrivalTime - theirArrivalTimeRef,
+						true,  // Is Arrival
+						false, // Is Departure
+						true
+						);
+					const_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
+						lineStopRank,
+						record.departureTime - theirDepartureTimeRef,
+						false,  // Is Arrival
+						true, // Is Departure
 						true
 						);
 				}
@@ -301,6 +287,21 @@ namespace synthese
 			return pm;
 		}
 
+		size_t ScheduleRealTimeUpdateService::_getStopRankByService(
+			const SchedulesBasedService *service) const
+		{
+			size_t i(0);
+			BOOST_FOREACH(const graph::Vertex *vertex, service->getVertices(true))
+			{
+				if(vertex->getHub() == _stopArea.get())
+				{
+					break;
+				}
+				i++;
+			}
+			// TODO Should manage the case where it is not found
+			return i;
+		}
 
 		bool ScheduleRealTimeUpdateService::isAuthorized(const Session* session
 		) const {
