@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE (test1)
 	{
 		HTTPRequest req;
 		req.headers.insert(make_pair("Host", "www.toto.com"));
-		req.uri = "?SERVICE=ScheduleRealTimeUpdateService&nr=1&se1=4503599627370501&ls=3&at1=03:20:00";
+		req.uri = "?SERVICE=ScheduleRealTimeUpdateService&nr=1&se1=4503599627370501&ls=3&at1=03:20:00&dt1=03:20:01";
 		req.ipaddr = "127.0.0.1";
 		DynamicRequest dr(req);
 
@@ -234,9 +234,7 @@ BOOST_AUTO_TEST_CASE (test1)
 	tss5.dump();
 
 	tss1.checkRealArrivalSchedule  (3, time_duration(3,20,0));
-	// FIXME The first departure time matching the adjusted ArrivalTime is
-	//       not adjusted. Here we should check stop 3 for 3,21
-	tss1.checkRealDepartureSchedule(4, time_duration(3,26,0));
+	tss1.checkRealDepartureSchedule(4, time_duration(3,20,1));
 
 	tss2.checkRealArrivalSchedule  (3, time_duration(3,20,0));
 	tss2.checkRealDepartureSchedule(4, time_duration(3,26,0));

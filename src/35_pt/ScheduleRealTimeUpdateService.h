@@ -28,6 +28,7 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 #include "ServicePointer.h"
+#include "SchedulesBasedService.h"
 #include "StopArea.hpp"
 #include <boost/date_time/time_duration.hpp>
 
@@ -72,13 +73,15 @@ namespace synthese
 			struct Record
 			{
 				boost::shared_ptr<ScheduledService> service;
-				bool isArrival;
-				boost::posix_time::time_duration newTime;
+				boost::posix_time::time_duration arrivalTime;
+				boost::posix_time::time_duration departureTime;
 			};
 
 			boost::shared_ptr<StopArea> _stopArea;
 			std::size_t _lineStopRank;
 			std::vector<Record> _records;
+
+			size_t _getStopRankByService(const SchedulesBasedService *service) const;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
