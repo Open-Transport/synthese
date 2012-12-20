@@ -107,6 +107,16 @@ public:
 		}
 	}
 
+	void checkSingleRealArrival(size_t stopIndex, time_duration startTime)
+	{
+		BOOST_CHECK(_scheduledService->getArrivalSchedules(true)[stopIndex] == startTime);
+	}
+
+	void checkSingleRealDeparture(size_t stopIndex, time_duration startTime)
+	{
+		BOOST_CHECK(_scheduledService->getDepartureSchedules(true)[stopIndex] == startTime);
+	}
+
 	void dump()
 	{
 		cout << "Service " << _scheduledService->getServiceNumber() << endl;
@@ -233,14 +243,17 @@ BOOST_AUTO_TEST_CASE (test1)
 	tss4.dump();
 	tss5.dump();
 
-	tss1.checkRealArrivalSchedule  (3, time_duration(3,20,0));
-	tss1.checkRealDepartureSchedule(4, time_duration(3,20,1));
+	tss1.checkSingleRealArrival    (3, time_duration(3,20,0));
+	tss1.checkRealArrivalSchedule  (4, time_duration(3,24,1));
+	tss1.checkRealDepartureSchedule(3, time_duration(3,20,1));
 
-	tss2.checkRealArrivalSchedule  (3, time_duration(3,20,0));
-	tss2.checkRealDepartureSchedule(4, time_duration(3,26,0));
+	tss2.checkSingleRealArrival    (3, time_duration(3,20,0));
+	tss2.checkRealArrivalSchedule  (4, time_duration(3,24,1));
+	tss2.checkRealDepartureSchedule(3, time_duration(3,20,1));
 
-	tss3.checkRealArrivalSchedule  (3, time_duration(3,20,0));
-	tss3.checkRealDepartureSchedule(4, time_duration(3,26,0));
+	tss3.checkSingleRealArrival    (3, time_duration(3,20,0));
+	tss3.checkRealArrivalSchedule  (4, time_duration(3,24,1));
+	tss3.checkRealDepartureSchedule(3, time_duration(3,20,1));
 
 	tss4.checkRealArrivalSchedule  (1, time_duration(4,04,0));
 	tss4.checkRealDepartureSchedule(0, time_duration(4,00,0));
