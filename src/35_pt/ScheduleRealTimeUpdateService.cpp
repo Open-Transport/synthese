@@ -135,12 +135,12 @@ namespace synthese
 				i++;
 				std::string indexStr = static_cast<std::ostringstream*>( &(ostringstream() << i) )->str();
 
-				if(map.getDefault<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID + indexStr, 0))
+				if(map.getDefault<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID, 0))
 				{
 					try
 					{
 						shared_ptr<const DataSource> dataSource(
-							Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID + indexStr))
+							Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID))
 							);
 						std::string serviceCodeBySource = map.get<string>(PARAMETER_SERVICE_ID + indexStr);
 						ScheduledService* obj(dataSource->getObjectByCode<ScheduledService>(serviceCodeBySource));
