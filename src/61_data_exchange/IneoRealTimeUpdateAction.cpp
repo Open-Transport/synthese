@@ -880,8 +880,8 @@ namespace synthese
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
-					oldService->setDataSourceLinksWithoutRegistration(links);
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
+					oldService->setDataSourceLinksWithoutRegistration(links);
 					it->updateService(*it->syntheseService);
 				}
 
@@ -894,8 +894,8 @@ namespace synthese
 							updatesEnv
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
-					oldService->setDataSourceLinksWithoutRegistration(links);
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
+					oldService->setDataSourceLinksWithoutRegistration(links);
 					it->updateService(*it->syntheseService);
 				}
 
@@ -1010,11 +1010,13 @@ namespace synthese
 				}
 
 				if(	(	edge.isArrivalAllowed() &&
-					horaires[i].hta != service.getArrivalSchedule(false, i)
-				) || (
+					(	horaires[i].hta.hours() != service.getArrivalSchedule(false, i).hours() ||
+						horaires[i].hta.minutes() != service.getArrivalSchedule(false, i).minutes()
+				)	) || (
 					edge.isDepartureAllowed() &&
-					horaires[i].htd != service.getDepartureSchedule(false, i)
-				)	){
+					(	horaires[i].htd.hours() != service.getDepartureSchedule(false, i).hours() ||
+						horaires[i].htd.minutes() != service.getDepartureSchedule(false, i).minutes()
+				)	)	){
 						return false;
 				}
 			}
