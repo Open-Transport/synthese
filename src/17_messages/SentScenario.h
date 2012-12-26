@@ -49,6 +49,18 @@ namespace synthese
 			public impex::ImportableTemplate<SentScenario>
 		{
 		public:
+			static const std::string DATA_NAME;
+			static const std::string DATA_START_DATE;
+			static const std::string DATA_END_DATE;
+			static const std::string DATA_ACTIVE;
+			static const std::string DATA_SCENARIO_ID;
+			static const std::string DATA_IS_TEMPLATE;
+			static const std::string DATA_CODE;
+			static const std::string DATA_VALUE;
+
+			static const std::string TAG_VARIABLE;
+			static const std::string TAG_MESSAGE;
+			static const std::string TAG_TEMPLATE_SCENARIO;
 
 			/// Chosen registry class.
 			typedef util::Registry<SentScenario>	Registry;
@@ -61,11 +73,11 @@ namespace synthese
 			typedef std::set<const SentAlarm*> Messages;
 
 		private:
-			bool					_isEnabled;
-			boost::posix_time::ptime	_periodStart; //!< Alarm applicability period start
-			boost::posix_time::ptime	_periodEnd;   //!< Alarm applicability period end
+			bool _isEnabled;
+			boost::posix_time::ptime _periodStart; //!< Alarm applicability period start
+			boost::posix_time::ptime _periodEnd;   //!< Alarm applicability period end
 			const ScenarioTemplate*	_template;
-			VariablesMap			_variables;
+			VariablesMap _variables;
 			mutable Messages _messages;
 
 		public:
@@ -94,11 +106,11 @@ namespace synthese
 
 			~SentScenario();
 
-			const boost::posix_time::ptime&	getPeriodStart()	const;
-			const boost::posix_time::ptime&	getPeriodEnd()		const;
-			bool					getIsEnabled()		const;
-			const ScenarioTemplate*	getTemplate()		const;
-			const VariablesMap&		getVariables()		const;
+			const boost::posix_time::ptime&	getPeriodStart() const { return _periodStart; }
+			const boost::posix_time::ptime&	getPeriodEnd() const { return _periodEnd; }
+			bool getIsEnabled()	const { return _isEnabled; }
+			const ScenarioTemplate*	getTemplate() const { return _template; }
+			const VariablesMap&	getVariables() const { return _variables; }
 
 			////////////////////////////////////////////////////////////////////
 			/// Start broadcast date setter.
@@ -136,6 +148,16 @@ namespace synthese
 
 			bool isApplicable(const boost::posix_time::ptime& date) const;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Export of the content of the object into a ParametersMap.
+			/// @param pm the ParametersMap object to populate
+			/// @author Hugues Romain
+			/// @date 2012
+			void toParametersMap(
+				util::ParametersMap& pm
+			) const;
 		};
 	}
 }

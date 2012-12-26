@@ -58,6 +58,12 @@ namespace synthese
 			static const std::string FORMAT_XML;
 			static const std::string FORMAT_JSON;
 
+			static const std::string DATA_VARIABLES;
+			static const std::string DATA_MESSAGES;
+			static const std::string DATA_RANK;
+
+			static const std::string TAG_SCENARIO;
+
 		protected:
 			//! @name Parameters
 			//@{
@@ -95,21 +101,6 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-		private:
-			static const std::string DATA_NAME;
-			static const std::string DATA_FOLDER_ID;
-			static const std::string DATA_FOLDER_NAME;
-			static const std::string DATA_VARIABLE;
-			static const std::string DATA_VARIABLES;
-			static const std::string DATA_MESSAGES;
-			static const std::string DATA_START_DATE;
-			static const std::string DATA_END_DATE;
-			static const std::string DATA_ACTIVE;
-			static const std::string DATA_MESSAGE;
-			static const std::string DATA_RANK;
-			static const std::string DATA_SCENARIO;
-			static const std::string DATA_SCENARIO_ID;
-			static const std::string DATA_IS_TEMPLATE;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -127,32 +118,6 @@ namespace synthese
 
 
 
-		private:
-
-			static const std::string DATA_CODE;
-			static const std::string DATA_HELP_MESSAGE;
-			static const std::string DATA_REQUIRED;
-			static const std::string DATA_VALUE;
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Display of a variable.
-			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenario_display#Variable
-			//////////////////////////////////////////////////////////////////////////
-			/// @param pm the parameters map to populate
-			/// @param variable variable to display
-			/// @param value value of the variable (for sent scenario)
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.2.0
-			void _displayVariable(
-				util::ParametersMap& pm,
-				const ScenarioTemplate::Variable& variable,
-				const std::string& value
-			) const;
-
-
-
-		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session
@@ -170,7 +135,6 @@ namespace synthese
 			/// @date 2010
 			virtual std::string getOutputMimeType() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ScenarioDisplayFunction_H__
