@@ -23,8 +23,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ScenarioTemplate.h"
+
 #include "AlarmTemplate.h"
+#include "ParametersMap.h"
 #include "Registry.h"
+#include "Request.h"
+#include "ScenarioFolder.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -34,6 +38,7 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace server;
 	using namespace util;
 
 	namespace util
@@ -43,6 +48,19 @@ namespace synthese
 
 	namespace messages
 	{
+		const std::string ScenarioTemplate::DATA_SCENARIO_ID = "scenario_id";
+		const std::string ScenarioTemplate::DATA_NAME = "name";
+		const std::string ScenarioTemplate::DATA_FOLDER_ID = "folder_id";
+		const std::string ScenarioTemplate::DATA_FOLDER_NAME = "folder_name";
+		const std::string ScenarioTemplate::DATA_IS_TEMPLATE = "is_template";
+		const std::string ScenarioTemplate::DATA_CODE = "code";
+		const std::string ScenarioTemplate::DATA_HELP_MESSAGE = "help_message";
+		const std::string ScenarioTemplate::DATA_REQUIRED = "required";
+
+		const std::string ScenarioTemplate::TAG_VARIABLE = "variable";
+		const std::string ScenarioTemplate::TAG_MESSAGE = "message";
+
+
 
 		ScenarioTemplate::ScenarioTemplate(
 			const ScenarioTemplate& source,
@@ -51,8 +69,7 @@ namespace synthese
 			Scenario(name),
 			_folder(source._folder),
 			_variables(source._variables)
-		{
-		}
+		{}
 
 
 
@@ -62,8 +79,7 @@ namespace synthese
 		):	Registrable(0),
 			Scenario(name),
 			_folder(folder)
-		{
-		}
+		{}
 
 
 
@@ -72,16 +88,12 @@ namespace synthese
 		):	util::Registrable(key)
 			, Scenario()
 			, _folder(NULL)
-		{
-
-		}
+		{}
 
 
 
 		ScenarioTemplate::~ScenarioTemplate()
-		{
-
-		}
+		{}
 
 
 
@@ -254,7 +266,7 @@ namespace synthese
 
 
 
-		bool ScenarioTemplate::ControlCompulsoryVariables(
+		bool ScenarioTemplate::CheckCompulsoryVariables(
 			const ScenarioTemplate::VariablesMap& variables,
 			const SentScenario::VariablesMap& values
 		){
@@ -266,5 +278,67 @@ namespace synthese
 			}
 			return true;
 		}
-	}
-}
+
+
+
+		void ScenarioTemplate::toParametersMap( util::ParametersMap& pm ) const
+		{
+			// roid
+			pm.insert(DATA_SCENARIO_ID, getKey());
+			pm.insert(Request::PARAMETER_OBJECT_ID, getKey()); // Deprecated
+
+			// name
+			pm.insert(DATA_NAME, getName());
+
+			// is template
+			pm.insert(DATA_IS_TEMPLATE, true);
+
+			// variables
+			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, getVariables())
+			{
+				shared_ptr<ParametersMap> variablePM(new ParametersMap);
+				// code
+				variablePM->insert(DATA_CODE, variable.first);
+
+				// help_message
+				variablePM->insert(DATA_HELP_MESSAGE, variable.second.helpMessage);
+
+				// required
+				variablePM->insert(DATA_REQUIRED, variable.second.compulsory);
+
+				pm.insert(TAG_VARIABLE, variablePM);
+			}
+
+			// Messages
+			BOOST_FOREACH(const AlarmTemplate* alarm, getMessages())
+			{
+				shared_ptr<ParametersMap> messagePM(new ParametersMap);
+				alarm->toParametersMap(*messagePM, false);
+				pm.insert(TAG_MESSAGE, messagePM);
+			}
+
+			// Folder
+			if(getFolder())
+			{
+				// folder_id
+				pm.insert(DATA_FOLDER_ID, getFolder()->getKey());
+
+				// folder_name
+				pm.insert(DATA_FOLDER_NAME, getFolder()->getName());
+			}
+		}
+
+
+
+		void ScenarioTemplate::addMessage( const AlarmTemplate& message ) const
+		{
+			_messages.insert(&message);
+		}
+
+
+
+		void ScenarioTemplate::removeMessage( const AlarmTemplate& message ) const
+		{
+			_messages.erase(&message);
+		}
+}	}

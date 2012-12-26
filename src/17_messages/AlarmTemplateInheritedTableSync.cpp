@@ -56,6 +56,10 @@ namespace synthese
 						env, linkLevel
 					).get()
 				);
+				if(obj->getScenario())
+				{
+					obj->getScenario()->addMessage(*obj);
+				}
 			}
 		}
 
@@ -63,7 +67,10 @@ namespace synthese
 		void DBInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Unlink(
 			AlarmTemplate* obj
 		){
-			obj->setScenario(NULL);
+			if(obj->getScenario())
+			{
+				obj->getScenario()->removeMessage(*obj);
+			}
 		}
 
 

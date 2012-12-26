@@ -53,6 +53,7 @@ namespace synthese
 			_CommonLoad(obj, rows, env, linkLevel);
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				// Scenario
 				obj->setScenario(
 					SentScenarioInheritedTableSync::Get(
 						rows->getLongLong(AlarmTableSync::COL_SCENARIO_ID),
@@ -64,6 +65,8 @@ namespace synthese
 				{
 					obj->getScenario()->addMessage(*obj);
 				}
+
+				// Template
 				RegistryKeyType id(rows->getLongLong(AlarmTableSync::COL_TEMPLATE_ID));
 				if(id > 0)
 				{
@@ -91,6 +94,7 @@ namespace synthese
 				obj->getScenario()->removeMessage(*obj);
 			}
 		}
+
 
 
 		template<>

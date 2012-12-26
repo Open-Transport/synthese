@@ -45,13 +45,28 @@ namespace synthese
 		///
 		/// Variables handling : scan all the contained messages to find all
 		/// variables declarations and fill in the _variables attribute
-		class ScenarioTemplate
-		:	public Scenario
+		class ScenarioTemplate:
+			public Scenario
 		{
 		public:
+			static const std::string DATA_SCENARIO_ID;
+			static const std::string DATA_NAME;
+			static const std::string DATA_FOLDER_ID;
+			static const std::string DATA_FOLDER_NAME;
+			static const std::string DATA_IS_TEMPLATE;
+			static const std::string DATA_CODE;
+			static const std::string DATA_HELP_MESSAGE;
+			static const std::string DATA_REQUIRED;
+
+			static const std::string TAG_VARIABLE;
+			static const std::string TAG_MESSAGE;
+
+
 
 			/// Chosen registry class.
 			typedef util::Registry<ScenarioTemplate>	Registry;
+
+			typedef std::set<const AlarmTemplate*> Messages;
 
 			struct Variable
 			{
@@ -68,6 +83,8 @@ namespace synthese
 		private:
 			ScenarioFolder*		_folder;
 			VariablesMap		_variables;
+
+			mutable Messages _messages;
 
 		public:
 			/// @name constructors and destructor
@@ -115,6 +132,10 @@ namespace synthese
 			//@}
 
 
+				void addMessage(const AlarmTemplate& message) const;
+				void removeMessage(const AlarmTemplate& message) const;
+				const Messages& getMessages() const { return _messages; }
+
 
 			/** Parses a string to find variables informations and stores it into a variables list.
 				@param text text to parse
@@ -160,17 +181,28 @@ namespace synthese
 
 
 
-			/** Controls that all compulsory variables are valued.
+			/** Checks that all compulsory variables are valued.
 				@param variables variables informations
 				@param values values of the variables
 				@return bool true if each compulsory variable is defined and non empty
 				@author Hugues Romain
 				@date 2009
 			*/
-			static bool ControlCompulsoryVariables(
+			static bool CheckCompulsoryVariables(
 				const ScenarioTemplate::VariablesMap& variables,
 				const SentScenario::VariablesMap& values
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Export of the content of the object into a ParametersMap.
+			/// @param pm the ParametersMap object to populate
+			/// @author Hugues Romain
+			/// @date 2012
+			void toParametersMap(
+				util::ParametersMap& pm
+			) const;
 		};
 	}
 }

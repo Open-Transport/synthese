@@ -60,6 +60,8 @@ namespace synthese
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
 			static const std::string PARAMETER_CURRENTLY_DISPLAYED;
 
+			static const std::string TAG_SCENARIO;
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -92,31 +94,6 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-		private:
-
-			static const std::string DATA_NAME;
-			static const std::string DATA_START_DATE;
-			static const std::string DATA_END_DATE;
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Display of a sent scenario.
-			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Sent-scenario
-			void _displaySentScenario(
-				const SentScenario& scenario,
-				util::ParametersMap& pm
-			) const;
-
-
-			static const std::string DATA_FOLDER_ID;
-			static const std::string TAG_SCENARIO;
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Display of a sent scenario.
-			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Scenario-template
-			void _displayScenarioTemplate(
-				const ScenarioTemplate& scenario,
-				util::ParametersMap& pm
-			) const;
 
 		public:
 			ScenariosListFunction();
