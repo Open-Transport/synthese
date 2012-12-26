@@ -21,14 +21,20 @@
 */
 
 #include "SentScenario.h"
-#include "ScenarioTemplate.h"
-#include "Registry.h"
 
+#include "ScenarioTemplate.h"
+#include "SentAlarm.h"
+#include "ParametersMap.h"
+#include "Registry.h"
+#include "Request.h"
+
+using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace server;
 	using namespace util;
 
 	namespace util
@@ -39,6 +45,21 @@ namespace synthese
 
 	namespace messages
 	{
+		const std::string SentScenario::DATA_NAME = "name";
+		const std::string SentScenario::DATA_START_DATE = "start_date";
+		const std::string SentScenario::DATA_END_DATE = "end_date";
+		const std::string SentScenario::DATA_ACTIVE = "active";
+		const std::string SentScenario::DATA_SCENARIO_ID = "scenario_id";
+		const std::string SentScenario::DATA_IS_TEMPLATE = "is_template";
+		const std::string SentScenario::DATA_CODE = "code";
+		const std::string SentScenario::DATA_VALUE = "value";
+
+		const std::string SentScenario::TAG_VARIABLE = "variable";
+		const std::string SentScenario::TAG_MESSAGE = "message";
+		const std::string SentScenario::TAG_TEMPLATE_SCENARIO = "template_scenario";
+
+
+
 		SentScenario::SentScenario(
 			util::RegistryKeyType key
 		):	Registrable(key),
@@ -47,8 +68,9 @@ namespace synthese
 			, _periodStart(second_clock::local_time())
 			, _periodEnd(not_a_date_time)
 			, _template(NULL)
-		{
-		}
+		{}
+
+
 
 		SentScenario::SentScenario(
 			const ScenarioTemplate& source
@@ -58,8 +80,8 @@ namespace synthese
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),
 			_template(&source)
-		{
-		}
+		{}
+
 
 
 		SentScenario::SentScenario(
@@ -75,10 +97,13 @@ namespace synthese
 		}
 
 
+
 		void SentScenario::setPeriodStart( const ptime& periodStart )
 		{
 			_periodStart = periodStart;
 		}
+
+
 
 		void SentScenario::setPeriodEnd( const ptime& periodEnd )
 		{
@@ -86,25 +111,13 @@ namespace synthese
 		}
 
 
-		const ptime& SentScenario::getPeriodStart() const
-		{
-			return _periodStart;
-		}
-
-		const ptime& SentScenario::getPeriodEnd() const
-		{
-			return _periodEnd;
-		}
 
 		void SentScenario::setIsEnabled( bool value )
 		{
 			_isEnabled = value;
 		}
 
-		bool SentScenario::getIsEnabled() const
-		{
-			return _isEnabled;
-		}
+
 
 		SentScenario::~SentScenario()
 		{
@@ -151,24 +164,10 @@ namespace synthese
 
 
 
-		const ScenarioTemplate* SentScenario::getTemplate(
-		) const {
-			return _template;
-		}
-
-
-
 		void SentScenario::setTemplate(
 			const ScenarioTemplate* value
 		) {
 			_template = value;
-		}
-
-
-
-		const SentScenario::VariablesMap& SentScenario::getVariables(
-		) const {
-			return _variables;
 		}
 
 
@@ -192,5 +191,74 @@ namespace synthese
 		{
 			_messages.erase(&message);
 		}
-	}
-}
+
+
+
+		void SentScenario::toParametersMap( util::ParametersMap& pm ) const
+		{
+			// roid
+			pm.insert(DATA_SCENARIO_ID, getKey());
+			pm.insert(Request::PARAMETER_OBJECT_ID, getKey()); // Deprecated
+
+			// name
+			pm.insert(DATA_NAME, getName());
+
+			// is template
+			pm.insert(DATA_IS_TEMPLATE, false);
+
+			if(	getTemplate()
+			){
+				// Template scenario
+				shared_ptr<ParametersMap> templatePM(new ParametersMap);
+				getTemplate()->toParametersMap(*templatePM);
+				pm.insert(TAG_TEMPLATE_SCENARIO, templatePM);
+
+				// Variables
+				const ScenarioTemplate::VariablesMap& variables(
+					getTemplate()->getVariables()
+				);
+				BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+				{
+					shared_ptr<ParametersMap> variablePM(new ParametersMap);
+					string value;
+					const SentScenario::VariablesMap& values(getVariables());
+					SentScenario::VariablesMap::const_iterator it(values.find(variable.first));
+					if(it != values.end())
+					{
+						value = it->second;
+					}
+					
+					// code
+					variablePM->insert(DATA_CODE, variable.first);
+
+					// value
+					variablePM->insert(DATA_VALUE, value);
+
+					pm.insert(TAG_VARIABLE, variablePM);
+				}
+			}
+
+			// Messages
+			BOOST_FOREACH(const SentAlarm* alarm, getMessages())
+			{
+				shared_ptr<ParametersMap> messagePM(new ParametersMap);
+				alarm->toParametersMap(*messagePM, false);
+				pm.insert(TAG_MESSAGE, messagePM);
+			}
+
+			// start date
+			if(!getPeriodStart().is_not_a_date_time())
+			{
+				pm.insert(DATA_START_DATE, getPeriodStart());
+			}
+
+			// end date
+			if(!getPeriodEnd().is_not_a_date_time())
+			{
+				pm.insert(DATA_END_DATE, getPeriodEnd());
+			}
+
+			// active
+			pm.insert(DATA_ACTIVE, getIsEnabled());
+		}
+}	}

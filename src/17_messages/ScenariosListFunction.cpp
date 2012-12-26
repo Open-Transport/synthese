@@ -53,11 +53,6 @@ namespace synthese
 		const string ScenariosListFunction::PARAMETER_SHOW_TEMPLATES("t");
 		const string ScenariosListFunction::PARAMETER_CURRENTLY_DISPLAYED = "currently_displayed";
 
-		const string ScenariosListFunction::DATA_NAME("name");
-		const string ScenariosListFunction::DATA_START_DATE("start_date");
-		const string ScenariosListFunction::DATA_END_DATE("end_date");
-		const string ScenariosListFunction::DATA_FOLDER_ID("folder_id");
-
 		const string ScenariosListFunction::TAG_SCENARIO = "scenario";
 
 
@@ -146,7 +141,7 @@ namespace synthese
 				BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& scenario, scenarios)
 				{
 					shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
-					_displayScenarioTemplate(*scenario, *scenarioPM);
+					scenario->toParametersMap(*scenarioPM);
 					pm.insert(TAG_SCENARIO, scenarioPM);
 				}
 			}
@@ -169,7 +164,7 @@ namespace synthese
 				BOOST_FOREACH(const shared_ptr<SentScenario>& message, scenarios)
 				{
 					shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
-					_displaySentScenario(*message, *scenarioPM);
+					message->toParametersMap(*scenarioPM);
 					pm.insert(TAG_SCENARIO, scenarioPM);
 				}
 			}
@@ -208,51 +203,5 @@ namespace synthese
 			_showCurrentlyDisplayed(true)
 		{
 
-		}
-
-
-
-		void ScenariosListFunction::_displaySentScenario(
-			const SentScenario& scenario,
-			ParametersMap& pm
-		) const	{
-
-			// roid
-			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());
-
-			// name
-			pm.insert(DATA_NAME, scenario.getName());
-
-			// start date
-			if(!scenario.getPeriodStart().is_not_a_date_time())
-			{
-				pm.insert(DATA_START_DATE, scenario.getPeriodStart());
-			}
-
-			// end date
-			if(!scenario.getPeriodEnd().is_not_a_date_time())
-			{
-				pm.insert(DATA_END_DATE, scenario.getPeriodEnd());
-			}
-		}
-
-
-
-		void ScenariosListFunction::_displayScenarioTemplate(
-			const ScenarioTemplate& scenario,
-			ParametersMap& pm
-		) const	{
-
-			// roid
-			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());
-
-			// name
-			pm.insert(DATA_NAME, scenario.getName());
-
-			// scenario template
-			if(scenario.getFolder())
-			{
-				pm.insert(DATA_FOLDER_ID, scenario.getFolder()->getKey());
-			}
 		}
 }	}
