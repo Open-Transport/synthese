@@ -90,6 +90,11 @@ namespace synthese
 					throw RequestException("No such page");
 				}
 			}
+
+			if(!_page.get())
+			{
+				setOutputFormatFromMap(map, string());
+			}
 		}
 
 
@@ -136,13 +141,20 @@ namespace synthese
 					_page->display(stream, request, *pmScreen);
 				}
 			}
-			else // XML output
+			else if(_outputFormat == MimeTypes::XML)
 			{
 				pm.outputXML(
 					stream,
 					DATA_SCREENS,
 					true,
 					"http://synthese.rcsmobility.com/include/54_departure_boards/GetDepartureBoards.xsd"
+				);
+			}
+			else if(_outputFormat == MimeTypes::JSON)
+			{
+				pm.outputJSON(
+					stream,
+					DATA_SCREENS
 				);
 			}
 
