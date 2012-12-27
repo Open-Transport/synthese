@@ -77,7 +77,26 @@ namespace synthese
 			static const std::string PARAMETER_SCENARIO_DATASOURCE_ID;
 			static const std::string PARAMETER_ENCODING;
 
+			static const std::string PARAMETER_MESSAGE_ID_;
+			static const std::string PARAMETER_MESSAGE_TITLE_;
+			static const std::string PARAMETER_MESSAGE_CONTENT_;
+			static const std::string PARAMETER_MESSAGE_LEVEL_;
+			static const std::string PARAMETER_MESSAGE_RECIPIENTS_;
+
 		private:
+			struct Message
+			{
+				util::RegistryKeyType id;
+				std::string title;
+				std::string content;
+				AlarmLevel level;
+				typedef std::map<
+					std::string,
+					std::vector<util::RegistryKeyType>
+				> recipients;
+			};
+			typedef std::vector<Message> Messages;
+
 			//! @name Datasources
 			//@{
 				boost::shared_ptr<const impex::DataSource> _scenarioDataSource;
@@ -89,6 +108,7 @@ namespace synthese
 				boost::shared_ptr<Scenario>				_scenario;
 				boost::shared_ptr<SentScenario>			_sscenario;
 				boost::shared_ptr<ScenarioTemplate>		_tscenario;
+				Messages _messages;
 			//@}
 
 			//! @name New values
