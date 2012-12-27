@@ -89,6 +89,11 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_CREATED_MESSAGE_TITLE = Action_PARAMETER_PREFIX + "_created_message_title";
 		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_ID_ = Action_PARAMETER_PREFIX + "_message_id_";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_TITLE_ = Action_PARAMETER_PREFIX + "_message_test_";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_CONTENT_ = Action_PARAMETER_PREFIX + "_message_content_";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_LEVEL_ = Action_PARAMETER_PREFIX + "_message_level_";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_message_recipients_";
 
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
@@ -297,6 +302,20 @@ namespace synthese
 							}
 						}
 					}
+				}
+
+				// Messages
+				for(size_t rank(0); map.isDefined(PARAMETER_MESSAGE_ID_+ lexical_cast<string>(rank)); ++rank)
+				{
+					string rankStr(lexical_cast<string>(rank));
+
+					Message msg;
+					msg.id = map.get<RegistryKeyType>(PARAMETER_MESSAGE_ID_+ rankStr);
+					msg.title = map.getDefault<string>(PARAMETER_MESSAGE_TITLE_+ rankStr);
+					msg.content = map.getDefault<string>(PARAMETER_MESSAGE_CONTENT_+ rankStr);
+					msg.level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_MESSAGE_LEVEL_+rankStr, 10));
+
+					_messages.push_back(msg);
 				}
 
 
@@ -710,6 +729,29 @@ namespace synthese
 			if(_message.get())
 			{
 				AlarmTableSync::Save(_message.get());
+			}
+
+			if(_sscenario.get())
+			{
+				BOOST_FOREACH(const Messages::value_type& msg, _messages)
+				{
+					Env env;
+					shared_ptr<SentAlarm> alarm;
+
+					if(msg.id)
+					{
+						alarm = ScenarioSentAlarmInheritedTableSync::GetEditable(msg.id, env);
+					}
+					else
+					{
+						alarm.reset(new SentAlarm);
+					}
+					alarm->setScenario(_sscenario.get());
+					alarm->setShortMessage(msg.title);
+					alarm->setLongMessage(msg.content);
+					alarm->setLevel(msg.level);
+					AlarmTableSync::Save(alarm.get());
+				}
 			}
 
 			if(_sscenario.get())
