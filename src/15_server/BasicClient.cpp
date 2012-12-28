@@ -224,4 +224,37 @@ namespace synthese
 				throw Exception(e.what());
 			}
 		}
+
+
+
+		std::string BasicClient::Get( const std::string url )
+		{
+			// Parsing of the url
+			string host;
+			string port("80");
+			string path("/");
+			size_t pos(0);
+			for(; pos+1<url.size() && (url[pos] != '/' || url[pos+1] != '/'); ++pos) ;
+			if(pos + 1 == url.size())
+			{
+				throw Exception("Bad URL");
+			}
+			size_t pos2(pos+2);
+			for(; pos2<url.size() && url[pos2]!=':' && url[pos2]!='/'; ++pos2) ;
+			host = url.substr(pos+2, pos2 - pos - 1);
+			if(pos2 < url.size())
+			{
+				if(url[pos2] == ':')
+				{
+					++pos2;
+					pos = pos2;
+					for(; pos2<url.size() && url[pos2]!='/'; ++pos2) ;
+					port = url.substr(pos, pos2-pos);
+				}
+				path = url.substr(pos2);
+			}
+
+			BasicClient c(host, port);
+			return c.get(path);
+		}
 }	}

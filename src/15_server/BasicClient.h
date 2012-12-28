@@ -70,6 +70,14 @@ namespace synthese
 				std::string contentType = std::string()
 			) const;
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Simple HTTP GET request helper.
+			/// @warning Only HTTP is supported, not HTTPS
+			/// @param url the url to get (format http://host:port/path)
+			static std::string Get(
+				const std::string url
+			);
 		};
 }	}
 
