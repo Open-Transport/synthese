@@ -70,6 +70,7 @@ namespace synthese
 			typedef std::map<std::string, File> Files;
 			typedef std::map<std::string, std::vector<boost::shared_ptr<ParametersMap> > > SubParametersMap;
 
+			static const SubParametersMap::mapped_type EMPTY_SUBMAP;
 
 			//////////////////////////////////////////////////////////////////////////
 			///  - FORMAT_INTERNAL : in most of cases the result of streaming
