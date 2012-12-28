@@ -47,6 +47,10 @@ namespace synthese
 {
 	namespace util
 	{
+		const ParametersMap::SubParametersMap::mapped_type ParametersMap::EMPTY_SUBMAP;
+
+
+
 		ParametersMap::ParametersMap(
 			const std::string& text
 		):	_format(FORMAT_INTERNAL)
@@ -633,7 +637,7 @@ namespace synthese
 			SubParametersMap::const_iterator it(_subMap.find(key));
 			if(it == _subMap.end())
 			{
-				throw MissingParameterException(key);
+				return EMPTY_SUBMAP;
 			}
 			return it->second;
 		}
