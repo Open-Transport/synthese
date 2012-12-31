@@ -43,6 +43,7 @@ namespace synthese
 
 	namespace messages
 	{
+		class MessageType;
 		class SentAlarm;
 		class ScenarioFolder;
 		class ScenarioTemplate;
@@ -82,6 +83,8 @@ namespace synthese
 			static const std::string PARAMETER_MESSAGE_CONTENT_;
 			static const std::string PARAMETER_MESSAGE_LEVEL_;
 			static const std::string PARAMETER_MESSAGE_RECIPIENTS_;
+			static const std::string PARAMETER_MESSAGE_ALTERNATIVES_;
+			static const std::string VALUES_SEPARATOR;
 
 		private:
 			struct Message
@@ -90,12 +93,20 @@ namespace synthese
 				std::string title;
 				std::string content;
 				AlarmLevel level;
+				typedef std::vector<
+					std::pair<
+						std::string,
+						util::RegistryKeyType
+				>	> Recipients;
+				Recipients recipients;
 				typedef std::map<
-					std::string,
-					std::vector<util::RegistryKeyType>
-				> recipients;
+					MessageType*,
+					std::string
+				> Alternatives;
+				Alternatives alternatives;
 			};
 			typedef std::vector<Message> Messages;
+			typedef std::set<util::RegistryKeyType> MessageIds;
 
 			//! @name Datasources
 			//@{
@@ -109,6 +120,7 @@ namespace synthese
 				boost::shared_ptr<SentScenario>			_sscenario;
 				boost::shared_ptr<ScenarioTemplate>		_tscenario;
 				Messages _messages;
+				MessageIds _messageIds;
 			//@}
 
 			//! @name New values

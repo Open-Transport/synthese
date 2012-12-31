@@ -1,11 +1,13 @@
 
 #include "MessagesModule.h"
 
-#include "AlarmTableSync.h"
-#include "TextTemplateTableSync.h"
-#include "ScenarioTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
+#include "AlarmTableSync.h"
+#include "MessageAlternativeTableSync.hpp"
+#include "MessageTypeTableSync.hpp"
+#include "ScenarioTableSync.h"
 #include "ScenarioFolderTableSync.h"
+#include "TextTemplateTableSync.h"
 
 #include "SentScenarioInheritedTableSync.h"
 #include "ScenarioTemplateInheritedTableSync.h"
@@ -25,6 +27,7 @@
 #include "MessagesLibraryLog.h"
 
 #include "GetMessagesFunction.hpp"
+#include "MessageTypesService.hpp"
 #include "ScenariosListFunction.hpp"
 #include "ScenarioDisplayFunction.hpp"
 
@@ -46,6 +49,8 @@
 // Registries
 #include "AlarmObjectLink.h"
 #include "AlarmTemplate.h"
+#include "MessageAlternative.hpp"
+#include "MessagesTypes.h"
 #include "SentAlarm.h"
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
@@ -60,11 +65,13 @@ void synthese::messages::moduleRegister()
 
 	synthese::messages::MessagesModule::integrate();
 
-	synthese::messages::ScenarioTableSync::integrate();
-	synthese::messages::AlarmTableSync::integrate();
-	synthese::messages::TextTemplateTableSync::integrate();
 	synthese::messages::AlarmObjectLinkTableSync::integrate();
+	synthese::messages::AlarmTableSync::integrate();
+	synthese::messages::MessageAlternativeTableSync::integrate();
+	synthese::messages::MessageTypeTableSync::integrate();
 	synthese::messages::ScenarioFolderTableSync::integrate();
+	synthese::messages::ScenarioTableSync::integrate();
+	synthese::messages::TextTemplateTableSync::integrate();
 
 	synthese::messages::SentScenarioInheritedTableSync::integrate();
 	synthese::messages::ScenarioTemplateInheritedTableSync::integrate();
@@ -84,6 +91,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::MessagesLibraryLog::integrate();
 
 	synthese::messages::GetMessagesFunction::integrate();
+	synthese::messages::MessageTypesService::integrate();
 	synthese::messages::ScenariosListFunction::integrate();
 	synthese::messages::ScenarioDisplayFunction::integrate();
 
@@ -104,6 +112,8 @@ void synthese::messages::moduleRegister()
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
 	synthese::util::Env::Integrate<synthese::messages::AlarmTemplate>();
+	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
+	synthese::util::Env::Integrate<synthese::messages::MessageType>();
 	synthese::util::Env::Integrate<synthese::messages::SentAlarm>();
 	synthese::util::Env::Integrate<synthese::messages::TextTemplate>();
 	synthese::util::Env::Integrate<synthese::messages::ScenarioFolder>();
