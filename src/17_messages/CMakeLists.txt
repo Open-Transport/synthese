@@ -28,6 +28,10 @@ GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MessageAdmin.cpp
 MessageAdmin.h
+MessageAlternative.cpp
+MessageAlternative.hpp
+MessageAlternativeTableSync.cpp
+MessageAlternativeTableSync.hpp
 MessagesAdmin.cpp
 MessagesAdmin.h
 MessagesAdvancedSelectTableSync.cpp
@@ -52,6 +56,12 @@ MessagesScenarioAdmin.h
 MessagesTemplateLibraryAdmin.cpp
 MessagesTemplateLibraryAdmin.h
 MessagesTypes.h
+MessageType.cpp
+MessageType.hpp
+MessageTypesService.cpp
+MessageTypesService.hpp
+MessageTypeTableSync.cpp
+MessageTypeTableSync.hpp
 NewMessageAction.cpp
 NewMessageAction.h
 Scenario.cpp

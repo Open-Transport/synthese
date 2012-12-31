@@ -21,6 +21,8 @@
 */
 
 #include "Alarm.h"
+
+#include "MessageAlternative.hpp"
 #include "Scenario.h"
 #include "AlarmTemplate.h"
 #include "ParametersMap.h"
@@ -32,6 +34,9 @@ namespace synthese
 {
 	using namespace util;
 
+	template<> const Field SimpleObjectFieldDefinition<messages::Alarm>::FIELD = Field("alarm_id", SQL_INTEGER);
+	template<> const std::string util::Registry<messages::Alarm>::KEY("Alarm");
+
 	namespace messages
 	{
 		const string Alarm::DATA_MESSAGE_ID("message_id");
@@ -41,6 +46,8 @@ namespace synthese
 		const string Alarm::DATA_SCENARIO_NAME("scenario_name");
 		const string Alarm::DATA_TITLE("title");
 		const string Alarm::DATA_DONE = "done";
+
+		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 
 
 
@@ -151,6 +158,14 @@ namespace synthese
 			{
 				pm.insert(prefix + DATA_SCENARIO_ID, getScenario()->getKey());
 				pm.insert(prefix + DATA_SCENARIO_NAME, getScenario()->getName());
+			}
+
+			// Message alternatives
+			BOOST_FOREACH(const MessageAlternatives::value_type& it, _messageAlternatives)
+			{
+				shared_ptr<ParametersMap> altPM(new ParametersMap);
+				it.second->toParametersMap(*altPM);
+				pm.insert(TAG_MESSAGE_ALTERNATIVE, altPM);
 			}
 		}
 }	}
