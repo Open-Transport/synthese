@@ -25,6 +25,8 @@
 #include "ScenarioSaveAction.h"
 
 #include "IConv.hpp"
+#include "MessageAlternativeTableSync.hpp"
+#include "MessageType.hpp"
 #include "MessagesModule.h"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
@@ -94,6 +96,8 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_CONTENT_ = Action_PARAMETER_PREFIX + "_message_content_";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_LEVEL_ = Action_PARAMETER_PREFIX + "_message_level_";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_message_recipients_";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_ALTERNATIVES_ = Action_PARAMETER_PREFIX + "_message_alternatives_";
+		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
 
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
@@ -309,13 +313,54 @@ namespace synthese
 				{
 					string rankStr(lexical_cast<string>(rank));
 
+					// Jump over removals (id is empty)
+					if(map.get<string>(PARAMETER_MESSAGE_ID_+ rankStr).empty())
+					{
+						continue;
+					}
+
 					Message msg;
-					msg.id = map.get<RegistryKeyType>(PARAMETER_MESSAGE_ID_+ rankStr);
+					msg.id = map.get<RegistryKeyType>(PARAMETER_MESSAGE_ID_+ rankStr); // explicit 0 value in case of new message
 					msg.title = map.getDefault<string>(PARAMETER_MESSAGE_TITLE_+ rankStr);
 					msg.content = map.getDefault<string>(PARAMETER_MESSAGE_CONTENT_+ rankStr);
 					msg.level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_MESSAGE_LEVEL_+rankStr, 10));
 
+					// Recipients
+					BOOST_FOREACH(const Factory<AlarmRecipient>::Keys::value_type& key, Factory<AlarmRecipient>::GetKeys())
+					{
+						string keys(map.getDefault<string>(PARAMETER_MESSAGE_RECIPIENTS_+ lexical_cast<string>(rank) + "_" + key));
+						if(!keys.empty())
+						{
+							vector<string> keysStrVector;
+							split(keysStrVector, keys, is_any_of(VALUES_SEPARATOR));
+							BOOST_FOREACH(const string& keyStr, keysStrVector)
+							{
+								try
+								{
+									msg.recipients.push_back(make_pair(key, lexical_cast<RegistryKeyType>(keyStr)));
+								}
+								catch(...)
+								{									
+								}
+							}
+						}
+					}
+
+					// Alternatives
+					BOOST_FOREACH(const MessageType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessageType>())
+					{
+						msg.alternatives.insert(
+							make_pair(
+								it.second.get(),
+								map.getDefault<string>(PARAMETER_MESSAGE_ALTERNATIVES_+ lexical_cast<string>(rank) + "_" + lexical_cast<string>(it.first))
+						)	);
+					}
+
 					_messages.push_back(msg);
+					if(msg.id)
+					{
+						_messageIds.insert(msg.id);
+					}
 				}
 
 
@@ -475,6 +520,8 @@ namespace synthese
 
 		void ScenarioSaveAction::run(Request& request)
 		{
+			DBTransaction transaction;
+
 			// Log message
 			stringstream text;
 
@@ -593,7 +640,7 @@ namespace synthese
 			}
 
 			// Save
-			ScenarioTableSync::Save(_scenario.get());
+			ScenarioTableSync::Save(_scenario.get(), transaction);
 
 			// Messages
 			if(_creation)
@@ -651,7 +698,7 @@ namespace synthese
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
 
-				AlarmTableSync::Save(message.get());
+				AlarmTableSync::Save(message.get(), transaction);
 
 				if(_recipients)
 				{
@@ -660,7 +707,7 @@ namespace synthese
 						AlarmObjectLink link;
 						link.setAlarm(message.get());
 						link.setObjectId(recipient);
-						AlarmObjectLinkTableSync::Save(&link);
+						AlarmObjectLinkTableSync::Save(&link, transaction);
 					}
 				}
 			}
@@ -728,11 +775,21 @@ namespace synthese
 
 			if(_message.get())
 			{
-				AlarmTableSync::Save(_message.get());
+				AlarmTableSync::Save(_message.get(), transaction);
 			}
 
 			if(_sscenario.get())
 			{
+				// Removals
+				BOOST_FOREACH(const SentAlarm* alarm, _sscenario->getMessages())
+				{
+					if(_messageIds.find(alarm->getKey()) == _messageIds.end())
+					{
+						AlarmTableSync::Remove(request.getSession(), alarm->getKey(), transaction, false);
+					}
+				}
+
+				// Insertions / updates
 				BOOST_FOREACH(const Messages::value_type& msg, _messages)
 				{
 					Env env;
@@ -750,8 +807,87 @@ namespace synthese
 					alarm->setShortMessage(msg.title);
 					alarm->setLongMessage(msg.content);
 					alarm->setLevel(msg.level);
-					AlarmTableSync::Save(alarm.get());
+					AlarmTableSync::Save(alarm.get(), transaction);
+
+					// Recipients
+					BOOST_FOREACH(const Message::Recipients::value_type& it, msg.recipients)
+					{
+						AlarmObjectLinkTableSync::SearchResult v(
+							AlarmObjectLinkTableSync::Search(env, alarm->getKey())
+						);
+						set<RegistryKeyType> toRemove;
+						typedef map<pair<string,RegistryKeyType>, RegistryKeyType> AOLMap;
+						AOLMap m;
+						BOOST_FOREACH(const shared_ptr<AlarmObjectLink>& item, v)
+						{
+							toRemove.insert(item->getKey());
+							m.insert(
+								make_pair(
+									make_pair(
+										item->getRecipientKey(),
+										item->getObjectId()
+									),
+									item->getKey()
+							)	);
+						}
+
+						// Insertions / updates
+						BOOST_FOREACH(const Message::Recipients::value_type& it, msg.recipients)
+						{
+							// Insertion
+							AOLMap::const_iterator itAOLMap(m.find(it));
+							if(itAOLMap == m.end())
+							{
+								AlarmObjectLink aol;
+								aol.setRecipientKey(it.first);
+								aol.setObjectId(it.second);
+								aol.setAlarm(alarm.get());
+								AlarmObjectLinkTableSync::Save(&aol, transaction);
+							}
+							else
+							{
+								toRemove.erase(itAOLMap->second);
+							}
+						}
+
+						// Removals
+						BOOST_FOREACH(RegistryKeyType id, toRemove)
+						{
+							DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(request.getSession(), id, transaction, false);
+						}
+					}
+
+
+					// Alternatives
+					BOOST_FOREACH(const Message::Alternatives::value_type& it, msg.alternatives)
+					{
+						shared_ptr<MessageAlternative> alternative;
+						bool toSave(false);
+						MessageAlternativeTableSync::SearchResult vec(
+							MessageAlternativeTableSync::Search(env, alarm->getKey(), it.first->getKey())
+						);
+						if(vec.empty())
+						{
+							alternative.reset(new MessageAlternative);
+							toSave = true;
+							alternative->set<Alarm>(*alarm);
+							alternative->set<MessageType>(*it.first);
+						}
+						else
+						{
+							alternative = *vec.begin();
+							toSave = (alternative->get<Content>() != it.second);
+						}
+						alternative->set<Content>(it.second);
+
+						if(toSave)
+						{
+							MessageAlternativeTableSync::Save(alternative.get(), transaction);
+						}
+					}
+
 				}
+
 			}
 
 			if(_sscenario.get())

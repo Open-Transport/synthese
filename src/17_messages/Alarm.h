@@ -23,11 +23,12 @@
 #ifndef SYNTHESE_MESSAGES_ALARM_H
 #define SYNTHESE_MESSAGES_ALARM_H
 
-#include <string>
+#include "PointerField.hpp"
 
 #include "MessagesTypes.h"
 #include "Registrable.h"
 
+#include <string>
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
@@ -39,6 +40,8 @@ namespace synthese
 
 	namespace messages
 	{
+		class MessageAlternative;
+		class MessageType;
 		class Scenario;
 
 		/** Alarm message.
@@ -52,8 +55,9 @@ namespace synthese
 			An alarm can be sent individually (single alarm) or in a group built from a scenario (grouped alarm)
 			The _scenario attribute points to the group if applicable.
 		*/
-		class Alarm
-			: public virtual util::Registrable
+		class Alarm:
+			public virtual util::Registrable,
+			public PointerField<Alarm, Alarm>
 		{
 		public:
 			static const std::string DATA_MESSAGE_ID;
@@ -64,6 +68,10 @@ namespace synthese
 			static const std::string DATA_TITLE;
 			static const std::string DATA_DONE;
 
+			static const std::string TAG_MESSAGE_ALTERNATIVE;
+
+			typedef std::map<MessageType*, MessageAlternative*> MessageAlternatives;
+
 		protected:
 			AlarmLevel			_level;
 			std::string			_shortMessage;  //!< Alarm message
@@ -71,6 +79,11 @@ namespace synthese
 			const Scenario* 	_scenario;
 			bool				_rawEditor;
 			bool				_done;
+
+			// Links
+			//@{
+				mutable MessageAlternatives _messageAlternatives;
+			//@}
 
 			Alarm(
 				util::RegistryKeyType key,
@@ -93,6 +106,7 @@ namespace synthese
 				const Scenario*			getScenario()		const;
 				bool					getRawEditor() const { return _rawEditor; }
 				bool					getDone() const { return _done; }
+				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
 			//@}
 
 			//! @name Setters
@@ -103,6 +117,7 @@ namespace synthese
 				void setScenario(const Scenario* scenario);
 				void setRawEditor(bool value){ _rawEditor = value; }
 				void setDone(bool value){ _done = value; }
+				void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
 			//@}
 
 			//! @name Services

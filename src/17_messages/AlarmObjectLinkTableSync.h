@@ -33,7 +33,7 @@
 #include "Registrable.h"
 
 #include "DBModule.h"
-#include "DBConditionalRegistryTableSyncTemplate.hpp"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include "AlarmObjectLink.h"
 #include "MessagesModule.h"
@@ -56,8 +56,8 @@ namespace synthese
 			Unlink method behavior :
 			 - removes the link between the alarm and the object if the alarm is a SentAlarm object (no exception is thrown if it does not exists)
 		*/
-		class AlarmObjectLinkTableSync
-		:	public db::DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
+		class AlarmObjectLinkTableSync:
+			public db::DBRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;
