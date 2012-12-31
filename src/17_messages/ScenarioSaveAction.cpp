@@ -890,6 +890,8 @@ namespace synthese
 
 			}
 
+			transaction.run();
+
 			if(_sscenario.get())
 			{
 				MessagesLog::addUpdateEntry(_sscenario.get(), text.str(), request.getUser().get());
