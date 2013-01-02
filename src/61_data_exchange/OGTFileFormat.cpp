@@ -257,6 +257,7 @@ namespace synthese
 					if(service)
 					{
 						*service |= user_data->_calendar;
+						service->addCodeBySource(user_data->_dataSource, user_data->tripNumber);
 					}
 				}
 				user_data->importTrip = false;
