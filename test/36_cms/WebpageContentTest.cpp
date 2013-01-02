@@ -21,6 +21,7 @@
 */
 
 #include "IfFunction.hpp"
+#include "StrLenFunction.hpp"
 #include "ParametersMap.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -41,6 +42,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 {
 	// Factory initialization
 	IfFunction::integrate();
+	StrLenFunction::integrate();
 
 	StaticFunctionRequest<WebPageDisplayFunction> request;
 	ParametersMap additionalParametersMap;
@@ -854,5 +856,16 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL((*variables.getSubMaps("submap").begin())->getDefault<string>("value"), "test1");
 		BOOST_CHECK_EQUAL((*variables.getSubMaps("submap").begin())->getDefault<string>("variable"), "test2");
 	}
+
+	{ // Strlen
+		string code("test<?strlen&t=0123456789?>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test10");
+	}
+
 }
 
