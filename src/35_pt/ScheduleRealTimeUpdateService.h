@@ -60,7 +60,6 @@ namespace synthese
 		{
 		public:
 
-			static const std::string PARAMETER_LINE_STOP_RANK;
 			static const std::string PARAMETER_STOP_AREA_ID;
 			static const std::string PARAMETER_STOP_AREA_DATASOURCE_ID;
 			static const std::string PARAMETER_SERVICE_ID;
