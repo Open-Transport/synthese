@@ -25,6 +25,7 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "Path.h"
 #include "Hub.h"
+#include "ImpExModuleRegister.cpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "GeographyModule.h"
@@ -43,10 +44,14 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
+#define TEST_SERVICE_DATASOURCE 16607027920896001
+#define TEST_STOP_AREA_ID 1970329131942220
+
 using namespace synthese::util;
 using namespace synthese::pt;
 using namespace synthese::geography;
 using namespace synthese::graph;
+using namespace synthese::impex;
 using namespace synthese::server;
 using namespace synthese;
 
@@ -64,6 +69,7 @@ public:
 		RegistryKeyType id,
 		string serviceNumber,
 		JourneyPattern &jp,
+		boost::shared_ptr<DataSource> &ds,
 		time_duration startTime
 	):	_scheduledService(boost::shared_ptr<ScheduledService>(new ScheduledService(id, serviceNumber, &jp)))
 	{
@@ -86,6 +92,7 @@ public:
 		}
 		jp.addService(*_scheduledService, true);
 		_scheduledService->setActive(day_clock::local_day());
+		_scheduledService->addCodeBySource(*ds, serviceNumber, true);
 		Env::GetOfficialEnv().getEditableRegistry<ScheduledService>().add(_scheduledService);
 	}
 
@@ -160,7 +167,9 @@ public:
 	{
 		for(size_t i=0; i< _numberOfStops; ++i)
 		{
-			_stopAreas.push_back(boost::shared_ptr<StopArea>(new StopArea(0, true)));
+			boost::shared_ptr<StopArea> stopArea(new StopArea(TEST_STOP_AREA_ID + i, true));
+			_stopAreas.push_back(stopArea);
+			Env::GetOfficialEnv().getEditableRegistry<StopArea>().add(stopArea);
 			_stopPoints.push_back(boost::shared_ptr<StopPoint>(new StopPoint(0, "", &*_stopAreas[i])));
 			_stopAreas[i]->addPhysicalStop(*_stopPoints[i]);
 		}
@@ -205,6 +214,10 @@ BOOST_AUTO_TEST_CASE (test1)
 {
 
 	synthese::pt::moduleRegister();
+	synthese::impex::moduleRegister();
+
+	boost::shared_ptr<DataSource> ds(new DataSource(TEST_SERVICE_DATASOURCE));
+	Env::GetOfficialEnv().getEditableRegistry<DataSource>().add(ds);
 
 	TestAreaMap testAreaMap(8);
 	
@@ -218,16 +231,16 @@ BOOST_AUTO_TEST_CASE (test1)
 	jp2.setCommercialLine(&cl2);
 	TestJourney tj2(jp2, testAreaMap);
 
-	TestScheduledService tss1(4503599627370501ULL, "1", jp,  time_duration(1,0,0));
-	TestScheduledService tss2(4503599627370502ULL, "2", jp2, time_duration(2,0,0));
-	TestScheduledService tss3(4503599627370503ULL, "3", jp,  time_duration(3,0,0));
-	TestScheduledService tss4(4503599627370504ULL, "4", jp2, time_duration(4,0,0));
-	TestScheduledService tss5(4503599627370505ULL, "5", jp,  time_duration(5,0,0));
+	TestScheduledService tss1(4503599627370501ULL, "1", jp, ds,  time_duration(1,0,0));
+	TestScheduledService tss2(4503599627370502ULL, "2", jp2, ds, time_duration(2,0,0));
+	TestScheduledService tss3(4503599627370503ULL, "3", jp, ds,  time_duration(3,0,0));
+	TestScheduledService tss4(4503599627370504ULL, "4", jp2, ds, time_duration(4,0,0));
+	TestScheduledService tss5(4503599627370505ULL, "5", jp, ds,  time_duration(5,0,0));
 
 	{
 		HTTPRequest req;
 		req.headers.insert(make_pair("Host", "www.toto.com"));
-		req.uri = "?SERVICE=ScheduleRealTimeUpdateService&nr=1&se1=4503599627370501&ls=3&at1=03:20:00&dt1=03:20:01";
+		req.uri = "?SERVICE=ScheduleRealTimeUpdateService&nr=1&sa=1970329131942223&ds=16607027920896001&se1=1&at1=03:20:00&dt1=03:20:01";
 		req.ipaddr = "127.0.0.1";
 		DynamicRequest dr(req);
 

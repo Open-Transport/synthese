@@ -75,13 +75,14 @@ namespace synthese
 				boost::shared_ptr<ScheduledService> service;
 				boost::posix_time::time_duration arrivalTime;
 				boost::posix_time::time_duration departureTime;
+				std::size_t lineStopRank;
 			};
 
 			boost::shared_ptr<StopArea> _stopArea;
-			std::size_t _lineStopRank;
 			std::vector<Record> _records;
 
-			size_t _getStopRankByService(const SchedulesBasedService *service) const;
+			size_t _getStopRankByService(const SchedulesBasedService *service,
+				 const boost::shared_ptr<StopArea> &stopArea) const;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -129,10 +130,6 @@ namespace synthese
 			/// @date 2011
 			virtual std::string getOutputMimeType() const;
 
-			//! @name Setters
-			//@{
-				void setLineStopRank(std::size_t value);
-			//@}
 		};
 	}
 }

@@ -58,9 +58,6 @@ namespace synthese
 
 	namespace pt
 	{
-		// For test only
-		const string ScheduleRealTimeUpdateService::PARAMETER_LINE_STOP_RANK = "ls";
-
 		const string ScheduleRealTimeUpdateService::PARAMETER_STOP_AREA_ID = "sa";
 		const string ScheduleRealTimeUpdateService::PARAMETER_STOP_AREA_DATASOURCE_ID = "sads";
 		/// Warning, PARAMETER_SERVICE_ID is a list starting at se1 up to any number in sequence
@@ -88,42 +85,35 @@ namespace synthese
 
 		void ScheduleRealTimeUpdateService::_setFromParametersMap(const ParametersMap& map)
 		{
-			if(map.isDefined(PARAMETER_LINE_STOP_RANK))
+			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DATASOURCE_ID, 0))
 			{
-				_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
-			}
-			else
-			{
-				if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DATASOURCE_ID, 0))
+				try
 				{
-					try
-					{
-						shared_ptr<const DataSource> dataSource(
-							Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DATASOURCE_ID))
-							);
-						std::string stopAreaCodeBySource = map.get<string>(PARAMETER_STOP_AREA_ID);
-						StopArea* obj(dataSource->getObjectByCode<StopArea>(stopAreaCodeBySource));
-						if(!obj)
-						{
-							throw ActionException("No such stop area");
-						}
-						_stopArea = Env::GetOfficialEnv().getEditableSPtr(obj);
-					}
-					catch(ObjectNotFoundException<DataSource>&)
-					{
-						throw ActionException("No such datasource");
-					}
-				}
-				else try
-				{
-					_stopArea = Env::GetOfficialEnv().getEditableRegistry<StopArea>().getEditable(
-						map.get<RegistryKeyType>(PARAMETER_STOP_AREA_ID)
+					shared_ptr<const DataSource> dataSource(
+						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DATASOURCE_ID))
 						);
+					std::string stopAreaCodeBySource = map.get<string>(PARAMETER_STOP_AREA_ID);
+					StopArea* obj(dataSource->getObjectByCode<StopArea>(stopAreaCodeBySource));
+					if(!obj)
+					{
+						throw ActionException("No such stop area");
+					}
+					_stopArea = Env::GetOfficialEnv().getEditableSPtr(obj);
 				}
-				catch(ObjectNotFoundException<StopArea>)
+				catch(ObjectNotFoundException<DataSource>&)
 				{
-					throw ActionException("No such stop area");
+					throw ActionException("No such datasource");
 				}
+			}
+			else try
+			{
+				_stopArea = Env::GetOfficialEnv().getEditableRegistry<StopArea>().getEditable(
+					map.get<RegistryKeyType>(PARAMETER_STOP_AREA_ID)
+					);
+			}
+			catch(ObjectNotFoundException<StopArea>)
+			{
+				throw ActionException("No such stop area");
 			}
 
 			size_t i(0);
@@ -135,7 +125,9 @@ namespace synthese
 				i++;
 				std::string indexStr = static_cast<std::ostringstream*>( &(ostringstream() << i) )->str();
 
-				if(map.getDefault<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID, 0))
+				if(map.getDefault<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID, 0) &&
+				   map.getDefault<RegistryKeyType>(PARAMETER_SERVICE_ID + indexStr, 0)
+				)
 				{
 					try
 					{
@@ -148,7 +140,9 @@ namespace synthese
 						{
 							throw ActionException("No such service");
 						}
-						record.service.reset(obj);
+						record.service = Env::GetOfficialEnv().getEditableSPtr(obj);
+						record.lineStopRank = _getStopRankByService(record.service.get(), _stopArea);
+						gotOne = true;
 					}
 					catch(ObjectNotFoundException<DataSource>&)
 					{
@@ -163,6 +157,7 @@ namespace synthese
 							map.get<RegistryKeyType>(PARAMETER_SERVICE_ID + indexStr)
 							);
 						gotOne = true;
+						record.lineStopRank = _getStopRankByService(record.service.get(), _stopArea);
 					}
 					catch(ObjectNotFoundException<ScheduledService>)
 					{
@@ -180,7 +175,7 @@ namespace synthese
 					boost::posix_time::time_duration departureTime = 
 						duration_from_string(map.get<string>(PARAMETER_DEPARTURE_TIME + indexStr));
 					// Detection of bad encoding of schedules after midnight
-					if(record.service->getDepartureSchedule(false, _lineStopRank) - departureTime > hours(12))
+					if(record.service->getDepartureSchedule(false, record.lineStopRank) - departureTime > hours(12))
 					{
 						departureTime += hours(24);
 					}
@@ -191,7 +186,7 @@ namespace synthese
 					boost::posix_time::time_duration arrivalTime =
 						duration_from_string(map.get<string>(PARAMETER_ARRIVAL_TIME + indexStr));
 					// Detection of bad encoding of schedules after midnight
-					if(record.service->getArrivalSchedule(false, _lineStopRank) - arrivalTime > hours(12))
+					if(record.service->getArrivalSchedule(false, record.lineStopRank) - arrivalTime > hours(12))
 					{
 						arrivalTime += hours(24);
 					}
@@ -211,7 +206,6 @@ namespace synthese
 			const Request& request
 		) const {
 			ParametersMap pm;
-			std::size_t lineStopRank(_lineStopRank);
 
 			if(_records.empty())
 			{
@@ -221,18 +215,13 @@ namespace synthese
 
 			BOOST_FOREACH(Record record, _records ) 
 			{
-				if(_stopArea)
-				{
-					lineStopRank = _getStopRankByService(record.service.get());
-				}
-
 				ptime now(second_clock::local_time());
 
 				//
 				// Resync the all services that are between the old scheduled date and the
 				// new one for the given service and line stop.
 				//
-				const StopPoint *sp(static_cast<const StopPoint*>(record.service->getRealTimeVertex(lineStopRank)));
+				const StopPoint *sp(static_cast<const StopPoint*>(record.service->getRealTimeVertex(record.lineStopRank)));
 				ArrivalDepartureTableGenerator::PhysicalStops ps;
 				ps.insert(make_pair(sp->getKey(), sp));
 				DeparturesTableDirection di(DISPLAY_ARRIVALS);
@@ -247,7 +236,7 @@ namespace synthese
 					lf,
 					dp,
 					fp,
-					ptime(now.date(), record.service->getArrivalBeginScheduleToIndex(true, lineStopRank)),
+					ptime(now.date(), record.service->getArrivalBeginScheduleToIndex(true, record.lineStopRank)),
 					ptime(now.date(), record.departureTime),
 					false
 					);
@@ -255,18 +244,13 @@ namespace synthese
 				BOOST_FOREACH(const ArrivalDepartureList::value_type& itService, tdg.generate())
 				{
 					const SchedulesBasedService *nextService (dynamic_cast<const SchedulesBasedService*>(itService.first.getService()));
-
-					if(_stopArea)
-					{
-						lineStopRank = _getStopRankByService(nextService);
-					}
+					size_t lineStopRank(_getStopRankByService(nextService, _stopArea));
 					posix_time::time_duration theirArrivalTimeRef(
 						nextService->getArrivalBeginScheduleToIndex(true, lineStopRank)
 					);
 					posix_time::time_duration theirDepartureTimeRef(
 						nextService->getDepartureBeginScheduleToIndex(true, lineStopRank)
 					);
-
 					// Reschedule this service to the new given time 
 					const_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
 						lineStopRank,
@@ -288,19 +272,19 @@ namespace synthese
 		}
 
 		size_t ScheduleRealTimeUpdateService::_getStopRankByService(
-			const SchedulesBasedService *service) const
+			const SchedulesBasedService *service, 
+			const shared_ptr<StopArea> &stopArea) const
 		{
-			size_t i(0);
+			int i(0);
 			BOOST_FOREACH(const graph::Vertex *vertex, service->getVertices(true))
 			{
-				if(vertex->getHub() == _stopArea.get())
+				if(vertex->getHub() == stopArea.get())
 				{
-					break;
+					return i;
 				}
 				i++;
 			}
-			// TODO Should manage the case where it is not found
-			return i;
+			throw ActionException("No such stop in this service");
 		}
 
 		bool ScheduleRealTimeUpdateService::isAuthorized(const Session* session
@@ -317,9 +301,4 @@ namespace synthese
 			return "text/javascript";
 		}
 
-
-		void ScheduleRealTimeUpdateService::setLineStopRank( std::size_t value )
-		{
-			_lineStopRank = value;
-		}
 }	}
