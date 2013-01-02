@@ -31,6 +31,7 @@
 #include "GraphConstants.h"
 
 #include <vector>
+#include <boost/utility.hpp>
 
 namespace synthese
 {
@@ -43,7 +44,7 @@ namespace synthese
 		/// Interface for user of rules defined by UseRules class.
 		/// @ingroup m18
 		/// @author Hugues Romain
-		class RuleUser
+		class RuleUser : boost::noncopyable
 		{
 		public:
 			typedef std::vector<const UseRule*> Rules;
