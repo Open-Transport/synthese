@@ -168,7 +168,7 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				return K::template GetCast<util::Registrable>(key, environment, linkLevel);
+				return GetCast<util::Registrable>(key, environment, linkLevel);
 			}
 
 
