@@ -130,7 +130,7 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				return K::GetCastEditable<util::Registrable>(key, environment, linkLevel);
+				return template GetCastEditable<util::Registrable>(key, environment, linkLevel);
 			}
 
 
@@ -168,7 +168,7 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				return K::GetCast<util::Registrable>(key, environment, linkLevel);
+				return template GetCast<util::Registrable>(key, environment, linkLevel);
 			}
 
 
