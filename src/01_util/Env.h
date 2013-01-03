@@ -288,7 +288,7 @@ namespace synthese
 			boost::shared_ptr<const C> getCast(
 				util::RegistryKeyType id
 			) const {
-				return const_pointer_cast<const C>(getCastEditable<C, R>(id));
+				return boost::const_pointer_cast<const C>(getCastEditable<C, R>(id));
 			}
 
 
