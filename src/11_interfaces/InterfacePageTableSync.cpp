@@ -196,6 +196,11 @@ namespace synthese
 			return page;
 		}
 
+		boost::shared_ptr<InterfacePage> InterfacePageTableSync::GetNewObject(
+			const DBResultSPtr& row
+		){
+			return shared_ptr<InterfacePage>();
+		}
 
 
 		InterfacePageTableSync::SearchResult InterfacePageTableSync::Search(
