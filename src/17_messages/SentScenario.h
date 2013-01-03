@@ -58,6 +58,7 @@ namespace synthese
 			static const std::string TAG_VARIABLE;
 			static const std::string TAG_MESSAGE;
 			static const std::string TAG_TEMPLATE_SCENARIO;
+			static const std::string TAG_SECTION;
 
 
 			////////////////////////////////////////////////////////////////////

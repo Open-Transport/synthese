@@ -51,6 +51,7 @@ namespace synthese
 		const std::string SentScenario::TAG_VARIABLE = "variable";
 		const std::string SentScenario::TAG_MESSAGE = "message";
 		const std::string SentScenario::TAG_TEMPLATE_SCENARIO = "template_scenario";
+		const std::string SentScenario::TAG_SECTION = "section";
 
 
 
@@ -238,6 +239,14 @@ namespace synthese
 				shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				alarm->toParametersMap(*messagePM, false);
 				pm.insert(TAG_MESSAGE, messagePM);
+			}
+
+			// Sections
+			BOOST_FOREACH(int section, getSections())
+			{
+				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
+				sectionPM->insert(DATA_CODE, section);
+				pm.insert(TAG_SECTION, sectionPM);
 			}
 
 			// start date
