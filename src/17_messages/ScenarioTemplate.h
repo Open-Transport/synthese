@@ -59,6 +59,7 @@ namespace synthese
 
 			static const std::string TAG_VARIABLE;
 			static const std::string TAG_MESSAGE;
+			static const std::string TAG_SECTION;
 
 
 			typedef std::set<const AlarmTemplate*> Messages;

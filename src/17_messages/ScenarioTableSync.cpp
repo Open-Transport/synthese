@@ -71,6 +71,7 @@ namespace synthese
 		const string ScenarioTableSync::COL_VARIABLES("variables");
 		const string ScenarioTableSync::COL_TEMPLATE("template_id");
 		const string ScenarioTableSync::COL_DATASOURCE_LINKS("datasource_links");
+		const string ScenarioTableSync::COL_SECTIONS = "sections";
 	}
 
 	namespace db
@@ -91,6 +92,7 @@ namespace synthese
 			Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
 			Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
 			Field(ScenarioTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(ScenarioTableSync::COL_SECTIONS, SQL_TEXT),
 			Field()
 		};
 
@@ -127,7 +129,50 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			// Name
 			object->setName(rows->getText ( ScenarioTableSync::COL_NAME));
+
+			// Sections
+			Scenario::Sections sections;
+			string sectionsStr(rows->getText(ScenarioTableSync::COL_SECTIONS));
+			trim(sectionsStr);
+			if(!sectionsStr.empty())
+			{
+				vector<string> tokens;
+				split(tokens, sectionsStr, is_any_of(","));
+				BOOST_FOREACH(const string& token, tokens)
+				{
+					try
+					{
+						sections.insert(lexical_cast<int>(token));
+					}
+					catch (bad_lexical_cast&)
+					{						
+					}
+				}
+			}
+			object->setSections(sections);
+
+			// Data source links
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				if(&env == &Env::GetOfficialEnv())
+				{
+					object->setDataSourceLinksWithRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
+							env
+					)	);
+				}
+				else
+				{
+					object->setDataSourceLinksWithoutRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
+							env
+					)	);
+				}
+			}
 
 			if(dynamic_cast<SentScenario*>(object))
 			{
@@ -172,24 +217,6 @@ namespace synthese
 					catch(Exception&)
 					{
 					}
-
-					// Data source links
-					if(&env == &Env::GetOfficialEnv())
-					{
-						sentScenario.setDataSourceLinksWithRegistration(
-							ImportableTableSync::GetDataSourceLinksFromSerializedString(
-								rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
-								env
-						)	);
-					}
-					else
-					{
-						sentScenario.setDataSourceLinksWithoutRegistration(
-							ImportableTableSync::GetDataSourceLinksFromSerializedString(
-								rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
-								env
-						)	);
-					}
 				}
 			}
 			else if(dynamic_cast<ScenarioTemplate*>(object))
@@ -231,10 +258,6 @@ namespace synthese
 				query.addField(scenarioTemplate.getFolder() ? scenarioTemplate.getFolder()->getKey() : RegistryKeyType(0));
 				query.addField(string());
 				query.addField(0);
-				query.addField(
-					DataSourceLinks::Serialize(
-						object->getDataSourceLinks()
-				)	);
 			}
 			else if(dynamic_cast<SentScenario*>(object))
 			{
@@ -266,11 +289,31 @@ namespace synthese
 				query.addField(RegistryKeyType(0));
 				query.addField(vars.str());
 				query.addField(sentScenario.getTemplate() ? sentScenario.getTemplate()->getKey() : RegistryKeyType(0));
-				query.addField(
-					DataSourceLinks::Serialize(
-						object->getDataSourceLinks()
-				)	);
 			}
+
+			// Data source links
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks()
+			)	);
+
+			// Sections
+			bool first(true);
+			stringstream sectionsStr;
+			BOOST_FOREACH(int section, object->getSections())
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					sectionsStr << ",";
+				}
+				sectionsStr << section;
+			}
+			query.addField(sectionsStr.str());
+
 			query.execute(transaction);
 		}
 

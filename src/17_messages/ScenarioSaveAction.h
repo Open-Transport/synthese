@@ -77,6 +77,7 @@ namespace synthese
 			static const std::string PARAMETER_RECIPIENT_TYPE;
 			static const std::string PARAMETER_SCENARIO_DATASOURCE_ID;
 			static const std::string PARAMETER_ENCODING;
+			static const std::string PARAMETER_SECTIONS;
 
 			static const std::string PARAMETER_MESSAGE_ID_;
 			static const std::string PARAMETER_MESSAGE_TITLE_;
@@ -138,6 +139,7 @@ namespace synthese
 				boost::optional<AlarmLevel>							_level;
 				std::string											_dataSourceLinkId;
 				boost::shared_ptr<SentAlarm>						_message;
+				boost::optional<Scenario::Sections>					_sections;
 			//@}
 
 			//! @name Action to do

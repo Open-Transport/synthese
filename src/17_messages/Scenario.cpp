@@ -37,14 +37,12 @@ namespace synthese
 	namespace messages
 	{
 		Scenario::~Scenario()
-		{
+		{}
 
-		}
 
-		Scenario::Scenario( const std::string name /*= std::string()*/ )
-			: Named(name)
-		{
 
-		}
-	}
-}
+		Scenario::Scenario(
+			const std::string name /*= std::string()*/
+		):	Named(name)
+		{}
+}	}

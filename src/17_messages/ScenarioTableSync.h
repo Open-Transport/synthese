@@ -77,6 +77,7 @@ namespace synthese
 			static const std::string COL_VARIABLES;
 			static const std::string COL_TEMPLATE;
 			static const std::string COL_DATASOURCE_LINKS;
+			static const std::string COL_SECTIONS;
 
 			ScenarioTableSync() {}
 			~ScenarioTableSync() {}

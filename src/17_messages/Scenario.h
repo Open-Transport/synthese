@@ -49,8 +49,11 @@ namespace synthese
 			public util::Named
 		{
 		public:
+			typedef std::set<int> Sections;
 
 		private:
+
+			Sections _sections;
 
 		protected:
 			Scenario(const std::string name = std::string());
@@ -70,6 +73,11 @@ namespace synthese
 			virtual void toParametersMap(
 				util::ParametersMap& pm
 			) const = 0;
+
+
+
+			const Sections& getSections() const { return _sections; }
+			void setSections(const Sections& value){ _sections = value; }
 		};
 	}
 }

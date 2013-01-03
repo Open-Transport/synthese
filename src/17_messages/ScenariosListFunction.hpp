@@ -59,6 +59,8 @@ namespace synthese
 			static const std::string PARAMETER_FOLDER_ID;
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
 			static const std::string PARAMETER_CURRENTLY_DISPLAYED;
+			static const std::string PARAMETER_SECTION_IN;
+			static const std::string PARAMETER_SECTION_OUT;
 
 			static const std::string TAG_SCENARIO;
 
@@ -69,6 +71,8 @@ namespace synthese
 				boost::logic::tribool _showCurrentlyDisplayed;
 				boost::shared_ptr<const ScenarioFolder> _parentFolder;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
+				boost::optional<int> _sectionIn;
+				boost::optional<int> _sectionOut;
 			//@}
 
 

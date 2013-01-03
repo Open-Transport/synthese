@@ -51,6 +51,8 @@ namespace synthese
 		const string ScenariosListFunction::PARAMETER_FOLDER_ID("f");
 		const string ScenariosListFunction::PARAMETER_SHOW_TEMPLATES("t");
 		const string ScenariosListFunction::PARAMETER_CURRENTLY_DISPLAYED = "currently_displayed";
+		const string ScenariosListFunction::PARAMETER_SECTION_IN = "section_in";
+		const string ScenariosListFunction::PARAMETER_SECTION_OUT = "section_out";
 
 		const string ScenariosListFunction::TAG_SCENARIO = "scenario";
 
@@ -118,6 +120,32 @@ namespace synthese
 			{
 				throw RequestException("No such CMS template : "+ e.getMessage());
 			}
+
+			// Section in
+			if(!map.getDefault<string>(PARAMETER_SECTION_IN).empty())
+			{
+				try
+				{
+					_sectionIn = map.get<int>(PARAMETER_SECTION_IN);
+				}
+				catch (bad_lexical_cast&)
+				{
+					throw RequestException("No such section");
+				}
+			}
+
+			// Section out
+			if(!map.getDefault<string>(PARAMETER_SECTION_OUT).empty())
+			{
+				try
+				{
+					_sectionOut = map.get<int>(PARAMETER_SECTION_OUT);
+				}
+				catch (bad_lexical_cast&)
+				{
+					throw RequestException("No such section");
+				}
+			}
 		}
 
 
@@ -156,6 +184,15 @@ namespace synthese
 
 			BOOST_FOREACH(const shared_ptr<Scenario>& scenario, scenarios)
 			{
+				// Section filter
+				const Scenario::Sections& sections(scenario->getSections());
+				if(	(	_sectionIn && sections.find(*_sectionIn) == sections.end()) ||
+					(	_sectionOut && sections.find(*_sectionOut) != sections.end())
+				){
+					continue;
+				}
+
+				// Export of the scenario
 				shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
 				scenario->toParametersMap(*scenarioPM);
 				pm.insert(TAG_SCENARIO, scenarioPM);
