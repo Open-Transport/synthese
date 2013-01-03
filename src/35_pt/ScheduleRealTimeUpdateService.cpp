@@ -68,6 +68,8 @@ namespace synthese
 		/// Warning, PARAMETER_ARRIVAL_TIME is a list starting at at1 up to any number in sequence
 		const string ScheduleRealTimeUpdateService::PARAMETER_ARRIVAL_TIME = "at";
 
+		std::map<std::pair<boost::weak_ptr<ScheduledService>,std::size_t>,boost::posix_time::ptime> ScheduleRealTimeUpdateService::_updateTimeStamps;
+
 
 		ScheduleRealTimeUpdateService::ScheduleRealTimeUpdateService()
 		{}
@@ -206,6 +208,7 @@ namespace synthese
 			const Request& request
 		) const {
 			ParametersMap pm;
+			ptime now(second_clock::local_time());
 
 			if(_records.empty())
 			{
@@ -215,8 +218,6 @@ namespace synthese
 
 			BOOST_FOREACH(Record record, _records ) 
 			{
-				ptime now(second_clock::local_time());
-
 				//
 				// Resync the all services that are between the old scheduled date and the
 				// new one for the given service and line stop.
@@ -266,7 +267,15 @@ namespace synthese
 						true, // Is Departure
 						true
 						);
+					stream << "re-scheduling service " << nextService->getKey() << " " << nextService->getServiceNumber() << endl;
 				}
+				// Record the time stamp for the update
+				_updateTimeStamps.insert(
+					make_pair(
+						make_pair(record.service, record.lineStopRank),
+						now
+					)
+				);
 			}
 			return pm;
 		}
