@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_db_FullSynchronizationPolicy_hpp__
 #define SYNTHESE_db_FullSynchronizationPolicy_hpp__
 
+#include "Env.h"
+
 namespace synthese
 {
 	namespace db
