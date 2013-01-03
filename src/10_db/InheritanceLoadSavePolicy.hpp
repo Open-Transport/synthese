@@ -119,9 +119,9 @@ namespace synthese
 		FieldsList InheritanceLoadSavePolicy<K, T>::GetFieldsList()
 		{
 			FieldsList l;
-			for(size_t i(0); !DBTableSyncTemplate<K>::_FIELDS[i].empty(); ++i)
+			for(size_t i(0); !K::_FIELDS[i].empty(); ++i)
 			{
-				l.push_back(DBTableSyncTemplate<K>::_FIELDS[i]);
+				l.push_back(K::_FIELDS[i]);
 			}
 			return l;
 		}
