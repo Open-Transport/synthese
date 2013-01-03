@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -42,7 +42,7 @@ namespace synthese
 		/// @since 3.1.15
 		//////////////////////////////////////////////////////////////////////////
 		class TimetableRowGroupTableSync:
-			public db::DBRegistryTableSyncTemplate<TimetableRowGroupTableSync, TimetableRowGroup>
+			public db::DBDirectTableSyncTemplate<TimetableRowGroupTableSync, TimetableRowGroup>
 		{
 		public:
 			//////////////////////////////////////////////////////////////////////////

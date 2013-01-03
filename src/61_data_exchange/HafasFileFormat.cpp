@@ -289,7 +289,7 @@ namespace synthese
 			{
 				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
+			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}
@@ -1531,6 +1531,10 @@ namespace synthese
 						bool inStop(false);
 						BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
 						{
+							if(inStop && zugStop.stopCode == endStopCode)
+							{
+								break;
+							}
 							if(zugStop.stopCode == startStopCode)
 							{
 								inStop = true;
@@ -1563,11 +1567,6 @@ namespace synthese
 
 							departures.push_back(zugStop.departureTime.is_not_a_date_time() ? zugStop.arrivalTime : zugStop.departureTime);
 							arrivals.push_back(zugStop.arrivalTime.is_not_a_date_time() ? zugStop.departureTime : zugStop.arrivalTime);
-
-							if(zugStop.stopCode == endStopCode)
-							{
-								break;
-							}
 						}
 						if(ignoreService)
 						{

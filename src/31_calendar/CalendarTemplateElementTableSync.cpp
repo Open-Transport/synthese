@@ -105,7 +105,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Load(
+		template<>
+		void OldLoadSavePolicy<CalendarTemplateElementTableSync,CalendarTemplateElement>::Load(
 			CalendarTemplateElement* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -150,7 +151,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<CalendarTemplate> e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_INCLUDE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_INCLUDE_ID, e);
 				}
 			}
 
@@ -166,14 +167,15 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<CalendarTemplate> e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_CALENDAR_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_CALENDAR_ID, e);
 				}
 			}
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Save(
+		template<>
+		void OldLoadSavePolicy<CalendarTemplateElementTableSync,CalendarTemplateElement>::Save(
 			CalendarTemplateElement* object,
 			optional<DBTransaction&> transaction
 		){
@@ -190,7 +192,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
+		template<>
+		void OldLoadSavePolicy<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
 			CalendarTemplateElement* obj
 		){
 			if(obj->getCalendar())

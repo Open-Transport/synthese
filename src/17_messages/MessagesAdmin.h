@@ -26,7 +26,7 @@
 #include "ActionResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
 #include "MessagesTypes.h"
-#include "SentScenarioInheritedTableSync.h"
+#include "ScenarioTableSync.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -123,7 +123,7 @@ namespace synthese
 
 		private:
 			boost::posix_time::ptime							_date;
-			SentScenarioInheritedTableSync::StatusSearch		_searchStatus;
+			ScenarioTableSync::StatusSearch		_searchStatus;
 //			AlarmLevel											_searchLevel;
 //			AlarmConflict										_searchConflict;
 			boost::optional<std::string>						_searchName;

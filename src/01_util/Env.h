@@ -232,6 +232,17 @@ namespace synthese
 
 
 			template<class R>
+			void add(
+				boost::shared_ptr<R> object
+			);
+
+
+
+			void addRegistrable(boost::shared_ptr<util::Registrable> object);
+
+
+
+			template<class R>
 			boost::shared_ptr<const R> get(
 				util::RegistryKeyType id
 			) const {
@@ -246,6 +257,40 @@ namespace synthese
 			) const {
 				return this->getEditableRegistry<R>().getEditable(id);
 			}
+
+
+
+			template<class C, class R>
+			const boost::shared_ptr<C>& getCastEditable(
+				util::RegistryKeyType id
+			) const {
+				try
+				{
+					boost::shared_ptr<C> c(
+						dynamic_pointer_cast<C, R>(
+							this->getEditableRegistry<R>().getEditable(id)
+					)	);
+					if(!c.get())
+					{
+						throw ObjectNotFoundException<C>(id, "Bad type");
+					}
+					return c;
+				}
+				catch(ObjectNotFoundException<R>& e)
+				{
+					throw ObjectNotFoundException<C>(id, e.getMessage());
+				}
+			}
+
+
+
+			template<class C, class R>
+			boost::shared_ptr<const C> getCast(
+				util::RegistryKeyType id
+			) const {
+				return const_pointer_cast<const C>(getCastEditable<C, R>(id));
+			}
+
 
 
 
@@ -316,6 +361,19 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			static const boost::shared_ptr<Env>& GetOfficialEnvSPtr() { return _officialRegistries; }
 		};
+
+
+
+		template<class R>
+		void Env::add(
+			boost::shared_ptr<R> object
+		){
+			if(!object.get())
+			{
+				return;
+			}
+			this->getEditableRegistry<R>().add(object);
+		}
 }	}
 
 #endif // SYNTHESE_util_Env_h__

@@ -24,12 +24,15 @@
 #define SYNTHESE_LineStopTableSync_H__
 
 #include "LineStop.h"
-#include "DBInheritanceTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "InheritanceLoadSavePolicy.hpp"
 
 namespace synthese
 {
 	namespace pt
 	{
+		class DesignatedLinePhysicalStop;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.10 Table : Route stop.
 		///	@ingroup m35LS refLS
@@ -51,7 +54,12 @@ namespace synthese
 		///		by coma.</li>
 		///	</ul>
 		class LineStopTableSync:
-			public db::DBInheritanceTableSyncTemplate<LineStopTableSync,LineStop>
+			public db::DBDirectTableSyncTemplate<
+				LineStopTableSync,
+				LineStop,
+				db::FullSynchronizationPolicy,
+				db::InheritanceLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_PHYSICALSTOPID;
@@ -115,8 +123,50 @@ namespace synthese
 				graph::MetricOffset newLength,
 				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Search of DesignatedLinePhysicalStop objects.
+			/// @param env Environment to populate when loading objects
+			/// @param startStop id of the starting vertex of the edge
+			/// @param endStop id of the ending vertex of the edge
+			/// @param first first element to return
+			/// @param number maximal number of elements to return
+			/// @param orderById order the returned elements by their id
+			/// @param raisingOrder order ascendantly or not
+			/// @param linkLevel automatic load of objects linked by foreign key
+			///	@author Hugues Romain
+			/// @since 3.2.1
+			/// @date 2011
+			static SearchResult SearchByStops(
+				util::Env& env,
+				boost::optional<util::RegistryKeyType> startStop = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> endStop = boost::optional<util::RegistryKeyType>(),
+				std::size_t first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderById = false,
+				bool raisingOrder = false,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+
+			static boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+				const StopArea& departure,
+				const StopArea& arrival,
+				util::Env& env
+			);
+
+
+
+			static boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+				const StopPoint& departure,
+				const StopPoint& arrival,
+				util::Env& env
+			);
+
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_LineStopTableSync_H__

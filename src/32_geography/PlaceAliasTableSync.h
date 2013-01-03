@@ -25,7 +25,8 @@
 
 #include "PlaceAlias.h"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -39,7 +40,12 @@ namespace synthese
 			@ingroup m32LS refLS
 		*/
 		class PlaceAliasTableSync:
-			public db::DBRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>
+			public db::DBDirectTableSyncTemplate<
+				PlaceAliasTableSync,
+				PlaceAlias,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -47,7 +53,7 @@ namespace synthese
 			static const std::string COL_CITYID;
 			static const std::string COL_ISCITYMAINCONNECTION;
 
-			PlaceAliasTableSync();
+			PlaceAliasTableSync() {}
 
 
 			/** PlaceAlias search.

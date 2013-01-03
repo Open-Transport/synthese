@@ -25,7 +25,7 @@
 
 #include "PublicPlace.h"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "FetcherTemplate.h"
 
 #include <vector>
@@ -40,7 +40,10 @@ namespace synthese
 			@ingroup m34LS refLS
 		*/
 		class PublicPlaceTableSync:
-			public db::DBRegistryTableSyncTemplate<PublicPlaceTableSync, PublicPlace>,
+			public db::DBDirectTableSyncTemplate<
+				PublicPlaceTableSync,
+				PublicPlace
+			>,
 			public db::FetcherTemplate<geography::NamedPlace, PublicPlaceTableSync>
 		{
 		public:

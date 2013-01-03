@@ -26,7 +26,8 @@
 #define SYNTHESE_HikingTrailTableSync_h__
 
 #include "HikingTrail.h"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -36,7 +37,12 @@ namespace synthese
 		///	HikingTrail table synchronizer.
 		///	@ingroup m58LS refLS
 		class HikingTrailTableSync:
-			public db::DBRegistryTableSyncTemplate<HikingTrailTableSync,HikingTrail>
+			public db::DBDirectTableSyncTemplate<
+				HikingTrailTableSync,
+				HikingTrail,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

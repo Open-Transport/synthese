@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "TreeFolder.hpp"
 
 namespace synthese
@@ -41,7 +41,7 @@ namespace synthese
 			@ingroup m20LS refLS
 		*/
 		class TreeFolderTableSync:
-			public db::DBRegistryTableSyncTemplate<TreeFolderTableSync, TreeFolder>
+			public db::DBDirectTableSyncTemplate<TreeFolderTableSync, TreeFolder>
 		{
 		public:
 			TreeFolderTableSync();

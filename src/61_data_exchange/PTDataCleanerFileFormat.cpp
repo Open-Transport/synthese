@@ -209,13 +209,17 @@ namespace synthese
 				{
 					if(dynamic_cast<const DesignatedLinePhysicalStop*>(edge))
 					{
-						_edgesToRemove.insert(static_pointer_cast<const LineStop, const Edge>(_env.getSPtr(dynamic_cast<const DesignatedLinePhysicalStop*>(edge))));
-						_env.getEditableRegistry<DesignatedLinePhysicalStop>().remove(edge->getKey());
+						_edgesToRemove.insert(
+							_env.getSPtr(dynamic_cast<const LineStop*>(edge))
+						);
+						_env.getEditableRegistry<LineStop>().remove(edge->getKey());
 					}
 					else if(dynamic_cast<const LineArea*>(edge))
 					{
-						_edgesToRemove.insert(static_pointer_cast<const LineStop, const LineArea>(_env.getSPtr(dynamic_cast<const LineArea*>(edge))));
-						_env.getEditableRegistry<LineArea>().remove(edge->getKey());
+						_edgesToRemove.insert(
+							_env.getSPtr(dynamic_cast<const LineStop*>(edge))
+						);
+						_env.getEditableRegistry<LineStop>().remove(edge->getKey());
 					}
 					if(static_cast<const LineStop*>(edge)->getIsArrival())
 					{

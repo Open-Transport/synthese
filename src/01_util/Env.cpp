@@ -21,16 +21,38 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// util
 #include "Env.h"
+
+#include "DBModule.h"
+#include "DBDirectTableSync.hpp"
+#include "Registrable.h"
 
 using namespace boost;
 
 namespace synthese
 {
+	using namespace db;
+	
 	namespace util
 	{
 		shared_ptr<Env> Env::_officialRegistries(new Env);
 		Env::RegistryCreatorMap Env::_registryCreators;
+
+
+
+		void Env::addRegistrable( boost::shared_ptr<util::Registrable> object )
+		{
+			if(!object.get())
+			{
+				return;
+			}
+			RegistryTableType tableId(decodeTableId(object->getKey()));
+			shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
+			if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+			{
+				throw synthese::Exception("Incompatible registry");
+			}
+			dynamic_cast<DBDirectTableSync&>(*tableSync).getEditableRegistry(*this).addRegistrable(object);
+		}
 	}
 }

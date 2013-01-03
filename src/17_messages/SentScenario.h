@@ -26,9 +26,7 @@
 #define SYNTHESE_SentScenario_h__
 
 #include "MessagesTypes.h"
-#include "Registry.h"
 #include "Scenario.h"
-#include "ImportableTemplate.hpp"
 
 #include <map>
 #include <string>
@@ -45,8 +43,7 @@ namespace synthese
 		/// Sent scenario instance class.
 		///	@ingroup m17
 		class SentScenario:
-			public Scenario,
-			public impex::ImportableTemplate<SentScenario>
+			public Scenario
 		{
 		public:
 			static const std::string DATA_NAME;
@@ -62,8 +59,6 @@ namespace synthese
 			static const std::string TAG_MESSAGE;
 			static const std::string TAG_TEMPLATE_SCENARIO;
 
-			/// Chosen registry class.
-			typedef util::Registry<SentScenario>	Registry;
 
 			////////////////////////////////////////////////////////////////////
 			/// Left : variable code

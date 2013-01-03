@@ -22,8 +22,6 @@ AlarmTableSync.cpp
 AlarmTableSync.h
 AlarmTemplate.cpp
 AlarmTemplate.h
-AlarmTemplateInheritedTableSync.cpp
-AlarmTemplateInheritedTableSync.h
 GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MessageAdmin.cpp
@@ -78,8 +76,6 @@ ScenarioFolderUpdateAction.cpp
 ScenarioFolderUpdateAction.h
 ScenarioSaveAction.cpp
 ScenarioSaveAction.h
-ScenarioSentAlarmInheritedTableSync.cpp
-ScenarioSentAlarmInheritedTableSync.h
 ScenariosListFunction.cpp
 ScenariosListFunction.hpp
 ScenarioStopAction.cpp
@@ -88,14 +84,10 @@ ScenarioTableSync.cpp
 ScenarioTableSync.h
 ScenarioTemplate.cpp
 ScenarioTemplate.h
-ScenarioTemplateInheritedTableSync.cpp
-ScenarioTemplateInheritedTableSync.h
 SentAlarm.cpp
 SentAlarm.h
 SentScenario.cpp
 SentScenario.h
-SentScenarioInheritedTableSync.cpp
-SentScenarioInheritedTableSync.h
 SimpleMessageCreationAction.cpp
 SimpleMessageCreationAction.hpp
 TextTemplate.cpp

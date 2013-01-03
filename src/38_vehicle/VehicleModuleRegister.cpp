@@ -37,11 +37,8 @@ void synthese::vehicle::moduleRegister()
 
 	// Factories
 
-	synthese::vehicle::CompositionTableSync::integrate();
-	synthese::util::FactorableTemplate<synthese::vehicle::CompositionTableSync, synthese::vehicle::ServiceCompositionInheritedTableSync>::integrate();
-	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::vehicle::ServiceCompositionInheritedTableSync>::integrate();
-	synthese::util::FactorableTemplate<synthese::vehicle::CompositionTableSync, synthese::vehicle::VehicleServiceCompositionInheritedTableSync>::integrate();
-	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::vehicle::VehicleServiceCompositionInheritedTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::vehicle::CompositionTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::vehicle::CompositionTableSync>::integrate();
 	synthese::vehicle::VehicleTableSync::integrate();
 	synthese::vehicle::VehiclePositionTableSync::integrate();
 

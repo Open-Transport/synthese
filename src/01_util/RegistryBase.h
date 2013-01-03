@@ -55,6 +55,13 @@ namespace synthese
 				RegistryKeyType key
 			) const = 0;
 
+			/** Adds an object to the registry.
+				@param ptr Shared pointer to the object to add
+				@throws RegistryKeyException if the key of the object is 0 or if the keys is already used in the registry
+			*/
+			virtual void addRegistrable(
+				const boost::shared_ptr<Registrable>& ptr
+			) = 0;
 		};
 	}
 }

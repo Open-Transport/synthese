@@ -160,7 +160,7 @@ namespace synthese
 
 
 		template<>
-		void DBDirectTableSyncTemplate<CommercialLineTableSync, CommercialLine>::Load(
+		void OldLoadSavePolicy<CommercialLineTableSync, CommercialLine>::Load(
 			CommercialLine* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -336,7 +336,7 @@ namespace synthese
 
 
 		template<>
-		void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
+		void OldLoadSavePolicy<CommercialLineTableSync,CommercialLine>::Unlink(
 			CommercialLine* obj
 		){
 			obj->setNullParent();
@@ -350,7 +350,7 @@ namespace synthese
 
 
 		template<>
-		void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Save(
+		void OldLoadSavePolicy<CommercialLineTableSync,CommercialLine>::Save(
 			CommercialLine* object,
 			optional<DBTransaction&> transaction
 		){

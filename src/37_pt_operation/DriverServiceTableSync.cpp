@@ -95,7 +95,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DriverServiceTableSync,DriverService>::Load(
+		template<> void OldLoadSavePolicy<DriverServiceTableSync,DriverService>::Load(
 			DriverService* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -135,7 +135,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DriverServiceTableSync,DriverService>::Save(
+		template<> void OldLoadSavePolicy<DriverServiceTableSync,DriverService>::Save(
 			DriverService* object,
 			optional<DBTransaction&> transaction
 		){
@@ -156,7 +156,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DriverServiceTableSync,DriverService>::Unlink(
+		template<> void OldLoadSavePolicy<DriverServiceTableSync,DriverService>::Unlink(
 			DriverService* obj
 		){
 			BOOST_FOREACH(const DriverService::Chunk& chunk, obj->getChunks())

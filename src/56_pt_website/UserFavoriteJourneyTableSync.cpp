@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Load(
+		template<> void OldLoadSavePolicy<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Load(
 			UserFavoriteJourney* object
 			, const db::DBResultSPtr& rows,
 			Env& env,
@@ -106,7 +106,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Save(
+		template<> void OldLoadSavePolicy<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Save(
 			UserFavoriteJourney* object,
 			optional<DBTransaction&> transaction
 		){
@@ -122,7 +122,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Unlink(
+		template<> void OldLoadSavePolicy<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Unlink(
 			UserFavoriteJourney* object
 		){
 			object->setUser(NULL);

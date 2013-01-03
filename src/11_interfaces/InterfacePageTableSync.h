@@ -26,7 +26,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <boost/optional.hpp>
 
@@ -39,7 +40,13 @@ namespace synthese
 		/** InterfacePageTableSync table synchronizer.
 			@ingroup m11LS refLS
 		*/
-		class InterfacePageTableSync : public db::DBRegistryTableSyncTemplate<InterfacePageTableSync,InterfacePage>
+		class InterfacePageTableSync:
+			public db::DBDirectTableSyncTemplate<
+				InterfacePageTableSync,
+				InterfacePage,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string TABLE_COL_INTERFACE;
@@ -51,7 +58,7 @@ namespace synthese
 
 			/** Interface page table sync constructor.
 			*/
-			InterfacePageTableSync();
+			InterfacePageTableSync() {}
 
 			static boost::shared_ptr<InterfacePage> GetNewObject(const db::DBResultSPtr& row);
 

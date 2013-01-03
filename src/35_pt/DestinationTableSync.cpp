@@ -87,7 +87,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DestinationTableSync,Destination>::Load(
+		template<> void OldLoadSavePolicy<DestinationTableSync,Destination>::Load(
 			Destination* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -106,7 +106,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DestinationTableSync,Destination>::Save(
+		template<> void OldLoadSavePolicy<DestinationTableSync,Destination>::Save(
 			Destination* object,
 			optional<DBTransaction&> transaction
 		){
@@ -123,7 +123,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DestinationTableSync,Destination>::Unlink(
+		template<> void OldLoadSavePolicy<DestinationTableSync,Destination>::Unlink(
 			Destination* obj
 		){
 		}

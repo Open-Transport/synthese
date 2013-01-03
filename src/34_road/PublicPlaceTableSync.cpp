@@ -75,42 +75,6 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Load(
-			PublicPlace* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Unlink(
-			PublicPlace* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Save(
-			PublicPlace* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
-
 		template<> bool DBTableSyncTemplate<PublicPlaceTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id

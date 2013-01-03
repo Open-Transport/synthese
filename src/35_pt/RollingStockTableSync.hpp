@@ -31,7 +31,8 @@
 #include <iostream>
 
 #include "RollingStock.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <boost/optional.hpp>
 
@@ -46,7 +47,13 @@ namespace synthese
 		/// @date 2007
 		//////////////////////////////////////////////////////////////////////////
 		/// See : RollingStock
-		class RollingStockTableSync : public db::DBRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>
+		class RollingStockTableSync:
+			public db::DBDirectTableSyncTemplate<
+				RollingStockTableSync,
+				RollingStock,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -58,7 +65,7 @@ namespace synthese
 			static const std::string COL_ENERGY_CONSUMPTION;
 			static const std::string COL_DATASOURCE_LINKS;
 
-			RollingStockTableSync();
+			RollingStockTableSync() {}
 
 
 			//////////////////////////////////////////////////////////////////////////

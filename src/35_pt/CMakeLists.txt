@@ -35,8 +35,6 @@ CopyGeometriesAction.cpp
 CopyGeometriesAction.hpp
 DesignatedLinePhysicalStop.cpp
 DesignatedLinePhysicalStop.hpp
-DesignatedLinePhysicalStopInheritedTableSync.cpp
-DesignatedLinePhysicalStopInheritedTableSync.hpp
 Destination.cpp
 Destination.hpp
 DestinationAdmin.cpp
@@ -47,8 +45,6 @@ DestinationTableSync.cpp
 DestinationTableSync.hpp
 DestinationUpdateAction.cpp
 DestinationUpdateAction.hpp
-DeviateServiceAction.cpp
-DeviateServiceAction.hpp
 DRTArea.cpp
 DRTArea.hpp
 DRTAreaAdmin.cpp
@@ -121,8 +117,6 @@ LineAlarmRecipient.cpp
 LineAlarmRecipient.hpp
 LineArea.cpp
 LineArea.hpp
-LineAreaInheritedTableSync.cpp
-LineAreaInheritedTableSync.hpp
 LineMarkerInterfacePage.cpp
 LineMarkerInterfacePage.h
 LinePhysicalStop.cpp

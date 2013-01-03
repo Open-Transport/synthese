@@ -28,7 +28,9 @@
 #include <string>
 #include <iostream>
 
-#include "DBConditionalRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "ConditionalSynchronizationPolicy.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "Reservation.h"
 
 namespace synthese
@@ -41,7 +43,12 @@ namespace synthese
 			@warning The load method does not update the transaction attribute. To do it, load the transaction first and load each reservation which belongs to it.
 		*/
 		class ReservationTableSync:
-			public db::DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>
+			public db::DBDirectTableSyncTemplate<
+				ReservationTableSync,
+				Reservation,
+				db::ConditionalSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_TRANSACTION_ID;

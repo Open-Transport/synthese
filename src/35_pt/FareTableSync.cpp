@@ -99,7 +99,7 @@ namespace synthese
 			return DBTableSync::Indexes();
 		}
 
-		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Load(
+		template<> void OldLoadSavePolicy<FareTableSync,Fare>::Load(
 			Fare* fare,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -122,7 +122,7 @@ namespace synthese
 			fare->setValidityPeriod(rows->getInt(FareTableSync::COL_VALIDITY_PERIOD));
 		}
 
-		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Save(
+		template<> void OldLoadSavePolicy<FareTableSync,Fare>::Save(
 			Fare* object,
 			optional<DBTransaction&> transaction
 		){
@@ -157,7 +157,7 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Unlink(Fare* obj)
+		template<> void OldLoadSavePolicy<FareTableSync,Fare>::Unlink(Fare* obj)
 		{
 		}
 

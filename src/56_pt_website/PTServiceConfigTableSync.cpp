@@ -70,40 +70,6 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<PTServiceConfigTableSync,PTServiceConfig>::Load(
-			PTServiceConfig* site,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(site->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			site->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				site->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<PTServiceConfigTableSync,PTServiceConfig>::Unlink(
-			PTServiceConfig* obj
-		){
-			obj->unlink();
-		}
-
-
-		template<> void DBDirectTableSyncTemplate<PTServiceConfigTableSync,PTServiceConfig>::Save(
-			PTServiceConfig* site,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*site, transaction);
-		}
-
-
 
 		template<> bool DBTableSyncTemplate<PTServiceConfigTableSync>::CanDelete(
 			const server::Session* session,

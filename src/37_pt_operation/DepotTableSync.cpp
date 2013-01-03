@@ -85,7 +85,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DepotTableSync,Depot>::Load(
+		template<> void OldLoadSavePolicy<DepotTableSync,Depot>::Load(
 			Depot* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -117,7 +117,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DepotTableSync,Depot>::Save(
+		template<> void OldLoadSavePolicy<DepotTableSync,Depot>::Save(
 			Depot* object,
 			optional<DBTransaction&> transaction
 		){
@@ -140,7 +140,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DepotTableSync,Depot>::Unlink(
+		template<> void OldLoadSavePolicy<DepotTableSync,Depot>::Unlink(
 			Depot* obj
 		){
 		}

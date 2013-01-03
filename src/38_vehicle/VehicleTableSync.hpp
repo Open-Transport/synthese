@@ -26,7 +26,8 @@
 #define SYNTHESE_VehicleTableSync_hpp__
 
 #include "Vehicle.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class VehicleTableSync:
-			public db::DBRegistryTableSyncTemplate<VehicleTableSync,Vehicle>
+			public db::DBDirectTableSyncTemplate<
+				VehicleTableSync,
+				Vehicle,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names
@@ -66,7 +72,7 @@ namespace synthese
 				///	@param parameterId optional ID of a foreign key to filter on (deactivated if undefined)
 				///	@param first First  object to answer
 				///	@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				///	@param orderByName The result records must be ordered by their name
+				///	@param orderByName The result reco	rds must be ordered by their name
 				///	@param raisingOrder The result records must be sorted ascendantly
 				///	@param linkLevel Level of links to build when reading foreign keys
 				///	@return Found objects.

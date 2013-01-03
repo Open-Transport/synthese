@@ -23,12 +23,11 @@
 #ifndef SYNTHESE_VDVClientTableSync_H__
 #define SYNTHESE_VDVClientTableSync_H__
 
+#include "DBDirectTableSyncTemplate.hpp"
 #include "VDVClient.hpp"
 
 #include <string>
 #include <iostream>
-
-#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -42,7 +41,7 @@ namespace synthese
 		/// @since 3.1.15
 		//////////////////////////////////////////////////////////////////////////
 		class VDVClientTableSync:
-			public db::DBRegistryTableSyncTemplate<VDVClientTableSync,VDVClient>
+			public db::DBDirectTableSyncTemplate<VDVClientTableSync, VDVClient>
 		{
 		public:
 			/** VDVClient search.

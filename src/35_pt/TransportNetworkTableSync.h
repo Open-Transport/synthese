@@ -28,7 +28,8 @@
 
 #include "TransportNetwork.h"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -40,8 +41,13 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @date 2006
 		//////////////////////////////////////////////////////////////////////////
-		class TransportNetworkTableSync
-		:	public db::DBRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>
+		class TransportNetworkTableSync:
+			public db::DBDirectTableSyncTemplate<
+				TransportNetworkTableSync,
+				TransportNetwork,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		 public:
 			static const std::string COL_NAME;

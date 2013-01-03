@@ -26,8 +26,9 @@
 #define SYNTHESE_DriverServiceTableSync_hpp__
 
 #include "DriverService.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "FetcherTemplate.h"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -40,7 +41,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.0
 		class DriverServiceTableSync:
-			public db::DBRegistryTableSyncTemplate<DriverServiceTableSync, DriverService>,
+			public db::DBDirectTableSyncTemplate<
+				DriverServiceTableSync,
+				DriverService,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>,
 			public db::FetcherTemplate<calendar::Calendar, DriverServiceTableSync>
 		{
 		public:

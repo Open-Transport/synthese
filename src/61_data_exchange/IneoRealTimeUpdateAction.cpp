@@ -40,11 +40,9 @@
 #include "LineStopTableSync.h"
 #include "ParametersMap.h"
 #include "Request.h"
-#include "ScenarioSentAlarmInheritedTableSync.h"
 #include "ScenarioTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "SentScenario.h"
-#include "SentScenarioInheritedTableSync.h"
 #include "StopPoint.hpp"
 
 using namespace boost;
@@ -140,7 +138,7 @@ namespace synthese
 			// Scenarios
 			set<RegistryKeyType> scenariosToRemove;
 			DataSource::Links::mapped_type existingScenarios(
-				_realTimeDataSource->getLinkedObjects<SentScenario>()
+				_realTimeDataSource->getLinkedObjects<Scenario>()
 			);
 			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingScenario, existingScenarios)
 			{
@@ -512,7 +510,11 @@ namespace synthese
 
 					shared_ptr<SentScenario> updatedScenario;
 					shared_ptr<SentAlarm> updatedMessage;
-					SentScenario* scenario(_realTimeDataSource->getObjectByCode<SentScenario>(lexical_cast<string>(programmation.ref)));
+					SentScenario* scenario(
+						static_cast<SentScenario*>(
+								_realTimeDataSource->getObjectByCode<Scenario>(
+							lexical_cast<string>(programmation.ref)
+					)	)	);
 					SentAlarm* message(NULL);
 					if(!scenario)
 					{
@@ -526,7 +528,7 @@ namespace synthese
 							lexical_cast<string>(programmation.ref)
 						);
 						updatedScenario->setIsEnabled(true);
-						updatesEnv.getEditableRegistry<SentScenario>().add(updatedScenario);
+						updatesEnv.getEditableRegistry<Scenario>().add(updatedScenario);
 
 						// Creation of the message
 						updatedMessage.reset(
@@ -537,7 +539,7 @@ namespace synthese
 						updatedScenario->addMessage(*updatedMessage);
 						scenario = updatedScenario.get();
 						message = updatedMessage.get();
-						updatesEnv.getEditableRegistry<SentAlarm>().add(updatedMessage);
+						updatesEnv.getEditableRegistry<Alarm>().add(updatedMessage);
 					}
 					else
 					{
@@ -562,7 +564,7 @@ namespace synthese
 							message->getShortMessage() != programmation.messageTitle ||
 							(message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
 						){
-							updatedMessage = ScenarioSentAlarmInheritedTableSync::GetEditable(
+							updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
 								message->getKey(),
 								updatesEnv
 							);
@@ -574,7 +576,7 @@ namespace synthese
 							scenario->getPeriodEnd() != programmation.endTime ||
 							scenario->getIsEnabled() != programmation.active
 						){
-							updatedScenario = SentScenarioInheritedTableSync::GetEditable(
+							updatedScenario = ScenarioTableSync::GetCastEditable<SentScenario>(
 								scenario->getKey(),
 								updatesEnv
 							);
@@ -794,7 +796,7 @@ namespace synthese
 										arretChn.type != "N"
 								)	);
 								jp->addEdge(*ls);
-								updatesEnv.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
+								updatesEnv.getEditableRegistry<LineStop>().add(ls);
 								++rank;
 							}
 						}

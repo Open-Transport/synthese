@@ -29,7 +29,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 #include <boost/optional.hpp>
@@ -43,7 +44,12 @@ namespace synthese
 		///	@ingroup m35LS refLS
 		///
 		class ContinuousServiceTableSync:
-			public db::DBRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>,
+			public db::DBDirectTableSyncTemplate<
+				ContinuousServiceTableSync,
+				ContinuousService,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>,
 			public db::FetcherTemplate<SchedulesBasedService, ContinuousServiceTableSync>,
 			public db::FetcherTemplate<calendar::Calendar, ContinuousServiceTableSync>
 		{

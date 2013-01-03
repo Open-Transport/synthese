@@ -61,17 +61,17 @@ namespace synthese
 			void rowsAdded(
 				db::DB* db,
 				const db::DBResultSPtr& rows
-			);
+			) const;
 
 			void rowsUpdated(
 				db::DB* db,
 				const db::DBResultSPtr& rows
-			);
+			) const;
 
 			void rowsRemoved(
 				db::DB* db,
 				const db::RowIdList& rowIds
-			);
+			) const;
 
 
 			static FieldsList GetFieldsList()

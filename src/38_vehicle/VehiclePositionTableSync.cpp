@@ -108,7 +108,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Load(
+		template<> void OldLoadSavePolicy<VehiclePositionTableSync,VehiclePosition>::Load(
 			VehiclePosition* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -192,7 +192,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Save(
+		template<> void OldLoadSavePolicy<VehiclePositionTableSync,VehiclePosition>::Save(
 			VehiclePosition* object,
 			optional<DBTransaction&> transaction
 		){
@@ -231,7 +231,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Unlink(
+		template<> void OldLoadSavePolicy<VehiclePositionTableSync,VehiclePosition>::Unlink(
 			VehiclePosition* obj
 		){
 			obj->setVehicle(NULL);

@@ -26,7 +26,7 @@
 
 #include "Profile.h"
 #include "ScenarioTemplate.h"
-#include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioTableSync.h"
 #include "Session.h"
 #include "User.h"
 #include "MessagesLibraryLog.h"
@@ -78,7 +78,7 @@ namespace synthese
 			{
 				try
 				{
-					_template = ScenarioTemplateInheritedTableSync::Get(*id, *_env);
+					_template = ScenarioTableSync::GetCast<ScenarioTemplate>(*id, *_env);
 				}
 				catch(...)
 				{
@@ -103,11 +103,17 @@ namespace synthese
 			// Name
 			_name = map.get<string>(PARAMETER_NAME);
 			if(_name.empty())
+			{
 				throw ActionException("Le scénario doit avoir un nom.");
+			}
 			Env env;
-			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1);
-			if (!env.getRegistry<ScenarioTemplate>().empty())
+			ScenarioTableSync::SearchResult r(
+				ScenarioTableSync::SearchTemplates(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1)
+			);
+			if (!r.empty())
+			{
 				throw ActionException("Un scénario de même nom existe déjà");
+			}
 		}
 
 
@@ -120,7 +126,7 @@ namespace synthese
 
 				ScenarioTableSync::Save(&scenario);
 
-				ScenarioTemplateInheritedTableSync::CopyMessagesFromOther(
+				ScenarioTableSync::CopyMessagesFromOther(
 					_template->getKey(), scenario
 				);
 

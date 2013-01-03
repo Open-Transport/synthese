@@ -25,6 +25,7 @@
 #include "CopyGeometriesAction.hpp"
 
 #include "ActionException.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Session.h"
@@ -32,7 +33,7 @@
 #include "User.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
-#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
+#include "LineStopTableSync.h"
 
 #include <geos/geom/LineString.h>
 
@@ -102,7 +103,11 @@ namespace synthese
 			RegistryKeyType templateId(map.getDefault<RegistryKeyType>(PARAMETER_EDGE_ID,0));
 			if(templateId) try
 			{
-				_edgeTemplate = DesignatedLinePhysicalStopInheritedTableSync::Get(templateId, *_env, UP_LINKS_LOAD_LEVEL);
+				_edgeTemplate = LineStopTableSync::GetCast<DesignatedLinePhysicalStop>(
+					templateId,
+					*_env,
+					UP_LINKS_LOAD_LEVEL
+				);
 				if(	_edgeTemplate->getFromVertex() != _startingStop.get() ||
 					!_edgeTemplate->getNext() ||
 					_edgeTemplate->getNext()->getFromVertex() != _endingStop.get()
@@ -128,9 +133,12 @@ namespace synthese
 		){
 			DBTransaction transaction;
 
-			DesignatedLinePhysicalStopInheritedTableSync::SearchResult edges(
-				DesignatedLinePhysicalStopInheritedTableSync::Search(*_env, _startingStop->getKey(), _endingStop->getKey())
-			);
+			LineStopTableSync::SearchResult edges(
+				LineStopTableSync::SearchByStops(
+					*_env,
+					_startingStop->getKey(),
+					_endingStop->getKey()
+			)	);
 
 			// Selection of the template geometry
 			shared_ptr<LineString> geom;
@@ -141,7 +149,7 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(const shared_ptr<DesignatedLinePhysicalStop>& edge, edges)
+				BOOST_FOREACH(const shared_ptr<LineStop>& edge, edges)
 				{
 					// The most detailed geometry is selected as template
 					if(edge->getGeometry().get() &&
@@ -154,7 +162,7 @@ namespace synthese
 
 			if(geom.get())
 			{
-				BOOST_FOREACH(const shared_ptr<DesignatedLinePhysicalStop>& edge, edges)
+				BOOST_FOREACH(const shared_ptr<LineStop>& edge, edges)
 				{
 					edge->setGeometry(geom);
 					LineStopTableSync::Save(edge.get(), transaction);

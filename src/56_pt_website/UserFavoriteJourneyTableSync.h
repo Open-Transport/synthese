@@ -26,7 +26,9 @@
 #define SYNTHESE_UserFavoriteJourneyTableSync_H__
 
 #include "UserFavoriteJourney.h"
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "NoSynchronizationPolicy.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -43,7 +45,12 @@ namespace synthese
 			@ingroup m56LS refLS
 		*/
 		class UserFavoriteJourneyTableSync:
-			public db::DBNoSyncTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>
+			public db::DBDirectTableSyncTemplate<
+				UserFavoriteJourneyTableSync,
+				UserFavoriteJourney,
+				db::NoSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_USER_ID;

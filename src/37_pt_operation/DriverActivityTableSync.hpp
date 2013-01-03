@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DriverActivityTableSync_H__
 #define SYNTHESE_DriverActivityTableSync_H__
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "DriverActivity.hpp"
 
 #include <string>
@@ -40,7 +40,10 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t085_driver_allocations
 		class DriverActivityTableSync:
-			public db::DBRegistryTableSyncTemplate<DriverActivityTableSync, DriverActivity>
+			public db::DBDirectTableSyncTemplate<
+				DriverActivityTableSync,
+				DriverActivity
+			>
 		{
 		public:
 			/** Driver allocation search.

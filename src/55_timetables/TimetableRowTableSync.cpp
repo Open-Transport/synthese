@@ -93,7 +93,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Load(
+		template<> void OldLoadSavePolicy<TimetableRowTableSync,TimetableRow>::Load(
 			TimetableRow* object
 			, const db::DBResultSPtr& rows,
 			Env& env,
@@ -126,7 +126,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Save(
+		template<> void OldLoadSavePolicy<TimetableRowTableSync,TimetableRow>::Save(
 			TimetableRow* object,
 			optional<DBTransaction&> transaction
 		){
@@ -142,7 +142,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Unlink(
+		template<> void OldLoadSavePolicy<TimetableRowTableSync,TimetableRow>::Unlink(
 			TimetableRow* obj
 		){
 		}

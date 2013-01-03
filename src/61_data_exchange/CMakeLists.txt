@@ -36,6 +36,8 @@ set(data_exchange_SRCS
   PTFileFormat.hpp
   RTMFileFormat.cpp
   RTMFileFormat.hpp
+  RSSFileFormat.cpp
+  RSSFileFormat.hpp
   ServicesCSVFileFormat.hpp
   ServicesCSVFileFormat.cpp
   StopsShapeFileFormat.cpp

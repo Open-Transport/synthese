@@ -25,7 +25,8 @@
 
 #include "MainRoadChunk.hpp"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -73,7 +74,12 @@ namespace synthese
 		///		<dt>road_id</dt><dd>id of the @ref road::RoadTableSync "road" which the chunk belongs to</dd>
 		///	</dl>
 		class RoadChunkTableSync:
-			public db::DBRegistryTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>
+			public db::DBDirectTableSyncTemplate<
+				RoadChunkTableSync,
+				MainRoadChunk,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			/** Road chunks table :

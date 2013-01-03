@@ -72,7 +72,7 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Load(
+		template<> void OldLoadSavePolicy<CityTableSync,City>::Load(
 			City* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -94,7 +94,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
+		template<> void OldLoadSavePolicy<CityTableSync,City>::Unlink(City* obj)
 		{
 			// Remove from cities matcher
 			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(obj));
@@ -117,7 +117,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Save(
+		template<> void OldLoadSavePolicy<CityTableSync,City>::Save(
 			City* object,
 			optional<DBTransaction&> transaction
 		){

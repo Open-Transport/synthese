@@ -102,7 +102,7 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Load(
+		template<> void OldLoadSavePolicy<DisplayScreenCPUTableSync,DisplayScreenCPU>::Load(
 			DisplayScreenCPU* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -125,14 +125,14 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<DisplayScreenCPU>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenCPUTableSync::COL_PLACE_ID + e.getMessage());
+					Log::GetInstance().warn("Data corrupted in " + DisplayScreenCPUTableSync::TABLE.NAME + "/" + DisplayScreenCPUTableSync::COL_PLACE_ID + e.getMessage());
 				}
 			}
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Save(
+		template<> void OldLoadSavePolicy<DisplayScreenCPUTableSync,DisplayScreenCPU>::Save(
 			DisplayScreenCPU* object,
 			optional<DBTransaction&> transaction
 		){
@@ -148,7 +148,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Unlink(
+		template<> void OldLoadSavePolicy<DisplayScreenCPUTableSync,DisplayScreenCPU>::Unlink(
 			DisplayScreenCPU* object
 		){
 			object->setPlace(NULL);

@@ -37,10 +37,6 @@ namespace synthese
 	using namespace util;
 
 
-	namespace util
-	{
-		template<> const string Registry<pt::LineArea>::KEY("LineArea");
-	}
 
 	namespace pt
 	{

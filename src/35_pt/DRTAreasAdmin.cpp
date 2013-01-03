@@ -153,9 +153,14 @@ namespace synthese
 				stream << t.col();
 
 				bool hasLine = false;
-				BOOST_FOREACH(Registry<LineArea>::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineArea>())
+				BOOST_FOREACH(Registry<LineStop>::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineStop>())
 				{
-					if(lineArea.second->getArea()->getKey() == it.first && lineArea.second->getLine())
+					if(!dynamic_cast<LineArea*>(lineArea.second.get()))
+					{
+						continue;
+					}
+					LineArea& la(static_cast<LineArea&>(*lineArea.second));
+					if(la.getArea()->getKey() == it.first && la.getLine())
 					{
 						hasLine = true;
 						break;

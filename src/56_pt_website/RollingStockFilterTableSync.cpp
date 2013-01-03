@@ -90,7 +90,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Load(
+		template<> void OldLoadSavePolicy<RollingStockFilterTableSync,RollingStockFilter>::Load(
 			RollingStockFilter* object
 			, const db::DBResultSPtr& rows
 			, util::Env& environment, util::LinkLevel linkLevel /* = util::UP_LINKS_LOAD_LEVEL */
@@ -153,7 +153,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Save(
+		template<> void OldLoadSavePolicy<RollingStockFilterTableSync,RollingStockFilter>::Save(
 			RollingStockFilter* object
 			, boost::optional<DBTransaction&> transaction /* = boost::optional<DBTransaction&> */
 		){
@@ -178,7 +178,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Unlink(
+		template<> void OldLoadSavePolicy<RollingStockFilterTableSync,RollingStockFilter>::Unlink(
 			RollingStockFilter* obj
 		){
 			if(obj->getSite())

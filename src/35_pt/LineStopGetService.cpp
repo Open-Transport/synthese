@@ -78,7 +78,7 @@ namespace synthese
 			{	// Load by id
 				try
 				{
-					_lineStop = Env::GetOfficialEnv().getRegistry<DesignatedLinePhysicalStop>().get(
+					_lineStop = Env::GetOfficialEnv().getCast<DesignatedLinePhysicalStop, LineStop>(
 						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 					);
 				}
@@ -110,7 +110,9 @@ namespace synthese
 							);
 
 							const Edge& edge(journeyPattern->findEdgeByVertex(stop.get()));
-							_lineStop = Env::GetOfficialEnv().getSPtr(static_cast<const DesignatedLinePhysicalStop*>(&edge));
+							_lineStop = static_pointer_cast<const DesignatedLinePhysicalStop, const LineStop>(
+								Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(&edge))
+							);
 						}
 						catch (ObjectNotFoundException<StopPoint>&)
 						{
@@ -132,7 +134,9 @@ namespace synthese
 								try
 								{
 									const Edge& edge(journeyPattern->findEdgeByVertex(itStop.second));
-									_lineStop = Env::GetOfficialEnv().getSPtr(static_cast<const DesignatedLinePhysicalStop*>(&edge));
+									_lineStop = static_pointer_cast<const DesignatedLinePhysicalStop, const LineStop>(
+										Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(&edge))
+									);
 									break;
 								}
 								catch (Path::VertexNotFoundException&)

@@ -28,7 +28,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -42,7 +43,12 @@ namespace synthese
 			- on delete : X
 		*/
 		class CityTableSync:
-			public db::DBRegistryTableSyncTemplate<CityTableSync,City>
+			public db::DBDirectTableSyncTemplate<
+				CityTableSync,
+				City,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;

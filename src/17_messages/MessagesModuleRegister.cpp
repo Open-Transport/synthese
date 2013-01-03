@@ -9,11 +9,6 @@
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
 
-#include "SentScenarioInheritedTableSync.h"
-#include "ScenarioTemplateInheritedTableSync.h"
-#include "AlarmTemplateInheritedTableSync.h"
-#include "ScenarioSentAlarmInheritedTableSync.h"
-
 #include "MessagesAdmin.h"
 #include "MessageAdmin.h"
 #include "MessagesScenarioAdmin.h"
@@ -48,14 +43,12 @@
 
 // Registries
 #include "AlarmObjectLink.h"
-#include "AlarmTemplate.h"
 #include "MessageAlternative.hpp"
 #include "MessagesTypes.h"
-#include "SentAlarm.h"
+#include "Alarm.h"
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
-#include "ScenarioTemplate.h"
-#include "SentScenario.h"
+#include "Scenario.h"
 
 
 #include "MessagesModule.inc.cpp"
@@ -72,11 +65,6 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioFolderTableSync::integrate();
 	synthese::messages::ScenarioTableSync::integrate();
 	synthese::messages::TextTemplateTableSync::integrate();
-
-	synthese::messages::SentScenarioInheritedTableSync::integrate();
-	synthese::messages::ScenarioTemplateInheritedTableSync::integrate();
-	synthese::messages::AlarmTemplateInheritedTableSync::integrate();
-	synthese::messages::ScenarioSentAlarmInheritedTableSync::integrate();
 
 	synthese::messages::MessagesAdmin::integrate();
 	synthese::messages::MessageAdmin::integrate();
@@ -111,12 +99,10 @@ void synthese::messages::moduleRegister()
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
-	synthese::util::Env::Integrate<synthese::messages::AlarmTemplate>();
 	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
 	synthese::util::Env::Integrate<synthese::messages::MessageType>();
-	synthese::util::Env::Integrate<synthese::messages::SentAlarm>();
+	synthese::util::Env::Integrate<synthese::messages::Alarm>();
 	synthese::util::Env::Integrate<synthese::messages::TextTemplate>();
 	synthese::util::Env::Integrate<synthese::messages::ScenarioFolder>();
-	synthese::util::Env::Integrate<synthese::messages::ScenarioTemplate>();
-	synthese::util::Env::Integrate<synthese::messages::SentScenario>();
+	synthese::util::Env::Integrate<synthese::messages::Scenario>();
 }

@@ -83,7 +83,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Load(
+		template<>
+		void OldLoadSavePolicy<InterfacePageTableSync,InterfacePage>::Load(
 			InterfacePage* page,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -109,7 +110,7 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<Interface>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + InterfacePageTableSync::TABLE_COL_INTERFACE, e);
+					Log::GetInstance().warn("Data corrupted in " + InterfacePageTableSync::TABLE.NAME + "/" + InterfacePageTableSync::TABLE_COL_INTERFACE, e);
 				}
 			}
 			page->setSource(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
@@ -117,7 +118,8 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Save(
+		template<>
+		void OldLoadSavePolicy<InterfacePageTableSync,InterfacePage>::Save(
 			InterfacePage* page,
 			optional<DBTransaction&> transaction
 		){
@@ -132,7 +134,8 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<InterfacePageTableSync, InterfacePage>::Unlink(
+		template<>
+		void OldLoadSavePolicy<InterfacePageTableSync, InterfacePage>::Unlink(
 			InterfacePage* obj
 		){
 			if (obj->getInterface() != NULL)
@@ -185,13 +188,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		InterfacePageTableSync::InterfacePageTableSync()
-			: DBRegistryTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
-		{
-		}
-
-
-
 		boost::shared_ptr<InterfacePage> InterfacePageTableSync::GetNewObject(
 			const DBResultSPtr& row
 		){

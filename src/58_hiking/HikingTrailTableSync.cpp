@@ -92,7 +92,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Load(
+		template<> void OldLoadSavePolicy<HikingTrailTableSync,HikingTrail>::Load(
 			HikingTrail* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -131,7 +131,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Save(
+		template<> void OldLoadSavePolicy<HikingTrailTableSync,HikingTrail>::Save(
 			HikingTrail* object,
 			optional<DBTransaction&> transaction
 		){
@@ -158,7 +158,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Unlink(
+		template<> void OldLoadSavePolicy<HikingTrailTableSync,HikingTrail>::Unlink(
 			HikingTrail* obj
 		){
 		}

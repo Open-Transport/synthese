@@ -30,7 +30,6 @@
 #include "MessagesModule.h"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
-#include "SentScenarioInheritedTableSync.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
 #include "MessagesRight.h"
@@ -40,13 +39,11 @@
 #include "DBLogModule.h"
 #include "ScenarioFolder.h"
 #include "ScenarioFolderTableSync.h"
-#include "ScenarioTemplateInheritedTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "MessagesTypes.h"
 #include "DataSourceTableSync.h"
 #include "ImportableTableSync.hpp"
-#include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmRecipient.h"
 #include "ImportableAdmin.hpp"
 
@@ -129,8 +126,8 @@ namespace synthese
 					{
 						_dataSourceLinkId = map.get<string>(PARAMETER_SCENARIO_ID);
 
-						ImportableTableSync::ObjectBySource<SentScenarioInheritedTableSync> scenarios(*_scenarioDataSource, *_env);
-						ImportableTableSync::ObjectBySource<SentScenarioInheritedTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
+						ImportableTableSync::ObjectBySource<ScenarioTableSync> scenarios(*_scenarioDataSource, *_env);
+						ImportableTableSync::ObjectBySource<ScenarioTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
 						if(!scenarioSet.empty())
 						{
 							_scenario = _env->getEditableSPtr(*scenarioSet.begin());
@@ -159,7 +156,7 @@ namespace synthese
 						{
 							try
 							{
-								_template = ScenarioTemplateInheritedTableSync::Get(
+								_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
 									map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
 									*_env
 								);
@@ -200,8 +197,16 @@ namespace synthese
 							throw ActionException("Le scénario doit avoir un nom.");
 						}
 						Env env;
-						ScenarioTemplateInheritedTableSync::Search(env, _tscenario->getFolder() ? _tscenario->getFolder()->getKey() : 0, _tscenario->getName(), NULL, 0, 1);
-						if (!env.getRegistry<ScenarioTemplate>().empty())
+						ScenarioTableSync::SearchResult r(
+							ScenarioTableSync::SearchTemplates(
+								env,
+								_tscenario->getFolder() ? _tscenario->getFolder()->getKey() : 0,
+								_tscenario->getName(),
+								NULL,
+								0,
+								1
+						)	);
+						if (!r.empty())
 						{
 							throw ActionException("Un scénario de même nom existe déjà");
 						}
@@ -216,7 +221,7 @@ namespace synthese
 						{
 							try
 							{
-								_source = SentScenarioInheritedTableSync::Get(
+								_source = ScenarioTableSync::GetCast<SentScenario>(
 									map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
 									*_env,
 									UP_LINKS_LOAD_LEVEL
@@ -235,7 +240,7 @@ namespace synthese
 							// Copy of a template
 							try
 							{
-								_template = ScenarioTemplateInheritedTableSync::Get(
+								_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
 									map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
 									*_env,
 									UP_LINKS_LOAD_LEVEL
@@ -390,15 +395,16 @@ namespace synthese
 
 						// Uniqueness check
 						Env env;
-						ScenarioTemplateInheritedTableSync::Search(
-							env,
-							folderId,
-							_name ? *_name : _scenario->getName(),
-							dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(),
-							0,
-							1
-						);
-						if (!env.getRegistry<ScenarioTemplate>().empty())
+						ScenarioTableSync::SearchResult r(
+							ScenarioTableSync::SearchTemplates(
+								env,
+								folderId,
+								_name ? *_name : _scenario->getName(),
+								dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(),
+								0,
+								1
+						)	);
+						if(	!r.empty())
 						{
 							throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
 						}
@@ -409,8 +415,8 @@ namespace synthese
 				if(_sscenario.get())
 				{
 					// Load of existing messages
-					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
-						ScenarioSentAlarmInheritedTableSync::Search(
+					AlarmTableSync::SearchResult alarms(
+						AlarmTableSync::Search(
 							*_env,
 							_sscenario->getKey(),
 							0,
@@ -418,7 +424,7 @@ namespace synthese
 					)	);
 					if(alarms.size() == 1)
 					{
-						_message = *alarms.begin();
+						_message = static_pointer_cast<SentAlarm, Alarm>(*alarms.begin());
 					}
 
 					// Importable
@@ -633,7 +639,7 @@ namespace synthese
 					_sscenario->setVariables(values);
 					if(!values.empty())
 					{
-						SentScenarioInheritedTableSync::WriteVariablesIntoMessages(*_sscenario);
+						ScenarioTableSync::WriteVariablesIntoMessages(*_sscenario);
 					}
 				}
 
@@ -649,7 +655,7 @@ namespace synthese
 				{
 					if(_source.get())
 					{
-						SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
+						ScenarioTableSync::CopyMessagesFromTemplate(
 							_source->getTemplate() ? _source->getTemplate()->getKey() : _source->getKey(),
 							*_sscenario
 						);
@@ -657,7 +663,7 @@ namespace synthese
 					else if(_template.get())
 					{
 						// The action on the alarms
-						SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
+						ScenarioTableSync::CopyMessagesFromTemplate(
 							_template->getKey(),
 							*_sscenario
 						);
@@ -665,7 +671,7 @@ namespace synthese
 				}
 				else
 				{
-					ScenarioTemplateInheritedTableSync::CopyMessagesFromOther(
+					ScenarioTableSync::CopyMessagesFromOther(
 						_template->getKey(),
 						*_tscenario
 					);
@@ -675,13 +681,13 @@ namespace synthese
 			{
 				shared_ptr<SentAlarm> message;
 
-				ScenarioSentAlarmInheritedTableSync::SearchResult msgs(
-					ScenarioSentAlarmInheritedTableSync::Search(
+				AlarmTableSync::SearchResult msgs(
+					AlarmTableSync::Search(
 						*_env, _sscenario->getKey()
 				)	);
 				if(msgs.size() == 1)
 				{
-					message = msgs.front();
+					message = static_pointer_cast<SentAlarm,Alarm>(msgs.front());
 					if(_recipients)
 					{
 						AlarmObjectLinkTableSync::Remove(message->getKey());
@@ -797,7 +803,7 @@ namespace synthese
 
 					if(msg.id)
 					{
-						alarm = ScenarioSentAlarmInheritedTableSync::GetEditable(msg.id, env);
+						alarm = AlarmTableSync::GetCastEditable<SentAlarm>(msg.id, env);
 					}
 					else
 					{

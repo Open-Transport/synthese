@@ -27,7 +27,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 			@ingroup m31LS refLS
 		*/
 		class CalendarLinkTableSync:
-			public db::DBRegistryTableSyncTemplate<CalendarLinkTableSync, CalendarLink>
+			public db::DBDirectTableSyncTemplate<
+				CalendarLinkTableSync,
+				CalendarLink,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_SERVICE_ID;

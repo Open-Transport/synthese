@@ -145,9 +145,10 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ReservationTableSync,Reservation>::Load(
-			Reservation* object
-			, const db::DBResultSPtr& rows,
+		template<>
+		void OldLoadSavePolicy<ReservationTableSync,Reservation>::Load(
+			Reservation* object,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -296,7 +297,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object)
+		template<>
+		void OldLoadSavePolicy<ReservationTableSync,Reservation>::Unlink(Reservation* object)
 		{
 			// Indexation (at first to avoid use of incomplete reservations in other threads)
 			ResaModule::RemoveReservationByService(*object);
@@ -310,7 +312,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ReservationTableSync,Reservation>::Save(
+		template<>
+		void OldLoadSavePolicy<ReservationTableSync,Reservation>::Save(
 			Reservation* object,
 			optional<DBTransaction&> transaction
 		){
@@ -381,12 +384,12 @@ namespace synthese
 
 
 		template<>
-		const bool DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::NEEDS_AUTO_RELOAD = true;
+		const bool ConditionalSynchronizationPolicy<ReservationTableSync, Reservation>::NEEDS_AUTO_RELOAD = true;
 
 
 
 		template<>
-		bool DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::IsLoaded(
+		bool ConditionalSynchronizationPolicy<ReservationTableSync, Reservation>::IsLoaded(
 			const DBResultSPtr& row
 		){
 			// Getting current time
@@ -413,7 +416,7 @@ namespace synthese
 
 
 		template<>
-		bool DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::IsLoaded(
+		bool ConditionalSynchronizationPolicy<ReservationTableSync, Reservation>::IsLoaded(
 			const Reservation& reservation
 		){
 			// Getting current time
@@ -434,7 +437,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Generates the SQL expression filtering the record to load.
 		template<>
-		shared_ptr<SQLExpression> DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::GetWhereLoaded()
+		shared_ptr<SQLExpression> ConditionalSynchronizationPolicy<ReservationTableSync, Reservation>::GetWhereLoaded()
 		{
 
 			// Getting current time

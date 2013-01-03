@@ -99,9 +99,14 @@ namespace synthese
 				if(_stops->empty())
 				{
 					bool hasLine = false;
-					BOOST_FOREACH(Registry<LineArea>::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineArea>())
+					BOOST_FOREACH(Registry<LineStop>::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineStop>())
 					{
-						if(lineArea.second->getArea()->getKey() == _area->getKey() && lineArea.second->getLine())
+						if(!dynamic_cast<LineArea*>(lineArea.second.get()))
+						{
+							continue;
+						}
+						LineArea& la(static_cast<LineArea&>(*lineArea.second));
+						if(la.getArea()->getKey() == _area->getKey() && la.getLine())
 						{
 							hasLine = true;
 							break;

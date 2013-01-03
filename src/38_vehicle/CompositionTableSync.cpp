@@ -56,11 +56,8 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,CompositionTableSync>::FACTORY_KEY("37.11 Compositions");
-		template<> const string FactorableTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync>::FACTORY_KEY("ServiceCompositionInheritedTableSync");
-		template<> const string FactorableTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY("VehicleServiceCompositionInheritedTableSync");
-		template<> const string FactorableTemplate<Fetcher<Calendar>, ServiceCompositionInheritedTableSync>::FACTORY_KEY("70.1");
-		template<> const string FactorableTemplate<Fetcher<Calendar>, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY("70.2");
+		template<> const string FactorableTemplate<DBTableSync, CompositionTableSync>::FACTORY_KEY("37.11 Compositions");
+		template<> const string FactorableTemplate<Fetcher<Calendar>, CompositionTableSync>::FACTORY_KEY("70.1");
 	}
 
 	namespace vehicle
@@ -113,28 +110,19 @@ namespace synthese
 
 
 		template<>
-		string DBInheritanceTableSyncTemplate<CompositionTableSync,Composition>::_GetSubClassKey(const DBResultSPtr& row)
-		{
+		shared_ptr<Composition> InheritanceLoadSavePolicy<CompositionTableSync,Composition>::GetNewObject(
+			const DBResultSPtr& row
+		){
 			return row->getLongLong(CompositionTableSync::COL_SERVICE_ID) ?
-				FactorableTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync>::FACTORY_KEY :
-				FactorableTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY
+				shared_ptr<Composition>(new ServiceComposition(row->getKey())) :
+				shared_ptr<Composition>(new VehicleServiceComposition(row->getKey()))
 			;
 		}
 
 
 
 		template<>
-		string DBInheritanceTableSyncTemplate<CompositionTableSync, Composition>::_GetSubClassKey(const Composition* obj)
-		{
-			return	(dynamic_cast<const ServiceComposition*>(obj) != NULL) ?
-				FactorableTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync>::FACTORY_KEY :
-				FactorableTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY
-			;
-		}
-
-
-
-		template<> void DBInheritanceTableSyncTemplate<CompositionTableSync, Composition>::_CommonLoad(
+		void InheritanceLoadSavePolicy<CompositionTableSync, Composition>::Load(
 			Composition* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -149,6 +137,78 @@ namespace synthese
 				object->setVehicles(
 					CompositionTableSync::UnserializeVehicles(rows->getText(CompositionTableSync::COL_VEHICLES), env, linkLevel)
 				);
+			}
+
+			if(dynamic_cast<ServiceComposition*>(object))
+			{
+				ServiceComposition& serviceComposition(static_cast<ServiceComposition&>(*object));
+
+				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+				{
+					// Service
+					RegistryKeyType serviceId(rows->getLongLong(CompositionTableSync::COL_SERVICE_ID));
+					if(serviceId > 0)
+					{
+						try
+						{
+							serviceComposition.setService(ScheduledServiceTableSync::GetEditable(serviceId, env, linkLevel).get());
+						}
+						catch(ObjectNotFoundException<ScheduledService>&)
+						{
+							Log::GetInstance().warn("No such service "+ lexical_cast<string>(serviceId) +" in Composition "+ lexical_cast<string>(object->getKey()));
+						}
+						VehicleModule::RegisterComposition(serviceComposition);
+					}
+
+					// Vertices
+					SchedulesBasedService::ServedVertices vertices;
+					if(rows->getText(CompositionTableSync::COL_SERVED_VERTICES).empty())
+					{
+						BOOST_FOREACH(const Path::Edges::value_type& edge, serviceComposition.getService()->getPath()->getEdges())
+						{
+							vertices.push_back(edge->getFromVertex());
+						}
+					}
+					else
+					{
+						vector<string> verticesString;
+						string text(rows->getText(CompositionTableSync::COL_SERVED_VERTICES));
+						if(!text.empty())
+						{
+							split(verticesString, text, is_any_of(","));
+							BOOST_FOREACH(const string& vertexString, verticesString)
+							{
+								vertices.push_back(
+									StopPointTableSync::GetEditable(lexical_cast<RegistryKeyType>(vertexString), env, linkLevel).get()
+								);
+							}
+						}
+					}
+					serviceComposition.setServedVertices(vertices);
+				}
+			}
+			else if(dynamic_cast<VehicleServiceComposition*>(object))
+			{
+				VehicleServiceComposition& vehicleServiceComposition(static_cast<VehicleServiceComposition&>(*object));
+
+				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+				{
+					// Vehicle Service
+					RegistryKeyType vehicleServiceId(rows->getLongLong(CompositionTableSync::COL_VEHICLE_SERVICE_ID));
+					if(vehicleServiceId > 0)
+					{
+						try
+						{
+							vehicleServiceComposition.setVehicleService(
+								VehicleServiceTableSync::GetEditable(vehicleServiceId, env, linkLevel).get()
+							);
+						}
+						catch(ObjectNotFoundException<VehicleService>&)
+						{
+							Log::GetInstance().warn("No such vehicle service "+ lexical_cast<string>(vehicleServiceId) +" in Composition "+ lexical_cast<string>(object->getKey()));
+						}
+					}
+				}
 			}
 		}
 
@@ -190,164 +250,78 @@ namespace synthese
 
 
 		template<>
-		void DBInheritedTableSyncTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync, ServiceComposition>::Load(
-			ServiceComposition* object,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
+		void InheritanceLoadSavePolicy<CompositionTableSync, Composition>::Unlink(
+			Composition* obj
 		){
-			_CommonLoad(object, rows, env, linkLevel);
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			if(dynamic_cast<VehicleServiceComposition*>(obj))
 			{
-				// Service
-				RegistryKeyType serviceId(rows->getLongLong(CompositionTableSync::COL_SERVICE_ID));
-				if(serviceId > 0)
-				{
-					try
-					{
-						object->setService(ScheduledServiceTableSync::GetEditable(serviceId, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<ScheduledService>&)
-					{
-						Log::GetInstance().warn("No such service "+ lexical_cast<string>(serviceId) +" in Composition "+ lexical_cast<string>(object->getKey()));
-					}
-					VehicleModule::RegisterComposition(*object);
-				}
+				VehicleServiceComposition& vsc(dynamic_cast<VehicleServiceComposition&>(*obj));
+
+				//PTOperationModule::UnregisterComposition(vsc);
+				vsc.setVehicleService(NULL);
+				vsc.setVehicles(Composition::VehicleLinks());
+			}
+			else if(dynamic_cast<ServiceComposition*>(obj))
+			{
+				ServiceComposition& sc(dynamic_cast<ServiceComposition&>(*obj));
+
+				VehicleModule::UnregisterComposition(sc);
+				sc.setService(NULL);
+				sc.setVehicles(Composition::VehicleLinks());
+				sc.setServedVertices(SchedulesBasedService::ServedVertices());
+			}
+		}
+
+
+
+		template<>
+		void InheritanceLoadSavePolicy<CompositionTableSync, Composition>::Save(
+			Composition* object,
+			optional<DBTransaction&> transaction
+		){
+			ReplaceQuery<CompositionTableSync> query(*object);
+
+			// Dates
+			stringstream datesString;
+			object->serialize(datesString);
+
+			if(dynamic_cast<ServiceComposition*>(object))
+			{
+				ServiceComposition& sc(static_cast<ServiceComposition&>(*object));
 
 				// Vertices
-				SchedulesBasedService::ServedVertices vertices;
-				if(rows->getText(CompositionTableSync::COL_SERVED_VERTICES).empty())
+				stringstream verticesString;
+				bool firstVertex(true);
+				BOOST_FOREACH(const SchedulesBasedService::ServedVertices::value_type& vertex, sc.getServedVertices())
 				{
-					BOOST_FOREACH(const Path::Edges::value_type& edge, object->getService()->getPath()->getEdges())
+					if(firstVertex)
 					{
-						vertices.push_back(edge->getFromVertex());
+						firstVertex = false;
 					}
-				}
-				else
-				{
-					vector<string> verticesString;
-					string text(rows->getText(CompositionTableSync::COL_SERVED_VERTICES));
-					if(!text.empty())
+					else
 					{
-						split(verticesString, text, is_any_of(","));
-						BOOST_FOREACH(const string& vertexString, verticesString)
-						{
-							vertices.push_back(
-								StopPointTableSync::GetEditable(lexical_cast<RegistryKeyType>(vertexString), env, linkLevel).get()
-							);
-						}
+						verticesString << ",";
 					}
+					verticesString << vertex->getKey();
 				}
-				object->setServedVertices(vertices);
+
+				query.addField(sc.getService() ? sc.getService()->getKey() : RegistryKeyType(0));
+				query.addField(0);
+				query.addField(CompositionTableSync::SerializeVehicles(sc.getVehicles()));
+				query.addField(datesString.str());
+				query.addField(verticesString.str());
 			}
-		}
-
-
-
-		template<>
-		void DBInheritedTableSyncTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync, VehicleServiceComposition>::Load(
-			VehicleServiceComposition* object,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			_CommonLoad(object, rows, env, linkLevel);
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			else if(dynamic_cast<VehicleServiceComposition*>(object))
 			{
-				// Vehicle Service
-				RegistryKeyType vehicleServiceId(rows->getLongLong(CompositionTableSync::COL_VEHICLE_SERVICE_ID));
-				if(vehicleServiceId > 0)
-				{
-					try
-					{
-						object->setVehicleService(VehicleServiceTableSync::GetEditable(vehicleServiceId, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<VehicleService>&)
-					{
-						Log::GetInstance().warn("No such vehicle service "+ lexical_cast<string>(vehicleServiceId) +" in Composition "+ lexical_cast<string>(object->getKey()));
-					}
-				}
-			}
-		}
+				VehicleServiceComposition& vsc(static_cast<VehicleServiceComposition&>(*object));
 
-
-
-
-		template<>
-		void DBInheritedTableSyncTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync, ServiceComposition>::Unlink(
-			ServiceComposition* obj
-		){
-			VehicleModule::UnregisterComposition(*obj);
-			obj->setService(NULL);
-			obj->setVehicles(Composition::VehicleLinks());
-			obj->setServedVertices(SchedulesBasedService::ServedVertices());
-		}
-
-
-
-		template<>
-		void DBInheritedTableSyncTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync, VehicleServiceComposition>::Unlink(
-			VehicleServiceComposition* obj
-		){
-			//PTOperationModule::UnregisterComposition(*obj);
-			obj->setVehicleService(NULL);
-			obj->setVehicles(Composition::VehicleLinks());
-		}
-
-
-
-		template<>
-		void DBInheritedTableSyncTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync, ServiceComposition>::Save(
-			ServiceComposition* object,
-			optional<DBTransaction&> transaction
-		){
-			// Dates
-			stringstream datesString;
-			object->serialize(datesString);
-
-			// Vertices
-			stringstream verticesString;
-			bool firstVertex(true);
-			BOOST_FOREACH(const SchedulesBasedService::ServedVertices::value_type& vertex, object->getServedVertices())
-			{
-				if(firstVertex)
-				{
-					firstVertex = false;
-				}
-				else
-				{
-					verticesString << ",";
-				}
-				verticesString << vertex->getKey();
+				query.addField(0);
+				query.addField(vsc.getVehicleService() ? vsc.getVehicleService()->getKey() : RegistryKeyType(0));
+				query.addField(CompositionTableSync::SerializeVehicles(vsc.getVehicles()));
+				query.addField(datesString.str());
+				query.addField(string());
 			}
 
-			ReplaceQuery<CompositionTableSync> query(*object);
-			query.addField(object->getService() ? object->getService()->getKey() : RegistryKeyType(0));
-			query.addField(0);
-			query.addField(CompositionTableSync::SerializeVehicles(object->getVehicles()));
-			query.addField(datesString.str());
-			query.addField(verticesString.str());
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void DBInheritedTableSyncTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync, VehicleServiceComposition>::Save(
-			VehicleServiceComposition* object,
-			optional<DBTransaction&> transaction
-		){
-			// Dates
-			stringstream datesString;
-			object->serialize(datesString);
-
-			ReplaceQuery<CompositionTableSync> query(*object);
-			query.addField(0);
-			query.addField(object->getVehicleService() ? object->getVehicleService()->getKey() : RegistryKeyType(0));
-			query.addField(CompositionTableSync::SerializeVehicles(object->getVehicles()));
-			query.addField(datesString.str());
-			query.addField(string());
 			query.execute(transaction);
 		}
 	}

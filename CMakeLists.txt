@@ -96,6 +96,10 @@ if(WIN32)
   add_definitions(/bigobj)
 
   # This is to avoid:
+  # error C2471: cannot update program database
+  add_definitions(/Z7)
+
+  # This is to avoid:
   # warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
   add_definitions(/wd4290)
 

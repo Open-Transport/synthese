@@ -26,11 +26,6 @@ using namespace std;
 
 namespace synthese
 {
-	namespace util
-	{
-		template<> const string Registry<pt::DesignatedLinePhysicalStop>::KEY("DesignatedLinePhysicalStop");
-	}
-
 	namespace pt
 	{
 		DesignatedLinePhysicalStop::DesignatedLinePhysicalStop(

@@ -258,21 +258,20 @@ namespace synthese
 			virtual void rowsAdded(
 				DB* db,
 				const DBResultSPtr& rows
-			) = 0;
+			) const = 0;
 
 			virtual void rowsUpdated(
 				DB* db,
 				const DBResultSPtr& rows
-			) = 0;
+			) const = 0;
 
 			virtual void rowsRemoved(
 				DB* db,
 				const RowIdList& rowIds
-			) = 0;
+			) const = 0;
 
 			virtual util::RegistryKeyType getNewId() const = 0;
 
-			virtual bool getNeedsToReload() const { return false; }
 
 
 			////////////////////////////////////////////////////////////////////

@@ -60,7 +60,7 @@ namespace synthese
 	*/
 	namespace db
 	{
-		class DBConditionalRegistryTableSync;
+		class ConditionalSynchronizationPolicyBase;
 		class DBTableSync;
 		class DBTransaction;
 
@@ -79,7 +79,7 @@ namespace synthese
 			typedef std::map<util::RegistryKeyType, std::string> SubClassMap;
 			typedef std::map<std::string, boost::shared_ptr<DBTableSync> > TablesByNameMap;
 			typedef std::map<util::RegistryTableType, boost::shared_ptr<DBTableSync> > TablesByIdMap;
-			typedef std::set<boost::shared_ptr<DBConditionalRegistryTableSync> > ConditionalTableSyncsToReload;
+			typedef std::set<boost::shared_ptr<ConditionalSynchronizationPolicyBase> > ConditionalTableSyncsToReload;
 
 			static const std::string PARAMETER_NODE_ID;
 

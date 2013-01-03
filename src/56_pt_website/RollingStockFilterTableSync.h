@@ -30,7 +30,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -42,7 +43,12 @@ namespace synthese
 			@ingroup m56LS refLS
 		*/
 		class RollingStockFilterTableSync :
-			public db::DBRegistryTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>
+			public db::DBDirectTableSyncTemplate<
+				RollingStockFilterTableSync,
+				RollingStockFilter,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_SITE_ID;

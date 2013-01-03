@@ -57,42 +57,6 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<MessageTypeTableSync,MessageType>::Load(
-			MessageType* website,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(website->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			website->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				website->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<MessageTypeTableSync,MessageType>::Unlink(
-			MessageType* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<MessageTypeTableSync,MessageType>::Save(
-			MessageType* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
-
 		template<> bool DBTableSyncTemplate<MessageTypeTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
@@ -129,7 +93,6 @@ namespace synthese
 
 	namespace messages
 	{
-
 		MessageTypeTableSync::SearchResult MessageTypeTableSync::Search(
 			Env& env,
 			std::string name

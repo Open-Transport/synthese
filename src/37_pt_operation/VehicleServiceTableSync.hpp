@@ -26,7 +26,8 @@
 #define SYNTHESE_VehicleServiceTableSync_hpp__
 
 #include "VehicleService.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class VehicleServiceTableSync:
-			public db::DBRegistryTableSyncTemplate<VehicleServiceTableSync,VehicleService>
+			public db::DBDirectTableSyncTemplate<
+				VehicleServiceTableSync,
+				VehicleService,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

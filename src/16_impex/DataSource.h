@@ -33,6 +33,7 @@
 
 #include <vector>
 #include <string>
+#include <boost/date_time/time_duration.hpp>
 #include <boost/foreach.hpp>
 
 namespace synthese
@@ -94,6 +95,7 @@ namespace synthese
 			std::string	_charset;
 			const CoordinatesSystem* _coordinatesSystem;
 			std::string _defaultImportRequest;
+			boost::posix_time::time_duration _autoImportDelay;
 
 			mutable Links _links;
 
@@ -112,6 +114,7 @@ namespace synthese
 				const std::string& getCharset() const { return _charset; }
 				const CoordinatesSystem* getCoordinatesSystem() const { return _coordinatesSystem; }
 				const std::string& getDefaultImportRequest() const { return _defaultImportRequest; }
+				const boost::posix_time::time_duration getAutoImportDelay() const { return _autoImportDelay; }
 			//@}
 
 			//! @name Setters
@@ -122,6 +125,7 @@ namespace synthese
 				void setCharset(const std::string& value) { _charset = value; }
 				void setCoordinatesSystem(const CoordinatesSystem* value){ _coordinatesSystem = value; }
 				void setDefaultImportRequest(const std::string& value){ _defaultImportRequest = value; }
+				void setAutoImportDelay(const boost::posix_time::time_duration& value){ _autoImportDelay = value; }
 			//@}
 
 			//! @name Modifiers

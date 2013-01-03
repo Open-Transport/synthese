@@ -85,7 +85,10 @@ namespace synthese
 			return DBTableSync::Indexes();
 		}
 
-		template<> void DBDirectTableSyncTemplate<ProfileTableSync,Profile>::Load(
+
+
+		template<>
+		void OldLoadSavePolicy<ProfileTableSync,Profile>::Load(
 			Profile* profile,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -105,7 +108,7 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<Profile>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + ProfileTableSync::TABLE_COL_PARENT_ID, e);
+						Log::GetInstance().warn("Data corrupted in " + ProfileTableSync::TABLE.NAME + "/" + ProfileTableSync::TABLE_COL_PARENT_ID, e);
 					}
 				}
 			}
@@ -113,7 +116,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ProfileTableSync,Profile>::Save(
+		template<>
+		void OldLoadSavePolicy<ProfileTableSync,Profile>::Save(
 			Profile* profile,
 			optional<DBTransaction&> transaction
 		){
@@ -125,10 +129,13 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<ProfileTableSync,Profile>::Unlink(Profile* profile)
+
+		template<>
+		void OldLoadSavePolicy<ProfileTableSync,Profile>::Unlink(Profile* profile)
 		{
 			profile->setParent(NULL);
 		}
+
 
 
 		template<> bool DBTableSyncTemplate<ProfileTableSync>::CanDelete(

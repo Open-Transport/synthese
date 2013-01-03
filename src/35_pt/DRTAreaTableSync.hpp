@@ -26,7 +26,8 @@
 #define SYNTHESE_DRTAreaTableSync_hpp__
 
 #include "DRTArea.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class DRTAreaTableSync:
-			public db::DBRegistryTableSyncTemplate<DRTAreaTableSync,DRTArea>
+			public db::DBDirectTableSyncTemplate<
+				DRTAreaTableSync,
+				DRTArea,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

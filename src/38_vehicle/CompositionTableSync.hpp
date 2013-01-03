@@ -25,10 +25,10 @@
 #ifndef SYNTHESE_CompositionTableSync_hpp__
 #define SYNTHESE_CompositionTableSync_hpp__
 
+#include "DBDirectTableSyncTemplate.hpp"
+#include "InheritanceLoadSavePolicy.hpp"
 #include "ServiceComposition.hpp"
 #include "VehicleServiceComposition.hpp"
-#include "DBInheritanceTableSyncTemplate.hpp"
-#include "DBInheritedRegistryTableSync.hpp"
 #include "FetcherTemplate.h"
 
 namespace synthese
@@ -42,7 +42,13 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class CompositionTableSync:
-			public db::DBInheritanceTableSyncTemplate<CompositionTableSync, Composition>
+			public db::DBDirectTableSyncTemplate<
+				CompositionTableSync,
+				Composition,
+				db::FullSynchronizationPolicy,
+				db::InheritanceLoadSavePolicy
+			>,
+			public db::FetcherTemplate<calendar::Calendar, CompositionTableSync>
 		{
 		public:
 			//! @name Field names
@@ -84,39 +90,6 @@ namespace synthese
 				static std::string SerializeVehicles(const Composition::VehicleLinks& value);
 			//@}
 		};
-
-
-
-		//////////////////////////////////////////////////////////////////////////
-		/// Service composition version.
-		/// @author Hugues Romain
-		/// @since 3.3.0
-		class ServiceCompositionInheritedTableSync:
-			public db::DBInheritedRegistryTableSync<
-				CompositionTableSync,
-				ServiceCompositionInheritedTableSync,
-				ServiceComposition
-			>,
-			public db::FetcherTemplate<calendar::Calendar, ServiceCompositionInheritedTableSync>
-		{
-		};
-
-
-
-		//////////////////////////////////////////////////////////////////////////
-		/// Vehicle service composition version.
-		/// @author Hugues Romain
-		/// @since 3.3.0
-		class VehicleServiceCompositionInheritedTableSync:
-			public db::DBInheritedRegistryTableSync<
-				CompositionTableSync,
-				VehicleServiceCompositionInheritedTableSync,
-				VehicleServiceComposition
-			>,
-			public db::FetcherTemplate<calendar::Calendar, VehicleServiceCompositionInheritedTableSync>
-		{
-		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_CompositionTableSync_hpp__

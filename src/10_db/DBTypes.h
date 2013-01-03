@@ -27,11 +27,6 @@ namespace synthese
 {
 	namespace db
 	{
-		typedef enum
-		{
-			AUTO_CREATE,
-			NEVER_CREATE
-		} AutoCreation;
 }	}
 
 #endif // SYNTHESE_db_Types_h__

@@ -114,7 +114,8 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Load(
+		template<>
+		void OldLoadSavePolicy<ScheduledServiceTableSync,ScheduledService>::Load(
 			ScheduledService* ss,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -302,7 +303,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Unlink(
+		template<> void OldLoadSavePolicy<ScheduledServiceTableSync,ScheduledService>::Unlink(
 			ScheduledService* ss
 		){
 			ss->getPath()->removeService(*ss);
@@ -314,7 +315,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(
+		template<> void OldLoadSavePolicy<ScheduledServiceTableSync,ScheduledService>::Save(
 			ScheduledService* object,
 			optional<DBTransaction&> transaction
 		){

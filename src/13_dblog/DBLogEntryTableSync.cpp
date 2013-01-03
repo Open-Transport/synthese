@@ -107,7 +107,8 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
+		template<>
+		void OldLoadSavePolicy<DBLogEntryTableSync,DBLogEntry>::Load(
 			DBLogEntry* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -133,12 +134,18 @@ namespace synthese
 			object->setUserId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
 		}
 
-		template<> void DBDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(
+
+
+		template<>
+		void OldLoadSavePolicy<DBLogEntryTableSync, DBLogEntry>::Unlink(
 			DBLogEntry* obj
 		){
 		}
 
-		template<> void DBDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Save(
+
+
+		template<>
+		void OldLoadSavePolicy<DBLogEntryTableSync,DBLogEntry>::Save(
 			DBLogEntry* object,
 			optional<DBTransaction&> transaction
 		){

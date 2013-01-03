@@ -31,7 +31,8 @@
 
 #include "Crossing.h"
 #include "FetcherTemplate.h"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -61,15 +62,20 @@ namespace synthese
 			</dl>
 		*/
 		class CrossingTableSync:
-			public db::DBRegistryTableSyncTemplate<CrossingTableSync, Crossing>,
+			public db::DBDirectTableSyncTemplate<
+				CrossingTableSync,
+				Crossing,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>,
 			public db::FetcherTemplate<graph::Vertex, CrossingTableSync>
 		{
 		public:
 			static const std::string COL_CODE_BY_SOURCE;
 			static const std::string COL_NON_REACHABLE_ROADS;
 
-			CrossingTableSync();
-			~CrossingTableSync();
+			CrossingTableSync() {}
+			~CrossingTableSync() {}
 
 
 			//////////////////////////////////////////////////////////////////////////

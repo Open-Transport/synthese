@@ -57,42 +57,6 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<MessageAlternativeTableSync,MessageAlternative>::Load(
-			MessageAlternative* website,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(website->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			website->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				website->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<MessageAlternativeTableSync,MessageAlternative>::Unlink(
-			MessageAlternative* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<MessageAlternativeTableSync,MessageAlternative>::Save(
-			MessageAlternative* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
-
 		template<> bool DBTableSyncTemplate<MessageAlternativeTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id

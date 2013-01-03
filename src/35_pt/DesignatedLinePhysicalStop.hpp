@@ -35,10 +35,6 @@ namespace synthese
 		class DesignatedLinePhysicalStop:
 			public LinePhysicalStop
 		{
-		public:
-			/// Chosen registry class.
-			typedef util::Registry<DesignatedLinePhysicalStop> Registry;
-
 		private:
 			bool	_scheduleInput;
 

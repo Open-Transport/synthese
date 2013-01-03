@@ -37,12 +37,6 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<messages::SentScenario>::KEY("SentScenario");
-	}
-
-
 	namespace messages
 	{
 		const std::string SentScenario::DATA_NAME = "name";

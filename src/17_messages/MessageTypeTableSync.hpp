@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -42,7 +42,7 @@ namespace synthese
 		/// @since 3.5.0
 		//////////////////////////////////////////////////////////////////////////
 		class MessageTypeTableSync:
-			public db::DBRegistryTableSyncTemplate<MessageTypeTableSync, MessageType>
+			public db::DBDirectTableSyncTemplate<MessageTypeTableSync, MessageType>
 		{
 		public:
 			/** Message type search.

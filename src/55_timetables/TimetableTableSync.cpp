@@ -115,7 +115,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TimetableTableSync,Timetable>::Load(
+		template<> void OldLoadSavePolicy<TimetableTableSync,Timetable>::Load(
 			Timetable* object
 			, const db::DBResultSPtr& rows,
 			Env& env,
@@ -142,7 +142,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<CommercialLine>&)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_LINES);
+						Log::GetInstance().warn("Data corrupted in " + TimetableTableSync::TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_LINES);
 					}
 				}
 
@@ -158,7 +158,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopPoint>&)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS);
+						Log::GetInstance().warn("Data corrupted in " + TimetableTableSync::TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS);
 					}
 				}
 
@@ -232,7 +232,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TimetableTableSync,Timetable>::Save(
+		template<> void OldLoadSavePolicy<TimetableTableSync,Timetable>::Save(
 			Timetable* object,
 			optional<DBTransaction&> transaction
 		){
@@ -275,7 +275,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TimetableTableSync,Timetable>::Unlink(
+		template<> void OldLoadSavePolicy<TimetableTableSync,Timetable>::Unlink(
 			Timetable* obj
 		){
 		}
@@ -324,12 +324,6 @@ namespace synthese
 
 	namespace timetables
 	{
-		TimetableTableSync::TimetableTableSync():
-			DBRegistryTableSyncTemplate<TimetableTableSync, Timetable>()
-		{}
-
-
-
 		TimetableTableSync::SearchResult TimetableTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> bookId
