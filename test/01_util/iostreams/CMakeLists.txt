@@ -1,5 +1,6 @@
 set(DEPS
   01_util_iostreams
+  10_db
 )
 
 
