@@ -22,9 +22,17 @@
 
 #include "Scenario.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace util;
+
+	namespace util
+	{
+		template<>
+		const string Registry<messages::Scenario>::KEY = "Scenario";
+	}
 
 	namespace messages
 	{

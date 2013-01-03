@@ -25,7 +25,8 @@
 #ifndef SYNTHESE_TimetableTableSync_H__
 #define SYNTHESE_TimetableTableSync_H__
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -41,7 +42,12 @@ namespace synthese
 			@ingroup m55LS refLS
 		*/
 		class TimetableTableSync:
-			public db::DBRegistryTableSyncTemplate<TimetableTableSync,Timetable>
+			public db::DBDirectTableSyncTemplate<
+				TimetableTableSync,
+				Timetable,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_BOOK_ID;
@@ -55,7 +61,7 @@ namespace synthese
 			static const std::string COL_TRANSFER_TIMETABLE_AFTER;
 			static const std::string COL_IGNORE_EMPTY_ROWS;
 
-			TimetableTableSync();
+			TimetableTableSync() {}
 
 
 			/** Timetable search.

@@ -103,7 +103,7 @@ namespace synthese
 			return DBTableSyncTemplate::Indexes();
 		}
 
-		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
+		template<> void OldLoadSavePolicy<DisplayTypeTableSync,DisplayType>::Load(
 			DisplayType* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -127,7 +127,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Interface>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, e);
 				}
 				try
 				{
@@ -140,7 +140,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Interface>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, e);
 				}
 				try
 				{
@@ -153,7 +153,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Interface>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, e);
 				}
 
 				// Display pages
@@ -168,7 +168,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Webpage>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, e);
 				}
 
 				try
@@ -182,7 +182,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Webpage>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, e);
 				}
 
 				try
@@ -196,7 +196,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Webpage>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, e);
 				}
 
 
@@ -211,7 +211,7 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Webpage>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, e);
 				}
 
 				try
@@ -225,19 +225,19 @@ namespace synthese
 				}
 				catch (ObjectNotFoundException<Webpage>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, e);
 				}
 			}
 		}
 
-		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Unlink(
+		template<> void OldLoadSavePolicy<DisplayTypeTableSync,DisplayType>::Unlink(
 			DisplayType* obj
 		){
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Save(
+		template<> void OldLoadSavePolicy<DisplayTypeTableSync,DisplayType>::Save(
 			DisplayType* object,
 			optional<DBTransaction&> transaction
 		){

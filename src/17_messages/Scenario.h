@@ -25,8 +25,11 @@
 #ifndef SYNTHESE_Scenario_h__
 #define SYNTHESE_Scenario_h__
 
-#include "Registrable.h"
+#include "ImportableTemplate.hpp"
 #include "Named.h"
+#include "ParametersMap.h"
+#include "Registrable.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -42,6 +45,7 @@ namespace synthese
 		///		- the sent scenario
 		class Scenario:
 			public virtual util::Registrable,
+			public impex::ImportableTemplate<Scenario>,
 			public util::Named
 		{
 		public:
@@ -52,8 +56,20 @@ namespace synthese
 			Scenario(const std::string name = std::string());
 
 		public:
+			/// Chosen registry class.
+			typedef util::Registry<Scenario>	Registry;
+
+
 			virtual ~Scenario();
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Export of the content of the object into a ParametersMap.
+			/// @param pm the ParametersMap object to populate
+			/// @author Hugues Romain
+			/// @date 2012
+			virtual void toParametersMap(
+				util::ParametersMap& pm
+			) const = 0;
 		};
 	}
 }

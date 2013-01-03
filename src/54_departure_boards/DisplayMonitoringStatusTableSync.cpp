@@ -113,7 +113,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Load(
+		template<> void OldLoadSavePolicy<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Load(
 			DisplayMonitoringStatus* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -153,19 +153,19 @@ namespace synthese
 					}
 					else
 					{
-						Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ lexical_cast<string>(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
+						Log::GetInstance().warn("Data corrupted in "+ DisplayMonitoringStatusTableSync::TABLE.NAME + " on display screen : "+ lexical_cast<string>(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
 					}
 				}
 				catch (ObjectNotFoundException<DisplayScreen>&)
 				{
-					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ lexical_cast<string>(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
+					Log::GetInstance().warn("Data corrupted in "+ DisplayMonitoringStatusTableSync::TABLE.NAME + " on display screen : "+ lexical_cast<string>(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
 				}
 			}
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Save(
+		template<> void OldLoadSavePolicy<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Save(
 			DisplayMonitoringStatus* object,
 			optional<DBTransaction&> transaction
 		){
@@ -196,7 +196,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Unlink(
+		template<> void OldLoadSavePolicy<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Unlink(
 			DisplayMonitoringStatus* obj
 		){
 		}

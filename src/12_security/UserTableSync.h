@@ -27,7 +27,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "User.h"
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "NoSynchronizationPolicy.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +41,12 @@ namespace synthese
 		*/
 
 		class UserTableSync:
-			public db::DBNoSyncTableSyncTemplate<UserTableSync,User>
+			public db::DBDirectTableSyncTemplate<
+				UserTableSync,
+				User,
+				db::NoSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string TABLE_COL_LOGIN;

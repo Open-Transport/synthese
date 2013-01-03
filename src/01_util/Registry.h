@@ -178,6 +178,14 @@ namespace synthese
 				);
 
 
+				/** Adds an object to the registry.
+					@param ptr Shared pointer to the object to add
+					@throws RegistryKeyException if the key of the object is 0 or if the keys is already used in the registry
+				*/
+				virtual void addRegistrable(
+					const boost::shared_ptr<Registrable>& ptr
+				);
+
 
 				/** Replaces an object in the registry.
 					@param ptr Shared pointer to the new object to add instead of the old one
@@ -208,6 +216,19 @@ namespace synthese
 			Registry ( const Registry& ref );
 			Registry& operator= ( const Registry& rhs );
 		};
+
+
+
+		template<class T>
+		void Registry<T>::addRegistrable(
+			const boost::shared_ptr<Registrable>& ptr
+		){
+			if(!dynamic_cast<T*>(ptr.get()))
+			{
+				throw synthese::Exception("Bad registry");
+			}
+			add(boost::dynamic_pointer_cast<T, Registrable>(ptr));
+		}
 
 
 

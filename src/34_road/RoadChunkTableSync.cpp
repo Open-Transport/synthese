@@ -116,7 +116,7 @@ namespace synthese
 			return r;
 		};
 
-		template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Load(
+		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Load(
 			MainRoadChunk* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -257,14 +257,14 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Unlink(
+		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Unlink(
 			MainRoadChunk* obj
 		){
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Save(
+		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Save(
 			MainRoadChunk* object,
 			optional<DBTransaction&> transaction
 		){

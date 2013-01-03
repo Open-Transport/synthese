@@ -39,14 +39,8 @@ namespace synthese
 {
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<messages::SentAlarm>::KEY("SentAlarm");
-	}
-
 	namespace messages
 	{
-
 		SentAlarm::SentAlarm(
 			util::RegistryKeyType key ,
 			const SentScenario* scenario /*= NULL */

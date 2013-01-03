@@ -22,10 +22,10 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_SiteTableSync_H__
-#define SYNTHESE_SiteTableSync_H__
+#ifndef SYNTHESE_ServiceQuotaTableSync_H__
+#define SYNTHESE_ServiceQuotaTableSync_H__
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "ServiceQuota.hpp"
 
 #include <string>
@@ -42,7 +42,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t089_service_quotas
 		class ServiceQuotaTableSync:
-			public db::DBRegistryTableSyncTemplate<ServiceQuotaTableSync, ServiceQuota>
+			public db::DBDirectTableSyncTemplate<ServiceQuotaTableSync, ServiceQuota>
 		{
 		public:
 			/** ServiceQuota search.

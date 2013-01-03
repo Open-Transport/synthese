@@ -81,7 +81,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Load(
+		template<>
+		void OldLoadSavePolicy<DataSourceTableSync,DataSource>::Load(
 			DataSource* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -122,7 +123,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
+		template<>
+		void OldLoadSavePolicy<DataSourceTableSync,DataSource>::Save(
 			DataSource* object,
 			optional<DBTransaction&> transaction
 		){
@@ -138,7 +140,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Unlink(
+		template<>
+		void OldLoadSavePolicy<DataSourceTableSync,DataSource>::Unlink(
 			DataSource* object
 		){
 			object->setCoordinatesSystem(NULL);
@@ -182,13 +185,6 @@ namespace synthese
 
 	namespace impex
 	{
-		DataSourceTableSync::DataSourceTableSync ()
-		:	DBRegistryTableSyncTemplate<DataSourceTableSync,DataSource>()
-		{
-		}
-
-
-
 		DataSourceTableSync::SearchResult DataSourceTableSync::Search(
 			Env& env,
 			string name,

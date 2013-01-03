@@ -26,7 +26,8 @@
 #ifndef SYNTHESE_DisplayScreenCPUTableSync_H__
 #define SYNTHESE_DisplayScreenCPUTableSync_H__
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -44,8 +45,13 @@ namespace synthese
 		/// DisplayScreenCPU table synchronizer class.
 		///	@ingroup m54LS refLS
 		////////////////////////////////////////////////////////////////////////
-		class DisplayScreenCPUTableSync
-		: public db::DBRegistryTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>
+		class DisplayScreenCPUTableSync:
+			public db::DBDirectTableSyncTemplate<
+				DisplayScreenCPUTableSync,
+				DisplayScreenCPU,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;

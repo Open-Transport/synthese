@@ -26,7 +26,8 @@
 #define SYNTHESE_JunctionTableSync_hpp__
 
 #include "Junction.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -38,7 +39,12 @@ namespace synthese
 		///	@author Hugues Romain
 		///	@date 2010
 		class JunctionTableSync:
-			public db::DBRegistryTableSyncTemplate<JunctionTableSync,Junction>
+			public db::DBDirectTableSyncTemplate<
+				JunctionTableSync,
+				Junction,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

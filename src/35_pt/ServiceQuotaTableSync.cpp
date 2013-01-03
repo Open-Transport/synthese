@@ -61,40 +61,6 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<ServiceQuotaTableSync,ServiceQuota>::Load(
-			ServiceQuota* site,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(site->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			site->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				site->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<ServiceQuotaTableSync,ServiceQuota>::Unlink(
-			ServiceQuota* obj
-		){
-			obj->unlink();
-		}
-
-
-		template<> void DBDirectTableSyncTemplate<ServiceQuotaTableSync,ServiceQuota>::Save(
-			ServiceQuota* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
 
 		template<> bool DBTableSyncTemplate<ServiceQuotaTableSync>::CanDelete(
 			const server::Session* session,

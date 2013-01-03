@@ -31,8 +31,6 @@
 #include "AlarmTemplate.h"
 #include "SentAlarm.h"
 #include "ScenarioFolder.h"
-#include "AlarmTemplateInheritedTableSync.h"
-#include "ScenarioSentAlarmInheritedTableSync.h"
 #include "ScenarioTableSync.h"
 
 using namespace std;
@@ -173,15 +171,8 @@ namespace synthese
 
 			ParametersMap pm;
 
-			if(dynamic_cast<const SentScenario*>(_scenario.get()))
-			{
-				static_cast<const SentScenario&>(*_scenario).toParametersMap(pm);
-			}
-			else
-			{
-				static_cast<const ScenarioTemplate&>(*_scenario).toParametersMap(pm);
-			}
-
+			_scenario->toParametersMap(pm);
+			
 			// Output
 			if(_mainTemplate.get()) // CMS output
 			{

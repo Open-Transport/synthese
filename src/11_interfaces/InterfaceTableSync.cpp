@@ -71,7 +71,8 @@ namespace synthese
 			return DBTableSync::Indexes();
 		}
 
-		template<> void DBDirectTableSyncTemplate<InterfaceTableSync,Interface>::Load(
+		template<>
+		void OldLoadSavePolicy<InterfaceTableSync,Interface>::Load(
 			Interface* interf,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -84,13 +85,15 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<InterfaceTableSync,Interface>::Unlink(
+		template<>
+		void OldLoadSavePolicy<InterfaceTableSync,Interface>::Unlink(
 			Interface* interf
 		){
 
 		}
 
-		template<> void DBDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(
+		template<>
+		void OldLoadSavePolicy<InterfaceTableSync,Interface>::Save(
 			Interface* object,
 			optional<DBTransaction&> transaction
 		){

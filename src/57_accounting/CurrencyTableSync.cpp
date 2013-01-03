@@ -94,7 +94,7 @@ namespace synthese
 
 
 		CurrencyTableSync::CurrencyTableSync()
-			: DBRegistryTableSyncTemplate<CurrencyTableSync,Currency>()
+			: DBDirectTableSyncTemplate<CurrencyTableSync,Currency>()
 		{
 			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);

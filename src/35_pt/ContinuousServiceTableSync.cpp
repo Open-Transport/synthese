@@ -112,7 +112,7 @@ namespace synthese
 			return r;
 		};
 
-		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Load(
+		template<> void OldLoadSavePolicy<ContinuousServiceTableSync,ContinuousService>::Load(
 			ContinuousService* cs,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -233,7 +233,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
+		template<> void OldLoadSavePolicy<ContinuousServiceTableSync,ContinuousService>::Unlink(
 			ContinuousService* obj
 		){
 			// Unregister from the route
@@ -245,7 +245,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Save(
+		template<> void OldLoadSavePolicy<ContinuousServiceTableSync,ContinuousService>::Save(
 			ContinuousService* object,
 			optional<DBTransaction&> transaction
 		){

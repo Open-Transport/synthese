@@ -93,7 +93,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Load(
+		template<> void OldLoadSavePolicy<RoadPlaceTableSync,RoadPlace>::Load(
 			RoadPlace* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -167,7 +167,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Save(
+		template<> void OldLoadSavePolicy<RoadPlaceTableSync,RoadPlace>::Save(
 			RoadPlace* object,
 			optional<DBTransaction&> transaction
 		){
@@ -184,7 +184,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Unlink(
+		template<> void OldLoadSavePolicy<RoadPlaceTableSync,RoadPlace>::Unlink(
 			RoadPlace* obj
 		){
 			// City matcher

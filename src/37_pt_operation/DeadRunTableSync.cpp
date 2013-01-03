@@ -104,7 +104,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DeadRunTableSync, DeadRun>::Load(
+		template<> void OldLoadSavePolicy<DeadRunTableSync, DeadRun>::Load(
 			DeadRun* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -180,7 +180,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DeadRunTableSync, DeadRun>::Save(
+		template<> void OldLoadSavePolicy<DeadRunTableSync, DeadRun>::Save(
 			DeadRun* object,
 			optional<DBTransaction&> transaction
 		){
@@ -225,7 +225,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DeadRunTableSync, DeadRun>::Unlink(
+		template<> void OldLoadSavePolicy<DeadRunTableSync, DeadRun>::Unlink(
 			DeadRun* obj
 		){
 		}

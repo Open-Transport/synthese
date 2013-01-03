@@ -101,7 +101,8 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
+		template<>
+		void OldLoadSavePolicy<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
 			OnlineReservationRule* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -154,13 +155,14 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Unlink(
+		template<>
+		void OldLoadSavePolicy<OnlineReservationRuleTableSync,OnlineReservationRule>::Unlink(
 			OnlineReservationRule* object
 		){
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Save(
+		template<> void OldLoadSavePolicy<OnlineReservationRuleTableSync,OnlineReservationRule>::Save(
 			OnlineReservationRule* object,
 			optional<DBTransaction&> transaction
 		){

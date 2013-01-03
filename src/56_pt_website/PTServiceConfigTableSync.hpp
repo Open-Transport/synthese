@@ -20,10 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_SiteTableSync_H__
-#define SYNTHESE_SiteTableSync_H__
+#ifndef SYNTHESE_PTServiceConfigTableSync_H__
+#define SYNTHESE_PTServiceConfigTableSync_H__
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "PTServiceConfig.hpp"
 
 #include <string>
@@ -40,7 +40,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t086_pt_services_configurations
 		class PTServiceConfigTableSync:
-			public db::DBRegistryTableSyncTemplate<PTServiceConfigTableSync, PTServiceConfig>
+			public db::DBDirectTableSyncTemplate<PTServiceConfigTableSync, PTServiceConfig>
 		{
 		public:
 			/** PT Service config search.

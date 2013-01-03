@@ -67,42 +67,6 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Load(
-			Webpage* webpage,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(webpage->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			webpage->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				webpage->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
-			Webpage* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<>
-		void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Save(
-			Webpage* webPage,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*webPage, transaction);
-		}
-
-
 
 		template<> bool DBTableSyncTemplate<WebPageTableSync>::CanDelete(
 			const server::Session* session,

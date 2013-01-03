@@ -26,7 +26,8 @@
 #define SYNTHESE_MapSourceTableSync_hpp__
 
 #include "MapSource.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.0
 		class MapSourceTableSync:
-			public db::DBRegistryTableSyncTemplate<MapSourceTableSync,MapSource>
+			public db::DBDirectTableSyncTemplate<
+				MapSourceTableSync,
+				MapSource,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

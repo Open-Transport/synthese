@@ -26,7 +26,9 @@
 #define SYNTHESE_VehiclePositionTableSync_hpp__
 
 #include "VehiclePosition.hpp"
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "NoSynchronizationPolicy.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +41,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class VehiclePositionTableSync:
-			public db::DBNoSyncTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>
+			public db::DBDirectTableSyncTemplate<
+				VehiclePositionTableSync,
+				VehiclePosition,
+				db::NoSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

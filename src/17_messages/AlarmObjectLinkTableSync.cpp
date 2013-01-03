@@ -90,7 +90,8 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
+		template<>
+		void OldLoadSavePolicy<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
 			AlarmObjectLink* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -136,7 +137,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
+		template<>
+		void OldLoadSavePolicy<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
 			AlarmObjectLink* object
 		){
 			if(dynamic_cast<SentAlarm*>(object->getAlarm()))
@@ -149,13 +151,14 @@ namespace synthese
 				}
 				catch(FactoryException<AlarmRecipient> e)
 				{
-					Log::GetInstance().error("Unhanded recipient type "+ object->getRecipientKey() +" in "+ TABLE.NAME +" object "+ lexical_cast<string>(object->getKey()), e);
+					Log::GetInstance().error("Unhanded recipient type "+ object->getRecipientKey() +" in "+ AlarmObjectLinkTableSync::TABLE.NAME +" object "+ lexical_cast<string>(object->getKey()), e);
 				}
 			}
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(
+		template<>
+		void OldLoadSavePolicy<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(
 			AlarmObjectLink* object,
 			optional<DBTransaction&> transaction
 		){

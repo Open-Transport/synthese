@@ -24,16 +24,19 @@
 
 #include "LineStopTableSync.h"
 
+#include "DesignatedLinePhysicalStop.hpp"
+#include "DRTAreaTableSync.hpp"
 #include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
+#include "LineArea.hpp"
+#include "LinkException.h"
 #include "Profile.h"
 #include "Session.h"
 #include "StopPointTableSync.hpp"
 #include "User.h"
-#include "LineAreaInheritedTableSync.hpp"
-#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "TransportNetworkRight.h"
 #include "RankUpdateQuery.hpp"
+#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "DBTransaction.hpp"
 
@@ -113,30 +116,20 @@ namespace synthese
 
 
 		template<>
-		string DBInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const DBResultSPtr& row)
-		{
+		shared_ptr<LineStop> InheritanceLoadSavePolicy<LineStopTableSync,LineStop>::GetNewObject(
+			const DBResultSPtr& row
+		){
 			return
 				(decodeTableId(row->getLongLong(LineStopTableSync::COL_PHYSICALSTOPID)) == StopPointTableSync::TABLE.ID) ?
-				DesignatedLinePhysicalStopInheritedTableSync::FACTORY_KEY :
-				LineAreaInheritedTableSync::FACTORY_KEY
+				shared_ptr<LineStop>(new DesignatedLinePhysicalStop(row->getKey())) :
+				shared_ptr<LineStop>(new LineArea(row->getKey()))
 			;
 		}
 
 
 
 		template<>
-		string DBInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const LineStop* obj)
-		{
-			return
-				(dynamic_cast<const DesignatedLinePhysicalStop*>(obj) != NULL) ?
-				DesignatedLinePhysicalStopInheritedTableSync::FACTORY_KEY :
-				LineAreaInheritedTableSync::FACTORY_KEY
-			;
-		}
-
-
-
-		template<> void DBInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_CommonLoad(
+		void InheritanceLoadSavePolicy<LineStopTableSync,LineStop>::Load(
 			LineStop* ls,
 			const DBResultSPtr& rows,
 			Env& env,
@@ -172,6 +165,153 @@ namespace synthese
 				util::RegistryKeyType lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
 				JourneyPattern* line(JourneyPatternTableSync::GetEditable (lineId, env, linkLevel).get());
 				ls->setLine(line);
+			}
+
+			if(dynamic_cast<DesignatedLinePhysicalStop*>(ls))
+			{
+				DesignatedLinePhysicalStop& dls(static_cast<DesignatedLinePhysicalStop&>(*ls));
+
+				// Schedule input
+				if(!rows->getText(LineStopTableSync::COL_SCHEDULEINPUT).empty())
+				{
+					dls.setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
+				}
+				else
+				{
+					dls.setScheduleInput(true);
+				}
+
+				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+				{
+					// Stop point
+					util::RegistryKeyType fromPhysicalStopId (
+						rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID)
+					);
+					dls.setPhysicalStop(*StopPointTableSync::GetEditable(fromPhysicalStopId, env, linkLevel));
+
+					// Line update
+					dls.getLine()->addEdge(dls);
+
+					// Sublines update
+					BOOST_FOREACH(JourneyPatternCopy* copy, ls->getLine()->getSubLines())
+					{
+						DesignatedLinePhysicalStop* newEdge(
+							new DesignatedLinePhysicalStop(
+								0,
+								copy,
+								dls.getRankInPath(),
+								dls.isDeparture(),
+								dls.isArrival(),
+								dls.getMetricOffset(),
+								dls.getPhysicalStop(),
+								dls.getScheduleInput()
+						)	);
+						copy->addEdge(*newEdge);
+					}
+				}
+			}
+			else if(dynamic_cast<LineArea*>(ls))
+			{
+				LineArea& lineArea(static_cast<LineArea&>(*ls));
+				lineArea.setInternalService(rows->getBool(LineStopTableSync::COL_INTERNAL_SERVICE));
+
+				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+				{
+					RegistryKeyType areaId(rows->getLongLong(LineStopTableSync::COL_PHYSICALSTOPID));
+					if(areaId) try
+					{
+						lineArea.setArea(
+							*DRTAreaTableSync::GetEditable(areaId, env, linkLevel)
+						);
+					}
+					catch(ObjectNotFoundException<DRTArea>& e)
+					{
+						throw LinkException<DRTAreaTableSync>(rows, LineStopTableSync::COL_PHYSICALSTOPID, e);
+					}
+
+					// Line update
+					lineArea.getLine()->addEdge(lineArea);
+				}
+
+				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+				{
+					// Sublines update
+					BOOST_FOREACH(JourneyPatternCopy* copy, ls->getLine()->getSubLines())
+					{
+						LineArea* newEdge(
+							new LineArea(
+								0,
+								copy,
+								lineArea.getRankInPath(),
+								lineArea.isDeparture(),
+								lineArea.isArrival(),
+								lineArea.getMetricOffset(),
+								lineArea.getArea(),
+								lineArea.getInternalService()
+						)	);
+						copy->addEdge(*newEdge);
+					}
+				}
+			}
+		}
+
+
+
+		template<>
+		void InheritanceLoadSavePolicy<LineStopTableSync, LineStop>::Save(
+			LineStop* object,
+			optional<DBTransaction&> transaction
+		){
+			ReplaceQuery<LineStopTableSync> query(*object);
+			if(dynamic_cast<DesignatedLinePhysicalStop*>(object))
+			{
+				DesignatedLinePhysicalStop& dls(static_cast<DesignatedLinePhysicalStop&>(*object));
+				if(!dls.getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
+				if(!dls.getLine()) throw Exception("Linestop Save error. Missing line");
+
+				query.addField(dls.getPhysicalStop()->getKey());
+				query.addField(dls.getLine()->getKey());
+				query.addField(dls.getRankInPath());
+				query.addField(dls.isDepartureAllowed());
+				query.addField(dls.isArrivalAllowed());
+				query.addField(dls.getMetricOffset());
+				query.addField(dls.getScheduleInput());
+				query.addField(false);
+				query.addField(static_pointer_cast<Geometry,LineString>(dls.getGeometry()));
+			}
+			else if(dynamic_cast<LineArea*>(object))
+			{
+				LineArea& lineArea(static_cast<LineArea&>(*object));
+				if(!lineArea.getArea()) throw Exception("LineArea save error. Missing physical stop");
+				if(!lineArea.getLine()) throw Exception("LineArea Save error. Missing line");
+
+				query.addField(lineArea.getArea()->getKey());
+				query.addField(lineArea.getLine()->getKey());
+				query.addField(lineArea.getRankInPath());
+				query.addField(lineArea.isDepartureAllowed());
+				query.addField(lineArea.isArrivalAllowed());
+				query.addField(lineArea.getMetricOffset());
+				query.addField(true);
+				query.addField(lineArea.getInternalService());
+				query.addField(static_pointer_cast<Geometry,LineString>(lineArea.getGeometry()));
+				query.execute(transaction);
+			}
+			query.execute(transaction);
+		}
+
+
+
+		template<>
+		void InheritanceLoadSavePolicy<LineStopTableSync, LineStop>::Unlink(
+			LineStop* obj
+		){
+			if(dynamic_cast<DesignatedLinePhysicalStop*>(obj))
+			{
+				static_cast<DesignatedLinePhysicalStop*>(obj)->clearPhysicalStop();
+			}
+			else if(dynamic_cast<LineArea*>(obj))
+			{
+				obj->getLine()->removeEdge(*obj);
 			}
 		}
 
@@ -249,6 +389,54 @@ namespace synthese
 			if (first > 0)
 			{
 				query.setFirst(first);
+			}
+
+			return LoadFromQuery(query.toString(), env, linkLevel);
+		}
+
+
+
+		LineStopTableSync::SearchResult LineStopTableSync::SearchByStops(
+			util::Env& env,
+			boost::optional<util::RegistryKeyType> startStop /*= boost::optional<util::RegistryKeyType>()*/,
+			boost::optional<util::RegistryKeyType> endStop /*= boost::optional<util::RegistryKeyType>()*/,
+			std::size_t first /*= 0*/,
+			boost::optional<std::size_t> number /*= boost::optional<std::size_t>()*/,
+			bool orderById /*= false*/,
+			bool raisingOrder /*= false*/,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			SelectQuery<LineStopTableSync> query;
+
+			if(startStop)
+			{
+				query.addWhereField(COL_PHYSICALSTOPID, *startStop);
+			}
+
+			if(endStop)
+			{
+				query.addWhere(
+					ComposedExpression::Get(
+						SubQueryExpression::Get(
+							string("SELECT b."+ COL_PHYSICALSTOPID +" FROM "+ TABLE.NAME +" AS b WHERE b."+ COL_LINEID +"="+ TABLE.NAME +"."+ COL_LINEID +" AND b."+ COL_RANKINPATH +"="+ TABLE.NAME +"."+ COL_RANKINPATH +"+1")
+						), ComposedExpression::OP_EQ,
+						ValueExpression<RegistryKeyType>::Get(*endStop)
+					)
+				);
+			}
+
+			// Ordering
+			if(orderById)
+			{
+				query.addOrderField(TABLE_COL_ID, raisingOrder);
+			}
+			if (number)
+			{
+				query.setNumber(*number + 1);
+				if (first > 0)
+				{
+					query.setFirst(first);
+				}
 			}
 
 			return LoadFromQuery(query.toString(), env, linkLevel);
@@ -339,5 +527,91 @@ namespace synthese
 					break;
 				}
 			}
+		}
+
+
+
+		boost::shared_ptr<DesignatedLinePhysicalStop> LineStopTableSync::SearchSimilarLineStop(
+			const StopArea& departure,
+			const StopArea& arrival,
+			util::Env& env
+		){
+			stringstream query;
+			query <<
+				" SELECT t1.*" <<
+				" FROM " <<
+					LineStopTableSync::TABLE.NAME << " t1," <<
+					LineStopTableSync::TABLE.NAME << " t2," <<
+					StopPointTableSync::TABLE.NAME << " s1," <<
+					StopPointTableSync::TABLE.NAME << " s2" <<
+				" WHERE " <<
+					"t1." << LineStopTableSync::COL_LINEID << "=t2." << LineStopTableSync::COL_LINEID << " AND " <<
+					"t1." << LineStopTableSync::COL_RANKINPATH << "+1=t2." << LineStopTableSync::COL_RANKINPATH << " AND " <<
+					"t1." << LineStopTableSync::COL_PHYSICALSTOPID << "=s1." << TABLE_COL_ID << " AND " <<
+					"t2." << LineStopTableSync::COL_PHYSICALSTOPID << "=s2." << TABLE_COL_ID << " AND " <<
+					"s1." << StopPointTableSync::COL_PLACEID << "=" << departure.getKey() << " AND " <<
+					"s2." << StopPointTableSync::COL_PLACEID << "=" << arrival.getKey() <<
+				" ORDER BY " <<
+					"NumPoints(t1." << TABLE_COL_GEOMETRY << ") DESC," <<
+					"t2." << LineStopTableSync::COL_METRICOFFSET << "-t1." << LineStopTableSync::COL_METRICOFFSET << " DESC" <<
+				" LIMIT 1"
+			;
+			SearchResult result(
+				LoadFromQuery(query.str(), env, UP_LINKS_LOAD_LEVEL)
+			);
+			return result.empty() ?
+				shared_ptr<DesignatedLinePhysicalStop>() :
+				static_pointer_cast<DesignatedLinePhysicalStop, LineStop>(*result.begin());
+		}
+
+
+
+		boost::shared_ptr<DesignatedLinePhysicalStop> LineStopTableSync::SearchSimilarLineStop(
+			const StopPoint& departure,
+			const StopPoint& arrival,
+			util::Env& env
+		){
+			SelectQuery<LineStopTableSync> query;
+			query.addTableJoin<LineStopTableSync>(
+				ComposedExpression::Get(
+					ComposedExpression::Get(
+						FieldExpression::Get(LineStopTableSync::TABLE.NAME, LineStopTableSync::COL_LINEID),
+						ComposedExpression::OP_EQ,
+						FieldExpression::Get("t2", LineStopTableSync::COL_LINEID)
+					),
+					ComposedExpression::OP_AND,
+					ComposedExpression::Get(
+						ComposedExpression::Get(
+							FieldExpression::Get(LineStopTableSync::TABLE.NAME, LineStopTableSync::COL_RANKINPATH),
+							ComposedExpression::OP_ADD,
+							ValueExpression<int>::Get(1)
+						),
+						ComposedExpression::OP_EQ,
+						FieldExpression::Get("t2", LineStopTableSync::COL_RANKINPATH)
+				)	),
+				"t2"
+			);
+			query.addWhereField(LineStopTableSync::COL_PHYSICALSTOPID, departure.getKey());
+			query.addWhereFieldOtherAlias("t2", LineStopTableSync::COL_PHYSICALSTOPID, arrival.getKey());
+			query.addOrder(
+				ValueExpression<string>::Get("NumPoints("+ LineStopTableSync::TABLE.NAME +"."+ TABLE_COL_GEOMETRY +")"),
+				false
+			);
+			query.addOrder(
+				ComposedExpression::Get(
+					FieldExpression::Get("t2", LineStopTableSync::COL_METRICOFFSET),
+					ComposedExpression::OP_SUB,
+					FieldExpression::Get(LineStopTableSync::TABLE.NAME, LineStopTableSync::COL_METRICOFFSET)
+				),
+				false
+			);
+			query.setNumber(1);
+			SearchResult result(
+				LoadFromQuery(query.toString(), env, UP_LINKS_LOAD_LEVEL)
+			);
+			return result.empty() ?
+				shared_ptr<DesignatedLinePhysicalStop>() :
+				static_pointer_cast<DesignatedLinePhysicalStop, LineStop>(*result.begin())
+			;
 		}
 }	}

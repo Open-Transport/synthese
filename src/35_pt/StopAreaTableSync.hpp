@@ -25,7 +25,8 @@
 
 #include "StopArea.hpp"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 #include <string>
@@ -44,7 +45,12 @@ namespace synthese
 				- on delete : X
 		*/
 		class StopAreaTableSync:
-			public db::DBRegistryTableSyncTemplate<StopAreaTableSync,StopArea>,
+			public db::DBDirectTableSyncTemplate<
+				StopAreaTableSync,
+				StopArea,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>,
 			public db::FetcherTemplate<geography::NamedPlace, StopAreaTableSync>
 		{
 		public:

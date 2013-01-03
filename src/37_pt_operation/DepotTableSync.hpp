@@ -26,7 +26,8 @@
 #define SYNTHESE_DepotTableSync_hpp__
 
 #include "Depot.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.0
 		class DepotTableSync:
-			public db::DBRegistryTableSyncTemplate<DepotTableSync,Depot>
+			public db::DBDirectTableSyncTemplate<
+				DepotTableSync,
+				Depot,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

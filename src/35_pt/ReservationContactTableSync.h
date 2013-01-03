@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_ReservationRuleTableSync_H__
 #define SYNTHESE_ReservationRuleTableSync_H__
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <iostream>
 #include <vector>
@@ -40,7 +41,12 @@ namespace synthese
 			@ingroup m35LS refLS
 		*/
 		class ReservationContactTableSync:
-			public db::DBRegistryTableSyncTemplate<ReservationContactTableSync, ReservationContact>
+			public db::DBDirectTableSyncTemplate<
+				ReservationContactTableSync,
+				ReservationContact,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -50,7 +56,7 @@ namespace synthese
 			static const std::string COL_WEBSITEURL;
 
 
-			ReservationContactTableSync();
+			ReservationContactTableSync() {}
 
 
 			/** ReservationRule search.

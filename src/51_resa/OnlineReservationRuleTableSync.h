@@ -30,7 +30,8 @@
 
 #include "OnlineReservationRule.h"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,13 @@ namespace synthese
 		/** OnlineReservationRule table synchronizer.
 			@ingroup m51LS refLS
 		*/
-		class OnlineReservationRuleTableSync : public db::DBRegistryTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>
+		class OnlineReservationRuleTableSync:
+			public db::DBDirectTableSyncTemplate<
+				OnlineReservationRuleTableSync,
+				OnlineReservationRule,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_RESERVATION_CONTACT_ID;

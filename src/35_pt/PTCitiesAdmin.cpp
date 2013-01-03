@@ -200,51 +200,49 @@ namespace synthese
 				const ParametersMap& citiesPM(
 					**pm.getSubMaps(PlacesListService::DATA_CITIES).begin()
 				);
-				if(citiesPM.hasSubMaps(PlacesListService::DATA_CITY))
-				{
-					BOOST_FOREACH(
-						shared_ptr<ParametersMap> item,
-						citiesPM.getSubMaps(PlacesListService::DATA_CITY)
-					){
-						// New row
-						stream << t.row();
+				BOOST_FOREACH(
+					shared_ptr<ParametersMap> item,
+					citiesPM.getSubMaps(PlacesListService::DATA_CITY)
+				){
+					// New row
+					stream << t.row();
 
-						// City load
-						shared_ptr<const City> city(
-							Env::GetOfficialEnv().get<City>(
-								item->get<RegistryKeyType>(City::DATA_CITY_ID)
-						)	);
+					// City load
+					shared_ptr<const City> city(
+						Env::GetOfficialEnv().get<City>(
+							item->get<RegistryKeyType>(City::DATA_CITY_ID)
+					)	);
 
-						// Open button
-						openCityRequest.getPage()->setCity(city);
-						stream << t.col() <<
-							HTMLModule::getLinkButton(
-								openCityRequest.getURL(),
-								"Ouvrir",
-								string(),
-								PTPlacesAdmin::ICON
-							)
-						;
+					// Open button
+					openCityRequest.getPage()->setCity(city);
+					stream << t.col() <<
+						HTMLModule::getLinkButton(
+							openCityRequest.getURL(),
+							"Ouvrir",
+							string(),
+							PTPlacesAdmin::ICON
+						)
+					;
 
-						// Key
-						stream << t.col() << item->get<string>(PlacesListService::DATA_KEY);
-						stream << t.col() << item->get<string>(City::DATA_CITY_CODE);
-						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
-						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
-						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
+					// Key
+					stream << t.col() << item->get<string>(PlacesListService::DATA_KEY);
+					stream << t.col() << item->get<string>(City::DATA_CITY_CODE);
+					stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
+					stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
+					stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
 
-						// Remove button
-						stream << t.col();
-						if(city->empty())
-						{
-							removeRequest.getAction()->setObjectId(city->getKey());
-							stream << HTMLModule::getLinkButton(
-								removeRequest.getURL(),
-								"Supprimer",
-								"Etes-vous sûr de vouloir supprimer la localité "+ city->getName() +" ?"
-							);
-						}
-				}	}
+					// Remove button
+					stream << t.col();
+					if(city->empty())
+					{
+						removeRequest.getAction()->setObjectId(city->getKey());
+						stream << HTMLModule::getLinkButton(
+							removeRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer la localité "+ city->getName() +" ?"
+						);
+					}
+				}
 
 				// Creation row
 				stream << t.row();

@@ -106,7 +106,7 @@ namespace synthese
 		DbModuleConfigTableSync::rowsAdded(
 			DB* db,
 			const DBResultSPtr& rows
-		){
+		) const {
 			while (rows->next ())
 			{
 				ModuleClass::SetParameter (rows->getText (COL_PARAMNAME),
@@ -119,7 +119,7 @@ namespace synthese
 		void DbModuleConfigTableSync::rowsUpdated(
 			DB* db,
 			const DBResultSPtr& rows
-		){
+		) const {
 		    rowsAdded (db, rows);
 		}
 
@@ -129,7 +129,7 @@ namespace synthese
 		DbModuleConfigTableSync::rowsRemoved(
 			DB* db,
 			const RowIdList& rowIds
-		){
+		) const {
 		}
 
 

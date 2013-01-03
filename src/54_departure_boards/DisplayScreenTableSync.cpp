@@ -181,7 +181,7 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
+		template<> void OldLoadSavePolicy<DisplayScreenTableSync,DisplayScreen>::Load(
 			DisplayScreen* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -229,7 +229,7 @@ namespace synthese
 				catch(ObjectNotFoundException<StopArea>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ lexical_cast<string>(placeId) + " not found"
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : localization "+ lexical_cast<string>(placeId) + " not found"
 					);
 				}
 
@@ -251,7 +251,7 @@ namespace synthese
 				catch(ObjectNotFoundException<DisplayScreen>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ TABLE.NAME + " on display screen : up display screen " +
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : up display screen " +
 						lexical_cast<string>(upId) + " not found"
 					);
 				}
@@ -267,7 +267,7 @@ namespace synthese
 					catch(ObjectNotFoundException<StopArea>&)
 					{
 						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on display screen : cpu host " +
+							"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : cpu host " +
 							lexical_cast<string>(cpuId) + " not found"
 						);
 					}
@@ -293,7 +293,7 @@ namespace synthese
 				catch(ObjectNotFoundException<DisplayType>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ TABLE.NAME + " on display screen : type " +
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : type " +
 						lexical_cast<string>(typeId) + " not found"
 					);
 				}
@@ -314,7 +314,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopPoint>&)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 					}
 				}
 				object->setStops(pstops);
@@ -329,7 +329,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
 					}
 				}
 
@@ -343,7 +343,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
 					}
 				}
 
@@ -357,7 +357,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 				}	}
 
 				// Transfers
@@ -380,7 +380,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 					}
 				}
 
@@ -395,7 +395,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
+		template<> void OldLoadSavePolicy<DisplayScreenTableSync,DisplayScreen>::Unlink(
 			DisplayScreen* object
 		){
 			object->setParent(NULL);
@@ -403,7 +403,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Save(
+		template<> void OldLoadSavePolicy<DisplayScreenTableSync,DisplayScreen>::Save(
 			DisplayScreen* object,
 			optional<DBTransaction&> transaction
 		){

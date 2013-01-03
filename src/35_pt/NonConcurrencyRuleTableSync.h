@@ -30,8 +30,9 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "NonConcurrencyRule.h"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -40,7 +41,13 @@ namespace synthese
 		/** NonConcurrencyRule table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class NonConcurrencyRuleTableSync : public db::DBRegistryTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>
+		class NonConcurrencyRuleTableSync:
+			public db::DBDirectTableSyncTemplate<
+				NonConcurrencyRuleTableSync,
+				NonConcurrencyRule,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_PRIORITY_LINE_ID;

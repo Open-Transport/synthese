@@ -48,11 +48,22 @@ namespace synthese
 			DBDirectTableSync(){}
 
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Checks if the table contains an element with the specified id.
+			/// @param key the id of the element
+			/// @return true if the table contains the specified element
+			/// @author Hugues Romain
+			/// @date 2013
+			virtual bool contains(
+				util::RegistryKeyType key
+			) const = 0;
+
+
+
 			virtual boost::shared_ptr<const util::Registrable> getRegistrable(
 				util::RegistryKeyType key,
 				util::Env& environment,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const = 0;
 
 
@@ -60,8 +71,7 @@ namespace synthese
 			virtual boost::shared_ptr<util::Registrable> getEditableRegistrable(
 				util::RegistryKeyType key,
 				util::Env& environment,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const = 0;
 
 
@@ -104,6 +114,11 @@ namespace synthese
 
 			virtual const util::RegistryBase& getRegistry(
 				const util::Env& env
+			) const = 0;
+
+
+			virtual util::RegistryBase& getEditableRegistry(
+				util::Env& env
 			) const = 0;
 		};
 	}

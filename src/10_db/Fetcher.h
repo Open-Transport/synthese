@@ -52,15 +52,13 @@ namespace synthese
 			virtual boost::shared_ptr<BaseClass> _getEditable(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const = 0;
 
 			virtual boost::shared_ptr<const BaseClass> _get(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const = 0;
 
 			virtual void _save(
@@ -79,23 +77,21 @@ namespace synthese
 			static boost::shared_ptr<BaseClass> FetchEditable(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			){
 				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(key)));
 				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
-				return pf->_getEditable(key, env, linkLevel, autoCreate);
+				return pf->_getEditable(key, env, linkLevel);
 			}
 
 			static boost::shared_ptr<const BaseClass> Fetch(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			){
 				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(key)));
 				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
-				return pf->_get(key, env, linkLevel, autoCreate);
+				return pf->_get(key, env, linkLevel);
 			}
 
 			static void FetchSave(

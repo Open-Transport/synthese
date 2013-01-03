@@ -618,10 +618,14 @@ namespace synthese
 			}
 
 			// --------------------------------------------------- StopPoint
-			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type itls, _env.getRegistry<DesignatedLinePhysicalStop>())
+			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 			{
-				const DesignatedLinePhysicalStop* ls(itls.second.get());
-				const StopPoint* ps = static_cast<const StopPoint*>(ls->getFromVertex());
+				if(!dynamic_cast<DesignatedLinePhysicalStop*>(lineStop.second.get()))
+				{
+					continue;
+				}
+				const DesignatedLinePhysicalStop& ls(static_cast<DesignatedLinePhysicalStop&>(*lineStop.second));
+				const StopPoint* ps = static_cast<const StopPoint*>(ls.getFromVertex());
 
 				shared_ptr<Point> wgs84ps;
 				if(ps->hasGeometry())
@@ -631,7 +635,7 @@ namespace synthese
 
 				os << fixed;
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
-				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
+				os << "<objectId>" << TridentId (peerid, "StopPoint", ls) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySources() << "</creatorId>" << "\n";
 				os << "<longitude>" << (ps->hasGeometry() ? wgs84ps->getX() :0) << "</longitude>" << "\n";
 				os << "<latitude>" << (ps->hasGeometry() ? wgs84ps->getY() : 0) << "</latitude>" << "\n";
@@ -2095,7 +2099,7 @@ namespace synthese
 			{
 				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
+			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}

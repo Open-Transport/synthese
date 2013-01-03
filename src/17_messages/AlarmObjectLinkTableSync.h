@@ -33,7 +33,8 @@
 #include "Registrable.h"
 
 #include "DBModule.h"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include "AlarmObjectLink.h"
 #include "MessagesModule.h"
@@ -57,7 +58,12 @@ namespace synthese
 			 - removes the link between the alarm and the object if the alarm is a SentAlarm object (no exception is thrown if it does not exists)
 		*/
 		class AlarmObjectLinkTableSync:
-			public db::DBRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
+			public db::DBDirectTableSyncTemplate<
+				AlarmObjectLinkTableSync,
+				AlarmObjectLink,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;
@@ -161,11 +167,11 @@ namespace synthese
 				try
 				{
 					objects.push_back(
-						db::DBDirectTableSyncTemplate<K,T>::GetEditable(
-						rows->getLongLong (COL_OBJECT_ID),
-						env,
-						linkLevel
-						)	);
+						K::GetEditable(
+							rows->getLongLong (COL_OBJECT_ID),
+							env,
+							linkLevel
+					)	);
 				}
 				catch(Exception& e)
 				{

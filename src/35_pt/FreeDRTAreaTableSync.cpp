@@ -103,7 +103,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<FreeDRTAreaTableSync,FreeDRTArea>::Load(
+		template<> void OldLoadSavePolicy<FreeDRTAreaTableSync,FreeDRTArea>::Load(
 			FreeDRTArea* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -182,7 +182,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<FreeDRTAreaTableSync,FreeDRTArea>::Save(
+		template<> void OldLoadSavePolicy<FreeDRTAreaTableSync,FreeDRTArea>::Save(
 			FreeDRTArea* object,
 			optional<DBTransaction&> transaction
 		){
@@ -198,7 +198,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<FreeDRTAreaTableSync,FreeDRTArea>::Unlink(
+		template<> void OldLoadSavePolicy<FreeDRTAreaTableSync,FreeDRTArea>::Unlink(
 			FreeDRTArea* obj
 		){
 			if(obj->getLine())

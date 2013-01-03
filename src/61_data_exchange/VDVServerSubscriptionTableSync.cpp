@@ -58,42 +58,6 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<VDVServerSubscriptionTableSync,VDVServerSubscription>::Load(
-			VDVServerSubscription* website,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(website->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			website->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				website->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<VDVServerSubscriptionTableSync,VDVServerSubscription>::Unlink(
-			VDVServerSubscription* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<VDVServerSubscriptionTableSync,VDVServerSubscription>::Save(
-			VDVServerSubscription* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
-
 		template<> bool DBTableSyncTemplate<VDVServerSubscriptionTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id

@@ -25,7 +25,9 @@
 #ifndef SYNTHESE_ReservationTransactionTableSync_H__
 #define SYNTHESE_ReservationTransactionTableSync_H__
 
-#include "DBConditionalRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "ConditionalSynchronizationPolicy.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include "ReservationTransaction.h"
 
@@ -48,7 +50,12 @@ namespace synthese
 			@ingroup m51LS refLS
 		*/
 		class ReservationTransactionTableSync:
-			public db::DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>
+			public db::DBDirectTableSyncTemplate<
+				ReservationTransactionTableSync,
+				ReservationTransaction,
+				db::ConditionalSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const boost::posix_time::time_duration BEFORE_RESERVATION_INDEXATION_DURATION;

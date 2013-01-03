@@ -30,7 +30,8 @@
 
 #include "Fare.h"
 #include "FareType.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,7 +45,12 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Synchronization : permanent.
 		class FareTableSync:
-			public db::DBRegistryTableSyncTemplate<FareTableSync,Fare>
+			public db::DBDirectTableSyncTemplate<
+				FareTableSync,
+				Fare,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		private:
 			static const std::string ROWS_SEPARATOR;

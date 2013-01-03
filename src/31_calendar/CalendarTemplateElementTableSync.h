@@ -30,7 +30,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "CalendarTemplateElement.h"
 
 namespace synthese
@@ -46,7 +47,12 @@ namespace synthese
 		/// Object : CalendarTemplateElement
 		/// See also : CalendarTemplateTableSync
 		class CalendarTemplateElementTableSync:
-			public db::DBRegistryTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>
+			public db::DBDirectTableSyncTemplate<
+				CalendarTemplateElementTableSync,
+				CalendarTemplateElement,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_CALENDAR_ID;

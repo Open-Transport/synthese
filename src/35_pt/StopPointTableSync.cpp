@@ -102,7 +102,8 @@ namespace synthese
 
 
 		/** Does not update the place */
-		template<> void DBDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Load(
+		template<>
+		void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Load(
 			StopPoint* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -200,7 +201,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Unlink(
+		template<> void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Unlink(
 			StopPoint* obj
 		){
 			// Hub
@@ -220,7 +221,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Save(
+		template<> void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Save(
 			StopPoint* object,
 			optional<DBTransaction&> transaction
 		){

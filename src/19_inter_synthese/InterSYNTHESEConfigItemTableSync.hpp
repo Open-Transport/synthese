@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -42,7 +42,7 @@ namespace synthese
 		/// @since 3.1.15
 		//////////////////////////////////////////////////////////////////////////
 		class InterSYNTHESEConfigItemTableSync:
-			public db::DBRegistryTableSyncTemplate<InterSYNTHESEConfigItemTableSync,InterSYNTHESEConfigItem>
+			public db::DBDirectTableSyncTemplate<InterSYNTHESEConfigItemTableSync,InterSYNTHESEConfigItem>
 		{
 		public:
 			/** InterSYNTHESEConfigItem search.

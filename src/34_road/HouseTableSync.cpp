@@ -84,7 +84,7 @@ namespace synthese
 			return DBTableSync::Indexes();
 		}
 
-		template<> void DBDirectTableSyncTemplate<HouseTableSync, House>::Load(
+		template<> void OldLoadSavePolicy<HouseTableSync, House>::Load(
 			House* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -118,14 +118,14 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<HouseTableSync, House>::Unlink(
+		template<> void OldLoadSavePolicy<HouseTableSync, House>::Unlink(
 			House* obj
 		){
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<HouseTableSync, House>::Save(
+		template<> void OldLoadSavePolicy<HouseTableSync, House>::Save(
 			House* object,
 			optional<DBTransaction&> transaction
 		){
@@ -173,19 +173,6 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 			//TODO Log the removal
-		}
-	}
-
-	namespace road
-	{
-		HouseTableSync::HouseTableSync()
-			: DBRegistryTableSyncTemplate<HouseTableSync, House>()
-		{
-		}
-
-		HouseTableSync::~HouseTableSync()
-		{
-
 		}
 	}
 }

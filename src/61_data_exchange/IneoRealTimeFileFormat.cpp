@@ -280,7 +280,7 @@ namespace synthese
 									stop._withTimes ? *stop._withTimes : true
 							)	);
 							result->addEdge(*ls);
-							_env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
+							_env.getEditableRegistry<LineStop>().add(ls);
 							++rank;
 					}	}
 				}
@@ -468,7 +468,7 @@ namespace synthese
 				{
 					JourneyPatternTableSync::Save(journeyPattern.second.get(), transaction);
 				}
-				BOOST_FOREACH(const Registry<DesignatedLinePhysicalStop>::value_type& lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
+				BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 				{
 					LineStopTableSync::Save(lineStop.second.get(), transaction);
 				}

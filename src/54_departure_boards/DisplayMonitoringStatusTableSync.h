@@ -27,7 +27,9 @@
 #define SYNTHESE_DisplayMonitoringStatusTableSync_H__
 
 #include "DisplayMonitoringStatus.h"
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "NoSynchronizationPolicy.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -47,7 +49,12 @@ namespace synthese
 		///	@ingroup m54LS refLS
 		////////////////////////////////////////////////////////////////////////
 		class DisplayMonitoringStatusTableSync:
-			public db::DBNoSyncTableSyncTemplate<DisplayMonitoringStatusTableSync, DisplayMonitoringStatus>
+			public db::DBDirectTableSyncTemplate<
+				DisplayMonitoringStatusTableSync,
+				DisplayMonitoringStatus,
+				db::NoSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_SCREEN_ID;

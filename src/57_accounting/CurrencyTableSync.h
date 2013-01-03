@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -41,7 +41,8 @@ namespace synthese
 			@ingroup m57LS refLS
 		*/
 
-		class CurrencyTableSync : public db::DBRegistryTableSyncTemplate<CurrencyTableSync,Currency>
+		class CurrencyTableSync:
+			public db::DBDirectTableSyncTemplate<CurrencyTableSync,Currency>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;

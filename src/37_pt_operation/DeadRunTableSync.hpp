@@ -25,8 +25,9 @@
 #ifndef SYNTHESE_DeadRunTableSync_hpp__
 #define SYNTHESE_DeadRunTableSync_hpp__
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 #include "DeadRun.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.0
 		class DeadRunTableSync:
-			public db::DBRegistryTableSyncTemplate<DeadRunTableSync,DeadRun>
+			public db::DBDirectTableSyncTemplate<
+				DeadRunTableSync,
+				DeadRun,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

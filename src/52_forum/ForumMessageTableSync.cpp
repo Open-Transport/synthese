@@ -103,7 +103,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Load(
+		template<>
+		void OldLoadSavePolicy<ForumMessageTableSync,ForumMessage>::Load(
 			ForumMessage* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -152,7 +153,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Save(
+		template<>
+		void OldLoadSavePolicy<ForumMessageTableSync,ForumMessage>::Save(
 			ForumMessage* object,
 			optional<DBTransaction&> transaction
 		){
@@ -170,7 +172,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Unlink(
+		template<>
+		void OldLoadSavePolicy<ForumMessageTableSync,ForumMessage>::Unlink(
 			ForumMessage* obj
 		){
 		}

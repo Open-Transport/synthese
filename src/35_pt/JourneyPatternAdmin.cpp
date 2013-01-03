@@ -239,12 +239,12 @@ namespace synthese
 
 					shared_ptr<const DesignatedLinePhysicalStop> linePhysicalStop(
 						dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ?
-						Env::GetOfficialEnv().getSPtr(static_cast<const DesignatedLinePhysicalStop*>(edge)) :
+						static_pointer_cast<const DesignatedLinePhysicalStop, const LineStop>(Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(edge))) :
 						shared_ptr<const DesignatedLinePhysicalStop>()
 					);
 					shared_ptr<const LineArea> lineArea(
 						dynamic_cast<const LineArea*>(edge) ?
-						Env::GetOfficialEnv().getSPtr(static_cast<const LineArea*>(edge)) :
+						static_pointer_cast<const LineArea, const LineStop>(Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(edge))) :
 						shared_ptr<const LineArea>()
 					);
 					shared_ptr<const LineStop> lineStop(
@@ -551,9 +551,8 @@ namespace synthese
 						if(dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge))
 						{
 							lineStopUpdateRequest.getAction()->setLineStop(
-								static_pointer_cast<LineStop, DesignatedLinePhysicalStop>(
-									Env::GetOfficialEnv().getEditableSPtr(static_cast<DesignatedLinePhysicalStop*>(*itEdge))
-							)	);
+								Env::GetOfficialEnv().getEditableSPtr(static_cast<LineStop*>(*itEdge))
+							);
 							stopPointUpdateRequest.getAction()->setStop(
 								Env::GetOfficialEnv().getEditableSPtr(static_cast<StopPoint*>((*itEdge)->getFromVertex()))
 							);

@@ -1,6 +1,6 @@
 
-/** DBInheritedNoSyncTableSyncTemplate class header.
-	@file DBInheritedNoSyncTableSyncTemplate.hpp
+/** NoSynchronizationPolicy class header.
+	@file NoSynchronizationPolicy.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,58 +20,54 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_db_DBInheritedNoSyncTableSyncTemplate_hpp__
-#define SYNTHESE_db_DBInheritedNoSyncTableSyncTemplate_hpp__
-
-#include "DBInheritedTableSyncTemplate.hpp"
-
-#include "01_util/ConstantReturner.h"
+#ifndef SYNTHESE_db_NoSynchronizationPolicy_hpp__
+#define SYNTHESE_db_NoSynchronizationPolicy_hpp__
 
 namespace synthese
 {
 	namespace db
 	{
-		class DB;
-
-		/** DBInheritedNoSyncTableSyncTemplate class.
+		/** NoSynchronizationPolicy class.
 			@ingroup m10
 		*/
-		template<class ParentTableSyncClass, class TableSyncClass, class ObjectClass>
-		class DBInheritedNoSyncTableSyncTemplate
-			: public DBInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>
+		template<class K, class T>
+		class NoSynchronizationPolicy
 		{
 		public:
-			typedef util::ConstantReturnerFalse RegisterInSubClassMap;
+			NoSynchronizationPolicy() {}
 
-			DBInheritedNoSyncTableSyncTemplate()
-				: DBInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>()
-			{
-
-			}
-
-			void rowsAdded (
+			/** Action to do on DisplayType creation.
+			This method loads a new object in ram.
+			*/
+			static void RowsAdded(
 				DB* db,
 				const DBResultSPtr& rows
 			){
-
 			}
 
-			void rowsUpdated (
+
+			/** Action to do on DisplayType creation.
+			This method updates the corresponding object in ram.
+			*/
+			static void RowsUpdated(
 				DB* db,
 				const DBResultSPtr& rows
 			){
-
 			}
 
-			void rowsRemoved (
+
+			/** Action to do on DisplayType deletion.
+			This method deletes the corresponding object in ram and runs
+			all necessary cleaning actions.
+			*/
+			static void RowsRemoved(
 				DB* db,
 				const RowIdList& rowIds
 			){
-
 			}
-
 		};
 	}
 }
 
-#endif // SYNTHESE_db_DBInheritedNoSyncTableSyncTemplate_hpp__
+#endif // SYNTHESE_db_NoSynchronizationPolicy_hpp__
+

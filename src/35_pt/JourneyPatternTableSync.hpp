@@ -30,7 +30,8 @@
 
 #include "JourneyPattern.hpp"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -46,7 +47,13 @@ namespace synthese
 			- on update :
 			- on delete : X
 		*/
-		class JourneyPatternTableSync : public db::DBRegistryTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>
+		class JourneyPatternTableSync:
+			public db::DBDirectTableSyncTemplate<
+				JourneyPatternTableSync,
+				JourneyPattern,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_COMMERCIAL_LINE_ID;

@@ -27,7 +27,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "PTUseRule.h"
 #include "RuleUser.h"
 
@@ -39,7 +40,12 @@ namespace synthese
 			@ingroup m35LS refLS
 		*/
 		class PTUseRuleTableSync:
-			public db::DBRegistryTableSyncTemplate<PTUseRuleTableSync,PTUseRule>
+			public db::DBDirectTableSyncTemplate<
+				PTUseRuleTableSync,
+				PTUseRule,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;

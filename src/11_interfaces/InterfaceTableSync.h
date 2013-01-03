@@ -27,7 +27,8 @@
 
 #include <string>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <boost/optional.hpp>
 
@@ -38,7 +39,13 @@ namespace synthese
 		/** InterfaceTableSync table synchronizer.
 			@ingroup m11LS refLS
 		*/
-		class InterfaceTableSync : public db::DBRegistryTableSyncTemplate<InterfaceTableSync,Interface>
+		class InterfaceTableSync:
+			public db::DBDirectTableSyncTemplate<
+				InterfaceTableSync,
+				Interface,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string TABLE_COL_NO_SESSION_DEFAULT_PAGE;
