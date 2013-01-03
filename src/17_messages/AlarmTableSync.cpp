@@ -97,7 +97,7 @@ namespace synthese
 		};
 
 		template<>
-		static boost::shared_ptr<Alarm> InheritanceLoadSavePolicy<AlarmTableSync, Alarm>::GetNewObject(
+		boost::shared_ptr<Alarm> InheritanceLoadSavePolicy<AlarmTableSync, Alarm>::GetNewObject(
 			const DBResultSPtr& row
 		){
 			if(row->getBool(AlarmTableSync::COL_IS_TEMPLATE))
