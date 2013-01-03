@@ -109,7 +109,7 @@ namespace synthese
 
 
 		template<>
-		static shared_ptr<Scenario> InheritanceLoadSavePolicy<ScenarioTableSync, Scenario>::GetNewObject(
+		shared_ptr<Scenario> InheritanceLoadSavePolicy<ScenarioTableSync, Scenario>::GetNewObject(
 			const DBResultSPtr& row
 		){
 			return row->getBool(ScenarioTableSync::COL_IS_TEMPLATE)
