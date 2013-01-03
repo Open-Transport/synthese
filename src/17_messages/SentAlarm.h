@@ -40,11 +40,6 @@ namespace synthese
 		class SentAlarm
 			: public Alarm
 		{
-		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<SentAlarm>	Registry;
-
 		private:
 			const AlarmTemplate*	_template;
 

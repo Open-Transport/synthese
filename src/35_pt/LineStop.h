@@ -56,6 +56,8 @@ namespace synthese
 
 
 		public:
+			/// Chosen registry class.
+			typedef util::Registry<LineStop> Registry;
 
 			LineStop(
 				util::RegistryKeyType id = 0,

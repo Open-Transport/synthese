@@ -60,41 +60,6 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<TimetableRowGroupItemTableSync,TimetableRowGroupItem>::Load(
-			TimetableRowGroupItem* webpage,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(webpage->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			webpage->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				webpage->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<TimetableRowGroupItemTableSync,TimetableRowGroupItem>::Unlink(
-			TimetableRowGroupItem* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<TimetableRowGroupItemTableSync,TimetableRowGroupItem>::Save(
-			TimetableRowGroupItem* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
 
 		template<> bool DBTableSyncTemplate<TimetableRowGroupItemTableSync>::CanDelete(
 			const server::Session* session,

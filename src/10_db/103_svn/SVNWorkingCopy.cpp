@@ -224,12 +224,24 @@ namespace synthese
 
 					// Update or creation
 					shared_ptr<Registrable> rObject;
-					rObject = directTableSync.getEditableRegistrable(
-						key,
-						_env,
-						UP_LINKS_LOAD_LEVEL,
-						AUTO_CREATE
-					);
+					if(directTableSync.contains(key))
+					{
+						rObject = directTableSync.getEditableRegistrable(
+							key,
+							_env
+						);
+					}
+					else
+					{
+						rObject = directTableSync.newObject();
+						// Forbidden for inheritance classes
+						if(!rObject.get())
+						{
+							throw synthese::Exception("Forbidden table");
+						}
+						rObject->setKey(key);
+						_env.addRegistrable(rObject);
+					}
 					shared_ptr<ObjectBase> object(dynamic_pointer_cast<ObjectBase, Registrable>(rObject));
 					object->loadFromRecord(map, _env);
 					directTableSync.saveRegistrable(*rObject, transaction);

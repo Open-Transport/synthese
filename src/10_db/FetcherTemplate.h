@@ -45,22 +45,20 @@ namespace synthese
 			virtual boost::shared_ptr<BaseClass> _getEditable(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
 				return boost::static_pointer_cast<BaseClass, typename TableSync::ObjectType>(
-					TableSync::GetEditable(key, env, linkLevel, autoCreate)
+					TableSync::GetEditable(key, env, linkLevel)
 				);
 			}
 
 			virtual boost::shared_ptr<const BaseClass> _get(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
 				return boost::static_pointer_cast<const BaseClass, const typename TableSync::ObjectType>(
-					TableSync::Get(key, env, linkLevel, autoCreate)
+					TableSync::Get(key, env, linkLevel)
 				);
 			}
 

@@ -45,7 +45,7 @@
 #include "City.h"
 #include "StopPointUpdateAction.hpp"
 #include "DestinationTableSync.hpp"
-#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "RollingStockTableSync.hpp"
 
 #include <geos/operation/distance/DistanceOp.h>
@@ -95,7 +95,7 @@ namespace synthese
 						stop._withTimes
 				)	);
 				route->addEdge(*ls);
-				env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
+				env.getEditableRegistry<LineStop>().add(ls);
 
 				++rank;
 			}
@@ -712,7 +712,7 @@ namespace synthese
 							stop._withTimes ? *stop._withTimes : true
 					)	);
 					result->addEdge(*ls);
-					env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
+					env.getEditableRegistry<LineStop>().add(ls);
 					++rank;
 				}
 
@@ -729,7 +729,7 @@ namespace synthese
 
 						Env env2;
 						shared_ptr<DesignatedLinePhysicalStop> templateObject(
-							DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
+							LineStopTableSync::SearchSimilarLineStop(
 								static_cast<const StopPoint&>(*(*itEdge)->getFromVertex()),
 								static_cast<const StopPoint&>(*(*(itEdge+1))->getFromVertex()),
 								env2

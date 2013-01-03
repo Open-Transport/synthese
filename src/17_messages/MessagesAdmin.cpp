@@ -38,8 +38,6 @@
 #include "ScenarioStopAction.h"
 #include "MessagesRight.h"
 #include "MessagesModule.h"
-#include "ScenarioSentAlarmInheritedTableSync.h"
-#include "ScenarioTemplateInheritedTableSync.h"
 #include "ScenarioTemplate.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
@@ -94,10 +92,12 @@ namespace synthese
 		MessagesAdmin::MessagesAdmin()
 			: AdminInterfaceElementTemplate<MessagesAdmin>()
 			, _date(second_clock::local_time())
-			, _searchStatus(SentScenarioInheritedTableSync::BROADCAST_RUNNING)
+			, _searchStatus(ScenarioTableSync::BROADCAST_RUNNING)
 //			_searchLevel(ALARM_LEVEL_UNKNOWN)
 //			, _searchConflict(ALARM_CONFLICT_UNKNOWN)
 		{}
+
+
 
 		void MessagesAdmin::setFromParametersMap(
 			const ParametersMap& map
@@ -118,7 +118,7 @@ namespace synthese
 				);
 				if(num)
 				{
-					_searchStatus = static_cast<SentScenarioInheritedTableSync::StatusSearch>(*num);
+					_searchStatus = static_cast<ScenarioTableSync::StatusSearch>(*num);
 				}
 
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LEVEL));
@@ -126,7 +126,7 @@ namespace synthese
 				{
 //					_searchLevel = ALARM_LEVEL_SCENARIO;
 					if(id)
-					_searchScenario = ScenarioTemplateInheritedTableSync::Get(*id, _getEnv()).get();
+					_searchScenario = ScenarioTableSync::GetCast<ScenarioTemplate>(*id, _getEnv()).get();
 				}
 //				else if (id != 0)
 //				{
@@ -170,13 +170,13 @@ namespace synthese
 
 			AdminActionFunctionRequest<ScenarioStopAction,MessagesAdmin> scenarioStopRequest(_request, *this);
 
-			vector<pair<optional<SentScenarioInheritedTableSync::StatusSearch>, string> > statusMap;
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING_WITH_END, "&nbsp;&gt;&nbsp;En cours avec date de fin"));
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING_WITHOUT_END, "&nbsp;&gt;&nbsp;En cours sans date de fin"));
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::FUTURE_BROADCAST, "&nbsp;&gt;&nbsp;Diffusion ultérieure"));
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_OVER, "Archivés"));
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_DRAFT, "Brouillons"));
+			vector<pair<optional<ScenarioTableSync::StatusSearch>, string> > statusMap;
+			statusMap.push_back(make_pair(ScenarioTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
+			statusMap.push_back(make_pair(ScenarioTableSync::BROADCAST_RUNNING_WITH_END, "&nbsp;&gt;&nbsp;En cours avec date de fin"));
+			statusMap.push_back(make_pair(ScenarioTableSync::BROADCAST_RUNNING_WITHOUT_END, "&nbsp;&gt;&nbsp;En cours sans date de fin"));
+			statusMap.push_back(make_pair(ScenarioTableSync::FUTURE_BROADCAST, "&nbsp;&gt;&nbsp;Diffusion ultérieure"));
+			statusMap.push_back(make_pair(ScenarioTableSync::BROADCAST_OVER, "Archivés"));
+			statusMap.push_back(make_pair(ScenarioTableSync::BROADCAST_DRAFT, "Brouillons"));
 
 			ptime now(second_clock::local_time());
 
@@ -196,7 +196,7 @@ namespace synthese
 				}
 			}
 
-			stream << s.cell("Statut", s.getForm().getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, optional<SentScenarioInheritedTableSync::StatusSearch>(_searchStatus)));
+			stream << s.cell("Statut", s.getForm().getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, optional<ScenarioTableSync::StatusSearch>(_searchStatus)));
 //			stream << s.cell(
 //				"Superposition",
 //				s.getForm().getSelectInput(PARAMETER_SEARCH_CONFLICT, MessagesModule::getConflictLabels(true), _searchConflict)
@@ -218,8 +218,8 @@ namespace synthese
 
 			stream << "<h1>Résultats de la recherche</h1>";
 
-			SentScenarioInheritedTableSync::SearchResult scenarios(
-				SentScenarioInheritedTableSync::Search(
+			ScenarioTableSync::SearchResult scenarios(
+				ScenarioTableSync::SearchSentScenarios(
 					_getEnv(),
 					_searchName,
 					_searchStatus,
@@ -253,26 +253,27 @@ namespace synthese
 
 			stream << t1.open();
 
-			BOOST_FOREACH(const shared_ptr<SentScenario>& message, scenarios)
+			BOOST_FOREACH(const shared_ptr<Scenario>& it, scenarios)
 			{
+				const SentScenario& message(static_cast<SentScenario&>(*it));
 				bool isDisplayedWithEndDate(
-					(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)
-					&& !message->getPeriodEnd().is_not_a_date_time()
-					&& message->getPeriodEnd() >= now
-					&& message->getIsEnabled()
+					(message.getPeriodStart().is_not_a_date_time() || message.getPeriodStart() <= now)
+					&& !message.getPeriodEnd().is_not_a_date_time()
+					&& message.getPeriodEnd() >= now
+					&& message.getIsEnabled()
 				);
 				bool isDisplayedWithoutEndDate(
-					(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)
-					&& message->getPeriodEnd().is_not_a_date_time()
-					&& message->getIsEnabled()
+					(message.getPeriodStart().is_not_a_date_time() || message.getPeriodStart() <= now)
+					&& message.getPeriodEnd().is_not_a_date_time()
+					&& message.getIsEnabled()
 				);
 				bool willBeDisplayed(
-					!message->getPeriodStart().is_not_a_date_time()
-					&& message->getPeriodStart() > now
-					&& message->getIsEnabled()
+					!message.getPeriodStart().is_not_a_date_time()
+					&& message.getPeriodStart() > now
+					&& message.getIsEnabled()
 				);
 				string rowColorCSS;
-				if (!message->getIsEnabled())
+				if (!message.getIsEnabled())
 				{
 					rowColorCSS = CSS_ALARM_DISABLED;
 				}
@@ -288,13 +289,13 @@ namespace synthese
 				{
 					rowColorCSS = CSS_ALARM_DISPLAYED_WITH_END_DATE;
 				}
-				stream << t1.row(lexical_cast<string>(message->getKey()), rowColorCSS);
+				stream << t1.row(lexical_cast<string>(message.getKey()), rowColorCSS);
 
 				// Dates
 				stream << t1.col();
-				if (!message->getIsEnabled())
+				if (!message.getIsEnabled())
 				{
-					if (!message->getPeriodEnd().is_not_a_date_time() && message->getPeriodEnd() < now)
+					if (!message.getPeriodEnd().is_not_a_date_time() && message.getPeriodEnd() < now)
 					{
 						stream << "Archivé";
 					}
@@ -305,11 +306,11 @@ namespace synthese
 				}
 				else
 				{
-					if (!message->getPeriodEnd().is_not_a_date_time() && message->getPeriodEnd() < now)
+					if (!message.getPeriodEnd().is_not_a_date_time() && message.getPeriodEnd() < now)
 					{
 						stream << "Archivé";
 					}
-					else if(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)
+					else if(message.getPeriodStart().is_not_a_date_time() || message.getPeriodStart() <= now)
 					{
 						stream << "En cours";
 					}
@@ -321,42 +322,42 @@ namespace synthese
 
 
 				stream << t1.col();
-				if (message->getPeriodStart().is_not_a_date_time() && message->getPeriodEnd().is_not_a_date_time())
+				if (message.getPeriodStart().is_not_a_date_time() && message.getPeriodEnd().is_not_a_date_time())
 				{
 					stream << "Diffusion permanente";
 				}
-				if (message->getPeriodStart().is_not_a_date_time() && !message->getPeriodEnd().is_not_a_date_time())
+				if (message.getPeriodStart().is_not_a_date_time() && !message.getPeriodEnd().is_not_a_date_time())
 				{
-					stream << "Jusqu'au " << message->getPeriodEnd();
+					stream << "Jusqu'au " << message.getPeriodEnd();
 				}
-				if (!message->getPeriodStart().is_not_a_date_time() && message->getPeriodEnd().is_not_a_date_time())
+				if (!message.getPeriodStart().is_not_a_date_time() && message.getPeriodEnd().is_not_a_date_time())
 				{
-					stream << "A compter du " << message->getPeriodStart();
+					stream << "A compter du " << message.getPeriodStart();
 				}
-				if (!message->getPeriodStart().is_not_a_date_time() && !message->getPeriodEnd().is_not_a_date_time())
+				if (!message.getPeriodStart().is_not_a_date_time() && !message.getPeriodEnd().is_not_a_date_time())
 				{
-					stream << "Du " << message->getPeriodStart() << " au " << message->getPeriodEnd();
+					stream << "Du " << message.getPeriodStart() << " au " << message.getPeriodEnd();
 				}
 
 				// Type
 //				stream << t1.col() << MessagesModule::getLevelLabel(message.level);
 				stream << t1.col();
-				if(message->getTemplate())
+				if(message.getTemplate())
 				{
-					stream << message->getTemplate()->getName();
+					stream << message.getTemplate()->getName();
 				}
 
-				stream << t1.col() << message->getName();
+				stream << t1.col() << message.getName();
 				//stream << t1.col(); // Bullet
 //				stream << t1.col() << MessagesModule::getConflictLabel(message.conflict); /// @todo put a graphic bullet
 				stream << t1.col();
 
-				scenarioRequest.getPage()->setScenario(message);
+				scenarioRequest.getPage()->setScenario(static_pointer_cast<SentScenario,Scenario>(it));
 
 				stream << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Ouvrir");
-				if (message->isApplicable(now))
+				if (message.isApplicable(now))
 				{
-					scenarioStopRequest.getAction()->setScenario(message);
+					scenarioStopRequest.getAction()->setScenario(static_pointer_cast<SentScenario,Scenario>(it));
 					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
 				}
 			}
@@ -432,7 +433,7 @@ namespace synthese
 					getNewPage<MessagesScenarioAdmin>()
 				);
 				p->setScenario(
-					SentScenarioInheritedTableSync::GetEditable(
+					ScenarioTableSync::GetCastEditable<SentScenario>(
 						sa ? sa->getScenario()->getKey() : ma->getAlarm()->getScenario()->getKey(),
 						_getEnv()
 				)	);

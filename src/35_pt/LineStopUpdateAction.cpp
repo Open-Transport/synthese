@@ -27,7 +27,7 @@
 #include "ActionException.h"
 #include "DBModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "GeometryField.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineArea.hpp"
@@ -235,7 +235,7 @@ namespace synthese
 				{
 					Env env2;
 					shared_ptr<DesignatedLinePhysicalStop> templateObject(
-						DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
+						LineStopTableSync::SearchSimilarLineStop(
 							*_prevLineStop->getPhysicalStop(),
 							*_physicalStop,
 							env2
@@ -251,7 +251,7 @@ namespace synthese
 				{
 					Env env2;
 					shared_ptr<DesignatedLinePhysicalStop> templateObject(
-						DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
+						LineStopTableSync::SearchSimilarLineStop(
 							*_physicalStop,
 							*_nextLineStop->getPhysicalStop(),
 							env2

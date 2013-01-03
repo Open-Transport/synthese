@@ -26,7 +26,7 @@
 #define SYNTHESE_PublicPlaceEntranceTableSync_hpp__
 
 #include "PublicPlaceEntrance.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -39,7 +39,10 @@ namespace synthese
 		///	@date 2012
 		/// @since 3.3.0
 		class PublicPlaceEntranceTableSync:
-			public db::DBRegistryTableSyncTemplate<PublicPlaceEntranceTableSync,PublicPlaceEntrance>
+			public db::DBDirectTableSyncTemplate<
+				PublicPlaceEntranceTableSync,
+				PublicPlaceEntrance
+			>
 		{
 		public:
 			//! @name Services

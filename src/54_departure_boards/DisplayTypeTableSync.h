@@ -30,7 +30,8 @@
 
 #include "DisplayType.h"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -43,7 +44,12 @@ namespace synthese
 		///	@ingroup m54LS refLS
 		/// @author Hugues Romain
 		class DisplayTypeTableSync:
-			public db::DBRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>
+			public db::DBDirectTableSyncTemplate<
+				DisplayTypeTableSync,
+				DisplayType,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;

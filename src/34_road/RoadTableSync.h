@@ -29,7 +29,8 @@
 #include <iostream>
 
 #include "MainRoadPart.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -47,8 +48,13 @@ namespace synthese
 		///		- road_place_id : named road which the road part belongs to
 		///		- right_side : (1|0) : true = the main Road object is on right side,
 		///			false = the main Road object is on left side
-		class RoadTableSync
-		:	public db::DBRegistryTableSyncTemplate<RoadTableSync, MainRoadPart>
+		class RoadTableSync:
+			public db::DBDirectTableSyncTemplate<
+				RoadTableSync,
+				MainRoadPart,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 

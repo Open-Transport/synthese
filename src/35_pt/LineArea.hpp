@@ -42,8 +42,6 @@ namespace synthese
 		public:
 			typedef std::vector<boost::shared_ptr<AreaGeneratedLineStop> > GeneratedLineStops;
 
-			/// Chosen registry class.
-			typedef util::Registry<LineArea> Registry;
 
 		private:
 			GeneratedLineStops _generatedLineStops;

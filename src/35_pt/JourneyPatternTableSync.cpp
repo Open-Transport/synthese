@@ -113,7 +113,8 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Load(
+		template<>
+		void OldLoadSavePolicy<JourneyPatternTableSync,JourneyPattern>::Load(
 			JourneyPattern* line,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -168,7 +169,7 @@ namespace synthese
 				{
 					try
 					{
-						line->setRollingStock(RollingStockTableSync::GetEditable(rollingStockId, env, linkLevel, AUTO_CREATE).get());
+						line->setRollingStock(RollingStockTableSync::GetEditable(rollingStockId, env, linkLevel).get());
 					}
 					catch(ObjectNotFoundException<RollingStock>&)
 					{
@@ -231,7 +232,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Save(
+		template<>
+		void OldLoadSavePolicy<JourneyPatternTableSync,JourneyPattern>::Save(
 			JourneyPattern* object,
 			optional<DBTransaction&> transaction
 		){
@@ -268,7 +270,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
+		template<>
+		void OldLoadSavePolicy<JourneyPatternTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
 		{
 			if(obj->getCommercialLine())
 			{

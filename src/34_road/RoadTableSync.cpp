@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Load(
+		template<> void OldLoadSavePolicy<RoadTableSync,MainRoadPart>::Load(
 			MainRoadPart* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -110,14 +110,14 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Unlink(
+		template<> void OldLoadSavePolicy<RoadTableSync,MainRoadPart>::Unlink(
 			MainRoadPart* obj
 		){
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Save(
+		template<> void OldLoadSavePolicy<RoadTableSync,MainRoadPart>::Save(
 			MainRoadPart* object,
 			optional<DBTransaction&> transaction
 		){

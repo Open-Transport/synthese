@@ -26,7 +26,8 @@
 #define SYNTHESE_CityAliasTableSync_hpp__
 
 #include "CityAlias.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.16
 		class CityAliasTableSync:
-			public db::DBRegistryTableSyncTemplate<CityAliasTableSync,CityAlias>
+			public db::DBDirectTableSyncTemplate<
+				CityAliasTableSync,
+				CityAlias,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

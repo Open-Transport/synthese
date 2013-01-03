@@ -24,7 +24,7 @@
 
 #include "CoordinatesSystem.hpp"
 #include "DB.hpp"
-#include "DBConditionalRegistryTableSync.hpp"
+#include "ConditionalSynchronizationPolicyBase.hpp"
 #include "DBDirectTableSync.hpp"
 #include "DBTableSync.hpp"
 #include "DBException.hpp"
@@ -99,11 +99,14 @@ namespace synthese
 			{
 				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync;
 				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync;
-				if(	sync->getNeedsToReload() &&
-					dynamic_cast<DBConditionalRegistryTableSync*>(sync.get())
+				ConditionalSynchronizationPolicyBase* cspb(
+					dynamic_cast<ConditionalSynchronizationPolicyBase*>(sync.get())
+				);
+				if(	cspb &&
+					cspb->needsToReload()
 				){
 					DBModule::_conditionalTableSyncsToReload.insert(
-						dynamic_pointer_cast<DBConditionalRegistryTableSync, DBTableSync>(sync)
+						dynamic_pointer_cast<ConditionalSynchronizationPolicyBase, DBTableSync>(sync)
 					);
 				}
 			}
@@ -323,10 +326,12 @@ namespace synthese
 				ServerModule::SetCurrentThreadRunningAction();
 
 				// Loop on each conditional synchronized table
-				BOOST_FOREACH(shared_ptr<DBConditionalRegistryTableSync> sync, _conditionalTableSyncsToReload)
+				BOOST_FOREACH(shared_ptr<ConditionalSynchronizationPolicyBase> sync, _conditionalTableSyncsToReload)
 				{
 					// Cleaning up the env with obsolete data
-					RegistryBase& registry(sync->getEditableRegistry(Env::GetOfficialEnv()));
+					RegistryBase& registry(
+						dynamic_cast<DBDirectTableSync&>(*sync).getEditableRegistry(Env::GetOfficialEnv())
+					);
 					RowIdList objectsToRemove;
 					BOOST_FOREACH(const RegistryBase::RegistrablesVector::value_type& it, registry.getRegistrablesVector())
 					{

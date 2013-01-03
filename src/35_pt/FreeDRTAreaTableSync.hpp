@@ -26,7 +26,8 @@
 #define SYNTHESE_FreeDRTAreaTableSync_hpp__
 
 #include "FreeDRTArea.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.1
 		class FreeDRTAreaTableSync:
-			public db::DBRegistryTableSyncTemplate<FreeDRTAreaTableSync,FreeDRTArea>
+			public db::DBDirectTableSyncTemplate<
+				FreeDRTAreaTableSync,
+				FreeDRTArea,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

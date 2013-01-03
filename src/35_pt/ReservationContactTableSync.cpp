@@ -86,7 +86,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Load(
+		template<> void OldLoadSavePolicy<ReservationContactTableSync,ReservationContact>::Load(
 			ReservationContact* rr,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -118,7 +118,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Save(
+		template<> void OldLoadSavePolicy<ReservationContactTableSync,ReservationContact>::Save(
 			ReservationContact* object,
 			optional<DBTransaction&> transaction
 		){
@@ -133,7 +133,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Unlink(
+		template<> void OldLoadSavePolicy<ReservationContactTableSync,ReservationContact>::Unlink(
 			ReservationContact* obj
 		){
 		}
@@ -175,13 +175,6 @@ namespace synthese
 
 	namespace pt
 	{
-		ReservationContactTableSync::ReservationContactTableSync()
-			: DBRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>()
-		{
-		}
-
-
-
 		ReservationContactTableSync::SearchResult ReservationContactTableSync::Search(
 			Env& env,
 			boost::optional<const std::string&> name,

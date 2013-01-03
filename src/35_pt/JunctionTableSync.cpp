@@ -104,7 +104,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<JunctionTableSync,Junction>::Load(
+		template<> void OldLoadSavePolicy<JunctionTableSync,Junction>::Load(
 			Junction* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -140,7 +140,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<JunctionTableSync,Junction>::Save(
+		template<> void OldLoadSavePolicy<JunctionTableSync,Junction>::Save(
 			Junction* object,
 			optional<DBTransaction&> transaction
 		){
@@ -155,7 +155,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<JunctionTableSync,Junction>::Unlink(
+		template<> void OldLoadSavePolicy<JunctionTableSync,Junction>::Unlink(
 			Junction* obj
 		){
 		}

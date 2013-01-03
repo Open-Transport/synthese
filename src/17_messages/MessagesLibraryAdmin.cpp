@@ -41,7 +41,7 @@
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioFolder.h"
 #include "ScenarioFolderUpdateAction.h"
-#include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioTableSync.h"
 #include "RemoveObjectAction.hpp"
 #include "StaticActionFunctionRequest.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -127,7 +127,7 @@ namespace synthese
 			{
 				stream << "<h1>Répertoire</h1>";
 
-				if(	_getEnv().getRegistry<ScenarioTemplate>().empty() &&
+				if(	_getEnv().getRegistry<Scenario>().empty() &&
 					_getEnv().getRegistry<ScenarioFolder>().empty()
 				){
 					AdminActionFunctionRequest<RemoveObjectAction,MessagesLibraryAdmin> removeFolderRequest(_request, *this);
@@ -184,8 +184,8 @@ namespace synthese
 			addScenarioRequest.setActionWillCreateObject();
 
 			// Search
-			ScenarioTemplateInheritedTableSync::SearchResult scenarios(
-				ScenarioTemplateInheritedTableSync::Search(
+			ScenarioTableSync::SearchResult scenarios(
+				ScenarioTableSync::SearchTemplates(
 					_getEnv(),
 					_folder.get() ? _folder->getKey() : 0
 					, string(), NULL
@@ -210,7 +210,7 @@ namespace synthese
 			);
 			stream << t3.open();
 
-			BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& scenario, scenarios)
+			BOOST_FOREACH(const shared_ptr<Scenario>& scenario, scenarios)
 			{
 				updateScenarioRequest.getPage()->setScenario(scenario);
 				deleteScenarioRequest.getAction()->setObjectId(scenario->getKey());
@@ -327,12 +327,12 @@ namespace synthese
 				}
 
 				// Scenarios
-				ScenarioTemplateInheritedTableSync::SearchResult scenarios(
-					ScenarioTemplateInheritedTableSync::Search(
+				ScenarioTableSync::SearchResult scenarios(
+					ScenarioTableSync::SearchTemplates(
 						*_env,
 						_folder.get() ? _folder->getKey() : 0
 				)	);
-				BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& tpl, scenarios)
+				BOOST_FOREACH(const shared_ptr<Scenario>& tpl, scenarios)
 				{
 					shared_ptr<MessagesScenarioAdmin> p(
 						getNewPage<MessagesScenarioAdmin>()

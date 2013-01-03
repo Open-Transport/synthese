@@ -28,7 +28,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 namespace synthese
@@ -62,7 +63,12 @@ namespace synthese
 		///	<dt>projected_metric_offset</dt><dd>metric offset of the projected point on the road chunk</dd>
 		///	</dl>
 		class StopPointTableSync:
-			public db::DBRegistryTableSyncTemplate<StopPointTableSync,StopPoint>,
+			public db::DBDirectTableSyncTemplate<
+				StopPointTableSync,
+				StopPoint,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>,
 			public db::FetcherTemplate<graph::Vertex, StopPointTableSync>
 		{
 		public:

@@ -28,7 +28,8 @@
 
 #include <boost/optional.hpp>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "CalendarTemplate.h"
 
 namespace synthese
@@ -42,8 +43,13 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t054_calendar_templates
 		/// Corresponding class : CalendarTemplate
-		class CalendarTemplateTableSync
-		:	public db::DBRegistryTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>
+		class CalendarTemplateTableSync:
+			public db::DBDirectTableSyncTemplate<
+				CalendarTemplateTableSync,
+				CalendarTemplate,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_TEXT;

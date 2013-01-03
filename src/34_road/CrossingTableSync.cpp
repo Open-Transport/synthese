@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CrossingTableSync, Crossing>::Load(
+		template<> void OldLoadSavePolicy<CrossingTableSync, Crossing>::Load(
 			Crossing* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -117,14 +117,14 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CrossingTableSync, Crossing>::Unlink(
+		template<> void OldLoadSavePolicy<CrossingTableSync, Crossing>::Unlink(
 			Crossing* obj
 		){
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<CrossingTableSync, Crossing>::Save(
+		template<> void OldLoadSavePolicy<CrossingTableSync, Crossing>::Save(
 			Crossing* object,
 			optional<DBTransaction&> transaction
 		){
@@ -178,16 +178,6 @@ namespace synthese
 
 	namespace road
 	{
-		CrossingTableSync::CrossingTableSync()
-			: DBRegistryTableSyncTemplate<CrossingTableSync, Crossing>()
-		{
-		}
-
-		CrossingTableSync::~CrossingTableSync()
-		{
-
-		}
-
 		CrossingTableSync::SearchResult CrossingTableSync::Search(
 			Env& env,
 			int first /*= 0*/,

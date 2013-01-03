@@ -79,7 +79,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<MapSourceTableSync,MapSource>::Load(
+		template<> void OldLoadSavePolicy<MapSourceTableSync,MapSource>::Load(
 			MapSource* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -119,7 +119,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<MapSourceTableSync,MapSource>::Save(
+		template<> void OldLoadSavePolicy<MapSourceTableSync,MapSource>::Save(
 			MapSource* object,
 			optional<DBTransaction&> transaction
 		){
@@ -140,7 +140,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<MapSourceTableSync,MapSource>::Unlink(
+		template<> void OldLoadSavePolicy<MapSourceTableSync,MapSource>::Unlink(
 			MapSource* obj
 		){
 		}

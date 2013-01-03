@@ -26,7 +26,8 @@
 #define SYNTHESE_DestinationTableSync_hpp__
 
 #include "Destination.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -39,7 +40,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.0
 		class DestinationTableSync:
-			public db::DBRegistryTableSyncTemplate<DestinationTableSync,Destination>
+			public db::DBDirectTableSyncTemplate<
+				DestinationTableSync,
+				Destination,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			//! @name Field names

@@ -41,8 +41,8 @@
 #include "MessagesModule.h"
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
-#include "ScenarioSentAlarmInheritedTableSync.h"
-#include "AlarmTemplateInheritedTableSync.h"
+#include "ScenarioTableSync.h"
+#include "AlarmTableSync.h"
 #include "StaticActionFunctionRequest.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
@@ -204,28 +204,11 @@ namespace synthese
 
 				stream << "<h1>Messages</h1>";
 
-				vector<shared_ptr<Alarm> > v;
-
-				if (_sentScenario.get())
-				{
-					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
-						ScenarioSentAlarmInheritedTableSync::Search(*_env, _sentScenario->getKey())
-					);
-					BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
-					{
-						v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
-					}
-				}
-				else
-				{
-					AlarmTemplateInheritedTableSync::SearchResult alarms(
-						AlarmTemplateInheritedTableSync::Search(*_env, _templateScenario->getKey())
-					);
-					BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
-					{
-						v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
-					}
-				}
+				AlarmTableSync::SearchResult v(
+					AlarmTableSync::Search(
+						*_env,
+						_sentScenario.get() ? _sentScenario->getKey() : _templateScenario->getKey()
+				)	);
 
 				ActionResultHTMLTable::HeaderVector h;
 				h.push_back(make_pair(string(), "Message"));
@@ -340,37 +323,18 @@ namespace synthese
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
-			if (dynamic_cast<const SentScenario*>(_scenario.get()))
+			AlarmTableSync::SearchResult alarms(
+				AlarmTableSync::Search(
+					*_env,
+					_scenario->getKey()
+			)	);
+			BOOST_FOREACH(const shared_ptr<Alarm>& alarm, alarms)
 			{
-				ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
-					ScenarioSentAlarmInheritedTableSync::Search(
-						*_env,
-						_scenario->getKey(), 0, optional<size_t>(), false, false, false, false, UP_LINKS_LOAD_LEVEL
-				)	);
-				BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
-				{
-					shared_ptr<MessageAdmin> p(
-						getNewPage<MessageAdmin>()
-					);
-					p->setMessage(alarm);
-					links.push_back(p);
-				}
-			}
-			else if (dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
-			{
-				AlarmTemplateInheritedTableSync::SearchResult alarms(
-					AlarmTemplateInheritedTableSync::Search(
-						*_env,
-						_scenario->getKey(), 0, optional<size_t>(), false, false, UP_LINKS_LOAD_LEVEL
-				)	);
-				BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
-				{
-					shared_ptr<MessageAdmin> p(
-						getNewPage<MessageAdmin>()
-					);
-					p->setMessage(alarm);
-					links.push_back(p);
-				}
+				shared_ptr<MessageAdmin> p(
+					getNewPage<MessageAdmin>()
+				);
+				p->setMessage(alarm);
+				links.push_back(p);
 			}
 
 			return links;

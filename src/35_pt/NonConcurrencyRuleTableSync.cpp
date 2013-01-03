@@ -85,7 +85,7 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
+		template<> void OldLoadSavePolicy<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
 			NonConcurrencyRule* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -129,7 +129,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Save(
+		template<> void OldLoadSavePolicy<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Save(
 			NonConcurrencyRule* object,
 			optional<DBTransaction&> transaction
 		){
@@ -142,7 +142,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
+		template<> void OldLoadSavePolicy<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
 			NonConcurrencyRule* obj
 		){
 			if(obj->getHiddenLine()) obj->getHiddenLine()->removeConcurrencyRule(obj);

@@ -119,7 +119,8 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Load(
+		template<>
+		void OldLoadSavePolicy<UserTableSync,User>::Load(
 			User* user,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -196,7 +197,8 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Unlink(
+		template<>
+		void OldLoadSavePolicy<UserTableSync,User>::Unlink(
 			User* obj
 		){
 			if(Env::GetOfficialEnv().contains(*obj))
@@ -207,7 +209,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Save(
+		template<>
+		void OldLoadSavePolicy<UserTableSync,User>::Save(
 			User* user,
 			optional<DBTransaction&> transaction
 		){

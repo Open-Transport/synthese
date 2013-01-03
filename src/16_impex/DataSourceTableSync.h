@@ -31,7 +31,8 @@
 
 #include "DataSource.h"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -41,18 +42,23 @@ namespace synthese
 			Automatic sychrnozation : none
 			@ingroup m16LS refLS
 		*/
-		class DataSourceTableSync
-		:	public db::DBRegistryTableSyncTemplate<DataSourceTableSync,DataSource>
+		class DataSourceTableSync:
+			public db::DBDirectTableSyncTemplate<
+				DataSourceTableSync,
+				DataSource,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
-		 public:
-			 static const std::string COL_NAME;
-			 static const std::string COL_FORMAT;
-			 static const std::string COL_ICON;
-			 static const std::string COL_CHARSET;
-			 static const std::string COL_SRID;
-			 static const std::string COL_DEFAULT_IMPORT_REQUEST;
+		public:
+			static const std::string COL_NAME;
+			static const std::string COL_FORMAT;
+			static const std::string COL_ICON;
+			static const std::string COL_CHARSET;
+			static const std::string COL_SRID;
+			static const std::string COL_DEFAULT_IMPORT_REQUEST;
 
-			DataSourceTableSync ();
+			DataSourceTableSync() {}
 
 			/** DataSource search.
 				@param env Environment to read and populate
@@ -80,7 +86,6 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
-	}
-}
+}	}
 
 #endif

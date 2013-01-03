@@ -23,12 +23,13 @@
 #ifndef SYNTHESE_TextTemplateTableSync_H__
 #define SYNTHESE_TextTemplateTableSync_H__
 
-
 #include <vector>
 #include <string>
 #include <iostream>
 
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
+
 #include "TextTemplate.h"
 
 namespace synthese
@@ -39,7 +40,12 @@ namespace synthese
 			@ingroup m17LS refLS
 		*/
 		class TextTemplateTableSync:
-			public db::DBNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>
+			public db::DBDirectTableSyncTemplate<
+				TextTemplateTableSync,
+				TextTemplate,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;

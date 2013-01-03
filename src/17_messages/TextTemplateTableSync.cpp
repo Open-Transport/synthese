@@ -84,7 +84,8 @@ namespace synthese
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
+		template<>
+		void OldLoadSavePolicy<TextTemplateTableSync,TextTemplate>::Load(
 			TextTemplate* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -97,12 +98,16 @@ namespace synthese
 			object->setParentId(rows->getLongLong(TextTemplateTableSync::COL_PARENT_ID));
 		}
 
-		template<> void DBDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Unlink(
+		template<>
+		void OldLoadSavePolicy<TextTemplateTableSync,TextTemplate>::Unlink(
 			TextTemplate* obj
 		){
 		}
 
-		template<> void DBDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Save(
+
+
+		template<>
+		void OldLoadSavePolicy<TextTemplateTableSync,TextTemplate>::Save(
 			TextTemplate* object,
 			optional<DBTransaction&> transaction
 		){

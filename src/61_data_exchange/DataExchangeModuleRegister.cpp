@@ -17,6 +17,7 @@
 #include "OGTFileFormat.hpp"
 #include "ObitiFileFormat.hpp"
 #include "PegaseFileFormat.hpp"
+#include "RSSFileFormat.hpp"
 #include "TridentFileFormat.h"
 #include "StopsShapeFileFormat.hpp"
 #include "ServicesCSVFileFormat.hpp"
@@ -72,6 +73,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OGTFileFormat::integrate();
 	synthese::data_exchange::ObitiFileFormat::integrate();
 	synthese::data_exchange::PegaseFileFormat::integrate();
+	synthese::data_exchange::RSSFileFormat::integrate();
 	synthese::data_exchange::TridentFileFormat::integrate();
 	synthese::data_exchange::StopsShapeFileFormat::integrate();
 	synthese::data_exchange::ServicesCSVFileFormat::integrate();

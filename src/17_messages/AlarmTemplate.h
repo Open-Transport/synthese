@@ -39,13 +39,6 @@ namespace synthese
 		:	public Alarm
 		{
 		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<AlarmTemplate>	Registry;
-
-		private:
-
-		public:
 			/** Constructor for reading the object from the database.
 				@param key ID of the alarm
 				@param scenario pointer to the scenario its belong

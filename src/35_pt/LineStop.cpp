@@ -32,6 +32,11 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
+	namespace util
+	{
+		template<> const string Registry<pt::LineStop>::KEY("LineStop");
+	}
+
 	namespace pt
 	{
 		LineStop::LineStop(

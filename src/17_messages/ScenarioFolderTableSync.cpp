@@ -32,7 +32,7 @@
 #include "DBException.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
-#include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioTableSync.h"
 #include "MessagesLibraryRight.h"
 #include "Session.h"
 #include "User.h"
@@ -83,7 +83,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Load(
+		template<>
+		void OldLoadSavePolicy<ScenarioFolderTableSync,ScenarioFolder>::Load(
 			ScenarioFolder* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -110,7 +111,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Save(
+		template<>
+		void OldLoadSavePolicy<ScenarioFolderTableSync,ScenarioFolder>::Save(
 			ScenarioFolder* object,
 			optional<DBTransaction&> transaction
 		){
@@ -122,7 +124,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
+		template<>
+		void OldLoadSavePolicy<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
 			ScenarioFolder* obj
 		){
 		}
@@ -134,15 +137,16 @@ namespace synthese
 			util::RegistryKeyType object_id
 		){
 			Env env;
-			ScenarioTemplateInheritedTableSync::Search(
-				env,
-				object_id,
-				string(),
-				NULL,
-				0,
-				1
-			);
-			if (!env.getRegistry<ScenarioTemplate>().empty())
+			ScenarioTableSync::SearchResult r(
+				ScenarioTableSync::SearchTemplates(
+					env,
+					object_id,
+					string(),
+					NULL,
+					0,
+					1
+			)	);
+			if(	!r.empty())
 			{
 				return false;
 			}

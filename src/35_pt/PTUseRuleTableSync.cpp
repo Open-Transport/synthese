@@ -106,7 +106,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Load(
+		template<> void OldLoadSavePolicy<PTUseRuleTableSync,PTUseRule>::Load(
 			PTUseRule* rr,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -189,7 +189,7 @@ namespace synthese
 			}
 		}
 
-		template<> void DBDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Save(
+		template<> void OldLoadSavePolicy<PTUseRuleTableSync,PTUseRule>::Save(
 			PTUseRule* object,
 			optional<DBTransaction&> transaction
 		){
@@ -213,7 +213,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Unlink(
+		template<> void OldLoadSavePolicy<PTUseRuleTableSync,PTUseRule>::Unlink(
 			PTUseRule* obj
 		){
 

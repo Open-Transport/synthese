@@ -92,7 +92,7 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(
+		template<> void OldLoadSavePolicy<RollingStockTableSync,RollingStock>::Load(
 			RollingStock* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -128,7 +128,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Save(
+		template<> void OldLoadSavePolicy<RollingStockTableSync,RollingStock>::Save(
 			RollingStock* object,
 			optional<DBTransaction&> transaction
 		){
@@ -149,7 +149,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Unlink(
+		template<> void OldLoadSavePolicy<RollingStockTableSync,RollingStock>::Unlink(
 			RollingStock* obj
 		){
 			obj->cleanDataSourceLinks(true);
@@ -194,13 +194,6 @@ namespace synthese
 
 	namespace pt
 	{
-		RollingStockTableSync::RollingStockTableSync()
-			: DBRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>()
-		{
-		}
-
-
-
 		RollingStockTableSync::SearchResult RollingStockTableSync::Search(
 			Env& env,
 			optional<string> tridentKey,

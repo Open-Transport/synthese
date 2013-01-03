@@ -93,7 +93,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Load(
+		template<>
+		void OldLoadSavePolicy<TransportNetworkTableSync,TransportNetwork>::Load(
 			TransportNetwork* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -120,7 +121,7 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, e);
 			}	}
 
 			{ // Periods calendars parent
@@ -136,13 +137,13 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>& e)
 				{
-					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, e);
+					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, e);
 			}	}
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(
+		template<> void OldLoadSavePolicy<TransportNetworkTableSync,TransportNetwork>::Save(
 			TransportNetwork* object,
 			optional<DBTransaction&> transaction
 		){
@@ -159,7 +160,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(
+		template<> void OldLoadSavePolicy<TransportNetworkTableSync,TransportNetwork>::Unlink(
 			TransportNetwork* object
 		){
 		}

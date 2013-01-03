@@ -22,7 +22,9 @@
 #ifndef SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
 #define SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
 
-#include "DBInheritanceTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "FullSynchronizationPolicy.hpp"
+#include "InheritanceLoadSavePolicy.hpp"
 
 #include "Alarm.h"
 #include "MessagesTypes.h"
@@ -49,7 +51,13 @@ namespace synthese
 
 			@note As Alarm is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
-		class AlarmTableSync : public db::DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>
+		class AlarmTableSync:
+			public db::DBDirectTableSyncTemplate<
+				AlarmTableSync,
+				Alarm,
+				db::FullSynchronizationPolicy,
+				db::InheritanceLoadSavePolicy
+			>
 		{
 		protected:
 			static const std::string _COL_CONFLICT_LEVEL;
@@ -60,16 +68,23 @@ namespace synthese
 			static const std::string COL_IS_TEMPLATE;
 			static const std::string COL_SHORT_MESSAGE;
 			static const std::string COL_LONG_MESSAGE;
-			static const std::string COL_PERIODSTART;
-			static const std::string COL_PERIODEND;
 			static const std::string COL_SCENARIO_ID;
-			static const std::string COL_ENABLED;
 			static const std::string COL_TEMPLATE_ID;
 			static const std::string COL_RAW_EDITOR;
 			static const std::string COL_DONE;
 
-			AlarmTableSync();
-			~AlarmTableSync();
+			AlarmTableSync() {}
+			~AlarmTableSync() {}
+
+			static SearchResult Search(
+				util::Env& env,
+				boost::optional<util::RegistryKeyType> scenarioId = boost::optional<util::RegistryKeyType>()
+				, int first = 0
+				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
+				, bool orderByLevel = false
+				, bool raisingOrder = false,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 		};
 	}
 }

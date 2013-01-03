@@ -31,19 +31,24 @@
 #include <iostream>
 #include <boost/optional.hpp>
 
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
+#include "ScenarioFolder.h"
 
 namespace synthese
 {
 	namespace messages
 	{
-		class ScenarioFolder;
-
 		/** Scenario folder table synchronizer.
 			@ingroup m17LS refLS
 		*/
 		class ScenarioFolderTableSync:
-			public db::DBNoSyncTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>
+			public db::DBDirectTableSyncTemplate<
+				ScenarioFolderTableSync,
+				ScenarioFolder,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;

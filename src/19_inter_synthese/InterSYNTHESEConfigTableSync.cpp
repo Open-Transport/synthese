@@ -58,42 +58,6 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<InterSYNTHESEConfigTableSync,InterSYNTHESEConfig>::Load(
-			InterSYNTHESEConfig* website,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(website->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			website->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				website->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<InterSYNTHESEConfigTableSync,InterSYNTHESEConfig>::Unlink(
-			InterSYNTHESEConfig* obj
-		){
-			obj->unlink();
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<InterSYNTHESEConfigTableSync,InterSYNTHESEConfig>::Save(
-			InterSYNTHESEConfig* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
-
 		template<> bool DBTableSyncTemplate<InterSYNTHESEConfigTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id

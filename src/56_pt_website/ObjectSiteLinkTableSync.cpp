@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Load(
+		template<> void OldLoadSavePolicy<ObjectSiteLinkTableSync,ObjectSiteLink>::Load(
 			ObjectSiteLink* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -113,7 +113,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Save(
+		template<> void OldLoadSavePolicy<ObjectSiteLinkTableSync,ObjectSiteLink>::Save(
 			ObjectSiteLink* object,
 			optional<DBTransaction&> transaction
 		){
@@ -125,7 +125,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
+		template<> void OldLoadSavePolicy<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
 			ObjectSiteLink* obj
 		){
 		}

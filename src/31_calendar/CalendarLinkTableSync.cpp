@@ -84,7 +84,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CalendarLinkTableSync,CalendarLink>::Load(
+		template<>
+		void OldLoadSavePolicy<CalendarLinkTableSync,CalendarLink>::Load(
 			CalendarLink* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -143,7 +144,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CalendarLinkTableSync, CalendarLink>::Save(
+		template<>
+		void OldLoadSavePolicy<CalendarLinkTableSync, CalendarLink>::Save(
 			CalendarLink* object,
 			optional<DBTransaction&> transaction
 		){
@@ -160,7 +162,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CalendarLinkTableSync,CalendarLink>::Unlink(CalendarLink* obj)
+		template<>
+		void OldLoadSavePolicy<CalendarLinkTableSync,CalendarLink>::Unlink(CalendarLink* obj)
 		{
 			if(obj->getCalendar())
 			{

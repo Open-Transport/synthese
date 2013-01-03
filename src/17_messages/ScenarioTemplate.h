@@ -26,7 +26,6 @@
 #define SYNTHESE_ScenarioTemplate_h__
 
 #include "Scenario.h"
-#include "Registry.h"
 #include "SentScenario.h"
 
 #include <map>
@@ -61,10 +60,6 @@ namespace synthese
 			static const std::string TAG_VARIABLE;
 			static const std::string TAG_MESSAGE;
 
-
-
-			/// Chosen registry class.
-			typedef util::Registry<ScenarioTemplate>	Registry;
 
 			typedef std::set<const AlarmTemplate*> Messages;
 

@@ -32,7 +32,8 @@
 #include <iostream>
 
 // Db
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 // Security
 #include "SecurityTypes.hpp"
@@ -47,7 +48,12 @@ namespace synthese
 			@ingroup m35LS refLS
 		*/
 		class CommercialLineTableSync:
-			public db::DBRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>
+			public db::DBDirectTableSyncTemplate<
+				CommercialLineTableSync,
+				CommercialLine,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NETWORK_ID;

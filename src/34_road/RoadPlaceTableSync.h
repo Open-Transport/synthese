@@ -31,7 +31,8 @@
 
 #include "RoadPlace.h"
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 #include <boost/optional.hpp>
 
@@ -42,8 +43,13 @@ namespace synthese
 		/** RoadPlace table synchronizer.
 			@ingroup m34LS refLS
 		*/
-		class RoadPlaceTableSync
-		:	public db::DBRegistryTableSyncTemplate<RoadPlaceTableSync,RoadPlace>
+		class RoadPlaceTableSync:
+			public db::DBDirectTableSyncTemplate<
+				RoadPlaceTableSync,
+				RoadPlace,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_NAME;

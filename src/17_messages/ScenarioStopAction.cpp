@@ -25,7 +25,6 @@
 #include "Profile.h"
 #include "ScenarioTableSync.h"
 #include "SentScenario.h"
-#include "SentScenarioInheritedTableSync.h"
 #include "Session.h"
 #include "User.h"
 #include "AlarmTableSync.h"
@@ -64,7 +63,7 @@ namespace synthese
 		{
 			try
 			{
-				_scenario = SentScenarioInheritedTableSync::GetEditable(
+				_scenario = ScenarioTableSync::GetCastEditable<SentScenario>(
 					map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
 					*_env
 				);

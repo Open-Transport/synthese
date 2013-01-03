@@ -111,7 +111,7 @@ namespace synthese
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Load(
+		template<> void OldLoadSavePolicy<StopAreaTableSync,StopArea>::Load(
 			StopArea* cp,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -261,7 +261,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Save(
+		template<> void OldLoadSavePolicy<StopAreaTableSync,StopArea>::Save(
 			StopArea* object,
 			optional<DBTransaction&> transaction
 		){
@@ -327,7 +327,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
+		template<> void OldLoadSavePolicy<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){
 			// Handicapped compliance

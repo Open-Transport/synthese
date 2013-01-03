@@ -28,6 +28,9 @@
 #include "DBDirectTableSync.hpp"
 #include "DBTableSyncTemplate.hpp"
 
+#include "FullSynchronizationPolicy.hpp"
+#include "StandardLoadSavePolicy.hpp"
+
 #include "DBTypes.h"
 #include "DB.hpp"
 #include "DBResult.hpp"
@@ -70,10 +73,17 @@ namespace synthese
 		///			and vice versa
 		///	@ingroup m10
 		////////////////////////////////////////////////////////////////////////
-		template <class K, class T>
+		template <
+			class K, // Table sync class
+			class T, // Object class
+			template <class, class> class SynchronizationPolicy = FullSynchronizationPolicy,
+			template <class, class> class LoadSavePolicy = StandardLoadSavePolicy // for compatibility with old classes
+		>
 		class DBDirectTableSyncTemplate:
 			public DBTableSyncTemplate<K>,
-			public DBDirectTableSync
+			public DBDirectTableSync,
+			public SynchronizationPolicy<K, T>,
+			public LoadSavePolicy<K, T>
 		{
 		public:
 			typedef K		TableSync;
@@ -82,23 +92,6 @@ namespace synthese
 
 
 		public:
-			static FieldsList GetFieldsList()
-			{
-				if(DBTableSyncTemplate<K>::_FIELDS[0].empty())
-				{
-					T object;
-					return object.getFields();
-				}
-				else
-				{
-					FieldsList l;
-					for(size_t i(0); !DBTableSyncTemplate<K>::_FIELDS[i].empty(); ++i)
-					{
-						l.push_back(DBTableSyncTemplate<K>::_FIELDS[i]);
-					}
-					return l;
-				}
-			}
 
 
 			virtual FieldsList getFieldsList() const { return GetFieldsList(); }
@@ -113,62 +106,31 @@ namespace synthese
 			///		- if non NULL : the object is read from the environment if exists, else from the database
 			///		- use Env::GetOfficialEnv() to use the official environment
 			///	@param linkLevel Level of load recursion (see each TableSync to know precisely the signification of each level for each class)
-			///	@param autoCreate :
-			///		- AUTO_CREATE : returns an empty object if the specified key was not found in the table (the returned object is <u>not</u> stored in the database).
-			///		- NEVER_CREATE (default) : throws a ObjectNotFound<T> exception if the specified key was not found in the table
 			///	@return shared pointer Pointer to an object corresponding to the fetched record.
 			///	@throw ObjectNotFound<T> if the object was not found and if autoCreate is deactivated
 			///	@todo implement upgrade of load level
 			static boost::shared_ptr<T> GetEditable(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
-			){
-				if (env.getRegistry<T>().contains(key))
-				{
-					return env.getEditableRegistry<T>().getEditable(key);
-				}
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+			
 
-				boost::shared_ptr<T> object;
-				try
-				{
-					DBResultSPtr rows(DBTableSyncTemplate<K>::_GetRow(key));
-					object.reset(new T(rows->getKey()));
-					env.getEditableRegistry<T>().add(object);
-					Load(object.get(), rows, env, linkLevel);
-				}
-				catch (typename db::DBEmptyResultException<K>&)
-				{
-					if (autoCreate == NEVER_CREATE)
-					{
-						throw util::ObjectNotFoundException<T>(key, "Object not found in "+ K::TABLE.NAME);
-					}
-					object.reset(new T(key));
-					env.getEditableRegistry<T>().add(object);
-				}
 
-				return object;
-			}
-
+			template<class S>
+			static boost::shared_ptr<S> GetCastEditable(
+				util::RegistryKeyType key,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 
 
 			virtual boost::shared_ptr<util::Registrable> getEditableRegistrable(
 				util::RegistryKeyType key,
 				util::Env& environment,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				try
-				{
-					return boost::dynamic_pointer_cast<util::Registrable, T>(
-						GetEditable(key, environment, linkLevel, autoCreate)
-					);
-				}
-				catch(util::ObjectNotFoundException<T>& e)
-				{
-					throw util::ObjectNotFoundException<util::Registrable>(e.getKey(), e.getMessage());
-				}
+				return GetCastEditable<util::Registrable>(key, environment, linkLevel);
 			}
 
 
@@ -188,48 +150,27 @@ namespace synthese
 			static boost::shared_ptr<const T> Get(
 				util::RegistryKeyType key,
 				util::Env& environment,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
-			){
-				return boost::const_pointer_cast<const T>(GetEditable(key,environment,linkLevel,autoCreate));
-			}
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 
+
+
+			template<class S>
+			static boost::shared_ptr<const S> GetCast(
+				util::RegistryKeyType key,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 
 
 			virtual boost::shared_ptr<const util::Registrable> getRegistrable(
 				util::RegistryKeyType key,
 				util::Env& environment,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
-				AutoCreation autoCreate = NEVER_CREATE
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				try
-				{
-					return boost::dynamic_pointer_cast<const util::Registrable, const T>(
-						Get(key, environment, linkLevel, autoCreate)
-					);
-				}
-				catch(util::ObjectNotFoundException<T>& e)
-				{
-					throw util::ObjectNotFoundException<util::Registrable>(e.getKey(), e.getMessage());
-				}
+				return GetCast<util::Registrable>(key, environment, linkLevel);
 			}
 
-
-
-			/** Object properties loader from the database.
-				@param obj Pointer to the object to load from the database
-				@param rows Row to read
-				@param environment Environment to read and populate
-				@author Hugues Romain
-				@date 2007
-				@warning To complete the load when building the RAM environment, follow the properties load by the link method
-			*/
-			static void Load(
-				T* obj,
-				const DBResultSPtr& rows,
-				util::Env& environment,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-			);
 
 
 			virtual void loadRegistrable(
@@ -241,24 +182,6 @@ namespace synthese
 				Load(&dynamic_cast<T&>(obj), rows, environment, linkLevel);
 			}
 
-			static void Unlink(
-				T* obj
-			);
-
-
-			/** Saving of the object in database.
-				@param obj Object to save
-				@author Hugues Romain
-				@date 2007
-
-				The object is recognized by its key :
-				- if the object has already a key, then the corresponding record is replaced
-				- if the object does not have any key, then the autoincrement function generates one for it.
-			*/
-			static void Save(
-				T* obj,
-				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
-			);
 
 
 			virtual void saveRegistrable(
@@ -270,25 +193,10 @@ namespace synthese
 
 
 
-			////////////////////////////////////////////////////////////////////
-			///	Object creator helper.
-			///	@param row data row
-			///	@return boost::shared_ptr<T> The created object
-			///	@author Hugues Romain
-			///	@date 2008
-			/// This static method can be overloaded.
-			////////////////////////////////////////////////////////////////////
-			static boost::shared_ptr<T> GetNewObject(
-				const DBResultSPtr& row
-			){
-				return boost::shared_ptr<T>(new T(row->getKey()));
-			}
-
-
 			virtual boost::shared_ptr<util::Registrable> newObject(
 			) const {
 				return boost::dynamic_pointer_cast<util::Registrable, T>(
-					boost::shared_ptr<T>(new T)
+					GetNewObject()
 				);
 			}
 
@@ -339,7 +247,7 @@ namespace synthese
 						{
 							boost::shared_ptr<T> object(K::GetNewObject(rows));
 							registry.add(object);
-							Load(object.get(), rows, env, linkLevel);
+							K::Load(object.get(), rows, env, linkLevel);
 							result.push_back(object);
 					}	}
 					catch(std::exception& e)
@@ -464,17 +372,80 @@ namespace synthese
 
 
 
+			virtual util::RegistryBase& getEditableRegistry(
+				util::Env& env
+			) const {
+				return static_cast<util::RegistryBase&>(env.getEditableRegistry<T>());
+			}
+
+
+
 			virtual RegistrableSearchResult search(
 				const std::string& whereClause,
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const;
+
+
+
+			virtual void rowsAdded(
+				DB* db,
+				const DBResultSPtr& rows
+			) const {
+				RowsAdded(db, rows);
+			}
+
+			virtual void rowsUpdated(
+				DB* db,
+				const DBResultSPtr& rows
+			) const {
+				RowsUpdated(db, rows);
+			}
+
+			virtual void rowsRemoved(
+				DB* db,
+				const RowIdList& rowIds
+			) const {
+				RowsRemoved(db, rowIds);
+			}
+
+
+
+			static bool Contains(
+				util::RegistryKeyType id
+			);
+
+
+			virtual bool contains(util::RegistryKeyType id) const { return Contains(id); }
 		};
 
 
 
-		template <class K, class T>
-		DBDirectTableSync::RegistrableSearchResult DBDirectTableSyncTemplate<K, T>::search(
+		template <
+			class K, // Table sync class
+			class T, // Object class
+			template <class, class> class SynchronizationPolicy,
+			template <class, class> class LoadSavePolicy
+		>
+		bool DBDirectTableSyncTemplate<K, T, SynchronizationPolicy, LoadSavePolicy>::Contains(
+			util::RegistryKeyType id
+		){
+			SelectQuery<K> q;
+			q.addTableField(TABLE_COL_ID);
+			q.addWhereField(TABLE_COL_ID, id);
+			DBResultSPtr rows(q.execute());
+			return rows->next();
+		}
+
+
+
+		template <
+			class K, // Table sync class
+			class T, // Object class
+			template <class, class> class SynchronizationPolicy,
+			template <class, class> class LoadSavePolicy
+		>
+		DBDirectTableSync::RegistrableSearchResult DBDirectTableSyncTemplate<K, T, SynchronizationPolicy, LoadSavePolicy>::search(
 			const std::string& whereClause,
 			util::Env& env,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
@@ -525,6 +496,106 @@ namespace synthese
 			}	}
 			return result;
 
+		}
+
+
+
+		template<
+			class K,
+			class T,
+			template <class, class> class SynchronizationPolicy,
+			template <class, class> class LoadSavePolicy
+		>
+		boost::shared_ptr<T> DBDirectTableSyncTemplate<K, T, SynchronizationPolicy, LoadSavePolicy>::GetEditable(
+			util::RegistryKeyType key,
+			util::Env& env,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL*/
+		){
+			if (env.getRegistry<T>().contains(key))
+			{
+				return env.getEditableRegistry<T>().getEditable(key);
+			}
+
+			boost::shared_ptr<T> object;
+			try
+			{
+				DBResultSPtr rows(DBTableSyncTemplate<K>::_GetRow(key));
+				object = K::GetNewObject(rows);
+				env.getEditableRegistry<T>().add(object);
+				K::Load(object.get(), rows, env, linkLevel);
+			}
+			catch (typename db::DBEmptyResultException<K>&)
+			{
+				throw util::ObjectNotFoundException<T>(key, "Object not found in "+ K::TABLE.NAME);
+			}
+
+			return object;
+		}
+
+
+
+		template<
+			class K,
+			class T,
+			template <class, class> class SynchronizationPolicy,
+			template <class, class> class LoadSavePolicy
+		>
+		template<class S>
+		boost::shared_ptr<S> DBDirectTableSyncTemplate<K, T, SynchronizationPolicy, LoadSavePolicy>::GetCastEditable(
+			util::RegistryKeyType key,
+			util::Env& environment,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL*/
+		){
+			try
+			{
+				boost::shared_ptr<T> t(GetEditable(key, environment, linkLevel));
+				if(!dynamic_cast<S*>(t.get()))
+				{
+					throw util::ObjectNotFoundException<S>(key, "Bad type conversion from "+ K::TABLE.NAME);
+				}
+				return boost::static_pointer_cast<S, T>(t);
+			}
+			catch(util::ObjectNotFoundException<T>& e)
+			{
+				throw util::ObjectNotFoundException<S>(key, e.getMessage());
+			}
+		}
+
+
+
+		template<
+			class K,
+			class T,
+			template <class, class> class SynchronizationPolicy,
+			template <class, class> class LoadSavePolicy
+		>
+		boost::shared_ptr<const T> DBDirectTableSyncTemplate<K, T, SynchronizationPolicy, LoadSavePolicy>::Get(
+			util::RegistryKeyType key,
+			util::Env& environment,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL*/
+		){
+			return boost::const_pointer_cast<const T>(
+				GetEditable(key,environment,linkLevel)
+			);
+		}
+
+
+
+		template<
+			class K,
+			class T,
+			template <class, class> class SynchronizationPolicy,
+			template <class, class> class LoadSavePolicy
+		>
+		template<class S>
+		boost::shared_ptr<const S> DBDirectTableSyncTemplate<K, T, SynchronizationPolicy, LoadSavePolicy>::GetCast(
+			util::RegistryKeyType key,
+			util::Env& environment,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL*/
+		){
+			return boost::const_pointer_cast<const S>(
+				GetCastEditable<S>(key,environment,linkLevel)
+			);
 		}
 }	}
 

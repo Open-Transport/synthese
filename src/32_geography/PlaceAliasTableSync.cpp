@@ -80,7 +80,8 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Load(
+		template<>
+		void OldLoadSavePolicy<PlaceAliasTableSync,PlaceAlias>::Load(
 			PlaceAlias* obj,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -135,7 +136,8 @@ namespace synthese
 			}
 		}
 
-		template<> void DBDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Unlink(
+		template<>
+		void OldLoadSavePolicy<PlaceAliasTableSync,PlaceAlias>::Unlink(
 			PlaceAlias* obj
 		){
 			City* city(const_cast<City*>(obj->getCity()));
@@ -147,7 +149,8 @@ namespace synthese
 			}
 		}
 
-		template<> void DBDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Save(
+		template<>
+		void OldLoadSavePolicy<PlaceAliasTableSync,PlaceAlias>::Save(
 			PlaceAlias* object,
 			optional<DBTransaction&> transaction
 		){
@@ -196,13 +199,6 @@ namespace synthese
 
 	namespace geography
 	{
-		PlaceAliasTableSync::PlaceAliasTableSync()
-			: DBRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>()
-		{
-		}
-
-
-
 		PlaceAliasTableSync::SearchResult PlaceAliasTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> aliasedPlaceId,

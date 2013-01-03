@@ -65,40 +65,6 @@ namespace synthese
 		};
 
 
-		template<> void DBDirectTableSyncTemplate<DriverAllocationTableSync,DriverAllocation>::Load(
-			DriverAllocation* object,
-			const DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
-			object->loadFromRecord(*rows, env);
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-		}
-
-
-
-		template<> void DBDirectTableSyncTemplate<DriverAllocationTableSync,DriverAllocation>::Unlink(
-			DriverAllocation* obj
-		){
-			obj->unlink();
-		}
-
-
-		template<> void DBDirectTableSyncTemplate<DriverAllocationTableSync,DriverAllocation>::Save(
-			DriverAllocation* object,
-			optional<DBTransaction&> transaction
-		){
-			DBModule::GetDB()->replaceStmt(*object, transaction);
-		}
-
-
 
 		template<> bool DBTableSyncTemplate<DriverAllocationTableSync>::CanDelete(
 			const server::Session* session,

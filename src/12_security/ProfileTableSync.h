@@ -26,7 +26,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,7 +45,12 @@ namespace synthese
 			@ingroup m12LS refLS
 		*/
 		class ProfileTableSync:
-			public db::DBRegistryTableSyncTemplate<ProfileTableSync,Profile>
+			public db::DBDirectTableSyncTemplate<
+				ProfileTableSync,
+				Profile,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 
 		public:

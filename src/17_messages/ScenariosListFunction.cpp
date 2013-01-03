@@ -29,8 +29,7 @@
 #include "ScenarioFolderTableSync.h"
 #include "Webpage.h"
 #include "ScenarioFolder.h"
-#include "SentScenarioInheritedTableSync.h"
-#include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
 
 using namespace std;
@@ -129,44 +128,37 @@ namespace synthese
 		) const {
 
 			ParametersMap pm;
-
+			ScenarioTableSync::SearchResult scenarios;
+			
 			if(_showTemplates)
 			{
-				ScenarioTemplateInheritedTableSync::SearchResult scenarios(
-					ScenarioTemplateInheritedTableSync::Search(
-						*_env,
-						_parentFolder.get() ? _parentFolder->getKey() : 0
-				)	);
+				scenarios = ScenarioTableSync::SearchTemplates(
+					*_env,
+					_parentFolder.get() ? _parentFolder->getKey() : 0
+				);
 
-				BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& scenario, scenarios)
-				{
-					shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
-					scenario->toParametersMap(*scenarioPM);
-					pm.insert(TAG_SCENARIO, scenarioPM);
-				}
 			}
 			else
 			{
 				ptime now(second_clock::local_time());
-				SentScenarioInheritedTableSync::SearchResult scenarios(
-					SentScenarioInheritedTableSync::Search(
-						*_env,
-						boost::optional<std::string>(),
-						indeterminate(_showCurrentlyDisplayed) ?
-							optional<SentScenarioInheritedTableSync::StatusSearch>() :
-							(	_showCurrentlyDisplayed ?
-								SentScenarioInheritedTableSync::BROADCAST_RUNNING :
-								SentScenarioInheritedTableSync::FUTURE_BROADCAST
-							),
-						now
-				)	);
+				scenarios = ScenarioTableSync::SearchSentScenarios(
+					*_env,
+					boost::optional<std::string>(),
+					indeterminate(_showCurrentlyDisplayed) ?
+						optional<ScenarioTableSync::StatusSearch>() :
+						(	_showCurrentlyDisplayed ?
+							ScenarioTableSync::BROADCAST_RUNNING :
+							ScenarioTableSync::FUTURE_BROADCAST
+						),
+					now
+				);
+			}
 
-				BOOST_FOREACH(const shared_ptr<SentScenario>& message, scenarios)
-				{
-					shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
-					message->toParametersMap(*scenarioPM);
-					pm.insert(TAG_SCENARIO, scenarioPM);
-				}
+			BOOST_FOREACH(const shared_ptr<Scenario>& scenario, scenarios)
+			{
+				shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
+				scenario->toParametersMap(*scenarioPM);
+				pm.insert(TAG_SCENARIO, scenarioPM);
 			}
 
 			if(_cmsTemplate.get())

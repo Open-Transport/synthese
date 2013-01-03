@@ -31,7 +31,8 @@
 #include <boost/optional.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 #include "Service.h"
 
@@ -44,7 +45,12 @@ namespace synthese
 		///	@ingroup m35LS refLS
 		///
 		class ScheduledServiceTableSync:
-			public db::DBRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>,
+			public db::DBDirectTableSyncTemplate<
+				ScheduledServiceTableSync,
+				ScheduledService,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>,
 			public db::FetcherTemplate<SchedulesBasedService, ScheduledServiceTableSync>,
 			public db::FetcherTemplate<calendar::Calendar, ScheduledServiceTableSync>
 		{

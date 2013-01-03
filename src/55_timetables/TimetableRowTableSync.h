@@ -27,7 +27,8 @@
 
 
 #include "TimetableRow.h"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -41,7 +42,12 @@ namespace synthese
 		/// Table name : t053_timetable_rows
 		/// Corresponding class : TimetableRow
 		class TimetableRowTableSync:
-			public db::DBRegistryTableSyncTemplate<TimetableRowTableSync,TimetableRow>
+			public db::DBDirectTableSyncTemplate<
+				TimetableRowTableSync,
+				TimetableRow,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>
 		{
 		public:
 			static const std::string COL_TIMETABLE_ID;

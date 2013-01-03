@@ -60,6 +60,9 @@ namespace synthese
 			public PointerField<Alarm, Alarm>
 		{
 		public:
+			/// Chosen registry class.
+			typedef util::Registry<Alarm>	Registry;
+
 			static const std::string DATA_MESSAGE_ID;
 			static const std::string DATA_CONTENT;
 			static const std::string DATA_PRIORITY;

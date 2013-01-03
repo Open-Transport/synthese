@@ -108,7 +108,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Load(
+		template<> void OldLoadSavePolicy<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Load(
 			FreeDRTTimeSlot* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -212,7 +212,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Save(
+		template<> void OldLoadSavePolicy<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Save(
 			FreeDRTTimeSlot* object,
 			optional<DBTransaction&> transaction
 		){
@@ -240,7 +240,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Unlink(
+		template<> void OldLoadSavePolicy<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Unlink(
 			FreeDRTTimeSlot* obj
 		){
 			if(obj->getArea())

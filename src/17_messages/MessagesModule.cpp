@@ -24,7 +24,6 @@
 
 #include "SentScenario.h"
 #include "ScenarioTemplate.h"
-#include "ScenarioTemplateInheritedTableSync.h"
 #include "ScenarioTableSync.h"
 #include "ScenarioFolder.h"
 #include "ScenarioFolderTableSync.h"
@@ -99,10 +98,10 @@ namespace synthese
 			}
 
 			Env env;
-			ScenarioTemplateInheritedTableSync::SearchResult templates(
-				ScenarioTemplateInheritedTableSync::Search(env, folderId)
+			ScenarioTableSync::SearchResult templates(
+				ScenarioTableSync::SearchTemplates(env, folderId)
 			);
-			BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& st, templates)
+			BOOST_FOREACH(const shared_ptr<Scenario>& st, templates)
 			{
 				m.push_back(make_pair(st->getKey(), prefix + st->getName()));
 			}

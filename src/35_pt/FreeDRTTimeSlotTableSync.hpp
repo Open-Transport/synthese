@@ -26,7 +26,8 @@
 #define SYNTHESE_FreeDRTTimeSlotTableSync_hpp__
 
 #include "FreeDRTTimeSlot.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "DBDirectTableSyncTemplate.hpp"
+#include "OldLoadSavePolicy.hpp"
 #include "FetcherTemplate.h"
 
 namespace synthese
@@ -40,7 +41,12 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.1
 		class FreeDRTTimeSlotTableSync:
-			public db::DBRegistryTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>,
+			public db::DBDirectTableSyncTemplate<
+				FreeDRTTimeSlotTableSync,
+				FreeDRTTimeSlot,
+				db::FullSynchronizationPolicy,
+				db::OldLoadSavePolicy
+			>,
 			public db::FetcherTemplate<calendar::Calendar, FreeDRTTimeSlotTableSync>
 		{
 		public:
