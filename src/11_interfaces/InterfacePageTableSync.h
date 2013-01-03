@@ -62,6 +62,8 @@ namespace synthese
 
 			static boost::shared_ptr<InterfacePage> GetNewObject(const db::DBResultSPtr& row);
 
+			static boost::shared_ptr<InterfacePage> GetNewObject();
+
 			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> interfaceId = boost::optional<util::RegistryKeyType>(),
