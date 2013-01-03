@@ -130,7 +130,7 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				return GetCastEditable<util::Registrable>(key, environment, linkLevel);
+				return K::GetCastEditable<util::Registrable>(key, environment, linkLevel);
 			}
 
 
@@ -168,7 +168,7 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				return GetCast<util::Registrable>(key, environment, linkLevel);
+				return K::GetCast<util::Registrable>(key, environment, linkLevel);
 			}
 
 
@@ -179,7 +179,7 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const {
-				Load(&dynamic_cast<T&>(obj), rows, environment, linkLevel);
+				K::Load(&dynamic_cast<T&>(obj), rows, environment, linkLevel);
 			}
 
 
@@ -188,7 +188,7 @@ namespace synthese
 				util::Registrable& obj,
 				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
 			) const {
-				Save(&dynamic_cast<T&>(obj), transaction);
+				K::Save(&dynamic_cast<T&>(obj), transaction);
 			}
 
 
@@ -196,7 +196,7 @@ namespace synthese
 			virtual boost::shared_ptr<util::Registrable> newObject(
 			) const {
 				return boost::dynamic_pointer_cast<util::Registrable, T>(
-					GetNewObject()
+					K::GetNewObject()
 				);
 			}
 
@@ -204,7 +204,7 @@ namespace synthese
 			virtual boost::shared_ptr<util::Registrable> createRegistrable(
 				const DBResultSPtr& row
 			) const	{
-				return boost::dynamic_pointer_cast<util::Registrable, T>(GetNewObject(row));
+				return boost::dynamic_pointer_cast<util::Registrable, T>(K::GetNewObject(row));
 			}
 
 
@@ -392,21 +392,21 @@ namespace synthese
 				DB* db,
 				const DBResultSPtr& rows
 			) const {
-				RowsAdded(db, rows);
+				K::RowsAdded(db, rows);
 			}
 
 			virtual void rowsUpdated(
 				DB* db,
 				const DBResultSPtr& rows
 			) const {
-				RowsUpdated(db, rows);
+				K::RowsUpdated(db, rows);
 			}
 
 			virtual void rowsRemoved(
 				DB* db,
 				const RowIdList& rowIds
 			) const {
-				RowsRemoved(db, rowIds);
+				K::RowsRemoved(db, rowIds);
 			}
 
 
