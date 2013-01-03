@@ -4,6 +4,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/01_util")
 set(DEPS
   00_framework
   01_util
+  10_db
 )
 
 boost_test(Log "${DEPS}")
