@@ -26,6 +26,7 @@
 
 #include "10_db/DeleteQuery.hpp"
 #include "10_db/ReplaceQuery.h"
+#include "OldLoadSavePolicy.hpp"
 
 #include <boost/optional.hpp>
 
@@ -58,7 +59,7 @@ public:
 
 
 class TestTableSync:
-	public db::DBRegistryTableSyncTemplate<TestTableSync,TestObject>
+	public db::DBDirectTableSyncTemplate<TestTableSync,TestObject,db::FullSynchronizationPolicy,db::OldLoadSavePolicy>
 {
 public:
 	static const std::string COL_NETWORK_ID;
@@ -142,7 +143,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TestTableSync,TestObject>::Load(
+		template<> void OldLoadSavePolicy<TestTableSync,TestObject>::Load(
 			TestObject* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -158,7 +159,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TestTableSync,TestObject>::Unlink(
+		template<> void OldLoadSavePolicy<TestTableSync,TestObject>::Unlink(
 			TestObject* obj
 		){
 			cout << "_____________Unlink" << endl;
@@ -167,7 +168,7 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TestTableSync,TestObject>::Save(
+		template<> void OldLoadSavePolicy<TestTableSync,TestObject>::Save(
 			TestObject* object,
 			optional<DBTransaction&> transaction
 		){

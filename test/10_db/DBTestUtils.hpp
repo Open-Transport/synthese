@@ -28,7 +28,7 @@
 
 #include "10_db/DBModule.h"
 #include "10_db/DBTableSync.hpp"
-#include "10_db/DBRegistryTableSyncTemplate.hpp"
+#include "10_db/DBDirectTableSyncTemplate.hpp"
 #include "10_db/101_sqlite/SQLiteDB.h"
 
 #ifdef WITH_MYSQL
