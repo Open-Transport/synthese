@@ -65,6 +65,8 @@ ServiceExpression.cpp
 ServiceExpression.hpp
 SingleOperatorExpression.cpp
 SingleOperatorExpression.hpp
+StrFillFunction.cpp
+StrFillFunction.hpp
 StrLenFunction.cpp
 StrLenFunction.hpp
 SubstractFunction.cpp
