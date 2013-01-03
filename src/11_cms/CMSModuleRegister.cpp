@@ -28,6 +28,7 @@
 #include "AndFunction.hpp"
 #include "WebPageLinksFunction.hpp"
 #include "WebPagePositionFunction.hpp"
+#include "StrFillFunction.hpp"
 #include "StrLenFunction.hpp"
 #include "SubStrFunction.hpp"
 #include "WebPageMenuFunction.hpp"
@@ -89,6 +90,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::OrService::integrate();
 	synthese::cms::WebPageLinksFunction::integrate();
 	synthese::cms::WebPagePositionFunction::integrate();
+	synthese::cms::StrFillFunction::integrate();
 	synthese::cms::StrLenFunction::integrate();
 	synthese::cms::SubStrFunction::integrate();
 	synthese::cms::WebPageMenuFunction::integrate();

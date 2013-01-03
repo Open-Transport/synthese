@@ -22,6 +22,7 @@
 
 #include "IfFunction.hpp"
 #include "StrLenFunction.hpp"
+#include "StrFillFunction.hpp"
 #include "ParametersMap.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -43,6 +44,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	// Factory initialization
 	IfFunction::integrate();
 	StrLenFunction::integrate();
+	StrFillFunction::integrate();
 
 	StaticFunctionRequest<WebPageDisplayFunction> request;
 	ParametersMap additionalParametersMap;
@@ -865,6 +867,17 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
 		string eval(wpc.eval(request, additionalParametersMap, page, variables));
 		BOOST_CHECK_EQUAL(eval, "test10");
+	}
+
+	{ // Strfill
+		// Padding left the value 123 with a size of 5
+		string code("test<?strfill&t=123&s=5&pl=0?>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test00123");
 	}
 
 }
