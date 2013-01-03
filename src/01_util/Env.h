@@ -267,7 +267,7 @@ namespace synthese
 				try
 				{
 					boost::shared_ptr<C> c(
-						dynamic_pointer_cast<C, R>(
+						boost::dynamic_pointer_cast<C, R>(
 							this->getEditableRegistry<R>().getEditable(id)
 					)	);
 					if(!c.get())
