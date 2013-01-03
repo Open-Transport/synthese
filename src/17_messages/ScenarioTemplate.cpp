@@ -54,6 +54,7 @@ namespace synthese
 
 		const std::string ScenarioTemplate::TAG_VARIABLE = "variable";
 		const std::string ScenarioTemplate::TAG_MESSAGE = "message";
+		const std::string ScenarioTemplate::TAG_SECTION = "section";
 
 
 
@@ -310,6 +311,14 @@ namespace synthese
 				shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				alarm->toParametersMap(*messagePM, false);
 				pm.insert(TAG_MESSAGE, messagePM);
+			}
+
+			// Sections
+			BOOST_FOREACH(int section, getSections())
+			{
+				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
+				sectionPM->insert(DATA_CODE, section);
+				pm.insert(TAG_SECTION, sectionPM);
 			}
 
 			// Folder

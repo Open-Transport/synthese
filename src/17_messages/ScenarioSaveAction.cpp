@@ -87,6 +87,7 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID = Action_PARAMETER_PREFIX + "is";
 		const string ScenarioSaveAction::PARAMETER_CREATED_MESSAGE_TITLE = Action_PARAMETER_PREFIX + "_created_message_title";
 		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
+		const string ScenarioSaveAction::PARAMETER_SECTIONS = Action_PARAMETER_PREFIX + "_sections";
 
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_ID_ = Action_PARAMETER_PREFIX + "_message_id_";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_TITLE_ = Action_PARAMETER_PREFIX + "_message_title_";
@@ -377,6 +378,29 @@ namespace synthese
 					_name = iconv.convert(map.get<string>(PARAMETER_NAME));
 				}
 
+				// Sections
+				if(map.isDefined(PARAMETER_SECTIONS))
+				{
+					_sections = Scenario::Sections();
+					string sectionsStr(map.get<string>(PARAMETER_SECTIONS));
+					trim(sectionsStr);
+					if(!sectionsStr.empty())
+					{
+						vector<string> tokens;
+						split(tokens, sectionsStr, is_any_of(","));
+						BOOST_FOREACH(const string& token, tokens)
+						{
+							try
+							{
+								_sections->insert(lexical_cast<int>(token));
+							}
+							catch (bad_lexical_cast&)
+							{						
+							}
+						}
+					}
+				}
+
 				// Template scenario only
 				if(_tscenario.get())
 				{
@@ -544,6 +568,12 @@ namespace synthese
 			{
 				DBLogModule::appendToLogIfChange(text, "Nom", _scenario->getName(), *_name);
 				_scenario->setName(*_name);
+			}
+
+			// Sections
+			if(_sections)
+			{
+				_scenario->setSections(*_sections);
 			}
 
 			if(_tscenario.get())
