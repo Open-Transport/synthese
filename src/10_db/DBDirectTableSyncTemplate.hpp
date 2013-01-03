@@ -94,7 +94,7 @@ namespace synthese
 		public:
 
 
-			virtual FieldsList getFieldsList() const { return GetFieldsList(); }
+			virtual FieldsList getFieldsList() const { return K::GetFieldsList(); }
 
 
 
