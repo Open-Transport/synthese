@@ -1,0 +1,9 @@
+t025_sites(cient_url,default_page_template_id,end_date,host_name,id,name,start_date,svn_url)
+"/terminus",
+"17732932122705939",
+"",
+"",
+"7036883007700995",
+"Terminus",
+"",
+"https://extranet.rcsmobility.com/svn/synthese3/trunk/sites/terminus"
