@@ -258,40 +258,72 @@ namespace synthese
 
 
 
-		void SchedulesBasedService::applyRealTimeLateDuration( std::size_t rank, boost::posix_time::time_duration value, bool atArrival, bool atDeparture, bool updateFollowingSchedules )
+		void SchedulesBasedService::_applyRealTimeShiftDuration( 
+			std::size_t rank, 
+			boost::posix_time::time_duration arrivalShift,
+			boost::posix_time::time_duration departureShift,
+			bool updateFollowingSchedules
+		)
 		{
-			if(atArrival)
+			// TODO Use a constant or a param for the accepted delay
+			if(!_RTTimestamps[rank].is_not_a_date_time() &&
+				_RTTimestamps[rank] > second_clock::local_time() - boost::posix_time::minutes(5))
+			{
+				// We are trying to update a data but we already did so soon enough
+				// to consider that we have a better one
+				return;
+			}
+			if(arrivalShift.total_seconds() == 0)
 			{
 				time_duration schedule(_arrivalSchedules[rank]);
-				schedule += value;
+				schedule += arrivalShift;
 				_RTArrivalSchedules[rank] = schedule;
 			}
-			if(atDeparture)
+			if(departureShift.total_seconds() == 0)
 			{
 				time_duration schedule(_departureSchedules[rank]);
-				schedule += value;
+				schedule += departureShift;
 				_RTDepartureSchedules[rank] = schedule;
 			}
 			if(updateFollowingSchedules && rank + 1 < _arrivalSchedules.size())
 			{
-				applyRealTimeLateDuration(
+				_applyRealTimeShiftDuration(
 					rank + 1,
-					value,
-					true, true, true
+					departureShift, // Next arrival shifted after current departure
+					departureShift,
+					true
 				);
 			}
-			if(atArrival && rank + 1 == _arrivalSchedules.size())
+			if(arrivalShift.total_seconds() && rank + 1 == _arrivalSchedules.size())
 			{
 				_computeNextRTUpdate();
 			}
 		}
 
-
+		void SchedulesBasedService::applyRealTimeShiftDuration( 
+			std::size_t rank, 
+			boost::posix_time::time_duration arrivalShift,
+			boost::posix_time::time_duration departureShift,
+			bool updateFollowingSchedules
+		)
+		{
+			// Clear the time stamp
+			_RTTimestamps[rank] = boost::posix_time::ptime();
+			_applyRealTimeShiftDuration(
+				rank,
+				arrivalShift, departureShift,
+				updateFollowingSchedules
+			);
+			// Set the time stamp
+			_RTTimestamps[rank] = second_clock::local_time();
+		}
 
 		void SchedulesBasedService::clearRTData()
 		{
 			_RTDepartureSchedules = _departureSchedules;
 			_RTArrivalSchedules = _arrivalSchedules;
+			// Assuming arrival and departure schedules have the same size
+			_RTTimestamps.assign(_departureSchedules.size(), boost::posix_time::ptime());
 
 			if(getPath())
 			{

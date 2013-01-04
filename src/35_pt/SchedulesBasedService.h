@@ -42,6 +42,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<boost::posix_time::time_duration> Schedules;
+			typedef std::vector<boost::posix_time::ptime> TimestampSchedules;
 
 			class BadSchedulesException: public synthese::Exception
 			{
@@ -74,8 +75,15 @@ namespace synthese
 				Schedules	_RTArrivalSchedules;
 				ServedVertices	_RTVertices;		//!< Real time edges
 				boost::posix_time::ptime _nextRTUpdate;
+				TimestampSchedules _RTTimestamps; 	//!< Hold the time stamp of updates
 			//@}
 
+			void _applyRealTimeShiftDuration(
+				std::size_t rank,
+				boost::posix_time::time_duration arrivalShift,
+				boost::posix_time::time_duration departureShift,
+				bool updateFollowingSchedules
+			);
 		public:
 			SchedulesBasedService(
 				std::string serviceNumber,
@@ -145,19 +153,17 @@ namespace synthese
 			//! @name Update methods
 			//@{
 				//////////////////////////////////////////////////////////////////////////
-				/// Apply late duration on real time schedules of the service.
-				/// @param rank Rank of the first edge where the late begins.
+				/// Apply a shift duration on real time schedules of the service.
+				/// @param rank Rank of the first edge where the shift begins.
 				///		rank must be inferior than the size of the schedules array
-				/// @param value Duration of the late
-				/// @param atArrival true if the late concerns the arrival time
-				/// @param atDeparture true if the late concerns the departure time
+				/// @param arrivalShift the time shift on arrival
+				/// @param departureShift the time shift on departure
 				/// @param updateFollowingSchedules true if the method must propagate the
 				///		late on each following edges (at arrivals and departures)
-				void applyRealTimeLateDuration(
+				void applyRealTimeShiftDuration(
 					std::size_t rank,
-					boost::posix_time::time_duration value,
-					bool atArrival,
-					bool atDeparture,
+					boost::posix_time::time_duration arrivalShift,
+					boost::posix_time::time_duration departureShift,
 					bool updateFollowingSchedules
 				);
 
@@ -200,12 +206,10 @@ namespace synthese
 				);
 
 
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Restores real time data to theoretical value.
 				/// Sets the next update into the next day.
 				virtual void clearRTData();
-
 
 
 				//////////////////////////////////////////////////////////////////////////
