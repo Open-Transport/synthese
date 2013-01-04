@@ -273,13 +273,13 @@ namespace synthese
 				// to consider that we have a better one
 				return;
 			}
-			if(arrivalShift.total_seconds() == 0)
+			if(arrivalShift.total_seconds() != 0)
 			{
 				time_duration schedule(_arrivalSchedules[rank]);
 				schedule += arrivalShift;
 				_RTArrivalSchedules[rank] = schedule;
 			}
-			if(departureShift.total_seconds() == 0)
+			if(departureShift.total_seconds() != 0)
 			{
 				time_duration schedule(_departureSchedules[rank]);
 				schedule += departureShift;
