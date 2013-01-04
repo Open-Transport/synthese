@@ -284,11 +284,10 @@ namespace synthese
 		{
 			if(!_lateDuration.is_not_a_date_time())
 			{
-				_service->applyRealTimeLateDuration(
+				_service->applyRealTimeShiftDuration(
 					_lineStopRank,
-					_lateDuration,
-					_atArrival,
-					_atDeparture,
+					(_atArrival ? _lateDuration : seconds(0)),
+					(_atDeparture ? _lateDuration : seconds(0)),
 					_propagateConstantly
 				);
 			}

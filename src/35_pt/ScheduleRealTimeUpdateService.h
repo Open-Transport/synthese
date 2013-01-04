@@ -84,9 +84,6 @@ namespace synthese
 			size_t _getStopRankByService(const SchedulesBasedService *service,
 				 const boost::shared_ptr<StopArea> &stopArea) const;
 
-			// Hold the time stamp of each update. The key is a pair<serviceId,stopRank>.
-			static std::map<std::pair<boost::weak_ptr<ScheduledService>,std::size_t>,boost::posix_time::ptime> _updateTimeStamps;
-
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
