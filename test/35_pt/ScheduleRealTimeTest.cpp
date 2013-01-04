@@ -210,6 +210,19 @@ public:
 
 };
 
+void runScheduleRealTimeUpdateService(string sa, string ds, string se1, string at1, string dt1)
+{
+	HTTPRequest req;
+	req.headers.insert(make_pair("Host", "www.toto.com"));
+	req.uri = string("?SERVICE=ScheduleRealTimeUpdateService&nr=1") +
+		"&sa=" + sa + "&ds=" + ds + "&se1=" + se1 + "&at1=" + at1 + "&dt1=" + dt1;
+	req.ipaddr = "127.0.0.1";
+	DynamicRequest dr(req);
+
+	stringstream s;
+	dr.run(s);
+}
+
 BOOST_AUTO_TEST_CASE (test1)
 {
 
@@ -237,18 +250,7 @@ BOOST_AUTO_TEST_CASE (test1)
 	TestScheduledService tss4(4503599627370504ULL, "4", jp2, ds, time_duration(4,0,0));
 	TestScheduledService tss5(4503599627370505ULL, "5", jp, ds,  time_duration(5,0,0));
 
-	{
-		HTTPRequest req;
-		req.headers.insert(make_pair("Host", "www.toto.com"));
-		req.uri = "?SERVICE=ScheduleRealTimeUpdateService&nr=1&sa=1970329131942223&ds=16607027920896001&se1=1&at1=03:20:00&dt1=03:20:01";
-		req.ipaddr = "127.0.0.1";
-		DynamicRequest dr(req);
-
-		stringstream s;
-		dr.run(s);
-		// TODO Check the result
-
-	}
+	runScheduleRealTimeUpdateService("1970329131942223", "16607027920896001", "1", "03:20:00", "03:20:01");
 
 	tss1.dump();
 	tss2.dump();
