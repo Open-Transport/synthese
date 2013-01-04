@@ -346,7 +346,10 @@ namespace synthese
 			}
 			catch(Request::RedirectException& e)
 			{
-				rep = HTTPReply::stock_reply(e.getPermanently() ? HTTPReply::moved_permanently : HTTPReply::moved_temporarily);
+				rep = HTTPReply::stock_reply(
+					e.getPermanently() ? HTTPReply::moved_permanently : HTTPReply::moved_temporarily,
+					e.what()
+				);
 				rep.headers.insert(make_pair("Location", e.getLocation()));
 				_SetCookieHeaders(rep, e.getCookiesMap());
 			}
@@ -363,17 +366,17 @@ namespace synthese
 			catch (RequestException& e)
 			{
 				Log::GetInstance().debug("Request error", e);
-				rep = HTTPReply::stock_reply(HTTPReply::bad_request);
+				rep = HTTPReply::stock_reply(HTTPReply::bad_request, e.what());
 			}
 			catch (ActionException& e)
 			{
 				Log::GetInstance().debug("Action error", e);
-				rep = HTTPReply::stock_reply(HTTPReply::bad_request);
+				rep = HTTPReply::stock_reply(HTTPReply::bad_request, e.what());
 			}
 			catch(Exception& e)
 			{
 				Log::GetInstance().debug("Exception", e);
-				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
+				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error, e.what());
 			}
 			catch(thread_interrupted)
 			{
@@ -384,7 +387,7 @@ namespace synthese
 			catch(std::exception& e)
 			{
 				Log::GetInstance().debug("An unhandled exception has occured : " + std::string (e.what ()));
-				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
+				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error, e.what());
 			}
 			catch(...)
 			{

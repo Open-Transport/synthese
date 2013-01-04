@@ -60,8 +60,8 @@ namespace synthese
 		  /// not be changed until the write operation has completed.
 		  std::vector<boost::asio::const_buffer> to_buffers();
 
-		  /// Get a stock reply.
-		  static HTTPReply stock_reply(status_type status);
+		  /// Get a stock reply with optionnaly a description.
+		  static HTTPReply stock_reply(status_type status, const std::string &description = "");
 		};
 
 		/// @}

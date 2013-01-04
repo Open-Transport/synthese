@@ -123,131 +123,75 @@ namespace synthese
 
 		namespace stock_replies {
 
-		const char ok[] = "";
-		const char created[] =
-		  "<html>"
-		  "<head><title>Created</title></head>"
-		  "<body><h1>201 Created</h1></body>"
-		  "</html>";
-		const char accepted[] =
-		  "<html>"
-		  "<head><title>Accepted</title></head>"
-		  "<body><h1>202 Accepted</h1></body>"
-		  "</html>";
-		const char no_content[] =
-		  "<html>"
-		  "<head><title>No Content</title></head>"
-		  "<body><h1>204 Content</h1></body>"
-		  "</html>";
-		const char multiple_choices[] =
-		  "<html>"
-		  "<head><title>Multiple Choices</title></head>"
-		  "<body><h1>300 Multiple Choices</h1></body>"
-		  "</html>";
-		const char moved_permanently[] =
-		  "<html>"
-		  "<head><title>Moved Permanently</title></head>"
-		  "<body><h1>301 Moved Permanently</h1></body>"
-		  "</html>";
-		const char moved_temporarily[] =
-		  "<html>"
-		  "<head><title>Moved Temporarily</title></head>"
-		  "<body><h1>302 Moved Temporarily</h1></body>"
-		  "</html>";
-		const char not_modified[] =
-		  "<html>"
-		  "<head><title>Not Modified</title></head>"
-		  "<body><h1>304 Not Modified</h1></body>"
-		  "</html>";
-		const char bad_request[] =
-		  "<html>"
-		  "<head><title>Bad Request</title></head>"
-		  "<body><h1>400 Bad Request</h1></body>"
-		  "</html>";
-		const char unauthorized[] =
-		  "<html>"
-		  "<head><title>Unauthorized</title></head>"
-		  "<body><h1>401 Unauthorized</h1></body>"
-		  "</html>";
-		const char forbidden[] =
-		  "<html>"
-		  "<head><title>Forbidden</title></head>"
-		  "<body><h1>403 Forbidden</h1></body>"
-		  "</html>";
-		const char not_found[] =
-		  "<html>"
-		  "<head><title>Not Found</title></head>"
-		  "<body><h1>404 Not Found</h1></body>"
-		  "</html>";
-		const char internal_server_error[] =
-		  "<html>"
-		  "<head><title>Internal Server Error</title></head>"
-		  "<body><h1>500 Internal Server Error</h1></body>"
-		  "</html>";
-		const char not_implemented[] =
-		  "<html>"
-		  "<head><title>Not Implemented</title></head>"
-		  "<body><h1>501 Not Implemented</h1></body>"
-		  "</html>";
-		const char bad_gateway[] =
-		  "<html>"
-		  "<head><title>Bad Gateway</title></head>"
-		  "<body><h1>502 Bad Gateway</h1></body>"
-		  "</html>";
-		const char service_unavailable[] =
-		  "<html>"
-		  "<head><title>Service Unavailable</title></head>"
-		  "<body><h1>503 Service Unavailable</h1></body>"
-		  "</html>";
+		std::string build_reply(
+			HTTPReply::status_type status, 
+			const std::string &title,
+			const std::string &description
+		)
+		{
+			std::ostringstream oss;
+			oss	<< "<html><head><title>" << title << "</title></head>"
+				<< "<body>"
+				<< "<h1>" << status << " " << title << "</h1>"
+				<< "<h3>" << description << "</h3>"
+				<< "</body></html>";
+			return oss.str();
+		}
 
-		std::string to_string(HTTPReply::status_type status)
+		std::string to_string(
+			HTTPReply::status_type status,
+			const std::string &description
+		)
 		{
 		  switch (status)
 		  {
 		  case HTTPReply::ok:
-			return ok;
+			return build_reply(status, "Ok", description);
 		  case HTTPReply::created:
-			return created;
+			return build_reply(status, "Created", description);
 		  case HTTPReply::accepted:
-			return accepted;
+			return build_reply(status, "Accepted", description);
 		  case HTTPReply::no_content:
-			return no_content;
+			return build_reply(status, "No Content", description);
 		  case HTTPReply::multiple_choices:
-			return multiple_choices;
+			return build_reply(status, "Multiple Choices", description);
 		  case HTTPReply::moved_permanently:
-			return moved_permanently;
+			return build_reply(status, "Moved Permanently", description);
 		  case HTTPReply::moved_temporarily:
-			return moved_temporarily;
+			return build_reply(status, "Moved Temporarily", description);
 		  case HTTPReply::not_modified:
-			return not_modified;
+			return build_reply(status, "Not Modified", description);
 		  case HTTPReply::bad_request:
-			return bad_request;
+			return build_reply(status, "Bad Request", description);
 		  case HTTPReply::unauthorized:
-			return unauthorized;
+			return build_reply(status, "Unauthorized", description);
 		  case HTTPReply::forbidden:
-			return forbidden;
+			return build_reply(status, "Forbidden", description);
 		  case HTTPReply::not_found:
-			return not_found;
+			return build_reply(status, "Not Found", description);
 		  case HTTPReply::internal_server_error:
-			return internal_server_error;
+			return build_reply(status, "Internal Server Error", description);
 		  case HTTPReply::not_implemented:
-			return not_implemented;
+			return build_reply(status, "Not Implemented", description);
 		  case HTTPReply::bad_gateway:
-			return bad_gateway;
+			return build_reply(status, "Bad Gateway", description);
 		  case HTTPReply::service_unavailable:
-			return service_unavailable;
+			return build_reply(status, "Service Unavailable", description);
 		  default:
-			return internal_server_error;
+			return build_reply(status, "Internal Server Error", description);
 		  }
 		}
 
 		} // namespace stock_replies
 
-		HTTPReply HTTPReply::stock_reply(HTTPReply::status_type status)
+		HTTPReply HTTPReply::stock_reply(
+			HTTPReply::status_type status,
+			const std::string &description
+		)
 		{
 		  HTTPReply rep;
 		  rep.status = status;
-		  rep.content = stock_replies::to_string(status);
+		  rep.content = stock_replies::to_string(status, description);
 		  rep.headers.insert(make_pair("Content-Length", boost::lexical_cast<std::string>(rep.content.size())));
 		  rep.headers.insert(make_pair("Content-Type", "text/html"));
 		  return rep;
