@@ -1,0 +1,71 @@
+<ul class="nav nav-tabs">
+ <#tab_title&default=1&id=diffusions&title=Diffusions#>
+ <#tab_title&id=tasks&title=Tâches#>
+ <#tab_title&id=evenements&title=Autres évènements#>
+ <#tab_title&id=archives&title=Archives#>
+</ul>
+
+
+<div class="tab-content">
+
+<#tab_div&default=1&id=diffusions#>
+ <?form&name=scenario_add&page_id=<#get_diffusion_page&section=<@section@>#>&a=scenario_save&co=1&actionParam_sections=<@section@>?>
+ <table class="table table-striped">
+ <thead><tr><th>début</th><th>fin</th>
+ <th>nom</th><th>scénario</th><th>statut</th><th>remarques</th><th></th></tr></thead>
+ <tbody>
+ <?scenarii&t=0&section_in=<@section@>&template=<{scenario&template=
+  <tr>
+  <td><#display_date&value=<@start_date@>#></td>
+  <td><#display_date&value=<@end_date@>#><@end_date?"":"(illimité)"@></td>
+  <td><@name@></td>
+  <td><{scenario_template&template=<@name@>&empty=(pas de modèle)}></td>
+  <td><span class="label<@active?" label-success":""@>"><@active?"Actif":"Inactif"@></span></td>
+  <td></td>
+  <td><?link&target=<#get_diffusion_page&section=<@section@>#>&roid=<@roid@>&class=btn btn-primary&text=Ouvrir?><?if&cond=<@active@>&then= <?link&target=<@p@>&a=scenariostop&actionParams=<@roid@>&class=btn btn-danger&text=Interrompre&confirm=Etes-vous sûr de vouloir interrompre la diffusion de l'événement ??>?></td>
+  </tr>
+ }>?>
+ </tbody><tfoot>
+ <tr>
+ <td></td>
+ <td></td>
+ <td><input name="actionParamnam" placeholder="Nom" /></td>
+ <td><select name="actionParamtpl">
+    <option value="">(pas de scénario modèle)</option>
+    <?scenarii&t=1&template=<{scenario&template=<option value="<@id@>"><@name@></option>}>?>
+    </select>
+ </td>
+ <td></td>
+ <td></td>
+ <td><button class="btn-warning btn">Ajouter</button></td></tr>
+ </tfoot></table></form>
+</div>
+
+<#tab_div&id=tasks#>
+<table class="table table-striped">
+<thead><tr><th></th><th>événement</th><th>tâches</th><th>échéances</th></tr></thead>
+<tbody>
+</tbody>
+</table>
+</div>
+
+<#tab_div&id=evenements#>
+<table class="table table-striped">
+<thead><tr><th>ligne(s)</th><th>titre</th><th>code</th><th></th></tr></thead>
+<tbody>
+<?scenarii&t=0&section_out=<@section@>&p=17732932122705949?>
+</tbody>
+</table></form>
+</div>
+
+<#tab_div&id=archives#>
+
+<table class="table table-striped">
+<thead><tr><th></th><th>événement</th><th>tâches</th><th>échéances</th></tr></thead>
+<tbody>
+<?scenarii&t=0&section_in=<@section@>&p=17732932122705966?>
+</tbody>
+</table>
+</div>
+
+</div>
