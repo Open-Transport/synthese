@@ -271,7 +271,8 @@ namespace synthese
 					result.push_back(K);
 					break;
 
-				case 'ç':
+				case 0xC7: // Capital cedilla C in ISO-8859-1 and Windows CP1252
+				case 0xE7: // Minus cedilla c
 					result.push_back(S);
 					break;
 
