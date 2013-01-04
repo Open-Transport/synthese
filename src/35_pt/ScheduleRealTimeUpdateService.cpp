@@ -68,8 +68,6 @@ namespace synthese
 		/// Warning, PARAMETER_ARRIVAL_TIME is a list starting at at1 up to any number in sequence
 		const string ScheduleRealTimeUpdateService::PARAMETER_ARRIVAL_TIME = "at";
 
-		std::map<std::pair<boost::weak_ptr<ScheduledService>,std::size_t>,boost::posix_time::ptime> ScheduleRealTimeUpdateService::_updateTimeStamps;
-
 
 		ScheduleRealTimeUpdateService::ScheduleRealTimeUpdateService()
 		{}
@@ -252,30 +250,15 @@ namespace synthese
 					posix_time::time_duration theirDepartureTimeRef(
 						nextService->getDepartureBeginScheduleToIndex(true, lineStopRank)
 					);
-					// Reschedule this service to the new given time 
-					const_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
+					// Reschedule this service to the new given time
+					const_cast<SchedulesBasedService*>(nextService)->applyRealTimeShiftDuration(
 						lineStopRank,
 						record.arrivalTime - theirArrivalTimeRef,
-						true,  // Is Arrival
-						false, // Is Departure
-						true
-						);
-					const_cast<SchedulesBasedService*>(nextService)->applyRealTimeLateDuration(
-						lineStopRank,
 						record.departureTime - theirDepartureTimeRef,
-						false,  // Is Arrival
-						true, // Is Departure
 						true
 						);
 					stream << "re-scheduling service " << nextService->getKey() << " " << nextService->getServiceNumber() << endl;
 				}
-				// Record the time stamp for the update
-				_updateTimeStamps.insert(
-					make_pair(
-						make_pair(record.service, record.lineStopRank),
-						now
-					)
-				);
 			}
 			return pm;
 		}
