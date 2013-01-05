@@ -288,7 +288,8 @@ namespace synthese
 					_lineStopRank,
 					(_atArrival ? _lateDuration : seconds(0)),
 					(_atDeparture ? _lateDuration : seconds(0)),
-					_propagateConstantly
+					_propagateConstantly,
+					false // Disable timestamping
 				);
 			}
 			else

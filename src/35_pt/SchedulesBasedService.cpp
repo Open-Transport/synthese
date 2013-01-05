@@ -269,8 +269,9 @@ namespace synthese
 			if(!_RTTimestamps[rank].is_not_a_date_time() &&
 				_RTTimestamps[rank] > second_clock::local_time() - boost::posix_time::minutes(5))
 			{
-				// We are trying to update a data but we already did so soon enough
-				// to consider that we have a better one
+				// We are trying to update a data but we already got a specific
+				// request on this rank and it is soon enough to consider that
+				// we have a better one.
 				return;
 			}
 			if(arrivalShift.total_seconds() != 0)
@@ -304,18 +305,25 @@ namespace synthese
 			std::size_t rank, 
 			boost::posix_time::time_duration arrivalShift,
 			boost::posix_time::time_duration departureShift,
-			bool updateFollowingSchedules
+			bool updateFollowingSchedules,
+			bool recordTimeStamp
 		)
 		{
-			// Clear the time stamp
+			// Clear the time stamp in all cases
+			// If we had a timestamp here, we assume that the
+			// new update should be processed so we clear it.
 			_RTTimestamps[rank] = boost::posix_time::ptime();
+
 			_applyRealTimeShiftDuration(
 				rank,
 				arrivalShift, departureShift,
 				updateFollowingSchedules
 			);
-			// Set the time stamp
-			_RTTimestamps[rank] = second_clock::local_time();
+			// Record the time stamp
+			if (recordTimeStamp)
+			{
+				_RTTimestamps[rank] = second_clock::local_time();
+			}
 		}
 
 		void SchedulesBasedService::clearRTData()

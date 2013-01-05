@@ -255,8 +255,9 @@ namespace synthese
 						lineStopRank,
 						record.arrivalTime - theirArrivalTimeRef,
 						record.departureTime - theirDepartureTimeRef,
-						true
-						);
+						true,
+						(nextService == record.service.get()) // Time stamp only the requested service
+					);
 					stream << "re-scheduling service " << nextService->getKey() << " " << nextService->getServiceNumber() << endl;
 				}
 			}

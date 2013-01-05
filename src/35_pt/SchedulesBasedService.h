@@ -159,12 +159,14 @@ namespace synthese
 				/// @param arrivalShift the time shift on arrival
 				/// @param departureShift the time shift on departure
 				/// @param updateFollowingSchedules true if the method must propagate the
-				///		late on each following edges (at arrivals and departures)
+				///		shift on each following edges (at arrivals and departures)
+				/// @param recordTimeStamp 
 				void applyRealTimeShiftDuration(
 					std::size_t rank,
 					boost::posix_time::time_duration arrivalShift,
 					boost::posix_time::time_duration departureShift,
-					bool updateFollowingSchedules
+					bool updateFollowingSchedules,
+					bool recordTimeStamp = true
 				);
 
 				void setRealTimeSchedules(
