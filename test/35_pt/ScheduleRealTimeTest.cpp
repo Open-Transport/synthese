@@ -270,6 +270,46 @@ BOOST_AUTO_TEST_CASE (test1)
 	tss3.checkRealArrivalSchedule  (4, time_duration(3,24,1));
 	tss3.checkRealDepartureSchedule(3, time_duration(3,20,1));
 
+	// These services are too late to be inpacted
+	tss4.checkRealArrivalSchedule  (1, time_duration(4,04,0));
+	tss4.checkRealDepartureSchedule(0, time_duration(4,00,0));
+
+	tss5.checkRealArrivalSchedule  (1, time_duration(5,04,0));
+	tss5.checkRealDepartureSchedule(0, time_duration(5,00,0));
+
+	/// -------
+	cout << endl << "Test that the algo keeps the time stamps of requests" << endl;
+	runScheduleRealTimeUpdateService("1970329131942222", "16607027920896001", "1", "03:19:00", "03:19:01");
+
+	tss1.dump();
+	tss2.dump();
+	tss3.dump();
+	tss4.dump();
+	tss5.dump();
+
+	// This update was done on the given stop
+	tss1.checkSingleRealArrival    (2, time_duration(3,19,0));
+	tss1.checkSingleRealDeparture  (2, time_duration(3,19,1));
+	// The update did not continued because of the timestamp effect
+	tss1.checkSingleRealArrival    (3, time_duration(3,20,0));
+	tss1.checkRealArrivalSchedule  (4, time_duration(3,24,1));
+	tss1.checkRealDepartureSchedule(3, time_duration(3,20,1));
+
+	// This update was done on the given stop
+	tss2.checkSingleRealArrival    (2, time_duration(3,19,0));
+	tss2.checkSingleRealDeparture  (2, time_duration(3,19,1));
+	// Here the update took place
+	tss2.checkRealArrivalSchedule  (3, time_duration(3,23,1));
+	tss2.checkRealDepartureSchedule(3, time_duration(3,24,1));
+
+	// This update was done on the given stop
+	tss3.checkSingleRealArrival    (2, time_duration(3,19,0));
+	tss3.checkSingleRealDeparture  (2, time_duration(3,19,1));
+	// Here the update took place
+	tss3.checkRealArrivalSchedule  (3, time_duration(3,23,1));
+	tss3.checkRealDepartureSchedule(3, time_duration(3,24,1));
+
+	// These services are too late to be inpacted
 	tss4.checkRealArrivalSchedule  (1, time_duration(4,04,0));
 	tss4.checkRealDepartureSchedule(0, time_duration(4,00,0));
 
