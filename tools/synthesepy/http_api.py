@@ -39,11 +39,10 @@ class HTTPApi(object):
     def __init__(self, env, hostname=None, username='root', password='root',
         debug=False):
         self.env = env
-        # TODO: use wsgi_proxy_port only for admin requests (and if using proxy).
         if hostname:
             self.hostname = hostname
         else:
-            self.hostname = 'localhost:%s' % env.c.wsgi_proxy_port
+            self.hostname = 'localhost:%s' % env.c.port
         self.username = username
         self.password = password
         self.debug = debug
@@ -51,6 +50,8 @@ class HTTPApi(object):
         self.sid2 = None
         self.browser = None
         self.admin_base_url = 'http://{0}/admin/'.format(
+            self.hostname)
+        self.base_url = 'http://{0}/'.format(
             self.hostname)
         self.admin_url = self.admin_base_url + 'synthese'
         self.admin_base_params = {
@@ -73,6 +74,11 @@ class HTTPApi(object):
 
     def reset_browser(self):
         self.browser = None
+
+    def get_browser_for_suffix(self, suffix):
+        br = self._get_browser()
+        br.open(self.base_url + suffix)
+        return br
 
     def get_admin_browser(self, logged_in=True):
         if logged_in:

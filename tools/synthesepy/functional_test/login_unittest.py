@@ -27,6 +27,7 @@ if sys.version_info >= (2, 7):
 else:
     import unittest2 as unittest
 import mechanize
+import time
 
 # Use absolute imports, otherwise the module is loaded twice and global
 # variables are overwritten.
@@ -37,41 +38,46 @@ class LoginTest(http_testcase.HTTPTestCase):
     USERNAME = 'root'
     PASSWORD = 'root'
 
-    def test_bad_username(self):
-        br = self.get_http_api().get_admin_browser(logged_in=False)
+    def test_bad_password(self):
+        print ">>>>> test_bad_password"
+        time.sleep(10)
+        br = self.get_http_api().get_browser_for_suffix("?SERVICE=packages")
 
-        br.select_form(name='login')
+        br.select_form(name='')
         br['actionParamlogin'] = self.USERNAME
         br['actionParampwd'] = 'badpassword'
         response = br.submit()
 
-        self.assertEqual(br.title(), 'Login - SYNTHESE3 Admin')
-        content = br.response().read()
-        self.assertIn('Action error : Mot de passe erron\xc3\xa9', content)
+        self.assertEqual(br.title(), None)
+        self.assertIn('Veuillez vous connecter pour utiliser cette fonction',
+                      response.read())
+        self.assertIn('Mot%20de%20passe%20erron%c3%a9', response.geturl())
 
-    def test_bad_password(self):
-        br = self.get_http_api().get_admin_browser(logged_in=False)
+    def test_bad_username(self):
+        br = self.get_http_api().get_browser_for_suffix("?SERVICE=packages")
 
-        br.select_form(name='login')
+        br.select_form(name='')
         br['actionParamlogin'] = 'badusername'
         br['actionParampwd'] = self.PASSWORD
         response = br.submit()
 
-        self.assertEqual(br.title(), 'Login - SYNTHESE3 Admin')
-        content = br.response().read()
-        self.assertIn('Action error : Utilisateur introuvable', content)
+        self.assertEqual(br.title(), None)
+        self.assertIn('Veuillez vous connecter pour utiliser cette fonction',
+                      response.read())
+        self.assertIn('Utilisateur%20introuvable', response.geturl())
 
     def test_successful_login(self):
-        br = self.get_http_api().get_admin_browser(logged_in=False)
+        br = self.get_http_api().get_browser_for_suffix("?SERVICE=packages")
 
-        br.select_form(name='login')
+        br.select_form(name='')
         br['actionParamlogin'] = self.USERNAME
         br['actionParampwd'] = self.PASSWORD
         response = br.submit()
 
-        self.assertEqual(br.title(), 'Accueil - SYNTHESE3 Admin')
+        self.assertEqual(br.title(), None)
         content = br.response().read()
-        self.assertIn('Bienvenue sur le module d\'administration de SYNTHESE', content)
+        self.assertIn('Etes-vous s\xc3\xbbr de vouloir installer le package admin/',
+                      content)
 
 
 def load_tests(loader, standard_tests, pattern):
