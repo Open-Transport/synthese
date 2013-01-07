@@ -119,7 +119,7 @@ namespace synthese
 		AlarmRecipient::RegistrableLinkedObjectsSet AlarmRecipientTemplate<T, C>::getLinkedObjects(
 			const Alarm& alarm
 		) const	{
-			RegistrableLinkedObjectsSet r;
+			AlarmRecipient::RegistrableLinkedObjectsSet r;
 			LinkedObjectsSet s(GetLinkedObjects(alarm));
 			BOOST_FOREACH(const LinkedObjectsSet::value_type& it, s)
 			{
