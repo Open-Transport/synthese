@@ -72,7 +72,9 @@ namespace synthese
 			static LinkedAlarmsSet	getLinkedAlarms(const ObjectType& object);
 			static LinkedObjectsSet	GetLinkedObjects(const Alarm& alarm);
 
-			virtual LinkedObjectsSet getLinkedObjects(const Alarm& alarm) const;
+			virtual AlarmRecipient::RegistrableLinkedObjectsSet getLinkedObjects(
+				const Alarm& alarm
+			) const;
 
 			static const SentAlarm* getAlarm(const ObjectType& object);
 			static const SentAlarm* getAlarm(const ObjectType& object, const boost::posix_time::ptime& date);
@@ -123,7 +125,7 @@ namespace synthese
 			{
 				r.insert(
 					make_pair(
-						static_cast<util::Registrable*>(it.first),
+						static_cast<const util::Registrable*>(it.first),
 						it.second
 				)	);
 			}
@@ -274,7 +276,7 @@ namespace synthese
 
 
 		template<class T, class C>
-		typename AlarmRecipientTemplate<T, C>::LinkedObjectsSet AlarmRecipientTemplate<T,C>::getLinkedObjects(
+		typename AlarmRecipientTemplate<T, C>::LinkedObjectsSet AlarmRecipientTemplate<T,C>::GetLinkedObjects(
 			const Alarm& alarm
 		){
 			typename  AlarmLinks::const_iterator it = _linksAlarm.find(&alarm);
