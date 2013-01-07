@@ -46,6 +46,8 @@ namespace synthese
 	
 	namespace messages
 	{
+		const string MessageTypesService::PARAMETER_SCENARIO_ID = "scenario_id";
+
 		const string MessageTypesService::TAG_TYPE = "type";
 		
 
