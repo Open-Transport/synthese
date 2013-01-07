@@ -121,7 +121,7 @@ namespace synthese
 		) const	{
 			AlarmRecipient::RegistrableLinkedObjectsSet r;
 			LinkedObjectsSet s(GetLinkedObjects(alarm));
-			BOOST_FOREACH(const LinkedObjectsSet::value_type& it, s)
+			BOOST_FOREACH(const typename LinkedObjectsSet::value_type& it, s)
 			{
 				r.insert(
 					std::make_pair(
