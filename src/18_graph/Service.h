@@ -242,8 +242,10 @@ namespace synthese
 
 			void toParametersMap(
 				util::ParametersMap& pm,
-				std::string prefix = std::string()
+				const std::string& prefix
 			) const;
+
+			virtual void toParametersMap(util::ParametersMap& pm) const;
 		};
 	}
 }
