@@ -124,7 +124,7 @@ namespace synthese
 			BOOST_FOREACH(const LinkedObjectsSet::value_type& it, s)
 			{
 				r.insert(
-					make_pair(
+					std::make_pair(
 						static_cast<const util::Registrable*>(it.first),
 						it.second
 				)	);
