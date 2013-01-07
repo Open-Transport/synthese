@@ -209,8 +209,10 @@ class HTTPApi(object):
 
     def call_action2(self, action, params, send_sid=False, use_get=False):
         params['a'] = action
+        params['nr'] = "1"
         return self.call_synthese2(params, send_sid, use_get)
 
     def call_service2(self, service, params, send_sid=False, use_get=False):
         params['SERVICE'] = service
+        params['nr'] = "1"
         return self.call_synthese2(params, send_sid, use_get)
