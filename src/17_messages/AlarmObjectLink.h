@@ -51,19 +51,21 @@ namespace synthese
 			util::RegistryKeyType	_objectId;
 			Alarm*			_alarm;
 			std::string		_recipientKey;
+			std::string		_parameter;
 
 		public:
 			AlarmObjectLink(util::RegistryKeyType key = 0);
 
 			util::RegistryKeyType getObjectId() const { return _objectId; }
-			Alarm* getAlarm() const;
-			std::string getRecipientKey() const;
+			Alarm* getAlarm() const { return _alarm; }
+			const std::string& getRecipientKey() const { return _recipientKey; }
+			const std::string& getParameter() const { return _parameter; }
 
 			void setObjectId(util::RegistryKeyType key);
-			void setAlarm(Alarm* value);
-			void setRecipientKey(const std::string& key);
+			void setAlarm(Alarm* value){ _alarm = value; }
+			void setRecipientKey(const std::string& value){ _recipientKey = value; }
+			void setParameter(const std::string& value){ _parameter = value; }
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_AlarmObjectLink_h__

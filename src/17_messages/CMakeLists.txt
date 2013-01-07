@@ -22,6 +22,8 @@ AlarmTableSync.cpp
 AlarmTableSync.h
 AlarmTemplate.cpp
 AlarmTemplate.h
+BroadcastPoint.cpp
+BroadcastPoint.hpp
 GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MessageAdmin.cpp

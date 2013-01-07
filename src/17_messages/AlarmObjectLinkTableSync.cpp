@@ -64,6 +64,7 @@ namespace synthese
 		const string AlarmObjectLinkTableSync::COL_RECIPIENT_KEY("recipient_key");
 		const string AlarmObjectLinkTableSync::COL_OBJECT_ID("object_id");
 		const string AlarmObjectLinkTableSync::COL_ALARM_ID("alarm_id");
+		const string AlarmObjectLinkTableSync::COL_PARAMETER = "parameter";
 	}
 
 	namespace db
@@ -78,6 +79,7 @@ namespace synthese
 			Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, SQL_TEXT),
 			Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
 			Field(AlarmObjectLinkTableSync::COL_ALARM_ID, SQL_INTEGER),
+			Field(AlarmObjectLinkTableSync::COL_PARAMETER, SQL_TEXT),
 			Field()
 		};
 
@@ -102,6 +104,7 @@ namespace synthese
 
 			object->setObjectId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_OBJECT_ID));
 			object->setRecipientKey(rows->getText ( AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
+			object->setParameter(rows->getText(AlarmObjectLinkTableSync::COL_PARAMETER));
 
 			try
 			{
@@ -166,6 +169,7 @@ namespace synthese
 			query.addField(object->getRecipientKey());
 			query.addField(object->getObjectId());
 			query.addField(object->getAlarm() ? object->getAlarm()->getKey() : RegistryKeyType(0));
+			query.addField(object->getParameter());
 			query.execute(transaction);
 		}
 

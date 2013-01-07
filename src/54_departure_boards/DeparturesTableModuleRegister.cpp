@@ -161,6 +161,8 @@ void synthese::departure_boards::moduleRegister()
 
 	synthese::departure_boards::IneoDepartureBoardsFileFormat::integrate();
 
+	synthese::departure_boards::DisplayScreen::integrate();
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreen>();
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayType>();

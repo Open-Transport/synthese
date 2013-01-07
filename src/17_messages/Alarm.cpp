@@ -22,6 +22,9 @@
 
 #include "Alarm.h"
 
+#include "AlarmObjectLink.h"
+#include "AlarmRecipient.h"
+#include "Factory.h"
 #include "MessageAlternative.hpp"
 #include "Scenario.h"
 #include "AlarmTemplate.h"
@@ -48,7 +51,10 @@ namespace synthese
 		const string Alarm::DATA_DONE = "done";
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
+		const string Alarm::TAG_RECIPIENTS = "recipients";
 
+		const string Alarm::ATTR_LINK_ID = "link_id";
+		const string Alarm::ATTR_LINK_PARAMETER = "link_parameter";
 
 
 		Alarm::Alarm(
@@ -90,63 +96,16 @@ namespace synthese
 
 
 
-		const AlarmLevel& Alarm::getLevel () const
-		{
-			return _level;
-		}
-
-
-		void Alarm::setLevel (const AlarmLevel& level)
-		{
-			_level = level;
-		}
-
-
-		void Alarm::setLongMessage( const std::string& message )
-		{
-			_longMessage = message;
-		}
-
-		void Alarm::setShortMessage( const std::string& message )
-		{
-			_shortMessage = message;
-		}
-
-		const std::string& Alarm::getLongMessage() const
-		{
-			return _longMessage;
-		}
-
-		const std::string& Alarm::getShortMessage() const
-		{
-			return _shortMessage;
-		}
-
 		Alarm::~Alarm()
-		{
-
-		}
-
-
-
-		void Alarm::setScenario( const Scenario* scenario )
-		{
-			_scenario = scenario;
-		}
-
-
-
-		const Scenario* Alarm::getScenario() const
-		{
-			return _scenario;
-		}
+		{}
 
 
 
 		void Alarm::toParametersMap(
 			util::ParametersMap& pm,
 			bool withScenario,
-			std::string prefix /*= std::string() */
+			std::string prefix /*= std::string() */,
+			bool withRecipients
 		) const	{
 			pm.insert(prefix + "roid", getKey()); // Backward compatibility, deprecated
 			pm.insert(prefix + DATA_MESSAGE_ID, getKey());
@@ -167,5 +126,29 @@ namespace synthese
 				it.second->toParametersMap(*altPM);
 				pm.insert(TAG_MESSAGE_ALTERNATIVE, altPM);
 			}
+
+			if(withRecipients)
+			{
+				shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
+				BOOST_FOREACH(shared_ptr<AlarmRecipient> ar, Factory<AlarmRecipient>::GetNewCollection())
+				{
+					AlarmRecipient::RegistrableLinkedObjectsSet s(ar->getLinkedObjects(*this));
+					BOOST_FOREACH(const AlarmRecipient::RegistrableLinkedObjectsSet::value_type& it, s)
+					{
+						shared_ptr<ParametersMap> arPM(new ParametersMap);
+						it.first->toParametersMap(*arPM);
+						arPM->insert(ATTR_LINK_ID, it.second->getKey());
+						arPM->insert(ATTR_LINK_PARAMETER, it.second->getParameter());
+						pm.insert(ar->getFactoryKey(), arPM);
+				}	}
+				pm.insert(TAG_RECIPIENTS, recipientsPM);
+			}
+		}
+
+
+
+		void Alarm::toParametersMap( util::ParametersMap& pm ) const
+		{
+			toParametersMap(pm, true);
 		}
 }	}

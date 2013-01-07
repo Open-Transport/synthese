@@ -509,13 +509,13 @@ namespace synthese
 					const Programmation& programmation(itProg.second);
 
 					shared_ptr<SentScenario> updatedScenario;
-					shared_ptr<SentAlarm> updatedMessage;
+					shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
 								_realTimeDataSource->getObjectByCode<Scenario>(
 							lexical_cast<string>(programmation.ref)
 					)	)	);
-					SentAlarm* message(NULL);
+					Alarm* message(NULL);
 					if(!scenario)
 					{
 						// Creation of the scenario
@@ -546,7 +546,7 @@ namespace synthese
 						scenariosToRemove.erase(scenario->getKey());
 
 						// Message content
-						const SentScenario::Messages& messages(scenario->getMessages());
+						const Scenario::Messages& messages(scenario->getMessages());
 						if(messages.size() != 1)
 						{
 							Log::GetInstance().warn(
@@ -559,7 +559,7 @@ namespace synthese
 								messagesToRemove.insert((*it)->getKey());
 							}
 						}
-						message = const_cast<SentAlarm*>(*messages.begin());
+						message = const_cast<Alarm*>(*messages.begin());
 						if(	message->getLongMessage() != programmation.content ||
 							message->getShortMessage() != programmation.messageTitle ||
 							(message->getLevel() == ALARM_LEVEL_WARNING) != programmation.priority
@@ -600,7 +600,8 @@ namespace synthese
 
 					// Adding of existing object links to the removal list
 					DisplayScreenAlarmRecipient::LinkedObjectsSet existingRecipients(
-						DisplayScreenAlarmRecipient::getLinkedObjects(**scenario->getMessages().begin())
+						DisplayScreenAlarmRecipient::getLinkedObjects(
+							**scenario->getMessages().begin())
 					);
 					BOOST_FOREACH(const DisplayScreenAlarmRecipient::LinkedObjectsSet::value_type& dsit, existingRecipients)
 					{

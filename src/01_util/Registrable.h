@@ -34,6 +34,10 @@ namespace synthese
 {
 	namespace util
 	{
+		class ParametersMap;
+
+
+
 		////////////////////////////////////////////////////////////////////
 		/// Base class for all registrable objects.
 		///
@@ -50,6 +54,9 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////
 		class Registrable
 		{
+		public:
+			static const std::string ATTR_ID;
+
 		private:
 			RegistryKeyType _key;	//!< ID of the object
 
@@ -76,6 +83,9 @@ namespace synthese
 
 
 				virtual FieldsList getFields() const { return FieldsList(); }
+
+
+				virtual void toParametersMap(util::ParametersMap& pm) const;
 			//@}
 
 			//! \name Setters

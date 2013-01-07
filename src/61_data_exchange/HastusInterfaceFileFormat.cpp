@@ -500,7 +500,7 @@ namespace synthese
 						*line,
 						service.routeCode,
 						optional<const string&>(),
-						service.routeCode,
+						optional<const string&>(),
 						optional<Destination*>(),
 						optional<const RuleUser::Rules&>(),
 						service.wayBack,

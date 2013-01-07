@@ -61,9 +61,6 @@ namespace synthese
 			static const std::string TAG_MESSAGE;
 			static const std::string TAG_SECTION;
 
-
-			typedef std::set<const AlarmTemplate*> Messages;
-
 			struct Variable
 			{
 				std::string code;
@@ -79,8 +76,6 @@ namespace synthese
 		private:
 			ScenarioFolder*		_folder;
 			VariablesMap		_variables;
-
-			mutable Messages _messages;
 
 		public:
 			/// @name constructors and destructor
@@ -127,10 +122,6 @@ namespace synthese
 			//@{
 			//@}
 
-
-				void addMessage(const AlarmTemplate& message) const;
-				void removeMessage(const AlarmTemplate& message) const;
-				const Messages& getMessages() const { return _messages; }
 
 
 			/** Parses a string to find variables informations and stores it into a variables list.

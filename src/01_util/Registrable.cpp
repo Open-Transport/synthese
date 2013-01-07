@@ -21,19 +21,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// util
 #include "Registrable.h"
+
+#include "ParametersMap.h"
 #include "RegistryKeyException.h"
 #include "ObjectNotFoundException.h"
 
 #include <assert.h>
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
 	namespace util
 	{
+		const string Registrable::ATTR_ID = "id";
+
+
+
 		Registrable::Registrable(
 			RegistryKeyType key
 		):	_key(key)
@@ -43,4 +49,11 @@ namespace synthese
 
 		Registrable::~Registrable()
 		{}
+
+
+
+		void Registrable::toParametersMap( util::ParametersMap& pm ) const
+		{
+			pm.insert(ATTR_ID, _key);
+		}
 }	}

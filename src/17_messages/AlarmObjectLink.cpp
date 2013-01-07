@@ -38,36 +38,11 @@ namespace synthese
 
 	namespace messages
 	{
-		Alarm* AlarmObjectLink::getAlarm() const
-		{
-			return _alarm;
-		}
-
-		std::string AlarmObjectLink::getRecipientKey() const
-		{
-			return _recipientKey;
-		}
-
-
-
-		void AlarmObjectLink::setAlarm(Alarm* alarm)
-		{
-			_alarm = alarm;
-		}
-
-		void AlarmObjectLink::setRecipientKey( const std::string& key )
-		{
-			_recipientKey = key;
-		}
-
-
-
 		AlarmObjectLink::AlarmObjectLink(
 			RegistryKeyType key
 		):	Registrable(key),
 			_alarm(NULL)
 		{
-
 		}
 
 
