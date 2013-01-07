@@ -45,4 +45,18 @@ namespace synthese
 			const std::string name /*= std::string()*/
 		):	Named(name)
 		{}
+
+
+
+		void Scenario::addMessage( const Alarm& message ) const
+		{
+			_messages.insert(&message);
+		}
+
+
+
+		void Scenario::removeMessage( const Alarm& message ) const
+		{
+			_messages.erase(&message);
+		}
 }	}

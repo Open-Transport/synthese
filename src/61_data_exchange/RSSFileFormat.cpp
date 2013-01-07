@@ -150,12 +150,12 @@ namespace synthese
 				BOOST_FOREACH(const Item& item, items)
 				{
 					shared_ptr<SentScenario> updatedScenario;
-					shared_ptr<SentAlarm> updatedMessage;
+					shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
 							_dataSource.getObjectByCode<Scenario>(lexical_cast<string>(item.guid))
 					)	);
-					SentAlarm* message(NULL);
+					Alarm* message(NULL);
 					if(!scenario)
 					{
 						// Creation of the scenario
@@ -194,7 +194,7 @@ namespace synthese
 						_scenariosToRemove.erase(scenario->getKey());
 
 						// Message content
-						const SentScenario::Messages& messages(scenario->getMessages());
+						const Scenario::Messages& messages(scenario->getMessages());
 						if(messages.size() != 1)
 						{
 							Log::GetInstance().warn(
@@ -207,7 +207,7 @@ namespace synthese
 								_messagesToRemove.insert((*it)->getKey());
 							}
 						}
-						message = const_cast<SentAlarm*>(*messages.begin());
+						message = const_cast<Alarm*>(*messages.begin());
 						if(	message->getLongMessage() != item.content ||
 							message->getShortMessage() != item.title
 						){

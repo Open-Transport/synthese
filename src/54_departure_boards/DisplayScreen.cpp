@@ -57,20 +57,21 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
-	using namespace util;
-	using namespace pt;
+	using namespace algorithm;
 	using namespace dblog;
-	using namespace interfaces;
-	using namespace graph;
-	using namespace road;
 	using namespace geography;
+	using namespace graph;
+	using namespace interfaces;
+	using namespace messages;
 	using namespace pt;
 	using namespace pt_journey_planner;
-	using namespace algorithm;
+	using namespace road;
+	using namespace util;
 
 	namespace util
 	{
 		template<> const string Registry<departure_boards::DisplayScreen>::KEY("DisplayScreen");
+		template<> const string util::FactorableTemplate<messages::BroadcastPoint, departure_boards::DisplayScreen>::FACTORY_KEY = "DisplayScreen";
 	}
 
 	namespace departure_boards
@@ -84,6 +85,9 @@ namespace synthese
 		const std::string DisplayScreen::DATA_TYPE_ID("type_id");
 		const std::string DisplayScreen::DATA_LOCATION_ID("location_id");
 		const std::string DisplayScreen::DATA_CPU_ID("cpu_id");
+
+		const std::string DisplayScreen::VAR_SCREEN_ID = "screen_id";
+		const std::string DisplayScreen::VAR_SCENARIO_ID = "scenario_id";
 
 
 
@@ -828,5 +832,49 @@ namespace synthese
 			pm.insert(prefix + DATA_SCREEN_ID, getKey());
 			pm.insert(prefix + DATA_TITLE, _title);
 			pm.insert(prefix + DATA_TYPE_ID, _displayType ? _displayType->getKey() : 0);
+		}
+
+
+
+		MessageType* DisplayScreen::getMessageType() const
+		{
+			return
+				_displayType ?
+				_displayType->getMessageType() :
+				NULL;
+		}
+
+
+
+		void DisplayScreen::getBrodcastPoints(
+			BroadcastPoint::BroadcastPoints& result
+		) const	{
+			BOOST_FOREACH(const DisplayScreen::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<DisplayScreen>())
+			{
+				result.push_back(it.second.get());
+			}
+		}
+
+
+
+		bool DisplayScreen::displaysMessage(
+			const messages::Scenario& message
+		) const	{
+
+			// Jump over undefined type or rule page
+			if(	!_displayType ||
+				!_displayType->getMessageIsDisplayedPage()
+			){
+				return false;
+			}
+
+			stringstream s;
+			ParametersMap pm;
+			pm.insert(VAR_SCREEN_ID, getKey());
+			pm.insert(VAR_SCENARIO_ID, message.getKey());
+			_displayType->getMessageIsDisplayedPage()->display(s, pm);
+			string str(s.str());
+			trim(str);
+			return str == "1";
 		}
 }	}

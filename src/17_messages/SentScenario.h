@@ -66,15 +66,12 @@ namespace synthese
 			/// Right : variable value
 			typedef std::map<std::string, std::string> VariablesMap;
 
-			typedef std::set<const SentAlarm*> Messages;
-
 		private:
 			bool _isEnabled;
 			boost::posix_time::ptime _periodStart; //!< Alarm applicability period start
 			boost::posix_time::ptime _periodEnd;   //!< Alarm applicability period end
 			const ScenarioTemplate*	_template;
 			VariablesMap _variables;
-			mutable Messages _messages;
 
 		public:
 			/** Basic constructor
@@ -124,9 +121,7 @@ namespace synthese
 			void setTemplate(const ScenarioTemplate* value);
 			void setVariables(const VariablesMap& value);
 
-			void addMessage(const SentAlarm& message) const;
-			void removeMessage(const SentAlarm& message) const;
-			const Messages& getMessages() const { return _messages; }
+
 
 			/** Gets the "worse" conflict status of each alarm contained in the scenario.
 				@return synthese::messages::AlarmConflict The conflict status of the scenario.

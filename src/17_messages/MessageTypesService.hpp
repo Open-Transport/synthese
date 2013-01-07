@@ -32,6 +32,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Scenario;
+
 		//////////////////////////////////////////////////////////////////////////
 		///	17.15 Function : MessageTypesService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Message_Types_List
@@ -44,14 +46,14 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,MessageTypesService>
 		{
 		public:
+			static const std::string PARAMETER_SCENARIO_ID;
+
 			static const std::string TAG_TYPE;
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				/// @todo Parsed parameters declaration
-				// eg : const void*	_object;
-				// eg : ParametersMap			_parameters;
+				const Scenario* _scenario;
 			//@}
 			
 			
@@ -81,9 +83,10 @@ namespace synthese
 			
 			
 		public:
+			MessageTypesService();
+
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 

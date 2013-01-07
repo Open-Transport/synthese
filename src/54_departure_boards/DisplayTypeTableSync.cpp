@@ -32,6 +32,7 @@
 #include "DBException.hpp"
 #include "DisplayScreenTableSync.h"
 #include "InterfaceTableSync.h"
+#include "MessageTypeTableSync.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
 #include "Session.h"
@@ -49,6 +50,7 @@ namespace synthese
 	using namespace db;
 	using namespace departure_boards;
 	using namespace interfaces;
+	using namespace messages;
 	using namespace util;
 	using namespace cms;
 	using namespace security;
@@ -72,6 +74,8 @@ namespace synthese
 		const string DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID("display_destination_page_id");
 		const string DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID("display_transfer_destination_page_id");
 		const string DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID("monitoring_parser_page_id");
+		const string DisplayTypeTableSync::COL_IS_DISPLAYED_MESSAGE_PAGE_ID = "is_displayed_message_page_id";
+		const string DisplayTypeTableSync::COL_MESSAGE_TYPE = "message_type_id";
 	}
 
 	namespace db
@@ -95,6 +99,8 @@ namespace synthese
 			Field(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, SQL_INTEGER),
 			Field(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, SQL_INTEGER),
 			Field(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_IS_DISPLAYED_MESSAGE_PAGE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_MESSAGE_TYPE, SQL_INTEGER),
 			Field()
 		};
 
@@ -216,6 +222,20 @@ namespace synthese
 
 				try
 				{
+					object->setMessageIsDisplayedPage(NULL);
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_IS_DISPLAYED_MESSAGE_PAGE_ID));
+					if (id > 0)
+					{
+						object->setMessageIsDisplayedPage(WebPageTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Webpage>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_IS_DISPLAYED_MESSAGE_PAGE_ID, e);
+				}
+
+				try
+				{
 					object->setMonitoringParserPage(NULL);
 					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID));
 					if (id > 0)
@@ -226,6 +246,23 @@ namespace synthese
 				catch (ObjectNotFoundException<Webpage>& e)
 				{
 					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, e);
+				}
+
+				// Message type
+				try
+				{
+					object->setMessageType(NULL);
+					RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_MESSAGE_TYPE));
+					if(id > 0)
+					{
+						object->setMessageType(
+							MessageTypeTableSync::GetEditable(id, env, linkLevel).get()
+						);
+					}
+				}
+				catch (ObjectNotFoundException<MessageType>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + DisplayTypeTableSync::TABLE.NAME + "/" + DisplayTypeTableSync::COL_MESSAGE_TYPE, e);
 				}
 			}
 		}

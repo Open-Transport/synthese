@@ -817,7 +817,7 @@ namespace synthese
 			if(_sscenario.get())
 			{
 				// Removals
-				BOOST_FOREACH(const SentAlarm* alarm, _sscenario->getMessages())
+				BOOST_FOREACH(const Alarm* alarm, _scenario->getMessages())
 				{
 					if(_messageIds.find(alarm->getKey()) == _messageIds.end())
 					{

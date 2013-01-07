@@ -35,6 +35,8 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
+
 		////////////////////////////////////////////////////////////////////
 		/// Scenario of alarms diffusion.
 		///	@ingroup m17
@@ -50,10 +52,13 @@ namespace synthese
 		{
 		public:
 			typedef std::set<int> Sections;
+			typedef std::set<const Alarm*> Messages;
 
 		private:
 
 			Sections _sections;
+
+			mutable Messages _messages;
 
 		protected:
 			Scenario(const std::string name = std::string());
@@ -64,6 +69,12 @@ namespace synthese
 
 
 			virtual ~Scenario();
+
+			void addMessage(const Alarm& message) const;
+			void removeMessage(const Alarm& message) const;
+			const Messages& getMessages() const { return _messages; }
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Export of the content of the object into a ParametersMap.

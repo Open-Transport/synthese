@@ -103,6 +103,10 @@ namespace synthese
 			) const = 0;
 
 			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const = 0;
+
+			typedef std::map<const util::Registrable*, const AlarmObjectLink*> RegistrableLinkedObjectsSet;
+
+			virtual RegistrableLinkedObjectsSet getLinkedObjects(const Alarm& alarm) const = 0;
 		};
 	}
 }

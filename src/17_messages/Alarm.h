@@ -72,6 +72,9 @@ namespace synthese
 			static const std::string DATA_DONE;
 
 			static const std::string TAG_MESSAGE_ALTERNATIVE;
+			static const std::string TAG_RECIPIENTS;
+			static const std::string ATTR_LINK_PARAMETER;
+			static const std::string ATTR_LINK_ID;
 
 			typedef std::map<MessageType*, MessageAlternative*> MessageAlternatives;
 
@@ -103,10 +106,10 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string&		getShortMessage()	const;
-				const std::string&		getLongMessage()	const;
-				const AlarmLevel&		getLevel()			const;
-				const Scenario*			getScenario()		const;
+			const std::string&		getShortMessage()	const { return _shortMessage; }
+				const std::string&		getLongMessage()	const { return _longMessage; }
+				const AlarmLevel&		getLevel()			const { return _level; }
+				const Scenario*			getScenario()		const { return _scenario; }
 				bool					getRawEditor() const { return _rawEditor; }
 				bool					getDone() const { return _done; }
 				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
@@ -114,10 +117,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setLevel (const AlarmLevel& level);
-				void setShortMessage( const std::string& message);
-				void setLongMessage( const std::string& message);
-				void setScenario(const Scenario* scenario);
+				void setLevel (const AlarmLevel& level){ _level = level; }
+				void setShortMessage( const std::string& message){ _shortMessage = message; }
+				void setLongMessage( const std::string& message){ _longMessage = message; }
+				void setScenario(const Scenario* scenario){ _scenario = scenario; }
 				void setRawEditor(bool value){ _rawEditor = value; }
 				void setDone(bool value){ _done = value; }
 				void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
@@ -136,9 +139,14 @@ namespace synthese
 				/// @date 2011
 				void toParametersMap(
 					util::ParametersMap& pm,
-					bool withScenario = true,
-					std::string prefix = std::string()
+					bool withScenario,
+					std::string prefix = std::string(),
+					bool withRecipients = false
 				) const;
+
+
+
+				virtual void toParametersMap(util::ParametersMap& pm) const;
 			//@}
 		};
 }	}

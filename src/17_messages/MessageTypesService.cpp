@@ -24,9 +24,11 @@
 
 #include "MessageTypesService.hpp"
 
+#include "BroadcastPoint.hpp"
 #include "MessageType.hpp"
 #include "RequestException.h"
 #include "Request.h"
+#include "Scenario.h"
 
 using namespace boost;
 using namespace std;
@@ -58,6 +60,21 @@ namespace synthese
 
 		void MessageTypesService::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Scenario
+			RegistryKeyType scenarioId(
+				map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_ID, 0)
+			);
+			if(scenarioId > 0)
+			{
+				try
+				{
+					_scenario = Env::GetOfficialEnv().get<Scenario>(scenarioId).get();
+				}
+				catch (ObjectNotFoundException<Scenario>&)
+				{
+					throw RequestException("No such scenario");
+				}
+			}
 		}
 
 
@@ -68,11 +85,49 @@ namespace synthese
 		) const {
 			ParametersMap pm;
 
-			BOOST_FOREACH(const MessageType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessageType>())
+			if(_scenario) // Messages types needed by a scenario
 			{
-				shared_ptr<ParametersMap> typePM(new ParametersMap);
-				it.second->toParametersMap(*typePM);
-				pm.insert(TAG_TYPE, typePM);
+				set<MessageType*> messageTypes;
+
+				// Broadcast points loop
+				BOOST_FOREACH(BroadcastPoint* broadcastPoint, BroadcastPoint::GetBroadcastPoints())
+				{
+					MessageType* messageType(broadcastPoint->getMessageType());
+
+					// Jump over null or already selected mesage type 
+					if(messageType == NULL ||
+						messageTypes.find(messageType) != messageTypes.end()
+					){
+						continue;
+					}
+
+					// Search if a message of the scenario have to be displayed on the broadcast point
+					BOOST_FOREACH(const Alarm* alarm, _scenario->getMessages())
+					{
+						if(broadcastPoint->displaysMessage(*alarm))
+						{
+							messageTypes.insert(broadcastPoint->getMessageType());
+							break;
+						}
+					}
+				}
+
+				// Loop on selected message types
+				BOOST_FOREACH(MessageType* messageType, messageTypes)
+				{
+					shared_ptr<ParametersMap> typePM(new ParametersMap);
+					messageType->toParametersMap(*typePM);
+					pm.insert(TAG_TYPE, typePM);
+				}
+			}
+			else // Entire registry
+			{
+				BOOST_FOREACH(const MessageType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessageType>())
+				{
+					shared_ptr<ParametersMap> typePM(new ParametersMap);
+					it.second->toParametersMap(*typePM);
+					pm.insert(TAG_TYPE, typePM);
+				}
 			}
 
 			return pm;
@@ -91,5 +146,13 @@ namespace synthese
 		std::string MessageTypesService::getOutputMimeType() const
 		{
 			return "text/html";
+		}
+
+
+
+		MessageTypesService::MessageTypesService():
+			_scenario(NULL)
+		{
+
 		}
 }	}

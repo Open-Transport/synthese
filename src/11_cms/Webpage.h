@@ -208,6 +208,18 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Parses the content and generates the result.
 				/// @param stream stream to write on
+				/// @author Hugues Romain
+				/// @date 2013
+				void display(
+					std::ostream& stream,
+					const util::ParametersMap& additionalParametersMap
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Parses the content and generates the result.
+				/// @param stream stream to write on
 				/// @param request current request
 				/// @author Hugues Romain
 				/// @date 2010
