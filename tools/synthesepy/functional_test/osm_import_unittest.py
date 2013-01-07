@@ -193,7 +193,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
             return
 
         self.check_import(
-C            'one_way.osm',
+            'one_way.osm',
             {'children': [{'_road_places': [{'_table': 't060_road_places',
                                  'name': u'Road0',
                                  'roads': [{'_table': 't015_roads',
