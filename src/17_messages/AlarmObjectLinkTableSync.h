@@ -69,6 +69,7 @@ namespace synthese
 			static const std::string COL_RECIPIENT_KEY;
 			static const std::string COL_OBJECT_ID;
 			static const std::string COL_ALARM_ID;
+			static const std::string COL_PARAMETER;
 
 			/** Search of alarm object links for a specified alarm in a specified recipient type.
 				@param alarm Alarm to the object must be liked with

@@ -175,20 +175,6 @@ namespace synthese
 
 
 
-		void SentScenario::addMessage( const SentAlarm& message ) const
-		{
-			_messages.insert(&message);
-		}
-
-
-
-		void SentScenario::removeMessage( const SentAlarm& message ) const
-		{
-			_messages.erase(&message);
-		}
-
-
-
 		void SentScenario::toParametersMap( util::ParametersMap& pm ) const
 		{
 			// roid
@@ -234,7 +220,7 @@ namespace synthese
 			}
 
 			// Messages
-			BOOST_FOREACH(const SentAlarm* alarm, getMessages())
+			BOOST_FOREACH(const Alarm* alarm, getMessages())
 			{
 				shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				alarm->toParametersMap(*messagePM, false);

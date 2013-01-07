@@ -25,6 +25,7 @@
 #ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
 #define SYNTHESE_CTABLEAUAFFICHAGE_H
 
+#include "BroadcastPoint.hpp"
 #include "DisplayScreenCPU.h"
 #include "ImportableTemplate.hpp"
 #include "Named.h"
@@ -101,9 +102,12 @@ namespace synthese
 					DisplayScreenCPU
 			>	>,
 			public util::Named,
-			public impex::ImportableTemplate<DisplayScreen>
+			public impex::ImportableTemplate<DisplayScreen>,
+			public util::FactorableTemplate<messages::BroadcastPoint, DisplayScreen>
 		{
 		public:
+			static const std::string VAR_SCREEN_ID;
+			static const std::string VAR_SCENARIO_ID;
 
 			/// Chosen registry class.
 			typedef util::Registry<DisplayScreen>	Registry;
@@ -394,6 +398,16 @@ namespace synthese
 			//! @name Static output methods
 			//@{
 				static const std::string GetSubScreenTypeLabel(SubScreenType value);
+			//@}
+
+
+			//! @name BroadcastPoint virtual methods
+			//@{
+				virtual messages::MessageType* getMessageType() const;
+
+				virtual bool displaysMessage(const messages::Scenario& message) const;
+
+				virtual void getBrodcastPoints(BroadcastPoints& result) const;
 			//@}
 		};
 }	}

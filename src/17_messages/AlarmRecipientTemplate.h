@@ -51,7 +51,7 @@ namespace synthese
 			typedef typename T::ObjectType									ObjectType;
 			typedef std::map<const ObjectType*, const AlarmObjectLink*>			LinkedObjectsSet;
 			typedef std::set<const AlarmObjectLink*>						LinkedAlarmsSet;
-			typedef typename std::map<const SentAlarm*, LinkedObjectsSet>	AlarmLinks;
+			typedef typename std::map<const Alarm*, LinkedObjectsSet>	AlarmLinks;
 			typedef typename std::map<const ObjectType*, LinkedAlarmsSet>	ObjectLinks;
 
 		private:
@@ -70,7 +70,9 @@ namespace synthese
 			static const std::string TITLE;
 
 			static LinkedAlarmsSet	getLinkedAlarms(const ObjectType& object);
-			static LinkedObjectsSet	getLinkedObjects(const SentAlarm& alarm);
+			static LinkedObjectsSet	GetLinkedObjects(const Alarm& alarm);
+
+			virtual LinkedObjectsSet getLinkedObjects(const Alarm& alarm) const;
 
 			static const SentAlarm* getAlarm(const ObjectType& object);
 			static const SentAlarm* getAlarm(const ObjectType& object, const boost::posix_time::ptime& date);
@@ -108,6 +110,25 @@ namespace synthese
 
 			virtual void getStaticParametersLabelsVirtual(security::ParameterLabelsVector& m);
 		};
+
+
+
+		template<class T, class C>
+		AlarmRecipient::RegistrableLinkedObjectsSet AlarmRecipientTemplate<T, C>::getLinkedObjects(
+			const Alarm& alarm
+		) const	{
+			RegistrableLinkedObjectsSet r;
+			LinkedObjectsSet s(GetLinkedObjects(alarm));
+			BOOST_FOREACH(const LinkedObjectsSet::value_type& it, s)
+			{
+				r.insert(
+					make_pair(
+						static_cast<util::Registrable*>(it.first),
+						it.second
+				)	);
+			}
+			return r;
+		}
 
 
 
@@ -254,7 +275,7 @@ namespace synthese
 
 		template<class T, class C>
 		typename AlarmRecipientTemplate<T, C>::LinkedObjectsSet AlarmRecipientTemplate<T,C>::getLinkedObjects(
-			const SentAlarm& alarm
+			const Alarm& alarm
 		){
 			typename  AlarmLinks::const_iterator it = _linksAlarm.find(&alarm);
 			return (it == _linksAlarm.end()) ? LinkedObjectsSet() : it->second;

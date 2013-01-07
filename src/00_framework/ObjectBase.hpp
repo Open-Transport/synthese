@@ -157,10 +157,16 @@ namespace synthese
 			/// @param map the generated ParametersMap
 			virtual void toParametersMap(
 				util::ParametersMap& map,
-				bool withAdditionalParameters = false,
+				bool withAdditionalParameters,
 				boost::logic::tribool withFiles = boost::logic::indeterminate,
 				std::string prefix = std::string()
 			) const = 0;
+
+
+
+			virtual void toParametersMap(
+				util::ParametersMap& map
+			) const;
 
 
 

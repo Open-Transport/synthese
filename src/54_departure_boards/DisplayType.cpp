@@ -43,10 +43,7 @@ namespace synthese
 			return _displayInterface;
 		}
 
-		const std::string& DisplayType::getName() const
-		{
-			return _name;
-		}
+
 
 		DisplayType::DisplayType(util::RegistryKeyType id)
 		:	Registrable(id),
@@ -59,7 +56,8 @@ namespace synthese
 			_displayRowPage(NULL),
 			_displayDestinationPage(NULL),
 			_displayTransferDestinationPage(NULL),
-			_monitoringParserPage(NULL)
+			_monitoringParserPage(NULL),
+			_messageType(NULL)
 		{}
 
 
@@ -67,11 +65,6 @@ namespace synthese
 		void DisplayType::setDisplayInterface(const Interface* interf )
 		{
 			_displayInterface = interf;
-		}
-
-		void DisplayType::setName( const std::string& name )
-		{
-			_name = name;
 		}
 
 

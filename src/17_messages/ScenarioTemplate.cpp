@@ -306,7 +306,7 @@ namespace synthese
 			}
 
 			// Messages
-			BOOST_FOREACH(const AlarmTemplate* alarm, getMessages())
+			BOOST_FOREACH(const Alarm* alarm, getMessages())
 			{
 				shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				alarm->toParametersMap(*messagePM, false);
@@ -330,19 +330,5 @@ namespace synthese
 				// folder_name
 				pm.insert(DATA_FOLDER_NAME, getFolder()->getName());
 			}
-		}
-
-
-
-		void ScenarioTemplate::addMessage( const AlarmTemplate& message ) const
-		{
-			_messages.insert(&message);
-		}
-
-
-
-		void ScenarioTemplate::removeMessage( const AlarmTemplate& message ) const
-		{
-			_messages.erase(&message);
 		}
 }	}

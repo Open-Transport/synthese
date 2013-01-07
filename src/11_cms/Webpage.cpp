@@ -24,6 +24,7 @@
 
 #include "ParametersMap.h"
 #include "DynamicRequest.h"
+#include "StaticFunctionRequest.h"
 #include "FunctionWithSite.h"
 #include "ServerModule.h"
 #include "WebPageDisplayFunction.h"
@@ -127,6 +128,14 @@ namespace synthese
 				*this,
 				variables
 			);
+		}
+
+
+
+		void Webpage::display( std::ostream& stream, const util::ParametersMap& additionalParametersMap ) const
+		{
+			StaticFunctionRequest<WebPageDisplayFunction> fakeRequest;
+			display(stream, fakeRequest, additionalParametersMap);
 		}
 
 

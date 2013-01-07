@@ -25,6 +25,7 @@
 #ifndef SYNTHESE_DisplayType_H__
 #define SYNTHESE_DisplayType_H__
 
+#include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
 
@@ -44,6 +45,11 @@ namespace synthese
 		class Interface;
 	}
 
+	namespace messages
+	{
+		class MessageType;
+	}
+
 	namespace departure_boards
 	{
 		////////////////////////////////////////////////////////////////////
@@ -56,8 +62,9 @@ namespace synthese
 		///		- audio : No audio reading can be produced
 		///		- monitoring : The display type cannot be monitored
 		////////////////////////////////////////////////////////////////////
-		class DisplayType
-		:	public virtual util::Registrable
+		class DisplayType:
+			public virtual util::Registrable,
+			public util::Named
 		{
 		public:
 
@@ -65,7 +72,6 @@ namespace synthese
 			typedef util::Registry<DisplayType>	Registry;
 
 		private:
-			std::string						_name;
 			const interfaces::Interface*	_displayInterface;				//!< On screen display Interface
 			const interfaces::Interface*	_audioInterface;		//!< Interface providing exchange with a vocal reading system
 			const interfaces::Interface*	_monitoringInterface;	//!< Interface used to parse monitoring outputs (see DisplayMonitoringStatus)
@@ -78,6 +84,9 @@ namespace synthese
 			const cms::Webpage* _displayDestinationPage;
 			const cms::Webpage* _displayTransferDestinationPage;
 			const cms::Webpage* _monitoringParserPage;
+			const cms::Webpage* _messageIsDisplayedPage;
+
+			messages::MessageType* _messageType;
 
 		public:
 
@@ -94,7 +103,6 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string&				getName()					const;
 				const interfaces::Interface*	getDisplayInterface()		const;
 				const interfaces::Interface*	getAudioInterface()			const;
 				const interfaces::Interface*	getMonitoringInterface()	const;
@@ -106,11 +114,12 @@ namespace synthese
 				const cms::Webpage* getDisplayDestinationPage() const { return _displayDestinationPage; }
 				const cms::Webpage* getDisplayTransferDestinationPage() const { return _displayTransferDestinationPage; }
 				const cms::Webpage* getMonitoringParserPage() const { return _monitoringParserPage; }
+				const cms::Webpage* getMessageIsDisplayedPage() const { return _messageIsDisplayedPage; }
+				messages::MessageType* getMessageType() const { return _messageType; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setName(const std::string& name);
 				void setDisplayInterface(const interfaces::Interface* interf);
 				void setAudioInterface(const interfaces::Interface* value);
 				void setMonitoringInterface(const interfaces::Interface* value);
@@ -122,6 +131,8 @@ namespace synthese
 				void setDisplayDestinationPage(const cms::Webpage* value){ _displayDestinationPage = value; }
 				void setDisplayTransferDestinationPage(const cms::Webpage* value){ _displayTransferDestinationPage = value; }
 				void setMonitoringParserPage(const cms::Webpage* value){ _monitoringParserPage = value; }
+				void setMessageIsDisplayedPage(const cms::Webpage* value){ _messageIsDisplayedPage = value; }
+				void setMessageType(messages::MessageType* value){ _messageType = value; }
 			//@}
 		};
 	}
