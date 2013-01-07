@@ -597,7 +597,8 @@ class Project(object):
         env = os.environ.copy()
         env['SYNTHESE_TESTDATA_CONNSTRING'] = self.config.conn_string + \
             ',triggerCheck=0'
-        utils.call(importer_path, env=env)
+	# FIXME: The testdata importer binary does not compile anymore we just skip its call.
+        #utils.call(importer_path, env=env)
 
     @property
     def db_backend(self):
