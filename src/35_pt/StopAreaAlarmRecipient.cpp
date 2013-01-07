@@ -75,7 +75,7 @@ namespace synthese
 
 		template<> AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::AlarmLinks
 		AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::_linksAlarm =
-			std::map<const SentAlarm*, std::map<const StopArea*, const AlarmObjectLink*> > ();
+			std::map<const Alarm*, std::map<const StopArea*, const AlarmObjectLink*> > ();
 
 		template<> AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::ObjectLinks
 		AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::_linksObject =
