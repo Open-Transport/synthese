@@ -600,7 +600,7 @@ namespace synthese
 
 					// Adding of existing object links to the removal list
 					DisplayScreenAlarmRecipient::LinkedObjectsSet existingRecipients(
-						DisplayScreenAlarmRecipient::getLinkedObjects(
+						DisplayScreenAlarmRecipient::GetLinkedObjects(
 							**scenario->getMessages().begin())
 					);
 					BOOST_FOREACH(const DisplayScreenAlarmRecipient::LinkedObjectsSet::value_type& dsit, existingRecipients)
