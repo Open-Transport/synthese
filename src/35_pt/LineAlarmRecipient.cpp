@@ -75,7 +75,7 @@ namespace synthese
 
 		template<> AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::AlarmLinks
 		AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::_linksAlarm =
-			std::map<const SentAlarm*, std::map<const CommercialLine*, const AlarmObjectLink*> > ();
+			std::map<const Alarm*, std::map<const CommercialLine*, const AlarmObjectLink*> > ();
 
 		template<> AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::ObjectLinks
 		AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::_linksObject =

@@ -102,13 +102,9 @@ namespace synthese
 					}
 
 					// Search if a message of the scenario have to be displayed on the broadcast point
-					BOOST_FOREACH(const Alarm* alarm, _scenario->getMessages())
+					if(broadcastPoint->displaysMessage(*_scenario))
 					{
-						if(broadcastPoint->displaysMessage(*alarm))
-						{
-							messageTypes.insert(broadcastPoint->getMessageType());
-							break;
-						}
+						messageTypes.insert(broadcastPoint->getMessageType());
 					}
 				}
 

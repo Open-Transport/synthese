@@ -94,7 +94,7 @@ namespace synthese
 
 	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::AlarmLinks
 	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksAlarm =
-			std::map<const SentAlarm*, std::map<const DisplayScreen*, const AlarmObjectLink*> > ();
+			std::map<const Alarm*, std::map<const DisplayScreen*, const AlarmObjectLink*> > ();
 
 	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::ObjectLinks
 	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksObject =
