@@ -76,17 +76,6 @@ namespace synthese
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Export of the content of the object into a ParametersMap.
-			/// @param pm the ParametersMap object to populate
-			/// @author Hugues Romain
-			/// @date 2012
-			virtual void toParametersMap(
-				util::ParametersMap& pm
-			) const = 0;
-
-
-
 			const Sections& getSections() const { return _sections; }
 			void setSections(const Sections& value){ _sections = value; }
 		};
