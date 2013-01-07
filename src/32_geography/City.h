@@ -178,8 +178,13 @@ namespace synthese
 				/// @date 2011
 				void toParametersMap(
 					util::ParametersMap& pm,
-					const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
+					const CoordinatesSystem* coordinatesSystem,
 					const std::string& prefix = std::string()
+				) const;
+
+
+				virtual void toParametersMap(
+					util::ParametersMap& pm
 				) const;
 			//@}
 		};

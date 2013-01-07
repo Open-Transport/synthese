@@ -162,6 +162,18 @@ namespace synthese
 
 
 
+		void City::toParametersMap( util::ParametersMap& pm ) const
+		{
+			static string fakePrefix;
+			toParametersMap(
+				pm,
+				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
+				fakePrefix
+			);
+		}
+
+
+
 		void City::addPlaceToMatcher( PlacesMatcher::Content place )
 		{
 			getLexicalMatcher(place->getFactoryKey()).add(place->getName(), place);
