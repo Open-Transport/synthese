@@ -193,7 +193,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
             return
 
         self.check_import(
-            'one_way.osm',
+C            'one_way.osm',
             {'children': [{'_road_places': [{'_table': 't060_road_places',
                                  'name': u'Road0',
                                  'roads': [{'_table': 't015_roads',
@@ -222,8 +222,8 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                                                              'right_start_house_number': u''}],
                                             'road_type': 8}]}],
                '_table': 't006_cities',
-               'code': u'-60',
-               'name': u'City0'}]}
+               'code': u'0',
+               'name': u'CITY0'}]}
         )
 
     def test_import_three_connected_ways(self):
@@ -313,8 +313,8 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                                                              'right_start_house_number': u''}],
                                             'road_type': 8}]}],
                '_table': 't006_cities',
-               'code': u'-316',
-               'name': u'City0'}]}
+               'code': u'0',
+               'name': u'CITY0'}]}
         )
 
         self.assertEquals(
