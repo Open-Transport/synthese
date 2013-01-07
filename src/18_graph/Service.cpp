@@ -227,7 +227,7 @@ namespace synthese
 
 		void Service::toParametersMap(
 			ParametersMap& pm,
-			string prefix /*= std::string() */
+			const string& prefix
 		) const	{
 
 			// ID
@@ -241,5 +241,13 @@ namespace synthese
 			{
 				pm.insert(prefix + ATTR_JOURNEY_PATTERN_ID, _path->getKey());
 			}
+		}
+
+
+
+		void Service::toParametersMap( util::ParametersMap& pm ) const
+		{
+			static string fakePrefix;
+			toParametersMap(pm, fakePrefix);
 		}
 }	}
