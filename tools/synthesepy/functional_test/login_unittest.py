@@ -39,7 +39,6 @@ class LoginTest(http_testcase.HTTPTestCase):
     PASSWORD = 'root'
 
     def test_bad_password(self):
-        print ">>>>> test_bad_password"
         time.sleep(10)
         br = self.get_http_api().get_browser_for_suffix("?SERVICE=packages")
 
