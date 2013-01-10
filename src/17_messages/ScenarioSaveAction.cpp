@@ -845,52 +845,48 @@ namespace synthese
 					alarm->setLevel(msg.level);
 					AlarmTableSync::Save(alarm.get(), transaction);
 
-					// Recipients
+					AlarmObjectLinkTableSync::SearchResult v(
+						AlarmObjectLinkTableSync::Search(env, alarm->getKey())
+					);
+					set<RegistryKeyType> toRemove;
+					typedef map<pair<string,RegistryKeyType>, RegistryKeyType> AOLMap;
+					AOLMap m;
+					BOOST_FOREACH(const shared_ptr<AlarmObjectLink>& item, v)
+					{
+						toRemove.insert(item->getKey());
+						m.insert(
+							make_pair(
+								make_pair(
+									item->getRecipientKey(),
+									item->getObjectId()
+								),
+								item->getKey()
+						)	);
+					}
+
+					// Insertions / updates
 					BOOST_FOREACH(const Message::Recipients::value_type& it, msg.recipients)
 					{
-						AlarmObjectLinkTableSync::SearchResult v(
-							AlarmObjectLinkTableSync::Search(env, alarm->getKey())
-						);
-						set<RegistryKeyType> toRemove;
-						typedef map<pair<string,RegistryKeyType>, RegistryKeyType> AOLMap;
-						AOLMap m;
-						BOOST_FOREACH(const shared_ptr<AlarmObjectLink>& item, v)
+						// Insertion
+						AOLMap::const_iterator itAOLMap(m.find(it));
+						if(itAOLMap == m.end())
 						{
-							toRemove.insert(item->getKey());
-							m.insert(
-								make_pair(
-									make_pair(
-										item->getRecipientKey(),
-										item->getObjectId()
-									),
-									item->getKey()
-							)	);
+							AlarmObjectLink aol;
+							aol.setRecipientKey(it.first);
+							aol.setObjectId(it.second);
+							aol.setAlarm(alarm.get());
+							AlarmObjectLinkTableSync::Save(&aol, transaction);
 						}
+						else
+						{
+							toRemove.erase(itAOLMap->second);
+						}
+					}
 
-						// Insertions / updates
-						BOOST_FOREACH(const Message::Recipients::value_type& it, msg.recipients)
-						{
-							// Insertion
-							AOLMap::const_iterator itAOLMap(m.find(it));
-							if(itAOLMap == m.end())
-							{
-								AlarmObjectLink aol;
-								aol.setRecipientKey(it.first);
-								aol.setObjectId(it.second);
-								aol.setAlarm(alarm.get());
-								AlarmObjectLinkTableSync::Save(&aol, transaction);
-							}
-							else
-							{
-								toRemove.erase(itAOLMap->second);
-							}
-						}
-
-						// Removals
-						BOOST_FOREACH(RegistryKeyType id, toRemove)
-						{
-							DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(request.getSession(), id, transaction, false);
-						}
+					// Removals
+					BOOST_FOREACH(RegistryKeyType id, toRemove)
+					{
+						DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(request.getSession(), id, transaction, false);
 					}
 
 
