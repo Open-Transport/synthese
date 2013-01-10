@@ -57,6 +57,7 @@ namespace synthese
 			_displayDestinationPage(NULL),
 			_displayTransferDestinationPage(NULL),
 			_monitoringParserPage(NULL),
+			_messageIsDisplayedPage(NULL),
 			_messageType(NULL)
 		{}
 
