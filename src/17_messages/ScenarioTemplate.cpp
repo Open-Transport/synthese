@@ -309,7 +309,7 @@ namespace synthese
 			BOOST_FOREACH(const Alarm* alarm, getMessages())
 			{
 				shared_ptr<ParametersMap> messagePM(new ParametersMap);
-				alarm->toParametersMap(*messagePM, false);
+				alarm->toParametersMap(*messagePM, false, string(), true);
 				pm.insert(TAG_MESSAGE, messagePM);
 			}
 

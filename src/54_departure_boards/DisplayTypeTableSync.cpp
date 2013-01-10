@@ -291,6 +291,8 @@ namespace synthese
 			query.addField(object->getDisplayDestinationPage() ? object->getDisplayDestinationPage()->getKey() : RegistryKeyType(0));
 			query.addField(object->getDisplayTransferDestinationPage() ? object->getDisplayTransferDestinationPage()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMonitoringParserPage() ? object->getMonitoringParserPage()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMessageIsDisplayedPage() ? object->getMessageIsDisplayedPage()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMessageType() ? object->getMessageType()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 

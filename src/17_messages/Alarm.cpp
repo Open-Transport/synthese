@@ -139,7 +139,7 @@ namespace synthese
 						it.first->toParametersMap(*arPM);
 						arPM->insert(ATTR_LINK_ID, it.second->getKey());
 						arPM->insert(ATTR_LINK_PARAMETER, it.second->getParameter());
-						pm.insert(ar->getFactoryKey(), arPM);
+						recipientsPM->insert(ar->getFactoryKey(), arPM);
 				}	}
 				pm.insert(TAG_RECIPIENTS, recipientsPM);
 			}
