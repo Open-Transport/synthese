@@ -26,5 +26,6 @@ namespace synthese
 {
 	namespace messages
 	{
+		AlarmRecipient::ObjectLinks::mapped_type AlarmRecipient::_emptyAOLSet;
 	}
 }

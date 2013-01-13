@@ -96,6 +96,7 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_message_recipients_";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_ALTERNATIVES_ = Action_PARAMETER_PREFIX + "_message_alternatives_";
 		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
+		const string ScenarioSaveAction::VALUES_PARAMETERS_SEPARATOR = "|";
 
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
@@ -287,7 +288,7 @@ namespace synthese
 						vector<string> recipients;
 						string recipientStr(map.get<string>(PARAMETER_RECIPIENT_ID));
 						boost::algorithm::split(recipients, recipientStr, is_any_of(","));
-						_recipients = vector<RegistryKeyType>();
+						_recipients = vector<shared_ptr<Registrable> >();
 						BOOST_FOREACH(const string& recipient, recipients)
 						{
 							try
@@ -295,15 +296,22 @@ namespace synthese
 								if(_recipientDataSource.get())
 								{
 									_recipients->push_back(
-										recipientType->getObjectIdBySource(
-											*_recipientDataSource,
-											recipient,
+										DBModule::GetEditableObject(
+											recipientType->getObjectIdBySource(
+												*_recipientDataSource,
+												recipient,
+												*_env
+											),
 											*_env
 									)	);
 								}
 								else
 								{
-									_recipients->push_back(lexical_cast<RegistryKeyType>(recipient));
+									_recipients->push_back(
+										DBModule::GetEditableObject(
+											lexical_cast<RegistryKeyType>(recipient),
+											*_env
+									)	);
 								}
 							}
 							catch(...)
@@ -341,9 +349,25 @@ namespace synthese
 							split(keysStrVector, keys, is_any_of(VALUES_SEPARATOR));
 							BOOST_FOREACH(const string& keyStr, keysStrVector)
 							{
+								vector<string> parts;
+								split(parts, keyStr, is_any_of(VALUES_PARAMETERS_SEPARATOR));
+								string parameter;
+								if(parts.size() > 1)
+								{
+									parameter = parts[1];
+								}
 								try
 								{
-									msg.recipients.push_back(make_pair(key, lexical_cast<RegistryKeyType>(keyStr)));
+									msg.recipients.push_back(
+										make_pair(
+											key,
+											make_pair(
+												DBModule::GetEditableObject(
+													lexical_cast<RegistryKeyType>(keyStr),
+													*_env
+												).get(),
+												parameter
+									)	)	);
 								}
 								catch(...)
 								{									
@@ -738,11 +762,11 @@ namespace synthese
 
 				if(_recipients)
 				{
-					BOOST_FOREACH(RegistryKeyType recipient, *_recipients)
+					BOOST_FOREACH(const shared_ptr<Registrable> recipient, *_recipients)
 					{
 						AlarmObjectLink link;
 						link.setAlarm(message.get());
-						link.setObjectId(recipient);
+						link.setObject(recipient.get());
 						AlarmObjectLinkTableSync::Save(&link, transaction);
 					}
 				}
@@ -849,7 +873,7 @@ namespace synthese
 						AlarmObjectLinkTableSync::Search(env, alarm->getKey())
 					);
 					set<RegistryKeyType> toRemove;
-					typedef map<pair<string,RegistryKeyType>, RegistryKeyType> AOLMap;
+					typedef map<Message::Recipients::value_type, RegistryKeyType> AOLMap;
 					AOLMap m;
 					BOOST_FOREACH(const shared_ptr<AlarmObjectLink>& item, v)
 					{
@@ -858,8 +882,10 @@ namespace synthese
 							make_pair(
 								make_pair(
 									item->getRecipientKey(),
-									item->getObjectId()
-								),
+									make_pair(
+										item->getObject(),
+										item->getParameter()
+								)	),
 								item->getKey()
 						)	);
 					}
@@ -873,7 +899,8 @@ namespace synthese
 						{
 							AlarmObjectLink aol;
 							aol.setRecipientKey(it.first);
-							aol.setObjectId(it.second);
+							aol.setObject(it.second.first);
+							aol.setParameter(it.second.second);
 							aol.setAlarm(alarm.get());
 							AlarmObjectLinkTableSync::Save(&aol, transaction);
 						}

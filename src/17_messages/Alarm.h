@@ -40,6 +40,7 @@ namespace synthese
 
 	namespace messages
 	{
+		class AlarmObjectLink;
 		class MessageAlternative;
 		class MessageType;
 		class Scenario;
@@ -77,6 +78,11 @@ namespace synthese
 			static const std::string ATTR_LINK_ID;
 
 			typedef std::map<MessageType*, MessageAlternative*> MessageAlternatives;
+			typedef std::map<
+				std::string,
+				std::set<
+					const AlarmObjectLink*
+			>	> LinkedObjects;
 
 		protected:
 			AlarmLevel			_level;
@@ -89,6 +95,7 @@ namespace synthese
 			// Links
 			//@{
 				mutable MessageAlternatives _messageAlternatives;
+				mutable LinkedObjects _linkedObjects;
 			//@}
 
 			Alarm(
@@ -113,6 +120,7 @@ namespace synthese
 				bool					getRawEditor() const { return _rawEditor; }
 				bool					getDone() const { return _done; }
 				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
+				const LinkedObjects& getLinkedObjects() const { return _linkedObjects; }
 			//@}
 
 			//! @name Setters
@@ -124,6 +132,7 @@ namespace synthese
 				void setRawEditor(bool value){ _rawEditor = value; }
 				void setDone(bool value){ _done = value; }
 				void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
+				void setLinkedObjects(const LinkedObjects& value) const { _linkedObjects = value; }
 			//@}
 
 			//! @name Services

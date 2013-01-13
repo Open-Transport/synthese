@@ -37,8 +37,14 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace util
+	{
+		class Registrable;
+	}
+
 	namespace messages
 	{
+		class AlarmRecipient;
 		class SentAlarm;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -54,6 +60,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,GetMessagesFunction>
 		{
 		public:
+			static const std::string PARAMETER_RECIPIENT_KEY;
 			static const std::string PARAMETER_RECIPIENT_ID;
 			static const std::string PARAMETER_MAX_MESSAGES_NUMBER;
 			static const std::string PARAMETER_BEST_PRIORITY_ONLY;
@@ -66,10 +73,12 @@ namespace synthese
 			static const std::string DATA_MESSAGES;
 			static const std::string DATA_MESSAGE;
 			static const std::string DATA_RANK;
+			static const std::string ATTR_PARAMETER;
 
 			//! \name Page parameters
 			//@{
-				util::RegistryKeyType _recipientId;
+				util::Registrable* _recipient;
+				boost::shared_ptr<AlarmRecipient> _recipientClass;
 				boost::optional<std::size_t> _maxMessagesNumber;
 				bool _bestPriorityOnly;
 				bool _priorityOrder;
@@ -104,20 +113,15 @@ namespace synthese
 
 
 		public:
-			GetMessagesFunction();
-
-
-			static void GetMessages(
-				util::ParametersMap& pm,
-				util::RegistryKeyType recipientId,
-				boost::optional<std::size_t> maxMessagesNumber,
-				bool bestPriorityOnly,
-				bool priorityOrder,
-				boost::posix_time::ptime date,
-				boost::posix_time::ptime endDate
+			GetMessagesFunction(
+				util::Registrable* recipient = NULL,
+				boost::shared_ptr<AlarmRecipient> _recipientClass = boost::shared_ptr<AlarmRecipient>(),
+				boost::optional<size_t> maxMessagesNumber = boost::optional<size_t>(),
+				bool bestPriorityOnly = true,
+				bool priorityOrder = true,
+				boost::posix_time::ptime date = boost::posix_time::second_clock::local_time(),
+				boost::posix_time::ptime endDate = boost::posix_time::second_clock::local_time()
 			);
-
-
 
 
 

@@ -130,16 +130,15 @@ namespace synthese
 			if(withRecipients)
 			{
 				shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
-				BOOST_FOREACH(shared_ptr<AlarmRecipient> ar, Factory<AlarmRecipient>::GetNewCollection())
+				BOOST_FOREACH(const LinkedObjects::value_type& ar, _linkedObjects)
 				{
-					AlarmRecipient::RegistrableLinkedObjectsSet s(ar->getLinkedObjects(*this));
-					BOOST_FOREACH(const AlarmRecipient::RegistrableLinkedObjectsSet::value_type& it, s)
+					BOOST_FOREACH(const LinkedObjects::mapped_type::value_type& it, ar.second)
 					{
 						shared_ptr<ParametersMap> arPM(new ParametersMap);
-						it.first->toParametersMap(*arPM);
-						arPM->insert(ATTR_LINK_ID, it.second->getKey());
-						arPM->insert(ATTR_LINK_PARAMETER, it.second->getParameter());
-						recipientsPM->insert(ar->getFactoryKey(), arPM);
+						it->getObject()->toParametersMap(*arPM);
+						arPM->insert(ATTR_LINK_ID, it->getKey());
+						arPM->insert(ATTR_LINK_PARAMETER, it->getParameter());
+						recipientsPM->insert(ar.first, arPM);
 				}	}
 				pm.insert(TAG_RECIPIENTS, recipientsPM);
 			}

@@ -59,7 +59,7 @@ namespace synthese
 			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
 			{
 				m.push_back(make_pair(string(), "=== " + recipient->getTitle() + " ==="));
-				recipient->getStaticParametersLabelsVirtual(m);
+				recipient->getParametersLabels(m);
 			}
 
 			return m;

@@ -39,8 +39,8 @@ namespace synthese
 
 			@note This class is used only to permit the remove hook
 		*/
-		class AlarmObjectLink
-		:	public virtual util::Registrable
+		class AlarmObjectLink:
+			public virtual util::Registrable
 		{
 		public:
 
@@ -48,7 +48,7 @@ namespace synthese
 			typedef util::Registry<AlarmObjectLink>	Registry;
 
 		private:
-			util::RegistryKeyType	_objectId;
+			util::Registrable*	_object;
 			Alarm*			_alarm;
 			std::string		_recipientKey;
 			std::string		_parameter;
@@ -56,12 +56,12 @@ namespace synthese
 		public:
 			AlarmObjectLink(util::RegistryKeyType key = 0);
 
-			util::RegistryKeyType getObjectId() const { return _objectId; }
+			util::Registrable* getObject() const { return _object; }
 			Alarm* getAlarm() const { return _alarm; }
 			const std::string& getRecipientKey() const { return _recipientKey; }
 			const std::string& getParameter() const { return _parameter; }
 
-			void setObjectId(util::RegistryKeyType key);
+			void setObject(util::Registrable* value){ _object = value; }
 			void setAlarm(Alarm* value){ _alarm = value; }
 			void setRecipientKey(const std::string& value){ _recipientKey = value; }
 			void setParameter(const std::string& value){ _parameter = value; }
