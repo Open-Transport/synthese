@@ -111,7 +111,7 @@ namespace synthese
 		const AlarmRecipient::ObjectLinks::mapped_type& AlarmRecipientTemplate<C>::GetLinkedAlarms(
 			const util::Registrable& object
 		){
-			typename ObjectLinks::const_iterator it = _linksObject.find(&object);
+			typename AlarmRecipient::ObjectLinks::const_iterator it = _linksObject.find(&object);
 			return (it == _linksObject.end()) ? AlarmRecipient::_emptyAOLSet : it->second;
 		}
 
