@@ -599,25 +599,39 @@ namespace synthese
 
 
 					// Adding of existing object links to the removal list
-					DisplayScreenAlarmRecipient::LinkedObjectsSet existingRecipients(
-						DisplayScreenAlarmRecipient::GetLinkedObjects(
-							**scenario->getMessages().begin())
+					Alarm::LinkedObjects::mapped_type existingRecipients;
+					const Alarm::LinkedObjects& linkedObjects(
+						(*scenario->getMessages().begin())->getLinkedObjects()
 					);
-					BOOST_FOREACH(const DisplayScreenAlarmRecipient::LinkedObjectsSet::value_type& dsit, existingRecipients)
+					Alarm::LinkedObjects::const_iterator it(
+						linkedObjects.find(
+							DisplayScreenAlarmRecipient::FACTORY_KEY
+					)	);
+					if(it != linkedObjects.end())
 					{
-						alarmObjectLinksToRemove.insert(dsit.second->getKey());
+						existingRecipients = it->second;
+					}
+					BOOST_FOREACH(const Alarm::LinkedObjects::mapped_type::value_type& aol, existingRecipients)
+					{
+						alarmObjectLinksToRemove.insert(aol->getKey());
 					}
 
 					// Loop on destinataires)
 					BOOST_FOREACH(const Programmation::Destinataires::value_type& itDest, programmation.destinataires)
 					{
 						// Search for existing link
-						DisplayScreenAlarmRecipient::LinkedObjectsSet::const_iterator itDS(
-							existingRecipients.find(itDest.syntheseDisplayBoard)
-						);
-						if(itDS != existingRecipients.end())
+						const AlarmObjectLink* toNotRemove(NULL);
+						BOOST_FOREACH(const Alarm::LinkedObjects::mapped_type::value_type& aol, existingRecipients)
 						{
-							alarmObjectLinksToRemove.erase(itDS->second->getKey());
+							if(aol->getObject() == itDest.syntheseDisplayBoard)
+							{
+								toNotRemove = aol;
+								break;
+							}
+						}
+						if(toNotRemove)
+						{
+							alarmObjectLinksToRemove.erase(toNotRemove->getKey());
 							continue;
 						}
 
@@ -625,7 +639,7 @@ namespace synthese
 						shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 						link->setKey(AlarmObjectLinkTableSync::getId());
 						link->setAlarm(message);
-						link->setObjectId(itDest.syntheseDisplayBoard->getKey());
+						link->setObject(itDest.syntheseDisplayBoard);
 						updatesEnv.getEditableRegistry<AlarmObjectLink>().add(link);
 					}
 				}

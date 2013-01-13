@@ -24,7 +24,6 @@
 #ifndef SYNTHESE_AtopAreaRecipient_h__
 #define SYNTHESE_AtopAreaRecipient_h__
 
-#include "StopAreaTableSync.hpp"
 #include "AlarmRecipientTemplate.h"
 
 namespace synthese
@@ -36,7 +35,7 @@ namespace synthese
 		///	@ingroup m35Messages refAlarmrecipients
 		/// @author Hugues Romain
 		class StopAreaAlarmRecipient:
-			public messages::AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>
+			public messages::AlarmRecipientTemplate<StopAreaAlarmRecipient>
 		{
 		public:
 			static const std::string PARAMETER_SEARCH_STOP_AREA;
@@ -52,12 +51,8 @@ namespace synthese
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const util::ParametersMap& parameters) const;
 
-			virtual void addObject(const messages::AlarmObjectLink& alarm, util::RegistryKeyType objectId);
-			virtual void removeObject(const messages::AlarmObjectLink& alarm, util::RegistryKeyType objectId);
-
 			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const;
 		};
-	}
-}
+}	}
 
 #endif

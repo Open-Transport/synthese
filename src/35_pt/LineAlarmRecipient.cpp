@@ -73,17 +73,15 @@ namespace synthese
 	       This should be investigate further.
 	    */
 
-		template<> AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::AlarmLinks
-		AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::_linksAlarm =
-			std::map<const Alarm*, std::map<const CommercialLine*, const AlarmObjectLink*> > ();
 
-		template<> AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::ObjectLinks
-		AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::_linksObject =
-			std::map<const CommercialLine*, std::set<const AlarmObjectLink*> > ();
+		template<>
+		AlarmRecipient::ObjectLinks AlarmRecipientTemplate<LineAlarmRecipient>::_linksObject = AlarmRecipient::ObjectLinks();
 
-		template<> const string AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::TITLE("Lignes");
+		template<>
+		const string AlarmRecipientTemplate<LineAlarmRecipient>::TITLE("Lignes");
 
-		template<> void AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::getStaticParametersLabels(
+		template<>
+		void AlarmRecipientTemplate<LineAlarmRecipient>::GetParametersLabels(
 			ParameterLabelsVector& m
 		){
 			m.push_back(make_pair(FACTORY_KEY +"/"+ GLOBAL_PERIMETER,"(toutes les lignes)"));
@@ -93,7 +91,7 @@ namespace synthese
 
 
 		template<>
-		util::RegistryKeyType AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::GetObjectIdBySource(
+		util::RegistryKeyType AlarmRecipientTemplate<LineAlarmRecipient>::GetObjectIdBySource(
 			const impex::DataSource& source,
 			const std::string& key,
 			util::Env& env
@@ -243,31 +241,6 @@ namespace synthese
 			map.insert(make_pair(PARAMETER_SEARCH_LINE, arf));
 */
 			return map;
-		}
-
-		void LineAlarmRecipient::addObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
-		{
-			try
-			{
-				add(
-					*Env::GetOfficialEnv().getRegistry<CommercialLine>().get(objectId),
-					alarm
-				);
-			}
-			catch(...)
-			{
-				throw AlarmObjectLinkException(objectId, alarm.getAlarm()->getKey(), "Line not found");
-			}
-		}
-
-
-
-		void LineAlarmRecipient::removeObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
-		{
-			remove(
-				*CommercialLineTableSync::Get(objectId, Env::GetOfficialEnv()),
-				alarm
-			);
 		}
 
 

@@ -31,9 +31,11 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
 		class MessageType;
 		class Scenario;
 
+		//////////////////////////////////////////////////////////////////////////
 		/** BroadcastPoint class.
 			@ingroup m17
 		*/
@@ -45,7 +47,14 @@ namespace synthese
 
 			virtual MessageType* getMessageType() const = 0;
 
-			virtual bool displaysMessage(const Scenario& message) const = 0;
+			virtual bool displaysScenario(const Scenario& scenario) const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Checks if the broadcast point displays the specified message.
+			/// @param message the message to check
+			/// @return true if the specified message is currently displayed on the broadcast point.
+			/// Note : if the message is a template the check is a simulation
+			virtual bool displaysMessage(const Alarm& message) const = 0;
 
 			typedef std::vector<BroadcastPoint*> BroadcastPoints;
 			

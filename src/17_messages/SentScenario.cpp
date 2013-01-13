@@ -107,33 +107,10 @@ namespace synthese
 
 
 
-		void SentScenario::setIsEnabled( bool value )
-		{
-			_isEnabled = value;
-		}
-
-
-
 		SentScenario::~SentScenario()
-		{
-
-		}
+		{}
 
 
-
-		AlarmConflict SentScenario::getConflictStatus() const
-		{
-			AlarmConflict conflictStatus(ALARM_NO_CONFLICT);
-/*			for (AlarmsSet::const_iterator it = getAlarms().begin(); it != getAlarms().end(); ++it)
-			{
-				AlarmConflict thisConflictStatus = (*it)->getConflictStatus();
-				if (thisConflictStatus > conflictStatus)
-					conflictStatus = thisConflictStatus;
-				if (conflictStatus == ALARM_CONFLICT)
-					return conflictStatus;
-			}*/
-			return conflictStatus;
-		}
 
 		bool SentScenario::isApplicable( const ptime& start, const ptime& end ) const
 		{
@@ -151,6 +128,8 @@ namespace synthese
 
 			return true;
 		}
+
+
 
 		bool SentScenario::isApplicable( const ptime& date ) const
 		{

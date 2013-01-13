@@ -41,26 +41,7 @@ namespace synthese
 		AlarmObjectLink::AlarmObjectLink(
 			RegistryKeyType key
 		):	Registrable(key),
+			_object(NULL),
 			_alarm(NULL)
-		{
-		}
-
-
-
-		void AlarmObjectLink::setObjectId( util::RegistryKeyType key )
-		{
-			_objectId = key;
-
-			RegistryTableType tableId(decodeTableId(_objectId));
-			BOOST_FOREACH(const Factory<AlarmRecipient>::ObjectsCollection::value_type& obj, Factory<AlarmRecipient>::GetNewCollection())
-			{
-				if(obj->getTableId() == tableId)
-				{
-					_recipientKey = obj->getFactoryKey();
-					return;
-				}
-			}
-			assert(false);
-		}
-	}
-}
+		{}
+}	}

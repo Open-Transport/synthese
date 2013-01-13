@@ -51,14 +51,7 @@ namespace synthese
 			, ALARM_LEVEL_SCENARIO = 100
 		} AlarmLevel;
 
-		typedef enum
-		{
-			ALARM_CONFLICT_UNKNOWN = 0
-			, ALARM_NO_CONFLICT = 10
-			, ALARM_WARNING_ON_INFO = 50
-			, ALARM_INFO_UNDER_WARNING = 70
-			, ALARM_CONFLICT = 100
-		} AlarmConflict;
+
 
 		typedef struct
 		{

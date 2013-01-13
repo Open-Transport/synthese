@@ -82,18 +82,8 @@ namespace synthese
 				bool operator()(SentAlarm* left, SentAlarm* right) const;
 			};
 
-			typedef std::map<util::RegistryKeyType, std::set<SentAlarm*, SentAlarmLess> > MessagesByRecipientId;
 
-		private:
-			static MessagesByRecipientId _messagesByRecipientId;
 
-		public:
-
-			static MessagesByRecipientId::mapped_type GetMessages(util::RegistryKeyType recipientId);
-
-			static void AddMessage(util::RegistryKeyType recipientId, SentAlarm* value);
-
-			static void RemoveMessage(util::RegistryKeyType recipientId, SentAlarm* value);
 
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
@@ -137,11 +127,9 @@ namespace synthese
 			static Labels GetLevelLabelsWithScenarios(
 				bool withAll
 			);
-			static std::vector<std::pair<AlarmConflict, std::string> >	getConflictLabels(bool withAll = false);
 			static Labels			getTextTemplateLabels(const AlarmLevel& level);
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
-			static std::string							getConflictLabel(const AlarmConflict& conflict);
 		};
 	}
 	/** @} */

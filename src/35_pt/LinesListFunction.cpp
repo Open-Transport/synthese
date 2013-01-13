@@ -31,6 +31,7 @@
 #include "GetMessagesFunction.hpp"
 #include "ImportableTableSync.hpp"
 #include "JourneyPattern.hpp"
+#include "LineAlarmRecipient.hpp"
 #include "MimeTypes.hpp"
 #include "Profile.h"
 #include "PTUseRule.h"
@@ -898,15 +899,16 @@ namespace synthese
 					// Messages output
 					if(_outputMessages)
 					{
-						GetMessagesFunction::GetMessages(
-							*linePM,
-							line->getKey(),
+						GetMessagesFunction f(
+							const_cast<CommercialLine*>(line.get()),
+							shared_ptr<LineAlarmRecipient>(),
 							optional<size_t>(),
 							true,
 							true,
 							second_clock::local_time(),
 							second_clock::local_time()
 						);
+						*linePM = f.run(stream, request);
 					}
 
 					pm.insert(DATA_LINE, linePM);

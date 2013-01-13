@@ -31,8 +31,15 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Registrable;
+	}
+
 	namespace messages
 	{
+		class AlarmRecipient;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 17.15 Action : SimpleMessageCreationAction.
 		/// @ingroup m17Actions refActions
@@ -57,10 +64,12 @@ namespace synthese
 			static const std::string PARAMETER_CONTENT;
 			static const std::string PARAMETER_RECIPIENT_ID;
 			static const std::string PARAMETER_LEVEL;
+			static const std::string PARAMETER_RECIPIENT_KEY;
 
 		private:
 			std::string _content;
-			util::RegistryKeyType _recipientId;
+			boost::shared_ptr<AlarmRecipient> _recipientClass;
+			boost::shared_ptr<util::Registrable> _recipient;
 			AlarmLevel _level;
 
 		protected:

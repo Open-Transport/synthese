@@ -60,17 +60,20 @@ namespace synthese
 
 			All the available alarm recipients are listed in the @ref refAlarmrecipients page.
 		*/
-		class AlarmRecipient
-		:	public util::FactoryBase<AlarmRecipient>
+		class AlarmRecipient:
+			public util::FactoryBase<AlarmRecipient>
 		{
 		public:
+			typedef std::map<
+				const util::Registrable*,
+				std::set<const AlarmObjectLink*>
+			>	ObjectLinks;
+			static ObjectLinks::mapped_type _emptyAOLSet;
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Name of the recipient.
 			virtual const std::string& getTitle() const = 0;
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Table which the objects to link belongs to.
-			virtual util::RegistryTableType getTableId() const = 0;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Interface to administrate links to objects.
@@ -83,7 +86,10 @@ namespace synthese
 				, server::StaticActionRequest<AlarmRemoveLinkAction>& removeRequest
 			) = 0;
 
-			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const util::ParametersMap& parameters) const = 0;
+			virtual AlarmRecipientSearchFieldsMap getSearchFields(
+				html::HTMLForm& form,
+				const util::ParametersMap& parameters
+			) const = 0;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds an object to the alarm as the current recipient type.
@@ -91,10 +97,12 @@ namespace synthese
 			/// @param objectId id of the object to add
 			/// @throws AlarmObjectLinkException if the object cannot be added (each
 			/// recipient type implements a rule)
-			virtual void addObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId) = 0;
-			virtual void removeObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId) = 0;
-			virtual AlarmConflict getConflictStatus(const SentAlarm& alarm) const = 0;
-			virtual void getStaticParametersLabelsVirtual(security::ParameterLabelsVector& m) = 0;
+			virtual void addObject(const AlarmObjectLink& alarm) const = 0;
+			virtual void removeObject(const AlarmObjectLink& alarm) const = 0;
+			
+			virtual void getParametersLabels(
+				security::ParameterLabelsVector& m
+			) const = 0;
 
 			virtual util::RegistryKeyType getObjectIdBySource(
 				const impex::DataSource& source,
@@ -102,14 +110,13 @@ namespace synthese
 				util::Env& env
 			) const = 0;
 
+			virtual const ObjectLinks::mapped_type& getLinkedAlarms(
+				const util::Registrable& object
+			) const = 0;
+
 			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const = 0;
-
-			typedef std::map<const util::Registrable*, const AlarmObjectLink*> RegistrableLinkedObjectsSet;
-
-			virtual RegistrableLinkedObjectsSet getLinkedObjects(const Alarm& alarm) const = 0;
 		};
-	}
-}
+}	}
 
 /** @defgroup refAlarmrecipients Alarm recipients.
 	@ingroup ref

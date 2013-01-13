@@ -32,6 +32,7 @@ namespace synthese
 {
 	namespace messages
 	{
+		class Alarm;
 		class Scenario;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -47,6 +48,8 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_SCENARIO_ID;
+			static const std::string PARAMETER_MESSAGE_ID;
+			static const std::string PARAMETER_RECIPIENTS_ID;
 
 			static const std::string TAG_TYPE;
 			
@@ -54,6 +57,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				const Scenario* _scenario;
+				const Alarm* _message;
 			//@}
 			
 			

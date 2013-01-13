@@ -26,6 +26,7 @@
 #include "BroadcastPoint.hpp"
 
 #include "Factory.h"
+#include "Scenario.h"
 
 #include <boost/foreach.hpp>
 
@@ -46,8 +47,21 @@ namespace synthese
 			}
 			return r;
 		}
-	}
-}
+
+
+
+		bool BroadcastPoint::displaysScenario( const Scenario& scenario ) const
+		{
+			BOOST_FOREACH(const Scenario::Messages::value_type& it, scenario.getMessages())
+			{
+				if(displaysMessage(*it))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+}	}
 
 #endif // SYNTHESE_messages_BroadcastPoint_cpp__
 

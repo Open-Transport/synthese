@@ -185,7 +185,7 @@ namespace synthese
 						shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 						link->setKey(AlarmObjectLinkTableSync::getId());
 						link->setAlarm(message);
-						link->setObjectId(_recipientId);
+						link->setObject(_recipient.get());
 						link->setRecipientKey(_recipientKey);
 						_env.getEditableRegistry<AlarmObjectLink>().add(link);
 					}
@@ -287,8 +287,18 @@ namespace synthese
 				throw Exception("No such recipient key");
 			}
 
-			// Recipient id
-			_recipientId = map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID);
+			// Recipient
+			try
+			{
+				_recipient = DBModule::GetEditableObject(
+					map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID),
+					_env
+				);
+			}
+			catch(ObjectNotFoundException<Registrable>&)
+			{
+				throw Exception("No such recipient");
+			}
 		}
 
 

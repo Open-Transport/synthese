@@ -33,6 +33,7 @@
 #include "BaseImportableUpdateAction.hpp"
 
 #include <string>
+#include <boost/tuple/tuple.hpp>
 
 namespace synthese
 {
@@ -43,6 +44,7 @@ namespace synthese
 
 	namespace messages
 	{
+		class AlarmRecipient;
 		class MessageType;
 		class SentAlarm;
 		class ScenarioFolder;
@@ -86,6 +88,7 @@ namespace synthese
 			static const std::string PARAMETER_MESSAGE_RECIPIENTS_;
 			static const std::string PARAMETER_MESSAGE_ALTERNATIVES_;
 			static const std::string VALUES_SEPARATOR;
+			static const std::string VALUES_PARAMETERS_SEPARATOR;
 
 		private:
 			struct Message
@@ -95,10 +98,12 @@ namespace synthese
 				std::string content;
 				AlarmLevel level;
 				typedef std::vector<
-					std::pair<
+					std::pair< // pair<pair>> instead of tuple because of VS2010 bug http://connect.microsoft.com/VisualStudio/feedback/details/534457/c-map-tuple-v-compilation-problems
 						std::string,
-						util::RegistryKeyType
-				>	> Recipients;
+						std::pair<
+							util::Registrable*,
+							std::string
+				>	>	> Recipients;
 				Recipients recipients;
 				typedef std::map<
 					MessageType*,
@@ -134,7 +139,11 @@ namespace synthese
 				SentScenario::VariablesMap							_variables;
 				boost::optional<std::string>						_messageToCreate;
 				boost::optional<std::string>						_messageToCreateTitle;
-				boost::optional<std::vector<util::RegistryKeyType> >	_recipients;
+				boost::optional<
+					std::vector<
+						boost::shared_ptr<
+							util::Registrable
+				>	>	>	_recipients;
 				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;
 				std::string											_dataSourceLinkId;

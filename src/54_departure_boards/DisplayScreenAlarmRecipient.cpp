@@ -91,18 +91,12 @@ namespace synthese
 	       explicitly call constructor with () in order to avoid undefined references.
 	       This should be investigate further.
 	    */
+	    template<>
+		AlarmRecipient::ObjectLinks AlarmRecipientTemplate<DisplayScreenAlarmRecipient>::_linksObject = AlarmRecipient::ObjectLinks();
 
-	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::AlarmLinks
-	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksAlarm =
-			std::map<const Alarm*, std::map<const DisplayScreen*, const AlarmObjectLink*> > ();
+		template<> const string AlarmRecipientTemplate<DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
 
-	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::ObjectLinks
-	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksObject =
-			std::map<const DisplayScreen*, std::set<const AlarmObjectLink*> > ();
-
-		template<> const string AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
-
-		template<> void AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::getStaticParametersLabels(
+		template<> void AlarmRecipientTemplate<DisplayScreenAlarmRecipient>::GetParametersLabels(
 			ParameterLabelsVector& m
 		){
 			m.push_back(make_pair(FACTORY_KEY +"/" + GLOBAL_PERIMETER,"(tous les afficheurs)"));
@@ -112,7 +106,7 @@ namespace synthese
 
 
 		template<>
-		RegistryKeyType AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::GetObjectIdBySource(
+		RegistryKeyType AlarmRecipientTemplate<DisplayScreenAlarmRecipient>::GetObjectIdBySource(
 			const impex::DataSource& source,
 			const std::string& key,
 			util::Env& env
@@ -294,29 +288,6 @@ namespace synthese
 			map.insert(make_pair(PARAMETER_SEARCH_LINE, arf));
 
 			return map;
-		}
-
-		void DisplayScreenAlarmRecipient::addObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
-		{
-			try
-			{
-				add(
-					*Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(objectId),
-					alarm
-				);
-			}
-			catch(...)
-			{
-				throw AlarmObjectLinkException(objectId, alarm.getAlarm()->getKey(), "Display screen not found");
-			}
-		}
-
-		void DisplayScreenAlarmRecipient::removeObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
-		{
-			remove(
-				*DisplayScreenTableSync::Get(objectId, Env::GetOfficialEnv()),
-				alarm
-			);
 		}
 
 

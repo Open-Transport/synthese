@@ -117,18 +117,11 @@ namespace synthese
 			///	Updates the alarms too.
 			///	@param periodEnd End broadcast date
 			void setPeriodEnd ( const boost::posix_time::ptime& periodEnd);
-			void setIsEnabled(bool value);
+			void setIsEnabled(bool value){ _isEnabled = value; }
 			void setTemplate(const ScenarioTemplate* value);
 			void setVariables(const VariablesMap& value);
 
 
-
-			/** Gets the "worse" conflict status of each alarm contained in the scenario.
-				@return synthese::messages::AlarmConflict The conflict status of the scenario.
-				@author Hugues Romain
-				@date 2007
-			*/
-			AlarmConflict getConflictStatus() const;
 
 			/** Applicability test.
 				@param start Start of applicability period
