@@ -87,7 +87,7 @@ namespace synthese
 		const std::string DisplayScreen::DATA_CPU_ID("cpu_id");
 
 		const std::string DisplayScreen::VAR_SCREEN_ID = "screen_id";
-		const std::string DisplayScreen::VAR_SCENARIO_ID = "scenario_id";
+		const std::string DisplayScreen::VAR_MESSAGE_ID = "message_id";
 
 
 
@@ -858,7 +858,7 @@ namespace synthese
 
 
 		bool DisplayScreen::displaysMessage(
-			const messages::Scenario& message
+			const messages::Alarm& message
 		) const	{
 
 			// Jump over undefined type or rule page
@@ -871,7 +871,7 @@ namespace synthese
 			stringstream s;
 			ParametersMap pm;
 			pm.insert(VAR_SCREEN_ID, getKey());
-			pm.insert(VAR_SCENARIO_ID, message.getKey());
+			pm.insert(VAR_MESSAGE_ID, message.getKey());
 			_displayType->getMessageIsDisplayedPage()->display(s, pm);
 			string str(s.str());
 			trim(str);

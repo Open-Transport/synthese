@@ -25,6 +25,7 @@
 #include "SimpleMessageCreationAction.hpp"
 
 #include "ActionException.h"
+#include "AlarmRecipient.h"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Session.h"
@@ -59,6 +60,7 @@ namespace synthese
 		const string SimpleMessageCreationAction::PARAMETER_CONTENT = Action_PARAMETER_PREFIX + "c";
 		const string SimpleMessageCreationAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "l";
 		const string SimpleMessageCreationAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "r";
+		const string SimpleMessageCreationAction::PARAMETER_RECIPIENT_KEY = Action_PARAMETER_PREFIX + "recipient_key";
 
 
 
@@ -67,7 +69,6 @@ namespace synthese
 			ParametersMap map;
 			map.insert(PARAMETER_CONTENT, _content);
 			map.insert(PARAMETER_LEVEL, static_cast<int>(_level));
-			map.insert(PARAMETER_RECIPIENT_ID, _recipientId);
 			return map;
 		}
 
@@ -85,8 +86,26 @@ namespace synthese
 			// Level
 			_level = static_cast<AlarmLevel>(map.get<int>(PARAMETER_LEVEL));
 
+			// Recipient class
+			string recipientClass(map.get<string>(PARAMETER_RECIPIENT_KEY));
+			if(!Factory<AlarmRecipient>::contains(recipientClass))
+			{
+				throw ActionException("No such recipient class");
+			}
+			_recipientClass.reset(Factory<AlarmRecipient>::create(recipientClass));
+
 			// Recipient
-			_recipientId = map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID);
+			try
+			{
+				_recipient = DBModule::GetEditableObject(
+					map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID),
+					*_env
+				);
+			}
+			catch(ObjectNotFoundException<Registrable>&)
+			{
+				throw ActionException("No such recipient");
+			}
 		}
 
 
@@ -112,7 +131,7 @@ namespace synthese
 			AlarmTableSync::Save(&alarm, transaction);
 
 			AlarmObjectLink link;
-			link.setObjectId(_recipientId);
+			link.setObject(_recipient.get());
 			link.setAlarm(&alarm);
 			AlarmObjectLinkTableSync::Save(&link, transaction);
 
@@ -133,9 +152,6 @@ namespace synthese
 
 
 		SimpleMessageCreationAction::SimpleMessageCreationAction():
-		_recipientId(0),
 		_level(ALARM_LEVEL_INFO)
-		{
-
-		}
+		{}
 }	}

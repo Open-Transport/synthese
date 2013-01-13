@@ -471,7 +471,7 @@ namespace synthese
 					);
 					if(	journeyPattern
 					){
-						MessagesModule::MessagesByRecipientId::mapped_type messages(
+/*						MessagesModule::MessagesByRecipientId::mapped_type messages(
 							MessagesModule::GetMessages(
 								journeyPattern->getCommercialLine()->getKey()
 						)	);
@@ -483,7 +483,7 @@ namespace synthese
 								result.lineLevel = it->getLevel();
 							}
 						}
-
+*/
 						// Departure stop
 						const StopArea* departureStopArea(
 							dynamic_cast<const StopArea*>(
@@ -491,7 +491,7 @@ namespace synthese
 						)	);
 						if(departureStopArea)
 						{
-							MessagesModule::MessagesByRecipientId::mapped_type messages(
+/*							MessagesModule::MessagesByRecipientId::mapped_type messages(
 								MessagesModule::GetMessages(departureStopArea->getKey())
 							);
 							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
@@ -502,7 +502,7 @@ namespace synthese
 									result.stopLevel = it->getLevel();
 								}
 							}
-						}
+*/						}
 
 						// Arrival stop
 						const StopArea* arrivalStopArea(
@@ -511,7 +511,7 @@ namespace synthese
 						)	);
 						if(arrivalStopArea)
 						{
-							MessagesModule::MessagesByRecipientId::mapped_type messages(
+/*							MessagesModule::MessagesByRecipientId::mapped_type messages(
 								MessagesModule::GetMessages(arrivalStopArea->getKey())
 							);
 							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
@@ -522,7 +522,7 @@ namespace synthese
 									result.stopLevel = it->getLevel();
 								}
 							}
-						}
+*/						}
 					}
 			}	}
 

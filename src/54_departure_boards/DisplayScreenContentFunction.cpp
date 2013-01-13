@@ -618,7 +618,7 @@ namespace synthese
 
 						RoutePlanningListWithAlarm displayedObject;
 						displayedObject.map = generator.run();
-						displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(*_screen, date);
+						displayedObject.alarm = NULL; // DisplayScreenAlarmRecipient::getAlarm(*_screen, date);
 
 						if(_screen->getType()->getDisplayInterface() &&
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()
@@ -662,7 +662,7 @@ namespace synthese
 					{
 						ArrivalDepartureListWithAlarm displayedObject;
 						displayedObject.map = _screen->generateStandardScreen(realStartDateTime, endDateTime);
-						displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(*_screen, date);
+						displayedObject.alarm = NULL; // DisplayScreenAlarmRecipient::getAlarm(*_screen, date);
 
 						if(_screen->getType()->getDisplayInterface() &&
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()

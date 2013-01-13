@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_LineRecipient_h__
 #define SYNTHESE_LineRecipient_h__
 
-#include "CommercialLineTableSync.h"
 #include "AlarmRecipientTemplate.h"
 
 namespace synthese
@@ -35,7 +34,7 @@ namespace synthese
 		///	@ingroup m35Messages refAlarmrecipients
 		/// @author Hugues Romain
 		class LineAlarmRecipient:
-			public messages::AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>
+			public messages::AlarmRecipientTemplate<LineAlarmRecipient>
 		{
 		public:
 			static const std::string PARAMETER_SEARCH_LINE;
@@ -51,12 +50,8 @@ namespace synthese
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const util::ParametersMap& parameters) const;
 
-			virtual void addObject(const messages::AlarmObjectLink& alarm, util::RegistryKeyType objectId);
-			virtual void removeObject(const messages::AlarmObjectLink& alarm, util::RegistryKeyType objectId);
-
 			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const;
 		};
-	}
-}
+}	}
 
 #endif

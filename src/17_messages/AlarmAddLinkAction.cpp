@@ -24,6 +24,7 @@
 
 #include "AlarmAddLinkAction.h"
 
+#include "DBModule.h"
 #include "Profile.h"
 #include "SentAlarm.h"
 #include "Session.h"
@@ -46,6 +47,7 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace server;
 	using namespace util;
 	using namespace dblog;
@@ -58,6 +60,8 @@ namespace synthese
 		const string AlarmAddLinkAction::PARAMETER_ALARM_ID = Action_PARAMETER_PREFIX + "a";
 		const string AlarmAddLinkAction::PARAMETER_RECIPIENT_KEY = Action_PARAMETER_PREFIX + "r";
 		const string AlarmAddLinkAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "o";
+		const string AlarmAddLinkAction::PARAMETER_PARAMETER = Action_PARAMETER_PREFIX + "_parameter";
+
 
 
 		ParametersMap AlarmAddLinkAction::getParametersMap() const
@@ -65,9 +69,15 @@ namespace synthese
 			ParametersMap map;
 			map.insert(PARAMETER_ALARM_ID, _alarm.get() ? _alarm->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_RECIPIENT_KEY, _recipientKey);
-			map.insert(PARAMETER_OBJECT_ID, _objectId);
+			if(_object.get())
+			{
+				map.insert(PARAMETER_OBJECT_ID, _object->getKey());
+			}
+			map.insert(PARAMETER_PARAMETER, _parameter);
 			return map;
 		}
+
+
 
 		void AlarmAddLinkAction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -81,7 +91,12 @@ namespace synthese
 
 			// Object ID
 			setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
+
+			// Parameter
+			_parameter = map.getDefault<string>(PARAMETER_PARAMETER);
 		}
+
+
 
 		void AlarmAddLinkAction::run(Request& request)
 		{
@@ -89,27 +104,44 @@ namespace synthese
 			shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 			aol->setRecipientKey(_recipientKey);
 			aol->setAlarm(_alarm.get());
-			aol->setObjectId(_objectId);
+			aol->setObject(_object.get());
+			aol->setParameter(_parameter);
 			AlarmObjectLinkTableSync::Save(aol.get());
 
 			// Log
-			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
-			{
-				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
-				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), "Ajout de destinataire " + _recipientKey + " #" + lexical_cast<string>(_objectId), request.getUser().get());
+			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get()
+			){
+				shared_ptr<const AlarmTemplate> alarmTemplate(
+					dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm)
+				);
+				MessagesLibraryLog::addUpdateEntry(
+					alarmTemplate.get(),
+					"Ajout de destinataire " + _recipientKey + " #" + lexical_cast<string>(_object->getKey()),
+					request.getUser().get()
+				);
 			}
 			else
 			{
-				shared_ptr<const SentAlarm> sentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(sentAlarm.get(), "Ajout de destinataire à message diffusé " + _recipientKey + " #" + lexical_cast<string>(_objectId), request.getUser().get());
+				shared_ptr<const SentAlarm> sentAlarm(
+					dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm)
+				);
+				MessagesLog::addUpdateEntry(
+					sentAlarm.get(),
+					"Ajout de destinataire à message diffusé " + _recipientKey + " #" + lexical_cast<string>(_object->getKey()),
+					request.getUser().get()
+				);
 			}
 		}
+
+
 
 		void AlarmAddLinkAction::setRecipientKey( const std::string& key )
 		{
 			_recipientKey = key;
 		}
 
+
+		
 		void AlarmAddLinkAction::setAlarmId(RegistryKeyType id)
 		{
 			try
@@ -122,9 +154,18 @@ namespace synthese
 			}
 		}
 
+
+
 		void AlarmAddLinkAction::setObjectId(RegistryKeyType id )
 		{
-			_objectId = id;
+			try
+			{
+				_object = DBModule::GetEditableObject(id, *_env);
+			}
+			catch (ObjectNotFoundException<Registrable>)
+			{
+				throw ActionException("Specified object not found");
+			}
 		}
 
 
@@ -137,8 +178,7 @@ namespace synthese
 			}
 			else
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE, FORBIDDEN, lexical_cast<string>(_objectId));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE, FORBIDDEN, lexical_cast<string>(_object->getKey()));
 			}
 		}
-	}
-}
+}	}

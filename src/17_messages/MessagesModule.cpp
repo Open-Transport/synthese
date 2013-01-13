@@ -79,8 +79,6 @@ namespace synthese
 
 	namespace messages
 	{
-		MessagesModule::MessagesByRecipientId MessagesModule::_messagesByRecipientId;
-
 		MessagesModule::Labels MessagesModule::GetScenarioTemplatesLabels(
 			string withAllLabel,
 			string withNoLabel
@@ -182,20 +180,6 @@ namespace synthese
 
 
 
-		std::vector<pair<AlarmConflict, std::string> > MessagesModule::getConflictLabels( bool withAll /*= false*/ )
-		{
-			vector<pair<AlarmConflict, string> > m;
-			if (withAll)
-				m.push_back(make_pair(ALARM_CONFLICT_UNKNOWN, "(tous)"));
-			m.push_back(make_pair(ALARM_NO_CONFLICT, getConflictLabel(ALARM_NO_CONFLICT)));
-			m.push_back(make_pair(ALARM_WARNING_ON_INFO, getConflictLabel(ALARM_WARNING_ON_INFO)));
-			m.push_back(make_pair(ALARM_INFO_UNDER_WARNING, getConflictLabel(ALARM_INFO_UNDER_WARNING)));
-			m.push_back(make_pair(ALARM_CONFLICT, getConflictLabel(ALARM_CONFLICT)));
-			return m;
-		}
-
-
-
 		MessagesModule::Labels MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
 		{
 			Env env;
@@ -218,69 +202,6 @@ namespace synthese
 			case ALARM_LEVEL_WARNING : return "Prioritaire";
 			case ALARM_LEVEL_SCENARIO: return "Scénario";
 			default: return "Inconnu";
-			}
-		}
-
-
-
-		std::string MessagesModule::getConflictLabel( const AlarmConflict& conflict )
-		{
-			switch (conflict)
-			{
-			case ALARM_NO_CONFLICT: return "Sans conflit";
-			case ALARM_WARNING_ON_INFO: return "Annulé par un prioritaire";
-			case ALARM_INFO_UNDER_WARNING: return "Annule un complémentaire";
-			case ALARM_CONFLICT: return "En conflit";
-			default: return "Inconnu";
-			}
-		}
-
-
-
-		MessagesModule::MessagesByRecipientId::mapped_type MessagesModule::GetMessages(
-			util::RegistryKeyType recipientId
-		){
-			MessagesByRecipientId::const_iterator it(_messagesByRecipientId.find(recipientId));
-			if(it == _messagesByRecipientId.end())
-			{
-				return MessagesByRecipientId::mapped_type();
-			}
-			return it->second;
-		}
-
-
-
-		void MessagesModule::AddMessage(
-			RegistryKeyType recipientId,
-			SentAlarm* value
-		){
-			MessagesByRecipientId::iterator it(_messagesByRecipientId.find(recipientId));
-			if(it == _messagesByRecipientId.end())
-			{
-				MessagesByRecipientId::mapped_type messages;
-				messages.insert(value);
-				_messagesByRecipientId.insert(make_pair(recipientId, messages));
-			}
-			else
-			{
-				it->second.insert(value);
-			}
-		}
-
-
-
-		void MessagesModule::RemoveMessage(
-			util::RegistryKeyType recipientId,
-			SentAlarm* value
-		){
-			MessagesByRecipientId::iterator it(_messagesByRecipientId.find(recipientId));
-			if(it != _messagesByRecipientId.end())
-			{
-				it->second.erase(value);
-				if(it->second.empty())
-				{
-					_messagesByRecipientId.erase(it);
-				}
 			}
 		}
 

@@ -91,41 +91,7 @@ namespace synthese
 			//@{
 				void					setTemplate(const AlarmTemplate* value);
 			//@}
-
-
-			/** Conflict between two alarms detector.
-				@param other Other alarm to compare with
-				@return synthese::messages::AlarmConflict the conflict situation between the two alarms if they where displayed on the same recipient
-				@author Hugues Romain
-				@date 2007
-
-				Conflict :
-				@code
-<-------------------|
-   				|------------------>
-				@endcode
-
-				Not conflict :
-				@code
-<-------------------|
-          				|------------------>
-				@endcode
-
-				The other's start date is supposed to be after the current one. If not the method is relaunched with the parameters inverted.
-
-				@todo Test each case in an unit test
-			*/
-			AlarmConflict wereInConflictWith(const SentAlarm& other) const;
-
-
-			/** Gets the "worse" conflict status of the alarm in each recipient type..
-				@return synthese::messages::AlarmConflict The conflict status of the alarm
-				@author Hugues Romain
-				@date 2007
-			*/
-			AlarmConflict getConflictStatus() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_SentAlarm_h__

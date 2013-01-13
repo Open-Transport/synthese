@@ -38,17 +38,20 @@ namespace synthese
 		/** AlarmAddLinkAction action class.
 			@ingroup m17Actions refActions
 		*/
-		class AlarmAddLinkAction : public util::FactorableTemplate<server::Action, AlarmAddLinkAction>
+		class AlarmAddLinkAction:
+			public util::FactorableTemplate<server::Action, AlarmAddLinkAction>
 		{
 		public:
 			static const std::string PARAMETER_RECIPIENT_KEY;
 			static const std::string PARAMETER_ALARM_ID;
 			static const std::string PARAMETER_OBJECT_ID;
+			static const std::string PARAMETER_PARAMETER;
 
 		private:
 			std::string		_recipientKey;
 			boost::shared_ptr<Alarm>		_alarm;
-			util::RegistryKeyType				_objectId;
+			boost::shared_ptr<util::Registrable> _object;
+			std::string _parameter;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -65,6 +68,7 @@ namespace synthese
 			void setRecipientKey(const std::string& key);
 			void setAlarmId(util::RegistryKeyType alarmId);
 			void setObjectId(util::RegistryKeyType id);
+			void setParameter(const std::string& value){ _parameter = value; }
 
 			/** Action to run, defined by each subclass.
 			*/

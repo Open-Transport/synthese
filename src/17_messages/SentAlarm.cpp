@@ -47,8 +47,7 @@ namespace synthese
 		):	Alarm(key, scenario),
 			Registrable(key),
 			_template(NULL)
-		{
-		}
+		{}
 
 
 
@@ -58,8 +57,7 @@ namespace synthese
 		):	Alarm(source, &scenario),
 			Registrable(0),
 			_template(&source)
-		{
-		}
+		{}
 
 
 
@@ -69,53 +67,12 @@ namespace synthese
 		):	Alarm(source, &scenario),
 			Registrable(0),
 			_template(source._template)
-		{
-		}
+		{}
 
 
 
 		SentAlarm::~SentAlarm()
-		{
-
-		}
-
-		AlarmConflict SentAlarm::wereInConflictWith( const SentAlarm& other ) const
-		{
-/*			// If one of the two alarms are not enabled, no conflict
-			if (!getIsEnabled() || !other.getIsEnabled())
-				return ALARM_NO_CONFLICT;
-
-			// Inverting the parameters if necessary
-			if ((other.getPeriodStart().is_not_a_date_time() && !getPeriodStart().is_not_a_date_time())
-				|| (!other.getPeriodStart().is_not_a_date_time() && !getPeriodStart().is_not_a_date_time() && other.getPeriodStart() < getPeriodStart()))
-				return other.wereInConflictWith(*this);
-
-			// No common period : no conflict
-			if (!other.getPeriodStart().is_not_a_date_time() && !getPeriodEnd().is_not_a_date_time() && other.getPeriodStart() > getPeriodEnd())
-				return ALARM_NO_CONFLICT;
-
-			// Common period : different level gives priority to an alarm
-			if (other.getLevel() != getLevel())
-				return ALARM_WARNING_ON_INFO;
-*/
-//			return ALARM_CONFLICT;
-			return ALARM_NO_CONFLICT;
-		}
-
-		AlarmConflict SentAlarm::getConflictStatus() const
-		{
-			AlarmConflict conflictStatus(ALARM_NO_CONFLICT);
-			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
-			{
-				AlarmConflict thisConflictStatus = recipient->getConflictStatus(*this);
-				if (thisConflictStatus > conflictStatus)
-					conflictStatus = thisConflictStatus;
-				if (conflictStatus == ALARM_CONFLICT)
-					return conflictStatus;
-			}
-			return conflictStatus;
-		}
+		{}
 
 
 
@@ -137,15 +94,4 @@ namespace synthese
 		{
 			_template = value;
 		}
-
-/*		SentAlarm::Complements SentAlarm::getComplements() const
-		{
-			return _complements;
-		}
-
-		void SentAlarm::setComplements( const Complements& complements )
-		{
-			_complements = complements;
-		}
-*/	}
-}
+}	}

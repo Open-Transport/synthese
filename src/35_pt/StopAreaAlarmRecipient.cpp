@@ -72,18 +72,12 @@ namespace synthese
 	       explicitly call constructor with () in order to avoid undefined references.
 	       This should be investigate further.
 	    */
+		template<>
+		AlarmRecipient::ObjectLinks	AlarmRecipientTemplate<StopAreaAlarmRecipient>::_linksObject = AlarmRecipient::ObjectLinks();
 
-		template<> AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::AlarmLinks
-		AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::_linksAlarm =
-			std::map<const Alarm*, std::map<const StopArea*, const AlarmObjectLink*> > ();
+		template<> const string AlarmRecipientTemplate<StopAreaAlarmRecipient>::TITLE("Arrêts");
 
-		template<> AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::ObjectLinks
-		AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::_linksObject =
-			std::map<const StopArea*, std::set<const AlarmObjectLink*> > ();
-
-		template<> const string AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::TITLE("Arrêts");
-
-		template<> void AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::getStaticParametersLabels(
+		template<> void AlarmRecipientTemplate<StopAreaAlarmRecipient>::GetParametersLabels(
 			ParameterLabelsVector& m
 		){
 			m.push_back(make_pair(FACTORY_KEY +"/"+ GLOBAL_PERIMETER,"(tous les arrêts)"));
@@ -92,7 +86,7 @@ namespace synthese
 
 
 		template<>
-		util::RegistryKeyType AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::GetObjectIdBySource(
+		util::RegistryKeyType AlarmRecipientTemplate<StopAreaAlarmRecipient>::GetObjectIdBySource(
 			const impex::DataSource& source,
 			const std::string& key,
 			util::Env& env
@@ -244,29 +238,6 @@ namespace synthese
 			map.insert(make_pair(PARAMETER_SEARCH_LINE, arf));
 */
 			return map;
-		}
-
-		void StopAreaAlarmRecipient::addObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
-		{
-			try
-			{
-				add(
-					*Env::GetOfficialEnv().getRegistry<StopArea>().get(objectId),
-					alarm
-				);
-			}
-			catch(...)
-			{
-				throw AlarmObjectLinkException(objectId, alarm.getAlarm()->getKey(), "Line not found");
-			}
-		}
-
-		void StopAreaAlarmRecipient::removeObject(const AlarmObjectLink& alarm, util::RegistryKeyType objectId )
-		{
-			remove(
-				*StopAreaTableSync::Get(objectId, Env::GetOfficialEnv()),
-				alarm
-			);
 		}
 
 

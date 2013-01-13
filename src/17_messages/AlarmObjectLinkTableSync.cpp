@@ -33,7 +33,6 @@
 #include "AlarmTableSync.h"
 #include "LoadException.h"
 #include "LinkException.h"
-#include "MessagesModule.h"
 #include "DeleteQuery.hpp"
 #include "ReplaceQuery.h"
 #include "MessagesLibraryRight.h"
@@ -102,26 +101,62 @@ namespace synthese
 			// It makes no sense to load such an object without the up links
 			assert(linkLevel > FIELDS_ONLY_LOAD_LEVEL);
 
-			object->setObjectId(rows->getLongLong ( AlarmObjectLinkTableSync::COL_OBJECT_ID));
 			object->setRecipientKey(rows->getText ( AlarmObjectLinkTableSync::COL_RECIPIENT_KEY));
 			object->setParameter(rows->getText(AlarmObjectLinkTableSync::COL_PARAMETER));
 
+			// Object
 			try
 			{
-				shared_ptr<Alarm> alarm(AlarmTableSync::GetEditable(
-						rows->getLongLong ( AlarmObjectLinkTableSync::COL_ALARM_ID),
+				object->setObject(
+					DBModule::GetEditableObject(
+						rows->getLongLong(AlarmObjectLinkTableSync::COL_OBJECT_ID),
+						env
+					).get()
+				);
+			}
+			catch(ObjectNotFoundException<Registrable>& e)
+			{
+				Log::GetInstance().warn("Data corrupted in " + AlarmObjectLinkTableSync::TABLE.NAME + "/" + AlarmObjectLinkTableSync::COL_OBJECT_ID, e);
+			}
+			
+
+			// Alarm
+			try
+			{
+				Alarm& alarm(
+					*AlarmTableSync::GetEditable(
+						rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
 						env,
 						linkLevel
 				)	);
-				object->setAlarm(alarm.get());
+				object->setAlarm(&alarm);
 
-				if(	linkLevel >= RECURSIVE_LINKS_LOAD_LEVEL &&
-					dynamic_cast<SentAlarm*>(alarm.get()) &&
-					static_cast<SentAlarm&>(*alarm).getScenario()
-				){
-					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-					ar->addObject(*object, object->getObjectId());
-					MessagesModule::AddMessage(object->getObjectId(), static_cast<SentAlarm*>(alarm.get()));
+				// link the object in the alarm (only if the linked object was found)
+				if(object->getObject())
+				{
+					Alarm::LinkedObjects linkedObjects(alarm.getLinkedObjects());
+					Alarm::LinkedObjects::iterator it(
+						linkedObjects.find(object->getRecipientKey())
+					);
+					if(it == linkedObjects.end())
+					{
+						it = linkedObjects.insert(
+							make_pair(
+								object->getRecipientKey(),
+								Alarm::LinkedObjects::mapped_type()
+						)	).first;
+					}
+					it->second.insert(object);
+					alarm.setLinkedObjects(linkedObjects);
+
+					// link the alarm in the object
+					if(	linkLevel >= RECURSIVE_LINKS_LOAD_LEVEL &&
+						dynamic_cast<SentAlarm*>(&alarm) &&
+						static_cast<SentAlarm&>(alarm).getScenario()
+					){
+						shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
+						ar->addObject(*object);
+					}
 				}
 			}
 			catch(FactoryException<AlarmRecipient> e)
@@ -144,13 +179,27 @@ namespace synthese
 		void OldLoadSavePolicy<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
 			AlarmObjectLink* object
 		){
+			if(object->getAlarm())
+			{
+				Alarm& alarm(*object->getAlarm());
+				Alarm::LinkedObjects linkedObjects(alarm.getLinkedObjects());
+				Alarm::LinkedObjects::iterator it(
+					linkedObjects.find(object->getRecipientKey())
+				);
+				if(it != linkedObjects.end())
+				{
+					it->second.erase(object);
+					alarm.setLinkedObjects(linkedObjects);
+				}
+			}
+
+			// Registration in the "recipient to message" map, not for template messages
 			if(dynamic_cast<SentAlarm*>(object->getAlarm()))
 			{
 				try
 				{
 					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-					ar->removeObject(*object, object->getObjectId());
-					MessagesModule::RemoveMessage(object->getObjectId(), static_cast<SentAlarm*>(object->getAlarm()));
+					ar->removeObject(*object);
 				}
 				catch(FactoryException<AlarmRecipient> e)
 				{
@@ -167,7 +216,7 @@ namespace synthese
 		){
 			ReplaceQuery<AlarmObjectLinkTableSync> query(*object);
 			query.addField(object->getRecipientKey());
-			query.addField(object->getObjectId());
+			query.addField(object->getObject() ? object->getObject()->getKey() : RegistryKeyType(0));
 			query.addField(object->getAlarm() ? object->getAlarm()->getKey() : RegistryKeyType(0));
 			query.addField(object->getParameter());
 			query.execute(transaction);
@@ -222,21 +271,24 @@ namespace synthese
 		){
 			Env env;
 			shared_ptr<const AlarmObjectLink> aol(AlarmObjectLinkTableSync::Get(id, env));
-			if (dynamic_cast<AlarmTemplate*>(aol->getAlarm()))
+			if(aol->getObject())
 			{
-				MessagesLibraryLog::addUpdateEntry(
-					dynamic_cast<AlarmTemplate*>(aol->getAlarm()),
-					"Suppression de la destination "+ lexical_cast<string>(aol->getObjectId()),
-					session->getUser().get()
-				);
-			}
-			else if(dynamic_cast<SentAlarm*>(aol->getAlarm()))
-			{
-				MessagesLog::addUpdateEntry(
-					dynamic_cast<SentAlarm*>(aol->getAlarm()),
-					"Suppression de la destination "+ lexical_cast<string>(aol->getObjectId()),
-					session->getUser().get()
-				);
+				if (dynamic_cast<AlarmTemplate*>(aol->getAlarm()))
+				{
+					MessagesLibraryLog::addUpdateEntry(
+						dynamic_cast<AlarmTemplate*>(aol->getAlarm()),
+						"Suppression de la destination "+ lexical_cast<string>(aol->getObject()->getKey()),
+						session->getUser().get()
+						);
+				}
+				else if(dynamic_cast<SentAlarm*>(aol->getAlarm()))
+				{
+					MessagesLog::addUpdateEntry(
+						dynamic_cast<SentAlarm*>(aol->getAlarm()),
+						"Suppression de la destination "+ lexical_cast<string>(aol->getObject()->getKey()),
+						session->getUser().get()
+					);
+				}
 			}
 		}
 	}
@@ -270,8 +322,9 @@ namespace synthese
 			{
 				AlarmObjectLink naol;
 				naol.setAlarm(&destAlarm);
-				naol.setObjectId(aol->getObjectId());
+				naol.setObject(aol->getObject());
 				naol.setRecipientKey(aol->getRecipientKey());
+				naol.setParameter(aol->getParameter());
 				Save(&naol);
 			}
 		}

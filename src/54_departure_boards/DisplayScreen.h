@@ -107,7 +107,7 @@ namespace synthese
 		{
 		public:
 			static const std::string VAR_SCREEN_ID;
-			static const std::string VAR_SCENARIO_ID;
+			static const std::string VAR_MESSAGE_ID;
 
 			/// Chosen registry class.
 			typedef util::Registry<DisplayScreen>	Registry;
@@ -405,7 +405,7 @@ namespace synthese
 			//@{
 				virtual messages::MessageType* getMessageType() const;
 
-				virtual bool displaysMessage(const messages::Scenario& message) const;
+				virtual bool displaysMessage(const messages::Alarm& message) const;
 
 				virtual void getBrodcastPoints(BroadcastPoints& result) const;
 			//@}

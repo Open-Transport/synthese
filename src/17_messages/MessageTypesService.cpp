@@ -47,6 +47,8 @@ namespace synthese
 	namespace messages
 	{
 		const string MessageTypesService::PARAMETER_SCENARIO_ID = "scenario_id";
+		const string MessageTypesService::PARAMETER_MESSAGE_ID = "message_id";
+
 
 		const string MessageTypesService::TAG_TYPE = "type";
 		
@@ -96,7 +98,7 @@ namespace synthese
 				{
 					MessageType* messageType(broadcastPoint->getMessageType());
 
-					// Jump over null or already selected mesage type 
+					// Jump over null or already selected message type 
 					if(messageType == NULL ||
 						messageTypes.find(messageType) != messageTypes.end()
 					){
@@ -104,8 +106,9 @@ namespace synthese
 					}
 
 					// Search if a message of the scenario have to be displayed on the broadcast point
-					if(broadcastPoint->displaysMessage(*_scenario))
-					{
+					if(	(_scenario && broadcastPoint->displaysScenario(*_scenario)) ||
+						(_message && broadcastPoint->displaysMessage(*_message))
+					){
 						messageTypes.insert(broadcastPoint->getMessageType());
 					}
 				}
@@ -149,7 +152,8 @@ namespace synthese
 
 
 		MessageTypesService::MessageTypesService():
-			_scenario(NULL)
+			_scenario(NULL),
+			_message(NULL)
 		{
 
 		}

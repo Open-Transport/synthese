@@ -31,6 +31,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Registrable;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -56,7 +61,7 @@ namespace synthese
 
 				std::string _url;
 				std::string _recipientKey;
-				util::RegistryKeyType _recipientId;
+				boost::shared_ptr<util::Registrable> _recipient;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _messagesToRemove;

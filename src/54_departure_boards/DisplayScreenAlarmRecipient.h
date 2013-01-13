@@ -35,7 +35,7 @@ namespace synthese
 		///	@ingroup m54Messages refAlarmrecipients
 		/// @author Hugues Romain
 		class DisplayScreenAlarmRecipient:
-			public messages::AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>
+			public messages::AlarmRecipientTemplate<DisplayScreenAlarmRecipient>
 		{
 		public:
 			static const std::string PARAMETER_SEARCH_CITY_NAME;
@@ -56,9 +56,6 @@ namespace synthese
 			);
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const util::ParametersMap& parameters) const;
-
-			virtual void addObject(const messages::AlarmObjectLink& alarm, util::RegistryKeyType objectId);
-			virtual void removeObject(const messages::AlarmObjectLink& alarm, util::RegistryKeyType objectId);
 
 			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const;
 		};
