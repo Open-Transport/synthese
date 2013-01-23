@@ -114,4 +114,11 @@ namespace synthese
 			updatePathCalendar();
 			return *this;
 		}
+
+		const JourneyPattern* NonPermanentService::getRoute() const
+		{
+			return static_cast<const JourneyPattern*>(getPath());
+		}
+
+		
 }	}

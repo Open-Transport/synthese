@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_env_NonPermanentService_h__
 #define SYNTHESE_env_NonPermanentService_h__
 
+#include "JourneyPattern.hpp"
 #include "Service.h"
 #include "Calendar.h"
 
@@ -77,6 +78,8 @@ namespace synthese
 			virtual calendar::Calendar& operator|= (const calendar::Calendar& op);
 
 			void updatePathCalendar();
+
+			const JourneyPattern* getRoute() const;
 		};
 }	}
 

@@ -214,7 +214,7 @@ namespace synthese
 				*/
 				UseRule::RunPossibilityType isUseRuleCompliant(
 					bool ignoreReservation
-				) const;
+				);
 
 
 				//////////////////////////////////////////////////////////////////////////

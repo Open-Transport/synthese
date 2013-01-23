@@ -31,8 +31,6 @@
 #include "Registry.h"
 
 #include <string>
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_comparison.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -68,18 +66,6 @@ namespace synthese
 			typedef util::Registry<ScheduledService>	Registry;
 
 		private:
-			typedef std::map<
-				boost::tuples::tuple<
-					const graph::Edge*,
-					const graph::Edge*,
-					std::size_t,
-					boost::gregorian::date
-				>, bool
-			> _NonConcurrencyCache;
-
-			mutable _NonConcurrencyCache _nonConcurrencyCache;
-			mutable boost::recursive_mutex _nonConcurrencyCacheMutex;
-
 			std::string	_team;
 
 
@@ -96,7 +82,6 @@ namespace synthese
 			//! @name Getters
 			//@{
 				virtual std::string getTeam() const;
-				const pt::JourneyPattern* getRoute() const;
 			//@}
 
 			//! @name Setters
@@ -111,15 +96,6 @@ namespace synthese
 			//! @name Query methods
 			//@{
 				virtual bool isContinuous () const;
-
-				virtual bool nonConcurrencyRuleOK(
-					const boost::gregorian::date& date,
-					const graph::Edge& departureEdge,
-					const graph::Edge& arrivalEdge,
-					std::size_t userClassRank
-				) const;
-
-				virtual void clearNonConcurrencyCache() const;
 
 				virtual graph::UseRule::ReservationAvailabilityType getReservationAbility(
 					const boost::gregorian::date& date,
@@ -177,7 +153,6 @@ namespace synthese
 
 		};
 
-		bool operator==(const ScheduledService& first, const ScheduledService& second);
 	}
 }
 
