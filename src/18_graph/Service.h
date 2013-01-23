@@ -142,7 +142,8 @@ namespace synthese
 				) const = 0;
 
 				virtual bool nonConcurrencyRuleOK(
-					const boost::gregorian::date& date,
+					boost::posix_time::ptime& time,
+					boost::posix_time::time_duration& range,
 					const graph::Edge& departureEdge,
 					const graph::Edge& arrivalEdge,
 					std::size_t userClassRank

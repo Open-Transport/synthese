@@ -142,7 +142,8 @@ namespace synthese
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
 			bool ignoreReservation
-		) const	{
+		)	{
+			ptime originDateTimeRef(_originDateTime);
 
 			// Checks for complete service pointers
 			if(_departureEdge && _arrivalEdge)
@@ -154,12 +155,15 @@ namespace synthese
 				}
 
 				// Check of non concurrency rules
-				if(	!_service->nonConcurrencyRuleOK(
-						_originDateTime.date(),
+				if(!_service->nonConcurrencyRuleOK(
+						originDateTimeRef,
+						_range,
 						*getDepartureEdge(),
 						*getArrivalEdge(),
 						_userClassRank
-				)	){
+					)
+				)
+				{
 					return UseRule::RUN_NOT_POSSIBLE;
 				}
 			}
@@ -171,6 +175,10 @@ namespace synthese
 			}
 
 			// All checks are OK
+			if(originDateTimeRef != _originDateTime)
+			{
+				shift(originDateTimeRef - _originDateTime);
+			}
 			return UseRule::RUN_POSSIBLE;
 		}
 

@@ -103,7 +103,6 @@ namespace synthese
 		}
 
 
-
 		ServicePointer ContinuousService::getFromPresenceTime(
 			const AccessParameters& accessParameters,
 			bool RTData,
@@ -363,10 +362,5 @@ namespace synthese
 		}
 
 
-
-		const pt::JourneyPattern* ContinuousService::getRoute() const
-		{
-			return static_cast<const JourneyPattern*>(getPath());
-		}
 	}
 }
