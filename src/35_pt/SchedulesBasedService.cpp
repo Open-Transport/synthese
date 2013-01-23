@@ -22,8 +22,13 @@
 
 #include "SchedulesBasedService.h"
 
+#include "AccessParameters.h"
+#include "CommercialLine.h"
 #include "LineStop.h"
+#include "NonConcurrencyRule.h"
 #include "Path.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
 #include "Vertex.h"
 
@@ -36,6 +41,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -771,4 +777,220 @@ namespace synthese
 				setVertex(i, vertices[i]);
 			}
 		}
+
+		/**
+		 * @brief SchedulesBasedService::isInTimeRange checks if the given time is
+		 * within one of the ranges in excludesRanges
+		 * @param time is the time to search
+		 * @param range is the range defined by the servicePointer calling us
+		 * @param exludeRanges is a vector of time_period that are invalid.
+		 * @return true if time is in one of the ranges
+		 */
+		bool SchedulesBasedService::isInTimeRange(
+				ptime &time,
+				time_duration &range,
+				const vector<time_period> &excludeRanges) const
+		{
+			BOOST_FOREACH(const time_period& period, excludeRanges)
+			{
+				if(period.contains(time))
+				{
+					if(period.end() > time + range)
+					{
+						// The unallowed slot goes after the whole range: not allowed
+						return true;
+					}
+					else
+					{
+						// Shift after the unallowed time slot
+						ptime newTime = period.end();
+						ptime ptEnd(time); ptEnd += range;
+						range = ptEnd - newTime;
+						time = newTime;
+						return false;
+					}
+				}
+				// Calc the new range
+				if(time < period.begin() && range > period.begin() - time)
+				{
+					range = period.begin() - time;
+					return false;
+				}
+			}
+			return false;
+		}
+
+		bool SchedulesBasedService::nonConcurrencyRuleOK(
+			ptime& time,
+			time_duration &range,
+			const Edge& departureEdge,
+			const Edge& arrivalEdge,
+			size_t userClassRank
+		) const {
+			const date date(time.date());
+			const CommercialLine* line(getRoute()->getCommercialLine());
+			if(line->getNonConcurrencyRules().empty()) return true;
+
+			boost::recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
+
+			_NonConcurrencyCache::const_iterator it(
+				_nonConcurrencyCache.find(
+					_NonConcurrencyCache::key_type(
+						&departureEdge,
+						&arrivalEdge,
+						userClassRank,
+						date
+			)	)	);
+			if(it != _nonConcurrencyCache.end())
+			{
+				return !isInTimeRange(time, range, it->second);
+			}
+			recursive_mutex::scoped_lock lineLock(line->getNonConcurrencyRulesMutex());
+
+			vector<time_period> excludeRanges;
+			const CommercialLine::NonConcurrencyRules& rules(line->getNonConcurrencyRules());
+			const StopArea::PhysicalStops& startStops(
+				static_cast<const StopPoint*>(departureEdge.getFromVertex())->getConnectionPlace()->getPhysicalStops()
+			);
+			const Hub* arrivalHub(
+				arrivalEdge.getFromVertex()->getHub()
+			);
+
+			typedef graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
+			PtrEdgeStep step(
+				arrivalHub->isConnectionPossible()
+				? (&Edge::getFollowingConnectionArrival)
+				: (&Edge::getFollowingArrivalForFineSteppingOnly)
+			);
+
+
+			BOOST_FOREACH(const NonConcurrencyRule* rule, rules)
+			{
+				CommercialLine* priorityLine(rule->getPriorityLine());
+				const CommercialLine::Paths& paths(priorityLine->getPaths());
+				ptime minStartTime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath()));
+				minStartTime -= rule->getDelay();
+				ptime maxStartTime(date, getDepartureEndScheduleToIndex(false, departureEdge.getRankInPath()));
+				maxStartTime += rule->getDelay();
+
+				// Loop on all vertices of the starting place
+				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStartStop, startStops)
+				{
+					// Loop on all non concurrent paths
+					BOOST_FOREACH(const Path* path, paths)
+					{
+						if(path == getPath()) continue;
+
+						const Vertex::Edges& departureEdges(itStartStop.second->getDepartureEdges());
+						pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> range(departureEdges.equal_range(path));
+						if(range.first == departureEdges.end() || range.first->first != path)
+						{
+							continue;
+						}
+
+						for(Vertex::Edges::const_iterator its(range.first); its != range.second; ++its)
+						{
+							const Edge& startEdge(*its->second);
+							// Search a service at the time of the possible
+							AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
+							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
+					
+							while(true)
+							{
+								ServicePointer serviceInstance(
+											startEdge.getNextService(
+												ap,
+												minStartTime,
+												maxStartTime,
+												true,
+												minServiceIndex,
+												false,
+												true
+												)	);
+								// If no service, advance to the next path
+								if (!serviceInstance.getService()) break;
+								++*minServiceIndex;
+								// This is needed because getNextService is broken if we keep calling
+								// it with a minStartTime on a non active day (infinite loop)
+								minStartTime = serviceInstance.getDepartureDateTime();
+								// Path traversal
+								for (const Edge* endEdge = (startEdge.*step) ();
+									 endEdge != NULL; endEdge = (endEdge->*step) ())
+								{
+									// Found eligible arrival place
+									if(endEdge->getHub() == arrivalHub)
+									{
+										time_period timePeriod(
+													serviceInstance.getDepartureDateTime() - rule->getDelay(),
+													serviceInstance.getDepartureDateTime() +
+													serviceInstance.getServiceRange() + rule->getDelay()
+													);
+										if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
+										{
+											// Merge the last period and the new one. We assume we are always called
+											// in incremental time so the time_periods are sorted
+											excludeRanges[excludeRanges.size()-1] =
+													timePeriod.merge(excludeRanges.back());
+										}
+										else
+										{
+											excludeRanges.push_back(timePeriod);
+										}
+
+										if ( isContinuous() )
+										{
+											// There maybe some more non concurent services to record
+											break;
+										} else
+										{
+											// No need to search further for non continuous services
+											_nonConcurrencyCache.insert(
+														make_pair(
+															_NonConcurrencyCache::key_type(
+																&departureEdge,
+																&arrivalEdge,
+																userClassRank,
+																date
+																), excludeRanges
+															)	);
+											return false;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			_nonConcurrencyCache.insert(
+				make_pair(
+					_NonConcurrencyCache::key_type(
+						&departureEdge,
+						&arrivalEdge,
+						userClassRank,
+						date
+					), excludeRanges
+			)	);
+			return !isInTimeRange(time, range, excludeRanges);
+		}
+
+
+		void SchedulesBasedService::clearNonConcurrencyCache() const
+		{
+			recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
+			_nonConcurrencyCache.clear();
+		}
+
+		bool operator==(const SchedulesBasedService& first, const SchedulesBasedService& second)
+		{
+			return
+				first.getPath() == second.getPath() &&
+				first.getServiceNumber() == second.getServiceNumber() &&
+				first.getDepartureSchedules(false) == second.getDepartureSchedules(false) &&
+				first.getArrivalSchedules(false) == second.getArrivalSchedules(false)
+			;
+		}
+
+
 }	}

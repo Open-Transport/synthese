@@ -24,6 +24,10 @@
 #define SYNTHESE_pt_SchedulesBasedService_h__
 
 #include "NonPermanentService.h"
+#include "JourneyPattern.hpp"
+
+#include <boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple_comparison.hpp>
 
 namespace synthese
 {
@@ -59,6 +63,25 @@ namespace synthese
 			typedef std::vector<const graph::Vertex*> ServedVertices;
 
 			static const std::string STOP_SEPARATOR;
+
+		private:
+			typedef std::map<
+				boost::tuples::tuple<
+					const graph::Edge*,
+					const graph::Edge*,
+					std::size_t,
+					boost::gregorian::date
+				>,
+			    std::vector<boost::posix_time::time_period>
+			> _NonConcurrencyCache;
+
+			mutable _NonConcurrencyCache _nonConcurrencyCache;
+			mutable boost::recursive_mutex _nonConcurrencyCacheMutex;
+
+			bool isInTimeRange(boost::posix_time::ptime &time,
+					boost::posix_time::time_duration &range, 
+					const std::vector<boost::posix_time::time_period> &excludeRanges
+			) const;
 
 		protected:
 
@@ -264,7 +287,34 @@ namespace synthese
 				);
 
 			//@}
+
+			//! @name Query methods
+			//@{
+				/**
+				 * @brief nonConcurrencyRuleOK
+				 * @param time[in,out] the date to check. it may be moved later to a valid start date.
+				 * @param range[in,out] the range to check. it may be changed if we are
+				 * a continuous service and got a non concurrency rule at some point in time
+				 * @param departureEdge
+				 * @param arrivalEdge
+				 * @param userClassRank
+				 * @return 
+				 */
+				virtual bool nonConcurrencyRuleOK(
+					boost::posix_time::ptime& time,
+					boost::posix_time::time_duration &range,
+					const graph::Edge& departureEdge,
+					const graph::Edge& arrivalEdge,
+					std::size_t userClassRank
+				) const;
+
+				virtual void clearNonConcurrencyCache() const;
+			//@}
+				
 		};
+
+		bool operator==(const SchedulesBasedService& first, const SchedulesBasedService& second);
+
 	}
 }
 

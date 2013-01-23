@@ -191,11 +191,13 @@ namespace synthese
 
 
 		bool Service::nonConcurrencyRuleOK(
-			const date& date,
+			ptime &time,
+			time_duration &range,
 			const graph::Edge& departureEdge,
 			const graph::Edge& arrivalEdge,
 			std::size_t userClassRank
 		) const	{
+			// By default we can run for the given range
 			return true;
 		}
 
