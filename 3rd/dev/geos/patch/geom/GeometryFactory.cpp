@@ -83,7 +83,8 @@ GeometryFactory::GeometryFactory()
 GeometryFactory::GeometryFactory(const PrecisionModel* pm, int newSRID,
 		CoordinateSequenceFactory* nCoordinateSequenceFactory)
 	:
-	SRID(newSRID)
+	SRID(newSRID),
+	coordinateListFactory(CoordinateArraySequenceFactory::instance())
 {
 #if GEOS_DEBUG
 	std::cerr << "GEOS_DEBUG: GeometryFactory["<<this<<"]::GeometryFactory(PrecisionModel["<<pm<<"], SRID)" << std::endl;
@@ -106,7 +107,8 @@ GeometryFactory::GeometryFactory(
 		CoordinateSequenceFactory* nCoordinateSequenceFactory)
 	:
 	precisionModel(new PrecisionModel()),
-	SRID(0)
+	SRID(0),
+	coordinateListFactory(CoordinateArraySequenceFactory::instance())
 {
 #if GEOS_DEBUG
 	std::cerr << "GEOS_DEBUG: GeometryFactory["<<this<<"]::GeometryFactory(CoordinateSequenceFactory["<<nCoordinateSequenceFactory<<"])" << std::endl;
