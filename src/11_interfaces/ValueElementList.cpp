@@ -103,7 +103,7 @@ namespace synthese
 
 			// Search end of current word ignoring spaces within braces
 			size_t wordEndPos;
-			size_t numberOfOpenedBraces = 0;
+			int numberOfOpenedBraces = 0;
 			for (; position < text.size(); position = wordEndPos+1)
 			{
 				// Purge initial spaces
@@ -159,7 +159,7 @@ namespace synthese
 				}
 
 				// Case 3 : multiple word
-				else if(str.size() > 1 && (str.at(0) == '{' && str.at(1) != '{' || str.at(0) == '['))
+				else if(str.size() > 1 && ((str.at(0) == '{' && str.at(1) != '{') || str.at(0) == '['))
 				{
 					vie.reset(new StaticValueInterfaceElement(str.substr(1, str.size() - 2)));
 				}
