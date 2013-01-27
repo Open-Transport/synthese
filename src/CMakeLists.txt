@@ -1,3 +1,7 @@
+# gcc warning settings
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+  add_definitions(-Wall -Wextra -Wno-unused-parameter)
+endif ()
 
 macro(set_source_groups)
   # default group
