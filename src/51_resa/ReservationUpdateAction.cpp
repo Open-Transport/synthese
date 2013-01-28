@@ -266,7 +266,7 @@ namespace synthese
 			{
 				DBLogModule::appendToLogIfChange(
 					text,
-					"Affectation véhicule",
+					"Affectation vÃ©hicule",
 					_reservation->getVehicle() ? _reservation->getVehicle()->getName() : "(undefined)",
 					_vehicle->get() ? (*_vehicle)->getName() : "(undefined)"
 				);
@@ -315,7 +315,7 @@ namespace synthese
 			{
 				DBLogModule::appendToLogIfChange(
 					text,
-					"Numéro de siège",
+					"NumÃ©ro de siÃ¨ge",
 					_reservation->getSeatNumber(),
 					*_seatNumber
 				);
