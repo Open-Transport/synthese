@@ -150,8 +150,8 @@ namespace synthese
 				if (m == 0) return n;
 
 
-				for(LevenshteinDistance i = 0; i <= n; matrix[i][0] = i++) ;
-				for(LevenshteinDistance j = 1; j <= m; matrix[0][j] = j++) ;
+				for(LevenshteinDistance i = 0; i <= n; i++) { matrix[i][0] = i; }
+				for(LevenshteinDistance j = 1; j <= m; j++) { matrix[0][j] = j; }
 
 				for (LevenshteinDistance i = 1; i <= n; i++ )
 				{

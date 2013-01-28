@@ -73,8 +73,8 @@ namespace synthese
 
 			private:
 				Entries _entries;
-				Level _maxLoggedLevel;
 				const Level _minLevel;
+				Level _maxLoggedLevel;
 
 			public:
 				Logger(

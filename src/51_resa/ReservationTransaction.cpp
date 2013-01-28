@@ -44,16 +44,16 @@ namespace synthese
 	{
 		ReservationTransaction::ReservationTransaction(
 			RegistryKeyType key
-		):	Registrable(key)
-			, _bookingTime(second_clock::local_time())
-			, _cancellationTime(not_a_date_time)
-			, _originDateTime(not_a_date_time)
-			, _destinationDateTime(not_a_date_time)
-			, _cancelUserId(0)
-			, _bookingUserId(0)
-			, _customerUserId(0),
+		):	Registrable(key),
+			_lastReservation(0),
+			_bookingTime(second_clock::local_time()),
+			_cancellationTime(not_a_date_time),
+			_customerUserId(0),
 			_customer(NULL),
-			_lastReservation(0)
+			_bookingUserId(0),
+			_cancelUserId(0),
+			_originDateTime(not_a_date_time),
+			_destinationDateTime(not_a_date_time)
 		{}
 
 
@@ -165,6 +165,9 @@ namespace synthese
 
 			case NO_SHOW:
 				return statusText + " constatée le " + to_simple_string(_cancellationTime);
+				
+			default:
+				break;
 			}
 
 			return statusText;

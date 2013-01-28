@@ -643,9 +643,9 @@ namespace synthese
 			}
 			return
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
-				!_createCustomer &&
+				(!_createCustomer &&
 				_customer->getKey() == session->getUser()->getKey() &&
-				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE))
 			;
 		}
 

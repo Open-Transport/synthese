@@ -50,7 +50,7 @@ namespace synthese
 				) const {
 					return
 						op1.score.phoneticScore > op2.score.phoneticScore ||
-						op1.score.phoneticScore == op2.score.phoneticScore && op1.score.levenshtein < op2.score.levenshtein;
+						(op1.score.phoneticScore == op2.score.phoneticScore && op1.score.levenshtein < op2.score.levenshtein);
 				}
 			};
 

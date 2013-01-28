@@ -56,6 +56,7 @@ namespace synthese
 			util::RegistryKeyType key
 		):	Registrable(key),
 			_accessCapacity(0),
+			_defaultFare(NULL),
 			_reservationType(RESERVATION_RULE_FORBIDDEN),
 			_originIsReference(false),
 			_minDelayMinutes(minutes(0)),
@@ -63,7 +64,6 @@ namespace synthese
 			_maxDelayDays(optional<date_duration>()),
 			_hourDeadLine(not_a_date_time),
 			_reservationMinDepartureTime(not_a_date_time),
-			_defaultFare(NULL),
 			_forbiddenInDepartureBoards(false),
 			_forbiddenInTimetables(false),
 			_forbiddenInJourneyPlanning(false)

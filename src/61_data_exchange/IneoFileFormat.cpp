@@ -176,17 +176,18 @@ namespace synthese
 		IneoFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<IneoFileFormat>(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<IneoFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
-			Importer(env, dataSource),
+			_importStopAreas(false),
 			_autoImportStops(false),
-			_interactive(false),
 			_displayLinkedStops(false),
-			_stopPoints(_dataSource, _env),
-			_lines(_dataSource, _env),
-			_destinations(_dataSource, _env),
+			_interactive(false),
 			_addWaybackToJourneyPatternCode(false),
-			_depots(_dataSource, _env)
+			_destinations(_dataSource, _env),
+			_stopPoints(_dataSource, _env),
+			_depots(_dataSource, _env),
+			_lines(_dataSource, _env)
 		{}
 
 

@@ -131,6 +131,8 @@ namespace synthese
 
 					case INF_EQ:
 						return lexical_cast<string>(leftDbl <= rightDbl);
+					default:
+						break;
 					}
 				}
 				catch(bad_lexical_cast&)
@@ -157,6 +159,9 @@ namespace synthese
 
 					case BIT_OR:
 						return lexical_cast<string>(leftInt | rightInt);
+					
+					default:
+						break;
 					}
 				}
 				catch(bad_lexical_cast&)

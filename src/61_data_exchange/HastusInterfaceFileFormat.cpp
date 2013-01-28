@@ -110,13 +110,13 @@ namespace synthese
 		HastusInterfaceFileFormat::Importer_::Importer_(
 			Env& env,
 			const DataSource& dataSource
-		):	OneFileTypeImporter<Importer_>(env, dataSource),
-			Importer(env, dataSource),
+		):	Importer(env, dataSource),
+			OneFileTypeImporter<Importer_>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
+			_fileNameIsACalendar(false),
 			_calendars(_dataSource, _env),
 			_lines(_dataSource, _env),
-			_stops(_dataSource, _env),
-			_fileNameIsACalendar(false)
+			_stops(_dataSource, _env)
 		{}
 
 

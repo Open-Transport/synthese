@@ -65,6 +65,7 @@ namespace synthese
 				case READ: return "Lecture";
 				case WRITE: return "Lecture/Ecriture";
 				case DELETE_RIGHT: return "Contrôle total";
+				case UNKNOWN_RIGHT_LEVEL: return "Inconnu";
 			}
 			return "";
 		}

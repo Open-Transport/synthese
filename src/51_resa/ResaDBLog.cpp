@@ -373,6 +373,9 @@ namespace synthese
 							ResaModule::GetStatusIcon(NO_SHOW)
 						);
 						break;
+						
+					default:
+						break;
 					}
 					stream << " ";
 				}

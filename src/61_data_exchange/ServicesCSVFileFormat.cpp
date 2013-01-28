@@ -120,9 +120,9 @@ namespace synthese
 		ServicesCSVFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<ServicesCSVFileFormat>(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<ServicesCSVFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
-			Importer(env, dataSource),
 			_interactive(true),
 			_lines(_dataSource, env),
 			_stopAreas(_dataSource, env),

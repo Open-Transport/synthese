@@ -46,6 +46,7 @@ namespace synthese
 		const std::string Log::LOG_PREFIX_WARN  ("WARN ");
 		const std::string Log::LOG_PREFIX_ERROR ("ERROR");
 		const std::string Log::LOG_PREFIX_FATAL ("FATAL");
+		const std::string Log::LOG_PREFIX_NONE  ("NONE");
 
 
 
@@ -224,6 +225,10 @@ namespace synthese
 
 			case Log::LEVEL_FATAL:
 				(*_outputStream) << LOG_PREFIX_FATAL;
+				break;
+
+			case Log::LEVEL_NONE:
+				(*_outputStream) << LOG_PREFIX_NONE;
 				break;
 			}
 

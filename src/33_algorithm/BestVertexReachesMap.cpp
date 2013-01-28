@@ -115,7 +115,7 @@ namespace synthese
 				else if(item.first == transferNumber)
 				{
 					if(	item.second.first < duration ||
-						item.second.first == duration && (strict || *item.second.second > *journeysptr)
+						(item.second.first == duration && (strict || *item.second.second > *journeysptr))
 					){
 						return true;
 					}

@@ -520,8 +520,8 @@ namespace synthese
 							if(!map.isDefined(PARAMETER_VARIABLE + variable.second.code))
 							{
 								if(	variable.second.compulsory &&
-									(	_enabled && *_enabled ||
-										!_enabled && _sscenario->getIsEnabled()
+									(	(_enabled && *_enabled) ||
+										(!_enabled && _sscenario->getIsEnabled())
 									)
 								){
 									SentScenario::VariablesMap::const_iterator it(
@@ -538,8 +538,8 @@ namespace synthese
 								iconv.convert(map.get<string>(PARAMETER_VARIABLE + variable.second.code))
 							);
 							if(	variable.second.compulsory &&
-								(	_enabled && *_enabled ||
-									!_enabled && _sscenario->getIsEnabled()
+								(	(_enabled && *_enabled) ||
+									(!_enabled && _sscenario->getIsEnabled())
 								) &&
 								value.empty()
 							){

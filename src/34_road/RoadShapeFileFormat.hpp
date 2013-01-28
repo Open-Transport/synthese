@@ -156,8 +156,8 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<RoadShapeFileFormat>(env, dataSource),
-					impex::Importer(env, dataSource),
+				):	impex::Importer(env, dataSource),
+					impex::MultipleFileTypesImporter<RoadShapeFileFormat>(env, dataSource),
 					_roadPlaces(dataSource, env)
 				{}
 

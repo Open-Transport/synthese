@@ -788,7 +788,6 @@ namespace synthese
 		) const {
 			string lowerInput(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(input));
 			stringstream output;
-			bool first = true;
 
 			char_separator<char> sep(" :,;.-_|/\\¦'°");
 			tokenizer<char_separator<char> > words(lowerInput, sep);

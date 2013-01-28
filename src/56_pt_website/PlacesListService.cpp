@@ -105,11 +105,11 @@ namespace synthese
 
 
 		PlacesListService::PlacesListService():
+			_config(NULL),
 			_sorted(true),
 			_citiesWithAtLeastAStop(true),
 			_minScore(0),
 			_coordinatesSystem(NULL),
-			_config(NULL),
 			_maxDistance(300)
 		{
 			 _houseMap = new HouseMapType();
@@ -349,7 +349,7 @@ namespace synthese
 				// Best place
 				if(!_houseMap->empty())
 				{
-					int nbResult = 0;
+					size_t nbResult = 0;
 					vector<lexical_matcher::LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit > houseList, roadList;
 					vector<int> distanceHouseList;
 					set<string> insertedRoadName;
@@ -714,8 +714,8 @@ namespace synthese
 					);
 					if(!bestMap.get() ||
 						cityBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
-						cityBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
-						cityBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN)
+						(cityBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
+						cityBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN))
 					){
 						bestMap = cityBestMap;
 						className = DATA_CITY;
@@ -731,8 +731,8 @@ namespace synthese
 					);
 					if(!bestMap.get() ||
 						ppBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
-						ppBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
-						ppBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN)
+						(ppBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
+						ppBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN))
 					){
 						bestMap = ppBestMap;
 						className = DATA_PUBLIC_PLACE;
@@ -748,8 +748,8 @@ namespace synthese
 					);
 					if(	!bestMap.get() ||
 						roadBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
-						roadBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
-						roadBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN)
+						(roadBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
+						roadBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN))
 					){
 						bestMap = roadBestMap;
 						className = DATA_ROAD;
@@ -765,8 +765,8 @@ namespace synthese
 					);
 					if(	!bestMap.get() ||
 						addressBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
-						addressBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
-						addressBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN)
+						(addressBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
+						addressBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN))
 					){
 						bestMap = addressBestMap;
 						className = DATA_ADDRESS;

@@ -81,8 +81,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
 			)	),
-			_online(false),
-			_startServiceTimeStamp(not_a_date_time)
+			_startServiceTimeStamp(not_a_date_time),
+			_online(false)
 		{
 		}
 

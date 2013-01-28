@@ -41,9 +41,9 @@ namespace synthese
 	{
 		JourneyPatternCopy::JourneyPatternCopy(
 			JourneyPattern& line
-		):	JourneyPattern(line.getKey()),
-			_mainLine(&line),
-			Registrable(line.getKey())
+		):	Registrable(line.getKey()),
+			JourneyPattern(line.getKey()),
+			_mainLine(&line)
 		{
 			// Registration
 			int rank(line.addSubLine(this));

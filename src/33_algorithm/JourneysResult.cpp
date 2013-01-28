@@ -180,8 +180,8 @@ namespace synthese
 						bestHopedGoalAccessDateTime	-= bestPossibleDuration;	// Minimal time to reach the goal
 					}
 				}
-				if(	_accessDirection == DEPARTURE_TO_ARRIVAL && bestHopedGoalAccessDateTime >= newMaxTime ||
-					_accessDirection == ARRIVAL_TO_DEPARTURE && bestHopedGoalAccessDateTime <= newMaxTime
+				if(	(_accessDirection == DEPARTURE_TO_ARRIVAL && bestHopedGoalAccessDateTime >= newMaxTime) ||
+					(_accessDirection == ARRIVAL_TO_DEPARTURE && bestHopedGoalAccessDateTime <= newMaxTime)
 				){
 					journeysToRemove.push_back(journey);
 				}

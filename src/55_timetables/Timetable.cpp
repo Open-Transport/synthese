@@ -84,8 +84,8 @@ namespace synthese
 		{
 			return
 				_contentType == CONTAINER ||
-				getBaseCalendar() != NULL &&
-				getBaseCalendar()->isLimited()
+				(getBaseCalendar() != NULL &&
+				 getBaseCalendar()->isLimited())
 			;
 		}
 

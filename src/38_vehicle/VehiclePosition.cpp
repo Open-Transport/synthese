@@ -61,9 +61,9 @@ namespace synthese
 			_time(not_a_date_time),
 			_meterOffset(0),
 			_stopPoint(NULL),
+			_depot(NULL),
 			_service(NULL),
 			_passengers(0),
-			_depot(NULL),
 			_inStopArea(false)
 		{}
 

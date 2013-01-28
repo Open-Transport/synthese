@@ -184,11 +184,11 @@ namespace synthese
 					UNKNOWN_RIGHT_LEVEL,
 					_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
 				) ||
-				_user->getKey() == user.getKey() &&
+				( _user->getKey() == user.getKey() &&
 				user.getProfile()->isAuthorized<SecurityRight>(
 					UNKNOWN_RIGHT_LEVEL,
 					READ,
-					string()
+					string() )
 				)
 			;
 		}

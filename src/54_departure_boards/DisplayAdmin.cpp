@@ -1160,17 +1160,19 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			if(	_displayScreen->getLocation() &&
-				profile.isAuthorized<ArrivalDepartureTableRight>(
+			if(	(_displayScreen->getLocation() &&
+				 profile.isAuthorized<ArrivalDepartureTableRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL,
 					lexical_cast<string>(_displayScreen->getLocation()->getKey())
-				) ||
-				!_displayScreen->getLocation() &&
-				profile.isAuthorized<ArrivalDepartureTableRight>(
-					READ,
-					UNKNOWN_RIGHT_LEVEL
-			)	){
+				)) ||
+				(!_displayScreen->getLocation() &&
+				 profile.isAuthorized<ArrivalDepartureTableRight>(
+					 READ,
+					 UNKNOWN_RIGHT_LEVEL
+				 )
+				)
+			){
 				bool writeRight(
 					_displayScreen->getLocation() ?
 					profile.isAuthorized<ArrivalDepartureTableRight>(
@@ -1185,14 +1187,14 @@ namespace synthese
 				_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writeRight, "cog.png"));
 			}
 
-			if(	_displayScreen->getLocation() &&
-				profile.isAuthorized<DisplayMaintenanceRight>(
+			if(	(_displayScreen->getLocation() &&
+				 profile.isAuthorized<DisplayMaintenanceRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL,
 					lexical_cast<string>(_displayScreen->getLocation()->getKey())
-				) ||
-				!_displayScreen->getLocation() &&
-				profile.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL)
+				)) ||
+				(!_displayScreen->getLocation() &&
+				profile.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL))
 			){
 				bool writeRight(
 					_displayScreen->getLocation() ?
@@ -1208,10 +1210,11 @@ namespace synthese
 				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writeRight, "wrench.png"));
 			}
 
-			if (_displayScreen->getLocation() &&
-				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocation()->getKey())) ||
-				!_displayScreen->getLocation() &&
-				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL)
+			if ((_displayScreen->getLocation() &&
+				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL,
+																 lexical_cast<string>(_displayScreen->getLocation()->getKey()))) ||
+				(!_displayScreen->getLocation() &&
+				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL))
 			){
 				bool writeRight(
 					_displayScreen->getLocation() ?

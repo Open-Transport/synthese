@@ -82,25 +82,25 @@ namespace synthese
 			const AlgorithmLogger& logger,
 			int totalDistance,
 			boost::optional<const JourneyTemplates&> journeyTemplates
-		):	_accessDirection(accessDirection),
-			_accessParameters(accessParameters),
+		):	_accessParameters(accessParameters),
+			_accessDirection(accessDirection),
 			_whatToSearch(whatToSearch),
 			_searchOnlyNodes(searchOnlyNodes),
 			_graphToUse(graphToUse),
 			_result(result),
 			_bestVertexReachesMap(bestVertexReachesMap),
-			_destinationVam(destinationVam),
 			_originDateTime(originDateTime),
 			_minMaxDateTimeAtOrigin(minMaxDateTimeAtOrigin),
 			_minMaxDateTimeAtDestination(minMaxDateTimeAtDestination),
 			_inverted(inverted),
 			_optim(optim),
+			_logger(logger),
 			_maxDuration(maxDuration),
 			_vmax(vmax),
-			_logger(logger),
+			_ignoreReservation(ignoreReservation),
+			_destinationVam(destinationVam),
 			_totalDistance(totalDistance),
-			_journeyTemplates(journeyTemplates),
-			_ignoreReservation(ignoreReservation)
+			_journeyTemplates(journeyTemplates)
 		{}
 
 

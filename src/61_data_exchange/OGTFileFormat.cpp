@@ -97,8 +97,8 @@ namespace synthese
 
 
 		OGTFileFormat::Importer_::Importer_( util::Env& env, const impex::DataSource& dataSource ):
-			OneFileTypeImporter<OGTFileFormat>(env, dataSource),
 			Importer(env, dataSource),
+			OneFileTypeImporter<OGTFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource)
 		{}
 
@@ -360,13 +360,13 @@ namespace synthese
 			util::Env& env,
 			ostream& stream,
 			const Calendar& calendar
-		):	_dataSource(dataSource),
+		):	_calendar(calendar),
+			_dataSource(dataSource),
 			_env(env),
 			_stream(stream),
-			_calendar(calendar),
-			stopPoints(dataSource, env),
 			line(NULL),
-			wayBack(false)
+			wayBack(false),
+			stopPoints(dataSource, env)
 		{
 		}
 

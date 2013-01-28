@@ -58,11 +58,12 @@ namespace synthese
 			MainRoadChunk::HouseNumber houseNumber,
 			bool numberAtBeginning,
 			std::string separator
-		):	Address(
+		):	Registrable(0),
+			Address(
 				chunk,
 				chunk.getHouseNumberMetricOffset(houseNumber),
 				houseNumber
-			), Registrable(0),
+			),
 			_numberAtBeginning(numberAtBeginning)
 		{
 			setName(

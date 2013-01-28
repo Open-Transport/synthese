@@ -38,9 +38,9 @@ namespace synthese
 		TimetableRow::TimetableRow(
 			RegistryKeyType id
 		):	Registrable(id),
-			_isArrival(true),
-			_isDeparture(true),
 			_place(NULL),
+			_isDeparture(true),
+			_isArrival(true),
 			_compulsory(PassageFacultatif),
 			_rank(0),
 			_timetableId(0)

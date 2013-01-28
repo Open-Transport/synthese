@@ -261,7 +261,7 @@ namespace synthese
 
 
 			template<class C, class R>
-			const boost::shared_ptr<C>& getCastEditable(
+			const boost::shared_ptr<C> getCastEditable(
 				util::RegistryKeyType id
 			) const {
 				try

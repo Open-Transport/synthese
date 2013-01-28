@@ -172,8 +172,8 @@ namespace synthese
 		RTMFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<RTMFileFormat>(env, dataSource),
-			Importer(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<RTMFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
 			_importStopArea(false),
 			_interactive(false),
@@ -455,7 +455,6 @@ namespace synthese
 					cout << u << endl;
 					u++;
 					const TripIndex& trip(itTrip.first);
-					const TripValues& tripValues(itTrip.second);
 
 					// Line
 					if(!lines.contains(trip.lineCode))
@@ -463,9 +462,6 @@ namespace synthese
 						stream << "WARN : inconsistent line id "<< trip.lineCode <<" in the trip "<< trip.code <<"<br />";
 						continue;
 					}
-					CommercialLine& line(
-						**lines.get(trip.lineCode).begin()
-					);
 					cout << "test construction lignes" << endl;	
 /*						
 					// Route

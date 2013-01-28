@@ -107,7 +107,6 @@ TileGrid::markTilesForLine (const Coordinate& from,
     int endTileX = (int) (to.x / _tileWidth);
     if (startTileX > endTileX)
     {
-	int tmp = startTileX;
 	startTileX = endTileX;
 	endTileX = startTileX;
     }
@@ -126,7 +125,6 @@ TileGrid::markTilesForLine (const Coordinate& from,
     int endTileY = (int) (to.y / _tileHeight);
     if (startTileY > endTileY)
     {
-	int tmp = startTileY;
 	startTileY = endTileY;
 	endTileY = startTileY;
     }

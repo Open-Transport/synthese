@@ -596,9 +596,10 @@ namespace synthese
 			const DisplayScreenCPUAdmin* ca(dynamic_cast<const DisplayScreenCPUAdmin*>(&currentPage));
 
 			if( _place &&
-				(	sa && sa->_place == _place ||
-					da && da->getScreen()->getRoot<PlaceWithDisplayBoards>() && da->getScreen()->getRoot<PlaceWithDisplayBoards>()->getPlace() == _place->get() ||
-					ca && ca->getCPU()->getPlace() == _place->get()
+				(	(sa && sa->_place == _place) ||
+					((da && da->getScreen()->getRoot<PlaceWithDisplayBoards>() &&
+					 da->getScreen()->getRoot<PlaceWithDisplayBoards>()->getPlace() == _place->get())) ||
+					(ca && ca->getCPU()->getPlace() == _place->get())
 			)	){
 				DisplayScreenCPUTableSync::SearchResult cpus(
 					DisplayScreenCPUTableSync::Search(

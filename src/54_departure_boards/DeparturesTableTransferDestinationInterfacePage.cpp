@@ -56,8 +56,8 @@ namespace synthese
 	namespace departure_boards
 	{
 		DeparturesTableTransferDestinationInterfacePage::DeparturesTableTransferDestinationInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, DeparturesTableTransferDestinationInterfacePage>(),
-			Registrable(0)
+			: Registrable(0),
+			  FactorableTemplate<interfaces::InterfacePage, DeparturesTableTransferDestinationInterfacePage>()
 		{
 		}
 

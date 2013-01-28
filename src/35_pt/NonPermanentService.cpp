@@ -51,8 +51,8 @@ namespace synthese
 		NonPermanentService::NonPermanentService(
 			string serviceNumber,
 			Path* path
-		):	Service(serviceNumber, path),
-			Registrable(0),
+		):	Registrable(0),
+			Service(serviceNumber, path),
 			Calendar()
 		{}
 

@@ -44,8 +44,8 @@ namespace synthese
 	namespace resa
 	{
 		CustomerPasswordEMailContentInterfacePage::CustomerPasswordEMailContentInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, CustomerPasswordEMailContentInterfacePage>(),
-			Registrable(0)
+			: Registrable(0),
+			  FactorableTemplate<interfaces::InterfacePage, CustomerPasswordEMailContentInterfacePage>()
 		{
 		}
 

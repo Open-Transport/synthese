@@ -256,6 +256,9 @@ namespace synthese
 			case NO_SHOW:
 				statusText += " constatée le " + to_simple_string(getTransaction()->getCancellationTime());
 				break;
+				
+			default:
+				break;
 			}
 
 			return statusText;

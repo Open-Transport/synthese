@@ -116,10 +116,10 @@ namespace synthese
 			{
 				date elementMinDate(element.second.getRealMinDate());
 
-				if(	elementMinDate < result &&
-					element.second.getOperation() != CalendarTemplateElement::AND ||
-					element.second.getOperation() == CalendarTemplateElement::AND &&
-					elementMinDate > result
+				if(	(elementMinDate < result &&
+					 element.second.getOperation() != CalendarTemplateElement::AND) ||
+					(element.second.getOperation() == CalendarTemplateElement::AND &&
+					 elementMinDate > result)
 				){
 					result = elementMinDate;
 				}
@@ -136,10 +136,10 @@ namespace synthese
 			{
 				date elementMaxDate(element.second.getRealMaxDate());
 
-				if(	elementMaxDate > result &&
-					element.second.getOperation() != CalendarTemplateElement::AND ||
-					element.second.getOperation() == CalendarTemplateElement::AND &&
-					elementMaxDate < result
+				if(	(elementMaxDate > result &&
+					 element.second.getOperation() != CalendarTemplateElement::AND) ||
+					(element.second.getOperation() == CalendarTemplateElement::AND &&
+					 elementMaxDate < result)
 				){
 					result = elementMaxDate;
 				}
@@ -186,8 +186,9 @@ namespace synthese
 			case RESTRICTED_RESTRICTION: return "Période particulière avec jours restreints";
 			case RESTRICTED_SCHOOL: return "Période particulière avec périodes scolaires";
 			case RESTRICTED_SCHOOL_RESTRICTION: return "Période particulière avec périodes scolaires avec jours restreints";
+			default:
+				return "Autre catégorie";
 			}
-			return "Autre catégorie";
 		}
 
 

@@ -66,14 +66,14 @@ namespace synthese
 		PublicPlace::PublicPlace (
 			util::RegistryKeyType id
 		):	Registrable(id),
-			NamedPlaceTemplate<PublicPlace>(),
 			Object<PublicPlace, PublicPlaceSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(NamedPlaceField),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
-			)	)
+			)	),
+		  NamedPlaceTemplate<PublicPlace>()
 		{}
 
 

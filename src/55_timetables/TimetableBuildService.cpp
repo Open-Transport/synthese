@@ -103,8 +103,8 @@ namespace synthese
 
 		TimetableBuildService::TimetableBuildService():
 			FactorableTemplate<Function,TimetableBuildService>(),
-			_timetableRank(0),
-			_warnings(new TimetableResult::Warnings)
+			_warnings(new TimetableResult::Warnings),
+			_timetableRank(0)
 		{}
 
 
@@ -551,7 +551,6 @@ namespace synthese
 				{
 					// 5.1 : Transfers rows before schedules
 					stringstream transfersBeforeContent;
-					size_t globalRank(0);
 					for(size_t depth(object.getBeforeTransferTimetablesNumber()); depth > 0; --depth)
 					{
 						const TimetableResult::RowServicesVector services(

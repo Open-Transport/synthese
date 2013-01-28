@@ -133,9 +133,9 @@ namespace synthese
 		ObitiFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<ObitiFileFormat>(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<ObitiFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
-			Importer(env, dataSource),
 			_interactive(true),
 			_lines(_dataSource, env),
 			_stopAreas(_dataSource, env),
@@ -413,7 +413,7 @@ namespace synthese
 
 						stream << "num of services : " << _line.size() << "<br />";
 
-						for(int numService = 1; numService < _line.size(); numService++)
+						for(size_t numService = 1; numService < _line.size(); numService++)
 						{
 							_firstLine(inFile, line, posSchedulesTable);
 
@@ -434,7 +434,7 @@ namespace synthese
 							daysCalendarName = _line[numService] + " " + commercialLine->getNetwork()->getName();
 
 							// Ignore other parameters
-							for(int i = 0; i < _numberOfOtherParameters; i++)
+							for(size_t i = 0; i < _numberOfOtherParameters; i++)
 							{
 								if(getline(inFile, line))
 									_loadLine(line);

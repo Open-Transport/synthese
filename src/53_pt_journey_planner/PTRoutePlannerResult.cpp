@@ -63,8 +63,8 @@ namespace synthese
 		):	_departurePlace(departurePlace),
 			_arrivalPlace(arrivalPlace),
 			_samePlaces(samePlaces),
-			_journeys(journeys),
-			_filtered(false)
+			_filtered(false),
+			_journeys(journeys)
 		{
 			_createOrderedPlaces();
 		}
@@ -560,8 +560,8 @@ namespace synthese
 						itJourney2 != getJourneys().end() &&
 						!itJourney->getContinuousServiceRange().total_seconds() &&
 						!itJourney2->getContinuousServiceRange().total_seconds() &&
-						(	forDeparture && itJourney2->getFirstDepartureTime() - itJourney->getFirstDepartureTime() < minWaitingTime ||
-							forArrival && itJourney2->getFirstArrivalTime() - itJourney->getFirstArrivalTime() < minWaitingTime
+						(	(forDeparture && itJourney2->getFirstDepartureTime() - itJourney->getFirstDepartureTime() < minWaitingTime) ||
+							(forArrival && itJourney2->getFirstArrivalTime() - itJourney->getFirstArrivalTime() < minWaitingTime)
 						)
 					);
 					++itJourney2

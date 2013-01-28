@@ -170,7 +170,7 @@ namespace synthese
 						break;
 					}
 
-					if( source[pos+1] == 239) // ï
+					if( (unsigned char)source[pos+1] == 239) // ï
 					{
 						pos += 1;
 						result.push_back(A);
@@ -360,10 +360,10 @@ namespace synthese
 						break;
 					}
 
-					if(	_IsFollowedBy(source, pos, "n") &&
+					if(	(_IsFollowedBy(source, pos, "n") &&
 						(	!_IsAnyOf(source, pos+2, VOWELS) ||
 							_IsAnyOf(source, pos, ACCENTUATED_E)
-						) ||
+						)) ||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
 					){
@@ -575,7 +575,7 @@ namespace synthese
 						break;
 					}
 
-					if(	_IsFollowedBy(source, pos, "n") && !_IsAnyOf(source, pos+2, VOWELS) ||
+					if(	(_IsFollowedBy(source, pos, "n") && !_IsAnyOf(source, pos+2, VOWELS)) ||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
 					){
@@ -826,7 +826,7 @@ namespace synthese
 
 		bool FrenchPhoneticString::_IsAnyOf( const std::string& source, size_t pos, const std::string& chars )
 		{
-			if(pos < 0 || pos >= source.size())
+			if(pos >= source.size())
 			{
 				return false;
 			}

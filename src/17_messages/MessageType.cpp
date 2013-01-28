@@ -52,7 +52,7 @@ namespace synthese
 		{
 			if(get<MaxLength>())
 			{
-				if(message.size() > get<MaxLength>())
+				if(message.size() > (size_t)get<MaxLength>())
 				{
 					return false;
 				}

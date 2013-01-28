@@ -104,9 +104,9 @@ namespace synthese
 			_maxConnections(1),
 			_curvesStep(5),
 			_maxDuration(60),
+			_speed(4),
 			_durationType(DURATION_TYPE_MEDIAN),
 			_frequencyType(FREQUENCY_TYPE_NO),
-			_speed(4),
 			_onlyWKT(false)
 		{
 		}

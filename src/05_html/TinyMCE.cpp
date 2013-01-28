@@ -36,10 +36,11 @@ namespace synthese
 
 
 		TinyMCE::TinyMCE():
-			_withFileManager(false),
 			_withImageManager(false),
+			_withFileManager(false),
 			_withPageBreak(false),
-			_withSpellChecker(false)
+			_withSpellChecker(false),
+			_withEmoticons(false)
 		{}
 
 

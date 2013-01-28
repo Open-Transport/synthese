@@ -241,8 +241,8 @@ namespace synthese
 			// Origin departure time
 			const time_duration& departureSchedule(_departureSchedules.at(0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
-			if(	!getDeparture && !inverted ||
-				getDeparture && inverted
+			if(	(!getDeparture && !inverted) ||
+				(getDeparture && inverted)
 			){
 				originDateTime -= range;
 			}

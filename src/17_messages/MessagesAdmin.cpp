@@ -424,10 +424,10 @@ namespace synthese
 				dynamic_cast<const MessageAdmin*>(&currentPage)
 			);
 
-			if(	sa &&
-				dynamic_cast<const SentScenario*>(sa->getScenario().get()) ||
-				ma &&
-				dynamic_cast<const SentAlarm*>(ma->getAlarm().get())
+			if(	(sa &&
+				 dynamic_cast<const SentScenario*>(sa->getScenario().get())) ||
+				(ma &&
+				 dynamic_cast<const SentAlarm*>(ma->getAlarm().get()))
 			){
 				shared_ptr<MessagesScenarioAdmin> p(
 					getNewPage<MessagesScenarioAdmin>()

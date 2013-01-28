@@ -69,8 +69,8 @@ namespace synthese
 
 		SentScenario::SentScenario(
 			const ScenarioTemplate& source
-		):	Scenario(source.getName()),
-			Registrable(0),
+		):	Registrable(0),
+			Scenario(source.getName()),
 			_isEnabled(false),
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),
@@ -81,8 +81,8 @@ namespace synthese
 
 		SentScenario::SentScenario(
 			const SentScenario& source
-		):	Scenario(source._template ? source._template->getName() : source.getName()),
-			Registrable(0),
+		):	Registrable(0),
+			Scenario(source._template ? source._template->getName() : source.getName()),
 			_isEnabled(false),
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),

@@ -62,9 +62,9 @@ namespace synthese
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& timetablegenerator,
 			const SchedulesBasedService& service
-		):	_line(static_cast<const JourneyPattern*>(service.getPath())),
-			_service(&service),
-			_calendar(service)
+		):	_calendar(service),
+			_line(static_cast<const JourneyPattern*>(service.getPath())),
+			_service(&service)
 		{
 			_calendar &= timetablegenerator.getBaseCalendar();
 
@@ -225,8 +225,8 @@ namespace synthese
 					for (itEdge2 = itEdge; itEdge2 != edges.end() && !exit; ++itEdge2)
 					{
 						if(	dynamic_cast<const StopArea*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
-							&&(	(*itEdge2)->isDeparture() && itRow->getIsDeparture()
-								|| (*itEdge2)->isArrival() && itRow->getIsArrival()
+							&&(	((*itEdge2)->isDeparture() && itRow->getIsDeparture())
+								|| ((*itEdge2)->isArrival() && itRow->getIsArrival())
 							) &&
 							(	!first ||
 								timetablegenerator.getAuthorizedPhysicalStops().empty() ||
@@ -448,8 +448,8 @@ namespace synthese
 				it1 != _content.end();
 				++it1, ++it2
 			){
-				if(	it1->first == NULL && it2->first != NULL ||
-					it1->first != NULL && it2->first != NULL && it1->second != it2->second
+				if(	(it1->first == NULL && it2->first != NULL) ||
+					(it1->first != NULL && it2->first != NULL && it1->second != it2->second)
 				){
 					return false;
 				}

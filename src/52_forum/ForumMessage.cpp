@@ -43,8 +43,8 @@ namespace synthese
 			Registrable(id),
 			_topic(NULL),
 			_user(NULL),
-			_published(true),
-			_date(second_clock::local_time())
+			_date(second_clock::local_time()),
+			_published(true)
 		{
 
 		}

@@ -181,8 +181,8 @@ namespace synthese
 
 			return
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
-				_transaction->getCustomerUserId() == session->getUser()->getKey() &&
-				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)
+				(_transaction->getCustomerUserId() == session->getUser()->getKey() &&
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE))
 			;
 		}
 	}

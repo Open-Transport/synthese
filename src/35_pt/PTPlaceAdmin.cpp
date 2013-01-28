@@ -119,8 +119,6 @@ namespace synthese
 		){
 			try
 			{
-				RegistryTableType tableId(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
-
 				setConnectionPlace(Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 			}
 			catch(ObjectNotFoundException<StopArea> e)

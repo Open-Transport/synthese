@@ -66,8 +66,8 @@ namespace synthese
 
 
 		DriverService::DriverService(util::RegistryKeyType id):
-			impex::ImportableTemplate<DriverService>(),
-			util::Registrable(id)
+			util::Registrable(id),
+			impex::ImportableTemplate<DriverService>()
 		{}
 
 

@@ -317,7 +317,6 @@ namespace synthese
 
 			DriverService::Chunks services;
 
-			VehicleService* currentVehicleService(NULL);
 			DriverService::Chunks::reverse_iterator itServices(services.rend());
 			BOOST_FOREACH(const string& elementStr, servicesStrs)
 			{

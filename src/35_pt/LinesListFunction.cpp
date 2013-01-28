@@ -619,9 +619,9 @@ namespace synthese
 			// Use rule tests
 			const UseRule& useRule(line.getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
 			if(	dynamic_cast<const PTUseRule*>(&useRule) &&
-				(	_ignoreJourneyPlannerExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning() ||
-					_ignoreTimetableExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables() ||
-					_ignoreDeparturesBoardExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()
+				(	(_ignoreJourneyPlannerExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning()) ||
+					(_ignoreTimetableExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables()) ||
+					(_ignoreDeparturesBoardExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
 			)	){
 				return false;
 			}

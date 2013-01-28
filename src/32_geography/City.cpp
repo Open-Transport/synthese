@@ -57,10 +57,10 @@ namespace synthese
 			RegistryKeyType key,
 			std::string name,
 			std::string code
-		):	IncludingPlace<NamedPlace>(),
-			_code (code),
+		):	Registrable(key),
+			IncludingPlace<NamedPlace>(),
 			_name(name),
-			Registrable(key)
+			_code (code)
 		{
 			Factory<NamedPlace>::Keys keys(Factory<NamedPlace>::GetKeys());
 			BOOST_FOREACH(const string& key, keys)
