@@ -137,7 +137,7 @@ namespace synthese
 			const server::Request& searchRequest
 		) const	{
 			Env env;
-			int tableId = decodeTableId(id);
+			util::RegistryTableType tableId = decodeTableId(id);
 
 			try
 			{

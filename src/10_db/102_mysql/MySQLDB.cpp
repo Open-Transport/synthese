@@ -692,7 +692,7 @@ namespace synthese
 
 			DBResultSPtr res = execQuery(sql.str());
 			res->next();
-			int columnCount = res->getInt(0);
+			unsigned int columnCount = res->getInt(0);
 
 			if (columnCount == 0)
 				return false;
@@ -883,7 +883,7 @@ namespace synthese
 						catch (const MySQLException& e)
 						{
 							// Don't retry if there's a wrong db error. That's a situation that can happen in the tests.
-							const int ER_BAD_DB_ERROR = 1049;
+							const unsigned int ER_BAD_DB_ERROR = 1049;
 							isFatal = e.getErrno() == ER_BAD_DB_ERROR;
 
 							Log::GetInstance().warn(

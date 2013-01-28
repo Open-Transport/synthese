@@ -107,9 +107,9 @@ namespace synthese
 
 		BookableCommercialLineAdmin::BookableCommercialLineAdmin()
 			: AdminInterfaceElementTemplate<BookableCommercialLineAdmin>(),
+			_displayCancelled(false),
 			_date(not_a_date_time),
-			_hideOldServices(false),
-			_displayCancelled(false)
+			_hideOldServices(false)
 		{ }
 
 
@@ -457,6 +457,8 @@ namespace synthese
 							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
 								stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
 								break;
+							default:
+								break;
 							}
 						}
 
@@ -477,6 +479,9 @@ namespace synthese
 							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
 								stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
 								break;
+								
+							default:
+								break;
 							}
 						}
 
@@ -496,6 +501,9 @@ namespace synthese
 
 							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
 								stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+								break;
+
+							default:
 								break;
 							}
 						}
@@ -620,6 +628,8 @@ namespace synthese
 
 									case SHOULD_BE_AT_WORK:
 										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
+										break;
+									default:
 										break;
 									}
 								}

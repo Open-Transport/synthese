@@ -64,6 +64,8 @@ namespace synthese
 				case WARN: stream << "WARN"; break;
 				case NOTI: stream << "NOTI"; break;
 				case ERROR: stream << "ERR "; break;
+				case ALL: stream << "ALL "; break;
+				case NOLOG: stream << "NOLOG "; break;
 				}
 				stream << " " << entry.content << "<br />";
 			}

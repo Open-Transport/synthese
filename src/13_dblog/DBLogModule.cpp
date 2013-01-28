@@ -91,6 +91,7 @@ namespace synthese
 			case DBLogEntry::DB_LOG_INFO : return "Information";
 			case DBLogEntry::DB_LOG_WARNING : return "Alerte";
 			case DBLogEntry::DB_LOG_ERROR : return "Erreur";
+			case DBLogEntry::DB_LOG_OK : return "Ok";
 			}
 			return string();
 		}

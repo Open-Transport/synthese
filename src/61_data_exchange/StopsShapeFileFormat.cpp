@@ -123,9 +123,9 @@ namespace synthese
 		StopsShapeFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<StopsShapeFileFormat>(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<StopsShapeFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
-			Importer(env, dataSource),
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env)
 		{}

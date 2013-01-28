@@ -469,10 +469,10 @@ namespace synthese
 									if(	&route2 != &route &&
 										route2.hasLinkWithSource(*link.first) &&
 										(	link.second.empty() ||
-											route2.getCodesBySource(*link.first).size() == 1 && route2.getACodeBySource(*link.first).empty() ||
+											(route2.getCodesBySource(*link.first).size() == 1 && route2.getACodeBySource(*link.first).empty()) ||
 											route2.hasCodeBySource(*link.first, link.second)
 										) &&
-										route2 == route
+										(route2 == route)
 									){
 										stream << t.row();
 
@@ -631,7 +631,6 @@ namespace synthese
 				if(_runControl && getCurrentTab() == getActiveTab())
 				{
 					AdminFunctionRequest<ServiceAdmin> openServiceRequest(request);
-					double maxSpeed(0);
 
 					HTMLTable::ColsVector c;
 					c.push_back("Réseau");

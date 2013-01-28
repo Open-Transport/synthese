@@ -523,10 +523,10 @@ namespace synthese
 				for(;
 					edgeIt != _edges.end() &&
 					(
-						(considerVertices && edge->getFromVertex() != (*edgeIt)->getFromVertex()) ||
+						((considerVertices && edge->getFromVertex() != (*edgeIt)->getFromVertex())) ||
 						edge->getFromVertex()->getHub() != (*edgeIt)->getFromVertex()->getHub() ||
-						edge->isArrival() && !(*edgeIt)->isArrival() ||
-						edge->isDeparture() && !(*edgeIt)->isDeparture()
+						(edge->isArrival() && !(*edgeIt)->isArrival()) ||
+						(edge->isDeparture() && !(*edgeIt)->isDeparture())
 					);
 					++edgeIt) ;
 				if(edgeIt == _edges.end())

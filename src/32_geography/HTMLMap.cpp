@@ -54,12 +54,12 @@ namespace synthese
 			const string id /*= "map" */
 		):	_center(static_cast<Point*>(center.clone())),
 			_horizontalDistance(horizontalDistance),
+			_id(id),
 			_editFieldName(editFieldName),
 			_addFieldName(addFieldName),
 			_highlight(highlight),
-			_id(id),
-			_mapSource(NULL),
 			_mousePosition(mousePosition),
+			_mapSource(NULL),
 			_withMapSourcesMenu(true)
 		{
 			if(highlight)

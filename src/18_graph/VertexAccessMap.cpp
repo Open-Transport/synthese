@@ -118,8 +118,8 @@ namespace synthese
 			else
 			{	// Update of the access conditions if more efficient
 				if(	vertexAccess.approachTime < it->second.approachTime
-				||	vertexAccess.approachTime == it->second.approachTime
-					&&	vertexAccess.approachDistance < it->second.approachDistance
+				||	(vertexAccess.approachTime == it->second.approachTime
+					&&	vertexAccess.approachDistance < it->second.approachDistance)
 				)	it->second = vertexAccess;
 			}
 

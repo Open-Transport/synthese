@@ -189,8 +189,8 @@ namespace synthese
 		) const {
 			return
 				session &&
-				(	session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE) ||
-					session->getUser() && session->getUser()->getKey() == _user->getKey()
+				(	(session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE)) ||
+					(session->getUser() && session->getUser()->getKey() == _user->getKey())
 				)
 			;
 		}

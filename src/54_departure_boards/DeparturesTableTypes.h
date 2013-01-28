@@ -71,8 +71,8 @@ namespace synthese
 		bool operator()(const graph::ServicePointer& _Left, const graph::ServicePointer& _Right) const
 		{
 			return (_Left.getDepartureDateTime() < _Right.getDepartureDateTime()
-				|| _Left.getDepartureDateTime() == _Right.getDepartureDateTime()
-				&& _Left.getDepartureEdge() < _Right.getDepartureEdge()
+				|| ((_Left.getDepartureDateTime() == _Right.getDepartureDateTime()
+				&& _Left.getDepartureEdge() < _Right.getDepartureEdge()))
 				);
 		}
 	};
@@ -83,8 +83,8 @@ namespace synthese
 		{
 			return
 				_Left.getDepartureDateTime() < _Right.getDepartureDateTime() ||
-				_Left.getDepartureDateTime() == _Right.getDepartureDateTime() && _Left.getArrivalDateTime() < _Right.getArrivalDateTime() ||
-				_Left.getDepartureDateTime() == _Right.getDepartureDateTime() && _Left.getArrivalDateTime() == _Right.getArrivalDateTime() && _Left.getArrivalEdge() < _Right.getArrivalEdge()
+				((_Left.getDepartureDateTime() == _Right.getDepartureDateTime() && _Left.getArrivalDateTime() < _Right.getArrivalDateTime())) ||
+				((_Left.getDepartureDateTime() == _Right.getDepartureDateTime() && _Left.getArrivalDateTime() == _Right.getArrivalDateTime() && _Left.getArrivalEdge() < _Right.getArrivalEdge()))
 			;
 		}
 	};

@@ -515,11 +515,8 @@ namespace synthese
 			Schedules departureSchedules;
 			Schedules arrivalSchedules;
 
-			BOOST_FOREACH(const Path::Edges::value_type& edge, _path->getEdges())
-			{
-				departureSchedules.push_back(firstSchedule);
-				arrivalSchedules.push_back(firstSchedule);
-			}
+			departureSchedules.assign(_path->getEdges().size(), firstSchedule);
+			arrivalSchedules.assign(_path->getEdges().size(), firstSchedule);
 
 			setSchedules(
 				departureSchedules,
@@ -617,10 +614,7 @@ namespace synthese
 			if(getPath())
 			{
 				_vertices.clear();
-				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
-				{
-					_vertices.push_back(NULL);
-				}
+				_vertices.assign(getPath()->getEdges().size(), NULL);
 			}
 		}
 

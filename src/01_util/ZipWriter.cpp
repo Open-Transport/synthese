@@ -87,7 +87,7 @@ static const uint32_t kCRC32Table[256] = {
 
 static uint32_t ComputeCRC32(const string &buf) {
 	uint32_t x = ~0U;
-	for (int i = 0; i < buf.size(); ++i) {
+	for (size_t i = 0; i < buf.size(); ++i) {
 		unsigned char c = buf[i];
 		x = kCRC32Table[(x ^ c) & 0xff] ^ (x >> 8);
 	}

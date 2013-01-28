@@ -244,14 +244,14 @@ namespace synthese
 					stream << t.col() << position->getMeterOffset();
 					if(lastMeters > 0)
 					{
-						if(	position->getMeterOffset() < lastMeters && _requestParameters.raisingOrder ||
-							position->getMeterOffset() > lastMeters && !_requestParameters.raisingOrder
+						if(	(position->getMeterOffset() < lastMeters && _requestParameters.raisingOrder) ||
+							(position->getMeterOffset() > lastMeters && !_requestParameters.raisingOrder)
 						){
 							stream << HTMLModule::getHTMLImage("exclamation.png", "!", string("Inversion d'ordre des mètres"));
 						}
-						if(	position->getMeterOffset() != lastMeters &&
-							(	position->getDepot() && position->getDepot() == lastDepot ||
-								position->getStopPoint() && position->getStopPoint() == lastStopPoint
+						if(	((position->getMeterOffset() != lastMeters &&
+							  (	position->getDepot() && position->getDepot() == lastDepot)) ||
+								(position->getStopPoint() && position->getStopPoint() == lastStopPoint)
 						)	){
 							stream << HTMLModule::getHTMLImage("error.png", "!", string("Mouvement probablement manquant"));
 						}

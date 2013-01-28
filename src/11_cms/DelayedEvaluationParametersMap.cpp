@@ -38,11 +38,11 @@ namespace synthese
 			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page,
 			util::ParametersMap& variables
-		):	_fields(fields),
-			_request(request),
+		):	_request(request),
 			_additionalParametersMap(additionalParametersMap),
 			_page(page),
-			_variables(variables)
+			_variables(variables),
+			_fields(fields)
 		{
 			// Backward compatibility with ParametersMap
 			BOOST_FOREACH(const Fields::value_type& field, _fields)

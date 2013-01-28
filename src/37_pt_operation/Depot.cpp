@@ -43,8 +43,8 @@ namespace synthese
 	namespace pt_operation
 	{
 		Depot::Depot(RegistryKeyType id /*= 0*/ ):
-			Vertex(NULL, boost::shared_ptr<geos::geom::Point>()),
-			Registrable(id)
+			Registrable(id),
+			Vertex(NULL, boost::shared_ptr<geos::geom::Point>())
 		{
 			_hub = this;
 

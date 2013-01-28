@@ -55,12 +55,12 @@ namespace synthese
 
 
 
-		int DBResult::_getColumnIndexInternal(const std::string& columnName) const
+		unsigned int DBResult::_getColumnIndexInternal(const std::string& columnName) const
 		{
 			int index = getColumnIndex(columnName);
 			if (index == -1)
 				throw DBException("No such column " + columnName);
-			return index;
+			return (unsigned int)index;
 		}
 
 

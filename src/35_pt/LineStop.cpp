@@ -48,9 +48,9 @@ namespace synthese
 			double metricOffset,
 			Vertex* vertex
 		):	Registrable(id),
+			Edge(line, rankInPath, vertex, metricOffset),
 			_isDeparture(isDeparture),
-			_isArrival(isArrival),
-			Edge(line, rankInPath, vertex, metricOffset)
+			_isArrival(isArrival)
 		{}
 
 

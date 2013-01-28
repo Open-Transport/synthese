@@ -64,17 +64,17 @@ namespace synthese
 			_highestDepartureTime(higherDepartureTime),
 			_lowestArrivalTime(lowerArrivalTime),
 			_highestArrivalTime(higherArrivalTime),
-			_whatToSearch(whatToSearch),
-			_graphToUse(graphToUse),
 			_maxDuration(maxDuration),
 			_maxSolutionsNumber(maxSolutionsNumber),
 			_accessParameters(accessParameters),
 			_planningOrder(planningOrder),
-			_journeyTemplates(graphToUse),
+			_whatToSearch(whatToSearch),
+			_graphToUse(graphToUse),
 			_vmax(vmax),
-			_logger(logger),
 			_ignoreReservation(ignoreReservation),
-			_maxTransferDuration(maxTransferDuration)
+			_maxTransferDuration(maxTransferDuration),
+			_logger(logger),
+			_journeyTemplates(graphToUse)
 		{}
 
 
@@ -99,8 +99,6 @@ namespace synthese
 			_highestDepartureTime(continuousService.getLastDepartureTime()),
 			_lowestArrivalTime(continuousService.getFirstArrivalTime()),
 			_highestArrivalTime(continuousService.getLastArrivalTime()),
-			_whatToSearch(whatToSearch),
-			_graphToUse(graphToUse),
 			_maxDuration(
 				(!maxDuration || continuousService.getDuration() - posix_time::seconds(1) < *maxDuration) ?
 				continuousService.getDuration() - posix_time::seconds(1) :
@@ -109,12 +107,14 @@ namespace synthese
 			_maxSolutionsNumber(maxSolutionsNumber),
 			_accessParameters(),
 			_planningOrder(planningOrder),
+			_whatToSearch(whatToSearch),
+			_graphToUse(graphToUse),
 			_parentContinuousService(continuousService),
-			_journeyTemplates(graphToUse),
 			_vmax(vmax),
-			_logger(logger),
 			_ignoreReservation(ignoreReservation),
-			_maxTransferDuration(maxTransferDuration)
+			_maxTransferDuration(maxTransferDuration),
+			_logger(logger),
+		  _journeyTemplates(graphToUse)
 		{}
 
 

@@ -71,7 +71,6 @@ namespace synthese
 		void InterfacePage::parse()
 		{
 			_components.clear();
-			int counter = 0;
 			size_t start_pos;
 			size_t end_pos;
 			std::string last_label = "";

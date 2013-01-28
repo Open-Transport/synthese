@@ -94,7 +94,6 @@ namespace synthese
 		DisplayScreen::DisplayScreen(
 			RegistryKeyType key
 		):	Registrable(key),
-			_displayedPlace(NULL),
 			_displayType(NULL),
 			_wiringCode(0),
 			_comPort(0),
@@ -103,6 +102,7 @@ namespace synthese
 			_serviceNumberDisplay(false),
 			_displayTeam(false),
 			_displayClock(true),
+			_displayedPlace(NULL),
 			_allPhysicalStopsDisplayed(true),
 			_direction(DISPLAY_DEPARTURES),
 			_originsOnly(WITH_PASSING),
@@ -110,10 +110,10 @@ namespace synthese
 			_clearingDelay(0),
 			_firstRow(0),
 			_routePlanningWithTransfer(false),
+			_allowCanceled(false),
 			_generationMethod(STANDARD_METHOD),
 			_destinationForceDelay(120),	// default = 2 hours
-			_maintenanceIsOnline(true),
-			_allowCanceled(false)
+			_maintenanceIsOnline(true)
 		{}
 
 

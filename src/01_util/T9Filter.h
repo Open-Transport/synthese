@@ -59,21 +59,21 @@ namespace synthese
 		bool
 			T9Filter::put(Sink& dest, int c)
 		{
-			if (c >= 'A' && c <= 'C' || c >= 'a' && c <= 'c' || c == 'à' || c == 'Â' || c == 'Ä' || c == 'ç' || c == 'À')
+			if ((c >= 'A' && c <= 'C') || (c >= 'a' && c <= 'c') || c == 'à' || c == 'Â' || c == 'Ä' || c == 'ç' || c == 'À')
 				return boost::iostreams::put(dest, '2');
-			else if (c >= 'D' && c <= 'F' || c >= 'd' && c <= 'f' || c == 'é' || c == 'ê' || c == 'è' || c == 'Ê' || c == 'Ë' || c == 'È')
+			else if ((c >= 'D' && c <= 'F') || (c >= 'd' && c <= 'f') || c == 'é' || c == 'ê' || c == 'è' || c == 'Ê' || c == 'Ë' || c == 'È')
 				return boost::iostreams::put(dest, '3');
-			else if (c >= 'G' && c <= 'I' || c >= 'g' && c <= 'i' || c == 'î' || c == 'ï' || c == 'Î' || c == 'Ï' || c == 'ì' || c == 'Ì')
+			else if ((c >= 'G' && c <= 'I') || (c >= 'g' && c <= 'i') || c == 'î' || c == 'ï' || c == 'Î' || c == 'Ï' || c == 'ì' || c == 'Ì')
 				return boost::iostreams::put(dest, '4');
-			else if (c >= 'J' && c <= 'L' || c >= 'j' && c <= 'l')
+			else if ((c >= 'J' && c <= 'L') || (c >= 'j' && c <= 'l'))
 				return boost::iostreams::put(dest, '5');
-			else if (c >= 'M' && c <= 'O' || c >= 'm' && c <= 'o' || c == 'ñ' || c == 'Ñ' || c == 'ô' || c == 'ö' || c == 'õ' || c == 'Ô' || c == 'Ö' || c == 'Õ' || c == 'ò' || c == 'Ò')
+			else if ((c >= 'M' && c <= 'O') || (c >= 'm' && c <= 'o') || c == 'ñ' || c == 'Ñ' || c == 'ô' || c == 'ö' || c == 'õ' || c == 'Ô' || c == 'Ö' || c == 'Õ' || c == 'ò' || c == 'Ò')
 				return boost::iostreams::put(dest, '6');
-			else if (c >= 'P' && c <= 'S' || c >= 'p' && c <= 's')
+			else if ((c >= 'P' && c <= 'S') || (c >= 'p' && c <= 's'))
 				return boost::iostreams::put(dest, '7');
-			else if (c >= 'T' && c <= 'V' || c >= 't' && c <= 'v' || c == 'ù' || c == 'Ù' || c == 'û' || c == 'Û' || c == 'ü' || c == 'Ü')
+			else if ((c >= 'T' && c <= 'V') || (c >= 't' && c <= 'v') || c == 'ù' || c == 'Ù' || c == 'û' || c == 'Û' || c == 'ü' || c == 'Ü')
 				return boost::iostreams::put(dest, '8');
-			else if (c >= 'W' && c <= 'Z' || c >= 'w' && c <= 'z')
+			else if ((c >= 'W' && c <= 'Z') || (c >= 'w' && c <= 'z'))
 				return boost::iostreams::put(dest, '7');
 			else if (c >= '0' && c <= '9')
 				return boost::iostreams::put(dest, c);

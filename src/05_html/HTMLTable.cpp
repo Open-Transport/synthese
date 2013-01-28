@@ -37,11 +37,12 @@ namespace synthese
 			std::string id
 		):	_id(id),
 			_cols(header.size()),
-			_className(className),
+			_section(UNKNOWN_SECTION),
 			_curCol(-1),
 			_curRow(-1),
-			_section(UNKNOWN_SECTION),
+			_className(className),
 			_rowOpen(false)
+			
 		{
 			if (header.empty())
 			{
@@ -88,11 +89,11 @@ namespace synthese
 			std::string className,
 			std::string id
 		):	_id(id),
-			_cols(cols)
-			, _className(className)
-			, _curCol(-1)
-			, _curRow(-1),
+			_cols(cols),
 			_section(UNKNOWN_SECTION),
+			_curCol(-1),
+			_curRow(-1),
+			_className(className),
 			_rowOpen(false)
 		{}
 
@@ -156,7 +157,7 @@ namespace synthese
 			size_t rowSpan
 		){
 			stringstream s;
-			if(_cols && (_curCol > _cols) || _curRow == -1 || !_rowOpen)
+			if((_cols && (_curCol > _cols)) || _curRow == -1 || !_rowOpen)
 			{
 				s << row();
 			}

@@ -72,12 +72,12 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 const std::string& urlPattern)
 
 : _realFrame (realFrame)
-, _selectedLines (selectedLines)
+, _neighborhood (0)
 , _preserveRatio (preserveRatio)
+, _lineGrouping (true)
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
-, _neighborhood (0)
-, _lineGrouping (true)
+, _selectedLines (selectedLines)
 
 {
    _width = width;
@@ -114,12 +114,12 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 const std::string& urlPattern)
 
 : _realFrame (0,0,0,0)
-, _selectedLines (selectedLines)
+, _neighborhood (neighborhood)
 , _preserveRatio (preserveRatio)
+, _lineGrouping (true)
 , _backgroundManager (backgroundManager)
 , _urlPattern (urlPattern)
-, _neighborhood (neighborhood)
-, _lineGrouping (true)
+, _selectedLines (selectedLines)
 {
 
    _width = width;
@@ -269,10 +269,6 @@ Map::findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
 {
 	// std::cerr << "*** findLinesSharingPoint " << drawableLines.size () << " x="
 	// 	<< point.x << " y=" << point.y << std::endl;
-	if (drawableLines.size () == 0) {
-		int a = 0;
-	}
-
     std::vector<DrawableLine*> sharingLines;
     const std::set<DrawableLine*>& sharingSelectedLines = _indexedLines.find (point);
 

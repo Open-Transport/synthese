@@ -254,8 +254,8 @@ namespace synthese
 		RSSFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	OneFileTypeImporter<RSSFileFormat>(env, dataSource),
-			Importer(env, dataSource)
+		):	Importer(env, dataSource),
+			OneFileTypeImporter<RSSFileFormat>(env, dataSource)
 		{}
 
 

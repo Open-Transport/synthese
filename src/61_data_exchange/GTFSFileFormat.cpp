@@ -169,8 +169,8 @@ namespace synthese
 		GTFSFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<GTFSFileFormat>(env, dataSource),
-			Importer(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<GTFSFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
 			_importStopArea(false),
 			_interactive(false),
@@ -1042,7 +1042,7 @@ namespace synthese
 
 				size_t nb_Points = lineStr->getNumPoints();
 
-				for( int i=0; i< nb_Points; i++)
+				for( size_t i=0; i< nb_Points; i++)
 				{
 					const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
 

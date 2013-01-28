@@ -43,8 +43,9 @@ namespace synthese
 	namespace resa
 	{
 		ReservationConfirmationEMailItemInterfacePage::ReservationConfirmationEMailItemInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, ReservationConfirmationEMailItemInterfacePage>(),
-			Registrable(0)
+			: Registrable(0),
+			  FactorableTemplate<interfaces::InterfacePage, ReservationConfirmationEMailItemInterfacePage>()
+			
 		{
 		}
 

@@ -39,9 +39,9 @@ namespace synthese
 	{
 		RoutePlanningIntermediateJourney::RoutePlanningIntermediateJourney(
 			PlanningPhase phase
-		):	_phase(phase),
-			_startApproachDuration(posix_time::minutes(0)),
+		):	_startApproachDuration(posix_time::minutes(0)),
 			_endApproachDuration(posix_time::minutes(0)),
+			_phase(phase),
 			_endReached(false),
 			_similarity(logic::indeterminate)
 		{
@@ -58,7 +58,6 @@ namespace synthese
 			bool similarity,
 			Score score
 		):	Journey(journey),
-			_phase(journey._phase),
 			_startApproachDuration(
 				journey._phase == DEPARTURE_TO_ARRIVAL ?
 				journey._startApproachDuration :
@@ -74,10 +73,11 @@ namespace synthese
 				):
 				journey._endApproachDuration
 			),
+			_phase(journey._phase),
 			_endReached(endIsReached),
 			_distanceToEnd(distanceToEnd),
-			_similarity(similarity),
-			_score(similarity ? 0 : score)
+			_score(similarity ? 0 : score),
+			_similarity(similarity)
 		{
 			if(journey._phase == DEPARTURE_TO_ARRIVAL)
 			{
@@ -95,13 +95,13 @@ namespace synthese
 			const RoutePlanningIntermediateJourney& journey1,
 			const RoutePlanningIntermediateJourney& journey2
 		):	Journey(journey1),
-			_phase(journey1._phase),
 			_startApproachDuration(journey1._startApproachDuration),
 			_endApproachDuration(journey2._endApproachDuration),
+			_phase(journey1._phase),
 			_endReached(journey2._endReached),
 			_distanceToEnd(journey2._distanceToEnd),
-			_similarity(journey1._similarity == false ? false : logic::indeterminate),
-			_score(journey2._score)
+			_score(journey2._score),
+			_similarity(journey1._similarity == false ? false : logic::indeterminate)
 		{
 			assert(journey1._phase == journey2._phase);
 
@@ -120,12 +120,12 @@ namespace synthese
 		RoutePlanningIntermediateJourney::RoutePlanningIntermediateJourney(
 			RoutePlanningIntermediateJourney& model,
 			PlanningPhase phase
-		):	_phase(phase),
-			_score(model._score),
-			_distanceToEnd(model._distanceToEnd),
-			_startApproachDuration(model._startApproachDuration),
+		):	_startApproachDuration(model._startApproachDuration),
 			_endApproachDuration(model._endApproachDuration),
+			_phase(phase),
 			_endReached(model._endReached),
+			_distanceToEnd(model._distanceToEnd),
+			_score(model._score),
 			_similarity(model._similarity)
 		{
 			append(model);

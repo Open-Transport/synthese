@@ -148,6 +148,9 @@ namespace synthese
 			case ROUTE_PLANNING_WITH_TRANSFER:
 				_screen->setRoutePlanningWithTransfer(true);
 				break;
+				
+			default:
+				break;
 			}
 
 			// Preselection delay

@@ -58,8 +58,8 @@ class ZipWriter {
 
         std::vector<FileInfo> files_;
 
+		std::ostream & stream_;
         uint32_t dir_len_;
-        std::ostream & stream_;
         void WriteLittleEndian32(uint32_t val);
         void WriteShort(uint16_t val);
         void WriteString(const std::string& str);

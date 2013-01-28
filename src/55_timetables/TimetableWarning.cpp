@@ -57,9 +57,9 @@ namespace synthese
 			size_t number,
 			const string& text,
 			const CalendarTemplate* calendarTemplate
-		):	_calendar(calendar),
-			_number(number),
-			_text(text),
+		):	_number(number),
+			_calendar(calendar),
+		  _text(text),
 			_calendarTemplate(calendarTemplate)
 		{}
 

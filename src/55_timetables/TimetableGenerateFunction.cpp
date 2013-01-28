@@ -155,8 +155,8 @@ namespace synthese
 
 		TimetableGenerateFunction::TimetableGenerateFunction():
 			FactorableTemplate<Function,TimetableGenerateFunction>(),
-			_timetableRank(0),
-			_warnings(new TimetableResult::Warnings)
+			_warnings(new TimetableResult::Warnings),
+			_timetableRank(0)
 		{
 			setEnv(shared_ptr<Env>(new Env));
 		}

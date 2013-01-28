@@ -45,8 +45,8 @@ namespace synthese
 		DeadRun::DeadRun(
 			RegistryKeyType id,
 			string number
-		):	SchedulesBasedService(number, NULL),
-			Registrable(id),
+		):	Registrable(id),
+			SchedulesBasedService(number, NULL),
 			_network(NULL)
 		{
 			setPath(this);

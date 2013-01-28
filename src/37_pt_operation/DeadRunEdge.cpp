@@ -42,8 +42,8 @@ namespace synthese
 	{
 		DeadRunEdge::DeadRunEdge(
 			RegistryKeyType id /*= 0*/
-		):	Edge(NULL, 0, NULL, 0),
-			Registrable(id)
+		):	Registrable(0),
+			Edge(NULL, 0, NULL, 0)
 		{}
 
 
@@ -51,8 +51,8 @@ namespace synthese
 		DeadRunEdge::DeadRunEdge(
 			DeadRun& parentPath,
 			Depot& depot
-		):	Edge(&parentPath, 0, &depot, 0),
-			Registrable(0)
+		):	Registrable(0),
+			Edge(&parentPath, 0, &depot, 0)
 		{}
 
 
@@ -60,8 +60,8 @@ namespace synthese
 		DeadRunEdge::DeadRunEdge(
 			DeadRun& parentPath,
 			StopPoint& stop
-		):	Edge(&parentPath, 0, &stop, 0),
-			Registrable(0)
+		):	Registrable(0),
+			Edge(&parentPath, 0, &stop, 0)
 		{}
 
 
@@ -70,8 +70,8 @@ namespace synthese
 			double length,
 			DeadRun& parentPath,
 			Depot& depot
-		):	Edge(&parentPath, 1, &depot, length),
-			Registrable(0)
+		):	Registrable(0),
+			Edge(&parentPath, 1, &depot, length)			
 		{}
 
 
@@ -80,8 +80,8 @@ namespace synthese
 			double length,
 			DeadRun& parentPath,
 			StopPoint& stop
-		):	Edge(&parentPath, 1, &stop, length),
-			Registrable(0)
+		):	Registrable(0),
+			Edge(&parentPath, 1, &stop, length)
 		{}
 
 

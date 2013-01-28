@@ -107,8 +107,8 @@ namespace synthese
 			const time_duration& rtSchedule(getDeparture ? _RTDepartureSchedules[edgeIndex] : _RTArrivalSchedules[edgeIndex]);
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
-			if(	getDeparture && presenceDateTime.time_of_day() > timeOfDay ||
-				!getDeparture && presenceDateTime.time_of_day() < timeOfDay
+			if(	(getDeparture && presenceDateTime.time_of_day() > timeOfDay) ||
+				(!getDeparture && presenceDateTime.time_of_day() < timeOfDay)
 			){
 				return ServicePointer();
 			}

@@ -144,8 +144,8 @@ namespace synthese
 		bool XMLReservationFunction::isAuthorized(const server::Session* session) const
 		{
 			return
-				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
-				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+				(session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE)) ||
+				(session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE));
 		}
 
 

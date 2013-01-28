@@ -572,7 +572,7 @@ namespace synthese
 
 				// Calendar filter
 				if(	!(_baseCalendar.hasAtLeastOneCommonDateWith(*service))
-					|| !_withContinuousServices && service->isContinuous()
+					|| (!_withContinuousServices && service->isContinuous())
 				)	continue;
 
 				// Column creation

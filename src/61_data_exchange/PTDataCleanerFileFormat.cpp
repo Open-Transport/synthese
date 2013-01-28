@@ -335,7 +335,6 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_addRemoveQueries( db::DBTransaction& transaction ) const
 		{
-			DB& db(*DBModule::GetDB());
 
 			// Vehicle services
 			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)

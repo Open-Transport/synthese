@@ -164,8 +164,8 @@ namespace synthese
 		HastusCSVFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<HastusCSVFileFormat>(env, dataSource),
-			Importer(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<HastusCSVFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
 			_importStopArea(false),
 			_interactive(false),

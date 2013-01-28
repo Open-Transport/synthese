@@ -483,9 +483,6 @@ namespace synthese
 						{
 							continue;
 						}
-						CommercialLine* line(
-							static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine()
-						);
 						{
 							result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
 						}

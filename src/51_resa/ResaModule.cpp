@@ -287,6 +287,8 @@ namespace synthese
 			case NO_SHOW: return "user_cross.png";
 			case SHOULD_BE_DONE: return "tick.png";
 			case DONE: return "tick.png";
+			default:
+				break;
 			}
 			return string();
 		}
@@ -310,6 +312,8 @@ namespace synthese
 			case NO_SHOW: return "absence";
 			case SHOULD_BE_DONE: return "prévu terminé";
 			case DONE: return "terminé";
+			default:
+				break;
 			}
 			return string();
 		}

@@ -46,8 +46,8 @@ namespace synthese
 	namespace departure_boards
 	{
 		DeparturesTableRoutePlanningRowKeyInterfacePage::DeparturesTableRoutePlanningRowKeyInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, DeparturesTableRoutePlanningRowKeyInterfacePage>(),
-			Registrable(0)
+			: Registrable(0),
+			  FactorableTemplate<interfaces::InterfacePage, DeparturesTableRoutePlanningRowKeyInterfacePage>()
 		{
 		}
 

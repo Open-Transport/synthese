@@ -135,11 +135,6 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   add_definitions(-D_DEBUG)
 endif()
 
-# gcc warning settings
-if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  add_definitions(-Wall -Wextra -Wno-unused-parameter)
-endif ()
-
 # Version info.
 
 set(SYNTHESE_VERSION_INFO "${SYNTHESE_VERSION}")

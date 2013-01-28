@@ -80,16 +80,16 @@ namespace synthese
 			_maxEndTime(maxEndTime),
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
+			_journeyTemplates(journeyTemplates),
+			_vmax(vmax),
+			_ignoreReservation(ignoreReservation),
+			_maxTransferDuration(maxTransferDuration),
 			_logger(logger),
 			_totalDistance(
 				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
 				int(destinationVam.getCentroid()->distance(originVam.getCentroid().get())) :
 				numeric_limits<int>::max()
-			),
-			_journeyTemplates(journeyTemplates),
-			_vmax(vmax),
-			_ignoreReservation(ignoreReservation),
-			_maxTransferDuration(maxTransferDuration)
+			)
 		{
 		}
 

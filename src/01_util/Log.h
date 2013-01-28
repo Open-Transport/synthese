@@ -117,6 +117,7 @@ namespace synthese
 			static const std::string LOG_PREFIX_WARN;
 			static const std::string LOG_PREFIX_ERROR;
 			static const std::string LOG_PREFIX_FATAL;
+			static const std::string LOG_PREFIX_NONE;
 
 			void append(
 				Log::Level level,
