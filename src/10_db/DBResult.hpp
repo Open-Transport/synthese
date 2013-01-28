@@ -66,7 +66,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Same as getColumnIndex(), but throws a DBException exception if the column doesn't exist.
 			/// @author Sylvain Pasche
-			int _getColumnIndexInternal(const std::string& columnName) const;
+			unsigned int _getColumnIndexInternal(const std::string& columnName) const;
 
 		protected:
 

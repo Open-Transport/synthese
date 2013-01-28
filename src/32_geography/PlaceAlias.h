@@ -29,7 +29,9 @@
 #include "Registry.h"
 #include "NamedPlaceTemplate.h"
 
+#ifdef _MSC_VER
 #pragma warning( disable : 4250 )
+#endif
 
 namespace synthese
 {

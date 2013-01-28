@@ -75,10 +75,10 @@ namespace synthese
 			_dataSource(NULL),
 			_minDate(not_a_date_time),
 			_date(not_a_date_time),
-			_minWorkDuration(not_a_date_time),
-			_maxWorkDuration(not_a_date_time),
 			_minWorkRange(not_a_date_time),
 			_maxWorkRange(not_a_date_time),
+			_minWorkDuration(not_a_date_time),
+			_maxWorkDuration(not_a_date_time),
 			_lineFilter(NULL),
 			_minHourFilter(not_a_date_time),
 			_maxHourFilter(not_a_date_time),
@@ -186,7 +186,6 @@ namespace synthese
 		) const {
 
 			ParametersMap map;
-			size_t rank(0);
 			typedef std::set<std::pair<date, const DriverAllocationTemplate*> > Result;
 			Result result;
 

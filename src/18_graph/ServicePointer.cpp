@@ -43,15 +43,15 @@ namespace synthese
 			size_t userClassRank,
 			const Service& service,
 			const boost::posix_time::ptime& originDateTime
-		):	_RTData(RTData),
-			_service(&service),
-			_range(posix_time::seconds(0)),
-			_departureEdge(NULL),
+		):	_departureEdge(NULL),
 			_realTimeDepartureVertex(NULL),
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_userClassRank(userClassRank),
+			_RTData(RTData),
+			_service(&service),
 			_originDateTime(originDateTime),
+			_range(posix_time::seconds(0)),
 			_canceled(false)
 		{}
 
@@ -64,15 +64,15 @@ namespace synthese
 			const gregorian::date& date,
 			const Edge& departureEdge,
 			const Edge& arrivalEdge
-		):	_RTData(RTData),
-			_service(&service),
-			_range(posix_time::seconds(0)),
-			_departureEdge(NULL),
+		):	_departureEdge(NULL),
 			_realTimeDepartureVertex(NULL),
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_userClassRank(userClassRank),
+			_RTData(RTData),
+			_service(&service),
 			_originDateTime(ptime(date, service.getDepartureSchedule(RTData, 0))),
+			_range(posix_time::seconds(0)),
 			_canceled(false)
 		{
 			AccessParameters ap(userClassRank+ USER_CLASS_CODE_OFFSET);
@@ -83,14 +83,14 @@ namespace synthese
 
 
 		ServicePointer::ServicePointer():
-			_RTData(false),
-			_service(NULL),
 			_departureEdge(NULL),
 			_realTimeDepartureVertex(NULL),
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
-			_range(posix_time::seconds(0)),
 			_userClassRank(0),
+			_RTData(false),
+			_service(NULL),
+			_range(posix_time::seconds(0)),
 			_canceled(false)
 		{}
 
@@ -100,13 +100,13 @@ namespace synthese
 			const ServicePointer& partiallyFilledPointer,
 			const Edge& edge,
 			const AccessParameters& accessParameters
-		):	_RTData(partiallyFilledPointer._RTData),
-			_service(partiallyFilledPointer._service),
-			_range(partiallyFilledPointer._range),
-			_userClassRank(partiallyFilledPointer._userClassRank),
-			_originDateTime(partiallyFilledPointer._originDateTime),
-			_departureEdge(NULL),
+		):	_departureEdge(NULL),
 			_arrivalEdge(NULL),
+			_userClassRank(partiallyFilledPointer._userClassRank),
+			_RTData(partiallyFilledPointer._RTData),
+			_service(partiallyFilledPointer._service),
+			_originDateTime(partiallyFilledPointer._originDateTime),
+			_range(partiallyFilledPointer._range),
 			_canceled(false)
 		{
 			assert(!_departureEdge || !_arrivalEdge);

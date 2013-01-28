@@ -324,7 +324,6 @@ namespace synthese
 					string leftId(rows->getText(NavstreetsFileFormat::_FIELD_REF_IN_ID));
 					string rightId(rows->getText(NavstreetsFileFormat::_FIELD_NREF_IN_ID));
 					int lAreaId(rows->getInt(NavstreetsFileFormat::_FIELD_L_AREA_ID));
-					int rAreaId(rows->getInt(NavstreetsFileFormat::_FIELD_R_AREA_ID));
 					string leftRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_REFADDR));
 					string leftNRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_NREFADDR));
 					string rightRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_REFADDR));

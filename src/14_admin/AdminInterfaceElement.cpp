@@ -227,7 +227,7 @@ namespace synthese
 			BOOST_FOREACH(const Tab& tab, _tabs)
 			{
 				stream << "<span id=\"tab_" << tab.getId() << "\"";
-				if(_activeTab.empty() && first || tab.getId() == _activeTab)
+				if((_activeTab.empty() && first) || tab.getId() == _activeTab)
 				{
 					stream << " class=\"active_tab\"";
 				}
@@ -290,7 +290,7 @@ namespace synthese
 			}
 
 			stream << "<div class=\"tabdiv";
-			if (_activeTab.empty() && first || _activeTab == _currentTab->getId())
+			if ((_activeTab.empty() && first) || _activeTab == _currentTab->getId())
 			{
 				stream << " active_tab_content";
 			}

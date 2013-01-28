@@ -90,8 +90,8 @@ namespace synthese
 			}
 
 			ptime originDateTime(presenceDateTime - duration);
-			if(	!getDeparture && !inverted ||
-				getDeparture && inverted
+			if(	(!getDeparture && !inverted) ||
+				(getDeparture && inverted)
 			){
 				originDateTime -= range;
 			}

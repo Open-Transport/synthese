@@ -117,7 +117,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 
 	int firstStopIndex = -1;
 	// find first stop index
-	for (int i=0; i<points->getCoordinatesRO()->getSize();++i)
+	for (size_t i=0; i<points->getCoordinatesRO()->getSize();++i)
 	{
 //	    const StopPoint* stop = dynamic_cast<const StopPoint*> (points[i]);
 //	    if (stop == 0) continue;
@@ -135,7 +135,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 	    int secondStopIndex = -1;
 
 
-	    for (int i=firstStopIndex+1; i<points->getCoordinatesRO()->getSize(); ++i)
+	    for (size_t i=firstStopIndex+1; i<points->getCoordinatesRO()->getSize(); ++i)
 	    {
 //		const StopPoint* stop = dynamic_cast<const StopPoint*> (points[i]);
 //		if (stop == 0) continue;

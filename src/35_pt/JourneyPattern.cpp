@@ -63,9 +63,9 @@ namespace synthese
 			Path(),
 			Named(name),
 			Calendar(),
+			_directionObj(NULL),
 			_isWalkingLine (false),
 			_wayBack(false),
-			_directionObj(NULL),
 			_main(false),
 			_plannedLength(0)
 		{}
@@ -291,9 +291,10 @@ namespace synthese
 			{
 				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
 				if( stop._stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop._stop.end() ||
-					(rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure || edge->isArrival() != stop._arrival)) ||
-					(stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()) ||
-					stop._metricOffset && stop._metricOffset != edge->getMetricOffset()
+					(((rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure)) || edge->isArrival() != stop._arrival)) ||
+					((stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) &&
+					  *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())) ||
+					(stop._metricOffset && stop._metricOffset) != edge->getMetricOffset()
 				){
 					return false;
 				}
@@ -429,8 +430,9 @@ namespace synthese
 				}
 
 				if( (rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure || edge->isArrival() != stop._arrival)) ||
-					(stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()) ||
-					stop._metricOffset && stop._metricOffset != edge->getMetricOffset()
+					((stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) &&
+					  *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())) ||
+					(stop._metricOffset && stop._metricOffset != edge->getMetricOffset())
 				){
 					return false;
 				}
@@ -449,8 +451,8 @@ namespace synthese
 			bool arrival /*= true */,
 			boost::optional<bool> withTimes,
 			boost::shared_ptr<geos::geom::LineString> geometry
-		):	_stop(stop),
-			_metricOffset(metricOffset),
+		):	_metricOffset(metricOffset),
+			_stop(stop),
 			_departure(departure),
 			_arrival(arrival),
 			_withTimes(withTimes),

@@ -115,8 +115,8 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<IGNstreetsFileFormat>(env, dataSource),
-					impex::Importer(env, dataSource),
+				):	impex::Importer(env, dataSource),
+					impex::MultipleFileTypesImporter<IGNstreetsFileFormat>(env, dataSource),
 					_displayStats(false),
 					_maxHouseDistance(200)
 				{}

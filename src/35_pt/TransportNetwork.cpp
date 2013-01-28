@@ -45,8 +45,8 @@ namespace synthese
 		TransportNetwork::TransportNetwork(
 			util::RegistryKeyType id,
 			std::string name
-		):	graph::PathClass(),
-			util::Registrable(id),
+		):	util::Registrable(id),
+			graph::PathClass(),
 			Named(name),
 			_daysCalendarsParent(NULL),
 			_periodsCalendarsParent(NULL)

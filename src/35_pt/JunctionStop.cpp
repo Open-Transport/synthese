@@ -41,8 +41,8 @@ namespace synthese
 		JunctionStop::JunctionStop(
 			Junction* parentPath /*= NULL*/,
 			StopPoint* fromVertex /*= NULL*/
-		):	Edge(parentPath, 0, fromVertex, 0),
-			Registrable(0)
+		):	Registrable(0),
+			Edge(parentPath, 0, fromVertex, 0)
 		{
 
 		}
@@ -53,8 +53,8 @@ namespace synthese
 			double length,
 			Junction* parentPath,
 			StopPoint* fromVertex
-		):	Edge(parentPath, 1, fromVertex, length),
-			Registrable(0)
+		):	Registrable(0),
+			Edge(parentPath, 1, fromVertex, length)
 		{
 		}
 

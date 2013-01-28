@@ -456,7 +456,7 @@ void
 DrawableLine::fuzzyfyPoints (const DrawableLineIndex& lineIndex)
 {
 	_fuzzyfiedPoints.clear ();
-	for (int i=0; i<_geometry->getCoordinatesRO()->getSize(); ++i) {
+	for (size_t i=0; i<_geometry->getCoordinatesRO()->getSize(); ++i) {
 		_fuzzyfiedPoints.push_back (lineIndex.getFuzzyPoint(_geometry->getCoordinatesRO()->getAt(i)));
 		// _fuzzyfiedPoints.push_back (*(_points[i]));
 	}
@@ -607,7 +607,6 @@ DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Coordinate>& poi
 		const Coordinate& p_i_plus_1 = points[i+1];
 		const Coordinate& p_i_plus_2 = points[i+2];
 
-		double distance =  _shifts[i+1] * spacing;
 		shiftedPoints.push_back ( calculateSingleShiftedPoint (
 					p_i,
 					p_i_plus_1,
@@ -635,8 +634,6 @@ void
 DrawableLine::prepare (Map& map, double spacing, PointShiftingMode shiftMode) const
 {
     std::vector<Coordinate> points;
-
-	const DrawableLineIndex& lineIndex = map.getLineIndex ();
 
 	Coordinate previousPoint (-1, -1);
     // Convert coordinates to output frame

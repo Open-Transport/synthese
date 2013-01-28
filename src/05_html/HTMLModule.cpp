@@ -195,7 +195,7 @@ namespace synthese
 				encodingTable['"'] = "&quot;";
 			}
 			stringstream s;
-			BOOST_FOREACH(char c, value)
+			BOOST_FOREACH(unsigned char c, value)
 			{
 				if(c >= 128)
 				{

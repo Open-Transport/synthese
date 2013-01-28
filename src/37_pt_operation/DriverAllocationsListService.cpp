@@ -188,7 +188,6 @@ namespace synthese
 		) const {
 
 			ParametersMap map;
-			size_t rank(0);
 
 			DriverAllocationTableSync::SearchResult allocations(
 				DriverAllocationTableSync::Search(

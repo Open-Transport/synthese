@@ -32,7 +32,9 @@
 #include <geos/geom/Envelope.h>
 #include <geos/geom/Point.h>
 
+#ifdef _MSC_VER
 #pragma warning( disable : 4250 )
+#endif
 
 namespace synthese
 {

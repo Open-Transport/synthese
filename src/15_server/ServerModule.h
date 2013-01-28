@@ -102,8 +102,7 @@ namespace synthese
 					THREAD_WAITING,
 					THREAD_ANALYSING_REQUEST,
 					THREAD_RUNNING_ACTION,
-					THREAD_RUNNING_FUNCTION,
-					THREAD_OTHER
+					THREAD_RUNNING_FUNCTION
 				} Status;
 
 				class Exception : public std::exception

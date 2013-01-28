@@ -324,16 +324,6 @@ namespace synthese
 			const Request& request
 		) const {
 
-			// Rights
-			bool globalReadRight(
-				// _request.isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
-				true
-			);
-			bool globalDeleteRight(
-				// _request.isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
-				true
-			);
-
 			// Local variables
 			ptime now(second_clock::local_time());
 
@@ -550,8 +540,8 @@ namespace synthese
 										service->getPath()->getKey()
 									)->findEdgeByVertex(itStop.second)
 								);
-								if( _minDepartureRank && edge.getRankInPath() < *_minDepartureRank ||
-									_maxDepartureRank && edge.getRankInPath() > *_maxDepartureRank
+								if( (_minDepartureRank && edge.getRankInPath() < *_minDepartureRank) ||
+									(_maxDepartureRank && edge.getRankInPath() > *_maxDepartureRank)
 								){
 									result = false;
 									break;
@@ -586,8 +576,8 @@ namespace synthese
 								const Edge& edge(
 									Env::GetOfficialEnv().get<JourneyPattern>(service->getPath()->getKey())->findEdgeByVertex(itStop.second)
 								);
-								if( _minArrivalRank && edge.getRankInPath() < *_minArrivalRank ||
-									_maxArrivalRank && edge.getRankInPath() > *_maxArrivalRank
+								if( (_minArrivalRank && edge.getRankInPath() < *_minArrivalRank) ||
+									(_maxArrivalRank && edge.getRankInPath() > *_maxArrivalRank)
 								){
 									result = false;
 									break;

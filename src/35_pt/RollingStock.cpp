@@ -49,8 +49,8 @@ namespace synthese
 
 		RollingStock::RollingStock(
 			util::RegistryKeyType key
-		):	graph::PathClass(),
-			util::Registrable(key),
+		):	util::Registrable(key),
+			graph::PathClass(),
 			_CO2Emissions(0),
 			_energyConsumption(0),
 			_isTridentKeyReference(false)

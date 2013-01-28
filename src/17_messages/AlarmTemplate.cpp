@@ -40,15 +40,17 @@ namespace synthese
 		AlarmTemplate::AlarmTemplate(
 			util::RegistryKeyType key,
 			const ScenarioTemplate* scenario
-		):	Alarm(key,scenario),
-			Registrable(key)
+		):	Registrable(key),
+			Alarm(key,scenario)
+			
 		{
 
 		}
 
 		AlarmTemplate::AlarmTemplate( const AlarmTemplate& source)
-		:	Alarm(source),
-			Registrable(0)
+		: Registrable(0),
+		  Alarm(source)
+			
 		{
 
 		}
@@ -56,8 +58,8 @@ namespace synthese
 		AlarmTemplate::AlarmTemplate(
 			const ScenarioTemplate& scenario,
 			const AlarmTemplate& source
-		):	Alarm(source, &scenario),
-			Registrable(0)
+		):	Registrable(0),
+			Alarm(source, &scenario)
 		{
 
 		}

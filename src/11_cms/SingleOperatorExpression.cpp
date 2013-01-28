@@ -73,6 +73,8 @@ namespace synthese
 
 					case NEG:
 						return lexical_cast<string>(-valueDbl);
+					default:
+						break;
 					}
 				}
 				catch(bad_lexical_cast&)

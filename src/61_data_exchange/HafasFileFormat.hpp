@@ -294,9 +294,9 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<HafasFileFormat>(env, dataSource),
+				):	impex::Importer(env, dataSource),
+					impex::MultipleFileTypesImporter<HafasFileFormat>(env, dataSource),
 					PTDataCleanerFileFormat(env, dataSource),
-					impex::Importer(env, dataSource),
 					_showStopsOnly(false),
 					_wayBackBitPosition(0),
 					_importFullServices(false),

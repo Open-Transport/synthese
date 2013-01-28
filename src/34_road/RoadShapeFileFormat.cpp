@@ -250,7 +250,6 @@ namespace synthese
 						os << "ERR : Empty geometry in the " << code << " road chunk.<br />";
 						continue;
 					}
-					double length(geometry->getLength());
 
 					// Start node
 					string startNodeCode(rows->getText(_roadChunksStartNodeField));

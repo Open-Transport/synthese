@@ -286,14 +286,14 @@ namespace synthese
 			const Request& request,
 			boost::shared_ptr<Action> action,
 			boost::shared_ptr<Function> function
-		):	_session(NULL),
-			_actionWillCreateObject(false),
-			_redirectAfterAction(request._redirectAfterAction),
+		):	_action(action),
+			_function(function),
+			_session(NULL),
+			_ip(request._ip),
 			_clientURL(request._clientURL),
 			_hostName(request._hostName),
-			_ip(request._ip),
-			_action(action),
-			_function(function)
+			_actionWillCreateObject(false),
+			_redirectAfterAction(request._redirectAfterAction)
 		{
 			setSession(request._session);
 		}

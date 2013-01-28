@@ -1021,8 +1021,8 @@ namespace synthese
 
 
 		PegaseFileFormat::Importer_::Importer_(util::Env& env, const impex::DataSource& dataSource):
-			OneFileTypeImporter<PegaseFileFormat>(env, dataSource),
 			Importer(env, dataSource),
+			OneFileTypeImporter<PegaseFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
 			_stopPoints(_dataSource, env),
 			_lines(_dataSource, env)

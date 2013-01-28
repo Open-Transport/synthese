@@ -97,7 +97,10 @@ namespace synthese
 			if (registry.contains(parameterKey) && registry.contains(perimeterKey)
 			){
 				const Profile* currentProfile(registry.get(parameterKey).get());
-				for(const Profile* includedProfile(registry.get(perimeterKey).get()); includedProfile; includedProfile = includedProfile = includedProfile->getParent())
+				for(const Profile* includedProfile(registry.get(perimeterKey).get());
+					includedProfile;
+					includedProfile = includedProfile->getParent()
+				)
 				{
 					if (currentProfile == includedProfile)
 					{

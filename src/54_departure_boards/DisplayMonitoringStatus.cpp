@@ -51,6 +51,9 @@ namespace synthese
 		DisplayMonitoringStatus::DisplayMonitoringStatus(
 			util::RegistryKeyType id
 		):	Registrable(id),
+			_displayScreen(NULL),
+			_cpu(NULL),
+			_time(second_clock::local_time()),
 			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
 			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
 			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
@@ -61,10 +64,7 @@ namespace synthese
 			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
 			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_displayScreen(NULL),
-			_cpu(NULL),
-			_time(second_clock::local_time())
+			_localizationStatus(DISPLAY_MONITORING_UNKNOWN)
 		{
 
 		}
@@ -75,6 +75,9 @@ namespace synthese
 			const std::string& monitoringInterfaceReturn,
 			const DisplayScreen* screen
 		):	Registrable(0),
+			_displayScreen(screen),
+			_cpu(NULL),
+			_time(second_clock::local_time()),
 			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
 			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
 			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
@@ -85,10 +88,7 @@ namespace synthese
 			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
 			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_displayScreen(screen),
-			_cpu(NULL),
-			_time(second_clock::local_time())
+			_localizationStatus(DISPLAY_MONITORING_UNKNOWN)
 		{
 			typedef tokenizer<char_separator<char> > tokenizer;
 			char_separator<char> sep1 ("|","",keep_empty_tokens);
@@ -207,6 +207,9 @@ namespace synthese
 		DisplayMonitoringStatus::DisplayMonitoringStatus(
 			const DisplayScreenCPU* cpu
 		):	Registrable(0),
+			_displayScreen(NULL),
+			_cpu(cpu),
+			_time(second_clock::local_time()),
 			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
 			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
 			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
@@ -217,10 +220,7 @@ namespace synthese
 			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
 			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
-			_cpu(cpu),
-			_displayScreen(NULL),
-			_time(second_clock::local_time())
+			_localizationStatus(DISPLAY_MONITORING_UNKNOWN)
 		{
 		}
 

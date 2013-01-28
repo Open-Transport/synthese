@@ -136,8 +136,8 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<HeuresFileFormat>(env, dataSource),
-					impex::Importer(env, dataSource),
+				):	impex::Importer(env, dataSource),
+					impex::MultipleFileTypesImporter<HeuresFileFormat>(env, dataSource),
 					PTDataCleanerFileFormat(env, dataSource)
 				{}
 

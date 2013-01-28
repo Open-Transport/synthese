@@ -59,8 +59,8 @@ namespace synthese
 	namespace resa
 	{
 		ReservationEditInterfacePage::ReservationEditInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, ReservationEditInterfacePage>(),
-			Registrable(0)
+			: Registrable(0),
+			  FactorableTemplate<interfaces::InterfacePage, ReservationEditInterfacePage>()
 		{
 		}
 
@@ -80,7 +80,8 @@ namespace synthese
 				request->getUser() &&
 				request->getUser()->getProfile() &&
 				(	request->getUser()->getProfile()->isAuthorized<ResaRight>(READ) ||
-					request->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, READ) && resa.getCustomerUserId() == request->getUser()->getKey()
+					(request->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, READ) &&
+					 resa.getCustomerUserId() == request->getUser()->getKey())
 			)	){
 
 				stringstream s;

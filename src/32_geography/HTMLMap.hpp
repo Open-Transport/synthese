@@ -136,7 +136,7 @@ namespace synthese
 				std::string getInitializationString(const std::string& layerName) const;
 
 				const std::string& getName() const { return _name; }
-				const bool getActivated() const { return _activated; }
+				bool getActivated() const { return _activated; }
 			};
 
 			typedef std::vector<Control> Controls;

@@ -98,7 +98,6 @@ namespace synthese
 			const string SYNTHESE_PING_SERVICE_ID("5001");
 			const string SYNTHESE_PING_SERVICE_NAME("'Ping'");
 			const string DUMMY_CONTACT_ID("9999999");
-			const size_t MAX_PROFILES(99999);
 
 			stream << "BEGIN;" << endl;
 

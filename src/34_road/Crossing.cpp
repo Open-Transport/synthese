@@ -54,9 +54,9 @@ namespace synthese
 			std::string codeBySource,
 			const impex::DataSource* source,
 			bool withIndexation
-		):	Hub(),
-			Vertex(this, geometry, withIndexation),
-			Registrable(key)
+		):	Registrable(key),
+			Hub(),
+			Vertex(this, geometry, withIndexation)
 		{
 			// Data source
 			if(source)

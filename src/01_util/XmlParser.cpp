@@ -72,7 +72,7 @@ char *_tcscpy(char *c1, const char *c2) { return (char*)strcpy(c1,c2); }
 inline int mmin( const int t1, const int t2 ) { return t1 < t2 ? t1 : t2; }
 
 // Enumeration used to decipher what type a token is
-typedef enum TokenTypeTag
+typedef enum
 {
     eTokenText = 0,
     eTokenQuotedText,
@@ -84,7 +84,7 @@ typedef enum TokenTypeTag
     eTokenShortHandClose,   /* "/>"           */
     eTokenClear,
     eTokenError
-};
+} TokenTypeTag;
 
 #define INDENTCHAR    _T('\t')
 
@@ -323,7 +323,7 @@ static TCHAR FindNonWhiteSpace(XML *pXML)
 
 // Find the next token in a string.
 // pcbToken contains the number of characters that have been read.
-static NextToken GetNextToken(XML *pXML, int *pcbToken, enum TokenTypeTag *pType)
+static NextToken GetNextToken(XML *pXML, int *pcbToken, TokenTypeTag *pType)
 {
     NextToken        result;
     LPCTSTR          lpXML;
@@ -746,7 +746,7 @@ int XMLNode::ParseXMLElement(void *pa)
 {
     XML *pXML=(XML *)pa;
     int cbToken;
-    enum TokenTypeTag type;
+    TokenTypeTag type;
     NextToken token;
     LPCTSTR lpszTemp;
     int cbTemp;

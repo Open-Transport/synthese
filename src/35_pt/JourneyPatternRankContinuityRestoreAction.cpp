@@ -103,7 +103,6 @@ namespace synthese
 					FIELDS_ONLY_LOAD_LEVEL
 			)	);
 			size_t rank(0);
-			bool ok(true);
 			DBTransaction transaction;
 			BOOST_FOREACH(const shared_ptr<LineStop>& lineStop, lineStops)
 			{

@@ -104,7 +104,7 @@ namespace synthese
 			// Service
 			try
 			{
-				Session* session(Session::Get(_sessionIdToCheck, request.getIP()));
+				Session::Get(_sessionIdToCheck, request.getIP());
 			}
 			catch(SessionException)
 			{

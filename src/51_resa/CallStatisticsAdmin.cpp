@@ -69,7 +69,6 @@ namespace synthese
 
 		CallStatisticsAdmin::CallStatisticsAdmin():
 			AdminInterfaceElementTemplate<CallStatisticsAdmin>(),
-			_searchStep(CallStatisticsTableSync::MONTH_STEP),
 			_searchPeriod(
 				gregorian::date(
 					gregorian::day_clock::local_day().month() == 1 ?
@@ -85,7 +84,8 @@ namespace synthese
 					gregorian::day_clock::local_day().month(),
 					1
 				)
-			)
+			),
+			_searchStep(CallStatisticsTableSync::MONTH_STEP)
 		{
 		}
 

@@ -48,8 +48,8 @@ namespace synthese
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
-			int value(lexical_cast<int>(_rank->getValue(parameters, variables, object, request)));
-			if (value >= parameters.size() || value < 0)
+			unsigned int value(lexical_cast<unsigned int>(_rank->getValue(parameters, variables, object, request)));
+			if (value >= parameters.size())
 				Log::GetInstance().warn("Invalid parameter rank in interface module");
 			else
 				stream << parameters[value];

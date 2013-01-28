@@ -144,7 +144,6 @@ namespace synthese
 		) const {
 
 			ParametersMap map;
-			size_t rank(0);
 			typedef set<pair<time_duration, const DriverService*> > Result;
 			Result r;
 			BOOST_FOREACH(const DriverService::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<DriverService>())

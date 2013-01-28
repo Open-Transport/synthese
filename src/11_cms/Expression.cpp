@@ -309,6 +309,9 @@ namespace synthese
 					str->push_back(*it);
 					++it;
 					break;
+					
+				case TERMINATED:
+					break;
 				}
 
 				// Handling last terminated item

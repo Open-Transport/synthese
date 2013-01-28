@@ -108,8 +108,8 @@ namespace synthese
 		IneoOperationFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<IneoOperationFileFormat>(env, dataSource),
-			Importer(env, dataSource),
+		):	Importer(env, dataSource),
+			MultipleFileTypesImporter<IneoOperationFileFormat>(env, dataSource),
 			_startDate(not_a_date_time),
 			_endDate(not_a_date_time),
 			_activities(_dataSource, _env),

@@ -119,8 +119,8 @@ namespace synthese
 
 				if(	result == _value.end() ||
 					itCal->second->getCategory() < result->second->getCategory() ||
-					itCal->second->getCategory() == result->second->getCategory() &&
-					itCal->second->getName().size() < result->second->getName().size()
+					(itCal->second->getCategory() == result->second->getCategory() &&
+					 itCal->second->getName().size() < result->second->getName().size())
 				){
 					result = itCal;
 				}
@@ -176,7 +176,6 @@ namespace synthese
 			if(result != _value.end())
 			{
 				stringstream strresult;
-				bool first(true);
 				strresult << result->second->getName();
 				if(bestAddings.size())
 				{

@@ -74,11 +74,11 @@ namespace synthese
 
 
 		RealTimeVehicleUpdateAction::RealTimeVehicleUpdateAction():
+			_service(NULL),
+			_lineStopRank(0),
 			_lateDuration(not_a_date_time),
 			_departureTime(not_a_date_time),
-			_arrivalTime(not_a_date_time),
-			_lineStopRank(0),
-			_service(NULL)
+			_arrivalTime(not_a_date_time)
 		{}
 
 

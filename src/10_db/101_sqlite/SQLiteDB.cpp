@@ -223,7 +223,7 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock lock(_updateMutex);
 #endif
 
-			SQLiteTSS* tss = _initSQLiteTSS();
+			_initSQLiteTSS();
 
 			int retc = sqlite3_exec(_getHandle(), "BEGIN TRANSACTION;", 0, 0, 0);
 
@@ -276,7 +276,7 @@ namespace synthese
 			// statement which is impossible to validate wihtout executing them one by one, given one database state)
 			assert(sql.size() > 0);
 
-			SQLiteTSS* tss = _initSQLiteTSS();
+			_initSQLiteTSS();
 
 			RequestExecutor rx(*this);
 			rx(sql);
@@ -625,7 +625,7 @@ namespace synthese
 			// an update can still be called inside hook callback.
 			boost::recursive_mutex::scoped_lock lock(_updateMutex);
 #endif
-			SQLiteTSS* tss = _initSQLiteTSS();
+			_initSQLiteTSS();
 
 			RequestExecutor rx(*this);
 			rx(record);
