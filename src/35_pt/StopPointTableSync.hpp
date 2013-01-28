@@ -112,7 +112,7 @@ namespace synthese
 			@param limit Number of results to answer. The size of the vector is less
 			or equal to number
 			@return Found stopoints (object id and name).
-			@author Gaël Sauvanet
+			@author Gael Sauvanet
 			@date 2012
 			*/
 			db::RowsList SearchForAutoComplete(
