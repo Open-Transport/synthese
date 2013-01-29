@@ -138,10 +138,14 @@ namespace synthese
 					static const std::string SEP_MAIN;
 					static const std::string SEP_FIELD;
 					static const std::string JOCKER;
+					static const std::string VALUE_LINES_BY_STOPS_PAIRS;
 					
 					boost::shared_ptr<pt::TransportNetwork> network;
 					boost::optional<size_t> lineNumberStart;
 					boost::optional<size_t> lineNumberEnd;
+					bool linesByStopsPair;
+
+					LineFilter();
 				};
 				typedef std::map<std::string, LineFilter> LinesFilter;
 
