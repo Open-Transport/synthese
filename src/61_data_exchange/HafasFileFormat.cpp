@@ -121,9 +121,16 @@ namespace synthese
 
 	namespace data_exchange
 	{
-		const std::string HafasFileFormat::Importer_::LineFilter::SEP_MAIN = ",";
-		const std::string HafasFileFormat::Importer_::LineFilter::SEP_FIELD = ":";
-		const std::string HafasFileFormat::Importer_::LineFilter::JOCKER = "*";
+		const string HafasFileFormat::Importer_::LineFilter::SEP_MAIN = ",";
+		const string HafasFileFormat::Importer_::LineFilter::SEP_FIELD = ":";
+		const string HafasFileFormat::Importer_::LineFilter::JOCKER = "*";
+		const string HafasFileFormat::Importer_::LineFilter::VALUE_LINES_BY_STOPS_PAIRS = "SP";
+
+
+
+		HafasFileFormat::Importer_::LineFilter::LineFilter():
+			linesByStopsPair(false)
+		{}
 
 
 
@@ -164,27 +171,35 @@ namespace synthese
 					}
 				}
 
-				// Line number start
-				if(items.size() > 2 && !items[1].empty())
+				// Lines by stops pairs
+				if(items.size() > 2 && items[2]==LineFilter::VALUE_LINES_BY_STOPS_PAIRS)
 				{
-					try
-					{
-						lineFilter.lineNumberStart = lexical_cast<size_t>(items[2]);
-					}
-					catch(bad_lexical_cast&)
-					{
-					}
+					lineFilter.linesByStopsPair = true;
 				}
-
-				// Line number end
-				if(items.size() > 3 && !items[2].empty())
+				else // Lines by service number pattern matching
 				{
-					try
+					// Line number start
+					if(items.size() > 2 && !items[1].empty())
 					{
-						lineFilter.lineNumberEnd = lexical_cast<size_t>(items[3]);
+						try
+						{
+							lineFilter.lineNumberStart = lexical_cast<size_t>(items[2]);
+						}
+						catch(bad_lexical_cast&)
+						{
+						}
 					}
-					catch(bad_lexical_cast&)
+
+					// Line number end
+					if(items.size() > 3 && !items[2].empty())
 					{
+						try
+						{
+							lineFilter.lineNumberEnd = lexical_cast<size_t>(items[3]);
+						}
+						catch(bad_lexical_cast&)
+						{
+						}
 					}
 				}
 
@@ -226,17 +241,25 @@ namespace synthese
 				}
 				s << LineFilter::SEP_FIELD;
 
-				// Line number start
-				if(filter.second.lineNumberStart)
+				// Lines by stops pairs
+				if(filter.second.linesByStopsPair)
 				{
-					s << *filter.second.lineNumberStart;
+					s << LineFilter::VALUE_LINES_BY_STOPS_PAIRS << LineFilter::SEP_FIELD;
 				}
-				s << LineFilter::SEP_FIELD;
-
-				// Line number end
-				if(filter.second.lineNumberStart)
+				else
 				{
-					s << *filter.second.lineNumberEnd;
+					// Line number start
+					if(filter.second.lineNumberStart)
+					{
+						s << *filter.second.lineNumberStart;
+					}
+					s << LineFilter::SEP_FIELD;
+
+					// Line number end
+					if(filter.second.lineNumberStart)
+					{
+						s << *filter.second.lineNumberEnd;
+					}
 				}
 			}
 			return s.str();
@@ -333,7 +356,9 @@ namespace synthese
 					double y(1000 * lexical_cast<double>(_getField(22, 10)));
 					if(x && y)
 					{
-						bahnhof.point = _dataSource.getCoordinatesSystem()->createPoint(x, y);
+						bahnhof.point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+							*_dataSource.getCoordinatesSystem()->createPoint(x, y)
+						);
 					}
 
 					// Names
@@ -562,6 +587,13 @@ namespace synthese
 						// Check of the last zug
 						if(itZug != _zugs.end())
 						{
+							// Line number if determinated by stops pair
+							if(	itZug->lineFilter->linesByStopsPair &&
+								itZug->stops.size() > 1
+							){
+								itZug->lineNumber = itZug->stops.begin()->stopCode +"-"+ itZug->stops.rbegin()->stopCode;
+							}
+
 							// Check of schedules
 							bool hasDeparture(false);
 							Zug::Stops::const_iterator itStop(itZug->stops.begin());
@@ -1424,6 +1456,16 @@ namespace synthese
 								// Insertion in the list
 								linkedStops.insert(newStop);
 							}
+							else // update coordinates if necessary and possible
+							{
+								BOOST_FOREACH(StopPoint* stop, linkedStops)
+								{
+									if(!stop->hasGeometry() && bahnhof.point.get())
+									{
+										stop->setGeometry(bahnhof.point);
+									}
+								}
+							}
 
 							// Registration in gleis map
 							gleisStopPoint[make_pair(bahnhof.operatorCode, gleis)] = linkedStops;
@@ -1461,10 +1503,31 @@ namespace synthese
 					continue;
 				}
 
-				// Update of the name with the code if nothing else is defined
+				// Update of the name with the code or with the stops pair if nothing else is defined
 				if(line->getName().empty())
 				{
-					line->setName(zug.lineNumber);
+					if(zug.lineFilter->linesByStopsPair)
+					{
+						Bahnhofs::const_iterator it1(
+							_bahnhofs.find(zug.stops.begin()->stopCode)
+						);
+						Bahnhofs::const_iterator it2(
+							_bahnhofs.find(zug.stops.rbegin()->stopCode)
+						);
+						if(	it1 != _bahnhofs.end() &&
+							it2 != _bahnhofs.end()
+						){
+							line->setName(
+								it1->second.cityName +" "+ it1->second.name +
+								" -> "+
+								it2->second.cityName +" "+ it2->second.name
+							);
+						}
+					}
+					else
+					{
+						line->setName(zug.lineNumber);
+					}
 				}
 
 				// Wayback
@@ -1529,12 +1592,10 @@ namespace synthese
 						JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 						bool ignoreService(false);
 						bool inStop(false);
+						bool firstStop(true);
 						BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
 						{
-							if(inStop && zugStop.stopCode == endStopCode)
-							{
-								break;
-							}
+							// Jump over stops before the first stop
 							if(zugStop.stopCode == startStopCode)
 							{
 								inStop = true;
@@ -1567,6 +1628,14 @@ namespace synthese
 
 							departures.push_back(zugStop.departureTime.is_not_a_date_time() ? zugStop.arrivalTime : zugStop.departureTime);
 							arrivals.push_back(zugStop.arrivalTime.is_not_a_date_time() ? zugStop.departureTime : zugStop.arrivalTime);
+
+							// End of the route
+							if(!firstStop && inStop && zugStop.stopCode == endStopCode)
+							{
+								break;
+							}
+
+							firstStop = false;
 						}
 						if(ignoreService)
 						{
