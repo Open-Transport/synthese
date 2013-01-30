@@ -1064,7 +1064,7 @@ namespace synthese
 							__NombrePages = displayedList.size () - 2;
 						}
 					}
-					if (__Pages != UNKNOWN_VALUE && __NombrePages > __Pages)
+					if (__Pages != UNKNOWN_VALUE && __NombrePages > (size_t)__Pages)
 					{
 						__NombrePages = __Pages;
 					}
