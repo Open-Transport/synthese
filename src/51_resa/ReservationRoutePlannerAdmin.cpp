@@ -113,8 +113,8 @@ namespace synthese
 		ReservationRoutePlannerAdmin::ReservationRoutePlannerAdmin(
 		):	AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>(),
 			_dateTime(second_clock::local_time()),
-			_withoutTransfer(false),
 			_disabledPassenger(false),
+			_withoutTransfer(false),
 			_planningOrder(DEPARTURE_FIRST),
 			_approachSpeed(0.833),//0.833 = 3km/h, 1.111 = 4km/h
 			_enabledPedestrian(false),
