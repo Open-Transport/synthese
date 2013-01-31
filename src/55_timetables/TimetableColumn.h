@@ -69,6 +69,7 @@ namespace synthese
 				Terminus,
 				Indetermine
 			};
+			typedef std::set<const pt::SchedulesBasedService*> Services;
 
 		private:
 			// Variables
@@ -76,7 +77,7 @@ namespace synthese
 			calendar::Calendar				_calendar;
 			boost::shared_ptr<TimetableWarning>			_warning;
 			const pt::JourneyPattern*				_line;
-			const pt::SchedulesBasedService*		_service;
+			Services		_services;
 			tTypeOD							_originType;
 			tTypeOD							_destinationType;
 
@@ -85,9 +86,12 @@ namespace synthese
 			static const std::string TAG_LINE;
 			static const std::string TAG_TRANSPORT_MODE;
 			static const std::string TAG_USE_RULE;
+			static const std::string ATTR_TIME;
+			static const std::string TAG_STOP_POINT;
+			static const std::string TAG_CELL;
 
 		public:
-			// Constructeur
+			// Constructor
 			TimetableColumn(
 				const TimetableGenerator& generator,
 				const pt::SchedulesBasedService& service
@@ -131,7 +135,7 @@ namespace synthese
 				const calendar::Calendar&				getCalendar()			const { return _calendar; }
 				const Content&							getContent()			const { return _content; }
 				const pt::JourneyPattern*				getLine()				const { return _line; }
-				const pt::SchedulesBasedService*		getService()			const { return _service; }
+				const Services&							getServices()			const { return _services; }
 				tTypeOD									getOriginType()			const { return _originType; }
 				tTypeOD									getDestinationType()	const { return _destinationType; }
 				boost::shared_ptr<TimetableWarning>		getWarning()			const { return _warning; }

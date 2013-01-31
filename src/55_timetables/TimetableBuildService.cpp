@@ -92,12 +92,14 @@ namespace synthese
 		const string TimetableBuildService::ATTR_IS_DEPARTURE = "is_departure";
 		
 		const string TimetableBuildService::TAG_PLACE = "place";
+		const string TimetableBuildService::TAG_STOP_POINT = "stop_point";
 
 		const string TimetableBuildService::TAG_COL = "col";
 		
 		const string TimetableBuildService::TAG_CELL = "cell";
 		const string TimetableBuildService::ATTR_TIME = "time";
-		const string TimetableBuildService::ATTR_SERVICE_ID = "service_id";
+		const string TimetableBuildService::TAG_SERVICE = "service";
+		const string TimetableBuildService::ATTR_ID = "id";
 
 
 
@@ -715,21 +717,31 @@ namespace synthese
 
 			// Loop on cells
 			size_t rank(0);
-			BOOST_FOREACH(time_duration duration, times)
+			BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& duration, times)
 			{
 				// New parameters map
 				shared_ptr<ParametersMap> cellPM(new ParametersMap);
 
 				// Time
-				if(!duration.is_not_a_date_time())
-				{
-					cellPM->insert(ATTR_TIME, duration);
+				if(!duration.second.is_not_a_date_time())
+				{ 
+					cellPM->insert(ATTR_TIME, duration.second);
 				}
 
 				// Service ID
-				if(services.at(rank))
+				BOOST_FOREACH(const TimetableColumn::Services::value_type& service, services.at(rank))
 				{
-					cellPM->insert(ATTR_SERVICE_ID, services.at(rank)->getKey());
+					shared_ptr<ParametersMap> servicePM(new ParametersMap);
+					servicePM->insert(ATTR_ID, service->getKey());
+					cellPM->insert(TAG_SERVICE, servicePM);
+				}
+
+				// Stop point
+				if(duration.first)
+				{
+					shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
+					duration.first->toParametersMap(*stopPointPM, false);
+					cellPM->insert(TAG_STOP_POINT, stopPointPM);
 				}
 
 				// Link to the main parameters map

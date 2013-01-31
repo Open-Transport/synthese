@@ -56,6 +56,9 @@ namespace synthese
 		const string TimetableColumn::TAG_LINE = "line";
 		const string TimetableColumn::TAG_TRANSPORT_MODE = "transport_mode";
 		const string TimetableColumn::TAG_USE_RULE = "use_rule";
+		const string TimetableColumn::ATTR_TIME = "time";
+		const string TimetableColumn::TAG_STOP_POINT = "stop_point";
+		const string TimetableColumn::TAG_CELL = "cell";
 
 
 
@@ -63,9 +66,9 @@ namespace synthese
 			const TimetableGenerator& timetablegenerator,
 			const SchedulesBasedService& service
 		):	_calendar(service),
-			_line(static_cast<const JourneyPattern*>(service.getPath())),
-			_service(&service)
+			_line(static_cast<const JourneyPattern*>(service.getPath()))
 		{
+			_services.insert(&service);
 			_calendar &= timetablegenerator.getBaseCalendar();
 
 			// Cells are populated with the most important intermediate places
@@ -96,7 +99,7 @@ namespace synthese
 				}
 				_content.push_back(
 					make_pair(
-						dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex()),
+						dynamic_cast<const StopPoint*>(service.getVertex((*itEdge)->getRankInPath())),
 						service.getDepartureBeginScheduleToIndex(false, (*itEdge)->getRankInPath())
 				)	);
 
@@ -168,7 +171,7 @@ namespace synthese
 				){
 					_content.push_back(
 						make_pair(
-							dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex()),
+							dynamic_cast<const StopPoint*>(service.getVertex((*itEdge)->getRankInPath())),
 							service.getArrivalBeginScheduleToIndex(false, (*itEdge)->getRankInPath())
 					)	);
 					--toInsert;
@@ -182,7 +185,7 @@ namespace synthese
 				Path::Edges::const_reverse_iterator itrEdge = edges.rbegin();
 				_content.push_back(
 					make_pair(
-						dynamic_cast<const StopPoint*>((*itrEdge)->getFromVertex()),
+						dynamic_cast<const StopPoint*>(service.getVertex((*itrEdge)->getRankInPath())),
 						service.getArrivalBeginScheduleToIndex(false, (*itrEdge)->getRankInPath())
 				)	);
 			}
@@ -215,7 +218,7 @@ namespace synthese
 					){
 						_content.push_back(
 							make_pair(
-								dynamic_cast<const StopPoint*>((*(itEdge-1))->getFromVertex()),
+								dynamic_cast<const StopPoint*>(service.getVertex((*(itEdge-1))->getRankInPath())),
 								service.getDepartureBeginScheduleToIndex(false, (itEdge-1) - edges.begin())
 						)	);
 						continue;
@@ -274,7 +277,7 @@ namespace synthese
 								first = false;
 								_content.push_back(
 									make_pair(
-										dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex()),
+										dynamic_cast<const StopPoint*>(service.getVertex((*itEdge2)->getRankInPath())),
 										((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
 											service.getDepartureBeginScheduleToIndex(false, (*itEdge2)->getRankInPath()) :
 											service.getArrivalBeginScheduleToIndex(false, (*itEdge2)->getRankInPath())
@@ -301,7 +304,6 @@ namespace synthese
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& generator
 		):	_line(NULL),
-			_service(NULL),
 			_originType(Indetermine),
 			_destinationType(Indetermine)
 		{
@@ -365,13 +367,19 @@ namespace synthese
 				}
 			}
 
-			// Premiere heure
+			// First schedule
 			for (i=0; i< rowsNumber; ++i)
+			{
 				if (!_content[i].second.is_not_a_date_time())
+				{
 					break;
+			}	}
 			for (j=0; j< rowsNumber; ++j)
+			{
 				if (!other._content[j].second.is_not_a_date_time())
+				{
 					break;
+			}	}
 			return _content[i].second < other._content[j].second;
 		}
 
@@ -391,7 +399,13 @@ namespace synthese
 				}
 			}
 
-			_service = NULL;
+			// Merging of the two services lists
+			_services.insert(
+				col._services.begin(),
+				col._services.end()
+			);
+
+			// Merging the two calendars
 			_calendar |= col._calendar;
 		}
 
@@ -430,7 +444,27 @@ namespace synthese
 				}
 			}
 
-			// Everything is OK the colums are identical
+			// Different use rules
+			const PTUseRule* ptUseRule1(NULL);
+			const PTUseRule* ptUseRule2(NULL);
+			if(!_services.empty())
+			{
+				ptUseRule1 = dynamic_cast<const PTUseRule*>(
+					&(*_services.begin())->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+			}
+			if(!op._services.empty())
+			{
+				ptUseRule2 = dynamic_cast<const PTUseRule*>(
+					&(*op._services.begin())->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				);
+			}
+			if(ptUseRule1 != ptUseRule2)
+			{
+				return false;
+			}
+
+			// Everything is OK the columns are identical
 			return true;
 		}
 
@@ -473,10 +507,10 @@ namespace synthese
 			}
 
 			// Service
-			if(_service)
+			BOOST_FOREACH(const Services::value_type& service, _services)
 			{
 				shared_ptr<ParametersMap> servicePM(new ParametersMap);
-				_service->toParametersMap(*servicePM);
+				service->toParametersMap(*servicePM);
 				pm.insert(TAG_SERVICE, servicePM);
 			}
 
@@ -497,11 +531,11 @@ namespace synthese
 			}
 
 			// Use rule
-			if(_service)
+			if(_services.size())
 			{
 				const PTUseRule* ptUseRule(
 					dynamic_cast<const PTUseRule*>(
-						&_service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+						&(*_services.begin())->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
 				)	);
 				if(ptUseRule)
 				{
@@ -511,5 +545,29 @@ namespace synthese
 				}
 			}
 
+			// Schedules
+			if(withSchedules)
+			{
+				BOOST_FOREACH(const Content::value_type& cell, _content)
+				{
+					shared_ptr<ParametersMap> cellPM(new ParametersMap);
+
+					// Time
+					if(!cell.second.is_not_a_date_time())
+					{
+						cellPM->insert(ATTR_TIME, cell.second);
+					}
+
+					// Stop point
+					if(cell.first)
+					{
+						shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
+						cell.first->toParametersMap(*stopPointPM, false);
+						cellPM->insert(TAG_STOP_POINT, stopPointPM);
+					}
+
+					pm.insert(TAG_CELL, cellPM);
+				}
+			}
 		}
 }	}
