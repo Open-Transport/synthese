@@ -115,12 +115,6 @@ if(WIN32)
   # warning C4250: 'xxx' : inherits 'yyy' via dominance
   add_definitions(/wd4250)
   
-  # To prevent "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
-  # To prevent "fatal error LNK1106: invalid file or disk full: cannot seek to 0x..."
-  SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO /expectedoutputsize:600000000")
-  SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "/INCREMENTAL:NO /expectedoutputsize:600000000")
- 
-
   # iconv
   add_library(iconv STATIC IMPORTED)
   set_property(TARGET iconv PROPERTY IMPORTED_LOCATION
