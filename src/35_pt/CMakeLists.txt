@@ -318,6 +318,8 @@ target_link_libraries(35_pt
 )
 
 # To prevent "fatal error LNK1106: invalid file or disk full: cannot seek to 0x..."
-set_target_properties(35_pt PROPERTIES LINK_FLAGS "/expectedoutputsize:600000000")
+if (WIN32)
+  set_target_properties(35_pt PROPERTIES LINK_FLAGS "/expectedoutputsize:600000000")
+endif()
 
 install(TARGETS 35_pt DESTINATION lib)
