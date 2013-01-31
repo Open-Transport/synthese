@@ -30,6 +30,7 @@
 #include "PTDataCleanerFileFormat.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "TransportNetworkTableSync.h"
 #include "IConv.hpp"
 
 #include <iostream>
@@ -140,7 +141,7 @@ namespace synthese
 					static const std::string JOCKER;
 					static const std::string VALUE_LINES_BY_STOPS_PAIRS;
 					
-					boost::shared_ptr<pt::TransportNetwork> network;
+					pt::TransportNetwork* network;
 					boost::optional<size_t> lineNumberStart;
 					boost::optional<size_t> lineNumberEnd;
 					bool linesByStopsPair;
@@ -149,8 +150,10 @@ namespace synthese
 				};
 				typedef std::map<std::string, LineFilter> LinesFilter;
 
-				static LinesFilter GetLinesFilter(const std::string& s);
+				LinesFilter getLinesFilter(const std::string& s);
 				static std::string LinesFilterToString(const LinesFilter& value);
+
+				impex::ImportableTableSync::ObjectBySource<pt::TransportNetworkTableSync> _networks;
 
 				//! @name Parameters
 				//@{
@@ -195,7 +198,6 @@ namespace synthese
 
 					std::string number;
 					std::string lineNumber;
-					boost::optional<std::string> secondLineNumber;
 					size_t version;
 					std::vector<CalendarUse> calendars;
 					std::string transportModeCode;
@@ -226,6 +228,7 @@ namespace synthese
 				mutable Bahnhofs _linkedBahnhofs;
 				const util::IConv _iconv;
 
+				mutable boost::gregorian::date _fileFirstDate;
 				mutable CalendarMap _calendarMap;
 
 				typedef std::pair<
@@ -301,6 +304,7 @@ namespace synthese
 				):	impex::Importer(env, dataSource),
 					impex::MultipleFileTypesImporter<HafasFileFormat>(env, dataSource),
 					PTDataCleanerFileFormat(env, dataSource),
+					_networks(dataSource, env),
 					_showStopsOnly(false),
 					_wayBackBitPosition(0),
 					_importFullServices(false),

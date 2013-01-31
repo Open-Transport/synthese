@@ -554,9 +554,17 @@ namespace synthese
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream,
-			optional<const string&> secondId
+			bool restrictInDefaultNetwork
 		){
-			CommercialLine* line(GetLine(lines, id, source, env, logStream, secondId));
+			CommercialLine* line(
+				GetLine(
+					lines,
+					id,
+					source,
+					env,
+					logStream,
+					restrictInDefaultNetwork ? optional<TransportNetwork&>(defaultNetwork) : optional<TransportNetwork&>()
+			)	);
 			if(!line)
 			{
 				line = new CommercialLine(CommercialLineTableSync::getId());
@@ -571,10 +579,6 @@ namespace synthese
 				line->setParent(defaultNetwork);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
-				if(secondId)
-				{
-					links.insert(make_pair(&source, *secondId));
-				}
 				line->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<CommercialLine>().add(shared_ptr<CommercialLine>(line));
 				lines.add(*line);
@@ -824,7 +828,7 @@ namespace synthese
 			std::ostream& logStream,
 			boost::optional<const std::string&> team,
 			boost::optional<const graph::RuleUser::Rules&> rules,
-			boost::optional<const SchedulesBasedService::ServedVertices&> servedVertices
+			boost::optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices
 		){
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
@@ -894,7 +898,27 @@ namespace synthese
 
 				if(servedVertices)
 				{
-					result->setVertices(*servedVertices);
+					SchedulesBasedService::ServedVertices vertices;
+					size_t stopRank(0);
+					BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& itStop, *servedVertices)
+					{
+						// Choosing the vertex in the same hub than in the path
+						Vertex* vertex(route.getEdge(stopRank)->getFromVertex());
+						if(	itStop._stop.find(static_cast<StopPoint*>(vertex)) == itStop._stop.end())
+						{
+							BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet::value_type& itStopLink, itStop._stop)
+							{
+								if(vertex->getHub() == itStopLink->getHub())
+								{
+									vertex = itStopLink;
+									break;
+								}
+							}
+						}
+						vertices.push_back(vertex);
+						++stopRank;
+					}
+					result->setVertices(vertices);
 				}
 
 				route.addService(*result, false);
@@ -1346,18 +1370,18 @@ namespace synthese
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream,
-			optional<const string&> secondId
+			optional<TransportNetwork&> network
 		){
 			CommercialLine* line(NULL);
 			if(lines.contains(id))
 			{
 				set<CommercialLine*> loadedLines(lines.get(id));
-				// Second id
-				if(secondId)
+				// Network
+				if(network)
 				{
 					BOOST_FOREACH(CommercialLine* loadedLine, loadedLines)
 					{
-						if(loadedLine->hasCodeBySource(source, *secondId))
+						if(loadedLine->getNetwork() == &(*network))
 						{
 							line = loadedLine;
 							break;

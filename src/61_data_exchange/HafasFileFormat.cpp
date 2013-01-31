@@ -134,7 +134,7 @@ namespace synthese
 
 
 
-		HafasFileFormat::Importer_::LinesFilter HafasFileFormat::Importer_::GetLinesFilter( const std::string& s )
+		HafasFileFormat::Importer_::LinesFilter HafasFileFormat::Importer_::getLinesFilter( const std::string& s )
 		{
 			LinesFilter result;
 			vector<string> filters;
@@ -157,33 +157,28 @@ namespace synthese
 				}
 
 				// Network
-				if(items.size() > 1)
+				ImportableTableSync::ObjectBySource<TransportNetworkTableSync>::Set networks(
+					_networks.get(pattern)
+				);
+				if(networks.empty())
 				{
-					try
-					{
-						lineFilter.network = Env::GetOfficialEnv().getEditable<TransportNetwork>(
-							lexical_cast<RegistryKeyType>(items[1])
-						);
-					}
-					catch(...)
-					{
-						continue;
-					}
+					continue;
 				}
+				lineFilter.network = *networks.begin();
 
 				// Lines by stops pairs
-				if(items.size() > 2 && items[2]==LineFilter::VALUE_LINES_BY_STOPS_PAIRS)
+				if(items.size() > 1 && items[1]==LineFilter::VALUE_LINES_BY_STOPS_PAIRS)
 				{
 					lineFilter.linesByStopsPair = true;
 				}
 				else // Lines by service number pattern matching
 				{
 					// Line number start
-					if(items.size() > 2 && !items[1].empty())
+					if(items.size() > 1 && !items[0].empty())
 					{
 						try
 						{
-							lineFilter.lineNumberStart = lexical_cast<size_t>(items[2]);
+							lineFilter.lineNumberStart = lexical_cast<size_t>(items[1]);
 						}
 						catch(bad_lexical_cast&)
 						{
@@ -191,11 +186,11 @@ namespace synthese
 					}
 
 					// Line number end
-					if(items.size() > 3 && !items[2].empty())
+					if(items.size() > 2 && !items[1].empty())
 					{
 						try
 						{
-							lineFilter.lineNumberEnd = lexical_cast<size_t>(items[3]);
+							lineFilter.lineNumberEnd = lexical_cast<size_t>(items[2]);
 						}
 						catch(bad_lexical_cast&)
 						{
@@ -233,13 +228,6 @@ namespace synthese
 
 				// Pattern
 				s << filter.first << LineFilter::SEP_FIELD;
-
-				// Network
-				if(filter.second.network.get())
-				{
-					s << filter.second.network->getKey();
-				}
-				s << LineFilter::SEP_FIELD;
 
 				// Lines by stops pairs
 				if(filter.second.linesByStopsPair)
@@ -533,7 +521,7 @@ namespace synthese
 					int id(lexical_cast<int>(_getField(0,6)));
 					string calendarString(_getField(7));
 
-					date curDate(_calendar.getFirstActiveDate());
+					date curDate(_fileFirstDate);
 					bool first(true);
 
 					Calendar calendar;
@@ -554,8 +542,9 @@ namespace synthese
 								{
 									break;
 								}
-								if(bits & 8)
-								{
+								if(	(bits & 8) &&
+									(curDate >= _calendar.getFirstActiveDate())
+								){
 									calendar.setActive(curDate);
 								}
 								curDate += days(1);
@@ -591,7 +580,14 @@ namespace synthese
 							if(	itZug->lineFilter->linesByStopsPair &&
 								itZug->stops.size() > 1
 							){
-								itZug->lineNumber = itZug->stops.begin()->stopCode +"-"+ itZug->stops.rbegin()->stopCode;
+								if(itZug->stops.begin()->stopCode < itZug->stops.rbegin()->stopCode)
+								{
+									itZug->lineNumber = itZug->stops.begin()->stopCode +"-"+ itZug->stops.rbegin()->stopCode;
+								}
+								else
+								{
+									itZug->lineNumber = itZug->stops.rbegin()->stopCode +"-"+ itZug->stops.begin()->stopCode;
+								}
 							}
 
 							// Check of schedules
@@ -640,15 +636,18 @@ namespace synthese
 						itZug = _zugs.insert(_zugs.end(), Zug());
 						itZug->lineFilter = lineFilter;
 						itZug->number = _getField(3,5);
-						itZug->lineNumber = lineNumber;
 						itZug->version = lexical_cast<size_t>(_getField(16, 2));
 						zugNumber = itZug->number +"/"+ lineNumber;
 						if(lineFilter->lineNumberStart && lineFilter->lineNumberEnd)
 						{
-							itZug->secondLineNumber = _getField(
-								*lineFilter->lineNumberStart,
+							itZug->lineNumber = _getField(
+								*lineFilter->lineNumberStart + 3,
 								*lineFilter->lineNumberEnd - *lineFilter->lineNumberStart + 1
 							);
+						}
+						else
+						{
+							itZug->lineNumber = lineNumber;
 						}
 
 						// Continuous service
@@ -854,20 +853,19 @@ namespace synthese
 				}
 
 				date now(day_clock::local_day());
+
+				// Start date
 				if(!_loadLine())
 				{
 					throw Exception("Inconsistent Eckdaten file");
 				}
-				date startDate(
+				_fileFirstDate = date(
 					lexical_cast<int>(_getField(6,4)),
 					lexical_cast<int>(_getField(3,2)),
 					lexical_cast<int>(_getField(0,2))
 				);
-				if(startDate < now && _fromToday)
-				{
-					startDate = now;
-				}
 
+				// End date
 				if(!_loadLine())
 				{
 					throw Exception("Inconsistent Eckdaten file");
@@ -877,11 +875,16 @@ namespace synthese
 					lexical_cast<int>(_getField(3,2)),
 					lexical_cast<int>(_getField(0,2))
 				);
-				_calendar = Calendar(startDate, endDate);
+
+				// Import mask
+				_calendar = Calendar(
+					(_fileFirstDate < now && _fromToday) ? now : _fileFirstDate,
+					endDate
+				);
 			}
 
 			// Lines filter
-			_linesFilter = GetLinesFilter(pm.getDefault<string>(PARAMETER_LINES_FILTER));
+			_linesFilter = getLinesFilter(pm.getDefault<string>(PARAMETER_LINES_FILTER));
 		}
 
 
@@ -1496,7 +1499,8 @@ namespace synthese
 					*zug.lineFilter->network,
 					_dataSource,
 					_env,
-					os
+					os,
+					zug.lineFilter->linesByStopsPair || (zug.lineFilter->lineNumberStart && zug.lineFilter->lineNumberEnd)
 				);
 				if(!line)
 				{
@@ -1519,7 +1523,7 @@ namespace synthese
 						){
 							line->setName(
 								it1->second.cityName +" "+ it1->second.name +
-								" -> "+
+								" - "+
 								it2->second.cityName +" "+ it2->second.name
 							);
 						}
@@ -1675,26 +1679,6 @@ namespace synthese
 						if(	zug.continuousServiceRange.is_not_a_date_time() ||
 							zug.continuousServiceRange.total_seconds() == 0
 						){
-							SchedulesBasedService::ServedVertices vertices;
-							size_t stopRank(0);
-							BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& itStop, stops)
-							{
-								// Choosing the vertex in the same hub than in the path
-								const Vertex* vertex(route->getEdge(stopRank)->getFromVertex());
-								if(	itStop._stop.find(static_cast<StopPoint*>(route->getEdge(stopRank)->getFromVertex())) == itStop._stop.end())
-								{
-									BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet::value_type& itStopLink, itStop._stop)
-									{
-										if(vertex->getHub() == itStopLink->getHub())
-										{
-											vertex = itStopLink;
-											break;
-										}
-									}
-								}
-								vertices.push_back(vertex);
-								++stopRank;
-							}
 							service = PTFileFormat::CreateOrUpdateService(
 								*route,
 								departures,
@@ -1705,7 +1689,7 @@ namespace synthese
 								os,
 								optional<const string&>(),
 								optional<const RuleUser::Rules&>(),
-								optional<const SchedulesBasedService::ServedVertices&>(vertices)
+								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops)
 							);
 						}
 						else
