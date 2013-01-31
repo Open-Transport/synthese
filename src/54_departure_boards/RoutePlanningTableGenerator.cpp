@@ -66,7 +66,7 @@ namespace synthese
 						0,
 						posix_time::minutes(0),
 						67,
-						_withTransfer ? 2 : 1
+						_withTransfer ? 1 : 0
 					),
 					DEPARTURE_FIRST,
 					false,
