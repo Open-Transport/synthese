@@ -33,13 +33,13 @@ namespace synthese
 	namespace timetables
 	{
 		TimetableResult::RowTimesVector TimetableResult::getRowSchedules(
-			std::size_t rank
+			size_t rank
 		) const	{
 			RowTimesVector result;
 			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
 			{
 				const TimetableColumn::Content& content(it->getContent());
-				result.push_back((content.begin() + rank)->second);
+				result.push_back(*(content.begin() + rank));
 			}
 			return result;
 		}
@@ -188,7 +188,7 @@ namespace synthese
 			RowServicesVector result;
 			BOOST_FOREACH(const Columns::value_type& col, _columns)
 			{
-				result.push_back(col.getService());
+				result.push_back(col.getServices());
 			}
 			return result;
 		}

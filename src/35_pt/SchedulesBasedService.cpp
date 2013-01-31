@@ -757,9 +757,18 @@ namespace synthese
 
 
 
-		bool SchedulesBasedService::comparePlannedStops( const ServedVertices& servedVertices ) const
-		{
-			return _vertices == servedVertices;
+		bool SchedulesBasedService::comparePlannedStops(
+			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedVertices
+		) const	{
+			for(size_t i(0); i<_vertices.size(); ++i)
+			{
+				if(	_vertices[i] &&
+					servedVertices[i]._stop.find(const_cast<StopPoint*>(static_cast<const StopPoint*>(_vertices[i]))) == servedVertices[i]._stop.end()
+				){
+					return false;
+				}
+			}
+			return true;
 		}
 
 
@@ -892,15 +901,15 @@ namespace synthese
 							while(true)
 							{
 								ServicePointer serviceInstance(
-											startEdge.getNextService(
-												ap,
-												minStartTime,
-												maxStartTime,
-												true,
-												minServiceIndex,
-												false,
-												true
-												)	);
+									startEdge.getNextService(
+										ap,
+										minStartTime,
+										maxStartTime,
+										true,
+										minServiceIndex,
+										false,
+										true
+								)	);
 								// If no service, advance to the next path
 								if (!serviceInstance.getService()) break;
 								++*minServiceIndex;

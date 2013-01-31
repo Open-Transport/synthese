@@ -210,7 +210,7 @@ namespace synthese
 				void generateIncrementalSchedules(boost::posix_time::time_duration firstSchedule);
 
 				bool comparePlannedSchedules(const Schedules& departure, const Schedules& arrival) const;
-				bool comparePlannedStops(const ServedVertices& servedVertices) const;
+				bool comparePlannedStops(const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedVertices) const;
 
 
 			//! @name Update methods
