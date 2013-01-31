@@ -55,10 +55,10 @@ namespace synthese
 			typedef std::vector<TimetableColumn>			Columns;
 			typedef std::map<std::size_t, boost::shared_ptr<TimetableWarning> >		Warnings;
 			typedef std::vector<pt::CommercialLine*> RowLinesVector;
-			typedef std::vector<const pt::SchedulesBasedService*> RowServicesVector;
+			typedef std::vector<TimetableColumn::Services> RowServicesVector;
 			typedef std::vector<boost::shared_ptr<TimetableWarning> > RowNotesVector;
 			typedef std::vector<const pt::RollingStock*> RowRollingStockVector;
-			typedef std::vector<boost::posix_time::time_duration> RowTimesVector;
+			typedef std::vector<TimetableColumn::Content::value_type> RowTimesVector;
 			typedef std::vector<TimetableColumn::tTypeOD>	RowTypeODVector;
 
 

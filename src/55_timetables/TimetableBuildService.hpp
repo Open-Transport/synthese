@@ -87,16 +87,14 @@ namespace synthese
 			static const std::string ATTR_IS_ARRIVAL;
 			static const std::string ATTR_IS_DEPARTURE;
 			static const std::string TAG_PLACE;
+			static const std::string TAG_STOP_POINT;
 
 			static const std::string TAG_COL;
 
 			static const std::string TAG_CELL;
 			static const std::string ATTR_TIME;
-			static const std::string ATTR_SERVICE_ID;
-
-
-
-
+			static const std::string TAG_SERVICE;
+			static const std::string ATTR_ID;
 
 		protected:
 			//! \name Page parameters

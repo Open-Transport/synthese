@@ -796,13 +796,13 @@ namespace synthese
 					bool aReservationRule(false);
 					BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
 					{
-						if(!service)
+						if(service.empty())
 						{
 							continue;
 						}
 						const PTUseRule* ptUseRule(
 							dynamic_cast<const PTUseRule*>(
-								&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+								&(*service.begin())->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
 						)	);
 						if(ptUseRule && ptUseRule->getReservationType() != PTUseRule::RESERVATION_FORBIDDEN)
 						{
@@ -1028,15 +1028,15 @@ namespace synthese
 			{
 				stringstream content;
 				size_t colRank(0);
-				BOOST_FOREACH(time_duration duration, times)
+				BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& duration, times)
 				{
 					_displayScheduleCell(
 						content,
 						request,
-						duration,
+						duration.second,
 						place.getRank(),
 						colRank,
-						services[colRank]
+						services[colRank].empty() ? NULL : *services[colRank].begin()
 					);
 					++colRank;
 				}
@@ -1161,7 +1161,12 @@ namespace synthese
 				size_t colRank(0);
 				BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
 				{
-					_displayServiceNumbersCell(content, request, colRank++, service);
+					_displayServiceNumbersCell(
+						content,
+						request,
+						colRank++,
+						service.empty() ? NULL : *service.begin()
+					);
 				}
 				pm.insert(DATA_CELLS_CONTENT, content.str());
 			}
@@ -1345,11 +1350,11 @@ namespace synthese
 
 			pm.insert(DATA_TYPE, TYPE_BOOKING);
 			pm.insert(DATA_CELL_RANK, colRank);
-			if(service)
+			if(!service.empty())
 			{
 				const PTUseRule* ptUseRule(
 					dynamic_cast<const PTUseRule*>(
-						&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+						&(*service.begin())->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
 				)	);
 				if(ptUseRule)
 				{

@@ -1073,9 +1073,9 @@ namespace synthese
 				BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& col, cols)
 				{
 					stream << tf.col();
-					if (!col.is_not_a_date_time())
+					if (!col.second.is_not_a_date_time())
 					{
-						stream << col.hours() << ":" << col.minutes();
+						stream << col.second.hours() << ":" << col.second.minutes();
 					}
 				}
 			}
