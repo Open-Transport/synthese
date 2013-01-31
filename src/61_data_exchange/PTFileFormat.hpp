@@ -125,7 +125,7 @@ namespace synthese
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream,
-				boost::optional<const std::string&> secondId = boost::optional<const std::string&>()
+				bool restrictInDefaultNetwork = false
 			);
 
 
@@ -136,7 +136,7 @@ namespace synthese
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream,
-				boost::optional<const std::string&> secondId = boost::optional<const std::string&>()
+				boost::optional<pt::TransportNetwork&> network = boost::optional<pt::TransportNetwork&>()
 			);
 
 
@@ -347,7 +347,7 @@ namespace synthese
 				std::ostream& logStream,
 				boost::optional<const std::string&> team = boost::optional<const std::string&>(),
 				boost::optional<const graph::RuleUser::Rules&> rules = boost::optional<const graph::RuleUser::Rules&>(),
-				boost::optional<const pt::SchedulesBasedService::ServedVertices&> servedVertices = boost::optional<const pt::SchedulesBasedService::ServedVertices&>()
+				boost::optional<const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices = boost::optional<const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization&>()
 			);
 
 
