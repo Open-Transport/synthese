@@ -385,7 +385,7 @@ namespace synthese
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"submit\" "
-				<< "value=\"" << HTMLModule::HTMLEncode(caption) << "\" "
+				<< "value=\"" << caption << "\" "
 				<< "/>";
 			return s.str();
 		}
