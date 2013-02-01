@@ -23,7 +23,10 @@
 
 #include "DbModuleConfigTableSync.h"
 
+#include "ActionService.hpp"
+#include "RedirectService.hpp"
 #include "SessionService.hpp"
+#include "SessionsListService.hpp"
 #include "XMLSessionFunction.h"
 #include "XMLSessionIsValidFunction.h"
 
@@ -56,6 +59,9 @@ void synthese::server::moduleRegister()
 	synthese::server::MemoryStatisticsAdmin::integrate();
 	synthese::server::ThreadsAdmin::integrate();
 
+	synthese::server::ActionService::integrate();
+	synthese::server::RedirectService::integrate();
+	synthese::server::SessionsListService::integrate();
 	synthese::server::SessionService::integrate();
 	synthese::server::XMLSessionFunction::integrate();
 	synthese::server::XMLSessionIsValidFunction::integrate();

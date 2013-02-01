@@ -44,6 +44,11 @@ namespace synthese
 
 	namespace server
 	{
+		const string Session::ATTR_ID = "id";
+		const string Session::TAG_USER = "user";
+		const string Session::ATTR_IP = "ip";
+		const string Session::ATTR_LAST_USE = "last_use";
+
 		Session::SessionMap	Session::_sessionMap;
 
 		const size_t Session::KEY_LENGTH = 20;
@@ -205,5 +210,36 @@ namespace synthese
 		{
 			mutex::scoped_lock lock(_requestsListMutex);
 			_requests.erase(&request);
+		}
+
+
+
+		void Session::toParametersMap(
+			util::ParametersMap& pm
+		) const {
+
+			// Id
+			pm.insert(ATTR_ID, getKey());
+			pm.insert("session_id", getKey()); // Backward compatiblity
+
+			// User
+			if(getUser())
+			{
+				shared_ptr<ParametersMap> userPM(new ParametersMap);
+				getUser()->toParametersMap(*userPM);
+				pm.insert(TAG_USER, userPM);
+			}
+
+			// IP
+			pm.insert(ATTR_IP, _ip);
+
+			// Last use
+			pm.insert(ATTR_LAST_USE, to_iso_extended_string(_lastUse));
+
+			// Variables
+			BOOST_FOREACH(const SessionVariables::value_type& it, _sessionVariables)
+			{
+				pm.insert(it.first, it.second);
+			}
 		}
 }	}
