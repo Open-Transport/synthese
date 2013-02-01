@@ -142,6 +142,10 @@ input[type=submit]:hover {background-color:#0080E0;}
 			/// @date 2010
 			/// @since 3.1.18
 			static std::string EscapeDoubleQuotes(const std::string value);
+
+
+
+			static std::string HTMLEncodeAmpersands(const std::string& value);
 		};
 
 
