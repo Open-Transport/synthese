@@ -233,4 +233,24 @@ namespace synthese
 			}
 			return s.str();
 		}
+
+
+
+		std::string HTMLModule::HTMLEncodeAmpersands(
+			const std::string& value
+		){
+			stringstream s;
+			BOOST_FOREACH(char c, value)
+			{
+				if(c == '&')
+				{
+					s << "&amp;";
+				}
+				else
+				{
+					s << c;
+				}
+			}
+			return s.str();
+		}
 }	}
