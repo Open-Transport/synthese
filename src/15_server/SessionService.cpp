@@ -45,8 +45,6 @@ namespace synthese
 	namespace server
 	{
 		const string SessionService::TAG_SESSION = "session";
-		const string SessionService::TAG_USER = "user";
-		const string SessionService::ATTR_ID = "session_id";
 		
 
 
@@ -73,24 +71,7 @@ namespace synthese
 			if(	request.getSession())
 			{
 				Session& session(*request.getSession());
-
-				try
-				{
-					// Id
-					map.insert(ATTR_ID, session.getKey());
-
-					// User
-					if(request.getSession()->getUser())
-					{
-						shared_ptr<ParametersMap> userPM(new ParametersMap);
-						session.getUser()->toParametersMap(*userPM);
-						map.insert(TAG_USER, userPM);
-					}
-				}
-				catch(SessionException)
-				{
-					map.insert(ATTR_ID, 0);
-				}
+				session.toParametersMap(map);
 			}
 
 			return map;
