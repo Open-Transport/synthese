@@ -47,11 +47,17 @@ namespace synthese
 		*/
 		class Session
 		{
-		private:
+		public:
+			static const std::string ATTR_ID;
+			static const std::string TAG_USER;
+			static const std::string ATTR_IP;
+			static const std::string ATTR_LAST_USE;
+
 			typedef std::map<std::string, std::string> SessionVariables;
 			typedef std::map<std::string, Session*> SessionMap;
 			typedef std::set<const Request*> Requests;
 
+		private:
 			static SessionMap _sessionMap;
 			static boost::mutex	_sessionMapMutex;
 
@@ -184,6 +190,23 @@ namespace synthese
 					const std::string& ip,
 					bool exceptionIfNotFound = true
 				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Sessions map getter.
+				/// @return the current sessions
+				static SessionMap& GetSessions(){ return _sessionMap; }
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Export to a parameters map.
+				/// @param pm the parameters map to populate
+				/// @retval pm the parameters map to populate
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 		};
 	}

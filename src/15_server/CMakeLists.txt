@@ -3,6 +3,8 @@ set(server_SRCS
 Action.h
 ActionException.cpp
 ActionException.h
+ActionService.cpp
+ActionService.hpp
 BasicClient.cpp
 BasicClient.h
 CleanerThreadExec.cpp
@@ -44,6 +46,8 @@ ModuleClassTemplate.hpp
 ModuleException.h
 QuitAction.cpp
 QuitAction.hpp
+RedirectService.cpp
+RedirectService.hpp
 Request.cpp
 Request.h
 RequestException.cpp
@@ -67,6 +71,8 @@ SessionException.cpp
 SessionException.h
 SessionService.cpp
 SessionService.hpp
+SessionsListService.cpp
+SessionsListService.hpp
 SetSessionVariableAction.cpp
 SetSessionVariableAction.hpp
 StaticActionFunctionRequest.h
