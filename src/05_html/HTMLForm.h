@@ -812,21 +812,21 @@ namespace synthese
 					s << "<option value=\"\"";
 					if (value == boost::optional<boost::shared_ptr<T> >())
 						s << " selected=\"selected\"";
-					s << ">" << HTMLModule::HTMLEncode(unknownLabel) << "</option>";
+					s << ">" << HTMLModule::HTMLEncodeAmpersands(unknownLabel) << "</option>";
 				}
 				if (!zeroLabel.empty())
 				{
 					s << "<option value=\"0\"";
 					if (value && *value == boost::shared_ptr<T>())
 						s << " selected=\"selected\"";
-					s << ">" << HTMLModule::HTMLEncode(zeroLabel) << "</option>";
+					s << ">" << HTMLModule::HTMLEncodeAmpersands(zeroLabel) << "</option>";
 				}
 				BOOST_FOREACH(const boost::shared_ptr<const T>& object, registry)
 				{
 					s << "<option value=\"" << object->getKey() << "\"";
 					if (value && object == *value)
 						s << " selected=\"selected\"";
-					s << ">" << HTMLModule::HTMLEncode(object->getName()) << "</option>";
+					s << ">" << HTMLModule::HTMLEncodeAmpersands(object->getName()) << "</option>";
 				}
 				s << "</select>";
 				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>((*value)->getKey()) : std::string());
@@ -849,7 +849,7 @@ namespace synthese
 				{
 					if (it->first == value)
 					{
-						s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second));
+						s << HTMLModule::HTMLEncodeAmpersands(boost::lexical_cast<std::string>(it->second));
 				}	}
 			}
 			else
@@ -860,14 +860,14 @@ namespace synthese
 					s << "<option value=\"";
 					if(it->first)
 					{
-						s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(*it->first));
+						s << HTMLModule::HTMLEncodeAmpersands(boost::lexical_cast<std::string>(*it->first));
 					}
 					s << "\"";
 					if (it->first == value)
 					{
 						s << " selected=\"selected\"";
 					}
-					s << ">" <<  HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second)) << "</option>";
+					s << ">" <<  HTMLModule::HTMLEncodeAmpersands(boost::lexical_cast<std::string>(it->second)) << "</option>";
 				}
 				s << "</select>";
 				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>(*value) : std::string());
@@ -889,7 +889,7 @@ namespace synthese
 				typename std::map<boost::optional<K>,T>::const_iterator it = choices.find(value);
 				if(it != choices.end())
 				{
-					s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second));
+					s << HTMLModule::HTMLEncodeAmpersands(boost::lexical_cast<std::string>(it->second));
 				}
 			}
 			else
@@ -900,14 +900,14 @@ namespace synthese
 					s << "<option value=\"";
 					if(it->first)
 					{
-						s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(*it->first));
+						s << HTMLModule::HTMLEncodeAmpersands(boost::lexical_cast<std::string>(*it->first));
 					}
 					s << "\"";
 					if (it->first == value)
 					{
 						s << " selected=\"selected\"";
 					}
-					s << ">" << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second)) << "</option>";
+					s << ">" << HTMLModule::HTMLEncodeAmpersands(boost::lexical_cast<std::string>(it->second)) << "</option>";
 				}
 				s << "</select>";
 				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>(*value) : std::string());
@@ -936,7 +936,7 @@ namespace synthese
 			s << "<input name=\"" << name << "\" type=\"radio\" value=\"";
 			if(valueIfSelected)
 			{
-				s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(*valueIfSelected));
+				s << HTMLModule::HTMLEncodeAmpersands(boost::lexical_cast<std::string>(*valueIfSelected));
 			}
 			s << "\"" << " id=\"" << id << "\"";
 			if (valueIfSelected == valueToSelect)

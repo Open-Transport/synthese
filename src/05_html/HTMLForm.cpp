@@ -120,7 +120,7 @@ namespace synthese
 			string className
 		){
 			if (!_updateRight)
-				return HTMLModule::HTMLEncode(value);
+				return HTMLModule::HTMLEncodeAmpersands(value);
 
 			removeHiddenFieldIfExists(name, value);
 
@@ -152,7 +152,7 @@ namespace synthese
 			}
 			else
 			{
-				s << HTMLModule::HTMLEncode(value) << "\" ";
+				s << HTMLModule::HTMLEncodeAmpersands(value) << "\" ";
 			}
 			s << "id=\"" << fieldId << "\" ";
 			if(!className.empty())
@@ -429,7 +429,7 @@ namespace synthese
 		){
 			if (!_updateRight)
 			{
-				return HTMLModule::HTMLEncode(value);
+				return HTMLModule::HTMLEncodeAmpersands(value);
 			}
 
 			removeHiddenFieldIfExists(name, value);
@@ -462,7 +462,7 @@ namespace synthese
 			}
 			s <<
 				">" <<
-				HTMLModule::HTMLEncode(value) << "</textarea>"
+				HTMLModule::HTMLEncodeAmpersands(value) << "</textarea>"
 			;
 			return s.str();
 		}
@@ -710,7 +710,7 @@ namespace synthese
 			{
 				s <<
 					"<input type=\"hidden\" name=\"" << it->first << "\" " <<
-					"value=\"" << HTMLModule::HTMLEncode(it->second) << "\" " <<
+					"value=\"" << HTMLModule::HTMLEncodeAmpersands(it->second) << "\" " <<
 					"id=\"" << _getFieldId(it->first) << "\" " <<
 				"/>";
 			}
@@ -764,7 +764,7 @@ namespace synthese
 				<< "src=\"" << imageURL << "\" "
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << _getFieldId(name) << "\" "
-				<< "alt=\"" << HTMLModule::HTMLEncode(alt) << "\" "
+				<< "alt=\"" << HTMLModule::HTMLEncodeAmpersands(alt) << "\" "
 				<< " />";
 			return s.str();
 		}
