@@ -229,7 +229,7 @@ class Builder(object):
             return
 
 
-        url = ('http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/'
+        url = ('https://extranet.rcsmobility.com/attachments/download/23511/'
             'mysql-{mysql_ver}-win{arch}.zip'.format(mysql_ver=MYSQL_VER, arch='x64' if self.env.c.x64 else '32'))
         self._download(url, '7dde95bea0125dca6bb26cf9c81ba69f' if self.env.c.x64 else 'todo')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
