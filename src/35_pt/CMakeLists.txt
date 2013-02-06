@@ -321,5 +321,8 @@ target_link_libraries(35_pt
 if (WIN32)
   set_target_properties(35_pt PROPERTIES LINK_FLAGS "/expectedoutputsize:600000000")
 endif()
+if (WIN64)
+  set_target_properties(35_pt PROPERTIES LINK_FLAGS "/expectedoutputsize:600000000")
+endif()
 
 install(TARGETS 35_pt DESTINATION lib)
