@@ -160,9 +160,12 @@ namespace synthese
 			const std::string& ip,
 			bool exceptionIfNotFound
 		){
-			mutex::scoped_lock(_sessionMapMutex);
 			Session* session(NULL);
-			SessionMap::iterator it(_sessionMap.find(key));
+			SessionMap::iterator it(NULL);
+			{
+				mutex::scoped_lock(_sessionMapMutex);
+				SessionMap::iterator it(_sessionMap.find(key));
+			}
 			if(it != _sessionMap.end())
 			{
 				session = it->second;
