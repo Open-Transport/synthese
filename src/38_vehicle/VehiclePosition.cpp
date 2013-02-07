@@ -109,6 +109,8 @@ namespace synthese
 				pm.insert(ATTR_Y, getGeometry()->getY());
 			}
 			pm.insert(ATTR_METER_OFFSET, _meterOffset);
+			pm.insert(ATTR_STATUS, _status);
+			pm.insert(ATTR_IN_STOP_AREA, _inStopArea);
 			if(_stopPoint)
 			{
 				shared_ptr<ParametersMap> stopPM(new ParametersMap);
