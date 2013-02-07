@@ -161,15 +161,16 @@ namespace synthese
 			bool exceptionIfNotFound
 		){
 			Session* session(NULL);
-			SessionMap::iterator it(NULL);
 			{
 				mutex::scoped_lock(_sessionMapMutex);
 				SessionMap::iterator it(_sessionMap.find(key));
+				if(it != _sessionMap.end())
+				{
+					session = it->second;
+				}
 			}
-			if(it != _sessionMap.end())
+			if(session)
 			{
-				session = it->second;
-
 				mutex::scoped_lock lock(session->_mutex);
 				if (ip != session->_ip)
 				{
