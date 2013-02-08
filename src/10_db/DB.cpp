@@ -531,14 +531,17 @@ namespace synthese
 #endif
 
 			// Inter-SYNTHESE sync
-			inter_synthese::InterSYNTHESEContent content(
-				DBInterSYNTHESE::FACTORY_KEY,
-				lexical_cast<string>(tableId),
-				DBInterSYNTHESE::GetDeleteStmtContent(objectId)
-			);
-			inter_synthese::InterSYNTHESEModule::Enqueue(
-				content,
-				transaction
-			);
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					DBInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(tableId),
+					DBInterSYNTHESE::GetDeleteStmtContent(objectId)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					transaction
+				);
+			}
 		}
 }	}
