@@ -125,6 +125,7 @@ namespace synthese
 		{
 			UnregisterParameter(DBModule::PARAMETER_NODE_ID);
 			DBModule::_ConnectionInfo.reset();
+			DBModule::GetDB()->removePreparedStatements();
 			DBModule::_Db.reset();
 		}
 
