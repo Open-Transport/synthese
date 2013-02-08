@@ -345,13 +345,15 @@ namespace synthese
 				{
 					stringstream content;
 					RequestEnqueue visitor(content);
-					apply_visitor(visitor, query);
-					slave.enqueue(
-						DBInterSYNTHESE::FACTORY_KEY,
-						content.str(),
-						saveTransaction,
-						true
-					);
+					if(apply_visitor(visitor, query))
+					{
+						slave.enqueue(
+							DBInterSYNTHESE::FACTORY_KEY,
+							content.str(),
+							saveTransaction,
+							true
+						);
+					}
 				}
 				saveTransaction.run();
 			}
@@ -403,17 +405,22 @@ namespace synthese
 
 
 
-		void DBInterSYNTHESE::RequestEnqueue::operator()( const std::string& sql )
+		bool DBInterSYNTHESE::RequestEnqueue::operator()( const std::string& sql )
 		{
 			_result <<
 				DBInterSYNTHESE::TYPE_SQL << DBInterSYNTHESE::FIELD_SEPARATOR <<
 				sql;
+			return true;
 		}
 
 
 
-		void DBInterSYNTHESE::RequestEnqueue::operator()( const DBRecord& r )
+		bool DBInterSYNTHESE::RequestEnqueue::operator()( const DBRecord& r )
 		{
+			if(r.getTable()->getFormat().ID == InterSYNTHESEQueue::CLASS_NUMBER)
+			{
+				return false;
+			}
 			_result <<
 				DBInterSYNTHESE::TYPE_REPLACE_STATEMENT << DBInterSYNTHESE::FIELD_SEPARATOR <<
 				r.getTable()->getFormat().ID << DBInterSYNTHESE::FIELD_SEPARATOR;
@@ -432,17 +439,19 @@ namespace synthese
 				// Next content
 				++it;
 			}
+			return true;
 		}
 
 
 
-		void DBInterSYNTHESE::RequestEnqueue::operator()(
+		bool DBInterSYNTHESE::RequestEnqueue::operator()(
 			util::RegistryKeyType id
 		){
 			_result <<
 				DBInterSYNTHESE::TYPE_DELETE_STATEMENT << DBInterSYNTHESE::FIELD_SEPARATOR <<
 				id
 			;
+			return true;
 		}
 
 
@@ -548,6 +557,10 @@ namespace synthese
 			const std::string& configPerimeter,
 			const std::string& messagePerimeter
 		) const {
+			// Do not enqueue if not in the perimeter and if it
+			// is the InterSYNTHESEQueue itself. It may happens if the user select
+			// this table in the inter_synthese_admin configuration but
+			// this is non sense.
 			return configPerimeter == messagePerimeter &&
 				messagePerimeter != lexical_cast<string>(InterSYNTHESEQueue::CLASS_NUMBER);
 		}
