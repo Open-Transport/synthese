@@ -656,6 +656,18 @@ namespace synthese
 
 		void SQLiteDB::removePreparedStatements()
 		{
+			// Finalize the prepared statements before removing them
+			// Loop on statements
+			ReplaceStatements::mapped_type& replaceStatements(_replaceStatements[this_thread::get_id()]);
+			BOOST_FOREACH(sqlite3_stmt* stmt, replaceStatements)
+			{
+				sqlite3_finalize(stmt);
+			}
+			DeleteStatements::mapped_type& deleteStatements(_deleteStatements[this_thread::get_id()]);
+			BOOST_FOREACH(sqlite3_stmt* stmt, deleteStatements)
+			{
+				sqlite3_finalize(stmt);
+			}
 			_replaceStatements.erase(this_thread::get_id());
 			_deleteStatements.erase(this_thread::get_id());
 		}
