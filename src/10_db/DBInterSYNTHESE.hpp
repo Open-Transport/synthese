@@ -98,7 +98,7 @@ namespace synthese
 			);
 
 			class RequestEnqueue:
-				public boost::static_visitor<>
+				public boost::static_visitor<bool>
 			{
 				std::stringstream& _result;
 
@@ -108,13 +108,13 @@ namespace synthese
 				);
 
 				// SQL query
-				void operator()(const std::string& sql);
+				bool operator()(const std::string& sql);
 
 				// Replace statement
-				void operator()(const DBRecord& r);
+				bool operator()(const DBRecord& r);
 
 				// Delete statement
-				void operator()(util::RegistryKeyType id);
+				bool operator()(util::RegistryKeyType id);
 			};
 
 			class ContentGetter:
