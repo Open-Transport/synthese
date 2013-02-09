@@ -235,7 +235,17 @@ namespace synthese
 			if(withAlgorithmOptimizations)
 			{
 				registerInParentOrRoot();
-				getRoot()->addPage(*this);
+				if(hasRoot())
+				{
+					getRoot()->addPage(*this);
+				}
+				else
+				{
+					util::Log::GetInstance().warn(
+						"Data corrupted in the load of the " +
+						this->getClassName() +" object " + boost::lexical_cast<std::string>(this->getKey())
+					);
+				}
 			}
 		}
 
@@ -245,7 +255,17 @@ namespace synthese
 		{
 			unregisterInParentOrRoot();
 			getRoot()->removePage(get<SmartURLPath>());
-			this->setParent(NULL);
+			if(hasRoot())
+			{
+				this->setParent(NULL);
+			}
+			else
+			{
+				util::Log::GetInstance().warn(
+					"Data corrupted in the load of the " +
+					this->getClassName() +" object " + boost::lexical_cast<std::string>(this->getKey())
+				);
+			}
 		}
 
 
