@@ -31,6 +31,7 @@
 #include "CMSModule.hpp"
 #include "CMSRight.hpp"
 #include "HTMLForm.h"
+#include "HTMLList.h"
 #include "HTMLModule.h"
 #include "ModuleAdmin.h"
 #include "ObjectUpdateAction.hpp"
@@ -258,6 +259,15 @@ namespace synthese
 					//////////////////////////////////////////////////////////////////////////
 					// Update
 					{
+						stream << "<h1>SVN Repository</h1>";
+
+						HTMLList l;
+						stream << l.open();
+						stream << l.element();
+						stream << HTMLModule::getHTMLLink(_site->get<SVNWorkingCopy>().getRepo().getURL(),
+														  _site->get<SVNWorkingCopy>().getRepo().getURL());
+						stream << l.close();
+
 						stream << "<h1>SVN Update</h1>";
 
 						AdminActionFunctionRequest<SVNUpdateAction, WebsiteAdmin> updateRequest(request, *this);
