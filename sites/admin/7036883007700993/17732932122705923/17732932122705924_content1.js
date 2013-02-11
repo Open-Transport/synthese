@@ -27,13 +27,13 @@ function showHideNode(image)
 
 function show(image, div)
 {
-    image.src = "ftv2mlastnode.png";
+    image.src = "/admin/img/ftv2mlastnode.png";
     div.style.display = 'block';
 }
 
 function hide(image, div)
 {
-    image.src = "ftv2plastnode.png";
+    image.src = "/admin/img/ftv2plastnode.png";
     div.style.display = 'none';
 }
 

@@ -65,8 +65,8 @@ table {margin-bottom:1.5em;border-collapse:collapse;}
 
 .node { cursor:pointer; }
 
-.lastblock { background-image:url(ftv2lastnode.png); background-repeat:no-repeat; background-position:0 0; float:left;}
-.notlastblock { background-image:url(ftv2vertline.png); background-repeat:repeat-y; background-position:0 0; float:left;}
+.lastblock { background-image:url(/admin/img/ftv2lastnode.png); background-repeat:no-repeat; background-position:0 0; float:left;}
+.notlastblock { background-image:url(/admin/img/ftv2vertline.png); background-repeat:repeat-y; background-position:0 0; float:left;}
 
 
 .level0 { width:256px; }
