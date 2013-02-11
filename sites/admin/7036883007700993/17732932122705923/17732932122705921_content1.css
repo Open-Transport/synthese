@@ -39,7 +39,7 @@ table {margin-bottom:1.5em;border-collapse:collapse;}
 #adminpos { width:65%; float:left; font-size:0.85em; line-height:16px;}
 #adminpos a { text-decoration:none; }
 #adminpos img { vertical-align:bottom;  margin-right:2px; border:none; }
-#pagename { float:left; font-size:28px;background:#d1e76e url(round.png) no-repeat; padding-bottom:1px; line-height:30px; padding-top:2px; margin-right:10%;}
+#pagename { float:left; font-size:28px;background:#d1e76e url(/admin/img/round.png) no-repeat; padding-bottom:1px; line-height:30px; padding-top:2px; margin-right:10%;}
 #pagename img {  margin:8px 10px 5px 20px; }
 #user { float:right; text-align:right; }
 #user img { vertical-align:middle; }
@@ -132,7 +132,7 @@ table.adminresults, table.propertysheet {margin-top:0.4em; margin-left:30px;  bo
 .propertysheet .r1 td, .propertysheet .r2 td, .adminresults .r1 td, .adminresults .r2 td { border-bottom:none; border-top:none; }
 
 
-#admincontent .info { background:url(information.png) 4px no-repeat; background-color:#bed8ff; padding:4px 4px 4px 22px; color:#333333; }
+#admincontent .info { background:url(/admin/img/information.png) 4px no-repeat; background-color:#bed8ff; padding:4px 4px 4px 22px; color:#333333; }
 #admincontent p, #admincontent #map  { margin-left:30px !important;}
 #admincontent #map { width:700px !important; height:400px !important; }
 #admincontent a img {border:none;}
