@@ -8,7 +8,7 @@
 <head>
 <meta charset="utf-8">
 <title><@title@> - SYNTHESE3 Admin</title>
-<link rel="icon" type="image/png" href="<@icon@>" />
+<?if&cond=<@icon@>&then=<link rel="icon" type="image/png" href="<@icon@>" />?>
 <style type="text/css">@import url(/admin/colors.css); @import url(/admin/admin.css); @import url(/admin/calendar/calendar-win2k-1.css);</style>
 <script type="text/javascript" src="/admin/calendar/calendar.js"></script><script type="text/javascript" src="/admin/calendar/calendar-fr.js"></script><script type="text/javascript" src="/admin/calendar/calendar-setup.js"></script>
 <script type="text/javascript" src="/admin/jquery/jquery-1.7.1.min.js"></script>
@@ -25,7 +25,7 @@
 <div id="title">
 
 <div id="logo">
-<img src="synthese.png" alt="SYNTHESE" />
+<img src="/admin/img/synthese.png" alt="SYNTHESE" />
 <!--
 <div id="calls"><div id="call" if {{callduration}} { class="incall"}
 print {>}
@@ -35,7 +35,7 @@ if {{callduration}} {{print {<span id="calldurationspan"></span><script type="te
 print {</div>}
 -->
 
-<?if&cond=<@switch_call_url@>&then=<a class="linkbutton" onmouseover="this.className='activatedlinkbutton';" onmouseout="this.className='linkbutton';" onmousedown="this.className='clickedlinkbutton';" onmouseup="this.className='activatedlinkbutton';" href="<@switch_call_url@>"><img src="phone.png" alt="P" /> <?if&cond=<@current_call_id@>&then=Stopper l'appel&else=Prendre un appel?></a>?>
+<?if&cond=<@switch_call_url@>&then=<a class="linkbutton" onmouseover="this.className='activatedlinkbutton';" onmouseout="this.className='linkbutton';" onmousedown="this.className='clickedlinkbutton';" onmouseup="this.className='activatedlinkbutton';" href="<@switch_call_url@>"><img src="/admin/img/phone.png" alt="P" /> <?if&cond=<@current_call_id@>&then=Stopper l'appel&else=Prendre un appel?></a>?>
 
 </div>
 
@@ -44,8 +44,8 @@ print {</div>}
 
 <div id="user">
 
-<?if&cond=<@session_id@>&then=<div id="username"><img src="user.png" alt="Utilisateur" /><@user_name@></div>?>
-<div id="logout"><?if&cond=<@user_name@>&then=<?link&target=<@p@>&class=linkbutton&a=logout&text=<img src="disconnect.png" title="Déconnecter">\&nbsp;Déconnecter?>?>
+<?if&cond=<@session_id@>&then=<div id="username"><img src="/admin/img/user.png" alt="Utilisateur" /><@user_name@></div>?>
+<div id="logout"><?if&cond=<@user_name@>&then=<?link&target=<@p@>&class=linkbutton&a=logout&text=<img src="/admin/img/disconnect.png" title="Déconnecter">\&nbsp;Déconnecter?>?>
 </div></div>
 
 <div id="pagename"><img src="<@icon@>" /><?if&cond=<@session_id@>&then=<@title@>&else=Login?></div>
@@ -58,7 +58,7 @@ print {</div>}
 <{tree_node&recursive=1&template=
 
 <div class="<?if&cond=<@is_last@>&then=lastblock&else=notlastblock?>">
-<div class="tree_icon<?if&cond=<@depth@>&then=s?>"><?if&cond=<@depth@>&then=<?if&cond=<@recursive_content@>&then=<img class="node" src="<?if&cond=<@is_opened@>&then=ftv2mlastnode&else=ftv2plastnode?>.png" alt="+" />&else=<img src="ftv2lastnode.png" alt="-" />?>?><img src="<@icon@>" class="icon" alt="x" /></div>
+<div class="tree_icon<?if&cond=<@depth@>&then=s?>"><?if&cond=<@depth@>&then=<?if&cond=<@recursive_content@>&then=<img class="node" src="/admin/img/<?if&cond=<@is_opened@>&then=ftv2mlastnode&else=ftv2plastnode?>.png" alt="+" />&else=<img src="/admin/img/ftv2lastnode.png" alt="-" />?>?><img src="<@icon@>" class="icon" alt="x" /></div>
 
 <div class="text level<@depth@>"><?if&cond=<@is_current@>&else=<a href="/admin?<@url@>">?><@title@><?if&cond=<@is_current@>&else=</a>?></div>
 <div <?if&cond=<@is_opened@>&else=style="display:none" ?> class="subtree subtree<@depth@>"><@recursive_content@></div>
@@ -78,7 +78,7 @@ Login : <input name="actionParamlogin" /> Mot de passe : <input type="password" 
 </div>
 
 <div id="footer">
-SYNTHESE <@version_info@> - &copy; 2003-2011 - SYNTHESE est un produit sous <a href="http://www.gnu.org/licenses/gpl.html">licence GPL</a> - Plus d'informations sur <a href="http://synthese.rcsmobility.com/">synthese.rcsmobility.com</a>
+SYNTHESE <@version_info@> - \&copy; 2003-2011 - SYNTHESE est un produit sous <a href="http://www.gnu.org/licenses/gpl.html">licence GPL</a> - Plus d'informations sur <a href="http://synthese.rcsmobility.com/">synthese.rcsmobility.com</a>
 </div>
 
 </div>
