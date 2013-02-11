@@ -272,9 +272,9 @@ namespace synthese
 		PTJourneyPlannerService::PTJourneyPlannerService(
 		):	_startDate(not_a_date_time),
 			_endDate(not_a_date_time),
-			_period(NULL),
 			_startArrivalDate(not_a_date_time),
 			_endArrivalDate(not_a_date_time),
+			_period(NULL),
 			_logger(new AlgorithmLogger()),
 			_page(NULL)
 		{}

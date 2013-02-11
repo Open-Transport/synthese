@@ -542,9 +542,9 @@ namespace synthese
 				if(!listeArretsNode.isEmpty())
 				{
 					_stopOrdMnaMap.clear();
-					for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
+					for(int i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
 					{
-						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", static_cast<int>(i)));
+						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", i));
 						if(blocANode.isEmpty())
 						{
 							continue;
@@ -598,9 +598,9 @@ namespace synthese
 				){
 					bool ok(true);
 					CurrentJourney::NextStops nextStops;
-					for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
+					for(int i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
 					{
-						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", static_cast<int>(i)));
+						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", i));
 						if(blocANode.isEmpty())
 						{
 							ok = false;
