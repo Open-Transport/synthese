@@ -386,8 +386,8 @@ namespace synthese
 		void PTUseRule::toParametersMap( util::ParametersMap& pm, std::string prefix /*= std::string() */ ) const
 		{
 			pm.insert(prefix + DATA_RESERVATION_COMPULSORY, _reservationType == RESERVATION_RULE_COMPULSORY);
-			pm.insert(prefix + DATA_RESERVATION_POSSIBLE, _reservationType != RESERVATION_FORBIDDEN);
-			if(_reservationType != RESERVATION_FORBIDDEN)
+			pm.insert(prefix + DATA_RESERVATION_POSSIBLE, _reservationType != RESERVATION_RULE_FORBIDDEN);
+			if(_reservationType != RESERVATION_RULE_FORBIDDEN)
 			{
 				pm.insert(prefix + DATA_RESERVATION_MIN_DELAY_MINUTES, _minDelayMinutes.minutes());
 			}
