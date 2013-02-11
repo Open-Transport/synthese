@@ -37,8 +37,7 @@ namespace synthese
 	{
 		/** Filters any stressed or special alphabetical character, which are converted
 			to their closest equivalent in A-Za-z.
-			Note that this filter is written given the encoding of this source file,
-			which is expected to be ISO8859-15.
+			Input stream must be ISO8859-1
 
 			@ingroup m01
 		*/
@@ -62,9 +61,9 @@ namespace synthese
 
 			while (i != n)
 			{
-				char c = s[i];
+				unsigned char c = s[i];
 
-				if (c == 0xFFFFFFc3 )
+				if (c == 0xc3)
 				{
 					i++;
 					if(i == n)
@@ -73,35 +72,35 @@ namespace synthese
 						break;
 					}
 					c = s[i];
-					switch((unsigned int)c)
+					switch(c)
 					{
-						case 0xFFFFFFa8 : //'è' = c3a8
-						case 0xFFFFFFa9 : //'é' = c3a9
-						case 0xFFFFFFaa : //'ê' = c3aa
-						case 0xFFFFFFab : //'ë' = c3ab
+						case 0xa8 : //'è' = c3a8
+						case 0xa9 : //'é' = c3a9
+						case 0xaa : //'ê' = c3aa
+						case 0xab : //'ë' = c3ab
 							boost::iostreams::put(dest, 'e');
 							break;
-						case 0xFFFFFFa7 : //'ç' = c3a7
+						case 0xa7 : //'ç' = c3a7
 							boost::iostreams::put(dest, 'c');
 							break;
-						case 0xFFFFFFa0 : //'à' = c3a0á
-						case 0xFFFFFFa1 : //'á' = c3a1
-						case 0xFFFFFFa2 : //'â' = c3a2
-						case 0xFFFFFFa4 : //'ä' = c3a4
+						case 0xa0 : //'à' = c3a0á
+						case 0xa1 : //'á' = c3a1
+						case 0xa2 : //'â' = c3a2
+						case 0xa4 : //'ä' = c3a4
 							boost::iostreams::put(dest, 'a');
 							break;
-						case 0xFFFFFFb9 : //'ù' = c3b9
-						case 0xFFFFFFba : //'ú' = c3ba
-						case 0xFFFFFFbb : //'û' = c3bb
-						case 0xFFFFFFbc : //'ü' = c3bc
+						case 0xb9 : //'ù' = c3b9
+						case 0xba : //'ú' = c3ba
+						case 0xbb : //'û' = c3bb
+						case 0xbc : //'ü' = c3bc
 							boost::iostreams::put(dest, 'u');
 							break;
-						case 0xFFFFFFb4 : //'ô' = c3b4
-						case 0xFFFFFFb6 : //'ö' = c3b6
+						case 0xb4 : //'ô' = c3b4
+						case 0xb6 : //'ö' = c3b6
 							boost::iostreams::put(dest, 'o');
 							break;
-						case 0xFFFFFFae : //'î' = c3ae
-						case 0xFFFFFFaf : //'ï' = c3af
+						case 0xae : //'î' = c3ae
+						case 0xaf : //'ï' = c3af
 							boost::iostreams::put(dest, 'i');
 							break;
 						default : //Put last two chars
@@ -110,7 +109,7 @@ namespace synthese
 							break;
 					}
 				}
-				else if (((unsigned int)c) == 0xFFFFFFc2 )
+				else if (c == 0xc2 )
 				{
 					i++;
 					if(i == n)
@@ -121,7 +120,7 @@ namespace synthese
 					c = s[i];
 					switch((unsigned int)c)
 					{
-						case 0xFFFFFFb0 : //'°' = c2b0
+						case 0xb0 : //'°' = c2b0
 							boost::iostreams::put(dest, 'o');
 							break;
 						default ://Put last two chars
@@ -130,7 +129,7 @@ namespace synthese
 							break;
 					}
 				}
-				else if (((unsigned int)c) == 0xFFFFFFc5 )
+				else if (c == 0xc5 )
 				{
 					i++;
 					if(i == n)
@@ -139,9 +138,9 @@ namespace synthese
 						break;
 					}
 					c = s[i];
-					switch((unsigned int)c)
+					switch(c)
 					{
-						case 0xFFFFFF93 : //'œ' = c593
+						case 0x93 : //'œ' = c593
 							boost::iostreams::put(dest, 'o');
 							boost::iostreams::put(dest, 'e');
 							break;
