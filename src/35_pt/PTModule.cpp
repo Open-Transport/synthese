@@ -90,6 +90,8 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<PTModule>::PreInit()
 		{
+			RegisterParameter(PTModule::MODULE_PARAM_ENABLE_THEORETICAL, "1", &PTModule::ParameterCallback);
+			RegisterParameter(PTModule::MODULE_PARAM_ENABLE_REAL_TIME, "1", &PTModule::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<PTModule>::Init()
@@ -149,11 +151,16 @@ namespace synthese
 		template<> void ModuleClassTemplate<PTModule>::CloseThread(
 		){
 		}
+	
 	}
 
 	namespace pt
 	{
 		PTModule::GeneralStopsMatcher PTModule::_generalStopsMatcher;
+		bool PTModule::_theoreticalAllowed(true);
+		bool PTModule::_realTimeAllowed(true);
+		const string PTModule::MODULE_PARAM_ENABLE_THEORETICAL ("enable_theoretical");
+		const string PTModule::MODULE_PARAM_ENABLE_REAL_TIME ("enable_real_time");
 
 		void PTModule::RTDataCleaner()
 		{
@@ -358,4 +365,30 @@ namespace synthese
 			)	);
 			return places.empty() ? shared_ptr<Place>() : places.begin()->placeResult.value;
 		}
+
+		void PTModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			if (name == MODULE_PARAM_ENABLE_THEORETICAL)
+			{
+				_theoreticalAllowed = lexical_cast<bool>(value);
+			}
+			else if (name == MODULE_PARAM_ENABLE_REAL_TIME)
+			{
+				_realTimeAllowed = lexical_cast<bool>(value);
+			}
+		}
+		
+		bool PTModule::isTheroticalAllowed()
+		{
+			return _theoreticalAllowed;
+		}
+		
+		bool PTModule::isRealTimeAllowed()
+		{
+			return _realTimeAllowed;
+		}
+		
+		
 }	}

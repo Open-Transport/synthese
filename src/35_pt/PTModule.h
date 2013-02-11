@@ -131,8 +131,13 @@ namespace synthese
 
 			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> > GeneralStopsMatcher;
 
+			static const std::string MODULE_PARAM_ENABLE_THEORETICAL;
+			static const std::string MODULE_PARAM_ENABLE_REAL_TIME;
+
 		private:
 			static GeneralStopsMatcher _generalStopsMatcher;
+			static bool _theoreticalAllowed;
+			static bool _realTimeAllowed;
 
 		public:
 			static GeneralStopsMatcher& GetGeneralStopsMatcher(){ return _generalStopsMatcher; }
@@ -188,6 +193,29 @@ namespace synthese
 			static int GetMaxAlarmLevel(
 				const graph::Journey&
 			);
+
+			/** Called whenever a parameter registered by this module is changed
+			 */
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
+			);
+
+			/**
+			 * @brief isTheroticalAllowed
+			 * This value is true by default and can be changed by setting the global
+			 * parameter "enable_theoretical".
+			 * @return true if it is allowed to use the theorical values in a report. 
+			 */
+			static bool isTheroticalAllowed();
+
+			/**
+			 * @brief isRealTimeAllowed
+			 * This value is true by default and can be changed by setting the global
+			 * parameter "enable_real_time".
+			 * @return true if is is allowed to use the real time values in a report.
+			 */
+			static bool isRealTimeAllowed();
 		};
 	}
 	/** @} */
