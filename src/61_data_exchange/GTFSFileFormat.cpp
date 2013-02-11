@@ -1083,14 +1083,6 @@ namespace synthese
 			bool isContinuous
 		) const
 		{
-			if(isContinuous)
-			{
-				static_cast<const ContinuousService *>(service);
-			}
-			else
-			{
-				static_cast<const ScheduledService *>(service);
-			}
 			boost::gregorian::date currentDay, firstActiveDay;
 			boost::gregorian::date lastActiveDay = service->getLastActiveDate();
 			bool weekDays [7];
@@ -1156,15 +1148,6 @@ namespace synthese
 		) const
 		{
 			bool passMidnight = false;
-
-			if(isContinuous)
-			{
-				static_cast<const ContinuousService *>(service);
-			}
-			else
-			{
-				static_cast<const ScheduledService *>(service);
-			}
 
 			BOOST_FOREACH(const shared_ptr<LineStop>& ls, linestops)
 			{
