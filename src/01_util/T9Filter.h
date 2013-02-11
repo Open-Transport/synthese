@@ -37,6 +37,8 @@ namespace synthese
 		/** Converts any letter into T9 replacement digit.
 			The digits are unchanged.
 			All other characters are converted to 0.
+			Input stream must be ISO8859-1
+
 			@ingroup m01
 		*/
 		class T9Filter : public boost::iostreams::output_filter

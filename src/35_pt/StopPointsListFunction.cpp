@@ -303,7 +303,7 @@ namespace synthese
 
 			// Filling in the result parameters map
 			ParametersMap pm;
-			int nbStops =0;
+			size_t nbStops = 0;
 			BOOST_FOREACH(const StopPointMapType::value_type& sp, stopPointMap)
 			{
 				// Declarations
