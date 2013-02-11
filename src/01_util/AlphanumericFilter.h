@@ -41,8 +41,7 @@ namespace synthese
 			Filters any non alphanumeric character, which are replaced by spaces.
 			Notes :
 				- accentuated characters are kept (use PlainCharFilter to remove them).
-				- note that this filter is written given the encoding of this source file,
-				  which is expected to be ISO8859-15.
+				- input stream must be ISO8859-1
 		*/
 		class AlphanumericFilter:
 		public boost::iostreams::multichar_output_filter
@@ -66,54 +65,54 @@ namespace synthese
 			int i = 0;
 			while (i != n)
 			{
-				char c = s[i];
+				unsigned char c = s[i];
 
-				if( c == 'á' ||
-					c == 'à' ||
-					c == 'â' ||
-					c == 'ä' ||
-					c == 'Á' ||
-					c == 'À' ||
-					c == 'Ä' ||
-					c == 'Â' ||
-					c == 'é' ||
-					c == 'è' ||
-					c == 'ê' ||
-					c == 'ë' ||
-					c == 'É' ||
-					c == 'È' ||
-					c == 'Ê' ||
-					c == 'Ë' ||
-					c == 'í' ||
-					c == 'ì' ||
-					c == 'ï' ||
-					c == 'î' ||
-					c == 'Í' ||
-					c == 'Ì' ||
-					c == 'Ï' ||
-					c == 'Î' ||
-					c == 'ó' ||
-					c == 'ò' ||
-					c == 'ö' ||
-					c == 'ô' ||
-					c == 'Ó' ||
-					c == 'Ò' ||
-					c == 'Ö' ||
-					c == 'Ô' ||
-					c == 'ú' ||
-					c == 'ù' ||
-					c == 'ü' ||
-					c == 'û' ||
-					c == 'Ú' ||
-					c == 'Ù' ||
-					c == 'Ü' ||
-					c == 'Û' ||
-					c == 'ç' ||
-					c == 'Ç' ||
-					c == 'Œ' ||
-					c == 'œ' ||
-					c == 'Æ' ||
-					c == 'æ' ||
+				if( c == 0XE1 ||
+					c == 0XE0 ||
+					c == 0XE2 ||
+					c == 0XE4 ||
+					c == 0XC1 ||
+					c == 0XC0 ||
+					c == 0XC4 ||
+					c == 0XC2 ||
+					c == 0XE9 ||
+					c == 0XE8 ||
+					c == 0XEA ||
+					c == 0XEB ||
+					c == 0XC9 ||
+					c == 0XC8 ||
+					c == 0XCA ||
+					c == 0XCB ||
+					c == 0XED ||
+					c == 0XEC ||
+					c == 0XEF ||
+					c == 0XEE ||
+					c == 0XCD ||
+					c == 0XCC ||
+					c == 0XCF ||
+					c == 0XCE ||
+					c == 0XF3 ||
+					c == 0XF2 ||
+					c == 0XF6 ||
+					c == 0XF4 ||
+					c == 0XD3 ||
+					c == 0XD2 ||
+					c == 0XD6 ||
+					c == 0XD4 ||
+					c == 0XFA ||
+					c == 0XF9 ||
+					c == 0XFC ||
+					c == 0XFB ||
+					c == 0XDA ||
+					c == 0XD9 ||
+					c == 0XDC ||
+					c == 0XDB ||
+					c == 0XE7 ||
+					c == 0XC7 ||
+					c == 0X20 ||
+					c == 0X20 ||
+					c == 0XC6 ||
+					c == 0XE6 ||
 					(c >= 'a' && c <= 'z') ||
 					(c >= 'A' && c <= 'Z') ||
 					(c >= '0' && c <= '9')
