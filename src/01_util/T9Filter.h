@@ -59,19 +59,19 @@ namespace synthese
 		bool
 			T9Filter::put(Sink& dest, int c)
 		{
-			if ((c >= 'A' && c <= 'C') || (c >= 'a' && c <= 'c') || c == 'à' || c == 'Â' || c == 'Ä' || c == 'ç' || c == 'À')
+			if ((c >= 'A' && c <= 'C') || (c >= 'a' && c <= 'c') || c == 0xE0 || c == 0xC2 || c == 0xC4 || c == 0xE7 || c == 0xC0)
 				return boost::iostreams::put(dest, '2');
-			else if ((c >= 'D' && c <= 'F') || (c >= 'd' && c <= 'f') || c == 'é' || c == 'ê' || c == 'è' || c == 'Ê' || c == 'Ë' || c == 'È')
+			else if ((c >= 'D' && c <= 'F') || (c >= 'd' && c <= 'f') || c == 0xE9 || c == 0xEA || c == 0xE8 || c == 0XCA || c == 0XCB || c == 0XC8)
 				return boost::iostreams::put(dest, '3');
-			else if ((c >= 'G' && c <= 'I') || (c >= 'g' && c <= 'i') || c == 'î' || c == 'ï' || c == 'Î' || c == 'Ï' || c == 'ì' || c == 'Ì')
+			else if ((c >= 'G' && c <= 'I') || (c >= 'g' && c <= 'i') || c == 0XEE || c == 0XEF || c == 0XCE || c == 0XCF || c == 0XEC || c == 0XCC)
 				return boost::iostreams::put(dest, '4');
 			else if ((c >= 'J' && c <= 'L') || (c >= 'j' && c <= 'l'))
 				return boost::iostreams::put(dest, '5');
-			else if ((c >= 'M' && c <= 'O') || (c >= 'm' && c <= 'o') || c == 'ñ' || c == 'Ñ' || c == 'ô' || c == 'ö' || c == 'õ' || c == 'Ô' || c == 'Ö' || c == 'Õ' || c == 'ò' || c == 'Ò')
+			else if ((c >= 'M' && c <= 'O') || (c >= 'm' && c <= 'o') || c == 0XF1 || c == 0XD1 || c == 0XF4 || c == 0XF6 || c == 0XF5 || c == 0XD4 || c == 0XD6 || c == 0XD5 || c == 0XF2 || c == 0XD2)
 				return boost::iostreams::put(dest, '6');
 			else if ((c >= 'P' && c <= 'S') || (c >= 'p' && c <= 's'))
 				return boost::iostreams::put(dest, '7');
-			else if ((c >= 'T' && c <= 'V') || (c >= 't' && c <= 'v') || c == 'ù' || c == 'Ù' || c == 'û' || c == 'Û' || c == 'ü' || c == 'Ü')
+			else if ((c >= 'T' && c <= 'V') || (c >= 't' && c <= 'v') || c == 0XF9 || c == 0XD9 || c == 0XFB || c == 0XDB || c == 0XFC || c == 0XDC)
 				return boost::iostreams::put(dest, '8');
 			else if ((c >= 'W' && c <= 'Z') || (c >= 'w' && c <= 'z'))
 				return boost::iostreams::put(dest, '7');
