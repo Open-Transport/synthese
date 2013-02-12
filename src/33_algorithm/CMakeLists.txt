@@ -27,6 +27,8 @@ RoutePlanningUserPrefPanel.cpp
 RoutePlanningUserPrefPanel.h
 TimeSlotRoutePlanner.cpp
 TimeSlotRoutePlanner.h
+TransferPlaceCheck.cpp
+TransferPlaceCheck.hpp
 VAMConverter.cpp
 VAMConverter.hpp
 )

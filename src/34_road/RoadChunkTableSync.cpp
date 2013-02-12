@@ -25,6 +25,7 @@
 #include "Address.h"
 #include "CrossingTableSync.hpp"
 #include "EdgeProjector.hpp"
+#include "RoadModule.h"
 #include "RoadTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -252,6 +253,12 @@ namespace synthese
 				double maxSpeed = rows->getDouble(RoadChunkTableSync::COL_CAR_SPEED);
 				object->setCarSpeed(maxSpeed);
 				object->getReverseRoadChunk()->setCarSpeed(maxSpeed);
+
+				if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+				{
+					// Useful transfer calculation
+					object->getHub()->clearAndPropagateUsefulTransfer(RoadModule::GRAPH_ID);
+				}
 			}
 		}
 
@@ -260,6 +267,11 @@ namespace synthese
 		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Unlink(
 			MainRoadChunk* obj
 		){
+			// Useful transfer calculation
+			if(obj->getHub())
+			{
+				obj->getHub()->clearAndPropagateUsefulTransfer(RoadModule::GRAPH_ID);
+			}
 		}
 
 

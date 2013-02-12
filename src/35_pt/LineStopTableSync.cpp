@@ -208,6 +208,9 @@ namespace synthese
 						)	);
 						copy->addEdge(*newEdge);
 					}
+
+					// Useful transfer calculation
+					dls.getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
 				}
 			}
 			else if(dynamic_cast<LineArea*>(ls))
@@ -250,6 +253,12 @@ namespace synthese
 								lineArea.getInternalService()
 						)	);
 						copy->addEdge(*newEdge);
+					}
+
+					// Useful transfer calculation
+					BOOST_FOREACH(StopArea* stopArea, lineArea.getArea()->getStops())
+					{
+						stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
 					}
 				}
 			}
@@ -307,11 +316,31 @@ namespace synthese
 		){
 			if(dynamic_cast<DesignatedLinePhysicalStop*>(obj))
 			{
-				static_cast<DesignatedLinePhysicalStop*>(obj)->clearPhysicalStop();
+				DesignatedLinePhysicalStop& object(
+					dynamic_cast<DesignatedLinePhysicalStop&>(*obj)
+				);
+
+				// Useful transfer calculation
+				if(object.getPhysicalStop())
+				{
+					object.getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+				}
+
+				object.clearPhysicalStop();
 			}
 			else if(dynamic_cast<LineArea*>(obj))
 			{
-				obj->getLine()->removeEdge(*obj);
+				LineArea& object(
+					dynamic_cast<LineArea&>(*obj)
+				);
+
+				object.getLine()->removeEdge(*obj);
+
+				// Useful transfer calculation
+				BOOST_FOREACH(StopArea* stopArea, object.getArea()->getStops())
+				{
+					stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+				}
 			}
 		}
 

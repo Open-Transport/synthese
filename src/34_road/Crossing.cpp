@@ -200,4 +200,16 @@ namespace synthese
 		{
 			return "Intersection";
 		}
+
+
+
+		Hub::Vertices Crossing::getVertices( graph::GraphIdType graphId ) const
+		{
+			Vertices result;
+			if(graphId == RoadModule::GRAPH_ID)
+			{
+				result.push_back(this);
+			}
+			return result;
+		}
 }	}
