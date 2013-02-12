@@ -59,6 +59,15 @@ namespace synthese
 			virtual bool containsAnyVertex(synthese::graph::GraphIdType) const;
 
 			virtual std::string getRuleUserName() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Lists the vertices contained in the hub.
+			/// @param graphId the graph the vertices must belong to
+			virtual Vertices getVertices(
+				graph::GraphIdType graphId
+			) const;
 		};
 	}
 }

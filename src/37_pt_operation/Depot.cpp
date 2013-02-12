@@ -107,4 +107,16 @@ namespace synthese
 		{
 			return "Dépôt";
 		}
+
+
+
+		Hub::Vertices Depot::getVertices( graph::GraphIdType graphId ) const
+		{
+			Vertices result;
+			if(graphId == PTOperationModule::GRAPH_ID)
+			{
+				result.push_back(this);
+			}
+			return result;
+		}
 }	}

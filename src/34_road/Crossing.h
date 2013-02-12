@@ -105,6 +105,15 @@ namespace synthese
 			//! @name Virtual queries for Hub interface
 			//@{
 				//////////////////////////////////////////////////////////////////////////
+				/// Lists the vertices contained in the hub.
+				/// @param graphId the graph the vertices must belong to
+				virtual Vertices getVertices(
+					graph::GraphIdType graphId
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
 				/// Gets the vertices contained by itself as a hub.
 				/// @retval adds itself to the result if the searched graph is road
 				/// @param whatToSearch graph to search

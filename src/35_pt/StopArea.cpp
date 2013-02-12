@@ -554,4 +554,20 @@ namespace synthese
 			}
 			return result;
 		}
+
+
+
+		Hub::Vertices StopArea::getVertices(
+			GraphIdType graphId
+		) const	{
+			Vertices result;
+			if(graphId == PTModule::GRAPH_ID)
+			{
+				BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
+				{
+					result.push_back(it.second);
+				}
+			}
+			return result;
+		}
 }	}

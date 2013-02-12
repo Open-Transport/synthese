@@ -193,7 +193,7 @@ namespace synthese
 		){
 			_insert(vertexItem, transfers, duration, journey);
 
-			if(!vertex.getHub()->isConnectionPossible()) return;
+			if(!vertex.getHub()->isUsefulTransfer(vertex.getGraphType())) return;
 
 			const Hub* p(vertex.getHub());
 			assert (p != 0);
