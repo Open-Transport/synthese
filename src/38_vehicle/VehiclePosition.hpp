@@ -89,8 +89,9 @@ namespace synthese
 				COMMERCIAL = 4,
 				NOT_IN_SERVICE = 5,
 				OUT_OF_SERVICE = 6,
-				UNKNOWN_STATUS = 7,
-				REFUELING = 8
+				UNKNOWN_STATUS = 999,
+				REFUELING = 8,
+				TERMINUS_START = 9
 			} Status;
 
 			static std::string GetStatusName(Status value);
