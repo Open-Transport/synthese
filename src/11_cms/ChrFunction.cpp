@@ -64,7 +64,7 @@ namespace synthese
 		) const {
 			if(!_code.empty())
 			{
-				stream << atoi(_code.c_str());
+				stream << char(atoi(_code.c_str()));
 			}
 			return util::ParametersMap();
 		}
