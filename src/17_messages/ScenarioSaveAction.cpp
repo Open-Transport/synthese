@@ -89,6 +89,7 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 		const string ScenarioSaveAction::PARAMETER_SECTIONS = Action_PARAMETER_PREFIX + "_sections";
 
+		const string ScenarioSaveAction::PARAMETER_WITH_MESSAGES = Action_PARAMETER_PREFIX + "_with_messages";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_ID_ = Action_PARAMETER_PREFIX + "_message_id_";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_TITLE_ = Action_PARAMETER_PREFIX + "_message_title_";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_CONTENT_ = Action_PARAMETER_PREFIX + "_message_content_";
@@ -323,75 +324,78 @@ namespace synthese
 				}
 
 				// Messages
-				for(size_t rank(0); map.isDefined(PARAMETER_MESSAGE_ID_+ lexical_cast<string>(rank)); ++rank)
+				_withMessages = map.getDefault<bool>(PARAMETER_WITH_MESSAGES, false);
+				if(_withMessages)
 				{
-					string rankStr(lexical_cast<string>(rank));
-
-					// Jump over removals (id is empty)
-					if(map.get<string>(PARAMETER_MESSAGE_ID_+ rankStr).empty())
+					for(size_t rank(0); map.isDefined(PARAMETER_MESSAGE_ID_+ lexical_cast<string>(rank)); ++rank)
 					{
-						continue;
-					}
+						string rankStr(lexical_cast<string>(rank));
 
-					Message msg;
-					msg.id = map.get<RegistryKeyType>(PARAMETER_MESSAGE_ID_+ rankStr); // explicit 0 value in case of new message
-					msg.title = map.getDefault<string>(PARAMETER_MESSAGE_TITLE_+ rankStr);
-					msg.content = map.getDefault<string>(PARAMETER_MESSAGE_CONTENT_+ rankStr);
-					msg.level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_MESSAGE_LEVEL_+rankStr, 10));
-
-					// Recipients
-					BOOST_FOREACH(const Factory<AlarmRecipient>::Keys::value_type& key, Factory<AlarmRecipient>::GetKeys())
-					{
-						string keys(map.getDefault<string>(PARAMETER_MESSAGE_RECIPIENTS_+ lexical_cast<string>(rank) + "_" + key));
-						if(!keys.empty())
+						// Jump over removals (id is empty)
+						if(map.get<string>(PARAMETER_MESSAGE_ID_+ rankStr).empty())
 						{
-							vector<string> keysStrVector;
-							split(keysStrVector, keys, is_any_of(VALUES_SEPARATOR));
-							BOOST_FOREACH(const string& keyStr, keysStrVector)
+							continue;
+						}
+
+						Message msg;
+						msg.id = map.get<RegistryKeyType>(PARAMETER_MESSAGE_ID_+ rankStr); // explicit 0 value in case of new message
+						msg.title = map.getDefault<string>(PARAMETER_MESSAGE_TITLE_+ rankStr);
+						msg.content = map.getDefault<string>(PARAMETER_MESSAGE_CONTENT_+ rankStr);
+						msg.level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_MESSAGE_LEVEL_+rankStr, 10));
+
+						// Recipients
+						BOOST_FOREACH(const Factory<AlarmRecipient>::Keys::value_type& key, Factory<AlarmRecipient>::GetKeys())
+						{
+							string keys(map.getDefault<string>(PARAMETER_MESSAGE_RECIPIENTS_+ lexical_cast<string>(rank) + "_" + key));
+							if(!keys.empty())
 							{
-								vector<string> parts;
-								split(parts, keyStr, is_any_of(VALUES_PARAMETERS_SEPARATOR));
-								string parameter;
-								if(parts.size() > 1)
+								vector<string> keysStrVector;
+								split(keysStrVector, keys, is_any_of(VALUES_SEPARATOR));
+								BOOST_FOREACH(const string& keyStr, keysStrVector)
 								{
-									parameter = parts[1];
-								}
-								try
-								{
-									msg.recipients.push_back(
-										make_pair(
-											key,
+									vector<string> parts;
+									split(parts, keyStr, is_any_of(VALUES_PARAMETERS_SEPARATOR));
+									string parameter;
+									if(parts.size() > 1)
+									{
+										parameter = parts[1];
+									}
+									try
+									{
+										msg.recipients.push_back(
 											make_pair(
-												DBModule::GetEditableObject(
-													lexical_cast<RegistryKeyType>(keyStr),
-													*_env
-												).get(),
-												parameter
-									)	)	);
-								}
-								catch(...)
-								{									
+												key,
+												make_pair(
+													DBModule::GetEditableObject(
+														lexical_cast<RegistryKeyType>(keyStr),
+														*_env
+													).get(),
+													parameter
+										)	)	);
+									}
+									catch(...)
+									{									
+									}
 								}
 							}
 						}
-					}
 
-					// Alternatives
-					BOOST_FOREACH(const MessageType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessageType>())
-					{
-						msg.alternatives.insert(
-							make_pair(
-								it.second.get(),
-								map.getDefault<string>(PARAMETER_MESSAGE_ALTERNATIVES_+ lexical_cast<string>(rank) + "_" + lexical_cast<string>(it.first))
-						)	);
-					}
+						// Alternatives
+						BOOST_FOREACH(const MessageType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessageType>())
+						{
+							msg.alternatives.insert(
+								make_pair(
+									it.second.get(),
+									map.getDefault<string>(PARAMETER_MESSAGE_ALTERNATIVES_+ lexical_cast<string>(rank) + "_" + lexical_cast<string>(it.first))
+							)	);
+						}
 
-					_messages.push_back(msg);
-					if(msg.id)
-					{
-						_messageIds.insert(msg.id);
-					}
-				}
+						_messages.push_back(msg);
+						if(msg.id)
+						{
+							_messageIds.insert(msg.id);
+						}
+				}	}
 
 
 				// Properties
@@ -565,8 +569,9 @@ namespace synthese
 
 
 
-		ScenarioSaveAction::ScenarioSaveAction()
-			: FactorableTemplate<Action, ScenarioSaveAction>(),
+		ScenarioSaveAction::ScenarioSaveAction():
+			FactorableTemplate<Action, ScenarioSaveAction>(),
+			_withMessages(false),
 			_creation(false)
 		{}
 
@@ -838,7 +843,7 @@ namespace synthese
 				AlarmTableSync::Save(_message.get(), transaction);
 			}
 
-			if(_sscenario.get())
+			if(_withMessages)
 			{
 				// Removals
 				BOOST_FOREACH(const Alarm* alarm, _scenario->getMessages())
