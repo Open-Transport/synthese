@@ -242,13 +242,12 @@ namespace synthese
 			stringstream s;
 			BOOST_FOREACH(char c, value)
 			{
-				if(c == '&')
+				switch(c)
 				{
-					s << "&amp;";
-				}
-				else
-				{
-					s << c;
+				case '&': s << "&amp;"; break;
+				case '<': s << "&lt;"; break;
+				case '>': s << "&gt;"; break;
+				default: s << c;
 				}
 			}
 			return s.str();
