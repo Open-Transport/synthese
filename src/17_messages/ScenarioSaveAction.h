@@ -81,6 +81,7 @@ namespace synthese
 			static const std::string PARAMETER_ENCODING;
 			static const std::string PARAMETER_SECTIONS;
 
+			static const std::string PARAMETER_WITH_MESSAGES;
 			static const std::string PARAMETER_MESSAGE_ID_;
 			static const std::string PARAMETER_MESSAGE_TITLE_;
 			static const std::string PARAMETER_MESSAGE_CONTENT_;
@@ -125,6 +126,7 @@ namespace synthese
 				boost::shared_ptr<Scenario>				_scenario;
 				boost::shared_ptr<SentScenario>			_sscenario;
 				boost::shared_ptr<ScenarioTemplate>		_tscenario;
+				bool _withMessages;
 				Messages _messages;
 				MessageIds _messageIds;
 			//@}
