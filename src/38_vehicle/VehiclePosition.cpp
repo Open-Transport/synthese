@@ -82,6 +82,7 @@ namespace synthese
 			case OUT_OF_SERVICE: return "Hors service";
 			case UNKNOWN_STATUS: return "Inconnu";
 			case REFUELING: return "Carburant";
+			case TERMINUS_START: return "Départ terminus";
 			}
 			return string();
 		}

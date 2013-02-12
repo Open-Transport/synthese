@@ -399,8 +399,11 @@ namespace synthese
 							status = VehiclePosition::SERVICE;
 							break;
 
-						case 2:
 						case 3:
+							status = VehiclePosition::TERMINUS_START;
+							break;
+
+						case 2:
 						case 4:
 						case 5:
 						case 7:
