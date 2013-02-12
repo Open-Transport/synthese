@@ -100,7 +100,7 @@ namespace synthese
 				_isobarycentre.reset();
 
 				// Updating the paths which needs fine stepping set
-				if (!vertex->getHub()->isConnectionPossible())
+				if (!vertex->getHub()->isUsefulTransfer(vertex->getGraphType()))
 				{
 					// Departure vertices
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, vertex->getDepartureEdges())

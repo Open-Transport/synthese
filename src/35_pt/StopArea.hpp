@@ -269,16 +269,20 @@ namespace synthese
 
 			//! @name Virtual queries for Hub interface
 			//@{
+				virtual Vertices getVertices(
+					graph::GraphIdType graphId
+				) const;
+
 				virtual boost::posix_time::time_duration	getMinTransferDelay() const;
 
 				virtual bool isConnectionAllowed(
-					const graph::Vertex& fromVertex
-					, const graph::Vertex& toVertex
+					const graph::Vertex& fromVertex,
+					const graph::Vertex& toVertex
 				) const;
 
 				virtual boost::posix_time::time_duration getTransferDelay(
-					const graph::Vertex& fromVertex
-					, const graph::Vertex& toVertex
+					const graph::Vertex& fromVertex,
+					const graph::Vertex& toVertex
 				) const;
 
 

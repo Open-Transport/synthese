@@ -346,18 +346,26 @@ namespace synthese
 
 						// Checks if the path use rules are compliant with current user profile
 						const UseRule& useRule(path.getUseRule(_accessParameters.getUserClassRank()));
-						if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning())
-						{
+						if(	dynamic_cast<const PTUseRule*>(&useRule) &&
+							static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning()
+						){
 							continue;
 						}
 
 						// Getting the path traversal method
+						bool needsFineStepping(
+							!_searchOnlyNodes ||
+							(	_accessDirection == DEPARTURE_TO_ARRIVAL ?
+								_destinationVam.needFineSteppingForArrival(&path) :
+								_destinationVam.needFineSteppingForDeparture(&path) // TODO Is it not originVAM ???
+							)
+						);
 						PtrEdgeStep step(
 							(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
-							(	!_searchOnlyNodes || _destinationVam.needFineSteppingForArrival(&path) ?
+							(	needsFineStepping ?
 								(&Edge::getFollowingArrivalForFineSteppingOnly) :
 								(&Edge::getFollowingConnectionArrival)
-							):(	!_searchOnlyNodes || _destinationVam.needFineSteppingForDeparture(&path) ?
+							):(	needsFineStepping ?
 								(&Edge::getPreviousDepartureForFineSteppingOnly) :
 								(&Edge::getPreviousConnectionDeparture)
 						)	);
@@ -427,9 +435,10 @@ namespace synthese
 							bool nonServedEdgesSearch(!nonServedEdges.empty());
 
 							// The path is traversed
-							for (const Edge* curEdge = (edge.*step)();
-								curEdge != NULL; curEdge = (curEdge->*step)())
-							{
+							for(const Edge* curEdge = (edge.*step)();
+								curEdge != NULL;
+								curEdge = (curEdge->*step)()
+							){
 								this_thread::interruption_point();
 
 								// If the path traversal is only to find non served edges, analyze it only if
@@ -445,7 +454,9 @@ namespace synthese
 								const Vertex* reachedVertex(curEdge->getFromVertex());
 
 								// Checks if the vertex use rules are compliant with current user profile
-								const UseRule& vertexUseRule(reachedVertex->getUseRule(_accessParameters.getUserClassRank()));
+								const UseRule& vertexUseRule(
+									reachedVertex->getUseRule(_accessParameters.getUserClassRank())
+								);
 								if(	!vertexUseRule.isCompatibleWith(_accessParameters)
 								){
 									continue;
@@ -463,12 +474,12 @@ namespace synthese
 								bool isReturnedVertex(
 									(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
 										(	!_searchOnlyNodes ||
-											(	reachedVertex->getHub()->isConnectionPossible() &&
+											(	reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
 												(	!_accessParameters.getMaxtransportConnectionsCount() ||
-													fullApproachJourney.size() + 1 < *_accessParameters.getMaxtransportConnectionsCount()
+													fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount()
 								)	)	)	)	);
 								bool isARecursionNode(
-									reachedVertex->getHub()->isConnectionPossible() &&
+									reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
 									(	!maxDepth || journey->size() < *maxDepth)
 								);
 								if(	!isGoalReached &&
@@ -685,9 +696,8 @@ sqrt(
 			assert(journey.getDistanceToEnd());
 
 			if(	!isGoalReached &&
-				reachedVertex->getHub()->isConnectionPossible() &&
-				_searchOnlyNodes &&
-				*journey.getDistanceToEnd() > 5000
+				reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
+				*journey.getDistanceToEnd() > 2000
 			){
 				ptime bestHopedGoalAccessDateTime (reachDateTime);
 				posix_time::time_duration minimalGoalReachDuration(

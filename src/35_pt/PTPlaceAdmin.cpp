@@ -66,6 +66,7 @@
 #include "StopPointAdmin.hpp"
 #include "StopPointTableSync.hpp"
 #include "StopPointUpdateAction.hpp"
+#include "TransferPlaceCheck.hpp"
 #include "TransportNetworkRight.h"
 #include "User.h"
 
@@ -76,6 +77,7 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace admin;
+	using namespace algorithm;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -505,6 +507,23 @@ namespace synthese
 			{
 				if(_connectionPlace.get())
 				{
+					stream << "<h1>Analyse</h1>";
+					TransferPlaceCheck p(
+						*_connectionPlace,
+						PTModule::GRAPH_ID
+					);
+					bool isATransferPlace(p());
+					stream << "<p class=\"info\">Cette zone d'arrêt ";
+					if(isATransferPlace)
+					{
+						stream << "permet des";
+					}
+					else
+					{
+						stream << "ne permet pas de";
+					}
+					stream << " correspondances utiles.</p>";
+
 					stream << "<h1>Propriétés</h1>";
 
 					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request, *this);
