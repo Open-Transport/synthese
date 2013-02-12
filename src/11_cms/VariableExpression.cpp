@@ -142,22 +142,22 @@ namespace synthese
 					string value;
 					if(!pm)
 					{
-						value = variables.getDefault<string>(toFind);
+						value = variables.getDefault<string>(toFind, string(), false);
 					}
 					if(value.empty())
 					{
 						if(pm)
 						{
-							value = pm->getDefault<string>(toFind);
+							value = pm->getDefault<string>(toFind, string(), false);
 						}
 						else
 						{
-							value = additionalParametersMap.getDefault<string>(toFind);
+							value = additionalParametersMap.getDefault<string>(toFind, string(), false);
 						}
 					}
 					if(value.empty() && !pm)
 					{
-						value = request.getParametersMap().getDefault<string>(toFind);
+						value = request.getParametersMap().getDefault<string>(toFind, string(), false);
 					}
 					return value;
 				}
