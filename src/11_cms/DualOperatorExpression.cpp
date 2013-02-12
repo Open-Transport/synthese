@@ -61,14 +61,14 @@ namespace synthese
 
 			// Operands evaluation
 			string left(_left->eval(request, additionalParametersMap, page, variables));
-			trim(left);
 			string right(_right->eval(request, additionalParametersMap, page, variables));
-			trim(right);
 
 			// Non numeric operator
 			switch(_operator)
 			{
 			case OR:
+				trim(left);
+				trim(right);
 				if ((!left.empty() && left != "0") || (!right.empty() && right != "0"))
 				{
 					return "1";
@@ -79,6 +79,8 @@ namespace synthese
 				}
 
 			case AND:
+				trim(left);
+				trim(right);
 				if((!left.empty() && left != "0") && (!right.empty() && right != "0"))
 				{
 					return "1";
@@ -100,8 +102,8 @@ namespace synthese
 			case INF_EQ:
 				try
 				{
-					double leftDbl(lexical_cast<double>(left));
-					double rightDbl(lexical_cast<double>(right));
+					double leftDbl(lexical_cast<double>(trim_copy(left)));
+					double rightDbl(lexical_cast<double>(trim_copy(right)));
 				
 					switch(_operator)
 					{
@@ -144,6 +146,8 @@ namespace synthese
 			case MOD:
 			case BIT_AND:
 			case BIT_OR:
+				trim(left);
+				trim(right);
 				try
 				{
 					long long int leftInt(lexical_cast<long long int>(left));
