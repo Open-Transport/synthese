@@ -248,7 +248,9 @@ namespace synthese
 			const VertexAccessMap& destinationVam,
 			PlanningPhase direction
 		) const	{
-
+#if 0
+			// TODO Work in progress...
+			
 			// Loop on each stop
 			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
 			{
@@ -267,5 +269,6 @@ namespace synthese
 
 				}
 			}
+#endif
 		}
 }	}
