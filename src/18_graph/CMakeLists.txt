@@ -15,6 +15,7 @@ GraphModule.h
 GraphModule.inc.cpp
 GraphModuleTemplate.h
 GraphTypes.h
+Hub.cpp
 Hub.h
 HubPoint.hpp
 Journey.cpp
