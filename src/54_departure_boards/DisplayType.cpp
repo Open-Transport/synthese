@@ -44,6 +44,8 @@ namespace synthese
 		const string DisplayType::ATTR_ID = "id";
 		const string DisplayType::ATTR_MESSAGE_TYPE_ID = "message_type";
 		const string DisplayType::ATTR_ROWS_NUMBER = "rows_number";
+		const string DisplayType::ATTR_MONITORING_PAGE_ID = "monitoring_page_id";
+		const string DisplayType::ATTR_MESSAGE_IS_DISPLAYED_PAGE_ID = "message_is_displayed_page_id";
 
 
 
@@ -129,5 +131,13 @@ namespace synthese
 			pm.insert(ATTR_ID, getKey());
 			pm.insert(ATTR_MESSAGE_TYPE_ID, _messageType ? _messageType->getKey() : RegistryKeyType(0));
 			pm.insert(ATTR_ROWS_NUMBER, _rowNumber);
+			pm.insert(
+				ATTR_MONITORING_PAGE_ID,
+				_monitoringParserPage ? _monitoringParserPage->getKey() : RegistryKeyType(0)
+			);
+			pm.insert(
+				ATTR_MESSAGE_IS_DISPLAYED_PAGE_ID,
+				_messageIsDisplayedPage ? _messageIsDisplayedPage->getKey() : RegistryKeyType(0)
+			);
 		}
 }	}

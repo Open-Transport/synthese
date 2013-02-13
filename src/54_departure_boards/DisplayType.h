@@ -70,22 +70,25 @@ namespace synthese
 			static const std::string ATTR_ID;
 			static const std::string ATTR_MESSAGE_TYPE_ID;
 			static const std::string ATTR_ROWS_NUMBER;
+			static const std::string ATTR_DISPLAY_PAGE;
+			static const std::string ATTR_MONITORING_PAGE_ID;
+			static const std::string ATTR_MESSAGE_IS_DISPLAYED_PAGE_ID;
 
 			/// Chosen registry class.
 			typedef util::Registry<DisplayType>	Registry;
 
 		private:
-			const interfaces::Interface*	_displayInterface;				//!< On screen display Interface
-			const interfaces::Interface*	_audioInterface;		//!< Interface providing exchange with a vocal reading system
-			const interfaces::Interface*	_monitoringInterface;	//!< Interface used to parse monitoring outputs (see DisplayMonitoringStatus)
+			const interfaces::Interface*	_displayInterface; // DEPRECATED				//!< On screen display Interface
+			const interfaces::Interface*	_audioInterface; // DEPRECATED		//!< Interface providing exchange with a vocal reading system
+			const interfaces::Interface*	_monitoringInterface; // DEPRECATED	//!< Interface used to parse monitoring outputs (see DisplayMonitoringStatus)
 			size_t								_rowNumber;
 			boost::optional<size_t>				_maxStopsNumber;
 			boost::posix_time::time_duration	_timeBetweenChecks;		//!< Time between monitoring checks (0 = no value)
 
 			const cms::Webpage*	_displayMainPage;
-			const cms::Webpage* _displayRowPage;
-			const cms::Webpage* _displayDestinationPage;
-			const cms::Webpage* _displayTransferDestinationPage;
+			const cms::Webpage* _displayRowPage; // DEPRECATED
+			const cms::Webpage* _displayDestinationPage; // DEPRECATED
+			const cms::Webpage* _displayTransferDestinationPage; // DEPRECATED
 			const cms::Webpage* _monitoringParserPage;
 			const cms::Webpage* _messageIsDisplayedPage;
 
