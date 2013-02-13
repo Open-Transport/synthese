@@ -67,6 +67,9 @@ namespace synthese
 			public util::Named
 		{
 		public:
+			static const std::string ATTR_ID;
+			static const std::string ATTR_MESSAGE_TYPE_ID;
+			static const std::string ATTR_ROWS_NUMBER;
 
 			/// Chosen registry class.
 			typedef util::Registry<DisplayType>	Registry;
@@ -134,6 +137,11 @@ namespace synthese
 				void setMessageIsDisplayedPage(const cms::Webpage* value){ _messageIsDisplayedPage = value; }
 				void setMessageType(messages::MessageType* value){ _messageType = value; }
 			//@}
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Exports the object to a parameters map.
+			/// @param pm the parameters map to populate
+			void toParametersMap(util::ParametersMap& pm) const;
 		};
 	}
 }

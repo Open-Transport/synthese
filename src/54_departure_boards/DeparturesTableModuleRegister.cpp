@@ -76,6 +76,7 @@
 
 #include "DisplayScreenSupervisionFunction.h"
 #include "DisplayScreenContentFunction.h"
+#include "DisplayTypesService.hpp"
 #include "AlarmTestOnDisplayScreenFunction.h"
 #include "DisplayGetNagiosStatusFunction.h"
 #include "CentreonConfigExportFunction.h"
@@ -144,13 +145,14 @@ void synthese::departure_boards::moduleRegister()
 
 	synthese::departure_boards::DisplayScreenContentFunction::integrate();
 	synthese::departure_boards::DisplayScreenSupervisionFunction::integrate();
+	synthese::departure_boards::DisplayTypesService::integrate();
 	synthese::departure_boards::AlarmTestOnDisplayScreenFunction::integrate();
 	synthese::departure_boards::DisplayGetNagiosStatusFunction::integrate();
 	synthese::departure_boards::CentreonConfigExportFunction::integrate();
 	synthese::departure_boards::CPUGetWiredScreensFunction::integrate();
 	synthese::departure_boards::GetDepartureBoardsService::integrate();
 	synthese::departure_boards::TransferLinesService::integrate();
-
+	
 	synthese::departure_boards::ArrivalDepartureTableRight::integrate();
 	synthese::departure_boards::DisplayMaintenanceRight::integrate();
 
