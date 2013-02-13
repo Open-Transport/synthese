@@ -24,6 +24,7 @@
 
 #include "MessageTypesService.hpp"
 
+#include "Alarm.h"
 #include "BroadcastPoint.hpp"
 #include "MessageType.hpp"
 #include "RequestException.h"
@@ -79,6 +80,22 @@ namespace synthese
 					throw RequestException("No such scenario");
 				}
 			}
+
+			// Message
+			RegistryKeyType messageId(
+				map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_ID, 0)
+			);
+			if(messageId > 0)
+			{
+				try
+				{
+					_message = Env::GetOfficialEnv().get<Alarm>(messageId).get();
+				}
+				catch (ObjectNotFoundException<Alarm>&)
+				{
+					throw RequestException("No such message");
+				}
+			}
 		}
 
 
@@ -89,7 +106,7 @@ namespace synthese
 		) const {
 			ParametersMap pm;
 
-			if(_scenario) // Messages types needed by a scenario
+			if(_scenario || _message) // Messages types needed by a scenario
 			{
 				set<MessageType*> messageTypes;
 
