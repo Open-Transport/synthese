@@ -119,6 +119,8 @@ DisplayTypeAdmin.cpp
 DisplayTypeAdmin.h
 DisplayTypesAdmin.cpp
 DisplayTypesAdmin.h
+DisplayTypesService.cpp
+DisplayTypesService.hpp
 DisplayTypeTableSync.cpp
 DisplayTypeTableSync.h
 ForcedDestinationsArrivalDepartureTableGenerator.cpp

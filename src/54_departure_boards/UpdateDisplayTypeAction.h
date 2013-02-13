@@ -41,6 +41,11 @@ namespace synthese
 		class Interface;
 	}
 
+	namespace messages
+	{
+		class MessageType;
+	}
+
 	namespace departure_boards
 	{
 		class DisplayType;
@@ -48,7 +53,8 @@ namespace synthese
 		/** UpdateDisplayTypeAction action class.
 			@ingroup m54Actions refActions
 		*/
-		class UpdateDisplayTypeAction : public util::FactorableTemplate<server::Action, UpdateDisplayTypeAction>
+		class UpdateDisplayTypeAction:
+			public util::FactorableTemplate<server::Action, UpdateDisplayTypeAction>
 		{
 		public:
 			static const std::string PARAMETER_ID;
@@ -64,21 +70,23 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_MONITORING_PARSER_PAGE_ID;
+			static const std::string PARAMETER_MESSAGE_TYPE_ID;
 
 		private:
 			boost::shared_ptr<DisplayType> _dt;
-			std::string _name;
-			boost::shared_ptr<const interfaces::Interface>	_interface;
-			boost::shared_ptr<const interfaces::Interface>	_monitoringInterface;
-			boost::shared_ptr<const interfaces::Interface>	_audioInterface;
-			size_t	_rows_number;
-			boost::optional<size_t>	_max_stops_number;
-			boost::posix_time::time_duration	_timeBetweenChecks;
-			boost::shared_ptr<const cms::Webpage> _displayMainPage;
-			boost::shared_ptr<const cms::Webpage> _displayRowPage;
-			boost::shared_ptr<const cms::Webpage> _displayDestinationPage;
-			boost::shared_ptr<const cms::Webpage> _displayTransferDestinationPage;
-			boost::shared_ptr<const cms::Webpage> _monitoringParserPage;
+			boost::optional<std::string> _name;
+			boost::optional<boost::shared_ptr<const interfaces::Interface> >	_interface;
+			boost::optional<boost::shared_ptr<const interfaces::Interface> >	_monitoringInterface;
+			boost::optional<boost::shared_ptr<const interfaces::Interface> >	_audioInterface;
+			boost::optional<size_t>	_rows_number;
+			boost::optional<boost::optional<size_t> >	_max_stops_number;
+			boost::optional<boost::posix_time::time_duration>	_timeBetweenChecks;
+			boost::optional<boost::shared_ptr<const cms::Webpage> > _displayMainPage;
+			boost::optional<boost::shared_ptr<const cms::Webpage> > _displayRowPage;
+			boost::optional<boost::shared_ptr<const cms::Webpage> > _displayDestinationPage;
+			boost::optional<boost::shared_ptr<const cms::Webpage> > _displayTransferDestinationPage;
+			boost::optional<boost::shared_ptr<const cms::Webpage> > _monitoringParserPage;
+			boost::optional<boost::shared_ptr<messages::MessageType> > _messageType;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

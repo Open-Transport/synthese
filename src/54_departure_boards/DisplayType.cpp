@@ -21,9 +21,12 @@
 */
 
 #include "DisplayType.h"
-#include "Registry.h"
+
+#include "MessageType.hpp"
+#include "ParametersMap.h"
 
 using namespace boost::posix_time;
+using namespace std;
 
 namespace synthese
 {
@@ -38,6 +41,12 @@ namespace synthese
 
 	namespace departure_boards
 	{
+		const string DisplayType::ATTR_ID = "id";
+		const string DisplayType::ATTR_MESSAGE_TYPE_ID = "message_type";
+		const string DisplayType::ATTR_ROWS_NUMBER = "rows_number";
+
+
+
 		const Interface* DisplayType::getDisplayInterface() const
 		{
 			return _displayInterface;
@@ -111,5 +120,14 @@ namespace synthese
 		const time_duration& DisplayType::getTimeBetweenChecks(
 		) const {
 			return _timeBetweenChecks;
+		}
+
+
+
+		void DisplayType::toParametersMap( util::ParametersMap& pm ) const
+		{
+			pm.insert(ATTR_ID, getKey());
+			pm.insert(ATTR_MESSAGE_TYPE_ID, _messageType ? _messageType->getKey() : RegistryKeyType(0));
+			pm.insert(ATTR_ROWS_NUMBER, _rowNumber);
 		}
 }	}

@@ -22,10 +22,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "UpdateDisplayTypeAction.h"
 
-#include "DisplayTypeTableSync.h"
 #include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DBLogModule.h"
+#include "DisplayTypeTableSync.h"
+#include "MessageTypeTableSync.hpp"
 #include "WebPageTableSync.h"
 #include "Webpage.h"
 #include "Interface.h"
@@ -47,13 +48,14 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace server;
-	using namespace util;
-	using namespace interfaces;
+	using namespace cms;
 	using namespace db;
 	using namespace dblog;
+	using namespace interfaces;
+	using namespace messages;
 	using namespace security;
-	using namespace cms;
+	using namespace server;
+	using namespace util;
 
 
 	namespace util
@@ -82,34 +84,71 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_dt.get())
+			{
 				map.insert(PARAMETER_ID, _dt->getKey());
-			map.insert(PARAMETER_NAME, _name);
-			if (_interface.get())
-				map.insert(PARAMETER_INTERFACE_ID, _interface->getKey());
-			map.insert(PARAMETER_ROWS_NUMBER, _rows_number);
-			map.insert(PARAMETER_MAX_STOPS_NUMBER, _max_stops_number);
-			if(_displayMainPage.get())
-			{
-				map.insert(PARAMETER_DISPLAY_MAIN_PAGE_ID, _displayMainPage->getKey());
 			}
-			if(_displayRowPage.get())
+			if(_name)
 			{
-				map.insert(PARAMETER_DISPLAY_ROW_PAGE_ID, _displayRowPage->getKey());
+				map.insert(PARAMETER_NAME, *_name);
 			}
-			if(_displayDestinationPage.get())
+			if(_interface)
 			{
-				map.insert(PARAMETER_DISPLAY_DESTINATION_PAGE_ID, _displayDestinationPage->getKey());
+				if (_interface->get())
+				{
+					map.insert(PARAMETER_INTERFACE_ID, (*_interface)->getKey());
+				}
+				else
+				{
+					map.insert(PARAMETER_INTERFACE_ID, 0);
+				}
 			}
-			if(_displayTransferDestinationPage.get())
+			if(_rows_number)
 			{
-				map.insert(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, _displayTransferDestinationPage->getKey());
+				map.insert(PARAMETER_ROWS_NUMBER, *_rows_number);
 			}
-			if(_monitoringParserPage.get())
+			if(_max_stops_number)
 			{
-				map.insert(PARAMETER_MONITORING_PARSER_PAGE_ID, _monitoringParserPage->getKey());
+				map.insert(PARAMETER_MAX_STOPS_NUMBER, *_max_stops_number);
+			}
+			if(_displayMainPage)
+			{
+				if(_displayMainPage->get())
+				{
+					map.insert(PARAMETER_DISPLAY_MAIN_PAGE_ID, (*_displayMainPage)->getKey());
+				}
+			}
+			if(_displayRowPage)
+			{
+				if(_displayRowPage->get())
+				{
+					map.insert(PARAMETER_DISPLAY_ROW_PAGE_ID, (*_displayRowPage)->getKey());
+				}
+			}
+			if(_displayDestinationPage)
+			{
+				if(_displayDestinationPage->get())
+				{
+					map.insert(PARAMETER_DISPLAY_DESTINATION_PAGE_ID, (*_displayDestinationPage)->getKey());
+				}
+			}
+			if(_displayTransferDestinationPage)
+			{
+				if(_displayTransferDestinationPage->get())
+				{
+					map.insert(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, (*_displayTransferDestinationPage)->getKey());
+				}
+			}
+			if(_monitoringParserPage)
+			{
+				if(_monitoringParserPage->get())
+				{
+					map.insert(PARAMETER_MONITORING_PARSER_PAGE_ID, (*_monitoringParserPage)->getKey());
+				}
 			}
 			return map;
 		}
+
+
 
 		void UpdateDisplayTypeAction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -117,36 +156,50 @@ namespace synthese
 			try
 			{
 				// Name
-				_name = map.get<string>(PARAMETER_NAME);
-				if (_name != _dt->getName())
+				if(map.isDefined(PARAMETER_NAME))
 				{
-					if (_name.empty())
-						throw ActionException("Le nom ne peut être vide.");
-
-					Env env;
-					DisplayTypeTableSync::SearchResult v(
-						DisplayTypeTableSync::Search(env, _name, optional<RegistryKeyType>(), 0, 2)
-					);
-					BOOST_FOREACH(shared_ptr<DisplayType> t, v)
+					_name = map.get<string>(PARAMETER_NAME);
+					if(	*_name != _dt->getName())
 					{
-						if(t->getKey() == _dt->getKey())
+						if (_name->empty())
+							throw ActionException("Le nom ne peut être vide.");
+
+						Env env;
+						DisplayTypeTableSync::SearchResult v(
+							DisplayTypeTableSync::Search(env, *_name, optional<RegistryKeyType>(), 0, 2)
+						);
+						BOOST_FOREACH(shared_ptr<DisplayType> t, v)
 						{
-							continue;
+							if(t->getKey() == _dt->getKey())
+							{
+								continue;
+							}
+							throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 						}
-						throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 					}
 				}
 
 				// Rows number
-				_rows_number = map.get<size_t>(PARAMETER_ROWS_NUMBER);
+				if(map.isDefined(PARAMETER_ROWS_NUMBER))
+				{
+					_rows_number = map.get<size_t>(PARAMETER_ROWS_NUMBER);
+				}
 
 				// Interface
-				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
-				if (id && *id)
+				if(map.isDefined(PARAMETER_INTERFACE_ID))
 				{
-					_interface = InterfaceTableSync::Get(*id, *_env);
+					RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID));
+					if (id)
+					{
+						_interface = InterfaceTableSync::Get(id, *_env);
+					}
+					else
+					{
+						_interface = shared_ptr<const Interface>();
+					}
 				}
-				else
+
+				if(map.isDefined(PARAMETER_DISPLAY_MAIN_PAGE_ID))
 				{ // CMS webpage instead
 					RegistryKeyType mid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_MAIN_PAGE_ID, 0));
 					if(mid)
@@ -159,155 +212,310 @@ namespace synthese
 						{
 							throw ActionException("No such main page");
 						}
-
-						RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_ROW_PAGE_ID, 0));
-						if(rid)
-						{
-							try
-							{
-								_displayRowPage = WebPageTableSync::Get(rid, *_env);
-							}
-							catch (ObjectNotFoundException<Webpage>&)
-							{
-								throw ActionException("No such row page");
-							}
-
-							RegistryKeyType did(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_DESTINATION_PAGE_ID, 0));
-							if(did)
-							{
-								try
-								{
-									_displayDestinationPage = WebPageTableSync::Get(did, *_env);
-								}
-								catch (ObjectNotFoundException<Webpage>&)
-								{
-									throw ActionException("No such destination page");
-								}
-							}
-
-							RegistryKeyType sid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, 0));
-							if(sid)
-							{
-								try
-								{
-									_displayTransferDestinationPage = WebPageTableSync::Get(sid, *_env);
-								}
-								catch (ObjectNotFoundException<Webpage>&)
-								{
-									throw ActionException("No such destination sorting page");
-								}
-							}
-							RegistryKeyType pid(map.getDefault<RegistryKeyType>(PARAMETER_MONITORING_PARSER_PAGE_ID, 0));
-							if(pid)
-							{
-								try
-								{
-									_monitoringParserPage = WebPageTableSync::Get(pid, *_env);
-								}
-								catch (ObjectNotFoundException<Webpage>&)
-								{
-									throw ActionException("No such monitoring parser page");
-								}
-							}
-						}
+					}
+					else
+					{
+						_displayMainPage = shared_ptr<const Webpage>();
 					}
 				}
-				id = map.getOptional<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID);
-				if (id && *id)
+
+				if(map.isDefined(PARAMETER_DISPLAY_ROW_PAGE_ID))
 				{
-					_audioInterface = InterfaceTableSync::Get(*id, *_env);
+					RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_ROW_PAGE_ID, 0));
+					if(rid)
+					{
+						try
+						{
+							_displayRowPage = WebPageTableSync::Get(rid, *_env);
+						}
+						catch (ObjectNotFoundException<Webpage>&)
+						{
+							throw ActionException("No such row page");
+						}
+					}
+					else
+					{
+						_displayRowPage = shared_ptr<const Webpage>();
+					}
 				}
-				id = map.getOptional<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
-				if (id && *id)
+
+				if(map.isDefined(PARAMETER_DISPLAY_DESTINATION_PAGE_ID))
 				{
-					_monitoringInterface = InterfaceTableSync::Get(*id, *_env);
+					RegistryKeyType did(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_DESTINATION_PAGE_ID, 0));
+					if(did)
+					{
+						try
+						{
+							_displayDestinationPage = WebPageTableSync::Get(did, *_env);
+						}
+						catch (ObjectNotFoundException<Webpage>&)
+						{
+							throw ActionException("No such destination page");
+						}
+					}
+					else
+					{
+						_displayDestinationPage = shared_ptr<const Webpage>();
+					}
+				}
+
+				if(map.isDefined(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID))
+				{
+					RegistryKeyType sid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, 0));
+					if(sid)
+					{
+						try
+						{
+							_displayTransferDestinationPage = WebPageTableSync::Get(sid, *_env);
+						}
+						catch (ObjectNotFoundException<Webpage>&)
+						{
+							throw ActionException("No such destination sorting page");
+						}
+					}
+					else
+					{
+						_displayTransferDestinationPage = shared_ptr<const Webpage>();
+					}
+				}
+
+				if(map.isDefined(PARAMETER_MONITORING_PARSER_PAGE_ID))
+				{
+					RegistryKeyType pid(map.getDefault<RegistryKeyType>(PARAMETER_MONITORING_PARSER_PAGE_ID, 0));
+					if(pid)
+					{
+						try
+						{
+							_monitoringParserPage = WebPageTableSync::Get(pid, *_env);
+						}
+						catch (ObjectNotFoundException<Webpage>&)
+						{
+							throw ActionException("No such monitoring parser page");
+						}
+					}
+					else
+					{
+						_monitoringParserPage = shared_ptr<const Webpage>();
+					}
+				}
+
+				if(map.isDefined(PARAMETER_AUDIO_INTERFACE_ID))
+				{
+					RegistryKeyType id(
+						map.get<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID)
+					);
+					if (id)
+					{
+						_audioInterface = InterfaceTableSync::Get(id, *_env);
+					}
+					else
+					{
+						_audioInterface = shared_ptr<const Interface>();
+					}
+				}
+
+				if(map.isDefined(PARAMETER_MONITORING_INTERFACE_ID))
+				{
+					RegistryKeyType id(
+						map.get<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID)
+					);
+					if (id)
+					{
+						_monitoringInterface = InterfaceTableSync::Get(id, *_env);
+					}
+					else
+					{
+						_monitoringInterface = shared_ptr<const Interface>();
+					}
 				}
 
 				// Max stops number
-				_max_stops_number = map.getOptional<size_t>(PARAMETER_MAX_STOPS_NUMBER);
-				if (_max_stops_number < 0)
+				if(map.isDefined(PARAMETER_MAX_STOPS_NUMBER))
 				{
-					throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
+					_max_stops_number = map.getOptional<size_t>(PARAMETER_MAX_STOPS_NUMBER);
+					if (*_max_stops_number && **_max_stops_number < 0)
+					{
+						throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
+					}
 				}
 
 				// Time between checks
-				_timeBetweenChecks = minutes(map.get<int>(PARAMETER_TIME_BETWEEN_CHECKS));
-				if (_timeBetweenChecks.minutes() < 0)
+				if(map.isDefined(PARAMETER_TIME_BETWEEN_CHECKS))
 				{
-					throw ActionException("La durée entre les tests de supervision doit être positive.");
+					_timeBetweenChecks = minutes(map.get<int>(PARAMETER_TIME_BETWEEN_CHECKS));
+					if (_timeBetweenChecks->minutes() < 0)
+					{
+						throw ActionException("La durée entre les tests de supervision doit être positive.");
+					}
+				}
+
+				// Message type
+				if(map.isDefined(PARAMETER_MESSAGE_TYPE_ID))
+				{
+					RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_MESSAGE_TYPE_ID));
+					if(id)
+					{
+						_messageType = MessageTypeTableSync::GetEditable(id, *_env);
+					}
+					else
+					{
+						_messageType = shared_ptr<MessageType>();
+					}
 				}
 			}
 			catch(ObjectNotFoundException<Interface>& e)
 			{
 				throw ActionException("Interface not found / "+ e.getMessage());
 			}
+			catch(ObjectNotFoundException<MessageType>& e)
+			{
+				throw ActionException("Message type not found"+ e.getMessage());
+			}
 		}
 
 		void UpdateDisplayTypeAction::run(Request& request)
 		{
-			// Log entry content
 			stringstream log;
-			DBLogModule::appendToLogIfChange(log, "Nom", _dt->getName(), _name);
-			DBLogModule::appendToLogIfChange(log, "Interface d'affichage", (_dt->getDisplayInterface() != NULL) ? _dt->getDisplayInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
-			DBLogModule::appendToLogIfChange(log, "Interface de supervision", (_dt->getMonitoringInterface() != NULL) ? _dt->getMonitoringInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
-			DBLogModule::appendToLogIfChange(log, "Interface audio", (_dt->getAudioInterface() != NULL) ? _dt->getAudioInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
-			DBLogModule::appendToLogIfChange(
-				log,
-				"Nombre de lignes",
-				lexical_cast<string>(_dt->getRowNumber()),
-				lexical_cast<string>(_rows_number)
-			);
-			DBLogModule::appendToLogIfChange(
-				log,
-				"Nombre d'arrêts intermédiaires",
-				_dt->getMaxStopsNumber() ? lexical_cast<string>(*_dt->getMaxStopsNumber()) : string(),
-				_max_stops_number ? lexical_cast<string>(*_max_stops_number) : string()
-			);
-			DBLogModule::appendToLogIfChange(log, "Temps entre les contrôles de supervision", to_simple_string(_dt->getTimeBetweenChecks()), to_simple_string(_timeBetweenChecks));
-			DBLogModule::appendToLogIfChange(
-				log,
-				"Page CMS principale",
-				(_dt->getDisplayMainPage() != NULL) ? _dt->getDisplayMainPage()->getFullName() : "(aucune)",
-				(_displayMainPage.get() != NULL) ? _displayMainPage->getFullName() : "(aucune)"
-			);
-			DBLogModule::appendToLogIfChange(
-				log,
-				"Page CMS pour rangée",
-				(_dt->getDisplayRowPage() != NULL) ? _dt->getDisplayRowPage()->getFullName() : "(aucune)",
-				(_displayRowPage.get() != NULL) ? _displayRowPage->getFullName() : "(aucune)"
-			);
-			DBLogModule::appendToLogIfChange(
-				log,
-				"Page CMS pour destination",
-				(_dt->getDisplayDestinationPage() != NULL) ? _dt->getDisplayDestinationPage()->getFullName() : "(aucune)",
-				(_displayDestinationPage.get() != NULL) ? _displayDestinationPage->getFullName() : "(aucune)"
-			);
-			DBLogModule::appendToLogIfChange(
-				log,
-				"Page CMS pour destination en correspondance",
-				(_dt->getDisplayTransferDestinationPage() != NULL) ? _dt->getDisplayTransferDestinationPage()->getFullName() : "(aucune)",
-				(_displayTransferDestinationPage.get() != NULL) ? _displayTransferDestinationPage->getFullName() : "(aucune)"
-			);
-			DBLogModule::appendToLogIfChange(
-				log,
-				"Page CMS pour parser les résultats de supervision",
-				(_dt->getMonitoringParserPage() != NULL) ? _dt->getMonitoringParserPage()->getFullName() : "(aucune)",
-				(_monitoringParserPage.get() != NULL) ? _monitoringParserPage->getFullName() : "(aucune)"
-			);
+
+			if(_name)
+			{
+				_dt->setName(*_name);
+				DBLogModule::appendToLogIfChange(log, "Nom", _dt->getName(), *_name);
+			}
+
+			if(_interface)
+			{
+				_dt->setDisplayInterface(_interface->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Interface d'affichage",
+					(_dt->getDisplayInterface() != NULL) ? _dt->getDisplayInterface()->getName() : "(aucune)",
+					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
+				);
+			}
+
+			if(_monitoringInterface)
+			{
+				_dt->setMonitoringInterface(_monitoringInterface->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Interface de supervision",
+					(_dt->getMonitoringInterface() != NULL) ? _dt->getMonitoringInterface()->getName() : "(aucune)",
+					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
+				);
+			}
+
+			if(_audioInterface)
+			{
+				_dt->setAudioInterface(_audioInterface->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Interface audio",
+					(_dt->getAudioInterface() != NULL) ? _dt->getAudioInterface()->getName() : "(aucune)",
+					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
+				);
+			}
+
+			if(_rows_number)
+			{
+				_dt->setRowNumber(*_rows_number);
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Nombre de lignes",
+					lexical_cast<string>(_dt->getRowNumber()),
+					lexical_cast<string>(*_rows_number)
+				);
+			}
+
+			if(_max_stops_number)
+			{
+				_dt->setMaxStopsNumber(*_max_stops_number);
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Nombre d'arrêts intermédiaires",
+					_dt->getMaxStopsNumber() ? lexical_cast<string>(*_dt->getMaxStopsNumber()) : string(),
+					*_max_stops_number ? lexical_cast<string>(**_max_stops_number) : string()
+				);
+			}
+
+			if(_timeBetweenChecks)
+			{
+				_dt->setTimeBetweenChecks(*_timeBetweenChecks);
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Temps entre les contrôles de supervision",
+					to_simple_string(_dt->getTimeBetweenChecks()),
+					to_simple_string(*_timeBetweenChecks)
+				);
+			}
+
+			if(_displayMainPage)
+			{
+				_dt->setDisplayMainPage(_displayMainPage->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Page CMS principale",
+					(_dt->getDisplayMainPage() != NULL) ? _dt->getDisplayMainPage()->getFullName() : "(aucune)",
+					(_displayMainPage->get() != NULL) ? (*_displayMainPage)->getFullName() : "(aucune)"
+				);
+			}
+
+			if(_displayRowPage)
+			{
+				_dt->setDisplayRowPage(_displayRowPage->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Page CMS pour rangée",
+					(_dt->getDisplayRowPage() != NULL) ? _dt->getDisplayRowPage()->getFullName() : "(aucune)",
+					(_displayRowPage->get() != NULL) ? (*_displayRowPage)->getFullName() : "(aucune)"
+				);
+			}
+
+			if(_displayDestinationPage)
+			{
+				_dt->setDisplayDestinationPage(_displayDestinationPage->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Page CMS pour destination",
+					(_dt->getDisplayDestinationPage() != NULL) ? _dt->getDisplayDestinationPage()->getFullName() : "(aucune)",
+					(_displayDestinationPage->get() != NULL) ? (*_displayDestinationPage)->getFullName() : "(aucune)"
+				);
+			}
+
+			if(_displayTransferDestinationPage)
+			{
+				_dt->setDisplayTransferDestinationPage(_displayTransferDestinationPage->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Page CMS pour destination en correspondance",
+					(_dt->getDisplayTransferDestinationPage() != NULL) ? _dt->getDisplayTransferDestinationPage()->getFullName() : "(aucune)",
+					(_displayTransferDestinationPage->get() != NULL) ? (*_displayTransferDestinationPage)->getFullName() : "(aucune)"
+				);
+			}
+
+			if(_monitoringParserPage)
+			{
+				_dt->setMonitoringParserPage(_monitoringParserPage->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Page CMS pour parser les résultats de supervision",
+					(_dt->getMonitoringParserPage() != NULL) ? _dt->getMonitoringParserPage()->getFullName() : "(aucune)",
+					(_monitoringParserPage->get() != NULL) ? (*_monitoringParserPage)->getFullName() : "(aucune)"
+				);
+			}
+
+			if(_messageType)
+			{
+				_dt->setMessageType(_messageType->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Type de message",
+					(_dt->getMessageType() != NULL) ? _dt->getMessageType()->getName() : "(aucun)",
+					(_messageType->get() != NULL) ? (*_messageType)->getName() : "(aucun)"
+				);
+			}
 
 			// Update
-			_dt->setName(_name);
-			_dt->setDisplayInterface(_interface.get());
-			_dt->setMonitoringInterface(_monitoringInterface.get());
-			_dt->setAudioInterface(_audioInterface.get());
-			_dt->setRowNumber(_rows_number);
-			_dt->setMaxStopsNumber(_max_stops_number);
-			_dt->setTimeBetweenChecks(_timeBetweenChecks);
-			_dt->setDisplayMainPage(_displayMainPage.get());
-			_dt->setDisplayRowPage(_displayRowPage.get());
-			_dt->setDisplayDestinationPage(_displayDestinationPage.get());
-			_dt->setDisplayTransferDestinationPage(_displayTransferDestinationPage.get());
-			_dt->setMonitoringParserPage(_monitoringParserPage.get());
 			DisplayTypeTableSync::Save(_dt.get());
 
 			// Log
