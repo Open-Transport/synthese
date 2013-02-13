@@ -359,7 +359,7 @@ namespace synthese
 					{
 						try
 						{
-							_messageIsDisplayedPage = WebPageTableSync::Get(pid, *_env);
+							_messageIsDisplayedPage = WebPageTableSync::Get(id, *_env);
 						}
 						catch (ObjectNotFoundException<Webpage>&)
 						{
