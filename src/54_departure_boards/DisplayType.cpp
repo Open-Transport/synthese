@@ -44,7 +44,7 @@ namespace synthese
 	{
 		const string DisplayType::ATTR_ID = "id";
 		const string DisplayType::ATTR_NAME = "name";
-		const string DisplayType::ATTR_MESSAGE_TYPE_ID = "message_type";
+		const string DisplayType::ATTR_MESSAGE_TYPE_ID = "message_type_id";
 		const string DisplayType::ATTR_ROWS_NUMBER = "rows_number";
 		const string DisplayType::ATTR_MONITORING_PAGE_ID = "monitoring_page_id";
 		const string DisplayType::ATTR_MESSAGE_IS_DISPLAYED_PAGE_ID = "message_is_displayed_page_id";
