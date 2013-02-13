@@ -38,7 +38,7 @@ namespace synthese
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<Function,departure_boards::DisplayTypesService>::FACTORY_KEY = "DisplayTypesService";
+	const string FactorableTemplate<Function,departure_boards::DisplayTypesService>::FACTORY_KEY = "display_types";
 	
 	namespace departure_boards
 	{
