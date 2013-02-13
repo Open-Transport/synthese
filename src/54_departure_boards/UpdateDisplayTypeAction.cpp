@@ -78,7 +78,7 @@ namespace synthese
 		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "dp");
 		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "tp");
 		const string UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID(Action_PARAMETER_PREFIX + "pp");
-		const string UpdateDisplayTypeAction::PARAMETER_MESSAGE_IS_DISPLAYED_PAGE_ID = Action_PARAMETER_PREFIX + "_message_is_idsplayed_page_id";
+		const string UpdateDisplayTypeAction::PARAMETER_MESSAGE_IS_DISPLAYED_PAGE_ID = Action_PARAMETER_PREFIX + "_message_is_displayed_page_id";
 		const string UpdateDisplayTypeAction::PARAMETER_MESSAGE_TYPE_ID = Action_PARAMETER_PREFIX + "_message_type_id";
 
 
