@@ -43,6 +43,7 @@ namespace synthese
 	namespace departure_boards
 	{
 		const string DisplayType::ATTR_ID = "id";
+		const string DisplayType::ATTR_NAME = "name";
 		const string DisplayType::ATTR_MESSAGE_TYPE_ID = "message_type";
 		const string DisplayType::ATTR_ROWS_NUMBER = "rows_number";
 		const string DisplayType::ATTR_MONITORING_PAGE_ID = "monitoring_page_id";
@@ -130,6 +131,7 @@ namespace synthese
 		void DisplayType::toParametersMap( util::ParametersMap& pm ) const
 		{
 			pm.insert(ATTR_ID, getKey());
+			pm.insert(ATTR_NAME, getName());
 			pm.insert(ATTR_MESSAGE_TYPE_ID, _messageType ? _messageType->getKey() : RegistryKeyType(0));
 			pm.insert(ATTR_ROWS_NUMBER, _rowNumber);
 			pm.insert(

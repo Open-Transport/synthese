@@ -68,6 +68,7 @@ namespace synthese
 		{
 		public:
 			static const std::string ATTR_ID;
+			static const std::string ATTR_NAME;
 			static const std::string ATTR_MESSAGE_TYPE_ID;
 			static const std::string ATTR_ROWS_NUMBER;
 			static const std::string ATTR_DISPLAY_PAGE;
