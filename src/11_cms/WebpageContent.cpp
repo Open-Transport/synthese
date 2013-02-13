@@ -126,7 +126,7 @@ namespace synthese
 			boost::logic::tribool withFiles
 		){
 			// Content
-			if(	withFiles != false
+			if(	withFiles || indeterminate(withFiles)
 			){
 				map.insert(
 					prefix + FIELDS[0].name,
