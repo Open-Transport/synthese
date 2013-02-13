@@ -68,7 +68,6 @@ namespace synthese
 		const std::string WebPageMenuFunction::PARAMETER_ITEM_PAGE_ID("item_page_id");
 		const std::string WebPageMenuFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const std::string WebPageMenuFunction::PARAMETER_RAW_DATA = "raw_data";
-		const std::string WebPageMenuFunction::TAG_PAGE = "page";
 		const std::string WebPageMenuFunction::VALUE_RSS = "rss";
 
 
