@@ -53,6 +53,7 @@ namespace synthese
 		const string WebPageMenuFunction::DATA_IS_LAST_PAGE = "is_last_page";
 		const string WebPageMenuFunction::DATA_IS_THE_CURRENT_PAGE = "is_the_current_page";
 		const string WebPageMenuFunction::DATA_CURRENT_PAGE_IN_BRANCH = "current_page_in_branch";
+		const string WebPageMenuFunction::TAG_PAGE = "page";
 
 		const std::string WebPageMenuFunction::PARAMETER_ROOT_ID("root");
 		const std::string WebPageMenuFunction::PARAMETER_MIN_DEPTH("min_depth");
@@ -66,6 +67,7 @@ namespace synthese
 		const std::string WebPageMenuFunction::PARAMETER_ENDING_AFTER_SUBMENU("ending_after_submenu_");
 		const std::string WebPageMenuFunction::PARAMETER_ITEM_PAGE_ID("item_page_id");
 		const std::string WebPageMenuFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
+		const std::string WebPageMenuFunction::PARAMETER_RAW_DATA = "raw_data";
 		const std::string WebPageMenuFunction::VALUE_RSS = "rss";
 
 
@@ -176,6 +178,9 @@ namespace synthese
 					_menuDefinition[i] = curMenuDefinition;
 				}
 			}
+
+			// Raw data
+			_rawData = map.getDefault<bool>(PARAMETER_RAW_DATA, false);
 		}
 
 
@@ -215,6 +220,7 @@ namespace synthese
 			}
 
 			// Content
+			ParametersMap pm;
 			_getMenuContentRecursive(
 				stream,
 				request,
@@ -222,7 +228,8 @@ namespace synthese
 				0,
 				currentPage,
 				0,
-				true
+				true,
+				pm
 			);
 
 			// RSS footer
@@ -231,7 +238,7 @@ namespace synthese
 				stream << "</channel></rss>";
 			}
 
-			return util::ParametersMap();
+			return pm;
 		}
 
 
@@ -266,7 +273,8 @@ namespace synthese
 			std::size_t depth,
 			const Webpage* currentPage,
 			size_t rank,
-			bool isLastPage
+			bool isLastPage,
+			ParametersMap& pm
 		) const	{
 			/** - Page in branch update */
 			bool returned_page_in_branch(currentPage ? (root == currentPage) : false);
@@ -301,6 +309,7 @@ namespace synthese
 				);
 
 				// Recursion
+				shared_ptr<ParametersMap> pagePM(new ParametersMap);
 				returned_page_in_branch |= _getMenuContentRecursive(
 					submenu,
 					request,
@@ -308,8 +317,13 @@ namespace synthese
 					depth + 1,
 					currentPage,
 					number,
-					isLastSubPage
+					isLastSubPage,
+					*pagePM
 				);
+				if(!pagePM->getMap().empty())
+				{
+					pm.insert(TAG_PAGE, pagePM);
+				}
 
 				// End of loop if last page
 				number++;
@@ -363,6 +377,14 @@ namespace synthese
 					}
 					stream << "</item>";
 				}
+				else if(_rawData)
+				{
+					root->toParametersMap(pm);
+					pm.insert(DATA_DEPTH, depth);
+					pm.insert(DATA_IS_THE_CURRENT_PAGE, root == currentPage);
+					pm.insert(DATA_IS_LAST_PAGE, isLastPage);
+					pm.insert(DATA_CURRENT_PAGE_IN_BRANCH, returned_page_in_branch);
+				}
 				else
 				{
 					stream <<
@@ -388,7 +410,8 @@ namespace synthese
 			}
 
 			/** - Submenu only if applicable */
-			if(	!submenu.str().empty() &&
+			if(	!_rawData &&
+				!submenu.str().empty() &&
 				_maxDepth > depth
 			){
 				if(!_itemPage.get() && _outputFormat.empty())
@@ -408,8 +431,7 @@ namespace synthese
 
 
 		WebPageMenuFunction::WebPageMenuFunction():
-		_minDepth(0), _maxDepth(0)
-		{
-
-		}
+			_minDepth(0), _maxDepth(0),
+			_rawData(false)
+		{}
 }	}
