@@ -72,6 +72,8 @@ namespace synthese
 			static const std::string PARAMETER_ITEM_PAGE_ID;
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_RSS;
+			static const std::string PARAMETER_RAW_DATA;
+			static const std::string TAG_PAGE;
 
 		protected:
 			struct MenuDefinition_ // Deprecated
@@ -94,6 +96,7 @@ namespace synthese
 				boost::shared_ptr<const Webpage> _itemPage;
 				std::map<std::size_t, MenuDefinition_> _menuDefinition; // Deprecated
 				std::string _outputFormat;
+				bool _rawData;
 			//@}
 
 
@@ -120,6 +123,7 @@ namespace synthese
 				@param current_page Page déterminant la racine du menu (non affichée : produit la liste d'éléments inférieurs)
 				@param depth Profondeur en cours de tracé
 				@param page_in_branch Page is in current submenu : return the current page code
+				@param pm parameters map to populate in raw mode
 				@return page_in_branch Page is in submenus from the current page
 			*/
 			bool _getMenuContentRecursive(
@@ -129,7 +133,8 @@ namespace synthese
 				std::size_t depth,
 				const Webpage* currentPage,
 				std::size_t rank,
-				bool isLastPage
+				bool isLastPage,
+				util::ParametersMap& pm
 			) const;
 
 		public:

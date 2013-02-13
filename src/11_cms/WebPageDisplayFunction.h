@@ -55,11 +55,13 @@ namespace synthese
 			static const std::string PARAMETER_HOST_NAME;
 			static const std::string PARAMETER_SMART_URL;
 			static const std::string PARAMETER_DONT_REDIRECT_IF_SMART_URL;
+			static const std::string PARAMETER_RAW_DATA;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				const Webpage*	_page;
+				bool			_rawData;
 				bool			_useTemplate;
 				std::string _smartURL;
 				bool _dontRedirectIfSmartURL;
