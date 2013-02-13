@@ -70,6 +70,7 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_MONITORING_PARSER_PAGE_ID;
+			static const std::string PARAMETER_MESSAGE_IS_DISPLAYED_PAGE_ID;
 			static const std::string PARAMETER_MESSAGE_TYPE_ID;
 
 		private:
@@ -86,6 +87,7 @@ namespace synthese
 			boost::optional<boost::shared_ptr<const cms::Webpage> > _displayDestinationPage;
 			boost::optional<boost::shared_ptr<const cms::Webpage> > _displayTransferDestinationPage;
 			boost::optional<boost::shared_ptr<const cms::Webpage> > _monitoringParserPage;
+			boost::optional<boost::shared_ptr<const cms::Webpage> > _messageIsDisplayedPage;
 			boost::optional<boost::shared_ptr<messages::MessageType> > _messageType;
 
 		protected:

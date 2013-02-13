@@ -78,6 +78,9 @@ namespace synthese
 		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "dp");
 		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "tp");
 		const string UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID(Action_PARAMETER_PREFIX + "pp");
+		const string UpdateDisplayTypeAction::PARAMETER_MESSAGE_IS_DISPLAYED_PAGE_ID = Action_PARAMETER_PREFIX + "_message_is_idsplayed_page_id";
+		const string UpdateDisplayTypeAction::PARAMETER_MESSAGE_TYPE_ID = Action_PARAMETER_PREFIX + "_message_type_id";
+
 
 
 		ParametersMap UpdateDisplayTypeAction::getParametersMap() const
@@ -349,6 +352,26 @@ namespace synthese
 					}
 				}
 
+				if(map.isDefined(PARAMETER_MESSAGE_IS_DISPLAYED_PAGE_ID))
+				{
+					RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_IS_DISPLAYED_PAGE_ID, 0));
+					if(id)
+					{
+						try
+						{
+							_messageIsDisplayedPage = WebPageTableSync::Get(pid, *_env);
+						}
+						catch (ObjectNotFoundException<Webpage>&)
+						{
+							throw ActionException("No such message is displayed rule page");
+						}
+					}
+					else
+					{
+						_messageIsDisplayedPage = shared_ptr<const Webpage>();
+					}
+				}
+
 				// Message type
 				if(map.isDefined(PARAMETER_MESSAGE_TYPE_ID))
 				{
@@ -501,6 +524,17 @@ namespace synthese
 					"Page CMS pour parser les résultats de supervision",
 					(_dt->getMonitoringParserPage() != NULL) ? _dt->getMonitoringParserPage()->getFullName() : "(aucune)",
 					(_monitoringParserPage->get() != NULL) ? (*_monitoringParserPage)->getFullName() : "(aucune)"
+				);
+			}
+
+			if(_messageIsDisplayedPage)
+			{
+				_dt->setMessageIsDisplayedPage(_messageIsDisplayedPage->get());
+				DBLogModule::appendToLogIfChange(
+					log,
+					"Page CMS définissant la règle d'affichage d'un message",
+					(_dt->getMessageIsDisplayedPage() != NULL) ? _dt->getMessageIsDisplayedPage()->getFullName() : "(aucune)",
+					(_messageIsDisplayedPage->get() != NULL) ? (*_messageIsDisplayedPage)->getFullName() : "(aucune)"
 				);
 			}
 
