@@ -51,6 +51,13 @@ namespace synthese
 			virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const { return p; }
 			virtual bool containsAnyVertex(GraphIdType graphType) const { return true; }
 			virtual std::string getRuleUserName() const {return "Hub"; }
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Lists the vertices contained in the hub.
+			/// @param graphId the graph the vertices must belong to
+			virtual Vertices getVertices(
+				GraphIdType graphId
+			) const { return Vertices(); }
 		};
 
 		class FakeVertex:
