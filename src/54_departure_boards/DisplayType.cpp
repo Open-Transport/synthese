@@ -24,6 +24,7 @@
 
 #include "MessageType.hpp"
 #include "ParametersMap.h"
+#include "Webpage.h"
 
 using namespace boost::posix_time;
 using namespace std;
