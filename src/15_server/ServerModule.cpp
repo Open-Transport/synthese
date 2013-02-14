@@ -92,7 +92,13 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_HTTP_FORCE_GZIP = "http_force_gzip";
 
 		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
-		const std::string ServerModule::VERSION_INFO(SYNTHESE_VERSION_INFO);
+#ifdef WIN32 // CMake is not able to extract the current revision number and the build date in other OS than linux right now
+		const std::string ServerModule::REVISION("");
+		const std::string ServerModule::BUILD_DATE("");
+#else
+		const std::string ServerModule::REVISION(SYNTHESE_REVISION);
+		const std::string ServerModule::BUILD_DATE(SYNTHESE_BUILD_DATE);
+#endif
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
