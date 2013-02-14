@@ -208,7 +208,7 @@ namespace synthese
 				}
 				if ((*itrs)->getReservationRuleId() != 0)
 				{
-					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place réservée sur ce tronçon");
+					stream << HTMLModule::getHTMLImage("/admin/img/resa_compulsory.png", "Place réservée sur ce tronçon");
 				}
 				stream << " de " << (*itrs)->getDeparturePlaceName();
 				stream << " le " << language.getWeekDayName((*itrs)->getDepartureTime().date().day_of_week()) << " " << (*itrs)->getDepartureTime();

@@ -305,7 +305,7 @@ namespace synthese
 							*tr,
 							searchRequest.getUser()->getLanguage() ? *searchRequest.getUser()->getLanguage() : Language::GetLanguageFromIso639_1Code("fr")
 						);
-						stream << "<br />Statut actuel de la réservation : " << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText()) << " " << tr->getFullStatusText();
+						stream << "<br />Statut actuel de la réservation : " << HTMLModule::getHTMLImage("/admin/img/" + ResaModule::GetStatusIcon(status), tr->getFullStatusText()) << " " << tr->getFullStatusText();
 					}
 
 					break;
@@ -498,7 +498,7 @@ namespace synthese
 		std::string ResaDBLog::GetIcon( const ResaDBLog::_EntryType& type )
 		{
 			return HTMLModule::getHTMLImage(
-				GetIconURL(type),
+				"/admin/img/" + GetIconURL(type),
 				GetText(type)
 			);
 		}

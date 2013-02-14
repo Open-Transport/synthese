@@ -438,8 +438,8 @@ namespace synthese
 					stream <<
 						t.col() <<
 						(	it.second.first ?
-							HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") :
-							HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible")
+							HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Arrivée possible") :
+							HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Arrivée impossible")
 						)
 					;
 
@@ -447,8 +447,8 @@ namespace synthese
 					stream <<
 						t.col() <<
 						(	it.second.second ?
-							HTMLModule::getHTMLImage("bullet_green.png","Départ possible") :
-							HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible")
+							HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Départ possible") :
+							HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Départ impossible")
 						)
 					;
 				}

@@ -315,7 +315,7 @@ namespace synthese
 				stream <<
 					t.col() <<
 					HTMLModule::getHTMLImage(
-						DBLogModule::getEntryIcon(dbe->getLevel()),
+						"/admin/img/" + DBLogModule::getEntryIcon(dbe->getLevel()),
 						DBLogModule::getEntryLevelLabel(dbe->getLevel())
 					)
 				;

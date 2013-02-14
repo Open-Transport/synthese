@@ -291,7 +291,7 @@ namespace synthese
 						t.col() <<
 						(	screen->getType() ?
 							screen->getType()->getName() :
-							HTMLModule::getHTMLImage("error.png", "Type non défini")
+							HTMLModule::getHTMLImage("/admin/img/error.png", "Type non défini")
 						)
 					;
 
@@ -304,7 +304,7 @@ namespace synthese
 					{
 						stream <<
 							HTMLModule::getHTMLImage(
-								"error.png",
+								"/admin/img/error.png",
 								"Veuillez définir le type d'afficheur dans l'écran de configuration."
 							)
 						;
@@ -313,7 +313,7 @@ namespace synthese
 					{
 						stream <<
 							HTMLModule::getHTMLImage(
-								"cross.png",
+								"/admin/img/cross.png",
 								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
 							)
 						;
@@ -321,7 +321,7 @@ namespace synthese
 					else if(!monitored)
 					{
 						stream << HTMLModule::getHTMLImage(
-								"help.png",
+								"/admin/img/help.png",
 								"Ce type d'afficheur n'est pas supervisé. Voir la définition du type."
 							)
 						;
@@ -335,20 +335,20 @@ namespace synthese
 						if(status.get() == NULL)
 						{
 							stream <<
-								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est jamais entré en contact.")
+								HTMLModule::getHTMLImage("/admin/img/exclamation.png", "Cet afficheur n'est jamais entré en contact.")
 							;
 						}
 						else if(screen->isDown(*status)
 						){
 							stream <<
-								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est plus en contact alors qu'il est déclaré online.")
+								HTMLModule::getHTMLImage("/admin/img/exclamation.png", "Cet afficheur n'est plus en contact alors qu'il est déclaré online.")
 							;
 						}
 						else
 						{
 							stream <<
 								HTMLModule::getHTMLImage(
-									DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()),
+									"/admin/img/" + DisplayMonitoringStatus::GetStatusIcon(status->getGlobalStatus()),
 									DisplayMonitoringStatus::GetStatusString(status->getGlobalStatus())
 								)
 							;
@@ -361,7 +361,7 @@ namespace synthese
 					{
 						stream <<
 							HTMLModule::getHTMLImage(
-								"cross.png",
+								"/admin/img/cross.png",
 								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
 							)
 						;
@@ -372,9 +372,10 @@ namespace synthese
 						{
 							stream <<
 								HTMLModule::getHTMLImage(
-									(	(alarm->getLevel() == ALARM_LEVEL_WARNING) ?
-										"full_screen_message_display.png" :
-										"partial_message_display.png"
+									string("/admin/img/") +
+									string((alarm->getLevel() == ALARM_LEVEL_WARNING) ?
+											"full_screen_message_display.png" :
+											"partial_message_display.png"
 									),
 									"Message : " + alarm->getShortMessage()
 								)
@@ -385,13 +386,13 @@ namespace synthese
 							if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(screen->getKey()))
 							{
 								stream <<
-									HTMLModule::getHTMLImage("times_display.png", "Affichage d'horaires en cours")
+									HTMLModule::getHTMLImage("/admin/img/times_display.png", "Affichage d'horaires en cours")
 								;
 							}
 							else
 							{
 								stream <<
-									HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichée, écran vide")
+									HTMLModule::getHTMLImage("/admin/img/empty_display.png", "Aucune ligne affichée, écran vide")
 								;
 							}
 						}

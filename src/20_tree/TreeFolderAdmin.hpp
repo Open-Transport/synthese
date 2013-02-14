@@ -194,7 +194,7 @@ namespace synthese
 						stream <<
 							html::HTMLModule::getHTMLLink(
 								removeFolderRequest.getURL(),
-								html::HTMLModule::getHTMLImage("remove.png", "Supprimer"),
+								html::HTMLModule::getHTMLImage("/admin/img/remove.png", "Supprimer"),
 								"Etes-vous sûr de vouloir supprimer le répertoire "+ folder->get<Name>() +" ?"
 							);
 					}

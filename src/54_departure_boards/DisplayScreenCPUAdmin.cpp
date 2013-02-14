@@ -207,7 +207,7 @@ namespace synthese
 				{
 					stream <<
 						l.element() <<
-						HTMLModule::getHTMLImage("help.png", "Information") <<
+						HTMLModule::getHTMLImage("/admin/img/help.png", "Information") <<
 						" Cette unité centrale n'est pas supervisée."
 						;
 				} else {
@@ -227,7 +227,7 @@ namespace synthese
 					{
 						stream <<
 							l.element() <<
-							HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+							HTMLModule::getHTMLImage("/admin/img/exclamation.png", "Statut KO") <<
 							" KO : Cette unité centrale n'est jamais entré en contact.";
 					}
 					else
@@ -236,7 +236,7 @@ namespace synthese
 						){
 							stream <<
 								l.element() <<
-								HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+								HTMLModule::getHTMLImage("/admin/img/exclamation.png", "Statut KO") <<
 								" KO : Cette unité centrale n'est plus en contact alors qu'elle est déclarée online."
 							;
 						}

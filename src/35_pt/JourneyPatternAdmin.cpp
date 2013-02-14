@@ -360,7 +360,7 @@ namespace synthese
 						stream <<
 							HTMLModule::getHTMLLink(
 								lineStopUpdateAction.getHTMLForm().getURL(),
-								HTMLModule::getHTMLImage("cog.png", "Générer distance depuis géométrie")
+								HTMLModule::getHTMLImage("/admin/img/cog.png", "Générer distance depuis géométrie")
 							);
 						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(false);
 					}
@@ -370,7 +370,7 @@ namespace synthese
 					{
 						// Area
 						stream << t.col();
-						stream << HTMLModule::getHTMLImage(DRTAreaAdmin::ICON, "Zone TAD");
+						stream << HTMLModule::getHTMLImage("/admin/img/" + DRTAreaAdmin::ICON, "Zone TAD");
 						if(lineArea->getArea())
 						{
 							stream << HTMLModule::getHTMLLink(
@@ -406,7 +406,7 @@ namespace synthese
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isArrivalAllowed() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"))
+							(lineStop->isArrivalAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>());
 
@@ -416,7 +416,7 @@ namespace synthese
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isDepartureAllowed() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"))
+							(lineStop->isDepartureAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>());
 
@@ -424,14 +424,14 @@ namespace synthese
 					stream << t.col();
 					if(	lineArea.get())
 					{
-						stream << HTMLModule::getHTMLImage("time.png", "Horaire fourni (zonal)");
+						stream << HTMLModule::getHTMLImage("/admin/img/time.png", "Horaire fourni (zonal)");
 					}
 					else if(linePhysicalStop)
 					{
 						string icon(
 							linePhysicalStop->getScheduleInput() ?
-							HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") :
-							HTMLModule::getHTMLImage("ftv2vertline.png", "Horaire non fourni à cet arrêt")
+							HTMLModule::getHTMLImage("/admin/img/time.png", "Horaire fourni à cet arrêt") :
+							HTMLModule::getHTMLImage("/admin/img/ftv2vertline.png", "Horaire non fourni à cet arrêt")
 						);
 
 						if(	_line->getServices().empty() &&

@@ -43,6 +43,9 @@ namespace synthese
 			public util::FactoryBase<BroadcastPoint>
 		{
 		public:
+			static const std::string VAR_BROADCAST_POINT_TYPE;
+			static const std::string VAR_MESSAGE_ID;
+
 			BroadcastPoint() {}
 
 			virtual MessageType* getMessageType() const = 0;

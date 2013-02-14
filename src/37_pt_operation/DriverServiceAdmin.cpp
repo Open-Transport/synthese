@@ -217,7 +217,7 @@ namespace synthese
 							const Hub* hub(service->getPath()->getEdge(es.startRank)->getFromVertex()->getHub());
 							if(lastHub && hub != lastHub)
 							{
-								stream << HTMLModule::getHTMLImage("error.png", "Le lieu de départ est différent de la précédente arrivée");
+								stream << HTMLModule::getHTMLImage("/admin/img/error.png", "Le lieu de départ est différent de la précédente arrivée");
 							}
 							if(dynamic_cast<const Depot*>(hub))
 							{
@@ -229,7 +229,7 @@ namespace synthese
 							}
 							else if(dynamic_cast<const DRTArea*>(hub))
 							{
-								stream << HTMLModule::getHTMLImage(DRTAreaAdmin::ICON, "Zone TAD");
+								stream << HTMLModule::getHTMLImage("/admin/img/"+DRTAreaAdmin::ICON, "Zone TAD");
 
 								stream << dynamic_cast<const DRTArea*>(hub)->getName();
 							}
@@ -255,7 +255,7 @@ namespace synthese
 							}
 							else if(dynamic_cast<const DRTArea*>(hub))
 							{
-								stream << HTMLModule::getHTMLImage(DRTAreaAdmin::ICON, "Zone TAD");
+								stream << HTMLModule::getHTMLImage("/admin/img/"+DRTAreaAdmin::ICON, "Zone TAD");
 
 								stream << dynamic_cast<const DRTArea*>(hub)->getName();
 							}

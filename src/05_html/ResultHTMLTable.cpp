@@ -117,7 +117,7 @@ namespace synthese
 					)	)	);
 					s << HTMLModule::getHTMLLink(
 							_searchForm.getURL(f),
-							HTMLModule::getHTMLImage("resultset_previous.png", "<<")
+							HTMLModule::getHTMLImage("/admin/img/resultset_previous.png", "<<")
 						) <<
 						"&nbsp;|&nbsp;"
 					;
@@ -140,7 +140,7 @@ namespace synthese
 						"&nbsp;|&nbsp;" <<
 						HTMLModule::getHTMLLink(
 							_searchForm.getURL(f),
-							HTMLModule::getHTMLImage("resultset_next.png", ">>")
+							HTMLModule::getHTMLImage("/admin/img/resultset_next.png", ">>")
 						)
 					;
 				}
