@@ -147,7 +147,7 @@ namespace synthese
 							removeFolderRequest.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?",
-							"folder_delete.png"
+							"/admin/img/folder_delete.png"
 						) << "</p>"
 					;
 				}
@@ -216,8 +216,8 @@ namespace synthese
 				deleteScenarioRequest.getAction()->setObjectId(scenario->getKey());
 				stream << t3.row(lexical_cast<string>(scenario->getKey()));
 				stream << t3.col() << scenario->getName();
-				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Ouvrir", string(), "cog_edit.png");
-				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
+				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Ouvrir", string(), "/admin/img/cog_edit.png");
+				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "/admin/img/cog_delete.png");
 			}
 
 			stream << t3.row(string());
@@ -265,7 +265,7 @@ namespace synthese
 			}
 
 			stream << l.element("folder");
-			stream << f.getImageSubmitButton("add.png", "Ajouter");
+			stream << f.getImageSubmitButton("/admin/img/add.png", "Ajouter");
 			stream << f.getTextInput(ScenarioFolderAdd::PARAMETER_NAME,"","(Entrez le nom du répertoire ici)");
 			stream << l.close() << f.close();
 

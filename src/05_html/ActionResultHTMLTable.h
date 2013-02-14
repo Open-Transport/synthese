@@ -58,7 +58,7 @@ namespace synthese
 				T& v,
 				const HTMLForm& actionForm,
 				std::string selectName=std::string(),
-				std::string iconPath=std::string()
+				std::string iconPath=std::string("/admin/img/")
 			):	ResultHTMLTable(header, searchForm, requestParameters, v, iconPath),
 				_actionForm(actionForm),
 				_selectName(selectName)
