@@ -161,7 +161,7 @@ namespace synthese
 					DeparturesTableModule::getDisplayTypeLabels(),
 					optional<RegistryKeyType>()
 				);
-			stream << testForm.getSubmitOnPopupLink(HTMLModule::getHTMLImage("accept.png", "OK"), 800, 600);
+			stream << testForm.getSubmitOnPopupLink(HTMLModule::getHTMLImage("/admin/img/accept.png", "OK"), 800, 600);
 			stream << "</p>" << testForm.close();
 
 			stream << "<h1>Afficheurs destinataires</h1>";
@@ -182,7 +182,7 @@ namespace synthese
 					removeRequest.getAction()->setObjectId(ds->getKey());
 
 					stream << l.element("display");
-					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer"));
+					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("/admin/img/delete.png","Supprimer"));
 
 					stream << ds->getFullName();
 				}

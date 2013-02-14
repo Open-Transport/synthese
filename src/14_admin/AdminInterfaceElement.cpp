@@ -234,7 +234,7 @@ namespace synthese
 				stream << " onclick=\"activateTab(this);\">";
 				if (!tab.getIcon().empty())
 				{
-					stream  << HTMLModule::getHTMLImage(tab.getIcon(), tab.getTitle()) << "&nbsp;";
+					stream  << HTMLModule::getHTMLImage("/admin/img/" + tab.getIcon(), tab.getTitle()) << "&nbsp;";
 				}
 				stream << tab.getTitle() << "</span>";
 				first = false;
@@ -377,7 +377,7 @@ namespace synthese
 			{
 				if(rtab.getId() == tab)
 				{
-					return HTMLModule::getLinkButton("activateTab(document.getElementById('tab_"+ rtab.getId() +"'));", rtab.getTitle(), string(), rtab.getIcon(), true);
+					return HTMLModule::getLinkButton("activateTab(document.getElementById('tab_"+ rtab.getId() +"'));", rtab.getTitle(), string(), "/admin/img/"+ rtab.getIcon(), true);
 				}
 			}
 			return string();

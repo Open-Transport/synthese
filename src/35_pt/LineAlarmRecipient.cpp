@@ -155,7 +155,7 @@ namespace synthese
 					removeRequest.getAction()->setObjectId(ds->getKey());
 
 					stream << l.element("chart_line");
-					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer"));
+					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("/admin/img/delete.png","Supprimer"));
 
 					stream << ds->getShortName();
 				}

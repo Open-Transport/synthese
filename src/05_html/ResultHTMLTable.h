@@ -116,7 +116,7 @@ namespace synthese
 				const HTMLForm& searchForm,
 				const RequestParameters& requestParameters,
 				T& v,
-				std::string iconPath = std::string()
+				std::string iconPath = "/admin/img/"
 			):	HTMLTable(header.size(), CSS_CLASS),
 				_requestParameters(requestParameters),
 				_searchForm(searchForm)

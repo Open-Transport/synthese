@@ -106,8 +106,7 @@ namespace synthese
 			public util::FactorableTemplate<messages::BroadcastPoint, DisplayScreen>
 		{
 		public:
-			static const std::string VAR_SCREEN_ID;
-			static const std::string VAR_MESSAGE_ID;
+			static const std::string VALUE_DISPLAY_SCREEN;
 
 			/// Chosen registry class.
 			typedef util::Registry<DisplayScreen>	Registry;

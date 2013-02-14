@@ -182,7 +182,7 @@ namespace synthese
 							if (it != _sentScenario->getVariables().end()) value = it->second;
 
 							stream << udt.cell(
-								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" "+ HTMLModule::getHTMLImage("information.png", "Info : " + variable.second.helpMessage))),
+								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" "+ HTMLModule::getHTMLImage("/admin/img/information.png", "Info : " + variable.second.helpMessage))),
 								udt.getForm().getTextInput(ScenarioSaveAction::PARAMETER_VARIABLE + variable.second.code, value)
 							);
 						}

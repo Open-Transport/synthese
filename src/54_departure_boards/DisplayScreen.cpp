@@ -85,9 +85,7 @@ namespace synthese
 		const std::string DisplayScreen::DATA_TYPE_ID("type_id");
 		const std::string DisplayScreen::DATA_LOCATION_ID("location_id");
 		const std::string DisplayScreen::DATA_CPU_ID("cpu_id");
-
-		const std::string DisplayScreen::VAR_SCREEN_ID = "screen_id";
-		const std::string DisplayScreen::VAR_MESSAGE_ID = "message_id";
+		const std::string DisplayScreen::VALUE_DISPLAY_SCREEN = "display_screen";
 
 
 
@@ -870,7 +868,8 @@ namespace synthese
 
 			stringstream s;
 			ParametersMap pm;
-			pm.insert(VAR_SCREEN_ID, getKey());
+			toParametersMap(pm);
+			pm.insert(VAR_BROADCAST_POINT_TYPE, VALUE_DISPLAY_SCREEN);
 			pm.insert(VAR_MESSAGE_ID, message.getKey());
 			_displayType->getMessageIsDisplayedPage()->display(s, pm);
 			string str(s.str());

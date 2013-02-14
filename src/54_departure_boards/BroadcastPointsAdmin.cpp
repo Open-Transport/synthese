@@ -203,7 +203,7 @@ namespace synthese
 						if(pl->cpuNumber > 0)
 						{
 							stream <<
-								HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unité centrale") <<
+								HTMLModule::getHTMLImage("/admin/img/" + DisplayScreenCPUAdmin::ICON, "unité centrale") <<
 								"x" << pl->cpuNumber
 							;
 						}
@@ -211,7 +211,7 @@ namespace synthese
 						if(pl->broadCastPointsNumber > 0)
 						{
 							stream <<
-								HTMLModule::getHTMLImage(DisplayAdmin::ICON, "écran") <<
+								HTMLModule::getHTMLImage("/admin/img/" + DisplayAdmin::ICON, "écran") <<
 								"x" << pl->broadCastPointsNumber
 							;
 						}
@@ -223,7 +223,7 @@ namespace synthese
 				}
 				catch (...)
 				{
-					stream << t.col(3) << HTMLModule::getHTMLImage("exclamation.png", "Erreur de données") << " Erreur de données : arrêt inexistant";
+					stream << t.col(3) << HTMLModule::getHTMLImage("/admin/img/exclamation.png", "Erreur de données") << " Erreur de données : arrêt inexistant";
 				}
 			}
 			stream << t.close();

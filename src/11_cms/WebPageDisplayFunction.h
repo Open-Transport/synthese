@@ -47,6 +47,7 @@ namespace synthese
 		{
 		private:
 			static const std::string DATA_CONTENT;
+			static const std::string ATTR_EQUIV_URL;
 
 		public:
 			static const std::string PARAMETER_SITE_ID;
@@ -65,6 +66,7 @@ namespace synthese
 				bool			_useTemplate;
 				std::string _smartURL;
 				bool _dontRedirectIfSmartURL;
+				std::string		_equivURI;
 			//@}
 
 

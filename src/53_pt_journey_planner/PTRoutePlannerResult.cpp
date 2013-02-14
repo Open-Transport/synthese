@@ -166,11 +166,11 @@ namespace synthese
 
 					if(it->getReservationCompliance(ignoreReservationDeadline) == true)
 					{
-						stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire";
+						stream << HTMLModule::getHTMLImage("/admin/img/resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire";
 					}
 					else
 					{
-						stream << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative";
+						stream << HTMLModule::getHTMLImage("/admin/img/resa_optional.png", "Réservation facultative") << " Réservation facultative";
 					}
 
 					const ptime deadline(it->getReservationDeadLine());
