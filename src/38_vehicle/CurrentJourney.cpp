@@ -38,12 +38,14 @@ namespace synthese
 		const string CurrentJourney::ATTR_LINE_NUMBER = "line_number";
 		const string CurrentJourney::TAG_NEXT_STOP = "next_stop";
 		const string CurrentJourney::TAG_COMMERCIAL_LINE = "commercial_line";
+		const string CurrentJourney::TAG_TERMINUS_DEPARTURE_TIME = "terminus_departure_time";
 
 
 
 		CurrentJourney::CurrentJourney():
 			_line(NULL),
-			_stopRequested(false)
+			_stopRequested(false),
+			_terminusDepartureTime(boost::posix_time::not_a_date_time)
 		{
 
 		}
@@ -74,6 +76,13 @@ namespace synthese
 				it.toParametersMap(*stopPM);
 
 				pm.insert(TAG_NEXT_STOP, stopPM);
+			}
+			
+			// Terminus departure time
+			// only valid when status indicates VehiclePosition::TERMINUS_START
+			if(! _terminusDepartureTime.is_not_a_date_time())
+			{
+				pm.insert(TAG_TERMINUS_DEPARTURE_TIME, _terminusDepartureTime);
 			}
 		}
 }	}

@@ -393,14 +393,17 @@ namespace synthese
 						{
 						case 0:
 							status = VehiclePosition::OUT_OF_SERVICE;
+							VehicleModule::GetCurrentJourney().setTerminusDepartureTime(posix_time::not_a_date_time);
 							break;
 
 						case 1:
 							status = VehiclePosition::SERVICE;
+							VehicleModule::GetCurrentJourney().setTerminusDepartureTime(posix_time::not_a_date_time);
 							break;
 
 						case 3:
 							status = VehiclePosition::TERMINUS_START;
+							// We will get a Departure Time from MsgInfo
 							break;
 
 						case 2:
@@ -409,15 +412,18 @@ namespace synthese
 						case 7:
 						case 8:
 							status = VehiclePosition::COMMERCIAL;
+							VehicleModule::GetCurrentJourney().setTerminusDepartureTime(posix_time::not_a_date_time);
 							break;
 
 						case 6:
 							status = VehiclePosition::DEAD_RUN_TRANSFER;
+							VehicleModule::GetCurrentJourney().setTerminusDepartureTime(posix_time::not_a_date_time);
 							break;
 
 						case 9:
 						case 10:
 							status = VehiclePosition::NOT_IN_SERVICE;
+							VehicleModule::GetCurrentJourney().setTerminusDepartureTime(posix_time::not_a_date_time);
 							break;
 						}
 						VehicleModule::GetCurrentVehiclePosition().setStatus(status);
@@ -750,6 +756,63 @@ namespace synthese
 					"</StatusReply>\n"
 				;
 				boost::asio::write(_socket, boost::asio::buffer(reply.str()));
+			}
+			else if(tagName == "MsgInfo")
+			{
+				XMLNode listeMsgNode(childNode.getChildNode("ListeMsg"));
+				if(	!listeMsgNode.isEmpty() ){
+					for(int i(0); i<listeMsgNode.nChildNode("BlocMsg"); ++i)
+					{
+						XMLNode blocMsgNode(listeMsgNode.getChildNode("BlocMsg", i));
+						if(! blocMsgNode.isEmpty())
+						{
+							XMLNode typeInfoNode(blocMsgNode.getChildNode("TypeInf", i));
+							if(! typeInfoNode.isEmpty() && string(typeInfoNode.getText()) == "5")
+							{
+								XMLNode contInfoNode(blocMsgNode.getChildNode("ContInf", i));
+								if(! contInfoNode.isEmpty())
+								{
+									string contInfoStr(contInfoNode.getText());
+									if(contInfoStr == "DEPART IMMINENT")
+									{
+										VehicleModule::GetCurrentJourney().setTerminusDepartureTime(
+													ptime(second_clock::local_time().date())
+										);
+									}
+									else
+									{
+										vector<string> parts;
+										split(parts, contInfoStr, is_any_of(" "));
+										if(parts.size() != 4 ||
+											( parts.size() == 4 &&
+											  (parts[0] != "DEPART" ||
+											   parts[1] != "DANS" ||
+											   parts[3] != "MN")
+											)
+										)
+										{
+											throw Exception("Malformed MsgInfo");
+										}
+										else
+										{
+											try
+											{
+												VehicleModule::GetCurrentJourney().setTerminusDepartureTime(
+															ptime(second_clock::local_time().date(), 
+																  time_duration(0, lexical_cast<unsigned short>(parts[2]), 0))
+														);
+											}
+											catch(bad_lexical_cast&)
+											{
+												throw Exception("Malformed MsgInfo minute");
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 
 		}
