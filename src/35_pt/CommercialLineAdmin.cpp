@@ -236,7 +236,7 @@ namespace synthese
 
 					// Open button cell
 					stream << t.col();
-					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FreeDRTAreaAdmin::ICON);
+					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + FreeDRTAreaAdmin::ICON);
 
 					// Name cell
 					stream << t.col();

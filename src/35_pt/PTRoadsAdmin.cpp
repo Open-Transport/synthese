@@ -144,7 +144,7 @@ namespace synthese
 				openRoadRequest.getPage()->setRoad(
 					Env::GetOfficialEnv().getSPtr(mainRoad)
 				);
-				stream << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), PTRoadAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTRoadAdmin::ICON);
 
 				// Left first number
 				stream << t.col();

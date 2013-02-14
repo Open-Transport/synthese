@@ -648,7 +648,7 @@ namespace synthese
 					stream << ts.col() << HTMLModule::getHTMLLink(serviceRequest.getURL(), to_iso_extended_string(service->getLastActiveDate()));
 
 					serviceRequest.getPage()->setActiveTab(string());
-					stream << ts.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
+					stream << ts.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), "/admin/img/" + ServiceAdmin::ICON);
 
 					stream << ts.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le service "+ service->getServiceNumber() +" ?");
 				}
@@ -732,7 +732,7 @@ namespace synthese
 
 					stream << tc.col() << to_iso_extended_string(service->getLastActiveDate());
 
-					stream << tc.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
+					stream << tc.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), "/admin/img/" + ServiceAdmin::ICON);
 
 					stream << tc.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le service ?");
 				}

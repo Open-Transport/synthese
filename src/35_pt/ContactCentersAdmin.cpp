@@ -129,7 +129,7 @@ namespace synthese
 				// Open button
 				stream << t.col();
 				openRequest.getPage()->setContactCenter(it.second);
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), ContactCenterAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + ContactCenterAdmin::ICON);
 
 				// Name
 				stream << t.col();
@@ -142,7 +142,7 @@ namespace synthese
 				// Delete button
 				stream << t.col();
 				deleteRequest.getAction()->setObjectId(it.first);
-				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer ce tarif ?", "delete.png");
+				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer ce tarif ?", "/admin/img/delete.png");
 			}
 
 			// New row for object creation

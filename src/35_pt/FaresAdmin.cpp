@@ -138,11 +138,11 @@ namespace synthese
 
 				stream << t.col();
 				openRequest.getPage()->setFare(it.second);
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FareAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + FareAdmin::ICON);
 
 				stream << t.col();
 				deleteRequest.getAction()->setObjectId(it.first);
-				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer ce tarif ?", "delete.png");
+				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer ce tarif ?", "/admin/img/delete.png");
 			}
 
 			stream << t.row();

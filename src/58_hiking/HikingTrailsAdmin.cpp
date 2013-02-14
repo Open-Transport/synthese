@@ -147,8 +147,8 @@ namespace synthese
 				removeRequest.getAction()->setObjectId(trail->getKey());
 				stream << t.row();
 				stream << t.col() << trail->getName();
-				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), HikingTrailAdmin::ICON);
-				stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la randonnée ?", HikingTrailAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + HikingTrailAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la randonnée ?", "/admin/img/" + HikingTrailAdmin::ICON);
 			}
 
 			stream << t.row();

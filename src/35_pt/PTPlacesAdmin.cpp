@@ -407,7 +407,7 @@ namespace synthese
 					}
 
 					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const StopArea>(place));
-					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTPlaceAdmin::ICON);
 
 					// Remove button only if no stops inside
 					stream << t.col();
@@ -495,7 +495,7 @@ namespace synthese
 				{
 					stream << t.row();
 					openRequest.getPage()->setPlace(const_pointer_cast<const PublicPlace>(place));
-					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PublicPlaceAdmin::ICON);
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PublicPlaceAdmin::ICON);
 
 					stream << t.col() << place->getKey();
 					if(!_city.get())

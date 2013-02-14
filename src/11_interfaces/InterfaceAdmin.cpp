@@ -140,7 +140,7 @@ namespace synthese
 				stream << t.row();
 				stream << t.col() << page->getFactoryKey();
 				stream << t.col() << page->getPageCode();
-				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), InterfacePageAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + InterfacePageAdmin::ICON);
 			}
 			stream << t.row();
 			stream << t.col() << f.getTextInput(InterfacePageAddAction::PARAMETER_CLASS, string());

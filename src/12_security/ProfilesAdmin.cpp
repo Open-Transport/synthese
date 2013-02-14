@@ -187,7 +187,7 @@ namespace synthese
 				stream
 					<< l.close()
 					<< t.col()
-					<< profileRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "group_edit.png")
+					<< profileRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "/admin/img/group_edit.png")
 				;
 				if(generalDeleteRight)
 				{
@@ -197,7 +197,7 @@ namespace synthese
 							UNKNOWN_RIGHT_LEVEL,
 							lexical_cast<string>(profile->getKey())
 					)	){
-						stream << deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
+						stream << deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "/admin/img/group_delete.png");
 			}	}	}
 
 			stream << t.row(string());

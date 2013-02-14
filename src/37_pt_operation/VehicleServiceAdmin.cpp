@@ -309,7 +309,7 @@ namespace synthese
 					stream << chunk->elements.size();
 
 					stream << t.col();
-					stream << HTMLModule::getLinkButton(openServiceRequest.getURL(), "Ouvrir", string(), DriverServiceAdmin::ICON);
+					stream << HTMLModule::getLinkButton(openServiceRequest.getURL(), "Ouvrir", string(), "/admin/img/" + DriverServiceAdmin::ICON);
 				}
 
 				stream << t.close();

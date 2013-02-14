@@ -148,7 +148,7 @@ namespace synthese
 
 				stream << t.col();
 				openRequest.getPage()->setArea(it.second);
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), DRTAreaAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + DRTAreaAdmin::ICON);
 
 				stream << t.col();
 
@@ -170,11 +170,11 @@ namespace synthese
 				if(!hasLine)
 				{
 					deleteRequest.getAction()->setObjectId(it.first);
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone ?", "delete.png");
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone ?", "/admin/img/delete.png");
 				}
 				else
 				{
-					stream << HTMLModule::getLinkButton("alert('Impossible, zone utilisée dans un itinéraire.');", "Supprimer", string(), "delete.png", true);
+					stream << HTMLModule::getLinkButton("alert('Impossible, zone utilisée dans un itinéraire.');", "Supprimer", string(), "/admin/img/delete.png", true);
 				}
 			}
 

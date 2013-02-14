@@ -707,7 +707,7 @@ namespace synthese
 					openRequest.getPage()->setArea(const_pointer_cast<const FreeDRTArea>(area));
 					stream <<
 						t.col() <<
-						HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FreeDRTBookingAdmin::ICON)
+						HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + FreeDRTBookingAdmin::ICON)
 					;
 
 					// Name
@@ -882,7 +882,7 @@ namespace synthese
 						"Saisie de réservation",
 						TAB_FREE_DRT,
 						true,
-						FreeDRTBookingAdmin::ICON
+						"/admin/img/" + FreeDRTBookingAdmin::ICON
 				)	);
 			}
 

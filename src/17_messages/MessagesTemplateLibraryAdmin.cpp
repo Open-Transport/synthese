@@ -195,7 +195,7 @@ namespace synthese
 					// Display
 					stream << "<h2>";
 					if (deleteRight)
-						stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ tt->getName()+" ?", "page_delete.png") << " ";
+						stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ tt->getName()+" ?", "/admin/img/page_delete.png") << " ";
 					stream << tt->getName() << "</h2>";
 
 					PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+ lexical_cast<string>(tt->getKey())));

@@ -342,7 +342,7 @@ namespace synthese
 							openJourneyPatternRequest.getURL(),
 							"Ouvrir",
 							string(),
-							JourneyPatternAdmin::ICON
+							"/admin/img/" + JourneyPatternAdmin::ICON
 						)
 					;
 

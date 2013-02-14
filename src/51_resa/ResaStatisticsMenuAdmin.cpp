@@ -104,7 +104,7 @@ namespace synthese
 			if(isAuthorized(*request.getUser()))
 			{
 				stream << "<h1>Statistiques d'appels</h1>";
-				stream << "<p>" << HTMLModule::getLinkButton(openCallsRequest.getURL(), "Statistiques appels", string(), "/admin/img" + CallStatisticsAdmin::ICON) << "</p>";
+				stream << "<p>" << HTMLModule::getLinkButton(openCallsRequest.getURL(), "Statistiques appels", string(), "/admin/img/" + CallStatisticsAdmin::ICON) << "</p>";
 			}
 
 
@@ -142,7 +142,7 @@ namespace synthese
 				stream << t.row();
 				stream << t.col(1, line->getStyle()) << line->getShortName();
 				stream << t.col() << line->getName();
-				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img" + ResaStatisticsAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + ResaStatisticsAdmin::ICON);
 			}
 			stream << t.close();
 
