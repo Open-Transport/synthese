@@ -1,0 +1,24 @@
+/* News Ticker */
+/* TODO: keep only generic styling here */
+
+.newsTicker {
+  position: relative;
+  display: none;
+}
+
+.newsTicker .itemsContainer {
+  height: 110px;
+  overflow: hidden;
+}
+
+.newsTicker ul {
+  position: absolute;
+  width: 230px;
+
+  display: none;
+  overflow: hidden;
+}
+
+.newsTicker ul:first-child {
+  display: block;
+}
