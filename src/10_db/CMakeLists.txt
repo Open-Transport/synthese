@@ -43,6 +43,8 @@ ObjectCreateAction.cpp
 ObjectCreateAction.hpp
 ObjectUpdateAction.cpp
 ObjectUpdateAction.hpp
+ObjectViewService.cpp
+ObjectViewService.hpp
 OldLoadSavePolicy.hpp
 RemoveObjectAction.cpp
 RemoveObjectAction.hpp
