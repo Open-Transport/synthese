@@ -176,7 +176,7 @@ namespace synthese
 					stream << t.col() << user->getPhone();
 					stream << t.col() << user->getLogin();
 
-					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "user.png");
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/user.png");
 				}
 
 				stream << t.close();

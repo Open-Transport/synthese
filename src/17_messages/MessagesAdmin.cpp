@@ -358,7 +358,7 @@ namespace synthese
 				if (message.isApplicable(now))
 				{
 					scenarioStopRequest.getAction()->setScenario(static_pointer_cast<SentScenario,Scenario>(it));
-					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
+					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "/admin/img/stop.png");
 				}
 			}
 			stream << t1.row(string());
