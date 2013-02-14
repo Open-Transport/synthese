@@ -164,7 +164,7 @@ namespace synthese
 				// Link
 				stream << t.col();
 				openRequest.getPage()->setVehicleService(const_pointer_cast<const VehicleService>(vehicleService));
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), VehicleServiceAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + VehicleServiceAdmin::ICON);
 
 				// Name
 				stream << t.col() << vehicleService->getName();

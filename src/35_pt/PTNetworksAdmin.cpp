@@ -161,7 +161,7 @@ namespace synthese
 					// Open button
 					stream << t.col();
 					openRequest.getPage()->setNetwork(*network);
-					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
+					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + TransportNetworkAdmin::ICON);
 
 					// Name
 					stream << t.col();

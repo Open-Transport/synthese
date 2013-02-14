@@ -398,7 +398,7 @@ namespace synthese
 					stream << t.row();
 
 					// Open button
-					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), StopPointAdmin::ICON);
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + StopPointAdmin::ICON);
 
 					// Name cell
 					stream << t.col() << stop->getName();

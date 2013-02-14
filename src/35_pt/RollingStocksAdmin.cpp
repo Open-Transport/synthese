@@ -134,11 +134,11 @@ namespace synthese
 
 				stream << t.col();
 				openRequest.getPage()->setRollingStock(it.second);
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), RollingStockAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + RollingStockAdmin::ICON);
 
 				stream << t.col();
 				deleteRequest.getAction()->setObjectId(it.first);
-				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le mode ?", "delete.png");
+				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le mode ?", "/admin/img/delete.png");
 			}
 
 			stream << t.row();

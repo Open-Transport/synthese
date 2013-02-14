@@ -253,7 +253,7 @@ namespace synthese
 						openCityRequest.getPage()->setCity(city);
 
 						stream << t.col() << city->getName();
-						stream << t.col() << HTMLModule::getLinkButton(openCityRequest.getURL(), "Ouvrir", string(), PTPlacesAdmin::ICON);
+						stream << t.col() << HTMLModule::getLinkButton(openCityRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTPlacesAdmin::ICON);
 					}
 					else
 					{
@@ -376,7 +376,7 @@ namespace synthese
 						stream << "var tripWKT=\"" << jv.getTripWKT() << "\";";
 						stream << HTMLModule::GetHTMLJavascriptClose();
 						stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
-						stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
+						stream << HTMLModule::GetHTMLJavascriptOpen("/lib/openlayers/OpenLayers.js");
 						stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
 						stream << HTMLModule::GetHTMLJavascriptOpen("pedestrianroutemap.js");
 					}

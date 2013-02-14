@@ -158,7 +158,7 @@ namespace synthese
 				// Open
 				stream << t.col();
 				openRequest.getPage()->setDepot(const_pointer_cast<const Depot>(depot));
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), DepotAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + DepotAdmin::ICON);
 
 				// Name
 				stream << t.col() << depot->getName();
