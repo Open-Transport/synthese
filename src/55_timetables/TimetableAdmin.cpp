@@ -230,8 +230,8 @@ namespace synthese
 
 					ActionResultHTMLTable::HeaderVector h3;
 					h3.push_back(make_pair(PARAMETER_RANK, "Rang"));
-					h3.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
-					h3.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_down.png", "V")));
+					h3.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/arrow_up.png", "^")));
+					h3.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/arrow_down.png", "V")));
 					h3.push_back(make_pair(PARAMETER_TITLE, "Titre"));
 					h3.push_back(make_pair(PARAMETER_TITLE, "Titre"));
 					h3.push_back(make_pair(string(), "Actions"));
@@ -267,18 +267,19 @@ namespace synthese
 						stream << t3.col();
 						if (*lastRank > 1)
 						{
-							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
+							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("/admin/img/arrow_up.png", "^"));
 						}
 						stream << t3.col();
 						if (maxRank && *lastRank < *maxRank)
 						{
-							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));
+							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("/admin/img/arrow_down.png", "V"));
 						}
 						stream <<
 							t3.col() <<
 							HTMLModule::getHTMLImage(
-							Timetable::GetIcon(tt->getContentType()),
-							Timetable::GetFormatName(tt->getContentType())
+								"/admin/img/" + Timetable::GetIcon(tt->getContentType()),
+								Timetable::GetFormatName(tt->getContentType()
+							)
 						);
 						stream << t3.col() << tt->getTitle();
 						stream <<
@@ -287,29 +288,29 @@ namespace synthese
 								editTimetableRequest.getURL(),
 								"Ouvrir",
 								string(),
-								"table_edit.png"
+								"/admin/img/table_edit.png"
 							);
 						stream << t3.col();
 							copyTimetableRequest.getAction()->setReverse(false);
-							stream << HTMLModule::getLinkButton(copyTimetableRequest.getURL(), "Dupliquer", string(), "table_add.png");
+							stream << HTMLModule::getLinkButton(copyTimetableRequest.getURL(), "Dupliquer", string(), "/admin/img/table_add.png");
 
 						stream << t3.col();
 							copyTimetableRequest.getAction()->setReverse(true);
-							stream << HTMLModule::getLinkButton(copyTimetableRequest.getURL(), "Copie inversée", string(), "table_add.png");
+							stream << HTMLModule::getLinkButton(copyTimetableRequest.getURL(), "Copie inversée", string(), "/admin/img/table_add.png");
 
 						stream <<
 							t3.col() <<
 							HTMLModule::getLinkButton(
 								removeRequest.getURL(),
 								"Supprimer",
-								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
+								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "/admin/img/table_delete.png"
 							);
 					}
 					lastRank = lastRank ? *lastRank + 1 : 0;
 					stream << t3.row(lexical_cast<string>(*lastRank));
 					vector<pair<optional<bool>, string> > booknotbook;
-					booknotbook.push_back(make_pair(true, HTMLModule::getHTMLImage("table_multiple.png","Document")));
-					booknotbook.push_back(make_pair(false, HTMLModule::getHTMLImage("table.png","Fiche horaire")));
+					booknotbook.push_back(make_pair(true, HTMLModule::getHTMLImage("/admin/img/table_multiple.png","Document")));
+					booknotbook.push_back(make_pair(false, HTMLModule::getHTMLImage("/admin/img/table.png","Fiche horaire")));
 					stream << t3.col() << *lastRank;
 					stream << t3.col(3) << t3.getActionForm().getRadioInputCollection(TimetableAddAction::PARAMETER_IS_BOOK, booknotbook, optional<bool>(false));
 					stream << t3.col() << t3.getActionForm().getTextInput(TimetableAddAction::PARAMETER_TITLE, string(), "(titre de la nouvelle fiche horaire)");
@@ -377,8 +378,8 @@ namespace synthese
 					if(!rows.empty()) // Old method
 					{
 						ActionResultHTMLTable::HeaderVector h;
-						h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
-						h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_down.png", "V")));
+						h.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/arrow_up.png", "^")));
+						h.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/arrow_down.png", "V")));
 						h.push_back(make_pair(PARAMETER_RANK, "Rang"));
 						h.push_back(make_pair(string(), "Commune"));
 						h.push_back(make_pair(string(), "Arrêt"));
@@ -424,10 +425,10 @@ namespace synthese
 							stream << t.row(lexical_cast<string>(*lastRank));
 							stream << t.col();
 							if (*lastRank > 0)
-								stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
+								stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("/admin/img/arrow_up.png", "^"));
 							stream << t.col();
 							if (maxRank && *lastRank < *maxRank)
-								stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));;
+								stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("/admin/img/arrow_down.png", "V"));;
 							stream << t.col() << *lastRank;
 							if(row->getPlace())
 							{
@@ -441,36 +442,36 @@ namespace synthese
 							stream <<
 								t.col() <<
 								(	row->getIsArrival() ?
-									HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") :
-									HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible")
+									HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Arrivée possible") :
+									HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Arrivée impossible")
 								)
 							;
 							stream <<
 								t.col() <<
 								(	row->getIsDeparture() ?
-									HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") :
-									HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible")
+									HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Départ possible") :
+									HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Départ impossible")
 								)
 							;
 							stream <<
 								t.col() <<
 								(	(row->getCompulsory() == TimetableRow::PassageObligatoire) ?
-									HTMLModule::getHTMLImage("bullet_green.png", "Obligatoire") :
-									HTMLModule::getHTMLImage("bullet_white.png", "Non obligatoire")
+									HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Obligatoire") :
+									HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Non obligatoire")
 								)
 							;
 							stream <<
 								t.col() <<
 								(	(row->getCompulsory() == TimetableRow::PassageSuffisant) ?
-									HTMLModule::getHTMLImage("bullet_green.png", "Suffisant") :
-									HTMLModule::getHTMLImage("bullet_white.png", "Non suffisant")
+									HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Suffisant") :
+									HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Non suffisant")
 								)
 							;
 							stream <<
 								t.col() <<
 								(	(false) ?
-									HTMLModule::getHTMLImage("bullet_green.png", "Affiché") :
-									HTMLModule::getHTMLImage("bullet_white.png", "Non affiché")
+									HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Affiché") :
+									HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Non affiché")
 								)
 							;
 							stream << t.col() << HTMLModule::getLinkButton(deleteRowRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");

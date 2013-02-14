@@ -705,7 +705,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "Destination"));
 			h.push_back(make_pair(string(), "Arrêts"));
 			h.push_back(make_pair(string(), "Long."));
-			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("car.png", "Services")));
+			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/car.png", "Services")));
 			h.push_back(make_pair(string(), "Source"));
 			h.push_back(make_pair(string(), "Actions"));
 
@@ -817,20 +817,26 @@ namespace synthese
 
 					stream <<
 						HTMLModule::getHTMLImage(
-							it.first->getIcon().empty() ?
-							"note.png" :
-							it.first->getIcon(),
+							"/admin/img/"+
+							(	it.first->getIcon().empty() ?
+								"note.png" :
+								it.first->getIcon()
+							),
 							name
 						);
 					if(!it.first->getFormat().empty())
 					{
-						stream << HTMLModule::getHTMLImage(DataSourceAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
+						stream <<
+							HTMLModule::getHTMLImage(
+								"/admin/img/" + DataSourceAdmin::ICON,
+								"Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire"
+						);
 					}
 				}
 
 				// Remove button
 				stream << t.col();
-				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "chart_line_delete.png");
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "/admin/icon/chart_line_delete.png");
 			}
 
 			stream << t.row(string());

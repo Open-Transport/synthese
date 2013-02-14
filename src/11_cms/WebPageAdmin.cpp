@@ -482,13 +482,13 @@ namespace synthese
 					if(it != pages.begin())
 					{
 						moveRequest.getAction()->setUp(true);
-						stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_up.png", "up"));
+						stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("/admin/img/arrow_up.png", "up"));
 					}
 					stream << t.col();
 					if(it+1 != pages.end())
 					{
 						moveRequest.getAction()->setUp(false);
-						stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_down.png", "down"));
+						stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("/admin/img/arrow_down.png", "down"));
 					}
 				}
 				else
@@ -497,8 +497,8 @@ namespace synthese
 					stream << t.col();
 				}
 				stream << t.col() << page->getName();
-				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), WebPageAdmin::ICON);
-				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png");
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + WebPageAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "/admin/img/page_go.png");
 
 				WebPageTableSync::SearchResult result(
 					WebPageTableSync::Search(

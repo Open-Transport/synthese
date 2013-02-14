@@ -259,7 +259,7 @@ namespace synthese
 				if(deleteScenarioRequest.getAction()->isAuthorized(_request.getSession()))
 				{
 					stream <<
-						HTMLModule::getHTMLLink(deleteScenarioRequest.getURL(), HTMLModule::getHTMLImage("remove.png", "Supprimer"), "Etes-vous sûr de vouloir supprimer le répertoire ?");
+						HTMLModule::getHTMLLink(deleteScenarioRequest.getURL(), HTMLModule::getHTMLImage("/admin/img/remove.png", "Supprimer"), "Etes-vous sûr de vouloir supprimer le répertoire ?");
 				}
 				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), folder->getName());
 			}

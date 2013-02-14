@@ -29,6 +29,7 @@
 #include "Env.h"
 #include "Request.h"
 #include "RequestException.h"
+#include "URI.hpp"
 #include "Webpage.h"
 #include "Website.hpp"
 
@@ -51,6 +52,7 @@ namespace synthese
 	namespace cms
 	{
 		const string WebPageDisplayFunction::DATA_CONTENT = "content";
+		const string WebPageDisplayFunction::ATTR_EQUIV_URL = "equiv_url";
 
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID = "p";
 		const string WebPageDisplayFunction::PARAMETER_SITE_ID = "si";
@@ -192,6 +194,11 @@ namespace synthese
 
 			// Raw mode (no content evaluation)
 			_rawData = map.getDefault<bool>(PARAMETER_RAW_DATA, false);
+
+			// Equivalent URL
+			stringstream uri;
+			map.outputURI(uri);
+			_equivURI = uri.str();
 		}
 
 
@@ -235,6 +242,36 @@ namespace synthese
 				if(_useTemplate && _page->getTemplate())
 				{
 					ParametersMap pm(getTemplateParameters());
+
+					// equiv URL
+					stringstream equivURL;
+					equivURL << "http://" << request.getHostName() << _page->getRoot()->get<ClientURL>();
+					bool started(false);
+					if(!_page->get<SmartURLPath>().empty())
+					{
+						equivURL << _page->get<SmartURLPath>();
+					}
+					else
+					{
+						equivURL <<
+							request.getClientURL() << Request::PARAMETER_STARTER <<
+							Request::PARAMETER_SERVICE << URI::PARAMETER_ASSIGNMENT << FACTORY_KEY
+						;
+						started = true;
+					}
+					if(!_equivURI.empty())
+					{
+						if(!started)
+						{
+							equivURL << Request::PARAMETER_STARTER;
+						}
+						else
+						{
+							equivURL << URI::PARAMETER_SEPARATOR;
+						}
+						equivURL << _equivURI;
+					}
+					pm.insert(ATTR_EQUIV_URL, equivURL.str());
 
 					// Page data
 					_page->toParametersMap(pm);

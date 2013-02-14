@@ -447,15 +447,15 @@ namespace synthese
 							switch(status)
 							{
 							case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
-								stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+								stream << HTMLModule::getHTMLImage("/admin/img/pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("/admin/img/stop.png", "Pas encore ouvert");
 								break;
 
 							case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
-								stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+								stream << HTMLModule::getHTMLImage("/admin/img/pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("/admin/img/stop_blue.png", "Ouvert à la réservation");
 								break;
 
 							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
-								stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+								stream << HTMLModule::getHTMLImage("/admin/img/pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("/admin/img/tick.png", "Fermé à la réservation");
 								break;
 							default:
 								break;
@@ -469,15 +469,15 @@ namespace synthese
 							switch(status)
 							{
 							case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
-								stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+								stream << HTMLModule::getHTMLImage("/admin/img/handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("/admin/img/stop.png", "Pas encore ouvert");
 								break;
 
 							case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
-								stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+								stream << HTMLModule::getHTMLImage("/admin/img/handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("/admin/img/stop_blue.png", "Ouvert à la réservation");
 								break;
 
 							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
-								stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+								stream << HTMLModule::getHTMLImage("/admin/img/handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("/admin/img/tick.png", "Fermé à la réservation");
 								break;
 								
 							default:
@@ -492,15 +492,15 @@ namespace synthese
 							switch(status)
 							{
 							case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
-								stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+								stream << HTMLModule::getHTMLImage("/admin/img/bike_access.png","Vélos") << HTMLModule::getHTMLImage("/admin/img/stop.png", "Pas encore ouvert");
 								break;
 
 							case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
-								stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+								stream << HTMLModule::getHTMLImage("/admin/img/bike_access.png","Vélos") << HTMLModule::getHTMLImage("/admin/img/stop_blue.png", "Ouvert à la réservation");
 								break;
 
 							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
-								stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+								stream << HTMLModule::getHTMLImage("/admin/img/bike_access.png","Vélos") << HTMLModule::getHTMLImage("/admin/img/tick.png", "Fermé à la réservation");
 								break;
 
 							default:
@@ -541,7 +541,7 @@ namespace synthese
 
 						printRequest.getPage()->setServiceNumber(dynamic_cast<Service*>(service.get())->getServiceNumber());
 
-						stream << t.col(1, string(), true) << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
+						stream << t.col(1, string(), true) << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("/admin/img/printer.png", "Imprimer"));
 					}
 
 					if (serviceReservations.empty())

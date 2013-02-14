@@ -356,7 +356,7 @@ namespace synthese
 				if(_displayScreen->getType() == NULL)
 				{
 					stream <<
-						HTMLModule::getHTMLImage("error.png", "Erreur") <<
+						HTMLModule::getHTMLImage("/admin/img/error.png", "Erreur") <<
 						" KO : Veuillez définir le type d'afficheur dans l'écran de configuration."
 					;
 				}
@@ -377,7 +377,7 @@ namespace synthese
 				{
 					stream <<
 						l.element() <<
-						HTMLModule::getHTMLImage("help.png", "Information") <<
+						HTMLModule::getHTMLImage("/admin/img/help.png", "Information") <<
 						" Ce type d'afficheur n'est pas supervisé."
 					;
 				} else {
@@ -391,7 +391,7 @@ namespace synthese
 					{
 						stream <<
 							l.element() <<
-							HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+							HTMLModule::getHTMLImage("/admin/img/exclamation.png", "Statut KO") <<
 							" KO : Cet afficheur n'est jamais entré en contact.";
 					}
 					else
@@ -400,7 +400,7 @@ namespace synthese
 						){
 							stream <<
 								l.element() <<
-								HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
+								HTMLModule::getHTMLImage("/admin/img/exclamation.png", "Statut KO") <<
 								" KO : Cet afficheur n'est plus en contact alors qu'il est déclaré online."
 							;
 						}
@@ -659,7 +659,7 @@ namespace synthese
 										HTMLModule::getHTMLLink(
 											addPhysicalRequest.getHTMLForm().getURL(),
 											HTMLModule::getHTMLImage(
-												"cross.png",
+												"/admin/img/cross.png",
 												"Arrêt non affiché, cliquer pour afficher"
 										)	)
 									;
@@ -669,7 +669,7 @@ namespace synthese
 										HTMLModule::getHTMLLink(
 											rmPhysicalRequest.getHTMLForm().getURL(),
 											HTMLModule::getHTMLImage(
-												"tick.png",
+												"/admin/img/tick.png",
 												"Arrêt affiché, cliquer pour enlever"
 										)	)
 									;
@@ -702,7 +702,7 @@ namespace synthese
 						stream <<
 							HTMLModule::getHTMLLink(
 								ntu.getURL(),
-								HTMLModule::getHTMLImage("delete.png","Supprimer")
+								HTMLModule::getHTMLImage("/admin/img/delete.png","Supprimer")
 							) <<
 							it.second->getFullName()
 						;
@@ -744,14 +744,14 @@ namespace synthese
 						stream <<
 							HTMLModule::getHTMLLink(
 								psdf.getURL(),
-								HTMLModule::getHTMLImage("delete.png","Supprimer")
+								HTMLModule::getHTMLImage("/admin/img/delete.png","Supprimer")
 							) <<
 							it.second->getFullName()
 						;
 					}
 
 					stream << l.element("broadcastpoint");
-					stream << psaf.getImageSubmitButton("add.png", "Ajouter");
+					stream << psaf.getImageSubmitButton("/admin/img/add.png", "Ajouter");
 					stream <<
 						psaf.getSelectInput(
 							AddPreselectionPlaceToDisplayScreenAction::PARAMETER_PLACE,
@@ -1015,7 +1015,7 @@ namespace synthese
 				{
 					stream << t.row();
 					stream << t.col() << priority++;
-					stream << t.col() << HTMLModule::getHTMLImage("cross.png", "Afficheur désactivé pour maintenance");
+					stream << t.col() << HTMLModule::getHTMLImage("/admin/img/cross.png", "Afficheur désactivé pour maintenance");
 					stream << t.col() << "Afficheur désactivé pour maintenance";
 					stream << t.col() << "(inconnu)";
 					stream << t.col() << getTabLinkButton(TAB_MAINTENANCE);
@@ -1030,7 +1030,7 @@ namespace synthese
 
 					stream << t.row();
 					stream << t.col() << priority++;
-					stream << t.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
+					stream << t.col() << HTMLModule::getHTMLImage("/admin/img/" + (alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 					stream << t.col() << "Message : " + alarm->getShortMessage();
 					stream << t.col() <<
 						(alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()))
@@ -1045,7 +1045,7 @@ namespace synthese
 				{
 					stream << t.row();
 					stream << t.col() << priority++;
-					stream << t.col() << HTMLModule::getHTMLImage("times_display.png", "Affichage de lignes");
+					stream << t.col() << HTMLModule::getHTMLImage("/admin/img/times_display.png", "Affichage de lignes");
 					stream << t.col();
 					if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 					{
@@ -1080,7 +1080,7 @@ namespace synthese
 					BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, futures)
 					{
 						stream << t2.row();
-						stream << t2.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
+						stream << t2.col() << HTMLModule::getHTMLImage("/admin/img/" + (alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 						stream << t2.col() << "Message : " + alarm->getShortMessage();
 						stream << t2.col() << alarm->getScenario()->getPeriodStart();
 						stream << t2.col() << (alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()));
@@ -1099,7 +1099,7 @@ namespace synthese
 				stream << "<h1>Visualisation en direct</h1>";
 
 				stream << "<p>";
-				stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "monitor_go.png") << " ";
+				stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "/admin/img/monitor_go.png") << " ";
 				stream << "</p>";
 
 				stream << "<h1>Simulation</h1>";

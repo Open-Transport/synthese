@@ -38,6 +38,11 @@ namespace synthese
 
 	namespace messages
 	{
+		const std::string BroadcastPoint::VAR_BROADCAST_POINT_TYPE = "broadcast_point_type";
+		const std::string BroadcastPoint::VAR_MESSAGE_ID = "message_id";
+
+
+
 		BroadcastPoint::BroadcastPoints BroadcastPoint::GetBroadcastPoints()
 		{
 			BroadcastPoints r;

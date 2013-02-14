@@ -140,7 +140,13 @@ namespace synthese
 				stream << t.cell("ID", lexical_cast<string>(_dataSource->getKey()));
 				stream << t.cell("Nom", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_NAME, _dataSource->getName()));
 				stream << t.cell("Format", t.getForm().getSelectInput(DataSourceUpdateAction::PARAMETER_FORMAT, ImpExModule::GetFileFormatsList(), optional<string>(_dataSource->getFormat())));
-				stream << t.cell("Icone", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_ICON, _dataSource->getIcon()) + " " + HTMLModule::getHTMLImage(_dataSource->getIcon().empty() ? "note.png" : _dataSource->getIcon(), _dataSource->getFormat()));
+				stream << t.cell(
+					"Icone",
+					t.getForm().getTextInput(
+						DataSourceUpdateAction::PARAMETER_ICON,
+						_dataSource->getIcon()
+					) + " " + HTMLModule::getHTMLImage("/admin/img/"+ (_dataSource->getIcon().empty() ? "note.png" : _dataSource->getIcon()), _dataSource->getFormat())
+				);
 				stream << t.cell("Jeu de caractères (défaut = auto-détection)", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_CHARSET, _dataSource->getCharset()));
 				stream << t.cell("SRID", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_SRID, _dataSource->getCoordinatesSystem() ? lexical_cast<string>(_dataSource->getCoordinatesSystem()->getSRID()) : string()));
 				stream << t.cell("Requête import par défaut", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_DEFAULT_IMPORT_REQUEST, _dataSource->getDefaultImportRequest()));

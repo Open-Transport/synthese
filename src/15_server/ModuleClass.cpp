@@ -178,7 +178,7 @@ namespace synthese
 			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& page, links)
 			{
 				r.setPage(const_pointer_cast<AdminInterfaceElement>(page));
-				stream << l.element() << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
+				stream << l.element() << HTMLModule::getHTMLImage("/admin/img/" + page->getIcon(), page->getTitle());
 				stream << HTMLModule::getHTMLLink(r.getURL(), page->getTitle());
 			}
 			stream << l.close();
