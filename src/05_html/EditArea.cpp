@@ -33,7 +33,7 @@ namespace synthese
 		EditArea::EditArea(
 			std::ostream& stream
 		){
-			stream << HTMLModule::GetHTMLJavascriptOpen("edit_area/edit_area_full.js");
+			stream << HTMLModule::GetHTMLJavascriptOpen("/lib/edit_area/edit_area_full.js");
 		}
 
 
