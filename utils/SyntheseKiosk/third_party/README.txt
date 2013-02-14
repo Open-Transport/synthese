@@ -16,6 +16,10 @@ polipo/lin64/polipo
   Polipo binary retrieved from the Debian stable 64bit package (version 1.0.4.1-1.1).
   It should work on all modern 64-bit Linuxes.
 
+polipo/lin32/polipo
+  Polipo binary retrieved from the Debian stable 32bit package (version 1.0.4.1-1.1).
+  It should work on all modern 32-bit Linuxes.
+
 polipo/win/polipo.exe
   Binary from https://archive.torproject.org/tor-package-archive/polipo/archive/polipo-1.0.4.0-win32.exe
 
