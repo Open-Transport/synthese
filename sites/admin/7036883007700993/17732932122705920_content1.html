@@ -2,19 +2,21 @@
 <@user_id=<?session&template=<{user&template=<@id@>}>?>@>
 <@user_name=<?session&template=<{user&template=<@name@>}>?>@>
 <@rub=<@rub?rub:"home"@>@>
+<@icon=<@session_id?icon:"key.png"@>@>
+
 <?admin_page&rub=<@rub@>&tab=<@tab@>&repeat_parameters=1&template=
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
 <head>
 <meta charset="utf-8">
 <title><@title@> - SYNTHESE3 Admin</title>
-<?if&cond=<@icon@>&then=<link rel="icon" type="image/png" href="<@icon@>" />?>
+<?if&cond=<@icon@>&then=<link rel="icon" type="image/png" href="/admin/img/<@icon@>" />?>
 <style type="text/css">@import url(/admin/colors.css); @import url(/admin/admin.css); @import url(/admin/calendar/calendar-win2k-1.css);</style>
 <script type="text/javascript" src="/admin/calendar/calendar.js"></script><script type="text/javascript" src="/admin/calendar/calendar-fr.js"></script><script type="text/javascript" src="/admin/calendar/calendar-setup.js"></script>
-<script type="text/javascript" src="/admin/jquery/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="/admin/jquery/jquery-ui-1.8.15.custom.min.js"></script>
-<link rel="stylesheet" href="/admin/jquery/jquery.ui.autocomplete.css" type="text/css"></link>
-<link rel="stylesheet" href="/admin/jquery/jquery.ui.theme.css" type="text/css"></link>
+<script type="text/javascript" src="/lib/jquery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/lib/jquery-ui/jquery-ui-1.8.15.custom.min.js"></script>
+<link rel="stylesheet" href="/lib/jquery-ui/jquery.ui.autocomplete.css" type="text/css"></link>
+<link rel="stylesheet" href="/lib/jquery-ui/jquery.ui.theme.css" type="text/css"></link>
 <script type="text/javascript" src="/admin/treeview.js"></script>
 <script type="text/javascript" src="tiny_mce/tiny_mce_src.js"></script>
 <script type="text/javascript" src="/admin/ajax_forms.js"></script>
@@ -40,7 +42,7 @@ print {</div>}
 </div>
 
 
-<div id="adminpos"><?if&cond=<@session_id@>&then=<{position_node&template=
+<div id="adminpos">\&nbsp;<?if&cond=<@session_id@>&then=<{position_node&template=
 <?if&cond=<@(rank+1)==items_count@>&else=
 <?if&cond=<@rank@>&then= / ?><a href="/admin?<@url@>"><@title@></a>?>}>?>
 </div>
@@ -73,15 +75,15 @@ print {</div>}
 </div></div>
   <div id="admincontent"><div id="admincontent2"><?if&cond=<@session_id@>&then=<@tabs@><@content@>&else=
 
-<?form&name=login&a=login&page_id=<@p@>?>
+<p><?form&name=login&a=login&page_id=<@p@>?>
 Login : <input name="actionParamlogin" /> Mot de passe : <input type="password" name="actionParampwd" /> <input type="submit" value="OK" />
-</form>
+</form></p>
 
 ?></div></div>
 </div>
 
 <div id="footer">
-SYNTHESE <@version_info@> - \&copy; 2003-2011 - SYNTHESE est un produit sous <a href="http://www.gnu.org/licenses/gpl.html">licence GPL</a> - Plus d'informations sur <a href="http://synthese.rcsmobility.com/">synthese.rcsmobility.com</a>
+SYNTHESE <?version&template=<@version@><?if&cond=<@revision@>&then= (révision <@revision@> compilée le <@build_date@>)?>?> - \&copy; 2003-2013 - SYNTHESE est un produit sous <a href="http://www.gnu.org/licenses/gpl.html">licence GPL</a> - Plus d'informations sur <a href="https://extranet.rcsmobility.com/projects/synthese/wiki" target="_new">le site du projet SYNTHESE</a>.\&nbsp;
 </div>
 
 </div>
