@@ -160,7 +160,7 @@ namespace synthese
 						stream << t.col() << it.second->getConnectionPlace()->getCity()->getName();
 						stream << t.col() << it.second->getConnectionPlace()->getName();
 						stream << t.col() << it.second->getName();
-						stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), StopPointAdmin::ICON);
+						stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + StopPointAdmin::ICON);
 					}
 					stream << t.close();
 				}
@@ -171,7 +171,7 @@ namespace synthese
 
 					stream <<
 						"<p class=\"info\">Les contrôles qualité sont désactivés par défaut.<br /><br />" <<
-						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
+						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), "/admin/img/" + ICON) <<
 						"</p>"
 					;
 				}
@@ -199,7 +199,7 @@ namespace synthese
 						openRequest.getPage()->setCity(it.second);
 						stream << t.row();
 						stream << t.col() << it.second->getName();
-						stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlacesAdmin::ICON);
+						stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTPlacesAdmin::ICON);
 					}
 					stream << t.close();
 				}
@@ -210,7 +210,7 @@ namespace synthese
 
 					stream <<
 						"<p class=\"info\">Les contrôles qualité sont désactivés par défaut.<br /><br />" <<
-						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
+						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), "/admin/img/" + ICON) <<
 						"</p>"
 					;
 				}

@@ -220,7 +220,7 @@ namespace synthese
 							openCityRequest.getURL(),
 							"Ouvrir",
 							string(),
-							PTPlacesAdmin::ICON
+							"/admin/img/" + PTPlacesAdmin::ICON
 						)
 					;
 
@@ -303,7 +303,7 @@ namespace synthese
 								openStopRequest.getURL(),
 								"Ouvrir",
 								string(),
-								PTPlaceAdmin::ICON
+								"/admin/img/" + PTPlaceAdmin::ICON
 							)
 						;
 
@@ -376,7 +376,7 @@ namespace synthese
 								openPPRequest.getURL(),
 								"Ouvrir",
 								string(),
-								PublicPlaceAdmin::ICON
+								"/admin/img/" + PublicPlaceAdmin::ICON
 							)
 						;
 
@@ -445,7 +445,7 @@ namespace synthese
 								openRoadRequest.getURL(),
 								"Ouvrir",
 								string(),
-								PTRoadsAdmin::ICON
+								"/admin/img/" + PTRoadsAdmin::ICON
 							)
 						;
 
@@ -503,7 +503,7 @@ namespace synthese
 								openRoadRequest.getURL(),
 								"Ouvrir",
 								string(),
-								PTRoadsAdmin::ICON
+								"/admin/img/" + PTRoadsAdmin::ICON
 							)
 						;
 

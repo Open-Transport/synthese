@@ -151,7 +151,7 @@ namespace synthese
 				stream << t.row(lexical_cast<string>(ptrule->getKey()));
 				stream << t.col() << ptrule->getName();
 				stream << t.col() << ptrule->getReservationType();
-				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTUseRuleAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTUseRuleAdmin::ICON);
 				stream << t.col() << "Supprimer";
 			}
 

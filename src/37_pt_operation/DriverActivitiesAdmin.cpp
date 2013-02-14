@@ -129,7 +129,7 @@ namespace synthese
 				// Open
 				stream << t.col();
 				openRequest.getPage()->setActivity(it.second);
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), DriverActivityAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + DriverActivityAdmin::ICON);
 
 				// Name
 				stream << t.col() << activity.get<Name>();

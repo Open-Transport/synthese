@@ -154,7 +154,7 @@ namespace synthese
 				// Display
 				stream << "<h1>Liens</h1>";
 				stream << "<p>";
-				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", ReservationRoutePlannerAdmin::ICON);
+				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", "/admin/img/" + ReservationRoutePlannerAdmin::ICON);
 				stream << "</p>";
 
 				stream << "<h1>Coordonnées</h1>";

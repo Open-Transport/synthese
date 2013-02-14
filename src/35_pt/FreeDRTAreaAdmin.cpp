@@ -289,7 +289,7 @@ namespace synthese
 
 					// Open button cell
 					stream << t.col();
-					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FreeDRTTimeSlotAdmin::ICON);
+					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + FreeDRTTimeSlotAdmin::ICON);
 
 					// Name cell
 					stream << t.col();

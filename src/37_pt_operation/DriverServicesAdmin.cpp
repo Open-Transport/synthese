@@ -164,7 +164,7 @@ namespace synthese
 				// Link
 				stream << t.col();
 				openRequest.getPage()->setDriverService(const_pointer_cast<const DriverService>(driverService));
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), DriverServiceAdmin::ICON);
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + DriverServiceAdmin::ICON);
 
 				// Name
 				stream << t.col() << driverService->getName();

@@ -153,7 +153,7 @@ namespace synthese
 				);
 
 				stream << "<h1>Visualisation</h1>";
-				stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png") << "</p>";
+				stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "/admin/img/page_go.png") << "</p>";
 
 
 				stream << "<h1>Contenu</h1>";
@@ -243,7 +243,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
 				stream << "<h1>Visualisation</h1>";
-				stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png") << "</p>";
+				stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "/admin/img/page_go.png") << "</p>";
 
 				stream << "<h1>Propriétés</h1>";
 
@@ -338,7 +338,7 @@ namespace synthese
 					stream << t.col() << link->getKey();
 					stream << t.col() << link->get<Title>();
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), ICON);
-					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lien ?", "page_delete.png");
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lien ?", "/admin/img/page_delete.png");
 				}
 
 				stream << t.row();
@@ -510,7 +510,7 @@ namespace synthese
 				stream << t.col();
 				if(result.empty())
 				{
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la page "+ page->getName() +" ?", "page_delete.png");
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la page "+ page->getName() +" ?", "/admin/img/page_delete.png");
 				}
 
 				_displaySubPages(stream, result, deleteRequest, moveRequest, request, t, f, depth+1);
