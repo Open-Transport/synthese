@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.4)
 
 # Version:
 set(VERSION_MAJOR 3)
-set(VERSION_MINOR 3)
+set(VERSION_MINOR 6)
 set(VERSION_REV 0)
 set(SYNTHESE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REV}")
 
@@ -131,20 +131,19 @@ endif()
 
 # Version info.
 
-set(SYNTHESE_VERSION_INFO "${SYNTHESE_VERSION}")
 if (NOT WIN32)
   # TODO: not adding svn revision on Windows. It expects a native svn, and fails
   # if Cygwin svn is found instead.
   find_package(Subversion)
   if (SUBVERSION_FOUND)
     Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Synthese)
-    set(SYNTHESE_VERSION_INFO "${SYNTHESE_VERSION_INFO} r${Synthese_WC_REVISION}")
+    set(SYNTHESE_REVISION "${Synthese_WC_REVISION}")
   endif (SUBVERSION_FOUND)
 
   exec_program("date"
     ARGS "'+%Y%m%d %H:%M'"
     OUTPUT_VARIABLE DATE)
-  set(SYNTHESE_VERSION_INFO "${SYNTHESE_VERSION_INFO} (built on ${DATE})")
+  set(SYNTHESE_BUILD_DATE "${DATE}")
 endif (NOT WIN32)
 
 # Note: this is using a .h file and not defines, otherwise everything gets

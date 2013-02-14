@@ -85,6 +85,8 @@ ThreadsAdmin.h
 ValidSessionInterfaceElement.cpp
 ValidSessionInterfaceElement.h
 version.h.in
+VersionService.cpp
+VersionService.hpp
 XMLSessionFunction.cpp
 XMLSessionFunction.h
 XMLSessionIsValidFunction.cpp

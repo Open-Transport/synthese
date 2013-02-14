@@ -133,7 +133,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_HTTP_FORCE_GZIP;
 
 			static const std::string VERSION;
-			static const std::string VERSION_INFO;
+			static const std::string REVISION;
+			static const std::string BUILD_DATE;
 
 		private:
 
