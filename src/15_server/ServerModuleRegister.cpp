@@ -27,6 +27,7 @@
 #include "RedirectService.hpp"
 #include "SessionService.hpp"
 #include "SessionsListService.hpp"
+#include "VersionService.hpp"
 #include "XMLSessionFunction.h"
 #include "XMLSessionIsValidFunction.h"
 
@@ -63,6 +64,7 @@ void synthese::server::moduleRegister()
 	synthese::server::RedirectService::integrate();
 	synthese::server::SessionsListService::integrate();
 	synthese::server::SessionService::integrate();
+	synthese::server::VersionService::integrate();
 	synthese::server::XMLSessionFunction::integrate();
 	synthese::server::XMLSessionIsValidFunction::integrate();
 }
