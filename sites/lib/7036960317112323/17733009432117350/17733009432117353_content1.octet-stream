@@ -1,0 +1,18 @@
+diff -dur OpenLayers_maptypepanel_orig/MapType.js OpenLayers_maptypepanel/MapType.js
+--- OpenLayers_maptypepanel_orig/MapType.js	2011-07-06 16:51:08.650129800 +0200
++++ OpenLayers_maptypepanel/MapType.js	2011-07-06 17:15:56.765245100 +0200
+@@ -54,11 +54,10 @@
+         var inner = OpenLayers.Util.createDiv();
+         inner.innerHTML = this.layer.name;
+         this.div.appendChild(inner);
+-
+-        this.panel_div = this.div;
+         this.div.style.position = 'relative';
+ 
+-        return this.div;
++        this.panel_div.appendChild(this.div);
++        return this.panel_div;
+     },
+ 
+     /**
+Only in OpenLayers_maptypepanel: patch.diff
