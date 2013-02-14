@@ -129,7 +129,7 @@ namespace synthese
 					if(	info.theThread->get_id() != this_thread::get_id()
 					){
 						killRequest.getAction()->setThreadId(it.first);
-						stream << HTMLModule::getLinkButton(killRequest.getURL(),"Kill","Are you sure to kill the thread "+ it.first +" ?", "stop.png");
+						stream << HTMLModule::getLinkButton(killRequest.getURL(),"Kill","Are you sure to kill the thread "+ it.first +" ?", "/admin/img/stop.png");
 					}
 				}
 			}

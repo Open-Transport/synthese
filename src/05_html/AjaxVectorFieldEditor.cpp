@@ -97,7 +97,7 @@ namespace synthese
 			stream << getSubmitButton(
 				"Enregistrer les modifications",
 				string(),
-				"disk.png"
+				"/admin/img/disk.png"
 			);
 			stream << t.close();
 
