@@ -214,7 +214,8 @@ namespace synthese
 
 					}
 				}
-
+				
+				VehicleModule::GetCurrentVehiclePosition().setStatus(VehiclePosition::UNKNOWN_STATUS);
 				// Wait 30 s
 				ServerModule::SetCurrentThreadWaiting();
 				this_thread::sleep(seconds(30));
