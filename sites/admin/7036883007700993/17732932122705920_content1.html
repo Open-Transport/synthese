@@ -4,6 +4,8 @@
 <@rub=<@rub?rub:"home"@>@>
 <@icon=<@session_id?icon:"key.png"@>@>
 
+<?if&cond=<@session_id&&url_to_load@>&then=<?redirect&url=<@url_to_load@>?>?>
+
 <?admin_page&rub=<@rub@>&tab=<@tab@>&repeat_parameters=1&template=
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
@@ -18,7 +20,7 @@
 <link rel="stylesheet" href="/lib/jquery-ui/jquery.ui.autocomplete.css" type="text/css"></link>
 <link rel="stylesheet" href="/lib/jquery-ui/jquery.ui.theme.css" type="text/css"></link>
 <script type="text/javascript" src="/admin/treeview.js"></script>
-<script type="text/javascript" src="tiny_mce/tiny_mce_src.js"></script>
+<script type="text/javascript" src="/lib/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/admin/ajax_forms.js"></script>
 </head>
 <body>
@@ -75,7 +77,7 @@ print {</div>}
 </div></div>
   <div id="admincontent"><div id="admincontent2"><?if&cond=<@session_id@>&then=<@tabs@><@content@>&else=
 
-<p><?form&name=login&a=login&page_id=<@p@>?>
+<p><?form&name=login&a=login&page_id=<@p@>&url_to_load=<@equiv_url@>?>
 Login : <input name="actionParamlogin" /> Mot de passe : <input type="password" name="actionParampwd" /> <input type="submit" value="OK" />
 </form></p>
 
@@ -88,7 +90,7 @@ SYNTHESE <?version&template=<@version@><?if&cond=<@revision@>&then= (révision <
 
 </div>
 
-<?if&cond=<@error_message@>&then=<script type="text/javascript">alert("<@error_message@>");</script>?>
+<?if&cond=<@rem@>&then=<script type="text/javascript">alert("<@rem@>");</script>?>
 
 ?>
 
