@@ -68,6 +68,18 @@ namespace synthese
 				ObjectBase* _object; //<! The corresponding object in SYNTHESE
 
 				mutable util::Env _env;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Removes an object from the database and its sub objects (recursion).
+				/// @param object the object to remove
+				/// @param transaction the transaction to populate
+				void _clean(
+					const ObjectBase& object,
+					db::DBTransaction& transaction
+				) const;
+
+
 				
 				typedef std::set<util::RegistryKeyType> ImportedObjects;
 
@@ -94,14 +106,11 @@ namespace synthese
 
 
 
-
-
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Exports the current object to the working copy.
 				/// The export process maintains the working copy at a compliant status :
 				///  - new files are declared as added
-				///  - files that non longer exists are declared as removed
+				///  - files that no longer exists are declared as removed
 				void _exportToWC() const;
 
 
@@ -164,6 +173,15 @@ namespace synthese
 
 
 
+					//////////////////////////////////////////////////////////////////////////
+					/// Performs an update of the current data from the server.
+					/// Two behaviors : 
+					///  - if a working copy already exists on the filesystem, it is updated
+					///  - if no working copy exists on the filesystem, the data from the server
+					///    is entirely imported in the database. In this case, local modifications
+					///    are lost.
+					/// @param user valid login on the server
+					/// @param password password corresponding to the login
 					void update(
 						const std::string& user,
 						const std::string& password
