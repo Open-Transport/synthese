@@ -23,6 +23,7 @@
 #include "SingleOperatorExpression.hpp"
 
 #include "ModuleClass.h"
+#include "WebsiteConfig.hpp"
 
 #include <cmath>
 #include <boost/algorithm/string.hpp>
@@ -96,6 +97,23 @@ namespace synthese
 			case GLOBAL:
 				return ModuleClass::GetParameter(value);
 
+			case READ_CONFIG:
+				WebsiteConfig* config(
+					page.getRoot()->getConfig()
+				);
+				if(config)
+				{
+					stringstream str;
+					config->get<WebpageContent>().display(
+						str,
+						request,
+						additionalParametersMap,
+						page,
+						variables
+					);
+				}
+				return string();
+
 			}
 
 			return string();
@@ -123,6 +141,10 @@ namespace synthese
 			if(	CompareText(it, end, "~global"))
 			{
 				return GLOBAL;
+			}
+			if(	CompareText(it, end, "~read_config"))
+			{
+				return READ_CONFIG;
 			}
 			return optional<Operator>();
 		}

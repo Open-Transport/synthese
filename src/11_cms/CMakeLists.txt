@@ -131,6 +131,10 @@ WebsiteAdmin.cpp
 WebsiteAdmin.hpp
 WebsiteTableSync.cpp
 WebsiteTableSync.hpp
+WebsiteConfig.cpp
+WebsiteConfig.hpp
+WebsiteConfigTableSync.cpp
+WebsiteConfigTableSync.hpp
 )
 
 set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
