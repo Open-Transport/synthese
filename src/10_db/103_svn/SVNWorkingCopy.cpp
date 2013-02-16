@@ -23,6 +23,7 @@
 #include "SVNWorkingCopy.hpp"
 
 #include "DBDirectTableSync.hpp"
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBTransaction.hpp"
 #include "ObjectBase.hpp"
@@ -305,7 +306,7 @@ namespace synthese
 				);
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Saving
+				// Saving
 				if(save)
 				{
 					transaction.run();
@@ -564,6 +565,11 @@ namespace synthese
 
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Performs a commit into from the server.
+			/// @param message the message to attach to the commit
+			/// @param user valid login on the server
+			/// @param password password corresponding to the login
 			void SVNWorkingCopy::commit(
 				const std::string& message,
 				const std::string& user,
@@ -615,8 +621,15 @@ namespace synthese
 				const std::string& user,
 				const std::string& password
 			){
-				_exportToWC();
-				_svnUpdate(user, password, _path);
+				if(exists(_path))
+				{
+					_exportToWC();
+					_svnUpdate(user, password, _path);
+				}
+				else
+				{
+					_repo.checkout(user, password, _path);
+				}
 				_importWC(true);
 			}
 
