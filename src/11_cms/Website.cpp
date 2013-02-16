@@ -39,6 +39,8 @@ namespace synthese
 	using namespace db::svn;
 	
 	CLASS_DEFINITION(Website, "t025_sites", 25)
+	FIELD_DEFINITION_OF_OBJECT(Website, "website_id", "websites")
+
 	FIELD_DEFINITION_OF_TYPE(HostName, "host_name", SQL_TEXT)
 	// TODO: rename to client_url once complex schema updates are in place (issue #9453).
 	FIELD_DEFINITION_OF_TYPE(ClientURL, "cient_url", SQL_TEXT)
@@ -58,7 +60,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ClientURL),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate),
 					FIELD_DEFAULT_CONSTRUCTOR(SVNWorkingCopy)
-			)	)
+			)	),
+			_config(NULL)
 		{
 			get<SVNWorkingCopy>().setObject(this);
 		}

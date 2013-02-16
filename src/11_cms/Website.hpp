@@ -42,6 +42,7 @@ namespace synthese
 	namespace cms
 	{
 		class Webpage;
+		class WebsiteConfig;
 
 		FIELD_STRING(HostName)
 		FIELD_STRING(ClientURL)
@@ -76,6 +77,7 @@ namespace synthese
 		private:
 			WebpagesBySmartURL _webpagesBySmartURL;
 			mutable boost::mutex _smartURLMutex; //!< For thread safety.
+			WebsiteConfig* _config;
 
 		public:
 			Website(util::RegistryKeyType id = 0);
@@ -87,6 +89,7 @@ namespace synthese
 				Webpage* getPageByIdOrSmartURL(const std::string& key) const;
 				virtual std::string getName() const { return get<Name>(); }
 				virtual SubObjects getSubObjects() const;
+				WebsiteConfig* getConfig() const { return _config; }
 
 				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > WebpagesList;
 
@@ -97,6 +100,7 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
+				void setConfig(WebsiteConfig* value){ _config = value; }
 				void addPage(Webpage& page);
 				void removePage(const std::string& page);
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
