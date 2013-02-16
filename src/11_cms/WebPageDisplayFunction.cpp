@@ -29,6 +29,7 @@
 #include "Env.h"
 #include "Request.h"
 #include "RequestException.h"
+#include "ServerConstants.h"
 #include "URI.hpp"
 #include "Webpage.h"
 #include "Website.hpp"
@@ -228,6 +229,7 @@ namespace synthese
 
 					ParametersMap pm(getTemplateParameters());
 					pm.remove(PARAMETER_PAGE_ID);
+					pm.remove(PARAMETER_CLIENT_ADDRESS);
 					stringstream uri;
 					pm.outputURI(uri);
 					string parameters(uri.str());
@@ -240,6 +242,7 @@ namespace synthese
 				}
 
 				ParametersMap pm(getTemplateParameters());
+				pm.remove(PARAMETER_CLIENT_ADDRESS);
 				stringstream url;
 				url << "http://" << request.getHostName();
 				bool started(false);
