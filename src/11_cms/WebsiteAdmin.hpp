@@ -61,6 +61,7 @@ namespace synthese
 
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_WEB_PAGES;
+			static const std::string TAB_CONFIG;
 			static const std::string TAB_SVN_STORAGE;
 
 		private:

@@ -46,6 +46,7 @@
 
 #include "WebPageTableSync.h"
 #include "WebsiteTableSync.hpp"
+#include "WebsiteConfigTableSync.hpp"
 
 #include "CMSInstallRight.hpp"
 #include "CMSRight.hpp"
@@ -62,6 +63,7 @@ void synthese::cms::moduleRegister()
 	// Registries
 	synthese::util::Env::Integrate<synthese::cms::Website>();
 	synthese::util::Env::Integrate<synthese::cms::Webpage>();
+	synthese::util::Env::Integrate<synthese::cms::WebsiteConfig>();
 
 	// 36 CMS
 	synthese::cms::WebPageAdmin::integrate();
@@ -69,6 +71,7 @@ void synthese::cms::moduleRegister()
 
 	synthese::cms::WebPageTableSync::integrate();
 	synthese::cms::WebsiteTableSync::integrate();
+	synthese::cms::WebsiteConfigTableSync::integrate();
 
 	synthese::cms::CMSModule::integrate();
 
