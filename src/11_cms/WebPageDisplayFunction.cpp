@@ -239,40 +239,42 @@ namespace synthese
 					throw Request::RedirectException(url.str(), true);
 				}
 
-				if(_useTemplate && _page->getTemplate())
+				ParametersMap pm(getTemplateParameters());
+				stringstream url;
+				url << "http://" << request.getHostName();
+				bool started(false);
+				if(!_page->get<SmartURLPath>().empty())
 				{
-					ParametersMap pm(getTemplateParameters());
-
-					// equiv URL
-					stringstream equivURL;
-					equivURL << "http://" << request.getHostName() << _page->getRoot()->get<ClientURL>();
-					bool started(false);
-					if(!_page->get<SmartURLPath>().empty())
+					url << _page->getRoot()->get<ClientURL>() << _page->get<SmartURLPath>();
+				}
+				else
+				{
+					url <<
+						request.getClientURL() << Request::PARAMETER_STARTER <<
+						Request::PARAMETER_SERVICE << URI::PARAMETER_ASSIGNMENT << FACTORY_KEY
+					;
+					started = true;
+				}
+			
+				stringstream uri;
+				pm.outputURI(uri);
+				string parameters(uri.str());
+				if(!parameters.empty())
+				{
+					if(!started)
 					{
-						equivURL << _page->get<SmartURLPath>();
+						url << Request::PARAMETER_STARTER;
 					}
 					else
 					{
-						equivURL <<
-							request.getClientURL() << Request::PARAMETER_STARTER <<
-							Request::PARAMETER_SERVICE << URI::PARAMETER_ASSIGNMENT << FACTORY_KEY
-						;
-						started = true;
+						url << URI::PARAMETER_SEPARATOR;
 					}
-					if(!_equivURI.empty())
-					{
-						if(!started)
-						{
-							equivURL << Request::PARAMETER_STARTER;
-						}
-						else
-						{
-							equivURL << URI::PARAMETER_SEPARATOR;
-						}
-						equivURL << _equivURI;
-					}
-					pm.insert(ATTR_EQUIV_URL, equivURL.str());
+					url << parameters;
+				}
+				pm.insert(ATTR_EQUIV_URL, url.str());
 
+				if(_useTemplate && _page->getTemplate())
+				{
 					// Page data
 					_page->toParametersMap(pm);
 
@@ -285,7 +287,7 @@ namespace synthese
 				}
 				else
 				{
-					_page->display(stream, request, getTemplateParameters());
+					_page->display(stream, request, pm);
 				}
 			}
 
