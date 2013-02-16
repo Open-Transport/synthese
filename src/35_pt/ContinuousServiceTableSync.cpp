@@ -299,6 +299,12 @@ namespace synthese
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
+			Env env;
+			CalendarLinkTableSync::SearchResult calendarLinks(CalendarLinkTableSync::Search(env, id));
+			BOOST_FOREACH(const CalendarLinkTableSync::SearchResult::value_type& calendarLink, calendarLinks)
+			{
+				CalendarLinkTableSync::Remove(NULL, calendarLink->getKey(), transaction, false);
+			}
 		}
 
 
