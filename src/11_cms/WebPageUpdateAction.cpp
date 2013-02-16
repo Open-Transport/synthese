@@ -331,7 +331,7 @@ namespace synthese
 			}
 
 			// Moving the page into an other node of the tree
-			if(_up && _up->get() != _page->getParent(true))
+			if(_up && *_up && _up->get() != _page->getParent(true))
 			{
 				if(_page->getParent(true))
 				{
