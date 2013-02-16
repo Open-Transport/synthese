@@ -28,8 +28,10 @@
 #include "AdminFunctionRequest.hpp"
 #include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
+#include "AjaxForm.hpp"
 #include "CMSModule.hpp"
 #include "CMSRight.hpp"
+#include "EditArea.hpp"
 #include "HTMLForm.h"
 #include "HTMLList.h"
 #include "HTMLModule.h"
@@ -46,10 +48,12 @@
 #include "SVNCommitAction.hpp"
 #include "SVNUpdateAction.hpp"
 #include "SVNWorkingCopyCreateAction.hpp"
+#include "ObjectUpdateAction.hpp"
 #include "User.h"
 #include "WebPageAdmin.h"
 #include "WebPageAddAction.h"
 #include "Website.hpp"
+#include "WebsiteConfigTableSync.hpp"
 #include "WebsiteTableSync.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageMoveAction.hpp"
@@ -94,6 +98,7 @@ namespace synthese
 
 		const string WebsiteAdmin::TAB_PROPERTIES("pr");
 		const string WebsiteAdmin::TAB_WEB_PAGES("wp");
+		const string WebsiteAdmin::TAB_CONFIG("config");
 		const string WebsiteAdmin::TAB_SVN_STORAGE("sr");
 
 
@@ -211,6 +216,39 @@ namespace synthese
 				uploadRequest.getAction()->setSite(_site);
 
 				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, uploadRequest, request);
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB CONFIG
+			if (openTabContent(stream, TAB_CONFIG))
+			{
+				stream << "<h1>Configuration du site</h1>";
+
+				// Creation of a config object if necessary
+				if(!_site->getConfig())
+				{
+					WebsiteConfig c;
+					c.set<Website>(optional<Website&>(const_cast<Website&>(*_site)));
+					WebsiteConfigTableSync::Save(&c);
+					assert(_site->getConfig());
+				}
+
+				AdminActionFunctionRequest<ObjectUpdateAction, WebsiteAdmin> updateConfigRequest(request, *this);
+				updateConfigRequest.getAction()->setObject(*_site->getConfig());
+				
+				AjaxForm f(updateConfigRequest.getAjaxForm("update_config"));
+				stream << f.open();
+				EditArea editArea(stream);
+				editArea.getAjaxForm(
+					stream,
+					updateConfigRequest.getURL(),
+					ObjectUpdateAction::PARAMETER_FIELD_PREFIX + WebpageContent::FIELDS[0].name,
+					_site->getConfig()->get<WebpageContent>().getCode(),
+					20,
+					80
+				);
+				stream << f.getSubmitButton("Sauvegarder");
+				stream << f.close();
 			}
 
 
@@ -421,6 +459,7 @@ namespace synthese
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Pages web", TAB_WEB_PAGES, true));
+			_tabs.push_back(Tab("Configuration", TAB_CONFIG, true));
 			_tabs.push_back(Tab("SVN", TAB_SVN_STORAGE, true));
 
 			_tabBuilded = true;
