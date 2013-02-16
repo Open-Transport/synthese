@@ -47,6 +47,7 @@
 #include "WebPageMoveAction.hpp"
 #include "WebPageTableSync.h"
 #include "WebPageUpdateAction.h"
+#include "WebsiteTableSync.hpp"
 
 #include <boost/algorithm/string/find.hpp>
 
@@ -302,6 +303,26 @@ namespace synthese
 					uploadRequest.getAction()->setUp(_page);
 
 					WebPageAdmin::DisplaySubPages(stream, _page->getKey(), addRequest, deleteRequest, moveRequest, uploadRequest, request);
+				}
+
+				stream << "<h1>Changement de site</h1>";
+				{
+					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> siteMoveRequest(request, *this);
+					siteMoveRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
+					PropertiesHTMLTable siteMoveForm(siteMoveRequest.getHTMLForm("site_move"));
+					stream << siteMoveForm.open();
+					stream << siteMoveForm.cell(
+						"Site",
+						siteMoveForm.getForm().getSelectInput(
+							WebPageUpdateAction::PARAMETER_SITE_ID,
+							WebsiteTableSync::Search(Env::GetOfficialEnv()),
+							optional<shared_ptr<Website> >(
+								Env::GetOfficialEnv().getEditableSPtr(_page->getRoot())
+							)
+						)
+					);
+					
+					stream << siteMoveForm.close();
 				}
 			}
 

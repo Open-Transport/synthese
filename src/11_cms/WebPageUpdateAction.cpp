@@ -317,6 +317,33 @@ namespace synthese
 
 
 
+		void WebPageUpdateAction::_updateSite(
+			Webpage& page,
+			db::DBTransaction& transaction
+		) const {
+
+			// The update
+			page.setRoot(_site->get());
+
+			// Recursive calls (update only)
+			if(page.getKey())
+			{
+				WebPageTableSync::SearchResult subPages(
+					WebPageTableSync::Search(
+					*_env,
+					optional<RegistryKeyType>(),
+					page.getKey()
+					)	);
+				BOOST_FOREACH(shared_ptr<Webpage> subPage, subPages)
+				{
+					_updateSite(*subPage, transaction);
+					WebPageTableSync::Save(subPage.get(), transaction);
+				}
+			}
+		}
+
+
+
 		void WebPageUpdateAction::run(
 			Request& request
 		){
@@ -327,29 +354,54 @@ namespace synthese
 
 			if(_site)
 			{
-				_page->setRoot(_site->get());
-			}
-
-			// Moving the page into an other node of the tree
-			if(_up && *_up && _up->get() != _page->getParent(true))
-			{
-				if(_page->getParent(true))
-				{
-					// Deleting the old position of the tree
-					WebPageTableSync::ShiftRank(
-						_page->getRoot()->getKey(),
-						_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
-						_page->getRank(),
-						false,
-						transaction
-					);
-				}
-
+				// Deleting the old position of the tree
+				WebPageTableSync::ShiftRank(
+					_page->getRoot()->getKey(),
+					_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
+					_page->getRank() + 1,
+					false,
+					transaction
+				);
+			
 				// Giving the highest rank into the new branch
 				WebPageTableSync::SearchResult lastRankPage(
 					WebPageTableSync::Search(
 						*_env,
-						(*_up)->getRoot()->getKey(),
+						(*_site)->getKey(),
+						RegistryKeyType(0),
+						optional<size_t>(),
+						0,
+						1,
+						true,
+						false,
+						false
+				)	);
+				_page->setRank(lastRankPage.empty() ? 0 : lastRankPage.front()->getRank() + 1);
+
+				// Changing the site of the page
+				_updateSite(*_page, transaction);
+
+				// Putting the page under the root of the new site
+				_page->setParent(NULL);
+			}
+
+			// Moving the page into an other node of the tree
+			else if(_up && _up->get() != _page->getParent(true))
+			{
+				// Deleting the old position of the tree
+				WebPageTableSync::ShiftRank(
+					_page->getRoot()->getKey(),
+					_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
+					_page->getRank() + 1,
+					false,
+					transaction
+				);
+				
+				// Giving the highest rank into the new branch
+				WebPageTableSync::SearchResult lastRankPage(
+					WebPageTableSync::Search(
+						*_env,
+						_page->getRoot()->getKey(),
 						_up->get() ? (*_up)->getKey() : RegistryKeyType(0),
 						optional<size_t>(),
 						0,
@@ -361,7 +413,8 @@ namespace synthese
 				_page->setRank(lastRankPage.empty() ? 0 : lastRankPage.front()->getRank() + 1);
 				_page->setParent(_up->get());
 
-				if(!_page->getRoot())
+				// Should never happen
+				if(!_page->getRoot() && _up->get())
 				{
 					_page->setRoot((*_up)->getRoot());
 				}
@@ -471,6 +524,6 @@ namespace synthese
 
 
 		WebPageUpdateAction::WebPageUpdateAction():
-		_decodeXMLEntitiesInContent(false)
+			_decodeXMLEntitiesInContent(false)
 		{}
 }	}
