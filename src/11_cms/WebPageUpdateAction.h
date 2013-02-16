@@ -109,6 +109,11 @@ namespace synthese
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
 
+			void _updateSite(
+				Webpage& page,
+				db::DBTransaction& transaction
+			) const;
+
 		public:
 			WebPageUpdateAction();
 
