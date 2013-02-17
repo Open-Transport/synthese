@@ -239,6 +239,12 @@ namespace synthese
 							// Attempt to find an other position which allow to output previous schedules
 							for(TimetableGenerator::Rows::const_iterator itRow4(itRow + 1); itRow4 != rows.end() && !exit; ++itRow4)
 							{
+								// Jump over rows with undefined places
+								if(!itRow4->getPlace())
+								{
+									continue;
+								}
+
 								Path::Edges::const_iterator itEdge3;
 								for(itEdge3 = itEdge; itEdge3 != itEdge2 && !exit; ++itEdge3)
 								{
@@ -259,6 +265,12 @@ namespace synthese
 									exit = false;
 									for(TimetableGenerator::Rows::const_iterator itRow5(itRow4 + 1); itRow5 != rows.end() && !exit; ++itRow5)
 									{
+										// Jump over rows with undefined places
+										if(!itRow5->getPlace())
+										{
+											continue;
+										}
+
 										for(Path::Edges::const_iterator itEdge4 = itEdge3+1; itEdge4 != edges.end(); ++itEdge4)
 										{
 											if(	dynamic_cast<const StopArea*>((*itEdge4)->getFromVertex()->getHub())->getKey() == itRow5->getPlace()->getKey() &&
