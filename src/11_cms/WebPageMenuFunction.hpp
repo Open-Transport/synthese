@@ -57,6 +57,9 @@ namespace synthese
 			static const std::string DATA_IS_LAST_PAGE;
 			static const std::string DATA_IS_THE_CURRENT_PAGE;
 			static const std::string DATA_CURRENT_PAGE_IN_BRANCH;
+			static const std::string ATTR_URL;
+			static const std::string ATTR_HREF;
+			static const std::string TAG_PAGE;
 
 		public:
 			static const std::string PARAMETER_ROOT_ID;
@@ -73,7 +76,6 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_RSS;
 			static const std::string PARAMETER_RAW_DATA;
-			static const std::string TAG_PAGE;
 
 		protected:
 			struct MenuDefinition_ // Deprecated
