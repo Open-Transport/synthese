@@ -53,6 +53,8 @@ namespace synthese
 		const string WebPageMenuFunction::DATA_IS_LAST_PAGE = "is_last_page";
 		const string WebPageMenuFunction::DATA_IS_THE_CURRENT_PAGE = "is_the_current_page";
 		const string WebPageMenuFunction::DATA_CURRENT_PAGE_IN_BRANCH = "current_page_in_branch";
+		const string WebPageMenuFunction::ATTR_URL = "url";
+		const string WebPageMenuFunction::ATTR_HREF = "href";
 		const string WebPageMenuFunction::TAG_PAGE = "page";
 
 		const std::string WebPageMenuFunction::PARAMETER_ROOT_ID("root");
@@ -351,6 +353,8 @@ namespace synthese
 					pm.insert(DATA_IS_THE_CURRENT_PAGE, root == currentPage);
 					pm.insert(DATA_IS_LAST_PAGE, isLastPage);
 					pm.insert(DATA_CURRENT_PAGE_IN_BRANCH, returned_page_in_branch);
+					pm.insert(ATTR_HREF, subPageRequest.getURL());
+					pm.insert(ATTR_URL, subPageRequest.getURL(true, true));
 					_itemPage->display(stream, request, pm);
 				}
 				else if(_outputFormat == VALUE_RSS)
@@ -384,6 +388,8 @@ namespace synthese
 					pm.insert(DATA_IS_THE_CURRENT_PAGE, root == currentPage);
 					pm.insert(DATA_IS_LAST_PAGE, isLastPage);
 					pm.insert(DATA_CURRENT_PAGE_IN_BRANCH, returned_page_in_branch);
+					pm.insert(ATTR_HREF, subPageRequest.getURL());
+					pm.insert(ATTR_URL, subPageRequest.getURL(true, true));
 				}
 				else
 				{
@@ -396,7 +402,8 @@ namespace synthese
 
 					stream <<
 						HTMLModule::getHTMLLink(
-							root->get<SmartURLPath>().empty() ? subPageRequest.getURL() : root->get<SmartURLPath>(), root->get<Title>()
+							subPageRequest.getURL(),
+							root->get<Title>()
 						)
 					;
 
