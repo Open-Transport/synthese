@@ -305,7 +305,7 @@ namespace synthese
 				if(map.isDefined(PARAMETER_AUDIO_INTERFACE_ID))
 				{
 					RegistryKeyType id(
-						map.get<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID)
+						map.getDefault<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID, 0)
 					);
 					if (id)
 					{
@@ -320,7 +320,7 @@ namespace synthese
 				if(map.isDefined(PARAMETER_MONITORING_INTERFACE_ID))
 				{
 					RegistryKeyType id(
-						map.get<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID)
+						map.getDefault<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID, 0)
 					);
 					if (id)
 					{
@@ -375,7 +375,7 @@ namespace synthese
 				// Message type
 				if(map.isDefined(PARAMETER_MESSAGE_TYPE_ID))
 				{
-					RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_MESSAGE_TYPE_ID));
+					RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_TYPE_ID, 0));
 					if(id)
 					{
 						_messageType = MessageTypeTableSync::GetEditable(id, *_env);
