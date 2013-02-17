@@ -770,6 +770,7 @@ namespace synthese
 					BOOST_FOREACH(const shared_ptr<Registrable> recipient, *_recipients)
 					{
 						AlarmObjectLink link;
+						link.setRecipientKey(_recipientType);
 						link.setAlarm(message.get());
 						link.setObject(recipient.get());
 						AlarmObjectLinkTableSync::Save(&link, transaction);
