@@ -137,6 +137,14 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2010
 			virtual std::string getOutputMimeType() const;
+
+		
+			//////////////////////////////////////////////////////////////////////////
+			/// Return the max-age of a page
+			/// @author Bruno Coudoin
+			/// @date 2013
+			/// @since 3.4.0
+			virtual boost::posix_time::time_duration getMaxAge() const;
 		};
 	}
 }

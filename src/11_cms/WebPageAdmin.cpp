@@ -278,6 +278,10 @@ namespace synthese
 					stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
 					stream << t.cell("Début publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->get<StartTime>()));
 					stream << t.cell("Fin publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_END_DATE, _page->get<EndTime>()));
+					string minutesStr( !_page->get<MaxAge>().is_not_a_date_time() &&_page->get<MaxAge>().total_seconds()
+									   ? boost::lexical_cast<string>(_page->get<MaxAge>().total_seconds() / 60)
+									   : "" );
+					stream << t.cell("Age maximum en cache (minutes)", t.getForm().GetTextInput(WebPageUpdateAction::PARAMETER_MAX_AGE, minutesStr));
 					stream << t.cell(
 						"Page supérieure",
 						t.getForm().getSelectInput(

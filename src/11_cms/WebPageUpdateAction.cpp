@@ -55,6 +55,7 @@ namespace synthese
 		const string WebPageUpdateAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
 		const string WebPageUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sd";
 		const string WebPageUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
+		const string WebPageUpdateAction::PARAMETER_MAX_AGE = Action_PARAMETER_PREFIX + "ma";
 		const string WebPageUpdateAction::PARAMETER_MIME_TYPE = Action_PARAMETER_PREFIX + "mt";
 		const string WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE = Action_PARAMETER_PREFIX + "du";
 		const string WebPageUpdateAction::PARAMETER_HAS_FORUM = Action_PARAMETER_PREFIX + "fo";
@@ -236,6 +237,22 @@ namespace synthese
 				else
 				{
 					_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+				}
+			}
+
+			// Max Age
+			if(map.isDefined(PARAMETER_MAX_AGE))
+			{
+				if(map.getDefault<string>(PARAMETER_MAX_AGE).empty())
+				{
+					_maxAge = time_duration(not_a_date_time);
+				}
+				else
+				{
+					_maxAge = time_duration(0, 
+											atoi(map.get<string>(PARAMETER_MAX_AGE).c_str()),
+											0,
+											0);
 				}
 			}
 
@@ -472,6 +489,12 @@ namespace synthese
 			if(_endDate)
 			{
 				_page->set<EndTime>(*_endDate);
+			}
+			if(_maxAge)
+			{
+				_page->set<MaxAge>( !(*_maxAge).is_not_a_date_time()
+									? *_maxAge 
+									: time_duration(0,0,0,0) );
 			}
 			if(_template)
 			{

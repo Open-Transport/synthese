@@ -54,6 +54,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(SmartURLPath, "smart_url_path", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(SmartURLDefaultParameterName, "smart_url_default_parameter_name", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(RawEditor, "raw_editor", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(MaxAge, "max_age", SQL_INTEGER)
 
 	template<> const Field ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[] = {
 		Field("site_id", SQL_INTEGER),
@@ -79,6 +80,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(WebpageContent),
 					FIELD_VALUE_CONSTRUCTOR(StartTime, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(EndTime, posix_time::not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(MaxAge, posix_time::not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(Abstract),
 					FIELD_DEFAULT_CONSTRUCTOR(ImageURL),
 					FIELD_DEFAULT_CONSTRUCTOR(WebpageLinks),
@@ -193,6 +195,10 @@ namespace synthese
 		}
 
 
+		boost::posix_time::time_duration Webpage::getMaxAge() const
+		{
+			return get<MaxAge>();
+		}
 
 		void Webpage::addAdditionalParameters(
 			util::ParametersMap& pm,
