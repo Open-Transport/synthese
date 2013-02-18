@@ -340,6 +340,11 @@ namespace synthese
 				{
 					rep.headers.insert(make_pair("Content-Disposition", "attachement; filename="+ request.getFunction()->getFileName()));
 				}
+				if(request.getFunction().get() && !request.getFunction()->getMaxAge().is_not_a_date_time())
+				{
+					rep.headers.insert(make_pair("Cache-Control", "public, max-age="+
+												 lexical_cast<string>(request.getFunction()->getMaxAge().total_seconds())));
+				}
 
 				_SetCookieHeaders(rep, request.getCookiesMap());
 

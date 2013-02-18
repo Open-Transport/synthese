@@ -331,4 +331,10 @@ namespace synthese
 			_useTemplate(true),
 			_dontRedirectIfSmartURL(false)
 		{}
+		
+		boost::posix_time::time_duration WebPageDisplayFunction::getMaxAge() const
+		{
+			return _page->getMaxAge();
+		}
+		
 }	}
