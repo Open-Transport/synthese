@@ -206,6 +206,35 @@ class CustomBrowser(object):
         except Exception, e:
             log.error("Failed to launch browser: %s", e)
 
+class XulRunnerBrowser(object):
+    """
+    Used for XulRunner
+    This class replicates the webdriver API and launches the browser manually.
+    """
+    def __init__(self, browser_path, browser_args):
+        self._path = browser_path
+        self._args = browser_args
+        log.debug("Browser path %s", self._path)
+        self._proc = None
+
+    def quit(self):
+        log.debug("Quitting browser")
+        if self._proc:
+            self._proc.terminate()
+
+    def refresh(self):
+        log.debug("dummy refresh")
+
+    def get(self, url):
+        self.quit()
+        cmd_line = [url if a == "URL" else a for a in self._args]
+        cmd_line.insert(0, self._path)
+        log.debug("Launching browser with cmdline: %s", cmd_line)
+        try:
+            self._proc = subprocess.Popen(cmd_line)
+        except Exception, e:
+            log.error("Failed to launch browser: %s", e)
+
 
 class Display(object):
     def __init__(self, kiosk, index, name):
@@ -292,6 +321,17 @@ class Display(object):
             console.warn("Proxy not supported with custome browser")
         return CustomBrowser(self._browser_path, self._browser_args)
 
+    def _create_xulrunner_browser(self):
+        if self._proxy.enabled:
+            log.warn('Automatic proxy configuration not supported for xulrunner browser')
+            log.warn('  You must first configure the proxy with the about:config URL and set the following values')
+            log.warn("    network.proxy.http=" + self._proxy._host)
+            log.warn("    network.proxy.http_port=" + str(self._proxy._port))
+            log.warn("    network.proxy.no_proxies_on=")
+            log.warn("    network.proxy.type=1")
+
+        return XulRunnerBrowser(self._browser_path, self._browser_args)
+
     def _create_browser(self):
         if self._browser_name == 'chrome':
             return self._create_chrome_browser()
@@ -299,6 +339,8 @@ class Display(object):
             return self._create_firefox_browser()
         elif self._browser_name == 'opera':
             return self._create_opera_browser()
+        elif self._browser_name == 'xulrunner':
+            return self._create_xulrunner_browser()
         elif self._browser_name == 'custom':
             return self._create_custom_browser()
         else:
