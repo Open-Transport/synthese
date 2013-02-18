@@ -32,6 +32,7 @@
 #include "TreeOtherClassRootPolicy.hpp"
 #include "Named.h"
 
+#include "MinutesField.hpp"
 #include "NumericField.hpp"
 #include "PointerField.hpp"
 #include "PtimeField.hpp"
@@ -72,6 +73,7 @@ namespace synthese
 		FIELD_STRING(SmartURLDefaultParameterName)
 		FIELD_BOOL(RawEditor)
 		FIELD_POINTER(SpecificTemplate, Webpage)
+		FIELD_MINUTES(MaxAge)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -80,6 +82,7 @@ namespace synthese
 			FIELD(WebpageContent),
 			FIELD(StartTime),
 			FIELD(EndTime),
+			FIELD(MaxAge),
 			FIELD(Abstract),
 			FIELD(ImageURL),
 			FIELD(WebpageLinks),
@@ -267,7 +270,8 @@ namespace synthese
 				std::string getFullName() const;
 
 
-
+				boost::posix_time::time_duration getMaxAge() const;
+				
 				//////////////////////////////////////////////////////////////////////////
 				/// CMS exporter.
 				//////////////////////////////////////////////////////////////////////////

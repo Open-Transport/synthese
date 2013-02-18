@@ -67,6 +67,7 @@ namespace synthese
 			static const std::string PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT;
 			static const std::string PARAMETER_RAW_EDITOR;
 			static const std::string PARAMETER_DO_NOT_EVALUATE;
+			static const std::string PARAMETER_MAX_AGE;
 
 		private:
 			boost::shared_ptr<Webpage> _page;
@@ -80,6 +81,7 @@ namespace synthese
 			boost::optional<SpecificTemplate::Type> _template;
 			boost::optional<boost::posix_time::ptime> _startDate;
 			boost::optional<boost::posix_time::ptime> _endDate;
+			boost::optional<boost::posix_time::time_duration> _maxAge;
 			boost::optional<util::MimeType> _mimeType;
 			boost::optional<bool> _doNotUseTemplate;
 			boost::optional<bool> _hasForum;

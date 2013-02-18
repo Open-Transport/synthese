@@ -222,6 +222,16 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.3.0
 			const std::string getOutputMimeTypeFromOutputFormat(const std::string& defaultMime = "") const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Return the max-age of a page
+			/// @author Bruno Coudoin
+			/// @date 2013
+			/// @since 3.4.0
+			virtual boost::posix_time::time_duration getMaxAge() const
+			{
+				return boost::gregorian::not_a_date_time;
+			}
 		};
 }	}
 
