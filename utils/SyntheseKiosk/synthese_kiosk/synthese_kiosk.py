@@ -126,6 +126,7 @@ class Proxy(object):
         options = {
             'diskCacheRoot': self._convert_polipo_path(self._cache_dir),
             'dnsUseGethostbyname': 'happily',
+            'relaxTransparency': 'maybe',
             'logFile': self._convert_polipo_path(self._log_file),
         }
         if not self._online:
