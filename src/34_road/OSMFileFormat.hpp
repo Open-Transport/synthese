@@ -64,11 +64,11 @@ namespace synthese
 				static const std::string PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE;
 
 				typedef std::map<util::RegistryKeyType, std::vector<road::MainRoadChunk::HouseNumber> > ChunkHouseNumberList;
-				typedef std::map<int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
-				typedef std::map<int, boost::shared_ptr<geography::City> > _CitiesMap;
+				typedef std::map<unsigned long long int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
+				typedef std::map<unsigned long long int, boost::shared_ptr<geography::City> > _CitiesMap;
 				typedef std::map<std::string, boost::shared_ptr<RoadPlace> > _RecentlyCreatedRoadPlaces;
-				typedef std::map<int, boost::shared_ptr<RoadPlace> > _LinkBetweenWayAndRoadPlaces;
-				typedef std::map<int, boost::shared_ptr<MainRoadPart> > _RecentlyCreatedRoadParts;
+				typedef std::map<unsigned long long int, boost::shared_ptr<RoadPlace> > _LinkBetweenWayAndRoadPlaces;
+				typedef std::map<unsigned long long int, boost::shared_ptr<MainRoadPart> > _RecentlyCreatedRoadParts;
 
 				mutable _CrossingsMap _crossingsMap;
 				mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;

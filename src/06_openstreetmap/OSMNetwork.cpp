@@ -48,35 +48,35 @@ void Network::addRelation(RelationPtr relation) {
    relations[relation->getId()] = relation;
 }
 
-const std::map<int, NodePtr >* Network::getNodes() {
+const std::map<unsigned long long int, NodePtr >* Network::getNodes() {
    return &nodes;
 }
 
-const std::map<int, WayPtr >* Network::getWays() {
+const std::map<unsigned long long int, WayPtr >* Network::getWays() {
    return &ways;
 }
 
-const std::map<int, RelationPtr >* Network::getRelations() {
+const std::map<unsigned long long int, RelationPtr >* Network::getRelations() {
    return &relations;
 }
 
 
-NodePtr Network::getNode(int id) throw (RefNotFoundException) {
-   std::map<int, NodePtr>::iterator it = nodes.find(id);
+NodePtr Network::getNode(unsigned long long int id) throw (RefNotFoundException) {
+   std::map<unsigned long long int, NodePtr>::iterator it = nodes.find(id);
    if (it == nodes.end())
       throw RefNotFoundException("node " + lexical_cast<std::string> (id) + " not in network");
    return it->second;
 }
 
-WayPtr Network::getWay(int id) throw (RefNotFoundException) {
-   std::map<int, WayPtr>::iterator it = ways.find(id);
+WayPtr Network::getWay(unsigned long long int id) throw (RefNotFoundException) {
+   std::map<unsigned long long int, WayPtr>::iterator it = ways.find(id);
    if (it == ways.end())
       throw RefNotFoundException("way " + lexical_cast<std::string> (id) + " not in network");
    return it->second;
 }
 
-RelationPtr Network::getRelation(int id) throw (RefNotFoundException) {
-   std::map<int, RelationPtr>::iterator it = relations.find(id);
+RelationPtr Network::getRelation(unsigned long long int id) throw (RefNotFoundException) {
+   std::map<unsigned long long int, RelationPtr>::iterator it = relations.find(id);
    if (it == relations.end())
       throw RefNotFoundException("relation " + lexical_cast<std::string> (id)+ " not in network");
    return it->second;
@@ -88,7 +88,7 @@ void Network::consolidate(bool discard_if_missing_reference) {
 }
 
 void Network::consolidateWays(bool discard_if_missing_reference) {
-   std::map<int, WayPtr>::iterator wayIt = ways.begin();
+   std::map<unsigned long long int, WayPtr>::iterator wayIt = ways.begin();
    //loop through the ways
    while(wayIt != ways.end()) {
       WayPtr way = wayIt->second;
@@ -99,7 +99,7 @@ void Network::consolidateWays(bool discard_if_missing_reference) {
          //the way references a node that doesn't exist
          if(discard_if_missing_reference) {
             //discard relations referencing this way
-            std::map<int,RelationPtr>::iterator relIt = relations.begin();
+            std::map<unsigned long long int,RelationPtr>::iterator relIt = relations.begin();
             while(relIt != relations.end()) {
                if(relIt->second->contains(way)) {
                   relations.erase(relIt++);
@@ -109,7 +109,7 @@ void Network::consolidateWays(bool discard_if_missing_reference) {
             }
 
             //discard the way
-            std::map<int,WayPtr>::iterator way_to_delete = wayIt++;
+            std::map<unsigned long long int,WayPtr>::iterator way_to_delete = wayIt++;
             ways.erase(way_to_delete);
          } else {
             wayIt++;
@@ -119,7 +119,7 @@ void Network::consolidateWays(bool discard_if_missing_reference) {
 }
 
 void Network::consolidateRelations(bool discard_if_missing_reference) {
-   std::map<int, RelationPtr>::iterator relIt = relations.begin();
+   std::map<unsigned long long int, RelationPtr>::iterator relIt = relations.begin();
    //loop through the relations
    while (relIt != relations.end()) {
       RelationPtr relation = relIt->second;
@@ -130,7 +130,7 @@ void Network::consolidateRelations(bool discard_if_missing_reference) {
          //the relation references a node, way or relation that doesn't exist
          if (discard_if_missing_reference) {
             //discard relations referencing this relation
-            std::map<int, RelationPtr>::iterator relIt2 = relations.begin();
+            std::map<unsigned long long int, RelationPtr>::iterator relIt2 = relations.begin();
             while (relIt2 != relations.end() && relIt2 != relIt) {
                if (relIt2->second->contains(relation)) {
                   relations.erase(relIt2++);
@@ -140,7 +140,7 @@ void Network::consolidateRelations(bool discard_if_missing_reference) {
             }
 
             //discard the relation itself
-            std::map<int, RelationPtr>::iterator rel_to_delete = relIt++;
+            std::map<unsigned long long int, RelationPtr>::iterator rel_to_delete = relIt++;
             relations.erase(rel_to_delete);
          } else {
             relIt++;
@@ -149,9 +149,9 @@ void Network::consolidateRelations(bool discard_if_missing_reference) {
    }
 }
 
-std::map<int,WayPtr> Network::getWalkableWays() {
-   std::map<int, WayPtr> ret;
-   typedef std::pair<int, WayPtr> WayType;
+std::map<unsigned long long int,WayPtr> Network::getWalkableWays() {
+   std::map<unsigned long long int, WayPtr> ret;
+   typedef std::pair<unsigned long long int, WayPtr> WayType;
    BOOST_FOREACH(WayType w, ways) {
       if(w.second->isWalkable() && w.second->getNodes()->size() > 1) {
          ret[w.second->getId()] = w.second;
@@ -161,12 +161,12 @@ std::map<int,WayPtr> Network::getWalkableWays() {
 }
 
 
-std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkableWaysByAdminBoundary(int admin_level) {
-   std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > ret;
+std::map<unsigned long long int,std::pair<RelationPtr,std::map<unsigned long long int, WayPtr> > > Network::getWalkableWaysByAdminBoundary(int admin_level) {
+   std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > ret;
    util::Log::GetInstance().info("extracting administrative boundaries");
-   std::map<int, RelationPtr> adminBoundaries = getAdministrativeBoundaries(admin_level);
+   std::map<unsigned long long int, RelationPtr> adminBoundaries = getAdministrativeBoundaries(admin_level);
    util::Log::GetInstance().info("finished extracting administrative boundaries");
-   std::map<int, WayPtr> walkableWays = getWalkableWays();
+   std::map<unsigned long long int, WayPtr> walkableWays = getWalkableWays();
 
    util::Log::GetInstance().info("extracting ways by administrative boundaries");
    /*
@@ -203,14 +203,14 @@ std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkabl
    }
    */
 
-   std::map<int, RelationPtr>::iterator boundaryIterator = adminBoundaries.begin();
+   std::map<unsigned long long int, RelationPtr>::iterator boundaryIterator = adminBoundaries.begin();
    while(boundaryIterator != adminBoundaries.end()) {
       RelationPtr boundary = boundaryIterator->second;
-      ret[boundaryIterator->first] = std::pair<RelationPtr, std::map<int, WayPtr> >(boundary, std::map<int, WayPtr>());
+      ret[boundaryIterator->first] = std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> >(boundary, std::map<unsigned long long int, WayPtr>());
       boundaryIterator++;
    }
 
-   std::map<int,WayPtr>::iterator wayIterator = walkableWays.begin();
+   std::map<unsigned long long int,WayPtr>::iterator wayIterator = walkableWays.begin();
    while(wayIterator != walkableWays.end()) {
       WayPtr way = wayIterator->second;
       boost::shared_ptr<const geos::geom::Geometry> wayGeom = way->toGeometry();
@@ -243,13 +243,13 @@ std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkabl
 }
 
 
-std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > Network::getWaysByAdminBoundary(int admin_level)
+std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > Network::getWaysByAdminBoundary(int admin_level)
 {
-	typedef std::map<int, WayPtr> WayMap;
-	typedef std::pair<int, WayPtr> WayType;
-	typedef std::map<int, RelationPtr> RelationMap;
+	typedef std::map<unsigned long long int, WayPtr> WayMap;
+	typedef std::pair<unsigned long long int, WayPtr> WayType;
+	typedef std::map<unsigned long long int, RelationPtr> RelationMap;
 	typedef std::pair<RelationPtr, WayMap> RelationWayPair;
-	typedef std::map<int, RelationWayPair> GlobalMap;
+	typedef std::map<unsigned long long int, RelationWayPair> GlobalMap;
 
 	GlobalMap ret;
 
@@ -313,10 +313,10 @@ std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > Network::getWaysB
 
 
 
-std::map<int,RelationPtr> Network::getAdministrativeBoundaries(int admin_level) {
-   std::map<int, RelationPtr> ret;
+std::map<unsigned long long int,RelationPtr> Network::getAdministrativeBoundaries(int admin_level) {
+   std::map<unsigned long long int, RelationPtr> ret;
 
-   std::map<int, RelationPtr>::const_iterator it = relations.begin();
+   std::map<unsigned long long int, RelationPtr>::const_iterator it = relations.begin();
 
    while (it != relations.end()) {
       RelationPtr relation = it->second;

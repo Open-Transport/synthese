@@ -120,7 +120,7 @@ void ExpatParser::startElement(void *d, const XML_Char* name,
 
          if(user_data->curWay) {
             if (!std::strcmp(name, "nd")) {
-               int refNode = attributes.getInteger(Element::ATTR_REF);
+               unsigned long long int refNode = attributes.getULongLongInt(Element::ATTR_REF);
                try {
                   NodePtr node = user_data->network->getNode(refNode);
                   user_data->curWay->pushNode(node);
@@ -138,7 +138,7 @@ void ExpatParser::startElement(void *d, const XML_Char* name,
          } else if(user_data->curRelation) {
             //parse members
             if (!std::strcmp(name, "member")) {
-               int refId = attributes.getInteger(Element::ATTR_REF);
+               unsigned long long int refId = attributes.getULongLongInt(Element::ATTR_REF);
                std::string type = attributes.getString(Element::ATTR_TYPE);
                if (type=="way") {
                   try {

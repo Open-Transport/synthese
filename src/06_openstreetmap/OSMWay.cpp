@@ -61,8 +61,8 @@ Way::Way(AttributeMap &attrs) throw(Exception): Element(attrs) {
    // TODO Auto-generated constructor stub
 }
 
-void Way::pushNode(int id ,NodePtr node) {
-   std::pair<int, NodePtr> pair(id, node);
+void Way::pushNode(unsigned long long int id ,NodePtr node) {
+   std::pair<unsigned long long int, NodePtr> pair(id, node);
    nodes.push_back(pair);
    resetGeometry();
 }
@@ -73,7 +73,7 @@ void Way::pushNode(NodePtr node) {
 
 std::string Way::toWKT() {
    std::stringstream wkt;
-   std::list<std::pair<int,NodePtr> >::iterator it = nodes.begin();
+   std::list<std::pair<unsigned long long int,NodePtr> >::iterator it = nodes.begin();
    wkt << "LINESTRING(";
    if (it != nodes.end())
       wkt << boost::lexical_cast<std::string>((*it).second->getLon()) << " " << boost::lexical_cast<std::string>((*it).second->getLat());
@@ -84,12 +84,12 @@ std::string Way::toWKT() {
    return wkt.str();
 }
 
-const std::list<std::pair<int, NodePtr> >* Way::getNodes() {
+const std::list<std::pair<unsigned long long int, NodePtr> >* Way::getNodes() {
    return &nodes;
 }
 
 void Way::consolidate(Network* network) throw(RefNotFoundException) {
-   std::list<std::pair<int,NodePtr> >::iterator it = nodes.begin();
+   std::list<std::pair<unsigned long long int,NodePtr> >::iterator it = nodes.begin();
    while(it != nodes.end()) {
       if(!(it->second)) {
          NodePtr node = network->getNode(it->first);
@@ -180,7 +180,7 @@ double Way::getAssociatedSpeed()
 }
 
 void Way::referenceWithNodes() {
-   typedef std::pair<int, NodePtr> nodeType;
+   typedef std::pair<unsigned long long int, NodePtr> nodeType;
    BOOST_FOREACH(nodeType node, nodes) {
       node.second->ways.push_back(this);
    }
