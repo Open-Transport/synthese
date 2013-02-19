@@ -166,7 +166,7 @@ namespace synthese
 
 			stream << "<h1>Pages d'administration</h1>";
 
-			stream << "Les liens suivants donnent accès aux pages d'administration du module " << getName() << ".</p>";
+			stream << "<p>Les liens suivants donnent accès aux pages d'administration du module " << getName() << ".</p>";
 
 			HTMLList l;
 			stream << l.open();
