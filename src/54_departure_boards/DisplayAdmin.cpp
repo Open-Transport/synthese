@@ -712,7 +712,7 @@ namespace synthese
 					stream << ant.getImageSubmitButton("add.png", "Ajouter");
 					stream << ant.getSelectInput(
 						AddForbiddenPlaceToDisplayScreenAction::PARAMETER_PLACE,
-						_displayScreen->getSortedAvaliableDestinationsLabels(
+						_displayScreen->getSortedAvailableDestinationsLabels(
 							_displayScreen->getForbiddenPlaces()
 						),
 						optional<RegistryKeyType>(0)
@@ -755,7 +755,7 @@ namespace synthese
 					stream <<
 						psaf.getSelectInput(
 							AddPreselectionPlaceToDisplayScreenAction::PARAMETER_PLACE,
-							_displayScreen->getSortedAvaliableDestinationsLabels(
+							_displayScreen->getSortedAvailableDestinationsLabels(
 								_displayScreen->getForcedDestinations()
 							),
 							optional<RegistryKeyType>(0)
@@ -912,7 +912,7 @@ namespace synthese
 					stream << t.row();
 					stream << t.col(2) << f.getSelectInput(
 						DisplayScreenAddDisplayedPlaceAction::PARAMETER_PLACE,
-						_displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
+						_displayScreen->getSortedAvailableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
 						optional<RegistryKeyType>(0)
 					);
 
@@ -964,7 +964,7 @@ namespace synthese
 					stream << tt.row();
 					stream << tt.col(2) << ft.getSelectInput(
 						DisplayScreenTransferDestinationAddAction::PARAMETER_TRANSFER_PLACE_ID,
-						_displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
+						_displayScreen->getSortedAvailableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
 						optional<RegistryKeyType>(0)
 					);
 					stream << tt.col() << ft.getTextInput(
