@@ -44,7 +44,6 @@ namespace synthese
 		){
 			CallCountSearchResult r;
 			stringstream s;
-			optional<Step> lastStep;
 			DB* db = DBModule::GetDB();
 
 			s << "SELECT " <<
@@ -63,6 +62,7 @@ namespace synthese
 				db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT) <<
 				" ORDER BY " << db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT)
 			;
+			optional<ResaDBLog::_EntryType> lastStep;
 			DBResultSPtr rows = db->execQuery(s.str());
 			while (rows->next ())
 			{
@@ -70,7 +70,7 @@ namespace synthese
 				{
 					r.insert(make_pair(static_cast<ResaDBLog::_EntryType>(rows->getInt("type")), CallCountSearchResult::mapped_type()));
 				}
-				lastStep = optional<size_t>(static_cast<ResaDBLog::_EntryType>(rows->getInt("type")));
+				lastStep = optional<ResaDBLog::_EntryType>(static_cast<ResaDBLog::_EntryType>(rows->getInt("type")));
 				CallCountSearchResult::iterator it(r.find(static_cast<ResaDBLog::_EntryType>(rows->getInt("type"))));
 				it->second.insert(make_pair(rows->getText("step"), rows->getInt("number")));
 			}
