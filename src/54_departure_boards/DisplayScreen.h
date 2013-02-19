@@ -357,7 +357,7 @@ namespace synthese
 
 				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
-				Labels getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid) const;
+				Labels getSortedAvailableDestinationsLabels(const DisplayedPlacesList& placesToAvoid) const;
 
 				/** Analyzes a monitoring status to determinate if the display is down or up.
 					@param status Status to read
