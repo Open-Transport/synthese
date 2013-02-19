@@ -113,12 +113,12 @@ namespace synthese
 
 			// TODO: use a typedef
 			// FIXME: valgrind shows a leak from here.
-			std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > waysByBoundaries =
+			std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > waysByBoundaries =
 					network->getWaysByAdminBoundary(8);
 
 			util::Log::GetInstance().info("extracted ways by boundary");
 
-			typedef std::map<int, NodePtr> NodesMap;
+			typedef std::map<unsigned long long int, NodePtr> NodesMap;
 			typedef std::vector<std::pair<osm::NodePtr, Point*> > HousesNodesWithGeom;
 			HousesNodesWithGeom housesNodesWithGeom;
 
@@ -136,8 +136,8 @@ namespace synthese
 
 			// cities, places and roads
 			// TODO: move to osm module.
-			typedef pair<int, std::pair<RelationPtr, std::map<int, WayPtr> > > BoundaryType;
-			typedef pair<int, double> ClosestWayFromCentroid;
+			typedef pair<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > BoundaryType;
+			typedef pair<unsigned long long int, double> ClosestWayFromCentroid;
 
 			BOOST_FOREACH(const BoundaryType& boundary_ways, waysByBoundaries)
 			{
@@ -184,7 +184,7 @@ namespace synthese
 
 				// insert ways of city
 				// TODO: move to osm module
-				typedef std::pair<int, WayPtr> WayType;
+				typedef std::pair<unsigned long long int, WayPtr> WayType;
 				BOOST_FOREACH(const WayType& w, boundary_ways.second.second)
 				{
 					WayPtr way = w.second;
@@ -241,7 +241,7 @@ namespace synthese
 					bool nonWalkableWay(!way->isWalkable());
 
 					// TODO: move to OSM module
-					typedef std::list<std::pair<int, NodePtr> > NodeList;
+					typedef std::list<std::pair<unsigned long long int, NodePtr> > NodeList;
 					const NodeList* nodes = way->getNodes();
 
 					if(nodes->size() < 2)
@@ -348,7 +348,7 @@ namespace synthese
 
 			util::Log::GetInstance().info("finished inserting road network");
 
-			typedef std::map<int, RelationPtr> ChunkRelations;
+			typedef std::map<unsigned long long int, RelationPtr> ChunkRelations;
 
 			// Loop over relations
 			BOOST_FOREACH(ChunkRelations::value_type rel, *(network->getRelations()))

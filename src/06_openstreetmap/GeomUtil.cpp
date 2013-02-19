@@ -66,7 +66,7 @@ std::vector<geos::geom::Polygon*>* GeomUtil::polygonize(std::list<WayPtr> &ways)
       }
    } else if(ways.size() == 1){
       WayPtr w = ways.front();
-      const std::list<std::pair<int,NodePtr> > *nodes = w->getNodes();
+      const std::list<std::pair<unsigned long long int,NodePtr> > *nodes = w->getNodes();
       if(nodes->size()>3 && nodes->front().first == nodes->back().first) {
          //we have a closed way, return it
          g = w->toGeometry().get()->clone();

@@ -39,13 +39,13 @@ const projPJ Element::originalProjection = pj_init_plus("+proj=longlat +ellps=WG
 
 
 Element::Element(AttributeMap &attributes) throw(Exception) {
-   this->id = attributes.getInteger(ATTR_ID);
+   this->id = attributes.getULongLongInt(ATTR_ID);
 }
 
 Element::~Element() {
 }
 
-int Element::getId() {
+unsigned long long int Element::getId() {
    return id;
 }
 

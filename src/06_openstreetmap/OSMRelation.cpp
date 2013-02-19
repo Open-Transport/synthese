@@ -44,36 +44,36 @@ void Relation::add(AttributeMap &attrs, RelationPtr relation) {
    add(attrs, relation->getId(), relation);
 }
 
-void Relation::addUnresolvedNode(AttributeMap &attrs, int id) {
+void Relation::addUnresolvedNode(AttributeMap &attrs, unsigned long long int id) {
    NodePtr node;
    add(attrs,id,node);
 }
 
-void Relation::addUnresolvedWay(AttributeMap &attrs, int id) {
+void Relation::addUnresolvedWay(AttributeMap &attrs, unsigned long long int id) {
    WayPtr way;
    add(attrs,id,way);
 }
 
-void Relation::addUnresolvedRelation(AttributeMap &attrs, int id) {
+void Relation::addUnresolvedRelation(AttributeMap &attrs, unsigned long long int id) {
    RelationPtr relation;
    add(attrs,id,relation);
 }
 
-void Relation::add(AttributeMap &attrs, int id, NodePtr node) {
+void Relation::add(AttributeMap &attrs, unsigned long long int id, NodePtr node) {
    std::string role = attrs.getString(ATTR_ROLE);
    boost::to_lower(role);
    nodes[role][id]=node;
    resetGeometry();
 }
 
-void Relation::add(AttributeMap &attrs, int id, WayPtr way) {
+void Relation::add(AttributeMap &attrs, unsigned long long int id, WayPtr way) {
    std::string role = attrs.getString(ATTR_ROLE);
    boost::to_lower(role);
    ways[role][id]=way;
    resetGeometry();
 }
 
-void Relation::add(AttributeMap &attrs, int id, RelationPtr relation) {
+void Relation::add(AttributeMap &attrs, unsigned long long int id, RelationPtr relation) {
    std::string role = attrs.getString(ATTR_ROLE);
    boost::to_lower(role);
    relations[role][id]=relation;
@@ -81,9 +81,9 @@ void Relation::add(AttributeMap &attrs, int id, RelationPtr relation) {
 }
 
 bool Relation::contains(NodePtr &node) {
-   typedef std::pair<std::string, std::map<int, NodePtr> > NodeRelationType;
+   typedef std::pair<std::string, std::map<unsigned long long int, NodePtr> > NodeRelationType;
    BOOST_FOREACH(NodeRelationType nrt, nodes) {
-      typedef std::pair<int, NodePtr> NodeType;
+      typedef std::pair<unsigned long long int, NodePtr> NodeType;
       BOOST_FOREACH(NodeType nt, nrt.second) {
          if(nt.second == node)
             return true;
@@ -93,9 +93,9 @@ bool Relation::contains(NodePtr &node) {
 }
 
 bool Relation::contains(WayPtr &way) {
-   typedef std::pair<std::string, std::map<int, WayPtr> > WayRelationType;
+   typedef std::pair<std::string, std::map<unsigned long long int, WayPtr> > WayRelationType;
    BOOST_FOREACH(WayRelationType wrt, ways) {
-      typedef std::pair<int, WayPtr> WayType;
+      typedef std::pair<unsigned long long int, WayPtr> WayType;
       BOOST_FOREACH(WayType wt, wrt.second) {
          if(wt.second == way)
             return true;
@@ -105,9 +105,9 @@ bool Relation::contains(WayPtr &way) {
 }
 
 bool Relation::contains(RelationPtr &rel) {
-   typedef std::pair<std::string, std::map<int, RelationPtr> > RelationRelationType;
+   typedef std::pair<std::string, std::map<unsigned long long int, RelationPtr> > RelationRelationType;
    BOOST_FOREACH(RelationRelationType rrt, relations) {
-      typedef std::pair<int, RelationPtr> RelationType;
+      typedef std::pair<unsigned long long int, RelationPtr> RelationType;
       BOOST_FOREACH(RelationType rt, rrt.second) {
          if(rt.second == rel)
             return true;
@@ -118,10 +118,10 @@ bool Relation::contains(RelationPtr &rel) {
 
 void Relation::consolidate(Network *network) throw(RefNotFoundException) {
 
-   std::map<std::string,std::map<int, NodePtr> >::iterator nit1 = nodes.begin();
+   std::map<std::string,std::map<unsigned long long int, NodePtr> >::iterator nit1 = nodes.begin();
    while (nit1 != nodes.end()) {
-      std::map<int, NodePtr> typeNodes = nit1->second;
-      std::map<int, NodePtr>::iterator nit2 = typeNodes.begin();
+      std::map<unsigned long long int, NodePtr> typeNodes = nit1->second;
+      std::map<unsigned long long int, NodePtr>::iterator nit2 = typeNodes.begin();
       while( nit2 != typeNodes.end()) {
          if (!(nit2->second)) {
             NodePtr node = network->getNode(nit2->first);
@@ -132,10 +132,10 @@ void Relation::consolidate(Network *network) throw(RefNotFoundException) {
       nit1++;
    }
 
-   std::map<std::string, std::map<int, WayPtr> >::iterator wit1 = ways.begin();
+   std::map<std::string, std::map<unsigned long long int, WayPtr> >::iterator wit1 = ways.begin();
    while (wit1 != ways.end()) {
-      std::map<int, WayPtr> typeWays = wit1->second;
-      std::map<int, WayPtr>::iterator wit2 = typeWays.begin();
+      std::map<unsigned long long int, WayPtr> typeWays = wit1->second;
+      std::map<unsigned long long int, WayPtr>::iterator wit2 = typeWays.begin();
       while (wit2 != typeWays.end()) {
          if (!(wit2->second)) {
             WayPtr way = network->getWay(wit2->first);
@@ -146,10 +146,10 @@ void Relation::consolidate(Network *network) throw(RefNotFoundException) {
       wit1++;
    }
 
-   std::map<std::string, std::map<int, RelationPtr> >::iterator rit1 = relations.begin();
+   std::map<std::string, std::map<unsigned long long int, RelationPtr> >::iterator rit1 = relations.begin();
    while (rit1 != relations.end()) {
-      std::map<int, RelationPtr> typeRelations = rit1->second;
-      std::map<int, RelationPtr>::iterator rit2 = typeRelations.begin();
+      std::map<unsigned long long int, RelationPtr> typeRelations = rit1->second;
+      std::map<unsigned long long int, RelationPtr>::iterator rit2 = typeRelations.begin();
       while (rit2 != typeRelations.end()) {
          if (!(rit2->second)) {
             RelationPtr relation = network->getRelation(rit2->first);
@@ -163,9 +163,9 @@ void Relation::consolidate(Network *network) throw(RefNotFoundException) {
 
 std::list<WayPtr> Relation::getWays(std::string &role) {
    std::list<WayPtr> ret;
-   std::map<std::string, std::map<int, WayPtr> >::iterator it1 = ways.find(role);
+   std::map<std::string, std::map<unsigned long long int, WayPtr> >::iterator it1 = ways.find(role);
    if (it1 != ways.end()) {
-      std::map<int, WayPtr>::iterator it2 = it1->second.begin();
+      std::map<unsigned long long int, WayPtr>::iterator it2 = it1->second.begin();
       while (it2 != it1->second.end()) {
          ret.push_back(it2->second);
          it2++;
@@ -176,9 +176,9 @@ std::list<WayPtr> Relation::getWays(std::string &role) {
 
 std::list<NodePtr> Relation::getNodes(std::string &role) {
    std::list<NodePtr> ret;
-   std::map<std::string, std::map<int, NodePtr> >::iterator it1 = nodes.find(role);
+   std::map<std::string, std::map<unsigned long long int, NodePtr> >::iterator it1 = nodes.find(role);
    if (it1 != nodes.end()) {
-      std::map<int, NodePtr>::iterator it2 = it1->second.begin();
+      std::map<unsigned long long int, NodePtr>::iterator it2 = it1->second.begin();
       while (it2 != it1->second.end()) {
          ret.push_back(it2->second);
          it2++;
@@ -205,9 +205,9 @@ std::list<WayPtr> Relation::getWays() {
 
 std::list<RelationPtr> Relation::getRelations(std::string &role) {
    std::list<RelationPtr> ret;
-   std::map<std::string, std::map<int, RelationPtr> >::iterator it1 = relations.find(role);
+   std::map<std::string, std::map<unsigned long long int, RelationPtr> >::iterator it1 = relations.find(role);
    if (it1 != relations.end()) {
-      std::map<int, RelationPtr>::iterator it2 = it1->second.begin();
+      std::map<unsigned long long int, RelationPtr>::iterator it2 = it1->second.begin();
       while (it2 != it1->second.end()) {
          ret.push_back(it2->second);
          it2++;
@@ -218,9 +218,9 @@ std::list<RelationPtr> Relation::getRelations(std::string &role) {
 
 std::list<RelationPtr> Relation::getRelations() {
    std::list<RelationPtr> ret;
-   std::map<std::string, std::map<int, RelationPtr> >::iterator it1 = relations.begin();
+   std::map<std::string, std::map<unsigned long long int, RelationPtr> >::iterator it1 = relations.begin();
    while (it1 != relations.end()) {
-      std::map<int, RelationPtr>::iterator it2 = it1->second.begin();
+      std::map<unsigned long long int, RelationPtr>::iterator it2 = it1->second.begin();
       while (it2 != it1->second.end()) {
          ret.push_back(it2->second);
          it2++;
