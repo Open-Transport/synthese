@@ -88,6 +88,10 @@ class Proxy(object):
         self._online = False
         self._running = False
         self._enabled = True
+        # It is important to specify a controlled config dir or polipo won't start
+        # if /etc/polipo is not writable.
+        self._polipo_config_dir = os.path.join(config_dir, 'polipo_config')
+        utils.maybe_makedirs(self._polipo_config_dir)
         self._cache_dir = os.path.join(config_dir, 'polipo_cache')
         self._log_file = os.path.join(config_dir, 'polipo.log')
         utils.maybe_makedirs(self._cache_dir)
@@ -133,6 +137,8 @@ class Proxy(object):
             options['proxyOffline'] = 'true'
 
         cmd_line = [self._polipo_path]
+        cmd_line.append('-c')
+        cmd_line.append(self._polipo_config_dir)
         for name, value in options.iteritems():
             cmd_line.append('{0}={1}'.format(name, value))
         log.debug('Polipo command line: %s', cmd_line)
