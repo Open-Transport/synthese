@@ -528,7 +528,7 @@ namespace synthese
 
 
 
-		DisplayScreen::Labels DisplayScreen::getSortedAvaliableDestinationsLabels(
+		DisplayScreen::Labels DisplayScreen::getSortedAvailableDestinationsLabels(
 			const DisplayedPlacesList& placesToAvoid
 		) const {
 			set<const DisplayScreen*> screens;
