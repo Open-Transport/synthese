@@ -36,7 +36,7 @@ public:
    /**
     * \return the id of the element in the osm database
     */
-   int getId();
+   unsigned long long int getId();
 
    /**
     * \brief add a key/value pair to the element
@@ -83,7 +83,7 @@ protected:
    boost::shared_ptr<geos::geom::Geometry> geometry;
    boost::shared_ptr<geos::geom::prep::PreparedGeometry> preparedGeometry;
    std::map<std::string,std::string> tags;
-   int id;
+   unsigned long long int id;
 
 public:
    static const std::string TAG_HIGHWAY;
@@ -190,7 +190,7 @@ public:
     * \param id The id of the referenced \ref Node, this should be the same as the id of the given \param node
     * \param node The node to add, or NULL
     */
-   void pushNode(int id, NodePtr node);
+   void pushNode(unsigned long long int id, NodePtr node);
 
    /**
     * \brief Add a node to the end of the way
@@ -201,7 +201,7 @@ public:
    /**
     * \brief Returns the list of nodes referenced by the way
     */
-   const std::list<std::pair<int, NodePtr> > *getNodes();
+   const std::list<std::pair<unsigned long long int, NodePtr> > *getNodes();
    std::string toWKT();
 
    /**
@@ -234,7 +234,7 @@ public:
 
 protected:
    /// the \ref Node "nodes" referenced by the way
-   std::list<std::pair<int, NodePtr> > nodes;
+   std::list<std::pair<unsigned long long int, NodePtr> > nodes;
 
 };
 
@@ -264,12 +264,12 @@ public:
     */
    virtual void addRelation(RelationPtr relation);
 
-   virtual const std::map<int, NodePtr > *getNodes();
-   virtual const std::map<int, WayPtr > *getWays();
-   virtual const std::map<int, RelationPtr > *getRelations();
-   virtual NodePtr getNode(int id) throw(RefNotFoundException);
-   virtual WayPtr getWay(int id) throw(RefNotFoundException);
-   virtual RelationPtr getRelation(int id) throw(RefNotFoundException);
+   virtual const std::map<unsigned long long int, NodePtr > *getNodes();
+   virtual const std::map<unsigned long long int, WayPtr > *getWays();
+   virtual const std::map<unsigned long long int, RelationPtr > *getRelations();
+   virtual NodePtr getNode(unsigned long long int id) throw(RefNotFoundException);
+   virtual WayPtr getWay(unsigned long long int id) throw(RefNotFoundException);
+   virtual RelationPtr getRelation(unsigned long long int id) throw(RefNotFoundException);
 
    /**
     * \brief compute missing references in the network's ways and relations
@@ -298,7 +298,7 @@ public:
    /**
     * \brief returns the list of ways that represent a physical route accessible to a pedestrian
     */
-   std::map<int,WayPtr> getWalkableWays();
+   std::map<unsigned long long int,WayPtr> getWalkableWays();
 
 
    /**
@@ -310,21 +310,21 @@ public:
     * \li departements: 6
     * \li countries: 2
     */
-   std::map<int,RelationPtr> getAdministrativeBoundaries(int admin_level);
+   std::map<unsigned long long int,RelationPtr> getAdministrativeBoundaries(int admin_level);
 
    /**
     * \brief return the walkable ways of the network, associated with their containing
     * administrative area
     */
-   std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > getWalkableWaysByAdminBoundary(int admin_level);
+   std::map<unsigned long long int,std::pair<RelationPtr,std::map<unsigned long long int, WayPtr> > > getWalkableWaysByAdminBoundary(int admin_level);
 
    // Return the valid ways of the network
-   std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > getWaysByAdminBoundary(int admin_level);
+   std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > getWaysByAdminBoundary(int admin_level);
 
 protected:
-   std::map<int, NodePtr > nodes;
-   std::map<int, WayPtr > ways;
-   std::map<int, RelationPtr > relations;
+   std::map<unsigned long long int, NodePtr > nodes;
+   std::map<unsigned long long int, WayPtr > ways;
+   std::map<unsigned long long int, RelationPtr > relations;
 };
 
 /**
@@ -351,17 +351,17 @@ public:
    /**
     * \brief add a related node by id
     */
-   void addUnresolvedNode(AttributeMap &attrs, int id);
+   void addUnresolvedNode(AttributeMap &attrs, unsigned long long int id);
 
    /**
     * \brief add a related way by id
     */
-   void addUnresolvedWay(AttributeMap &attrs, int id);
+   void addUnresolvedWay(AttributeMap &attrs, unsigned long long int id);
 
    /**
     * \brief add a related relation by id
     */
-   void addUnresolvedRelation(AttributeMap &attrs, int id);
+   void addUnresolvedRelation(AttributeMap &attrs, unsigned long long int id);
 
    /**
     * \brief return list of ways matching given role
@@ -409,13 +409,13 @@ public:
    virtual boost::shared_ptr<const geos::geom::Geometry> toGeometry();
 
 protected:
-   void add(AttributeMap &attrs, int id, NodePtr node);
-   void add(AttributeMap &attrs, int id, WayPtr way);
-   void add(AttributeMap &attrs, int id, RelationPtr relation);
+   void add(AttributeMap &attrs, unsigned long long int id, NodePtr node);
+   void add(AttributeMap &attrs, unsigned long long int id, WayPtr way);
+   void add(AttributeMap &attrs, unsigned long long int id, RelationPtr relation);
    void resetGeometry();
-   std::map<std::string, std::map<int, NodePtr> >  nodes;
-   std::map<std::string, std::map<int, WayPtr> >  ways;
-   std::map<std::string, std::map<int, RelationPtr> >  relations;
+   std::map<std::string, std::map<unsigned long long int, NodePtr> >  nodes;
+   std::map<std::string, std::map<unsigned long long int, WayPtr> >  ways;
+   std::map<std::string, std::map<unsigned long long int, RelationPtr> >  relations;
 
 private:
    ///has the geometry extraction process already run
