@@ -438,7 +438,7 @@ namespace synthese
 			JourneyPatternTableSync::SearchResult routes(JourneyPatternTableSync::Search(env, id));
 			BOOST_FOREACH(const JourneyPatternTableSync::SearchResult::value_type& route, routes)
 			{
-				JourneyPatternTableSync::Remove(NULL, id, transaction, false);
+				JourneyPatternTableSync::Remove(NULL, route->getKey(), transaction, false);
 			}
 		}
 
