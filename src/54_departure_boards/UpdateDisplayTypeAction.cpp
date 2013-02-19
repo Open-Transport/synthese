@@ -336,10 +336,6 @@ namespace synthese
 				if(map.isDefined(PARAMETER_MAX_STOPS_NUMBER))
 				{
 					_max_stops_number = map.getOptional<size_t>(PARAMETER_MAX_STOPS_NUMBER);
-					if (*_max_stops_number && **_max_stops_number < 0)
-					{
-						throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
-					}
 				}
 
 				// Time between checks
