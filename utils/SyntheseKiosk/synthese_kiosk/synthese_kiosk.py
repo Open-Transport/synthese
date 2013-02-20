@@ -93,8 +93,10 @@ class Proxy(object):
         self._polipo_config_dir = os.path.join(config_dir, 'polipo_config')
         utils.maybe_makedirs(self._polipo_config_dir)
         self._cache_dir = os.path.join(config_dir, 'polipo_cache')
-        self._log_file = os.path.join(config_dir, 'polipo.log')
         utils.maybe_makedirs(self._cache_dir)
+        self._local_document_dir = os.path.join(config_dir, 'polipo_local')
+        utils.maybe_makedirs(self._local_document_dir)
+        self._log_file = os.path.join(config_dir, 'polipo.log')
         self._host = 'localhost'
         self._port = 8123
         self._proc = None
@@ -104,7 +106,7 @@ class Proxy(object):
         if sys.platform == 'win32':
             subprocess.call('taskkill /f /im polipo.exe', shell=True)
         else:
-            subprocess.call('pkill polipo', shell=True)
+            subprocess.call('killall -9 polipo', shell=True)
 
     def _convert_polipo_path(self, path):
         # Polipo on Windows expects Unix style paths, without the drive letter
@@ -129,6 +131,7 @@ class Proxy(object):
 
         options = {
             'diskCacheRoot': self._convert_polipo_path(self._cache_dir),
+            'localDocumentRoot': self._convert_polipo_path(self._local_document_dir),
             'dnsUseGethostbyname': 'happily',
             'relaxTransparency': 'maybe',
             'logFile': self._convert_polipo_path(self._log_file),
@@ -325,7 +328,7 @@ class Display(object):
 
     def _create_custom_browser(self):
         if self._proxy.enabled:
-            console.warn("Proxy not supported with custome browser")
+            log.warn("Proxy not supported with custom browser")
         return CustomBrowser(self._browser_path, self._browser_args)
 
     def _create_xulrunner_browser(self):
