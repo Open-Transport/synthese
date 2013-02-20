@@ -403,13 +403,13 @@ namespace synthese
 							break;
 
 						case 3:
+						case 5:
 							status = VehiclePosition::TERMINUS_START;
 							// We will get a Departure Time from MsgInfo
 							break;
 
 						case 2:
 						case 4:
-						case 5:
 						case 7:
 						case 8:
 							status = VehiclePosition::COMMERCIAL;
