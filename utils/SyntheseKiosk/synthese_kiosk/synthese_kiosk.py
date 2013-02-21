@@ -221,11 +221,41 @@ class XulRunnerBrowser(object):
     Used for XulRunner
     This class replicates the webdriver API and launches the browser manually.
     """
-    def __init__(self, browser_path, browser_args):
+    def __init__(self, proxy_enabled, browser_path, browser_args):
         self._path = browser_path
         self._args = browser_args
         log.debug("Browser path %s", self._path)
         self._proc = None
+        if proxy_enabled:
+            self.createProfile()
+
+    def createProfile(self):
+        profileDir = os.getenv("HOME")
+        utils.maybe_makedirs(profileDir + "/.test/test/kiosk.default")
+
+        # Create the profile
+        f = open(profileDir + "/.test/test/profiles.ini", "w")
+        f.write('''
+[General]
+StartWithLastProfile=1
+
+[Profile0]
+Name=default
+IsRelative=1
+Path=kiosk.default
+Default=1
+''')
+        f.close()
+
+        # Create the pref.js
+        f = open(profileDir + "/.test/test/kiosk.default/prefs.js", "w")
+        f.write('''
+user_pref("network.proxy.http", "localhost");
+user_pref("network.proxy.http_port", 8123);
+user_pref("network.proxy.no_proxies_on", "");
+user_pref("network.proxy.type", 1);
+''')
+        f.close()
 
     def quit(self):
         log.debug("Quitting browser")
@@ -332,15 +362,7 @@ class Display(object):
         return CustomBrowser(self._browser_path, self._browser_args)
 
     def _create_xulrunner_browser(self):
-        if self._proxy.enabled:
-            log.warn('Automatic proxy configuration not supported for xulrunner browser')
-            log.warn('  You must first configure the proxy with the about:config URL and set the following values')
-            log.warn("    network.proxy.http=" + self._proxy._host)
-            log.warn("    network.proxy.http_port=" + str(self._proxy._port))
-            log.warn("    network.proxy.no_proxies_on=")
-            log.warn("    network.proxy.type=1")
-
-        return XulRunnerBrowser(self._browser_path, self._browser_args)
+        return XulRunnerBrowser(self._proxy.enabled, self._browser_path, self._browser_args)
 
     def _create_browser(self):
         if self._browser_name == 'chrome':
@@ -659,7 +681,10 @@ class SyntheseKiosk(object):
             t.start()
 
     def start(self):
-        ports = [self._proxy._port, self.WEBAPP_PORT]
+        ports = [self.WEBAPP_PORT]
+        if self._proxy.enabled:
+            ports.append(self._proxy._port)
+
         for port in ports:
             utils.kill_listening_processes(port)
         self.start_admin_app()
