@@ -42,6 +42,8 @@ namespace synthese
 		const std::string SentScenario::DATA_NAME = "name";
 		const std::string SentScenario::DATA_START_DATE = "start_date";
 		const std::string SentScenario::DATA_END_DATE = "end_date";
+		const std::string SentScenario::DATA_EVENT_START_DATE = "event_start_date";
+		const std::string SentScenario::DATA_EVENT_END_DATE = "event_end_date";
 		const std::string SentScenario::DATA_ACTIVE = "active";
 		const std::string SentScenario::DATA_SCENARIO_ID = "scenario_id";
 		const std::string SentScenario::DATA_IS_TEMPLATE = "is_template";
@@ -224,6 +226,18 @@ namespace synthese
 			if(!getPeriodEnd().is_not_a_date_time())
 			{
 				pm.insert(DATA_END_DATE, getPeriodEnd());
+			}
+
+			// start date
+			if(!getEventStart().is_not_a_date_time())
+			{
+				pm.insert(DATA_EVENT_START_DATE, getEventStart());
+			}
+
+			// end date
+			if(!getEventEnd().is_not_a_date_time())
+			{
+				pm.insert(DATA_EVENT_END_DATE, getEventEnd());
 			}
 
 			// active

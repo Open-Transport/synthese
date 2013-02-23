@@ -74,6 +74,8 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
 		const string ScenarioSaveAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
 		const string ScenarioSaveAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
+		const string ScenarioSaveAction::PARAMETER_EVENT_START_DATE = Action_PARAMETER_PREFIX + "_event_start_date";
+		const string ScenarioSaveAction::PARAMETER_EVENT_END_DATE = Action_PARAMETER_PREFIX + "_event_end_date";
 		const string ScenarioSaveAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "sid";
 		const string ScenarioSaveAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
 		const string ScenarioSaveAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
@@ -511,8 +513,35 @@ namespace synthese
 						else
 						{
 							_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+							*_endDate -= seconds(_endDate->time_of_day().seconds());
 						}
-						*_endDate -= seconds(_endDate->time_of_day().seconds());
+					}
+
+					// Event Start date
+					if(map.isDefined(PARAMETER_EVENT_START_DATE))
+					{
+						if(map.get<string>(PARAMETER_EVENT_START_DATE).empty())
+						{
+							_eventStartDate = ptime();
+						}
+						else
+						{
+							_eventStartDate = time_from_string(map.get<string>(PARAMETER_EVENT_START_DATE));
+						}
+					}
+
+					// Event End date
+					if(map.isDefined(PARAMETER_EVENT_END_DATE))
+					{
+						if(map.get<string>(PARAMETER_EVENT_END_DATE).empty())
+						{
+							_eventEndDate = ptime();
+						}
+						else
+						{
+							_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
+							*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
+						}
 					}
 
 					// Variables
@@ -655,6 +684,30 @@ namespace synthese
 						to_simple_string(*_endDate)
 					);
 					_sscenario->setPeriodEnd(*_endDate);
+				}
+
+				// Start date
+				if(_eventStartDate)
+				{
+					DBLogModule::appendToLogIfChange(
+						text,
+						"Date de début événement",
+						to_simple_string(_sscenario->getEventStart()),
+						to_simple_string(*_eventStartDate)
+					);
+					_sscenario->setEventStart(*_eventStartDate);
+				}
+
+				// End date
+				if(_eventEndDate)
+				{
+					DBLogModule::appendToLogIfChange(
+						text,
+						"Date de fin",
+						to_simple_string(_sscenario->getEventEnd()),
+						to_simple_string(*_eventEndDate)
+					);
+					_sscenario->setEventEnd(*_eventEndDate);
 				}
 
 				// Datasource
