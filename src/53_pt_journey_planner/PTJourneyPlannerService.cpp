@@ -535,7 +535,6 @@ namespace synthese
 				}
 				// XY input
 				else if(
-					map.isDefined(PARAMETER_DEPARTURE_PLACE_XY) &&
 					map.isDefined(PARAMETER_ARRIVAL_PLACE_XY)
 				){
 					PlacesListService placesListService;
