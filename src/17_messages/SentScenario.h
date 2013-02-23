@@ -47,6 +47,8 @@ namespace synthese
 		{
 		public:
 			static const std::string DATA_NAME;
+			static const std::string DATA_EVENT_START_DATE;
+			static const std::string DATA_EVENT_END_DATE;
 			static const std::string DATA_START_DATE;
 			static const std::string DATA_END_DATE;
 			static const std::string DATA_ACTIVE;
@@ -68,6 +70,8 @@ namespace synthese
 
 		private:
 			bool _isEnabled;
+			boost::posix_time::ptime _eventStart; //!< Alarm applicability period start
+			boost::posix_time::ptime _eventEnd;   //!< Alarm applicability period end
 			boost::posix_time::ptime _periodStart; //!< Alarm applicability period start
 			boost::posix_time::ptime _periodEnd;   //!< Alarm applicability period end
 			const ScenarioTemplate*	_template;
@@ -99,6 +103,8 @@ namespace synthese
 
 			~SentScenario();
 
+			const boost::posix_time::ptime&	getEventStart() const { return _eventStart; }
+			const boost::posix_time::ptime&	getEventEnd() const { return _eventEnd; }
 			const boost::posix_time::ptime&	getPeriodStart() const { return _periodStart; }
 			const boost::posix_time::ptime&	getPeriodEnd() const { return _periodEnd; }
 			bool getIsEnabled()	const { return _isEnabled; }
@@ -111,12 +117,15 @@ namespace synthese
 			///	@param periodStart Start broadcast date
 			void setPeriodStart ( const boost::posix_time::ptime& periodStart);
 
+			void setEventStart ( const boost::posix_time::ptime& value){ _eventStart = value; }
 
 			////////////////////////////////////////////////////////////////////
 			/// End broadcast date setter.
 			///	Updates the alarms too.
 			///	@param periodEnd End broadcast date
 			void setPeriodEnd ( const boost::posix_time::ptime& periodEnd);
+
+			void setEventEnd ( const boost::posix_time::ptime& value){ _eventEnd = value; }
 			void setIsEnabled(bool value){ _isEnabled = value; }
 			void setTemplate(const ScenarioTemplate* value);
 			void setVariables(const VariablesMap& value);

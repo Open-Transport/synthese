@@ -64,6 +64,8 @@ namespace synthese
 			static const std::string PARAMETER_CREATE_TEMPLATE;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_EVENT_START_DATE;
+			static const std::string PARAMETER_EVENT_END_DATE;
 			static const std::string PARAMETER_ENABLED;
 			static const std::string PARAMETER_SCENARIO_ID;
 			static const std::string PARAMETER_NAME;
@@ -138,6 +140,8 @@ namespace synthese
 				boost::optional<bool>								_enabled;
 				boost::optional<boost::posix_time::ptime>			_startDate;
 				boost::optional<boost::posix_time::ptime>			_endDate;
+				boost::optional<boost::posix_time::ptime>			_eventStartDate;
+				boost::optional<boost::posix_time::ptime>			_eventEndDate;
 				SentScenario::VariablesMap							_variables;
 				boost::optional<std::string>						_messageToCreate;
 				boost::optional<std::string>						_messageToCreateTitle;
