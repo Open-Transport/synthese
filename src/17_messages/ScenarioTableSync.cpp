@@ -72,6 +72,8 @@ namespace synthese
 		const string ScenarioTableSync::COL_TEMPLATE("template_id");
 		const string ScenarioTableSync::COL_DATASOURCE_LINKS("datasource_links");
 		const string ScenarioTableSync::COL_SECTIONS = "sections";
+		const string ScenarioTableSync::COL_EVENT_START = "event_start";
+		const string ScenarioTableSync::COL_EVENT_END = "event_end";
 	}
 
 	namespace db
@@ -93,6 +95,8 @@ namespace synthese
 			Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
 			Field(ScenarioTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field(ScenarioTableSync::COL_SECTIONS, SQL_TEXT),
+			Field(ScenarioTableSync::COL_EVENT_START, SQL_DATETIME),
+			Field(ScenarioTableSync::COL_EVENT_END, SQL_DATETIME),
 			Field()
 		};
 
@@ -181,6 +185,8 @@ namespace synthese
 				sentScenario.setIsEnabled(rows->getBool ( ScenarioTableSync::COL_ENABLED));
 				sentScenario.setPeriodStart(rows->getDateTime( ScenarioTableSync::COL_PERIODSTART));
 				sentScenario.setPeriodEnd(rows->getDateTime( ScenarioTableSync::COL_PERIODEND));
+				sentScenario.setEventStart(rows->getDateTime( ScenarioTableSync::COL_EVENT_START));
+				sentScenario.setEventEnd(rows->getDateTime( ScenarioTableSync::COL_EVENT_END));
 
 				const string txtVariables(rows->getText(ScenarioTableSync::COL_VARIABLES));
 				SentScenario::VariablesMap variables;
@@ -313,6 +319,18 @@ namespace synthese
 				sectionsStr << section;
 			}
 			query.addField(sectionsStr.str());
+
+			if(dynamic_cast<ScenarioTemplate*>(object))
+			{
+				query.addFieldNull();
+				query.addFieldNull();
+			}
+			else
+			{
+				SentScenario& sentScenario(static_cast<SentScenario&>(*object));
+				query.addFrameworkField<PtimeField>(sentScenario.getEventStart());
+				query.addFrameworkField<PtimeField>(sentScenario.getEventEnd());
+			}
 
 			query.execute(transaction);
 		}
