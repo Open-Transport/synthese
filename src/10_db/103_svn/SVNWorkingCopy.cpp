@@ -566,7 +566,7 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Performs a commit into from the server.
+			/// Performs a commit into the server.
 			/// @param message the message to attach to the commit
 			/// @param user valid login on the server
 			/// @param password password corresponding to the login
