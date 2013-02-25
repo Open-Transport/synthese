@@ -146,8 +146,16 @@ namespace synthese
 			const typename MinutesField<C>::Type& fieldObject,
 			DBContent& content
 		){
-			int i(fieldObject.total_seconds() / 60);
-			content.push_back(Cell(i));
+			if(fieldObject.is_not_a_date_time())
+			{
+				boost::optional<std::string> emptyString;
+				content.push_back(Cell(emptyString));
+			}
+			else
+			{
+				int i(fieldObject.total_seconds() / 60);
+				content.push_back(Cell(i));
+			}
 		}
 
 
