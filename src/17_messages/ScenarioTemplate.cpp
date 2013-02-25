@@ -88,6 +88,16 @@ namespace synthese
 
 
 
+		ScenarioTemplate::ScenarioTemplate(
+			const SentScenario& source,
+			const std::string& name
+		):	Registrable(0),
+			Scenario(name),
+			_folder(NULL)
+		{}
+
+
+
 		ScenarioTemplate::~ScenarioTemplate()
 		{}
 

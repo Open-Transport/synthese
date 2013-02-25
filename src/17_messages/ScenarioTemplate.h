@@ -102,6 +102,11 @@ namespace synthese
 					const std::string& name
 				);
 
+				ScenarioTemplate(
+					const SentScenario& source,
+					const std::string& name
+				);
+
 				ScenarioTemplate(util::RegistryKeyType key);
 				~ScenarioTemplate();
 			//@}

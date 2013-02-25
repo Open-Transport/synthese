@@ -23,6 +23,8 @@
 #include "VehicleUpdateAction.hpp"
 #include "VehiclePositionUpdateAction.hpp"
 
+#include "VehicleAlarmRecipient.hpp"
+
 // Registries
 #include "Composition.hpp"
 #include "Vehicle.hpp"
@@ -55,6 +57,8 @@ void synthese::vehicle::moduleRegister()
 	synthese::vehicle::GetCompositionsService::integrate();
 	synthese::vehicle::GetVehiclesService::integrate();
 	synthese::vehicle::VehicleInformationsService::integrate();
+
+	synthese::vehicle::VehicleAlarmRecipient::integrate();
 
 	synthese::vehicle::VehicleModule::integrate();
 

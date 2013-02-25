@@ -311,12 +311,13 @@ namespace synthese
 
 
 		void AlarmObjectLinkTableSync::CopyRecipients(
-			const Alarm& sourceAlarm,
-			Alarm& destAlarm
+			RegistryKeyType sourceId,
+			Alarm& destAlarm,
+			optional<DBTransaction&> transaction
 		){
 			Env lenv;
 			SearchResult links(
-				Search(lenv, sourceAlarm.getKey())
+				Search(lenv, sourceId)
 			);
 			BOOST_FOREACH(const shared_ptr<AlarmObjectLink>& aol, links)
 			{
@@ -325,9 +326,11 @@ namespace synthese
 				naol.setObject(aol->getObject());
 				naol.setRecipientKey(aol->getRecipientKey());
 				naol.setParameter(aol->getParameter());
-				Save(&naol);
+				Save(&naol, transaction);
 			}
 		}
+
+
 
 		AlarmObjectLinkTableSync::SearchResult AlarmObjectLinkTableSync::Search(
 			Env& env,
