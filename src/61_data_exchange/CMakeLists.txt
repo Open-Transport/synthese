@@ -40,6 +40,8 @@ set(data_exchange_SRCS
   RSSFileFormat.hpp
   ServicesCSVFileFormat.hpp
   ServicesCSVFileFormat.cpp
+  StopButtonFilePoller.cpp
+  StopButtonFilePoller.hpp
   StopsShapeFileFormat.cpp
   StopsShapeFileFormat.hpp
   TridentFileFormat.cpp

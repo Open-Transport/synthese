@@ -24,6 +24,7 @@
 
 #include "IneoNCEConnection.hpp"
 #include "ServerModule.h"
+#include "StopButtonFilePoller.hpp"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
 #include "VDVServer.hpp"
@@ -74,6 +75,8 @@ namespace synthese
 			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_HOST, "", &IneoNCEConnection::ParameterCallback);
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_PORT, "", &IneoNCEConnection::ParameterCallback);
+			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_FILE, "", &StopButtonFilePoller::ParameterCallback);
+			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_PERIOD_MS, "", &StopButtonFilePoller::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::Init()
@@ -89,6 +92,9 @@ namespace synthese
 
 			// Ineo NCE connector
 			ServerModule::AddThread(&IneoNCEConnection::InitThread, "Ineo NCE connector");
+
+			// Stop Button File Poller
+			ServerModule::AddThread(&StopButtonFilePoller::InitThread, "Stop Button File Poller");
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()
