@@ -861,7 +861,7 @@ namespace synthese
 
 			typedef graph::Edge* (graph::Edge::*PtrEdgeStep) () const;
 			PtrEdgeStep step(
-				arrivalHub->isUsefulTransfer(arrivalEdge->getFromVertex()->getGraphType())
+				arrivalHub->isUsefulTransfer(arrivalEdge.getFromVertex()->getGraphType())
 				? (&Edge::getFollowingConnectionArrival)
 				: (&Edge::getFollowingArrivalForFineSteppingOnly)
 			);
