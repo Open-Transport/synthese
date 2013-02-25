@@ -126,8 +126,9 @@ namespace synthese
 
 				ScenarioTableSync::Save(&scenario);
 
-				ScenarioTableSync::CopyMessagesFromOther(
-					_template->getKey(), scenario
+				ScenarioTableSync::CopyMessages(
+					_template->getKey(),
+					scenario
 				);
 
 				// Remember of the id of created object to view it after the action

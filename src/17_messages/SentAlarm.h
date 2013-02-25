@@ -69,6 +69,22 @@ namespace synthese
 				const AlarmTemplate& source
 			);
 
+
+
+			/** Alarm generic dynamic copy constructor.
+				@param scenario Scenario which belongs the new alarm
+				@param source Alarm to copy
+				@author Hugues Romain
+				@date 2013
+				@warning the recipients are not copied. Do it at the table synchronization.
+			*/
+			SentAlarm(
+				const SentScenario& scenario,
+				const Alarm& source
+			);
+
+
+
 			/** Basic constructor.
 				@param scenario Scenario which belongs the new alarm
 				@author Hugues Romain

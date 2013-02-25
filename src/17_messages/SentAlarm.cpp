@@ -71,6 +71,20 @@ namespace synthese
 
 
 
+		SentAlarm::SentAlarm(
+			const SentScenario& scenario,
+			const Alarm& source
+		):	Registrable(0),
+			Alarm(source, &scenario),
+			_template(
+				dynamic_cast<const AlarmTemplate*>(&source) ?
+				static_cast<const AlarmTemplate*>(&source) :
+				static_cast<const SentAlarm&>(source)._template
+			)
+		{}
+
+
+
 		SentAlarm::~SentAlarm()
 		{}
 

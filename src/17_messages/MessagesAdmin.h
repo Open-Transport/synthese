@@ -113,7 +113,8 @@ namespace synthese
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
-		class MessagesAdmin : public admin::AdminInterfaceElementTemplate<MessagesAdmin>
+		class MessagesAdmin :
+			public admin::AdminInterfaceElementTemplate<MessagesAdmin>
 		{
 		public:
 			static const std::string CSS_ALARM_DISABLED;
@@ -122,10 +123,7 @@ namespace synthese
 			static const std::string CSS_ALARM_DISPLAYED_WITH_END_DATE;
 
 		private:
-			boost::posix_time::ptime							_date;
-			ScenarioTableSync::StatusSearch		_searchStatus;
-//			AlarmLevel											_searchLevel;
-//			AlarmConflict										_searchConflict;
+			bool _searchArchive;
 			boost::optional<std::string>						_searchName;
 			boost::optional<const ScenarioTemplate*>			_searchScenario;
 			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
@@ -133,11 +131,10 @@ namespace synthese
 			util::ParametersMap	_parametersMap;
 
 		public:
-			static const std::string PARAMETER_SEARCH_DATE;
-			static const std::string PARAMETER_SEARCH_LEVEL;
-			static const std::string PARAMETER_SEARCH_STATUS;
-			static const std::string PARAMETER_SEARCH_CONFLICT;
+			static const std::string PARAMETER_SEARCH_ARCHIVE;
 			static const std::string PARAMETER_SEARCH_NAME;
+			static const std::string PARAMETER_SEARCH_TEMPLATE;
+			static const std::string SORT_ON_DATE;
 
 			MessagesAdmin();
 

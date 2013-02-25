@@ -61,6 +61,8 @@ namespace synthese
 			static const std::string PARAMETER_CURRENTLY_DISPLAYED;
 			static const std::string PARAMETER_SECTION_IN;
 			static const std::string PARAMETER_SECTION_OUT;
+			static const std::string PARAMETER_TEXT_SEARCH;
+			static const std::string PARAMETER_ARCHIVES;
 
 			static const std::string TAG_SCENARIO;
 
@@ -68,11 +70,13 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				bool _showTemplates;
-				boost::logic::tribool _showCurrentlyDisplayed;
+				boost::optional<bool> _showCurrentlyDisplayed;
 				boost::shared_ptr<const ScenarioFolder> _parentFolder;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 				boost::optional<int> _sectionIn;
 				boost::optional<int> _sectionOut;
+				boost::optional<std::string> _textSearch;
+				boost::optional<bool> _archivesOnly;
 			//@}
 
 

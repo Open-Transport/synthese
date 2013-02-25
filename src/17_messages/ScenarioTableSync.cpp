@@ -23,22 +23,22 @@
 #include "ScenarioTableSync.h"
 
 #include "AlarmObjectLinkTableSync.h"
+#include "AlarmTableSync.h"
 #include "DataSourceLinksField.hpp"
+#include "DBException.hpp"
+#include "DBModule.h"
+#include "DBResult.hpp"
 #include "ImportableTableSync.hpp"
+#include "MessageAlternativeTableSync.hpp"
+#include "MessagesLibraryRight.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLog.h"
+#include "MessagesRight.h"
 #include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "SentScenario.h"
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioTemplate.h"
-#include "AlarmTableSync.h"
-#include "DBModule.h"
-#include "DBResult.hpp"
-#include "DBException.hpp"
-#include "AlarmTableSync.h"
-#include "MessagesLibraryRight.h"
-#include "MessagesRight.h"
-#include "MessagesLibraryLog.h"
-#include "MessagesLog.h"
 #include "Session.h"
 #include "User.h"
 
@@ -46,6 +46,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -427,65 +428,57 @@ namespace synthese
 
 
 
-		void ScenarioTableSync::CopyMessagesFromOther( RegistryKeyType sourceId, const ScenarioTemplate& dest )
-		{
-			// The action on the alarms
-			Env env;
-			AlarmTableSync::SearchResult alarms(
-				AlarmTableSync::Search(env, sourceId)
-			);
-			BOOST_FOREACH(const shared_ptr<Alarm>& templateAlarm, alarms)
-			{
-				AlarmTemplate alarm(dest, static_cast<AlarmTemplate&>(*templateAlarm));
-				AlarmTableSync::Save(&alarm);
-
-				AlarmObjectLinkTableSync::CopyRecipients(
-					*templateAlarm,
-					alarm
-				);
-			}
-		}
-
-
-
-		void ScenarioTableSync::CopyMessagesFromOther( RegistryKeyType sourceId, const SentScenario& dest )
-		{
-			// The action on the alarms
-			Env env;
-			AlarmTableSync::SearchResult alarms(
-				AlarmTableSync::Search(env, sourceId)
-			);
-			BOOST_FOREACH(const shared_ptr<Alarm>& templateAlarm, alarms)
-			{
-				SentAlarm alarm(static_cast<SentAlarm&>(*templateAlarm));
-				AlarmTableSync::Save(&alarm);
-
-				AlarmObjectLinkTableSync::CopyRecipients(
-					*templateAlarm,
-					alarm
-				);
-			}
-		}
-
-
-
-		void ScenarioTableSync::CopyMessagesFromTemplate(
+		//////////////////////////////////////////////////////////////////////////
+		/// Performs a copy of each message from a scenario to a new one.
+		/// @param sourceId the if of the scenario to copy
+		/// @param dest the new scenario
+		/// @param transaction the transaction
+		void ScenarioTableSync::CopyMessages(
 			RegistryKeyType sourceId,
-			const SentScenario& dest
+			const Scenario& dest,
+			optional<DBTransaction&> transaction
 		){
-			// The action on the alarms
+			// The existing messages
 			Env env;
 			AlarmTableSync::SearchResult alarms(
 				AlarmTableSync::Search(env, sourceId)
 			);
+
+			// Copy of each message
 			BOOST_FOREACH(const shared_ptr<Alarm>& templateAlarm, alarms)
 			{
-				SentAlarm alarm(dest, static_cast<AlarmTemplate&>(*templateAlarm));
-				AlarmTableSync::Save(&alarm);
+				// Message creation
+				shared_ptr<Alarm> alarm;
+				if(dynamic_cast<const SentScenario*>(&dest))
+				{
+					alarm.reset(
+						new SentAlarm(
+							static_cast<const SentScenario&>(dest),
+							*templateAlarm
+					)	);
+				}
+				else
+				{
+					alarm.reset(
+						new AlarmTemplate(
+							static_cast<const ScenarioTemplate&>(dest),
+							*templateAlarm
+					)	);
+				}
+				AlarmTableSync::Save(alarm.get(), transaction);
 
+				// Copy of the recipients of the message
 				AlarmObjectLinkTableSync::CopyRecipients(
-					*templateAlarm,
-					alarm
+					templateAlarm->getKey(),
+					*alarm,
+					transaction
+				);
+
+				// Copy of the message alternatives
+				MessageAlternativeTableSync::CopyAlternatives(
+					templateAlarm->getKey(),
+					*alarm,
+					transaction
 				);
 			}
 		}
@@ -561,20 +554,29 @@ namespace synthese
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Sent scenario search.
+		/// @param env the environment to populate
+		///	@param name Name of the scenario
+		/// @param inArchive filters the scenario with end date in the past
+		/// @param isActive filters the scenario with the activation status set to on
+		/// @param scenarioId filters the scenarion on its template
+		///	@param first First Scenario object to answer
+		///	@param number Number of Scenario objects to answer (0 = all) The size of the vector is less or equal to number, 
+		/// then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then 
+		/// there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+		///	@author Hugues Romain
+		///	@date 2006-2013
 		ScenarioTableSync::SearchResult ScenarioTableSync::SearchSentScenarios(
 			Env& env,
 			optional<string> name /*= optional<string>()*/,
-			/*AlarmConflict conflict, */
-			/*AlarmLevel level, */
-			optional<StatusSearch> status /*= optional<StatusSearch>()*/,
-			optional<posix_time::ptime> date /*= optional<posix_time::ptime>()*/,
+			boost::optional<bool> inArchive,
+			boost::optional<bool> isActive,
 			optional<RegistryKeyType> scenarioId /*= optional<RegistryKeyType>()*/,
 			optional<int> first /*= optional<int>()*/,
 			optional<size_t> number /*= optional<size_t>()*/,
 			bool orderByDate /*= true*/,
 			bool orderByName /*= false*/,
-			bool orderByStatus /*= false*/,
-			/*bool orderByConflict = false, */
 			bool raisingOrder /*= false*/,
 			LinkLevel linkLevel /*= UP_LINKS_LOAD_LEVEL */
 		){
@@ -590,94 +592,39 @@ namespace synthese
 				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			}
 
-			if(status && date)
+			// Archive filter
+			if(inArchive)
 			{
-				switch(*status)
+				ptime date(second_clock::local_time());
+				if(*inArchive)
 				{
-				case BROADCAST_OVER:
 					query << " AND " <<
 						ScenarioTableSync::COL_PERIODEND << " IS NOT NULL AND " <<
 						ScenarioTableSync::COL_PERIODEND << "!='' AND " <<
-						ScenarioTableSync::COL_PERIODEND << "<'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
-						;
-					break;
-
-				case BROADCAST_RUNNING:
-					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "=''"
-						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
-						<< ") AND " << ScenarioTableSync::COL_ENABLED
-						;
-					break;
-
-				case BROADCAST_RUNNING_WITH_END:
-					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "!=''"
-						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
-						<< ") AND " << ScenarioTableSync::COL_ENABLED
-						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL AND " << ScenarioTableSync::COL_PERIODEND << "!=''"
-						<< " AND " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
-						;
-					break;
-
-				case BROADCAST_RUNNING_WITHOUT_END:
-					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "=''"
-						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
-						<< ") AND " << ScenarioTableSync::COL_ENABLED
-						<<  " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "='')"
-						;
-					break;
-
-				case FUTURE_BROADCAST:
-					query << " AND " << ScenarioTableSync::COL_PERIODSTART << " IS NOT NULL " << " AND " << ScenarioTableSync::COL_PERIODSTART << "!=''"
-						<< " AND " << ScenarioTableSync::COL_PERIODSTART << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
-						<< " AND " << ScenarioTableSync::COL_ENABLED
-						;
-					break;
-
-				case BROADCAST_DRAFT:
-					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL "
-						<< " OR " << ScenarioTableSync::COL_PERIODEND << "=''"
-						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
-						<< ") AND NOT " << ScenarioTableSync::COL_ENABLED
-						;
-					break;
+						ScenarioTableSync::COL_PERIODEND << "<='" << to_iso_extended_string(date.date()) << " " << to_simple_string(date.time_of_day()) << "'"
+					;
+				}
+				else
+				{
+					query << " AND (" <<
+						ScenarioTableSync::COL_PERIODEND << " IS NULL OR " <<
+						ScenarioTableSync::COL_PERIODEND << "='' OR " <<
+						ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date.date()) << " " << to_simple_string(date.time_of_day()) << "'" <<
+						")"
+					;
 				}
 			}
 
-			if(!status && date)
+			// Active filter
+			if(isActive)
 			{
-				query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "='' OR " <<
-					ScenarioTableSync::COL_PERIODSTART << " <='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'" <<
-					") AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "='' OR " <<
-					ScenarioTableSync::COL_PERIODEND << " >='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'" <<
-					")"
-				;
+				query << " AND " << ScenarioTableSync::COL_ENABLED << "=" << *isActive;
 			}
-
+		
 			if(scenarioId)
 			{
 				query << " AND " << ScenarioTableSync::COL_TEMPLATE << "=" << *scenarioId;
 			}
-
-
-			/*				<< ",(SELECT COUNT(" << AlarmObjectLinkTableSync::COL_OBJECT_ID << ") FROM " <<
-			AlarmObjectLinkTableSync::TABLE.NAME << " AS aol3 WHERE aol3." <<
-			AlarmObjectLinkTableSync::COL_ALARM_ID << "=a." << TABLE_COL_ID << ") AS " <<
-			_COL_RECIPIENTS_NUMBER*/
-
-			/*				<< ",(SELECT MAX(al2."  << COL_LEVEL << ") FROM " << AlarmObjectLinkTableSync::TABLE.NAME <<
-			" AS aol1 INNER JOIN " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol2 ON aol1." <<
-			AlarmObjectLinkTableSync::COL_OBJECT_ID << "=aol2." <<
-			AlarmObjectLinkTableSync::COL_OBJECT_ID << " AND aol1." <<
-			AlarmObjectLinkTableSync::COL_ALARM_ID << " != aol2." <<
-			AlarmObjectLinkTableSync::COL_ALARM_ID << " INNER JOIN " << TABLE.NAME << " AS al2 ON al2." <<
-			TABLE_COL_ID << " = aol2." << AlarmObjectLinkTableSync::COL_ALARM_ID << " WHERE "
-			<< " aol1." << AlarmObjectLinkTableSync::COL_ALARM_ID << "=a." << TABLE_COL_ID
-			<< " AND al2." << COL_IS_TEMPLATE << "=0 "
-			<< " AND (al2." << COL_PERIODSTART << " IS NULL OR a." << COL_PERIODEND << " IS NULL OR al2." <<
-			COL_PERIODSTART << " <= a." << COL_PERIODEND << ")"
-			<< " AND (al2." << COL_PERIODEND << " IS NULL OR a." << COL_PERIODSTART << " IS NULL OR al2." <<
-			COL_PERIODEND <<" >= a." << COL_PERIODSTART << ")"
-			<< ") AS " << _COL_CONFLICT_LEVEL*/
 
 			if(orderByDate)
 			{

@@ -162,6 +162,10 @@ namespace synthese
 	};
 
 	#define FIELD_TIME(N) struct N : public TimeField<N> {};
+
+	FIELD_TIME(Hour)
+	FIELD_TIME(StartHour)
+	FIELD_TIME(EndHour)
 }
 
 #endif

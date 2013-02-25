@@ -61,8 +61,21 @@ namespace synthese
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Performs a copy of the messages alternative of a message into an other one.
+			/// @param sourceId the id of the source message
+			/// @param dest the destination message
+			/// @param transaction the transaction
+			/// @since 3.6.0
+			static void CopyAlternatives(
+				util::RegistryKeyType sourceId,
+				Alarm& dest,
+				boost::optional<db::DBTransaction&> transaction
+			);
 		};
-	}
-}
+}	}
 
 #endif

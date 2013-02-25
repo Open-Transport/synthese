@@ -22,6 +22,7 @@
 
 #include "MessageAlternativeTableSync.hpp"
 
+#include "AlarmTableSync.h"
 #include "DBResult.hpp"
 #include "SelectQuery.hpp"
 
@@ -122,5 +123,26 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
+		void MessageAlternativeTableSync::CopyAlternatives(
+			RegistryKeyType sourceId,
+			Alarm& dest,
+			optional<DBTransaction&> transaction
+		){
+			Env lenv;
+			SearchResult alternatives(
+				Search(lenv, sourceId)
+			);
+			BOOST_FOREACH(const shared_ptr<MessageAlternative>& alternative, alternatives)
+			{
+				MessageAlternative ma;
+				ma.set<Alarm>(dest);
+				ma.set<MessageType>(alternative->get<MessageType>());
+				ma.set<Content>(alternative->get<Content>());
+				Save(&ma, transaction);
+			}
 		}
 }	}

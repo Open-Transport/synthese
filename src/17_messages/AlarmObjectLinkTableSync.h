@@ -133,11 +133,21 @@ namespace synthese
 			);
 
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Performs a copy of each recipient of a message into an other one.
+			/// @param sourceId the id of the message to copy
+			/// @param destAlarm the new message message
+			/// @param transaction the transaction
 			static void CopyRecipients(
-				const Alarm& sourceAlarm,
-				Alarm& destAlarm
+				util::RegistryKeyType sourceId,
+				Alarm& destAlarm,
+				boost::optional<db::DBTransaction&> transaction
 			);
 		};
+
+
 
 		template<class K, class T>
 		std::vector< boost::shared_ptr<T> > AlarmObjectLinkTableSync::search(
