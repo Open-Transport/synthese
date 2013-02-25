@@ -767,10 +767,10 @@ namespace synthese
 						XMLNode blocMsgNode(listeMsgNode.getChildNode("BlocMsg", i));
 						if(! blocMsgNode.isEmpty())
 						{
-							XMLNode typeInfoNode(blocMsgNode.getChildNode("TypeInf", i));
+							XMLNode typeInfoNode(blocMsgNode.getChildNode("TypeInf"));
 							if(! typeInfoNode.isEmpty() && string(typeInfoNode.getText()) == "5")
 							{
-								XMLNode contInfoNode(blocMsgNode.getChildNode("ContInf", i));
+								XMLNode contInfoNode(blocMsgNode.getChildNode("ContInf"));
 								if(! contInfoNode.isEmpty())
 								{
 									string contInfoStr(contInfoNode.getText());
