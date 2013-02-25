@@ -32,8 +32,6 @@ namespace synthese
 	CLASS_DEFINITION(MessageApplicationPeriod, "t103_message_application_periods", 103)
 
 	FIELD_DEFINITION_OF_TYPE(MessageOrScenarioId, "object_id", SQL_INTEGER)
-    FIELD_DEFINITION_OF_TYPE(StartHour, "start_hour", SQL_TIME)
-    FIELD_DEFINITION_OF_TYPE(EndHour, "end_hour", SQL_TIME)
     FIELD_DEFINITION_OF_TYPE(Dates, "dates", SQL_TEXT)
 
 	namespace messages
