@@ -157,7 +157,25 @@ namespace synthese
 					_creation = true;
 					if(map.getDefault<bool>(PARAMETER_CREATE_TEMPLATE,false))
 					{
-						if(map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE))
+						if(map.getOptional<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY))
+						{
+							try
+							{
+								_source = ScenarioTableSync::GetCast<SentScenario>(
+									map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
+									*_env
+								);
+								_tscenario.reset(
+									new ScenarioTemplate(*_source, _source->getName())
+								);
+								_tscenario->setSections(_source->getSections());
+							}
+							catch(...)
+							{
+								throw ActionException("specified scenario not found");
+							}
+						}
+						else if(map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE))
 						{
 							try
 							{
@@ -168,6 +186,7 @@ namespace synthese
 								_tscenario.reset(
 									new ScenarioTemplate(*_template, map.get<string>(PARAMETER_NAME))
 								);
+								_tscenario->setSections(_template->getSections());
 							}
 							catch(...)
 							{
@@ -261,8 +280,8 @@ namespace synthese
 						{	// Blank scenario
 							_sscenario.reset(new SentScenario);
 						}
+						_scenario = static_pointer_cast<Scenario, SentScenario>(_sscenario);
 					}
-					_scenario = static_pointer_cast<Scenario, SentScenario>(_sscenario);
 				}
 
 
@@ -763,29 +782,21 @@ namespace synthese
 			// Messages
 			if(_creation)
 			{
-				if(_sscenario.get())
+				if(_source.get())
 				{
-					if(_source.get())
-					{
-						ScenarioTableSync::CopyMessagesFromTemplate(
-							_source->getTemplate() ? _source->getTemplate()->getKey() : _source->getKey(),
-							*_sscenario
-						);
-					}
-					else if(_template.get())
-					{
-						// The action on the alarms
-						ScenarioTableSync::CopyMessagesFromTemplate(
-							_template->getKey(),
-							*_sscenario
-						);
-					}
+					ScenarioTableSync::CopyMessages(
+						_source->getTemplate() ? _source->getTemplate()->getKey() : _source->getKey(),
+						*_scenario,
+						transaction
+					);
 				}
-				else
+				else if(_template.get())
 				{
-					ScenarioTableSync::CopyMessagesFromOther(
-						_template->getKey(),
-						*_tscenario
+					// The action on the alarms
+					ScenarioTableSync::CopyMessages(
+						_template.get() ? _template->getKey() : _source->getKey(),
+						*_scenario,
+						transaction
 					);
 				}
 			}

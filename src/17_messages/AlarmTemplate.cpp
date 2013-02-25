@@ -21,7 +21,7 @@
 */
 
 #include "AlarmTemplate.h"
-#include "Registry.h"
+
 #include "ScenarioTemplate.h"
 
 using namespace std;
@@ -31,9 +31,7 @@ namespace synthese
 	namespace messages
 	{
 		AlarmTemplate::~AlarmTemplate()
-		{
-
-		}
+		{}
 
 
 
@@ -41,28 +39,25 @@ namespace synthese
 			util::RegistryKeyType key,
 			const ScenarioTemplate* scenario
 		):	Registrable(key),
-			Alarm(key,scenario)
-			
-		{
+			Alarm(key, scenario)
+		{}
 
-		}
 
-		AlarmTemplate::AlarmTemplate( const AlarmTemplate& source)
-		: Registrable(0),
-		  Alarm(source)
-			
-		{
 
-		}
+		AlarmTemplate::AlarmTemplate(
+			const AlarmTemplate& source
+		):	Registrable(0),
+			Alarm(source)
+		{}
+
+
 
 		AlarmTemplate::AlarmTemplate(
 			const ScenarioTemplate& scenario,
-			const AlarmTemplate& source
+			const Alarm& source
 		):	Registrable(0),
 			Alarm(source, &scenario)
-		{
-
-		}
+		{}
 
 
 
@@ -70,5 +65,4 @@ namespace synthese
 		{
 			return static_cast<const ScenarioTemplate*>(Alarm::getScenario());
 		}
-	}
-}
+}	}

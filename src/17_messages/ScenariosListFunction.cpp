@@ -53,6 +53,8 @@ namespace synthese
 		const string ScenariosListFunction::PARAMETER_CURRENTLY_DISPLAYED = "currently_displayed";
 		const string ScenariosListFunction::PARAMETER_SECTION_IN = "section_in";
 		const string ScenariosListFunction::PARAMETER_SECTION_OUT = "section_out";
+		const string ScenariosListFunction::PARAMETER_TEXT_SEARCH = "text_search";
+		const string ScenariosListFunction::PARAMETER_ARCHIVES = "archives";
 
 		const string ScenariosListFunction::TAG_SCENARIO = "scenario";
 
@@ -69,6 +71,19 @@ namespace synthese
 				map.insert(PARAMETER_CMS_TEMPLATE_ID, _cmsTemplate->getKey());
 			}
 			map.insert(PARAMETER_SHOW_TEMPLATES, _showTemplates);
+
+			// Text search
+			if(_textSearch)
+			{
+				map.insert(PARAMETER_TEXT_SEARCH, *_textSearch);
+			}
+
+			// Archives only
+			if(_archivesOnly)
+			{
+				map.insert(PARAMETER_ARCHIVES, true);
+			}
+
 			return map;
 		}
 
@@ -104,10 +119,11 @@ namespace synthese
 				}
 				else
 				{
-					_showCurrentlyDisplayed = indeterminate;
+					_showCurrentlyDisplayed = optional<bool>();
 				}
 			}
 
+			// CMS page for the display
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CMS_TEMPLATE_ID));
@@ -146,6 +162,19 @@ namespace synthese
 					throw RequestException("No such section");
 				}
 			}
+
+			// Text search
+			string textSearch(map.getDefault<string>(PARAMETER_TEXT_SEARCH));
+			if(!textSearch.empty())
+			{
+				_textSearch = textSearch;
+			}
+
+			// Archives only
+			if(map.isDefined(PARAMETER_ARCHIVES))
+			{
+				_archivesOnly = map.getDefault<bool>(PARAMETER_ARCHIVES, false);
+			}
 		}
 
 
@@ -164,22 +193,42 @@ namespace synthese
 					*_env,
 					_parentFolder.get() ? _parentFolder->getKey() : 0
 				);
-
 			}
 			else
 			{
-				ptime now(second_clock::local_time());
 				scenarios = ScenarioTableSync::SearchSentScenarios(
 					*_env,
 					boost::optional<std::string>(),
-					indeterminate(_showCurrentlyDisplayed) ?
-						optional<ScenarioTableSync::StatusSearch>() :
-						(	_showCurrentlyDisplayed ?
-							ScenarioTableSync::BROADCAST_RUNNING :
-							ScenarioTableSync::FUTURE_BROADCAST
-						),
-					now
+					_archivesOnly,
+					_showCurrentlyDisplayed
 				);
+			}
+
+			// Applying text search filter
+			if(_textSearch)
+			{
+				ScenarioTableSync::SearchResult newScenarios;
+				BOOST_FOREACH(const shared_ptr<Scenario>& scenario, scenarios)
+				{
+					// Try in the scenario name
+					if(find_first(scenario->getName(), *_textSearch))
+					{
+						newScenarios.push_back(scenario);
+						continue;
+					}
+
+					// Try in each message (short and long names)
+					BOOST_FOREACH(const Scenario::Messages::value_type& message, scenario->getMessages())
+					{
+						if( find_first(message->getShortMessage(), *_textSearch) ||
+							find_first(message->getLongMessage(), *_textSearch)
+						){
+							newScenarios.push_back(scenario);
+							break;
+						}
+					}
+				}
+				scenarios = newScenarios;
 			}
 
 			BOOST_FOREACH(const shared_ptr<Scenario>& scenario, scenarios)

@@ -92,23 +92,10 @@ namespace synthese
 
 
 
-			static void CopyMessagesFromOther(
+			static void CopyMessages(
 				util::RegistryKeyType sourceId,
-				const ScenarioTemplate& dest
-			);
-
-
-
-			static void CopyMessagesFromTemplate(
-				util::RegistryKeyType sourceId,
-				const SentScenario& dest
-			);
-
-
-
-			static void CopyMessagesFromOther(
-				util::RegistryKeyType sourceId,
-				const SentScenario& dest
+				const Scenario& dest,
+				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 
 
@@ -121,6 +108,7 @@ namespace synthese
 			static void WriteVariablesIntoMessages(
 				const SentScenario& scenario
 			);
+
 
 
 			/** Template scenario search.
@@ -149,46 +137,16 @@ namespace synthese
 
 
 
-			typedef enum
-			{
-				BROADCAST_OVER,
-				BROADCAST_RUNNING,
-				BROADCAST_RUNNING_WITH_END,
-				BROADCAST_RUNNING_WITHOUT_END,
-				FUTURE_BROADCAST,
-				BROADCAST_DRAFT
-			} StatusSearch;
-
-
-
-			/** Sent scenario search.
-				@param name Name of the template scenario
-				@param status status of the message :
-					- BROADCAST_OVER : endDate in past
-					- BROADCAST_RUNNING : startDate in past or unknown + activated,
-					- BROADCAST_RUNNING_WITH_END : startDate in past or unknown + endTime in future + activated
-					- BROADCAST_RUNNING_WITHOUT_END : startDate in past or unknown + endTime unknown + activated,
-					- FUTURE_BROADCAST : startDate in future + activated,
-					- BROADCAST_DRAFT : endDate in future or unknown + not activated
-				@param first First Scenario object to answer
-				@param number Number of Scenario objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@author Hugues Romain
-				@date 2006
-			*/
 			static SearchResult SearchSentScenarios(
 				util::Env& env,
 				boost::optional<std::string> name = boost::optional<std::string>(),
-				//AlarmConflict conflict,
-				//AlarmLevel level,
-				boost::optional<StatusSearch> status = boost::optional<StatusSearch>(),
-				boost::optional<boost::posix_time::ptime> date = boost::optional<boost::posix_time::ptime>(),
+				boost::optional<bool> inArchive = boost::optional<bool>(),
+				boost::optional<bool> isActive = boost::optional<bool>(),
 				boost::optional<util::RegistryKeyType> scenarioId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<int> first = boost::optional<int>(),
 				boost::optional<size_t> number = boost::optional<size_t>(),
 				bool orderByDate = true,
 				bool orderByName = false,
-				bool orderByStatus = false,
-				//bool orderByConflict = false,
 				bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
@@ -205,7 +163,6 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ScenarioTableSync_H__

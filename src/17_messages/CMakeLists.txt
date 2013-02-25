@@ -32,6 +32,10 @@ MessageAlternative.cpp
 MessageAlternative.hpp
 MessageAlternativeTableSync.cpp
 MessageAlternativeTableSync.hpp
+MessageApplicationPeriod.hpp
+MessageApplicationPeriod.cpp
+MessageApplicationPeriodTableSync.cpp
+MessageApplicationPeriodTableSync.hpp
 MessagesAdmin.cpp
 MessagesAdmin.h
 MessagesAdvancedSelectTableSync.cpp
