@@ -26,6 +26,7 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "InterfaceTableSync.h"
+#include "WebPageTableSync.h"
 #include "ReplaceQuery.h"
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
@@ -43,6 +44,7 @@ namespace synthese
 	using namespace resa;
 	using namespace pt;
 	using namespace interfaces;
+	using namespace cms;
 
 	namespace util
 	{
@@ -66,6 +68,9 @@ namespace synthese
 		const string OnlineReservationRuleTableSync::COL_SENDER_EMAIL("sender_email");
 		const string OnlineReservationRuleTableSync::COL_SENDER_NAME("sender_name");
 		const string OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID("email_interface_id");
+		const string OnlineReservationRuleTableSync::COL_CONFIRMATION_EMAIL_CMS_ID("confirmation_email_cms_id");
+		const string OnlineReservationRuleTableSync::COL_CANCELLATION_EMAIL_CMS_ID("cancellation_email_cms_id");
+		const string OnlineReservationRuleTableSync::COL_PASSWORD_EMAIL_CMS_ID("password_email_cms_id");
 	}
 
 	namespace db
@@ -90,6 +95,9 @@ namespace synthese
 			Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_CONFIRMATION_EMAIL_CMS_ID, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_CANCELLATION_EMAIL_CMS_ID, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_PASSWORD_EMAIL_CMS_ID, SQL_TEXT),
 			Field()
 		};
 
@@ -102,7 +110,7 @@ namespace synthese
 		}
 
 		template<>
-		void OldLoadSavePolicy<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
+        void OldLoadSavePolicy<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
 			OnlineReservationRule* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -136,6 +144,7 @@ namespace synthese
 					Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
 				}
 
+				bool warningToDisplayForEmail(true);
 				try
 				{
 					object->setEMailInterface(
@@ -145,10 +154,63 @@ namespace synthese
 							linkLevel
 						).get()
 					);
+					warningToDisplayForEmail = false;
+                }
+                catch (...)
+                {
+                    Log::GetInstance().info("E-Mail interface not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
+                }
+
+				bool warningToDisplayForEmailCMS(true);
+                try
+                {
+                    // CMS Confirmation EMail
+					object->setConfirmationEMailCMS(
+						WebPageTableSync::GetEditable(
+							rows->getLongLong(OnlineReservationRuleTableSync::COL_CONFIRMATION_EMAIL_CMS_ID),
+							env,
+							linkLevel)
+					);
+					warningToDisplayForEmailCMS = false;
 				}
 				catch (...)
 				{
-					Log::GetInstance().warn("E-Mail interface not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
+                    Log::GetInstance().info("Confirmation E-Mail CMS webpage not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
+				}
+                try
+                {
+                    // CMS Cancellation EMail
+					object->setCancellationEMailCMS(
+						WebPageTableSync::GetEditable(
+							rows->getLongLong(OnlineReservationRuleTableSync::COL_CANCELLATION_EMAIL_CMS_ID),
+							env,
+							linkLevel)
+					);
+				}
+				catch (...)
+				{
+                    Log::GetInstance().info("Cancellation E-Mail CMS webpage not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
+					warningToDisplayForEmailCMS = true;
+				}
+                try
+                {
+                    // CMS Password EMail
+					object->setPasswordEMailCMS(
+						WebPageTableSync::GetEditable(
+							rows->getLongLong(OnlineReservationRuleTableSync::COL_PASSWORD_EMAIL_CMS_ID),
+							env,
+							linkLevel)
+					);
+				}
+				catch (...)
+				{
+                    Log::GetInstance().info("Password E-Mail CMS webpage not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
+					warningToDisplayForEmailCMS = true;
+				}
+
+				if (warningToDisplayForEmail && warningToDisplayForEmailCMS)
+				{
+					Log::GetInstance().warn("E-Mail not found for online reservation rule (no interface, no CMS) "+ lexical_cast<string>(object->getKey()));
 				}
 
 			}

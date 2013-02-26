@@ -48,6 +48,11 @@ namespace synthese
 		class User;
 	}
 
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace resa
 	{
 		class ReservationTransaction;
@@ -68,6 +73,34 @@ namespace synthese
 			typedef std::set<size_t> CapacityThresholds;
 			typedef std::map<util::RegistryKeyType, const OnlineReservationRule*> OnlineReservationRuleMap;
 
+			static const std::string DATA_SUBJECT_OR_CONTENT;
+			static const std::string DATA_DEPARTURE_DATE;
+			static const std::string DATA_DEPARTURE_PLACE_NAME;
+			static const std::string DATA_ARRIVAL_PLACE_NAME;
+			static const std::string DATA_DEPARTURE_TIME;
+			static const std::string DATA_ARRIVAL_TIME;
+			static const std::string DATA_LINE_CODE;
+			static const std::string DATA_ROAD_RESA;
+			static const std::string DATA_KEY_RESA;
+			static const std::string DATA_CUSTOMER_ID;
+			static const std::string DATA_RESERVATION_DEAD_LINE_DATE;
+			static const std::string DATA_RESERVATION_DEAD_LINE_TIME;
+			static const std::string DATA_CUSTOMER_NAME;
+			static const std::string DATA_CUSTOMER_PHONE;
+			static const std::string DATA_USER_LOGIN;
+			static const std::string DATA_USER_SURNAME;
+			static const std::string DATA_USER_NAME;
+			static const std::string DATA_USER_KEY;
+			static const std::string DATA_USER_PHONE;
+			static const std::string DATA_USER_EMAIL;
+			static const std::string DATA_USER_PASSWORD;
+
+
+			static const std::string TYPE_SUBJECT;
+			static const std::string TYPE_CONTENT;
+			static const std::string TYPE_UNCHANGED_PASSWORD;
+
+
 		private:
 			//! \name Link with env reservation rules
 			//@{
@@ -86,6 +119,9 @@ namespace synthese
 				std::string _senderEMail;
 				std::string _senderName;
 				interfaces::Interface*	_eMailInterface;
+				boost::shared_ptr<const cms::Webpage> _cmsConfirmationEMail;
+				boost::shared_ptr<const cms::Webpage> _cmsCancellationEMail;
+				boost::shared_ptr<const cms::Webpage> _cmsPasswordEMail;
 			//@}
 
 			//! \name Optional form fields
@@ -139,6 +175,9 @@ namespace synthese
 				void	setSenderEMail(const std::string& value);
 				void	setSenderName(const std::string& value);
 				void	setEMailInterface(interfaces::Interface* value);
+				void	setConfirmationEMailCMS(boost::shared_ptr<const cms::Webpage> value);
+				void	setCancellationEMailCMS(boost::shared_ptr<const cms::Webpage> value);
+				void	setPasswordEMailCMS(boost::shared_ptr<const cms::Webpage> value);
 			//@}
 
 			//! \name Queries
