@@ -115,15 +115,12 @@ namespace synthese
 							getline(ifs, line);
 							ifs.seekg (0, ios::beg);
 
-							cout << "line = " << line << endl;
 							if(line == "1")
 							{
 								VehicleModule::GetCurrentJourney().setStopRequested(true);
 							}
-							else
-							{
-								VehicleModule::GetCurrentJourney().setStopRequested(false);
-							}
+							// Else we don't set the stopRequestTo 0, it must be reseted when the
+							// bus reaches the next bus stop.
 							
 							this_thread::sleep(periodMS);
 
