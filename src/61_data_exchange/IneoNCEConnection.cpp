@@ -771,7 +771,7 @@ namespace synthese
 							if(! typeInfoNode.isEmpty() && string(typeInfoNode.getText()) == "5")
 							{
 								XMLNode contInfoNode(blocMsgNode.getChildNode("ContInf"));
-								if(! contInfoNode.isEmpty())
+								if(! contInfoNode.isEmpty() && contInfoNode.getText())
 								{
 									string contInfoStr(contInfoNode.getText());
 									if(contInfoStr == "DEPART IMMINENT")
