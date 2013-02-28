@@ -2747,11 +2747,16 @@ namespace synthese
 				{
 					if(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
 					){
+						ParametersMap pmLine;
+						RollingStock* rs = static_cast<const JourneyPattern*>(leg.getService()->getPath())->getRollingStock();
+						pmLine.insert(DATA_ROLLINGSTOCK_ID, (rs ? rs->getKey() : RegistryKeyType(0)));
+
 						LineMarkerInterfacePage::Display(
 							lineMarkers,
 							_lineMarkerPage,
 							request,
-							*static_cast<const JourneyPattern*>(leg.getService()->getPath ())->getCommercialLine()
+							*static_cast<const JourneyPattern*>(leg.getService()->getPath ())->getCommercialLine(),
+							pmLine
 						);
 						junctionsNumber++;
 					}
