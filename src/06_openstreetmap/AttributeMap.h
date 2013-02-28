@@ -26,6 +26,8 @@ public:
     * \param key The key to lookup from
     * \exception Exception Key is not in map
     */
+   int getInteger(const std::string &key) throw(Exception);
+
    unsigned long long int getULongLongInt(const std::string &key) throw(Exception);
 
    /**

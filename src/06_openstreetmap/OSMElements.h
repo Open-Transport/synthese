@@ -90,9 +90,13 @@ public:
    static const std::string TAG_RAILWAY;
    static const std::string TAG_AMENITY;
    static const std::string TAG_FOOT;
+   static const std::string TAG_BICYCLE;
+   static const std::string TAG_MOTOR_VEHICLE;
+   static const std::string TAG_MOTORCAR;
    static const std::string TAG_BOUNDARY;
    static const std::string TAG_ADMINLEVEL;
    static const std::string TAG_NAME;
+   static const std::string TAG_ACCESS;
    static const std::string TAG_AREA;
    static const std::string TAG_BRIDGE;
    static const std::string TAG_TUNNEL;
@@ -217,6 +221,8 @@ public:
     * is not specifically marked as restricted to pedestrians.
     */
    bool isWalkable();
+   bool isDrivable();
+   bool isBikable();
 
    /**
     * loop through this way's nodes, and add a reference to ourself to each node.
