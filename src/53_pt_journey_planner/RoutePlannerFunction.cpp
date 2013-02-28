@@ -3327,7 +3327,7 @@ namespace synthese
 							*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
 							*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
 							it+1 == services.end(),
-							it == services.begin(),
+							*(roadServiceUses.begin()) == services.begin(),
 							isFirstFoot,
 							(*roadServiceUses.begin())->getDepartureDateTime(),
 							(*roadServiceUses.rbegin())->getArrivalDateTime(),
