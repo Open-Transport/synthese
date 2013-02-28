@@ -39,29 +39,7 @@ namespace synthese
 
 	namespace road
 	{
-		RoadChunk::CarSpeedDividers get_speed_dividers() 
-		{
-			RoadChunk::CarSpeedDividers carSpeedDividers;
-
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_UNKNOWN, 0.9));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_MOTORWAY, 0.95));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_MEDIANSTRIPPEDROAD, 0.85));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PRINCIPLEAXIS, 0.9));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_SECONDARYAXIS, 0.85));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_BRIDGE, 0.8));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_STREET, 0.7));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PEDESTRIANSTREET, 0.5));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_ACCESSROAD, 0.8));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PRIVATEWAY, 0.4));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PEDESTRIANPATH, 0.4));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_TUNNEL, 0.8));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_HIGHWAY, 0.8));
-			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_STEPS, 0.5));
-
-			return carSpeedDividers;
-		}
-
-		const RoadChunk::CarSpeedDividers RoadChunk::CAR_SPEED_FACTORS = get_speed_dividers();
+		const CarSpeedFactors RoadChunk::CAR_SPEED_FACTORS = CarSpeedFactors();
 
 		RoadChunk::RoadChunk(
 			util::RegistryKeyType id,
@@ -129,9 +107,9 @@ namespace synthese
 			}
 			else
 			{
-				if(CAR_SPEED_FACTORS.find(this->getRoad()->getType()) != CAR_SPEED_FACTORS.end())
+				if(CAR_SPEED_FACTORS._factors.find(this->getRoad()->getType()) != CAR_SPEED_FACTORS._factors.end())
 				{
-					return _carSpeed * CAR_SPEED_FACTORS.find(this->getRoad()->getType())->second;
+					return _carSpeed * CAR_SPEED_FACTORS._factors.find(this->getRoad()->getType())->second;
 				}
 				return _carSpeed;
 			}

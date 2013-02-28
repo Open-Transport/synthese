@@ -41,6 +41,30 @@ namespace synthese
 	{
 		class Crossing;
 
+		struct CarSpeedFactors {
+			typedef std::map<Road::RoadType, double> SpeedFactors;
+			SpeedFactors _factors;
+
+			CarSpeedFactors() : _factors()
+			{
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_UNKNOWN, 0.7));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_MOTORWAY, 0.9));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_MEDIANSTRIPPEDROAD, 0.85));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_PRINCIPLEAXIS, 0.8));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_SECONDARYAXIS, 0.6));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_BRIDGE, 0.5));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_STREET, 0.5));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_PEDESTRIANSTREET, 0.5));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_ACCESSROAD, 0.5));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_PRIVATEWAY, 0.2));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_PEDESTRIANPATH, 0.2));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_TUNNEL, 0.5));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_HIGHWAY, 0.8));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_STEPS, 0.5));
+				_factors.insert(SpeedFactors::value_type(Road::ROAD_TYPE_SERVICE, 0.2));
+			}
+		};
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Association class between road and crossings.
 		///	@ingroup m35
@@ -56,8 +80,7 @@ namespace synthese
 			public graph::Edge
 		{
 		public :
-			typedef std::map<Road::RoadType, double> CarSpeedDividers;
-			static const CarSpeedDividers CAR_SPEED_FACTORS;
+			static const CarSpeedFactors CAR_SPEED_FACTORS;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
