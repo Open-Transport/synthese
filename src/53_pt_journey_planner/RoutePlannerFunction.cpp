@@ -42,6 +42,7 @@
 #include "Hub.h"
 #include "Service.h"
 #include "CommercialLine.h"
+#include "TransportNetwork.h"
 #include "RollingStock.hpp"
 #include "RGBColor.h"
 #include "Crossing.h"
