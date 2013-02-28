@@ -83,6 +83,7 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
+			static const std::string PARAMETER_IGNORE_LINE_SHORT_NAME;
 			static const std::string PARAMETER_LETTERS_BEFORE_NUMBERS;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_OUTPUT_GEOMETRY;
@@ -135,6 +136,7 @@ namespace synthese
 				bool _ignoreTimetableExcludedLines;
 				bool _ignoreJourneyPlannerExcludedLines;
 				bool _ignoreDeparturesBoardExcludedLines;
+				bool _ignoreLineShortName;
 				bool _outputMessages;
 				bool _lettersBeforeNumbers;
 				std::string _outputGeometry;
