@@ -24,7 +24,6 @@
 
 #include "Address.h"
 #include "CrossingTableSync.hpp"
-#include "EdgeProjector.hpp"
 #include "RoadModule.h"
 #include "RoadTableSync.h"
 #include "ReplaceQuery.h"
@@ -76,6 +75,8 @@ namespace synthese
 		const string RoadChunkTableSync::COL_ONE_WAY("one_way");
 		const string RoadChunkTableSync::COL_CAR_SPEED("car_speed");
 		const string RoadChunkTableSync::COL_NON_WALKABLE("non_walkable");
+		const string RoadChunkTableSync::COL_NON_DRIVABLE("non_drivable");
+		const string RoadChunkTableSync::COL_NON_BIKABLE("non_bikable");
 	}
 
 	namespace db
@@ -100,6 +101,8 @@ namespace synthese
 			Field(RoadChunkTableSync::COL_ONE_WAY, SQL_INTEGER),
 			Field(RoadChunkTableSync::COL_CAR_SPEED, SQL_DOUBLE),
 			Field(RoadChunkTableSync::COL_NON_WALKABLE, SQL_BOOLEAN),
+			Field(RoadChunkTableSync::COL_NON_DRIVABLE, SQL_BOOLEAN),
+			Field(RoadChunkTableSync::COL_NON_BIKABLE, SQL_BOOLEAN),
 			Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			Field()
 		};
@@ -123,8 +126,6 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			bool noMotorVehicles;
-
 			// Rank in road
 			int rankInRoad (rows->getInt (RoadChunkTableSync::COL_RANKINPATH));
 			object->setRankInPath(rankInRoad);
@@ -147,6 +148,8 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				bool noMotorVehicles(false);
+
 				try
 				{
 					shared_ptr<MainRoadPart> road(RoadTableSync::GetEditable(rows->getLongLong(RoadChunkTableSync::COL_ROADID), env, linkLevel));
@@ -160,6 +163,7 @@ namespace synthese
 					);
 					road->addRoadChunk(*object);
 
+					/* Backward compatibility, useless for OpenStreetMap datas since non_drivable field in database, remove if useless (might broke car journey planning with other datasets) */
 					switch(road->getType())
 					{
 						case Road::ROAD_TYPE_PEDESTRIANSTREET:
@@ -217,16 +221,24 @@ namespace synthese
 				}
 
 				RuleUser::Rules rules(RuleUser::GetEmptyRules());
-				if(rows->getBool(RoadChunkTableSync::COL_NON_WALKABLE))
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-				else
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-				rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+				rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+				rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 				rules[USER_CAR - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 
+				if(rows->getBool(RoadChunkTableSync::COL_NON_WALKABLE))
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+				}				
+
+				if(rows->getBool(RoadChunkTableSync::COL_NON_BIKABLE))
+				{
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+				}				
+
 				int oneWay = rows->getInt(RoadChunkTableSync::COL_ONE_WAY);
-				if(noMotorVehicles)
+				if(rows->getBool(RoadChunkTableSync::COL_NON_DRIVABLE) || noMotorVehicles)
 				{
 					rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
 					object->getReverseRoadChunk()->setRules(rules);
@@ -291,16 +303,22 @@ namespace synthese
 			query.addField(object->getRightHouseNumberBounds() ? lexical_cast<string>(object->getRightHouseNumberBounds()->second) : string());
 			query.addField(static_cast<int>(object->getLeftHouseNumberBounds() ? object->getLeftHouseNumberingPolicy() : MainRoadChunk::ALL));
 			query.addField(static_cast<int>(object->getRightHouseNumberBounds() ? object->getRightHouseNumberingPolicy() : MainRoadChunk::ALL));
-			int oneWay = 0;
+
 			AccessParameters ac(USER_CAR);
-			if(!object->getUseRule(USER_CAR - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac))
+			int oneWay = 0;
+			bool mainCarAllowance = object->getUseRule(USER_CAR - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac);
+			bool reverseCarAllowance = object->getReverseRoadChunk()->getUseRule(USER_CAR - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac);
+			if(!mainCarAllowance && reverseCarAllowance)
 				oneWay = -1;
-			else if(!object->getReverseRoadChunk()->getUseRule(USER_CAR - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac))
+			else if(mainCarAllowance && !reverseCarAllowance)
 				oneWay = 1;
 			query.addField(oneWay);
 			query.addField(object->getCarSpeed(true));
 			ac = AccessParameters(USER_PEDESTRIAN);
 			query.addField(!object->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac));
+			query.addField(!mainCarAllowance && !reverseCarAllowance);
+			ac = AccessParameters(USER_BIKE);
+			query.addField(!object->getUseRule(USER_BIKE - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac));
 			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
 			query.execute(transaction);
 		}

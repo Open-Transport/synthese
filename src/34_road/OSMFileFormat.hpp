@@ -161,7 +161,9 @@ namespace synthese
 					graph::MetricOffset metricOffset,
 					TraficDirection traficDirection = TWO_WAYS,
 					double maxSpeed = 50 / 3.6,
-					bool isNonWalkable = false
+					bool isNonWalkable = false,
+					bool isNonDrivable = false,
+					bool isNonBikable = false
 				) const;
 
 				void _projectHouseAndUpdateChunkHouseNumberBounds(

@@ -170,13 +170,13 @@ std::map<unsigned long long int,std::pair<RelationPtr,std::map<unsigned long lon
 
    util::Log::GetInstance().info("extracting ways by administrative boundaries");
    /*
-   std::map<int,RelationPtr>::iterator boundaryIterator = adminBoundaries.begin();
+   std::map<unsigned long long int,RelationPtr>::iterator boundaryIterator = adminBoundaries.begin();
    while(boundaryIterator != adminBoundaries.end()) {
       RelationPtr boundary = boundaryIterator->second;
-      ret[boundaryIterator->first] = std::pair<RelationPtr,std::map<int,WayPtr> >(boundary, std::map<int,WayPtr>());
+      ret[boundaryIterator->first] = std::pair<RelationPtr,std::map<unsigned long long int,WayPtr> >(boundary, std::map<unsigned long long int,WayPtr>());
       boost::shared_ptr<const geos::geom::prep::PreparedGeometry> boundaryPrepGeom =
             boundary->toPreparedGeometry();
-      std::map<int,WayPtr>::iterator wayIterator = walkableWays.begin();
+      std::map<unsigned long long int,WayPtr>::iterator wayIterator = walkableWays.begin();
       while(wayIterator != walkableWays.end()) {
          WayPtr way = wayIterator->second;
          boost::shared_ptr<const geos::geom::Geometry> wayGeom = way->toGeometry();

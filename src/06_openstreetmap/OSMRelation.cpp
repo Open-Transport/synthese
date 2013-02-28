@@ -190,9 +190,9 @@ std::list<NodePtr> Relation::getNodes(std::string &role) {
 /*
 std::list<WayPtr> Relation::getWays() {
    std::list<WayPtr> ret;
-   std::map<std::string, std::map<int, WayPtr> >::iterator it1 = ways.begin();
+   std::map<std::string, std::map<unsigned long long int, WayPtr> >::iterator it1 = ways.begin();
    while (it1 != ways.end()) {
-      std::map<int, WayPtr>::iterator it2 = it1->second.begin();
+      std::map<unsigned long long int, WayPtr>::iterator it2 = it1->second.begin();
       while (it2 != it1->second.end()) {
          ret.push_back(it2->second);
          it2++;
@@ -328,10 +328,10 @@ geos::geom::Geometry* Relation::extractBoundary() {
 
 /*
 void template<class T> Relation::consolidate(Network *network, T linkedElements) {
-   std::map<std::string,std::map<int, T> >::iterator it1 = linkedElements.begin();
+   std::map<std::string,std::map<unsigned long long int, T> >::iterator it1 = linkedElements.begin();
    while (it1 != linkedElements.end()) {
-      std::map<int, T> typeNodes = it1->second;
-      std::map<int, T>::iterator it2 = typeNodes.begin();
+      std::map<unsigned long long int, T> typeNodes = it1->second;
+      std::map<unsigned long long int, T>::iterator it2 = typeNodes.begin();
       while( it2 != typeNodes.end()) {
          if (!(it2->second)) {
             T node = network->getNode(it2->first);
