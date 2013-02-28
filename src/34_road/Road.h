@@ -76,7 +76,8 @@ namespace synthese
 			ROAD_TYPE_PEDESTRIANPATH, /* chemin pieton */
 			ROAD_TYPE_TUNNEL, /* tunnel */
 			ROAD_TYPE_HIGHWAY, /* route secondaire */
-			ROAD_TYPE_STEPS /* steps */
+			ROAD_TYPE_STEPS, /* steps */
+			ROAD_TYPE_SERVICE
 		} RoadType;
 
 
