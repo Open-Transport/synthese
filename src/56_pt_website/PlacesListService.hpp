@@ -78,6 +78,7 @@ namespace synthese
 
 			static const std::string PARAMETER_COORDINATES_XY;
 			static const std::string PARAMETER_MAX_DISTANCE;
+			static const std::string PARAMETER_COMPATIBLE_USER_CLASSES_LIST;
 
 			static const std::string DATA_BEST_PLACE;
 			static const std::string DATA_CLASS;
@@ -103,6 +104,8 @@ namespace synthese
 			static const std::string DATA_DISTANCE_TO_ORIGIN;
 
 		protected:
+			typedef std::set<graph::UserClassCode> CompatibleUserClassesRequired;
+
 			//! \name Page parameters
 			//@{
 				std::string _text;
@@ -119,6 +122,7 @@ namespace synthese
 				std::string _coordinatesXY;
 				double _maxDistance;
 				boost::shared_ptr<geos::geom::Point> _originPoint;
+				CompatibleUserClassesRequired _requiredUserClasses;
 			//@}
 
 		public:
@@ -198,6 +202,7 @@ namespace synthese
 					_coordinatesXY = coordinatesXY;
 					_parseCoordinates();
 				}
+				void addRequiredUserClass(const graph::UserClassCode code) { _requiredUserClasses.insert(code); }
 
 			//@}
 

@@ -140,7 +140,8 @@ namespace synthese
 			static void ProjectAddress(
 				const geos::geom::Point& point,
 				double maxDistance,
-				Address& address
+				Address& address,
+				algorithm::EdgeProjector<boost::shared_ptr<road::MainRoadChunk> >::CompatibleUserClassesRequired requiredUserClasses = algorithm::EdgeProjector<boost::shared_ptr<road::MainRoadChunk> >::CompatibleUserClassesRequired()
 			);
 		};
 }	}

@@ -478,6 +478,114 @@ namespace synthese
 				_minMaxDurationRatioFilter = map.get<double>(PARAMETER_MIN_MAX_DURATION_RATIO_FILTER);
 			}
 
+			AccessParameters::AllowedPathClasses allowedPathClasses;
+			try
+			{
+				// Rolling stock filter
+				if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
+				{
+					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+					allowedPathClasses = _rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses();
+				}
+			}
+			catch(ObjectNotFoundException<RollingStockFilter>&)
+			{
+			}
+
+			string rsStr(map.getDefault<string>(PARAMETER_ROLLING_STOCK_LIST));
+			try
+			{
+				if(!rsStr.empty())
+                        	{
+					vector<string> rsVect;
+					split(rsVect, rsStr, is_any_of(",; "));
+					allowedPathClasses.insert(0);
+					BOOST_FOREACH(string& rsItem, rsVect)
+					{
+						allowedPathClasses.insert(lexical_cast<RegistryKeyType>(rsItem));
+					}
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Rolling Stock List is unreadable");
+			}
+
+			AccessParameters::AllowedNetworks allowedNetworks;
+			string nwlStr(map.getDefault<string>(PARAMETER_NETWORK_LIST));
+			try
+			{
+				if(!nwlStr.empty())
+                        	{
+					vector<string> nwVect;
+					split(nwVect, nwlStr, is_any_of(",; "));
+					allowedNetworks.insert(0);
+					BOOST_FOREACH(string& nwItem, nwVect)
+					{
+						allowedNetworks.insert(lexical_cast<RegistryKeyType>(nwItem));
+					}
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Network List is unreadable");
+			}
+
+			// Accessibility
+			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
+			if(_config)
+			{
+				_accessParameters = _config->getAccessParameters(
+					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
+					allowedPathClasses,
+					allowedNetworks
+				);
+			}
+			else
+			{
+				if(acint && *acint == USER_HANDICAPPED)
+				{
+					_accessParameters = AccessParameters(
+						*acint, false, false, 300, posix_time::hours(24), 0.556, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+					);
+				}
+				else if(acint && *acint == USER_BIKE)
+				{
+					_accessParameters = AccessParameters(
+						*acint, false, false, 3000, posix_time::hours(24), 4.167, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+					);
+				}
+				else
+				{
+					_accessParameters = AccessParameters(
+						USER_PEDESTRIAN, false, false, 1000, posix_time::hours(24), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+					);
+				}
+			}
+
+			// Max depth
+			if(map.getOptional<size_t>(PARAMETER_MAX_DEPTH))
+			{
+				_accessParameters.setMaxtransportConnectionsCount(map.getOptional<size_t>(PARAMETER_MAX_DEPTH));
+			}
+
+			// Filter on waiting time
+			if(map.getDefault<long>(PARAMETER_MIN_WAITING_TIME_FILTER, 0))
+			{
+				_minWaitingTimeFilter = minutes(map.get<long>(PARAMETER_MIN_WAITING_TIME_FILTER));
+			}
+
+			// Approach speed
+			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
+			{
+				_accessParameters.setApproachSpeed(*(map.getOptional<double>(PARAMETER_APPROACH_SPEED)));
+			}
+
+			if(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE))
+			{
+				_accessParameters.setMaxApproachDistance(*(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE)));
+			}
+
 			// Origin and destination places
 			optional<RegistryKeyType> favoriteId(map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID));
 			if (favoriteId) // Favorite places
@@ -538,6 +646,7 @@ namespace synthese
 					placesListService.setNumber(1);
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
 					placesListService.setCitiesWithAtLeastAStop(false);
+					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
 					placesListService.setCoordinatesXY(originPlaceXY);
 					_departure_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
@@ -588,6 +697,7 @@ namespace synthese
 					placesListService.setNumber(1);
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
 					placesListService.setCitiesWithAtLeastAStop(false);
+					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
 					placesListService.setCoordinatesXY(destinationPlaceXY);
 					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
@@ -653,59 +763,6 @@ namespace synthese
 				throw RequestException(e.what());
 			}
 
-			AccessParameters::AllowedPathClasses allowedPathClasses;
-			try
-			{
-				// Rolling stock filter
-				if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
-				{
-					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
-					allowedPathClasses = _rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses();
-				}
-			}
-			catch(ObjectNotFoundException<RollingStockFilter>&)
-			{
-			}
-
-			string rsStr(map.getDefault<string>(PARAMETER_ROLLING_STOCK_LIST));
-			try
-			{
-				if(!rsStr.empty())
-				{
-					vector<string> rsVect;
-					split(rsVect, rsStr, is_any_of(",; "));
-					allowedPathClasses.insert(0);
-					BOOST_FOREACH(string& rsItem, rsVect)
-					{
-						allowedPathClasses.insert(lexical_cast<RegistryKeyType>(rsItem));
-					}
-				}
-			}
-			catch(bad_lexical_cast&)
-			{
-				throw RequestException("Rolling Stock List is unreadable");
-			}
-
-			AccessParameters::AllowedNetworks allowedNetworks;
-			string nwlStr(map.getDefault<string>(PARAMETER_NETWORK_LIST));
-			try
-			{
-				if(!nwlStr.empty())
-				{
-					vector<string> nwVect;
-					split(nwVect, nwlStr, is_any_of(",; "));
-					allowedNetworks.insert(0);
-					BOOST_FOREACH(string& nwItem, nwVect)
-					{
-						allowedNetworks.insert(lexical_cast<RegistryKeyType>(nwItem));
-					}
-				}
-			}
-			catch(bad_lexical_cast&)
-			{
-				throw RequestException("Network List is unreadable");
-			}
-
 			// Max solutions number
 			_maxSolutionsNumber = map.getOptional<size_t>(PARAMETER_MAX_SOLUTIONS_NUMBER);
 
@@ -714,61 +771,6 @@ namespace synthese
 
 			// Ignore Reservation Rules
 			_ignoreReservationRules = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
-
-			// Accessibility
-			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
-			if(_config)
-			{
-				_accessParameters = _config->getAccessParameters(
-					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
-					allowedPathClasses,
-					allowedNetworks
-				);
-			}
-			else
-			{
-				if(acint && *acint == USER_HANDICAPPED)
-				{
-					_accessParameters = AccessParameters(
-						*acint, false, false, 300, posix_time::hours(24), 0.556, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
-					);
-				}
-				else if(acint && *acint == USER_BIKE)
-				{
-					_accessParameters = AccessParameters(
-						*acint, false, false, 3000, posix_time::hours(24), 4.167, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
-					);
-				}
-				else
-				{
-					_accessParameters = AccessParameters(
-						USER_PEDESTRIAN, false, false, 1000, posix_time::hours(24), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
-					);
-				}
-			}
-
-			// Max depth
-			if(map.getOptional<size_t>(PARAMETER_MAX_DEPTH))
-			{
-				_accessParameters.setMaxtransportConnectionsCount(map.getOptional<size_t>(PARAMETER_MAX_DEPTH));
-			}
-
-			// Filter on waiting time
-			if(map.getDefault<long>(PARAMETER_MIN_WAITING_TIME_FILTER, 0))
-			{
-				_minWaitingTimeFilter = minutes(map.get<long>(PARAMETER_MIN_WAITING_TIME_FILTER));
-			}
-
-			// Approach speed
-			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
-			{
-				_accessParameters.setApproachSpeed(*(map.getOptional<double>(PARAMETER_APPROACH_SPEED)));
-			}
-
-			if(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE))
-			{
-				_accessParameters.setMaxApproachDistance(*(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE)));
-			}
 
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
