@@ -281,6 +281,7 @@ namespace synthese
 				static const std::string DATA_ARRIVAL_LATITUDE;
 				static const std::string DATA_IS_LAST_LEG;
 				static const std::string DATA_IS_FIRST_LEG;
+				static const std::string DATA_USER_CLASS_CODE;
 			//@}
 
 			//! @name Junction cells
@@ -740,7 +741,10 @@ namespace synthese
 				const graph::Vertex& arrivalVertex,
 				bool isLastLeg,
 				bool isFirstLeg,
-				bool isFirstFoot
+				bool isFirstFoot,
+				const boost::posix_time::ptime departureTime,
+				const boost::posix_time::ptime arrivalTime,
+				size_t userClassRank
 			) const;
 
 
