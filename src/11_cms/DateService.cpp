@@ -168,7 +168,7 @@ namespace synthese
 				{
 					throw RequestException("Bad strftime format");
 				}
-				delete str_date;
+				delete[] str_date;
 			}
 			return util::ParametersMap();
 		}
