@@ -26,10 +26,15 @@
 #define SYNTHESE_ProjectAllStopPointsAction_H__
 
 #include "Action.h"
+#include "EdgeProjector.hpp"
 #include "FactorableTemplate.h"
 
 namespace synthese
 {
+	namespace algorithm
+	{
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -50,9 +55,11 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_MAX_DISTANCE;
+			static const std::string PARAMETER_COMPATIBLE_USER_CLASSES_LIST;
 
 		private:
 			double _maxDistance;
+			algorithm::EdgeProjector<boost::shared_ptr<road::MainRoadChunk> >::CompatibleUserClassesRequired _requiredUserClasses;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

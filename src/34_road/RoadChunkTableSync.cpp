@@ -388,7 +388,8 @@ namespace synthese
 		void RoadChunkTableSync::ProjectAddress(
 			const Point& point,
 			double maxDistance,
-			Address& address
+			Address& address,
+			EdgeProjector<shared_ptr<MainRoadChunk> >::CompatibleUserClassesRequired requiredUserClasses
 		){
 			EdgeProjector<shared_ptr<MainRoadChunk> >::From paths(
 				SearchByMaxDistance(
@@ -400,7 +401,7 @@ namespace synthese
 
 			if(!paths.empty())
 			{
-				EdgeProjector<shared_ptr<MainRoadChunk> > projector(paths, maxDistance);
+				EdgeProjector<shared_ptr<MainRoadChunk> > projector(paths, maxDistance, requiredUserClasses);
 
 				try
 				{

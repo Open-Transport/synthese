@@ -28,13 +28,13 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
-#include "EdgeProjector.hpp"
 #include "RoadPlace.h"
 #include "LexicalMatcher.h"
 #include "DBTransaction.hpp"
 #include "StopArea.hpp"
 #include "Road.h"
 #include "RoadChunkTableSync.h"
+#include "RequestException.h"
 
 #include <boost/foreach.hpp>
 
@@ -60,6 +60,7 @@ namespace synthese
 	namespace pt
 	{
 		const string ProjectAllStopPointsAction::PARAMETER_MAX_DISTANCE("md");
+		const string ProjectAllStopPointsAction::PARAMETER_COMPATIBLE_USER_CLASSES_LIST("acList");
 
 
 		ParametersMap ProjectAllStopPointsAction::getParametersMap() const
@@ -74,6 +75,27 @@ namespace synthese
 		void ProjectAllStopPointsAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_maxDistance = map.getDefault<double>(PARAMETER_MAX_DISTANCE, 100);
+
+			string userClassList(map.getDefault<string>(PARAMETER_COMPATIBLE_USER_CLASSES_LIST));
+			try
+			{
+				if(!userClassList.empty())
+				{
+					vector<string> userClassVect;
+					split(userClassVect, userClassList, is_any_of(",; "));
+					BOOST_FOREACH(string& userClass, userClassVect)
+					{
+						UserClassCode code = lexical_cast<UserClassCode>(userClass);
+						// Ignore invalid user class codes
+						if(code > USER_CLASS_CODE_OFFSET && code < (USER_CLASS_CODE_OFFSET + USER_CLASSES_VECTOR_SIZE))
+							_requiredUserClasses.insert(code);
+					}		
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Bad user class code in acList parameter.");
+			}
 		}
 
 
@@ -92,7 +114,6 @@ namespace synthese
 					true
 			)	);
 
-
 			BOOST_FOREACH(const shared_ptr<StopPoint>& stopPoint, stopPoints)
 			{
 				Address address;
@@ -101,7 +122,8 @@ namespace synthese
 					RoadChunkTableSync::ProjectAddress(
 						*stopPoint->getGeometry(),
 						_maxDistance,
-						address
+						address,
+						_requiredUserClasses
 					);
 				}
 				if(address.getRoadChunk())
