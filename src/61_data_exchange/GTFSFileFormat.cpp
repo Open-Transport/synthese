@@ -686,9 +686,9 @@ namespace synthese
 						tripDetail.offsetFromLast = lexical_cast<MetricOffset>(_getValue("shape_dist_traveled"));
 					}
 					else
-                    {
+					{
 						tripDetail.offsetFromLast = 0;
-                    }
+					}
 					stringstream arr_stream(_getValue("arrival_time"));
 					if(arr_stream.str() != "" && arr_stream >> tripDetail.arrivalTime) // Invalid time duration
 					{
@@ -753,7 +753,7 @@ namespace synthese
 		void GTFSFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
 			const server::Request& request
-		) const	{
+		) const {
 			stream << "<h1>Fichiers</h1>";
 
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
@@ -939,7 +939,6 @@ namespace synthese
 					}
 				}
 			}
-
 		}
 
 
