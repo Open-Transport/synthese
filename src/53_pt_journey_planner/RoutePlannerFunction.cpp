@@ -280,6 +280,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_ARRIVAL_LATITUDE("arrival_latitude");
 		const string RoutePlannerFunction::DATA_IS_LAST_LEG("is_last_leg");
 		const string RoutePlannerFunction::DATA_IS_FIRST_LEG("is_first_leg");
+		const string RoutePlannerFunction::DATA_USER_CLASS_CODE("ac");
 
 		// Junction cells
 		const string RoutePlannerFunction::DATA_REACHED_PLACE_IS_NAMED("reached_place_is_named");
@@ -3327,7 +3328,10 @@ namespace synthese
 							*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
 							it+1 == services.end(),
 							it == services.begin(),
-							isFirstFoot
+							isFirstFoot,
+							(*roadServiceUses.begin())->getDepartureDateTime(),
+							(*roadServiceUses.rbegin())->getArrivalDateTime(),
+							(*roadServiceUses.begin())->getUserClassRank()
 						);
 
 						roadServiceUses.clear();
@@ -3462,7 +3466,10 @@ namespace synthese
 			const graph::Vertex& arrivalVertex,
 			bool isLastLeg,
 			bool isFirstLeg,
-			bool isFirstFoot
+			bool isFirstFoot,
+			const posix_time::ptime departureTime,
+			const posix_time::ptime arrivalTime,
+			size_t userClassRank
 		) const {
 			ParametersMap pm(getTemplateParameters());
 
@@ -3499,6 +3506,11 @@ namespace synthese
 			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
+
+			pm.insert(DATA_DEPARTURE_TIME, departureTime.time_of_day());
+			pm.insert(DATA_ARRIVAL_TIME, arrivalTime.time_of_day());
+			pm.insert(DATA_DURATION, arrivalTime - departureTime);
+			pm.insert(DATA_USER_CLASS_CODE, USER_CLASS_CODE_OFFSET + userClassRank);
 
 			// WKT
 			if(geometry)
