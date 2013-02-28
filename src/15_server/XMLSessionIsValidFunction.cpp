@@ -99,7 +99,7 @@ namespace synthese
 
 			// Declarations
 			ParametersMap pm;
-			bool value;
+			bool value = true;
 
 			// Service
 			try
