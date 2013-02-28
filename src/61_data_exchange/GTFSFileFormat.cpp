@@ -1109,10 +1109,27 @@ namespace synthese
 			bool isContinuous
 		) const
 		{
-			boost::gregorian::date currentDay, firstActiveDay;
-			boost::gregorian::date lastActiveDay = service->getLastActiveDate();
+		try
+		{
+			boost::gregorian::date currentDay, firstActiveDay, lastActiveDay;
+			try
+			{
+				lastActiveDay = service->getLastActiveDate();
+			}
+			catch(...)
+			{
+				throw Exception("Service LastActiveDate is corrupted");
+			}
 			bool weekDays [7];
-			currentDay = firstActiveDay = service->getFirstActiveDate();
+
+			try
+			{
+				currentDay = firstActiveDay = service->getFirstActiveDate();
+			}
+			catch(...)
+			{
+				throw Exception("Service FirstActiveDate is corrupted");
+			}
 			boost::gregorian::date::day_of_week_type dayOfWeek = firstActiveDay.day_of_week();
 			unsigned int firstActiveDayIndex = (dayOfWeek + 6) % 7; // 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
 
@@ -1148,6 +1165,15 @@ namespace synthese
 				}
 				currentDay += date_duration(1);
 			}
+		}
+		catch(const Exception & e)
+		{
+			throw Exception("Exception when wrinting calendars for service " + lexical_cast<string>(serviceId) + " : " + e.getMessage());
+		}
+		catch(...)
+		{
+			throw Exception("Unknown exception when wrinting calendars for service " + lexical_cast<string>(serviceId));
+		}
 		}
 
 		void GTFSFileFormat::Exporter_::_addFrequencies(stringstream& frequencies,
@@ -1256,6 +1282,8 @@ namespace synthese
 			bool isContinuous
 		) const
 		{
+			try
+			{
 			RegistryKeyType serviceKey;
 			RegistryKeyType routeId;
 			string tripHeadSign,journeyName;
@@ -1369,6 +1397,16 @@ namespace synthese
 					tripsTxt << endl;
 				}
 				// END TRIPS.TXT
+			}
+			}
+			catch (const Exception & e)
+			{
+				Log::GetInstance().warn("Exception in GTFSFileFormat::Exporter_::_filesProvider: " + e.getMessage() + ", service will be ignored !");
+				throw Exception("Exception in GTFSFileFormat::Exporter_::_filesProvider: " + e.getMessage() + ", service will be ignored !");
+			}
+			catch (...)
+			{
+				throw Exception("Unknown Exception in GTFSFileFormat::Exporter_::_filesProvider");
 			}
 		}
 
