@@ -66,6 +66,8 @@ namespace synthese
 
 			MainRoadChunk* getMainRoadChunk() const { return _mainRoadChunk; }
 
+			boost::shared_ptr<geos::geom::LineString> getRealGeometry() const;
+
 			/// Chosen registry class.
 			typedef util::Registry<ReverseRoadChunk> Registry;
 		};

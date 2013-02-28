@@ -23,6 +23,8 @@
 #include "ReverseRoadChunk.hpp"
 #include "ReverseRoadPart.hpp"
 
+#include <geos/geom/LineString.h>
+
 using namespace std;
 
 namespace synthese
@@ -51,4 +53,16 @@ namespace synthese
 			),
 			_mainRoadChunk(mainRoadChunk)
 		{}
+
+		boost::shared_ptr<geos::geom::LineString> ReverseRoadChunk::getRealGeometry(
+		) const {
+			if(!this->getNext())
+				return boost::shared_ptr<geos::geom::LineString>();
+
+			boost::shared_ptr<geos::geom::LineString> tmpGeom(static_cast<const ReverseRoadChunk*>(this->getNext())->getMainRoadChunk()->getRealGeometry());
+			if(!tmpGeom->isEmpty())
+				return boost::shared_ptr<geos::geom::LineString>(static_cast<geos::geom::LineString*>(tmpGeom->reverse()));
+			else
+				return graph::Edge::getRealGeometry();
+		}
 }	}
