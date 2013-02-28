@@ -104,6 +104,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES = "ittd";
 		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES = "ijpd";
 		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES = "idbd";
+		const string LinesListFunction::PARAMETER_IGNORE_LINE_SHORT_NAME = "ilsn";
 		const string LinesListFunction::PARAMETER_LETTERS_BEFORE_NUMBERS = "letters_before_numbers";
 		const string LinesListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
@@ -198,6 +199,7 @@ namespace synthese
 			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
 			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
 			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
+			result.insert(PARAMETER_IGNORE_LINE_SHORT_NAME, _ignoreLineShortName);
 
 			// Rolling stock filter
 			if(_rollingStockFilter.get() != NULL)
@@ -359,6 +361,7 @@ namespace synthese
 			_ignoreDeparturesBoardExcludedLines = map.isTrue(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES);
 			_ignoreJourneyPlannerExcludedLines = map.isTrue(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES);
 			_ignoreTimetableExcludedLines = map.isTrue(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES);
+			_ignoreLineShortName = map.isTrue(PARAMETER_IGNORE_LINE_SHORT_NAME);
 
 			// Rolling stock filter
 			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
@@ -731,7 +734,10 @@ namespace synthese
 						if(!tm.get() || line->usesTransportMode(*tm))
 						{
 							// Insert respecting order described up there
-							linesMap[tm.get()][SortableLineNumber(line->getShortName(), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
+							if(!_ignoreLineShortName)
+								linesMap[tm.get()][SortableLineNumber(line->getShortName(), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
+							else
+								linesMap[tm.get()][SortableLineNumber(boost::lexical_cast<std::string>(line->getKey()), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
 							alreadyShownLines.insert(line.get());
 						}
 				}	}
@@ -992,6 +998,7 @@ namespace synthese
 			_ignoreTimetableExcludedLines(false),
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false),
+			_ignoreLineShortName(false),
 			_outputMessages(false),
 			_lettersBeforeNumbers(true),
 			_displayDurationBeforeFirstDepartureFilter(false)
