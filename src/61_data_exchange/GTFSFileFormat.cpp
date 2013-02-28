@@ -1109,71 +1109,72 @@ namespace synthese
 			bool isContinuous
 		) const
 		{
-		try
-		{
-			boost::gregorian::date currentDay, firstActiveDay, lastActiveDay;
 			try
 			{
-				lastActiveDay = service->getLastActiveDate();
-			}
-			catch(...)
-			{
-				throw Exception("Service LastActiveDate is corrupted");
-			}
-			bool weekDays [7];
-
-			try
-			{
-				currentDay = firstActiveDay = service->getFirstActiveDate();
-			}
-			catch(...)
-			{
-				throw Exception("Service FirstActiveDate is corrupted");
-			}
-			boost::gregorian::date::day_of_week_type dayOfWeek = firstActiveDay.day_of_week();
-			unsigned int firstActiveDayIndex = (dayOfWeek + 6) % 7; // 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
-
-			// 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
-			for(int i = 0; i<7; i++)
-			{
-				weekDays[(i+firstActiveDayIndex) % 7] = service->isActive(firstActiveDay + date_duration(i));
-			}
-
-			calendar << serviceId << ",";
-
-			for(int i=0; i<7; i++)
-			{
-				calendar << weekDays[i] << ",";
-			}
-
-			calendar << to_iso_string(service->getFirstActiveDate()) << ","
-				<< to_iso_string(service->getLastActiveDate())
-				<< endl;
-
-			// END CALENDAR.TXT
-
-			// BEGIN CALENDAR_DATES.TXT
-			for(int i = 0; currentDay <= lastActiveDay;i++)
-			{
-				bool isNormalyActive = weekDays[(firstActiveDayIndex + i) % 7];
-				if(isNormalyActive != service->isActive(currentDay))
-				{
-					calendarDates << serviceId << ","
-						<< to_iso_string(currentDay) << ","
-						<< (2 - service->isActive(currentDay))
-						<< endl;
+				boost::gregorian::date currentDay, firstActiveDay, lastActiveDay;
+				try
+					{
+					lastActiveDay = service->getLastActiveDate();
 				}
-				currentDay += date_duration(1);
+				catch(...)
+				{
+					throw Exception("Service LastActiveDate is corrupted");
+				}
+				bool weekDays [7];
+
+				try
+				{
+					currentDay = firstActiveDay = service->getFirstActiveDate();
+				}
+				catch(...)
+				{
+					throw Exception("Service FirstActiveDate is corrupted");
+				}
+
+				boost::gregorian::date::day_of_week_type dayOfWeek = firstActiveDay.day_of_week();
+				unsigned int firstActiveDayIndex = (dayOfWeek + 6) % 7; // 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
+
+				// 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
+				for(int i = 0; i<7; i++)
+				{
+					weekDays[(i+firstActiveDayIndex) % 7] = service->isActive(firstActiveDay + date_duration(i));
+				}
+
+				calendar << serviceId << ",";
+
+				for(int i=0; i<7; i++)
+				{
+					calendar << weekDays[i] << ",";
+				}
+
+				calendar << to_iso_string(service->getFirstActiveDate()) << ","
+					<< to_iso_string(service->getLastActiveDate())
+					<< endl;
+
+				// END CALENDAR.TXT
+
+				// BEGIN CALENDAR_DATES.TXT
+				for(int i = 0; currentDay <= lastActiveDay;i++)
+				{
+					bool isNormalyActive = weekDays[(firstActiveDayIndex + i) % 7];
+					if(isNormalyActive != service->isActive(currentDay))
+					{
+						calendarDates << serviceId << ","
+							<< to_iso_string(currentDay) << ","
+							<< (2 - service->isActive(currentDay))
+							<< endl;
+					}
+					currentDay += date_duration(1);
+				}
 			}
-		}
-		catch(const Exception & e)
-		{
-			throw Exception("Exception when wrinting calendars for service " + lexical_cast<string>(serviceId) + " : " + e.getMessage());
-		}
-		catch(...)
-		{
-			throw Exception("Unknown exception when wrinting calendars for service " + lexical_cast<string>(serviceId));
-		}
+			catch(const Exception & e)
+			{
+				throw Exception("Exception when wrinting calendars for service " + lexical_cast<string>(serviceId) + " : " + e.getMessage());
+			}
+			catch(...)
+			{
+				throw Exception("Unknown exception when wrinting calendars for service " + lexical_cast<string>(serviceId));
+			}
 		}
 
 		void GTFSFileFormat::Exporter_::_addFrequencies(stringstream& frequencies,
@@ -1284,120 +1285,120 @@ namespace synthese
 		{
 			try
 			{
-			RegistryKeyType serviceKey;
-			RegistryKeyType routeId;
-			string tripHeadSign,journeyName;
-			bool stopTimesExist = false;
+				RegistryKeyType serviceKey;
+				RegistryKeyType routeId;
+				string tripHeadSign,journeyName;
+				bool stopTimesExist = false;
 
-			routeId = _key(static_cast<const JourneyPattern *>(&(*service->getPath()))->getCommercialLine()->getKey());
+				routeId = _key(static_cast<const JourneyPattern *>(&(*service->getPath()))->getCommercialLine()->getKey());
 
-			const JourneyPattern * line = static_cast<const JourneyPattern *>(&(*service->getPath()));
+				const JourneyPattern * line = static_cast<const JourneyPattern *>(&(*service->getPath()));
 
-			string lineDirection(
-				line->getDirection().empty() && line->getDirectionObj() ?
-				line->getDirectionObj()->getDisplayedText() :
-				line->getDirection()
-			);
-			tripHeadSign = _Str(lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection);
+				string lineDirection(
+					line->getDirection().empty() && line->getDirectionObj() ?
+					line->getDirectionObj()->getDisplayedText() :
+					line->getDirection()
+				);
+				tripHeadSign = _Str(lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection);
 
-			journeyName = _SubLine(_Str(line->getName()));
+				journeyName = _SubLine(_Str(line->getName()));
 
-			RegistryKeyType tripId = _key(service->getKey(), 1);
-			const Path * path = service->getPath();
+				RegistryKeyType tripId = _key(service->getKey(), 1);
+				const Path * path = service->getPath();
 
-			// BEGIN STOP_TIMES.TXT 1/2
+				// BEGIN STOP_TIMES.TXT 1/2
 
-			LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, service->getPath()->getKey()));
+				LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, service->getPath()->getKey()));
 
-			_addStopTimes(stopTimesTxt,
-				lineStops,
-				service,
-				stopTimesExist,
-				isContinuous
-			);
+				_addStopTimes(stopTimesTxt,
+					lineStops,
+					service,
+					stopTimesExist,
+					isContinuous
+				);
 
-			// END STOP_TIMES.TXT 1/2
+				// END STOP_TIMES.TXT 1/2
 
-			const Calendar * currentCal = static_cast<const Calendar *>(service);
-			list <pair<const Calendar *, RegistryKeyType> >::iterator itCal = calendarMap.begin();
-			bool alreadyExist = false;
-			while(itCal != calendarMap.end())
-			{
-				if(*(itCal->first) == *currentCal)
+				const Calendar * currentCal = static_cast<const Calendar *>(service);
+				list <pair<const Calendar *, RegistryKeyType> >::iterator itCal = calendarMap.begin();
+				bool alreadyExist = false;
+				while(itCal != calendarMap.end())
 				{
-					alreadyExist = true;
-					break;
-				}
-				itCal++;
-			}
-
-			if(!alreadyExist)
-			{
-				serviceKey = _key(service->getKey());
-
-				calendarMap.push_back(make_pair(currentCal, serviceKey));
-
-				// BEGIN TRIPS.TXT 1.1
-				// trip_id,service_id,route_id,trip_headsign
-				if(stopTimesExist) // only trips wich have stops_times will be added
-				{
-					if(isContinuous)
+					if(*(itCal->first) == *currentCal)
 					{
-						// BEGIN FREQUENCIES.TXT 1_2
+						alreadyExist = true;
+						break;
+					}
+					itCal++;
+				}
 
-						_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
+				if(!alreadyExist)
+				{
+					serviceKey = _key(service->getKey());
 
-						// END FREQUENCIES.TXT 1_2
+					calendarMap.push_back(make_pair(currentCal, serviceKey));
+
+					// BEGIN TRIPS.TXT 1.1
+					// trip_id,service_id,route_id,trip_headsign
+					if(stopTimesExist) // only trips wich have stops_times will be added
+					{
+						if(isContinuous)
+						{
+							// BEGIN FREQUENCIES.TXT 1_2
+
+							_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
+
+							// END FREQUENCIES.TXT 1_2
+						}
+
+						_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
+
+						// BEGIN SHAPES.TXT 1.1
+
+						_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
+
+						// END SHAPES.TXT 1.1
+
+						tripsTxt << endl;
+
+						// END TRIPS.TXT 1.1
 					}
 
-					_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
+					// BEGIN CALENDAR.TX & CALENDAR_DATES 1/2
 
-					// BEGIN SHAPES.TXT 1.1
+					_addCalendars(calendarTxt, calendarDatesTxt, service, serviceKey, isContinuous);
 
-					_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
-
-					// END SHAPES.TXT 1.1
-
-					tripsTxt << endl;
-
-					// END TRIPS.TXT 1.1
+					// END CALENDAR.TX & CALENDAR_DATES 1/2
 				}
-
-				// BEGIN CALENDAR.TX & CALENDAR_DATES 1/2
-
-				_addCalendars(calendarTxt, calendarDatesTxt, service, serviceKey, isContinuous);
-
-				// END CALENDAR.TX & CALENDAR_DATES 1/2
-			}
-			else
-			{
-				serviceKey = itCal->second;
-
-				// BEGIN TRIPS.TXT 1.2
-				// trip_id,service_id,route_id,trip_headsign
-				if(stopTimesExist)
+				else
 				{
-					_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
+					serviceKey = itCal->second;
 
-					if(isContinuous)
+					// BEGIN TRIPS.TXT 1.2
+					// trip_id,service_id,route_id,trip_headsign
+					if(stopTimesExist)
 					{
-						// BEGIN FREQUENCIES.TXT 2_2
+						_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
 
-						_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
+						if(isContinuous)
+						{
+							// BEGIN FREQUENCIES.TXT 2_2
 
-						// END FREQUENCIES.TXT 2_2
+							_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
+
+							// END FREQUENCIES.TXT 2_2
+						}
+
+						// BEGIN SHAPES.TXT 1.2
+
+						_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
+
+						// END SHAPES.TXT 1.2
+
+						tripsTxt << endl;
 					}
-
-					// BEGIN SHAPES.TXT 1.2
-
-					_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
-
-					// END SHAPES.TXT 1.2
-
-					tripsTxt << endl;
+					// END TRIPS.TXT
 				}
-				// END TRIPS.TXT
-			}
 			}
 			catch (const Exception & e)
 			{
