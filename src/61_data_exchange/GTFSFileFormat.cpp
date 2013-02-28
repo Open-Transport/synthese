@@ -596,6 +596,7 @@ namespace synthese
 			else if(key == FILE_STOP_TIMES)
 			{
 				string lastTripCode;
+				time_duration previousArrivalTime, previousDepartureTime;
 				TripDetailVector tripDetailVector;
 
 				while(getline(inFile, line))
@@ -680,16 +681,40 @@ namespace synthese
 					}
 
 					TripDetail tripDetail;
-					tripDetail.offsetFromLast = lexical_cast<MetricOffset>(_getValue("shape_dist_traveled"));
-					tripDetail.arrivalTime = duration_from_string(_getValue("arrival_time"));
-					if(tripDetail.arrivalTime.seconds())
+					if(_getValue("shape_dist_traveled") != "")
 					{
-						tripDetail.arrivalTime += seconds(60 - tripDetail.arrivalTime.seconds());
+						tripDetail.offsetFromLast = lexical_cast<MetricOffset>(_getValue("shape_dist_traveled"));
 					}
-					tripDetail.departureTime = duration_from_string(_getValue("departure_time"));
-					if(tripDetail.departureTime.seconds())
+					else
+                    {
+						tripDetail.offsetFromLast = 0;
+                    }
+					stringstream arr_stream(_getValue("arrival_time"));
+					if(arr_stream.str() != "" && arr_stream >> tripDetail.arrivalTime) // Invalid time duration
 					{
-						tripDetail.departureTime -= seconds(tripDetail.departureTime.seconds());
+						if(tripDetail.arrivalTime.seconds())
+						{
+							tripDetail.arrivalTime += seconds(60 - tripDetail.arrivalTime.seconds());
+						}
+						previousArrivalTime = tripDetail.arrivalTime;
+					}
+					else  // Invalid time duration
+					{
+						tripDetail.arrivalTime = previousArrivalTime; // Copy previous regulation stop
+					}
+
+					stringstream dep_stream(_getValue("departure_time"));
+					if(dep_stream.str() != "" && dep_stream >> tripDetail.departureTime)
+					{
+						if(tripDetail.departureTime.seconds())
+						{
+							tripDetail.departureTime -= seconds(tripDetail.departureTime.seconds());
+						}
+						previousDepartureTime = tripDetail.departureTime;
+					}
+					else // Invalid time duration
+					{
+						tripDetail.departureTime = previousDepartureTime; // Copy previous regulation stop
 					}
 
 					string stopCode(_getValue("stop_id"));
@@ -965,10 +990,12 @@ namespace synthese
 		RegistryKeyType GTFSFileFormat::Exporter_::_key(RegistryKeyType key,RegistryKeyType suffix) const
 		{
 			RegistryKeyType gtfsKey;
-			gtfsKey = 0;
+			/*gtfsKey = 0;
 			if(suffix)
 				gtfsKey = suffix << 48;
 			gtfsKey |= key & (RegistryKeyType)0xFFFFFFFFFFFF;
+			*/
+			gtfsKey = key;
 			return gtfsKey;
 		}
 
@@ -1232,7 +1259,7 @@ namespace synthese
 		{
 			RegistryKeyType serviceKey;
 			RegistryKeyType routeId;
-			string tripHeadSign;
+			string tripHeadSign,journeyName;
 			bool stopTimesExist = false;
 
 			routeId = _key(static_cast<const JourneyPattern *>(&(*service->getPath()))->getCommercialLine()->getKey());
@@ -1245,6 +1272,8 @@ namespace synthese
 				line->getDirection()
 			);
 			tripHeadSign = _Str(lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection);
+
+			journeyName = _SubLine(_Str(line->getName()));
 
 			RegistryKeyType tripId = _key(service->getKey(), 1);
 			const Path * path = service->getPath();
@@ -1298,7 +1327,7 @@ namespace synthese
 
 					// BEGIN SHAPES.TXT 1.1
 
-					_addShapes(path, tripId, shapesTxt, tripsTxt, tripHeadSign);
+					_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
 
 					// END SHAPES.TXT 1.1
 
@@ -1334,7 +1363,7 @@ namespace synthese
 
 					// BEGIN SHAPES.TXT 1.2
 
-					_addShapes(path, tripId, shapesTxt, tripsTxt, tripHeadSign);
+					_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
 
 					// END SHAPES.TXT 1.2
 
