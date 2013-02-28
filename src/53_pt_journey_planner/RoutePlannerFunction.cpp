@@ -300,6 +300,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_BIKE_PLACES_NUMBER("bike_places_number");
 		const string RoutePlannerFunction::DATA_WKT("wkt");
 		const string RoutePlannerFunction::DATA_LINE_MARKERS("line_markers");
+		const string RoutePlannerFunction::DATA_NETWORK("network");
 
 		RoutePlannerFunction::RoutePlannerFunction(
 		):	_startDate(not_a_date_time),
@@ -3597,6 +3598,7 @@ namespace synthese
 				pm.insert(DATA_ROLLINGSTOCK_NAME, line->getRollingStock()->getName()); // 5
 				pm.insert(DATA_ROLLINGSTOCK_ARTICLE, line->getRollingStock()->getArticle()); // 6
 			}
+			pm.insert(DATA_NETWORK, line->getNetwork()->getName());
 			string lineDirection(
 				line->getDirection().empty() && line->getDirectionObj() ?
 				line->getDirectionObj()->getDisplayedText() :
