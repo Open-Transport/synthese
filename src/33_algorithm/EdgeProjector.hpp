@@ -25,6 +25,8 @@
 
 #include "Exception.h"
 #include "DBModule.h"
+#include "AccessParameters.h"
+#include "ReverseRoadChunk.hpp"
 
 #include <map>
 #include <vector>
@@ -63,6 +65,7 @@ namespace synthese
 			> PathsNearby;
 
 			typedef std::vector<T> From;
+			typedef std::set<graph::UserClassCode> CompatibleUserClassesRequired;
 
 			class NotFoundException:
 			   public synthese::Exception
@@ -77,6 +80,7 @@ namespace synthese
 		private:
 			From _from;
 			double _distanceLimit;
+			const CompatibleUserClassesRequired _requiredUserClasses;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -88,9 +92,11 @@ namespace synthese
 			/// @since 3.2.0
 			EdgeProjector(
 				const From& from,
-				double distance_limit=30
+				double distance_limit=30,
+				const CompatibleUserClassesRequired requiredUserClasses = CompatibleUserClassesRequired()
 			):	_from(from),
-				_distanceLimit(distance_limit)
+				_distanceLimit(distance_limit),
+				_requiredUserClasses(requiredUserClasses)
 			{}
 
 			virtual ~EdgeProjector() {}
@@ -139,6 +145,21 @@ namespace synthese
 			{
 				boost::shared_ptr<geos::geom::LineString> edgeGeom = edge->getRealGeometry();
 				if(!edgeGeom.get() || edgeGeom->isEmpty())
+				{
+					continue;
+				}
+
+				bool compatibleWithUserClasses(true);
+				BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
+				{
+					if(!edge->isCompatibleWith(graph::AccessParameters(userClassCode)) && !edge->getReverseRoadChunk()->isCompatibleWith(graph::AccessParameters(userClassCode)))
+					{
+						compatibleWithUserClasses = false;
+						break;
+					}
+				}
+
+				if(!compatibleWithUserClasses)
 				{
 					continue;
 				}

@@ -79,6 +79,7 @@ namespace synthese
 
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
+		const string PlacesListService::PARAMETER_COMPATIBLE_USER_CLASSES_LIST = "acList";
 
 		const string PlacesListService::DATA_ADDRESS = "address";
 		const string PlacesListService::DATA_ADDRESSES = "addresses";
@@ -110,7 +111,8 @@ namespace synthese
 			_citiesWithAtLeastAStop(true),
 			_minScore(0),
 			_coordinatesSystem(NULL),
-			_maxDistance(300)
+			_maxDistance(300),
+			_requiredUserClasses()
 		{
 			 _houseMap = new HouseMapType();
 		}
@@ -290,6 +292,27 @@ namespace synthese
 			{
 				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
+
+			string userClassList(map.getDefault<string>(PARAMETER_COMPATIBLE_USER_CLASSES_LIST));
+			try
+			{
+				if(!userClassList.empty())
+				{
+					vector<string> userClassVect;
+					split(userClassVect, userClassList, is_any_of(",; "));
+					BOOST_FOREACH(string& userClass, userClassVect)
+					{
+						graph::UserClassCode code = lexical_cast<graph::UserClassCode>(userClass);
+						// Ignore invalid user class codes
+						if(code > graph::USER_CLASS_CODE_OFFSET && code < (graph::USER_CLASS_CODE_OFFSET + graph::USER_CLASSES_VECTOR_SIZE))
+							_requiredUserClasses.insert(code);
+					}		
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Bad user class code in acList parameter.");
+			}
 		}
 
 
@@ -318,9 +341,20 @@ namespace synthese
 					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
 					MainRoadChunk::HouseNumber houseNumber(0);
 
-					// If road doesn't have a name, avoid return it.
-					if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
+					bool compatibleWithUserClasses(true);
+					BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
+					{
+						if(!chunk.isCompatibleWith(graph::AccessParameters(userClassCode)) && !chunk.getReverseRoadChunk()->isCompatibleWith(graph::AccessParameters(userClassCode)))
+						{
+							compatibleWithUserClasses = false;
+							break;
+						}
+					}
+
+					if(!compatibleWithUserClasses)
+					{
 						continue;
+					}
 
 					if(chunk.getLeftHouseNumberBounds() && chunk.getLeftHouseNumberBounds()->first != 0)
 					{
