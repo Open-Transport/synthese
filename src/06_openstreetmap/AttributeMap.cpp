@@ -14,6 +14,11 @@ namespace osm {
 AttributeMap::AttributeMap() {
 }
 
+int AttributeMap::getInteger(const std::string &key) throw (Exception) {
+   std::string value = this->getString(key);
+   return boost::lexical_cast<int>(value);
+}
+
 unsigned long long int AttributeMap::getULongLongInt(const std::string &key) throw (Exception) {
    std::string value = this->getString(key);
    return boost::lexical_cast<unsigned long long int>(value);

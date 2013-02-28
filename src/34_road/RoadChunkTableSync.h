@@ -27,6 +27,7 @@
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "OldLoadSavePolicy.hpp"
+#include "EdgeProjector.hpp"
 
 #include <vector>
 #include <string>
@@ -42,6 +43,10 @@ namespace geos
 
 namespace synthese
 {
+	namespace algorithm
+	{
+	}
+
 	namespace road
 	{
 		class Address;
@@ -100,6 +105,8 @@ namespace synthese
 			static const std::string COL_ONE_WAY;
 			static const std::string COL_CAR_SPEED;
 			static const std::string COL_NON_WALKABLE;
+			static const std::string COL_NON_DRIVABLE;
+			static const std::string COL_NON_BIKABLE;
 
 
 

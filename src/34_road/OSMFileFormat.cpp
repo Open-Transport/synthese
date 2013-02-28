@@ -40,6 +40,7 @@
 #include "RoadTableSync.h"
 #include "RoadChunk.h"
 #include "RoadChunkTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -113,8 +114,7 @@ namespace synthese
 
 			// TODO: use a typedef
 			// FIXME: valgrind shows a leak from here.
-			std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > waysByBoundaries =
-					network->getWaysByAdminBoundary(8);
+			std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > waysByBoundaries = network->getWaysByAdminBoundary(8);
 
 			util::Log::GetInstance().info("extracted ways by boundary");
 
@@ -174,7 +174,29 @@ namespace synthese
 				else
 				{
 					city = cities.front();
-					closestWayFromCentroid = make_pair(0, 0);
+
+					pt::StopAreaTableSync::SearchResult stopAreas = pt::StopAreaTableSync::Search(
+						_env,
+						optional<RegistryKeyType>(city->getKey()),
+						logic::tribool(true),
+						optional<string>(),
+						optional<string>(),
+						optional<string>(),
+						true,
+						true,
+						0,
+						0,
+						util::UP_LINKS_LOAD_LEVEL
+					);
+
+					if(stopAreas.empty())
+					{
+						closestWayFromCentroid = make_pair(0, 9999.9);
+					}
+					else
+					{
+						closestWayFromCentroid = make_pair(0, 0);
+					}
 				}
 
 				// The Synthese <-> OSM objects mapping is done in the following way:
@@ -188,23 +210,21 @@ namespace synthese
 				BOOST_FOREACH(const WayType& w, boundary_ways.second.second)
 				{
 					WayPtr way = w.second;
+					Road::RoadType wayType = way->getAssociatedRoadType();
+
+					bool nonWalkableWay(!way->isWalkable());
+					bool nonDrivableWay(!way->isDrivable());
+					bool nonBikableWay(!way->isBikable());
 
 					shared_ptr<RoadPlace> roadPlace = _getOrCreateRoadPlace(way, city);
 
 					// Create Road
-					shared_ptr<MainRoadPart> road(new MainRoadPart(0, way->getAssociatedRoadType()));
+					shared_ptr<MainRoadPart> road(new MainRoadPart(0, wayType));
 
 					road->setRoadPlace(*roadPlace);
 					road->setKey(RoadTableSync::getId());
 					_env.getEditableRegistry<MainRoadPart>().add(road);
 					_recentlyCreatedRoadParts[way->getId()] = road;
-
-					if(_addCentralChunkReference)
-					{
-						double distance = distance::DistanceOp::distance(*centroid, *way->toGeometry()->getCentroid());
-						if(closestWayFromCentroid.second > distance)
-							closestWayFromCentroid = make_pair(way->getId(), distance);
-					}
 
 					double maxSpeed = way->getAssociatedSpeed();
 
@@ -238,7 +258,15 @@ namespace synthese
 					if(way->hasTag("junction") && (way->getTag("junction") == "roundabout"))
 						traficDirection = ONE_WAY;
 
-					bool nonWalkableWay(!way->isWalkable());
+					// Check if the central chunk is allowed for everybody
+					if(_addCentralChunkReference && !nonWalkableWay && !nonDrivableWay && !nonBikableWay)
+					{
+						double distance = fabs(distance::DistanceOp::distance(*centroid, *way->toGeometry()->getCentroid()));
+						if(closestWayFromCentroid.second > distance)
+						{
+							closestWayFromCentroid = make_pair(way->getId(), distance);
+						}
+					}
 
 					// TODO: move to OSM module
 					typedef std::list<std::pair<unsigned long long int, NodePtr> > NodeList;
@@ -286,7 +314,7 @@ namespace synthese
 
 						shared_ptr<LineString> roadChunkLine(geometryFactory.createLineString(*cs));
 
-						_createRoadChunk(road, startCrossing, roadChunkLine, rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay);
+						_createRoadChunk(road, startCrossing, roadChunkLine, rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay, nonDrivableWay, nonBikableWay);
 
 						metricOffset += roadChunkLine->getLength();
 						startCrossing = _getOrCreateCrossing(node, point);
@@ -300,7 +328,7 @@ namespace synthese
 					}
 
 					// Add last road chunk.
-					_createRoadChunk(road, startCrossing, optional<shared_ptr<LineString> >(), rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay);
+					_createRoadChunk(road, startCrossing, optional<shared_ptr<LineString> >(), rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay, nonDrivableWay, nonBikableWay);
 				}
 
 				const PreparedGeometry* cityGeom = boundary->toPreparedGeometry().get();
@@ -636,7 +664,9 @@ namespace synthese
 			MetricOffset metricOffset,
 			TraficDirection traficDirection,
 			double maxSpeed,
-			bool isNonWalkable
+			bool isNonWalkable,
+			bool isNonDrivable,
+			bool isNonBikable
 		) const {
 			shared_ptr<MainRoadChunk> roadChunk(new MainRoadChunk);
 			roadChunk->setRoad(road.get());
@@ -652,15 +682,29 @@ namespace synthese
 			road->addRoadChunk(*roadChunk);
 
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
-			if(isNonWalkable)
-				rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-			else
-				rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			rules[USER_CAR - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 
-			if(traficDirection == ONE_WAY)
+			if(isNonWalkable)
+			{
+				rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+			}
+
+			if(isNonBikable)
+			{
+				rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+			}
+
+			if(isNonDrivable)
+			{
+				rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+				roadChunk->getReverseRoadChunk()->setRules(rules);
+				roadChunk->setRules(rules);
+			}
+			else if(traficDirection == ONE_WAY)
 			{
 				roadChunk->setRules(rules);
 				rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
