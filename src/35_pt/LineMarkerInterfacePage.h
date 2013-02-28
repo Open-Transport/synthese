@@ -27,6 +27,7 @@
 
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
+#include "ParametersMap.h"
 
 #include <boost/optional.hpp>
 
@@ -112,6 +113,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				const pt::CommercialLine& commercialLine,
+				util::ParametersMap pm = util::ParametersMap(),
 				boost::optional<std::size_t> rank = boost::optional<std::size_t>()
 			);
 		};

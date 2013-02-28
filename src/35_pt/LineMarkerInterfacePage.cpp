@@ -91,9 +91,10 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const pt::CommercialLine& commercialLine,
+			ParametersMap pm,
 			optional<size_t> rank
 		){
-			ParametersMap pm(request.getFunction()->getTemplateParameters());
+			pm.merge(request.getFunction()->getTemplateParameters());
 
 			pm.insert(DATA_STYLE_NAME, commercialLine.getStyle());
 			pm.insert(DATA_IMAGE_URL, commercialLine.getImage());
