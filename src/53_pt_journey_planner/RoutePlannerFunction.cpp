@@ -116,6 +116,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 		const string RoutePlannerFunction::PARAMETER_MAX_DEPTH = "md";
 		const string RoutePlannerFunction::PARAMETER_APPROACH_SPEED = "apsp";
+		const string RoutePlannerFunction::PARAMETER_MAX_APPROACH_DISTANCE = "mad";
 		const string RoutePlannerFunction::PARAMETER_DAY = "dy";
 		const string RoutePlannerFunction::PARAMETER_PERIOD_ID = "pi";
 		const string RoutePlannerFunction::PARAMETER_ACCESSIBILITY = "ac";
@@ -755,6 +756,11 @@ namespace synthese
 			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
 			{
 				_accessParameters.setApproachSpeed(*(map.getOptional<double>(PARAMETER_APPROACH_SPEED)));
+			}
+
+			if(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE))
+			{
+				_accessParameters.setMaxApproachDistance(*(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE)));
 			}
 
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
