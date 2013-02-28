@@ -726,19 +726,19 @@ namespace synthese
 				if(acint && *acint == USER_HANDICAPPED)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 300, posix_time::minutes(23), 0.556, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+						*acint, false, false, 300, posix_time::hours(24), 0.556, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 				else if(acint && *acint == USER_BIKE)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 3000, posix_time::minutes(23), 4.167, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+						*acint, false, false, 3000, posix_time::hours(24), 4.167, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 				else
 				{
 					_accessParameters = AccessParameters(
-						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+						USER_PEDESTRIAN, false, false, 1000, posix_time::hours(24), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 			}
