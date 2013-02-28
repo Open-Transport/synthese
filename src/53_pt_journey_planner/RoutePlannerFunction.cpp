@@ -3605,6 +3605,8 @@ namespace synthese
 				pm
 			);
 
+			pm.insert(DATA_DURATION, firstArrivalDateTime - firstDepartureDateTime);
+
 			if(line->getRollingStock())
 			{
 				pm.insert(DATA_ROLLINGSTOCK_ID, line->getRollingStock()->getKey()); // 4
