@@ -286,12 +286,10 @@ namespace synthese
 
 					/* Spatial lequest on linestring (or other geometrical objects) enveloppes indexes :
 					* The linestring must be retained if it does have an intersection with the "envelope" parameter
-					* There is an intersection if (at least) one of the linestring envelope bound is contained in the "envelope" parameter
+					* There is an intersection if the linestring envelope have at least an intersection with the envelope
 					*/
-					subQuery << "( c.xmin > " << envelope.getMinX() << " AND c.xmin < " << envelope.getMaxX() <<
-						" AND c.ymin > " << envelope.getMinY() << " AND c.ymin < " << envelope.getMaxY() << " ) OR "
-						"( c.xmax > " << envelope.getMinX() << " AND c.xmax < " << envelope.getMaxX() <<
-						" AND c.ymax > " << envelope.getMinY() << " AND c.ymax < " << envelope.getMaxY() << " ) "
+					subQuery << "( c.xmin < " << envelope.getMaxX() << " AND c.xmax > " << envelope.getMinX() <<
+						" AND c.ymin < " << envelope.getMaxY() << " AND c.ymax > " << envelope.getMinY() << " )"
 						;
 
 					/* WARNING :
