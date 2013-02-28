@@ -527,6 +527,7 @@ namespace synthese
 
 					// Departure
 					placesListService.setClassFilter(map.getDefault<string>(PARAMETER_DEPARTURE_CLASS_FILTER));
+					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.setText(originPlaceText);
 					_departure_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
@@ -536,6 +537,7 @@ namespace synthese
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
+					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.setCoordinatesXY(originPlaceXY);
 					_departure_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
@@ -575,6 +577,7 @@ namespace synthese
 
 					// Arrival
 					placesListService.setClassFilter(map.getDefault<string>(PARAMETER_ARRIVAL_CLASS_FILTER));
+					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.setText(destinationPlaceText);
 					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
@@ -584,6 +587,7 @@ namespace synthese
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
+					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.setCoordinatesXY(destinationPlaceXY);
 					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
