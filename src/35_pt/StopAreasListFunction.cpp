@@ -266,7 +266,7 @@ namespace synthese
 						}
 					}
 
-					BOOST_FOREACH(const Edge* edge,journey->getEdges())
+					BOOST_FOREACH(const Edge* edge,journey->getAllEdges())
 					{
 						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea * connPlace(stopPoint->getConnectionPlace());
