@@ -254,6 +254,7 @@ namespace synthese
 			//@{
 				void setApproachSpeed(double value){ _approachSpeed = value; }
 				void setMaxtransportConnectionsCount(boost::optional<size_t> value){ _maxTransportConnectionCount = value;}
+				void setMaxApproachDistance(int maxApproachDistance) { _maxApproachDistance = maxApproachDistance; } 
 			//@}
 		};
 	}
