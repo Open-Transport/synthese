@@ -245,7 +245,7 @@ namespace synthese
 				///		<li>If the edge is the last edge, the vertex point is returned</li>
 				///		<li>Else a right line string between the vertex and the next one is returned</li>
 				/// </ul>
-				boost::shared_ptr<geos::geom::LineString> getRealGeometry(
+				virtual boost::shared_ptr<geos::geom::LineString> getRealGeometry(
 				) const;
 
 
