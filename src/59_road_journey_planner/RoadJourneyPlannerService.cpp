@@ -21,11 +21,10 @@
 
 #include "RoadJourneyPlannerService.hpp"
 
-#include "AlgorithmLogger.hpp"
+#include "AStarShortestPathCalculator.hpp"
 #include "CoordinatesSystem.hpp"
-#include "Edge.h"
+#include "Crossing.h"
 #include "GraphTypes.h"
-#include "MainRoadChunk.hpp"
 #include "NamedPlace.h"
 #include "Place.h"
 #include "PlacesListService.hpp"
@@ -34,16 +33,11 @@
 #include "ReverseRoadChunk.hpp"
 #include "Road.h"
 #include "RoadChunk.h"
-#include "RoadJourneyPlanner.h"
-#include "RoadJourneyPlannerResult.h"
-#include "RoadJourneyPlannerModule.hpp"
-#include "RoadPlace.h"
-#include "Service.h"
-#include "ServicePointer.h"
-#include "Vertex.h"
+#include "VertexAccessMap.h"
 #include "Webpage.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <geos/algorithm/CGAlgorithms.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/LineString.h>
@@ -51,12 +45,12 @@
 #include <geos/io/WKTWriter.h>
 
 using namespace std;
+using namespace geos::algorithm;
 using namespace geos::geom;
 using namespace geos::io;
 
 namespace synthese
 {
-	using namespace algorithm;
 	using namespace cms;
 	using namespace geography;
 	using namespace graph;
@@ -72,8 +66,10 @@ namespace synthese
 	{
 		const std::string RoadJourneyPlannerService::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
 		const std::string RoadJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
-		const std::string RoadJourneyPlannerService::PARAMETER_CAR_TRIP("ct");
+		const std::string RoadJourneyPlannerService::PARAMETER_ACCESSIBILITY("ac");
 		const std::string RoadJourneyPlannerService::PARAMETER_SRID("srid");
+		const std::string RoadJourneyPlannerService::PARAMETER_DEPARTURE_PLACE_XY("departure_place_XY");
+		const std::string RoadJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_XY("arrival_place_XY");
 
 		const std::string RoadJourneyPlannerService::PARAMETER_PAGE("page");
 		const std::string RoadJourneyPlannerService::PARAMETER_BOARD_PAGE("board_page");
@@ -85,6 +81,10 @@ namespace synthese
 		const std::string RoadJourneyPlannerService::DATA_BOARD("board");
 		const std::string RoadJourneyPlannerService::DATA_DEPARTURE_NAME("departure_name");
 		const std::string RoadJourneyPlannerService::DATA_ARRIVAL_NAME("arrival_name");
+		const std::string RoadJourneyPlannerService::DATA_ORIGIN_CITY_TEXT("origin_city_text");
+		const std::string RoadJourneyPlannerService::DATA_ORIGIN_PLACE_TEXT("origin_place_text");
+		const std::string RoadJourneyPlannerService::DATA_DESTINATION_CITY_TEXT("destination_city_text");
+		const std::string RoadJourneyPlannerService::DATA_DESTINATION_PLACE_TEXT("destination_place_text");
 		const std::string RoadJourneyPlannerService::DATA_DEPARTURE_TIME("departure_time");
 		const std::string RoadJourneyPlannerService::DATA_ARRIVAL_TIME("arrival_time");
 		const std::string RoadJourneyPlannerService::DATA_DURATION("duration");
@@ -140,8 +140,6 @@ namespace synthese
 				map.insert(PARAMETER_ARRIVAL_PLACE_TEXT, _destinationPlaceText);
 			}
 
-			map.insert(PARAMETER_CAR_TRIP, _carTrip ? 1 : 0);
-
 			return map;
 		}
 
@@ -155,7 +153,27 @@ namespace synthese
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
-			if(map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT) && map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT))
+			// Accessibility
+			UserClassCode userClassCode(map.getDefault<UserClassCode>(PARAMETER_ACCESSIBILITY, USER_PEDESTRIAN));
+			if(userClassCode == USER_CAR)
+			{
+				_accessParameters = AccessParameters(userClassCode, false, false, 1200000, boost::posix_time::hours(24), 13.889);
+			}
+			else if(userClassCode == USER_BIKE)
+			{
+				_accessParameters = AccessParameters(userClassCode, false, false, 360000, boost::posix_time::hours(24), 4.167);
+			}
+			else
+			{
+				_accessParameters = AccessParameters(userClassCode, false, false, 72000, boost::posix_time::hours(24), 0.833);
+			}
+
+			string originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
+			string destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
+			string originPlaceXY = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY);
+			string destinationPlaceXY = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY);
+
+			if(!originPlaceText.empty() || !destinationPlaceText.empty())
 			{
 				PlacesListService placesListService;
 				placesListService.setNumber(1);
@@ -163,27 +181,44 @@ namespace synthese
 				placesListService.setCitiesWithAtLeastAStop(false);
 				placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-				// Departure
-				placesListService.setText(map.get<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
-				_departure_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.runWithoutOutput()
-				);
+				if(!originPlaceText.empty())
+				{
+					placesListService.setText(originPlaceText);
+					_departure_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 
-				// Arrival
-				placesListService.setText(map.get<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
-				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.runWithoutOutput()
-				);
+				if(!destinationPlaceText.empty())
+				{
+					placesListService.setText(destinationPlaceText);
+					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 			}
 
-			_carTrip = map.getDefault<bool>(PARAMETER_CAR_TRIP, false);
-			if(_carTrip)
+			if(!originPlaceXY.empty() || !destinationPlaceXY.empty())
 			{
-				_accessParameters = AccessParameters(USER_CAR, false, false, 300000, boost::posix_time::hours(5), 1000, 1000);
-			}
-			else
-			{
-				_accessParameters = AccessParameters(USER_PEDESTRIAN, false, false, 300000, boost::posix_time::hours(5), 1.111, 1000);
+				if(!originPlaceXY.empty())
+				{
+					PlacesListService placesListServiceOrigin;
+					placesListServiceOrigin.setNumber(1);
+					placesListServiceOrigin.setCoordinatesSystem(_coordinatesSystem);
+					placesListServiceOrigin.addRequiredUserClass(_accessParameters.getUserClass());
+					placesListServiceOrigin.setCoordinatesXY(originPlaceXY);
+					_departure_place.placeResult = placesListServiceOrigin.getPlaceFromBestResult(placesListServiceOrigin.runWithoutOutput());
+				}
+
+				if(!destinationPlaceXY.empty())
+				{
+					PlacesListService placesListServiceDestination;
+					placesListServiceDestination.setNumber(1);
+					placesListServiceDestination.setCoordinatesSystem(_coordinatesSystem);
+					placesListServiceDestination.addRequiredUserClass(_accessParameters.getUserClass());
+					placesListServiceDestination.setCoordinatesXY(destinationPlaceXY);
+					_arrival_place.placeResult = placesListServiceDestination.getPlaceFromBestResult(placesListServiceDestination.runWithoutOutput());
+				}
 			}
 
 			try
@@ -246,153 +281,130 @@ namespace synthese
 			const Request& request
 		) const {
 			ParametersMap result;
-			const GeometryFactory& gf(CoordinatesSystem::GetDefaultGeometryFactory());
 
-			// Checks if there is something to plan
 			if(!_departure_place.placeResult.value || !_arrival_place.placeResult.value)
 			{
-				result.merge(getTemplateParameters());
 				result.insert(DATA_ERROR_MESSAGE, string("Departure or arrival place not found"));
-				_errorPage->display(stream, request, result);
-				return ParametersMap();
+
+				if(_errorPage.get())
+				{
+					result.merge(getTemplateParameters());
+					_errorPage->display(stream, request, result);
+					return ParametersMap();
+				}
+				else
+					return result;
 			}
 
 			boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
-			boost::posix_time::ptime endDate(now);
-			endDate += boost::posix_time::hours(24);
 
-			AlgorithmLogger logger;
 			Place* departure = _departure_place.placeResult.value.get();
 			Place* arrival = _arrival_place.placeResult.value.get();
 
-			RoadJourneyPlanner r(
+			if(departure->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID).intersercts(arrival->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID)))
+			{
+				result.insert(DATA_ERROR_MESSAGE, string("Same place"));
+
+				if(_errorPage.get())
+				{
+					result.merge(getTemplateParameters());
+					_errorPage->display(stream, request, result);
+					return ParametersMap();
+				}
+				else
+					return result;
+			}
+
+			algorithm::AStarShortestPathCalculator r(
 				departure,
 				arrival,
 				now,
-				endDate,
-				now,
-				endDate,
-				1,
-				_accessParameters,
-				DEPARTURE_FIRST,
-				logger
+				_accessParameters
 			);
-			RoadJourneyPlannerResult resultJourney(r.run());
 
-			if(resultJourney.getJourneys().size())
+			algorithm::AStarShortestPathCalculator::ResultPath path(r.run());
+
+			if(!path.empty())
 			{
-				Journey journey = *resultJourney.getJourneys().begin();
 				boost::shared_ptr<ParametersMap> board(new ParametersMap);
-				size_t rank(0);
-				int total_distance(0);
 
 				if(dynamic_cast<const NamedPlace*>(departure))
 				{
-					board->insert(DATA_DEPARTURE_NAME, dynamic_cast<const NamedPlace*>(departure)->getFullName());
+					const NamedPlace* place = dynamic_cast<const NamedPlace*>(departure);
+					board->insert(DATA_ORIGIN_CITY_TEXT, place->getCity()->getName());
+					board->insert(DATA_ORIGIN_PLACE_TEXT, place->getName());
+					board->insert(DATA_DEPARTURE_NAME, place->getFullName());
 				}
 				else
 				{
-					board->insert(DATA_DEPARTURE_NAME, dynamic_cast<const City*>(departure)->getName());
+					const City* place = dynamic_cast<const City*>(departure);
+					board->insert(DATA_ORIGIN_CITY_TEXT, place->getName());
+					board->insert(DATA_ORIGIN_PLACE_TEXT, "");
+					board->insert(DATA_DEPARTURE_NAME, place->getName());
 				}
 
 				if(dynamic_cast<const NamedPlace*>(arrival))
 				{
-					board->insert(DATA_ARRIVAL_NAME, dynamic_cast<const NamedPlace*>(arrival)->getFullName());
+					const NamedPlace* place = dynamic_cast<const NamedPlace*>(arrival);
+					board->insert(DATA_DESTINATION_CITY_TEXT, place->getCity()->getName());
+					board->insert(DATA_DESTINATION_PLACE_TEXT, place->getName());
+					board->insert(DATA_ARRIVAL_NAME, place->getFullName());
 				}
 				else
 				{
-					board->insert(DATA_ARRIVAL_NAME, dynamic_cast<const City*>(arrival)->getName());
+					const City* place = dynamic_cast<const City*>(arrival);
+					board->insert(DATA_DESTINATION_CITY_TEXT, place->getName());
+					board->insert(DATA_DESTINATION_PLACE_TEXT, "");
+					board->insert(DATA_ARRIVAL_NAME, place->getName());
 				}
 
-				board->insert(DATA_DEPARTURE_TIME, journey.getServiceUses().begin()->getDepartureDateTime());
-				board->insert(DATA_ARRIVAL_TIME, journey.getServiceUses().rbegin()->getArrivalDateTime());
-				board->insert(DATA_DURATION, journey.getServiceUses().rbegin()->getArrivalDateTime() - journey.getServiceUses().begin()->getDepartureDateTime());
+				board->insert(DATA_DEPARTURE_TIME, now);
 
 				int curDistance(0);
-				RoadPlace* curRoadPlace;
-				boost::posix_time::ptime departureTime;
+				size_t rank(0);
+				int total_distance(0);
+				bool first(true);
+				RoadPlace* curRoadPlace(NULL);
+				boost::posix_time::ptime departureTime(now);
 				boost::posix_time::ptime arrivalTime;
 				vector<Geometry*> geometries;
 				vector<Geometry*> curGeom;
 
-
-				BOOST_FOREACH(Journey::ServiceUses::value_type& service, journey.getServiceUses())
+				BOOST_FOREACH(const RoadChunk* chunk, path)
 				{
-					const Road* road;
-					if(dynamic_cast<const Road*>(service.getService()->getPath()))
+					const Road* road = chunk->getRoad();
+
+					boost::shared_ptr<geos::geom::LineString> geometry = chunk->getRealGeometry();
+					boost::shared_ptr<geos::geom::Geometry> geometryProjected(_coordinatesSystem->convertGeometry(*geometry));
+
+					double distance(0);
+					if(geometry)
+						distance = CGAlgorithms::length(geometry->getCoordinates());
+
+					double speed(_accessParameters.getApproachSpeed());
+					if(_accessParameters.getUserClass() == USER_CAR && chunk->getCarSpeed() > 0)
+						speed = chunk->getCarSpeed();
+
+					if(first)
 					{
-						road = static_cast<const Road*>(service.getService()->getPath());
-					}
-					else
-					{
-						continue;
-					}
-
-					geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create(0,2));
-					const graph::Edge *e = service.getDepartureEdge();
-					while(true)
-					{
-						geos::geom::Coordinate c;
-						const Road *curRoad = dynamic_cast<const Road*>(e->getParentPath());
-						if(!curRoad->isReversed()) {
-							c.x = e->getFromVertex()->getGeometry()->getX();
-							c.y = e->getFromVertex()->getGeometry()->getY();
-							coords->add(c,0);
-						}
-						bool addViaPoints = true;
-						if(e == service.getArrivalEdge() && !curRoad->isReversed())
-							addViaPoints = false;
-						if(e == service.getDepartureEdge() && curRoad->isReversed())
-							addViaPoints = false;
-						if(addViaPoints)
-						{
-							LineString* geometry;
-							const RoadChunk* r(static_cast<const RoadChunk*>(e));
-
-							if(r->isReversed())
-								geometry = static_cast<LineString*>(static_cast<const ReverseRoadChunk*>(r)->getMainRoadChunk()->getGeometry()->reverse());
-							else
-								geometry = e->getGeometry().get();
-
-							if(geometry)
-							{
-								for(size_t i(0); i<geometry->getCoordinatesRO()->getSize(); ++i)
-								{
-									coords->add(geometry->getCoordinatesRO()->getAt(i), false);
-								}
-							}
-						}
-						if(curRoad->isReversed())
-						{
-							c.x = e->getFromVertex()->getGeometry()->getX();
-							c.y = e->getFromVertex()->getGeometry()->getY();
-							coords->add(c, false);
-						}
-						if(e == service.getArrivalEdge())
-							break;
-
-						e = e->getFollowingArrivalForFineSteppingOnly();
-					}
-					LineString* serviceLineString = gf.createLineString(coords);
-					boost::shared_ptr<geos::geom::Geometry> geometryProjected(_coordinatesSystem->convertGeometry(*serviceLineString));
-
-					if(!curDistance)
-					{
-						curDistance = static_cast<int>(service.getDistance());
-						departureTime = service.getDepartureDateTime();
-						arrivalTime = service.getArrivalDateTime();
+						curDistance = static_cast<int>(distance);
+						arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
 						curRoadPlace = road->getRoadPlace();
 						curGeom.push_back(geometryProjected.get()->clone());
 						rank++;
+						first = false;
 					}
 					else if(curRoadPlace->getName() == road->getRoadPlace()->getName())
 					{
-						curDistance += static_cast<int>(service.getDistance());
-						arrivalTime = service.getArrivalDateTime();
+						curDistance += static_cast<int>(distance);
+						arrivalTime = arrivalTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
 						curGeom.push_back(geometryProjected.get()->clone());
 					}
 					else
 					{
+						MultiLineString* multiLineString = _coordinatesSystem->getGeometryFactory().createMultiLineString(curGeom);
+						geometries.push_back(multiLineString->clone());
+
 						boost::shared_ptr<ParametersMap> step(new ParametersMap);
 						step->insert(DATA_RANK, rank);
 						step->insert(DATA_ROAD_NAME, curRoadPlace->getName());
@@ -401,22 +413,20 @@ namespace synthese
 						step->insert(DATA_DEPARTURE_STEP_TIME, departureTime);
 						step->insert(DATA_ARRIVAL_STEP_TIME, arrivalTime);
 						step->insert(DATA_STEP_DURATION, arrivalTime - departureTime);
-
-						MultiLineString* multiLineString = _coordinatesSystem->getGeometryFactory().createMultiLineString(curGeom);
-						geometries.push_back(multiLineString->clone());
+						step->insert(DATA_WKT, multiLineString->toText());
 
 						board->insert(DATA_STEP_MAP, step);
 
-						curDistance = static_cast<int>(service.getDistance());
-						departureTime = service.getDepartureDateTime();
-						arrivalTime = service.getArrivalDateTime();
+						curDistance = static_cast<int>(distance);
+						departureTime = arrivalTime;
+						arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
 						curRoadPlace = road->getRoadPlace();
 						curGeom.clear();
-                        			curGeom.push_back(geometryProjected.get()->clone());
+						curGeom.push_back(geometryProjected.get()->clone());
 						rank++;
 					}
 
-					total_distance += service.getDistance();
+					total_distance += static_cast<int>(distance);
 				}
 
 				MultiLineString* multiLineString = _coordinatesSystem->getGeometryFactory().createMultiLineString(curGeom);
@@ -429,39 +439,61 @@ namespace synthese
 				step->insert(DATA_TOTAL_DISTANCE, total_distance);
 				step->insert(DATA_DEPARTURE_STEP_TIME, departureTime);
 				step->insert(DATA_ARRIVAL_STEP_TIME, arrivalTime);
+				step->insert(DATA_STEP_DURATION, arrivalTime - departureTime);
+				step->insert(DATA_WKT, multiLineString->toText());
 
 				board->insert(DATA_STEP_MAP, step);
 				board->insert(DATA_DISTANCE, total_distance);
+
+				board->insert(DATA_ARRIVAL_TIME, arrivalTime);
+				board->insert(DATA_DURATION, arrivalTime - now);
 
 				result.insert(DATA_BOARD_MAP, board);
 
 				GeometryCollection* geometryCollection(_coordinatesSystem->getGeometryFactory().createGeometryCollection(geometries));
 				result.insert(DATA_WKT, geometryCollection->toText());
 			}
-			else
+			else if(_errorPage.get())
 			{
 				if(dynamic_cast<const NamedPlace*>(departure))
 				{
-					result.insert(DATA_DEPARTURE_NAME, dynamic_cast<const NamedPlace*>(departure)->getFullName());
+					const NamedPlace* place = dynamic_cast<const NamedPlace*>(departure);
+					result.insert(DATA_ORIGIN_CITY_TEXT, place->getCity()->getName());
+					result.insert(DATA_ORIGIN_PLACE_TEXT, place->getName());
+					result.insert(DATA_DEPARTURE_NAME, place->getFullName());
 				}
 				else
 				{
-					result.insert(DATA_DEPARTURE_NAME, dynamic_cast<const City*>(departure)->getName());
+					const City* place = dynamic_cast<const City*>(departure);
+					result.insert(DATA_ORIGIN_CITY_TEXT, place->getName());
+					result.insert(DATA_ORIGIN_PLACE_TEXT, "");
+					result.insert(DATA_DEPARTURE_NAME, place->getName());
 				}
 
 				if(dynamic_cast<const NamedPlace*>(arrival))
 				{
-					result.insert(DATA_ARRIVAL_NAME, dynamic_cast<const NamedPlace*>(arrival)->getFullName());
+					const NamedPlace* place = dynamic_cast<const NamedPlace*>(arrival);
+					result.insert(DATA_DESTINATION_CITY_TEXT, place->getCity()->getName());
+					result.insert(DATA_DESTINATION_PLACE_TEXT, place->getName());
+					result.insert(DATA_ARRIVAL_NAME, place->getFullName());
 				}
 				else
 				{
-					result.insert(DATA_ARRIVAL_NAME, dynamic_cast<const City*>(arrival)->getName());
+					const City* place = dynamic_cast<const City*>(arrival);
+					result.insert(DATA_DESTINATION_CITY_TEXT, place->getName());
+					result.insert(DATA_DESTINATION_PLACE_TEXT, "");
+					result.insert(DATA_ARRIVAL_NAME, place->getName());
 				}
 
 				result.merge(getTemplateParameters());
 				result.insert(DATA_ERROR_MESSAGE, string("No results"));
 				_errorPage->display(stream, request, result);
 				return ParametersMap();
+			}
+			else
+			{
+				result.insert(DATA_ERROR_MESSAGE, string("No results"));
+				return result;
 			}
 
 			if(_page.get())
@@ -490,7 +522,7 @@ namespace synthese
 				_page->display(stream, request, result);
 			}
 
-			return ParametersMap();
+			return result;
 		}
 
 

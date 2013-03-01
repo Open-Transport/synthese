@@ -26,13 +26,17 @@
 #define SYNTHESE_RoadTripPlannerAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
-#include "AlgorithmTypes.h"
+#include "GraphConstants.h"
 
 namespace synthese
 {
 	namespace security
 	{
 		class User;
+	}
+
+	namespace graph
+	{
 	}
 
 	namespace road_journey_planner
@@ -51,20 +55,15 @@ namespace synthese
 		class RoadJourneyPlannerAdmin:
 			public admin::AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>
 		{
-			std::string						_startCity;
-			std::string						_startPlace;
-			std::string						_endCity;
-			std::string						_endPlace;
-			int 							_carTrip;
-			algorithm::PlanningOrder				_planningOrder;
+			std::string	_startPlace;
+			std::string	_endPlace;
+			graph::UserClassCode _accessibility;
 
 		public:
-			static const std::string PARAMETER_START_CITY;
 			static const std::string PARAMETER_START_PLACE;
-			static const std::string PARAMETER_END_CITY;
 			static const std::string PARAMETER_END_PLACE;
-			static const std::string PARAMETER_PLANNING_ORDER;
-			static const std::string PARAMETER_CAR_TRIP;
+			static const std::string PARAMETER_ACCESSIBILITY;
+
 			RoadJourneyPlannerAdmin();
 
 
