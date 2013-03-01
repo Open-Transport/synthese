@@ -143,7 +143,7 @@ namespace synthese
 				const std::string& getACodeBySource() const;
 
 				std::string getCodeBySources() const;
-
+				std::string getDataSourceName() const;
 
 
 				void dataSourceLinksToParametersMap(

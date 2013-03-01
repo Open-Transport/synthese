@@ -136,7 +136,22 @@ namespace synthese
 			return result;
 		}
 
-
+		std::string Importable::getDataSourceName() const
+		{
+			string result;
+			BOOST_FOREACH(const DataSourceLinks::value_type& l, _dataSourceLinks)
+			{
+				if(!result.empty())
+				{
+					result += ",";
+				}
+				if(l.first)
+				{
+					result += l.first->getName();
+				}
+			}
+			return result;
+		}
 
 		std::vector<std::string> Importable::getCodesBySource( const DataSource& source ) const
 		{
