@@ -82,7 +82,7 @@ namespace synthese
 		const string ServiceDensityService::DATA_SERVICE_DEPARTURE_SCHEDULE = "serviceDepartureDateTime";
 		const string ServiceDensityService::DATA_COMMERCIAL_LINE_NAME = "serviceCommercialLineName";
 		const string ServiceDensityService::DATA_LINE_NAME = "serviceLineName";
-		const string ServiceDensityService::DATA_SERVICE_NETWORK = "serviceNnetwork";
+		const string ServiceDensityService::DATA_SERVICE_NETWORK = "serviceNetwork";
 		const string ServiceDensityService::DATA_SERVICE_ROLLING_STOCK = "serviceRollingStock";
 		const string ServiceDensityService::DATA_SERVICE_RANK = "serviceRank";
 
