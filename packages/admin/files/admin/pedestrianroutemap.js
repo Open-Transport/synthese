@@ -29,8 +29,6 @@ function map_init() {
         projection: "EPSG:900913"
     } );
 
-
-    // Define the map layer
     var layerOSM = new OpenLayers.Layer.OSM("OSM", null, {
 	isBaseLayer: true,
 
@@ -45,19 +43,18 @@ function map_init() {
         tripLayer = new OpenLayers.Layer.Vector("trip", {style: result_style});
         map.addLayer(tripLayer);
 
-        var bbox;
-        if(journeys[0]) {
-            var journey = journeys[0].geometry.clone();
+        var bbox = new OpenLayers.Bounds();
+        for(var i = 0 ; i < journeys.length ; i++) {
+            var journey = journeys[i].geometry.clone();
             journey.transform(dataProjection,mapProjection);
             var journeyFeature = new OpenLayers.Feature.Vector(journey); 
             tripLayer.addFeatures([journeyFeature]);
-            bbox = journey.getBounds();
-            map.zoomToExtent(bbox);
+	    bbox.extend(journey.getBounds());
         }
+	map.zoomToExtent(bbox);
    }
 }
 
 $(document).ready(function() {
 	map_init();
 });
-

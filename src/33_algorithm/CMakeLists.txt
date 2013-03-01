@@ -9,6 +9,8 @@ AlgorithmModuleRegister.cpp
 AlgorithmModule.h
 AlgorithmModule.inc.cpp
 AlgorithmTypes.h
+AStarShortestPathCalculator.cpp
+AStarShortestPathCalculator.hpp
 BestVertexReachesMap.cpp
 BestVertexReachesMap.h
 EdgeProjector.hpp

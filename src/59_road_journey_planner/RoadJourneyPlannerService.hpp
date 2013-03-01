@@ -45,8 +45,10 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_DEPARTURE_PLACE_TEXT;
 			static const std::string PARAMETER_ARRIVAL_PLACE_TEXT;
-			static const std::string PARAMETER_CAR_TRIP;
+			static const std::string PARAMETER_ACCESSIBILITY;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_DEPARTURE_PLACE_XY;
+			static const std::string PARAMETER_ARRIVAL_PLACE_XY;
 
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_BOARD_PAGE;
@@ -59,6 +61,10 @@ namespace synthese
 			static const std::string DATA_BOARD;
 			static const std::string DATA_DEPARTURE_NAME;
 			static const std::string DATA_ARRIVAL_NAME;
+			static const std::string DATA_ORIGIN_CITY_TEXT;
+			static const std::string DATA_ORIGIN_PLACE_TEXT;
+			static const std::string DATA_DESTINATION_CITY_TEXT;
+			static const std::string DATA_DESTINATION_PLACE_TEXT;
 			static const std::string DATA_DEPARTURE_TIME;
 			static const std::string DATA_ARRIVAL_TIME;
 			static const std::string DATA_DURATION;

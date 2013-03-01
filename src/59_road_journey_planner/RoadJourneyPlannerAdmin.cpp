@@ -24,9 +24,6 @@
 
 #include "RoadJourneyPlannerAdmin.h"
 
-#include "AlgorithmLogger.hpp"
-#include "GeographyModule.h"
-#include "NamedPlace.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "Profile.h"
@@ -34,23 +31,14 @@
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 
-#include "RoadJourneyPlanner.h"
-#include "RoadJourneyPlannerResult.h"
+#include "ResultHTMLTable.h"
 #include "RoadJourneyPlannerModule.hpp"
+#include "RoadJourneyPlannerService.hpp"
 #include "SearchFormHTMLTable.h"
-#include "PTConstants.h"
-#include "Journey.h"
-#include "ServicePointer.h"
-#include "Road.h"
-#include "RoadChunk.h"
-#include "AccessParameters.h"
-#include "RoadPlace.h"
 #include "User.h"
 #include "UserTableSync.h"
-#include "RoadModule.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -64,11 +52,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
-	using namespace algorithm;
 	using namespace security;
 	using namespace graph;
-	using namespace road;
-	using namespace geography;
 	using namespace road_journey_planner;
 
 
@@ -80,22 +65,18 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>::ICON("arrow_switch.png");
-		template<> const string AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>::DEFAULT_TITLE("Itineraires pi&eacute;tons");
+		template<> const string AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>::DEFAULT_TITLE("Itinéraires routiers");
 	}
 
 	namespace road_journey_planner
 	{
-		const std::string RoadJourneyPlannerAdmin::PARAMETER_START_CITY("sc");
 		const std::string RoadJourneyPlannerAdmin::PARAMETER_START_PLACE("sp");
-		const std::string RoadJourneyPlannerAdmin::PARAMETER_END_CITY("ec");
 		const std::string RoadJourneyPlannerAdmin::PARAMETER_END_PLACE("ep");
-		const std::string RoadJourneyPlannerAdmin::PARAMETER_PLANNING_ORDER("po");
-		const std::string RoadJourneyPlannerAdmin::PARAMETER_CAR_TRIP("ct");
+		const std::string RoadJourneyPlannerAdmin::PARAMETER_ACCESSIBILITY("ac");
 
 
 		RoadJourneyPlannerAdmin::RoadJourneyPlannerAdmin(
-		):	AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>(),
-			_planningOrder(DEPARTURE_FIRST)
+		):	AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>()
 		{ }
 
 
@@ -103,12 +84,9 @@ namespace synthese
 		void RoadJourneyPlannerAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_planningOrder = static_cast<PlanningOrder>(map.getDefault<int>(PARAMETER_PLANNING_ORDER));
-			_startCity = map.getDefault<string>(PARAMETER_START_CITY);
 			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
-			_endCity = map.getDefault<string>(PARAMETER_END_CITY);
 			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
-			_carTrip = map.getDefault<int>(PARAMETER_CAR_TRIP, 0);
+			_accessibility = map.getDefault<UserClassCode>(PARAMETER_ACCESSIBILITY, USER_PEDESTRIAN);
 		}
 
 
@@ -116,12 +94,9 @@ namespace synthese
 		ParametersMap RoadJourneyPlannerAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			m.insert(PARAMETER_START_CITY, _startCity);
 			m.insert(PARAMETER_START_PLACE, _startPlace);
-			m.insert(PARAMETER_END_CITY, _endCity);
 			m.insert(PARAMETER_END_PLACE, _endPlace);
-			m.insert(PARAMETER_PLANNING_ORDER, static_cast<int>(_planningOrder));
-			m.insert(PARAMETER_CAR_TRIP, lexical_cast<int>(_carTrip));
+			m.insert(PARAMETER_ACCESSIBILITY, static_cast<int>(_accessibility));
 			return m;
 		}
 
@@ -135,116 +110,114 @@ namespace synthese
 			// Search form
 			stream << "<h1>Recherche</h1>";
 
-			shared_ptr<const Place> startPlace;
-			shared_ptr<const Place> endPlace;
-
-			if (!_startCity.empty() && !_endCity.empty())
-			{
-				startPlace = RoadModule::FetchPlace(_startCity, _startPlace);
-				endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
-			}
+			vector<pair<optional<UserClassCode>, string> > choices;
+			choices.push_back(make_pair(optional<UserClassCode>(USER_PEDESTRIAN), "Piéton"));
+			choices.push_back(make_pair(optional<UserClassCode>(USER_BIKE), "Vélo"));
+			choices.push_back(make_pair(optional<UserClassCode>(USER_CAR), "Voiture"));
 
 			AdminFunctionRequest<RoadJourneyPlannerAdmin> searchRequest(_request, *this);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
-			stream << st.cell("Commune d&eacute;part", st.getForm().getTextInput(
-						PARAMETER_START_CITY,
-						startPlace.get() ?
-						(dynamic_cast<const City*>(startPlace.get()) ? dynamic_cast<const City*>(startPlace.get())->getName() : dynamic_cast<const NamedPlace*>(startPlace.get())->getCity()->getName()) :
-						_startCity
-				)	);
-			stream << st.cell("Lieu d&eacute;part", st.getForm().getTextInput(
-						PARAMETER_START_PLACE,
-						startPlace.get() ?
-						(dynamic_cast<const City*>(startPlace.get()) ? string() : dynamic_cast<const NamedPlace*>(startPlace.get())->getName()) :
-						_startPlace
-				)	);
+			stream << st.cell("Lieu de d&eacute;part", st.getForm().getTextInput(PARAMETER_START_PLACE, _startPlace));
+			stream << st.cell("Lieu d'arriv&eacute;e", st.getForm().getTextInput(PARAMETER_END_PLACE, _endPlace));
 			stream << st.row();
-			stream << st.cell("Commune arriv&eacute;e", st.getForm().getTextInput(
-						PARAMETER_END_CITY,
-						endPlace.get() ?
-						(dynamic_cast<const City*>(endPlace.get()) ? dynamic_cast<const City*>(endPlace.get())->getName() : dynamic_cast<const NamedPlace*>(endPlace.get())->getCity()->getName()) :
-						_endCity
-				)	);
-			stream << st.cell("Lieu arriv&eacute;e", st.getForm().getTextInput(
-						PARAMETER_END_PLACE,
-						endPlace.get() ?
-						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<const NamedPlace*>(endPlace.get())->getName()) :
-						_endPlace
-				)	);
-			stream << st.row();
-			stream << st.cell("Trajet en voiture", st.getForm().getOuiNonRadioInput(PARAMETER_CAR_TRIP, (_carTrip == 1)));
-			stream << st.close();
-			stream << st.getForm().setFocus(PARAMETER_START_CITY);
+			stream << st.cell("Mode de transport", st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, choices, optional<UserClassCode>(_accessibility ? _accessibility : USER_CAR)));
 
-			// No calculation without cities
-			if (_startCity.empty() || _endCity.empty())
+			stream << st.close();
+			stream << st.getForm().setFocus(PARAMETER_START_PLACE);
+
+			ParametersMap param;
+
+			// No calculation without input
+			if (_startPlace.empty() || _endPlace.empty())
 				return;
 
-			ptime now(second_clock::local_time());
+			param.insert("dpt", _startPlace);
+			param.insert("apt", _endPlace);
+			param.insert("srid", 27572);
+			param.insert("ac", static_cast<int>(_accessibility));
 
+			RoadJourneyPlannerService r;
+			r._setFromParametersMap(param);
 
-			ptime endDate(now);
-			if(_planningOrder == DEPARTURE_FIRST)
+			ParametersMap result(r.runWithoutOutput());
+
+			string error = result.getDefault<string>("error_message");
+			if(!error.empty())
 			{
-				endDate += days(1);
+				if(error.compare("Departure or arrival place not found") == 0)
+				{
+					stream << "<p>Lieu de départ ou d'arrivée non trouvé.</p>" << endl;
+				}
+				else if(error.compare("No results") == 0)
+				{
+					stream << "<p>Aucun résultat trouvé.</p>" << endl;
+				}
+				else
+				{
+					stream << "<p>Erreur.</p>" << endl;
+				}
 			}
 			else
 			{
-				endDate -= days(1);
-			}
+				stream << "<h2>Feuille de route</h2>" << endl;
 
-			AccessParameters ap;
-			// Route planning
-			if(_carTrip)
-			{
-				ap = AccessParameters(
-					USER_CAR,
-					false, false, 300000, posix_time::hours(5), 1000,
-					1000
-				);
-			}
-			else
-			{
-				ap = AccessParameters(
-					USER_PEDESTRIAN,
-					false, false, 30000, posix_time::hours(5), 1.111,
-					1000
-				);
-			}
+				const shared_ptr<ParametersMap> boardMap = *result.getSubMaps("boardMap").begin();
 
-			AlgorithmLogger logger;
-			RoadJourneyPlanner r(
-				startPlace.get(),
-				endPlace.get(),
-				_planningOrder == DEPARTURE_FIRST ? now : endDate,
-				_planningOrder == DEPARTURE_FIRST ? endDate : now,
-				_planningOrder == DEPARTURE_FIRST ? now : endDate,
-				_planningOrder == DEPARTURE_FIRST ? endDate : now,
-				1,
-				ap,
-				_planningOrder,
-				logger
-			);
-			RoadJourneyPlannerResult jv(r.run());
+				stream << "<div>Trajet de " << boardMap->getValue("origin_city_text") << " " << boardMap->getValue("origin_place_text") << " à " << boardMap->getValue("destination_city_text") << " " << boardMap->getValue("destination_place_text") << ".</div>" << endl;
+				stream << "Départ à " << boardMap->getValue("departure_time") << ", arrivée à " << boardMap->getValue("arrival_time") << " (" << boardMap->getValue("duration") << ", " << boardMap->getValue("distance") << "m).</div>" << endl;
 
+				HTMLTable::ColsVector v;
+				v.push_back("&Eacute;tape");
+				v.push_back("Rue à prendre");
+				v.push_back("Sur");
+				v.push_back("Départ");
+				v.push_back("Arriv&eacute;e");
+				v.push_back("Distance totale");
+				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
 
-			stream << "<h1>Résultats</h1>";
+				stream << t.open();
+				stream << t.row() << endl;
+				stream << t.col() << "0" << endl;
+				stream << t.col() << boardMap->getValue("departure_name") << endl;
+				stream << t.col() << "&nbsp;" << endl;
+				stream << t.col() << boardMap->getValue("departure_time") << endl;
+				stream << t.col() << "&nbsp;" << endl;
+				stream << t.col() << "0m" << endl;
 
-			jv.displayHTMLTable(stream);
+				size_t rank(0);
 
-			if(jv.getJourneys().size())
-			{
-				stream << "<h2>Carte</h2><div id=\"olmap\"></div>" << std::endl;
+				if(boardMap->hasSubMaps("stepMap"))
+				{
+					BOOST_FOREACH(const shared_ptr<ParametersMap>& step, boardMap->getSubMaps("stepMap"))
+					{
+						stream << t.row() << endl;
+						stream << t.col() << step->getValue("rank") << endl;
+						stream << t.col() << step->getValue("road_name") << endl;
+						stream << t.col() << step->getValue("distance") << "m" << endl;
+						stream << t.col() << step->getValue("departure_time") << endl;
+						stream << t.col() << step->getValue("arrival_time") << endl;
+						stream << t.col() << step->getValue("total_distance") << "m" << endl;
+						rank++;
+					}
+				}
+
+				stream << t.row() << endl;
+				stream << t.col() << ++rank << endl;
+				stream << t.col() << boardMap->getValue("arrival_name") << endl;
+				stream << t.col() << "&nbsp;";
+				stream << t.col() << "&nbsp;" << endl;
+				stream << t.col() << boardMap->getValue("arrival_time") << endl;
+				stream << t.col() << boardMap->getValue("distance") << "m" << endl;
+				stream << t.close() << endl;
+
+				stream << "<h2>Carte</h2><div id=\"olmap\"></div>" << endl;
 				stream << HTMLModule::GetHTMLJavascriptOpen();
-				stream << "var tripWKT=\"" << jv.getTripWKT() << "\";";
+				stream << "var tripWKT=\"" << result.getValue("wkt") << "\";";
 				stream << HTMLModule::GetHTMLJavascriptClose();
 				stream << HTMLModule::GetHTMLJavascriptOpen("http://svn.osgeo.org/metacrs/proj4js/trunk/lib/proj4js-combined.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("http://svn.osgeo.org/metacrs/proj4js/trunk/lib/defs/EPSG900913.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("http://trac.osgeo.org/proj4js/raw-attachment/ticket/32/EPSG27572.js");
-				//stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
-				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
-				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("/lib/openlayers/OpenLayers.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("pedestrianroutemap.js");
 			}
