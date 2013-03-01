@@ -266,9 +266,9 @@ namespace synthese
 			// Filling in the result parameters map
 			ParametersMap pm;
 
-			int nbService = 0;
-			int nbStop = 0;
-			int maxDistance = 0;
+			size_t nbService = 0;
+			size_t nbStop = 0;
+			size_t maxDistance = 0;
 			bool isServiceNumberReadched = false;
 			BOOST_FOREACH(const StopPointSetType::value_type& sp, stopPointSet)
 			{
@@ -283,7 +283,7 @@ namespace synthese
 				}
 				stopMap->insert(DATA_STOP_DATASOURCE,dataSourceName);
 
-				int nbServiceInStop = 0;
+				size_t nbServiceInStop = 0;
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getStopPoint()->getDepartureEdges())
 				{
 					const LineStop* ls = static_cast<const LineStop*>(edge.second);
