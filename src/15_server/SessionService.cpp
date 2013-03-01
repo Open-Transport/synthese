@@ -70,8 +70,10 @@ namespace synthese
 
 			if(	request.getSession())
 			{
+				shared_ptr<ParametersMap> sessionPM(new ParametersMap);
 				Session& session(*request.getSession());
-				session.toParametersMap(map);
+				session.toParametersMap(*sessionPM);
+				map.insert(TAG_SESSION, sessionPM);
 			}
 
 			return map;
