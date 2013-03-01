@@ -9,6 +9,7 @@
 #include "LineStopGetService.hpp"
 #include "StopAreasListFunction.hpp"
 #include "StopPointsListFunction.hpp"
+#include "ServiceDensityService.hpp"
 #include "RealTimeUpdateFunction.h"
 #include "PhysicalStopsCSVExportFunction.h"
 #include "PTNetworksListFunction.hpp"
@@ -211,6 +212,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PhysicalStopsCSVExportFunction::integrate();
 	synthese::pt::LinesListFunction::integrate();
 	synthese::pt::StopPointsListFunction::integrate();
+	synthese::pt::ServiceDensityService::integrate();
 	synthese::pt::StopAreasListFunction::integrate();
 	synthese::pt::PTNetworksListFunction::integrate();
 	synthese::pt::PTRoutesListFunction::integrate();
