@@ -868,9 +868,15 @@ namespace synthese
 
 			stringstream s;
 			ParametersMap pm;
-			toParametersMap(pm);
+
+			shared_ptr<ParametersMap> screenPM(new ParametersMap);
+			toParametersMap(*screenPM);
+			pm.insert("screen", screenPM);
 			pm.insert(VAR_BROADCAST_POINT_TYPE, VALUE_DISPLAY_SCREEN);
-			pm.insert(VAR_MESSAGE_ID, message.getKey());
+			shared_ptr<ParametersMap> messagePM(new ParametersMap);
+			message.toParametersMap(*messagePM, false, string(), true);
+			pm.insert("message", messagePM);
+
 			_displayType->getMessageIsDisplayedPage()->display(s, pm);
 			string str(s.str());
 			trim(str);
