@@ -923,17 +923,31 @@ namespace synthese
 				BOOST_FOREACH(const Messages::value_type& msg, _messages)
 				{
 					Env env;
-					shared_ptr<SentAlarm> alarm;
+					shared_ptr<Alarm> alarm;
 
-					if(msg.id)
+					if(_sscenario.get())
 					{
-						alarm = AlarmTableSync::GetCastEditable<SentAlarm>(msg.id, env);
+						if(msg.id)
+						{
+							alarm = AlarmTableSync::GetCastEditable<SentAlarm>(msg.id, env);
+						}
+						else
+						{
+							alarm.reset(new SentAlarm);
+						}
 					}
 					else
 					{
-						alarm.reset(new SentAlarm);
+						if(msg.id)
+						{
+							alarm = AlarmTableSync::GetCastEditable<AlarmTemplate>(msg.id, env);
+						}
+						else
+						{
+							alarm.reset(new AlarmTemplate);
+						}
 					}
-					alarm->setScenario(_sscenario.get());
+					alarm->setScenario(_scenario.get());
 					alarm->setShortMessage(msg.title);
 					alarm->setLongMessage(msg.content);
 					alarm->setLevel(msg.level);
