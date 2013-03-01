@@ -125,6 +125,7 @@ namespace synthese
 			{
 				typedef set<pair<City*, string> > MissingStreets;
 				MissingStreets missingStreets;
+				set<string> missingCities;
 				size_t ok(0);
 				size_t streetTooFar(0);
 				size_t cityNotFound(0);
@@ -263,6 +264,7 @@ namespace synthese
 							if(cities.empty())
 							{
 								++cityNotFound;
+								missingCities.insert(cityName);
 								continue;
 							}
 							else
@@ -298,6 +300,25 @@ namespace synthese
 						}
 					}
 
+				}
+
+				if(!missingCities.empty())
+				{
+					os << "<h1>Villes non trouvées</h1>";
+
+					// Header
+					HTMLTable::ColsVector c;
+					c.push_back("Commune");
+
+					// Table
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					os << t.open();
+					BOOST_FOREACH(const string missingCity, missingCities)
+					{
+						os << t.row();
+						os << t.col() << missingCity;
+					}
+					os << t.close();
 				}
 
 				if(!missingStreets.empty())
