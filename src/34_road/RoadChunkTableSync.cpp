@@ -163,7 +163,14 @@ namespace synthese
 					);
 					road->addRoadChunk(*object);
 
-					/* Backward compatibility, useless for OpenStreetMap datas since non_drivable field in database, remove if useless (might broke car journey planning with other datasets) */
+					/* 
+					TODO Backward compatibility.
+					Useless for OpenStreetMap datas since non_drivable field in database (r8381)
+					and after a fresh OSM import.
+					Now the OSM importer check those fields (and some more) and save it into DB.
+					Should be useless soon for OSM graph, might be still usefull for pure road
+					journey planning on NAVTEQ graph (must be pretty rare).
+					*/
 					switch(road->getType())
 					{
 						case Road::ROAD_TYPE_PEDESTRIANSTREET:
