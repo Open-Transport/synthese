@@ -37,8 +37,13 @@
 #include "StaticActionFunctionRequest.h"
 #include "StaticFunctionRequest.h"
 #include "SVNCheckoutAction.hpp"
+#include "SVNUpdateAction.hpp"
 #include "User.h"
+#include "Webpage.h"
+#include "Website.hpp"
 
+using namespace boost;
+using namespace boost::algorithm;
 using namespace std;
 
 namespace synthese
@@ -120,6 +125,11 @@ namespace synthese
 					checkoutRequest.getAction()->setUser(_svnUser);
 					checkoutRequest.getAction()->setUser(_svnPassword);
 
+					// Update request
+					StaticActionFunctionRequest<SVNUpdateAction, PackagesService> updateRequest(request, true);
+					updateRequest.getAction()->setUser(_svnUser);
+					updateRequest.getAction()->setUser(_svnPassword);
+
 					// Draw the table
 					HTMLTable::ColsVector c;
 					c.push_back("Package");
@@ -132,23 +142,81 @@ namespace synthese
 					p << t.open();
 					BOOST_FOREACH(const string& package, packages)
 					{
+						// Jump over empty strings
+						if(trim_copy(package).empty())
+						{
+							continue;
+						}
+
+						// Check of the id of the site
+						SVNCommands::LsResult files(
+							_repo.ls("/"+ package, _svnUser, _svnPassword)
+						);
+						RegistryKeyType siteId(0);
+						BOOST_FOREACH(const string& file, files)
+						{
+							if(	file.size() > 5 &&
+								file.substr(file.size() - 5, 5) == ".dump"
+							){
+								try
+								{
+									siteId = lexical_cast<RegistryKeyType>(
+										file.substr(0, file.size() - 5)
+									);
+								}
+								catch(bad_lexical_cast&)
+								{
+								}
+							}
+						}
+
+						// No id was found : corrupted package
+						if(!siteId)
+						{
+							continue;
+						}
+
+						// Is the package currently installed ?
+						bool isInstalled(
+							Env::GetOfficialEnv().getRegistry<Website>().contains(siteId)
+						);
+
+						// HTML output
 						p << t.row();
 
+						// Package name
 						p << t.col() << package;
 
-						p << t.col() << "NON";
+						// Package is installed =
+						p << t.col() <<
+							(isInstalled ? "OUI" : "NON");
 
-						// Installation action
+						// Action cell
 						if(installRight)
 						{
-							SVNRepository packageRepo(_repo.getURL() +"/"+ package);
-							checkoutRequest.getAction()->setRepo(packageRepo);
 							p << t.col();
-							p << HTMLModule::getLinkButton(
-								checkoutRequest.getURL(),
-								"Installer",
-								"Etes-vous sûr de vouloir installer le package "+ package +" ?"
-							);
+							if(isInstalled)
+							{
+								shared_ptr<ObjectBase> site(
+									Env::GetOfficialEnv().getCastEditable<ObjectBase, Website>(siteId)
+								);
+								updateRequest.getAction()->setObject(site);
+								p << HTMLModule::getLinkButton(
+									updateRequest.getURL(),
+									"Mettre à jour",
+									"Etes-vous sûr de vouloir mettre à jour le package "+ package +" ?"
+								);
+							}
+							else
+							{
+								SVNRepository packageRepo(_repo.getURL() +"/"+ package);
+								checkoutRequest.getAction()->setRepo(packageRepo);
+								p << HTMLModule::getLinkButton(
+									checkoutRequest.getURL(),
+									"Installer",
+									"Etes-vous sûr de vouloir installer le package "+ package +" ?"
+								);
+							}
 						}
 					}
 					p << t.close();

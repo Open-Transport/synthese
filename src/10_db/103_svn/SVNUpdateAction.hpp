@@ -94,6 +94,8 @@ namespace synthese
 
 				//! @name Setters
 				//@{
+					void setUser(const std::string& value){ _user = value; }
+					void setPassword(const std::string& value){ _password = value; }
 					void setObject(boost::shared_ptr<ObjectBase> value) { _object = value; }
 				//@}
 			};
