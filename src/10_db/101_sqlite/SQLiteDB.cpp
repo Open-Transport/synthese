@@ -551,6 +551,11 @@ namespace synthese
 			ReplaceStatements::mapped_type& replaceStatements(_replaceStatements[this_thread::get_id()]);
 			DeleteStatements::mapped_type& deleteStatements(_deleteStatements[this_thread::get_id()]);
 
+			if(DBModule::GetTablesById().empty())
+			{
+				return;
+			}
+
 			// Clear the statements
 			size_t tablesNumber(
 				DBModule::GetTablesById().rbegin()->first + 1
