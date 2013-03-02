@@ -542,7 +542,7 @@ namespace synthese
 			}
 
 			map<std::string, std::pair<RegistryKeyType, string> > m;
-			BOOST_FOREACH(const DisplayScreen* screen, screens)
+			for(size_t i(0); i < screens.size(); ++i)
 			{
 				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, getPhysicalStops())
 				{
