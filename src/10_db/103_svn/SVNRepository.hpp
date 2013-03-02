@@ -82,6 +82,16 @@ namespace synthese
 						const std::string& user,
 						const std::string& password
 					) const;
+
+
+
+					//////////////////////////////////////////////////////////////////////////
+					/// Obtains the list of the elements contained in a specified directory of the repository
+					SVNCommands::LsResult ls(
+						const std::string& path,
+						const std::string& user,
+						const std::string& password
+					) const;
 				//@}
 			};
 }	}	}

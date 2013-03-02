@@ -69,4 +69,14 @@ namespace synthese
 			) const	{
 				return _svnLs(user, password, _url);
 			}
+
+
+
+			SVNCommands::LsResult SVNRepository::ls(
+				const std::string& path,
+				const std::string& user,
+				const std::string& password
+			) const	{
+				return _svnLs(user, password, _url + path);
+			}
 }	}	}
