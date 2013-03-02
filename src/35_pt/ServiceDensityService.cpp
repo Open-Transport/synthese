@@ -47,6 +47,7 @@
 
 using namespace std;
 using namespace geos::geom;
+using namespace geos::util;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::algorithm;
