@@ -178,12 +178,10 @@ namespace synthese
 			const ObjectBase& object,
 			DBContent& content
 		){
-			boost::optional<std::string> s;
-			if(fieldObject.get() && !fieldObject->isEmpty())
-			{
-				s = _geomToString(fieldObject);
-			}
-			content.push_back(Cell(s));
+			content.push_back(
+				Cell(
+					static_pointer_cast<geos::geom::Geometry, T::Type>(fieldObject)
+			)	);
 		}
 
 
