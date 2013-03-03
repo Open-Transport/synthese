@@ -342,7 +342,6 @@ namespace synthese
 
 			_tabBuilded = true;
 		}
-	}
-}
+}	}
 
 
