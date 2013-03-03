@@ -26,9 +26,18 @@
 #include "UtilTypes.h" // TODO : merge this file in the current one
 
 #include <boost/optional.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/variant.hpp>
 #include <string>
 #include <vector>
+
+namespace geos
+{
+	namespace geom
+	{
+		class Geometry;
+	}
+}
 
 namespace synthese
 {
@@ -42,7 +51,8 @@ namespace synthese
 		size_t,
 		double,
 		util::RegistryKeyType,
-		boost::optional<Blob>
+		boost::optional<Blob>,
+		boost::shared_ptr<geos::geom::Geometry> // Will be useless when all tables will be migrated in the fusion mode (GeometryField produces directly WKT string)
 	> Cell;
 
 	typedef std::vector<Cell> DBContent;

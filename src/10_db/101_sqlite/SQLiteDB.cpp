@@ -34,10 +34,13 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <geos/geom/Geometry.h>
+#include <geos/io/WKTWriter.h>
 #include <spatialite.h>
 
 using namespace std;
 using namespace boost;
+using namespace geos::io;
 
 namespace synthese
 {
@@ -752,6 +755,26 @@ namespace synthese
 
 
 
+		void SQLiteDB::DBRecordCellBindConvertor::operator()( const boost::shared_ptr<geos::geom::Geometry>& geom ) const
+		{
+			string str;
+			if(geom)
+			{
+				boost::shared_ptr<geos::geom::Geometry> projected(geom);
+				if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+					static_cast<CoordinatesSystem::SRID>(geom->getSRID())
+				){
+					projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*geom);
+				}
+
+				WKTWriter wkt;
+				str = wkt.write(projected.get());
+			}
+			sqlite3_bind_text(&_stmt, static_cast<int>(_i), str.c_str(), static_cast<int>(str.size()), NULL);
+		}
+
+
+
 		SQLiteDB::RequestExecutor::RequestExecutor( SQLiteDB& db ):
 			_db(db)
 		{
@@ -778,7 +801,13 @@ namespace synthese
 		void SQLiteDB::RequestExecutor::operator()( const DBRecord& record )
 		{
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
-			ReplaceStatements::mapped_type& replaceStatements(_replaceStatements[this_thread::get_id()]);
+			ReplaceStatements::iterator it(_replaceStatements.find(this_thread::get_id()));
+			assert(it != _replaceStatements.end());
+			if(it == _replaceStatements.end())
+			{
+				return;
+			}
+			ReplaceStatements::mapped_type& replaceStatements(it->second);
 			sqlite3_stmt* stmt(replaceStatements[record.getTable()->getFormat().ID]);
 			for(size_t i(0); i<fieldsNumber; ++i)
 			{
