@@ -770,7 +770,9 @@ namespace synthese
 				WKTWriter wkt;
 				str = wkt.write(projected.get());
 			}
-			sqlite3_bind_text(&_stmt, static_cast<int>(_i), str.c_str(), static_cast<int>(str.size()), NULL);
+			char* persistentStr = (char*) malloc(str.size() * sizeof(char));
+			memcpy(persistentStr, str.c_str(), str.size());
+			sqlite3_bind_text(&_stmt, static_cast<int>(_i), persistentStr, static_cast<int>(str.size()), free);
 		}
 
 
