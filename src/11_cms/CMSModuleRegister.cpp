@@ -15,6 +15,7 @@
 #include "DateService.hpp"
 #include "EvalService.hpp"
 #include "LanguageSelectorService.hpp"
+#include "NoOpService.hpp"
 #include "NotService.hpp"
 #include "PackagesService.hpp"
 #include "PrecisionService.hpp"
@@ -90,6 +91,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::EqualFunction::integrate();
 	synthese::cms::SuperiorFunction::integrate();
 	synthese::cms::AndFunction::integrate();
+	synthese::cms::NoOpService::integrate();
 	synthese::cms::OrService::integrate();
 	synthese::cms::WebPageLinksFunction::integrate();
 	synthese::cms::WebPagePositionFunction::integrate();
