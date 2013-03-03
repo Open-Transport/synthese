@@ -33,8 +33,12 @@
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
 
+#include <geos/geom/Geometry.h>
+#include <geos/io/WKTWriter.h>
+
 using namespace boost;
 using namespace std;
+using namespace geos::io;
 
 namespace synthese
 {
@@ -548,6 +552,30 @@ namespace synthese
 					0 << DBInterSYNTHESE::FIELD_SEPARATOR
 				;
 			}
+		}
+
+
+
+		void DBInterSYNTHESE::ContentGetter::operator()( const boost::shared_ptr<geos::geom::Geometry>& geom ) const
+		{
+			string str;
+			if(geom)
+			{
+				boost::shared_ptr<geos::geom::Geometry> projected(geom);
+				if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+					static_cast<CoordinatesSystem::SRID>(geom->getSRID())
+					){
+						projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*geom);
+				}
+
+				WKTWriter wkt;
+				str = wkt.write(projected.get());
+			}
+			_result <<
+				0 << DBInterSYNTHESE::FIELD_SEPARATOR <<
+				str.size() << DBInterSYNTHESE::FIELD_SEPARATOR <<
+				str
+			;
 		}
 
 
