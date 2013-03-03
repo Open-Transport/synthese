@@ -180,7 +180,7 @@ namespace synthese
 		){
 			content.push_back(
 				Cell(
-					static_pointer_cast<geos::geom::Geometry, T>(fieldObject)
+					boost::static_pointer_cast<geos::geom::Geometry, T>(fieldObject)
 			)	);
 		}
 
