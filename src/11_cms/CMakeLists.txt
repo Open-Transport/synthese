@@ -51,6 +51,8 @@ LanguageSelectorService.cpp
 LanguageSelectorService.hpp
 MailService.cpp
 MailService.hpp
+NoOpService.cpp
+NoOpService.hpp
 NotService.cpp
 NotService.hpp
 OrService.cpp
