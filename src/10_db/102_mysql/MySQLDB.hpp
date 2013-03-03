@@ -83,6 +83,7 @@ namespace synthese
 				void operator()(const util::RegistryKeyType& id) const;
 				void operator()(const boost::optional<std::string>& str) const;
 				void operator()(const boost::optional<Blob>& blob) const;
+				void operator()(const boost::shared_ptr<geos::geom::Geometry>& geom) const;
 			};
 
 			class RequestExecutor:

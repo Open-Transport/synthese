@@ -38,7 +38,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <errmsg.h>
+#include <geos/geom/Geometry.h>
+#include <geos/io/WKTWriter.h>
 
+using namespace geos::io;
 using namespace std;
 using boost::bind;
 using boost::lexical_cast;
@@ -1032,6 +1035,28 @@ namespace synthese
 			{
 				*_bnd.is_null = true;
 			}
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const boost::shared_ptr<geos::geom::Geometry>& geom ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_STRING;
+			string str;
+			if(geom)
+			{
+				boost::shared_ptr<geos::geom::Geometry> projected(geom);
+				if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+					static_cast<CoordinatesSystem::SRID>(geom->getSRID())
+				){
+					projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*geom);
+				}
+
+				WKTWriter wkt;
+				str = wkt.write(projected.get());
+			}
+			_bnd.buffer = static_cast<void*>(const_cast<char*>(str.c_str()));
+			*_bnd.length = str.size();
 		}
 
 
