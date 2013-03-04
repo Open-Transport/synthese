@@ -35,6 +35,8 @@ import subprocess
 import sys
 import threading
 import time
+import shutil
+from datetime import datetime, timedelta
 
 import flask
 from flask import g, request
@@ -51,6 +53,7 @@ thisdir = os.path.abspath(os.path.dirname(__file__))
 
 log = logging.getLogger(__name__)
 
+CONFIG_FILE = 'kiosk_config.json'
 
 def get_thirdparty_binary(dir_name, fatal=True):
     suffix = ''
@@ -277,11 +280,11 @@ user_pref("network.proxy.type", 1);
 
 
 class Display(object):
-    def __init__(self, kiosk, index, name):
+    def __init__(self, kiosk, index, name, url):
         config = kiosk.config
         self._kiosk = kiosk
         self._proxy = kiosk._proxy
-        self._synthese_url = config['synthese_url']
+        self._synthese_url = url
         self._index = index
         self._name = name
         self._browser_name = config['browser']
@@ -290,6 +293,7 @@ class Display(object):
         self._debug = config['debug']
         self._browser = None
         self._url = None
+        log.debug('Creating display ' + name + ' ' + self._synthese_url);
 
     def __str__(self):
         return '<Display %s>' % self.__dict__
@@ -378,26 +382,19 @@ class Display(object):
         else:
             raise Exception('Unsupported browser: %s', self._browser_name)
 
-    def refresh(self, force_reload=False):
-        KIOSK_PATH = '/kiosk/kiosk.html'
-        kiosk_params = {
-            'display': self._name,
-        }
-        if self._debug:
-            kiosk_params['debug'] = True
-        if not self._kiosk.online:
-            kiosk_params['offline'] = True
-
-        kiosk_url = '{0}{1}#{2}'.format(
-            self._synthese_url, KIOSK_PATH, json.dumps(kiosk_params))
-
+    def refresh(self, force_reload=False, new_url=None):
         old_url = self._url
-        self._url = kiosk_url
+        if new_url:
+            self._url = new_url
+        else:
+            self._url = self._synthese_url
+
         if self._url == old_url and not force_reload:
-            log.debug('Browser already has the url loaded, not refreshing')
+            log.debug('Browser already has the url ' + self._url + 'loaded, not refreshing')
             return
         log.debug('Showing url: %s', self._url)
         self.browser.get(self._url)
+        log.info('refreshing browser ' + self._url)
         self.browser.refresh()
 
     def stop(self):
@@ -419,8 +416,8 @@ DEFAULT_CONFIG = {
     'browser_path': None,
     'browser_args': ['URL'],
     'displays': [],
-    'caching_proxy': True,
     'debug': False,
+    'offline_cache_dir': None,
 }
 
 
@@ -512,7 +509,33 @@ def screenshot(index):
     response.mimetype = 'image/png'
     return response
 
+def fallback(name):
+    log.info('Serving file ' + g.kiosk.config['offline_cache_dir'] + "/" + name)
+    if not os.path.isfile(g.kiosk.config['offline_cache_dir'] + "/" + name):
+          log.error('File not found for internal http server ' + 
+                    g.kiosk.config['offline_cache_dir'] + "/" + name)
+          return flask.make_response()
 
+    f = open(g.kiosk.config['offline_cache_dir'] + "/" + name)
+    result = f.read()
+    f.close()
+    response = flask.make_response(result)
+    if name.endswith('.css'):
+        response.mimetype = 'text/css'
+    elif name.endswith('.jpg') or name.endswith('.jpeg'):
+        response.mimetype = 'image/jpeg'
+    elif name.endswith('.png'):
+        response.mimetype = 'image/png'
+    elif name.endswith('.swf'):
+        response.mimetype = 'application/x-shockwave-flash'
+    else:
+        response.mimetype = 'text/html'
+    return response
+
+#
+# SyntheseKiosk
+# -------------
+#
 class SyntheseKiosk(object):
     WEBAPP_PORT = 5000
 
@@ -529,6 +552,27 @@ class SyntheseKiosk(object):
         self._config_path = os.path.join(self._config_dir, 'config.json')
         self._init_logging()
         log.debug('Config path: %s', self._config_path)
+
+        if not self.config['offline_cache_dir']:
+            print "ERROR: Missing parameter 'offline_cache_dir' in your json config"
+            sys.exit(1)
+
+        self._cache_manager = CacheManager(self.config['offline_cache_dir'],
+                                           self.config['synthese_url'])
+        self._cache_manager.refresh_kiosk_config()
+        self._kiosk_config = KioskConfig(self.config['offline_cache_dir'])
+        while not self._kiosk_config.load():
+            log.info("We have no config yet, will retry later in 10s")
+            time.sleep(10)
+            self._cache_manager.refresh_kiosk_config()
+
+        # Init refresh timers
+        self._next_config_refresh_date = datetime.now() + \
+            timedelta(seconds=self._kiosk_config.getConfigRefreshTimeout())
+
+        self._next_fallback_refresh_date = datetime.now() + \
+            timedelta(seconds=self._kiosk_config.getFallBackRefreshTimeout())
+
         self._init_displays()
 
     def _init_logging(self):
@@ -551,9 +595,13 @@ class SyntheseKiosk(object):
         logging.getLogger('werkzeug').setLevel(logging.WARN)
 
     def _init_display(self, index):
-        c = self.config
-        name = c['displays'][index]
-        return Display(self, index, name)
+        name = self.config['displays'][index]
+        self.init_offline_server(name)
+        self._cache_manager.refresh_offline_cache(name,
+                                                  self._kiosk_config.getFallBackUrl())
+        return Display(self, index, name, 
+                       self._config['synthese_url'] +
+                       self._kiosk_config.getDisplayUrl(name))
 
     def _init_displays(self):
         self._displays = []
@@ -594,9 +642,6 @@ class SyntheseKiosk(object):
         self._config = DEFAULT_CONFIG.copy()
         self._config.update(json.load(open(self._config_path)))
 
-        # Initialize state from config
-        self._proxy.enabled = self._config['caching_proxy']
-
         return self._config
 
     @config.setter
@@ -625,19 +670,30 @@ class SyntheseKiosk(object):
                 ' to configure the application.')
             return
 
+        self.refresh_kiosk_config_if_needed()
+        self.refresh_offline_cache_if_needed()
+
         self.online = self._is_online()
+        log.debug("online=" + str(self.online))
         for display in self._displays:
-            display.refresh(force_reload)
+            if self.online:
+                display.refresh(force_reload,
+                                self._config['synthese_url'] +
+                                self._kiosk_config.getDisplayUrl(display._name))
+            else:
+                display.refresh(force_reload,
+                                'http://localhost:' + str(self.WEBAPP_PORT) +
+                                '/fallback/' + display._name + self._kiosk_config.getFallBackUrl())
 
-        if not self.online:
-            OFFLINE_POLL_INTERVAL_S = 10
+        OFFLINE_POLL_INTERVAL_S = self._kiosk_config.getFallBackTimeout()
 
-            self._refresh_sched_event = self._sched.enter(
-                OFFLINE_POLL_INTERVAL_S, 1, self.refresh_displays, ())
+        self._refresh_sched_event = self._sched.enter(
+            OFFLINE_POLL_INTERVAL_S, 1, self.refresh_displays, ())
+
 
     def update_config(self, old_config):
         if (self.config['debug'] != old_config['debug'] or
-            self.config['caching_proxy'] != old_config['caching_proxy'] or
+            self.config['offline_cache_dir'] != old_config['offline_cache_dir'] or
             self.config['browser'] != old_config['browser'] or
             self.config['browser_path'] != old_config['browser_path'] or
             self.config['browser_args'] != old_config['browser_args'] or
@@ -706,3 +762,137 @@ class SyntheseKiosk(object):
 
         self._proxy.stop()
         sys.exit(1)
+
+    def init_offline_server(self, display):
+        admin_app.add_url_rule('/fallback/<path:name>', 'fallback', fallback)
+
+    def refresh_kiosk_config_if_needed(self):
+        if self._next_config_refresh_date < datetime.now():
+            self._next_config_refresh_date = datetime.now() + \
+                timedelta(seconds=self._kiosk_config.getConfigRefreshTimeout())
+            log.info("Refreshing the kiosk config")
+            self._cache_manager.refresh_kiosk_config()
+
+            currentFallBackUrl = self._kiosk_config.getFallBackUrl()
+            # Load the new configuration
+            self._kiosk_config.load()
+
+            if currentFallBackUrl != self._kiosk_config.getFallBackUrl():
+                # The fallback url has changed, wget this site now
+                self.refresh_offline_cache_if_needed()
+
+    def refresh_offline_cache_if_needed(self):
+        if self._next_fallback_refresh_date < datetime.now():
+            self._next_fallback_refresh_date = datetime.now() + \
+                timedelta(seconds=self._kiosk_config.getFallBackRefreshTimeout())
+            log.info("Refreshing offline cache")
+            for display in self._displays:
+                self._cache_manager.refresh_offline_cache(display._name,
+                                                          self._kiosk_config.getFallBackUrl())
+
+class CacheManager(object):
+
+    def __init__(self, cache_dir, synthese_url):
+        self._cache_dir = cache_dir
+        self._synthese_url = synthese_url
+
+    def _wget(self, directory, url):
+        log.debug('running wget in ' + directory + " for url " + url)
+        utils.maybe_makedirs(directory)
+        cmd_line = ["wget"]
+        cmd_line.append('--recursive')
+        cmd_line.append('--quiet')
+        cmd_line.append('--no-host-directories')
+        cmd_line.append('--no-parent')
+        cmd_line.append('--page-requisites')
+        cmd_line.append('--convert-links')
+        cmd_line.append('--no-verbose')
+        cmd_line.append('--directory-prefix')
+        cmd_line.append(directory)
+        cmd_line.append(url)
+        log.debug('Wget command line: %s', cmd_line)
+        try:
+            retval = subprocess.call(cmd_line)
+            # Return True if the wget succeeded
+            return retval == 0
+        except Exception, e:
+            log.error("Failed to launch wget: %s", e)
+
+        return False
+
+    def refresh_offline_cache(self, display, url):
+        log.debug("refresh_offline_cache " + display + url)
+        cache_dir = self._cache_dir + "/" + display
+        if self._wget(cache_dir + "_NEW",
+                      self._synthese_url + url):
+            if os.path.isdir(cache_dir):
+                print 'os.rename '+cache_dir + ',' + cache_dir + '_TODELETE'
+                os.rename(cache_dir, cache_dir + "_TODELETE")
+            print 'os.rename '+cache_dir + '_NEW,' + cache_dir
+            os.rename(cache_dir + "_NEW", cache_dir)
+            if os.path.isdir(cache_dir + "_TODELETE"):
+                shutil.rmtree(cache_dir + "_TODELETE")
+        else:
+            # Remove the uncomplete wget directory
+            if os.path.isdir(cache_dir + "_NEW"):
+                shutil.rmtree(cache_dir + "_NEW")
+
+
+    def refresh_kiosk_config(self):
+        log.debug("refresh_kiosk_config")
+        cache_file = self._cache_dir + "/" + CONFIG_FILE
+        if self._wget(self._cache_dir,
+                   self._synthese_url + "/" + CONFIG_FILE):
+            if os.path.isfile(cache_file + '.1'):
+                os.rename(cache_file + '.1', cache_file)
+
+class KioskConfig(object):
+
+    def __init__(self, cache_dir):
+        self._cache_dir = cache_dir
+        self._config = None
+
+    def load(self):
+        config_file = self._cache_dir + "/" + CONFIG_FILE
+        log.debug("load_kiosk_config " + config_file)
+        if not os.path.isfile(config_file):
+            print "Configuration file " + config_file + " not found"
+            return False
+
+        try:
+            self._config = (json.load(open(config_file)))
+            return True
+        except Exception, e:
+            log.error("Failed to load json config file '%s': %s", config_file, e)
+            return False
+
+    def getFallBackUrl(self):
+        try:
+            return self._config['defaults']['fallbackUrl']
+        except:
+            return None
+
+    def getFallBackTimeout(self):
+        try:
+            return self._config['defaults']['fallbackTimeout']
+        except:
+            return None
+
+    def getFallBackRefreshTimeout(self):
+        try:
+            return self._config['defaults']['fallbackRefreshTimeout']
+        except:
+            return None
+
+    def getConfigRefreshTimeout(self):
+        try:
+            return self._config['defaults']['configRefreshTimeout']
+        except:
+            return None
+
+    def getDisplayUrl(self, display):
+        log.debug('getDisplayUrl ' + display + ":" + self._config['displays'][display]['url'])
+        try:
+            return self._config['displays'][display]['url']
+        except:
+            return None

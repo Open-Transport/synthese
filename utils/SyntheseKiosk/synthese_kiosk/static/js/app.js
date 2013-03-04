@@ -15,7 +15,7 @@ function ConfigViewModel() {
   this.browserPath = ko.observable();
   this.browserArgs = ko.observable();
   this.displayNames = ko.observable();
-  this.cachingProxy = ko.observable();
+  this.offlineCacheDir = ko.observable();
   this.debug = ko.observable();
 
   var self = this;
@@ -43,7 +43,7 @@ function ConfigViewModel() {
     self.browserPath(config.browser_path);
     self.browserArgs(config.browser_args.join(","));
     self.displayNames(config.displays.join(","));
-    self.cachingProxy(config.caching_proxy);
+    self.offlineCacheDir(config.offline_cache_dir);
     self.debug(config.debug);
   };
 
@@ -74,7 +74,7 @@ function ConfigViewModel() {
       displays: configObj.displayNames.split(",").filter(function(d) {
         return d;
       }),
-      caching_proxy: configObj.cachingProxy,
+      offline_cache_dir: configObj.offlineCacheDir,
       debug: configObj.debug
     };
     $.post("/set_config", {
