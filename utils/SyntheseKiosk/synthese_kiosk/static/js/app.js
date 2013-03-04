@@ -10,7 +10,7 @@ function ConfigViewModel() {
   this.syntheseUrl = ko.observable();
   this.adminPassword = ko.observable();
   this.secretKey = ko.observable();
-    this.availableBrowsers = ["firefox", "chrome", "opera", "xulrunner", "custom"];
+  this.availableBrowsers = ["firefox", "chrome", "opera", "custom"];
   this.browser = ko.observable();
   this.browserPath = ko.observable();
   this.browserArgs = ko.observable();

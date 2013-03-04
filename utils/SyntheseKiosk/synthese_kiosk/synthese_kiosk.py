@@ -84,112 +84,6 @@ def get_thirdparty_binary(dir_name, fatal=True):
     return binary_path
 
 
-class Proxy(object):
-    """Class to manage the Polipo proxy process"""
-
-    def __init__(self, config_dir):
-        self._online = False
-        self._running = False
-        self._enabled = True
-        # It is important to specify a controlled config dir or polipo won't start
-        # if /etc/polipo is not writable.
-        self._polipo_config_dir = os.path.join(config_dir, 'polipo_config')
-        utils.maybe_makedirs(self._polipo_config_dir)
-        self._cache_dir = os.path.join(config_dir, 'polipo_cache')
-        utils.maybe_makedirs(self._cache_dir)
-        self._local_document_dir = os.path.join(config_dir, 'polipo_local')
-        utils.maybe_makedirs(self._local_document_dir)
-        self._log_file = os.path.join(config_dir, 'polipo.log')
-        self._host = 'localhost'
-        self._port = 8123
-        self._proc = None
-        self._polipo_path = get_thirdparty_binary('polipo', fatal=False)
-
-    def _ensure_stopped(self):
-        if sys.platform == 'win32':
-            subprocess.call('taskkill /f /im polipo.exe', shell=True)
-        else:
-            subprocess.call('killall -9 polipo', shell=True)
-
-    def _convert_polipo_path(self, path):
-        # Polipo on Windows expects Unix style paths, without the drive letter
-        if sys.platform != 'win32':
-            return path
-        log.debug('Path %s, cwd: %s', path, os.getcwd())
-        if (os.path.splitdrive(path)[0].lower() !=
-            os.path.splitdrive(os.getcwd())[0].lower()):
-            raise Exception('Wrong drive expectations')
-        return os.path.splitdrive(path)[1].replace(os.sep, '/')
-
-    def start(self):
-        if not self._enabled:
-            return
-
-        if not self._polipo_path:
-            log.error("Can't find polipo binary. Proxy cannot run")
-            return
-            
-        self._ensure_stopped()
-        self._running = True
-
-        options = {
-            'diskCacheRoot': self._convert_polipo_path(self._cache_dir),
-            'localDocumentRoot': self._convert_polipo_path(self._local_document_dir),
-            'dnsUseGethostbyname': 'happily',
-            'relaxTransparency': 'maybe',
-            'logFile': self._convert_polipo_path(self._log_file),
-        }
-        if not self._online:
-            options['proxyOffline'] = 'true'
-
-        cmd_line = [self._polipo_path]
-        cmd_line.append('-c')
-        cmd_line.append(self._polipo_config_dir)
-        for name, value in options.iteritems():
-            cmd_line.append('{0}={1}'.format(name, value))
-        log.debug('Polipo command line: %s', cmd_line)
-
-        self._proc = subprocess.Popen(cmd_line)
-
-        time.sleep(2)
-        if self._proc.poll() is not None:
-            raise Exception('Failed to start polipo')
-
-    def stop(self):
-        if self._proc:
-            self._proc.terminate()
-        self._running = False
-
-    @property
-    def online(self):
-        return self._online
-
-    @online.setter
-    def online(self, value):
-        old_online = self._online
-        self._online = value
-        if not self._running or old_online != self._online:
-            self.start()
-
-    @property
-    def enabled(self):
-        return self._enabled
-
-    @enabled.setter
-    def enabled(self, value):
-        self._enabled = value
-
-    def clear_cache(self):
-        self.stop()
-        time.sleep(1)
-        try:
-            shutil.rmtree(self._cache_dir)
-        except IOError, e:
-            pass
-        utils.maybe_makedirs(self._cache_dir)
-        self.start()
-
-
 class CustomBrowser(object):
     """
     Used for browsers that aren't supported by webdriver.
@@ -219,71 +113,11 @@ class CustomBrowser(object):
         except Exception, e:
             log.error("Failed to launch browser: %s", e)
 
-class XulRunnerBrowser(object):
-    """
-    Used for XulRunner
-    This class replicates the webdriver API and launches the browser manually.
-    """
-    def __init__(self, proxy_enabled, browser_path, browser_args):
-        self._path = browser_path
-        self._args = browser_args
-        log.debug("Browser path %s", self._path)
-        self._proc = None
-        if proxy_enabled:
-            self.createProfile()
-
-    def createProfile(self):
-        profileDir = os.getenv("HOME")
-        utils.maybe_makedirs(profileDir + "/.test/test/kiosk.default")
-
-        # Create the profile
-        f = open(profileDir + "/.test/test/profiles.ini", "w")
-        f.write('''
-[General]
-StartWithLastProfile=1
-
-[Profile0]
-Name=default
-IsRelative=1
-Path=kiosk.default
-Default=1
-''')
-        f.close()
-
-        # Create the pref.js
-        f = open(profileDir + "/.test/test/kiosk.default/prefs.js", "w")
-        f.write('''
-user_pref("network.proxy.http", "localhost");
-user_pref("network.proxy.http_port", 8123);
-user_pref("network.proxy.no_proxies_on", "");
-user_pref("network.proxy.type", 1);
-''')
-        f.close()
-
-    def quit(self):
-        log.debug("Quitting browser")
-        if self._proc:
-            self._proc.terminate()
-
-    def refresh(self):
-        log.debug("dummy refresh")
-
-    def get(self, url):
-        self.quit()
-        cmd_line = [url if a == "URL" else a for a in self._args]
-        cmd_line.insert(0, self._path)
-        log.debug("Launching browser with cmdline: %s", cmd_line)
-        try:
-            self._proc = subprocess.Popen(cmd_line)
-        except Exception, e:
-            log.error("Failed to launch browser: %s", e)
-
 
 class Display(object):
     def __init__(self, kiosk, index, name, url):
         config = kiosk.config
         self._kiosk = kiosk
-        self._proxy = kiosk._proxy
         self._synthese_url = url
         self._index = index
         self._name = name
@@ -318,11 +152,6 @@ class Display(object):
         if not self._debug:
             options.add_argument('--kiosk')
 
-        if self._proxy.enabled:
-            options.add_argument(
-                '--proxy-server=http://{_host}:{_port}'.format(
-                    **self._proxy.__dict__))
-
         return webdriver.Chrome(
             executable_path=chromedriver_path,
             chrome_options=options)
@@ -330,10 +159,6 @@ class Display(object):
     def _create_firefox_browser(self):
         profile = webdriver.FirefoxProfile()
 
-        if self._proxy.enabled:
-            profile.set_preference('network.proxy.type', 1);
-            profile.set_preference('network.proxy.http', self._proxy._host)
-            profile.set_preference('network.proxy.http_port', self._proxy._port)
         xpi_path = os.path.join(
             thisdir, os.pardir, 'third_party', 'r_kiosk-0.9.0-fx.xpi')
         if not self._debug:
@@ -354,19 +179,10 @@ class Display(object):
                 'http://selenium.googlecode.com/files/selenium-server-standalone-2.18.0.jar '
                 'to %r' % selenium_jar)
 
-        if self._proxy.enabled:
-            # TODO: proxy.
-            pass
-
         return webdriver.Opera(executable_path=selenium_jar)
 
     def _create_custom_browser(self):
-        if self._proxy.enabled:
-            log.warn("Proxy not supported with custom browser")
         return CustomBrowser(self._browser_path, self._browser_args)
-
-    def _create_xulrunner_browser(self):
-        return XulRunnerBrowser(self._proxy.enabled, self._browser_path, self._browser_args)
 
     def _create_browser(self):
         if self._browser_name == 'chrome':
@@ -375,8 +191,6 @@ class Display(object):
             return self._create_firefox_browser()
         elif self._browser_name == 'opera':
             return self._create_opera_browser()
-        elif self._browser_name == 'xulrunner':
-            return self._create_xulrunner_browser()
         elif self._browser_name == 'custom':
             return self._create_custom_browser()
         else:
@@ -479,12 +293,6 @@ def force_reload():
     flask.flash('Forced Display Reload')
     return flask.redirect(flask.url_for('index'))
 
-@admin_app.route('/clear_proxy_cache', methods=['POST'])
-def clear_proxy_cache():
-    g.kiosk._proxy.clear_cache()
-    flask.flash('Cleared Proxy Cache')
-    return flask.redirect(flask.url_for('index'))
-
 @admin_app.route('/stop_kiosk', methods=['POST'])
 def stop_kiosk():
     g.kiosk.stop()
@@ -546,7 +354,6 @@ class SyntheseKiosk(object):
         self._config_dir = os.path.normpath(os.path.abspath(self._config_dir))
         utils.maybe_makedirs(self._config_dir)
         self._online = False
-        self._proxy = Proxy(self._config_dir)
         self._sched = sched.scheduler(time.time, time.sleep)
 
         self._config_path = os.path.join(self._config_dir, 'config.json')
@@ -629,7 +436,6 @@ class SyntheseKiosk(object):
     def online(self, value):
         log.debug('Setting online status to: %s', value)
         self._online = value
-        self._proxy.online = value
 
     @property
     def config(self):
@@ -738,8 +544,6 @@ class SyntheseKiosk(object):
 
     def start(self):
         ports = [self.WEBAPP_PORT]
-        if self._proxy.enabled:
-            ports.append(self._proxy._port)
 
         for port in ports:
             utils.kill_listening_processes(port)
@@ -760,7 +564,6 @@ class SyntheseKiosk(object):
         for display in self._displays:
             display.stop()
 
-        self._proxy.stop()
         sys.exit(1)
 
     def init_offline_server(self, display):
