@@ -112,13 +112,13 @@
           </div><!-- /clearfix -->
 
           <div class="clearfix">
-            <label for="caching_proxy">Use Caching Proxy</label>
+            <label for="offline_cache_dir">Offline Cache Directory</label>
             <div class="input">
-              <input id="caching_proxy" name="caching_proxy"
-                     data-bind="checked: cachingProxy" type="checkbox">
+              <input class="xlarge" id="offline_cache_dir" name="offline_cache_dir"
+                     data-bind="value: offlineCacheDir" size="30" type="text">
               <span class="help-block">
-                The caching proxy is used to show the fallback page if Synthese
-                is unreachable and the Kiosk is restarted. 
+                The offline cache dir is a local persistent storage place used
+                to save the fallback site.
               </span>
             </div>
           </div><!-- /clearfix -->
