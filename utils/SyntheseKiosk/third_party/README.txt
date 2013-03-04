@@ -12,17 +12,6 @@ distribute-0.6.24.tar.gz:
 pip-1.0.2.tar.gz:
   http://pypi.python.org/packages/source/p/pip/pip-1.0.2.tar.gz#md5=47ec6ff3f6d962696fe08d4c8264ad49
 
-polipo/lin64/polipo
-  Polipo binary retrieved from the Debian stable 64bit package (version 1.0.4.1-1.1).
-  It should work on all modern 64-bit Linuxes.
-
-polipo/lin32/polipo
-  Polipo binary retrieved from the Debian stable 32bit package (version 1.0.4.1-1.1).
-  It should work on all modern 32-bit Linuxes.
-
-polipo/win/polipo.exe
-  Binary from https://archive.torproject.org/tor-package-archive/polipo/archive/polipo-1.0.4.0-win32.exe
-
 r_kiosk-0.9.0-fx.xpi:
   https://addons.mozilla.org/en-US/firefox/addon/r-kiosk/
   install.rdf inside the .xpi was modified to replace:

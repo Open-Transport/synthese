@@ -87,7 +87,7 @@
           </div><!-- /clearfix -->
 
           <div class="clearfix">
-            <label for="browser_args">Browser Arguments (for custom and xulrunner browser)</label>
+            <label for="browser_args">Browser Arguments (for custom browser)</label>
             <div class="input">
               <input class="xlarge" id="browser_args" name="browser_args"
                      data-bind="value: browserArgs" size="30" type="text">
@@ -157,18 +157,6 @@
           </div>
           <div class="actions">
             <input type="submit" class="btn primary" value="Force Displays Reload">
-          </div>
-        </fieldset>
-      </form>
-
-      <form action="{{ url_for('clear_proxy_cache') }}" method=post>
-        <fieldset>
-          <legend>Clear Proxy Cache</legend>
-          <div class="input">
-            Clears the proxy cache used for showing content when offline.
-          </div>
-          <div class="actions">
-            <input type="submit" class="btn primary" value="Clear Proxy Cache">
           </div>
         </fieldset>
       </form>
