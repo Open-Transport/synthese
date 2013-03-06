@@ -1492,6 +1492,7 @@ namespace synthese
 
 
 						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()));
+						const Junction* junction(dynamic_cast<const Junction*>(leg.getService()->getPath()));
 						if(line != NULL)
 						{
 							// Insertion of fake leg if site does not output road approach detail
@@ -1664,6 +1665,17 @@ namespace synthese
 							}
 							stream << "</transport>";
 						}
+						else if (junction != NULL)
+						{
+							stream <<
+								"<junction" <<
+									" length=\"" << ceil(leg.getDistance()) << "\"" <<
+									" departureTime=\"" << posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"" <<
+									" arrivalTime=\"" << posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\">";
+							_xmlDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
+							_xmlDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
+							stream << "</junction>";
+						}
 
 						const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
 						if(road != NULL)
@@ -1759,6 +1771,9 @@ namespace synthese
 						{
 							lastTransportEnding = itl;
 						}
+
+						// Junction :
+
 					}
 
 					// Bug 7694 : fulfill unused arrival rows
