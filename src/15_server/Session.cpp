@@ -68,7 +68,7 @@ namespace synthese
 
 		bool Session::hasProfile() const
 		{
-			mutex::scoped_lock lock(_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return
 				_user != NULL &&
 				_user->getProfile() != NULL
@@ -79,7 +79,7 @@ namespace synthese
 
 		void Session::setSessionIdCookie(Request &request) const
 		{
-			mutex::scoped_lock lock(_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			request.setCookie(
 				COOKIE_SESSIONID,
 				this->getKey(),
@@ -91,7 +91,7 @@ namespace synthese
 
 		void Session::removeSessionIdCookie( Request &request ) const
 		{
-			mutex::scoped_lock lock(_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			request.removeCookie(COOKIE_SESSIONID);
 		}
 
@@ -99,7 +99,7 @@ namespace synthese
 
 		void Session::setSessionVariable( const std::string& variable, const std::string& value )
 		{
-			mutex::scoped_lock lock(_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			if(!value.empty())
 			{
 				_sessionVariables[variable] = value;
@@ -118,7 +118,7 @@ namespace synthese
 
 		std::string Session::getSessionVariable( const std::string& variable ) const
 		{
-			mutex::scoped_lock lock(_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			SessionVariables::const_iterator it(_sessionVariables.find(variable));
 			return (it == _sessionVariables.end()) ? string() : it->second;
 		}
@@ -144,7 +144,7 @@ namespace synthese
 			while(!session._requests.empty());
 
 			mutex::scoped_lock(_sessionMapMutex);
-			mutex::scoped_lock(session._mutex);
+			recursive_mutex::scoped_lock(session._mutex);
 			SessionMap::iterator it(_sessionMap.find(session._key));
 			if(it != _sessionMap.end())
 			{
@@ -171,7 +171,7 @@ namespace synthese
 			}
 			if(session)
 			{
-				mutex::scoped_lock lock(session->_mutex);
+				recursive_mutex::scoped_lock lock(session->_mutex);
 				if (ip != session->_ip)
 				{
 					throw SessionException("IP has changed during the session.");
