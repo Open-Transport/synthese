@@ -71,10 +71,12 @@ def main():
         subprocess.check_call("rm *zip", shell=True, cwd=target_dir)
 
     # Linux chromedriver is quite large. Download it at installation time.
-    if sys.platform == 'linux2' and platform.architecture()[0] == '64bit':
-        download_and_extract(
-            "http://chromedriver.googlecode.com/files/chromedriver_linux64_23.0.1240.0.zip",
-            ("chromedriver", "lin64", "chromedriver"))
+    if sys.platform == 'linux2':
+        target_dir = join(thisdir, "third_party", "chromedriver", "third_party", "lin64")
+        print "Warning, Selenium webdriver for Chrome is not packaged. If you use Chrome,"
+        print "         you must download the driver from http://chromedriver.googlecode.com/files/"
+        print "         and extract it under:"
+        print "         " + target_dir
 
 if __name__ == '__main__':
     main()
