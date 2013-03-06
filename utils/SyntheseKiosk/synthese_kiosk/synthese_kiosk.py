@@ -232,6 +232,7 @@ DEFAULT_CONFIG = {
     'displays': [],
     'debug': False,
     'offline_cache_dir': None,
+    'auto_refresh_timeout': None,
 }
 
 
@@ -368,6 +369,8 @@ class SyntheseKiosk(object):
                                            self.config['synthese_url'])
         self._cache_manager.refresh_kiosk_config()
         self._kiosk_config = KioskConfig(self.config['offline_cache_dir'])
+        # If we don't have the kiosk_config.json file localy, we
+        # download it now.
         while not self._kiosk_config.load():
             log.info("We have no config yet, will retry later in 10s")
             time.sleep(10)
@@ -379,6 +382,13 @@ class SyntheseKiosk(object):
 
         self._next_fallback_refresh_date = datetime.now() + \
             timedelta(seconds=self._kiosk_config.getFallBackRefreshTimeout())
+
+        if self.config['auto_refresh_timeout']:
+            self._next_browser_refresh_date = datetime.now() + \
+                timedelta(seconds=self.config['auto_refresh_timeout'])
+        else:
+            self._next_browser_refresh_date = None
+
 
         self._init_displays()
 
@@ -478,6 +488,17 @@ class SyntheseKiosk(object):
 
         self.refresh_kiosk_config_if_needed()
         self.refresh_offline_cache_if_needed()
+
+        if self.config['auto_refresh_timeout']:
+            if not self._next_browser_refresh_date:
+                self._next_browser_refresh_date = datetime.now() + \
+                    timedelta(seconds=self.config['auto_refresh_timeout'])
+
+            if self._next_browser_refresh_date < datetime.now():
+                self._next_browser_refresh_date = datetime.now() + \
+                    timedelta(seconds=self.config['auto_refresh_timeout'])
+                force_reload = True
+                log.info("Refreshing browser")
 
         self.online = self._is_online()
         log.debug("online=" + str(self.online))
@@ -629,9 +650,7 @@ class CacheManager(object):
         if self._wget(cache_dir + "_NEW",
                       self._synthese_url + url):
             if os.path.isdir(cache_dir):
-                print 'os.rename '+cache_dir + ',' + cache_dir + '_TODELETE'
                 os.rename(cache_dir, cache_dir + "_TODELETE")
-            print 'os.rename '+cache_dir + '_NEW,' + cache_dir
             os.rename(cache_dir + "_NEW", cache_dir)
             if os.path.isdir(cache_dir + "_TODELETE"):
                 shutil.rmtree(cache_dir + "_TODELETE")
