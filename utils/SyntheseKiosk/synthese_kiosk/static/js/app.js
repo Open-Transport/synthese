@@ -16,6 +16,7 @@ function ConfigViewModel() {
   this.browserArgs = ko.observable();
   this.displayNames = ko.observable();
   this.offlineCacheDir = ko.observable();
+  this.autoRefreshTimeout = ko.observable();
   this.debug = ko.observable();
 
   var self = this;
@@ -44,6 +45,7 @@ function ConfigViewModel() {
     self.browserArgs(config.browser_args.join(","));
     self.displayNames(config.displays.join(","));
     self.offlineCacheDir(config.offline_cache_dir);
+    self.autoRefreshTimeout(config.auto_refresh_timeout);
     self.debug(config.debug);
   };
 
@@ -75,6 +77,7 @@ function ConfigViewModel() {
         return d;
       }),
       offline_cache_dir: configObj.offlineCacheDir,
+      auto_refresh_timeout: parseInt(configObj.autoRefreshTimeout),
       debug: configObj.debug
     };
     $.post("/set_config", {

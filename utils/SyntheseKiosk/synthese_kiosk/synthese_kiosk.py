@@ -232,7 +232,7 @@ DEFAULT_CONFIG = {
     'displays': [],
     'debug': False,
     'offline_cache_dir': None,
-    'auto_refresh_timeout': None,
+    'auto_refresh_timeout': 0,
 }
 
 
@@ -521,6 +521,7 @@ class SyntheseKiosk(object):
     def update_config(self, old_config):
         if (self.config['debug'] != old_config['debug'] or
             self.config['offline_cache_dir'] != old_config['offline_cache_dir'] or
+            self.config['auto_refresh_timeout'] != old_config['auto_refresh_timeout'] or
             self.config['browser'] != old_config['browser'] or
             self.config['browser_path'] != old_config['browser_path'] or
             self.config['browser_args'] != old_config['browser_args'] or

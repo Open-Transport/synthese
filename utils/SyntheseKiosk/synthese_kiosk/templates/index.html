@@ -124,6 +124,20 @@
           </div><!-- /clearfix -->
 
           <div class="clearfix">
+            <label for="auto_refresh_timeout">Auto Refresh Timeout</label>
+            <div class="input">
+              <input class="xlarge" id="auto_refresh_timeout" name="auto_refresh_timeout"
+                     data-bind="value: autoRefreshTimeout" size="30" type="number">
+              <span class="help-block">
+                This is the period used to force a refresh of the browser. You must
+                use a browser supported by Selenium and have installed the proper driver.
+		If you don't do so, the browser will be killed and restarted instead of
+		being silently refreshed. Set the value to 0 to disable the refresh.
+              </span>
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
             <label for="debug">Debug</label>
             <div class="input">
               <input id="debug" name="debug"
