@@ -29,6 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
 
 namespace synthese
@@ -67,7 +68,7 @@ namespace synthese
 			boost::posix_time::ptime	_lastUse;
 			SessionVariables			_sessionVariables;
 
-			mutable boost::mutex		_mutex; //!< For thread safety in case of concurrent access with the same session.
+			mutable boost::recursive_mutex		_mutex; //!< For thread safety in case of concurrent access with the same session.
 			mutable boost::mutex	_requestsListMutex;
 			Requests		_requests;
 
