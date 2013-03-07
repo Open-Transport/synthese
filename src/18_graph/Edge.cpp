@@ -184,6 +184,7 @@ namespace synthese
 				(*minNextServiceIndex == services.end() || services.value_comp()(*next, **minNextServiceIndex))
 			){
 				next = *minNextServiceIndex;
+				firstRun = false;
 			}
 
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
