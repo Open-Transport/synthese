@@ -306,6 +306,18 @@ namespace synthese
 						continue;
 					}
 
+                    // Avoid adresses from empty cities
+                    if (_citiesWithAtLeastAStop &&
+                        dynamic_cast<geography::NamedPlace*>(item.value.get()))
+                    {
+                        const geography::City* city = dynamic_cast<geography::NamedPlace*>(item.value.get())->getCity();
+                        if (city->getLexicalMatcher(pt::StopArea::FACTORY_KEY).size() == 0)
+                        {
+                            continue;
+                        }
+                    }
+
+
 					// Allocation
 					boost::shared_ptr<util::ParametersMap> pm(new util::ParametersMap);
 
