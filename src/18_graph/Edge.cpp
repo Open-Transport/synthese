@@ -167,7 +167,7 @@ namespace synthese
 			bool ignoreReservation,
 			bool allowCanceled
 		) const	{
-
+			bool firstRun(true);
 			const ServiceSet& services(getParentPath()->getServices());
 
 			if(services.empty())
@@ -230,9 +230,21 @@ namespace synthese
 						return servicePointer;
 				}	}
 
-				departureMoment = ptime(departureMoment.date(), hours(24));
-
-				next = _departureIndex[0].get(RTData);
+				if(firstRun && departureMoment.time_of_day().hours() != 23)
+				{
+					// This is a special case that happens when a route have schedules after midnight
+					// In this case the last line goes in a 'first' departureIndex slot and breaks the
+					// main loop above. Here we force a test of the next slot before moving to the
+					// next day.
+					firstRun =false;
+					next = _departureIndex[departureMoment.time_of_day().hours() + 1].get(RTData);
+				}
+				else
+				{
+					departureMoment = ptime(departureMoment.date(), hours(24));					
+					next = _departureIndex[0].get(RTData);
+				}
+		
 			}
 
 			return ServicePointer();
