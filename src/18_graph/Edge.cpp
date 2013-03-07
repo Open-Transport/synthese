@@ -238,7 +238,8 @@ namespace synthese
 					// main loop above. Here we force a test of the next slot before moving to the
 					// next day.
 					firstRun =false;
-					next = _departureIndex[departureMoment.time_of_day().hours() + 1].get(RTData);
+					next = services.begin();
+//					next = _departureIndex[departureMoment.time_of_day().hours() + 1].get(RTData);
 				}
 				else
 				{
