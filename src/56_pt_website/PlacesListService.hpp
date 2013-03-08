@@ -311,7 +311,9 @@ namespace synthese
                         dynamic_cast<geography::NamedPlace*>(item.value.get()))
                     {
                         const geography::City* city = dynamic_cast<geography::NamedPlace*>(item.value.get())->getCity();
-                        if (city->getLexicalMatcher(pt::StopArea::FACTORY_KEY).size() == 0)
+                        if (city &&
+							city->getLexicalMatcher(pt::StopArea::FACTORY_KEY).size() == 0
+						)
                         {
                             continue;
                         }
