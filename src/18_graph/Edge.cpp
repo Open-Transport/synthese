@@ -352,14 +352,15 @@ namespace synthese
 			for(ServiceSet::const_iterator it(services.begin()); it!=services.end(); ++it)
 			{
 				const Service* service = *it;
-				time_duration endHour(Service::GetTimeOfDay(service->getDepartureEndScheduleToIndex(RTData, getRankInPath())));
-				size_t endHours(endHour.hours());
-				time_duration beginHour(Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(RTData, getRankInPath())));
+				time_duration endHour(service->getDepartureEndScheduleToIndex(RTData, getRankInPath()));
+				size_t endHours(std::min(endHour.hours(), 23));
+				time_duration beginHour(service->getDepartureBeginScheduleToIndex(RTData, getRankInPath()));
 
 				for (numHour = 0; numHour <= endHours; ++numHour)
 				{
 					if(	_departureIndex[numHour].get(RTData) == services.end() ||
-						Service::GetTimeOfDay((*_departureIndex[numHour].get(RTData))->getDepartureBeginScheduleToIndex(RTData, getRankInPath())) > endHour
+						(*_departureIndex[numHour].get(RTData)) \
+							->getDepartureBeginScheduleToIndex(RTData, getRankInPath()) > endHour
 					){
 						_departureIndex[numHour].set(RTData, it);
 					}
@@ -380,16 +381,16 @@ namespace synthese
 			for(ServiceSet::const_reverse_iterator it(services.rbegin()); it != services.rend(); ++it)
 			{
 				const Service* service = *it;
-				time_duration endHour(Service::GetTimeOfDay(service->getArrivalEndScheduleToIndex(RTData, getRankInPath())));
-				time_duration beginHour(Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(RTData, getRankInPath())));
-				size_t beginHours(beginHour.hours());
+				time_duration endHour(service->getArrivalEndScheduleToIndex(RTData, getRankInPath()));
+				time_duration beginHour(service->getArrivalBeginScheduleToIndex(RTData, getRankInPath()));
+				size_t beginHours(std::min(beginHour.hours(), 23));
 
 				for (numHour = 23; numHour >= beginHours; --numHour)
 				{
 					if(	_arrivalIndex[numHour].get(RTData) == services.rend()	||
-						Service::GetTimeOfDay((*_arrivalIndex[numHour].get(RTData))->getArrivalBeginScheduleToIndex(RTData, getRankInPath())) < beginHour
+						(*_arrivalIndex[numHour].get(RTData))->getArrivalBeginScheduleToIndex(RTData, getRankInPath()) < beginHour
 					){
-						_arrivalIndex[numHour].set(RTData, it);
+						_arrivalIndex[numHour].set(RTData, it);						
 					}
 					if(numHour == 0) break;
 				}
