@@ -633,14 +633,15 @@ namespace synthese
 						);
 						removeJunctionRequest.getAction()->setObjectId(junction->getKey());
 
-						stream << t.row();
-						stream << t.col() << junction->getStart()->getName();
+                        stream << t.row();
+                        stream << t.col() << junction->getStart()->getCodeBySources() + " / " + junction->getStart()->getName();
+
 						stream << t.col() <<
 							HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
 								junction->getEnd()->getConnectionPlace()->getFullName()
 							);
-						stream << t.col() << junction->getEnd()->getName();
+                        stream << t.col() << junction->getEnd()->getCodeBySources() + " / " + junction->getEnd()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
 						stream << t.col() << "oui";
@@ -666,12 +667,12 @@ namespace synthese
 						removeJunctionRequest.getAction()->setObjectId(junction->getKey());
 
 						stream << t.row();
-						stream << t.col() << junction->getStart()->getName();
+                        stream << t.col() << junction->getStart()->getCodeBySources() + " / " + junction->getStart()->getName();
 						stream << t.col() << HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
 								junction->getEnd()->getConnectionPlace()->getFullName()
 							);
-						stream << t.col() << junction->getEnd()->getName();
+                        stream << t.col() << junction->getEnd()->getCodeBySources() + " / " + junction->getEnd()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
 						stream << t.col() << "non";
@@ -696,13 +697,13 @@ namespace synthese
 						removeJunctionRequest.getAction()->setObjectId(junction->getKey());
 
 						stream << t.row();
-						stream << t.col() << junction->getEnd()->getName();
+                        stream << t.col() << junction->getEnd()->getCodeBySources() + " / " + junction->getEnd()->getName();
 						stream << t.col() <<
 							HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
 								junction->getStart()->getConnectionPlace()->getFullName()
 							);
-						stream << t.col() << junction->getStart()->getName();
+                        stream << t.col() << junction->getStart()->getCodeBySources() + " / " + junction->getStart()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
 						stream << t.col() << "non";
