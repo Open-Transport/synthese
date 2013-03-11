@@ -353,7 +353,7 @@ namespace synthese
 			{
 				const Service* service = *it;
 				time_duration endHour(service->getDepartureEndScheduleToIndex(RTData, getRankInPath()));
-				size_t endHours(std::min(endHour.hours(), 23));
+				size_t endHours(std::min((size_t)endHour.hours(), (size_t)23));
 				time_duration beginHour(service->getDepartureBeginScheduleToIndex(RTData, getRankInPath()));
 
 				for (numHour = 0; numHour <= endHours; ++numHour)
@@ -383,7 +383,7 @@ namespace synthese
 				const Service* service = *it;
 				time_duration endHour(service->getArrivalEndScheduleToIndex(RTData, getRankInPath()));
 				time_duration beginHour(service->getArrivalBeginScheduleToIndex(RTData, getRankInPath()));
-				size_t beginHours(std::min(beginHour.hours(), 23));
+				size_t beginHours(std::min((size_t)beginHour.hours(), (size_t)23));
 
 				for (numHour = 23; numHour >= beginHours; --numHour)
 				{
