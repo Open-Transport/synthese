@@ -387,7 +387,12 @@ namespace synthese
 		bool MessagesLibraryAdmin::_hasSameContent( const AdminInterfaceElement& other ) const
 		{
 			const MessagesLibraryAdmin& mother(static_cast<const MessagesLibraryAdmin&>(other));
-			return
+            if ((!_folder && mother._folder) ||
+                (_folder && !mother._folder))
+            {
+                return false;
+            }
+            return
 				(!_folder.get() && !mother._folder.get()) ||
 				(_folder.get() && mother._folder.get() && mother._folder->getKey()) == _folder->getKey();
 		}
