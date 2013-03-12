@@ -268,7 +268,16 @@ namespace synthese
 				try
 				{
 					EMail email(ServerModule::GetEMailSender());
-					email.setFormat(EMail::EMAIL_HTML);
+
+					// MIME type
+					string mimeType = _cmsConfirmationEMail.get()->getMimeType();
+					if (mimeType == "text/html") {
+						email.setFormat(EMail::EMAIL_HTML);
+					}
+					else
+					{
+						email.setFormat(EMail::EMAIL_TEXT);
+					}
 					email.setSender(_senderEMail);
 					email.setSenderName(_senderName);
 
@@ -379,7 +388,14 @@ namespace synthese
 				try
 				{
 					EMail email(ServerModule::GetEMailSender());
-					email.setFormat(EMail::EMAIL_HTML);
+					string mimeType = _cmsPasswordEMail.get()->getMimeType();
+					if (mimeType == "text/html") {
+						email.setFormat(EMail::EMAIL_HTML);
+					}
+					else
+					{
+						email.setFormat(EMail::EMAIL_TEXT);
+					}
 					email.setSender(_senderEMail);
 					email.setSenderName(_senderName);
 
@@ -538,7 +554,14 @@ namespace synthese
 				try
 				{
 					EMail email(ServerModule::GetEMailSender());
-					email.setFormat(EMail::EMAIL_HTML);
+					string mimeType = _cmsCancellationEMail.get()->getMimeType();
+					if (mimeType == "text/html") {
+						email.setFormat(EMail::EMAIL_HTML);
+					}
+					else
+					{
+						email.setFormat(EMail::EMAIL_TEXT);
+					}
 					email.setSender(_senderEMail);
 					email.setSenderName(_senderName);
 
