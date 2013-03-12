@@ -22,10 +22,16 @@
 
 #include "IneoNCEConnection.hpp"
 
-#include "CommercialLine.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "AlarmTableSync.h"
+#include "DBTransaction.hpp"
+#include "ScenarioTableSync.h"
+#include "ScenarioFolderTableSync.h"
+#include "MessagesLog.h"
 #include "Env.h"
 #include "Exception.h"
 #include "Log.h"
+#include "Session.h"
 #include "CurrentJourney.hpp"
 #include "ServerModule.h"
 #include "StopArea.hpp"
@@ -49,9 +55,13 @@ using namespace boost::system;
 using namespace geos::geom;
 using namespace std;
 
+#define INEO_NCE_SCENARIO_NAME "_IneoNCEConnection_"
+
 namespace synthese
 {
+	using namespace db;
 	using namespace impex;
+	using namespace messages;
 	using namespace pt;
 	using namespace server;
 	using namespace util;
@@ -82,6 +92,7 @@ namespace synthese
 
 			// Start the persistent actor that checks for deadline expiry.
 			checkDeadline();
+
 		}
 
 
@@ -177,6 +188,8 @@ namespace synthese
 
 		void IneoNCEConnection::InitThread()
 		{
+			_theConnection->initScenario();
+
 			// Main loop (never ends)
 			while(true)
 			{
@@ -222,6 +235,162 @@ namespace synthese
 			}
 		}
 
+
+		bool IneoNCEConnection::initScenario()
+		{
+			Env env;
+			ScenarioTableSync::SearchResult scenarios(
+				ScenarioTableSync::SearchSentScenarios(
+					env,
+					boost::optional<string>(INEO_NCE_SCENARIO_NAME),
+					boost::optional<bool>(),
+					boost::optional<bool>(),
+					boost::optional<RegistryKeyType>(),
+					boost::optional<int>(),
+					boost::optional<size_t>(),
+					true,
+					false,
+					false
+			)	);
+			if (scenarios.size())
+			{
+				DBTransaction transaction;
+				_sentScenario = dynamic_pointer_cast<SentScenario>(scenarios[0]);
+				_sentScenario->setIsEnabled(false);
+				_sentScenario->setPeriodStart(second_clock::local_time());
+				ScenarioTableSync::Save(_sentScenario.get(), transaction);
+				transaction.run();
+			}
+			else
+			{
+				createScenario();
+			}
+
+			// Get the SentScenario (our Message)
+			env.clear();
+			AlarmTableSync::SearchResult alarms(
+						AlarmTableSync::Search(env, _sentScenario->getKey()
+			)	);
+			if(alarms.size())
+			{
+				_message = dynamic_pointer_cast<SentAlarm>(alarms[0]);
+				_message->setScenario(_sentScenario.get());
+				_message->setLongMessage("");
+				_message->setShortMessage(INEO_NCE_SCENARIO_NAME);
+			}
+			else
+			{
+				createMessage();
+			}
+
+			// Remove all the Alarm Links, will create one once we know our line
+			clearScenarioLink();
+
+			return true;
+		}
+
+		void IneoNCEConnection::createScenario()
+		{
+			DBTransaction transaction;
+			Env env(Env::GetOfficialEnv());
+			// Creation of the scenario
+			_sentScenario.reset(
+						new SentScenario(
+							ScenarioTableSync::getId()
+			)	);
+			_sentScenario->setIsEnabled(false);
+			_sentScenario->setName(INEO_NCE_SCENARIO_NAME);
+			_sentScenario->setPeriodStart(second_clock::local_time());
+			env.getEditableRegistry<Scenario>().add(_sentScenario);
+			ScenarioTableSync::Save(_sentScenario.get(), transaction);
+			transaction.run();
+		}
+
+		void IneoNCEConnection::createMessage()
+		{
+			DBTransaction transaction;
+			Env env(Env::GetOfficialEnv());
+			_message.reset(
+						new SentAlarm(
+						AlarmTableSync::getId()
+							)	);
+			_message->setScenario(_sentScenario.get());
+			_sentScenario->addMessage(*_message);
+			_message->setLongMessage("");
+			_message->setShortMessage("");
+			_message->setLevel(ALARM_LEVEL_WARNING);
+			env.getEditableRegistry<Alarm>().add(_message);
+			AlarmTableSync::Save(_message.get(), transaction);
+			transaction.run();
+		}
+
+		void IneoNCEConnection::clearScenarioLink() const
+		{
+			Env env;
+			AlarmObjectLinkTableSync::SearchResult alarmLinks(
+						AlarmObjectLinkTableSync::Search(env, _message->getKey())
+						);
+			{
+				DBTransaction transaction;
+				Session *session(Session::New("0.0.0.0"));
+				BOOST_FOREACH(shared_ptr<AlarmObjectLink> alarmLink, alarmLinks)
+				{
+					AlarmObjectLinkTableSync::Remove(alarmLink->getKey());
+					DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(session, alarmLink->getKey(),
+						transaction, false
+					);
+				}
+				transaction.run();
+				Session::Delete(*session);
+			}
+		}
+
+		void IneoNCEConnection::createScenarioLink(CommercialLine *line) const
+		{
+			DBTransaction transaction;
+			Env env(Env::GetOfficialEnv());
+			_alarmObjectLink.reset(new AlarmObjectLink);
+			_alarmObjectLink->setKey(AlarmObjectLinkTableSync::getId());
+			_alarmObjectLink->setAlarm(_message.get());
+
+			_alarmObjectLink->setObject(line);
+			_alarmObjectLink->setRecipientKey("line");
+			env.getEditableRegistry<AlarmObjectLink>().add(_alarmObjectLink);
+
+			AlarmObjectLinkTableSync::Save(_alarmObjectLink.get(), transaction);
+			transaction.run();
+		}
+
+		void IneoNCEConnection::setScenarioLine(CommercialLine *line) const
+		{
+			if(!line ||
+				(_alarmObjectLink.get() && line->getKey() == _alarmObjectLink->getKey())
+			)
+			{
+				// The line has not changed
+				return;
+			}
+
+			clearScenarioLink();
+			createScenarioLink(line);
+		}
+
+		// If the given text message is empty then the scenario message is disabled
+		void IneoNCEConnection::setMessage(const string &message) const
+		{
+			if(_message.get())
+			{
+				DBTransaction transaction;
+				_message->setLongMessage(message);
+
+				// If the message is empty, we disable it
+				_sentScenario->setIsEnabled(!message.empty());
+
+				AlarmTableSync::Save(_message.get(), transaction);
+				ScenarioTableSync::Save(_sentScenario.get(), transaction);
+				transaction.run();
+			}
+		}
 
 
 		XMLNode IneoNCEConnection::ParseInput(
@@ -535,6 +704,7 @@ namespace synthese
 						_theConnection->_dataSource->getObjectByCode<CommercialLine>(nligNode.getText())
 					);
 					VehicleModule::GetCurrentJourney().setLine(line);
+					setScenarioLine(line);
 				}
 
 				// Line number
@@ -768,48 +938,65 @@ namespace synthese
 						XMLNode blocMsgNode(listeMsgNode.getChildNode("BlocMsg", i));
 						if(! blocMsgNode.isEmpty())
 						{
+							XMLNode contInfoNode(blocMsgNode.getChildNode("ContInf"));
 							XMLNode typeInfoNode(blocMsgNode.getChildNode("TypeInf"));
-							if(! typeInfoNode.isEmpty() && string(typeInfoNode.getText()) == "5")
+							if(! typeInfoNode.isEmpty() 
+								&& ! contInfoNode.isEmpty() 
+								&& contInfoNode.getText()
+							)
 							{
-								XMLNode contInfoNode(blocMsgNode.getChildNode("ContInf"));
-								if(! contInfoNode.isEmpty() && contInfoNode.getText())
+								try
 								{
+									int typeInfo(lexical_cast<int>(typeInfoNode.getText()));
 									string contInfoStr(contInfoNode.getText());
-									if(contInfoStr == "DEPART IMMINENT")
+									switch(typeInfo)
 									{
-										VehicleModule::GetCurrentJourney().setTerminusDepartureTime(
-													ptime(second_clock::local_time().date())
-										);
-									}
-									else
-									{
-										vector<string> parts;
-										split(parts, contInfoStr, is_any_of(" "));
-										if(parts.size() != 4 ||
-											( parts.size() == 4 &&
-											  (parts[0] != "DEPART" ||
-											   parts[1] != "DANS" ||
-											   parts[3] != "MN")
-											)
-										)
+									case 1:
+										// This is an information message
+										setMessage(contInfoStr);
+										break;
+									case 5:
+										if(contInfoStr == "DEPART IMMINENT")
 										{
-											throw Exception("Malformed MsgInfo");
+											VehicleModule::GetCurrentJourney().setTerminusDepartureTime(
+														ptime(second_clock::local_time().date())
+														);
 										}
 										else
 										{
-											try
+											vector<string> parts;
+											split(parts, contInfoStr, is_any_of(" "));
+											if(parts.size() != 4 ||
+													( parts.size() == 4 &&
+													  (parts[0] != "DEPART" ||
+													   parts[1] != "DANS" ||
+													   parts[3] != "MN")
+													  )
+													)
 											{
-												VehicleModule::GetCurrentJourney().setTerminusDepartureTime(
-															ptime(second_clock::local_time().date(), 
-																  time_duration(0, lexical_cast<unsigned short>(parts[2]), 0))
-														);
+												throw Exception("Malformed MsgInfo");
 											}
-											catch(bad_lexical_cast&)
+											else
 											{
-												throw Exception("Malformed MsgInfo minute");
+												try
+												{
+													VehicleModule::GetCurrentJourney().setTerminusDepartureTime(
+																ptime(second_clock::local_time().date(), 
+																	  time_duration(0, lexical_cast<unsigned short>(parts[2]), 0))
+															);
+												}
+												catch(bad_lexical_cast&)
+												{
+													throw Exception("Malformed MsgInfo minute");
+												}
 											}
 										}
+										break;
 									}
+								}
+								catch(bad_lexical_cast&)
+								{
+									throw Exception("Malformed TypInfo number");
 								}
 							}
 						}
