@@ -30,6 +30,11 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 
+#include "AlarmObjectLink.h"
+#include "CommercialLine.h"
+#include "SentScenario.h"
+#include "SentAlarm.h"
+
 namespace synthese
 {
 	namespace impex
@@ -92,6 +97,18 @@ namespace synthese
 
 			void checkDeadline();
 
+			// Message management
+			boost::shared_ptr<messages::SentScenario> _sentScenario;
+			boost::shared_ptr<messages::SentAlarm> _message;
+			mutable boost::shared_ptr<messages::AlarmObjectLink> _alarmObjectLink;
+			bool initScenario();
+			void createScenario();
+			void createMessage();
+			void createScenarioLink(pt::CommercialLine *line) const;
+			void clearScenarioLink() const;
+			void setMessage(const std::string &message) const;
+			void setScenarioLine(pt::CommercialLine *line) const;
+			
 		public:
 			IneoNCEConnection();
 
