@@ -280,18 +280,21 @@ namespace synthese
 				// we have a better one.
 				return;
 			}
-			if(arrivalShift.total_seconds() != 0)
+
+			// Arrival shift
 			{
 				time_duration schedule(_arrivalSchedules[rank]);
 				schedule += arrivalShift;
 				_RTArrivalSchedules[rank] = schedule;
 			}
-			if(departureShift.total_seconds() != 0)
+
+			// Departure shift
 			{
 				time_duration schedule(_departureSchedules[rank]);
 				schedule += departureShift;
 				_RTDepartureSchedules[rank] = schedule;
 			}
+
 			if(updateFollowingSchedules && rank + 1 < _arrivalSchedules.size())
 			{
 				_applyRealTimeShiftDuration(
@@ -301,11 +304,13 @@ namespace synthese
 					true
 				);
 			}
-			if(arrivalShift.total_seconds() && rank + 1 == _arrivalSchedules.size())
+			if(rank + 1 == _arrivalSchedules.size())
 			{
 				_computeNextRTUpdate();
 			}
 		}
+
+
 
 		void SchedulesBasedService::applyRealTimeShiftDuration( 
 			std::size_t rank, 
