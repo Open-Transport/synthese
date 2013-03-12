@@ -76,12 +76,12 @@ namespace synthese
 		template<>
 		AlarmRecipient::ObjectLinks	AlarmRecipientTemplate<VehicleAlarmRecipient>::_linksObject = AlarmRecipient::ObjectLinks();
 
-		template<> const string AlarmRecipientTemplate<VehicleAlarmRecipient>::TITLE("Véhicules");
+		template<> const string AlarmRecipientTemplate<VehicleAlarmRecipient>::TITLE("VÃ©hicules");
 
 		template<> void AlarmRecipientTemplate<VehicleAlarmRecipient>::GetParametersLabels(
 			ParameterLabelsVector& m
 		){
-			m.push_back(make_pair(FACTORY_KEY +"/"+ GLOBAL_PERIMETER,"(tous les véhicules)"));
+			m.push_back(make_pair(FACTORY_KEY +"/"+ GLOBAL_PERIMETER,"(tous les vÃ©hicules)"));
 		}
 
 
