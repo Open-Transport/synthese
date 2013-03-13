@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_INEO_NCE_HOST;
 			static const std::string MODULE_PARAM_INEO_NCE_PORT;
 			static const std::string MODULE_PARAM_INEO_NCE_DATASOURCE_ID;
+			static const std::string MODULE_PARAM_INEO_NCE_WITH_LOCAL_MESSAGE;
 
 			enum Status
 			{
@@ -67,6 +68,7 @@ namespace synthese
 			std::string _nceAddress;
 			std::string _ncePort;
 			const impex::DataSource* _dataSource;
+			bool _withLocalMessage;
 
 			mutable Status _status;
 
