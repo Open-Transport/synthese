@@ -128,6 +128,16 @@ namespace synthese
 				stream << t.col() << item;
 				stream << t.col() << "(submap)";
 			}
+			BOOST_FOREACH(const ParametersMap::SubMapsKeys::value_type& item, variables.getSubMapsKeys())
+			{
+				if(additionalParametersMap.hasSubMaps(item))
+				{
+					continue;
+				}
+				stream << t.row();
+				stream << t.col() << item;
+				stream << t.col() << "(submap)";
+			}
 			stream << t.close();
 
 		}
