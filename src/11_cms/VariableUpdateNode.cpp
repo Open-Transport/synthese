@@ -101,18 +101,18 @@ namespace synthese
 						const ParametersMap::SubParametersMap::mapped_type& subMaps(
 							pm->getSubMaps(item.key)
 						);
-						pm = NULL;
+						ParametersMap* pm2(NULL);
 						BOOST_FOREACH(const shared_ptr<ParametersMap>& subMapItem, subMaps)
 						{
 							if(subMapItem->getDefault<string>(FIELD_ID) == idx)
 							{
-								pm = subMapItem.get();
+								pm2 = subMapItem.get();
 								break;
 							}
 						}
 
 						// Creation if necessary
-						if(!pm)
+						if(!pm2)
 						{
 							shared_ptr<ParametersMap> subMap(new ParametersMap);
 							subMap->insert(
@@ -121,6 +121,10 @@ namespace synthese
 							);
 							pm->insert(item.key, subMap);
 							pm = subMap.get();
+						}
+						else
+						{
+							pm = pm2;
 						}
 					}
 				}

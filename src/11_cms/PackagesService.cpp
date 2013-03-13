@@ -68,6 +68,9 @@ namespace synthese
 		ParametersMap PackagesService::_getParametersMap() const
 		{
 			ParametersMap map;
+			map.insert(PARAMETER_SVN_URL, _repo.getURL());
+			map.insert(PARAMETER_SVN_USER, _svnUser);
+			map.insert(PARAMETER_SVN_PASSWORD, _svnPassword);
 			return map;
 		}
 
@@ -123,12 +126,12 @@ namespace synthese
 					// Installation request
 					StaticActionFunctionRequest<SVNCheckoutAction, PackagesService> checkoutRequest(request, true);
 					checkoutRequest.getAction()->setUser(_svnUser);
-					checkoutRequest.getAction()->setUser(_svnPassword);
+					checkoutRequest.getAction()->setPassword(_svnPassword);
 
 					// Update request
 					StaticActionFunctionRequest<SVNUpdateAction, PackagesService> updateRequest(request, true);
 					updateRequest.getAction()->setUser(_svnUser);
-					updateRequest.getAction()->setUser(_svnPassword);
+					updateRequest.getAction()->setPassword(_svnPassword);
 
 					// Draw the table
 					HTMLTable::ColsVector c;
