@@ -73,6 +73,7 @@ namespace synthese
 		const string IneoNCEConnection::MODULE_PARAM_INEO_NCE_HOST = "ineo_nce_host";
 		const string IneoNCEConnection::MODULE_PARAM_INEO_NCE_PORT = "ineo_nce_port";
 		const string IneoNCEConnection::MODULE_PARAM_INEO_NCE_DATASOURCE_ID = "ineo_nce_datasource_id";
+		const string IneoNCEConnection::MODULE_PARAM_INEO_NCE_WITH_LOCAL_MESSAGE = "ineo_nce_with_local_message";
 		
 		boost::shared_ptr<IneoNCEConnection> IneoNCEConnection::_theConnection(new IneoNCEConnection);
 		
@@ -188,8 +189,6 @@ namespace synthese
 
 		void IneoNCEConnection::InitThread()
 		{
-			_theConnection->initScenario();
-
 			// Main loop (never ends)
 			while(true)
 			{
@@ -363,6 +362,11 @@ namespace synthese
 
 		void IneoNCEConnection::setScenarioLine(CommercialLine *line) const
 		{
+			if(!_withLocalMessage)
+			{
+				return;
+			}
+
 			if(!line ||
 				(_alarmObjectLink.get() && line->getKey() == _alarmObjectLink->getKey())
 			)
@@ -378,6 +382,11 @@ namespace synthese
 		// If the given text message is empty then the scenario message is disabled
 		void IneoNCEConnection::setMessage(const string &message) const
 		{
+			if(!_withLocalMessage)
+			{
+				return;
+			}
+
 			if(_message.get())
 			{
 				DBTransaction transaction;
@@ -452,6 +461,17 @@ namespace synthese
 				catch(bad_lexical_cast&)
 				{
 					// Log ?
+				}
+			}
+
+			// With Local Message
+			if(name == MODULE_PARAM_INEO_NCE_WITH_LOCAL_MESSAGE)
+			{
+				_theConnection->_withLocalMessage = (value == "1");
+
+				if(_theConnection->_withLocalMessage)
+				{
+					_theConnection->initScenario();
 				}
 			}
 		}
