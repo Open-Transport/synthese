@@ -167,7 +167,8 @@ namespace synthese
 			}
 
 			// No items to display
-			if(	!additionalParametersMap.hasSubMaps(_arrayCode)
+			if(	!additionalParametersMap.hasSubMaps(_arrayCode) &&
+				!variables.hasSubMaps(_arrayCode)
 			){
 				_emptyTemplate.display(stream, request, baseParametersMap, page, variables);
 				return;
@@ -175,7 +176,9 @@ namespace synthese
 
 			// Items read
 			const ParametersMap::SubParametersMap::mapped_type& items(
-				additionalParametersMap.getSubMaps(_arrayCode)
+				additionalParametersMap.hasSubMaps(_arrayCode) ?
+				additionalParametersMap.getSubMaps(_arrayCode) :
+				variables.getSubMaps(_arrayCode)
 			);
 			size_t itemsCount(items.size());
 

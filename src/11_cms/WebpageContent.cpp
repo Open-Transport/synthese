@@ -362,9 +362,9 @@ namespace synthese
 						for(string::const_iterator it3(parameter.begin()); it3!=parameter.end(); )
 						{
 							// Alphanum chars
-							if( (*it3 >= 'a' && *it <= 'z') ||
-								(*it3 >= 'A' && *it <= 'Z') ||
-								(*it3 >= '0' && *it <= '9') ||
+							if( (*it3 >= 'a' && *it3 <= 'z') ||
+								(*it3 >= 'A' && *it3 <= 'Z') ||
+								(*it3 >= '0' && *it3 <= '9') ||
 								*it3 == '_'
 							){
 								items.rbegin()->key.push_back(*it3);
