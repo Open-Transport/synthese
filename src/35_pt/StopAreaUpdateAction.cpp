@@ -1,4 +1,4 @@
-
+﻿
 //////////////////////////////////////////////////////////////////////////
 /// StopAreaUpdateAction class implementation.
 /// @file StopAreaUpdateAction.cpp
@@ -35,6 +35,11 @@
 #include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "CityTableSync.h"
+#include "PathGroup.h"
+#include "StopPoint.hpp"
+#include "StopPointTableSync.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
 
 using namespace std;
 using namespace boost::posix_time;
@@ -45,9 +50,11 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace pt;
+    using namespace pt;
 	using namespace impex;
 	using namespace geography;
+    using namespace graph;
+    using namespace db;
 
 	namespace util
 	{
@@ -232,7 +239,44 @@ namespace synthese
 			// Importable
 			_doImportableUpdate(*_place, request);
 
-			StopAreaTableSync::Save(_place.get());
+            // TODO : do we have to load everything of these ?
+			// at least it actually works.
+            StopPointTableSync::SearchResult stops(
+                StopPointTableSync::Search(*_env, _place->getKey())
+            );
+            CommercialLineTableSync::SearchResult lines(
+                CommercialLineTableSync::Search(*_env)
+            );
+            JourneyPatternTableSync::SearchResult journeyPatterns(
+                JourneyPatternTableSync::Search(*_env)
+            );
+            LineStopTableSync::SearchResult lineStops(
+                LineStopTableSync::Search(*_env)
+            );
+
+            _place->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+
+            DBTransaction transaction;
+
+            StopAreaTableSync::Save(_place.get(), transaction);
+            BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
+            {
+                StopPointTableSync::Save(stop.get(), transaction);
+            }
+            BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+            {
+                CommercialLineTableSync::Save(line.get(), transaction);
+            }
+            BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, journeyPatterns)
+            {
+                JourneyPatternTableSync::Save(line.get(), transaction);
+            }
+            BOOST_FOREACH(const shared_ptr<LineStop>& lineStop, lineStops)
+            {
+                LineStopTableSync::Save(lineStop.get(), transaction);
+            }
+
+            transaction.run();
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
