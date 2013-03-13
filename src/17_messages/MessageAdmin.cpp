@@ -159,6 +159,17 @@ namespace synthese
 				}
 				else
 				{
+					PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
+					stream << tu.open();
+					stream << tu.cell(
+						"Type",
+						tu.getForm().getRadioInputCollection(
+							UpdateAlarmMessagesAction::PARAMETER_TYPE,
+							MessagesModule::getLevelLabels(),
+							optional<AlarmLevel>(_alarm->getLevel())
+					)	);
+					stream << tu.close();
+
 					StaticActionRequest<UpdateAlarmMessagesAction> contentUpdateRequest(_request);
 					contentUpdateRequest.getAction()->setAlarm(const_pointer_cast<Alarm>(_alarm));
 
