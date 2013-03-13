@@ -394,7 +394,7 @@ namespace synthese
 				StopPointTableSync::SearchResult stops(StopPointTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 				BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
 				{
-					result.push_back(std::make_pair(stop->getKey(), stop->getName()));
+					result.push_back(std::make_pair(stop->getKey(), stop->getCodeBySources() + " / " + stop->getName()));
 				}
 				return result;
 		} ;
