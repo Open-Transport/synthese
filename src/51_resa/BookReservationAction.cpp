@@ -427,6 +427,9 @@ namespace synthese
 			rt.setCustomerUserId(_customer->getKey());
 			rt.setSeats(_seatsNumber);
 			rt.setComment(_comment);
+			rt.setCustomer(
+				UserTableSync::GetEditable(_customer->getKey(), *_env, UP_LINKS_LOAD_LEVEL).get()
+			);
 			ReservationTransactionTableSync::Save(&rt);
 
 			// Contact center
