@@ -1,0 +1,11 @@
+<select name="<@name@>" class="input-medium">
+<@n=0@>
+<<option>>
+<option value="<?date&d=+<@n@>&u=day?>"	<?if&cond=<?=&l=<@value@>&r=<?date&d=+<@n@>&u=day?>?>&then=selected="true"?>>
+<#/snippets/day_name&d=<?date&d=+<@n@>&u=day&strftime_format=%u?>#>
+<?date&d=+<@n@>&u=day&strftime_format=%d?>
+<#/snippets/month_name&m=<?date&d=+<@n@>&u=day&strftime_format=%m?>#>
+</option>
+<@n=<?+&l=<@n@>&r=1?>@>
+<%<?if&cond=<?=&l=<@n@>&r=20?>&else=option?>%>
+</select>
