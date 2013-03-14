@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title><#/config/title#>: <@title@></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+  <?if	&cond=<?session&template=<{session&template=<@session_id@>}>?>
+	&else=
+	<div class="navbar">
+		<div class="navbar-inner">
+			<div class="container">
+			      <ul class="nav pull-right">
+				      <a class="brand" href="#"><#/config/title#></a>
+			      </ul>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+	<?form	&name=login
+		&a=login
+		&class=form-horizontal well
+		&page_id=<@p@>
+	?>
+	
+	<fieldset>
+	<legend>Veuillez vous connecter.</legend>
+	<div class="control-group">
+		<label class="control-label" for="actionParamlogin">Login</label>
+		<div class="controls">
+			<input type="text" class="input-xlarge" id="actionParamlogin" name="actionParamlogin" />
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="actionParampwd">Mot de passe</label>
+		<div class="controls">
+			<input type="password" class="input-xlarge" id="actionParampwd" name="actionParampwd" />
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="controls">
+			<button type="submit" class="btn btn-primary">Connecter</button>
+		</div>
+	</div>
+	</fieldset>
+ 	</form>
+	</div>
+	&then=
+		<?if&cond=<@no_navbar@>&else=
+    <div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+      <form class="navbar-form pull-left">
+      <button class="btn btn-primary">Prendre un appel</button>
+      </form>
+  
+      <ul class="nav">
+      <li class="divider-vertical"></li>
+      <?menu&root=17733447518781464&raw_data=1&template=<{page&template=
+        <li><?link&target=<@id@>&text=<@title@>?></li>
+      }>?>
+      </ul>
+      <ul class="nav pull-right">
+      <?link&target=<@p@>&a=logout&text=Déconnecter&class=btn?>
+      <?link&target=17733447518781464&class=brand&text=<#/config/title#>?>
+      </ul>
+    </div>
+    </div>
+    </div>
+    ?>
+    
+  <div class="container-fluid">
+  <@content@>
+      <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+    <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+
+  </div>
+  ?></body>
+</html>

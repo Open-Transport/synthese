@@ -1,0 +1,58 @@
+<span class="span3">
+<ul class="nav nav-list well">
+<?LinesListFunction2
+&contact_center_id=<#/config/contact_center#>
+&template=
+	<{line&template=
+		<li><?link&target=<@p@>&line_id=<@id@>&text=<@shortName@> <@name@>?></li>
+	}>
+?></ul></span>
+
+<span class="span10">
+<?if
+&cond=<@line_id@>
+&then=
+	<div class="page-header span10">
+	<div class="pull-left">
+	<h1><?PTObjectInformationFunction&roid=<@line_id@>&info=short_name?> 
+	<?PTObjectInformationFunction&roid=<@line_id@>&info=name?></h1>
+	</div>
+	
+	<div class="btn-group pull-right">
+         <?link&target=<@p@>&line_id=<@line_id@>&date=<?date&b=<@date@>&d=-2&u=day?>&class=btn&text=<?date&b=<@date@>&d=-2&u=day&strftime_format=%d/%m?>?>
+         <?link&target=<@p@>&line_id=<@line_id@>&date=<?date&b=<@date@>&d=-1&u=day?>&class=btn&text=<?date&b=<@date@>&d=-1&u=day&strftime_format=%d/%m?>?>
+         <?link&target=<@p@>&line_id=<@line_id@>&date=<?date&b=<@date@>&d=&u=day?>&class=btn btn-primary&text=<?date&b=<@date@>&d=&u=day&strftime_format=%d/%m?>?>
+         <?link&target=<@p@>&line_id=<@line_id@>&date=<?date&b=<@date@>&d=+1&u=day?>&class=btn&text=<?date&b=<@date@>&d=+1&u=day&strftime_format=%d/%m?>?>
+         <?link&target=<@p@>&line_id=<@line_id@>&date=<?date&b=<@date@>&d=+2&u=day?>&class=btn&text=<?date&b=<@date@>&d=+2&u=day&strftime_format=%d/%m?>?>
+        </div>
+        </div>
+        
+        <@date=<?if&cond=<@date@>&then=<@date@>&else=<?date?>?>@>
+	
+	<?ReservationsListService
+	&li=<@line_id@>
+	&da=<@date@>
+	&template=
+		<table class="table table-striped table-condensed">
+		<thead>
+		<tr><th></th><th>Heure</th>
+		<th>Départ</th>
+		<th>Arrivée</th>
+		<th>Heure</th>
+		<th>Client</th>
+		</tr></thead><tbody>
+		<{reservation&template=
+			<tr>
+			<td><?if&cond=<@comment@>&then=<a href="#" title="<@comment@>" rel="tooltip" class="badge badge-info">!</a>?></td>
+			<td><?substr&t=<@departure_time@>&f=11&n=5?></td>
+			<td><@departure_place_name@></td>
+			<td><@arrival_place_name@></td>
+			<td><?substr&t=<@arrival_time@>&f=11&n=5?></td>
+			<td><@name@></td>
+			</tr>
+			
+		}></tbody></table>
+	?>
+	
+	
+?></span>

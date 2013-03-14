@@ -1,0 +1,24 @@
+<?places_list
+	&text=<@text@>
+	&number=5
+	&sorted=1
+	&template=
+	<table class="table table-condensed">
+	<thead>
+	<tr><th>Localités</th><th>Lieux publics</th><th>Rues</th><th>Arrêts</th></tr>
+	</thead><tfoot><tr>
+	  <td style="width:25%"><{cities&template=<ul><{city&template=
+	    <li><a href="#" onclick='selectPlace("<@field@>","<@key@>");'><@key@></a></li>
+	  }></ul>}></td>
+	  <td style="width:25%"><{public_places&template=<ul><{public_place&template=
+	    <li><a href="#" onclick='selectPlace("<@field@>","<@key@>");'><@key@></a></li>
+	  }></ul>}></td>
+	  <td style="width:25%"><{roads&template=<ul><{road&template=
+	    <li><a href="#" onclick='selectPlace("<@field@>","<@key@>");'><@key@></a></li>
+	  }></ul>}></td>
+	  <td style="width:25%"><{stops&template=<ul><{stop&template=
+	    <li><a href="#" onclick='selectPlace("<@field@>","<@key@>");'><@key@></a></li>
+	  }></ul>}></td>
+	</tr></tfoot>
+	</table>
+?>

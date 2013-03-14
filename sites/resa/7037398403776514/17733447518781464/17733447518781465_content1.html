@@ -1,0 +1,63 @@
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#journey" data-toggle="tab">Par trajet</a></li>
+    <li><a href="#user" data-toggle="tab">Par utilisateur</a></li>
+    <li><a href="#line" data-toggle="tab">Par ligne</a></li>
+</ul>
+
+<div class="tab-content">
+<div class="tab-pane active" id="journey">
+<?form	&page_id=<@p@>
+	&class=well form-inline
+	&name=journey_planner
+?>
+<div class="input-append"><input type="text" class="input-large" placeholder="Départ" id="departure" name="departure" value="<@departure@>"><a href="#" onclick="showPlacesList('departure');" class="btn">+</a></div>
+<div class="input-append"><input type="text" class="input-large" placeholder="Arrivée" id="arrival" name="arrival" value="<@arrival@>"><a href="#" onclick="showPlacesList('arrival');" class="btn">+</a></div>
+<#/snippets/dates_list&name=date&value=<@date@>#>
+<#/snippets/time_list&name=time&value=<@time@>#>
+<button class="btn btn-primary">OK</button>
+</form>
+</div>
+<div class="modal fade" id="searchPlace">
+    <div class="modal-header">
+    <button class="close" data-dismiss="modal">×</button>
+    <h3>Sélection de lieu</h3>
+    </div>
+    <div class="modal-body" id="placesListBody">
+    </div>
+    <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">Fermer</a>
+    </div>
+</div>
+<script>
+function showPlacesList(field)
+{
+  $('#placesListBody').html("Veuillez patienter...");
+  $('#searchPlace').modal('show');
+  $.ajax({
+    url: '<@client_url@>?SERVICE=page&si=<@site_id@>&smart_url=/snippets/places_list&field='+ field +'&text='+document.getElementById(field).value,
+    success: function(data){
+      $('#placesListBody').html(data);
+    }
+  });
+  return false;
+}
+function selectPlace(field,key)
+{
+  document.getElementById(field).value=key;
+  $('#searchPlace').modal('hide');
+  return false;
+}
+</script>
+
+
+<div class="tab-pane" id="user">
+<#/snippets/client_form#>
+</div>
+
+<div class="tab-pane" id="line">
+<div class="well">
+<h2>Sélectionner la ligne</h2>
+</div>
+</div>
+
+</div>

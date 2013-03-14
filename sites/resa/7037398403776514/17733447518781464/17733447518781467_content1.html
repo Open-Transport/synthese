@@ -1,0 +1,40 @@
+<h1>Réservations non confirmées à contrôler</h1>
+
+<table class="table table-condensed table-striped">
+<thead>
+<tr><th>Ligne</th><th>Fermeture</th><th>Heure</th><th>Départ</th><th>Arrivée</th><th>Client</th><th>Statut</th></tr>
+</thead><tbody>
+<?LinesListFunction2
+&contact_center_id=<#/config/contact_center#>
+&template=<{line&template=
+	<?ReservationsListService
+	&li=<@line_id@>
+	&use_cache=1
+	&template=<{reservation&template=
+		<@status_code=<{status&template=<@status@>}>@>
+		<?if
+		&cond=<?and&l=<?or&l=<?or&l=<?=&l=<@status_code@>&r=3?>&r=<?=&l=<@status_code@>&r=5?>?>&r=<?or&l=<?=&l=<@status_code@>&r=7?>&r=<?=&l=<@status_code@>&r=9?>?>?>
+			&r=<?>&r=<@minutes_to_departure@>&l=<?if&cond=<?=&l=<@minutes_dead_line_to_departure@>&r=15?>&then=9&else=30?>?>
+			?>
+		&then=
+			<tr><td><@line_short_name@></td>
+			<td><#display_hour&date=<@reservation_dead_line@>#></td>
+			<td><#display_hour&date=<@departure_time@>#></td>
+			<td><@departure_place_name@></td>
+			<td><@arrival_place_name@></td>
+			<td><@name@></td>
+			<td><{status&template=<@name@>}></td>
+			</tr>
+		?>
+	}>?>
+}>?>
+</tbody></table>
+
+<script type="text/javascript">
+<!--
+function AutoRefresh(interval) {
+	setTimeout("location.reload(true);",interval);
+}
+AutoRefresh(60000);
+//   -->
+</script>
