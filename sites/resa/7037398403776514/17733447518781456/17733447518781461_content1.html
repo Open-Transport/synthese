@@ -1,0 +1,9 @@
+<@value=<?if&cond=<?=&l=<@value@>&r=?>&then=<?date&strftime_format=%H?>:00&else=<@value@>?>@>
+<select name="<@name@>" class="input-small">
+<@n=0@>
+<<option>>
+<@formatted=<?if&cond=<?>&l=<@n@>&r=9?>&else=0?><@n@>:00@>
+<option value="<@formatted@>" <?if&cond=<?=&l=<@value@>&r=<@formatted@>?>&then=selected="1"?>><@formatted@></option>
+<@n=<?+&l=<@n@>&r=1?>@>
+<%<?if&cond=<?=&l=<@n@>&r=24?>&else=option?>%>
+</select>
