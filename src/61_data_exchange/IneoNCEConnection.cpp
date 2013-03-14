@@ -316,7 +316,7 @@ namespace synthese
 			_message->setScenario(_sentScenario.get());
 			_sentScenario->addMessage(*_message);
 			_message->setLongMessage("");
-			_message->setShortMessage("");
+			_message->setShortMessage(INEO_NCE_SCENARIO_NAME);
 			_message->setLevel(ALARM_LEVEL_WARNING);
 			env.getEditableRegistry<Alarm>().add(_message);
 			AlarmTableSync::Save(_message.get(), transaction);
@@ -973,7 +973,7 @@ namespace synthese
 									{
 									case 1:
 										// This is an information message
-										setMessage(contInfoStr);
+										setMessage(_iconv.convert(contInfoStr));
 										break;
 									case 5:
 										if(contInfoStr == "DEPART IMMINENT")
