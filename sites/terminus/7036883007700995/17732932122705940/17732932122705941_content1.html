@@ -1,11 +1,54 @@
-<p>Bienvenue dans Terminus</p>
+<p class="lead">Bienvenue dans Terminus</p>
 
+<@exp_scenario_number=0@>
+<?scenarii&
+	t=0&
+	archives=0&
+	section_in=1&
+	template=<{scenario&template=
+		<?if&cond=<@active@>&then=<@exp_scenario_number=<@exp_scenario_number+1@>@>?>
+	}>
+?>
+<@comm_scenario_number=0@>
+<?scenarii&
+	t=0&
+	archives=0&
+	section_in=2&
+	template=<{scenario&template=
+		<?if&cond=<@active@>&then=<@comm_scenario_number=<@comm_scenario_number+1@>@>?>
+	}>
+?>
 <@iv_scenario_number=0@>
-<?scenarii&t=0&template=<{scenario&template=
-<?if&cond=<@active@>&then=<@iv_scenario_number=<@iv_scenario_number+1@>@>?>
+<?scenarii&
+	t=0&
+	archives=0&
+	section_in=3&
+	template=<{scenario&template=
+		<?if&cond=<@active@>&then=<@iv_scenario_number=<@iv_scenario_number+1@>@>?>
+	}>
+?>
 
-}>?>
-
-
+<h5>Résumé des diffusions en cours</h5>
 <table class="table table-striped table-condensed">
-<tr><td>Information voyageurs</td><td><@iv_scenario_number@> évènement<@(iv_scenario_number>1)?"s":""@> en cours de diffusion</td></tr></table>
+<?if&cond=<@exp_scenario_number@>&then=
+<tr><td>Exploitation</td><td><@exp_scenario_number@> Evénement<@(exp_scenario_number>1)?"s":""@> en cours de diffusion</td></tr>
+?>
+<?if&cond=<@comm_scenario_number@>&then=
+<tr><td>Communication</td><td><@comm_scenario_number@> Evénement<@(comm_scenario_number>1)?"s":""@> en cours de diffusion</td></tr>
+?>
+<?if&cond=<@iv_scenario_number@>&then=
+<tr><td>Information voyageurs</td><td><@iv_scenario_number@> Evénement<@(iv_scenario_number>1)?"s":""@> en cours de diffusion</td></tr>
+?>
+</table>
+<h5>Sessions ouvertes</h5>
+<table class="table table-striped table-condensed">
+<thead><tr><td>Utilisateur</td><td>Rubrique</td><td>Evénement</td></tr></thead><tbody>
+<?SessionsListService&template=<{session&template=
+<?if&cond=<@terminus_section@>&then=
+<tr>
+<td><{user&template=<@login@>}></td>
+<td><#section_name&section=<@terminus_section@>#></td>
+<td></td>
+</tr>
+?>
+}>?></tbody></table>
