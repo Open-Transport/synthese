@@ -316,8 +316,9 @@ namespace synthese
 					contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceName());
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceName());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-					contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomerName());
+					contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
 					contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
+					contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
 
 					_cmsConfirmationEMail.get()->display(content, contentMap);
 
@@ -599,8 +600,9 @@ namespace synthese
 					contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceName());
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceName());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-					contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomerName());
+					contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
 					contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
+					contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
 
 					_cmsCancellationEMail.get()->display(content, contentMap);
 					email.setContent(content.str());
