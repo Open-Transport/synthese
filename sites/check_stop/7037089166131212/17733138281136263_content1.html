@@ -1,0 +1,16 @@
+<h1>Saisir le nom de l'arrêt</h1>
+
+<?form&name=search&page_id=<@p@>?>
+<input name="s" value="<@s@>" /> <button class="btn btn-mini btn-primary">OK</button>
+</form>
+
+<?if&cond=<@s@>&then=
+	<ul><?places_list&
+		class_filter=stop&
+		text=<@s@>&
+		number=10&
+		template=<{stops&template=<{stop&template=
+			<li><?link&target=17733138281136265&roid=<@id@>&text=<@city_name@> <@name@>?></li>
+		}>}>
+	?></ul>
+?>

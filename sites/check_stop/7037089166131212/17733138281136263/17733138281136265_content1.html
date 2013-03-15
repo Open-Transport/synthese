@@ -1,0 +1,17 @@
+<table class="table table-striped table-condensed">
+<?timetable_build
+&roid=<@roid@>
+&cid=15199653037343235
+&template=
+<{col&template=
+ <tr>
+ <td><{cell&template=<?if&cond=<@rank@>&else=<?substr&t=<@time@>&n=5?>?>}></td>
+ <td><{line&template=<@line_short_name@>}></td>
+ <td><{service&template=<@rank?"/":""@><a href="/admin/?SERVICE=page\&cc=0\&p=17732932122705920\&roid=<@service_id@>\&rub=ServiceAdmin"><@service_number@></a>}></td>
+ <td style="white-space:nowrap;"><{service&template=<@rank?" ou ":""@><?services_list&roid=<@service_id@>&template=<{service&template=<@arrival_place_name@>}>?>}></td>
+ <td><{cell&template=<?if&cond=<@rank@>&else=<{stop_point&template=<@name@>}>?>}></td>
+ <td style="white-space:nowrap;"><{note&template=<@text@>}></td>
+ </tr>
+}>
+?>
+</table>
