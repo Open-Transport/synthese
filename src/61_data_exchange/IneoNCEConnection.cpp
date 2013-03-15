@@ -960,9 +960,8 @@ namespace synthese
 						{
 							XMLNode contInfoNode(blocMsgNode.getChildNode("ContInf"));
 							XMLNode typeInfoNode(blocMsgNode.getChildNode("TypeInf"));
-							if(! typeInfoNode.isEmpty() 
-								&& ! contInfoNode.isEmpty() 
-								&& contInfoNode.getText()
+							if(! typeInfoNode.isEmpty()
+								&& ! contInfoNode.isEmpty()
 							)
 							{
 								try
@@ -982,7 +981,7 @@ namespace synthese
 														ptime(second_clock::local_time().date())
 														);
 										}
-										else
+										else if(contInfoStr.compare(0, 6, "DEPART") == 0)
 										{
 											vector<string> parts;
 											split(parts, contInfoStr, is_any_of(" "));
