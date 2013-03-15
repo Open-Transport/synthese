@@ -531,7 +531,7 @@ namespace synthese
 									t = duration_from_string(map.get<string>(PARAMETER_START_TIME));
 								}
 								_startDate = ptime(
-									date_from_iso_string(map.get<string>(PARAMETER_START_DATE)),
+									from_string(map.get<string>(PARAMETER_START_DATE)),
 									t
 								);
 							}
@@ -559,7 +559,7 @@ namespace synthese
 									t = duration_from_string(map.get<string>(PARAMETER_END_TIME));
 								}
 								_endDate = ptime(
-									date_from_iso_string(map.get<string>(PARAMETER_END_DATE)),
+									from_string(map.get<string>(PARAMETER_END_DATE)),
 									t
 								);
 							}
@@ -588,7 +588,7 @@ namespace synthese
 									t = duration_from_string(map.get<string>(PARAMETER_EVENT_START_TIME));
 								}
 								_eventStartDate = ptime(
-									date_from_iso_string(map.get<string>(PARAMETER_EVENT_START_DATE)),
+									from_string(map.get<string>(PARAMETER_EVENT_START_DATE)),
 									t
 								);
 							}
@@ -616,7 +616,7 @@ namespace synthese
 									t = duration_from_string(map.get<string>(PARAMETER_EVENT_END_TIME));
 								}
 								_eventEndDate = ptime(
-									date_from_iso_string(map.get<string>(PARAMETER_EVENT_END_DATE)),
+									from_string(map.get<string>(PARAMETER_EVENT_END_DATE)),
 									t
 								);
 							}
