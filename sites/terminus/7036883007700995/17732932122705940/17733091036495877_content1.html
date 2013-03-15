@@ -1,5 +1,8 @@
 <ul id="nav_tabs" class="nav nav-tabs">
- <#tab_title&default=1&id=message_types&title=Types de contenu#>
+ <#tab_title&default=1&id=message_types&title=Types de messages#>
+ <#tab_title&id=display_types&title=Types de diffuseurs#>
+ <#tab_title&id=broadcast_rules&title=Règles d'affichage#>
+ <#tab_title&id=log&title=Journal#>
 </ul>
 
 <div id="tab_content" class="tab-content">
@@ -38,5 +41,84 @@
 
 </div>
 
+<#tab_div&id=display_types#>
+
+<h3>Bornes</h3>
+
+<table class="table table-condensed table-striped">
+<thead><tr><th>type de borne</th><th>type de message</th><th>règle d'affichage</th></tr></thead><tbody>
+<?display_types&template=
+<{display_type&template=
+<tr>
+
+<td><@name@></td>
+
+<td><?form&tab=display_types&class=form-inline&page_id=<@p@>&name=message_type_<@id@>&a=updatedisplaytype&actionParamdtu_id=<@id@>?><select name="actionParam_message_type_id"><option value="0">Message principal</option><?message_types&template=<{type&template=<option value="<@id@>" <?if&cond=<@message_type_id==id@>&then=selected="true"?>><@name@></option>}>?></select><button class="btn btn-primary">Modifier</button></form></td>
+
+<td><?form&tab=display_types&class=form-inline&page_id=<@p@>&name=message_rule_<@id@>&a=updatedisplaytype&actionParamdtu_id=<@id@>?><select name="actionParam_message_is_displayed_page_id"><option value="0">Pas de règle</option><?menu&root=17733086741528586&raw_data=1&template=<{page&template=<option value="<@id@>" <?if&cond=<@message_is_displayed_page_id==id@>&then=selected="true"?>><@title@></option>}>?>?></select><button class="btn btn-primary">Modifier</button></form></td>
+
+</tr>
+}>?>
+</tbody></table>
+</div>
+
+<#tab_div&id=broadcast_rules#>
+
+<table class="table table-striped table-condensed">
+<thead><tr><th>règle</th><th>code source</th></tr></thead><tbody>
+<?menu&root=17733086741528586&raw_data=1&template=
+<{page&template=
+<tr>
+
+<td><@title@></td>
+
+<td><?form&tab=broadcast_rules&class=form-inline&page_id=<@p@>&name=rule_code_<@id@>&a=ObjectUpdate&actionParam_object_id=<@id@>?>
+<textarea name="actionParam_field_content1"><@content1@></textarea><br /><button class="btn btn-primary">Enregistrer</button></form>
+</td></tr>
+}>?>
+</tbody></table>
+</div>
+
+
+<#tab_div&id=log#>
+
+    <div class="pagination">
+    <ul>
+    <?if&cond=<@r>=150@>&then=<li><?link&target=<@p@>&r=0&text=1&tab=log?></li>?>
+    <?if&cond=<@r>=200@>&then=<li class="disabled"><a href="#">...</a></li>?>
+    <?if&cond=<@r>=100@>&then=<li><?link&target=<@p@>&r=<@r-100@>&text=<@(r/50)-1@>&tab=log?></li>?>
+    <?if&cond=<@r>=50@>&then=<li><?link&target=<@p@>&r=<@r-50@>&text=<@(r/50)@>&tab=log?></li>?>
+    <li class="active"><a href="#"><@1+(r/50)@></a></li>
+    <li><?link&target=<@p@>&r=<@r+50@>&text=<@(r/50)+2@>&tab=log?></li>
+    <li><?link&target=<@p@>&r=<@r+100@>&text=<@(r/50)+3@>&tab=log?></li>
+    </ul>
+    </div>
+
+<table class="table-striped table-condensed table">
+<thead><tr>
+<th>date</th>
+<th>utilisateur</th>
+<th>événement</th>
+<th>contenu</th>
+<th>action</th>
+</tr></thead>
+<tbody>
+<?db_log&
+	log_key=messages&
+	first=<@r@>&
+	template=<{entry&template=
+		<tr>
+		<td><@date@></td>
+		<td><{user&template=<@login@>}></td>
+		<td><@object_name@></td>
+		<td><@col0@></td>
+		<td><?substr&t=<@col1@>&n=200?></td>
+		</tr>
+	}>
+?>
+</tbody>
+</table>
+
+</div>
 
 </div>

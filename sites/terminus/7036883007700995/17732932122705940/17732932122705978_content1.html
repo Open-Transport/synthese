@@ -1,21 +1,30 @@
-<form class="form well">
-<select><option>Ligne 1</option><option>Ligne 2</option></select>
-<button class="btn btn-prmiary">Rechercher</button>
+<?form&name=search&page_id=<@p@>&class=form well?>
+<input name="text_search" value="<@text_search@>" />
+<button class="btn btn-primary">Rechercher</button>
 </form>
 
 <?form&name=scenario_add&page_id=17732932122705950&a=masca&lib=1?>
 <table class="table table-striped">
-<thead><tr><th>ligne(s)</th><th>titre</th><th>code</th><th></th></tr></thead>
+<thead><tr><th>nom</th><th>comm</th><th>expl</th><th>iv</th><th></th></tr></thead>
 <tbody>
-<?scenarii&t=1&template=
-<tr>
- <td>...</td>
- <td><@name@></td>
- <td>xxx</td>
- <td><?link&target=17732932122705950&class=btn btn-mini btn-warning&text=Ouvrir&roid=<@roid@>&lib=1?><?link&target=<@p@>&class=btn btn-mini btn-primary&text=Supprimer&a=RemoveObjectAction&actionParamoi=<@roid@></td>
-</tr>
+<?scenarii&
+	t=1&
+	text_search=<@text_search@>&
+	template=<{scenario&template=
+		<tr>
+		 <td><@name@></td>
+		 <td><?link&target=17733086741528593&class=btn btn-mini btn-primary&text=Ouvrir&roid=<@roid@>&lib=1?></td>
+		 <td><?link&target=17733086741528593&class=btn btn-mini btn-primary&text=Ouvrir&roid=<@roid@>&lib=1?></td>
+		 <td><?link&target=17733086741528593&class=btn btn-mini btn-primary&text=Ouvrir&roid=<@roid@>&lib=1?></td>
+		 <td><?link&target=<@p@>&class=btn btn-mini btn-danger&text=Supprimer&a=RemoveObjectAction&actionParamoi=<@roid@>?></td>
+		</tr>
+	}>
 ?>
-</tbody>
-<tr><td></td><td><input name="actionParamna" placeholder="Nom" /></td><td></td><td><button class="btn-warning btn">Ajouter</button></td></tr>
-<tfoot>
+</tbody><tfoot>
+<tr>
+<td><input name="actionParamna" placeholder="Nom" /></td>
+<td></td>
+<td></td>
+<td></td>
+<td><button class="btn-warning btn btn-mini">Ajouter</button></td></tr>
 </tfoot></table></form>
