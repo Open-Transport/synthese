@@ -51,6 +51,7 @@ namespace synthese
 			static const std::string PARAMETER_LOG_KEY;
 			static const std::string PARAMETER_FIRST;
 			static const std::string PARAMETER_NUMBER;
+			static const std::string PARAMETER_UP_SORT;
 			static const std::string PARAMETER_SEARCH_USER;
 			static const std::string PARAMETER_SEARCH_TYPE;
 			static const std::string PARAMETER_START_DATE;
@@ -72,6 +73,7 @@ namespace synthese
 				boost::optional<util::RegistryKeyType>			_searchObjectId2;
 				size_t _first;
 				size_t _number;
+				bool _upSort;
 			//@}
 			
 			
