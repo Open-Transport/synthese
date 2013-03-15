@@ -54,6 +54,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::gregorian;
 using namespace boost::algorithm;
 
 namespace synthese
@@ -74,8 +75,12 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
 		const string ScenarioSaveAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
 		const string ScenarioSaveAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
+		const string ScenarioSaveAction::PARAMETER_START_TIME = Action_PARAMETER_PREFIX + "_start_time";
+		const string ScenarioSaveAction::PARAMETER_END_TIME = Action_PARAMETER_PREFIX + "_end_time";
 		const string ScenarioSaveAction::PARAMETER_EVENT_START_DATE = Action_PARAMETER_PREFIX + "_event_start_date";
 		const string ScenarioSaveAction::PARAMETER_EVENT_END_DATE = Action_PARAMETER_PREFIX + "_event_end_date";
+		const string ScenarioSaveAction::PARAMETER_EVENT_START_TIME = Action_PARAMETER_PREFIX + "_event_start_time";
+		const string ScenarioSaveAction::PARAMETER_EVENT_END_TIME = Action_PARAMETER_PREFIX + "_event_end_time";
 		const string ScenarioSaveAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "sid";
 		const string ScenarioSaveAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
 		const string ScenarioSaveAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
@@ -518,7 +523,22 @@ namespace synthese
 						}
 						else
 						{
-							_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
+							if(map.isDefined(PARAMETER_START_TIME))
+							{
+								time_duration t(0,0,0);
+								if(!map.get<string>(PARAMETER_START_TIME).empty())
+								{
+									t = duration_from_string(map.get<string>(PARAMETER_START_TIME));
+								}
+								_startDate = ptime(
+									date_from_iso_string(map.get<string>(PARAMETER_START_DATE)),
+									t
+								);
+							}
+							else
+							{
+								_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
+							}
 						}
 					}
 
@@ -531,7 +551,22 @@ namespace synthese
 						}
 						else
 						{
-							_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+							if(map.isDefined(PARAMETER_END_TIME))
+							{
+								time_duration t(23,59,59);
+								if(!map.get<string>(PARAMETER_END_TIME).empty())
+								{
+									t = duration_from_string(map.get<string>(PARAMETER_END_TIME));
+								}
+								_endDate = ptime(
+									date_from_iso_string(map.get<string>(PARAMETER_END_DATE)),
+									t
+								);
+							}
+							else
+							{
+								_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+							}
 							*_endDate -= seconds(_endDate->time_of_day().seconds());
 						}
 					}
@@ -545,7 +580,22 @@ namespace synthese
 						}
 						else
 						{
-							_eventStartDate = time_from_string(map.get<string>(PARAMETER_EVENT_START_DATE));
+							if(map.isDefined(PARAMETER_EVENT_START_TIME))
+							{
+								time_duration t(0,0,0);
+								if(!map.get<string>(PARAMETER_EVENT_START_TIME).empty())
+								{
+									t = duration_from_string(map.get<string>(PARAMETER_EVENT_START_TIME));
+								}
+								_eventStartDate = ptime(
+									date_from_iso_string(map.get<string>(PARAMETER_EVENT_START_DATE)),
+									t
+								);
+							}
+							else
+							{
+								_eventStartDate = time_from_string(map.get<string>(PARAMETER_EVENT_START_DATE));
+							}
 						}
 					}
 
@@ -558,7 +608,22 @@ namespace synthese
 						}
 						else
 						{
-							_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
+							if(map.isDefined(PARAMETER_EVENT_END_TIME))
+							{
+								time_duration t(23,59,59);
+								if(!map.get<string>(PARAMETER_EVENT_END_TIME).empty())
+								{
+									t = duration_from_string(map.get<string>(PARAMETER_EVENT_END_TIME));
+								}
+								_eventEndDate = ptime(
+									date_from_iso_string(map.get<string>(PARAMETER_EVENT_END_DATE)),
+									t
+								);
+							}
+							else
+							{
+								_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
+							}
 							*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
 						}
 					}
