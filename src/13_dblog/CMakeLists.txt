@@ -22,6 +22,8 @@ DBLogRight.cpp
 DBLogRight.h
 DBLogTemplate.cpp
 DBLogTemplate.h
+DBLogViewService.cpp
+DBLogViewService.hpp
 )
 
 set_source_files_properties(DBLogModule.gen.cpp DBLogModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

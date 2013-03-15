@@ -2,9 +2,14 @@
 #include "DBLogModule.h"
 
 #include "DBLogAdmin.h"
+
 #include "DBLogRight.h"
+
 #include "DBLogEntryTableSync.h"
+
 #include "DBLogPurgeAction.h"
+
+#include "DBLogViewService.hpp"
 
 // Registries
 #include "DBLogEntry.h"
@@ -23,6 +28,8 @@ void synthese::dblog::moduleRegister()
 
 	synthese::dblog::DBLogEntryTableSync::integrate();
 	synthese::dblog::DBLogPurgeAction::integrate();
+
+	synthese::dblog::DBLogViewService::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::dblog::DBLogEntry>();
