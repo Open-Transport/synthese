@@ -99,7 +99,11 @@ namespace synthese
 				}
 				_content.push_back(
 					make_pair(
-						dynamic_cast<const StopPoint*>(service.getVertex((*itEdge)->getRankInPath())),
+						dynamic_cast<const StopPoint*>(
+							service.getVertex((*itEdge)->getRankInPath()) ?
+							service.getVertex((*itEdge)->getRankInPath()) :
+							(*itEdge)->getFromVertex()
+						),
 						service.getDepartureBeginScheduleToIndex(false, (*itEdge)->getRankInPath())
 				)	);
 
@@ -171,7 +175,11 @@ namespace synthese
 				){
 					_content.push_back(
 						make_pair(
-							dynamic_cast<const StopPoint*>(service.getVertex((*itEdge)->getRankInPath())),
+							dynamic_cast<const StopPoint*>(
+								service.getVertex((*itEdge)->getRankInPath()) ?
+								service.getVertex((*itEdge)->getRankInPath()) :
+								(*itEdge)->getFromVertex()
+							),
 							service.getArrivalBeginScheduleToIndex(false, (*itEdge)->getRankInPath())
 					)	);
 					--toInsert;
@@ -185,7 +193,11 @@ namespace synthese
 				Path::Edges::const_reverse_iterator itrEdge = edges.rbegin();
 				_content.push_back(
 					make_pair(
-						dynamic_cast<const StopPoint*>(service.getVertex((*itrEdge)->getRankInPath())),
+						dynamic_cast<const StopPoint*>(
+							service.getVertex((*itrEdge)->getRankInPath()) ?
+							service.getVertex((*itrEdge)->getRankInPath()) :
+							(*itrEdge)->getFromVertex()
+						),
 						service.getArrivalBeginScheduleToIndex(false, (*itrEdge)->getRankInPath())
 				)	);
 			}
@@ -218,7 +230,11 @@ namespace synthese
 					){
 						_content.push_back(
 							make_pair(
-								dynamic_cast<const StopPoint*>(service.getVertex((*(itEdge-1))->getRankInPath())),
+								dynamic_cast<const StopPoint*>(
+									service.getVertex((*(itEdge-1))->getRankInPath()) ?
+									service.getVertex((*(itEdge-1))->getRankInPath()) :
+									(*(itEdge-1))->getFromVertex()
+								),
 								service.getDepartureBeginScheduleToIndex(false, (itEdge-1) - edges.begin())
 						)	);
 						continue;
@@ -289,7 +305,11 @@ namespace synthese
 								first = false;
 								_content.push_back(
 									make_pair(
-										dynamic_cast<const StopPoint*>(service.getVertex((*itEdge2)->getRankInPath())),
+										dynamic_cast<const StopPoint*>(
+											service.getVertex((*itEdge2)->getRankInPath()) ?
+											service.getVertex((*itEdge2)->getRankInPath()) :
+											(*itEdge2)->getFromVertex()
+										),
 										((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
 											service.getDepartureBeginScheduleToIndex(false, (*itEdge2)->getRankInPath()) :
 											service.getArrivalBeginScheduleToIndex(false, (*itEdge2)->getRankInPath())
