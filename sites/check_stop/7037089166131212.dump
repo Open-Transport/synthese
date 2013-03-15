@@ -1,0 +1,9 @@
+t025_sites(cient_url,default_page_template_id,end_date,host_name,id,name,start_date,svn_url)
+"/check_stop",
+"17733138281136264",
+"",
+"",
+"7037089166131212",
+"check_stop",
+"",
+"https://extranet.rcsmobility.com/svn/synthese3/trunk/sites/check_stop"
