@@ -64,8 +64,12 @@ namespace synthese
 			static const std::string PARAMETER_CREATE_TEMPLATE;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_START_TIME;
+			static const std::string PARAMETER_END_TIME;
 			static const std::string PARAMETER_EVENT_START_DATE;
 			static const std::string PARAMETER_EVENT_END_DATE;
+			static const std::string PARAMETER_EVENT_START_TIME;
+			static const std::string PARAMETER_EVENT_END_TIME;
 			static const std::string PARAMETER_ENABLED;
 			static const std::string PARAMETER_SCENARIO_ID;
 			static const std::string PARAMETER_NAME;
