@@ -58,6 +58,7 @@ namespace synthese
 		const string DBLogViewService::PARAMETER_SEARCH_TEXT = "text";
 		const string DBLogViewService::PARAMETER_OBJECT_ID = "object_id";
 		const string DBLogViewService::PARAMETER_OBJECT_ID2 = "object2_id";
+		const string DBLogViewService::PARAMETER_UP_SORT = "up_sort";
 		
 
 
@@ -126,6 +127,7 @@ namespace synthese
 			// table parameters
 			_first = map.getDefault<size_t>(PARAMETER_FIRST, 0);
 			_number = map.getDefault<size_t>(PARAMETER_NUMBER, 50);
+			_upSort = map.getDefault<bool>(PARAMETER_UP_SORT, false);
 		}
 
 
@@ -148,13 +150,19 @@ namespace synthese
 					_searchObjectId2,
 					_searchText
 					, _first
-					, _number
+					, _number,
+					true,
+					false,
+					false,
+					_upSort
 			)	);
 
 			BOOST_FOREACH(const shared_ptr<DBLogEntry>& dbe, entries)
 			{
 				shared_ptr<ParametersMap> entryPM(new ParametersMap);
 				entryPM->insert("id", dbe->getKey());
+
+				entryPM->insert("date", to_iso_extended_string(dbe->getDate()));
 
 				entryPM->insert("entry_level", static_cast<int>(dbe->getLevel()));
 				entryPM->insert("entry_level_text", DBLogModule::getEntryLevelLabel(dbe->getLevel()));
@@ -223,7 +231,8 @@ namespace synthese
 			_searchEndDate(not_a_date_time),
 			_searchLevel(DBLogEntry::DB_LOG_UNKNOWN),
 			_first(0),
-			_number(50)
+			_number(50),
+			_upSort(false)
 		{
 		}
 }	}
