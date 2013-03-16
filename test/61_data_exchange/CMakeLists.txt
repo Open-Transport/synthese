@@ -1,3 +1,4 @@
+include_directories(${SPATIALITE_INCLUDE_DIRS})
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
 include_directories(${EXPAT_INCLUDE_DIRS})
