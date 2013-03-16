@@ -28,6 +28,9 @@
 #include "PTModuleRegister.cpp"
 #include "ImpExModuleRegister.cpp"
 #include "Request.h"
+#include "DBModule.h"
+#include "101_sqlite/SQLiteDB.h"
+#include "UtilTypes.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -47,10 +50,20 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 {
 	synthese::pt::moduleRegister();
 	synthese::impex::moduleRegister();
+	synthese::data_exchange::IneoFileFormat::integrate();
 
-	Env env;
+	boost::filesystem::path _dbPath = boost::filesystem::complete("test_db.db", boost::filesystem::initial_path());
+	boost::filesystem::remove(_dbPath);
+	string _connectionString = "sqlite://debug=1,path=" + _dbPath.string();
+	synthese::db::SQLiteDB::integrate();
+	synthese::db::DBModule::SetConnectionString(_connectionString );
+	ModuleClassTemplate<synthese::db::DBModule>::PreInit();
+	ModuleClassTemplate<synthese::db::DBModule>::Init();
+	
+	Env& env(Env::GetOfficialEnv());
 
 	shared_ptr<DataSource> ds(new DataSource(16607027920896001));
+	ds->setFormat("Ineo");
 	env.getEditableRegistry<DataSource>().add(ds);
 	
 	// STOP1
