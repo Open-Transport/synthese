@@ -65,13 +65,30 @@ boost::filesystem::path* pidFile (0);
 
 void quit(bool doExit = true);
 
+volatile sig_atomic_t fatal_error_in_progress = 0;
+
 void sig_INT_handler(int sig)
 {
+	// Since this handler is established for more than one kind of signal, 
+	// it might still get invoked recursively by delivery of some other kind
+	// of signal.  Use a static variable to keep track of that.
+	if (fatal_error_in_progress)
+		raise (sig);
+	fatal_error_in_progress = 1;
+	
 	// Catch INT signal and close server properly with exit.
 	// This allows profiling info to be dumped.
 	Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
 
-	quit();
+	quit(false);
+	
+	// Now reraise the signal.  We reactivate the signal's
+	// default handling, which is to terminate the process.
+	// We could just call exit or abort,
+	// but reraising the signal sets the return status
+	// from the process correctly.
+	signal (sig, SIG_DFL);
+	raise (sig);
 }
 
 
