@@ -63,6 +63,18 @@ namespace synthese
 					map.insert(PARAMETER_OBJECT_ID, _object->getKey());
 				}
 
+				// User
+				if(!_user.empty())
+				{
+					map.insert(PARAMETER_USER, _user);
+				}
+
+				// Password
+				if(!_password.empty())
+				{
+					map.insert(PARAMETER_PASSWORD, _password);
+				}
+
 				return map;
 			}
 			
