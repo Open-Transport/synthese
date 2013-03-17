@@ -587,7 +587,7 @@ namespace synthese
 					}
 					if(field.isGeometry())
 					{
-						query << "GeomFromText(?)";
+						query << "GeomFromText(?," << CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() << ")";
 					}
 					else
 					{
