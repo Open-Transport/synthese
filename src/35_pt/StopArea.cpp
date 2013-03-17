@@ -270,20 +270,22 @@ namespace synthese
 					{
 						continue;
 					}
-					result.insert(
-						it.second->getProjectedPoint().getRoadChunk()->getFromCrossing(),
-						VertexAccess(minutes(static_cast<long>(round(it.second->getProjectedPoint().getMetricOffset() / 50.0))), it.second->getProjectedPoint().getMetricOffset())
-					);
-					/*
- 					 * If next edge exist try add next crossing to vam (see issue #23315)
- 					 */
-					if(it.second->getProjectedPoint().getRoadChunk()->getNext())
-						result.insert(
-							it.second->getProjectedPoint().getRoadChunk()->getNext()->getFromVertex(),
-							VertexAccess(
-								minutes(static_cast<long>(round((it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50.0))),
-								it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
-						)	);
+                    result.insert(
+                        it.second->getProjectedPoint().getRoadChunk()->getFromCrossing(),
+                        VertexAccess(minutes(static_cast<long>(it.second->getProjectedPoint().getMetricOffset() / 50)), it.second->getProjectedPoint().getMetricOffset())
+                    );
+                    /*
+                     * If next edge exist try add next crossing to vam (see issue #23315)
+                     */
+                    if(it.second->getProjectedPoint().getRoadChunk()->getNext())
+                    {
+                        result.insert(
+                            it.second->getProjectedPoint().getRoadChunk()->getNext()->getFromVertex(),
+                            VertexAccess(
+                                minutes(static_cast<long>(ceil(((it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50.0)))),
+                                it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
+                        )	);
+                    }
 				}
 			}
 
