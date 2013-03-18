@@ -820,6 +820,9 @@ namespace synthese
 					// Search for a service with the same planned schedules
 					BOOST_FOREACH(const JourneyPattern* route, course.chainage->syntheseJourneyPatterns)
 					{
+						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+									*route->sharedServicesMutex
+						);
 						BOOST_FOREACH(Service* sservice, route->getServices())
 						{
 							ScheduledService* service(

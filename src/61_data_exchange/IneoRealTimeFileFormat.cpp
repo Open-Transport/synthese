@@ -289,6 +289,9 @@ namespace synthese
 				ScheduledService* service(NULL);
 				BOOST_FOREACH(JourneyPattern* route, routes)
 				{
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*route->sharedServicesMutex
+					);
 					BOOST_FOREACH(Service* sservice, route->getServices())
 					{
 						service = dynamic_cast<ScheduledService*>(sservice);
@@ -360,6 +363,9 @@ namespace synthese
 							continue;
 						}
 
+						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+									*jp->sharedServicesMutex
+						);
 						BOOST_FOREACH(const Service* service, jp->getServices())
 						{
 							const ScheduledService* sservice(dynamic_cast<const ScheduledService*>(service));

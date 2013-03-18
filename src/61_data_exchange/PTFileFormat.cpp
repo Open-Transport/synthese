@@ -858,6 +858,9 @@ namespace synthese
 
 			// Search for a corresponding service
 			ScheduledService* result(NULL);
+			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*route.sharedServicesMutex
+			);
 			BOOST_FOREACH(Service* tservice, route.getServices())
 			{
 				ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
@@ -975,6 +978,9 @@ namespace synthese
 
 			// Search for a corresponding service
 			ContinuousService* result(NULL);
+			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*route.sharedServicesMutex
+			);
 			BOOST_FOREACH(Service* tservice, route.getServices())
 			{
 				ContinuousService* curService(dynamic_cast<ContinuousService*>(tservice));
