@@ -49,6 +49,7 @@ namespace synthese
 			static const std::string PARAMETER_BASE;
 			static const std::string PARAMETER_UNIT;
 			static const std::string PARAMETER_STRFTIME_FORMAT;
+			static const std::string PARAMETER_LANG;
 
 		protected:
 			//! \name Page parameters
@@ -59,6 +60,7 @@ namespace synthese
 				bool _withTime;
 				OffsetUnit _unit;
 				std::string _strftimeFormat;
+				std::string _strftimeLang;
 			//@}
 
 
