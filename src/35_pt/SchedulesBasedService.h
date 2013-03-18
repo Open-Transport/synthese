@@ -99,6 +99,8 @@ namespace synthese
 				ServedVertices	_RTVertices;		//!< Real time edges
 				boost::posix_time::ptime _nextRTUpdate;
 				TimestampSchedules _RTTimestamps; 	//!< Hold the time stamp of updates
+				Schedules	_emptySchedules;	//!< Always empty departure schedules
+				bool _hasRealTimeData;
 			//@}
 
 			void _applyRealTimeShiftDuration(
@@ -116,8 +118,8 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const Schedules& getDepartureSchedules(bool RTData) const;
-				const Schedules& getArrivalSchedules(bool RTData) const;
+				const Schedules& getDepartureSchedules(bool THData, bool RTData) const;
+				const Schedules& getArrivalSchedules(bool THData, bool RTData) const;
 				const ServedVertices& getVertices(bool RTData) const;
 				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}

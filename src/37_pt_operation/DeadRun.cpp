@@ -141,33 +141,33 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getDepartureSchedules(RTData)[rankInPath];
+			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
 
 
 		boost::posix_time::time_duration DeadRun::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getDepartureSchedules(RTData)[rankInPath];
+			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
 
 
 		boost::posix_time::time_duration DeadRun::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getArrivalSchedules(RTData)[rankInPath];
+			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
 
 
 		boost::posix_time::time_duration DeadRun::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getArrivalSchedules(RTData)[rankInPath];
+			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
 
 
-		graph::ServicePointer DeadRun::getFromPresenceTime(const AccessParameters&, bool,bool, const synthese::graph::Edge &,const boost::posix_time::ptime &,bool,bool,bool,bool) const
+		graph::ServicePointer DeadRun::getFromPresenceTime(const AccessParameters&, bool, bool,bool, const synthese::graph::Edge &,const boost::posix_time::ptime &,bool,bool,bool,bool) const
 		{
 			return ServicePointer();
 		}

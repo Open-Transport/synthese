@@ -124,7 +124,7 @@ namespace synthese
 				);
 				_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
 
-				if(_lineStopRank >= _service->getArrivalSchedules(false).size())
+				if(_lineStopRank >= _service->getArrivalSchedules(true, false).size())
 				{
 					throw RequestException("Inconsistent line stop number");
 				}

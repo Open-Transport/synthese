@@ -219,7 +219,7 @@ namespace synthese
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, e.getMessage());
 			}
 			if(	path &&
-				path->getEdges().size() != ss->getArrivalSchedules(false).size()
+				path->getEdges().size() != ss->getArrivalSchedules(true, false).size()
 			){
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
 			}

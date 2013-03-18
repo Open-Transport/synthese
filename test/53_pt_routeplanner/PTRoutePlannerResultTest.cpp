@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	F.setPhysicalStop(PF);
 
 	Journey j0;
-	ServicePointer sp0_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer sp0_0(true, false, USER_PEDESTRIAN, S, now);
 	sp0_0.setDepartureInformations(A, now, now, PA);
 	sp0_0.setArrivalInformations(B, now, now, PB);
 	j0.append(sp0_0);
@@ -123,11 +123,11 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	}
 
 	Journey j1;
-	ServicePointer sp1_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer sp1_0(true, false, USER_PEDESTRIAN, S, now);
 	sp1_0.setDepartureInformations(A, now, now, PA);
 	sp1_0.setArrivalInformations(C, now, now, PC);
 	j1.append(sp1_0);
-	ServicePointer sp1_1(false, USER_PEDESTRIAN, S, now);
+	ServicePointer sp1_1(true, false, USER_PEDESTRIAN, S, now);
 	sp1_1.setDepartureInformations(C, now, now, PC);
 	sp1_1.setArrivalInformations(B, now, now, PB);
 	j1.append(sp1_1);
@@ -156,11 +156,11 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	}
 
 	Journey j2;
-	ServicePointer s2_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s2_0(true, false, USER_PEDESTRIAN, S, now);
 	s2_0.setDepartureInformations(A, now, now, PA);
 	s2_0.setArrivalInformations(D, now, now, PD);
 	j2.append(s2_0);
-	ServicePointer s2_1(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s2_1(true, false, USER_PEDESTRIAN, S, now);
 	s2_1.setDepartureInformations(D, now, now, PD);
 	s2_1.setArrivalInformations(B, now, now, PB);
 	j2.append(s2_1);
@@ -186,14 +186,14 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	}
 
 	Journey j3;
-	ServicePointer s3_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s3_0(true, false, USER_PEDESTRIAN, S, now);
 	s3_0.setDepartureInformations(A, now, now, PA);
 	s3_0.setArrivalInformations(C, now, now, PC);
-	ServicePointer s3_1(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s3_1(true, false, USER_PEDESTRIAN, S, now);
 	s3_1.setDepartureInformations(C, now, now, PC);
 	s3_1.setArrivalInformations(D, now, now, PD);
 	j3.append(s3_1);
-	ServicePointer s3_2(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s3_2(true, false, USER_PEDESTRIAN, S, now);
 	s3_2.setDepartureInformations(D, now, now, PD);
 	s3_2.setArrivalInformations(B, now, now, PB);
 	j3.append(s3_2);
@@ -219,15 +219,15 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	}
 
 	Journey j4;
-	ServicePointer s4_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s4_0(true, false, USER_PEDESTRIAN, S, now);
 	s4_0.setDepartureInformations(A, now, now, PA);
 	s4_0.setArrivalInformations(E, now, now, PE);
 	j4.append(s4_0);
-	ServicePointer s4_1(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s4_1(true, false, USER_PEDESTRIAN, S, now);
 	s4_1.setDepartureInformations(E, now, now, PE);
 	s4_1.setArrivalInformations(F, now, now, PF);
 	j4.append(s4_1);
-	ServicePointer s4_2(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s4_2(true, false, USER_PEDESTRIAN, S, now);
 	s4_2.setDepartureInformations(F, now, now, PF);
 	s4_2.setArrivalInformations(B, now, now, PB);
 	j4.append(s4_2);
@@ -259,23 +259,23 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	}
 
 	Journey j5;
-	ServicePointer s5_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s5_0(true, false, USER_PEDESTRIAN, S, now);
 	s5_0.setDepartureInformations(A, now, now, PA);
 	s5_0.setArrivalInformations(C, now, now, PC);
 	j5.append(s5_0);
-	ServicePointer s5_1(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s5_1(true, false, USER_PEDESTRIAN, S, now);
 	s5_1.setDepartureInformations(C, now, now, PC);
 	s5_1.setArrivalInformations(D, now, now, PD);
 	j5.append(s5_1);
-	ServicePointer s5_2(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s5_2(true, false, USER_PEDESTRIAN, S, now);
 	s5_2.setDepartureInformations(D, now, now, PD);
 	s5_2.setArrivalInformations(E, now, now, PE);
 	j5.append(s5_2);
-	ServicePointer s5_3(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s5_3(true, false, USER_PEDESTRIAN, S, now);
 	s5_3.setDepartureInformations(E, now, now, PE);
 	s5_3.setArrivalInformations(F, now, now, PF);
 	j5.append(s5_3);
-	ServicePointer s5_4(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s5_4(true, false, USER_PEDESTRIAN, S, now);
 	s5_4.setDepartureInformations(F, now, now, PF);
 	s5_4.setArrivalInformations(B, now, now, PB);
 	j5.append(s5_4);
@@ -307,15 +307,15 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	}
 
 	Journey j6;
-	ServicePointer s6_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s6_0(true, false, USER_PEDESTRIAN, S, now);
 	s6_0.setDepartureInformations(A, now, now, PA);
 	s6_0.setArrivalInformations(D, now, now, PD);
 	j6.append(s6_0);
-	ServicePointer s6_1(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s6_1(true, false, USER_PEDESTRIAN, S, now);
 	s6_1.setDepartureInformations(D, now, now, PD);
 	s6_1.setArrivalInformations(C, now, now, PC);
 	j6.append(s6_1);
-	ServicePointer s6_2(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s6_2(true, false, USER_PEDESTRIAN, S, now);
 	s6_2.setDepartureInformations(C, now, now, PC);
 	s6_2.setArrivalInformations(B, now, now, PB);
 	j6.append(s6_2);
@@ -423,19 +423,19 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	MainRoadChunk Ch2(0, &Cr2, 2, &R);
 
 	Journey j0;
-	ServicePointer s0_0(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s0_0(true, false, USER_PEDESTRIAN, Sr, now);
 	s0_0.setDepartureInformations(A, now, now, PA);
 	s0_0.setArrivalInformations(Ch0, now, now, Cr0);
 	j0.append(s0_0);
-	ServicePointer s0_1(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s0_1(true, false, USER_PEDESTRIAN, Sr, now);
 	s0_1.setDepartureInformations(Ch0, now, now, Cr0);
 	s0_1.setArrivalInformations(Ch1, now, now, Cr1);
 	j0.append(s0_1);
-	ServicePointer s0_2(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s0_2(true, false, USER_PEDESTRIAN, Sr, now);
 	s0_2.setDepartureInformations(Ch1, now, now, Cr1);
 	s0_2.setArrivalInformations(C, now, now, PC);
 	j0.append(s0_2);
-	ServicePointer s0_3(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s0_3(true, false, USER_PEDESTRIAN, S, now);
 	s0_3.setDepartureInformations(C, now, now, PC);
 	s0_3.setArrivalInformations(B, now, now, PB);
 	j0.append(s0_3);
@@ -466,15 +466,15 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	}
 
 	Journey j1;
-	ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
 	s1_0.setDepartureInformations(A, now, now, PA);
 	s1_0.setArrivalInformations(E, now, now, PE);
 	j1.append(s1_0);
-	ServicePointer s1_1(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s1_1(true, false, USER_PEDESTRIAN, Sr, now);
 	s1_1.setDepartureInformations(E, now, now, PE);
 	s1_1.setArrivalInformations(Ch2, now, now, Cr2);
 	j1.append(s1_1);
-	ServicePointer s1_2(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s1_2(true, false, USER_PEDESTRIAN, Sr, now);
 	s1_2.setDepartureInformations(Ch2, now, now, Cr2);
 	s1_2.setArrivalInformations(B, now, now, PB);
 	j1.append(s1_2);
@@ -509,11 +509,11 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	}
 
 	Journey j2;
-	ServicePointer s2_0(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s2_0(true, false, USER_PEDESTRIAN, Sr, now);
 	s2_0.setDepartureInformations(Ch0, now, now, Cr0);
 	s2_0.setArrivalInformations(D, now, now, PD);
 	j2.append(s2_0);
-	ServicePointer s2_1(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s2_1(true, false, USER_PEDESTRIAN, S, now);
 	s2_1.setDepartureInformations(D, now, now, PD);
 	s2_1.setArrivalInformations(B, now, now, PB);
 	j2.append(s2_1);
@@ -553,11 +553,11 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	}
 
 	Journey j3;
-	ServicePointer s3_0(false, USER_PEDESTRIAN, S, now);
+	ServicePointer s3_0(true, false, USER_PEDESTRIAN, S, now);
 	s3_0.setDepartureInformations(A, now, now, PA);
 	s3_0.setArrivalInformations(F, now, now, PF);
 	j3.append(s3_0);
-	ServicePointer s3_1(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s3_1(true, false, USER_PEDESTRIAN, Sr, now);
 	s3_1.setDepartureInformations(F, now, now, PF);
 	s3_1.setArrivalInformations(Ch2, now, now, Cr2);
 	j3.append(s3_1);
@@ -602,11 +602,11 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	}
 
 	Journey j4;
-	ServicePointer s4_0(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s4_0(true, false, USER_PEDESTRIAN, Sr, now);
 	s4_0.setDepartureInformations(Ch0, now, now, Cr0);
 	s4_0.setArrivalInformations(F, now, now, PF);
 	j4.append(s4_0);
-	ServicePointer s4_1(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s4_1(true, false, USER_PEDESTRIAN, Sr, now);
 	s4_1.setDepartureInformations(F, now, now, PF);
 	s4_1.setArrivalInformations(Ch2, now, now, Cr2);
 	j4.append(s4_1);
@@ -651,7 +651,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	}
 
 	Journey j5;
-	ServicePointer s5_0(false, USER_PEDESTRIAN, Sr, now);
+	ServicePointer s5_0(true, false, USER_PEDESTRIAN, Sr, now);
 	s5_0.setDepartureInformations(Ch0, now, now, Cr0);
 	s5_0.setArrivalInformations(Ch1, now, now, Cr1);
 	j5.append(s5_0);
@@ -759,21 +759,21 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 
 	{
 		Journey j0;
-		ServicePointer s0_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
 		s0_0.setDepartureInformations(D, now, now, PD);
 		s0_0.setArrivalInformations(C, now, now, PC);
 		j0.append(s0_0);
-		ServicePointer s0_1(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_1(true, false, USER_PEDESTRIAN, S, now);
 		s0_1.setDepartureInformations(C, now, now, PC);
 		s0_1.setArrivalInformations(B, now, now, PB);
 		j0.append(s0_1);
 
 		Journey j1;
-		ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
 		s1_0.setDepartureInformations(E, now, now, PE);
 		s1_0.setArrivalInformations(C, now, now, PC);
 		j1.append(s1_0);
-		ServicePointer s1_1(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_1(true, false, USER_PEDESTRIAN, S, now);
 		s1_1.setDepartureInformations(C, now, now, PC);
 		s1_1.setArrivalInformations(B, now, now, PB);
 		j1.append(s1_1);
@@ -809,21 +809,21 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 
 	{
 		Journey j0;
-		ServicePointer s0_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
 		s0_0.setDepartureInformations(A, now, now, PA);
 		s0_0.setArrivalInformations(C, now, now, PC);
 		j0.append(s0_0);
-		ServicePointer s0_1(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_1(true, false, USER_PEDESTRIAN, S, now);
 		s0_1.setDepartureInformations(C, now, now, PC);
 		s0_1.setArrivalInformations(D, now, now, PD);
 		j0.append(s0_1);
 
 		Journey j1;
-		ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
 		s1_0.setDepartureInformations(A, now, now, PA);
 		s1_0.setArrivalInformations(C, now, now, PC);
 		j1.append(s1_0);
-		ServicePointer s1_1(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_1(true, false, USER_PEDESTRIAN, S, now);
 		s1_1.setDepartureInformations(A, now, now, PA);
 		s1_1.setArrivalInformations(E, now, now, PE);
 		j1.append(s1_1);
@@ -859,13 +859,13 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 
 	{
 		Journey j0;
-		ServicePointer s0_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
 		s0_0.setDepartureInformations(D, now, now, PD);
 		s0_0.setArrivalInformations(E, now, now, PE);
 		j0.append(s0_0);
 
 		Journey j1;
-		ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
 		s1_0.setDepartureInformations(C, now, now, PC);
 		s1_0.setArrivalInformations(F, now, now, PF);
 		j1.append(s1_0);
@@ -901,13 +901,13 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 
 	{ // 7798 The actual destination must always be at the end of the table
 		Journey j0;
-		ServicePointer s0_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
 		s0_0.setDepartureInformations(A, now, now, PA);
 		s0_0.setArrivalInformations(B, now, now, PB);
 		j0.append(s0_0);
 
 		Journey j1;
-		ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
 		s1_0.setDepartureInformations(C, now, now, PC);
 		s1_0.setArrivalInformations(F, now, now, PF);
 		j1.append(s1_0);
@@ -943,13 +943,13 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 
 	{ // 7798 The actual destination must always be at the end of the table
 		Journey j0;
-		ServicePointer s0_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
 		s0_0.setDepartureInformations(D, now, now, PD);
 		s0_0.setArrivalInformations(F, now, now, PF);
 		j0.append(s0_0);
 
 		Journey j1;
-		ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
 		s1_0.setDepartureInformations(A, now, now, PA);
 		s1_0.setArrivalInformations(B, now, now, PB);
 		j1.append(s1_0);
@@ -985,17 +985,17 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 
 	{ // 13407 Crash if a destination stop is used for transfer too
 		Journey j0;
-		ServicePointer s0_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
 		s0_0.setDepartureInformations(A, now, now, PD);
 		s0_0.setArrivalInformations(B, now, now, PF);
 		j0.append(s0_0);
 
 		Journey j1;
-		ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
 		s1_0.setDepartureInformations(A, now, now, PA);
 		s1_0.setArrivalInformations(B, now, now, PB);
 		j1.append(s1_0);
-		ServicePointer s1_1(false, USER_PEDESTRIAN, S, now);
+		ServicePointer s1_1(true, false, USER_PEDESTRIAN, S, now);
 		s1_1.setDepartureInformations(B, now, now, PA);
 		s1_1.setArrivalInformations(C, now, now, PB);
 		j1.append(s1_1);

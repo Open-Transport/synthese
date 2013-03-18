@@ -144,7 +144,7 @@ namespace synthese
 
 				for (size_t i(0); i<_type->getRowNumber(); ++i)
 				{
-					ServicePointer sp(false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
+					ServicePointer sp(true, false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
 					sp.setDepartureInformations(lineStop, d, d, ps);
 					sp.setArrivalInformations(lineStop, d, d, ps);
 					ActualDisplayedArrivalsList destinations;

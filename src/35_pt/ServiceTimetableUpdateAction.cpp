@@ -99,7 +99,7 @@ namespace synthese
 			}
 
 			_rank = map.get<size_t>(PARAMETER_RANK);
-			if(_rank >= _service->getDepartureSchedules(false).size())
+			if(_rank >= _service->getDepartureSchedules(true, false).size())
 			{
 				throw ActionException("Invalid rank");
 			}
@@ -121,8 +121,8 @@ namespace synthese
 		void ServiceTimetableUpdateAction::run(
 			Request& request
 		){
-			SchedulesBasedService::Schedules departureSchedules(_service->getDepartureSchedules(false));
-			SchedulesBasedService::Schedules arrivalSchedules(_service->getArrivalSchedules(false));
+			SchedulesBasedService::Schedules departureSchedules(_service->getDepartureSchedules(true, false));
+			SchedulesBasedService::Schedules arrivalSchedules(_service->getArrivalSchedules(true, false));
 
 			if(!_shifting_delay.is_not_a_date_time())
 			{

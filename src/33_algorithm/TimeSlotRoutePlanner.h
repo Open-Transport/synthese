@@ -69,6 +69,9 @@ namespace synthese
 				double								_vmax;
 				bool								_ignoreReservation;
 				boost::optional<boost::posix_time::time_duration>	_maxTransferDuration;
+				bool								_enableTheoretical;
+				bool								_enableRealTime;
+				
 			//@}
 
 			//! @name Logging
@@ -88,8 +91,7 @@ namespace synthese
 		public:
 			/** Constructor for specified time slot route planning.
 			*/
-			TimeSlotRoutePlanner(
-				const graph::VertexAccessMap& originVam,
+			TimeSlotRoutePlanner(const graph::VertexAccessMap& originVam,
 				const graph::VertexAccessMap& destinationVam,
 				const boost::posix_time::ptime& lowestDepartureTime,
 				const boost::posix_time::ptime& highestDepartureTime,
@@ -104,7 +106,9 @@ namespace synthese
 				double							vmax,
 				bool							ignoreReservation,
 				const AlgorithmLogger& logger,
-				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				bool enableTheoretical = true,
+				bool enableRealTime = true
 			);
 
 
@@ -132,7 +136,9 @@ namespace synthese
 				double						vmax,
 				bool							ignoreReservation,
 				const AlgorithmLogger& logger,
-				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				bool enableTheoretical = true,
+				bool enableRealTime = true
 			);
 
 			//! @name Getters

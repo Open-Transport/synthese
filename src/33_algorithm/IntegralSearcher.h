@@ -88,6 +88,8 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration>	_maxDuration;
 				const double								_vmax;
 				bool										_ignoreReservation;
+				bool										_enableTheoretical;
+				bool										_enableRealTime;
 			//@}
 
 			//! @name Route planning data
@@ -152,8 +154,7 @@ namespace synthese
 			) const;
 
 
-			IntegralSearcher(
-				PlanningPhase										accessDirection,
+			IntegralSearcher(PlanningPhase										accessDirection,
 				const graph::AccessParameters&						accessParameters,
 				graph::GraphIdType									whatToSearch,
 				bool												searchOnlyNodes,
@@ -171,7 +172,9 @@ namespace synthese
 				bool												ignoreReservation,
 				const AlgorithmLogger&								logger,
 				int													totalDistance = 0,
-				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>()
+				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>(),
+				bool 												enableTheoretical = true,
+				bool												enableRealTime = true
 			);
 
 

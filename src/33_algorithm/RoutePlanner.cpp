@@ -69,7 +69,10 @@ namespace synthese
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
 			boost::optional<const JourneyTemplates&> journeyTemplates,
-			const optional<time_duration>	maxTransferDuration
+			const optional<time_duration>	maxTransferDuration,
+			bool enableTheoretical,
+			bool enableRealTime
+				
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_planningOrder(planningOrder),
@@ -84,6 +87,8 @@ namespace synthese
 			_vmax(vmax),
 			_ignoreReservation(ignoreReservation),
 			_maxTransferDuration(maxTransferDuration),
+			_enableTheoretical(enableTheoretical),
+			_enableRealTime(enableRealTime),
 			_logger(logger),
 			_totalDistance(
 				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
@@ -272,7 +277,9 @@ namespace synthese
 				_ignoreReservation,
 				_logger,
 				_totalDistance,
-				_journeyTemplates
+				_journeyTemplates,
+				_enableTheoretical,
+				_enableRealTime
 			);
 
 			is.integralSearch(
