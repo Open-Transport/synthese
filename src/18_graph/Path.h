@@ -26,6 +26,7 @@
 #include "Registrable.h"
 #include "RuleUser.h"
 #include "GraphTypes.h"
+#include "shared_recursive_mutex.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/optional.hpp>
@@ -98,12 +99,16 @@ namespace synthese
 			Path();
 
 		public:
+			/// Use it to protect iteration over the services
+			boost::shared_ptr<util::shared_recursive_mutex> sharedServicesMutex;
 
 			virtual ~Path ();
 
 
 			//! @name Getters
 			//@{
+				/// @warning Iterating over a ServiceSet must be protected
+				/// by using a boost::shared_lock with _sharedServicesMutex.
 				const ServiceSet&	getServices()	const { return _services; }
 				const Edges&		getEdges()		const { return _edges; }
 				Edges&				getEdges()			  { return _edges; }

@@ -168,7 +168,9 @@ namespace synthese
 			bool enableTheoretical,
 			bool enableRealTime
 		) const	{
-
+			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*getParentPath()->sharedServicesMutex
+			);
 			const ServiceSet& services(getParentPath()->getServices());
 
 			if(services.empty())
@@ -253,7 +255,9 @@ namespace synthese
 			bool enableTheoretical,
 			bool enableRealTime
 		) const {
-
+			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*getParentPath()->sharedServicesMutex
+			);
 			const ServiceSet& services(getParentPath()->getServices());
 
 			if(services.empty())
@@ -331,6 +335,9 @@ namespace synthese
 		) const {
 
 			boost::recursive_mutex::scoped_lock lock(_indexMutex);
+			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*getParentPath()->sharedServicesMutex
+			);
 
 			const ServiceSet& services(getParentPath()->getServices());
 			size_t numHour;

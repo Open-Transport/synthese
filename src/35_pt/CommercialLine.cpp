@@ -110,6 +110,9 @@ namespace synthese
 
 			BOOST_FOREACH(const Path* path, _paths)
 			{
+				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+							*path->sharedServicesMutex
+				);
 				BOOST_FOREACH(const Service* service, path->getServices())
 				{
 					service->clearNonConcurrencyCache();
@@ -130,6 +133,9 @@ namespace synthese
 
 			BOOST_FOREACH(const Path* path, _paths)
 			{
+				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+							*path->sharedServicesMutex
+				);
 				BOOST_FOREACH(const Service* service, path->getServices())
 				{
 					service->clearNonConcurrencyCache();
@@ -163,6 +169,9 @@ namespace synthese
 			Calendar result;
 			BOOST_FOREACH(const Path* path, _paths)
 			{
+				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+							*path->sharedServicesMutex
+				);
 				BOOST_FOREACH(const Service* service, path->getServices())
 				{
 					if(dynamic_cast<const NonPermanentService*>(service))
@@ -177,6 +186,9 @@ namespace synthese
 
 				BOOST_FOREACH(const JourneyPatternCopy* subline, static_cast<const JourneyPattern*>(path)->getSubLines())
 				{
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*subline->sharedServicesMutex
+					);
 					BOOST_FOREACH(const Service* service, subline->getServices())
 					{
 						if(dynamic_cast<const NonPermanentService*>(service))
