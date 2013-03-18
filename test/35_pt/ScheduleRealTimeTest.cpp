@@ -98,55 +98,55 @@ public:
 
 	void checkRealArrivalSchedule(size_t stopIndex, time_duration startTime)
 	{
-		for(size_t i = stopIndex ; i < _scheduledService->getArrivalSchedules(true).size() ; ++i)
+		for(size_t i = stopIndex ; i < _scheduledService->getArrivalSchedules(true, true).size() ; ++i)
 		{
-			BOOST_CHECK(_scheduledService->getArrivalSchedules(true)[i] == startTime);
+			BOOST_CHECK(_scheduledService->getArrivalSchedules(true, true)[i] == startTime);
 			startTime += time_duration(0,5,0);
 		}
 	}
 
 	void checkRealDepartureSchedule(size_t stopIndex, time_duration startTime)
 	{
-		for(size_t i = stopIndex ; i < _scheduledService->getDepartureSchedules(true).size() ; ++i)
+		for(size_t i = stopIndex ; i < _scheduledService->getDepartureSchedules(true, true).size() ; ++i)
 		{
-			BOOST_CHECK(_scheduledService->getDepartureSchedules(true)[i] == startTime);
+			BOOST_CHECK(_scheduledService->getDepartureSchedules(true, true)[i] == startTime);
 			startTime += time_duration(0,5,0);
 		}
 	}
 
 	void checkSingleRealArrival(size_t stopIndex, time_duration startTime)
 	{
-		BOOST_CHECK(_scheduledService->getArrivalSchedules(true)[stopIndex] == startTime);
+		BOOST_CHECK(_scheduledService->getArrivalSchedules(true, true)[stopIndex] == startTime);
 	}
 
 	void checkSingleRealDeparture(size_t stopIndex, time_duration startTime)
 	{
-		BOOST_CHECK(_scheduledService->getDepartureSchedules(true)[stopIndex] == startTime);
+		BOOST_CHECK(_scheduledService->getDepartureSchedules(true, true)[stopIndex] == startTime);
 	}
 
 	void dump()
 	{
 		cout << "Service " << _scheduledService->getServiceNumber() << endl;
 		cout << "  Normal Arrival Time" << endl << "  ";
-		BOOST_FOREACH(time_duration td, _scheduledService->getArrivalSchedules(false))
+		BOOST_FOREACH(time_duration td, _scheduledService->getArrivalSchedules(true, false))
 		{
 			cout << td << " ";
 		}
 		cout << endl;
 		cout << "  Normal Departure Time" << endl << "  ";
-		BOOST_FOREACH(time_duration td, _scheduledService->getDepartureSchedules(false))
+		BOOST_FOREACH(time_duration td, _scheduledService->getDepartureSchedules(true, false))
 		{
 			cout << td << " ";
 		}
 		cout << endl;
 		cout << "  Real Arrival Time" << endl << "  ";
-		BOOST_FOREACH(time_duration td, _scheduledService->getArrivalSchedules(true))
+		BOOST_FOREACH(time_duration td, _scheduledService->getArrivalSchedules(true, true))
 		{
 			cout << td << " ";
 		}
 		cout << endl;
 		cout << "  Real Departure Time" << endl << "  ";
-		BOOST_FOREACH(time_duration td, _scheduledService->getDepartureSchedules(true))
+		BOOST_FOREACH(time_duration td, _scheduledService->getDepartureSchedules(true, true))
 		{
 			cout << td << " ";
 		}

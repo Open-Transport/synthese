@@ -292,7 +292,7 @@ namespace synthese
 					// Add service to chunk
 					Chunk::Element element;
 					element.service = service;
-					for(size_t i(0); i<service->getDepartureSchedules(false).size(); ++i)
+					for(size_t i(0); i<service->getDepartureSchedules(true, false).size(); ++i)
 					{
 						if(service->getDepartureSchedule(false, i) >= startTime)
 						{
@@ -300,7 +300,7 @@ namespace synthese
 							break;
 						}
 					}
-					for(size_t i(service->getArrivalSchedules(false).size()); i>0; --i)
+					for(size_t i(service->getArrivalSchedules(true, false).size()); i>0; --i)
 					{
 						if(service->getArrivalSchedule(false, i-1) <= endTime)
 						{

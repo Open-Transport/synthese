@@ -82,7 +82,9 @@ namespace synthese
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
 			int totalDistance,
-			boost::optional<const JourneyTemplates&> journeyTemplates
+			boost::optional<const JourneyTemplates&> journeyTemplates,
+			bool enableTheoretical,
+			bool enableRealTime
 		):	_accessParameters(accessParameters),
 			_accessDirection(accessDirection),
 			_whatToSearch(whatToSearch),
@@ -99,6 +101,8 @@ namespace synthese
 			_maxDuration(maxDuration),
 			_vmax(vmax),
 			_ignoreReservation(ignoreReservation),
+			_enableTheoretical(enableTheoretical),
+			_enableRealTime(enableRealTime),
 			_destinationVam(destinationVam),
 			_totalDistance(totalDistance),
 			_journeyTemplates(journeyTemplates)
@@ -396,7 +400,10 @@ namespace synthese
 									true,
 									departureServiceNumber,
 									_inverted,
-									_ignoreReservation
+									_ignoreReservation,
+									false, // allowCanceledService
+									_enableTheoretical,
+									_enableRealTime
 								):
 								edge.getPreviousService(
 									_accessParameters,
@@ -405,7 +412,10 @@ namespace synthese
 									true,
 									arrivalServiceNumber,
 									_inverted,
-									_ignoreReservation
+									_ignoreReservation,
+									false, // allowCanceledService
+									_enableTheoretical,
+									_enableRealTime
 							)	);
 
 							// If no service, advance to the next edge

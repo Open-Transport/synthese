@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		e3.setParentPath(&L);
 		ptime d3_0s(date(2000,1,1), minutes(0));
 		ptime d3_0e(date(2000,1,1), minutes(5));
-		ServicePointer sp3_0(false, 0, S, d3_0s);
+		ServicePointer sp3_0(true, false, 0, S, d3_0s);
 		sp3_0.setDepartureInformations(e1, d3_0s, d3_0s, *e1.getFromVertex());
 		sp3_0.setArrivalInformations(e3, d3_0e, d3_0e, *e3.getFromVertex());
 		j3.append(sp3_0);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		e3.setParentPath(&L);
 		ptime d3_0s(date(2000,1,1), minutes(0));
 		ptime d3_0e(date(2000,1,1), minutes(5));
-		ServicePointer sp3_0(false, 0, S, d3_0s);
+		ServicePointer sp3_0(true, false, 0, S, d3_0s);
 		sp3_0.setArrivalInformations(e2, d3_0e, d3_0e, *e2.getFromVertex());
 		sp3_0.setDepartureInformations(e3, d3_0s, d3_0s, *e3.getFromVertex());
 		j3.append(sp3_0);
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		Journey j3_1;
 		ptime d3_1s(date(2000,1,1), minutes(0));
 		ptime d3_1e(date(2000,1,1), minutes(5));
-		ServicePointer sp3_1(false, 0, S, d3_1s);
+		ServicePointer sp3_1(true, false, 0, S, d3_1s);
 		sp3_1.setDepartureInformations(e1, d3_1s, d3_1s, *e1.getFromVertex());
 		sp3_1.setArrivalInformations(e3, d3_1e, d3_1e, *e3.getFromVertex());
 		j3_1.append(sp3_1);
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		Journey j3_2;
 		ptime d3_2s(date(2000,1,1), minutes(0));
 		ptime d3_2e(date(2000,1,1), minutes(5));
-		ServicePointer sp3_2(false, 0, S, d3_2s);
+		ServicePointer sp3_2(true, false, 0, S, d3_2s);
 		sp3_2.setArrivalInformations(e2, d3_2e, d3_2e, *e2.getFromVertex());
 		sp3_2.setDepartureInformations(e3, d3_2s, d3_2s, *e3.getFromVertex());
 		j3_2.append(sp3_2);

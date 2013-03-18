@@ -108,8 +108,8 @@ namespace synthese
 				return false;
 			}
 
-			ScheduledService::Schedules departureSchedules(service->getDepartureSchedules(true));
-			ScheduledService::Schedules arrivalSchedules(service->getArrivalSchedules(true));
+			ScheduledService::Schedules departureSchedules(service->getDepartureSchedules(true, true));
+			ScheduledService::Schedules arrivalSchedules(service->getArrivalSchedules(true, true));
 			ScheduledService::ServedVertices vertices(service->getVertices(true));
 			for(size_t i(1); i+2<fields.size(); i+=4)
 			{

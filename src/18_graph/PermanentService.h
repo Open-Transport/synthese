@@ -67,6 +67,7 @@ namespace synthese
 			virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 
 			/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
+				@param THData ignored parameter
 				@param RTData ignored parameter
 				@param edge Edge
 				@param presenceDateTime Goal  time
@@ -82,6 +83,7 @@ namespace synthese
 			*/
 			virtual graph::ServicePointer getFromPresenceTime(
 				const AccessParameters& accessParameters,
+				bool THData,
 				bool RTData,
 				bool getDeparture,
 				const graph::Edge& edge,

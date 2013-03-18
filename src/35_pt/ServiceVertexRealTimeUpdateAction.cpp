@@ -159,7 +159,7 @@ namespace synthese
 				}
 			}
 
-			if(_lineStopRank >= _service->getArrivalSchedules(false).size())
+			if(_lineStopRank >= _service->getArrivalSchedules(true, false).size())
 			{
 				throw ActionException("Inconsistent linestop rank");
 			}
@@ -205,7 +205,7 @@ namespace synthese
 				// Propagation
 				if(_propagate)
 				{
-					for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(false).size(); ++rank)
+					for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(true, false).size(); ++rank)
 					{
 						_service->setRealTimeVertex(rank, _service->getPath()->getEdge(rank)->getFromVertex());
 					}
@@ -218,7 +218,7 @@ namespace synthese
 				// Propagation
 				if(!_physicalStop.get() && _propagate)
 				{
-					for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(false).size(); ++rank)
+					for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(true, false).size(); ++rank)
 					{
 						_service->setRealTimeVertex(rank, NULL);
 					}

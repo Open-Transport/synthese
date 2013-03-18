@@ -39,6 +39,7 @@ namespace synthese
 	namespace graph
 	{
 		ServicePointer::ServicePointer(
+			bool THData,
 			bool RTData,
 			size_t userClassRank,
 			const Service& service,
@@ -48,6 +49,7 @@ namespace synthese
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_userClassRank(userClassRank),
+			_THData(THData),
 			_RTData(RTData),
 			_service(&service),
 			_originDateTime(originDateTime),
@@ -58,6 +60,7 @@ namespace synthese
 
 
 		ServicePointer::ServicePointer(
+			bool THData,
 			bool RTData,
 			size_t userClassRank,
 			const Service& service,
@@ -69,6 +72,7 @@ namespace synthese
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_userClassRank(userClassRank),
+			_THData(THData),
 			_RTData(RTData),
 			_service(&service),
 			_originDateTime(ptime(date, service.getDepartureSchedule(RTData, 0))),
@@ -88,6 +92,7 @@ namespace synthese
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_userClassRank(0),
+			_THData(true),
 			_RTData(false),
 			_service(NULL),
 			_range(posix_time::seconds(0)),
@@ -103,6 +108,7 @@ namespace synthese
 		):	_departureEdge(NULL),
 			_arrivalEdge(NULL),
 			_userClassRank(partiallyFilledPointer._userClassRank),
+			_THData(partiallyFilledPointer._THData),
 			_RTData(partiallyFilledPointer._RTData),
 			_service(partiallyFilledPointer._service),
 			_originDateTime(partiallyFilledPointer._originDateTime),
@@ -343,6 +349,7 @@ namespace synthese
 				_realTimeArrivalVertex == rhs._realTimeArrivalVertex &&
 				_theoreticalArrivalTime == rhs._theoreticalArrivalTime &&
 				_userClassRank == rhs._userClassRank &&
+				_THData == rhs._THData &&
 				_RTData == rhs._RTData &&
 				_service == rhs._service &&
 				_originDateTime == rhs._originDateTime &&

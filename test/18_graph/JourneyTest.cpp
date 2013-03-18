@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE (TransferNumber)
 			e31.setMetricOffset(1);
 			ptime d3_0s(date(2000,1,1), minutes(0));
 			ptime d3_0e(date(2000,1,1), minutes(1));
-			ServicePointer sp3_0(false, 0, S, d3_0s);
+			ServicePointer sp3_0(true, false, 0, S, d3_0s);
 			sp3_0.setDepartureInformations(e3, d3_0s, d3_0s, *e3.getFromVertex());
 			sp3_0.setArrivalInformations(e31, d3_0e, d3_0e, *e31.getFromVertex());
 			Journey j4;
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE (TransferNumber)
 			e3F1.setFromVertex(&v3);
 			e3F1.setParentPath(&LF);
 			e3F1.setMetricOffset(1);
-			ServicePointer sp3_0F(false, 0, SF, d3_0s);
+			ServicePointer sp3_0F(true, false, 0, SF, d3_0s);
 			sp3_0F.setDepartureInformations(e3F, d3_0s, d3_0s, *e3F.getFromVertex());
 			sp3_0F.setArrivalInformations(e3F1, d3_0e, d3_0e, *e3F1.getFromVertex());
 			Journey j3;

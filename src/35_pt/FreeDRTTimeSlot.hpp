@@ -159,6 +159,7 @@ namespace synthese
 				/// Use getJourneyDepartureToArrival or getJourneyArrivalToDeparture instead.
 				virtual graph::ServicePointer getFromPresenceTime(
 					const graph::AccessParameters& accessParameters,
+					bool THData,
 					bool RTData,
 					bool getDeparture,
 					const graph::Edge& edge,
