@@ -675,6 +675,9 @@ namespace synthese
 				BOOST_FOREACH(SchedulesMap::value_type& it, services)
 				{
 					JourneyPattern* route(it.first.first);
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*route->sharedServicesMutex
+					);
 					ScheduledService* curService(NULL);
 					BOOST_FOREACH(Service* service, route->getServices())
 					{

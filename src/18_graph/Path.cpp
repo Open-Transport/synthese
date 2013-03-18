@@ -58,7 +58,8 @@ namespace synthese
 			RuleUser(),
 			_pathGroup(NULL),
 			_pathClass(NULL),
-			_pathNetwork(NULL)
+			_pathNetwork(NULL),
+			sharedServicesMutex(new synthese::util::shared_recursive_mutex)
 		{}
 
 
@@ -89,6 +90,7 @@ namespace synthese
 			Service& service,
 			bool ensureLineTheory
 		){
+			boost::unique_lock<shared_recursive_mutex> lock(*sharedServicesMutex);
 			if (_services.find(&service) != _services.end())
 				throw Exception("The service already exists.");
 
@@ -107,6 +109,7 @@ namespace synthese
 
 		void Path::removeService(Service& service)
 		{
+			boost::unique_lock<shared_recursive_mutex> lock(*sharedServicesMutex);
 			_services.erase(&service);
 
 			markScheduleIndexesUpdateNeeded(false);

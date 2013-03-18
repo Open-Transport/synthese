@@ -194,6 +194,9 @@ namespace synthese
 					}
 
 					// Gets all services
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*journeyPattern.sharedServicesMutex
+					);
 					BOOST_FOREACH(Service* service, journeyPattern.getServices())
 					{
 						result.insert(service);
@@ -202,6 +205,9 @@ namespace synthese
 					// Sub journey pattern
 					BOOST_FOREACH(JourneyPatternCopy* subPath, journeyPattern.getSubLines())
 					{
+						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+									*subPath->sharedServicesMutex
+						);
 						BOOST_FOREACH(Service* service, subPath->getServices())
 						{
 							result.insert(service);

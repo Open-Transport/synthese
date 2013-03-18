@@ -93,6 +93,9 @@ namespace synthese
 				{
 					ScheduledServiceTableSync::Search(_env, itPath->getKey());
 					ContinuousServiceTableSync::Search(_env, itPath->getKey());
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*itPath->sharedServicesMutex
+					);
 
 					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getServices())
 					{
@@ -510,6 +513,9 @@ namespace synthese
 				{
 					ScheduledServiceTableSync::Search(_env, itPath->getKey());
 					ContinuousServiceTableSync::Search(_env, itPath->getKey());
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*itPath->sharedServicesMutex
+					);
 
 					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getServices())
 					{
