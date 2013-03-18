@@ -967,7 +967,7 @@ namespace synthese
 								try
 								{
 									int typeInfo(lexical_cast<int>(typeInfoNode.getText()));
-									string contInfoStr(contInfoNode.getText());
+									string contInfoStr(contInfoNode.getText() ? contInfoNode.getText() : "");
 									switch(typeInfo)
 									{
 									case 1:
