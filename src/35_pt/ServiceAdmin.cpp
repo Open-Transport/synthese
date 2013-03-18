@@ -497,6 +497,8 @@ namespace synthese
 						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
 					}
 					scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+					scheduleUpdateRequest.getAction()->setAtDeparture(true);
+					scheduleUpdateRequest.getAction()->setAtArrival(true);
 					vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 
 					stream << ts.col();
