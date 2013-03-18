@@ -582,11 +582,11 @@ namespace synthese
 							){
 								if(itZug->stops.begin()->stopCode < itZug->stops.rbegin()->stopCode)
 								{
-									itZug->lineNumber = itZug->stops.begin()->stopCode +"-"+ itZug->stops.rbegin()->stopCode;
+									itZug->lineNumber = itZug->transportModeCode +"-"+ itZug->stops.begin()->stopCode +"-"+ itZug->stops.rbegin()->stopCode;
 								}
 								else
 								{
-									itZug->lineNumber = itZug->stops.rbegin()->stopCode +"-"+ itZug->stops.begin()->stopCode;
+									itZug->lineNumber = itZug->transportModeCode +"-"+ itZug->stops.rbegin()->stopCode +"-"+ itZug->stops.begin()->stopCode;
 								}
 							}
 
@@ -1527,6 +1527,7 @@ namespace synthese
 								it2->second.cityName +" "+ it2->second.name
 							);
 						}
+						line->setShortName(zug.transportModeCode);
 					}
 					else
 					{
