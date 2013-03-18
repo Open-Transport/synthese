@@ -27,6 +27,11 @@
 #include "DateService.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
+#if !defined WIN32
+# include <locale.h>
+#else
+# include <windows.h>
+#endif
 
 using namespace std;
 using namespace boost;
@@ -48,7 +53,7 @@ namespace synthese
 		const string DateService::PARAMETER_BASE("b");
 		const string DateService::PARAMETER_UNIT("u");
 		const string DateService::PARAMETER_STRFTIME_FORMAT("strftime_format");
-
+		const string DateService::PARAMETER_LANG("lang");
 
 
 		DateService::DateService():
@@ -62,6 +67,7 @@ namespace synthese
 			ParametersMap map;
 			map.insert(PARAMETER_WITH_TIME, _withTime);
 			map.insert(PARAMETER_STRFTIME_FORMAT, _strftimeFormat);
+			map.insert(PARAMETER_LANG, _strftimeLang);
 			return map;
 		}
 
@@ -109,6 +115,7 @@ namespace synthese
 				throw RequestException("Bad unit for parameter u, must be in {'second', 'minute', 'hour', 'day'}");
 
 			_strftimeFormat = map.getDefault<string>(PARAMETER_STRFTIME_FORMAT);
+			_strftimeLang = map.getDefault<string>(PARAMETER_LANG);
 		}
 
 
@@ -160,14 +167,28 @@ namespace synthese
 				// Not new char(100), basic mistake !
 				char* str_date = new char[100];
 				const tm tm_time = to_tm(final_time);
+				locale_t loc;
+				bool changeLocale = false;
+
+				if(!_strftimeLang.empty())
+				{
+					//Locale given : localise strftime
+					loc = newlocale (LC_TIME_MASK, _strftimeLang.c_str(), NULL);
+					if (loc == (locale_t) 0)
+						throw RequestException("Failed to set locale to " + _strftimeLang);
+					changeLocale = true;
+					uselocale(loc);
+				}
 				if(strftime(str_date, 100, _strftimeFormat.c_str(), &tm_time))
 				{
 					stream << str_date;
 				}
 				else
 				{
+					if(changeLocale)freelocale (loc);
 					throw RequestException("Bad strftime format");
 				}
+				if(changeLocale)freelocale (loc);
 				delete[] str_date;
 			}
 			return util::ParametersMap();
