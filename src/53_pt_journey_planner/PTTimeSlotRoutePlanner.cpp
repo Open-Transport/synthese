@@ -206,7 +206,9 @@ namespace synthese
 					70, // 252 km/h TODO take it configurable
 					_ignoreReservation,
 					_logger,
-					_maxTransferDuration
+					_maxTransferDuration,
+					PTModule::isTheroticalAllowed(),
+					PTModule::isRealTimeAllowed()							
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,
@@ -230,7 +232,9 @@ namespace synthese
 					100,
 					_ignoreReservation,
 					_logger,
-					_maxTransferDuration
+					_maxTransferDuration,
+					PTModule::isTheroticalAllowed(),
+					PTModule::isRealTimeAllowed()
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,

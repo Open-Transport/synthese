@@ -77,6 +77,7 @@ namespace synthese
 
 		ServicePointer ScheduledService::getFromPresenceTime(
 			const AccessParameters& accessParameters,
+			bool THData,
 			bool RTData,
 			bool getDeparture,
 			const Edge& edge,
@@ -131,7 +132,7 @@ namespace synthese
 			}
 
 			// Saving dates
-			ServicePointer ptr(RTData, accessParameters.getUserClassRank(), *this, originDateTime);
+			ServicePointer ptr(THData, RTData, accessParameters.getUserClassRank(), *this, originDateTime);
 
 			if(getDeparture)
 			{
@@ -196,26 +197,27 @@ namespace synthese
 			if(servicePointer.getArrivalEdge() == NULL)
 			{
 				time_duration schedule(
-					getArrivalSchedules(servicePointer.getRTData())[edgeIndex]
+					getArrivalSchedules(servicePointer.getTHData(),
+										servicePointer.getRTData())[edgeIndex]
 				);
 
 				servicePointer.setArrivalInformations(
 					edge,
 					servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]),
-					servicePointer.getOriginDateTime() + (getArrivalSchedules(false)[edgeIndex] - _departureSchedules[0]),
+					servicePointer.getOriginDateTime() + (getArrivalSchedules(true, false)[edgeIndex] - _departureSchedules[0]),
 					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
 			else
 			{
 				time_duration schedule(
-					getDepartureSchedules(servicePointer.getRTData())[edgeIndex]
+					getDepartureSchedules(true, servicePointer.getRTData())[edgeIndex]
 				);
 
 				servicePointer.setDepartureInformations(
 					edge,
 					servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]),
-					servicePointer.getOriginDateTime() + (getDepartureSchedules(false)[edgeIndex] - _departureSchedules[0]),
+					servicePointer.getOriginDateTime() + (getDepartureSchedules(true, false)[edgeIndex] - _departureSchedules[0]),
 					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
@@ -225,22 +227,22 @@ namespace synthese
 
 		time_duration ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getDepartureSchedules(RTData)[rankInPath];
+			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
 		time_duration ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getDepartureSchedules(RTData)[rankInPath];
+			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
 		time_duration ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getArrivalSchedules(RTData)[rankInPath];
+			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
 		time_duration ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getArrivalSchedules(RTData)[rankInPath];
+			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
 
@@ -271,6 +273,7 @@ namespace synthese
 					ServicePointer p(
 						getFromPresenceTime(
 							ap,
+							true,
 							false,
 							true,
 							**it,
@@ -302,6 +305,7 @@ namespace synthese
 				{
 					ServicePointer p(getFromPresenceTime(
 						ap,
+						true,
 						false,
 						true,
 						**it,
@@ -334,6 +338,7 @@ namespace synthese
 			ServicePointer originPtr(
 				getFromPresenceTime(
 					accessParameters,
+					true,
 					RTdata,
 					true,
 					*edge,
@@ -352,7 +357,7 @@ namespace synthese
 			for(edge = edge->getFollowingArrivalForFineSteppingOnly(); edge; edge = edge->getFollowingArrivalForFineSteppingOnly())
 			{
 				ptime arrivalTime(
-					originPtr.getOriginDateTime() + (getArrivalSchedules(false)[edge->getRankInPath()] - _departureSchedules[0])
+					originPtr.getOriginDateTime() + (getArrivalSchedules(true, false)[edge->getRankInPath()] - _departureSchedules[0])
 				);
 
 				if(RTdata && !_RTVertices[edge->getRankInPath()])
@@ -363,7 +368,7 @@ namespace synthese
 				if(arrivalTime > date)
 				{
 					edge = edge->getPreviousDepartureForFineSteppingOnly();
-					ServicePointer result(RTdata, accessParameters.getUserClassRank(), *this, originPtr.getOriginDateTime());
+					ServicePointer result(true, RTdata, accessParameters.getUserClassRank(), *this, originPtr.getOriginDateTime());
 					result.setDepartureInformations(
 						*edge,
 						originPtr.getOriginDateTime() + (_RTDepartureSchedules[edge->getRankInPath()] - _departureSchedules[0]),

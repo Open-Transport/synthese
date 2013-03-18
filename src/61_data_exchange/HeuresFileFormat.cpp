@@ -879,7 +879,7 @@ namespace synthese
 				_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 5, false, '0');
 
 				// Schedules
-				size_t schedulesNumber(ss.getDepartureSchedules(false).size());
+				size_t schedulesNumber(ss.getDepartureSchedules(true, false).size());
 				for(size_t i(0); i<schedulesNumber; ++i)
 				{
 					time_duration departureSchedule(ss.getDepartureSchedule(false, i));

@@ -297,7 +297,9 @@ namespace synthese
 					boost::optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 					bool inverted = false,
 					bool ignoreReservation = false,
-					bool allowCanceledService = false
+					bool allowCanceledService = false,
+					bool enableTheoretical = true,
+					bool enableRealTime = true
 				) const;
 
 
@@ -322,7 +324,9 @@ namespace synthese
 					boost::optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 					bool inverted = false,
 					bool ignoreReservation = false,
-					bool allowCanceledService = false
+					bool allowCanceledService = false,
+					bool enableTheoretical = true,
+					bool enableRealTime = true
 				) const;
 			//@}
 

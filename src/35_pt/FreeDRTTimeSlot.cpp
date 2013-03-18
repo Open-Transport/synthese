@@ -152,6 +152,7 @@ namespace synthese
 
 		ServicePointer FreeDRTTimeSlot::getFromPresenceTime(
 			const AccessParameters& accessParameters,
+			bool THData,
 			bool RTData,
 			bool getDeparture,
 			const graph::Edge& edge,

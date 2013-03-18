@@ -322,6 +322,7 @@ namespace synthese
 					}
 
 					ServicePointer sp(
+						true,
 						false,
 						_userClassCode,
 						*_service,

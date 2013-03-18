@@ -105,6 +105,7 @@ namespace synthese
 
 		ServicePointer ContinuousService::getFromPresenceTime(
 			const AccessParameters& accessParameters,
+			bool THData,
 			bool RTData,
 			bool getDeparture,
 			const Edge& edge,
@@ -259,7 +260,7 @@ namespace synthese
 			}
 
 			// Saving of the result
-			ServicePointer ptr(RTData, accessParameters.getUserClassRank(), *this, originDateTime);
+			ServicePointer ptr(THData, RTData, accessParameters.getUserClassRank(), *this, originDateTime);
 			if(getDeparture)
 			{
 				ptime dateTime(actualDateTime);

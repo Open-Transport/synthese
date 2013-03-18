@@ -219,7 +219,7 @@ namespace synthese
 
 		boost::posix_time::time_duration SchedulesBasedService::getDepartureSchedule( bool RTData, std::size_t rank ) const
 		{
-			return getDepartureSchedules(RTData).at(rank);
+			return getDepartureSchedules(true, RTData).at(rank);
 		}
 
 
@@ -228,40 +228,49 @@ namespace synthese
 		{
 			for (Path::Edges::const_reverse_iterator it(getPath()->getEdges().rbegin()); it != getPath()->getEdges().rend(); ++it)
 				if ((*it)->isDeparture())
-					return getDepartureSchedules(RTData).at((*it)->getRankInPath());
+					return getDepartureSchedules(true, RTData).at((*it)->getRankInPath());
 			assert(false);
-			return getDepartureSchedules(RTData).at(0);
+			return getDepartureSchedules(true, RTData).at(0);
 		}
 
 
 
 		boost::posix_time::time_duration SchedulesBasedService::getArrivalSchedule( bool RTData, std::size_t rank ) const
 		{
-			return getArrivalSchedules(RTData).at(rank);
+			return getArrivalSchedules(true, RTData).at(rank);
 		}
 
 
 
 		const boost::posix_time::time_duration& SchedulesBasedService::getLastArrivalSchedule( bool RTData ) const
 		{
-			Schedules::const_iterator it(getArrivalSchedules(RTData).end() - 1);
+			Schedules::const_iterator it(getArrivalSchedules(true, RTData).end() - 1);
 			return *it;
 		}
 
 
 
-		const SchedulesBasedService::Schedules& SchedulesBasedService::getDepartureSchedules( bool RTData ) const
+		const SchedulesBasedService::Schedules& SchedulesBasedService::getDepartureSchedules( bool THData, bool RTData ) const
 		{
-			return RTData ? _RTDepartureSchedules : _departureSchedules;
+			if(RTData && _hasRealTimeData)
+			{
+				return _RTDepartureSchedules;
+			}
+
+			return THData ? _departureSchedules : _emptySchedules;
 		}
 
 
 
-		const SchedulesBasedService::Schedules& SchedulesBasedService::getArrivalSchedules( bool RTData ) const
+		const SchedulesBasedService::Schedules& SchedulesBasedService::getArrivalSchedules( bool THData, bool RTData ) const
 		{
-			return RTData ? _RTArrivalSchedules : _arrivalSchedules;
-		}
+			if(RTData && _hasRealTimeData)
+			{
+				return _RTArrivalSchedules;
+			}
 
+			return THData ? _arrivalSchedules : _emptySchedules;
+		}
 
 
 		void SchedulesBasedService::_applyRealTimeShiftDuration( 
@@ -271,6 +280,7 @@ namespace synthese
 			bool updateFollowingSchedules
 		)
 		{
+			_hasRealTimeData = true;
 			// TODO Use a constant or a param for the accepted delay
 			if(!_RTTimestamps[rank].is_not_a_date_time() &&
 				_RTTimestamps[rank] > second_clock::local_time() - boost::posix_time::minutes(5))
@@ -339,10 +349,12 @@ namespace synthese
 
 		void SchedulesBasedService::clearRTData()
 		{
+			_hasRealTimeData = false;
 			_RTDepartureSchedules = _departureSchedules;
 			_RTArrivalSchedules = _arrivalSchedules;
 			// Assuming arrival and departure schedules have the same size
 			_RTTimestamps.assign(_departureSchedules.size(), boost::posix_time::ptime());
+			_emptySchedules.assign(_departureSchedules.size(), not_a_date_time);
 
 			if(getPath())
 			{
@@ -598,6 +610,7 @@ namespace synthese
 				}
 			}
 			_path->markScheduleIndexesUpdateNeeded(true);
+			_hasRealTimeData = true;
 		}
 
 
@@ -610,6 +623,7 @@ namespace synthese
 			_RTArrivalSchedules = arrivalSchedules;
 			_computeNextRTUpdate();
 			_path->markScheduleIndexesUpdateNeeded(true);
+			_hasRealTimeData = true;
 		}
 
 
@@ -995,8 +1009,8 @@ namespace synthese
 			return
 				first.getPath() == second.getPath() &&
 				first.getServiceNumber() == second.getServiceNumber() &&
-				first.getDepartureSchedules(false) == second.getDepartureSchedules(false) &&
-				first.getArrivalSchedules(false) == second.getArrivalSchedules(false)
+				first.getDepartureSchedules(true, false) == second.getDepartureSchedules(true, false) &&
+				first.getArrivalSchedules(true, false) == second.getArrivalSchedules(true, false)
 			;
 		}
 

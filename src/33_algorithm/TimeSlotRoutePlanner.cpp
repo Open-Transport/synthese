@@ -57,7 +57,9 @@ namespace synthese
 			double vmax,
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
-			boost::optional<boost::posix_time::time_duration> maxTransferDuration
+			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
+			bool enableTheoretical,
+			bool enableRealTime
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(lowerDepartureTime),
@@ -73,6 +75,8 @@ namespace synthese
 			_vmax(vmax),
 			_ignoreReservation(ignoreReservation),
 			_maxTransferDuration(maxTransferDuration),
+			_enableTheoretical(enableTheoretical),
+			_enableRealTime(enableRealTime),
 			_logger(logger),
 			_journeyTemplates(graphToUse)
 		{}
@@ -92,7 +96,9 @@ namespace synthese
 			double vmax,
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
-			boost::optional<boost::posix_time::time_duration> maxTransferDuration
+			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
+			bool enableTheoretical,
+			bool enableRealTime
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(continuousService.getFirstDepartureTime()),
@@ -113,8 +119,10 @@ namespace synthese
 			_vmax(vmax),
 			_ignoreReservation(ignoreReservation),
 			_maxTransferDuration(maxTransferDuration),
+			_enableTheoretical(enableTheoretical),
+			_enableRealTime(enableRealTime),
 			_logger(logger),
-		  _journeyTemplates(graphToUse)
+			_journeyTemplates(graphToUse)
 		{}
 
 
@@ -171,7 +179,9 @@ namespace synthese
 					_ignoreReservation,
 					_logger,
 					_journeyTemplates,
-					_maxTransferDuration
+					_maxTransferDuration,
+					_enableTheoretical,
+					_enableRealTime							
 				);
 				Journey journey(r.run());
 

@@ -120,8 +120,8 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	s.setSchedules(d, a, true);
 	s.setActive(today);
 
-	SchedulesBasedService::Schedules id(s.getDepartureSchedules(false));
-	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(false));
+	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, false));
+	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(true, false));
 	BOOST_CHECK_EQUAL(id.size(), l.getEdges().size());
 	BOOST_CHECK_EQUAL(ia[0], time_duration(2,0, 0)); // Scheduled
 	BOOST_CHECK_EQUAL(id[0], time_duration(2,0, 0)); // Scheduled
@@ -149,6 +149,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	ServicePointer sp1(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -188,6 +189,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	ServicePointer sp2(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -228,6 +230,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	ServicePointer sp3(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -245,6 +248,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	ServicePointer sp4(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			false,
 			l7AD,
@@ -285,6 +289,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	ServicePointer sp5(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			false,
 			l7AD,
@@ -326,6 +331,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	ServicePointer sp6(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			false,
 			l7AD,
@@ -414,8 +420,8 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	s.setSchedules(d, a, true);
 	s.setActive(today);
 
-	SchedulesBasedService::Schedules id(s.getDepartureSchedules(false));
-	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(false));
+	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, false));
+	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(true, false));
 	BOOST_CHECK_EQUAL(id.size(), l.getEdges().size());
 	BOOST_CHECK_EQUAL(ia[0], time_duration(2,0, 0)); // Scheduled
 	BOOST_CHECK_EQUAL(id[0], time_duration(2,0, 0)); // Scheduled
@@ -443,6 +449,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp1(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -482,6 +489,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp2(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -520,6 +528,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp2i(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -560,6 +569,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp3(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -599,6 +609,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp3i(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -639,6 +650,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp4(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -677,6 +689,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp4i(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -717,6 +730,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp5(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -734,6 +748,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp6(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			false,
 			l7AD,
@@ -774,6 +789,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp7(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			false,
 			l7AD,
@@ -816,6 +832,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	ServicePointer sp8(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			false,
 			l7AD,
@@ -915,6 +932,7 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	ServicePointer sp1(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -953,6 +971,7 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	ServicePointer sp1i(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			true,
 			l3AD,
@@ -992,6 +1011,7 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	ServicePointer sp7(
 		s.getFromPresenceTime(
 			ap,
+			true,
 			false,
 			false,
 			l7AD,

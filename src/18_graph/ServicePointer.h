@@ -80,6 +80,7 @@ namespace synthese
 			//! @name General information
 			//@{
 				std::size_t		_userClassRank;
+				bool				_THData;
 				bool				_RTData;
 				const Service*	_service;
 				boost::posix_time::ptime		_originDateTime;
@@ -92,6 +93,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			ServicePointer(
+				bool THData,
 				bool RTData,
 				std::size_t userClassRank,
 				const Service& service,
@@ -103,6 +105,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			ServicePointer(
+				bool THData,
 				bool RTData,
 				std::size_t userClassRank,
 				const Service& service,
@@ -146,6 +149,7 @@ namespace synthese
 				const boost::posix_time::ptime&	getOriginDateTime()			const { return _originDateTime; }
 				boost::posix_time::time_duration	getServiceRange() const { return _range; }
 				std::size_t				getUserClassRank() const { return _userClassRank; }
+				bool					getTHData() const { return _THData; }
 				bool					getRTData() const { return _RTData; }
 				bool					getCanceled() const { return _canceled; }
 			//@}

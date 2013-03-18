@@ -185,7 +185,7 @@ namespace synthese
 				throw LoadException<ContinuousServiceTableSync>(rows, ContinuousServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
 			}
 			if(	cs->getPath() &&
-				cs->getPath()->getEdges().size() != cs->getArrivalSchedules(false).size()
+				cs->getPath()->getEdges().size() != cs->getArrivalSchedules(true, false).size()
 			){
 				throw LoadException<ContinuousServiceTableSync>(rows, ContinuousServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
 			}

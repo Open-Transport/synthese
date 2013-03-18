@@ -41,6 +41,7 @@ namespace synthese
 	{
 		ServicePointer PermanentService::getFromPresenceTime(
 			const AccessParameters& accessParameters,
+			bool THData,
 			bool RTData,
 			bool getDeparture,
 			const Edge& edge,
@@ -96,6 +97,7 @@ namespace synthese
 				originDateTime -= range;
 			}
 			ServicePointer sp(
+				THData,
 				RTData,
 				accessParameters.getUserClassRank(),
 				*this,
