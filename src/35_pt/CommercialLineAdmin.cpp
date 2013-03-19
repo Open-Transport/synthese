@@ -437,7 +437,7 @@ namespace synthese
 					stream << t.row();
 					stream << t.col() << rule->getPriorityLine()->getNetwork()->getName();
 					stream << t.col(1, rule->getPriorityLine()->getStyle()) << rule->getPriorityLine()->getShortName();
-					stream << t.col() << rule->getDelay().minutes();
+					stream << t.col() << rule->getDelay().total_seconds() / 60;
 					stream << t.col() <<
 						HTMLModule::getLinkButton(
 							removeRequest.getURL(),
