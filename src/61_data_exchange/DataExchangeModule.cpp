@@ -100,6 +100,12 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()
 		{
+			UnregisterParameter(DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE);
+			UnregisterParameter(DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE);
+			UnregisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_HOST);
+			UnregisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_PORT);
+			UnregisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_FILE);
+			UnregisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_PERIOD_MS);
 		}
 
 
