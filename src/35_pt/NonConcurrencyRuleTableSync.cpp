@@ -136,7 +136,7 @@ namespace synthese
 			ReplaceQuery<NonConcurrencyRuleTableSync> query(*object);
 			query.addField(object->getPriorityLine()->getKey());
 			query.addField(object->getHiddenLine()->getKey());
-			query.addField(object->getDelay().total_seconds() / 60);
+			query.addField(static_cast<int>(object->getDelay().total_seconds() / 60));
 			query.execute(transaction);
 		}
 
