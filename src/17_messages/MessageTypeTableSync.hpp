@@ -1,6 +1,6 @@
 
-/** VDVClientTableSync class header.
-	@file VDVClientTableSync.h
+/** MessageTypeTableSync class header.
+	@file MessageTypeTableSync.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>

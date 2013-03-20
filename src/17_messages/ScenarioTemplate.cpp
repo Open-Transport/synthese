@@ -24,6 +24,7 @@
 
 #include "ScenarioTemplate.h"
 
+#include "SentAlarm.h"
 #include "AlarmTemplate.h"
 #include "ParametersMap.h"
 #include "Registry.h"

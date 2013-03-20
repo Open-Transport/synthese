@@ -4,6 +4,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "MessageAlternativeTableSync.hpp"
+#include "MessageApplicationPeriodTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioFolderTableSync.h"
@@ -61,6 +62,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::AlarmObjectLinkTableSync::integrate();
 	synthese::messages::AlarmTableSync::integrate();
 	synthese::messages::MessageAlternativeTableSync::integrate();
+	synthese::messages::MessageApplicationPeriodTableSync::integrate();
 	synthese::messages::MessageTypeTableSync::integrate();
 	synthese::messages::ScenarioFolderTableSync::integrate();
 	synthese::messages::ScenarioTableSync::integrate();
@@ -100,6 +102,7 @@ void synthese::messages::moduleRegister()
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
 	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
+	synthese::util::Env::Integrate<synthese::messages::MessageApplicationPeriod>();
 	synthese::util::Env::Integrate<synthese::messages::MessageType>();
 	synthese::util::Env::Integrate<synthese::messages::Alarm>();
 	synthese::util::Env::Integrate<synthese::messages::TextTemplate>();

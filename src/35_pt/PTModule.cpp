@@ -22,6 +22,7 @@
 
 #include "PTModule.h"
 
+#include "SentScenario.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "ContinuousService.h"

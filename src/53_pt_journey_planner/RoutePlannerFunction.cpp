@@ -22,6 +22,7 @@
 
 #include "RoutePlannerFunction.h"
 
+#include "SentScenario.h"
 #include "AccessParameters.h"
 #include "AlgorithmLogger.hpp"
 #include "Edge.h"

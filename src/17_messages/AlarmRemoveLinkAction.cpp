@@ -24,7 +24,7 @@
 
 #include "AlarmRemoveLinkAction.h"
 
-#include "Alarm.h"
+#include "SentScenario.h"
 #include "AlarmTableSync.h"
 #include "ActionException.h"
 #include "Profile.h"

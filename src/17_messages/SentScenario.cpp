@@ -50,6 +50,7 @@ namespace synthese
 		const std::string SentScenario::DATA_CODE = "code";
 		const std::string SentScenario::DATA_VALUE = "value";
 
+		const std::string SentScenario::TAG_APPLICATION_PERIOD = "application_period";
 		const std::string SentScenario::TAG_VARIABLE = "variable";
 		const std::string SentScenario::TAG_MESSAGE = "message";
 		const std::string SentScenario::TAG_TEMPLATE_SCENARIO = "template_scenario";
@@ -242,5 +243,13 @@ namespace synthese
 
 			// active
 			pm.insert(DATA_ACTIVE, getIsEnabled());
+
+			// application period
+			BOOST_FOREACH(const MessageApplicationPeriod::ApplicationPeriods::value_type& it, _applicationPeriods)
+			{
+				shared_ptr<ParametersMap> apPM(new ParametersMap);
+				it.second->toParametersMap(*apPM);
+				pm.insert(TAG_APPLICATION_PERIOD, apPM);
+			}
 		}
 }	}
