@@ -182,10 +182,11 @@ void quit(bool doExit)
 {
 	// End all threads
 	ServerModule::KillAllHTTPThreads(false);
+	ServerModule::End();
 
 	// Terminate all modules
 	vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
-	BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+	BOOST_REVERSE_FOREACH(const shared_ptr<ModuleClass> module, modules)
 	{
 		Log::GetInstance ().info ("Terminating module " + module->getFactoryKey() + "...");
 		module->end();
