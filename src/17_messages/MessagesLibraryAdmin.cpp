@@ -389,6 +389,6 @@ namespace synthese
 			const MessagesLibraryAdmin& mother(static_cast<const MessagesLibraryAdmin&>(other));
             return
 				(!_folder.get() && !mother._folder.get()) ||
-				(_folder.get() && mother._folder.get()) && (mother._folder->getKey() == _folder->getKey());
+				((_folder.get() && mother._folder.get()) && (mother._folder->getKey() == _folder->getKey()));
 		}
 }	}
