@@ -25,8 +25,10 @@
 #ifndef SYNTHESE_SentScenario_h__
 #define SYNTHESE_SentScenario_h__
 
-#include "MessagesTypes.h"
 #include "Scenario.h"
+
+#include "MessageApplicationPeriod.hpp"
+#include "MessagesTypes.h"
 
 #include <map>
 #include <string>
@@ -46,6 +48,7 @@ namespace synthese
 			public Scenario
 		{
 		public:
+			static const std::string TAG_APPLICATION_PERIOD;
 			static const std::string DATA_NAME;
 			static const std::string DATA_EVENT_START_DATE;
 			static const std::string DATA_EVENT_END_DATE;
@@ -76,6 +79,8 @@ namespace synthese
 			boost::posix_time::ptime _periodEnd;   //!< Alarm applicability period end
 			const ScenarioTemplate*	_template;
 			VariablesMap _variables;
+
+			mutable MessageApplicationPeriod::ApplicationPeriods _applicationPeriods;
 
 		public:
 			/** Basic constructor
@@ -110,6 +115,7 @@ namespace synthese
 			bool getIsEnabled()	const { return _isEnabled; }
 			const ScenarioTemplate*	getTemplate() const { return _template; }
 			const VariablesMap&	getVariables() const { return _variables; }
+			const MessageApplicationPeriod::ApplicationPeriods& getApplicationPeriods() const { return _applicationPeriods; }
 
 			////////////////////////////////////////////////////////////////////
 			/// Start broadcast date setter.
@@ -129,6 +135,7 @@ namespace synthese
 			void setIsEnabled(bool value){ _isEnabled = value; }
 			void setTemplate(const ScenarioTemplate* value);
 			void setVariables(const VariablesMap& value);
+			void setApplicationPeriods(const MessageApplicationPeriod::ApplicationPeriods& value) const { _applicationPeriods = value; }
 
 
 

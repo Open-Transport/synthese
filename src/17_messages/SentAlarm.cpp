@@ -41,6 +41,10 @@ namespace synthese
 
 	namespace messages
 	{
+		const string SentAlarm::TAG_APPLICATION_PERIOD = "application_period";
+
+
+
 		SentAlarm::SentAlarm(
 			util::RegistryKeyType key ,
 			const SentScenario* scenario /*= NULL */
@@ -107,5 +111,19 @@ namespace synthese
 		void SentAlarm::setTemplate( const AlarmTemplate* value )
 		{
 			_template = value;
+		}
+
+
+
+		void SentAlarm::toParametersMap( util::ParametersMap& pm, bool withScenario, std::string prefix /*= std::string()*/, bool withRecipients /*= false */ ) const
+		{
+			Alarm::toParametersMap(pm, withScenario, prefix, withRecipients);
+
+			BOOST_FOREACH(const MessageApplicationPeriod::ApplicationPeriods::value_type& it, _applicationPeriods)
+			{
+				shared_ptr<ParametersMap> apPM(new ParametersMap);
+				it.second->toParametersMap(*apPM);
+				pm.insert(TAG_APPLICATION_PERIOD, apPM);
+			}
 		}
 }	}

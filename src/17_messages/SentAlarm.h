@@ -24,6 +24,8 @@
 #define SYNTHESE_SentAlarm_h__
 
 #include "Alarm.h"
+
+#include "MessageApplicationPeriod.hpp"
 #include "MessagesTypes.h"
 #include "Registry.h"
 
@@ -37,11 +39,16 @@ namespace synthese
 		/** Sent Alarm Interface.
 			@ingroup m17
 		*/
-		class SentAlarm
-			: public Alarm
+		class SentAlarm:
+			public Alarm
 		{
+		public:
+			static const std::string TAG_APPLICATION_PERIOD;
+
 		private:
 			const AlarmTemplate*	_template;
+
+			mutable MessageApplicationPeriod::ApplicationPeriods _applicationPeriods;
 
 		public:
 			/** Copy constructor.
@@ -101,12 +108,22 @@ namespace synthese
 			//@{
 				const AlarmTemplate*	getTemplate()		const;
 				const SentScenario*		getScenario()		const;
+				const MessageApplicationPeriod::ApplicationPeriods& getApplicationPeriods() const { return _applicationPeriods; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void					setTemplate(const AlarmTemplate* value);
+				void setApplicationPeriods(const MessageApplicationPeriod::ApplicationPeriods& value) const { _applicationPeriods = value; }
 			//@}
+
+			virtual void toParametersMap(
+				util::ParametersMap& pm,
+				bool withScenario,
+				std::string prefix = std::string(),
+				bool withRecipients = false
+			) const;
+
 		};
 }	}
 

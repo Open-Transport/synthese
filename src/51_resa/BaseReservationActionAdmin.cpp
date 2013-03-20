@@ -63,8 +63,9 @@ namespace synthese
 			const util::ParametersMap& map
 		){
 
-			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
-			{
+			if(	map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID) &&
+				decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == ReservationTransactionTableSync::TABLE.ID
+			){
 				try
 				{
 					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(

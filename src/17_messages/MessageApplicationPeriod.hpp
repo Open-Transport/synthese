@@ -26,28 +26,41 @@
 #include "Calendar.h"
 #include "Object.hpp"
 
-#include "Alarm.h"
 #include "MessageType.hpp"
 #include "NumericField.hpp"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
 #include "TimeField.hpp"
+#include "PtimeField.hpp"
 
 namespace synthese
 {
-	FIELD_ID(MessageOrScenarioId)
+	namespace messages
+	{
+		class Alarm;
+		class Scenario;
+	}
+
+	FIELD_POINTER(AlarmPointer, messages::Alarm)
+	FIELD_POINTER(ScenarioPointer, messages::Scenario)
 	FIELD_STRING(Dates)
 
 	typedef boost::fusion::map<
 		FIELD(Key),
-		FIELD(MessageOrScenarioId),
+		FIELD(AlarmPointer),
+		FIELD(ScenarioPointer),
 		FIELD(StartHour),
 		FIELD(EndHour),
+		FIELD(StartTime),
+		FIELD(EndTime),
 		FIELD(Dates)
 	> MessageApplicationPeriodRecord;
 
 	namespace messages
 	{
+		class SentAlarm;
+		class SentScenario;
+
 		/** MessageApplicationPeriod class.
 			@ingroup m17
 		*/
@@ -62,6 +75,11 @@ namespace synthese
 			MessageApplicationPeriod(
 				util::RegistryKeyType id = 0
 			);
+
+			typedef std::map<
+				std::pair<boost::posix_time::time_duration, boost::posix_time::time_duration>,
+				MessageApplicationPeriod*
+			> ApplicationPeriods;
 
 			//! @name Modifiers
 			//@{

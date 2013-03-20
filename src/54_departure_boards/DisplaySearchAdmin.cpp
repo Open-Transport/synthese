@@ -22,6 +22,7 @@
 
 #include "DisplaySearchAdmin.h"
 
+#include "SentScenario.h"
 #include "AdvancedSelectTableSync.h"
 #include "DisplayScreenTableSync.h"
 #include "User.h"

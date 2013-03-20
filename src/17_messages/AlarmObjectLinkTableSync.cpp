@@ -22,6 +22,7 @@
 
 #include "AlarmObjectLinkTableSync.h"
 
+#include "SentScenario.h"
 #include "AlarmObjectLinkException.h"
 #include "AlarmRecipient.h"
 #include "AlarmObjectLink.h"
