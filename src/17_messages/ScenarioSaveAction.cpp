@@ -26,6 +26,7 @@
 
 #include "IConv.hpp"
 #include "MessageAlternativeTableSync.hpp"
+#include "MessageApplicationPeriodTableSync.hpp"
 #include "MessageType.hpp"
 #include "MessagesModule.h"
 #include "ScenarioTableSync.h"
@@ -106,6 +107,13 @@ namespace synthese
 		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
 		const string ScenarioSaveAction::VALUES_PARAMETERS_SEPARATOR = "|";
 
+		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_START_DATE = Action_PARAMETER_PREFIX + "_ap_sd_";
+		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_END_DATE = Action_PARAMETER_PREFIX + "_ap_ed_";
+		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_START_TIME = Action_PARAMETER_PREFIX + "_ap_st_";
+		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_END_TIME = Action_PARAMETER_PREFIX + "_ap_et_";
+		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_START_HOUR = Action_PARAMETER_PREFIX + "_ap_sh_";
+		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_END_HOUR = Action_PARAMETER_PREFIX + "_ap_eh_";
+		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_ID = Action_PARAMETER_PREFIX + "_ap_id_";
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
 		{
@@ -668,6 +676,78 @@ namespace synthese
 							)	);
 						}
 					}
+
+					// Message application periods
+					if(map.isDefined(PARAMETER_APPLICATION_PERIOD_ID + lexical_cast<string>(0)))
+					{
+						_messageApplicationPeriods = MessageApplicationPeriods();
+						size_t i(0);
+						string istr(lexical_cast<string>(i));
+						while(map.isDefined(PARAMETER_APPLICATION_PERIOD_ID + istr))
+						{
+							MessageApplicationPeriod* m_a_p(NULL);
+							if(map.getDefault<RegistryKeyType>(PARAMETER_APPLICATION_PERIOD_ID + istr, 0))
+							{
+								m_a_p = MessageApplicationPeriodTableSync::GetEditable(
+									map.get<RegistryKeyType>(PARAMETER_APPLICATION_PERIOD_ID + istr),
+									*_env
+								).get();
+							}
+							else
+							{
+								shared_ptr<MessageApplicationPeriod> newMap(new MessageApplicationPeriod);
+								newMap->set<ScenarioPointer>(*_scenario);
+								newMap->set<Key>(MessageApplicationPeriodTableSync::getId());
+								_env->add(newMap);
+								m_a_p = newMap.get();
+							}
+
+							// Property load
+							time_duration startHour(not_a_date_time);
+							if(!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_HOUR + istr).empty())
+							{
+								startHour = duration_from_string(
+									map.get<string>(PARAMETER_APPLICATION_PERIOD_START_HOUR + istr)
+								);
+							}
+							m_a_p->set<StartHour>(startHour);
+
+							time_duration endHour(not_a_date_time);
+							if(!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_HOUR + istr).empty())
+							{
+								endHour = duration_from_string(
+									map.get<string>(PARAMETER_APPLICATION_PERIOD_END_HOUR + istr)
+								);
+							}
+							m_a_p->set<EndHour>(endHour);
+
+							ptime startTime(not_a_date_time);
+							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty() &&
+								!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr).empty()
+							){
+								startTime = ptime(
+									from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr)),
+									duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr))
+								);
+							}
+							m_a_p->set<StartTime>(startTime);
+
+							ptime endTime(not_a_date_time);
+							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_DATE + istr).empty() &&
+								!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr).empty()
+							){
+								endTime = ptime(
+									from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_END_DATE + istr)),
+									duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr))
+								);
+							}
+							m_a_p->set<EndTime>(endTime);
+
+							_messageApplicationPeriods->insert(m_a_p);
+						}
+					}
+					boost::optional<MessageApplicationPeriods> _messageApplicationPeriods;
+
 				}
 			}
 			catch(ParametersMap::MissingParameterException& e)
@@ -910,6 +990,15 @@ namespace synthese
 			if(_creation && request.getActionWillCreateObject())
 			{
 				request.setActionCreatedId(_scenario->getKey());
+			}
+
+			// Message application periods
+			if(_messageApplicationPeriods)
+			{
+				BOOST_FOREACH(MessageApplicationPeriod* m_a_p, *_messageApplicationPeriods)
+				{
+					MessageApplicationPeriodTableSync::Save(m_a_p);
+				}
 			}
 
 			// Log

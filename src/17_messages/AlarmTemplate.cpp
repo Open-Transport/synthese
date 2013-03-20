@@ -22,6 +22,7 @@
 
 #include "AlarmTemplate.h"
 
+#include "SentAlarm.h"
 #include "ScenarioTemplate.h"
 
 using namespace std;

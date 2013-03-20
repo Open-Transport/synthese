@@ -146,7 +146,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @since 3.3.0
 				/// @date 2011
-				void toParametersMap(
+				virtual void toParametersMap(
 					util::ParametersMap& pm,
 					bool withScenario,
 					std::string prefix = std::string(),

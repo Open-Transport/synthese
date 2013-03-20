@@ -24,6 +24,7 @@
 
 #include "AlarmAddLinkAction.h"
 
+#include "SentScenario.h"
 #include "DBModule.h"
 #include "Profile.h"
 #include "SentAlarm.h"

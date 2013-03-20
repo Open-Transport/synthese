@@ -96,6 +96,13 @@ namespace synthese
 			static const std::string PARAMETER_MESSAGE_ALTERNATIVES_;
 			static const std::string VALUES_SEPARATOR;
 			static const std::string VALUES_PARAMETERS_SEPARATOR;
+			static const std::string PARAMETER_APPLICATION_PERIOD_START_DATE;
+			static const std::string PARAMETER_APPLICATION_PERIOD_END_DATE;
+			static const std::string PARAMETER_APPLICATION_PERIOD_START_TIME;
+			static const std::string PARAMETER_APPLICATION_PERIOD_END_TIME;
+			static const std::string PARAMETER_APPLICATION_PERIOD_START_HOUR;
+			static const std::string PARAMETER_APPLICATION_PERIOD_END_HOUR;
+			static const std::string PARAMETER_APPLICATION_PERIOD_ID;
 
 		private:
 			struct Message
@@ -120,6 +127,10 @@ namespace synthese
 			};
 			typedef std::vector<Message> Messages;
 			typedef std::set<util::RegistryKeyType> MessageIds;
+
+			typedef std::set<
+				MessageApplicationPeriod*
+			> MessageApplicationPeriods;
 
 			//! @name Datasources
 			//@{
@@ -159,6 +170,7 @@ namespace synthese
 				std::string											_dataSourceLinkId;
 				boost::shared_ptr<SentAlarm>						_message;
 				boost::optional<Scenario::Sections>					_sections;
+				boost::optional<MessageApplicationPeriods>			_messageApplicationPeriods;
 			//@}
 
 			//! @name Action to do

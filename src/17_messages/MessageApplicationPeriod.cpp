@@ -22,6 +22,10 @@
 
 #include "MessageApplicationPeriod.hpp"
 
+#include "SentAlarm.h"
+#include "SentScenario.h"
+
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -29,9 +33,10 @@ namespace synthese
 	using namespace messages;
 	using namespace util;
 
-	CLASS_DEFINITION(MessageApplicationPeriod, "t103_message_application_periods", 103)
+	CLASS_DEFINITION(MessageApplicationPeriod, "t104_message_application_periods", 104)
 
-	FIELD_DEFINITION_OF_TYPE(MessageOrScenarioId, "object_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(AlarmPointer, "message_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ScenarioPointer, "scenario_id", SQL_INTEGER)
     FIELD_DEFINITION_OF_TYPE(Dates, "dates", SQL_TEXT)
 
 	namespace messages
@@ -42,9 +47,12 @@ namespace synthese
 			Object<MessageApplicationPeriod, MessageApplicationPeriodRecord>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
-					FIELD_VALUE_CONSTRUCTOR(MessageOrScenarioId, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(AlarmPointer),
+					FIELD_DEFAULT_CONSTRUCTOR(ScenarioPointer),
 					FIELD_DEFAULT_CONSTRUCTOR(StartHour),
 					FIELD_DEFAULT_CONSTRUCTOR(EndHour),
+					FIELD_DEFAULT_CONSTRUCTOR(StartTime),
+					FIELD_DEFAULT_CONSTRUCTOR(EndTime),
 					FIELD_DEFAULT_CONSTRUCTOR(Dates)
 			)	)
 		{}
@@ -52,14 +60,70 @@ namespace synthese
 
 
 
-		void MessageApplicationPeriod::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
-		{
+		void MessageApplicationPeriod::link(
+			util::Env& env,
+			bool withAlgorithmOptimizations /*= false*/
+		){
+			optional<Alarm&> message(get<AlarmPointer>());
+			if(message)
+			{
+				ApplicationPeriods ap(dynamic_cast<SentAlarm&>(*message).getApplicationPeriods());
+				ap.insert(
+					make_pair(
+						make_pair(get<StartHour>(), get<EndHour>()),
+						this
+				)	);
+				dynamic_cast<SentAlarm&>(*message).setApplicationPeriods(ap);
+			}
+			else
+			{
+				optional<Scenario&> scenario(get<ScenarioPointer>());
+				if(scenario)
+				{
+					ApplicationPeriods ap(dynamic_cast<SentScenario&>(*scenario).getApplicationPeriods());
+					ap.insert(
+						make_pair(
+						make_pair(get<StartHour>(), get<EndHour>()),
+							this
+					)	);
+					dynamic_cast<SentScenario&>(*scenario).setApplicationPeriods(ap);
+				}
+			}
 		}
 
 
 
 		void MessageApplicationPeriod::unlink()
 		{
+			optional<Alarm&> message(get<AlarmPointer>());
+			if(message)
+			{
+				ApplicationPeriods ap(dynamic_cast<SentAlarm&>(*message).getApplicationPeriods());
+				for(ApplicationPeriods::iterator it(ap.begin()); it != ap.end(); ++it)
+				{
+					if(it->second == this)
+					{
+						ap.erase(it);
+					}
+				}
+				dynamic_cast<SentAlarm&>(*message).setApplicationPeriods(ap);
+			}
+			else
+			{
+				optional<Scenario&> scenario(get<ScenarioPointer>());
+				if(scenario)
+				{
+					ApplicationPeriods ap(dynamic_cast<SentScenario&>(*scenario).getApplicationPeriods());
+					for(ApplicationPeriods::iterator it(ap.begin()); it != ap.end(); ++it)
+					{
+						if(it->second == this)
+						{
+							ap.erase(it);
+						}
+					}
+					dynamic_cast<SentScenario&>(*scenario).setApplicationPeriods(ap);
+				}
+			}
 		}
 
 
