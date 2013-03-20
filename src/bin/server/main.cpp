@@ -65,6 +65,18 @@ boost::filesystem::path* pidFile (0);
 
 void quit(bool doExit = true);
 
+typedef void (*sighandler_t)(int);
+static void setSigHandlers(sighandler_t handler)
+{
+	std::signal (SIGINT, handler);
+	std::signal (SIGTERM, handler);
+	std::signal (SIGSEGV, handler);
+	std::signal (SIGILL, handler);
+
+#ifndef WIN32
+	std::signal(SIGPIPE, handler);
+#endif	
+}
 volatile sig_atomic_t fatal_error_in_progress = 0;
 
 void sig_INT_handler(int sig)
@@ -80,6 +92,9 @@ void sig_INT_handler(int sig)
 	// This allows profiling info to be dumped.
 	Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
 
+	// Ignore if we crash in the stop procedure
+	setSigHandlers(SIG_DFL);
+
 	quit(false);
 	
 	// Now reraise the signal.  We reactivate the signal's
@@ -87,7 +102,6 @@ void sig_INT_handler(int sig)
 	// We could just call exit or abort,
 	// but reraising the signal sets the return status
 	// from the process correctly.
-	signal (sig, SIG_DFL);
 	raise (sig);
 }
 
@@ -196,14 +210,8 @@ int main( int argc, char **argv )
 #ifdef VLD
 	VLDDisable();
 #endif
-	std::signal (SIGINT, sig_INT_handler);
-	std::signal (SIGTERM, sig_INT_handler);
-	std::signal (SIGSEGV, sig_INT_handler);
-	std::signal (SIGILL, sig_INT_handler);
 
-#ifndef WIN32
-	std::signal(SIGPIPE, sig_PIPE_handler);
-#endif
+	setSigHandlers(sig_INT_handler);
 
 #ifdef WIN32
 	// Useful for attaching debugger at startup.
