@@ -111,7 +111,7 @@ namespace synthese
 				maxDuration
 			),
 			_maxSolutionsNumber(maxSolutionsNumber),
-			_accessParameters(),
+			_accessParameters(accessParameters),
 			_planningOrder(planningOrder),
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
