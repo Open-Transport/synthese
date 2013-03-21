@@ -92,10 +92,10 @@ namespace synthese
 			ServerModule::AddThread(&DataExchangeModule::ServersConnector, "VDV servers connector");
 
 			// Ineo NCE connector
-			ServerModule::AddThread(&IneoNCEConnection::InitThread, "Ineo NCE connector");
+			ServerModule::AddThread(&IneoNCEConnection::RunThread, "Ineo NCE connector");
 
 			// Stop Button File Poller
-			ServerModule::AddThread(&StopButtonFilePoller::InitThread, "Stop Button File Poller");
+			ServerModule::AddThread(&StopButtonFilePoller::RunThread, "Stop Button File Poller");
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()

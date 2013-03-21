@@ -63,7 +63,7 @@ namespace synthese
 		}
 
 
-		void StopButtonFilePoller::InitThread()
+		void StopButtonFilePoller::RunThread()
 		{
 			// Main loop (never ends)
 			while(true)
@@ -131,6 +131,10 @@ namespace synthese
 						util::Log::GetInstance().info(
 							e.what()
 						);
+					}
+					catch(thread_interrupted)
+					{
+						throw thread_interrupted();
 					}
 					catch(...)
 					{
