@@ -54,13 +54,18 @@ namespace synthese
 			static const std::string COL_TRANSACTION_ID;
 			static const std::string COL_LINE_ID;
 			static const std::string COL_LINE_CODE;
+            static const std::string COL_IS_RESERVATION_POSSIBLE;
 			static const std::string COL_SERVICE_ID;
 			static const std::string COL_SERVICE_CODE;
 			static const std::string COL_ORIGIN_DATE_TIME;
 			static const std::string COL_DEPARTURE_PLACE_ID;
+			static const std::string COL_DEPARTURE_CITY_NAME;
+			static const std::string COL_DEPARTURE_PLACE_NAME_NO_CITY;
 			static const std::string COL_DEPARTURE_PLACE_NAME;
 			static const std::string COL_DEPARTURE_TIME;
 			static const std::string COL_ARRIVAL_PLACE_ID;
+			static const std::string COL_ARRIVAL_CITY_NAME;
+			static const std::string COL_ARRIVAL_PLACE_NAME_NO_CITY;
 			static const std::string COL_ARRIVAL_PLACE_NAME;
 			static const std::string COL_ARRIVAL_TIME;
 			static const std::string COL_RESERVATION_RULE_ID;

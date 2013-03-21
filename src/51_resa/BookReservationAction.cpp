@@ -480,6 +480,12 @@ namespace synthese
 					}
 					if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
 					{
+						r->setDepartureCityName(
+							dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getCity()->getName()
+						);
+						r->setDeparturePlaceNameNoCity(
+							dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getName()
+						);
 						r->setDeparturePlaceName(
 							dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getFullName()
 						);
@@ -510,6 +516,16 @@ namespace synthese
 					}
 					if(dynamic_cast<const NamedPlace*>(su.getArrivalEdge()->getHub()))
 					{
+						r->setArrivalCityName(
+							dynamic_cast<const NamedPlace*>(
+								su.getArrivalEdge()->getHub()
+							)->getCity()->getName()
+						);
+						r->setArrivalPlaceNameNoCity(
+							dynamic_cast<const NamedPlace*>(
+								su.getArrivalEdge()->getHub()
+							)->getName()
+						);
 						r->setArrivalPlaceName(
 							dynamic_cast<const NamedPlace*>(
 								su.getArrivalEdge()->getHub()
@@ -533,7 +549,7 @@ namespace synthese
 						r->setLineId(road->getKey());
 					}
 
-
+                    r->setReservationPossible(false);
 					if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation))
 					){
 						if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
@@ -556,6 +572,7 @@ namespace synthese
 								su.getOriginDateTime(),
 								su.getDepartureDateTime()
 						)	);
+                        r->setReservationPossible(true);
 					}
 					r->setServiceId(su.getService()->getKey());
 					r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
@@ -579,6 +596,12 @@ namespace synthese
 				r->setDeparturePlaceId(
 					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getKey()
 				);
+				r->setDepartureCityName(
+					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getCity()->getName()
+				);
+				r->setDeparturePlaceNameNoCity(
+					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getName()
+				);
 				r->setDeparturePlaceName(
 					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getFullName()
 				);
@@ -587,6 +610,12 @@ namespace synthese
 				r->setArrivalPlaceId(
 					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getKey()
 				);
+				r->setArrivalCityName(
+					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getCity()->getName()
+				);
+				r->setArrivalPlaceNameNoCity(
+					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getName()
+				);
 				r->setArrivalPlaceName(
 					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getFullName()
 				);
@@ -594,6 +623,7 @@ namespace synthese
 
 				r->setLineCode(_freeDRTTimeSlot->getArea()->getLine()->getShortName());
 				r->setLineId(_freeDRTTimeSlot->getArea()->getLine()->getKey());
+                r->setReservationPossible(false);
 
 				reservationContact = OnlineReservationRule::GetOnlineReservationRule(
 					_freeDRTTimeSlot->getArea()->getLine()->getReservationContact()
@@ -605,7 +635,7 @@ namespace synthese
 						static_cast<const PTUseRule&>(
 							_freeDRTTimeSlot->getUseRule(_userClassCode)
 						).getKey()
-					);
+                    );
 				}
 				r->setReservationDeadLine(
 					_freeDRTTimeSlot->getUseRule(_userClassCode).getReservationDeadLine(

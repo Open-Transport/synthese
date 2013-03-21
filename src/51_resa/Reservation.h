@@ -69,7 +69,11 @@ namespace synthese
 			static const std::string DATA_NAME;
 			static const std::string DATA_PHONE;
 			static const std::string DATA_LANGUAGE;
+            static const std::string DATA_DEPARTURE_CITY_NAME;
+            static const std::string DATA_DEPARTURE_PLACE_NAME_NO_CITY;
 			static const std::string DATA_DEPARTURE_PLACE_NAME;
+            static const std::string DATA_ARRIVAL_CITY_NAME;
+            static const std::string DATA_ARRIVAL_PLACE_NAME_NO_CITY;
 			static const std::string DATA_ARRIVAL_PLACE_NAME;
 			static const std::string DATA_DEPARTURE_PLACE_ID;
 			static const std::string DATA_ARRIVAL_PLACE_ID;
@@ -111,12 +115,17 @@ namespace synthese
 			//@{
 				util::RegistryKeyType _lineId;				//!< ID of the booked CommercialLine
 				std::string						_lineCode;				//!< Comprehensive line code
+                bool    						_isReservationPossible;
 				util::RegistryKeyType			_serviceId;				//!< Code du service au sein l'axe
 				std::string						_serviceCode;			//!< Code du service au sein l'axe
 				util::RegistryKeyType			_departurePlaceId;		//!< ID of the departure Place
-				std::string						_departurePlaceName;
+				std::string						_departureCityName;
+				std::string						_departurePlaceNameNoCity;
+				std::string						_departurePlaceName;	// This concatenates place and city
 				util::RegistryKeyType			_arrivalPlaceId;		//!< ID of the arrival Place
-				std::string						_arrivalPlaceName;
+				std::string						_arrivalCityName;
+				std::string						_arrivalPlaceNameNoCity;
+				std::string						_arrivalPlaceName;		// This concatenates place and city
 				util::RegistryKeyType			_reservationRuleId;		//!< ID of the used OnlineReservationRule
 				std::string						_departureAddress;		//!< Adresse du départ
 				std::string						_arrivalAddress;		//!< Adresse d'arrivée
@@ -140,11 +149,16 @@ namespace synthese
 			//@{
 				void setLineId				(util::RegistryKeyType id){ _lineId = id; }
 				void setLineCode			(const std::string& code){ _lineCode = code; }
+                void setReservationPossible	(bool isReservationPossible){ _isReservationPossible = isReservationPossible; }
 				void setServiceId			(util::RegistryKeyType id){ _serviceId = id; }
 				void setServiceCode			(const std::string& code){ _serviceCode = code; }
 				void setDeparturePlaceId	(util::RegistryKeyType id){ _departurePlaceId = id; }
+				void setDepartureCityName	(const std::string& cityName){ _departureCityName = cityName; }
+				void setDeparturePlaceNameNoCity	(const std::string& name){ _departurePlaceNameNoCity = name; }
 				void setDeparturePlaceName	(const std::string& name){ _departurePlaceName = name; }
 				void setArrivalPlaceId		(util::RegistryKeyType id){ _arrivalPlaceId = id; }
+				void setArrivalCityName		(const std::string& cityName){ _arrivalCityName = cityName; }
+				void setArrivalPlaceNameNoCity	(const std::string& name){ _arrivalPlaceNameNoCity = name; }
 				void setArrivalPlaceName	(const std::string& name){ _arrivalPlaceName = name; }
 				void setReservationRuleId	(util::RegistryKeyType id){ _reservationRuleId = id; }
 				void setDepartureAddress	(const std::string& address){ _departureAddress = address; }
@@ -177,11 +191,16 @@ namespace synthese
 			//@{
 				util::RegistryKeyType			getLineId()					const { return _lineId; }
 				const std::string&				getLineCode()				const { return _lineCode; }
+                bool            				getReservationPossible()	const { return _isReservationPossible; }
 				util::RegistryKeyType			getServiceId()				const { return _serviceId; }
 				const std::string&				getServiceCode()			const { return _serviceCode; }
 				util::RegistryKeyType			getDeparturePlaceId()		const { return _departurePlaceId; }
+				const std::string&				getDepartureCityName()		const { return _departureCityName; }
+				const std::string&				getDeparturePlaceNameNoCity()		const { return _departurePlaceNameNoCity; }
 				const std::string&				getDeparturePlaceName()		const { return _departurePlaceName; }
 				util::RegistryKeyType			getArrivalPlaceId()			const { return _arrivalPlaceId; }
+				const std::string&				getArrivalCityName()		const { return _arrivalCityName; }
+				const std::string&				getArrivalPlaceNameNoCity()		const { return _arrivalPlaceNameNoCity; }
 				const std::string&				getArrivalPlaceName()		const { return _arrivalPlaceName; }
 				util::RegistryKeyType			getReservationRuleId()		const { return _reservationRuleId; }
 				const std::string&				getDepartureAddress()		const { return _departureAddress; }

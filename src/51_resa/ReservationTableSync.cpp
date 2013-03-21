@@ -64,12 +64,17 @@ namespace synthese
 		const string ReservationTableSync::COL_TRANSACTION_ID("transaction_id");
 		const string ReservationTableSync::COL_LINE_ID = "line_id";
 		const string ReservationTableSync::COL_LINE_CODE = "line_code";
+        const string ReservationTableSync::COL_IS_RESERVATION_POSSIBLE = "is_reservation_possible";
 		const string ReservationTableSync::COL_SERVICE_ID = "service_id";
 		const string ReservationTableSync::COL_SERVICE_CODE = "service_code";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_ID = "departure_place_id";
+		const string ReservationTableSync::COL_DEPARTURE_CITY_NAME = "departure_city_name";
+		const string ReservationTableSync::COL_DEPARTURE_PLACE_NAME_NO_CITY = "departure_place_name_no_city";
 		const string ReservationTableSync::COL_DEPARTURE_PLACE_NAME = "departure_place_name";
 		const string ReservationTableSync::COL_DEPARTURE_TIME = "departure_time";
 		const string ReservationTableSync::COL_ARRIVAL_PLACE_ID = "arrival_place_id";
+		const string ReservationTableSync::COL_ARRIVAL_CITY_NAME = "arrival_city_name";
+		const string ReservationTableSync::COL_ARRIVAL_PLACE_NAME_NO_CITY = "arrival_place_name_no_city";
 		const string ReservationTableSync::COL_ARRIVAL_PLACE_NAME = "arrival_place_name";
 		const string ReservationTableSync::COL_ARRIVAL_TIME = "arrival_time";
 		const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
@@ -98,12 +103,17 @@ namespace synthese
 			Field(ReservationTableSync::COL_TRANSACTION_ID, SQL_INTEGER),
 			Field(ReservationTableSync::COL_LINE_ID, SQL_INTEGER),
 			Field(ReservationTableSync::COL_LINE_CODE, SQL_TEXT),
+            Field(ReservationTableSync::COL_IS_RESERVATION_POSSIBLE, SQL_BOOLEAN),
 			Field(ReservationTableSync::COL_SERVICE_ID, SQL_INTEGER),
 			Field(ReservationTableSync::COL_SERVICE_CODE, SQL_TEXT),
 			Field(ReservationTableSync::COL_DEPARTURE_PLACE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_DEPARTURE_CITY_NAME, SQL_TEXT),
+			Field(ReservationTableSync::COL_DEPARTURE_PLACE_NAME_NO_CITY, SQL_TEXT),
 			Field(ReservationTableSync::COL_DEPARTURE_PLACE_NAME, SQL_TEXT),
 			Field(ReservationTableSync::COL_DEPARTURE_TIME, SQL_DATETIME),
 			Field(ReservationTableSync::COL_ARRIVAL_PLACE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_ARRIVAL_CITY_NAME, SQL_TEXT),
+			Field(ReservationTableSync::COL_ARRIVAL_PLACE_NAME_NO_CITY, SQL_TEXT),
 			Field(ReservationTableSync::COL_ARRIVAL_PLACE_NAME, SQL_TEXT),
 			Field(ReservationTableSync::COL_ARRIVAL_TIME, SQL_DATETIME),
 			Field(ReservationTableSync::COL_RESERVATION_RULE_ID, SQL_INTEGER),
@@ -154,12 +164,17 @@ namespace synthese
 		){
 			object->setLineId(rows->getLongLong ( ReservationTableSync::COL_LINE_ID));
 			object->setLineCode(rows->getText ( ReservationTableSync::COL_LINE_CODE));
+            object->setReservationPossible(rows->getBool( ReservationTableSync::COL_IS_RESERVATION_POSSIBLE));
 			object->setServiceId(rows->getLongLong(ReservationTableSync::COL_SERVICE_ID));
 			object->setServiceCode(rows->getText ( ReservationTableSync::COL_SERVICE_CODE));
 			object->setDeparturePlaceId(rows->getLongLong ( ReservationTableSync::COL_DEPARTURE_PLACE_ID));
+			object->setDepartureCityName(rows->getText ( ReservationTableSync::COL_DEPARTURE_CITY_NAME));
+			object->setDeparturePlaceNameNoCity(rows->getText ( ReservationTableSync::COL_DEPARTURE_PLACE_NAME_NO_CITY));
 			object->setDeparturePlaceName(rows->getText ( ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
 			object->setDepartureTime(rows->getDateTime( ReservationTableSync::COL_DEPARTURE_TIME));
 			object->setArrivalPlaceId(rows->getLongLong ( ReservationTableSync::COL_ARRIVAL_PLACE_ID));
+			object->setArrivalCityName(rows->getText ( ReservationTableSync::COL_ARRIVAL_CITY_NAME));
+			object->setArrivalPlaceNameNoCity(rows->getText ( ReservationTableSync::COL_ARRIVAL_PLACE_NAME_NO_CITY));
 			object->setArrivalPlaceName(rows->getText ( ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
 			object->setArrivalTime(rows->getDateTime( ReservationTableSync::COL_ARRIVAL_TIME));
 			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID));
@@ -321,12 +336,17 @@ namespace synthese
 			query.addField(object->getTransaction() ? object->getTransaction()->getKey() : RegistryKeyType(0));
 			query.addField(object->getLineId());
 			query.addField(object->getLineCode());
+            query.addField(object->getReservationPossible());
 			query.addField(object->getServiceId());
 			query.addField(object->getServiceCode());
 			query.addField(object->getDeparturePlaceId());
+            query.addField(object->getDepartureCityName());
+            query.addField(object->getDeparturePlaceNameNoCity());
 			query.addField(object->getDeparturePlaceName());
 			query.addFrameworkField<PtimeField>(object->getDepartureTime());
 			query.addField(object->getArrivalPlaceId());
+            query.addField(object->getArrivalCityName());
+            query.addField(object->getArrivalPlaceNameNoCity());
 			query.addField(object->getArrivalPlaceName());
 			query.addFrameworkField<PtimeField>(object->getArrivalTime());
 			query.addField(object->getReservationRuleId());
