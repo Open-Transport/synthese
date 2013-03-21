@@ -99,12 +99,17 @@ namespace synthese
 			if(message)
 			{
 				ApplicationPeriods ap(dynamic_cast<SentAlarm&>(*message).getApplicationPeriods());
-				for(ApplicationPeriods::iterator it(ap.begin()); it != ap.end(); ++it)
+				ApplicationPeriods::iterator it(ap.begin());
+				for(; it != ap.end(); ++it)
 				{
 					if(it->second == this)
 					{
-						ap.erase(it);
+						break;
 					}
+				}
+				if(it != ap.end())
+				{
+					ap.erase(it);
 				}
 				dynamic_cast<SentAlarm&>(*message).setApplicationPeriods(ap);
 			}
@@ -114,12 +119,17 @@ namespace synthese
 				if(scenario)
 				{
 					ApplicationPeriods ap(dynamic_cast<SentScenario&>(*scenario).getApplicationPeriods());
-					for(ApplicationPeriods::iterator it(ap.begin()); it != ap.end(); ++it)
+					ApplicationPeriods::iterator it(ap.begin());
+					for(; it != ap.end(); ++it)
 					{
 						if(it->second == this)
 						{
-							ap.erase(it);
+							break;
 						}
+					}
+					if(it != ap.end())
+					{
+						ap.erase(it);
 					}
 					dynamic_cast<SentScenario&>(*scenario).setApplicationPeriods(ap);
 				}
