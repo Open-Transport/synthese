@@ -129,7 +129,7 @@ namespace synthese
 			//@}
 
 //				static void test(const boost::system::error_code& error);
-			static void InitThread();
+			static void RunThread();
 
 			static void ParameterCallback(
 				const std::string& name,
