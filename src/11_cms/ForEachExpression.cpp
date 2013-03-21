@@ -25,6 +25,7 @@
 #include "ParametersMap.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
+#include "alphanum.hpp"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -43,6 +44,7 @@ namespace synthese
 		const string ForEachExpression::PARAMETER_EMPTY = "empty";
 		const string ForEachExpression::PARAMETER_SORT_DOWN = "sort_down";
 		const string ForEachExpression::PARAMETER_SORT_UP = "sort_up";
+		const string ForEachExpression::PARAMETER_ALPHANUM_SORT = "alphanum_sort";
 		const string ForEachExpression::PARAMETER_TEMPLATE = "template";
 		const string ForEachExpression::PARAMETER_RECURSIVE = "recursive";
 		const string ForEachExpression::DATA_RECURSIVE_CONTENT = "recursive_content";
@@ -52,7 +54,8 @@ namespace synthese
 		ForEachExpression::ForEachExpression(
 			std::string::const_iterator& it,
 			std::string::const_iterator end
-		):	_recursive(false)
+		):	_alphanumSort(false),
+			_recursive(false)
 		{
 			// function name
 			for(;it != end && *it != '&' && *it != '}'; ++it)
@@ -106,6 +109,10 @@ namespace synthese
 						{
 							_sortUpTemplate = parameterNodes;
 						}
+						else if(parameterNameStr == PARAMETER_ALPHANUM_SORT)
+						{
+							_alphanumSort = true;
+						}
 						else
 						{
 							_parameters.push_back(
@@ -123,7 +130,6 @@ namespace synthese
 					}
 			}	}
 		}
-
 
 
 		void ForEachExpression::display(
@@ -183,8 +189,21 @@ namespace synthese
 			size_t itemsCount(items.size());
 
 			// Sorting items : building the sorting key
-			typedef map<string, shared_ptr<ParametersMap> > SortedItems;
-			SortedItems sortedItems;
+			typedef map<string, shared_ptr<ParametersMap>, 
+					boost::function<bool(const string &, const string &)> > SortedItems;
+			
+			util::alphanum_less<string> comparatorAlphanum;
+			std::less<string> comparatorLess;
+			boost::function<bool(const std::string &, const std::string &)> _comparator;
+			if(_alphanumSort)
+			{
+				_comparator = comparatorAlphanum;
+			}
+			else
+			{
+				_comparator = comparatorLess;
+			}
+			SortedItems sortedItems(boost::bind(_comparator, _1, _2));
 			if(!_sortUpTemplate.empty() || !_sortDownTemplate.empty())
 			{
 				// Loop on items
