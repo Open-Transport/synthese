@@ -133,7 +133,7 @@ namespace synthese
 			ResaDBLog::AddCancelReservationEntry(request.getSession(), *_transaction, oldStatus);
 
 			// Mail
-			shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));
+            shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));
 			const OnlineReservationRule* reservationContact(NULL);
 			BOOST_FOREACH(const Reservation* resa, _transaction->getReservations())
 			{
@@ -154,6 +154,7 @@ namespace synthese
 					continue;
 				}
 			}
+            _transaction->setCustomer(UserTableSync::GetEditable(_transaction->getCustomerUserId(), *_env, UP_LINKS_LOAD_LEVEL).get());
 			if(	customer.get() && !customer->getEMail().empty() && reservationContact)
 			{
 				reservationContact->sendCustomerCancellationEMail(*_transaction);

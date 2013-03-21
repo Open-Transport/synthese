@@ -75,11 +75,15 @@ namespace synthese
 
 			static const std::string DATA_SUBJECT_OR_CONTENT;
 			static const std::string DATA_DEPARTURE_DATE;
+			static const std::string DATA_DEPARTURE_CITY_NAME;
 			static const std::string DATA_DEPARTURE_PLACE_NAME;
+			static const std::string DATA_ARRIVAL_CITY_NAME;
 			static const std::string DATA_ARRIVAL_PLACE_NAME;
 			static const std::string DATA_DEPARTURE_TIME;
+            static const std::string DATA_IS_RESERVATION_POSSIBLE;
 			static const std::string DATA_ARRIVAL_TIME;
 			static const std::string DATA_LINE_CODE;
+			static const std::string DATA_ROAD_RESAS;
 			static const std::string DATA_ROAD_RESA;
 			static const std::string DATA_KEY_RESA;
 			static const std::string DATA_CUSTOMER_ID;
