@@ -78,7 +78,7 @@ namespace synthese
 			//@}
 
 
-			static void InitThread();
+			static void RunThread();
 
 			static void ParameterCallback(
 				const std::string& name,
