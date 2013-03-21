@@ -685,6 +685,13 @@ namespace synthese
 						string istr(lexical_cast<string>(i));
 						while(map.isDefined(PARAMETER_APPLICATION_PERIOD_ID + istr))
 						{
+							if(	map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_ID + istr).empty() &&
+								!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty()
+							){
+								break;
+								// TODO implement removal
+							}
+
 							MessageApplicationPeriod* m_a_p(NULL);
 							if(map.getDefault<RegistryKeyType>(PARAMETER_APPLICATION_PERIOD_ID + istr, 0))
 							{
@@ -703,7 +710,7 @@ namespace synthese
 							}
 
 							// Property load
-							time_duration startHour(not_a_date_time);
+							time_duration startHour(0,0,0);
 							if(!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_HOUR + istr).empty())
 							{
 								startHour = duration_from_string(
@@ -712,7 +719,7 @@ namespace synthese
 							}
 							m_a_p->set<StartHour>(startHour);
 
-							time_duration endHour(not_a_date_time);
+							time_duration endHour(23,59,0);
 							if(!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_HOUR + istr).empty())
 							{
 								endHour = duration_from_string(
@@ -722,29 +729,32 @@ namespace synthese
 							m_a_p->set<EndHour>(endHour);
 
 							ptime startTime(not_a_date_time);
-							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty() &&
-								!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr).empty()
+							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty()
 							){
 								startTime = ptime(
 									from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr)),
-									duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr))
+									map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr).empty() ?
+										time_duration(0,0,0) :
+										duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr))
 								);
 							}
 							m_a_p->set<StartTime>(startTime);
 
 							ptime endTime(not_a_date_time);
-							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_DATE + istr).empty() &&
-								!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr).empty()
+							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_DATE + istr).empty()
 							){
 								endTime = ptime(
 									from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_END_DATE + istr)),
-									duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr))
+									map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr).empty() ?
+										time_duration(23,59,0) :
+										duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr))
 								);
 							}
 							m_a_p->set<EndTime>(endTime);
 
 							_messageApplicationPeriods->insert(m_a_p);
 							++i;
+							istr = lexical_cast<string>(i);
 						}
 					}
 					boost::optional<MessageApplicationPeriods> _messageApplicationPeriods;
