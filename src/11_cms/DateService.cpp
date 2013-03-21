@@ -28,9 +28,7 @@
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #if !defined WIN32
-# include <locale.h>
-#else
-# include <windows.h>
+#include <locale.h>
 #endif
 
 using namespace std;
@@ -167,9 +165,10 @@ namespace synthese
 				// Not new char(100), basic mistake !
 				char* str_date = new char[100];
 				const tm tm_time = to_tm(final_time);
-				locale_t loc;
 				bool changeLocale = false;
 
+#if !defined WIN32
+				locale_t loc;
 				if(!_strftimeLang.empty())
 				{
 					//Locale given : localise strftime
@@ -179,16 +178,19 @@ namespace synthese
 					changeLocale = true;
 					uselocale(loc);
 				}
+#endif
 				if(strftime(str_date, 100, _strftimeFormat.c_str(), &tm_time))
 				{
 					stream << str_date;
 				}
+#if !defined WIN32
 				else
 				{
 					if(changeLocale)freelocale (loc);
 					throw RequestException("Bad strftime format");
 				}
 				if(changeLocale)freelocale (loc);
+#endif
 				delete[] str_date;
 			}
 			return util::ParametersMap();
