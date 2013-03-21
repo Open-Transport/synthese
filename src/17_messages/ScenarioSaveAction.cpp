@@ -328,7 +328,11 @@ namespace synthese
 						{
 							try
 							{
-								if(_recipientDataSource.get())
+								if(!lexical_cast<RegistryKeyType>(recipient))
+								{
+									_recipients->push_back(shared_ptr<Registrable>());
+								}
+								else if(_recipientDataSource.get())
 								{
 									_recipients->push_back(
 										DBModule::GetEditableObject(
@@ -400,6 +404,8 @@ namespace synthese
 											make_pair(
 												key,
 												make_pair(
+													(keyStr.empty() || !lexical_cast<RegistryKeyType>(keyStr)) ?
+													NULL :
 													DBModule::GetEditableObject(
 														lexical_cast<RegistryKeyType>(keyStr),
 														*_env

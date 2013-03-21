@@ -106,18 +106,21 @@ namespace synthese
 			object->setParameter(rows->getText(AlarmObjectLinkTableSync::COL_PARAMETER));
 
 			// Object
-			try
+			if(rows->getLongLong(AlarmObjectLinkTableSync::COL_OBJECT_ID) > 0)
 			{
-				object->setObject(
-					DBModule::GetEditableObject(
-						rows->getLongLong(AlarmObjectLinkTableSync::COL_OBJECT_ID),
-						env
-					).get()
-				);
-			}
-			catch(ObjectNotFoundException<Registrable>& e)
-			{
-				Log::GetInstance().warn("Data corrupted in " + AlarmObjectLinkTableSync::TABLE.NAME + "/" + AlarmObjectLinkTableSync::COL_OBJECT_ID, e);
+				try
+				{
+					object->setObject(
+						DBModule::GetEditableObject(
+							rows->getLongLong(AlarmObjectLinkTableSync::COL_OBJECT_ID),
+							env
+						).get()
+					);
+				}
+				catch(ObjectNotFoundException<Registrable>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + AlarmObjectLinkTableSync::TABLE.NAME + "/" + AlarmObjectLinkTableSync::COL_OBJECT_ID, e);
+				}
 			}
 			
 
