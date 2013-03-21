@@ -183,6 +183,7 @@ void quit(bool doExit)
 	// End all threads
 	ServerModule::KillAllHTTPThreads(false);
 	ServerModule::End();
+	ServerModule::KillAllThreads();
 
 	// Terminate all modules
 	vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
