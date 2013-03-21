@@ -67,7 +67,7 @@ namespace synthese
 		time_duration DBModule::DURATION_BETWEEN_CONDITONAL_SYNCS = minutes(1);
 		const string DBModule::PARAMETER_NODE_ID = "node_id";
 		RegistryNodeType DBModule::_nodeId = 1;
-		size_t DBModule::_thrCount = 0;
+		unsigned int DBModule::_thrCount = 0;
 	}
 
 	namespace server
