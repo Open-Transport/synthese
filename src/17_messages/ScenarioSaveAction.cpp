@@ -744,7 +744,7 @@ namespace synthese
 							m_a_p->set<EndTime>(endTime);
 
 							_messageApplicationPeriods->insert(m_a_p);
-							++istr;
+							++i;
 						}
 					}
 					boost::optional<MessageApplicationPeriods> _messageApplicationPeriods;
