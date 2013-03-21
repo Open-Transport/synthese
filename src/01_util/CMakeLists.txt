@@ -1,6 +1,7 @@
 set_source_groups()
 
 set(util_SRCS
+alphanum.hpp
 AlphanumericFilter.h
 ConcurrentQueue.hpp
 ConstantReturner.h
