@@ -172,6 +172,11 @@ namespace synthese
 				}
 				
 				XMLNode statusNode = allNode.getChildNode("Status");
+				if (statusNode.isEmpty())
+				{
+					_online = false;
+					return;
+				}
 				string ergebinsAttr(statusNode.getAttribute("Ergebnis"));
 				if(ergebinsAttr != "ok")
 				{
