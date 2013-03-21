@@ -87,7 +87,9 @@ namespace synthese
 			//! \name Journey
 			//@{
 				util::RegistryKeyType	_originPlaceId;
-				std::string			_originPlaceText;
+				std::string			_originCityText;
+				std::string			_originPlaceTextNoCity;
+				std::string			_originPlaceText; // This concatenates place and city
 				util::RegistryKeyType	_destinationPlaceId;
 				std::string			_destinationPlaceText;
 				boost::posix_time::ptime		_originDateTime;

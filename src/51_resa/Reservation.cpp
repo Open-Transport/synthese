@@ -48,7 +48,11 @@ namespace synthese
 	namespace resa
 	{
 		const string Reservation::DATA_COMMENT = "comment";
+        const string Reservation::DATA_ARRIVAL_CITY_NAME("arrival_city_name");
+        const string Reservation::DATA_ARRIVAL_PLACE_NAME_NO_CITY("arrival_place_name_no_city");
 		const string Reservation::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
+        const string Reservation::DATA_DEPARTURE_CITY_NAME("departure_city_name");
+        const string Reservation::DATA_DEPARTURE_PLACE_NAME_NO_CITY("departure_place_name_no_city");
 		const string Reservation::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
 		const string Reservation::DATA_ARRIVAL_PLACE_ID("arrival_place_id");
 		const string Reservation::DATA_DEPARTURE_PLACE_ID("departure_place_id");
@@ -84,6 +88,7 @@ namespace synthese
 		):	Registrable(key),
 			_transaction(NULL),
 			_lineId(0),
+            _isReservationPossible(false),
 			_serviceId(0),
 			_departurePlaceId(0),
 			_arrivalPlaceId(0),
@@ -286,7 +291,11 @@ namespace synthese
 			pm.insert(DATA_BOOKING_USER_ID, getTransaction()->getBookingUserId());
 
 			// Places
+            pm.insert(DATA_DEPARTURE_CITY_NAME, getDepartureCityName());
+            pm.insert(DATA_DEPARTURE_PLACE_NAME_NO_CITY, getDeparturePlaceNameNoCity());
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, getDeparturePlaceName());
+            pm.insert(DATA_ARRIVAL_CITY_NAME, getArrivalCityName());
+            pm.insert(DATA_ARRIVAL_PLACE_NAME_NO_CITY, getArrivalPlaceNameNoCity());
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, getArrivalPlaceName());
 			pm.insert(DATA_DEPARTURE_PLACE_ID, getDeparturePlaceId());
 			pm.insert(DATA_ARRIVAL_PLACE_ID, getArrivalPlaceId());
