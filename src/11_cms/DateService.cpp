@@ -27,9 +27,7 @@
 #include "DateService.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
-#if !defined WIN32
-#include <locale.h>
-#endif
+#include <locale>
 
 using namespace std;
 using namespace boost;
@@ -162,36 +160,33 @@ namespace synthese
 			}
 			else
 			{
-				// Not new char(100), basic mistake !
-				char* str_date = new char[100];
 				const tm tm_time = to_tm(final_time);
-				bool changeLocale = false;
+				char str_date[100];
 
-#if !defined WIN32
-				locale_t loc;
 				if(!_strftimeLang.empty())
 				{
 					//Locale given : localise strftime
-					loc = newlocale (LC_TIME_MASK, _strftimeLang.c_str(), NULL);
-					if (loc == (locale_t) 0)
+					try
+					{
+						locale currentLocale(std::locale::global(std::locale( _strftimeLang.c_str())));
+						if(strftime(str_date, 100, _strftimeFormat.c_str(), &tm_time))
+						{
+							stream << str_date;
+						}
+						std::locale::global(currentLocale);
+					}
+					catch(...)
+					{
 						throw RequestException("Failed to set locale to " + _strftimeLang);
-					changeLocale = true;
-					uselocale(loc);
+					}
 				}
-#endif
-				if(strftime(str_date, 100, _strftimeFormat.c_str(), &tm_time))
-				{
-					stream << str_date;
-				}
-#if !defined WIN32
 				else
 				{
-					if(changeLocale)freelocale (loc);
-					throw RequestException("Bad strftime format");
+					if(strftime(str_date, 100, _strftimeFormat.c_str(), &tm_time))
+					{
+						stream << str_date;
+					}
 				}
-				if(changeLocale)freelocale (loc);
-#endif
-				delete[] str_date;
 			}
 			return util::ParametersMap();
 		}
