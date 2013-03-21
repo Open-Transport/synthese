@@ -53,8 +53,18 @@ namespace synthese
 				module->initThread();
 			}
 
-			// Launch the function
-			_func();
+			try
+			{
+				// Launch the function
+				_func();
+			}
+			catch(boost::thread_interrupted)
+			{
+			}
+			catch(...)
+			{
+			}
+
 
 			// Launch each module closing trigger
 			BOOST_FOREACH(

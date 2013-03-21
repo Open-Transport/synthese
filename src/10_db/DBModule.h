@@ -93,6 +93,7 @@ namespace synthese
 			static TablesByIdMap	_idTableSyncMap;
 			static ConditionalTableSyncsToReload _conditionalTableSyncsToReload;
 			static util::RegistryNodeType _nodeId;
+			static unsigned int _thrCount;
 
 
 

@@ -33,6 +33,7 @@
 #include "Factory.h"
 #include "Log.h"
 #include "ServerModule.h"
+#include "threads/Thread.h"
 
 #include <iostream>
 #include <boost/foreach.hpp>
@@ -66,6 +67,7 @@ namespace synthese
 		time_duration DBModule::DURATION_BETWEEN_CONDITONAL_SYNCS = minutes(1);
 		const string DBModule::PARAMETER_NODE_ID = "node_id";
 		RegistryNodeType DBModule::_nodeId = 1;
+		size_t DBModule::_thrCount = 0;
 	}
 
 	namespace server
@@ -126,6 +128,12 @@ namespace synthese
 			UnregisterParameter(DBModule::PARAMETER_NODE_ID);
 			DBModule::_ConnectionInfo.reset();
 			DBModule::GetDB()->removePreparedStatements();
+
+			// Wait for all the thread to call CloseThread
+			while(DBModule::_thrCount)
+			{
+				util::Thread::Sleep(200);
+			}
 			DBModule::_Db.reset();
 		}
 
@@ -133,6 +141,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DBModule>::InitThread(
 		){
+			DBModule::_thrCount++;
 			DBModule::GetDB()->initPreparedStatements();
 		}
 
@@ -141,6 +150,7 @@ namespace synthese
 		template<> void ModuleClassTemplate<DBModule>::CloseThread(
 		){
 			DBModule::GetDB()->removePreparedStatements();
+			DBModule::_thrCount--;
 		}
 	}
 
