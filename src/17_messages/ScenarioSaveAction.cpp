@@ -692,7 +692,7 @@ namespace synthese
 						while(map.isDefined(PARAMETER_APPLICATION_PERIOD_ID + istr))
 						{
 							if(	map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_ID + istr).empty() &&
-								!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty()
+								map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty()
 							){
 								break;
 								// TODO implement removal
