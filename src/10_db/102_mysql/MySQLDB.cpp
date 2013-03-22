@@ -389,6 +389,13 @@ namespace synthese
 		void MySQLDB::saveRecord(
 			const DBRecord& record
 		){
+			// Auto increment update
+			RegistryKeyType objectId(
+				boost::get<RegistryKeyType>(record.getContent().at(0))
+			);
+			record.getTable()->updateAutoIncrement(objectId);
+
+			// Preparation of a MySQL bindable object
 			boost::recursive_mutex::scoped_lock lock(_connectionMutex);
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
 			MYSQL_BIND* bnd = new MYSQL_BIND[fieldsNumber];
@@ -404,6 +411,8 @@ namespace synthese
 				DBRecordCellBindConvertor visitor(*(bnd+i));
 				apply_visitor(visitor, record.getContent().at(i));
 			}
+
+			// Running the prepared statement
 			MYSQL_STMT* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
 			if(mysql_stmt_bind_param(stmt, bnd))
 			{
@@ -447,6 +456,8 @@ namespace synthese
 					}
 				}
 			}
+
+			// Cleaning
 			delete[] isNullArray;
 			delete[] lengthArray;
 			delete[] bnd;
