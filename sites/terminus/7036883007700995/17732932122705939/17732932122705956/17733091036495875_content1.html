@@ -709,7 +709,9 @@ function copyContent(contentRank)
   });
   tinyMCE.execCommand('mceAddControl', false, 'tinymce_'+ (nextMessageRank-1));
   $('#tab_m_'+(nextMessageRank-1)).tab('show');
+  current_message_rank=nextMessageRank-1;
   tinyMCE.execCommand('mceFocus', false, 'tinymce_'+ (nextMessageRank-1));
+  document.getElementById('tab_key').value = "m_"+ current_message_rank;
   activateForm();
   return false;
 
