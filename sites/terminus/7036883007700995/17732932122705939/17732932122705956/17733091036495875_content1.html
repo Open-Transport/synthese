@@ -572,8 +572,7 @@ function addMessageTab(message)
   
   ++nextMessageRank;
 }
-
-var current_message_rank = <@(<?substr&t=<@tab@>&n=2?>=="m_")?<?substr&t=<@tab@>&f=2?>:-1@>;
+var current_message_rank = <?if&cond=<@<?substr&t=<@tab@>&n=2?>=="m_"@>&then=<?substr&t=<@tab@>&f=2?>&else=-1?>;
 var available_objects = new Array();
 
 $(document).ready(function(){
