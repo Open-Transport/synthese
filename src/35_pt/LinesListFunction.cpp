@@ -25,6 +25,7 @@
 
 #include "LinesListFunction.h"
 
+#include "alphanum.hpp"
 #include "CalendarTemplate.h"
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
@@ -45,7 +46,6 @@
 #include "ReservationContact.h"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
-#include "SortableLineNumber.hpp"
 #include "TransportNetwork.h"
 #include "StopArea.hpp"
 #include "TransportNetworkTableSync.h"
@@ -695,16 +695,31 @@ namespace synthese
 			// [A1] -> ligne A1: XXX - XXX
 			//
 
-			typedef std::map<
-				const RollingStock*,
-				map<SortableLineNumber, shared_ptr<const CommercialLine> >
-			> LinesMapType;
+			util::alphanum_less<string> comparatorAlphanum;
+			util::alphanum_text_first_less<string> comparatorAlphanumTextFirst;
+			boost::function<bool(const std::string &, const std::string &)> comparator;
+			if(_lettersBeforeNumbers)
+			{
+				comparator = comparatorAlphanumTextFirst;
+			}
+			else
+			{
+				comparator = comparatorAlphanum;
+			}
+
+			typedef map<string, shared_ptr<const CommercialLine>, 
+					boost::function<bool(const string &, const string &)> > SortedItems;
+			typedef std::map<const RollingStock*, SortedItems> LinesMapType;
 			LinesMapType linesMap;
 
 			// Specified line ID
 			if(_line.get())
 			{
-				linesMap[NULL][SortableLineNumber(_line->getShortName(), _lettersBeforeNumbers)] = _line;
+				if(linesMap.find(NULL) == linesMap.end())
+				{
+					linesMap[NULL] = SortedItems(boost::bind(comparator, _1, _2));					
+				}
+				linesMap[NULL][_line->getShortName()] = _line;
 			}
 			else
 			{
@@ -734,10 +749,14 @@ namespace synthese
 						if(!tm.get() || line->usesTransportMode(*tm))
 						{
 							// Insert respecting order described up there
+							if(linesMap.find(tm.get()) == linesMap.end())
+							{
+								linesMap[tm.get()] = SortedItems(boost::bind(comparator, _1, _2));					
+							}
 							if(!_ignoreLineShortName)
-								linesMap[tm.get()][SortableLineNumber(line->getShortName(), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
+								linesMap[tm.get()][line->getShortName()] = const_pointer_cast<const CommercialLine>(line);
 							else
-								linesMap[tm.get()][SortableLineNumber(boost::lexical_cast<std::string>(line->getKey()), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
+								linesMap[tm.get()][boost::lexical_cast<std::string>(line->getKey())] = const_pointer_cast<const CommercialLine>(line);
 							alreadyShownLines.insert(line.get());
 						}
 				}	}
