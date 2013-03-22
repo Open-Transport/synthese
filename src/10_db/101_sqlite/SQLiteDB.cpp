@@ -802,6 +802,12 @@ namespace synthese
 
 		void SQLiteDB::RequestExecutor::operator()( const DBRecord& record )
 		{
+			// Auto increment update
+			RegistryKeyType objectId(
+				boost::get<RegistryKeyType>(record.getContent().at(0))
+			);
+			record.getTable()->updateAutoIncrement(objectId);
+
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
 			ReplaceStatements::iterator it(_replaceStatements.find(this_thread::get_id()));
 			assert(it != _replaceStatements.end());
