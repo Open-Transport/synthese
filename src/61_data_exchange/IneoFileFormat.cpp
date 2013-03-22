@@ -179,7 +179,6 @@ namespace synthese
 		):	Importer(env, dataSource),
 			MultipleFileTypesImporter<IneoFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
-			_importStopAreas(false),
 			_autoImportStops(false),
 			_displayLinkedStops(false),
 			_interactive(false),
@@ -214,7 +213,7 @@ namespace synthese
 				ImportableTableSync::ObjectBySource<DepotTableSync> depots(_dataSource, _env);
 
 				// 1.1 Stop areas
-				if(_importStopAreas)
+				if(_defaultCity.get())
 				{
 					// Loop
 					while(_readLine(inFile))
