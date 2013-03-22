@@ -94,9 +94,11 @@ namespace synthese
        @param r NULL-terminated C-style string
        @return negative if l<r, 0 if l equals r, positive if l>r
      */
-    int alphanum_impl(const char *l, const char *r)
+	int alphanum_impl(const char *l, const char *r, bool text_first=false)
     {
       enum mode_t { STRING, NUMBER } mode=STRING;
+	  int l_digit_result(text_first ? +1 : -1);
+	  int r_digit_result(text_first ? -1 : +1);
 
       while(*l && *r)
 	{
@@ -114,9 +116,9 @@ namespace synthese
 		      break;
 		    }
 		  // if only the left character is a digit, we have a result
-		  if(l_digit) return -1;
+		  if(l_digit) return l_digit_result;
 		  // if only the right character is a digit, we have a result
-		  if(r_digit) return +1;
+		  if(r_digit) return r_digit_result;
 		  // compute the difference of both characters
 		  const int diff=l_char - r_char;
 		  // if they differ we have a result
@@ -314,6 +316,150 @@ namespace synthese
     }
   };
 
+  /* ----------------------------------------------------------------*/
+  /* ----------------------------------------------------------------*/
+  /* ----------------------------------------------------------------*/
+
+  /**
+     Compare left and right with the same semantics as strcmp(), but with the
+     "Alphanum Algorithm" which produces more human-friendly
+     results. The classes lT and rT must implement "std::ostream
+     operator<< (std::ostream&, const Ty&)".
+
+     @return negative if left<right, 0 if left==right, positive if left>right.
+  */
+  template <typename lT, typename rT>
+  int alphanum_text_first_comp(const lT& left, const rT& right)
+  {
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<" << typeid(left).name() << "," << typeid(right).name() << "> " << left << "," << right << std::endl;
+#endif
+    std::ostringstream l; l << left;
+    std::ostringstream r; r << right;
+    return alphanum_impl(l.str().c_str(), r.str().c_str(), true);
+  }
+
+  /**
+     Compare l and r with the same semantics as strcmp(), but with
+     the "Alphanum Algorithm" which produces more human-friendly
+     results.
+
+     @return negative if l<r, 0 if l==r, positive if l>r.
+  */
+  template <>
+  int alphanum_text_first_comp<std::string>(const std::string& l, const std::string& r)
+  {
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<std::string,std::string> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l.c_str(), r.c_str(), true);
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+
+  // now follow a lot of overloaded alphanum_text_first_comp() functions to get a
+  // direct call to alphanum_impl(text_first=true) upon the various combinations of c
+  // and c++ strings.
+
+  /**
+     Compare l and r with the same semantics as strcmp(), but with
+     the "Alphanum Algorithm" which produces more human-friendly
+     results.
+
+     @return negative if l<r, 0 if l==r, positive if l>r.
+  */
+  int alphanum_text_first_comp(char* l, char* r)
+  {
+    assert(l);
+    assert(r);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<char*,char*> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l, r, true);
+  }
+
+  int alphanum_text_first_comp(const char* l, const char* r)
+  {
+    assert(l);
+    assert(r);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<const char*,const char*> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l, r, true);
+  }
+
+  int alphanum_text_first_comp(char* l, const char* r)
+  {
+    assert(l);
+    assert(r);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<char*,const char*> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l, r, true);
+  }
+
+  int alphanum_text_first_comp(const char* l, char* r)
+  {
+    assert(l);
+    assert(r);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<const char*,char*> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l, r, true);
+  }
+
+  int alphanum_text_first_comp(const std::string& l, char* r)
+  {
+    assert(r);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<std::string,char*> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l.c_str(), r, true);
+  }
+
+  int alphanum_text_first_comp(char* l, const std::string& r)
+  {
+    assert(l);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<char*,std::string> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l, r.c_str(), true);
+  }
+
+  int alphanum_text_first_comp(const std::string& l, const char* r)
+  {
+    assert(r);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<std::string,const char*> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l.c_str(), r, true);
+  }
+
+  int alphanum_text_first_comp(const char* l, const std::string& r)
+  {
+    assert(l);
+#ifdef DOJDEBUG
+    std::clog << "alphanum_comp<const char*,std::string> " << l << "," << r << std::endl;
+#endif
+    return alphanum_impl(l, r.c_str(), true);
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+
+  /**
+     Functor class to compare two objects with the "Alphanum
+     Algorithm" but with text being sorted first.
+     If the objects are no std::string, they must
+     implement "std::ostream operator<< (std::ostream&, const Ty&)".
+  */
+  template<class Ty>
+  struct alphanum_text_first_less : public std::binary_function<Ty, Ty, bool>
+  {
+    bool operator()(const Ty& left, const Ty& right) const
+    {
+      return alphanum_text_first_comp(left, right) < 0;
+    }
+  };
 }
 }
 
