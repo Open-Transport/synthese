@@ -44,7 +44,7 @@ namespace synthese
 			static const std::string PARAMETER_EMPTY;
 			static const std::string PARAMETER_SORT_DOWN;
 			static const std::string PARAMETER_SORT_UP;
-			static const std::string PARAMETER_ALPHANUM_SORT;
+			static const std::string PARAMETER_SORT_ALGO;
 			static const std::string PARAMETER_TEMPLATE;
 			static const std::string PARAMETER_RECURSIVE;
 
@@ -55,7 +55,7 @@ namespace synthese
 			WebpageContent _emptyTemplate;
 			WebpageContent _sortUpTemplate;
 			WebpageContent _sortDownTemplate;
-			bool _alphanumSort;
+			WebpageContent _sortAlgoNode;
 			typedef std::vector<std::pair<std::string, WebpageContent> > Parameters;
 			Parameters _parameters;
 			bool _recursive;
