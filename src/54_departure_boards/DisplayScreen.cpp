@@ -880,6 +880,6 @@ namespace synthese
 			_displayType->getMessageIsDisplayedPage()->display(s, pm);
 			string str(s.str());
 			trim(str);
-			return str == "1";
+			return !str.empty();
 		}
 }	}
