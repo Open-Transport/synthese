@@ -44,7 +44,7 @@ namespace synthese
 		const string ForEachExpression::PARAMETER_EMPTY = "empty";
 		const string ForEachExpression::PARAMETER_SORT_DOWN = "sort_down";
 		const string ForEachExpression::PARAMETER_SORT_UP = "sort_up";
-		const string ForEachExpression::PARAMETER_ALPHANUM_SORT = "alphanum_sort";
+		const string ForEachExpression::PARAMETER_SORT_ALGO = "sort_algo";
 		const string ForEachExpression::PARAMETER_TEMPLATE = "template";
 		const string ForEachExpression::PARAMETER_RECURSIVE = "recursive";
 		const string ForEachExpression::DATA_RECURSIVE_CONTENT = "recursive_content";
@@ -54,8 +54,7 @@ namespace synthese
 		ForEachExpression::ForEachExpression(
 			std::string::const_iterator& it,
 			std::string::const_iterator end
-		):	_alphanumSort(false),
-			_recursive(false)
+		):	_recursive(false)
 		{
 			// function name
 			for(;it != end && *it != '&' && *it != '}'; ++it)
@@ -109,9 +108,12 @@ namespace synthese
 						{
 							_sortUpTemplate = parameterNodes;
 						}
-						else if(parameterNameStr == PARAMETER_ALPHANUM_SORT)
+						else if(parameterNameStr == PARAMETER_SORT_ALGO)
 						{
-							_alphanumSort = true;
+							// 0 = Default (faster)
+							// 1 = Alpha numeric
+							// 2 = Alpha numeric with text first
+							_sortAlgoNode = parameterNodes;
 						}
 						else
 						{
@@ -191,17 +193,31 @@ namespace synthese
 			// Sorting items : building the sorting key
 			typedef map<string, shared_ptr<ParametersMap>, 
 					boost::function<bool(const string &, const string &)> > SortedItems;
+
+			int sortAlgo(0);
+			string sortAlgoCodeStr(
+				_sortAlgoNode.eval(request, additionalParametersMap, page, variables)
+			);
+			if(!sortAlgoCodeStr.empty())
+			{
+				sortAlgo = lexical_cast<int>(sortAlgoCodeStr);
+			}
 			
 			util::alphanum_less<string> comparatorAlphanum;
+			util::alphanum_text_first_less<string> comparatorAlphanumTextFirst;
 			std::less<string> comparatorLess;
 			boost::function<bool(const std::string &, const std::string &)> _comparator;
-			if(_alphanumSort)
+			switch(sortAlgo)
 			{
+			case 1:
 				_comparator = comparatorAlphanum;
-			}
-			else
-			{
+				break;
+			case 2:
+				_comparator = comparatorAlphanumTextFirst;
+				break;
+			default:
 				_comparator = comparatorLess;
+				break;
 			}
 			SortedItems sortedItems(boost::bind(_comparator, _1, _2));
 			if(!_sortUpTemplate.empty() || !_sortDownTemplate.empty())
