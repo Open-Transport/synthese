@@ -110,9 +110,10 @@ namespace synthese
 						}
 						else if(parameterNameStr == PARAMETER_SORT_ALGO)
 						{
-							// 0 = Default (faster)
-							// 1 = Alpha numeric
-							// 2 = Alpha numeric with text first
+							// One of:
+							// default (the faster)
+							// alphanumeric
+							// alphanumeric_text_first
 							_sortAlgoNode = parameterNodes;
 						}
 						else
@@ -194,32 +195,27 @@ namespace synthese
 			typedef map<string, shared_ptr<ParametersMap>, 
 					boost::function<bool(const string &, const string &)> > SortedItems;
 
-			int sortAlgo(0);
-			string sortAlgoCodeStr(
+			string sortAlgoStr(
 				_sortAlgoNode.eval(request, additionalParametersMap, page, variables)
 			);
-			if(!sortAlgoCodeStr.empty())
-			{
-				sortAlgo = lexical_cast<int>(sortAlgoCodeStr);
-			}
 			
 			util::alphanum_less<string> comparatorAlphanum;
 			util::alphanum_text_first_less<string> comparatorAlphanumTextFirst;
 			std::less<string> comparatorLess;
-			boost::function<bool(const std::string &, const std::string &)> _comparator;
-			switch(sortAlgo)
+			boost::function<bool(const std::string &, const std::string &)> comparator;
+			if(sortAlgoStr == "alphanumeric")
 			{
-			case 1:
-				_comparator = comparatorAlphanum;
-				break;
-			case 2:
-				_comparator = comparatorAlphanumTextFirst;
-				break;
-			default:
-				_comparator = comparatorLess;
-				break;
+				comparator = comparatorAlphanum;
 			}
-			SortedItems sortedItems(boost::bind(_comparator, _1, _2));
+			else if(sortAlgoStr == "alphanumeric_text_first")
+			{
+				comparator = comparatorAlphanumTextFirst;
+			}
+			else
+			{
+				comparator = comparatorLess;
+			}
+			SortedItems sortedItems(boost::bind(comparator, _1, _2));
 			if(!_sortUpTemplate.empty() || !_sortDownTemplate.empty())
 			{
 				// Loop on items
