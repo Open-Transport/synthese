@@ -579,26 +579,29 @@ var available_objects = new Array();
 $(document).ready(function(){
 
  available_objects['line'] = new Array(
+  { id:"0", label:"(toutes)" }
  <?LinesListFunction2&template=
-  <{line&template=<@rank?",":""@> { id:"<@line_id@>", label:"<@line_short_name@>"} }>
+  <{line&template=,{ id:"<@line_id@>", label:"<@line_short_name@>"} }>
  ?>
  );
  available_objects['stoparea'] = new Array(
+  { id:"0", label:"(tous)" }
  <?StopAreasListFunction&template=
   <{stopArea&
     sort_up=<@city_name@>*<@name@>&
-    template=<@rank?",":""@> { id:"<@id@>", label:"<@city_name@> <@name@>"} }>
+    template=,{ id:"<@id@>", label:"<@city_name@> <@name@>"} }>
  ?>
  );
  available_objects['displayscreen'] = new Array(
-  { id:"0", label:"(tous)" }
+  { id:"0", label:"(toutes)" }
  <?GetDepartureBoards&template=
   <{screen&sort_up=<@name@>&template=,{ id:"<@screen_id@>", label:"<@mac@> <@name@>"} }>
  ?>
  );
  available_objects['vehicle'] = new Array(
+  { id:"0", label:"(toutes)" }
  <?LinesListFunction2&template=
-  <{line&template=<@rank?",":""@> { id:"<@line_id@>", label:"<@line_short_name@>"} }>
+  <{line&template=,{ id:"<@line_id@>", label:"<@line_short_name@>"} }>
  ?>
  );
 
