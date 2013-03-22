@@ -76,8 +76,7 @@ namespace synthese
 				util::RegistryKeyType id = 0
 			);
 
-			typedef std::map<
-				std::pair<boost::posix_time::time_duration, boost::posix_time::time_duration>,
+			typedef std::set<
 				MessageApplicationPeriod*
 			> ApplicationPeriods;
 
