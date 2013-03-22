@@ -68,11 +68,7 @@ namespace synthese
 			if(message)
 			{
 				ApplicationPeriods ap(dynamic_cast<SentAlarm&>(*message).getApplicationPeriods());
-				ap.insert(
-					make_pair(
-						make_pair(get<StartHour>(), get<EndHour>()),
-						this
-				)	);
+				ap.insert(this);
 				dynamic_cast<SentAlarm&>(*message).setApplicationPeriods(ap);
 			}
 			else
@@ -81,11 +77,7 @@ namespace synthese
 				if(scenario)
 				{
 					ApplicationPeriods ap(dynamic_cast<SentScenario&>(*scenario).getApplicationPeriods());
-					ap.insert(
-						make_pair(
-						make_pair(get<StartHour>(), get<EndHour>()),
-							this
-					)	);
+					ap.insert(this);
 					dynamic_cast<SentScenario&>(*scenario).setApplicationPeriods(ap);
 				}
 			}
@@ -99,14 +91,7 @@ namespace synthese
 			if(message)
 			{
 				ApplicationPeriods ap(dynamic_cast<SentAlarm&>(*message).getApplicationPeriods());
-				ApplicationPeriods::iterator it(ap.begin());
-				for(; it != ap.end(); ++it)
-				{
-					if(it->second == this)
-					{
-						break;
-					}
-				}
+				ApplicationPeriods::iterator it(ap.find(this));
 				if(it != ap.end())
 				{
 					ap.erase(it);
@@ -119,14 +104,7 @@ namespace synthese
 				if(scenario)
 				{
 					ApplicationPeriods ap(dynamic_cast<SentScenario&>(*scenario).getApplicationPeriods());
-					ApplicationPeriods::iterator it(ap.begin());
-					for(; it != ap.end(); ++it)
-					{
-						if(it->second == this)
-						{
-							break;
-						}
-					}
+					ApplicationPeriods::iterator it(ap.find(this));
 					if(it != ap.end())
 					{
 						ap.erase(it);
