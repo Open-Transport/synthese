@@ -882,7 +882,7 @@ namespace synthese
 						"Saisie de réservation",
 						TAB_FREE_DRT,
 						true,
-						"/admin/img/" + FreeDRTBookingAdmin::ICON
+						FreeDRTBookingAdmin::ICON
 				)	);
 			}
 
