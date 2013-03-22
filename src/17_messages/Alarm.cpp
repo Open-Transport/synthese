@@ -24,6 +24,7 @@
 
 #include "AlarmObjectLink.h"
 #include "AlarmRecipient.h"
+#include "DBConstants.h"
 #include "Factory.h"
 #include "MessageAlternative.hpp"
 #include "Scenario.h"
@@ -35,6 +36,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 
 	template<> const Field SimpleObjectFieldDefinition<messages::Alarm>::FIELD = Field("alarm_id", SQL_INTEGER);
@@ -135,7 +137,14 @@ namespace synthese
 					BOOST_FOREACH(const LinkedObjects::mapped_type::value_type& it, ar.second)
 					{
 						shared_ptr<ParametersMap> arPM(new ParametersMap);
-						it->getObject()->toParametersMap(*arPM);
+						if(it->getObject())
+						{
+							it->getObject()->toParametersMap(*arPM);
+						}
+						else
+						{
+							arPM->insert(TABLE_COL_ID, 0);
+						}
 						arPM->insert(ATTR_LINK_ID, it->getKey());
 						arPM->insert(ATTR_LINK_PARAMETER, it->getParameter());
 						recipientsPM->insert(ar.first, arPM);

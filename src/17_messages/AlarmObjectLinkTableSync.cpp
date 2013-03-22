@@ -106,9 +106,9 @@ namespace synthese
 			object->setParameter(rows->getText(AlarmObjectLinkTableSync::COL_PARAMETER));
 
 			// Object
-			if(rows->getLongLong(AlarmObjectLinkTableSync::COL_OBJECT_ID) > 0)
+			try
 			{
-				try
+				if(rows->getLongLong(AlarmObjectLinkTableSync::COL_OBJECT_ID) > 0)
 				{
 					object->setObject(
 						DBModule::GetEditableObject(
@@ -117,16 +117,8 @@ namespace synthese
 						).get()
 					);
 				}
-				catch(ObjectNotFoundException<Registrable>& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + AlarmObjectLinkTableSync::TABLE.NAME + "/" + AlarmObjectLinkTableSync::COL_OBJECT_ID, e);
-				}
-			}
-			
-
-			// Alarm
-			try
-			{
+		
+				// Alarm
 				Alarm& alarm(
 					*AlarmTableSync::GetEditable(
 						rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
@@ -136,32 +128,33 @@ namespace synthese
 				object->setAlarm(&alarm);
 
 				// link the object in the alarm (only if the linked object was found)
-				if(object->getObject())
+				Alarm::LinkedObjects linkedObjects(alarm.getLinkedObjects());
+				Alarm::LinkedObjects::iterator it(
+					linkedObjects.find(object->getRecipientKey())
+				);
+				if(it == linkedObjects.end())
 				{
-					Alarm::LinkedObjects linkedObjects(alarm.getLinkedObjects());
-					Alarm::LinkedObjects::iterator it(
-						linkedObjects.find(object->getRecipientKey())
-					);
-					if(it == linkedObjects.end())
-					{
-						it = linkedObjects.insert(
-							make_pair(
-								object->getRecipientKey(),
-								Alarm::LinkedObjects::mapped_type()
-						)	).first;
-					}
-					it->second.insert(object);
-					alarm.setLinkedObjects(linkedObjects);
-
-					// link the alarm in the object
-					if(	linkLevel >= RECURSIVE_LINKS_LOAD_LEVEL &&
-						dynamic_cast<SentAlarm*>(&alarm) &&
-						static_cast<SentAlarm&>(alarm).getScenario()
-					){
-						shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
-						ar->addObject(*object);
-					}
+					it = linkedObjects.insert(
+						make_pair(
+							object->getRecipientKey(),
+							Alarm::LinkedObjects::mapped_type()
+					)	).first;
 				}
+				it->second.insert(object);
+				alarm.setLinkedObjects(linkedObjects);
+
+				// link the alarm in the object
+				if(	linkLevel >= RECURSIVE_LINKS_LOAD_LEVEL &&
+					dynamic_cast<SentAlarm*>(&alarm) &&
+					static_cast<SentAlarm&>(alarm).getScenario()
+				){
+					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
+					ar->addObject(*object);
+				}
+			}
+			catch(ObjectNotFoundException<Registrable>& e)
+			{
+				Log::GetInstance().warn("Data corrupted in " + AlarmObjectLinkTableSync::TABLE.NAME + "/" + AlarmObjectLinkTableSync::COL_OBJECT_ID, e);
 			}
 			catch(FactoryException<AlarmRecipient> e)
 			{
