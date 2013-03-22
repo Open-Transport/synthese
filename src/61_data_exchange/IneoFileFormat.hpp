@@ -156,7 +156,6 @@ namespace synthese
 					mutable Points _points;
 
 					std::string _journeyPatternLineOverloadField;
-					bool _importStopAreas;
 					bool _autoImportStops;
 					bool _displayLinkedStops;
 					boost::shared_ptr<const geography::City> _defaultCity;
