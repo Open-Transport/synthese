@@ -184,7 +184,7 @@ namespace synthese
 
      @return negative if left<right, 0 if left==right, positive if left>right.
   */
-  template <typename lT, typename rT>
+  template <typename lT, typename rT> inline
   int alphanum_comp(const lT& left, const rT& right)
   {
 #ifdef DOJDEBUG
@@ -202,7 +202,7 @@ namespace synthese
 
      @return negative if l<r, 0 if l==r, positive if l>r.
   */
-  template <>
+  template <> inline
   int alphanum_comp<std::string>(const std::string& l, const std::string& r)
   {
 #ifdef DOJDEBUG
@@ -224,7 +224,7 @@ namespace synthese
 
      @return negative if l<r, 0 if l==r, positive if l>r.
   */
-  int alphanum_comp(char* l, char* r)
+  inline int alphanum_comp(char* l, char* r)
   {
     assert(l);
     assert(r);
@@ -234,7 +234,7 @@ namespace synthese
     return alphanum_impl(l, r);
   }
 
-  int alphanum_comp(const char* l, const char* r)
+  inline int alphanum_comp(const char* l, const char* r)
   {
     assert(l);
     assert(r);
@@ -244,7 +244,7 @@ namespace synthese
     return alphanum_impl(l, r);
   }
 
-  int alphanum_comp(char* l, const char* r)
+  inline int alphanum_comp(char* l, const char* r)
   {
     assert(l);
     assert(r);
@@ -254,7 +254,7 @@ namespace synthese
     return alphanum_impl(l, r);
   }
 
-  int alphanum_comp(const char* l, char* r)
+  inline int alphanum_comp(const char* l, char* r)
   {
     assert(l);
     assert(r);
@@ -264,7 +264,7 @@ namespace synthese
     return alphanum_impl(l, r);
   }
 
-  int alphanum_comp(const std::string& l, char* r)
+  inline int alphanum_comp(const std::string& l, char* r)
   {
     assert(r);
 #ifdef DOJDEBUG
@@ -273,7 +273,7 @@ namespace synthese
     return alphanum_impl(l.c_str(), r);
   }
 
-  int alphanum_comp(char* l, const std::string& r)
+  inline int alphanum_comp(char* l, const std::string& r)
   {
     assert(l);
 #ifdef DOJDEBUG
@@ -282,7 +282,7 @@ namespace synthese
     return alphanum_impl(l, r.c_str());
   }
 
-  int alphanum_comp(const std::string& l, const char* r)
+  inline int alphanum_comp(const std::string& l, const char* r)
   {
     assert(r);
 #ifdef DOJDEBUG
@@ -291,7 +291,7 @@ namespace synthese
     return alphanum_impl(l.c_str(), r);
   }
 
-  int alphanum_comp(const char* l, const std::string& r)
+  inline int alphanum_comp(const char* l, const std::string& r)
   {
     assert(l);
 #ifdef DOJDEBUG
@@ -328,7 +328,7 @@ namespace synthese
 
      @return negative if left<right, 0 if left==right, positive if left>right.
   */
-  template <typename lT, typename rT>
+  template <typename lT, typename rT> inline
   int alphanum_text_first_comp(const lT& left, const rT& right)
   {
 #ifdef DOJDEBUG
@@ -346,7 +346,7 @@ namespace synthese
 
      @return negative if l<r, 0 if l==r, positive if l>r.
   */
-  template <>
+  template <> inline
   int alphanum_text_first_comp<std::string>(const std::string& l, const std::string& r)
   {
 #ifdef DOJDEBUG
@@ -368,7 +368,7 @@ namespace synthese
 
      @return negative if l<r, 0 if l==r, positive if l>r.
   */
-  int alphanum_text_first_comp(char* l, char* r)
+  inline int alphanum_text_first_comp(char* l, char* r)
   {
     assert(l);
     assert(r);
@@ -378,7 +378,7 @@ namespace synthese
     return alphanum_impl(l, r, true);
   }
 
-  int alphanum_text_first_comp(const char* l, const char* r)
+  inline int alphanum_text_first_comp(const char* l, const char* r)
   {
     assert(l);
     assert(r);
@@ -388,7 +388,7 @@ namespace synthese
     return alphanum_impl(l, r, true);
   }
 
-  int alphanum_text_first_comp(char* l, const char* r)
+  inline int alphanum_text_first_comp(char* l, const char* r)
   {
     assert(l);
     assert(r);
@@ -398,7 +398,7 @@ namespace synthese
     return alphanum_impl(l, r, true);
   }
 
-  int alphanum_text_first_comp(const char* l, char* r)
+  inline int alphanum_text_first_comp(const char* l, char* r)
   {
     assert(l);
     assert(r);
@@ -408,7 +408,7 @@ namespace synthese
     return alphanum_impl(l, r, true);
   }
 
-  int alphanum_text_first_comp(const std::string& l, char* r)
+  inline int alphanum_text_first_comp(const std::string& l, char* r)
   {
     assert(r);
 #ifdef DOJDEBUG
@@ -417,7 +417,7 @@ namespace synthese
     return alphanum_impl(l.c_str(), r, true);
   }
 
-  int alphanum_text_first_comp(char* l, const std::string& r)
+  inline int alphanum_text_first_comp(char* l, const std::string& r)
   {
     assert(l);
 #ifdef DOJDEBUG
@@ -426,7 +426,7 @@ namespace synthese
     return alphanum_impl(l, r.c_str(), true);
   }
 
-  int alphanum_text_first_comp(const std::string& l, const char* r)
+  inline int alphanum_text_first_comp(const std::string& l, const char* r)
   {
     assert(r);
 #ifdef DOJDEBUG
@@ -435,7 +435,7 @@ namespace synthese
     return alphanum_impl(l.c_str(), r, true);
   }
 
-  int alphanum_text_first_comp(const char* l, const std::string& r)
+  inline int alphanum_text_first_comp(const char* l, const std::string& r)
   {
     assert(l);
 #ifdef DOJDEBUG
