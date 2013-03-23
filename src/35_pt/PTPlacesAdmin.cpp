@@ -498,7 +498,7 @@ namespace synthese
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PublicPlaceAdmin::ICON);
 
 					stream << t.col() << place->getKey();
-					if(!_city.get())
+					if(!_city.get() && place->getCity())
 					{
 						stream << t.col() << place->getCity()->getName();
 					}
