@@ -243,8 +243,6 @@ ServiceVertexRealTimeUpdateAction.cpp
 ServiceVertexRealTimeUpdateAction.h
 ServicesListService.cpp
 ServicesListService.hpp
-SortableLineNumber.cpp
-SortableLineNumber.hpp
 StopArea.cpp
 StopArea.hpp
 StopAreaAddAction.cpp

@@ -24,6 +24,7 @@
 
 #include "StopPointsListFunction.hpp"
 
+#include "alphanum.hpp"
 #include "MimeTypes.hpp"
 #include "RequestException.h"
 #include "Request.h"
@@ -408,7 +409,8 @@ namespace synthese
 
 							if(_sortByLineName)
 							{
-								typedef multimap <SortableLineNumber, shared_ptr<ParametersMap> > sortedMapType;
+								typedef multimap <string, shared_ptr<ParametersMap>,
+									util::alphanum_text_first_less<string> > sortedMapType;
 								sortedMapType sortedMap;
 								BOOST_FOREACH(const shared_ptr<ParametersMap>& destination, destinationVect)
 								{
@@ -420,13 +422,16 @@ namespace synthese
 											shared_ptr<ParametersMap> newDestination(new ParametersMap);
 											newDestination->merge(*destination);
 											newDestination->insert(TAG_LINE, line);
-											sortedMap.insert(make_pair(SortableLineNumber(line->get<string>("line_short_name"), false), newDestination));
+											sortedMap.insert(make_pair(line->get<string>("line_short_name"), newDestination));
+											std::cout << line->get<string>("line_short_name") << std::endl;
 										}
 									}
 								}
 
+								std::cout << "================" << std::endl;
 								BOOST_FOREACH(sortedMapType::value_type it, sortedMap)
 								{
+									std::cout << it.first << std::endl;
 									sortedDestinationVect.push_back(it.second);
 								}
 							}
@@ -499,7 +504,7 @@ namespace synthese
 
 			if(	_opCode != otherStopPoint.getOpCode()
 			){
-				return _opCode < otherStopPoint.getOpCode(); 
+				return util::alphanum_text_first_comp(_opCode, otherStopPoint.getOpCode()) < 0; 
 			}
 
 			return _sp < otherStopPoint._sp;
@@ -507,7 +512,7 @@ namespace synthese
 
 
 
-		SortableLineNumber StopPointsListFunction::SortableStopPoint::getOpCode() const
+		string StopPointsListFunction::SortableStopPoint::getOpCode() const
 		{
 			return _opCode;
 		}
@@ -538,12 +543,12 @@ namespace synthese
 
 		bool StopPointsListFunction::SortableLineKey::operator<(SortableLineKey const &otherLineKey) const
 		{
-			return _lineShortName < otherLineKey.getShortName();
+			return util::alphanum_text_first_comp(_lineShortName, otherLineKey.getShortName()) < 0;
 		}
 
 
 
-		SortableLineNumber StopPointsListFunction::SortableLineKey::getShortName() const
+		string StopPointsListFunction::SortableLineKey::getShortName() const
 		{
 			return _lineShortName;
 		}
@@ -557,7 +562,7 @@ namespace synthese
 
 		bool StopPointsListFunction::SortableStopArea::operator<(SortableStopArea const &otherStopArea) const
 		{
-			return _destinationName < otherStopArea.getDestinationName();
+			return util::alphanum_text_first_comp(_destinationName, otherStopArea.getDestinationName()) < 0;
 		}
 
 		string StopPointsListFunction::SortableStopArea::getDestinationName() const

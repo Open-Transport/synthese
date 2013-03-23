@@ -28,7 +28,6 @@
 #include "UtilTypes.h"
 #include "FactorableTemplate.h"
 #include "Function.h"
-#include "SortableLineNumber.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -178,20 +177,20 @@ namespace synthese
 			{
 			private:
 				util::RegistryKeyType _key;
-				SortableLineNumber _lineShortName;
+				std::string _lineShortName;
 
 			public:
 				SortableLineKey(util::RegistryKeyType key, std::string lineShortName);
 				bool operator<(SortableLineKey const &otherLineKey) const;
 				bool operator!=(SortableLineKey const &otherLineKey) const;
-				SortableLineNumber getShortName() const;
+				std::string getShortName() const;
 			};
 
 			class SortableStopPoint
 			{
 			private:
 				const StopPoint * _sp;
-				SortableLineNumber _opCode;
+				std::string _opCode;
 				int _distanceToBboxCenter;
 				bool _isSortByDistanceToBboxCenter;
 			public:
@@ -199,7 +198,7 @@ namespace synthese
 				bool operator<(SortableStopPoint const &otherStopPoint) const;
 				const StopPoint * getStopPoint() const;
 				int getDistanceToBboxCenter() const;
-				SortableLineNumber getOpCode() const;
+				std::string getOpCode() const;
 			};
 
 			class SortableStopArea
