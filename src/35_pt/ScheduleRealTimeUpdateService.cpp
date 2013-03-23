@@ -69,10 +69,6 @@ namespace synthese
 		const string ScheduleRealTimeUpdateService::PARAMETER_ARRIVAL_TIME = "at";
 
 
-		ScheduleRealTimeUpdateService::ScheduleRealTimeUpdateService()
-		{}
-
-
 
 		ParametersMap ScheduleRealTimeUpdateService::_getParametersMap() const
 		{
