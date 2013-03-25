@@ -381,7 +381,7 @@ namespace synthese
 			}
 		}
 		
-		bool PTModule::isTheroticalAllowed()
+		bool PTModule::isTheoreticalAllowed()
 		{
 			return _theoreticalAllowed;
 		}
