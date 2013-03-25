@@ -657,7 +657,6 @@ namespace synthese
 						nextStops.push_back(nextStop);
 					}
 					VehicleModule::GetCurrentJourney().setNextStops(nextStops);
-					VehicleModule::GetCurrentJourney().setStopRequested(false);
 				}
 
 				// Ord
