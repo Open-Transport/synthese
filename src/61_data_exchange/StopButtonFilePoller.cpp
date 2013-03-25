@@ -78,7 +78,7 @@ namespace synthese
 						time_duration periodMS(milliseconds(atoi(_theConnection->_periodMS.c_str())));
 						ifstream ifs ( _theConnection->_file.c_str() );
 
-						// Fine we have a valid period and opened the file to pool
+						// Fine we have a valid period and opened the file to poll
 						if(ifs.is_open() && periodMS.total_milliseconds())
 						{
 							_theConnection->_status = online;
@@ -119,9 +119,11 @@ namespace synthese
 							{
 								VehicleModule::GetCurrentJourney().setStopRequested(true);
 							}
-							// Else we don't set the stopRequestTo 0, it must be reseted when the
-							// bus reaches the next bus stop.
-							
+							else
+							{
+								VehicleModule::GetCurrentJourney().setStopRequested(false);
+							}
+
 							this_thread::sleep(periodMS);
 
 						}
