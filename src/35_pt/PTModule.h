@@ -202,12 +202,12 @@ namespace synthese
 			);
 
 			/**
-			 * @brief isTheroticalAllowed
+			 * @brief isTheoreticalAllowed
 			 * This value is true by default and can be changed by setting the global
 			 * parameter "enable_theoretical".
 			 * @return true if it is allowed to use the theorical values in a report. 
 			 */
-			static bool isTheroticalAllowed();
+			static bool isTheoreticalAllowed();
 
 			/**
 			 * @brief isRealTimeAllowed

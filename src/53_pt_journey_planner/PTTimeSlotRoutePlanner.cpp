@@ -207,8 +207,8 @@ namespace synthese
 					_ignoreReservation,
 					_logger,
 					_maxTransferDuration,
-					PTModule::isTheroticalAllowed(),
-					PTModule::isRealTimeAllowed()							
+					PTModule::isTheoreticalAllowed(),
+					PTModule::isRealTimeAllowed()
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,
@@ -233,7 +233,7 @@ namespace synthese
 					_ignoreReservation,
 					_logger,
 					_maxTransferDuration,
-					PTModule::isTheroticalAllowed(),
+					PTModule::isTheoreticalAllowed(),
 					PTModule::isRealTimeAllowed()
 				);
 				return PTRoutePlannerResult(
