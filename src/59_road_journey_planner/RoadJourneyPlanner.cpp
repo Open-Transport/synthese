@@ -1,6 +1,6 @@
 
-/** PTTimeSlotRoutePlanner class implementation.
-	@file PTTimeSlotRoutePlanner.cpp
+/** RoadJourneyPlanner class implementation.
+	@file RoadJourneyPlanner.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>

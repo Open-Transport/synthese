@@ -38,7 +38,6 @@
 #include "Place.h"
 #include "PlacesListService.hpp"
 #include "PTModule.h"
-#include "PTTimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
 #include "RequestException.h"
 #include "RoadModule.h"
