@@ -122,6 +122,12 @@ namespace synthese
 				return ServicePointer();
 			}
 
+			// Check Theoretical and Real Time validity
+			if(!THData && RTData && !_hasRealTimeData)
+			{
+				return ServicePointer();
+			}
+
 			// Check of real time vertex
 			if(	RTData && !_RTVertices[edge.getRankInPath()])
 			{
