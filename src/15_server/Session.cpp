@@ -136,23 +136,36 @@ namespace synthese
 			return session;
 		}
 
+		
+		// Remove the given session from the map
+		// @return true if the session was found and removed
+		bool Session::_removeSessionFromMap()
+		{
+			// Wait for all requests to be unregistered
+			while(!_requests.empty());
+
+			// @FIXME There is a race here, nothing ensure that a request
+			// won't be allocated at this spot.
+
+			mutex::scoped_lock(_sessionMapMutex);
+			recursive_mutex::scoped_lock(_mutex);
+			SessionMap::iterator it(_sessionMap.find(_key));
+			if(it != _sessionMap.end())
+			{
+				_sessionMap.erase(it);
+				return true;
+			}
+			return false;
+		}
 
 
 		void Session::Delete( Session& session )
 		{
-			// Wait for all requests to be unregistered
-			while(!session._requests.empty());
-
-			mutex::scoped_lock(_sessionMapMutex);
-			recursive_mutex::scoped_lock(session._mutex);
-			SessionMap::iterator it(_sessionMap.find(session._key));
-			if(it != _sessionMap.end())
+			if(session._removeSessionFromMap())
 			{
-				_sessionMap.erase(it);
 				delete &session;
 			}
 		}
-
 
 
 		Session* Session::Get(
@@ -161,6 +174,7 @@ namespace synthese
 			bool exceptionIfNotFound
 		){
 			Session* session(NULL);
+			bool deleteSession(false);
 			{
 				mutex::scoped_lock(_sessionMapMutex);
 				SessionMap::iterator it(_sessionMap.find(key));
@@ -171,19 +185,28 @@ namespace synthese
 			}
 			if(session)
 			{
-				recursive_mutex::scoped_lock lock(session->_mutex);
-				if (ip != session->_ip)
-				{
-					throw SessionException("IP has changed during the session.");
-				}
-
 				ptime now(second_clock::local_time());
-				if( (now - session->_lastUse) > ServerModule::GetSessionMaxDuration())
 				{
-					Delete(*session);
+					recursive_mutex::scoped_lock lock(session->_mutex);
+					if (ip != session->_ip)
+					{
+						throw SessionException("IP has changed during the session.");
+					}
+					
+					if( (now - session->_lastUse) > ServerModule::GetSessionMaxDuration())
+					{
+						if(session->_removeSessionFromMap())
+						{
+							// do not delete the session here because we are locked on its mutex
+							deleteSession = true;
+						}
+					}
+				}
+				if(deleteSession)
+				{
+					delete session;
 					throw SessionException("Session is too old");
 				}
-
 				session->_lastUse = now;
 			}
 			else

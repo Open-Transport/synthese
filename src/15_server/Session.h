@@ -90,6 +90,8 @@ namespace synthese
 				);
 			//@}
 
+				bool _removeSessionFromMap();
+
 		public:
 			//! \name Setters
 			//@{
