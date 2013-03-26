@@ -37,6 +37,7 @@
 #include "Interface.h"
 #include "Env.h"
 #include "LineStop.h"
+#include "PTModule.h"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
@@ -778,8 +779,11 @@ namespace synthese
 									false,
 									index,
 									false,
-									false
-							)	);
+									false,
+									false,
+									PTModule::isTheoreticalAllowed(),
+									PTModule::isRealTimeAllowed()
+											)	);
 							if (!servicePointer.getService())
 								break;
 							++*index;
