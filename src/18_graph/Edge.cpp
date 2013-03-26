@@ -173,7 +173,7 @@ namespace synthese
 			);
 			const ServiceSet& services(getParentPath()->getServices());
 
-			if(services.empty())
+			if(services.empty() || (!enableTheoretical && !enableRealTime))
 			{
 				return ServicePointer();
 			}

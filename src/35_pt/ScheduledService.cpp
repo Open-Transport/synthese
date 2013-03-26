@@ -94,6 +94,12 @@ namespace synthese
 				return ServicePointer();
 			}
 
+			// Check Theoretical and Real Time validity
+			if(!THData && RTData && !_hasRealTimeData)
+			{
+				return ServicePointer();
+			}
+
 			// Initializations
 			size_t edgeIndex(edge.getRankInPath());
 
