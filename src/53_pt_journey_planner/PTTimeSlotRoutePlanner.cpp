@@ -67,7 +67,9 @@ namespace synthese
 			const PlanningOrder planningOrder,
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
-			boost::optional<boost::posix_time::time_duration> maxTransferDuration
+			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
+			bool enableTheoretical,
+			bool enableRealTime
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
@@ -86,7 +88,9 @@ namespace synthese
 				100,
 				ignoreReservation,
 				logger,
-				maxTransferDuration
+				maxTransferDuration,
+				enableTheoretical,
+				enableRealTime
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination)
@@ -207,8 +211,8 @@ namespace synthese
 					_ignoreReservation,
 					_logger,
 					_maxTransferDuration,
-					PTModule::isTheoreticalAllowed(),
-					PTModule::isRealTimeAllowed()
+					_enableTheoretical,
+					_enableRealTime
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,
@@ -233,8 +237,8 @@ namespace synthese
 					_ignoreReservation,
 					_logger,
 					_maxTransferDuration,
-					PTModule::isTheoreticalAllowed(),
-					PTModule::isRealTimeAllowed()
+					_enableTheoretical,
+					_enableRealTime
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,

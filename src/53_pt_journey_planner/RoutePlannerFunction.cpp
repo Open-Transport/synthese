@@ -31,6 +31,7 @@
 #include "Session.h"
 #include "JourneyPattern.hpp"
 #include "PlacesListService.hpp"
+#include "PTModule.h"
 #include "PTRoutePlannerResult.h"
 #include "PTServiceConfigTableSync.hpp"
 #include "PTTimeSlotRoutePlanner.h"
@@ -1187,7 +1188,9 @@ namespace synthese
 				planningOrder,
 				_ignoreReservationRules,
 				*_logger,
-				_maxTransferDuration
+				_maxTransferDuration,
+				PTModule::isTheoreticalAllowed(),
+				PTModule::isRealTimeAllowed()
 			);
 
 			// Computing

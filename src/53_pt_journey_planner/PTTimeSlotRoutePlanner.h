@@ -120,7 +120,9 @@ namespace synthese
 				const algorithm::PlanningOrder		planningOrder,
 				bool								ignoreReservation,
 				const algorithm::AlgorithmLogger& algorithmLogger,
-				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				bool enableTheoretical = true,
+				bool enableRealTime = true
 			);
 
 			PTRoutePlannerResult run() const;
