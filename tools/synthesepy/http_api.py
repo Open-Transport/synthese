@@ -190,7 +190,7 @@ class HTTPApi(object):
 
         requests.defaults.max_retries = 1
         common_kwargs = {
-            'prefetch': True,
+            'stream': False,
         }
         if use_get:
             r = requests.get(url, params=params, **common_kwargs)

@@ -183,7 +183,7 @@ class Result(object):
                 'actionParamlogin': url.username,
                 'actionParampwd': url.password,
                 'nr': '1',
-            }, prefetch=True)
+            }, stream=False)
 
             if 'sid' not in r.cookies:
                 raise Exception('Authentication failure')
@@ -202,7 +202,7 @@ class Result(object):
                 u_parts[4] = urllib.urlencode(qs)
                 u = urlparse.urlunparse(u_parts)
 
-            return self.project.requests_session.get(u, prefetch=True), sid
+            return self.project.requests_session.get(u, stream=False), sid
 
         def save(url, host, u, kind):
             result = None
