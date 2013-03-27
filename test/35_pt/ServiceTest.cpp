@@ -170,6 +170,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	BOOST_CHECK(sp1.getTheoreticalArrivalDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp1.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp1.getServiceRange(), minutes(0));
+	BOOST_CHECK(sp1.getDuration().is_not_a_date_time());
 
 	s.completeServicePointer(sp1, l7AD, ap);
 	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
@@ -183,6 +184,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	BOOST_CHECK_EQUAL(sp1.getTheoreticalArrivalDateTime(), ptime(today, time_duration(2,31,0)));
 	BOOST_CHECK_EQUAL(sp1.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp1.getServiceRange(), minutes(0));
+	BOOST_CHECK_EQUAL(sp1.getDuration(), minutes(12));
 
 	// From departure, at the departure time
 	ptime time2(today, time_duration(2,19,0));
@@ -342,6 +344,151 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true
 	)	);
 	BOOST_CHECK(sp6.getService() == NULL);
+}
+
+BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
+{
+	GeographyModule::PreInit();
+
+	date today(day_clock::local_day());
+
+	RuleUser::Rules r;
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	JourneyPattern l(5678);
+	l.setRules(r);
+
+	StopArea p1(0, true);
+	StopArea p2(0, false);
+	StopArea p3(0, false);
+	StopArea p4(0, false);
+	StopArea p5(0, true);
+	StopArea p6(0, true);
+	StopArea p7(0, false);
+	StopArea p8(0, false);
+
+	StopPoint s1(0, "s1", &p1);
+	StopPoint s2(0, "s1", &p2);
+	StopPoint s3(0, "s1", &p3);
+	StopPoint s4(0, "s1", &p4);
+	StopPoint s5(0, "s1", &p5);
+	StopPoint s6(0, "s1", &p6);
+	StopPoint s7(0, "s1", &p7);
+	StopPoint s8(0, "s1", &p8);
+
+	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
+	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&s2, false);
+	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true,160,&s3, false);
+	DesignatedLinePhysicalStop l4A(0, &l, 3, false, true,200,&s4, true);
+	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,250,&s5, false);
+	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,450,&s6, false);
+	DesignatedLinePhysicalStop l7AD(0, &l, 6, true, true,500,&s7, true);
+	DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,600,&s8, true);
+	DesignatedLinePhysicalStop* lNULL(NULL);
+
+	l.addEdge(l1D);
+	l.addEdge(l2D);
+	l.addEdge(l3AD);
+	l.addEdge(l4A);
+	l.addEdge(l5D);
+	l.addEdge(l6AD);
+	l.addEdge(l7AD);
+	l.addEdge(l8A);
+
+	ScheduledService s(1234, "1234AB", &l);
+
+	BOOST_CHECK_EQUAL(s.getKey(), 1234);
+	BOOST_CHECK_EQUAL(s.getServiceNumber(), "1234AB");
+	BOOST_CHECK_EQUAL(s.getPath(), &l);
+	BOOST_CHECK_EQUAL(s.isContinuous(), false);
+
+	SchedulesBasedService::Schedules d;
+	SchedulesBasedService::Schedules a;
+
+	a.push_back(time_duration(2, 0, 0));
+	d.push_back(time_duration(2, 0, 0));
+
+	a.push_back(time_duration(2, 24, 0));
+	d.push_back(time_duration(2, 30, 0));
+
+	a.push_back(time_duration(2, 31, 0));
+	d.push_back(time_duration(2, 31, 0));
+
+	a.push_back(time_duration(3, 10, 0));
+	d.push_back(time_duration(3, 10, 0));
+
+	s.setSchedules(d, a, true);
+	// Apply a RealTime shift
+	s.applyRealTimeShiftDuration(0, time_duration(0, 10, 0), time_duration(0, 10, 0), true);
+	s.setActive(today);
+
+	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, true));
+	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(true, true));
+	BOOST_CHECK_EQUAL(id.size(), l.getEdges().size());
+	BOOST_CHECK_EQUAL(ia[0], time_duration(2,10, 0)); // Scheduled
+	BOOST_CHECK_EQUAL(id[0], time_duration(2,10, 0)); // Scheduled
+	BOOST_CHECK_EQUAL(ia[1], time_duration(2,16, 0));
+	BOOST_CHECK_EQUAL(id[1], time_duration(2,16, 0));
+	BOOST_CHECK_EQUAL(ia[2], time_duration(2,30, 0));
+	BOOST_CHECK_EQUAL(id[2], time_duration(2,29, 0));
+	BOOST_CHECK_EQUAL(ia[3], time_duration(2,34, 0)); // Scheduled
+	BOOST_CHECK_EQUAL(id[3], time_duration(2,40, 0)); // Scheduled
+	BOOST_CHECK_EQUAL(ia[4], time_duration(2,41, 0));
+	BOOST_CHECK_EQUAL(id[4], time_duration(2,40, 0));
+	BOOST_CHECK_EQUAL(ia[5], time_duration(2,41, 0));
+	BOOST_CHECK_EQUAL(id[5], time_duration(2,40, 0));
+	BOOST_CHECK_EQUAL(ia[6], time_duration(2,41, 0)); // Scheduled
+	BOOST_CHECK_EQUAL(id[6], time_duration(2,41, 0)); // Scheduled
+	BOOST_CHECK_EQUAL(ia[7], time_duration(3,20, 0)); // Scheduled
+	BOOST_CHECK_EQUAL(id[7], time_duration(3,20, 0)); // Scheduled
+
+
+	// Service pointer
+	AccessParameters ap;
+
+	// From departure, before the departure time
+	ptime time1(today, time_duration(1,50,0));
+	ServicePointer sp1(
+		s.getFromPresenceTime(
+			ap,
+			true,
+			true,
+			true,
+			l3AD,
+			time1,
+			false,
+			false,
+			true,
+			true
+	)	);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
+	BOOST_CHECK(sp1.getArrivalEdge() == NULL);
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK(sp1.getRealTimeArrivalVertex() == NULL);
+	BOOST_CHECK_EQUAL(sp1.getService(), &s);
+	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(2,29,0)));
+	BOOST_CHECK(sp1.getArrivalDateTime().is_not_a_date_time());
+	BOOST_CHECK_EQUAL(sp1.getTheoreticalDepartureDateTime(), ptime(today, time_duration(2,19,0)));
+	BOOST_CHECK(sp1.getTheoreticalArrivalDateTime().is_not_a_date_time());
+	BOOST_CHECK_EQUAL(sp1.getOriginDateTime(), ptime(today, time_duration(2,10,0)));
+	BOOST_CHECK_EQUAL(sp1.getServiceRange(), minutes(0));
+	BOOST_CHECK(sp1.getDuration().is_not_a_date_time());
+
+	s.completeServicePointer(sp1, l7AD, ap);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), &l7AD);
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp1.getService(), &s);
+	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(2,29,0)));
+	BOOST_CHECK_EQUAL(sp1.getArrivalDateTime(), ptime(today, time_duration(2,41,0)));
+	BOOST_CHECK_EQUAL(sp1.getTheoreticalDepartureDateTime(), ptime(today, time_duration(2,19,0)));
+	BOOST_CHECK_EQUAL(sp1.getTheoreticalArrivalDateTime(), ptime(today, time_duration(2,31,0)));
+	BOOST_CHECK_EQUAL(sp1.getOriginDateTime(), ptime(today, time_duration(2,10,0)));
+	BOOST_CHECK_EQUAL(sp1.getServiceRange(), minutes(0));
+	BOOST_CHECK_EQUAL(sp1.getDuration(), minutes(12));
+
 }
 
 BOOST_AUTO_TEST_CASE (testContinuousService)
