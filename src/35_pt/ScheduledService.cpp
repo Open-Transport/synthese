@@ -209,8 +209,11 @@ namespace synthese
 
 				servicePointer.setArrivalInformations(
 					edge,
-					servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]),
-					servicePointer.getOriginDateTime() + (getArrivalSchedules(true, false)[edgeIndex] - _departureSchedules[0]),
+					servicePointer.getOriginDateTime() +
+						(schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() +
+						(getArrivalSchedules(true, false)[edgeIndex] -
+						 getDepartureSchedule(servicePointer.getRTData(), 0)),
 					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
@@ -222,8 +225,10 @@ namespace synthese
 
 				servicePointer.setDepartureInformations(
 					edge,
-					servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]),
-					servicePointer.getOriginDateTime() + (getDepartureSchedules(true, false)[edgeIndex] - _departureSchedules[0]),
+					servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() +
+						(getDepartureSchedules(true, false)[edgeIndex] -
+						 getDepartureSchedule(servicePointer.getRTData(), 0)),
 					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
