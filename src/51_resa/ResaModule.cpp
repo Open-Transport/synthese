@@ -379,7 +379,7 @@ namespace synthese
 
 			if(buttonIsAllowed)
 			{
-				RegistryKeyType callId(ResaModule::GetCurrentCallId(request.getSession()));
+				RegistryKeyType callId(ResaModule::GetCurrentCallId(request.getSession().get()));
 
 				if (callId == 0)
 				{ // Case call start

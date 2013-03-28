@@ -334,16 +334,16 @@ namespace synthese
 						);
 			{
 				DBTransaction transaction;
-				Session *session(Session::New("0.0.0.0"));
+				shared_ptr<Session> session(Session::New("0.0.0.0"));
 				BOOST_FOREACH(shared_ptr<AlarmObjectLink> alarmLink, alarmLinks)
 				{
 					AlarmObjectLinkTableSync::Remove(alarmLink->getKey());
-					DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(session, alarmLink->getKey(),
+					DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(session.get(), alarmLink->getKey(),
 						transaction, false
 					);
 				}
 				transaction.run();
-				Session::Delete(*session);
+				Session::Delete(session);
 			}
 		}
 

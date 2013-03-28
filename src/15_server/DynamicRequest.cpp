@@ -104,9 +104,9 @@ namespace synthese
 		void DynamicRequest::_setupSession()
 		{
 			// Reinitialization of the session pointer (useless in standard situation)
-			if(_session)
+			if(_session.get())
 			{
-				setSession(NULL);
+				setSession(shared_ptr<Session>());
 			}
 
 			// Fetching of the session id 
@@ -119,9 +119,9 @@ namespace synthese
 			try
 			{
 				// Try to open an existing session
-				Session* session(Session::Get(sid, _ip, false));
+				shared_ptr<Session> session(Session::Get(sid, _ip, false));
 
-				if(session)
+				if(session.get())
 				{
 					setSession(session);
 				}
@@ -155,7 +155,7 @@ namespace synthese
 							return;
 						}
 
-						setSession(Session::New(_ip, sid));
+						setSession(shared_ptr<Session>(Session::New(_ip, sid)));
 						_session->setUser(user);
 					}
 					catch(UserException&)
@@ -322,13 +322,13 @@ namespace synthese
 
 			// Session
 			_setupSession();
-			if(!_session && !ServerModule::GetAutoLoginUser().empty())
+			if(!_session.get() && !ServerModule::GetAutoLoginUser().empty())
 			{
 				shared_ptr<User> user = UserTableSync::getUserFromLogin(ServerModule::GetAutoLoginUser());
 				setSession(Session::New(_ip));
 				_session->setUser(user);
 			}
-			if(_session)
+			if(_session.get())
 			{
 				try
 				{

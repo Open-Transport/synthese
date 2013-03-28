@@ -189,7 +189,7 @@ namespace synthese
 						folder->getKey()
 					);
 					if(	folder->empty() &&
-						removeFolderRequest.getAction()->isAuthorized(request.getSession())
+						removeFolderRequest.getAction()->isAuthorized(request.getSession().get())
 					){
 						stream <<
 							html::HTMLModule::getHTMLLink(

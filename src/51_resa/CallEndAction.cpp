@@ -71,7 +71,7 @@ namespace synthese
 
 		void CallEndAction::run(Request& request)
 		{
-			ResaModule::CallClose(request.getSession());
+			ResaModule::CallClose(request.getSession().get());
 		}
 
 

@@ -256,7 +256,7 @@ namespace synthese
 				goFolderRequest.getPage()->setFolder(folder);
 				deleteScenarioRequest.getAction()->setObjectId(folder->getKey());
 				stream << l.element("folder");
-				if(deleteScenarioRequest.getAction()->isAuthorized(_request.getSession()))
+				if(deleteScenarioRequest.getAction()->isAuthorized(_request.getSession().get()))
 				{
 					stream <<
 						HTMLModule::getHTMLLink(deleteScenarioRequest.getURL(), HTMLModule::getHTMLImage("/admin/img/remove.png", "Supprimer"), "Etes-vous sûr de vouloir supprimer le répertoire ?");
