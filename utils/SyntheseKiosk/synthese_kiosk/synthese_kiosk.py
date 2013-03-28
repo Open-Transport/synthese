@@ -486,7 +486,9 @@ class SyntheseKiosk(object):
                 ' to configure the application.')
             return
 
-        self.refresh_kiosk_config_if_needed()
+        if self.refresh_kiosk_config_if_needed():
+            force_reload = True
+
         self.refresh_offline_cache_if_needed()
 
         if self.config['auto_refresh_timeout']:
@@ -592,19 +594,22 @@ class SyntheseKiosk(object):
         admin_app.add_url_rule('/fallback/<path:name>', 'fallback', fallback)
 
     def refresh_kiosk_config_if_needed(self):
+        """ Return True if the config has changed """
+        config_changed = False
         if self._next_config_refresh_date < datetime.now():
             self._next_config_refresh_date = datetime.now() + \
                 timedelta(seconds=self._kiosk_config.getConfigRefreshTimeout())
             log.info("Refreshing the kiosk config")
             self._cache_manager.refresh_kiosk_config()
 
-            currentFallBackUrl = self._kiosk_config.getFallBackUrl()
             # Load the new configuration
-            self._kiosk_config.load()
+            config_changed = self._kiosk_config.reload()
 
-            if currentFallBackUrl != self._kiosk_config.getFallBackUrl():
+            if config_changed:
                 # The fallback url has changed, wget this site now
                 self.refresh_offline_cache_if_needed()
+
+        return config_changed
 
     def refresh_offline_cache_if_needed(self):
         if self._next_fallback_refresh_date < datetime.now():
@@ -675,19 +680,34 @@ class KioskConfig(object):
         self._cache_dir = cache_dir
         self._config = None
 
-    def load(self):
+    def _load(self):
+        """
+        Load the config file on disk and return a tupple of 2 boolean
+        (loaded, changed)
+        """
+        previous_config = self._config
         config_file = self._cache_dir + "/" + CONFIG_FILE
         log.debug("load_kiosk_config " + config_file)
         if not os.path.isfile(config_file):
             print "Configuration file " + config_file + " not found"
-            return False
+            return (False, previous_config != self._config)
 
         try:
             self._config = (json.load(open(config_file)))
-            return True
+            print "reload"
+            print previous_config == self._config
+            return (True, previous_config != self._config)
         except Exception, e:
             log.error("Failed to load json config file '%s': %s", config_file, e)
-            return False
+            return (False, previous_config != self._config)
+
+    def load(self):
+        """ Return True if the configuration has been loaded """
+        return self._load()[0]
+
+    def reload(self):
+        """ return True if the configuration has changed """
+        return self._load()[1]
 
     def getFallBackUrl(self):
         try:
