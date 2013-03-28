@@ -1086,7 +1086,7 @@ namespace synthese
 				{
 					if(_messageIds.find(alarm->getKey()) == _messageIds.end())
 					{
-						AlarmTableSync::Remove(request.getSession(), alarm->getKey(), transaction, false);
+						AlarmTableSync::Remove(request.getSession().get(), alarm->getKey(), transaction, false);
 					}
 				}
 
@@ -1168,7 +1168,7 @@ namespace synthese
 					// Removals
 					BOOST_FOREACH(RegistryKeyType id, toRemove)
 					{
-						DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(request.getSession(), id, transaction, false);
+						DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(request.getSession().get(), id, transaction, false);
 					}
 
 

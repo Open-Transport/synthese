@@ -130,7 +130,7 @@ namespace synthese
 			ReservationTransactionTableSync::Save(_transaction.get());
 
 			// Write the log
-			ResaDBLog::AddCancelReservationEntry(request.getSession(), *_transaction, oldStatus);
+			ResaDBLog::AddCancelReservationEntry(request.getSession().get(), *_transaction, oldStatus);
 
 			// Mail
             shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));

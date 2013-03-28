@@ -118,7 +118,7 @@ namespace synthese
 				true, false
 			);
 
-			if(purgeRequest.getAction()->isAuthorized(_request.getSession()))
+			if(purgeRequest.getAction()->isAuthorized(_request.getSession().get()))
 			{
 				stream << "<h1>Purge</h1>";
 

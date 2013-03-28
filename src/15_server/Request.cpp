@@ -83,11 +83,9 @@ namespace synthese
 
 		void Request::deleteSession()
 		{
-			if(_session)
+			if(_session.get())
 			{
-				Session* session(_session);
-				setSession(NULL);
-				Session::Delete(*session);
+				setSession(shared_ptr<Session>());
 			}
 		}
 
@@ -153,7 +151,7 @@ namespace synthese
 						throw RequestException("Missing parameter in function call :"+ e.getField());
 					}
 
-					if(	!_action->isAuthorized(_session)
+					if(	!_action->isAuthorized(_session.get())
 					){
 						_actionErrorMessage = "Forbidden Action";
 					}
@@ -190,7 +188,7 @@ namespace synthese
 					throw RedirectException(getURL(), false, getCookiesMap());
 				}
 
-				if (!_function->isAuthorized(_session))
+				if (!_function->isAuthorized(_session.get()))
 				{
 					throw ForbiddenRequestException();
 				}
@@ -211,15 +209,15 @@ namespace synthese
 			){
 				return false;
 			}
-			return (!_action.get() || _action->isAuthorized(_session))
-				&& (!_function.get() || _function->isAuthorized(_session));
+			return (!_action.get() || _action->isAuthorized(_session.get()))
+				&& (!_function.get() || _function->isAuthorized(_session.get()));
 		}
 
 
 
 		boost::shared_ptr<const security::User> Request::getUser() const
 		{
-			if (_session)
+			if (_session.get())
 			{
 				return _session->getUser();
 			}
@@ -275,8 +273,7 @@ namespace synthese
 
 
 		Request::Request(
-		):	_session(NULL),
-			_actionWillCreateObject(false),
+		):	_actionWillCreateObject(false),
 			_redirectAfterAction(true)
 		{}
 
@@ -288,7 +285,6 @@ namespace synthese
 			boost::shared_ptr<Function> function
 		):	_action(action),
 			_function(function),
-			_session(NULL),
 			_ip(request._ip),
 			_clientURL(request._clientURL),
 			_hostName(request._hostName),
@@ -300,13 +296,14 @@ namespace synthese
 
 
 
-		void Request::setSession( Session* session )
+		void Request::setSession( shared_ptr<Session> session )
 		{
-			if(_session)
+			if(_session.get())
 			{
 				_session->unregisterRequest(*this);
+				Session::Delete(_session);
 			}
-			if(session)
+			if(session.get())
 			{
 				session->registerRequest(*this);
 			}

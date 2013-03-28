@@ -160,7 +160,7 @@ namespace synthese
 				function->_setFromParametersMap(serviceParametersMap);
 
 				// Right check
-				if (function->isAuthorized(request.getSession()))
+				if (function->isAuthorized(request.getSession().get()))
 				{
 					// Run of the service
 					result = function->run(stream, request);

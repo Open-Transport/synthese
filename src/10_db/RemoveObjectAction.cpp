@@ -69,7 +69,7 @@ namespace synthese
 			Request& request
 		){
 			DBTransaction transaction;
-			_tableSync->deleteRecord(request.getSession(), _objectId, transaction);
+			_tableSync->deleteRecord(request.getSession().get(), _objectId, transaction);
 			transaction.run();
 		}
 
