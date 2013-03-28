@@ -287,7 +287,7 @@ namespace synthese
 			PageLinks result;
 			if(	dynamic_cast<const ResaModule*>(&module))
 			{
-				util::RegistryKeyType callId(ResaModule::GetCurrentCallId(request.getSession()));
+				util::RegistryKeyType callId(ResaModule::GetCurrentCallId(request.getSession().get()));
 
 				if(callId > 0)
 				{

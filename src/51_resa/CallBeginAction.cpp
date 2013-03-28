@@ -71,7 +71,7 @@ namespace synthese
 
 		void CallBeginAction::run(Request& request)
 		{
-			ResaModule::CallOpen(request.getSession());
+			ResaModule::CallOpen(request.getSession().get());
 		}
 
 

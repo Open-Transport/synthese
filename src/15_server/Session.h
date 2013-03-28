@@ -55,7 +55,7 @@ namespace synthese
 			static const std::string ATTR_LAST_USE;
 
 			typedef std::map<std::string, std::string> SessionVariables;
-			typedef std::map<std::string, Session*> SessionMap;
+			typedef std::map<std::string, boost::shared_ptr<Session> > SessionMap;
 			typedef std::set<const Request*> Requests;
 
 		private:
@@ -159,7 +159,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Session deletion helper.
 				/// @param session the session to delete
-				static void Delete(Session& session);
+				static void Delete(boost::shared_ptr<Session> session);
 
 
 
@@ -169,7 +169,7 @@ namespace synthese
 				/// @param request the request to register on the session
 				/// @param key session key to force (empty = auto generated key)
 				/// @return the newly created session
-				static Session* New(
+				static boost::shared_ptr<synthese::server::Session> New(
 					const std::string& ip,
 					std::string key = std::string()
 				);
@@ -188,7 +188,7 @@ namespace synthese
 				///  - check of the expiration time of the session
 				///  - refresh the last use time
 				/// @throw SessionException if the session does not exist or if a check fails
-				static Session* Get(
+				static boost::shared_ptr<synthese::server::Session> Get(
 					const std::string& key,
 					const std::string& ip,
 					bool exceptionIfNotFound = true

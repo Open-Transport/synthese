@@ -125,12 +125,12 @@ namespace synthese
 
 
 
-		Session* Session::New(
+		shared_ptr<Session> Session::New(
 			const string& ip,
 			string key
 		){
 			mutex::scoped_lock(_sessionMapMutex);
-			Session* session(new Session(ip, key));
+			shared_ptr<Session> session(new Session(ip, key));
 			mutex::scoped_lock(session->_requestsListMutex);
 			_sessionMap.insert(make_pair(session->_key, session));
 			return session;
@@ -141,14 +141,7 @@ namespace synthese
 		// @return true if the session was found and removed
 		bool Session::_removeSessionFromMap()
 		{
-			// Wait for all requests to be unregistered
-			while(!_requests.empty());
-
-			// @FIXME There is a race here, nothing ensure that a request
-			// won't be allocated at this spot.
-
 			mutex::scoped_lock(_sessionMapMutex);
-			recursive_mutex::scoped_lock(_mutex);
 			SessionMap::iterator it(_sessionMap.find(_key));
 			if(it != _sessionMap.end())
 			{
@@ -159,22 +152,18 @@ namespace synthese
 		}
 
 
-		void Session::Delete( Session& session )
+		void Session::Delete( shared_ptr<Session> session )
 		{
-			if(session._removeSessionFromMap())
-			{
-				delete &session;
-			}
+			session->_removeSessionFromMap();
 		}
 
 
-		Session* Session::Get(
+		shared_ptr<Session> Session::Get(
 			const std::string& key,
 			const std::string& ip,
 			bool exceptionIfNotFound
 		){
-			Session* session(NULL);
-			bool deleteSession(false);
+			shared_ptr<Session> session;
 			{
 				mutex::scoped_lock(_sessionMapMutex);
 				SessionMap::iterator it(_sessionMap.find(key));
@@ -183,7 +172,7 @@ namespace synthese
 					session = it->second;
 				}
 			}
-			if(session)
+			if(session.get())
 			{
 				ptime now(second_clock::local_time());
 				{
@@ -195,17 +184,9 @@ namespace synthese
 					
 					if( (now - session->_lastUse) > ServerModule::GetSessionMaxDuration())
 					{
-						if(session->_removeSessionFromMap())
-						{
-							// do not delete the session here because we are locked on its mutex
-							deleteSession = true;
-						}
+						session->_removeSessionFromMap();
+						throw SessionException("Session is too old");
 					}
-				}
-				if(deleteSession)
-				{
-					delete session;
-					throw SessionException("Session is too old");
 				}
 				session->_lastUse = now;
 			}
@@ -217,7 +198,7 @@ namespace synthese
 				}
 				else
 				{
-					return NULL;
+					return shared_ptr<Session>();
 				}
 			}
 			return session;

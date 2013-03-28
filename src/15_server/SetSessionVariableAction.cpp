@@ -77,12 +77,12 @@ namespace synthese
 		void SetSessionVariableAction::run(
 			Request& request
 		){
-			if(!request.getSession())
+			if(!request.getSession().get())
 			{
 				throw ActionException("No active session right now");
 			}
 
-			const_cast<Session*>(request.getSession())->setSessionVariable(_variable, _value);
+			request.getSession()->setSessionVariable(_variable, _value);
 		}
 
 

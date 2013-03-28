@@ -649,7 +649,7 @@ namespace synthese
 			}
 
 			// Log
-			ResaDBLog::AddBookReservationEntry(request.getSession(), rt);
+			ResaDBLog::AddBookReservationEntry(request.getSession().get(), rt);
 
 			// Mail
 			if(!_ignoreReservation && !_customer->getEMail().empty() && reservationContact)

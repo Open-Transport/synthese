@@ -96,7 +96,7 @@ namespace synthese
 			ParametersMap map;
 			
 			// Right check
-			if(	!_action->isAuthorized(request.getSession())
+			if(	!_action->isAuthorized(request.getSession().get())
 			){
 				map.insert(ATTR_ERROR_MESSAGE, "Forbidden Action");
 			}

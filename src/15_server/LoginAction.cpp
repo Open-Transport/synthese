@@ -87,7 +87,7 @@ namespace synthese
 					throw ActionException("Connexion impossible");
 				}
 
-				Session* session = Session::New(request.getIP());
+				shared_ptr<Session> session(Session::New(request.getIP()));
 				request.setSession(session);
 				session->setUser(user);
 				session->setSessionIdCookie(request);
