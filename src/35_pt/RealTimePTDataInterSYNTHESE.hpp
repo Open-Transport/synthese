@@ -26,11 +26,13 @@
 #include "FactorableTemplate.h"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace pt
 	{
-		class ScheduledService;
+		class SchedulesBasedService;
 
 		//////////////////////////////////////////////////////////////////////////
 		//// RealTimePTDataInterSYNTHESE class.
@@ -75,8 +77,8 @@ namespace synthese
 			typedef std::vector<bool> RanksToSync;
 
 			static std::string GetContent(
-				const ScheduledService& service,
-				const RanksToSync& ranksToSync
+				const SchedulesBasedService& service,
+				boost::optional<const RanksToSync&> ranksToSync = boost::optional<const RanksToSync&>()
 			);
 		};
 	}
