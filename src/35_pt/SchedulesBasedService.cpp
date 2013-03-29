@@ -349,6 +349,22 @@ namespace synthese
 			{
 				_RTTimestamps[rank] = second_clock::local_time();
 			}
+
+
+
+			// Inter-SYNTHESE sync
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
+					RealTimePTDataInterSYNTHESE::GetContent(*this)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					boost::optional<db::DBTransaction&>()
+				);
+			}
 		}
 
 		void SchedulesBasedService::clearRTData()
@@ -381,6 +397,21 @@ namespace synthese
 				}
 			}
 			_computeNextRTUpdate();
+
+
+			// Inter-SYNTHESE sync
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
+					RealTimePTDataInterSYNTHESE::GetContent(*this)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					boost::optional<db::DBTransaction&>()
+				);
+			}
 		}
 
 
@@ -615,6 +646,21 @@ namespace synthese
 			}
 			_path->markScheduleIndexesUpdateNeeded(true);
 			_hasRealTimeData = true;
+
+
+			// Inter-SYNTHESE sync
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
+					RealTimePTDataInterSYNTHESE::GetContent(*this)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					boost::optional<db::DBTransaction&>()
+				);
+			}
 		}
 
 
