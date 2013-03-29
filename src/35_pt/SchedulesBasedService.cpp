@@ -24,9 +24,12 @@
 
 #include "AccessParameters.h"
 #include "CommercialLine.h"
+#include "InterSYNTHESEContent.hpp"
+#include "InterSYNTHESEModule.hpp"
 #include "LineStop.h"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
+#include "RealTimePTDataInterSYNTHESE.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
@@ -47,6 +50,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace graph;
+	using namespace inter_synthese;
 	using namespace util;
 
 
@@ -624,6 +628,21 @@ namespace synthese
 			_computeNextRTUpdate();
 			_path->markScheduleIndexesUpdateNeeded(true);
 			_hasRealTimeData = true;
+
+
+			// Inter-SYNTHESE sync
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
+					RealTimePTDataInterSYNTHESE::GetContent(*this)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					boost::optional<db::DBTransaction&>()
+				);
+			}
 		}
 
 
@@ -757,6 +776,20 @@ namespace synthese
 		void SchedulesBasedService::setRealTimeVertices( const ServedVertices& value )
 		{
 			_RTVertices = value;
+
+			// Inter-SYNTHESE sync
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
+					RealTimePTDataInterSYNTHESE::GetContent(*this)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					boost::optional<db::DBTransaction&>()
+				);
+			}
 		}
 
 
