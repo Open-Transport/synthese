@@ -22,8 +22,11 @@
 
 #include "RealTimePTDataInterSYNTHESE.hpp"
 
-#include "ScheduledService.h"
+#include "CommercialLine.h"
+#include "ContinuousServiceTableSync.h"
+#include "ScheduledServiceTableSync.h"
 #include "StopPoint.hpp"
+#include "TransportNetwork.h"
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
@@ -59,11 +62,18 @@ namespace synthese
 
 
 
+		/// Config perimeter = network id
+		/// Message perimeter = line id
 		bool RealTimePTDataInterSYNTHESE::mustBeEnqueued(
 			const std::string& configPerimeter,
 			const std::string& messagePerimeter
 		) const	{
-			return true;
+
+			RegistryKeyType lineId(lexical_cast<RegistryKeyType>(messagePerimeter));
+			shared_ptr<const CommercialLine> line(Env::GetOfficialEnv().get<CommercialLine>(lineId));
+			RegistryKeyType networkId(lexical_cast<RegistryKeyType>(configPerimeter));
+			return line->getNetwork()->getKey() == networkId;
+
 		}
 
 
@@ -91,13 +101,20 @@ namespace synthese
 			}
 
 			// Load of the service
-			shared_ptr<ScheduledService> service;
+			shared_ptr<SchedulesBasedService> service;
 			try
 			{
-				service = Env::GetOfficialEnv().getEditable<ScheduledService>(
-					lexical_cast<RegistryKeyType>(
-						fields[0]
-				)	);
+				RegistryKeyType serviceId(
+					lexical_cast<RegistryKeyType>(fields[0])
+				);
+				if(decodeTableId(serviceId) == ScheduledServiceTableSync::TABLE.ID)
+				{
+					service = Env::GetOfficialEnv().getCastEditable<SchedulesBasedService, ScheduledService>(serviceId);
+				}
+				else if(decodeTableId(serviceId) == ContinuousServiceTableSync::TABLE.ID)
+				{
+					service = Env::GetOfficialEnv().getCastEditable<SchedulesBasedService, ContinuousService>(serviceId);
+				}
 			}
 			catch (bad_lexical_cast&)
 			{
@@ -108,9 +125,9 @@ namespace synthese
 				return false;
 			}
 
-			ScheduledService::Schedules departureSchedules(service->getDepartureSchedules(true, true));
-			ScheduledService::Schedules arrivalSchedules(service->getArrivalSchedules(true, true));
-			ScheduledService::ServedVertices vertices(service->getVertices(true));
+			SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, true));
+			SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, true));
+			SchedulesBasedService::ServedVertices vertices(service->getVertices(true));
 			for(size_t i(1); i+2<fields.size(); i+=4)
 			{
 				try
@@ -148,10 +165,10 @@ namespace synthese
 			service->setRealTimeVertices(
 				vertices
 			);
-			//service->setRealTimeSchedules(
-			//	departureSchedules,
-			//	arrivalSchedules
-			//);
+			service->setRealTimeSchedules(
+				departureSchedules,
+				arrivalSchedules
+			);
 
 			return true;
 		}
@@ -175,14 +192,15 @@ namespace synthese
 
 
 		string RealTimePTDataInterSYNTHESE::GetContent(
-			const ScheduledService& service,
-			const RanksToSync& ranksToSync
+			const SchedulesBasedService& service,
+			optional<const RanksToSync&> ranksToSync
 		){
 			stringstream result;
 			result << service.getKey();
-			for(size_t i(0); i<ranksToSync.size(); ++i)
+			size_t maxRank(service.getRoute()->getEdges().size());
+			for(size_t i(0); i<maxRank; ++i)
 			{
-				if(ranksToSync[i])
+				if(!ranksToSync || ranksToSync->at(i))
 				{
 					result <<
 						FIELD_SEPARATOR <<
