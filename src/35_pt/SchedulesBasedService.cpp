@@ -397,21 +397,6 @@ namespace synthese
 				}
 			}
 			_computeNextRTUpdate();
-
-
-			// Inter-SYNTHESE sync
-			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
-			{
-				inter_synthese::InterSYNTHESEContent content(
-					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
-					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
-					RealTimePTDataInterSYNTHESE::GetContent(*this)
-				);
-				inter_synthese::InterSYNTHESEModule::Enqueue(
-					content,
-					boost::optional<db::DBTransaction&>()
-				);
-			}
 		}
 
 
