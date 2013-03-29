@@ -155,7 +155,7 @@ namespace synthese
 		{
 			if(!get<InterSYNTHESEConfig>())
 			{
-				throw Exception("Inconsistent slave");
+				throw Exception("Invalid slave configuration");
 			}
 
 			mutex::scoped_lock lock(_queueMutex);
