@@ -192,7 +192,7 @@ namespace synthese
 			size_t itemsCount(items.size());
 
 			// Sorting items : building the sorting key
-			typedef map<string, shared_ptr<ParametersMap>, 
+			typedef multimap<string, shared_ptr<ParametersMap>, 
 					boost::function<bool(const string &, const string &)> > SortedItems;
 
 			string sortAlgoStr(
