@@ -435,7 +435,7 @@ namespace synthese
 				searchRequest.getPage()->_dateTime = date;
 				searchRequest.getPage()->_planningOrder = ARRIVAL_FIRST;
 
-				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions précédentes", string(), "resultset_previous.png") << " ";
+				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions précédentes", string(), "/admin/img/resultset_previous.png") << " ";
 			}
 
 			searchRequest.getPage()->_planningOrder = DEPARTURE_FIRST;
@@ -456,7 +456,7 @@ namespace synthese
 				date = it->getFirstDepartureTime();
 				date += minutes(1);
 				searchRequest.getPage()->_dateTime = date;
-				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions suivantes", string(), "resultset_next.png") << " ";
+				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions suivantes", string(), "/admin/img/resultset_next.png") << " ";
 
 			}
 

@@ -194,7 +194,7 @@ namespace synthese
 				}
 				stream << t.close();
 
-				stream << "<p>" << HTMLModule::getLinkButton(sendPasswordRequest.getURL(), "Envoi de nouveau mot de passe par e-mail", string(), ResaDBLog::GetIconURL(ResaDBLog::EMAIL)) << "</p>";
+				stream << "<p>" << HTMLModule::getLinkButton(sendPasswordRequest.getURL(), "Envoi de nouveau mot de passe par e-mail", string(), "/admin/img/" + ResaDBLog::GetIconURL(ResaDBLog::EMAIL)) << "</p>";
 			}
 
 

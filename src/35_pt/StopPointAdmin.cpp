@@ -241,7 +241,17 @@ namespace synthese
 							"</span>"
 						;
 					}
-					map.addPoint(HTMLMap::MapPoint(*_stop->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), _stop->getName() + "<br />" + popupcontent.str(), 21, 25));
+					map.addPoint(
+						HTMLMap::MapPoint(
+							*_stop->getGeometry(),
+							"/admin/img/marker-blue.png",
+							"/admin/img/marker.png",
+							"/admin/img/marker-gold.png",
+							moveAction.getURL(),
+							_stop->getName() + "<br />" + popupcontent.str(),
+							21,
+							25
+					)	);
 				}
 
 				map.draw(stream, request);

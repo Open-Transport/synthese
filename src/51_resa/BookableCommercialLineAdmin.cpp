@@ -327,7 +327,7 @@ namespace synthese
 							searchRequest.getURL(),
 							"Jour précédent",
 							string(),
-							"resultset_previous.png"
+							"/admin/img/resultset_previous.png"
 						) << " ";
 
 					searchRequest.getPage()->_date = _date;
@@ -337,7 +337,7 @@ namespace synthese
 							searchRequest.getURL(),
 							_hideOldServices ? "Journée entière" : "Prochains services",
 							string(),
-							_hideOldServices ? "stop_blue.png" : "stop_green.png"
+							_hideOldServices ? "/admin/img/stop_blue.png" : "/admin/img/stop_green.png"
 						) << " ";
 
 					date = _date;
@@ -349,7 +349,7 @@ namespace synthese
 							searchRequest.getURL(),
 							"Jour suivant",
 							string(),
-							"resultset_next.png"
+							"/admin/img/resultset_next.png"
 						) << "</p>"
 					;
 
