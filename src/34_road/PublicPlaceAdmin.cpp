@@ -179,9 +179,9 @@ namespace synthese
 					map.addPoint(
 						HTMLMap::MapPoint(
 							*_place->get<PointGeometry>(),
-							"marker.png",
-							"marker-blue.png",
-							"marker-gold.png",
+							"/admin/img/marker.png",
+							"/admin/img/marker-blue.png",
+							"/admin/img/marker-gold.png",
 							movePlaceAction.getURL(),
 							_place->getName(),
 							21, 25
@@ -204,9 +204,9 @@ namespace synthese
 					map.addPoint(
 						HTMLMap::MapPoint(
 							*it->getGeometry(),
-							"marker-blue.png",
-							"marker.png",
-							"marker-gold.png",
+							"/admin/img/marker-blue.png",
+							"/admin/img/marker.png",
+							"/admin/img/marker-gold.png",
 							moveEntranceAction.getURL(),
 							it->getName(),
 							21, 25

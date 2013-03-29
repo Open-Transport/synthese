@@ -285,7 +285,7 @@ namespace synthese
 			csvRequest.getFunction()->setRowStep(_searchRowStep);
 			csvRequest.getFunction()->setColStep(_searchColStep);
 
-			stream << "<p>" << HTMLModule::getLinkButton(csvRequest.getURL(), "Export CSV", string(), "page_white_go.png") << "</p>";
+			stream << "<p>" << HTMLModule::getLinkButton(csvRequest.getURL(), "Export CSV", string(), "/admin/img/page_white_go.png") << "</p>";
 
 		}
 

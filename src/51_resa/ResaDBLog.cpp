@@ -396,7 +396,7 @@ namespace synthese
 								searchRequest
 							).getFunction()->getEnv()
 					)	);
-					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir", string(), GetIconURL(CALL_ENTRY));
+					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir", string(), "/admin/img/" + GetIconURL(CALL_ENTRY));
 				} catch(...)
 				{
 
