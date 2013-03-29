@@ -385,6 +385,14 @@ namespace synthese
                         if (junction != NULL)
                         {
                             departureMoment = desiredTime;
+							if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+							{
+								fullApproachJourney.setStartApproachDuration(minutes(0));
+							}
+							else
+							{
+								fullApproachJourney.setEndApproachDuration(minutes(0));
+							}
                         }
 						while(true)
 						{
