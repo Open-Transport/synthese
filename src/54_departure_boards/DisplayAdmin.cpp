@@ -577,7 +577,7 @@ namespace synthese
 							stream << t.col() << rmDisplayedRequest.getHTMLForm().getLinkButton(
 								"Supprimer",
 								"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
-								"delete.png"
+								"/admin/img/delete.png"
 							);
 
 						}
@@ -905,7 +905,7 @@ namespace synthese
 						stream << t.col() << rmDisplayedRequest.getHTMLForm().getLinkButton(
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
-							"delete.png"
+							"/admin/img/delete.png"
 						);
 					}
 
@@ -957,7 +957,7 @@ namespace synthese
 							stream << tt.col() << rmTransferRequest.getHTMLForm().getLinkButton(
 								"Supprimer",
 								"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
-								"delete.png"
+								"/admin/img/delete.png"
 							);
 					}	}
 

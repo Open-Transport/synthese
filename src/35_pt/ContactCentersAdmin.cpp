@@ -116,6 +116,7 @@ namespace synthese
 			c.push_back(string());
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 
+			stream << "<h1>Centres de contact</h1>";
 			stream << f.open();
 			stream << t.open();
 
@@ -147,6 +148,7 @@ namespace synthese
 
 			// New row for object creation
 			stream << t.row();
+			stream << t.col();
 			stream << t.col();
 			stream << f.getTextInput(ContactCenterUpdateAction::PARAMETER_NAME, string(), "(nom)");
 			stream << t.col() << f.getTextInput(ContactCenterUpdateAction::PARAMETER_PHONE_NUMBER, string(), "(numéro)");

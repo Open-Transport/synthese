@@ -286,9 +286,9 @@ namespace synthese
 						map.addPoint(
 							HTMLMap::MapPoint(
 								*it.second->getGeometry(),
-								"marker-blue.png",
-								"marker.png",
-								"marker-gold.png",
+								"/admin/img/marker-blue.png",
+								"/admin/img/marker.png",
+								"/admin/img/marker-gold.png",
 								moveAction.getURL(),
 								popupcontent.str(),
 								21, 25
@@ -297,7 +297,7 @@ namespace synthese
 					/*
 					BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())
 					{
-						map.addPoint(HTMLMap::Point(*address, "marker-green.png", "marker.png", "marker-gold.png", string(), string()));
+						map.addPoint(HTMLMap::Point(*address, "/admin/img/marker-green.png", "/admin/img/marker.png", "/admin/img/marker-gold.png", string(), string()));
 					}
 					*/
 					/// @todo Station entrances

@@ -552,10 +552,10 @@ namespace synthese
 
 				stream << "<h1>Formats Trident</h1>";
 				stream << "<p>";
-				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident standard", string(), "page_white_go.png");
+				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident standard", string(), "/admin/img/page_white_go.png");
 				stream << " ";
 				exporter->setWithTisseoExtension(true);
-				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "page_white_go.png");
+				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "/admin/img/page_white_go.png");
 				stream << "</p>";
 */			}
 
