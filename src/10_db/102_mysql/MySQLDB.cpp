@@ -91,10 +91,6 @@ namespace synthese
 
 	namespace db
 	{
-		std::vector<MYSQL_STMT*> MySQLDB::_replaceStatements;
-		std::vector<MYSQL_STMT*> MySQLDB::_deleteStatements;
-
-
 		MySQLDB::MySQLDB() :
 			_connection(NULL),
 			_mysqlThreadInitialized(cleanupThread),
@@ -129,8 +125,21 @@ namespace synthese
 				/* ignored */
 			}
 
+			// Cleaning prepared statements
+			BOOST_FOREACH(PreparedStatements::value_type& replaceStatement, _replaceStatements)
+			{
+				mysql_stmt_close(replaceStatement);
+			}
+			BOOST_FOREACH(PreparedStatements::value_type& deleteStatement, _deleteStatements)
+			{
+				mysql_stmt_close(deleteStatement);
+			}
+
+			// Connection closing
 			if (_connection)
+			{
 				mysql_close(_connection);
+			}
 		}
 
 
@@ -313,8 +322,8 @@ namespace synthese
 
 
 
-		void MySQLDB::initPreparedStatements(
-		){
+		void MySQLDB::_initPreparedStatements(
+		) const {
 			// Runs only once at the first thread creation
 			if(!_replaceStatements.empty())
 			{
@@ -325,9 +334,7 @@ namespace synthese
 			size_t tablesNumber(
 				DBModule::GetTablesById().rbegin()->first + 1
 			);
-			_replaceStatements.clear();
 			_replaceStatements.resize(tablesNumber, NULL);
-			_deleteStatements.clear();
 			_deleteStatements.resize(tablesNumber, NULL);
 
 			// Loop on tables
@@ -413,7 +420,7 @@ namespace synthese
 			}
 
 			// Running the prepared statement
-			MYSQL_STMT* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
+			MYSQL_STMT* stmt(_getReplaceStatement(record.getTable()->getFormat().ID));
 			if(mysql_stmt_bind_param(stmt, bnd))
 			{
 				string errorMsg(mysql_stmt_error(stmt));
@@ -473,7 +480,7 @@ namespace synthese
 			memset(bnd, 0, sizeof(bnd));
 			DBRecordCellBindConvertor visitor(*bnd);
 			visitor(id);
-			MYSQL_STMT* stmt(_deleteStatements[decodeTableId(id)]);
+			MYSQL_STMT* stmt(_getDeleteStatement(decodeTableId(id)));
 			if(mysql_stmt_bind_param(stmt, bnd))
 			{
 				string errorMsg(mysql_stmt_error(stmt));
@@ -963,9 +970,20 @@ namespace synthese
 
 
 
-		void MySQLDB::removePreparedStatements()
-		{
-			// Do nothing
+		MYSQL_STMT* MySQLDB::_getReplaceStatement(
+			RegistryTableType tableId
+		) const	{
+			_initPreparedStatements();
+			return _replaceStatements[tableId];
+		}
+
+
+
+		MYSQL_STMT* MySQLDB::_getDeleteStatement(
+			RegistryTableType tableId
+		) const {
+			_initPreparedStatements();
+			return _deleteStatements[tableId];
 		}
 
 
