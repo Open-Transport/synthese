@@ -694,6 +694,19 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
 	}
 
+	{ // Service call with & at the end
+		string code("test<?if&cond=0&then=1&else=2&?>=test");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test2=test");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 6);
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
+	}
+
 	{ // Service call
 		string code("test<?if&cond=0&then=2&else=3?>");
 		WebpageContent wpc(code);
