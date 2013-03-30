@@ -1,0 +1,55 @@
+<@active=<@~global("vdv_server_active")@>@>
+<@port=<@~global("port")@>@>
+
+
+<ul class="nav nav-tabs">
+<li class="active"><a href="#properties" data-toggle="tab">Propriétés</a></li>
+<li><a href="#clients" data-toggle="tab">Clients</a></li>
+</ul>
+
+<div class="tab-content">
+<div class="tab-pane active" id="properties">
+
+<h1>Serveur SYNTHESE VDV (port <@port@>)</h1>
+
+Etat du serveur : <?link&target=<@p@>&a=global_variable_update&actionParam_variable=vdv_server_active&actionParam_value=<@!active@>&text=<@active?"actif":"inactif"@>?>
+
+</div>
+<div class="tab-pane" id="clients">
+
+<h1>Clients enregistrés</h1>
+
+<?vdv_clients_list&template=
+<table class="table table-condensed">
+<thead><tr><th>nom</th><th>code</th><th>host</th><th>port</th><th>rem</th><th></th><th></th></tr></thead><tbody>
+<{client&template=
+<tr>
+<td><@name@></td>
+<td><@client_control_centre_code@></td>
+<td><@reply_address@></td>
+<td><@reply_port@></td>
+<td><@sbb_mode?"SBB mode":""@></td>
+<td><a class="btn btn-mini btn-primary" href="#props<@id@>" data-toggle="modal">Propriétés</a></td>
+<td><a class="btn btn-mini btn-primary" href="#nodes<@id@>" data-toggle="modal">Abonnements</a>
+</tr>
+}>
+</tbody></table>
+
+<{client&template=
+<div class="modal hide fade" id="nodes<@id@>">
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">�</button><h3>Abonnements de <@name@></h3></div>
+<div class="modal-body">
+<table class="table table-condensed table-striped"><thead>
+<tr><th>ID</th><th>Localité</th><th>Arrêt</th><th colspan="2">Ligne</th><th>Direction</th></tr></thead><tbody>
+<{subscription&template=<tr><td><@id@></td> <{stop_area&template=<td><@city_name@></td><td><@name@></td>}> <{line&template=<td><@shortName@></td><td><@name@></td>}><th><@direction_filter@></th><th><@time_span@></th><th><@hysteresis@></th></tr>}>
+</tbody></table>
+</div>
+<div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-primary">Fermer</a></div>
+</div>
+}>
+
+?>
+
+
+</div>
+</div>
