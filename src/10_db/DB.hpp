@@ -152,8 +152,6 @@ namespace synthese
 			virtual void initForStandaloneUse() = 0;
 			virtual void preInit();
 			virtual void init();
-			virtual void initPreparedStatements() = 0;
-			virtual void removePreparedStatements() = 0;
 			
 			
 			//////////////////////////////////////////////////////////////////////////

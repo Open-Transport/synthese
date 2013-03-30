@@ -61,8 +61,9 @@ namespace synthese
 			ConcurrentQueue<DBModifEvent> _modifEventQueue;
 			boost::shared_ptr<boost::thread> _modifEventsThread;
 
-			static std::vector<MYSQL_STMT*> _replaceStatements;
-			static std::vector<MYSQL_STMT*> _deleteStatements;
+			typedef std::vector<MYSQL_STMT*> PreparedStatements;
+			mutable PreparedStatements _replaceStatements;
+			mutable PreparedStatements _deleteStatements;
 
 			class DBRecordCellBindConvertor:
 				public boost::static_visitor<>
@@ -114,8 +115,6 @@ namespace synthese
 			virtual void initForStandaloneUse();
 			virtual void preInit();
 			virtual void init();
-			virtual void initPreparedStatements();
-			virtual void removePreparedStatements();
 			virtual void saveRecord(
 				const DBRecord& record
 			);
@@ -156,6 +155,9 @@ namespace synthese
 #endif
 		private:
 
+			void _initPreparedStatements() const;
+			MYSQL_STMT* _getReplaceStatement(util::RegistryTableType tableId) const;
+			MYSQL_STMT* _getDeleteStatement(util::RegistryTableType tableId) const;
 			void _initConnection(bool initTriggerMetadata = true);
 			void _initTriggerMetadata();
 			//////////////////////////////////////////////////////////////////////////

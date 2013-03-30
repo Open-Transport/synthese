@@ -54,11 +54,6 @@ namespace synthese
 
 	namespace db
 	{
-		SQLiteDB::ReplaceStatements SQLiteDB::_replaceStatements;
-		SQLiteDB::DeleteStatements SQLiteDB::_deleteStatements;
-
-
-
 		void cleanupTSS(SQLiteTSS* tss)
 		{
 			// FIXME: tss is sometimes null on Windows during unit tests. Needs to be investigated.
@@ -67,7 +62,21 @@ namespace synthese
 				Log::GetInstance().warn("tss is null, not calling sqlite3_close");
 				return;
 			}
+
+			// Finalize the prepared statements
+			BOOST_FOREACH(sqlite3_stmt* stmt, tss->replaceStatements)
+			{
+				sqlite3_finalize(stmt);
+			}
+			BOOST_FOREACH(sqlite3_stmt* stmt, tss->deleteStatements)
+			{
+				sqlite3_finalize(stmt);
+			}
+
+			// Closing the SQLite "connection"
 			SQLiteDB::_ThrowIfError(tss->handle, sqlite3_close(tss->handle), "Cannot close SQLite handle");
+
+			// Memory clean
 			delete tss;
 		}
 
@@ -175,6 +184,8 @@ namespace synthese
 #endif
 
 				tss->handle = handle;
+
+
 
 				_tss.reset(tss);
 			}
@@ -548,13 +559,23 @@ namespace synthese
 
 
 
-		void SQLiteDB::initPreparedStatements(
-		){
-			// Thread specific statements
-			ReplaceStatements::mapped_type& replaceStatements(_replaceStatements[this_thread::get_id()]);
-			DeleteStatements::mapped_type& deleteStatements(_deleteStatements[this_thread::get_id()]);
-
+		//////////////////////////////////////////////////////////////////////////
+		/// Creation of the replace and delete prepared statements.
+		/// They are stored in thread specific storage, because they are thread-
+		/// specific (use of the SQLite handle associated to the current thread)
+		void SQLiteDB::_initPreparedStatements(
+		) const {
 			if(DBModule::GetTablesById().empty())
+			{
+				return;
+			}
+
+			// Thread specific statements
+			PreparedStatements& replaceStatements(_getSQLiteTSS()->replaceStatements);
+			PreparedStatements& deleteStatements(_getSQLiteTSS()->deleteStatements);
+
+			// Prepared statements are already initialized
+			if(!replaceStatements.empty())
 			{
 				return;
 			}
@@ -563,9 +584,7 @@ namespace synthese
 			size_t tablesNumber(
 				DBModule::GetTablesById().rbegin()->first + 1
 			);
-			replaceStatements.clear();
 			replaceStatements.resize(tablesNumber, NULL);
-			deleteStatements.clear();
 			deleteStatements.resize(tablesNumber, NULL);
 
 			// Loop on tables
@@ -635,8 +654,27 @@ namespace synthese
 #endif
 			_initSQLiteTSS();
 
-			RequestExecutor rx(*this);
-			rx(record);
+			// Auto increment update
+			RegistryKeyType objectId(
+				boost::get<RegistryKeyType>(record.getContent().at(0))
+			);
+			record.getTable()->updateAutoIncrement(objectId);
+
+			size_t fieldsNumber(record.getTable()->getFieldsList().size());
+			sqlite3_stmt* stmt(_getReplaceStatement(record.getTable()->getFormat().ID));
+			for(size_t i(0); i<fieldsNumber; ++i)
+			{
+				DBRecordCellBindConvertor visitor(*stmt, i+1);
+				apply_visitor(visitor, record.getContent().at(i));
+			}
+
+			int retc = sqlite3_step(stmt);
+
+			_ThrowIfError(_getHandle(), retc, "Error executing prepared statement");
+
+			retc = sqlite3_reset(stmt);
+
+			_ThrowIfError(_getHandle(), retc, "Error resetting prepared statement");
 
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			_recordDBModifEvents(tss->events);
@@ -646,8 +684,7 @@ namespace synthese
 
 		void SQLiteDB::deleteRow( util::RegistryKeyType id )
 		{
-			DeleteStatements::mapped_type& deleteStatements(_deleteStatements[this_thread::get_id()]);
-			sqlite3_stmt* stmt(deleteStatements[decodeTableId(id)]);
+			sqlite3_stmt* stmt(_getDeleteStatement(decodeTableId(id)));
 			DBRecordCellBindConvertor visitor(*stmt, 1);
 			visitor(id);
 
@@ -662,22 +699,26 @@ namespace synthese
 
 
 
-		void SQLiteDB::removePreparedStatements()
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the replace prepared statement available for the current thread.
+		/// @param the id of the table on which the request replaces elements
+		/// @return the replace prepared statement
+		sqlite3_stmt* SQLiteDB::_getReplaceStatement( util::RegistryTableType tableId ) const
 		{
-			// Finalize the prepared statements before removing them
-			// Loop on statements
-			ReplaceStatements::mapped_type& replaceStatements(_replaceStatements[this_thread::get_id()]);
-			BOOST_FOREACH(sqlite3_stmt* stmt, replaceStatements)
-			{
-				sqlite3_finalize(stmt);
-			}
-			DeleteStatements::mapped_type& deleteStatements(_deleteStatements[this_thread::get_id()]);
-			BOOST_FOREACH(sqlite3_stmt* stmt, deleteStatements)
-			{
-				sqlite3_finalize(stmt);
-			}
-			_replaceStatements.erase(this_thread::get_id());
-			_deleteStatements.erase(this_thread::get_id());
+			_initPreparedStatements();
+			return _getSQLiteTSS()->replaceStatements[tableId];
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the delete prepared statement available for the current thread.
+		/// @param the id of the table on which the request deletes elements
+		/// @return the delete prepared statement
+		sqlite3_stmt* SQLiteDB::_getDeleteStatement( util::RegistryTableType tableId ) const
+		{
+			_initPreparedStatements();
+			return _getSQLiteTSS()->deleteStatements[tableId];
 		}
 
 
@@ -802,34 +843,7 @@ namespace synthese
 
 		void SQLiteDB::RequestExecutor::operator()( const DBRecord& record )
 		{
-			// Auto increment update
-			RegistryKeyType objectId(
-				boost::get<RegistryKeyType>(record.getContent().at(0))
-			);
-			record.getTable()->updateAutoIncrement(objectId);
-
-			size_t fieldsNumber(record.getTable()->getFieldsList().size());
-			ReplaceStatements::iterator it(_replaceStatements.find(this_thread::get_id()));
-			assert(it != _replaceStatements.end());
-			if(it == _replaceStatements.end())
-			{
-				return;
-			}
-			ReplaceStatements::mapped_type& replaceStatements(it->second);
-			sqlite3_stmt* stmt(replaceStatements[record.getTable()->getFormat().ID]);
-			for(size_t i(0); i<fieldsNumber; ++i)
-			{
-				DBRecordCellBindConvertor visitor(*stmt, i+1);
-				apply_visitor(visitor, record.getContent().at(i));
-			}
-
-			int retc = sqlite3_step(stmt);
-
-			_ThrowIfError(_db._getHandle(), retc, "Error executing prepared statement");
-
-			retc = sqlite3_reset(stmt);
-
-			_ThrowIfError(_db._getHandle(), retc, "Error resetting prepared statement");
+			_db.saveRecord(record);
 		}
 
 
