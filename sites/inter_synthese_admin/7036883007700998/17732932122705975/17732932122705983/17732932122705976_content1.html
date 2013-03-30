@@ -1,0 +1,68 @@
+<@tabs["properties"]=Propriétés@>
+<@tabs["queue"]=Queue@>
+<@tabs["links"]=Liens@>
+<@tab=<@tab?tab:"properties"@>@>
+
+<?inter_synthese_slaves_view&template=<{slave&template=<?if&cond=<@id==roid@>&then=
+
+<h1>Esclave <@name?(name+" ("+address+")"):address@></h1>
+
+<ul class="nav nav-tabs"><{tabs&template=
+ <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
+}></ul>
+
+<div class="tab-content">
+<div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
+
+<?form&
+  name=properties&
+  slave_id=<@slave_id@>&
+  page_id=<@p@>&
+  a=ObjectUpdate&
+  actionParam_object_id=<@slave_id@>
+?>
+ <table class="table table-striped table-condensed">
+ <tr><td>ID</td><td><@id@></td></tr>
+ <tr><td>Nom</td><td><input type="text" name="actionParam_field_name" value="<@name@>" /></td></tr>
+ <tr><td>Adresse</td><td><input type="text" name="actionParam_field_address" value="<@address@>" /></td></tr>
+ <tr><td>Port</td><td><input type="text" name="actionParam_field_port" value="<@port@>" /></td></tr>
+ <tr><td>Actif</td><td><input type="text" name="actionParam_field_active" value="<@active@>" /></td></tr>
+ <tr><td>Configuration</td>  <td><select name="actionParam_field_config_id" /><?inter_synthese_configs&template=
+  <{config&template=<option value="<@id@>" <@(config_id==id)?" selected=\"true\"":""@>><@name@></option>}>?></select></td>
+</tr>
+ <tr><td></td><td><button class="btn btn-warning" type="submit">OK</button></td></tr>
+</table>
+</form>
+
+</div><div class="tab-pane <@(tab=="queue")?"active":""@>" id="queue">
+
+<div class="well">Dernier accès : <@last_activity_report@></div>
+
+<table class="table table-striped table-condensed"><thead>
+ <tr><th>Rang</th><th>Heure</th><th>Type</th><th>Contenu</th></tr>
+</thead><tbody>
+ <{queue_item&template=
+ 	<?if&cond=<@rank<50@>&then=
+		<tr>
+		<td><@rank@></td>
+		<td><?substr&t=<@request_time@>&n=19?></td>
+		<td><@sync_type@></td>
+		<td><?substr&t=<@content@>&n=100?></td>
+		</tr>
+	 ?><?if&cond=<@rank==50@>&then=
+		<tr><td>...</td></tr>
+	 ?>
+ }>
+</tbody></table>
+
+</div><div class="tab-pane <@(tab=="links")?"active":""@>" id="links">
+
+<div class="well">
+<p><a href="http://<@address@><@port?(":"+port):""@>/admin" target="_new" class="btn btn-primary">Administration SYNTHESE</a></p>
+<p><a href="http://<@address@><@port?(":"+port):""@>/inter_synthese_admin" target="_new" class="btn btn-primary">Administration Inter-SYNTHESE</a></p>
+</div>
+
+
+</div></div>
+
+?>}>?>

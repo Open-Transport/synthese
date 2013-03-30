@@ -1,76 +1,8 @@
-<html>
-<body>
-<h1>Maitre</h1>
-
-
-<table>
-<tr><th>host</th><th>port</th><th>active</th><th>config</th><th></th></tr>
-<?inter_synthese_slaves_view&template=
-
-<{slave&template=
-<tr>
-<td><@address@></td>
-<td><@port@></td>
-<td><@active@></td>
-<td><@config_id@></td>
-<td><?link&target=17732932122705976&text=Detail&slave_id=<@id@>?></td>
-</tr>
-}>
-?>
-
-<?form&name=new_slave&page_id=<@p@>&a=ObjectCreate&actionParam_table_id=93?>
-<tr>
-
-<td><input name="actionParam_field_address" /></td>
-<td><input name="actionParam_field_port" /></td>
-<td><input name="actionParam_field_active" /></td>
-<td><input name="actionParam_field_config" /></td>
-<td><input type="submit" value="OK" /></td>
-
-</tr>
-</form>
-
-</table>
-
-
-<h1>Esclave</h1>
-
-<table>
-<tr><td>Adresse maître</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_master_host&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_master_host")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>Port maître</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_master_port&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_master_port")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>Attente entre les cycles</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_waiting_time&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_waiting_time")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>ID esclave</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_slave_id&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_slave_id")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>Actif</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_active&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_active")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-</table>
-
-<h1>Configurations</h1>
-
-<?form&page_id=<@p@>&name=add_config&a=ObjectCreate&actionParam_table_id=94?>
-<table>
-<tr><th>ID</th><th>Nom</th><th>Force Dump</th><th></th></tr>
-
-<?inter_synthese_configs&template=
-<{config&template=
-<tr>
-<td><@id@></td>
-<td><@name@></td>
-<td><@force_dump@></td>
-<td><?link&target=17732932122705977&config_id=<@id@>&text=Ouvrir?>
-</tr>
+<div class="page-header"><h1>Bienvenue sur l'administration de la synchronisation Inter-SYNTHESE</h1></div>
+<?menu&raw_data=1&template=<{page&template=
+<div class="span4 well">
+<h1><@title@></h1>
+<p><@abstract@></p>
+<?link&target=<@id@>&text=Ouvrir&class=btn btn-primary?>
+</div>
 }>?>
-
-
-<tr>
-<td></td>
-<td><input name="actionParam_field_name" /></td>
-<td><input type="submit" value="OK" /></td>
-</tr>
-</form>
-
-
-</table>
