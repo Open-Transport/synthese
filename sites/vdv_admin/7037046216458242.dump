@@ -1,0 +1,9 @@
+t025_sites(cient_url,default_page_template_id,end_date,host_name,id,name,start_date,svn_url)
+"/vdv_admin",
+"17733095331463181",
+"",
+"",
+"7037046216458242",
+"VDV Admin",
+"",
+"https://extranet.rcsmobility.com/svn/synthese3/trunk/sites/vdv_admin"
