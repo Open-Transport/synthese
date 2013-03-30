@@ -244,8 +244,6 @@ namespace synthese
 						_env.addRegistrable(rObject);
 					}
 					shared_ptr<ObjectBase> object(dynamic_pointer_cast<ObjectBase, Registrable>(rObject));
-					object->loadFromRecord(map, _env);
-					directTableSync.saveRegistrable(*rObject, transaction);
 
 
 					//////////////////////////////////////////////////////////////////////////
@@ -258,6 +256,12 @@ namespace synthese
 					){
 						subObjects = _import(subDirPath, transaction);
 					}
+
+					// Load properties of the current object
+					// Placed after the load of the sub objects to prevent bad link
+					// in case of link to a sub object
+					object->loadFromRecord(map, _env);
+					directTableSync.saveRegistrable(*rObject, transaction);
 
 					// Deletions
 					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
