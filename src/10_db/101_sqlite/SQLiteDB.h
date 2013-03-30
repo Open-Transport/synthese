@@ -40,13 +40,17 @@ namespace synthese
 		class DBRecord;
 		class DBTableSync;
 
-		typedef struct
+		typedef std::vector<sqlite3_stmt*> PreparedStatements;
+
+		struct SQLiteTSS
 		{
 			sqlite3* handle;
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			std::vector<DB::DBModifEvent> events;
 #endif
-		} SQLiteTSS;
+			PreparedStatements replaceStatements;
+			PreparedStatements deleteStatements;
+		};
 
 		//////////////////////////////////////////////////////////////////////////
 		/// SQLite database backend.
@@ -64,10 +68,6 @@ namespace synthese
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			boost::recursive_mutex _updateMutex;
 #endif
-			typedef std::map<boost::thread::id, std::vector<sqlite3_stmt*> > ReplaceStatements; 
-			static ReplaceStatements _replaceStatements;
-			typedef std::map<boost::thread::id, std::vector<sqlite3_stmt*> > DeleteStatements;
-			static DeleteStatements _deleteStatements;
 
 			class DBRecordCellBindConvertor:
 				public boost::static_visitor<>
@@ -120,8 +120,6 @@ namespace synthese
 
 			virtual void initForStandaloneUse();
 			virtual void preInit();
-			virtual void initPreparedStatements();
-			virtual void removePreparedStatements();
 			virtual void saveRecord(
 				const DBRecord& record
 			);
@@ -146,17 +144,20 @@ namespace synthese
 			virtual const std::string getSQLDateFormat(const std::string& format, const std::string& expr);
 			virtual const std::string getSQLConvertInteger(const std::string& expr);
 			virtual bool isBackend(Backend backend);
-
+			
 		protected:
 
 			virtual void _doExecUpdate(const SQLData& sql);
 
 		private:
+			void _initPreparedStatements() const;
+			sqlite3_stmt* _getReplaceStatement(util::RegistryTableType tableId) const;
+			sqlite3_stmt* _getDeleteStatement(util::RegistryTableType tableId) const;
+			sqlite3* _getHandle() const;
 			static void _ThrowIfError(sqlite3* handle, int retCode, const std::string& message);
 			SQLiteTSS* _getSQLiteTSS() const;
 			SQLiteTSS* _initSQLiteTSS() const;
-			sqlite3* _getHandle() const;
-
+			
 			friend class SQLiteResult;
 			friend void cleanupTSS(SQLiteTSS* tss);
 		};
