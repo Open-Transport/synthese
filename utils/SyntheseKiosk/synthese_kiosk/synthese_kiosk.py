@@ -694,8 +694,6 @@ class KioskConfig(object):
 
         try:
             self._config = (json.load(open(config_file)))
-            print "reload"
-            print previous_config == self._config
             return (True, previous_config != self._config)
         except Exception, e:
             log.error("Failed to load json config file '%s': %s", config_file, e)
