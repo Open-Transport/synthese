@@ -1,96 +1,79 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>Interface inter_synthèse</title>
+<title>Configuration</title>
 
 </head>
 <body>
+
 <div class="navbar navbar-inverse navbar-fixed-top">      
 	<div class="navbar-inner">
-        <div class="container-fluid"><a class="brand" href="/inter_synthese_admin">Interface inter_synthèse</a>
-	<div class="nav-collapse">
+        <div class="container-fluid"><a class="brand" href="/inter_synthese_admin">Interface inter_synthèse</a>	<div class="nav-collapse">
 	  <ul class="nav">
-		<li class="active"><a href="" title="">Accueil</a></li>
+		<li class="active"><a href="/inter_synthese_admin" title="">Accueil</a></li>
 	  </ul>
+	</div></div>
 	</div>
 </div>
-	</div>
-</div>
-<div class="container-fluid" style=" width: 50%;">	
-<h2 style="margin-top: 60px;">Maître</h2>
-
-
-<table class="table table-striped">
-<tr><th>host</th><th>port</th><th>active</th><th>config</th><th></th></tr>
+<div class="container-fluid" style=" width: 50%;">
 <?inter_synthese_slaves_view&template=
-
 <{slave&template=
-<tr>
-<td><@address@></td>
-<td><@port@></td>
-<td><@active@></td>
-<td><@config_id@></td>
-<td><?link&class=btn btn-mini btn-warning&target=17732932122705976&text=Detail&slave_id=<@id@>?></td>
-</tr>
-}>
-?>
+<?if&cond=<@id==slave_id@>&then=
 
-<?form&name=new_slave&page_id=<@p@>&a=ObjectCreate&actionParam_table_id=93?>
-<tr>
+<h2 style="margin-top: 60px;">Propriétés</h2>
 
-<td><input name="actionParam_field_address" /></td>
-<td><input name="actionParam_field_port" /></td>
-<td><input name="actionParam_field_active" /></td>
-<td><input name="actionParam_field_config" /></td>
-<td><input type="submit" value="OK" /></td>
+<?form&name=properties&slave_id=<@slave_id@>&page_id=<@p@>&a=ObjectUpdate&actionParam_object_id=<@slave_id@>?>
+<table>
 
-</tr>
+<tr><td>ID</td><td><@id@></td></tr>
+
+<tr><td>Address</td><td><input name="actionParam_field_address" value="<@address@>" /></td></tr>
+
+<tr><td>Port</td><td><input name="actionParam_field_port" value="<@port@>" /></td></tr>
+
+<tr><td>Active</td><td><input name="actionParam_field_active" value="<@active@>" /></td></tr>
+
+<tr><td>Config</td><td><input name="actionParam_field_config_id" value="<@config_id@>" /></td></tr>
+
+<tr><td>Dernier accès</td><td><input name="actionParam_field_last_activity_report" value="<@last_activity_report@>" /></td></tr>
+
+<tr><td></td><td><input type="submit" value="OK" /></td></tr>
+</table>
 </form>
 
-</table>
-
-
-<h1>Esclave</h1>
+<h2>Queue</h2>
 
 <table>
-<tr><td>Adresse maître</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_master_host&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_master_host")@>" /><input type="submit" value="OK" /></form></td></tr>
+<tr>
+<th>Rang</th><th>Heure</th><th>Type</th><th>Contenu</th>
+</tr>
 
-<tr><td>Port maître</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_master_port&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_master_port")@>" /><input type="submit" value="OK" /></form></td></tr>
+<{queue_item&template=
+<?if&cond=<@rank<50@>&then=
 
-<tr><td>Attente entre les cycles</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_waiting_time&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_waiting_time")@>" /><input type="submit" value="OK" /></form></td></tr>
+<tr>
+<td><@rank@></td>
+<td><?substr&t=<@request_time@>&n=19?></td>
+<td><@sync_type@></td>
+<td><?substr&t=<@content@>&n=100?></td>
+</tr>
+?>
+<?if&cond=<@rank==50@>&then=
 
-<tr><td>ID esclave</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_slave_id&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_slave_id")@>" /><input type="submit" value="OK" /></form></td></tr>
+<tr><td>...</td></tr>
 
-<tr><td>Actif</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_active&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_active")@>" /><input type="submit" value="OK" /></form></td></tr>
+?>
+
+}>
 
 </table>
 
-<h2>Configurations</h2>
-
-<?form&page_id=<@p@>&name=add_config&a=ObjectCreate&actionParam_table_id=94?>
-<table class="table table-striped">
-<tr><th>ID</th><th>Nom</th><th></th></tr>
-
-<?inter_synthese_configs&template=
-<{config&template=
-<tr>
-<td><@id@></td>
-<td><@name@></td>
-<td><?link&class=btn btn-mini btn-warning&target=17732932122705977&config_id=<@id@>&text=Ouvrir?>
-</tr>
-}>?>
 
 
-<tr>
-<td></td>
-<td><input name="actionParam_field_name" /></td>
-<td><input type="submit" value="OK" /></td>
-</tr>
+?>}>?>
 
 
-
-</table></form></div>
-
+</div>
 <style>
 .clearfix {
   *zoom: 1;
@@ -6242,6 +6225,5 @@ a.badge:focus {
 }
 
 </style>
-</body>
 
-</html>
+</body></html>
