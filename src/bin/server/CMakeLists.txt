@@ -31,8 +31,7 @@ include_directories(${EXPAT_INCLUDE_DIRS})
 add_executable(s3-server main.cpp)
 
 # To prevent "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
-# (seems to be useless)
-# set_target_properties(s3-server PROPERTIES LINK_FLAGS "/INCREMENTAL:NO")
+set_target_properties(s3-server PROPERTIES LINK_FLAGS "/INCREMENTAL:NO")
 
 foreach(module ${MODULES})
   # Don't include submodules
