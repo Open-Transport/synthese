@@ -22,6 +22,8 @@
 
 #include "CoordinatesSystem.hpp"
 
+#include "SchemaMacros.hpp"
+
 #include <geos/geom/Point.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
@@ -36,6 +38,8 @@ using namespace geos::algorithm;
 
 namespace synthese
 {
+	FIELD_DEFINITION_OF_TYPE(CoordinatesSystem, "srid", SQL_INTEGER)
+
 	const string CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM("instance_coordinates_system");
 	const CoordinatesSystem* CoordinatesSystem::_instanceCoordinatesSystem(NULL);
 	const CoordinatesSystem* CoordinatesSystem::_storageCoordinatesSystem(NULL);
@@ -146,6 +150,119 @@ namespace synthese
 			result.insert(make_pair(it.first, lexical_cast<string>(it.first) +" "+ it.second->getName()));
 		}
 		return result;
+	}
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	/// Conversion of a string into a coordinate system pointer.
+	/// @param text the text to convert
+	/// @return the pointer
+	CoordinatesSystem::Type CoordinatesSystem::_stringToPointer( const std::string& text )
+	{
+		return text.empty() ?
+			NULL :
+			&GetCoordinatesSystem(lexical_cast<SRID>(text))
+		;
+	}
+
+
+
+	void CoordinatesSystem::LoadFromRecord(
+		CoordinatesSystem::Type& fieldObject,
+		ObjectBase& object,
+		const Record& record,
+		const util::Env& env
+	){
+		SimpleObjectFieldDefinition<CoordinatesSystem>::_LoadFromStringWithDefaultValue(
+			fieldObject,
+			record,
+			_stringToPointer,
+			Type(NULL)
+		);
+	}
+
+
+
+	void CoordinatesSystem::SaveToFilesMap(
+		const Type& fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
+		SimpleObjectFieldDefinition<CoordinatesSystem>::_SaveToFilesMap(
+			fieldObject,
+			map,
+			_pointerToString
+		);
+	}
+
+
+
+	std::string CoordinatesSystem::_pointerToString( const CoordinatesSystem::Type& value )
+	{
+		if(value == NULL)
+		{
+			return string();
+		}
+		return lexical_cast<string>(value->getSRID());
+	}
+
+
+
+	void CoordinatesSystem::SaveToParametersMap(
+		const Type& fieldObject, util::ParametersMap& map, const std::string& prefix, boost::logic::tribool withFiles )
+	{
+		SimpleObjectFieldDefinition<CoordinatesSystem>::_SaveToParametersMap(
+			fieldObject,
+			map,
+			prefix,
+			withFiles,
+			_pointerToString
+		);
+	}
+
+
+
+	void CoordinatesSystem::SaveToParametersMap(
+		const Type& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix, boost::logic::tribool withFiles )
+	{
+		SimpleObjectFieldDefinition<CoordinatesSystem>::_SaveToParametersMap(
+			fieldObject,
+			map,
+			prefix,
+			withFiles,
+			_pointerToString
+		);
+	}
+
+
+
+	void CoordinatesSystem::SaveToDBContent( const Type& fieldObject, const ObjectBase& object, DBContent& content )
+	{
+		SaveToDBContent(fieldObject, content);
+	}
+
+
+
+	void CoordinatesSystem::SaveToDBContent( const Type& fieldObject, DBContent& content )
+	{
+		if(fieldObject == NULL)
+		{
+			boost::optional<std::string> emptyString;
+			content.push_back(Cell(emptyString));
+		}
+		else
+		{
+			int i(static_cast<int>(fieldObject->getSRID()));
+			content.push_back(Cell(i));
+		}
+	}
+
+
+
+	void CoordinatesSystem::GetLinkedObjectsIds( LinkedObjectsIds& list, const Record& record )
+	{
+
 	}
 
 

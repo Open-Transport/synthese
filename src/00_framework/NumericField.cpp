@@ -28,5 +28,6 @@ namespace synthese
 {
 	FIELD_DEFINITION_OF_TYPE(Key, "id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(Rank, "rank", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Active, "active", SQL_BOOLEAN)
 }
 

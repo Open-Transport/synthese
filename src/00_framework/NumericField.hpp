@@ -139,6 +139,7 @@ namespace synthese
 
 	FIELD_ID(Key)
 	FIELD_SIZE_T(Rank)
+	FIELD_BOOL(Active)
 }
 
 #endif

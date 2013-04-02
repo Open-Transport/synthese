@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_geography_CoordinatesSystem_hpp__
-#define SYNTHESE_geography_CoordinatesSystem_hpp__
+#ifndef SYNTHESE_CoordinatesSystem_hpp__
+#define SYNTHESE_CoordinatesSystem_hpp__
 
 #include "Exception.h"
+#include "FrameworkTypes.hpp"
+#include "SimpleObjectFieldDefinition.hpp"
 
 #include <string>
 #include <map>
@@ -36,15 +38,25 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
+	class ObjectBase;
+
 	/** CoordinatesSystem class.
 		@ingroup m00
 		@author Hugues Romain
 		@since 3.2.0
 		@date 2010
 	*/
-	class CoordinatesSystem
+	class CoordinatesSystem:
+		public SimpleObjectFieldDefinition<CoordinatesSystem>
 	{
 	public:
+		typedef const CoordinatesSystem* Type;
+
 		typedef unsigned int SRID;
 
 
@@ -214,7 +226,72 @@ namespace synthese
 			typedef std::map<boost::optional<SRID>, std::string> CoordinatesSystemsTextMap;
 			static CoordinatesSystemsTextMap GetCoordinatesSystemsTextMap();
 		//@}
+
+		/// @name Field methods
+		//@{
+			static CoordinatesSystem::Type _stringToPointer(const std::string& text);
+			static std::string _pointerToString(const CoordinatesSystem::Type& value);
+
+
+
+			static void LoadFromRecord(
+				CoordinatesSystem::Type& fieldObject,
+				ObjectBase& object,
+				const Record& record,
+				const util::Env& env
+			);
+
+
+
+
+			static void SaveToFilesMap(
+				const CoordinatesSystem::Type& fieldObject,
+				const ObjectBase& object,
+				FilesMap& map
+			);
+
+
+
+			static void SaveToParametersMap(
+				const CoordinatesSystem::Type& fieldObject,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			);
+
+
+
+			static void SaveToParametersMap(
+				const CoordinatesSystem::Type& fieldObject,
+				const ObjectBase& object,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			);
+
+
+
+			static void SaveToDBContent(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				DBContent& content
+			);
+
+
+
+			static void SaveToDBContent(
+				const Type& fieldObject,
+				DBContent& content
+			);
+
+
+
+			static void GetLinkedObjectsIds(
+				LinkedObjectsIds& list, 
+				const Record& record
+			);
+		//@}
 	};
 }
 
-#endif // SYNTHESE_geography_CoordinatesSystem_hpp__
+#endif // SYNTHESE_CoordinatesSystem_hpp__
