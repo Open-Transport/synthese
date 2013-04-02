@@ -46,7 +46,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ServerAddress, "address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServerPort, "port", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(LastActivityReport, "last_activity_report", SQL_DATETIME)
-	FIELD_DEFINITION_OF_TYPE(Active, "active", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(inter_synthese::Active, "active", SQL_BOOLEAN)
 
 	namespace inter_synthese
 	{
@@ -65,7 +65,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(ServerPort, "8080"),
 					FIELD_VALUE_CONSTRUCTOR(LastActivityReport, posix_time::not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
-					FIELD_VALUE_CONSTRUCTOR(Active, false)
+					FIELD_VALUE_CONSTRUCTOR(inter_synthese::Active, false)
 			)	),
 			_lastSentRange(make_pair(_queue.end(), _queue.end()))
 		{
