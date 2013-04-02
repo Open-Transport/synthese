@@ -1,96 +1,96 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>Interface inter_synthèse</title>
+<title>Configuration</title>
 
 </head>
 <body>
+
 <div class="navbar navbar-inverse navbar-fixed-top">      
 	<div class="navbar-inner">
-        <div class="container-fluid"><a class="brand" href="/inter_synthese_admin">Interface inter_synthèse</a>
-	<div class="nav-collapse">
+        <div class="container-fluid"><a class="brand" href="/inter_synthese_admin">Interface inter_synthèse</a>	<div class="nav-collapse">
 	  <ul class="nav">
-		<li class="active"><a href="" title="">Accueil</a></li>
+		<li class="active"><a href="/inter_synthese_admin" title="">Accueil</a></li>
 	  </ul>
+	</div></div>
 	</div>
 </div>
-	</div>
-</div>
-<div class="container-fluid" style=" width: 50%;">	
-<h2 style="margin-top: 60px;">Maître</h2>
+<div class="container-fluid" style=" width: 50%;">
+<?inter_synthese_configs&template=
+<{config&template=<?if&cond=<@id==config_id@>&then=
 
+<h2 style="margin-top: 60px;">Propriétés</h2>
 
+<?form&name=properties&page_id=<@p@>&a=ObjectUpdate&actionParam_object_id=<@config_id@>&config_id=<@config_id@>?>
 <table class="table table-striped">
-<tr><th>host</th><th>port</th><th>active</th><th>config</th><th></th></tr>
-<?inter_synthese_slaves_view&template=
-
-<{slave&template=
-<tr>
-<td><@address@></td>
-<td><@port@></td>
-<td><@active@></td>
-<td><@config_id@></td>
-<td><?link&class=btn btn-mini btn-warning&target=17732932122705976&text=Detail&slave_id=<@id@>?></td>
-</tr>
-}>
-?>
-
-<?form&name=new_slave&page_id=<@p@>&a=ObjectCreate&actionParam_table_id=93?>
-<tr>
-
-<td><input name="actionParam_field_address" /></td>
-<td><input name="actionParam_field_port" /></td>
-<td><input name="actionParam_field_active" /></td>
-<td><input name="actionParam_field_config" /></td>
-<td><input type="submit" value="OK" /></td>
-
-</tr>
+<tr><td>ID</td><td><@id@></td></tr>
+<tr><td>Nom</td><td><input name="actionParam_field_name" value="<@name@>" /></td></tr>
+<tr><td></td><td><input type="submit" value="OK" /></td></tr>
+</table>
 </form>
 
-</table>
+<h2>Règles</h2>
 
-
-<h1>Esclave</h1>
-
-<table>
-<tr><td>Adresse maître</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_master_host&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_master_host")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>Port maître</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_master_port&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_master_port")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>Attente entre les cycles</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_waiting_time&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_waiting_time")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>ID esclave</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_slave_id&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_slave_id")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-<tr><td>Actif</td><td><?form&page_id=<@p@>&name=master&a=global_variable_update&actionParam_variable=inter_synthese_active&actionParam_persistent=0?><input name="actionParam_value" value="<@~global("inter_synthese_active")@>" /><input type="submit" value="OK" /></form></td></tr>
-
-</table>
-
-<h2>Configurations</h2>
-
-<?form&page_id=<@p@>&name=add_config&a=ObjectCreate&actionParam_table_id=94?>
 <table class="table table-striped">
-<tr><th>ID</th><th>Nom</th><th></th></tr>
+<tr><th>Type</th><th>Paramètres</th><th></th></tr>
 
-<?inter_synthese_configs&template=
-<{config&template=
+<{item&template=
+
 <tr>
-<td><@id@></td>
-<td><@name@></td>
-<td><?link&class=btn btn-mini btn-warning&target=17732932122705977&config_id=<@id@>&text=Ouvrir?>
+<td><@sync_type@></td>
+<td>
+<?if&cond=<@sync_type=="db"@>&then=
+<?tables&template=<{table&template=<@(id==perimeter)?name:""@>}>?>
+&else=
+<@perimeter@>?></td>
+<td><?link&target=<@p@>&a=RemoveObjectAction&actionParamoi=<@id@>&text=Supprimer&config_id=<@config_id@>?></td>
 </tr>
-}>?>
+}>
 
+<?form&page_id=<@p@>&name=add_item&a=ObjectCreate&actionParam_table_id=95&actionParam_field_config_id=<@id@>&config_id=<@config_id@>?>
 
 <tr>
-<td></td>
-<td><input name="actionParam_field_name" /></td>
+<td><input name="actionParam_field_sync_type" /></td>
+<td><select name="actionParam_field_perimeter">
+<?tables&template=<{table&template=<option value="<@id@>"><@name@></option>}>?>
+</select></td>
 <td><input type="submit" value="OK" /></td>
 </tr>
 
+</form>
+</table>
+
+<h1>Module Temps réel</h1>
+
+<table>
+<tr><th>table</th><th></th></tr>
+
+<{item&template=
+<?if&cond=<@sync_type=="ptrt"@>&then=
+
+<tr>
+<td>
+<?PTNetworksListFunction&template=<{network&template=<@(network_id==perimeter)?name:""@>}>?>
+</td>
+<td><?link&target=<@p@>&a=RemoveObjectAction&actionParamoi=<@id@>&text=Supprimer&config_id=<@config_id@>?></td>
+</tr>
+?>}>
+
+<?form&page_id=<@p@>&name=add_item&a=ObjectCreate&actionParam_table_id=95&actionParam_field_config_id=<@id@>&config_id=<@config_id@>?>
+<input type="hidden" name="actionParam_field_sync_type" value="ptrt" />
+<tr>
+<td><select name="actionParam_field_perimeter">
+<?PTNetworksListFunction&template=<{network&template=<option value="<@network_id@>"><@name@></option>}>?>
+</select></td>
+<td><input type="submit" value="OK" /></td>
+</tr>
+
+</form>
+</table>
 
 
-</table></form></div>
-
+?>}>?>
+</div>
 <style>
 .clearfix {
   *zoom: 1;
@@ -6242,6 +6242,5 @@ a.badge:focus {
 }
 
 </style>
-</body>
 
-</html>
+</body></html>
