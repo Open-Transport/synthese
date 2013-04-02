@@ -36,12 +36,14 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace cms;
 	using namespace util;
 	using namespace server;
 	using namespace security;
 	using namespace html;
 
-	template<> const string util::FactorableTemplate<Function,cms::WebPageLinkFunction>::FACTORY_KEY("link");
+	template<>
+	const string FactorableTemplate<FunctionWithSite<false>, WebPageLinkFunction>::FACTORY_KEY = "link";
 
 	namespace cms
 	{
@@ -56,7 +58,7 @@ namespace synthese
 		ParametersMap WebPageLinkFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			if(_target.get())
+			if(_target)
 			{
 				map.insert(PARAMETER_TARGET, _target->getKey());
 			}
@@ -70,14 +72,35 @@ namespace synthese
 
 		void WebPageLinkFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_target = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_TARGET));
+			// Target
+			string targetStr(map.get<string>(PARAMETER_TARGET));
+			ParametersMap::Trim(targetStr);
+			if(targetStr[0] >= '0' && targetStr[0] <= '9')
+			{	// Page by ID
+				try
+				{
+					RegistryKeyType pageId(lexical_cast<RegistryKeyType>(targetStr));
+					_target = Env::GetOfficialEnv().get<Webpage>(pageId).get();
+				}
+				catch(bad_lexical_cast&)
+				{
+					throw RequestException("Bad cast in page id");
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such web page");
+				}
 			}
-			catch(ObjectNotFoundException<Webpage>&)
-			{
-				throw RequestException("No such web page");
+			else
+			{	// Page by smart URL
+				_target = getSite()->getPageBySmartURL(targetStr);
+				if(!_target)
+				{
+					throw RequestException("No such web page");
+				}
 			}
+
+			
 			optional<string> ot(map.getOptional<string>(PARAMETER_TEXT, false));
 			_text = ot ? *ot : _target->getName();
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
@@ -132,7 +155,7 @@ namespace synthese
 			else
 			{	// Classic URL
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-				openRequest.getFunction()->setPage(_target.get());
+				openRequest.getFunction()->setPage(_target);
 				openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
 				if(!_target->getRoot()->get<ClientURL>().empty())
 				{
@@ -171,8 +194,7 @@ namespace synthese
 
 
 		WebPageLinkFunction::WebPageLinkFunction():
+			_target(NULL),
 			_useSmartURL(true)
-		{
-
-		}
+		{}
 }	}

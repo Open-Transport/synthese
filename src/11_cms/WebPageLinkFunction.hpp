@@ -26,7 +26,8 @@
 #define SYNTHESE_WebPageLinkFunction_H__
 
 #include "FactorableTemplate.h"
-#include "Function.h"
+#include "FunctionWithSite.h"
+
 #include "ParametersMap.h"
 
 namespace synthese
@@ -44,7 +45,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.16
 		class WebPageLinkFunction:
-			public util::FactorableTemplate<server::Function,WebPageLinkFunction>
+			public util::FactorableTemplate<FunctionWithSite<false>,WebPageLinkFunction>
 		{
 		public:
 			static const std::string PARAMETER_TARGET;
@@ -56,7 +57,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const Webpage> _target;
+				const Webpage* _target;
 				std::string _text;
 				bool _useSmartURL;
 				std::string _confirm;

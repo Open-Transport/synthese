@@ -22,9 +22,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "WebPageFormFunction.hpp"
+
 #include "RequestException.h"
 #include "Request.h"
-#include "WebPageFormFunction.hpp"
 #include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
@@ -36,18 +37,21 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace cms;
 	using namespace util;
 	using namespace server;
 	using namespace security;
 	using namespace html;
 
-	template<> const string util::FactorableTemplate<Function,cms::WebPageFormFunction>::FACTORY_KEY("form");
+	template<>
+	const string FactorableTemplate<FunctionWithSite<false>, WebPageFormFunction>::FACTORY_KEY = "form";
 
 	namespace cms
 	{
 		const string WebPageFormFunction::PARAMETER_NAME("name");
 		const string WebPageFormFunction::PARAMETER_FORM_ID("form_id");
 		const string WebPageFormFunction::PARAMETER_PAGE_ID("page_id");
+		const string WebPageFormFunction::PARAMETER_TARGET = "target";
 		const string WebPageFormFunction::PARAMETER_SCRIPT("script");
 		const string WebPageFormFunction::PARAMETER_CLASS("class");
 		const string WebPageFormFunction::PARAMETER_IDEM("idem");
@@ -59,9 +63,9 @@ namespace synthese
 			map.insert(PARAMETER_FORM_ID, _formId);
 			map.insert(PARAMETER_SCRIPT, _script);
 			map.insert(PARAMETER_CLASS, _class);
-			if(_page.get())
+			if(_page)
 			{
-				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+				map.insert(PARAMETER_TARGET, _page->getKey());
 			}
 			map.insert(PARAMETER_IDEM, _idem);
 			return map;
@@ -76,15 +80,39 @@ namespace synthese
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
 			_class = map.getDefault<string>(PARAMETER_CLASS);
 			_idem = map.getDefault<bool>(PARAMETER_IDEM, false);
+
+			// Web page target
 			if(!_idem)
 			{
-				try
+				string targetStr(map.getDefault<string>(PARAMETER_TARGET));
+				if(targetStr.empty())
 				{
-					_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+					targetStr = map.getDefault<string>(PARAMETER_PAGE_ID);
 				}
-				catch (ObjectNotFoundException<Webpage>&)
-				{
-					throw RequestException("No such page");
+				ParametersMap::Trim(targetStr);
+				if(targetStr[0] >= '0' && targetStr[0] <= '9')
+				{	// Page by ID
+					try
+					{
+						RegistryKeyType pageId(lexical_cast<RegistryKeyType>(targetStr));
+						_page = Env::GetOfficialEnv().get<Webpage>(pageId).get();
+					}
+					catch(bad_lexical_cast&)
+					{
+						throw RequestException("Bad cast in page id");
+					}
+					catch(ObjectNotFoundException<Webpage>&)
+					{
+						throw RequestException("No such web page");
+					}
+				}
+				else
+				{	// Page by smart URL
+					_page = getSite()->getPageBySmartURL(targetStr);
+					if(!_page)
+					{
+						throw RequestException("No such web page");
+					}
 				}
 			}
 
@@ -96,7 +124,8 @@ namespace synthese
 					item.first == PARAMETER_SCRIPT ||
 					item.first == PARAMETER_CLASS ||
 					item.first == PARAMETER_IDEM ||
-					item.first == PARAMETER_PAGE_ID
+					item.first == PARAMETER_PAGE_ID ||
+					item.first == PARAMETER_TARGET
 				){
 					continue;
 				}
@@ -145,7 +174,7 @@ namespace synthese
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
 					openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
-					openRequest.getFunction()->setPage(_page.get());
+					openRequest.getFunction()->setPage(_page);
 					if(!_page->getRoot()->get<ClientURL>().empty())
 					{
 						openRequest.setClientURL(_page->getRoot()->get<ClientURL>());
