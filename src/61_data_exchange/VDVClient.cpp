@@ -59,7 +59,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ReplyAddress, "reply_address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ReplyPort, "reply_port", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DefaultDirection, "default_direction", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(Active, "active", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(data_exchange::Active, "active", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(SBBMode, "sbb_mode", SQL_BOOLEAN)
 	
 	namespace data_exchange
@@ -82,7 +82,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
-					FIELD_VALUE_CONSTRUCTOR(Active, true),
+					FIELD_VALUE_CONSTRUCTOR(data_exchange::Active, true),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath),
 					FIELD_VALUE_CONSTRUCTOR(SBBMode, false)
 			)	),
