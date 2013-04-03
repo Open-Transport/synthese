@@ -56,6 +56,9 @@ using namespace geos::geom;
 using namespace std;
 
 #define INEO_NCE_SCENARIO_NAME "_IneoNCEConnection_"
+#define INEO_NCE_MESSAGE_ALARM "_IneoNCEConnection_Alarm"
+#define INEO_NCE_MESSAGE_DETOUR1 "_IneoNCEConnection_Detour1"
+#define INEO_NCE_MESSAGE_DETOUR2 "_IneoNCEConnection_Detour2"
 
 namespace synthese
 {
@@ -273,20 +276,38 @@ namespace synthese
 			AlarmTableSync::SearchResult alarms(
 						AlarmTableSync::Search(env, _sentScenario->getKey()
 			)	);
-			if(alarms.size())
+			if(alarms.size() > 0)
 			{
-				_message = dynamic_pointer_cast<SentAlarm>(alarms[0]);
-				_message->setScenario(_sentScenario.get());
-				_message->setLongMessage("");
-				_message->setShortMessage(INEO_NCE_SCENARIO_NAME);
+				_messages[INEO_NCE_MESSAGE_ALARM] = dynamic_pointer_cast<SentAlarm>(alarms[0]);
+				initMessage(INEO_NCE_MESSAGE_ALARM);
 			}
 			else
 			{
-				createMessage();
+				createMessage(INEO_NCE_MESSAGE_ALARM);
+			}
+
+			if(alarms.size() > 1)
+			{
+				_messages[INEO_NCE_MESSAGE_DETOUR1] = dynamic_pointer_cast<SentAlarm>(alarms[1]);
+				initMessage(INEO_NCE_MESSAGE_DETOUR1);
+			}
+			else
+			{
+				createMessage(INEO_NCE_MESSAGE_DETOUR1);
+			}
+
+			if(alarms.size() > 2)
+			{
+				_messages[INEO_NCE_MESSAGE_DETOUR2] = dynamic_pointer_cast<SentAlarm>(alarms[2]);
+				initMessage(INEO_NCE_MESSAGE_DETOUR2);
+			}
+			else
+			{
+				createMessage(INEO_NCE_MESSAGE_DETOUR2);
 			}
 
 			// Remove all the Alarm Links, will create one once we know our line
-			clearScenarioLink();
+			clearScenarioLinks();
 
 			return true;
 		}
@@ -308,29 +329,33 @@ namespace synthese
 			transaction.run();
 		}
 
-		void IneoNCEConnection::createMessage()
+		void IneoNCEConnection::initMessage(const string &messageName)
+		{
+			_messages[messageName]->setScenario(_sentScenario.get());
+			_messages[messageName]->setLongMessage("");
+			_messages[messageName]->setShortMessage(messageName);
+		}
+
+		void IneoNCEConnection::createMessage(const string &messageName)
 		{
 			DBTransaction transaction;
 			Env env(Env::GetOfficialEnv());
-			_message.reset(
-						new SentAlarm(
-						AlarmTableSync::getId()
-							)	);
-			_message->setScenario(_sentScenario.get());
-			_sentScenario->addMessage(*_message);
-			_message->setLongMessage("");
-			_message->setShortMessage(INEO_NCE_SCENARIO_NAME);
-			_message->setLevel(ALARM_LEVEL_WARNING);
-			env.getEditableRegistry<Alarm>().add(_message);
-			AlarmTableSync::Save(_message.get(), transaction);
+			_messages[messageName] = shared_ptr<messages::SentAlarm>(new SentAlarm(AlarmTableSync::getId()));
+			_messages[messageName]->setScenario(_sentScenario.get());
+			_sentScenario->addMessage(*_messages[messageName]);
+			_messages[messageName]->setLongMessage("");
+			_messages[messageName]->setShortMessage(messageName);
+			_messages[messageName]->setLevel(ALARM_LEVEL_WARNING);
+			env.getEditableRegistry<Alarm>().add(_messages[messageName]);
+			AlarmTableSync::Save(_messages[messageName].get(), transaction);
 			transaction.run();
 		}
 
-		void IneoNCEConnection::clearScenarioLink() const
+		void IneoNCEConnection::clearScenarioLink(const string &messageName) const
 		{
 			Env env;
 			AlarmObjectLinkTableSync::SearchResult alarmLinks(
-						AlarmObjectLinkTableSync::Search(env, _message->getKey())
+						AlarmObjectLinkTableSync::Search(env, _messages[messageName]->getKey())
 						);
 			{
 				DBTransaction transaction;
@@ -347,13 +372,21 @@ namespace synthese
 			}
 		}
 
-		void IneoNCEConnection::createScenarioLink(CommercialLine *line) const
+		void IneoNCEConnection::clearScenarioLinks() const
+		{
+			clearScenarioLink(INEO_NCE_MESSAGE_ALARM);
+			clearScenarioLink(INEO_NCE_MESSAGE_DETOUR1);
+			clearScenarioLink(INEO_NCE_MESSAGE_DETOUR2);
+		}
+		
+		void IneoNCEConnection::createScenarioLink(const string &messageName,
+											   CommercialLine *line) const
 		{
 			DBTransaction transaction;
 			Env env(Env::GetOfficialEnv());
 			_alarmObjectLink.reset(new AlarmObjectLink);
 			_alarmObjectLink->setKey(AlarmObjectLinkTableSync::getId());
-			_alarmObjectLink->setAlarm(_message.get());
+			_alarmObjectLink->setAlarm(_messages[messageName].get());
 
 			_alarmObjectLink->setObject(line);
 			_alarmObjectLink->setRecipientKey("line");
@@ -361,6 +394,13 @@ namespace synthese
 
 			AlarmObjectLinkTableSync::Save(_alarmObjectLink.get(), transaction);
 			transaction.run();
+		}
+
+		void IneoNCEConnection::createScenarioLinks(CommercialLine *line) const
+		{
+			createScenarioLink(INEO_NCE_MESSAGE_ALARM, line);
+			createScenarioLink(INEO_NCE_MESSAGE_DETOUR1, line);
+			createScenarioLink(INEO_NCE_MESSAGE_DETOUR2, line);
 		}
 
 		void IneoNCEConnection::setScenarioLine(CommercialLine *line) const
@@ -378,27 +418,42 @@ namespace synthese
 				return;
 			}
 
-			clearScenarioLink();
-			createScenarioLink(line);
+			clearScenarioLinks();
+			createScenarioLinks(line);
+		}
+
+		// Return true if at least one message has data
+		bool IneoNCEConnection::hasMessage() const
+		{
+			bool gotOne(false);
+			BOOST_FOREACH(const MessageMap::value_type &message, _messages)
+			{
+				if(!message.second->getLongMessage().empty())
+				{
+					gotOne = true;
+				}
+			}
+			return gotOne;
 		}
 
 		// If the given text message is empty then the scenario message is disabled
-		void IneoNCEConnection::setMessage(const string &message) const
+		void IneoNCEConnection::setMessage(const string &messageName,
+										   const string &message) const
 		{
 			if(!_withLocalMessage)
 			{
 				return;
 			}
 
-			if(_message.get())
+			if(_messages[messageName].get())
 			{
 				DBTransaction transaction;
-				_message->setLongMessage(message);
+				_messages[messageName]->setLongMessage(message);
 
 				// If the message is empty, we disable it
 				_sentScenario->setIsEnabled(!message.empty());
 
-				AlarmTableSync::Save(_message.get(), transaction);
+				AlarmTableSync::Save(_messages[messageName].get(), transaction);
 				ScenarioTableSync::Save(_sentScenario.get(), transaction);
 				transaction.run();
 			}
@@ -974,7 +1029,15 @@ namespace synthese
 									{
 									case 1:
 										// This is an information message
-										setMessage(_iconv.convert(contInfoStr));
+										setMessage(INEO_NCE_MESSAGE_ALARM, _iconv.convert(contInfoStr));
+										break;
+									case 3:
+										// This is a detour information message
+										setMessage(INEO_NCE_MESSAGE_DETOUR1, _iconv.convert(contInfoStr));
+										break;
+									case 4:
+										// This is a detour information message
+										setMessage(INEO_NCE_MESSAGE_DETOUR2, _iconv.convert(contInfoStr));
 										break;
 									case 5:
 										if(contInfoStr == "DEPART IMMINENT")

@@ -65,6 +65,8 @@ RowsListFunction.cpp
 RowsListFunction.hpp
 ServiceExpression.cpp
 ServiceExpression.hpp
+ServiceListService.cpp
+ServiceListService.hpp
 SingleOperatorExpression.cpp
 SingleOperatorExpression.hpp
 StrFillFunction.cpp
