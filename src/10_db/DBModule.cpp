@@ -131,6 +131,7 @@ namespace synthese
 			while(DBModule::_thrCount)
 			{
 				util::Thread::Sleep(200);
+				Log::GetInstance().warn("Waiting for " + lexical_cast<string>(DBModule::_thrCount) + " thread(s) to exit.");
 			}
 			DBModule::_Db.reset();
 		}
