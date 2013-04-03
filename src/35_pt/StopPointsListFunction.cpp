@@ -92,6 +92,30 @@ namespace synthese
 		const string StopPointsListFunction::DATA_LINES = "lines";
 		const string StopPointsListFunction::DATA_DISTANCE_TO_BBOX_CENTER = "distanceToBboxCenter";
 
+		Function::API StopPointsListFunction::getAPI() const
+		{
+			Function::API api(
+						"Public Transport",
+						"Returns the list of stop points for a commercial line, "
+						"a stop area or a bounding box",
+						"");
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_LINE_ID, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_DATE, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_PAGE_ID, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_DESTINATION_PAGE_ID, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_LINE_PAGE_ID, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_BBOX,
+								   "A bounding box of the form 'x1,y1,x2,y2'", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_SRID, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_SORT_BY_LINE_NAME,
+								   "Sort by line name", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_OMIT_SAME_AREA_DESTINATIONS, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER, "", false));
+			api.addParams(APIParam(StopPointsListFunction::PARAMETER_MAX_SOLUTIONS_NUMBER,
+								   "Max number of solution", false));
+			return api;
+		}
 
 
 		ParametersMap StopPointsListFunction::_getParametersMap() const
