@@ -232,39 +232,6 @@ namespace synthese
 			{
 				return boost::gregorian::not_a_date_time;
 			}
-
-			class APIParam
-			{
-			private:
-				std::string _key;
-				std::string _description;
-				bool _mandatory;
-			public:
-				APIParam(std::string key, std::string description, bool mantatory);
-				std::string getKey() const;
-				std::string getDescription() const;
-				bool isMandatory() const;
-			};
-
-			class API
-			{
-			private:
-				std::string _group;
-				std::string _title;
-				std::string _description;
-				std::vector<APIParam> _params;
-			public:
-				API();
-				API(std::string group, std::string title, std::string description);
-				std::string getGroup() const;
-				std::string getTitle() const;
-				std::string getDescription() const;
-				void addParams(APIParam param);
-				const std::vector<APIParam> &getParams() const;
-			};
-
-			virtual API getAPI() const;
-
 		};
 }	}
 

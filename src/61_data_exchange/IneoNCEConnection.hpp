@@ -101,22 +101,14 @@ namespace synthese
 
 			// Message management
 			boost::shared_ptr<messages::SentScenario> _sentScenario;
-			// There are serveral messages to hold, the key is the message type
-			typedef std::map<const std::string, boost::shared_ptr<messages::SentAlarm> > MessageMap;
-			mutable MessageMap _messages;
+			boost::shared_ptr<messages::SentAlarm> _message;
 			mutable boost::shared_ptr<messages::AlarmObjectLink> _alarmObjectLink;
 			bool initScenario();
 			void createScenario();
-			void initMessage(const std::string &messageName);
-			void createMessage(const std::string &messageName);
-			bool hasMessage() const;
-			void createScenarioLinks(pt::CommercialLine *line) const;
-			void createScenarioLink(const std::string &messageName,
-									pt::CommercialLine *line) const;
-			void clearScenarioLinks() const;
-			void clearScenarioLink(const std::string &messageName) const;
-			void setMessage(const std::string &messageName,
-							const std::string &message) const;
+			void createMessage();
+			void createScenarioLink(pt::CommercialLine *line) const;
+			void clearScenarioLink() const;
+			void setMessage(const std::string &message) const;
 			void setScenarioLine(pt::CommercialLine *line) const;
 			
 		public:
