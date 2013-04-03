@@ -44,18 +44,7 @@ namespace synthese
 		const string AddService::PARAMETER_LEFT("l");
 		const string AddService::PARAMETER_RIGHT("r");
 
-		Function::API AddService::getAPI() const
-		{
-			Function::API api(
-						"CMS Language",
-						"Return the addition of the two given parameters",
-						"Example:\n"
-						"<?+&l=1&r=2?> returns 3.\n"
-						"To assign this result to the variable 'lines' you can do: <@lines=<?+&l=1&r=2?>@>");
-			api.addParams(APIParam(AddService::PARAMETER_LEFT, "Left integer or double value to add", true));
-			api.addParams(APIParam(AddService::PARAMETER_RIGHT, "Right integer or double value to add", true));
-			return api;
-		}
+
 
 		ParametersMap AddService::_getParametersMap() const
 		{
