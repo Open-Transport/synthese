@@ -41,18 +41,6 @@ namespace synthese
 		const string AndFunction::PARAMETER_LEFT("l");
 		const string AndFunction::PARAMETER_RIGHT("r");
 
-		Function::API AndFunction::getAPI() const
-		{
-			Function::API api(
-						"CMS Language",
-						"And operator",
-						"Example:\n"
-						"<?and&l=1&r=1?> returns true.\n"
-						"");
-			api.addParams(APIParam(AndFunction::PARAMETER_LEFT, "Left value to test", true));
-			api.addParams(APIParam(AndFunction::PARAMETER_RIGHT, "Right value to test", true));
-			return api;
-		}
 
 
 		ParametersMap AndFunction::_getParametersMap() const
