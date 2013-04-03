@@ -248,7 +248,7 @@ namespace synthese
 					"WHERE jour="+ todayStr +" ORDER BY "+ _database +".ARRETCHN.chainage, "+ _database +".ARRETCHN.pos"
 				);
 				string query(
-					"SELECT * FROM "+ _database +".CHAINAGE WHERE jour="+ todayStr
+					"SELECT * FROM "+ _database +".CHAINAGE WHERE jour="+ todayStr + "ORDER BY ref"
 				);
 			
 				DBResultSPtr chainageResult(db.execQuery(chainageQuery));
@@ -271,6 +271,14 @@ namespace synthese
 					{
 						Log::GetInstance().warn("Bad ligne field in chainage "+ lexical_cast<string>(ref));
 						chainages.erase(ref);
+						do
+						{
+							int chainage_ref(chainageResult->getInt("chainage"));
+							if(chainage_ref != ref)
+							{
+								break;
+							}
+						} while(chainageResult->next());
 						continue;
 					}
 					chainage.ligne = &it->second;
