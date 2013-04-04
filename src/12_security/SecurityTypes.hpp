@@ -84,6 +84,7 @@ namespace synthese
 			, FORBIDDEN	= 0		//!< Interdiction
 			, USE		= 20	//!< Utilisation de fonction autorisée
 			, READ		= 40	//!< Lecture directe de données autorisée
+			, CANCEL	= 50	//!< Annulation autorisée (delete sans write)
 			, WRITE		= 60	//!< Ecriture directe de donnée autorisée
 			, DELETE_RIGHT	= 80	//!< Suppression de donnée autorisée
 		} RightLevel;

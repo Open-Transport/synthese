@@ -94,21 +94,6 @@ namespace synthese
 				throw ActionException("No such reservation");
 			}
 
-			// Check of the date : a cancellation has no sense if after the arrival time
-			ptime now(second_clock::local_time());
-			ReservationTableSync::SearchResult reservations(
-				ReservationTableSync::Search(*_env, _transaction->getKey())
-			);
-			BOOST_FOREACH(const shared_ptr<Reservation>& resa, reservations)
-			{
-				if (resa->getReservationRuleId() != 0)
-				{
-					if (now > resa->getArrivalTime())
-						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
-					break;
-				}
-			}
-
 			// Tests if the reservation is already cancelled
 			if(!_transaction->getCancellationTime().is_not_a_date_time())
 			{
@@ -120,11 +105,36 @@ namespace synthese
 
 		void CancelReservationAction::run(Request& request)
 		{
+			// Check of the date : a cancellation has no sense if after the arrival time
+			ptime now(second_clock::local_time());
+			ReservationTableSync::SearchResult reservations(
+				ReservationTableSync::Search(*_env, _transaction->getKey())
+			);
+			BOOST_FOREACH(const shared_ptr<Reservation>& resa, reservations)
+			{
+				if (resa->getReservationRuleId() != 0)
+				{
+					// If the resa should be done, we should throw an exception
+					// but if the user has CANCEL right (but no more), he should be a driver
+					// and may want to log an absence by cancelling the resa too late
+					// (back at the deposit for example), we let him 24h to do that
+					if (now > resa->getArrivalTime() &&
+						(!request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) ||
+						request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE))
+					)
+						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
+					else if (request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) &&
+						now > resa->getArrivalTime() + hours(24)
+					)
+						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
+					break;
+				}
+			}
+
 			// Store old parameters
 			ReservationStatus oldStatus(_transaction->getStatus());
 
 			// Write the cancellation
-			ptime now(second_clock::local_time());
 			_transaction->setCancellationTime(now);
 			_transaction->setCancelUserId(request.getUser()->getKey());
 			ReservationTransactionTableSync::Save(_transaction.get());
@@ -183,7 +193,10 @@ namespace synthese
 			return
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
 				(_transaction->getCustomerUserId() == session->getUser()->getKey() &&
-				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE))
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)) ||
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) ||
+				(_transaction->getCustomerUserId() == session->getUser()->getKey() &&
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, CANCEL))
 			;
 		}
 	}
