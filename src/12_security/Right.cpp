@@ -63,6 +63,7 @@ namespace synthese
 				case FORBIDDEN: return "Interdit";
 				case USE: return "Utilisation";
 				case READ: return "Lecture";
+				case CANCEL: return "Annulation";
 				case WRITE: return "Lecture/Ecriture";
 				case DELETE_RIGHT: return "Contrôle total";
 				case UNKNOWN_RIGHT_LEVEL: return "Inconnu";
