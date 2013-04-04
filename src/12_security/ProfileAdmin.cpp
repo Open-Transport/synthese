@@ -43,6 +43,7 @@
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "SecurityRight.h"
+#include "ResaRight.h"
 
 #include <boost/foreach.hpp>
 
@@ -57,6 +58,7 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace security;
+	using namespace resa;
 
 	namespace util
 	{
@@ -131,6 +133,14 @@ namespace synthese
 			privatePublicMap.push_back(make_pair((int) WRITE, "Ecriture"));
 			privatePublicMap.push_back(make_pair((int) DELETE_RIGHT, "Contrôle total"));
 
+			vector<pair<optional<int>, string> > privatePublicMapResa;
+			privatePublicMapResa.push_back(make_pair((int) FORBIDDEN, "Interdit"));
+			privatePublicMapResa.push_back(make_pair((int) USE, "Utilisation"));
+			privatePublicMapResa.push_back(make_pair((int) READ, "Lecture"));
+			privatePublicMapResa.push_back(make_pair((int) CANCEL, "Annulation"));
+			privatePublicMapResa.push_back(make_pair((int) WRITE, "Ecriture"));
+			privatePublicMapResa.push_back(make_pair((int) DELETE_RIGHT, "Contrôle total"));
+
 
 			stream	<< "<h1>Propriétés</h1>";
 
@@ -166,12 +176,24 @@ namespace synthese
 						form.addHiddenField(UpdateRightAction::PARAMETER_RIGHT_CODE, right->getFactoryKey());
 						form.addHiddenField(UpdateRightAction::PARAMETER_RIGHT_PARAMETER, right->getParameter());
 						stream << form.open();
-						stream << "Public : " <<
-							form.getSelectInput(
-								UpdateRightAction::PARAMETER_PUBLIC_VALUE,
-								privatePublicMap,
-								optional<int>((int) right->getPublicRightLevel())
+						if (dynamic_cast<const ResaRight*>(right.get()))
+						{
+							stream << "Public : " <<
+								form.getSelectInput(
+									UpdateRightAction::PARAMETER_PUBLIC_VALUE,
+									privatePublicMapResa,
+									optional<int>((int) right->getPublicRightLevel())
 							);
+						}
+						else
+						{
+							stream << "Public : " <<
+								form.getSelectInput(
+									UpdateRightAction::PARAMETER_PUBLIC_VALUE,
+									privatePublicMap,
+									optional<int>((int) right->getPublicRightLevel())
+								);
+						}
 						if (right->getUsePrivateRights())
 							stream << " Privé : " <<
 							form.getSelectInput(
@@ -223,10 +245,20 @@ namespace synthese
 				}
 				else
 					stream << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, pl, optional<string>(GLOBAL_PERIMETER));
-				stream
-					<< "</td>"
-					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, optional<int>((int) USE)) << "</td>"
-					<< "<td>";
+				if (dynamic_cast<const ResaRight*>(right.get()))
+				{
+					stream
+						<< "</td>"
+						<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMapResa, optional<int>((int) USE)) << "</td>"
+						<< "<td>";
+				}
+				else
+				{
+					stream
+						<< "</td>"
+						<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, optional<int>((int) USE)) << "</td>"
+						<< "<td>";
+				}
 				if (right->getUsePrivateRights())
 					stream << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, optional<int>((int) USE));
 				stream

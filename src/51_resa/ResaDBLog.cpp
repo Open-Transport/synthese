@@ -203,6 +203,9 @@ namespace synthese
 				break;
 
 			case AT_WORK:
+			case DONE:
+			case SHOULD_BE_DONE:
+			case SHOULD_BE_AT_WORK:
 				type = ResaDBLog::NO_SHOW_ENTRY;
 				description = "Absence";
 				level = DBLogEntry::DB_LOG_ERROR;

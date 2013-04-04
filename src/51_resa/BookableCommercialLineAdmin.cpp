@@ -205,6 +205,9 @@ namespace synthese
 				bool globalDeleteRight(
 					_request.getUser()->getProfile()->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
 				);
+				bool globalCancelRight(
+					_request.getUser()->getProfile()->isAuthorized<ResaRight>(security::CANCEL, UNKNOWN_RIGHT_LEVEL)
+				);
 
 				// Requests
 				AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request, *this);
@@ -415,7 +418,7 @@ namespace synthese
 				c.push_back("Heure arrivée");
 				c.push_back("Places");
 				c.push_back("Client");
-				if (globalDeleteRight && !_serviceNumber)
+				if ((globalDeleteRight || globalCancelRight) && !_serviceNumber)
 					c.push_back("Actions");
 				HTMLTable t(c,"adminresults");
 				stream << t.open();
@@ -631,6 +634,20 @@ namespace synthese
 										break;
 									default:
 										break;
+									}
+								}
+								else if (globalCancelRight)
+								{
+									switch(status)
+									{
+									case AT_WORK:
+									case DONE:
+									case SHOULD_BE_DONE:
+									case SHOULD_BE_AT_WORK:
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
+										break;
+									default:
+									break;
 									}
 								}
 
