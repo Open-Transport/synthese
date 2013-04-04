@@ -53,6 +53,7 @@ namespace synthese
 		const string TransferLinesService::PARAMETER_LINE_ID = "line_id";
 		const string TransferLinesService::PARAMETER_STOP_AREA_ID = "stop_area_id";
 		const string TransferLinesService::PARAMETER_TIME = "time";
+		const string TransferLinesService::PARAMETER_DURATION = "duration";
 		
 		const string TransferLinesService::TAG_LINE = "line";
 
@@ -101,6 +102,9 @@ namespace synthese
 			{
 				_time = second_clock::local_time();
 			}
+
+			// Duration
+			_duration = duration_from_string(map.getDefault<string>(PARAMETER_DURATION, "02:00"));
 		}
 
 
@@ -212,7 +216,7 @@ namespace synthese
 			LineFilter lf;
 			DisplayedPlacesList dp;
 			ForbiddenPlacesList fp;
-			ptime endTime(_time + hours(2)); ///TODO new parameter for duration
+			ptime endTime(_time + _duration);
 			StandardArrivalDepartureTableGenerator tdg(
 				ps,
 				di,

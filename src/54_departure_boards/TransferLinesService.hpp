@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string PARAMETER_LINE_ID;
 			static const std::string PARAMETER_STOP_AREA_ID;
 			static const std::string PARAMETER_TIME;
+			static const std::string PARAMETER_DURATION;
 
 			static const std::string TAG_LINE;
 			
@@ -62,6 +63,7 @@ namespace synthese
 				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::shared_ptr<const pt::StopArea> _stopArea;
 				boost::posix_time::ptime _time;
+				boost::posix_time::time_duration _duration;
 			//@}
 
 			typedef std::set<const pt::CommercialLine*> LinesSet;
