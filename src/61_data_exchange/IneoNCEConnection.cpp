@@ -450,8 +450,8 @@ namespace synthese
 				DBTransaction transaction;
 				_messages[messageName]->setLongMessage(message);
 
-				// If the message is empty, we disable it
-				_sentScenario->setIsEnabled(!message.empty());
+				// If there is at least one message enable the scenario
+				_sentScenario->setIsEnabled(hasMessage());
 
 				AlarmTableSync::Save(_messages[messageName].get(), transaction);
 				ScenarioTableSync::Save(_sentScenario.get(), transaction);
