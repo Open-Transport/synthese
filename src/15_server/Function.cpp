@@ -158,4 +158,10 @@ namespace synthese
 			}
 			return _outputFormat;
 		}
+
+		FunctionAPI Function::getAPI() const
+		{
+			return FunctionAPI();
+		}
+
 }	}
