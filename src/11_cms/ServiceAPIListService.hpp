@@ -1,12 +1,12 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-/// AddService class header.
-///	@file AddService.hpp
-///	@author Hugues Romain
-///	@date 2011
+/// ServiceAPIListService class header.
+///	@file ServiceAPIListService.hpp
+///	@author Bruno Coudoin
+///	@date 2013
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+///	Copyright (C) 2013 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -22,42 +22,52 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_AddService_H__
-#define SYNTHESE_AddService_H__
+#ifndef SYNTHESE_ServiceAPIListService_H__
+#define SYNTHESE_ServiceAPIListService_H__
 
 #include "FactorableTemplate.h"
 #include "Function.h"
+#include "alphanum.hpp"
 
 namespace synthese
 {
 	namespace cms
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///	35.15 Function : AddService.
+		///	35.15 Function : ServiceAPIListService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Operators
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m35Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2011
 		/// @since 3.3.0
-		class AddService:
-			public util::FactorableTemplate<server::Function,AddService>
+		class ServiceAPIListService:
+			public util::FactorableTemplate<server::Function,ServiceAPIListService>
 		{
 		public:
-			static const std::string PARAMETER_LEFT;
-			static const std::string PARAMETER_RIGHT;
+			static const std::string PARAMETER_ACTION_OR_FUNCTION;
+
+			static const std::string ATTR_GROUPS;
+			static const std::string ATTR_GROUP_NAME;
+			static const std::string ATTR_API_SERVICES;
+			static const std::string ATTR_PARAM_GROUPS;
+			static const std::string ATTR_PARAM_GROUP_NAME;
+			static const std::string ATTR_NAME;
+			static const std::string ATTR_TITLE;
+			static const std::string ATTR_DESCRIPTION;
+			static const std::string ATTR_DEPRECATED;
+			static const std::string ATTR_PARAMETERS;
+			static const std::string ATTR_PARAM_KEY;
+			static const std::string ATTR_PARAM_DESCRIPTION;
+			static const std::string ATTR_PARAM_MANDATORY;
 
 		protected:
+			std::string _actionOrfunction;
 			//! \name Page parameters
 			//@{
-				double _left;
-				double _right;
 			//@}
 
 		public:
-			AddService();
-
-
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
@@ -112,7 +122,11 @@ namespace synthese
 			virtual std::string getOutputMimeType() const;
 
 			virtual server::FunctionAPI getAPI() const;
+
+			typedef std::map<std::string, server::FunctionAPI, util::alphanum_text_first_less<std::string> > APIKey;
+			typedef std::map<const std::string, APIKey, util::alphanum_text_first_less<std::string> > GroupedAPI;
+			util::ParametersMap getParametersMap(const GroupedAPI& groupedAPI) const;
 		};
 }	}
 
-#endif // SYNTHESE_AddService_H__
+#endif // SYNTHESE_ServiceAPIListService_H__

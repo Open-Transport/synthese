@@ -17,6 +17,8 @@ DynamicRequest.cpp
 DynamicRequest.h
 Function.cpp
 Function.h
+FunctionAPI.cpp
+FunctionAPI.h
 GlobalVariableUpdateAction.cpp
 GlobalVariableUpdateAction.hpp
 HtmlFormCalendarFieldInterfaceElement.cpp

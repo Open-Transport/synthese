@@ -170,6 +170,8 @@ namespace synthese
 			/// @date 2010
 			virtual std::string getOutputMimeType() const;
 
+			virtual server::FunctionAPI getAPI() const;
+
 		private:
 			bool _isSortByDistanceToBboxCenter;
 

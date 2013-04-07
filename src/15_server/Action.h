@@ -27,6 +27,7 @@
 #define SYNTHESE_Action_H__
 
 #include "FactoryBase.h"
+#include "FunctionAPI.h"
 #include "Env.h"
 
 #define Action_PARAMETER_PREFIX std::string("actionParam")
@@ -105,6 +106,15 @@ namespace synthese
 
 			boost::shared_ptr<util::Env> getEnv() const { return _env; }
 			void setEnv(boost::shared_ptr<util::Env> value) { _env = value; }
+
+			///
+			/// \brief getAPI
+			/// \return the API of this Action
+			///
+			virtual FunctionAPI getAPI() const
+			{
+				return FunctionAPI();
+			}
 		};
 	}
 }

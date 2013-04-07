@@ -107,6 +107,8 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual std::string getOutputMimeType() const;
+
+			virtual server::FunctionAPI getAPI() const;
 		};
 	}
 }
