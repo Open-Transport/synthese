@@ -128,8 +128,9 @@ namespace synthese
 			DBModule::_ConnectionInfo.reset();
 
 			// Wait for all the thread to call CloseThread
-			while(DBModule::_thrCount)
+			if(DBModule::_thrCount)
 			{
+				Log::GetInstance().warn("Waiting for " + lexical_cast<string>(DBModule::_thrCount) + " thread(s) to exit.");
 				util::Thread::Sleep(200);
 			}
 			DBModule::_Db.reset();
