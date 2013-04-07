@@ -27,6 +27,7 @@
 #define SYNTHESE_Function_h__
 
 #include "FactoryBase.h"
+#include "FunctionAPI.h"
 #include "ParametersMap.h"
 #include "Env.h"
 
@@ -232,6 +233,13 @@ namespace synthese
 			{
 				return boost::gregorian::not_a_date_time;
 			}
+
+			///
+			/// \brief getAPI
+			/// \return the API of the Function
+			///
+			virtual FunctionAPI getAPI() const;
+
 		};
 }	}
 
