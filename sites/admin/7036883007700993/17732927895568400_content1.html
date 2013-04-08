@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Available services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+ </head>
+ <body>
+  <div class="container">
+
+<@deprecated_string=<b> (Deprecated)</b>@>
+<@non_deprecated_string=@>
+<h1>Functions</h1>
+<?ServiceAPIListService&
+  action_or_function=function&
+  template=
+  <{groups
+     &template=<h2><@group_name@></h2>
+     <{services
+       &template=<h3><@name@><@deprecated?deprecated_string:non_deprecated_string@></h3> <@title@> <br><pre><@description@></pre><br>
+       <{param_groups
+          &template=<h4><@param_group_name@></h4>
+          <{parameters
+            &template=<li><b><@param_key@></b> <@param_description@></li>
+          }>
+       }>
+       <br>
+     }>
+     <br>
+  }>
+?>
+
+<h1>Actions</h1>
+<?ServiceAPIListService&
+  action_or_function=action&
+  template=
+  <{groups
+     &template=<h2><@group_name@></h2>
+     <{services
+       &template=<h3><@name@><@deprecated?deprecated_string:non_deprecated_string@></h3> <@title@> <br><pre><@description@></pre><br>
+       <{param_groups
+          &template=<h4><@param_group_name@></h4>
+          <{parameters
+            &template=<li><b><@param_key@></b> <@param_description@></li>
+          }>
+       }>
+       <br>
+     }>
+     <br>
+  }>
+?>
+
+ </body>
+</html>
