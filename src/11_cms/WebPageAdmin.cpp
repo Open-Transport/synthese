@@ -174,7 +174,8 @@ namespace synthese
 				}
 				else
 				{
-					stream << "L'éditeur technique est obligatoire à cause de la présence de balise d'appel aux services SYNTHESE dans le contenu de la page.";
+					stream << HTMLModule::getLinkButton("/admin/service_api", "Services API", string(), "/admin/img/help.png");
+					stream << " L'éditeur technique est obligatoire à cause de la présence de balise d'appel aux services SYNTHESE dans le contenu de la page.";
 				}
 				stream << "</p>";
 
