@@ -32,6 +32,7 @@
 #include "InterSYNTHESEModule.hpp"
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
+#include "Log.h"
 
 #include <geos/geom/Geometry.h>
 #include <geos/io/WKTWriter.h>
@@ -569,7 +570,15 @@ namespace synthese
 				}
 
 				WKTWriter wkt;
-				str = wkt.write(projected.get());
+
+				if(projected->isValid())
+				{
+					str = wkt.write(projected.get());
+				}
+				else
+				{
+					Log::GetInstance().warn("bad geometry, maybe due to a failed conversion");
+				}
 			}
 			_result <<
 				0 << DBInterSYNTHESE::FIELD_SEPARATOR <<
