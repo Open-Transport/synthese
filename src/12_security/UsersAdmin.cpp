@@ -102,7 +102,7 @@ namespace synthese
 			}
 
 			// Table Parameters
-			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_LOGIN, 30);
+			_requestParameters.setFromParametersMap(map, PARAM_SEARCH_LOGIN, 30);
 		}
 
 

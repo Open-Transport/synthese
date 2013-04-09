@@ -86,7 +86,7 @@ namespace synthese
 			const ParametersMap& map
 		){
 			_requestParameters.setFromParametersMap(
-				map.getMap(),
+				map,
 				PARAMETER_NAME,
 				optional<size_t>()
 			);

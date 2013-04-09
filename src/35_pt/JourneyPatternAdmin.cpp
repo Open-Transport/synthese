@@ -137,7 +137,7 @@ namespace synthese
 			}
 
 			// Search table initialization
-			_requestParameters.setFromParametersMap(map.getMap(), ScheduledServiceTableSync::COL_SCHEDULES);
+			_requestParameters.setFromParametersMap(map, ScheduledServiceTableSync::COL_SCHEDULES);
 		}
 
 

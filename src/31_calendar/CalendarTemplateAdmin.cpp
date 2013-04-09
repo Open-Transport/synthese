@@ -98,7 +98,7 @@ namespace synthese
 		void CalendarTemplateAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_requestParameters.setFromParametersMap(map.getMap(), CalendarTemplateElementTableSync::COL_RANK);
+			_requestParameters.setFromParametersMap(map, CalendarTemplateElementTableSync::COL_RANK);
 			try
 			{
 				_calendar = Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));

@@ -112,7 +112,7 @@ namespace synthese
 			}
 
 			// Parameters
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_START_DATE, 500, false);
+			_requestParameters.setFromParametersMap(map, PARAMETER_SEARCH_START_DATE, 500, false);
 		}
 
 

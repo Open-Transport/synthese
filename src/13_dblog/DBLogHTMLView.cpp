@@ -167,7 +167,7 @@ namespace synthese
 
 			// table parameters
 			_requestParameters.setFromParametersMap(
-				map.getMap(),
+				map,
 				_getParameterName(PARAMETER_START_DATE),
 				30,
 				false,
