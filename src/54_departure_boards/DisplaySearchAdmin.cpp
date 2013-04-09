@@ -117,7 +117,7 @@ namespace synthese
 				_searchMessage = map.getOptional<int>(PARAMETER_SEARCH_MESSAGE);
 			}
 
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
+			_requestParameters.setFromParametersMap(map, PARAMETER_SEARCH_CITY, 30);
 		}
 
 

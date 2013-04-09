@@ -86,7 +86,7 @@ namespace synthese
 			_searchRightName = map.getDefault<string>(PARAMETER_SEARCH_RIGHT);
 
 			// Parameters
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
+			_requestParameters.setFromParametersMap(map, PARAMETER_SEARCH_NAME, 30);
 		}
 
 

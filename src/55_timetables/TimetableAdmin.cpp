@@ -125,7 +125,7 @@ namespace synthese
 					throw AdminParametersException("No such timetable");
 				}
 			}
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK);
+			_requestParameters.setFromParametersMap(map, PARAMETER_RANK);
 		}
 
 

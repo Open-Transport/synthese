@@ -94,7 +94,7 @@ namespace synthese
 
 			_lineUId = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
 
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
+			_requestParameters.setFromParametersMap(map, PARAMETER_CITY_NAME, 30);
 		}
 
 

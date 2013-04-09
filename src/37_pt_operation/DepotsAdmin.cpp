@@ -77,7 +77,7 @@ namespace synthese
 		void DepotsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
+			_requestParameters.setFromParametersMap(map, PARAMETER_SEARCH_NAME, 30);
 			if(!map.getDefault<string>(PARAMETER_SEARCH_NAME).empty())
 			{
 				_searchName = map.get<string>(PARAMETER_SEARCH_NAME);

@@ -73,7 +73,7 @@ namespace synthese
 			const ParametersMap& map
 		){
 			// Search table initialization
-			_requestParameters.setFromParametersMap(map.getMap());
+			_requestParameters.setFromParametersMap(map);
 		}
 
 

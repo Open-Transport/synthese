@@ -107,7 +107,7 @@ namespace synthese
 
 				_searchName = map.getOptional<string>(PARAMETER_SEARCH_NAME);
 
-				_requestParameters.setFromParametersMap(map.getMap(), SORT_ON_DATE, 15, false);
+				_requestParameters.setFromParametersMap(map, SORT_ON_DATE, 15, false);
 		}
 
 

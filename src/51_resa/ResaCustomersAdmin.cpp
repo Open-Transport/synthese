@@ -89,7 +89,7 @@ namespace synthese
 				_searchLogin = map.getOptional<string>(PARAM_SEARCH_LOGIN);
 			}
 
-			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
+			_requestParameters.setFromParametersMap(map, PARAM_SEARCH_NAME, 30);
 		}
 
 

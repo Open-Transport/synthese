@@ -73,7 +73,7 @@ namespace synthese
 		){
 
 			// Search table initialization
-			_requestParameters.setFromParametersMap(map.getMap(), ForumMessageTableSync::COL_DATE, 50, false);
+			_requestParameters.setFromParametersMap(map, ForumMessageTableSync::COL_DATE, 50, false);
 		}
 
 
