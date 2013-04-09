@@ -114,7 +114,15 @@ namespace synthese
 				ScheduledServiceTableSync::Search(
 					env,
 					optional<RegistryKeyType>(),
-					id
+					id,
+					optional<RegistryKeyType>(),
+					optional<string>(),
+					false,
+					0,
+					optional<size_t>(),
+					true,
+					true,
+					UP_DOWN_LINKS_LOAD_LEVEL
 			)	);
 			BOOST_FOREACH(const shared_ptr<ScheduledService>& serv, services)
 			{
@@ -174,7 +182,15 @@ namespace synthese
 			}
 
 			ContinuousServiceTableSync::SearchResult cservices(
-				ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), id)
+				ContinuousServiceTableSync::Search(
+					env, 
+					optional<RegistryKeyType>(), 
+					id,
+					0,
+					optional<size_t>(),
+					true,
+					true,
+					UP_DOWN_LINKS_LOAD_LEVEL)
 			);
 			BOOST_FOREACH(const shared_ptr<ContinuousService>& serv, cservices)
 			{
