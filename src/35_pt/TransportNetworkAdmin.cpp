@@ -89,7 +89,7 @@ namespace synthese
 		){
 			// Search parameters
 			_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
+			_requestParameters.setFromParametersMap(map, PARAMETER_SEARCH_NAME, 100);
 
 			// Node
 			_loadNodeFromMainEnv(map);

@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace html
 	{
 		/** ResultHTMLTable class.
@@ -80,7 +85,7 @@ namespace synthese
 					@param prefix prefix of the field codes in the map (default = none)
 				*/
 				void setFromParametersMap(
-					const std::map<std::string, std::string>& map,
+					const util::ParametersMap& map,
 					const std::string defaultOrderField = std::string(),
 					boost::optional<size_t> defaultMaxSize = boost::optional<size_t>(),
 					bool defaultRaisingOrder = true,

@@ -24,6 +24,7 @@
 
 #include <sstream>
 
+#include "ParametersMap.h"
 #include "ResultHTMLTable.h"
 
 using namespace std;
@@ -44,7 +45,7 @@ namespace synthese
 
 
 		void ResultHTMLTable::RequestParameters::setFromParametersMap(
-			const map<string, string>& m,
+			const util::ParametersMap& m,
 			const string defaultOrderField,
 			optional<size_t> defaultMaxSize,
 			bool defaultRaisingOrder,
@@ -54,41 +55,36 @@ namespace synthese
 
 			_prefix = prefix;
 
-			it = m.find(_getParameterCode(_PARAMETER_FIRST));
 			try
 			{
-				first =
-					it == m.end() ?
-					0 :
-					lexical_cast<size_t>(it->second)
-				;
+				first = lexical_cast<size_t>(m.getValue(_PARAMETER_FIRST));
 			}
 			catch(...)
 			{
 				first = 0;
 			}
 
-			it = m.find(_getParameterCode(_PARAMETER_ORDER_FIELD));
-			orderField = (it == m.end() || it->second.empty()) ? defaultOrderField : it->second;
-
-			it = m.find(_getParameterCode(_PARAMETER_RAISING_ORDER));
 			try
 			{
-				raisingOrder = (it == m.end()) ? defaultRaisingOrder : lexical_cast<bool>(it->second);
+				orderField = m.getValue(_PARAMETER_ORDER_FIELD);
 			}
 			catch(...)
 			{
-				raisingOrder = defaultRaisingOrder;
+				orderField = defaultOrderField;
 			}
 
-			it = m.find(_getParameterCode(_PARAMETER_MAX_SIZE));
 			try
 			{
-				maxSize =
-					it == m.end() ?
-					defaultMaxSize :
-					optional<size_t>(lexical_cast<size_t>(it->second))
-				;
+				raisingOrder = lexical_cast<bool>(m.getValue(_PARAMETER_RAISING_ORDER));
+			}
+            catch(...)
+			{
+                raisingOrder = defaultRaisingOrder;
+			}
+
+			try
+			{
+				maxSize = lexical_cast<size_t>(m.getValue(_PARAMETER_MAX_SIZE));
 			}
 			catch(...)
 			{
