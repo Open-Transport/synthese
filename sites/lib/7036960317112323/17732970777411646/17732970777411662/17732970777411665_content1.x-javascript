@@ -1,5 +1,7 @@
 /*
 * last update: 2006-08-24
+*
+* 2013-04-10 Bruno Coudoin: Added support for SYNTHESE Services.
 */
 
 editAreaLoader.load_syntax["html"] = {
@@ -33,6 +35,12 @@ editAreaLoader.load_syntax["html"] = {
 			,'modifiers' : 'g'
 			,'execute' : 'before' // before or after
 		}
+		,'services' : {
+			'search' : '(<)([^ \r\n\t&]+)(&)'
+			,'class' : 'services'
+			,'modifiers' : 'gi'
+			,'execute' : 'before' // before or after
+		}
 	}
 	,'STYLES' : {
 		'COMMENTS': 'color: #AAAAAA;'
@@ -46,6 +54,7 @@ editAreaLoader.load_syntax["html"] = {
 			,'tags': 'color: #E62253;'
 			,'doctype': 'color: #8DCFB5;'
 			,'test': 'color: #00FF00;'
+			,'services': 'color: #FF0000;'	
 		}	
 	}		
 };
