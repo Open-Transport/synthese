@@ -117,7 +117,7 @@ namespace synthese
 			}
 
 			// Search table initialization
-			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_CITY, 30);
+			_requestParameters.setFromParametersMap(map, PARAM_SEARCH_CITY, 30);
 		}
 
 

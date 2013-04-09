@@ -72,7 +72,7 @@ namespace synthese
 		void BookableCommercialLinesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_requestParameters.setFromParametersMap(map.getMap());
+			_requestParameters.setFromParametersMap(map);
 		}
 
 

@@ -87,7 +87,7 @@ namespace synthese
 			_searchName = map.getOptional<string>(PARAMETER_SEARCH_NAME);
 
 			// Search table initialization
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
+			_requestParameters.setFromParametersMap(map, PARAMETER_SEARCH_NAME, 100);
 		}
 
 

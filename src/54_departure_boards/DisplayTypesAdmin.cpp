@@ -83,7 +83,7 @@ namespace synthese
 		void DisplayTypesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_requestParameters.setFromParametersMap(map.getMap(), DisplayTypeTableSync::COL_NAME, 20);
+			_requestParameters.setFromParametersMap(map, DisplayTypeTableSync::COL_NAME, 20);
 			if(!map.getDefault<string>(PARAMETER_NAME).empty())
 			{
 				_searchName = map.getOptional<string>(PARAMETER_NAME);

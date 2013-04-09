@@ -128,7 +128,7 @@ namespace synthese
 
 			// Search page
 			_searchPage = map.getDefault<string>(PARAMETER_SEARCH_PAGE);
-			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK, optional<size_t>());
+			_pageSearchParameter.setFromParametersMap(map, PARAMETER_SEARCH_RANK, optional<size_t>());
 		}
 
 

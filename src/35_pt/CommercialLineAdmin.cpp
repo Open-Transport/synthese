@@ -133,7 +133,7 @@ namespace synthese
 				_endDate = from_string(map.get<string>(PARAMETER_DATES_END));
 			}
 
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
+			_requestParameters.setFromParametersMap(map, PARAMETER_SEARCH_NAME, 100);
 
 			try
 			{
