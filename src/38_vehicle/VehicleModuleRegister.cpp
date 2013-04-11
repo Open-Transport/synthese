@@ -56,8 +56,6 @@ void synthese::vehicle::moduleRegister()
 	synthese::vehicle::GetVehiclesService::integrate();
 	synthese::vehicle::VehicleInformationsService::integrate();
 
-	synthese::vehicle::VehicleAlarmRecipient::integrate();
-
 	synthese::vehicle::VehicleModule::integrate();
 
 	// Registries
