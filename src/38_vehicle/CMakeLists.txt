@@ -27,8 +27,6 @@ Vehicle.cpp
 Vehicle.hpp
 VehicleAdmin.cpp
 VehicleAdmin.hpp
-VehicleAlarmRecipient.hpp
-VehicleAlarmRecipient.cpp
 VehiclesAdmin.cpp
 VehiclesAdmin.hpp
 VehicleInformationsService.cpp
