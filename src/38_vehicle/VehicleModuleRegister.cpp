@@ -23,8 +23,6 @@
 #include "VehicleUpdateAction.hpp"
 #include "VehiclePositionUpdateAction.hpp"
 
-#include "VehicleAlarmRecipient.hpp"
-
 // Registries
 #include "Composition.hpp"
 #include "Vehicle.hpp"
