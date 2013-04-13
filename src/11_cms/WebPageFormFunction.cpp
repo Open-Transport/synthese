@@ -75,7 +75,7 @@ namespace synthese
 
 		void WebPageFormFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_name = map.get<string>(PARAMETER_NAME);
+			_name = map.getDefault<string>(PARAMETER_NAME);
 			_formId = map.getDefault<string>(PARAMETER_FORM_ID);
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
 			_class = map.getDefault<string>(PARAMETER_CLASS);
@@ -172,21 +172,48 @@ namespace synthese
 
 				try
 				{
-					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-					openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
-					openRequest.getFunction()->setPage(_page);
-					if(!_page->getRoot()->get<ClientURL>().empty())
+					// The form
+					auto_ptr<HTMLForm> form;
+
+					if(_page->get<SmartURLPath>().empty())
 					{
-						openRequest.setClientURL(_page->getRoot()->get<ClientURL>());
+						// Case without smart URL : call the page display function with a page ID
+						StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
+						openRequest.getFunction()->setPage(_page);
+
+						// Use site smart URL if available
+						if(!_page->getRoot()->get<ClientURL>().empty())
+						{
+							openRequest.setClientURL(_page->getRoot()->get<ClientURL>());
+						}
+
+						// Form initialization
+						form.reset(new HTMLForm(openRequest.getHTMLForm(_name)));
+					}
+					else
+					{
+						// Case with smart URL : use it in the action attribute
+						form.reset(
+							new HTMLForm(
+								_name,
+								_page->getRoot()->get<ClientURL>() + _page->get<SmartURLPath>()
+						)	);
 					}
 
-					HTMLForm form(openRequest.getHTMLForm(_name));
+					// Postcondition : form is now initialized
+
+					// Add additional parameters
 					BOOST_FOREACH(const ParametersMap::Map::value_type& parameter, _parameters.getMap())
 					{
-						form.addHiddenField(parameter.first, ParametersMap::Trim(parameter.second));
+						form->addHiddenField(
+							parameter.first,
+							ParametersMap::Trim(parameter.second)
+						);
 					}
-					stream << form.open(htmlComplement);
-					stream << form.getHiddenFields();
+
+					// Output
+					stream << form->open(htmlComplement);
+					stream << form->getHiddenFields();
 				}
 				catch(ObjectNotFoundException<Webpage>&)
 				{
