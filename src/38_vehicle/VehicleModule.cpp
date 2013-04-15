@@ -48,6 +48,9 @@ namespace synthese
 		VehicleModule::ServiceCompositions VehicleModule::_serviceCompositions;
 		VehiclePosition VehicleModule::_currentVehiclePosition;
 		CurrentJourney VehicleModule::_currentJourney;
+		VehicleModule::VehicleScreensMap VehicleModule::_currentScreens;
+		VehicleModule::ExtraParameterMap VehicleModule::_extraParameters;
+		bool VehicleModule::_ignition(false);
 	}
 
 	namespace server

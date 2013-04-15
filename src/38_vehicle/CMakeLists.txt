@@ -42,6 +42,8 @@ VehiclePositionTableSync.cpp
 VehiclePositionTableSync.hpp
 VehiclePositionUpdateAction.cpp
 VehiclePositionUpdateAction.hpp
+VehicleScreen.cpp
+VehicleScreen.hpp
 VehicleTableSync.cpp
 VehicleTableSync.hpp
 VehicleUpdateAction.cpp

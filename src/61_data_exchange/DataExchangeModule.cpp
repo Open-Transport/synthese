@@ -23,6 +23,7 @@
 #include "DataExchangeModule.hpp"
 
 #include "IneoNCEConnection.hpp"
+#include "MGScreenConnection.hpp"
 #include "ServerModule.h"
 #include "StopButtonFilePoller.hpp"
 #include "VDVClient.hpp"
@@ -75,6 +76,10 @@ namespace synthese
 			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_HOST, "", &IneoNCEConnection::ParameterCallback);
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_PORT, "", &IneoNCEConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_HOST, "", &MGScreenConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_PORT, "", &MGScreenConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_SPEED, "5", &MGScreenConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_VALUE, "60", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_FILE, "", &StopButtonFilePoller::ParameterCallback);
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_PERIOD_MS, "", &StopButtonFilePoller::ParameterCallback);
 		}
@@ -93,6 +98,9 @@ namespace synthese
 
 			// Ineo NCE connector
 			ServerModule::AddThread(&IneoNCEConnection::RunThread, "Ineo NCE connector");
+
+			// MG Screen connector
+			ServerModule::AddThread(&MGScreenConnection::RunThread, "MG Screen connector");
 
 			// Stop Button File Poller
 			ServerModule::AddThread(&StopButtonFilePoller::RunThread, "Stop Button File Poller");
