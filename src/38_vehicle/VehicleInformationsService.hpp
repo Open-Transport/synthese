@@ -49,6 +49,10 @@ namespace synthese
 			static const std::string TAG_VEHICLE;
 			static const std::string TAG_POSITION;
 			static const std::string TAG_JOURNEY;
+			static const std::string TAG_IGNITION;
+			static const std::string TAG_SCREEN;
+			static const std::string TAG_SCREENS;
+			static const std::string TAG_EXTRA_PARAMETERS;
 
 		public:
 			
@@ -117,6 +121,8 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual std::string getOutputMimeType() const;
+
+			server::FunctionAPI getAPI() const;
 		};
 }	}
 
