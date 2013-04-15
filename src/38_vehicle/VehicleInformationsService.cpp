@@ -46,7 +46,23 @@ namespace synthese
 		const string VehicleInformationsService::TAG_VEHICLE = "vehicle";
 		const string VehicleInformationsService::TAG_POSITION = "position";
 		const string VehicleInformationsService::TAG_JOURNEY = "journey";
+		const string VehicleInformationsService::TAG_IGNITION = "ignition";
+		const string VehicleInformationsService::TAG_SCREEN = "screen";
+		const string VehicleInformationsService::TAG_SCREENS = "screens";
+		const string VehicleInformationsService::TAG_EXTRA_PARAMETERS = "extra_parameters";
 
+		server::FunctionAPI VehicleInformationsService::getAPI() const
+		{
+			FunctionAPI api(
+				"38_vehicle",
+				"Query vehicle information",
+				"Return many information about the vehicle associated to this SYNTHESE instance"
+				"or from a given vehicle specified by its 'roid'\n"
+				"The information is returned as a parameters map."
+			);
+			api.addParams(Request::PARAMETER_OBJECT_ID, "The 'roid' of a Vehicle", false);
+			return api;
+		}
 
 		ParametersMap VehicleInformationsService::_getParametersMap() const
 		{
@@ -101,6 +117,28 @@ namespace synthese
 
 				// Journey
 				VehicleModule::GetCurrentJourney().toParametersMap(map);
+
+				// Ignition
+				map.insert(TAG_IGNITION, VehicleModule::getIgnition());
+
+				// Screens
+				shared_ptr<ParametersMap> screenMap(new ParametersMap);
+				BOOST_FOREACH(const VehicleModule::VehicleScreensMap::value_type& item, VehicleModule::GetVehicleScreens())
+				{
+					// Insert a submap for each screen
+					shared_ptr<ParametersMap> subScreenMap(new ParametersMap);
+					item.second.toParametersMap(*subScreenMap);
+					screenMap->insert(TAG_SCREEN, subScreenMap);
+				}
+				map.insert(TAG_SCREENS, screenMap);
+
+				// Extra Parameters
+				shared_ptr<ParametersMap> extraParamMap(new ParametersMap);
+				BOOST_FOREACH(const VehicleModule::ExtraParameterMap::value_type& item, VehicleModule::GetExtraParameters())
+				{
+					extraParamMap->insert(item.first, item.second);
+				}
+				map.insert(TAG_EXTRA_PARAMETERS, extraParamMap);
 			}
 
 			return map;

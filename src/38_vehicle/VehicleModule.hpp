@@ -27,6 +27,7 @@
 
 #include "CurrentJourney.hpp"
 #include "VehiclePosition.hpp"
+#include "VehicleScreen.hpp"
 
 #include <vector>
 #include <utility>
@@ -94,12 +95,17 @@ namespace synthese
 		public:
 			typedef std::map<const pt::CommercialLine*, std::set<const Vehicle*> > LinesAllowedVehicles;
 			typedef std::map<const pt::ScheduledService*, std::set<const ServiceComposition*> > ServiceCompositions;
+			typedef std::map<std::string, VehicleScreen> VehicleScreensMap;
+			typedef std::map<std::string, std::string> ExtraParameterMap;
 
 		private:
 			static CurrentJourney _currentJourney;
 			static LinesAllowedVehicles _linesAllowedVehicles;
 			static ServiceCompositions _serviceCompositions;
 			static VehiclePosition _currentVehiclePosition;
+			static VehicleScreensMap _currentScreens;
+			static ExtraParameterMap _extraParameters;
+			static bool _ignition;
 
 		public:
 			static void RegisterVehicle(const Vehicle& vehicle);
@@ -113,6 +119,17 @@ namespace synthese
 			static VehiclePosition& GetCurrentVehiclePosition(){ return _currentVehiclePosition; }
 
 			static CurrentJourney& GetCurrentJourney(){ return _currentJourney; }
+
+			static void RemoveVehicleScreen(const std::string &name){ _currentScreens.erase(name); }
+			static VehicleScreen& GetVehicleScreen(const std::string &name){ return _currentScreens[name]; }
+			static const VehicleScreensMap& GetVehicleScreens(){ return _currentScreens; }
+
+			static void SetExtraParameter(const std::string& key, const std::string& value){ _extraParameters[key] = value; }
+			static std::string GetExtraParameter(const std::string &key){ return _extraParameters[key]; }
+			static const ExtraParameterMap& GetExtraParameters(){ return _extraParameters; }
+
+			static bool getIgnition() { return _ignition; }
+			static void setIgnition(bool value) { _ignition = value; }
 		};
 	}
 	/** @} */

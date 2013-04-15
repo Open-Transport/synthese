@@ -24,6 +24,8 @@ set(data_exchange_SRCS
   IneoRealTimeFileFormat.hpp
   IneoRealTimeUpdateAction.cpp
   IneoRealTimeUpdateAction.hpp
+  MGScreenConnection.cpp
+  MGScreenConnection.hpp
   OGTFileFormat.cpp
   OGTFileFormat.hpp
   ObitiFileFormat.cpp
