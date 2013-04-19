@@ -206,7 +206,6 @@ namespace synthese
 			links.insert(make_pair(&source, id));
 			stopArea->setDataSourceLinksWithoutRegistration(links);
 			stopArea->setCity(&city);
-			stopArea->setName(name);
 			if(mainStopArea)
 			{
 				city.addIncludedPlace(*stopArea);
@@ -858,23 +857,25 @@ namespace synthese
 
 			// Search for a corresponding service
 			ScheduledService* result(NULL);
-			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-						*route.sharedServicesMutex
-			);
-			BOOST_FOREACH(Service* tservice, route.getServices())
 			{
-				ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
+				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+					*route.sharedServicesMutex
+				);
+				BOOST_FOREACH(Service* tservice, route.getServices())
+				{
+					ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
 
-				if(!curService) continue;
+					if(!curService) continue;
 
-				if(	curService->getServiceNumber() == number &&
-					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
-					(!servedVertices || curService->comparePlannedStops(*servedVertices)) &&
-					(team ? curService->getTeam() == *team : true) &&
-					(rules ? curService->getRules() == *rules : true)
-				){
-					result = curService;
-					break;
+					if(	curService->getServiceNumber() == number &&
+						curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
+						(!servedVertices || curService->comparePlannedStops(*servedVertices)) &&
+						(team ? curService->getTeam() == *team : true) &&
+						(rules ? curService->getRules() == *rules : true)
+					){
+						result = curService;
+						break;
+					}
 				}
 			}
 
@@ -978,22 +979,24 @@ namespace synthese
 
 			// Search for a corresponding service
 			ContinuousService* result(NULL);
-			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-						*route.sharedServicesMutex
-			);
-			BOOST_FOREACH(Service* tservice, route.getServices())
 			{
-				ContinuousService* curService(dynamic_cast<ContinuousService*>(tservice));
+				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+					*route.sharedServicesMutex
+				);
+				BOOST_FOREACH(Service* tservice, route.getServices())
+				{
+					ContinuousService* curService(dynamic_cast<ContinuousService*>(tservice));
 
-				if(!curService) continue;
+					if(!curService) continue;
 
-				if(	curService->getServiceNumber() == number &&
-					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
-					curService->getRange() == range &&
-					curService->getMaxWaitingTime() == waitingTime
-				){
-					result = curService;
-					break;
+					if(	curService->getServiceNumber() == number &&
+						curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
+						curService->getRange() == range &&
+						curService->getMaxWaitingTime() == waitingTime
+					){
+						result = curService;
+						break;
+					}
 				}
 			}
 
