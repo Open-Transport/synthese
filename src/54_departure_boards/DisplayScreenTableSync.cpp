@@ -45,7 +45,6 @@
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
-#include "DBLogEntryTableSync.h"
 #include "SentAlarm.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
@@ -71,7 +70,6 @@ namespace synthese
 	using namespace util;
 	using namespace departure_boards;
 	using namespace pt;
-	using namespace dblog;
 	using namespace security;
 	using namespace messages;
 	using namespace geography;
