@@ -89,6 +89,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_STOP_NAME("sn");
 		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
 		const string DisplayScreenContentFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
+		const string DisplayScreenContentFunction::PARAMETER_GENERATION_METHOD = "generation_method";
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -158,6 +159,71 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_ROW_PAGE_ID("row_page_id");
 		const string DisplayScreenContentFunction::PARAMETER_DESTINATION_PAGE_ID("destination_page_id");
 		const string DisplayScreenContentFunction::PARAMETER_TRANSFER_DESTINATION_PAGE_ID("transfer_destination_page_id");
+
+		FunctionAPI DisplayScreenContentFunction::getAPI() const
+		{
+			FunctionAPI api(
+				"Departure Boards",
+				"Display Screen Generation",
+				"Generate a display screen for a stop area or a physical stop"
+			);
+
+			api.openParamGroup("Loading pre-configured display screen by id");
+			api.addParams(Request::PARAMETER_OBJECT_ID, "A display screen roid", true);
+
+			api.openParamGroup("Load of pre-configured display screen by mac address");
+			api.addParams(DisplayScreenContentFunction::PARAMETER_MAC_ADDRESS,
+						  "MAC address of the display screen. "
+						  "Note : the MAC address must correspond to the content of the 'MAC address' "
+						  "field of the board in the database. Actually, the content of this field is "
+						  "free and must not necessarily be a MAC address.", false);
+
+			api.openParamGroup("Generating from a stop area by id.");
+			api.addParams(Request::PARAMETER_OBJECT_ID, "A stop area roid.", true);
+
+			api.openParamGroup("Generating from a stop area by name");
+			api.addParams(DisplayScreenContentFunction::PARAMETER_CITY_NAME, "City name.", true);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_STOP_NAME, "Stop name.", true);
+
+			api.openParamGroup("Generating from a physical stop by id.");
+			api.addParams(Request::PARAMETER_OBJECT_ID, "A physical stop roid.", true);
+
+			api.openParamGroup("Generating from a physical stop by operator code");
+			api.addParams(Request::PARAMETER_OBJECT_ID,
+						  "Id of the stop area which the stop belongs to.", true);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_OPERATOR_CODE,
+						  "Operator code of the physical stop.", true);
+
+			api.openParamGroup("Content tweak");
+			api.addParams(DisplayScreenContentFunction::PARAMETER_DATE,
+						  "Date of the search (iso format : YYYY-MM-DD HH:II). Default is the actual time of the request.",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_WAY,
+						  "'backward' or 'forward'. If 'way' is 'forward' the answer will be the 'rn' "
+						  "next departures after 'date'. "
+						  "If 'way' is 'backward' the answer will be the 'rn' "
+						  "previous departures just before 'date'.\n"
+						  "WARNING : rn is the number of departures which have different start time. "
+						  "Consequently, if two service starts at the same minutes this will count "
+						  "for a single start!", false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_INTERFACE_ID, "Deprecated. "
+						  "id of display interface to use. If not specified, the standard XML output is used",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_ROWS_NUMBER,
+						  "Maximal returned number of results per physical stops. "
+						  "Default value is 10.", false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_LINE_ID,
+						  "Commercial line ID : if given then results are only for this line", false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_ROLLING_STOCK_FILTER_ID,
+						  "Rolling stock filter ID.", false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_GENERATION_METHOD,
+						  "Specify the generation method. Must be one of 'standard_method', "
+						  "'with_forced_destinations_method', 'route_planning' or "
+						  "'display_children_only'. The default is 'standard_method'",
+						  false);
+
+			return api;
+		}
 
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
@@ -274,8 +340,24 @@ namespace synthese
 					_FunctionWithSite::_setFromParametersMap(map);
 
 					DisplayScreen* screen(new DisplayScreen);
+
+					// Screen Generation Type
+					string generationMethodStr(map.getDefault<string>(PARAMETER_GENERATION_METHOD, "standard_method"));
+					DisplayScreen::GenerationMethod generationMethod = DisplayScreen::STANDARD_METHOD;
+					if(generationMethodStr == "with_forced_destinations_method")
+					{
+						generationMethod = DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD;
+					}
+					else if(generationMethodStr == "route_planning")
+					{
+						generationMethod = DisplayScreen::ROUTE_PLANNING;
+					}
+					else if(generationMethodStr == "display_children_only")
+					{
+						generationMethod = DisplayScreen::DISPLAY_CHILDREN_ONLY;
+					}
 					//Generation Method of the pannel is "STANDARD_METHOD"
-					screen->setGenerationMethod(DisplayScreen::STANDARD_METHOD);
+					screen->setGenerationMethod(generationMethod);
 					_type.reset(new DisplayType);
 					_type->setRowNumber(map.getDefault<size_t>(PARAMETER_ROWS_NUMBER, 10));
 
