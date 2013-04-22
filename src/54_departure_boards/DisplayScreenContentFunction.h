@@ -76,7 +76,7 @@ namespace synthese
 			static const std::string PARAMETER_STOP_NAME;
 			static const std::string PARAMETER_LINE_ID;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
-			static const std::string PARAMETER_TISSEO_IS_REAL_TIME;
+			static const std::string PARAMETER_GENERATION_METHOD;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -389,6 +389,8 @@ namespace synthese
 					const pt::StopArea& place
 				) const;
 			//@}
+
+				server::FunctionAPI getAPI() const;
 		};
 	}
 }
