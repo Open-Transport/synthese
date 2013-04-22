@@ -45,6 +45,8 @@ namespace synthese
 			static const std::string PARAMETER_SORT_DOWN;
 			static const std::string PARAMETER_SORT_UP;
 			static const std::string PARAMETER_SORT_ALGO;
+			static const std::string PARAMETER_MAX_PER_SORT_KEY;
+			static const std::string PARAMETER_RESULTS_IN_A_SUBMAP;
 			static const std::string PARAMETER_TEMPLATE;
 			static const std::string PARAMETER_RECURSIVE;
 
@@ -56,6 +58,8 @@ namespace synthese
 			WebpageContent _sortUpTemplate;
 			WebpageContent _sortDownTemplate;
 			WebpageContent _sortAlgoNode;
+			WebpageContent _maxPerSortKey;
+			bool _resultsInASubmap;
 			typedef std::vector<std::pair<std::string, WebpageContent> > Parameters;
 			Parameters _parameters;
 			bool _recursive;
@@ -101,6 +105,8 @@ namespace synthese
 				const Webpage& page,
 				util::ParametersMap& variables
 			) const;
+
+			virtual server::FunctionAPI getAPI() const;
 		};
 }	}
 
