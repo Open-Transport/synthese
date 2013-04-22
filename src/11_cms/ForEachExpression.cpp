@@ -36,6 +36,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace server;
 
 	namespace cms
 	{
@@ -45,16 +46,50 @@ namespace synthese
 		const string ForEachExpression::PARAMETER_SORT_DOWN = "sort_down";
 		const string ForEachExpression::PARAMETER_SORT_UP = "sort_up";
 		const string ForEachExpression::PARAMETER_SORT_ALGO = "sort_algo";
+		const string ForEachExpression::PARAMETER_MAX_PER_SORT_KEY = "max_per_sort_key";
+		const string ForEachExpression::PARAMETER_RESULTS_IN_A_SUBMAP = "results_in_a_submap";
 		const string ForEachExpression::PARAMETER_TEMPLATE = "template";
 		const string ForEachExpression::PARAMETER_RECURSIVE = "recursive";
 		const string ForEachExpression::DATA_RECURSIVE_CONTENT = "recursive_content";
 
+		/// @FIXME Expressions does not appear in ServiceAPIListService.
+		FunctionAPI ForEachExpression::getAPI() const
+		{
+			FunctionAPI api(
+				"CMS Language",
+				"Parameters map iteration",
+				"You provide the name of a sub parameters map as the first parameter "
+				"and a template that will be evaluated for each item in this sub map.\n"
+				"Basic example:\n"
+				"  <?a_service_that_creates_a_submap&\n"
+				"    template=<{a_sub_map_entry&template=<@@>}>\n"
+				"  ?>"
+			);
+
+			api.addParams(PARAMETER_EMPTY, "Specify a template to use when there is no data", false);
+			api.addParams(PARAMETER_SORT_DOWN,
+						  "The name of a field in the sub map used as the key for a down sort", false);
+			api.addParams(PARAMETER_SORT_UP,
+						  "The name of a field in the sub map used as the key for an up sort", false);
+			api.addParams(PARAMETER_SORT_ALGO, "The sort algorithm, can be 'default' (the faster), "
+						  "'alphanumeric' or 'alphanumeric_text_first'",
+						  false);
+			api.addParams(PARAMETER_MAX_PER_SORT_KEY, "Maximum items per sort key. "
+						  "If the sort key contains the character '|', only the left part "
+						  "of the key is concerned by this field.", false);
+			api.addParams(PARAMETER_RESULTS_IN_A_SUBMAP,
+						  "Returns the results in a new submap named 'foreach_results'", false);
+			api.addParams(PARAMETER_TEMPLATE, "", false);
+			api.addParams(PARAMETER_RECURSIVE, "Apply the template recursively", false);
+			return api;
+		}
 
 
 		ForEachExpression::ForEachExpression(
 			std::string::const_iterator& it,
 			std::string::const_iterator end
-		):	_recursive(false)
+		):	_resultsInASubmap(false),
+			_recursive(false)
 		{
 			// function name
 			for(;it != end && *it != '&' && *it != '}'; ++it)
@@ -115,6 +150,14 @@ namespace synthese
 							// alphanumeric
 							// alphanumeric_text_first
 							_sortAlgoNode = parameterNodes;
+						}
+						else if(parameterNameStr == PARAMETER_MAX_PER_SORT_KEY)
+						{
+							_maxPerSortKey = parameterNodes;
+						}
+						else if(parameterNameStr == PARAMETER_RESULTS_IN_A_SUBMAP)
+						{
+							_resultsInASubmap = true;
 						}
 						else
 						{
@@ -198,7 +241,14 @@ namespace synthese
 			string sortAlgoStr(
 				_sortAlgoNode.eval(request, additionalParametersMap, page, variables)
 			);
-			
+
+			string maxPerSortKeyString(_maxPerSortKey.eval(request, additionalParametersMap, page, variables));
+			if(maxPerSortKeyString.empty())
+			{
+				maxPerSortKeyString = "0";
+			}
+			size_t maxPerSortKeyValue(lexical_cast<size_t>(maxPerSortKeyString));
+
 			util::alphanum_less<string> comparatorAlphanum;
 			util::alphanum_text_first_less<string> comparatorAlphanumTextFirst;
 			std::less<string> comparatorLess;
@@ -242,110 +292,206 @@ namespace synthese
 					// Insertion in the map
 					sortedItems.insert(make_pair(key.str(), item));
 				}
+
+				// Remove multiple entries
+				if(maxPerSortKeyValue)
+				{
+					size_t count(0);
+					string previousKey;
+					for(SortedItems::iterator it = sortedItems.begin();
+						it != sortedItems.end(); /* no increment */)
+					{
+						string key(it->first);
+						unsigned found = key.find_first_of("|");
+						if(found != std::string::npos)
+						{
+							key = key.substr(0, found);
+						}
+
+						if(key == previousKey)
+						{
+							count++;
+							if(count >= maxPerSortKeyValue)
+							{
+								sortedItems.erase(it++);
+							}
+							else
+							{
+								it++;
+							}
+						}
+						else
+						{
+							previousKey = key;
+							count = 0;
+							it++;
+						}
+					}
+
+				}
 			}
 
 			size_t rank(0);
-			
-			// Case items are sorted ascending
-			if(!_sortUpTemplate.empty())
+
+			// Return the result in a new submap in order to give a chance to the caller
+			if(_resultsInASubmap)
 			{
-				BOOST_FOREACH(const SortedItems::value_type item, sortedItems)
+				shared_ptr<ParametersMap> pm(new ParametersMap);
+				if(!_sortUpTemplate.empty())
 				{
-					stringstream recursiveContent;
-
-					// Recursion
-					if(_recursive && item.second->hasSubMaps(_arrayCode))
+					BOOST_FOREACH(const SortedItems::value_type item, sortedItems)
 					{
-						display(
-							recursiveContent,
-							request,
-							*item.second,
-							page,
-							variables
-						);
+						pm->insert("foreach_results", item.second);
 					}
-
-					_displayItem(
-						stream,
-						request,
-						page,
-						baseParametersMap,
-						*item.second,
-						variables,
-						optional<const WebpageContent&>(),
-						templatePage,
-						rank,
-						itemsCount,
-						recursiveContent.str()
-					);
 				}
-			}
-			// Case items are sorted descending
-			else if(!_sortDownTemplate.empty())
-			{
-				BOOST_REVERSE_FOREACH(const SortedItems::value_type item, sortedItems)
+				else if(!_sortDownTemplate.empty())
 				{
-					stringstream recursiveContent;
+					BOOST_REVERSE_FOREACH(const SortedItems::value_type item, sortedItems)
 
-					// Recursion
-					if(_recursive && item.second->hasSubMaps(_arrayCode))
 					{
-						display(
-							recursiveContent,
-							request,
-							*item.second,
-							page,
-							variables
-						);
+						pm->insert("foreach_results", item.second);
 					}
-
-					_displayItem(
-						stream,
-						request,
-						page,
-						baseParametersMap,
-						*item.second,
-						variables,
-						optional<const WebpageContent&>(),
-						templatePage,
-						rank,
-						itemsCount,
-						recursiveContent.str()
-					);
 				}
+				else
+				{
+					BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+					{
+						shared_ptr<ParametersMap> subPm(item);
+						pm->insert("foreach_results", subPm);
+					}
+				}
+
+				stringstream recursiveContent;
+
+				// Recursion
+				if(_recursive)
+				{
+					display(
+								recursiveContent,
+								request,
+								*pm,
+								page,
+								variables
+								);
+				}
+
+				_displayItem(
+							stream,
+							request,
+							page,
+							baseParametersMap,
+							*pm,
+							variables,
+							optional<const WebpageContent&>(),
+							templatePage,
+							rank,
+							itemsCount,
+							recursiveContent.str()
+							);
 			}
-			// Case items are read in the same order as in the service result
 			else
 			{
-				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+				// Case items are sorted ascending
+				if(!_sortUpTemplate.empty())
 				{
-					stringstream recursiveContent;
-
-					// Recursion
-					if(_recursive && item->hasSubMaps(_arrayCode))
+					BOOST_FOREACH(const SortedItems::value_type item, sortedItems)
 					{
-						display(
-							recursiveContent,
+						stringstream recursiveContent;
+
+						// Recursion
+						if(_recursive && item.second->hasSubMaps(_arrayCode))
+						{
+							display(
+								recursiveContent,
+								request,
+								*item.second,
+								page,
+								variables
+							);
+						}
+
+						_displayItem(
+							stream,
 							request,
-							*item,
 							page,
-							variables
+							baseParametersMap,
+							*item.second,
+							variables,
+							optional<const WebpageContent&>(),
+							templatePage,
+							rank,
+							itemsCount,
+							recursiveContent.str()
 						);
 					}
+				}
+				// Case items are sorted descending
+				else if(!_sortDownTemplate.empty())
+				{
+					BOOST_REVERSE_FOREACH(const SortedItems::value_type item, sortedItems)
+					{
+						stringstream recursiveContent;
 
-					_displayItem(
-						stream,
-						request,
-						page,
-						baseParametersMap,
-						*item,
-						variables,
-						optional<const WebpageContent&>(),
-						templatePage,
-						rank,
-						itemsCount,
-						recursiveContent.str()
-					);
+						// Recursion
+						if(_recursive && item.second->hasSubMaps(_arrayCode))
+						{
+							display(
+								recursiveContent,
+								request,
+								*item.second,
+								page,
+								variables
+							);
+						}
+
+						_displayItem(
+							stream,
+							request,
+							page,
+							baseParametersMap,
+							*item.second,
+							variables,
+							optional<const WebpageContent&>(),
+							templatePage,
+							rank,
+							itemsCount,
+							recursiveContent.str()
+						);
+					}
+				}
+				// Case items are read in the same order as in the service result
+				else
+				{
+					BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+					{
+						stringstream recursiveContent;
+
+						// Recursion
+						if(_recursive && item->hasSubMaps(_arrayCode))
+						{
+							display(
+								recursiveContent,
+								request,
+								*item,
+								page,
+								variables
+							);
+						}
+
+						_displayItem(
+							stream,
+							request,
+							page,
+							baseParametersMap,
+							*item,
+							variables,
+							optional<const WebpageContent&>(),
+							templatePage,
+							rank,
+							itemsCount,
+							recursiveContent.str()
+						);
+					}
 				}
 			}
 		}
