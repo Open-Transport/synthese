@@ -24,6 +24,7 @@
 #include "DbModuleConfigTableSync.h"
 
 #include "ActionService.hpp"
+#include "HardwareInformationService.hpp"
 #include "RedirectService.hpp"
 #include "SessionService.hpp"
 #include "SessionsListService.hpp"
@@ -41,6 +42,7 @@ void synthese::server::moduleRegister()
 	synthese::server::LoginInterfacePage::integrate();
 
 	synthese::server::GlobalVariableUpdateAction::integrate();
+	synthese::server::HardwareInformationService::integrate();
 	synthese::server::LoginAction::integrate();
 	synthese::server::LogoutAction::integrate();
 	synthese::server::QuitAction::integrate();
