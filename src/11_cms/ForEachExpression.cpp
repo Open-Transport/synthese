@@ -275,6 +275,12 @@ namespace synthese
 				{
 					stringstream key;
 
+					if(!item.get())
+					{
+						// A Null was added in a ParametersMap, escape it silently
+						continue;
+					}
+
 					_displayItem(
 						key,
 						request,
@@ -356,6 +362,12 @@ namespace synthese
 				{
 					BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
 					{
+						if(!item.get())
+						{
+							// A Null was added in a ParametersMap, escape it silently
+							continue;
+						}
+
 						shared_ptr<ParametersMap> subPm(item);
 						pm->insert("foreach_results", subPm);
 					}
@@ -465,6 +477,12 @@ namespace synthese
 					BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
 					{
 						stringstream recursiveContent;
+
+						if(!item.get())
+						{
+							// A Null was added in a ParametersMap, escape it silently
+							continue;
+						}
 
 						// Recursion
 						if(_recursive && item->hasSubMaps(_arrayCode))
