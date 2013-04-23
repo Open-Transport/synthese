@@ -21,6 +21,8 @@ FunctionAPI.cpp
 FunctionAPI.h
 GlobalVariableUpdateAction.cpp
 GlobalVariableUpdateAction.hpp
+HardwareInformationService.cpp
+HardwareInformationService.hpp
 HtmlFormCalendarFieldInterfaceElement.cpp
 HtmlFormCalendarFieldInterfaceElement.h
 HtmlFormFieldInterfaceElement.cpp
