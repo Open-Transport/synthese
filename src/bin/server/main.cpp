@@ -35,6 +35,7 @@
 #include "ModuleClass.h"
 #include "Language.hpp"
 #include "DBModule.h"
+#include "15_server/version.h"
 
 #include <csignal>
 #include <string>
@@ -235,6 +236,7 @@ int main( int argc, char **argv )
 			po::options_description desc("Allowed options");
 			desc.add_options()
 				("help", "produce this help message")
+				("version", "display the version number and exit")
 				("dbconn", po::value<std::string>(&dbConnString)->default_value(std::string ("sqlite://")),
 				 "Database connection string, using format <backend>://<backend_specific_parameters> "
 				 "(see backend documentation for the meaning of backend specific parameters).")
@@ -250,6 +252,14 @@ int main( int argc, char **argv )
 			po::variables_map vm;
 			po::store(po::parse_command_line(argc, argv, desc), vm);
 			po::notify(vm);
+
+			if (vm.count("version"))
+			{
+				std::cout << "SYNTHESE " << SYNTHESE_VERSION << " " <<
+					SYNTHESE_REVISION <<
+					" (" << SYNTHESE_BUILD_DATE << ")" << std::endl;
+				return 1;
+			}
 
 			if (vm.count("help"))
 			{
