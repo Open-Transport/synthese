@@ -102,7 +102,8 @@ namespace synthese
 	{
 		_instanceCoordinatesSystem = NULL;
 		_storageCoordinatesSystem = NULL;
-		_CoordinatesSystems.clear();
+		if (_CoordinatesSystems.size() != 0)
+			_CoordinatesSystems.clear();
 	}
 
 
