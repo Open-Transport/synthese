@@ -293,7 +293,7 @@ void testTypes(const TestBackend& testBackend)
 			ReplaceQuery<TestTypesTableSync> query(object);
 			query.addField(static_cast<int>(-2147483648LL));
 			query.addField(43);
-			query.addField(static_cast<int>(9223372036854775807LL));
+			query.addField(static_cast<unsigned long long int>(9223372036854775807LL));
 			query.addField(12345.12345);
 			query.addField(std::string("Foo bar blah '\\"));
 			query.addField(true);
