@@ -1086,7 +1086,9 @@ namespace synthese
 				WKTWriter wkt;
 				str = wkt.write(projected.get());
 			}
-			_bnd.buffer = static_cast<void*>(const_cast<char*>(str.c_str()));
+			char* persistentStr = (char*) malloc(str.size() * sizeof(char));
+			memcpy(persistentStr, str.c_str(), str.size());
+			_bnd.buffer = static_cast<void*>(persistentStr);
 			*_bnd.length = str.size();
 		}
 
