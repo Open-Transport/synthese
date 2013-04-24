@@ -1,9 +1,0 @@
-t025_sites(cient_url,default_page_template_id,end_date,host_name,id,name,start_date,svn_url)
-"/sequencer",
-"0",
-"",
-"",
-"7036878712733798",
-"Sequencer",
-"",
-"https://extranet.rcsmobility.com/svn/synthese3/trunk/sites/sequencer"
