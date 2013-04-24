@@ -128,11 +128,13 @@ namespace synthese
 			// Cleaning prepared statements
 			BOOST_FOREACH(PreparedStatements::value_type& replaceStatement, _replaceStatements)
 			{
-				mysql_stmt_close(replaceStatement);
+				if (replaceStatement)
+					mysql_stmt_close(replaceStatement);
 			}
 			BOOST_FOREACH(PreparedStatements::value_type& deleteStatement, _deleteStatements)
 			{
-				mysql_stmt_close(deleteStatement);
+				if (deleteStatement)
+					mysql_stmt_close(deleteStatement);
 			}
 
 			// Connection closing
