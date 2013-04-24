@@ -37,6 +37,7 @@
 #include "ContinuousService.h"
 #include "DynamicRequest.h"
 #include "HTTPRequest.hpp"
+#include "InterSYNTHESEModuleRegister.cpp"
 
 #include "UtilConstants.h"
 
@@ -228,6 +229,7 @@ BOOST_AUTO_TEST_CASE (test1)
 
 	synthese::pt::moduleRegister();
 	synthese::impex::moduleRegister();
+	synthese::inter_synthese::moduleRegister();
 
 	boost::shared_ptr<DataSource> ds(new DataSource(TEST_SERVICE_DATASOURCE));
 	Env::GetOfficialEnv().getEditableRegistry<DataSource>().add(ds);
