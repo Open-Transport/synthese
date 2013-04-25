@@ -49,7 +49,12 @@ def run(env, args):
                 package_dir)
             return
         utils.RemoveDirectory(package_dir)
-    os.makedirs(package_dir)
+
+    try:
+        os.makedirs(package_dir)
+    except:
+        raise Exception('Failed to create the '
+            'directory in %r, cannot continue' % package_dir)
 
     log.info('Cleaning prefix %r', config.prefix)
     utils.RemoveDirectory(config.prefix)
