@@ -44,6 +44,8 @@
 #include "ScheduledServiceTableSync.h"
 #include "SentScenario.h"
 #include "StopPoint.hpp"
+#include "Vehicle.hpp"
+#include "VehicleTableSync.hpp"
 
 using namespace boost;
 using namespace boost::gregorian;
@@ -62,6 +64,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace vehicle;
 	
 	template<>
 	const string FactorableTemplate<Action, data_exchange::IneoRealTimeUpdateAction>::FACTORY_KEY = "ineo_realtime_update";
@@ -151,6 +154,16 @@ namespace synthese
 			// Alarms
 			set<RegistryKeyType> messagesToRemove;
 
+			// Vehicles
+			set<RegistryKeyType> vehiclesToRemove;
+			DataSource::Links::mapped_type existingVehicles(
+				_realTimeDataSource->getLinkedObjects<Vehicle>()
+			);
+			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingVehicle, existingVehicles)
+			{
+				vehiclesToRemove.insert(existingVehicle.second->getKey());
+			}
+
 			//////////////////////////////////////////////////////////////////////////
 			// Pre-loading objects from BDSI
 
@@ -159,6 +172,7 @@ namespace synthese
 			Arrets arrets;
 			Chainages chainages;
 			Programmations programmations;
+			IneoVehicles ineoVehicles;
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
 
@@ -472,7 +486,7 @@ namespace synthese
 						programmation.endTime += days(1);
 					}
 
-					do 
+					do
 					{
 						int prog_ref(destResult->getInt("ref_prog"));
 						if(prog_ref != ref)
@@ -499,6 +513,25 @@ namespace synthese
 						);
 
 					} while(destResult->next());
+				}
+			}
+
+			// Vehicle
+			{
+				string query("SELECT VEHICULE.* FROM "+ _database +".VEHICULE");
+				DBResultSPtr result(db.execQuery(query));
+				while(result->next())
+				{
+					int ref(result->getInt("ref"));
+					IneoVehicle& vehicle(
+						ineoVehicles.insert(
+							make_pair(
+								ref,
+								IneoVehicle()
+						)	).first->second
+					);
+					vehicle.ref = lexical_cast<string>(ref);
+					vehicle.available = (result->getText("neutralise") == "N" ? true : false);
 				}
 			}
 
@@ -942,6 +975,54 @@ namespace synthese
 				}
 			}
 
+			{ // Vehicles
+
+				// Loop on objects present in the database (search for creations and updates)
+				BOOST_FOREACH(const IneoVehicles::value_type& itVehicle, ineoVehicles)
+				{
+					const IneoVehicle& ineoVehicle(itVehicle.second);
+
+					shared_ptr<Vehicle> updatedVehicle;
+					Vehicle* vehicle(
+						static_cast<Vehicle*>(
+								_realTimeDataSource->getObjectByCode<Vehicle>(
+									ineoVehicle.ref
+					)	)	);
+					if(!vehicle)
+					{
+						// Creation of the vehicle
+						updatedVehicle.reset(
+							new Vehicle(
+								VehicleTableSync::getId()
+						)	);
+						updatedVehicle->addCodeBySource(
+							*_realTimeDataSource,
+							ineoVehicle.ref
+						);
+						updatesEnv.getEditableRegistry<Vehicle>().add(updatedVehicle);
+					}
+					else
+					{
+						vehiclesToRemove.erase(vehicle->getKey());
+
+						if(	vehicle->getNumber() != ineoVehicle.ref ||
+							vehicle->getAvailable() != ineoVehicle.available
+						){
+							updatedVehicle = VehicleTableSync::GetCastEditable<Vehicle>(
+								vehicle->getKey(),
+								updatesEnv
+							);
+						}
+					}
+
+					if(updatedVehicle.get())
+					{
+						updatedVehicle->setNumber(ineoVehicle.ref);
+						updatedVehicle->setAvailable(ineoVehicle.available);
+					}
+
+				}
+			}
 
 			//////////////////////////////////////////////////////////////////////////
 			// Storage
@@ -963,6 +1044,11 @@ namespace synthese
 			BOOST_FOREACH(RegistryKeyType id, messagesToRemove)
 			{
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
+			}
+			// Vehicle removals
+			BOOST_FOREACH(RegistryKeyType id, vehiclesToRemove)
+			{
+				DBTableSyncTemplate<VehicleTableSync>::Remove(NULL, id, transaction, false);
 			}
 
 			transaction.run();
