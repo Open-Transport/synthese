@@ -173,11 +173,18 @@ namespace synthese
 				Destinataires destinataires;
 			};
 
+			struct IneoVehicle
+			{
+				std::string ref;
+				bool available;
+			};
+
 			typedef std::map<int, Course> Courses;
 			typedef std::map<int, Ligne> Lignes;
 			typedef std::map<int, Arret> Arrets;
 			typedef std::map<int, Chainage> Chainages;
 			typedef std::map<int, Programmation> Programmations;
+			typedef std::map<int, IneoVehicle> IneoVehicles;
 
 
 		protected:
