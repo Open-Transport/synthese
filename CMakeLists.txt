@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.4)
 
 # Version:
 set(VERSION_MAJOR 3)
-set(VERSION_MINOR 6)
+set(VERSION_MINOR 8)
 set(VERSION_REV 0)
 set(SYNTHESE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REV}")
 
