@@ -38,7 +38,8 @@ namespace synthese
 	{
 		ObjectSiteLink::ObjectSiteLink(
 			RegistryKeyType id
-		):	Registrable(id)
+		):	Registrable(id),
+			_site(NULL)
 		{
 
 		}
