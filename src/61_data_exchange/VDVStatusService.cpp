@@ -76,7 +76,7 @@ namespace synthese
 			string request(map.getDefault<string>(PARAMETER_POST_DATA));
 
 			XMLResults results;
-			XMLNode allNode = XMLNode::parseString(request.c_str(), "vdv453:StatusAnfrage", &results);
+			XMLNode allNode = XMLNode::parseString(request.c_str(), "StatusAnfrage", &results);
 			if (results.error != eXMLErrorNone)
 			{
 				_ok = false;
@@ -128,7 +128,7 @@ namespace synthese
 			stringstream result;
 			result << 
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<vdv453:StatusAntwort xmlns:vdv453=\"vdv453ger\">" <<
+				"<StatusAntwort>" <<
 				"<Status Zst=\"";
 			ToXsdDateTime(result, now);
 			result <<
@@ -142,7 +142,7 @@ namespace synthese
 			ToXsdDateTime(result, serverStartingTime);
 			result <<
 				"</StartDienstZst>" <<
-				"</vdv453:StatusAntwort>"
+				"</StatusAntwort>"
 			;
 			map.insert(DATA_RESULT, result.str());
 

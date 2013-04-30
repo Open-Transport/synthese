@@ -88,7 +88,7 @@ namespace synthese
 			string content(map.getDefault<string>(PARAMETER_POST_DATA));
 
 			XMLResults results;
-			XMLNode allNode = XMLNode::parseString(content.c_str(), "vdv453:DatenAbrufenAnfrage", &results);
+			XMLNode allNode = XMLNode::parseString(content.c_str(), "DatenAbrufenAnfrage", &results);
 			if (results.error != eXMLErrorNone)
 			{
 				_errorNumber = "100";
@@ -165,7 +165,7 @@ namespace synthese
 			stringstream result;
 			result <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<vdv453:DatenAbrufenAntwort xmlns:vdv453=\"vdv453ger\">" <<
+				"<DatenAbrufenAntwort>" <<
 				"<Bestaetigung Zst=\"";
 			ToXsdDateTime(result, now);
 			result <<
@@ -405,7 +405,7 @@ namespace synthese
 					
 					it.second->declareSending();
 			}	}
-			result << "</vdv453:DatenAbrufenAntwort>";
+			result << "</DatenAbrufenAntwort>";
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			map.insert(DATA_RESULT, result.str());

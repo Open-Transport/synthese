@@ -28,6 +28,7 @@
 #include "Request.h"
 #include "RequestException.h"
 #include "VDVServer.hpp"
+#include "VDVServerSubscription.hpp"
 
 using namespace boost;
 using namespace std;
@@ -43,6 +44,7 @@ namespace synthese
 	
 	namespace data_exchange
 	{
+		const string VDVServersListService::PARAMETER_SUBSCRIPTION_ID = "subscription_id";
 		const string VDVServersListService::TAG_SERVER = "server";
 		
 
@@ -57,6 +59,40 @@ namespace synthese
 
 		void VDVServersListService::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Server filter
+			RegistryKeyType serverFilterId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+			if(serverFilterId > 0)
+			{
+				try
+				{
+					_serverFilter = Env::GetOfficialEnv().getRegistry<VDVServer>().get(serverFilterId);
+				}
+				catch(ObjectNotFoundException<VDVServer>&)
+				{
+					throw RequestException("No such VDV server");
+				}
+			}
+
+			// Subscription filter
+			RegistryKeyType subscriptionId(map.getDefault<RegistryKeyType>(PARAMETER_SUBSCRIPTION_ID));
+			if(subscriptionId > 0)
+			{
+				try
+				{
+					shared_ptr<const VDVServerSubscription> subscription(
+						Env::GetOfficialEnv().getRegistry<VDVServerSubscription>().get(subscriptionId)
+					);
+					if(!subscription->get<VDVServer>())
+					{
+						throw RequestException("Invalid VDV server subscription");
+					}
+					_serverFilter = Env::GetOfficialEnv().getSPtr(&*subscription->get<VDVServer>());
+				}
+				catch(ObjectNotFoundException<VDVServerSubscription>&)
+				{
+					throw RequestException("No such VDV server subscription");
+				}
+			}
 		}
 
 
@@ -67,13 +103,22 @@ namespace synthese
 		) const {
 			ParametersMap map;
 
-			BOOST_FOREACH(
-				const VDVServer::Registry::value_type& server,
-				Env::GetOfficialEnv().getRegistry<VDVServer>()
-			){
+			if(_serverFilter.get())
+			{
 				shared_ptr<ParametersMap> serverPM(new ParametersMap);
-				server.second->toParametersMap(*serverPM, true);
+				_serverFilter->toParametersMap(*serverPM, true);
 				map.insert(TAG_SERVER, serverPM);
+			}
+			else
+			{
+				BOOST_FOREACH(
+					const VDVServer::Registry::value_type& server,
+					Env::GetOfficialEnv().getRegistry<VDVServer>()
+				){
+					shared_ptr<ParametersMap> serverPM(new ParametersMap);
+					server.second->toParametersMap(*serverPM, true);
+					map.insert(TAG_SERVER, serverPM);
+				}
 			}
 
 			return map;
