@@ -157,7 +157,7 @@ namespace synthese
 			// Vehicles
 			set<RegistryKeyType> vehiclesToRemove;
 			DataSource::Links::mapped_type existingVehicles(
-				_realTimeDataSource->getLinkedObjects<Vehicle>()
+				_plannedDataSource->getLinkedObjects<Vehicle>()
 			);
 			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingVehicle, existingVehicles)
 			{
@@ -985,7 +985,7 @@ namespace synthese
 					shared_ptr<Vehicle> updatedVehicle;
 					Vehicle* vehicle(
 						static_cast<Vehicle*>(
-								_realTimeDataSource->getObjectByCode<Vehicle>(
+								_plannedDataSource->getObjectByCode<Vehicle>(
 									ineoVehicle.ref
 					)	)	);
 					if(!vehicle)
@@ -996,7 +996,7 @@ namespace synthese
 								VehicleTableSync::getId()
 						)	);
 						updatedVehicle->addCodeBySource(
-							*_realTimeDataSource,
+							*_plannedDataSource,
 							ineoVehicle.ref
 						);
 						updatesEnv.getEditableRegistry<Vehicle>().add(updatedVehicle);
