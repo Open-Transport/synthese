@@ -576,44 +576,23 @@ namespace synthese
 				{
 					string vehicleNumber(nparcNode.getText());
 					Vehicle* vehicle(VehicleModule::GetCurrentVehiclePosition().getVehicle());
-					if(vehicle)
+					if(!vehicle || (vehicle->getNumber() != vehicleNumber) )
 					{
-						if(_theConnection->_dataSource)
+						// Initial vehicle setting or
+						// we are now running in a different vehicle
+						try
 						{
-							if(!vehicle->hasCodeBySource(*_theConnection->_dataSource, vehicleNumber))
-							{
-								try
-								{
-									vehicle = _theConnection->_dataSource->getObjectByCode<Vehicle>(vehicleNumber);
-								}
-								catch(...)
-								{
-									vehicle = NULL;
-									// Log
-								}
-							}
+							VehicleModule::GetCurrentVehiclePosition().setVehicle(
+								_theConnection->_dataSource->getObjectByCode<Vehicle>(vehicleNumber)
+							);
 						}
-						else
+						catch(...)
 						{
-							if(lexical_cast<string>(vehicle->getKey()) != vehicleNumber)
-							{
-								try
-								{
-									vehicle = Env::GetOfficialEnv().getEditable<Vehicle>(
-										lexical_cast<RegistryKeyType>(vehicleNumber)
-									).get();
-								}
-								catch(...)
-								{
-									vehicle = NULL;
-									// Log
-								}
-							}
+							VehicleModule::GetCurrentVehiclePosition().setVehicle(NULL);
+							util::Log::GetInstance().error(
+								"Could not find vehicle number " + vehicleNumber
+							);
 						}
-					}
-					if(vehicle != VehicleModule::GetCurrentVehiclePosition().getVehicle())
-					{
-						VehicleModule::GetCurrentVehiclePosition().setVehicle(vehicle);
 					}
 				}
 
