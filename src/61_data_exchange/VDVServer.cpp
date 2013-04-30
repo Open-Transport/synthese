@@ -147,10 +147,10 @@ namespace synthese
 			stringstream statusAnfrage;
 			statusAnfrage <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<vdv453:StatusAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
+				"<Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(statusAnfrage, now);
 			statusAnfrage <<
-				"\" xmlns:vdv453=\"vdv453ger\"/>";
+				"\"/>";
 
 			bool reloadNeeded(!_online);
 			try
@@ -164,7 +164,7 @@ namespace synthese
 				trace("StatusAntwort", statusAntwortStr);
 
 				XMLResults results;
-				XMLNode allNode = XMLNode::parseString(statusAntwortStr.c_str(), "vdv453:StatusAntwort", &results);
+				XMLNode allNode = XMLNode::parseString(statusAntwortStr.c_str(), "StatusAntwort", &results);
 				if (results.error != eXMLErrorNone)
 				{
 					_online = false;
@@ -241,12 +241,12 @@ namespace synthese
 			stringstream cleanRequest;
 			cleanRequest <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<vdv453:AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
+				"<AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(cleanRequest, now);
 			cleanRequest <<
-				"\" xmlns:vdv453=\"vdv453ger\">" <<
+				"\">" <<
 				"<AboLoeschenAlle>true</AboLoeschenAlle>" <<
-				"</vdv453:AboAnfrage>"
+				"</AboAnfrage>"
 			;
 
 			try
@@ -275,9 +275,9 @@ namespace synthese
 			stringstream aboAnfrage;
 			aboAnfrage <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<vdv453:AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
+				"<AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(aboAnfrage, now);
-			aboAnfrage << "\" xmlns:vdv453=\"vdv453ger\">";
+			aboAnfrage << "\">";
 
 			BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
 			{
@@ -313,7 +313,7 @@ namespace synthese
 				;
 			}
 
-			aboAnfrage << "</vdv453:AboAnfrage>";
+			aboAnfrage << "</AboAnfrage>";
 
 			try
 			{
@@ -329,7 +329,7 @@ namespace synthese
 				trace("AboAntwort", aboAntwortStr);
 
 				XMLResults aboAntwortResults;
-				XMLNode aboAntwortNode = XMLNode::parseString(aboAntwortStr.c_str(), "vdv453:AboAntwort", &aboAntwortResults);
+				XMLNode aboAntwortNode = XMLNode::parseString(aboAntwortStr.c_str(), "AboAntwort", &aboAntwortResults);
 				if (aboAntwortResults.error != eXMLErrorNone ||
 					aboAntwortNode.isEmpty()
 				){
@@ -378,14 +378,14 @@ namespace synthese
 			stringstream request;
 			request <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<vdv453:DatenAbrufenAnfrage xmlns:vdv453=\"vdv453ger\" Sender=\"" <<
+				"<DatenAbrufenAnfrage Sender=\"" <<
 				get<ClientControlCentreCode>() <<
 				"\" Zst=\"";
 			ToXsdDateTime(request, now);
 			request <<
 				"\">" <<
 				"<DatensatzAlle>0</DatensatzAlle>" <<
-				"</vdv453:DatenAbrufenAnfrage>"
+				"</DatenAbrufenAnfrage>"
 			;
 
 			// Sending the request

@@ -32,6 +32,8 @@ namespace synthese
 {
 	namespace data_exchange
 	{
+		class VDVServer;
+
 		//////////////////////////////////////////////////////////////////////////
 		///	61.15 Function : VDVServersListService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/VDV
@@ -44,9 +46,11 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,VDVServersListService>
 		{
 		public:
+			static const std::string PARAMETER_SUBSCRIPTION_ID;
 			static const std::string TAG_SERVER;
 			
 		protected:
+			boost::shared_ptr<const VDVServer> _serverFilter;
 			
 			
 			//////////////////////////////////////////////////////////////////////////

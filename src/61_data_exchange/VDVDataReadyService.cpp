@@ -66,7 +66,7 @@ namespace synthese
 			string content(map.getDefault<string>(PARAMETER_POST_DATA));
 
 			XMLResults results;
-			XMLNode allNode = XMLNode::parseString(content.c_str(), "vdv453:DatenBereitAnfrage", &results);
+			XMLNode allNode = XMLNode::parseString(content.c_str(), "DatenBereitAnfrage", &results);
 			if (results.error != eXMLErrorNone)
 			{
 				return;
@@ -102,14 +102,14 @@ namespace synthese
 			stringstream result;
 			result <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<vdv453:DatenBereitAntwort xmlns:vdv453=\"vdv453ger\">" <<
+				"<DatenBereitAntwort>" <<
 				"<Bestaetigung Zst=\"";
 			ToXsdDateTime(result, now);
 			result <<
 				"\" Ergebnis=\"ok\" Fehlernummer=\"0\">" <<
 				"<Fehlertext />" <<
 				"</Bestaetigung>" <<
-				"</vdv453:DatenBereitAntwort>"
+				"</DatenBereitAntwort>"
 			;
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
