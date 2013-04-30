@@ -22,6 +22,7 @@
 
 #include "VDVServerSubscription.hpp"
 
+using namespace std;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -38,6 +39,11 @@ namespace synthese
 	
 	namespace data_exchange
 	{
+		const string VDVServerSubscription::ATTR_ONLINE = "online";
+		const string VDVServerSubscription::ATTR_EXPIRATION = "expiration";
+
+
+
 		VDVServerSubscription::VDVServerSubscription(
 			util::RegistryKeyType id /*= 0*/
 		):	Registrable(id),
@@ -73,6 +79,19 @@ namespace synthese
 			if(get<VDVServer>())
 			{
 				get<VDVServer>()->removeSubscription(this);
+			}
+		}
+
+
+
+		void VDVServerSubscription::addAdditionalParameters(
+			ParametersMap& map,
+			string prefix
+		) const	{
+			map.insert(ATTR_ONLINE, _online);
+			if(!_expiration.is_not_a_date_time())
+			{
+				map.insert(ATTR_EXPIRATION, to_iso_extended_string(_expiration));
 			}
 		}
 }	}

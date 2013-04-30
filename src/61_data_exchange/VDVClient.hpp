@@ -51,7 +51,6 @@ namespace synthese
 		FIELD_STRING(ReplyAddress)
 		FIELD_STRING(ReplyPort)
 		FIELD_STRING(DefaultDirection)
-		FIELD_BOOL(Active)
 		FIELD_BOOL(SBBMode)
 
 		typedef boost::fusion::map<

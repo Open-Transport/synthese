@@ -59,6 +59,8 @@ namespace synthese
 			public Object<VDVServerSubscription, VDVServerSubscriptionRecord>
 		{
 		public:
+			static const std::string ATTR_ONLINE;
+			static const std::string ATTR_EXPIRATION;
 		
 			/// Chosen registry class.
 			typedef util::Registry<VDVServerSubscription>	Registry;
@@ -75,6 +77,7 @@ namespace synthese
 			//@{
 				bool getOnline() const { return _online; }
 				const boost::posix_time::ptime& getExpiration() const { return _expiration; }
+				void addAdditionalParameters(util::ParametersMap& map, std::string prefix) const;
 			//@}
 
 			//! @name Modifiers

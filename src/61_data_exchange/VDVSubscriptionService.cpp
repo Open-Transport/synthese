@@ -80,7 +80,7 @@ namespace synthese
 			string content(map.getDefault<string>(PARAMETER_POST_DATA));
 
 			XMLResults results;
-			XMLNode allNode = XMLNode::parseString(content.c_str(), "vdv453:AboAnfrage", &results);
+			XMLNode allNode = XMLNode::parseString(content.c_str(), "AboAnfrage", &results);
 			if(	results.error != eXMLErrorNone ||
 				allNode.isEmpty()
 			){
@@ -236,7 +236,7 @@ namespace synthese
 			stringstream result;
 			result << 
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
-				"<vdv453:AboAntwort xmlns:vdv453=\"vdv453ger\">" <<
+				"<AboAntwort>" <<
 				"<Bestaetigung Fehlernummer=\"" <<
 				(_errorNumber.empty() ? "0" : _errorNumber) <<
 				"\" Zst=\"";
@@ -250,7 +250,7 @@ namespace synthese
 			{
 				result << "<FehlerText>" << _errorText << "</FehlerText>";
 			}
-			result << "</Bestaetigung></vdv453:AboAntwort>";
+			result << "</Bestaetigung></AboAntwort>";
 			map.insert(DATA_RESULT, result.str());
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
