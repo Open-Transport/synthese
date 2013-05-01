@@ -154,6 +154,8 @@ namespace synthese
 
 
 
+				bool operator< (const ParametersMap& rhs) const;
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets a submap vector.
 				const SubParametersMap::mapped_type& getSubMaps(
@@ -332,7 +334,8 @@ namespace synthese
 				/// @pre the format of the other parameters map is the same as the current one
 				void merge(
 					const ParametersMap& other,
-					std::string prefix = std::string()
+					std::string prefix = std::string(),
+					bool withSubmap = false
 				);
 
 
