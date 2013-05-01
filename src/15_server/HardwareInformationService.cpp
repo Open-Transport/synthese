@@ -26,8 +26,10 @@
 #include "Request.h"
 #include "ServerModule.h"
 
+#ifndef WIN32
 #include <sys/socket.h>
 #include <ifaddrs.h>
+#endif
 #include <stdio.h>
 
 using namespace std;
