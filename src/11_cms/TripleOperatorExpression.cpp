@@ -63,8 +63,6 @@ namespace synthese
 
 			// Operands evaluation
 			string expr1(_expr1->eval(request, additionalParametersMap, page, variables));
-			string expr2(_expr2->eval(request, additionalParametersMap, page, variables));
-			string expr3(_expr3->eval(request, additionalParametersMap, page, variables));
 
 			// Applying operator
 			switch(_operator)
@@ -73,11 +71,11 @@ namespace synthese
 				expr1 = ParametersMap::Trim(expr1);
 				if(expr1.empty() || expr1 == "0")
 				{
-					return expr3;
+					return _expr3->eval(request, additionalParametersMap, page, variables);
 				}
 				else
 				{
-					return expr2;
+					return _expr2->eval(request, additionalParametersMap, page, variables);
 				}
 			}
 

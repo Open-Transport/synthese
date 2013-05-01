@@ -34,7 +34,7 @@ namespace synthese
 		){
 			set<string> terminations;
 			terminations.insert("%>");
-			_direction = WebpageContent(it, end, terminations);
+			_direction = CMSScript(it, end, terminations);
 		}
 
 

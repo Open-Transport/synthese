@@ -22,17 +22,7 @@
 
 #include "WebpageContent.hpp"
 
-#include "ConstantExpression.hpp"
-#include "ForEachExpression.hpp"
-#include "GotoNode.hpp"
-#include "IncludeExpression.hpp"
-#include "HTMLTable.h"
-#include "LabelNode.hpp"
-#include "Request.h"
-#include "ServiceExpression.hpp"
-#include "VariableUpdateNode.hpp"
-#include "Webpage.h"
-#include "WebPageDisplayFunction.h"
+#include "FilesMap.hpp"
 
 #include <boost/algorithm/string.hpp>
 
@@ -41,7 +31,6 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace html;
 	using namespace server;
 	using namespace util;
 	using namespace cms;
@@ -86,34 +75,17 @@ namespace synthese
 				}
 			}
 
-			bool toUpdate(false);
-			if(record.isDefined(FIELDS[1].name))
-			{
-
-				bool newValue(record.getDefault<bool>(FIELDS[1].name, false));
-				toUpdate |= (fieldObject._ignoreWhiteChars != newValue);
-				fieldObject._ignoreWhiteChars = newValue;
-			}
-
-			if(record.isDefined(FIELDS[3].name))
-			{
-				bool newValue(record.getDefault<bool>(FIELDS[3].name, false));
-				toUpdate |= (fieldObject._doNotEvaluate != newValue);
-				fieldObject._doNotEvaluate = newValue;
-			}
-
-			if(record.isDefined(FIELDS[0].name))
-			{
-				// At end because nodes generation needs the value of the other parameters to be updated
-				string newValue(record.getDefault<string>(FIELDS[0].name));
-				toUpdate |= (newValue != fieldObject._code);
-				fieldObject._code = newValue;
-			}
-
-			if(toUpdate)
-			{
-				fieldObject._updateNodes();
-			}
+			fieldObject._script.update(
+				record.isDefined(FIELDS[0].name) ?
+					record.get<string>(FIELDS[0].name) :
+					fieldObject.getCMSScript().getCode(),
+				record.isDefined(FIELDS[1].name) ?
+					record.getDefault<bool>(FIELDS[1].name, false) :
+					fieldObject.getCMSScript().getIgnoreWhiteChars(),
+				record.isDefined(FIELDS[3].name) ?
+					record.getDefault<bool>(FIELDS[3].name, false) :
+					fieldObject.getCMSScript().getDoNotEvaluate()
+			);
 		}
 
 
@@ -130,14 +102,14 @@ namespace synthese
 			){
 				map.insert(
 					prefix + FIELDS[0].name,
-					fieldObject._code
+					fieldObject.getCMSScript().getCode()
 				);
 			}
 
 			// Ignore white chars
 			map.insert(
 				prefix + FIELDS[1].name,
-				fieldObject._ignoreWhiteChars
+				fieldObject.getCMSScript().getIgnoreWhiteChars()
 			);
 
 			// Mime type
@@ -149,7 +121,7 @@ namespace synthese
 			// Ignore white chars
 			map.insert(
 				prefix + FIELDS[3].name,
-				fieldObject._doNotEvaluate
+				fieldObject.getCMSScript().getDoNotEvaluate()
 			);
 		}
 
@@ -161,7 +133,7 @@ namespace synthese
 			FilesMap& map
 		){
 			FilesMap::File item;
-			item.content = fieldObject._code;
+			item.content = fieldObject.getCMSScript().getCode();
 			item.mimeType = fieldObject._mimeType;
 			map.insert(
 				FIELDS[0].name,
@@ -178,28 +150,25 @@ namespace synthese
 		){
 			// Content
 			Blob b;
-			b.first = const_cast<char*>(fieldObject._code.c_str());
-			b.second = fieldObject._code.size();
+			b.first = const_cast<char*>(fieldObject.getCMSScript().getCode().c_str());
+			b.second = fieldObject.getCMSScript().getCode().size();
 			content.push_back(Cell(b));
 
 			// Ignore white chars
-			content.push_back(Cell(fieldObject._ignoreWhiteChars));
+			content.push_back(Cell(fieldObject.getCMSScript().getIgnoreWhiteChars()));
 
 			// Mime type
 			string s(fieldObject._mimeType);
 			content.push_back(Cell(s));
 
 			// Do not evaluate
-			content.push_back(Cell(fieldObject._doNotEvaluate));
+			content.push_back(Cell(fieldObject.getCMSScript().getDoNotEvaluate()));
 		}
 
 
 
 		WebpageContent::WebpageContent(
-		):	_ignoreWhiteChars(false),
-			_mimeType(MimeTypes::HTML),
-			_doNotEvaluate(false),
-			_sharedMutex(new synthese::util::shared_recursive_mutex)
+		):	_mimeType(MimeTypes::HTML)
 		{}
 
 
@@ -209,392 +178,11 @@ namespace synthese
 			bool ignoreWhiteChars,
 			MimeType mimeType,
 			bool doNotEvaluate
-		):	_code(code),
-			_ignoreWhiteChars(ignoreWhiteChars),
-			_mimeType(mimeType),
-			_doNotEvaluate(doNotEvaluate),
-			_sharedMutex(new synthese::util::shared_recursive_mutex)
+		):	_script(code, ignoreWhiteChars, doNotEvaluate),
+			_mimeType(mimeType)
 		{
-			_updateNodes();
 		}
 
-
-
-		WebpageContent::WebpageContent(
-			std::string::const_iterator& it,
-			std::string::const_iterator end,
-			std::set<std::string> termination
-		):	_ignoreWhiteChars(false),
-			_mimeType(MimeTypes::HTML),
-			_doNotEvaluate(false),
-			_sharedMutex(new synthese::util::shared_recursive_mutex)
-		{
-			_parse(it, end, termination);
-		}
-
-
-
-		void WebpageContent::_updateNodes()
-		{
-			boost::unique_lock<shared_recursive_mutex> lock(*_sharedMutex);
-			if(_doNotEvaluate)
-			{
-				_nodes.clear();
-				_nodes.push_back(
-					shared_ptr<WebpageContentNode>(
-						new ConstantExpression(_code)
-				)	);
-			}
-			else
-			{
-				string::const_iterator it(_code.begin());
-				_parse(it, _code.end(), set<string>());
-			}
-		}
-
-
-
-		void WebpageContent::setCode( const std::string& value )
-		{
-			bool toUpdate(value != _code);
-			_code = value;
-			if(toUpdate)
-			{
-				_updateNodes();
-			}
-		}
-
-
-
-
-		void WebpageContent::_parse(
-			std::string::const_iterator& it,
-			std::string::const_iterator end,
-			std::set<std::string> termination
-		){
-			_nodes.clear();
-
-			string currentText;
-
-			while(it != end)
-			{
-				// Ignore white chars
-				if(	_ignoreWhiteChars &&
-					(*it == ' ' || *it == '\r' || *it == '\n')
-				){
-					++it;
-					continue;
-				}
-
-				// Special characters
-				if(*it == '\\' && it+1 != end)
-				{
-					++it;
-					currentText.push_back(*it);
-					++it;
-				} // Call to a public function
-				else if(*it == '<' && it+1 != end && *(it+1)=='?' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					// Handle current text node
-					if(!currentText.empty())
-					{
-						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
-								new ConstantExpression(currentText)
-						)	);
-						currentText.clear();
-					}
-
-					// Parsing service node
-					shared_ptr<ServiceExpression> node(
-						new ServiceExpression(it, end)
-					);
-
-					if(node->getFunctionCreator())
-					{
-						_nodes.push_back(
-							static_pointer_cast<WebpageContentNode, ServiceExpression>(
-								node
-						)	);
-					}
-
-				} // Variable getter or setter
-				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)
-				{
-					if(!currentText.empty())
-					{
-						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
-								new ConstantExpression(currentText)
-						)	);
-						currentText.clear();
-					}
-
-					// variable name
-					string parameter;
-					it += 2;
-					string::const_iterator it2;
-					for(it2 = it;
-						it2 != end && *it2 != '=' && *it2 != '@' && *it2 != '<';
-						++it2
-					){
-						parameter.push_back(*it2);
-					}
-
-					// Is a variable set ?
-					if(	it2 != end &&
-						*it2 == '=' &&
-						(it2+1 == end || *(it2+1) != '=') &&
-						(*(it2-1) != '!') &&
-						(*(it2-1) != '<') &&
-						(*(it2-1) != '>')
-					){
-						it = it2;
-						++it;
-
-						trim(parameter);
-
-						VariableUpdateNode::Items items;
-						items.push_back(VariableUpdateNode::Item());
-						for(string::const_iterator it3(parameter.begin()); it3!=parameter.end(); )
-						{
-							// Alphanum chars
-							if( (*it3 >= 'a' && *it3 <= 'z') ||
-								(*it3 >= 'A' && *it3 <= 'Z') ||
-								(*it3 >= '0' && *it3 <= '9') ||
-								*it3 == '_'
-							){
-								items.rbegin()->key.push_back(*it3);
-								++it3;
-								continue;
-							}
-
-							// Index
-							if(	*it3 == '[')
-							{
-								++it3;
-								items.rbegin()->index = Expression::Parse(it3, parameter.end(), "]");
-								continue;
-							}
-
-							// Sub map
-							if(	*it3 == '.')
-							{
-								++it3;
-								items.push_back(VariableUpdateNode::Item());
-								continue;
-							}
-
-							// Ignored char
-							++it3;
-						}
-
-						// Node creation
-						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
-								new VariableUpdateNode(items, it, end)
-						)	);
-					}
-					else // Is an expression
-					{
-						shared_ptr<Expression> expr(
-							Expression::Parse(it, end, "@>")
-						);
-
-						// Storage
-						if(expr.get())
-						{
-							_nodes.push_back(expr);
-						}
-					}
-				} // Foreach
-				else if(*it == '<' && it+1 != end && *(it+1)=='{' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					// Handle current text node
-					if(!currentText.empty())
-					{
-						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
-								new ConstantExpression(currentText)
-						)	);
-						currentText.clear();
-					}
-
-					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
-							new ForEachExpression(it, end)
-					)	);
-
-				} // Shortcut to WebpageDisplayFunction
-				else if(*it == '<' && it+1 != end && *(it+1)=='#' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					// Handle current text node
-					if(!currentText.empty())
-					{
-						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
-								new ConstantExpression(currentText)
-						)	);
-						currentText.clear();
-					}
-
-					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
-							new IncludeExpression(it, end)
-					)	);
-
-				} // Goto
-				else if(*it == '<' && it+1 != end && *(it+1)=='%' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					if(!currentText.empty())
-					{
-						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
-								new ConstantExpression(currentText)
-						)	);
-						currentText.clear();
-					}
-
-					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
-							new GotoNode(it, end)
-					)	);
-
-				} // Label
-				else if(*it == '<' && it+1 != end && *(it+1)=='<' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					if(!currentText.empty())
-					{
-						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
-								new ConstantExpression(currentText)
-						)	);
-						currentText.clear();
-					}
-
-					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
-							new LabelNode(it, end)
-					)	);
-
-				}
-				else 
-				{
-					// Check if the termination was reached
-					bool terminated(false);
-					BOOST_FOREACH(const string& test, termination)
-					{
-						if(Expression::CompareText(it, end, test))
-						{
-							terminated = true;
-							break;
-						}
-					}
-					if(terminated)
-					{
-						break;
-					}
-
-					// The character is added to the current text
-					currentText.push_back(*it);
-					++it;
-				}
-			}
-
-			if(!currentText.empty())
-			{
-				_nodes.push_back(
-					shared_ptr<WebpageContentNode>(
-						new ConstantExpression(currentText)
-				)	);
-				currentText.clear();
-			}
-		}
-
-
-
-		void WebpageContent::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page,
-			util::ParametersMap& variables
-		) const	{
-			boost::shared_lock<shared_recursive_mutex> lock(*_sharedMutex);
-
-			Nodes::const_iterator itNode(_nodes.begin());
-			while(itNode != _nodes.end())
-			{
-				// Goto
-				if(dynamic_cast<GotoNode*>(itNode->get()))
-				{
-					// Search of label
-					string label(
-						static_cast<GotoNode*>(itNode->get())->eval(
-							request,
-							additionalParametersMap,
-							page,
-							variables
-					)	);
-					if(!label.empty())
-					{
-						Nodes::const_iterator itGotoNode(itNode+1);
-						for(; itGotoNode != _nodes.end(); ++itGotoNode)
-						{
-							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->getLabel() == label)
-							{
-								itNode = itGotoNode;
-								break;
-							}
-						}
-						if(itGotoNode == _nodes.end())
-						{
-							for(itGotoNode = _nodes.begin(); itGotoNode != itNode; ++itGotoNode)
-							{
-								if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->getLabel() == label)
-								{
-									itNode = itGotoNode;
-									break;
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					(*itNode)->display(stream, request, additionalParametersMap, page, variables);
-				}
-				++itNode;
-			}
-		}
-
-
-
-		std::string WebpageContent::eval(
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page,
-			util::ParametersMap& variables
-		) const	{
-			stringstream s;
-			display(s, request, additionalParametersMap, page, variables);
-			return s.str();
-		}
 
 
 

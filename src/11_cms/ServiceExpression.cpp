@@ -252,7 +252,7 @@ namespace synthese
 						
 						// Parsing of the nodes
 						++it;
-						WebpageContent parameterNodes(it, end, functionTermination);
+						CMSScript parameterNodes(it, end, functionTermination);
 						string parameterNameStr(ParametersMap::Trim(parameterName.str()));
 
 						// Special template parameter

@@ -242,8 +242,8 @@ namespace synthese
 				editArea.getAjaxForm(
 					stream,
 					updateConfigRequest.getURL(),
-					ObjectUpdateAction::PARAMETER_FIELD_PREFIX + WebpageContent::FIELDS[0].name,
-					_site->getConfig()->get<WebpageContent>().getCode(),
+					ObjectUpdateAction::PARAMETER_FIELD_PREFIX + ConfigScript::FIELD.name,
+					_site->getConfig()->get<ConfigScript>().getCode(),
 					20,
 					80
 				);

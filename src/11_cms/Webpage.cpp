@@ -123,7 +123,7 @@ namespace synthese
 			const util::ParametersMap& additionalParametersMap,
 			util::ParametersMap& variables
 		) const	{
-			get<WebpageContent>().display(
+			get<WebpageContent>().getCMSScript().display(
 				stream,
 				request,
 				additionalParametersMap,
@@ -134,8 +134,10 @@ namespace synthese
 
 
 
-		void Webpage::display( std::ostream& stream, const util::ParametersMap& additionalParametersMap ) const
-		{
+		void Webpage::display(
+			std::ostream& stream,
+			const util::ParametersMap& additionalParametersMap
+		) const	{
 			StaticFunctionRequest<WebPageDisplayFunction> fakeRequest;
 			display(stream, fakeRequest, additionalParametersMap);
 		}

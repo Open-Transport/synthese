@@ -104,7 +104,7 @@ namespace synthese
 				if(config)
 				{
 					stringstream str;
-					config->get<WebpageContent>().display(
+					config->get<ConfigScript>().display(
 						str,
 						request,
 						additionalParametersMap,

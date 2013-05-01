@@ -25,7 +25,7 @@
 
 #include "Expression.hpp"
 
-#include "WebpageContent.hpp"
+#include "CMSScript.hpp"
 
 namespace synthese
 {
@@ -38,8 +38,8 @@ namespace synthese
 			public Expression
 		{
 		private:
-			std::string _pageName;
-			typedef std::vector<std::pair<std::string, WebpageContent> > Parameters;
+			CMSScript _pageName;
+			typedef std::vector<std::pair<std::string, CMSScript> > Parameters;
 			Parameters _parameters;
 
 		public:

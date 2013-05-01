@@ -53,7 +53,7 @@ namespace synthese
 			termination.insert("@>");
 
 			// Load of the value definition
-			_value = WebpageContent(
+			_value = CMSScript(
 				it,
 				end,
 				termination

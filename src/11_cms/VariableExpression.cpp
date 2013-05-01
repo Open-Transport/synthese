@@ -61,13 +61,17 @@ namespace synthese
 				{
 					return request.getClientURL();
 				}
-				else if(_variable.begin()->key == "host_name")
+				if(_variable.begin()->key == "host_name")
 				{
 					return request.getHostName();
 				}
 				if(page.getRoot() && _variable.begin()->key == "site")
 				{
 					return lexical_cast<string>(page.getRoot()->getKey());
+				}
+				if(_variable.begin()->key == "p")
+				{
+					return lexical_cast<string>(page.getKey());
 				}
 			}
 

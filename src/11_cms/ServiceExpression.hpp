@@ -26,7 +26,7 @@
 #include "Expression.hpp"
 
 #include "Factory.h"
-#include "WebpageContent.hpp"
+#include "CMSScript.hpp"
 
 #include <vector>
 
@@ -54,10 +54,10 @@ namespace synthese
 
 
 			const util::Factory<server::Function>::CreatorInterface* _functionCreator;
-			typedef std::vector<std::pair<std::string, WebpageContent> > Parameters;
+			typedef std::vector<std::pair<std::string, CMSScript> > Parameters;
 			Parameters _serviceParameters;
 			Parameters _templateParameters;
-			WebpageContent _inlineTemplate;
+			CMSScript _inlineTemplate;
 			bool _repeatParameters;
 
 

@@ -442,7 +442,7 @@ namespace synthese
 				bool ignoreWhiteChars(
 					_ignoreWhiteChars ?
 					*_ignoreWhiteChars :
-					_page->get<WebpageContent>().getIgnoreWhiteChars()
+					_page->get<WebpageContent>().getCMSScript().getIgnoreWhiteChars()
 				);
 
 				MimeType mimeType(
@@ -454,13 +454,13 @@ namespace synthese
 				string content(
 					_content1 ?
 					*_content1 :
-					_page->get<WebpageContent>().getCode()
+					_page->get<WebpageContent>().getCMSScript().getCode()
 				);
 
 				bool doNotEvaluate(
 					_doNotEvaluate ?
 					*_doNotEvaluate :
-					_page->get<WebpageContent>().getDoNotEvaluate()
+					_page->get<WebpageContent>().getCMSScript().getDoNotEvaluate()
 				);
 
 				if(_content1 && _decodeXMLEntitiesInContent)

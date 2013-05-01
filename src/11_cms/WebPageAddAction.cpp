@@ -174,7 +174,10 @@ namespace synthese
 
 			if(_template.get())
 			{
-				object.set<WebpageContent>(WebpageContent(_template->get<WebpageContent>().getCode()));
+				object.set<WebpageContent>(
+					WebpageContent(
+						_template->get<WebpageContent>().getCMSScript().getCode()
+				)	);
 				object.setParent(_template->getParent());
 			}
 

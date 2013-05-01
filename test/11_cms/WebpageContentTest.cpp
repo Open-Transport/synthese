@@ -1,5 +1,5 @@
 
-/** WebpageContent unit test.
+/** CMSScript unit test.
 	@file WebpageContentTest.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -27,7 +27,7 @@
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 #include "Website.hpp"
-#include "WebpageContent.hpp"
+#include "CMSScript.hpp"
 #include "StaticFunctionRequest.h"
 
 #include <boost/test/auto_unit_test.hpp>
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Empty content
 		string code;
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), true);
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Only a space
 		string code(" ");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // A space to trim
 		string code(" ");
-		WebpageContent wpc(code, true);
+		CMSScript wpc(code, true);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), true);
 		BOOST_CHECK_EQUAL(wpc.empty(), true);
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // A word
 		string code("test");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // 2 lines
 		string code("test\ntest");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Numeric expression
 		string code("test<@23@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Addition expression
 		string code("test<@23+12@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Subtraction expression
 		string code("test<@23-12@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Multiplication expression
 		string code("test<@23*12@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Division expression
 		string code("test<@24/12@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Modulo expression
 		string code("test<@25%12@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Not expression
 		string code("test<@!0@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Not expression
 		string code("test<@!1@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Not expression
 		string code("test<@!111@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Not expression
 		string code("test<@!(0)@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Not expression
 		string code("test<@~not(0)@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Sub expression
 		string code("test<@-3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Combined expression
 		string code("test<@-3+23@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // And expression
 		string code("test<@1&&1@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // And expression with spaces
 		string code("test<@ 1 && 1 @>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // And expression
 		string code("test<@1&&0@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Or expression
 		string code("test<@1||0@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Bitand expression
 		string code("test<@3&2@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Bitor expression
 		string code("test<@3|2@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Ternary operator
 		string code("test<@1?2:3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Ternary operator
 		string code("test<@0?2:3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable set
 		string code("test<@variable=2@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable get
 		string code("test<@variable=2@><@variable@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable + operation get
 		string code("test<@variable=2@><@variable+2@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // 2 variable with numbers + operation get
 		string code("test<@variable1=2@><@variable2=3@><@variable1+variable2@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Fake operation in variable set
 		string code("test<@variable=2+5@><@variable@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -377,7 +377,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Real operation in variable set
 		string code("test<@variable=<@2+5@>@><@variable@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable in variable
 		string code("test<@variable=<@variable1@>@><@variable@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable and operation and concatenation
 		string code("test<@variable=<@variable1+8@>-@><@variable@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // String in expression
 		string code("test<@\"test\"+3+\"test\"@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // String in expression with escaped character
 		string code("test<@\"test\\\"\"+3+\"\\\"test\"@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -433,7 +433,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Single quoted string in expression
 		string code("test<@'test'+3+'test'@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -443,7 +443,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Double quotes in single quoted expression
 		string code("test<@'test\"'+3+'\"test'@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -453,7 +453,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Parentheses
 		string code("test<@2+(4*6)@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -463,7 +463,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Multiple parentheses
 		string code("test<@2+((4*6)/(8-5))@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -473,7 +473,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Encapsulated expression
 		string code("test<@2+<@(4*6)/(8-5)@>@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -489,7 +489,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		pm2->insert("test", string("OK2"));
 		additionalParametersMap.insert("spm", pm2);
 		string code("test<{spm&template=<@test@>}>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -499,7 +499,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Foreach in expression
 		string code("test<@\"test\"+<{spm&template=<@test@>}>@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -509,7 +509,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Foreach in variable
 		string code("test<@variable=<{spm&template=<@test@>}>@><@variable@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -521,7 +521,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable printer
 		string code("<@@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -531,7 +531,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Empty expression
 		string code("<@ @>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), true);
@@ -541,7 +541,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Modulo operator
 		string code("<@4%3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -551,7 +551,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // & operator
 		string code("<@6&3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -561,7 +561,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // & operator with long long
 		string code("<@25769803776&12884901888@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -571,7 +571,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // & operator
 		string code("<@variable=6@><@variable&3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -581,7 +581,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Modulo operator
 		string code("<@3%4@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -591,7 +591,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Modulo operator
 		string code("<@5%3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -601,7 +601,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Equal test
 		string code("<@4==3@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -611,7 +611,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Equal test
 		string code("<@variable=OK1OK2@><@variable==\"OK1OK2\"@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -623,7 +623,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Equal test
 		string code("<@variable!=\"OK1OK2\"@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -635,7 +635,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Equal test
 		string code("<@variable!=\"K1OK2\"@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -647,7 +647,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Combined ternary operators
 		string code("<@1?<@0?2:3@>:4@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -657,7 +657,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable with _
 		string code("test<@_variable=4@><@_variable@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -670,7 +670,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Variable with spaces before and after the name
 		string code("test<@    variable  =6@><@  variable   @>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -683,7 +683,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Service call
 		string code("test<?if&cond=1&then=2&else=3?>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -696,7 +696,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Service call with & at the end
 		string code("test<?if&cond=0&then=1&else=2&?>=test");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -709,7 +709,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Service call
 		string code("test<?if&cond=0&then=2&else=3?>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -722,7 +722,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Delayed evaluation parameters
 		string code("test<?if&cond=1&then=<@variable=8@>&else=<@_variable=12@>?>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -735,7 +735,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Delayed evaluation parameters
 		string code("test<?if&cond=0&then=<@variable=22@>&else=<@_variable=37@>?>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -749,7 +749,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	{ // Access to additional parameter map
 		string code("test<@param@>");
 		additionalParametersMap.insert("param", 8);
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -776,7 +776,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		subMap3->insert("other", 57);
 		subMap2->insert("item", subMap3);
 		additionalParametersMap.insert("item", subMap2);
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -789,7 +789,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Unique access to sub map
 		string code("test<@item[26]@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -802,7 +802,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Unique access to sub map
 		string code("test<@item[26].other@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -815,7 +815,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Unique access to sub map
 		string code("test<@item[26].item[21]@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -828,7 +828,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Unique access to sub map
 		string code("test<@item[26].item[21].other@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -841,7 +841,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Create submap in CMS
 		string code("<@submap[\"idx\"]=test1@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -857,7 +857,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Create submap in CMS
 		string code("<@submap[\"idx\"].variable=test2@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -874,7 +874,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Strlen
 		string code("test<?strlen&t=0123456789?>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -885,7 +885,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	{ // Strfill
 		// Padding left the value 123 with a size of 5
 		string code("test<?strfill&t=123&s=5&pl=0?>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -895,7 +895,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Expression with >= operator
 		string code("test<@param>=5@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
@@ -905,12 +905,22 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Expression with >= operator
 		string code("test<@param>=10@>");
-		WebpageContent wpc(code);
+		CMSScript wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
 		string eval(wpc.eval(request, additionalParametersMap, page, variables));
 		BOOST_CHECK_EQUAL(eval, "test0");
+	}
+
+	{ // Expression with = in text
+		string code("test<@\"a=b\"@>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "testa=b");
 	}
 }
 
