@@ -98,7 +98,7 @@ namespace synthese
 				{
 					request_stream << "POST";
 				}
-				request_stream << " " << url << " HTTP/1.1\r\n";
+				request_stream << " " << url << " HTTP/1.0\r\n"; // TODO : upgrade to 1.1 by handling Transfer-Encoding: chunked
 				request_stream << "Host: " << _serverHost << ":" << _serverPort << "\r\n";
 				request_stream << "User-Agent: SYNTHESE/" << ServerModule::VERSION << "\r\n";
 				request_stream << "Accept: */*\r\n";
@@ -184,16 +184,35 @@ namespace synthese
 					}
 				}
 
+				// Obtaining size to transfer
+				size_t size(0);
+				size_t transferred(0);
+				Headers::const_iterator itSize(headers.find("Content-Length"));
+				if(itSize != headers.end())
+				{
+					size = lexical_cast<size_t>(itSize->second);
+				}
+
 				// Write whatever content we already have to output.
 				if (response.size() > 0)
 				{
+					transferred += response.size();
 					tmp << &response;
 				}
 
 				// Read until EOF, writing data to output as we go.
-				while(asio::read(socket, response, asio::transfer_at_least(1), error))
-				{
+				while(
+					asio::read(socket, response, asio::transfer_at_least(1), error)
+				){
+					transferred += response.size();
 					tmp << &response;
+
+					// Quit if the bytes to transfer are all present in the stream
+					if(size && transferred >= size)
+					{
+						error = asio::error::eof;
+						break;
+					}
 				}
 				if (error != asio::error::eof)
 				{
@@ -241,7 +260,7 @@ namespace synthese
 			}
 			size_t pos2(pos+2);
 			for(; pos2<url.size() && url[pos2]!=':' && url[pos2]!='/'; ++pos2) ;
-			host = url.substr(pos+2, pos2 - pos - 1);
+			host = url.substr(pos+2, pos2 - pos - 2);
 			if(pos2 < url.size())
 			{
 				if(url[pos2] == ':')
