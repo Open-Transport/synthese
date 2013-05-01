@@ -23,36 +23,26 @@
 #ifndef SYNTHESE_cms_WebpageContent_hpp__
 #define SYNTHESE_cms_WebpageContent_hpp__
 
+#include "CMSScript.hpp"
 #include "Factory.h"
 #include "Function.h"
 #include "ComplexObjectFieldDefinition.hpp"
 
 #include "FrameworkTypes.hpp"
-#include "WebpageContentNode.hpp"
 #include "MimeType.hpp"
 #include "MimeTypes.hpp"
 
-#include "shared_recursive_mutex.hpp"
-
 #include <boost/logic/tribool.hpp>
 #include <ostream>
-#include <vector>
-#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
 	class FilesMap;
 	class ObjectBase;
 
-	namespace server
-	{
-		class Request;
-	}
-
 	namespace util
 	{
 		class Env;
-		class ParametersMap;
 	}
 
 	namespace cms
@@ -69,42 +59,9 @@ namespace synthese
 			typedef WebpageContent Type;
 
 		private:
-
-		protected:
-			std::string _code;
-			bool _ignoreWhiteChars;
+			CMSScript _script;
 			util::MimeType _mimeType;
-			bool _doNotEvaluate;
 
-		private:
-			typedef std::vector<boost::shared_ptr<WebpageContentNode> > Nodes;
-			mutable Nodes _nodes;
-			boost::shared_ptr<util::shared_recursive_mutex> _sharedMutex;
-
-			void _updateNodes();
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Parses the content and put it in the nodes cache.
-			/// @retval nodes object to write the result on
-			/// @param it iterator on the beginning of the string to parse
-			/// @param end iterator on the end of the string to parse
-			/// @param termination termination string to detect to interrupt the parsing
-			/// @return iterator on the end of the parsing
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			/// The parsing stops when the iterator has reached the end of the string, or if the ?> sequence has been found, indicating that the following text belongs to
-			///	a lower level of recursion.
-			/// If the level of recursion is superior than 0, then the output is encoded
-			/// as an url to avoid mistake when the result of parsing is considered as
-			/// a single parameter of a function call.
-			void _parse(
-				std::string::const_iterator& it,
-				std::string::const_iterator end,
-				std::set<std::string> termination
-			);
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -124,67 +81,12 @@ namespace synthese
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Constructor by string part parsing.
-			WebpageContent(
-				std::string::const_iterator& it,
-				std::string::const_iterator end,
-				std::set<std::string> termination
-			);
-
 			/// @name Getters
 			//@{
-				const std::string& getCode() const { return _code; }
-				bool getIgnoreWhiteChars() const { return _ignoreWhiteChars; }
+				const CMSScript& getCMSScript() const { return _script; }
 				const util::MimeType& getMimeType() const { return _mimeType; }
-				bool getDoNotEvaluate() const { return _doNotEvaluate; }
 			//@}
 
-			/// @name Modifiers
-			//@{
-				//////////////////////////////////////////////////////////////////////////
-				/// Runs a nodes update if the value has changed.
-				void setCode(const std::string& value);
-			//@}
-
-			/// @name Services
-			//@{
-				//////////////////////////////////////////////////////////////////////////
-				/// Checks if the objects has at least a node to display.
-				bool empty() const { return _nodes.empty(); }
-			
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Evaluates the nodes on a stream.
-				/// @param stream stream to write on
-				/// @param request current request
-				/// @author Hugues Romain
-				/// @date 2010
-				/// @since 3.1.16
-				void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Evaluates the nodes on a new string.
-				/// @param request current request
-				/// @author Hugues Romain
-				/// @date 2012
-				/// @since 3.4.0
-				std::string eval(
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			//@}
 
 
 			static void LoadFromRecord(

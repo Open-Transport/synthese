@@ -42,6 +42,7 @@ namespace synthese
 	{
 		const string ForEachExpression::DATA_ITEMS_COUNT = "items_count";
 		const string ForEachExpression::DATA_RANK = "rank";
+		const string ForEachExpression::DATA_DEPTH = "depth";
 		const string ForEachExpression::PARAMETER_EMPTY = "empty";
 		const string ForEachExpression::PARAMETER_SORT_DOWN = "sort_down";
 		const string ForEachExpression::PARAMETER_SORT_UP = "sort_up";
@@ -116,7 +117,7 @@ namespace synthese
 
 					if(it != end)
 					{
-						WebpageContent parameterNodes(it, end, functionTermination);
+						CMSScript parameterNodes(it, end, functionTermination);
 						string parameterNameStr(ParametersMap::Trim(parameterName.str()));
 						
 						if(parameterNameStr == WebPageDisplayFunction::PARAMETER_PAGE_ID)
@@ -183,7 +184,8 @@ namespace synthese
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page,
-			util::ParametersMap& variables
+			util::ParametersMap& variables,
+			size_t depth
 		) const	{
 
 			// Page load
@@ -292,7 +294,8 @@ namespace synthese
 						NULL,
 						rank,
 						itemsCount,
-						noRecursive
+						noRecursive,
+						depth
 					);
 
 					// Insertion in the map
@@ -308,7 +311,7 @@ namespace synthese
 						it != sortedItems.end(); /* no increment */)
 					{
 						string key(it->first);
-						unsigned found = key.find_first_of("|");
+						size_t found = key.find_first_of("|");
 						if(found != std::string::npos)
 						{
 							key = key.substr(0, found);
@@ -379,27 +382,29 @@ namespace synthese
 				if(_recursive)
 				{
 					display(
-								recursiveContent,
-								request,
-								*pm,
-								page,
-								variables
-								);
+						recursiveContent,
+						request,
+						*pm,
+						page,
+						variables,
+						depth + 1
+					);
 				}
 
 				_displayItem(
-							stream,
-							request,
-							page,
-							baseParametersMap,
-							*pm,
-							variables,
-							optional<const WebpageContent&>(),
-							templatePage,
-							rank,
-							itemsCount,
-							recursiveContent.str()
-							);
+					stream,
+					request,
+					page,
+					baseParametersMap,
+					*pm,
+					variables,
+					optional<const CMSScript&>(),
+					templatePage,
+					rank,
+					itemsCount,
+					recursiveContent.str(),
+					depth
+				);
 			}
 			else
 			{
@@ -418,7 +423,8 @@ namespace synthese
 								request,
 								*item.second,
 								page,
-								variables
+								variables,
+								depth + 1
 							);
 						}
 
@@ -429,11 +435,12 @@ namespace synthese
 							baseParametersMap,
 							*item.second,
 							variables,
-							optional<const WebpageContent&>(),
+							optional<const CMSScript&>(),
 							templatePage,
 							rank,
 							itemsCount,
-							recursiveContent.str()
+							recursiveContent.str(),
+							depth
 						);
 					}
 				}
@@ -452,7 +459,8 @@ namespace synthese
 								request,
 								*item.second,
 								page,
-								variables
+								variables,
+								depth + 1
 							);
 						}
 
@@ -463,11 +471,12 @@ namespace synthese
 							baseParametersMap,
 							*item.second,
 							variables,
-							optional<const WebpageContent&>(),
+							optional<const CMSScript&>(),
 							templatePage,
 							rank,
 							itemsCount,
-							recursiveContent.str()
+							recursiveContent.str(),
+							depth
 						);
 					}
 				}
@@ -492,7 +501,8 @@ namespace synthese
 								request,
 								*item,
 								page,
-								variables
+								variables,
+								depth + 1
 							);
 						}
 
@@ -503,11 +513,12 @@ namespace synthese
 							baseParametersMap,
 							*item,
 							variables,
-							optional<const WebpageContent&>(),
+							optional<const CMSScript&>(),
 							templatePage,
 							rank,
 							itemsCount,
-							recursiveContent.str()
+							recursiveContent.str(),
+							depth
 						);
 					}
 				}
@@ -523,15 +534,17 @@ namespace synthese
 			const util::ParametersMap& baseParametersMap,
 			const util::ParametersMap& item,
 			util::ParametersMap& variables,
-			optional<const WebpageContent&> templateContent,
+			optional<const CMSScript&> templateContent,
 			const Webpage* templatePage,
 			size_t& rank,
 			size_t itemsCount,
-			const std::string& recursiveContent
+			const string& recursiveContent,
+			size_t depth
 		) const {
 			ParametersMap pm(item);
 			pm.merge(baseParametersMap);
 			pm.insert(DATA_RANK, rank++);
+			pm.insert(DATA_DEPTH, depth);
 			pm.insert(DATA_ITEMS_COUNT, itemsCount);
 			if(!recursiveContent.empty())
 			{
@@ -562,7 +575,7 @@ namespace synthese
 			util::ParametersMap& variables
 		) const	{
 			stringstream s;
-			display(s, request, additionalParametersMap, page, variables);
+			display(s, request, additionalParametersMap, page, variables, 0);
 			return s.str();
 		}
 }	}

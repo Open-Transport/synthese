@@ -145,12 +145,15 @@ namespace synthese
 			// TAB CONTENT
 			if (openTabContent(stream, TAB_CONTENT))
 			{
+				const string& code(
+					_page->get<WebpageContent>().getCMSScript().getCode()
+				);
 				bool canBeWYSIWYG(
-					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<?") &&
-					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<#") &&
-					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<@") &&
-					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<{") &&
-					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<%")
+					!boost::algorithm::find_first(code, "<?") &&
+					!boost::algorithm::find_first(code, "<#") &&
+					!boost::algorithm::find_first(code, "<@") &&
+					!boost::algorithm::find_first(code, "<{") &&
+					!boost::algorithm::find_first(code, "<%")
 				);
 
 				stream << "<h1>Visualisation</h1>";
@@ -191,7 +194,12 @@ namespace synthese
 				){
 					if(_page->get<WebpageContent>().getMimeType() == MimeTypes::HTML)
 					{
-						stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->get<WebpageContent>().getCode());
+						stream <<
+							TinyMCE::GetFakeFormWithInput(
+								WebPageUpdateAction::PARAMETER_CONTENT1,
+								_page->get<WebpageContent>().getCMSScript().getCode()
+							)
+						;
 					}
 					else if(_page->get<WebpageContent>().getMimeType() == MimeTypes::PNG ||
 						_page->get<WebpageContent>().getMimeType() == MimeTypes::GIF ||
@@ -209,7 +217,13 @@ namespace synthese
 					AjaxForm f(contentUpdateRequest.getAjaxForm("update_content"));
 					stream << f.open();
 					EditArea editArea(stream);
-					editArea.getAjaxForm(stream, contentUpdateRequest.getURL(), WebPageUpdateAction::PARAMETER_CONTENT1, _page->get<WebpageContent>().getCode(), 20, 80);
+					editArea.getAjaxForm(
+						stream,
+						contentUpdateRequest.getURL(),
+						WebPageUpdateAction::PARAMETER_CONTENT1,
+						_page->get<WebpageContent>().getCMSScript().getCode(),
+						20, 80
+					);
 					stream << f.getSubmitButton("Sauvegarder");
 					stream << f.close();
 				}
@@ -259,9 +273,23 @@ namespace synthese
 					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->get<SpecificTemplate>() ? lexical_cast<string>(_page->get<SpecificTemplate>()->getKey()) : "0"));
 					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->get<DoNotUseTemplate>()));
 					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->get<HasForum>()));
-					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->get<WebpageContent>().getIgnoreWhiteChars()));
+					stream <<
+						t.cell(
+							"Ignorer caractères invisibles",
+							t.getForm().getOuiNonRadioInput(
+								WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS,
+								_page->get<WebpageContent>().getCMSScript().getIgnoreWhiteChars()
+						)	)
+					;
 					stream << t.cell("Type MIME", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->getMimeType()));
-					stream << t.cell("Ne pas evaluer le code", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_EVALUATE, _page->get<WebpageContent>().getDoNotEvaluate()));
+					stream <<
+						t.cell(
+							"Ne pas evaluer le code",
+							t.getForm().getOuiNonRadioInput(
+								WebPageUpdateAction::PARAMETER_DO_NOT_EVALUATE,
+								_page->get<WebpageContent>().getCMSScript().getDoNotEvaluate()
+						)	)
+					;
 					stream << t.close();
 				}
 			}
