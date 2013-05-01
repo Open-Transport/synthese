@@ -34,21 +34,21 @@ namespace synthese
 		class TreeOtherClassRootPolicy
 		{
 		public:
-			typedef O TreeRootType;
+			typedef O RootType;
 
 		private:
-			TreeRootType* _root;
+			RootType* _root;
 
 		public:
 			TreeOtherClassRootPolicy() : _root(NULL) {}
 
-			TreeRootType* getRoot() const { return _root; }
+			RootType* getRoot() const { return _root; }
 
 			bool hasRoot() const { return _root != NULL; }
 
 			const typename O::ChildrenType& getRootChildren() const { return getRoot()->getChildren(); }
 
-			void setRoot(TreeRootType* value) { _root=value; }
+			void setRoot(RootType* value) { _root=value; }
 
 			void setSameRoot(const TreeOtherClassRootPolicy<O>& value){ _root = value._root; }
 

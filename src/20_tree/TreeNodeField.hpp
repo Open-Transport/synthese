@@ -103,9 +103,9 @@ namespace synthese
 					{
 						try
 						{
-							t.setRoot(env.getEditable<typename T::TreeRootType>(id).get());
+							t.setRoot(env.getEditable<typename T::RootType>(id).get());
 						}
-						catch(util::ObjectNotFoundException<typename T::TreeRootType>&)
+						catch(util::ObjectNotFoundException<typename T::RootType>&)
 						{
 							util::Log::GetInstance().warn(
 								"Data corrupted in on node " + boost::lexical_cast<std::string>(object.getKey()) +" : root " +
