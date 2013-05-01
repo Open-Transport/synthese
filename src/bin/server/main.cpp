@@ -255,9 +255,9 @@ int main( int argc, char **argv )
 
 			if (vm.count("version"))
 			{
-				std::cout << "SYNTHESE " << SYNTHESE_VERSION << " " <<
-					SYNTHESE_REVISION <<
-					" (" << SYNTHESE_BUILD_DATE << ")" << std::endl;
+				std::cout << "SYNTHESE " << ServerModule::VERSION << " " <<
+					ServerModule::REVISION <<
+					" (" << ServerModule::BUILD_DATE << ")" << std::endl;
 				return 1;
 			}
 
