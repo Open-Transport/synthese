@@ -57,7 +57,10 @@ namespace synthese
 			}
 			pm.merge(additionalParametersMap);
 
-			Webpage* includedPage(page.getRoot()->getPageBySmartURL(_pageName));
+			Webpage* includedPage(
+				page.getRoot()->getPageBySmartURL(
+					_pageName.eval(request, additionalParametersMap, page, variables)
+			)	);
 			if(includedPage)
 			{
 				includedPage->display(stream, request, pm, variables);
@@ -84,11 +87,13 @@ namespace synthese
 			std::string::const_iterator end
 		){
 			// page name
-			_pageName = "!";
+			string pageName("!");
 			for(;it != end && *it != '&' && *it != '#'; ++it)
 			{
-				_pageName.push_back(*it);
+				pageName.push_back(*it);
 			}
+			_pageName.setCode(pageName);
+
 			// parameters
 			if(it != end && *it == '#')
 			{
@@ -107,7 +112,7 @@ namespace synthese
 
 					if(it != end)
 					{
-						WebpageContent parameterNodes(
+						CMSScript parameterNodes(
 							it,
 							end,
 							functionTermination

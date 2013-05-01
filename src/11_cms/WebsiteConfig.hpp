@@ -25,20 +25,22 @@
 
 #include "Object.hpp"
 
+#include "CMSScriptField.hpp"
 #include "NumericField.hpp"
 #include "Registry.h"
-#include "WebpageContent.hpp"
 #include "Webpage.h"
 #include "Website.hpp"
 
 namespace synthese
 {
+	FIELD_CMS_SCRIPT(ConfigScript)
+
 	namespace cms
 	{
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Website),
-			FIELD(WebpageContent)
+			FIELD(ConfigScript)
 		> WebsiteConfigRecord;
 
 

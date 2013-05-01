@@ -52,7 +52,7 @@ namespace synthese
 
 		private:
 			Items _variable;
-			WebpageContent _value;
+			CMSScript _value;
 
 		public:
 			VariableUpdateNode(

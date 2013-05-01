@@ -25,10 +25,17 @@
 
 #include "Expression.hpp"
 
-#include "WebpageContent.hpp"
+#include "CMSScript.hpp"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
+	namespace server
+	{
+		class FunctionAPI;
+	}
+
 	namespace cms
 	{
 		/** ForEachExpression class.
@@ -40,6 +47,7 @@ namespace synthese
 		private:
 			static const std::string DATA_ITEMS_COUNT;
 			static const std::string DATA_RANK;
+			static const std::string DATA_DEPTH;
 			static const std::string DATA_RECURSIVE_CONTENT;
 			static const std::string PARAMETER_EMPTY;
 			static const std::string PARAMETER_SORT_DOWN;
@@ -52,15 +60,17 @@ namespace synthese
 
 
 			std::string _arrayCode;
-			WebpageContent _pageCode;
-			WebpageContent _inlineTemplate;
-			WebpageContent _emptyTemplate;
-			WebpageContent _sortUpTemplate;
-			WebpageContent _sortDownTemplate;
-			WebpageContent _sortAlgoNode;
-			WebpageContent _maxPerSortKey;
+
+			CMSScript _pageCode;
+			CMSScript _inlineTemplate;
+			CMSScript _emptyTemplate;
+			CMSScript _sortUpTemplate;
+			CMSScript _sortDownTemplate;
+			CMSScript _sortAlgoNode;
+			CMSScript _maxPerSortKey;
 			bool _resultsInASubmap;
-			typedef std::vector<std::pair<std::string, WebpageContent> > Parameters;
+			typedef std::vector<std::pair<std::string, CMSScript> > Parameters;
+
 			Parameters _parameters;
 			bool _recursive;
 
@@ -79,7 +89,8 @@ namespace synthese
 				const server::Request& request,
 				const util::ParametersMap& additionalParametersMap,
 				const Webpage& page,
-				util::ParametersMap& variables
+				util::ParametersMap& variables,
+				size_t depth
 			) const;
 
 
@@ -91,11 +102,12 @@ namespace synthese
 				const util::ParametersMap& baseParametersMap,
 				const util::ParametersMap& item,
 				util::ParametersMap& variables,
-				boost::optional<const WebpageContent&> templateContent,
+				boost::optional<const CMSScript&> templateContent,
 				const Webpage* templatePage,
 				size_t& rank,
 				size_t itemsCount,
-				const std::string& recursiveContent
+				const std::string& recursiveContent,
+				size_t depth
 			) const;
 
 

@@ -25,7 +25,7 @@
 
 #include "ParametersMap.h"
 
-#include "WebpageContent.hpp"
+#include "CMSScript.hpp"
 
 namespace synthese
 {
@@ -40,12 +40,12 @@ namespace synthese
 		public:
 			struct Field
 			{
-				static const WebpageContent emptyContent;
+				static const CMSScript emptyContent;
 
-				const WebpageContent& content;
+				const CMSScript& content;
 				mutable boost::optional<std::string> result;
 
-				Field(const WebpageContent& _content);
+				Field(const CMSScript& _content);
 				Field(const std::string& constContent);
 			};
 

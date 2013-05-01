@@ -28,7 +28,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		const WebpageContent DelayedEvaluationParametersMap::Field::emptyContent;
+		const CMSScript DelayedEvaluationParametersMap::Field::emptyContent;
 
 
 
@@ -96,7 +96,7 @@ namespace synthese
 
 
 		DelayedEvaluationParametersMap::Field::Field(
-			const WebpageContent& _content
+			const CMSScript& _content
 		):	content(_content)
 		{}
 

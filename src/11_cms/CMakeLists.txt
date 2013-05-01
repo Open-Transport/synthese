@@ -18,6 +18,9 @@ CMSModule.hpp
 CMSModule.inc.cpp
 CMSRight.cpp
 CMSRight.hpp
+CMSScript.cpp
+CMSScript.hpp
+CMSScriptField.hpp
 ConstantExpression.cpp
 ConstantExpression.hpp
 DateService.cpp

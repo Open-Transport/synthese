@@ -26,6 +26,8 @@ namespace synthese
 {
 	CLASS_DEFINITION(cms::WebsiteConfig, "t103_website_configs", 103)
 
+	FIELD_DEFINITION_OF_TYPE(ConfigScript, "content1", SQL_TEXT)
+
 	using namespace util;
 		
 	namespace cms
@@ -36,7 +38,7 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Website),
-					FIELD_DEFAULT_CONSTRUCTOR(WebpageContent)
+					FIELD_DEFAULT_CONSTRUCTOR(ConfigScript)
 			)	)
 		{
 		}

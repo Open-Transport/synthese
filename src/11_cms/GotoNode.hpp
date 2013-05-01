@@ -25,7 +25,7 @@
 
 #include "WebpageContentNode.hpp"
 
-#include "WebpageContent.hpp"
+#include "CMSScript.hpp"
 
 namespace synthese
 {
@@ -38,7 +38,7 @@ namespace synthese
 			public WebpageContentNode
 		{
 		private:
-			WebpageContent _direction;
+			CMSScript _direction;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
