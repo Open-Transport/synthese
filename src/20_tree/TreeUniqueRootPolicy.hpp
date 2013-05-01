@@ -42,7 +42,7 @@ namespace synthese
 			public TreeRoot<T, OrderingPolicy_>
 		{
 		public:
-			typedef T* RootType;
+			typedef T RootType;
 
 			TreeUniqueRootPolicy() {}
 
@@ -50,7 +50,9 @@ namespace synthese
 
 			bool hasRoot() const { return true; }
 
-			void setSameRoot(const TreeUniqueRootPolicy<OrderingPolicy_, T>&){ }
+			void setRoot(RootType* value){}
+
+			void setSameRoot(const TreeUniqueRootPolicy<OrderingPolicy_, T>&){}
 
 			const typename TreeRoot<T, OrderingPolicy_>::ChildrenType& getRootChildren() const { return getRoot()->getChildren(); }
 
