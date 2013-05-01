@@ -83,6 +83,8 @@ namespace synthese
 		public PointerField<ObjectClass_, ObjectClass_>
 	{
 	public:
+		/// Registry class.
+		typedef util::Registry<ObjectClass_>	Registry;
 
 		struct Vector:
 			public PointersVectorField<Vector, ObjectClass_>
