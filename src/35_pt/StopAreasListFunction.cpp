@@ -25,6 +25,7 @@
 
 #include "RequestException.h"
 #include "StopAreasListFunction.hpp"
+#include "StopAreaTableSync.hpp"
 #include "TransportNetwork.h"
 #include "CommercialLine.h"
 #include "StopArea.hpp"
@@ -74,6 +75,8 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_STOP_PAGE_ID = "stop_page_id";
 		const string StopAreasListFunction::PARAMETER_LINE_PAGE_ID = "line_page_id";
 		const string StopAreasListFunction::PARAMETER_TERMINUS_ID = "terminus_id";
+		const string StopAreasListFunction::PARAMETER_OUTPUT_STOPS = "output_stops";
+		const string StopAreasListFunction::PARAMETER_GROUP_BY_CITIES = "group_by_cities";
 
 		const string StopAreasListFunction::DATA_LINE = "line";
 		const string StopAreasListFunction::DATA_LINES = "lines";
@@ -87,6 +90,10 @@ namespace synthese
 			if(_commercialLine.get())
 			{
 				result.insert(Request::PARAMETER_OBJECT_ID, _commercialLine->getKey());
+			}
+			if(_stopAreaFilter.get())
+			{
+				result.insert(Request::PARAMETER_OBJECT_ID, _stopAreaFilter->getKey());
 			}
 			if(_bbox)
 			{
@@ -118,6 +125,18 @@ namespace synthese
 			{
 				result.insert(PARAMETER_TERMINUS_ID, *_terminusId);
 			}
+
+			// Output stops ?
+			if(_outputStops)
+			{
+				result.insert(PARAMETER_OUTPUT_STOPS, _outputStops);
+			}
+
+			// Group by cities ?
+			if(_groupByCities)
+			{
+				result.insert(PARAMETER_GROUP_BY_CITIES, _groupByCities);
+			}
 			return result;
 		}
 
@@ -129,7 +148,8 @@ namespace synthese
 			if(roid)
 			{
 				// Line filter
-				if(decodeTableId(roid) == CommercialLineTableSync::TABLE.ID) try
+				RegistryTableType tableId(decodeTableId(roid));
+				if(tableId == CommercialLineTableSync::TABLE.ID) try
 				{
 					_commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 				}
@@ -138,7 +158,7 @@ namespace synthese
 					throw RequestException("No such Commercial Line");
 				}
 				// City filter
-				else if(decodeTableId(roid) == CityTableSync::TABLE.ID) try
+				else if(tableId == CityTableSync::TABLE.ID) try
 				{
 					_city = Env::GetOfficialEnv().get<City>(roid);
 				}
@@ -146,10 +166,25 @@ namespace synthese
 				{
 					throw RequestException("No such city");
 				}
+				// Stop area filter
+				else if(tableId == StopAreaTableSync::TABLE.ID) try
+				{
+					_stopAreaFilter = Env::GetOfficialEnv().get<StopArea>(roid);
+				}
+				catch (ObjectNotFoundException<StopArea>&)
+				{
+					throw RequestException("No such stop area");
+				}
 			}
 
 			// Output lines
 			_outputLines = map.isTrue(PARAMETER_OUTPUT_LINES);
+
+			// Output stops ?
+			_outputStops = map.isTrue(PARAMETER_OUTPUT_STOPS);
+
+			// Group by cities ?
+			_groupByCities = map.isTrue(PARAMETER_GROUP_BY_CITIES);
 
 			// SRID
 			CoordinatesSystem::SRID srid(
@@ -289,6 +324,10 @@ namespace synthese
 				{
 					stopSet.insert(dynamic_cast<StopArea*>(itStopArea.second.get()));
 				}
+			}
+			else if(_stopAreaFilter.get())
+			{
+				stopSet.insert(_stopAreaFilter.get());
 			}
 			else
 			{

@@ -48,6 +48,7 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
+		class StopArea;
 
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Stop Area list public Function class.
@@ -66,6 +67,8 @@ namespace synthese
 			static const std::string PARAMETER_STOP_PAGE_ID;
 			static const std::string PARAMETER_LINE_PAGE_ID;
 			static const std::string PARAMETER_TERMINUS_ID;
+			static const std::string PARAMETER_OUTPUT_STOPS;
+			static const std::string PARAMETER_GROUP_BY_CITIES;
 
 		private:
 			static const std::string DATA_LINE;
@@ -79,6 +82,7 @@ namespace synthese
 			//@{
 				boost::shared_ptr<const pt::CommercialLine> _commercialLine;
 				boost::shared_ptr<const geography::City> _city;
+				boost::shared_ptr<const StopArea> _stopAreaFilter;
 				boost::optional<geos::geom::Envelope> _bbox;
 				const CoordinatesSystem* _coordinatesSystem;
 				bool _outputLines;
@@ -86,6 +90,8 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _linePage;
 				std::string _outputFormat;
 				boost::optional<util::RegistryKeyType> _terminusId;
+				bool _outputStops;
+				bool _groupByCities;
 			//@}
 
 			//! @name Setters
