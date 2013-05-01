@@ -578,7 +578,8 @@ namespace synthese
 
 		void ParametersMap::merge(
 			const ParametersMap& other,
-			string prefix
+			string prefix,
+			bool withSubmap
 		){
 			assert(_format == other._format);
 
@@ -595,6 +596,20 @@ namespace synthese
 
 				// Insertion of the item in the current map
 				_map.insert(make_pair(key, it.second));
+			}
+
+			// Merge the submap
+			if(withSubmap)
+			{
+				BOOST_FOREACH(const SubParametersMap::value_type& it, other._subMap)
+				{
+					string key(prefix + it.first);
+
+					BOOST_FOREACH(const shared_ptr<ParametersMap>& item, it.second)
+					{
+						insert(key, item);
+					}
+				}
 			}
 		}
 
@@ -726,5 +741,12 @@ namespace synthese
 				result.push_back(item.first);
 			}
 			return result;
+		}
+
+
+
+		bool ParametersMap::operator<( const ParametersMap& rhs ) const
+		{
+			return _map < rhs._map;
 		}
 }	}
