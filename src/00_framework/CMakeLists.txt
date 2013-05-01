@@ -26,12 +26,15 @@ NumericField.hpp
 Object.hpp
 ObjectBase.cpp
 ObjectBase.hpp
+ParametersMapField.cpp
+ParametersMapField.hpp
 PointerField.hpp
 PtimeField.cpp
 PtimeField.hpp
 Record.cpp
 Record.hpp
 SchemaMacros.hpp
+SecondsField.hpp
 SimpleMapField.hpp
 SimpleObjectFieldDefinition.hpp
 StringField.cpp
