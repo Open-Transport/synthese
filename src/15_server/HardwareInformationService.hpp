@@ -26,7 +26,10 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
+
+#ifndef WIN32
 #include <arpa/inet.h>
+#endif
 
 namespace synthese
 {
