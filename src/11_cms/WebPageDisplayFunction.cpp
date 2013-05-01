@@ -26,6 +26,7 @@
 
 #include "Action.h"
 #include "CMSModule.hpp"
+#include "DelayedEvaluationParametersMap.hpp"
 #include "Env.h"
 #include "Request.h"
 #include "RequestException.h"
@@ -276,17 +277,48 @@ namespace synthese
 				}
 				pm.insert(ATTR_EQUIV_URL, url.str());
 
+				// Page data
+				_page->toParametersMap(pm);
+
 				if(_useTemplate && _page->getTemplate())
 				{
-					// Page data
-					_page->toParametersMap(pm);
+					DelayedEvaluationParametersMap::Fields fields;
+					BOOST_FOREACH(const ParametersMap::Map::value_type& it, pm.getMap())
+					{
+						fields.insert(
+							make_pair(
+								it.first,
+								DelayedEvaluationParametersMap::Field(it.second)
+						)	);
+					}
 
-					// Generated content
+					// The page content will be evaluated when it will be displayed
+					// Variables initialized by the template are available at the page
+					// evaluation
 					stringstream content;
-					_page->display(content, request, pm);
-					pm.insert(DATA_CONTENT, content.str());
-
-					_page->getTemplate()->display(stream, request, pm);
+					fields.insert(
+						make_pair(
+							DATA_CONTENT,
+							DelayedEvaluationParametersMap::Field(_page->get<WebpageContent>().getCMSScript())
+					)	);
+					
+					ParametersMap variables;
+					DelayedEvaluationParametersMap depm(
+						fields,
+						request,
+						pm,
+						*_page,
+						variables
+					);
+					
+					// Display the template
+					_page->getTemplate()->get<WebpageContent>().getCMSScript().display(
+						stream,
+						request,
+						depm,
+						*_page,
+						variables
+					);
 				}
 				else
 				{
@@ -332,9 +364,10 @@ namespace synthese
 			_dontRedirectIfSmartURL(false)
 		{}
 		
+
+
 		boost::posix_time::time_duration WebPageDisplayFunction::getMaxAge() const
 		{
 			return _page->getMaxAge();
 		}
-		
 }	}

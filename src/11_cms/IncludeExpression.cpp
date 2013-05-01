@@ -63,7 +63,13 @@ namespace synthese
 			)	);
 			if(includedPage)
 			{
-				includedPage->display(stream, request, pm, variables);
+				includedPage->get<WebpageContent>().getCMSScript().display(
+					stream,
+					request,
+					pm,
+					page,
+					variables
+				);
 			}
 		}
 
