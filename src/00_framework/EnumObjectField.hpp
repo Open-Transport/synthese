@@ -25,6 +25,8 @@
 
 #include "SimpleObjectFieldDefinition.hpp"
 
+#include "Log.h"
+
 namespace synthese
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -52,7 +54,20 @@ namespace synthese
 		){
 			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				fieldObject = static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name));
+				try
+				{
+					fieldObject = static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name));
+				}
+				catch(Record::MissingParameterException& e)
+				{
+					std::stringstream message;
+					message << "Undefined enum in field " << SimpleObjectFieldDefinition<C>::FIELD.name;
+					if(record.getDefault<util::RegistryKeyType>("id"))
+					{
+						message << " in object " << record.get<util::RegistryKeyType>("id");
+					}
+					util::Log::GetInstance().warn(message.str(), e);
+				}
 			}
 		}
 
