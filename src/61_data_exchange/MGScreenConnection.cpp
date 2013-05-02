@@ -207,7 +207,7 @@ namespace synthese
 					catch(std::exception& e)
 					{
 						util::Log::GetInstance().info(
-							e.what()
+							string("MGScreenConnection : ") + e.what()
 						);
 					}
 					catch(thread_interrupted)
