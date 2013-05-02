@@ -120,7 +120,7 @@ namespace synthese
 		{
 			if(!_buf.get())
 			{
-				throw Exception("Buffer is null");
+				throw Exception("MGScreenConnection : Buffer is null");
 			}
 
 			// Set a deadline for the asynchronous operation. Since this function uses
@@ -280,8 +280,8 @@ namespace synthese
 			reply << "{ \"jsonrpc\": \"2.0\", \"id\": \"1\", \"method\": "
 					 "\"registerObject\", \"params\": [ \"InfovisionInputState\" ] }\n";
 
-			cout << reply.str() << endl;
 			boost::asio::write(_socket, boost::asio::buffer(reply.str()));
+			util::Log::GetInstance().debug("MGScreenConnection : registerData : " + reply.str());
 		}
 
 		void MGScreenConnection::displaySetBacklightParams(int min, int max, int speed) const
@@ -298,8 +298,8 @@ namespace synthese
 						 "\"Maximum\": " << max << ", " <<
 						 "\"Speed\": " << speed << " " <<
 						 "} }\n";
-				cout << reply.str() << endl;
 				boost::asio::write(_socket, boost::asio::buffer(reply.str()));
+				util::Log::GetInstance().debug("MGScreenConnection : displaySetBacklightParams : " + reply.str());
 			}
 		}
 
@@ -315,8 +315,8 @@ namespace synthese
 						 "\"PanelNo\": 0, "
 						 "\"BacklightValue\": " << value << " " <<
 						 "} }\n";
-				cout << reply.str() << endl;
 				boost::asio::write(_socket, boost::asio::buffer(reply.str()));
+				util::Log::GetInstance().debug("MGScreenConnection : displaySetBacklightValue : " + reply.str());
 			}
 		}
 
@@ -346,9 +346,9 @@ namespace synthese
 			// Log the input
 			if(Log::GetInstance().getLevel() <= Log::LEVEL_DEBUG)
 			{
-				util::Log::GetInstance().info(
-					bufStr
-				);
+				string singleLine(bufStr);
+				replace(singleLine.begin(), singleLine.end(), '\n', ' ');
+				util::Log::GetInstance().debug("MGScreenConnection : " + singleLine);
 			}
 
 			boost::property_tree::ptree pt;

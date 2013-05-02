@@ -135,7 +135,7 @@ namespace synthese
 		{
 			if(!_buf.get())
 			{
-				throw Exception("Buffer is null");
+				throw Exception("IneoNCEConnection : Buffer is null");
 			}
 
 			// Set a deadline for the asynchronous operation. Since this function uses
@@ -467,7 +467,7 @@ namespace synthese
 			XMLNode allNode = XMLNode::parseString(xml.c_str(), NULL, &results);
 			if (results.error != eXMLErrorNone)
 			{
-				throw Exception("Invalid XML");
+				throw Exception("IneoNCEConnection : Invalid XML");
 			}
 			return allNode;
 		}
@@ -552,9 +552,9 @@ namespace synthese
 			// Log the input
 			if(Log::GetInstance().getLevel() <= Log::LEVEL_DEBUG)
 			{
-				util::Log::GetInstance().info(
-					bufStr
-				);
+				string singleLine(bufStr);
+				replace(singleLine.begin(), singleLine.end(), '\n', ' ');
+				util::Log::GetInstance().debug("IneoNCEConnection : " + singleLine);
 			}
 
 			// Parsing
@@ -590,7 +590,7 @@ namespace synthese
 						{
 							VehicleModule::GetCurrentVehiclePosition().setVehicle(NULL);
 							util::Log::GetInstance().error(
-								"Could not find vehicle number " + vehicleNumber
+								"IneoNCEConnection : Could not find vehicle number " + vehicleNumber
 							);
 						}
 					}
@@ -657,7 +657,7 @@ namespace synthese
 					}
 					catch(bad_lexical_cast&)
 					{
-						// Log
+						util::Log::GetInstance().error("IneoNCEConnection : Failed to parse MsgLoc");
 					}
 				}
 
@@ -713,7 +713,8 @@ namespace synthese
 					}
 					catch(bad_lexical_cast&)
 					{
-						// Log
+						util::Log::GetInstance().error("IneoNCEConnection : Failed to parse Curv " +
+													   string(curvNode.getText()));
 					}
 				}
 
@@ -739,7 +740,9 @@ namespace synthese
 						}
 						catch (bad_lexical_cast&)
 						{
-							
+							util::Log::GetInstance().error("IneoNCEConnection : Failed to parse GPS Long / Lat " +
+														   string(longNode.getText()) +
+														   string(latNode.getText()) );
 						}
 					}
 				}
@@ -817,7 +820,9 @@ namespace synthese
 					split(parts, dateStr, is_any_of("/"));
 					if(parts.size() != 3)
 					{
-						throw Exception("Malformed date");
+						util::Log::GetInstance().error("IneoNCEConnection : Failed to parse MsgArrets Date " +
+													   string(dateNode.getText()) );
+						throw Exception("IneoNCEConnection : Malformed date");
 					}
 					nceNow = ptime(
 						date(
@@ -1037,7 +1042,7 @@ namespace synthese
 													  )
 													)
 											{
-												throw Exception("Malformed MsgInfo");
+												throw Exception("IneoNCEConnection : Malformed MsgInfo");
 											}
 											else
 											{
@@ -1050,7 +1055,7 @@ namespace synthese
 												}
 												catch(bad_lexical_cast&)
 												{
-													throw Exception("Malformed MsgInfo minute");
+													throw Exception("IneoNCEConnection : Malformed MsgInfo minute");
 												}
 											}
 										}
@@ -1059,7 +1064,7 @@ namespace synthese
 								}
 								catch(bad_lexical_cast&)
 								{
-									throw Exception("Malformed TypInfo number");
+									throw Exception("IneoNCEConnection : Malformed TypInfo number");
 								}
 							}
 						}
