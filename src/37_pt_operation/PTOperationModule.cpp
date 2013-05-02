@@ -60,6 +60,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<PTOperationModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<PTOperationModule>::End()
 		{
 		}

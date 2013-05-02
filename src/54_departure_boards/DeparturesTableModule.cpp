@@ -59,6 +59,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<DeparturesTableModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<DeparturesTableModule>::End()
 		{
 		}

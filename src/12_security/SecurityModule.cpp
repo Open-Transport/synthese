@@ -101,6 +101,10 @@ namespace synthese
 			transaction.run();
 		}
 
+		template<> void ModuleClassTemplate<SecurityModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<SecurityModule>::End()
 		{
 		}

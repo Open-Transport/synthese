@@ -49,6 +49,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<TreeModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<TreeModule>::End()
 		{
 		}

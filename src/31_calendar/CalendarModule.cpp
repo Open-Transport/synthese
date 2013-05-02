@@ -56,6 +56,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<CalendarModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<CalendarModule>::End()
 		{
 		}

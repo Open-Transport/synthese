@@ -57,6 +57,11 @@ namespace synthese
 		}
 
 
+		template<> void ModuleClassTemplate<SVNModule>::Start()
+		{
+		}
+
+
 
 		template<> void ModuleClassTemplate<SVNModule>::End()
 		{

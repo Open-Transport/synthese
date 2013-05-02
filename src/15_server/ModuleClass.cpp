@@ -73,6 +73,10 @@ namespace synthese
 			return it->second;
 	    }
 
+		const ModuleClass::Parameters &ModuleClass::GetParameters()
+		{
+			return _Parameters;
+		}
 
 
 	    void ModuleClass::SetParameter(
@@ -183,4 +187,5 @@ namespace synthese
 			}
 			stream << l.close();
 		}
+
 }	}

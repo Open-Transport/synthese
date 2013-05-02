@@ -357,6 +357,12 @@ int main( int argc, char **argv )
 				module->init();
 			}
 
+			BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+			{
+				Log::GetInstance ().info ("Starting module " + module->getFactoryKey() + "...");
+				module->start();
+			}
+
 
 #ifndef WIN32
 			// Create the real PID file

@@ -65,6 +65,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<VehicleModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<VehicleModule>::End()
 		{
 		}

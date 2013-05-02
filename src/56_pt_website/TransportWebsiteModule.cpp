@@ -49,7 +49,10 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<TransportWebsiteModule>::Init()
 		{
+		}
 
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::Start()
+		{
 		}
 
 		template<> void ModuleClassTemplate<TransportWebsiteModule>::End()
