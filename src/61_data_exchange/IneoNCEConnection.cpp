@@ -220,7 +220,7 @@ namespace synthese
 					catch(std::exception& e)
 					{
 						util::Log::GetInstance().info(
-							e.what()
+							string("IneoNCEConnection : ") + e.what()
 						);
 					}
 					catch(thread_interrupted)
