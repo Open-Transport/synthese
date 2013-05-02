@@ -100,6 +100,7 @@ namespace synthese
 			const InterSYNTHESEContent& content,
 			boost::optional<db::DBTransaction&> transaction
 		) const {
+			boost::mutex::scoped_lock(_configMutex);
 			// Avoid useless check if no slave
 			if(_slaves.empty())
 			{

@@ -58,11 +58,7 @@ namespace synthese
 		{
 			if(get<InterSYNTHESEConfig>())
 			{
-				InterSYNTHESEConfig::Items items(
-					get<InterSYNTHESEConfig>()->getItems()
-				);
-				items.insert(this);
-				get<InterSYNTHESEConfig>()->setItems(items);
+				get<InterSYNTHESEConfig>()->insertItem(this);
 			}
 		}
 
@@ -72,11 +68,7 @@ namespace synthese
 		{
 			if(get<InterSYNTHESEConfig>())
 			{
-				InterSYNTHESEConfig::Items items(
-					get<InterSYNTHESEConfig>()->getItems()
-				);
-				items.erase(this);
-				get<InterSYNTHESEConfig>()->setItems(items);
+				get<InterSYNTHESEConfig>()->eraseItem(this);
 			}
 		}
 

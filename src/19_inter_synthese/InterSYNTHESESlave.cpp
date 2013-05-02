@@ -77,9 +77,7 @@ namespace synthese
 		{
 			if(get<InterSYNTHESEConfig>())
 			{
-				InterSYNTHESEConfig::Slaves slaves(get<InterSYNTHESEConfig>()->getSlaves());
-				slaves.insert(this);
-				get<InterSYNTHESEConfig>()->setSlaves(slaves);
+				get<InterSYNTHESEConfig>()->insertSlave(this);
 			}
 		}
 
@@ -89,9 +87,7 @@ namespace synthese
 		{
 			if(get<InterSYNTHESEConfig>())
 			{
-				InterSYNTHESEConfig::Slaves slaves(get<InterSYNTHESEConfig>()->getSlaves());
-				slaves.erase(this);
-				get<InterSYNTHESEConfig>()->setSlaves(slaves);
+				get<InterSYNTHESEConfig>()->eraseSlave(this);
 			}
 		}
 

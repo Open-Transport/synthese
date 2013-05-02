@@ -31,6 +31,7 @@
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace synthese
 {
@@ -72,6 +73,7 @@ namespace synthese
 			typedef std::set<InterSYNTHESESlave*> Slaves;
 
 		private:
+			boost::mutex _configMutex;
 			Items _items;
 			Slaves _slaves;
 		
@@ -80,8 +82,16 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				const Items& getItems() const { return _items; }
-				const Slaves& getSlaves() const { return _slaves; }
+				const Items getItems() const
+				{
+					boost::mutex::scoped_lock(_configMutex);
+					return _items;
+				}
+				const Slaves getSlaves() const
+				{
+					boost::mutex::scoped_lock(_configMutex);
+					return _slaves;
+				}
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks if the sync message should be sent to the slaves of the config.
@@ -105,8 +115,26 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void setItems(const Items& value){ _items = value; }
-				void setSlaves(const Slaves& value){ _slaves = value; }
+				void insertItem(InterSYNTHESEConfigItem* value)
+				{
+					boost::mutex::scoped_lock(_configMutex);
+					_items.insert(value);
+				}
+				void insertSlave(InterSYNTHESESlave* value)
+				{
+					boost::mutex::scoped_lock(_configMutex);
+					_slaves.insert(value);
+				}
+				void eraseItem(InterSYNTHESEConfigItem* value)
+				{
+					boost::mutex::scoped_lock(_configMutex);
+					_items.erase(value);
+				}
+				void eraseSlave(InterSYNTHESESlave* value)
+				{
+					boost::mutex::scoped_lock(_configMutex);
+					_slaves.erase(value);
+				}
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}
