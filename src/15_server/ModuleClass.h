@@ -81,6 +81,7 @@ namespace synthese
 				const std::string& name,
 				const std::string defaultValue = ""
 			);
+			static const Parameters &GetParameters();
 			static void SetParameter(
 				const std::string& name,
 				const std::string& value,
@@ -102,6 +103,7 @@ namespace synthese
 		public:
 			virtual void preInit() const = 0;
 			virtual void init() const = 0;
+			virtual void start() const = 0;
 			virtual void end() const = 0;
 			virtual const std::string& getName() const = 0;
 			virtual void initThread() const = 0;

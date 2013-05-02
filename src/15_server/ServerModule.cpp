@@ -151,6 +151,10 @@ namespace synthese
 			}
 		}
 
+		template<> void ModuleClassTemplate<ServerModule>::Start()
+		{
+			// FIXME: Should move the RunHTTPServer in the Start
+		}
 
 		void ServerModule::RunHTTPServer()
 		{

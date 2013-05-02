@@ -65,6 +65,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<RoadModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<RoadModule>::End()
 		{
 		}

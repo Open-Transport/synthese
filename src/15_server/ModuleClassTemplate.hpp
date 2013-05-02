@@ -45,6 +45,7 @@ namespace synthese
 		protected:
 			virtual void preInit() const { PreInit(); }
 			virtual void init() const { Init(); }
+			virtual void start() const { Start(); }
 			virtual void end() const { End(); }
 			virtual const std::string& getName() const { return NAME; }
 			virtual void initThread() const { InitThread(); }
@@ -64,6 +65,13 @@ namespace synthese
 				Must be implemented for each instantiation.
 			*/
 			static void Init();
+
+
+			/** Third step of initialization of the module.
+				This method is launched after Init is launched for each module.
+				Must be provided by each instance if needed. Default does nothing.
+			*/
+			static void Start();
 
 
 

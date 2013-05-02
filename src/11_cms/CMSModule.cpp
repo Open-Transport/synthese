@@ -73,6 +73,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<CMSModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<CMSModule>::End()
 		{
 		}

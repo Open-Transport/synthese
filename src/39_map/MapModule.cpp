@@ -76,6 +76,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<MapModule>::Start()
+		{
+		}
+
 
 		template<> void ModuleClassTemplate<MapModule>::End()
 		{

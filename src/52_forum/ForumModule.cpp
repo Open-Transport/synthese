@@ -47,6 +47,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<ForumModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<ForumModule>::End()
 		{
 		}
