@@ -60,6 +60,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<MessagesModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<MessagesModule>::End()
 		{
 		}

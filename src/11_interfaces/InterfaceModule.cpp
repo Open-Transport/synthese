@@ -58,6 +58,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<InterfaceModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<InterfaceModule>::End()
 		{
 		}

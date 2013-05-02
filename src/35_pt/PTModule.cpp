@@ -97,9 +97,6 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<PTModule>::Init()
 		{
-			// Data cleaner
-			ServerModule::AddThread(&PTModule::RTDataCleaner, "Real time data cleaner");
-
 			// Creation of each transport mode corresponding to Trident values except "Other" which is used for null pointer
 			Env env;
 			vector<string> tridentKeys;
@@ -135,6 +132,12 @@ namespace synthese
 				}
 			}
 
+		}
+
+		template<> void ModuleClassTemplate<PTModule>::Start()
+		{
+			// Data cleaner
+			ServerModule::AddThread(&PTModule::RTDataCleaner, "Real time data cleaner");
 		}
 
 		template<> void ModuleClassTemplate<PTModule>::End()

@@ -160,7 +160,9 @@ namespace synthese
 			}
 		}
 
-
+		template<> void ModuleClassTemplate<ResaModule>::Start()
+		{
+		}
 
 		template<> void ModuleClassTemplate<ResaModule>::End()
 		{

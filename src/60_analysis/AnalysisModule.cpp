@@ -49,6 +49,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<AnalysisModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<AnalysisModule>::End()
 		{
 		}

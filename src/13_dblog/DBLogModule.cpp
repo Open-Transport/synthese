@@ -56,6 +56,11 @@ namespace synthese
 		}
 
 
+		template<> void ModuleClassTemplate<DBLogModule>::Start()
+		{
+		}
+
+
 
 		template<> void ModuleClassTemplate<DBLogModule>::InitThread(
 		){

@@ -84,6 +84,10 @@ namespace synthese
 			}
 		}
 
+		template<> void ModuleClassTemplate<GeographyModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<GeographyModule>::End()
 		{
 			UnregisterParameter(GeographyModule::MODULE_PARAM_CITY_NAME_BEFORE_PLACE_NAME);

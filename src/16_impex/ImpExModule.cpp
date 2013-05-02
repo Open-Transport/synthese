@@ -57,6 +57,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<ImpExModule>::Start()
+		{
+		}
+
 
 
 		template<> void ModuleClassTemplate<ImpExModule>::InitThread(

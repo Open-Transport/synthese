@@ -79,6 +79,10 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Init()
 		{
+		}
+
+		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
+		{
 			ServerModule::AddThread(&InterSYNTHESEModule::InterSYNTHESE, "Inter-SYNTHESE client synchronization");
 		}
 

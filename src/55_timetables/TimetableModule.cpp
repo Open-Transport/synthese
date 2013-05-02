@@ -51,6 +51,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<TimetableModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<TimetableModule>::End()
 		{
 		}

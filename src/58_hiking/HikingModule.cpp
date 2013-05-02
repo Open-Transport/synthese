@@ -48,6 +48,10 @@ namespace synthese
 		{
 		}
 
+		template<> void ModuleClassTemplate<HikingModule>::Start()
+		{
+		}
+
 		template<> void ModuleClassTemplate<HikingModule>::End()
 		{
 		}

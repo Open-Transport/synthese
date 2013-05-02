@@ -116,11 +116,13 @@ namespace synthese
 			// DB initialization
 			DBModule::GetDB()->init();
 
+		}
+
+		template<> void ModuleClassTemplate<DBModule>::Start()
+		{
 			// Conditional tables load maintainer thread
 			ServerModule::AddThread(&DBModule::UpdateConditionalTableSyncEnv, "Conditional tables load maintainer");
 		}
-
-
 
 		template<> void ModuleClassTemplate<DBModule>::End()
 		{
