@@ -22,7 +22,6 @@
 
 #include "IneoDepartureBoardsFileFormat.hpp"
 
-#include "Import.hpp"
 #include "PropertiesHTMLTable.h"
 #include "DataSource.h"
 #include "AdminFunctionRequest.hpp"
@@ -68,20 +67,17 @@ namespace synthese
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_PT_DATASOURCE_ID("ps");
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_DEFAULT_DISPLAY_TYPE_ID("dt");
 
-		bool IneoDepartureBoardsFileFormat::Importer_::_read(
-			optional<const server::Request&> adminRequest
-		) const	{
+		bool IneoDepartureBoardsFileFormat::Importer_::_read( std::ostream& os, boost::optional<const server::Request&> adminRequest ) const
+		{
 			if(_database.empty() || !_ptDataSource.get())
 			{
 				return false;
 			}
 
-			DataSource& dataSource(*_import.get<DataSource>());
-
 			// Services linked to the planned source
 			ImportableTableSync::ObjectBySource<StopPointTableSync> stops(*_ptDataSource, _env);
 			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*_ptDataSource, _env);
-			ImportableTableSync::ObjectBySource<DisplayScreenTableSync> screens(dataSource, _env);
+			ImportableTableSync::ObjectBySource<DisplayScreenTableSync> screens(_dataSource, _env);
 
 			// 1 : sets existing departure boards offline (will be turned online when reloaded except if does not exists anymore)
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DisplayScreenTableSync>::Map::value_type& itScreen, screens.getMap())
@@ -110,7 +106,7 @@ namespace synthese
 				{
 					screen = new DisplayScreen(DisplayScreenTableSync::getId());
 					screen->setType(_defaultDisplayType.get());
-					screen->addCodeBySource(dataSource, borneRef);
+					screen->addCodeBySource(_dataSource, borneRef);
 					screen->setAllPhysicalStopsDisplayed(false);
 					_env.getEditableRegistry<DisplayScreen>().add(shared_ptr<DisplayScreen>(screen));
 				}
@@ -118,9 +114,7 @@ namespace synthese
 				{
 					if(screenSet.size() > 1)
 					{
-						_logWarning(
-							"More than one existing screen with datasource link "+ borneRef
-						);
+						os << "WARN : More than one existing screen with datasource link " << borneRef << "<br />";
 					}
 					screen = *screenSet.begin();
 				}
@@ -149,7 +143,7 @@ namespace synthese
 							linesResult->getText("ref_ligne"),
 							*_ptDataSource,
 							_env,
-							_logger
+							os
 					)	);
 					if(!line)
 					{
@@ -180,7 +174,7 @@ namespace synthese
 							stops,
 							stopCode,
 							optional<const string&>(),
-							_logger,
+							os,
 							false
 					)	);
 
@@ -220,10 +214,8 @@ namespace synthese
 
 		IneoDepartureBoardsFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			DatabaseReadImporter<IneoDepartureBoardsFileFormat>(env, import, logger)
+			const impex::DataSource& dataSource
+		):	DatabaseReadImporter<IneoDepartureBoardsFileFormat>(env, dataSource)
 		{}
 
 
