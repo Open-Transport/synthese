@@ -118,6 +118,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_SUB_SCREEN_TYPE("sub_screen_type");
 		const string DisplayScreenTableSync::COL_DATASOURCE_LINKS("datasource_links");
 		const string DisplayScreenTableSync::COL_ALLOW_CANCELED("allow_canceled");
+		const string DisplayScreenTableSync::COL_STOP_POINT_LOCATION = "stop_point_location";
 	}
 
 	namespace db
@@ -164,6 +165,7 @@ namespace synthese
 			Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
 			Field(DisplayScreenTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field(DisplayScreenTableSync::COL_ALLOW_CANCELED, SQL_BOOLEAN),
+			Field(DisplayScreenTableSync::COL_STOP_POINT_LOCATION, SQL_INTEGER),
 			Field()
 		};
 
@@ -227,7 +229,24 @@ namespace synthese
 				catch(ObjectNotFoundException<StopArea>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : localization "+ lexical_cast<string>(placeId) + " not found"
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : location "+ lexical_cast<string>(placeId) + " not found"
+					);
+				}
+
+				// Stop point location
+				RegistryKeyType stopId(
+					rows->getDefault<RegistryKeyType>(DisplayScreenTableSync::COL_STOP_POINT_LOCATION, 0)
+				);
+				if(stopId) try
+				{
+					object->setStopPointLocation(
+						StopPointTableSync::GetEditable(stopId, env, linkLevel).get()
+					);
+				}
+				catch(ObjectNotFoundException<StopPoint>&)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : stop point location "+ lexical_cast<string>(stopId) + " not found"
 					);
 				}
 
@@ -519,6 +538,7 @@ namespace synthese
 					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getAllowCanceled());
+			query.addField(object->getStopPointLocation() ? object->getStopPointLocation()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 
