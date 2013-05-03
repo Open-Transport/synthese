@@ -54,7 +54,6 @@ namespace synthese
 		protected:
 			virtual bool _parse(
 				const boost::filesystem::path& filePath,
-				std::ostream& os,
 				boost::optional<const server::Request&> request
 			) const = 0;
 
@@ -68,8 +67,9 @@ namespace synthese
 		public:
 			OneFileTypeImporter(
 				util::Env& env,
-				const DataSource& dataSource
-			):	Importer(env, dataSource)
+				const Import& import,
+				const impex::ImportLogger& logger
+			):	Importer(env, import, logger)
 			{}
 
 
@@ -130,22 +130,13 @@ namespace synthese
 
 
 			bool parseFiles(
-				std::ostream& os,
 				boost::optional<const server::Request&> request
 			) const {
-
-				// Log stream selection
-				boost::shared_ptr<std::ofstream> logFile;
-				if(_logPath)
-				{
-					logFile.reset(new std::ofstream(_logPath->file_string().c_str()));
-				}
-				std::ostream& logStream(_logPath ? *logFile : os);
 
 				bool result(true);
 				BOOST_FOREACH(const FilePathsSet::value_type& path, _pathsSet)
 				{
-					result &= _parse(path, logStream, request);
+					result &= _parse(path, request);
 				}
 				return result;
 			}

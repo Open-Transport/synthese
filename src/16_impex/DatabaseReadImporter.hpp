@@ -25,6 +25,8 @@
 
 #include "Importer.hpp"
 
+#include "ParametersMap.h"
+
 namespace synthese
 {
 	namespace impex
@@ -34,7 +36,7 @@ namespace synthese
 		*/
 		template<class FF>
 		class DatabaseReadImporter:
-			public Importer
+			virtual public Importer
 		{
 		public:
 			static const bool IMPORTABLE;	//!< Name of the database to read at the import
@@ -42,15 +44,15 @@ namespace synthese
 
 			DatabaseReadImporter(
 				util::Env& env,
-				const DataSource& dataSource
-			):	Importer(env, dataSource)
+				const Import& import,
+				const impex::ImportLogger& logger
+			):	Importer(env, import, logger)
 			{}
 
 		protected:
 			std::string _database;
 
 			virtual bool _read(
-				std::ostream& os,
 				boost::optional<const server::Request&> request
 			) const = 0;
 
@@ -76,11 +78,10 @@ namespace synthese
 
 
 			bool parseFiles(
-				std::ostream& os,
 				boost::optional<const server::Request&> request
 			) const {
 				bool result(true);
-				result &= _read(os, request);
+				result &= _read(request);
 				return result;
 			}
 		};

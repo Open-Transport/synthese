@@ -26,10 +26,14 @@
 #ifndef SYNTHESE_DataSource_h__
 #define SYNTHESE_DataSource_h__
 
+#include "Object.hpp"
+
+#include "CoordinatesSystem.hpp"
 #include "PointerField.hpp"
 #include "Registrable.h"
 #include "Registry.h"
-#include "PointersVectorField.hpp"
+#include "SchemaMacros.hpp"
+#include "StringField.hpp"
 
 #include <vector>
 #include <string>
@@ -45,10 +49,22 @@ namespace synthese
 		class Env;
 	}
 
+	FIELD_STRING(Icon)
+	FIELD_STRING(Charset)
+
 	namespace impex
 	{
 		class Importer;
 		class Importable;
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Icon),
+			FIELD(Charset),
+			FIELD(CoordinatesSystem)
+		> DataSourceRecord;
+
 
 		////////////////////////////////////////////////////////////////////////
 		/// DataSource class.
@@ -65,18 +81,11 @@ namespace synthese
 		/// Sources with automated import refer to a FileFormat instance.
 		///
 		class DataSource:
-			public virtual util::Registrable,
-			public PointerField<DataSource, DataSource>
+			public Object<DataSource, DataSourceRecord>
 		{
 		public:
-			struct Vector:
-				public PointersVectorField<Vector, DataSource>
-			{
-
-			};
 
 			typedef util::Registry<DataSource> Registry;
-			static const util::RegistryTableType CLASS_NUMBER;
 
 			// Typedefs
 			typedef std::map<
@@ -88,15 +97,6 @@ namespace synthese
 
 
 		private:
-			// Attributes
-			std::string	_name;
-			std::string _format;
-			std::string _icon;
-			std::string	_charset;
-			const CoordinatesSystem* _coordinatesSystem;
-			std::string _defaultImportRequest;
-			boost::posix_time::time_duration _autoImportDelay;
-
 			mutable Links _links;
 
 		public:
@@ -105,28 +105,6 @@ namespace synthese
 			DataSource(
 				util::RegistryKeyType id = 0
 			);
-
-			//! @name Getters
-			//@{
-				const std::string& getName() const { return _name; }
-				const std::string& getFormat() const { return _format; }
-				const std::string& getIcon() const { return _icon; }
-				const std::string& getCharset() const { return _charset; }
-				const CoordinatesSystem* getCoordinatesSystem() const { return _coordinatesSystem; }
-				const std::string& getDefaultImportRequest() const { return _defaultImportRequest; }
-				const boost::posix_time::time_duration getAutoImportDelay() const { return _autoImportDelay; }
-			//@}
-
-			//! @name Setters
-			//@{
-				void setName(const std::string& value) { _name = value;	}
-				void setFormat(const std::string& value) { _format = value; }
-				void setIcon(const std::string& value) { _icon = value; }
-				void setCharset(const std::string& value) { _charset = value; }
-				void setCoordinatesSystem(const CoordinatesSystem* value){ _coordinatesSystem = value; }
-				void setDefaultImportRequest(const std::string& value){ _defaultImportRequest = value; }
-				void setAutoImportDelay(const boost::posix_time::time_duration& value){ _autoImportDelay = value; }
-			//@}
 
 			//! @name Modifiers
 			//@{
@@ -200,13 +178,7 @@ namespace synthese
 					return it->second;
 				}
 
-				boost::shared_ptr<Importer> getImporter(util::Env& env) const;
-				bool canImport() const;
 				const CoordinatesSystem& getActualCoordinateSystem() const;
-			//@}
-
-			//! @name Static algorithms
-			//@{
 			//@}
 		};
 }	}

@@ -44,37 +44,26 @@ namespace synthese
 
 	namespace impex
 	{
-		class DataSource;
+		class Import;
 		class Importer;
 		class Exporter;
+		class ImportLogger;
 
-		/** Import/export file format factorable base class.
-
-			Each import subclass defines a format which can be imported.
-
-			@ingroup m16
-
-			Import
-
-			There is two ways to launch the data import upon file paths :
-				- run parseFiles with a paths set argument : there is only one file type to read,
-					but the data can be provided in more than one file. The set contains
-					all the paths.
-				- run parseFiles with a paths map argument : there is more than one file type, each
-					type contains a part of the fields to import and is identified by a key.
-					The key is also the parameter code Request field containing the file path.
-					The files are loaded respecting the key alphabetical order.
-		*/
 		class FileFormat:
 			public util::FactoryBase<FileFormat>
 		{
 		public:
+			static const std::string ATTR_KEY;
+			static const std::string ATTR_CAN_IMPORT;
+			static const std::string ATTR_CAN_EXPORT;
+
 			virtual bool canImport() const = 0;
 			virtual bool canExport() const = 0;
 
 			virtual boost::shared_ptr<Importer> getImporter(
 				util::Env& env,
-				const DataSource& dataSource
+				const Import& import,
+				const ImportLogger& importLogger
 			) const = 0;
 
 			virtual boost::shared_ptr<Exporter> getExporter(
@@ -87,9 +76,13 @@ namespace synthese
 				const std::string& id,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream,
+				const ImportLogger& logger,
 				const std::string& logName
 			);
+
+			void toParametersMap(
+				util::ParametersMap& pm
+			) const;
 		};
 
 
@@ -100,7 +93,7 @@ namespace synthese
 			const std::string& id,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream,
+			const ImportLogger& logger,
 			const std::string& logName
 		){
 			std::set<typename T::ObjectType*> loadedObjects(objects.get(id));
@@ -108,12 +101,13 @@ namespace synthese
 			{
 				if(!logName.empty())
 				{
-					logStream << "LOAD : link between " << logName << " " << id << " and ";
+					std::stringstream logStream;
+					logStream << "Link between " << logName << " " << id << " and ";
 					BOOST_FOREACH(typename T::ObjectType* o, loadedObjects)
 					{
 						logStream << o->getKey();
 					}
-					logStream << "<br />";
+					logger.log(ImportLogger::LOAD, logStream.str());
 				}
 				return *loadedObjects.begin();
 			}
@@ -127,7 +121,10 @@ namespace synthese
 
 			if(!logName.empty())
 			{
-				logStream << "CREA : Creation of the " << logName << "  with key " << id << "<br />";
+				logger.log(
+					ImportLogger::CREA,
+					"Creation of the "+ logName +"  with key "+ id
+				);
 			}
 			return o.get();
 		}

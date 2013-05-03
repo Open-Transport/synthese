@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class ImportLogger;
+	}
+
 	namespace calendar
 	{
 		class CalendarTemplateTableSync;
@@ -41,7 +46,7 @@ namespace synthese
 			static CalendarTemplate* GetCalendarTemplate(
 				impex::ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>& calendars,
 				const std::string& code,
-				std::ostream& logStream
+				const impex::ImportLogger& logger
 			);
 		};
 	}

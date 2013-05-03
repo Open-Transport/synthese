@@ -21,6 +21,8 @@
 */
 
 #include "StopsShapeFileFormat.hpp"
+
+#include "Import.hpp"
 #include "StopArea.hpp"
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
@@ -122,27 +124,33 @@ namespace synthese
 
 		StopsShapeFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			MultipleFileTypesImporter<StopsShapeFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			MultipleFileTypesImporter<StopsShapeFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
 			_displayLinkedStops(false),
-			_stopPoints(_dataSource, _env)
+			_stopPoints(*import.get<DataSource>(), _env)
 		{}
 
 
 
 		bool StopsShapeFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			const std::string& key,
 			boost::optional<const server::Request&> request
 		) const {
 			PTFileFormat::ImportableStopPoints linkedStopPoints;
 			PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
 
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			// Loading the file into SQLite as virtual table
-			VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
+			VirtualShapeVirtualTable table(
+				filePath,
+				dataSource.get<Charset>(),
+				dataSource.get<CoordinatesSystem>()->getSRID()
+			);
 
 			stringstream query;
 			query << "SELECT *, AsText(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << "_ASTEXT FROM " << table.getName();
@@ -155,11 +163,11 @@ namespace synthese
 					dynamic_pointer_cast<Point, Geometry>(
 						rows->getGeometryFromWKT(
 							_FIELD_GEOMETRY+"_ASTEXT",
-							_dataSource.getCoordinatesSystem()->getGeometryFactory()
+							dataSource.get<CoordinatesSystem>()->getGeometryFactory()
 				)	)	);
 				if(!geometry.get())
 				{
-					stream << "ERR : Empty geometry.<br />";
+					_logWarning("Empty geometry.");
 					continue;
 				}
 
@@ -187,7 +195,7 @@ namespace synthese
 					stopOperatorCode = to_lower_copy(trim_copy(rows->getText(*_stopName1)));
 					if(!_valueForwardDirection || !_valueBackwardDirection)
 					{
-						stream << "ERR : value Forward or Backward direction is not defined.<br />";
+						_logError("ERR : value Forward or Backward direction is not defined.");
 						return false;
 					}
 
@@ -233,7 +241,9 @@ namespace synthese
 					);
 					if(cities.empty())
 					{
-						stream << "WARN : City " << cityName << " / " << cityCode << " not found<br />";
+						_logWarning(
+							"City "+ cityName +" / "+ cityCode +" not found"
+						);
 					}
 					else
 					{
@@ -275,7 +285,7 @@ namespace synthese
 				}
 				else
 				{
-					stream << "WARN : City not defined<br />";
+					_logWarning("City not defined");
 					continue;
 				}
 
@@ -288,9 +298,9 @@ namespace synthese
 						optional<const graph::RuleUser::Rules&>(),
 						optional<const StopArea*>(),
 						geometry.get(),
-						_dataSource,
+						dataSource,
 						_env,
-						stream
+						_logger
 					);
 				}
 				else
@@ -302,9 +312,9 @@ namespace synthese
 						geometry.get(),
 						*cityForStopAreaAutoGeneration,
 						_stopAreaDefaultTransferDuration,
-						_dataSource,
+						dataSource,
 						_env,
-						stream,
+						_logger,
 						boost::optional<const graph::RuleUser::Rules&>()
 					);
 				}
@@ -316,17 +326,17 @@ namespace synthese
 					nonLinkedStopPoints,
 					*request,
 					_env,
-					_dataSource,
-					stream
-					);
+					dataSource,
+					_logger
+				);
 				if(_displayLinkedStops)
 				{
 					PTFileFormat::DisplayStopPointImportScreen(
 						linkedStopPoints,
 						*request,
 						_env,
-						_dataSource,
-						stream
+						dataSource,
+						_logger
 					);
 				}
 			}

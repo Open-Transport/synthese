@@ -21,7 +21,9 @@
 */
 
 #include "PTFileFormat.hpp"
+
 #include "DesignatedLinePhysicalStop.hpp"
+#include "ImportLogger.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
@@ -71,7 +73,7 @@ namespace synthese
 			CommercialLine& line,
 			const impex::DataSource& source,
 			Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			shared_ptr<JourneyPattern> route(new JourneyPattern);
 			route->setCommercialLine(&line);
@@ -111,7 +113,7 @@ namespace synthese
 			const std::string& name,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			TransportNetwork* network;
 			if(networks.contains(id))
@@ -119,10 +121,16 @@ namespace synthese
 				set<TransportNetwork*> loadedNetworks(networks.get(id));
 				if(loadedNetworks.size() > 1)
 				{
-					logStream << "WARN : more than one network with key " << id << "<br />";
+					importLogger.log(
+						ImportLogger::WARN, 
+						"More than one network with key "+ id
+					);
 				}
 				network = *loadedNetworks.begin();
-				logStream << "LOAD : Use of existing network " << network->getKey() << " (" << network->getName() << ")<br />";
+				importLogger.log(
+					ImportLogger::LOAD,
+					"Use of existing network "+ lexical_cast<string>(network->getKey()) +" ("+ network->getName() +")"
+				);
 			}
 			else
 			{
@@ -134,7 +142,10 @@ namespace synthese
 				network->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<TransportNetwork>().add(shared_ptr<TransportNetwork>(network));
 				networks.add(*network);
-				logStream << "CREA : Creation of the network with key " << id << " (" << name <<  ")<br />";
+				importLogger.log(
+					ImportLogger::CREA,
+					"Creation of the network with key "+ id +" ("+ name + ")"
+				);
 			}
 			network->setName(name);
 			return network;
@@ -146,15 +157,16 @@ namespace synthese
 			const impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 			const std::string& id,
 			boost::optional<const std::string&> name,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			bool errorIfNotFound /*= true */
 		){
 			if(stopAreas.contains(id))
 			{
 				set<StopArea*> loadedStopAreas(stopAreas.get(id));
 
+				stringstream logStream;
 				logStream
-					<< "LOAD : Link between stop areas " << id;
+					<< "Link between stop areas " << id;
 				if(name)
 				{
 					logStream << " (" << *name << ")";
@@ -164,19 +176,20 @@ namespace synthese
 				{
 					logStream << sp->getKey() << " (" << sp->getFullName() << ") ";
 				}
-				logStream << "<br />";
+				importLogger.log(ImportLogger::LOAD, logStream.str());
 
 				return loadedStopAreas;
 			}
 
 			if(errorIfNotFound)
 			{
-				logStream << "ERR  : stop area not found " << id;
+				stringstream logStream;
+				logStream << "Stop area not found " << id;
 				if(name)
 				{
 					logStream << " (" << *name << ")";
 				}
-				logStream << "<br />";
+				importLogger.log(ImportLogger::ERROR, logStream.str());
 			}
 			return set<StopArea*>();
 		}
@@ -194,7 +207,7 @@ namespace synthese
 			bool mainStopArea,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			StopArea* stopArea(
 				new StopArea(
@@ -213,6 +226,10 @@ namespace synthese
 			env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
 			stopAreas.add(*stopArea);
 
+			importLogger.logCreation(
+				"Creation of the stop area with key "+ id +" ("+ city.getName() +" "+ name + ")"
+			);
+
 			return stopArea;
 		}
 
@@ -227,10 +244,10 @@ namespace synthese
 			boost::posix_time::time_duration defaultTransferDuration,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			// Load if possible
-			set<StopArea*> result(GetStopAreas(stopAreas, id, name, logStream, false));
+			set<StopArea*> result(GetStopAreas(stopAreas, id, name, importLogger, false));
 
 			// Create if necessary
 			if(result.empty())
@@ -238,7 +255,10 @@ namespace synthese
 				// Abort if undefined city
 				if(!city)
 				{
-					logStream << "WARN : The stop area " << name << " cannot be created because of undefined city.<br/>";
+					importLogger.log(
+						ImportLogger::WARN,
+						"The stop area "+ name +" cannot be created because of undefined city."
+					);
 					return result;
 				}
 
@@ -252,7 +272,7 @@ namespace synthese
 						false,
 						source,
 						env,
-						logStream
+						importLogger
 				)	);
 			}
 
@@ -275,15 +295,15 @@ namespace synthese
 			const impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
 			const std::string& id,
 			boost::optional<const std::string&> name,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			bool errorIfNotFound
 		){
 			if(stopPoints.contains(id))
 			{
 				set<StopPoint*> loadedStopPoints(stopPoints.get(id));
 
-				logStream
-					<< "LOAD : Link between stops " << id;
+				stringstream logStream;
+				logStream << "Link between stops " << id;
 				if(name)
 				{
 					logStream << " (" << *name << ")";
@@ -293,18 +313,19 @@ namespace synthese
 				{
 					logStream << sp->getKey() << " (" << sp->getConnectionPlace()->getFullName() << ") ";
 				}
-				logStream << "<br />";
+				importLogger.log(ImportLogger::LOAD, logStream.str());
 
 				return loadedStopPoints;
 			}
 			if(errorIfNotFound)
 			{
-				logStream << "ERR  : stop not found " << id;
+				stringstream logStream;
+				logStream << "Stop not found " << id;
 				if(name)
 				{
 					logStream << " (" << *name << ")";
 				}
-				logStream << "<br />";
+				importLogger.log(ImportLogger::ERROR, logStream.str());
 			}
 			return set<StopPoint*>();
 		}
@@ -318,7 +339,7 @@ namespace synthese
 			const StopArea& stopArea,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			// Object creation
 			StopPoint* stop(
@@ -342,12 +363,13 @@ namespace synthese
 			}
 
 			// Log
-			logStream << "CREA : Creation of the physical stop with key " << code;
+			stringstream logStream;
+			logStream << "Creation of the physical stop with key " << code;
 			if(name)
 			{
 				logStream << " (" << *name <<  ")";
 			}
-			logStream << "<br />";
+			importLogger.log(ImportLogger::CREA, logStream.str());
 
 			// Return
 			return stop;
@@ -364,12 +386,12 @@ namespace synthese
 			boost::optional<const StopPoint::Geometry*> geometry,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			bool doNotUpdate
 		){
 			// Load if possible
 			bool creation(false);
-			set<StopPoint*> result(GetStopPoints(stops, code, name, logStream, false));
+			set<StopPoint*> result(GetStopPoints(stops, code, name, importLogger, false));
 
 			// Creation if necessary
 			if(result.empty())
@@ -387,18 +409,19 @@ namespace synthese
 						**stopArea,
 						source,
 						env,
-						logStream
+						importLogger
 				)	);
 				creation = true;
 			}
 			else
 			{
-				logStream << "LOAD : Link with existing stop " << (*result.begin())->getName() << " for stop " << code;
+				stringstream logStream;
+				logStream << "Link with existing stop " << (*result.begin())->getName() << " for stop " << code;
 				if(name)
 				{
 					logStream << " (" << *name <<  ")";
 				}
-				logStream << "<br />";
+				importLogger.log(ImportLogger::LOAD, logStream.str());
 			}
 
 			// Update
@@ -445,11 +468,11 @@ namespace synthese
 			boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			boost::optional<const graph::RuleUser::Rules&> rules
 		){
 			// Load if possible
-			set<StopPoint*> result(GetStopPoints(stops, code, name, logStream, false));
+			set<StopPoint*> result(GetStopPoints(stops, code, name, importLogger, false));
 
 			// Creation if necessary
 			if(result.empty())
@@ -488,17 +511,26 @@ namespace synthese
 						curStop->setName(name);
 						curStop->setCity(&cityForStopAreaAutoGeneration);
 						env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
-						logStream << "CREA : Auto generation of the commercial stop for stop " << code << " (" << name <<  ")<br />";
+						importLogger.log(
+							ImportLogger::CREA,
+							"Auto generation of the commercial stop for stop "+ code +" ("+ name +")"
+						);
 					}
 					else
 					{
-						logStream << "LOAD : Link with existing commercial stop " << curStop->getFullName() << " for stop " << code << " (" << name <<  ")<br />";
+						importLogger.log(
+							ImportLogger::LOAD,
+							"Link with existing commercial stop "+ curStop->getFullName() +" for stop "+ code +" ("+ name +")"
+						);
 					}
 				}
 				else
 				{
 					curStop = stopAreas.begin()->get();
-					logStream << "LOAD : Link with existing commercial stop " << curStop->getFullName() << " for stop " << code << " (" << name <<  ")<br />";
+					importLogger.log(
+						ImportLogger::LOAD,
+						"Link with existing commercial stop "+ curStop->getFullName() +" for stop "+ code +" ("+ name +")"
+					);
 				}
 
 				// Stop creation
@@ -510,12 +542,15 @@ namespace synthese
 						*curStop,
 						source,
 						env,
-						logStream
+						importLogger
 				)	);
 			}
 			else
 			{
-				logStream << "LOAD : Link with existing stop " << (*result.begin())->getName() << " for stop " << code << " (" << name <<  ")<br />";
+				importLogger.log(
+					ImportLogger::LOAD,
+					"Link with existing stop "+ (*result.begin())->getName() +" for stop "+ code +" ("+ name +")"
+				);
 			}
 
 			// Update
@@ -523,7 +558,10 @@ namespace synthese
 			{
 				if(stop->getName() != name)
 				{
-					logStream << "INFO : Stop " << code << " (" << stop->getName() << ") rename to " << name << "<br />";
+					importLogger.log(
+						ImportLogger::INFO,
+						"Stop "+ code +" ("+ stop->getName() +") renamed to "+ name
+					);
 					stop->setName(name);
 				}
 				if(geometry && *geometry)
@@ -552,7 +590,7 @@ namespace synthese
 			TransportNetwork& defaultNetwork,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			bool restrictInDefaultNetwork
 		){
 			CommercialLine* line(
@@ -561,19 +599,20 @@ namespace synthese
 					id,
 					source,
 					env,
-					logStream,
+					importLogger,
 					restrictInDefaultNetwork ? optional<TransportNetwork&>(defaultNetwork) : optional<TransportNetwork&>()
 			)	);
 			if(!line)
 			{
 				line = new CommercialLine(CommercialLineTableSync::getId());
 
-				logStream << "CREA : Creation of the commercial line with key " << id;
+				stringstream logStream;
+				logStream << "Creation of the commercial line with key " << id;
 				if(name)
 				{
 					logStream << " (" << *name <<  ")";
 				}
-				logStream << "<br />";
+				importLogger.log(ImportLogger::CREA, logStream.str());
 
 				line->setParent(defaultNetwork);
 				Importable::DataSourceLinks links;
@@ -613,7 +652,7 @@ namespace synthese
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			bool removeOldCodes,
 			bool updateMetricOffsetOnUpdate,
 			bool attemptToCopyExistingGeometries,
@@ -648,7 +687,10 @@ namespace synthese
 				){
 					if(!result)
 					{
-						logStream << "LOAD : Use of route " << jp->getKey() << " (" << jp->getName() << ") for " << (id ? *id : string("unknown")) << ")<br />";
+						importLogger.log(
+							ImportLogger::LOAD,
+							"Use of route "+ lexical_cast<string>(jp->getKey()) +" ("+ jp->getName() +") for "+ (id ? *id : string("unknown")) +")"
+						);
 						result = jp;
 						if(!id)
 						{
@@ -661,11 +703,17 @@ namespace synthese
 						{
 							jp->removeSourceLink(source, *id);
 							jp->addCodeBySource(source, string());
-							logStream << "INFO : Code " << *id << " was removed from route " << jp->getKey() << "<br />";
+							importLogger.log(
+								ImportLogger::INFO,
+								"Code "+ *id +" was removed from route "+ lexical_cast<string>(jp->getKey())
+							);
 						}
 						else
 						{
-							logStream << "WARN : Route " << *id << ") is defined twice or more.<br />";
+							importLogger.log(
+								ImportLogger::WARN,
+								"Route "+ *id +") is defined twice or more."
+							);
 						}
 					}
 				}
@@ -675,7 +723,10 @@ namespace synthese
 			if(!result)
 			{
 				creation = true;
-				logStream << "CREA : Creation of route " << (name ? *name : string()) << " for " << (id ? *id : string("unknown")) << "<br />";
+				importLogger.log(
+					ImportLogger::CREA,
+					"Creation of route "+ (name ? *name : string()) +" for "+ (id ? *id : string("unknown"))
+				);
 				result = new JourneyPattern(
 					JourneyPatternTableSync::getId()
 				);
@@ -824,7 +875,7 @@ namespace synthese
 			const std::string& number,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			boost::optional<const std::string&> team,
 			boost::optional<const graph::RuleUser::Rules&> rules,
 			boost::optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices
@@ -833,7 +884,10 @@ namespace synthese
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
 				route.getScheduledStopsNumber() != arrivalSchedules.size()
 			){
-				logStream << "WARN : Inconsistent schedules size in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				importLogger.log(
+					ImportLogger::WARN,
+					"Inconsistent schedules size in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+				);
 				return NULL;
 			}
 
@@ -842,7 +896,10 @@ namespace synthese
 			{
 				if(td.is_not_a_date_time())
 				{
-					logStream << "WARN : At least an undefined time in departure schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					importLogger.log(
+						ImportLogger::WARN,
+						"At least an undefined time in departure schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+					);
 					return NULL;
 				}
 			}
@@ -850,7 +907,10 @@ namespace synthese
 			{
 				if(ta.is_not_a_date_time())
 				{
-					logStream << "WARN : At least an undefined time in arrival schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					importLogger.log(
+						ImportLogger::WARN,
+						"At least an undefined time in arrival schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+					);
 					return NULL;
 				}
 			}
@@ -928,11 +988,17 @@ namespace synthese
 				route.addService(*result, false);
 				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
 
-				logStream << "CREA : Creation of service " << result->getServiceNumber() << " for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				importLogger.log(
+					ImportLogger::CREA,
+					"Creation of service "+ result->getServiceNumber() +" for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+				);
 			}
 			else
 			{
-				logStream << "LOAD : Use of service " << result->getKey() << " (" << result->getServiceNumber() << ") for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				importLogger.log(
+					ImportLogger::LOAD,
+					"Use of service "+ lexical_cast<string>(result->getKey()) +" ("+ result->getServiceNumber() +") for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+				);
 			}
 
 			return result;
@@ -949,13 +1015,16 @@ namespace synthese
 			const boost::posix_time::time_duration& waitingTime,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
 				route.getScheduledStopsNumber() != arrivalSchedules.size()
 			){
-				logStream << "WARN : Inconsistent schedules size in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				importLogger.log(
+					ImportLogger::WARN,
+					"Inconsistent schedules size in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+				);
 				return NULL;
 			}
 
@@ -964,7 +1033,10 @@ namespace synthese
 			{
 				if(td.is_not_a_date_time())
 				{
-					logStream << "WARN : At least an undefined time in departure schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					importLogger.log(
+						ImportLogger::WARN,
+						"At least an undefined time in departure schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+					);
 					return NULL;
 				}
 			}
@@ -972,13 +1044,20 @@ namespace synthese
 			{
 				if(ta.is_not_a_date_time())
 				{
-					logStream << "WARN : At least an undefined time in arrival schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					importLogger.log(
+						ImportLogger::WARN,
+						"At least an undefined time in arrival schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+					);
 					return NULL;
 				}
 			}
 
 			// Search for a corresponding service
 			ContinuousService* result(NULL);
+			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+				*route.sharedServicesMutex
+			);
+			BOOST_FOREACH(Service* tservice, route.getServices())
 			{
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 					*route.sharedServicesMutex
@@ -1015,11 +1094,17 @@ namespace synthese
 				route.addService(*result, false);
 				env.getEditableRegistry<ContinuousService>().add(shared_ptr<ContinuousService>(result));
 
-				logStream << "CREA : Creation of continuous service " << result->getServiceNumber() << " for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				importLogger.log(
+					ImportLogger::CREA,
+					"Creation of continuous service "+ result->getServiceNumber() +" for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+				);
 			}
 			else
 			{
-				logStream << "LOAD : Use of continuous service " << result->getKey() << " (" << result->getServiceNumber() << ") for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				importLogger.log(
+					ImportLogger::LOAD,
+					"Use of continuous service "+ lexical_cast<string>(result->getKey()) +" ("+ result->getServiceNumber() +") for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
+				);
 			}
 
 			return result;
@@ -1035,7 +1120,7 @@ namespace synthese
 			boost::shared_ptr<const geography::City> defaultCity,
 			util::Env& env,
 			const impex::DataSource& source,
-			std::ostream& stream
+			const impex::ImportLogger& importLogger
 		){
 			if(objects.empty())
 			{
@@ -1045,6 +1130,7 @@ namespace synthese
 			// Variables
 			bool linked(!objects.begin()->linkedStopAreas.empty());
 			AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
+			stringstream stream;
 
 			// Title
 			stream << "<h1>Zones d'arrêt ";
@@ -1129,6 +1215,8 @@ namespace synthese
 				}
 			}
 			stream << t.close();
+
+			importLogger.logRaw(stream.str());
 		}
 
 
@@ -1138,7 +1226,7 @@ namespace synthese
 			const server::Request& request,
 			util::Env& env,
 			const impex::DataSource& source,
-			std::ostream& stream
+			const impex::ImportLogger& importLogger
 		){
 			if(objects.empty())
 			{
@@ -1149,6 +1237,7 @@ namespace synthese
 			bool linked(!objects.begin()->linkedStopPoints.empty());
 			AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
 			AdminFunctionRequest<StopPointAdmin> openStopPointRequest(request);
+			stringstream stream;
 
 			// Title
 			stream << "<h1>Arrêts ";
@@ -1330,6 +1419,8 @@ namespace synthese
 				}
 			}
 			stream << t.close();
+
+			importLogger.logRaw(stream.str());
 		}
 
 
@@ -1341,7 +1432,7 @@ namespace synthese
 			const std::string& ttsText,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			Destination* destination;
 			if(destinations.contains(id))
@@ -1349,10 +1440,16 @@ namespace synthese
 				set<Destination*> loadedDestination(destinations.get(id));
 				if(loadedDestination.size() > 1)
 				{
-					logStream << "WARN : more than one destination with key " << id << "<br />";
+					importLogger.log(
+						ImportLogger::WARN,
+						"More than one destination with key "+ id
+					);
 				}
 				destination = *loadedDestination.begin();
-				logStream << "LOAD : Use of existing destination " << destination->getKey() << " (" << destination->getDisplayedText() << ")<br />";
+				importLogger.log(
+					ImportLogger::LOAD,
+					"Use of existing destination "+ lexical_cast<string>(destination->getKey()) +" ("+ destination->getDisplayedText() +")"
+				);
 			}
 			else
 			{
@@ -1364,7 +1461,10 @@ namespace synthese
 				destination->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<Destination>().add(shared_ptr<Destination>(destination));
 				destinations.add(*destination);
-				logStream << "CREA : Creation of the destination with key " << id << " (" << displayText <<  ")<br />";
+				importLogger.log(
+					ImportLogger::CREA,
+					"Creation of the destination with key "+ id +" ("+ displayText +")"
+				);
 			}
 			destination->setDisplayedText(displayText);
 			destination->setTTSText(ttsText);
@@ -1378,7 +1478,7 @@ namespace synthese
 			const std::string& id,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream,
+			const impex::ImportLogger& importLogger,
 			optional<TransportNetwork&> network
 		){
 			CommercialLine* line(NULL);
@@ -1401,7 +1501,10 @@ namespace synthese
 				{
 					if(loadedLines.size() > 1)
 					{
-						logStream << "WARN : more than one line with key " << id << "<br />";
+						importLogger.log(
+							ImportLogger::WARN,
+							"More than one line with key "+ id
+						);
 					}
 					line = *loadedLines.begin();
 				}
@@ -1419,7 +1522,10 @@ namespace synthese
 						}
 					}
 
-					logStream << "LOAD : Use of existing commercial line " << line->getKey() << " (" << line->getName() << ")<br />";
+					importLogger.log(
+						ImportLogger::LOAD,
+						"Use of existing commercial line "+ lexical_cast<string>(line->getKey()) +" ("+ line->getName() +")"
+					);
 				}
 			}
 			return line;
@@ -1431,7 +1537,7 @@ namespace synthese
 			pt::CommercialLine& line,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 			const impex::DataSource& source,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			// Attempting to find an existing route by value comparison
 			set<JourneyPattern*> result;
@@ -1453,8 +1559,10 @@ namespace synthese
 				if(	*jp == servedStops
 				){
 					result.insert(jp);
-					logStream << "LOAD : Use of existing route " << jp->getKey() <<
-						" (" << jp->getName() << ")<br />";
+					importLogger.log(
+						ImportLogger::LOAD,
+						"Use of existing route "+ lexical_cast<string>(jp->getKey()) +" ("+ jp->getName() +")"
+					);
 				}
 			}
 			return result;
@@ -1465,7 +1573,7 @@ namespace synthese
 		RollingStock* PTFileFormat::GetTransportMode(
 			const impex::ImportableTableSync::ObjectBySource<RollingStockTableSync>& transportModes,
 			const std::string& id,
-			std::ostream& logStream
+			const impex::ImportLogger& importLogger
 		){
 			RollingStock* transportMode(NULL);
 			if(transportModes.contains(id))
@@ -1473,7 +1581,10 @@ namespace synthese
 				set<RollingStock*> loadedTransportModes(transportModes.get(id));
 				if(loadedTransportModes.size() > 1)
 				{
-					logStream << "WARN : more than one transport mode with key " << id << "<br />";
+					importLogger.log(
+						ImportLogger::WARN,
+						"more than one transport mode with key "+ id
+					);
 				}
 				transportMode = *loadedTransportModes.begin();
 			}

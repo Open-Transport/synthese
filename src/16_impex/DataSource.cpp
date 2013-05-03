@@ -24,9 +24,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DataSource.h"
+
 #include "Exception.h"
-#include "FileFormat.h"
-#include "Factory.h"
 #include "Importer.hpp"
 #include "Importable.h"
 
@@ -37,49 +36,30 @@ namespace synthese
 {
 	using namespace util;
 
+	CLASS_DEFINITION(impex::DataSource, "t059_data_sources", 59)
 	FIELD_DEFINITION_OF_OBJECT(impex::DataSource, "data_source_id", "data_source_ids")
-
-	namespace util
-	{
-		template<> const string Registry<impex::DataSource>::KEY("DataSource");
-	}
+	FIELD_DEFINITION_OF_TYPE(Icon, "icon", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Charset, "charset", SQL_TEXT)
 
 	namespace impex
 	{
-		const util::RegistryTableType DataSource::CLASS_NUMBER = 59;
-
 		DataSource::DataSource(
 			RegistryKeyType id
 		):	Registrable(id),
-			_coordinatesSystem(NULL)
+			Object<DataSource, DataSourceRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(Icon),
+					FIELD_DEFAULT_CONSTRUCTOR(Charset),
+					FIELD_VALUE_CONSTRUCTOR(CoordinatesSystem, &CoordinatesSystem::GetInstanceCoordinatesSystem())
+			)	)
 		{}
-
-
-
-		boost::shared_ptr<Importer> DataSource::getImporter(
-			util::Env& env
-		) const {
-			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(_format));
-			return fileFormat->getImporter(env, *this);
-		}
-
-
-
-		bool DataSource::canImport() const
-		{
-			if(!Factory<FileFormat>::contains(_format))
-			{
-				return false;
-			}
-
-			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(_format));
-			return fileFormat->canImport();
-		}
 
 
 
 		const CoordinatesSystem& DataSource::getActualCoordinateSystem() const
 		{
-			return _coordinatesSystem ? *_coordinatesSystem : CoordinatesSystem::GetInstanceCoordinatesSystem();
+			return get<CoordinatesSystem>() ? *get<CoordinatesSystem>() : CoordinatesSystem::GetInstanceCoordinatesSystem();
 		}
 }	}

@@ -60,6 +60,11 @@ namespace synthese
 		class ContinuousService;
 	}
 
+	namespace impex
+	{
+		class ImportLogger;
+	}
+
 	namespace data_exchange
 	{
 		/** PTFileFormat class.
@@ -75,7 +80,7 @@ namespace synthese
 				pt::CommercialLine& line,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -89,7 +94,7 @@ namespace synthese
 				const std::string& name,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -105,7 +110,7 @@ namespace synthese
 				const std::string& ttsText,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -124,7 +129,7 @@ namespace synthese
 				pt::TransportNetwork& defaultNetwork,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				bool restrictInDefaultNetwork = false
 			);
 
@@ -135,7 +140,7 @@ namespace synthese
 				const std::string& id,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				boost::optional<pt::TransportNetwork&> network = boost::optional<pt::TransportNetwork&>()
 			);
 
@@ -150,7 +155,7 @@ namespace synthese
 				boost::posix_time::time_duration defaultTransferDuration,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -164,7 +169,7 @@ namespace synthese
 				bool mainStopArea,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -173,7 +178,7 @@ namespace synthese
 				const impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync>& stopAreas,
 				const std::string& id,
 				boost::optional<const std::string&> name,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				bool errorIfNotFound = true
 			);
 
@@ -212,7 +217,7 @@ namespace synthese
 				boost::shared_ptr<const geography::City> defaultCity,
 				util::Env& env,
 				const impex::DataSource& source,
-				std::ostream& stream
+				const impex::ImportLogger& importLogger
 			);
 
 			static void DisplayStopPointImportScreen(
@@ -220,7 +225,7 @@ namespace synthese
 				const server::Request& request,
 				util::Env& env,
 				const impex::DataSource& source,
-				std::ostream& stream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -249,7 +254,7 @@ namespace synthese
 				boost::optional<const pt::StopPoint::Geometry*> geometry,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				bool doNotUpdate = false
 			);
 
@@ -262,7 +267,7 @@ namespace synthese
 				const pt::StopArea& stopArea,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -278,7 +283,7 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				boost::optional<const graph::RuleUser::Rules&> rules
 			);
 
@@ -288,7 +293,7 @@ namespace synthese
 				const impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync>& stopPoints,
 				const std::string& id,
 				boost::optional<const std::string&> name,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				bool errorIfNotFound = true
 			);
 
@@ -297,7 +302,7 @@ namespace synthese
 			static pt::RollingStock* GetTransportMode(
 				const impex::ImportableTableSync::ObjectBySource<pt::RollingStockTableSync>& transportModes,
 				const std::string& id,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -320,7 +325,7 @@ namespace synthese
 				const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				bool removeOldCodes,
 				bool updateMetricOffsetOnUpdate,
 				bool attemptToCopyExistingGeometries = true,
@@ -332,7 +337,7 @@ namespace synthese
 				pt::CommercialLine& line,
 				const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 
 
@@ -344,7 +349,7 @@ namespace synthese
 				const std::string& number,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream,
+				const impex::ImportLogger& importLogger,
 				boost::optional<const std::string&> team = boost::optional<const std::string&>(),
 				boost::optional<const graph::RuleUser::Rules&> rules = boost::optional<const graph::RuleUser::Rules&>(),
 				boost::optional<const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices = boost::optional<const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization&>()
@@ -361,7 +366,7 @@ namespace synthese
 				const boost::posix_time::time_duration& waitingTime,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& importLogger
 			);
 		};
 }	}

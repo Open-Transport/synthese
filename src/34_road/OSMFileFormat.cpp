@@ -33,6 +33,7 @@
 #include "EdgeProjector.hpp"
 #include "ForbiddenUseRule.h"
 #include "FrenchPhoneticString.h"
+#include "Import.hpp"
 #include "PropertiesHTMLTable.h"
 #include "ReverseRoadChunk.hpp"
 #include "RoadPlace.h"
@@ -82,16 +83,21 @@ namespace synthese
 	{
 		const string OSMFileFormat::Importer_::PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE("add_central_chunk_reference");
 
+
+
 		bool OSMFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			boost::optional<const server::Request&> request
 		) const {
+
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			NetworkPtr network;
 			boost::filesystem::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 			boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
 			if(!file.good())
 			{
+				_logError("Unable to open file");
 				throw std::runtime_error("unable to open file");
 			}
 			std::string ext = boost::filesystem::extension(filePath);
@@ -110,13 +116,13 @@ namespace synthese
 
 			network->consolidate(true);
 
-			util::Log::GetInstance().info("finished parsing osm xml");
+			_logDebug("finished parsing osm xml");
 
 			// TODO: use a typedef
 			// FIXME: valgrind shows a leak from here.
 			std::map<unsigned long long int, std::pair<RelationPtr, std::map<unsigned long long int, WayPtr> > > waysByBoundaries = network->getWaysByAdminBoundary(8);
 
-			util::Log::GetInstance().info("extracted ways by boundary");
+			_logDebug("Extracted ways by boundary");
 
 			typedef std::map<unsigned long long int, NodePtr> NodesMap;
 			typedef std::vector<std::pair<osm::NodePtr, Point*> > HousesNodesWithGeom;
@@ -129,7 +135,9 @@ namespace synthese
 				if(node->hasTag("addr:housenumber") && node->hasTag("addr:street"))
 				{
 					// Compute the house geometry
-					shared_ptr<Point> houseCoord(_dataSource.getActualCoordinateSystem().createPoint(node->getLon(), node->getLat()));
+					shared_ptr<Point> houseCoord(
+						dataSource.getActualCoordinateSystem().createPoint(node->getLon(), node->getLat())
+					);
 					housesNodesWithGeom.push_back(make_pair(node, static_cast<Point*>(houseCoord->clone())));
 				}
 			}
@@ -151,7 +159,7 @@ namespace synthese
 				Geometry* centroid = boundary->toGeometry()->getCentroid();
 				std::string cityCode = cityId;
 				std::string cityName = to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(boundary->getTag(Element::TAG_NAME)));
-				util::Log::GetInstance().info("treating ways of boundary " + cityName);
+				_logDebug("treating ways of boundary " + cityName);
 				CityTableSync::SearchResult cities = CityTableSync::Search(
 					_env,
 					boost::optional<std::string>(), // exactname
@@ -274,7 +282,7 @@ namespace synthese
 
 					if(nodes->size() < 2)
 					{
-						util::Log::GetInstance().warn("Ignoring way with less than 2 nodes");
+						_logWarning("Ignoring way with less than 2 nodes");
 						continue;
 					}
 
@@ -292,7 +300,7 @@ namespace synthese
 						i++;
 
 						shared_ptr<Point> point(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-							*_dataSource.getActualCoordinateSystem().createPoint(
+							*dataSource.getActualCoordinateSystem().createPoint(
 								node->getLon(),
 								node->getLat()
 						)	)	);
@@ -374,7 +382,7 @@ namespace synthese
 				}
 			}
 
-			util::Log::GetInstance().info("finished inserting road network");
+			_logDebug("finished inserting road network");
 
 			typedef std::map<unsigned long long int, RelationPtr> ChunkRelations;
 
@@ -492,14 +500,14 @@ namespace synthese
 				}
 			}
 
-			util::Log::GetInstance().info("finished parsing relation");
+			_logDebug("finished parsing relation");
 
 			BOOST_FOREACH(const Registry<MainRoadPart>::value_type& road, _env.getEditableRegistry<MainRoadPart>())
 			{
 				road.second->validateGeometry();
 			}
 
-			util::Log::GetInstance().info("finished validating road geometries");
+			_logDebug("finished validating road geometries");
 			return true;
 		}
 
@@ -507,9 +515,10 @@ namespace synthese
 
 		OSMFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			OneFileTypeImporter<OSMFileFormat>(env, dataSource)
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			OneFileTypeImporter<OSMFileFormat>(env, import, logger)
 		{}
 
 
@@ -646,7 +655,7 @@ namespace synthese
 					CrossingTableSync::getId(),
 					position,
 					lexical_cast<string>(node->getId()),
-					&_dataSource
+					&(*_import.get<DataSource>())
 			)	);
 
 			_crossingsMap[node->getId()] = crossing;
@@ -737,7 +746,7 @@ namespace synthese
 				MainRoadChunk::HouseNumber num = lexical_cast<MainRoadChunk::HouseNumber>(house->getTag("addr:housenumber"));
 				// Compute the house geometry
 				shared_ptr<Point> houseCoord(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-					*_dataSource.getActualCoordinateSystem().createPoint(
+					*_import.get<DataSource>()->getActualCoordinateSystem().createPoint(
 						house->getLon(),
 						house->getLat()
 					)

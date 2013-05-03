@@ -33,6 +33,7 @@
 #include "HTMLModule.h"
 #include "IConv.hpp"
 #include "ImpExModule.h"
+#include "Import.hpp"
 #include "Importer.hpp"
 #include "PropertiesHTMLTable.h"
 #include "PTFileFormat.hpp"
@@ -107,13 +108,14 @@ namespace synthese
 
 		IneoOperationFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			MultipleFileTypesImporter<IneoOperationFileFormat>(env, dataSource),
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			MultipleFileTypesImporter<IneoOperationFileFormat>(env, import, logger),
 			_startDate(not_a_date_time),
 			_endDate(not_a_date_time),
-			_activities(_dataSource, _env),
-			_driverAllocationTemplates(_dataSource, _env)
+			_activities(*import.get<DataSource>(), _env),
+			_driverAllocationTemplates(*import.get<DataSource>(), _env)
 		{}
 
 
@@ -181,9 +183,11 @@ namespace synthese
 				return false;
 			}
 
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			// Driver allocations
 			date undefinedDate(not_a_date_time);
-			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
+			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(dataSource, _env);
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::value_type& itDASet, driverAllocations.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
@@ -197,7 +201,7 @@ namespace synthese
 
 			// Driver allocation templates
 			DriverService::Vector::Type emptyDATChunks;
-			ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync> driverAllocationTemplates(_dataSource, _env);
+			ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync> driverAllocationTemplates(dataSource, _env);
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::value_type& itDASet, driverAllocationTemplates.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
@@ -210,7 +214,7 @@ namespace synthese
 			}	}
 
 			// Driver services
-			ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
+			ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(dataSource, _env);
 			DriverService::Chunks emptyChunks;
 			Calendar importDate(_startDate, _endDate);
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::value_type& itDSSet, driverServices.getMap())
@@ -231,7 +235,6 @@ namespace synthese
 
 		bool IneoOperationFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			const string& key,
 			boost::optional<const server::Request&> request
 		) const {
@@ -239,15 +242,18 @@ namespace synthese
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
+				_logError("Could no open the file " + filePath.file_string());
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 			_clearFieldsMap();
 			date now(day_clock::local_day());
 
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			if(key == FILE_SAB)
 			{
 				ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(*_ptDatasource, _env);
-				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(dataSource, _env);
 				string lastKey;
 				DriverService* ds(NULL);
 				DriverAllocationTemplate* da(NULL);
@@ -282,9 +288,9 @@ namespace synthese
 							ds = FileFormat::LoadOrCreateObject<DriverServiceTableSync>(
 								driverServices,
 								fullKey,
-								_dataSource,
+								dataSource,
 								_env,
-								stream,
+								_logger,
 								"driver service"
 							);
 							lastKey = fullKey;
@@ -299,9 +305,9 @@ namespace synthese
 							da = FileFormat::LoadOrCreateObject<DriverAllocationTemplateTableSync>(
 								_driverAllocationTemplates,
 								fullKey,
-								_dataSource,
+								dataSource,
 								_env,
-								stream,
+								_logger,
 								"driver allocation template"
 							);
 
@@ -438,7 +444,9 @@ namespace synthese
 							lvs = vehicleServices.getBeginWith(vsKey);
 							if(lvs.empty())
 							{
-								stream << "WARN : vehicle service " << vsKey << " not foud in driver service " << key << ".<br />";
+								_logWarning(
+									"Vehicle service "+ vsKey +" not foud in driver service "+ key +"."
+								);
 								continue;
 							}
 
@@ -481,8 +489,8 @@ namespace synthese
 			}
 			else if(key == FILE_AFA)
 			{
-				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);
-				ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<UserTableSync> users(dataSource, _env);
+				ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(dataSource, _env);
 				do
 				{
 					// File read
@@ -502,9 +510,9 @@ namespace synthese
 						DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
 							driverAllocations,
 							fullKey,
-							_dataSource,
+							dataSource,
 							_env,
-							stream,
+							_logger,
 							"allocation"
 						);
 
@@ -524,9 +532,9 @@ namespace synthese
 							FileFormat::LoadOrCreateObject<UserTableSync>(
 								users,
 								userKey,
-								_dataSource,
+								dataSource,
 								_env,
-								stream,
+								_logger,
 								"conducteur"
 						)	);
 						da->set<Driver>(*user);
@@ -547,7 +555,9 @@ namespace synthese
 							);
 							if(templates.empty())
 							{
-								stream << "WARN : undefined allocation template " << templateFullKey << ".<br />";
+								_logWarning(
+									"Undefined allocation template "+ templateFullKey +"."
+								);
 								continue;
 							}
 							da->set<DriverAllocationTemplate>(
@@ -589,12 +599,14 @@ namespace synthese
 
 		bool IneoOperationFileFormat::Importer_::afterParsing()
 		{
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			// Driver services without services
 			BOOST_FOREACH(
 				const Registry<DriverService>::value_type& itDriverService,
 				_env.getRegistry<DriverService>()
 			){
-				if(	!itDriverService.second->hasLinkWithSource(_dataSource) ||
+				if(	!itDriverService.second->hasLinkWithSource(dataSource) ||
 					!itDriverService.second->getChunks().empty()
 				){
 					continue;
@@ -608,7 +620,7 @@ namespace synthese
 				const Registry<DriverAllocationTemplate>::value_type& itDriverAllocationTemplate,
 				_env.getRegistry<DriverAllocationTemplate>()
 			){
-				if(	!itDriverAllocationTemplate.second->hasLinkWithSource(_dataSource) ||
+				if(	!itDriverAllocationTemplate.second->hasLinkWithSource(dataSource) ||
 					!itDriverAllocationTemplate.second->get<DriverService::Vector>().empty()
 				){
 					continue;
@@ -622,7 +634,7 @@ namespace synthese
 				const Registry<DriverAllocation>::value_type& itDriverAllocation,
 				_env.getRegistry<DriverAllocation>()
 			){
-				if(	!itDriverAllocation.second->hasLinkWithSource(_dataSource) ||
+				if(	!itDriverAllocation.second->hasLinkWithSource(dataSource) ||
 					!itDriverAllocation.second->get<Date>().is_not_a_date()
 				){
 					continue;
@@ -793,7 +805,7 @@ namespace synthese
 					return;
 				}
 				vector<string> fields;
-				string utfLine(IConv(_dataSource.getCharset(), "UTF-8").convert(trim_line.substr(separator+1)));
+				string utfLine(IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(trim_line.substr(separator+1)));
 				split(fields, utfLine, is_any_of(SEP));
 				const vector<string>& cols(itFieldsMap->second);
 				for(size_t i=0; i<fields.size() && i<cols.size(); ++i)

@@ -23,20 +23,34 @@
 #ifndef SYNTHESE_impex_Importer_hpp__
 #define SYNTHESE_impex_Importer_hpp__
 
-#include "Env.h"
-#include "ParametersMap.h"
-#include "DBTransaction.hpp"
-#include "AdminInterfaceElement.h"
+#include "ImportLogger.hpp"
 
 #include <ostream>
 #include <boost/optional.hpp>
-#include <boost/filesystem/path.hpp>
+#include <boost/date_time/gregorian/greg_date.hpp>
 
 namespace synthese
 {
+	namespace db
+	{
+		class DBTransaction;
+	}
+
+	namespace server
+	{
+		class Request;
+	}
+
+	namespace util
+	{
+		class Env;
+		class ParametersMap;
+	}
+
 	namespace impex
 	{
-		class DataSource;
+		class Import;
+		class ImportLogger;
 
 		/** Importer class.
 			@ingroup m16
@@ -45,91 +59,53 @@ namespace synthese
 		{
 		public:
 
-			class Logger
-			{
-			public:
-				typedef enum
-				{
-					ALL = 0,
-					DEBG = 10,
-					LOAD = 20,
-					CREA = 25,
-					INFO = 30,
-					WARN = 40,
-					NOTI = 50,
-					ERROR = 60,
-					NOLOG = 99
-				} Level;
-
-				struct Entry
-				{
-					Level level;
-					std::string content;
-					Entry(Level level_, const std::string& content_):
-					level(level_), content(content_) {}
-				};
-
-				typedef std::vector<Entry> Entries;
-
-			private:
-				Entries _entries;
-				const Level _minLevel;
-				Level _maxLoggedLevel;
-
-			public:
-				Logger(
-					Level minLevel
-				);
-
-				void log(
-					Level level,
-					const std::string& content
-				);
-
-				void output(
-					std::ostream& stream
-				) const;
-
-				Level getMaxLoggedLevel() const { return _maxLoggedLevel; }
-			};
-
 			Importer(
 				util::Env& env,
-				const DataSource& dataSource,
-				Logger::Level minLevel = Logger::ALL
-			):	_env(env),
-				_dataSource(dataSource),
-				_logger(minLevel)
-			{}
+				const Import& import,
+				const ImportLogger& logger
+			);
 
 		protected:
-			util::Env&						_env;
-			const DataSource&						_dataSource;
-			boost::optional<boost::filesystem::path> _logPath;
-			mutable Logger							_logger;
+			util::Env&				_env;
+			const Import&			_import;
+			const ImportLogger&		_logger;
 
 			virtual db::DBTransaction _save() const = 0;
+
+			void _log(
+				ImportLogger::Level level,
+				const std::string& content
+			) const;
+			void _logError(const std::string& content) const;
+			void _logWarning(const std::string& content) const;
+			void _logDebug(const std::string& content) const;
+			void _logInfo(const std::string& content) const;
+			void _logLoad(const std::string& content) const;
+			void _logCreation(const std::string& content) const;
 
 		public:
 			//! @name Getters
 			//@{
-				const DataSource& getDataSource() const { return _dataSource; }
-				boost::optional<boost::filesystem::path> getLogPath() const { return _logPath; }
-				const Logger& getLogger() const { return _logger; }
+				const Import& getImport() const { return _import; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setLogPath(boost::optional<boost::filesystem::path> value){ _logPath = value; }
 			//@}
 
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
 
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Purge the obsolete data imported by the source
 			/// @param firstDayToKeep the first day to keep
-			virtual void cleanObsoleteData(const boost::gregorian::date& firstDayToKeep) const {}
+			virtual void cleanObsoleteData(
+				const boost::gregorian::date& firstDayToKeep
+			) const {}
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
@@ -148,11 +124,9 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Launches the parsing of the files, with output on an admin page.
-			/// @param os output stream
-			/// @param request admin
+			/// @param request
 			/// @return true if it is allowed to save the data
 			virtual bool parseFiles(
-				std::ostream& os,
 				boost::optional<const server::Request&> request
 			) const = 0;
 
@@ -161,23 +135,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Interface for the save method.
 			/// @return transaction to run
-			db::DBTransaction save() const
-			{
-				db::DBTransaction result(_save());
-				_env.clear();
-				return result;
-			}
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Import screen to include in the administration console.
-			/// @param os stream to write the result on
-			/// @param request request for display of the administration console
-			/// @since 3.2.0
-			/// @date 2010
-			virtual void displayAdmin(
-				std::ostream& os,
-				const server::Request& request
-			) const = 0;
+			db::DBTransaction save() const;
 		};
 }	}
 

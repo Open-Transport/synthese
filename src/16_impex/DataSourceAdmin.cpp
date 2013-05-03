@@ -25,13 +25,13 @@
 #include "DataSourceAdmin.h"
 
 #include "AdminParametersException.h"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "User.h"
 #include "ImpExModule.h"
 #include "GlobalRight.h"
 #include "PropertiesHTMLTable.h"
-#include "DataSourceUpdateAction.hpp"
 #include "DataSource.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "FileFormat.h"
@@ -45,6 +45,7 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace html;
 	using namespace admin;
 	using namespace server;
@@ -92,12 +93,12 @@ namespace synthese
 				throw AdminParametersException("No such data source");
 			}
 
-			if(Factory<FileFormat>::contains(_dataSource->getFormat()))
-			{
-				_doImport = map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
-				_importer = _dataSource->getImporter(*_env);
-				_importer->setFromParametersMap(map, _doImport);
-			}
+//			if(Factory<FileFormat>::contains(_dataSource->getFormat()))
+//			{
+//				_doImport = map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
+//				_importer = _dataSource->getImporter(*_env);
+//				_importer->setFromParametersMap(map, _doImport);
+//			}
 		}
 
 
@@ -132,35 +133,42 @@ namespace synthese
 			// PROPERTIES TAB
 			if(openTabContent(stream, TAB_PROPERTIES))
 			{
-				AdminActionFunctionRequest<DataSourceUpdateAction, DataSourceAdmin> updateRequest(request, *this);
-				updateRequest.getAction()->setDataSource(const_pointer_cast<DataSource>(_dataSource));
+				AdminActionFunctionRequest<ObjectUpdateAction, DataSourceAdmin> updateRequest(request, *this);
+				updateRequest.getAction()->setObject(const_cast<DataSource&>(*_dataSource));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("updateds"));
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_dataSource->getKey()));
-				stream << t.cell("Nom", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_NAME, _dataSource->getName()));
-				stream << t.cell("Format", t.getForm().getSelectInput(DataSourceUpdateAction::PARAMETER_FORMAT, ImpExModule::GetFileFormatsList(), optional<string>(_dataSource->getFormat())));
+				stream << t.cell(
+					"Nom",
+					t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Name>(), _dataSource->get<Name>())
+				);
 				stream << t.cell(
 					"Icone",
 					t.getForm().getTextInput(
-						DataSourceUpdateAction::PARAMETER_ICON,
-						_dataSource->getIcon()
-					) + " " + HTMLModule::getHTMLImage("/admin/img/"+ (_dataSource->getIcon().empty() ? "note.png" : _dataSource->getIcon()), _dataSource->getFormat())
+						ObjectUpdateAction::GetInputName<Icon>(),
+						_dataSource->get<Icon>()
+					) + " " + HTMLModule::getHTMLImage("/admin/img/"+ (_dataSource->get<Icon>().empty() ? "note.png" : _dataSource->get<Icon>()), _dataSource->get<Name>())
 				);
-				stream << t.cell("Jeu de caractères (défaut = auto-détection)", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_CHARSET, _dataSource->getCharset()));
-				stream << t.cell("SRID", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_SRID, _dataSource->getCoordinatesSystem() ? lexical_cast<string>(_dataSource->getCoordinatesSystem()->getSRID()) : string()));
-				stream << t.cell("Requête import par défaut", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_DEFAULT_IMPORT_REQUEST, _dataSource->getDefaultImportRequest()));
+				stream << t.cell(
+					"Jeu de caractères (défaut = auto-détection)",
+					t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Charset>(), _dataSource->get<Charset>())
+				);
+				stream << t.cell(
+					"SRID",
+					t.getForm().getTextInput(ObjectUpdateAction::GetInputName<CoordinatesSystem>(), _dataSource->get<CoordinatesSystem>() ? lexical_cast<string>(_dataSource->get<CoordinatesSystem>()->getSRID()) : string())
+				);
 				stream << t.close();
 			}
 
 
 			////////////////////////////////////////////////////////////////////
 			// MAINTENANCE TAB
-			if(openTabContent(stream, TAB_MAINTENANCE))
+/*			if(openTabContent(stream, TAB_MAINTENANCE))
 			{
 				AdminActionFunctionRequest<CleanObsoleteDataAction, DataSourceAdmin> cleanRequest(request, *this);
 				cleanRequest.getAction()->setEnv(_env);
-				cleanRequest.getAction()->setDataSource(*_dataSource);
+				cleanRequest.getAction()->setObject(*_dataSource);
 				PropertiesHTMLTable cleanForm(cleanRequest.getHTMLForm("clean"));
 				date yesterday(gregorian::day_clock::local_day());
 				yesterday -= days(1);
@@ -193,7 +201,7 @@ namespace synthese
 
 				stream << "Return code : " << (doImport ? "0" : "1");
 			}
-
+*/
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
@@ -221,12 +229,12 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
-			if(_dataSource.get() && _dataSource->canImport())
+/*			if(_dataSource.get() && _dataSource->canImport())
 			{
 				_tabs.push_back(Tab("Import", TAB_IMPORT, true));
 			}
 			_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, true));
-
+*/
 			_tabBuilded = true;
 		}
 	}

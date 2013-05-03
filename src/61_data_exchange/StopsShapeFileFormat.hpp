@@ -112,7 +112,6 @@ namespace synthese
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					std::ostream& os,
 					const std::string& key,
 					boost::optional<const server::Request&> adminRequest
 				) const;
@@ -121,7 +120,8 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
+					const impex::Import& import,
+					const impex::ImportLogger& logger
 				);
 
 				//////////////////////////////////////////////////////////////////////////

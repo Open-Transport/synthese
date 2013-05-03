@@ -21,6 +21,8 @@
 */
 
 #include "OGTFileFormat.hpp"
+
+#include "Import.hpp"
 #include "PTFileFormat.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
@@ -58,16 +60,19 @@ namespace synthese
 	{
 		bool OGTFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& os,
 			boost::optional<const server::Request&> adminRequest
 		) const {
 
-			ExpatParser parser(_dataSource, _env, os, _calendar);
+			ExpatParser parser(*_import.get<DataSource>(), _env, _logger, _calendar);
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
-				throw Exception("Could no open the file " + filePath.file_string());
+				_log(
+					ImportLogger::ERROR,
+					"Could not open the file " + filePath.file_string()
+				);
+				throw Exception("Could not open the file " + filePath.file_string());
 			}
 			parser.parse(inFile);
 			return true;
@@ -96,10 +101,13 @@ namespace synthese
 
 
 
-		OGTFileFormat::Importer_::Importer_( util::Env& env, const impex::DataSource& dataSource ):
-			Importer(env, dataSource),
-			OneFileTypeImporter<OGTFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource)
+		OGTFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			OneFileTypeImporter<OGTFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger)
 		{}
 
 
@@ -182,7 +190,7 @@ namespace synthese
 									user_data->stopPoints,
 									attributes["TOP"],
 									boost::optional<const std::string&>(),
-									user_data->_stream,
+									user_data->_logger,
 									true
 							)	);
 							if(!user_data->tripStops.empty())
@@ -240,7 +248,7 @@ namespace synthese
 							user_data->tripStops,
 							user_data->_dataSource,
 							user_data->_env,
-							user_data->_stream,
+							user_data->_logger,
 							true,
 							true
 					)	);
@@ -252,7 +260,7 @@ namespace synthese
 							user_data->tripNumber,
 							user_data->_dataSource,
 							user_data->_env,
-							user_data->_stream
+							user_data->_logger
 					)	);
 					if(service)
 					{
@@ -273,12 +281,12 @@ namespace synthese
 		OGTFileFormat::Importer_::ExpatParser::ExpatParser(
 			const impex::DataSource& dataSource,
 			util::Env& env,
-			ostream& stream,
+			const impex::ImportLogger& logger,
 			const Calendar& calendar
 		):	user_data(
 				dataSource,
 				env,
-				stream,
+				logger,
 				calendar
 			)
 		{}
@@ -358,12 +366,12 @@ namespace synthese
 		OGTFileFormat::Importer_::ExpatParser::expat_user_data::expat_user_data(
 			const impex::DataSource& dataSource,
 			util::Env& env,
-			ostream& stream,
+			const impex::ImportLogger& logger,
 			const Calendar& calendar
 		):	_calendar(calendar),
 			_dataSource(dataSource),
 			_env(env),
-			_stream(stream),
+			_logger(logger),
 			line(NULL),
 			wayBack(false),
 			stopPoints(dataSource, env)

@@ -22,11 +22,15 @@
 
 #include "RSSFileFormat.hpp"
 
-#include "AlarmRecipient.h"
-#include "BasicClient.h"
-#include "ScenarioTableSync.h"
-#include "AlarmTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
+#include "AlarmRecipient.h"
+#include "AlarmTableSync.h"
+#include "BasicClient.h"
+#include "DisplayScreenAlarmRecipient.h"
+#include "Import.hpp"
+#include "LineAlarmRecipient.hpp"
+#include "ScenarioTableSync.h"
+#include "StopAreaAlarmRecipient.hpp"
 #include "XmlToolkit.h"
 
 using namespace boost;
@@ -36,8 +40,10 @@ namespace synthese
 {
 	using namespace data_exchange;
 	using namespace db;
+	using namespace departure_boards;
 	using namespace impex;
 	using namespace messages;
+	using namespace pt;
 	using namespace server;
 	using namespace util;
 
@@ -48,15 +54,13 @@ namespace synthese
 
 	namespace data_exchange
 	{
-		const string RSSFileFormat::Importer_::PARAMETER_URL = "url";
-		const string RSSFileFormat::Importer_::PARAMETER_RECIPIENT_KEY = "recipient_key";
-		const string RSSFileFormat::Importer_::PARAMETER_RECIPIENT_ID = "recipient_id";
+		const string RSSFileFormat::Importer_::PARAMETER_LINE_RECIPIENT_ID = "line_recipient_id";
+		const string RSSFileFormat::Importer_::PARAMETER_STOP_RECIPIENT_ID = "stop_recipient_id";
+		const string RSSFileFormat::Importer_::PARAMETER_BROADCAST_POINT_RECIPIENT_ID = "broadcast_point_recipient_id";
 
 
 
-		bool RSSFileFormat::Importer_::_parse(
-			const boost::filesystem::path& filePath,
-			std::ostream& os,
+		bool RSSFileFormat::Importer_::_read(
 			boost::optional<const server::Request&> adminRequest
 		) const	{
 
@@ -64,21 +68,9 @@ namespace synthese
 			try
 			{
 				// If no path defined, get the content online instead
-				string content;
-				if(filePath.file_string().empty())
-				{
-					content = BasicClient::Get(_url);
-				}
-				else
-				{
-					string line;
-					ifstream inFile;
-					inFile.open(filePath.file_string().c_str());
-					while(getline(inFile, line))
-					{
-						content += line;
-					}
-				}
+				string content(
+					BasicClient::Get(_address)
+				);
 
 				// Parsing of the content
 				XMLResults pResults;
@@ -89,9 +81,9 @@ namespace synthese
 				for(int c(0); c<allNode.nChildNode("channel"); ++c)
 				{
 					XMLNode channelNode(allNode.getChildNode("channel", c));
-					for(int n(0); n<allNode.nChildNode("item"); ++n)
+					for(int n(0); n<channelNode.nChildNode("item"); ++n)
 					{
-						XMLNode itemNode(allNode.getChildNode("item", n));
+						XMLNode itemNode(channelNode.getChildNode("item", n));
 						Item item;
 
 						// Title
@@ -103,7 +95,17 @@ namespace synthese
 						// Content
 						if(itemNode.nChildNode("description"))
 						{
-							item.content = itemNode.getChildNode("description").getText();
+							XMLNode descriptionNode(itemNode.getChildNode("description"));
+							if(descriptionNode.nText())
+							{
+								item.content = descriptionNode.getText();
+							}
+							else if(
+								descriptionNode.nClear() &&
+								descriptionNode.getClear(0).lpszValue
+							){
+								item.content = descriptionNode.getClear(0).lpszValue;
+							}
 						}
 
 						// GUID
@@ -136,10 +138,11 @@ namespace synthese
 						items.push_back(item);
 				}	}
 
+				DataSource& dataSource(*_import.get<DataSource>());
 
 				// Scenarios
 				DataSource::Links::mapped_type existingScenarios(
-					_dataSource.getLinkedObjects<Scenario>()
+					dataSource.getLinkedObjects<Scenario>()
 				);
 				BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingScenario, existingScenarios)
 				{
@@ -153,7 +156,7 @@ namespace synthese
 					shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
-							_dataSource.getObjectByCode<Scenario>(lexical_cast<string>(item.guid))
+							dataSource.getObjectByCode<Scenario>(lexical_cast<string>(item.guid))
 					)	);
 					Alarm* message(NULL);
 					if(!scenario)
@@ -164,7 +167,7 @@ namespace synthese
 								ScenarioTableSync::getId()
 						)	);
 						updatedScenario->addCodeBySource(
-							_dataSource,
+							dataSource,
 							lexical_cast<string>(item.guid)
 						);
 						updatedScenario->setIsEnabled(true);
@@ -181,13 +184,35 @@ namespace synthese
 						message = updatedMessage.get();
 						_env.getEditableRegistry<Alarm>().add(updatedMessage);
 
-						// Link creation
-						shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
-						link->setKey(AlarmObjectLinkTableSync::getId());
-						link->setAlarm(message);
-						link->setObject(_recipient.get());
-						link->setRecipientKey(_recipientKey);
-						_env.getEditableRegistry<AlarmObjectLink>().add(link);
+						// Links creation
+						if(_lineRecipientId)
+						{
+							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+							link->setKey(AlarmObjectLinkTableSync::getId());
+							link->setAlarm(message);
+							link->setObjectId(*_lineRecipientId);
+							link->setRecipient(LineAlarmRecipient::FACTORY_KEY);
+							_env.getEditableRegistry<AlarmObjectLink>().add(link);
+						}
+						if(_stopRecipientId)
+						{
+							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+							link->setKey(AlarmObjectLinkTableSync::getId());
+							link->setAlarm(message);
+							link->setObjectId(*_stopRecipientId);
+							link->setRecipient(StopAreaAlarmRecipient::FACTORY_KEY);
+							_env.getEditableRegistry<AlarmObjectLink>().add(link);
+						}
+						if(_broadcastPointRecipientId)
+						{
+							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+							link->setKey(AlarmObjectLinkTableSync::getId());
+							link->setAlarm(message);
+							link->setObjectId(*_broadcastPointRecipientId);
+							link->setRecipient(DisplayScreenAlarmRecipient::FACTORY_KEY);
+							_env.getEditableRegistry<AlarmObjectLink>().add(link);
+						}
+
 					}
 					else
 					{
@@ -253,17 +278,11 @@ namespace synthese
 
 		RSSFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			OneFileTypeImporter<RSSFileFormat>(env, dataSource)
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			ConnectionImporter<RSSFileFormat>(env, import, logger)
 		{}
-
-
-
-		void RSSFileFormat::Importer_::displayAdmin( std::ostream& os, const server::Request& request ) const
-		{
-
-		}
 
 
 
@@ -277,27 +296,44 @@ namespace synthese
 
 		void RSSFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
-			// URL
-			_url = map.get<string>(PARAMETER_URL);
-
-			// Recipient key
-			_recipientKey = map.get<string>(PARAMETER_RECIPIENT_KEY);
-			if(!Factory<AlarmRecipient>::contains(_recipientKey))
-			{
-				throw Exception("No such recipient key");
-			}
-
-			// Recipient
+			// Recipients
+			string lineRecipient(map.getDefault<string>(PARAMETER_LINE_RECIPIENT_ID));
+			if(!lineRecipient.empty())
 			try
 			{
-				_recipient = DBModule::GetEditableObject(
-					map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID),
-					_env
-				);
+				_lineRecipientId = lexical_cast<RegistryKeyType>(lineRecipient);
 			}
-			catch(ObjectNotFoundException<Registrable>&)
+			catch(bad_lexical_cast&)
 			{
-				throw Exception("No such recipient");
+				throw Exception("No such line recipient");
+			}
+
+			string stopRecipient(map.getDefault<string>(PARAMETER_STOP_RECIPIENT_ID));
+			if(!stopRecipient.empty())
+			try
+			{
+				_stopRecipientId = lexical_cast<RegistryKeyType>(stopRecipient);
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw Exception("No such stop recipient");
+			}
+
+			string broadcastRecipient(map.getDefault<string>(PARAMETER_BROADCAST_POINT_RECIPIENT_ID));
+			if(!broadcastRecipient.empty())
+			try
+			{
+				_broadcastPointRecipientId = lexical_cast<RegistryKeyType>(broadcastRecipient);
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw Exception("No such broadcast recipient");
+			}
+
+			// Datasource check
+			if(!_import.get<DataSource>())
+			{
+				throw Exception("The import must link to a datasource");
 			}
 		}
 

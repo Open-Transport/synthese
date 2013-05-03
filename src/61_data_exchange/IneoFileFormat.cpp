@@ -38,6 +38,7 @@
 #include "HTMLModule.h"
 #include "IConv.hpp"
 #include "ImpExModule.h"
+#include "Import.hpp"
 #include "Importer.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
@@ -175,25 +176,25 @@ namespace synthese
 
 		IneoFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			MultipleFileTypesImporter<IneoFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			MultipleFileTypesImporter<IneoFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
 			_autoImportStops(false),
 			_displayLinkedStops(false),
 			_interactive(false),
 			_addWaybackToJourneyPatternCode(false),
-			_destinations(_dataSource, _env),
-			_stopPoints(_dataSource, _env),
-			_depots(_dataSource, _env),
-			_lines(_dataSource, _env)
+			_destinations(*import.get<DataSource>(), _env),
+			_stopPoints(*import.get<DataSource>(), _env),
+			_depots(*import.get<DataSource>(), _env),
+			_lines(*import.get<DataSource>(), _env)
 		{}
 
 
 
 		bool IneoFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			const string& key,
 			boost::optional<const server::Request&> request
 		) const {
@@ -201,16 +202,22 @@ namespace synthese
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
+				_log(
+					ImportLogger::ERROR,
+					"Could no open the file " + filePath.file_string()
+				);
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 			_clearFieldsMap();
 			date now(day_clock::local_day());
 
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			// 1 : Stops
 			if(key == FILE_PNT)
 			{
-				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
-				ImportableTableSync::ObjectBySource<DepotTableSync> depots(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(dataSource, _env);
+				ImportableTableSync::ObjectBySource<DepotTableSync> depots(dataSource, _env);
 
 				// 1.1 Stop areas
 				if(_defaultCity.get())
@@ -271,9 +278,9 @@ namespace synthese
 							city.get(),
 							!_stopCityCodeField.empty(),
 							_stopAreaDefaultTransferDuration,
-							_dataSource,
+							dataSource,
 							_env,
-							stream
+							_logger
 						);
 				}	}
 
@@ -314,7 +321,7 @@ namespace synthese
 					{
 						try
 						{
-							geometry = _dataSource.getActualCoordinateSystem().createPoint(
+							geometry = dataSource.getActualCoordinateSystem().createPoint(
 								lexical_cast<double>(_getValue("X")),
 								lexical_cast<double>(_getValue("Y"))
 							);
@@ -386,7 +393,10 @@ namespace synthese
 					set<StopArea*> stopAreasSet(stopAreas.get(stopAreaCode));
 					if(stopAreasSet.empty())
 					{
-						stream << "WARN : Stop area " << stopAreaCode << " was not found for stop " << id << ". Stop update or creation is ignored.<br />";
+						_log(
+							ImportLogger::WARN,
+							"Stop area "+ stopAreaCode +" was not found for stop "+ id +". Stop update or creation is ignored."
+						);
 						continue;
 					}
 					stop.stopArea = *stopAreasSet.begin();
@@ -418,18 +428,18 @@ namespace synthese
 				{
 					BOOST_FOREACH(StopPoint* stop, itStop.second)
 					{
-						BOOST_FOREACH(const std::string& code, stop->getCodesBySource(_dataSource))
+						BOOST_FOREACH(const std::string& code, stop->getCodesBySource(dataSource))
 						{
 							if(!_mnlp_prefix.empty() && code.size() > _mnlp_prefix.size() && code.substr(0, _mnlp_prefix.size()) == _mnlp_prefix)
 							{
-								stop->removeSourceLink(_dataSource, code);
+								stop->removeSourceLink(dataSource, code);
 								toRemove.insert(make_pair(code, stop));
 								continue;
 							}
 							StopsMap::const_iterator it(stops.find(code));
 							if(it == stops.end())
 							{
-								stop->removeSourceLink(_dataSource, code);
+								stop->removeSourceLink(dataSource, code);
 								toRemove.insert(make_pair(code, stop));
 							}
 						}
@@ -460,9 +470,9 @@ namespace synthese
 							handicapped,
 							itStop.second.stopArea,
 							itStop.second.geometry.get(),
-							_dataSource,
+							dataSource,
 							_env,
-							stream
+							_logger
 					)	);
 
 					if(_stopIdField != VALUE_MNLP)
@@ -470,7 +480,7 @@ namespace synthese
 						// Adding of the code to the stop if not already exists
 						BOOST_FOREACH(const string& code, itStop.second.codes)
 						{
-							(*matchingStops.begin())->addCodeBySource(_dataSource, code);
+							(*matchingStops.begin())->addCodeBySource(dataSource, code);
 						}
 						_stopPoints.add(**matchingStops.begin());
 					}
@@ -499,7 +509,7 @@ namespace synthese
 									make_pair(
 										key,
 										shared_ptr<LineString>(
-											_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
+											dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
 								)	)	);
 							}
 						}
@@ -507,7 +517,7 @@ namespace synthese
 							_mnlp_prefix + _getValue("NLP1"),
 							_mnlp_prefix + _getValue("NLP2")
 						);
-						sequence = _dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2);
+						sequence = dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2);
 
 						if(_points[_getValue("NLP1")].get())
 						{
@@ -540,7 +550,7 @@ namespace synthese
 							make_pair(
 								key,
 								shared_ptr<LineString>(
-									_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
+									dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
 						)	)	);
 					}
 				}
@@ -576,9 +586,9 @@ namespace synthese
 								_getValue("NDSTG"),
 								_getValue("DSTBL"),
 								_getValue("DSTTS"),
-								_dataSource,
+								dataSource,
 								_env,
-								stream
+								_logger
 						)	);
 
 						// Destination overload
@@ -596,7 +606,7 @@ namespace synthese
 			// 4 : Lines
 			else if(key == FILE_LIG)
 			{
-				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
 				CommercialLine* line(NULL);
 				Destination* destination(NULL);
 				JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
@@ -625,9 +635,9 @@ namespace synthese
 								jpWayback,
 								NULL,
 								stops,
-								_dataSource,
+								dataSource,
 								_env,
-								stream,
+								_logger,
 								true,
 								true
 						)	);
@@ -651,9 +661,9 @@ namespace synthese
 							_getValue(_lineShortNameField),
 							optional<RGBColor>(),
 							*_network,
-							_dataSource,
+							dataSource,
 							_env,
-							stream
+							_logger
 						);
 					}
 					else if(_section == "CH")
@@ -679,7 +689,10 @@ namespace synthese
 							set<Destination*> destinations(_destinations.get(destinationCode));
 							if(destinations.empty())
 							{
-								stream << "WARN : Destination " << destinationCode << " not found in journey pattern " << jpKey << "<br />";
+								_log(
+									ImportLogger::WARN,
+									"Destination "+ destinationCode +" not found in journey pattern "+ jpKey
+								);
 							}
 							else
 							{
@@ -690,9 +703,9 @@ namespace synthese
 									overloadedLine = PTFileFormat::GetLine(
 										lines,
 										it->second,
-										_dataSource,
+										dataSource,
 										_env,
-										stream
+										_logger
 									);
 								}
 							}
@@ -714,7 +727,10 @@ namespace synthese
 							}
 							else
 							{
-								stream << "WARN : distance between " << lastStopCode << " and " << stopCode << " not found.<br />";
+								_log(
+									ImportLogger::WARN,
+									"Distance between "+ lastStopCode +" and "+ stopCode +" not found."
+								);
 							}
 
 							// Geometry
@@ -793,8 +809,8 @@ namespace synthese
 			}
 			else if(key == FILE_HOR)
 			{
-				ImportableTableSync::ObjectBySource<DeadRunTableSync> deadRuns(_dataSource, _env);
-				ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DeadRunTableSync> deadRuns(dataSource, _env);
+				ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(dataSource, _env);
 				TCOUValues tcou;
 				JourneyPattern* route(NULL);
 				VehicleService* vehicleService(NULL);
@@ -823,9 +839,9 @@ namespace synthese
 								departureSchedules,
 								arrivalSchedules,
 								string(),
-								_dataSource,
+								dataSource,
 								_env,
-								stream
+								_logger
 							);
 						}
 						else if(
@@ -837,9 +853,9 @@ namespace synthese
 								FileFormat::LoadOrCreateObject(
 									deadRuns,
 									cidx,
-									_dataSource,
+									dataSource,
 									_env,
-									stream,
+									_logger,
 									"haut le pied"
 							)	);
 
@@ -968,9 +984,9 @@ namespace synthese
 						vehicleService = PTOperationFileFormat::CreateOrUpdateVehicleService(
 							vehicleServices,
 							sb + "/" + lexical_cast<string>(ph) + (_vehicleServiceSuffix.empty() ? string() : ("/"+ _vehicleServiceSuffix)),
-							_dataSource,
+							dataSource,
 							_env,
-							stream
+							_logger
 						);
 						vehicleService->setName(sb);
 
@@ -1032,114 +1048,6 @@ namespace synthese
 				}
 			}
 			return true;
-		}
-
-
-
-		void IneoFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			stream << "<h1>Fichiers</h1>";
-
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.title("Fichiers");
-			stream << t.cell("Fichier PNT (arrêts)", t.getForm().getTextInput(_getFileParameterName(FILE_PNT), _pathsMap[FILE_PNT].file_string()));
-			stream << t.cell("Fichier PTF (points de forme)", t.getForm().getTextInput(_getFileParameterName(FILE_PTF), _pathsMap[FILE_PTF].file_string()));
-			stream << t.cell("Fichier DIS (distances)", t.getForm().getTextInput(_getFileParameterName(FILE_DIS), _pathsMap[FILE_DIS].file_string()));
-			stream << t.cell("Fichier DST (destinations)", t.getForm().getTextInput(_getFileParameterName(FILE_DST), _pathsMap[FILE_DST].file_string()));
-			stream << t.cell("Fichier LIG (lignes)", t.getForm().getTextInput(_getFileParameterName(FILE_LIG), _pathsMap[FILE_LIG].file_string()));
-			stream << t.cell("Fichier CJV (dates)", t.getForm().getTextInput(_getFileParameterName(FILE_CJV), _pathsMap[FILE_CJV].file_string()));
-			stream << t.cell("Fichier CAL (calendriers)", t.getForm().getTextInput(_getFileParameterName(FILE_CAL), _pathsMap[FILE_CAL].file_string()));
-			stream << t.cell("Fichier HOR (horaires)", t.getForm().getTextInput(_getFileParameterName(FILE_HOR), _pathsMap[FILE_HOR].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
-			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
-			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
-			stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
-			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Import automatique arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_AUTO_IMPORT_STOPS, _autoImportStops));
-			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
-			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
-
-			// Line read method
-			vector<pair<optional<string>, string> > methods;
-			methods.push_back(make_pair(optional<string>(VALUE_CIDX), VALUE_CIDX));
-			methods.push_back(make_pair(optional<string>(VALUE_SV), VALUE_SV));
-			stream << t.cell("Méthode d'identification des lignes", t.getForm().getSelectInput(PARAMETER_LINE_READ_METHOD, methods, optional<string>(_lineReadMethod)));
-
-			// Line short name field
-			vector<pair<optional<string>, string> > fields;
-			fields.push_back(make_pair(optional<string>(VALUE_NLGIV), VALUE_NLGIV));
-			fields.push_back(make_pair(optional<string>(VALUE_MNLC), VALUE_MNLC));
-			stream << t.cell("Champ nom court des lignes", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, fields, optional<string>(_lineShortNameField)));
-
-			// Stop id field
-			vector<pair<optional<string>, string> > sfields;
-			sfields.push_back(make_pair(optional<string>(VALUE_MNLP), VALUE_MNLP));
-			sfields.push_back(make_pair(optional<string>(VALUE_IDENTSMS), VALUE_IDENTSMS));
-			stream << t.cell("Champ id arrêt", t.getForm().getSelectInput(PARAMETER_STOP_ID_FIELD, sfields, optional<string>(_stopIdField)));
-
-			// Stop area id field
-			vector<pair<optional<string>, string> > saifields;
-			saifields.push_back(make_pair(optional<string>(VALUE_MNCP), VALUE_MNCP));
-			saifields.push_back(make_pair(optional<string>(VALUE_LIBP), VALUE_LIBP));
-			stream << t.cell("Champ id arrêt commercial", t.getForm().getSelectInput(PARAMETER_STOP_AREA_ID_FIELD, saifields, optional<string>(_stopAreaIdField)));
-
-			// Stop name field
-			vector<pair<optional<string>, string> > snfields;
-			snfields.push_back(make_pair(optional<string>(VALUE_LIBP), VALUE_LIBP));
-			snfields.push_back(make_pair(optional<string>(VALUE_LIBCOM), VALUE_LIBCOM));
-			stream << t.cell("Champ nom arrêt", t.getForm().getSelectInput(PARAMETER_STOP_NAME_FIELD, snfields, optional<string>(_stopNameField)));
-
-			// Stop city field
-			vector<pair<optional<string>, string> > scfields;
-			scfields.push_back(make_pair(optional<string>(string()), "Pas de champ commune"));
-			scfields.push_back(make_pair(optional<string>(VALUE_CODE_COMMUNE), VALUE_CODE_COMMUNE));
-			stream << t.cell("Champ commune arrêt", t.getForm().getSelectInput(PARAMETER_STOP_CITY_CODE_FIELD, scfields, optional<string>(_stopCityCodeField)));
-
-			// Stop accessibility field
-			vector<pair<optional<string>, string> > safields;
-			safields.push_back(make_pair(optional<string>(string()), "Pas de champ accessibilité arrêt"));
-			safields.push_back(make_pair(optional<string>(VALUE_UFR), VALUE_UFR));
-			stream <<
-				t.cell(
-					"Champ accessibilité arrêt",
-					t.getForm().getSelectInput(
-						PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD,
-						safields,
-						optional<string>(_stopHandicappedAccessibilityField)
-				)	)
-			;
-
-			// Handicapped use rule
-			stream <<
-				t.cell(
-					"ID règle accessibilité arrêt",
-					t.getForm().getSelectInput(
-						PARAMETER_HANDICAPPED_ALLOWED_USE_RULE,
-						PTModule::GetPTUseRuleLabels(),
-						boost::optional<util::RegistryKeyType>()
-				)	)
-			;
-
-			// Add wayback to journey pattern code
-			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getOuiNonRadioInput(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode));
-
-			// Journey pattern line overload field
-			stream << t.cell("Champ de forçage de ligne dans le fichier girouettes", t.getForm().getTextInput(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField));
-
-			// Auto-purge
-			stream << t.cell("Purge automatique des jours passés", t.getForm().getOuiNonRadioInput(PARAMETER_AUTO_PURGE, _autoPurge));
-
-			// Vehicle services suffix
-			stream << t.cell("Suffixe des services-voiture", t.getForm().getTextInput(PARAMETER_VEHICLE_SERVICE_SUFFIX, _vehicleServiceSuffix));
-
-			stream << t.close();
 		}
 
 
@@ -1270,7 +1178,7 @@ namespace synthese
 					return;
 				}
 				vector<string> fields;
-				string utfLine(IConv(_dataSource.getCharset(), "UTF-8").convert(trim_line.substr(separator+1)));
+				string utfLine(IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(trim_line.substr(separator+1)));
 				split(fields, utfLine, is_any_of(SEP));
 				const vector<string>& cols(itFieldsMap->second);
 				for(size_t i=0; i<fields.size() && i<cols.size(); ++i)

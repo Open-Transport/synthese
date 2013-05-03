@@ -21,6 +21,8 @@
 */
 
 #include "PegaseFileFormat.hpp"
+
+#include "Import.hpp"
 #include "PTFileFormat.hpp"
 #include "DataSourceAdmin.h"
 #include "AdminFunctionRequest.hpp"
@@ -590,20 +592,27 @@ namespace synthese
 
 		bool PegaseFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& os,
 			boost::optional<const server::Request&> adminRequest
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
-				throw Exception("Could no open the file " + filePath.file_string());
+				_log(
+					ImportLogger::ERROR,
+					"Could not open the file " + filePath.file_string()
+				);
+				throw Exception("Could not open the file " + filePath.file_string());
 			}
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			SQLDumpParser parser(inFile);
 
-			os << "INFO : loading POINT_D_ARRET<br />";
-			cout << "INFO : loading POINT_D_ARRET" << endl;
+			_log(
+				ImportLogger::DEBG,
+				"loading POINT_D_ARRET"
+			);
 			parser.setTableToParse("POINT_D_ARRET");
 			while(parser.getRow())
 			{
@@ -616,14 +625,20 @@ namespace synthese
 				);
 				if(cities.empty())
 				{
-					os << "WARN : City with code: " << cityCode << " not found (stop code: " << stopCode << ")<br />";
+					_log(
+						ImportLogger::WARN,
+						"City with code: "+ cityCode +" not found (stop code: "+ stopCode +")"
+					);
 					if(_defaultCity)
 					{
 						cityForStopAreaAutoGeneration = _defaultCity;
 					}
 					else
 					{
-						os << "ERR : no default city. Data might be inconsistent<br />";
+						_log(
+							ImportLogger::WARN,
+							"No default city. Data might be inconsistent"
+						);
 						continue;
 					}
 				}
@@ -638,7 +653,7 @@ namespace synthese
 				string y = parser.getCell("PA_ORDONNEE");
 				if(x != "NULL" && y != "NULL")
 				{
-					point = _dataSource.getActualCoordinateSystem().createPoint(
+					point = dataSource.getActualCoordinateSystem().createPoint(
 						lexical_cast<double>(x),
 						lexical_cast<double>(y)
 					);
@@ -648,7 +663,7 @@ namespace synthese
 					}
 				}
 
-				IConv iconv(_dataSource.getCharset(), "UTF-8");
+				IConv iconv(dataSource.get<Charset>(), "UTF-8");
 				string shortName(trim_copy(parser.getCell("PA_NOM_COURT")));
 				// Somtimes, the short name is truncated. This tries to look
 				// at the long name (which also contains the city as a prefix)
@@ -667,17 +682,19 @@ namespace synthese
 					point.get(),
 					*cityForStopAreaAutoGeneration.get(),
 					optional<time_duration>(),
-					_dataSource,
+					dataSource,
 					_env,
-					os,
+					_logger,
 					boost::optional<const graph::RuleUser::Rules&>()
 				);
 			}
 
 			ServiceInfoMap serviceInfos;
 
-			os << "INFO : loading ARR_SER<br />";
-			cout << "INFO : loading ARR_SER" << endl;
+			_log(
+				ImportLogger::DEBG,
+				"Loading ARR_SER"
+			);
 			parser.setTableToParse("ARR_SER");
 			while(parser.getRow())
 			{
@@ -694,8 +711,10 @@ namespace synthese
 				int rank = parser.getCellInt("AS_NO_ORDRE");
 				if(serviceInfo.find(rank) != serviceInfo.end())
 				{
-					os << "ERR : duplicate ranks (" << rank << ") found for service key: " <<
-						serviceKey << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Duplicate ranks ("+ lexical_cast<string>(rank) +") found for service key: "+ lexical_cast<string>(serviceKey)
+					);
 					continue;
 				}
 
@@ -703,8 +722,11 @@ namespace synthese
 				scheduleInfo.stopPointId = parser.getCell("AS_COD_ARRET");
 				if(!_stopPoints.contains(scheduleInfo.stopPointId))
 				{
-					os << "ERR : Found a ARR_SER entry without a matching stop point. Service key: " <<
-						serviceKey << " stop code: " << scheduleInfo.stopPointId << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Found a ARR_SER entry without a matching stop point. Service key: "+
+							lexical_cast<string>(serviceKey) +" stop code: "+ scheduleInfo.stopPointId
+					);
 					continue;
 				}
 
@@ -733,8 +755,10 @@ namespace synthese
 			JourneyPatternInfoMap journeyPatternInfos;
 			date now(day_clock::local_day());
 
-			os << "INFO : loading ITINERAIRE<br />";
-			cout << "INFO : loading ITINERAIRE" << endl;
+			_log(
+				ImportLogger::DEBG,
+				"Loading ITINERAIRE"
+			);
 			parser.setTableToParse("ITINERAIRE");
 			while(parser.getRow())
 			{
@@ -766,8 +790,10 @@ namespace synthese
 
 			CalendarMap calendars;
 
-			os << "INFO : loading CAL_DAT<br />";
-			cout << "INFO : loading CAL_DAT" << endl;
+			_log(
+				ImportLogger::DEBG,
+				"Loading CAL_DAT"
+			);
 			parser.setTableToParse("CAL_DAT");
 			while(parser.getRow())
 			{
@@ -776,7 +802,10 @@ namespace synthese
 				string dateStr = parser.getCell("CAD_DATE");
 				if(dateStr.size() != 8)
 				{
-					os << "WARN : incorrect calendar date: " << dateStr << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Incorrect calendar date: "+ dateStr
+					);
 					continue;
 				}
 				date activeDate = parseDate(dateStr);
@@ -795,8 +824,7 @@ namespace synthese
 			}
 
 			ServiceToCalendarIdMap serviceToCalendarId;
-			os << "INFO : loading CAL_SER<br />";
-			cout << "INFO : loading CAL_SER" << endl;
+			_log(ImportLogger::DEBG, "Loading CAL_SER");
 			parser.setTableToParse("CAL_SER");
 			while(parser.getRow())
 			{
@@ -807,8 +835,7 @@ namespace synthese
 			}
 
 			ServiceToCalendarMap serviceToCalendar;
-			os << "INFO : loading SERVICE<br />";
-			cout << "INFO : loading SERVICE" << endl;
+			_log(ImportLogger::DEBG, "Loading SERVICE");
 			parser.setTableToParse("SERVICE");
 			while(parser.getRow())
 			{
@@ -841,16 +868,22 @@ namespace synthese
 
 				if(cal.empty())
 				{
-					os << "WARN : calendar id: " << calendarId << " from service " << serviceKey << " is empty<br />";
+					_log(
+						ImportLogger::WARN,
+						"Calendar id: "+ lexical_cast<string>(calendarId) +" from service "+ lexical_cast<string>(serviceKey) +" is empty"
+					);
 					continue;
 				}
 
 				if(cal.getFirstActiveDate() > cal.getLastActiveDate())
 				{
-					os << "WARN : calendar id: " << calendarId << " from service " << serviceKey <<
-						" has a last active date (" << cal.getLastActiveDate() <<
-						") lower than its first active date (" << cal.getFirstActiveDate() <<
-						")<br />";
+					_log(
+						ImportLogger::WARN,
+						"Calendar id: "+ lexical_cast<string>(calendarId) +" from service "+ lexical_cast<string>(serviceKey) +
+							" has a last active date ("+ lexical_cast<string>(cal.getLastActiveDate()) +
+							") lower than its first active date ("+ lexical_cast<string>(cal.getFirstActiveDate()) +
+							")"
+					);
 					continue;
 				}
 				assert(cal.getFirstActiveDate() <= cal.getLastActiveDate());
@@ -874,7 +907,10 @@ namespace synthese
 			}
 			else
 			{
-				os << "WARN : rollingStock not defined <br />";
+				_log(
+					ImportLogger::ERROR,
+					"RollingStock not defined"
+				);
 				return false;
 			}
 
@@ -887,9 +923,12 @@ namespace synthese
 
 				if(journeyPatternInfos.find(serviceKey.journeyPatternId) == journeyPatternInfos.end())
 				{
-					os << "WARN : unable to find journey pattern with name: " <<
-						serviceKey.journeyPatternId.name <<
-						" and start date: " << serviceKey.journeyPatternId.startDate << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Unable to find journey pattern with name: "+
+							serviceKey.journeyPatternId.name +
+						" and start date: "+ lexical_cast<string>(serviceKey.journeyPatternId.startDate)
+					);
 					continue;
 				}
 				JourneyPatternInfo& journeyPatternInfo = journeyPatternInfos[serviceKey.journeyPatternId];
@@ -915,16 +954,19 @@ namespace synthese
 						lineInfo.lineName,
 						optional<RGBColor>(),
 						*_network,
-						_dataSource,
+						dataSource,
 						_env,
-						os
+						_logger
 					)
 				);
 				assert(commercialLine);
 
 				if(serviceInfo.empty())
 				{
-					os << "ERR : no schedules found for service: " << serviceKey << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"No schedules found for service: "+ lexical_cast<string>(serviceKey)
+					);
 					continue;
 				}
 
@@ -940,7 +982,10 @@ namespace synthese
 
 					if(!_stopPoints.contains(scheduleInfo.stopPointId))
 					{
-						os << "ERR : Missing stop point with id: " << scheduleInfo.stopPointId << "<br />";
+						_log(
+							ImportLogger::WARN,
+							"Missing stop point with id: "+ scheduleInfo.stopPointId
+						);
 						continue;
 					}
 					set<StopPoint*> stopPoints = _stopPoints.get(scheduleInfo.stopPointId);
@@ -959,7 +1004,10 @@ namespace synthese
 
 				if(stops.size() < 2)
 				{
-					os << "WARN : journey pattern has less than 2 stops. It is ignored. service key: " << serviceKey << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Journey pattern has less than 2 stops. It is ignored. service key: "+ lexical_cast<string>(serviceKey)
+					);
 					continue;
 				}
 
@@ -982,9 +1030,9 @@ namespace synthese
 						journeyPatternInfo.wayBack,
 						rollingStock,
 						stops,
-						_dataSource,
+						dataSource,
 						_env,
-						os,
+						_logger,
 						true,
 						true
 					)
@@ -999,16 +1047,19 @@ namespace synthese
 						departures,
 						arrivals,
 						lexical_cast<string>(serviceKey.serviceId),
-						_dataSource,
+						dataSource,
 						_env,
-						os
+						_logger
 					)
 				);
 				if(service)
 				{
 					if(serviceToCalendar.find(serviceKey) == serviceToCalendar.end())
 					{
-						os << "WARN : service has no calendar. service key: " << serviceKey << "<br />";
+						_log(
+							ImportLogger::WARN,
+							"Service has no calendar. service key: "+ lexical_cast<string>(serviceKey)
+						);
 						continue;
 					}
 					*service |= serviceToCalendar[serviceKey];
@@ -1020,12 +1071,15 @@ namespace synthese
 
 
 
-		PegaseFileFormat::Importer_::Importer_(util::Env& env, const impex::DataSource& dataSource):
-			Importer(env, dataSource),
-			OneFileTypeImporter<PegaseFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
-			_stopPoints(_dataSource, env),
-			_lines(_dataSource, env)
+		PegaseFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			OneFileTypeImporter<PegaseFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
+			_stopPoints(*import.get<DataSource>(), env),
+			_lines(*import.get<DataSource>(), env)
 		{}
 
 

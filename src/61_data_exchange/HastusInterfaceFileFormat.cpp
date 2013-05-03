@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "HastusInterfaceFileFormat.hpp"
+
 #include "DataSource.h"
 #include "DBModule.h"
-#include "HastusInterfaceFileFormat.hpp"
 #include "GraphConstants.h"
+#include "Import.hpp"
 #include "StopPoint.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
@@ -109,14 +111,15 @@ namespace synthese
 		// CONSTRUCTOR
 		HastusInterfaceFileFormat::Importer_::Importer_(
 			Env& env,
-			const DataSource& dataSource
-		):	Importer(env, dataSource),
-			OneFileTypeImporter<Importer_>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			OneFileTypeImporter<Importer_>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
 			_fileNameIsACalendar(false),
-			_calendars(_dataSource, _env),
-			_lines(_dataSource, _env),
-			_stops(_dataSource, _env)
+			_calendars(*import.get<DataSource>(), _env),
+			_lines(*import.get<DataSource>(), _env),
+			_stops(*import.get<DataSource>(), _env)
 		{}
 
 
@@ -173,7 +176,6 @@ namespace synthese
 
 		bool HastusInterfaceFileFormat::Importer_::_parse(
 			const path& filePath,
-			ostream& os,
 			boost::optional<const server::Request&> adminRequest
 		) const {
 
@@ -182,6 +184,9 @@ namespace synthese
 
 			// File opening
 			_openFile(filePath);
+
+			// Datasource
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			// File name is a calendar
 			optional<Calendar> fileMask;
@@ -192,7 +197,7 @@ namespace synthese
 					CalendarFileFormat::GetCalendarTemplate(
 						_calendars,
 						fileName,
-						os
+						_logger
 				)	);
 				if(fileCalendar)
 				{
@@ -259,9 +264,9 @@ namespace synthese
 					lineCode,
 					optional<RGBColor>(),
 					*_network,
-					_dataSource,
+					dataSource,
 					_env,
-					os
+					_logger
 				);
 			}
 
@@ -272,7 +277,7 @@ namespace synthese
 				CalendarFileFormat::GetCalendarTemplate(
 					_calendars,
 					mainCalendarCode,
-					os
+					_logger
 			)	);
 			Calendar mainMask;
 			if(mainCalendar)
@@ -381,7 +386,7 @@ namespace synthese
 					_stops,
 					stopCode.first,
 					optional<const string&>(),
-					os,
+					_logger,
 					true
 				);
 				if(stopCode.second.empty())
@@ -399,11 +404,14 @@ namespace synthese
 					nonLinkedStopPoints,
 					*adminRequest,
 					_env,
-					_dataSource,
-					os
+					dataSource,
+					_logger
 				);
 
-				os << "ERR  : Au moins un arrêt non trouvé : import interrompu<br />";
+				_log(
+					ImportLogger::ERROR,
+					"Au moins un arrêt non trouvé : import interrompu"
+				);
 				return false;
 			}
 
@@ -415,13 +423,16 @@ namespace synthese
 					PTFileFormat::GetLine(
 						_lines,
 						service.lineCode,
-						_dataSource,
+						dataSource,
 						_env,
-						os
+						_logger
 				)	);
 				if(line == NULL)
 				{
-					os << "WARN : Inconsistent line number " << service.lineCode << " in service " << service.code << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Inconsistent line number "+ service.lineCode +" in service "+ service.code
+					);
 					continue;
 				}
 
@@ -490,7 +501,10 @@ namespace synthese
 				}
 				if(scheduledStopsI < service.scheduledStops.size())
 				{
-					os << "WARN : A scheduled stop did not match with the full stop list : " << service.scheduledStops[scheduledStopsI] << " after " << service.stops[lastScheduledStop] << ". Service is ignored.<br />";
+					_log(
+						ImportLogger::WARN,
+						"A scheduled stop did not match with the full stop list : "+ service.scheduledStops[scheduledStopsI] +" after "+ service.stops[lastScheduledStop] +". Service is ignored."
+					);
 					continue;
 				}
 
@@ -506,15 +520,18 @@ namespace synthese
 						service.wayBack,
 						lineTransportModes[service.lineCode].get(),
 						servedStops,
-						_dataSource,
+						dataSource,
 						_env,
-						os,
+						_logger,
 						true, // Remove old codes
 						false // Don't update metric offsets on update because default metric offset are approximations
 				)	);
 				if(route == NULL)
 				{
-					os << "WARN : Route " << service.routeCode << " was not built in service " << service.code << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Route "+ service.routeCode +" was not built in service "+ service.code
+					);
 					continue;
 				}
 
@@ -525,9 +542,9 @@ namespace synthese
 						service.schedules,
 						service.schedules,
 						service.code,
-						_dataSource,
+						dataSource,
 						_env,
-						os
+						_logger
 				)	);
 
 				// Calendar
@@ -535,7 +552,7 @@ namespace synthese
 					CalendarFileFormat::GetCalendarTemplate(
 						_calendars,
 						service.calendar,
-						os
+						_logger
 				)	);
 				if(calendar && !mainMask.empty())
 				{
@@ -550,12 +567,14 @@ namespace synthese
 			// Abort if at least one missing calendar
 			if(!missingCalendars.empty())
 			{
-				os << "ERR  : At least a calendar is missing. Details :<ul>";
+				stringstream os;
+				os << "At least a calendar is missing. Details :<ul>";
 				BOOST_FOREACH(const string& code, missingCalendars)
 				{
 					os << "<li>" << code << "</li>";
 				}
 				os << "</ul>";
+				_log(ImportLogger::ERROR, os.str());
 				return false;
 			}
 
@@ -682,7 +701,7 @@ namespace synthese
 			}
 
 			// Declarations
-			IConv converter(_dataSource.getCharset(), "UTF-8");
+			IConv converter(_import.get<DataSource>()->get<Charset>(), "UTF-8");
 
 			// Read the current record
 			if(_record->content.size() < start+length)
@@ -706,7 +725,7 @@ namespace synthese
 		) const	{
 
 			// Declarations
-			IConv converter(_dataSource.getCharset(), "UTF-8");
+			IConv converter(_import.get<DataSource>()->get<Charset>(), "UTF-8");
 
 			// Fix of the positions
 			--numberPosition;

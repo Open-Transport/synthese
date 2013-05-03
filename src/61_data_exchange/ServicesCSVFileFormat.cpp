@@ -24,6 +24,7 @@
 
 #include "ServicesCSVFileFormat.hpp"
 
+#include "Import.hpp"
 #include "Importer.hpp"
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
@@ -119,26 +120,28 @@ namespace synthese
 
 		ServicesCSVFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			MultipleFileTypesImporter<ServicesCSVFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			MultipleFileTypesImporter<ServicesCSVFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
 			_interactive(true),
-			_lines(_dataSource, env),
-			_stopAreas(_dataSource, env),
-			_stopPoints(_dataSource, env)
+			_lines(*import.get<DataSource>(), env),
+			_stopAreas(*import.get<DataSource>(), env),
+			_stopPoints(*import.get<DataSource>(), env)
 		{}
 
 
 
 		bool ServicesCSVFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			const std::string& key,
 			boost::optional<const server::Request&> request
 		) const {
 			ifstream inFile;
 			string line;
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			if(key == PATH_SERVICES)
 			{
@@ -154,7 +157,10 @@ namespace synthese
 				}
 				else
 				{
-					stream << "Invalid path!" << "<br />";
+					_log(
+						ImportLogger::ERROR,
+						"Invalid path!"
+					);
 					return false;
 				}
 
@@ -166,7 +172,10 @@ namespace synthese
 				}
 				else
 				{
-					stream << "WARN : rollingStock not defined";
+					_log(
+						ImportLogger::ERROR,
+						"RollingStock not defined"
+					);
 					return false;
 				}
 
@@ -177,23 +186,32 @@ namespace synthese
 				}
 				else
 				{
-					stream << "ERR : no default city<br />";
+					_log(
+						ImportLogger::ERROR,
+						"No default city"
+					);
 					return false;
 				}
 
-				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
 				shared_ptr<ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> > calendarTemplates;
-				calendarTemplates.reset(new ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>(_dataSource, _env));
+				calendarTemplates.reset(new ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>(dataSource, _env));
 
 				BOOST_FOREACH(const string& file, schedulesFiles)
 				{
 					ifstream inFile;
 					string fileWithPath = filePath.file_string() + file;
-					stream << "INFO : Loading file " << fileWithPath << "<br />";
+					_log(
+						ImportLogger::DEBG,
+						"Loading file "+ fileWithPath
+					);
 					inFile.open(fileWithPath.c_str());
 					if(!inFile)
 					{
-						stream << "Could no open the file " << fileWithPath << "<br />";
+						_log(
+							ImportLogger::ERROR,
+							"Could no open the file "+ fileWithPath
+						);
 						return false;
 					}
 					// Ignore header lines
@@ -203,7 +221,10 @@ namespace synthese
 							_loadLine(line);
 						else
 						{
-							stream << "Error with the number of lines to ignore : " << _numberOfLinesToIgnore << "<br />";
+							_log(
+								ImportLogger::ERROR,
+								"Error with the number of lines to ignore : "+ lexical_cast<string>(_numberOfLinesToIgnore)
+							);
 							return false;
 						}
 					}
@@ -223,32 +244,51 @@ namespace synthese
 					backwardStr = fields[1];
 					periodCalendarName = fields[2];
 					daysCalendarName = fields[3].substr(0,fields[3].size()-4);
-					stream << periodCalendarName << " ; " << daysCalendarName << " ; " << lineNameStr << " ;"  << backwardStr << endl;
+					_log(
+						ImportLogger::DEBG,
+						periodCalendarName +" ; "+ daysCalendarName +" ; "+ lineNameStr +" ;"+ backwardStr
+					);
 
 					bool backward = false;
 					if(backwardStr == "RETOUR")
+					{
 						backward = true;
+					}
 
-					CommercialLine* commercialLine(PTFileFormat::GetLine(lines, lineNameStr, _dataSource, _env, stream));
+					CommercialLine* commercialLine(
+						PTFileFormat::GetLine(lines, lineNameStr, dataSource, _env, _logger)
+					);
 					if(!commercialLine)
 					{
-						stream << "No such line " << lineNameStr << "<br />";
+						_log(
+							ImportLogger::ERROR,
+							"No such line "+ lineNameStr
+						);
 						return false;
 					}
 
 					if(!_serviceNumberField)
 					{
-						stream << "ERROR : service number field not defined";
+						_log(
+							ImportLogger::ERROR,
+							"Service number field not defined"
+						);
 						return false;
 					}
 					else if(!_timeField)
 					{
-						stream << "ERROR : time field not defined";
+						_log(
+							ImportLogger::ERROR,
+							"Time field not defined"
+						);
 						return false;
 					}
 					else if(!_stopNameField && !_stopCodeField)
 					{
-						stream << "ERROR : stop name field or stop code field must be defined";
+						_log(
+							ImportLogger::ERROR,
+							"Stop name field or stop code field must be defined"
+						);
 						return false;
 					}
 
@@ -258,7 +298,12 @@ namespace synthese
 						periodCalendar = *calendarTemplates->get(periodCalendarName).begin();
 					}
 					else
-						stream << "WARN : Calendar <pre>\"" << periodCalendarName << "\"</pre> not found<br />";
+					{
+						_log(
+							ImportLogger::WARN,
+							"Calendar <pre>\""+ periodCalendarName +"\"</pre> not found"
+						);
+					}
 
 					CalendarTemplate* daysCalendar(NULL);
 					if(calendarTemplates->contains(daysCalendarName))
@@ -266,7 +311,12 @@ namespace synthese
 						daysCalendar = *calendarTemplates->get(daysCalendarName).begin();
 					}
 					else
-						stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
+					{
+						_log(
+							ImportLogger::WARN,
+							"Calendar <pre>\""+ daysCalendarName +"\"</pre> not found"
+						);
+					}
 
 					ServiceDetail serviceDetail;
 					ServiceDetailVector serviceDetailVector;
@@ -321,15 +371,18 @@ namespace synthese
 							optional<const StopPoint::Geometry*>(),
 							*cityForStopAreaAutoGeneration.get(),
 							optional<time_duration>(),
-							_dataSource,
+							dataSource,
 							_env,
-							stream,
+							_logger,
 							boost::optional<const graph::RuleUser::Rules&>()
 						);
 
 						if(stopPoints.empty())
 						{
-							stream << "Physical stop not found " << stopCodeStr << " - " << stopNameStr << "<br />";
+							_log(
+								ImportLogger::ERROR,
+								"Physical stop not found "+ stopCodeStr +" - "+ stopNameStr
+							);
 							return false;
 						}
 						else
@@ -376,15 +429,18 @@ namespace synthese
 								backward,
 								rollingStock,
 								serviceDetail.stops,
-								_dataSource,
+								dataSource,
 								_env,
-								stream,
+								_logger,
 								true,
 								true
 						)	);
 						if(route == NULL)
 						{
-							stream << "WARN : failure at route creation ("<< commercialLine->getShortName() <<")<br />";
+							_log(
+								ImportLogger::ERROR,
+								"Failure at route creation ("+ commercialLine->getShortName() +")"
+							);
 							return false;
 						}
 
@@ -395,9 +451,9 @@ namespace synthese
 								serviceDetail.departureSchedules,
 								serviceDetail.arrivalSchedules,
 								serviceDetail.serviceNumber,
-								_dataSource,
+								dataSource,
 								_env,
-								stream
+								_logger
 						)	);
 
 						// Calendars
@@ -428,13 +484,27 @@ namespace synthese
 								serviceCalendarLink = boost::shared_ptr<CalendarLink>(new CalendarLink(CalendarLinkTableSync::getId()));
 
 								if(periodCalendar)
+								{
 									serviceCalendarLink->setCalendarTemplate2(periodCalendar);
+								}
 								else
-									stream << "WARN : Calendar <pre>\"" << periodCalendarName << "\"</pre> not found<br />";
+								{
+									_log(
+										ImportLogger::WARN,
+										"Calendar <pre>\""+ periodCalendarName +"\"</pre> not found"
+									);
+								}
 								if(daysCalendar)
+								{
 									serviceCalendarLink->setCalendarTemplate(daysCalendar);
+								}
 								else
-									stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
+								{
+									_log(
+										ImportLogger::WARN,
+										"Calendar <pre>\""+ daysCalendarName +"\"</pre> not found"
+									);
+								}
 
 								serviceCalendarLink->setCalendar(service);
 
@@ -447,7 +517,10 @@ namespace synthese
 						}
 						else
 						{
-							stream << "WARN : failure at service creation ("<< serviceDetail.serviceNumber <<")<br />";
+							_log(
+								ImportLogger::ERROR,
+								"Failure at service creation ("+ serviceDetail.serviceNumber +")"
+							);
 							return false;
 						}
 					}
@@ -548,7 +621,7 @@ namespace synthese
 					line.substr(0, line.size() - 1) :
 					line
 				);
-				utfline = IConv(_dataSource.getCharset(), "UTF-8").convert(line);
+				utfline = IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
 		}

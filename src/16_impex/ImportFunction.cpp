@@ -21,12 +21,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ImportFunction.h"
+
 #include "RequestException.h"
-#include "DataSource.h"
-#include "DataSourceTableSync.h"
+#include "ImportTableSync.hpp"
 #include "FileFormat.h"
 #include "DBTransaction.hpp"
-#include "ImportFunction.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -48,9 +48,11 @@ namespace synthese
 	namespace impex
 	{
 		/// Parameter names declarations
-		const string ImportFunction::PARAMETER_DATA_SOURCE("ds");
-		const string ImportFunction::PARAMETER_DO_IMPORT("di");
-		const string ImportFunction::PARAMETER_LOG_PATH("lp");
+		const string ImportFunction::PARAMETER_IMPORT_ID = "import_id";
+		const string ImportFunction::PARAMETER_DO_IMPORT = "di";
+		const string ImportFunction::PARAMETER_LOG_PATH = "lp";
+		const string ImportFunction::PARAMETER_MIN_LOG_LEVEL = "min_log_level";
+		const string ImportFunction::PARAMETER_OUTPUT_LOGS = "output_logs";
 
 
 
@@ -68,11 +70,7 @@ namespace synthese
 			ParametersMap map(_importer.get() ? _importer->getParametersMap() : ParametersMap());
 			if(_importer.get())
 			{
-				map.insert(PARAMETER_DATA_SOURCE, _importer->getDataSource().getKey());
-				if(_importer->getLogPath())
-				{
-					map.insert(PARAMETER_LOG_PATH, _importer->getLogPath()->file_string());
-				}
+				map.insert(PARAMETER_IMPORT_ID, _importer->getImport().getKey());
 			}
 			map.insert(PARAMETER_DO_IMPORT, _doImport);
 			return map;
@@ -82,27 +80,56 @@ namespace synthese
 
 		void ImportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Datasource
-			RegistryKeyType dataSourceId(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE));
+			// Import
+			RegistryKeyType importId(map.get<RegistryKeyType>(PARAMETER_IMPORT_ID));
 			try
 			{
-				shared_ptr<const DataSource> dataSource(DataSourceTableSync::Get(dataSourceId, *_env));
-				_importer = dataSource->getImporter(*_env);
-				_importer->setFromParametersMap(map, true);
+				shared_ptr<const Import> import(ImportTableSync::Get(importId, *_env));
 
 				// Log path
-				string logPath(map.getDefault<string>(PARAMETER_LOG_PATH));
-				if(!logPath.empty())
+				bool outputLogs(map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false));
+
+				// Min log force
+				ImportLogger::Level minLogLevel(import->get<MinLogLevel>());
+				if(map.isDefined(PARAMETER_MIN_LOG_LEVEL))
 				{
-					_importer->setLogPath(filesystem::path(logPath));
+					minLogLevel = static_cast<ImportLogger::Level>(map.get<int>(PARAMETER_MIN_LOG_LEVEL));
 				}
 
-				stringstream output;
+				// Log path force
+				string logPath(import->get<LogPath>());
+				if(map.isDefined(PARAMETER_LOG_PATH))
+				{
+					logPath = map.get<string>(PARAMETER_LOG_PATH);
+				}
+				
+				// Logger generation
+				if(outputLogs)
+				{
+					_importLogger.reset(
+						new ImportLogger(
+							minLogLevel,
+							logPath,
+							_output
+					)	);
+				}
+				else
+				{
+					_importLogger.reset(
+						new ImportLogger(
+						minLogLevel,
+						logPath,
+						optional<ostream&>()
+					)	);
+				}
+
+				// Importer generation
+				_importer = import->getImporter(*_env, *_importLogger);
+				_importer->setFromParametersMap(map, true);
+
 				_doImport = _importer->beforeParsing();
-				_doImport &= _importer->parseFiles(output, optional<const Request&>()) && map.isTrue(PARAMETER_DO_IMPORT);
-				_importer->getLogger().output(output);
+				_doImport &= _importer->parseFiles(optional<const Request&>()) && map.isTrue(PARAMETER_DO_IMPORT);
 				_doImport &=_importer->afterParsing();
-				_output = output.str();
 			}
 			catch(ObjectNotFoundException<DataSource> e)
 			{
@@ -127,22 +154,22 @@ namespace synthese
 			{
 				_importer->save().run();
 
-				// If logs in a file the output 0 if import succeed
-				if(_importer->getLogPath())
+				// If no log output
+				if(!_importLogger->getOutputStream())
 				{
 					stream << "0";
 				}
 			}
 			else
 			{
-				if(_importer->getLogPath())
+				if(!_importLogger->getOutputStream())
 				{
 					stream << "1";
 				}
 			}
-			if(!_importer->getLogPath())
+			if(_importLogger->getOutputStream())
 			{
-				stream << _output;
+				stream << _output.str();
 			}
 
 			return pm;

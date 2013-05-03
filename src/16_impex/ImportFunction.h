@@ -48,8 +48,10 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_DO_IMPORT;	//!< do_import parameter
-			static const std::string PARAMETER_DATA_SOURCE;	//!< clear_network parameter
-			static const std::string PARAMETER_LOG_PATH;	//!< clear_network parameter
+			static const std::string PARAMETER_IMPORT_ID;	//!< 
+			static const std::string PARAMETER_LOG_PATH;	//!< 
+			static const std::string PARAMETER_OUTPUT_LOGS;
+			static const std::string PARAMETER_MIN_LOG_LEVEL;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
@@ -62,9 +64,10 @@ namespace synthese
 			//@{
 				bool							_doImport;
 				boost::shared_ptr<Importer>		_importer;
+				boost::shared_ptr<ImportLogger>	_importLogger;
 			//@}
 
-			std::string							_output;
+			mutable std::stringstream _output;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.

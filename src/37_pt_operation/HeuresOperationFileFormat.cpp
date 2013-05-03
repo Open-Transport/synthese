@@ -23,6 +23,7 @@
 #include "HeuresOperationFileFormat.hpp"
 
 #include "DataSource.h"
+#include "Import.hpp"
 #include "PTOperationFileFormat.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
@@ -168,7 +169,6 @@ namespace synthese
 
 		bool HeuresOperationFileFormat::Importer_::_parse(
 			const path& filePath,
-			std::ostream& logStream,
 			const std::string& key,
 			boost::optional<const server::Request&> request
 		) const {
@@ -176,19 +176,23 @@ namespace synthese
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
+				_logError("Could no open the file " + filePath.file_string());
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
 			if(!_startDate || !_endDate)
 			{
+				_logError("Start date and end date must be defined");
 				throw RequestException("Start date and end date must be defined");
 			}
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			// Depots
 			if(key == FILE_POINTSARRETS)
 			{
 				string line;
-				ImportableTableSync::ObjectBySource<DepotTableSync> depots(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DepotTableSync> depots(dataSource, _env);
 
 				while(getline(inFile, line))
 				{
@@ -200,7 +204,7 @@ namespace synthese
 
 					// Extraction of values
 					string name(
-						IConv(_dataSource.getCharset(), "UTF-8").convert(
+						IConv(dataSource.get<Charset>(), "UTF-8").convert(
 							boost::algorithm::trim_copy(line.substr(5, 50))
 					)	);
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
@@ -209,25 +213,28 @@ namespace synthese
 					set<Depot*> loadedDepots(depots.get(id));
 					if(!loadedDepots.empty())
 					{
-						logStream << "LOAD : link between depots " << id << " (" << name << ")" << " and ";
+						stringstream logStream;
+						logStream << "Link between depots " << id << " (" << name << ")" << " and ";
 						BOOST_FOREACH(Depot* dp, loadedDepots)
 						{
 							logStream << dp->getKey() << " (" << dp->getName() << ") ";
 						}
-						logStream << "<br />";
+						_logLoad(logStream.str());
 					}
 					else
 					{
 						shared_ptr<Depot> depot(new Depot(DepotTableSync::getId()));
 
 						Importable::DataSourceLinks links;
-						links.insert(make_pair(&_dataSource, id));
+						links.insert(make_pair(&dataSource, id));
 						depot->setDataSourceLinksWithoutRegistration(links);
 						_env.getEditableRegistry<Depot>().add(depot);
 						_depots.add(*depot);
 						loadedDepots.insert(depot.get());
 
-						logStream << "CREA : Creation of the depot with key " << id << " (" << name <<  ")<br />";
+						_logCreation(
+							"Creation of the depot with key "+ id +" ("+ name +")"
+						);
 					}
 
 					// Update of properties
@@ -242,7 +249,9 @@ namespace synthese
 			{
 				if(!_network.get())
 				{
-					logStream << "ERR  : The transport network was not specified.<br/>";
+					_logError(
+						"The transport network was not specified."
+					);
 					return false;
 				}
 
@@ -280,13 +289,15 @@ namespace synthese
 							lexical_cast<string>(commercialLineNumber),
 							*_ptDataSource,
 							_env,
-							logStream
+							_logger
 						);
 
 						// Check of the line
 						if(!cline)
 						{
-							logStream << "WARN : line " << commercialLineNumber << " not found in route " << routeNumber << "<br />";
+							_logWarning(
+								"Line "+ lexical_cast<string>(commercialLineNumber) +" not found in route "+ routeNumber
+							);
 							ignoreRoute = true;
 						}
 
@@ -297,7 +308,9 @@ namespace synthese
 						{
 							if(line.size() < i+9)
 							{
-								logStream << "WARN : inconsistent line size " << line << "<br />";
+								_logWarning(
+									"Inconsistent line size "+ line
+								);
 								ignoreRoute = true;
 								break;
 							}
@@ -317,7 +330,9 @@ namespace synthese
 
 							if(!stops.contains(stopNumber))
 							{
-								logStream << "WARN : stop " << stopNumber << " not found<br />";
+								_logWarning(
+									"Stop "+ stopNumber +" not found"
+								);
 								ignoreRoute = true;
 							}
 
@@ -342,16 +357,20 @@ namespace synthese
 								*cline,
 								servedStops,
 								*_ptDataSource,
-								logStream
+								_logger
 						)	);
 						if(routeSet.empty())
 						{
-							logStream << "WARN : route " << routeNumber << " not found<br />";
+							_logWarning(
+								"Route "+ routeNumber +" not found"
+							);
 							continue;
 						}
 						if(routeSet.size() > 1)
 						{
-							logStream << "WARN : route " << routeNumber << " is present twice or more in line " << cline->getShortName() << "<br />";
+							_logWarning(
+								"Route "+ routeNumber +" is present twice or more in line "+ cline->getShortName()
+							);
 						}
 
 						_routes.insert(
@@ -380,7 +399,7 @@ namespace synthese
 							}
 							else
 							{
-								logStream << "WARN : Stop " << stopNumber << " was not found.<br/>";
+								_logWarning("Stop "+ stopNumber +" was not found.");
 								continue;
 							}
 						}
@@ -399,7 +418,7 @@ namespace synthese
 							}
 							else
 							{
-								logStream << "WARN : Stop " << stopNumber << " was not found.<br/>";
+								_logWarning("Stop "+ stopNumber +" was not found.");
 								continue;
 							}
 
@@ -424,8 +443,8 @@ namespace synthese
 				> SchedulesMap;
 				SchedulesMap services;
 
-				ImportableTableSync::ObjectBySource<DeadRunTableSync> deadRuns(_dataSource, _env);
-				ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DeadRunTableSync> deadRuns(dataSource, _env);
+				ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(dataSource, _env);
 
 				// Cleaning all vehicle services
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::value_type& vsset, vehicleServices.getMap())
@@ -452,9 +471,9 @@ namespace synthese
 						PTOperationFileFormat::CreateOrUpdateVehicleService(
 							vehicleServices,
 							vehicleServiceCode,
-							_dataSource,
+							dataSource,
 							_env,
-							logStream
+							_logger
 					)	);
 
 					Troncons::mapped_type troncon(new DriverService::Chunk(vehicleService));
@@ -520,7 +539,7 @@ namespace synthese
 							// Existing dead run
 							if(deadRun)
 							{
-								logStream << "LOAD : use of existing dead run " << deadRun->getKey() << "<br />";
+								_logLoad("Use of existing dead run "+ lexical_cast<string>(deadRun->getKey()));
 							}
 							else
 							{
@@ -531,7 +550,7 @@ namespace synthese
 
 								// Source links
 								Importable::DataSourceLinks links;
-								links.insert(make_pair(&_dataSource, string()));
+								links.insert(make_pair(&dataSource, string()));
 								deadRun->setDataSourceLinksWithoutRegistration(links);
 
 								// Route
@@ -555,7 +574,7 @@ namespace synthese
 								_env.getEditableRegistry<DeadRun>().add(shared_ptr<DeadRun>(deadRun));
 								deadRuns.add(*deadRun);
 
-								logStream << "CREA : Creation of the dead run with key " << deadRun->getKey() << "<br />";
+								_logCreation("Creation of the dead run with key "+ lexical_cast<string>(deadRun->getKey()));
 							}
 
 							vehicleService->insert(*deadRun);
@@ -584,7 +603,9 @@ namespace synthese
 							{
 								if(itS->first.first != route)
 								{
-									logStream << "WARN : inconsistent route in service file " << serviceNumber << "/" << lineNumber << "/" << routeNumber << "<br />";
+									_logWarning(
+										"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber
+									);
 									for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 									continue;
 								}
@@ -621,7 +642,9 @@ namespace synthese
 
 								if(rank >= itS->second.departure.size())
 								{
-									logStream << "WARN : inconsistent stops number in troncons file " << serviceNumber << "/" << lineNumber << "/" << routeNumber << "<br />";
+									_logWarning(
+										"Inconsistent stops number in troncons file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber
+									);
 									continue;
 								}
 
@@ -695,7 +718,9 @@ namespace synthese
 
 					if(curService == NULL)
 					{
-						logStream << "WARN : inconsistent service in service file " << it.first.second << "/" << it.first.first->getCommercialLine()->getShortName() << "/" << it.first.first->getName() << "<br />";
+						_logWarning(
+							"Inconsistent service in service file "+ it.first.second +"/"+ it.first.first->getCommercialLine()->getShortName() +"/"+ it.first.first->getName()
+						);
 						continue;
 					}
 
@@ -714,12 +739,14 @@ namespace synthese
 			{
 				if(!_startDate || !_endDate)
 				{
-					logStream << "ERR  : Start date or end date not defined<br />";
+					_logError(
+						"Start date or end date not defined"
+					);
 					return false;
 				}
 
 				// Cleaning all vehicle services
-				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(dataSource, _env);
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::value_type& dsset, driverServices.getMap())
 				{
 					BOOST_FOREACH(DriverService* ds, dsset.second)
@@ -760,25 +787,26 @@ namespace synthese
 					set<DriverService*> loadedDriverServices(driverServices.get(driverServiceCode));
 					if(!loadedDriverServices.empty())
 					{
-						logStream << "LOAD : link between driver services " << driverServiceCode << " and ";
+						stringstream logStream;
+						logStream << "Link between driver services " << driverServiceCode << " and ";
 						BOOST_FOREACH(DriverService* ds, loadedDriverServices)
 						{
 							logStream << ds->getKey();
 						}
-						logStream << "<br />";
+						_logLoad(logStream.str());
 					}
 					else
 					{
 						shared_ptr<DriverService> ds(new DriverService(DriverServiceTableSync::getId()));
 
 						Importable::DataSourceLinks links;
-						links.insert(make_pair(&_dataSource, driverServiceCode));
+						links.insert(make_pair(&dataSource, driverServiceCode));
 						ds->setDataSourceLinksWithoutRegistration(links);
 						_env.getEditableRegistry<DriverService>().add(ds);
 						driverServices.add(*ds);
 						loadedDriverServices.insert(ds.get());
 
-						logStream << "CREA : Creation of the driver service with key " << driverServiceCode << "<br />";
+						_logCreation("Creation of the driver service with key "+ driverServiceCode);
 					}
 					DriverService* driverService(
 						*loadedDriverServices.begin()
@@ -953,4 +981,15 @@ namespace synthese
 				throw RequestException("A stops data source must be defined");
 			}
 		}
+
+
+
+		HeuresOperationFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	impex::Importer(env, import, logger),
+			impex::MultipleFileTypesImporter<HeuresOperationFileFormat>(env, import, logger),
+			_depots(*import.get<DataSource>(), env)
+		{}
 }	}

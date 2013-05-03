@@ -214,7 +214,6 @@ namespace synthese
 				/// @date 2010
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					std::ostream& os,
 					const std::string& key,
 					boost::optional<const server::Request&> request
 				) const;
@@ -223,11 +222,9 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
-				):	impex::Importer(env, dataSource),
-					impex::MultipleFileTypesImporter<NavstreetsFileFormat>(env, dataSource),
-					_roadPlaces(dataSource, env)
-				{}
+					const impex::Import& import,
+					const impex::ImportLogger& logger
+				);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.

@@ -25,6 +25,8 @@
 #include "DataSourcesAdmin.h"
 
 #include "AdminParametersException.h"
+#include "ObjectCreateAction.hpp"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "User.h"
@@ -36,7 +38,6 @@
 #include "DataSourceAdmin.h"
 #include "HTMLModule.h"
 #include "AdminActionFunctionRequest.hpp"
-#include "DataSourceUpdateAction.hpp"
 #include "RemoveObjectAction.hpp"
 #include "HTMLForm.h"
 #include "ImpExModule.h"
@@ -120,7 +121,8 @@ namespace synthese
 
 			AdminFunctionRequest<DataSourceAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<DataSourceUpdateAction, DataSourceAdmin> addRequest(request);
+			AdminActionFunctionRequest<ObjectCreateAction, DataSourceAdmin> addRequest(request);
+			addRequest.getAction()->setTable<DataSource>();
 			addRequest.setActionWillCreateObject();
 			addRequest.setActionFailedPage<DataSourcesAdmin>();
 
@@ -130,7 +132,6 @@ namespace synthese
 				DataSourceTableSync::Search(
 					*_env,
 					_searchName,
-					optional<string>(),
 					_requestParameters.first,
 					_requestParameters.maxSize,
 					_requestParameters.orderField == PARAM_SEARCH_NAME,
@@ -143,7 +144,6 @@ namespace synthese
 			ResultHTMLTable::HeaderVector c;
 			c.push_back(make_pair(string(), "ID"));
 			c.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
-			c.push_back(make_pair(string(), "Format"));
 			c.push_back(make_pair(string(), "Actions"));
 			c.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable t(c, searchRequest.getHTMLForm(), _requestParameters, dataSources);
@@ -158,15 +158,13 @@ namespace synthese
 				stream << t.row();
 				stream << t.col() << dataSource->getKey();
 				stream << t.col() << dataSource->getName();
-				stream << t.col() << dataSource->getFormat();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getHTMLForm().getURL(), "Ouvrir", string(), "/admin/img/database_edit.png");
 				stream << t.col() << HTMLModule::getLinkButton(removeRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la source de données "+ dataSource->getName() +" ?", "/admin/img/database_delete.png");
 			}
 
 			stream << t.row();
 			stream << t.col() << "Création :";
-			stream << t.col() << f.getTextInput(DataSourceUpdateAction::PARAMETER_NAME, string(), "(nom)");
-			stream << t.col() << f.getSelectInput(DataSourceUpdateAction::PARAMETER_FORMAT, ImpExModule::GetFileFormatsList(), optional<string>());
+			stream << t.col() << f.getTextInput(ObjectCreateAction::GetInputName<Name>(), string(), "(nom)");
 			stream << t.col(2) << f.getSubmitButton("Ajouter");
 			stream << t.close();
 			stream << f.close();

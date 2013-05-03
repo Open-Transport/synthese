@@ -267,6 +267,8 @@ StopPointAdmin.cpp
 StopPointAdmin.hpp
 StopPointsListFunction.cpp
 StopPointsListFunction.hpp
+StopsInterSYNTHESEIdFilter.cpp
+StopsInterSYNTHESEIdFilter.hpp
 ServiceDensityService.cpp
 ServiceDensityService.hpp
 StopPointTableSync.cpp

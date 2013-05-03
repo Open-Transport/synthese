@@ -21,6 +21,8 @@
 */
 
 #include "GTFSFileFormat.hpp"
+
+#include "Import.hpp"
 #include "TransportNetwork.h"
 #include "StopArea.hpp"
 #include "Destination.hpp"
@@ -168,23 +170,23 @@ namespace synthese
 
 		GTFSFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			MultipleFileTypesImporter<GTFSFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const impex::Import& import,
+			const impex::ImportLogger& importLogger
+		):	Importer(env, import, importLogger),
+			MultipleFileTypesImporter<GTFSFileFormat>(env, import, importLogger),
+			PTDataCleanerFileFormat(env, import, importLogger),
 			_importStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
-			_networks(_dataSource, env),
-			_stopPoints(_dataSource, env),
-			_lines(_dataSource, env)
+			_networks(*import.get<DataSource>(), env),
+			_stopPoints(*import.get<DataSource>(), env),
+			_lines(*import.get<DataSource>(), env)
 		{}
 
 
 
 		bool GTFSFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			const std::string& key,
 			boost::optional<const server::Request&> request
 		) const {
@@ -201,13 +203,15 @@ namespace synthese
 			}
 			_loadFieldsMap(line);
 
-			stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
+			_log(ImportLogger::INFO, "Loading file "+ filePath.file_string() +" as "+ key);
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			// 1 : Routes
 			// Stops
 			if(key == FILE_STOPS)
 			{
-				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(dataSource, _env);
 
 				// 2.1 : stop areas
 				if(_importStopArea)
@@ -252,9 +256,9 @@ namespace synthese
 								_defaultCity.get(),
 								false,
 								_stopAreaDefaultTransferDuration,
-								_dataSource,
+								dataSource,
 								_env,
-								stream
+								_logger
 							);
 						}
 					}
@@ -268,8 +272,8 @@ namespace synthese
 							false,
 							_defaultCity,
 							_env,
-							_dataSource,
-							stream
+							dataSource,
+							_logger
 						);
 						if(_displayLinkedStops)
 						{
@@ -280,9 +284,9 @@ namespace synthese
 								false,
 								_defaultCity,
 								_env,
-								_dataSource,
-								stream
-								);
+								dataSource,
+								_logger
+							);
 						}
 					}
 				}
@@ -319,13 +323,16 @@ namespace synthese
 					}
 					else
 					{
-						stream << "WARN : inconsistent stop area id "<< stopAreaId <<" in the stop point "<< id <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"inconsistent stop area id "+ stopAreaId +" in the stop point "+ id
+						);
 						continue;
 					}
 
 					// Point
 					shared_ptr<geos::geom::Point> point(
-						_dataSource.getActualCoordinateSystem().createPoint(
+						dataSource.getActualCoordinateSystem().createPoint(
 							lexical_cast<double>(_getValue("stop_lon")),
 							lexical_cast<double>(_getValue("stop_lat"))
 					)	);
@@ -359,9 +366,9 @@ namespace synthese
 							optional<const RuleUser::Rules&>(),
 							stopArea,
 							point.get(),
-							_dataSource,
+							dataSource,
 							_env,
-							stream
+							_logger
 						);
 					}
 				}
@@ -372,8 +379,8 @@ namespace synthese
 						nonLinkedStopPoints,
 						*request,
 						_env,
-						_dataSource,
-						stream
+						dataSource,
+						_logger
 					);
 					if(_displayLinkedStops)
 					{
@@ -381,8 +388,8 @@ namespace synthese
 							linkedStopPoints,
 							*request,
 							_env,
-							_dataSource,
-							stream
+							dataSource,
+							_logger
 						);
 					}
 				}
@@ -406,9 +413,9 @@ namespace synthese
 						_networks,
 						_getValue("agency_id"),
 						_getValue("agency_name"),
-						_dataSource,
+						dataSource,
 						_env,
-						stream
+						_logger
 					);
 				}
 			}
@@ -433,7 +440,10 @@ namespace synthese
 					}
 					else
 					{
-						stream << "WARN : inconsistent network id "<< networkId <<" in the line "<< id <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"Inconsistent network id "+ networkId +" in the line "+ id
+						);
 						continue;
 					}
 
@@ -456,9 +466,9 @@ namespace synthese
 						_getValue("route_short_name"),
 						color,
 						*network,
-						_dataSource,
+						dataSource,
 						_env,
-						stream
+						_logger
 					);
 				}
 			}
@@ -484,7 +494,10 @@ namespace synthese
 					string endDateStr(_getValue("end_date"));
 					if(startDateStr.size() != 8 || endDateStr.size() != 8)
 					{
-						stream << "WARN : inconsistent dates in "<< line <<" (" << startDateStr << " and " << endDateStr << ")<br />";
+						_log(
+							ImportLogger::WARN,
+							"Inconsistent dates in "+ line +" ("+ startDateStr +" and "+ endDateStr +")"
+						);
 						continue;
 					}
 					date startDate(
@@ -524,7 +537,10 @@ namespace synthese
 					string dateStr(_getValue("date"));
 					if(dateStr.size() != 8)
 					{
-						stream << "WARN : inconsistent date in "<< line <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"Inconsistent date in "+ line
+						);
 						continue;
 					}
 					date d(
@@ -557,7 +573,10 @@ namespace synthese
 					string lineCode(_getValue("route_id"));
 					if(!_lines.contains(lineCode))
 					{
-						stream << "WARN : inconsistent line id "<< lineCode <<" in the trip "<< id <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"Inconsistent line id "+ lineCode +" in the trip "+ id
+						);
 						continue;
 					}
 					trip.line = *_lines.get(lineCode).begin();
@@ -579,7 +598,10 @@ namespace synthese
 					Calendars::const_iterator it(_calendars.find(calendarCode));
 					if(it == _calendars.end())
 					{
-						stream << "WARN : inconsistent service id "<< calendarCode <<" in the trip "<< id <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"Inconsistent service id "+ calendarCode +" in the trip "+ id
+						);
 						continue;
 					}
 					trip.calendar = it->second;
@@ -610,7 +632,10 @@ namespace synthese
 						TripsMap::const_iterator it(_trips.find(lastTripCode));
 						if(it == _trips.end())
 						{
-							stream << "WARN : inconsistent trip id "<< lastTripCode <<" in the trip stops file<br />";
+							_log(
+								ImportLogger::WARN,
+								"Inconsistent trip id "+ lastTripCode +" in the trip stops file"
+							);
 							continue;
 						}
 						Trip trip(it->second);
@@ -643,9 +668,9 @@ namespace synthese
 								trip.direction,
 								NULL,
 								stops,
-								_dataSource,
+								dataSource,
 								_env,
-								stream,
+								_logger,
 								true,
 								true
 						)	);
@@ -668,9 +693,9 @@ namespace synthese
 								departures,
 								arrivals,
 								lastTripCode,
-								_dataSource,
+								dataSource,
 								_env,
-								stream
+								_logger
 						)	);
 						if(service)
 						{
@@ -720,7 +745,10 @@ namespace synthese
 					string stopCode(_getValue("stop_id"));
 					if(!_stopPoints.contains(stopCode))
 					{
-						stream << "WARN : inconsistent stop id "<< stopCode <<" in the trip "<< tripCode <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"inconsistent stop id "+ stopCode +" in the trip "+ tripCode
+						);
 						continue;
 					}
 					tripDetail.stop = _stopPoints.get(stopCode);
@@ -746,44 +774,6 @@ namespace synthese
 				// TODO
 			}
 			return true;
-		}
-
-
-
-		void GTFSFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const {
-			stream << "<h1>Fichiers</h1>";
-
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			t.getForm().addHiddenField(PARAMETER_FROM_TODAY, string("1"));
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
-			stream << t.title("Fichiers");
-			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
-			stream << t.cell("Fichier stops", t.getForm().getTextInput(_getFileParameterName(FILE_STOPS), _pathsMap[FILE_STOPS].file_string()));
-			stream << t.cell("Fichier transfers (optionnel)", t.getForm().getTextInput(_getFileParameterName(FILE_TRANSFERS), _pathsMap[FILE_TRANSFERS].file_string()));
-			stream << t.cell("Fichier réseaux", t.getForm().getTextInput(_getFileParameterName(FILE_AGENCY), _pathsMap[FILE_AGENCY].file_string()));
-			stream << t.cell("Fichier routes", t.getForm().getTextInput(_getFileParameterName(FILE_ROUTES), _pathsMap[FILE_ROUTES].file_string()));
-			stream << t.cell("Fichier calendriers", t.getForm().getTextInput(_getFileParameterName(FILE_CALENDAR), _pathsMap[FILE_CALENDAR].file_string()));
-			stream << t.cell("Fichier dates", t.getForm().getTextInput(_getFileParameterName(FILE_CALENDAR_DATES), _pathsMap[FILE_CALENDAR_DATES].file_string()));
-			stream << t.cell("Fichier voyages", t.getForm().getTextInput(_getFileParameterName(FILE_TRIPS), _pathsMap[FILE_TRIPS].file_string()));
-			stream << t.cell("Fichier horaires", t.getForm().getTextInput(_getFileParameterName(FILE_STOP_TIMES), _pathsMap[FILE_STOP_TIMES].file_string()));
-			stream << t.cell("Fichier attributs tarification", t.getForm().getTextInput(_getFileParameterName(FILE_FARE_ATTRIBUTES), _pathsMap[FILE_FARE_ATTRIBUTES].file_string()));
-			stream << t.cell("Fichier règles tarification", t.getForm().getTextInput(_getFileParameterName(FILE_FARE_RULES), _pathsMap[FILE_FARE_RULES].file_string()));
-			stream << t.cell("Fichier géométries", t.getForm().getTextInput(_getFileParameterName(FILE_SHAPES), _pathsMap[FILE_SHAPES].file_string()));
-			stream << t.cell("Fichier services continus", t.getForm().getTextInput(_getFileParameterName(FILE_FREQUENCIES), _pathsMap[FILE_FREQUENCIES].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Import zones d'arrêt", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOP_AREA, _importStopArea));
-			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
-			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
-			stream << t.cell("Masque règles d'utilisation", t.getForm().getTextInput(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks)));
-			stream << t.close();
 		}
 
 
@@ -872,7 +862,7 @@ namespace synthese
 					line.substr(0, line.size() - 1) :
 					line
 				);
-				utfline = IConv(_dataSource.getCharset(), "UTF-8").convert(line);
+				utfline = IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
 		}

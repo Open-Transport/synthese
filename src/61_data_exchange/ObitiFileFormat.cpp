@@ -21,6 +21,8 @@
 */
 
 #include "ObitiFileFormat.hpp"
+
+#include "Import.hpp"
 #include "Importer.hpp"
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
@@ -132,26 +134,28 @@ namespace synthese
 
 		ObitiFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			MultipleFileTypesImporter<ObitiFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			MultipleFileTypesImporter<ObitiFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
 			_interactive(true),
-			_lines(_dataSource, env),
-			_stopAreas(_dataSource, env),
-			_stopPoints(_dataSource, env)
+			_lines(*_import.get<DataSource>(), env),
+			_stopAreas(*_import.get<DataSource>(), env),
+			_stopPoints(*_import.get<DataSource>(), env)
 		{}
 
 
 
 		bool ObitiFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			const std::string& key,
 			boost::optional<const server::Request&> request
 		) const {
 			ifstream inFile;
 			string line;
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			if(key != PATH_HORAIRES)
 			{
@@ -166,10 +170,18 @@ namespace synthese
 					return false;
 				}
 				_loadFieldsMap(line);
-				stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
+				_log(
+					ImportLogger::DEBG,
+					"Loading file "+ filePath.file_string() +" as "+ key
+				);
 			}
 			else
-				stream << "INFO : Loading path " << filePath << " as " << key << "<br />";
+			{
+				_log(
+					ImportLogger::DEBG,
+					"Loading path "+ filePath.file_string() +" as "+ key
+				);
+			}
 
 
 			// 1 : lines
@@ -211,7 +223,10 @@ namespace synthese
 					);
 					if(cities.empty())
 					{
-						stream << "WARN : City " << cityName << " not found<br />";
+						_log(
+							ImportLogger::WARN,
+							"City "+ cityName +" not found"
+						);
 					}
 					else
 					{
@@ -239,9 +254,9 @@ namespace synthese
 						city,
 						false,
 						_stopAreaDefaultTransferDuration,
-						_dataSource,
+						dataSource,
 						_env,
-						stream
+						_logger
 					);
 				}
 			}
@@ -263,7 +278,10 @@ namespace synthese
 					LinesMap::const_iterator it(_linesMap.find(idLigne));
 					if(it == _linesMap.end())
 					{
-						stream << "WARN : Obiti line ID "<< idLigne << " not found<br />";
+						_log(
+							ImportLogger::WARN,
+							"Obiti line ID "+ idLigne +" not found"
+						);
 						return false;
 					}
 					LineObitiElement lineObiti(it->second);
@@ -280,7 +298,10 @@ namespace synthese
 					}
 					else
 					{
-						stream << "WARN : inconsistent stop area id "<< stopAreaId <<" in the stop point "<< id <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"Inconsistent stop area id "+ stopAreaId +" in the stop point "+ id
+						);
 						continue;
 					}
 
@@ -308,9 +329,9 @@ namespace synthese
 						NULL,
 						stopArea,
 						point.get(),
-						_dataSource,
+						dataSource,
 						_env,
-						stream
+						_logger
 					);
 				}
 			}
@@ -330,7 +351,10 @@ namespace synthese
 				}
 				else
 				{
-					stream << "Invalid path!" << "<br />";
+					_log(
+						ImportLogger::ERROR,
+						"Invalid path!"
+					);
 					return false;
 				}
 
@@ -342,11 +366,14 @@ namespace synthese
 				}
 				else
 				{
-					stream << "WARN : rollingStock not defined";
+					_log(
+						ImportLogger::ERROR,
+						"RollingStock not defined"
+					);
 					return false;
 				}
 
-				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
 				shared_ptr<ImportableTableSync::ObjectBySource<StopPointTableSync> > stopPointsFromOtherImport;
 				if(_stopsFromDataSource && _stopsDataSource)
 					stopPointsFromOtherImport.reset(new ImportableTableSync::ObjectBySource<StopPointTableSync>(*_stopsDataSource, _env));
@@ -359,11 +386,13 @@ namespace synthese
 				{
 					ifstream inFile;
 					string fileWithPath = filePath.file_string() + file;
-					stream << fileWithPath << "<br />";
 					inFile.open(fileWithPath.c_str());
 					if(!inFile)
 					{
-						stream << "Could no open the file " << fileWithPath << "<br />";
+						_log(
+							ImportLogger::ERROR,
+							"Could no open the file "+ fileWithPath
+						);
 						return false;
 					}
 
@@ -390,12 +419,15 @@ namespace synthese
 							}
 						}
 
-						stream << "INFO : Loading file " << filePath.file_string().c_str()+file << "<br />";
-
-						CommercialLine* commercialLine(PTFileFormat::GetLine(lines, file, _dataSource, _env, stream));
+						CommercialLine* commercialLine(
+							PTFileFormat::GetLine(lines, file, dataSource, _env, _logger)
+						);
 						if(!commercialLine)
 						{
-							stream << "No such line " << file << "<br />";
+							_log(
+								ImportLogger::ERROR,
+								"No such line "+ file
+							);
 							return false;
 						}
 
@@ -411,7 +443,10 @@ namespace synthese
 						// Number of services
 						_firstLine(inFile, line, posSchedulesTable);
 
-						stream << "num of services : " << _line.size() << "<br />";
+						_log(
+							ImportLogger::DEBG,
+							"Number of services : "+ lexical_cast<string>(_line.size())
+						);
 
 						for(size_t numService = 1; numService < _line.size(); numService++)
 						{
@@ -420,7 +455,10 @@ namespace synthese
 							// Get Period Calendar name
 							if(!_moveToField(inFile,_periodCalendarField))
 							{
-								stream << "No such period field " << _periodCalendarField << "<br />";
+								_log(
+									ImportLogger::ERROR,
+									"No such period field "+ _periodCalendarField
+								);
 								return false;
 							}
 							periodCalendarName = _line[numService] + " " + commercialLine->getNetwork()->getName();
@@ -428,7 +466,10 @@ namespace synthese
 							// Get Days Calendar name
 							if(!_moveToField(inFile,_daysCalendarField))
 							{
-								stream << "No such period field " << _daysCalendarField << "<br />";
+								_log(
+									ImportLogger::ERROR,
+									"No such period field "+ _daysCalendarField
+								);
 								return false;
 							}
 							daysCalendarName = _line[numService] + " " + commercialLine->getNetwork()->getName();
@@ -440,7 +481,10 @@ namespace synthese
 									_loadLine(line);
 								else
 								{
-									stream << "Error with the number of other parameters : " << _numberOfOtherParameters << "<br />";
+									_log(
+										ImportLogger::ERROR,
+										"Error with the number of other parameters : "+ lexical_cast<string>(_numberOfOtherParameters)
+									);
 									return false;
 								}
 							}
@@ -483,27 +527,42 @@ namespace synthese
 									if(stopPointsFromOtherImport->contains(stopPointId))
 									{
 										stopPoints = stopPointsFromOtherImport->get(stopPointId);
-										stream << "stop id "<< stopPointId <<" found in the service "<< numService <<"<br />";
+										_log(
+											ImportLogger::DEBG,
+											"Stop id "+ stopPointId +" found in the service "+ lexical_cast<string>(numService)
+										);
 									}
 									else if(stopPointsFromOtherImport->contains(stopPointId2))
 									{
 										stopPoints = stopPointsFromOtherImport->get(stopPointId2);
-										stream << "stop id "<< stopPointId2 <<" found in the service "<< numService <<"<br />";
+										_log(
+											ImportLogger::DEBG,
+											"Stop id "+ stopPointId2 +" found in the service "+ lexical_cast<string>(numService)
+										);
 									}
 									else if(stopPointsFromOtherImport->contains(stopPointId3))
 									{
 										stopPoints = stopPointsFromOtherImport->get(stopPointId3);
-										stream << "stop id "<< stopPointId3 <<" found in the service "<< numService <<"<br />";
+										_log(
+											ImportLogger::DEBG,
+											"Stop id "+ stopPointId3 +" found in the service "+ lexical_cast<string>(numService)
+										);
 									}
 									else
 									{
-										stream << "stop id "<< stopPointId <<"/" << stopPointId2 << " not found in the service "<< numService <<"<br />";
+										_log(
+											ImportLogger::ERROR,
+											"Stop id "+ stopPointId +"/"+ stopPointId2 +" not found in the service "+ lexical_cast<string>(numService)
+										);
 										return false;
 									}
 								}
 								else
 								{
-									stream << "WARN : inconsistent stop id "<< stopPointId <<" in the service "<< numService <<"<br />";
+									_log(
+										ImportLogger::ERROR,
+										"Inconsistent stop id "+ stopPointId +" in the service "+ lexical_cast<string>(numService)
+									);
 									return false;
 								}
 
@@ -535,7 +594,10 @@ namespace synthese
 
 							if(stops.size() > 0)
 							{
-								stream << "service number " << numService << "<br />";
+								_log(
+									ImportLogger::DEBG,
+									"Service number "+ lexical_cast<string>(numService)
+								);
 
 								CalendarTemplate* periodCalendar(NULL);
 								CalendarTemplateTableSync::SearchResult calendars(
@@ -551,9 +613,16 @@ namespace synthese
 										optional<RegistryKeyType>())
 								);
 								if(calendars.empty())
-									stream << "WARN : Calendar <pre>\"" << periodCalendarName << "\"</pre> not found<br />";
+								{
+									_log(
+										ImportLogger::WARN,
+										"Calendar <pre>\""+ periodCalendarName +"\"</pre> not found"
+									);
+								}
 								else
+								{
 									periodCalendar = calendars.begin()->get();
+								}
 
 
 								CalendarTemplate* daysCalendar(NULL);
@@ -567,12 +636,19 @@ namespace synthese
 										0,
 										1,
 										UP_LINKS_LOAD_LEVEL,
-										optional<RegistryKeyType>())
-								);
+										optional<RegistryKeyType>()
+								)	);
 								if(calendars2.empty())
-									stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
+								{
+									_log(
+										ImportLogger::WARN,
+										"Calendar <pre>\""+ daysCalendarName +"\"</pre> not found"
+									);
+								}
 								else
+								{
 									daysCalendar = calendars2.begin()->get();
+								}
 
 								// Route
 								JourneyPattern* route(
@@ -586,15 +662,18 @@ namespace synthese
 										backward,
 										rollingStock,
 										stops,
-										_dataSource,
+										dataSource,
 										_env,
-										stream,
+										_logger,
 										true,
 										true
 								)	);
 								if(route == NULL)
 								{
-									stream << "WARN : failure at route creation ("<< commercialLine->getShortName() <<")<br />";
+									_log(
+										ImportLogger::ERROR,
+										"Failure at route creation ("+ commercialLine->getShortName() +")"
+									);
 									return false;
 								}
 
@@ -605,9 +684,9 @@ namespace synthese
 										departureSchedules,
 										arrivalSchedules,
 										serviceID,
-										_dataSource,
+										dataSource,
 										_env,
-										stream
+										_logger
 								)	);
 
 								// Calendars
@@ -638,13 +717,27 @@ namespace synthese
 										serviceCalendarLink = boost::shared_ptr<CalendarLink>(new CalendarLink(CalendarLinkTableSync::getId()));
 
 										if(periodCalendar)
+										{
 											serviceCalendarLink->setCalendarTemplate2(periodCalendar);
+										}
 										else
-											stream << "WARN : Calendar <pre>\"" << periodCalendarName << "\"</pre> not found<br />";
+										{
+											_log(
+												ImportLogger::WARN,
+												"Calendar <pre>\""+ periodCalendarName +"\"</pre> not found"
+											);
+										}
 										if(daysCalendar)
+										{
 											serviceCalendarLink->setCalendarTemplate(daysCalendar);
+										}
 										else
-											stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
+										{
+											_log(
+												ImportLogger::WARN,
+												"Calendar <pre>\""+ daysCalendarName +"\"</pre> not found"
+											);
+										}
 
 										serviceCalendarLink->setCalendar(service);
 
@@ -656,7 +749,10 @@ namespace synthese
 								}
 								else
 								{
-									stream << "WARN : failure at service creation ("<< serviceID <<")<br />";
+									_log(
+										ImportLogger::ERROR,
+										"Failure at service creation ("+ serviceID +")"
+									);
 									return false;
 								}
 							}
@@ -786,7 +882,7 @@ namespace synthese
 					line.substr(0, line.size() - 1) :
 					line
 				);
-				utfline = IConv(_dataSource.getCharset(), "UTF-8").convert(line);
+				utfline = IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
 		}

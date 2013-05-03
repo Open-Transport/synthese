@@ -85,6 +85,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID;
+			static const util::RegistryKeyType FAKE_IMPORT_ID;
 
 		private:
 			static boost::posix_time::time_duration _syncWaitingTime;
@@ -92,10 +93,9 @@ namespace synthese
 			static std::string _masterPort;
 			static bool _slaveActive;
 			static util::RegistryKeyType _slaveId;
+			static void _generateFakeImport();
 
 		public:
-			static void InterSYNTHESE();
-
 			static void Enqueue(
 				const InterSYNTHESEContent& content,
 				boost::optional<db::DBTransaction&> transaction

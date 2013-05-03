@@ -5,6 +5,8 @@
 
 #include "PTModule.h"
 
+#include "StopsInterSYNTHESEIdFilter.hpp"
+
 #include "LinesListFunction.h"
 #include "LineStopGetService.hpp"
 #include "StopAreasListFunction.hpp"
@@ -149,6 +151,7 @@ void synthese::pt::moduleRegister()
 	// PT MODULE 35
 
 	// Factories
+	synthese::pt::StopsInterSYNTHESEIdFilter::integrate();
 
 	synthese::pt::TransportNetworkTableSync::integrate();
 
