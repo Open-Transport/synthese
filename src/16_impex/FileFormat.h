@@ -26,6 +26,7 @@
 
 #include "Importable.h"
 #include "ImportableTableSync.hpp"
+#include "ImportLogger.hpp"
 
 #include <boost/filesystem/path.hpp>
 #include <set>
