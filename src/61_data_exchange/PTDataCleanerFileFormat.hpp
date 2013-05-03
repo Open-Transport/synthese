@@ -73,7 +73,8 @@ namespace synthese
 
 			PTDataCleanerFileFormat(
 				util::Env& env,
-				const impex::DataSource& dataSource
+				const impex::Import& import,
+				const impex::ImportLogger& importLogger
 			);
 
 			virtual bool beforeParsing();

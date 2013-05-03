@@ -23,6 +23,7 @@
 #include "HeuresFileFormat.hpp"
 
 #include "DataSource.h"
+#include "Import.hpp"
 #include "NonConcurrencyRuleTableSync.h"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
@@ -177,7 +178,6 @@ namespace synthese
 
 		bool HeuresFileFormat::Importer_::_parse(
 			const path& filePath,
-			std::ostream& stream,
 			const std::string& key,
 			boost::optional<const server::Request&> request
 		) const {
@@ -185,6 +185,10 @@ namespace synthese
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
+				_log(
+					ImportLogger::ERROR,
+					"Could no open the file " + filePath.file_string()
+				);
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
@@ -193,21 +197,23 @@ namespace synthese
 				throw RequestException("Base calendar must be non empty");
 			}
 
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			if(key == FILE_POINTSARRETS)
 			{
 				string line;
 
 				PTFileFormat::ImportableStopPoints linkedStopPoints;
 				PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
-				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : _dataSource);
+				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : dataSource);
 				ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(stopsDataSource, _env);
 				ImportableTableSync::ObjectBySource<DestinationTableSync> destinations(stopsDataSource, _env);
 
 				while(getline(inFile, line))
 				{
-					if(!_dataSource.getCharset().empty())
+					if(!dataSource.get<Charset>().empty())
 					{
-						line = IConv(stopsDataSource.getCharset(), "UTF-8").convert(line);
+						line = IConv(stopsDataSource.get<Charset>(), "UTF-8").convert(line);
 					}
 
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
@@ -217,7 +223,10 @@ namespace synthese
 						set<Destination*> destinationSet(destinations.get(destinationCode));
 						if(destinationSet.empty())
 						{
-							stream << "WARN : The destination " << destinationCode << " was not found in the database<br/>";
+							_log(
+								ImportLogger::WARN,
+								"The destination "+ destinationCode +" was not found in the database"
+							);
 						}
 						else
 						{
@@ -257,7 +266,7 @@ namespace synthese
 						*request,
 						_env,
 						stopsDataSource,
-						stream
+						_logger
 					);
 					if(_displayLinkedStops)
 					{
@@ -266,13 +275,16 @@ namespace synthese
 							*request,
 							_env,
 							stopsDataSource,
-							stream
+							_logger
 						);
 					}
 				}
 				if(!nonLinkedStopPoints.empty())
 				{
-					stream << "ERR  : At least a stop could not be linked.<br/>";
+					_log(
+						ImportLogger::ERROR,
+						"At least a stop could not be linked."
+					);
 					return false;
 				}
 			}
@@ -280,7 +292,10 @@ namespace synthese
 			{
 				if(!_network.get())
 				{
-					stream << "ERR  : The transport network was not specified.<br/>";
+					_log(
+						ImportLogger::ERROR,
+						"The transport network was not specified."
+					);
 					return false;
 				}
 
@@ -288,15 +303,18 @@ namespace synthese
 				RollingStockTableSync::SearchResult rollingstock(RollingStockTableSync::Search(_env, string("Bus")));
 				if(rollingstock.empty())
 				{
-					stream << "ERR  : The bus transport mode is not registered in the table 49.<br />";
+					_log(
+						ImportLogger::ERROR,
+						"The bus transport mode is not registered in the table 49."
+					);
 					return false;
 				}
 				RollingStock* bus(rollingstock.front().get());
 
 				// Load of the stops
-				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : _dataSource);
+				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : dataSource);
 				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(stopsDataSource, _env);
-				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
 
 				// Parsing the file
 				string line;
@@ -333,9 +351,9 @@ namespace synthese
 						lexical_cast<string>(commercialLineNumber),
 						optional<RGBColor>(),
 						*_network,
-						_dataSource,
+						dataSource,
 						_env,
-						stream
+						_logger
 					);
 
 					// Stops
@@ -347,7 +365,10 @@ namespace synthese
 					{
 						if(line.size() < i+9)
 						{
-							stream << "WARN : inconsistent line size " << line << "<br />";
+							_log(
+								ImportLogger::WARN,
+								"Inconsistent line size "+ line
+							);
 							ignoreRoute = true;
 							break;
 						}
@@ -366,7 +387,10 @@ namespace synthese
 							}
 							else
 							{
-								stream << "WARN : destination " << stopNumber << " was not registered.<br />";
+								_log(
+									ImportLogger::WARN,
+									"Destination "+ stopNumber +" was not registered."
+								);
 							}
 							continue;
 						}
@@ -376,7 +400,10 @@ namespace synthese
 
 						if(!stops.contains(stopNumber))
 						{
-							stream << "WARN : stop " << stopNumber << " not found<br />";
+							_log(
+								ImportLogger::WARN,
+								"Stop "+ stopNumber +" not found"
+							);
 							ignoreRoute = true;
 						}
 
@@ -407,9 +434,9 @@ namespace synthese
 							routeType == 1,
 							bus,
 							servedStops,
-							_dataSource,
+							dataSource,
 							_env,
-							stream,
+							_logger,
 							true,
 							true
 					)	);
@@ -451,7 +478,10 @@ namespace synthese
 						{
 							if(_technicalRoutes.find(make_pair(lineNumber, routeNumber)) == _technicalRoutes.end())
 							{
-								stream << "WARN : route not found in service file " << lineNumber << "/" << routeNumber << "<br />";
+								_log(
+									ImportLogger::WARN,
+									"Route not found in service file "+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber)
+								);
 							}
 							for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 							continue;
@@ -464,7 +494,10 @@ namespace synthese
 						{
 							if(itS->first.first != route)
 							{
-								stream << "WARN : inconsistent route in service file " << serviceNumber << "/" << lineNumber << "/" << routeNumber << "<br />";
+								_log(
+									ImportLogger::WARN,
+									"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber)
+								);
 								for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 								continue;
 							}
@@ -524,9 +557,9 @@ namespace synthese
 							it.second.first.first,
 							it.second.first.second,
 							it.first.second,
-							_dataSource,
+							dataSource,
 							_env,
-							stream
+							_logger
 					)	);
 
 					if(service == NULL)
@@ -544,7 +577,10 @@ namespace synthese
 			{
 				if(_calendar.empty())
 				{
-					stream << "ERR  : Start date or end date not defined<br />";
+					_log(
+						ImportLogger::ERROR,
+						"Start date or end date not defined"
+					);
 					return false;
 				}
 
@@ -584,7 +620,10 @@ namespace synthese
 						)	);
 						if(itS == _services.end())
 						{
-							stream << "WARN : inconsistent service number " << lineNumber << "/" << serviceNumber << " in " << line << "<br />";
+							_log(
+								ImportLogger::WARN,
+								"Inconsistent service number "+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(serviceNumber) +" in "+ line
+							);
 							continue;
 						}
 
@@ -770,7 +809,7 @@ namespace synthese
 				if(codes.empty())
 				{
 					oneStopWithoutCode = true;
-					os << "ERR  : Stop " << stop.getConnectionPlace()->getFullName() << "/" << stop.getName() << " has no code for the datasource" << endl;
+					os << "ERR: Stop "<< stop.getConnectionPlace()->getFullName() <<"/"<< stop.getName() <<" has no code for the datasource";
 					continue;
 				}
 
@@ -792,7 +831,7 @@ namespace synthese
 			// Break if one stop without code
 			if(oneStopWithoutCode)
 			{
-				os << "STOP : Import broken, at least a stop without code for the datasource" << endl;
+				os << "ERR : export broken, at least a stop without code for the datasource";
 				return;
 			}
 

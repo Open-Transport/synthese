@@ -22,6 +22,7 @@
 
 #include "PTOperationFileFormat.hpp"
 
+#include "ImportLogger.hpp"
 #include "VehicleServiceTableSync.hpp"
 
 using namespace std;
@@ -38,17 +39,18 @@ namespace synthese
 			const std::string& id,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			const impex::ImportLogger& logger
 		){
 			set<VehicleService*> loadedVehicleServices(vehicleServices.get(id));
 			if(!loadedVehicleServices.empty())
 			{
-				logStream << "LOAD : link between vehicle services " << id << " and ";
+				stringstream logStream;
+				logStream << "Link between vehicle services " << id << " and ";
 				BOOST_FOREACH(VehicleService* vs, loadedVehicleServices)
 				{
 					logStream << vs->getKey();
 				}
-				logStream << "<br />";
+				logger.log(ImportLogger::LOAD, logStream.str());
 			}
 			else
 			{
@@ -61,7 +63,10 @@ namespace synthese
 				vehicleServices.add(*vs);
 				loadedVehicleServices.insert(vs.get());
 
-				logStream << "CREA : Creation of the vehicle service with key " << id << "<br />";
+				logger.log(
+					ImportLogger::CREA,
+					"Creation of the vehicle service with key "+ id
+				);
 			}
 			return *loadedVehicleServices.begin();
 		}

@@ -117,15 +117,17 @@ namespace synthese
 
 		bool RoadShapeFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& os,
 			const std::string& key,
 			boost::optional<const server::Request&> adminRequest
 		) const {
 
+			// DataSource
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			// SRID
-			if(!_dataSource.getCoordinatesSystem())
+			if(!dataSource.get<CoordinatesSystem>())
 			{
-				os << "ERR  : SRID must be set in datasource.<br />";
+				_logError("SRID must be set in datasource.");
 				return false;
 			}
 
@@ -137,12 +139,16 @@ namespace synthese
 					_roadPlacesCodeField.empty() ||
 					_roadPlacesNameField.empty()
 				){
-					os << "ERR  : City code, name, and code field names must be defined for road places file. Load interrupted.<br />";
+					_logError("City code, name, and code field names must be defined for road places file. Load interrupted.");
 					return false;
 				}
 
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualShapeVirtualTable table(
+					filePath,
+					dataSource.get<Charset>(),
+					dataSource.get<CoordinatesSystem>()->getSRID()
+				);
 				stringstream query;
 				query << "SELECT *, AsText(" << RoadShapeFileFormat::Importer_::FIELD_GEOMETRY << ") AS " << RoadShapeFileFormat::Importer_::FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
 				DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
@@ -156,7 +162,7 @@ namespace synthese
 					);
 					if(!city.get())
 					{
-						os << "<b>WARN : Unknown city " << rows->getText(_roadPlacesCityCodeField) << " in road place " << rows->getText(_roadPlacesCodeField) << ". Road place is ignored.<br />";
+						_logWarning("Unknown city "+ rows->getText(_roadPlacesCityCodeField) +" in road place "+ rows->getText(_roadPlacesCodeField) +". Road place is ignored.");
 						continue;
 					}
 
@@ -169,7 +175,7 @@ namespace synthese
 					);
 					if(code.empty())
 					{
-						os << "WARN : Each road place code must be non empty<br />";
+						_logWarning("Each road place code must be non empty");
 						continue;
 					}
 
@@ -179,9 +185,9 @@ namespace synthese
 						code,
 						name,
 						*city,
-						_dataSource,
+						dataSource,
 						_env,
-						os
+						_logger
 					);
 				}
 
@@ -195,7 +201,7 @@ namespace synthese
 					_roadChunksCodeField.empty() ||
 					_roadChunksRoadPlaceField.empty() // Todo turn it into optional field
 				){
-					os << "ERR  : Start node, end node, road place code, and code field names must be defined for road chunks file. Load interrupted.<br />";
+					_logError("Start node, end node, road place code, and code field names must be defined for road chunks file. Load interrupted.");
 					return false;
 				}
 				bool withHouseNumbers(
@@ -206,13 +212,17 @@ namespace synthese
 				);
 
 				// Geometry factory
-				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
+				const GeometryFactory& geometryFactory(dataSource.get<CoordinatesSystem>()->getGeometryFactory());
 
 				// Crossings
-				ImportableTableSync::ObjectBySource<CrossingTableSync> crossings(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<CrossingTableSync> crossings(dataSource, _env);
 
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualShapeVirtualTable table(
+					filePath,
+					dataSource.get<Charset>(),
+					dataSource.get<CoordinatesSystem>()->getSRID()
+				);
 				stringstream query;
 				query << "SELECT *, AsText(" << RoadShapeFileFormat::Importer_::FIELD_GEOMETRY << ") AS " << RoadShapeFileFormat::Importer_::FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
 				DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
@@ -224,7 +234,7 @@ namespace synthese
 					string code(rows->getText(_roadChunksCodeField));
 					if(code.empty())
 					{
-						os << "WARN : Each road chunk code must be non empty<br />";
+						_logWarning("Each road chunk code must be non empty");
 						continue;
 					}
 
@@ -233,7 +243,7 @@ namespace synthese
 						RoadFileFormat::GetRoadPlace(
 							_roadPlaces,
 							rows->getText(_roadChunksRoadPlaceField),
-							os
+							_logger
 					)	);
 					if(!roadPlace)
 					{
@@ -247,7 +257,7 @@ namespace synthese
 					)	);
 					if(!geometry.get())
 					{
-						os << "ERR : Empty geometry in the " << code << " road chunk.<br />";
+						_logWarning("Empty geometry in the "+ code +" road chunk.");
 						continue;
 					}
 
@@ -255,32 +265,32 @@ namespace synthese
 					string startNodeCode(rows->getText(_roadChunksStartNodeField));
 					if(startNodeCode.empty())
 					{
-						os << "WARN : The start node code is empty in the road chunk " << code << "<br />";
+						_logWarning("The start node code is empty in the road chunk "+ code);
 						continue;
 					}
 					shared_ptr<Point> startPoint(
-						_dataSource.getCoordinatesSystem()->createPoint(
+						dataSource.get<CoordinatesSystem>()->createPoint(
 							geometry->getCoordinatesRO()->getX(0),
 							geometry->getCoordinatesRO()->getY(0)
 					)	);
 					Crossing* startCrossing(
-						RoadFileFormat::CreateOrUpdateCrossing(crossings, startNodeCode, startPoint, _dataSource, _env, os)
+						RoadFileFormat::CreateOrUpdateCrossing(crossings, startNodeCode, startPoint, dataSource, _env, _logger)
 					);
 
 					// End node
 					string endNodeCode(rows->getText(_roadChunksEndNodeField));
 					if(endNodeCode.empty())
 					{
-						os << "WARN : The end node code is empty in the road chunk " << code << "<br />";
+						_logWarning("The end node code is empty in the road chunk "+ code);
 						continue;
 					}
 					shared_ptr<Point> endPoint(
-						_dataSource.getCoordinatesSystem()->createPoint(
+						dataSource.get<CoordinatesSystem>()->createPoint(
 							geometry->getCoordinatesRO()->getX(geometry->getCoordinatesRO()->size() - 1),
 							geometry->getCoordinatesRO()->getY(geometry->getCoordinatesRO()->size() - 1)
 					)	);
 					Crossing* endCrossing(
-						RoadFileFormat::CreateOrUpdateCrossing(crossings, endNodeCode, endPoint, _dataSource, _env, os)
+						RoadFileFormat::CreateOrUpdateCrossing(crossings, endNodeCode, endPoint, dataSource, _env, _logger)
 					);
 
 					// House numbers
@@ -358,19 +368,23 @@ namespace synthese
 					_publicPlacesRoadChunkField.empty() || // Todo turn it into optional field
 					_publicPlacesNumberField.empty() // Todo turn it into optional field
 				){
-					os << "ERR  : Code, name, city code, road chunk, and number field names must be defined for public places file. Load interrupted.<br />";
+					_logError("Code, name, city code, road chunk, and number field names must be defined for public places file. Load interrupted.");
 					return false;
 				}
 
 				// Geometry factory
-				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
+				const GeometryFactory& geometryFactory(dataSource.get<CoordinatesSystem>()->getGeometryFactory());
 
 				// Public places
-				ImportableTableSync::ObjectBySource<PublicPlaceTableSync> publicPlaces(_dataSource, _env);
-				ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync> publicPlaceEntrances(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<PublicPlaceTableSync> publicPlaces(dataSource, _env);
+				ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync> publicPlaceEntrances(dataSource, _env);
 
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualShapeVirtualTable table(
+					filePath,
+					dataSource.get<Charset>(),
+					dataSource.get<CoordinatesSystem>()->getSRID()
+				);
 				stringstream query;
 				query << "SELECT *, AsText(" << RoadShapeFileFormat::Importer_::FIELD_GEOMETRY << ") AS " << RoadShapeFileFormat::Importer_::FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
 				DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
@@ -385,7 +399,7 @@ namespace synthese
 					string code(rows->getText(_publicPlacesCodeField));
 					if(code.empty())
 					{
-						os << "WARN : Each road chunk code must be non empty<br />";
+						_logWarning("Each road chunk code must be non empty");
 						continue;
 					}
 
@@ -396,7 +410,7 @@ namespace synthese
 					);
 					if(!city.get())
 					{
-						os << "<b>WARN : Unknown city " << cityCode << " in public place " << code << ". Public place is ignored.<br />";
+						_logWarning("Unknown city "+ cityCode +" in public place "+ code +". Public place is ignored.");
 						continue;
 					}
 
@@ -410,7 +424,7 @@ namespace synthese
 					)	);
 					if(!geometry.get())
 					{
-						os << "ERR : Empty geometry in the " << code << " road place.<br />";
+						_logWarning("Empty geometry in the "+ code +" road place.");
 						continue;
 					}
 
@@ -422,9 +436,9 @@ namespace synthese
 							name,
 							geometry,
 							*city,
-							_dataSource,
+							dataSource,
 							_env,
-							os
+							_logger
 					)	);
 
 
@@ -443,7 +457,7 @@ namespace synthese
 					map<string, MainRoadChunk*>::iterator itRoadChunk(_roadChunks.find(roadChunkId));
 					if(itRoadChunk == _roadChunks.end())
 					{
-						os << "<b>WARN : Unknown road chunk " << roadChunkId << " in public place " << code << ". Public place entrance is ignored.<br />";
+						_logWarning("Unknown road chunk "+ roadChunkId +" in public place "+ code +". Public place entrance is ignored.");
 						continue;
 					}
 					MainRoadChunk* roadChunk = itRoadChunk->second;
@@ -470,9 +484,9 @@ namespace synthese
 							houseNumber,
 							*roadChunk,
 							*publicPlace,
-							_dataSource,
+							dataSource,
 							_env,
-							os
+							_logger
 						);
 					}
 					catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
@@ -481,7 +495,7 @@ namespace synthese
 				}
 			}
 
-			os << "<b>SUCCESS : Data loaded</b><br />";
+			_logDebug("<b>SUCCESS : Data loaded</b>");
 
 			return true;
 		}

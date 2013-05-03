@@ -16,14 +16,14 @@ set(data_exchange_SRCS
   HastusInterfaceFileFormat.hpp
   HeuresFileFormat.cpp
   HeuresFileFormat.hpp
+  IneoBDSIFileFormat.cpp
+  IneoBDSIFileFormat.hpp
   IneoFileFormat.cpp
   IneoFileFormat.hpp
   IneoNCEConnection.cpp
   IneoNCEConnection.hpp
   IneoRealTimeFileFormat.cpp
   IneoRealTimeFileFormat.hpp
-  IneoRealTimeUpdateAction.cpp
-  IneoRealTimeUpdateAction.hpp
   MGScreenConnection.cpp
   MGScreenConnection.hpp
   OGTFileFormat.cpp

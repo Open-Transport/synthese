@@ -31,6 +31,7 @@
 #include "DataSourceAdmin.h"
 #include "DBTransaction.hpp"
 #include "EdgeProjector.hpp"
+#include "Import.hpp"
 #include "ImportFunction.h"
 #include "PublicPlaceTableSync.h"
 #include "PublicPlaceEntranceTableSync.hpp"
@@ -155,16 +156,17 @@ namespace synthese
 
 		bool NavstreetsFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& os,
 			const std::string& key,
 			boost::optional<const server::Request&> adminRequest
 		) const {
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			// 1 : Administrative areas
 			if(key == FILE_MTDAREA)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualDBFVirtualTable table(filePath, _dataSource.getCharset());
+				VirtualDBFVirtualTable table(filePath, dataSource.get<Charset>());
 
 				map<
 					pair<string,string>, // Region,Departement
@@ -232,7 +234,10 @@ namespace synthese
 
 							if(cities.empty())
 							{
-								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " (" << cityID << ") not found.<br />";
+								_logWarning(
+									"City "+ rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) +
+										" ("+ lexical_cast<string>(cityID) +") not found."
+								);
 								_missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
 								continue;
 							}
@@ -278,7 +283,10 @@ namespace synthese
 
 							if(cities.empty())
 							{
-								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " (" << cityID << ") not found.<br />";
+								_logWarning(
+									"City "+ rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) +
+										" ("+ lexical_cast<string>(cityID) +") not found."
+								);
 								_missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
 								continue;
 							}
@@ -302,7 +310,11 @@ namespace synthese
 			else if(key == FILE_STREETS)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualShapeVirtualTable table(
+					filePath,
+					dataSource.get<Charset>(),
+					dataSource.get<CoordinatesSystem>()->getSRID()
+				);
 
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;
@@ -313,7 +325,9 @@ namespace synthese
 				> CreatedCities;
 				CreatedCities createdCities;
 
-				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
+				const GeometryFactory& geometryFactory(
+					dataSource.get<CoordinatesSystem>()->getGeometryFactory()
+				);
 
 				stringstream query;
 				query << "SELECT *, AsText(" << NavstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << NavstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
@@ -337,7 +351,7 @@ namespace synthese
 
 					if(!geometry.get())
 					{
-						os << "ERR : Empty geometry.<br />";
+						_logWarning("ERR : Empty geometry.");
 						continue;
 					}
 
@@ -378,7 +392,9 @@ namespace synthese
 												itc->second,
 												city
 										)	);
-										os << "AUTOCREATION " << itc->second << " (" << lAreaId << ").<br />";
+										_logCreation(
+											"AUTOCREATION "+ lexical_cast<string>(itc->second) +" ("+ lexical_cast<string>(lAreaId) +")."
+										);
 									}
 								}
 							}
@@ -390,7 +406,7 @@ namespace synthese
 
 						if(city == NULL)
 						{
-							os << "ERR : City " << lAreaId << " not found.<br />";
+							_logWarning("City "+ lexical_cast<string>(lAreaId) +" not found.");
 							continue;
 						}
 
@@ -420,7 +436,7 @@ namespace synthese
 									CrossingTableSync::getId(),
 									shared_ptr<Point>(geometry->getStartPoint()),
 									leftId,
-									&_dataSource
+									&dataSource
 							)	);
 
 							_navteqCrossings.insert(make_pair(leftId, leftNode));
@@ -441,7 +457,7 @@ namespace synthese
 									CrossingTableSync::getId(),
 									shared_ptr<Point>(geometry->getEndPoint()),
 									rightId,
-									&_dataSource
+									&dataSource
 							)	);
 
 							_navteqCrossings.insert(make_pair(rightId, rightNode));
@@ -458,9 +474,9 @@ namespace synthese
 							roadCode,
 							roadName,
 							*city,
-							_dataSource,
+							dataSource,
 							_env,
-							os
+							_logger
 						);
 
 						// Chunk insertion
@@ -482,13 +498,17 @@ namespace synthese
 			else if(key == FILE_PUBLIC_PLACES)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualShapeVirtualTable table(
+					filePath,
+					dataSource.get<Charset>(),
+					dataSource.get<CoordinatesSystem>()->getSRID()
+				);
 
-				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
+				const GeometryFactory& geometryFactory(dataSource.get<CoordinatesSystem>()->getGeometryFactory());
 
 				// Public places
-				ImportableTableSync::ObjectBySource<PublicPlaceTableSync> publicPlaces(_dataSource, _env);
-				ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync> publicPlaceEntrances(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<PublicPlaceTableSync> publicPlaces(dataSource, _env);
+				ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync> publicPlaceEntrances(dataSource, _env);
 
 				stringstream query;
 				query << "SELECT *, AsText(" << NavstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << NavstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
@@ -518,7 +538,7 @@ namespace synthese
 					)	);
 					if(!geometry.get())
 					{
-						os << "ERR : Empty geometry in the " << poiId << " public place.<br />";
+						_logWarning("Empty geometry in the "+ poiId +" public place.");
 						continue;
 					}
 
@@ -550,9 +570,9 @@ namespace synthese
 									poiName,
 									geometry,
 									*city,
-									_dataSource,
+									dataSource,
 									_env,
-									os
+									_logger
 							)	);
 
 							// PublicPlaceEntrance
@@ -573,21 +593,19 @@ namespace synthese
 								houseNumber,
 								*roadChunk,
 								*publicPlace,
-								_dataSource,
+								dataSource,
 								_env,
-								os
+								_logger
 							);
 						}
 						catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
 						{
 						}
 					}
-
-
 				}
 			}
 
-			os << "<b>SUCCESS : Data loaded</b><br />";
+			_logDebug("<b>SUCCESS : Data loaded</b>");
 
 			return true;
 		}
@@ -710,4 +728,15 @@ namespace synthese
 		{
 			_citiesAutoCreation = map.getDefault<bool>(PARAMETER_CITIES_AUTO_CREATION, false);
 		}
+
+
+
+		NavstreetsFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	impex::Importer(env, import, logger),
+			impex::MultipleFileTypesImporter<NavstreetsFileFormat>(env, import, logger),
+			_roadPlaces(*import.get<DataSource>(), env)
+		{}
 }	}

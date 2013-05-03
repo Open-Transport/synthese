@@ -32,7 +32,7 @@
 #include "DataSource.h"
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
+#include "StandardLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -47,16 +47,10 @@ namespace synthese
 				DataSourceTableSync,
 				DataSource,
 				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				db::StandardLoadSavePolicy
 			>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_FORMAT;
-			static const std::string COL_ICON;
-			static const std::string COL_CHARSET;
-			static const std::string COL_SRID;
-			static const std::string COL_DEFAULT_IMPORT_REQUEST;
 
 			DataSourceTableSync() {}
 
@@ -78,7 +72,6 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				std::string name = std::string(),
-				boost::optional<std::string> format = boost::optional<std::string>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,

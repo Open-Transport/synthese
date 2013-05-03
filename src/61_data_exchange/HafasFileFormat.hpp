@@ -278,11 +278,10 @@ namespace synthese
 				//@}
 
 				void _showBahnhofScreen(
-					std::ostream& os,
 					boost::optional<const server::Request&> adminRequest
 				) const;
 
-				bool _importObjects(std::ostream& os) const;
+				bool _importObjects() const;
 
 			protected:
 
@@ -290,7 +289,6 @@ namespace synthese
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					std::ostream& os,
 					const std::string& key,
 					boost::optional<const server::Request&> adminRequest
 				) const;
@@ -300,17 +298,11 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
-				):	impex::Importer(env, dataSource),
-					impex::MultipleFileTypesImporter<HafasFileFormat>(env, dataSource),
-					PTDataCleanerFileFormat(env, dataSource),
-					_networks(dataSource, env),
-					_showStopsOnly(false),
-					_wayBackBitPosition(0),
-					_importFullServices(false),
-					_importStops(false),
-					_iconv(dataSource.getCharset().empty() ? string("UTF-8") : dataSource.getCharset(), "UTF-8")
-				{}
+					const impex::Import& import,
+					const impex::ImportLogger& logger
+				);
+				
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Import screen to include in the administration console.

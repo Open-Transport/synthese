@@ -68,7 +68,6 @@ namespace synthese
 			protected:
 
 				virtual bool _read(
-					std::ostream& os,
 					boost::optional<const server::Request&> adminRequest
 				) const;
 
@@ -76,7 +75,8 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
+					const impex::Import& import,
+					const impex::ImportLogger& logger
 				);
 
 				//////////////////////////////////////////////////////////////////////////

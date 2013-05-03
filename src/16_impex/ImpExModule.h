@@ -80,6 +80,8 @@ namespace synthese
 		public:
 			typedef std::vector<std::pair<boost::optional<std::string>, std::string> > FileFormatsList;
 			static FileFormatsList GetFileFormatsList();
+
+			static void AutoImportsThread();
 		};
 	}
 	/** @} */

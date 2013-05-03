@@ -27,6 +27,7 @@
 #include "DBTransaction.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DRTAreaTableSync.hpp"
+#include "Import.hpp"
 #include "ImportableTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineArea.hpp"
@@ -66,8 +67,9 @@ namespace synthese
 
 		PTDataCleanerFileFormat::PTDataCleanerFileFormat(
 			util::Env& env,
-			const DataSource& dataSource
-		):	Importer(env, dataSource),
+			const Import& import,
+			const impex::ImportLogger& importLogger
+		):	Importer(env, import, importLogger),
 			_fromToday(false),
 			_cleanOldData(true),
 			_cleanUnusedStops(false),
@@ -84,9 +86,10 @@ namespace synthese
 			}
 
 			date now(gregorian::day_clock::local_day());
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			// PT data
-			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(_dataSource, _env);
+			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(dataSource, _env);
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::value_type& itPathSet, journeyPatterns.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::mapped_type::value_type& itPath, itPathSet.second)
@@ -94,7 +97,7 @@ namespace synthese
 					ScheduledServiceTableSync::Search(_env, itPath->getKey());
 					ContinuousServiceTableSync::Search(_env, itPath->getKey());
 					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*itPath->sharedServicesMutex
+						*itPath->sharedServicesMutex
 					);
 
 					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getServices())
@@ -142,7 +145,7 @@ namespace synthese
 			// PT Operation
 
 			// Vehicle services
-			ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(_dataSource, _env);
+			ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(dataSource, _env);
 			VehicleService::DriverServiceChunks emptyVSChunks;
 			VehicleService::Services emptyVSServices;
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::value_type& itVSSet, vehicleServices.getMap())
@@ -164,10 +167,12 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_selectObjectsToRemove() const
 		{
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			// Scheduled services without any active date
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& itService, _env.getRegistry<ScheduledService>())
 			{
-				if(itService.second->getRoute()->hasLinkWithSource(_dataSource) && itService.second->empty())
+				if(itService.second->getRoute()->hasLinkWithSource(dataSource) && itService.second->empty())
 				{
 					_scheduledServicesToRemove.insert(itService.second);
 					itService.second->getPath()->removeService(*itService.second);
@@ -177,7 +182,7 @@ namespace synthese
 			// Continuous services without any active date
 			BOOST_FOREACH(const Registry<ContinuousService>::value_type& itCService, _env.getRegistry<ContinuousService>())
 			{
-				if(itCService.second->getRoute()->hasLinkWithSource(_dataSource) && itCService.second->empty())
+				if(itCService.second->getRoute()->hasLinkWithSource(dataSource) && itCService.second->empty())
 				{
 					_continuousServicesToRemove.insert(itCService.second);
 					itCService.second->getPath()->removeService(*itCService.second);
@@ -187,7 +192,7 @@ namespace synthese
 			// Journey patterns without any service
 			BOOST_FOREACH(const Registry<JourneyPattern>::value_type& itJourneyPattern, _env.getRegistry<JourneyPattern>())
 			{
-				if(itJourneyPattern.second->hasLinkWithSource(_dataSource) && itJourneyPattern.second->getServices().empty())
+				if(itJourneyPattern.second->hasLinkWithSource(dataSource) && itJourneyPattern.second->getServices().empty())
 				{
 					_journeyPatternsToRemove.insert(itJourneyPattern.second);
 				}
@@ -239,7 +244,7 @@ namespace synthese
 			// Vehicle services without services or without day
 			BOOST_FOREACH(const Registry<VehicleService>::value_type& itVehicleService, _env.getRegistry<VehicleService>())
 			{
-				if(	itVehicleService.second->hasLinkWithSource(_dataSource) &&
+				if(	itVehicleService.second->hasLinkWithSource(dataSource) &&
 					(	itVehicleService.second->getServices().empty() ||
 						itVehicleService.second->empty()
 				)	){
@@ -257,14 +262,14 @@ namespace synthese
 			{
 				// Stops without Journey patterns without any service
 				Env checkEnv;
-				shared_ptr<const DataSource> dataSourceInCheckEnv(DataSourceTableSync::Get(_dataSource.getKey(), _env));
+				shared_ptr<const DataSource> dataSourceInCheckEnv(DataSourceTableSync::Get(dataSource.getKey(), _env));
 				DRTAreaTableSync::Search(_env);
 				BOOST_FOREACH(const Registry<StopPoint>::value_type& itStopPoint, _env.getRegistry<StopPoint>())
 				{
 					const StopPoint& stop(*itStopPoint.second);
 
 					// Check if the stop should be removed according to the imported files
-					if(	!stop.hasLinkWithSource(_dataSource) ||
+					if(	!stop.hasLinkWithSource(dataSource) ||
 						stop.getDataSourceLinks().size() != 1 ||
 						!stop.getDepartureEdges().empty() ||
 						!stop.getArrivalEdges().empty()
@@ -500,7 +505,9 @@ namespace synthese
 		void PTDataCleanerFileFormat::cleanObsoleteData(
 			const date& firstDayToKeep
 		) const {
-			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(_dataSource, _env);
+
+			DataSource& dataSource(*_import.get<DataSource>());
+			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(dataSource, _env);
 
 			set<ScheduledService*> scheduledServicesToRemove;
 			set<ContinuousService*> continuousServicesToRemove;

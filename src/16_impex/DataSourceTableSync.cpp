@@ -43,33 +43,13 @@ namespace synthese
 		"16.01 DataSource"
 	);
 
-	namespace impex
-	{
-		const string DataSourceTableSync::COL_NAME("name");
-		const string DataSourceTableSync::COL_FORMAT("format");
-		const string DataSourceTableSync::COL_ICON("icon");
-		const string DataSourceTableSync::COL_CHARSET("charset");
-		const string DataSourceTableSync::COL_SRID("srid");
-		const string DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST = "default_import_request";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DataSourceTableSync>::TABLE(
 			"t059_data_sources"
 		);
 
-		template<> const Field DBTableSyncTemplate<DataSourceTableSync>::_FIELDS[]=
-		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(DataSourceTableSync::COL_NAME, SQL_TEXT),
-			Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
-			Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
-			Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
-			Field(DataSourceTableSync::COL_SRID, SQL_INTEGER),
-			Field(DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST, SQL_TEXT),
-			Field()
-		};
+		template<> const Field DBTableSyncTemplate<DataSourceTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 
 
@@ -77,74 +57,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<DataSourceTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<DataSourceTableSync,DataSource>::Load(
-			DataSource* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Name
-			string name (rows->getText(DataSourceTableSync::COL_NAME));
-			object->setName(name);
-
-			// Format
-			string format (rows->getText(DataSourceTableSync::COL_FORMAT));
-			object->setFormat(format);
-
-			// Icon
-			object->setIcon(rows->getText(DataSourceTableSync::COL_ICON));
-
-			// Charset
-			object->setCharset(rows->getText(DataSourceTableSync::COL_CHARSET));
-
-			// CoordinatesSystem
-			CoordinatesSystem::SRID srid(rows->getInt(DataSourceTableSync::COL_SRID));
-			if(srid > 0) try
-			{
-				object->setCoordinatesSystem(&CoordinatesSystem::GetCoordinatesSystem(srid));
-			}
-			catch(CoordinatesSystem::CoordinatesSystemNotFoundException& e)
-			{
-				Log::GetInstance().error("Bad SRID in record"+ lexical_cast<string>(object->getKey()), e);
-			}
-			else
-			{
-				object->setCoordinatesSystem(NULL);
-			}
-
-			// Default import request
-			object->setDefaultImportRequest(rows->getText(DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST));
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<DataSourceTableSync,DataSource>::Save(
-			DataSource* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<DataSourceTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getFormat());
-			query.addField(object->getIcon());
-			query.addField(object->getCharset());
-			query.addField(static_cast<int>(object->getCoordinatesSystem() ? object->getCoordinatesSystem()->getSRID() : CoordinatesSystem::SRID(0)));
-			query.addField(object->getDefaultImportRequest());
-			query.execute(transaction);
-		}
-
-
-
-		template<>
-		void OldLoadSavePolicy<DataSourceTableSync,DataSource>::Unlink(
-			DataSource* object
-		){
-			object->setCoordinatesSystem(NULL);
 		}
 
 
@@ -188,7 +100,6 @@ namespace synthese
 		DataSourceTableSync::SearchResult DataSourceTableSync::Search(
 			Env& env,
 			string name,
-			optional<string> format,
 			int first /*= 0*/
 			, optional<size_t> number /*= 0*/
 			, bool orderByName
@@ -198,15 +109,15 @@ namespace synthese
 			SelectQuery<DataSourceTableSync> query;
 			if (!name.empty())
 			{
-				query.addWhereField(COL_NAME, "%"+ lexical_cast<string>(name) + "%", ComposedExpression::OP_LIKE);
-			}
-			if(format)
-			{
-				query.addWhereField(COL_FORMAT, *format);
+				query.addWhereField(
+					Name::FIELD.name,
+					"%"+ lexical_cast<string>(name) + "%",
+					ComposedExpression::OP_LIKE
+				);
 			}
 			if (orderByName)
 			{
-				query.addOrderField(COL_NAME, raisingOrder);
+				query.addOrderField(Name::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{

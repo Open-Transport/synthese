@@ -24,11 +24,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ImpExModule.h"
+
 #include "Exception.h"
 #include "FileFormat.h"
+#include "Import.hpp"
+#include "ServerModule.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -53,12 +57,15 @@ namespace synthese
 		{
 		}
 
+
+
 		template<> void ModuleClassTemplate<ImpExModule>::End()
 		{
 		}
 
 		template<> void ModuleClassTemplate<ImpExModule>::Start()
 		{
+			ServerModule::AddThread(&ImpExModule::AutoImportsThread, "Auto imports");
 		}
 
 
@@ -86,6 +93,36 @@ namespace synthese
 				vec.push_back(make_pair(optional<string>(key), key));
 			}
 			return vec;
+		}
+
+
+		void ImpExModule::AutoImportsThread()
+		{
+			while(true)
+			{
+				ServerModule::SetCurrentThreadRunningAction();
+
+				// Loop on imports
+				BOOST_FOREACH(const Registry<Import>::value_type& it, Env::GetOfficialEnv().getRegistry<Import>())
+				{
+					Import& import(*it.second);
+
+					// Run activated imports to do
+					posix_time::ptime now(posix_time::second_clock::local_time());
+					if(	import.getNextAutoImport().is_not_a_date_time() ||
+						!import.get<Active>() ||
+						import.getNextAutoImport() > now
+					){
+						continue;
+					}
+
+					import.runAutoImport();
+				}
+
+				ServerModule::SetCurrentThreadWaiting();
+
+				this_thread::sleep(seconds(1));
+			}
 		}
 	}
 }

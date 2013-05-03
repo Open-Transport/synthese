@@ -21,8 +21,10 @@
 */
 
 #include "IGNstreetsFileFormat.hpp"
+
 #include "CrossingTableSync.hpp"
 #include "HouseTableSync.hpp"
+#include "Import.hpp"
 #include "RoadTableSync.h"
 #include "RoadChunkTableSync.h"
 #include "RoadPlaceTableSync.h"
@@ -108,16 +110,21 @@ namespace synthese
 
 		bool IGNstreetsFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& os,
 			const std::string& key,
 			boost::optional<const server::Request&> adminRequest
 		) const {
 			// 1 : Administrative areas
 
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			if(key == FILE_ADDRESS)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualShapeVirtualTable table(
+					filePath,
+					dataSource.get<Charset>(),
+					dataSource.get<CoordinatesSystem>()->getSRID()
+				);
 				typedef set<pair<City*, string> > MissingStreets;
 				MissingStreets missingStreets;
 				size_t ok(0);
@@ -147,11 +154,11 @@ namespace synthese
 							dynamic_pointer_cast<Point, Geometry>(
 								rows->getGeometryFromWKT(
 									IGNstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT",
-									_dataSource.getCoordinatesSystem()->getGeometryFactory()
+									dataSource.get<CoordinatesSystem>()->getGeometryFactory()
 						)	)	);
 						if(!geometry.get())
 						{
-							os << "ERR : Empty geometry.<br />";
+							_logWarning("Empty geometry.");
 							++badGeometry;
 							continue;
 						}
@@ -189,13 +196,16 @@ namespace synthese
 						catch(...)
 						{
 							++streetTooFar;
-							os << "WARN : house " << *house->getHouseNumber() << " could not be projected on " << nomRue << "<br />";
+							_logWarning(
+								"House "+ lexical_cast<string>(*house->getHouseNumber()) +" could not be projected on "+ nomRue
+							);
 						}
 					}
 				}
 
 				if(!missingStreets.empty())
 				{
+					stringstream os;
 					os << "<h1>Rues non trouvées</h1>";
 
 					// Header
@@ -213,12 +223,14 @@ namespace synthese
 						os << t.col() << missingStreet.second;
 					}
 					os << t.close();
+					_logger.logRaw(os.str());
 				}
 
 				if(_displayStats)
 				{
 					size_t total(ok + cityNotFound + roadNotFound + emptyStreetName + badGeometry + streetTooFar);
 
+					stringstream os;
 					os << "<h1>Statistiques</h1>";
 
 					// Header
@@ -251,10 +263,11 @@ namespace synthese
 					os << t.col() << streetTooFar;
 					os << t.col() << floor(100 * (double(streetTooFar) / double(total)));
 					os << t.close();
+					_logger.logRaw(os.str());
 				}
 			}
 
-			os << "<b>SUCCESS : Data loaded</b><br />";
+			_logDebug("<b>SUCCESS : Data loaded</b>");
 
 			return true;
 		}
@@ -307,4 +320,16 @@ namespace synthese
 			_displayStats = map.getDefault<bool>(PARAMETER_DISPLAY_STATS, false);
 			_maxHouseDistance = map.getDefault<double>(PARAMETER_MAX_HOUSE_DISTANCE, 200);
 		}
+
+
+
+		IGNstreetsFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	impex::Importer(env, import, logger),
+			impex::MultipleFileTypesImporter<IGNstreetsFileFormat>(env, import, logger),
+			_displayStats(false),
+			_maxHouseDistance(200)
+		{}
 }	}

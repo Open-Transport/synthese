@@ -24,6 +24,7 @@
 
 #include "CommercialLine.h"
 #include "ContinuousServiceTableSync.h"
+#include "InterSYNTHESEIdFilter.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "StopPoint.hpp"
 #include "TransportNetwork.h"
@@ -85,8 +86,11 @@ namespace synthese
 
 
 
-		bool RealTimePTDataInterSYNTHESE::sync( const std::string& parameter ) const
-		{
+		bool RealTimePTDataInterSYNTHESE::sync(
+			const string& parameter,
+			const InterSYNTHESEIdFilter* idFilter
+		) const	{
+
 			if(parameter.empty())
 			{
 				return false;
@@ -146,8 +150,9 @@ namespace synthese
 					if(	i+3 < fields.size() &&
 						!fields[i+3].empty()
 					){
+						string vertexIdStr = idFilter->convertId(0, string(), fields[i+3]);
 						vertex = Env::GetOfficialEnv().getEditable<StopPoint>(
-							lexical_cast<RegistryKeyType>(fields[i+3])
+							lexical_cast<RegistryKeyType>(vertexIdStr)
 						).get();
 					}
 

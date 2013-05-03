@@ -93,13 +93,15 @@ namespace synthese
 
 			MultipleFileTypesImporter(
 				util::Env& env,
-				const DataSource& dataSource
-			):	Importer(env, dataSource)
+				const Import& import,
+				const ImportLogger& importLogger
+			):	Importer(env, import, importLogger)
 			{}
+
+
 
 			virtual bool _parse(
 				const boost::filesystem::path& filePath,
-				std::ostream& os,
 				const FileKey& fileKey,
 				boost::optional<const server::Request&> request
 			) const = 0;
@@ -146,17 +148,8 @@ namespace synthese
 
 
 			bool parseFiles(
-				std::ostream& os,
 				boost::optional<const server::Request&> request
 			) const {
-
-				// Log stream selection
-				boost::shared_ptr<std::ofstream> logFile;
-				if(_logPath)
-				{
-					logFile.reset(new std::ofstream(_logPath->file_string().c_str()));
-				}
-				std::ostream& logStream(_logPath ? *logFile : os);
 
 				BOOST_FOREACH(const std::string& key, FILES.getFiles())
 				{
@@ -167,7 +160,7 @@ namespace synthese
 					}
 					const FilePathsMap::mapped_type& path(it->second);
 
-					if(!_parse(path, logStream, key, request))
+					if(!_parse(path, key, request))
 					{
 						return false;
 					}

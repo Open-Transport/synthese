@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class ImportLogger;
+	}
+
 	namespace geography
 	{
 		class City;
@@ -63,14 +68,14 @@ namespace synthese
 				const geography::City& city,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& logger
 			);
 
 
 			static RoadPlace* GetRoadPlace(
 				impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync>& roadPlaces,
 				const std::string& code,
-				std::ostream& logStream
+				const impex::ImportLogger& logger
 			);
 
 
@@ -81,7 +86,7 @@ namespace synthese
 				boost::shared_ptr<geos::geom::Point> geometry,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& logger
 			);
 
 
@@ -98,7 +103,7 @@ namespace synthese
 				const geography::City& city,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& logger
 			);
 
 
@@ -117,7 +122,7 @@ namespace synthese
 				PublicPlace& publicPlace,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& logger
 			);
 
 		private:

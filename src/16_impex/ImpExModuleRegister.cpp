@@ -5,20 +5,24 @@
 
 #include "ImpExModule.h"
 
-#include "ImportFunction.h"
+#include "DataSourcesService.hpp"
 #include "ExportFunction.hpp"
+#include "FileFormatsService.hpp"
+#include "ImportFunction.h"
+#include "ImportsService.hpp"
 
 #include "DataSourceTableSync.h"
+#include "ImportTableSync.hpp"
+
 #include "DataSourcesAdmin.h"
 #include "DataSourceAdmin.h"
 
 #include "CleanObsoleteDataAction.hpp"
-#include "DataSourceUpdateAction.hpp"
 
 // Registries
 
 #include "DataSource.h"
-
+#include "Import.hpp"
 
 #include "ImpExModule.inc.cpp"
 
@@ -31,18 +35,22 @@ void synthese::impex::moduleRegister()
 
 	synthese::impex::ImpExModule::integrate();
 
-	synthese::impex::ImportFunction::integrate ();
+	synthese::impex::DataSourcesService::integrate();
 	synthese::impex::ExportFunction::integrate ();
+	synthese::impex::FileFormatsService::integrate();
+	synthese::impex::ImportFunction::integrate ();
+	synthese::impex::ImportsService::integrate();
 
 	synthese::impex::DataSourceTableSync::integrate();
+	synthese::impex::ImportTableSync::integrate();
 
 	synthese::impex::DataSourcesAdmin::integrate();
 	synthese::impex::DataSourceAdmin::integrate();
 
 	synthese::impex::CleanObsoleteDataAction::integrate();
-	synthese::impex::DataSourceUpdateAction::integrate();
 
 	// Registries
 
 	synthese::util::Env::Integrate<synthese::impex::DataSource>();
+	synthese::util::Env::Integrate<synthese::impex::Import>();
 }

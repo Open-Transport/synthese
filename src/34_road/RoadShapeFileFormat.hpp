@@ -31,6 +31,8 @@
 #include "ImportableTableSync.hpp"
 #include "RoadPlaceTableSync.h"
 
+#include "Import.hpp"
+
 #include <map>
 #include <ostream>
 #include <string>
@@ -139,14 +141,12 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Reads an input files and load its content to the memory.
 				/// @param filePath file to read
-				/// @param os stream to write log messages on
 				/// @param key type of the file
 				/// @author Hugues Romain
 				/// @since 3.2.0
 				/// @date 2010
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					std::ostream& os,
 					const std::string& key,
 					boost::optional<const server::Request&> request
 				) const;
@@ -155,10 +155,11 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
-				):	impex::Importer(env, dataSource),
-					impex::MultipleFileTypesImporter<RoadShapeFileFormat>(env, dataSource),
-					_roadPlaces(dataSource, env)
+					const impex::Import& import,
+					const impex::ImportLogger& logger
+				):	impex::Importer(env, import, logger),
+					impex::MultipleFileTypesImporter<RoadShapeFileFormat>(env, import, logger),
+					_roadPlaces(*import.get<impex::DataSource>(), env)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////
