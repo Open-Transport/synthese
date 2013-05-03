@@ -65,37 +65,54 @@ namespace synthese
 
 		void MessageTypesService::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Scenario
-			RegistryKeyType scenarioId(
-				map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_ID, 0)
+			// Message type
+			RegistryKeyType typeId(
+				map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0)
 			);
-			if(scenarioId > 0)
+			if(typeId > 0)
 			{
 				try
 				{
-					_scenario = Env::GetOfficialEnv().get<Scenario>(scenarioId).get();
+					_messageType = Env::GetOfficialEnv().get<MessageType>(typeId).get();
 				}
-				catch (ObjectNotFoundException<Scenario>&)
+				catch (ObjectNotFoundException<MessageType>&)
 				{
-					throw RequestException("No such scenario");
+					throw RequestException("No such message type");
 				}
 			}
+			else
+			{
+				// Scenario
+				RegistryKeyType scenarioId(
+					map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_ID, 0)
+				);
+				if(scenarioId > 0)
+				{
+					try
+					{
+						_scenario = Env::GetOfficialEnv().get<Scenario>(scenarioId).get();
+					}
+					catch (ObjectNotFoundException<Scenario>&)
+					{
+						throw RequestException("No such scenario");
+					}
+				}
 
-			// Message
-			RegistryKeyType messageId(
-				map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_ID, 0)
-			);
-			if(messageId > 0)
-			{
-				try
+				// Message
+				RegistryKeyType messageId(
+					map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_ID, 0)
+				);
+				if(messageId > 0)
 				{
-					_message = Env::GetOfficialEnv().get<Alarm>(messageId).get();
-				}
-				catch (ObjectNotFoundException<Alarm>&)
-				{
-					throw RequestException("No such message");
-				}
-			}
+					try
+					{
+						_message = Env::GetOfficialEnv().get<Alarm>(messageId).get();
+					}
+					catch (ObjectNotFoundException<Alarm>&)
+					{
+						throw RequestException("No such message");
+					}
+			}	}
 		}
 
 
@@ -106,11 +123,18 @@ namespace synthese
 		) const {
 			ParametersMap pm;
 
-			if(_scenario || _message) // Messages types needed by a scenario
+			if(_messageType)
+			{
+				shared_ptr<ParametersMap> typePM(new ParametersMap);
+				_messageType->toParametersMap(*typePM);
+				pm.insert(TAG_TYPE, typePM);
+			}
+			else if(_scenario || _message) // Messages types needed by a scenario
 			{
 				set<MessageType*> messageTypes;
 
 				// Broadcast points loop
+				ParametersMap fakeParameters;
 				BOOST_FOREACH(BroadcastPoint* broadcastPoint, BroadcastPoint::GetBroadcastPoints())
 				{
 					MessageType* messageType(broadcastPoint->getMessageType());
@@ -124,7 +148,7 @@ namespace synthese
 
 					// Search if a message of the scenario have to be displayed on the broadcast point
 					if(	(_scenario && broadcastPoint->displaysScenario(*_scenario)) ||
-						(_message && broadcastPoint->displaysMessage(*_message))
+						(_message && _message->isOnBroadcastPoint(*broadcastPoint, fakeParameters))
 					){
 						messageTypes.insert(broadcastPoint->getMessageType());
 					}
@@ -169,6 +193,7 @@ namespace synthese
 
 
 		MessageTypesService::MessageTypesService():
+			_messageType(NULL),
 			_scenario(NULL),
 			_message(NULL)
 		{

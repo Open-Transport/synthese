@@ -26,6 +26,7 @@
 
 #include "AlarmObjectLink.h"
 #include "AlarmRecipient.h"
+#include "BroadcastPoint.hpp"
 #include "DBModule.h"
 #include "MessagesModule.h"
 #include "RequestException.h"
@@ -51,7 +52,6 @@ namespace synthese
 
 	namespace messages
 	{
-		const string GetMessagesFunction::PARAMETER_RECIPIENT_KEY = "recipient_key";
 		const string GetMessagesFunction::PARAMETER_RECIPIENT_ID("r");
 		const string GetMessagesFunction::PARAMETER_MAX_MESSAGES_NUMBER("n");
 		const string GetMessagesFunction::PARAMETER_BEST_PRIORITY_ONLY("b");
@@ -105,30 +105,25 @@ namespace synthese
 
 		void GetMessagesFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Recipient class
-			string recipientClass(map.getDefault<string>(PARAMETER_RECIPIENT_KEY));
-			if(!recipientClass.empty())
-			{
-				if(!Factory<AlarmRecipient>::contains(recipientClass))
-				{
-					throw RequestException("No such recipient class");
-				}
-				_recipientClass.reset(Factory<AlarmRecipient>::create(recipientClass));
-			}
-
-			// Recipient
+			// Broadcast point
+			RegistryKeyType broadcastPointId(
+				map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID)
+			);
 			try
 			{
-				_recipient = DBModule::GetEditableObject(
-					map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID),
-					*_env
-				).get();
+				const Registrable* object(
+					DBModule::GetObject(broadcastPointId, *_env).get()
+				);
+				if(dynamic_cast<const BroadcastPoint*>(object))
+				{
+					_broadcastPoint = dynamic_cast<const BroadcastPoint*>(object);
+				}
 			}
 			catch(ObjectNotFoundException<Registrable>&)
 			{
-				throw RequestException("No such recipient");
+				throw RequestException("No such broadcast object");
 			}
-
+ 
 			_maxMessagesNumber = map.getOptional<size_t>(PARAMETER_MAX_MESSAGES_NUMBER);
 			_bestPriorityOnly = map.getDefault<bool>(PARAMETER_BEST_PRIORITY_ONLY, true);
 			_priorityOrder = map.getDefault<bool>(PARAMETER_PRIORITY_ORDER, true);
@@ -170,6 +165,16 @@ namespace synthese
 			{
 				setOutputFormatFromMap(map, "");
 			}
+
+			// Parameters
+			_parameters.merge(map);
+			_parameters.remove(PARAMETER_CMS_TEMPLATE_ID);
+			_parameters.remove(PARAMETER_RECIPIENT_ID);
+			_parameters.remove(PARAMETER_MAX_MESSAGES_NUMBER);
+			_parameters.remove(PARAMETER_BEST_PRIORITY_ONLY);
+			_parameters.remove(PARAMETER_PRIORITY_ORDER);
+			_parameters.remove(PARAMETER_DATE);
+			_parameters.remove(PARAMETER_END_DATE);
 		}
 
 
@@ -182,45 +187,31 @@ namespace synthese
 			ParametersMap pm;
 
 			// Getting messages
-			AlarmRecipient::ObjectLinks::mapped_type links;
-			if(_recipientClass)
-			{
-				links = _recipientClass->getLinkedAlarms(*_recipient);
-			}
-			else
-			{
-				BOOST_FOREACH(const shared_ptr<AlarmRecipient>& ar, Factory<AlarmRecipient>::GetNewCollection())
-				{
-					const AlarmRecipient::ObjectLinks::mapped_type& ol(ar->getLinkedAlarms(*_recipient));
-					links.insert(ol.begin(), ol.end());
-				}
-			}
+			MessagesModule::ActivatedMessages messages(
+				MessagesModule::GetActivatedMessages(
+					*_broadcastPoint,
+					_parameters
+			)	);
 
 			size_t number(0);
 
 			optional<AlarmLevel> bestPriority;
 			if(_priorityOrder) // TODO HOW THIS CAN WORK ?
 			{
-				BOOST_FOREACH(const AlarmRecipient::ObjectLinks::mapped_type::value_type& it, links)
+				BOOST_FOREACH(const SentAlarm* message, messages)
 				{
-					if( !dynamic_cast<const SentScenario*>(it->getAlarm()->getScenario()) ||
-						!static_cast<const SentScenario*>(it->getAlarm()->getScenario())->isApplicable(_date, _endDate)
-					){
-						continue;
-					}
 					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
 					{
 						break;
 					}
-					if(_bestPriorityOnly && bestPriority && it->getAlarm()->getLevel() != *bestPriority)
+					if(_bestPriorityOnly && bestPriority && message->getLevel() != *bestPriority)
 					{
 						break;
 					}
-					bestPriority = it->getAlarm()->getLevel();
+					bestPriority = message->getLevel();
 
 					shared_ptr<ParametersMap> messagePM(new ParametersMap);
-					it->getAlarm()->toParametersMap(*messagePM, true);
-					messagePM->insert(ATTR_PARAMETER, it->getParameter());
+					message->toParametersMap(*messagePM, true);
 					pm.insert(DATA_MESSAGE, messagePM);
 
 					++number;
@@ -228,34 +219,23 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(const AlarmRecipient::ObjectLinks::mapped_type::value_type& it, links)
+				BOOST_FOREACH(const SentAlarm* message, messages)
 				{
-					if( !dynamic_cast<const SentScenario*>(it->getAlarm()->getScenario()) ||
-						!static_cast<const SentScenario*>(it->getAlarm()->getScenario())->isApplicable(_date, _endDate)
-					){
-						continue;
-					}
-					bestPriority = it->getAlarm()->getLevel();
+					bestPriority = message->getLevel();
 					break;
 				}
-				BOOST_REVERSE_FOREACH(const AlarmRecipient::ObjectLinks::mapped_type::value_type& it, links)
+				BOOST_REVERSE_FOREACH(const SentAlarm* message, messages)
 				{
-					if( !dynamic_cast<const SentScenario*>(it->getAlarm()->getScenario()) ||
-						!static_cast<const SentScenario*>(it->getAlarm()->getScenario())->isApplicable(_date, _endDate)
-					){
-						continue;
-					}
 					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
 					{
 						break;
 					}
-					if(_bestPriorityOnly && it->getAlarm()->getLevel() != *bestPriority)
+					if(_bestPriorityOnly && message->getLevel() != *bestPriority)
 					{
 						continue;
 					}
 					shared_ptr<ParametersMap> messagePM(new ParametersMap);
-					it->getAlarm()->toParametersMap(*messagePM, true);
-					messagePM->insert(ATTR_PARAMETER, it->getParameter());
+					message->toParametersMap(*messagePM, true);
 					pm.insert(DATA_MESSAGE, messagePM);
 					++number;
 				}
@@ -307,15 +287,15 @@ namespace synthese
 
 
 		GetMessagesFunction::GetMessagesFunction(
-			util::Registrable* recipient /*= NULL*/,
-			boost::shared_ptr<AlarmRecipient> _recipientClass /*= boost::shared_ptr<AlarmRecipient>()*/,
+			const BroadcastPoint* broadcastPoint,
+			util::ParametersMap parameters,
 			boost::optional<size_t> maxMessagesNumber /*= boost::optional<size_t>()*/,
 			bool bestPriorityOnly /*= true*/,
 			bool priorityOrder /*= true*/,
 			boost::posix_time::ptime date /*= second_clock::local_time()*/,
 			boost::posix_time::ptime endDate /*= second_clock::local_time() */
-		):	_recipient(recipient),
-			_recipientClass(_recipientClass),
+		):	_broadcastPoint(broadcastPoint),
+			_parameters(parameters),
 			_maxMessagesNumber(maxMessagesNumber),
 			_bestPriorityOnly(bestPriorityOnly),
 			_priorityOrder(priorityOrder),

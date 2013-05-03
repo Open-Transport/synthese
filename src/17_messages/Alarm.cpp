@@ -24,6 +24,7 @@
 
 #include "AlarmObjectLink.h"
 #include "AlarmRecipient.h"
+#include "BroadcastPoint.hpp"
 #include "DBConstants.h"
 #include "Factory.h"
 #include "MessageAlternative.hpp"
@@ -132,23 +133,15 @@ namespace synthese
 			if(withRecipients)
 			{
 				shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
-				BOOST_FOREACH(const LinkedObjects::value_type& ar, _linkedObjects)
-				{
-					BOOST_FOREACH(const LinkedObjects::mapped_type::value_type& it, ar.second)
-					{
-						shared_ptr<ParametersMap> arPM(new ParametersMap);
-						if(it->getObject())
-						{
-							it->getObject()->toParametersMap(*arPM);
-						}
-						else
-						{
-							arPM->insert(TABLE_COL_ID, 0);
-						}
-						arPM->insert(ATTR_LINK_ID, it->getKey());
-						arPM->insert(ATTR_LINK_PARAMETER, it->getParameter());
-						recipientsPM->insert(ar.first, arPM);
-				}	}
+
+				// Locks the linked objects
+				mutex::scoped_lock(_linkedObjectsMutex);
+
+				// Loop on linked objects
+				LinkedObjectsToParametersMap(
+					_linkedObjects,
+					*recipientsPM
+				);
 				pm.insert(TAG_RECIPIENTS, recipientsPM);
 			}
 		}
@@ -159,4 +152,142 @@ namespace synthese
 		{
 			toParametersMap(pm, true);
 		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Checks if the message must be displayed on the specified broadcast point
+		/// according to the display parameters
+		bool Alarm::_isOnBroadcastPoint(
+			const BroadcastPoint& point,
+			const ParametersMap& parameters
+		) const	{
+
+			// Locks the linked objects
+			mutex::scoped_lock(_linkedObjectsMutex);
+
+			// Asks the broadcast point
+			return point.displaysMessage(_linkedObjects, parameters);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Public view of _isOnBroadcastPoint.
+		bool Alarm::isOnBroadcastPoint(
+			const BroadcastPoint& point,
+			const util::ParametersMap& parameters
+		) const {
+			return _isOnBroadcastPoint(point, parameters);
+		}
+
+
+
+		void Alarm::addLinkedObject(
+			const AlarmObjectLink& link
+		) const	{
+			// Locks the cache
+			mutex::scoped_lock(_linkedObjectsMutex);
+
+			// Adds the object in the cache
+			LinkedObjects::iterator it(
+				_linkedObjects.find(
+					link.getRecipient()->getFactoryKey()
+			)	);
+			if(it == _linkedObjects.end())
+			{
+				it = _linkedObjects.insert(
+					make_pair(
+						link.getRecipient()->getFactoryKey(),
+						LinkedObjects::mapped_type()
+					)
+				).first;
+			}
+			it->second.insert(&link);
+		}
+
+
+
+		void Alarm::removeLinkedObject( const AlarmObjectLink& link ) const
+		{
+			// Locks the cache
+			mutex::scoped_lock(_linkedObjectsMutex);
+
+			// Removes the object of the cache
+			LinkedObjects::iterator it(
+				_linkedObjects.find(
+					link.getRecipient()->getFactoryKey()
+			)	);
+			if(it != _linkedObjects.end())
+			{
+				it->second.erase(&link);
+			}
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Exports linked objects into a parameters map.
+		/// @param linkedObjects the objects to export
+		/// @param pm the parameters map to populate
+		void Alarm::LinkedObjectsToParametersMap(
+			const LinkedObjects& linkedObjects,
+			util::ParametersMap& pm
+		){
+			BOOST_FOREACH(const LinkedObjects::value_type& ar, linkedObjects)
+			{
+				BOOST_FOREACH(const LinkedObjects::mapped_type::value_type& it, ar.second)
+				{
+					shared_ptr<ParametersMap> arPM(new ParametersMap);
+					arPM->insert(TABLE_COL_ID, it->getObjectId());
+					arPM->insert(ATTR_LINK_ID, it->getKey());
+					arPM->insert(ATTR_LINK_PARAMETER, it->getParameter());
+					pm.insert(ar.first, arPM);
+			}	}
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Extracts the linked objects from the cache, for a recipient type only.
+		/// @param recipientKey the factory key of the recipient type
+		/// @return a copy of the list of the recipients
+		Alarm::LinkedObjects::mapped_type Alarm::getLinkedObjects(
+			const std::string& recipientKey
+		) const	{
+
+			// Locks the cache
+			mutex::scoped_lock(_linkedObjectsMutex);
+
+			// Search the recipient key in the cache
+			LinkedObjects::iterator it(
+				_linkedObjects.find(
+					recipientKey
+			)	);
+
+			// If not found return empty list
+			if(it == _linkedObjects.end())
+			{
+				return LinkedObjects::mapped_type();
+			}
+
+			return it->second;
+		}
+
+
+
+		// Class documentation
+		/** @class Alarm
+			Alarm message.
+			@ingroup m17
+
+			An alarm message is intended to be broadcasted at a time period into several destinations :
+				- display screens
+				- route planner results
+				- etc.
+
+			An alarm can be sent individually (single alarm) or in a group built from a scenario (grouped alarm)
+			The _scenario attribute points to the group if applicable.
+		*/
 }	}
+

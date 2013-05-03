@@ -174,6 +174,11 @@ namespace synthese
 							).get()
 						);
 					}
+
+					if(&env == &Env::GetOfficialEnv())
+					{
+						MessagesModule::UpdateActivatedMessages();
+					}
 				}
 			}
 
@@ -225,6 +230,11 @@ namespace synthese
 					SentAlarm& sentAlarm(static_cast<SentAlarm&>(*obj));
 					sentAlarm.getScenario()->removeMessage(sentAlarm);
 				}
+			}
+
+			if(dynamic_cast<SentAlarm*>(obj))
+			{
+				MessagesModule::UpdateActivatedMessages();
 			}
 		}
 

@@ -126,4 +126,92 @@ namespace synthese
 				pm.insert(TAG_APPLICATION_PERIOD, apPM);
 			}
 		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Checks if the current message is active at the specified time.
+		/// @param when the time to check
+		/// @return true if the message must be displayed at the specified time
+		bool SentAlarm::isApplicable( boost::posix_time::ptime& when ) const
+		{
+			// Check if the event is active first
+			if( !getScenario() ||
+				!getScenario()->getIsEnabled()
+			){
+				return false;
+			}
+
+			// Then check if specific application periods are defined for the current message
+			if(!_applicationPeriods.empty())
+			{
+				// Search for an application period including the checked date
+				BOOST_FOREACH(
+					const MessageApplicationPeriod::ApplicationPeriods::value_type& period,
+					_applicationPeriods
+				){
+					if(period->getValue(when))
+					{
+						return true;
+					}
+				}
+
+				// No period was found : the message is inactive
+				return false;
+			}
+
+			// Then check if application periods are defined for the event
+			if(!getScenario()->getApplicationPeriods().empty())
+			{
+				// Search for an application period including the checked date
+				BOOST_FOREACH(
+					const MessageApplicationPeriod::ApplicationPeriods::value_type& period,
+					getScenario()->getApplicationPeriods()
+				){
+					if(period->getValue(when))
+					{
+						return true;
+					}
+				}
+
+				// No period was found : the message is inactive
+				return false;
+			}
+
+			// Then refer to the simple start/end date of the scenario
+			return
+				getScenario()->getPeriodStart() <= when &&
+				getScenario()->getPeriodEnd() >= when;
+		}
+
+
+
+		void SentAlarm::clearBroadcastPointsCache() const
+		{
+			_broadcastPointsCache.clear();
+		}
+
+
+
+		bool SentAlarm::isOnBroadcastPoint(
+			const BroadcastPoint& point,
+			const util::ParametersMap& parameters
+		) const	{
+
+			BroadcastPointsCache::key_type pp(
+				make_pair(&point, parameters)
+			);
+			BroadcastPointsCache::const_iterator it(
+				_broadcastPointsCache.find(pp)
+			);
+			if(it == _broadcastPointsCache.end())
+			{
+				it = _broadcastPointsCache.insert(
+					make_pair(
+						pp,
+						_isOnBroadcastPoint(point, parameters)
+				)	).first;
+			}
+			return it->second;
+		}
 }	}

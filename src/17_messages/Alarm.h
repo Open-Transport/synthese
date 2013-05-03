@@ -41,21 +41,11 @@ namespace synthese
 	namespace messages
 	{
 		class AlarmObjectLink;
+		class BroadcastPoint;
 		class MessageAlternative;
 		class MessageType;
 		class Scenario;
 
-		/** Alarm message.
-			@ingroup m17
-
-			An alarm message is intended to be broadcasted at a time period into several destinations :
-				- display screens
-				- route planner results
-				- etc.
-
-			An alarm can be sent individually (single alarm) or in a group built from a scenario (grouped alarm)
-			The _scenario attribute points to the group if applicable.
-		*/
 		class Alarm:
 			public virtual util::Registrable,
 			public PointerField<Alarm, Alarm>
@@ -77,7 +67,11 @@ namespace synthese
 			static const std::string ATTR_LINK_PARAMETER;
 			static const std::string ATTR_LINK_ID;
 
-			typedef std::map<MessageType*, MessageAlternative*> MessageAlternatives;
+			typedef std::map<
+				MessageType*,
+				MessageAlternative*
+			> MessageAlternatives;
+			
 			typedef std::map<
 				std::string,
 				std::set<
@@ -96,6 +90,7 @@ namespace synthese
 			//@{
 				mutable MessageAlternatives _messageAlternatives;
 				mutable LinkedObjects _linkedObjects;
+				mutable boost::mutex _linkedObjectsMutex;
 			//@}
 
 			Alarm(
@@ -107,6 +102,11 @@ namespace synthese
 				const Alarm& source,
 				const Scenario* scenario
 			);
+
+			bool _isOnBroadcastPoint(
+				const BroadcastPoint& point,
+				const util::ParametersMap& parameters
+			) const;
 
 		public:
 			virtual ~Alarm();
@@ -120,7 +120,6 @@ namespace synthese
 				bool					getRawEditor() const { return _rawEditor; }
 				bool					getDone() const { return _done; }
 				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
-				const LinkedObjects& getLinkedObjects() const { return _linkedObjects; }
 			//@}
 
 			//! @name Setters
@@ -132,7 +131,8 @@ namespace synthese
 				void setRawEditor(bool value){ _rawEditor = value; }
 				void setDone(bool value){ _done = value; }
 				void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
-				void setLinkedObjects(const LinkedObjects& value) const { _linkedObjects = value; }
+				void addLinkedObject(const AlarmObjectLink& link) const;
+				void removeLinkedObject(const AlarmObjectLink& link) const;
 			//@}
 
 			//! @name Services
@@ -156,6 +156,23 @@ namespace synthese
 
 
 				virtual void toParametersMap(util::ParametersMap& pm) const;
+
+
+				static void LinkedObjectsToParametersMap(
+					const LinkedObjects& linkedObjects,
+					util::ParametersMap& pm
+				);
+
+
+				virtual bool isOnBroadcastPoint(
+					const BroadcastPoint& point,
+					const util::ParametersMap& parameters
+				) const;
+
+
+				LinkedObjects::mapped_type getLinkedObjects(
+					const std::string& recipientKey
+				) const;
 			//@}
 		};
 }	}

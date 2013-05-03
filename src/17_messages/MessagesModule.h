@@ -31,6 +31,7 @@
 #include <vector>
 #include <string>
 #include <boost/optional.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace synthese
 {
@@ -66,6 +67,7 @@ namespace synthese
 	*/
 	namespace messages
 	{
+		class BroadcastPoint;
 		class SentAlarm;
 
 		/** 17 Messages module class.
@@ -74,6 +76,21 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
+			typedef std::set<SentAlarm*> ActivatedMessages;
+
+		private:
+			static ActivatedMessages _activatedMessages;
+			static boost::mutex _activatedMessagesMutex;
+			static long _lastMinute;
+
+		public:
+			static void UpdateActivatedMessages();
+
+			static ActivatedMessages GetActivatedMessages(
+				const BroadcastPoint& broadcastPoint,
+				const util::ParametersMap& parameters
+			);
+
 			struct SentAlarmLess : public std::binary_function<SentAlarm*, SentAlarm*, bool>
 			{
 				//////////////////////////////////////////////////////////////////////////
@@ -130,6 +147,8 @@ namespace synthese
 			static Labels			getTextTemplateLabels(const AlarmLevel& level);
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
+
+			static void MessagesActivationThread();
 		};
 	}
 	/** @} */

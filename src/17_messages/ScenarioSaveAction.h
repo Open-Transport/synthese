@@ -115,7 +115,7 @@ namespace synthese
 					std::pair< // pair<pair>> instead of tuple because of VS2010 bug http://connect.microsoft.com/VisualStudio/feedback/details/534457/c-map-tuple-v-compilation-problems
 						std::string,
 						std::pair<
-							util::Registrable*,
+							util::RegistryKeyType,
 							std::string
 				>	>	> Recipients;
 				Recipients recipients;
@@ -160,11 +160,12 @@ namespace synthese
 				SentScenario::VariablesMap							_variables;
 				boost::optional<std::string>						_messageToCreate;
 				boost::optional<std::string>						_messageToCreateTitle;
+				typedef 
 				boost::optional<
 					std::vector<
-						boost::shared_ptr<
-							util::Registrable
-				>	>	>	_recipients;
+					std::pair<util::RegistryKeyType, boost::optional<std::string> >
+				>	>	Recipients;
+				Recipients _recipients;
 				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;
 				std::string											_dataSourceLinkId;
