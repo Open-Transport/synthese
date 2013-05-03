@@ -71,6 +71,8 @@ namespace synthese
 			static const std::string PARAMETER_GROUP_BY_CITIES;
 
 		private:
+			static const std::string TAG_CITY;
+			static const std::string TAG_STOP;
 			static const std::string DATA_LINE;
 			static const std::string DATA_LINES;
 			static const std::string DATA_STOP_RANK;
