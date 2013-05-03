@@ -24,6 +24,7 @@
 // scons workaround
 #ifdef INEO_FILE_PATTERN
 
+#include "Import.hpp"
 #include "IneoFileFormat.hpp"
 #include "PTModuleRegister.cpp"
 #include "ImpExModuleRegister.cpp"
@@ -63,9 +64,13 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 	Env& env(Env::GetOfficialEnv());
 
 	shared_ptr<DataSource> ds(new DataSource(16607027920896001));
-	ds->setFormat("Ineo");
 	env.getEditableRegistry<DataSource>().add(ds);
-	
+
+	shared_ptr<Import> import(new Import(1)); // TODO put real number
+	import->set<DataSource>(*ds);
+	import->set<synthese::FileFormatKey>("Ineo");
+
+
 	// STOP1
 	shared_ptr<StopPoint> sp1(new StopPoint);
 	
@@ -83,15 +88,15 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 	map.insert(IneoFileFormat::Importer_::FILE_HOR, ineoFilePattern + ".hor");
 	map.insert(IneoFileFormat::Importer_::FILE_CAL, ineoFilePattern + ".cal");
 
-	boost::shared_ptr<Importer> importer(ds->getImporter(env));
+	stringstream logstream;
+	ImportLogger logger(ImportLogger::ALL, string(), logstream);
+	boost::shared_ptr<Importer> importer(import->getImporter(env, logger));
 	importer->setFromParametersMap(map, true);
 
-	stringstream output;
 	bool doImport(
 		importer->beforeParsing()
 	);
-	doImport &= importer->parseFiles(output, boost::optional<const Request&>());
-	importer->getLogger().output(output);
+	doImport &= importer->parseFiles(boost::optional<const Request&>());
 	doImport &= importer->afterParsing();
 	
 	
