@@ -127,6 +127,7 @@ namespace synthese
 						linkLevel
 				)	);
 				object->setAlarm(&alarm);
+				alarm.addLinkedObject(*object);
 
 				// link the object in the alarm
 				SentAlarm* sentAlarm(
@@ -152,6 +153,7 @@ namespace synthese
 		){
 			if(object->getAlarm())
 			{
+				object->getAlarm()->removeLinkedObject(*object);
 				// link the object in the alarm (only if the linked object was found)
 				SentAlarm* sentAlarm(
 					dynamic_cast<SentAlarm*>(
