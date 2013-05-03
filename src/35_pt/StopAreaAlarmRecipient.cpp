@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// departure_boards
 #include "StopAreaAlarmRecipient.hpp"
+
+#include "City.h"
 #include "ResultHTMLTable.h"
 #include "SecurityConstants.hpp"
+#include "StopPoint.hpp"
 #include "User.h"
 #include "Profile.h"
 #include "HTMLList.h"
@@ -52,6 +54,7 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace geography;
 	using namespace messages;
 	using namespace util;
 	using namespace server;
@@ -68,13 +71,6 @@ namespace synthese
 
 	namespace messages
 	{
-	    /* IMPORTANT : for some reason, probably a gcc bug, is was necessary to
-	       explicitly call constructor with () in order to avoid undefined references.
-	       This should be investigate further.
-	    */
-		template<>
-		AlarmRecipient::ObjectLinks	AlarmRecipientTemplate<StopAreaAlarmRecipient>::_linksObject = AlarmRecipient::ObjectLinks();
-
 		template<> const string AlarmRecipientTemplate<StopAreaAlarmRecipient>::TITLE("Arrêts");
 
 		template<> void AlarmRecipientTemplate<StopAreaAlarmRecipient>::GetParametersLabels(
@@ -247,5 +243,74 @@ namespace synthese
 			TransportNetworkRight* result(new TransportNetworkRight);
 			result->setParameter(perimeter);
 			return shared_ptr<Right>(result);
+		}
+
+
+
+		StopAreaAlarmRecipient::AvailableRecipients::Tree::value_type StopAreaAlarmRecipient::getAvailableRecipients() const
+		{
+			// Root item
+			shared_ptr<AvailableRecipients> result(new AvailableRecipients);
+			result->id = 0;
+			result->name = "Tous les arrêts";
+
+			// Sort cities alphabetically
+			typedef multimap<string, City*> Cities;
+			Cities cities;
+			BOOST_FOREACH(
+				const Registry<City>::value_type& item,
+				Env::GetOfficialEnv().getRegistry<City>()
+			){
+				cities.insert(make_pair(item.second->getName(), item.second.get()));
+			}
+
+			// Cities loop
+			BOOST_FOREACH(const Cities::value_type& city, cities)
+			{
+				// Register city
+				shared_ptr<AvailableRecipients> cityObj(new AvailableRecipients);
+				cityObj->id = city.second->getKey();
+				cityObj->name = city.first;
+				result->tree.push_back(cityObj);
+
+				// Sort stop areas
+				typedef multimap<string, StopArea*> StopAreas;
+				StopAreas stopAreas;
+				BOOST_FOREACH(
+					const City::PlacesMatcher::Map::value_type& stopArea,
+					city.second->getLexicalMatcher(StopArea::FACTORY_KEY).entries()
+				){
+					stopAreas.insert(
+						make_pair(
+							stopArea.second->getName(),
+							static_cast<StopArea*>(stopArea.second.get())
+					)	);
+				}
+
+				// Stop areas loop
+				BOOST_FOREACH(const StopAreas::value_type& stopAreaItem, stopAreas)
+				{
+					const StopArea& stopArea(*stopAreaItem.second);
+
+					// Register stop area
+					shared_ptr<AvailableRecipients> stopAreaObj(new AvailableRecipients);
+					stopAreaObj->id = stopArea.getKey();
+					stopAreaObj->name = stopArea.getName();
+					cityObj->tree.push_back(stopAreaObj);
+
+					// Physical stops loop
+					BOOST_FOREACH(
+						const StopArea::PhysicalStops::value_type& stop,
+						stopArea.getPhysicalStops()
+					){
+						shared_ptr<AvailableRecipients> stopObj(new AvailableRecipients);
+						stopObj->id = stop.first;
+						stopObj->name = stop.second->getName() +" ("+ stop.second->getCodeBySources() +")";
+						stopAreaObj->tree.push_back(stopObj);
+					}
+				}
+			}
+
+			return result;
 		}
 }	}

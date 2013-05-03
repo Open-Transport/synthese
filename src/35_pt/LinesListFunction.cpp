@@ -29,6 +29,7 @@
 #include "CalendarTemplate.h"
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
+#include "CustomBroadcastPoint.hpp"
 #include "GetMessagesFunction.hpp"
 #include "ImportableTableSync.hpp"
 #include "JourneyPattern.hpp"
@@ -39,7 +40,6 @@
 #include "Right.h"
 #include "Session.h"
 #include "User.h"
-#include "CommercialLine.h"
 #include "Path.h"
 #include "Request.h"
 #include "RequestException.h"
@@ -108,7 +108,6 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_LETTERS_BEFORE_NUMBERS = "letters_before_numbers";
 		const string LinesListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
-		const string LinesListFunction::PARAMETER_OUTPUT_MESSAGES = "output_messages";
 		const string LinesListFunction::PARAMETER_RIGHT_CLASS = "right_class";
 		const string LinesListFunction::PARAMETER_RIGHT_LEVEL = "right_level";
 		const string LinesListFunction::PARAMETER_CONTACT_CENTER_ID = "contact_center_id";
@@ -118,10 +117,11 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_CALENDAR_FILTER = "calendar_filter";
 		const string LinesListFunction::PARAMETER_RUNS_SOON_FILTER = "runs_soon_filter";
 		const string LinesListFunction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER = "display_duration_before_first_departure_filter";
+		const string LinesListFunction::PARAMETER_BROADCAST_POINT_ID = "broadcast_point_id";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
-		const string LinesListFunction::DATA_LINE("line");
+		const string LinesListFunction::TAG_LINE = "line";
 		const string LinesListFunction::DATA_LINES("lines");
 		const string LinesListFunction::DATA_STOP_AREAS("stopAreas");
 		const string LinesListFunction::DATA_STOP_AREA("stopArea");
@@ -135,8 +135,6 @@ namespace synthese
 		const string LinesListFunction::DATA_Y("y");
 		const string LinesListFunction::DATA_TERMINUS("terminus");
 		const string LinesListFunction::DATA_STOP_AREA_TERMINUS("stopAreaTerminus");
-
-
 
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
@@ -178,7 +176,10 @@ namespace synthese
 			result.insert(PARAMETER_OUTPUT_TERMINUSES, _outputTerminuses);
 
 			// Output messages
-			result.insert(PARAMETER_OUTPUT_MESSAGES, _outputMessages);
+			if(_broadcastPoint)
+			{
+				result.insert(PARAMETER_BROADCAST_POINT_ID, _broadcastPoint->getKey());
+			}
 
 			// Page or output format
 			if(_page.get())
@@ -323,7 +324,20 @@ namespace synthese
 			}
 
 			// Output messages
-			_outputMessages = map.isTrue(PARAMETER_OUTPUT_MESSAGES);
+			RegistryKeyType broadcastPointId(
+				map.getDefault<RegistryKeyType>(PARAMETER_BROADCAST_POINT_ID, 0)
+			);
+			if(broadcastPointId)
+			{
+				try
+				{
+					_broadcastPoint = Env::GetOfficialEnv().get<CustomBroadcastPoint>(broadcastPointId).get();
+				}
+				catch(ObjectNotFoundException<CustomBroadcastPoint>&)
+				{
+					throw RequestException("No such broadcast point");
+				}
+			}
 
 			// Output
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
@@ -922,27 +936,28 @@ namespace synthese
 					}
 
 					// Messages output
-					if(_outputMessages)
+					if(_broadcastPoint)
 					{
+						// Parameters map
+						ParametersMap parameters;
+						parameters.insert(TAG_LINE, linePM);
+
 						GetMessagesFunction f(
-							const_cast<CommercialLine*>(line.get()),
-							shared_ptr<LineAlarmRecipient>(),
-							optional<size_t>(),
-							true,
-							true,
-							second_clock::local_time(),
-							second_clock::local_time()
+							_broadcastPoint,
+							parameters
 						);
-						*linePM = f.run(stream, request);
+						linePM->merge(
+							f.run(stream, request)
+						);
 					}
 
-					pm.insert(DATA_LINE, linePM);
+					pm.insert(TAG_LINE, linePM);
 			}	}
 
 			if(_page.get()) // CMS output
 			{
 				size_t rank(0);
-				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(DATA_LINE))
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(TAG_LINE))
 				{
 					// Template parameters
 					pmLine->merge(getTemplateParameters());
@@ -977,7 +992,7 @@ namespace synthese
 			else if(_outputFormat == MimeTypes::CSV)
 			{
 				// Hand made formatting for CSV.
-				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(DATA_LINE))
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(TAG_LINE))
 				{
 					stream << pmLine->get<string>(CommercialLine::DATA_LINE_ID) << ";" << pmLine->get<string>(CommercialLine::DATA_LINE_SHORT_NAME) << "\n";
 				}
@@ -1020,7 +1035,8 @@ namespace synthese
 			_ignoreLineShortName(false),
 			_outputMessages(false),
 			_lettersBeforeNumbers(true),
-			_displayDurationBeforeFirstDepartureFilter(false)
+			_displayDurationBeforeFirstDepartureFilter(false),
+			_broadcastPoint(NULL)
 		{}
 
 
