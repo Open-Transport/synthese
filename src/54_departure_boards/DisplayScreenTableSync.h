@@ -91,6 +91,7 @@ namespace synthese
 				static const std::string COL_SUB_SCREEN_TYPE;
 				static const std::string COL_DATASOURCE_LINKS;
 				static const std::string COL_ALLOW_CANCELED;
+				static const std::string COL_STOP_POINT_LOCATION;
 			//@}
 
 
