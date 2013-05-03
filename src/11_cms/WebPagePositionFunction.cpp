@@ -48,6 +48,11 @@ namespace synthese
 		const string WebPagePositionFunction::PARAMETER_DISPLAY_PAGE_ID("display_page_id");
 		const string WebPagePositionFunction::PARAMETER_MIN_DEPTH("min_depth");
 		const string WebPagePositionFunction::PARAMETER_MAX_DEPTH("max_depth");
+		const string WebPagePositionFunction::PARAMETER_RAW_DATA = "raw_data";
+
+		const string WebPagePositionFunction::TAG_PAGE = "page";
+
+
 
 		ParametersMap WebPagePositionFunction::_getParametersMap() const
 		{
@@ -65,8 +70,14 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void WebPagePositionFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Raw data
+			_rawData = map.getDefault<bool>(PARAMETER_RAW_DATA, false);
+
+			// Page
 			try
 			{
 				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
@@ -75,16 +86,25 @@ namespace synthese
 			{
 				throw RequestException("No such web page");
 			}
-			optional<RegistryKeyType> displayPageId(map.getOptional<RegistryKeyType>(PARAMETER_DISPLAY_PAGE_ID));
-			if(displayPageId) try
+
+			// Display page
+			if(!_rawData)
 			{
-				_displayPage = Env::GetOfficialEnv().get<Webpage>(*displayPageId);
+				optional<RegistryKeyType> displayPageId(map.getOptional<RegistryKeyType>(PARAMETER_DISPLAY_PAGE_ID));
+				if(displayPageId) try
+				{
+					_displayPage = Env::GetOfficialEnv().get<Webpage>(*displayPageId);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such display page");
+				}
 			}
-			catch (ObjectNotFoundException<Webpage>&)
-			{
-				throw RequestException("No such display page");
-			}
+
+			// Min depth
 			_minDepth = map.getDefault<size_t>(PARAMETER_MIN_DEPTH, 1);
+
+			// Max depth
 			optional<int> depth = map.getOptional<int>(PARAMETER_MAX_DEPTH);
 			if(depth)
 			{
@@ -105,15 +125,22 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			ParametersMap pm;
+
+			// Get the tree branch
 			deque<const Webpage*> pages;
 			for(const Webpage* page(_page.get()); page != NULL; page = page->getParent())
 			{
 				pages.push_front(page);
 			}
+
+			// Populate the parameters map
 			size_t depth(0);
 			bool first(true);
 			BOOST_FOREACH(const Webpage* curPage, pages)
 			{
+				// Jump or break depending on the depth
 				++depth;
 				if(depth < _minDepth)
 				{
@@ -123,10 +150,18 @@ namespace synthese
 				{
 					break;
 				}
-				if(_displayPage.get())
+
+				// Export the page
+				if(_rawData)
 				{
-					ParametersMap pm(getTemplateParameters());
-					curPage->toParametersMap(pm, true, false);
+					shared_ptr<ParametersMap> pagePM(new ParametersMap);
+					curPage->toParametersMap(*pagePM, true, false);
+					pm.insert(TAG_PAGE, pagePM);
+				}
+				else if(_displayPage.get())
+				{
+					ParametersMap pagePM(getTemplateParameters());
+					curPage->toParametersMap(pagePM, true, false);
 					_displayPage->display(stream, request, pm);
 				}
 				else
@@ -140,7 +175,7 @@ namespace synthese
 				}
 			}
 
-			return util::ParametersMap();
+			return pm;
 		}
 
 
@@ -157,5 +192,11 @@ namespace synthese
 		{
 			return "text/html";
 		}
-	}
-}
+
+
+
+		WebPagePositionFunction::WebPagePositionFunction():
+			_minDepth(1),
+			_rawData(false)
+		{}
+}	}

@@ -57,10 +57,9 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_PAGE_ID;
 			static const std::string PARAMETER_MIN_DEPTH;
 			static const std::string PARAMETER_MAX_DEPTH;
-			static const std::string PARAMETER_BEGINNING;
-			static const std::string PARAMETER_ENDING;
-			static const std::string PARAMETER_BEGINNING_SELECTED;
-			static const std::string PARAMETER_ENDING_SELECTED;
+			static const std::string PARAMETER_RAW_DATA;
+
+			static const std::string TAG_PAGE;
 
 		protected:
 			//! \name Page parameters
@@ -69,6 +68,7 @@ namespace synthese
 				boost::shared_ptr<const Webpage> _displayPage;
 				std::size_t _minDepth;
 				boost::optional<std::size_t> _maxDepth;
+				bool _rawData;
 			//@}
 
 
@@ -92,10 +92,7 @@ namespace synthese
 
 
 		public:
-			//! @name Setters
-			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
-			//@}
+			WebPagePositionFunction();
 
 
 
