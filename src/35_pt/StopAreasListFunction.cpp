@@ -78,11 +78,15 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_OUTPUT_STOPS = "output_stops";
 		const string StopAreasListFunction::PARAMETER_GROUP_BY_CITIES = "group_by_cities";
 
+		const string StopAreasListFunction::TAG_CITY = "city";
+		const string StopAreasListFunction::TAG_STOP = "stop";
 		const string StopAreasListFunction::DATA_LINE = "line";
 		const string StopAreasListFunction::DATA_LINES = "lines";
 		const string StopAreasListFunction::DATA_STOP_RANK("stop_rank");
 		const string StopAreasListFunction::DATA_STOP_AREA("stopArea");
 		const string StopAreasListFunction::DATA_STOP_AREAS("stopAreas");
+
+
 
 		ParametersMap StopAreasListFunction::_getParametersMap() const
 		{
@@ -255,20 +259,33 @@ namespace synthese
 
 		StopAreasListFunction::StopAreasListFunction():
 			_coordinatesSystem(NULL),
-			_outputLines(true)
+			_outputLines(true),
+			_outputStops(false),
+			_groupByCities(false)
 		{}
 
 
 
 		struct StopAreasComparator
 		{
-		bool operator()(const StopArea* s1, const StopArea* s2) const
+			bool operator()(const StopArea* s1, const StopArea* s2) const
 			{
-				if(s1->getName() == s2->getName())
-				{
-					return s1 < s2;
+				if(	s1->getCity() != s2->getCity()
+				){
+					if(s1->getCity()->getName() != s2->getCity()->getName())
+					{
+						return s1->getCity()->getName() < s2->getCity()->getName();
+					}
+					else
+					{
+						return s1->getCity() < s2->getCity();
+					}
 				}
-				return s1->getName() < s2->getName();
+				if(s1->getName() != s2->getName())
+				{
+					return s1->getName() < s2->getName();
+				}
+				return s1 < s2;
 			}
 		};
 
@@ -334,7 +351,8 @@ namespace synthese
 				BOOST_FOREACH(const Registry<StopArea>::value_type& stopArea, Env::GetOfficialEnv().getRegistry<StopArea>())
 				{
 					if(	!stopArea.second->getPoint().get() ||
-						(_bbox && !_bbox->contains(*stopArea.second->getPoint()->getCoordinate()))
+						(_bbox && !_bbox->contains(*stopArea.second->getPoint()->getCoordinate())) ||
+						!stopArea.second->getCity()
 					){
 						continue;
 					}
@@ -376,11 +394,32 @@ namespace synthese
 
 			// Stops loop
 			ParametersMap pm;
+			const City* lastCity(NULL);
+			shared_ptr<ParametersMap> cityPM;
 			BOOST_FOREACH(StopSet::value_type it, stopSet)
 			{
-				shared_ptr<ParametersMap> stopPm(new ParametersMap);
+				// Group by cities
+				if(_groupByCities && it->getCity() != lastCity)
+				{
+					cityPM.reset(new ParametersMap);
+					it->getCity()->toParametersMap(*cityPM, _coordinatesSystem);
+					pm.insert(TAG_CITY, cityPM);
+					lastCity = it->getCity();
+				}
 
+				shared_ptr<ParametersMap> stopPm(new ParametersMap);
 				it->toParametersMap(*stopPm, _coordinatesSystem);
+
+				// Output stops
+				if(_outputStops)
+				{
+					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, it->getPhysicalStops())
+					{
+						shared_ptr<ParametersMap> sPm(new ParametersMap);
+						itStop.second->toParametersMap(*sPm);
+						stopPm->insert(TAG_STOP, sPm);
+					}
+				}
 
 				// Lines calling at the stop
 				if(_outputLines)
@@ -417,7 +456,14 @@ namespace synthese
 					}
 				}
 
-				pm.insert(DATA_STOP_AREA, stopPm);
+				if(_groupByCities)
+				{
+					cityPM->insert(DATA_STOP_AREA, stopPm);
+				}
+				else
+				{
+					pm.insert(DATA_STOP_AREA, stopPm);
+				}
 			}
 
 			// Informations about the request

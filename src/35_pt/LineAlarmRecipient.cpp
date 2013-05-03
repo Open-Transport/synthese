@@ -20,10 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// departure_boards
 #include "LineAlarmRecipient.hpp"
+
 #include "ResultHTMLTable.h"
 #include "SecurityConstants.hpp"
+#include "TreeFolder.hpp"
 #include "User.h"
 #include "Profile.h"
 #include "HTMLList.h"
@@ -53,6 +54,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace messages;
+	using namespace tree;
 	using namespace util;
 	using namespace server;
 	using namespace pt;
@@ -68,15 +70,6 @@ namespace synthese
 
 	namespace messages
 	{
-	    /* IMPORTANT : for some reason, probably a gcc bug, is was necessary to
-	       explicitly call constructor with () in order to avoid undefined references.
-	       This should be investigate further.
-	    */
-
-
-		template<>
-		AlarmRecipient::ObjectLinks AlarmRecipientTemplate<LineAlarmRecipient>::_linksObject = AlarmRecipient::ObjectLinks();
-
 		template<>
 		const string AlarmRecipientTemplate<LineAlarmRecipient>::TITLE("Lignes");
 
@@ -250,5 +243,84 @@ namespace synthese
 			TransportNetworkRight* result(new TransportNetworkRight);
 			result->setParameter(perimeter);
 			return shared_ptr<Right>(result);
+		}
+
+
+
+		AlarmRecipient::AvailableRecipients::Tree::value_type LineAlarmRecipient::getAvailableRecipients() const
+		{
+			// Root item
+			shared_ptr<AvailableRecipients> result(new AvailableRecipients);
+			result->id = 0;
+			result->name = "Toutes les lignes";
+
+			// Networks
+			BOOST_FOREACH(
+				const Registry<TransportNetwork>::value_type& item,
+				Env::GetOfficialEnv().getRegistry<TransportNetwork>()
+			){
+				result->tree.push_back(
+					_addNodeToAvailableRecipient(
+						*item.second
+				)	);
+			}
+
+			return result;
+		}
+
+
+
+		shared_ptr<LineAlarmRecipient::AvailableRecipients> LineAlarmRecipient::_addNodeToAvailableRecipient(
+			const TreeFolderUpNode& node
+		){
+			// The node
+			shared_ptr<AvailableRecipients> result(new AvailableRecipients);
+			result->id = node.getKey();
+			if(dynamic_cast<const TransportNetwork*>(&node))
+			{
+				result->name = static_cast<const TransportNetwork&>(node).getName();
+			}
+			else if(dynamic_cast<const TreeFolder*>(&node))
+			{
+				result->name = static_cast<const TreeFolder&>(node).getName();
+			}
+
+			// Folder loop
+			BOOST_FOREACH(
+				TreeFolder* folder,
+				node.getChildren<TreeFolder>()
+			){
+				result->tree.push_back(
+					_addNodeToAvailableRecipient(*folder)
+				);
+			}
+
+			// Lines loop
+			BOOST_FOREACH(
+				CommercialLine* line,
+				node.getChildren<CommercialLine>()
+			){
+				// Line node
+				shared_ptr<AvailableRecipients> lineObj(new AvailableRecipients);
+				lineObj->id = line->getKey();
+				lineObj->name = "Ligne "+ line->getShortName() + " (" + line->getLongName() + ")";
+				result->tree.push_back(lineObj);
+
+				// Direction 1
+				shared_ptr<AvailableRecipients> lineForward(new AvailableRecipients);
+				lineForward->id = line->getKey();
+				lineForward->parameter = "0";
+				lineForward->name = "Ligne "+ line->getShortName() + " sens aller";
+				lineObj->tree.push_back(lineForward);
+
+				// Direction 2
+				shared_ptr<AvailableRecipients> lineBackward(new AvailableRecipients);
+				lineBackward->id = line->getKey();
+				lineBackward->parameter = "1";
+				lineBackward->name = "Ligne "+ line->getShortName() + " sens retour";
+				lineObj->tree.push_back(lineBackward);
+			}
+
+			return result;
 		}
 }	}

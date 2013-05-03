@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace tree
+	{
+		class TreeFolderUpNode;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -51,6 +56,13 @@ namespace synthese
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const util::ParametersMap& parameters) const;
 
 			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const;
+
+			virtual AvailableRecipients::Tree::value_type getAvailableRecipients() const;
+
+		private:
+			static boost::shared_ptr<AvailableRecipients> _addNodeToAvailableRecipient(
+				const tree::TreeFolderUpNode& node
+			);
 		};
 }	}
 

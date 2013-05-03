@@ -62,6 +62,11 @@ namespace synthese
 		class RollingStockFilter;
 	}
 
+	namespace messages
+	{
+		class CustomBroadcastPoint;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
@@ -87,7 +92,6 @@ namespace synthese
 			static const std::string PARAMETER_LETTERS_BEFORE_NUMBERS;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_OUTPUT_GEOMETRY;
-			static const std::string PARAMETER_OUTPUT_MESSAGES;
 			static const std::string PARAMETER_OUTPUT_STOPS;
 			static const std::string PARAMETER_OUTPUT_TERMINUSES;
 			static const std::string PARAMETER_PAGE_ID;
@@ -103,10 +107,11 @@ namespace synthese
 			static const std::string PARAMETER_CALENDAR_FILTER;
 			static const std::string PARAMETER_RUNS_SOON_FILTER;
 			static const std::string PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER;
+			static const std::string PARAMETER_BROADCAST_POINT_ID;
 
 			static const std::string FORMAT_WKT;
 
-			static const std::string DATA_LINE;
+			static const std::string TAG_LINE;
 			static const std::string DATA_LINES;
 			static const std::string DATA_STOP_AREAS;
 			static const std::string DATA_STOP_AREA;
@@ -151,6 +156,7 @@ namespace synthese
 				calendar::Calendar _calendarDaysFilter;
 				boost::optional<boost::posix_time::time_duration> _runsSoonFilter;
 				bool _displayDurationBeforeFirstDepartureFilter;
+				const messages::CustomBroadcastPoint* _broadcastPoint;
 			//@}
 
 			mutable boost::optional<const security::RightsOfSameClassMap&> _rights;
