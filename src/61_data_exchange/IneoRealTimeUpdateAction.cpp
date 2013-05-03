@@ -681,6 +681,7 @@ namespace synthese
 						link->setKey(AlarmObjectLinkTableSync::getId());
 						link->setAlarm(message);
 						link->setObject(itDest.syntheseDisplayBoard);
+						link->setRecipientKey("displayscreen");
 						updatesEnv.getEditableRegistry<AlarmObjectLink>().add(link);
 					}
 				}
