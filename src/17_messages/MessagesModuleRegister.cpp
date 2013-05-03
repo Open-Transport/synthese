@@ -116,6 +116,9 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioFolderAdd::integrate();
 	synthese::messages::ScenarioFolderUpdateAction::integrate();
 
+	synthese::messages::CustomBroadcastPoint::integrate();
+	synthese::messages::MailingList::integrate();
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
 	synthese::util::Env::Integrate<synthese::messages::MailingList>();
