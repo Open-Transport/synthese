@@ -1,15 +1,63 @@
+<@folder_id=<@roid?roid:0@>@>
+
+<ul class="breadcrumb">
+ <@folder_id?  
+   ("<li>" + <?link&target=<@p@>?> + " <span class=\"divider\">/</span></li>"):
+   "<li class=\"active\">Bibliothèque</li>"
+ @>
+ <?ScenarioFoldersService&
+   root_id=0&
+   template=<{folder&recursive=1&template=
+   	<@recursive_content?("<li>"+<?link&target=<@p@>&roid=<@id@>&text=<@name@>?>+" <span class=\"divider\">/</span></li>"):""@>
+   	<@(id==folder_id)?("<li class=\"active\">"+name+"</li>"):""@>
+   	<@recursive_content@>
+ }>?>
+</ul>
+
+<div class="row-fluid">
+<div class="span3" id="tree">
+<ul class="nav nav-list well">
+ <li<@folder_id?"":" class=\"active\""@>><?link&
+                                      target=<@p@>&
+                                      text=Bibliothèque<@folder_id?"":"<div class=\"pull-right\" onclick=\"$('#newdir').modal('show'); return false;\"><i class=\"icon-plus icon-white\"></i></div>"@>?></li>
+ <?if&cond=<@folder_id@>&then=<@has_scenario=<?scenarii&t=1&f=<@folder_id@>&template=<{scenario&template=1}>?>@>?>
+ <?ScenarioFoldersService&
+   root_id=0&
+   template=<{folder&recursive=1&template=
+   	<li<@(id==folder_id)?" class=\"active\"":""@> style="padding-left:<@15+(depth*15)@>px;"><?link&
+   	      target=<@p@>&
+   	      roid=<@id@>&
+   	      text=<@name@>
+   	      <@(id==folder_id)?"<div class=\"pull-right\" onclick=\"$('#newdir').modal('show'); return false;\"><i class=\"icon-plus icon-white\"></i></div>":""@>
+   	      <@((!has_scenario)&&(id==folder_id))?"<div class=\"pull-right\" onclick=\"$('#removedir').modal('show'); return false;\"><i class=\"icon-remove icon-white\"></i></div>":""@>
+	?></li>
+   	<@recursive_content@>   
+ }>?>
+</ul>
+
+</div>
+<div class="span9">
+
+
 <?form&name=search&page_id=<@p@>&class=form well?>
 <input name="text_search" value="<@text_search@>" />
 <button class="btn btn-primary">Rechercher</button>
 </form>
 
-<?form&name=scenario_add&page_id=17732932122705950&a=masca&lib=1?>
+<?form&
+  name=scenario_add&
+  target=/lib/scenario&
+  a=masca&
+  actionParamfi=<@folder_id@>&
+  co=1&
+?>
 <table class="table table-striped">
 <thead><tr><th>nom</th><th>comm</th><th>expl</th><th>iv</th><th></th></tr></thead>
 <tbody>
 <?scenarii&
 	t=1&
 	text_search=<@text_search@>&
+	f=<@roid@>&
 	template=<{scenario&template=
 		<tr>
 		 <td><@name@></td>
@@ -28,3 +76,53 @@
 <td></td>
 <td><button class="btn-warning btn btn-mini">Ajouter</button></td></tr>
 </tfoot></table></form>
+
+</div></div>
+
+<div class="modal hide fade" id="newdir">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Nouveau répertoire</h3>
+ </div>
+ <?form&
+   name=newdir&
+   a=ScenarioFolderAdd&
+   target=<@p@>&
+   co=1&
+   class=form-horizontal&
+   actionParampi=<@folder_id@>
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls">
+     <input type="text" name="actionParamna">
+    </div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer le répertoire</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="removedir">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Suppression de répertoire</h3>
+ </div>
+ <?form&
+   name=newdir&
+   a=RemoveObjectAction&
+   target=<@p@>&
+   roid=0&
+   actionParamoi=<@folder_id@>
+ ?>
+  <div class="modal-body">
+   <p>Etes-vous sûr de vouloir supprimer le répertoire ?</p>
+  </div><div class="modal-footer">
+   <button class="btn btn-danger" type="submit">Oui</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
+  </div>
+ </form>
+</div>
