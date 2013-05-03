@@ -1101,6 +1101,5 @@ SAVE(JourneyPattern, li98);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 DataSource ds05(16607023625928705ULL);
-ds05.setName("test source");
-ds05.setFormat("Trident");
+ds05.set<Name>("test source");
 SAVE(DataSource, ds05);
