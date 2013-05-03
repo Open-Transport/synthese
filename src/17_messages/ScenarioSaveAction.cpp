@@ -323,35 +323,43 @@ namespace synthese
 						vector<string> recipients;
 						string recipientStr(map.get<string>(PARAMETER_RECIPIENT_ID));
 						boost::algorithm::split(recipients, recipientStr, is_any_of(","));
-						_recipients = vector<shared_ptr<Registrable> >();
+						_recipients = Recipients::value_type();
 						BOOST_FOREACH(const string& recipient, recipients)
 						{
+							vector<string> recipientParams;
+							boost::algorithm::split(recipientParams, recipient, is_any_of("|"));
+							Recipients::value_type::value_type rec;
+
 							try
 							{
-								if(!lexical_cast<RegistryKeyType>(recipient))
+								if(!lexical_cast<RegistryKeyType>(recipientParams[0]))
 								{
-									_recipients->push_back(shared_ptr<Registrable>());
+									rec.first = 0;
 								}
 								else if(_recipientDataSource.get())
 								{
-									_recipients->push_back(
+									rec.first =
 										DBModule::GetEditableObject(
 											recipientType->getObjectIdBySource(
 												*_recipientDataSource,
-												recipient,
+												recipientParams[0],
 												*_env
 											),
 											*_env
-									)	);
+										)->getKey()
+									;
 								}
 								else
 								{
-									_recipients->push_back(
-										DBModule::GetEditableObject(
-											lexical_cast<RegistryKeyType>(recipient),
-											*_env
-									)	);
+									rec.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
 								}
+
+								if(recipientParams.size() > 0)
+								{
+									rec.second = recipientParams[1];
+								}
+
+								_recipients->push_back(rec);
 							}
 							catch(...)
 							{
@@ -404,12 +412,7 @@ namespace synthese
 											make_pair(
 												key,
 												make_pair(
-													(keyStr.empty() || !lexical_cast<RegistryKeyType>(keyStr)) ?
-													NULL :
-													DBModule::GetEditableObject(
-														lexical_cast<RegistryKeyType>(keyStr),
-														*_env
-													).get(),
+													keyStr.empty() ? 0 : lexical_cast<RegistryKeyType>(keyStr),
 													parameter
 										)	)	);
 									}
@@ -993,12 +996,16 @@ namespace synthese
 
 				if(_recipients)
 				{
-					BOOST_FOREACH(const shared_ptr<Registrable> recipient, *_recipients)
+					BOOST_FOREACH(const Recipients::value_type::value_type& recipient, *_recipients)
 					{
 						AlarmObjectLink link;
-						link.setRecipientKey(_recipientType);
+						link.setRecipient(_recipientType);
 						link.setAlarm(message.get());
-						link.setObject(recipient.get());
+						link.setObjectId(recipient.first);
+						if(recipient.second)
+						{
+							link.setParameter(*recipient.second);
+						}
 						AlarmObjectLinkTableSync::Save(&link, transaction);
 					}
 				}
@@ -1136,9 +1143,9 @@ namespace synthese
 						m.insert(
 							make_pair(
 								make_pair(
-									item->getRecipientKey(),
+									item->getRecipient()->getFactoryKey(),
 									make_pair(
-										item->getObject(),
+										item->getObjectId(),
 										item->getParameter()
 								)	),
 								item->getKey()
@@ -1153,8 +1160,8 @@ namespace synthese
 						if(itAOLMap == m.end())
 						{
 							AlarmObjectLink aol;
-							aol.setRecipientKey(it.first);
-							aol.setObject(it.second.first);
+							aol.setRecipient(it.first);
+							aol.setObjectId(it.second.first);
 							aol.setParameter(it.second.second);
 							aol.setAlarm(alarm.get());
 							AlarmObjectLinkTableSync::Save(&aol, transaction);

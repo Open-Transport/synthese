@@ -33,12 +33,8 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
+		class AlarmRecipient;
 
-		/** Link between an alarm and an object.
-			@ingroup m17
-
-			@note This class is used only to permit the remove hook
-		*/
 		class AlarmObjectLink:
 			public virtual util::Registrable
 		{
@@ -48,22 +44,22 @@ namespace synthese
 			typedef util::Registry<AlarmObjectLink>	Registry;
 
 		private:
-			util::Registrable*	_object;
+			util::RegistryKeyType	_objectId;
 			Alarm*			_alarm;
-			std::string		_recipientKey;
+			std::auto_ptr<AlarmRecipient> _recipient;
 			std::string		_parameter;
 
 		public:
 			AlarmObjectLink(util::RegistryKeyType key = 0);
 
-			util::Registrable* getObject() const { return _object; }
+			util::RegistryKeyType getObjectId() const { return _objectId; }
 			Alarm* getAlarm() const { return _alarm; }
-			const std::string& getRecipientKey() const { return _recipientKey; }
+			const AlarmRecipient* getRecipient() const { return _recipient.get(); }
 			const std::string& getParameter() const { return _parameter; }
 
-			void setObject(util::Registrable* value){ _object = value; }
+			void setObjectId(util::RegistryKeyType value){ _objectId = value; }
 			void setAlarm(Alarm* value){ _alarm = value; }
-			void setRecipientKey(const std::string& value){ _recipientKey = value; }
+			void setRecipient(const std::string& key);
 			void setParameter(const std::string& value){ _parameter = value; }
 		};
 }	}

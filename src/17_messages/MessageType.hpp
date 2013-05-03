@@ -50,9 +50,6 @@ namespace synthese
 			public Object<MessageType, MessageTypeRecord>
 		{
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<MessageType>	Registry;
-
 			MessageType(
 				util::RegistryKeyType id = 0
 			);

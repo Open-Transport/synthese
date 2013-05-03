@@ -69,6 +69,7 @@ namespace synthese
 			ParametersMap map;
 			map.insert(PARAMETER_CONTENT, _content);
 			map.insert(PARAMETER_LEVEL, static_cast<int>(_level));
+			map.insert(PARAMETER_RECIPIENT_ID, _recipientId);
 			return map;
 		}
 
@@ -95,17 +96,7 @@ namespace synthese
 			_recipientClass.reset(Factory<AlarmRecipient>::create(recipientClass));
 
 			// Recipient
-			try
-			{
-				_recipient = DBModule::GetEditableObject(
-					map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID),
-					*_env
-				);
-			}
-			catch(ObjectNotFoundException<Registrable>&)
-			{
-				throw ActionException("No such recipient");
-			}
+			_recipientId = map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID);
 		}
 
 
@@ -131,8 +122,9 @@ namespace synthese
 			AlarmTableSync::Save(&alarm, transaction);
 
 			AlarmObjectLink link;
-			link.setObject(_recipient.get());
+			link.setObjectId(_recipientId);
 			link.setAlarm(&alarm);
+			link.setRecipient(_recipientClass->getFactoryKey());
 			AlarmObjectLinkTableSync::Save(&link, transaction);
 
 			transaction.run();
@@ -152,6 +144,7 @@ namespace synthese
 
 
 		SimpleMessageCreationAction::SimpleMessageCreationAction():
-		_level(ALARM_LEVEL_INFO)
+			_level(ALARM_LEVEL_INFO),
+			_recipientId(0)
 		{}
 }	}

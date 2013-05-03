@@ -70,10 +70,7 @@ namespace synthese
 			ParametersMap map;
 			map.insert(PARAMETER_ALARM_ID, _alarm.get() ? _alarm->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_RECIPIENT_KEY, _recipientKey);
-			if(_object.get())
-			{
-				map.insert(PARAMETER_OBJECT_ID, _object->getKey());
-			}
+			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			map.insert(PARAMETER_PARAMETER, _parameter);
 			return map;
 		}
@@ -103,9 +100,9 @@ namespace synthese
 		{
 			// Action
 			shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
-			aol->setRecipientKey(_recipientKey);
+			aol->setRecipient(_recipientKey);
 			aol->setAlarm(_alarm.get());
-			aol->setObject(_object.get());
+			aol->setObjectId(_objectId);
 			aol->setParameter(_parameter);
 			AlarmObjectLinkTableSync::Save(aol.get());
 
@@ -117,7 +114,7 @@ namespace synthese
 				);
 				MessagesLibraryLog::addUpdateEntry(
 					alarmTemplate.get(),
-					"Ajout de destinataire " + _recipientKey + " #" + lexical_cast<string>(_object->getKey()),
+					"Ajout de destinataire " + _recipientKey + " #" + lexical_cast<string>(_objectId),
 					request.getUser().get()
 				);
 			}
@@ -128,7 +125,7 @@ namespace synthese
 				);
 				MessagesLog::addUpdateEntry(
 					sentAlarm.get(),
-					"Ajout de destinataire à message diffusé " + _recipientKey + " #" + lexical_cast<string>(_object->getKey()),
+					"Ajout de destinataire à message diffusé " + _recipientKey + " #" + lexical_cast<string>(_objectId),
 					request.getUser().get()
 				);
 			}
@@ -159,14 +156,7 @@ namespace synthese
 
 		void AlarmAddLinkAction::setObjectId(RegistryKeyType id )
 		{
-			try
-			{
-				_object = DBModule::GetEditableObject(id, *_env);
-			}
-			catch (ObjectNotFoundException<Registrable>)
-			{
-				throw ActionException("Specified object not found");
-			}
+			_objectId = id;
 		}
 
 
@@ -179,7 +169,15 @@ namespace synthese
 			}
 			else
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE, FORBIDDEN, lexical_cast<string>(_object->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE, FORBIDDEN, lexical_cast<string>(_objectId));
 			}
+		}
+
+
+
+		AlarmAddLinkAction::AlarmAddLinkAction():
+			_objectId(0)
+		{
+
 		}
 }	}

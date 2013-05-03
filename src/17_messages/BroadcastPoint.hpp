@@ -25,6 +25,8 @@
 
 #include "FactoryBase.h"
 
+#include "SentAlarm.h"
+
 #include <vector>
 
 namespace synthese
@@ -54,16 +56,42 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Checks if the broadcast point displays the specified message.
-			/// @param message the message to check
+			/// @param linkedObjects the objects linked to the message
+			/// @param the display parameters
 			/// @return true if the specified message is currently displayed on the broadcast point.
 			/// Note : if the message is a template the check is a simulation
-			virtual bool displaysMessage(const Alarm& message) const = 0;
+			virtual bool displaysMessage(
+				const Alarm::LinkedObjects& linkedObjects,
+				const util::ParametersMap& parameters
+			) const = 0;
 
 			typedef std::vector<BroadcastPoint*> BroadcastPoints;
 			
 			virtual void getBrodcastPoints(BroadcastPoints& result) const = 0;
 
 			static BroadcastPoints GetBroadcastPoints();
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Function to run when the message display begins.
+			/// Default implementation does nothing.
+			/// @param linkedObjects the objects linked to the message
+			/// @param the display parameters
+			virtual void onDisplayStart(
+				const SentAlarm& message
+			) const {}
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Function to run when the message display ends.
+			/// Default implementation does nothing.
+			/// @param linkedObjects the objects linked to the message
+			/// @param the display parameters
+			virtual void onDisplayEnd(
+				const SentAlarm& message
+			) const {}
 		};
 }	}
 

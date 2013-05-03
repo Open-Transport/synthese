@@ -45,6 +45,7 @@ namespace synthese
 	namespace messages
 	{
 		class AlarmRecipient;
+		class BroadcastPoint;
 		class SentAlarm;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -60,7 +61,6 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,GetMessagesFunction>
 		{
 		public:
-			static const std::string PARAMETER_RECIPIENT_KEY;
 			static const std::string PARAMETER_RECIPIENT_ID;
 			static const std::string PARAMETER_MAX_MESSAGES_NUMBER;
 			static const std::string PARAMETER_BEST_PRIORITY_ONLY;
@@ -77,8 +77,8 @@ namespace synthese
 
 			//! \name Page parameters
 			//@{
-				util::Registrable* _recipient;
-				boost::shared_ptr<AlarmRecipient> _recipientClass;
+				const BroadcastPoint* _broadcastPoint;
+				util::ParametersMap _parameters;
 				boost::optional<std::size_t> _maxMessagesNumber;
 				bool _bestPriorityOnly;
 				bool _priorityOrder;
@@ -114,8 +114,8 @@ namespace synthese
 
 		public:
 			GetMessagesFunction(
-				util::Registrable* recipient = NULL,
-				boost::shared_ptr<AlarmRecipient> _recipientClass = boost::shared_ptr<AlarmRecipient>(),
+				const BroadcastPoint* broadcastPoint = NULL,
+				util::ParametersMap parameters = util::ParametersMap(),
 				boost::optional<size_t> maxMessagesNumber = boost::optional<size_t>(),
 				bool bestPriorityOnly = true,
 				bool priorityOrder = true,
