@@ -60,8 +60,10 @@ namespace synthese
 
 	namespace pt
 	{
+		class CommercialLine;
 		class StopArea;
 		class JourneyPattern;
+		class TransportNetwork;
 	}
 
 	namespace departure_boards
@@ -141,6 +143,7 @@ namespace synthese
 				int													_wiringCode;	// Display ID in a bus
 				int													_comPort;
 				std::string											_macAddress;
+				pt::StopPoint*										_stopPointLocation;
 			//@}
 
 			//! \name Appearance
@@ -190,6 +193,15 @@ namespace synthese
 			//!	\name Protected
 			//@{
 				boost::posix_time::ptime	_MomentFin(const boost::posix_time::ptime& __MomentDebut)			const;
+
+				bool _locationOnLine(
+					const pt::CommercialLine& line,
+					boost::optional<bool> direction
+				) const;
+
+				bool _locationOnNetwork(
+					const pt::TransportNetwork& network
+				) const;
 
 		public:
 				//////////////////////////////////////////////////////////////////////////
@@ -260,6 +272,7 @@ namespace synthese
 				void	setAllowedLines(const LineFilter& value){ _allowedLines = value; }
 				void	setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value){ _physicalStops = value; }
 				void	setAllowCanceled(bool value){ _allowCanceled = value; }
+				void	setStopPointLocation(pt::StopPoint* value){ _stopPointLocation = value; }
 			//@}
 
 			//! \name Modifiers
@@ -332,6 +345,7 @@ namespace synthese
 				SubScreenType					getSubScreenType()				const { return _subScreenType; }
 				const LineFilter&				getAllowedLines()				const { return _allowedLines; }
 				bool							getAllowCanceled()				const { return _allowCanceled; }
+				pt::StopPoint*					getStopPointLocation()			const { return _stopPointLocation; }
 			//@}
 
 			//! \name Services
@@ -404,7 +418,10 @@ namespace synthese
 			//@{
 				virtual messages::MessageType* getMessageType() const;
 
-				virtual bool displaysMessage(const messages::Alarm& message) const;
+				virtual bool displaysMessage(
+					const messages::Alarm::LinkedObjects& linkedObjects,
+					const util::ParametersMap& parameters
+				) const;
 
 				virtual void getBrodcastPoints(BroadcastPoints& result) const;
 			//@}

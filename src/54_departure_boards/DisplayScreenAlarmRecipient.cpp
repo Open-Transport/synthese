@@ -20,37 +20,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// departure_boards
 #include "DisplayScreenAlarmRecipient.h"
+
 #include "AlarmTestOnDisplayScreenFunction.h"
+#include "ArrivalDepartureTableRight.h"
+#include "CustomBroadcastPoint.hpp"
 #include "DeparturesTableModule.h"
 #include "DisplaySearchAdmin.h"
 #include "DisplayScreenTableSync.h"
-#include "ArrivalDepartureTableRight.h"
 #include "DisplayType.h"
 #include "DisplayScreen.h"
-#include "ImportableTableSync.hpp"
-#include "ArrivalDepartureTableRight.h"
-
-// Std
-#include <vector>
-
-// html
-#include "ResultHTMLTable.h"
 #include "HTMLList.h"
-
-// security
+#include "ImportableTableSync.hpp"
+#include "ResultHTMLTable.h"
 #include "SecurityConstants.hpp"
 #include "User.h"
 #include "Profile.h"
-
-// transport
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "PTModule.h"
-
-// messages
 #include "Alarm.h"
 #include "AlarmObjectLink.h"
 #include "AlarmObjectLinkTableSync.h"
@@ -58,10 +47,9 @@
 #include "AlarmAddLinkAction.h"
 #include "MessagesRight.h"
 #include "AlarmObjectLinkException.h"
-
-// admin
 #include "AdminModule.h"
 
+#include <vector>
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -87,13 +75,6 @@ namespace synthese
 
 	namespace messages
 	{
-	    /* IMPORTANT : for some reason, probably a gcc bug, is was necessary to
-	       explicitly call constructor with () in order to avoid undefined references.
-	       This should be investigate further.
-	    */
-	    template<>
-		AlarmRecipient::ObjectLinks AlarmRecipientTemplate<DisplayScreenAlarmRecipient>::_linksObject = AlarmRecipient::ObjectLinks();
-
 		template<> const string AlarmRecipientTemplate<DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
 
 		template<> void AlarmRecipientTemplate<DisplayScreenAlarmRecipient>::GetParametersLabels(
@@ -297,5 +278,86 @@ namespace synthese
 			ArrivalDepartureTableRight* result(new ArrivalDepartureTableRight);
 			result->setParameter(perimeter);
 			return shared_ptr<Right>(result);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the tree of available recipients.
+		AlarmRecipient::AvailableRecipients::Tree::value_type DisplayScreenAlarmRecipient::getAvailableRecipients() const
+		{
+			// Root item
+			shared_ptr<AvailableRecipients> result(new AvailableRecipients);
+			result->id = 0;
+			result->name = "Points de diffusion";
+			
+			// Display screens
+			shared_ptr<AvailableRecipients> displayScreens(new AvailableRecipients);
+			displayScreens->id = DisplayScreenTableSync::TABLE.ID;
+			displayScreens->name = "Bornes d'information voyageur";
+			result->tree.push_back(displayScreens);
+
+			// Loop on display screens
+			BOOST_FOREACH(
+				const Registry<DisplayScreen>::value_type& item,
+				Env::GetOfficialEnv().getRegistry<DisplayScreen>()
+			){
+				shared_ptr<AvailableRecipients> displayScreen(new AvailableRecipients);
+				displayScreen->id = item.first;
+				displayScreen->name = item.second->getName();
+				displayScreens->tree.push_back(displayScreen);
+			}
+
+			// Custom broadcast points
+			shared_ptr<AvailableRecipients> customBroadcastPoints(new AvailableRecipients);
+			customBroadcastPoints->id = CustomBroadcastPoint::CLASS_NUMBER;
+			customBroadcastPoints->name = "Autres points de diffusion";
+			result->tree.push_back(customBroadcastPoints);
+
+			// Loop on custom broadcast points
+			BOOST_FOREACH(
+				const Registry<CustomBroadcastPoint>::value_type& item,
+				Env::GetOfficialEnv().getRegistry<CustomBroadcastPoint>()
+			){
+				// Jump over non root elements
+				if(item.second->getRoot())
+				{
+					continue;
+				}
+
+				// Add the broadcast point and its children
+				customBroadcastPoints->tree.push_back(
+					_addCustomBroadcastPointToAvailableRecipient(
+						*item.second
+				)	);
+			}
+
+			// Return the result
+			return result;
+		}
+
+
+
+		shared_ptr<AlarmRecipient::AvailableRecipients> DisplayScreenAlarmRecipient::_addCustomBroadcastPointToAvailableRecipient(
+			const messages::CustomBroadcastPoint& broadcastPoint
+		){
+			// Registration
+			shared_ptr<AvailableRecipients> customBroadcastPoint(new AvailableRecipients);
+			customBroadcastPoint->id = broadcastPoint.getKey();
+			customBroadcastPoint->name = broadcastPoint.get<Name>();
+
+			// Recursion
+			BOOST_FOREACH(
+				const CustomBroadcastPoint::ChildrenType::value_type& child,
+				broadcastPoint.getChildren()
+			){
+				customBroadcastPoint->tree.push_back(
+					_addCustomBroadcastPointToAvailableRecipient(
+						*child.second
+				)	);
+			}
+
+			// Return result
+			return customBroadcastPoint;
 		}
 }	}

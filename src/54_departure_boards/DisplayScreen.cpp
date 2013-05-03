@@ -25,24 +25,30 @@
 #include "DisplayScreen.h"
 
 #include "AlgorithmLogger.hpp"
-#include "Registry.h"
-#include "Interface.h"
-#include "InterfacePageException.h"
-#include "StopArea.hpp"
-#include "StopPoint.hpp"
-#include "Edge.h"
-#include "DisplayType.h"
-#include "DisplayMaintenanceLog.h"
+#include "CityTableSync.h"
+#include "CommercialLineTableSync.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DeparturesTableRoutePlanningInterfacePage.h"
-#include "DisplayScreenAlarmRecipient.h"
-#include "DisplayScreenCPU.h"
+#include "DisplayMaintenanceLog.h"
 #include "DisplayMonitoringStatus.h"
-#include "RoutePlanningTableGenerator.h"
-#include "Webpage.h"
+#include "DisplayScreenAlarmRecipient.h"
 #include "DisplayScreenContentFunction.h"
-#include "PTTimeSlotRoutePlanner.h"
+#include "DisplayScreenCPU.h"
+#include "DisplayType.h"
+#include "Interface.h"
+#include "InterfacePageException.h"
+#include "JourneyPattern.hpp"
+#include "LineAlarmRecipient.hpp"
+#include "LineStop.h"
 #include "PTRoutePlannerResult.h"
+#include "PTTimeSlotRoutePlanner.h"
+#include "RoutePlanningTableGenerator.h"
+#include "StopAreaTableSync.hpp"
+#include "StopAreaAlarmRecipient.hpp"
+#include "StopPointTableSync.hpp"
+#include "TransportNetworkTableSync.h"
+#include "TreeFolderTableSync.hpp"
+#include "Webpage.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -66,6 +72,7 @@ namespace synthese
 	using namespace pt;
 	using namespace pt_journey_planner;
 	using namespace road;
+	using namespace tree;
 	using namespace util;
 
 	namespace util
@@ -95,6 +102,7 @@ namespace synthese
 			_displayType(NULL),
 			_wiringCode(0),
 			_comPort(0),
+			_stopPointLocation(NULL),
 			_blinkingDelay(1),
 			_trackNumberDisplay(false),
 			_serviceNumberDisplay(false),
@@ -856,14 +864,188 @@ namespace synthese
 
 
 		bool DisplayScreen::displaysMessage(
-			const messages::Alarm& message
+			const Alarm::LinkedObjects& linkedObjects,
+			const util::ParametersMap& parameters
 		) const	{
 
-			// Jump over undefined type or rule page
+			// If no customized rule, use the Jump over undefined type or rule page
 			if(	!_displayType ||
 				!_displayType->getMessageIsDisplayedPage()
 			){
-				return false;
+				// in broad cast points recipients
+				Alarm::LinkedObjects::const_iterator it(
+					linkedObjects.find(
+						DisplayScreenAlarmRecipient::FACTORY_KEY
+				)	);
+
+				// No broadcast recipient = no display
+				if(it == linkedObjects.end())
+				{
+					return false;
+				}
+
+				// Loop on each recipient
+				bool result(false);
+				BOOST_FOREACH(
+					const Alarm::LinkedObjects::mapped_type::value_type& link,
+					it->second
+				){
+					// Search for precisely specified broadcast
+					if(	link->getObjectId() == getKey())
+					{
+						return true;
+					}
+
+					// Search for general broadcast on display screens
+					if(	link->getObjectId() == DisplayScreenTableSync::TABLE.ID ||
+						link->getObjectId() == 0
+					){
+						result = true;
+					}
+
+					if(result)
+					{
+						break;
+					}
+				}
+				if(!result)
+				{
+					return false;
+				}
+
+				if(!getLocation())
+				{
+					return false;
+				}
+
+				// The display is allowed on this screen, search for lines and stops
+
+
+				// Search for lines
+				it = linkedObjects.find(
+					LineAlarmRecipient::FACTORY_KEY
+				);
+
+				// No lines recipients = all lines OK
+				if(it != linkedObjects.end())
+				{
+					bool result(false);
+
+					// Loop on links
+					BOOST_FOREACH(
+						const Alarm::LinkedObjects::mapped_type::value_type& link,
+						it->second
+					){
+						// 0 link = all lines
+						if(link->getObjectId() == 0)
+						{
+							result = true;
+						}
+						else if(decodeTableId(link->getObjectId()) == TransportNetworkTableSync::TABLE.ID)
+						{ 	// network id = check all lines of the network
+							try
+							{
+								const TransportNetwork& network(
+									*Env::GetOfficialEnv().get<TransportNetwork>(
+										link->getObjectId()
+								)	);
+								result = _locationOnNetwork(network);
+							}
+							catch(ObjectNotFoundException<TransportNetwork>&)
+							{
+							}
+						}
+						else if(decodeTableId(link->getObjectId()) == TreeFolderTableSync::TABLE.ID)
+						{
+							// TODO
+						}
+						else if(decodeTableId(link->getObjectId()) == CommercialLineTableSync::TABLE.ID)
+						{	// line id = check the line
+
+							// Checking if direction is specified
+							optional<bool> direction;
+							if(!link->getParameter().empty())
+							{
+								direction = (link->getParameter() == "1");
+							}
+
+							try
+							{
+								const CommercialLine& line(
+									*Env::GetOfficialEnv().get<CommercialLine>(
+										link->getObjectId()
+								)	);
+								result = _locationOnLine(
+									line,
+									direction
+								);
+							}
+							catch(ObjectNotFoundException<CommercialLine>&)
+							{
+							}
+						}
+
+						if(result)
+						{
+							break;
+						}
+					}
+
+					// No line allows the display : display is forbidden
+					if(!result)
+					{
+						return false;
+					}
+				}
+
+				// Search for stops
+				it = linkedObjects.find(
+					StopAreaAlarmRecipient::FACTORY_KEY
+				);
+
+				// No stops recipients = all stops OK
+				if(it != linkedObjects.end())
+				{
+					bool result(false);
+
+					// Loop on links
+					BOOST_FOREACH(
+						const Alarm::LinkedObjects::mapped_type::value_type& link,
+						it->second
+					){
+						// 0 link = all lines
+						if(link->getObjectId() == 0)
+						{
+							result = true;
+						}
+						else if(decodeTableId(link->getObjectId()) == CityTableSync::TABLE.ID)
+						{
+							result = (getLocation()->getCity()->getKey() == link->getObjectId());
+						}
+						else if(decodeTableId(link->getObjectId()) == StopAreaTableSync::TABLE.ID)
+						{
+							result = (getLocation()->getKey() == link->getObjectId());
+						}
+						else if(decodeTableId(link->getObjectId()) == StopPointTableSync::TABLE.ID)
+						{
+							result = (_stopPointLocation && _stopPointLocation->getKey() == link->getObjectId());
+						}
+
+						if(result)
+						{
+							break;
+						}
+					}
+
+					// No stop allows the display : display is forbidden
+					if(!result)
+					{
+						return false;
+					}
+				}
+
+				// Nothing has blocked the display
+				return true;
 			}
 
 			stringstream s;
@@ -873,13 +1055,196 @@ namespace synthese
 			toParametersMap(*screenPM);
 			pm.insert("screen", screenPM);
 			pm.insert(VAR_BROADCAST_POINT_TYPE, VALUE_DISPLAY_SCREEN);
-			shared_ptr<ParametersMap> messagePM(new ParametersMap);
-			message.toParametersMap(*messagePM, false, string(), true);
-			pm.insert("message", messagePM);
+			shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
+			Alarm::LinkedObjectsToParametersMap(linkedObjects, *recipientsPM);
+			pm.insert("recipients", recipientsPM);
 
 			_displayType->getMessageIsDisplayedPage()->display(s, pm);
 			string str(s.str());
 			trim(str);
 			return !str.empty();
+		}
+
+
+
+		bool DisplayScreen::_locationOnLine(
+			const pt::CommercialLine& line,
+			boost::optional<bool> direction
+		) const	{
+
+			if(_stopPointLocation)
+			{
+				// Search on departure edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getDepartureEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine() == &line &&
+						(	!direction ||
+							path->getWayBack() == *direction
+					)	){
+						return true;
+					}
+				}
+
+				// Search on arrival edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getArrivalEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine() == &line &&
+						(	!direction ||
+							path->getWayBack() == *direction
+					)	){
+						return true;
+					}
+				}
+
+				// Nothing was found
+				return false;
+			}
+
+			// Check if the location is a stop area
+			const StopArea* stopArea(
+				dynamic_cast<const StopArea*>(getLocation())
+			);
+			if(!stopArea)
+			{
+				return false;
+			}
+
+			// Loop on each stop
+			BOOST_FOREACH(
+				const StopArea::PhysicalStops::value_type& it,
+				stopArea->getPhysicalStops()
+			){
+				const StopPoint& stopPoint(*it.second);
+
+				// Search on departure edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getDepartureEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine() == &line)
+					{
+						return true;
+					}
+				}
+
+				// Search on arrival edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getArrivalEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine() == &line)
+					{
+						return true;
+					}
+				}
+			}
+
+			// Nothing was found
+			return false;
+		}
+
+
+
+		bool DisplayScreen::_locationOnNetwork(
+			const pt::TransportNetwork& network
+		) const	{
+
+			if(_stopPointLocation)
+			{
+				// Search on departure edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getDepartureEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine()->getNetwork() == &network)
+					{
+						return true;
+					}
+				}
+
+				// Search on arrival edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getArrivalEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine()->getNetwork() == &network)
+					{
+						return true;
+					}
+				}
+
+				// Nothing was found
+				return false;
+			}
+
+			// Check if the location is a stop area
+			const StopArea* stopArea(
+				dynamic_cast<const StopArea*>(getLocation())
+			);
+			if(!stopArea)
+			{
+				return false;
+			}
+
+			// Loop on each stop
+			BOOST_FOREACH(
+				const StopArea::PhysicalStops::value_type& it,
+				stopArea->getPhysicalStops()
+			){
+				const StopPoint& stopPoint(*it.second);
+
+				// Search on departure edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getDepartureEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine()->getNetwork() == &network)
+					{
+						return true;
+					}
+				}
+
+				// Search on arrival edges
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getArrivalEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
+					if(	path->getCommercialLine()->getNetwork() == &network)
+					{
+						return true;
+					}
+				}
+			}
+
+			// Nothing was found
+			return false;
 		}
 }	}
