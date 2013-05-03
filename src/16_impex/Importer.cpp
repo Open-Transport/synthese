@@ -22,53 +22,84 @@
 
 #include "Importer.hpp"
 
+#include "DBTransaction.hpp"
+#include "Env.h"
+
 namespace synthese
 {
+	using namespace db;
+
 	namespace impex
 	{
-		Importer::Logger::Logger(
-			Level minLevel
-		):	_minLevel(minLevel),
-			_maxLoggedLevel(ALL)
+		//////////////////////////////////////////////////////////////////////////
+		/// Shortcut to Importlogger::log
+		void Importer::_log(
+			ImportLogger::Level level,
+			const std::string& content
+		) const	{
+			_logger.log(level, content);
+		}
+
+
+
+		Importer::Importer(
+			util::Env& env,
+			const Import& import,
+			const ImportLogger& logger
+		):	_env(env),
+			_import(import),
+			_logger(logger)
 		{}
 
 
 
-		void Importer::Logger::log( Level level, const std::string& content )
+		DBTransaction Importer::save() const
 		{
-			if(level >= _minLevel)
-			{
-				_entries.push_back(
-					Entry(level, content)
-				);
-				if(level > _maxLoggedLevel)
-				{
-					_maxLoggedLevel = level;
-				}
-			}
+			DBTransaction result(_save());
+			_env.clear();
+			return result;
 		}
 
 
 
-		void Importer::Logger::output(
-			std::ostream& stream
-		) const {
-			BOOST_FOREACH(const Entry& entry, _entries)
-			{
-				switch(entry.level)
-				{
-				case DEBG: stream << "DEBG"; break;
-				case LOAD: stream << "LOAD"; break;
-				case CREA: stream << "CREA"; break;
-				case INFO: stream << "INFO"; break;
-				case WARN: stream << "WARN"; break;
-				case NOTI: stream << "NOTI"; break;
-				case ERROR: stream << "ERR "; break;
-				case ALL: stream << "ALL "; break;
-				case NOLOG: stream << "NOLOG "; break;
-				}
-				stream << " " << entry.content << "<br />";
-			}
+		void Importer::_logError( const std::string& content ) const
+		{
+			_logger.logError(content);
+		}
+
+
+
+		void Importer::_logWarning( const std::string& content ) const
+		{
+			_logger.logWarning(content);
+		}
+
+
+
+		void Importer::_logDebug( const std::string& content ) const
+		{
+			_logger.logDebug(content);
+		}
+
+
+
+		void Importer::_logInfo( const std::string& content ) const
+		{
+			_logger.logInfo(content);
+
+		}
+
+
+
+		void Importer::_logLoad( const std::string& content ) const
+		{
+			_logger.logLoad(content);
+		}
+
+
+
+		void Importer::_logCreation( const std::string& content ) const
+		{
+			_logger.logCreation(content);
 		}
 }	}
-

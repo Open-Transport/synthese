@@ -63,7 +63,8 @@ namespace synthese
 			) const;
 
 			virtual bool sync(
-				const std::string& parameter
+				const std::string& parameter,
+				const inter_synthese::InterSYNTHESEIdFilter* idFilter
 			) const;
 
 			virtual void closeSync(

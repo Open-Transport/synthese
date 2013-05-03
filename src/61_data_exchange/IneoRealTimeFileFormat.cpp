@@ -21,6 +21,8 @@
 */
 
 #include "IneoRealTimeFileFormat.hpp"
+
+#include "Import.hpp"
 #include "PropertiesHTMLTable.h"
 #include "DataSource.h"
 #include "AdminFunctionRequest.hpp"
@@ -68,12 +70,17 @@ namespace synthese
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_STOP_CODE_PREFIX("stop_code_prefix");
 
-		bool IneoRealTimeFileFormat::Importer_::_read( std::ostream& os, boost::optional<const server::Request&> adminRequest ) const
-		{
+
+
+		bool IneoRealTimeFileFormat::Importer_::_read(
+			boost::optional<const server::Request&> adminRequest
+		) const	{
 			if(_database.empty() || !_plannedDataSource.get())
 			{
 				return false;
 			}
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			shared_ptr<DB> db;
 
@@ -108,23 +115,23 @@ namespace synthese
 				}	}
 
 				// 1 : clean the old references to the current source
-				ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(dataSource, _env);
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<ScheduledServiceTableSync>::Map::value_type& itService, sourcedServices.getMap())
 				{
 					BOOST_FOREACH(const ImportableTableSync::ObjectBySource<ScheduledServiceTableSync>::Map::mapped_type::value_type& obj, itService.second)
 					{
-						obj->removeSourceLinks(_dataSource);
+						obj->removeSourceLinks(dataSource);
 					}
 				}
 			}
 			else
 			{
 				// 1 : clean the old references to the current source
-				ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(dataSource, _env);
 				set<ScheduledService*> services(sourcedServices.get(*_courseId));
 				BOOST_FOREACH(ScheduledService* service, services)
 				{
-					service->removeSourceLinks(_dataSource);
+					service->removeSourceLinks(dataSource);
 					_services.insert(service);
 				}
 			}
@@ -145,8 +152,10 @@ namespace synthese
 				string chainage(result->getText("chainage"));
 				string ligneRef(result->getText("ligne_ref"));
 
-				os << "INFO : Processing serviceRef=" << serviceRef << " chainage=" <<
-					chainage << " ligneRef=" << ligneRef << "<br />";
+				_log(
+					ImportLogger::DEBG,
+					"Processing serviceRef="+ serviceRef +" chainage="+	chainage +" ligneRef="+ ligneRef
+				);
 
 				CommercialLine* line(
 					PTFileFormat::GetLine(
@@ -154,12 +163,15 @@ namespace synthese
 						ligneRef,
 						*_plannedDataSource,
 						_env,
-						os
+						_logger
 				)	);
 
 				if(!line)
 				{
-					os << "WARN : Line " << ligneRef << " was not found for service " << serviceRef << "<br />";
+					_log(
+						ImportLogger::WARN,
+						"Line "+ ligneRef +" was not found for service "+ serviceRef
+					);
 					continue;
 				}
 
@@ -190,11 +202,14 @@ namespace synthese
 							stops,
 							_stopCodePrefix + stopCode,
 							boost::optional<const std::string&>(),
-							os
+							_logger
 					)	);
 					if(stopsSet.empty())
 					{
-						os << "WARN : Can't find stops for code " << _stopCodePrefix << stopCode << "<br />";
+						_log(
+							ImportLogger::WARN,
+							"Can't find stops for code "+ _stopCodePrefix + stopCode
+						);
 						continue;
 					}
 
@@ -238,7 +253,7 @@ namespace synthese
 						*line,
 						servedStops,
 						*_plannedDataSource,
-						os
+						_logger
 				)	);
 
 				if(routes.empty())
@@ -252,7 +267,10 @@ namespace synthese
 						string routeName(routeResult->getText("nom"));
 						bool wayBack(routeResult->getText("sens") != "A");
 
-						os << "CREA : Creation of route " << routeName << "<br />";
+						_log(
+							ImportLogger::CREA,
+							"Creation of route "+ routeName
+						);
 
 						JourneyPattern* result = new JourneyPattern(
 							JourneyPatternTableSync::getId()
@@ -302,8 +320,11 @@ namespace synthese
 						if(	service->isActive(today) &&
 							service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 						){
-							os << "LOAD : Use of service " << service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-							service->addCodeBySource(_dataSource, serviceRef);
+							_log(
+								ImportLogger::LOAD,
+								"Use of service "+ lexical_cast<string>(service->getKey()) +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route->getKey()) +" ("+ route->getName() +")"
+							);
+							service->addCodeBySource(dataSource, serviceRef);
 							_services.insert(service);
 							break;
 						}
@@ -327,17 +348,23 @@ namespace synthese
 						);
 						service->setSchedules(departureSchedules, arrivalSchedules, true);
 						service->setPath(route);
-						service->addCodeBySource(_dataSource, serviceRef);
+						service->addCodeBySource(dataSource, serviceRef);
 						service->setActive(today);
 						route->addService(*service, false);
 						_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
 						_services.insert(service);
 
-						os << "CREA : Creation of service (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+						_log(
+							ImportLogger::CREA,
+							"Creation of service ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route->getKey()) +" ("+ route->getName() +")"
+						);
 					}
 					else
 					{
-						os << "WARN : Service (ref=" << serviceRef << ") has empty departure or arrival schedules, not creating<br />";
+						_log(
+							ImportLogger::WARN,
+							"Service (ref="+ serviceRef +") has empty departure or arrival schedules, not creating"
+						);
 					}
 				}
 			}
@@ -371,12 +398,15 @@ namespace synthese
 							const ScheduledService* sservice(dynamic_cast<const ScheduledService*>(service));
 							if(	sservice &&
 								sservice->isActive(today) &&
-								!sservice->hasLinkWithSource(_dataSource)
+								!sservice->hasLinkWithSource(dataSource)
 							){
 								const_cast<ScheduledService*>(sservice)->setInactive(today);
-								os << "INFO : Deactivating unlinked service " << sservice->getKey() <<
-									" on route " << sservice->getRoute()->getKey() << " (" <<
-									sservice->getRoute()->getName() << ")<br />";
+								_log(
+									ImportLogger::INFO,
+									"Deactivating unlinked service "+ lexical_cast<string>(sservice->getKey()) +
+										" on route "+ lexical_cast<string>(sservice->getRoute()->getKey()) +" (" +
+										sservice->getRoute()->getName() +")"
+								);
 							}
 						}
 					}
@@ -388,8 +418,10 @@ namespace synthese
 
 		IneoRealTimeFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	DatabaseReadImporter<IneoRealTimeFileFormat>(env, dataSource)
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			DatabaseReadImporter<IneoRealTimeFileFormat>(env, import, logger)
 		{}
 
 

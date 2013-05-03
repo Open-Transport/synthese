@@ -6,6 +6,8 @@
 #include "InterSYNTHESESlave.hpp"
 #include "InterSYNTHESEQueue.hpp"
 
+#include "InterSYNTHESEFileFormat.hpp"
+
 #include "InterSYNTHESEConfigTableSync.hpp"
 #include "InterSYNTHESEConfigItemTableSync.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
@@ -26,6 +28,8 @@ void synthese::inter_synthese::moduleRegister()
 	synthese::inter_synthese::InterSYNTHESEConfigItemTableSync::integrate();
 	synthese::inter_synthese::InterSYNTHESESlaveTableSync::integrate();
 	synthese::inter_synthese::InterSYNTHESEQueueTableSync::integrate();
+
+	synthese::inter_synthese::InterSYNTHESEFileFormat::integrate();
 
 	synthese::inter_synthese::InterSYNTHESEConfigsViewService::integrate();
 	synthese::inter_synthese::InterSYNTHESESlavesViewService::integrate();

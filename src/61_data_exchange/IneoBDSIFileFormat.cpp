@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// IneoRealTimeUpdateAction class implementation.
-/// @file IneoRealTimeUpdateAction.cpp
+/// IneoBDSIFileFormat class implementation.
+/// @file IneoBDSIFileFormat.cpp
 /// @author Hugues Romain
 /// @date 2012
 ///
@@ -22,7 +22,7 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "IneoRealTimeUpdateAction.hpp"
+#include "IneoBDSIFileFormat.hpp"
 
 #include "ActionException.h"
 #include "AlarmObjectLinkTableSync.h"
@@ -35,6 +35,7 @@
 #include "DisplayScreenAlarmRecipient.h"
 #include "DBModule.h"
 #include "DBTransaction.hpp"
+#include "Import.hpp"
 #include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
@@ -44,12 +45,13 @@
 #include "ScheduledServiceTableSync.h"
 #include "SentScenario.h"
 #include "StopPoint.hpp"
-#include "Vehicle.hpp"
-#include "VehicleTableSync.hpp"
+
+#include <boost/filesystem.hpp>
 
 using namespace boost;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
+using namespace boost::filesystem;
 using namespace std;
 
 namespace synthese
@@ -64,21 +66,18 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace vehicle;
 	
 	template<>
-	const string FactorableTemplate<Action, data_exchange::IneoRealTimeUpdateAction>::FACTORY_KEY = "ineo_realtime_update";
+	const string FactorableTemplate<FileFormat, data_exchange::IneoBDSIFileFormat>::FACTORY_KEY = "ineo_bdsi";
 
 	namespace data_exchange
 	{
-		const string IneoRealTimeUpdateAction::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_mr_ds";
-		const string IneoRealTimeUpdateAction::PARAMETER_PLANNED_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_th_ds";
-		const string IneoRealTimeUpdateAction::PARAMETER_REAL_TIME_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_rt_ds";
-		const string IneoRealTimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = "mr_ds";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
 		
 		
 		
-		ParametersMap IneoRealTimeUpdateAction::getParametersMap() const
+		ParametersMap IneoBDSIFileFormat::Importer_::getParametersMap() const
 		{
 			ParametersMap map;
 			return map;
@@ -86,7 +85,7 @@ namespace synthese
 		
 		
 		
-		void IneoRealTimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
+		void IneoBDSIFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Planned datasource
 			try
@@ -111,58 +110,27 @@ namespace synthese
 			{
 				throw ActionException("No such messages recipients data source");
 			}
-
-			// Real time datasource
-			try
-			{
-				_realTimeDataSource = Env::GetOfficialEnv().get<DataSource>(
-					map.get<RegistryKeyType>(PARAMETER_REAL_TIME_DATASOURCE_ID)
-				);
-			}
-			catch(ObjectNotFoundException<DataSource>&)
-			{
-				throw ActionException("No such real time data source");
-			}
-
-			// Database
-			_database = map.get<string>(PARAMETER_DATABASE);
 		}
 		
 		
 		
-		void IneoRealTimeUpdateAction::run(
-			Request& request
-		){
+		bool IneoBDSIFileFormat::Importer_::_read(
+			boost::optional<const server::Request&> request
+		) const {
 			date today(day_clock::local_day());
 
 			//////////////////////////////////////////////////////////////////////////
 			// Preparation of list of objects to remove
 
 			// Scenarios
-			set<RegistryKeyType> scenariosToRemove;
 			DataSource::Links::mapped_type existingScenarios(
-				_realTimeDataSource->getLinkedObjects<Scenario>()
+				_import.get<DataSource>()->getLinkedObjects<Scenario>()
 			);
 			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingScenario, existingScenarios)
 			{
-				scenariosToRemove.insert(existingScenario.second->getKey());
+				_scenariosToRemove.insert(existingScenario.second->getKey());
 			}
 
-			// Alarm object links
-			set<RegistryKeyType> alarmObjectLinksToRemove;
-
-			// Alarms
-			set<RegistryKeyType> messagesToRemove;
-
-			// Vehicles
-			set<RegistryKeyType> vehiclesToRemove;
-			DataSource::Links::mapped_type existingVehicles(
-				_plannedDataSource->getLinkedObjects<Vehicle>()
-			);
-			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingVehicle, existingVehicles)
-			{
-				vehiclesToRemove.insert(existingVehicle.second->getKey());
-			}
 
 			//////////////////////////////////////////////////////////////////////////
 			// Pre-loading objects from BDSI
@@ -172,7 +140,6 @@ namespace synthese
 			Arrets arrets;
 			Chainages chainages;
 			Programmations programmations;
-			IneoVehicles ineoVehicles;
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
 
@@ -186,16 +153,35 @@ namespace synthese
 				{
 					// SYNTHESE stop point
 					string mnemol(result->getText("mnemol"));
+					string name(result->getText("nom"));
+
 					StopPoint* stopPoint(
 						_plannedDataSource->getObjectByCode<StopPoint>(mnemol)
 					);
 					Depot* depot(NULL);
-					if(!stopPoint)
+					if(stopPoint)
+					{
+						_logLoad(
+							ImportLogger::LOAD,
+							"STOP",mnemol,name,stopPoint->getKey(),stopPoint->getConnectionPlace()->getFullName() + "/" + stopPoint->getName(), string(), string(), "OK"
+						);
+					}
+					else
 					{
 						depot = _plannedDataSource->getObjectByCode<Depot>(mnemol);
-						if(!depot)
+						if(depot)
 						{
-							Log::GetInstance().warn("No such stop point or depot : " + mnemol);
+							_logLoad(
+								ImportLogger::LOAD,
+								"DEPOT",mnemol,name,depot->getKey(),depot->getName(),string(), string(), "OK"
+							);
+						}
+						else
+						{
+							_logLoad(
+								ImportLogger::WARN,
+								"STOP/DEPOT",mnemol,name,0,string(), string(),string(), "NOT FOUND"
+							);
 							continue;
 					}	}
 
@@ -212,7 +198,7 @@ namespace synthese
 					);
 
 					// Copy of values
-					arret.nom = result->getText("nom");
+					arret.nom = name;
 					arret.ref = ref;
 					arret.syntheseStop = stopPoint;
 				}
@@ -231,9 +217,20 @@ namespace synthese
 					CommercialLine* line(
 						_plannedDataSource->getObjectByCode<CommercialLine>(mnemo)
 					);
-					if(!line)
+					if(line)
+					{
+						_logLoad(
+							ImportLogger::LOAD,
+							"LINE",mnemo,mnemo,line->getKey(),line->getName(),string(), string(), "OK"
+						);
+					}
+					else
 					{
 						Log::GetInstance().warn("No such line : " + mnemo);
+						_logLoad(
+							ImportLogger::WARN,
+							"LINE",mnemo,mnemo,0,string(), string(),string(), "NOT FOUND"
+						);
 						continue;
 					}
 
@@ -271,6 +268,8 @@ namespace synthese
 				while(result->next())
 				{
 					int ref(result->getInt("ref"));
+					string name(result->getText("nom"));
+
 					Chainage& chainage(
 						chainages.insert(
 							make_pair(
@@ -283,7 +282,10 @@ namespace synthese
 					Lignes::iterator it(lignes.find(result->getInt("ligne")));
 					if(it == lignes.end())
 					{
-						Log::GetInstance().warn("Bad ligne field in chainage "+ lexical_cast<string>(ref));
+						_logLoad(
+							ImportLogger::WARN,
+							"JOURNEYPATTERN",lexical_cast<string>(ref),name,0,string(),string(), string(),"LINE NOT FOUND"
+						);
 						chainages.erase(ref);
 						do
 						{
@@ -296,8 +298,12 @@ namespace synthese
 						continue;
 					}
 					chainage.ligne = &it->second;
-					chainage.nom = result->getText("nom");
+					chainage.nom = name;
 					chainage.sens = (result->getText("sens") == "R");
+					_logLoad(
+						ImportLogger::LOAD,
+						"JOURNEYPATTERN",lexical_cast<string>(ref),name,0,string(),string(), string(),"OK"
+					);
 					
 					// Arretchn loop
 					do
@@ -318,13 +324,20 @@ namespace synthese
 						Arrets::iterator it(arrets.find(chainageResult->getInt("arret")));
 						if(it == arrets.end())
 						{
-							Log::GetInstance().warn("Bad arret field in arretchn "+ lexical_cast<string>(arretChn.ref));
+							_logLoad(
+								ImportLogger::WARN,
+								"STOPPOINT",lexical_cast<string>(arretChn.ref),lexical_cast<string>(arretChn.ref),0,string(),string(), string(),"Bad arret field in arretchn"
+							);
 							chainage.arretChns.pop_back();
 							continue;
 						}
 						arretChn.arret = &it->second;
 						arretChn.pos = chainageResult->getInt("pos");
 						arretChn.type = chainageResult->getText("type");
+						_logLoad(
+							ImportLogger::LOAD,
+							"STOPPOINT",lexical_cast<string>(arretChn.ref),arretChn.arret->nom,0,string(),string(), string(),"OK"
+						);
 
 					} while(chainageResult->next());
 				}
@@ -359,11 +372,18 @@ namespace synthese
 					Chainages::iterator it(chainages.find(result->getInt("chainage")));
 					if(it == chainages.end())
 					{
-						Log::GetInstance().warn("Bad chainage field in course "+ lexical_cast<string>(ref));
+						_logLoad(
+							ImportLogger::WARN,
+							"SERVICE",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),string(), string(),"Bad chainage field in course "
+						);
 						courses.erase(ref);
 					}
 					else
 					{
+						_logLoad(
+							ImportLogger::LOAD,
+							"SERVICE",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),string(), string(),"OK"
+						);
 						course.chainage = &it->second;
 						course.syntheseService = NULL;
 					}
@@ -435,6 +455,23 @@ namespace synthese
 							){
 								horaire.hrd = now_plus_35;
 							}
+
+							_logLoad(
+								ImportLogger::DEBG,
+								"SCHEDULE_HTD",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
+							);
+							_logLoad(
+								ImportLogger::DEBG,
+								"SCHEDULE_HTA",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("hta"),to_simple_string(horaire.hta),"OK"
+							);
+							_logLoad(
+								ImportLogger::DEBG,
+								"SCHEDULE_HRD",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("hrd"),to_simple_string(horaire.hrd),"OK"
+							);
+							_logLoad(
+								ImportLogger::DEBG,
+								"SCHEDULE_HRA",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("hra"),to_simple_string(horaire.hra),"OK"
+							);
 						}
 
 					} while(horaireResult->next());
@@ -486,7 +523,7 @@ namespace synthese
 						programmation.endTime += days(1);
 					}
 
-					do
+					do 
 					{
 						int prog_ref(destResult->getInt("ref_prog"));
 						if(prog_ref != ref)
@@ -516,31 +553,9 @@ namespace synthese
 				}
 			}
 
-			// Vehicle
-			{
-				string query("SELECT VEHICULE.* FROM "+ _database +".VEHICULE");
-				DBResultSPtr result(db.execQuery(query));
-				while(result->next())
-				{
-					int ref(result->getInt("ref"));
-					IneoVehicle& vehicle(
-						ineoVehicles.insert(
-							make_pair(
-								ref,
-								IneoVehicle()
-						)	).first->second
-					);
-					vehicle.ref = lexical_cast<string>(ref);
-					vehicle.available = (result->getText("neutralise") == "N" ? true : false);
-				}
-			}
-
 
 			//////////////////////////////////////////////////////////////////////////
 			// Import content analyzing
-
-			// Objects to update in database
-			Env updatesEnv;
 
 			{ // Scenarios and messages
 
@@ -553,8 +568,8 @@ namespace synthese
 					shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
-								_realTimeDataSource->getObjectByCode<Scenario>(
-							lexical_cast<string>(programmation.ref)
+							_import.get<DataSource>()->getObjectByCode<Scenario>(
+								lexical_cast<string>(programmation.ref)
 					)	)	);
 					Alarm* message(NULL);
 					if(!scenario)
@@ -565,11 +580,11 @@ namespace synthese
 								ScenarioTableSync::getId()
 						)	);
 						updatedScenario->addCodeBySource(
-							*_realTimeDataSource,
+							*_import.get<DataSource>(),
 							lexical_cast<string>(programmation.ref)
 						);
 						updatedScenario->setIsEnabled(true);
-						updatesEnv.getEditableRegistry<Scenario>().add(updatedScenario);
+						_env.getEditableRegistry<Scenario>().add(updatedScenario);
 
 						// Creation of the message
 						updatedMessage.reset(
@@ -580,11 +595,11 @@ namespace synthese
 						updatedScenario->addMessage(*updatedMessage);
 						scenario = updatedScenario.get();
 						message = updatedMessage.get();
-						updatesEnv.getEditableRegistry<Alarm>().add(updatedMessage);
+						_env.getEditableRegistry<Alarm>().add(updatedMessage);
 					}
 					else
 					{
-						scenariosToRemove.erase(scenario->getKey());
+						_scenariosToRemove.erase(scenario->getKey());
 
 						// Message content
 						const Scenario::Messages& messages(scenario->getMessages());
@@ -597,7 +612,7 @@ namespace synthese
 							SentScenario::Messages::const_iterator it(messages.begin());
 							for(++it; it != messages.end(); ++it)
 							{
-								messagesToRemove.insert((*it)->getKey());
+								_messagesToRemove.insert((*it)->getKey());
 							}
 						}
 						message = const_cast<Alarm*>(*messages.begin());
@@ -607,7 +622,7 @@ namespace synthese
 						){
 							updatedMessage = AlarmTableSync::GetCastEditable<SentAlarm>(
 								message->getKey(),
-								updatesEnv
+								_env
 							);
 						}
 
@@ -619,7 +634,7 @@ namespace synthese
 						){
 							updatedScenario = ScenarioTableSync::GetCastEditable<SentScenario>(
 								scenario->getKey(),
-								updatesEnv
+								_env
 							);
 						}
 					}
@@ -640,21 +655,13 @@ namespace synthese
 
 
 					// Adding of existing object links to the removal list
-					Alarm::LinkedObjects::mapped_type existingRecipients;
-					const Alarm::LinkedObjects& linkedObjects(
-						(*scenario->getMessages().begin())->getLinkedObjects()
-					);
-					Alarm::LinkedObjects::const_iterator it(
-						linkedObjects.find(
+					Alarm::LinkedObjects::mapped_type existingRecipients(
+						(*scenario->getMessages().begin())->getLinkedObjects(
 							DisplayScreenAlarmRecipient::FACTORY_KEY
 					)	);
-					if(it != linkedObjects.end())
-					{
-						existingRecipients = it->second;
-					}
 					BOOST_FOREACH(const Alarm::LinkedObjects::mapped_type::value_type& aol, existingRecipients)
 					{
-						alarmObjectLinksToRemove.insert(aol->getKey());
+						_alarmObjectLinksToRemove.insert(aol->getKey());
 					}
 
 					// Loop on destinataires)
@@ -664,7 +671,7 @@ namespace synthese
 						const AlarmObjectLink* toNotRemove(NULL);
 						BOOST_FOREACH(const Alarm::LinkedObjects::mapped_type::value_type& aol, existingRecipients)
 						{
-							if(aol->getObject() == itDest.syntheseDisplayBoard)
+							if(aol->getObjectId() == itDest.syntheseDisplayBoard->getKey())
 							{
 								toNotRemove = aol;
 								break;
@@ -672,7 +679,7 @@ namespace synthese
 						}
 						if(toNotRemove)
 						{
-							alarmObjectLinksToRemove.erase(toNotRemove->getKey());
+							_alarmObjectLinksToRemove.erase(toNotRemove->getKey());
 							continue;
 						}
 
@@ -680,8 +687,9 @@ namespace synthese
 						shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 						link->setKey(AlarmObjectLinkTableSync::getId());
 						link->setAlarm(message);
-						link->setObject(itDest.syntheseDisplayBoard);
-						updatesEnv.getEditableRegistry<AlarmObjectLink>().add(link);
+						link->setObjectId(itDest.syntheseDisplayBoard->getKey());
+						link->setRecipient(DisplayScreenAlarmRecipient::FACTORY_KEY);
+						_env.getEditableRegistry<AlarmObjectLink>().add(link);
 					}
 				}
 			}
@@ -723,7 +731,7 @@ namespace synthese
 
 					// Known ref ?
 					ScheduledService* service(
-						_realTimeDataSource->getObjectByCode<ScheduledService>(lexical_cast<string>(course.ref))
+						_import.get<DataSource>()->getObjectByCode<ScheduledService>(lexical_cast<string>(course.ref))
 					);
 					if(!service)
 					{
@@ -789,7 +797,7 @@ namespace synthese
 							const JourneyPattern& jp(*static_cast<JourneyPattern*>(path));
 
 							if(	!jp.hasLinkWithSource(*_plannedDataSource) &&
-								!jp.hasLinkWithSource(*_realTimeDataSource)
+								!jp.hasLinkWithSource(*_import.get<DataSource>())
 							){
 								continue;
 							}
@@ -831,10 +839,10 @@ namespace synthese
 							jp->setWayBack(course.chainage->sens);
 							jp->setName(course.chainage->nom);
 							jp->addCodeBySource(
-								*_realTimeDataSource,
+								*_import.get<DataSource>(),
 								lexical_cast<string>(course.chainage->ref)
 							);
-							updatesEnv.getEditableRegistry<JourneyPattern>().add(jp);
+							_env.getEditableRegistry<JourneyPattern>().add(jp);
 							course.chainage->syntheseJourneyPatterns.push_back(jp.get());
 
 							size_t rank(0);
@@ -852,7 +860,7 @@ namespace synthese
 										arretChn.type != "N"
 								)	);
 								jp->addEdge(*ls);
-								updatesEnv.getEditableRegistry<LineStop>().add(ls);
+								_env.getEditableRegistry<LineStop>().add(ls);
 								++rank;
 							}
 						}
@@ -914,15 +922,15 @@ namespace synthese
 					}
 					course.syntheseService->setSchedules(departureSchedules, arrivalSchedules, true);
 					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
-					course.syntheseService->addCodeBySource(*_realTimeDataSource, lexical_cast<string>(course.ref));
+					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), lexical_cast<string>(course.ref));
 					course.syntheseService->setActive(today);
-					updatesEnv.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(course.syntheseService));
+					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(course.syntheseService));
 
 					servicesToLinkAndUpdate.push_back(&course);
 				}
 
 				DataSource* dataSourceOnUpdateEnv(
-					DataSourceTableSync::GetEditable(_realTimeDataSource->getKey(), updatesEnv).get()
+					DataSourceTableSync::GetEditable(_import.get<DataSource>()->getKey(), _env).get()
 				);
 
 				// Loop on services to update
@@ -937,7 +945,7 @@ namespace synthese
 					shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it->syntheseService->getKey(),
-							updatesEnv
+							_env
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
@@ -952,7 +960,7 @@ namespace synthese
 					shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it->syntheseService->getKey(),
-							updatesEnv
+							_env
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
@@ -966,7 +974,7 @@ namespace synthese
 					shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it.second->getKey(),
-							updatesEnv
+							_env
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
@@ -975,103 +983,76 @@ namespace synthese
 				}
 			}
 
-			{ // Vehicles
+			return true;
+		}
+		
 
-				// Loop on objects present in the database (search for creations and updates)
-				BOOST_FOREACH(const IneoVehicles::value_type& itVehicle, ineoVehicles)
-				{
-					const IneoVehicle& ineoVehicle(itVehicle.second);
 
-					shared_ptr<Vehicle> updatedVehicle;
-					Vehicle* vehicle(
-						static_cast<Vehicle*>(
-								_plannedDataSource->getObjectByCode<Vehicle>(
-									ineoVehicle.ref
-					)	)	);
-					if(!vehicle)
-					{
-						// Creation of the vehicle
-						updatedVehicle.reset(
-							new Vehicle(
-								VehicleTableSync::getId()
-						)	);
-						updatedVehicle->addCodeBySource(
-							*_plannedDataSource,
-							ineoVehicle.ref
-						);
-						updatesEnv.getEditableRegistry<Vehicle>().add(updatedVehicle);
-					}
-					else
-					{
-						vehiclesToRemove.erase(vehicle->getKey());
+		IneoBDSIFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			DatabaseReadImporter<IneoBDSIFileFormat>(env, import, logger)
+		{}
 
-						if(	vehicle->getNumber() != ineoVehicle.ref ||
-							vehicle->getAvailable() != ineoVehicle.available
-						){
-							updatedVehicle = VehicleTableSync::GetCastEditable<Vehicle>(
-								vehicle->getKey(),
-								updatesEnv
-							);
-						}
-					}
 
-					if(updatedVehicle.get())
-					{
-						updatedVehicle->setNumber(ineoVehicle.ref);
-						updatedVehicle->setAvailable(ineoVehicle.available);
-					}
 
-				}
-			}
+		void IneoBDSIFileFormat::Importer_::_logLoad(
+			ImportLogger::Level level,
+			const std::string& table,
+			const std::string& localId,
+			const std::string& locaName,
+			const util::RegistryKeyType syntheseId,
+			const std::string& syntheseName,
+			const std::string& oldValue,
+			const std::string& newValue,
+			const std::string& remarks
+		) const	{
 
-			//////////////////////////////////////////////////////////////////////////
-			// Storage
+			stringstream content;
+			content <<
+					table << ";" <<
+					localId << ";" <<
+					locaName << ";" <<
+					(syntheseId ? lexical_cast<string>(syntheseId) : string()) << ";" <<
+					syntheseName << ";" <<
+					oldValue << ";" <<
+					newValue << ";" <<
+					remarks
+			;
+			_log(level, content.str());
+		}
 
+
+
+		DBTransaction IneoBDSIFileFormat::Importer_::_save() const
+		{
 			DBTransaction transaction;
 
 			// Saving
-			DBModule::SaveEntireEnv(updatesEnv, transaction);
+			DBModule::SaveEntireEnv(_env, transaction);
 
 			// Removals
-			BOOST_FOREACH(RegistryKeyType id, alarmObjectLinksToRemove)
+			BOOST_FOREACH(RegistryKeyType id, _alarmObjectLinksToRemove)
 			{
 				DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(NULL, id, transaction, false);
 			}
-			BOOST_FOREACH(RegistryKeyType id, scenariosToRemove)
+			BOOST_FOREACH(RegistryKeyType id, _scenariosToRemove)
 			{
 				DBTableSyncTemplate<ScenarioTableSync>::Remove(NULL, id, transaction, false);
 			}
-			BOOST_FOREACH(RegistryKeyType id, messagesToRemove)
+			BOOST_FOREACH(RegistryKeyType id, _messagesToRemove)
 			{
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
-			// Vehicle removals
-			BOOST_FOREACH(RegistryKeyType id, vehiclesToRemove)
-			{
-				DBTableSyncTemplate<VehicleTableSync>::Remove(NULL, id, transaction, false);
-			}
 
-			transaction.run();
-		}
-		
-		
-		
-		bool IneoRealTimeUpdateAction::isAuthorized(
-			const Session* session
-		) const {
-			return true;
+			return transaction;
 		}
 
 
 
-		IneoRealTimeUpdateAction::IneoRealTimeUpdateAction()
-		{
-
-		}
-
-
-
-		bool IneoRealTimeUpdateAction::Course::mustBeImported() const
+		bool IneoBDSIFileFormat::Importer_::Course::mustBeImported() const
 		{
 			// Jump over courses with incomplete chainages
 			if(horaires.size() != chainage->arretChns.size())
@@ -1093,7 +1074,7 @@ namespace synthese
 
 
 
-		bool IneoRealTimeUpdateAction::Course::operator==( const pt::ScheduledService& service ) const
+		bool IneoBDSIFileFormat::Importer_::Course::operator==( const pt::ScheduledService& service ) const
 		{
 			// Basic route check
 			const JourneyPattern& jp(*static_cast<const JourneyPattern*>(service.getPath()));
@@ -1143,7 +1124,7 @@ namespace synthese
 
 
 
-		void IneoRealTimeUpdateAction::Course::updateService( pt::ScheduledService& service ) const
+		void IneoBDSIFileFormat::Importer_::Course::updateService( pt::ScheduledService& service ) const
 		{
 			// Update of the real time schedules
 			SchedulesBasedService::Schedules departureSchedules;
@@ -1158,7 +1139,7 @@ namespace synthese
 
 
 
-		bool IneoRealTimeUpdateAction::Course::operator!=( const pt::ScheduledService& op ) const
+		bool IneoBDSIFileFormat::Importer_::Course::operator!=( const pt::ScheduledService& op ) const
 		{
 			return !operator==(op);
 		}

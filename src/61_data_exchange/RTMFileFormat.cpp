@@ -22,6 +22,7 @@
 
 #include "RTMFileFormat.hpp"
 
+#include "Import.hpp"
 #include "PTModule.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
@@ -171,21 +172,21 @@ namespace synthese
 
 		RTMFileFormat::Importer_::Importer_(
 			util::Env& env,
-			const impex::DataSource& dataSource
-		):	Importer(env, dataSource),
-			MultipleFileTypesImporter<RTMFileFormat>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			MultipleFileTypesImporter<RTMFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
 			_importStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
-			_stopPoints(_dataSource, env)
+			_stopPoints(*_import.get<DataSource>(), env)
 		{}
 
 
 
 		bool RTMFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& stream,
 			const std::string& key,
 			boost::optional<const server::Request&> request
 		) const {
@@ -196,7 +197,12 @@ namespace synthese
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 			string line;
-			stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
+			_log(
+				ImportLogger::DEBG,
+				"Loading file "+ filePath.file_string() +" as "+ key
+			);
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			// Stops
 			if(key == FILE_ARRETS)
@@ -220,7 +226,10 @@ namespace synthese
 		
 					if(cities.empty())
 					{
-						stream << "WARN : City " << "Marseille" << " not found<br />";
+						_log(
+							ImportLogger::WARN,
+							"City Marseille not found"
+						);
 					}
 					else
 					{
@@ -243,7 +252,7 @@ namespace synthese
 								y.replace(2,1,".");
 							}
 						 
-							point = _dataSource.getActualCoordinateSystem().createPoint(
+							point = dataSource.getActualCoordinateSystem().createPoint(
 								lexical_cast<double>(x),
 								lexical_cast<double>(y)
 							);
@@ -255,12 +264,18 @@ namespace synthese
 						}
 						catch(boost::bad_lexical_cast&)
 						{
-							stream << "WARN : Stop " << code << " has invalid coordinate 1 <br />";
+							_log(
+								ImportLogger::WARN,
+								"Stop "+ code +" has invalid coordinate 1"
+							);
 						}
 					}
 					else
 					{
-						stream << "WARN : Stop " << code << " has invalid coordinate<br />";
+						_log(
+							ImportLogger::WARN,
+							"Stop "+ code +" has invalid coordinate"
+						);
 					}
 
 					// Handicapped rules
@@ -280,9 +295,9 @@ namespace synthese
 						point.get(),
 						*cityForStopAreaAutoGeneration,
 						_stopAreaDefaultTransferDuration,
-						_dataSource,
+						dataSource,
 						_env,
-						stream,
+						_logger,
  						handicappedUseRule
 					);
 					cout << "test arrets ok" << endl;
@@ -448,7 +463,7 @@ namespace synthese
 					}
 				}
 				// SYNTHESE object construction
-				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
 				BOOST_FOREACH(const Trips::value_type& itTrip, _trips)
 				{
 					cout << "debut construction" << endl;
@@ -459,7 +474,10 @@ namespace synthese
 					// Line
 					if(!lines.contains(trip.lineCode))
 					{
-						stream << "WARN : inconsistent line id "<< trip.lineCode <<" in the trip "<< trip.code <<"<br />";
+						_log(
+							ImportLogger::WARN,
+							"Inconsistent line id "+ trip.lineCode +" in the trip "+ trip.code
+						);
 						continue;
 					}
 					cout << "test construction lignes" << endl;	
@@ -590,7 +608,7 @@ namespace synthese
 					line.substr(0, line.size() - 1) :
 					line
 				);
-				utfline = IConv(_dataSource.getCharset(), "UTF-8").convert(line);
+				utfline = IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
 		}

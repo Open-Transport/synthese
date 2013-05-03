@@ -22,14 +22,11 @@
 
 #include "InterSYNTHESEModule.hpp"
 
-#include "BasicClient.h"
+#include "Import.hpp"
+#include "InterSYNTHESEFileFormat.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlave.hpp"
-#include "InterSYNTHESESlaveUpdateService.hpp"
-#include "InterSYNTHESESyncTypeFactory.hpp"
-#include "InterSYNTHESEUpdateAckService.hpp"
-#include "ServerModule.h"
-#include "StaticFunctionRequest.h"
+#include "URI.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/thread.hpp>
@@ -41,6 +38,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace impex;
 	using namespace inter_synthese;
 	using namespace server;
 	using namespace util;
@@ -49,11 +47,12 @@ namespace synthese
 	
 	namespace inter_synthese
 	{
-		const std::string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_MASTER_HOST = "inter_synthese_master_host";
-		const std::string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_MASTER_PORT = "inter_synthese_master_port";
-		const std::string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME = "inter_synthese_waiting_time";
-		const std::string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE = "inter_synthese_slave_active";
-		const std::string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID = "inter_synthese_slave_id";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_MASTER_HOST = "inter_synthese_master_host";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_MASTER_PORT = "inter_synthese_master_port";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME = "inter_synthese_waiting_time";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE = "inter_synthese_slave_active";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID = "inter_synthese_slave_id";
+		const RegistryKeyType InterSYNTHESEModule::FAKE_IMPORT_ID = 1;
 
 		string InterSYNTHESEModule::_masterHost;
 		string InterSYNTHESEModule::_masterPort;
@@ -70,7 +69,7 @@ namespace synthese
 		{
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_MASTER_HOST, string(), &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_MASTER_PORT, "8080", &InterSYNTHESEModule::ParameterCallback);
-			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE, "1", &InterSYNTHESEModule::ParameterCallback);
+			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE, "0", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID, "0", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME, "5", &InterSYNTHESEModule::ParameterCallback);
 		}
@@ -83,7 +82,6 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
 		{
-			ServerModule::AddThread(&InterSYNTHESEModule::InterSYNTHESE, "Inter-SYNTHESE client synchronization");
 		}
 
 
@@ -107,190 +105,6 @@ namespace synthese
 
 	namespace inter_synthese
 	{
-		void InterSYNTHESEModule::InterSYNTHESE()
-		{
-			while(true)
-			{
-				ServerModule::SetCurrentThreadRunningAction();
-
-				posix_time::ptime now(posix_time::second_clock::local_time());
-
-				if(	_slaveActive &&
-					!_masterHost.empty() &&
-					!_masterPort.empty()
-				){
-					try
-					{
-						Log::GetInstance().debug(
-							"Inter-SYNTHESE : Attempt to sync with "+ _masterHost +":"+ _masterPort + " as slave id #"+ lexical_cast<string>(_slaveId)
-						);
-						
-						StaticFunctionRequest<InterSYNTHESESlaveUpdateService> r;
-						r.getFunction()->setSlaveId(_slaveId);
-						BasicClient c(
-							_masterHost,
-							_masterPort
-						);
-						string contentStr(
-							c.get(r.getURL())
-						);
-
-						if(contentStr == InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC)
-						{
-							Log::GetInstance().debug(
-								"Inter-SYNTHESE : "+ _masterHost +":"+ _masterPort + " has no content to sync for slave id #"+ lexical_cast<string>(_slaveId)
-							);
-						}
-						else
-						{
-							bool ok(true);
-							typedef std::map<
-								util::RegistryKeyType,	// id of the update
-								std::pair<
-									std::string,		// synchronizer
-									std::string			// message
-							>	> ContentMap;
-							ContentMap content;
-				
-							size_t i(0);
-							while(i < contentStr.size())
-							{
-								ContentMap::mapped_type item;
-
-								// ID + Search for next :
-								size_t l=i;
-								for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-								if(i == contentStr.size())
-								{
-									ok = false;
-									break;
-								}
-								RegistryKeyType id(lexical_cast<RegistryKeyType>(contentStr.substr(l, i-l)));
-								++i;
-
-								// Synchronizer + Search for next :
-								l=i;
-								for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-								if(i == contentStr.size())
-								{
-									ok = false;
-									break;
-								}
-								item.first = contentStr.substr(l, i-l);
-								++i;
-
-								// Size + Search for next :
-								l=i;
-								for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-								if(i == contentStr.size())
-								{
-									ok = false;
-									break;
-								}
-								size_t contentSize = lexical_cast<size_t>(contentStr.substr(l, i-l));
-								++i;
-
-								// Content
-								if(i+contentSize > contentStr.size())
-								{
-									ok = false;
-									break;
-								}
-								item.second = contentStr.substr(i, contentSize);
-								i += contentSize + InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
-
-								content.insert(
-									make_pair(
-										id,
-										item
-								)	);
-							}
-
-							if(ok)
-							{
-								Log::GetInstance().debug(
-									"Inter-SYNTHESE : "+ _masterHost +":"+ _masterPort + " has sent "+ lexical_cast<string>(content.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
-								);
-
-								StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
-								ackRequest.getFunction()->setSlaveId(_slaveId);
-								if(!content.empty())
-								{
-									ackRequest.getFunction()->setRangeBegin(
-										content.begin()->first
-									);
-									ackRequest.getFunction()->setRangeEnd(
-										content.rbegin()->first
-									);
-								}
-								BasicClient c2(
-									_masterHost,
-									_masterPort
-								);
-								string result2(
-									c2.get(ackRequest.getURL())
-								);
-								if(result2 == InterSYNTHESEUpdateAckService::VALUE_OK)
-								{
-									// Local variables
-									auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;
-									string lastFactoryKey;
-
-									// Reading the content
-									BOOST_FOREACH(const ContentMap::value_type& item, content)
-									{
-										try
-										{
-											const string& factoryKey(item.second.first);
-											if(factoryKey != lastFactoryKey)
-											{
-												if(interSYNTHESE.get())
-												{
-													interSYNTHESE->closeSync();
-												}
-												interSYNTHESE.reset(
-													Factory<InterSYNTHESESyncTypeFactory>::create(factoryKey)
-												);
-												lastFactoryKey = factoryKey;
-												interSYNTHESE->initSync();
-											}
-
-											interSYNTHESE->sync(item.second.second);
-										}
-										catch(...)
-										{
-											// Log
-										}
-									}
-									if(interSYNTHESE.get())
-									{
-										interSYNTHESE->closeSync();
-										Log::GetInstance().debug(
-											"Inter-SYNTHESE : "+ _masterHost +":"+ _masterPort + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
-										);
-									}
-								}
-							}
-						}
-					}
-					catch(std::exception& e)
-					{
-						Log::GetInstance().warn(
-							"Inter-SYNTHESE : Synchronization with "+ _masterHost +":"+ _masterPort + " as slave id #"+ lexical_cast<string>(_slaveId) +" has failed",
-							e
-						);
-					}
-				}
-
-				ServerModule::SetCurrentThreadWaiting();
-
-				this_thread::sleep(_syncWaitingTime);
-			}
-
-		}
-
-
-
 		void InterSYNTHESEModule::Enqueue(
 			const InterSYNTHESEContent& content,
 			boost::optional<db::DBTransaction&> transaction
@@ -354,6 +168,50 @@ namespace synthese
 				catch(bad_lexical_cast&)
 				{
 					// Log
+				}
+			}
+			_generateFakeImport();
+		}
+
+
+
+		void InterSYNTHESEModule::_generateFakeImport()
+		{
+			if(!_slaveActive)
+			{
+				if(Env::GetOfficialEnv().getRegistry<Import>().contains(FAKE_IMPORT_ID))
+				{
+					Env::GetOfficialEnv().getEditableRegistry<Import>().remove(FAKE_IMPORT_ID);
+				}
+			}
+			else
+			{
+				shared_ptr<Import> import;
+				bool created(false);
+				if(Env::GetOfficialEnv().getRegistry<Import>().contains(FAKE_IMPORT_ID))
+				{
+					import = Env::GetOfficialEnv().getRegistry<Import>().getEditable(FAKE_IMPORT_ID);
+				}
+				else
+				{
+					import.reset(new Import(FAKE_IMPORT_ID));
+					import->set<Name>("Auto generated Inter-SYNTHESE import");
+					import->set<FileFormatKey>(InterSYNTHESEFileFormat::FACTORY_KEY);
+					import->set<Active>(true);
+					created = true;
+				}
+
+				// Import parameters
+				ParametersMap pm;
+				pm.insert(ConnectionImporter<InterSYNTHESEFileFormat>::PARAMETER_ADDRESS, _masterHost);
+				pm.insert(ConnectionImporter<InterSYNTHESEFileFormat>::PARAMETER_PORT, _masterPort);
+				pm.insert(InterSYNTHESEFileFormat::Importer_::PARAMETER_SLAVE_ID, _slaveId);
+				import->set<synthese::Parameters>(pm);
+
+				import->set<AutoImportDelay>(_syncWaitingTime);
+				if(created)
+				{
+					Env::GetOfficialEnv().getEditableRegistry<Import>().add(import);
 				}
 			}
 		}

@@ -22,11 +22,12 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "CleanObsoleteDataAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "CleanObsoleteDataAction.hpp"
 #include "Request.h"
-#include "DataSourceTableSync.h"
+#include "ImportTableSync.hpp"
 #include "Importer.hpp"
 #include "FileFormat.h"
 
@@ -46,7 +47,7 @@ namespace synthese
 
 	namespace impex
 	{
-		const string CleanObsoleteDataAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "datasource_id";
+		const string CleanObsoleteDataAction::PARAMETER_IMPORT_ID = Action_PARAMETER_PREFIX + "_import_id";
 		const string CleanObsoleteDataAction::PARAMETER_FIRST_DATE = Action_PARAMETER_PREFIX + "first_date";
 
 
@@ -55,7 +56,7 @@ namespace synthese
 			ParametersMap map;
 			if(_importer.get())
 			{
-				map.insert(PARAMETER_DATASOURCE_ID, _importer->getDataSource().getKey());
+				map.insert(PARAMETER_IMPORT_ID, _importer->getImport().getKey());
 			}
 			if(!_firstDate.is_not_a_date())
 			{
@@ -68,18 +69,18 @@ namespace synthese
 
 		void CleanObsoleteDataAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Datasource
+			// Import
 			try
 			{
-				setDataSource(*DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID), *_env));
+				setImport(*ImportTableSync::Get(map.get<RegistryKeyType>(PARAMETER_IMPORT_ID), *_env));
 			}
-			catch(ObjectNotFoundException<DataSource>&)
+			catch(ObjectNotFoundException<Import>&)
 			{
-				throw ActionException("No such datasource");
+				throw ActionException("No such import");
 			}
 			if(!_importer.get())
 			{
-				throw ActionException("Invalid datasource : maybe file format is undefined ?");
+				throw ActionException("Invalid import : maybe file format is undefined ?");
 			}
 
 			// Date
@@ -104,11 +105,12 @@ namespace synthese
 
 
 
-		void CleanObsoleteDataAction::setDataSource(const DataSource& dataSource)
+		void CleanObsoleteDataAction::setImport(const Import& value)
 		{
 			try
 			{
-				_importer  = dataSource.getImporter(*_env);
+				_importLogger.reset(new ImportLogger(ImportLogger::WARN, string(), _output));
+				_importer  = value.getImporter(*_env, *_importLogger);
 			}
 			catch(FactoryException<FileFormat>&)
 			{

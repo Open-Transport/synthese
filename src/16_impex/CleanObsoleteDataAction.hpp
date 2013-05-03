@@ -33,7 +33,8 @@ namespace synthese
 	namespace impex
 	{
 		class Importer;
-		class DataSource;
+		class Import;
+		class ImportLogger;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 16.15 Action : CleanObsoleteDataAction.
@@ -52,11 +53,14 @@ namespace synthese
 			public util::FactorableTemplate<server::Action, CleanObsoleteDataAction>
 		{
 		public:
-			static const std::string PARAMETER_DATASOURCE_ID;
+			static const std::string PARAMETER_IMPORT_ID;
 			static const std::string PARAMETER_FIRST_DATE;
 
 		private:
 			boost::shared_ptr<Importer> _importer;
+			boost::shared_ptr<ImportLogger> _importLogger;
+			std::stringstream _output;
+
 			boost::gregorian::date _firstDate;
 
 		protected:
@@ -93,7 +97,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setDataSource(const DataSource& dataSource);
+				void setImport(const Import& import);
 			//@}
 		};
 	}

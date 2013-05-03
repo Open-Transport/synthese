@@ -41,12 +41,14 @@ namespace synthese
 
 			virtual boost::shared_ptr<Importer> getImporter(
 				util::Env& env,
-				const DataSource& dataSource
+				const Import& import,
+				const ImportLogger& importLogger
 			) const	{
+
 				return
 					boost::static_pointer_cast<Importer, typename FF::Importer_>(
 						boost::shared_ptr<typename FF::Importer_>(
-							new typename FF::Importer_(env, dataSource)
+							new typename FF::Importer_(env, import, importLogger)
 					)	);
 			}
 

@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "TridentFileFormat.h"
+
 #include "DataSource.h"
 #include "DBModule.h"
-#include "TridentFileFormat.h"
 #include "GraphConstants.h"
+#include "Import.hpp"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
@@ -121,21 +123,22 @@ namespace synthese
 		// CONSTRUCTOR
 		TridentFileFormat::Importer_::Importer_(
 			Env& env,
-			const DataSource& dataSource
-		):	Importer(env, dataSource),
-			OneFileTypeImporter<Importer_>(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource),
+			const Import& import,
+			const impex::ImportLogger& logger
+		):	Importer(env, import, logger),
+			OneFileTypeImporter<Importer_>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
 			_importStops(false),
 			_autoGenerateStopAreas(false),
 			_importJunctions(false),
 			_mergeRoutes(true),
 			_defaultTransferDuration(minutes(8)),
 			_importTimetablesAsTemplates(false),
-			_calendarTemplates(_dataSource, env),
-			_stopAreas(_dataSource, env),
-			_stops(_dataSource, env),
-			_networks(dataSource, env),
-			_lines(dataSource, env)
+			_calendarTemplates(*import.get<DataSource>(), env),
+			_stopAreas(*import.get<DataSource>(), env),
+			_stops(*import.get<DataSource>(), env),
+			_networks(*import.get<DataSource>(), env),
+			_lines(*import.get<DataSource>(), env)
 		{}
 
 
@@ -157,6 +160,8 @@ namespace synthese
 			return result;
 		}
 
+
+
 		util::ParametersMap TridentFileFormat::Exporter_::getParametersMap() const
 		{
 			ParametersMap result;
@@ -172,6 +177,7 @@ namespace synthese
 			result.insert(PARAMETER_WITH_TISSEO_EXTENSION, _withTisseoExtension);
 			return result;
 		}
+
 
 
 		void TridentFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
@@ -1046,18 +1052,20 @@ namespace synthese
 
 		bool TridentFileFormat::Importer_::_parse(
 			const path& filePath,
-			ostream& os,
 			boost::optional<const server::Request&> adminRequest
 		) const {
 			bool failure(false);
 
-			string encoding(_dataSource.getCharset());
+			DataSource& dataSource(*_import.get<DataSource>());
+
+			string encoding(dataSource.get<Charset>());
 			if(encoding.empty())
 			{
 				ifstream inFile;
 				inFile.open(filePath.file_string().c_str());
 				if(!inFile)
 				{
+					_logError("Could no open the file " + filePath.file_string());
 					throw Exception("Could no open the file " + filePath.file_string());
 				}
 				string line;
@@ -1091,17 +1099,19 @@ namespace synthese
 			XMLNode allNode = XMLNode::parseFile(filePath.file_string().c_str(), "ChouettePTNetwork", &pResults);
 			if (pResults.error != eXMLErrorNone)
 			{
-				os <<
-					"ERR  : XML Parsing error " << XMLNode::getError(pResults.error) <<
-					" inside file " << filePath.file_string() <<
-					" at line " << pResults.nLine << ", column " << pResults.nColumn << "<br />";
+				_logError(
+					"XML Parsing error "+ lexical_cast<string>(XMLNode::getError(pResults.error)) +
+					" inside file "+ filePath.file_string() +
+					" at line "+ lexical_cast<string>(pResults.nLine) +", column "+
+					lexical_cast<string>(pResults.nColumn)
+				);
 				return false;
 			}
 			if(allNode.isEmpty())
 			{
-				os <<
-					"ERR  : File " << filePath.file_string() <<
-					" is empty.<br />";
+				_logError(
+					"File "+ filePath.file_string() +" is empty."
+				);
 				return false;
 			}
 
@@ -1111,7 +1121,7 @@ namespace synthese
 			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
 			XMLNode clineNameNode = lineNode.getChildNode("publishedName");
-			os << "<h2>Trident import of " << charset_converter.convert(clineNameNode.getText()) << "</h2>";
+			_logDebug("<h2>Trident import of "+ charset_converter.convert(clineNameNode.getText()) +"</h2>");
 
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
@@ -1123,9 +1133,9 @@ namespace synthese
 					_networks,
 					networkIdNode.getText(),
 					charset_converter.convert(networkNameNode.getText()),
-					_dataSource,
+					dataSource,
 					_env,
-					os
+					_logger
 			)	);
 
 			// Commercial lines
@@ -1141,9 +1151,9 @@ namespace synthese
 						optional<const string&>(charset_converter.convert(clineShortNameNode.getText())),
 					optional<RGBColor>(),
 					*network,
-					_dataSource,
+					dataSource,
 					_env,
-					os
+					_logger
 			)	);
 
 			// Transport mode
@@ -1213,7 +1223,10 @@ namespace synthese
 						map<string,XMLNode>::iterator itPlace(areaCentroids.find(areaNode.getText()));
 						if(itPlace == areaCentroids.end())
 						{
-							os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << name << ")<br />";
+							_logWarning(
+								"Area centroid "+ string(areaNode.getText()) +" not found in CommercialStopPoint "+
+								lexical_cast<string>(stopKey) +" ("+ name +")"
+							);
 							failure = true;
 							continue;
 						}
@@ -1255,7 +1268,9 @@ namespace synthese
 								map<string,XMLNode>::iterator itPlace(areaCentroids.find(areaNode.getText()));
 								if(itPlace == areaCentroids.end())
 								{
-									os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << name << ")<br />";
+									_logWarning(
+										"Area centroid "+ string(areaNode.getText()) +" not found in CommercialStopPoint "+ stopKey +" ("+ name +")"
+									);
 									failure = true;
 									continue;
 								}
@@ -1286,12 +1301,14 @@ namespace synthese
 							_stopAreas,
 							stopKey,
 							optional<const string&>(),
-							os,
+							_logger,
 							false
 					)	);
 					if(cstops.size() > 1)
 					{
-						os << "WARN : more than one stop with key" << stopKey << "<br />";
+						_logWarning(
+							"More than one stop with key"+ stopKey
+						);
 					}
 					if(!cstops.empty())
 					{
@@ -1300,7 +1317,9 @@ namespace synthese
 
 						if(curStop->getName() != name)
 						{
-							os << "NOTI : stop area is differently named in source file and in SYNTHESE (source=" << name << ", SYNTHESE=" << curStop->getName() << ")<br />";
+							_logInfo(
+								"Stop area is differently named in source file and in SYNTHESE (source="+ name +", SYNTHESE="+ curStop->getName() +")"
+							);
 						}
 					}
 					else if(!cityCode.empty()) // Link by city and name
@@ -1323,7 +1342,7 @@ namespace synthese
 
 							if(cityAliasResult.empty())
 							{
-								os << "ERR  : commercial stop point " << stopKey << " does not link to a valid city (" << cityCode << ")<br />";
+								_logError("Commercial stop point "+ stopKey +" does not link to a valid city ("+ cityCode +")");
 								failure = true;
 								continue;
 							}
@@ -1339,25 +1358,25 @@ namespace synthese
 							*city,
 							_defaultTransferDuration,
 							false,
-							_dataSource,
+							dataSource,
 							_env,
-							os
+							_logger
 						);
-
-						os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << name <<  ")<br />";
 					}
 					else
 					{
+						string logText(
+							"Commercial stop point "+ stopKey +" cannot be created due to undefined city."
+						);
 						if(_autoGenerateStopAreas)
 						{
-							os << "WARN";
+							_logWarning(logText);
 						}
 						else
 						{
+							_logError(logText);
 							failure = true;
-							os << "ERR ";
 						}
-						os << " : commercial stop point " << stopKey << " cannot be created due to undefined city<br />";
 						continue;
 					}
 
@@ -1401,14 +1420,18 @@ namespace synthese
 					shared_ptr<const City> city;
 					if(areaCentroidNode.isEmpty())
 					{
-						os << "WARN : Physical stop " << stopKey << " does not have any area centroid (" << name <<  ")<br />";
+						_logWarning(
+							"Physical stop "+ stopKey +" does not have any area centroid ("+ name +")"
+						);
 					}
 					else
 					{
 						map<string, XMLNode>::iterator itPlace(areaCentroids.find(areaCentroidNode.getText()));
 						if(itPlace == areaCentroids.end())
 						{
-							os << "WARN : Physical stop with key " << stopKey << " links to a not found area centroid " << areaCentroidNode.getText() << " (" << name <<  ")<br />";
+							_logWarning(
+								"Physical stop with key "+ stopKey +" links to a not found area centroid "+ areaCentroidNode.getText() +" ("+ name +")"
+							);
 						}
 						else
 						{
@@ -1442,7 +1465,9 @@ namespace synthese
 							}
 							catch(UnknkownSRIDException&)
 							{
-								os << "WARN : Physical stop with key " << stopKey << " uses an unknown SRID";
+								_logWarning(
+									"Physical stop with key "+ stopKey +" uses an unknown SRID"
+								);
 							}
 
 							XMLNode addressNode(areaCentroid.getChildNode("address", 0));
@@ -1471,7 +1496,9 @@ namespace synthese
 
 									if(cityAliasResult.empty())
 									{
-										os << "ERR  : stop point " << stopKey << " with area centroid " << areaCentroid.getChildNode("name").getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode").getText() << ")<br />";
+										_logError(
+											"Stop point "+ stopKey +" with area centroid "+ areaCentroid.getChildNode("name").getText() +" does not link to a valid city ("+ addressNode.getChildNode("countryCode").getText() +")"
+										);
 										failure = true;
 										continue;
 									}
@@ -1501,9 +1528,9 @@ namespace synthese
 							optional<const RuleUser::Rules&>(),
 							curStop,
 							geometry.get(),
-							_dataSource,
+							dataSource,
 							_env,
-							os
+							_logger
 						);
 					}
 					else if(_autoGenerateStopAreas && city)
@@ -1515,15 +1542,17 @@ namespace synthese
 							geometry.get(),
 							*city,
 							_defaultTransferDuration,
-							_dataSource,
+							dataSource,
 							_env,
-							os,
+							_logger,
 							boost::optional<const graph::RuleUser::Rules&>()
 						);
 					}
 					if(stopPoints.empty())
 					{
-						os << "ERR  : stop " << stopKey << " not found and cannot be created in any commercial stop (" << name << ")<br />";
+						_logError(
+							"Stop "+ stopKey +" not found and cannot be created in any commercial stop ("+ name +")"
+						);
 						failure = true;
 						continue;
 					}
@@ -1534,7 +1563,7 @@ namespace synthese
 							_stops,
 							stopKey,
 							name,
-							os
+							_logger
 						).empty()
 					){
 						failure = true;
@@ -1546,7 +1575,9 @@ namespace synthese
 
 			if(failure)
 			{
-				os << "<b>FAILURE : At least a stop is missing : load interrupted</b><br />";
+				_logError(
+					"<b>FAILURE : At least a stop is missing : load interrupted</b>"
+				);
 				return !failure;
 			}
 
@@ -1561,7 +1592,10 @@ namespace synthese
 				set<StopPoint*> linkableStops(_stops.get(containedNode.getText()));
 				if(linkableStops.empty())
 				{
-					os << "ERR  : stop " << containedNode.getText() << " not found by stop point " << spKeyNode.getText() << ")<br />";
+					_logError(
+						"Stop "+ string(containedNode.getText()) +" not found by stop point "+ 
+						string(spKeyNode.getText()) +")"
+					);
 					failure = true;
 					continue;
 				}
@@ -1570,7 +1604,9 @@ namespace synthese
 
 			if(failure)
 			{
-				os << "<b>FAILURE : At least a stop point is missing : load interrupted</b><br />";
+				_logError(
+					"<b>FAILURE : At least a stop point is missing : load interrupted</b>"
+				);
 				return !failure;
 			}
 
@@ -1655,7 +1691,9 @@ namespace synthese
 					);
 					if(stopPointCode == lastStopPoint)
 					{
-						os << "WARN : StopPoint " << lastStopPoint << " is repeated in journey pattern " << route.objectId << "<br />";
+						_logWarning(
+							"StopPoint "+ lastStopPoint +" is repeated in journey pattern "+ route.objectId
+						);
 						continue;
 					}
 					lastStopPoint = stopPointCode;
@@ -1684,14 +1722,18 @@ namespace synthese
 				map<string,Route>::const_iterator itLine(routes.find(jpKeyNode.getText()));
 				if(itLine == routes.end())
 				{
-					os << "WARN : Service " << serviceNumber << " / " << keyNode.getText() << " ignored because journey pattern " << jpKeyNode.getText() << " was not found.<br />";
+					_logWarning(
+						"Service "+ serviceNumber +" / "+ keyNode.getText() +" ignored because journey pattern "+ jpKeyNode.getText() +" was not found."
+					);
 					continue;
 				}
 				Route route(itLine->second);
 				size_t stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
 				if(stopsNumber != route.stops.size())
 				{
-					os << "WARN : Service " << serviceNumber << " / " << keyNode.getText() << " ignored due to bad stops number<br />";
+					_logWarning(
+						"Service "+ serviceNumber +" / "+ keyNode.getText() +" ignored due to bad stops number"
+					);
 					continue;
 				}
 				bool updatedRoute(false);
@@ -1762,9 +1804,9 @@ namespace synthese
 						route.wayBack,
 						rollingStock.get(),
 						route.stops,
-						_dataSource,
+						dataSource,
 						_env,
-						os,
+						_logger,
 						true,
 						true
 					);
@@ -1781,9 +1823,9 @@ namespace synthese
 						deps,
 						arrs,
 						serviceNumber,
-						_dataSource,
+						dataSource,
 						_env,
-						os
+						_logger
 				)	);
 				if(service)
 				{
@@ -1812,7 +1854,7 @@ namespace synthese
 					if(cts.empty())
 					{
 						ct = new CalendarTemplate(CalendarTemplateTableSync::getId());
-						ct->addCodeBySource(_dataSource, calendarId);
+						ct->addCodeBySource(dataSource, calendarId);
 						_env.getEditableRegistry<CalendarTemplate>().add(shared_ptr<CalendarTemplate>(ct));
 						_calendarTemplates.add(*ct);
 						calendarToImport = true;
@@ -1931,7 +1973,9 @@ namespace synthese
 						
 						if(!_calendarTemplates.contains(dayTypeKey))
 						{
-							os << "WARN : Calendar template " << dayTypeKey << " was not found.<br />";
+							_logWarning(
+								"Calendar template "+ dayTypeKey +" was not found."
+							);
 							continue;
 						}
 
@@ -1986,7 +2030,9 @@ namespace synthese
 						!connectionNode.nChildNode("linkDistance") ||
 						!connectionNode.nChildNode("defaultDuration")
 					){
-						os << "WARN : Connection link at rank " << connectionRank << " is malformed.<br />";
+						_logWarning(
+							"Connection link at rank "+ lexical_cast<string>(connectionRank) +" is malformed."
+						);
 						continue;
 					}
 
@@ -2008,7 +2054,10 @@ namespace synthese
 					)	);
 					if(startStops.empty() || endStops.empty())
 					{
-						os << "WARN : Connection link " << key.getText() << " rejected because of inexistent stop (" << startNode.getText() << "/" << endNode.getText() << ")<br />";
+						_logWarning(
+							"Connection link "+ string(key.getText()) +" rejected because of inexistent stop ("+
+							string(startNode.getText()) +"/"+ string(endNode.getText()) +")"
+						);
 						continue;
 					}
 					shared_ptr<StopPoint> startStop = startStops.front();
@@ -2041,13 +2090,17 @@ namespace synthese
 						if(!junctions.empty())
 						{
 							junction = junctions.front();
-							os << "LOAD : Load of junction " << key.getText() << "<br />";
+							_logLoad(
+								"Load of junction "+ string(key.getText())
+							);
 						}
 						else
 						{
 							junction.reset(new Junction);
 							junction->setKey(JunctionTableSync::getId());
-							os << "CREA : Creation of junction " << key.getText() << "<br />";
+							_logCreation(
+								"Creation of junction "+ string(key.getText())
+							);
 						}
 
 
@@ -2062,7 +2115,7 @@ namespace synthese
 				}
 			}
 
-			os << "<b>SUCCESS : Data loaded</b><br />";
+			_logDebug("<b>SUCCESS : Data loaded</b>");
 			return !failure;
 		}
 

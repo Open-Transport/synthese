@@ -72,7 +72,7 @@ namespace synthese
 						ExpatParser(
 							const impex::DataSource& dataSource,
 							util::Env& env,
-							std::ostream& stream,
+							const impex::ImportLogger& logger,
 							const calendar::Calendar& calendar
 						);
 						virtual ~ExpatParser();
@@ -89,7 +89,7 @@ namespace synthese
 							const calendar::Calendar& _calendar;
 							const impex::DataSource& _dataSource;
 							util::Env& _env;
-							std::ostream& _stream;
+							const impex::ImportLogger& _logger;
 							pt::CommercialLine* line;
 							bool wayBack;
 							bool importTrip;
@@ -103,7 +103,7 @@ namespace synthese
 							expat_user_data(
 								const impex::DataSource& dataSource,
 								util::Env& env,
-								std::ostream& stream,
+								const impex::ImportLogger& logger,
 								const calendar::Calendar& calendar
 							);
 						};
@@ -119,7 +119,6 @@ namespace synthese
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					std::ostream& os,
 					boost::optional<const server::Request&> adminRequest
 				) const;
 
@@ -127,7 +126,8 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
+					const impex::Import& import,
+					const impex::ImportLogger& logger
 				);
 
 				//////////////////////////////////////////////////////////////////////////

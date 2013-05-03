@@ -21,7 +21,9 @@
 */
 
 #include "HafasFileFormat.hpp"
+
 #include "DataSource.h"
+#include "Import.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
@@ -318,7 +320,6 @@ namespace synthese
 
 		bool HafasFileFormat::Importer_::_parse(
 			const path& filePath,
-			std::ostream& os,
 			const std::string& key,
 			boost::optional<const server::Request&> adminRequest
 		) const {
@@ -327,6 +328,8 @@ namespace synthese
 			{
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			// 0 : Coordinates
 			if(key == FILE_KOORD)
@@ -345,7 +348,7 @@ namespace synthese
 					if(x && y)
 					{
 						bahnhof.point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-							*_dataSource.getCoordinatesSystem()->createPoint(x, y)
+							*dataSource.get<CoordinatesSystem>()->createPoint(x, y)
 						);
 					}
 
@@ -686,7 +689,10 @@ namespace synthese
 						Bahnhofs::iterator itBahnhof(_bahnhofs.find(stopCode));
 						if(itBahnhof == _bahnhofs.end())
 						{
-							os << "WARN : Inconsistent service " << zugNumber << " : stop " << stopCode << " is not present in koord file. Service is ignored<br />";
+							_log(
+								ImportLogger::WARN,
+								"Inconsistent service "+ zugNumber +" : stop "+ stopCode +" is not present in koord file. Service is ignored"
+							);
 							if(itZug != _zugs.end())
 							{
 								_zugs.pop_back();
@@ -755,7 +761,7 @@ namespace synthese
 					}
 				}
 
-				return _importObjects(os);
+				return _importObjects();
 			}
 
 			return true;
@@ -965,9 +971,11 @@ namespace synthese
 
 
 		void HafasFileFormat::Importer_::_showBahnhofScreen(
-			std::ostream& os,
 			boost::optional<const server::Request&> adminRequest
 		) const	{
+
+			DataSource& dataSource(*_import.get<DataSource>());
+			stringstream os;
 
 			// If at least a stop import has failed, no import but an admin screen if possible
 			if(!_nonLinkedBahnhofs.empty() && adminRequest)
@@ -1036,7 +1044,7 @@ namespace synthese
 						addRequest.getAction()->setCityName(bahnhof.second.cityName);
 						addRequest.getAction()->setCreateCityIfNecessary(true);
 						Importable::DataSourceLinks links;
-						links.insert(make_pair(&_dataSource, bahnhof.first));
+						links.insert(make_pair(&dataSource, bahnhof.first));
 						addRequest.getAction()->setDataSourceLinks(links);
 						addRequest.getAction()->setPoint(CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.point));
 						os << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
@@ -1189,17 +1197,19 @@ namespace synthese
 				os << t.close();
 			}
 
+			_logger.logRaw(os.str());
 		}
 
 
 
 		bool HafasFileFormat::Importer_::_importObjects(
-			std::ostream& os
 		) const	{
 
+			DataSource& dataSource(*_import.get<DataSource>());
+
 			// Linked objects loading
-			ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(_dataSource, _env);
-			ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
+			ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(dataSource, _env);
+			ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(dataSource, _env);
 			map<pair<string, string>, set<StopPoint*> > gleisStopPoint;
 			typedef map<string, City*> CitiesByName;
 			CitiesByName citiesByName;
@@ -1257,8 +1267,13 @@ namespace synthese
 
 					// Search if a new stop area must be created
 					set<StopArea*> stopAreasSet(
-						PTFileFormat::GetStopAreas(stopAreas, bahnhof.operatorCode, optional<const string&>(), os, false)
-					);
+						PTFileFormat::GetStopAreas(
+							stopAreas,
+							bahnhof.operatorCode,
+							optional<const string&>(),
+							_logger,
+							false
+					)	);
 					// Associated stop areas
 					StopAreaMappingMap::const_iterator itMappedStopAreas(
 						_stopAreaMappingMap.find(bahnhof.operatorCode)
@@ -1270,11 +1285,17 @@ namespace synthese
 						{
 							BOOST_FOREACH(const string& otherCode, itMappedStopAreas->second)
 							{
-								stopAreasSet = PTFileFormat::GetStopAreas(stopAreas, otherCode, optional<const string&>(), os, false);
+								stopAreasSet = PTFileFormat::GetStopAreas(
+									stopAreas,
+									otherCode,
+									optional<const string&>(),
+									_logger,
+									false
+								);
 								if(!stopAreasSet.empty())
 								{
 									StopArea* linkedStopArea(*stopAreasSet.begin());
-									linkedStopArea->addCodeBySource(_dataSource, bahnhof.operatorCode);
+									linkedStopArea->addCodeBySource(dataSource, bahnhof.operatorCode);
 									stopAreas.add(*linkedStopArea);
 									break;
 								}
@@ -1335,9 +1356,9 @@ namespace synthese
 								*city,
 								bahnhof.defaultTransferDuration,
 								mainStop,
-								_dataSource,
+								dataSource,
 								_env,
-								os
+								_logger
 						)	);
 
 						// Links
@@ -1346,12 +1367,12 @@ namespace synthese
 						{
 							BOOST_FOREACH(const string& otherCode, itMappedStopAreas->second)
 							{
-								links.insert(make_pair(&_dataSource, otherCode));
+								links.insert(make_pair(&dataSource, otherCode));
 							}
 						}
 						else
 						{
-							links.insert(make_pair(&_dataSource, bahnhof.operatorCode));
+							links.insert(make_pair(&dataSource, bahnhof.operatorCode));
 						}
 						newStopArea->setDataSourceLinksWithoutRegistration(links);
 						stopAreas.add(*newStopArea);
@@ -1386,7 +1407,10 @@ namespace synthese
 						);
 						if(stopAreasSet.size() > 1)
 						{
-							_logger.log(Logger::WARN, "Multiple stop areas with code "+ bahnhof.operatorCode);
+							_log(
+								ImportLogger::WARN,
+								"Multiple stop areas with code "+ bahnhof.operatorCode
+							);
 						}
 						assert(!stopAreasSet.empty());
 						stopArea = *stopAreasSet.begin();
@@ -1403,9 +1427,9 @@ namespace synthese
 							boost::optional<const graph::RuleUser::Rules&>(),
 							stopArea,
 							bahnhof.point.get() ? optional<const Point*>(bahnhof.point.get()) : optional<const Point*>(),
-							_dataSource,
+							dataSource,
 							_env,
-							os,
+							_logger,
 							true
     					);
 					}
@@ -1416,7 +1440,7 @@ namespace synthese
 								stopPoints,
 								bahnhof.operatorCode,
 								optional<const string&>(),
-								os,
+								_logger,
 								false
 						)	);
 						BOOST_FOREACH(const string& gleis, bahnhof.gleisSet)
@@ -1425,7 +1449,7 @@ namespace synthese
 							set<StopPoint*> linkedStops;
 							BOOST_FOREACH(StopPoint* stop, stopsSet)
 							{
-								if(stop->hasCodeBySource(_dataSource, gleis))
+								if(stop->hasCodeBySource(dataSource, gleis))
 								{
 									linkedStops.insert(stop);
 								}
@@ -1441,13 +1465,13 @@ namespace synthese
 										bahnhof.operatorCode,
 										gleis,
 										*stopArea,
-										_dataSource,
+										dataSource,
 										_env,
-										os
+										_logger
 								)	);
 
 								// Source links with gleis number
-								newStop->addCodeBySource(_dataSource, gleis);
+								newStop->addCodeBySource(dataSource, gleis);
 								stopPoints.add(*newStop);
 
 								// Position
@@ -1484,8 +1508,8 @@ namespace synthese
 			}
 
 			// Services
-			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
-			ImportableTableSync::ObjectBySource<RollingStockTableSync> transportModes(_dataSource, _env);
+			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
+			ImportableTableSync::ObjectBySource<RollingStockTableSync> transportModes(dataSource, _env);
 			BOOST_FOREACH(const Zug& zug, _zugs)
 			{
 				// Line
@@ -1497,9 +1521,9 @@ namespace synthese
 					optional<const string&>(),
 					optional<RGBColor>(),
 					*zug.lineFilter->network,
-					_dataSource,
+					dataSource,
 					_env,
-					os,
+					_logger,
 					zug.lineFilter->linesByStopsPair || (zug.lineFilter->lineNumberStart && zug.lineFilter->lineNumberEnd)
 				);
 				if(!line)
@@ -1551,7 +1575,7 @@ namespace synthese
 					PTFileFormat::GetTransportMode(
 						transportModes,
 						zug.transportModeCode,
-						os
+						_logger
 				)	);
 
 				// Calendars
@@ -1621,7 +1645,10 @@ namespace synthese
 							// Check if at least a stop was found
 							if(stop._stop.empty())
 							{
-								_logger.log(Logger::WARN, "The stop "+ zugStop.stopCode +"/"+ zugStop.gleisCode +" was not found : the service "+ zug.number +"/"+ zug.lineNumber +" is ignored");
+								_log(
+									ImportLogger::WARN,
+									"The stop "+ zugStop.stopCode +"/"+ zugStop.gleisCode +" was not found : the service "+ zug.number +"/"+ zug.lineNumber +" is ignored"
+								);
 								ignoreService = true;
 								break;
 							}
@@ -1666,9 +1693,9 @@ namespace synthese
 								wayBack,
 								transportMode,
 								stops,
-								_dataSource,
+								dataSource,
 								_env,
-								os,
+								_logger,
 								true,
 								true,
 								true,
@@ -1685,9 +1712,9 @@ namespace synthese
 								departures,
 								arrivals,
 								zug.number,
-								_dataSource,
+								dataSource,
 								_env,
-								os,
+								_logger,
 								optional<const string&>(),
 								optional<const RuleUser::Rules&>(),
 								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops)
@@ -1702,9 +1729,9 @@ namespace synthese
 								zug.number,
 								zug.continuousServiceRange,
 								zug.continuousServiceWaitingTime,
-								_dataSource,
+								dataSource,
 								_env,
-								os
+								_logger
 							);
 						}
 
@@ -1759,4 +1786,26 @@ namespace synthese
 
 			return NULL;
 		}
+
+
+
+		HafasFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			const impex::ImportLogger& logger
+		):	impex::Importer(env, import, logger),
+			impex::MultipleFileTypesImporter<HafasFileFormat>(env, import, logger),
+			PTDataCleanerFileFormat(env, import, logger),
+			_networks(*import.get<DataSource>(), env),
+			_showStopsOnly(false),
+			_wayBackBitPosition(0),
+			_importFullServices(false),
+			_importStops(false),
+			_iconv(
+				import.get<DataSource>()->get<Charset>().empty() ?
+					string("UTF-8") :
+					import.get<DataSource>()->get<Charset>(),
+				"UTF-8"
+			)
+		{}
 }	}

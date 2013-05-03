@@ -47,8 +47,7 @@ namespace synthese
 		FIELD_STRING(ServerAddress)
 		FIELD_STRING(ServerPort)
 		FIELD_PTIME(LastActivityReport)
-		FIELD_BOOL(Active)
-		
+
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),

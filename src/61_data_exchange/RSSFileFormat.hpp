@@ -24,18 +24,13 @@
 #define SYNTHESE_data_exchange_RSSFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
-#include "OneFileTypeImporter.hpp"
+#include "ConnectionImporter.hpp"
 #include "NoExportPolicy.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
-	namespace util
-	{
-		class Registrable;
-	}
-
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -52,24 +47,22 @@ namespace synthese
 			/// @ingroup m61
 			/// @author Hugues Romain
 			class Importer_:
-				public impex::OneFileTypeImporter<RSSFileFormat>
+				public impex::ConnectionImporter<RSSFileFormat>
 			{
 			protected:
-				static const std::string PARAMETER_URL;
-				static const std::string PARAMETER_RECIPIENT_KEY;
-				static const std::string PARAMETER_RECIPIENT_ID;
+				static const std::string PARAMETER_LINE_RECIPIENT_ID;
+				static const std::string PARAMETER_STOP_RECIPIENT_ID;
+				static const std::string PARAMETER_BROADCAST_POINT_RECIPIENT_ID;
 
-				std::string _url;
-				std::string _recipientKey;
-				boost::shared_ptr<util::Registrable> _recipient;
+				boost::optional<util::RegistryKeyType> _lineRecipientId;
+				boost::optional<util::RegistryKeyType> _stopRecipientId;
+				boost::optional<util::RegistryKeyType> _broadcastPointRecipientId;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _messagesToRemove;
 
-				virtual bool _parse(
-					const boost::filesystem::path& filePath,
-					std::ostream& os,
-					boost::optional<const server::Request&> adminRequest
+				virtual bool _read(
+					boost::optional<const server::Request&> request
 				) const;
 
 				struct Item
@@ -85,23 +78,9 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
+					const impex::Import& import,
+					const impex::ImportLogger& logger
 				);
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.5.0
-				/// @date 2012
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
-
-
 
 
 

@@ -106,14 +106,12 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Reads an input files and load its content to the memory.
 				/// @param filePath file to read
-				/// @param os stream to write log messages on
 				/// @param key type of the file
 				/// @author Gaël Sauvanet
 				/// @since 3.3.0
 				/// @date 2012
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					std::ostream& os,
 					const std::string& key,
 					boost::optional<const server::Request&> adminRequest
 				) const;
@@ -124,9 +122,10 @@ namespace synthese
 			public:
 				Importer_(
 					util::Env& env,
-					const impex::DataSource& dataSource
-				):	impex::Importer(env, dataSource),
-					impex::MultipleFileTypesImporter<HousesCSVFileFormat>(env, dataSource),
+					const impex::Import& import,
+					const impex::ImportLogger& logger
+				):	impex::Importer(env, import, logger),
+					impex::MultipleFileTypesImporter<HousesCSVFileFormat>(env, import, logger),
 					_displayStats(false),
 					_maxHouseDistance(200)
 				{}

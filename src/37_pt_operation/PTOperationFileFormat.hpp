@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class ImportLogger;
+	}
+
 	namespace pt_operation
 	{
 		class VehicleService;
@@ -50,7 +55,7 @@ namespace synthese
 				const std::string& id,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				const impex::ImportLogger& logger
 			);
 		};
 	}

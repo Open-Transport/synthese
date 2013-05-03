@@ -818,20 +818,17 @@ namespace synthese
 					stream <<
 						HTMLModule::getHTMLImage(
 							"/admin/img/"+
-							(	it.first->getIcon().empty() ?
+							(	it.first->get<Icon>().empty() ?
 								"note.png" :
-								it.first->getIcon()
+								it.first->get<Icon>()
 							),
 							name
 						);
-					if(!it.first->getFormat().empty())
-					{
-						stream <<
-							HTMLModule::getHTMLImage(
-								"/admin/img/" + DataSourceAdmin::ICON,
-								"Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire"
-						);
-					}
+					stream <<
+						HTMLModule::getHTMLImage(
+							"/admin/img/" + DataSourceAdmin::ICON,
+							"Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire"
+					);
 				}
 
 				// Remove button

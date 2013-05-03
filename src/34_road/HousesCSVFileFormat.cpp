@@ -21,8 +21,10 @@
 */
 
 #include "HousesCSVFileFormat.hpp"
+
 #include "CrossingTableSync.hpp"
 #include "HouseTableSync.hpp"
+#include "Import.hpp"
 #include "RoadTableSync.h"
 #include "RoadChunkTableSync.h"
 #include "RoadPlaceTableSync.h"
@@ -115,11 +117,12 @@ namespace synthese
 
 		bool HousesCSVFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& os,
 			const std::string& key,
 			boost::optional<const server::Request&> adminRequest
 		) const {
 			// 1 : Administrative areas
+
+			DataSource& dataSource(*_import.get<DataSource>());
 
 			if(key == FILE_ADDRESS)
 			{
@@ -137,11 +140,11 @@ namespace synthese
 					ifstream inFile;
 					string line;
 
-					os << "INFO : Loading file " << filePath << "<br />";
+					_logDebug("Loading file "+ filePath.file_string());
 					inFile.open(filePath.file_string().c_str());
 					if(!inFile)
 					{
-						os << "Could no open the file " << filePath << "<br />";
+						_logError("Could not open the file "+ filePath.file_string());
 						return false;
 					}
 					// Ignore header lines
@@ -151,34 +154,36 @@ namespace synthese
 							_loadLine(line);
 						else
 						{
-							os << "Error with the number of lines to ignore : " << _numberOfLinesToIgnore << "<br />";
+							_logError(
+								"Error with the number of lines to ignore : "+ lexical_cast<string>(_numberOfLinesToIgnore)
+							);
 							return false;
 						}
 					}
 
 					if(!_cityCodeField || !_cityNameField)
 					{
-						os << "ERROR : city field not defined";
+						_logError("City field not defined");
 						return false;
 					}
 					if(!_roadNameField)
 					{
-						os << "ERROR : road name field not defined";
+						_logError("Road name field not defined");
 						return false;
 					}
 					if(!_numberField)
 					{
-						os << "ERROR : number field not defined";
+						_logError("Number field not defined");
 						return false;
 					}
 					if(!_geometryXField)
 					{
-						os << "ERROR : geometry x field not defined";
+						_logError("Geometry x field not defined");
 						return false;
 					}
 					if(!_geometryYField)
 					{
-						os << "ERROR : geometry y field not defined";
+						_logError("Geometry y field not defined");
 						return false;
 					}
 
@@ -224,7 +229,7 @@ namespace synthese
 						else
 							continue;					
 						shared_ptr<Point> geometry(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-							*_dataSource.getActualCoordinateSystem().createPoint(
+							*dataSource.getActualCoordinateSystem().createPoint(
 								x,
 								y
 							)
@@ -239,7 +244,7 @@ namespace synthese
 
 						if(!geometry.get())
 						{
-							os << "ERR : Empty geometry.<br />";
+							_logWarning("Empty geometry");
 							++badGeometry;
 							continue;
 						}
@@ -296,7 +301,7 @@ namespace synthese
 						catch(...)
 						{
 							++streetTooFar;
-							os << "WARN : house " << *house->getHouseNumber() << " could not be projected on " << roadName << "<br />";
+							_logWarning("House "+ lexical_cast<string>(*house->getHouseNumber()) +" could not be projected on "+ roadName);
 						}
 					}
 
@@ -304,6 +309,7 @@ namespace synthese
 
 				if(!missingCities.empty())
 				{
+					stringstream os;
 					os << "<h1>Villes non trouvées</h1>";
 
 					// Header
@@ -319,10 +325,12 @@ namespace synthese
 						os << t.col() << missingCity;
 					}
 					os << t.close();
+					_logger.logRaw(os.str());
 				}
 
 				if(!missingStreets.empty())
 				{
+					stringstream os;
 					os << "<h1>Rues non trouvées</h1>";
 
 					// Header
@@ -340,12 +348,14 @@ namespace synthese
 						os << t.col() << missingStreet.second;
 					}
 					os << t.close();
+					_logger.logRaw(os.str());
 				}
 
 				if(_displayStats)
 				{
 					size_t total(ok + cityNotFound + roadNotFound + emptyStreetName + badGeometry + streetTooFar);
 
+					stringstream os;
 					os << "<h1>Statistiques</h1>";
 
 					// Header
@@ -378,10 +388,11 @@ namespace synthese
 					os << t.col() << streetTooFar;
 					os << t.col() << floor(100 * (double(streetTooFar) / double(total)));
 					os << t.close();
+					_logger.logRaw(os.str());
 				}
 			}
 
-			os << "<b>SUCCESS : Data loaded</b><br />";
+			_logDebug("<b>SUCCESS : Data loaded</b>");
 
 			return true;
 		}
@@ -485,7 +496,7 @@ namespace synthese
 					line.substr(0, line.size() - 1) :
 				line
 					);
-				utfline = IConv(_dataSource.getCharset(), "UTF-8").convert(line);
+				utfline = IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
 		}
