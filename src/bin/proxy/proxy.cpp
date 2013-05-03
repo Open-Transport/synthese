@@ -72,7 +72,7 @@ namespace
 	locking_queue<Request> queue;
 	deque<string> messages;
 	const unsigned int MAX_MESSAGES = 1000;
-	const unsigned int MAX_QUEUE_SIZE = 5000;
+	const unsigned int MAX_QUEUE_SIZE = 1;
 	const int CURL_TIMEOUT_MS = 2 * 1000;
 	bool dispatching = true;
 
@@ -80,6 +80,7 @@ namespace
 	int port;
 	string target;
 	string password;
+	size_t queue_size;
 
 
 
@@ -107,7 +108,7 @@ namespace
 			"<link rel=icon type=image/gif href=data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==>" <<
 			"<title>Synthese Proxy Status</title></head>" <<
 			"<html><h1>Synthese Proxy Status</h1>" <<
-			"<p>Queue size: " << queue.size() << "</p>" <<
+			"<p>Queue size: " << queue.size() << " (max=" << queue_size << ")</p>" <<
 			"<h3>Management</h3>"<<"<p>Dispatching status: ";
 		if(dispatching)
 			output_ << "<span style='color: green'>Dispatching</span>";
@@ -242,7 +243,7 @@ namespace
 		}
 		else
 		{
-			if(queue.size() >= MAX_QUEUE_SIZE)
+			if(queue.size() >= queue_size)
 			{
 				addMessage("Queue is full, dropping " + httpRequest.uri +
 					" (POST:" + httpRequest.postData + ")");
@@ -370,6 +371,7 @@ int main(int ac, char* av[])
 		("port,p", po::value<int>(&port)->default_value(-1), "port to listen on")
 		("password", po::value<std::string>(&password), "password for the administration interface")
 		("target", po::value<std::string>(&target), "Target URL where to relay requests (e.g. http://localhost:9999/)")
+		("queue_size", po::value<size_t>(&queue_size), "Max size of the queue")
 		;
 
 	po::variables_map vm;
@@ -387,6 +389,11 @@ int main(int ac, char* av[])
 		return 1;
 	}
 
+	if(!queue_size)
+	{
+		queue_size = MAX_QUEUE_SIZE;
+	}
+	cout << queue_size << endl;
 #ifndef HAVE_CURL
 	cout << "Libcurl support not available. The proxy can't work properly." << endl;
 	return 1;
