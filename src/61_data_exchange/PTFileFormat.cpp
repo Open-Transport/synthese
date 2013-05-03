@@ -1059,23 +1059,17 @@ namespace synthese
 			);
 			BOOST_FOREACH(Service* tservice, route.getServices())
 			{
-				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-					*route.sharedServicesMutex
-				);
-				BOOST_FOREACH(Service* tservice, route.getServices())
-				{
-					ContinuousService* curService(dynamic_cast<ContinuousService*>(tservice));
+				ContinuousService* curService(dynamic_cast<ContinuousService*>(tservice));
 
-					if(!curService) continue;
+				if(!curService) continue;
 
-					if(	curService->getServiceNumber() == number &&
-						curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
-						curService->getRange() == range &&
-						curService->getMaxWaitingTime() == waitingTime
+				if(	curService->getServiceNumber() == number &&
+					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
+					curService->getRange() == range &&
+					curService->getMaxWaitingTime() == waitingTime
 					){
-						result = curService;
-						break;
-					}
+					result = curService;
+					break;
 				}
 			}
 
