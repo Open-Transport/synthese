@@ -25,6 +25,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "DBTransaction.hpp"
+#include "LineAlarmRecipient.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioFolderTableSync.h"
 #include "MessagesLog.h"
@@ -387,9 +388,8 @@ namespace synthese
 			_alarmObjectLink.reset(new AlarmObjectLink);
 			_alarmObjectLink->setKey(AlarmObjectLinkTableSync::getId());
 			_alarmObjectLink->setAlarm(_messages[messageName].get());
-
-			_alarmObjectLink->setObject(line);
-			_alarmObjectLink->setRecipientKey("line");
+			_alarmObjectLink->setObjectId(line->getKey());
+			_alarmObjectLink->setRecipient(LineAlarmRecipient::FACTORY_KEY);
 			env.getEditableRegistry<AlarmObjectLink>().add(_alarmObjectLink);
 
 			AlarmObjectLinkTableSync::Save(_alarmObjectLink.get(), transaction);
