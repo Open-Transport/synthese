@@ -41,7 +41,22 @@ namespace synthese
 		AlarmObjectLink::AlarmObjectLink(
 			RegistryKeyType key
 		):	Registrable(key),
-			_object(NULL),
+			_objectId(0),
 			_alarm(NULL)
 		{}
+
+
+
+		void AlarmObjectLink::setRecipient( const std::string& key )
+		{
+			_recipient.reset(
+				Factory<AlarmRecipient>::create(key)
+			);
+		}
 }	}
+
+/** @class AlarmObjectLink
+	@ingroup m17
+
+	Link between an alarm and an object.
+*/

@@ -22,6 +22,8 @@
 
 #include "ScenarioFolder.h"
 
+#include "ParametersMap.h"
+
 using namespace std;
 
 namespace synthese
@@ -35,6 +37,9 @@ namespace synthese
 
 	namespace messages
 	{
+		const string ScenarioFolder::ATTR_ID = "id";
+		const string ScenarioFolder::ATTR_NAME= "name";
+
 
 
 		ScenarioFolder* ScenarioFolder::getParent() const
@@ -75,5 +80,12 @@ namespace synthese
 			}
 			return result;
 		}
-	}
-}
+
+
+
+		void ScenarioFolder::toParametersMap( util::ParametersMap& pm ) const
+		{
+			pm.insert(ATTR_ID, getKey());
+			pm.insert(ATTR_NAME, getName());
+		}
+}	}

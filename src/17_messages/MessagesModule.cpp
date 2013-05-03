@@ -22,7 +22,10 @@
 
 #include "MessagesModule.h"
 
+#include "BroadcastPoint.hpp"
+#include "Env.h"
 #include "SentScenario.h"
+#include "ServerModule.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTableSync.h"
 #include "ScenarioFolder.h"
@@ -30,12 +33,11 @@
 #include "TextTemplateTableSync.h"
 #include "TextTemplate.h"
 
-#include "Env.h"
-
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -58,6 +60,10 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<MessagesModule>::Init()
 		{
+			ServerModule::AddThread(
+				&MessagesModule::MessagesActivationThread,
+				"Messages activations"
+			);
 		}
 
 		template<> void ModuleClassTemplate<MessagesModule>::Start()
@@ -83,6 +89,10 @@ namespace synthese
 
 	namespace messages
 	{
+		MessagesModule::ActivatedMessages MessagesModule::_activatedMessages;
+		boost::mutex MessagesModule::_activatedMessagesMutex;
+		long MessagesModule::_lastMinute(60);
+
 		MessagesModule::Labels MessagesModule::GetScenarioTemplatesLabels(
 			string withAllLabel,
 			string withNoLabel
@@ -211,8 +221,142 @@ namespace synthese
 
 
 
-		bool MessagesModule::SentAlarmLess::operator()( SentAlarm* left, SentAlarm* right) const
+		//////////////////////////////////////////////////////////////////////////
+		/// This thread updates every minute the list of activated messages.
+		void MessagesModule::MessagesActivationThread()
 		{
+			while(true)
+			{
+				// Check if a new minute has begun
+				ptime now(second_clock::local_time());
+				if(now.time_of_day().minutes() != _lastMinute)
+				{
+					// Change the thread status
+					ServerModule::SetCurrentThreadRunningAction();
+
+					// Update the activated messages cache
+					UpdateActivatedMessages();
+
+					// Update the last seconds cache
+					_lastMinute = now.time_of_day().minutes();
+
+					// Change the thread status
+					ServerModule::SetCurrentThreadWaiting();
+				}
+
+				// Wait 500 ms
+				this_thread::sleep(milliseconds(500));
+			}
+
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Updates the activated messages cache
+		void MessagesModule::UpdateActivatedMessages()
+		{
+			// Now
+			ptime now(second_clock::local_time());
+
+			// Wait for the availability of the cache
+			mutex::scoped_lock(_activatedMessagesMutex);
+
+			// Duplicate the cache to run deactivation triggers
+			ActivatedMessages decativatedMessages(_activatedMessages);
+
+			// Loop on all messages
+			BOOST_FOREACH(
+				const Registry<Alarm>::value_type& message,
+				Env::GetOfficialEnv().getRegistry<Alarm>()
+			){
+				// Avoid library messages
+				SentAlarm* sentMessage(
+					dynamic_cast<SentAlarm*>(message.second.get())
+				);
+				if(sentMessage == NULL)
+				{
+					continue;
+				}
+
+				// Record active message
+				if(sentMessage->isApplicable(now))
+				{
+					// Remove the message as deactivated one
+					decativatedMessages.erase(sentMessage);
+
+					// Check if the message was already activated
+					if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
+					{
+						// Record the message as activated
+						_activatedMessages.insert(sentMessage);
+
+						// Run the display start trigger on each broadcast point
+						BOOST_FOREACH(
+							const BroadcastPoint::BroadcastPoints::value_type& bp,
+							BroadcastPoint::GetBroadcastPoints()
+						){
+							bp->onDisplayStart(*sentMessage);
+						}
+					}
+				}
+			}
+
+			// Erase deactivated messages
+			BOOST_FOREACH(const ActivatedMessages::value_type& sentMessage, decativatedMessages)
+			{
+				// Remove from cache
+				_activatedMessages.erase(sentMessage);
+
+				// Run the display end trigger
+				BOOST_FOREACH(
+					const BroadcastPoint::BroadcastPoints::value_type& bp,
+					BroadcastPoint::GetBroadcastPoints()
+				){
+					bp->onDisplayEnd(*sentMessage);
+				}
+			}
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Lists the message to display on a broadcast point according to the
+		/// specified parameters.
+		/// @param broadcastPoint the broadcast point to check
+		/// @param parameters the broadcast parameters
+		/// @return the list of the messages to display
+		MessagesModule::ActivatedMessages MessagesModule::GetActivatedMessages(
+			const BroadcastPoint& broadcastPoint,
+			const util::ParametersMap& parameters
+		){
+			// Wait for the availability of the cache
+			mutex::scoped_lock(_activatedMessagesMutex);
+
+			// Initialisation of the result
+			ActivatedMessages result;
+
+			// Check each message
+			BOOST_FOREACH(SentAlarm* message, _activatedMessages)
+			{
+				// Check the message
+				if(message->isOnBroadcastPoint(
+					broadcastPoint,
+					parameters
+				)	){
+					result.insert(message);
+				}
+			}
+
+			return result;
+		}
+
+
+
+		bool MessagesModule::SentAlarmLess::operator()(
+			SentAlarm* left,
+			SentAlarm* right
+		) const {
 			assert(left && right);
 
 			if(left->getLevel() != right->getLevel())

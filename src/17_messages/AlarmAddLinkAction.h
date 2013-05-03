@@ -50,7 +50,7 @@ namespace synthese
 		private:
 			std::string		_recipientKey;
 			boost::shared_ptr<Alarm>		_alarm;
-			boost::shared_ptr<util::Registrable> _object;
+			util::RegistryKeyType _objectId;
 			std::string _parameter;
 
 		protected:
@@ -75,6 +75,8 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
+
+			AlarmAddLinkAction();
 		};
 	}
 }

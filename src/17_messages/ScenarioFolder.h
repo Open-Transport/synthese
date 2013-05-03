@@ -36,10 +36,12 @@ namespace synthese
 
 			@ingroup m17
 		*/
-		class ScenarioFolder
-		:	public virtual util::Registrable
+		class ScenarioFolder:
+			public virtual util::Registrable
 		{
 		public:
+			static const std::string ATTR_NAME;
+			static const std::string ATTR_ID;
 
 			/// Chosen registry class.
 			typedef util::Registry<ScenarioFolder>	Registry;
@@ -73,6 +75,12 @@ namespace synthese
 					@date 2009
 				*/
 				std::string getFullName() const;
+
+
+
+				virtual void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 
 		};

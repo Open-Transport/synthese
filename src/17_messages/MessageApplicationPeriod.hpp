@@ -29,6 +29,7 @@
 #include "MessageType.hpp"
 #include "NumericField.hpp"
 #include "SchemaMacros.hpp"
+#include "Scenario.h"
 #include "StringField.hpp"
 #include "TimeField.hpp"
 #include "PtimeField.hpp"

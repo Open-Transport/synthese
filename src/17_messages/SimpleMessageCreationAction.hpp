@@ -68,8 +68,8 @@ namespace synthese
 
 		private:
 			std::string _content;
-			boost::shared_ptr<AlarmRecipient> _recipientClass;
-			boost::shared_ptr<util::Registrable> _recipient;
+			std::auto_ptr<AlarmRecipient> _recipientClass;
+			util::RegistryKeyType _recipientId;
 			AlarmLevel _level;
 
 		protected:

@@ -49,25 +49,12 @@ namespace synthese
 			public util::FactorableTemplate<AlarmRecipient, C>
 		{
 		private:
-			static AlarmRecipient::ObjectLinks _linksObject;
 
 		protected:
-			static void AddObject(const AlarmObjectLink& alarm);
-			virtual void addObject(const AlarmObjectLink& alarm) const { AddObject(alarm); }
-			static void RemoveObject(const AlarmObjectLink& alarm);
-			virtual void removeObject(const AlarmObjectLink& alarm) const { RemoveObject(alarm); }
-
 			virtual const std::string& getTitle() const;
 
 		public:
 			static const std::string TITLE;
-
-			static const AlarmRecipient::ObjectLinks::mapped_type& GetLinkedAlarms(
-				const util::Registrable& object
-			);
-			virtual const AlarmRecipient::ObjectLinks::mapped_type& getLinkedAlarms(
-				const util::Registrable& object
-			) const { return GetLinkedAlarms(object); }
 
 
 			static void GetParametersLabels(security::ParameterLabelsVector& m);
@@ -107,59 +94,6 @@ namespace synthese
 
 
 
-		template<class C>
-		const AlarmRecipient::ObjectLinks::mapped_type& AlarmRecipientTemplate<C>::GetLinkedAlarms(
-			const util::Registrable& object
-		){
-			typename AlarmRecipient::ObjectLinks::const_iterator it = _linksObject.find(&object);
-			return (it == _linksObject.end()) ? AlarmRecipient::_emptyAOLSet : it->second;
-		}
-
-
-
-		template<class C>
-		void AlarmRecipientTemplate<C>::RemoveObject(
-			const AlarmObjectLink& alarm
-		){
-			AlarmRecipient::ObjectLinks::iterator it =
-			_linksObject.find(alarm.getObject());
-
-			if (it != _linksObject.end())
-			{
-				AlarmRecipient::ObjectLinks::mapped_type::iterator its(
-					it->second.find(&alarm)
-				);
-				if (its != it->second.end())
-				{
-					it->second.erase(its);
-				}
-				if(it->second.empty())
-				{
-					_linksObject.erase(it);
-				}
-			}
-		}
-
-
-
-		template<class C>
-		void AlarmRecipientTemplate<C>::AddObject(
-			const AlarmObjectLink& alarm
-		){
-			AlarmRecipient::ObjectLinks::iterator it = _linksObject.find(
-				alarm.getObject()
-			);
-			if (it == _linksObject.end())
-			{
-				AlarmRecipient::ObjectLinks::mapped_type s;
-				s.insert(&alarm);
-				_linksObject.insert(make_pair(alarm.getObject(), s));
-			}
-			else
-			{
-				it->second.insert(&alarm);
-			}
-		}
 }	}
 
 #endif // SYNTHESE_AlarmRecipientTemplate_h__

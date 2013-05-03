@@ -91,14 +91,6 @@ namespace synthese
 				const util::ParametersMap& parameters
 			) const = 0;
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Adds an object to the alarm as the current recipient type.
-			/// @param alarm alarm to add the object into
-			/// @param objectId id of the object to add
-			/// @throws AlarmObjectLinkException if the object cannot be added (each
-			/// recipient type implements a rule)
-			virtual void addObject(const AlarmObjectLink& alarm) const = 0;
-			virtual void removeObject(const AlarmObjectLink& alarm) const = 0;
 			
 			virtual void getParametersLabels(
 				security::ParameterLabelsVector& m
@@ -110,11 +102,18 @@ namespace synthese
 				util::Env& env
 			) const = 0;
 
-			virtual const ObjectLinks::mapped_type& getLinkedAlarms(
-				const util::Registrable& object
-			) const = 0;
-
 			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const = 0;
+
+			struct AvailableRecipients
+			{
+				util::RegistryKeyType id;
+				std::string parameter;
+				std::string name;
+				typedef std::vector<boost::shared_ptr<AvailableRecipients> > Tree;
+				Tree tree;
+			};
+
+			virtual AvailableRecipients::Tree::value_type getAvailableRecipients() const = 0;
 		};
 }	}
 

@@ -50,6 +50,15 @@ namespace synthese
 
 			mutable MessageApplicationPeriod::ApplicationPeriods _applicationPeriods;
 
+			typedef std::map<
+				std::pair<
+					const BroadcastPoint*,
+					util::ParametersMap
+				>, bool
+			> BroadcastPointsCache;
+
+			mutable BroadcastPointsCache _broadcastPointsCache;
+
 		public:
 			/** Copy constructor.
 				@param source Alarm template to copy (should be of the same scenario)
@@ -124,6 +133,17 @@ namespace synthese
 				bool withRecipients = false
 			) const;
 
+
+			bool isApplicable(
+				boost::posix_time::ptime& when
+			) const;
+
+			virtual bool isOnBroadcastPoint(
+				const BroadcastPoint& point,
+				const util::ParametersMap& parameters
+			) const;
+
+			void clearBroadcastPointsCache() const;
 		};
 }	}
 
