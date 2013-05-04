@@ -15,7 +15,13 @@
 <div class="tab-content">
 
 <#tab_div&default=1&id=diffusions#>
- <?form&name=scenario_add&page_id=<#get_diffusion_page&section=<@section@>#>&a=scenario_save&co=1&actionParam_sections=<@section@>?>
+ <?form&
+   name=scenario_add&
+   page_id=<#get_diffusion_page&section=<@section@>#>&
+   a=scenario_save&
+   co=1&
+   actionParam_sections=<@section@>
+ ?>
  <table class="table table-striped">
  <thead><tr><th>début</th><th>fin</th>
  <th>nom</th><th>scénario</th><th>statut</th><th>archivage</th><th></th></tr></thead>
@@ -51,7 +57,7 @@
     <option value="">(pas de scénario modèle)</option>
     <?scenarii&
     	t=1&
-    	template=<{scenario&template=<option value="<@id@>"><@name@></option>}>?>
+    	template=<{scenario&template=<option value="<@scenario_id@>"><@name@></option>}>?>
     </select>
  </td>
  <td></td>
