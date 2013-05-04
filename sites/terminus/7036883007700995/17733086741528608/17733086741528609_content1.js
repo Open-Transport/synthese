@@ -56,6 +56,7 @@ $(function(){
   $('.openclose').click(openclose);
   $('.search-query').keyup(filter);
   $('input[factory]').change(change_recipient);
+  $('.date').datepicker();
 });
 
 function show_objects(recipient)
