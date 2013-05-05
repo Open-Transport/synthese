@@ -113,27 +113,47 @@ namespace synthese
 				while(it != end && *it == '&')
 				{
 					stringstream parameterName;
-					++it;
-					ParseText(parameterName, it, end, "=");
-
-					if(it != end)
-					{
-						CMSScript parameterNodes(
-							it,
-							end,
-							functionTermination
-						);
-						_parameters.push_back(
-							make_pair(
-								ParametersMap::Trim(parameterName.str()),
-								parameterNodes
-						)	);
-						if(*(it-1) != '&')
-						{
-							break;
-						}
-						--it;
+					for(++it;
+						it!= end && *it != '=' && !(*it == '#' && (it+1 == end || *(it+1)=='>'));
+						++it
+					){
+						parameterName.put(*it);
 					}
+
+					if(it == end)
+					{
+						break;
+					}
+					if(*it == '#' && it+1 == end)
+					{
+						++it;
+						break;
+					}
+
+					if(*it == '#' && *(it+1) == '>')
+					{
+						++it;
+						++it;
+						break;
+					}
+
+					++it;
+
+					CMSScript parameterNodes(
+						it,
+						end,
+						functionTermination
+					);
+					_parameters.push_back(
+						make_pair(
+							ParametersMap::Trim(parameterName.str()),
+							parameterNodes
+					)	);
+					if(*(it-1) != '&')
+					{
+						break;
+					}
+					--it;
 				}
 			}
 		}
