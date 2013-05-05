@@ -25,6 +25,7 @@
 
 #include "Object.hpp"
 
+#include "CMSScriptField.hpp"
 #include "DataSource.h"
 #include "EnumObjectField.hpp"
 #include "ImportLogger.hpp"
@@ -50,6 +51,7 @@ namespace synthese
 	FIELD_SECONDS(AutoImportDelay)
 	FIELD_TIME(AutoImportTime)
 	FIELD_ENUM(MinLogLevel, impex::ImportLogger::Level)
+	FIELD_CMS_SCRIPT(Documentation)
 	
 	namespace impex
 	{
@@ -63,7 +65,8 @@ namespace synthese
 			FIELD(AutoImportTime),
 			FIELD(Active),
 			FIELD(LogPath),
-			FIELD(MinLogLevel)
+			FIELD(MinLogLevel),
+			FIELD(Documentation)
 		> ImportRecord;
 
 
