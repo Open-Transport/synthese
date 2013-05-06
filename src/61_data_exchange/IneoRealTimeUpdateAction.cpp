@@ -75,7 +75,7 @@ namespace synthese
 		const string IneoRealTimeUpdateAction::PARAMETER_PLANNED_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_th_ds";
 		const string IneoRealTimeUpdateAction::PARAMETER_REAL_TIME_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_rt_ds";
 		const string IneoRealTimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
-		
+		boost::mutex IneoRealTimeUpdateAction::isRunningMutex;
 		
 		
 		ParametersMap IneoRealTimeUpdateAction::getParametersMap() const
@@ -133,6 +133,12 @@ namespace synthese
 		void IneoRealTimeUpdateAction::run(
 			Request& request
 		){
+			boost::mutex::scoped_lock lock(isRunningMutex, boost::try_to_lock);
+			if(!lock.owns_lock())
+			{
+				throw ActionException("Already running");
+			}
+
 			date today(day_clock::local_day());
 
 			//////////////////////////////////////////////////////////////////////////
