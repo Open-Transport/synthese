@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///	AvailableRecipientsService class header.
-///	@file AvailableRecipientsService.hpp
+///	MessagesSectionsService class header.
+///	@file MessagesSectionsService.hpp
 ///	@author hromain
 ///	@date 2013
 ///
@@ -22,79 +22,71 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_AvailableRecipientsService_H__
-#define SYNTHESE_AvailableRecipientsService_H__
+#ifndef SYNTHESE_MessagesSectionsService_H__
+#define SYNTHESE_MessagesSectionsService_H__
 
 #include "FactorableTemplate.h"
 #include "Function.h"
-
-#include "AlarmRecipient.h"
 
 namespace synthese
 {
 	namespace messages
 	{
+		class MessagesSection;
+		
 		//////////////////////////////////////////////////////////////////////////
-		///	17.15 Function : AvailableRecipientsService.
-		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Available_recipients
+		///	17.15 Function : MessagesSectionsService.
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Messages_sections
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m17Functions refFunctions
 		///	@author hromain
 		///	@date 2013
-		/// @since 3.7.0
-		class AvailableRecipientsService:
-			public util::FactorableTemplate<server::Function,AvailableRecipientsService>
+		/// @since 3.9.0
+		class MessagesSectionsService:
+			public util::FactorableTemplate<server::Function,MessagesSectionsService>
 		{
 		public:
-			static const std::string PARAMETER_RECIPIENT_KEY;
+			static const std::string TAG_SECTION;
 			
-			static const std::string TAG_RECIPIENT;
-			static const std::string ATTR_ID;
-			static const std::string ATTR_NAME;
-			static const std::string ATTR_PARAMETER;
-
-		private:
-			void _recipientToParametersMap(
-				const AlarmRecipient::AvailableRecipients& recipient,
-				util::ParametersMap& pm
-			) const;
-
 		protected:
 			//! \name Page parameters
 			//@{
-				std::auto_ptr<AlarmRecipient> _recipient;
+				const MessagesSection* _section;
 			//@}
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Available_recipients#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Messages_sections#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author hromain
 			/// @date 2013
-			/// @since 3.7.0
+			/// @since 3.9.0
 			util::ParametersMap _getParametersMap() const;
 			
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Available_recipients#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Messages_sections#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author hromain
 			/// @date 2013
-			/// @since 3.7.0
+			/// @since 3.9.0
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
 			
+		private:
+			static void _outputSection(util::ParametersMap& pm, const MessagesSection& section);
 			
 		public:
+			MessagesSectionsService();
+
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 
@@ -128,5 +120,5 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_AvailableRecipientsService_H__
+#endif // SYNTHESE_MessagesSectionsService_H__
 

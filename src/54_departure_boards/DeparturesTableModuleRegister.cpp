@@ -72,8 +72,6 @@
 #include "ArrivalDepartureTableLog.h"
 #include "DisplayMaintenanceLog.h"
 
-#include "DisplayScreenAlarmRecipient.h"
-
 #include "DisplayScreenSupervisionFunction.h"
 #include "DisplayScreenContentFunction.h"
 #include "DisplayTypesService.hpp"
@@ -158,8 +156,6 @@ void synthese::departure_boards::moduleRegister()
 
 	synthese::departure_boards::ArrivalDepartureTableLog::integrate();
 	synthese::departure_boards::DisplayMaintenanceLog::integrate();
-
-	synthese::departure_boards::DisplayScreenAlarmRecipient::integrate();
 
 	synthese::departure_boards::IneoDepartureBoardsFileFormat::integrate();
 

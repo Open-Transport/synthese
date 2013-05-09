@@ -22,8 +22,6 @@ AlarmTableSync.cpp
 AlarmTableSync.h
 AlarmTemplate.cpp
 AlarmTemplate.h
-AvailableRecipientsService.cpp
-AvailableRecipientsService.hpp
 BroadcastPoint.cpp
 BroadcastPoint.hpp
 CustomBroadcastPoint.cpp
@@ -32,6 +30,8 @@ CustomBroadcastPointTableSync.cpp
 CustomBroadcastPointTableSync.hpp
 CustomBroadcastPointsService.cpp
 CustomBroadcastPointsService.hpp
+DisplayScreenAlarmRecipient.cpp
+DisplayScreenAlarmRecipient.h
 GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MailingList.cpp
@@ -75,6 +75,12 @@ MessagesRight.cpp
 MessagesRight.h
 MessagesScenarioAdmin.cpp
 MessagesScenarioAdmin.h
+MessagesSection.cpp
+MessagesSection.hpp
+MessagesSectionTableSync.cpp
+MessagesSectionTableSync.hpp
+MessagesSectionsService.cpp
+MessagesSectionsService.hpp
 MessagesTemplateLibraryAdmin.cpp
 MessagesTemplateLibraryAdmin.h
 MessagesTypes.h

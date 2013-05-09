@@ -112,8 +112,6 @@ namespace synthese
 				typedef std::vector<boost::shared_ptr<AvailableRecipients> > Tree;
 				Tree tree;
 			};
-
-			virtual AvailableRecipients::Tree::value_type getAvailableRecipients() const = 0;
 		};
 }	}
 
