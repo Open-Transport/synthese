@@ -57,9 +57,10 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace departure_boards; // Temporary. TODO : remove all call to this module
+	
 	using namespace messages;
 	using namespace util;
-	using namespace departure_boards;
 	using namespace server;
 	using namespace pt;
 	using namespace admin;
@@ -102,7 +103,7 @@ namespace synthese
 		}
 	}
 
-	namespace departure_boards
+	namespace messages
 	{
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_CITY_NAME = "dsascity";
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STOP_NAME = "dsaslid";
@@ -278,86 +279,5 @@ namespace synthese
 			ArrivalDepartureTableRight* result(new ArrivalDepartureTableRight);
 			result->setParameter(perimeter);
 			return shared_ptr<Right>(result);
-		}
-
-
-
-		//////////////////////////////////////////////////////////////////////////
-		/// Gets the tree of available recipients.
-		AlarmRecipient::AvailableRecipients::Tree::value_type DisplayScreenAlarmRecipient::getAvailableRecipients() const
-		{
-			// Root item
-			shared_ptr<AvailableRecipients> result(new AvailableRecipients);
-			result->id = 0;
-			result->name = "Points de diffusion";
-			
-			// Display screens
-			shared_ptr<AvailableRecipients> displayScreens(new AvailableRecipients);
-			displayScreens->id = DisplayScreenTableSync::TABLE.ID;
-			displayScreens->name = "Bornes d'information voyageur";
-			result->tree.push_back(displayScreens);
-
-			// Loop on display screens
-			BOOST_FOREACH(
-				const Registry<DisplayScreen>::value_type& item,
-				Env::GetOfficialEnv().getRegistry<DisplayScreen>()
-			){
-				shared_ptr<AvailableRecipients> displayScreen(new AvailableRecipients);
-				displayScreen->id = item.first;
-				displayScreen->name = item.second->getName();
-				displayScreens->tree.push_back(displayScreen);
-			}
-
-			// Custom broadcast points
-			shared_ptr<AvailableRecipients> customBroadcastPoints(new AvailableRecipients);
-			customBroadcastPoints->id = CustomBroadcastPoint::CLASS_NUMBER;
-			customBroadcastPoints->name = "Autres points de diffusion";
-			result->tree.push_back(customBroadcastPoints);
-
-			// Loop on custom broadcast points
-			BOOST_FOREACH(
-				const Registry<CustomBroadcastPoint>::value_type& item,
-				Env::GetOfficialEnv().getRegistry<CustomBroadcastPoint>()
-			){
-				// Jump over non root elements
-				if(item.second->getRoot())
-				{
-					continue;
-				}
-
-				// Add the broadcast point and its children
-				customBroadcastPoints->tree.push_back(
-					_addCustomBroadcastPointToAvailableRecipient(
-						*item.second
-				)	);
-			}
-
-			// Return the result
-			return result;
-		}
-
-
-
-		shared_ptr<AlarmRecipient::AvailableRecipients> DisplayScreenAlarmRecipient::_addCustomBroadcastPointToAvailableRecipient(
-			const messages::CustomBroadcastPoint& broadcastPoint
-		){
-			// Registration
-			shared_ptr<AvailableRecipients> customBroadcastPoint(new AvailableRecipients);
-			customBroadcastPoint->id = broadcastPoint.getKey();
-			customBroadcastPoint->name = broadcastPoint.get<Name>();
-
-			// Recursion
-			BOOST_FOREACH(
-				const CustomBroadcastPoint::ChildrenType::value_type& child,
-				broadcastPoint.getChildren()
-			){
-				customBroadcastPoint->tree.push_back(
-					_addCustomBroadcastPointToAvailableRecipient(
-						*child.second
-				)	);
-			}
-
-			// Return result
-			return customBroadcastPoint;
 		}
 }	}

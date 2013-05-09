@@ -8,10 +8,13 @@
 #include "MailingListSubscriptionTableSync.hpp"
 #include "MessageAlternativeTableSync.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
+#include "MessagesSectionTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
+
+#include "DisplayScreenAlarmRecipient.h"
 
 #include "MessagesAdmin.h"
 #include "MessageAdmin.h"
@@ -25,10 +28,10 @@
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
 
-#include "AvailableRecipientsService.hpp"
 #include "CustomBroadcastPointsService.hpp"
 #include "GetMessagesFunction.hpp"
 #include "MailingListsService.hpp"
+#include "MessagesSectionsService.hpp"
 #include "MessageTypesService.hpp"
 #include "ScenariosListFunction.hpp"
 #include "ScenarioDisplayFunction.hpp"
@@ -56,6 +59,7 @@
 #include "MailingListSubscription.hpp"
 #include "MessageAlternative.hpp"
 #include "MessagesTypes.h"
+#include "MessagesSection.hpp"
 #include "Alarm.h"
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
@@ -76,6 +80,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::MailingListSubscriptionTableSync::integrate();
 	synthese::messages::MessageAlternativeTableSync::integrate();
 	synthese::messages::MessageApplicationPeriodTableSync::integrate();
+	synthese::messages::MessagesSectionTableSync::integrate();
 	synthese::messages::MessageTypeTableSync::integrate();
 	synthese::messages::ScenarioFolderTableSync::integrate();
 	synthese::messages::ScenarioTableSync::integrate();
@@ -93,10 +98,10 @@ void synthese::messages::moduleRegister()
 	synthese::messages::MessagesLog::integrate();
 	synthese::messages::MessagesLibraryLog::integrate();
 
-	synthese::messages::AvailableRecipientsService::integrate();
 	synthese::messages::CustomBroadcastPointsService::integrate();
 	synthese::messages::GetMessagesFunction::integrate();
 	synthese::messages::MailingListsService::integrate();
+	synthese::messages::MessagesSectionsService::integrate();
 	synthese::messages::MessageTypesService::integrate();
 	synthese::messages::ScenariosListFunction::integrate();
 	synthese::messages::ScenarioDisplayFunction::integrate();
@@ -119,6 +124,8 @@ void synthese::messages::moduleRegister()
 	synthese::messages::CustomBroadcastPoint::integrate();
 	synthese::messages::MailingList::integrate();
 
+	synthese::messages::DisplayScreenAlarmRecipient::integrate();
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();
 	synthese::util::Env::Integrate<synthese::messages::MailingList>();
@@ -131,4 +138,5 @@ void synthese::messages::moduleRegister()
 	synthese::util::Env::Integrate<synthese::messages::ScenarioFolder>();
 	synthese::util::Env::Integrate<synthese::messages::Scenario>();
 	synthese::util::Env::Integrate<synthese::messages::CustomBroadcastPoint>();
+	synthese::util::Env::Integrate<synthese::messages::MessagesSection>();
 }
