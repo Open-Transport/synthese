@@ -46,6 +46,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,MailingListsService>
 		{
 		public:
+			static const std::string PARAMETER_MANUAL_SENDING_FILTER;
 			static const std::string PARAMETER_WITH_SUBSCRIPTIONS;
 			static const std::string TAG_MAILING_LIST;
 
@@ -55,6 +56,7 @@ namespace synthese
 			//@{
 				const MailingList* _mailingList;
 				bool _withSubscriptions;
+				boost::optional<bool> _manualSendingFilter;
 			//@}
 			
 			
