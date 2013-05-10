@@ -40,6 +40,7 @@ using namespace synthese::geography;
 using namespace synthese::road;
 using namespace synthese::util;
 using namespace synthese::pt;
+using namespace synthese::vehicle;
 
 using namespace std;
 using namespace boost;
