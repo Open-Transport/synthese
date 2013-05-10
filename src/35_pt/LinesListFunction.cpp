@@ -76,18 +76,18 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace pt;
+	using namespace vehicle;
 	using namespace security;
 	using namespace cms;
 	using namespace geography;
 	using namespace graph;
 	using namespace impex;
 	using namespace messages;
-	using namespace pt;
 	using namespace pt_website;
 	using namespace util;
 	using namespace security;
-	using namespace server;
 	using namespace tree;
+	using namespace vehicle;
 
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"

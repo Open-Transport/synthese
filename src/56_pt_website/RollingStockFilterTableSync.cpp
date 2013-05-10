@@ -47,7 +47,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace pt_website;
-	using namespace pt;
+	using namespace vehicle;
 	using namespace security;
 
 	namespace util

@@ -554,7 +554,7 @@ namespace synthese
 			void _displayRollingStockCell(
 				std::ostream& stream,
 				const server::Request& request,
-				const pt::RollingStock* object,
+				const vehicle::RollingStock* object,
 				std::size_t colRank
 			) const;
 		};

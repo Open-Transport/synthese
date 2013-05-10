@@ -93,6 +93,7 @@ namespace synthese
 	using namespace admin;
 	using namespace html;
 	using namespace calendar;
+	using namespace vehicle;
 
 	namespace util
 	{

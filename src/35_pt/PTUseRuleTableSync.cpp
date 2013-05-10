@@ -30,7 +30,7 @@
 #include "Session.h"
 #include "TimeField.hpp"
 #include "User.h"
-#include "FareTableSync.h"
+#include "FareTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "TransportNetworkRight.h"
@@ -46,6 +46,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace fare;
 	using namespace pt;
 	using namespace util;
 	using namespace db;

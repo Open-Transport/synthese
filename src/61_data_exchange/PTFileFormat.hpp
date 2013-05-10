@@ -43,6 +43,12 @@ namespace synthese
 		class City;
 	}
 
+	namespace vehicle
+	{
+		class RollingStock;
+		class RollingStockTableSync;
+	}
+
 	namespace pt
 	{
 		class TransportNetwork;
@@ -52,8 +58,6 @@ namespace synthese
 		class CommercialLine;
 		class CommercialLineTableSync;
 		class StopPointTableSync;
-		class RollingStock;
-		class RollingStockTableSync;
 		class Destination;
 		class DestinationTableSync;
 		class ScheduledService;
@@ -299,8 +303,8 @@ namespace synthese
 
 
 
-			static pt::RollingStock* GetTransportMode(
-				const impex::ImportableTableSync::ObjectBySource<pt::RollingStockTableSync>& transportModes,
+			static vehicle::RollingStock* GetTransportMode(
+				const impex::ImportableTableSync::ObjectBySource<vehicle::RollingStockTableSync>& transportModes,
 				const std::string& id,
 				const impex::ImportLogger& importLogger
 			);
@@ -321,7 +325,7 @@ namespace synthese
 				boost::optional<pt::Destination*> destinationObj,
 				boost::optional<const graph::RuleUser::Rules&> useRule,
 				boost::optional<bool> wayBack,
-				pt::RollingStock* rollingStock,
+				vehicle::RollingStock* rollingStock,
 				const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,
 				util::Env& env,

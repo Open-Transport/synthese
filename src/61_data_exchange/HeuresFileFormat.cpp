@@ -95,6 +95,7 @@ namespace synthese
 	using namespace server;
 	using namespace html;
 	using namespace tree;
+	using namespace vehicle;
 
 	namespace util
 	{

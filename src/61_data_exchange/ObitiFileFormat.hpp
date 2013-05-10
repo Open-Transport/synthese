@@ -97,7 +97,7 @@ namespace synthese
 			private:
 				static const std::string SEP;
 
-				boost::shared_ptr<pt::RollingStock> _rollingStock;
+				boost::shared_ptr<vehicle::RollingStock> _rollingStock;
 				std::string _periodCalendarField;
 				std::string _daysCalendarField;
 				size_t _numberOfOtherParameters;

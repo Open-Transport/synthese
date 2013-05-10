@@ -60,14 +60,18 @@ namespace synthese
 		class Service;
 	}
 
+	namespace vehicle
+	{
+		class RollingStock;
+	}
+
 	namespace pt
 	{
 		class TransportNetwork;
 		class NonConcurrencyRule;
 		class ReservationContact;
 		class StopArea;
-		class RollingStock;
-
+		
 		/** Commercial line.
 			@ingroup m35
 
@@ -177,7 +181,7 @@ namespace synthese
 				void setReservationContact(const pt::ReservationContact* value) { _reservationContact = value; }
 				void setCalendarTemplate(calendar::CalendarTemplate* value) { _calendarTemplate = value;}
 				void setNonConcurrencyRules(const NonConcurrencyRules& value) { _nonConcurrencyRules = value; }
-				void setOpionalReservationPlaces(const PlacesSet& value) { _optionalReservationPlaces = value; }
+				void setOptionalReservationPlaces(const PlacesSet& value) { _optionalReservationPlaces = value; }
 				void setMapURL(const std::string& value){ _mapURL = value; }
 				void setDocURL(const std::string& value){ _docURL = value; }
 				void setTimetableId(util::RegistryKeyType value){ _timetableId = value; }
@@ -255,7 +259,7 @@ namespace synthese
 				/// @since 3.3.0
 				/// @date 2011
 				bool usesTransportMode(
-					const RollingStock& transportMode
+					const vehicle::RollingStock& transportMode
 				) const;
 
 

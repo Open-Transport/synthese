@@ -44,6 +44,7 @@ namespace synthese
 		class BroadcastPoint;
 		class MessageAlternative;
 		class MessageType;
+		class MessagesSection;
 		class Scenario;
 
 		class Alarm:
@@ -64,6 +65,7 @@ namespace synthese
 
 			static const std::string TAG_MESSAGE_ALTERNATIVE;
 			static const std::string TAG_RECIPIENTS;
+			static const std::string TAG_SECTION;
 			static const std::string ATTR_LINK_PARAMETER;
 			static const std::string ATTR_LINK_ID;
 
@@ -85,6 +87,7 @@ namespace synthese
 			const Scenario* 	_scenario;
 			bool				_rawEditor;
 			bool				_done;
+			const MessagesSection* _section;
 
 			// Links
 			//@{
@@ -120,6 +123,7 @@ namespace synthese
 				bool					getRawEditor() const { return _rawEditor; }
 				bool					getDone() const { return _done; }
 				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
+				const MessagesSection* getSection() const { return _section; }
 			//@}
 
 			//! @name Setters
@@ -133,6 +137,7 @@ namespace synthese
 				void setMessageAlternatives(const MessageAlternatives& value) const { _messageAlternatives = value; }
 				void addLinkedObject(const AlarmObjectLink& link) const;
 				void removeLinkedObject(const AlarmObjectLink& link) const;
+				void setSection(const MessagesSection* value){ _section = value; }
 			//@}
 
 			//! @name Services

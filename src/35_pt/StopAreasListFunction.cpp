@@ -56,6 +56,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
+	using namespace vehicle;
 	using namespace pt;
 	using namespace security;
 	using namespace graph;

@@ -88,6 +88,7 @@ namespace synthese
 	using namespace admin;
 	using namespace server;
 	using namespace geography;
+	using namespace vehicle;
 
 	namespace util
 	{

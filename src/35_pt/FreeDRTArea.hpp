@@ -44,12 +44,16 @@ namespace synthese
 		class Place;
 	}
 
+	namespace vehicle
+	{
+		class RollingStock;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
 		class FreeDRTTimeSlot;
 		class StopArea;
-		class RollingStock;
 		class TransportNetwork;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -122,7 +126,7 @@ namespace synthese
 
 			/// @name Modifiers
 			//@{
-				void setRollingStock(RollingStock* value);
+				void setRollingStock(vehicle::RollingStock* value);
 				void setNetwork(TransportNetwork* value);
 				void setLine(CommercialLine* value);
 				void addTimeSlot(FreeDRTTimeSlot& value);
@@ -146,7 +150,7 @@ namespace synthese
 
 
 				CommercialLine* getLine() const;
-				RollingStock*	getRollingStock()			const;
+				vehicle::RollingStock*	getRollingStock()			const;
 				TransportNetwork* getNetwork() const;
 
 

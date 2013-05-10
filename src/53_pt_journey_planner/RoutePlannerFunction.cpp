@@ -22,12 +22,13 @@
 
 #include "RoutePlannerFunction.h"
 
-#include "SentScenario.h"
 #include "AccessParameters.h"
 #include "AlgorithmLogger.hpp"
 #include "Edge.h"
 #include "HourPeriod.h"
 #include "ObjectNotFoundException.h"
+#include "ReservationRuleInterfacePage.h"
+#include "SentScenario.h"
 #include "Session.h"
 #include "JourneyPattern.hpp"
 #include "PlacesListService.hpp"
@@ -66,13 +67,12 @@
 #include "StopArea.hpp"
 #include "StaticFunctionRequest.h"
 #include "RoutePlannerFunction.h"
-#include "ReservationRuleInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
 #include "SentAlarm.h"
 #include "PTModule.h"
 #include "Destination.hpp"
 #include "Junction.hpp"
-#include "Fare.h"
+#include "Fare.hpp"
 #include "FareTicket.hpp"
 #include "HTMLForm.h"
 #include "CMSModule.hpp"
@@ -96,11 +96,13 @@ using namespace geos::io;
 namespace synthese
 {
 	using namespace algorithm;
-	using namespace util;
-	using namespace server;
+	using namespace db;
+	using namespace fare;
 	using namespace pt;
 	using namespace pt_website;
-	using namespace db;
+	using namespace server;
+	using namespace util;
+	using namespace vehicle;
 	using namespace graph;
 	using namespace geography;
 	using namespace road;

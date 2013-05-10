@@ -22,6 +22,7 @@
 
 #include "SentScenario.h"
 
+#include "MessagesSection.hpp"
 #include "ScenarioTemplate.h"
 #include "SentAlarm.h"
 #include "ParametersMap.h"
@@ -210,10 +211,10 @@ namespace synthese
 			}
 
 			// Sections
-			BOOST_FOREACH(int section, getSections())
+			BOOST_FOREACH(const MessagesSection* section, getSections())
 			{
 				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
-				sectionPM->insert(DATA_CODE, section);
+				section->toParametersMap(*sectionPM, true);
 				pm.insert(TAG_SECTION, sectionPM);
 			}
 

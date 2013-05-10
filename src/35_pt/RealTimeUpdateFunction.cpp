@@ -29,7 +29,6 @@
 #include "StopArea.hpp"
 #include "LinePhysicalStop.hpp"
 #include "ScheduledService.h"
-#include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "Interface.h"
 #include "JourneyPattern.hpp"
 #include "Webpage.h"
@@ -55,9 +54,8 @@ namespace synthese
 	using namespace cms;
 	using namespace graph;
 
-
-
-	template<> const string util::FactorableTemplate<RequestWithInterface,pt::RealTimeUpdateFunction>::FACTORY_KEY("rtu");
+	template<>
+	const string FactorableTemplate<Function, RealTimeUpdateFunction>::FACTORY_KEY = "rtu";
 
 	namespace pt
 	{
@@ -79,12 +77,14 @@ namespace synthese
 
 
 		RealTimeUpdateFunction::RealTimeUpdateFunction():
-			FactorableTemplate<RequestWithInterface, RealTimeUpdateFunction>()
+			FactorableTemplate<Function, RealTimeUpdateFunction>()
 		{}
+
+
 
 		ParametersMap RealTimeUpdateFunction::_getParametersMap() const
 		{
-			ParametersMap map(RequestWithInterface::_getParametersMap());
+			ParametersMap map;
 			if(_service.get())
 			{
 				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
@@ -95,43 +95,37 @@ namespace synthese
 
 		void RealTimeUpdateFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// CMS page
 			try
 			{
-				// Interface
-				RequestWithInterface::_setFromParametersMap(map);
-				if(getInterface() == NULL)
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CMS_TEMPLATE_ID));
+				if(id)
 				{
-					try
-					{
-						optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CMS_TEMPLATE_ID));
-						if(id)
-						{
-							_cmsTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
-						}
-					}
-					catch (ObjectNotFoundException<Webpage>& e)
-					{
-						throw RequestException("No such CMS template : "+ e.getMessage());
-					}
+					_cmsTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
-				else if(!getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>())
-				{
-					throw RequestException("The interface does not implement the Real Time Update Screen");
-				}
+			}
+			catch (ObjectNotFoundException<Webpage>& e)
+			{
+				throw RequestException("No such CMS template : "+ e.getMessage());
+			}
 
+			// Service
+			try
+			{
 				_service = Env::GetOfficialEnv().getRegistry<ScheduledService>().get(
 					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
 				);
-				_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
-
-				if(_lineStopRank >= _service->getArrivalSchedules(true, false).size())
-				{
-					throw RequestException("Inconsistent line stop number");
-				}
 			}
 			catch(ObjectNotFoundException<ScheduledService>)
 			{
 				throw RequestException("No such service");
+			}
+
+			// Line stop rank
+			_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
+			if(_lineStopRank >= _service->getArrivalSchedules(true, false).size())
+			{
+				throw RequestException("Inconsistent line stop number");
 			}
 		}
 
@@ -139,21 +133,7 @@ namespace synthese
 
 		util::ParametersMap RealTimeUpdateFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			if(getInterface())
-			{
-				VariablesMap vm;
-				const RealTimeUpdateScreenServiceInterfacePage* page(
-					getInterface()->getPage<RealTimeUpdateScreenServiceInterfacePage>()
-				);
-				page->display(
-					stream,
-					*_service,
-					*_service->getRoute()->getLineStop(_lineStopRank),
-					vm,
-					&request
-				);
-			}
-			else if(_cmsTemplate.get())
+			if(_cmsTemplate.get())
 			{
 				_display(stream, request, *_service, *_service->getRoute()->getLineStop(_lineStopRank));
 			}
@@ -177,9 +157,7 @@ namespace synthese
 		std::string RealTimeUpdateFunction::getOutputMimeType() const
 		{
 			return
-				getInterface() ?
-				getInterface()->getPage<RealTimeUpdateScreenServiceInterfacePage>()->getMimeType() :
-				(_cmsTemplate.get() ? _cmsTemplate->getMimeType() : "text/plain")
+				_cmsTemplate.get() ? _cmsTemplate->getMimeType() : "text/plain"
 			;
 		}
 

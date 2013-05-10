@@ -21,6 +21,16 @@ NextStop.cpp
 NextStop.hpp
 RealTimeVehicleUpdateAction.cpp
 RealTimeVehicleUpdateAction.hpp
+RollingStock.cpp
+RollingStock.hpp
+RollingStockAdmin.cpp
+RollingStockAdmin.hpp
+RollingStocksAdmin.cpp
+RollingStocksAdmin.hpp
+RollingStockTableSync.cpp
+RollingStockTableSync.hpp
+RollingStockUpdateAction.cpp
+RollingStockUpdateAction.hpp
 ServiceComposition.cpp
 ServiceComposition.hpp
 Vehicle.cpp

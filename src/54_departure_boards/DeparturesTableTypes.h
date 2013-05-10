@@ -43,10 +43,6 @@ namespace synthese
 		class LineStop;
 	}
 
-	namespace messages
-	{
-		class Alarm;
-	}
 
 	/** @addtogroup m54
 	@{
@@ -120,12 +116,6 @@ namespace synthese
 
 	typedef ArrivalDepartureList::value_type ArrivalDepartureRow;
 
-	struct ArrivalDepartureListWithAlarm
-	{
-		ArrivalDepartureList map;
-		const messages::Alarm* alarm;
-	};
-
 	struct RoutePlanningListElementLess : public std::binary_function<pt::StopArea*, pt::StopArea*, bool>
 	{
 		bool operator()(const pt::StopArea* _Left, const pt::StopArea* _Right) const
@@ -135,7 +125,6 @@ namespace synthese
 	};
 	typedef std::map<const pt::StopArea*, graph::Journey, RoutePlanningListElementLess> RoutePlanningList;
 	typedef RoutePlanningList::value_type RoutePlanningRow;
-	struct RoutePlanningListWithAlarm { RoutePlanningList map; const messages::Alarm* alarm; };
 
 	/** @} */
 }

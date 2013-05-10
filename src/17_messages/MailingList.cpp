@@ -22,7 +22,7 @@
 
 #include "MailingList.hpp"
 
-#include "DisplayScreenAlarmRecipient.h"
+#include "BroadcastPointAlarmRecipient.hpp"
 #include "MailingListSubscription.hpp"
 #include "ServerModule.h"
 
@@ -31,7 +31,6 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace departure_boards;
 	using namespace messages;
 	using namespace server;
 	using namespace util;
@@ -175,7 +174,7 @@ namespace synthese
 			// in broad cast points recipients
 			Alarm::LinkedObjects::const_iterator it(
 				recipients.find(
-					DisplayScreenAlarmRecipient::FACTORY_KEY
+					BroadcastPointAlarmRecipient::FACTORY_KEY
 			)	);
 
 			// No broadcast recipient = no display

@@ -24,14 +24,14 @@ AlarmTemplate.cpp
 AlarmTemplate.h
 BroadcastPoint.cpp
 BroadcastPoint.hpp
+BroadcastPointAlarmRecipient.cpp
+BroadcastPointAlarmRecipient.hpp
 CustomBroadcastPoint.cpp
 CustomBroadcastPoint.hpp
 CustomBroadcastPointTableSync.cpp
 CustomBroadcastPointTableSync.hpp
 CustomBroadcastPointsService.cpp
 CustomBroadcastPointsService.hpp
-DisplayScreenAlarmRecipient.cpp
-DisplayScreenAlarmRecipient.h
 GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MailingList.cpp

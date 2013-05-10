@@ -97,7 +97,7 @@ namespace synthese
 			private:
 				static const std::string SEP;
 
-				boost::shared_ptr<pt::RollingStock> _rollingStock;
+				boost::shared_ptr<vehicle::RollingStock> _rollingStock;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::optional<std::size_t> _serviceNumberField;
 				boost::optional<std::size_t> _stopCodeField;

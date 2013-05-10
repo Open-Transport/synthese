@@ -272,7 +272,7 @@ namespace synthese
 						Log::GetInstance().warn("No such place "+ stop +" in optional reservation places of commercial line "+ lexical_cast<string>(object->getKey()));
 					}
 				}
-				object->setOpionalReservationPlaces(placesWithOptionalReservation);
+				object->setOptionalReservationPlaces(placesWithOptionalReservation);
 
 				// Bike compliance
 				util::RegistryKeyType bikeComplianceId(

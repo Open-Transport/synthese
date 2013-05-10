@@ -29,7 +29,6 @@
 #include "Edge.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
-#include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "RealTimeUpdateFunction.h"
 #include "Interface.h"
 #include "StaticFunctionRequest.h"
@@ -129,20 +128,7 @@ namespace synthese
 					lexical_cast<string>((ptd.first.getDepartureDateTime() - ptd.first.getTheoreticalDepartureDateTime()).total_seconds() / 60)
 				); //13
 
-				if(	getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>() &&
-					dynamic_cast<const ScheduledService*>(ptd.first.getService()) &&
-					request
-				){
-					StaticFunctionRequest<RealTimeUpdateFunction> realTimeRequest(*request, true);
-					realTimeRequest.getFunction()->setInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(getInterface()->getKey()));
-					realTimeRequest.getFunction()->setService(Env::GetOfficialEnv().getRegistry<ScheduledService>().get(ptd.first.getService()->getKey()));
-					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getDepartureEdge()->getRankInPath());
-					parameters.push_back(realTimeRequest.getURL());
-				}
-				else
-				{
-					parameters.push_back(string());
-				} //14
+				parameters.push_back(string()); //14
 			}
 
 			InterfacePage::_display(
