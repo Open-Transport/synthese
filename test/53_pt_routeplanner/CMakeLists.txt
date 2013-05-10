@@ -35,6 +35,7 @@ set(DEPS
   11_cms # from 53_pt_journey_planner > 35_pt
   54_departure_boards
   61_data_exchange
+  37_pt_operation
 )
 
 boost_test(IntegralSearch "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
