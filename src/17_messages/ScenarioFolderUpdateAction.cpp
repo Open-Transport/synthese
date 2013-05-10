@@ -124,9 +124,19 @@ namespace synthese
 				if (_name != _folder->getName())
 				{
 					Env env;
-					ScenarioFolderTableSync::Search(env, _parentFolder.get() ? (*_parentFolder)->getKey() : 0, _name, 0, 1);
+					ScenarioFolderTableSync::Search(
+						env,
+						_parentFolder ?
+							(_parentFolder.get() ? (*_parentFolder)->getKey() : 0) :
+							(_folder->getParent() ? _folder->getParent()->getKey() : 0),
+						_name,
+						0,
+						1
+					);
 					if (!env.getRegistry<ScenarioFolder>().empty())
+					{
 						throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
+					}
 				}
 			}
 		}
