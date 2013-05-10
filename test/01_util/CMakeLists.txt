@@ -16,6 +16,7 @@ set(DEPS
   00_framework
   54_departure_boards
   61_data_exchange
+  37_pt_operation
 )
 
 boost_test(Log "${DEPS}")
