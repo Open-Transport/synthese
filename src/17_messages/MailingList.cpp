@@ -41,6 +41,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(Sender, "sender", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(SenderName, "sender_name", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(EMailFormat, "format", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ManualSending, "manual_sending", SQL_BOOLEAN)
 
 	namespace util
 	{
@@ -64,7 +65,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Sender),
 					FIELD_DEFAULT_CONSTRUCTOR(SenderName),
 					FIELD_VALUE_CONSTRUCTOR(EMailFormat, EMail::EMAIL_TEXT),
-					FIELD_DEFAULT_CONSTRUCTOR(MessageType)
+					FIELD_DEFAULT_CONSTRUCTOR(MessageType),
+					FIELD_VALUE_CONSTRUCTOR(ManualSending, false)
 			)	)
 		{}
 
