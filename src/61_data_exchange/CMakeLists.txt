@@ -95,6 +95,7 @@ target_link_libraries(61_data_exchange
   31_calendar
   32_geography
   33_algorithm
+  37_pt_operation
   38_vehicle
   expat
 )
