@@ -227,6 +227,7 @@ namespace synthese
 			);
 			query.addField(object->getRawEditor());
 			query.addField(object->getDone());
+			query.addField(object->getSection());
 			query.execute(transaction);
 		}
 
