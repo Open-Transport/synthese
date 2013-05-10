@@ -2,26 +2,22 @@
 <!DOCTYPE HTML>
 <@session_id=<?session&template=<{session&template=<@id@>}>?>@>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8">
-    <title>Terminus</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=1;" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+ <head>
+  <meta charset="utf-8">
+  <title>Terminus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=1;" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- Le styles -->
-    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-
-    <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
-
-    <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
-<link href="/lib/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
-
-
-    <style type="text/css">
+  <!-- Le styles -->
+  <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+  <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+  <link href="/lib/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+  <style type="text/css">
       body {
         padding-top: 60px;
         
@@ -34,57 +30,27 @@
       th { text-align:left !important; padding-right:10px; }
 
       
-    </style>
-    
+  </style>
+   
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-  </head>
+ </head>
 
-  <body onload="window.scrollTo(0, 1);">
+ <body onload="window.scrollTo(0, 1);">
+  <#navbar&top=1#>
+  <div class="container-fluid" style="min-height:350px">
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="http://itl.t-l.ch/"><img src="/admin/logo_itl_inv.png" title="itl" style="height:30px;margin:-4px 0 -10px 0;" /></a>
-          <a class="brand" href="/terminus">Terminus</a>
-
-<?if	&cond=<@session_id@>
-	&then=
-          <div class="nav-collapse">
-            <ul class="nav">
-		<?menu	&root=17732932122705940
-			&item_page_id=17732932122705945
-		?>
-	    </ul>
-	    <ul class="nav pull-right">
-               <li><a href="#"><i class="icon-wrench icon-white"></i></a></li>
-               <li><?link&target=17732932122705941&a=logout&text=<i class="icon-off icon-white"></i>?></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-?>
-        </div>
-      </div>
-    </div>
-
-    <div class="container-fluid" style="min-height:350px">
-      <!-- Main hero unit for a primary marketing message or call to action -->
-
-<?if	&cond=<@session_id@>
-	&else=
+   <?if&
+     cond=<@session_id@>&
+     else=
 	
 	<div class="hero-unit">
         
-                  <h2>Bienvenue sur Terminus</h2>
-        <?form&name=login&page_id=<@p@>&a=login&class=form-horizontal well?>
+         <h2>Bienvenue sur Terminus</h2>
+         <?form&name=login&page_id=<@p@>&a=login&class=form-horizontal well?>
         
           <label>Veuillez remplir le formulaire suivant pour vous connecter :</label>
           <input name="actionParamlogin" type="text" class="span3" placeholder="Login">
@@ -93,52 +59,15 @@
           <label></label>
 
           <button type="submit" class="btn btn-primary">Connexion</button>
-        </form>
-              
-        
-      </div>
-	
-	&then=<@content@>
-?>
-      
-
-    </div> <!-- /container -->
-
-    <div class="navbar navbar-inverse" style="margin-bottom:0; padding-left:0 !important; padding-right:0 !important;">
-      <div class="navbar-inner" style="border-radius:0 !important;  padding-left:0 !important; padding-right:0 !important;">
-        <div class="container-fluid">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="/terminus">Terminus</a>
-
-<?if	&cond=<@session_id@>
-	&then=
-          <div class="nav-collapse">
-            <ul class="nav">
-
-		<?menu	&root=17732932122705940
-			&item_page_id=17732932122705945
-		?>
-		</ul>
-		<ul class="pull-right nav">
-                      <li><a href="#"><i class="icon-wrench icon-white"></i></a></li>
-           <li>
-                    <?link&target=17732932122705941&a=logout&text=<i class="icon-off icon-white"></i>?>
-                  </li>
-            </ul>
-          </div><!--/.nav-collapse -->
-?>
+         </form>
         </div>
-      </div>
-    </div>
+	&
+     then=<@content@>
+   ?>
+      
+  </div>
 
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+  <#navbar#>
 
-  </body>
+ </body>
 </html>
