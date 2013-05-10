@@ -140,7 +140,7 @@ namespace synthese
 			}
 
 			// Section in
-			if(!map.getDefault<RegistryKeyType>(PARAMETER_SECTION_IN))
+			if(!map.getDefault<string>(PARAMETER_SECTION_IN).empty())
 			{
 				try
 				{
