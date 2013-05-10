@@ -14,6 +14,7 @@ set(DEPS
   12_security
   15_server
   16_impex
+  38_vehicle
   54_departure_boards
   10_db
   00_framework
