@@ -91,7 +91,8 @@ namespace synthese
 				throw ActionException("No such folder");
 			}
 
-			try
+			// Parent folder
+			if(map.isDefined(PARAMETER_PARENT_FOLDER_ID)) try
 			{
 				RegistryKeyType id(
 					map.get<RegistryKeyType>(PARAMETER_PARENT_FOLDER_ID)
@@ -100,23 +101,33 @@ namespace synthese
 				{
 					_parentFolder = ScenarioFolderTableSync::GetEditable(id, *_env);
 				}
+				else
+				{
+					_parentFolder = shared_ptr<ScenarioFolder>();
+				}
+
+				if ((!_folder.get() && !_parentFolder->get()) || (_folder.get() && _parentFolder->get() && _folder->getKey() == (*_parentFolder)->getKey()))
+				{
+					throw ActionException("The folder and the parent folder cannot be the same");
+				}
 			}
 			catch(...)
 			{
 				throw ActionException("No such parent folder");
 			}
 
-			if ((!_folder.get() && !_parentFolder.get()) || (_folder.get() && _parentFolder.get() && _folder->getKey() == _parentFolder->getKey()))
-				throw ActionException("The folder and the parent folder cannot be the same");
-
-			_name = map.get<string>(PARAMETER_NAME);
-
-			if (_name != _folder->getName())
+			// Name
+			if(map.isDefined(PARAMETER_NAME))
 			{
-				Env env;
-				ScenarioFolderTableSync::Search(env, _parentFolder.get() ? _parentFolder->getKey() : 0, _name, 0, 1);
-				if (!env.getRegistry<ScenarioFolder>().empty())
-					throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
+				_name = map.get<string>(PARAMETER_NAME);
+
+				if (_name != _folder->getName())
+				{
+					Env env;
+					ScenarioFolderTableSync::Search(env, _parentFolder.get() ? (*_parentFolder)->getKey() : 0, _name, 0, 1);
+					if (!env.getRegistry<ScenarioFolder>().empty())
+						throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
+				}
 			}
 		}
 
@@ -124,8 +135,17 @@ namespace synthese
 
 		void ScenarioFolderUpdateAction::run(Request& request)
 		{
-			_folder->setName(_name);
-			_folder->setParent(_parentFolder.get());
+			// Name
+			if(_name)
+			{
+				_folder->setName(*_name);
+			}
+
+			// Parent folder
+			if(_parentFolder)
+			{
+				_folder->setParent(_parentFolder->get());
+			}
 
 			ScenarioFolderTableSync::Save(_folder.get());
 		}
