@@ -28,6 +28,8 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace messages
@@ -46,8 +48,8 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<ScenarioFolder>		_folder;
-			boost::shared_ptr<ScenarioFolder>	_parentFolder;
-			std::string								_name;
+			boost::optional<boost::shared_ptr<ScenarioFolder> >	_parentFolder;
+			boost::optional<std::string>			_name;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
