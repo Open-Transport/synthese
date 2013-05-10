@@ -34,6 +34,7 @@ using namespace synthese::algorithm;
 using namespace synthese::graph;
 using namespace synthese::util;
 using namespace synthese::pt;
+using namespace synthese::vehicle;
 
 BOOST_AUTO_TEST_CASE (RoutePlanner)
 {
