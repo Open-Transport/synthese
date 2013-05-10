@@ -44,6 +44,7 @@ namespace synthese
 	namespace messages
 	{
 		const string MailingListsService::PARAMETER_WITH_SUBSCRIPTIONS = "with_subscriptions";
+		const string MailingListsService::PARAMETER_MANUAL_SENDING_FILTER = "manual_sending";
 		const string MailingListsService::TAG_MAILING_LIST = "mailing_list";
 
 
@@ -62,6 +63,12 @@ namespace synthese
 			if(_withSubscriptions)
 			{
 				map.insert(PARAMETER_WITH_SUBSCRIPTIONS, 1);
+			}
+
+			// Manual sending
+			if(_manualSendingFilter)
+			{
+				map.insert(PARAMETER_MANUAL_SENDING_FILTER, *_manualSendingFilter);
 			}
 
 			return map;
@@ -87,6 +94,12 @@ namespace synthese
 
 			// With recipients
 			_withSubscriptions = map.getDefault<bool>(PARAMETER_WITH_SUBSCRIPTIONS, false);
+
+			// Manual sending
+			if(!map.getDefault<string>(PARAMETER_MANUAL_SENDING_FILTER).empty())
+			{
+				_manualSendingFilter = map.getDefault<bool>(PARAMETER_MANUAL_SENDING_FILTER, false);
+			}
 		}
 
 
@@ -109,7 +122,17 @@ namespace synthese
 					const Registry<MailingList>::value_type& it,
 					Env::GetOfficialEnv().getRegistry<MailingList>()
 				){
-					mailingLists.insert(make_pair(it.second->get<Name>(), it.second.get()));
+					// Manual sending filter
+					if(_manualSendingFilter &&
+						it.second->get<ManualSending>() != *_manualSendingFilter
+					){
+						continue;
+					}
+
+					// The mailing list is registered for the output
+					mailingLists.insert(
+						make_pair(it.second->get<Name>(), it.second.get())
+					);
 				}
 			}
 

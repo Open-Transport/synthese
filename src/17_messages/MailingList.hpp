@@ -39,6 +39,7 @@ namespace synthese
 	FIELD_STRING(Sender)
 	FIELD_STRING(SenderName)
 	FIELD_ENUM(EMailFormat, util::EMail::Format)
+	FIELD_BOOL(ManualSending)
 
 	namespace messages
 	{
@@ -48,7 +49,8 @@ namespace synthese
 			FIELD(Sender),
 			FIELD(SenderName),
 			FIELD(EMailFormat),
-			FIELD(messages::MessageType)
+			FIELD(messages::MessageType),
+			FIELD(ManualSending)
 		> MailingListRecord;
 
 		class MailingListSubscription;
