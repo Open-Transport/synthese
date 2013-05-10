@@ -35,10 +35,13 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace fare
 	{
 		class Fare;
+	}
 
+	namespace pt
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Public transportation use rule.
 		///	@ingroup m35
@@ -97,7 +100,7 @@ namespace synthese
 				AccessCapacity _accessCapacity;
 
 				/// Default fare
-				const Fare*	_defaultFare;
+				const fare::Fare*	_defaultFare;
 			//@}
 
 			//! @name Reservation
@@ -150,7 +153,7 @@ namespace synthese
 				boost::posix_time::time_duration					getMinDelayMinutes()			const { return _minDelayMinutes; }
 				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const { return _maxDelayDays; }
 				ReservationRuleType	getReservationType()			const { return _reservationType; }
-				const Fare*	getDefaultFare()				const { return _defaultFare; }
+				const fare::Fare*	getDefaultFare()				const { return _defaultFare; }
 				bool getForbiddenInDepartureBoards ()	const { return _forbiddenInDepartureBoards; }
 				bool getForbiddenInTimetables ()		const { return _forbiddenInTimetables; }
 				bool getForbiddenInJourneyPlanning ()	const { return _forbiddenInJourneyPlanning; }
@@ -172,7 +175,7 @@ namespace synthese
 				void setOriginIsReference (bool value){ _originIsReference = value; }
 				void setReservationType(ReservationRuleType value){ _reservationType = value; }
 				void setAccessCapacity(AccessCapacity value){ _accessCapacity = value; }
-				void setDefaultFare(const Fare* value){ _defaultFare = value; }
+				void setDefaultFare(const fare::Fare* value){ _defaultFare = value; }
 				void setForbiddenInDepartureBoards (bool value){ _forbiddenInDepartureBoards = value; }
 				void setForbiddenInJourneyPlanning (bool value){ _forbiddenInJourneyPlanning = value; }
 				void setForbiddenInTimetables (bool value){ _forbiddenInTimetables = value; }

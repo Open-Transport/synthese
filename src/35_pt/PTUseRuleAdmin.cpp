@@ -24,6 +24,7 @@
 
 #include "PTUseRuleAdmin.h"
 
+#include "Fare.hpp"
 #include "Profile.h"
 #include "PTUseRulesAdmin.h"
 #include "User.h"
@@ -35,7 +36,7 @@
 #include "PTUseRuleTableSync.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "PTUseRuleUpdateAction.hpp"
-#include "FareTableSync.h"
+#include "FareTableSync.hpp"
 
 #include <boost/optional.hpp>
 
@@ -45,11 +46,12 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
+	using namespace fare;
+	using namespace html;
+	using namespace pt;
+	using namespace security;
 	using namespace server;
 	using namespace util;
-	using namespace security;
-	using namespace pt;
-	using namespace html;
 
 	namespace util
 	{

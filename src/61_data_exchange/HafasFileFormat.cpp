@@ -71,6 +71,7 @@ namespace synthese
 {
 	using namespace data_exchange;
 	using namespace util;
+	using namespace vehicle;
 	using namespace impex;
 	using namespace pt;
 	using namespace road;

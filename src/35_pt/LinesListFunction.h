@@ -67,11 +67,15 @@ namespace synthese
 		class CustomBroadcastPoint;
 	}
 
+	namespace vehicle
+	{
+		class RollingStock;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
 		class TransportNetwork;
-		class RollingStock;
 		class ReservationContact;
 
 		////////////////////////////////////////////////////////////////////
@@ -146,7 +150,7 @@ namespace synthese
 				bool _lettersBeforeNumbers;
 				std::string _outputGeometry;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
-				typedef std::vector<boost::shared_ptr<const RollingStock> > TransportModeSorting;
+				typedef std::vector<boost::shared_ptr<const vehicle::RollingStock> > TransportModeSorting;
 				TransportModeSorting _sortByTransportMode;
 				std::string _rightClass;
 				boost::optional<security::RightLevel> _rightLevel;

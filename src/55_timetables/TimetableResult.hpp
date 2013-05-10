@@ -32,10 +32,14 @@
 
 namespace synthese
 {
+	namespace vehicle
+	{
+		class RollingStock;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
-		class RollingStock;
 		class SchedulesBasedService;
 	}
 
@@ -57,7 +61,7 @@ namespace synthese
 			typedef std::vector<pt::CommercialLine*> RowLinesVector;
 			typedef std::vector<TimetableColumn::Services> RowServicesVector;
 			typedef std::vector<boost::shared_ptr<TimetableWarning> > RowNotesVector;
-			typedef std::vector<const pt::RollingStock*> RowRollingStockVector;
+			typedef std::vector<const vehicle::RollingStock*> RowRollingStockVector;
 			typedef std::vector<TimetableColumn::Content::value_type> RowTimesVector;
 			typedef std::vector<TimetableColumn::tTypeOD>	RowTypeODVector;
 

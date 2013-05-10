@@ -35,10 +35,14 @@
 
 namespace synthese
 {
+	namespace vehicle
+	{
+		class RollingStock;
+	}
+
 	namespace pt
 	{
 		class JourneyPattern;
-		class RollingStock;
 		class Destination;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -67,7 +71,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
 
-			boost::optional<boost::shared_ptr<RollingStock> > _transportMode;
+			boost::optional<boost::shared_ptr<vehicle::RollingStock> > _transportMode;
 			boost::optional<boost::shared_ptr<Destination> > _directionObj;
 			boost::optional<std::string> _name;
 			boost::optional<std::string> _direction;

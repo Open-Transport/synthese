@@ -64,13 +64,12 @@
 #include "Webpage.h"
 #include "StopArea.hpp"
 #include "StaticFunctionRequest.h"
-#include "ReservationRuleInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
 #include "SentAlarm.h"
 #include "PTModule.h"
 #include "Destination.hpp"
 #include "Junction.hpp"
-#include "Fare.h"
+#include "Fare.hpp"
 #include "FareTicket.hpp"
 #include "HTMLForm.h"
 #include "CMSModule.hpp"
@@ -94,8 +93,10 @@ using namespace geos::io;
 namespace synthese
 {
 	using namespace algorithm;
-	using namespace util;
+	using namespace fare;
 	using namespace server;
+	using namespace util;
+	using namespace vehicle;
 	using namespace pt;
 	using namespace pt_website;
 	using namespace db;

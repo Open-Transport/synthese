@@ -1,0 +1,1 @@
+synthese::fare::moduleRegister();

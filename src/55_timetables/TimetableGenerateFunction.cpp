@@ -63,6 +63,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace vehicle;
 	using namespace geography;
 	using namespace calendar;
 	using namespace graph;
@@ -1221,8 +1222,8 @@ namespace synthese
 		void TimetableGenerateFunction::_displayRollingStockCell(
 			std::ostream& stream,
 			const server::Request& request,
-			const pt::RollingStock* object,
-			std::size_t colRank
+			const RollingStock* object,
+			size_t colRank
 		) const {
 			ParametersMap pm(getTemplateParameters());
 

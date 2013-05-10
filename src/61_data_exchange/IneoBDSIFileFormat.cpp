@@ -27,12 +27,12 @@
 #include "ActionException.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmRecipientTemplate.h"
+#include "BroadcastPointAlarmRecipient.hpp"
 #include "CommercialLine.h"
 #include "DataSourceTableSync.h"
 #include "Depot.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DisplayScreen.h"
-#include "DisplayScreenAlarmRecipient.h"
 #include "DBModule.h"
 #include "DBTransaction.hpp"
 #include "Import.hpp"
@@ -657,7 +657,7 @@ namespace synthese
 					// Adding of existing object links to the removal list
 					Alarm::LinkedObjects::mapped_type existingRecipients(
 						(*scenario->getMessages().begin())->getLinkedObjects(
-							DisplayScreenAlarmRecipient::FACTORY_KEY
+							BroadcastPointAlarmRecipient::FACTORY_KEY
 					)	);
 					BOOST_FOREACH(const Alarm::LinkedObjects::mapped_type::value_type& aol, existingRecipients)
 					{
@@ -688,7 +688,7 @@ namespace synthese
 						link->setKey(AlarmObjectLinkTableSync::getId());
 						link->setAlarm(message);
 						link->setObjectId(itDest.syntheseDisplayBoard->getKey());
-						link->setRecipient(DisplayScreenAlarmRecipient::FACTORY_KEY);
+						link->setRecipient(BroadcastPointAlarmRecipient::FACTORY_KEY);
 						_env.getEditableRegistry<AlarmObjectLink>().add(link);
 					}
 				}

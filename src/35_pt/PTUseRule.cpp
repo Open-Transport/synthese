@@ -75,9 +75,13 @@ namespace synthese
 			const time_duration& hourDeadLine
 		){
 			if (hourDeadLine == time_duration(0,0,0))
+			{
 				_hourDeadLine = time_duration(23,59,59);
+			}
 			else
+			{
 				_hourDeadLine = hourDeadLine;
+			}
 		}
 
 

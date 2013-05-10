@@ -57,24 +57,6 @@ DRTAreaUpdateAction.cpp
 DRTAreaUpdateAction.hpp
 EnvironmentSyncException.cpp
 EnvironmentSyncException.h
-Fare.cpp
-Fare.h
-FareAdmin.cpp
-FareAdmin.h
-FaresAdmin.cpp
-FaresAdmin.h
-FareTableSync.cpp
-FareTableSync.h
-FareTicket.cpp
-FareTicket.hpp
-FareType.cpp
-FareType.hpp
-FareTypeDistance.cpp
-FareTypeDistance.hpp
-FareTypeFlatRate.cpp
-FareTypeFlatRate.hpp
-FareUpdateAction.cpp
-FareUpdateAction.hpp
 FreeDRTArea.cpp
 FreeDRTArea.hpp
 FreeDRTAreaAdmin.cpp
@@ -192,8 +174,6 @@ RealTimePTDataInterSYNTHESE.cpp
 RealTimePTDataInterSYNTHESE.hpp
 RealTimeUpdateFunction.cpp
 RealTimeUpdateFunction.h
-RealTimeUpdateScreenServiceInterfacePage.cpp
-RealTimeUpdateScreenServiceInterfacePage.h
 ReservableService.hpp
 ReservationContact.cpp
 ReservationContact.h
@@ -201,16 +181,6 @@ ReservationContactTableSync.cpp
 ReservationContactTableSync.h
 ReservationRuleInterfacePage.cpp
 ReservationRuleInterfacePage.h
-RollingStock.cpp
-RollingStock.hpp
-RollingStockAdmin.cpp
-RollingStockAdmin.hpp
-RollingStocksAdmin.cpp
-RollingStocksAdmin.hpp
-RollingStockTableSync.cpp
-RollingStockTableSync.hpp
-RollingStockUpdateAction.cpp
-RollingStockUpdateAction.hpp
 ScheduledService.cpp
 ScheduledService.h
 ScheduledServiceTableSync.cpp
@@ -309,10 +279,12 @@ target_link_libraries(35_pt
   17_messages
   18_graph
   20_tree
+  30_fare
   31_calendar
   32_geography
   33_algorithm
   34_road
+  38_vehicle
   # Forward dependencies:
   #11_cms
   #39_map

@@ -27,6 +27,7 @@
 #include "MessagesLibraryLog.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
+#include "MessagesSectionTableSync.hpp"
 #include "MessagesLog.h"
 #include "MessagesTypes.h"
 #include "Profile.h"
@@ -66,6 +67,7 @@ namespace synthese
 		const string AlarmTableSync::COL_TEMPLATE_ID("template_id");
 		const string AlarmTableSync::COL_RAW_EDITOR = "raw_editor";
 		const string AlarmTableSync::COL_DONE = "done";
+		const string AlarmTableSync::COL_MESSAGES_SECTION_ID = "messages_section_id";
 	}
 
 	namespace db
@@ -85,6 +87,7 @@ namespace synthese
 			Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
 			Field(AlarmTableSync::COL_DONE, SQL_BOOLEAN),
+			Field(AlarmTableSync::COL_MESSAGES_SECTION_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -124,6 +127,21 @@ namespace synthese
 			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
 			alarm->setRawEditor(rows->getBool(AlarmTableSync::COL_RAW_EDITOR));
 			alarm->setDone(rows->getBool(AlarmTableSync::COL_DONE));
+
+			// Section
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				alarm->setSection(NULL);
+				RegistryKeyType id(rows->getDefault<RegistryKeyType>(AlarmTableSync::COL_MESSAGES_SECTION_ID));
+				if(id) try
+				{
+					alarm->setSection(MessagesSectionTableSync::Get(id, env).get());
+				}
+				catch (ObjectNotFoundException<MessagesSection>& e)
+				{
+					Log::GetInstance().warn("Invalid section", e);
+				}
+			}
 
 			if(dynamic_cast<AlarmTemplate*>(alarm))
 			{

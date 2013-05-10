@@ -60,6 +60,7 @@ namespace synthese
 	using namespace graph;
 	using namespace impex;
 	using namespace pt;
+	using namespace vehicle;	
 	using namespace db;
 	using namespace html;
 	using namespace server;

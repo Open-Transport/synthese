@@ -49,6 +49,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace security;
+	using namespace vehicle;
 	using namespace pt;
 	using namespace geography;
 	using namespace graph;

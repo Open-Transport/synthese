@@ -47,11 +47,15 @@ namespace synthese
 		class Service;
 	}
 
+	namespace vehicle
+	{
+		class RollingStock;
+	}
+
 	namespace pt
 	{
 		class TransportNetwork;
 		class StopPoint;
-		class RollingStock;
 		class JourneyPatternCopy;
 		class Destination;
 		class LineStop;
@@ -124,8 +128,8 @@ namespace synthese
 			//@{
 				const std::string&	getDirection ()				const;
 				const std::string&	getTimetableName ()			const;
-				pt::RollingStock*	getRollingStock()			const;
-                                pt::TransportNetwork*	getNetwork()				const;
+				vehicle::RollingStock*	getRollingStock()			const;
+                TransportNetwork*	getNetwork()				const;
 				bool				getWalkingLine ()			const;
 				CommercialLine*		getCommercialLine()			const;
 				const SubLines		getSubLines()				const;
@@ -139,7 +143,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setWalkingLine (bool isWalkingLine);
-				void setRollingStock(pt::RollingStock*);
+				void setRollingStock(vehicle::RollingStock*);
 				void setNetwork(pt::TransportNetwork*);
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);

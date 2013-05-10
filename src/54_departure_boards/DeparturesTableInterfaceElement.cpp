@@ -84,7 +84,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const ArrivalDepartureList& ptds(static_cast<const ArrivalDepartureListWithAlarm*>(object)->map);
+			const ArrivalDepartureList& ptds(*static_cast<const ArrivalDepartureList*>(object));
 
 			int __MultiplicateurRangee(_multiplicateurRangeeVIE->isFalse(parameters, variables, object, request)
 				? 1

@@ -26,6 +26,7 @@
 
 #include "SentAlarm.h"
 #include "AlarmTemplate.h"
+#include "MessagesSection.hpp"
 #include "ParametersMap.h"
 #include "Registry.h"
 #include "Request.h"
@@ -325,10 +326,10 @@ namespace synthese
 			}
 
 			// Sections
-			BOOST_FOREACH(int section, getSections())
+			BOOST_FOREACH(const MessagesSection* section, getSections())
 			{
 				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
-				sectionPM->insert(DATA_CODE, section);
+				section->toParametersMap(*sectionPM, true);
 				pm.insert(TAG_SECTION, sectionPM);
 			}
 

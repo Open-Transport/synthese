@@ -22,10 +22,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ScenariosListFunction.hpp"
+
+#include "MessagesSection.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "MessagesRight.h"
-#include "ScenariosListFunction.hpp"
 #include "ScenarioFolderTableSync.h"
 #include "Webpage.h"
 #include "ScenarioFolder.h"
@@ -138,13 +140,17 @@ namespace synthese
 			}
 
 			// Section in
-			if(!map.getDefault<string>(PARAMETER_SECTION_IN).empty())
+			if(!map.getDefault<RegistryKeyType>(PARAMETER_SECTION_IN))
 			{
 				try
 				{
-					_sectionIn = map.get<int>(PARAMETER_SECTION_IN);
+					_sectionIn = *Env::GetOfficialEnv().get<MessagesSection>(map.get<RegistryKeyType>(PARAMETER_SECTION_IN));
 				}
 				catch (bad_lexical_cast&)
+				{
+					throw RequestException("No such section");
+				}
+				catch(ObjectNotFoundException<MessagesSection>&)
 				{
 					throw RequestException("No such section");
 				}
@@ -155,9 +161,13 @@ namespace synthese
 			{
 				try
 				{
-					_sectionOut = map.get<int>(PARAMETER_SECTION_OUT);
+					_sectionOut = *Env::GetOfficialEnv().get<MessagesSection>(map.get<RegistryKeyType>(PARAMETER_SECTION_OUT));
 				}
 				catch (bad_lexical_cast&)
+				{
+					throw RequestException("No such section");
+				}
+				catch(ObjectNotFoundException<MessagesSection>&)
 				{
 					throw RequestException("No such section");
 				}
@@ -235,8 +245,8 @@ namespace synthese
 			{
 				// Section filter
 				const Scenario::Sections& sections(scenario->getSections());
-				if(	(	_sectionIn && sections.find(*_sectionIn) == sections.end()) ||
-					(	_sectionOut && sections.find(*_sectionOut) != sections.end())
+				if(	(	_sectionIn && sections.find(&*_sectionIn) == sections.end()) ||
+					(	_sectionOut && sections.find(&*_sectionOut) != sections.end())
 				){
 					continue;
 				}

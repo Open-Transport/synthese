@@ -44,6 +44,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace vehicle;
 	using namespace impex;
 	using namespace graph;
 	using namespace db;

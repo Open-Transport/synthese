@@ -29,6 +29,7 @@
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessageType.hpp"
 #include "MessagesModule.h"
+#include "MessagesSection.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
 #include "MessagesLog.h"
@@ -463,10 +464,20 @@ namespace synthese
 						{
 							try
 							{
-								_sections->insert(lexical_cast<int>(token));
+								RegistryKeyType sectionId(lexical_cast<RegistryKeyType>(token));
+								if(sectionId)
+								{
+									_sections->insert(
+										Env::GetOfficialEnv().get<MessagesSection>(sectionId).get()
+									);
+								}
 							}
 							catch (bad_lexical_cast&)
 							{						
+							}
+							catch(ObjectNotFoundException<MessagesSection>&)
+							{
+
 							}
 						}
 					}

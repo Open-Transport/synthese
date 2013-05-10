@@ -22,6 +22,7 @@
 
 #include "VehicleModule.hpp"
 
+#include "RollingStockTableSync.hpp"
 #include "ServiceComposition.hpp"
 #include "Vehicle.hpp"
 
@@ -63,6 +64,40 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<VehicleModule>::Init()
 		{
+			// Creation of each transport mode corresponding to Trident values except "Other" which is used for null pointer
+			Env env;
+			vector<string> tridentKeys;
+			tridentKeys.push_back("Air");
+			tridentKeys.push_back("Train");
+			tridentKeys.push_back("LongDistanceTrain");
+			tridentKeys.push_back("LocalTrain");
+			tridentKeys.push_back("RapidTransit");
+			tridentKeys.push_back("Metro");
+			tridentKeys.push_back("Tramway");
+			tridentKeys.push_back("Coach");
+			tridentKeys.push_back("Bus");
+			tridentKeys.push_back("Ferry");
+			tridentKeys.push_back("Waterborne");
+			tridentKeys.push_back("PrivateVehicle");
+			tridentKeys.push_back("Walk");
+			tridentKeys.push_back("Trolleybus");
+			tridentKeys.push_back("Bicycle");
+			tridentKeys.push_back("Shuttle");
+			tridentKeys.push_back("Taxi");
+			tridentKeys.push_back("VAL");
+
+			BOOST_FOREACH(const string& tridentKey, tridentKeys)
+			{
+				RollingStockTableSync::SearchResult rollingStocks(RollingStockTableSync::Search(env, tridentKey, true));
+				if(rollingStocks.empty())
+				{
+					RollingStock s;
+					s.setName(tridentKey);
+					s.setTridentKey(tridentKey);
+					s.setIsTridentKeyReference(true);
+					RollingStockTableSync::Save(&s);
+				}
+			}
 		}
 
 		template<> void ModuleClassTemplate<VehicleModule>::Start()

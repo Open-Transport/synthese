@@ -48,6 +48,7 @@ namespace synthese
 	using namespace impex;
 	using namespace pt;
 	using namespace calendar;
+	using namespace vehicle;
 
 	namespace util
 	{
@@ -116,20 +117,28 @@ namespace synthese
 		{
 			return static_cast<RollingStock*>(_pathClass);
 		}
+
+
+
 		TransportNetwork*   JourneyPattern::getNetwork () const
-                {
-                        return static_cast<TransportNetwork*>(_pathNetwork);
-                }
+        {
+            return static_cast<TransportNetwork*>(_pathNetwork);
+        }
+
 
 
 		void JourneyPattern::setRollingStock(RollingStock* rollingStock)
 		{
 			_pathClass = static_cast<PathClass*>(rollingStock);
 		}
+
+
+
 		void JourneyPattern::setNetwork(TransportNetwork* transportNetwork)
-                {
-                        _pathNetwork = static_cast<PathClass*>(transportNetwork);
-                }
+        {
+             _pathNetwork = static_cast<PathClass*>(transportNetwork);
+        }
+
 
 
 		void JourneyPattern::setWalkingLine (bool isWalkingLine)

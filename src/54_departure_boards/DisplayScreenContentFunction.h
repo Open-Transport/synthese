@@ -52,6 +52,7 @@ namespace synthese
 
 	namespace departure_boards
 	{
+		class AlarmTestOnDisplayScreenFunction;
 		class DisplayType;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -189,8 +190,6 @@ namespace synthese
 				static const std::string DATA_INTERMEDIATE_STOPS_NUMBER;
 				static const std::string DATA_DISPLAY_CLOCK;
 				static const std::string DATA_ROWS;
-				static const std::string DATA_MESSAGE_LEVEL;
-				static const std::string DATA_MESSAGE_CONTENT;
 				static const std::string DATA_DATE;
 				static const std::string DATA_MAC;
 				static const std::string DATA_SUBSCREEN_;
@@ -221,7 +220,7 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					boost::shared_ptr<const cms::Webpage> transferPage,
 					const boost::posix_time::ptime&  date,
-					const ArrivalDepartureListWithAlarm& rows,
+					const ArrivalDepartureList& rows,
 					const DisplayScreen& screen
 				) const;
 			private:
@@ -265,8 +264,8 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					boost::shared_ptr<const cms::Webpage> transferPage,
 					const boost::posix_time::ptime& requestTime,
-					std::size_t rowRank,
-					std::size_t pageNumber,
+					size_t rowRank,
+					size_t pageNumber,
 					const ArrivalDepartureRow& row,
 					const DisplayScreen& screen
 				) const;
@@ -307,8 +306,8 @@ namespace synthese
 					const graph::ServicePointer& object,
 					bool lastDisplayedStopWasInTheSameCity,
 					bool isTheEndStation,
-					std::size_t rank,
-					std::size_t globalRank,
+					size_t rank,
+					size_t globalRank,
 					const IntermediateStop::TransferDestinations& transferDestinations,
 					const DisplayScreen& screen,
 					bool isContinuation,
@@ -330,7 +329,7 @@ namespace synthese
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
 					const graph::ServicePointer& object,
-					std::size_t localTransferRank,
+					size_t localTransferRank,
 					const DisplayScreen& screen
 				) const;
 
@@ -350,7 +349,7 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> rowPage,
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					const boost::posix_time::ptime& date,
-					const RoutePlanningListWithAlarm& rows,
+					const RoutePlanningList& rows,
 					const DisplayScreen& screen
 				) const;
 			private:
@@ -372,7 +371,7 @@ namespace synthese
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
 					boost::shared_ptr<const cms::Webpage> destinationPage,
-					std::size_t rowId,
+					size_t rowId,
 					const RoutePlanningRow& row,
 					const DisplayScreen& screen
 				) const;
@@ -390,8 +389,9 @@ namespace synthese
 				) const;
 			//@}
 
-				server::FunctionAPI getAPI() const;
+			server::FunctionAPI getAPI() const;
+
+			friend class AlarmTestOnDisplayScreenFunction;
 		};
-	}
-}
+}	}
 #endif // SYNTHESE_DisplayScreenContentRequest_H__

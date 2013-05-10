@@ -34,6 +34,7 @@
 #include "MessagesLibraryLog.h"
 #include "MessagesLog.h"
 #include "MessagesRight.h"
+#include "MessagesSectionTableSync.hpp"
 #include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "SentScenario.h"
@@ -72,7 +73,7 @@ namespace synthese
 		const string ScenarioTableSync::COL_VARIABLES("variables");
 		const string ScenarioTableSync::COL_TEMPLATE("template_id");
 		const string ScenarioTableSync::COL_DATASOURCE_LINKS("datasource_links");
-		const string ScenarioTableSync::COL_SECTIONS = "sections";
+		const string ScenarioTableSync::COL_SECTIONS = "messages_section_ids";
 		const string ScenarioTableSync::COL_EVENT_START = "event_start";
 		const string ScenarioTableSync::COL_EVENT_END = "event_end";
 	}
@@ -149,10 +150,18 @@ namespace synthese
 				{
 					try
 					{
-						sections.insert(lexical_cast<int>(token));
+						sections.insert(
+							MessagesSectionTableSync::Get(
+								lexical_cast<RegistryKeyType>(token),
+								env
+							).get()
+						);
 					}
 					catch (bad_lexical_cast&)
 					{						
+					}
+					catch(ObjectNotFoundException<MessagesSection>&)
+					{
 					}
 				}
 			}
@@ -307,7 +316,7 @@ namespace synthese
 			// Sections
 			bool first(true);
 			stringstream sectionsStr;
-			BOOST_FOREACH(int section, object->getSections())
+			BOOST_FOREACH(const MessagesSection* section, object->getSections())
 			{
 				if(first)
 				{
@@ -317,7 +326,7 @@ namespace synthese
 				{
 					sectionsStr << ",";
 				}
-				sectionsStr << section;
+				sectionsStr << section->getKey();
 			}
 			query.addField(sectionsStr.str());
 

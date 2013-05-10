@@ -30,7 +30,7 @@ namespace synthese
 {
 	using namespace graph;
 	using namespace util;
-	using namespace pt;
+	using namespace vehicle;
 
 	namespace util
 	{

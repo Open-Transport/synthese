@@ -61,6 +61,7 @@ namespace synthese
 {
 	using namespace pt;
 	using namespace util;
+	using namespace vehicle;
 	using namespace impex;
 	using namespace graph;
 	using namespace admin;
@@ -648,7 +649,7 @@ namespace synthese
 			boost::optional<Destination*> destinationObj,
 			boost::optional<const RuleUser::Rules&> rules,
 			boost::optional<bool> wayBack,
-			pt::RollingStock* rollingStock,
+			vehicle::RollingStock* rollingStock,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 			const impex::DataSource& source,
 			util::Env& env,

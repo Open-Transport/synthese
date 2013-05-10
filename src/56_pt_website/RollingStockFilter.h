@@ -33,7 +33,7 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace vehicle
 	{
 		class RollingStock;
 	}
@@ -49,7 +49,7 @@ namespace synthese
 			public util::Registrable
 		{
 		public:
-			typedef std::set<const pt::RollingStock*> List;
+			typedef std::set<const vehicle::RollingStock*> List;
 
 			/// Chosen registry class.
 			typedef util::Registry<RollingStockFilter>	Registry;
@@ -87,7 +87,7 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void addRollingStock(const pt::RollingStock* value) { _list.insert(value); }
+				void addRollingStock(const vehicle::RollingStock* value) { _list.insert(value); }
 				void cleanRollingStocks() { _list.clear(); }
 			//@}
 

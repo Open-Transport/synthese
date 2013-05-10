@@ -48,6 +48,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
+	using namespace vehicle;
 	using namespace calendar;
 	using namespace impex;
 

@@ -28,6 +28,7 @@
 #include "DBConstants.h"
 #include "Factory.h"
 #include "MessageAlternative.hpp"
+#include "MessagesSection.hpp"
 #include "Scenario.h"
 #include "AlarmTemplate.h"
 #include "ParametersMap.h"
@@ -55,6 +56,7 @@ namespace synthese
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 		const string Alarm::TAG_RECIPIENTS = "recipients";
+		const string Alarm::TAG_SECTION = "section";
 
 		const string Alarm::ATTR_LINK_ID = "link_id";
 		const string Alarm::ATTR_LINK_PARAMETER = "link_parameter";
@@ -67,7 +69,8 @@ namespace synthese
 			_level(ALARM_LEVEL_INFO),
 			_scenario(scenario),
 			_rawEditor(false),
-			_done(true)
+			_done(true),
+			_section(NULL)
 		{}
 
 
@@ -80,7 +83,8 @@ namespace synthese
 			_longMessage(source._longMessage),
 			_scenario(source._scenario),
 			_rawEditor(source._rawEditor),
-			_done(source._done)
+			_done(source._done),
+			_section(source._section)
 		{}
 
 
@@ -94,7 +98,8 @@ namespace synthese
 			_longMessage(source._longMessage),
 			_scenario(scenario),
 			_rawEditor(source._rawEditor),
-			_done(source._done)
+			_done(source._done),
+			_section(source._section)
 		{}
 
 
@@ -120,6 +125,14 @@ namespace synthese
 			{
 				pm.insert(prefix + DATA_SCENARIO_ID, getScenario()->getKey());
 				pm.insert(prefix + DATA_SCENARIO_NAME, getScenario()->getName());
+			}
+
+			// Section
+			if(_section)
+			{
+				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
+				_section->toParametersMap(*sectionPM, true);
+				pm.insert(TAG_SECTION, sectionPM);
 			}
 
 			// Message alternatives
