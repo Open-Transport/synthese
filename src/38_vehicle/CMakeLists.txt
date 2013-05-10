@@ -69,8 +69,6 @@ target_link_libraries(38_vehicle
   01_util
   10_db
   34_road
-  35_pt
-  37_pt_operation
 )
 
 install(TARGETS 38_vehicle DESTINATION lib)
