@@ -1,0 +1,237 @@
+<@section_name=<@section?<?messages_sections&roid=<@section@>&template=<{section&template=<@name@>}>?>:title@>@>
+
+<ul class="breadcrumb">
+ <li class="active"><@section_name@></li>
+</ul>
+
+<ul class="nav nav-tabs">
+ <#tab_title&default=1&id=diffusions&title=Diffusions#>
+ <#tab_title&id=tasks&title=Tâches#>
+ <#tab_title&id=evenements&title=Autres événements#>
+ <#tab_title&id=archives&title=Archives#>
+</ul>
+
+<?action&a=SetSessionVariable&actionParamvariable=terminus_section&actionParamvalue=<@section@>?>
+<?action&a=SetSessionVariable&actionParamvariable=terminus_event&actionParamvalue=?>
+
+<div class="tab-content">
+
+<#tab_div&default=1&id=diffusions#>
+ <table class="table table-striped">
+ <thead><tr><th>début</th><th>fin</th>
+ <th>nom</th><th>modèle</th><th>statut</th><th>archivage</th><th></th></tr></thead>
+ <tbody>
+ <?scenarii&
+ 	t=0&
+ 	archives=0&
+ 	section_in=<@section@>&
+ 	template=<{scenario&template=
+	  <tr>
+	  <td><#display_date&value=<@start_date@>#></td>
+	  <td><#display_date&value=<@end_date@>#><@end_date?"":"(illimité)"@></td>
+	  <td><@name@></td>
+	  <td><{scenario_template&template=<@name@>&empty=(pas de modèle)}></td>
+	  <td>
+	   <?if&
+	     cond=<@active@>&
+	     then= <?link&target=<@p@>&section=<@section@>&a=scenario_save&actionParamsid=<@roid@>&actionParamena=0&class=btn btn-warning btn-mini&text=<i class="icon-pause icon-white"></i>&confirm=Etes-vous sûr de vouloir suspendre la diffusion de l'événement ??>&
+	     else= <?link&target=<@p@>&section=<@section@>&a=scenario_save&actionParamsid=<@roid@>&actionParamena=1&class=btn btn-success btn-mini&text=<i class="icon-play icon-white"></i>&confirm=Etes-vous sûr de vouloir activer la diffusion de l'événement ??>
+	   ?> <span class="label<@active?" label-success":""@>"><@active?"Actif":"Inactif"@></span>
+	  </td>
+	  <td>
+	   <?link&
+	     target=<@p@>&
+	     a=scenariostop&
+	     section=<@section@>&
+	     actionParams=<@roid@>&
+	     class=btn btn-danger btn-mini&
+	     text=<i class="icon-eject icon-white"></i>&
+	     confirm=Etes-vous sûr de vouloir clore et archiver l'événement ?&
+	   ?>
+	  </td>
+	  <td>
+	   <?link&
+	     target=/events/event&
+	     section=<@section@>&
+	     roid=<@roid@>&
+	     class=btn btn-primary btn-mini&
+	     text=Ouvrir&
+	   ?>
+	  </td>
+	  <td><a href="#" class="btn btn-danger btn-mini copy_event_link" element_id="<@id@>" element_name="<@name@>">Dupliquer</a></td>
+	  </tr>
+	}>
+ ?>
+ </tbody><tfoot>
+  <tr>
+   <td></td>
+   <td></td>
+   <td></td>
+   <td></td>
+   <td></td>
+   <td></td>
+   <td><a href="#" id="new_event_link" class="btn-warning btn btn-mini">Ajouter</a></td>
+  </tr>
+ </tfoot></table>
+</div>
+
+<#tab_div&id=tasks#>
+<table class="table table-striped">
+<thead><tr><th></th><th>événement</th><th>tâches</th><th>échéances</th></tr></thead>
+<tbody>
+</tbody>
+</table>
+</div>
+
+<#tab_div&id=evenements#>
+<table class="table table-striped">
+<thead><tr><th>titre</th>
+		<?if&cond=<@section==1@>&else=<th>expl</th>?>
+		<?if&cond=<@section==2@>&else=<th>comm</th>?>
+		<?if&cond=<@section==3@>&else=<th>iv</th>?>
+</tr></thead>
+<tbody>
+<?scenarii&
+	t=0&
+	section_out=<@section@>&
+	archive=0&
+	template=<{scenario&template=
+		<tr><td><@name@></td>
+		<?if&cond=<@section==1@>&else=<td><{section&template=<?if&cond=<@code==1@>&then=<?link&text=Ouvrir&class=btn btn-primary btn-mini&target=17733091036495882&roid=<@scenario_id@>?>?>}></td>?>
+		<?if&cond=<@section==2@>&else=<td><{section&template=<?if&cond=<@code==2@>&then=<?link&text=Ouvrir&class=btn btn-primary btn-mini&target=17733091036495881&roid=<@scenario_id@>?>?>}></td>?>
+		<?if&cond=<@section==3@>&else=<td><{section&template=<?if&cond=<@code==3@>&then=<?link&text=Ouvrir&class=btn btn-primary btn-mini&target=17733091036495879&roid=<@scenario_id@>?>?>}></td>?>
+		</tr>
+	}>
+?>
+</tbody>
+</table></form>
+</div>
+
+<#tab_div&id=archives#>
+ <table class="table table-striped">
+ <thead><tr><th></th><th>fin</th><th>nom</th><th></th><th></th></tr></thead>
+ <tbody>
+ <?scenarii&
+  t=0&
+  archives=1&
+  section_in=<@section@>&
+  template=<{scenario&template=
+	<tr>
+	 <td><@end_date@></td>
+	 <td><@name@></td>
+	 <td>
+	  <?link&
+	    target=/events/event&
+	    roid=<@roid@>&
+	    class=btn btn-primary btn-mini&
+	    section=<@section@>&
+	    text=Ouvrir&
+	  ?>
+	 </td><td>
+	  <?link&
+	    target=17732932122705978&
+	    a=scenario_save&
+	    actionParamt=1&
+	    actionParamsid=<@roid@>&
+	    class=btn btn-warning btn-mini&
+	    text=Copier dans la bibliothèque&
+	  ?>
+	 </td><td>
+	  <?link&
+	    target=/events/event&
+	    co=1&
+	    a=scenario_save&
+	    actionParamt=0&
+	    actionParamsid=<@roid@>&
+	    class=btn btn-warning btn-mini&
+	    text=Copier dans les événements actifs&
+	  ?>
+	 </td>
+	</tr>
+ }>?>
+ </tbody>
+ </table>
+</div>
+
+</div>
+
+
+<div class="modal hide fade" id="new_event_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Création d'évènement</h3>
+ </div>
+ <?form&
+   name=scenario_add&
+   target=/events/event&
+   section=<@section@>&
+   a=scenario_save&
+   co=1&
+   actionParam_sections=<@section@>&
+   actionParamtpl=0&
+   class=form-horizontal&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls"><input name="actionParamnam" type="text" /></div>
+   </div>
+   <div class="control-group">
+    <label class="control-label">Modèle</label>
+    <div class="controls"><ul class="nav nav-list well">
+     <li class="template_element" element_id="0" active="1"><a>(pas de modèle)</a></li>
+     <li class="folder_element" element_id="0"><a>Bibliothèque</a></li>
+     <?scenarii&
+       t=1&
+       template=<{scenario&template=
+	<li class="template_element" style="padding-left:15px;" element_id="<@id@>"><a href="#"><@name@></a></li>
+     }>?>
+     <?ScenarioFoldersService&
+      root_id=0&
+      template=<{folder&recursive=1&template=
+	<li class="folder_element" style="padding-left:<@15+(depth*15)@>px;" element_id="<@id@>"><a><@name@></a></li>
+	<@recursive_content@>
+	<@folder_depth=<@depth@>@>
+	<?scenarii&
+	  t=1&
+	  f=<@id@>&
+	  template=<{scenario&template=
+		<li class="template_element" style="padding-left:<@15+(folder_depth*15)@>px;" element_id="<@id@>" <@(folder_id==id)?"active=\"1\"":""@>><a href="#"><@name@></a></li>
+	}>?>
+     }>?>
+    </ul></div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="copy_event_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Duplication d'évènement</h3>
+ </div>
+ <?form&
+   name=event_copy&
+   target=/events/event&
+   section=<@section@>&
+   a=scenario_save&
+   co=1&
+   actionParamtpl=0&
+   class=form-horizontal&
+ ?>
+  <div class="modal-body">
+   <div class="control-group">
+    <label class="control-label">Nom</label>
+    <div class="controls"><input name="actionParamnam" id="copy_event_name_field" type="text" /></div>
+   </div>
+  </div><div class="modal-footer">
+   <button class="btn btn-warning" type="submit">Créer</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Annuler</button>
+  </div>
+ </form>
+</div>
+
+<script src="/terminus/js/events.js"></script>

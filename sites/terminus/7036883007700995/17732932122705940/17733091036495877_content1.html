@@ -7,6 +7,7 @@
  <#tab_title&id=display_types&title=Types de bornes#>
  <#tab_title&id=mailing_lists&title=Listes de diffusion#>
  <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
+ <#tab_title&id=sections&title=Sections#>
  <#tab_title&id=log&title=Journal#>
 </ul>
 
@@ -219,6 +220,52 @@
    ?>
   </div>
  </div>
+
+</div><#tab_div&id=sections#>
+
+ <table class="table table-condensed table-striped"><thead>
+  <tr>
+   <th>nom</th>
+   <th></th>
+  </tr></thead><tbody>
+  <?messages_sections&
+    template=<{section&template=
+   	<tr>
+   	 <td>
+   	  <?form&
+   	    target=<@p@>&
+   	    tab=sections&
+   	    a=ObjectUpdate&
+   	    actionParam_object_id=<@id@>&
+   	    class=form-inline&
+   	  ?>
+   	   <input type="text" name="actionParam_field_name" value="<@name@>" />
+   	   <button type="submit" class="btn btn-warning">Renommer</button>
+   	  </form>
+   	 </td>
+   	</tr>
+  }>?>
+  </tbody><tfoot>
+  <tr>
+   <td>
+    <?form&
+      target=<@p@>&
+      tab=sections&
+      a=ObjectCreate&
+      actionParam_table_id=109&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_field_name" placeholder="Nom de section" />
+     <button type="submit" class="btn btn-warning">Ajouter</button>
+    </form>
+   </td>
+  </tr>
+ </tfoot></table>
+   
+
+
+
+
 </div><#tab_div&id=log#>
 
     <div class="pagination">
