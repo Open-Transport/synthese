@@ -26,7 +26,7 @@
 #include "AlarmRecipient.h"
 #include "AlarmTableSync.h"
 #include "BasicClient.h"
-#include "DisplayScreenAlarmRecipient.h"
+#include "BroadcastPointAlarmRecipient.hpp"
 #include "Import.hpp"
 #include "LineAlarmRecipient.hpp"
 #include "ScenarioTableSync.h"
@@ -40,7 +40,6 @@ namespace synthese
 {
 	using namespace data_exchange;
 	using namespace db;
-	using namespace departure_boards;
 	using namespace impex;
 	using namespace messages;
 	using namespace pt;
@@ -209,7 +208,7 @@ namespace synthese
 							link->setKey(AlarmObjectLinkTableSync::getId());
 							link->setAlarm(message);
 							link->setObjectId(*_broadcastPointRecipientId);
-							link->setRecipient(DisplayScreenAlarmRecipient::FACTORY_KEY);
+							link->setRecipient(BroadcastPointAlarmRecipient::FACTORY_KEY);
 							_env.getEditableRegistry<AlarmObjectLink>().add(link);
 						}
 

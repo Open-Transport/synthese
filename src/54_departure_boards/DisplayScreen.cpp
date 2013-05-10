@@ -25,15 +25,15 @@
 #include "DisplayScreen.h"
 
 #include "AlgorithmLogger.hpp"
+#include "BroadcastPointAlarmRecipient.hpp"
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "DeparturesTableInterfacePage.h"
-#include "DeparturesTableRoutePlanningInterfacePage.h"
 #include "DisplayMaintenanceLog.h"
 #include "DisplayMonitoringStatus.h"
-#include "DisplayScreenAlarmRecipient.h"
 #include "DisplayScreenContentFunction.h"
 #include "DisplayScreenCPU.h"
+#include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
 #include "Interface.h"
 #include "InterfacePageException.h"
@@ -875,7 +875,7 @@ namespace synthese
 				// in broad cast points recipients
 				Alarm::LinkedObjects::const_iterator it(
 					linkedObjects.find(
-						DisplayScreenAlarmRecipient::FACTORY_KEY
+						BroadcastPointAlarmRecipient::FACTORY_KEY
 				)	);
 
 				// No broadcast recipient = no display

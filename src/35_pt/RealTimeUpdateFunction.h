@@ -26,7 +26,7 @@
 #define SYNTHESE_RealTimeUpdateFunction_H__
 
 #include "FactorableTemplate.h"
-#include "RequestWithInterface.h"
+#include "Function.h"
 
 namespace synthese
 {
@@ -56,7 +56,7 @@ namespace synthese
 		///	<dt>t</dt><dd>CMS template to use for the display. The template will become the parameters produced by RealTimeUpdateFunction::_display.</dd>
 		/// </dl>
 		class RealTimeUpdateFunction:
-			public util::FactorableTemplate<interfaces::RequestWithInterface,RealTimeUpdateFunction>
+			public util::FactorableTemplate<server::Function, RealTimeUpdateFunction>
 		{
 		public:
 			static const std::string PARAMETER_SERVICE_ID;

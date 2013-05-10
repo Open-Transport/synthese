@@ -62,6 +62,7 @@ namespace synthese
 	using namespace security;
 	using namespace cms;
 	using namespace pt_website;
+	using namespace vehicle;
 
 	template<> const string util::FactorableTemplate<Function,pt::StopPointsListFunction>::FACTORY_KEY("StopPointsListFunction");
 
@@ -799,6 +800,6 @@ namespace synthese
 			}
 
 			//return value
-			return round(distanceToBboxCenter);
+			return static_cast<int>(round(distanceToBboxCenter));
 		}
 }	}

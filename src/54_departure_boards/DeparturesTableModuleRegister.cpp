@@ -12,18 +12,12 @@
 #include "DeparturesTableModule.h"
 
 #include "DeparturesTableInterfaceElement.h"
-#include "DeparturesTableRoutePlanningInterfaceElement.h"
-#include "DisplayScreenHasAlarmValueInterfaceElement.h"
-#include "DisplayScreenAlarmContentValueInterfaceElement.h"
 #include "DeparturesTableLineContentInterfaceElement.h"
 #include "DeparturesTableDestinationContentInterfaceElement.h"
 
 #include "DepartureTableRowInterfacePage.h"
-#include "DeparturesTableRoutePlanningRowInterfacePage.h"
-#include "DeparturesTableRoutePlanningRowKeyInterfacePage.h"
 #include "ParseDisplayReturnInterfacePage.h"
 #include "DeparturesTableInterfacePage.h"
-#include "DeparturesTableRoutePlanningInterfacePage.h"
 #include "DeparturesTableDestinationInterfacepage.h"
 #include "DeparturesTableTransferDestinationInterfacePage.h"
 
@@ -90,17 +84,11 @@ void synthese::departure_boards::moduleRegister()
 	synthese::departure_boards::DeparturesTableModule::integrate();
 
 	synthese::departure_boards::DeparturesTableInterfaceElement::integrate();
-	synthese::departure_boards::DeparturesTableRoutePlanningInterfaceElement::integrate();
 	synthese::departure_boards::DeparturesTableLineContentInterfaceElement::integrate();
 	synthese::departure_boards::DeparturesTableDestinationContentInterfaceElement::integrate();
-	synthese::departure_boards::DisplayScreenHasAlarmValueInterfaceElement::integrate();
-	synthese::departure_boards::DisplayScreenAlarmContentValueInterfaceElement::integrate();
 
 	synthese::departure_boards::DeparturesTableInterfacePage::integrate();
-	synthese::departure_boards::DeparturesTableRoutePlanningInterfacePage::integrate();
 	synthese::departure_boards::DepartureTableRowInterfacePage::integrate();
-	synthese::departure_boards::DeparturesTableRoutePlanningRowInterfacePage::integrate();
-	synthese::departure_boards::DeparturesTableRoutePlanningRowKeyInterfacePage::integrate();
 	synthese::departure_boards::ParseDisplayReturnInterfacePage::integrate();
 	synthese::departure_boards::DeparturesTableTransferDestinationInterfacePage::integrate();
 	synthese::departure_boards::DeparturesTableDestinationInterfacepage::integrate();

@@ -31,11 +31,9 @@
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
-#include "RollingStockTableSync.hpp"
 #include "ReservationContactTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "StopAreaTableSync.hpp"
-#include "FareTableSync.h"
 #include "LineStopTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
@@ -45,8 +43,6 @@
 #include "ContactCentersAdmin.hpp"
 #include "DestinationAdmin.hpp"
 #include "DestinationsAdmin.hpp"
-#include "FareAdmin.h"
-#include "FaresAdmin.h"
 #include "FreeDRTAreaAdmin.hpp"
 #include "FreeDRTTimeSlot.hpp"
 #include "FreeDRTTimeSlotAdmin.hpp"
@@ -68,10 +64,7 @@
 #include "StopPointAdmin.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "DRTAreasAdmin.hpp"
-#include "RollingStockAdmin.hpp"
-#include "RollingStocksAdmin.hpp"
 
-#include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
 
 #include "CleanAllStopPointProjectionsAction.hpp"
@@ -81,7 +74,6 @@
 #include "CopyGeometriesAction.hpp"
 #include "DestinationUpdateAction.hpp"
 #include "DRTAreaUpdateAction.hpp"
-#include "FareUpdateAction.hpp"
 #include "FreeDRTAreaUpdateAction.hpp"
 #include "FreeDRTTimeSlotUpdateAction.hpp"
 #include "JourneyPatternAddAction.hpp"
@@ -109,7 +101,6 @@
 #include "LineStopUpdateAction.hpp"
 #include "ProjectAllStopPointsAction.hpp"
 #include "StopAreaTransferAddAction.h"
-#include "RollingStockUpdateAction.hpp"
 #include "ServiceQuotaUpdateAction.hpp"
 
 #include "LineAlarmRecipient.hpp"
@@ -135,8 +126,6 @@
 #include "PTUseRule.h"
 #include "Junction.hpp"
 #include "StopPoint.hpp"
-#include "RollingStock.hpp"
-#include "Fare.h"
 #include "ScheduledService.h"
 #include "ContinuousService.h"
 #include "NonConcurrencyRule.h"
@@ -170,8 +159,6 @@ void synthese::pt::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt::ScheduledServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::FreeDRTTimeSlotTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt::FreeDRTTimeSlotTableSync>::integrate();
-	synthese::pt::FareTableSync::integrate();
-	synthese::pt::RollingStockTableSync::integrate();
 	synthese::pt::NonConcurrencyRuleTableSync::integrate();
 	synthese::pt::ReservationContactTableSync::integrate();
 	synthese::pt::CommercialLineTableSync::integrate();
@@ -205,10 +192,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::StopPointAdmin::integrate();
 	synthese::pt::DRTAreaAdmin::integrate();
 	synthese::pt::DRTAreasAdmin::integrate();
-	synthese::pt::FareAdmin::integrate();
-	synthese::pt::FaresAdmin::integrate();
-	synthese::pt::RollingStockAdmin::integrate();
-	synthese::pt::RollingStocksAdmin::integrate();
 
 	synthese::pt::LineStopGetService::integrate();
 	synthese::pt::RealTimeUpdateFunction::integrate();
@@ -226,7 +209,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ServiceQuotasListService::integrate();
 
 	synthese::pt::LineMarkerInterfacePage::integrate();
-	synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 
 	synthese::pt::CleanAllStopPointProjectionsAction::integrate();
 	synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
@@ -238,8 +220,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DRTAreaUpdateAction::integrate();
 	synthese::pt::FreeDRTAreaUpdateAction::integrate();
 	synthese::pt::FreeDRTTimeSlotUpdateAction::integrate();
-	synthese::pt::RollingStockUpdateAction::integrate();
-	synthese::pt::FareUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JourneyPatternRankContinuityRestoreAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();
@@ -292,10 +272,7 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::PTUseRule>();
 	synthese::util::Env::Integrate<synthese::pt::ContinuousService>();
 	synthese::util::Env::Integrate<synthese::pt::ScheduledService>();
-	synthese::util::Env::Integrate<synthese::pt::RollingStock>();
-	synthese::util::Env::Integrate<synthese::pt::Fare>();
 	synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
 	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
 	synthese::util::Env::Integrate<synthese::pt::ServiceQuota>();
-
 }

@@ -24,6 +24,7 @@
 
 #include "AlarmTestOnDisplayScreenFunction.h"
 
+#include "MessagesModule.h"
 #include "Profile.h"
 #include "RequestException.h"
 #include "Request.h"
@@ -32,13 +33,11 @@
 #include "ArrivalDepartureTableRight.h"
 #include "SentAlarm.h"
 #include "AlarmTableSync.h"
+#include "DisplayScreenContentFunction.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "DeparturesTableTypes.h"
-#include "DeparturesTableInterfacePage.h"
 #include "Interface.h"
-#include "InterfacePage.h"
-#include "InterfacePageException.h"
 #include "StopArea.hpp"
 #include "ServicePointer.h"
 #include "JourneyPattern.hpp"
@@ -46,7 +45,6 @@
 #include "City.h"
 #include "CommercialLine.h"
 #include "GraphConstants.h"
-#include "InterfacePageTableSync.h"
 #include "SentScenario.h"
 #include "StopPoint.hpp"
 #include "PermanentService.h"
@@ -58,6 +56,7 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace cms;
 	using namespace util;
 	using namespace server;
 	using namespace messages;
@@ -94,22 +93,13 @@ namespace synthese
 
 		void AlarmTestOnDisplayScreenFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Message
 			setAlarmId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 
+			// Display type
 			try
 			{
 				_type = DisplayTypeTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DISPLAY_TYPE_ID), *_env);
-				if (!_type->getDisplayInterface())
-				{
-					throw RequestException("The specified type has no display interface");
-				}
-				InterfacePageTableSync::Search(
-					*_env,
-					_type->getDisplayInterface()->getKey(),
-					optional<int>(),
-					optional<int>(),
-					UP_DOWN_LINKS_LOAD_LEVEL
-				);
 			}
 			catch (...)
 			{
@@ -121,83 +111,74 @@ namespace synthese
 
 		util::ParametersMap AlarmTestOnDisplayScreenFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			try
+			DisplayScreen fakeScreen;
+			ArrivalDepartureList displayedObject;
+
+			City city;
+			city.setName("CITY");
+			StopArea place;
+			place.setName("TEST");
+			place.setCity(&city);
+			StopPoint ps(0, string(), &place);
+			place.addPhysicalStop(ps);
+			CommercialLine cline;
+			cline.setShortName("00");
+			JourneyPattern line;
+			line.setCommercialLine(&cline);
+			PermanentService s(0, &line, minutes(5));
+			DesignatedLinePhysicalStop lineStop;
+			lineStop.setLine(&line);
+			lineStop.setPhysicalStop(ps);
+			ptime now(second_clock::local_time());
+			ptime d(now);
+
+			for (size_t i(0); i<_type->getRowNumber(); ++i)
 			{
-				ArrivalDepartureListWithAlarm displayedObject;
+				ServicePointer sp(true, false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
+				sp.setDepartureInformations(lineStop, d, d, ps);
+				sp.setArrivalInformations(lineStop, d, d, ps);
+				ActualDisplayedArrivalsList destinations;
 
-				City city;
-				city.setName("CITY");
-				StopArea place;
-				place.setName("TEST");
-				place.setCity(&city);
-				StopPoint ps(0, string(), &place);
-				place.addPhysicalStop(ps);
-				CommercialLine cline;
-				cline.setShortName("00");
-				JourneyPattern line;
-				line.setCommercialLine(&cline);
-				PermanentService s(0, &line, minutes(5));
-				DesignatedLinePhysicalStop lineStop;
-				lineStop.setLine(&line);
-				lineStop.setPhysicalStop(ps);
-				ptime d(second_clock::local_time());
+				destinations.push_back(IntermediateStop(&place, sp));
+				destinations.push_back(IntermediateStop(&place, sp));
 
-				for (size_t i(0); i<_type->getRowNumber(); ++i)
-				{
-					ServicePointer sp(true, false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
-					sp.setDepartureInformations(lineStop, d, d, ps);
-					sp.setArrivalInformations(lineStop, d, d, ps);
-					ActualDisplayedArrivalsList destinations;
+				displayedObject.insert(
+					make_pair(
+						sp,
+						destinations
+				)	);
+				d += minutes(1);
+			}
 
-					destinations.push_back(IntermediateStop(&place, sp));
-					destinations.push_back(IntermediateStop(&place, sp));
+			SentScenario scenario;
+			scenario.setIsEnabled(true);
 
-					displayedObject.map.insert(
-						make_pair(
-							sp,
-							destinations
-					)	);
-					d += minutes(1);
-				}
+			shared_ptr<SentAlarm> alarm(new SentAlarm(1, &scenario));
+			alarm->setShortMessage(_alarm->getShortMessage());
+			alarm->setLongMessage(_alarm->getLongMessage());
+			alarm->setLevel(_alarm->getLevel());
 
-				SentScenario scenario;
-				scenario.setIsEnabled(true);
+			Env::GetOfficialEnv().getEditableRegistry<Alarm>().add(alarm);
+			MessagesModule::UpdateActivatedMessages();
 
-				SentAlarm alarm;
-				alarm.setShortMessage(_alarm->getShortMessage());
-				alarm.setLongMessage(_alarm->getLongMessage());
-				alarm.setLevel(_alarm->getLevel());
-				alarm.setScenario(&scenario);
-
-				displayedObject.alarm = &alarm;
-				const DeparturesTableInterfacePage* page(
-					_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
-				);
-				if (page == NULL)
-				{
-					return ParametersMap();
-				}
-
-				VariablesMap variables;
-
-				page->display(
-					stream
-					, variables
-					, "TEST"
-					, 0
-					, false
-					, false
-					, false
-					, _type->getMaxStopsNumber(),
-					0,
-					true
-					, &place
-					, displayedObject
+			if(_type->getDisplayMainPage())
+			{
+				DisplayScreenContentFunction f;
+				f._displayDepartureBoard(
+					stream,
+					request,
+					Env::GetOfficialEnv().getSPtr(_type->getDisplayMainPage()),
+					Env::GetOfficialEnv().getSPtr(_type->getDisplayRowPage()),
+					Env::GetOfficialEnv().getSPtr(_type->getDisplayDestinationPage()),
+					Env::GetOfficialEnv().getSPtr(_type->getDisplayTransferDestinationPage()),
+					now,
+					displayedObject,
+					fakeScreen
 				);
 			}
-			catch (InterfacePageException&)
-			{
-			}
+
+			Env::GetOfficialEnv().getEditableRegistry<Alarm>().remove(alarm->getKey());
+			MessagesModule::UpdateActivatedMessages();
 
 			return util::ParametersMap();
 		}
@@ -225,9 +206,9 @@ namespace synthese
 
 		std::string AlarmTestOnDisplayScreenFunction::getOutputMimeType() const
 		{
-			const DeparturesTableInterfacePage* page(
-				_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
-				);
+			const Webpage* page(
+				_type->getDisplayMainPage()
+			);
 			return (page == NULL) ? "text/plain" : page->getMimeType();
 		}
 	}

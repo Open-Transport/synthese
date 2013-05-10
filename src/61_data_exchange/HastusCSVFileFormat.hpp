@@ -86,12 +86,12 @@ namespace synthese
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 
 			private:
-				typedef std::map<std::string, boost::shared_ptr<pt::RollingStock> > RollingStockMap;
+				typedef std::map<std::string, boost::shared_ptr<vehicle::RollingStock> > RollingStockMap;
 				static const std::string SEP;
 
 				boost::shared_ptr<const pt::TransportNetwork> _network;
 				RollingStockMap _rollingStocks;
-				boost::shared_ptr<pt::RollingStock> _defaultRollingStock;
+				boost::shared_ptr<vehicle::RollingStock> _defaultRollingStock;
 				bool _importStopArea;
 				bool _interactive;
 				bool _displayLinkedStops;
@@ -123,7 +123,7 @@ namespace synthese
 					pt::ScheduledService::Schedules schedules;
 					pt::JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 					calendar::Calendar calendar;
-					pt::RollingStock* rollingStock;
+					vehicle::RollingStock* rollingStock;
 				};
 				typedef std::map<TripIndex, TripValues> Trips;
 				mutable Trips _trips;

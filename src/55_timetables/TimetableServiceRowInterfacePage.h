@@ -42,7 +42,7 @@ namespace synthese
 		class Request;
 	}
 
-	namespace pt
+	namespace vehicle
 	{
 		class RollingStock;
 	}
@@ -164,7 +164,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				const TimetableColumn::Content::value_type& object,
-				const pt::RollingStock* rollingStock,
+				const vehicle::RollingStock* rollingStock,
 				std::size_t rank
 			);
 		};

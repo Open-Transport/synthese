@@ -45,6 +45,7 @@ set(MODULES
 18_graph
 19_inter_synthese
 20_tree
+30_fare
 31_calendar
 32_geography
 33_algorithm

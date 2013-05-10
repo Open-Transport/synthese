@@ -55,7 +55,6 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
-		class RollingStock;
 	}
 
 	namespace data_exchange

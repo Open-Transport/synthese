@@ -91,7 +91,7 @@ namespace synthese
 				int blinkingDelay,
 				bool displayClock
 				, const pt::StopArea* place
-				, const ArrivalDepartureListWithAlarm& rows
+				, const ArrivalDepartureList& rows
 				, const server::Request* request = NULL
 			) const;
 
@@ -112,7 +112,7 @@ namespace synthese
 				, int blinkingDelay,
 				bool displayClock
 				, const pt::StopArea* place
-				, const RoutePlanningListWithAlarm& rows
+				, const RoutePlanningList& rows
 				, const server::Request* request = NULL
 			) const;
 

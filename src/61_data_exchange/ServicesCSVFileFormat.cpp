@@ -70,6 +70,7 @@ namespace synthese
 	using namespace impex;
 	using namespace pt;
 	using namespace util;
+	using namespace vehicle;
 	using namespace db;
 	using namespace calendar;
 	using namespace graph;

@@ -14,7 +14,7 @@
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
 
-#include "DisplayScreenAlarmRecipient.h"
+#include "BroadcastPointAlarmRecipient.hpp"
 
 #include "MessagesAdmin.h"
 #include "MessageAdmin.h"
@@ -124,7 +124,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::CustomBroadcastPoint::integrate();
 	synthese::messages::MailingList::integrate();
 
-	synthese::messages::DisplayScreenAlarmRecipient::integrate();
+	synthese::messages::BroadcastPointAlarmRecipient::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();

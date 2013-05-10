@@ -88,10 +88,11 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace admin;
+	using namespace html;
+	using namespace pt;
 	using namespace server;
 	using namespace util;
-	using namespace pt;
-	using namespace html;
+	using namespace vehicle;
 	using namespace security;
 	using namespace graph;
 	using namespace impex;

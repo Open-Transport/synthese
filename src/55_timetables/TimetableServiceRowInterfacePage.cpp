@@ -49,6 +49,7 @@ namespace synthese
 	using namespace pt;
 	using namespace cms;
 	using namespace server;
+	using namespace vehicle;
 
 	namespace timetables
 	{
@@ -89,7 +90,7 @@ namespace synthese
 			const TimetableColumn& object,
 			const time_duration& lastSchedule,
 			size_t rank,
-			std::size_t followingServicesWithSameHour
+			size_t followingServicesWithSameHour
 		){
 			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
@@ -157,8 +158,8 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const TimetableColumn::Content::value_type& object,
-			const pt::RollingStock* rollingStock,
-			std::size_t rank
+			const RollingStock* rollingStock,
+			size_t rank
 		){
 			ParametersMap pm(request.getFunction()->getTemplateParameters());
 

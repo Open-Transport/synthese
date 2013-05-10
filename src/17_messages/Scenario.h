@@ -36,6 +36,7 @@ namespace synthese
 	namespace messages
 	{
 		class Alarm;
+		class MessagesSection;
 
 		////////////////////////////////////////////////////////////////////
 		/// Scenario of alarms diffusion.
@@ -51,7 +52,7 @@ namespace synthese
 			public util::Named
 		{
 		public:
-			typedef std::set<int> Sections;
+			typedef std::set<const MessagesSection*> Sections;
 			typedef std::set<const Alarm*> Messages;
 
 		private:

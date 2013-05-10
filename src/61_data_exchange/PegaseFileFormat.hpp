@@ -113,7 +113,7 @@ namespace synthese
 
 			private:
 				boost::shared_ptr<pt::TransportNetwork> _network;
-				boost::shared_ptr<pt::RollingStock> _rollingStock;
+				boost::shared_ptr<vehicle::RollingStock> _rollingStock;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;

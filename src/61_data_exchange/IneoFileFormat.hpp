@@ -55,6 +55,11 @@ namespace synthese
 		class City;
 	}
 
+	namespace vehicle
+	{
+		class RollingStock;
+	}
+
 	namespace pt
 	{
 		class PTUseRule;
@@ -62,7 +67,6 @@ namespace synthese
 		class JourneyPattern;
 		class CommercialLine;
 		class ScheduledService;
-		class RollingStock;
 	}
 
 	namespace data_exchange

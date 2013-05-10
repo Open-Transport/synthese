@@ -54,11 +54,13 @@ namespace synthese
 			typedef tree::TreeFolderUpNode* Type;
 
 		private:
+			util::RegistryTableType _tableId;
 			TreeFolderRoot* _root;
 			TreeFolderUpNode*	_parent;
 
 		protected:
 			TreeFolderDownNodeInterface():
+				_tableId(0),
 				_root(NULL),
 				_parent(NULL)
 			{}
@@ -74,10 +76,13 @@ namespace synthese
 			//@{
 				TreeFolderRoot* _getRoot() const {	return _root; }
 				TreeFolderUpNode* _getParent() const { return _parent; }
+				util::RegistryTableType getTableId() const { return _tableId; }
 			//@}
 
 			/// @name Services
 			//@{
+				void setTableId(util::RegistryTableType value){ _tableId = value; }
+
 				template<class T>
 				T* getCastRoot() const
 				{

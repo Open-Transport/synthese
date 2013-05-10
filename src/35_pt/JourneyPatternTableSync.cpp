@@ -30,7 +30,7 @@
 #include "User.h"
 #include "GraphConstants.h"
 #include "CommercialLineTableSync.h"
-#include "FareTableSync.h"
+#include "FareTableSync.hpp"
 #include "RollingStockTableSync.hpp"
 #include "DataSourceTableSync.h"
 #include "PTUseRuleTableSync.h"
@@ -50,11 +50,13 @@ using namespace boost;
 namespace synthese
 {
 	using namespace db;
+	using namespace fare;
 	using namespace util;
 	using namespace impex;
 	using namespace graph;
 	using namespace pt;
 	using namespace security;
+	using namespace vehicle;
 
 	template<> const string util::FactorableTemplate<DBTableSync,JourneyPatternTableSync>::FACTORY_KEY(
 		"35.30.01 Journey patterns"
