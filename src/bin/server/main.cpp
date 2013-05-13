@@ -71,7 +71,6 @@ static void setSigHandlers(sighandler_t handler)
 {
 	std::signal (SIGINT, handler);
 	std::signal (SIGTERM, handler);
-	std::signal (SIGSEGV, handler);
 	std::signal (SIGILL, handler);
 
 #ifndef WIN32
