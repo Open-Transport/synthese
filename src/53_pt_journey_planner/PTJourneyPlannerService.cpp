@@ -655,7 +655,7 @@ namespace synthese
 				else
 				{
 					_accessParameters = AccessParameters(
-						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833
+						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 1.111
 					);
 				}
 			}
