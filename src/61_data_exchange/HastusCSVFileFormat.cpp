@@ -110,6 +110,7 @@ namespace synthese
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 		const string HastusCSVFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
+		const string HastusCSVFileFormat::Importer_::PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE = "handicapped_forbidden_use_rule";
 	}
 
 	namespace impex
@@ -270,7 +271,7 @@ namespace synthese
 					RuleUser::Rules handicappedForbiddenRules;
 					handicappedForbiddenRules.push_back(NULL);
 					handicappedForbiddenRules.push_back(NULL);
-					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(_handicappedForbiddenUseRule.get());
 					handicappedForbiddenRules.push_back(NULL);
 
 					optional<const RuleUser::Rules&> handicappedUseRule(
@@ -426,7 +427,9 @@ namespace synthese
 							_env,
 							_logger,
 							true,
-							true
+							true,
+                            true,
+                            true
 					)	);
 					if(route == NULL)
 					{
@@ -444,10 +447,12 @@ namespace synthese
 					handicappedRules.push_back(NULL);
 					handicappedRules.push_back(_handicappedAllowedUseRule.get());
 					handicappedRules.push_back(NULL);
+					handicappedRules.push_back(NULL);
 
 					RuleUser::Rules handicappedForbiddenRules;
 					handicappedForbiddenRules.push_back(NULL);
 					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(_handicappedForbiddenUseRule.get());
 					handicappedForbiddenRules.push_back(NULL);
 					handicappedForbiddenRules.push_back(NULL);
 
@@ -521,6 +526,17 @@ namespace synthese
 					"ID règle accessibilité arrêt",
 					t.getForm().getSelectInput(
 						PARAMETER_HANDICAPPED_ALLOWED_USE_RULE,
+						PTModule::GetPTUseRuleLabels(),
+						boost::optional<util::RegistryKeyType>()
+				)	)
+			;
+
+			// Handicapped forbidden use rule
+			stream <<
+				t.cell(
+					"ID règle accessibilité arrêt (interdiction)",
+					t.getForm().getSelectInput(
+						PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE,
 						PTModule::GetPTUseRuleLabels(),
 						boost::optional<util::RegistryKeyType>()
 				)	)
@@ -623,6 +639,12 @@ namespace synthese
 				map.insert(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE, _handicappedAllowedUseRule->getKey());
 			}
 
+			// Handicapped forbidden use rule
+			if(_handicappedForbiddenUseRule.get())
+			{
+				map.insert(PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE, _handicappedForbiddenUseRule->getKey());
+			}
+
 			return map;
 		}
 
@@ -666,6 +688,19 @@ namespace synthese
 			catch(ObjectNotFoundException<PTUseRule>&)
 			{
 				throw Exception("No such handicapped use rule");
+			}
+
+			// Handicapped PT forbidden use rule
+			RegistryKeyType handicappedPTForbiddenUseRuleId(
+				map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE)
+			);
+			if(handicappedPTForbiddenUseRuleId) try
+			{
+				_handicappedForbiddenUseRule = PTUseRuleTableSync::GetEditable(handicappedPTForbiddenUseRuleId, _env);
+			}
+			catch(ObjectNotFoundException<PTUseRule>&)
+			{
+				throw Exception("No such handicapped forbidden use rule");
 			}
 		}
 }	}
