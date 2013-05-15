@@ -306,16 +306,21 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 			Env env;
-			shared_ptr<const StopPoint> stopPoint(StopPointTableSync::Get(id, env));
-			StopArea::TransferDelaysMap tdMap(stopPoint->getConnectionPlace()->getTransferDelays());
-			BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& td, tdMap)
+			try
 			{
-				if(td.first.first == id || td.first.second == id)
+				shared_ptr<const StopPoint> stopPoint(StopPointTableSync::Get(id, env));
+				StopArea::TransferDelaysMap tdMap(stopPoint->getConnectionPlace()->getTransferDelays());
+				BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& td, tdMap)
 				{
-					const_cast<StopArea*>(stopPoint->getConnectionPlace())->removeTransferDelay(td.first.first, td.first.second);
+					if(td.first.first == id || td.first.second == id)
+					{
+						const_cast<StopArea*>(stopPoint->getConnectionPlace())->removeTransferDelay(td.first.first, td.first.second);
+					}
 				}
+				StopAreaTableSync::Save(const_cast<StopArea*>(stopPoint->getConnectionPlace()), transaction);
 			}
-			StopAreaTableSync::Save(const_cast<StopArea*>(stopPoint->getConnectionPlace()), transaction);
+			catch (...)
+			{}
 		}
 
 
