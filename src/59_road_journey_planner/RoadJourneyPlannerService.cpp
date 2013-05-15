@@ -165,7 +165,7 @@ namespace synthese
 			}
 			else
 			{
-				_accessParameters = AccessParameters(userClassCode, false, false, 72000, boost::posix_time::hours(24), 0.833);
+				_accessParameters = AccessParameters(userClassCode, false, false, 72000, boost::posix_time::hours(24), 1.111);
 			}
 
 			string originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);

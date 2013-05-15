@@ -147,7 +147,7 @@ namespace synthese
 			case USER_PEDESTRIAN:
 			default:
 				return AccessParameters(
-					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, get<MaxConnections>(), allowedPathClasses, allowedNetworks
+					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 1.111, get<MaxConnections>(), allowedPathClasses, allowedNetworks
 				);
 			}
 		}

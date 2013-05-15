@@ -562,7 +562,7 @@ namespace synthese
 				else
 				{
 					_accessParameters = AccessParameters(
-						USER_PEDESTRIAN, false, false, 1000, posix_time::hours(24), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+						USER_PEDESTRIAN, false, false, 1000, posix_time::hours(24), 1.111, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 			}

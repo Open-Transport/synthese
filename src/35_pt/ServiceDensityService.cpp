@@ -244,7 +244,7 @@ namespace synthese
 				throw RequestException("Network List is unreadable");
 			}
 			_accessParameters = AccessParameters(
-				USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
+				USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 1.111, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 			);
 		}
 

@@ -170,7 +170,7 @@ namespace synthese
 		{
 			_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
 			_ignoreReservation = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
-			_approachSpeed = map.getDefault<double>(PARAMETER_APPROACH_SPEED, 0.833);
+			_approachSpeed = map.getDefault<double>(PARAMETER_APPROACH_SPEED, 1.111);
 			_comment = map.getDefault<string>(PARAMETER_COMMENT);
 
 			if(map.getDefault<bool>(PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME, false))
