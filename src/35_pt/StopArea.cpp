@@ -29,6 +29,7 @@
 #include "Env.h"
 #include "ForbiddenUseRule.h"
 #include "FreeDRTArea.hpp"
+#include "DRTArea.hpp"
 #include "JourneyPattern.hpp"
 #include "ParametersMap.h"
 #include "PTModule.h"
@@ -260,7 +261,11 @@ namespace synthese
 			const AccessParameters& accessParameters,
 			const geography::Place::GraphTypes& whatToSearch
 		) const {
-			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
+			/*
+			 * If StopArea isn't in a DRTArea, then attempt to use crossings arround stop.
+			 * Else AVOID IT : if user want to start from a stopArea (to make a reservation) we musn't change the starting stopArea without notification !!
+			 */
+			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end() && !isInDRT())
 			{
 				BOOST_FOREACH(
 					const PhysicalStops::value_type& it,
@@ -557,7 +562,15 @@ namespace synthese
 			return result;
 		}
 
-
+		bool StopArea::isInDRT() const
+		{
+			BOOST_FOREACH(const DRTArea::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<DRTArea>())
+			{
+				if(item.second->contains(*this))
+					return true;
+			}
+			return false;
+		}
 
 		Hub::Vertices StopArea::getVertices(
 			GraphIdType graphId
