@@ -962,6 +962,7 @@ namespace synthese
 							updatesEnv
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
+					links.erase(dataSourceOnUpdateEnv);
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
 					oldService->setDataSourceLinksWithoutRegistration(links);
 					it->updateService(*it->syntheseService);
