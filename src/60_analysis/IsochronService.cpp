@@ -184,7 +184,7 @@ namespace synthese
 			if(!coordinatesXY.empty())
 			{
 				placesListService.addRequiredUserClass(USER_PEDESTRIAN);
-				placesListService.setCoordinatesXY(coordinatesXY);
+				placesListService.setCoordinatesXY(coordinatesXY, false);
 			}
 			else if(!startPlaceName.empty())
 			{

@@ -70,6 +70,7 @@ namespace synthese
 		const std::string RoadJourneyPlannerService::PARAMETER_SRID("srid");
 		const std::string RoadJourneyPlannerService::PARAMETER_DEPARTURE_PLACE_XY("departure_place_XY");
 		const std::string RoadJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_XY("arrival_place_XY");
+		const std::string RoadJourneyPlannerService::PARAMETER_INVERT_XY("invert_XY");
 
 		const std::string RoadJourneyPlannerService::PARAMETER_PAGE("page");
 		const std::string RoadJourneyPlannerService::PARAMETER_BOARD_PAGE("board_page");
@@ -172,6 +173,7 @@ namespace synthese
 			string destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
 			string originPlaceXY = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY);
 			string destinationPlaceXY = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY);
+			bool invertXY = map.getDefault<bool>(PARAMETER_INVERT_XY);
 
 			if(!originPlaceText.empty() || !destinationPlaceText.empty())
 			{
@@ -206,7 +208,7 @@ namespace synthese
 					placesListServiceOrigin.setNumber(1);
 					placesListServiceOrigin.setCoordinatesSystem(_coordinatesSystem);
 					placesListServiceOrigin.addRequiredUserClass(_accessParameters.getUserClass());
-					placesListServiceOrigin.setCoordinatesXY(originPlaceXY);
+					placesListServiceOrigin.setCoordinatesXY(originPlaceXY, invertXY);
 					_departure_place.placeResult = placesListServiceOrigin.getPlaceFromBestResult(placesListServiceOrigin.runWithoutOutput());
 				}
 
@@ -216,7 +218,7 @@ namespace synthese
 					placesListServiceDestination.setNumber(1);
 					placesListServiceDestination.setCoordinatesSystem(_coordinatesSystem);
 					placesListServiceDestination.addRequiredUserClass(_accessParameters.getUserClass());
-					placesListServiceDestination.setCoordinatesXY(destinationPlaceXY);
+					placesListServiceDestination.setCoordinatesXY(destinationPlaceXY, invertXY);
 					_arrival_place.placeResult = placesListServiceDestination.getPlaceFromBestResult(placesListServiceDestination.runWithoutOutput());
 				}
 			}

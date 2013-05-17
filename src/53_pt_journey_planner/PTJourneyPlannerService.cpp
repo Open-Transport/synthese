@@ -139,6 +139,7 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_SRID = "srid";
 		const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PLACE_XY = "departure_place_XY";
 		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_XY = "arrival_place_XY";
+		const string PTJourneyPlannerService::PARAMETER_INVERT_XY = "invert_XY";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -487,7 +488,7 @@ namespace synthese
 				{
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem);
+					placesListService.setCoordinatesSystem(_coordinatesSystem, map.getDefault<bool>(PARAMETER_INVERT_XY));
 
 					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY));
 					_departure_place.placeResult = placesListService.getPlaceFromBestResult(
@@ -540,7 +541,7 @@ namespace synthese
 				){
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem);
+					placesListService.setCoordinatesSystem(_coordinatesSystem, map.getDefault<bool>(PARAMETER_INVERT_XY));
 
 					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY));
 					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(

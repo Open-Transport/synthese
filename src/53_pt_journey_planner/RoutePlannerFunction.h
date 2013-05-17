@@ -133,6 +133,7 @@ namespace synthese
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_DEPARTURE_PLACE_XY;
 			static const std::string PARAMETER_ARRIVAL_PLACE_XY;
+			static const std::string PARAMETER_INVERT_XY;
 			static const std::string PARAMETER_SHOW_COORDINATES;
 			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
