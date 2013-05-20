@@ -241,14 +241,14 @@ namespace synthese
 				v.push_back("Actions");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
 				stream << f.open() << t.open();
-				BOOST_FOREACH(const shared_ptr<ObjectSiteLink>& link, cities)
+				BOOST_FOREACH(const boost::shared_ptr<ObjectSiteLink>& link, cities)
 				{
 					cityRemoveRequest.getAction()->setObjectId(link->getKey());
 
 					stream << t.row();
 					if(Env::GetOfficialEnv().getRegistry<City>().contains(link->getObjectId()))
 					{
-						shared_ptr<const City> city(Env::GetOfficialEnv().get<City>(link->getObjectId()));
+						boost::shared_ptr<const City> city(Env::GetOfficialEnv().get<City>(link->getObjectId()));
 
 						openCityRequest.getPage()->setCity(city);
 
@@ -413,9 +413,9 @@ namespace synthese
 				PTServiceConfigTableSync::SearchResult sites(
 					PTServiceConfigTableSync::Search(Env::GetOfficialEnv())
 				);
-				BOOST_FOREACH(const shared_ptr<PTServiceConfig>& site, sites)
+				BOOST_FOREACH(const boost::shared_ptr<PTServiceConfig>& site, sites)
 				{
-					shared_ptr<TransportSiteAdmin> p(
+					boost::shared_ptr<TransportSiteAdmin> p(
 						getNewPage<TransportSiteAdmin>()
 					);
 					p->_config = const_pointer_cast<const PTServiceConfig>(site);

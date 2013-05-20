@@ -328,7 +328,7 @@ namespace synthese
 			if(!_coordinatesXY.empty())
 			{
 				//Best place, which is near the originPoint
-				shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
+				boost::shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
 				RoadChunkTableSync::SearchResult  roadChunks = RoadChunkTableSync::SearchByMaxDistance(
 					*originPoint.get(),
 					_maxDistance,//distance  to originPoint
@@ -384,13 +384,13 @@ namespace synthese
 				if(!_houseMap->empty())
 				{
 					size_t nbResult = 0;
-					vector<lexical_matcher::LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit > houseList, roadList;
+					vector<lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit > houseList, roadList;
 					vector<int> distanceHouseList;
 					set<string> insertedRoadName;
 
 					BOOST_FOREACH(const HouseMapType::value_type& it, (*_houseMap))
 					{
-						shared_ptr<House> house = it.second;
+						boost::shared_ptr<House> house = it.second;
 
 						if(house.get())
 						{
@@ -402,7 +402,7 @@ namespace synthese
 								set<string>::iterator frenchIt = insertedRoadName.find(roadName);
 								if(frenchIt == insertedRoadName.end())
 								{
-									LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit roadResult;
+									LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit roadResult;
 									insertedRoadName.insert(roadName);
 									roadResult.key = roadName;
 									FrenchSentence::ComparisonScore score;
@@ -421,7 +421,7 @@ namespace synthese
 							}
 							else
 							{
-								lexical_matcher::LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+								lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit houseResult;
 
 								houseResult.key = (house.get())->getName();
 								FrenchSentence::ComparisonScore score;
@@ -448,7 +448,7 @@ namespace synthese
 					if (!houseList.empty())
 					{
 						// Registration
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
 							houseList,
@@ -468,7 +468,7 @@ namespace synthese
 					// Stops
 					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
 							_city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
@@ -500,16 +500,16 @@ namespace synthese
 								)	);
 
 								// Transformation into house places list
-								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult houseList;
+								LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchResult houseList;
 								BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
 								{
 									const RoadPlace& roadPlace(
 										dynamic_cast<const RoadPlace&>(*place.value)
 									);
 
-									shared_ptr<House> house(roadPlace.getHouse(number));
+									boost::shared_ptr<House> house(roadPlace.getHouse(number));
 
-									LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+									LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit houseResult;
 									houseResult.key = place.key;
 									houseResult.score = place.score;
 									houseResult.value = house.get() ?
@@ -521,7 +521,7 @@ namespace synthese
 								}
 
 								// Registration
-								shared_ptr<ParametersMap> pm(new ParametersMap);
+								boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 								_registerItems<NamedPlace>(
 									*pm,
 									houseList
@@ -534,7 +534,7 @@ namespace synthese
 						}
 
 						// Roads if not address
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
 							_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
@@ -548,7 +548,7 @@ namespace synthese
 					// Public places
 					if(_classFilter.empty() || _classFilter == DATA_PUBLIC_PLACE)
 					{
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
 							_city->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
@@ -568,7 +568,7 @@ namespace synthese
 					// Cities
 					if(_classFilter.empty() || _classFilter == DATA_CITY)
 					{
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<City>(
 							*pm,
 							GeographyModule::GetCitiesMatcher().bestMatches(
@@ -582,7 +582,7 @@ namespace synthese
 					// Stops
 					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<StopArea>(
 							*pm,
 							PTModule::GetGeneralStopsMatcher().bestMatches(
@@ -596,7 +596,7 @@ namespace synthese
 					// Roads
 					if(_classFilter.empty() || _classFilter == DATA_ROAD || _classFilter == DATA_ADDRESS)
 					{
-						LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult roadList;
+						LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchResult roadList;
 						vector<string> words;
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
@@ -615,16 +615,16 @@ namespace synthese
 								)	);
 
 								// Transformation into house places list
-								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult houseList;
+								LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchResult houseList;
 								BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& place, places)
 								{
 									const RoadPlace& roadPlace(
 										dynamic_cast<const RoadPlace&>(*place.value)
 									);
 
-									shared_ptr<House> house(roadPlace.getHouse(number));
+									boost::shared_ptr<House> house(roadPlace.getHouse(number));
 
-									LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+									LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit houseResult;
 									houseResult.key = place.key;
 									houseResult.score = place.score;
 									// If house.get() this is a ADRESS else this is a ROAD
@@ -641,7 +641,7 @@ namespace synthese
 								}
 
 								// Registration
-								shared_ptr<ParametersMap> pm(new ParametersMap);
+								boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 								_registerItems<NamedPlace>(
 									*pm,
 									houseList
@@ -654,7 +654,7 @@ namespace synthese
 						}
 
 						// Roads if not address
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						RoadModule::GeneralRoadsMatcher::MatchResult roads(
 							RoadModule::GetGeneralRoadsMatcher().bestMatches(
 								_text,
@@ -664,7 +664,7 @@ namespace synthese
 						// We add road results to the roadList
 						BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& road, roads)
 						{
-							LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit roadResult;
+							LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit roadResult;
 
 							roadResult.key = road.key;
 							roadResult.score = road.score;
@@ -682,7 +682,7 @@ namespace synthese
 					// Public places
 					if(_classFilter.empty() || _classFilter == DATA_PUBLIC_PLACE)
 					{
-						shared_ptr<ParametersMap> pm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<PublicPlace>(
 							*pm,
 							RoadModule::GetGeneralPublicPlacesMatcher().bestMatches(
@@ -696,7 +696,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<ParametersMap> pm(new ParametersMap);
+				boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 				if(_city.get())
 				{ /// TODO take into account of _classFilter
 					_registerItems<NamedPlace>(
@@ -725,11 +725,11 @@ namespace synthese
 			}
 
 			// Best place
-			shared_ptr<ParametersMap> bestMap;
+			boost::shared_ptr<ParametersMap> bestMap;
 			string className;
 			if(_sorted)
 			{
-				shared_ptr<ParametersMap> bestPlace(new ParametersMap);
+				boost::shared_ptr<ParametersMap> bestPlace(new ParametersMap);
 
 				// Stop areas
 				if(result.hasSubMaps(DATA_STOPS) &&
@@ -743,7 +743,7 @@ namespace synthese
 				if(result.hasSubMaps(DATA_CITIES) &&
 					(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
 				){
-					shared_ptr<ParametersMap> cityBestMap(
+					boost::shared_ptr<ParametersMap> cityBestMap(
 						*(*result.getSubMaps(DATA_CITIES).begin())->getSubMaps(DATA_CITY).begin()
 					);
 					if(!bestMap.get() ||
@@ -760,7 +760,7 @@ namespace synthese
 				if(result.hasSubMaps(DATA_PUBLIC_PLACES) &&
 					(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_PUBLIC_PLACE)
 				){
-					shared_ptr<ParametersMap> ppBestMap(
+					boost::shared_ptr<ParametersMap> ppBestMap(
 						*(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->getSubMaps(DATA_PUBLIC_PLACE).begin()
 					);
 					if(!bestMap.get() ||
@@ -777,7 +777,7 @@ namespace synthese
 				if(	result.hasSubMaps(DATA_ROADS) &&
 					(*result.getSubMaps(DATA_ROADS).begin())->hasSubMaps(DATA_ROAD)
 				){
-					shared_ptr<ParametersMap> roadBestMap(
+					boost::shared_ptr<ParametersMap> roadBestMap(
 						*(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD).begin()
 					);
 					if(	!bestMap.get() ||
@@ -794,7 +794,7 @@ namespace synthese
 				if(	result.hasSubMaps(DATA_ADDRESSES) &&
 					(*result.getSubMaps(DATA_ADDRESSES).begin())->hasSubMaps(DATA_ADDRESS)
 				){
-					shared_ptr<ParametersMap> addressBestMap(
+					boost::shared_ptr<ParametersMap> addressBestMap(
 						*(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS).begin()
 					);
 					if(	!bestMap.get() ||
@@ -1002,7 +1002,7 @@ namespace synthese
 			std::size_t& rank
 		) const {
 
-			BOOST_FOREACH(const shared_ptr<ParametersMap>& item, maps)
+			BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& item, maps)
 			{
 				// Template parameters
 				item->merge(getTemplateParameters());
@@ -1024,7 +1024,7 @@ namespace synthese
 			std::ostream& stream,
 			const util::ParametersMap & result,
 			const server::Request& request,
-			shared_ptr<ParametersMap> bestPlace,
+			boost::shared_ptr<ParametersMap> bestPlace,
 			const string& bestPlaceClassName
 		) const {
 			ParametersMap classMap(getTemplateParameters());
@@ -1043,7 +1043,7 @@ namespace synthese
 			if(bestPlace.get())
 			{
 				stringstream bestPlaceStream;
-				vector<shared_ptr<ParametersMap> > bestPlaceMap;
+				vector<boost::shared_ptr<ParametersMap> > bestPlaceMap;
 				bestPlaceMap.push_back(bestPlace);
 				_displayItems(
 					bestPlaceStream,
@@ -1134,7 +1134,7 @@ namespace synthese
 
 			if(_sorted)
 			{
-				shared_ptr<ParametersMap> bestPlaceMap(*result.getSubMaps(DATA_BEST_PLACE).begin());
+				boost::shared_ptr<ParametersMap> bestPlaceMap(*result.getSubMaps(DATA_BEST_PLACE).begin());
 
 				// Class of the best place
 				ParametersMap::SubMapsKeys keys(bestPlaceMap->getSubMapsKeys());
@@ -1143,7 +1143,7 @@ namespace synthese
 					return placeResult;
 				}
 				string className(*keys.begin());
-				shared_ptr<ParametersMap> itemMap(
+				boost::shared_ptr<ParametersMap> itemMap(
 					*bestPlaceMap->getSubMaps(className).begin()
 				);
 				placeResult.score.phoneticScore = itemMap->get<double>(DATA_PHONETIC_SCORE);
@@ -1185,7 +1185,7 @@ namespace synthese
 				}
 				else if(className == DATA_ADDRESS)
 				{
-					const shared_ptr<RoadPlace>& roadPlace(
+					const boost::shared_ptr<RoadPlace>& roadPlace(
 						Env::GetOfficialEnv().getEditable<RoadPlace>(
 							itemMap->get<RegistryKeyType>(
 								House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID
@@ -1230,15 +1230,15 @@ namespace synthese
 			return _house;
 		}
 
-		int PlacesListService::CalcDistanceToOriginPoint(const shared_ptr<House> & house) const
+		int PlacesListService::CalcDistanceToOriginPoint(const boost::shared_ptr<House> & house) const
 		{
 			//return value
 			int distanceToOriginPoint = 0;
 
 			if(_originPoint && house.get())
 			{
-				shared_ptr<LineString> gp = (house.get())->getRoadChunk()->getGeometry();
-				shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
+				boost::shared_ptr<LineString> gp = (house.get())->getRoadChunk()->getGeometry();
+				boost::shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
 
 				if(gp.get())
 				{
@@ -1252,13 +1252,13 @@ namespace synthese
 
 		void PlacesListService::addHouse(
 				HouseMapType* const* houseMap,
-				const shared_ptr<House> & house,
+				const boost::shared_ptr<House> & house,
 				string name
 			) const {
 
 			int distanceToOriginPoint = CalcDistanceToOriginPoint(house);
 			SortHouseByDistanceToOriginPoint keyHouse(house.get(), distanceToOriginPoint, name);
-			(*houseMap)->insert(pair<const SortHouseByDistanceToOriginPoint,const shared_ptr<House> >(keyHouse,house));
+			(*houseMap)->insert(pair<const SortHouseByDistanceToOriginPoint,const boost::shared_ptr<House> >(keyHouse,house));
 		}
 
 		void PlacesListService::_parseCoordinates() {

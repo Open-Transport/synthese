@@ -104,8 +104,8 @@ namespace synthese
 			{
 				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
 				{
-					shared_ptr<PTServiceConfig> site(PTServiceConfigTableSync::GetEditable(id, env, linkLevel));
-					shared_ptr<City> city(CityTableSync::GetEditable(object->getObjectId(), env, linkLevel));
+					boost::shared_ptr<PTServiceConfig> site(PTServiceConfigTableSync::GetEditable(id, env, linkLevel));
+					boost::shared_ptr<City> city(CityTableSync::GetEditable(object->getObjectId(), env, linkLevel));
 					site->addCity(city);
 				}
 			}
