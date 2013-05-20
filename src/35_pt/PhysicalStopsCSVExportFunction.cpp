@@ -87,10 +87,10 @@ namespace synthese
 					throw RequestException("Malformed bbox.");
 				}
 
-				shared_ptr<Point> pt1(
+				boost::shared_ptr<Point> pt1(
 					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[0]), lexical_cast<double>(parsed_bbox[1]))
 				);
-				shared_ptr<Point> pt2(
+				boost::shared_ptr<Point> pt2(
 					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[2]), lexical_cast<double>(parsed_bbox[3]))
 				);
 				pt1 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt1);
@@ -128,7 +128,7 @@ namespace synthese
 					continue;
 				}
 
-				shared_ptr<Point> pts(
+				boost::shared_ptr<Point> pts(
 					_coordinatesSystem->convertPoint(*ps.getGeometry())
 				);
 

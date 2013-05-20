@@ -46,20 +46,20 @@ namespace synthese
 	{
 
 
-		shared_ptr<City>
+		boost::shared_ptr<City>
 		XmlBuilder::CreateCity (XMLNode& node)
 		{
 			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
 			std::string name (GetStringAttr (node, "name"));
 
-			return shared_ptr<City>(new City (id, name));
+			return boost::shared_ptr<City>(new City (id, name));
 		}
 
 
 
 
-		shared_ptr<StopArea>
+		boost::shared_ptr<StopArea>
 		XmlBuilder::CreateConnectionPlace (XMLNode& node,
 						   const Registry<City>& cities)
 		{
@@ -79,9 +79,9 @@ namespace synthese
 					"defaultTransferDelay"
 			)	)	);
 
-			shared_ptr<const City> city = cities.get (cityId);
+			boost::shared_ptr<const City> city = cities.get (cityId);
 
-			shared_ptr<StopArea> p(
+			boost::shared_ptr<StopArea> p(
 				new StopArea(id, type, defaultTransferDelay)
 			);
 			p->setCity(city.get());
@@ -91,12 +91,12 @@ namespace synthese
 		}
 
 
-		shared_ptr<CommercialLine>
+		boost::shared_ptr<CommercialLine>
 		XmlBuilder::CreateCommercialLine (XMLNode& node)
 		{
 			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
-			shared_ptr<CommercialLine> commercialLine (new CommercialLine ());
+			boost::shared_ptr<CommercialLine> commercialLine (new CommercialLine ());
 
 			commercialLine->setKey (id);
 
@@ -118,7 +118,7 @@ namespace synthese
 
 
 
-		shared_ptr<JourneyPattern>
+		boost::shared_ptr<JourneyPattern>
 		XmlBuilder::CreateLine (XMLNode& node,
 					const Registry<CommercialLine>& commercialLines)
 		{
@@ -126,7 +126,7 @@ namespace synthese
 
 			std::string name (GetStringAttr (node, "name"));
 
-			shared_ptr<JourneyPattern> line(new JourneyPattern(id, name));
+			boost::shared_ptr<JourneyPattern> line(new JourneyPattern(id, name));
 
 			util::RegistryKeyType commercialLineId (GetLongLongAttr (node, "commercialLineId"));
 			line->setCommercialLine (const_cast<CommercialLine*>(commercialLines.get(commercialLineId).get()));
@@ -140,7 +140,7 @@ namespace synthese
 
 
 
-		shared_ptr<DesignatedLinePhysicalStop>
+		boost::shared_ptr<DesignatedLinePhysicalStop>
 		XmlBuilder::CreateLineStop (XMLNode& node,
 						Registry<JourneyPattern>& lines,
 						const Registry<StopPoint>& physicalStops)
@@ -156,9 +156,9 @@ namespace synthese
 			bool isArrival (GetBoolAttr (node, "isArrival"));
 			double metricOffset (GetDoubleAttr (node, "metricOffset"));
 
-			shared_ptr<JourneyPattern> line = lines.getEditable (lineId);
+			boost::shared_ptr<JourneyPattern> line = lines.getEditable (lineId);
 
-			shared_ptr<DesignatedLinePhysicalStop> lineStop (
+			boost::shared_ptr<DesignatedLinePhysicalStop> lineStop (
 			new DesignatedLinePhysicalStop(
 				id,
 				line.get(),
@@ -183,7 +183,7 @@ namespace synthese
 
 
 
-		shared_ptr<StopPoint>
+		boost::shared_ptr<StopPoint>
 		XmlBuilder::CreatePhysicalStop(
 			XMLNode& node,
 			const Registry<StopArea>& connectionPlaces)
@@ -195,7 +195,7 @@ namespace synthese
 			double x (GetDoubleAttr (node, "x"));
 			double y (GetDoubleAttr (node, "y"));
 
-			return shared_ptr<StopPoint>(
+			return boost::shared_ptr<StopPoint>(
 				new synthese::pt::StopPoint(
 					id,
 					name,

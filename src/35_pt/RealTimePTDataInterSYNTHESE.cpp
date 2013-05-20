@@ -71,7 +71,7 @@ namespace synthese
 		) const	{
 
 			RegistryKeyType lineId(lexical_cast<RegistryKeyType>(messagePerimeter));
-			shared_ptr<const CommercialLine> line(Env::GetOfficialEnv().get<CommercialLine>(lineId));
+			boost::shared_ptr<const CommercialLine> line(Env::GetOfficialEnv().get<CommercialLine>(lineId));
 			RegistryKeyType networkId(lexical_cast<RegistryKeyType>(configPerimeter));
 			return line->getNetwork()->getKey() == networkId;
 
@@ -105,7 +105,7 @@ namespace synthese
 			}
 
 			// Load of the service
-			shared_ptr<SchedulesBasedService> service;
+			boost::shared_ptr<SchedulesBasedService> service;
 			try
 			{
 				RegistryKeyType serviceId(

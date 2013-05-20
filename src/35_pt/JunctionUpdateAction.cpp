@@ -109,7 +109,7 @@ namespace synthese
 			}
 			else
 			{
-				_junction = shared_ptr<Junction>(new Junction);
+				_junction = boost::shared_ptr<Junction>(new Junction);
 			}
 
 			if(map.isDefined(PARAMETER_FROM_ID))

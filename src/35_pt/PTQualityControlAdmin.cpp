@@ -389,7 +389,7 @@ namespace synthese
 							true,
 							FIELDS_ONLY_LOAD_LEVEL
 					)	);
-					BOOST_FOREACH(const shared_ptr<JourneyPattern>& journeyPattern, journeyPatterns)
+					BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& journeyPattern, journeyPatterns)
 					{
 						LineStopTableSync::SearchResult lineStops(
 							LineStopTableSync::Search(
@@ -404,7 +404,7 @@ namespace synthese
 						)	);
 						size_t rank(0);
 						bool ok(true);
-						BOOST_FOREACH(const shared_ptr<LineStop>& lineStop, lineStops)
+						BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStops)
 						{
 							if(lineStop->getRankInPath() != rank)
 							{

@@ -115,7 +115,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const DataSource> dataSource(
+					boost::shared_ptr<const DataSource> dataSource(
 						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID))
 					);
 					_serviceCodeBySource = map.get<string>(PARAMETER_SERVICE_ID);

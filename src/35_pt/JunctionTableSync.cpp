@@ -214,13 +214,13 @@ namespace synthese
 			{
 				if(decodeTableId(*startStopFilter) == StopAreaTableSync::TABLE.ID)
 				{
-					shared_ptr<SQLExpression> expr(ValueExpression<int>::Get(0));
+					boost::shared_ptr<SQLExpression> expr(ValueExpression<int>::Get(0));
 					StopPointTableSync::SearchResult stops(
 						StopPointTableSync::Search(env, *startStopFilter)
 					);
 					if(!stops.empty())
 					{
-						BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
+						BOOST_FOREACH(const boost::shared_ptr<StopPoint>& stop, stops)
 						{
 							expr = ComposedExpression::Get(
 								expr,
@@ -242,13 +242,13 @@ namespace synthese
 			{
 				if(decodeTableId(*endStopFilter) == StopAreaTableSync::TABLE.ID)
 				{
-					shared_ptr<SQLExpression> expr(ValueExpression<int>::Get(0));
+					boost::shared_ptr<SQLExpression> expr(ValueExpression<int>::Get(0));
 					StopPointTableSync::SearchResult stops(
 						StopPointTableSync::Search(env, *endStopFilter)
 					);
 					if(!stops.empty())
 					{
-						BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
+						BOOST_FOREACH(const boost::shared_ptr<StopPoint>& stop, stops)
 						{
 							expr = ComposedExpression::Get(
 								expr,

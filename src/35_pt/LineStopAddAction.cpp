@@ -117,17 +117,17 @@ namespace synthese
 				{
 					throw ActionException("City not found");
 				}
-				shared_ptr<City> city(CityTableSync::GetEditable(cities.front()->getKey(), *_env));
+				boost::shared_ptr<City> city(CityTableSync::GetEditable(cities.front()->getKey(), *_env));
 
 				const string place(map.get<string>(PARAMETER_STOP_NAME));
-				vector<shared_ptr<StopArea> > stops(
+				vector<boost::shared_ptr<StopArea> > stops(
 					cities.front()->search<StopArea>(place, 1)
 				);
 				if(stops.empty())
 				{
 					throw ActionException("Place not found");
 				}
-				shared_ptr<StopArea> stop(StopAreaTableSync::GetEditable(stops.front()->getKey(), *_env));
+				boost::shared_ptr<StopArea> stop(StopAreaTableSync::GetEditable(stops.front()->getKey(), *_env));
 				StopPointTableSync::Search(*_env, stop->getKey());
 
 				if(stop->getPhysicalStops().empty())

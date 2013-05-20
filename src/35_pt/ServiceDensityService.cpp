@@ -177,7 +177,7 @@ namespace synthese
 					throw RequestException("Invalid center point coordinates");
 				}
 
-				shared_ptr<Point> pt1(
+				boost::shared_ptr<Point> pt1(
 					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_coord[0]), lexical_cast<double>(parsed_coord[1]))
 				);
 
@@ -275,7 +275,7 @@ namespace synthese
 			bool isServiceNumberReadched = false;
 			BOOST_FOREACH(const StopPointSetType::value_type& sp, stopPointSet)
 			{
-				shared_ptr<ParametersMap> stopMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> stopMap(new ParametersMap);
 				stopMap->insert(DATA_STOP_POINT_ID, sp.getStopPoint()->getKey());
 				stopMap->insert(DATA_STOP_POINT_NAME, sp.getStopPoint()->getName());
 				stopMap->insert(DATA_STOP_DISTANCE, sp.getDistanceToCenter());
@@ -330,7 +330,7 @@ namespace synthese
 						maxDistance = sp.getDistanceToCenter();
 						if(_displayServices)
 						{
-							shared_ptr<ParametersMap> serviceMap(new ParametersMap);
+							boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
 							serviceMap->insert(DATA_SERVICE_ID, service->getKey());
 
 							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
@@ -468,7 +468,7 @@ namespace synthese
 		{
 			int distanceToCenter = 0;
 
-			shared_ptr<Point> gp = stopPoint.getGeometry();
+			boost::shared_ptr<Point> gp = stopPoint.getGeometry();
 
 			if(gp.get())
 			{

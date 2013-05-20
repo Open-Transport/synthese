@@ -145,7 +145,7 @@ namespace synthese
 			{
 				stream << "<h1>Carte</h1>";
 
-				shared_ptr<Point> mapCenter(_stop->getConnectionPlace()->getPoint());
+				boost::shared_ptr<Point> mapCenter(_stop->getConnectionPlace()->getPoint());
 
 				// If the place does not contain any point, it has no coordinate : search the last created place with coordinates
 				if(!mapCenter.get() || mapCenter->isEmpty())
@@ -162,7 +162,7 @@ namespace synthese
 						const Registry<StopArea>& registry(newEnv.getRegistry<StopArea>());
 						BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
 						{
-							shared_ptr<const StopArea> envStopArea(Env::GetOfficialEnv().get<StopArea>(stopArea.first));
+							boost::shared_ptr<const StopArea> envStopArea(Env::GetOfficialEnv().get<StopArea>(stopArea.first));
 							if(envStopArea->getPoint() && !envStopArea->getPoint()->isEmpty())
 							{
 								mapCenter = envStopArea->getPoint();
@@ -511,7 +511,7 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<PTPlaceAdmin> p(getNewPage<PTPlaceAdmin>());
+			boost::shared_ptr<PTPlaceAdmin> p(getNewPage<PTPlaceAdmin>());
 			p->setConnectionPlace(Env::GetOfficialEnv().getSPtr(
 					_stop->getConnectionPlace()
 			)	);

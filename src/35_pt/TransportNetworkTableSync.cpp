@@ -256,7 +256,7 @@ namespace synthese
 			if(prefix) query.addWhereField(TransportNetworkTableSync::COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 			if(limit) query.setNumber(*limit);
 			TransportNetworkTableSync::SearchResult networks(TransportNetworkTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-			BOOST_FOREACH(const shared_ptr<TransportNetwork>& network, networks)
+			BOOST_FOREACH(const boost::shared_ptr<TransportNetwork>& network, networks)
 			{
 				result.push_back(std::make_pair(network->getKey(), network->getName()));
 			}

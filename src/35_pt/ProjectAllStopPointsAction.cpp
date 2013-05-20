@@ -105,7 +105,7 @@ namespace synthese
 		){
 			DBTransaction transaction;
 
-			vector<shared_ptr<StopPoint> > stopPoints(
+			vector<boost::shared_ptr<StopPoint> > stopPoints(
 				StopPointTableSync::Search(
 					Env::GetOfficialEnv(),
 					optional<RegistryKeyType>(),
@@ -114,7 +114,7 @@ namespace synthese
 					true
 			)	);
 
-			BOOST_FOREACH(const shared_ptr<StopPoint>& stopPoint, stopPoints)
+			BOOST_FOREACH(const boost::shared_ptr<StopPoint>& stopPoint, stopPoints)
 			{
 				Address address;
 				if(stopPoint->hasGeometry())

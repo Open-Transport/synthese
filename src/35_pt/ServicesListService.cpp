@@ -219,7 +219,7 @@ namespace synthese
 			// The map is filled
 			BOOST_FOREACH(Service* service, result)
 			{
-				shared_ptr<ParametersMap> serviceMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
 				serviceMap->insert(DATA_ID, service->getKey());
 				if(!_displayDate.is_not_a_date() && dynamic_cast<NonPermanentService*>(service))
 				{
@@ -283,7 +283,7 @@ namespace synthese
 						);
 
 						// Output
-						shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 						if(baseCalendar.first)
 						{
 							baseCalendar.first->toParametersMap(*calendarPM);
@@ -298,7 +298,7 @@ namespace synthese
 					// Stops
 					BOOST_FOREACH(const Path::Edges::value_type& edge, service->getPath()->getAllEdges())
 					{
-						shared_ptr<ParametersMap> stopPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 
 						const StopArea* stopArea(
 							dynamic_cast<const StopPoint*>(edge->getFromVertex())->getConnectionPlace()

@@ -93,7 +93,7 @@ namespace synthese
 				// Load of the route
 				try
 				{
-					shared_ptr<const JourneyPattern> journeyPattern(
+					boost::shared_ptr<const JourneyPattern> journeyPattern(
 						Env::GetOfficialEnv().get<JourneyPattern>(
 							map.get<RegistryKeyType>(PARAMETER_ROUTE_ID)
 					)	);
@@ -105,7 +105,7 @@ namespace synthese
 					{
 						try
 						{
-							shared_ptr<const StopPoint> stop(
+							boost::shared_ptr<const StopPoint> stop(
 								Env::GetOfficialEnv().get<StopPoint>(stopId)
 							);
 
@@ -126,7 +126,7 @@ namespace synthese
 					{
 						try
 						{
-							shared_ptr<const StopArea> stopArea(
+							boost::shared_ptr<const StopArea> stopArea(
 								Env::GetOfficialEnv().get<StopArea>(stopId)
 							);
 							BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())

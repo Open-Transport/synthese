@@ -203,7 +203,7 @@ namespace synthese
 			if(map.isDefined(ObjectUpdateAction::GetInputName<LineStringGeometry>()))
 			{
 				WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
-				_geometry = shared_ptr<LineString>(
+				_geometry = boost::shared_ptr<LineString>(
 					static_cast<LineString*>(
 						reader.read(map.get<string>(ObjectUpdateAction::GetInputName<LineStringGeometry>()))
 				)	);
@@ -234,7 +234,7 @@ namespace synthese
 				if(_prevLineStop)
 				{
 					Env env2;
-					shared_ptr<DesignatedLinePhysicalStop> templateObject(
+					boost::shared_ptr<DesignatedLinePhysicalStop> templateObject(
 						LineStopTableSync::SearchSimilarLineStop(
 							*_prevLineStop->getPhysicalStop(),
 							*_physicalStop,
@@ -250,7 +250,7 @@ namespace synthese
 				if(_nextLineStop && !_geometry)
 				{
 					Env env2;
-					shared_ptr<DesignatedLinePhysicalStop> templateObject(
+					boost::shared_ptr<DesignatedLinePhysicalStop> templateObject(
 						LineStopTableSync::SearchSimilarLineStop(
 							*_physicalStop,
 							*_nextLineStop->getPhysicalStop(),

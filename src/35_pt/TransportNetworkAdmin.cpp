@@ -173,7 +173,7 @@ namespace synthese
 			stream << t.open();
 
 			// Rows
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
 				// Row opening
 				stream << t.row();
@@ -316,7 +316,7 @@ namespace synthese
 				vector<TreeFolder*> folders(node->getChildren<TreeFolder>());
 				BOOST_FOREACH(TreeFolder* folder, folders)
 				{
-					shared_ptr<TransportNetworkAdmin> p(
+					boost::shared_ptr<TransportNetworkAdmin> p(
 						getNewPage<TransportNetworkAdmin>()
 					);
 					p->setFolder(*folder);
@@ -327,7 +327,7 @@ namespace synthese
 				vector<CommercialLine*> lines(node->getChildren<CommercialLine>());
 				BOOST_FOREACH(CommercialLine* line, lines)
 				{
-					shared_ptr<CommercialLineAdmin> p(
+					boost::shared_ptr<CommercialLineAdmin> p(
 						getNewPage<CommercialLineAdmin>()
 					);
 					p->setCommercialLine(Env::GetOfficialEnv().getSPtr(line));
@@ -376,7 +376,7 @@ namespace synthese
 		{
 			if(getFolder())
 			{
-				shared_ptr<TransportNetworkAdmin> p(
+				boost::shared_ptr<TransportNetworkAdmin> p(
 					getNewPage<TransportNetworkAdmin>()
 				);
 				p->setNode(*getFolder()->_getParent());
@@ -387,7 +387,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<PTNetworksAdmin> p(
+				boost::shared_ptr<PTNetworksAdmin> p(
 					getNewPage<PTNetworksAdmin>()
 				);
 				

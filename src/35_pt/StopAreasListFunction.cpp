@@ -209,10 +209,10 @@ namespace synthese
 					throw RequestException("Malformed bbox.");
 				}
 
-				shared_ptr<Point> pt1(
+				boost::shared_ptr<Point> pt1(
 					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[0]), lexical_cast<double>(parsed_bbox[1]))
 				);
-				shared_ptr<Point> pt2(
+				boost::shared_ptr<Point> pt2(
 					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[2]), lexical_cast<double>(parsed_bbox[3]))
 				);
 				pt1 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt1);
@@ -396,7 +396,7 @@ namespace synthese
 			// Stops loop
 			ParametersMap pm;
 			const City* lastCity(NULL);
-			shared_ptr<ParametersMap> cityPM;
+			boost::shared_ptr<ParametersMap> cityPM;
 			BOOST_FOREACH(StopSet::value_type it, stopSet)
 			{
 				// Group by cities
@@ -408,7 +408,7 @@ namespace synthese
 					lastCity = it->getCity();
 				}
 
-				shared_ptr<ParametersMap> stopPm(new ParametersMap);
+				boost::shared_ptr<ParametersMap> stopPm(new ParametersMap);
 				it->toParametersMap(*stopPm, _coordinatesSystem);
 
 				// Output stops
@@ -416,7 +416,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, it->getPhysicalStops())
 					{
-						shared_ptr<ParametersMap> sPm(new ParametersMap);
+						boost::shared_ptr<ParametersMap> sPm(new ParametersMap);
 						itStop.second->toParametersMap(*sPm);
 						stopPm->insert(TAG_STOP, sPm);
 					}
@@ -428,7 +428,7 @@ namespace synthese
 					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(false))
 					{
 						// For CMS output
-						shared_ptr<ParametersMap> pmLine(new ParametersMap);
+						boost::shared_ptr<ParametersMap> pmLine(new ParametersMap);
 
 						itLine->toParametersMap(*pmLine);
 
@@ -448,7 +448,7 @@ namespace synthese
 						}
 						BOOST_FOREACH(RollingStock * rs, rollingStocks)
 						{
-							shared_ptr<ParametersMap> transportModePM(new ParametersMap);
+							boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
 							rs->toParametersMap(*transportModePM);
 							pmLine->insert("transportMode", transportModePM);
 						}

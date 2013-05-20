@@ -178,7 +178,7 @@ namespace synthese
 								if(prevOther.getGeometry().get())
 								{
 									ls.setGeometry(
-										shared_ptr<LineString>(
+										boost::shared_ptr<LineString>(
 											dynamic_cast<LineString*>(prevOther.getGeometry()->reverse())
 									)	);
 								}
@@ -201,7 +201,7 @@ namespace synthese
 							if(other.getGeometry().get())
 							{
 								ls.setGeometry(
-									shared_ptr<LineString>(
+									boost::shared_ptr<LineString>(
 										dynamic_cast<LineString*>(other.getGeometry()->reverse())
 								)	);
 							}
@@ -229,7 +229,7 @@ namespace synthese
 							if(other.getGeometry().get())
 							{
 								ls.setGeometry(
-									shared_ptr<LineString>(
+									boost::shared_ptr<LineString>(
 										dynamic_cast<LineString*>(other.getGeometry()->clone())
 								)	);
 							}
@@ -251,7 +251,7 @@ namespace synthese
 							if(other.getGeometry().get())
 							{
 								ls.setGeometry(
-									shared_ptr<LineString>(
+									boost::shared_ptr<LineString>(
 										dynamic_cast<LineString*>(other.getGeometry()->clone())
 								)	);
 							}

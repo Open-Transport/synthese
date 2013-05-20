@@ -124,7 +124,7 @@ namespace synthese
 					true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 			)	);
-			BOOST_FOREACH(const shared_ptr<ScheduledService>& serv, services)
+			BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& serv, services)
 			{
 				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{
@@ -192,7 +192,7 @@ namespace synthese
 					true,
 					UP_DOWN_LINKS_LOAD_LEVEL)
 			);
-			BOOST_FOREACH(const shared_ptr<ContinuousService>& serv, cservices)
+			BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& serv, cservices)
 			{
 				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{

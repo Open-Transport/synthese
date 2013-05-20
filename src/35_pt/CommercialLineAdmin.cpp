@@ -225,7 +225,7 @@ namespace synthese
 				stream << t.open();
 
 				// Loop on items
-				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
+				BOOST_FOREACH(const boost::shared_ptr<FreeDRTArea>& area, areas)
 				{
 					// Declarations
 					openRequest.getPage()->setArea(const_pointer_cast<const FreeDRTArea>(area));
@@ -430,7 +430,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(const shared_ptr<NonConcurrencyRule>& rule, rules)
+				BOOST_FOREACH(const boost::shared_ptr<NonConcurrencyRule>& rule, rules)
 				{
 					removeRequest.getAction()->setObjectId(rule->getKey());
 
@@ -544,7 +544,7 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-/*				shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
+/*				boost::shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
 				exporter->setLine(_cline);
 
 				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
@@ -593,9 +593,9 @@ namespace synthese
 				JourneyPatternTableSync::SearchResult routes(
 					JourneyPatternTableSync::Search(Env::GetOfficialEnv(), _cline->getKey())
 				);
-				BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, routes)
+				BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& line, routes)
 				{
-					shared_ptr<JourneyPatternAdmin> p(
+					boost::shared_ptr<JourneyPatternAdmin> p(
 						getNewPage<JourneyPatternAdmin>()
 					);
 					p->setLine(line);
@@ -606,9 +606,9 @@ namespace synthese
 				FreeDRTAreaTableSync::SearchResult areas(
 					FreeDRTAreaTableSync::Search(Env::GetOfficialEnv(), _cline->getKey())
 				);
-				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
+				BOOST_FOREACH(const boost::shared_ptr<FreeDRTArea>& area, areas)
 				{
-					shared_ptr<FreeDRTAreaAdmin> p(
+					boost::shared_ptr<FreeDRTAreaAdmin> p(
 						getNewPage<FreeDRTAreaAdmin>()
 					);
 					p->setArea(area);
@@ -647,7 +647,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<TransportNetworkAdmin> p(
+			boost::shared_ptr<TransportNetworkAdmin> p(
 				getNewPage<TransportNetworkAdmin>()
 			);
 			p->setNode(*_cline->_getParent());
@@ -720,7 +720,7 @@ namespace synthese
 
 			stream << t.open();
 			AdminFunctionRequest<JourneyPatternAdmin> lineOpenRequest(request);
-			BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, routes)
+			BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& line, routes)
 			{
 				// Row initialization
 				lineOpenRequest.getPage()->setLine(line);

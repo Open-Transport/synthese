@@ -151,7 +151,7 @@ namespace synthese
 			stream << t.open();
 
 			// Rows
-			BOOST_FOREACH(const shared_ptr<TransportNetwork>& network, networks)
+			BOOST_FOREACH(const boost::shared_ptr<TransportNetwork>& network, networks)
 			{
 				if(request.getUser()->getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(network->getKey())))
 				{
@@ -227,7 +227,7 @@ namespace synthese
 			{
 				if(request.getUser()->getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(network->getKey())))
 				{
-					shared_ptr<TransportNetworkAdmin> link(
+					boost::shared_ptr<TransportNetworkAdmin> link(
 						getNewPage<TransportNetworkAdmin>()
 					);
 					link->setNetwork(*network);

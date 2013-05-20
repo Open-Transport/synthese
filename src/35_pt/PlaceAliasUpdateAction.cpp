@@ -103,7 +103,7 @@ namespace synthese
 			}
 			else
 			{
-				_alias = shared_ptr<PlaceAlias>(new PlaceAlias);
+				_alias = boost::shared_ptr<PlaceAlias>(new PlaceAlias);
 			}
 
 			if(map.isDefined(PARAMETER_STOP_AREA_ID))

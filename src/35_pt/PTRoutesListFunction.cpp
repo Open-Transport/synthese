@@ -299,7 +299,7 @@ namespace synthese
 			{
 				if(!isOutputXML)
 				{
-					shared_ptr<ParametersMap> pm(new ParametersMap());
+					boost::shared_ptr<ParametersMap> pm(new ParametersMap());
 
 					pm->insert(Request::PARAMETER_OBJECT_ID, route->getKey());
 					pm->insert(DATA_NAME, route->getName());

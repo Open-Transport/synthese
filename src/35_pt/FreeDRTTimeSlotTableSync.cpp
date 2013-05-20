@@ -182,7 +182,7 @@ namespace synthese
 				}
 				else
 				{
-					BOOST_FOREACH(const shared_ptr<CalendarLink>& link, links)
+					BOOST_FOREACH(const boost::shared_ptr<CalendarLink>& link, links)
 					{
 						object->addCalendarLink(*link, false);
 					}
