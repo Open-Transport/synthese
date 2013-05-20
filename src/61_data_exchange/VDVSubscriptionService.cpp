@@ -128,7 +128,7 @@ namespace synthese
 						continue;
 					}
 
-					shared_ptr<VDVClientSubscription> subscription(new VDVClientSubscription(id, *_client));
+					boost::shared_ptr<VDVClientSubscription> subscription(new VDVClientSubscription(id, *_client));
 
 					if(aboAZBNode.nChildNode("AZBID"))
 					{

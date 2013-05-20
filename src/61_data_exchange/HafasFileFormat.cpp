@@ -386,7 +386,7 @@ namespace synthese
 					{
 						itService = _gleisMap.insert(
 							make_pair(
-								make_tuple(
+								boost::make_tuple(
 									_getField(3, 5),
 									_getField(9, 6),
 									lexical_cast<size_t>(_getField(16, 2))
@@ -451,7 +451,7 @@ namespace synthese
 					{
 						_interServiceTransferDurationMap.insert(
 							make_pair(
-								make_tuple(
+								boost::make_tuple(
 									_getField(0, 7), // Stop code
 									make_pair(
 										_getField(8, 5), // Service code
@@ -740,12 +740,12 @@ namespace synthese
 						// Gleis
 						GleisMap::const_iterator itGleis(
 							_gleisMap.find(
-								make_tuple(itZug->number, itZug->lineNumber, itZug->version)
+								boost::make_tuple(itZug->number, itZug->lineNumber, itZug->version)
 						)	);
 						if(itGleis == _gleisMap.end())
 						{
 							itGleis = _gleisMap.find(
-								make_tuple(itZug->number, itZug->lineNumber, 0)
+								boost::make_tuple(itZug->number, itZug->lineNumber, 0)
 							);
 						}
 						if(itGleis != _gleisMap.end())
@@ -999,7 +999,7 @@ namespace synthese
 				BOOST_FOREACH(const Bahnhofs::value_type& bahnhof, _nonLinkedBahnhofs)
 				{
 					// Projected point
-					shared_ptr<Point> projected;
+					boost::shared_ptr<Point> projected;
 					if(bahnhof.second.point.get())
 					{
 						projected = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
@@ -1090,7 +1090,7 @@ namespace synthese
 				BOOST_FOREACH(const Bahnhofs::value_type& bahnhof, _linkedBahnhofs)
 				{
 					// Projected point
-					shared_ptr<Point> projected;
+					boost::shared_ptr<Point> projected;
 					if(bahnhof.second.point.get())
 					{
 						projected = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
@@ -1223,7 +1223,7 @@ namespace synthese
 					CityTableSync::Search(
 						_env
 				)	);
-				BOOST_FOREACH(const shared_ptr<City>& city, cities)
+				BOOST_FOREACH(const boost::shared_ptr<City>& city, cities)
 				{
 					citiesByName.insert(make_pair(city->getName(), city.get()));
 				}
@@ -1261,7 +1261,7 @@ namespace synthese
 								CityTableSync::getId(),
 								bahnhof.cityName
 							);
-							_env.getEditableRegistry<City>().add(shared_ptr<City>(city));
+							_env.getEditableRegistry<City>().add(boost::shared_ptr<City>(city));
 							citiesByName.insert(make_pair(city->getName(), city));
 						}
 					}

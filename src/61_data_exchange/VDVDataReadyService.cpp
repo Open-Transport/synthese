@@ -120,7 +120,7 @@ namespace synthese
 			_vdvServer->trace("DatenBereitAntwort", result.str());
 
 			// Run the update in a separate thread
-			ServerModule::AddThread(bind(&VDVServer::updateSYNTHESEFromServer, _vdvServer), "VDV servers connector");
+			ServerModule::AddThread(boost::bind(&VDVServer::updateSYNTHESEFromServer, _vdvServer), "VDV servers connector");
 
 			// Map return
 			return map;

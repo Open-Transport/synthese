@@ -222,7 +222,7 @@ namespace synthese
 			// Subscriptions
 			BOOST_FOREACH(const Subscriptions::value_type& subscription, _subscriptions)
 			{
-				shared_ptr<ParametersMap> subscriptionMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> subscriptionMap(new ParametersMap);
 				subscription.second->toParametersMap(*subscriptionMap);
 				map.insert(prefix + TAG_SUBSCRIPTION, subscriptionMap);
 			}

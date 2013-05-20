@@ -162,13 +162,13 @@ namespace synthese
 			}
 			if(_stopArea)
 			{
-				shared_ptr<ParametersMap> stopPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 				_stopArea->toParametersMap(*stopPM);
 				pm.insert(TAG_STOP_AREA, stopPM);
 			}
 			if(_line)
 			{
-				shared_ptr<ParametersMap> linePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 				_line->toParametersMap(*linePM);
 				pm.insert(TAG_LINE, linePM);
 			}

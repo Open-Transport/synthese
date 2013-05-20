@@ -180,7 +180,7 @@ namespace synthese
 					return false;
 				}
 
-				shared_ptr<const City> cityForStopAreaAutoGeneration;
+				boost::shared_ptr<const City> cityForStopAreaAutoGeneration;
 				if(_defaultCity)
 				{
 					cityForStopAreaAutoGeneration = _defaultCity;
@@ -195,7 +195,7 @@ namespace synthese
 				}
 
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
-				shared_ptr<ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> > calendarTemplates;
+				boost::shared_ptr<ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> > calendarTemplates;
 				calendarTemplates.reset(new ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>(dataSource, _env));
 
 				BOOST_FOREACH(const string& file, schedulesFiles)
@@ -471,7 +471,7 @@ namespace synthese
 							);
 							if(!serviceCalendarLinks.empty())
 							{
-								BOOST_FOREACH(shared_ptr<CalendarLink> scl, serviceCalendarLinks)
+								BOOST_FOREACH(boost::shared_ptr<CalendarLink> scl, serviceCalendarLinks)
 								{
 									if((scl->getCalendarTemplate2() == periodCalendar) && (scl->getCalendarTemplate() == daysCalendar))
 									{
@@ -511,7 +511,7 @@ namespace synthese
 
 								service->addCalendarLink(*serviceCalendarLink,true);
 
-								_env.getEditableRegistry<CalendarLink>().add(shared_ptr<CalendarLink>(serviceCalendarLink));
+								_env.getEditableRegistry<CalendarLink>().add(boost::shared_ptr<CalendarLink>(serviceCalendarLink));
 							}
 							service->setCalendarFromLinks();
 
@@ -708,7 +708,7 @@ namespace synthese
 
 					try
 					{
-						shared_ptr<const PTUseRule> ptUseRule(
+						boost::shared_ptr<const PTUseRule> ptUseRule(
 							PTUseRuleTableSync::Get(
 								lexical_cast<RegistryKeyType>(parts[1]),
 								_env
