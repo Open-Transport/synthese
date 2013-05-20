@@ -81,7 +81,7 @@ namespace synthese
 						}
 
 						const RegistryBase& registry(dynamic_cast<DBDirectTableSync&>(*ts).getRegistry(env));
-						shared_ptr<Registrable> parent(registry.getEditableObject(id));
+						boost::shared_ptr<Registrable> parent(registry.getEditableObject(id));
 
 						if(!dynamic_cast<TreeFolderUpNode*>(parent.get()))
 						{
