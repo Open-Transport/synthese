@@ -50,7 +50,7 @@ namespace synthese
 	{
 		Crossing::Crossing(
 			util::RegistryKeyType key,
-			shared_ptr<Point> geometry,
+			boost::shared_ptr<Point> geometry,
 			std::string codeBySource,
 			const impex::DataSource* source,
 			bool withIndexation

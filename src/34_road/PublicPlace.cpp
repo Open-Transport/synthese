@@ -118,7 +118,7 @@ namespace synthese
 
 
 
-		const shared_ptr<Point>& PublicPlace::getPoint() const
+		const boost::shared_ptr<Point>& PublicPlace::getPoint() const
 		{
 			return get<PointGeometry>();
 		}
@@ -146,7 +146,7 @@ namespace synthese
 			// Coordinates
 			if(coordinatesSystem && getPoint())
 			{
-				shared_ptr<Point> pg(
+				boost::shared_ptr<Point> pg(
 					coordinatesSystem->convertPoint(*getPoint())
 				);
 				{

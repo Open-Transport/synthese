@@ -157,7 +157,7 @@ namespace synthese
 				while(rows->next())
 				{
 					// City field
-					shared_ptr<City> city(
+					boost::shared_ptr<City> city(
 						CityTableSync::GetEditableFromCode(rows->getText(_roadPlacesCityCodeField), _env)
 					);
 					if(!city.get())
@@ -251,7 +251,7 @@ namespace synthese
 					}
 
 					// Geometry
-					shared_ptr<LineString> geometry(
+					boost::shared_ptr<LineString> geometry(
 						dynamic_pointer_cast<LineString, Geometry>(
 							rows->getGeometryFromWKT(RoadShapeFileFormat::Importer_::FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
 					)	);
@@ -268,7 +268,7 @@ namespace synthese
 						_logWarning("The start node code is empty in the road chunk "+ code);
 						continue;
 					}
-					shared_ptr<Point> startPoint(
+					boost::shared_ptr<Point> startPoint(
 						dataSource.get<CoordinatesSystem>()->createPoint(
 							geometry->getCoordinatesRO()->getX(0),
 							geometry->getCoordinatesRO()->getY(0)
@@ -284,7 +284,7 @@ namespace synthese
 						_logWarning("The end node code is empty in the road chunk "+ code);
 						continue;
 					}
-					shared_ptr<Point> endPoint(
+					boost::shared_ptr<Point> endPoint(
 						dataSource.get<CoordinatesSystem>()->createPoint(
 							geometry->getCoordinatesRO()->getX(geometry->getCoordinatesRO()->size() - 1),
 							geometry->getCoordinatesRO()->getY(geometry->getCoordinatesRO()->size() - 1)
@@ -405,7 +405,7 @@ namespace synthese
 
 					// City field
 					string cityCode(rows->getText(_publicPlacesCityCodeField));
-					shared_ptr<City> city(
+					boost::shared_ptr<City> city(
 						CityTableSync::GetEditableFromCode(cityCode, _env)
 					);
 					if(!city.get())
@@ -418,7 +418,7 @@ namespace synthese
 					string name(rows->getText(_publicPlacesNameField));
 
 					// Geometry
-					shared_ptr<Point> geometry(
+					boost::shared_ptr<Point> geometry(
 						dynamic_pointer_cast<Point, Geometry>(
 							rows->getGeometryFromWKT(RoadShapeFileFormat::Importer_::FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
 					)	);
@@ -489,7 +489,7 @@ namespace synthese
 							_logger
 						);
 					}
-					catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
+					catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
 					{
 					}
 				}

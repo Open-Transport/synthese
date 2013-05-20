@@ -228,7 +228,7 @@ namespace synthese
 							y = lexical_cast<int>(_getValue(*_geometryYField));
 						else
 							continue;					
-						shared_ptr<Point> geometry(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+						boost::shared_ptr<Point> geometry(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
 							*dataSource.getActualCoordinateSystem().createPoint(
 								x,
 								y
@@ -249,11 +249,11 @@ namespace synthese
 							continue;
 						}
 
-						shared_ptr<House> house(new House());
+						boost::shared_ptr<House> house(new House());
 						house->setKey(HouseTableSync::getId());
 						house->setGeometry(geometry);
 						house->setHouseNumber(number);
-						shared_ptr<City> city(CityTableSync::GetEditableFromCode(cityCode, _env));
+						boost::shared_ptr<City> city(CityTableSync::GetEditableFromCode(cityCode, _env));
 
 						if(!city.get())
 						{
@@ -287,7 +287,7 @@ namespace synthese
 						}
 
 						RoadTableSync::SearchResult paths(RoadTableSync::Search(_env, roadPlace->getKey()));
-						BOOST_FOREACH(const shared_ptr<Path>& path, paths)
+						BOOST_FOREACH(const boost::shared_ptr<Path>& path, paths)
 						{
 							RoadChunkTableSync::Search(_env, path->getKey());
 						}

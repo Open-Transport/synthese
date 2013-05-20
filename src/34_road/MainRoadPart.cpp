@@ -87,11 +87,11 @@ namespace synthese
 						-chunk.getMetricOffset(),
 						&chunk
 				)	);
-				shared_ptr<LineString> geometry(chunk.getGeometry());
+				boost::shared_ptr<LineString> geometry(chunk.getGeometry());
 				if(geometry.get())
 				{
 					reverseChunk->setGeometry(
-						shared_ptr<LineString>(
+						boost::shared_ptr<LineString>(
 							dynamic_cast<LineString*>(chunk.getGeometry()->reverse())
 					)	);
 				}

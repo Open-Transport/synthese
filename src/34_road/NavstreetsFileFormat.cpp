@@ -219,7 +219,7 @@ namespace synthese
 							continue;
 						}
 
-						shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), _env));
+						boost::shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), _env));
 
 						if(!city.get())
 						{
@@ -316,7 +316,7 @@ namespace synthese
 					dataSource.get<CoordinatesSystem>()->getSRID()
 				);
 
-				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
+				typedef map<string, boost::shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;
 
 				typedef map<
@@ -344,7 +344,7 @@ namespace synthese
 					string rightNRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_NREFADDR));
 					string leftAddressSchema(rows->getText(NavstreetsFileFormat::_FIELD_L_ADDRSCH));
 					string rightAddressSchema(rows->getText(NavstreetsFileFormat::_FIELD_R_ADDRSCH));
-					shared_ptr<LineString> geometry(
+					boost::shared_ptr<LineString> geometry(
 						dynamic_pointer_cast<LineString, Geometry>(
 						rows->getGeometryFromWKT(NavstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
 					)	);
@@ -379,7 +379,7 @@ namespace synthese
 									}
 									else
 									{
-										shared_ptr<City> newCity = boost::shared_ptr<City>(new City);
+										boost::shared_ptr<City> newCity = boost::shared_ptr<City>(new City);
 										newCity->setName(itc->second);
 										newCity->setKey(CityTableSync::getId());
 										_env.getEditableRegistry<City>().add(newCity);
@@ -428,13 +428,13 @@ namespace synthese
 
 						// Left node
 						_CrossingsMap::const_iterator ita1(_navteqCrossings.find(leftId));
-						shared_ptr<Crossing> leftNode;
+						boost::shared_ptr<Crossing> leftNode;
 						if(ita1 == _navteqCrossings.end())
 						{
 							leftNode.reset(
 								new Crossing(
 									CrossingTableSync::getId(),
-									shared_ptr<Point>(geometry->getStartPoint()),
+									boost::shared_ptr<Point>(geometry->getStartPoint()),
 									leftId,
 									&dataSource
 							)	);
@@ -449,13 +449,13 @@ namespace synthese
 
 						// Right node
 						_CrossingsMap::const_iterator ita2(_navteqCrossings.find(rightId));
-						shared_ptr<Crossing> rightNode;
+						boost::shared_ptr<Crossing> rightNode;
 						if(ita2 == _navteqCrossings.end())
 						{
 							rightNode.reset(
 								new Crossing(
 									CrossingTableSync::getId(),
-									shared_ptr<Point>(geometry->getEndPoint()),
+									boost::shared_ptr<Point>(geometry->getEndPoint()),
 									rightId,
 									&dataSource
 							)	);
@@ -532,7 +532,7 @@ namespace synthese
 					string streetName(rows->getText(NavstreetsFileFormat::_FIELD_ST_NAME));
 
 					// Geometry
-					shared_ptr<Point> geometry(
+					boost::shared_ptr<Point> geometry(
 						dynamic_pointer_cast<Point, Geometry>(
 							rows->getGeometryFromWKT(NavstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
 					)	);
@@ -542,7 +542,7 @@ namespace synthese
 						continue;
 					}
 
-					EdgeProjector<shared_ptr<MainRoadChunk> >::From paths(
+					EdgeProjector<boost::shared_ptr<MainRoadChunk> >::From paths(
 						RoadChunkTableSync::SearchByMaxDistance(
 							*geometry.get(), _maxDistance,
 							Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL
@@ -550,10 +550,10 @@ namespace synthese
 
 					if(!paths.empty())
 					{
-						EdgeProjector<shared_ptr<MainRoadChunk> > projector(paths, _maxDistance);
+						EdgeProjector<boost::shared_ptr<MainRoadChunk> > projector(paths, _maxDistance);
 						try
 						{
-							EdgeProjector<shared_ptr<MainRoadChunk> >::PathNearby projection(projector.projectEdge(*geometry.get()->getCoordinate()));
+							EdgeProjector<boost::shared_ptr<MainRoadChunk> >::PathNearby projection(projector.projectEdge(*geometry.get()->getCoordinate()));
 
 							Address projectedAddress(
 								*(projection.get<1>().get()),
@@ -598,7 +598,7 @@ namespace synthese
 								_logger
 							);
 						}
-						catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
+						catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
 						{
 						}
 					}

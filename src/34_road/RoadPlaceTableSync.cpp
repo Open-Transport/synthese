@@ -294,7 +294,7 @@ namespace synthese
 			);
 			if(roadPlaces.empty())
 			{
-				return shared_ptr<RoadPlace>();
+				return boost::shared_ptr<RoadPlace>();
 			}
 			return roadPlaces.front();
 		}
