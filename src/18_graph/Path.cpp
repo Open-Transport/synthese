@@ -710,7 +710,7 @@ namespace synthese
 
 
 
-		shared_ptr<LineString> Path::getGeometry(
+		boost::shared_ptr<LineString> Path::getGeometry(
 			std::size_t fromEdgeIndex,
 			boost::optional<std::size_t> toEdgeIndex
 		) const {
@@ -722,7 +722,7 @@ namespace synthese
 			// Handle empty roads
 			if(_edges.empty())
 			{
-				return shared_ptr<LineString>(gf.createLineString());
+				return boost::shared_ptr<LineString>(gf.createLineString());
 			}
 
 			// Auto get end edge index
@@ -734,7 +734,7 @@ namespace synthese
 			// Gets the coordinates of each edge
 			for(size_t i=fromEdgeIndex; i<=*toEdgeIndex; ++i)
 			{
-				shared_ptr<LineString> geometry(_edges[i]->getRealGeometry());
+				boost::shared_ptr<LineString> geometry(_edges[i]->getRealGeometry());
 				if(!geometry.get())
 				{
 					break;
@@ -747,7 +747,7 @@ namespace synthese
 			}
 
 			//coords* owned by the shared pointer
-			return shared_ptr<LineString>(gf.createLineString(coords));
+			return boost::shared_ptr<LineString>(gf.createLineString(coords));
 		}
 
 
@@ -768,7 +768,7 @@ namespace synthese
 		{
 			if(!_edges.size()) return;
 			double graphlength = _edges.back()->getMetricOffset() - _edges.front()->getMetricOffset();
-			shared_ptr<LineString> geometry(getGeometry());
+			boost::shared_ptr<LineString> geometry(getGeometry());
 			double geomLength = geometry->getLength();
 			if(std::abs(graphlength-geomLength)>0.1)
 			{

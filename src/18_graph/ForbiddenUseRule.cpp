@@ -20,7 +20,7 @@ namespace synthese
 {
 	namespace graph
 	{
-		shared_ptr<const ForbiddenUseRule> ForbiddenUseRule::INSTANCE(new ForbiddenUseRule);
+		boost::shared_ptr<const ForbiddenUseRule> ForbiddenUseRule::INSTANCE(new ForbiddenUseRule);
 
 		ptime ForbiddenUseRule::getReservationDeadLine( const ptime& originTime, const ptime& departureTime ) const
 		{

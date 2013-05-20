@@ -314,7 +314,7 @@ namespace synthese
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
-				shared_ptr<LineString> geometry(edge->getRealGeometry());
+				boost::shared_ptr<LineString> geometry(edge->getRealGeometry());
 				if(!geometry.get())
 				{
 					continue;
@@ -326,12 +326,12 @@ namespace synthese
 			}
 			if(cs->size() < 2)
 			{
-				return shared_ptr<LineString>();
+				return boost::shared_ptr<LineString>();
 			}
 			else
 			{
 				cs->removeRepeatedPoints();
-				return shared_ptr<LineString>(geometryFactory.createLineString(cs));
+				return boost::shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 		}
 
