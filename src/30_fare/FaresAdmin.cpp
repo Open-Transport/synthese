@@ -192,7 +192,7 @@ namespace synthese
 
 			if(fa)
 			{
-				shared_ptr<FareAdmin> p(getNewPage<FareAdmin>());
+				boost::shared_ptr<FareAdmin> p(getNewPage<FareAdmin>());
 				p->setFare(fa->getFare());
 				links.push_back(p);
 			}

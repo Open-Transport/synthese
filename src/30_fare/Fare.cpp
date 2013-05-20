@@ -53,13 +53,13 @@ namespace synthese
 			switch(number)
 			{
 				case FareType::FARE_TYPE_FLAT_RATE:
-					_type = shared_ptr<FareTypeFlatRate>(new FareTypeFlatRate());
+					_type = boost::shared_ptr<FareTypeFlatRate>(new FareTypeFlatRate());
 					break;
 				case FareType::FARE_TYPE_DISTANCE:
-					_type = shared_ptr<FareTypeDistance>(new FareTypeDistance());
+					_type = boost::shared_ptr<FareTypeDistance>(new FareTypeDistance());
 					break;
 				default:
-					_type = shared_ptr<FareType>(new FareType(FareType::FARE_TYPE_UNKNOWN));
+					_type = boost::shared_ptr<FareType>(new FareType(FareType::FARE_TYPE_UNKNOWN));
 					break;
 			}
 		}
