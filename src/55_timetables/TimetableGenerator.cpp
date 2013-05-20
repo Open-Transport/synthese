@@ -425,7 +425,7 @@ namespace synthese
 				if(_transferTimetableBefore.get())
 				{
 					result.createBeforeTransfer();
-					TimetableResult beforeResult(_transferTimetableBefore->build(false, shared_ptr<TimetableResult::Warnings>()));
+					TimetableResult beforeResult(_transferTimetableBefore->build(false, boost::shared_ptr<TimetableResult::Warnings>()));
 
 					for(TimetableResult::Columns::const_iterator col(result.getColumns().begin()); col != result.getColumns().end(); ++col)
 					{
@@ -487,7 +487,7 @@ namespace synthese
 				if(_transferTimetableAfter.get())
 				{
 					result.createAfterTransfer();
-					TimetableResult afterResult(_transferTimetableAfter->build(false, shared_ptr<TimetableResult::Warnings>()));
+					TimetableResult afterResult(_transferTimetableAfter->build(false, boost::shared_ptr<TimetableResult::Warnings>()));
 
 					for(TimetableResult::Columns::const_reverse_iterator col(result.getColumns().rbegin()); col != result.getColumns().rend(); ++col)
 					{
@@ -632,7 +632,7 @@ namespace synthese
 			{
 				if(itCol->getCalendar() == _baseCalendar) continue;
 
-				shared_ptr<TimetableWarning> warn;
+				boost::shared_ptr<TimetableWarning> warn;
 				BOOST_FOREACH(const TimetableResult::Warnings::value_type& itWarn, result.getWarnings())
 				{
 					if(itWarn.second->getCalendar() == itCol->getCalendar())
@@ -650,7 +650,7 @@ namespace synthese
 					warn = result.getWarnings().insert(
 						make_pair(
 							nextNumber,
-							shared_ptr<TimetableWarning>(new TimetableWarning(
+							boost::shared_ptr<TimetableWarning>(new TimetableWarning(
 								itCol->getCalendar(),
 								nextNumber,
 								baseCalendar.second,

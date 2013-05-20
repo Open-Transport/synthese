@@ -192,7 +192,7 @@ namespace synthese
 			else if(map.getOptional<string>(PARAMETER_DAY))
 			{
 				date curDate(from_string(map.get<string>(PARAMETER_DAY)));
-				_calendarTemplate = shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
+				_calendarTemplate = boost::shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
 			}
 
 			// Ignore past dates
@@ -227,7 +227,7 @@ namespace synthese
 				if(!rowsBeforeStr.empty() || !rowsAfterStr.empty())
 				{
 					// The template is copied
-					shared_ptr<Timetable> timetableCopy(new Timetable);
+					boost::shared_ptr<Timetable> timetableCopy(new Timetable);
 					timetableCopy->setBaseCalendar(_timetable->getBaseCalendar());
 					timetableCopy->setWaybackFilter(_timetable->getWaybackFilter());
 					timetableCopy->setTitle(_timetable->getTitle());
@@ -259,7 +259,7 @@ namespace synthese
 					BOOST_FOREACH(const Timetable::RowGroups::value_type& rowGroup, _timetable->getRowGroups())
 					{
 						// New row group
-						shared_ptr<TimetableRowGroup> rowGroupCopy(new TimetableRowGroup);
+						boost::shared_ptr<TimetableRowGroup> rowGroupCopy(new TimetableRowGroup);
 						rowGroupCopy->set<Rank>(rank++);
 						rowGroupCopy->set<AutoRowsOrder>(rowGroup->get<AutoRowsOrder>());
 						rowGroupCopy->set<IsDeparture>(rowGroup->get<IsDeparture>());
@@ -273,7 +273,7 @@ namespace synthese
 						// Items loop
 						BOOST_FOREACH(const TimetableRowGroup::Items::value_type& item, rowGroup->getItems())
 						{
-							shared_ptr<TimetableRowGroupItem> itemCopy(new TimetableRowGroupItem);
+							boost::shared_ptr<TimetableRowGroupItem> itemCopy(new TimetableRowGroupItem);
 							itemCopy->set<StopArea>(item->get<StopArea>());
 							itemCopy->set<Rank>(item->get<Rank>());
 							itemCopy->set<TimetableRowGroup>(*rowGroupCopy);
@@ -304,11 +304,11 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<Timetable> timetable(new Timetable);
+				boost::shared_ptr<Timetable> timetable(new Timetable);
 				if(!_calendarTemplate.get())
 				{
 					date curDate(day_clock::local_day());
-					_calendarTemplate = shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
+					_calendarTemplate = boost::shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
 				}
 				if(!_calendarTemplate->isLimited())
 				{
@@ -349,7 +349,7 @@ namespace synthese
 				} // Way 4.1 : stop area timetable
 				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == StopAreaTableSync::TABLE.ID)
 				{
-					shared_ptr<const StopArea> place;
+					boost::shared_ptr<const StopArea> place;
 					try
 					{
 						place = Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
@@ -370,7 +370,7 @@ namespace synthese
 				} // Way 4.2 : physical stop timetable
 				else if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == StopPointTableSync::TABLE.ID)
 				{
-					shared_ptr<const StopPoint> stop;
+					boost::shared_ptr<const StopPoint> stop;
 					try
 					{
 						stop = Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
@@ -410,11 +410,11 @@ namespace synthese
 						// Timetable properties
 						timetable->setContentType(Timetable::CONTAINER);
 
-						shared_ptr<Timetable> tt1(new Timetable);
+						boost::shared_ptr<Timetable> tt1(new Timetable);
 						tt1->setBaseCalendar(timetable->getBaseCalendar());
 						AddLineDirectionToTimetable(*tt1, *_commercialLine, false);
 
-						shared_ptr<Timetable> tt2(new Timetable);
+						boost::shared_ptr<Timetable> tt2(new Timetable);
 						tt2->setBaseCalendar(timetable->getBaseCalendar());
 						AddLineDirectionToTimetable(*tt2, *_commercialLine, true);
 					}
@@ -470,7 +470,7 @@ namespace synthese
 			// Adding the notes to the parameters map
 			BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, *_warnings)
 			{
-				shared_ptr<ParametersMap> notePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> notePM(new ParametersMap);
 				warning.second->toParametersMap(*notePM, true);
 				pm.insert(TAG_NOTE, notePM);
 			}
@@ -504,10 +504,10 @@ namespace synthese
 			if(object.getContentType() == Timetable::CONTAINER)
 			{
 				size_t ttRank(0);
-				BOOST_FOREACH(const shared_ptr<Timetable>& tt, _containerContent)
+				BOOST_FOREACH(const boost::shared_ptr<Timetable>& tt, _containerContent)
 				{
 					// New parameters map
-					shared_ptr<ParametersMap> subPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> subPM(new ParametersMap);
 
 					// Recursive call
 					_outputResult(
@@ -576,7 +576,7 @@ namespace synthese
 								result.getBeforeTransferTimetable(depth).getRowSchedules(row.getRank())
 							);
 
-							shared_ptr<ParametersMap> rowPM(new ParametersMap);
+							boost::shared_ptr<ParametersMap> rowPM(new ParametersMap);
 
 							_outputStopRow(
 								*rowPM,
@@ -608,7 +608,7 @@ namespace synthese
 
 						const TimetableResult::RowTimesVector times(result.getRowSchedules(row.getRank()));
 
-						shared_ptr<ParametersMap> rowPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> rowPM(new ParametersMap);
 
 						_outputStopRow(
 							*rowPM,
@@ -645,7 +645,7 @@ namespace synthese
 								result.getAfterTransferTimetable(depth).getRowSchedules(row.getRank())
 							);
 
-							shared_ptr<ParametersMap> rowPM(new ParametersMap);
+							boost::shared_ptr<ParametersMap> rowPM(new ParametersMap);
 
 							_outputStopRow(
 								*rowPM,
@@ -664,7 +664,7 @@ namespace synthese
 				// Columns
 				BOOST_FOREACH(const TimetableResult::Columns::value_type& col, result.getColumns())
 				{
-					shared_ptr<ParametersMap> colPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> colPM(new ParametersMap);
 					col.toParametersMap(
 						*colPM,
 						object.getContentType() == Timetable::TABLE_SERVICES_IN_ROWS
@@ -710,7 +710,7 @@ namespace synthese
 			if(	place.getPlace() &&
 				dynamic_cast<const StopArea*>(place.getPlace()))
 			{
-				shared_ptr<ParametersMap> placePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> placePM(new ParametersMap);
 				dynamic_cast<const StopArea*>(place.getPlace())->toParametersMap(*placePM);
 				pm.insert(TAG_PLACE, placePM);
 			}
@@ -720,7 +720,7 @@ namespace synthese
 			BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& duration, times)
 			{
 				// New parameters map
-				shared_ptr<ParametersMap> cellPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
 
 				// Time
 				if(!duration.second.is_not_a_date_time())
@@ -731,7 +731,7 @@ namespace synthese
 				// Service ID
 				BOOST_FOREACH(const TimetableColumn::Services::value_type& service, services.at(rank))
 				{
-					shared_ptr<ParametersMap> servicePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
 					servicePM->insert(ATTR_ID, service->getKey());
 					cellPM->insert(TAG_SERVICE, servicePM);
 				}
@@ -739,7 +739,7 @@ namespace synthese
 				// Stop point
 				if(duration.first)
 				{
-					shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
 					duration.first->toParametersMap(*stopPointPM, false);
 					cellPM->insert(TAG_STOP_POINT, stopPointPM);
 				}
@@ -849,7 +849,7 @@ namespace synthese
 			}
 
 			// New row group
-			shared_ptr<TimetableRowGroup> rowGroup(
+			boost::shared_ptr<TimetableRowGroup> rowGroup(
 				new TimetableRowGroup
 			);
 			rowGroup->set<Rank>(before ? 0 : timetable.getRowGroups().size());
@@ -874,7 +874,7 @@ namespace synthese
 					RegistryTableType tableId(decodeTableId(id));
 					if(tableId == StopAreaTableSync::TABLE.ID)
 					{
-						shared_ptr<TimetableRowGroupItem> item(new TimetableRowGroupItem);
+						boost::shared_ptr<TimetableRowGroupItem> item(new TimetableRowGroupItem);
 						item->set<StopArea>(*Env::GetOfficialEnv().getEditable<StopArea>(id));
 						item->set<Rank>(rank++);
 						item->set<TimetableRowGroup>(*rowGroup);
@@ -888,7 +888,7 @@ namespace synthese
 							const City::PlacesMatcher::Map::value_type& stop,
 							city.getLexicalMatcher(StopArea::FACTORY_KEY).entries()
 						){
-							shared_ptr<TimetableRowGroupItem> item(new TimetableRowGroupItem);
+							boost::shared_ptr<TimetableRowGroupItem> item(new TimetableRowGroupItem);
 							item->set<StopArea>(*const_cast<StopArea*>(dynamic_cast<const StopArea*>(stop.second.get())));
 							item->set<Rank>(rank++);
 							item->set<TimetableRowGroup>(*rowGroup);

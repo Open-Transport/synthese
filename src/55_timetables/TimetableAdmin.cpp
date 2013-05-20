@@ -254,7 +254,7 @@ namespace synthese
 
 					// Links to folders or timetable edition
 					AdminFunctionRequest<TimetableAdmin> editTimetableRequest(_request, *this);
-					BOOST_FOREACH(const shared_ptr<Timetable>& tt, timetables)
+					BOOST_FOREACH(const boost::shared_ptr<Timetable>& tt, timetables)
 					{
 						editTimetableRequest.getPage()->setTimetable(tt);
 						copyTimetableRequest.getAction()->setTemplate(const_pointer_cast<const Timetable>(tt));
@@ -402,7 +402,7 @@ namespace synthese
 
 						optional<size_t> maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
 						optional<size_t> lastRank;
-						BOOST_FOREACH(const shared_ptr<TimetableRow>& row, rows)
+						BOOST_FOREACH(const boost::shared_ptr<TimetableRow>& row, rows)
 						{
 							lastRank = row->getRank();
 							deleteRowRequest.getAction()->setObjectId(row->getKey());
@@ -878,7 +878,7 @@ namespace synthese
 							Env::GetOfficialEnv(),
 							_timetable->isGenerable() ? _timetable->getBaseCalendar()->getResult() : Calendar(date(now.year(), 1, 1), date(now.year(), 12, 31))
 					)	);
-					const TimetableResult result(g->build(true, shared_ptr<TimetableResult::Warnings>()));
+					const TimetableResult result(g->build(true, boost::shared_ptr<TimetableResult::Warnings>()));
 
 					// Drawing the result
 					stream << "<h1>Tableau</h1>";
@@ -1004,9 +1004,9 @@ namespace synthese
 			TimetableTableSync::SearchResult timetables(
 				TimetableTableSync::Search(Env::GetOfficialEnv(), _timetable.get() ? _timetable->getKey() : 0)
 			);
-			BOOST_FOREACH(const shared_ptr<Timetable>& tt, timetables)
+			BOOST_FOREACH(const boost::shared_ptr<Timetable>& tt, timetables)
 			{
-				shared_ptr<TimetableAdmin> page(
+				boost::shared_ptr<TimetableAdmin> page(
 					getNewPage<TimetableAdmin>()
 				);
 				page->setTimetable(tt);

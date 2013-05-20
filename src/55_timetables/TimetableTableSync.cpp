@@ -167,7 +167,7 @@ namespace synthese
 					TimetableRowTableSync::SearchResult rows(
 						TimetableRowTableSync::Search(env, object->getKey())
 					);
-					BOOST_FOREACH(const shared_ptr<TimetableRow>& row, rows)
+					BOOST_FOREACH(const boost::shared_ptr<TimetableRow>& row, rows)
 					{
 						object->addRow(*row);
 					}

@@ -533,7 +533,7 @@ namespace synthese
 			// Note
 			if(_warning)
 			{
-				shared_ptr<ParametersMap> notePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> notePM(new ParametersMap);
 				_warning->toParametersMap(*notePM, false);
 				pm.insert(TAG_NOTE, notePM);
 			}
@@ -541,7 +541,7 @@ namespace synthese
 			// Service
 			BOOST_FOREACH(const Services::value_type& service, _services)
 			{
-				shared_ptr<ParametersMap> servicePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
 				service->toParametersMap(*servicePM);
 				pm.insert(TAG_SERVICE, servicePM);
 			}
@@ -549,7 +549,7 @@ namespace synthese
 			// Line
 			if(_line && _line->getCommercialLine())
 			{
-				shared_ptr<ParametersMap> linePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 				_line->getCommercialLine()->toParametersMap(*linePM);
 				pm.insert(TAG_LINE, linePM);
 			}
@@ -557,7 +557,7 @@ namespace synthese
 			// Transport mode
 			if(_line && _line->getRollingStock())
 			{
-				shared_ptr<ParametersMap> transportModePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
 				_line->getRollingStock()->toParametersMap(*transportModePM);
 				pm.insert(TAG_TRANSPORT_MODE, transportModePM);
 			}
@@ -571,7 +571,7 @@ namespace synthese
 				)	);
 				if(ptUseRule)
 				{
-					shared_ptr<ParametersMap> useRulePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> useRulePM(new ParametersMap);
 					ptUseRule->toParametersMap(*useRulePM);
 					pm.insert(TAG_USE_RULE, useRulePM);
 				}
@@ -582,7 +582,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Content::value_type& cell, _content)
 				{
-					shared_ptr<ParametersMap> cellPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
 
 					// Time
 					if(!cell.second.is_not_a_date_time())
@@ -593,7 +593,7 @@ namespace synthese
 					// Stop point
 					if(cell.first)
 					{
-						shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
 						cell.first->toParametersMap(*stopPointPM, false);
 						cellPM->insert(TAG_STOP_POINT, stopPointPM);
 					}

@@ -171,7 +171,7 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 			Env env;
-			shared_ptr<const TimetableRow> row(TimetableRowTableSync::Get(id, env));
+			boost::shared_ptr<const TimetableRow> row(TimetableRowTableSync::Get(id, env));
 			TimetableRowTableSync::Shift(row->getTimetableId(), row->getRank(), -1, transaction);
 		}
 

@@ -66,7 +66,7 @@ namespace synthese
 			util::RegistryKeyType object_id
 		){
 			Env env;
-			shared_ptr<const TimetableRowGroupTableSync::ObjectType> object(TimetableRowGroupTableSync::Get(object_id, env));
+			boost::shared_ptr<const TimetableRowGroupTableSync::ObjectType> object(TimetableRowGroupTableSync::Get(object_id, env));
 			return object->allowDelete(session);
 		}
 
@@ -77,7 +77,7 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 			Env env;
-			shared_ptr<const TimetableRowGroupTableSync::ObjectType> object(TimetableRowGroupTableSync::Get(id, env));
+			boost::shared_ptr<const TimetableRowGroupTableSync::ObjectType> object(TimetableRowGroupTableSync::Get(id, env));
 			object->beforeDelete(transaction);
 		}
 
@@ -88,7 +88,7 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 			Env env;
-			shared_ptr<const TimetableRowGroupTableSync::ObjectType> object(TimetableRowGroupTableSync::Get(id, env));
+			boost::shared_ptr<const TimetableRowGroupTableSync::ObjectType> object(TimetableRowGroupTableSync::Get(id, env));
 			object->afterDelete(transaction);
 		}
 
