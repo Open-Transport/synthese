@@ -179,7 +179,7 @@ namespace synthese
 			boost::shared_ptr<DBLog> dbLog;
 			try
 			{
-				shared_ptr<const DBLogEntry> entry(DBLogEntryTableSync::Get(object_id, env));
+				boost::shared_ptr<const DBLogEntry> entry(DBLogEntryTableSync::Get(object_id, env));
 				dbLog.reset(Factory<DBLog>::create(entry->getLogKey()));
 			}
 			catch(ObjectNotFoundException<DBLogEntry>&)
