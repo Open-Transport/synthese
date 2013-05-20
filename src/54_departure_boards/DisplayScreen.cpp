@@ -232,7 +232,7 @@ namespace synthese
 			const boost::posix_time::ptime& endTime,
 			bool rootCall
 		) const	{
-			shared_ptr<ArrivalDepartureTableGenerator> generator;
+			boost::shared_ptr<ArrivalDepartureTableGenerator> generator;
 			switch (_generationMethod)
 			{
 			case STANDARD_METHOD:
@@ -1051,11 +1051,11 @@ namespace synthese
 			stringstream s;
 			ParametersMap pm;
 
-			shared_ptr<ParametersMap> screenPM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> screenPM(new ParametersMap);
 			toParametersMap(*screenPM);
 			pm.insert("screen", screenPM);
 			pm.insert(VAR_BROADCAST_POINT_TYPE, VALUE_DISPLAY_SCREEN);
-			shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
 			Alarm::LinkedObjectsToParametersMap(linkedObjects, *recipientsPM);
 			pm.insert("recipients", recipientsPM);
 

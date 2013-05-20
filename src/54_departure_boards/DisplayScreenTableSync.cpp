@@ -552,7 +552,7 @@ namespace synthese
 			try
 			{
 				Env env;
-				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(object_id, env));
+				boost::shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(object_id, env));
 				if (screen->getLocation() != NULL)
 				{
 					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(screen->getLocation()->getKey()));
@@ -592,7 +592,7 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 			Env env;
-			shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(id, env));
+			boost::shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(id, env));
 			ArrivalDepartureTableLog::addRemoveEntry(screen.get(), session->getUser().get());
 		}
 	}
@@ -821,7 +821,7 @@ namespace synthese
 				query.setNumber(*limit);
 			}
 			DBResultSPtr rows = query.execute();
-			vector<shared_ptr<SentAlarm> > result;
+			vector<boost::shared_ptr<SentAlarm> > result;
 			while(rows->next())
 			{
 				result.push_back(
@@ -861,7 +861,7 @@ namespace synthese
 
 
 
-		vector<shared_ptr<SentAlarm> > DisplayScreenTableSync::GetFutureDisplayedMessages(
+		vector<boost::shared_ptr<SentAlarm> > DisplayScreenTableSync::GetFutureDisplayedMessages(
 			Env& env,
 			RegistryKeyType screenId,
 			optional<int> number
@@ -882,7 +882,7 @@ namespace synthese
 				q << " LIMIT " << *number;
 			}
 			DBResultSPtr rows = DBModule::GetDB()->execQuery(q.str());
-			vector<shared_ptr<SentAlarm> > result;
+			vector<boost::shared_ptr<SentAlarm> > result;
 			while(rows->next())
 			{
 				result.push_back(static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)));
@@ -892,7 +892,7 @@ namespace synthese
 
 
 
-		shared_ptr<DisplayScreen> DisplayScreenTableSync::GetByMACAddress(
+		boost::shared_ptr<DisplayScreen> DisplayScreenTableSync::GetByMACAddress(
 			util::Env& env,
 			const std::string& macAddress,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */ )
@@ -944,7 +944,7 @@ namespace synthese
 				RegistryKeyType id(lexical_cast<RegistryKeyType>(parts[0]));
 				try
 				{
-					shared_ptr<const CommercialLine> lineObj(
+					boost::shared_ptr<const CommercialLine> lineObj(
 						CommercialLineTableSync::Get(id, env, linkLevel)
 					);
 					result.insert(

@@ -364,7 +364,7 @@ namespace synthese
 					// 3.1 by id
 					if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
 					{
-						shared_ptr<const StopPoint> stop(
+						boost::shared_ptr<const StopPoint> stop(
 								Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 						);
 
@@ -383,7 +383,7 @@ namespace synthese
 						string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
 
 						//Get StopPoint Global Registry
-						typedef const pair<const RegistryKeyType, shared_ptr<StopPoint> > myType;
+						typedef const pair<const RegistryKeyType, boost::shared_ptr<StopPoint> > myType;
 						ArrivalDepartureTableGenerator::PhysicalStops pstops;
 						BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
 						{
@@ -612,18 +612,18 @@ namespace synthese
 			pm.insert(DATA_STOP_AREA_CITY_NAME, connPlace->getCity()->getName());
 			pm.insert(DATA_STOP_AREA_CITY_ID, connPlace->getCity()->getKey());
 
-			shared_ptr<ParametersMap> journeyPm(new ParametersMap());
+			boost::shared_ptr<ParametersMap> journeyPm(new ParametersMap());
 			journeyPm->insert("route_id", journeyPattern->getKey());
 			journeyPm->insert("date_time", servicePointer.getDepartureDateTime());
 
-			shared_ptr<ParametersMap> stopPM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 			stop->toParametersMap(*stopPM, false);
 			journeyPm->insert("stop", stopPM);
 
 			RollingStock* rs = journeyPattern->getRollingStock();
 			if(rs)
 			{
-				shared_ptr<ParametersMap> rsPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
 				rs->toParametersMap(*rsPM);
 				journeyPm->insert("rollingStock", rsPM);
 			}
@@ -632,7 +632,7 @@ namespace synthese
 
 			if(commercialLine)
 			{
-				shared_ptr<ParametersMap> linePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 				commercialLine->toParametersMap(*linePM);
 				journeyPm->insert("line", linePM);
 			}
@@ -640,7 +640,7 @@ namespace synthese
 			const StopArea& origin(
 				*journeyPattern->getOrigin()->getConnectionPlace()
 			);
-			shared_ptr<ParametersMap> originPM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> originPM(new ParametersMap);
 			origin.toParametersMap(*originPM);
 			journeyPm->insert("origin", originPM);
 
@@ -648,11 +648,11 @@ namespace synthese
 			const StopArea& destination(
 				*journeyPattern->getDestination()->getConnectionPlace()
 			);
-			shared_ptr<ParametersMap> destinationPM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> destinationPM(new ParametersMap);
 			destination.toParametersMap(*destinationPM);
 			journeyPm->insert("destination", destinationPM);
 
-			shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
 			connPlace->toParametersMap(*connPlacePM);
 			journeyPm->insert("stopArea", connPlacePM);
 
@@ -1023,7 +1023,7 @@ namespace synthese
 
 
 		void DisplayScreenContentFunction::setScreen(
-			shared_ptr<const DisplayScreen> value
+			boost::shared_ptr<const DisplayScreen> value
 		){
 			_screen = value;
 		}

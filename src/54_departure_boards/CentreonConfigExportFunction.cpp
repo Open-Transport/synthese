@@ -187,7 +187,7 @@ namespace synthese
 					DisplayTypeTableSync::Search(env)
 				);
 				UniqueStringsSet hostgroups;
-				BOOST_FOREACH(const shared_ptr<const DisplayType>& type, types)
+				BOOST_FOREACH(const boost::shared_ptr<const DisplayType>& type, types)
 				{
 					const string& hostgroup(hostgroups.getUniqueString(_ConvertToNagiosName(type->getName())));
 					stream <<
@@ -230,7 +230,7 @@ namespace synthese
 					DisplayScreenTableSync::Search(env)
 				);
 				UniqueStringsSet hosts;
-				BOOST_FOREACH(const shared_ptr<const DisplayScreen>& screen, screens)
+				BOOST_FOREACH(const boost::shared_ptr<const DisplayScreen>& screen, screens)
 				{
 					if(!screen->isMonitored()) continue;
 

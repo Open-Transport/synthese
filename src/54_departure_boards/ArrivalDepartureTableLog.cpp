@@ -79,7 +79,7 @@ namespace synthese
 					AdminFunctionRequest<DisplayAdmin> openRequest(
 						dynamic_cast<const Request& >(searchRequest)
 					);
-					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id, env);
+					boost::shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id, env);
 					openRequest.getPage()->setScreen(ds);
 					return HTMLModule::getHTMLLink(openRequest.getURL(), ds->getFullName());
 				}
@@ -88,7 +88,7 @@ namespace synthese
 					AdminFunctionRequest<DisplayTypeAdmin> openRequest(
 						dynamic_cast<const Request& >(searchRequest)
 					);
-					shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					openRequest.getPage()->setType(dt);
 					return HTMLModule::getHTMLLink(openRequest.getURL(), dt->getName());
 				}
@@ -97,7 +97,7 @@ namespace synthese
 					AdminFunctionRequest<DisplayScreenCPUAdmin> openRequest(
 						dynamic_cast<const Request& >(searchRequest)
 					);
-					shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					openRequest.getPage()->setCPU(cpu);
 					return HTMLModule::getHTMLLink(openRequest.getURL(), cpu->getName());
 				}

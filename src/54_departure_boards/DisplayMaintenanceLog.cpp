@@ -137,12 +137,12 @@ namespace synthese
 			{
 				if(decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
-					shared_ptr<const DisplayScreen> screen = DisplayScreenTableSync::Get(id, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
+					boost::shared_ptr<const DisplayScreen> screen = DisplayScreenTableSync::Get(id, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
 					return screen->getFullName();
 				}
 				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
 				{
-					shared_ptr<const DisplayScreenCPU> cpu = DisplayScreenCPUTableSync::Get(id, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
+					boost::shared_ptr<const DisplayScreenCPU> cpu = DisplayScreenCPUTableSync::Get(id, Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL);
 					return cpu->getFullName();
 				}
 			}
@@ -240,7 +240,7 @@ namespace synthese
 			const DisplayScreen& screen
 		){
 			// Control last entry : if already a down entry, do not reyrite any identical entry
-			shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, screen.getKey()));
+			boost::shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, screen.getKey()));
 			if(	lastEntry.get() == NULL ||
 				lastEntry->getContent()[0] == lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_DOWN))
 			){
@@ -333,7 +333,7 @@ namespace synthese
 		void DisplayMaintenanceLog::AddMonitoringDownEntry( const DisplayScreenCPU& cpu )
 		{
 			// Control last entry : if already a down entry, do not rewrite any identical entry
-			shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, cpu.getKey()));
+			boost::shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, cpu.getKey()));
 			if(	lastEntry.get() == NULL ||
 				lastEntry->getContent()[0] == lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_DOWN))
 			){

@@ -185,7 +185,7 @@ namespace synthese
 
 			stream << t.open();
 			AdminFunctionRequest<DisplaySearchAdmin> goRequest(_request);
-			BOOST_FOREACH(const shared_ptr<ConnectionPlaceWithBroadcastPoint>& pl, searchResult)
+			BOOST_FOREACH(const boost::shared_ptr<ConnectionPlaceWithBroadcastPoint>& pl, searchResult)
 			{
 				stream << t.row();
 				try
@@ -271,7 +271,7 @@ namespace synthese
 				dynamic_cast<const BroadcastPointsAdmin*>(&currentPage) ||
 				dynamic_cast<const DisplayAdmin*>(&currentPage)
 			){
-				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
+				vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
 					searchConnectionPlacesWithBroadcastPoints(
 						_getEnv(),
 						request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
@@ -283,9 +283,9 @@ namespace synthese
 				)	);
 
 				bool currentToAdd(sa && sa->getPlace() && sa->getPlace()->get());
-				BOOST_FOREACH(const shared_ptr<ConnectionPlaceWithBroadcastPoint>& result, searchResult)
+				BOOST_FOREACH(const boost::shared_ptr<ConnectionPlaceWithBroadcastPoint>& result, searchResult)
 				{
-					shared_ptr<DisplaySearchAdmin> p(
+					boost::shared_ptr<DisplaySearchAdmin> p(
 						getNewPage<DisplaySearchAdmin>()
 					);
 					p->setPlace(result->place->getKey());
@@ -295,7 +295,7 @@ namespace synthese
 
 				if(currentToAdd)
 				{
-					shared_ptr<DisplaySearchAdmin> p(
+					boost::shared_ptr<DisplaySearchAdmin> p(
 						getNewPage<DisplaySearchAdmin>()
 					);
 					p->setPlace((*sa->getPlace())->getKey());
