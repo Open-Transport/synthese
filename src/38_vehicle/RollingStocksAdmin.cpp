@@ -185,7 +185,7 @@ namespace synthese
 
 			if(rsa)
 			{
-				shared_ptr<RollingStockAdmin> p(getNewPage<RollingStockAdmin>());
+				boost::shared_ptr<RollingStockAdmin> p(getNewPage<RollingStockAdmin>());
 				p->setRollingStock(rsa->getRollingStock());
 				links.push_back(p);
 			}

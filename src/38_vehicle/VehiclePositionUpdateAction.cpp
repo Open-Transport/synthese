@@ -114,7 +114,7 @@ namespace synthese
 				}
 				else
 				{
-					_vehicle = shared_ptr<Vehicle>();
+					_vehicle = boost::shared_ptr<Vehicle>();
 				}
 			}
 
@@ -141,7 +141,7 @@ namespace synthese
 				}
 				else
 				{
-					_service = shared_ptr<ScheduledService>();
+					_service = boost::shared_ptr<ScheduledService>();
 				}
 			}
 
@@ -153,17 +153,17 @@ namespace synthese
 					if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
 					{
 						_stopPoint = StopPointTableSync::GetEditable(id, *_env);
-						_depot = shared_ptr<Depot>();
+						_depot = boost::shared_ptr<Depot>();
 					}
 					else if(decodeTableId(id) == DepotTableSync::TABLE.ID)
 					{
 						_depot = DepotTableSync::GetEditable(id, *_env);
-						_stopPoint = shared_ptr<StopPoint>();
+						_stopPoint = boost::shared_ptr<StopPoint>();
 					}
 					else
 					{
-						_stopPoint = shared_ptr<StopPoint>();
-						_depot = shared_ptr<Depot>();
+						_stopPoint = boost::shared_ptr<StopPoint>();
+						_depot = boost::shared_ptr<Depot>();
 					}
 				}
 				catch(ObjectNotFoundException<StopPoint>&)
@@ -176,8 +176,8 @@ namespace synthese
 				}
 				else
 				{
-					_stopPoint = shared_ptr<StopPoint>();
-					_depot = shared_ptr<Depot>();
+					_stopPoint = boost::shared_ptr<StopPoint>();
+					_depot = boost::shared_ptr<Depot>();
 				}
 			}
 

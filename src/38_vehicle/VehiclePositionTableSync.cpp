@@ -126,7 +126,7 @@ namespace synthese
 			string pointsStr(rows->getText(TABLE_COL_GEOMETRY));
 			if(pointsStr.empty())
 			{
-				object->setGeometry(shared_ptr<Point>());
+				object->setGeometry(boost::shared_ptr<Point>());
 			}
 			else
 			{

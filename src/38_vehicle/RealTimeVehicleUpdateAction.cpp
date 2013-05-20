@@ -127,7 +127,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const DataSource> dataSource(
+					boost::shared_ptr<const DataSource> dataSource(
 						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_VEHICLE_SERVICE_DATASOURCE_ID))
 					);
 					VehicleService* obj(dataSource->getObjectByCode<VehicleService>(map.get<string>(PARAMETER_VEHICLE_SERVICE_ID)));
@@ -135,7 +135,7 @@ namespace synthese
 					{
 						throw ActionException("No such vehicle service");
 					}
-					shared_ptr<VehicleService> vehicleService(
+					boost::shared_ptr<VehicleService> vehicleService(
 						Env::GetOfficialEnv().getEditableSPtr(obj)
 					);
 
