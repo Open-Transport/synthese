@@ -186,7 +186,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<Import> import;
+				boost::shared_ptr<Import> import;
 				bool created(false);
 				if(Env::GetOfficialEnv().getRegistry<Import>().contains(FAKE_IMPORT_ID))
 				{

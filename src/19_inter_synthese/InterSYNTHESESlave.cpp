@@ -136,7 +136,7 @@ namespace synthese
 			
 			BOOST_FOREACH(const Queue::value_type& it, _queue)
 			{
-				shared_ptr<ParametersMap> itemPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> itemPM(new ParametersMap);
 
 				it.second->toParametersMap(*itemPM);
 
