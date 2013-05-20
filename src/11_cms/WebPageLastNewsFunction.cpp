@@ -136,7 +136,7 @@ namespace synthese
 			}
 
 			size_t number(0);
-			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
+			BOOST_FOREACH(const boost::shared_ptr<Webpage>& page, pages)
 			{
 				if(!page->mustBeDisplayed())
 				{

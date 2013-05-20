@@ -101,7 +101,7 @@ namespace synthese
 			size_t i(0);
 			for (RowsList::const_iterator it = result.begin(); it != result.end(); ++it)
 			{
-				shared_ptr<ParametersMap> rowPm(new ParametersMap());
+				boost::shared_ptr<ParametersMap> rowPm(new ParametersMap());
 
 				rowPm->insert(DATA_RANK, i++);
 				rowPm->insert("name", it->second);

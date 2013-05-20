@@ -134,7 +134,7 @@ namespace synthese
 			const Request& request
 		) const {
 			string url;
-			shared_ptr<const WebPageDisplayFunction> webpageDisplayFunction(
+			boost::shared_ptr<const WebPageDisplayFunction> webpageDisplayFunction(
 				dynamic_pointer_cast<const WebPageDisplayFunction,const Function>(
 					request.getFunction()
 			)	);

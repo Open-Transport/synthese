@@ -296,7 +296,7 @@ namespace synthese
 			)	);
 			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
-				shared_ptr<Webpage> page(*it);
+				boost::shared_ptr<Webpage> page(*it);
 
 				// Avoid no displayed pages
 				if(!page->mustBeDisplayed())
@@ -311,7 +311,7 @@ namespace synthese
 				);
 
 				// Recursion
-				shared_ptr<ParametersMap> pagePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> pagePM(new ParametersMap);
 				returned_page_in_branch |= _getMenuContentRecursive(
 					submenu,
 					request,

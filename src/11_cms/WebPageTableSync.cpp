@@ -90,7 +90,7 @@ namespace synthese
 				ComposedExpression::OP_LIKE
 			);
 			WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
+			BOOST_FOREACH(const boost::shared_ptr<Webpage>& page, pages)
 			{
 				WebpageLinks::Type newLinks;
 				BOOST_FOREACH(Webpage* linkedPage, page->get<WebpageLinks>())
@@ -112,7 +112,7 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 			Env env;
-			shared_ptr<const Webpage> page(WebPageTableSync::Get(id, env));
+			boost::shared_ptr<const Webpage> page(WebPageTableSync::Get(id, env));
 			WebPageTableSync::ShiftRank(
 				page->getRoot()->getKey(),
 				page->getParent() ? page->getParent()->getKey() : RegistryKeyType(0),
@@ -230,7 +230,7 @@ namespace synthese
 			}
 			query.addOrderField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name,true);
 			WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
+			BOOST_FOREACH(const boost::shared_ptr<Webpage>& page, pages)
 			{
 				result.push_back(std::make_pair(page->getKey(), page->getName()));
 			}

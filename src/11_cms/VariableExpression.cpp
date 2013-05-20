@@ -123,7 +123,7 @@ namespace synthese
 							pm->getSubMaps(item.key)
 						);
 						pm = NULL;
-						BOOST_FOREACH(const shared_ptr<ParametersMap>& subMapItem, subMaps)
+						BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& subMapItem, subMaps)
 						{
 							if(subMapItem->getDefault<string>(FIELD_ID) == idx)
 							{

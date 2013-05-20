@@ -117,7 +117,7 @@ namespace synthese
 
 			if(_actionOrfunction == "function")
 			{
-				BOOST_FOREACH(shared_ptr<Function> item, Factory<Function>::GetNewCollection())
+				BOOST_FOREACH(boost::shared_ptr<Function> item, Factory<Function>::GetNewCollection())
 				{
 					FunctionAPI api(item->getAPI());
 
@@ -130,7 +130,7 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(shared_ptr<Action> item, Factory<Action>::GetNewCollection())
+				BOOST_FOREACH(boost::shared_ptr<Action> item, Factory<Action>::GetNewCollection())
 				{
 					FunctionAPI api(item->getAPI());
 
@@ -150,12 +150,12 @@ namespace synthese
 
 			BOOST_FOREACH(const GroupedAPI::value_type &groupAPI, groupedAPI)
 			{
-				shared_ptr<ParametersMap> groupedPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> groupedPM(new ParametersMap);
 				groupedPM->insert(ATTR_GROUP_NAME, groupAPI.first);
 
 				BOOST_FOREACH(const APIKey::value_type &apiKey, groupAPI.second)
 				{
-					shared_ptr<ParametersMap> servicePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
 
 					servicePM->insert(ATTR_NAME, apiKey.first);
 					const FunctionAPI &api(apiKey.second);
@@ -171,12 +171,12 @@ namespace synthese
 
 					BOOST_FOREACH(const FunctionAPI::APIParamsMap::value_type& it, api.getParams())
 					{
-						shared_ptr<ParametersMap> paramGroupPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> paramGroupPM(new ParametersMap);
 						paramGroupPM->insert(ATTR_PARAM_GROUP_NAME, it.first);
 
 						BOOST_FOREACH(FunctionAPIParam param, it.second)
 						{
-							shared_ptr<ParametersMap> paramPM(new ParametersMap);
+							boost::shared_ptr<ParametersMap> paramPM(new ParametersMap);
 							paramPM->insert(ATTR_PARAM_KEY, param.getKey());
 							paramPM->insert(ATTR_PARAM_DESCRIPTION, param.getDescription());
 							paramPM->insert(ATTR_PARAM_MANDATORY, param.isMandatory());
