@@ -111,7 +111,7 @@ namespace synthese
 			}
 			else
 			{
-				_link = shared_ptr<CalendarLink>(new CalendarLink);
+				_link = boost::shared_ptr<CalendarLink>(new CalendarLink);
 			}
 
 			// Service

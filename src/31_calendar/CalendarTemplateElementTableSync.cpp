@@ -228,7 +228,7 @@ namespace synthese
 			try
 			{
 				Env env;
-				shared_ptr<const CalendarTemplateElement> element(CalendarTemplateElementTableSync::Get(id,env));
+				boost::shared_ptr<const CalendarTemplateElement> element(CalendarTemplateElementTableSync::Get(id,env));
 				if(element->getCalendar())
 				{
 					CalendarTemplateElementTableSync::Shift(element->getCalendar()->getKey(), element->getRank(), -1, transaction);
