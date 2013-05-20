@@ -83,7 +83,7 @@ namespace synthese
 
 			if(_dataSourceFilter.get())
 			{
-				shared_ptr<ParametersMap> dsPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> dsPM(new ParametersMap);
 				_dataSourceFilter->toParametersMap(*dsPM);
 				map.insert(TAG_DATA_SOURCE, dsPM);
 			}
@@ -91,7 +91,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Registry<DataSource>::value_type& it, Env::GetOfficialEnv().getRegistry<DataSource>())
 				{
-					shared_ptr<ParametersMap> dsPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> dsPM(new ParametersMap);
 					it.second->toParametersMap(*dsPM);
 					map.insert(TAG_DATA_SOURCE, dsPM);
 				}

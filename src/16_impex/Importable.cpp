@@ -189,7 +189,7 @@ namespace synthese
 		{
 			BOOST_FOREACH(const DataSourceLinks::value_type& l, _dataSourceLinks)
 			{
-				shared_ptr<ParametersMap> dsPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> dsPM(new ParametersMap);
 				dsPM->insert(ATTR_DATA_SOURCE_ID, l.first->getKey());
 				dsPM->insert(ATTR_DATA_SOURCE_NAME, l.first->getName());
 				dsPM->insert(ATTR_ID, l.second);

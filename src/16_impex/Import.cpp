@@ -80,7 +80,7 @@ namespace synthese
 			const ImportLogger& importLogger
 		) const {
 
-			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
+			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 			return fileFormat->getImporter(env, *this, importLogger);
 		}
 
@@ -93,7 +93,7 @@ namespace synthese
 				return false;
 			}
 
-			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
+			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 			return fileFormat->canImport();
 		}
 
@@ -138,7 +138,7 @@ namespace synthese
 		{
 			if(!_autoImporter.get())
 			{
-				shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
+				boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 				_autoImporterEnv.reset(new Env);
 				ImportLogger importLogger(
 					get<MinLogLevel>(),

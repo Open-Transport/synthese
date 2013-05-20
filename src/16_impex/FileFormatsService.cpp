@@ -66,9 +66,9 @@ namespace synthese
 		) const {
 			ParametersMap map;
 			
-			BOOST_FOREACH(shared_ptr<FileFormat> format, Factory<FileFormat>::GetNewCollection())
+			BOOST_FOREACH(boost::shared_ptr<FileFormat> format, Factory<FileFormat>::GetNewCollection())
 			{
-				shared_ptr<ParametersMap> formatPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> formatPM(new ParametersMap);
 				format->toParametersMap(*formatPM);
 				map.insert(TAG_FORMAT, formatPM);
 			}

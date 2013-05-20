@@ -83,7 +83,7 @@ namespace synthese
 
 			if(_importFilter.get())
 			{
-				shared_ptr<ParametersMap> importPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> importPM(new ParametersMap);
 				_importFilter->toParametersMap(*importPM, true);
 				map.insert(TAG_IMPORT, importPM);
 			}
@@ -91,7 +91,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Registry<Import>::value_type& it, Env::GetOfficialEnv().getRegistry<Import>())
 				{
-					shared_ptr<ParametersMap> importPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> importPM(new ParametersMap);
 					it.second->toParametersMap(*importPM, true);
 					map.insert(TAG_IMPORT, importPM);
 				}
