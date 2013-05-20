@@ -105,7 +105,7 @@ namespace synthese
 					_page.reset(
 						Factory<AdminInterfaceElement>::create(pageKey)
 					);
-					_page->setEnv(shared_ptr<Env>(new Env));
+					_page->setEnv(boost::shared_ptr<Env>(new Env));
 					_page->setFromParametersMap(map);
 					_page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
 				}
@@ -184,7 +184,7 @@ namespace synthese
 					);
 					pm.insert(DATA_CONTENT, contentStream.str());
 
-					BOOST_FOREACH(const shared_ptr<ModuleClass>& module, Factory<ModuleClass>::GetNewCollection())
+					BOOST_FOREACH(const boost::shared_ptr<ModuleClass>& module, Factory<ModuleClass>::GetNewCollection())
 					{
 						module->addAdminPageParameters(pm, request);
 					}
@@ -210,14 +210,14 @@ namespace synthese
 						StaticFunctionRequest<AdminPageDisplayService> r(request, true);
 
 						// Modules list
-						vector<shared_ptr<ModuleClass> > modules(
+						vector<boost::shared_ptr<ModuleClass> > modules(
 							Factory<ModuleClass>::GetNewCollection()
 						);
 						HTMLList l;
 						p << l.open();
-						for(vector<shared_ptr<ModuleClass> >::const_reverse_iterator it(modules.rbegin()); it != modules.rend(); ++it)
+						for(vector<boost::shared_ptr<ModuleClass> >::const_reverse_iterator it(modules.rbegin()); it != modules.rend(); ++it)
 						{
-							shared_ptr<ModuleAdmin> link(new ModuleAdmin);
+							boost::shared_ptr<ModuleAdmin> link(new ModuleAdmin);
 							link->setModuleClass(*it);
 							if (!link->getSubPages(*link, request).empty())
 							{
@@ -275,13 +275,13 @@ namespace synthese
 
 
 
-		shared_ptr<ParametersMap> AdminPageDisplayService::_getPositionNode(
+		boost::shared_ptr<ParametersMap> AdminPageDisplayService::_getPositionNode(
 			boost::shared_ptr<const AdminInterfaceElement> link,
 			size_t depth,
 			bool isLast
 		) const {
 
-			shared_ptr<ParametersMap> pm(new ParametersMap);
+			boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 
 			// title, icon, url
 			link->toParametersMap(*pm);
@@ -305,7 +305,7 @@ namespace synthese
 			bool isLast
 		) const {
 
-			shared_ptr<ParametersMap> nodePM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> nodePM(new ParametersMap);
 
 			// icon, title, url
 			tree.page->toParametersMap(*nodePM);

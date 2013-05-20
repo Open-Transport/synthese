@@ -65,7 +65,7 @@ namespace synthese
 			// Module class
 			try
 			{
-				setModuleClass(shared_ptr<ModuleClass>(
+				setModuleClass(boost::shared_ptr<ModuleClass>(
 						Factory<ModuleClass>::create(map.get<string>(PARAMETER_MODULE))
 				)	);
 			}
@@ -125,13 +125,13 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement>& page, pages)
+			BOOST_FOREACH(const boost::shared_ptr<AdminInterfaceElement>& page, pages)
 			{
 				page->setEnv(_env);
 				PageLinks l(
 					page->getSubPagesOfModule(*_moduleClass, currentPage, request)
 				);
-				BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& link, l)
+				BOOST_FOREACH(const boost::shared_ptr<const AdminInterfaceElement>& link, l)
 				{
 					links.push_back(link);
 				}
