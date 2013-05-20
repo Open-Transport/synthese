@@ -933,7 +933,9 @@ namespace synthese
 							second_clock::local_time(),
 							second_clock::local_time()
 						);
-						*linePM = f.run(stream, request);
+						linePM->merge(
+							f.run(stream, request)
+						);
 					}
 
 					pm.insert(DATA_LINE, linePM);
