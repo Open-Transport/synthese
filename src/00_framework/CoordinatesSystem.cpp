@@ -57,7 +57,7 @@ namespace synthese
 
 	boost::shared_ptr<geos::geom::Geometry> CoordinatesSystem::convertGeometry( const geos::geom::Geometry& source ) const
 	{
-		shared_ptr<geos::geom::Geometry> result(_geometryFactory.createGeometry(&source));
+		boost::shared_ptr<geos::geom::Geometry> result(_geometryFactory.createGeometry(&source));
 
 		CoordinatesSystem::ConversionFilter filter(
 			GetCoordinatesSystem(source.getSRID()),
@@ -93,7 +93,7 @@ namespace synthese
 
 	void CoordinatesSystem::AddCoordinatesSystem( SRID srid, const std::string& name, const std::string& projSequence )
 	{
-		_CoordinatesSystems.insert(make_pair(srid, new CoordinatesSystem(srid, name, projSequence)));
+		_CoordinatesSystems.insert(make_pair(srid, boost::shared_ptr<CoordinatesSystem>(new CoordinatesSystem(srid, name, projSequence))));
 	}
 
 
@@ -118,7 +118,7 @@ namespace synthese
 	boost::shared_ptr<geos::geom::Point> CoordinatesSystem::createPoint( double x, double y ) const
 	{
 		Coordinate c(x,y);
-		return shared_ptr<Point>(_geometryFactory.createPoint(c));
+		return boost::shared_ptr<Point>(_geometryFactory.createPoint(c));
 	}
 
 

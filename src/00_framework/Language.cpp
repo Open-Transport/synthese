@@ -89,9 +89,9 @@ namespace synthese
 
 	void Language::Populate()
 	{
-		shared_ptr<Language> english(AddLanguage(string("en"), "eng", "english"));
-		shared_ptr<Language> french(AddLanguage(string("fr"), "fre", "français"));
-		shared_ptr<Language> german(AddLanguage(string("de"), "ger", "deutsch"));
+		boost::shared_ptr<Language> english(AddLanguage(string("en"), "eng", "english"));
+		boost::shared_ptr<Language> french(AddLanguage(string("fr"), "fre", "français"));
+		boost::shared_ptr<Language> german(AddLanguage(string("de"), "ger", "deutsch"));
 
 		english->addName(*french, "anglais");
 		english->addName(*german, "englisch");
@@ -146,7 +146,7 @@ namespace synthese
 		const std::string& iso639_2Code,
 		const std::string& name
 	){
-		shared_ptr<Language> lang(new Language);
+		boost::shared_ptr<Language> lang(new Language);
 		lang->_iso639_1Code = iso639_1Code;
 		lang->_iso639_2Code = iso639_2Code;
 		lang->_names.insert(make_pair(lang.get(), name));
