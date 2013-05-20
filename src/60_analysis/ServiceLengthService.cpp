@@ -158,7 +158,7 @@ namespace synthese
 					bool isArea(!dynamic_cast<DesignatedLinePhysicalStop*>(edge));
 					bool isDeparture(edge->isDeparture());
 					bool isArrival(edge->isArrival());
-					BOOST_FOREACH(const shared_ptr<Reservation>& resa, resas)
+					BOOST_FOREACH(const boost::shared_ptr<Reservation>& resa, resas)
 					{
 						if(isDeparture)
 						{
