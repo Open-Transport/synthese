@@ -168,9 +168,9 @@ namespace synthese
 						stream << "<h1>Définition des tranches</h1>";
 
 						AjaxVectorFieldEditor::Fields fields;
-						fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Seuil bas tranche (km)")));
-						fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Seuil haut tranche (km)")));
-						fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Prix par km")));
+						fields.push_back(boost::shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Seuil bas tranche (km)")));
+						fields.push_back(boost::shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Seuil haut tranche (km)")));
+						fields.push_back(boost::shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Prix par km")));
 
 						// Creation of the editor
 						AjaxVectorFieldEditor editor(
