@@ -82,10 +82,10 @@ namespace synthese
 
 
 
-		shared_ptr<ofstream> AlgorithmLogger::_openNewFile() const
+		boost::shared_ptr<ofstream> AlgorithmLogger::_openNewFile() const
 		{
 			++_fileNumber;
-			shared_ptr<ofstream> result(
+			boost::shared_ptr<ofstream> result(
 				new ofstream(
 					_getCurrentFilePath().file_string().c_str()
 			)	);
@@ -322,7 +322,7 @@ namespace synthese
 
 
 		void AlgorithmLogger::recordJourneyPlannerLogIntegralSearch(
-			shared_ptr<const RoutePlanningIntermediateJourney> journey,
+			boost::shared_ptr<const RoutePlanningIntermediateJourney> journey,
 			const ptime& bestDateTime,
 			const JourneysResult& todo
 		) const {
@@ -506,7 +506,7 @@ namespace synthese
 			size_t cleaneds(0);
 			size_t added(0);
 			size_t updated(0);
-			BOOST_FOREACH(const shared_ptr<RoutePlanningIntermediateJourney>& journey, _todoBeforeClean)
+			BOOST_FOREACH(const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey, _todoBeforeClean)
 			{
 				const Vertex* vertex(journey->getEndEdge().getFromVertex());
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.row();
