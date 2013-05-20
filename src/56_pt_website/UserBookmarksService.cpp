@@ -107,7 +107,7 @@ namespace synthese
 			UserFavoriteJourneyTableSync::SearchResult favorites(
 				UserFavoriteJourneyTableSync::Search(*_env, _user.get())
 			);
-			BOOST_FOREACH(const shared_ptr<UserFavoriteJourney>& fav, favorites)
+			BOOST_FOREACH(const boost::shared_ptr<UserFavoriteJourney>& fav, favorites)
 			{
 				ParametersMap pm(getTemplateParameters());
 

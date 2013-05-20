@@ -300,7 +300,7 @@ namespace synthese
 						{
 							stream << " id=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getKey() << "\"";
 						}
-						shared_ptr<Point> placePoint;
+						boost::shared_ptr<Point> placePoint;
 						double x = 0.0;
 						double y = 0.0;
 						if(it.placeResult.value.get()->getPoint().get())
@@ -336,7 +336,7 @@ namespace synthese
 				if(_page.get() || _itemPage.get() || !_outputFormat.empty())
 				{
 					size_t c(0);
-					BOOST_FOREACH(const LexicalMatcher<shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
+					BOOST_FOREACH(const LexicalMatcher<boost::shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
 					{
 						placesList.push_back(
 							make_pair(
@@ -356,7 +356,7 @@ namespace synthese
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 						"<options xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
 						;
-					BOOST_FOREACH(const LexicalMatcher<shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
+					BOOST_FOREACH(const LexicalMatcher<boost::shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
 					{
 						stream << "<option type=\"";
 						if(	dynamic_cast<StopArea*>(it.second.get()) ||
@@ -423,7 +423,7 @@ namespace synthese
 				size_t i(0);
 				BOOST_FOREACH(const PlacesList::value_type& it, placesList)
 				{
-					shared_ptr<ParametersMap> placePm(new ParametersMap());
+					boost::shared_ptr<ParametersMap> placePm(new ParametersMap());
 
 					placePm->insert(DATA_RANK, i);
 					placePm->insert(DATA_NAME, it.second);

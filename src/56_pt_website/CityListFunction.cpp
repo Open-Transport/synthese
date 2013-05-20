@@ -172,7 +172,7 @@ namespace synthese
 					matcher.bestMatches(_input, (_atLeastAStop || !_n) ? 0 : *_n)
 				);
 				size_t nbmatches(0);
-				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
+				BOOST_FOREACH(LexicalMatcher<boost::shared_ptr<City> >::MatchHit it, matches)
 				{
 					if(_atLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
 					{
@@ -196,7 +196,7 @@ namespace synthese
 						"<options xsi:noNamespaceSchemaLocation=\"https://extranet.rcsmobility.com/projects/synthese/repository/raw/doc/include/56_transport_website/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
 					;
 					size_t nbmatches(0);
-					BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
+					BOOST_FOREACH(LexicalMatcher<boost::shared_ptr<City> >::MatchHit it, matches)
 					{
 						if(_atLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
 						{
@@ -218,7 +218,7 @@ namespace synthese
 			else
 			{
 				size_t c(0);
-				BOOST_FOREACH(const LexicalMatcher<shared_ptr<City> >::Map::value_type& it, matcher.entries())
+				BOOST_FOREACH(const LexicalMatcher<boost::shared_ptr<City> >::Map::value_type& it, matcher.entries())
 				{
 					if(_atLeastAStop && it.second->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
 					{
@@ -236,7 +236,7 @@ namespace synthese
 			size_t i(0);
 			BOOST_FOREACH(const GeographyModule::CityList::value_type& it, citiesList)
 			{
-				shared_ptr<ParametersMap> cityPm(new ParametersMap(getTemplateParameters()));
+				boost::shared_ptr<ParametersMap> cityPm(new ParametersMap(getTemplateParameters()));
 
 				it->toParametersMap(*cityPm, _coordinatesSystem);
 				cityPm->insert(DATA_RANK, i++);

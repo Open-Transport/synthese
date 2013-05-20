@@ -108,7 +108,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<PTServiceConfig> site(
+					boost::shared_ptr<PTServiceConfig> site(
 						PTServiceConfigTableSync::GetEditable(
 							rows->getLongLong(RollingStockFilterTableSync::COL_SITE_ID),
 							environment,
