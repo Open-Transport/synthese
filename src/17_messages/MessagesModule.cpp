@@ -113,7 +113,7 @@ namespace synthese
 			ScenarioTableSync::SearchResult templates(
 				ScenarioTableSync::SearchTemplates(env, folderId)
 			);
-			BOOST_FOREACH(const shared_ptr<Scenario>& st, templates)
+			BOOST_FOREACH(const boost::shared_ptr<Scenario>& st, templates)
 			{
 				m.push_back(make_pair(st->getKey(), prefix + st->getName()));
 			}
@@ -123,7 +123,7 @@ namespace synthese
 				ScenarioFolderTableSync::SearchResult folders(
 					ScenarioFolderTableSync::Search(env, *folderId)
 				);
-				BOOST_FOREACH(const shared_ptr<ScenarioFolder>& folder, folders)
+				BOOST_FOREACH(const boost::shared_ptr<ScenarioFolder>& folder, folders)
 				{
 					Labels r(GetScenarioTemplatesLabels(string(), string(), folder->getKey(), prefix + folder->getName() +"/"));
 					m.insert(m.end(),r.begin(), r.end());
@@ -147,7 +147,7 @@ namespace synthese
 			ScenarioFolderTableSync::SearchResult folders(
 				ScenarioFolderTableSync::Search(env, folderId)
 			);
-			BOOST_FOREACH(const shared_ptr<ScenarioFolder>& folder, folders)
+			BOOST_FOREACH(const boost::shared_ptr<ScenarioFolder>& folder, folders)
 			{
 				if (forbiddenFolderId && folder->getKey() == *forbiddenFolderId)
 					continue;
@@ -201,7 +201,7 @@ namespace synthese
 			TextTemplateTableSync::SearchResult templates(
 				TextTemplateTableSync::Search(env, level)
 			);
-			BOOST_FOREACH(const shared_ptr<TextTemplate>& text, templates)
+			BOOST_FOREACH(const boost::shared_ptr<TextTemplate>& text, templates)
 			{
 				m.push_back(make_pair(text->getKey(), text->getName()));
 			}

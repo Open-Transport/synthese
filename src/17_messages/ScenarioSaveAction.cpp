@@ -209,7 +209,7 @@ namespace synthese
 						}
 						else
 						{	// New template
-							shared_ptr<ScenarioFolder> folder;
+							boost::shared_ptr<ScenarioFolder> folder;
 							if(map.isDefined(PARAMETER_FOLDER_ID))
 							{
 								try
@@ -319,7 +319,7 @@ namespace synthese
 
 						// Recipient type
 						_recipientType = map.get<string>(PARAMETER_RECIPIENT_TYPE);
-						shared_ptr<AlarmRecipient> recipientType(Factory<AlarmRecipient>::create(_recipientType));
+						boost::shared_ptr<AlarmRecipient> recipientType(Factory<AlarmRecipient>::create(_recipientType));
 
 						vector<string> recipients;
 						string recipientStr(map.get<string>(PARAMETER_RECIPIENT_ID));
@@ -492,7 +492,7 @@ namespace synthese
 						RegistryKeyType folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
 						if (folderId == 0)
 						{
-							_folder = shared_ptr<ScenarioFolder>();
+							_folder = boost::shared_ptr<ScenarioFolder>();
 						}
 						else
 						{
@@ -722,7 +722,7 @@ namespace synthese
 							}
 							else
 							{
-								shared_ptr<MessageApplicationPeriod> newMap(new MessageApplicationPeriod);
+								boost::shared_ptr<MessageApplicationPeriod> newMap(new MessageApplicationPeriod);
 								newMap->set<ScenarioPointer>(*_scenario);
 								newMap->set<Key>(MessageApplicationPeriodTableSync::getId());
 								_env->add(newMap);
@@ -978,7 +978,7 @@ namespace synthese
 			}
 			if(_messageToCreate && _level && _sscenario.get())
 			{
-				shared_ptr<SentAlarm> message;
+				boost::shared_ptr<SentAlarm> message;
 
 				AlarmTableSync::SearchResult msgs(
 					AlarmTableSync::Search(
@@ -1112,7 +1112,7 @@ namespace synthese
 				BOOST_FOREACH(const Messages::value_type& msg, _messages)
 				{
 					Env env;
-					shared_ptr<Alarm> alarm;
+					boost::shared_ptr<Alarm> alarm;
 
 					if(_sscenario.get())
 					{
@@ -1148,7 +1148,7 @@ namespace synthese
 					set<RegistryKeyType> toRemove;
 					typedef map<Message::Recipients::value_type, RegistryKeyType> AOLMap;
 					AOLMap m;
-					BOOST_FOREACH(const shared_ptr<AlarmObjectLink>& item, v)
+					BOOST_FOREACH(const boost::shared_ptr<AlarmObjectLink>& item, v)
 					{
 						toRemove.insert(item->getKey());
 						m.insert(
@@ -1193,7 +1193,7 @@ namespace synthese
 					// Alternatives
 					BOOST_FOREACH(const Message::Alternatives::value_type& it, msg.alternatives)
 					{
-						shared_ptr<MessageAlternative> alternative;
+						boost::shared_ptr<MessageAlternative> alternative;
 						bool toSave(false);
 						MessageAlternativeTableSync::SearchResult vec(
 							MessageAlternativeTableSync::Search(env, alarm->getKey(), it.first->getKey())

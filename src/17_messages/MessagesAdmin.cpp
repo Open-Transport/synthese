@@ -144,8 +144,8 @@ namespace synthese
 			SearchFormHTMLTable s(searchRequest.getHTMLForm());
 			stream << s.open();
 
-			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
+			vector<boost::shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
+			BOOST_FOREACH(const boost::shared_ptr<AlarmRecipient> recipient, recipients)
 			{
 				AlarmRecipientSearchFieldsMap m(recipient->getSearchFields(s.getForm(), _parametersMap));
 				for (AlarmRecipientSearchFieldsMap::iterator itm = m.begin(); itm != m.end(); ++itm)
@@ -213,7 +213,7 @@ namespace synthese
 
 			stream << t1.open();
 
-			BOOST_FOREACH(const shared_ptr<Scenario>& it, scenarios)
+			BOOST_FOREACH(const boost::shared_ptr<Scenario>& it, scenarios)
 			{
 				const SentScenario& message(static_cast<SentScenario&>(*it));
 				bool isDisplayedWithEndDate(
@@ -389,7 +389,7 @@ namespace synthese
 				(ma &&
 				 dynamic_cast<const SentAlarm*>(ma->getAlarm().get()))
 			){
-				shared_ptr<MessagesScenarioAdmin> p(
+				boost::shared_ptr<MessagesScenarioAdmin> p(
 					getNewPage<MessagesScenarioAdmin>()
 				);
 				p->setScenario(

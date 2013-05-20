@@ -117,12 +117,12 @@ namespace synthese
 
 
 		template<>
-		shared_ptr<Scenario> InheritanceLoadSavePolicy<ScenarioTableSync, Scenario>::GetNewObject(
+		boost::shared_ptr<Scenario> InheritanceLoadSavePolicy<ScenarioTableSync, Scenario>::GetNewObject(
 			const DBResultSPtr& row
 		){
 			return row->getBool(ScenarioTableSync::COL_IS_TEMPLATE)
-				? shared_ptr<Scenario>(new ScenarioTemplate(row->getKey()))
-				: shared_ptr<Scenario>(new SentScenario(row->getKey()))
+				? boost::shared_ptr<Scenario>(new ScenarioTemplate(row->getKey()))
+				: boost::shared_ptr<Scenario>(new SentScenario(row->getKey()))
 			;
 		}
 
@@ -364,7 +364,7 @@ namespace synthese
 			RegistryKeyType object_id
 		){
 			Env env;
-			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(object_id, env));
+			boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(object_id, env));
 			if(dynamic_cast<const ScenarioTemplate*>(scenario.get()))
 			{
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
@@ -385,7 +385,7 @@ namespace synthese
 			AlarmTableSync::SearchResult alarms(
 				AlarmTableSync::Search(env, id)
 			);
-			BOOST_FOREACH(const shared_ptr<Alarm>& alarm, alarms)
+			BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, alarms)
 			{
 				AlarmTableSync::Remove(NULL, alarm->getKey(), transaction, false);
 			}
@@ -406,7 +406,7 @@ namespace synthese
 			RegistryKeyType id
 		){
 			Env env;
-			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env));
+			boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env));
 			if(dynamic_cast<const ScenarioTemplate*>(scenario.get()))
 			{
 				MessagesLibraryLog::addDeleteEntry(dynamic_cast<const ScenarioTemplate*>(scenario.get()), session->getUser().get());
@@ -427,7 +427,7 @@ namespace synthese
 			AlarmTableSync::SearchResult alarms(
 				AlarmTableSync::Search(env, scenarioId, 0, optional<size_t>(), false, false, FIELDS_ONLY_LOAD_LEVEL)
 			);
-			BOOST_FOREACH(const shared_ptr<const Alarm>& alarm, alarms)
+			BOOST_FOREACH(const boost::shared_ptr<const Alarm>& alarm, alarms)
 			{
 				ScenarioTemplate::GetVariablesInformations(alarm->getShortMessage(), result);
 				ScenarioTemplate::GetVariablesInformations(alarm->getLongMessage(), result);
@@ -454,10 +454,10 @@ namespace synthese
 			);
 
 			// Copy of each message
-			BOOST_FOREACH(const shared_ptr<Alarm>& templateAlarm, alarms)
+			BOOST_FOREACH(const boost::shared_ptr<Alarm>& templateAlarm, alarms)
 			{
 				// Message creation
-				shared_ptr<Alarm> alarm;
+				boost::shared_ptr<Alarm> alarm;
 				if(dynamic_cast<const SentScenario*>(&dest))
 				{
 					alarm.reset(
@@ -503,7 +503,7 @@ namespace synthese
 
 			const SentScenario::VariablesMap& values(scenario.getVariables());
 
-			BOOST_FOREACH(const shared_ptr<Alarm>& alarm, alarms)
+			BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, alarms)
 			{
 				SentAlarm& sentAlarm(static_cast<SentAlarm&>(*alarm));
 

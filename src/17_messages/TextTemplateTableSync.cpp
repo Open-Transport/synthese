@@ -152,7 +152,7 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 			Env env;
-			shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env));
+			boost::shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env));
 			MessagesLibraryLog::AddTemplateDeleteEntry(*text, session->getUser().get());
 		}
 	}

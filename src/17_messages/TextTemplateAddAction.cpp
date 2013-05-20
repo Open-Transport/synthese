@@ -74,7 +74,7 @@ namespace synthese
 			_parentId = map.get<RegistryKeyType>(PARAMETER_PARENT_ID);
 			if (_parentId > 0)
 			{
-				shared_ptr<const TextTemplate> parent;
+				boost::shared_ptr<const TextTemplate> parent;
 				try
 				{
 					parent = TextTemplateTableSync::Get(_parentId, *_env);

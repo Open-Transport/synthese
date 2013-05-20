@@ -105,7 +105,7 @@ namespace synthese
 			// Single broadcast point export
 			if(_bp)
 			{
-				shared_ptr<ParametersMap> bpPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> bpPM(new ParametersMap);
 				_bp->toParametersMap(*bpPM, true);
 				map.insert(TAG_BROADCAST_POINT, bpPM);
 			}
@@ -153,14 +153,14 @@ namespace synthese
 
 			// Loop on broadcast points
 			BOOST_FOREACH(
-				shared_ptr<CustomBroadcastPoint> bp,
+				boost::shared_ptr<CustomBroadcastPoint> bp,
 				CustomBroadcastPointTableSync::Search(
 					Env::GetOfficialEnv(),
 					string(),
 					parent ? parent->getKey() : RegistryKeyType(0)
 				)
 			){
-				shared_ptr<ParametersMap> bpPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> bpPM(new ParametersMap);
 				bp->toParametersMap(*bpPM, true);
 				pm.insert(TAG_BROADCAST_POINT, bpPM);
 

@@ -210,7 +210,7 @@ namespace synthese
 					}
 					bestPriority = message->getLevel();
 
-					shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 					message->toParametersMap(*messagePM, true);
 					pm.insert(DATA_MESSAGE, messagePM);
 
@@ -234,7 +234,7 @@ namespace synthese
 					{
 						continue;
 					}
-					shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 					message->toParametersMap(*messagePM, true);
 					pm.insert(DATA_MESSAGE, messagePM);
 					++number;

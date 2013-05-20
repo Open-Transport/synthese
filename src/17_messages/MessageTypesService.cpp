@@ -125,7 +125,7 @@ namespace synthese
 
 			if(_messageType)
 			{
-				shared_ptr<ParametersMap> typePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> typePM(new ParametersMap);
 				_messageType->toParametersMap(*typePM);
 				pm.insert(TAG_TYPE, typePM);
 			}
@@ -157,7 +157,7 @@ namespace synthese
 				// Loop on selected message types
 				BOOST_FOREACH(MessageType* messageType, messageTypes)
 				{
-					shared_ptr<ParametersMap> typePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> typePM(new ParametersMap);
 					messageType->toParametersMap(*typePM);
 					pm.insert(TAG_TYPE, typePM);
 				}
@@ -166,7 +166,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const MessageType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessageType>())
 				{
-					shared_ptr<ParametersMap> typePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> typePM(new ParametersMap);
 					it.second->toParametersMap(*typePM);
 					pm.insert(TAG_TYPE, typePM);
 				}
