@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace interfaces
 	{
-		shared_ptr<LibraryInterfaceElement> LibraryInterfaceElement::create( const std::string & text, const InterfacePage* page )
+		boost::shared_ptr<LibraryInterfaceElement> LibraryInterfaceElement::create( const std::string & text, const InterfacePage* page )
 		{
 			// Trim the left spaces
 			size_t start_pos;
@@ -49,13 +49,13 @@ namespace synthese
 
 			// Empty line : return null
 			if (start_pos >= text.size())
-				return shared_ptr<LibraryInterfaceElement>();
+				return boost::shared_ptr<LibraryInterfaceElement>();
 
 			// Search for the end of the keyword
 			size_t word_end_pos = start_pos;
 			for (; word_end_pos < text.size() && text[word_end_pos] != ' '; ++word_end_pos) ;
 
-			shared_ptr<LibraryInterfaceElement> lie;
+			boost::shared_ptr<LibraryInterfaceElement> lie;
 			try
 			{
 				lie.reset(Factory<LibraryInterfaceElement>::create(text.substr(start_pos, word_end_pos - start_pos)));

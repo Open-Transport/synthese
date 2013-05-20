@@ -47,7 +47,7 @@ namespace synthese
 		{
 			if (vel.size() != 1)
 				throw InterfacePageException("Malformed line label declaration");
-			shared_ptr<LibraryInterfaceElement> vie = vel.front();
+			boost::shared_ptr<LibraryInterfaceElement> vie = vel.front();
             if (!dynamic_pointer_cast<StaticValueInterfaceElement, LibraryInterfaceElement>(vie).get())
 				throw InterfacePageException("JourneyPattern label must be statically defined");
 			ParametersVector pv;

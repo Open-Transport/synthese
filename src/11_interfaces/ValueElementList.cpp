@@ -65,16 +65,16 @@ namespace synthese
 			return pv;
 		}
 
-		shared_ptr<LibraryInterfaceElement> ValueElementList::front()
+		boost::shared_ptr<LibraryInterfaceElement> ValueElementList::front()
 		{
 			if (_elements.size() > 0)
 			{
-				shared_ptr<LibraryInterfaceElement> vie(_elements.front());
+				boost::shared_ptr<LibraryInterfaceElement> vie(_elements.front());
 				_elements.pop_front();
 				return vie;
 			}
 			else
-				return shared_ptr<LibraryInterfaceElement>();
+				return boost::shared_ptr<LibraryInterfaceElement>();
 		}
 
 		size_t ValueElementList::size() const
@@ -143,7 +143,7 @@ namespace synthese
 			// Registering each word as ValueInterfaceElement
 			for (vector<string>::const_iterator it = elements.begin(); it != elements.end(); ++it)
 			{
-				shared_ptr<LibraryInterfaceElement> vie;
+				boost::shared_ptr<LibraryInterfaceElement> vie;
 				const std::string& str = *it;
 
 				// Case 1 : Parameter

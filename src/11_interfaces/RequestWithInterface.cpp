@@ -85,7 +85,7 @@ namespace synthese
 			}
 		}
 
-		shared_ptr<const Interface> RequestWithInterface::getInterface() const
+		boost::shared_ptr<const Interface> RequestWithInterface::getInterface() const
 		{
 			return _interface;
 		}

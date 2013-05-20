@@ -189,7 +189,7 @@ namespace synthese
 			SearchResult interfaces(
 				Search(env, pageFilter)
 			);
-			BOOST_FOREACH(const shared_ptr<Interface>& interf, interfaces)
+			BOOST_FOREACH(const boost::shared_ptr<Interface>& interf, interfaces)
 			{
 				m.push_back(make_pair(interf->getKey(), interf->getName()));
 			}
