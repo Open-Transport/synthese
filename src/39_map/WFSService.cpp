@@ -98,7 +98,7 @@ namespace synthese
 			// Type name
 			stringstream typeName;
 			bool first(true);
-			BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
+			BOOST_FOREACH(const boost::shared_ptr<WFSType>& type, _types)
 			{
 				if(first)
 				{
@@ -115,17 +115,17 @@ namespace synthese
 			// BBox
 			if(_envelope && _srs)
 			{
-				shared_ptr<Point> minPoint(
+				boost::shared_ptr<Point> minPoint(
 					CoordinatesSystem::GetStorageCoordinatesSystem().createPoint(_envelope->getMinX(), _envelope->getMinY())
 				);
-				shared_ptr<Point> maxPoint(
+				boost::shared_ptr<Point> maxPoint(
 					CoordinatesSystem::GetStorageCoordinatesSystem().createPoint(_envelope->getMaxX(), _envelope->getMaxY())
 				);
 
-				shared_ptr<Point> convMinPoint(
+				boost::shared_ptr<Point> convMinPoint(
 					_srs->convertPoint(*minPoint)
 				);
-				shared_ptr<Point> convMaxPoint(
+				boost::shared_ptr<Point> convMaxPoint(
 					_srs->convertPoint(*maxPoint)
 				);
 
@@ -207,7 +207,7 @@ namespace synthese
 				{
 					throw RequestException("Type "+ typeName +" does not exists.");
 				}
-				_types.push_back(shared_ptr<WFSType>(Factory<WFSType>::create(typeName)));
+				_types.push_back(boost::shared_ptr<WFSType>(Factory<WFSType>::create(typeName)));
 			}
 
 			// BBox
@@ -223,23 +223,23 @@ namespace synthese
 
 				try
 				{
-					shared_ptr<Point> minPoint(
+					boost::shared_ptr<Point> minPoint(
 						_srs->getGeometryFactory().createPoint(
 							Coordinate(
 								lexical_cast<double>(bboxVector[0]),
 								lexical_cast<double>(bboxVector[1])
 					)	)	);
-					shared_ptr<Point> maxPoint(
+					boost::shared_ptr<Point> maxPoint(
 						_srs->getGeometryFactory().createPoint(
 							Coordinate(
 								lexical_cast<double>(bboxVector[2]),
 								lexical_cast<double>(bboxVector[3])
 					)	)	);
 
-					shared_ptr<Point> wgsMinPoint(
+					boost::shared_ptr<Point> wgsMinPoint(
 						CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*minPoint)
 					);
-					shared_ptr<Point> wgsMaxPoint(
+					boost::shared_ptr<Point> wgsMaxPoint(
 						CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*maxPoint)
 					);
 
@@ -278,7 +278,7 @@ namespace synthese
 						"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " <<
 						"xsi:schemaLocation=\"https://extranet.rcsmobility.com/projects/synthese http://" << request.getHostName() << request.getClientURL() << "?" << Request::PARAMETER_SERVICE << "=" << FACTORY_KEY << "&amp;" << PARAMETER_REQUEST << "=" << VALUE_REQUEST_DescribeFeatureType << "&amp;" << PARAMETER_TYPENAME << "=";
 				bool first(true);
-				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
+				BOOST_FOREACH(const boost::shared_ptr<WFSType>& type, _types)
 				{
 					if(first)
 					{
@@ -294,7 +294,7 @@ namespace synthese
 					">";
 
 				// Features
-				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
+				BOOST_FOREACH(const boost::shared_ptr<WFSType>& type, _types)
 				{
 					if(_envelope)
 					{
@@ -321,7 +321,7 @@ namespace synthese
 					"<import namespace=\"http://www.opengis.net/gml\" schemaLocation=\"../gml/3.1.1/base/gml.xsd\" />"
 				;
 
-				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
+				BOOST_FOREACH(const boost::shared_ptr<WFSType>& type, _types)
 				{
 					type->getSchema(stream);
 				}
@@ -441,7 +441,7 @@ namespace synthese
 					// FeatureTypeList
 					"<wfs:FeatureTypeList>";
 
-				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
+				BOOST_FOREACH(const boost::shared_ptr<WFSType>& type, _types)
 				{
 					stream <<
 						"<wfs:FeatureType xmlns:synthese=\"https://extranet.rcsmobility.com/projects/synthese\">" <<
