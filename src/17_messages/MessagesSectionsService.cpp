@@ -122,7 +122,7 @@ namespace synthese
 
 		void MessagesSectionsService::_outputSection( util::ParametersMap& pm, const MessagesSection& section )
 		{
-			shared_ptr<ParametersMap> sectionMap(new ParametersMap);
+			boost::shared_ptr<ParametersMap> sectionMap(new ParametersMap);
 			section.toParametersMap(*sectionMap, true);
 			pm.insert(TAG_SECTION, sectionMap);
 		}

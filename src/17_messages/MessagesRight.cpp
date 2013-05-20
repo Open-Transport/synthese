@@ -55,8 +55,8 @@ namespace synthese
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les messages)"));
 
-			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
+			vector<boost::shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
+			BOOST_FOREACH(const boost::shared_ptr<AlarmRecipient> recipient, recipients)
 			{
 				m.push_back(make_pair(string(), "=== " + recipient->getTitle() + " ==="));
 				recipient->getParametersLabels(m);
@@ -77,8 +77,8 @@ namespace synthese
 
 			if(parts.size() == 2)
 			{
-				shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
-				shared_ptr<Right> subright(recipient->getRight(parts[1]));
+				boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
+				boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
 				return parts[0] + ":" + subright->displayParameter();
 			}
 			else
@@ -96,8 +96,8 @@ namespace synthese
 
 			if(parts.size() == 2)
 			{
-				shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
-				shared_ptr<Right> subright(recipient->getRight(parts[1]));
+				boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
+				boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
 				return subright->perimeterIncludes(perimeter, env);
 			}
 			else

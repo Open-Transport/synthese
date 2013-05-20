@@ -136,7 +136,7 @@ namespace synthese
 			SearchResult alternatives(
 				Search(lenv, sourceId)
 			);
-			BOOST_FOREACH(const shared_ptr<MessageAlternative>& alternative, alternatives)
+			BOOST_FOREACH(const boost::shared_ptr<MessageAlternative>& alternative, alternatives)
 			{
 				MessageAlternative ma;
 				ma.set<Alarm>(dest);

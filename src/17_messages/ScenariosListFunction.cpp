@@ -218,7 +218,7 @@ namespace synthese
 			if(_textSearch)
 			{
 				ScenarioTableSync::SearchResult newScenarios;
-				BOOST_FOREACH(const shared_ptr<Scenario>& scenario, scenarios)
+				BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
 				{
 					// Try in the scenario name
 					if(find_first(scenario->getName(), *_textSearch))
@@ -241,7 +241,7 @@ namespace synthese
 				scenarios = newScenarios;
 			}
 
-			BOOST_FOREACH(const shared_ptr<Scenario>& scenario, scenarios)
+			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
 			{
 				// Section filter
 				const Scenario::Sections& sections(scenario->getSections());
@@ -252,7 +252,7 @@ namespace synthese
 				}
 
 				// Export of the scenario
-				shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
 				scenario->toParametersMap(*scenarioPM);
 				pm.insert(TAG_SCENARIO, scenarioPM);
 			}

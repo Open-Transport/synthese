@@ -304,7 +304,7 @@ namespace synthese
 			// variables
 			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, getVariables())
 			{
-				shared_ptr<ParametersMap> variablePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> variablePM(new ParametersMap);
 				// code
 				variablePM->insert(DATA_CODE, variable.first);
 
@@ -320,7 +320,7 @@ namespace synthese
 			// Messages
 			BOOST_FOREACH(const Alarm* alarm, getMessages())
 			{
-				shared_ptr<ParametersMap> messagePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				alarm->toParametersMap(*messagePM, false, string(), true);
 				pm.insert(TAG_MESSAGE, messagePM);
 			}
@@ -328,7 +328,7 @@ namespace synthese
 			// Sections
 			BOOST_FOREACH(const MessagesSection* section, getSections())
 			{
-				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
 				section->toParametersMap(*sectionPM, true);
 				pm.insert(TAG_SECTION, sectionPM);
 			}

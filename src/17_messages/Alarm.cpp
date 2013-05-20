@@ -138,14 +138,14 @@ namespace synthese
 			// Message alternatives
 			BOOST_FOREACH(const MessageAlternatives::value_type& it, _messageAlternatives)
 			{
-				shared_ptr<ParametersMap> altPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> altPM(new ParametersMap);
 				it.second->toParametersMap(*altPM);
 				pm.insert(TAG_MESSAGE_ALTERNATIVE, altPM);
 			}
 
 			if(withRecipients)
 			{
-				shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> recipientsPM(new ParametersMap);
 
 				// Locks the linked objects
 				mutex::scoped_lock(_linkedObjectsMutex);
@@ -251,7 +251,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const LinkedObjects::mapped_type::value_type& it, ar.second)
 				{
-					shared_ptr<ParametersMap> arPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> arPM(new ParametersMap);
 					arPM->insert(TABLE_COL_ID, it->getObjectId());
 					arPM->insert(ATTR_LINK_ID, it->getKey());
 					arPM->insert(ATTR_LINK_PARAMETER, it->getParameter());

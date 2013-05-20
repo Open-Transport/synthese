@@ -157,12 +157,12 @@ namespace synthese
 		}
 
 		void AddScenarioAction::setFolder(
-			shared_ptr<ScenarioFolder> value
+			boost::shared_ptr<ScenarioFolder> value
 		){
 			_folder = value;
 		}
 		void AddScenarioAction::setFolder(
-			shared_ptr<const ScenarioFolder> value
+			boost::shared_ptr<const ScenarioFolder> value
 		){
 			_folder = const_pointer_cast<ScenarioFolder>(value);
 		}

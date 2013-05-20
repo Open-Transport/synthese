@@ -143,7 +143,7 @@ namespace synthese
 			BOOST_FOREACH(const MailingLists::value_type& it, mailingLists)
 			{
 				// New submap
-				shared_ptr<ParametersMap> mlPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> mlPM(new ParametersMap);
 
 				// Export the submap
 				it.second->toParametersMap(*mlPM, _withSubscriptions);

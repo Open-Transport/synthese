@@ -71,22 +71,22 @@ namespace synthese
 				Env env;
 				if (tableId == ScenarioTableSync::TABLE.ID)
 				{
-					shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return scenario->getName();
 				}
 				else if (tableId == AlarmTableSync::TABLE.ID)
 				{
-					shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return alarm->getShortMessage();
 				}
 				else if (tableId == TextTemplateTableSync::TABLE.ID)
 				{
-					shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return text->getName();
 				}
 				else if (tableId == ScenarioFolderTableSync::TABLE.ID)
 				{
-					shared_ptr<const ScenarioFolder> folder(ScenarioFolderTableSync::Get(id, env));
+					boost::shared_ptr<const ScenarioFolder> folder(ScenarioFolderTableSync::Get(id, env));
 					return folder->getFullName();
 				}
 			}

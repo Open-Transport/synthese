@@ -134,7 +134,7 @@ namespace synthese
 			const server::Request& _request
 		) const	{
 
-			shared_ptr<const SentScenario> _sentScenario = dynamic_pointer_cast<const SentScenario>(_scenario);
+			boost::shared_ptr<const SentScenario> _sentScenario = dynamic_pointer_cast<const SentScenario>(_scenario);
 			const ScenarioTemplate* _templateScenario = dynamic_cast<const ScenarioTemplate*>(_scenario.get());
 
 
@@ -226,7 +226,7 @@ namespace synthese
 				stream << t.open();
 
 				AdminFunctionRequest<MessageAdmin> messRequest(_request);
-				BOOST_FOREACH(const shared_ptr<Alarm>& alarm, v)
+				BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, v)
 				{
 					messRequest.getPage()->setMessage(alarm);
 					deleteRequest.getAction()->setObjectId(alarm->getKey());
@@ -328,9 +328,9 @@ namespace synthese
 					*_env,
 					_scenario->getKey()
 			)	);
-			BOOST_FOREACH(const shared_ptr<Alarm>& alarm, alarms)
+			BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, alarms)
 			{
-				shared_ptr<MessageAdmin> p(
+				boost::shared_ptr<MessageAdmin> p(
 					getNewPage<MessageAdmin>()
 				);
 				p->setMessage(alarm);
