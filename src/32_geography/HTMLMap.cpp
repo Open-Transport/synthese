@@ -167,7 +167,7 @@ namespace synthese
 					stream << "new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString(Array(";
 					for(size_t i=0; i<lineString.lineString->getNumPoints(); ++i)
 					{
-						shared_ptr<Point> wgs84Point(
+						boost::shared_ptr<Point> wgs84Point(
 							CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 								*lineString.lineString->getPointN(i)
 						)	);
@@ -214,7 +214,7 @@ namespace synthese
 					{
 						stream << ",";
 					}
-					shared_ptr<Point> wgs84Point(
+					boost::shared_ptr<Point> wgs84Point(
 						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 							*point.point
 					)	);
@@ -355,21 +355,21 @@ namespace synthese
 			;
 
 			// First initialization
-			shared_ptr<Point> firstPoint(
+			boost::shared_ptr<Point> firstPoint(
 				CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
 					_center->getX() - _horizontalDistance / 2,
 					_center->getY() - _horizontalDistance / 2
 			)	);
-			shared_ptr<Point> firstPointProjected(
+			boost::shared_ptr<Point> firstPointProjected(
 				_mapSource->getCoordinatesSystem().convertPoint(
 					*firstPoint
 			)	);
-			shared_ptr<Point> secondPoint(
+			boost::shared_ptr<Point> secondPoint(
 				CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
 					_center->getX() + _horizontalDistance / 2,
 					_center->getY() + _horizontalDistance / 2
 			)	);
-			shared_ptr<Point> secondPointProjected(
+			boost::shared_ptr<Point> secondPointProjected(
 				_mapSource->getCoordinatesSystem().convertPoint(
 					*secondPoint
 			)	);

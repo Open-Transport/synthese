@@ -144,7 +144,7 @@ namespace synthese
 			// X and Y
 			if(coordinatesSystem && getPoint().get())
 			{
-				shared_ptr<Point> center(
+				boost::shared_ptr<Point> center(
 					coordinatesSystem->convertPoint(*getPoint())
 				);
 				{
