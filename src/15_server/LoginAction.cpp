@@ -78,7 +78,7 @@ namespace synthese
 				if (_login.empty() || _password.empty())
 					throw ActionException("Champ utilisateur ou mot de passe vide");
 
-				shared_ptr<User> user = UserTableSync::getUserFromLogin(_login);
+				boost::shared_ptr<User> user = UserTableSync::getUserFromLogin(_login);
 				user->verifyPassword(_password);
 
 				// Disallow deactivated users and users without profile
@@ -87,7 +87,7 @@ namespace synthese
 					throw ActionException("Connexion impossible");
 				}
 
-				shared_ptr<Session> session(Session::New(request.getIP()));
+				boost::shared_ptr<Session> session(Session::New(request.getIP()));
 				request.setSession(session);
 				session->setUser(user);
 				session->setSessionIdCookie(request);
