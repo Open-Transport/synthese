@@ -69,7 +69,7 @@ namespace synthese
 			HTMLList l;
 			stream << l.open();
 
-			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& link, getSubPages(*this, request))
+			BOOST_FOREACH(const boost::shared_ptr<const AdminInterfaceElement>& link, getSubPages(*this, request))
 			{
 				BaseAdminFunctionRequest r(request);
 				r.setPage(const_pointer_cast<AdminInterfaceElement>(link));
@@ -117,12 +117,12 @@ namespace synthese
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
-			vector<shared_ptr<ModuleClass> > modules(
+			vector<boost::shared_ptr<ModuleClass> > modules(
 				Factory<ModuleClass>::GetNewCollection()
 			);
-			for(vector<shared_ptr<ModuleClass> >::const_reverse_iterator it(modules.rbegin()); it != modules.rend(); ++it)
+			for(vector<boost::shared_ptr<ModuleClass> >::const_reverse_iterator it(modules.rbegin()); it != modules.rend(); ++it)
 			{
-				shared_ptr<ModuleAdmin> link(
+				boost::shared_ptr<ModuleAdmin> link(
 					getNewPage<ModuleAdmin>()
 				);
 				link->setModuleClass(*it);
@@ -134,7 +134,7 @@ namespace synthese
 
 			if(request.getUser()->getProfile()->isAuthorized<SecurityRight>(UNKNOWN_RIGHT_LEVEL, READ, string()))
 			{
-				shared_ptr<UserAdmin> userPage(getNewPage<UserAdmin>());
+				boost::shared_ptr<UserAdmin> userPage(getNewPage<UserAdmin>());
 				userPage->setUserC(request.getUser());
 				links.push_back(userPage);
 			}

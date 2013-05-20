@@ -130,7 +130,7 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
-			shared_ptr<const AdminInterfaceElement> adminPage,
+			boost::shared_ptr<const AdminInterfaceElement> adminPage,
 			PageLinks position,
 			const server::Request& request
 		) const {
@@ -140,7 +140,7 @@ namespace synthese
 
 			// Recursion
 			PageLinks pages(adminPage->getSubPages(*this, request));
-			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& link, pages)
+			BOOST_FOREACH(const boost::shared_ptr<const AdminInterfaceElement>& link, pages)
 			{
 				position.push_back(link);
 				if (*link == *this)
@@ -503,7 +503,7 @@ namespace synthese
 			{
 				if(**it == page) return *(it+1);
 			}
-			return shared_ptr<const AdminInterfaceElement>();
+			return boost::shared_ptr<const AdminInterfaceElement>();
 		}
 	}
 }
