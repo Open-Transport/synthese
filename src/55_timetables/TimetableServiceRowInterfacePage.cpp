@@ -84,8 +84,8 @@ namespace synthese
 
 		void TimetableServiceRowInterfacePage::Display(
 			std::ostream& stream,
-			shared_ptr<const Webpage> page,
-			shared_ptr<const Webpage> cellPage,
+			boost::shared_ptr<const Webpage> page,
+			boost::shared_ptr<const Webpage> cellPage,
 			const server::Request& request,
 			const TimetableColumn& object,
 			const time_duration& lastSchedule,

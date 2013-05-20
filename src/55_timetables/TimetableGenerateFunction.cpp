@@ -159,7 +159,7 @@ namespace synthese
 			_warnings(new TimetableResult::Warnings),
 			_timetableRank(0)
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			setEnv(boost::shared_ptr<Env>(new Env));
 		}
 
 
@@ -263,7 +263,7 @@ namespace synthese
 			else if(map.getOptional<string>(PARAMETER_DAY))
 			{
 				date curDate(from_string(map.get<string>(PARAMETER_DAY)));
-				_calendarTemplate = shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
+				_calendarTemplate = boost::shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
 			}
 
 			_ignorePastDates = map.getOptional<bool>(PARAMETER_IGNORE_PAST_DATES);
@@ -285,11 +285,11 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<Timetable> timetable(new Timetable);
+				boost::shared_ptr<Timetable> timetable(new Timetable);
 				if(!_calendarTemplate.get())
 				{
 					date curDate(day_clock::local_day());
-					_calendarTemplate = shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
+					_calendarTemplate = boost::shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
 				}
 				if(!_calendarTemplate->isLimited())
 				{
@@ -330,7 +330,7 @@ namespace synthese
 				} // Way 4.1 : stop area timetable
 				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == StopAreaTableSync::TABLE.ID)
 				{
-					shared_ptr<const StopArea> place;
+					boost::shared_ptr<const StopArea> place;
 					try
 					{
 						place = Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
@@ -351,7 +351,7 @@ namespace synthese
 				} // Way 4.2 : physical stop timetable
 				else if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == StopPointTableSync::TABLE.ID)
 				{
-					shared_ptr<const StopPoint> stop;
+					boost::shared_ptr<const StopPoint> stop;
 					try
 					{
 						stop = Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
@@ -393,11 +393,11 @@ namespace synthese
 						// Timetable properties
 						timetable->setContentType(Timetable::CONTAINER);
 
-						shared_ptr<Timetable> tt1(new Timetable);
+						boost::shared_ptr<Timetable> tt1(new Timetable);
 						tt1->setBaseCalendar(timetable->getBaseCalendar());
 						AddLineDirectionToTimetable(*tt1, *_commercialLine, false);
 
-						shared_ptr<Timetable> tt2(new Timetable);
+						boost::shared_ptr<Timetable> tt2(new Timetable);
 						tt2->setBaseCalendar(timetable->getBaseCalendar());
 						AddLineDirectionToTimetable(*tt2, *_commercialLine, true);
 					}
@@ -568,7 +568,7 @@ namespace synthese
 			size_t rank
 		) const {
 			ParametersMap pm(getTemplateParameters());
-			shared_ptr<TimetableResult::Warnings> warnings;
+			boost::shared_ptr<TimetableResult::Warnings> warnings;
 
 			// Common parameters
 			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(object.getContentType()));
@@ -592,7 +592,7 @@ namespace synthese
 						stringstream content;
 						Env env;
 						warnings.reset(new TimetableResult::Warnings);
-						BOOST_FOREACH(const shared_ptr<Timetable>& tt, _containerContent)
+						BOOST_FOREACH(const boost::shared_ptr<Timetable>& tt, _containerContent)
 						{
 							try
 							{
@@ -613,8 +613,8 @@ namespace synthese
 								_display(
 									content,
 									pageForSubTimetable,
-									shared_ptr<const Webpage>(),
-									shared_ptr<const Webpage>(),
+									boost::shared_ptr<const Webpage>(),
+									boost::shared_ptr<const Webpage>(),
 									request,
 									*tt,
 									*g,

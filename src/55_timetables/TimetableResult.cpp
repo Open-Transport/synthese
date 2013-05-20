@@ -178,7 +178,7 @@ namespace synthese
 
 		TimetableResult::TimetableResult(
 			boost::shared_ptr<Warnings> warnings
-		):	_warnings(warnings.get() ? warnings : shared_ptr<Warnings>(new Warnings))
+		):	_warnings(warnings.get() ? warnings : boost::shared_ptr<Warnings>(new Warnings))
 		{}
 
 

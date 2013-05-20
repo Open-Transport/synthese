@@ -193,7 +193,7 @@ namespace synthese
 
 			ParametersMap pm(getTemplateParameters());
 
-			shared_ptr<TimetableResult::Warnings> warnings(new TimetableResult::Warnings);
+			boost::shared_ptr<TimetableResult::Warnings> warnings(new TimetableResult::Warnings);
 			size_t timetableRank(0);
 			BOOST_FOREACH(const Timetables::value_type& tt, _timetables)
 			{
