@@ -58,7 +58,7 @@ namespace synthese
 		) const {
 			if (request->getSession())
 			{
-				shared_ptr<const User> user(request->getUser());
+				boost::shared_ptr<const User> user(request->getUser());
 				if (user)
 					stream << user->getFullName();
 			}

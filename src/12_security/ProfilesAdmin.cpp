@@ -162,7 +162,7 @@ namespace synthese
 			stream << t.open();
 
 			// Profiles loop
-			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
+			BOOST_FOREACH(const boost::shared_ptr<Profile>& profile, profiles)
 			{
 				profileRequest.getPage()->setProfile(profile);
 				deleteProfileRequest.getAction()->setObjectId(profile->getKey());
@@ -179,7 +179,7 @@ namespace synthese
 				}
 				for(RightsVector::const_iterator it(profile->getRights().begin()); it != profile->getRights().end(); ++it)
 				{
-					shared_ptr<Right> r(it->second);
+					boost::shared_ptr<Right> r(it->second);
 					stream << l.element() << "Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getName();
 					if (r->getParameter() != GLOBAL_PERIMETER)
 						stream << "/" << r->displayParameter();
@@ -244,9 +244,9 @@ namespace synthese
 					_getEnv(),
 					0
 			)	);
-			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
+			BOOST_FOREACH(const boost::shared_ptr<Profile>& profile, profiles)
 			{
-				shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
+				boost::shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
 				p->setProfile(profile);
 				links.push_back(p);
 			}

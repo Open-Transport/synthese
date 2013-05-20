@@ -93,16 +93,16 @@ namespace synthese
 			_rights.erase(it);
 		}
 
-		shared_ptr<Right> Profile::getRight( const std::string key, const std::string parameter)
+		boost::shared_ptr<Right> Profile::getRight( const std::string key, const std::string parameter)
 		{
 			RightsVector::const_iterator it = _rights.find(make_pair(key, parameter));
-			return (it == _rights.end()) ? shared_ptr<Right>() : it->second;
+			return (it == _rights.end()) ? boost::shared_ptr<Right>() : it->second;
 		}
 
-		shared_ptr<const Right> Profile::getRight( const std::string key, const std::string parameter) const
+		boost::shared_ptr<const Right> Profile::getRight( const std::string key, const std::string parameter) const
 		{
 			RightsVector::const_iterator it = _rights.find(make_pair(key, parameter));
-			return (it == _rights.end()) ? shared_ptr<Right>() : it->second;
+			return (it == _rights.end()) ? boost::shared_ptr<Right>() : it->second;
 		}
 
 		const RightsVector& Profile::getRights() const
@@ -110,7 +110,7 @@ namespace synthese
 			return _rights;
 		}
 
-		void Profile::addRight(shared_ptr<Right> right )
+		void Profile::addRight(boost::shared_ptr<Right> right )
 		{
 			_rights.insert(make_pair(make_pair(right->getFactoryKey(), right->getParameter()), right));
 		}
@@ -123,7 +123,7 @@ namespace synthese
 			bool publicAuthorization = false;
 
 			// 1 Reading of the global right
-			shared_ptr<const Right> sright = getRight();
+			boost::shared_ptr<const Right> sright = getRight();
 			if (sright != NULL)
 			{
 				privateAuthorization = (sright->getPrivateRightLevel() >= right.getPrivateRightLevel());
