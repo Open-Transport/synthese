@@ -197,7 +197,7 @@ namespace synthese
 					}
 					if(chunk.testIfHouseNumberBelongsToChunk(houseNumber))
 					{
-						return shared_ptr<House>(
+						return boost::shared_ptr<House>(
 							new House(
 								chunk,
 								houseNumber,
@@ -329,7 +329,7 @@ namespace synthese
 
 
 			// No return
-			return shared_ptr<House>();
+			return boost::shared_ptr<House>();
 		}
 
 
@@ -355,7 +355,7 @@ namespace synthese
 			// Coordinates
 			if(coordinatesSystem && getPoint())
 			{
-				shared_ptr<Point> pg(
+				boost::shared_ptr<Point> pg(
 					coordinatesSystem->convertPoint(*getPoint())
 				);
 				{
