@@ -415,7 +415,7 @@ namespace synthese
 					{
 						stream << ",";
 					}
-					shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					boost::shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 						*(*it).second.stop->getPoint()
 					)	);
 					stream << "[ ";
