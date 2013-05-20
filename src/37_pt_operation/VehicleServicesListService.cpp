@@ -139,7 +139,7 @@ namespace synthese
 					}
 				}
 
-				shared_ptr<ParametersMap> vsMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> vsMap(new ParametersMap);
 				vs.toParametersMap(*vsMap);
 				map.insert(TAG_VEHICLE_SERVICE, vsMap);
 			}
@@ -148,7 +148,7 @@ namespace synthese
 			{
 				if(map.hasSubMaps(TAG_VEHICLE_SERVICE))
 				{
-					BOOST_FOREACH(const shared_ptr<ParametersMap>& vsMap, map.getSubMaps(TAG_VEHICLE_SERVICE))
+					BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& vsMap, map.getSubMaps(TAG_VEHICLE_SERVICE))
 					{
 						vsMap->merge(getTemplateParameters());
 						_page->display(stream, request, *vsMap);

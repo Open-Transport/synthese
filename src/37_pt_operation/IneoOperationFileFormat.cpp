@@ -645,7 +645,7 @@ namespace synthese
 	
 			// Driver services
 			BOOST_FOREACH(
-				const shared_ptr<const DriverService>& driverService,
+				const boost::shared_ptr<const DriverService>& driverService,
 				_driverServicesToRemove
 			){
 				_env.getEditableRegistry<DriverService>().remove(
@@ -655,7 +655,7 @@ namespace synthese
 
 			// Driver allocation
 			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocation>& driverAllocation,
+				const boost::shared_ptr<const DriverAllocation>& driverAllocation,
 				_driverAllocationsToRemove
 			){
 				_env.getEditableRegistry<DriverAllocation>().remove(
@@ -665,7 +665,7 @@ namespace synthese
 
 			// Driver allocation template
 			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocationTemplate>& driverAllocationTemplate,
+				const boost::shared_ptr<const DriverAllocationTemplate>& driverAllocationTemplate,
 				_driverAllocationTemplatesToRemove
 			){
 				_env.getEditableRegistry<DriverAllocationTemplate>().remove(
@@ -684,7 +684,7 @@ namespace synthese
 
 			// Driver allocations removals
 			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocation>& driverAllocation,
+				const boost::shared_ptr<const DriverAllocation>& driverAllocation,
 				_driverAllocationsToRemove
 			){
 				DBModule::GetDB()->deleteStmt(driverAllocation->getKey(), transaction);
@@ -692,7 +692,7 @@ namespace synthese
 
 			// Driver allocation templates removals
 			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocationTemplate>& driverAllocation,
+				const boost::shared_ptr<const DriverAllocationTemplate>& driverAllocation,
 				_driverAllocationTemplatesToRemove
 			){
 				DBModule::GetDB()->deleteStmt(driverAllocation->getKey(), transaction);
@@ -700,7 +700,7 @@ namespace synthese
 
 			// Driver services removals
 			BOOST_FOREACH(
-				const shared_ptr<const DriverService>& driverService,
+				const boost::shared_ptr<const DriverService>& driverService,
 				_driverServicesToRemove
 			){
 				DBModule::GetDB()->deleteStmt(driverService->getKey(), transaction);

@@ -157,7 +157,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(const shared_ptr<DriverService>& driverService, driverServices)
+			BOOST_FOREACH(const boost::shared_ptr<DriverService>& driverService, driverServices)
 			{
 				stream << t.row(lexical_cast<string>(driverService->getKey()));
 
@@ -241,7 +241,7 @@ namespace synthese
 			){
 				BOOST_FOREACH(const DriverService::Registry::value_type& service, Env::GetOfficialEnv().getRegistry<DriverService>())
 				{
-					shared_ptr<DriverServiceAdmin> p(
+					boost::shared_ptr<DriverServiceAdmin> p(
 						getNewPage<DriverServiceAdmin>()
 					);
 					p->setDriverService(service.second);

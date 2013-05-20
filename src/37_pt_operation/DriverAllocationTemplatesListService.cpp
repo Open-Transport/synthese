@@ -294,12 +294,12 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				// Output preparation
 
-				shared_ptr<ParametersMap> allocPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> allocPM(new ParametersMap);
 				alloc.toParametersMap(*allocPM);
 
 				BOOST_FOREACH(const DriverService::Vector::Type::value_type& service, alloc.get<DriverService::Vector>())
 				{
-					shared_ptr<ParametersMap> servicePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
 					service->toParametersMap(*servicePM);
 					allocPM->insert("service", servicePM);
 				}

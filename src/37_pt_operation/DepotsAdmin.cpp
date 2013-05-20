@@ -150,7 +150,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(const shared_ptr<Depot>& depot, depots)
+			BOOST_FOREACH(const boost::shared_ptr<Depot>& depot, depots)
 			{
 				// Row
 				stream << t.row(lexical_cast<string>(depot->getKey()));
