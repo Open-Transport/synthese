@@ -106,7 +106,7 @@ namespace synthese
 			// Reinitialization of the session pointer (useless in standard situation)
 			if(_session.get())
 			{
-				setSession(shared_ptr<Session>());
+				setSession(boost::shared_ptr<Session>());
 			}
 
 			// Fetching of the session id 
@@ -119,7 +119,7 @@ namespace synthese
 			try
 			{
 				// Try to open an existing session
-				shared_ptr<Session> session(Session::Get(sid, _ip, false));
+				boost::shared_ptr<Session> session(Session::Get(sid, _ip, false));
 
 				if(session.get())
 				{
@@ -146,7 +146,7 @@ namespace synthese
 					// Loading of the user from the table
 					try
 					{
-						shared_ptr<User> user = UserTableSync::getUserFromLogin(login);
+						boost::shared_ptr<User> user = UserTableSync::getUserFromLogin(login);
 						user->verifyPassword(password);
 
 						if(!user->getConnectionAllowed())
@@ -155,7 +155,7 @@ namespace synthese
 							return;
 						}
 
-						setSession(shared_ptr<Session>(Session::New(_ip, sid)));
+						setSession(boost::shared_ptr<Session>(Session::New(_ip, sid)));
 						_session->setUser(user);
 					}
 					catch(UserException&)
@@ -324,7 +324,7 @@ namespace synthese
 			_setupSession();
 			if(!_session.get() && !ServerModule::GetAutoLoginUser().empty())
 			{
-				shared_ptr<User> user = UserTableSync::getUserFromLogin(ServerModule::GetAutoLoginUser());
+				boost::shared_ptr<User> user = UserTableSync::getUserFromLogin(ServerModule::GetAutoLoginUser());
 				setSession(Session::New(_ip));
 				_session->setUser(user);
 			}

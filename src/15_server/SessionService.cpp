@@ -70,7 +70,7 @@ namespace synthese
 
 			if(	request.getSession())
 			{
-				shared_ptr<ParametersMap> sessionPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> sessionPM(new ParametersMap);
 				Session& session(*request.getSession());
 				session.toParametersMap(*sessionPM);
 				map.insert(TAG_SESSION, sessionPM);

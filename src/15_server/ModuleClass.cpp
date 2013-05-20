@@ -179,7 +179,7 @@ namespace synthese
 				currentPage.getSubPages(currentPage, request)
 			);
 			BaseAdminFunctionRequest r(request);
-			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& page, links)
+			BOOST_FOREACH(const boost::shared_ptr<const AdminInterfaceElement>& page, links)
 			{
 				r.setPage(const_pointer_cast<AdminInterfaceElement>(page));
 				stream << l.element() << HTMLModule::getHTMLImage("/admin/img/" + page->getIcon(), page->getTitle());
