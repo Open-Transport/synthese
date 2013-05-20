@@ -163,7 +163,7 @@ namespace synthese
 			try
 			{
 				Env env;
-				shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(object_id, env));
+				boost::shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(object_id, env));
 				if (cpu->getPlace())
 				{
 					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(cpu->getPlace()->getKey()));
@@ -215,7 +215,7 @@ namespace synthese
 		){
 			// Log
 			Env env;
-			shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env));
+			boost::shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env));
 			ArrivalDepartureTableLog::addRemoveEntry(*cpu, *session->getUser());
 		}
 	}

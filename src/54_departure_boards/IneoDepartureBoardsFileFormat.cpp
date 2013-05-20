@@ -112,7 +112,7 @@ namespace synthese
 					screen->setType(_defaultDisplayType.get());
 					screen->addCodeBySource(dataSource, borneRef);
 					screen->setAllPhysicalStopsDisplayed(false);
-					_env.getEditableRegistry<DisplayScreen>().add(shared_ptr<DisplayScreen>(screen));
+					_env.getEditableRegistry<DisplayScreen>().add(boost::shared_ptr<DisplayScreen>(screen));
 				}
 				else
 				{

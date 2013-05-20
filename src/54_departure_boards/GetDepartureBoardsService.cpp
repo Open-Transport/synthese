@@ -116,10 +116,10 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					_stopArea.get() ? optional<RegistryKeyType>(_stopArea->getKey()) : optional<RegistryKeyType>()
 			)	);
-			BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
+			BOOST_FOREACH(const boost::shared_ptr<DisplayScreen>& screen, screens)
 			{
 				// Declaration
-				shared_ptr<ParametersMap> pmScreen(new ParametersMap);
+				boost::shared_ptr<ParametersMap> pmScreen(new ParametersMap);
 
 				screen->toParametersMap(*pmScreen);
 

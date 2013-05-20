@@ -80,7 +80,7 @@ namespace synthese
 		AlarmTestOnDisplayScreenFunction::AlarmTestOnDisplayScreenFunction()
 			: util::FactorableTemplate<server::Function,AlarmTestOnDisplayScreenFunction>()
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			setEnv(boost::shared_ptr<Env>(new Env));
 		}
 
 		ParametersMap AlarmTestOnDisplayScreenFunction::_getParametersMap() const
@@ -153,7 +153,7 @@ namespace synthese
 			SentScenario scenario;
 			scenario.setIsEnabled(true);
 
-			shared_ptr<SentAlarm> alarm(new SentAlarm(1, &scenario));
+			boost::shared_ptr<SentAlarm> alarm(new SentAlarm(1, &scenario));
 			alarm->setShortMessage(_alarm->getShortMessage());
 			alarm->setLongMessage(_alarm->getLongMessage());
 			alarm->setLevel(_alarm->getLevel());

@@ -84,7 +84,7 @@ namespace synthese
 			){
 				stream << "3\nUnmonitored.|temp=-1\n";
 			} else {
-				shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(_screen->getKey()));
+				boost::shared_ptr<DisplayMonitoringStatus> status(DisplayMonitoringStatusTableSync::GetStatus(_screen->getKey()));
 
 				if(	status.get() == NULL
 				){

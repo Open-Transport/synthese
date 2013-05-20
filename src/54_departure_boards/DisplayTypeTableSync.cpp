@@ -352,7 +352,7 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 			Env env;
-			shared_ptr<const DisplayType> typ(DisplayTypeTableSync::Get(id, env));
+			boost::shared_ptr<const DisplayType> typ(DisplayTypeTableSync::Get(id, env));
 			ArrivalDepartureTableLog::addDeleteTypeEntry(typ.get(), session->getUser().get());
 		}
 	}

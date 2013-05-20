@@ -249,7 +249,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
+				BOOST_FOREACH(const boost::shared_ptr<DisplayScreen>& screen, screens)
 				{
 					if(screen->getParent())
 					{
@@ -264,10 +264,10 @@ namespace synthese
 						viewRequest.setClientURL(screen->getType()->getDisplayInterface()->getDefaultClientURL());
 					}
 
-					vector<shared_ptr<SentAlarm> > alarms(
+					vector<boost::shared_ptr<SentAlarm> > alarms(
 						DisplayScreenTableSync::GetCurrentDisplayedMessage(_getEnv(), screen->getKey(), 1)
 					);
-					shared_ptr<SentAlarm> alarm(alarms.empty() ? shared_ptr<SentAlarm>() : alarms.front());
+					boost::shared_ptr<SentAlarm> alarm(alarms.empty() ? boost::shared_ptr<SentAlarm>() : alarms.front());
 
 					stream << t.row(lexical_cast<string>(screen->getKey()));
 					if (!_place || !_place->get())
@@ -329,7 +329,7 @@ namespace synthese
 					}
 					else
 					{
-						shared_ptr<DisplayMonitoringStatus> status(
+						boost::shared_ptr<DisplayMonitoringStatus> status(
 							DisplayMonitoringStatusTableSync::GetStatus(screen->getKey())
 						);
 
@@ -462,7 +462,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(const shared_ptr<DisplayScreenCPU>& cpu, cpus)
+				BOOST_FOREACH(const boost::shared_ptr<DisplayScreenCPU>& cpu, cpus)
 				{
 					updateRequest.getPage()->setCPU(cpu);
 
@@ -571,13 +571,13 @@ namespace synthese
 				isAuthorized(*request.getUser()))
 			{
 				// General search
-				shared_ptr<DisplaySearchAdmin> p1(getNewPage<DisplaySearchAdmin>());
-				p1->_place = optional<shared_ptr<const StopArea> >();
+				boost::shared_ptr<DisplaySearchAdmin> p1(getNewPage<DisplaySearchAdmin>());
+				p1->_place = optional<boost::shared_ptr<const StopArea> >();
 				links.push_back(p1);
 
 				// Stock
-				shared_ptr<DisplaySearchAdmin> p2(getNewPage<DisplaySearchAdmin>());
-				p2->_place = shared_ptr<const StopArea>();
+				boost::shared_ptr<DisplaySearchAdmin> p2(getNewPage<DisplaySearchAdmin>());
+				p2->_place = boost::shared_ptr<const StopArea>();
 				links.push_back(p2);
 			}
 
@@ -609,9 +609,9 @@ namespace synthese
 						_place->get() ? (*_place)->getKey() : 0,
 						optional<string>()
 				)	);
-				BOOST_FOREACH(const shared_ptr<DisplayScreenCPU>& cpu, cpus)
+				BOOST_FOREACH(const boost::shared_ptr<DisplayScreenCPU>& cpu, cpus)
 				{
-					shared_ptr<DisplayScreenCPUAdmin> p(getNewPage<DisplayScreenCPUAdmin>());
+					boost::shared_ptr<DisplayScreenCPUAdmin> p(getNewPage<DisplayScreenCPUAdmin>());
 					p->setCPU(cpu);
 					links.push_back(p);
 				}
@@ -624,14 +624,14 @@ namespace synthese
 						optional<RegistryKeyType>(),
 						_place->get() ? (*_place)->getKey() : 0
 				)	);
-				BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
+				BOOST_FOREACH(const boost::shared_ptr<DisplayScreen>& screen, screens)
 				{
 					if(	screen->getRoot<DisplayScreenCPU>() ||
 						screen->getParent() != NULL
 					){
 						continue;
 					}
-					shared_ptr<DisplayAdmin> p(getNewPage<DisplayAdmin>());
+					boost::shared_ptr<DisplayAdmin> p(getNewPage<DisplayAdmin>());
 					p->setScreen(screen);
 					links.push_back(p);
 				}
@@ -683,7 +683,7 @@ namespace synthese
 			}
 			if(*id == 0)
 			{
-				_place = shared_ptr<const StopArea>();
+				_place = boost::shared_ptr<const StopArea>();
 			}
 			else
 			{

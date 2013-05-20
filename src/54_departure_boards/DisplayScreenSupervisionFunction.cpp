@@ -60,7 +60,7 @@ namespace synthese
 		DisplayScreenSupervisionFunction::DisplayScreenSupervisionFunction()
 			: util::FactorableTemplate<server::Function,DisplayScreenSupervisionFunction>()
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			setEnv(boost::shared_ptr<Env>(new Env));
 		}
 
 
