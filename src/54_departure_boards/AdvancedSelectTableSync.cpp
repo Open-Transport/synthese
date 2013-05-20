@@ -51,7 +51,7 @@ namespace synthese
 
 	namespace departure_boards
 	{
-		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
+		std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
 			Env& env,
 			const security::RightsOfSameClassMap& rights
 			, bool totalControl
@@ -126,10 +126,10 @@ namespace synthese
 			try
 			{
 				DBResultSPtr rows = DBModule::GetDB()->execQuery(query.str());
-				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > objects;
+				vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > objects;
 				while (rows->next ())
 				{
-					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
+					boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = rows->getInt("bc");
 					object->cpuNumber = rows->getInt("cc");
 					if(env.getRegistry<StopArea>().contains(rows->getKey()))
@@ -156,7 +156,7 @@ namespace synthese
 
 
 
-		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints(
+		std::vector<boost::shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints(
 			Env& env,
 			boost::optional<std::size_t> number,
 			int first/*=0*/
@@ -180,7 +180,7 @@ namespace synthese
 			{
 				DB* db = DBModule::GetDB();
 				DBResultSPtr rows = db->execQuery(query.str());
-				vector<shared_ptr<const CommercialLine> > objects;
+				vector<boost::shared_ptr<const CommercialLine> > objects;
 				while (rows->next ())
 				{
 					objects.push_back(CommercialLineTableSync::Get(

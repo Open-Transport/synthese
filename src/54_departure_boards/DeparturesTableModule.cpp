@@ -100,7 +100,7 @@ namespace synthese
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(Env::GetOfficialEnv())
 			);
-			BOOST_FOREACH(const shared_ptr<DisplayType>& displayType, types)
+			BOOST_FOREACH(const boost::shared_ptr<DisplayType>& displayType, types)
 			{
 				m.push_back(make_pair(displayType->getKey(), displayType->getName()));
 			}
@@ -116,7 +116,7 @@ namespace synthese
 			Labels localizations;
 			if (withAll)
 				localizations.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
-			std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > bpv = searchConnectionPlacesWithBroadcastPoints(
+			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > bpv = searchConnectionPlacesWithBroadcastPoints(
 				Env::GetOfficialEnv(),
 				rights,
 				totalControl,
@@ -125,7 +125,7 @@ namespace synthese
 				string(),
 				AT_LEAST_ONE_BROADCASTPOINT
 			);
-			BOOST_FOREACH(const shared_ptr<ConnectionPlaceWithBroadcastPoint>& con, bpv)
+			BOOST_FOREACH(const boost::shared_ptr<ConnectionPlaceWithBroadcastPoint>& con, bpv)
 			{
 				localizations.push_back(make_pair(con->place->getKey(), con->cityName + " " + con->place->getName()));
 			}
@@ -142,8 +142,8 @@ namespace synthese
 			{
 				m.push_back(make_pair(optional<RegistryKeyType>(), "(toutes)"));
 			}
-			vector<shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints(env);
-			BOOST_FOREACH(const shared_ptr<const CommercialLine>& line, c)
+			vector<boost::shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints(env);
+			BOOST_FOREACH(const boost::shared_ptr<const CommercialLine>& line, c)
 			{
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			}
@@ -163,7 +163,7 @@ namespace synthese
 			{
 				if(!registry.contains(place->getKey()))
 				{
-					shared_ptr<PlaceWithDisplayBoards> result(
+					boost::shared_ptr<PlaceWithDisplayBoards> result(
 						new PlaceWithDisplayBoards(place)
 					);
 					registry.add(

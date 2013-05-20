@@ -259,7 +259,7 @@ namespace synthese
 							t.getForm().getSelectInput(
 								UpdateDisplayScreenAction::PARAMETER_CPU,
 								cpus,
-								optional<shared_ptr<DisplayScreenCPU> >(
+								optional<boost::shared_ptr<DisplayScreenCPU> >(
 									Env::GetOfficialEnv().getEditableSPtr(
 										const_cast<DisplayScreenCPU*>(_displayScreen->getRoot<DisplayScreenCPU>())
 								)	),
@@ -1021,9 +1021,9 @@ namespace synthese
 					stream << t.col() << getTabLinkButton(TAB_MAINTENANCE);
 				}
 
-				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(Env::GetOfficialEnv(), _displayScreen->getKey()));
+				vector<boost::shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(Env::GetOfficialEnv(), _displayScreen->getKey()));
 				AdminFunctionRequest<MessageAdmin> viewMessageRequest(_request);
-				BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
+				BOOST_FOREACH(const boost::shared_ptr<SentAlarm>& alarm, alarms)
 				{
 					// Avoid malformed message
 					if(alarm->getScenario() == NULL) continue;
@@ -1063,7 +1063,7 @@ namespace synthese
 
 				stream << "<h1>Contenus en attente</h1>";
 
-				vector<shared_ptr<SentAlarm> > futures(DisplayScreenTableSync::GetFutureDisplayedMessages(
+				vector<boost::shared_ptr<SentAlarm> > futures(DisplayScreenTableSync::GetFutureDisplayedMessages(
 					Env::GetOfficialEnv(),
 					_displayScreen->getKey()
 				)	);
@@ -1077,7 +1077,7 @@ namespace synthese
 					h2.push_back("Admin");
 					HTMLTable t2(h2, ResultHTMLTable::CSS_CLASS);
 					stream << t2.open();
-					BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, futures)
+					BOOST_FOREACH(const boost::shared_ptr<SentAlarm>& alarm, futures)
 					{
 						stream << t2.row();
 						stream << t2.col() << HTMLModule::getHTMLImage("/admin/img/" + (alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
@@ -1270,7 +1270,7 @@ namespace synthese
 			){
 				BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, _displayScreen->getChildren())
 				{
-					shared_ptr<DisplayAdmin> p(
+					boost::shared_ptr<DisplayAdmin> p(
 						getNewPage<DisplayAdmin>()
 					);
 					p->setScreen(Env::GetOfficialEnv().getSPtr(it.second));

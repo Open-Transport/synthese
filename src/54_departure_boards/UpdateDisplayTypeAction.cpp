@@ -171,7 +171,7 @@ namespace synthese
 						DisplayTypeTableSync::SearchResult v(
 							DisplayTypeTableSync::Search(env, *_name, optional<RegistryKeyType>(), 0, 2)
 						);
-						BOOST_FOREACH(shared_ptr<DisplayType> t, v)
+						BOOST_FOREACH(boost::shared_ptr<DisplayType> t, v)
 						{
 							if(t->getKey() == _dt->getKey())
 							{
@@ -198,7 +198,7 @@ namespace synthese
 					}
 					else
 					{
-						_interface = shared_ptr<const Interface>();
+						_interface = boost::shared_ptr<const Interface>();
 					}
 				}
 
@@ -218,7 +218,7 @@ namespace synthese
 					}
 					else
 					{
-						_displayMainPage = shared_ptr<const Webpage>();
+						_displayMainPage = boost::shared_ptr<const Webpage>();
 					}
 				}
 
@@ -238,7 +238,7 @@ namespace synthese
 					}
 					else
 					{
-						_displayRowPage = shared_ptr<const Webpage>();
+						_displayRowPage = boost::shared_ptr<const Webpage>();
 					}
 				}
 
@@ -258,7 +258,7 @@ namespace synthese
 					}
 					else
 					{
-						_displayDestinationPage = shared_ptr<const Webpage>();
+						_displayDestinationPage = boost::shared_ptr<const Webpage>();
 					}
 				}
 
@@ -278,7 +278,7 @@ namespace synthese
 					}
 					else
 					{
-						_displayTransferDestinationPage = shared_ptr<const Webpage>();
+						_displayTransferDestinationPage = boost::shared_ptr<const Webpage>();
 					}
 				}
 
@@ -298,7 +298,7 @@ namespace synthese
 					}
 					else
 					{
-						_monitoringParserPage = shared_ptr<const Webpage>();
+						_monitoringParserPage = boost::shared_ptr<const Webpage>();
 					}
 				}
 
@@ -313,7 +313,7 @@ namespace synthese
 					}
 					else
 					{
-						_audioInterface = shared_ptr<const Interface>();
+						_audioInterface = boost::shared_ptr<const Interface>();
 					}
 				}
 
@@ -328,7 +328,7 @@ namespace synthese
 					}
 					else
 					{
-						_monitoringInterface = shared_ptr<const Interface>();
+						_monitoringInterface = boost::shared_ptr<const Interface>();
 					}
 				}
 
@@ -364,7 +364,7 @@ namespace synthese
 					}
 					else
 					{
-						_messageIsDisplayedPage = shared_ptr<const Webpage>();
+						_messageIsDisplayedPage = boost::shared_ptr<const Webpage>();
 					}
 				}
 
@@ -378,7 +378,7 @@ namespace synthese
 					}
 					else
 					{
-						_messageType = shared_ptr<MessageType>();
+						_messageType = boost::shared_ptr<MessageType>();
 					}
 				}
 			}

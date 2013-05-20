@@ -283,10 +283,10 @@ namespace synthese
 
 			if(entries.empty())
 			{
-				return shared_ptr<DisplayMonitoringStatus>();
+				return boost::shared_ptr<DisplayMonitoringStatus>();
 			}
 
-			shared_ptr<DisplayMonitoringStatus> status(entries.front());
+			boost::shared_ptr<DisplayMonitoringStatus> status(entries.front());
 			if(screen.isDown(*status))
 			{
 				DisplayMaintenanceLog::AddMonitoringDownEntry(screen);
@@ -310,7 +310,7 @@ namespace synthese
 				return not_a_date_time;
 			}
 
-			shared_ptr<DisplayMonitoringStatus> status(entries.front());
+			boost::shared_ptr<DisplayMonitoringStatus> status(entries.front());
 			if(cpu.isDown(status->getTime()))
 			{
 				DisplayMaintenanceLog::AddMonitoringDownEntry(cpu);

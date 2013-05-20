@@ -46,7 +46,7 @@ namespace synthese
 		ParameterLabelsVector RightTemplate<ArrivalDepartureTableRight>::getStaticParametersLabels()
 		{
 			ParameterLabelsVector m;
-			m.push_back(make_pair("*","(tous les afficheurs)"));
+			m.push_back(std::pair<boost::optional<std::string>, std::string>(boost::optional<std::string>("*"),"(tous les afficheurs)"));
 
 			PTModule::getNetworkLinePlaceRightParameterList(m);
 

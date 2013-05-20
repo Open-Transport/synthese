@@ -123,7 +123,7 @@ namespace synthese
 					continue;
 				}
 
-				shared_ptr<util::ParametersMap> screenPM(new ParametersMap);
+				boost::shared_ptr<util::ParametersMap> screenPM(new ParametersMap);
 				screenPM->insert(DISPLAY_SCREEN_ID_XML_FIELD, screen.getKey());
 				screenPM->insert(DISPLAY_SCREEN_COMPORT_XML_FIELD, screen.getComPort());
 
