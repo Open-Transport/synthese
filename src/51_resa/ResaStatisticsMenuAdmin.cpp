@@ -135,7 +135,7 @@ namespace synthese
 			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, lines);
 			stream << t.open();
 
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
 				openRequest.getPage()->setCommercialLine(line);
 
@@ -178,7 +178,7 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			shared_ptr<CallStatisticsAdmin> p(
+			boost::shared_ptr<CallStatisticsAdmin> p(
 				getNewPage<CallStatisticsAdmin>()
 			);
 			if(p->isAuthorized(*request.getUser()))
@@ -196,9 +196,9 @@ namespace synthese
 					optional<size_t>()
 					, false, true, true, true
 			)	);
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
-				shared_ptr<ResaStatisticsAdmin> p(
+				boost::shared_ptr<ResaStatisticsAdmin> p(
 					getNewPage<ResaStatisticsAdmin>()
 				);
 				p->setCommercialLine(line);

@@ -457,7 +457,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Generates the SQL expression filtering the record to load.
 		template<>
-		shared_ptr<SQLExpression> ConditionalSynchronizationPolicy<ReservationTableSync, Reservation>::GetWhereLoaded()
+		boost::shared_ptr<SQLExpression> ConditionalSynchronizationPolicy<ReservationTableSync, Reservation>::GetWhereLoaded()
 		{
 
 			// Getting current time

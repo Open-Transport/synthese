@@ -83,7 +83,7 @@ namespace synthese
 
 		util::ParametersMap XMLReservationFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			shared_ptr<const ReservationTransaction> resa(_resa);
+			boost::shared_ptr<const ReservationTransaction> resa(_resa);
 			if(!resa.get() && request.getActionCreatedId())
 			{
 				resa = ReservationTransactionTableSync::Get(*request.getActionCreatedId(), *getEnv());
@@ -160,7 +160,7 @@ namespace synthese
 		XMLReservationFunction::XMLReservationFunction():
 		FactorableTemplate<server::Function,XMLReservationFunction>()
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			setEnv(boost::shared_ptr<Env>(new Env));
 		}
 	}
 }

@@ -143,7 +143,7 @@ namespace synthese
 
 			if(rp)
 			{
-				shared_ptr<ResaEditLogEntryAdmin> p(getNewPage<ResaEditLogEntryAdmin>());
+				boost::shared_ptr<ResaEditLogEntryAdmin> p(getNewPage<ResaEditLogEntryAdmin>());
 				p->setEntry(rp->getEntry());
 				links.push_back(p);
 			}

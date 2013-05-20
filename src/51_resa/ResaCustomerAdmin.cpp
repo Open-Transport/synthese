@@ -291,15 +291,15 @@ namespace synthese
 
 				if(callId > 0)
 				{
-					shared_ptr<const DBLogEntry> entry(DBLogEntryTableSync::Get(callId, *_env));
+					boost::shared_ptr<const DBLogEntry> entry(DBLogEntryTableSync::Get(callId, *_env));
 
 					if(entry->getObjectId() > 0)
 					{
 						try
 						{
-							shared_ptr<const User> user(UserTableSync::Get(entry->getObjectId(), *_env));
+							boost::shared_ptr<const User> user(UserTableSync::Get(entry->getObjectId(), *_env));
 
-							shared_ptr<ResaCustomerAdmin> p(new ResaCustomerAdmin);
+							boost::shared_ptr<ResaCustomerAdmin> p(new ResaCustomerAdmin);
 							p->setUser(user);
 
 							result.push_back(p);

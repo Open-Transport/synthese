@@ -163,7 +163,7 @@ namespace synthese
 			}
 
 			// Customer
-			shared_ptr<const User> customer;
+			boost::shared_ptr<const User> customer;
 			if (_entry->getObjectId() > 0)
 			{
 				try
@@ -185,7 +185,7 @@ namespace synthese
 				stream << t.cell("Client", "inconnu");
 
 			// Operator
-			shared_ptr<const User> op;
+			boost::shared_ptr<const User> op;
 			if(_entry->getUserId() > 0)
 			{
 				try
