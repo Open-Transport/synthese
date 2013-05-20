@@ -82,7 +82,7 @@ namespace synthese
 
 
 		void JourneysResult::add(
-			const shared_ptr<RoutePlanningIntermediateJourney>& journey
+			const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey
 		){
 			const graph::Vertex* vertex(journey->getEndEdge().getFromVertex());
 			boost::posix_time::time_duration duration(
@@ -205,11 +205,11 @@ namespace synthese
 				}
 				it = next;
 			}
-			BOOST_FOREACH(const shared_ptr<RoutePlanningIntermediateJourney>& journey, journeysToRemove)
+			BOOST_FOREACH(const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey, journeysToRemove)
 			{
 				remove(*journey);
 			}
-			BOOST_FOREACH(const shared_ptr<RoutePlanningIntermediateJourney>& journey, journeysToAdd)
+			BOOST_FOREACH(const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey, journeysToAdd)
 			{
 				add(journey);
 			}

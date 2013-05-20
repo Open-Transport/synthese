@@ -93,7 +93,7 @@ namespace synthese
 			const int realCost,
 			const double distance
 		):	_node(node),
-			_parent(shared_ptr<AStarNode>()),
+			_parent(boost::shared_ptr<AStarNode>()),
 			_link(NULL),
 			_heuristicCost(heuristicCost),
 			_realCost(realCost),
@@ -104,7 +104,7 @@ namespace synthese
 
 
 
-		bool operator<(const shared_ptr<AStarNode> n1, const shared_ptr<AStarNode> n2)
+		bool operator<(const boost::shared_ptr<AStarNode> n1, const boost::shared_ptr<AStarNode> n2)
 		{
 			return n1->getHeuristicCost() > n2->getHeuristicCost();
 		}
@@ -129,8 +129,8 @@ namespace synthese
 				return result;
 			}
 
-			const shared_ptr<Point> heuristicReference = endingVertices.getCentroid();
-			priority_queue<shared_ptr<AStarNode> > openSet;
+			const boost::shared_ptr<Point> heuristicReference = endingVertices.getCentroid();
+			priority_queue<boost::shared_ptr<AStarNode> > openSet;
 			NodeMap nodeMap;
 
 			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& currentVertex, startingVertices.getMap())
@@ -139,13 +139,13 @@ namespace synthese
 				{
 					int crossingCost = currentVertex.second.approachTime.total_seconds();
 					int heuristic = _getHeuristicScore(c, heuristicReference);
-					shared_ptr<AStarNode> startNode(new AStarNode(c, crossingCost + heuristic, crossingCost, currentVertex.second.approachDistance)); // The real cost might be bad (road_place or city...)
+					boost::shared_ptr<AStarNode> startNode(new AStarNode(c, crossingCost + heuristic, crossingCost, currentVertex.second.approachDistance)); // The real cost might be bad (road_place or city...)
 					nodeMap.insert(NodeMap::value_type(c->getKey(), startNode));
 					openSet.push(startNode);
 				}
 			}
 
-			shared_ptr<AStarNode> lastNode = _findShortestPath(
+			boost::shared_ptr<AStarNode> lastNode = _findShortestPath(
 				nodeMap,
 				openSet,
 				endingVertices,
@@ -162,13 +162,13 @@ namespace synthese
 
 
 
-		shared_ptr<AStarNode> AStarShortestPathCalculator::_findShortestPath(
+		boost::shared_ptr<AStarNode> AStarShortestPathCalculator::_findShortestPath(
 			NodeMap& nodeMap,
-			priority_queue<shared_ptr<AStarNode> >& openSet,
+			priority_queue<boost::shared_ptr<AStarNode> >& openSet,
 			const VertexAccessMap& endingVertices,
-			const shared_ptr<Point> heuristicReference
+			const boost::shared_ptr<Point> heuristicReference
 		) const {
-			shared_ptr<AStarNode> resultNode;
+			boost::shared_ptr<AStarNode> resultNode;
 			
 			if(openSet.empty())
 			{
@@ -177,7 +177,7 @@ namespace synthese
 
 			while(!openSet.empty() && !resultNode.get())
 			{
-				shared_ptr<AStarNode> curNode = openSet.top();
+				boost::shared_ptr<AStarNode> curNode = openSet.top();
 				openSet.pop();
 
 				if(endingVertices.contains(curNode->getCrossing()))
@@ -237,7 +237,7 @@ namespace synthese
 						else
 							linkChunk = nextChunkInPath;
 
-						shared_ptr<LineString> chunkGeom = linkChunk->getRealGeometry();
+						boost::shared_ptr<LineString> chunkGeom = linkChunk->getRealGeometry();
 						
 						if(chunkGeom)
 							distance = CGAlgorithms::length(chunkGeom->getCoordinates());
@@ -259,7 +259,7 @@ namespace synthese
 						// If we haven't discovered the crossing yet, we're adding it to the open set, if we have, we're updating its score if ours is better
 						if(nextNode == nodeMap.end())
 						{
-							shared_ptr<AStarNode> newNode(new AStarNode(nextCrossing, newScore + heuristic, newScore, newDistance));
+							boost::shared_ptr<AStarNode> newNode(new AStarNode(nextCrossing, newScore + heuristic, newScore, newDistance));
 							newNode->setParent(curNode);
 							newNode->setLink(linkChunk);
 							nodeMap.insert(NodeMap::value_type(nextCrossing->getKey(), newNode));
@@ -284,9 +284,9 @@ namespace synthese
 
 		int AStarShortestPathCalculator::_getHeuristicScore(
 			const Crossing* origin,
-			const shared_ptr<Point> destination
+			const boost::shared_ptr<Point> destination
 		) const {
-			shared_ptr<Point> originPoint = origin->getGeometry();
+			boost::shared_ptr<Point> originPoint = origin->getGeometry();
 
 			if(originPoint.get())
 				return static_cast<int>(geos::operation::distance::DistanceOp::distance(*originPoint, *destination) / _accessParameters.getApproachSpeed());
@@ -300,11 +300,11 @@ namespace synthese
 			const VertexAccessMap& originVAM,
 			const VertexAccessMap& destinationVAM
 		) const {
-			shared_ptr<Point> heuristicReference = destinationVAM.getCentroid();
+			boost::shared_ptr<Point> heuristicReference = destinationVAM.getCentroid();
 			VertexAccessMap result;
 			FoundStops foundStops;
 
-			priority_queue<shared_ptr<AStarNode> > openSet;
+			priority_queue<boost::shared_ptr<AStarNode> > openSet;
 			NodeMap nodeMap;
 
 			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& currentVertex, originVAM.getMap())
@@ -313,7 +313,7 @@ namespace synthese
 				{
 					int crossingCost = currentVertex.second.approachTime.total_seconds();
 					int heuristic = _getHeuristicScore(c, heuristicReference);
-					shared_ptr<AStarNode> startNode(new AStarNode(c, crossingCost + heuristic, crossingCost, currentVertex.second.approachDistance)); // The real cost might be bad (road_place or city...)
+					boost::shared_ptr<AStarNode> startNode(new AStarNode(c, crossingCost + heuristic, crossingCost, currentVertex.second.approachDistance)); // The real cost might be bad (road_place or city...)
 					nodeMap.insert(NodeMap::value_type(c->getKey(), startNode));
 					openSet.push(startNode);
 				}
@@ -324,7 +324,7 @@ namespace synthese
 				}
 			}
 
-			shared_ptr<AStarNode> lastNode = _findShortestPath(
+			boost::shared_ptr<AStarNode> lastNode = _findShortestPath(
 				nodeMap,
 				openSet,
 				destinationVAM,
@@ -355,7 +355,7 @@ namespace synthese
 
 		void AStarShortestPathCalculator::_reconstructPath(
 			ResultPath& result,
-			shared_ptr<AStarNode> curNode
+			boost::shared_ptr<AStarNode> curNode
 		) const {
 			while(curNode->getParent())
 			{
@@ -368,7 +368,7 @@ namespace synthese
 
 		Journey AStarShortestPathCalculator::_generateJourneyFromNode(
 			const pt::StopPoint* arrival,
-			const shared_ptr<AStarNode> lastNode
+			const boost::shared_ptr<AStarNode> lastNode
 		) const {
 			// Reconstructing a SYNTHESE Journey from a vector of edges returned by _findShortestPath
 			Journey result;
