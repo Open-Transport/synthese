@@ -199,7 +199,7 @@ namespace synthese
 								addViaPoints = false;
 							if(addViaPoints)
 							{
-								shared_ptr<LineString> geometry(e->getGeometry());
+								boost::shared_ptr<LineString> geometry(e->getGeometry());
 								if(geometry.get())
 								{
 									for(size_t i(0); i<geometry->getCoordinatesRO()->getSize(); ++i)
