@@ -60,7 +60,7 @@ namespace synthese
 			FactorableTemplate<Function, ImportFunction>(),
 			_doImport(false)
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			setEnv(boost::shared_ptr<Env>(new Env));
 		}
 
 
@@ -84,7 +84,7 @@ namespace synthese
 			RegistryKeyType importId(map.get<RegistryKeyType>(PARAMETER_IMPORT_ID));
 			try
 			{
-				shared_ptr<const Import> import(ImportTableSync::Get(importId, *_env));
+				boost::shared_ptr<const Import> import(ImportTableSync::Get(importId, *_env));
 
 				// Log path
 				bool outputLogs(map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false));
