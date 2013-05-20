@@ -130,7 +130,7 @@ namespace synthese
 
 			AdminFunctionRequest<CalendarTemplateAdmin> editCalendar(_request);
 			BOOST_FOREACH(
-				shared_ptr<CalendarTemplate> ct,
+				boost::shared_ptr<CalendarTemplate> ct,
 				calendars
 			){
 				editCalendar.getPage()->setCalendar(const_pointer_cast<const CalendarTemplate>(ct));
@@ -225,9 +225,9 @@ namespace synthese
 						UP_LINKS_LOAD_LEVEL,
 						RegistryKeyType(0)
 				)	);
-				BOOST_FOREACH(const shared_ptr<CalendarTemplate>& ct, calendars)
+				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplate>& ct, calendars)
 				{
-					shared_ptr<CalendarTemplateAdmin> page(
+					boost::shared_ptr<CalendarTemplateAdmin> page(
 						getNewPage<CalendarTemplateAdmin>()
 					);
 					page->setCalendar(ct);

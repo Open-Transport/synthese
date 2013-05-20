@@ -113,7 +113,7 @@ namespace synthese
  						0, optional<size_t>(),
  						UP_LINKS_LOAD_LEVEL
  				)	);
- 				BOOST_FOREACH(const shared_ptr<CalendarTemplateElement>& e, elements)
+ 				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& e, elements)
  				{
  					object->addElement(*e);
  				}

@@ -115,7 +115,7 @@ namespace synthese
 				else
 				{
 					BOOST_FOREACH(
-						const shared_ptr<CalendarTemplate>& cal,
+						const boost::shared_ptr<CalendarTemplate>& cal,
 						CalendarTemplateTableSync::Search(
 							Env::GetOfficialEnv(),
 							optional<string>(),
@@ -140,7 +140,7 @@ namespace synthese
 
 			BOOST_FOREACH(const CalendarTemplate* it, calendars)
 			{
-				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 
 				it->toParametersMap(*calendarPM);
 

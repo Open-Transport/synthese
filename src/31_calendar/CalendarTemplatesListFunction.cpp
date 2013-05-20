@@ -99,7 +99,7 @@ namespace synthese
 			CalendarTemplateTableSync::SearchResult s(CalendarTemplateTableSync::Search(Env::GetOfficialEnv()));
 
 			stream << "<select name=\"" << _fieldName << "\">";
-			BOOST_FOREACH(const shared_ptr<const CalendarTemplate>& object, s)
+			BOOST_FOREACH(const boost::shared_ptr<const CalendarTemplate>& object, s)
 			{
 				stream << "<option value=\"" << object->getKey() << "\"";
 				if (_defaultValue.get() == object.get())
