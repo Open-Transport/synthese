@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace graph
 	{
-		shared_ptr<const AllowedUseRule> AllowedUseRule::INSTANCE(new AllowedUseRule);
+		boost::shared_ptr<const AllowedUseRule> AllowedUseRule::INSTANCE(new AllowedUseRule);
 
 		boost::posix_time::ptime AllowedUseRule::getReservationDeadLine(
 			const boost::posix_time::ptime& originTime,
