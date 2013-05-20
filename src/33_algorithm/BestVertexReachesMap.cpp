@@ -255,7 +255,7 @@ namespace synthese
 						_bestTimeMap[it->first->getIndex()],
 						0,
 						it->second.approachTime,
-						shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(accessDirection))
+						boost::shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(accessDirection))
 					);
 				}
 			}

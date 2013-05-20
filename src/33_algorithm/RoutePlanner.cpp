@@ -255,7 +255,7 @@ namespace synthese
 
 			// Open logger
 			_logger.openJourneyPlannerLog(originDateTime, accessDirection);
-			shared_ptr<const RoutePlanningIntermediateJourney> journey;
+			boost::shared_ptr<const RoutePlanningIntermediateJourney> journey;
 
 			// Initialization of the integral searcher
 			IntegralSearcher is(

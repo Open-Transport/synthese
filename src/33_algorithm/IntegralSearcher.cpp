@@ -200,7 +200,7 @@ namespace synthese
 			while(!todo.empty())
 			{
 				this_thread::interruption_point();
-				shared_ptr<RoutePlanningIntermediateJourney> journey(todo.front());
+				boost::shared_ptr<RoutePlanningIntermediateJourney> journey(todo.front());
 
 				VertexAccessMap curVam;
 				ptime minMaxDateTimeAtOrigin(callMinMaxDateTimeAtOrigin);
@@ -541,7 +541,7 @@ sqrt(
 									)
 								);
 
-								shared_ptr<RoutePlanningIntermediateJourney> resultJourney(
+								boost::shared_ptr<RoutePlanningIntermediateJourney> resultJourney(
 									new RoutePlanningIntermediateJourney(
 										fullApproachJourney,
 										serviceUse,
@@ -585,7 +585,7 @@ sqrt(
 								// Storage of the journey for recursion
 								if(	isARecursionNode
 								){
-									shared_ptr<RoutePlanningIntermediateJourney> todoJourney(
+									boost::shared_ptr<RoutePlanningIntermediateJourney> todoJourney(
 										new RoutePlanningIntermediateJourney(
 											*journey,
 											serviceUse,
@@ -648,7 +648,7 @@ sqrt(
 // ------------------------------------------------------------------------- Utilities
 
 		IntegralSearcher::_JourneyUsefulness IntegralSearcher::evaluateJourney(
-			const shared_ptr<RoutePlanningIntermediateJourney>& journeysptr,
+			const boost::shared_ptr<RoutePlanningIntermediateJourney>& journeysptr,
 			bool isGoalReached
 		) const {
 
