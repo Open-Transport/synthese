@@ -527,7 +527,7 @@ namespace synthese
 
 			// Building field names list
 			set<string> colNames;
-			BOOST_FOREACH(shared_ptr<ParametersMap> item, items)
+			BOOST_FOREACH(boost::shared_ptr<ParametersMap> item, items)
 			{
 				BOOST_FOREACH(const Map::value_type& itMap, item->getMap())
 				{
@@ -555,7 +555,7 @@ namespace synthese
 			}
 
 			// Data output
-			BOOST_FOREACH(shared_ptr<ParametersMap> item, items)
+			BOOST_FOREACH(boost::shared_ptr<ParametersMap> item, items)
 			{
 				bool firstItem(true);
 				BOOST_FOREACH(const Map::value_type& itMap, item->getMap())
@@ -605,7 +605,7 @@ namespace synthese
 				{
 					string key(prefix + it.first);
 
-					BOOST_FOREACH(const shared_ptr<ParametersMap>& item, it.second)
+					BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& item, it.second)
 					{
 						insert(key, item);
 					}
