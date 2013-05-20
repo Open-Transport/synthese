@@ -45,7 +45,7 @@ namespace synthese
 			, const void* rootObject /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			for (vector<shared_ptr<LibraryInterfaceElement> >::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
+			for (vector<boost::shared_ptr<LibraryInterfaceElement> >::const_iterator it = _parameters.begin(); it != _parameters.end(); ++it)
 				(*it)->display(stream, parameters, vars, rootObject, request);
 			return string();
 		}

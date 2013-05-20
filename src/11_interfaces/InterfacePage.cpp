@@ -57,7 +57,7 @@ namespace synthese
 			, const server::Request* request) const
 		{
 			string label_to_go;
-			BOOST_FOREACH(const shared_ptr<LibraryInterfaceElement>& component, _components)
+			BOOST_FOREACH(const boost::shared_ptr<LibraryInterfaceElement>& component, _components)
 			{
 				if (label_to_go.empty() || component->getLabel() == label_to_go)
 				{
@@ -79,7 +79,7 @@ namespace synthese
 				for (end_pos = start_pos; end_pos < _source.size() && _source[end_pos] != '\n' && _source[end_pos] != '\r'; ++end_pos);
 
 				std::string line = _source.substr(start_pos, end_pos - start_pos);
-				shared_ptr<LibraryInterfaceElement> lie;
+				boost::shared_ptr<LibraryInterfaceElement> lie;
 				try
 				{
 					lie = LibraryInterfaceElement::create(line, this);

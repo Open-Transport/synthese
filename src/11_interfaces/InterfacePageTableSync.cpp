@@ -97,7 +97,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<Interface> interf(InterfaceTableSync::GetEditable(
+					boost::shared_ptr<Interface> interf(InterfaceTableSync::GetEditable(
 							rows->getLongLong(InterfacePageTableSync::TABLE_COL_INTERFACE),
 							env,
 							linkLevel
@@ -191,14 +191,14 @@ namespace synthese
 		boost::shared_ptr<InterfacePage> InterfacePageTableSync::GetNewObject(
 			const DBResultSPtr& row
 		){
-			shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(row->getText(InterfacePageTableSync::TABLE_COL_CLASS)));
+			boost::shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(row->getText(InterfacePageTableSync::TABLE_COL_CLASS)));
 			page->setKey(row->getKey());
 			return page;
 		}
 
 		boost::shared_ptr<InterfacePage> InterfacePageTableSync::GetNewObject(
 		){
-			return shared_ptr<InterfacePage>();
+			return boost::shared_ptr<InterfacePage>();
 		}
 
 
