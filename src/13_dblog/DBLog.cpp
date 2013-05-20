@@ -87,7 +87,7 @@ namespace synthese
 			)	);
 			return
 				entries.empty() ?
-				shared_ptr<DBLogEntry>() :
+				boost::shared_ptr<DBLogEntry>() :
 				entries.front()
 			;
 		}
@@ -120,7 +120,7 @@ namespace synthese
 			util::RegistryKeyType objectId /*= 0 */,
 			RegistryKeyType objectId2
 		){
-			shared_ptr<DBLog> dbLog(Factory<DBLog>::create(logKey));
+			boost::shared_ptr<DBLog> dbLog(Factory<DBLog>::create(logKey));
 			int cols(dbLog->getColumnNames().size());
 			DBLogEntry::Content c;
 			c.push_back(content);

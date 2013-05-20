@@ -53,8 +53,8 @@ namespace synthese
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les journaux)"));
-			vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
+			vector<boost::shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
+			BOOST_FOREACH(const boost::shared_ptr<DBLog> loge, logs)
 			{
 				m.push_back(make_pair(loge->getFactoryKey(), loge->getName()));
 			}
