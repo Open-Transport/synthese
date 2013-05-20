@@ -1934,7 +1934,7 @@ namespace synthese
 			const NamedPlace& np,
 			bool showCoords
 		) const {
-			shared_ptr<Point> gp;
+			boost::shared_ptr<Point> gp;
 
 			showCoords &= (np.getPoint().get() != NULL && !np.getPoint()->isEmpty());
 
@@ -1986,7 +1986,7 @@ namespace synthese
 			const pt::StopPoint& stop,
 			bool showCoords
 		) const {
-			shared_ptr<Point> gp;
+			boost::shared_ptr<Point> gp;
 			if(stop.getGeometry().get() && !stop.getGeometry()->isEmpty())
 			{
 				gp = _coordinatesSystem->convertPoint(
@@ -2002,7 +2002,7 @@ namespace synthese
 
 			if(showCoords && gp.get())
 			{
-				shared_ptr<Point> pt(stop.getGeometry().get() ? stop.getGeometry() : stop.getConnectionPlace()->getPoint());
+				boost::shared_ptr<Point> pt(stop.getGeometry().get() ? stop.getGeometry() : stop.getConnectionPlace()->getPoint());
 
 				stream <<
 					"<" << tag <<
@@ -2033,7 +2033,7 @@ namespace synthese
 					const NamedPlace& np,
 					bool showCoords
 		) const {
-			shared_ptr<Point> gp;
+			boost::shared_ptr<Point> gp;
 
 			if(	np.getPoint().get() &&
 				!np.getPoint()->isEmpty()
@@ -2075,7 +2075,7 @@ namespace synthese
 			const road::RoadPlace& roadPlace,
 			bool showCoords
 		) const {
-			shared_ptr<Point> gp;
+			boost::shared_ptr<Point> gp;
 
 			if(	address.getGeometry().get() &&
 				!address.getGeometry()->isEmpty()
@@ -2116,7 +2116,7 @@ namespace synthese
 			const road::RoadPlace& roadPlace,
 			bool showCoords
 		) const {
-			shared_ptr<Point> gp;
+			boost::shared_ptr<Point> gp;
 
 			if(	roadPlace.getPoint().get() &&
 				!roadPlace.getPoint()->isEmpty()
@@ -2223,7 +2223,7 @@ namespace synthese
 				const PTRoutePlannerResult::PlacesListConfiguration::List& placesList(
 					object.getOrderedPlaces().getResult()
 				);
-				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
+				typedef vector<boost::shared_ptr<ostringstream> > PlacesContentVector;
 				PlacesContentVector sheetRows(placesList.size());
 				BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
 				{
@@ -3117,7 +3117,7 @@ namespace synthese
 
 			if(departurePlace.getPoint())
 			{
-				shared_ptr<Point> departurePoint(
+				boost::shared_ptr<Point> departurePoint(
 					_coordinatesSystem->convertPoint(
 						*departurePlace.getPoint()
 				)	);
@@ -3156,7 +3156,7 @@ namespace synthese
 
 			if(arrivalPlace.getPoint())
 			{
-				shared_ptr<Point> arrivalPoint(
+				boost::shared_ptr<Point> arrivalPoint(
 					_coordinatesSystem->convertPoint(
 						*arrivalPlace.getPoint()
 				)	);
@@ -3322,14 +3322,14 @@ namespace synthese
 						// Distance and geometry
 						double distance(0);
 						vector<Geometry*> geometries;
-						vector<shared_ptr<Geometry> > geometriesSPtr;
+						vector<boost::shared_ptr<Geometry> > geometriesSPtr;
 						BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
 						{
 							distance += itLeg->getDistance();
-							shared_ptr<LineString> geometry(itLeg->getGeometry());
+							boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
 							if(geometry.get())
 							{
-								shared_ptr<Geometry> geometryProjected(
+								boost::shared_ptr<Geometry> geometryProjected(
 									_coordinatesSystem->convertGeometry(
 										*static_cast<Geometry*>(geometry.get())
 								)	);
@@ -3338,7 +3338,7 @@ namespace synthese
 							}
 						}
 
-						shared_ptr<MultiLineString> multiLineString(
+						boost::shared_ptr<MultiLineString> multiLineString(
 							_coordinatesSystem->getGeometryFactory().createMultiLineString(
 								geometries
 						)	);
@@ -3409,7 +3409,7 @@ namespace synthese
 			if(	place.getPoint().get() &&
 				!place.getPoint()->isEmpty()
 			){
-				shared_ptr<Point> point(
+				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
 						*place.getPoint()
 				)	);
@@ -3429,7 +3429,7 @@ namespace synthese
 				if(	arrivalPhysicalStop->getGeometry().get() &&
 					!arrivalPhysicalStop->getGeometry()->isEmpty()
 				){
-					shared_ptr<Point> point(
+					boost::shared_ptr<Point> point(
 						_coordinatesSystem->convertPoint(
 							*arrivalPhysicalStop->getGeometry()
 					)	);
@@ -3446,7 +3446,7 @@ namespace synthese
 				if(	departurePhysicalStop->getGeometry().get() &&
 					!departurePhysicalStop->getGeometry()->isEmpty()
 				){
-					shared_ptr<Point> point(
+					boost::shared_ptr<Point> point(
 						_coordinatesSystem->convertPoint(
 							*departurePhysicalStop->getGeometry()
 					)	);
@@ -3504,7 +3504,7 @@ namespace synthese
 			if(	departureVertex.getGeometry().get() &&
 				!departureVertex.getGeometry()->isEmpty()
 			){
-				shared_ptr<Point> point(
+				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
 						*departureVertex.getGeometry()
 				)	);
@@ -3515,7 +3515,7 @@ namespace synthese
 			if(	arrivalVertex.getGeometry().get() &&
 				!arrivalVertex.getGeometry()->isEmpty()
 			){
-				shared_ptr<Point> point(
+				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
 						*arrivalVertex.getGeometry()
 				)	);
@@ -3542,12 +3542,12 @@ namespace synthese
 			// WKT
 			if(geometry)
 			{
-				shared_ptr<Geometry> geometryProjected(
+				boost::shared_ptr<Geometry> geometryProjected(
 					_coordinatesSystem->convertGeometry(
 						*geometry
 				)	);
 
-				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				boost::shared_ptr<WKTWriter> wktWriter(new WKTWriter);
 				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
@@ -3675,15 +3675,15 @@ namespace synthese
 			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 
-			shared_ptr<LineString> geometry(serviceUse.getGeometry());
+			boost::shared_ptr<LineString> geometry(serviceUse.getGeometry());
 			if(geometry.get())
 			{
-				shared_ptr<Geometry> geometryProjected(
+				boost::shared_ptr<Geometry> geometryProjected(
 					_coordinatesSystem->convertGeometry(
 						*static_cast<Geometry*>(geometry.get())
 				)	);
 
-				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				boost::shared_ptr<WKTWriter> wktWriter(new WKTWriter);
 				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
