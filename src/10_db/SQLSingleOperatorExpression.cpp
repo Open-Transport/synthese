@@ -39,7 +39,7 @@ namespace synthese
 
 		SQLSingleOperatorExpression::SQLSingleOperatorExpression(
 			const string& op,
-			shared_ptr<SQLExpression> expr
+			boost::shared_ptr<SQLExpression> expr
 		):	_op(op),
 			_expr(expr)
 		{}
@@ -65,11 +65,11 @@ namespace synthese
 
 
 
-		shared_ptr<SQLExpression> SQLSingleOperatorExpression::Get(
+		boost::shared_ptr<SQLExpression> SQLSingleOperatorExpression::Get(
 			const string& op,
-			shared_ptr<SQLExpression> expr
+			boost::shared_ptr<SQLExpression> expr
 		){
-			return shared_ptr<SQLExpression>(
+			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(
 					new SQLSingleOperatorExpression(op, expr)
 			)	);

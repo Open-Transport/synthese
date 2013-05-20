@@ -216,7 +216,7 @@ namespace synthese
 					//////////////////////////////////////////////////////////////////////////
 					/// Transforming into object
 					RegistryTableType classId(decodeTableId(key));
-					shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
 					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
 					{
 						throw synthese::Exception("Bad table");
@@ -224,7 +224,7 @@ namespace synthese
 					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
 
 					// Update or creation
-					shared_ptr<Registrable> rObject;
+					boost::shared_ptr<Registrable> rObject;
 					if(directTableSync.contains(key))
 					{
 						rObject = directTableSync.getEditableRegistrable(
@@ -243,7 +243,7 @@ namespace synthese
 						rObject->setKey(key);
 						_env.addRegistrable(rObject);
 					}
-					shared_ptr<ObjectBase> object(dynamic_pointer_cast<ObjectBase, Registrable>(rObject));
+					boost::shared_ptr<ObjectBase> object(dynamic_pointer_cast<ObjectBase, Registrable>(rObject));
 
 
 					//////////////////////////////////////////////////////////////////////////
@@ -267,7 +267,7 @@ namespace synthese
 					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
 					if( registry.contains(object->getKey()))
 					{
-						shared_ptr<ObjectBase> mObject(
+						boost::shared_ptr<ObjectBase> mObject(
 							dynamic_pointer_cast<ObjectBase, Registrable>(
 								registry.getEditableObject(object->getKey())
 						)	);
@@ -278,7 +278,7 @@ namespace synthese
 								if(subObjects.find(subObject->getKey()) == subObjects.end())
 								{
 									RegistryTableType classId(decodeTableId(subObject->getKey()));
-									shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
+									boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
 									tableSync->deleteRecord(NULL, subObject->getKey(), transaction, false);
 								}
 							}

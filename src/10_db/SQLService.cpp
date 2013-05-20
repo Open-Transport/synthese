@@ -81,7 +81,7 @@ namespace synthese
 
 			while(rows->next ())
 			{
-				shared_ptr<ParametersMap> rowPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> rowPM(new ParametersMap);
 
 				Record::FieldNames fieldNames(rows->getFieldNames());
 				BOOST_FOREACH(const string& fieldName, fieldNames)

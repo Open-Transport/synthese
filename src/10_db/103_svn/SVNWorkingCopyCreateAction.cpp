@@ -128,7 +128,7 @@ namespace synthese
 				wc.create(_user, _password);
 
 				RegistryTableType tableId(decodeTableId(_object->getKey()));
-				shared_ptr<DBDirectTableSync> tableSync(
+				boost::shared_ptr<DBDirectTableSync> tableSync(
 					dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
 						DBModule::GetTableSync(tableId)
 				)	);
