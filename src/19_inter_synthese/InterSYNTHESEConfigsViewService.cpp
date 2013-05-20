@@ -72,7 +72,7 @@ namespace synthese
 				Env::GetOfficialEnv().getRegistry<InterSYNTHESEConfig>()
 			){
 
-				shared_ptr<ParametersMap> configPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> configPM(new ParametersMap);
 
 				it.second->toParametersMap(*configPM, true);
 

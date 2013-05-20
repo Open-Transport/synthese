@@ -85,7 +85,7 @@ namespace synthese
 
 			BOOST_FOREACH(const Items::value_type& it, _items)
 			{
-				shared_ptr<ParametersMap> itemPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> itemPM(new ParametersMap);
 
 				it->toParametersMap(*itemPM);
 
