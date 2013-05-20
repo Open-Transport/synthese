@@ -368,7 +368,7 @@ namespace synthese
 				result.push_back(make_pair(optional<RegistryKeyType>(0), *noVehicleLabel));
 			}
 			SearchResult vehicles(Search(env));
-			BOOST_FOREACH(const shared_ptr<Vehicle>& vehicle, vehicles)
+			BOOST_FOREACH(const boost::shared_ptr<Vehicle>& vehicle, vehicles)
 			{
 				result.push_back(make_pair(optional<RegistryKeyType>(vehicle->getKey()), vehicle->getName()));
 			}

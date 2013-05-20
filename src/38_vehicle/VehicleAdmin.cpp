@@ -232,7 +232,7 @@ namespace synthese
 					DepotTableSync::GetDepotsList(*_env, optional<string>("(pas de lieu)"))
 				);
 				set<StopPoint*> knownPlaces;
-				BOOST_FOREACH(const shared_ptr<VehiclePosition>& position, positions)
+				BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& position, positions)
 				{
 					removeRequest.getAction()->setObjectId(position->getKey());
 

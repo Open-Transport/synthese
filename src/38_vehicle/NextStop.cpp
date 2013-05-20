@@ -56,7 +56,7 @@ namespace synthese
 			// Stop
 			if(_stop)
 			{
-				shared_ptr<ParametersMap> stopPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 				_stop->toParametersMap(*stopPM, true);
 				pm.insert(TAG_STOP, stopPM);
 			}
