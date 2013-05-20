@@ -476,7 +476,7 @@ namespace synthese
 
 
 
-		shared_ptr<LineString> Edge::getRealGeometry(
+		boost::shared_ptr<LineString> Edge::getRealGeometry(
 		) const	{
 			if(getGeometry().get())
 			{
@@ -499,15 +499,15 @@ namespace synthese
 				cs->add(*getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->getGeometry()->getCoordinate(), false);
 				if(cs->size() != 2)
 				{
-					return shared_ptr<LineString>();
+					return boost::shared_ptr<LineString>();
 				}
 				else
 				{
-					return shared_ptr<LineString>(geometryFactory.createLineString(cs));
+					return boost::shared_ptr<LineString>(geometryFactory.createLineString(cs));
 				}
 			}
 
-			return shared_ptr<LineString>(geometryFactory.createLineString());
+			return boost::shared_ptr<LineString>(geometryFactory.createLineString());
 		}
 
 
