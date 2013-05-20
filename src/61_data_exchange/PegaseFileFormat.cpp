@@ -620,7 +620,7 @@ namespace synthese
 				string cityCode = parser.getCell("PA_COD_COMMU");
 				string stopCode = parser.getCell("PA_CODE_ARRET");
 
-				shared_ptr<const City> cityForStopAreaAutoGeneration;
+				boost::shared_ptr<const City> cityForStopAreaAutoGeneration;
 				CityTableSync::SearchResult cities(
 					CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode, 0, 1)
 				);
@@ -648,7 +648,7 @@ namespace synthese
 					cityForStopAreaAutoGeneration = *cities.begin();
 				}
 
-				shared_ptr<geos::geom::Point> point;
+				boost::shared_ptr<geos::geom::Point> point;
 
 				string x = parser.getCell("PA_ABSCISSE");
 				string y = parser.getCell("PA_ORDONNEE");

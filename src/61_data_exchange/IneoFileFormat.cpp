@@ -249,7 +249,7 @@ namespace synthese
 						string name(_getValue(_stopNameField));
 
 						// City
-						shared_ptr<const City> city;
+						boost::shared_ptr<const City> city;
 						if(!_stopCityCodeField.empty())
 						{
 							string cityCode(_getValue(_stopCityCodeField));
@@ -316,7 +316,7 @@ namespace synthese
 					}
 
 					// Point
-					shared_ptr<Point> geometry;
+					boost::shared_ptr<Point> geometry;
 					if(!_getValue("X").empty() && !_getValue("Y").empty())
 					{
 						try
@@ -508,7 +508,7 @@ namespace synthese
 								_geometries.insert(
 									make_pair(
 										key,
-										shared_ptr<LineString>(
+										boost::shared_ptr<LineString>(
 											dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
 								)	)	);
 							}
@@ -549,7 +549,7 @@ namespace synthese
 						_geometries.insert(
 							make_pair(
 								key,
-								shared_ptr<LineString>(
+								boost::shared_ptr<LineString>(
 									dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
 						)	)	);
 					}
@@ -714,7 +714,7 @@ namespace synthese
 					else if(_section == "PC")
 					{
 						string stopCode(_mnlp_prefix + _getValue("MNL"));
-						shared_ptr<LineString> lineString;
+						boost::shared_ptr<LineString> lineString;
 						if(!lastStopCode.empty())
 						{
 							// Distance

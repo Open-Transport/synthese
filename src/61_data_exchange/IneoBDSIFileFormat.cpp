@@ -564,8 +564,8 @@ namespace synthese
 				{
 					const Programmation& programmation(itProg.second);
 
-					shared_ptr<SentScenario> updatedScenario;
-					shared_ptr<Alarm> updatedMessage;
+					boost::shared_ptr<SentScenario> updatedScenario;
+					boost::shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
 							_import.get<DataSource>()->getObjectByCode<Scenario>(
@@ -684,7 +684,7 @@ namespace synthese
 						}
 
 						// Link creation
-						shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+						boost::shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 						link->setKey(AlarmObjectLinkTableSync::getId());
 						link->setAlarm(message);
 						link->setObjectId(itDest.syntheseDisplayBoard->getKey());
@@ -834,7 +834,7 @@ namespace synthese
 						// If no journey pattern was found, creation of a new journey pattern
 						if(course.chainage->syntheseJourneyPatterns.empty())
 						{
-							shared_ptr<JourneyPattern> jp(new JourneyPattern(JourneyPatternTableSync::getId()));
+							boost::shared_ptr<JourneyPattern> jp(new JourneyPattern(JourneyPatternTableSync::getId()));
 							jp->setCommercialLine(course.chainage->ligne->syntheseLine);
 							jp->setWayBack(course.chainage->sens);
 							jp->setName(course.chainage->nom);
@@ -848,7 +848,7 @@ namespace synthese
 							size_t rank(0);
 							BOOST_FOREACH(const Chainage::ArretChns::value_type& arretChn, course.chainage->arretChns)
 							{
-								shared_ptr<DesignatedLinePhysicalStop> ls(
+								boost::shared_ptr<DesignatedLinePhysicalStop> ls(
 									new DesignatedLinePhysicalStop(
 										LineStopTableSync::getId(),
 										jp.get(),
@@ -924,7 +924,7 @@ namespace synthese
 					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
 					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), lexical_cast<string>(course.ref));
 					course.syntheseService->setActive(today);
-					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(course.syntheseService));
+					_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(course.syntheseService));
 
 					servicesToLinkAndUpdate.push_back(&course);
 				}
@@ -942,7 +942,7 @@ namespace synthese
 				// Loop on services to move and update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToMoveAndUpdate)
 				{
-					shared_ptr<ScheduledService> oldService(
+					boost::shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it->syntheseService->getKey(),
 							_env
@@ -957,7 +957,7 @@ namespace synthese
 				// Loop on services to link and update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToLinkAndUpdate)
 				{
-					shared_ptr<ScheduledService> oldService(
+					boost::shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it->syntheseService->getKey(),
 							_env
@@ -972,7 +972,7 @@ namespace synthese
 				// Remove services from today
 				BOOST_FOREACH(const ServicesToRemove::value_type& it, servicesToRemove)
 				{
-					shared_ptr<ScheduledService> oldService(
+					boost::shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it.second->getKey(),
 							_env

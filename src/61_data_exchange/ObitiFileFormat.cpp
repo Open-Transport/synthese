@@ -307,7 +307,7 @@ namespace synthese
 					}
 
 					// Point
-					shared_ptr<geos::geom::Point> point;
+					boost::shared_ptr<geos::geom::Point> point;
 
 					PTFileFormat::ImportableStopPoint isp;
 					isp.operatorCode = id;
@@ -375,7 +375,7 @@ namespace synthese
 				}
 
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
-				shared_ptr<ImportableTableSync::ObjectBySource<StopPointTableSync> > stopPointsFromOtherImport;
+				boost::shared_ptr<ImportableTableSync::ObjectBySource<StopPointTableSync> > stopPointsFromOtherImport;
 				if(_stopsFromDataSource && _stopsDataSource)
 					stopPointsFromOtherImport.reset(new ImportableTableSync::ObjectBySource<StopPointTableSync>(*_stopsDataSource, _env));
 
@@ -704,7 +704,7 @@ namespace synthese
 									)	);
 									if(!serviceCalendarLinks.empty())
 									{
-										BOOST_FOREACH(const shared_ptr<CalendarLink>& scl, serviceCalendarLinks)
+										BOOST_FOREACH(const boost::shared_ptr<CalendarLink>& scl, serviceCalendarLinks)
 										{
 											if((scl->getCalendarTemplate2() == periodCalendar) && (scl->getCalendarTemplate() == daysCalendar))
 											{
@@ -744,7 +744,7 @@ namespace synthese
 
 										service->addCalendarLink(*serviceCalendarLink,true);
 
-										_env.getEditableRegistry<CalendarLink>().add(shared_ptr<CalendarLink>(serviceCalendarLink));
+										_env.getEditableRegistry<CalendarLink>().add(boost::shared_ptr<CalendarLink>(serviceCalendarLink));
 									}
 									service->setCalendarFromLinks();
 								}
@@ -986,7 +986,7 @@ namespace synthese
 
 					try
 					{
-						shared_ptr<const PTUseRule> ptUseRule(
+						boost::shared_ptr<const PTUseRule> ptUseRule(
 							PTUseRuleTableSync::Get(
 								lexical_cast<RegistryKeyType>(parts[1]),
 								_env

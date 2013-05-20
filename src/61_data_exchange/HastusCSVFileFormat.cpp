@@ -231,7 +231,7 @@ namespace synthese
 					}
 
 					// Point
-					shared_ptr<geos::geom::Point> point;
+					boost::shared_ptr<geos::geom::Point> point;
 					if(!x.empty() && !y.empty())
 					{
 						try

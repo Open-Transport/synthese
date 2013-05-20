@@ -170,7 +170,7 @@ namespace synthese
 			}
 
 			// Put the actor back to sleep.
-			_deadline.async_wait(bind(&MGScreenConnection::checkDeadline, this));
+			_deadline.async_wait(boost::bind(&MGScreenConnection::checkDeadline, this));
 		}
 
 

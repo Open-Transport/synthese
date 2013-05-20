@@ -425,7 +425,7 @@ namespace synthese
 			{
 				const StopPoint& ps(*itps.second);
 
-				shared_ptr<Point> wgs84ps;
+				boost::shared_ptr<Point> wgs84ps;
 				if(ps.hasGeometry())
 				{
 					wgs84ps = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(*ps.getGeometry());
@@ -634,7 +634,7 @@ namespace synthese
 				const DesignatedLinePhysicalStop& ls(static_cast<DesignatedLinePhysicalStop&>(*lineStop.second));
 				const StopPoint* ps = static_cast<const StopPoint*>(ls.getFromVertex());
 
-				shared_ptr<Point> wgs84ps;
+				boost::shared_ptr<Point> wgs84ps;
 				if(ps->hasGeometry())
 				{
 					wgs84ps = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(*ps->getGeometry());
@@ -766,7 +766,7 @@ namespace synthese
 				LineStopTableSync::SearchResult linestops(
 					LineStopTableSync::Search(_env, srv->getPath()->getKey())
 				);
-				BOOST_FOREACH(const shared_ptr<LineStop>& ls, linestops)
+				BOOST_FOREACH(const boost::shared_ptr<LineStop>& ls, linestops)
 				{
 					os << "<vehicleJourneyAtStop>" << "\n";
 					os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
@@ -876,7 +876,7 @@ namespace synthese
 					LineStopTableSync::SearchResult linestops(
 						LineStopTableSync::Search(_env, srv->getPath()->getKey())
 					);
-					BOOST_FOREACH(const shared_ptr<LineStop>& ls, linestops)
+					BOOST_FOREACH(const boost::shared_ptr<LineStop>& ls, linestops)
 					{
 						os << "<vehicleJourneyAtStop>" << "\n";
 						os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
@@ -1015,7 +1015,7 @@ namespace synthese
 					StopAreaTableSync::SearchResult places(
 						StopAreaTableSync::Search(senv, city->getKey(), true)
 					);
-					BOOST_FOREACH(const shared_ptr<const StopArea>& cp, places)
+					BOOST_FOREACH(const boost::shared_ptr<const StopArea>& cp, places)
 					{
 						// filter physical stops not concerned by this line.
 						if(!_env.getRegistry<StopArea>().contains(cp->getKey())) continue;
@@ -1158,7 +1158,7 @@ namespace synthese
 			)	);
 
 			// Transport mode
-			shared_ptr<RollingStock> rollingStock;
+			boost::shared_ptr<RollingStock> rollingStock;
 			RollingStockTableSync::SearchResult rollingStocks(
 				RollingStockTableSync::Search(
 					_env,
@@ -1417,8 +1417,8 @@ namespace synthese
 				if(_importStops)
 				{
 					// Geometry
-					shared_ptr<StopPoint::Geometry> geometry;
-					shared_ptr<const City> city;
+					boost::shared_ptr<StopPoint::Geometry> geometry;
+					boost::shared_ptr<const City> city;
 					if(areaCentroidNode.isEmpty())
 					{
 						_logWarning(
@@ -1615,7 +1615,7 @@ namespace synthese
 			JourneyPatternTableSync::SearchResult sroutes(
 				JourneyPatternTableSync::Search(_env, cline->getKey())
 			);
-			BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, sroutes)
+			BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& line, sroutes)
 			{
 				LineStopTableSync::Search(
 					_env,
@@ -1856,7 +1856,7 @@ namespace synthese
 					{
 						ct = new CalendarTemplate(CalendarTemplateTableSync::getId());
 						ct->addCodeBySource(dataSource, calendarId);
-						_env.getEditableRegistry<CalendarTemplate>().add(shared_ptr<CalendarTemplate>(ct));
+						_env.getEditableRegistry<CalendarTemplate>().add(boost::shared_ptr<CalendarTemplate>(ct));
 						_calendarTemplates.add(*ct);
 						calendarToImport = true;
 					}
@@ -1885,7 +1885,7 @@ namespace synthese
 						}
 						if(calendarToImport)
 						{
-							BOOST_FOREACH(const shared_ptr<CalendarTemplateElement>& element, elements)
+							BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& element, elements)
 							{
 								_calendarElementsToRemove.insert(element);
 								_env.getEditableRegistry<CalendarTemplateElement>().remove(element->getKey());
@@ -1906,7 +1906,7 @@ namespace synthese
 						{
 							XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
 							date d(from_string(dayNode.getText()));
-							shared_ptr<CalendarTemplateElement> cte(new CalendarTemplateElement(CalendarTemplateElementTableSync::getId()));
+							boost::shared_ptr<CalendarTemplateElement> cte(new CalendarTemplateElement(CalendarTemplateElementTableSync::getId()));
 							cte->setCalendar(ct);
 							cte->setMinDate(d);
 							cte->setMaxDate(d);
@@ -2061,8 +2061,8 @@ namespace synthese
 						);
 						continue;
 					}
-					shared_ptr<StopPoint> startStop = startStops.front();
-					shared_ptr<StopPoint> endStop = endStops.front();
+					boost::shared_ptr<StopPoint> startStop = startStops.front();
+					boost::shared_ptr<StopPoint> endStop = endStops.front();
 
 					// Internal or external connection
 					if(startStop->getConnectionPlace() == endStop->getConnectionPlace())
@@ -2087,7 +2087,7 @@ namespace synthese
 								_env, startStop->getKey(), endStop->getKey()
 						)	);
 
-						shared_ptr<Junction> junction;
+						boost::shared_ptr<Junction> junction;
 						if(!junctions.empty())
 						{
 							junction = junctions.front();
@@ -2167,7 +2167,7 @@ namespace synthese
 			}
 			if(_importTimetablesAsTemplates)
 			{
-				BOOST_FOREACH(const shared_ptr<CalendarTemplateElement>& element, _calendarElementsToRemove)
+				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& element, _calendarElementsToRemove)
 				{
 					DBModule::GetDB()->deleteStmt(element->getKey(), transaction);
 				}

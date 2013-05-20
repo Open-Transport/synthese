@@ -67,6 +67,7 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/Geometry.h>
@@ -79,6 +80,8 @@ using namespace boost::algorithm;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
 using namespace geos::geom;
+using boost::tokenizer;
+using boost::escaped_list_separator;
 
 namespace synthese
 {
@@ -332,7 +335,7 @@ namespace synthese
 					}
 
 					// Point
-					shared_ptr<geos::geom::Point> point(
+					boost::shared_ptr<geos::geom::Point> point(
 						dataSource.getActualCoordinateSystem().createPoint(
 							lexical_cast<double>(_getValue("stop_lon")),
 							lexical_cast<double>(_getValue("stop_lat"))
@@ -864,7 +867,12 @@ namespace synthese
 					line
 				);
 				utfline = IConv(_import.get<DataSource>()->get<Charset>(), "UTF-8").convert(line);
-				split(_line, utfline, is_any_of(SEP));
+
+				tokenizer<escaped_list_separator<char> > tok(utfline, escaped_list_separator<char>('\\', ',', '\"'));
+				for(tokenizer<escaped_list_separator<char> >::iterator beg=tok.begin(); beg!=tok.end(); ++beg)
+				{
+					_line.push_back(*beg);
+				}
 			}
 		}
 
@@ -918,7 +926,7 @@ namespace synthese
 
 					try
 					{
-						shared_ptr<const PTUseRule> ptUseRule(
+						boost::shared_ptr<const PTUseRule> ptUseRule(
 							PTUseRuleTableSync::Get(
 								lexical_cast<RegistryKeyType>(parts[1]),
 								_env
@@ -1051,11 +1059,11 @@ namespace synthese
 				if( ! edge->getNext())
 					break;
 
-				shared_ptr<geos::geom::LineString> lineStr = edge->getRealGeometry();
+				boost::shared_ptr<geos::geom::LineString> lineStr = edge->getRealGeometry();
 
 				if(!lineStr.get())continue;
 
-				shared_ptr<geos::geom::Geometry> prGeom(CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertGeometry(*lineStr));
+				boost::shared_ptr<geos::geom::Geometry> prGeom(CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertGeometry(*lineStr));
 
 				size_t nb_Points = lineStr->getNumPoints();
 
@@ -1193,9 +1201,9 @@ namespace synthese
 		{
 			bool passMidnight = false;
 
-			BOOST_FOREACH(const shared_ptr<LineStop>& ls, linestops)
+			BOOST_FOREACH(const boost::shared_ptr<LineStop>& ls, linestops)
 			{
-				shared_ptr<geos::geom::Point> gp;
+				boost::shared_ptr<geos::geom::Point> gp;
 				string departureTimeStr;
 				string arrivalTimeStr;
 				boost::posix_time::time_duration arrival;
@@ -1449,7 +1457,7 @@ namespace synthese
 				const StopPoint& stopPoint(*itps.second);
 				if (stopPoint.getDepartureEdges().empty() && stopPoint.getArrivalEdges().empty()) continue;
 
-				shared_ptr<geos::geom::Point> gp;
+				boost::shared_ptr<geos::geom::Point> gp;
 				if(stopPoint.hasGeometry())
 				{
 					gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*stopPoint.getGeometry());
@@ -1474,7 +1482,7 @@ namespace synthese
 			){
 				const StopArea* connPlace(itcp.second.get());
 
-				shared_ptr<geos::geom::Point> gp;
+				boost::shared_ptr<geos::geom::Point> gp;
 				if(connPlace->getPoint().get() && !connPlace->getPoint()->isEmpty())
 				{
 					gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*connPlace->getPoint());
