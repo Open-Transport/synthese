@@ -221,7 +221,7 @@ namespace synthese
 				stream << f.open() << t.open();
 
 				size_t nextRank(0);
-				BOOST_FOREACH(const shared_ptr<CalendarTemplateElement>& ct, elements)
+				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& ct, elements)
 				{
 					delRequest.getAction()->setObjectId(ct->getKey());
 					nextRank = ct->getRank() + 1;
@@ -383,9 +383,9 @@ namespace synthese
 						UP_LINKS_LOAD_LEVEL,
 						_calendar->getKey()
 				)	);
-				BOOST_FOREACH(const shared_ptr<CalendarTemplate>& ct, calendars)
+				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplate>& ct, calendars)
 				{
-					shared_ptr<CalendarTemplateAdmin> page(
+					boost::shared_ptr<CalendarTemplateAdmin> page(
 						getNewPage<CalendarTemplateAdmin>()
 					);
 					page->setCalendar(const_pointer_cast<const CalendarTemplate>(ct));
