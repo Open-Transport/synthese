@@ -89,7 +89,7 @@ namespace synthese
 				HikingTrailTableSync::SearchResult::value_type& trail,
 				trails
 			){
-				shared_ptr<ParametersMap> itemMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> itemMap(new ParametersMap);
 
 				itemMap->insert(Request::PARAMETER_OBJECT_ID, trail->getKey());
 
@@ -98,7 +98,7 @@ namespace synthese
 
 			if(_itemDisplayPage.get())
 			{
-				BOOST_FOREACH(const shared_ptr<ParametersMap>& itemMap, pm.getSubMaps(DATA_HIKING_TRAIL))
+				BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& itemMap, pm.getSubMaps(DATA_HIKING_TRAIL))
 				{
 					itemMap->merge(getTemplateParameters());
 
