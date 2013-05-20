@@ -88,12 +88,12 @@ namespace synthese
 		const std::string ResaModule::DATA_CURRENT_CALL_TIMESTAMP("current_call_timestamp");
 
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
-		shared_ptr<Profile> ResaModule::_basicProfile;
-		shared_ptr<Profile> ResaModule::_autoresaProfile;
-		shared_ptr<Profile> ResaModule::_adminProfile;
+		boost::shared_ptr<Profile> ResaModule::_basicProfile;
+		boost::shared_ptr<Profile> ResaModule::_autoresaProfile;
+		boost::shared_ptr<Profile> ResaModule::_adminProfile;
 		recursive_mutex ResaModule::_sessionsCallIdsMutex;
-		shared_ptr<OnlineReservationRule> ResaModule::_reservationContact;
-		shared_ptr<PTServiceConfig> ResaModule::_journeyPlannerConfig;
+		boost::shared_ptr<OnlineReservationRule> ResaModule::_reservationContact;
+		boost::shared_ptr<PTServiceConfig> ResaModule::_journeyPlannerConfig;
 		ResaModule::ReservationsByService ResaModule::_reservationsByService;
 		boost::recursive_mutex ResaModule::_reservationsByServiceMutex;
 	}
@@ -126,7 +126,7 @@ namespace synthese
 				else
 					ResaModule::_basicProfile = profiles.front();
 				ResaModule::_basicProfile->setName(ResaModule::_BASIC_PROFILE_NAME);
-				shared_ptr<Right> r(new GlobalRight);
+				boost::shared_ptr<Right> r(new GlobalRight);
 				r->setPrivateLevel(FORBIDDEN);
 				r->setPublicLevel(FORBIDDEN);
 				ResaModule::_basicProfile->cleanRights();
@@ -146,12 +146,12 @@ namespace synthese
 				else
 					ResaModule::_autoresaProfile = profiles.front();
 				ResaModule::_autoresaProfile->setName(ResaModule::_AUTORESA_PROFILE_NAME);
-				shared_ptr<Right> r2(new GlobalRight);
+				boost::shared_ptr<Right> r2(new GlobalRight);
 				r2->setPrivateLevel(FORBIDDEN);
 				r2->setPublicLevel(FORBIDDEN);
 				ResaModule::_autoresaProfile->cleanRights();
 				ResaModule::_autoresaProfile->addRight(r2);
-				shared_ptr<Right> r3(new ResaRight);
+				boost::shared_ptr<Right> r3(new ResaRight);
 				r3->setPrivateLevel(WRITE);
 				r3->setPublicLevel(FORBIDDEN);
 				ResaModule::_autoresaProfile->addRight(r3);
@@ -201,7 +201,7 @@ namespace synthese
 				try
 				{
 					Env env;
-					shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get((*itrs)->getLineId(), env));
+					boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get((*itrs)->getLineId(), env));
 					stream << "<span class=\"" << line->getStyle() << "\"><span class=\"linesmall\">" << line->getShortName() << "</span></span> ";
 				}
 				catch (...)
@@ -406,7 +406,7 @@ namespace synthese
 					map.insert(DATA_SWITCH_CALL_URL, callRequest.getURL());
 
 					Env env;
-					shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
+					boost::shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
 					map.insert(DATA_CURRENT_CALL_TIMESTAMP, to_iso_string(entry->getDate()));
 				}
 			}

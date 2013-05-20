@@ -238,8 +238,8 @@ namespace synthese
 			// Search form
 			stream << "<h1>Recherche</h1>";
 
-			shared_ptr<Place> startPlace;
-			shared_ptr<Place> endPlace;
+			boost::shared_ptr<Place> startPlace;
+			boost::shared_ptr<Place> endPlace;
 
 			if (!_startCity.empty() && !_endCity.empty())
 			{

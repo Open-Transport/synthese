@@ -451,7 +451,7 @@ namespace synthese
 					assert(su.getArrivalEdge() != NULL);
 					assert(su.getArrivalEdge()->getHub() != NULL);
 
-					shared_ptr<Reservation> r(new Reservation);
+					boost::shared_ptr<Reservation> r(new Reservation);
 					r->setKey(ReservationTableSync::getId());
 					_env->getEditableRegistry<Reservation>().add(r);
 
@@ -588,7 +588,7 @@ namespace synthese
 					return;
 				}
 
-				shared_ptr<Reservation> r(new Reservation);
+				boost::shared_ptr<Reservation> r(new Reservation);
 				r->setKey(ReservationTableSync::getId());
 				_env->getEditableRegistry<Reservation>().add(r);
 

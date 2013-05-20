@@ -271,7 +271,7 @@ namespace synthese
 				JourneyPatternTableSync::SearchResult routes(
 					JourneyPatternTableSync::Search(*_env, _line->getKey())
 				);
-				BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, routes)
+				BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& line, routes)
 				{
 					LineStopTableSync::Search(
 						*_env,
@@ -348,7 +348,7 @@ namespace synthese
 						*_env,
 						_line->getKey()
 				)	);
-				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
+				BOOST_FOREACH(const boost::shared_ptr<FreeDRTArea>& area, areas)
 				{
 					FreeDRTTimeSlotTableSync::Search(
 						*_env,
@@ -412,7 +412,7 @@ namespace synthese
 				)	);
 
 				// Sort reservations
-				BOOST_FOREACH(const shared_ptr<const Reservation>& resa, sqlreservations)
+				BOOST_FOREACH(const boost::shared_ptr<const Reservation>& resa, sqlreservations)
 				{
 					reservations[resa->getServiceCode()].addReservation(resa.get());
 				}
@@ -426,7 +426,7 @@ namespace synthese
 			if(_reservationPage.get())
 			{
 				size_t rank(0);
-				BOOST_FOREACH(shared_ptr<ParametersMap> resaPM, pm.getSubMaps(DATA_RESERVATION))
+				BOOST_FOREACH(boost::shared_ptr<ParametersMap> resaPM, pm.getSubMaps(DATA_RESERVATION))
 				{
 					resaPM->merge(getTemplateParameters());
 					resaPM->insert(DATA_RANK, rank++);
@@ -481,7 +481,7 @@ namespace synthese
 		{
 			if(!_useCache)
 			{
-				setEnv(shared_ptr<Env>(new Env));
+				setEnv(boost::shared_ptr<Env>(new Env));
 			}
 		}
 
@@ -525,10 +525,10 @@ namespace synthese
 						decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
 					){
 						bool result(true);
-						shared_ptr<const ScheduledService> service(
+						boost::shared_ptr<const ScheduledService> service(
 							Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
 						);
-						shared_ptr<const StopArea> stopArea(
+						boost::shared_ptr<const StopArea> stopArea(
 							Env::GetOfficialEnv().get<StopArea>(reservation->getDeparturePlaceId())
 						);
 						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
@@ -562,10 +562,10 @@ namespace synthese
 						decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
 					){
 						bool result(true);
-						shared_ptr<const ScheduledService> service(
+						boost::shared_ptr<const ScheduledService> service(
 							Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
 						);
-						shared_ptr<const StopArea> stopArea(
+						boost::shared_ptr<const StopArea> stopArea(
 							Env::GetOfficialEnv().get<StopArea>(reservation->getArrivalPlaceId())
 						);
 
@@ -601,7 +601,7 @@ namespace synthese
 
 					//
 
-					shared_ptr<ParametersMap> resaPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> resaPM(new ParametersMap);
 					reservation->toParametersMap(*resaPM, _language);
 					pm.insert(DATA_RESERVATION, resaPM);
 				}

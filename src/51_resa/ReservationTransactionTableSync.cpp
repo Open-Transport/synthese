@@ -263,7 +263,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Generates the SQL expression filtering the record to load.
 		template<>
-		shared_ptr<SQLExpression> ConditionalSynchronizationPolicy<ReservationTransactionTableSync, ReservationTransaction>::GetWhereLoaded()
+		boost::shared_ptr<SQLExpression> ConditionalSynchronizationPolicy<ReservationTransactionTableSync, ReservationTransaction>::GetWhereLoaded()
 		{
 			// No massive load (reservation transactions are loaded on demand by their reservations)
 			return ValueExpression<int>::Get(0);

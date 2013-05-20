@@ -440,7 +440,7 @@ namespace synthese
 
 		FreeDRTBookingAdmin::PageLinks FreeDRTBookingAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<BookableCommercialLineAdmin> p(
+			boost::shared_ptr<BookableCommercialLineAdmin> p(
 				getNewPage<BookableCommercialLineAdmin>()
 			);
 			p->setCommercialLine(Env::GetOfficialEnv().getSPtr(_area->getLine()));
