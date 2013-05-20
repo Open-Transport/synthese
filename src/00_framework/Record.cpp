@@ -83,7 +83,7 @@ namespace synthese
 
 		if(colStr.empty())
 		{
-			return shared_ptr<Geometry>();
+			return boost::shared_ptr<Geometry>();
 		}
 
 		const geos::geom::GeometryFactory* factoryPtr;
@@ -101,12 +101,12 @@ namespace synthese
 		{
 			return
 				CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
-					*shared_ptr<Geometry>(reader.read(colStr))
+					*boost::shared_ptr<Geometry>(reader.read(colStr))
 			);
 		}
 		catch(geos::io::ParseException&)
 		{
-			return shared_ptr<Geometry>();
+			return boost::shared_ptr<Geometry>();
 		}
 }	}
 
