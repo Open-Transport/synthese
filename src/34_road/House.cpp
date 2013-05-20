@@ -161,7 +161,7 @@ namespace synthese
 			// Location
 			if(getGeometry().get())
 			{
-				shared_ptr<Geometry> center(
+				boost::shared_ptr<Geometry> center(
 					coordinatesSystem->convertPoint(*getGeometry())
 				);
 				pm.insert(DATA_X, center->getX());

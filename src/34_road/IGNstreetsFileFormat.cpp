@@ -150,7 +150,7 @@ namespace synthese
 							continue;
 						}
 						string codeINSEE(rows->getText(IGNstreetsFileFormat::_FIELD_INSEE_COMM));
-						shared_ptr<Point> geometry(
+						boost::shared_ptr<Point> geometry(
 							dynamic_pointer_cast<Point, Geometry>(
 								rows->getGeometryFromWKT(
 									IGNstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT",
@@ -162,11 +162,11 @@ namespace synthese
 							++badGeometry;
 							continue;
 						}
-						shared_ptr<House> house(new House());
+						boost::shared_ptr<House> house(new House());
 						house->setKey(HouseTableSync::getId());
 						house->setGeometry(geometry);
 						house->setHouseNumber(numero);
-						shared_ptr<City> city(CityTableSync::GetEditableFromCode(codeINSEE, _env));
+						boost::shared_ptr<City> city(CityTableSync::GetEditableFromCode(codeINSEE, _env));
 						// ToDo tester si le RoadPlace a été trouvé + City
 						if(!city.get())
 						{
@@ -182,7 +182,7 @@ namespace synthese
 						}
 
 						RoadTableSync::SearchResult paths(RoadTableSync::Search(_env, roadPlace->getKey()));
-						BOOST_FOREACH(const shared_ptr<Path>& path, paths)
+						BOOST_FOREACH(const boost::shared_ptr<Path>& path, paths)
 						{
 							RoadChunkTableSync::Search(_env, path->getKey());
 						}

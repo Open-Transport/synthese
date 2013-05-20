@@ -79,7 +79,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, code));
 				roadPlace->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<RoadPlace>().add(shared_ptr<RoadPlace>(roadPlace));
+				env.getEditableRegistry<RoadPlace>().add(boost::shared_ptr<RoadPlace>(roadPlace));
 				roadPlaces.add(*roadPlace);
 				logger.logCreation(
 					"Creation of the road place with key "+ code +" ("+ city.getName() +" "+ name +")"
@@ -130,7 +130,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, code));
 				publicPlace->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<PublicPlace>().add(shared_ptr<PublicPlace>(publicPlace));
+				env.getEditableRegistry<PublicPlace>().add(boost::shared_ptr<PublicPlace>(publicPlace));
 				publicPlaces.add(*publicPlace);
 				logger.logCreation(
 					"Creation of the public place with key "+ code +" ("+ city.getName() +" "+ name +")"
@@ -205,7 +205,7 @@ namespace synthese
 			{
 				crossing = new Crossing(
 					CrossingTableSync::getId(),
-					shared_ptr<Point>(),
+					boost::shared_ptr<Point>(),
 					string(),
 					NULL,
 					false
@@ -213,7 +213,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, code));
 				crossing->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<Crossing>().add(shared_ptr<Crossing>(crossing));
+				env.getEditableRegistry<Crossing>().add(boost::shared_ptr<Crossing>(crossing));
 				crossings.add(*crossing);
 				logger.logCreation(
 					"Creation of the crossing with key "+ code
@@ -279,7 +279,7 @@ namespace synthese
 				);
 
 				// Second road chunk creation
-				shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
+				boost::shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
 				secondRoadChunk->setRoad(road);
 				secondRoadChunk->setFromCrossing(&endNode);
 				secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
@@ -331,7 +331,7 @@ namespace synthese
 				if(road)
 				{
 					// First road chunk creation
-					shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
+					boost::shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
 					firstRoadChunk->setRoad(road);
 					firstRoadChunk->setFromCrossing(&startNode);
 					firstRoadChunk->setRankInPath(0);
@@ -352,13 +352,13 @@ namespace synthese
 				}
 				else
 				{
-					shared_ptr<MainRoadPart> road(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
+					boost::shared_ptr<MainRoadPart> road(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
 					road->setRoadPlace(roadPlace);
 					road->setKey(RoadTableSync::getId());
 					env.getEditableRegistry<MainRoadPart>().add(road);
 
 					// First road chunk
-					shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
+					boost::shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
 					firstRoadChunk->setRoad(road.get());
 					firstRoadChunk->setFromCrossing(&startNode);
 					firstRoadChunk->setRankInPath(0);
@@ -378,7 +378,7 @@ namespace synthese
 					env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
 
 					// Second road chunk
-					shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
+					boost::shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
 					secondRoadChunk->setRoad(road.get());
 					secondRoadChunk->setFromCrossing(&endNode);
 					secondRoadChunk->setRankInPath(1);
@@ -449,7 +449,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, code));
 				publicPlaceEntrance->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<PublicPlaceEntrance>().add(shared_ptr<PublicPlaceEntrance>(publicPlaceEntrance));
+				env.getEditableRegistry<PublicPlaceEntrance>().add(boost::shared_ptr<PublicPlaceEntrance>(publicPlaceEntrance));
 				publicPlaceEntrances.add(*publicPlaceEntrance);
 				stringstream logStream;
 				logStream << "Creation of the public place entrance with key " << code << " (" << publicPlace.getFullName();

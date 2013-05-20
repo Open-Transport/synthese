@@ -144,7 +144,7 @@ namespace synthese
 				StaticActionRequest<ObjectUpdateAction> movePlaceAction(request);
 				movePlaceAction.getAction()->setObject(*_place);
 
-				shared_ptr<Point> mapCenter(_place->get<PointGeometry>());
+				boost::shared_ptr<Point> mapCenter(_place->get<PointGeometry>());
 
 				// If the place does not contain any point, it has no coordinate : search the last created place with coordinates
 				if(!mapCenter.get() || mapCenter->isEmpty())
@@ -359,7 +359,7 @@ namespace synthese
 				isAuthorized(*request.getUser()) &&
 				dynamic_cast<const PublicPlaceAdmin*>(&currentPage)
 			){
-				shared_ptr<PublicPlaceAdmin> page(getNewCopiedPage());
+				boost::shared_ptr<PublicPlaceAdmin> page(getNewCopiedPage());
 				page->setPlace(dynamic_cast<const PublicPlaceAdmin&>(currentPage)._place);
 				links.push_back(page);
 			}

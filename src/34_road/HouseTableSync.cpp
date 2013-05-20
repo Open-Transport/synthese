@@ -91,7 +91,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			// Geometry
-			shared_ptr<Point> point(
+			boost::shared_ptr<Point> point(
 				static_pointer_cast<Point, Geometry>(
 					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
 			)	);

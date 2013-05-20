@@ -244,7 +244,7 @@ namespace synthese
 							dynamic_cast<const RoadPlace&>(*place.value)
 						);
 
-						shared_ptr<House> house(roadPlace.getHouse(number, numberAtBeginning));
+						boost::shared_ptr<House> house(roadPlace.getHouse(number, numberAtBeginning));
 
 						ExtendedFetchPlaceResult placeResult;
 						placeResult.cityResult = cityResult;

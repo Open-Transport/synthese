@@ -135,7 +135,7 @@ namespace synthese
 				if(node->hasTag("addr:housenumber") && node->hasTag("addr:street"))
 				{
 					// Compute the house geometry
-					shared_ptr<Point> houseCoord(
+					boost::shared_ptr<Point> houseCoord(
 						dataSource.getActualCoordinateSystem().createPoint(node->getLon(), node->getLat())
 					);
 					housesNodesWithGeom.push_back(make_pair(node, static_cast<Point*>(houseCoord->clone())));
@@ -168,7 +168,7 @@ namespace synthese
 					0, 0, true, true,
 					util::UP_LINKS_LOAD_LEVEL // code
 				);
-				shared_ptr<City> city;
+				boost::shared_ptr<City> city;
 
 				if(cities.empty())
 				{
@@ -224,10 +224,10 @@ namespace synthese
 					bool nonDrivableWay(!way->isDrivable());
 					bool nonBikableWay(!way->isBikable());
 
-					shared_ptr<RoadPlace> roadPlace = _getOrCreateRoadPlace(way, city);
+					boost::shared_ptr<RoadPlace> roadPlace = _getOrCreateRoadPlace(way, city);
 
 					// Create Road
-					shared_ptr<MainRoadPart> road(new MainRoadPart(0, wayType));
+					boost::shared_ptr<MainRoadPart> road(new MainRoadPart(0, wayType));
 
 					road->setRoadPlace(*roadPlace);
 					road->setKey(RoadTableSync::getId());
@@ -287,8 +287,8 @@ namespace synthese
 					}
 
 					const GeometryFactory& geometryFactory(CoordinatesSystem::GetDefaultGeometryFactory());
-					shared_ptr<CoordinateSequence> cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
-					shared_ptr<Crossing> startCrossing;
+					boost::shared_ptr<CoordinateSequence> cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+					boost::shared_ptr<Crossing> startCrossing;
 					size_t rank(0);
 					MetricOffset metricOffset(0);
 
@@ -299,7 +299,7 @@ namespace synthese
 						NodePtr node = idAndNode.second;
 						i++;
 
-						shared_ptr<Point> point(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+						boost::shared_ptr<Point> point(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
 							*dataSource.getActualCoordinateSystem().createPoint(
 								node->getLon(),
 								node->getLat()
@@ -320,7 +320,7 @@ namespace synthese
 							continue;
 						}
 
-						shared_ptr<LineString> roadChunkLine(geometryFactory.createLineString(*cs));
+						boost::shared_ptr<LineString> roadChunkLine(geometryFactory.createLineString(*cs));
 
 						_createRoadChunk(road, startCrossing, roadChunkLine, rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay, nonDrivableWay, nonBikableWay);
 
@@ -336,7 +336,7 @@ namespace synthese
 					}
 
 					// Add last road chunk.
-					_createRoadChunk(road, startCrossing, optional<shared_ptr<LineString> >(), rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay, nonDrivableWay, nonBikableWay);
+					_createRoadChunk(road, startCrossing, optional<boost::shared_ptr<LineString> >(), rank, metricOffset, traficDirection, maxSpeed, nonWalkableWay, nonDrivableWay, nonBikableWay);
 				}
 
 				const PreparedGeometry* cityGeom = boundary->toPreparedGeometry().get();
@@ -351,7 +351,7 @@ namespace synthese
 					_RecentlyCreatedRoadPlaces::iterator it(_recentlyCreatedRoadPlaces.find(cityName + string(" ") + _toAlphanumericString(node->getTag("addr:street"))));
 					if(it != _recentlyCreatedRoadPlaces.end())
 					{
-						shared_ptr<RoadPlace> refRoadPlace;
+						boost::shared_ptr<RoadPlace> refRoadPlace;
 						refRoadPlace = it->second;
 						std::vector<MainRoadChunk*> refRoadChunks;
 
@@ -449,7 +449,7 @@ namespace synthese
 					// If there is at least one
 					if(!waysList.empty())
 					{
-						shared_ptr<RoadPlace> refRoadPlace;
+						boost::shared_ptr<RoadPlace> refRoadPlace;
 						// Loop over every ways
 						BOOST_FOREACH(WayPtr curWay, waysList)
 						{
@@ -597,9 +597,9 @@ namespace synthese
 
 
 
-		shared_ptr<RoadPlace> OSMFileFormat::Importer_::_getOrCreateRoadPlace(
+		boost::shared_ptr<RoadPlace> OSMFileFormat::Importer_::_getOrCreateRoadPlace(
 			WayPtr& way,
-			shared_ptr<City> city
+			boost::shared_ptr<City> city
 		) const {
 			string roadName;
 			string plainRoadName;
@@ -621,8 +621,8 @@ namespace synthese
 				}
 			}
 
-			shared_ptr<RoadPlace> roadPlace;
-			roadPlace = shared_ptr<RoadPlace>(new RoadPlace);
+			boost::shared_ptr<RoadPlace> roadPlace;
+			roadPlace = boost::shared_ptr<RoadPlace>(new RoadPlace);
 			roadPlace->setCity(city.get());
 			roadPlace->setName(roadName);
 			roadPlace->setKey(RoadPlaceTableSync::getId());
@@ -640,9 +640,9 @@ namespace synthese
 		/*
 		 * creates or retrieves an existing crossing for a node
 		 */
-		shared_ptr<Crossing> OSMFileFormat::Importer_::_getOrCreateCrossing(
+		boost::shared_ptr<Crossing> OSMFileFormat::Importer_::_getOrCreateCrossing(
 			NodePtr &node,
-			shared_ptr<Point> position
+			boost::shared_ptr<Point> position
 		) const {
 			_CrossingsMap::const_iterator it = _crossingsMap.find(node->getId());
 			if(it != _crossingsMap.end())
@@ -650,7 +650,7 @@ namespace synthese
 				return it->second;
 			}
 
-			shared_ptr<Crossing> crossing(
+			boost::shared_ptr<Crossing> crossing(
 				new Crossing(
 					CrossingTableSync::getId(),
 					position,
@@ -666,9 +666,9 @@ namespace synthese
 
 
 		void OSMFileFormat::Importer_::_createRoadChunk(
-			const shared_ptr<MainRoadPart> road,
-			const shared_ptr<Crossing> crossing,
-			const optional<shared_ptr<LineString> > geometry,
+			const boost::shared_ptr<MainRoadPart> road,
+			const boost::shared_ptr<Crossing> crossing,
+			const optional<boost::shared_ptr<LineString> > geometry,
 			size_t rank,
 			MetricOffset metricOffset,
 			TraficDirection traficDirection,
@@ -677,7 +677,7 @@ namespace synthese
 			bool isNonDrivable,
 			bool isNonBikable
 		) const {
-			shared_ptr<MainRoadChunk> roadChunk(new MainRoadChunk);
+			boost::shared_ptr<MainRoadChunk> roadChunk(new MainRoadChunk);
 			roadChunk->setRoad(road.get());
 			roadChunk->setFromCrossing(crossing.get());
 			roadChunk->setRankInPath(rank);
@@ -745,7 +745,7 @@ namespace synthese
 			{
 				MainRoadChunk::HouseNumber num = lexical_cast<MainRoadChunk::HouseNumber>(house->getTag("addr:housenumber"));
 				// Compute the house geometry
-				shared_ptr<Point> houseCoord(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+				boost::shared_ptr<Point> houseCoord(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
 					*_import.get<DataSource>()->getActualCoordinateSystem().createPoint(
 						house->getLon(),
 						house->getLat()

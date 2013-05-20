@@ -137,7 +137,7 @@ namespace synthese
 			string viaPointsStr(rows->getText (TABLE_COL_GEOMETRY));
 			if(viaPointsStr.empty())
 			{
-				object->setGeometry(shared_ptr<LineString>());
+				object->setGeometry(boost::shared_ptr<LineString>());
 			}
 			else
 			{
@@ -152,7 +152,7 @@ namespace synthese
 
 				try
 				{
-					shared_ptr<MainRoadPart> road(RoadTableSync::GetEditable(rows->getLongLong(RoadChunkTableSync::COL_ROADID), env, linkLevel));
+					boost::shared_ptr<MainRoadPart> road(RoadTableSync::GetEditable(rows->getLongLong(RoadChunkTableSync::COL_ROADID), env, linkLevel));
 					object->setRoad(road.get());
 					object->setFromCrossing(
 						CrossingTableSync::GetEditable(
@@ -396,9 +396,9 @@ namespace synthese
 			const Point& point,
 			double maxDistance,
 			Address& address,
-			EdgeProjector<shared_ptr<MainRoadChunk> >::CompatibleUserClassesRequired requiredUserClasses
+			EdgeProjector<boost::shared_ptr<MainRoadChunk> >::CompatibleUserClassesRequired requiredUserClasses
 		){
-			EdgeProjector<shared_ptr<MainRoadChunk> >::From paths(
+			EdgeProjector<boost::shared_ptr<MainRoadChunk> >::From paths(
 				SearchByMaxDistance(
 					point,
 					maxDistance,
@@ -408,24 +408,24 @@ namespace synthese
 
 			if(!paths.empty())
 			{
-				EdgeProjector<shared_ptr<MainRoadChunk> > projector(paths, maxDistance, requiredUserClasses);
+				EdgeProjector<boost::shared_ptr<MainRoadChunk> > projector(paths, maxDistance, requiredUserClasses);
 
 				try
 				{
-					EdgeProjector<shared_ptr<MainRoadChunk> >::PathNearby projection(
+					EdgeProjector<boost::shared_ptr<MainRoadChunk> >::PathNearby projection(
 						projector.projectEdge(
 							*point.getCoordinate()
 					)	);
 
 					address.setGeometry(
-						shared_ptr<Point>(
+						boost::shared_ptr<Point>(
 							CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createPoint(
 								projection.get<0>()
 					)	)	);
 					address.setRoadChunk(projection.get<1>().get());
 					address.setMetricOffset(projection.get<2>());
 				}
-				catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
+				catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
 				{
 				}
 			}
