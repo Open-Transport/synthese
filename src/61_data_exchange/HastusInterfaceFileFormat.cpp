@@ -216,7 +216,7 @@ namespace synthese
 			);
 
 			// Record 2 : Lines
-			typedef map<string, shared_ptr<RollingStock> > LineTransportModes;
+			typedef map<string, boost::shared_ptr<RollingStock> > LineTransportModes;
 			LineTransportModes lineTransportModes;
 			for(size_t lineRank(0); lineRank < lineNumbers.size(); ++lineRank)
 			{
@@ -233,7 +233,7 @@ namespace synthese
 				{
 					tridentKey = "Bus";
 				}
-				shared_ptr<RollingStock> rollingStock;
+				boost::shared_ptr<RollingStock> rollingStock;
 				RollingStockTableSync::SearchResult rollingStocks(
 					RollingStockTableSync::Search(
 						_env,

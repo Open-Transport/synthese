@@ -82,7 +82,7 @@ namespace synthese
 
 			DataSource& dataSource(*_import.get<DataSource>());
 
-			shared_ptr<DB> db;
+			boost::shared_ptr<DB> db;
 
 			if(_dbConnString)
 			{
@@ -280,13 +280,13 @@ namespace synthese
 						result->setName(routeName);
 						result->setWayBack(wayBack);
 						result->addCodeBySource(*_plannedDataSource, string());
-						_env.getEditableRegistry<JourneyPattern>().add(shared_ptr<JourneyPattern>(result));
+						_env.getEditableRegistry<JourneyPattern>().add(boost::shared_ptr<JourneyPattern>(result));
 						routes.insert(result);
 
 						size_t rank(0);
 						BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 						{
-							shared_ptr<DesignatedLinePhysicalStop> ls(
+							boost::shared_ptr<DesignatedLinePhysicalStop> ls(
 								new DesignatedLinePhysicalStop(
 									LineStopTableSync::getId(),
 									result,
@@ -351,7 +351,7 @@ namespace synthese
 						service->addCodeBySource(dataSource, serviceRef);
 						service->setActive(today);
 						route->addService(*service, false);
-						_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
+						_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(service));
 						_services.insert(service);
 
 						_log(

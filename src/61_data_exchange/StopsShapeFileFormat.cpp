@@ -159,7 +159,7 @@ namespace synthese
 
 			while(rows->next())
 			{
-				shared_ptr<Point> geometry(
+				boost::shared_ptr<Point> geometry(
 					dynamic_pointer_cast<Point, Geometry>(
 						rows->getGeometryFromWKT(
 							_FIELD_GEOMETRY+"_ASTEXT",

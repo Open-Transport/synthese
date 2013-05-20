@@ -151,8 +151,8 @@ namespace synthese
 				// Loop on imported items
 				BOOST_FOREACH(const Item& item, items)
 				{
-					shared_ptr<SentScenario> updatedScenario;
-					shared_ptr<Alarm> updatedMessage;
+					boost::shared_ptr<SentScenario> updatedScenario;
+					boost::shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
 							dataSource.getObjectByCode<Scenario>(lexical_cast<string>(item.guid))
@@ -186,7 +186,7 @@ namespace synthese
 						// Links creation
 						if(_lineRecipientId)
 						{
-							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+							boost::shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 							link->setKey(AlarmObjectLinkTableSync::getId());
 							link->setAlarm(message);
 							link->setObjectId(*_lineRecipientId);
@@ -195,7 +195,7 @@ namespace synthese
 						}
 						if(_stopRecipientId)
 						{
-							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+							boost::shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 							link->setKey(AlarmObjectLinkTableSync::getId());
 							link->setAlarm(message);
 							link->setObjectId(*_stopRecipientId);
@@ -204,7 +204,7 @@ namespace synthese
 						}
 						if(_broadcastPointRecipientId)
 						{
-							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+							boost::shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 							link->setKey(AlarmObjectLinkTableSync::getId());
 							link->setAlarm(message);
 							link->setObjectId(*_broadcastPointRecipientId);

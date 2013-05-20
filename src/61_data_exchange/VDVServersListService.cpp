@@ -79,7 +79,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const VDVServerSubscription> subscription(
+					boost::shared_ptr<const VDVServerSubscription> subscription(
 						Env::GetOfficialEnv().getRegistry<VDVServerSubscription>().get(subscriptionId)
 					);
 					if(!subscription->get<VDVServer>())
@@ -105,7 +105,7 @@ namespace synthese
 
 			if(_serverFilter.get())
 			{
-				shared_ptr<ParametersMap> serverPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> serverPM(new ParametersMap);
 				_serverFilter->toParametersMap(*serverPM, true);
 				map.insert(TAG_SERVER, serverPM);
 			}
@@ -115,7 +115,7 @@ namespace synthese
 					const VDVServer::Registry::value_type& server,
 					Env::GetOfficialEnv().getRegistry<VDVServer>()
 				){
-					shared_ptr<ParametersMap> serverPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> serverPM(new ParametersMap);
 					server.second->toParametersMap(*serverPM, true);
 					map.insert(TAG_SERVER, serverPM);
 				}

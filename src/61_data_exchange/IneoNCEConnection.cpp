@@ -186,7 +186,7 @@ namespace synthese
 			}
 
 			// Put the actor back to sleep.
-			_deadline.async_wait(bind(&IneoNCEConnection::checkDeadline, this));
+			_deadline.async_wait(boost::bind(&IneoNCEConnection::checkDeadline, this));
 		}
 
 
@@ -341,7 +341,7 @@ namespace synthese
 		{
 			DBTransaction transaction;
 			Env env(Env::GetOfficialEnv());
-			_messages[messageName] = shared_ptr<messages::SentAlarm>(new SentAlarm(AlarmTableSync::getId()));
+			_messages[messageName] = boost::shared_ptr<messages::SentAlarm>(new SentAlarm(AlarmTableSync::getId()));
 			_messages[messageName]->setScenario(_sentScenario.get());
 			_sentScenario->addMessage(*_messages[messageName]);
 			_messages[messageName]->setLongMessage("");
@@ -360,8 +360,8 @@ namespace synthese
 						);
 			{
 				DBTransaction transaction;
-				shared_ptr<Session> session(Session::New("0.0.0.0"));
-				BOOST_FOREACH(shared_ptr<AlarmObjectLink> alarmLink, alarmLinks)
+				boost::shared_ptr<Session> session(Session::New("0.0.0.0"));
+				BOOST_FOREACH(boost::shared_ptr<AlarmObjectLink> alarmLink, alarmLinks)
 				{
 					AlarmObjectLinkTableSync::Remove(alarmLink->getKey());
 					DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(session.get(), alarmLink->getKey(),
@@ -728,7 +728,7 @@ namespace synthese
 					{
 						try
 						{
-							shared_ptr<Point> point(
+							boost::shared_ptr<Point> point(
 								CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
 									lexical_cast<double>(longNode.getText()),
 									lexical_cast<double>(latNode.getText())

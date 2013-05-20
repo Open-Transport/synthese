@@ -76,7 +76,7 @@ namespace synthese
 			Env& env,
 			const impex::ImportLogger& importLogger
 		){
-			shared_ptr<JourneyPattern> route(new JourneyPattern);
+			boost::shared_ptr<JourneyPattern> route(new JourneyPattern);
 			route->setCommercialLine(&line);
 			route->addCodeBySource(source, string());
 			route->setKey(JourneyPatternTableSync::getId());
@@ -86,7 +86,7 @@ namespace synthese
 			size_t rank(0);
 			BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
 			{
-				shared_ptr<DesignatedLinePhysicalStop> ls(
+				boost::shared_ptr<DesignatedLinePhysicalStop> ls(
 					new DesignatedLinePhysicalStop(
 						LineStopTableSync::getId(),
 						route.get(),
@@ -141,7 +141,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				network->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<TransportNetwork>().add(shared_ptr<TransportNetwork>(network));
+				env.getEditableRegistry<TransportNetwork>().add(boost::shared_ptr<TransportNetwork>(network));
 				networks.add(*network);
 				importLogger.log(
 					ImportLogger::CREA,
@@ -224,7 +224,7 @@ namespace synthese
 			{
 				city.addIncludedPlace(*stopArea);
 			}
-			env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
+			env.getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(stopArea));
 			stopAreas.add(*stopArea);
 
 			importLogger.logCreation(
@@ -348,13 +348,13 @@ namespace synthese
 					StopPointTableSync::getId(),
 					string(),
 					&stopArea,
-					shared_ptr<Point>(),
+					boost::shared_ptr<Point>(),
 					false
 			)	);
 			Importable::DataSourceLinks links;
 			links.insert(make_pair(&source, code));
 			stop->setDataSourceLinksWithoutRegistration(links);
-			env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stop));
+			env.getEditableRegistry<StopPoint>().add(boost::shared_ptr<StopPoint>(stop));
 			stops.add(*stop);
 
 			// Properties
@@ -511,7 +511,7 @@ namespace synthese
 						}
 						curStop->setName(name);
 						curStop->setCity(&cityForStopAreaAutoGeneration);
-						env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
+						env.getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(curStop));
 						importLogger.log(
 							ImportLogger::CREA,
 							"Auto generation of the commercial stop for stop "+ code +" ("+ name +")"
@@ -619,7 +619,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				line->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<CommercialLine>().add(shared_ptr<CommercialLine>(line));
+				env.getEditableRegistry<CommercialLine>().add(boost::shared_ptr<CommercialLine>(line));
 				lines.add(*line);
 			}
 
@@ -749,13 +749,13 @@ namespace synthese
 				result->setDataSourceLinksWithoutRegistration(links);
 
 				// Storage in the environment
-				env.getEditableRegistry<JourneyPattern>().add(shared_ptr<JourneyPattern>(result));
+				env.getEditableRegistry<JourneyPattern>().add(boost::shared_ptr<JourneyPattern>(result));
 
 				// Served stops
 				size_t rank(0);
 				BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 				{
-					shared_ptr<DesignatedLinePhysicalStop> ls(
+					boost::shared_ptr<DesignatedLinePhysicalStop> ls(
 						new DesignatedLinePhysicalStop(
 							LineStopTableSync::getId(),
 							result,
@@ -783,7 +783,7 @@ namespace synthese
 						}
 
 						Env env2;
-						shared_ptr<DesignatedLinePhysicalStop> templateObject(
+						boost::shared_ptr<DesignatedLinePhysicalStop> templateObject(
 							LineStopTableSync::SearchSimilarLineStop(
 								static_cast<const StopPoint&>(*(*itEdge)->getFromVertex()),
 								static_cast<const StopPoint&>(*(*(itEdge+1))->getFromVertex()),
@@ -987,7 +987,7 @@ namespace synthese
 				}
 
 				route.addService(*result, false);
-				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
+				env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(result));
 
 				importLogger.log(
 					ImportLogger::CREA,
@@ -1087,7 +1087,7 @@ namespace synthese
 				result->setSchedules(departureSchedules, arrivalSchedules, true);
 				result->setPath(&route);
 				route.addService(*result, false);
-				env.getEditableRegistry<ContinuousService>().add(shared_ptr<ContinuousService>(result));
+				env.getEditableRegistry<ContinuousService>().add(boost::shared_ptr<ContinuousService>(result));
 
 				importLogger.log(
 					ImportLogger::CREA,
@@ -1285,7 +1285,7 @@ namespace synthese
 					stream << HTMLModule::getHTMLLink(openRequest.getURL(), object.stopArea->getFullName());
 				}
 
-				shared_ptr<geos::geom::Point> projectedPoint;
+				boost::shared_ptr<geos::geom::Point> projectedPoint;
 				if(object.coords.get())
 				{
 					projectedPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*object.coords);
@@ -1454,7 +1454,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				destination->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<Destination>().add(shared_ptr<Destination>(destination));
+				env.getEditableRegistry<Destination>().add(boost::shared_ptr<Destination>(destination));
 				destinations.add(*destination);
 				importLogger.log(
 					ImportLogger::CREA,
