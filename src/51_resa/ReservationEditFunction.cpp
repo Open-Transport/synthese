@@ -111,7 +111,7 @@ namespace synthese
 		ReservationEditFunction::ReservationEditFunction():
 			FactorableTemplate<interfaces::RequestWithInterface,ReservationEditFunction>()
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			setEnv(boost::shared_ptr<Env>(new Env));
 		}
 	}
 }

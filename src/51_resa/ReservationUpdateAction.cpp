@@ -139,7 +139,7 @@ namespace synthese
 				}
 				else
 				{
-					_vehicle = shared_ptr<Vehicle>();
+					_vehicle = boost::shared_ptr<Vehicle>();
 				}
 			}
 			catch(ObjectNotFoundException<Vehicle>&)
@@ -182,7 +182,7 @@ namespace synthese
 				}
 				else
 				{
-					_acknowledgeUser = shared_ptr<User>();
+					_acknowledgeUser = boost::shared_ptr<User>();
 				}
 			}
 
@@ -202,7 +202,7 @@ namespace synthese
 				}
 				else
 				{
-					_cancellationAcknowledgeUser = shared_ptr<User>();
+					_cancellationAcknowledgeUser = boost::shared_ptr<User>();
 				}
 			}
 
@@ -347,7 +347,7 @@ namespace synthese
 				}
 
 				{
-					shared_ptr<VehiclePosition> position;
+					boost::shared_ptr<VehiclePosition> position;
 					if(_reservation->getVehiclePositionAtDeparture())
 					{
 						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->getVehiclePositionAtDeparture()));
@@ -375,10 +375,10 @@ namespace synthese
 						}
 					}
 
-					shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getDeparturePlaceId(), *_env));
+					boost::shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getDeparturePlaceId(), *_env));
 					StopPointTableSync::Search(*_env, stopArea->getKey());
 					const StopPoint* stopPoint(stopArea->getPhysicalStops().begin()->second);
-					shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
+					boost::shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
 					Edge* edge(
 						service->getEdgeFromStopAndTime(
 							*stopPoint,
@@ -396,7 +396,7 @@ namespace synthese
 							_realDepartureTime
 					)	);
 					bool geomToWrite(true);
-					BOOST_FOREACH(const shared_ptr<VehiclePosition>& oldPosition, oldPositions)
+					BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& oldPosition, oldPositions)
 					{
 						if(oldPosition->getGeometry())
 						{
@@ -425,7 +425,7 @@ namespace synthese
 				}
 
 				{
-					shared_ptr<VehiclePosition> position;
+					boost::shared_ptr<VehiclePosition> position;
 					if(_reservation->getVehiclePositionAtArrival())
 					{
 						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->getVehiclePositionAtArrival()));
@@ -453,10 +453,10 @@ namespace synthese
 						}
 					}
 
-					shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getArrivalPlaceId(), *_env));
+					boost::shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getArrivalPlaceId(), *_env));
 					StopPointTableSync::Search(*_env, stopArea->getKey());
 					const StopPoint* stopPoint(stopArea->getPhysicalStops().begin()->second);
-					shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
+					boost::shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
 					Edge* edge(
 						service->getEdgeFromStopAndTime(
 							*stopPoint,
@@ -474,7 +474,7 @@ namespace synthese
 							_realArrivalTime
 					)	);
 					bool geomToWrite(true);
-					BOOST_FOREACH(const shared_ptr<VehiclePosition>& oldPosition, oldPositions)
+					BOOST_FOREACH(const boost::shared_ptr<VehiclePosition>& oldPosition, oldPositions)
 					{
 						if(oldPosition->getGeometry())
 						{

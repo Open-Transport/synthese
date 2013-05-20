@@ -165,7 +165,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(const shared_ptr<User>& user, users)
+				BOOST_FOREACH(const boost::shared_ptr<User>& user, users)
 				{
 					openRequest.getPage()->setUser(user);
 
@@ -222,7 +222,7 @@ namespace synthese
 
 			if(ra)
 			{
-				shared_ptr<ResaCustomerAdmin> p(
+				boost::shared_ptr<ResaCustomerAdmin> p(
 					getNewPage<ResaCustomerAdmin>()
 				);
 				p->setUser(ra->getUser());

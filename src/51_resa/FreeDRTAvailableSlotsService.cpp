@@ -151,7 +151,7 @@ namespace synthese
 			{
 				// Declarations
 				const FreeDRTTimeSlot& timeSlot(static_cast<const FreeDRTTimeSlot&>(*itServ));
-				shared_ptr<ParametersMap> servicePM;
+				boost::shared_ptr<ParametersMap> servicePM;
 
 				// Calendar check
 				// TODO handle time slots with date change
@@ -198,7 +198,7 @@ namespace synthese
 					}
 
 					// Storage of the slot
-					shared_ptr<ParametersMap> slotPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> slotPM(new ParametersMap);
 					slotPM->insert(ATTR_DEPARTURE_TIME, curTime);
 					slotPM->insert(ATTR_ARRIVAL_TIME, curTime + bestCommercialJourneyTime);
 					servicePM->insert(ITEM_SLOT, slotPM);

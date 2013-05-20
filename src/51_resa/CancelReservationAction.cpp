@@ -110,7 +110,7 @@ namespace synthese
 			ReservationTableSync::SearchResult reservations(
 				ReservationTableSync::Search(*_env, _transaction->getKey())
 			);
-			BOOST_FOREACH(const shared_ptr<Reservation>& resa, reservations)
+			BOOST_FOREACH(const boost::shared_ptr<Reservation>& resa, reservations)
 			{
 				if (resa->getReservationRuleId() != 0)
 				{
@@ -143,13 +143,13 @@ namespace synthese
 			ResaDBLog::AddCancelReservationEntry(request.getSession().get(), *_transaction, oldStatus);
 
 			// Mail
-            shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));
+            boost::shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));
 			const OnlineReservationRule* reservationContact(NULL);
 			BOOST_FOREACH(const Reservation* resa, _transaction->getReservations())
 			{
 				try
 				{
-					shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(resa->getLineId(), *_env));
+					boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get(resa->getLineId(), *_env));
 					const OnlineReservationRule* onlineContact(OnlineReservationRule::GetOnlineReservationRule(
 							line->getReservationContact()
 					)	);

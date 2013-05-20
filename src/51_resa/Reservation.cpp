@@ -320,7 +320,7 @@ namespace synthese
 			}
 			if(_acknowledgeUser)
 			{
-				shared_ptr<ParametersMap> userPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
 				_acknowledgeUser->toParametersMap(*userPM);
 				pm.insert(DATA_ACKNOWLEDGE_USER, userPM);
 			}
@@ -338,7 +338,7 @@ namespace synthese
 			}
 			if(_cancellationAcknowledgeUser)
 			{
-				shared_ptr<ParametersMap> userPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
 				_cancellationAcknowledgeUser->toParametersMap(*userPM);
 				pm.insert(DATA_CANCELLATION_ACKNOWLEDGE_USER, userPM);
 			}
@@ -351,7 +351,7 @@ namespace synthese
 			pm.insert(DATA_SEAT, getSeatNumber());
 
 			// Status
-			shared_ptr<ParametersMap> statusPM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> statusPM(new ParametersMap);
 			statusPM->insert(DATA_STATUS, static_cast<int>(getStatus()));
 			statusPM->insert(DATA_NAME, ResaModule::GetStatusText(getStatus()));
 			statusPM->insert(DATA_FULL_TEXT, getFullStatusText());

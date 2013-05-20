@@ -130,7 +130,7 @@ namespace synthese
 			AdminFunctionRequest<ReservationAdmin> openRequest(request, *this);
 
 			AdminFunctionRequest<ResaCustomerAdmin> openCustomer(request);
-			shared_ptr<const User> user(UserTableSync::Get(_resa->getTransaction()->getCustomerUserId(), *_env));
+			boost::shared_ptr<const User> user(UserTableSync::Get(_resa->getTransaction()->getCustomerUserId(), *_env));
 			openCustomer.getPage()->setUser(user);
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));

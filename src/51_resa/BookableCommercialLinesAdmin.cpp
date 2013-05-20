@@ -115,7 +115,7 @@ namespace synthese
 			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, lines);
 			stream << t.open();
 
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
 				openRequest.getPage()->setCommercialLine(line);
 
@@ -170,9 +170,9 @@ namespace synthese
 					optional<size_t>()
 					, false, true, true, true
 			)	);
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
-				shared_ptr<BookableCommercialLineAdmin> p(
+				boost::shared_ptr<BookableCommercialLineAdmin> p(
 					getNewPage<BookableCommercialLineAdmin>()
 				);
 				p->setCommercialLine(line);

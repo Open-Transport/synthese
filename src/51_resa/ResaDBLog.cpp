@@ -81,7 +81,7 @@ namespace synthese
 					dynamic_cast<const Request& >(searchRequest)
 				);
 
-				shared_ptr<const User> user(
+				boost::shared_ptr<const User> user(
 					UserTableSync::Get(
 						id,
 						*dynamic_cast<const Request& >(
@@ -149,7 +149,7 @@ namespace synthese
 		void ResaDBLog::UpdateCallEntryDate( RegistryKeyType callId )
 		{
 			Env env;
-			shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
+			boost::shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
 			DBLogEntry::Content content(entry->getContent());
 			ptime now(second_clock::local_time());
 			content[COL_DATE2] = to_iso_extended_string(now.date()) + " "+to_simple_string(now.time_of_day());
@@ -163,7 +163,7 @@ namespace synthese
 			try
 			{
 				Env env;
-				shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
+				boost::shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
 				entry->setObjectId(customerId);
 
 				DBLogEntryTableSync::Save(entry.get());
@@ -253,7 +253,7 @@ namespace synthese
 			bool writingRight(searchRequest.getUser()->getProfile()->isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL));
 
 			ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(lexical_cast<int>(content[ResaDBLog::COL_TYPE])));
-			shared_ptr<ReservationTransaction> tr;
+			boost::shared_ptr<ReservationTransaction> tr;
 			ReservationStatus status(NO_RESERVATION);
 			Env env;
 
@@ -340,12 +340,12 @@ namespace synthese
 				if(entryType == RESERVATION_ENTRY)
 				{
 					// Cancel request
-					shared_ptr<CancelReservationAction> action(new CancelReservationAction);
+					boost::shared_ptr<CancelReservationAction> action(new CancelReservationAction);
 					action->setTransaction(tr);
 					Request cancelRequest(
 						searchRequest,
 						static_pointer_cast<Action, CancelReservationAction>(action),
-						shared_ptr<Function>(searchRequest.getFunction()->clone())
+						boost::shared_ptr<Function>(searchRequest.getFunction()->clone())
 					);
 
 					switch(status)
