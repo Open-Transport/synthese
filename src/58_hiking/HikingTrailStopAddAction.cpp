@@ -100,7 +100,7 @@ namespace synthese
 			}
 
 			const string place(map.get<string>(PARAMETER_NAME));
-			vector<shared_ptr<StopArea> > stops(
+			vector<boost::shared_ptr<StopArea> > stops(
 				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())

@@ -192,7 +192,7 @@ namespace synthese
 
 			BOOST_FOREACH(Registry<HikingTrail>::value_type it, Env::GetOfficialEnv().getRegistry<HikingTrail>())
 			{
-				shared_ptr<HikingTrailAdmin> p(getNewPage<HikingTrailAdmin>());
+				boost::shared_ptr<HikingTrailAdmin> p(getNewPage<HikingTrailAdmin>());
 				p->setTrail(it.second);
 				links.push_back(p);
 			}
