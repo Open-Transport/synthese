@@ -162,7 +162,7 @@ namespace synthese
 			// Up page
 			if(map.isDefined(PARAMETER_UP_ID))
 			{
-				_up = shared_ptr<Webpage>();
+				_up = boost::shared_ptr<Webpage>();
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_UP_ID));
 				if(id > 0)
 				try
@@ -185,7 +185,7 @@ namespace synthese
 			// Site
 			if(map.isDefined(PARAMETER_SITE_ID))
 			{
-				_site = shared_ptr<Website>();
+				_site = boost::shared_ptr<Website>();
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
 				if(id > 0)
 					try
@@ -351,7 +351,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					page.getKey()
 					)	);
-				BOOST_FOREACH(shared_ptr<Webpage> subPage, subPages)
+				BOOST_FOREACH(boost::shared_ptr<Webpage> subPage, subPages)
 				{
 					_updateSite(*subPage, transaction);
 					WebPageTableSync::Save(subPage.get(), transaction);

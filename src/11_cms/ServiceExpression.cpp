@@ -146,7 +146,7 @@ namespace synthese
 			}
 
 			// Function
-			shared_ptr<Function> function(_functionCreator->create());
+			boost::shared_ptr<Function> function(_functionCreator->create());
 			if(dynamic_cast<FunctionWithSiteBase*>(function.get()))
 			{
 				static_cast<FunctionWithSiteBase*>(function.get())->setSite(page.getRoot());

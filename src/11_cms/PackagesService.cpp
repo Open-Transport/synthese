@@ -200,7 +200,7 @@ namespace synthese
 							p << t.col();
 							if(isInstalled)
 							{
-								shared_ptr<ObjectBase> site(
+								boost::shared_ptr<ObjectBase> site(
 									Env::GetOfficialEnv().getCastEditable<ObjectBase, Website>(siteId)
 								);
 								updateRequest.getAction()->setObject(site);

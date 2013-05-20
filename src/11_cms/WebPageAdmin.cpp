@@ -349,7 +349,7 @@ namespace synthese
 						siteMoveForm.getForm().getSelectInput(
 							WebPageUpdateAction::PARAMETER_SITE_ID,
 							WebsiteTableSync::Search(Env::GetOfficialEnv()),
-							optional<shared_ptr<Website> >(
+							optional<boost::shared_ptr<Website> >(
 								Env::GetOfficialEnv().getEditableSPtr(_page->getRoot())
 							)
 						)
@@ -439,9 +439,9 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _page->getRoot()->getKey(), _page->getKey()));
-			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
+			BOOST_FOREACH(const boost::shared_ptr<Webpage>& page, pages)
 			{
-				shared_ptr<WebPageAdmin> p(
+				boost::shared_ptr<WebPageAdmin> p(
 					getNewPage<WebPageAdmin>()
 				);
 				p->setPage(const_pointer_cast<const Webpage>(page));
@@ -457,7 +457,7 @@ namespace synthese
 		{
 			if(_page->getParent())
 			{
-				shared_ptr<WebPageAdmin> p(
+				boost::shared_ptr<WebPageAdmin> p(
 					getNewPage<WebPageAdmin>()
 				);
 				p->setPage(Env::GetOfficialEnv().getSPtr(_page->getParent()));
@@ -467,7 +467,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<WebsiteAdmin> p(
+				boost::shared_ptr<WebsiteAdmin> p(
 					getNewPage<WebsiteAdmin>()
 				);
 				p->setSite(Env::GetOfficialEnv().getSPtr(_page->getRoot()));
@@ -508,7 +508,7 @@ namespace synthese
 
 			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
-				shared_ptr<Webpage> page(*it);
+				boost::shared_ptr<Webpage> page(*it);
 
 				openRequest.getPage()->setPage(const_pointer_cast<const Webpage>(page));
 				viewRequest.getFunction()->setPage(page.get());

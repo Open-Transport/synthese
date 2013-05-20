@@ -154,7 +154,7 @@ namespace synthese
 				// Export the page
 				if(_rawData)
 				{
-					shared_ptr<ParametersMap> pagePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> pagePM(new ParametersMap);
 					curPage->toParametersMap(*pagePM, true, false);
 					pm.insert(TAG_PAGE, pagePM);
 				}

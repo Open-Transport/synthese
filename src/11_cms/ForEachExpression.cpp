@@ -237,7 +237,7 @@ namespace synthese
 			size_t itemsCount(items.size());
 
 			// Sorting items : building the sorting key
-			typedef multimap<string, shared_ptr<ParametersMap>, 
+			typedef multimap<string, boost::shared_ptr<ParametersMap>, 
 					boost::function<bool(const string &, const string &)> > SortedItems;
 
 			string sortAlgoStr(
@@ -345,7 +345,7 @@ namespace synthese
 			// Return the result in a new submap in order to give a chance to the caller
 			if(_resultsInASubmap)
 			{
-				shared_ptr<ParametersMap> pm(new ParametersMap);
+				boost::shared_ptr<ParametersMap> pm(new ParametersMap);
 				if(!_sortUpTemplate.empty())
 				{
 					BOOST_FOREACH(const SortedItems::value_type item, sortedItems)
@@ -371,7 +371,7 @@ namespace synthese
 							continue;
 						}
 
-						shared_ptr<ParametersMap> subPm(item);
+						boost::shared_ptr<ParametersMap> subPm(item);
 						pm->insert("foreach_results", subPm);
 					}
 				}
