@@ -60,7 +60,7 @@ namespace synthese
 		void ExportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			string fileFormatKey(map.get<string>(PARAMETER_FILE_FORMAT));
-			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(fileFormatKey));
+			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(fileFormatKey));
 			_exporter = fileFormat->getExporter();
 			_exporter->setFromParametersMap(map);
 		}
