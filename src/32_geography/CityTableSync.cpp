@@ -105,7 +105,7 @@ namespace synthese
 					Env::GetOfficialEnv(),
 					obj->getName()
 			)	);
-			BOOST_FOREACH(shared_ptr<City> other, others)
+			BOOST_FOREACH(boost::shared_ptr<City> other, others)
 			{
 				if(other->getKey() != obj->getKey())
 				{
@@ -213,8 +213,8 @@ namespace synthese
 					0, 1, false, false,
 					FIELDS_ONLY_LOAD_LEVEL
 			)	);
-			if(cities.empty()) return shared_ptr<City>();
-			shared_ptr<const City> result(cities.front());
+			if(cities.empty()) return boost::shared_ptr<City>();
+			boost::shared_ptr<const City> result(cities.front());
 			return GetEditable(result->getKey(), environment, linkLevel);
 		}
 	}
