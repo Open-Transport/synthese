@@ -98,7 +98,7 @@ namespace synthese
 
 			if(!messages.empty())
 			{
-				shared_ptr<ForumMessage> message(messages.front());
+				boost::shared_ptr<ForumMessage> message(messages.front());
 
 				if(dateDisplayPage.get())
 				{
