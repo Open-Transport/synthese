@@ -157,9 +157,9 @@ namespace synthese
 					_upSort
 			)	);
 
-			BOOST_FOREACH(const shared_ptr<DBLogEntry>& dbe, entries)
+			BOOST_FOREACH(const boost::shared_ptr<DBLogEntry>& dbe, entries)
 			{
-				shared_ptr<ParametersMap> entryPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> entryPM(new ParametersMap);
 				entryPM->insert("id", dbe->getKey());
 
 				entryPM->insert("date", to_iso_extended_string(dbe->getDate()));
@@ -167,7 +167,7 @@ namespace synthese
 				entryPM->insert("entry_level", static_cast<int>(dbe->getLevel()));
 				entryPM->insert("entry_level_text", DBLogModule::getEntryLevelLabel(dbe->getLevel()));
 
-				shared_ptr<const User> user;
+				boost::shared_ptr<const User> user;
 				try
 				{
 					user = UserTableSync::Get(dbe->getUserId(), *_env);
@@ -177,7 +177,7 @@ namespace synthese
 				}
 				if(user.get())
 				{
-					shared_ptr<ParametersMap> userPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
 					user->toParametersMap(*userPM);
 					entryPM->insert("user", userPM);
 				}

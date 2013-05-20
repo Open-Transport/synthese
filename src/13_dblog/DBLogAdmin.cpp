@@ -151,12 +151,12 @@ namespace synthese
 				request.getUser() &&
 				request.getUser()->getProfile()
 			){
-				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
-				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
+				vector<boost::shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
+				BOOST_FOREACH(const boost::shared_ptr<DBLog> loge, logs)
 				{
 					if(!loge->isAuthorized(*request.getUser()->getProfile(), READ) || loge->getName().empty()) continue;
 
-					shared_ptr<DBLogAdmin> p(
+					boost::shared_ptr<DBLogAdmin> p(
 						getNewPage<DBLogAdmin>()
 					);
 					p->_viewer.setLogKey(
