@@ -144,7 +144,7 @@ namespace synthese
 					_requestParameters.orderField == PARAM_SEARCH_NAME,
 					_requestParameters.raisingOrder
 			)	);
-			BOOST_FOREACH(const shared_ptr<MapSource>& mapSource, mapSources)
+			BOOST_FOREACH(const boost::shared_ptr<MapSource>& mapSource, mapSources)
 			{
 				// Row init
 				stream << t.row();
@@ -238,9 +238,9 @@ namespace synthese
 					MapSourceTableSync::Search(
 						*_env
 				)	);
-				BOOST_FOREACH(const shared_ptr<MapSource>& mapSource, mapSources)
+				BOOST_FOREACH(const boost::shared_ptr<MapSource>& mapSource, mapSources)
 				{
-					shared_ptr<MapSourceAdmin> p(getNewPage<MapSourceAdmin>());
+					boost::shared_ptr<MapSourceAdmin> p(getNewPage<MapSourceAdmin>());
 					p->setMapSource(const_pointer_cast<const MapSource>(mapSource));
 					links.push_back(p);
 				}

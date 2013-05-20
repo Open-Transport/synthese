@@ -58,7 +58,7 @@ namespace synthese
 
 		void CityNameValueInterfaceElement::storeParameters(ValueElementList& vel)
 		{
-			_uid = vel.isEmpty() ? shared_ptr<LibraryInterfaceElement>() : vel.front();
+			_uid = vel.isEmpty() ? boost::shared_ptr<LibraryInterfaceElement>() : vel.front();
 		}
 	}
 }
