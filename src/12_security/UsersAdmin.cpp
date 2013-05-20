@@ -211,7 +211,7 @@ namespace synthese
 			stream << f.open();
 			stream << t.open();
 
-			BOOST_FOREACH(const shared_ptr<User>& user, users)
+			BOOST_FOREACH(const boost::shared_ptr<User>& user, users)
 			{
 				userRequest.getPage()->setUser(user);
 				deleteUserRequest.getAction()->setObjectId(user->getKey());
@@ -271,7 +271,7 @@ namespace synthese
 
 			if(ua)
 			{
-				shared_ptr<UserAdmin> p(getNewPage<UserAdmin>());
+				boost::shared_ptr<UserAdmin> p(getNewPage<UserAdmin>());
 				p->setUserC(ua->getUser());
 				links.push_back(p);
 			}

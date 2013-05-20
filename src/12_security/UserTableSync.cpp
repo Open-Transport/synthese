@@ -283,7 +283,7 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 			Env env;
-			shared_ptr<const User> user(UserTableSync::Get(id, env));
+			boost::shared_ptr<const User> user(UserTableSync::Get(id, env));
 			SecurityLog::addUserAdmin(
 				session->getUser().get(),
 				user.get(),
@@ -294,7 +294,7 @@ namespace synthese
 
 	namespace security
 	{
-		shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )
+		boost::shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )
 		{
 			Env& env(Env::GetOfficialEnv());
 			DB* db = DBModule::GetDB();
@@ -309,7 +309,7 @@ namespace synthese
 				if (rows->next () == false)
 					throw Exception("User "+ login + " not found in database.");
 
-				shared_ptr<User> user (new User(rows->getKey()));
+				boost::shared_ptr<User> user (new User(rows->getKey()));
 				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);
 				return user;
 			}

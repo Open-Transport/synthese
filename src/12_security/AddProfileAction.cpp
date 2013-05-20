@@ -91,7 +91,7 @@ namespace synthese
 
 		void AddProfileAction::run(Request& request)
 		{
-			shared_ptr<Profile> profile(new Profile);
+			boost::shared_ptr<Profile> profile(new Profile);
 			profile->setName(_name);
 			if (_templateProfile.get())
 			{
@@ -102,7 +102,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<Right> r(new GlobalRight);
+				boost::shared_ptr<Right> r(new GlobalRight);
 				r->setPrivateLevel(FORBIDDEN);
 				r->setPublicLevel(FORBIDDEN);
 				profile->addRight(r);

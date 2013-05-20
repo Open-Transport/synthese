@@ -49,7 +49,7 @@ namespace synthese
 		{
 			ParameterLabelsVector m;
 			m.push_back(make_pair(GLOBAL_PERIMETER, "(tous profils)"));
-			SecurityRight::addSubProfilesLabel(m, shared_ptr<Profile>(), string());
+			SecurityRight::addSubProfilesLabel(m, boost::shared_ptr<Profile>(), string());
 			return m;
 		}
 
@@ -114,10 +114,10 @@ namespace synthese
 
 		void SecurityRight::addSubProfilesLabel(
 			ParameterLabelsVector& plv,
-			shared_ptr<Profile> parent,
+			boost::shared_ptr<Profile> parent,
 			std::string prefix
 		){
-			BOOST_FOREACH(const shared_ptr<Profile>& profile, SecurityModule::getSubProfiles(parent))
+			BOOST_FOREACH(const boost::shared_ptr<Profile>& profile, SecurityModule::getSubProfiles(parent))
 			{
 				plv.push_back(make_pair(lexical_cast<string>(profile->getKey()), prefix + profile->getName()));
 

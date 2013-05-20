@@ -151,7 +151,7 @@ namespace synthese
 			if(_user.get() && _user.get()->getProfile())
 			{
 				// 1 Reading of the global right
-				shared_ptr<const Right> right =  _user.get()->getProfile()->getRight();
+				boost::shared_ptr<const Right> right =  _user.get()->getProfile()->getRight();
 				if (right != NULL)
 				{
 					if( (_private && (right->getPrivateRightLevel() >= _level)) ||

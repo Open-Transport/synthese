@@ -199,7 +199,7 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 			Env env;
-			shared_ptr<const Profile> profile(ProfileTableSync::Get(id, env));
+			boost::shared_ptr<const Profile> profile(ProfileTableSync::Get(id, env));
 			SecurityLog::addProfileAdmin(session->getUser().get(), profile.get(), "Suppression de " + profile->getName());
 		}
 
@@ -267,7 +267,7 @@ namespace synthese
 
 			for (RightsVector::const_iterator it = p->getRights().begin(); it != p->getRights().end(); ++it)
 			{
-				shared_ptr<const Right> right = it->second;
+				boost::shared_ptr<const Right> right = it->second;
 				if (it != p->getRights().begin())
 					s	<< RIGHT_SEPARATOR;
 				s	<< right->getFactoryKey()
@@ -299,7 +299,7 @@ namespace synthese
 
 				try
 				{
-					shared_ptr<Right> right(Factory<Right>::create(*it));
+					boost::shared_ptr<Right> right(Factory<Right>::create(*it));
 
 					++it;
 					right->setParameter(*it);

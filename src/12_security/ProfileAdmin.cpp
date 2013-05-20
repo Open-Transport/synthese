@@ -166,7 +166,7 @@ namespace synthese
 				// Habilitations list
 				for (RightsVector::const_iterator it = _profile->getRights().begin(); it != _profile->getRights().end(); ++it)
 				{
-					shared_ptr<const Right> right = it->second;
+					boost::shared_ptr<const Right> right = it->second;
 					stream << t.row();
 					stream << t.col() << right->getName();
 					stream << t.col() << right->displayParameter();
@@ -227,8 +227,8 @@ namespace synthese
 
 			stream << t.open();
 
-			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<Right> right, rights)
+			vector<boost::shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
+			BOOST_FOREACH(const boost::shared_ptr<Right> right, rights)
 			{
 				ParameterLabelsVector pl(right->getParametersLabels());
 				HTMLForm form(addRightRequest.getHTMLForm("add" + right->getFactoryKey()));
@@ -289,7 +289,7 @@ namespace synthese
 			_profile = const_pointer_cast<const Profile>(value);
 		}
 
-		shared_ptr<const Profile> ProfileAdmin::getProfile() const
+		boost::shared_ptr<const Profile> ProfileAdmin::getProfile() const
 		{
 			return _profile;
 		}
@@ -306,9 +306,9 @@ namespace synthese
 					_getEnv(),
 					_profile->getKey()
 			)	);
-			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
+			BOOST_FOREACH(const boost::shared_ptr<Profile>& profile, profiles)
 			{
-				shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
+				boost::shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
 				p->setProfile(profile);
 				links.push_back(p);
 			}

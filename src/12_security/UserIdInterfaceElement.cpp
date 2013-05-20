@@ -54,7 +54,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			shared_ptr<const User> user(request->getUser());
+			boost::shared_ptr<const User> user(request->getUser());
 			if (user)
 				stream << user->getKey();
 

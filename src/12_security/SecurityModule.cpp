@@ -69,7 +69,7 @@ namespace synthese
 			DBTransaction transaction;
 
 			SecurityModule::_rootProfile->setName(SecurityModule::ROOT_PROFILE);
-			shared_ptr<Right> r(new GlobalRight);
+			boost::shared_ptr<Right> r(new GlobalRight);
 			r->setPublicLevel(DELETE_RIGHT);
 			r->setPrivateLevel(DELETE_RIGHT);
 			SecurityModule::_rootProfile->cleanRights();
@@ -128,18 +128,18 @@ namespace synthese
 		const std::string SecurityModule::ROOT_RIGHTS = "*,*,100,100";
 		const std::string SecurityModule::ROOT_USER = "root";
 
-		shared_ptr<User> SecurityModule::_rootUser;
-		shared_ptr<Profile> SecurityModule::_rootProfile;
+		boost::shared_ptr<User> SecurityModule::_rootUser;
+		boost::shared_ptr<Profile> SecurityModule::_rootProfile;
 
-		shared_ptr<Profile>	_rootProfile;
+		boost::shared_ptr<Profile>	_rootProfile;
 
 
 
 		SecurityModule::FactoryKeysLabels SecurityModule::getRightsTemplates()
 		{
 			FactoryKeysLabels m;
-			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<Right> right, rights)
+			vector<boost::shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
+			BOOST_FOREACH(const boost::shared_ptr<Right> right, rights)
 			{
 				m.push_back(make_pair(right->getFactoryKey(), right->getFactoryKey()));
 			}
@@ -160,7 +160,7 @@ namespace synthese
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(env)
 			);
-			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
+			BOOST_FOREACH(const boost::shared_ptr<Profile>& profile, profiles)
 			{
 				m.push_back(make_pair(profile->getKey(), profile->getName()));
 			}
@@ -188,7 +188,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					false
 			)	);
-			BOOST_FOREACH(const shared_ptr<User>& user, users)
+			BOOST_FOREACH(const boost::shared_ptr<User>& user, users)
 			{
 				m.push_back(make_pair(user->getKey(), user->getSurname() + " " + user->getName()));
 			}
@@ -202,17 +202,17 @@ namespace synthese
 			FactoryKeysLabels m;
 			if (withAll)
 				m.push_back(make_pair(optional<string>(), "(toutes)"));
-			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<Right> right, rights)
+			vector<boost::shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
+			BOOST_FOREACH(const boost::shared_ptr<Right> right, rights)
 			{
 				m.push_back(make_pair(right->getFactoryKey(), right->getName()));
 			}
 			return m;
 		}
 
-		std::vector<shared_ptr<Profile> > SecurityModule::getSubProfiles(shared_ptr<const Profile> profile )
+		std::vector<boost::shared_ptr<Profile> > SecurityModule::getSubProfiles(boost::shared_ptr<const Profile> profile )
 		{
-			vector<shared_ptr<Profile> > v;
+			vector<boost::shared_ptr<Profile> > v;
 			Env env;
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(
@@ -222,7 +222,7 @@ namespace synthese
 					optional<size_t>(),
 					FIELDS_ONLY_LOAD_LEVEL
 			)	);
-			BOOST_FOREACH(const shared_ptr<Profile>& cprofile, profiles)
+			BOOST_FOREACH(const boost::shared_ptr<Profile>& cprofile, profiles)
 			{
 				 v.push_back(cprofile);
 			}
