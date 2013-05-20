@@ -303,7 +303,7 @@ namespace synthese
 			SearchResult fares(Search(env));
 			result.push_back(make_pair(RegistryKeyType(0), "(inconnu)"));
 
-			BOOST_FOREACH(const shared_ptr<Fare>& fare, fares)
+			BOOST_FOREACH(const boost::shared_ptr<Fare>& fare, fares)
 			{
 				result.push_back(make_pair(fare->getKey(), fare->getName()));
 			}
