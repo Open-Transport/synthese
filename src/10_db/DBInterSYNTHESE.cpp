@@ -314,12 +314,12 @@ namespace synthese
 				RegistryTableType tableId(
 					lexical_cast<RegistryTableType>(perimeter)
 				);
-				shared_ptr<DBTableSync> tableSync(
+				boost::shared_ptr<DBTableSync> tableSync(
 					DBModule::GetTableSync(
 						tableId
 				)	);
 
-				shared_ptr<DBDirectTableSync> directTableSync(
+				boost::shared_ptr<DBDirectTableSync> directTableSync(
 					dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
 						tableSync
 				)	);

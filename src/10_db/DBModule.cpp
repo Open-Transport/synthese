@@ -96,8 +96,8 @@ namespace synthese
 		{
 			// Table sync registration
 			DBModule::_tableSyncMap.clear();
-			vector<shared_ptr<DBTableSync> > tableSyncs(Factory<DBTableSync>::GetNewCollection());
-			BOOST_FOREACH(shared_ptr<DBTableSync> sync, tableSyncs)
+			vector<boost::shared_ptr<DBTableSync> > tableSyncs(Factory<DBTableSync>::GetNewCollection());
+			BOOST_FOREACH(boost::shared_ptr<DBTableSync> sync, tableSyncs)
 			{
 				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync;
 				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync;
@@ -195,7 +195,7 @@ namespace synthese
 
 
 
-		shared_ptr<DB> DBModule::GetDBSPtr()
+		boost::shared_ptr<DB> DBModule::GetDBSPtr()
 		{
 			assert(_Db.get());
 			return _Db;
@@ -204,9 +204,9 @@ namespace synthese
 
 		boost::shared_ptr<DB> DBModule::GetDBForStandaloneUse(const string& connectionString)
 		{
-			shared_ptr<DB::ConnectionInfo> ci(new DB::ConnectionInfo(connectionString));
+			boost::shared_ptr<DB::ConnectionInfo> ci(new DB::ConnectionInfo(connectionString));
 
-			shared_ptr<DB> db(util::Factory<DB>::create(ci->backend));
+			boost::shared_ptr<DB> db(util::Factory<DB>::create(ci->backend));
 			db->setStandaloneUse(true);
 			db->setConnectionInfo(ci);
 			db->initForStandaloneUse();
@@ -237,7 +237,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<DBTableSync> tableSync(GetTableSync(decodeTableId(id)));
+					boost::shared_ptr<DBTableSync> tableSync(GetTableSync(decodeTableId(id)));
 					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
 					{
 						continue;
@@ -268,7 +268,7 @@ namespace synthese
 				{
 					if(!tableSync)
 					{
-						shared_ptr<DBTableSync> tableSyncR(GetTableSync(decodeTableId(item->getKey())));
+						boost::shared_ptr<DBTableSync> tableSyncR(GetTableSync(decodeTableId(item->getKey())));
 						tableSync = dynamic_cast<DBDirectTableSync*>(tableSyncR.get());
 						if(!tableSync)
 						{
@@ -282,7 +282,7 @@ namespace synthese
 
 
 
-		shared_ptr<const Registrable> DBModule::GetObject(
+		boost::shared_ptr<const Registrable> DBModule::GetObject(
 			util::RegistryKeyType id,
 			util::Env& env
 		){
@@ -294,7 +294,7 @@ namespace synthese
 		boost::shared_ptr<util::Registrable> DBModule::GetEditableObject( util::RegistryKeyType id, util::Env& env )
 		{
 			RegistryTableType tableId(decodeTableId(id));
-			shared_ptr<DBDirectTableSync> tableSync(
+			boost::shared_ptr<DBDirectTableSync> tableSync(
 				dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
 					GetTableSync(tableId)
 			)	);
@@ -312,7 +312,7 @@ namespace synthese
 			boost::optional<DBTransaction&> transaction /*= boost::optional<DBTransaction&>() */
 		){
 			RegistryTableType tableId(decodeTableId(object.getKey())); // If the key is not defined, the table is not decoded
-			shared_ptr<DBDirectTableSync> tableSync(
+			boost::shared_ptr<DBDirectTableSync> tableSync(
 				dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
 					GetTableSync(tableId)
 			)	);
@@ -336,7 +336,7 @@ namespace synthese
 				ServerModule::SetCurrentThreadRunningAction();
 
 				// Loop on each conditional synchronized table
-				BOOST_FOREACH(shared_ptr<ConditionalSynchronizationPolicyBase> sync, _conditionalTableSyncsToReload)
+				BOOST_FOREACH(boost::shared_ptr<ConditionalSynchronizationPolicyBase> sync, _conditionalTableSyncsToReload)
 				{
 					// Cleaning up the env with obsolete data
 					RegistryBase& registry(

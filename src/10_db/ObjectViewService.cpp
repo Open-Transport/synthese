@@ -60,7 +60,7 @@ namespace synthese
 			// Object
 			try
 			{
-				shared_ptr<const Registrable> object(
+				boost::shared_ptr<const Registrable> object(
 					DBModule::GetObject(
 						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
 						Env::GetOfficialEnv()
