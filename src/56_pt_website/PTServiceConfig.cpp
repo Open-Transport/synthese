@@ -194,7 +194,7 @@ namespace synthese
 
 
 
-		void PTServiceConfig::addCity(shared_ptr<City> city)
+		void PTServiceConfig::addCity(boost::shared_ptr<City> city)
 		{
 			if(!city) return;
 
@@ -204,7 +204,7 @@ namespace synthese
 			if(it != _citiesMatcher.entries().end())
 			{
 				string oldName(it->first.getSource());
-				shared_ptr<City> oldCity(it->second);
+				boost::shared_ptr<City> oldCity(it->second);
 				_citiesMatcher.remove(oldName);
 				_citiesMatcher.add(oldName + " (" + oldCity->getCode().substr(0,2) + ")", oldCity);
 				name += " (" + city->getCode().substr(0,2) + ")";
@@ -228,7 +228,7 @@ namespace synthese
 
 
 
-		const shared_ptr<Place> PTServiceConfig::fetchPlace(
+		const boost::shared_ptr<Place> PTServiceConfig::fetchPlace(
 			const string& cityName,
 			const string& placeName
 		) const {
