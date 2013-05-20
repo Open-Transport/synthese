@@ -98,7 +98,7 @@ namespace synthese
 		void InterfacePageAddAction::run(
 			Request& request
 		){
-			shared_ptr<InterfacePage> object(Factory<InterfacePage>::create(_class));
+			boost::shared_ptr<InterfacePage> object(Factory<InterfacePage>::create(_class));
 			object->setInterface(_interface.get());
 			object->setPageCode(_variant);
 			InterfacePageTableSync::Save(object.get());
