@@ -130,8 +130,8 @@ namespace synthese
 				}
 
 				// Depot, stop point, direction, length
-				shared_ptr<Depot> depot;
-				shared_ptr<StopPoint> stop;
+				boost::shared_ptr<Depot> depot;
+				boost::shared_ptr<StopPoint> stop;
 				RegistryKeyType pid(rows->getLongLong(DeadRunTableSync::COL_DEPOT_ID));
 				RegistryKeyType stopId(rows->getLongLong(DeadRunTableSync::COL_STOP_ID));
 				try

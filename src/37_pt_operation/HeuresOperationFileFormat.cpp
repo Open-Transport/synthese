@@ -223,7 +223,7 @@ namespace synthese
 					}
 					else
 					{
-						shared_ptr<Depot> depot(new Depot(DepotTableSync::getId()));
+						boost::shared_ptr<Depot> depot(new Depot(DepotTableSync::getId()));
 
 						Importable::DataSourceLinks links;
 						links.insert(make_pair(&dataSource, id));
@@ -571,7 +571,7 @@ namespace synthese
 								deadRun->setSchedules(arrivalSchedules, departureSchedules, false);
 
 								// Registration
-								_env.getEditableRegistry<DeadRun>().add(shared_ptr<DeadRun>(deadRun));
+								_env.getEditableRegistry<DeadRun>().add(boost::shared_ptr<DeadRun>(deadRun));
 								deadRuns.add(*deadRun);
 
 								_logCreation("Creation of the dead run with key "+ lexical_cast<string>(deadRun->getKey()));
@@ -797,7 +797,7 @@ namespace synthese
 					}
 					else
 					{
-						shared_ptr<DriverService> ds(new DriverService(DriverServiceTableSync::getId()));
+						boost::shared_ptr<DriverService> ds(new DriverService(DriverServiceTableSync::getId()));
 
 						Importable::DataSourceLinks links;
 						links.insert(make_pair(&dataSource, driverServiceCode));
