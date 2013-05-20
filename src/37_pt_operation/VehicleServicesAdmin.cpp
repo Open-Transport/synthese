@@ -157,7 +157,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(const shared_ptr<VehicleService>& vehicleService, vehicleServices)
+			BOOST_FOREACH(const boost::shared_ptr<VehicleService>& vehicleService, vehicleServices)
 			{
 				stream << t.row(lexical_cast<string>(vehicleService->getKey()));
 
@@ -238,7 +238,7 @@ namespace synthese
 			){
 				BOOST_FOREACH(const VehicleService::Registry::value_type& service, Env::GetOfficialEnv().getRegistry<VehicleService>())
 				{
-					shared_ptr<VehicleServiceAdmin> p(
+					boost::shared_ptr<VehicleServiceAdmin> p(
 						getNewPage<VehicleServiceAdmin>()
 					);
 					p->setVehicleService(service.second);

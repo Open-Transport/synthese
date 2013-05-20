@@ -128,7 +128,7 @@ namespace synthese
 
 			BOOST_FOREACH(const Services::value_type& service, _services)
 			{
-				shared_ptr<ParametersMap> serviceMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
 
 				serviceMap->insert(ATTR_CLASS, dynamic_cast<ScheduledService*>(service) ? VALUE_COMMERCIAL : VALUE_DEAD_RUN);
 				service->toParametersMap(*serviceMap);

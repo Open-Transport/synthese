@@ -95,7 +95,7 @@ namespace synthese
 			string pointsStr(rows->getText(TABLE_COL_GEOMETRY));
 			if(pointsStr.empty())
 			{
-				object->setGeometry(shared_ptr<Point>());
+				object->setGeometry(boost::shared_ptr<Point>());
 			}
 			else
 			{
@@ -224,7 +224,7 @@ namespace synthese
 				result.push_back(make_pair(optional<RegistryKeyType>(0), *noDepotLabel));
 			}
 			SearchResult depots(Search(env));
-			BOOST_FOREACH(const shared_ptr<Depot>& depot, depots)
+			BOOST_FOREACH(const boost::shared_ptr<Depot>& depot, depots)
 			{
 				result.push_back(make_pair(optional<RegistryKeyType>(depot->getKey()), depot->getName()));
 			}

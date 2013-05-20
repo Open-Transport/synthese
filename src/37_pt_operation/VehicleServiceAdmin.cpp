@@ -370,7 +370,7 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<VehicleServicesAdmin> p(
+			boost::shared_ptr<VehicleServicesAdmin> p(
 				getNewPage<VehicleServicesAdmin>()
 			);
 			links.push_back(p);

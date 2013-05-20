@@ -341,7 +341,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DriverServiceAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<DriverServicesAdmin> p(
+			boost::shared_ptr<DriverServicesAdmin> p(
 				getNewPage<DriverServicesAdmin>()
 			);
 			PageLinks links(p->_getCurrentTreeBranch());

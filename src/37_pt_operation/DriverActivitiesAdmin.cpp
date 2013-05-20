@@ -194,7 +194,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const DriverActivity::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<DriverActivity>())
 				{
-					shared_ptr<DriverActivityAdmin> p(getNewPage<DriverActivityAdmin>());
+					boost::shared_ptr<DriverActivityAdmin> p(getNewPage<DriverActivityAdmin>());
 					p->setActivity(const_pointer_cast<const DriverActivity>(it.second));
 					links.push_back(p);
 				}

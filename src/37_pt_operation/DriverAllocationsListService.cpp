@@ -196,7 +196,7 @@ namespace synthese
 					_minDate,
 					_driver ? optional<RegistryKeyType>(_driver->getKey()) : optional<RegistryKeyType>()
 			)	);
-			BOOST_FOREACH(const shared_ptr<DriverAllocation>& it, allocations)
+			BOOST_FOREACH(const boost::shared_ptr<DriverAllocation>& it, allocations)
 			{
 				// Init
 				const DriverAllocation& alloc(*it);
@@ -204,12 +204,12 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				// Output preparation
 
-				shared_ptr<ParametersMap> allocPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> allocPM(new ParametersMap);
 				alloc.toParametersMap(*allocPM);
 
 				if(alloc.get<DriverActivity>())
 				{
-					shared_ptr<ParametersMap> activityPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> activityPM(new ParametersMap);
 					alloc.get<DriverActivity>()->toParametersMap(*activityPM);
 					allocPM->insert("activity", activityPM);
 				}
@@ -223,7 +223,7 @@ namespace synthese
 						const DriverService::Vector::Type::value_type& service,
 						alloc.get<DriverAllocationTemplate>()->get<DriverService::Vector>()
 					){
-						shared_ptr<ParametersMap> servicePM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
 						service->toParametersMap(*servicePM);
 						allocPM->insert("service", servicePM);
 					}
@@ -236,7 +236,7 @@ namespace synthese
 			{
 				if(map.hasSubMaps(TAG_ALLOCATION))
 				{
-					BOOST_FOREACH(const shared_ptr<ParametersMap>& allocPM, map.getSubMaps(TAG_ALLOCATION))
+					BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& allocPM, map.getSubMaps(TAG_ALLOCATION))
 					{
 						allocPM->merge(getTemplateParameters());
 						_page->display(stream, request, *allocPM);

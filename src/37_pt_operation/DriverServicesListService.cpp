@@ -188,7 +188,7 @@ namespace synthese
 
 			BOOST_FOREACH(const Result::value_type& item, r)
 			{
-				shared_ptr<ParametersMap> servicePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
 				item.second->toParametersMap(*servicePM, true, _vehicleService);
 				map.insert(TAG_SERVICE, servicePM);
 			}
@@ -197,7 +197,7 @@ namespace synthese
 			{
 				if(map.hasSubMaps(TAG_SERVICE))
 				{
-					BOOST_FOREACH(const shared_ptr<ParametersMap>& servicePM, map.getSubMaps(TAG_SERVICE))
+					BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& servicePM, map.getSubMaps(TAG_SERVICE))
 					{
 						servicePM->merge(getTemplateParameters());
 						_page->display(stream, request, *servicePM);

@@ -137,7 +137,7 @@ namespace synthese
 				}
 
 				// Declarations
-				shared_ptr<ParametersMap> chunkPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> chunkPM(new ParametersMap);
 
 				// Times
 				if(!chunk.elements.empty())
@@ -157,7 +157,7 @@ namespace synthese
 				// Vehicle service
 				if(recursive && chunk.vehicleService)
 				{
-					shared_ptr<ParametersMap> vsPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> vsPM(new ParametersMap);
 					chunk.vehicleService->toParametersMap(*vsPM, false);
 					chunkPM->insert(TAG_VEHICLE_SERVICE, vsPM);
 				}
@@ -165,7 +165,7 @@ namespace synthese
 				// Activity
 				if(recursive && chunk.activity)
 				{
-					shared_ptr<ParametersMap> activityPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> activityPM(new ParametersMap);
 					chunk.activity->toParametersMap(*activityPM, false);
 					chunkPM->insert(TAG_ACTIVITY, activityPM);
 				}
@@ -189,7 +189,7 @@ namespace synthese
 				BOOST_FOREACH(const DriverService::Chunk::Element& element, chunk.elements)
 				{
 					// Declaration
-					shared_ptr<ParametersMap> elementPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> elementPM(new ParametersMap);
 
 					// Service
 					elementPM->insert(ATTR_SERVICE_ID, element.service->getKey());

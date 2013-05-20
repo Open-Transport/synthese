@@ -54,7 +54,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<VehicleService> vs(new VehicleService(VehicleServiceTableSync::getId()));
+				boost::shared_ptr<VehicleService> vs(new VehicleService(VehicleServiceTableSync::getId()));
 
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
