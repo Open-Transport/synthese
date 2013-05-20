@@ -86,6 +86,6 @@ namespace synthese
 		void RemoveObjectAction::setObjectId( util::RegistryKeyType value )
 		{
 			_objectId = value;
-			_tableSync = shared_ptr<DBTableSync>(DBModule::GetTableSync(decodeTableId(_objectId)));
+			_tableSync = boost::shared_ptr<DBTableSync>(DBModule::GetTableSync(decodeTableId(_objectId)));
 		}
 }	}

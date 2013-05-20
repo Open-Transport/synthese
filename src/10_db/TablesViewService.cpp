@@ -77,14 +77,14 @@ namespace synthese
 
 			BOOST_FOREACH( const DBModule::TablesByIdMap::value_type& it, DBModule::GetTablesById() )
 			{
-				shared_ptr<ParametersMap> tablePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> tablePM(new ParametersMap);
 
 				tablePM->insert(ATTR_ID, static_cast<int>(it.first));
 				tablePM->insert(ATTR_NAME, it.second->getFormat().NAME);
 
 				BOOST_FOREACH(const FieldsList::value_type& f, it.second->getFieldsList())
 				{
-					shared_ptr<ParametersMap> fieldPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> fieldPM(new ParametersMap);
 
 					fieldPM->insert(ATTR_NAME, f.name);
 					fieldPM->insert(ATTR_EXPORT_ON_FILE, f.exportOnFile);

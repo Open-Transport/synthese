@@ -233,10 +233,10 @@ namespace synthese
 		void DB::init()
 		{
 			recursive_mutex::scoped_lock lock(_tableSynchronizersMutex);
-			vector<shared_ptr<DBTableSync> > tableSyncs(Factory<DBTableSync>::GetNewCollection());
+			vector<boost::shared_ptr<DBTableSync> > tableSyncs(Factory<DBTableSync>::GetNewCollection());
 
 			// Call the update schema step on all synchronizers.
-			BOOST_FOREACH(const shared_ptr<DBTableSync> tableSync, tableSyncs)
+			BOOST_FOREACH(const boost::shared_ptr<DBTableSync> tableSync, tableSyncs)
 			{
 				Log::GetInstance().info("Updating schema for table " + tableSync->getFactoryKey() + "...");
 			    try
@@ -254,13 +254,13 @@ namespace synthese
 			_schemaUpdated = true;
 
 			Log::GetInstance().info("Initializing local auto-increments...");
-			BOOST_FOREACH(const shared_ptr<DBTableSync> tableSync, tableSyncs)
+			BOOST_FOREACH(const boost::shared_ptr<DBTableSync> tableSync, tableSyncs)
 			{
 				tableSync->initAutoIncrement();
 			}
 
 			// Call the first sync step on all synchronizers.
-			BOOST_FOREACH(const shared_ptr<DBTableSync> tableSync, tableSyncs)
+			BOOST_FOREACH(const boost::shared_ptr<DBTableSync> tableSync, tableSyncs)
 			{
 			    Log::GetInstance().info("Loading table " + tableSync->getFactoryKey() +"...");
 			    try

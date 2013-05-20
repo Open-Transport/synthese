@@ -44,7 +44,7 @@ namespace synthese
 
 		boost::shared_ptr<SQLExpression> FieldExpression::Get( const std::string& table, const std::string& field )
 		{
-			return shared_ptr<SQLExpression>(
+			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(new FieldExpression(table,field))
 			);
 		}
@@ -60,7 +60,7 @@ namespace synthese
 
 		boost::shared_ptr<SQLExpression> SubQueryExpression::Get( const std::string& subQuery )
 		{
-			return shared_ptr<SQLExpression>(
+			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(new SubQueryExpression(subQuery))
 			);
 		}

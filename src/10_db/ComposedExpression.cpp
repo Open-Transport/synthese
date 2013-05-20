@@ -50,9 +50,9 @@ namespace synthese
 
 
 		ComposedExpression::ComposedExpression(
-			shared_ptr<SQLExpression> expr1,
+			boost::shared_ptr<SQLExpression> expr1,
 			const string& op,
-			shared_ptr<SQLExpression> expr2
+			boost::shared_ptr<SQLExpression> expr2
 		):	_expr1(expr1),
 			_op(op),
 			_expr2(expr2)
@@ -69,12 +69,12 @@ namespace synthese
 
 
 
-		shared_ptr<SQLExpression> ComposedExpression::Get(
-			shared_ptr<SQLExpression> expr1,
+		boost::shared_ptr<SQLExpression> ComposedExpression::Get(
+			boost::shared_ptr<SQLExpression> expr1,
 			const string& op,
-			shared_ptr<SQLExpression> expr2
+			boost::shared_ptr<SQLExpression> expr2
 		){
-			return shared_ptr<SQLExpression>(
+			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(
 					new ComposedExpression(expr1, op, expr2)
 			)	);
