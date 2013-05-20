@@ -172,7 +172,7 @@ namespace synthese
 			{
 				// Differentiation on line stops
 				const DrawableLine* dbl = *(selectedLines.begin ());
-				shared_ptr<const JourneyPattern> line = lines.get (dbl->getLineId ());
+				boost::shared_ptr<const JourneyPattern> line = lines.get (dbl->getLineId ());
 				const vector<Edge*>& lineStops =  line->getEdges();
 				const vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 

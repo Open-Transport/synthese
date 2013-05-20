@@ -111,7 +111,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
          it != selectedLines.end () ; ++it)
     {
 	const DrawableLine* dbl = *it;
-	shared_ptr<LineString> points = dbl->getPoints ();
+	boost::shared_ptr<LineString> points = dbl->getPoints ();
 
 
 

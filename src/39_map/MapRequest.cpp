@@ -138,7 +138,7 @@ namespace synthese
 			RenderingConfig conf;
 
 			// Choose the renderer
-			shared_ptr<Renderer> renderer(Factory<Renderer>::create(_output));
+			boost::shared_ptr<Renderer> renderer(Factory<Renderer>::create(_output));
 
 			// Generate an id for the map file based on current time
 			ptime timems (boost::date_time::microsec_clock<ptime>::local_time ());
