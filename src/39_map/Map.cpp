@@ -135,7 +135,7 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 it != selectedLines.end ();
 	 ++it)
     {
-		shared_ptr<LineString> points = (*it)->getPoints();
+		boost::shared_ptr<LineString> points = (*it)->getPoints();
 		for(size_t i(0); i<points->getCoordinatesRO()->getSize(); ++i)
 		{
 			const Coordinate& p(points->getCoordinatesRO()->getAt(i));
@@ -548,7 +548,7 @@ Map::preparePhysicalStops ()
 	    const DrawableLine* dbl = *it;
         if (dbl->getWithPhysicalStops () == false) continue;
 
-	    shared_ptr<LineString> points = dbl->getPoints ();
+	    boost::shared_ptr<LineString> points = dbl->getPoints ();
 	    for (size_t i=0; i<points->getCoordinatesRO()->getSize(); ++i)
 	    {
 /*	        const Coordinate* p = points[i];

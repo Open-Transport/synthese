@@ -53,7 +53,7 @@ namespace synthese
 
 			util::RegistryKeyType lineId (GetLongLongAttr (node, "lineId"));
 
-			shared_ptr<const JourneyPattern> line = lines.get (lineId);
+			boost::shared_ptr<const JourneyPattern> line = lines.get (lineId);
 
 			const vector<Edge*>& lineStops = line->getEdges ();
 

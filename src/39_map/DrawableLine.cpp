@@ -76,7 +76,7 @@ DrawableLine::DrawableLine (const JourneyPattern* line,
 
 
 DrawableLine::DrawableLine (const util::RegistryKeyType& lineId,
-			    shared_ptr<LineString> points,
+			    boost::shared_ptr<LineString> points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
 			    bool withPhysicalStops)
