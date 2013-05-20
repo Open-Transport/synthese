@@ -162,7 +162,7 @@ namespace synthese
 			{
 				stream << "<h2>Feuille de route</h2>" << endl;
 
-				const shared_ptr<ParametersMap> boardMap = *result.getSubMaps("boardMap").begin();
+				const boost::shared_ptr<ParametersMap> boardMap = *result.getSubMaps("boardMap").begin();
 
 				stream << "<div>Trajet de " << boardMap->getValue("origin_city_text") << " " << boardMap->getValue("origin_place_text") << " à " << boardMap->getValue("destination_city_text") << " " << boardMap->getValue("destination_place_text") << ".</div>" << endl;
 				stream << "Départ à " << boardMap->getValue("departure_time") << ", arrivée à " << boardMap->getValue("arrival_time") << " (" << boardMap->getValue("duration") << ", " << boardMap->getValue("distance") << "m).</div>" << endl;
@@ -189,7 +189,7 @@ namespace synthese
 
 				if(boardMap->hasSubMaps("stepMap"))
 				{
-					BOOST_FOREACH(const shared_ptr<ParametersMap>& step, boardMap->getSubMaps("stepMap"))
+					BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& step, boardMap->getSubMaps("stepMap"))
 					{
 						stream << t.row() << endl;
 						stream << t.col() << step->getValue("rank") << endl;
