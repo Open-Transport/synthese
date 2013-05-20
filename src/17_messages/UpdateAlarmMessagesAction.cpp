@@ -224,12 +224,12 @@ namespace synthese
 			// Log
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
 			{
-				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
+				boost::shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
 				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), s.str(), request.getUser().get());
 			}
 			else
 			{
-				shared_ptr<const SentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
+				boost::shared_ptr<const SentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
 				MessagesLog::addUpdateEntry(scenarioSentAlarm.get(), s.str(), request.getUser().get());
 			}
 		}

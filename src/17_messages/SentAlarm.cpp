@@ -121,7 +121,7 @@ namespace synthese
 
 			BOOST_FOREACH(const MessageApplicationPeriod::ApplicationPeriods::value_type& it, _applicationPeriods)
 			{
-				shared_ptr<ParametersMap> apPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> apPM(new ParametersMap);
 				it->toParametersMap(*apPM);
 				pm.insert(TAG_APPLICATION_PERIOD, apPM);
 			}

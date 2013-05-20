@@ -142,7 +142,7 @@ namespace synthese
 			BOOST_FOREACH(const Subscriptions::value_type& subscription, _subscriptions)
 			{
 				// New submap
-				shared_ptr<ParametersMap> subPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> subPM(new ParametersMap);
 
 				// Populate the submap
 				subscription->toParametersMap(*subPM);

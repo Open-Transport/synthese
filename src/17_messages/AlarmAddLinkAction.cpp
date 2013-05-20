@@ -99,7 +99,7 @@ namespace synthese
 		void AlarmAddLinkAction::run(Request& request)
 		{
 			// Action
-			shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
+			boost::shared_ptr<AlarmObjectLink> aol(new AlarmObjectLink);
 			aol->setRecipient(_recipientKey);
 			aol->setAlarm(_alarm.get());
 			aol->setObjectId(_objectId);
@@ -109,7 +109,7 @@ namespace synthese
 			// Log
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get()
 			){
-				shared_ptr<const AlarmTemplate> alarmTemplate(
+				boost::shared_ptr<const AlarmTemplate> alarmTemplate(
 					dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm)
 				);
 				MessagesLibraryLog::addUpdateEntry(
@@ -120,7 +120,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<const SentAlarm> sentAlarm(
+				boost::shared_ptr<const SentAlarm> sentAlarm(
 					dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm)
 				);
 				MessagesLog::addUpdateEntry(

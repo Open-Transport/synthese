@@ -114,9 +114,9 @@ namespace synthese
 			ScenarioFolderTableSync::SearchResult folders(
 				ScenarioFolderTableSync::Search(Env::GetOfficialEnv(), parent ? parent->getKey() : 0)
 			);
-			BOOST_FOREACH(const shared_ptr<ScenarioFolder>& cfolder, folders)
+			BOOST_FOREACH(const boost::shared_ptr<ScenarioFolder>& cfolder, folders)
 			{
-				shared_ptr<ParametersMap> folderPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> folderPM(new ParametersMap);
 				cfolder->toParametersMap(*folderPM);
 				pm.insert(TAG_FOLDER, folderPM);
 

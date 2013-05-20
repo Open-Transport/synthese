@@ -173,7 +173,7 @@ namespace synthese
 			if(	getTemplate()
 			){
 				// Template scenario
-				shared_ptr<ParametersMap> templatePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> templatePM(new ParametersMap);
 				getTemplate()->toParametersMap(*templatePM);
 				pm.insert(TAG_TEMPLATE_SCENARIO, templatePM);
 
@@ -183,7 +183,7 @@ namespace synthese
 				);
 				BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
 				{
-					shared_ptr<ParametersMap> variablePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> variablePM(new ParametersMap);
 					string value;
 					const SentScenario::VariablesMap& values(getVariables());
 					SentScenario::VariablesMap::const_iterator it(values.find(variable.first));
@@ -205,7 +205,7 @@ namespace synthese
 			// Messages
 			BOOST_FOREACH(const Alarm* alarm, getMessages())
 			{
-				shared_ptr<ParametersMap> messagePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 				alarm->toParametersMap(*messagePM, false, string(), true);
 				pm.insert(TAG_MESSAGE, messagePM);
 			}
@@ -213,7 +213,7 @@ namespace synthese
 			// Sections
 			BOOST_FOREACH(const MessagesSection* section, getSections())
 			{
-				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
 				section->toParametersMap(*sectionPM, true);
 				pm.insert(TAG_SECTION, sectionPM);
 			}
@@ -248,7 +248,7 @@ namespace synthese
 			// application period
 			BOOST_FOREACH(const MessageApplicationPeriod::ApplicationPeriods::value_type& it, _applicationPeriods)
 			{
-				shared_ptr<ParametersMap> apPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> apPM(new ParametersMap);
 				it->toParametersMap(*apPM);
 				pm.insert(TAG_APPLICATION_PERIOD, apPM);
 			}

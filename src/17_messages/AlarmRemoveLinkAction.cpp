@@ -88,12 +88,12 @@ namespace synthese
 
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
 			{
-				shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
+				boost::shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
 				MessagesLibraryLog::addUpdateEntry(talarm.get(), "Suppression de la destination "+ lexical_cast<string>(_objectId), request.getUser().get());
 			}
 			else if(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm).get() != NULL)
 			{
-				shared_ptr<const SentAlarm> salarm(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm));
+				boost::shared_ptr<const SentAlarm> salarm(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm));
 				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ lexical_cast<string>(_objectId), request.getUser().get());
 			}
 		}

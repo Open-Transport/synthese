@@ -105,11 +105,11 @@ namespace synthese
 		){
 			if(row->getBool(AlarmTableSync::COL_IS_TEMPLATE))
 			{
-				return shared_ptr<Alarm>(new AlarmTemplate(row->getKey()));
+				return boost::shared_ptr<Alarm>(new AlarmTemplate(row->getKey()));
 			}
 			else
 			{
-				return shared_ptr<Alarm>(new SentAlarm(row->getKey()));
+				return boost::shared_ptr<Alarm>(new SentAlarm(row->getKey()));
 			}
 		}
 
@@ -265,7 +265,7 @@ namespace synthese
 			try
 			{
 				Env env;
-				shared_ptr<const Alarm> alarm(AlarmTableSync::Get(object_id, env));
+				boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(object_id, env));
 				if (dynamic_cast<const SentAlarm*>(alarm.get()))
 				{
 					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(DELETE_RIGHT);
@@ -305,7 +305,7 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 			Env env;
-			shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env));
+			boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env));
 			if (dynamic_cast<const SentAlarm*>(alarm.get()))
 			{
 				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(alarm.get()), session->getUser().get());

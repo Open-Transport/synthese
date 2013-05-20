@@ -122,7 +122,7 @@ namespace synthese
 			, StaticActionRequest<messages::AlarmRemoveLinkAction>& removeRequest
 		){
 			Env env;
-			vector<shared_ptr<DisplayScreen> > dsv(
+			vector<boost::shared_ptr<DisplayScreen> > dsv(
 				AlarmObjectLinkTableSync::search<DisplayScreenTableSync,DisplayScreen>(
 					env,
 					alarm->getKey(),
@@ -157,9 +157,9 @@ namespace synthese
 				HTMLList l;
 				stream << l.open();
 
-				for (vector<shared_ptr<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
+				for (vector<boost::shared_ptr<DisplayScreen> >::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 				{
-					shared_ptr<DisplayScreen> ds = *dsit;
+					boost::shared_ptr<DisplayScreen> ds = *dsit;
 					usedDisplayScreens.insert(ds->getKey());
 					removeRequest.getAction()->setObjectId(ds->getKey());
 
@@ -225,7 +225,7 @@ namespace synthese
 
 			stream << t1.open();
 
-			BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
+			BOOST_FOREACH(const boost::shared_ptr<DisplayScreen>& screen, screens)
 			{
 				if(!screen->getLocation())
 				{
@@ -249,7 +249,7 @@ namespace synthese
 
 		AlarmRecipientSearchFieldsMap BroadcastPointAlarmRecipient::getSearchFields(HTMLForm& form, const ParametersMap& parameters) const
 		{
-			shared_ptr<const JourneyPattern> line;
+			boost::shared_ptr<const JourneyPattern> line;
 			Env env;
 			optional<RegistryKeyType> id(parameters.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LINE));
 			if (id)
@@ -278,6 +278,6 @@ namespace synthese
 		{
 			ArrivalDepartureTableRight* result(new ArrivalDepartureTableRight);
 			result->setParameter(perimeter);
-			return shared_ptr<Right>(result);
+			return boost::shared_ptr<Right>(result);
 		}
 }	}

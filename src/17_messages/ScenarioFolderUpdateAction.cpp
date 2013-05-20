@@ -103,7 +103,7 @@ namespace synthese
 				}
 				else
 				{
-					_parentFolder = shared_ptr<ScenarioFolder>();
+					_parentFolder = boost::shared_ptr<ScenarioFolder>();
 				}
 
 				if ((!_folder.get() && !_parentFolder->get()) || (_folder.get() && _parentFolder->get() && _folder->getKey() == (*_parentFolder)->getKey()))
@@ -163,7 +163,7 @@ namespace synthese
 
 
 		void ScenarioFolderUpdateAction::setFolder(
-			shared_ptr<ScenarioFolder> value
+			boost::shared_ptr<ScenarioFolder> value
 		){
 			_folder = value;
 		}
@@ -171,7 +171,7 @@ namespace synthese
 
 
 		void ScenarioFolderUpdateAction::setFolder(
-			shared_ptr<const ScenarioFolder> value
+			boost::shared_ptr<const ScenarioFolder> value
 		){
 			_folder = const_pointer_cast<ScenarioFolder>(value);
 		}
