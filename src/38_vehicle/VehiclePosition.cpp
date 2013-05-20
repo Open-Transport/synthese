@@ -114,7 +114,7 @@ namespace synthese
 			pm.insert(ATTR_IN_STOP_AREA, _inStopArea);
 			if(_stopPoint)
 			{
-				shared_ptr<ParametersMap> stopPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 				_stopPoint->toParametersMap(*stopPM);
 				pm.insert(TAG_STOP, stopPM);
 			}

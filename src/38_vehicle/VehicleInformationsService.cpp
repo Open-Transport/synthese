@@ -122,18 +122,18 @@ namespace synthese
 				map.insert(TAG_IGNITION, VehicleModule::getIgnition());
 
 				// Screens
-				shared_ptr<ParametersMap> screenMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> screenMap(new ParametersMap);
 				BOOST_FOREACH(const VehicleModule::VehicleScreensMap::value_type& item, VehicleModule::GetVehicleScreens())
 				{
 					// Insert a submap for each screen
-					shared_ptr<ParametersMap> subScreenMap(new ParametersMap);
+					boost::shared_ptr<ParametersMap> subScreenMap(new ParametersMap);
 					item.second.toParametersMap(*subScreenMap);
 					screenMap->insert(TAG_SCREEN, subScreenMap);
 				}
 				map.insert(TAG_SCREENS, screenMap);
 
 				// Extra Parameters
-				shared_ptr<ParametersMap> extraParamMap(new ParametersMap);
+				boost::shared_ptr<ParametersMap> extraParamMap(new ParametersMap);
 				BOOST_FOREACH(const VehicleModule::ExtraParameterMap::value_type& item, VehicleModule::GetExtraParameters())
 				{
 					extraParamMap->insert(item.first, item.second);

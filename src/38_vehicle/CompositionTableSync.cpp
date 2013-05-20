@@ -110,12 +110,12 @@ namespace synthese
 
 
 		template<>
-		shared_ptr<Composition> InheritanceLoadSavePolicy<CompositionTableSync,Composition>::GetNewObject(
+		boost::shared_ptr<Composition> InheritanceLoadSavePolicy<CompositionTableSync,Composition>::GetNewObject(
 			const DBResultSPtr& row
 		){
 			return row->getLongLong(CompositionTableSync::COL_SERVICE_ID) ?
-				shared_ptr<Composition>(new ServiceComposition(row->getKey())) :
-				shared_ptr<Composition>(new VehicleServiceComposition(row->getKey()))
+				boost::shared_ptr<Composition>(new ServiceComposition(row->getKey())) :
+				boost::shared_ptr<Composition>(new VehicleServiceComposition(row->getKey()))
 			;
 		}
 
