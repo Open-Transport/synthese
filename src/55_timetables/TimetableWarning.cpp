@@ -109,7 +109,7 @@ namespace synthese
 					}
 
 					// Writing the active date to a sub map
-					shared_ptr<ParametersMap> datePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> datePM(new ParametersMap);
 					datePM->insert(ATTR_DATE, day);
 					pm.insert(TAG_DAY, datePM);
 			}	}
@@ -129,7 +129,7 @@ namespace synthese
 			// Calendar template
 			if(_calendarTemplate)
 			{
-				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				_calendarTemplate->toParametersMap(*calendarPM);
 				pm.insert(TAG_CALENDAR, calendarPM);
 			}
