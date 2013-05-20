@@ -137,7 +137,7 @@ namespace synthese
 				ServerModule::UpdateStartingTime();
 				ServerModule::_acceptor.async_accept(
 					ServerModule::_new_connection->socket(),
-					bind(&ServerModule::HandleAccept, asio::placeholders::error)
+					boost::bind(&ServerModule::HandleAccept, asio::placeholders::error)
 				);
 			}
 
@@ -426,7 +426,7 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
 			Threads::iterator it(_threads.find(key));
 			if(it == _threads.end()) return;
-			shared_ptr<thread> theThread(it->second.theThread);
+			boost::shared_ptr<thread> theThread(it->second.theThread);
 
 			_threads.erase(it);
 
@@ -493,7 +493,7 @@ namespace synthese
 		{
 			while(true)
 			{
-				shared_ptr<thread> theThread;
+				boost::shared_ptr<thread> theThread;
 				{
 					recursive_mutex::scoped_lock lock(_threadManagementMutex);
 					if(_threads.empty()) break;
@@ -509,9 +509,9 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
 
-			shared_ptr<thread> theThread(
+			boost::shared_ptr<thread> theThread(
 				AddThread(
-					bind(&asio::io_service::run, &ServerModule::_io_service),
+					boost::bind(&asio::io_service::run, &ServerModule::_io_service),
 					"HTTP",
 					true
 			)	);

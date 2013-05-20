@@ -69,7 +69,7 @@ namespace synthese
 			// Loop on sessions
 			BOOST_FOREACH(const Session::SessionMap::value_type& session, Session::GetSessions())
 			{
-				shared_ptr<ParametersMap> sessionPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> sessionPM(new ParametersMap);
 				session.second->toParametersMap(*sessionPM);
 				map.insert(TAG_SESSION, sessionPM);
 			}

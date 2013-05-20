@@ -125,12 +125,12 @@ namespace synthese
 
 
 
-		shared_ptr<Session> Session::New(
+		boost::shared_ptr<Session> Session::New(
 			const string& ip,
 			string key
 		){
 			mutex::scoped_lock(_sessionMapMutex);
-			shared_ptr<Session> session(new Session(ip, key));
+			boost::shared_ptr<Session> session(new Session(ip, key));
 			mutex::scoped_lock(session->_requestsListMutex);
 			_sessionMap.insert(make_pair(session->_key, session));
 			return session;
@@ -152,18 +152,18 @@ namespace synthese
 		}
 
 
-		void Session::Delete( shared_ptr<Session> session )
+		void Session::Delete( boost::shared_ptr<Session> session )
 		{
 			session->_removeSessionFromMap();
 		}
 
 
-		shared_ptr<Session> Session::Get(
+		boost::shared_ptr<Session> Session::Get(
 			const std::string& key,
 			const std::string& ip,
 			bool exceptionIfNotFound
 		){
-			shared_ptr<Session> session;
+			boost::shared_ptr<Session> session;
 			{
 				mutex::scoped_lock(_sessionMapMutex);
 				SessionMap::iterator it(_sessionMap.find(key));
@@ -198,7 +198,7 @@ namespace synthese
 				}
 				else
 				{
-					return shared_ptr<Session>();
+					return boost::shared_ptr<Session>();
 				}
 			}
 			return session;
@@ -233,7 +233,7 @@ namespace synthese
 			// User
 			if(getUser())
 			{
-				shared_ptr<ParametersMap> userPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
 				getUser()->toParametersMap(*userPM);
 				pm.insert(TAG_USER, userPM);
 			}

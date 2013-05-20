@@ -130,7 +130,7 @@ namespace synthese
 
 				HTMLForm f(r.getHTMLForm(_name->getValue(parameters, variables, object, request)));
 
-				for (vector<shared_ptr<LibraryInterfaceElement> >::const_iterator it = _fieldsToAvoid.begin(); it != _fieldsToAvoid.end(); ++it)
+				for (vector<boost::shared_ptr<LibraryInterfaceElement> >::const_iterator it = _fieldsToAvoid.begin(); it != _fieldsToAvoid.end(); ++it)
 				{
 					string fieldName((*it)->getValue(parameters, variables, object, request));
 					string fieldValue;
