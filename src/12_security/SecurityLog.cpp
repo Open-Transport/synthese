@@ -136,12 +136,12 @@ namespace synthese
 			{
 				if (decodeTableId(id) == UserTableSync::TABLE.ID)
 				{
-					shared_ptr<const User> user(UserTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const User> user(UserTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return user->getLogin();
 				}
 				else if (decodeTableId(id) == ProfileTableSync::TABLE.ID)
 				{
-					shared_ptr<const Profile> profile(ProfileTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
+					boost::shared_ptr<const Profile> profile(ProfileTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					return profile->getName();
 				}
 			}

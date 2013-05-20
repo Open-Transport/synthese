@@ -201,12 +201,12 @@ namespace synthese
 		}
 
 
-		void UserAdmin::setUser(shared_ptr<User> value)
+		void UserAdmin::setUser(boost::shared_ptr<User> value)
 		{
 			_user = value;
 		}
 
-		void UserAdmin::setUserC(shared_ptr<const User> value)
+		void UserAdmin::setUserC(boost::shared_ptr<const User> value)
 		{
 			_user = const_pointer_cast<const User>(value);
 		}

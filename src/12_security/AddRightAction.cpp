@@ -94,7 +94,7 @@ namespace synthese
 		void AddRightAction::run(
 			Request& request
 		){
-			shared_ptr<Right> right(Factory<Right>::create(_rightName));
+			boost::shared_ptr<Right> right(Factory<Right>::create(_rightName));
 			right->setParameter(_parameter);
 			right->setPrivateLevel(_privateLevel);
 			right->setPublicLevel(_publicLevel);
