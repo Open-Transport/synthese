@@ -876,7 +876,7 @@ namespace synthese
 			pm.insert(DATA_FILTERED_JOURNEYS, _result->getFiltered());
 
 			// Text formatted date
-			shared_ptr<ParametersMap> datePM(new ParametersMap);
+			boost::shared_ptr<ParametersMap> datePM(new ParametersMap);
 			DateTimeInterfacePage::fillParametersMap(*datePM, startDate.date());
 			pm.insert(ARRAY_DATE, datePM);
 
@@ -955,7 +955,7 @@ namespace synthese
 						}
 
 						// Saving of the columns on each lines
-						shared_ptr<ParametersMap> cellPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
 						_displayScheduleCell(
 							*cellPM,
 							i,
@@ -995,7 +995,7 @@ namespace synthese
 							break;
 						}
 
-						shared_ptr<ParametersMap> cellPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
 						_displayScheduleCell(
 							*cellPM,
 							i,
@@ -1022,7 +1022,7 @@ namespace synthese
 						break;
 					}
 
-					shared_ptr<ParametersMap> cellPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
 					_displayScheduleCell(
 						*cellPM,
 						i,
@@ -1045,7 +1045,7 @@ namespace synthese
 			PlacesContentVector::const_iterator it(sheetRows.begin());
 			BOOST_FOREACH(const PTRoutePlannerResult::PlacesListConfiguration::List::value_type& pi, placesList)
 			{
-				shared_ptr<ParametersMap> rowPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> rowPM(new ParametersMap);
 				_displayRow(
 					*rowPM,
 					*pi.place,
@@ -1075,7 +1075,7 @@ namespace synthese
 					it != _result->getJourneys().end();
 					++it, ++i
 				){
-					shared_ptr<ParametersMap> boardPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> boardPM(new ParametersMap);
 					_displayJourney(
 						*boardPM,
 						i,
@@ -1173,7 +1173,7 @@ namespace synthese
 					return;
 				}
 
-				shared_ptr<ParametersMap> cellPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
 				_displayScheduleCell(
 					*cellPM,
 					columnNumber,
@@ -1378,7 +1378,7 @@ namespace synthese
 
 			BOOST_FOREACH(const FareTicket& ticket, ticketsList)
 			{
-				shared_ptr<ParametersMap> pmTicket(new ParametersMap);
+				boost::shared_ptr<ParametersMap> pmTicket(new ParametersMap);
 				pmTicket->insert(DATA_TICKET_PRICE, ticket.getPrice());
 				pmTicket->insert(DATA_TICKET_NAME, ticket.getFare() ? ticket.getFare()->getName() : string());
 				pmTicket->insert(DATA_TICKET_CURRENCY, ticket.getFare() ? ticket.getFare()->getCurrency() : string());
@@ -1394,7 +1394,7 @@ namespace synthese
 				pm.insert(DATA_DEPARTURE_TIME, s.str());
 			}
 			{
-				shared_ptr<ParametersMap> datePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> datePM(new ParametersMap);
 				DateTimeInterfacePage::fillParametersMap(*datePM, journey.getFirstDepartureTime());
 				pm.insert(ITEM_DEPARTURE_TIME_OBJ, datePM);
 			}
@@ -1424,7 +1424,7 @@ namespace synthese
 
 			if(departurePlace.getPoint())
 			{
-				shared_ptr<Point> departurePoint(
+				boost::shared_ptr<Point> departurePoint(
 					_coordinatesSystem->convertPoint(
 						*departurePlace.getPoint()
 				)	);
@@ -1439,7 +1439,7 @@ namespace synthese
 				pm.insert(DATA_ARRIVAL_TIME, s.str());
 			}
 			{
-				shared_ptr<ParametersMap> datePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> datePM(new ParametersMap);
 				DateTimeInterfacePage::fillParametersMap(*datePM, journey.getFirstArrivalTime());
 				pm.insert(ITEM_ARRIVAL_TIME_OBJ, datePM);
 			}
@@ -1468,7 +1468,7 @@ namespace synthese
 
 			if(arrivalPlace.getPoint())
 			{
-				shared_ptr<Point> arrivalPoint(
+				boost::shared_ptr<Point> arrivalPoint(
 					_coordinatesSystem->convertPoint(
 						*arrivalPlace.getPoint()
 				)	);
@@ -1477,7 +1477,7 @@ namespace synthese
 			}
 			// Duration
 			{
-				shared_ptr<ParametersMap> durationPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> durationPM(new ParametersMap);
 				DateTimeInterfacePage::fillParametersMap(*durationPM, journey.getDuration());
 				pm.insert(DATA_DURATION, durationPM);
 			}
@@ -1494,7 +1494,7 @@ namespace synthese
 			if(!journey.getReservationDeadLine().is_not_a_date_time())
 			{
 				{
-					shared_ptr<ParametersMap> datePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> datePM(new ParametersMap);
 					DateTimeInterfacePage::fillParametersMap(*datePM, journey.getReservationDeadLine());
 					pm.insert(ITEM_RESERVATION_DEADLINE_OBJ, datePM);
 				}
@@ -1544,7 +1544,7 @@ namespace synthese
 			const Journey::ServiceUses& services(journey.getServiceUses());
 			for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)
 			{
-				shared_ptr<ParametersMap> legPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> legPM(new ParametersMap);
 				const ServicePointer& leg(*it);
 
 				const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath()));
@@ -1615,14 +1615,14 @@ namespace synthese
 					// Distance and geometry
 					double distance(0);
 					vector<Geometry*> geometries;
-					vector<shared_ptr<Geometry> > geometriesSPtr;
+					vector<boost::shared_ptr<Geometry> > geometriesSPtr;
 					BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
 					{
 						distance += itLeg->getDistance();
-						shared_ptr<LineString> geometry(itLeg->getGeometry());
+						boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
 						if(geometry.get())
 						{
-							shared_ptr<Geometry> geometryProjected(
+							boost::shared_ptr<Geometry> geometryProjected(
 								_coordinatesSystem->convertGeometry(
 									*static_cast<Geometry*>(geometry.get())
 							)	);
@@ -1631,7 +1631,7 @@ namespace synthese
 						}
 					}
 
-					shared_ptr<MultiLineString> multiLineString(
+					boost::shared_ptr<MultiLineString> multiLineString(
 						_coordinatesSystem->getGeometryFactory().createMultiLineString(
 							geometries
 					)	);
@@ -1700,7 +1700,7 @@ namespace synthese
 				if(	place.getPoint().get() &&
 					!place.getPoint()->isEmpty()
 				){
-					shared_ptr<Point> point(
+					boost::shared_ptr<Point> point(
 						_coordinatesSystem->convertPoint(
 							*place.getPoint()
 					)	);
@@ -1717,7 +1717,7 @@ namespace synthese
 				if(	stop->getGeometry().get() &&
 					!stop->getGeometry()->isEmpty()
 				){
-					shared_ptr<Point> point(
+					boost::shared_ptr<Point> point(
 						_coordinatesSystem->convertPoint(
 							*stop->getGeometry()
 					)	);
@@ -1761,7 +1761,7 @@ namespace synthese
 			if(	departureVertex.getGeometry().get() &&
 				!departureVertex.getGeometry()->isEmpty()
 			){
-				shared_ptr<Point> point(
+				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
 						*departureVertex.getGeometry()
 				)	);
@@ -1772,7 +1772,7 @@ namespace synthese
 			if(	arrivalVertex.getGeometry().get() &&
 				!arrivalVertex.getGeometry()->isEmpty()
 			){
-				shared_ptr<Point> point(
+				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
 						*arrivalVertex.getGeometry()
 				)	);
@@ -1792,12 +1792,12 @@ namespace synthese
 			// WKT
 			if(geometry)
 			{
-				shared_ptr<Geometry> geometryProjected(
+				boost::shared_ptr<Geometry> geometryProjected(
 					_coordinatesSystem->convertGeometry(
 						*geometry
 				)	);
 
-				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				boost::shared_ptr<WKTWriter> wktWriter(new WKTWriter);
 				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
@@ -1894,15 +1894,15 @@ namespace synthese
 
 			pm.insert(DATA_ODD_ROW, color);
 
-			shared_ptr<LineString> geometry(serviceUse.getGeometry());
+			boost::shared_ptr<LineString> geometry(serviceUse.getGeometry());
 			if(geometry.get())
 			{
-				shared_ptr<Geometry> geometryProjected(
+				boost::shared_ptr<Geometry> geometryProjected(
 					_coordinatesSystem->convertGeometry(
 						*static_cast<Geometry*>(geometry.get())
 				)	);
 
-				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				boost::shared_ptr<WKTWriter> wktWriter(new WKTWriter);
 				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
