@@ -35,7 +35,7 @@ namespace synthese
 	
 	namespace util
 	{
-		shared_ptr<Env> Env::_officialRegistries(new Env);
+		boost::shared_ptr<Env> Env::_officialRegistries(new Env);
 		Env::RegistryCreatorMap Env::_registryCreators;
 
 
@@ -47,7 +47,7 @@ namespace synthese
 				return;
 			}
 			RegistryTableType tableId(decodeTableId(object->getKey()));
-			shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
+			boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
 			if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
 			{
 				throw synthese::Exception("Incompatible registry");
