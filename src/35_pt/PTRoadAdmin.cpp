@@ -237,7 +237,7 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<PTRoadsAdmin> p(getNewPage<PTRoadsAdmin>());
+			boost::shared_ptr<PTRoadsAdmin> p(getNewPage<PTRoadsAdmin>());
 			p->setRoadPlace(Env::GetOfficialEnv().getSPtr(
 				_road->getRoadPlace()
 			)	);

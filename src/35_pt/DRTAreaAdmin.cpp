@@ -137,7 +137,7 @@ namespace synthese
 				AjaxVectorFieldEditor::Fields fields;
 
 				// Stop field
-				fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(
+				fields.push_back(boost::shared_ptr<AjaxVectorFieldEditor::Field>(
 					new AjaxVectorFieldEditor::TextAutoCompleteInputField(
 						"Arrêt",
 						DRTAreaUpdateAction::PARAMETER_STOPS,

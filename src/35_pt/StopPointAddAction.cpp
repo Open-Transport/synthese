@@ -166,7 +166,7 @@ namespace synthese
 				}
 				if(_city.get())
 				{
-					vector<shared_ptr<StopArea> > places(_city->search<StopArea>(_name, 1));
+					vector<boost::shared_ptr<StopArea> > places(_city->search<StopArea>(_name, 1));
 					if(!places.empty() && (*places.begin())->getName() == _name)
 					{
 						_place = *places.begin();

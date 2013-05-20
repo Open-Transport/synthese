@@ -211,7 +211,7 @@ namespace synthese
 			if(prefix) query.addWhereField(DestinationTableSync::COL_DISPLAYED_TEXT, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 			if(limit) query.setNumber(*limit);
 			DestinationTableSync::SearchResult destinations(DestinationTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-			BOOST_FOREACH(const shared_ptr<Destination>& destination, destinations)
+			BOOST_FOREACH(const boost::shared_ptr<Destination>& destination, destinations)
 			{
 				result.push_back(std::make_pair(destination->getKey(), destination->getDisplayedText()));
 			}

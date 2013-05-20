@@ -139,7 +139,7 @@ namespace synthese
 					AjaxVectorFieldEditor::Fields fields;
 
 					// Cities field
-					fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(
+					fields.push_back(boost::shared_ptr<AjaxVectorFieldEditor::Field>(
 						new AjaxVectorFieldEditor::TextAutoCompleteInputField(
 							"Commune",
 							FreeDRTAreaUpdateAction::PARAMETER_CITIES,
@@ -184,7 +184,7 @@ namespace synthese
 					AjaxVectorFieldEditor::Fields fields;
 
 					// Stops field
-					fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(
+					fields.push_back(boost::shared_ptr<AjaxVectorFieldEditor::Field>(
 						new AjaxVectorFieldEditor::TextAutoCompleteInputField(
 							"Arrêt",
 							FreeDRTAreaUpdateAction::PARAMETER_STOP_AREAS,
@@ -352,9 +352,9 @@ namespace synthese
 				FreeDRTTimeSlotTableSync::SearchResult timeSlots(
 					FreeDRTTimeSlotTableSync::Search(Env::GetOfficialEnv(), _area->getKey())
 				);
-				BOOST_FOREACH(const shared_ptr<FreeDRTTimeSlot>& timeSlot, timeSlots)
+				BOOST_FOREACH(const boost::shared_ptr<FreeDRTTimeSlot>& timeSlot, timeSlots)
 				{
-					shared_ptr<FreeDRTTimeSlotAdmin> p(
+					boost::shared_ptr<FreeDRTTimeSlotAdmin> p(
 						getNewPage<FreeDRTTimeSlotAdmin>()
 					);
 					p->setTimeSlot(timeSlot);
@@ -395,7 +395,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks FreeDRTAreaAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<CommercialLineAdmin> p(
+			boost::shared_ptr<CommercialLineAdmin> p(
 				getNewPage<CommercialLineAdmin>()
 			);
 			p->setCommercialLine(Env::GetOfficialEnv().getSPtr(_area->getLine()));

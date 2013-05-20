@@ -238,17 +238,17 @@ namespace synthese
 					}
 					++expectedRank;
 
-					shared_ptr<const DesignatedLinePhysicalStop> linePhysicalStop(
+					boost::shared_ptr<const DesignatedLinePhysicalStop> linePhysicalStop(
 						dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ?
 						static_pointer_cast<const DesignatedLinePhysicalStop, const LineStop>(Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(edge))) :
-						shared_ptr<const DesignatedLinePhysicalStop>()
+						boost::shared_ptr<const DesignatedLinePhysicalStop>()
 					);
-					shared_ptr<const LineArea> lineArea(
+					boost::shared_ptr<const LineArea> lineArea(
 						dynamic_cast<const LineArea*>(edge) ?
 						static_pointer_cast<const LineArea, const LineStop>(Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(edge))) :
-						shared_ptr<const LineArea>()
+						boost::shared_ptr<const LineArea>()
 					);
-					shared_ptr<const LineStop> lineStop(
+					boost::shared_ptr<const LineStop> lineStop(
 						linePhysicalStop.get() ?
 						static_pointer_cast<const LineStop, const LinePhysicalStop>(linePhysicalStop) :
 						static_pointer_cast<const LineStop, const LineArea>(lineArea)
@@ -340,7 +340,7 @@ namespace synthese
 								lineStopUpdateAction.getHTMLForm().getURL(),
 								ps.second->getName().empty() ? lexical_cast<string>(ps.second->getKey()) : ps.second->getName()
 							);
-							lineStopUpdateAction.getAction()->setPhysicalStop(shared_ptr<StopPoint>());
+							lineStopUpdateAction.getAction()->setPhysicalStop(boost::shared_ptr<StopPoint>());
 
 							if(ps.second == linePhysicalStop->getPhysicalStop())
 							{
@@ -516,7 +516,7 @@ namespace synthese
 
 
 				Envelope e;
-				shared_ptr<geos::geom::Point> center;
+				boost::shared_ptr<geos::geom::Point> center;
 				BOOST_FOREACH(const Path::Edges::value_type& edge, _line->getEdges())
 				{
 					if(edge->getFromVertex()->hasGeometry())
@@ -560,7 +560,7 @@ namespace synthese
 						}
 						if(itEdge+1 != _line->getEdges().end())
 						{
-							shared_ptr<LineString> geom((*itEdge)->getRealGeometry());
+							boost::shared_ptr<LineString> geom((*itEdge)->getRealGeometry());
 							if(geom.get())
 							{
 								map.addLineString(
@@ -623,7 +623,7 @@ namespace synthese
 				stream << ts.open();
 
 				size_t i(0);
-				BOOST_FOREACH(const shared_ptr<ScheduledService>& service, sservices)
+				BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, sservices)
 				{
 					serviceRequest.getPage()->setService(service);
 					removeRequest.getAction()->setObjectId(service->getKey());
@@ -703,7 +703,7 @@ namespace synthese
 				stream << tc.open();
 
 				size_t i(0);
-				BOOST_FOREACH(const shared_ptr<ContinuousService>& service, cservices)
+				BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& service, cservices)
 				{
 					serviceRequest.getPage()->setService(service);
 					removeRequest.getAction()->setObjectId(service->getKey());
@@ -984,9 +984,9 @@ namespace synthese
 				ScheduledServiceTableSync::SearchResult services(
 					ScheduledServiceTableSync::Search(*_env, _line->getKey())
 				);
-				BOOST_FOREACH(const shared_ptr<const ScheduledService>& service, services)
+				BOOST_FOREACH(const boost::shared_ptr<const ScheduledService>& service, services)
 				{
-					shared_ptr<ServiceAdmin> p(
+					boost::shared_ptr<ServiceAdmin> p(
 						getNewPage<ServiceAdmin>()
 					);
 					p->setService(service);
@@ -995,9 +995,9 @@ namespace synthese
 				ContinuousServiceTableSync::SearchResult cservices(
 					ContinuousServiceTableSync::Search(*_env, _line->getKey())
 				);
-				BOOST_FOREACH(const shared_ptr<const ContinuousService>& service, cservices)
+				BOOST_FOREACH(const boost::shared_ptr<const ContinuousService>& service, cservices)
 				{
-					shared_ptr<ServiceAdmin> p(
+					boost::shared_ptr<ServiceAdmin> p(
 						getNewPage<ServiceAdmin>()
 					);
 					p->setService(service);
@@ -1012,7 +1012,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks JourneyPatternAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<CommercialLineAdmin> p(
+			boost::shared_ptr<CommercialLineAdmin> p(
 				getNewPage<CommercialLineAdmin>()
 			);
 			p->setCommercialLine(Env::GetOfficialEnv().getSPtr(_line->getCommercialLine()));

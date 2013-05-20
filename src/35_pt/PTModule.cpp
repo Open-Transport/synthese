@@ -167,7 +167,7 @@ namespace synthese
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(Env::GetOfficialEnv(), rights, totalControl, neededLevel)
 			);
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			return m;
 		}
@@ -188,13 +188,13 @@ namespace synthese
 			);
 
 			m.push_back(make_pair(string(), namePrefix +"--- Réseaux ---"));
-			BOOST_FOREACH(const shared_ptr<TransportNetwork>& network, networks)
+			BOOST_FOREACH(const boost::shared_ptr<TransportNetwork>& network, networks)
 			{
 				m.push_back(make_pair(codePrefix + lexical_cast<string>(network->getKey()), namePrefix + network->getName() ));
 			}
 
 			m.push_back(make_pair(string(), namePrefix + "--- Lignes ---"));
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
 				m.push_back(make_pair(codePrefix + lexical_cast<string>(line->getKey()), namePrefix + line->getName() ));
 			}
@@ -331,7 +331,7 @@ namespace synthese
 					placeName,
 					1
 			)	);
-			return places.empty() ? shared_ptr<Place>() : places.begin()->placeResult.value;
+			return places.empty() ? boost::shared_ptr<Place>() : places.begin()->placeResult.value;
 		}
 
 		void PTModule::ParameterCallback(

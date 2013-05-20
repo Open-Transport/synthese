@@ -197,7 +197,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks FreeDRTTimeSlotAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<FreeDRTAreaAdmin> p(
+			boost::shared_ptr<FreeDRTAreaAdmin> p(
 				getNewPage<FreeDRTAreaAdmin>()
 			);
 			p->setArea(Env::GetOfficialEnv().getSPtr(_timeSlot->getArea()));

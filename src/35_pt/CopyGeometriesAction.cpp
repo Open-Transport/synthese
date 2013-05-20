@@ -141,7 +141,7 @@ namespace synthese
 			)	);
 
 			// Selection of the template geometry
-			shared_ptr<LineString> geom;
+			boost::shared_ptr<LineString> geom;
 
 			if(_edgeTemplate.get())
 			{
@@ -149,7 +149,7 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(const shared_ptr<LineStop>& edge, edges)
+				BOOST_FOREACH(const boost::shared_ptr<LineStop>& edge, edges)
 				{
 					// The most detailed geometry is selected as template
 					if(edge->getGeometry().get() &&
@@ -162,7 +162,7 @@ namespace synthese
 
 			if(geom.get())
 			{
-				BOOST_FOREACH(const shared_ptr<LineStop>& edge, edges)
+				BOOST_FOREACH(const boost::shared_ptr<LineStop>& edge, edges)
 				{
 					edge->setGeometry(geom);
 					LineStopTableSync::Save(edge.get(), transaction);

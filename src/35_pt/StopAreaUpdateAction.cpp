@@ -259,19 +259,19 @@ namespace synthese
             DBTransaction transaction;
 
             StopAreaTableSync::Save(_place.get(), transaction);
-            BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
+            BOOST_FOREACH(const boost::shared_ptr<StopPoint>& stop, stops)
             {
                 StopPointTableSync::Save(stop.get(), transaction);
             }
-            BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+            BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
             {
                 CommercialLineTableSync::Save(line.get(), transaction);
             }
-            BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, journeyPatterns)
+            BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& line, journeyPatterns)
             {
                 JourneyPatternTableSync::Save(line.get(), transaction);
             }
-            BOOST_FOREACH(const shared_ptr<LineStop>& lineStop, lineStops)
+            BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStops)
             {
                 LineStopTableSync::Save(lineStop.get(), transaction);
             }

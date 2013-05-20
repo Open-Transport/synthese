@@ -151,7 +151,7 @@ namespace synthese
 			// Try to get ServiceQuota for this Service
 			if(serviceQuotas.size() == 1)
 			{
-				shared_ptr<ParametersMap> serviceQuotaPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> serviceQuotaPM(new ParametersMap);
 
 				serviceQuota = serviceQuotas[0];
 
@@ -162,7 +162,7 @@ namespace synthese
 
 				for (QuotasMap::iterator quota = start_iter; quota != end_iter; ++quota)
 				{
-					shared_ptr<ParametersMap> quotaPM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> quotaPM(new ParametersMap);
 					quotaPM->insert("date", (*quota).first);
 					quotaPM->insert("n", (*quota).second);
 					serviceQuotaPM->insert("quota", quotaPM);

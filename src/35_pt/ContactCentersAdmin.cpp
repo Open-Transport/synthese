@@ -194,7 +194,7 @@ namespace synthese
 
 			if(fa)
 			{
-				shared_ptr<ContactCenterAdmin> p(getNewPage<ContactCenterAdmin>());
+				boost::shared_ptr<ContactCenterAdmin> p(getNewPage<ContactCenterAdmin>());
 				p->setContactCenter(fa->getContactCenter());
 				links.push_back(p);
 			}

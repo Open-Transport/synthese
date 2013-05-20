@@ -177,7 +177,7 @@ namespace synthese
 				);
 				try
 				{
-					shared_ptr<City> city(
+					boost::shared_ptr<City> city(
 						CityTableSync::GetEditable(cityId, env, linkLevel)
 					);
 					cp->setCity(const_cast<City*>(city.get()));

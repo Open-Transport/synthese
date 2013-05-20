@@ -85,7 +85,7 @@ namespace synthese
 					UP_LINKS_LOAD_LEVEL
 			)	);
 
-			BOOST_FOREACH(const shared_ptr<StopPoint>& ps, stops)
+			BOOST_FOREACH(const boost::shared_ptr<StopPoint>& ps, stops)
 			{
 				boost::shared_ptr<geos::geom::Point> point(
 					sr.convertPoint(*ps->getGeometry())

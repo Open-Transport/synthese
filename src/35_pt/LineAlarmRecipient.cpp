@@ -136,7 +136,7 @@ namespace synthese
 				// Loop on lines
 				for (CommercialLineTableSync::SearchResult::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 				{
-					shared_ptr<CommercialLine> ds = *dsit;
+					boost::shared_ptr<CommercialLine> ds = *dsit;
 
 					// Right check
 //					if(!getRight()->perimeterIncludes(lexical_cast<string>(ds->getKey()))
@@ -188,7 +188,7 @@ namespace synthese
 			);
 
 			stream << t.open();
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
 				if (usedLines.find(line->getKey()) != usedLines.end())
 				{
@@ -214,7 +214,7 @@ namespace synthese
 		AlarmRecipientSearchFieldsMap LineAlarmRecipient::getSearchFields(HTMLForm& form, const ParametersMap& parameters) const
 		{
 			AlarmRecipientSearchFieldsMap map;
-/*			shared_ptr<const JourneyPattern> line;
+/*			boost::shared_ptr<const JourneyPattern> line;
 			Env env;
 			optional<RegistryKeyType> id(parameters.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LINE));
 			if (id)
@@ -242,6 +242,6 @@ namespace synthese
 		{
 			TransportNetworkRight* result(new TransportNetworkRight);
 			result->setParameter(perimeter);
-			return shared_ptr<Right>(result);
+			return boost::shared_ptr<Right>(result);
 		}
 }	}

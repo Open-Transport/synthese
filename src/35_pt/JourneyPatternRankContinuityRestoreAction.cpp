@@ -104,7 +104,7 @@ namespace synthese
 			)	);
 			size_t rank(0);
 			DBTransaction transaction;
-			BOOST_FOREACH(const shared_ptr<LineStop>& lineStop, lineStops)
+			BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStops)
 			{
 				if(lineStop->getRankInPath() != rank)
 				{

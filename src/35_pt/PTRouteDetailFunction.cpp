@@ -255,7 +255,7 @@ namespace synthese
 				}
 				lastConnPlace = connPlace;
 
-				shared_ptr<ParametersMap> sm(new ParametersMap);
+				boost::shared_ptr<ParametersMap> sm(new ParametersMap);
 				sm->insert(DATA_ID, stopPoint->getKey());
 				sm->insert(DATA_RANK, edge->getRankInPath());
 				sm->insert(DATA_DEPARTURE_IS_ALLOWED, edge->isDepartureAllowed());
@@ -293,7 +293,7 @@ namespace synthese
 				if(_stopPage.get())
 				{
 					stringstream s;
-					BOOST_FOREACH(const shared_ptr<ParametersMap>& item, m.getSubMaps(TAG_STOP))
+					BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& item, m.getSubMaps(TAG_STOP))
 					{
 						item->merge(getTemplateParameters());
 

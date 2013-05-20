@@ -170,7 +170,7 @@ namespace synthese
 
 					StaticActionRequest<StopPointUpdateAction> moveAction(request);
 
-					shared_ptr<Point> mapCenter(_connectionPlace->getPoint());
+					boost::shared_ptr<Point> mapCenter(_connectionPlace->getPoint());
 
 					// If the place does not contain any point, it has no coordinate : search the last created place with coordinates
 					if(!mapCenter.get() || mapCenter->isEmpty())
@@ -187,7 +187,7 @@ namespace synthese
 							const Registry<StopArea>& registry(newEnv.getRegistry<StopArea>());
 							BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
 							{
-								shared_ptr<const StopArea> envStopArea(Env::GetOfficialEnv().get<StopArea>(stopArea.first));
+								boost::shared_ptr<const StopArea> envStopArea(Env::GetOfficialEnv().get<StopArea>(stopArea.first));
 								if(envStopArea->getPoint() && !envStopArea->getPoint()->isEmpty())
 								{
 									mapCenter = envStopArea->getPoint();
@@ -406,7 +406,7 @@ namespace synthese
 
 					if(stop->getGeometry().get())
 					{
-						shared_ptr<Point> pt(CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*stop->getGeometry()));
+						boost::shared_ptr<Point> pt(CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*stop->getGeometry()));
 						stream << t.col() << pt->getX();
 						stream << t.col() << pt->getY();
 						stream << t.col() << stop->getGeometry()->getX();
@@ -561,8 +561,8 @@ namespace synthese
 					{
 						try
 						{
-							shared_ptr<StopPoint> startStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.first));
-							shared_ptr<StopPoint> endStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.second));
+							boost::shared_ptr<StopPoint> startStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.first));
+							boost::shared_ptr<StopPoint> endStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.second));
 							removeTransferRequest.getAction()->setFrom(startStop);
 							removeTransferRequest.getAction()->setTo(endStop);
 
@@ -622,7 +622,7 @@ namespace synthese
 					stream << t.open();
 					stream << t.row();
 					stream << t.col(7, string(), true) << "Jonctions bidirectionnelles";
-					BOOST_FOREACH(const shared_ptr<Junction>& junction, allJunctions)
+					BOOST_FOREACH(const boost::shared_ptr<Junction>& junction, allJunctions)
 					{
 						if(!junction->getBack())
 						{
@@ -655,7 +655,7 @@ namespace synthese
 
 					stream << t.row();
 					stream << t.col(7, string(), true) << "Jonctions au départ de " << _connectionPlace->getFullName();
-					BOOST_FOREACH(const shared_ptr<Junction>& junction, startings)
+					BOOST_FOREACH(const boost::shared_ptr<Junction>& junction, startings)
 					{
 						if(junction->getBack() || !junction->isValid())
 						{
@@ -685,7 +685,7 @@ namespace synthese
 
 					stream << t.row();
 					stream << t.col(7, string(), true) << "Jonctions vers " << _connectionPlace->getFullName();
-					BOOST_FOREACH(const shared_ptr<Junction>& junction, endings)
+					BOOST_FOREACH(const boost::shared_ptr<Junction>& junction, endings)
 					{
 						if(junction->getBack() || !junction->isValid())
 						{
@@ -772,7 +772,7 @@ namespace synthese
 						*_env,
 						_connectionPlace->getKey()
 				)	);
-				BOOST_FOREACH(const shared_ptr<PlaceAlias>& alias, aliases)
+				BOOST_FOREACH(const boost::shared_ptr<PlaceAlias>& alias, aliases)
 				{
 					// Row opening
 					stream << t.row();
@@ -849,7 +849,7 @@ namespace synthese
 
 			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 			{
-				shared_ptr<StopPointAdmin> p(getNewPage<StopPointAdmin>());
+				boost::shared_ptr<StopPointAdmin> p(getNewPage<StopPointAdmin>());
 				p->setStop(Env::GetOfficialEnv().getSPtr(it.second));
 				links.push_back(p);
 			}
@@ -899,7 +899,7 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<PTPlacesAdmin> p(getNewPage<PTPlacesAdmin>());
+			boost::shared_ptr<PTPlacesAdmin> p(getNewPage<PTPlacesAdmin>());
 			p->setCity(Env::GetOfficialEnv().getSPtr(
 					_connectionPlace->getCity()
 			)	);

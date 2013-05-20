@@ -225,7 +225,7 @@ namespace synthese
 
 			if(ua)
 			{
-				shared_ptr<DRTAreaAdmin> p(getNewPage<DRTAreaAdmin>());
+				boost::shared_ptr<DRTAreaAdmin> p(getNewPage<DRTAreaAdmin>());
 				p->setArea(ua->getArea());
 				links.push_back(p);
 			}

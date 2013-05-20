@@ -62,7 +62,7 @@ namespace synthese
 			RegistryKeyType id,
 			string name,
 			const StopArea* place,
-			shared_ptr<Point> geometry,
+			boost::shared_ptr<Point> geometry,
 			bool withIndexation
 		):	Registrable(id),
 			Vertex(place, geometry, withIndexation),
@@ -231,7 +231,7 @@ namespace synthese
 			pm.insert(DATA_OPERATOR_CODE, getCodeBySources());
 			if(getGeometry().get())
 			{
-				shared_ptr<Point> gp = coordinatesSystem.convertPoint(*getGeometry());
+				boost::shared_ptr<Point> gp = coordinatesSystem.convertPoint(*getGeometry());
 				if(gp.get())
 				{
 					pm.insert(DATA_X, gp->getX());
@@ -242,7 +242,7 @@ namespace synthese
 			// Stop area data
 			if(withStopAreaData)
 			{
-				shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
 				getConnectionPlace()->toParametersMap(*stopAreaPM, &coordinatesSystem);
 				pm.insert(TAG_STOP_AREA, stopAreaPM);
 			}

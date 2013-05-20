@@ -201,14 +201,14 @@ namespace synthese
 					**pm.getSubMaps(PlacesListService::DATA_CITIES).begin()
 				);
 				BOOST_FOREACH(
-					shared_ptr<ParametersMap> item,
+					boost::shared_ptr<ParametersMap> item,
 					citiesPM.getSubMaps(PlacesListService::DATA_CITY)
 				){
 					// New row
 					stream << t.row();
 
 					// City load
-					shared_ptr<const City> city(
+					boost::shared_ptr<const City> city(
 						Env::GetOfficialEnv().get<City>(
 							item->get<RegistryKeyType>(City::DATA_CITY_ID)
 					)	);
@@ -284,14 +284,14 @@ namespace synthese
 				if(stopsPM.hasSubMaps(PlacesListService::DATA_STOP))
 				{
 					BOOST_FOREACH(
-						shared_ptr<ParametersMap> item,
+						boost::shared_ptr<ParametersMap> item,
 						stopsPM.getSubMaps(PlacesListService::DATA_STOP)
 					){
 						// New row
 						stream << t.row();
 
 						// Load of the stop area
-						shared_ptr<const StopArea> stopArea(
+						boost::shared_ptr<const StopArea> stopArea(
 							Env::GetOfficialEnv().get<StopArea>(
 								item->get<RegistryKeyType>(StopArea::DATA_STOP_ID)
 						)	);
@@ -357,14 +357,14 @@ namespace synthese
 				if(ppPM.hasSubMaps(PlacesListService::DATA_PUBLIC_PLACE))
 				{
 					BOOST_FOREACH(
-						shared_ptr<ParametersMap> item,
+						boost::shared_ptr<ParametersMap> item,
 						ppPM.getSubMaps(PlacesListService::DATA_PUBLIC_PLACE)
 					){
 						// New row
 						stream << t.row();
 
 						// Load of the public place
-						shared_ptr<const PublicPlace> pp(
+						boost::shared_ptr<const PublicPlace> pp(
 							Env::GetOfficialEnv().get<PublicPlace>(
 								item->get<RegistryKeyType>(PublicPlace::DATA_ID)
 						)	);
@@ -430,7 +430,7 @@ namespace synthese
 				if(roadsPM.hasSubMaps(PlacesListService::DATA_ROAD))
 				{
 					BOOST_FOREACH(
-						shared_ptr<ParametersMap> item,
+						boost::shared_ptr<ParametersMap> item,
 						roadsPM.getSubMaps(PlacesListService::DATA_ROAD)
 					){
 						stream << t.row();
@@ -488,7 +488,7 @@ namespace synthese
 				if(roadsPM.hasSubMaps(PlacesListService::DATA_ADDRESS))
 				{
 					BOOST_FOREACH(
-						shared_ptr<ParametersMap> item,
+						boost::shared_ptr<ParametersMap> item,
 						roadsPM.getSubMaps(PlacesListService::DATA_ADDRESS)
 					){
 						stream << t.row();

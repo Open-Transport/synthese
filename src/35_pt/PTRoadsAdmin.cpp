@@ -219,7 +219,7 @@ namespace synthese
 						continue;
 					}
 
-					shared_ptr<PTRoadAdmin> p(getNewPage<PTRoadAdmin>());
+					boost::shared_ptr<PTRoadAdmin> p(getNewPage<PTRoadAdmin>());
 					p->setRoad(Env::GetOfficialEnv().getSPtr(static_cast<MainRoadPart*>(road)));
 					links.push_back(p);
 				}
@@ -241,7 +241,7 @@ namespace synthese
 			PageLinks links;
 
 			links.push_back(getNewPage<PTCitiesAdmin>());
-			shared_ptr<PTPlacesAdmin> p(getNewPage<PTPlacesAdmin>());
+			boost::shared_ptr<PTPlacesAdmin> p(getNewPage<PTPlacesAdmin>());
 			p->setCity(Env::GetOfficialEnv().getSPtr(_roadPlace->getCity()));
 			links.push_back(p);
 			links.push_back(getNewCopiedPage());

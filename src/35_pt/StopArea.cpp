@@ -309,7 +309,7 @@ namespace synthese
 
 
 
-		const shared_ptr<Point>& StopArea::getPoint() const
+		const boost::shared_ptr<Point>& StopArea::getPoint() const
 		{
 			if (!_isoBarycentre.get())
 			{
@@ -523,7 +523,7 @@ namespace synthese
 			}
 			if(coordinatesSystem && getPoint())
 			{
-				shared_ptr<Point> pg(
+				boost::shared_ptr<Point> pg(
 					coordinatesSystem->convertPoint(*getPoint())
 				);
 				{
