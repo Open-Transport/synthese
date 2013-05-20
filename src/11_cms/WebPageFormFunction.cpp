@@ -164,7 +164,7 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<const Function> fws(request.getFunction());
+				boost::shared_ptr<const Function> fws(request.getFunction());
 				if(!fws.get())
 				{
 					return ParametersMap();

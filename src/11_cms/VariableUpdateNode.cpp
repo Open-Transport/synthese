@@ -83,7 +83,7 @@ namespace synthese
 					// Submap creation
 					if(!pm->hasSubMaps(item.key))
 					{
-						shared_ptr<ParametersMap> subMap(new ParametersMap);
+						boost::shared_ptr<ParametersMap> subMap(new ParametersMap);
 						if(item.index.get())
 						{
 							subMap->insert(
@@ -102,7 +102,7 @@ namespace synthese
 							pm->getSubMaps(item.key)
 						);
 						ParametersMap* pm2(NULL);
-						BOOST_FOREACH(const shared_ptr<ParametersMap>& subMapItem, subMaps)
+						BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& subMapItem, subMaps)
 						{
 							if(subMapItem->getDefault<string>(FIELD_ID) == idx)
 							{
@@ -114,7 +114,7 @@ namespace synthese
 						// Creation if necessary
 						if(!pm2)
 						{
-							shared_ptr<ParametersMap> subMap(new ParametersMap);
+							boost::shared_ptr<ParametersMap> subMap(new ParametersMap);
 							subMap->insert(
 								FIELD_ID,
 								item.index->eval(request, additionalParametersMap, page, variables)

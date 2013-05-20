@@ -111,7 +111,7 @@ namespace synthese
 			}
 
 			{
-				shared_ptr<const WebPageDisplayFunction> function(
+				boost::shared_ptr<const WebPageDisplayFunction> function(
 					dynamic_pointer_cast<const WebPageDisplayFunction>(
 						request.getFunction()
 				)	);
@@ -122,7 +122,7 @@ namespace synthese
 			}
 
 			{
-				shared_ptr<const FunctionWithSiteBase> function(
+				boost::shared_ptr<const FunctionWithSiteBase> function(
 						dynamic_pointer_cast<const FunctionWithSiteBase>(
 						request.getFunction()
 				)	);
@@ -140,7 +140,7 @@ namespace synthese
 		const Webpage* CMSModule::GetWebPage(
 			const server::Request& request
 		){
-			shared_ptr<const WebPageDisplayFunction> function(
+			boost::shared_ptr<const WebPageDisplayFunction> function(
 				dynamic_pointer_cast<const WebPageDisplayFunction>(
 					request.getFunction()
 			)	);
@@ -299,7 +299,7 @@ namespace synthese
 			// New site request
 			AdminActionFunctionRequest<ObjectCreateAction, WebsiteAdmin> createRequest(request);
 			createRequest.setActionFailedPage<ModuleAdmin>();
-			static_cast<ModuleAdmin*>(createRequest.getActionFailedPage().get())->setModuleClass(shared_ptr<ModuleClass>(new CMSModule));
+			static_cast<ModuleAdmin*>(createRequest.getActionFailedPage().get())->setModuleClass(boost::shared_ptr<ModuleClass>(new CMSModule));
 			createRequest.getAction()->setTable<Website>();
 			createRequest.setActionWillCreateObject();
 
@@ -308,7 +308,7 @@ namespace synthese
 
 			// Remove site request
 			AdminActionFunctionRequest<RemoveObjectAction, ModuleAdmin> removeRequest(request);
-			removeRequest.getPage()->setModuleClass(shared_ptr<ModuleClass>(new CMSModule));
+			removeRequest.getPage()->setModuleClass(boost::shared_ptr<ModuleClass>(new CMSModule));
 
 			// Form and table
 			HTMLForm f(createRequest.getHTMLForm("new"));
@@ -354,7 +354,7 @@ namespace synthese
 			stream << "<h1>SVN Checkout</h1>";
 			AdminActionFunctionRequest<SVNCheckoutAction, WebsiteAdmin> svnRequest(request);
 			svnRequest.setActionFailedPage<ModuleAdmin>();
-			static_cast<ModuleAdmin*>(svnRequest.getActionFailedPage().get())->setModuleClass(shared_ptr<ModuleClass>(new CMSModule));
+			static_cast<ModuleAdmin*>(svnRequest.getActionFailedPage().get())->setModuleClass(boost::shared_ptr<ModuleClass>(new CMSModule));
 			svnRequest.setActionWillCreateObject();
 			PropertiesHTMLTable pf(svnRequest.getHTMLForm("svn"));
 			stream << pf.open();

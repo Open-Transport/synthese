@@ -59,14 +59,14 @@ namespace synthese
 			optional<DualOperatorExpression::Operator> dualOperator;
 			optional<TripleOperatorExpression::Operator> tripleOperator;
 			optional<string> str;
-			shared_ptr<Expression> expr1;
-			shared_ptr<Expression> expr2;
-			shared_ptr<Expression> expr;
+			boost::shared_ptr<Expression> expr1;
+			boost::shared_ptr<Expression> expr2;
+			boost::shared_ptr<Expression> expr;
 			VariableExpression::Items variable;
 
 			if(	CompareText(it, end, termination))
 			{
-				return shared_ptr<Expression>(new VariablesDebugExpression);
+				return boost::shared_ptr<Expression>(new VariablesDebugExpression);
 			}
 
 			ParserStatus status(UNDEFINED);

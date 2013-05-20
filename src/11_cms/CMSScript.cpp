@@ -91,7 +91,7 @@ namespace synthese
 			{
 				_nodes.clear();
 				_nodes.push_back(
-					shared_ptr<WebpageContentNode>(
+					boost::shared_ptr<WebpageContentNode>(
 						new ConstantExpression(_code)
 				)	);
 			}
@@ -189,14 +189,14 @@ namespace synthese
 					if(!currentText.empty())
 					{
 						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
+							boost::shared_ptr<WebpageContentNode>(
 								new ConstantExpression(currentText)
 						)	);
 						currentText.clear();
 					}
 
 					// Parsing service node
-					shared_ptr<ServiceExpression> node(
+					boost::shared_ptr<ServiceExpression> node(
 						new ServiceExpression(it, end)
 					);
 
@@ -214,7 +214,7 @@ namespace synthese
 					if(!currentText.empty())
 					{
 						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
+							boost::shared_ptr<WebpageContentNode>(
 								new ConstantExpression(currentText)
 						)	);
 						currentText.clear();
@@ -339,13 +339,13 @@ namespace synthese
 
 						// Node creation
 						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
+							boost::shared_ptr<WebpageContentNode>(
 								new VariableUpdateNode(items, it, end)
 						)	);
 					}
 					else // Is an expression
 					{
-						shared_ptr<Expression> expr(
+						boost::shared_ptr<Expression> expr(
 							Expression::Parse(it, end, "@>")
 						);
 
@@ -365,14 +365,14 @@ namespace synthese
 					if(!currentText.empty())
 					{
 						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
+							boost::shared_ptr<WebpageContentNode>(
 								new ConstantExpression(currentText)
 						)	);
 						currentText.clear();
 					}
 
 					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
+						boost::shared_ptr<WebpageContentNode>(
 							new ForEachExpression(it, end)
 					)	);
 
@@ -386,14 +386,14 @@ namespace synthese
 					if(!currentText.empty())
 					{
 						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
+							boost::shared_ptr<WebpageContentNode>(
 								new ConstantExpression(currentText)
 						)	);
 						currentText.clear();
 					}
 
 					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
+						boost::shared_ptr<WebpageContentNode>(
 							new IncludeExpression(it, end)
 					)	);
 
@@ -406,14 +406,14 @@ namespace synthese
 					if(!currentText.empty())
 					{
 						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
+							boost::shared_ptr<WebpageContentNode>(
 								new ConstantExpression(currentText)
 						)	);
 						currentText.clear();
 					}
 
 					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
+						boost::shared_ptr<WebpageContentNode>(
 							new GotoNode(it, end)
 					)	);
 
@@ -426,14 +426,14 @@ namespace synthese
 					if(!currentText.empty())
 					{
 						_nodes.push_back(
-							shared_ptr<WebpageContentNode>(
+							boost::shared_ptr<WebpageContentNode>(
 								new ConstantExpression(currentText)
 						)	);
 						currentText.clear();
 					}
 
 					_nodes.push_back(
-						shared_ptr<WebpageContentNode>(
+						boost::shared_ptr<WebpageContentNode>(
 							new LabelNode(it, end)
 					)	);
 
@@ -464,7 +464,7 @@ namespace synthese
 			if(!currentText.empty())
 			{
 				_nodes.push_back(
-					shared_ptr<WebpageContentNode>(
+					boost::shared_ptr<WebpageContentNode>(
 						new ConstantExpression(currentText)
 				)	);
 				currentText.clear();
