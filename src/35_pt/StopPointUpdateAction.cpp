@@ -121,7 +121,7 @@ namespace synthese
 				}
 				else
 				{
-					_stopArea = shared_ptr<StopArea>();
+					_stopArea = boost::shared_ptr<StopArea>();
 				}
 			}
 			catch(ObjectNotFoundException<StopArea>&)

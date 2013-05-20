@@ -116,13 +116,13 @@ namespace synthese
 
 
 		template<>
-		shared_ptr<LineStop> InheritanceLoadSavePolicy<LineStopTableSync,LineStop>::GetNewObject(
+		boost::shared_ptr<LineStop> InheritanceLoadSavePolicy<LineStopTableSync,LineStop>::GetNewObject(
 			const DBResultSPtr& row
 		){
 			return
 				(decodeTableId(row->getLongLong(LineStopTableSync::COL_PHYSICALSTOPID)) == StopPointTableSync::TABLE.ID) ?
-				shared_ptr<LineStop>(new DesignatedLinePhysicalStop(row->getKey())) :
-				shared_ptr<LineStop>(new LineArea(row->getKey()))
+				boost::shared_ptr<LineStop>(new DesignatedLinePhysicalStop(row->getKey())) :
+				boost::shared_ptr<LineStop>(new LineArea(row->getKey()))
 			;
 		}
 
@@ -144,7 +144,7 @@ namespace synthese
 			string viaPointsStr(rows->getText(TABLE_COL_GEOMETRY));
 			if(viaPointsStr.empty())
 			{
-				ls->setGeometry(shared_ptr<LineString>());
+				ls->setGeometry(boost::shared_ptr<LineString>());
 			}
 			else
 			{
@@ -369,7 +369,7 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 			Env env;
-			shared_ptr<const LineStop> lineStop(LineStopTableSync::Get(id, env));
+			boost::shared_ptr<const LineStop> lineStop(LineStopTableSync::Get(id, env));
 
 			RankUpdateQuery<LineStopTableSync> query(LineStopTableSync::COL_RANKINPATH, -1, lineStop->getRankInPath(), false);
 			query.addWhereField(LineStopTableSync::COL_LINEID, lineStop->getLine()->getKey());
@@ -589,7 +589,7 @@ namespace synthese
 				LoadFromQuery(query.str(), env, UP_LINKS_LOAD_LEVEL)
 			);
 			return result.empty() ?
-				shared_ptr<DesignatedLinePhysicalStop>() :
+				boost::shared_ptr<DesignatedLinePhysicalStop>() :
 				static_pointer_cast<DesignatedLinePhysicalStop, LineStop>(*result.begin());
 		}
 
@@ -639,7 +639,7 @@ namespace synthese
 				LoadFromQuery(query.toString(), env, UP_LINKS_LOAD_LEVEL)
 			);
 			return result.empty() ?
-				shared_ptr<DesignatedLinePhysicalStop>() :
+				boost::shared_ptr<DesignatedLinePhysicalStop>() :
 				static_pointer_cast<DesignatedLinePhysicalStop, LineStop>(*result.begin())
 			;
 		}

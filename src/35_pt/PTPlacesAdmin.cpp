@@ -198,7 +198,7 @@ namespace synthese
 
 						if(dynamic_pointer_cast<RoadPlace>(it.value).get())
 						{
-							shared_ptr<RoadPlace> roadPlace(static_pointer_cast<RoadPlace>(it.value));
+							boost::shared_ptr<RoadPlace> roadPlace(static_pointer_cast<RoadPlace>(it.value));
 							openRoadRequest.getPage()->setRoadPlace(roadPlace);
 
 							stream << t.col();
@@ -212,7 +212,7 @@ namespace synthese
 						}
 						else if(dynamic_pointer_cast<StopArea>(it.value).get())
 						{
-							shared_ptr<StopArea> connectionPlace(static_pointer_cast<StopArea>(it.value));
+							boost::shared_ptr<StopArea> connectionPlace(static_pointer_cast<StopArea>(it.value));
 							openPlaceRequest.getPage()->setConnectionPlace(connectionPlace);
 
 							stream << t.col();
@@ -226,7 +226,7 @@ namespace synthese
 						}
 						else if(dynamic_cast<const PlaceAlias*>(it.value.get()))
 						{
-							shared_ptr<PlaceAlias> alias(static_pointer_cast<PlaceAlias>(it.value));
+							boost::shared_ptr<PlaceAlias> alias(static_pointer_cast<PlaceAlias>(it.value));
 							const StopArea* connectionPlace(dynamic_cast<const StopArea*>(alias->getAliasedPlace()));
 							if(connectionPlace)
 							{

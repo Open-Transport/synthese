@@ -213,7 +213,7 @@ namespace synthese
 			{
 				stringstream s;
 				bool first(true);
-				BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
+				BOOST_FOREACH(const boost::shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 				{
 					if(!tm.get())
 					{
@@ -399,7 +399,7 @@ namespace synthese
 				{
 					try
 					{
-						shared_ptr<const RollingStock> tm(
+						boost::shared_ptr<const RollingStock> tm(
 							Env::GetOfficialEnv().get<RollingStock>(lexical_cast<RegistryKeyType>(tmstr))
 						);
 						_sortByTransportMode.push_back(tm);
@@ -414,7 +414,7 @@ namespace synthese
 					}
 				}
 			}
-			_sortByTransportMode.push_back(shared_ptr<RollingStock>()); // NULL pointer at end
+			_sortByTransportMode.push_back(boost::shared_ptr<RollingStock>()); // NULL pointer at end
 
 			// Contact center filter
 			_contactCenterFilter.reset();
@@ -431,7 +431,7 @@ namespace synthese
 				}
 				else
 				{
-					_contactCenterFilter = shared_ptr<ReservationContact>();
+					_contactCenterFilter = boost::shared_ptr<ReservationContact>();
 				}
 			}
 
@@ -721,7 +721,7 @@ namespace synthese
 				comparator = comparatorAlphanum;
 			}
 
-			typedef map<string, shared_ptr<const CommercialLine>, 
+			typedef map<string, boost::shared_ptr<const CommercialLine>, 
 					boost::function<bool(const string &, const string &)> > SortedItems;
 			typedef std::map<const RollingStock*, SortedItems> LinesMapType;
 			LinesMapType linesMap;
@@ -737,7 +737,7 @@ namespace synthese
 			}
 			else
 			{
-				vector<shared_ptr<CommercialLine> > lines;
+				vector<boost::shared_ptr<CommercialLine> > lines;
 				BOOST_FOREACH(const CommercialLine::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<CommercialLine>())
 				{
 					if(!_lineIsSelected(*it.second, request))
@@ -749,9 +749,9 @@ namespace synthese
 				}
 
 				set<CommercialLine*> alreadyShownLines;
-				BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
+				BOOST_FOREACH(const boost::shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 				{
-					BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+					BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 					{
 						// Avoid to return a line twice
 						if(alreadyShownLines.find(line.get()) != alreadyShownLines.end())
@@ -778,12 +778,12 @@ namespace synthese
 
 			// Populating the parameters map
 			ParametersMap pm;
-			BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
+			BOOST_FOREACH(const boost::shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 			{
 				BOOST_FOREACH(const LinesMapType::mapped_type::value_type& it, linesMap[tm.get()])
 				{
-					shared_ptr<const CommercialLine> line = it.second;
-					shared_ptr<ParametersMap> linePM(new ParametersMap);
+					boost::shared_ptr<const CommercialLine> line = it.second;
+					boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 					line->toParametersMap(*linePM);
 
 					// Rolling stock
@@ -805,7 +805,7 @@ namespace synthese
 					}
 					BOOST_FOREACH(RollingStock * rs, rollingStocks)
 					{
-						shared_ptr<ParametersMap> rsPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
 						rs->toParametersMap(*rsPM);
 						linePM->insert(DATA_TRANSPORT_MODE, rsPM);
 					}
@@ -847,10 +847,10 @@ namespace synthese
 
 						if(_outputStops)
 						{
-							shared_ptr<ParametersMap> stopAreasPM(new ParametersMap);
+							boost::shared_ptr<ParametersMap> stopAreasPM(new ParametersMap);
 							BOOST_FOREACH(const StopArea* stopArea, stopAreas)
 							{
-								shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
+								boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
 								stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
 								stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
 							}
@@ -862,7 +862,7 @@ namespace synthese
 							//Terminus
 							BOOST_FOREACH(const StopArea* stopArea, stopAreasTerminus)
 							{
-								shared_ptr<ParametersMap> stopAreaTerminusPM(new ParametersMap);
+								boost::shared_ptr<ParametersMap> stopAreaTerminusPM(new ParametersMap);
 								stopArea->toParametersMap(*stopAreaTerminusPM, _coordinatesSystem);
 								linePM->insert(DATA_STOP_AREA_TERMINUS, stopAreaTerminusPM);
 							}
@@ -870,7 +870,7 @@ namespace synthese
 					}
 					if(!_outputGeometry.empty())
 					{
-						typedef map<pair<Vertex*, Vertex*>, shared_ptr<Geometry> > VertexPairs;
+						typedef map<pair<Vertex*, Vertex*>, boost::shared_ptr<Geometry> > VertexPairs;
 						VertexPairs geometries;
 						BOOST_FOREACH(Path* path, line->getPaths())
 						{
@@ -888,27 +888,27 @@ namespace synthese
 								VertexPairs::key_type od(make_pair(edge->getFromVertex(), edge->getNext()->getFromVertex()));
 								if(geometries.find(od) == geometries.end())
 								{
-									shared_ptr<LineString> lineGeometry = edge->getRealGeometry();
+									boost::shared_ptr<LineString> lineGeometry = edge->getRealGeometry();
 									if (lineGeometry)
 										geometries.insert(make_pair(od, lineGeometry));
 								}
 							}
 						}
 
-						shared_ptr<ParametersMap> geometryPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> geometryPM(new ParametersMap);
 						if(_outputGeometry == FORMAT_WKT)
 						{
-							vector<shared_ptr<Geometry> > vec;
+							vector<boost::shared_ptr<Geometry> > vec;
 							vector<Geometry*> vecd;
 							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
 							{
-								shared_ptr<Geometry> prGeom(
+								boost::shared_ptr<Geometry> prGeom(
 									_coordinatesSystem->convertGeometry(*it.second)
 								);
 								vec.push_back(prGeom);
 								vecd.push_back(prGeom.get());
 							}
-							shared_ptr<GeometryCollection> mls(
+							boost::shared_ptr<GeometryCollection> mls(
 								_coordinatesSystem->getGeometryFactory().createGeometryCollection(vecd)
 							);
 							geometryPM->insert(DATA_WKT, WKTWriter().write(mls.get()));
@@ -917,14 +917,14 @@ namespace synthese
 						{
 							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
 							{
-								shared_ptr<ParametersMap> edgePM(new ParametersMap);
-								shared_ptr<Geometry> prGeom(
+								boost::shared_ptr<ParametersMap> edgePM(new ParametersMap);
+								boost::shared_ptr<Geometry> prGeom(
 									_coordinatesSystem->convertGeometry(*it.second)
 								);
 								for(size_t i(0); i<prGeom->getNumPoints(); ++i)
 								{
 									const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
-									shared_ptr<ParametersMap> pointPM(new ParametersMap);
+									boost::shared_ptr<ParametersMap> pointPM(new ParametersMap);
 									pointPM->insert(DATA_X, pt.x);
 									pointPM->insert(DATA_Y, pt.y);
 									edgePM->insert(DATA_POINT, pointPM);
@@ -974,10 +974,10 @@ namespace synthese
 					//Add Terminus
 					if(_stopAreaTerminusPage.get() && pmLine->hasSubMaps(DATA_STOP_AREA_TERMINUS))
 					{
-						shared_ptr<ParametersMap> stopAreasTerminusPM(new ParametersMap);
+						boost::shared_ptr<ParametersMap> stopAreasTerminusPM(new ParametersMap);
 						stringstream stopAreasTerminusStream;
 
-						BOOST_FOREACH(const shared_ptr<ParametersMap>& stopAreaPM, pmLine->getSubMaps(DATA_STOP_AREA_TERMINUS))
+						BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& stopAreaPM, pmLine->getSubMaps(DATA_STOP_AREA_TERMINUS))
 						{
 							stopAreaPM->merge(getTemplateParameters());
 							_stopAreaTerminusPage->display(stopAreasTerminusStream, request, *stopAreaPM);

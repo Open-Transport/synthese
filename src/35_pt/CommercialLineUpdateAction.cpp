@@ -246,7 +246,7 @@ namespace synthese
 				}
 				else
 				{
-					_reservationContact = shared_ptr<const ReservationContact>();
+					_reservationContact = boost::shared_ptr<const ReservationContact>();
 				}
 			}
 

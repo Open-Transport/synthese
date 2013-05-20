@@ -145,7 +145,7 @@ namespace synthese
 			ActionResultHTMLTable t(h, st.getForm(), _requestParameters, ptrules, creationRequest.getHTMLForm(), PTUseRuleUpdateAction::PARAMETER_TEMPLATE_ID);
 			stream << t.open();
 
-			BOOST_FOREACH(const shared_ptr<PTUseRule>& ptrule, ptrules)
+			BOOST_FOREACH(const boost::shared_ptr<PTUseRule>& ptrule, ptrules)
 			{
 				openRequest.getPage()->setRule(ptrule);
 				stream << t.row(lexical_cast<string>(ptrule->getKey()));
@@ -197,9 +197,9 @@ namespace synthese
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
-				BOOST_FOREACH(const shared_ptr<PTUseRule>& ptrule, ptrules)
+				BOOST_FOREACH(const boost::shared_ptr<PTUseRule>& ptrule, ptrules)
 				{
-					shared_ptr<PTUseRuleAdmin> p(getNewPage<PTUseRuleAdmin>());
+					boost::shared_ptr<PTUseRuleAdmin> p(getNewPage<PTUseRuleAdmin>());
 					p->setRule(ptrule);
 					links.push_back(p);
 			}	}

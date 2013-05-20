@@ -255,7 +255,7 @@ namespace synthese
 								serviceVertexUpdateAction.getHTMLForm().getURL(),
 								ps.second->getName().empty() ? lexical_cast<string>(ps.second->getKey()) : ps.second->getName()
 								);
-							serviceVertexUpdateAction.getAction()->setPhysicalStop(shared_ptr<StopPoint>());
+							serviceVertexUpdateAction.getAction()->setPhysicalStop(boost::shared_ptr<StopPoint>());
 
 							if(ps.second == linePhysicalStop->getPhysicalStop())
 							{
@@ -654,7 +654,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ServiceAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<JourneyPatternAdmin> p(
+			boost::shared_ptr<JourneyPatternAdmin> p(
 				getNewPage<JourneyPatternAdmin>()
 			);
 			p->setLine(Env::GetOfficialEnv().get<JourneyPattern>(_service->getPath()->getKey()));

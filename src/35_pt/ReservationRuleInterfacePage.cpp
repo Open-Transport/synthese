@@ -49,8 +49,8 @@ namespace synthese
 
 		void ReservationRuleInterfacePage::Display(
 			std::ostream& stream,
-			shared_ptr<const Webpage> page,
-			shared_ptr<const Webpage> dateTimePage,
+			boost::shared_ptr<const Webpage> page,
+			boost::shared_ptr<const Webpage> dateTimePage,
 			const Request& request,
 			const util::ParametersMap& templateParametersMap,
 			const Journey& journey

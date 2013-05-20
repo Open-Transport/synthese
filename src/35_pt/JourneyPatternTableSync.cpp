@@ -384,7 +384,7 @@ namespace synthese
 					env,
 					journeyPatternId
 			)	);
-			BOOST_FOREACH(const shared_ptr<ScheduledService>& service, services)
+			BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, services)
 			{
 				ScheduledServiceTableSync::Save(service.get(), transaction);
 			}
@@ -393,7 +393,7 @@ namespace synthese
 					env,
 					journeyPatternId
 			)	);
-			BOOST_FOREACH(const shared_ptr<ContinuousService>& cservice, cservices)
+			BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& cservice, cservices)
 			{
 				ContinuousServiceTableSync::Save(cservice.get(), transaction);
 			}

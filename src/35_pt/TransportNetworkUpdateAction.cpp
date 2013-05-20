@@ -135,7 +135,7 @@ namespace synthese
 				}
 				else
 				{
-					_daysCalendarsParent = shared_ptr<CalendarTemplate>();
+					_daysCalendarsParent = boost::shared_ptr<CalendarTemplate>();
 			}	}
 
 			// Periods calendars parent
@@ -154,7 +154,7 @@ namespace synthese
 				}
 				else
 				{
-					_periodsCalendarsParent = shared_ptr<CalendarTemplate>();
+					_periodsCalendarsParent = boost::shared_ptr<CalendarTemplate>();
 			}	}
 		}
 

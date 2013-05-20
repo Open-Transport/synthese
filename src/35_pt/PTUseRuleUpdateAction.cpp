@@ -241,7 +241,7 @@ namespace synthese
 				}
 				else
 				{
-					_fare = shared_ptr<Fare>();
+					_fare = boost::shared_ptr<Fare>();
 				}
 			}
 

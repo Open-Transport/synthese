@@ -154,7 +154,7 @@ namespace synthese
 				}
 				else
 				{
-					_transportMode = shared_ptr<RollingStock>();
+					_transportMode = boost::shared_ptr<RollingStock>();
 				}
 			}
 
@@ -171,7 +171,7 @@ namespace synthese
 				}
 				else
 				{
-					_directionObj = shared_ptr<Destination>();
+					_directionObj = boost::shared_ptr<Destination>();
 				}
 			}
 

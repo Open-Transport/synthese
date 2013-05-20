@@ -252,7 +252,7 @@ namespace synthese
 				}
 				query.addOrderField(COL_NAME,true);
 				DRTAreaTableSync::SearchResult areas(DRTAreaTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-				BOOST_FOREACH(const shared_ptr<DRTArea>& area, areas)
+				BOOST_FOREACH(const boost::shared_ptr<DRTArea>& area, areas)
 				{
 					result.push_back(std::make_pair(area->getKey(), area->getName()));
 				}

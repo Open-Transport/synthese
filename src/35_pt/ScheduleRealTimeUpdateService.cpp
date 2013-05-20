@@ -85,7 +85,7 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<const DataSource> dataSource(
+					boost::shared_ptr<const DataSource> dataSource(
 						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DATASOURCE_ID))
 						);
 					std::string stopAreaCodeBySource = map.get<string>(PARAMETER_STOP_AREA_ID);
@@ -127,7 +127,7 @@ namespace synthese
 				{
 					try
 					{
-						shared_ptr<const DataSource> dataSource(
+						boost::shared_ptr<const DataSource> dataSource(
 							Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID))
 							);
 						std::string serviceCodeBySource = map.get<string>(PARAMETER_SERVICE_ID + indexStr);
@@ -262,7 +262,7 @@ namespace synthese
 
 		size_t ScheduleRealTimeUpdateService::_getStopRankByService(
 			const SchedulesBasedService *service, 
-			const shared_ptr<StopArea> &stopArea) const
+			const boost::shared_ptr<StopArea> &stopArea) const
 		{
 			int i(0);
 			BOOST_FOREACH(const graph::Vertex *vertex, service->getVertices(true))

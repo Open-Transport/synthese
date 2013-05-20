@@ -68,7 +68,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stopPoint, stopArea->getPhysicalStops())
 				{
-					shared_ptr<AreaGeneratedLineStop> generatedLineStop(
+					boost::shared_ptr<AreaGeneratedLineStop> generatedLineStop(
 						new AreaGeneratedLineStop(
 							getLine(),
 							getRankInPath(),
@@ -133,7 +133,7 @@ namespace synthese
 		Edge::SubEdges LineArea::getSubEdges() const
 		{
 			SubEdges result;
-			BOOST_FOREACH(const shared_ptr<AreaGeneratedLineStop>& generatedLineStop, _generatedLineStops)
+			BOOST_FOREACH(const boost::shared_ptr<AreaGeneratedLineStop>& generatedLineStop, _generatedLineStops)
 			{
 				result.push_back(generatedLineStop.get());
 			}
