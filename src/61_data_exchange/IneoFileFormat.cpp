@@ -629,6 +629,8 @@ namespace synthese
 								_env,
 								stream,
 								true,
+								true,
+								true,
 								true
 						)	);
 						stops.clear();
