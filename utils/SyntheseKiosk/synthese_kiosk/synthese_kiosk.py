@@ -746,19 +746,19 @@ class KioskConfig(object):
         try:
             return self._config['defaults']['fallbackTimeout']
         except:
-            return None
+            return 10
 
     def getFallBackRefreshTimeout(self):
         try:
             return self._config['defaults']['fallbackRefreshTimeout']
         except:
-            return None
+            return 300
 
     def getConfigRefreshTimeout(self):
         try:
             return self._config['defaults']['configRefreshTimeout']
         except:
-            return None
+            return 60
 
     def getDisplayUrl(self, display):
         log.debug('getDisplayUrl ' + display + ":" + self._config['displays'][display]['url'])
