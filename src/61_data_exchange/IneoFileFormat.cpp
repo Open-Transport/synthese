@@ -639,7 +639,9 @@ namespace synthese
 								_env,
 								_logger,
 								true,
-								true
+								true,
+                                true,
+                                true
 						)	);
 						stops.clear();
 						atLeastAnInexistantStop = false;
