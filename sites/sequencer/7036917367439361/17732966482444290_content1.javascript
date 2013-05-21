@@ -19,11 +19,17 @@ var FrameView = Backbone.View.extend({
 
     if (/service.*unavailable/i.test(html) ||
         /failed to connect/i.test(html) ||
-        // Polipo error messages
+        /404 Not Found/i.test(html) ||
+        // Polipo error message
         /Connection refused/i.test(html) ||
         /502 disconnected operation/i.test(html)) {
       console.log("Detected page with failure: " + this.url);
+      this.kv.callKiosk("force_offline", this.url);
       dfd.reject();
+    } else {
+      var nobreak =  html.replace(/(\r\n|\n|\r)/gm, " ");
+      var message = ("debug" + ":" + nobreak.substr(0, 100) + "....." + nobreak.substr(nobreak.length-100));
+      this.kv.callKiosk("message", message);
     }
     dfd.resolve();
   },
@@ -76,6 +82,11 @@ var KioskView = Backbone.View.extend({
     var paramString = decodeURIComponent(location.hash.substring(1));
     try {
       params = JSON.parse(paramString);
+      if(this.kioskName != undefined) {
+        this.kioskName = params.kiosk;
+      } else {
+        this.kioskName = "UNDEFINED";
+      }
       this.targetUrl = params.target_url;
       this.refreshTimeout = params.refresh_timeout;
       this.stopped = false;
@@ -160,6 +171,18 @@ var KioskView = Backbone.View.extend({
     this.currentFrame = frameName;
     $("#framesContainer > *:not(:first-child)").hide();
     $(this.getFrame(frameName).el).show();
+  },
+
+  callKiosk: function(method, args) {
+    $.ajax({
+      url: "http://localhost:5000/display_rpc",
+      type: "POST",
+      data: {
+        display: this.kioskName,
+        method: method,
+        args: args,
+      }
+    });
   },
 
   refresh: function() {
