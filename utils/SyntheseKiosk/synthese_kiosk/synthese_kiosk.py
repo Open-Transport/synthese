@@ -308,6 +308,12 @@ def display_rpc():
     if method == 'message':
         level, message = request.form['args'].split(':', 1)
         getattr(log, level)('Browser message: %s', message)
+    elif method == 'force_offline':
+        log.info('Kiosk ' + request.form['display'] + " requested to be set offline and to check url '" + request.form['args'] + "'")
+        g.kiosk.force_offline(True, request.form['args'])
+    elif method == 'force_online':
+        log.info('Kiosk ' + request.form['display'] + " requested to be set online'")
+        g.kiosk.force_offline(False, None)
     return response
 
 @admin_app.route('/screenshot/<int:index>')
@@ -355,6 +361,8 @@ class SyntheseKiosk(object):
         self._config_dir = os.path.normpath(os.path.abspath(self._config_dir))
         utils.maybe_makedirs(self._config_dir)
         self._online = False
+        self._force_offline = False
+        self._force_offline_url_to_check = None
         self._sched = sched.scheduler(time.time, time.sleep)
 
         self._config_path = os.path.join(self._config_dir, 'config.json')
@@ -425,16 +433,31 @@ class SyntheseKiosk(object):
         for index, name in enumerate(self.config['displays']):
             self._displays.append(self._init_display(index))
 
-    def _is_online(self):
-        url = '{0}/online_check?{1}'.format(
-            self.config['synthese_url'], int(time.time()))
-        ONLINE_CHECK_TIMEOUT_S = 10
-
+    def _is_url_online(self, url, timeout):
         try:
             log.debug('Trying to fetch: %s', url)
-            requests.get(url, timeout=ONLINE_CHECK_TIMEOUT_S)
+            r = requests.get(url, timeout=timeout)
         except requests.RequestException, e:
             log.warn('Exception while fetching request: %s', e)
+            return False
+
+        if r.status_code != 200:
+            log.warn("Error HTTP %d returned for url '%s', go offline"
+                     % (r.status_code, url))
+            return False
+
+        return True
+
+    def _is_online(self):
+        ONLINE_CHECK_TIMEOUT_S = 10
+        if not self._force_offline:
+            url = '{0}/?SERVICE=version&{1}'.format(
+                self.config['synthese_url'], int(time.time()))
+            return self._is_url_online(url, ONLINE_CHECK_TIMEOUT_S)
+        elif self._force_offline_url_to_check:
+            return self._is_url_online( \
+                self.config['synthese_url'] + self._force_offline_url_to_check, ONLINE_CHECK_TIMEOUT_S)
+        else:
             return False
         return True
 
@@ -446,6 +469,12 @@ class SyntheseKiosk(object):
     def online(self, value):
         log.debug('Setting online status to: %s', value)
         self._online = value
+
+    def force_offline(self, value, url_to_check):
+        log.debug("Setting force offline status to: %s with url '%s'" 
+                  % (value, url_to_check))
+        self._force_offline = value
+        self._force_offline_url_to_check = url_to_check
 
     @property
     def config(self):
