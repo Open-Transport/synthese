@@ -187,11 +187,13 @@ namespace synthese
 			ParametersMap pm;
 
 			// Getting messages
-			MessagesModule::ActivatedMessages messages(
-				MessagesModule::GetActivatedMessages(
+			MessagesModule::ActivatedMessages messages;
+			if (_broadcastPoint)
+			{
+				messages = MessagesModule::GetActivatedMessages(
 					*_broadcastPoint,
-					_parameters
-			)	);
+					_parameters);
+			}
 
 			size_t number(0);
 
