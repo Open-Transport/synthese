@@ -41,7 +41,7 @@ namespace synthese
 	namespace cms
 	{
 		const string ForEachExpression::DATA_ITEMS_COUNT = "items_count";
-		const string ForEachExpression::DATA_RANK = "rank";
+		const string ForEachExpression::DATA_RANK = "item_rank";
 		const string ForEachExpression::DATA_DEPTH = "depth";
 		const string ForEachExpression::PARAMETER_EMPTY = "empty";
 		const string ForEachExpression::PARAMETER_SORT_DOWN = "sort_down";
