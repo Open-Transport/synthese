@@ -81,7 +81,7 @@ namespace synthese
 				}
 				record.insert(
 					item.first.substr(PARAMETER_FIELD_PREFIX.size()),
-					item.second
+					map.getValue(item.first)
 				);
 			}
 
