@@ -58,3 +58,24 @@ $(function(){
   $('#rename_dir_link').click(rename_dir_link_click);
   $('#remove_dir_link').click(remove_dir_link_click);
 });
+
+
+function copyContent(contentRank)
+{
+ addMessageTab({
+    id: 0,
+    title: "Copie de " + document.getElementById('title_'+ contentRank).value,
+    content: tinyMCE.get('tinymce_'+ contentRank).getContent(),
+    level: document.getElementById('level_'+ contentRank).value,
+    alternatives: {},
+    recipients: {}
+  });
+  tinyMCE.execCommand('mceAddControl', false, 'tinymce_'+ (nextMessageRank-1));
+  $('#tab_m_'+(nextMessageRank-1)).tab('show');
+  current_message_rank=nextMessageRank-1;
+  tinyMCE.execCommand('mceFocus', false, 'tinymce_'+ (nextMessageRank-1));
+  document.getElementById('tab_key').value = "m_"+ current_message_rank;
+  activateForm();
+  return false;
+
+}
