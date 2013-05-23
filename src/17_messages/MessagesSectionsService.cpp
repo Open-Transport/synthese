@@ -115,14 +115,6 @@ namespace synthese
 
 
 
-		MessagesSectionsService::MessagesSectionsService():
-			_section(NULL)
-		{
-
-		}
-
-
-
 		void MessagesSectionsService::_outputSection( util::ParametersMap& pm, const MessagesSection& section )
 		{
 			boost::shared_ptr<ParametersMap> sectionMap(new ParametersMap);
