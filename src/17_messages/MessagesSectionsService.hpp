@@ -53,6 +53,10 @@ namespace synthese
 			//@{
 			//@}
 			
+			struct ElementLess : public std::binary_function<const MessagesSection*, const MessagesSection*, bool>
+			{
+				bool operator()(const MessagesSection* left, const MessagesSection* right) const;
+			};
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.

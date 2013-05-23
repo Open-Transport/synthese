@@ -68,17 +68,6 @@ namespace synthese
 			ParametersMap pm;
 
 			// Sorting
-			struct ElementLess : public std::binary_function<const MessagesSection*, const MessagesSection*, bool>
-			{
-				bool operator()(const MessagesSection* left, const MessagesSection* right) const
-				{
-					if(left && right && left->get<Rank>() != right->get<Rank>())
-					{
-						return left->get<Rank>() < right->get<Rank>();
-					}
-					return left < right;
-				}
-			};
 			typedef set<const MessagesSection*, ElementLess> Sections;
 			Sections sections;
 			BOOST_FOREACH(const MessagesSection::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessagesSection>())
@@ -120,5 +109,16 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> sectionMap(new ParametersMap);
 			section.toParametersMap(*sectionMap, true);
 			pm.insert(TAG_SECTION, sectionMap);
+		}
+
+
+
+		bool MessagesSectionsService::ElementLess::operator()( const MessagesSection* left, const MessagesSection* right ) const
+		{
+			if(left && right && left->get<Rank>() != right->get<Rank>())
+			{
+				return left->get<Rank>() < right->get<Rank>();
+			}
+			return left < right;
 		}
 }	}
