@@ -12,25 +12,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- Le styles -->
   <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
   <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+  <script src="/lib/jquery-ui/jquery-ui.min.js"></script>
   <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
   <link href="/lib/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
-  <style type="text/css">
-      body {
-        padding-top: 60px;
-        
-      }
-      .message_overview p { display:inline; }
-      .message_overview img { display:none; }
-      a.iv { background-color: <@roots["iv"].color@> !important;}
-      a.comm { background-color: <@roots["comm"].color@> !important;}
-      a.expl { background-color: <@roots["expl"].color@> !important; }
-      th { text-align:left !important; padding-right:10px; }
-
-      
-  </style>
+  <link href="/terminus/css/terminus.css" rel="stylesheet">
    
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -41,7 +28,7 @@
 
  <body onload="window.scrollTo(0, 1);">
   <#navbar&top=1#>
-  <div class="container-fluid" style="min-height:350px">
+  <div class="container-fluid" id="main_container">
 
    <?if&
      cond=<@session_id@>&

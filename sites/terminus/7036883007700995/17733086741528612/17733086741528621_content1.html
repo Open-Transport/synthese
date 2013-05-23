@@ -4,29 +4,33 @@
    <?link&
      target=/&
      class=brand&
-     text=Terminus
+     text=Terminus&
    ?>
-   <?if	&cond=<@session_id@>
-	&then=
-          <div class="nav-collapse">
-            <ul class="nav">
-             <li><?link&target=/lib?></li>
-             <li><?link&target=/events?></li>
-             <?messages_sections&
-               template=<{section&template=
-               	<li><?link&
-               	  target=/events&
-               	  section=<@id@>&
-               	  text=<@name@>&
-               	?></li>
-             }>?>
-             <li><?link&target=/admin?></li>
-	    </ul>
-	    <ul class="nav pull-right">
-               <li><a href="#"><i class="icon-wrench icon-white"></i></a></li>
-               <li><?link&target=17732932122705941&a=logout&text=<i class="icon-off icon-white"></i>?></li>
-            </ul>
-          </div><!--/.nav-collapse -->
+   <?if&
+     cond=<@session_id@>&
+     then=<div class="nav-collapse">
+           <ul class="nav">
+            <li><?link&target=/lib?></li>
+            <li><?link&target=/events?></li>
+            <?messages_sections&
+              template=<{section&
+                         template=<li><?link&
+               	                        target=/events&
+                                        section=<@id@>&
+               	                        text=<@name@>&
+               	                      ?></li>}>
+            ?>
+            <li><?link&target=/admin?></li>
+	   </ul>
+	   <ul class="nav pull-right">
+            <li><a href="#"><i class="icon-wrench icon-white"></i></a></li>
+            <li><?link&
+                  target=17732932122705941&
+                  a=logout&
+                  text=<i class="icon-off icon-white"></i>&
+                ?></li>
+           </ul>
+          </div>&
    ?>
   </div>
  </div>
