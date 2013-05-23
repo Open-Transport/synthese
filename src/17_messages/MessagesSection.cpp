@@ -22,11 +22,19 @@
 
 #include "MessagesSection.hpp"
 
+#include "MessagesSectionTableSync.hpp"
+#include "RankUpdateQuery.hpp"
+
 namespace synthese
 {
 	CLASS_DEFINITION(messages::MessagesSection, "t109_messages_sections", 109)
 	FIELD_DEFINITION_OF_OBJECT(messages::MessagesSection, "messages_section_id", "messages_section_ids")
 
+	FIELD_DEFINITION_OF_TYPE(Code, "code", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Color, "color", SQL_TEXT)
+
+	using namespace db;
+	
 	namespace messages
 	{
 		MessagesSection::MessagesSection(
@@ -36,8 +44,68 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
-					FIELD_VALUE_CONSTRUCTOR(Rank, 0)
+					FIELD_VALUE_CONSTRUCTOR(Rank, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(Code),
+					FIELD_DEFAULT_CONSTRUCTOR(Color)
 			)	)
 		{}
+
+
+
+		void MessagesSection::beforeUpdate(
+			const ObjectBase& existingObject,
+			boost::optional<db::DBTransaction&> transaction
+		) const	{
+
+			const MessagesSection& existingSection(static_cast<const MessagesSection&>(existingObject));
+
+			// Rank has been decreased
+			if(get<Rank>() < existingSection.get<Rank>())
+			{
+				RankUpdateQuery<MessagesSectionTableSync> query(
+					Rank::FIELD.name,
+					1,
+					get<Rank>(),
+					existingSection.get<Rank>() - 1
+				);
+				query.execute(transaction);
+			}
+			else if(get<Rank>() > existingSection.get<Rank>()) // Rank has been increased
+			{
+				RankUpdateQuery<MessagesSectionTableSync> query(
+					Rank::FIELD.name,
+					-1,
+					existingSection.get<Rank>() + 1,
+					get<Rank>()
+				);
+				query.execute(transaction);
+			}
+		}
+
+
+
+		void MessagesSection::afterDelete( boost::optional<db::DBTransaction&> transaction ) const
+		{
+			// Shift other ranks
+			RankUpdateQuery<MessagesSectionTableSync> query(
+				Rank::FIELD.name,
+				-1,
+				get<Rank>() + 1
+			);
+			query.execute(transaction);
+		}
+
+
+
+		void MessagesSection::beforeCreate( boost::optional<db::DBTransaction&> transaction ) const
+		{
+			// Shift other ranks
+			RankUpdateQuery<MessagesSectionTableSync> query(
+				Rank::FIELD.name,
+				1,
+				get<Rank>()
+			);
+			query.execute(transaction);
+		}
 }	}
 

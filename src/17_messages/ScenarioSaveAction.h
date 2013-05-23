@@ -34,6 +34,7 @@
 
 #include <string>
 #include <boost/tuple/tuple.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace synthese
 {
@@ -61,103 +62,82 @@ namespace synthese
 			public impex::BaseImportableUpdateAction
 		{
 		public:
+			// Parameters for action determination
 			static const std::string PARAMETER_CREATE_TEMPLATE;
+			static const std::string PARAMETER_TEMPLATE;
+			static const std::string PARAMETER_MESSAGE_TO_COPY;
+			static const std::string PARAMETER_SCENARIO_ID;
+			static const std::string PARAMETER_SCENARIO_DATASOURCE_ID;
+
+			// Parameters for properties
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_ENABLED;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_START_TIME;
 			static const std::string PARAMETER_END_TIME;
+			static const std::string PARAMETER_VARIABLE;
+			static const std::string PARAMETER_SECTIONS;
+			static const std::string PARAMETER_FOLDER_ID;
+			static const std::string PARAMETER_ARCHIVED;
+
+			// Parameters for unused properties
 			static const std::string PARAMETER_EVENT_START_DATE;
 			static const std::string PARAMETER_EVENT_END_DATE;
 			static const std::string PARAMETER_EVENT_START_TIME;
 			static const std::string PARAMETER_EVENT_END_TIME;
-			static const std::string PARAMETER_ENABLED;
-			static const std::string PARAMETER_SCENARIO_ID;
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_FOLDER_ID;
-			static const std::string PARAMETER_VARIABLE;
-			static const std::string PARAMETER_TEMPLATE;
-			static const std::string PARAMETER_MESSAGE_TO_COPY;
-			static const std::string PARAMETER_MESSAGE_TO_CREATE;
-			static const std::string PARAMETER_CREATED_MESSAGE_TITLE;
-			static const std::string PARAMETER_RECIPIENT_ID;
-			static const std::string PARAMETER_LEVEL;
-			static const std::string PARAMETER_RECIPIENT_DATASOURCE_ID;
-			static const std::string PARAMETER_RECIPIENT_TYPE;
-			static const std::string PARAMETER_SCENARIO_DATASOURCE_ID;
-			static const std::string PARAMETER_ENCODING;
-			static const std::string PARAMETER_SECTIONS;
 
-			static const std::string PARAMETER_WITH_MESSAGES;
-			static const std::string PARAMETER_MESSAGE_ID_;
-			static const std::string PARAMETER_MESSAGE_TITLE_;
-			static const std::string PARAMETER_MESSAGE_CONTENT_;
-			static const std::string PARAMETER_MESSAGE_LEVEL_;
-			static const std::string PARAMETER_MESSAGE_RECIPIENTS_;
-			static const std::string PARAMETER_MESSAGE_ALTERNATIVES_;
-			static const std::string VALUES_SEPARATOR;
-			static const std::string VALUES_PARAMETERS_SEPARATOR;
-			static const std::string PARAMETER_APPLICATION_PERIOD_START_DATE;
-			static const std::string PARAMETER_APPLICATION_PERIOD_END_DATE;
-			static const std::string PARAMETER_APPLICATION_PERIOD_START_TIME;
-			static const std::string PARAMETER_APPLICATION_PERIOD_END_TIME;
-			static const std::string PARAMETER_APPLICATION_PERIOD_START_HOUR;
-			static const std::string PARAMETER_APPLICATION_PERIOD_END_HOUR;
-			static const std::string PARAMETER_APPLICATION_PERIOD_ID;
+			// Parameters for A/B/G/H message update full method
+			static const std::string PARAMETER_JSON;
 
-		private:
-			struct Message
-			{
-				util::RegistryKeyType id;
-				std::string title;
-				std::string content;
-				AlarmLevel level;
-				typedef std::vector<
-					std::pair< // pair<pair>> instead of tuple because of VS2010 bug http://connect.microsoft.com/VisualStudio/feedback/details/534457/c-map-tuple-v-compilation-problems
-						std::string,
-						std::pair<
-							util::RegistryKeyType,
-							std::string
-				>	>	> Recipients;
-				Recipients recipients;
-				typedef std::map<
-					MessageType*,
-					std::string
-				> Alternatives;
-				Alternatives alternatives;
-			};
-			typedef std::vector<Message> Messages;
-			typedef std::set<util::RegistryKeyType> MessageIds;
-
-			typedef std::set<
-				MessageApplicationPeriod*
-			> MessageApplicationPeriods;
-
-			//! @name Datasources
+			/// @name Parameters for A/B/G/H message update simplified method
 			//@{
-				boost::shared_ptr<const impex::DataSource> _scenarioDataSource;
-				boost::shared_ptr<const impex::DataSource> _recipientDataSource;
+				static const std::string PARAMETER_MESSAGE_TO_CREATE;
+				static const std::string PARAMETER_CREATED_MESSAGE_TITLE;
+				static const std::string PARAMETER_RECIPIENT_ID;
+				static const std::string PARAMETER_LEVEL;
+				static const std::string PARAMETER_RECIPIENT_DATASOURCE_ID;
+				static const std::string PARAMETER_RECIPIENT_TYPE;
+				static const std::string PARAMETER_ENCODING;
 			//@}
 
-			//! @name Scenario to update
+			static const std::string VALUES_SEPARATOR;
+			static const std::string VALUES_PARAMETERS_SEPARATOR;
+
+		private:
+			//! @name Determination of the action
 			//@{
 				boost::shared_ptr<Scenario>				_scenario;
 				boost::shared_ptr<SentScenario>			_sscenario;
 				boost::shared_ptr<ScenarioTemplate>		_tscenario;
-				bool _withMessages;
-				Messages _messages;
-				MessageIds _messageIds;
+				bool _creation;
+				boost::shared_ptr<const ScenarioTemplate>	_template;
+				boost::shared_ptr<const SentScenario>		_source;
+				boost::shared_ptr<const impex::DataSource> _scenarioDataSource;
 			//@}
 
-			//! @name New values
+			//! @name Properties
 			//@{
 				boost::optional<std::string>						_name;
 				boost::optional<boost::shared_ptr<ScenarioFolder> >	_folder;
 				boost::optional<bool>								_enabled;
+				boost::optional<bool>								_archived;
 				boost::optional<boost::posix_time::ptime>			_startDate;
 				boost::optional<boost::posix_time::ptime>			_endDate;
 				boost::optional<boost::posix_time::ptime>			_eventStartDate;
 				boost::optional<boost::posix_time::ptime>			_eventEndDate;
 				SentScenario::VariablesMap							_variables;
+				boost::optional<Scenario::Sections>					_sections;
+			//@}
+
+			//! @name Values for A/B/G/H message update full method
+			//@{
+				boost::optional<boost::property_tree::ptree> _messagesAndCalendars;
+			//@}
+
+			//! @name Values for A/B/G/H message update simplified method
+			//@{
+				boost::shared_ptr<const impex::DataSource> _recipientDataSource;
 				boost::optional<std::string>						_messageToCreate;
 				boost::optional<std::string>						_messageToCreateTitle;
 				typedef 
@@ -170,16 +150,8 @@ namespace synthese
 				boost::optional<AlarmLevel>							_level;
 				std::string											_dataSourceLinkId;
 				boost::shared_ptr<SentAlarm>						_message;
-				boost::optional<Scenario::Sections>					_sections;
-				boost::optional<MessageApplicationPeriods>			_messageApplicationPeriods;
 			//@}
 
-			//! @name Action to do
-			//@{
-				bool _creation;
-				boost::shared_ptr<const ScenarioTemplate>	_template;
-				boost::shared_ptr<const SentScenario>		_source;
-			//@}
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

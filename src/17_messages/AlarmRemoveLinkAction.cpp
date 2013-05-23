@@ -84,7 +84,7 @@ namespace synthese
 			Request& request
 		) throw (ActionException) {
 
-			AlarmObjectLinkTableSync::Remove(_alarm->getKey(), _objectId);
+			AlarmObjectLinkTableSync::RemoveByMessage(_alarm->getKey(), _objectId);
 
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
 			{

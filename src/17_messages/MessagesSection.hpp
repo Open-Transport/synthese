@@ -31,12 +31,17 @@
 
 namespace synthese
 {
+	FIELD_STRING(Code)
+	FIELD_STRING(Color)
+
 	namespace messages
 	{
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
-			FIELD(Rank)
+			FIELD(Rank),
+			FIELD(Code),
+			FIELD(Color)
 		> MessagesSectionRecord;
 
 
@@ -49,9 +54,26 @@ namespace synthese
 		public:
 			MessagesSection(util::RegistryKeyType id=0);
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Updates the rank of other objects if the rank has been changed.
+			virtual void beforeUpdate(
+				const ObjectBase& existingObject,
+				boost::optional<db::DBTransaction&> transaction
+			) const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Updates the rank of other objects.
+			virtual void afterDelete(
+				boost::optional<db::DBTransaction&> transaction
+			) const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Updates the rank of other objects.
+			virtual void beforeCreate(
+				boost::optional<db::DBTransaction&> transaction
+			) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_messages_MessagesSection_hpp__
 

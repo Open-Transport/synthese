@@ -11,6 +11,7 @@
 #include "MessagesSectionTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "ScenarioTableSync.h"
+#include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
 
@@ -64,6 +65,7 @@
 #include "TextTemplate.h"
 #include "ScenarioFolder.h"
 #include "Scenario.h"
+#include "ScenarioCalendar.hpp"
 
 
 #include "MessagesModule.inc.cpp"
@@ -82,6 +84,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::MessageApplicationPeriodTableSync::integrate();
 	synthese::messages::MessagesSectionTableSync::integrate();
 	synthese::messages::MessageTypeTableSync::integrate();
+	synthese::messages::ScenarioCalendarTableSync::integrate();
 	synthese::messages::ScenarioFolderTableSync::integrate();
 	synthese::messages::ScenarioTableSync::integrate();
 	synthese::messages::TextTemplateTableSync::integrate();
@@ -133,6 +136,7 @@ void synthese::messages::moduleRegister()
 	synthese::util::Env::Integrate<synthese::messages::MessageAlternative>();
 	synthese::util::Env::Integrate<synthese::messages::MessageApplicationPeriod>();
 	synthese::util::Env::Integrate<synthese::messages::MessageType>();
+	synthese::util::Env::Integrate<synthese::messages::ScenarioCalendar>();
 	synthese::util::Env::Integrate<synthese::messages::Alarm>();
 	synthese::util::Env::Integrate<synthese::messages::TextTemplate>();
 	synthese::util::Env::Integrate<synthese::messages::ScenarioFolder>();

@@ -60,6 +60,7 @@ namespace synthese
 
 		const string Alarm::ATTR_LINK_ID = "link_id";
 		const string Alarm::ATTR_LINK_PARAMETER = "link_parameter";
+		const string Alarm::ATTR_CALENDAR_ID = "calendar_id";
 
 
 		Alarm::Alarm(
@@ -70,7 +71,8 @@ namespace synthese
 			_scenario(scenario),
 			_rawEditor(false),
 			_done(true),
-			_section(NULL)
+			_section(NULL),
+			_calendar(NULL)
 		{}
 
 
@@ -84,14 +86,16 @@ namespace synthese
 			_scenario(source._scenario),
 			_rawEditor(source._rawEditor),
 			_done(source._done),
-			_section(source._section)
+			_section(source._section),
+			_calendar(source._calendar)
 		{}
 
 
 
 		Alarm::Alarm(
 			const Alarm& source,
-			const Scenario* scenario
+			const Scenario* scenario,
+			const ScenarioCalendar* calendar
 		):	Registrable(0),
 			_level(source._level),
 			_shortMessage(source._shortMessage),
@@ -99,7 +103,8 @@ namespace synthese
 			_scenario(scenario),
 			_rawEditor(source._rawEditor),
 			_done(source._done),
-			_section(source._section)
+			_section(source._section),
+			_calendar(calendar)
 		{}
 
 
@@ -157,6 +162,8 @@ namespace synthese
 				);
 				pm.insert(TAG_RECIPIENTS, recipientsPM);
 			}
+
+			pm.insert(ATTR_CALENDAR_ID, _calendar ? _calendar->getKey() : 0);
 		}
 
 
