@@ -43,15 +43,13 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Key : RemoveObjectAction
 		///
-		/// Parameters :
-		///	<dl>
-		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
-		///	</dl>
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Object_manipulation#Object-removal
 		class RemoveObjectAction:
 			public util::FactorableTemplate<server::Action, RemoveObjectAction>
 		{
 		public:
 			static const std::string PARAMETER_OBJECT_ID;
+			static const std::string PARAMETER_OLD_OBJECT_ID;
 
 		private:
 			util::RegistryKeyType _objectId;
