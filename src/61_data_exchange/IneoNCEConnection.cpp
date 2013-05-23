@@ -363,7 +363,7 @@ namespace synthese
 				boost::shared_ptr<Session> session(Session::New("0.0.0.0"));
 				BOOST_FOREACH(boost::shared_ptr<AlarmObjectLink> alarmLink, alarmLinks)
 				{
-					AlarmObjectLinkTableSync::Remove(alarmLink->getKey());
+					AlarmObjectLinkTableSync::Remove(NULL, alarmLink->getKey(), transaction, false);
 					DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(session.get(), alarmLink->getKey(),
 						transaction, false
 					);
