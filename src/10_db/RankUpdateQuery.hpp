@@ -62,15 +62,15 @@ namespace synthese
 			/// following the changed row have to be incremented to decremented.
 			/// @param rankColumn Name of the rank column
 			/// @param delta Amount to add to the rank value of the updated rows.
-			/// @param rank Rows with a rank value greater (or equal, see next parameter) to this parameter are updated.
-			/// @orEqual (optional) If true, update rows with a rank greater or equal to the rank parameter, otherwise use a strict comparison.
+			/// @param minRank Only rows with a rank value greater or equal to this parameter are updated.
+			/// @param maxRank Only rows with a rank value less or equal to this parameter are updated.
 			/// @author Sylvain Pasche
 			/// @date 2011
 			RankUpdateQuery(
 				const std::string& rankColumn,
 				int delta,
-				size_t rank,
-				bool orEqual = true
+				size_t minRank,
+				boost::optional<size_t> maxRank = boost::optional<size_t>()
 			){
 				_updateQuery.reset(new UpdateQuery<Table>());
 
@@ -78,9 +78,18 @@ namespace synthese
 
 				_updateQuery->addWhereField(
 					rankColumn,
-					rank,
-					orEqual ? ComposedExpression::OP_SUPEQ : ComposedExpression::OP_SUP
+					minRank,
+					ComposedExpression::OP_SUPEQ
 				);
+
+				if(maxRank)
+				{
+					_updateQuery->addWhereField(
+						rankColumn,
+						*maxRank,
+						ComposedExpression::OP_INFEQ
+					);
+				}
 			}
 
 			//! @name Modifiers
