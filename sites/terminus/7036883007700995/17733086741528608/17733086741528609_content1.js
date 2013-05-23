@@ -3,15 +3,15 @@ var formToSave = false;
 function openclose()
 {
  var div = $(this).siblings('div');
- activate_node($(this), div.css('display')=='none');
+ activate_node($(this), div.hasClass('hide'));
 }
 
 function activate_node(icon_selector, value)
 {
  var div = icon_selector.siblings('div');
- div.css('display',value?'block':'none');
  if(value)
  {
+   div.removeClass('hide');
    icon_selector.addClass('icon-chevron-down');
    icon_selector.removeClass('icon-chevron-right');
  }
@@ -19,20 +19,24 @@ function activate_node(icon_selector, value)
  {
    icon_selector.addClass('icon-chevron-right');
    icon_selector.removeClass('icon-chevron-down');
+   div.addClass('hide');
  }
 }
 
 
 function filter()
 {
-  var text=$(this).val();
-  var elements=$(this).next().find('label');
+  var text=$(this).val().toUpperCase();
+  var elements=$(this).parent().find('label');
   if(text != '')
   {
     elements.each(function(){
-      if($(this).text().indexOf(text) !== -1)
+      var txt = $(this).text().toUpperCase();
+      $(this).parent().removeClass('search-visible');
+      $(this).parent().removeClass('search-invisible');
+      if(txt.indexOf(text) !== -1)
       {
-        $(this).parent().addClass('search-visible');
+        $(this).parentsUntil('div.modal_body').addClass('search-visible');
       }
       else
       {
@@ -43,8 +47,9 @@ function filter()
   else
   {
     elements.each(function(){
-      $(this).parent().removeClass('search-visible');
-      $(this).parent().removeClass('search-invisible');
+      var parent = $(this).parentsUntil('div.modal_body');
+      parent.removeClass('search-visible');
+      parent.removeClass('search-invisible');
     });
   }
 }
@@ -629,11 +634,12 @@ function change_message_title()
   activateForm();
 }
 
-function change_calendar_name()
+function calendar_rename()
 {
   var title = $('#calendar input[field=name]').val();
   if(!title) title = "(sans nom)";
   $('#mi_c_'+ current_calendar.rank +' span[content=name]').html(title);
+  $('#change_calendar_list option[value='+ current_calendar.rank +']').html(title);
   activateForm();
 }
 
@@ -828,11 +834,16 @@ function change_calendar_click()
   remove_message(current_message);
   var new_calendar_rank = $('#change_calendar_list').val();
   current_message.calendar_rank = new_calendar_rank;
+  calendar_by_rank[new_calendar_rank].message.push(current_message);
   add_message(current_message);
 
   $('#change_calendar_list').val(new_calendar_rank);
-  activateForm();
-  
+  activateForm(); 
+}
+
+function focus_on_input()
+{
+  $(this).find('input[type=text]').eq(0).focus();
 }
 
 $(function(){
@@ -840,7 +851,7 @@ $(function(){
   $('.navbar-inner a').click(alert_on_exit);
   $('#mi_properties').click(open_properties_click);
   $('.openclose').click(openclose);
-  $('.search-query').keyup(filter);
+  $('input[action=search]').keyup(filter);
   $('input[factory]').change(change_recipient);
   $('#new_period').click(new_period_click);
   $('#message a[factory]').click(show_recipients_click);
@@ -851,12 +862,13 @@ $(function(){
   $('#message input[field=title]').bind('keyup', change_message_title);
   $('#message input[field=title]').bind('cut', change_message_title);
   $('#message input[field=title]').bind('paste', change_message_title);
-  $('#calendar input[field=name]').bind('keyup', change_calendar_name);
-  $('#calendar input[field=name]').bind('cut', change_calendar_name);
-  $('#calendar input[field=name]').bind('paste', change_calendar_name);
+  $('#calendar input[field=name]').bind('keyup', calendar_rename);
+  $('#calendar input[field=name]').bind('cut', calendar_rename);
+  $('#calendar input[field=name]').bind('paste', calendar_rename);
   $('div[action=add_calendar]').click(new_calendar_click);
   $('div[action=add_calendar]').tooltip({placement: 'right'});
   $('#change_calendar').click(change_calendar_click);
+  $('.modal').bind('shown', focus_on_input);
 
   open_properties_click();
 });

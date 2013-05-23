@@ -33,8 +33,8 @@ tinyMCE.init({
 .close_tab { display:none; }
 .active .close_tab { display:inline-block; }
 .openclose { cursor:pointer; }
-.search-visible { display:block; }
 .search-invisible { display:none; }
+.search-visible { display:block !important; }
 label.checkbox { display:inline-block !important; }
 </style>
 
@@ -310,22 +310,26 @@ label.checkbox { display:inline-block !important; }
   <h3>Message <span id="m_line_title"></span> : Lignes</h3>
  </div>
  <div class="modal-body">
+  <input type="text" class="input-medium search-query pull-right" action="search" />
   <?PTNetworksListFunction&
     template=<{network&template=
 	<div>
 	 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" /> Réseau <@name@></label>
-	 <div style="padding-left:30px; display:none;">
+	 <div style="padding-left:30px;" class="hide">
 	  <?LinesListFunction2&
 	    ni=<@id@>&
+	    with_directions=1&
 	    template=<{line&template=
 		<div>
 		 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" /> <@line_short_name@> <@name@></label>
-		 <div style="padding-left:30px; display:none;">
+		 <div style="padding-left:30px;" class="hide">
 		  <div>
-		   <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" /> <@line_short_name@> <@name@> Aller</label>
+		   <@direction=<{forward_direction&template=<@direction@> }>@>
+		   <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" /> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
 		  </div>
 		  <div>
-		   <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" /> <@line_short_name@> <@name@> Retour</label>
+		   <@direction=<{backward_direction&template=<@direction@> }>@>
+		   <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" /> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
 		  </div>
 		 </div>
 		</div>
@@ -347,24 +351,26 @@ label.checkbox { display:inline-block !important; }
   <h3>Message <span id="m_stoparea_title"></span> : Zones d'arrêt</h3>
  </div>
  <div class="modal-body">
+  <input type="text" class="input-medium search-query pull-right" action="search" />
   <?StopAreasListFunction&
     group_by_cities=1&
     output_stops=1&
+    stops_directions=3&
     template=<{city&template=
     	<div>
 	 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@city_id@>" /> Commune <@city_name@></label>
-	 <div style="padding-left:30px; display:none;"><{stopArea&template=
+	 <div style="padding-left:30px;" class="hide"><{stopArea&template=
     		<div>
 	 	 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" /> Arrêt commercial <@name@></label>
-	 	 <div style="padding-left:30px; display:none;"><{stop&template=
+	 	 <div style="padding-left:30px;" class="hide"><{stop&template=
 	 		<div>
-	 		 <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" /> Arrêt physique <@operatorCode@></label>
+	 		 <@direction=<{direction&template=<@direction@> }>@>
+	 		 <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" /> Arrêt physique <@direction?("direction "+direction):operatorCode@></label>
 	 		</div>
 	 	 }></div>
 	 	</div>
 	 }></div>
 	</div>
-
   }>?>
  </div>
  <div class="modal-footer">
@@ -380,18 +386,18 @@ label.checkbox { display:inline-block !important; }
   <h3>Message <span id="m_displayscreen_title"></span> : Diffuseurs</h3>
  </div>
  <div class="modal-body">
-  <input type="text" class="input-medium search-query pull-right" />
+  <input type="text" class="input-medium search-query pull-right" action="search" />
      	<div>
 	 <i class="icon-chevron-down openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="0" /> Tous</label>
 	 <div style="padding-left:30px;">
 	  <div>
       	   <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="41" /> Bornes</label>
-      	   <div style="padding-left:30px; display:none">
+      	   <div style="padding-left:30px;" class="hide">
 	   <?display_types&
       	     template=<{display_type&template=
       	     	<div>
       	   	 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="<@id@>" /> Type <@name@></label>
-      	   	 <div style="padding-left:30px; display:none;">
+      	   	 <div style="padding-left:30px;" class="hide">
       	   	 <@current_type_id=<@id@>@>
       	   	 <?GetDepartureBoards&
       	   	   template=<{screen&template=
@@ -408,10 +414,10 @@ label.checkbox { display:inline-block !important; }
 	  </div>
      	  <div>
 	   <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" value="107" /> Listes de diffusion</label>
-	   <div style="padding-left:30px; display:none;">
+	   <div style="padding-left:30px;" class="hide">
 	    <div>
 	     <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi automatique</label>
-	     <div style="padding-left:30px; display:none;">
+	     <div style="padding-left:30px;" class="hide">
 	      <?mailing_lists&
 	        manual_sending=0&
 	        template=<{mailing_list&template=
@@ -423,7 +429,7 @@ label.checkbox { display:inline-block !important; }
 	    </div>
 	    <div>
 	     <i class="icon-chevron-right openclose"></i> <label class="checkbox">Listes à envoi manuel</label>
-	     <div style="padding-left:30px; display:none;">
+	     <div style="padding-left:30px;" class="hide">
 	      <?mailing_lists&
 	        manual_sending=1&
 	        template=<{mailing_list&template=
@@ -437,7 +443,7 @@ label.checkbox { display:inline-block !important; }
 	  </div>
      	  <div>
 	   <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="displayscreen" noparam="1" value="106" /> Autres diffuseurs</label>
-	   <div style="padding-left:30px; display:none;">
+	   <div style="padding-left:30px;" class="hide">
 	   <?custom_broadcast_points&
 	     recursive=1&
 	     template=<{broadcast_point&recursive=1&template=
