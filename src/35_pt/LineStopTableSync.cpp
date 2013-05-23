@@ -371,7 +371,7 @@ namespace synthese
 			Env env;
 			boost::shared_ptr<const LineStop> lineStop(LineStopTableSync::Get(id, env));
 
-			RankUpdateQuery<LineStopTableSync> query(LineStopTableSync::COL_RANKINPATH, -1, lineStop->getRankInPath(), false);
+			RankUpdateQuery<LineStopTableSync> query(LineStopTableSync::COL_RANKINPATH, -1, lineStop->getRankInPath()+1);
 			query.addWhereField(LineStopTableSync::COL_LINEID, lineStop->getLine()->getKey());
 			query.execute(transaction);
 		}
