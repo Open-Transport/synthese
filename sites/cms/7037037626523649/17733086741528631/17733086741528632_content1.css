@@ -1,0 +1,44 @@
+#menu
+{
+  width:300px;
+  float:left;
+}
+#main
+{
+  float:left;
+}
+#menu_content
+{
+  overflow:auto;
+}
+#menu_title .nav-pills
+{
+ margin:4px;
+}
+
+.navbar
+{
+  margin-bottom:0 !important;
+}
+
+.navbar-inner
+{
+  border-radius:0 !important;
+}
+
+.tree_1 { padding-left:20px; }
+.tree_2 { padding-left:40px; }
+.tree_3 { padding-left:60px; }
+.tree_4 { padding-left:80px; }
+.tree_5 { padding-left:100px; }
+.tree_6 { padding-left:120px; }
+.tree_7 { padding-left:140px; }
+.tree_8 { padding-left:160px; }
+.tree_9 { padding-left:180px; }
+.tree_10 { padding-left:200px; }
+.tree_11 { padding-left:220px; }
+.tree_12 { padding-left:240px; }
+.tree_13 { padding-left:260px; }
+.tree_14 { padding-left:280px; }
+.tree_15 { padding-left:300px; }
+.tree_26 { padding-left:320px; }
