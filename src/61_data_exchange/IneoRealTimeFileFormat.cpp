@@ -60,7 +60,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat, IneoRealTimeFileFormat>::FACTORY_KEY("Ineo temps reel");
+		template<> const string FactorableTemplate<FileFormat, IneoRealTimeFileFormat>::FACTORY_KEY("ineo temps reel");
 	}
 
 	namespace data_exchange
