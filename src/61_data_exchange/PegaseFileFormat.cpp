@@ -68,7 +68,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat, PegaseFileFormat>::FACTORY_KEY("Pégase");
+		template<> const string FactorableTemplate<FileFormat, PegaseFileFormat>::FACTORY_KEY("pegase");
 	}
 
 	namespace data_exchange
