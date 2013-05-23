@@ -1,0 +1,32 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<div class="control-group">
+ <label class="control-label">Fichier</label>
+ <div class="controls">
+  <input name="pa" type="text" value="<@pa@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Options d'import</h3>
+
+<div class="control-group">
+ <label class="control-label">Effacer données existantes</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<div class="control-group">
+ <label class="control-label">Calendrier</label>
+ <div class="controls">
+  <select name="calendar_id" is_parameter="true">
+   <option value="">(non défini)</option>
+   <?CalendarsListService&template=<{calendar&template=
+   	<option value="<@id@>" <@(id==calendar_id)?"selected=\"true\"":""@>><@name@></option>
+   }>?>
+  </select>
+ </div>
+</div>

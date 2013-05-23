@@ -1,0 +1,192 @@
+<ul class="breadcrumb">
+ <div class="pull-right">
+  <a href="#new_connection" data-toggle="modal" class="btn btn-primary">Nouvelle connexion</a>
+ </div>
+ <li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+ <h1>Vue client</h1>
+</ul>
+
+<table class="table table-striped table-condensed"><thead>
+<tr><th></th><th>nom</th><th>adresse</th><th>port</th><th>protocole</th><th>actif</th><th></th></tr>
+</thead><tbody>
+ <tr>
+  <td>
+   <?link&
+     target=17732932122705988&
+     text=Ouvrir&
+     class=btn btn-primary btn-mini&
+   ?>
+  </td>
+  <td>SAE Inéo</td>
+  <td>N.A.</td>
+  <td>N.A.</td>
+  <td>Trigger BDSI Inéo</td>
+  <td></td>
+  <td></td>
+ </tr><tr>
+  <td>
+   <?link&
+     target=/client/nce&
+     text=Ouvrir&
+     class=btn btn-primary btn-mini&
+   ?>
+  </td>
+  <td>NCE Inéo</td>
+  <td><@~global("ineo_nce_host")@></td>
+  <td><@~global("ineo_nce_port")@></td>
+  <td>Bus IP Inéo</td>
+  <td></td>
+  <td></td>
+ </tr>
+ <?vdv_servers_list&
+   template=<{server&template=
+   	<tr>
+	  <td>
+	  <?link&
+	    target=/client/vdv&
+	    text=Ouvrir&
+	    roid=<@id@>&
+	    class=btn btn-primary btn-mini&
+	  ?>
+	 </td>
+   	 <td><@name@></td>
+   	 <td><@address@></td>
+   	 <td><@port@></td>
+   	 <td>VDV</td>
+   	 <td><span class="label label-success">Actif</span></td>
+	 <td>
+	  <?link&
+	    target=<@p@>&
+	    text=Supprimer&
+	    confirm=Etes-vous sûr de vouloir supprimer l'esclave ?&
+	    a=RemoveObjectAction&
+	    actionParamoi=<@id@>&
+	    class=btn btn-mini btn-danger
+	  ?>
+	 </td>
+   	</tr>
+ }>?>
+ <?imports&template=<{import&template=
+ 	<tr>
+ 	 <td>
+ 	  <?link&
+ 	    target=/client/import&
+ 	    text=Ouvrir&
+ 	    class=btn btn-primary btn-mini&
+ 	    roid=<@id@>&
+ 	  ?>
+ 	 </td>
+ 	 <td><@name@></td>
+ 	 <td><@address@></td>
+ 	 <td><@port@></td>
+ 	 <td>Import <@file_format@></td>
+   	 <td><span class="label label-<@active?"success":"important"@>"><@active?"Actif":"Inactif"@></span></td>
+ 	 <td>
+ 	  <?link&
+ 	    target=<@p@>&
+ 	    text=Supprimer&
+ 	    class=btn btn-danger btn-mini&
+ 	    confirm=Etes-vous sûr de vouloir supprimer l'import <@name@> ?&
+ 	    a=RemoveObjectAction&
+	    actionParamoi=<@id@>&
+ 	  ?>
+ 	</tr>
+ }>?>
+</tbody></table>
+
+
+<div id="new_connection" class="modal hide fade">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+  <h3>Nouvelle connexion</h3>
+ </div>
+ <div class="modal-body">
+  <ul class="nav nav-tabs">
+   <li class="active"><a href="#vdv" data-toggle="tab">VDV</a></li>
+   <li><a href="#import" data-toggle="tab">Import</a></li>
+  </ul>
+  <div class="tab-content">
+   <div class="tab-pane active" id="vdv">
+   
+    <?form&
+      name=new_vdv&
+      page_id=/client/vdv&
+      a=ObjectCreate&
+      actionParam_table_id=97&
+      class=form-horizontal&
+      co=1&
+    ?>
+     <div class="control-group">
+      <label class="control-label">Nom</label>
+      <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
+     </div>
+     <div class="control-group">
+      <label class="control-label">Adresse</label>
+      <div class="controls"><input type="text" class="input-medium" name="actionParam_field_address" /></div>
+     </div>
+     <div class="control-group">
+      <label class="control-label">Port</label>
+      <div class="controls"><input type="text" class="input-medium" name="actionParam_field_port" /></div>
+     </div>
+     <div class="control-group">
+      <div class="controls">
+       <button type="submit" class="btn btn-warning">Ajouter</button>
+      </div>
+     </div>
+    </form>
+   </div>
+
+   <div class="tab-pane" id="import">
+    <?form&
+      name=new_import&
+      page_id=/client/import&
+      a=ObjectCreate&
+      actionParam_table_id=105&
+      class=form-horizontal&
+      co=1&
+      form_id=new_import_form&
+    ?>
+     <div class="control-group">
+      <label class="control-label">Nom</label>
+      <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
+     </div>
+     <div class="control-group">
+      <label class="control-label">Source de données</label>
+      <div class="controls">
+       <select name="actionParam_field_data_source_id">
+      	<option value="">(non défini)</option>
+        <?data_sources&template=<{data_source&template=
+        	<option value="<@id@>"><@name@></option>
+        }>?>
+       </select>
+      </div>
+     </div>
+     <div class="control-group">
+      <label class="control-label">Format de fichier</label>
+      <div class="controls">
+       <select name="actionParam_field_file_format">
+        <?file_formats&template=<{format&template=
+        	<option value="<@key@>"><@key@></option>
+        }>?>
+       </select>
+      </div>
+     </div>
+     <div class="control-group">
+      <div class="controls">
+       <button type="submit" class="btn btn-warning">Ajouter</button>
+      </div>
+     </div>
+    </form>
+    <script>
+     $('#new_import_form').submit(function(){
+      return true;
+     });
+    </script>
+   </div>
+
+  </div>
+ </div>
+ <div class="modal-footer">
+  <a href="#" data-dismiss="modal" class="btn btn-primary">Fermer</a>
+ </div>
+</div>

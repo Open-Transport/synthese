@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<@session_id=<?session&template=<{session&template=<@id@>}>?>@>
+<link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+body { padding-top:55px; }
+</style>
+<title><@title@></title>
+<script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+<link href="/lib/bootstrap_datepicker/css/datepicker.css" rel="stylesheet">
+<script src="/lib/bootstrap_datepicker/js/bootstrap-datepicker-fr.js"></script>
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+ <div class="navbar-inner" style="border-radius:0 !important;">
+  <div class="container">
+   <?link&
+     target=17732932122705975&
+     text=Connect&
+     class=brand&
+   ?>
+   <?if&
+     cond=<@session_id@>&
+     then=
+        <ul class="nav">
+	 <?menu&
+	   root=17732932122705975&
+	   raw_data=1&
+	   template=<{page&template=
+		<li<?if&cond=<@current_page_in_branch@>&then= class="active"?>>
+		 <?link&target=<@id@>&text=<@title@>&class=<?if&cond=<@current_page_in_branch@>&then=<@page_id=<@id@>@>?>?>
+		</li>
+ 	   }>
+ 	 ?>
+ 	</ul>
+	<ul class="pull-right nav">
+         <li>
+          <?link&target=17732932122705975&a=logout&text=<i class="icon-off icon-white"></i>?>
+         </li>
+      	</ul>
+   ?>
+  </div>
+ </div>
+</div>
+
+<div class="container">
+<?if&
+  cond=<@session_id@>&
+  then=<@content@>&
+  else=
+	<div class="hero-unit">
+         <h2>Bienvenue sur Connect</h2>
+         <?form&
+           name=login&
+           page_id=<@p@>&
+           a=login&
+           class=form-horizontal well
+         ?>
+          <label>Veuillez remplir le formulaire suivant pour vous connecter :</label>
+          <input name="actionParamlogin" type="text" class="span3" placeholder="Login">
+          <label></label>
+          <input name="actionParampwd" type="password" class="span3" placeholder="Mot de passe">
+          <label></label>
+          <button type="submit" class="btn btn-primary">Connexion</button>
+         </form>
+	</div>
+?>
+</div>
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

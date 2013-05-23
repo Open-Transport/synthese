@@ -1,0 +1,48 @@
+<?if&cond=<@roid@>&then=
+<?data_sources&
+  roid=<@roid@>&
+  template=<{data_source&template=
+  
+	<ul class="breadcrumb">
+	<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+	<li><?link&target=/sources&text=Sources de données?> <span class="divider">/</span></li>
+	<h1><@name@></h1>
+	</ul>
+	
+	<?form&
+	  name=properties&
+	  target=<@p@>&
+	  a=ObjectUpdate&
+	  actionParam_object_id=<@id@>&
+	  roid=<@id@>&
+	  class=form-horizontal&
+	  tab=properties
+	?>
+	 <div class="control-group">
+	  <label class="control-label" for="prop-name">Nom</label>
+	  <div class="controls"><input type="text" name="actionParam_field_name" value="<@name@>" /></div>
+	 </div>
+
+	 <div class="control-group">
+	  <label class="control-label" for="prop-name">Icone</label>
+	  <div class="controls"><input type="text" name="actionParam_field_icon" value="<@icon@>" /></div>
+	 </div>
+
+	 <div class="control-group">
+	  <label class="control-label" for="prop-name">Jeu de caractères</label>
+	  <div class="controls"><input type="text" name="actionParam_field_charset" value="<@charset@>" /></div>
+	 </div>
+
+	 <div class="control-group">
+	  <label class="control-label" for="prop-name">Système de coordonnées</label>
+	  <div class="controls"><input type="text" name="actionParam_field_srid" value="<@srid@>" /></div>
+	 </div>
+
+	 <div class="control-group">
+	  <div class="controls"><button type="submit" class="btn btn-warning">OK</button></div>
+	 </div>
+		
+	</form>
+  }>
+?>
+?>

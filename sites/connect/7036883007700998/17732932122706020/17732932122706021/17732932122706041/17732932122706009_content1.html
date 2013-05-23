@@ -1,0 +1,81 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<div class="control-group">
+ <label class="control-label">Fichier</label>
+ <div class="controls">
+  <input name="pa" type="text" value="<@pa@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<div class="control-group">
+ <label class="control-label">Réseau de transport</label>
+ <div class="controls">
+  <select name="net" is_parameter="true">
+   <option value="">(non défini)</option>
+   <?PTNetworksListFunction&template=<{network&template=
+       <option value="<@id@>" <@(id==net)?"selected=\"true\"":""@>><@name@></option>
+   }>?>
+  </select>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">ID Mode de transport</label>
+ <div class="controls">
+  <input name="rolling_stock_id" type="text" value="<@rolling_stock_id@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">ID commune pour les nouveaux arrêts commerciaux</label>
+ <div class="controls">
+  <input name="sadc" type="text" value="<@sadc@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">ID règle d'utilisation représentant la réservation obligatoire</label>
+ <div class="controls">
+  <input name="reservation_rule_id" type="text" value="<@reservation_rule_id@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Retraitements sur les données</h3>
+
+<div class="control-group">
+ <label class="control-label">Pattern des numéros de lignes pour réinterprétation</label>
+ <div class="controls">
+  <label class="radio"><input type="radio" name="line_filter_mode" value="mode1" <@(line_filter_mode=="mode1")?"checked=\"true\"":""@>" is_parameter="true" /> LR{nnn} || LSR{nnn}</label>
+  <label class="radio"><input type="radio" name="line_filter_mode" value="mode2" <@(line_filter_mode=="mode2")?"checked=\"true\"":""@>" is_parameter="true" /> S{nombre chaine}</label>
+  <label class="radio"><input type="radio" name="line_filter_mode" value="mode3" <@(line_filter_mode=="mode3")?"checked=\"true\"":""@>" is_parameter="true" /> LR-{chaine}-{n} ou SR-{chaine}-{nn}</label>
+  <label class="radio"><input type="radio" name="line_filter_mode" value="mode4" <@(line_filter_mode=="mode4")?"checked=\"true\"":""@>" is_parameter="true" /> !LR-{chaine}-{n}</label>
+ </div>
+</div>
+
+<h3>Options d'import</h3>
+
+<div class="control-group">
+ <label class="control-label">Effacer données existantes</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Effacer arrêts inutilisés</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="clean_unused_stops" value="1" <@clean_unused_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="clean_unused_stops" value="0" <@clean_unused_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Ignorer données passées</label>
+ <div class="controls">
+   <label class="radio inline"><input type="radio" name="from_today" value="1" <@from_today?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="from_today" value="0" <@from_today?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>

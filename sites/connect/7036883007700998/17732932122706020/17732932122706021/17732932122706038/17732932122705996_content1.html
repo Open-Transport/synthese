@@ -1,0 +1,62 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<div class="control-group">
+ <label class="control-label">Fichier unique</label>
+ <div class="controls">
+  <input type="text" class="" name="pa" value="<@pa@>" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">ou</label>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Répertoire</label>
+ <div class="controls">
+  <input type="text" class="" name="dr" value="<@dr@>" />
+ </div>
+</div>
+
+<h3>Options d'import</h3>
+
+<div class="control-group">
+ <label class="control-label">Effacer données existantes</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<div class="control-group">
+ <label class="control-label">Réseau de transport</label>
+ <div class="controls">
+  <select name="network_id" is_parameter="true">
+   <option value="">(non défini)</option>
+   <?PTNetworksListFunction&template=<{network&template=
+       <option value="<@id@>" <@(id==network_id)?"selected=\"true\"":""@>><@name@></option>
+   }>?>
+  </select>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Période de couverture de l'import</label>
+ <div class="controls">
+  <label class="radio"><input type="radio" name="file_name_is_a_calendar" value="1" <@file_name_is_a_calendar?"checked=\"true\"":""@>" is_parameter="true" /> Calendrier désigné par le nom du fichier</label>
+  <label class="radio"><input type="radio" name="file_name_is_a_calendar" value="0" <@file_name_is_a_calendar?"":"checked=\"true\""@>" is_parameter="true" /> Plage de dates</label>
+ </div>
+</div>
+
+<?if&
+  cond=<@file_name_is_a_calendar@>&
+  else=
+	<div class="control-group">
+	 <label class="control-label">Dates de validité de l'import</label>
+	 <div class="controls">
+	  <input type="text" class="" name="start_date" value="<@start_date@>" /> à <input type="text" class="" name="end_date" value="<@end_date@>" />
+	 </div>
+	</div>&
+?>
