@@ -1,0 +1,228 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier arrêts (PNT)&
+  name=papnt&
+#>
+
+<div class="control-group">
+ <label class="control-label">Fichier points de forme (PTF)</label>
+ <div class="controls">
+  <input name="paptf" type="text" value="<@paptf@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des distances (DIS)</label>
+ <div class="controls">
+  <input name="padis" type="text" value="<@padis@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des destinations (DST)</label>
+ <div class="controls">
+  <input name="padst" type="text" value="<@padst@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des lignes (LIG)</label>
+ <div class="controls">
+  <input name="palig" type="text" value="<@palig@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des dates de calendriers (CJV)</label>
+ <div class="controls">
+  <input name="pacjv" type="text" value="<@pacjv@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des calendriers (CAL)</label>
+ <div class="controls">
+  <input name="pacal" type="text" value="<@pacal@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des horaires (HOR)</label>
+ <div class="controls">
+  <input name="pahor" type="text" value="<@pahor@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<#forms/network_selector&
+  name=net&
+#>
+
+<div class="control-group">
+ <label class="control-label">ID règle d'utilisation représentant l'accessibilité handicapé</label>
+ <div class="controls">
+  <input name="handicapped_allowed_use_rule" type="text" value="<@handicapped_allowed_use_rule@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Choix des champs contenant les données</h3>
+
+<#forms/radio_inputs&
+  label=Lignes : identifiant&
+  name=line_read_method&
+  label1=CIDX&
+  value1=CIDX&
+  label2=SV&
+  value2=SV&
+#>
+
+<#forms/radio_inputs&
+  label=Lignes : identifiant prioritaire sur fichier des girouettes&
+  name=journey_pattern_line_overload_field&
+  label1=non utilisé&
+  value1=&
+  label2=DSTAS&
+  value2=DSTAS&
+  help=Si le champ spécifié est rempli, alors sa valeur est considérée comme identifiant de la ligne à la place du champ classique.&
+#>
+
+<#forms/radio_inputs&
+  label=Lignes : nom court&
+  name=line_short_name_field&
+  label1=NLGIV&
+  value1=NLGIV&
+  label2=MNLC&
+  value2=MNLC&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : identifiant&
+  name=stop_id_field&
+  label1=MNLP&
+  value1=MNLP&
+  label2=IdentSMS&
+  value2=IdentSMS&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : nom&
+  name=stop_name_field&
+  label1=LIBP&
+  value1=LIBP&
+  label2=LIBCOM&
+  value2=LIBCOM&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : identifiant arrêt commercial&
+  name=stop_area_id_field&
+  label1=MNCP&
+  value1=MNCP&
+  label2=LIBP&
+  value2=LIBP&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : accessibilité handicapés&
+  name=stop_handicapped_accessibility_field&
+  label1=pas de champ accessibilité&
+  value1=&
+  label2=UFR&
+  value2=UFR&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts commerciaux : commune&
+  name=stop_city_code_field&
+  label1=pas de champ commune&
+  value1=&
+  label2=code_commune&
+  value2=code_commune&
+#>
+
+<?if&cond=<@stop_city_code_field==""@>&then=
+	<#forms/text_input&
+	  label=ID commune pour les nouveaux arrêts commerciaux&
+	  name=sadc&
+	#>
+?>
+
+<h3>Retraitements sur les données</h3>
+
+<#forms/text_input&
+  label=Nouveaux arrêts commerciaux : temps de correspondance&
+  name=sadt&
+  class=input-mini&
+  unit=min&
+#>
+
+<div class="control-group">
+ <label class="control-label">Ajouter le sens au code des itinéraires</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="add_wayback_to_journeypattern_code" value="1" <@add_wayback_to_journeypattern_code?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="add_wayback_to_journeypattern_code" value="0" <@add_wayback_to_journeypattern_code?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Suffixe à ajouter au code des services voitures</label>
+ <div class="controls">
+  <input name="vehicle_service_suffix" type="text" value="<@vehicle_service_suffix@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Rapport d'import</h3>
+
+<#forms/yes_no_input&
+  label=Affichage des arrêts liés&
+  name=display_linked_stops&
+#>
+
+<h3>Options d'import</h3>
+
+<div class="control-group">
+ <label class="control-label">Effacer données existantes</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Effacer arrêts inutilisés</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="clean_unused_stops" value="1" <@clean_unused_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="clean_unused_stops" value="0" <@clean_unused_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Importer arrêts</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="impstp" value="1" <@impstp?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="impstp" value="0" <@impstp?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Import automatique des arrêts</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="isa" value="1" <@isa?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="isa" value="0" <@isa?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<#forms/yes_no_input&
+  label=Ignorer données passées&
+  name=from_today&
+#>
+
+<div class="control-group">
+ <label class="control-label">Purge automatique des jours passés</label>
+ <div class="controls">
+   <label class="radio inline"><input type="radio" name="auto_purge" value="1" <@auto_purge?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="auto_purge" value="0" <@auto_purge?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>

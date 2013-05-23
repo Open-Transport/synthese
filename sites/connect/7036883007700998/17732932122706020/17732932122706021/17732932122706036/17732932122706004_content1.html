@@ -1,0 +1,29 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<div class="control-group">
+ <label class="control-label">Fichier services voitures (SAB)</label>
+ <div class="controls">
+  <input name="pasab" type="text" value="<@pasab@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier affectations (AFA)</label>
+ <div class="controls">
+  <input name="paafa" type="text" value="<@paafa@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Lien avec la base SYNTHESE</h3>
+
+<div class="control-group">
+ <label class="control-label">Source de données offre de transport public</label>
+ <div class="controls">
+	   <select name="pt_datasource_id">
+	    <option<@(0==pt_datasource_id)?" selected=\"true\"":""@>>(aucune)</option>
+	    <?data_sources&template=<{data_source&template=
+	    	<option<@(id==pt_datasource_id)?" selected=\"true\"":""@>><@name@></option>
+	    }>?>
+	   </select>
+ </div>
+</div>

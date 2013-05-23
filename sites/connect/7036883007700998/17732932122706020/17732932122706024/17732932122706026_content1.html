@@ -1,0 +1,7 @@
+<div class="control-group">
+ <label class="control-label"><@label@> <?if&cond=<@help@>&then=<#forms/help_button&content=<@help@>&title=<@label@>#>?></label>
+ <div class="controls"><@input_value=<?EvalService&t=\<@<@name@>\@>?>@>
+  <label class="radio inline"><input type="radio" name="<@name@>" value="1" <@input_value?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="<@name@>" value="0" <@input_value?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>

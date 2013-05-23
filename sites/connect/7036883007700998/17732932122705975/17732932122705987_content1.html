@@ -1,0 +1,44 @@
+<ul class="breadcrumb">
+ <li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+ <h1>Sources de données</h1>
+</ul>
+
+
+<?form&
+  target=/sources/source&
+  co=1&
+  a=ObjectCreate&
+  actionParam_table_id=59&
+  name=creation&
+?>
+<table class="table table-condensed table-striped"><thead>
+ <tr><th></th><th>nom</th><th></th></tr>
+</thead><tbody>
+ <?data_sources&template=<{data_source&template=
+	<tr>
+	 <td>
+	  <?link&
+	    target=/sources/source&
+	    roid=<@id@>&
+	    text=Ouvrir&
+	    class=btn btn-mini btn-primary&
+	  ?>
+	 </td>
+	 <td><@name@></td>
+	 <td>
+	  <?link&
+	    target=<@p@>&
+	    text=Supprimer&
+	    class=btn btn-mini btn-danger&
+	    confirm=Etes-vous sûr de vouloir supprimer la source de données <@name@> ?&
+	  ?>
+	 </td>
+	</tr>
+ }>?>
+</tbody><tfoot>
+ <tr>
+  <td></td>
+  <td><input name="actionParam_field_name" type="text" /></td>
+  <td><button class="btn btn-mini btn-warning">Créer</button></td>
+</tfoot></table>
+</form>

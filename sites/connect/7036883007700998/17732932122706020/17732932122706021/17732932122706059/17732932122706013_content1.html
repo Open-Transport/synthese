@@ -1,0 +1,67 @@
+<h3>Accès aux données</h3>
+
+<#forms/text_input&
+  label=Répertoire des fichiers horaires&
+  name=paservices&
+#>
+
+<h3>Choix des champs contenant les données</h3>
+
+<#forms/text_input&
+  label=Nombre de lignes d'en-tête à ignorer&
+  name=nb_lines_to_ignore&
+  class=input-mini&
+#>
+
+<#forms/text_input&
+  label=Numéro du champ de numéro de service&
+  name=field_service_number&
+  class=input-mini&
+#>
+
+<#forms/text_input&
+  label=Numéro du champ d'identifiant d'arrêt&
+  name=field_stop_code&
+  class=input-mini&
+#>
+
+<#forms/text_input&
+  label=Numéro du champ de nom d'arrêt&
+  name=field_stop_name&
+  class=input-mini&
+#>
+
+<#forms/text_input&
+  label=Numéro du champ d'horaire de passage&
+  name=field_time&
+  class=input-mini&
+#>
+
+<h3>Retraitements de données</h3>
+
+<#forms/text_input&
+  label=Nouveaux arrêts commerciaux : ID commune&
+  name=sadc&
+#>
+
+<#forms/text_input&
+  label=Masque des règles d'utilisation&
+  name=use_rule_block_id_mask&
+#>
+
+<#forms/text_input&
+  label=Identifiant mode de transport&
+  name=rolling_stock_id&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Ignorer données passées&
+  name=from_today&
+#>
+
+<#forms/yes_no_input&
+  label=Effacer données existantes&
+  name=clean_old_data&
+#>

@@ -1,0 +1,146 @@
+<div class="control-group">
+ <label class="control-label">Ignorer données passées</label>
+ <div class="controls">
+  <div class="controls">
+   <label class="radio inline"><input type="radio" name="from_today" value="1" <@from_today?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="from_today" value="0" <@from_today?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+  </div>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Effacer données actuelles</label>
+ <div class="controls">
+  <div class="controls">
+   <label class="radio inline"><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+  </div>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Effacer arrêts non utilisés</label>
+ <div class="controls">
+  <div class="controls">
+   <label class="radio inline"><input type="radio" name="clean_unused_stops" value="1" <@clean_unused_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="clean_unused_stops" value="0" <@clean_unused_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+  </div>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier arrêts (stops)</label>
+ <div class="controls">
+  <input name="pastops" type="text" value="<@pastops@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier transfers (optionnel)</label>
+ <div class="controls">
+  <input name="patransfers" type="text" value="<@patransfers@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier réseaux (agency)</label>
+ <div class="controls">
+  <input name="paagency" type="text" value="<@paagency@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier itinéraires (routes)</label>
+ <div class="controls">
+  <input name="paroutes" type="text" value="<@paroutes@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier calendriers</label>
+ <div class="controls">
+  <input name="pacalendar" type="text" value="<@pacalendar@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier dates</label>
+ <div class="controls">
+  <input name="pacalendar_dates" type="text" value="<@pacalendar_dates@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier voyages (trips)</label>
+ <div class="controls">
+  <input name="patrips" type="text" value="<@patrips@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier horaires (stop_times)</label>
+ <div class="controls">
+  <input name="pastop_times" type="text" value="<@pastop_times@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier attributs tarification (fare_attributes)</label>
+ <div class="controls">
+  <input name="pafare_attributes" type="text" value="<@pafare_attributes@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier règles de tarification (fare_rules)</label>
+ <div class="controls">
+  <input name="pafare_rules" type="text" value="<@pafare_rules@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier géométries (shapes)</label>
+ <div class="controls">
+  <input name="pashapes" type="text" value="<@pashapes@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Fichier services continus (frequencies)</label>
+ <div class="controls">
+  <input name="pafrequencies" type="text" value="<@pafrequencies@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Affichage arrêts liés</label>
+ <div class="controls">
+  <div class="controls">
+   <label class="radio inline"><input type="radio" name="display_linked_stops" value="1" <@display_linked_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="display_linked_stops" value="0" <@display_linked_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+  </div>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Import arrêts commerciaux</label>
+ <div class="controls">
+  <div class="controls">
+   <label class="radio inline"><input type="radio" name="isa" value="1" <@isa?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="isa" value="0" <@isa?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+  </div>
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">ID commune par défaut</label>
+ <div class="controls">
+  <input name="sadc" type="text" value="<@sadc@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Temps de transfert par défaut</label>
+ <div class="controls">
+  <div class="input-append">
+   <input type="text" class="input-mini" name="sadt" value="<@sadt@>" />
+   <span class="add-on">min</span>
+  </div>
+ </div>
+</div>
+
+<div class="control-group"><label class="control-label">Masque règles d'utilisation</label>
+ <div class="controls">
+  <input name="use_rule_block_id_mask" type="text" value="<@use_rule_block_id_mask@>" is_parameter="true" />
+ </div>
+</div>
