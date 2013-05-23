@@ -40,12 +40,14 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, db::RemoveObjectAction>::FACTORY_KEY("RemoveObjectAction");
+		template<>
+		const string FactorableTemplate<Action, db::RemoveObjectAction>::FACTORY_KEY = "RemoveObjectAction";
 	}
 
 	namespace db
 	{
-		const string RemoveObjectAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "oi";
+		const string RemoveObjectAction::PARAMETER_OLD_OBJECT_ID = Action_PARAMETER_PREFIX + "oi";
+		const string RemoveObjectAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "_object_id";
 
 
 
@@ -60,7 +62,33 @@ namespace synthese
 
 		void RemoveObjectAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
+			// Object ID
+			if(map.isDefined(PARAMETER_OBJECT_ID))
+			{
+				try
+				{
+					setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
+				}
+				catch(Record::MissingParameterException& e)
+				{
+					throw ActionException("Invalid object id : "+ e.getMessage());
+				}
+			}
+			else if(map.isDefined(PARAMETER_OLD_OBJECT_ID))
+			{
+				try
+				{
+					setObjectId(map.get<RegistryKeyType>(PARAMETER_OLD_OBJECT_ID));
+				}
+				catch(Record::MissingParameterException& e)
+				{
+					throw ActionException("Invalid object id : "+ e.getMessage());
+				}
+			}
+			else
+			{
+				throw ActionException("Object id was not specified");
+			}
 		}
 
 
