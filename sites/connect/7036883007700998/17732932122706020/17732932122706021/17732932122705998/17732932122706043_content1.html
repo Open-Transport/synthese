@@ -1,0 +1,62 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  name=papointsarrets&
+  label=Fichier des arrêts&
+#>
+
+<#forms/text_input&
+  name=paitinerai&
+  label=Fichier des itinéraires&
+#>
+
+<#forms/text_input&
+  name=patroncons&
+  label=Fichier des tronçons&
+#>
+
+<#forms/text_input&
+  name=paservices&
+  label=Fichier des services&
+#>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<#forms/network_selector&
+  name=network_id&
+#>
+
+<#forms/datasource_selector&
+  label=Source de données offre de transport public&
+  name=pt_datasource_id&
+#>
+
+<#forms/datasource_selector&
+  label=Source de données des arrêts&
+  name=stops_datasource_id&
+#>
+
+<#forms/calendar_selector&
+  label=Calendrier des jours fériés&
+  name=day7_calendar_id&
+#>
+
+<h3>Mode debug</h3>
+
+<#forms/yes_no_input&
+  label=Affichage arrêts liés&
+  name=display_linked_stops&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Effacer données anciennes&
+  name=clean_old_data&
+#>
+
+<#forms/datepicker&
+  label=Dates de l'import&
+  name=start_date&
+  name2=end_date&
+#>

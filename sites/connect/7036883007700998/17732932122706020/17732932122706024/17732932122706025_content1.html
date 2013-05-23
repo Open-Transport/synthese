@@ -1,0 +1,9 @@
+<div class="control-group">
+ <label class="control-label"><@label@> <?if&cond=<@help@>&then=<#forms/help_button&content=<@help@>&title=<@label@>#>?></label>
+ <div class="controls">
+  <div class="input-append">
+   <input name="<@name@>" class="<@class@>" type="text" value="<?EvalService&t=\<@<@name@>\@>?>" is_parameter="true" />
+   <?if&cond=<@unit@>&then=<span class="add-on"><@unit@></span>?>
+  </div>  
+ </div>
+</div>

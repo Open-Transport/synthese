@@ -1,0 +1,79 @@
+<div class="control-group">
+ <label class="control-label">Effacer données anciennes</label>
+ <div class="controls">
+  <div class="controls">
+   <label><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+  </div>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Date de début</label>
+ <div class="controls">
+  <input name="start_date" type="text" value="<@start_date@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Date de fin</label>
+ <div class="controls">
+  <input name="end_date" type="text" value="<@end_date@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des arrêts</label>
+ <div class="controls">
+  <input name="papointsarrets" type="text" value="<@papointsarrets@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des itinéraires</label>
+ <div class="controls">
+  <input name="paitinerai" type="text" value="<@paitinerai@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des tronçons</label>
+ <div class="controls">
+  <input name="patroncons" type="text" value="<@patroncons@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier des services</label>
+ <div class="controls">
+  <input name="paservices" type="text" value="<@paservices@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<#forms/network_selector&
+  name=network_id&
+#>
+
+<#forms/datasource_selector&
+  label=Source de données des arrêts (si différente)&
+  name=stops_datasource_id&
+#>
+
+<#forms/calendar_selector&
+  label=Calendrier des jours fériés&
+  name=day7_calendar_id&
+#>
+
+<h3>Mode debug</h3>
+
+<div class="control-group">
+ <label class="control-label">Affichage des arrêts</label>
+ <div class="controls">
+  <div class="controls">
+   <label><input type="radio" name="display_linked_stops" value="1" <@display_linked_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label><input type="radio" name="display_linked_stops" value="0" <@display_linked_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+  </div>
+ </div>
+</div>

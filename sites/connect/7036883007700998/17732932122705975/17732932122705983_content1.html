@@ -1,0 +1,154 @@
+<@tabs["slaves"]=Clients@>
+<@tabs["configs"]=Configurations Inter-SYNTHESE@>
+<@tab=<@tab?tab:"slaves"@>@>
+
+<ul class="breadcrumb">
+<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+<h1>Vue serveur</h1>
+</ul>
+
+<ul class="nav nav-tabs"><{tabs&template=
+ <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
+}></ul>
+
+<div class="tab-content">
+
+<div class="tab-pane <@(tab=="slaves")?"active":""@>" id="slaves">
+
+<table class="table table-condensed table-striped"><thead>
+ <tr><th></th><th>nom</th><th>adresse</th><th>port</th><th>actif</th><th>type</th><th></th></tr>
+</thead><tbody>
+ <?form&
+   name=new_slave&
+   page_id=17732932122705976&
+   a=ObjectCreate&
+   actionParam_table_id=93&
+   co=1&
+ ?>
+ <tr class="warning">
+  <td></td>
+  <td><input type="text" class="input-medium" name="actionParam_field_name" /></td>
+  <td><input type="text" class="input-mini" name="actionParam_field_address" /></td>
+  <td><input type="text" class="input-mini" name="actionParam_field_port" /></td>
+  <td></td>
+  <td>Inter-SYNTHESE</td>
+  <td><button type="submit" class="btn btn-small btn-warning">Ajouter</button></td>
+  <td></td>
+ </tr>
+ </form>
+ <?inter_synthese_slaves_view&template=<{slave&template=
+	<tr>
+	 <td><?link&target=17732932122705976&text=Ouvrir&roid=<@id@>&class=btn btn-mini btn-primary?></td>
+	 <td><@name@></td>
+	 <td><@address@></td>
+	 <td><@port@></td>
+	 <td><span class="label label-<@active?"success":"important"@>"><@active?"Actif":"Inactif"@></span></td>
+	 <td>Inter-SYNTHESE (<?inter_synthese_configs&template=<{config&template=<@(id==config_id)?name:""@>}>?>)</td>
+	 <td>
+	  <?link&
+	    target=<@p@>&
+	    text=Supprimer&
+	    confirm=Etes-vous sûr de vouloir supprimer l'esclave ?&
+	    a=RemoveObjectAction&
+	    actionParamoi=<@id@>&
+	    class=btn btn-mini btn-danger
+	  ?>
+	 </td>
+	</tr>
+ }>?>
+ <?form&
+   name=new_vdv&
+   page_id=/server/vdv&
+   a=ObjectCreate&
+   actionParam_table_id=99&
+   co=1&
+ ?>
+ <tr class="warning">
+  <td></td>
+  <td><input type="text" class="input-medium" name="actionParam_field_name" /></td>
+  <td><input type="text" class="input-mini" name="actionParam_field_reply_address" /></td>
+  <td><input type="text" class="input-mini" name="actionParam_field_reply_port" /></td>
+  <td></td>
+  <td>VDV</td>
+  <td><button type="submit" class="btn btn-small btn-warning">Ajouter</button></td>
+  <td></td>
+ </tr>
+ </form>
+ <?vdv_clients_list&template=<{client&template=
+	<tr>
+	 <td>
+	  <?link&
+	    target=/server/vdv&
+	    roid=<@id@>&
+	    text=Ouvrir&
+	    class=btn btn-mini btn-primary&
+	  ?>
+	 </td>
+	 <td><@name@></td>
+	 <td><@reply_address@></td>
+	 <td><@reply_port@></td>
+ 	 <td><span class="label label-<@active?"success":"important"@>"><@active?"Actif":"Inactif"@></span></td>
+ 	 <td>VDV<@sbb_mode?" (CFF)":""@></td>
+	 <td>
+	  <?link&
+	    target=<@p@>&
+	    text=Supprimer&
+	    confirm=Etes-vous sûr de vouloir supprimer le client VDV ?&
+	    a=RemoveObjectAction&
+	    actionParamoi=<@id@>&
+	    class=btn btn-mini btn-danger
+	  ?>
+	 </td>
+	</tr>
+  }>?>
+
+</tbody></table>
+
+</div>
+
+<div class="tab-pane <@(tab=="configs")?"active":""@>" id="configs">
+
+<?form&
+  page_id=17732932122705977&
+  name=add_config&
+  a=ObjectCreate&
+  actionParam_table_id=94&
+  co=1
+?>
+<table class="table table-condensed table-striped"><thead>
+ <tr><th></th><th>nom</th><th>dump systématique</th><th></th></tr>
+</thead><tbody>
+ <tr class="warning">
+  <td></td>
+  <td><input type="text" class="input-mini" name="actionParam_field_name" /></td>
+  <td><input type="text" class="input-mini" name="actionParam_field_force_dump" /></td>
+  <td><button type="submit" class="btn btn-small btn-warning">Ajouter</button></td>
+ </tr>
+ <?inter_synthese_configs&template=<{config&template=
+	<tr>
+	 <td>
+	  <?link&
+	    target=17732932122705977&
+	    roid=<@id@>&
+	    text=Ouvrir&
+	    class=btn btn-mini btn-primary
+	  ?>
+	 </td>
+	 <td><@name@></td>
+	 <td><@force_dump@></td>
+	 <td>
+	  <?link&
+	    target=<@p@>&
+	    text=Supprimer&
+	    confirm=Etes-vous sûr de vouloir supprimer la configuration <@name@> ?&
+	    a=RemoveObjectAction&actionParamoi=<@id@>&
+	    class=btn btn-mini btn-danger
+	  ?>
+	 </td>
+	</tr>
+ }>?>
+</tbody></table>
+</form>
+
+</div>
+</div>

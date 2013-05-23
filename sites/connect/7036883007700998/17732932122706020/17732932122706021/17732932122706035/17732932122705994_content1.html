@@ -1,0 +1,119 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<div class="control-group">
+ <label class="control-label">Fichier quais (gleis)</label>
+ <div class="controls">
+  <input name="pagleis" type="text" value="<@pagleis@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier coordonnées (koord)</label>
+ <div class="controls">
+  <input name="pakoord" type="text" value="<@pakoord@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier dates (eckdaten)</label>
+ <div class="controls">
+  <input name="paeckdaten" type="text" value="<@paeckdaten@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier calendriers (bitfield)</label>
+ <div class="controls">
+  <input name="paeckdaten" type="text" value="<@paeckdaten@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier horaires (zugdat)</label>
+ <div class="controls">
+  <input name="pabitfeld" type="text" value="<@pabitfeld@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier correspondances (umsteigb)</label>
+ <div class="controls">
+  <input name="paumsteigb" type="text" value="<@paumsteigb@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier correspondances (umsteigz)</label>
+ <div class="controls">
+  <input name="paumsteigz" type="text" value="<@paumsteigz@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Fichier jonctions (metabhf)</label>
+ <div class="controls">
+  <input name="pametabhf" type="text" value="<@pametabhf@>" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Périmètre</h3>
+
+<div class="control-group">
+ <label class="control-label">Filtre des lignes à importer</label>
+ <div class="controls">
+  <textarea name="lines_filter" type="text" is_parameter="true"><@lines_filter@></textarea>
+ </div>
+</div>
+
+<h3>Options d'import</h3>
+
+<div class="control-group">
+ <label class="control-label">Effacer données existantes</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Ignorer données passées</label>
+ <div class="controls">
+   <label class="radio inline"><input type="radio" name="from_today" value="1" <@from_today?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+   <label class="radio inline"><input type="radio" name="from_today" value="0" <@from_today?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Importer arrêts</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="import_stops" value="1" <@import_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="import_stops" value="0" <@import_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Importer les services complets</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="import_full_services" value="1" <@import_full_services?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="import_full_services" value="0" <@import_full_services?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>
+
+<h3>Retraitement des données</h3>
+
+<div class="control-group">
+ <label class="control-label">Position du chiffre aller retour</label>
+ <div class="controls">
+  <input name="wayback_bit_position" type="text" value="<@wayback_bit_position@>" class="input-mini" is_parameter="true" />
+ </div>
+</div>
+
+<h3>Mode debug</h3>
+
+<div class="control-group">
+ <label class="control-label">Uniquement afficher liste d'arrêts</label>
+ <div class="controls">
+  <label class="radio inline"><input type="radio" name="show_stops_only" value="1" <@show_stops_only?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="show_stops_only" value="0" <@show_stops_only?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
+ </div>
+</div>

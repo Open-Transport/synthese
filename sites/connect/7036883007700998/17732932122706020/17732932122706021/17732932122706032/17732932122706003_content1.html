@@ -1,0 +1,41 @@
+<p>Format obsolète : migrer la base Inéo et utiliser ineo_bdsi</p>
+
+<div class="control-group">
+ <label class="control-label">Nom de base de données</label>
+ <div class="controls">
+  <input name="db" type="text" value="<@db@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Source de données des données planifiées (si différente)</label>
+ <div class="controls">
+  <select name="ps" is_parameter="true">
+   <option value="">(non défini)</option>
+   <?data_sources&template=<{data_source&template=
+   	<option value="<@id@>" <@(id==ps)?"selected=\"true\"":""@>><@name@></option>
+   }>?>
+  </select>
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">ID course</label>
+ <div class="controls">
+  <input name="ci" type="text" value="<@ci@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Chaîne de connexion au serveur de base de données</label>
+ <div class="controls">
+  <input name="conn_string" type="text" value="<@conn_string@>" is_parameter="true" />
+ </div>
+</div>
+
+<div class="control-group">
+ <label class="control-label">Préfixe sur les codes d'arrêts</label>
+ <div class="controls">
+  <input name="conn_string" type="text" value="<@conn_string@>" is_parameter="true" />
+ </div>
+</div>
