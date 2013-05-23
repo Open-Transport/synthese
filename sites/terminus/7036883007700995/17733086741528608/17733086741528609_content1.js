@@ -268,7 +268,7 @@ function add_calendar(calendar)
 
   for(var i=0; i<calendar.message.length; ++i)
   {
-    calendar.message[i].calendar = calendar;
+    calendar.message[i].calendar_rank = calendar.rank;
     add_message(calendar.message[i]);
   }
 }
@@ -372,7 +372,7 @@ function add_message(message)
   message_by_rank[message.rank] = message;
   ++next_message_rank;
 
-  var calendar_item = $('#mi_c_'+ message.calendar.rank);
+  var calendar_item = $('#mi_c_'+ message.calendar_rank);
   var last_item = calendar_item.last('.tree_2');
   var insert_position = last_item ? last_item : calendar_item;
   var message_title = message.title ? message.title : "(sans titre)";
@@ -400,7 +400,7 @@ function open_message(message)
   tinyMCE.get('tinymce').setContent(message.content);
   $('#message select[field=level]').val(message.level);
 
-  $('#change_calendar_list').val(message.calendar.rank);
+  $('#change_calendar_list').val(message.calendar_rank);
 
   if(message.alternative.length)
   {
@@ -412,7 +412,7 @@ function open_message(message)
         if(at.type_id == $(this).attr('type_id'))
         {
           $(this).removeClass('hide');
-          $(this).find('textarea').val(at.value);
+          $(this).find('textarea').val(at.content);
           break;
         }
       }
@@ -455,7 +455,7 @@ function close_message()
           var at = current_message.alternative[i];
           if(at.type_id == $(this).attr('type_id'))
           {
-            at.value = $(this).find('textarea').val();
+            at.content = $(this).find('textarea').val();
             break;
           }
         }
@@ -476,7 +476,7 @@ function copy_message_click()
   
   var new_message = {
    id:"",
-   calendar: message.calendar,
+   calendar_rank: message.calendar_rank,
    title:"Copie de "+ message.title,
    content: message.content,
    level: message.level,
@@ -518,7 +518,7 @@ function remove_message_click()
 
 function remove_message(message)
 {
-  var calendar = message.calendar;
+  var calendar = calendar_by_rank[message.calendar_rank];
   
   for(var i=0; i<calendar.message.length; ++i)
   {
@@ -537,10 +537,9 @@ function create_message_click()
   close_calendar();
 
   var calendar_rank = $(this).closest('li').attr('id').substr(5);
-  var calendar = calendar_by_rank[calendar_rank];
   var new_message = {
    id:"",
-   calendar: calendar,
+   calendar_rank: calendar_rank,
    title:"",
    content:"",
    level:10,
@@ -827,11 +826,11 @@ function drawCalendar()
 function change_calendar_click()
 {
   remove_message(current_message);
-  var new_calendar = calendar_by_rank[$('#change_calendar_list').val()];
-  current_message.calendar = new_calendar;
+  var new_calendar_rank = $('#change_calendar_list').val();
+  current_message.calendar_rank = new_calendar_rank;
   add_message(current_message);
 
-  $('#change_calendar_list').val(new_calendar.rank);
+  $('#change_calendar_list').val(new_calendar_rank);
   activateForm();
   
 }
