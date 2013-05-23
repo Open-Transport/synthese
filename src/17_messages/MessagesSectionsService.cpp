@@ -56,19 +56,6 @@ namespace synthese
 
 		void MessagesSectionsService::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Unique section id
-			RegistryKeyType sectionId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
-			if(sectionId > 0)
-			{
-				try
-				{
-					_section = Env::GetOfficialEnv().get<MessagesSection>(sectionId).get();
-				}
-				catch (ObjectNotFoundException<MessagesSection>&)
-				{
-					throw RequestException("No such messages section : "+ lexical_cast<string>(sectionId));
-				}
-			}
 		}
 
 
@@ -80,18 +67,34 @@ namespace synthese
 
 			ParametersMap pm;
 
-			if(_section)
+			// Sorting
+			struct ElementLess : public std::binary_function<const MessagesSection*, const MessagesSection*, bool>
 			{
-				_outputSection(pm, *_section);
-			}
-			else
-			{
-				BOOST_FOREACH(const MessagesSection::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessagesSection>())
+				bool operator()(const MessagesSection* left, const MessagesSection* right) const
 				{
-					_outputSection(pm, *it.second);
+					if(left && right && left->get<Rank>() != right->get<Rank>())
+					{
+						return left->get<Rank>() < right->get<Rank>();
+					}
+					return left < right;
 				}
+			};
+			typedef set<const MessagesSection*, ElementLess> Sections;
+			Sections sections;
+			BOOST_FOREACH(const MessagesSection::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessagesSection>())
+			{
+				sections.insert(it.second.get());
 			}
 
+			// Output
+			BOOST_FOREACH(const Sections::value_type& section, sections)
+			{
+				shared_ptr<ParametersMap> sectionMap(new ParametersMap);
+				section->toParametersMap(*sectionMap, true);
+				pm.insert(TAG_SECTION, sectionMap);
+			}
+
+			// Return
 			return pm;
 		}
 		

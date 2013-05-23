@@ -26,10 +26,11 @@
 #include "Calendar.h"
 #include "Object.hpp"
 
+#include "CalendarField.hpp"
 #include "MessageType.hpp"
 #include "NumericField.hpp"
 #include "SchemaMacros.hpp"
-#include "Scenario.h"
+#include "ScenarioCalendar.hpp"
 #include "StringField.hpp"
 #include "TimeField.hpp"
 #include "PtimeField.hpp"
@@ -38,18 +39,12 @@ namespace synthese
 {
 	namespace messages
 	{
-		class Alarm;
 		class Scenario;
 	}
 
-	FIELD_POINTER(AlarmPointer, messages::Alarm)
-	FIELD_POINTER(ScenarioPointer, messages::Scenario)
-	FIELD_STRING(Dates)
-
 	typedef boost::fusion::map<
 		FIELD(Key),
-		FIELD(AlarmPointer),
-		FIELD(ScenarioPointer),
+		FIELD(messages::ScenarioCalendar),
 		FIELD(StartHour),
 		FIELD(EndHour),
 		FIELD(StartTime),
@@ -59,9 +54,6 @@ namespace synthese
 
 	namespace messages
 	{
-		class SentAlarm;
-		class SentScenario;
-
 		/** MessageApplicationPeriod class.
 			@ingroup m17
 		*/
@@ -70,16 +62,14 @@ namespace synthese
 			public calendar::Calendar
 		{
 		public:
+			static const std::string TAG_DATE;
+
 			/// Chosen registry class.
 			typedef util::Registry<MessageApplicationPeriod>	Registry;
 
 			MessageApplicationPeriod(
 				util::RegistryKeyType id = 0
 			);
-
-			typedef std::set<
-				MessageApplicationPeriod*
-			> ApplicationPeriods;
 
 			//! @name Modifiers
 			//@{
@@ -90,10 +80,13 @@ namespace synthese
 			/// @name Services
 			//@{
 				bool getValue(const boost::posix_time::ptime& time) const;
+
+				virtual void addAdditionalParameters(
+					util::ParametersMap& map,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_messages_MessageApplicationPeriod_hpp__
-

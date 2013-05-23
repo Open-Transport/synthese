@@ -1,6 +1,6 @@
 
-/** MessageApplicationPeriodTableSync class implementation.
-	@file MessageApplicationPeriodTableSync.cpp
+/** ScenarioCalendarTableSync class implementation.
+	@file ScenarioCalendarTableSync.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,10 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MessageApplicationPeriodTableSync.hpp"
+#include "ScenarioCalendarTableSync.hpp"
 
-#include "SentAlarm.h"
-#include "SentScenario.h"
+#include "AlarmTableSync.h"
 #include "DBResult.hpp"
 #include "SelectQuery.hpp"
 
@@ -40,26 +39,27 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,MessageApplicationPeriodTableSync>::FACTORY_KEY("17.40 Message application period");
+		template<>
+		const string FactorableTemplate<DBTableSync, ScenarioCalendarTableSync>::FACTORY_KEY = "17.40 Scenario calendars";
 	}
 
 	namespace db
 	{
-		template<> const DBTableSync::Format DBTableSyncTemplate<MessageApplicationPeriodTableSync>::TABLE(
-			"t104_message_application_periods"
+		template<> const DBTableSync::Format DBTableSyncTemplate<ScenarioCalendarTableSync>::TABLE(
+			"t110_scenario_calendars"
 		);
 
-		template<> const Field DBTableSyncTemplate<MessageApplicationPeriodTableSync>::_FIELDS[] = { Field() }; // Defined by the record
+		template<> const Field DBTableSyncTemplate<ScenarioCalendarTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 		template<>
-		DBTableSync::Indexes DBTableSyncTemplate<MessageApplicationPeriodTableSync>::GetIndexes()
+		DBTableSync::Indexes DBTableSyncTemplate<ScenarioCalendarTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
 		}
 
 
 
-		template<> bool DBTableSyncTemplate<MessageApplicationPeriodTableSync>::CanDelete(
+		template<> bool DBTableSyncTemplate<ScenarioCalendarTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
@@ -69,7 +69,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<MessageApplicationPeriodTableSync>::BeforeDelete(
+		template<> void DBTableSyncTemplate<ScenarioCalendarTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -77,7 +77,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<MessageApplicationPeriodTableSync>::AfterDelete(
+		template<> void DBTableSyncTemplate<ScenarioCalendarTableSync>::AfterDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -85,7 +85,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<MessageApplicationPeriodTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ScenarioCalendarTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
@@ -95,19 +95,19 @@ namespace synthese
 
 	namespace messages
 	{
-		MessageApplicationPeriodTableSync::SearchResult MessageApplicationPeriodTableSync::Search(
+
+		ScenarioCalendarTableSync::SearchResult ScenarioCalendarTableSync::Search(
 			Env& env,
-			optional<RegistryKeyType> calendarId,
+			optional<RegistryKeyType> scenarioId,
 			int first /*= 0*/,
-			boost::optional<std::size_t> number,
-			bool orderByName,
+			optional<size_t> number,
 			bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			SelectQuery<MessageApplicationPeriodTableSync> query;
-			if (calendarId)
+			SelectQuery<ScenarioCalendarTableSync> query;
+			if (scenarioId)
 			{
-				query.addWhereField(ScenarioCalendar::FIELD.name, *calendarId, ComposedExpression::OP_EQ);
+				query.addWhereField(SimpleObjectFieldDefinition<ScenarioPointer>::FIELD.name, *scenarioId, ComposedExpression::OP_EQ);
 			}
 			if (number)
 			{

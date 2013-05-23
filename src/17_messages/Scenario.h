@@ -37,6 +37,7 @@ namespace synthese
 	{
 		class Alarm;
 		class MessagesSection;
+		class ScenarioCalendar;
 
 		////////////////////////////////////////////////////////////////////
 		/// Scenario of alarms diffusion.
@@ -54,12 +55,14 @@ namespace synthese
 		public:
 			typedef std::set<const MessagesSection*> Sections;
 			typedef std::set<const Alarm*> Messages;
+			typedef std::set<ScenarioCalendar*> ScenarioCalendars;
 
 		private:
 
 			Sections _sections;
 
 			mutable Messages _messages;
+			mutable ScenarioCalendars _calendars;
 
 		protected:
 			Scenario(const std::string name = std::string());
@@ -73,12 +76,19 @@ namespace synthese
 
 			void addMessage(const Alarm& message) const;
 			void removeMessage(const Alarm& message) const;
-			const Messages& getMessages() const { return _messages; }
 
+			/// @name Setters
+			//@{
+				void setSections(const Sections& value){ _sections = value; }
+				void setCalendars(const ScenarioCalendars& value) const { _calendars = value; }
+			//@}
 
-
-			const Sections& getSections() const { return _sections; }
-			void setSections(const Sections& value){ _sections = value; }
+			/// @name Getters
+			//@{
+				const Messages& getMessages() const { return _messages; }
+				const ScenarioCalendars& getCalendars() const { return _calendars; }
+				const Sections& getSections() const { return _sections; }
+			//@}
 		};
 	}
 }

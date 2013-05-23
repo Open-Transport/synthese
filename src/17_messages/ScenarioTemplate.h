@@ -60,6 +60,7 @@ namespace synthese
 			static const std::string TAG_VARIABLE;
 			static const std::string TAG_MESSAGE;
 			static const std::string TAG_SECTION;
+			static const std::string TAG_CALENDAR;
 
 			struct Variable
 			{

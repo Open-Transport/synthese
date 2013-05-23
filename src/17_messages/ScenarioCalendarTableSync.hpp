@@ -1,6 +1,6 @@
 
-/** MessageApplicationPeriodTableSync class header.
-	@file MessageApplicationPeriodTableSync.hpp
+/** ScenarioCalendarTableSync class header.
+	@file ScenarioCalendarTableSync.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,10 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_MessageApplicationPeriodTableSync_H__
-#define SYNTHESE_MessageApplicationPeriodTableSync_H__
+#ifndef SYNTHESE_ScenarioCalendarTableSync_H__
+#define SYNTHESE_ScenarioCalendarTableSync_H__
 
-#include "MessageApplicationPeriod.hpp"
+#include "ScenarioCalendar.hpp"
 
 #include <string>
 #include <iostream>
@@ -35,14 +35,14 @@ namespace synthese
 	namespace messages
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 17.10 Table : Message type.
+		/// 17.10 Table : Message alternative.
 		///	@ingroup m17LS refLS
 		/// @author Hugues Romain
 		/// @date 2012
 		/// @since 3.5.0
 		//////////////////////////////////////////////////////////////////////////
-		class MessageApplicationPeriodTableSync:
-			public db::DBDirectTableSyncTemplate<MessageApplicationPeriodTableSync, MessageApplicationPeriod>
+		class ScenarioCalendarTableSync:
+			public db::DBDirectTableSyncTemplate<ScenarioCalendarTableSync, ScenarioCalendar>
 		{
 		public:
 			/** Message type search.
@@ -54,10 +54,9 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				boost::optional<util::RegistryKeyType> calendarId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> scenarioId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<size_t> number = boost::optional<size_t>(),
-				bool orderByName = true,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);

@@ -107,32 +107,26 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
+
+
 			/** Remove a link between an alarm and an object specified by their id.
 				@param alarmId ID of the alarm
 				@param objectId ID of the object. Undefined = Removes all links of the alarm
 				@author Hugues Romain
 				@date 2007
 			*/
-			static void Remove(
+			static void RemoveByMessage(
 				util::RegistryKeyType alarmId,
-				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>()
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Removes links between alarms and a specified object.
-			/// @param objectId id of the target of the alarms to remove
-			/// @param transaction optional transaction
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.2.0
-			static void RemoveByTarget(
-				util::RegistryKeyType objectId,
+				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 
 
+
+			static void AlarmObjectLinkTableSync::RemoveByTarget(
+				util::RegistryKeyType objectId,
+				boost::optional<db::DBTransaction&> transaction
+			);
 
 
 			//////////////////////////////////////////////////////////////////////////

@@ -38,6 +38,7 @@
 #include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "SentScenario.h"
+#include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioTemplate.h"
 #include "Session.h"
@@ -76,6 +77,11 @@ namespace synthese
 		const string ScenarioTableSync::COL_SECTIONS = "messages_section_ids";
 		const string ScenarioTableSync::COL_EVENT_START = "event_start";
 		const string ScenarioTableSync::COL_EVENT_END = "event_end";
+		const string ScenarioTableSync::COL_ARCHIVED = "archived";
+
+		const string ScenarioTableSync::VARIABLES_SEPARATOR = "|";
+		const string ScenarioTableSync::VARIABLES_OPERATOR = "&";
+		const string ScenarioTableSync::SECTIONS_SEPARATOR = ",";
 	}
 
 	namespace db
@@ -99,8 +105,11 @@ namespace synthese
 			Field(ScenarioTableSync::COL_SECTIONS, SQL_TEXT),
 			Field(ScenarioTableSync::COL_EVENT_START, SQL_DATETIME),
 			Field(ScenarioTableSync::COL_EVENT_END, SQL_DATETIME),
+			Field(ScenarioTableSync::COL_ARCHIVED, SQL_BOOLEAN),
 			Field()
 		};
+
+
 
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<ScenarioTableSync>::GetIndexes()
@@ -116,13 +125,14 @@ namespace synthese
 		}
 
 
+
 		template<>
-		boost::shared_ptr<Scenario> InheritanceLoadSavePolicy<ScenarioTableSync, Scenario>::GetNewObject(
+		shared_ptr<Scenario> InheritanceLoadSavePolicy<ScenarioTableSync, Scenario>::GetNewObject(
 			const DBResultSPtr& row
 		){
 			return row->getBool(ScenarioTableSync::COL_IS_TEMPLATE)
-				? boost::shared_ptr<Scenario>(new ScenarioTemplate(row->getKey()))
-				: boost::shared_ptr<Scenario>(new SentScenario(row->getKey()))
+				? shared_ptr<Scenario>(new ScenarioTemplate(row->getKey()))
+				: shared_ptr<Scenario>(new SentScenario(row->getKey()))
 			;
 		}
 
@@ -145,7 +155,7 @@ namespace synthese
 			if(!sectionsStr.empty())
 			{
 				vector<string> tokens;
-				split(tokens, sectionsStr, is_any_of(","));
+				split(tokens, sectionsStr, is_any_of(ScenarioTableSync::SECTIONS_SEPARATOR));
 				BOOST_FOREACH(const string& token, tokens)
 				{
 					try
@@ -198,16 +208,24 @@ namespace synthese
 				sentScenario.setEventStart(rows->getDateTime( ScenarioTableSync::COL_EVENT_START));
 				sentScenario.setEventEnd(rows->getDateTime( ScenarioTableSync::COL_EVENT_END));
 
+				// Archived
+				sentScenario.setArchived(rows->getBool(ScenarioTableSync::COL_ARCHIVED));
+
+				// Variables
 				const string txtVariables(rows->getText(ScenarioTableSync::COL_VARIABLES));
 				SentScenario::VariablesMap variables;
 				vector<string> tokens;
-				split(tokens, txtVariables, is_any_of("|"));
+				split(tokens, txtVariables, is_any_of(ScenarioTableSync::VARIABLES_SEPARATOR));
 				BOOST_FOREACH(const string& token, tokens)
 				{
 					if(token.empty()) continue;
 
 					typedef split_iterator<string::const_iterator> string_split_iterator;
-					string_split_iterator it = make_split_iterator(token, first_finder("$", is_iequal()));
+					string_split_iterator it(
+						make_split_iterator(
+							token,
+							first_finder(ScenarioTableSync::VARIABLES_OPERATOR, is_iequal())
+					)	);
 					string code = copy_range<string>(*it);
 					++it;
 					if (it == string_split_iterator())
@@ -261,59 +279,77 @@ namespace synthese
 			Scenario* object,
 			optional<DBTransaction&> transaction
 		){
+			// Variables
 			ReplaceQuery<ScenarioTableSync> query(*object);
+			ScenarioTemplate* scenarioTemplate(dynamic_cast<ScenarioTemplate*>(object));
+			SentScenario* sentScenario(static_cast<SentScenario*>(object));
+			bool isTemplate(scenarioTemplate);
 
-			if(dynamic_cast<ScenarioTemplate*>(object))
-			{
-				ScenarioTemplate& scenarioTemplate(static_cast<ScenarioTemplate&>(*object));
-				query.addField(1);
-				query.addField(0);
-				query.addField(object->getName());
-				query.addFieldNull();
-				query.addFieldNull();
-				query.addField(scenarioTemplate.getFolder() ? scenarioTemplate.getFolder()->getKey() : RegistryKeyType(0));
-				query.addField(string());
-				query.addField(0);
-			}
-			else if(dynamic_cast<SentScenario*>(object))
-			{
-				SentScenario& sentScenario(static_cast<SentScenario&>(*object));
+			// Is template field
+			query.addField(isTemplate);
 
-				// Preparation
-				stringstream vars;
-				const SentScenario::VariablesMap& variables(sentScenario.getVariables());
+			// Is enabled field
+			query.addField(!isTemplate && sentScenario->getIsEnabled());
+
+			// Name field
+			query.addField(object->getName());
+
+			// Period start field
+			query.addFrameworkField<PtimeField>(
+				isTemplate ?
+				ptime(not_a_date_time) :
+				sentScenario->getPeriodStart()
+			);
+
+			// Period end field
+			query.addFrameworkField<PtimeField>(
+				isTemplate ?
+				ptime(not_a_date_time) :
+				sentScenario->getPeriodEnd()
+			);
+
+			// Folder id field
+			query.addField(
+				(isTemplate && scenarioTemplate->getFolder()) ?
+				scenarioTemplate->getFolder()->getKey() :
+				RegistryKeyType(0)
+			);
+
+			// Variables field
+			stringstream vars;
+			if(!isTemplate)
+			{
+				const SentScenario::VariablesMap& variables(sentScenario->getVariables());
 				bool firstVar(true);
 				BOOST_FOREACH(const SentScenario::VariablesMap::value_type& variable, variables)
 				{
 					if(!firstVar)
 					{
-						vars << "|";
+						vars << ScenarioTableSync::VARIABLES_SEPARATOR;
 					}
 					else
 					{
 						firstVar = false;
 					}
-					vars << variable.first << "$" << variable.second;
+					vars << variable.first << ScenarioTableSync::VARIABLES_OPERATOR << variable.second;
 				}
-
-				// Main replace query
-				query.addField(0);
-				query.addField(sentScenario.getIsEnabled());
-				query.addField(object->getName());
-				query.addFrameworkField<PtimeField>(sentScenario.getPeriodStart());
-				query.addFrameworkField<PtimeField>(sentScenario.getPeriodEnd());
-				query.addField(RegistryKeyType(0));
-				query.addField(vars.str());
-				query.addField(sentScenario.getTemplate() ? sentScenario.getTemplate()->getKey() : RegistryKeyType(0));
 			}
+			query.addField(vars.str());
 
-			// Data source links
+			// Template id field
+			query.addField(
+				(!isTemplate && sentScenario->getTemplate()) ?
+				sentScenario->getTemplate()->getKey() :
+				RegistryKeyType(0)
+			);
+
+			// Data source links field
 			query.addField(
 				DataSourceLinks::Serialize(
 					object->getDataSourceLinks()
 			)	);
 
-			// Sections
+			// Sections field
 			bool first(true);
 			stringstream sectionsStr;
 			BOOST_FOREACH(const MessagesSection* section, object->getSections())
@@ -324,24 +360,30 @@ namespace synthese
 				}
 				else
 				{
-					sectionsStr << ",";
+					sectionsStr << ScenarioTableSync::SECTIONS_SEPARATOR;
 				}
 				sectionsStr << section->getKey();
 			}
 			query.addField(sectionsStr.str());
 
-			if(dynamic_cast<ScenarioTemplate*>(object))
-			{
-				query.addFieldNull();
-				query.addFieldNull();
-			}
-			else
-			{
-				SentScenario& sentScenario(static_cast<SentScenario&>(*object));
-				query.addFrameworkField<PtimeField>(sentScenario.getEventStart());
-				query.addFrameworkField<PtimeField>(sentScenario.getEventEnd());
-			}
+			// Event start field
+			query.addFrameworkField<PtimeField>(
+				isTemplate ?
+				ptime(not_a_date_time) :
+				sentScenario->getEventStart()
+			);
 
+			// Event end field
+			query.addFrameworkField<PtimeField>(
+				isTemplate ?
+				ptime(not_a_date_time) :
+				sentScenario->getEventEnd()
+			);
+
+			// Archived field
+			query.addField(!isTemplate && sentScenario->getArchived());
+
+			// Run the query
 			query.execute(transaction);
 		}
 
@@ -364,7 +406,7 @@ namespace synthese
 			RegistryKeyType object_id
 		){
 			Env env;
-			boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(object_id, env));
+			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(object_id, env));
 			if(dynamic_cast<const ScenarioTemplate*>(scenario.get()))
 			{
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
@@ -382,12 +424,23 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 			Env env;
+
+			// Messages
 			AlarmTableSync::SearchResult alarms(
 				AlarmTableSync::Search(env, id)
 			);
-			BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, alarms)
+			BOOST_FOREACH(const shared_ptr<Alarm>& alarm, alarms)
 			{
 				AlarmTableSync::Remove(NULL, alarm->getKey(), transaction, false);
+			}
+
+			// Calendars
+			ScenarioCalendarTableSync::SearchResult calendars(
+				ScenarioCalendarTableSync::Search(env, id)
+			);
+			BOOST_FOREACH(const shared_ptr<ScenarioCalendar>& calendar, calendars)
+			{
+				ScenarioCalendarTableSync::Remove(NULL, calendar->getKey(), transaction, false);
 			}
 		}
 
@@ -406,7 +459,7 @@ namespace synthese
 			RegistryKeyType id
 		){
 			Env env;
-			boost::shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env));
+			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env));
 			if(dynamic_cast<const ScenarioTemplate*>(scenario.get()))
 			{
 				MessagesLibraryLog::addDeleteEntry(dynamic_cast<const ScenarioTemplate*>(scenario.get()), session->getUser().get());
@@ -427,7 +480,7 @@ namespace synthese
 			AlarmTableSync::SearchResult alarms(
 				AlarmTableSync::Search(env, scenarioId, 0, optional<size_t>(), false, false, FIELDS_ONLY_LOAD_LEVEL)
 			);
-			BOOST_FOREACH(const boost::shared_ptr<const Alarm>& alarm, alarms)
+			BOOST_FOREACH(const shared_ptr<const Alarm>& alarm, alarms)
 			{
 				ScenarioTemplate::GetVariablesInformations(alarm->getShortMessage(), result);
 				ScenarioTemplate::GetVariablesInformations(alarm->getLongMessage(), result);
@@ -447,49 +500,49 @@ namespace synthese
 			const Scenario& dest,
 			optional<DBTransaction&> transaction
 		){
-			// The existing messages
-			Env env;
-			AlarmTableSync::SearchResult alarms(
-				AlarmTableSync::Search(env, sourceId)
-			);
-
-			// Copy of each message
-			BOOST_FOREACH(const boost::shared_ptr<Alarm>& templateAlarm, alarms)
-			{
-				// Message creation
-				boost::shared_ptr<Alarm> alarm;
-				if(dynamic_cast<const SentScenario*>(&dest))
-				{
-					alarm.reset(
-						new SentAlarm(
-							static_cast<const SentScenario&>(dest),
-							*templateAlarm
-					)	);
-				}
-				else
-				{
-					alarm.reset(
-						new AlarmTemplate(
-							static_cast<const ScenarioTemplate&>(dest),
-							*templateAlarm
-					)	);
-				}
-				AlarmTableSync::Save(alarm.get(), transaction);
-
-				// Copy of the recipients of the message
-				AlarmObjectLinkTableSync::CopyRecipients(
-					templateAlarm->getKey(),
-					*alarm,
-					transaction
+				// The existing messages
+				Env env;
+				AlarmTableSync::SearchResult alarms(
+					AlarmTableSync::Search(env, sourceId)
 				);
 
-				// Copy of the message alternatives
-				MessageAlternativeTableSync::CopyAlternatives(
-					templateAlarm->getKey(),
-					*alarm,
-					transaction
-				);
-			}
+				// Copy of each message
+				BOOST_FOREACH(const shared_ptr<Alarm>& templateAlarm, alarms)
+				{
+					// Message creation
+					shared_ptr<Alarm> alarm;
+					if(dynamic_cast<const SentScenario*>(&dest))
+					{
+						alarm.reset(
+							new SentAlarm(
+								static_cast<const SentScenario&>(dest),
+								*templateAlarm
+						)	);
+					}
+					else
+					{
+						alarm.reset(
+							new AlarmTemplate(
+								static_cast<const ScenarioTemplate&>(dest),
+								*templateAlarm
+						)	);
+					}
+					AlarmTableSync::Save(alarm.get(), transaction);
+
+					// Copy of the recipients of the message
+					AlarmObjectLinkTableSync::CopyRecipients(
+						templateAlarm->getKey(),
+						*alarm,
+						transaction
+					);
+
+					// Copy of the message alternatives
+					MessageAlternativeTableSync::CopyAlternatives(
+						templateAlarm->getKey(),
+						*alarm,
+						transaction
+					);
+				}
 		}
 
 
@@ -503,7 +556,7 @@ namespace synthese
 
 			const SentScenario::VariablesMap& values(scenario.getVariables());
 
-			BOOST_FOREACH(const boost::shared_ptr<Alarm>& alarm, alarms)
+			BOOST_FOREACH(const shared_ptr<Alarm>& alarm, alarms)
 			{
 				SentAlarm& sentAlarm(static_cast<SentAlarm&>(*alarm));
 
