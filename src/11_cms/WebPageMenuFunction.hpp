@@ -35,6 +35,7 @@ namespace synthese
 	namespace cms
 	{
 		class Webpage;
+		class Website;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageMenuFunction.
@@ -92,6 +93,7 @@ namespace synthese
 			//@{
 				boost::optional<util::RegistryKeyType> _rootId;
 				boost::shared_ptr<const Webpage> _root;
+				boost::shared_ptr<const Website> _rootSite;
 				boost::optional<std::size_t> _maxNumber;
 				std::size_t _minDepth;
 				std::size_t _maxDepth;
