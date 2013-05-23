@@ -123,7 +123,7 @@ namespace synthese
 
 
 
-			static void AlarmObjectLinkTableSync::RemoveByTarget(
+			static void RemoveByTarget(
 				util::RegistryKeyType objectId,
 				boost::optional<db::DBTransaction&> transaction
 			);
