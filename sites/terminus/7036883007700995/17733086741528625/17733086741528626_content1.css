@@ -1,0 +1,61 @@
+body {
+ padding-top: 60px;
+}
+
+#main_container {
+ min-height:350px;
+}
+
+.message_overview p {
+ display:inline;
+}
+
+.message_overview img {
+ display:none;
+}
+
+th {
+ text-align:left !important;
+ padding-right:10px;
+}
+
+.link {
+ cursor:pointer;
+}
+
+.tree_1 {
+ padding-left:16px;
+}
+.tree_2 {
+ padding-left:32px;
+}
+.tree_3 {
+ padding-left:48px;
+}
+.tree_4 {
+ padding-left:64px;
+}
+.tree_5 {
+ padding-left:80px;
+}
+.tree_6 {
+ padding-left:96px;
+}
+.tree_7 {
+ padding-left:112px;
+}
+.tree_8 {
+ padding-left:128px;
+}
+.tree_9 {
+ padding-left:144px;
+}
+.tree_10 {
+ padding-left:160px;
+}
+.tree_11 {
+ padding-left:176px;
+}
+.tree_12 {
+ padding-left:192px;
+}
