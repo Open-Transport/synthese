@@ -21,6 +21,7 @@ TreeModule.h
 TreeModule.inc.cpp
 TreeMultiClassRootPolicy.hpp
 TreeNode.hpp
+TreeNodeField.hpp
 TreeOtherClassRootPolicy.hpp
 TreeRankOrderingPolicy.hpp
 TreeRoot.hpp
