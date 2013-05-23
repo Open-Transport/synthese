@@ -23,6 +23,7 @@
 #include "SentScenario.h"
 
 #include "MessagesSection.hpp"
+#include "ScenarioCalendar.hpp"
 #include "ScenarioTemplate.h"
 #include "SentAlarm.h"
 #include "ParametersMap.h"
@@ -40,6 +41,7 @@ namespace synthese
 
 	namespace messages
 	{
+		const std::string SentScenario::DATA_ID = "id";
 		const std::string SentScenario::DATA_NAME = "name";
 		const std::string SentScenario::DATA_START_DATE = "start_date";
 		const std::string SentScenario::DATA_END_DATE = "end_date";
@@ -51,22 +53,23 @@ namespace synthese
 		const std::string SentScenario::DATA_CODE = "code";
 		const std::string SentScenario::DATA_VALUE = "value";
 
-		const std::string SentScenario::TAG_APPLICATION_PERIOD = "application_period";
 		const std::string SentScenario::TAG_VARIABLE = "variable";
 		const std::string SentScenario::TAG_MESSAGE = "message";
 		const std::string SentScenario::TAG_TEMPLATE_SCENARIO = "template_scenario";
 		const std::string SentScenario::TAG_SECTION = "section";
+		const std::string SentScenario::TAG_CALENDAR = "calendar";
 
 
 
 		SentScenario::SentScenario(
 			util::RegistryKeyType key
 		):	Registrable(key),
-			Scenario()
-			, _isEnabled(false)
-			, _periodStart(second_clock::local_time())
-			, _periodEnd(not_a_date_time)
-			, _template(NULL)
+			Scenario(),
+			_isEnabled(false),
+			_periodStart(second_clock::local_time()),
+			_periodEnd(not_a_date_time),
+			_template(NULL),
+			_archived(false)
 		{}
 
 
@@ -78,7 +81,8 @@ namespace synthese
 			_isEnabled(false),
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),
-			_template(&source)
+			_template(&source),
+			_archived(false)
 		{}
 
 
@@ -91,7 +95,8 @@ namespace synthese
 			_periodStart(second_clock::local_time()),
 			_periodEnd(not_a_date_time),
 			_template(source._template),
-			_variables(source._variables)
+			_variables(source._variables),
+			_archived(false)
 		{
 		}
 
@@ -118,17 +123,29 @@ namespace synthese
 
 		bool SentScenario::isApplicable( const ptime& start, const ptime& end ) const
 		{
+			// Archived event is never applicable
+			if(_archived)
+			{
+				return false;
+			}
+
 			// Disabled alarm is never applicable
 			if (!getIsEnabled())
+			{
 				return false;
+			}
 
 			// Start date control
 			if (!getPeriodStart().is_not_a_date_time() && end < getPeriodStart())
+			{
 				return false;
+			}
 
 			// End date control
 			if (!getPeriodEnd().is_not_a_date_time() && start >= getPeriodEnd())
+			{
 				return false;
+			}
 
 			return true;
 		}
@@ -144,7 +161,7 @@ namespace synthese
 
 		void SentScenario::setTemplate(
 			const ScenarioTemplate* value
-		) {
+		){
 			_template = value;
 		}
 
@@ -152,7 +169,7 @@ namespace synthese
 
 		void SentScenario::setVariables(
 			const VariablesMap& value
-		) {
+		){
 			_variables = value;
 		}
 
@@ -161,7 +178,8 @@ namespace synthese
 		void SentScenario::toParametersMap( util::ParametersMap& pm ) const
 		{
 			// roid
-			pm.insert(DATA_SCENARIO_ID, getKey());
+			pm.insert(DATA_ID, getKey());
+			pm.insert(DATA_SCENARIO_ID, getKey()); // Deprecated
 			pm.insert(Request::PARAMETER_OBJECT_ID, getKey()); // Deprecated
 
 			// name
@@ -202,12 +220,63 @@ namespace synthese
 				}
 			}
 
-			// Messages
-			BOOST_FOREACH(const Alarm* alarm, getMessages())
+			// Calendars
+			bool oneMessageWithoutCalendar(false);
+			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
 			{
-				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
-				alarm->toParametersMap(*messagePM, false, string(), true);
-				pm.insert(TAG_MESSAGE, messagePM);
+				// Calendar export
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				calendar->toParametersMap(*calendarPM);
+				pm.insert(TAG_CALENDAR, calendarPM);
+
+				// Messages loop
+				BOOST_FOREACH(const Alarm* alarm, getMessages())
+				{
+					// Mark message without calendar and avoit it
+					if(!alarm->getCalendar())
+					{
+						oneMessageWithoutCalendar = true;
+						continue;
+					}
+
+					// Jump over messages of other calendars
+					if(alarm->getCalendar() != calendar)
+					{
+						continue;
+					}
+
+					// Message export
+					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					alarm->toParametersMap(*messagePM, false, string(), true);
+					calendarPM->insert(TAG_MESSAGE, messagePM);
+				}
+			}
+
+			// Fake calendar for old style messages
+			if(	oneMessageWithoutCalendar ||
+				(getCalendars().empty() && !getMessages().empty())
+			){
+				// Fake calendar export
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				calendarPM->insert(Key::FIELD.name, 0);
+				calendarPM->insert(Name::FIELD.name, string());
+				calendarPM->insert(ScenarioPointer::FIELD.name, getKey());
+				pm.insert(TAG_CALENDAR, calendarPM);
+
+				// Old style messages loop
+				BOOST_FOREACH(const Alarm* alarm, getMessages())
+				{
+					// Jump over new style messages
+					if(alarm->getCalendar())
+					{
+						continue;
+					}
+
+					// Message export
+					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					alarm->toParametersMap(*messagePM, false, string(), true);
+					calendarPM->insert(TAG_MESSAGE, messagePM);
+				}
 			}
 
 			// Sections
@@ -244,13 +313,5 @@ namespace synthese
 
 			// active
 			pm.insert(DATA_ACTIVE, getIsEnabled());
-
-			// application period
-			BOOST_FOREACH(const MessageApplicationPeriod::ApplicationPeriods::value_type& it, _applicationPeriods)
-			{
-				boost::shared_ptr<ParametersMap> apPM(new ParametersMap);
-				it->toParametersMap(*apPM);
-				pm.insert(TAG_APPLICATION_PERIOD, apPM);
-			}
 		}
 }	}

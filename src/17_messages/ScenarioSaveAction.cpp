@@ -27,9 +27,10 @@
 #include "IConv.hpp"
 #include "MessageAlternativeTableSync.hpp"
 #include "MessageApplicationPeriodTableSync.hpp"
-#include "MessageType.hpp"
+#include "MessageTypeTableSync.hpp"
 #include "MessagesModule.h"
 #include "MessagesSection.hpp"
+#include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
 #include "MessagesLog.h"
@@ -52,12 +53,14 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace boost::algorithm;
+using namespace boost::property_tree;
 
 namespace synthese
 {
@@ -72,49 +75,46 @@ namespace synthese
 
 	namespace messages
 	{
+		// Parameters for action determination
 		const string ScenarioSaveAction::PARAMETER_CREATE_TEMPLATE = Action_PARAMETER_PREFIX + "t";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_COPY = Action_PARAMETER_PREFIX + "mt";
+		const string ScenarioSaveAction::PARAMETER_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
+		const string ScenarioSaveAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "sid";
+		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID = Action_PARAMETER_PREFIX + "is";
+
+		// Parameters for properties
+		const string ScenarioSaveAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
 		const string ScenarioSaveAction::PARAMETER_VARIABLE = Action_PARAMETER_PREFIX + "var";
 		const string ScenarioSaveAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
 		const string ScenarioSaveAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
 		const string ScenarioSaveAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
 		const string ScenarioSaveAction::PARAMETER_START_TIME = Action_PARAMETER_PREFIX + "_start_time";
 		const string ScenarioSaveAction::PARAMETER_END_TIME = Action_PARAMETER_PREFIX + "_end_time";
+		const string ScenarioSaveAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
+		const string ScenarioSaveAction::PARAMETER_SECTIONS = Action_PARAMETER_PREFIX + "_field_sections";
+		const string ScenarioSaveAction::PARAMETER_ARCHIVED = Action_PARAMETER_PREFIX + "_field_archived";
+
+		// Parameters for unused properties
 		const string ScenarioSaveAction::PARAMETER_EVENT_START_DATE = Action_PARAMETER_PREFIX + "_event_start_date";
 		const string ScenarioSaveAction::PARAMETER_EVENT_END_DATE = Action_PARAMETER_PREFIX + "_event_end_date";
 		const string ScenarioSaveAction::PARAMETER_EVENT_START_TIME = Action_PARAMETER_PREFIX + "_event_start_time";
 		const string ScenarioSaveAction::PARAMETER_EVENT_END_TIME = Action_PARAMETER_PREFIX + "_event_end_time";
-		const string ScenarioSaveAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "sid";
-		const string ScenarioSaveAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
-		const string ScenarioSaveAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
-		const string ScenarioSaveAction::PARAMETER_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_COPY = Action_PARAMETER_PREFIX + "mt";
+
+		// Parameters for A/B/G/H message update full method
+		const string ScenarioSaveAction::PARAMETER_JSON = Action_PARAMETER_PREFIX + "_json";
+
+		// Parameters for A/B/G/H message update simplified method
+		const string ScenarioSaveAction::PARAMETER_CREATED_MESSAGE_TITLE = Action_PARAMETER_PREFIX + "_created_message_title";
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_CREATE = Action_PARAMETER_PREFIX + "me";
-		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
+		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 		const string ScenarioSaveAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "le";
+		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
-		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID = Action_PARAMETER_PREFIX + "is";
-		const string ScenarioSaveAction::PARAMETER_CREATED_MESSAGE_TITLE = Action_PARAMETER_PREFIX + "_created_message_title";
-		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
-		const string ScenarioSaveAction::PARAMETER_SECTIONS = Action_PARAMETER_PREFIX + "_sections";
-
-		const string ScenarioSaveAction::PARAMETER_WITH_MESSAGES = Action_PARAMETER_PREFIX + "_with_messages";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_ID_ = Action_PARAMETER_PREFIX + "_message_id_";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_TITLE_ = Action_PARAMETER_PREFIX + "_message_title_";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_CONTENT_ = Action_PARAMETER_PREFIX + "_message_content_";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_LEVEL_ = Action_PARAMETER_PREFIX + "_message_level_";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_message_recipients_";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_ALTERNATIVES_ = Action_PARAMETER_PREFIX + "_message_alternatives_";
+		
 		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
 		const string ScenarioSaveAction::VALUES_PARAMETERS_SEPARATOR = "|";
 
-		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_START_DATE = Action_PARAMETER_PREFIX + "_ap_sd_";
-		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_END_DATE = Action_PARAMETER_PREFIX + "_ap_ed_";
-		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_START_TIME = Action_PARAMETER_PREFIX + "_ap_st_";
-		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_END_TIME = Action_PARAMETER_PREFIX + "_ap_et_";
-		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_START_HOUR = Action_PARAMETER_PREFIX + "_ap_sh_";
-		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_END_HOUR = Action_PARAMETER_PREFIX + "_ap_eh_";
-		const string ScenarioSaveAction::PARAMETER_APPLICATION_PERIOD_ID = Action_PARAMETER_PREFIX + "_ap_id_";
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
 		{
@@ -131,171 +131,453 @@ namespace synthese
 
 		void ScenarioSaveAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			//////////////////////////////////////////////////////////////////////////
+			// Action determination
+
+			// Update or a scenario identified by data source
+			// (data source id is memorized in case of creation)
+			if(	map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_DATASOURCE_ID, 0) &&
+				!map.getDefault<string>(PARAMETER_SCENARIO_ID).empty()
+			){
+				// Data source
+				try
+				{
+					_scenarioDataSource = DataSourceTableSync::Get(
+						map.get<RegistryKeyType>(PARAMETER_SCENARIO_DATASOURCE_ID),
+						*_env
+					);
+				}
+				catch(ObjectNotFoundException<DataSource>& e)
+				{
+					throw ActionException("No such data source for scenario id : "+ e.getMessage());
+				}
+
+				// Id
+				_dataSourceLinkId = map.get<string>(PARAMETER_SCENARIO_ID);
+
+				// Update or creation ?
+				ImportableTableSync::ObjectBySource<ScenarioTableSync> scenarios(*_scenarioDataSource, *_env);
+				ImportableTableSync::ObjectBySource<ScenarioTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
+				if(!scenarioSet.empty())
+				{	// Update (actions G/H)
+					_scenario = _env->getEditableSPtr(*scenarioSet.begin());
+					if(dynamic_cast<SentScenario*>(_scenario.get()))
+					{
+						_sscenario = static_pointer_cast<SentScenario, Scenario>(_scenario);
+					}
+					if(dynamic_cast<ScenarioTemplate*>(_scenario.get()))
+					{
+						_tscenario = static_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
+					}
+				}
+			}
+			// Update, identified by id (actions G/H)
+			else if(map.isDefined(PARAMETER_SCENARIO_ID))
+			{
+				setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
+			}
+			// If not update, then creation
+			if(!_scenario.get())
+			{
+				_creation = true;
+
+				// Template creation
+				if(map.getDefault<bool>(PARAMETER_CREATE_TEMPLATE,false))
+				{
+					// By copying an event (action E)
+					if(map.getOptional<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY))
+					{
+						try
+						{
+							_source = ScenarioTableSync::GetCast<SentScenario>(
+								map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
+								*_env
+							);
+							_tscenario.reset(
+								new ScenarioTemplate(*_source, _source->getName())
+							);
+							_tscenario->setSections(_source->getSections());
+						}
+						catch(...)
+						{
+							throw ActionException("specified scenario not found");
+						}
+					}
+					// By copying an other template (action F)
+					else if(map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE))
+					{
+						try
+						{
+							_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
+								map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
+								*_env
+							);
+							_tscenario.reset(
+								new ScenarioTemplate(*_template, map.get<string>(PARAMETER_NAME))
+							);
+							_tscenario->setSections(_template->getSections());
+						}
+						catch(...)
+						{
+							throw ActionException("specified scenario template not found");
+						}
+					}
+					else // From scratch (action B)
+					{
+						boost::shared_ptr<ScenarioFolder> folder;
+						if(map.isDefined(PARAMETER_FOLDER_ID))
+						{
+							try
+							{
+								folder = ScenarioFolderTableSync::GetEditable(
+									map.get<RegistryKeyType>(PARAMETER_FOLDER_ID),
+									*_env
+								);
+							}
+							catch (...)
+							{
+								throw ActionException("Bad folder ID");
+							}
+						}
+						_tscenario.reset(
+							new ScenarioTemplate(map.get<string>(PARAMETER_NAME), folder.get())
+						);
+					}
+
+					// Name check
+					if(_tscenario->getName().empty())
+					{
+						throw ActionException("Le scénario doit avoir un nom.");
+					}
+			
+					_scenario = static_pointer_cast<Scenario,ScenarioTemplate>(_tscenario);
+				}
+				else
+				{	// Sent scenario creation
+
+					// Copy an other sent scenario (action E)
+					if(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY, 0))
+					{
+						try
+						{
+							_source = ScenarioTableSync::GetCast<SentScenario>(
+								map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
+								*_env,
+								UP_LINKS_LOAD_LEVEL
+							);
+							_sscenario.reset(
+								new SentScenario(*_source)
+							);
+						}
+						catch(ObjectNotFoundException<SentScenario>& e)
+						{
+							throw ActionException("scenario to copy", e, *this);
+						}
+					}
+					else if(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE, 0))
+					{
+						// Copy of a template (action D)
+						try
+						{
+							_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
+								map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
+								*_env,
+								UP_LINKS_LOAD_LEVEL
+							);
+							_sscenario.reset(new SentScenario(*_template));
+						}
+						catch(ObjectNotFoundException<ScenarioTemplate>& e)
+						{
+							throw ActionException("scenario template", e, *this);
+						}
+					}
+					else
+					{	// Creation from scratch (action A)
+						_sscenario.reset(new SentScenario);
+					}
+					_scenario = static_pointer_cast<Scenario, SentScenario>(_sscenario);
+				}
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			// Load of attached objects
+			if(_scenario->getKey())
+			{
+				ScenarioCalendarTableSync::SearchResult calendars(ScenarioCalendarTableSync::Search(*_env, _scenario->getKey()));
+				AlarmTableSync::SearchResult messages(AlarmTableSync::Search(*_env, _scenario->getKey()));
+
+				BOOST_FOREACH(const boost::shared_ptr<ScenarioCalendar>& calendar, calendars)
+				{
+					MessageApplicationPeriodTableSync::Search(*_env, calendar->getKey());
+				}
+
+				BOOST_FOREACH(const boost::shared_ptr<Alarm> message, messages)
+				{
+					MessageAlternativeTableSync::Search(*_env, message->getKey());
+					AlarmObjectLinkTableSync::Search(*_env, message->getKey());
+				}
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			// Properties
+
 			// Encoding
 			IConv iconv(map.getDefault<string>(PARAMETER_ENCODING, "UTF-8"), "UTF-8");
 
-			// Update or creation
-			try
+			// Name
+			if(map.isDefined(PARAMETER_NAME))
 			{
-				// Data source
-				if(map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_DATASOURCE_ID, 0))
-				{
-					_scenarioDataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_SCENARIO_DATASOURCE_ID), *_env);
-					if(map.isDefined(PARAMETER_SCENARIO_ID))
-					{
-						_dataSourceLinkId = map.get<string>(PARAMETER_SCENARIO_ID);
+				_name = iconv.convert(map.get<string>(PARAMETER_NAME));
+			}
 
-						ImportableTableSync::ObjectBySource<ScenarioTableSync> scenarios(*_scenarioDataSource, *_env);
-						ImportableTableSync::ObjectBySource<ScenarioTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
-						if(!scenarioSet.empty())
+			// Sections
+			if(map.isDefined(PARAMETER_SECTIONS))
+			{
+				_sections = Scenario::Sections();
+				string sectionsStr(map.get<string>(PARAMETER_SECTIONS));
+				trim(sectionsStr);
+				if(!sectionsStr.empty())
+				{
+					vector<string> tokens;
+					split(tokens, sectionsStr, is_any_of(VALUES_SEPARATOR));
+					BOOST_FOREACH(const string& token, tokens)
+					{
+						try
 						{
-							_scenario = _env->getEditableSPtr(*scenarioSet.begin());
-							if(dynamic_cast<SentScenario*>(_scenario.get()))
+							RegistryKeyType sectionId(lexical_cast<RegistryKeyType>(token));
+							if(sectionId)
 							{
-								_sscenario = static_pointer_cast<SentScenario, Scenario>(_scenario);
+								_sections->insert(
+									Env::GetOfficialEnv().get<MessagesSection>(sectionId).get()
+								);
 							}
-							if(dynamic_cast<ScenarioTemplate*>(_scenario.get()))
-							{
-								_tscenario = static_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
-							}
+						}
+						catch (bad_lexical_cast&)
+						{						
+						}
+						catch(ObjectNotFoundException<MessagesSection>&)
+						{
+
 						}
 					}
 				}
-				else if(map.isDefined(PARAMETER_SCENARIO_ID))
+			}
+
+			// Template scenario only
+			if(_tscenario.get())
+			{
+				// Folder
+				if(map.isDefined(PARAMETER_FOLDER_ID))
 				{
-					setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
-				}
-
-				if(!_scenario.get())
-				{	// Creation
-					_creation = true;
-					if(map.getDefault<bool>(PARAMETER_CREATE_TEMPLATE,false))
+					RegistryKeyType folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
+					if (folderId == 0)
 					{
-						if(map.getOptional<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY))
-						{
-							try
-							{
-								_source = ScenarioTableSync::GetCast<SentScenario>(
-									map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
-									*_env
-								);
-								_tscenario.reset(
-									new ScenarioTemplate(*_source, _source->getName())
-								);
-								_tscenario->setSections(_source->getSections());
-							}
-							catch(...)
-							{
-								throw ActionException("specified scenario not found");
-							}
-						}
-						else if(map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE))
-						{
-							try
-							{
-								_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
-									map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
-									*_env
-								);
-								_tscenario.reset(
-									new ScenarioTemplate(*_template, map.get<string>(PARAMETER_NAME))
-								);
-								_tscenario->setSections(_template->getSections());
-							}
-							catch(...)
-							{
-								throw ActionException("specified scenario template not found");
-							}
-						}
-						else
-						{	// New template
-							boost::shared_ptr<ScenarioFolder> folder;
-							if(map.isDefined(PARAMETER_FOLDER_ID))
-							{
-								try
-								{
-									folder = ScenarioFolderTableSync::GetEditable(
-										map.get<RegistryKeyType>(PARAMETER_FOLDER_ID),
-										*_env
-									);
-								}
-								catch (...)
-								{
-									throw ActionException("Bad folder ID");
-								}
-							}
-							_tscenario.reset(
-								new ScenarioTemplate(map.get<string>(PARAMETER_NAME), folder.get())
-							);
-						}
-
-						// Name check
-						if(_tscenario->getName().empty())
-						{
-							throw ActionException("Le scénario doit avoir un nom.");
-						}
-						Env env;
-						ScenarioTableSync::SearchResult r(
-							ScenarioTableSync::SearchTemplates(
-								env,
-								_tscenario->getFolder() ? _tscenario->getFolder()->getKey() : 0,
-								_tscenario->getName(),
-								NULL,
-								0,
-								1
-						)	);
-						if (!r.empty())
-						{
-							throw ActionException("Un scénario de même nom existe déjà");
-						}
-
-						_scenario = static_pointer_cast<Scenario,ScenarioTemplate>(_tscenario);
+						_folder = boost::shared_ptr<ScenarioFolder>();
 					}
 					else
-					{	// Sent scenario creation
+					{
+						_folder = ScenarioFolderTableSync::GetEditable(folderId, *_env);
+					}
+				}
+			}
 
-						// Copy an other sent scenario
-						if(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY, 0))
+			// Event only
+			if(_sscenario.get())
+			{
+				// Importable
+				_setImportableUpdateFromParametersMap(*_env, map);
+
+				// Enabled
+				if(map.isDefined(PARAMETER_ENABLED))
+				{
+					_enabled = map.get<bool>(PARAMETER_ENABLED);
+				}
+
+				// Archived
+				if(map.isDefined(PARAMETER_ARCHIVED))
+				{
+					_archived = map.get<bool>(PARAMETER_ARCHIVED);
+				}
+
+				// Start date
+				if(map.isDefined(PARAMETER_START_DATE))
+				{
+					if(map.get<string>(PARAMETER_START_DATE).empty())
+					{
+						_startDate = ptime();
+					}
+					else
+					{
+						if(map.isDefined(PARAMETER_START_TIME))
 						{
-							try
+							time_duration t(0,0,0);
+							if(!map.get<string>(PARAMETER_START_TIME).empty())
 							{
-								_source = ScenarioTableSync::GetCast<SentScenario>(
-									map.get<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY),
-									*_env,
-									UP_LINKS_LOAD_LEVEL
-								);
-								_sscenario.reset(
-									new SentScenario(*_source)
-								);
+								t = duration_from_string(map.get<string>(PARAMETER_START_TIME));
 							}
-							catch(ObjectNotFoundException<SentScenario>& e)
-							{
-								throw ActionException("scenario to copy", e, *this);
-							}
-						}
-						else if(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE, 0))
-						{
-							// Copy of a template
-							try
-							{
-								_template = ScenarioTableSync::GetCast<ScenarioTemplate>(
-									map.get<RegistryKeyType>(PARAMETER_TEMPLATE),
-									*_env,
-									UP_LINKS_LOAD_LEVEL
-								);
-								_sscenario.reset(new SentScenario(*_template));
-							}
-							catch(ObjectNotFoundException<ScenarioTemplate>& e)
-							{
-								throw ActionException("scenario template", e, *this);
-							}
+							_startDate = ptime(
+								from_string(map.get<string>(PARAMETER_START_DATE)),
+								t
+							);
 						}
 						else
-						{	// Blank scenario
-							_sscenario.reset(new SentScenario);
+						{
+							_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
 						}
-						_scenario = static_pointer_cast<Scenario, SentScenario>(_sscenario);
 					}
+				}
+
+				// End date
+				if(map.isDefined(PARAMETER_END_DATE))
+				{
+					if(map.get<string>(PARAMETER_END_DATE).empty())
+					{
+						_endDate = ptime();
+					}
+					else
+					{
+						if(map.isDefined(PARAMETER_END_TIME))
+						{
+							time_duration t(23,59,59);
+							if(!map.get<string>(PARAMETER_END_TIME).empty())
+							{
+								t = duration_from_string(map.get<string>(PARAMETER_END_TIME));
+							}
+							_endDate = ptime(
+								from_string(map.get<string>(PARAMETER_END_DATE)),
+								t
+							);
+						}
+						else
+						{
+							_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+						}
+						*_endDate -= seconds(_endDate->time_of_day().seconds());
+					}
+				}
+
+				// Event Start date
+				if(map.isDefined(PARAMETER_EVENT_START_DATE))
+				{
+					if(map.get<string>(PARAMETER_EVENT_START_DATE).empty())
+					{
+						_eventStartDate = ptime();
+					}
+					else
+					{
+						if(map.isDefined(PARAMETER_EVENT_START_TIME))
+						{
+							time_duration t(0,0,0);
+							if(!map.get<string>(PARAMETER_EVENT_START_TIME).empty())
+							{
+								t = duration_from_string(map.get<string>(PARAMETER_EVENT_START_TIME));
+							}
+							_eventStartDate = ptime(
+								from_string(map.get<string>(PARAMETER_EVENT_START_DATE)),
+								t
+							);
+						}
+						else
+						{
+							_eventStartDate = time_from_string(map.get<string>(PARAMETER_EVENT_START_DATE));
+						}
+					}
+				}
+
+				// Event End date
+				if(map.isDefined(PARAMETER_EVENT_END_DATE))
+				{
+					if(map.get<string>(PARAMETER_EVENT_END_DATE).empty())
+					{
+						_eventEndDate = ptime();
+					}
+					else
+					{
+						if(map.isDefined(PARAMETER_EVENT_END_TIME))
+						{
+							time_duration t(23,59,59);
+							if(!map.get<string>(PARAMETER_EVENT_END_TIME).empty())
+							{
+								t = duration_from_string(map.get<string>(PARAMETER_EVENT_END_TIME));
+							}
+							_eventEndDate = ptime(
+								from_string(map.get<string>(PARAMETER_EVENT_END_DATE)),
+								t
+							);
+						}
+						else
+						{
+							_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
+						}
+						*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
+					}
+				}
+
+				// Variables
+				if(_sscenario->getTemplate())
+				{
+					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
+					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+					{
+						if(!map.isDefined(PARAMETER_VARIABLE + variable.second.code))
+						{
+							if(	variable.second.compulsory &&
+								(	(_enabled && *_enabled) ||
+									(!_enabled && _sscenario->getIsEnabled())
+								)
+							){
+								SentScenario::VariablesMap::const_iterator it(
+									_sscenario->getVariables().find(variable.second.code)
+								);
+								if(it == _sscenario->getVariables().end() || it->second.empty())
+								{
+									throw ActionException("The variable "+ variable.first +" is still undefined : the scenario cannot be active");
+								}
+							}
+							continue;
+						}
+						string value(
+							iconv.convert(map.get<string>(PARAMETER_VARIABLE + variable.second.code))
+						);
+						if(	variable.second.compulsory &&
+							(	(_enabled && *_enabled) ||
+								(!_enabled && _sscenario->getIsEnabled())
+							) &&
+							value.empty()
+						){
+							throw ActionException("Variable "+ variable.first +" must be defined to activate the scenario.");
+						}
+						_variables.insert(make_pair(
+								variable.second.code,
+								value
+						)	);
+					}
+				}
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			// Calendars and messages
+
+			// Full method
+			if(map.isDefined(PARAMETER_JSON))
+			{
+				_messagesAndCalendars = ptree();
+				istringstream ss(map.get<string>(PARAMETER_JSON));
+				read_json(ss, *_messagesAndCalendars);
+			}
+			else // Simplified method
+			{
+				// Load of existing messages
+				AlarmTableSync::SearchResult alarms(
+					AlarmTableSync::Search(
+						*_env,
+						_scenario->getKey(),
+						0,
+						2
+				)	);
+				if(alarms.size() == 1)
+				{
+					_message = static_pointer_cast<SentAlarm, Alarm>(*alarms.begin());
 				}
 
 
@@ -369,425 +651,6 @@ namespace synthese
 						}
 					}
 				}
-
-				// Messages
-				_withMessages = map.getDefault<bool>(PARAMETER_WITH_MESSAGES, false);
-				if(_withMessages)
-				{
-					for(size_t rank(0); map.isDefined(PARAMETER_MESSAGE_ID_+ lexical_cast<string>(rank)); ++rank)
-					{
-						string rankStr(lexical_cast<string>(rank));
-
-						// Jump over removals (id is empty)
-						if(map.get<string>(PARAMETER_MESSAGE_ID_+ rankStr).empty())
-						{
-							continue;
-						}
-
-						Message msg;
-						msg.id = map.get<RegistryKeyType>(PARAMETER_MESSAGE_ID_+ rankStr); // explicit 0 value in case of new message
-						msg.title = map.getDefault<string>(PARAMETER_MESSAGE_TITLE_+ rankStr);
-						msg.content = map.getDefault<string>(PARAMETER_MESSAGE_CONTENT_+ rankStr);
-						msg.level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_MESSAGE_LEVEL_+rankStr, 10));
-
-						// Recipients
-						BOOST_FOREACH(const Factory<AlarmRecipient>::Keys::value_type& key, Factory<AlarmRecipient>::GetKeys())
-						{
-							string keys(map.getDefault<string>(PARAMETER_MESSAGE_RECIPIENTS_+ lexical_cast<string>(rank) + "_" + key));
-							if(!keys.empty())
-							{
-								vector<string> keysStrVector;
-								split(keysStrVector, keys, is_any_of(VALUES_SEPARATOR));
-								BOOST_FOREACH(const string& keyStr, keysStrVector)
-								{
-									vector<string> parts;
-									split(parts, keyStr, is_any_of(VALUES_PARAMETERS_SEPARATOR));
-									string parameter;
-									if(parts.size() > 1)
-									{
-										parameter = parts[1];
-									}
-									try
-									{
-										msg.recipients.push_back(
-											make_pair(
-												key,
-												make_pair(
-													keyStr.empty() ? 0 : lexical_cast<RegistryKeyType>(keyStr),
-													parameter
-										)	)	);
-									}
-									catch(...)
-									{									
-									}
-								}
-							}
-						}
-
-						// Alternatives
-						BOOST_FOREACH(const MessageType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<MessageType>())
-						{
-							msg.alternatives.insert(
-								make_pair(
-									it.second.get(),
-									map.getDefault<string>(PARAMETER_MESSAGE_ALTERNATIVES_+ lexical_cast<string>(rank) + "_" + lexical_cast<string>(it.first))
-							)	);
-						}
-
-						_messages.push_back(msg);
-						if(msg.id)
-						{
-							_messageIds.insert(msg.id);
-						}
-				}	}
-
-
-				// Properties
-
-				// Name
-				if(map.isDefined(PARAMETER_NAME))
-				{
-					_name = iconv.convert(map.get<string>(PARAMETER_NAME));
-				}
-
-				// Sections
-				if(map.isDefined(PARAMETER_SECTIONS))
-				{
-					_sections = Scenario::Sections();
-					string sectionsStr(map.get<string>(PARAMETER_SECTIONS));
-					trim(sectionsStr);
-					if(!sectionsStr.empty())
-					{
-						vector<string> tokens;
-						split(tokens, sectionsStr, is_any_of(","));
-						BOOST_FOREACH(const string& token, tokens)
-						{
-							try
-							{
-								RegistryKeyType sectionId(lexical_cast<RegistryKeyType>(token));
-								if(sectionId)
-								{
-									_sections->insert(
-										Env::GetOfficialEnv().get<MessagesSection>(sectionId).get()
-									);
-								}
-							}
-							catch (bad_lexical_cast&)
-							{						
-							}
-							catch(ObjectNotFoundException<MessagesSection>&)
-							{
-
-							}
-						}
-					}
-				}
-
-				// Template scenario only
-				if(_tscenario.get())
-				{
-					// Folder
-					if(map.isDefined(PARAMETER_FOLDER_ID))
-					{
-						RegistryKeyType folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
-						if (folderId == 0)
-						{
-							_folder = boost::shared_ptr<ScenarioFolder>();
-						}
-						else
-						{
-							_folder = ScenarioFolderTableSync::GetEditable(folderId, *_env);
-						}
-
-						// Uniqueness check
-						Env env;
-						ScenarioTableSync::SearchResult r(
-							ScenarioTableSync::SearchTemplates(
-								env,
-								folderId,
-								_name ? *_name : _scenario->getName(),
-								dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(),
-								0,
-								1
-						)	);
-						if(	!r.empty())
-						{
-							throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
-						}
-					}
-				}
-
-				// Sent scenario only
-				if(_sscenario.get())
-				{
-					// Load of existing messages
-					AlarmTableSync::SearchResult alarms(
-						AlarmTableSync::Search(
-							*_env,
-							_sscenario->getKey(),
-							0,
-							2
-					)	);
-					if(alarms.size() == 1)
-					{
-						_message = static_pointer_cast<SentAlarm, Alarm>(*alarms.begin());
-					}
-
-					// Importable
-					_setImportableUpdateFromParametersMap(*_env, map);
-
-					// Enabled
-					if(map.isDefined(PARAMETER_ENABLED))
-					{
-						_enabled = map.get<bool>(PARAMETER_ENABLED);
-					}
-
-					// Start date
-					if(map.isDefined(PARAMETER_START_DATE))
-					{
-						if(map.get<string>(PARAMETER_START_DATE).empty())
-						{
-							_startDate = ptime();
-						}
-						else
-						{
-							if(map.isDefined(PARAMETER_START_TIME))
-							{
-								time_duration t(0,0,0);
-								if(!map.get<string>(PARAMETER_START_TIME).empty())
-								{
-									t = duration_from_string(map.get<string>(PARAMETER_START_TIME));
-								}
-								_startDate = ptime(
-									from_string(map.get<string>(PARAMETER_START_DATE)),
-									t
-								);
-							}
-							else
-							{
-								_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
-							}
-						}
-					}
-
-					// End date
-					if(map.isDefined(PARAMETER_END_DATE))
-					{
-						if(map.get<string>(PARAMETER_END_DATE).empty())
-						{
-							_endDate = ptime();
-						}
-						else
-						{
-							if(map.isDefined(PARAMETER_END_TIME))
-							{
-								time_duration t(23,59,59);
-								if(!map.get<string>(PARAMETER_END_TIME).empty())
-								{
-									t = duration_from_string(map.get<string>(PARAMETER_END_TIME));
-								}
-								_endDate = ptime(
-									from_string(map.get<string>(PARAMETER_END_DATE)),
-									t
-								);
-							}
-							else
-							{
-								_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
-							}
-							*_endDate -= seconds(_endDate->time_of_day().seconds());
-						}
-					}
-
-					// Event Start date
-					if(map.isDefined(PARAMETER_EVENT_START_DATE))
-					{
-						if(map.get<string>(PARAMETER_EVENT_START_DATE).empty())
-						{
-							_eventStartDate = ptime();
-						}
-						else
-						{
-							if(map.isDefined(PARAMETER_EVENT_START_TIME))
-							{
-								time_duration t(0,0,0);
-								if(!map.get<string>(PARAMETER_EVENT_START_TIME).empty())
-								{
-									t = duration_from_string(map.get<string>(PARAMETER_EVENT_START_TIME));
-								}
-								_eventStartDate = ptime(
-									from_string(map.get<string>(PARAMETER_EVENT_START_DATE)),
-									t
-								);
-							}
-							else
-							{
-								_eventStartDate = time_from_string(map.get<string>(PARAMETER_EVENT_START_DATE));
-							}
-						}
-					}
-
-					// Event End date
-					if(map.isDefined(PARAMETER_EVENT_END_DATE))
-					{
-						if(map.get<string>(PARAMETER_EVENT_END_DATE).empty())
-						{
-							_eventEndDate = ptime();
-						}
-						else
-						{
-							if(map.isDefined(PARAMETER_EVENT_END_TIME))
-							{
-								time_duration t(23,59,59);
-								if(!map.get<string>(PARAMETER_EVENT_END_TIME).empty())
-								{
-									t = duration_from_string(map.get<string>(PARAMETER_EVENT_END_TIME));
-								}
-								_eventEndDate = ptime(
-									from_string(map.get<string>(PARAMETER_EVENT_END_DATE)),
-									t
-								);
-							}
-							else
-							{
-								_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
-							}
-							*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
-						}
-					}
-
-					// Variables
-					if(_sscenario->getTemplate())
-					{
-						const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
-						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
-						{
-							if(!map.isDefined(PARAMETER_VARIABLE + variable.second.code))
-							{
-								if(	variable.second.compulsory &&
-									(	(_enabled && *_enabled) ||
-										(!_enabled && _sscenario->getIsEnabled())
-									)
-								){
-									SentScenario::VariablesMap::const_iterator it(
-										_sscenario->getVariables().find(variable.second.code)
-									);
-									if(it == _sscenario->getVariables().end() || it->second.empty())
-									{
-										throw ActionException("The variable "+ variable.first +" is still undefined : the scenario cannot be active");
-									}
-								}
-								continue;
-							}
-							string value(
-								iconv.convert(map.get<string>(PARAMETER_VARIABLE + variable.second.code))
-							);
-							if(	variable.second.compulsory &&
-								(	(_enabled && *_enabled) ||
-									(!_enabled && _sscenario->getIsEnabled())
-								) &&
-								value.empty()
-							){
-								throw ActionException("Variable "+ variable.first +" must be defined to activate the scenario.");
-							}
-							_variables.insert(make_pair(
-									variable.second.code,
-									value
-							)	);
-						}
-					}
-
-					// Message application periods
-					if(map.isDefined(PARAMETER_APPLICATION_PERIOD_ID + lexical_cast<string>(0)))
-					{
-						_messageApplicationPeriods = MessageApplicationPeriods();
-						size_t i(0);
-						string istr(lexical_cast<string>(i));
-						while(map.isDefined(PARAMETER_APPLICATION_PERIOD_ID + istr))
-						{
-							if(	map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_ID + istr).empty() &&
-								map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty()
-							){
-								break;
-								// TODO implement removal
-							}
-
-							MessageApplicationPeriod* m_a_p(NULL);
-							if(map.getDefault<RegistryKeyType>(PARAMETER_APPLICATION_PERIOD_ID + istr, 0))
-							{
-								m_a_p = MessageApplicationPeriodTableSync::GetEditable(
-									map.get<RegistryKeyType>(PARAMETER_APPLICATION_PERIOD_ID + istr),
-									*_env
-								).get();
-							}
-							else
-							{
-								boost::shared_ptr<MessageApplicationPeriod> newMap(new MessageApplicationPeriod);
-								newMap->set<ScenarioPointer>(*_scenario);
-								newMap->set<Key>(MessageApplicationPeriodTableSync::getId());
-								_env->add(newMap);
-								m_a_p = newMap.get();
-							}
-
-							// Property load
-							time_duration startHour(0,0,0);
-							if(!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_HOUR + istr).empty())
-							{
-								startHour = duration_from_string(
-									map.get<string>(PARAMETER_APPLICATION_PERIOD_START_HOUR + istr)
-								);
-							}
-							m_a_p->set<StartHour>(startHour);
-
-							time_duration endHour(23,59,0);
-							if(!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_HOUR + istr).empty())
-							{
-								endHour = duration_from_string(
-									map.get<string>(PARAMETER_APPLICATION_PERIOD_END_HOUR + istr)
-								);
-							}
-							m_a_p->set<EndHour>(endHour);
-
-							ptime startTime(not_a_date_time);
-							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr).empty()
-							){
-								startTime = ptime(
-									from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_START_DATE + istr)),
-									map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr).empty() ?
-										time_duration(0,0,0) :
-										duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_START_TIME + istr))
-								);
-							}
-							m_a_p->set<StartTime>(startTime);
-
-							ptime endTime(not_a_date_time);
-							if(	!map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_DATE + istr).empty()
-							){
-								endTime = ptime(
-									from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_END_DATE + istr)),
-									map.getDefault<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr).empty() ?
-										time_duration(23,59,0) :
-										duration_from_string(map.get<string>(PARAMETER_APPLICATION_PERIOD_END_TIME + istr))
-								);
-							}
-							m_a_p->set<EndTime>(endTime);
-
-							_messageApplicationPeriods->insert(m_a_p);
-							++i;
-							istr = lexical_cast<string>(i);
-						}
-					}
-					boost::optional<MessageApplicationPeriods> _messageApplicationPeriods;
-
-				}
-			}
-			catch(ParametersMap::MissingParameterException& e)
-			{
-				throw ActionException(e, *this);
-			}
-			catch(ObjectNotFoundException<DataSource>&)
-			{
-				throw ActionException("No such data source");
 			}
 		}
 
@@ -795,7 +658,6 @@ namespace synthese
 
 		ScenarioSaveAction::ScenarioSaveAction():
 			FactorableTemplate<Action, ScenarioSaveAction>(),
-			_withMessages(false),
 			_creation(false)
 		{}
 
@@ -807,6 +669,9 @@ namespace synthese
 
 			// Log message
 			stringstream text;
+
+			//////////////////////////////////////////////////////////////////////////
+			// Properties
 
 			// Data source link
 			if( _sscenario.get() && _scenarioDataSource.get() && !_dataSourceLinkId.empty())
@@ -855,6 +720,18 @@ namespace synthese
 						*_enabled ? "activé" : "désactivé"
 					);
 					_sscenario->setIsEnabled(*_enabled);
+				}
+
+				// Enabled
+				if(_enabled)
+				{
+					DBLogModule::appendToLogIfChange(
+						text,
+						"Archive ",
+						_sscenario->getArchived() ? "archivé" : "non archivé",
+						*_enabled ? "archivé" : "non archivé"
+						);
+					_sscenario->setArchived(*_archived);
 				}
 
 				// Start date
@@ -955,41 +832,390 @@ namespace synthese
 			// Save
 			ScenarioTableSync::Save(_scenario.get(), transaction);
 
+			//////////////////////////////////////////////////////////////////////////
 			// Messages
-			if(_creation)
+
+			// Copy from template (for creation)
+			if(_creation && (_source.get() || _template.get()))
 			{
-				if(_source.get())
+				const Scenario& tpl(_template.get() ? *_template : *_source);
+
+				// Calendars copy
+				typedef map<RegistryKeyType, ScenarioCalendar*> CalendarsMapping;
+				CalendarsMapping calendarsMapping;
+				ScenarioCalendarTableSync::SearchResult calendars(
+					ScenarioCalendarTableSync::Search(
+						*_env,
+						tpl.getKey()
+				)	);
+				BOOST_FOREACH(const boost::shared_ptr<ScenarioCalendar> calendar, calendars)
 				{
-					ScenarioTableSync::CopyMessages(
-						_source->getTemplate() ? _source->getTemplate()->getKey() : _source->getKey(),
-						*_scenario,
+					// The calendar
+					boost::shared_ptr<ScenarioCalendar> newCalendar(
+						static_pointer_cast<ScenarioCalendar, ObjectBase>(calendar->copy())
+					);
+					newCalendar->set<Key>(ScenarioCalendarTableSync::getId());
+					newCalendar->set<ScenarioPointer>(*_scenario);
+					_env->getEditableRegistry<ScenarioCalendar>().add(newCalendar);
+					ScenarioCalendarTableSync::Save(newCalendar.get(), transaction);
+					calendarsMapping[calendar->getKey()] = newCalendar.get();
+
+					// The dates (for action C only)
+					if(_source.get() && _sscenario.get())
+					{
+						MessageApplicationPeriodTableSync::SearchResult periods(
+							MessageApplicationPeriodTableSync::Search(
+								*_env,
+								calendar->getKey()
+						)	);
+						BOOST_FOREACH(const boost::shared_ptr<MessageApplicationPeriod>& period, periods)
+						{
+							boost::shared_ptr<MessageApplicationPeriod> newPeriod(
+								static_pointer_cast<MessageApplicationPeriod, ObjectBase>(period->copy())
+							);
+							newPeriod->set<Key>(MessageApplicationPeriodTableSync::getId());
+							newPeriod->set<ScenarioCalendar>(*newCalendar);
+							_env->getEditableRegistry<MessageApplicationPeriod>().add(newPeriod);
+							MessageApplicationPeriodTableSync::Save(newPeriod.get(), transaction);
+						}
+					}
+				}
+
+				// Messages copy
+				AlarmTableSync::SearchResult alarms(
+					AlarmTableSync::Search(*_env, tpl.getKey())
+				);
+				BOOST_FOREACH(const boost::shared_ptr<Alarm>& templateAlarm, alarms)
+				{
+					// Message creation
+					boost::shared_ptr<Alarm> alarm;
+					if(_sscenario.get())
+					{
+						alarm.reset(
+							new SentAlarm(
+								*_sscenario,
+								*templateAlarm
+						)	);
+					}
+					else
+					{
+						alarm.reset(
+							new AlarmTemplate(
+								*_tscenario,
+								*templateAlarm
+						)	);
+					}
+
+					// Calendar
+					if(templateAlarm->getCalendar())
+					{
+						alarm->setCalendar(calendarsMapping[templateAlarm->getCalendar()->getKey()]);
+					}
+					AlarmTableSync::Save(alarm.get(), transaction);
+
+					// Copy of the recipients of the message
+					AlarmObjectLinkTableSync::CopyRecipients(
+						templateAlarm->getKey(),
+						*alarm,
 						transaction
 					);
-				}
-				else if(_template.get())
-				{
-					// The action on the alarms
-					ScenarioTableSync::CopyMessages(
-						_template.get() ? _template->getKey() : _source->getKey(),
-						*_scenario,
+
+					// Copy of the message alternatives
+					MessageAlternativeTableSync::CopyAlternatives(
+						templateAlarm->getKey(),
+						*alarm,
 						transaction
 					);
 				}
 			}
-			if(_messageToCreate && _level && _sscenario.get())
+			// A/B/G/H action, full method
+			if(_messagesAndCalendars)
+			{
+				// Objects to remove if not found
+				Scenario::ScenarioCalendars existingCalendars(_scenario->getCalendars());
+				Scenario::Messages existingMessages(_scenario->getMessages());
+
+				// Loop on calendars
+				BOOST_FOREACH(const ptree::value_type& calendarNode, _messagesAndCalendars->get_child("calendar"))
+				{
+					RegistryKeyType calendarId(calendarNode.second.get("id", RegistryKeyType(0)));
+					boost::shared_ptr<ScenarioCalendar> calendar;
+
+					if(	calendarId &&
+						_env->getRegistry<ScenarioCalendar>().contains(calendarId)
+					){
+						calendar = _env->getEditable<ScenarioCalendar>(calendarId);
+
+						// Check if the calendar is linked to the event
+						Scenario::ScenarioCalendars::iterator it(existingCalendars.find(calendar.get()));
+						if(it == existingCalendars.end())
+						{
+							calendar.reset();
+						}
+						else
+						{
+							existingCalendars.erase(it);
+						}
+					}
+
+					// Calendar was not found, create it
+					if(!calendar.get())
+					{
+						calendar.reset(new ScenarioCalendar);
+						calendar->set<ScenarioPointer>(*_scenario);
+					}
+
+					// Update of the calendar properties
+					calendar->set<Name>(calendarNode.second.get("name", string()));
+
+					// Save
+					ScenarioCalendarTableSync::Save(calendar.get(), transaction);
+
+					// Application periods
+					ScenarioCalendar::ApplicationPeriods existingPeriods(calendar->getApplicationPeriods());
+
+					// Loop on received periods
+					BOOST_FOREACH(const ptree::value_type& periodNode, calendarNode.second.get_child("period"))
+					{
+						RegistryKeyType periodId(periodNode.second.get("id", RegistryKeyType(0)));
+						boost::shared_ptr<MessageApplicationPeriod> period;
+
+						if(	periodId &&
+							_env->getRegistry<MessageApplicationPeriod>().contains(periodId)
+						){
+							period = _env->getEditable<MessageApplicationPeriod>(periodId);
+
+							// Check if the period is linked to the event
+							ScenarioCalendar::ApplicationPeriods::iterator it(existingPeriods.find(period.get()));
+							if(it == existingPeriods.end())
+							{
+								period.reset();
+							}
+							else
+							{
+								existingPeriods.erase(it);
+							}
+						}
+
+						// Period was not found, create it
+						if(!period.get())
+						{
+							period.reset(new MessageApplicationPeriod);
+							period->set<ScenarioCalendar>(*calendar);
+						}
+
+						// Update of the period properties
+						string startDateStr(periodNode.second.get("start_date", string()));
+						period->set<StartTime>(startDateStr.empty() ? ptime(not_a_date_time) : time_from_string(startDateStr));
+						string endDateStr(periodNode.second.get("end_date", string()));
+						period->set<EndTime>(endDateStr.empty() ? ptime(not_a_date_time) : time_from_string(endDateStr));
+						string startHourStr(periodNode.second.get("start_hour", string()));
+						period->set<StartHour>(startHourStr.empty() ? time_duration(not_a_date_time) : duration_from_string(startHourStr));
+						string endHourStr(periodNode.second.get("end_hour", string()));
+						period->set<EndHour>(endHourStr.empty() ? time_duration(not_a_date_time) : duration_from_string(endHourStr));
+
+						// Dates
+						period->clear();
+						BOOST_FOREACH(const ptree::value_type& dateNode, periodNode.second.get_child("date"))
+						{
+							period->setActive(from_string(dateNode.second.data()));
+						}
+
+						// Save
+						MessageApplicationPeriodTableSync::Save(period.get(), transaction);
+					}
+
+					// Removals
+					BOOST_FOREACH(MessageApplicationPeriod* period, existingPeriods)
+					{
+						MessageApplicationPeriodTableSync::Remove(request.getSession().get(), period->getKey(), transaction, false);
+					}
+
+					// Loop on messages
+					BOOST_FOREACH(const ptree::value_type& messageNode, calendarNode.second.get_child("message"))
+					{
+						RegistryKeyType messageId(messageNode.second.get("id", RegistryKeyType(0)));
+						boost::shared_ptr<Alarm> message;
+
+						if(	messageId &&
+							_env->getRegistry<Alarm>().contains(messageId)
+						){
+							message = _env->getEditable<Alarm>(messageId);
+
+							// Check if the period is linked to the event
+							Scenario::Messages::iterator it(existingMessages.find(message.get()));
+							if(it == existingMessages.end())
+							{
+								message.reset();
+							}
+							else
+							{
+								existingMessages.erase(it);
+							}
+						}
+
+						// Period was not found, create it
+						if(!message.get())
+						{
+							if(_sscenario.get())
+							{
+								message.reset(new SentAlarm);
+							}
+							else
+							{
+								message.reset(new AlarmTemplate);
+							}
+							message->setScenario(_scenario.get());
+						}
+
+						// Update of the message properties
+						message->setCalendar(calendar.get());
+						message->setShortMessage(messageNode.second.get("title", string()));
+						message->setLevel(static_cast<AlarmLevel>(messageNode.second.get("level", 0)));
+						message->setLongMessage(messageNode.second.get("content", string()));
+
+						// Save
+						AlarmTableSync::Save(message.get(), transaction);
+
+						// Alternatives
+						Alarm::MessageAlternatives existingAlternatives(message->getMessageAlternatives());
+
+						// Loop on alternatives
+						BOOST_FOREACH(const ptree::value_type& alternativeNode, messageNode.second.get_child("alternative"))
+						{
+							RegistryKeyType alternativeId(alternativeNode.second.get("id", RegistryKeyType(0)));
+							boost::shared_ptr<MessageAlternative> alternative;
+
+							if(	alternativeId &&
+								_env->getRegistry<MessageAlternative>().contains(alternativeId)
+							){
+								alternative = _env->getEditable<MessageAlternative>(alternativeId);
+
+								// Check if the alternative is linked to the event
+								Alarm::MessageAlternatives::iterator it(
+									existingAlternatives.find(
+										&*alternative->get<MessageType>()
+								)	);
+								if(it == existingAlternatives.end())
+								{
+									alternative.reset();
+								}
+								else
+								{
+									existingAlternatives.erase(it);
+								}
+							}
+
+							// Period was not found, create it
+							if(!alternative.get())
+							{
+								alternative.reset(new MessageAlternative);
+								alternative->set<Alarm>(*message);
+							}
+
+							// Properties
+							try
+							{
+								alternative->set<MessageType>(
+									*MessageTypeTableSync::GetEditable(
+										alternativeNode.second.get("type_id", RegistryKeyType(0)),
+										*_env
+								)	);
+							}
+							catch(...)
+							{
+
+							}
+							alternative->set<Content>(alternativeNode.second.get("content", string()));
+
+							// Save
+							MessageAlternativeTableSync::Save(alternative.get(), transaction);
+						}
+
+						// Removals
+						BOOST_FOREACH(const Alarm::MessageAlternatives::value_type& alternative, existingAlternatives)
+						{
+							MessageAlternativeTableSync::Remove(request.getSession().get(), alternative.second->getKey(), transaction, false);
+						}
+
+						// Links
+						BOOST_FOREACH(boost::shared_ptr<AlarmRecipient> linkType, Factory<AlarmRecipient>::GetNewCollection())
+						{
+							// Recipients
+							Alarm::LinkedObjects::mapped_type existingLinks(message->getLinkedObjects(linkType->getFactoryKey()));
+
+							// Loop on recipients
+							BOOST_FOREACH(const ptree::value_type& linkNode, messageNode.second.get_child(linkType->getFactoryKey() + "_recipient"))
+							{
+								RegistryKeyType linkId(linkNode.second.get("id", RegistryKeyType(0)));
+								boost::shared_ptr<AlarmObjectLink> link;
+
+								if(	linkId &&
+									_env->getRegistry<AlarmObjectLink>().contains(linkId)
+								){
+									link = _env->getEditable<AlarmObjectLink>(linkId);
+
+									// Check if the link is linked to the event
+									Alarm::LinkedObjects::mapped_type::iterator it(existingLinks.find(link.get()));
+									if(it == existingLinks.end())
+									{
+										link.reset();
+									}
+									else
+									{
+										existingLinks.erase(it);
+									}
+								}
+
+								// Link was not found, create it
+								if(!link.get())
+								{
+									link.reset(new AlarmObjectLink);
+									link->setAlarm(message.get());
+									link->setRecipient(linkType->getFactoryKey());
+								}
+
+								// Properties
+								link->setObjectId(linkNode.second.get("recipient_id", RegistryKeyType(0)));
+								link->setParameter(linkNode.second.get("parameter", string()));
+
+								// Save
+								AlarmObjectLinkTableSync::Save(link.get(), transaction);
+							}
+
+							// Removals
+							BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
+							{
+								AlarmObjectLinkTableSync::Remove(request.getSession().get(), link->getKey(), transaction, false);
+							}
+						}
+					}
+				}
+
+				// Removals
+				BOOST_FOREACH(ScenarioCalendar* calendar, existingCalendars)
+				{
+					ScenarioCalendarTableSync::Remove(request.getSession().get(), calendar->getKey(), transaction, false);
+				}
+				BOOST_FOREACH(const Alarm* message, existingMessages)
+				{
+					AlarmTableSync::Remove(request.getSession().get(), message->getKey(), transaction, false);
+				}
+			}
+			else if(_messageToCreate && _level) // A/B/G/H action, simplified method
 			{
 				boost::shared_ptr<SentAlarm> message;
 
 				AlarmTableSync::SearchResult msgs(
 					AlarmTableSync::Search(
-						*_env, _sscenario->getKey()
+						*_env, _scenario->getKey()
 				)	);
 				if(msgs.size() == 1)
 				{
 					message = static_pointer_cast<SentAlarm,Alarm>(msgs.front());
 					if(_recipients)
 					{
-						AlarmObjectLinkTableSync::Remove(message->getKey());
+						AlarmObjectLinkTableSync::RemoveByMessage(message->getKey(), optional<RegistryKeyType>(), transaction);
 					}
 				}
 				else
@@ -1025,15 +1251,6 @@ namespace synthese
 			if(_creation && request.getActionWillCreateObject())
 			{
 				request.setActionCreatedId(_scenario->getKey());
-			}
-
-			// Message application periods
-			if(_messageApplicationPeriods)
-			{
-				BOOST_FOREACH(MessageApplicationPeriod* m_a_p, *_messageApplicationPeriods)
-				{
-					MessageApplicationPeriodTableSync::Save(m_a_p);
-				}
 			}
 
 			// Log
@@ -1097,130 +1314,6 @@ namespace synthese
 				AlarmTableSync::Save(_message.get(), transaction);
 			}
 
-			if(_withMessages)
-			{
-				// Removals
-				BOOST_FOREACH(const Alarm* alarm, _scenario->getMessages())
-				{
-					if(_messageIds.find(alarm->getKey()) == _messageIds.end())
-					{
-						AlarmTableSync::Remove(request.getSession().get(), alarm->getKey(), transaction, false);
-					}
-				}
-
-				// Insertions / updates
-				BOOST_FOREACH(const Messages::value_type& msg, _messages)
-				{
-					Env env;
-					boost::shared_ptr<Alarm> alarm;
-
-					if(_sscenario.get())
-					{
-						if(msg.id)
-						{
-							alarm = AlarmTableSync::GetCastEditable<SentAlarm>(msg.id, env);
-						}
-						else
-						{
-							alarm.reset(new SentAlarm);
-						}
-					}
-					else
-					{
-						if(msg.id)
-						{
-							alarm = AlarmTableSync::GetCastEditable<AlarmTemplate>(msg.id, env);
-						}
-						else
-						{
-							alarm.reset(new AlarmTemplate);
-						}
-					}
-					alarm->setScenario(_scenario.get());
-					alarm->setShortMessage(msg.title);
-					alarm->setLongMessage(msg.content);
-					alarm->setLevel(msg.level);
-					AlarmTableSync::Save(alarm.get(), transaction);
-
-					AlarmObjectLinkTableSync::SearchResult v(
-						AlarmObjectLinkTableSync::Search(env, alarm->getKey())
-					);
-					set<RegistryKeyType> toRemove;
-					typedef map<Message::Recipients::value_type, RegistryKeyType> AOLMap;
-					AOLMap m;
-					BOOST_FOREACH(const boost::shared_ptr<AlarmObjectLink>& item, v)
-					{
-						toRemove.insert(item->getKey());
-						m.insert(
-							make_pair(
-								make_pair(
-									item->getRecipient()->getFactoryKey(),
-									make_pair(
-										item->getObjectId(),
-										item->getParameter()
-								)	),
-								item->getKey()
-						)	);
-					}
-
-					// Insertions / updates
-					BOOST_FOREACH(const Message::Recipients::value_type& it, msg.recipients)
-					{
-						// Insertion
-						AOLMap::const_iterator itAOLMap(m.find(it));
-						if(itAOLMap == m.end())
-						{
-							AlarmObjectLink aol;
-							aol.setRecipient(it.first);
-							aol.setObjectId(it.second.first);
-							aol.setParameter(it.second.second);
-							aol.setAlarm(alarm.get());
-							AlarmObjectLinkTableSync::Save(&aol, transaction);
-						}
-						else
-						{
-							toRemove.erase(itAOLMap->second);
-						}
-					}
-
-					// Removals
-					BOOST_FOREACH(RegistryKeyType id, toRemove)
-					{
-						DBTableSyncTemplate<AlarmObjectLinkTableSync>::Remove(request.getSession().get(), id, transaction, false);
-					}
-
-
-					// Alternatives
-					BOOST_FOREACH(const Message::Alternatives::value_type& it, msg.alternatives)
-					{
-						boost::shared_ptr<MessageAlternative> alternative;
-						bool toSave(false);
-						MessageAlternativeTableSync::SearchResult vec(
-							MessageAlternativeTableSync::Search(env, alarm->getKey(), it.first->getKey())
-						);
-						if(vec.empty())
-						{
-							alternative.reset(new MessageAlternative);
-							toSave = true;
-							alternative->set<Alarm>(*alarm);
-							alternative->set<MessageType>(*it.first);
-						}
-						else
-						{
-							alternative = *vec.begin();
-							toSave = (alternative->get<Content>() != it.second);
-						}
-						alternative->set<Content>(it.second);
-
-						if(toSave)
-						{
-							MessageAlternativeTableSync::Save(alternative.get(), transaction);
-						}
-					}
-
-				}
-
-			}
 
 			transaction.run();
 
@@ -1236,7 +1329,8 @@ namespace synthese
 
 
 
-		bool ScenarioSaveAction::isAuthorized(const Session* session
+		bool ScenarioSaveAction::isAuthorized(
+			const Session* session
 		) const {
 			return true;
 //			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);

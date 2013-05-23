@@ -57,6 +57,7 @@ namespace synthese
 		const std::string ScenarioTemplate::TAG_VARIABLE = "variable";
 		const std::string ScenarioTemplate::TAG_MESSAGE = "message";
 		const std::string ScenarioTemplate::TAG_SECTION = "section";
+		const std::string ScenarioTemplate::TAG_CALENDAR = "calendar";
 
 
 
@@ -304,7 +305,7 @@ namespace synthese
 			// variables
 			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, getVariables())
 			{
-				boost::shared_ptr<ParametersMap> variablePM(new ParametersMap);
+				shared_ptr<ParametersMap> variablePM(new ParametersMap);
 				// code
 				variablePM->insert(DATA_CODE, variable.first);
 
@@ -317,18 +318,70 @@ namespace synthese
 				pm.insert(TAG_VARIABLE, variablePM);
 			}
 
-			// Messages
-			BOOST_FOREACH(const Alarm* alarm, getMessages())
+
+			// Calendars
+			bool oneMessageWithoutCalendar(false);
+			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
 			{
-				boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
-				alarm->toParametersMap(*messagePM, false, string(), true);
-				pm.insert(TAG_MESSAGE, messagePM);
+				// Calendar export
+				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				calendar->toParametersMap(*calendarPM);
+				pm.insert(TAG_CALENDAR, calendarPM);
+
+				// Messages loop
+				BOOST_FOREACH(const Alarm* alarm, getMessages())
+				{
+					// Mark message without calendar and avoit it
+					if(!alarm->getCalendar())
+					{
+						oneMessageWithoutCalendar = true;
+						continue;
+					}
+
+					// Jump over messages of other calendars
+					if(alarm->getCalendar() != calendar)
+					{
+						continue;
+					}
+
+					// Message export
+					shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					alarm->toParametersMap(*messagePM, false, string(), true);
+					calendarPM->insert(TAG_MESSAGE, messagePM);
+				}
+			}
+
+			// Fake calendar for old style messages
+			if(	oneMessageWithoutCalendar ||
+				(getCalendars().empty() && !getMessages().empty())
+			){
+				// Fake calendar export
+				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				calendarPM->insert(Key::FIELD.name, 0);
+				calendarPM->insert(Name::FIELD.name, string());
+				calendarPM->insert(ScenarioPointer::FIELD.name, getKey());
+				pm.insert(TAG_CALENDAR, calendarPM);
+
+				// Old style messages loop
+				BOOST_FOREACH(const Alarm* alarm, getMessages())
+				{
+					// Jump over new style messages
+					if(alarm->getCalendar())
+					{
+						continue;
+					}
+
+					// Message export
+					shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					alarm->toParametersMap(*messagePM, false, string(), true);
+					calendarPM->insert(TAG_MESSAGE, messagePM);
+				}
 			}
 
 			// Sections
 			BOOST_FOREACH(const MessagesSection* section, getSections())
 			{
-				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
+				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
 				section->toParametersMap(*sectionPM, true);
 				pm.insert(TAG_SECTION, sectionPM);
 			}

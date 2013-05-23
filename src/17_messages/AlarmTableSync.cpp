@@ -24,6 +24,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTemplate.h"
 #include "DBResult.hpp"
+#include "MessageAlternativeTableSync.hpp"
 #include "MessagesLibraryLog.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
@@ -32,6 +33,7 @@
 #include "MessagesTypes.h"
 #include "Profile.h"
 #include "ReplaceQuery.h"
+#include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioTemplate.h"
 #include "ScenarioTableSync.h"
 #include "SentAlarm.h"
@@ -68,6 +70,7 @@ namespace synthese
 		const string AlarmTableSync::COL_RAW_EDITOR = "raw_editor";
 		const string AlarmTableSync::COL_DONE = "done";
 		const string AlarmTableSync::COL_MESSAGES_SECTION_ID = "messages_section_id";
+		const string AlarmTableSync::COL_CALENDAR_ID = "calendar_id";
 	}
 
 	namespace db
@@ -88,6 +91,7 @@ namespace synthese
 			Field(AlarmTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
 			Field(AlarmTableSync::COL_DONE, SQL_BOOLEAN),
 			Field(AlarmTableSync::COL_MESSAGES_SECTION_ID, SQL_INTEGER),
+			Field(AlarmTableSync::COL_CALENDAR_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -200,6 +204,32 @@ namespace synthese
 				}
 			}
 
+			// Calendar
+			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
+			{
+				RegistryKeyType calendarId(
+					rows->getDefault<RegistryKeyType>(
+						AlarmTableSync::COL_CALENDAR_ID,
+						RegistryKeyType(0)
+				)	);
+				alarm->setCalendar(NULL);
+				if(calendarId)
+				{
+					try
+					{
+						alarm->setCalendar(
+							ScenarioCalendarTableSync::Get(
+								calendarId,
+								env
+							).get()
+						);
+					}
+					catch(ObjectNotFoundException<ScenarioCalendar>&)
+					{
+
+					}
+				}
+			}
 		}
 
 
@@ -228,6 +258,11 @@ namespace synthese
 			query.addField(object->getRawEditor());
 			query.addField(object->getDone());
 			query.addField(object->getSection());
+			query.addField(
+				object->getCalendar() ?
+				object->getCalendar()->getKey() :
+				RegistryKeyType(0)
+			);
 			query.execute(transaction);
 		}
 
@@ -287,7 +322,20 @@ namespace synthese
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
-			AlarmObjectLinkTableSync::Remove(id);
+			Env env;
+
+			// Links
+			AlarmObjectLinkTableSync::RemoveByMessage(id);
+
+			// Message alternatives
+			MessageAlternativeTableSync::SearchResult alternatives(
+				MessageAlternativeTableSync::Search(env, id)
+			);
+			BOOST_FOREACH(const boost::shared_ptr<MessageAlternative>& alternative, alternatives)
+			{
+				MessageAlternativeTableSync::Remove(NULL, alternative->getKey(), transaction, false);
+			}
+
 		}
 
 

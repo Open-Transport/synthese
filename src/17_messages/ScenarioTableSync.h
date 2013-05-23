@@ -80,6 +80,11 @@ namespace synthese
 			static const std::string COL_SECTIONS;
 			static const std::string COL_EVENT_START;
 			static const std::string COL_EVENT_END;
+			static const std::string COL_ARCHIVED;
+
+			static const std::string VARIABLES_SEPARATOR;
+			static const std::string VARIABLES_OPERATOR;
+			static const std::string SECTIONS_SEPARATOR;
 
 			ScenarioTableSync() {}
 			~ScenarioTableSync() {}

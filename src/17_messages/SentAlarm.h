@@ -43,12 +43,9 @@ namespace synthese
 			public Alarm
 		{
 		public:
-			static const std::string TAG_APPLICATION_PERIOD;
 
 		private:
 			const AlarmTemplate*	_template;
-
-			mutable MessageApplicationPeriod::ApplicationPeriods _applicationPeriods;
 
 			typedef std::map<
 				std::pair<
@@ -117,13 +114,11 @@ namespace synthese
 			//@{
 				const AlarmTemplate*	getTemplate()		const;
 				const SentScenario*		getScenario()		const;
-				const MessageApplicationPeriod::ApplicationPeriods& getApplicationPeriods() const { return _applicationPeriods; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void					setTemplate(const AlarmTemplate* value);
-				void setApplicationPeriods(const MessageApplicationPeriod::ApplicationPeriods& value) const { _applicationPeriods = value; }
 			//@}
 
 			virtual void toParametersMap(

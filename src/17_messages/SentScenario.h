@@ -48,7 +48,7 @@ namespace synthese
 			public Scenario
 		{
 		public:
-			static const std::string TAG_APPLICATION_PERIOD;
+			static const std::string DATA_ID;
 			static const std::string DATA_NAME;
 			static const std::string DATA_EVENT_START_DATE;
 			static const std::string DATA_EVENT_END_DATE;
@@ -64,6 +64,7 @@ namespace synthese
 			static const std::string TAG_MESSAGE;
 			static const std::string TAG_TEMPLATE_SCENARIO;
 			static const std::string TAG_SECTION;
+			static const std::string TAG_CALENDAR;
 
 
 			////////////////////////////////////////////////////////////////////
@@ -79,8 +80,8 @@ namespace synthese
 			boost::posix_time::ptime _periodEnd;   //!< Alarm applicability period end
 			const ScenarioTemplate*	_template;
 			VariablesMap _variables;
+			bool _archived;
 
-			mutable MessageApplicationPeriod::ApplicationPeriods _applicationPeriods;
 
 		public:
 			/** Basic constructor
@@ -108,35 +109,41 @@ namespace synthese
 
 			~SentScenario();
 
-			const boost::posix_time::ptime&	getEventStart() const { return _eventStart; }
-			const boost::posix_time::ptime&	getEventEnd() const { return _eventEnd; }
-			const boost::posix_time::ptime&	getPeriodStart() const { return _periodStart; }
-			const boost::posix_time::ptime&	getPeriodEnd() const { return _periodEnd; }
-			bool getIsEnabled()	const { return _isEnabled; }
-			const ScenarioTemplate*	getTemplate() const { return _template; }
-			const VariablesMap&	getVariables() const { return _variables; }
-			const MessageApplicationPeriod::ApplicationPeriods& getApplicationPeriods() const { return _applicationPeriods; }
+			/// @name Getters
+			//@{
+				const boost::posix_time::ptime&	getEventStart() const { return _eventStart; }
+				const boost::posix_time::ptime&	getEventEnd() const { return _eventEnd; }
+				const boost::posix_time::ptime&	getPeriodStart() const { return _periodStart; }
+				const boost::posix_time::ptime&	getPeriodEnd() const { return _periodEnd; }
+				bool getIsEnabled()	const { return _isEnabled; }
+				bool getArchived() const { return _archived; }
+				const ScenarioTemplate*	getTemplate() const { return _template; }
+				const VariablesMap&	getVariables() const { return _variables; }
+			//@}
 
-			////////////////////////////////////////////////////////////////////
-			/// Start broadcast date setter.
-			///	Updates the alarms too.
-			///	@param periodStart Start broadcast date
-			void setPeriodStart ( const boost::posix_time::ptime& periodStart);
+			/// @name Setters
+			//@{
+				////////////////////////////////////////////////////////////////////
+				/// Start broadcast date setter.
+				///	Updates the alarms too.
+				///	@param periodStart Start broadcast date
+				void setPeriodStart ( const boost::posix_time::ptime& periodStart);
 
-			void setEventStart ( const boost::posix_time::ptime& value){ _eventStart = value; }
+				void setEventStart ( const boost::posix_time::ptime& value){ _eventStart = value; }
 
-			////////////////////////////////////////////////////////////////////
-			/// End broadcast date setter.
-			///	Updates the alarms too.
-			///	@param periodEnd End broadcast date
-			void setPeriodEnd ( const boost::posix_time::ptime& periodEnd);
 
-			void setEventEnd ( const boost::posix_time::ptime& value){ _eventEnd = value; }
-			void setIsEnabled(bool value){ _isEnabled = value; }
-			void setTemplate(const ScenarioTemplate* value);
-			void setVariables(const VariablesMap& value);
-			void setApplicationPeriods(const MessageApplicationPeriod::ApplicationPeriods& value) const { _applicationPeriods = value; }
+				////////////////////////////////////////////////////////////////////
+				/// End broadcast date setter.
+				///	Updates the alarms too.
+				///	@param periodEnd End broadcast date
+				void setPeriodEnd ( const boost::posix_time::ptime& periodEnd);
 
+				void setEventEnd ( const boost::posix_time::ptime& value){ _eventEnd = value; }
+				void setIsEnabled(bool value){ _isEnabled = value; }
+				void setTemplate(const ScenarioTemplate* value);
+				void setVariables(const VariablesMap& value);
+				void setArchived(bool value){ _archived = value; }
+			//@}
 
 
 			/** Applicability test.
@@ -159,7 +166,6 @@ namespace synthese
 				util::ParametersMap& pm
 			) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_SentScenario_h__

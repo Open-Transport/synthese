@@ -94,6 +94,10 @@ NewMessageAction.cpp
 NewMessageAction.h
 Scenario.cpp
 Scenario.h
+ScenarioCalendar.cpp
+ScenarioCalendar.hpp
+ScenarioCalendarTableSync.cpp
+ScenarioCalendarTableSync.hpp
 ScenarioDisplayFunction.cpp
 ScenarioDisplayFunction.hpp
 ScenarioFolder.cpp

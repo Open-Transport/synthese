@@ -41,10 +41,6 @@ namespace synthese
 
 	namespace messages
 	{
-		const string SentAlarm::TAG_APPLICATION_PERIOD = "application_period";
-
-
-
 		SentAlarm::SentAlarm(
 			util::RegistryKeyType key ,
 			const SentScenario* scenario /*= NULL */
@@ -59,7 +55,7 @@ namespace synthese
 			const SentScenario& scenario,
 			const AlarmTemplate& source
 		):	Registrable(0),
-			Alarm(source, &scenario),
+			Alarm(source, &scenario, NULL),
 			_template(&source)
 		{}
 
@@ -69,7 +65,7 @@ namespace synthese
 			const SentScenario& scenario,
 			const SentAlarm& source
 		):	Registrable(0),
-			Alarm(source, &scenario),
+			Alarm(source, &scenario, NULL),
 			_template(source._template)
 		{}
 
@@ -79,7 +75,7 @@ namespace synthese
 			const SentScenario& scenario,
 			const Alarm& source
 		):	Registrable(0),
-			Alarm(source, &scenario),
+			Alarm(source, &scenario, NULL),
 			_template(
 				dynamic_cast<const AlarmTemplate*>(&source) ?
 				static_cast<const AlarmTemplate*>(&source) :
@@ -118,13 +114,6 @@ namespace synthese
 		void SentAlarm::toParametersMap( util::ParametersMap& pm, bool withScenario, std::string prefix /*= std::string()*/, bool withRecipients /*= false */ ) const
 		{
 			Alarm::toParametersMap(pm, withScenario, prefix, withRecipients);
-
-			BOOST_FOREACH(const MessageApplicationPeriod::ApplicationPeriods::value_type& it, _applicationPeriods)
-			{
-				boost::shared_ptr<ParametersMap> apPM(new ParametersMap);
-				it->toParametersMap(*apPM);
-				pm.insert(TAG_APPLICATION_PERIOD, apPM);
-			}
 		}
 
 
@@ -143,12 +132,12 @@ namespace synthese
 			}
 
 			// Then check if specific application periods are defined for the current message
-			if(!_applicationPeriods.empty())
+			if(_calendar)
 			{
 				// Search for an application period including the checked date
 				BOOST_FOREACH(
-					const MessageApplicationPeriod::ApplicationPeriods::value_type& period,
-					_applicationPeriods
+					const ScenarioCalendar::ApplicationPeriods::value_type& period,
+					_calendar->getApplicationPeriods()
 				){
 					if(period->getValue(when))
 					{
@@ -159,29 +148,13 @@ namespace synthese
 				// No period was found : the message is inactive
 				return false;
 			}
-
-			// Then check if application periods are defined for the event
-			if(!getScenario()->getApplicationPeriods().empty())
+			else
 			{
-				// Search for an application period including the checked date
-				BOOST_FOREACH(
-					const MessageApplicationPeriod::ApplicationPeriods::value_type& period,
-					getScenario()->getApplicationPeriods()
-				){
-					if(period->getValue(when))
-					{
-						return true;
-					}
-				}
-
-				// No period was found : the message is inactive
-				return false;
+				// Then refer to the simple start/end date of the scenario
+				return
+					getScenario()->getPeriodStart() <= when &&
+					getScenario()->getPeriodEnd() >= when;
 			}
-
-			// Then refer to the simple start/end date of the scenario
-			return
-				getScenario()->getPeriodStart() <= when &&
-				getScenario()->getPeriodEnd() >= when;
 		}
 
 

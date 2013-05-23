@@ -57,7 +57,7 @@ namespace synthese
 			const ScenarioTemplate& scenario,
 			const Alarm& source
 		):	Registrable(0),
-			Alarm(source, &scenario)
+			Alarm(source, &scenario, NULL)
 		{}
 
 

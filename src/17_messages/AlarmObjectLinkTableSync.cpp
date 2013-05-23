@@ -251,9 +251,10 @@ namespace synthese
 
 	namespace messages
 	{
-		void AlarmObjectLinkTableSync::Remove(
+		void AlarmObjectLinkTableSync::RemoveByMessage(
 			RegistryKeyType alarmId,
-			optional<RegistryKeyType> objectId
+			optional<RegistryKeyType> objectId,
+			optional<DBTransaction&> transaction
 		){
 			DeleteQuery<AlarmObjectLinkTableSync> query;
 			query.addWhereField(COL_ALARM_ID, alarmId);
@@ -261,7 +262,7 @@ namespace synthese
 			{
 				query.addWhereField(COL_OBJECT_ID, *objectId);
 			}
-			query.execute();
+			query.execute(transaction);
 		}
 
 
@@ -319,5 +320,4 @@ namespace synthese
 			query.addWhereField(COL_OBJECT_ID, objectId);
 			query.execute(transaction);
 		}
-	}
-}
+}	}
