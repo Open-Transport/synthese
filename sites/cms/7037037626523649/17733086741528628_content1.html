@@ -1,0 +1,72 @@
+<@site_id=<?object&roid=<@roid@>&template=<@id@>?>@>
+<?if&cond=<@site_id==roid@>&then=
+<@site_name=<?object&roid=<@roid@>&template=<@name@>?>@>
+<html>
+<head>
+<link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="/cms/css/main.css" rel="stylesheet" media="screen">
+<title><@site_name@> - SYNTHESE CMS</title>
+</head>
+<body>
+<div class="navbar navbar-inverse">
+ <div class="navbar-inner">
+  <a class="brand" href="#" class="active"><@site_name@> - SYNTHESE CMS</a>
+  <ul class="nav">
+   <li><a href="#">Configuration locale</a></li>
+  </ul>
+   <ul class="nav pull-right">
+    <li class="dropdown">
+     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      Ouvrir un site
+      <b class="caret"></b>
+     </a>
+     <ul class="dropdown-menu">
+      <li><a href="#">Terminus</a></li>
+      <li><a href="#">Admin</a></li>
+     </ul>
+    </li>
+   </ul>
+ </div>
+</div>
+<div id="menu">
+ <div id="menu_title">
+  <ul class="nav nav-pills">
+   <li class="active" files="1">
+    <a href="#">Fichiers</a>
+   </li>
+   <li file_type="js" class="hide"><a href="#">Javascript</a></li>
+  </ul>
+ </div>
+ <div id="menu_content">
+  <div id="menu_files">
+   <ul class="nav nav-list">
+    <?menu&
+      root=<@site_id@>&
+      raw_data=1&
+      min_depth=0&
+      max_depth=9999&
+      template=
+     	<{page&
+    	  recursive=1&
+    	  template=
+	    	<li class="tree_<@depth@>" file_id="<@id@>" file_type="<@mime_type@>"><a href="#"><@title@></a></li>
+	    	<@recursive_content@>
+	}>
+    ?>
+   </ul>
+  </div><div id="menu_js" class="hide">
+   <ul class="nav nav-list">
+   </ul>
+  </div>
+ </div>
+</div>
+<div id="main">
+ <textarea id="editor"></textarea>
+</div>
+<script src="/lib/jquery/jquery-1.7.1.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="/lib/edit_area/edit_area_full.js"></script>
+<script src="/cms/js/main.js"></script>
+</body>
+</html>
+?>
