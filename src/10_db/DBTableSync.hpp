@@ -190,6 +190,16 @@ namespace synthese
 
 
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if a field exists in the table.
+				/// @param fieldName the name of the field to check
+				/// @return true if the field exists in the table
+				/// @date 2013
+				/// @author Hugues Romain
+				bool hasField(const std::string& fieldName) const;
+
+
+
 				////////////////////////////////////////////////////////////////////
 				///	Auto increment initializer.
 				///	@author Hugues Romain

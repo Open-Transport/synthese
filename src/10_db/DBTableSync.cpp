@@ -57,6 +57,20 @@ namespace synthese
 
 
 
+		bool DBTableSync::hasField( const std::string& fieldName ) const
+		{
+			BOOST_FOREACH(const FieldsList::value_type& field, getFieldsList())
+			{
+				if(field.name == fieldName)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+
 
 		DBTableSync::Index::Index(
 			const char* first,
