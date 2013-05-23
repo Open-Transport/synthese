@@ -9,6 +9,8 @@ Calendar.cpp
 Calendar.h
 CalendarDateInterfacePage.cpp
 CalendarDateInterfacePage.hpp
+CalendarField.cpp
+CalendarField.hpp
 CalendarFileFormat.cpp
 CalendarFileFormat.hpp
 CalendarLink.cpp
