@@ -118,13 +118,21 @@ namespace synthese
 			_rootId = map.getOptional<RegistryKeyType>(PARAMETER_ROOT_ID);
 			if(_rootId)
 			{
-				if(*_rootId > 0) try
+				if(decodeTableId(*_rootId) == Webpage::CLASS_NUMBER) try
 				{
 					_root = Env::GetOfficialEnv().get<Webpage>(*_rootId);
 				}
 				catch (ObjectNotFoundException<Webpage>&)
 				{
 					throw RequestException("No such root page");
+				}
+				else if(decodeTableId(*_rootId) == Website::CLASS_NUMBER) try
+				{
+					_rootSite = Env::GetOfficialEnv().get<Website>(*_rootId);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such root site");
 				}
 			}
 
@@ -223,16 +231,40 @@ namespace synthese
 
 			// Content
 			ParametersMap pm;
-			_getMenuContentRecursive(
-				stream,
-				request,
-				rootPage,
-				0,
-				currentPage,
-				0,
-				true,
-				pm
-			);
+			if(_root.get())
+			{
+				_getMenuContentRecursive(
+					stream,
+					request,
+					rootPage,
+					0,
+					currentPage,
+					0,
+					true,
+					pm
+				);
+			}
+			else if(_rootSite.get())
+			{
+				BOOST_FOREACH(const Website::ChildrenType::value_type& it, _rootSite->getChildren())
+				{
+					shared_ptr<ParametersMap> pagePM(new ParametersMap);
+					_getMenuContentRecursive(
+						stream,
+						request,
+						it.second,
+						0,
+						currentPage,
+						0,
+						true,
+						*pagePM
+					);
+					if(!pagePM->getMap().empty())
+					{
+						pm.insert(TAG_PAGE, pagePM);
+					}
+				}
+			}
 
 			// RSS footer
 			if(!_itemPage.get() && _outputFormat == VALUE_RSS)
