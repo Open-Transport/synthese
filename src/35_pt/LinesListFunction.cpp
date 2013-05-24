@@ -30,6 +30,7 @@
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "CustomBroadcastPoint.hpp"
+#include "Destination.hpp"
 #include "GetMessagesFunction.hpp"
 #include "ImportableTableSync.hpp"
 #include "JourneyPattern.hpp"
@@ -118,10 +119,14 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_RUNS_SOON_FILTER = "runs_soon_filter";
 		const string LinesListFunction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER = "display_duration_before_first_departure_filter";
 		const string LinesListFunction::PARAMETER_BROADCAST_POINT_ID = "broadcast_point_id";
+		const string LinesListFunction::PARAMETER_WITH_DIRECTIONS = "with_directions";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
 		const string LinesListFunction::TAG_LINE = "line";
+		const string LinesListFunction::TAG_FORWARD_DIRECTION = "forward_direction";
+		const string LinesListFunction::TAG_BACKWARD_DIRECTION = "backward_direction";
+		const string LinesListFunction::ATTR_DIRECTION = "direction";
 		const string LinesListFunction::DATA_LINES("lines");
 		const string LinesListFunction::DATA_STOP_AREAS("stopAreas");
 		const string LinesListFunction::DATA_STOP_AREA("stopArea");
@@ -174,6 +179,9 @@ namespace synthese
 
 			// Output terminuses
 			result.insert(PARAMETER_OUTPUT_TERMINUSES, _outputTerminuses);
+
+			// With directions
+			result.insert(PARAMETER_WITH_DIRECTIONS, _withDirections);
 
 			// Output messages
 			if(_broadcastPoint)
@@ -338,6 +346,9 @@ namespace synthese
 					throw RequestException("No such broadcast point");
 				}
 			}
+
+			// With directions
+			_withDirections = map.getDefault<bool>(PARAMETER_WITH_DIRECTIONS, false);
 
 			// Output
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
@@ -790,17 +801,14 @@ namespace synthese
 					set<RollingStock *> rollingStocks;
 					BOOST_FOREACH(Path* path, line->getPaths())
 					{
-						if(!dynamic_cast<const JourneyPattern*>(path))
+						const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(path));
+						if(!jp || !jp->getRollingStock())
 						{
 							continue;
 						}
 
-						if(	!static_cast<const JourneyPattern*>(path)->getRollingStock()
-						){
-							continue;
-						}
 						rollingStocks.insert(
-							static_cast<const JourneyPattern*>(path)->getRollingStock()
+							jp->getRollingStock()
 						);
 					}
 					BOOST_FOREACH(RollingStock * rs, rollingStocks)
@@ -808,6 +816,47 @@ namespace synthese
 						boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
 						rs->toParametersMap(*rsPM);
 						linePM->insert(DATA_TRANSPORT_MODE, rsPM);
+					}
+
+					// Directions
+					if(_withDirections)
+					{
+						// Loop on wayback
+						for(size_t wayback(0); wayback!=2; ++wayback)
+						{
+							set<string> directions;
+
+							BOOST_FOREACH(Path* path, line->getPaths())
+							{
+								const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(path));
+								if(!jp || !jp->getMain() || jp->getWayBack() != (wayback == 1))
+								{
+									continue;
+								}
+
+								string direction;
+								if(jp->getDirectionObj())
+								{
+									direction = jp->getDirectionObj()->getDisplayedText();
+								}
+								else if(!jp->getDirection().empty())
+								{
+									direction = jp->getDirection();
+								}
+								else if(dynamic_cast<const NamedPlace*>(jp->getDestination()->getHub()))
+								{
+									direction = dynamic_cast<const NamedPlace*>(jp->getDestination()->getHub())->getFullName();
+								}
+								directions.insert(direction);
+							}
+
+							BOOST_FOREACH(const string& direction, directions)
+							{
+								boost::shared_ptr<ParametersMap> directionPM(new ParametersMap);
+								directionPM->insert(ATTR_DIRECTION, direction);
+								linePM->insert(wayback ? TAG_BACKWARD_DIRECTION : TAG_FORWARD_DIRECTION, directionPM);
+							}
+						}
 					}
 
 					if(_outputStops || _outputTerminuses)
@@ -1033,7 +1082,7 @@ namespace synthese
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false),
 			_ignoreLineShortName(false),
-			_outputMessages(false),
+			_withDirections(false),
 			_lettersBeforeNumbers(true),
 			_displayDurationBeforeFirstDepartureFilter(false),
 			_broadcastPoint(NULL)
