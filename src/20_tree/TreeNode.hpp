@@ -62,7 +62,7 @@ namespace synthese
 			typedef RootPolicy_ RootPolicy;
 			typedef TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_> TreeNodeType;
 
-			typedef std::map<typename OrderingPolicy::OrderingKeyType, ObjectType*> ChildrenType;
+			typedef std::multimap<typename OrderingPolicy::OrderingKeyType, ObjectType*> ChildrenType;
 
 		private:
 			//! @name Tree node informations
