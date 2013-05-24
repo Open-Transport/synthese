@@ -117,6 +117,7 @@ namespace synthese
 
 		void InterSYNTHESESlave::queue( InterSYNTHESEQueue& obj ) const
 		{
+			recursive_mutex::scoped_lock lock(_queueMutex);
 			_queue.insert(make_pair(obj.get<Key>(), &obj));
 		}
 
@@ -124,6 +125,7 @@ namespace synthese
 
 		void InterSYNTHESESlave::removeFromQueue( util::RegistryKeyType id ) const
 		{
+			recursive_mutex::scoped_lock lock(_queueMutex);
 			_queue.erase(id);
 		}
 
@@ -153,14 +155,18 @@ namespace synthese
 				throw Exception("Invalid slave configuration");
 			}
 
-			mutex::scoped_lock lock(_queueMutex);
 			if(isObsolete() || get<InterSYNTHESEConfig>()->get<ForceDump>())
 			{
 				// Clean the obsolete queue items
 				DBTransaction deleteTransaction;
-				BOOST_FOREACH(const Queue::value_type& it, _queue)
 				{
-					DBModule::GetDB()->deleteStmt(it.first, deleteTransaction);
+					// Do no run transation with the lock or we will deadlock if
+					// a transaction triggers a real time update
+					recursive_mutex::scoped_lock lock(_queueMutex);
+					BOOST_FOREACH(const Queue::value_type& it, _queue)
+					{
+						DBModule::GetDB()->deleteStmt(it.first, deleteTransaction);
+					}
 				}
 				deleteTransaction.run();
 
@@ -206,16 +212,20 @@ namespace synthese
 		void InterSYNTHESESlave::clearLastSentRange() const
 		{
 			DBTransaction transaction;
+			{
+				// Do no run transation with the lock or we will deadlock if
+				// a transaction triggers a real time update
+				recursive_mutex::scoped_lock lock(_queueMutex);
 
-			for(Queue::iterator it(_lastSentRange.first);
-				it != _queue.end();
-				++it
-			){
-				DBModule::GetDB()->deleteStmt(it->first, transaction);
+				for(Queue::iterator it(_lastSentRange.first);
+					it != _queue.end();
+					++it
+					){
+					DBModule::GetDB()->deleteStmt(it->first, transaction);
+				}
+
+				_lastSentRange = make_pair(_queue.end(), _queue.end());
 			}
-
-			_lastSentRange = make_pair(_queue.end(), _queue.end());
-
 			transaction.run();
 		}
 }	}
