@@ -41,7 +41,7 @@ namespace synthese
 		public:
 			typedef ChildType_ ChildType;
 			typedef OrderingPolicy_<ChildType_> OrderingPolicy;
-			typedef std::map<typename OrderingPolicy::OrderingKeyType, ChildType*> ChildrenType;
+			typedef std::multimap<typename OrderingPolicy::OrderingKeyType, ChildType*> ChildrenType;
 
 		private:
 			ChildrenType _children;
