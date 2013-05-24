@@ -23,8 +23,10 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA	02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "RequestException.h"
 #include "StopAreasListFunction.hpp"
+
+#include "Destination.hpp"
+#include "RequestException.h"
 #include "StopAreaTableSync.hpp"
 #include "TransportNetwork.h"
 #include "CommercialLine.h"
@@ -78,7 +80,10 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_TERMINUS_ID = "terminus_id";
 		const string StopAreasListFunction::PARAMETER_OUTPUT_STOPS = "output_stops";
 		const string StopAreasListFunction::PARAMETER_GROUP_BY_CITIES = "group_by_cities";
+		const string StopAreasListFunction::PARAMETER_STOPS_DIRECTIONS = "stops_directions";
 
+
+		const string StopAreasListFunction::TAG_DIRECTION = "direction";
 		const string StopAreasListFunction::TAG_CITY = "city";
 		const string StopAreasListFunction::TAG_STOP = "stop";
 		const string StopAreasListFunction::DATA_LINE = "line";
@@ -254,6 +259,9 @@ namespace synthese
 			{
 				_terminusId = map.getOptional<RegistryKeyType>(PARAMETER_TERMINUS_ID);
 			}
+
+			// Stops directions
+			_stopsDirections = map.getDefault<size_t>(PARAMETER_STOPS_DIRECTIONS, 0);
 		}
 
 
@@ -262,7 +270,8 @@ namespace synthese
 			_coordinatesSystem(NULL),
 			_outputLines(true),
 			_outputStops(false),
-			_groupByCities(false)
+			_groupByCities(false),
+			_stopsDirections(0)
 		{}
 
 
@@ -416,8 +425,54 @@ namespace synthese
 				{
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, it->getPhysicalStops())
 					{
+						const StopPoint& stop(*itStop.second);
+
 						boost::shared_ptr<ParametersMap> sPm(new ParametersMap);
-						itStop.second->toParametersMap(*sPm);
+						stop.toParametersMap(*sPm);
+
+						// Stops directions
+						if(_stopsDirections)
+						{
+							set<string> directions;
+							size_t directionsNumber(0);
+							BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, stop.getDepartureEdges())
+							{
+								const Path* path(itEdge.first);
+								const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(path));
+								if(!jp || !jp->getMain())
+								{
+									continue;
+								}
+								string direction;
+								if(jp->getDirectionObj())
+								{
+									direction = jp->getDirectionObj()->getDisplayedText();
+								}
+								else if(!jp->getDirection().empty())
+								{
+									direction = jp->getDirection();
+								}
+								else if(dynamic_cast<const NamedPlace*>(jp->getDestination()->getHub()))
+								{
+									direction = dynamic_cast<const NamedPlace*>(jp->getDestination()->getHub())->getFullName();
+								}
+								if(directions.find(direction) == directions.end())
+								{
+									directions.insert(direction);
+									++directionsNumber;
+									if(directionsNumber == _stopsDirections)
+									{
+										break;
+									}
+								}
+							}
+							BOOST_FOREACH(const string& direction, directions)
+							{
+								boost::shared_ptr<ParametersMap> directionPM(new ParametersMap);
+								directionPM->insert(TAG_DIRECTION, direction);
+								sPm->insert(TAG_DIRECTION, directionPM);
+							}
+						}
 						stopPm->insert(TAG_STOP, sPm);
 					}
 				}
@@ -528,6 +583,8 @@ namespace synthese
 		) const {
 			return true;
 		}
+
+
 
 		std::string StopAreasListFunction::getOutputMimeType() const
 		{
