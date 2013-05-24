@@ -31,7 +31,7 @@
 #include "StringField.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/thread/mutex.hpp>
+#include "boost/thread/recursive_mutex.hpp"
 
 namespace synthese
 {
@@ -87,7 +87,7 @@ namespace synthese
 		private:
 			mutable Queue _queue;
 			mutable QueueRange _lastSentRange;
-			mutable boost::mutex _queueMutex;
+			mutable boost::recursive_mutex _queueMutex;
 		
 		public:
 			InterSYNTHESESlave(util::RegistryKeyType id = 0);
