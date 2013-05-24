@@ -231,20 +231,7 @@ namespace synthese
 
 			// Content
 			ParametersMap pm;
-			if(_root.get())
-			{
-				_getMenuContentRecursive(
-					stream,
-					request,
-					rootPage,
-					0,
-					currentPage,
-					0,
-					true,
-					pm
-				);
-			}
-			else if(_rootSite.get())
+			if(_rootSite.get())
 			{
 				BOOST_FOREACH(const Website::ChildrenType::value_type& it, _rootSite->getChildren())
 				{
@@ -264,6 +251,19 @@ namespace synthese
 						pm.insert(TAG_PAGE, pagePM);
 					}
 				}
+			}
+			else
+			{
+				_getMenuContentRecursive(
+					stream,
+					request,
+					rootPage,
+					0,
+					currentPage,
+					0,
+					true,
+					pm
+				);
 			}
 
 			// RSS footer
