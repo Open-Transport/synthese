@@ -350,8 +350,10 @@ namespace synthese
 					rep.headers.insert(make_pair("Cache-Control", "public, max-age="+
 												 lexical_cast<string>(request.getFunction()->getMaxAge().total_seconds())));
 				}
-
-				_SetCookieHeaders(rep, request.getCookiesMap());
+				else
+				{
+					_SetCookieHeaders(rep, request.getCookiesMap());
+				}
 
 				if(_httpTracePath)
 				{
