@@ -29,6 +29,7 @@
 #include "AndFunction.hpp"
 #include "WebPageLinksFunction.hpp"
 #include "WebPagePositionFunction.hpp"
+#include "WebsitesService.hpp"
 #include "ServiceAPIListService.hpp"
 #include "StrFillFunction.hpp"
 #include "StrLenFunction.hpp"
@@ -109,6 +110,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::ChrFunction::integrate();
 	synthese::cms::RowsListFunction::integrate();
 	synthese::cms::MailService::integrate();
+	synthese::cms::WebsitesService::integrate();
 
 	synthese::cms::WebPageAddAction::integrate();
 	synthese::cms::WebpageContentUploadAction::integrate();
