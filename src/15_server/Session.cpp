@@ -50,6 +50,7 @@ namespace synthese
 		const string Session::ATTR_LAST_USE = "last_use";
 
 		Session::SessionMap	Session::_sessionMap;
+		boost::mutex Session::_sessionMapMutex;
 
 		const size_t Session::KEY_LENGTH = 20;
 		const string Session::COOKIE_SESSIONID = "sid";
@@ -129,9 +130,9 @@ namespace synthese
 			const string& ip,
 			string key
 		){
-			mutex::scoped_lock(_sessionMapMutex);
+			mutex::scoped_lock session_lock(_sessionMapMutex);
 			shared_ptr<Session> session(new Session(ip, key));
-			mutex::scoped_lock(session->_requestsListMutex);
+			mutex::scoped_lock request_lock(session->_requestsListMutex);
 			_sessionMap.insert(make_pair(session->_key, session));
 			return session;
 		}
@@ -141,7 +142,7 @@ namespace synthese
 		// @return true if the session was found and removed
 		bool Session::_removeSessionFromMap()
 		{
-			mutex::scoped_lock(_sessionMapMutex);
+			mutex::scoped_lock lock(_sessionMapMutex);
 			SessionMap::iterator it(_sessionMap.find(_key));
 			if(it != _sessionMap.end())
 			{
@@ -165,7 +166,7 @@ namespace synthese
 		){
 			shared_ptr<Session> session;
 			{
-				mutex::scoped_lock(_sessionMapMutex);
+				mutex::scoped_lock lock(_sessionMapMutex);
 				SessionMap::iterator it(_sessionMap.find(key));
 				if(it != _sessionMap.end())
 				{
