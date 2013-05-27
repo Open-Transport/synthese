@@ -222,6 +222,11 @@ namespace synthese
 					++it
 					){
 					DBModule::GetDB()->deleteStmt(it->first, transaction);
+					// Exit on last item
+					if(it == _lastSentRange.second)
+					{
+						break;
+					}
 				}
 
 				_lastSentRange = make_pair(_queue.end(), _queue.end());
