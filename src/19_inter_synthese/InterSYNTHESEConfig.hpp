@@ -31,7 +31,7 @@
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace synthese
 {
@@ -73,7 +73,7 @@ namespace synthese
 			typedef std::set<InterSYNTHESESlave*> Slaves;
 
 		private:
-			boost::mutex _configMutex;
+			mutable boost::recursive_mutex _configMutex;
 			Items _items;
 			Slaves _slaves;
 		
@@ -84,7 +84,7 @@ namespace synthese
 			//@{
 				const Items getItems() const
 				{
-					boost::mutex::scoped_lock(_configMutex);
+					boost::recursive_mutex::scoped_lock lock(_configMutex);
 					return _items;
 				}
 				const Slaves getSlaves() const
@@ -117,22 +117,22 @@ namespace synthese
 			//@{
 				void insertItem(InterSYNTHESEConfigItem* value)
 				{
-					boost::mutex::scoped_lock(_configMutex);
+					boost::recursive_mutex::scoped_lock lock(_configMutex);
 					_items.insert(value);
 				}
 				void insertSlave(InterSYNTHESESlave* value)
 				{
-					boost::mutex::scoped_lock(_configMutex);
+					boost::recursive_mutex::scoped_lock lock(_configMutex);
 					_slaves.insert(value);
 				}
 				void eraseItem(InterSYNTHESEConfigItem* value)
 				{
-					boost::mutex::scoped_lock(_configMutex);
+					boost::recursive_mutex::scoped_lock lock(_configMutex);
 					_items.erase(value);
 				}
 				void eraseSlave(InterSYNTHESESlave* value)
 				{
-					boost::mutex::scoped_lock(_configMutex);
+					boost::recursive_mutex::scoped_lock lock(_configMutex);
 					_slaves.erase(value);
 				}
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
