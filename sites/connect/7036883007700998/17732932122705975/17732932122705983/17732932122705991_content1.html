@@ -33,10 +33,10 @@
 	  <td><input type="text" value="<@name@>" name="actionParam_field_name" /></td>
 	 </tr><tr>
 	  <td>Adresse</td>
-	  <td><input type="text" value="<@address@>" name="actionParam_field_address" /></td>
+	  <td><input type="text" value="<@reply_address@>" name="actionParam_field_address" /></td>
 	 </tr><tr>
 	  <td>Port</td>
-	  <td><input type="text" value="<@port@>" name="actionParam_field_port" /></td>
+	  <td><input type="text" value="<@reply_port@>" name="actionParam_field_port" /></td>
 	 </tr><tr>
 	  <td>Code du serveur</td>
 	  <td><input type="text" value="<@server_control_centre_code@>" name="actionParam_field_server_control_centre_code" /></td>
@@ -52,7 +52,7 @@
 	   <select name="actionParam_field_data_source_id">
 	    <option<@(0==data_source_id)?" selected=\"true\"":""@>>(aucune)</option>
 	    <?data_sources&template=<{data_source&template=
-	    	<option<@(id==data_source_id)?" selected=\"true\"":""@>><@name@></option>
+	    	<option<@(id==data_source_id)?" selected=\"true\"":""@> value="<@id@>"><@name@></option>
 	    }>?>
 	   </select>
 	  </td>
