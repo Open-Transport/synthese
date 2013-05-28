@@ -326,6 +326,7 @@ label.checkbox { display:inline-block !important; }
 		  <div>
 		   <@direction=<{forward_direction&template=<@direction@> }>@>
 		   <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" /> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
+		   <@direction=@>
 		  </div>
 		  <div>
 		   <@direction=<{backward_direction&template=<@direction@> }>@>
@@ -362,10 +363,12 @@ label.checkbox { display:inline-block !important; }
 	 <div style="padding-left:30px;" class="hide"><{stopArea&template=
     		<div>
 	 	 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" /> Arrêt commercial <@name@></label>
+	 	 <@stop_area_name=<@name@>@>
 	 	 <div style="padding-left:30px;" class="hide"><{stop&template=
 	 		<div>
+	 		 <@direction=@>
 	 		 <@direction=<{direction&template=<@direction@> }>@>
-	 		 <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" /> Arrêt physique <@direction?("direction "+direction):operatorCode@></label>
+	 		 <label class="checkbox"><input type="checkbox" factory="stoparea" noparam="1" value="<@id@>" /> Arrêt <@stop_area_name@> <@direction?("direction "+direction):operatorCode@></label>
 	 		</div>
 	 	 }></div>
 	 	</div>
