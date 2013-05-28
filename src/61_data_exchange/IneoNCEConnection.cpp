@@ -728,10 +728,27 @@ namespace synthese
 					{
 						try
 						{
+							// Convert Longitude suffix W to a negative value
+							string longStr(longNode.getText());
+							string longSuffix(longStr.substr(longStr.size()-1 , 1));
+							double longVal(lexical_cast<double>(longStr.substr(0, longStr.size()-1)));
+							if(longSuffix == "W")
+							{
+								longVal *= -1;
+							}
+							// Convert Latitude suffix S to a negative value
+							string latStr(latNode.getText());
+							string latSuffix(latStr.substr(latStr.size()-1 , 1));
+							double latVal(lexical_cast<double>(latStr.substr(0, latStr.size()-1)));
+							if(latSuffix == "S")
+							{
+								latVal *= -1;
+							}
+							// Create the coordinate point
 							boost::shared_ptr<Point> point(
 								CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
-									lexical_cast<double>(longNode.getText()),
-									lexical_cast<double>(latNode.getText())
+									longVal,
+									latVal
 							)	);
 							VehicleModule::GetCurrentVehiclePosition().setGeometry(
 								CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
@@ -741,7 +758,7 @@ namespace synthese
 						catch (bad_lexical_cast&)
 						{
 							util::Log::GetInstance().error("IneoNCEConnection : Failed to parse GPS Long / Lat " +
-														   string(longNode.getText()) +
+														   string(longNode.getText()) + " " +
 														   string(latNode.getText()) );
 						}
 					}
