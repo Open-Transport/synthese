@@ -62,13 +62,18 @@ namespace synthese
 		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_PORT = "mg_screen_port";
 		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_SPEED = "mg_screen_speed";
 		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_VALUE = "mg_screen_value";
+		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_MIN = "mg_screen_min";
+		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_MAX = "mg_screen_max";
 
 		boost::shared_ptr<MGScreenConnection> MGScreenConnection::_theConnection(new MGScreenConnection);
 
 
 		MGScreenConnection::MGScreenConnection(
-		):	_mgScreenSpeed(0), // Will be initialized by the --params
+		):	_initialized(false),
+			_mgScreenSpeed(0), // Will be initialized by the --params
 			_mgScreenValue(0),
+			_mgScreenMin(0),
+			_mgScreenMax(0),
 			_status(offline),
 			_io_service(),
 			_deadline(_io_service),
@@ -225,6 +230,7 @@ namespace synthese
 				// Wait 30 s
 				ServerModule::SetCurrentThreadWaiting();
 				this_thread::sleep(seconds(30));
+				_theConnection->_initialized = false;
 			}
 		}
 
@@ -255,16 +261,36 @@ namespace synthese
 				{
 					_theConnection->_status = offline;
 				}
+				changed = false;
 			}
 
 			if(name == MODULE_PARAM_MG_SCREEN_SPEED)
 			{
 				_theConnection->_mgScreenSpeed = lexical_cast<int>(value);
+				changed = true;
 			}
 
 			if(name == MODULE_PARAM_MG_SCREEN_VALUE)
 			{
 				_theConnection->_mgScreenValue = lexical_cast<int>(value);
+				changed = true;
+			}
+
+			if(name == MODULE_PARAM_MG_SCREEN_MIN)
+			{
+				_theConnection->_mgScreenMin = lexical_cast<int>(value);
+				changed = true;
+			}
+
+			if(name == MODULE_PARAM_MG_SCREEN_MAX)
+			{
+				_theConnection->_mgScreenMax = lexical_cast<int>(value);
+				changed = true;
+			}
+
+			if(changed)
+			{
+				_theConnection->_initialized = false;
 			}
 		}
 
@@ -317,13 +343,12 @@ namespace synthese
 						 "} }\n";
 				boost::asio::write(_socket, boost::asio::buffer(reply.str()));
 				util::Log::GetInstance().debug("MGScreenConnection : displaySetBacklightValue : " + reply.str());
+				screen.second.setBacklightAutomaticMode( value == -1 ? true : false);
 			}
 		}
 
 		void MGScreenConnection::handleData(
 		) const	{
-			static bool initialized(false);
-
 			// Copy the content obtained into a string
 			string bufStr;
 			istream is(_buf.get());
@@ -375,13 +400,13 @@ namespace synthese
 							screen.setBacklightMax(panel.second.get<int>("BacklightMax"));
 							screen.setBacklightSpeed(panel.second.get<int>("BacklightSpeed"));
 						}
-						screen.setBacklightAutomaticMode( screen.getBacklightValue() == -1 ? true : false);
 					}
 
-					if(!initialized)
+					if(!_initialized)
 					{
-						displaySetBacklightParams(1, 255, _mgScreenSpeed);
-						initialized = true;
+						displaySetBacklightParams(_mgScreenMin, _mgScreenMax, _mgScreenSpeed);
+						displaySetBacklightValue(-1);
+						_initialized = true;
 					}
 
 				}
