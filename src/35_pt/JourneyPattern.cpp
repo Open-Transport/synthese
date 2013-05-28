@@ -294,7 +294,7 @@ namespace synthese
 					(((rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure)) || edge->isArrival() != stop._arrival)) ||
 					((stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) &&
 					  *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())) ||
-					(stop._metricOffset && stop._metricOffset) != edge->getMetricOffset()
+					(stop._metricOffset && stop._metricOffset != edge->getMetricOffset())
 				){
 					return false;
 				}
