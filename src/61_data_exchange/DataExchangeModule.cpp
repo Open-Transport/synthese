@@ -80,6 +80,8 @@ namespace synthese
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_PORT, "", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_SPEED, "5", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_VALUE, "60", &MGScreenConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_MIN, "1", &MGScreenConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_MAX, "255", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_FILE, "", &StopButtonFilePoller::ParameterCallback);
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_PERIOD_MS, "", &StopButtonFilePoller::ParameterCallback);
 		}

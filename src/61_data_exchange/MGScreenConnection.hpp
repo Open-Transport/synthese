@@ -41,6 +41,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_MG_SCREEN_PORT;
 			static const std::string MODULE_PARAM_MG_SCREEN_SPEED;
 			static const std::string MODULE_PARAM_MG_SCREEN_VALUE;
+			static const std::string MODULE_PARAM_MG_SCREEN_MIN;
+			static const std::string MODULE_PARAM_MG_SCREEN_MAX;
 
 			enum Status
 			{
@@ -52,10 +54,13 @@ namespace synthese
 		private:
 			static boost::shared_ptr<MGScreenConnection> _theConnection;
 
+			mutable bool _initialized;
 			std::string _mgScreenAddress;
 			std::string _mgScreenPort;
 			int _mgScreenSpeed;
 			int _mgScreenValue;
+			int _mgScreenMin;
+			int _mgScreenMax;
 
 			mutable Status _status;
 
