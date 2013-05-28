@@ -886,6 +886,7 @@ namespace synthese
 							){
 								course.syntheseService = service;
 								servicesToLinkAndUpdate.push_back(&course);
+								servicesToRemove.erase(lexical_cast<string>(course.ref));
 								break;
 							}
 						}
