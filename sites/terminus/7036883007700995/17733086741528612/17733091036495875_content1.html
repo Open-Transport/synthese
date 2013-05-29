@@ -17,17 +17,6 @@
 
 <script src="/lib/tiny_mce/tiny_mce.js"></script>
 <script>
-tinyMCE.init({
-        mode : "specific_textareas",
-        editor_selector : "mceEditor",
-        handle_event_callback : "tinymce_event",
-	oninit : "update_chars",
-	language: 'fr',
-	width: 415,
-	theme_advanced_statusbar_location: 'none',
-        theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,removeformat,|,forecolor,backcolor,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect",
-        theme_advanced_buttons2 : "bullist,numlist,separator,outdent,indent,separator,undo,redo,|,link,unlink,image,hr,charmap,code,formatselect"
-});
 </script>
 <style>
 .close_tab { display:none; }
@@ -83,7 +72,8 @@ label.checkbox { display:inline-block !important; }
 	   a=scenario_save&
 	   actionParamsid=<@scenario_id@>&
 	   actionParam_json=&
-	   tab=&
+	   display=&
+	   rank_to_display=&
 	   section=<@section@>&
 	   roid=<@scenario_id@>&
 	 ?>
@@ -468,8 +458,33 @@ label.checkbox { display:inline-block !important; }
 
 
 <script>
-$(function(){
- 
+function display_init()
+{ 
+  <?if&cond=<@display=="calendar"@>&then=
+    open_calendar(calendar_by_rank[<@rank_to_display@>]);
+    display('calendar');
+  ?>
+  <?if&cond=<@display=="message"@>&then=
+    open_message(message_by_rank[<@rank_to_display@>]);
+    display('message');
+  ?>
+  <?if&cond=<@display@>&else=
+    display('properties');
+  ?>
+}
+  $(function(){
+   tinyMCE.init({
+        mode : "specific_textareas",
+        editor_selector : "mceEditor",
+        handle_event_callback : "tinymce_event",
+	oninit : display_init,
+	language: 'fr',
+	width: 415,
+	theme_advanced_statusbar_location: 'none',
+        theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,removeformat,|,forecolor,backcolor,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect",
+        theme_advanced_buttons2 : "bullist,numlist,separator,outdent,indent,separator,undo,redo,|,link,unlink,image,hr,charmap,code,formatselect"
+  });
+
   event = {
     calendar: [ <{calendar&template=
   	<@current_calendar_id=<@id@>@>
@@ -532,9 +547,8 @@ $(function(){
   ]};
   
   build_divs();
-  display('<@(display=="")?"properties":display@>');
+
 });
 </script>
-
 <script src="/terminus/js/event.js"></script>
 ?>?>

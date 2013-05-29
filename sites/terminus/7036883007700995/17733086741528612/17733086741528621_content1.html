@@ -12,9 +12,10 @@
            <ul class="nav">
             <li><?link&target=/lib?></li>
             <li><?link&target=/events?></li>
+            <@section@>
             <?messages_sections&
               template=<{section&
-                         template=<li><?link&
+                         template=<li <@(section==id)?(" style=\"background-color:"+ color +" !important\""):""@>><?link&
                	                        target=/events&
                                         section=<@id@>&
                	                        text=<@name@>&
