@@ -582,9 +582,12 @@ namespace synthese
 						// we are now running in a different vehicle
 						try
 						{
-							VehicleModule::GetCurrentVehiclePosition().setVehicle(
-								_theConnection->_dataSource->getObjectByCode<Vehicle>(vehicleNumber)
-							);
+							if(_theConnection->_dataSource)
+							{
+								VehicleModule::GetCurrentVehiclePosition().setVehicle(
+									_theConnection->_dataSource->getObjectByCode<Vehicle>(vehicleNumber)
+								);
+							}
 						}
 						catch(...)
 						{
