@@ -132,18 +132,21 @@ label.checkbox { display:inline-block !important; }
         <td>
          <?if&
            cond=<@is_template@>&
-     	   then=<h4>Scénario de bibliothèque</h4>&
+     	   then=<h4>Modèle de bibliothèque</h4>&
      	   else=<h4>Statut : <?if&
-     		cond=<@in_archive@>&
-    		then=<span class="label label-info">Archivé</span>&
-    		else=<span class="label <@active?"label-success":""@>"><@active?"Actif":"Inactif"@></span>&
+	     		cond=<@in_archive@>&
+	    		then=<span class="label label-info">Archivé</span>&
+	    		else=<span class="label <@active?"label-success":""@>"><@active?"Actif":"Inactif"@></span>&
+    		?>
          ?></h4>
         </td>
+        <?if&cond=<@is_template@>&else=
         <?if&
           cond=<@in_archive@>&
           else=<td><h4>Archivage</h4></td>&
-        ?>
+        ?>?>
        </tr>
+       <?if&cond=<@is_template@>&else=
        <?if&
          cond=<@in_archive@>&
          else=<tr>
@@ -158,7 +161,7 @@ label.checkbox { display:inline-block !important; }
     	      <?link&target=<@p@>&a=scenariostop&actionParams=<@scenario_id@>&roid=<@scenario_id@>&class=btn btn-danger btn-mini&text=<i class="icon-eject icon-white"></i>&confirm=Etes-vous sûr de vouloir clore et archiver l'événement ??>
              </td>
             </tr>&
-       ?>
+       ?>?>
       </table>
      </div>
 
@@ -493,13 +496,14 @@ function display_init()
   	  name: "<@name?name:"Calendrier par défaut"@>",
   	  period:[ <{application_period&template=
   	  	{ id: '<@id@>',
-  	  	  start_date: '<@start_date@>',
-  	  	  end_date: '<@end_date@>',
+  	  	  start_date: '<@start_time@>',
+  	  	  end_date: '<@end_time@>',
   	  	  start_hour: '<@start_hour@>',
   	  	  end_hour: '<@end_hour@>',
   	  	  date: [ <{date&template=
   	  	  	'<@date@>',
-  	  	  }> ]
+  	  	  }> ],
+  	  	  rank: <@item_rank@>
   	  	},
   	  }> ],
 	  message:[ <{message&template=<?if&cond=<@current_calendar_id==calendar_id@>&then=

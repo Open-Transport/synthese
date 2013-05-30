@@ -299,6 +299,34 @@ function open_calendar(calendar)
 
 }
 
+function date_from_sql(sql)
+{
+  if(!sql) return null;
+  return new Date(
+    sql.substr(0,4),
+    sql.substr(5,2)-1,
+    sql.substr(8,2),
+    sql.substr(11,2),
+    sql.substr(14,2),
+    0, 0);
+}
+
+function date_to_sql(date)
+{
+  if(!date) return '';
+  var s = '';
+  s += date.getFullYear() +'-';
+  if(date.getMonth() < 9) s += '0';
+  s += (date.getMonth()+1) +'-';
+  if (date.getDate() < 10) s += '0';
+  s += date.getDate() +' ';
+  if (date.getHours() < 10) s += '0';
+  s += date.getHours() +':';
+  if (date.getMinutes() < 10) s += '0';
+  s += date.getMinutes();
+  return s;
+}
+
 function close_calendar()
 {
   if(current_calendar)
@@ -334,8 +362,8 @@ function close_calendar()
       current_calendar.period.push({
         id: $(this).attr('period_id'),
         rank: period_rank,
-        start_date: start_date ? start_date.toISOString() : '',
-        end_date: end_date ? end_date.toISOString() : '',
+        start_date: date_to_sql(start_date),
+        end_date: date_to_sql(end_date),
         start_hour: $(this).find('input[field=start_hour]').val(),
         end_hour: $(this).find('input[field=end_hour]').val(),
         date:[]
@@ -703,11 +731,11 @@ function add_period(period)
   var end_date = null;
   if(period.start_date)
   {
-    start_date= new Date(period.start_date);
+    start_date= date_from_sql(period.start_date);
   }
   if(period.end_date)
   {
-    end_date = new Date(period.end_date);
+    end_date = date_from_sql(period.end_date);
   }
   var s =
    '<div class="well form-horizontal" rank="' + period.rank +'" period_id="'+ period.id +'">' +
@@ -772,7 +800,7 @@ function add_period(period)
    '</div>';
   
   $('#periods').append(s);
-  $('.date').datepicker();
+  $('.date').datepicker().on('changeDate',activateForm);
   $('#remove_period_'+ period.rank).click(remove_period_click);
 }
 
