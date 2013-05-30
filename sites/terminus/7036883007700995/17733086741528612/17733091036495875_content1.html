@@ -182,7 +182,7 @@ label.checkbox { display:inline-block !important; }
 	   <?if&
 	     cond=<@active_section[<@id@>]@>&
 	     then=<?if&
-	           cond=<@id!=section@>&
+	           cond=<@(id!=section)&&(!is_template)@>&
 	           then=<?link&
 	                  target=<@p@>&
 	                  section=<@id@>&

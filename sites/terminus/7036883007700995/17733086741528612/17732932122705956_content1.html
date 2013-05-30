@@ -184,7 +184,7 @@
      <?scenarii&
        t=1&
        template=<{scenario&template=
-	<li class="template_element" style="padding-left:15px;" element_id="<@id@>"><a href="#"><@name@></a></li>
+	<li class="template_element" style="padding-left:15px;" element_id="<@scenario_id@>"><a href="#"><@name@></a></li>
      }>?>
      <?ScenarioFoldersService&
       root_id=0&
@@ -196,7 +196,7 @@
 	  t=1&
 	  f=<@id@>&
 	  template=<{scenario&template=
-		<li class="template_element" style="padding-left:<@15+(folder_depth*15)@>px;" element_id="<@id@>" <@(folder_id==id)?"active=\"1\"":""@>><a href="#"><@name@></a></li>
+		<li class="template_element" style="padding-left:<@15+(folder_depth*15)@>px;" element_id="<@scenario_id@>" <@(folder_id==id)?"active=\"1\"":""@>><a href="#"><@name@></a></li>
 	}>?>
      }>?>
     </ul></div>
