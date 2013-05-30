@@ -56,7 +56,7 @@
   co=1&
 ?>
 <table class="table table-striped">
-<thead><tr><th>nom</th><th>comm</th><th>expl</th><th>iv</th><th></th><th></th><th></th></tr></thead>
+<thead><tr><th>nom</th><th></th><th></th><th></th><th></th></tr></thead>
 <tbody>
 <?scenarii&
   t=1&
@@ -65,24 +65,12 @@
   template=<{scenario&template=
 	<tr>
 	 <td><@name@></td>
-	 <td><?link&
-	   target=/lib/scenario&
-	   class=btn btn-mini btn-primary&
-	   text=Ouvrir&
-	   roid=<@roid@>&
-	 ?></td>
-	 <td><?link&
-	   target=/lib/scenario&
-	   class=btn btn-mini btn-primary&
-	   text=Ouvrir&
-	   roid=<@roid@>&
-	 ?></td>
-	 <td><?link&
-	   target=/lib/scenario&
-	   class=btn btn-mini btn-primary&
-	   text=Ouvrir&
-	   roid=<@roid@>&
-	 ?></td>
+	       <td><?link&
+		   target=/lib/scenario&
+		   class=btn btn-mini btn-primary&
+		   text=Ouvrir&
+		   roid=<@roid@>&
+		 ?></td>
 	 <td><div class="btn btn-mini btn-warning move_link" element_id="<@roid@>" element_name="<@name@>">Déplacer</div></td>
 	 <td><div class="btn btn-mini btn-warning rename_link" element_id="<@roid@>" element_name="<@name@>">Renommer</div></td>
 	 <td><div class="btn btn-mini btn-danger remove_link" element_id="<@roid@>" element_name="<@name@>">Supprimer</div></td>
