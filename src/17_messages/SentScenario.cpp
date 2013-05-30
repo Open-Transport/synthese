@@ -226,7 +226,7 @@ namespace synthese
 			{
 				// Calendar export
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
-				calendar->toParametersMap(*calendarPM);
+				calendar->toParametersMap(*calendarPM, true);
 				pm.insert(TAG_CALENDAR, calendarPM);
 
 				// Messages loop
