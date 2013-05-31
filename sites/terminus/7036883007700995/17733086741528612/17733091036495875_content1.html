@@ -314,10 +314,7 @@ label.checkbox { display:inline-block !important; }
 	    roid=<@network_id@>&
 	    template=<{folder&template=
 		<div>
-		 <?if&cond=<@recursive_content@>&then=<i class="icon-chevron-right openclose"></i>?> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" /> <@name@></label>
-		 <div style="padding-left:30px;" class="hide">
-	    	  <@recursive_content@>
-		  <?LinesListFunction2&
+		 <@lines_menu=<?LinesListFunction2&
 		    ni=<@id@>&
 		    with_directions=1&
 		    template=<{line&template=
@@ -335,12 +332,16 @@ label.checkbox { display:inline-block !important; }
 			  </div>
 			 </div>
 			</div>
-		  }>?>
+		  }>?>@>
+		 <?if&cond=<@recursive_content@><@lines_menu@>&then=<i class="icon-chevron-right openclose"></i>?> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" /> <@name@></label>
+		 <div style="padding-left:30px;" class="hide">
+	    	  <@recursive_content@>
+		  <@lines_menu@>
 	    	 </div>
 	    	</div>
 	  }>?>
 	  <?LinesListFunction2&
-	    ni=<@id@>&
+	    ni=<@network_id@>,0&
 	    with_directions=1&
 	    template=<{line&template=
 		<div>
