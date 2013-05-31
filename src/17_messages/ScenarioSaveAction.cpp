@@ -840,97 +840,10 @@ namespace synthese
 			{
 				const Scenario& tpl(_template.get() ? *_template : *_source);
 
-				// Calendars copy
-				typedef map<RegistryKeyType, ScenarioCalendar*> CalendarsMapping;
-				CalendarsMapping calendarsMapping;
-				ScenarioCalendarTableSync::SearchResult calendars(
-					ScenarioCalendarTableSync::Search(
-						*_env,
-						tpl.getKey()
-				)	);
-				BOOST_FOREACH(const boost::shared_ptr<ScenarioCalendar> calendar, calendars)
-				{
-					// The calendar
-					boost::shared_ptr<ScenarioCalendar> newCalendar(
-						static_pointer_cast<ScenarioCalendar, ObjectBase>(calendar->copy())
-					);
-					newCalendar->set<Key>(ScenarioCalendarTableSync::getId());
-					newCalendar->set<ScenarioPointer>(*_scenario);
-					_env->getEditableRegistry<ScenarioCalendar>().add(newCalendar);
-					ScenarioCalendarTableSync::Save(newCalendar.get(), transaction);
-					calendarsMapping[calendar->getKey()] = newCalendar.get();
-
-					// The dates (for action C only)
-					if(_source.get() && _sscenario.get())
-					{
-						MessageApplicationPeriodTableSync::SearchResult periods(
-							MessageApplicationPeriodTableSync::Search(
-								*_env,
-								calendar->getKey()
-						)	);
-						BOOST_FOREACH(const boost::shared_ptr<MessageApplicationPeriod>& period, periods)
-						{
-							boost::shared_ptr<MessageApplicationPeriod> newPeriod(
-								static_pointer_cast<MessageApplicationPeriod, ObjectBase>(period->copy())
-							);
-							newPeriod->set<Key>(MessageApplicationPeriodTableSync::getId());
-							newPeriod->set<ScenarioCalendar>(*newCalendar);
-							_env->getEditableRegistry<MessageApplicationPeriod>().add(newPeriod);
-							MessageApplicationPeriodTableSync::Save(newPeriod.get(), transaction);
-						}
-					}
-				}
-
-				// Messages copy
-				AlarmTableSync::SearchResult alarms(
-					AlarmTableSync::Search(*_env, tpl.getKey())
-				);
-				BOOST_FOREACH(const boost::shared_ptr<Alarm>& templateAlarm, alarms)
-				{
-					// Message creation
-					boost::shared_ptr<Alarm> alarm;
-					if(_sscenario.get())
-					{
-						alarm.reset(
-							new SentAlarm(
-								*_sscenario,
-								*templateAlarm
-						)	);
-					}
-					else
-					{
-						alarm.reset(
-							new AlarmTemplate(
-								*_tscenario,
-								*templateAlarm
-						)	);
-					}
-
-					// Calendar
-					if(templateAlarm->getCalendar())
-					{
-						alarm->setCalendar(calendarsMapping[templateAlarm->getCalendar()->getKey()]);
-					}
-					AlarmTableSync::Save(alarm.get(), transaction);
-
-					// Copy of the recipients of the message
-					AlarmObjectLinkTableSync::CopyRecipients(
-						templateAlarm->getKey(),
-						*alarm,
-						transaction
-					);
-
-					// Copy of the message alternatives
-					MessageAlternativeTableSync::CopyAlternatives(
-						templateAlarm->getKey(),
-						*alarm,
-						transaction
-					);
-				}
+				ScenarioTableSync::CopyMessages(tpl.getKey(), *_scenario, transaction);
 			}
-			// A/B/G/H action, full method
-			if(_messagesAndCalendars)
-			{
+			else if(_messagesAndCalendars)
+			{   // A/B/G/H action, full method
 				// Objects to remove if not found
 				Scenario::ScenarioCalendars existingCalendars(_scenario->getCalendars());
 				Scenario::Messages existingMessages(_scenario->getMessages());
