@@ -120,4 +120,31 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
+
+
+
+		void MessageApplicationPeriodTableSync::CopyPeriods(
+			util::RegistryKeyType sourceId,
+			ScenarioCalendar& calendar,
+			boost::optional<db::DBTransaction&> transaction
+		){
+			Env env;
+			SearchResult periods(
+				Search(env, sourceId)
+			);
+			BOOST_FOREACH(const boost::shared_ptr<MessageApplicationPeriod>& period, periods)
+			{
+				// Raw copy
+				boost::shared_ptr<MessageApplicationPeriod> newPeriod(
+					boost::dynamic_pointer_cast<MessageApplicationPeriod, ObjectBase>(
+						period->copy()
+				)	);
+
+				// Link to the new calendar
+				period->set<ScenarioCalendar>(calendar);
+
+				// Save
+				Save(period.get(), transaction);
+			}
+		}
 }	}
