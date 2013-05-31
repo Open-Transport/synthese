@@ -248,8 +248,8 @@ label.checkbox { display:inline-block !important; }
          template=<{type&template=
         	<tr type_id="<@id@>" max_length="<@max_length@>">
         	 <td><@name@><br /><a href="#" class="btn btn-warning btn-mini" generate_alternative="specific">Générer</a></td>
-            	 <td><textarea onkeyup="activateForm(this);" onpaste="activateForm(this);" oncut="activateForm(this);" field="message_alternative"></textarea></td>
-            	 <td><span field="counter"></span><br /><span field="check"></span></td>
+            	 <td><textarea onkeyup="activateForm(this);" onpaste="activateForm(this);" oncut="activateForm(this);" field="message_alternative" limit="<@max_length@>"></textarea><span field="counter"></span></td>
+            	 <td><br /><span field="check"></span></td>
             	</tr>
        }>?>
       </tbody>
