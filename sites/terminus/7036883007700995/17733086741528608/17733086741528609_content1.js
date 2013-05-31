@@ -223,6 +223,12 @@ function generate_alternative_click()
   return false;
 }
 
+function update_chars_alternative()
+{
+  var size = $(this).val().length;
+  $(this).next().html(size + ' caractère' + (size > 1 ? 's' : ''));
+}
+
 function update_chars()
 {
   var tinymce = tinyMCE.get('tinymce');
@@ -917,5 +923,6 @@ $(function(){
   $('div[action=add_calendar]').click(new_calendar_click);
   $('div[action=add_calendar]').tooltip({placement: 'right'});
   $('#change_calendar').click(change_calendar_click);
+  $('textarea[field=message_alternative]').keyup(update_chars_alternative);
   $('.modal').bind('shown', focus_on_input);
 });
