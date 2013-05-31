@@ -242,7 +242,7 @@ label.checkbox { display:inline-block !important; }
     <div class="well">
      <a class="btn btn-primary btn-mini" href="#" generate_alternative="all">Générer tout</a>
      <table class="table table-condensed" id="table_alternatives">
-      <thead><tr><th>règle</th><th>message</th><th>contrôle</th><th></th></tr></thead>
+      <thead><tr><th>règle</th><th>message</th><th></th><th></th></tr></thead>
       <tbody>
        <?message_types&
          template=<{type&template=
@@ -307,8 +307,38 @@ label.checkbox { display:inline-block !important; }
   <?PTNetworksListFunction&
     template=<{network&template=
 	<div>
-	 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" /> Réseau <@name@></label>
+	 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@network_id@>" /> Réseau <@name@></label>
 	 <div style="padding-left:30px;" class="hide">
+	  <?tree_folders&
+	    recursive=1&
+	    roid=<@network_id@>&
+	    template=<{folder&template=
+		<div>
+		 <?if&cond=<@recursive_content@>&then=<i class="icon-chevron-right openclose"></i>?> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" /> <@name@></label>
+		 <div style="padding-left:30px;" class="hide">
+	    	  <@recursive_content@>
+		  <?LinesListFunction2&
+		    ni=<@id@>&
+		    with_directions=1&
+		    template=<{line&template=
+			<div>
+			 <i class="icon-chevron-right openclose"></i> <label class="checkbox"><input type="checkbox" factory="line" noparam="1" value="<@id@>" /> <@line_short_name@> <@name@></label>
+			 <div style="padding-left:30px;" class="hide">
+			  <div>
+			   <@direction=<{forward_direction&template=<@direction@> }>@>
+			   <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="0" /> <@line_short_name@> <@name@> <@direction?("direction "+direction):"aller"@></label>
+			   <@direction=@>
+			  </div>
+			  <div>
+			   <@direction=<{backward_direction&template=<@direction@> }>@>
+			   <label class="checkbox"><input type="checkbox" value="<@id@>" factory="line" parameter="1" /> <@line_short_name@> <@name@> <@direction?("direction "+direction):"retour"@></label>
+			  </div>
+			 </div>
+			</div>
+		  }>?>
+	    	 </div>
+	    	</div>
+	  }>?>
 	  <?LinesListFunction2&
 	    ni=<@id@>&
 	    with_directions=1&
