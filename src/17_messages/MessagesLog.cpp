@@ -95,7 +95,7 @@ namespace synthese
 			content.push_back(string());
 			content.push_back(
 				"Création par copie de "+ scenarioTemplate.getName() +
-				" (modèle "+ scenarioTemplate.getTemplate()->getName() +")"
+				(scenarioTemplate.getTemplate() ? (" (modèle "+ scenarioTemplate.getTemplate()->getName() +")") : "")
 			);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
 		}
