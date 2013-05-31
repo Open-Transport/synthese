@@ -298,6 +298,10 @@ namespace synthese
 								Env::GetOfficialEnv().get<TreeFolder>(id).get()
 							);
 						}
+						else if(id == 0)
+						{
+							_folders.insert(NULL);
+						}
 					}
 					catch(bad_lexical_cast)
 					{
@@ -555,6 +559,11 @@ namespace synthese
 				bool result(false);
 				BOOST_FOREACH(const TreeFolder* folder, _folders)
 				{
+					if(!folder && line._getParent() == line.getNetwork())
+					{
+						result = true;
+						break;
+					}
 					if(line.isChildOf(*folder))
 					{
 						result = true;
