@@ -5,6 +5,8 @@
 
 #include "TreeFolderTableSync.hpp"
 
+#include "TreeFoldersService.hpp"
+
 #include "TreeModule.h"
 
 // Registries
@@ -20,6 +22,8 @@ void synthese::tree::moduleRegister()
 
 	// Factories
 	synthese::tree::TreeModule::integrate();
+
+	synthese::tree::TreeFoldersService::integrate();
 
 	synthese::tree::TreeFolderTableSync::integrate();
 
