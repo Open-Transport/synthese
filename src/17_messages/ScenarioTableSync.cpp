@@ -30,6 +30,7 @@
 #include "DBResult.hpp"
 #include "ImportableTableSync.hpp"
 #include "MessageAlternativeTableSync.hpp"
+#include "MessageApplicationPeriodTableSync.hpp"
 #include "MessagesLibraryRight.h"
 #include "MessagesLibraryLog.h"
 #include "MessagesLog.h"
@@ -497,52 +498,92 @@ namespace synthese
 		/// @param transaction the transaction
 		void ScenarioTableSync::CopyMessages(
 			RegistryKeyType sourceId,
-			const Scenario& dest,
+			Scenario& dest,
 			optional<DBTransaction&> transaction
 		){
-				// The existing messages
-				Env env;
-				AlarmTableSync::SearchResult alarms(
-					AlarmTableSync::Search(env, sourceId)
+			// Variables
+			Env env;
+
+			// Calendars
+			typedef map<RegistryKeyType, boost::shared_ptr<ScenarioCalendar> > CalendarsMap;
+			CalendarsMap calendarsMap;
+			ScenarioCalendarTableSync::SearchResult calendars(ScenarioCalendarTableSync::Search(env, sourceId));
+			BOOST_FOREACH(const boost::shared_ptr<ScenarioCalendar>& calendar, calendars)
+			{
+				// Calendar creation
+				boost::shared_ptr<ScenarioCalendar> newCalendar(
+					boost::dynamic_pointer_cast<ScenarioCalendar, ObjectBase>(
+						calendar->copy()
+				)	);
+
+				// Link with the new scenario
+				newCalendar->set<ScenarioPointer>(dest);
+
+				// Save
+				ScenarioCalendarTableSync::Save(newCalendar.get(), transaction);
+
+				// Store the relation between the source calendar and the new one
+				calendarsMap.insert(make_pair(calendar->getKey(), newCalendar));
+
+				// Copy the periods
+				MessageApplicationPeriodTableSync::CopyPeriods(
+					calendar->getKey(),
+					*newCalendar,
+					transaction
 				);
 
-				// Copy of each message
-				BOOST_FOREACH(const shared_ptr<Alarm>& templateAlarm, alarms)
+			}
+
+			// The existing messages
+			AlarmTableSync::SearchResult alarms(
+				AlarmTableSync::Search(env, sourceId)
+			);
+
+			// Copy of each message
+			BOOST_FOREACH(const shared_ptr<Alarm>& templateAlarm, alarms)
+			{
+				// Calendar
+				shared_ptr<ScenarioCalendar> calendar;
+				if(templateAlarm->getCalendar())
 				{
-					// Message creation
-					shared_ptr<Alarm> alarm;
-					if(dynamic_cast<const SentScenario*>(&dest))
-					{
-						alarm.reset(
-							new SentAlarm(
-								static_cast<const SentScenario&>(dest),
-								*templateAlarm
-						)	);
-					}
-					else
-					{
-						alarm.reset(
-							new AlarmTemplate(
-								static_cast<const ScenarioTemplate&>(dest),
-								*templateAlarm
-						)	);
-					}
-					AlarmTableSync::Save(alarm.get(), transaction);
-
-					// Copy of the recipients of the message
-					AlarmObjectLinkTableSync::CopyRecipients(
-						templateAlarm->getKey(),
-						*alarm,
-						transaction
-					);
-
-					// Copy of the message alternatives
-					MessageAlternativeTableSync::CopyAlternatives(
-						templateAlarm->getKey(),
-						*alarm,
-						transaction
-					);
+					calendar = calendarsMap[templateAlarm->getCalendar()->getKey()];
 				}
+
+				// Message creation
+				shared_ptr<Alarm> alarm;
+				if(dynamic_cast<const SentScenario*>(&dest))
+				{
+					alarm.reset(
+						new SentAlarm(
+							static_cast<const SentScenario&>(dest),
+							*templateAlarm
+					)	);
+				}
+				else
+				{
+					alarm.reset(
+						new AlarmTemplate(
+							static_cast<const ScenarioTemplate&>(dest),
+							*templateAlarm
+					)	);
+				}
+				alarm->setCalendar(calendar.get());
+				AlarmTableSync::Save(alarm.get(), transaction);
+
+				// Copy of the recipients of the message
+				AlarmObjectLinkTableSync::CopyRecipients(
+					templateAlarm->getKey(),
+					*alarm,
+					transaction
+				);
+
+				// Copy of the message alternatives
+				MessageAlternativeTableSync::CopyAlternatives(
+					templateAlarm->getKey(),
+					*alarm,
+					transaction
+				);
+			}
 		}
 
 
