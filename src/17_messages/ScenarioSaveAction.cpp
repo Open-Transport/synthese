@@ -693,6 +693,15 @@ namespace synthese
 			{
 				_scenario->setSections(*_sections);
 			}
+			else if(_creation && (_source.get() || _template.get()))
+			{
+				const Scenario& tpl(
+					_template.get() ?
+					*static_pointer_cast<const Scenario, const ScenarioTemplate>(_template) :
+					*static_pointer_cast<const Scenario, const SentScenario>(_source)
+				);
+				_scenario->setSections(tpl.getSections());
+			}
 
 			if(_tscenario.get())
 			{
@@ -838,7 +847,11 @@ namespace synthese
 			// Copy from template (for creation)
 			if(_creation && (_source.get() || _template.get()))
 			{
-				const Scenario& tpl(_template.get() ? *_template : *_source);
+				const Scenario& tpl(
+					_template.get() ?
+					*static_pointer_cast<const Scenario, const ScenarioTemplate>(_template) :
+					*static_pointer_cast<const Scenario, const SentScenario>(_source)
+				);
 
 				ScenarioTableSync::CopyMessages(tpl.getKey(), *_scenario, transaction);
 			}
