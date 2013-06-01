@@ -71,7 +71,7 @@ function populate_menu_js(content)
   var s = 0;
   while(true)
   {
-    var i = content.indexOf("function ", s);
+    var i = content.indexOf("function"+' ', s);
     if(i == -1) break;
     var j = content.indexOf("(", i);
     if(j == -1) break;
