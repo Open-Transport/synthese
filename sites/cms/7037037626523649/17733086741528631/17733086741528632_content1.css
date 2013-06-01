@@ -1,3 +1,7 @@
+body
+{
+  overflow:hidden;
+}
 #menu
 {
   width:300px;
