@@ -1,16 +1,15 @@
-<@site_id=<@s@>@>
-<@site_name=<?object&roid=<@site_id@>&template=<@name@>?>@>
+<@site_name=<?object&roid=<@s@>&template=<@name@>?>@>
 <html>
 <head>
 <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <link href="/cms/css/main.css" rel="stylesheet" media="screen">
-<title><?if&cond=<@site_id@>&then=<@site_name@> - ?>SYNTHESE CMS</title>
+<title><?if&cond=<@s@>&then=<@site_name@> - ?>SYNTHESE CMS</title>
 </head>
 <body>
 <div class="navbar navbar-inverse">
  <div class="navbar-inner">
-  <a class="brand" href="#" class="active"><?if&cond=<@site_id@>&then=<@site_name@> - ?>SYNTHESE CMS</a>
-  <?if&cond=<@site_id@>&then=
+  <a class="brand" href="#" class="active"><?if&cond=<@s@>&then=<@site_name@> - ?>SYNTHESE CMS</a>
+  <?if&cond=<@s@>&then=
 	  <ul class="nav">
 	   <li><a href="#">Configuration locale</a></li>
 	   <li><a href="#properties_modal" data-toggle="modal">Propriétés</a></li>
@@ -39,7 +38,7 @@
  </div>
 </div>
 <?if&
-  cond=<@site_id@>&
+  cond=<@s@>&
   else=<div class="well" style="margin:40px;"><h1>Bienvenue sur le CMS SYNTHESE.</h1><p>Sélectionnez le site à éditer sur le menu en haut à droite.</p></div>&
   then=
 <div id="menu">
@@ -55,7 +54,7 @@
   <div id="menu_files">
    <ul class="nav nav-list">
     <?menu&
-      root=<@site_id@>&
+      root=<@s@>&
       raw_data=1&
       min_depth=0&
       max_depth=9999&
@@ -81,8 +80,8 @@
    name=properties&
    a=ObjectUpdate&
    target=<@p@>&
-   site_id=<@site_id@>&
-   actionParam_object_id=<@site_id@>&
+   s=<@s@>&
+   actionParam_object_id=<@s@>&
    class=form form-horizontal&
  ?>
  <div class="modal-header">
@@ -91,7 +90,7 @@
  </div>
  <div class="modal-body">
   <?object&
-    roid=<@site_id@>&
+    roid=<@s@>&
     template=
 	  <div class="control-group">
 	   <label class="control-label">Nom</label>
@@ -111,7 +110,7 @@
 	    <select name="default_page_template_id">
 	    <option value="0">(pas de modèle)</option>
 	    <?menu&
-	      root=<@site_id@>&
+	      root=<@s@>&
 	      raw_data=1&
 	      min_depth=0&
 	      max_depth=9999&
