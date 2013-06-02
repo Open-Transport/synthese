@@ -36,6 +36,7 @@ using namespace boost::algorithm;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 	
 	namespace cms
 	{
@@ -74,6 +75,26 @@ namespace synthese
 
 					case NEG:
 						return lexical_cast<string>(-valueDbl);
+					default:
+						break;
+					}
+				}
+				catch(bad_lexical_cast&)
+				{
+					return string();
+				}
+
+			// ID operators
+			case DECODE_TABLE:
+				try
+				{
+					RegistryKeyType id(lexical_cast<RegistryKeyType>(value));
+
+					switch(_operator)
+					{
+					case DECODE_TABLE:
+						return lexical_cast<string>(decodeTableId(id));
+
 					default:
 						break;
 					}
@@ -145,6 +166,10 @@ namespace synthese
 			if(	CompareText(it, end, "~read_config"))
 			{
 				return READ_CONFIG;
+			}
+			if(	CompareText(it, end, "~decode_table"))
+			{
+				return DECODE_TABLE;
 			}
 			return optional<Operator>();
 		}
