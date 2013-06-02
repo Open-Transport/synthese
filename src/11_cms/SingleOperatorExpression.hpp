@@ -44,7 +44,8 @@ namespace synthese
 				SQRT,
 				NEG,
 				GLOBAL,
-				READ_CONFIG
+				READ_CONFIG,
+				DECODE_TABLE
 			};
 
 		private:
