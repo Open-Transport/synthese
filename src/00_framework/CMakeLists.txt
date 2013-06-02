@@ -31,6 +31,8 @@ ParametersMapField.hpp
 PointerField.hpp
 PtimeField.cpp
 PtimeField.hpp
+PtreeRecord.cpp
+PtreeRecord.hpp
 Record.cpp
 Record.hpp
 SchemaMacros.hpp
