@@ -68,7 +68,7 @@ namespace synthese
 		) const {
 			ParametersMap map;
 			
-			BOOST_FOREACH(const DataExchangeModule::VDVClients::value_type& client, DataExchangeModule::GetVDVClients())
+			BOOST_FOREACH(const VDVClient::Registry::value_type& client, Env::GetOfficialEnv().getRegistry<VDVClient>())
 			{
 				boost::shared_ptr<ParametersMap> clientPM(new ParametersMap);
 				client.second->toParametersMap(*clientPM, true);
