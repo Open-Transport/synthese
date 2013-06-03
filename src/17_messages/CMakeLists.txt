@@ -36,6 +36,8 @@ GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MailingList.cpp
 MailingList.hpp
+MailingListSendAction.cpp
+MailingListSendAction.hpp
 MailingListsService.cpp
 MailingListsService.hpp
 MailingListSubscription.cpp

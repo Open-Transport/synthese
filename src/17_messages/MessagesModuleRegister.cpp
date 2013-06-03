@@ -38,6 +38,7 @@
 #include "ScenarioDisplayFunction.hpp"
 #include "ScenarioFoldersService.hpp"
 
+#include "MailingListSendAction.hpp"
 #include "ScenarioSaveAction.h"
 #include "SimpleMessageCreationAction.hpp"
 #include "UpdateAlarmMessagesFromTemplateAction.h"
@@ -110,6 +111,7 @@ void synthese::messages::moduleRegister()
 	synthese::messages::ScenarioDisplayFunction::integrate();
 	synthese::messages::ScenarioFoldersService::integrate();
 
+	synthese::messages::MailingListSendAction::integrate();
 	synthese::messages::ScenarioSaveAction::integrate();
 	synthese::messages::SimpleMessageCreationAction::integrate();
 	synthese::messages::ScenarioStopAction::integrate();
