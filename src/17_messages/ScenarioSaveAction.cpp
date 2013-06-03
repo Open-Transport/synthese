@@ -731,14 +731,14 @@ namespace synthese
 					_sscenario->setIsEnabled(*_enabled);
 				}
 
-				// Enabled
-				if(_enabled)
+				// Archived
+				if(_archived)
 				{
 					DBLogModule::appendToLogIfChange(
 						text,
 						"Archive ",
 						_sscenario->getArchived() ? "archivé" : "non archivé",
-						*_enabled ? "archivé" : "non archivé"
+						*_archived ? "archivé" : "non archivé"
 						);
 					_sscenario->setArchived(*_archived);
 				}
