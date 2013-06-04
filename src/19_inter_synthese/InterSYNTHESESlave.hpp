@@ -69,6 +69,7 @@ namespace synthese
 			public Object<InterSYNTHESESlave, InterSYNTHESESlaveRecord>
 		{
 			static const std::string TAG_QUEUE_ITEM;
+			static const std::string TAG_QUEUE_SIZE;
 		public:
 		
 			/// Chosen registry class.
