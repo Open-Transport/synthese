@@ -4,7 +4,7 @@ t063_web_pages(abstract,do_not_evaluate,do_not_use_template,end_time,has_forum,i
 "0",
 "",
 "0",
-"17732932122705977",
+"17732932122706073",
 "0",
 "",
 "",
@@ -14,8 +14,8 @@ t063_web_pages(abstract,do_not_evaluate,do_not_use_template,end_time,has_forum,i
 "1",
 "7036883007700998",
 "",
-"/master/slave_config",
+"!formats/inter_synthese_package/doc",
 "0",
-"2012-10-17 17:23:29",
-"Flux Inter-SYNTHESE",
-"17732932122705983"
+"2013-06-03 00:19:35",
+"doc",
+"17732932122706071"

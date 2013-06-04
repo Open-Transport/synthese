@@ -1,68 +1,348 @@
-<@tabs["properties"]=Propriétés@>
-<@tabs["queue"]=Queue@>
-<@tabs["links"]=Liens@>
-<@tab=<@tab?tab:"properties"@>@>
+<ul class="breadcrumb">
+<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+<li class="active">Vue serveur <span class="divider">/</span></li>
+<li class="active">Systèmes clients</li>
+</ul>
 
-<?inter_synthese_slaves_view&template=<{slave&template=<?if&cond=<@id==roid@>&then=
+<@sl_id=<@roid@>@>
+<div class="row-fluid">
+  <div class="span3" id="tree">
+   <ul class="nav nav-list well">
+    <li>
+     <?link&
+       target=<@p@>&
+       tab=slaves&
+       text=Clients de flux Inter-SYNTHESE
+            <div class="pull-right" id="inter-synthese_client_add_link" data-type="Inter-SYNTHESE" data-table="93" data-placement="right" data-toggle="tooltip" title="Ajouter un client de flux Inter-SYNTHESE"><i class="icon-plus"></i></div>&
+     ?>
+    </li>
+    <?inter_synthese_slaves_view&template=<{slave&template=
+     	<li class="tree_1<@(sl_id==id)?" active":""@>">
+     	 <?link&
+     	   target=<@p@>&
+     	   tab=slaves&
+     	   roid=<@id@>&
+     	   text=<span class="status status-<@active@>">\&nbsp;</span>
+     	        <span data-content="name"><@name?name:"(sans nom)"@></span>
+     	        <@(id==sl_id)?("<div class=\"pull-right\" id=\"client_remove_link\" data-id=\""+ id +"\" data-placement=\"right\" data-toggle=\"tooltip\" title=\"Supprimer le client "+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+     	 ?>
+     	</li>
+    }>?>
+    <li>
+     <?link&
+       target=<@p@>&
+       tab=slaves&
+       text=Clients VDV
+            <div class="pull-right" id="vdv_client_add_link" data-type="VDV" data-table="99" data-placement="right" data-toggle="tooltip" title="Ajouter un client VDV"><i class="icon-plus"></i></div>&
+     ?>
+    </li>
+    <?vdv_clients_list&template=<{client&template=
+     	<li class="tree_1<@(sl_id==id)?" active":""@>">
+     	 <?link&
+     	   target=<@p@>&
+     	   tab=slaves&
+     	   roid=<@id@>&
+     	   text=<span class="status status-<@active@>">\&nbsp;</span>
+     	        <span data-content="name"><@name?name:"(sans nom)"@></span>
+     	        <@(id==sl_id)?("<div class=\"pull-right\" id=\"client_remove_link\" data-id=\""+ id +"\" data-toggle=\"tooltip\" title=\"Supprimer le client "+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+     	 ?>
+     	</li>
+     }>?>
+   </ul>
+  </div>
+   <?if&
+     cond=<@sl_id@>&
+     else=	<div class="span9">
+     		 <div class="alert alert-info">Cette page permet de déclarer les systèmes clients se connectant au serveur SYNTHESE pour obtenir des informations en temps réel.<br />Sélectionner le système client à administrer dans le menu ci-contre ou cliquer sur l'une des icones <i class="icon-plus"></i> pour en ajouter un.</div>
+     		</div>&
+     then=
+     
+     <?if&
+       cond=<@(~decode_table(sl_id))==93@>&
+       then=<?object&roid=<@sl_id@>&template=
+            <div class="span5">
+       	     <?form&
+	       name=id_properties&
+	       roid=<@sl_id@>&
+	       tab=slaves&
+	       target=<@p@>&
+	       a=ObjectUpdate&
+	       actionParam_object_id=<@sl_id@>&
+	       class=form-horizontal&
+	     ?>
+	      <div class="control-group">
+	       <label class="control-label">ID</label>
+	       <div class="controls">
+	        <label class="control-label"><@id@></label>
+	       </div>
+	      </div>
+	      <div class="control-group">
+	       <label class="control-label">Nom</label>
+	       <div class="controls">
+	        <input type="text" name="actionParam_field_name" value="<@name@>" />
+	       </div>
+	      </div>
+	      <div class="control-group">
+	       <label class="control-label">Adresse</label>
+	       <div class="controls">
+	        <input type="text" name="actionParam_field_address" class="input-medium" value="<@address@>" placeholder="Adresse" /> : <input type="text" class="input-mini" name="actionParam_field_port" value="<@port@>" placeholder="Port" />
+	       </div>
+	      </div>
+	      <div class="control-group">
+	       <label class="control-label">Flux</label>
+	       <div class="controls">
+	        <select name="actionParam_field_config_id" />
+	         <option value="0">(non défini)</option>
+	         <?inter_synthese_configs&template=<{config&template=
+	        	<option value="<@id@>" <@(config_id==id)?" selected=\"true\"":""@>><@name@></option>
+	         }>?>
+	        </select>
+	       </div>
+	      </div><div class="control-group">
+	       <div class="controls">
+	        <button class="btn btn-warning">Modifier</button>
+	       </div>
+	      </div>
+	     </form>
+            </div><div class="span4">
+             <div class="well">
+              <h4>
+               Statut : <span class="label label-<@active?"success":"important"@>"><@active?"Actif":"Inactif"@></span>
+               <div class="pull-right">
+                <?link&
+                  target=<@p@>&
+                  text=<i class="icon-<@active?"pause":"play"@> icon-white"></i>&
+                  class=btn btn-<@active?"warning":"success"@> btn-small&
+                  a=ObjectUpdate&
+                  actionParam_object_id=<@sl_id@>&
+                  roid=<@sl_id@>&
+                  tab=slaves&
+                  actionParam_field_active=<@active?0:1@>&
+                  confirm=<@active?("Etes-vous sûr de vouloir stopper la synchronisation du client Inter-SYNTHESE "+name+" ?"):""@>&
+                ?>
+               </h4>
+               Dernier accès : <@last_activity_report?last_activity_report:"néant"@>
+               <div class="pull-right">
+               <?if&
+                 cond=<@last_activity_report@>&
+                 then=  <?link&
+			  target=<@p@>&
+		          roid=<@sl_id@>&
+		          text=<i class="icon-stop icon-white"></i>&
+		          confirm=Etes-vous sûr de vouloir réinitialiser le client Inter-SYNTHESE <@name@> ?&
+		          a=ObjectUpdate&
+		          tab=slaves&
+		          actionParam_object_id=<@sl_id@>&
+		          actionParam_field_last_activity_report=&
+		          class=btn btn-small btn-danger&
+		        ?>
+	       ?>
+               </div>
+               <a href="#inter-synthese_queue_modal" data-toggle="modal"><br />Queue de synchronisation</a>
+              </div>
+             </div>
 
-<h1>Esclave <@name?(name+" ("+address+")"):address@></h1>
+            <div class="hide modal fade" id="inter-synthese_queue_modal">
+             <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+              <h3>Queue de synchronisation</h3>
+             </div><div class="modal-body">
+		<table class="table table-striped table-condensed"><thead>
+		 <tr><th>Rang</th><th>Heure</th><th>Type</th><th>Contenu</th></tr>
+		</thead><tbody>
+		 <{queue_item&template=
+		 	<?if&cond=<@rank<50@>&then=
+				<tr>
+				<td><@rank@></td>
+				<td><?substr&t=<@request_time@>&n=19?></td>
+				<td><@sync_type@></td>
+				<td><?substr&t=<@content@>&n=100?></td>
+				</tr>
+			 ?><?if&cond=<@rank==50@>&then=
+				<tr><td>...</td></tr>
+			 ?>
+		 }>
+		</tbody></table>
+	     </div><div class="modal-footer">
+		<a href="#" class="btn btn-primary" data-dismiss="modal">Fermer</a>
+	     </div>
+            </div>
 
-<ul class="nav nav-tabs"><{tabs&template=
- <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
-}></ul>
+	    ?>
+	?>
+	<?if&
+	  cond=<@(~decode_table(sl_id))==99@>&
+	  then=<?object&roid=<@sl_id@>&template=
+	  	<div class="span5">
+	        <?form&
+		  target=<@p@>&
+		  name=vdv_properties&
+		  a=ObjectUpdate&
+		  actionParam_object_id=<@sl_id@>&
+		  roid=<@sl_id@>&
+		  tab=slaves&
+		  class=form-horizontal&
+		?>
+	         <div class="control-group">
+	          <label class="control-label">Nom</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_name" value="<@name@>" />
+	          </div>
+	         </div><div class="control-group">
+	          <label class="control-label">Adresse d'envoi des notifications</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_reply_host" class="input-medium" value="<@replay_host@>" placeholder="Adresse" /> : <input type="text" class="input-mini" name="actionParam_field_reply_port" value="<@reply_port@>" placeholder="Port" />
+	          </div>
+	         </div><div class="control-group">
+	          <label class="control-label">Code du serveur SYNTHESE</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_server_control_centre_code" value="<@server_control_centre_code@>" />
+	          </div>
+	         </div><div class="control-group">
+	          <label class="control-label">Code du client VDV</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_client_control_centre_code" value="<@client_control_centre_code@>" />
+	          </div>
+	         </div><div class="control-group">
+	          <label class="control-label">Code du service</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_service_code" value="<@service_code@>" />
+	          </div>
+	         </div><div class="control-group">
+	          <label class="control-label">Source de données</label>
+	          <div class="controls">
+		   <select name="actionParam_field_data_source_id">
+		    <option<@(0==data_source_id)?" selected=\"true\"":""@>>(aucune)</option>
+		    <?data_sources&template=<{data_source&template=
+		    	<option<@(id==data_source_id)?" selected=\"true\"":""@>><@name@></option>
+		    }>?>
+		   </select>
+	          </div>
+	         </div><div class="control-group">
+	          <label class="control-label">Direction par défaut</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_default_direction" value="<@default_direction@>" />
+	          </div>
+	         </div><div class="control-group">
+	          <label class="control-label">Répertoire de logs (trace)</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_trace_path" value="<@trace_path@>" />
+	          </div>
+	         </div><div class="control-group">
+	          <div class="controls">
+	           <button class="btn btn-warning">Modifier</button>
+	          </div>
+	         </div>
+	        </form>
+	        </div><div class="span4">
+	             <div class="well">
+	              <h4>
+	               Statut : <span class="label label-<@active?"success":"important"@>"><@active?"Actif":"Inactif"@></span>
+	               <div class="pull-right">
+	                <?link&
+	                  target=<@p@>&
+	                  text=<i class="icon-<@active?"pause":"play"@> icon-white"></i>&
+	                  class=btn btn-<@active?"warning":"success"@> btn-small&
+	                  a=ObjectUpdate&
+	                  actionParam_object_id=<@sl_id@>&
+	                  roid=<@sl_id@>&
+	                  tab=slaves&
+	                  actionParam_field_active=<@active?0:1@>&
+	                  confirm=<@active?("Etes-vous sûr de vouloir stopper la synchronisation du client VDV "+name+" ?"):""@>&
+	                ?>
+	               </h4>
+	               <a href="#vdv_server_subscriptions_modal" data-toggle="modal"><br />Abonnements en cours</a>
+	              </div>
+		        </div>
+	        
+                <div class="hide modal fade" id="vdv_server_subscriptions_modal">
+	             <div class="modal-header">
+	              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+	              <h3>Abonnements en cours</h3>
+	             </div><div class="modal-body">
+		 <table class="table table-striped table-condensed"><thead>
+	 	  <tr><th></th><th>nom</th><th>arrêt</th><th>ligne</th><th>direction</th><th>visibilité</th><th>hysteresis</th></tr>
+		 </thead><tbody>
+	     	  <{subscription&template=
+		 	<tr>
+		 	 <td><@id@></td>
+		 	 <{stop_area&template=
+		 	 	<td><@city_name@></td>
+		 	 	<td><@name@></td>
+		 	 }><{line&template=
+		 	 	<td><@shortName@></td>
+		 	 	<td><@name@></td>
+		 	 }>
+		 	 <th><@direction_filter@></th>
+		 	 <th><@time_span@></th>
+		 	 <th><@hysteresis@></th>
+		 	</tr>
+		  }>
+		 </tbody></table>
+	     </div><div class="modal-footer">
+		<a href="#" class="btn btn-primary" data-dismiss="modal">Fermer</a>
+	     </div>
+		 </div>
+		
+	       ?>
 
-<div class="tab-content">
-<div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
+	?>
+	
+	  <div class="hide modal fade" id="client_remove_modal">
+	   <?form&
+	     name=client_remove&
+	     target=<@p@>&
+	     tab=slaves&
+	     a=RemoveObjectAction&
+	     actionParam_object_id=&
+	   ?>
+           <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+            <h3>Confirmation de suppression</h3>
+           </div><div class="modal-body">
+            <p>Etes-vous sûr de vouloir supprimer le client <span id="client_remove_name_span"></span> ?</p>
+	   </div><div class="modal-footer">
+	    <button type="submit" class="btn btn-danger">Oui</button>
+	    <a href="#" class="btn btn-primary" data-dismiss="modal">Non</a>
+	   </div>
+	   </form>
+	  </div>
+	
+   ?>
 
-<?form&
-  name=properties&
-  slave_id=<@slave_id@>&
-  page_id=<@p@>&
-  a=ObjectUpdate&
-  actionParam_object_id=<@slave_id@>
-?>
- <table class="table table-striped table-condensed">
- <tr><td>ID</td><td><@id@></td></tr>
- <tr><td>Nom</td><td><input type="text" name="actionParam_field_name" value="<@name@>" /></td></tr>
- <tr><td>Adresse</td><td><input type="text" name="actionParam_field_address" value="<@address@>" /></td></tr>
- <tr><td>Port</td><td><input type="text" name="actionParam_field_port" value="<@port@>" /></td></tr>
- <tr><td>Actif</td><td><input type="text" name="actionParam_field_active" value="<@active@>" /></td></tr>
- <tr><td>Configuration</td>  <td><select name="actionParam_field_config_id" /><?inter_synthese_configs&template=
-  <{config&template=<option value="<@id@>" <@(config_id==id)?" selected=\"true\"":""@>><@name@></option>}>?></select></td>
-</tr>
- <tr><td></td><td><button class="btn btn-warning" type="submit">OK</button></td></tr>
-</table>
-</form>
+	  <div class="hide modal fade" id="client_add_modal">
+	   <?form&
+	     name=client_add&
+	     target=<@p@>&
+	     tab=slaves&
+	     a=ObjectCreate&
+	     actionParam_table_id=&
+	     actionParam_field_active=0&
+	     class=form-horizontal&
+	     co=1&
+	   ?>
+           <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+            <h3>Création de client <span id="client_add_type_span"></span></h3>
+           </div><div class="modal-body">
+	         <div class="control-group">
+	          <label class="control-label">Nom</label>
+	          <div class="controls">
+	           <input type="text" name="actionParam_field_name" placeholder="Nom" />
+	          </div>
+	         </div>
+	   </div><div class="modal-footer">
+	    <button type="submit" class="btn btn-warning">Créer</button>
+	    <a href="#" class="btn btn-primary" data-dismiss="modal">Annuler</a>
+	   </div>
+	   </form>
+	  </div>
 
-</div><div class="tab-pane <@(tab=="queue")?"active":""@>" id="queue">
+ </div>
 
-<div class="well">Dernier accès : <@last_activity_report@></div>
 
-<table class="table table-striped table-condensed"><thead>
- <tr><th>Rang</th><th>Heure</th><th>Type</th><th>Contenu</th></tr>
-</thead><tbody>
- <{queue_item&template=
- 	<?if&cond=<@rank<50@>&then=
-		<tr>
-		<td><@rank@></td>
-		<td><?substr&t=<@request_time@>&n=19?></td>
-		<td><@sync_type@></td>
-		<td><?substr&t=<@content@>&n=100?></td>
-		</tr>
-	 ?><?if&cond=<@rank==50@>&then=
-		<tr><td>...</td></tr>
-	 ?>
- }>
-</tbody></table>
 
-</div><div class="tab-pane <@(tab=="links")?"active":""@>" id="links">
-
-<div class="well">
-<p><a href="http://<@address@><@port?(":"+port):""@>/admin" target="_new" class="btn btn-primary">Administration SYNTHESE</a></p>
-<p><a href="http://<@address@><@port?(":"+port):""@>/inter_synthese_admin" target="_new" class="btn btn-primary">Administration Inter-SYNTHESE</a></p>
+</div>
 </div>
 
-
-</div></div>
-
-?>}>?>
+<script src="/connect/js/server.js"></script>

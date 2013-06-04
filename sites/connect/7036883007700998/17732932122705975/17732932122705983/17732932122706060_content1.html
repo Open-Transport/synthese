@@ -1,0 +1,235 @@
+<ul class="breadcrumb">
+<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+<li class="active">Vue serveur <span class="divider">/</span></li>
+<li class="active">Paquets Inter-SYNTHESE</li>
+</ul>
+
+<div class="row-fluid">
+ <div class="span3" id="tree">
+  <ul class="nav nav-list well">
+   <li class="<@roid?"":" active"@>">
+    <?link&
+      target=<@p@>&
+      text=Paquets Inter-SYNTHESE
+           <div class="pull-right" id="package_add_link" title="Créer un paquet Inter-SYNTHESE"><i class="icon-plus<@roid?"":" icon-white"@>"></i></div>&
+    ?>
+   </li>
+   <?inter_synthese_packages&template=<{package&template=
+   	<?if&cond=<@import_id@>&else=
+		<li class="tree_1<@(roid==id)?" active":""@>">
+	     	 <?link&
+	     	   target=<@p@>&
+	     	   roid=<@id@>&
+	     	   text=<span data-content="name"><@name?name:"(sans nom)"@></span>
+	     	        <@(id==roid)?("<div class=\"pull-right\" id=\"package_remove_link\" title=\"Supprimer le paquet "+name+"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>&
+	     	 ?>
+	     	</li>
+	?>
+   }>?>
+  </ul>
+ </div>
+ 
+  <?if&
+    cond=<@roid@>&
+    else=<div class="span9"><div class="alert alert-info">Cet écran permet de configurer les paquets Inter-SYNTHESE mis à disposition sur ce dépôt.<br />Sélectionner le paquet à configurer dans le menu ci-contre ou cliquer sur l'icone <i class="icon-plus"></i> pour en créer un nouveau.</div></div>&
+    then=
+	
+	<?object&
+	  roid=<@roid@>&
+	  additional_parameters=1&
+	  template=
+	  	<@edit=<@lock_time&&(!lock_server_name)@>@>
+		<div class="span5">
+		<?if&
+		  cond=<@edit@>&
+		  then=	<?form&
+		  	  form_id=update_form&
+		  	  name=update&
+			  page_id=<@p@>&
+			  a=ObjectUpdate&
+			  actionParam_object_id=<@id@>&
+			  roid=<@roid@>&
+			  class=form-horizontal&
+			  actionParam_field_object_ids=&
+			?>&
+		  else=<div class="form-horizontal">&
+		?>
+		 <?if&
+		   cond=<@!lock_time@>&
+		   then=<div class="alert">Pour modifier ce paquet, il est nécessaire au préalable de le vérouiller à l'aide du bouton <i class="icon-lock"></i>.</div>&
+		 ?>
+		 <h3>Dénomination</h3>
+		 <div class="control-group">
+		  <label class="control-label" for="prop-name">Nom</label>
+		  <div class="controls"><?if&cond=<@edit@>&then=<input type="text" name="actionParam_field_name" value="<@name@>" />&else=<@name@>?></div>
+		 </div>
+		 <div class="control-group">
+		  <label class="control-label" for="prop-name">Code</label>
+		  <div class="controls"><?if&cond=<@edit@>&then=<input type="text" name="actionParam_field_code" value="<@code@>" />&else=<@code@>?></div>
+		 </div>
+		 <h3>Droits d'accès</h3>
+		 <div class="control-group">
+		  <label class="control-label" for="prop-name">Lecture publique autorisée</label>
+		  <div class="controls">
+		   <?if&
+		     cond=<@edit@>&
+		     then= <label class="radio inline"><input type="radio" name="actionParam_field_public" value="1" <@public?"checked=\"true\"":""@> /> OUI</label>
+			   <label class="radio inline"><input type="radio" name="actionParam_field_public" value="0" <@public?"":"checked=\"true\""@> /> NON</label>&
+		     else=<@public?"OUI":"NON"@>&
+		   ?>
+		  </div>
+		 </div>
+		 <h3>Contenu</h3>
+		 <div class="control-group">
+		  <label class="control-label" for="prop-name">Tables complètes</label>
+		  <div class="controls">
+		  </div>
+		 </div>
+		 <div class="control-group">
+		  <label class="control-label" for="prop-name">Objets spécifiques</label>
+		  <div class="controls">
+		   <table class="table table-condensed table-striped" id="objects_table">
+		    <tbody>
+		    </tbody>
+		    <?if&cond=<@edit@>&then=
+			    <tfoot>
+			     <tr><td></td><td></td><td><div class="pull-right" id="object_add_link"><a href="#"><i class="icon-plus"></i></a></div></td></tr>
+			    </tfoot>
+		    ?>
+		   </table>
+		  </div>
+		 </div>
+		 <?if&cond=<@edit@>&then=
+			 <div class="control-group">
+			  <div class="controls"><button type="submit" class="btn btn-warning">Enregistrer les modifications</button></div>
+			 </div>
+			</form>&
+		   else=</div>&
+		 ?>
+
+		</div><div class="span4">
+		
+		 <div class="well">
+		  <h4>Statut :
+		   <span class="label label-<@lock_time?<@lock_server_name?"important":"info"@>:"success"@>"><@lock_time?<@lock_server_name?("Edition en cours sur "+ lock_server_name):"Edition en cours sur ce serveur"@>:"Libre"@></span>
+		   <div class="pull-right">
+		    <?if&
+		      cond=<@lock_server_name@>&
+		      else=
+			    <?link&
+			      target=<@p@>&
+			      class=btn btn-warning btn-small&
+			      roid=<@roid@>&
+			      a=inter-synthese_package_auto_lock&
+			      actionParam_package_id=<@roid@>&
+			      actionParam_lock=<@lock_time?0:1@>&
+			      text=<i class="icon-<@lock_time?"ok":"lock"@> icon-white"></i>&
+			      confirm=Etes-vous sûr de vouloir <@lock_time?"libérer":"vérouiller"@> le paquet <@name@> ?&
+			    ?>
+		    ?>
+		   </div>
+		  </h4>
+		 </div>
+		
+		</div>
+		
+		<div class="hide modal fade" id="package_remove_modal">
+		   <?form&
+		     name=package_remove&
+		     target=<@p@>&
+		     a=RemoveObjectAction&
+		     actionParam_object_id=<@id@>&
+		   ?>
+		   <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+		    <h3>Confirmation de suppression</h3>
+		   </div><div class="modal-body">
+		    <p>Etes-vous sûr de vouloir supprimer le paquet <@name@> ?</p>
+		    <p>Note : cela ne supprimera pas les objets présents à l'intérieur.</p>
+		   </div><div class="modal-footer">
+		    <button type="submit" class="btn btn-danger">Oui</button>
+		    <a href="#" class="btn btn-primary" data-dismiss="modal">Non</a>
+		   </div>
+		   </form>
+		</div>
+		
+		<script>
+		edit = <@edit@>;
+		objects=[
+		<{object&template=
+			<@table_id=<@~decode_table(id)@>@>
+			{ id: '<@id@>',
+			  name: "<@name@>",
+			  table: '<?tables&template=<{table&template=<?if&cond=<@table_id==id@>&then=<@name@>?>}>?>'
+			},
+		}>];
+		</script>
+	
+	?>
+	
+  ?>
+ </div>
+</div>
+
+<div class="hide modal fade" id="package_add_modal">
+   <?form&
+     name=package_add&
+     target=<@p@>&
+     a=ObjectCreate&
+     actionParam_table_id=111&
+     class=form-horizontal&
+     co=1&
+   ?>
+   <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+    <h3>Création de paquet Inter-SYNTHESE</h3>
+   </div><div class="modal-body">
+         <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+           <input type="text" name="actionParam_field_name" placeholder="Nom" />
+          </div>
+         </div>
+   </div><div class="modal-footer">
+    <button type="submit" class="btn btn-warning">Créer</button>
+    <a href="#" class="btn btn-primary" data-dismiss="modal">Annuler</a>
+   </div>
+   </form>
+</div>
+
+<div class="hide modal fade" id="object_add_modal">
+   <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+    <h3>Ajout d'objet au paquet</h3>
+   </div><div class="modal-body">
+    <div class="form-horizontal">
+         <div class="control-group">
+          <label class="control-label">ID</label>
+          <div class="controls">
+           <input type="text" id="object_add_id_field" placeholder="ID" />
+          </div>
+         </div>
+    </div>
+    <div id="object_add_check_div"></div>
+   </div><div class="modal-footer">
+    <a href="#" class="btn btn-primary" data-dismiss="modal">Annuler</a>
+    <a href="#" id="object_add_confirm_link" class="btn btn-warning">Ajouter</a>
+   </div>
+</div>
+
+
+<div class="hide modal fade" id="object_remove_modal">
+   <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+    <h3>Confirmation de suppression d'objet</h3>
+   </div><div class="modal-body">
+    <p>Etes-vous sûr de vouloir supprimer l'objet <span id="object_remove_name_span"></span> du paquet ?</p>
+    <p>Note : seul le lien entre l'objet et le paquet sera supprimé.</p>
+   </div><div class="modal-footer">
+    <a href="#" class="btn btn-danger" id="object_remove_confirm_link">Oui</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal">Non</a>
+   </div>
+</div>
+
+
+<script src="/connect/js/packages.js"></script>
