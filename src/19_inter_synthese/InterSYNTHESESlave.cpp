@@ -51,6 +51,7 @@ namespace synthese
 	namespace inter_synthese
 	{
 		const string InterSYNTHESESlave::TAG_QUEUE_ITEM = "queue_item";
+		const string InterSYNTHESESlave::TAG_QUEUE_SIZE = "queue_size";
 
 
 
@@ -136,7 +137,10 @@ namespace synthese
 			util::ParametersMap& map,
 			std::string prefix /*= std::string() */
 		) const	{
-			
+
+			map.insert(prefix + TAG_QUEUE_SIZE, _queue.size());
+
+			size_t count(30);
 			BOOST_FOREACH(const Queue::value_type& it, _queue)
 			{
 				shared_ptr<ParametersMap> itemPM(new ParametersMap);
@@ -144,6 +148,13 @@ namespace synthese
 				it.second->toParametersMap(*itemPM);
 
 				map.insert(prefix + TAG_QUEUE_ITEM, itemPM);
+
+				if(--count == 0)
+				{
+					// We don't want to publish this way all the queue content
+					// as it may be huge.
+					break;
+				}
 			}
 		}
 
