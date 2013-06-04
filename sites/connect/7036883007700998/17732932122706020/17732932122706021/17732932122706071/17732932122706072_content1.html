@@ -1,0 +1,33 @@
+<h3>Accès aux données</h3>
+
+<#forms/text_input&
+  label=URL&
+  name=url&
+#>
+
+<#forms/text_input&
+  label=Utilisateur&
+  name=user&
+#>
+
+<#forms/text_input&
+  label=Mot de passe&
+  name=password&
+  password=1&
+#>
+
+<?if&
+  cond=<@for=="execution"@>&
+  then=
+	<h3>Accès en écriture</h3>
+	
+	<#forms/yes_no_input&
+	  label=Vérouiller les données pour les modifier localement&
+	  name=lock&
+	#>
+	
+	<#forms/text_input&
+	  label=Nom du serveur courant pour identification du verrou&
+	  name=lock_server_name&
+	#>
+?>
