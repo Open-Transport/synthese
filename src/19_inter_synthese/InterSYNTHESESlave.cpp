@@ -190,6 +190,15 @@ namespace synthese
 
 			Queue::iterator itEnd(_queue.end());
 			--itEnd;
+			if(_queue.size() > get<InterSYNTHESEConfig>()->get<MaxQueriesNumber>())
+			{
+				itEnd = _queue.begin();
+				size_t count(get<InterSYNTHESEConfig>()->get<MaxQueriesNumber>());
+				while(--count)
+				{
+					++itEnd;
+				}
+			}
 			return make_pair(
 				_queue.begin(),
 				itEnd
