@@ -3,10 +3,11 @@
 <head>
 <@session_id=<?session&template=<{session&template=<@id@>}>?>@>
 <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="/connect/css/main.css" rel="stylesheet">
 <style type="text/css">
 body { padding-top:55px; }
 </style>
-<title><@title@></title>
+<title><@title@> - SYNTHESE Connect</title>
 <script src="/lib/jquery/jquery-1.7.1.min.js"></script>
 <link href="/lib/bootstrap_datepicker/css/datepicker.css" rel="stylesheet">
 <script src="/lib/bootstrap_datepicker/js/bootstrap-datepicker-fr.js"></script>
@@ -14,10 +15,10 @@ body { padding-top:55px; }
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
  <div class="navbar-inner" style="border-radius:0 !important;">
-  <div class="container">
+  <div class="container-fluid">
    <?link&
      target=17732932122705975&
-     text=Connect&
+     text=SYNTHESE Connect&
      class=brand&
    ?>
    <?if&
@@ -27,10 +28,22 @@ body { padding-top:55px; }
 	 <?menu&
 	   root=17732932122705975&
 	   raw_data=1&
+	   max_depth=2&
 	   template=<{page&template=
-		<li<?if&cond=<@current_page_in_branch@>&then= class="active"?>>
-		 <?link&target=<@id@>&text=<@title@>&class=<?if&cond=<@current_page_in_branch@>&then=<@page_id=<@id@>@>?>?>
-		</li>
+		 <?if&cond=<{page&template=1}>&then=
+		   <li class="dropdown<@current_page_in_branch?" active":""@>">
+		    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="menu_<@id@>"><@title@> <b class="caret"></b></a>
+		    <ul class="dropdown-menu" role="menu" aria-labelledby="menu_<@id@>">
+		     <{page&template=
+      			 <li><?link&target=<@id@>&text=<@title@>&class=<?if&cond=<@current_page_in_branch@>&then=<@page_id=<@id@>@>?>?></li>
+      		     }>
+      		    </ul>
+      		   </li>
+      		  &else=
+    		   <li<?if&cond=<@current_page_in_branch@>&then= class="active"?>>
+		     <?link&target=<@id@>&text=<@title@>&class=<?if&cond=<@current_page_in_branch@>&then=<@page_id=<@id@>@>?>?>
+		   </li>
+      		  ?>
  	   }>
  	 ?>
  	</ul>
@@ -44,7 +57,7 @@ body { padding-top:55px; }
  </div>
 </div>
 
-<div class="container">
+<div class="container-fluid">
 <?if&
   cond=<@session_id@>&
   then=<@content@>&
@@ -68,5 +81,6 @@ body { padding-top:55px; }
 ?>
 </div>
 <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="/connect/js/connect.js"></script>
 </body>
 </html>

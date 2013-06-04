@@ -1,159 +1,248 @@
-<@tabs["properties"]=Propriétés@>
-<@tabs["db"]=Base de données@>
-<@tabs["ptrt"]=Temps réel transport public@>
-<@tab=<@tab?tab:"properties"@>@>
-<@config_id=<@roid@>@>
+<ul class="breadcrumb">
+<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+<li class="active">Vue serveur <span class="divider">/</span></li>
+<li class="active">Flux Inter-SYNTHESE</li>
+</ul>
 
-<?inter_synthese_configs&template=
-<{config&template=<?if&cond=<@id==config_id@>&then=
+<div class="row-fluid">
+ <div class="span3" id="tree">
+  <ul class="nav nav-list well">
+   <li class="<@roid?"":" active"@>">
+    <?link&
+      target=<@p@>&
+      text=Flux Inter-SYNTHESE
+           <div class="pull-right" id="stream_add_link"><i class="icon-plus"></i></div>&
+    ?>
+   </li>
+   <?inter_synthese_slaves_view&template=<{slave&template=
+     <@is_used[<@config_id@>]=1@>
+   }>?>
+   <?inter_synthese_configs&template=<{config&template=
+	<li class="tree_1<@(roid==id)?" active":""@>">
+     	 <?link&
+     	   target=<@p@>&
+     	   roid=<@id@>&
+     	   text=<span data-content="name"><@name?name:"(sans nom)"@></span>
+     	        <@((id==roid)&&(!is_used[id]))?"<div class=\"pull-right\" id=\"stream_remove_link\"><i class=\"icon-remove icon-white\"></i></div>":""@>&
+     	 ?>
+     	</li>
+   }>?>
+  </ul>
+ </div><div class="span9">
+ 
+  <?if&
+    cond=<@roid@>&
+    else=<div class="alert alert-info">Cet écran permet de configurer les flux Inter-SYNTHESE mis à disposition des systèmes clients.<br />Sélectionner le flux à configurer dans le menu ci-contre ou cliquer sur l'icone <i class="icon-plus"></i> pour en créer un nouveau.</div>&
+    then=
+	<@tabs["properties"]=Propriétés@>
+	<@tabs["db"]=Base de données@>
+	<@tabs["ptrt"]=Temps réel transport public@>
+	<@tab=<@tab?tab:"properties"@>@>
+	<@config_id=<@roid@>@>
+	
+	<?object&
+	  roid=<@roid@>&
+	  additional_parameters=1&
+	  template=
+	
+		<ul class="nav nav-tabs"><{tabs&template=
+		 <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
+		}></ul>
+		
+		<div class="tab-content">
+		<div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
 
-	<ul class="breadcrumb">
-	<li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
-	<li><?link&target=/server&tab=configs?> <span class="divider">/</span></li>
-	<h1>Configuration <@name@></h1>
-	</ul>
+		<?if&cond=<@is_used[id]@>&then=
+	    		<div class="alert">
+	    		 <button type="button" class="close" data-dismiss="alert">\&times;</button>
+	    		 <strong>Remarque</strong> Ce flux ne peut pas être supprimé pour le moment, car il est utilisé par au moins un <?link&target=/server/clients&text=système client?>.
+			</div>
+		?>
+			
+		<?form&
+		  name=properties&
+		  page_id=<@p@>&
+		  a=ObjectUpdate&actionParam_object_id=<@id@>&
+		  roid=<@config_id@>&
+		  class=form-horizontal&
+		?>
+		 <div class="control-group">
+		  <label class="control-label" for="prop-name">Nom</label>
+		  <div class="controls"><input type="text" id="prop_name" name="actionParam_field_name" value="<@name@>" /></div>
+		 </div>
+		 <div class="control-group">
+		  <label class="control-label">Tranmission complète systématique</label>
+		  <div class="controls">
+		   <label class="radio inline"><input type="radio" name="actionParam_field_force_dump" value="1" <@force_dump?"checked=\"true\"":""@>" /> OUI</label>
+		   <label class="radio inline"><input type="radio" name="actionParam_field_force_dump" value="0" <@force_dump?"":"checked=\"true\""@>" /> NON</label>
+		  </div>
+		 </div>
+		 <?if&cond=<@force_dump@>&else=
+			 <div class="control-group">
+			  <label class="control-label">Durée maximale d'interrpuption avant transfert complet</label>
+			  <div class="controls"><div class="input-prepend input-append">
+			   <input type="text" name="actionParam_field_link_break_minutes" value="<@link_break_minutes@>" class="input-mini" />
+			   <span class="add-on">min</span>
+			  </div></div>
+			 </div>
+		 ?>
+		 <div class="control-group">
+		  <label class="control-label">Nombre maximal d'éléments par transmissions</label>
+		  <div class="controls"><input type="text" name="actionParam_field_max_queries_number" value="<@max_queries_number@>" class="input-mini" /></div>
+		 </div>
+		 <div class="control-group">
+		  <div class="controls"><button type="submit" class="btn btn-warning">OK</button></div>
+		 </div>
+		</form>
+		
+		</div><div class="tab-pane <@(tab=="db")?"active":""@>" id="db">
+		
+		<?tables&template=<{table&template=<@table_name[id]=<@name@>@>}>?>
+		
+		<?form&
+		  page_id=<@p@>&
+		  name=add_item&
+		  a=ObjectCreate&
+		  actionParam_table_id=95&
+		  actionParam_field_config_id=<@config_id@>&
+		  roid=<@config_id@>&
+		  actionParam_field_sync_type=db&
+		  tab=db
+		?>
+		<table class="table table-condensed table-striped"><thead>
+		 <tr><th>table</th><th></th></tr>
+		</thead><tbody>
+		 <tr class="warning">
+		  <td><select name="actionParam_field_perimeter">
+		   <?tables&template=<{table&template=<option value="<@id@>"><@name@></option>}>?>
+		  </select></td>
+		  <td><button class="btn btn-warning btn-mini" type="submit">Ajouter</button></td>
+		 </tr>
+		 <{item&
+		   sort_up=<@table_name[perimeter]@>&
+		   template=
+		   	<?if&
+		   	  cond=<@sync_type=="db"@>&
+		   	  then=
+				<tr>
+				 <td><@table_name[perimeter]@></td>
+				 <td>
+				  <?link&
+				    target=<@p@>&
+				    a=RemoveObjectAction&
+				    actionParamoi=<@id@>&
+				    text=Supprimer&
+				    roid=<@config_id@>&
+				    class=btn btn-danger btn-mini&
+				    tab=db&
+				  ?>
+				 </td>
+				</tr>
+		   	?>
+		 }>
+		</tbody></table>
+		</form>
+		
+		</div><div class="tab-pane <@(tab=="ptrt")?"active":""@>" id="ptrt">
+		
+		<?PTNetworksListFunction&
+		  template=<{network&template=
+		  	<@network_name[network_id]=<@name@>@>
+		  }>
+		?>
+		<?form&
+		  page_id=<@p@>&
+		  name=add_item&
+		  a=ObjectCreate&
+		  actionParam_table_id=95&
+		  actionParam_field_config_id=<@id@>&
+		  roid=<@config_id@>&
+		  actionParam_field_sync_type=ptrt&
+		  tab=ptrt&
+		?>
+		<table class="table table-condensed table-striped"><thead>
+		 <tr><th>réseau</th><th></th></tr>
+		</thead><tbody>
+		 <tr class="warning">
+		  <td><select name="actionParam_field_perimeter">
+		   <?PTNetworksListFunction&
+		     template=<{network&template=<option value="<@network_id@>"><@name@></option>}>
+		   ?>
+		  </select></td>
+		  <td><button type="submit" class="btn btn-mini btn-warning">Ajouter</button></td>
+		 </tr>
+		 <{item&template=<?if&cond=<@sync_type=="ptrt"@>&then=
+			<tr>
+			 <td><@network_name[perimeter]@></td>
+			 <td>
+			  <?link&
+			    target=<@p@>&
+			    a=RemoveObjectAction&
+			    actionParamoi=<@id@>&
+			    text=Supprimer&
+			    roid=<@config_id@>&
+			    class=btn btn-mini btn-danger&
+			    tab=ptrt&
+			  ?>
+			 </td>
+			</tr>
+		 ?>}>
+		</tbody></table>
+		</form>
+		
+		</div>
+		</div>
+		
+		<div class="hide modal fade" id="stream_remove_modal">
+		   <?form&
+		     name=source_remove&
+		     target=<@p@>&
+		     a=RemoveObjectAction&
+		     actionParam_object_id=<@id@>&
+		   ?>
+		   <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+		    <h3>Confirmation de suppression</h3>
+		   </div><div class="modal-body">
+		    <p>Etes-vous sûr de vouloir supprimer le flux <@name@> ?</p>
+		   </div><div class="modal-footer">
+		    <button type="submit" class="btn btn-danger">Oui</button>
+		    <a href="#" class="btn btn-primary" data-dismiss="modal">Non</a>
+		   </div>
+		   </form>
+		</div>
 
-<ul class="nav nav-tabs"><{tabs&template=
- <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
-}></ul>
-
-<div class="tab-content">
-<div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
-
-<?form&
-  name=properties&
-  page_id=<@p@>&
-  a=ObjectUpdate&actionParam_object_id=<@id@>&
-  roid=<@config_id@>&
-  force_dump=<@force_dump@>&
-  class=form-horizontal&
-  tab=properties
-?>
- <div class="control-group">
-  <label class="control-label" for="prop-name">Nom</label>
-  <div class="controls"><input type="text" id="prop_name" name="actionParam_field_name" value="<@name@>" /></div>
+		
+	?>
+	
+  ?>
  </div>
- <div class="control-group">
-  <label class="control-label">Tranmission complète systématique</label>
-  <div class="controls">
-   <label><input type="radio" name="actionParam_field_force_dump" value="1" <@force_dump?"checked=\"true\"":""@>" /> OUI</label>
-   <label><input type="radio" name="actionParam_field_force_dump" value="0" <@force_dump?"":"checked=\"true\""@>" /> NON</label>
-  </div>
- </div>
- <?if&cond=<@force_dump@>&else=
-	 <div class="control-group">
-	  <label class="control-label">Durée maximale d'interrpuption avant transfert complet</label>
-	  <div class="controls"><div class="input-prepend input-append">
-	   <input type="text" name="actionParam_field_link_break_minutes" value="<@link_break_minutes@>" class="input-mini" />
-	   <span class="add-on">min</span>
-	  </div></div>
-	 </div>
- ?>
- <div class="control-group">
-  <label class="control-label">Nombre maximal d'éléments par transmissions</label>
-  <div class="controls"><input type="text" name="actionParam_field_max_queries_number" value="<@max_queries_number@>" class="input-mini" /></div>
- </div>
- <div class="control-group">
-  <div class="controls"><button type="submit" class="btn btn-warning">OK</button></div>
- </div>
-</form>
+</div>
 
-</div><div class="tab-pane <@(tab=="db")?"active":""@>" id="db">
-
-<?tables&template=<{table&template=<@table_name[id]=<@name@>@>}>?>
-
-<?form&
-  page_id=<@p@>&
-  name=add_item&
-  a=ObjectCreate&
-  actionParam_table_id=95&
-  actionParam_field_config_id=<@config_id@>&
-  roid=<@config_id@>&
-  actionParam_field_sync_type=db&
-  tab=db
-?>
-<table class="table table-condensed table-striped"><thead>
- <tr><th>table</th><th></th></tr>
-</thead><tbody>
- <tr class="warning">
-  <td><select name="actionParam_field_perimeter">
-   <?tables&template=<{table&template=<option value="<@id@>"><@name@></option>}>?>
-  </select></td>
-  <td><button class="btn btn-warning btn-mini" type="submit">Ajouter</button></td>
- </tr>
- <{item&
-   sort_up=<@table_name[perimeter]@>&
-   template=
-   	<?if&
-   	  cond=<@sync_type=="db"@>&
-   	  then=
-		<tr>
-		 <td><@table_name[perimeter]@></td>
-		 <td>
-		  <?link&
-		    target=<@p@>&
-		    a=RemoveObjectAction&
-		    actionParamoi=<@id@>&
-		    text=Supprimer&
-		    roid=<@config_id@>&
-		    class=btn btn-danger btn-mini&
-		    tab=db&
-		  ?>
-		 </td>
-		</tr>
-   	?>
- }>
-</tbody></table>
-</form>
-
-</div><div class="tab-pane <@(tab=="ptrt")?"active":""@>" id="ptrt">
-
-<?PTNetworksListFunction&
-  template=<{network&template=
-  	<@network_name[network_id]=<@name@>@>
-  }>
-?>
-<?form&
-  page_id=<@p@>&
-  name=add_item&
-  a=ObjectCreate&
-  actionParam_table_id=95&
-  actionParam_field_config_id=<@id@>&
-  roid=<@config_id@>&
-  actionParam_field_sync_type=ptrt&
-  tab=ptrt&
-?>
-<table class="table table-condensed table-striped"><thead>
- <tr><th>réseau</th><th></th></tr>
-</thead><tbody>
- <tr class="warning">
-  <td><select name="actionParam_field_perimeter">
-   <?PTNetworksListFunction&
-     template=<{network&template=<option value="<@network_id@>"><@name@></option>}>
+<div class="hide modal fade" id="stream_add_modal">
+   <?form&
+     name=stream_add&
+     target=<@p@>&
+     a=ObjectCreate&
+     actionParam_table_id=94&
+     class=form-horizontal&
+     co=1&
    ?>
-  </select></td>
-  <td><button type="submit" class="btn btn-mini btn-warning">Ajouter</button></td>
- </tr>
- <{item&template=<?if&cond=<@sync_type=="ptrt"@>&then=
-	<tr>
-	 <td><@network_name[perimeter]@></td>
-	 <td>
-	  <?link&
-	    target=<@p@>&
-	    a=RemoveObjectAction&
-	    actionParamoi=<@id@>&
-	    text=Supprimer&
-	    roid=<@config_id@>&
-	    class=btn btn-mini btn-danger&
-	    tab=ptrt&
-	  ?>
-	 </td>
-	</tr>
- ?>}>
-</tbody></table>
-</form>
-
-</div>
+   <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">\&times;</button>
+    <h3>Création de flux Inter-SYNTHESE</h3>
+   </div><div class="modal-body">
+         <div class="control-group">
+          <label class="control-label">Nom</label>
+          <div class="controls">
+           <input type="text" name="actionParam_field_name" placeholder="Nom" />
+          </div>
+         </div>
+   </div><div class="modal-footer">
+    <button type="submit" class="btn btn-warning">Créer</button>
+    <a href="#" class="btn btn-primary" data-dismiss="modal">Annuler</a>
+   </div>
+   </form>
 </div>
 
-?>}>?>
+<script src="/connect/js/inter-synthese_streams.js"></script>
