@@ -57,7 +57,10 @@ namespace synthese
 			DeparturesTableDirection di(DISPLAY_DEPARTURES);
 			EndFilter ef(WITH_PASSING);
 			LineFilter lf;
-			lf.insert(make_pair(_line, optional<bool>()));
+			if (_line)
+			{
+				lf.insert(make_pair(_line, optional<bool>()));
+			}
 			DisplayedPlacesList dp;
 			ForbiddenPlacesList fp;
 			ptime now(second_clock::local_time());
