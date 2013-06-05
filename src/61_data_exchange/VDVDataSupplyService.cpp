@@ -47,6 +47,7 @@
 using namespace boost;
 using namespace boost::posix_time;
 using namespace std;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -354,9 +355,18 @@ namespace synthese
 						}
 						direction = iconv.convert(direction);
 
+						// Expiration time
+						ptime expirationTime(
+							(now.time_of_day() <= time_duration(2, 30, 0)) ? now.date() : now.date() + days(1),
+							time_duration(2,30, 0)
+							);
+						expirationTime -= diff_from_utc;
+
 						// XML generation
 						result << "<AZBFahrplanlage Zst=\"";
 						ToXsdDateTime(result, now);
+						result << "\" VerfallZst=\"";
+						ToXsdDateTime(result, expirationTime);
 						result <<
 							"\">" <<
 							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
