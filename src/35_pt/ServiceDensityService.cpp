@@ -273,6 +273,7 @@ namespace synthese
 			size_t nbStop = 0;
 			size_t maxDistance = 0;
 			bool isServiceNumberReadched = false;
+			set<RegistryKeyType> serviceStored;
 			BOOST_FOREACH(const StopPointSetType::value_type& sp, stopPointSet)
 			{
 				boost::shared_ptr<ParametersMap> stopMap(new ParametersMap);
@@ -324,6 +325,11 @@ namespace synthese
 						){
 							continue;
 						}
+
+						// Check if service already stored in map
+						if(serviceStored.find(service->getKey()) != serviceStored.end())
+							continue;
+						serviceStored.insert(service->getKey());
 
 						nbService++;
 						nbServiceInStop++;
