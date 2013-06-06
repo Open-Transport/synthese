@@ -1,14 +1,14 @@
 <div class="control-group">
  <label class="control-label"><@label@></label>
- <div class="controls"><@input_value=<?EvalService&t=\<@<@name@>\@>?>@>
-  <div class="input-append date" data-date="<@input_value?<?substr&t=<@input_value@>&n=10?>:<?date?>@>" data-date-weekStart="1" data-date-format="yyyy-mm-dd">
-   <input class="input-small" placeholder="yyyy-mm-jj" type="text" name="<@name@>" value="<?substr&t=<@input_value@>&n=10?>" />
+ <div class="controls">
+  <div class="input-append date" data-date="<@input_value?<?substr&t=<@~variable(name)@>&n=10?>:<?date?>@>" data-date-weekStart="1" data-date-format="yyyy-mm-dd">
+   <input class="input-small" placeholder="yyyy-mm-jj" type="text" name="<@name@>" value="<?substr&t=<@~variable(name)@>&n=10?>" />
    <span class="add-on"><i class="icon-th"></i></span>
   </div>
   <?if&cond=<@name2@>&then=
 	<@input_value=<?EvalService&t=\<@<@name2@>\@>?>@> à 
-	<div class="input-append date" data-date="<@input_value?<?substr&t=<@input_value@>&n=10?>:<?date?>@>" data-date-weekStart="1" data-date-format="yyyy-mm-dd">
-	 <input class="input-small" placeholder="yyyy-mm-jj" type="text" name="<@name2@>" value="<?substr&t=<@input_value@>&n=10?>" />
+	<div class="input-append date" data-date="<@(~variable(name))?<?substr&t=<@(~variable(name))@>&n=10?>:<?date?>@>" data-date-weekStart="1" data-date-format="yyyy-mm-dd">
+	 <input class="input-small" placeholder="yyyy-mm-jj" type="text" name="<@name2@>" value="<?substr&t=<@(~variable(name))@>&n=10?>" />
 	 <span class="add-on"><i class="icon-th"></i></span>
 	</div>
   ?>

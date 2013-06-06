@@ -272,6 +272,7 @@
 	</div><div class="tab-pane <@(tab=="parameters")?"active":""@>" id="parameters">
 	 <?form&
 	   target=<@p@>&
+	   name=update_parameters&
 	   a=ObjectUpdate&
 	   actionParam_object_id=<@id@>&
 	   roid=<@id@>&
@@ -279,7 +280,7 @@
 	   tab=parameters&
 	   actionParam_field_parameters=<@parameters@>&
 	   form_id=update_parameters&
-	 ?><@url@>
+	 ?>
 	  <#formats/<@file_format@>/form&for=template#>
 	  <div class="control-group">
 	   <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
