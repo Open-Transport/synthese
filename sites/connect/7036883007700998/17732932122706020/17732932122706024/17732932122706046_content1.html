@@ -1,7 +1,7 @@
 <div class="control-group">
  <label class="control-label"><@label@></label>
  <div class="controls">
-  <select name="<@name@>" is_parameter="true"><@input_value=<?EvalService&t=\<@<@name@>\@>?>@>
+  <select name="<@name@>" is_parameter="true"><@input_value=<@~variable(name)@>@>
    <option value="">(non défini)</option>
    <?data_sources&template=<{data_source&template=
    	<option value="<@id@>" <@(id==input_value)?"selected=\"true\"":""@>><@name@></option>

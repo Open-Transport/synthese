@@ -1,12 +1,7 @@
-<div class="control-group">
- <label class="control-label">Effacer données anciennes</label>
- <div class="controls">
-  <div class="controls">
-   <label><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
-   <label><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
-  </div>
- </div>
-</div>
+<#forms/yes_no_input&
+  label=Effacer données anciennes&
+  name=clean_old_data&
+#>
 
 <div class="control-group">
  <label class="control-label">Date de début</label>
@@ -68,12 +63,7 @@
 
 <h3>Mode debug</h3>
 
-<div class="control-group">
- <label class="control-label">Affichage des arrêts</label>
- <div class="controls">
-  <div class="controls">
-   <label><input type="radio" name="display_linked_stops" value="1" <@display_linked_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
-   <label><input type="radio" name="display_linked_stops" value="0" <@display_linked_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
-  </div>
- </div>
-</div>
+<#forms/yes_no_input&
+  name=display_linked_stops&
+  label=Affichage des arrêts&
+#>

@@ -1,32 +1,4 @@
-<div class="control-group">
- <label class="control-label">Ignorer données passées</label>
- <div class="controls">
-  <div class="controls">
-   <label class="radio inline"><input type="radio" name="from_today" value="1" <@from_today?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
-   <label class="radio inline"><input type="radio" name="from_today" value="0" <@from_today?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
-  </div>
- </div>
-</div>
-
-<div class="control-group">
- <label class="control-label">Effacer données actuelles</label>
- <div class="controls">
-  <div class="controls">
-   <label class="radio inline"><input type="radio" name="clean_old_data" value="1" <@clean_old_data?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
-   <label class="radio inline"><input type="radio" name="clean_old_data" value="0" <@clean_old_data?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
-  </div>
- </div>
-</div>
-
-<div class="control-group">
- <label class="control-label">Effacer arrêts non utilisés</label>
- <div class="controls">
-  <div class="controls">
-   <label class="radio inline"><input type="radio" name="clean_unused_stops" value="1" <@clean_unused_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
-   <label class="radio inline"><input type="radio" name="clean_unused_stops" value="0" <@clean_unused_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
-  </div>
- </div>
-</div>
+<h3>Emplacement des fichiers de données</h3>
 
 <div class="control-group">
  <label class="control-label">Fichier arrêts (stops)</label>
@@ -103,44 +75,48 @@
  </div>
 </div>
 
-<div class="control-group">
- <label class="control-label">Affichage arrêts liés</label>
- <div class="controls">
-  <div class="controls">
-   <label class="radio inline"><input type="radio" name="display_linked_stops" value="1" <@display_linked_stops?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
-   <label class="radio inline"><input type="radio" name="display_linked_stops" value="0" <@display_linked_stops?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
-  </div>
- </div>
-</div>
+<h3>Retraitement des données</h3>
 
-<div class="control-group">
- <label class="control-label">Import arrêts commerciaux</label>
- <div class="controls">
-  <div class="controls">
-   <label class="radio inline"><input type="radio" name="isa" value="1" <@isa?"checked=\"true\"":""@>" is_parameter="true" /> OUI</label>
-   <label class="radio inline"><input type="radio" name="isa" value="0" <@isa?"":"checked=\"true\""@>" is_parameter="true" /> NON</label>
-  </div>
- </div>
-</div>
+<#forms/text_input&
+  name=sadc&
+  label=ID commune par défaut&
+#>
 
-<div class="control-group"><label class="control-label">ID commune par défaut</label>
- <div class="controls">
-  <input name="sadc" type="text" value="<@sadc@>" is_parameter="true" />
- </div>
-</div>
+<#forms/text_input&
+  name=sadt&
+  unit=min&
+  class=input-mini&
+  label=Temps de transfert par défaut&
+#>
 
-<div class="control-group">
- <label class="control-label">Temps de transfert par défaut</label>
- <div class="controls">
-  <div class="input-append">
-   <input type="text" class="input-mini" name="sadt" value="<@sadt@>" />
-   <span class="add-on">min</span>
-  </div>
- </div>
-</div>
+<#forms/text_input&
+  name=use_rule_block_id_mask&
+  label=Masque règles d'utilisation&
+#>
 
-<div class="control-group"><label class="control-label">Masque règles d'utilisation</label>
- <div class="controls">
-  <input name="use_rule_block_id_mask" type="text" value="<@use_rule_block_id_mask@>" is_parameter="true" />
- </div>
-</div>
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  name=from_today&
+  label=Ignorer données passées&
+#>
+
+<#forms/yes_no_input&
+  name=clean_old_data&
+  label=Effacer données actuelles&
+#>
+
+<#forms/yes_no_input&
+  name=clean_unused_stops&
+  label=Effacer arrêts non utilisés&
+#>
+
+<#forms/yes_no_input&
+  name=isa&
+  label=Import arrêts commerciaux&
+#>
+
+<#forms/yes_no_input&
+  name=display_linked_stops&
+  label=Affichage arrêts liés&
+#>
