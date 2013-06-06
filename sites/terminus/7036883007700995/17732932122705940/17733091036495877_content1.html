@@ -9,6 +9,7 @@
  <#tab_title&id=broadcast_points&title=Autres diffuseurs#>
  <#tab_title&id=sections&title=Sections#>
  <#tab_title&id=log&title=Journal#>
+ <#tab_title&id=system&title=Système#>
 </ul>
 
 <div id="tab_content" class="tab-content">
@@ -478,6 +479,43 @@
 </tbody>
 </table>
 
+</div><#tab_div&id=system#>
+
+ <div class="form-horizontal">
+  <div class="control-group">
+   <label class="control-label">Adresse serveur SMTP</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=smtp_server&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("smtp_server")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>	
+  <div class="control-group">
+   <label class="control-label">Port serveur SMTP</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=smtp_port&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("smtp_port")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>	
+ </div>
+
 </div>
 
 </div>
@@ -663,6 +701,29 @@
  ?>
   <div class="modal-body">
    <p>Etes-vous sûr de vouloir supprimer <span id="remove_name"></span> ?</p>
+  </div><div class="modal-footer">
+   <button class="btn btn-danger" type="submit">Oui</button>
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
+  </div>
+ </form>
+</div>
+
+<div class="modal hide fade" id="mail_remove_modal">
+ <div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  <h3>Suppression d'abonné de liste de diffusion</h3>
+ </div>
+ <?form&
+   name=mail_remove_form&
+   a=RemoveObjectAction&
+   target=<@p@>&
+   roid=<@ml_id@>&
+   tab=mailing_lists&
+   open_subscriptions=1&
+   actionParamoi=0&
+ ?>
+  <div class="modal-body">
+   <p>Etes-vous sûr de vouloir supprimer <span id="mail_remove_name"></span> ?</p>
   </div><div class="modal-footer">
    <button class="btn btn-danger" type="submit">Oui</button>
    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Non</button>
