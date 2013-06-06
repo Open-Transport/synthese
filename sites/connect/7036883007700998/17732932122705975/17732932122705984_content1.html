@@ -194,7 +194,7 @@
      ?>?>
      <?if&
        cond=<@~decode_table(roid)==105@>&
-       then=<?object&roid=<@roid@>&template=
+       then=<?object&roid=<@roid@>&additional_parameters=1&template=
 	
 	<@tabs["properties"]=Propriétés@>
 	<@tabs["parameters"]=Paramètres par défaut@>
@@ -279,7 +279,7 @@
 	   tab=parameters&
 	   actionParam_field_parameters=<@parameters@>&
 	   form_id=update_parameters&
-	 ?>
+	 ?><@url@>
 	  <#formats/<@file_format@>/form&for=template#>
 	  <div class="control-group">
 	   <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
