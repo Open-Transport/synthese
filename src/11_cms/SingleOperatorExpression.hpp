@@ -45,7 +45,9 @@ namespace synthese
 				NEG,
 				GLOBAL,
 				READ_CONFIG,
-				DECODE_TABLE
+				DECODE_TABLE,
+				LENGTH,
+				VARIABLE
 			};
 
 		private:
