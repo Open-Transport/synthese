@@ -125,7 +125,7 @@ function update_object_preview(recipient, message)
         s += input.closest('label').text();
         if(input.attr('manual_sending'))
         {
-          s += ' <a class="btn btn-warning btn-mini" href="#" id="send_mail'+ link.recipient_id +'">Envoyer</a>';
+          s += ' <a class="btn btn-warning btn-mini" href="#" data-message="'+ message.id +'" id="send_mail'+ link.recipient_id +'">Envoyer</a>';
         }
       }
     }
@@ -135,6 +135,27 @@ function update_object_preview(recipient, message)
     s = (recipient == 'displayscreen' ? "Aucun" : "Tous");
   }
   $('#preview_recipients_'+ recipient).html(s);
+
+  for(var i=0; i<links.length; ++i)
+  {
+    var link = links[i];
+    if(link.parameter) continue;
+    var input = $('input[factory="'+recipient+'"][value="'+ link.recipient_id +'"][noparam]');
+    if(input.attr('manual_sending'))
+    {
+      $('#send_mail'+ link.recipient_id).click(send_mail_click);
+    }
+  }
+}
+
+function send_mail_click()
+{
+  if(!confirm("Etes-vous sûr de vouloir envoyer le message à la liste ?")) return false;
+  var recipient = $(this).attr('id').substr(9);
+  var msg = $(this).attr('data-message');
+  $.get('/terminus/ajax/send_mail?message='+ msg +'&recipient='+ recipient, function(data){
+    alert("Message envoyé");
+  });
 }
 
 function update_objects_field(recipient, message)
