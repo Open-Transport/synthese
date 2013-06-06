@@ -65,9 +65,9 @@ namespace synthese
 				}
 				else
 				{
-					s << ",";
+					s << util::URI::PARAMETER_SEPARATOR;
 				}
-				s << item.first << "=" << util::URI::Encode(item.second);
+				s << item.first << util::URI::PARAMETER_ASSIGNMENT << util::URI::Encode(item.second);
 			}
 			return s.str();
 		}
