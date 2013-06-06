@@ -408,12 +408,12 @@ namespace synthese
 		) const {
 
 			// Head
-			if(first)
-			{
-				os << "{";
-			}
 			if(!tag.empty())
 			{
+				if(first)
+				{
+					os << "{";
+				}
 				os << "\"" << tag << "\":";
 			}
 			os << "{";
@@ -430,7 +430,11 @@ namespace synthese
 				{
 					os << ",";
 				}
-				os << "\"" << itMap.first << "\":\"" << itMap.second << "\"";
+				os << "\"" << itMap.first << "\":\"";
+				string value(itMap.second);
+				algorithm::replace_all(value, "\\", "\\\\");
+				algorithm::replace_all(value, "\"", "\\\"");
+				os << value << "\"";
 			}
 
 			// Child objects
@@ -507,7 +511,7 @@ namespace synthese
 
 			// Foot
 			os << "}";
-			if(first)
+			if(first && !tag.empty())
 			{
 				os << "}";
 			}
