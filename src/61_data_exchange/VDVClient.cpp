@@ -139,7 +139,7 @@ namespace synthese
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
 			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
 			now -= diff_from_utc;
-			const string contentType = "text/xml";
+			const string contentType = "application/xml";
 
 			stringstream data;
 			data <<
@@ -156,6 +156,7 @@ namespace synthese
 			}
 			catch(...)
 			{
+				Log::GetInstance().warn("Error while sending DatenBereitAnfrage");
 			}
 
 			// Trace
