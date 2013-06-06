@@ -118,6 +118,34 @@ namespace synthese
 			case GLOBAL:
 				return ModuleClass::GetParameter(value);
 
+			case VARIABLE:
+				{
+					ParametersMap::Map::const_iterator it(
+						variables.getMap().find(value)
+					);
+					if(it != variables.getMap().end())
+					{
+						return lexical_cast<string>(it->second);
+					}
+					it = additionalParametersMap.getMap().find(value);
+					if(it != additionalParametersMap.getMap().end())
+					{
+						return it->second;
+					}
+					return string();
+				}
+
+			case LENGTH:
+				if(additionalParametersMap.hasSubMaps(value))
+				{
+					return lexical_cast<string>(additionalParametersMap.getSubMaps(value).size());
+				}
+				if(variables.hasSubMaps(value))
+				{
+					return lexical_cast<string>(variables.getSubMaps(value).size());
+				}
+				return "0";
+
 			case READ_CONFIG:
 				WebsiteConfig* config(
 					page.getRoot()->getConfig()
@@ -170,6 +198,14 @@ namespace synthese
 			if(	CompareText(it, end, "~decode_table"))
 			{
 				return DECODE_TABLE;
+			}
+			if(	CompareText(it, end, "~length"))
+			{
+				return LENGTH;
+			}
+			if(	CompareText(it, end, "~variable"))
+			{
+				return VARIABLE;
 			}
 			return optional<Operator>();
 		}
