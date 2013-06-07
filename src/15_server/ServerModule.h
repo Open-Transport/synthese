@@ -136,6 +136,9 @@ namespace synthese
 			static const std::string REVISION;
 			static const std::string BUILD_DATE;
 
+			// Take it if you change the base
+			static boost::mutex baseWriterMutex;
+
 		private:
 
 			/// The io_service used to perform asynchronous operations.

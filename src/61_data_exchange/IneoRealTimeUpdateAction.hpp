@@ -84,9 +84,6 @@ namespace synthese
 			boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 			std::string _database;
 
-			// We dont want multiple running instance of this service
-			static boost::mutex isRunningMutex;
-
 			struct Arret
 			{
 				int ref;
