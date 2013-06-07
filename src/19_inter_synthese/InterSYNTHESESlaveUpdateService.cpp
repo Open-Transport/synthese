@@ -100,11 +100,6 @@ namespace synthese
 			{
 				// Send to the slave that there is nothing to sync
 				stream << NO_CONTENT_TO_SYNC;
-
-				// Record the request as slave activity
-				ptime now(second_clock::local_time());
-				_slave->set<LastActivityReport>(now);
-				InterSYNTHESESlaveTableSync::Save(_slave.get());
 			}
 			else
 			{
@@ -126,6 +121,13 @@ namespace synthese
 				}
 			}
 			_slave->setLastSentRange(range);
+
+			// Record the request as slave activity
+			// Even if the slave crashed and don't get the results,
+			// we won't rebuild the full database on the new slave_update
+			ptime now(second_clock::local_time());
+			_slave->set<LastActivityReport>(now);
+			InterSYNTHESESlaveTableSync::Save(_slave.get());
 
 			return ParametersMap();
 		}
