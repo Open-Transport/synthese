@@ -68,16 +68,29 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
 					FIELD_VALUE_CONSTRUCTOR(inter_synthese::Active, false)
 			)	),
-			_lastSentRange(make_pair(_queue.end(), _queue.end()))
+			_lastSentRange(make_pair(_queue.end(), _queue.end())),
+			_previousConfig(NULL)
 		{
 		}
 
+		InterSYNTHESESlave::~InterSYNTHESESlave()
+		{
+			if(_previousConfig)
+			{
+				_previousConfig->eraseSlave(this);
+			}
+		}
 
 
 		void InterSYNTHESESlave::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			if(get<InterSYNTHESEConfig>())
+			if(get<InterSYNTHESEConfig>() && _previousConfig != get_pointer(get<InterSYNTHESEConfig>()))
 			{
+				if(_previousConfig)
+				{
+					_previousConfig->eraseSlave(this);
+					_previousConfig = NULL;
+				}
 				get<InterSYNTHESEConfig>()->insertSlave(this);
 			}
 		}
@@ -88,7 +101,7 @@ namespace synthese
 		{
 			if(get<InterSYNTHESEConfig>())
 			{
-				get<InterSYNTHESEConfig>()->eraseSlave(this);
+				_previousConfig = get_pointer(get<InterSYNTHESEConfig>());
 			}
 		}
 

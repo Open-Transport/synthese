@@ -90,9 +90,15 @@ namespace synthese
 			mutable Queue _queue;
 			mutable QueueRange _lastSentRange;
 			mutable boost::recursive_mutex _queueMutex;
-		
+
+			// Keep the previous config at unlink time and use it at link
+			// time only if it has changed. Don't forget to unlink it in
+			// our destructor
+			InterSYNTHESEConfig *_previousConfig;
+
 		public:
 			InterSYNTHESESlave(util::RegistryKeyType id = 0);
+			~InterSYNTHESESlave();
 
 			//! @name Services
 			//@{
