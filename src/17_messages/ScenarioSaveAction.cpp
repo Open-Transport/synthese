@@ -637,7 +637,7 @@ namespace synthese
 									rec.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
 								}
 
-								if(recipientParams.size() > 0)
+								if(recipientParams.size() > 1)
 								{
 									rec.second = recipientParams[1];
 								}
