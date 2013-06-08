@@ -22,7 +22,6 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 
 #include "InterSYNTHESEQueue.hpp"
@@ -32,7 +31,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "ServerConstants.h"
-#include "ServerModule.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -88,12 +86,6 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-
-			boost::mutex::scoped_lock lock(ServerModule::baseWriterMutex, boost::try_to_lock);
-			if(!lock.owns_lock())
-			{
-				throw ActionException("InterSYNTHESESlaveUpdateService: Already running a base update");
-			}
 
 			InterSYNTHESESlave::QueueRange range(_slave->getQueueRange());
 			if(range.first == _slave->getQueue().end())

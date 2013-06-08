@@ -20,6 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ActionException.h"
 #include "InterSYNTHESESlave.hpp"
 
 #include "BasicClient.h"
@@ -28,6 +29,7 @@
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
+#include "ServerModule.h"
 
 using namespace boost;
 using namespace std;
@@ -194,6 +196,12 @@ namespace synthese
 					}
 				}
 				deleteTransaction.run();
+
+				boost::mutex::scoped_lock lock(ServerModule::baseWriterMutex, boost::try_to_lock);
+				if(!lock.owns_lock())
+				{
+					throw ActionException("InterSYNTHESESlaveUpdateService: Already running a base update");
+				}
 
 				// Load new queue items
 				BOOST_FOREACH(
