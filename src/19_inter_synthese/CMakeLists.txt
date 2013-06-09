@@ -28,6 +28,8 @@ InterSYNTHESEPackageAutoLockAction.cpp
 InterSYNTHESEPackageAutoLockAction.hpp
 InterSYNTHESEPackageCommitAction.cpp
 InterSYNTHESEPackageCommitAction.hpp
+InterSYNTHESEPackageCommitService.cpp
+InterSYNTHESEPackageCommitService.hpp
 InterSYNTHESEPackageContent.cpp
 InterSYNTHESEPackageContent.hpp
 InterSYNTHESEPackageFileFormat.cpp
