@@ -13,7 +13,7 @@
             <div class="pull-right" id="connection_add_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>&
      ?>
     </li>
-    <li class="tree_1<@(roid=="nce")?"active":""@>">
+    <li class="tree_1<@(roid=="nce")?" active":""@>">
      <?link&
        target=<@p@>&
        roid=nce&
@@ -51,11 +51,30 @@
      	<div class="form-horizontal">
 	 <div class="control-group">
 	  <label class="control-label" for="prop-name">Adresse</label>
-	  <div class="controls"><@~global("ineo_nce_host")@></div>
+	  <div class="controls">
+	   <?form&
+	     a=global_variable_update&
+	     actionParam_variable=ineo_nce_host&
+	     actionParam_persistent=1&
+	     class=form-inline&
+	   ?>
+	    <input type="text" value="<@~global("ineo_nce_host")@>" name="actionParam_value" />
+	    <button class="btn btn-warning" type="submit">Modifier</button>
+	   </form>
+	  </div>
 	 </div>
 	 <div class="control-group">
 	  <label class="control-label" for="prop-name">Port</label>
-	  <div class="controls"><@~global("ineo_nce_port")@></div>
+	  <div class="controls">
+	   <?form&
+	     a=global_variable_update&
+	     actionParam_variable=ineo_nce_port&
+	     actionParam_persistent=1&
+	     class=form-inline&
+	   ?>
+	    <input type="text" value="<@~global("ineo_nce_port")@>" name="actionParam_value" />
+	    <button class="btn btn-warning" type="submit">Modifier</button>
+	   </form>
 	 </div>
 	</div>&
      else=
