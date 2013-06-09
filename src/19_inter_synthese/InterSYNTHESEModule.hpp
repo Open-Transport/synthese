@@ -45,6 +45,7 @@ namespace synthese
 	namespace inter_synthese
 	{
 		class InterSYNTHESEContent;
+		class InterSYNTHESEPackage;
 
 		/**	@defgroup m19Actions 19.15 Actions
 			@ingroup m19
@@ -87,6 +88,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID;
 			static const util::RegistryKeyType FAKE_IMPORT_ID;
 
+			typedef std::map<std::string, InterSYNTHESEPackage*> PackagesBySmartURL;
+
 		private:
 			static boost::posix_time::time_duration _syncWaitingTime;
 			static std::string _masterHost;
@@ -94,6 +97,7 @@ namespace synthese
 			static bool _slaveActive;
 			static util::RegistryKeyType _slaveId;
 			static void _generateFakeImport();
+			static PackagesBySmartURL _packagesBySmartURL;
 
 		public:
 			static void Enqueue(
@@ -104,6 +108,18 @@ namespace synthese
 			static void ParameterCallback(
 				const std::string& name,
 				const std::string& value
+			);
+
+			static InterSYNTHESEPackage* GetPackageBySmartURL(
+				const std::string& smartURL
+			);
+
+			static void AddPackage(
+				InterSYNTHESEPackage& package
+			);
+
+			static void RemovePackage(
+				const std::string& smartURL
 			);
 		};
 
