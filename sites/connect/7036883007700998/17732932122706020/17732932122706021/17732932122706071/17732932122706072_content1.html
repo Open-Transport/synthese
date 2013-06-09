@@ -1,3 +1,61 @@
+<div class="row" style="margin-left:0">
+<?if&
+  cond=<@for=="execution"@>&
+  then=
+  	<?inter_synthese_packages&
+  	  template=<{package&template=<?if&cond=<@roid==import_id@>&then=
+  	  	<div class="well pull-right span5">
+	  	 <h4>Informations sur le paquet</h4>
+	  	 <table class="table">
+	  	  <tr><td>Nom</td><td><@name@></td></tr>
+	  	  <tr><td>Code</td><td><@code@></td></tr>
+	  	  <tr>
+	  	   <td>Ecriture</td>
+	  	   <td>
+	  	    <?if&
+	  	      cond=<@lock_time@>&
+	  	      then=
+	  	    	<span class="label label-success" title="Depuis le <@lock_time@>">OUI</span><br />
+		  	<?link&
+		  	  text=Envoyer les modifications&
+		  	  target=<@p@>&
+		  	  a=inter-synthese_package_commit&
+		  	  actionParam_package=<@id@>&
+		  	  roid=<@roid@>&
+		  	  tab=run&
+		  	  class=btn btn-warning btn-mini&
+		  	  confirm=Etes-vous sûr de vouloir envoyer les modifications au dépôt ?&
+		  	?>
+		  	<?link&
+		  	  text=Envoyer les modifications et libérer le paquet&
+		  	  target=<@p@>&
+		  	  a=inter-synthese_package_commit&
+		  	  actionParam_package=<@id@>&
+		  	  actionParam_release_lock=1&
+		  	  roid=<@roid@>&
+		  	  tab=run&
+		  	  class=btn btn-warning btn-mini&
+		  	  confirm=Etes-vous sûr de vouloir envoyer les modifications au dépôt et libérer le paquet ?&
+		  	?>&
+		      else=
+		    	<span class="label label-danger">NON</span><br />
+		    ?>
+	  	   </td>
+	  	  </tr>
+	  	  <tr>
+	  	   <td>Objets</td>
+	  	   <td>
+	  	    <{object&template=
+	  	      <@name@>
+	  	    }>
+	  	   </td>
+	  	  </tr>
+	  	  <tr><td>Tables</td><td></td></tr>
+	  	 </table>
+	  	</div>
+	?>}>?>
+?>
+<div class="pull-left">
 <h3>Accès aux données</h3>
 
 <#forms/text_input&
@@ -31,3 +89,5 @@
 	  name=lock_server_name&
 	#>
 ?>
+</div>
+</div>
