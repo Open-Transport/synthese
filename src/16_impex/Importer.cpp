@@ -56,7 +56,6 @@ namespace synthese
 		DBTransaction Importer::save() const
 		{
 			DBTransaction result(_save());
-			_env.clear();
 			return result;
 		}
 
