@@ -96,7 +96,34 @@ namespace synthese
 		/// @return true if the time is in the defined period
 		bool MessageApplicationPeriod::getValue( const boost::posix_time::ptime& time ) const
 		{
-			return isActive(time.date()) && time.time_of_day() > get<StartHour>() && time.time_of_day() < get<EndHour>();
+			// If dates are defined, the current time must belong to the dates list
+			if(	!Calendar::empty() && !isActive(time.date()))
+			{
+				return false;
+			}
+			// If start time is defined, the current time must be after it
+			if(	!get<StartTime>().is_not_a_date_time() && time < get<StartTime>())
+			{
+				return false;
+			}
+			// If end time is defined, the current time must be before it
+			if(	!get<EndTime>().is_not_a_date_time() && time > get<EndTime>())
+			{
+				return false;
+			}
+			// If start hour is defined, the current time must be after it
+			if(	!get<StartHour>().is_not_a_date_time() && time.time_of_day() < get<StartHour>())
+			{
+				return false;
+			}
+			// If end hour is defined, the current time must be before it
+			if(	!get<EndHour>().is_not_a_date_time() && time.time_of_day() > get<EndHour>())
+			{
+				return false;
+			}
+
+			// No filter has been activated, then the message must be displayed
+			return true;
 		}
 
 
