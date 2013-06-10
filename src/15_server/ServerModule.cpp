@@ -73,7 +73,7 @@ namespace synthese
 		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
 		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service, &ServerModule::HandleRequest));
 		ServerModule::Threads ServerModule::_threads;
-		size_t ServerModule::_waitingThreads(0);
+		size_t ServerModule::_availableHTTPThreads(0);
 		recursive_mutex ServerModule::_threadManagementMutex;
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
 		string ServerModule::_autoLoginUser("");
@@ -264,6 +264,7 @@ namespace synthese
 		){
 			try
 			{
+				UseHTTPThread();
 				Log::GetInstance ().debug ("Received request : " +
 					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" +
 					(req.postData.empty() ?
@@ -410,6 +411,7 @@ namespace synthese
 				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
 			}
 
+			ReleaseHTTPThread();
 			SetCurrentThreadWaiting();
 		}
 
@@ -516,7 +518,7 @@ namespace synthese
 					"HTTP",
 					true
 			)	);
-			++_waitingThreads;
+			++_availableHTTPThreads;
 			return theThread->get_id();
 		}
 
@@ -532,12 +534,6 @@ namespace synthese
 				info.status = ThreadInfo::THREAD_ANALYSING_REQUEST;
 				info.queryString = queryString;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
-				--_waitingThreads;
-				if(_waitingThreads == 0)
-				{
-					AddHTTPThread();
-					Log::GetInstance ().info ("Raised HTTP threads number to "+ lexical_cast<string>(_threads.size()) +" due to pool saturation.");
-				}
 			}
 			catch (ThreadInfo::Exception&)
 			{
@@ -598,7 +594,6 @@ namespace synthese
 				if(info.status == ThreadInfo::THREAD_WAITING) return;
 				info.status = ThreadInfo::THREAD_WAITING;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
-				++_waitingThreads;
 			}
 			catch (ThreadInfo::Exception&)
 			{
@@ -665,5 +660,24 @@ namespace synthese
 		const boost::posix_time::ptime& ServerModule::GetStartingTime()
 		{
 			return _serverStartingTime;
+		}
+
+
+
+		void ServerModule::UseHTTPThread()
+		{
+			--_availableHTTPThreads;
+			if(_availableHTTPThreads == 0)
+			{
+				AddHTTPThread();
+				Log::GetInstance ().info ("Raised HTTP threads number to "+ lexical_cast<string>(_threads.size()) +" due to pool saturation.");
+			}
+		}
+
+
+
+		void ServerModule::ReleaseHTTPThread()
+		{
+			++_availableHTTPThreads;
 		}
 }	}
