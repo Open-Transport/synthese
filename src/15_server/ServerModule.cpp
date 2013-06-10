@@ -667,6 +667,7 @@ namespace synthese
 
 		void ServerModule::UseHTTPThread()
 		{
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
 			--_availableHTTPThreads;
 			if(_availableHTTPThreads == 0)
 			{
@@ -679,6 +680,7 @@ namespace synthese
 
 		void ServerModule::ReleaseHTTPThread()
 		{
+			recursive_mutex::scoped_lock lock(_threadManagementMutex);
 			++_availableHTTPThreads;
 		}
 }	}
