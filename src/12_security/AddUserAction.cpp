@@ -145,7 +145,6 @@ namespace synthese
 		bool AddUserAction::isAuthorized(const Session* session
 		) const {
 			// Special patch for tmr_groupes which allow user to subscribe directly
-			Log::GetInstance().debug("Demande d'autorisation pour création d'un utilisateur - " + _profile.get()->getName());
 			if (_profile.get()->getName() == "Utilisateurs TMR")
 				return true;
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
