@@ -273,6 +273,7 @@ namespace synthese
 			pm.insert("address", _address);
 			pm.insert("postcode", _postCode);
 			pm.insert("cityText", _cityText);
+			pm.insert("country", _country);
 			pm.insert("is_connection_allowed", _isConnectionAllowed);
 			if(_profile)
 			{
