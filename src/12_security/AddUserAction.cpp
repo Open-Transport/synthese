@@ -47,6 +47,15 @@ namespace synthese
 		const std::string AddUserAction::PARAMETER_NAME(Action_PARAMETER_PREFIX + "nm");
 		const std::string AddUserAction::PARAMETER_LOGIN(Action_PARAMETER_PREFIX + "lg");
 		const std::string AddUserAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "pid");
+		const std::string AddUserAction::PARAMETER_PASS1(Action_PARAMETER_PREFIX + "p1");
+		const std::string AddUserAction::PARAMETER_PASS2(Action_PARAMETER_PREFIX + "p2");
+		const std::string AddUserAction::PARAMETER_SURNAME(Action_PARAMETER_PREFIX + "surn");
+		const std::string AddUserAction::PARAMETER_ADDRESS(Action_PARAMETER_PREFIX + "addr");
+		const std::string AddUserAction::PARAMETER_POSTAL_CODE(Action_PARAMETER_PREFIX + "post");
+		const std::string AddUserAction::PARAMETER_CITY(Action_PARAMETER_PREFIX + "city");
+		const std::string AddUserAction::PARAMETER_COUNTRY(Action_PARAMETER_PREFIX + "country");
+		const std::string AddUserAction::PARAMETER_PHONE(Action_PARAMETER_PREFIX + "phon");
+		const std::string AddUserAction::PARAMETER_EMAIL(Action_PARAMETER_PREFIX + "email");
 
 		ParametersMap AddUserAction::getParametersMap() const
 		{
@@ -79,6 +88,22 @@ namespace synthese
 			{
 				throw ActionException("Profil inexistant");
 			}
+
+			_password = map.getDefault<string>(PARAMETER_PASS1, string(), false);
+			if (!_password.empty())
+			{
+				string pass2 = map.getDefault<string>(PARAMETER_PASS2, string(), false);
+				if (pass2 != _password)
+					throw ActionException("Les mots de passe entrés ne sont pas identiques");
+			}
+			
+			_surname = map.getDefault<string>(PARAMETER_SURNAME);
+			_address = map.getDefault<string>(PARAMETER_ADDRESS);
+			_postalCode = map.getDefault<string>(PARAMETER_POSTAL_CODE);
+			_phone = map.getDefault<string>(PARAMETER_PHONE);
+			_city = map.getDefault<string>(PARAMETER_CITY);
+			_country = map.getDefault<string>(PARAMETER_COUNTRY);
+			_email = map.getDefault<string>(PARAMETER_EMAIL);
 		}
 
 		void AddUserAction::run(Request& request)
@@ -87,6 +112,22 @@ namespace synthese
 			user.setLogin(_login);
 			user.setName(_name);
 			user.setProfile(_profile.get());
+			if (!_password.empty())
+				user.setPassword(_password);
+			if (!_surname.empty())
+				user.setSurname(_surname);
+			if (!_address.empty())
+				user.setAddress(_address);
+			if (!_postalCode.empty())
+				user.setPostCode(_postalCode);
+			if (!_phone.empty())
+				user.setPhone(_phone);
+			if (!_city.empty())
+				user.setCityText(_city);
+			if (!_country.empty())
+				user.setCountry(_country);
+			if (!_email.empty())
+				user.setEMail(_email);
 			UserTableSync::Save(&user);
 
 			request.setActionCreatedId(user.getKey());
@@ -103,6 +144,10 @@ namespace synthese
 
 		bool AddUserAction::isAuthorized(const Session* session
 		) const {
+			// Special patch for tmr_groupes which allow user to subscribe directly
+			if (!session &&
+				_profile.get()->getName() == "Utilisateurs TMR")
+				return true;
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a check on the profile on the user who creates the new user, depending on the new user profile
 		}

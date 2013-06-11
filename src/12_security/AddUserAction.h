@@ -43,11 +43,28 @@ namespace synthese
 			static const std::string PARAMETER_LOGIN;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_PROFILE_ID;
+			static const std::string PARAMETER_PASS1;
+			static const std::string PARAMETER_PASS2;
+			static const std::string PARAMETER_SURNAME;
+			static const std::string PARAMETER_ADDRESS;
+			static const std::string PARAMETER_POSTAL_CODE;
+			static const std::string PARAMETER_CITY;
+			static const std::string PARAMETER_COUNTRY;
+			static const std::string PARAMETER_EMAIL;
+			static const std::string PARAMETER_PHONE;
 
 		private:
 			std::string _login;
 			std::string _name;
 			boost::shared_ptr<const Profile>	_profile;
+			std::string _password;
+			std::string _surname;
+			std::string _address;
+			std::string _postalCode;
+			std::string _city;
+			std::string _country;
+			std::string _phone;
+			std::string _email;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
