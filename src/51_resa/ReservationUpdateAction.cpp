@@ -76,6 +76,7 @@ namespace synthese
 		const string ReservationUpdateAction::PARAMETER_ARRIVAL_METER_OFFSET(Action_PARAMETER_PREFIX + "am");
 		const string ReservationUpdateAction::PARAMETER_CANCELLATION_ACKNOWLEDGE_TIME = Action_PARAMETER_PREFIX + "_cancellation_acknowledge_time";
 		const string ReservationUpdateAction::PARAMETER_CANCELLATION_ACKNOWLEDGE_USER_ID = Action_PARAMETER_PREFIX + "_cancellation_acknowledge_user_id";
+		const string ReservationUpdateAction::PARAMETER_CANCEL_ACKNOWLEDGEMENT = Action_PARAMETER_PREFIX + "_cancel_acknowledgement";
 
 
 
@@ -186,6 +187,12 @@ namespace synthese
 				}
 			}
 
+			if (map.isDefined(PARAMETER_CANCEL_ACKNOWLEDGEMENT) &&
+				!map.isDefined(PARAMETER_ACKNOWLEDGE_TIME))
+			{
+				_cancelAcknowledgement = map.get<bool>(PARAMETER_CANCEL_ACKNOWLEDGEMENT);
+			}
+
 			// Cancellation acknowledge time
 			if(map.isDefined(PARAMETER_CANCELLATION_ACKNOWLEDGE_TIME))
 			{
@@ -278,11 +285,19 @@ namespace synthese
 			{
 				_reservation->setAcknowledgeUser(_acknowledgeUser->get());
 			}
+			else if(_cancelAcknowledgement)
+			{
+				_reservation->setAcknowledgeUser(NULL);
+			}
 
 			// Acknowledge time
 			if(_acknowledgeTime)
 			{
 				_reservation->setAcknowledgeTime(*_acknowledgeTime);
+			}
+			else if(_cancelAcknowledgement)
+			{
+				_reservation->setAcknowledgeTime(not_a_date_time);
 			}
 			if(_acknowledgeUser && !_acknowledgeTime)
 			{
