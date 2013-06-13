@@ -80,7 +80,7 @@
      else=
      <?if&
        cond=<@~decode_table(roid)==97@>&
-       then=<?object&roid=<@roid@>&template=
+       then=<?object&roid=<@roid@>&additional_parameters=1&template=
 	<@tabs["properties"]=Propriétés@>
 	<@tabs["subscriptions"]=Abonnements@>
 	<@tab=<@tab?tab:"properties"@>@>
@@ -119,7 +119,7 @@
 	  <td><input type="text" value="<@client_control_centre_code@>" name="actionParam_field_client_control_centre_code" /></td>
 	 </tr><tr>
 	  <td>Code du service</td>
-	  <td><input type="text" value="<@sevice_code@>" name="actionParam_field_service_code" /></td>
+	  <td><input type="text" value="<@service_code@>" name="actionParam_field_service_code" /></td>
 	 </tr><tr>
 	  <td>Source de données</td>
 	  <td>
