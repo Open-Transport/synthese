@@ -74,6 +74,7 @@ namespace synthese
 			static const std::string PARAMETER_ACKNOWLEDGE_USER_ID;
 			static const std::string PARAMETER_CANCELLATION_ACKNOWLEDGE_TIME;
 			static const std::string PARAMETER_CANCELLATION_ACKNOWLEDGE_USER_ID;
+			static const std::string PARAMETER_CANCEL_ACKNOWLEDGEMENT;
 
 		private:
 			boost::shared_ptr<Reservation> _reservation;
@@ -88,6 +89,7 @@ namespace synthese
 			boost::optional<boost::shared_ptr<security::User> > _acknowledgeUser;
 			boost::optional<boost::posix_time::ptime> _cancellationAcknowledgeTime;
 			boost::optional<boost::shared_ptr<security::User> > _cancellationAcknowledgeUser;
+			boost::optional<bool> _cancelAcknowledgement;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
