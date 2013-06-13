@@ -278,6 +278,6 @@ namespace synthese
 
 		std::string VDVSubscriptionService::getOutputMimeType() const
 		{
-			return "text/xml";
+			return "application/xml";
 		}
 }	}
