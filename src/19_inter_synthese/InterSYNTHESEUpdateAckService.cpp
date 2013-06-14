@@ -107,9 +107,7 @@ namespace synthese
 				_slave->clearLastSentRange();
 
 				// Record the request as slave activity
-				ptime now(second_clock::local_time());
-				_slave->set<LastActivityReport>(now);
-				InterSYNTHESESlaveTableSync::Save(_slave.get());
+				_slave->markAsUpToDate();
 			}
 			else
 			{
