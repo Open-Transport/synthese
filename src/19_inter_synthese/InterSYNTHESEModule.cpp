@@ -84,6 +84,7 @@ namespace synthese
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
 		{
 			ServerModule::AddThread(&InterSYNTHESEModule::InterSYNTHESE, "Inter-SYNTHESE client synchronization");
+			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "Inter-SYNTHESE slave full updater");
 		}
 
 
