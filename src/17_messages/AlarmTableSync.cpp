@@ -202,6 +202,7 @@ namespace synthese
 						MessagesModule::UpdateActivatedMessages();
 					}
 				}
+				sentAlarm.clearBroadcastPointsCache();
 			}
 
 			// Calendar
