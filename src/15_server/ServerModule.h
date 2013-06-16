@@ -152,16 +152,12 @@ namespace synthese
 
 			// Threads
 			static Threads _threads;
-			static std::size_t _availableHTTPThreads;
 			static boost::recursive_mutex _threadManagementMutex;
 			static boost::posix_time::time_duration _sessionMaxDuration;
 			static std::string _autoLoginUser;
 			static boost::posix_time::ptime _serverStartingTime;
 			static boost::optional<boost::filesystem::path> _httpTracePath;
 			static bool _forceGZip;
-
-			static void UseHTTPThread();
-			static void ReleaseHTTPThread();
 
 		public:
 			static boost::thread::id AddHTTPThread();
