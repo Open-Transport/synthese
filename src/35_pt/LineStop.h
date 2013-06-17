@@ -98,6 +98,7 @@ namespace synthese
 				virtual bool isArrivalAllowed() const;
 
 				virtual bool getScheduleInput() const = 0;
+				virtual bool getReservationNeeded() const { return true; }
 
 				JourneyPattern*				getLine()			const;
 			//@}

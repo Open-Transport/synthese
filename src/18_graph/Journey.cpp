@@ -21,6 +21,8 @@
 */
 
 #include "Journey.h"
+
+#include "LineStop.h"
 #include "UseRule.h"
 #include "Path.h"
 #include "Service.h"
@@ -42,6 +44,8 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace pt;
+	
 	namespace graph
 	{
 		Journey::Journey(
@@ -220,13 +224,22 @@ namespace synthese
 			boost::logic::tribool result(false);
 			BOOST_FOREACH(const ServicePointer& su, _journeyLegs)
 			{
+				const LineStop* ls(dynamic_cast<const LineStop*>(su.getDepartureEdge()));
+				if(ls && !ls->getReservationNeeded())
+				{
+					continue;
+				}
 				const UseRule::ReservationAvailabilityType& resa(
 					su.getUseRule().getReservationAvailability(su, ignoreReservationDeadline)
 				);
 				if(resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE)
+				{
 					return true;
+				}
 				if(resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE)
+				{
 					result = boost::logic::indeterminate;
+				}
 			}
 			return result;
 		}
