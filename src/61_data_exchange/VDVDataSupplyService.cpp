@@ -116,16 +116,20 @@ namespace synthese
 				XMLNode allDataNode(allNode.getChildNode("DatensatzAlle"));
 				if(!allDataNode.isEmpty())
 				{
-					try
+					if ((string)(allDataNode.getText()) == "true")
+						_withNonUpdatedContent = true;
+					else
 					{
-						_withNonUpdatedContent = lexical_cast<bool>(
-							allDataNode.getText()
-						);
+						try
+						{
+							_withNonUpdatedContent = lexical_cast<bool>(
+								allDataNode.getText()
+								);
+						}
+						catch(bad_lexical_cast&)
+						{
+						}
 					}
-					catch(bad_lexical_cast&)
-					{						
-					}
-					
 				}
 			}
 			catch (Exception&)
@@ -379,7 +383,7 @@ namespace synthese
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
 							"<RichtungsText>" << direction << "</RichtungsText>" <<
-							"<ZielHst>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</ZielHst>" <<
+							"<ZielHst>" << direction << "</ZielHst>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>"
 						;
