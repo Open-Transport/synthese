@@ -279,6 +279,7 @@ namespace synthese
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
 							"<RichtungsText>" << direction << "</RichtungsText>" <<
 							"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
+							"<Ursache></Ursache>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>" << 
 							"</AZBFahrtLoeschen>"
