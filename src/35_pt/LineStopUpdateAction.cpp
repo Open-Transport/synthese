@@ -73,6 +73,7 @@ namespace synthese
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_INTERNAL = Action_PARAMETER_PREFIX + "ai";
 		const string LineStopUpdateAction::PARAMETER_WITH_SCHEDULES = Action_PARAMETER_PREFIX + "with_schedules";
 		const string LineStopUpdateAction::PARAMETER_READ_LENGTH_FROM_GEOMETRY = Action_PARAMETER_PREFIX + "read_length_from_geometry";
+		const string LineStopUpdateAction::PARAMETER_RESERVATION_NEEDED = Action_PARAMETER_PREFIX + "_reservation_needed";
 
 
 
@@ -110,6 +111,10 @@ namespace synthese
 			if(_withSchedules)
 			{
 				map.insert(PARAMETER_WITH_SCHEDULES, *_withSchedules);
+			}
+			if(_reservationNeeded)
+			{
+				map.insert(PARAMETER_RESERVATION_NEEDED, *_reservationNeeded);
 			}
 			if(_geometry)
 			{
@@ -197,6 +202,12 @@ namespace synthese
 			if(map.isDefined(PARAMETER_WITH_SCHEDULES))
 			{
 				_withSchedules = map.get<bool>(PARAMETER_WITH_SCHEDULES);
+			}
+
+			// Reservation needed
+			if(map.isDefined(PARAMETER_RESERVATION_NEEDED))
+			{
+				_reservationNeeded = map.get<bool>(PARAMETER_RESERVATION_NEEDED);
 			}
 
 			// Geometry
@@ -288,6 +299,12 @@ namespace synthese
 			if(_withSchedules && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
 			{
 				 dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())->setScheduleInput(*_withSchedules);
+			}
+
+			// With schedules
+			if(_reservationNeeded && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
+			{
+				dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())->setReservationNeeded(*_reservationNeeded);
 			}
 
 			// Geometry

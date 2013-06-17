@@ -75,6 +75,7 @@ namespace synthese
 			static const std::string PARAMETER_METRIC_OFFSET;
 			static const std::string PARAMETER_AREA;
 			static const std::string PARAMETER_WITH_SCHEDULES;
+			static const std::string PARAMETER_RESERVATION_NEEDED;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
@@ -83,6 +84,7 @@ namespace synthese
 			std::size_t _rank;
 			double _metricOffset;
 			bool _withSchedules;
+			bool _reservationNeeded;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

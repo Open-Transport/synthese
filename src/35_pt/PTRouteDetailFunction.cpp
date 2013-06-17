@@ -24,7 +24,7 @@
 
 #include "PTRouteDetailFunction.hpp"
 #include "Request.h"
-#include "Edge.h"
+#include "LineStop.h"
 #include "StopPoint.hpp"
 #include "JourneyPattern.hpp"
 #include "RequestException.h"
@@ -89,6 +89,8 @@ namespace synthese
 		const string PTRouteDetailFunction::DATA_DEPARTURE_TIME("departureTime");
 		const string PTRouteDetailFunction::DATA_ARRIVAL_TIME("arrivalTime");
 		const string PTRouteDetailFunction::DATA_IS_MAIN("isMain");
+		const string PTRouteDetailFunction::DATA_WITH_SCHEDULES = "with_schedules";
+		const string PTRouteDetailFunction::DATA_RESERVATION_NEEDED = "reservation_needed";
 
 
 
@@ -254,12 +256,15 @@ namespace synthese
 					continue;
 				}
 				lastConnPlace = connPlace;
+				const LineStop* lineStop(static_cast<const LineStop*>(edge));
 
 				boost::shared_ptr<ParametersMap> sm(new ParametersMap);
 				sm->insert(DATA_ID, stopPoint->getKey());
 				sm->insert(DATA_RANK, edge->getRankInPath());
 				sm->insert(DATA_DEPARTURE_IS_ALLOWED, edge->isDepartureAllowed());
 				sm->insert(DATA_ARRIVAL_IS_ALLOWED, edge->isArrivalAllowed());
+				sm->insert(DATA_WITH_SCHEDULES, lineStop->getScheduleInput());
+				sm->insert(DATA_RESERVATION_NEEDED, lineStop->getReservationNeeded());
 				sm->insert(DATA_NAME, stopPoint->getName());
 				sm->insert(DATA_OPERATOR_CODE, stopPoint->getCodeBySources());
 				sm->insert(DATA_STOP_AREA_ID, connPlace->getKey());

@@ -70,6 +70,7 @@ namespace synthese
 		const std::string LineStopTableSync::COL_METRICOFFSET("metric_offset");
 		const std::string LineStopTableSync::COL_SCHEDULEINPUT("schedule_input");
 		const std::string LineStopTableSync::COL_INTERNAL_SERVICE("internal_service");
+		const std::string LineStopTableSync::COL_RESERVATION_NEEDED = "reservation_needed";
 	}
 
 	namespace db
@@ -91,6 +92,7 @@ namespace synthese
 			Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
 			Field(LineStopTableSync::COL_SCHEDULEINPUT, SQL_BOOLEAN),
 			Field(LineStopTableSync::COL_INTERNAL_SERVICE, SQL_BOOLEAN),
+			Field(LineStopTableSync::COL_RESERVATION_NEEDED, SQL_BOOLEAN),
 			Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			Field()
 		};
@@ -179,6 +181,16 @@ namespace synthese
 				else
 				{
 					dls.setScheduleInput(true);
+				}
+
+				// Reservation needed
+				if(!rows->getText(LineStopTableSync::COL_RESERVATION_NEEDED).empty())
+				{
+					dls.setReservationNeeded(rows->getBool(LineStopTableSync::COL_RESERVATION_NEEDED));
+				}
+				else
+				{
+					dls.setReservationNeeded(true);
 				}
 
 				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -286,6 +298,7 @@ namespace synthese
 				query.addField(dls.getMetricOffset());
 				query.addField(dls.getScheduleInput());
 				query.addField(false);
+				query.addField(dls.getReservationNeeded());
 				query.addField(static_pointer_cast<Geometry,LineString>(dls.getGeometry()));
 			}
 			else if(dynamic_cast<LineArea*>(object))
@@ -303,6 +316,7 @@ namespace synthese
 				query.addField(true);
 				query.addField(lineArea.getInternalService());
 				query.addField(static_pointer_cast<Geometry,LineString>(lineArea.getGeometry()));
+				query.addField(true);
 				query.execute(transaction);
 			}
 			query.execute(transaction);

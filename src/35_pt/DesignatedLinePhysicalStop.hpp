@@ -37,6 +37,7 @@ namespace synthese
 		{
 		private:
 			bool	_scheduleInput;
+			bool	_reservationNeeded;
 
 		public:
 			DesignatedLinePhysicalStop(
@@ -47,12 +48,15 @@ namespace synthese
 				bool isArrival = true,
 				double metricOffset = 0,
 				StopPoint* stop = NULL,
-				bool scheduleInput = true
+				bool scheduleInput = true,
+				bool reservationNeeded = true
 			);
 
 			virtual bool getScheduleInput()	const { return _scheduleInput; }
+			virtual bool getReservationNeeded() const { return _reservationNeeded; }
 
 			void setScheduleInput(bool value) { _scheduleInput = value; }
+			void setReservationNeeded(bool value) { _reservationNeeded = value; }
 		};
 	}
 }

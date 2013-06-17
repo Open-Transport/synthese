@@ -73,6 +73,7 @@ namespace synthese
 			static const std::string PARAMETER_ALLOWED_INTERNAL;
 			static const std::string PARAMETER_WITH_SCHEDULES;
 			static const std::string PARAMETER_READ_LENGTH_FROM_GEOMETRY;
+			static const std::string PARAMETER_RESERVATION_NEEDED;
 
 		private:
 			boost::shared_ptr<LineStop> _lineStop;
@@ -85,6 +86,7 @@ namespace synthese
 			DesignatedLinePhysicalStop* _nextLineStop;
 			DesignatedLinePhysicalStop* _prevLineStop;
 			bool _readLengthFromGeometry;
+			boost::optional<bool> _reservationNeeded;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -125,6 +127,7 @@ namespace synthese
 				void setAllowedArrival(boost::optional<bool>(value)){ _allowedArrival = value; }
 				void setAllowedInternal(boost::optional<bool>(value)){ _allowedInternal = value; }
 				void setWithSchedules(boost::optional<bool>(value)){ _withSchedules = value; }
+				void setReservationNeeded(boost::optional<bool>(value)){ _reservationNeeded = value; }
 				void setPhysicalStop(boost::shared_ptr<StopPoint> value){ _physicalStop = value; }
 				void setReadLengthFromGeometry(bool value){ _readLengthFromGeometry = value; }
 			//@}

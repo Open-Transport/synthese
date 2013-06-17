@@ -36,9 +36,11 @@ namespace synthese
 			bool isArrival,
 			double metricOffset,
 			StopPoint* stop,
-			bool scheduleInput
+			bool scheduleInput,
+			bool reservationNeeded
 		):	Registrable(id),
 			LinePhysicalStop(id, line, rankInPath, isDeparture, isArrival, metricOffset, stop),
-			_scheduleInput(scheduleInput)
+			_scheduleInput(scheduleInput),
+			_reservationNeeded(reservationNeeded)
 		{}
 }	}

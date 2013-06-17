@@ -69,6 +69,7 @@ namespace synthese
 		const string LineStopAddAction::PARAMETER_METRIC_OFFSET = Action_PARAMETER_PREFIX + "mo";
 		const string LineStopAddAction::PARAMETER_AREA = Action_PARAMETER_PREFIX + "ar";
 		const string LineStopAddAction::PARAMETER_WITH_SCHEDULES = Action_PARAMETER_PREFIX + "with_schedules";
+		const string LineStopAddAction::PARAMETER_RESERVATION_NEEDED = Action_PARAMETER_PREFIX + "_reservation_needed";
 
 
 
@@ -90,6 +91,7 @@ namespace synthese
 			}
 			map.insert(PARAMETER_RANK, _rank);
 			map.insert(PARAMETER_WITH_SCHEDULES, _withSchedules);
+			map.insert(PARAMETER_RESERVATION_NEEDED, _reservationNeeded);
 			return map;
 		}
 
@@ -171,6 +173,9 @@ namespace synthese
 
 			// With schedules
 			_withSchedules = map.getDefault<bool>(PARAMETER_WITH_SCHEDULES, true);
+
+			// Reservation needed
+			_reservationNeeded = map.getDefault<bool>(PARAMETER_RESERVATION_NEEDED, true);
 		}
 
 
@@ -192,7 +197,8 @@ namespace synthese
 					true,
 					_metricOffset,
 					_stop.get(),
-					_withSchedules
+					_withSchedules,
+					_reservationNeeded
 				);
 				LineStopTableSync::InsertStop(lineStop);
 			}
@@ -233,6 +239,7 @@ namespace synthese
 		LineStopAddAction::LineStopAddAction():
 			_rank(0),
 			_metricOffset(0),
-			_withSchedules(true)
+			_withSchedules(true),
+			_reservationNeeded(true)
 		{}
 }	}
