@@ -216,9 +216,8 @@ namespace synthese
 				v.push_back("pm");
 				v.push_back("A");
 				v.push_back("D");
-				v.push_back("Hor");
-// 				if (reservation)
-// 					v.push_back("Resa");
+				v.push_back("H");
+				v.push_back("R");
 				v.push_back("Action");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
 
@@ -449,8 +448,25 @@ namespace synthese
 						}
 					}
 
-// 					if (reservation)
-// 						stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
+					// Reservation
+					stream << t.col();
+					if(	lineArea.get())
+					{
+						stream << HTMLModule::getHTMLImage("/admin/img/resa_compulsory.png", "Règle de réservation applicable à cette zone");
+					}
+					else if(linePhysicalStop)
+					{
+						string icon(
+							linePhysicalStop->getReservationNeeded() ?
+							HTMLModule::getHTMLImage("/admin/img/resa_compulsory.png", "Règle de réservation applicable à cet arrêt") :
+							HTMLModule::getHTMLImage("/admin/img/ftv2vertline.png", "Arrêt sans réservation")
+						);
+
+						lineStopUpdateAction.getAction()->setReservationNeeded(!linePhysicalStop->getReservationNeeded());
+						stream << HTMLModule::getHTMLLink(lineStopUpdateAction.getHTMLForm().getURL(), icon);
+						lineStopUpdateAction.getAction()->setReservationNeeded(optional<bool>());
+					}
+
 					stream << t.col() << HTMLModule::getLinkButton(lineStopRemoveAction.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 				}
 

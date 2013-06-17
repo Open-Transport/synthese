@@ -89,6 +89,8 @@ namespace synthese
 			static const std::string DATA_DEPARTURE_TIME;
 			static const std::string DATA_ARRIVAL_TIME;
 			static const std::string DATA_IS_MAIN;
+			static const std::string DATA_WITH_SCHEDULES;
+			static const std::string DATA_RESERVATION_NEEDED;
 
 			//! \name Page parameters
 			//@{
