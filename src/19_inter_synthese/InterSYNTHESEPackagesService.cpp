@@ -42,6 +42,7 @@ namespace synthese
 	namespace inter_synthese
 	{
 		const string InterSYNTHESEPackagesService::PARAMETER_TABLE_FILTER = "table_filter";
+		const string InterSYNTHESEPackagesService::PARAMETER_OBJECT_FILTER = "object_filter";
 
 		const string InterSYNTHESEPackagesService::TAG_PACKAGE = "package";
 		
@@ -63,6 +64,13 @@ namespace synthese
 			{
 				_tableFilter = tableFilter;
 			}
+
+			// Object filter
+			RegistryKeyType objectFilter(map.getDefault<RegistryKeyType>(PARAMETER_OBJECT_FILTER, 0));
+			if(objectFilter)
+			{
+				_objectFilter = objectFilter;
+			}
 		}
 
 
@@ -79,14 +87,15 @@ namespace synthese
 				// Variable
 				const InterSYNTHESEPackage& package(*it.second);
 
-				// Jump over filtered packages
-				if(_tableFilter)
+				// Jump over table filtered packages
+				if(_tableFilter || _objectFilter)
 				{
 					bool ok(false);
 					BOOST_FOREACH(ObjectBase* obj, package.get<Objects>())
 					{
-						if(obj->getClassNumber() == *_tableFilter)
-						{
+						if(	(_objectFilter && obj->getKey() == *_objectFilter) ||
+							(_tableFilter && obj->getClassNumber() == *_tableFilter)
+						){
 							ok = true;
 							break;
 						}
