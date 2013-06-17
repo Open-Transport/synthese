@@ -184,6 +184,6 @@ namespace synthese
 
 		std::string VDVStatusService::getOutputMimeType() const
 		{
-			return "application/xml";
+			return "text/xml";
 		}
 }	}
