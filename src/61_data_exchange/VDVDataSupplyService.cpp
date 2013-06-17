@@ -432,6 +432,7 @@ namespace synthese
 						}
 						result << "<HaltepositionsText></HaltepositionsText>";
 						result << "<HaltID></HaltID>";
+						result << "<AbfahrtszeitAZBDisposition></AbfahrtszeitAZBDisposition>";
 						result << "</AZBFahrplanlage>";
 					}
 					result << "</AZBNachricht>";
