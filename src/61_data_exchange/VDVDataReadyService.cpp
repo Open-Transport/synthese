@@ -138,6 +138,6 @@ namespace synthese
 
 		std::string VDVDataReadyService::getOutputMimeType() const
 		{
-			return "application/xml";
+			return "text/xml";
 		}
 }	}
