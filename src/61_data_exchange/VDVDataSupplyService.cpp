@@ -253,6 +253,14 @@ namespace synthese
 							direction = jp.getDestination()->getConnectionPlace()->getName();
 						}
 						direction = iconv.convert(direction);
+
+						// Provenance
+						string provenance = jp.getOrigin()->getConnectionPlace()->getName26();
+						if(provenance.empty())
+						{
+							provenance = jp.getOrigin()->getConnectionPlace()->getName();
+						}
+						provenance = iconv.convert(provenance);
 					
 						// XML generation
 						result <<
@@ -270,6 +278,7 @@ namespace synthese
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
 							"<RichtungsText>" << direction << "</RichtungsText>" <<
+							"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>" << 
 							"</AZBFahrtLoeschen>"
@@ -359,6 +368,14 @@ namespace synthese
 						}
 						direction = iconv.convert(direction);
 
+						//Provenance
+						string provenance = jp.getOrigin()->getConnectionPlace()->getName26();
+						if(provenance.empty())
+						{
+							provenance = jp.getOrigin()->getConnectionPlace()->getName();
+						}
+						provenance = iconv.convert(provenance);
+
 						// Expiration time
 						ptime expirationTime(
 							(now.time_of_day() <= time_duration(2, 30, 0)) ? now.date() : now.date() + days(1),
@@ -383,6 +400,7 @@ namespace synthese
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
 							"<RichtungsText>" << direction << "</RichtungsText>" <<
+							"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 							"<ZielHst>" << direction << "</ZielHst>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>"
