@@ -45,6 +45,7 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_TABLE_FILTER;
+			static const std::string PARAMETER_OBJECT_FILTER;
 
 			static const std::string TAG_PACKAGE;
 			
@@ -52,6 +53,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::optional<util::RegistryTableType> _tableFilter;
+				boost::optional<util::RegistryKeyType> _objectFilter;
 			//@}
 			
 			
