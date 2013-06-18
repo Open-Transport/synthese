@@ -430,9 +430,7 @@ namespace synthese
 							ToXsdDateTime(result, departureDateTime);
 							result << "</AbfahrtszeitAZBPrognose>";
 						}
-						result << "<HaltepositionsText></HaltepositionsText>";
-						result << "<HaltID></HaltID>";
-						result << "<AbfahrtszeitAZBDisposition></AbfahrtszeitAZBDisposition>";
+						result << "<HaltID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</HaltID>";
 						result << "</AZBFahrplanlage>";
 					}
 					result << "</AZBNachricht>";
