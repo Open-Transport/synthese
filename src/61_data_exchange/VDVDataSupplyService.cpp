@@ -202,90 +202,6 @@ namespace synthese
 
 					result << "<AZBNachricht AboID=\"" << it.second->getId() << "\">";
 
-					// Deletions
-					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getDeletions())
-					{
-						// Local variables
-						const ServicePointer& sp(dep.second);
-						const CommercialLine& line(
-							*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
-						);
-						const JourneyPattern& jp(
-							*static_cast<const JourneyPattern*>(sp.getService()->getPath())
-						);
-						const TransportNetwork& network(
-							*line.getNetwork()
-						);
-						string networkId(
-							network.getACodeBySource(
-								*_vdvClient->get<DataSource>()
-						)	);
-						string serviceNumber;
-						if(!networkId.empty())
-						{
-							serviceNumber = networkId + "-";
-						}
-						if(sp.getService()->getServiceNumber().empty())
-						{
-							serviceNumber += "00000";
-						}
-						else
-						{
-							serviceNumber += sp.getService()->getServiceNumber();
-						}
-						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
-						string direction;
-						if(jp.getDirectionObj())
-						{
-							direction = jp.getDirectionObj()->getDisplayedText();
-						}
-						else if(!jp.getDirection().empty())
-						{
-							direction = jp.getDirection();
-						}
-						trim(direction);
-						if(direction.empty())
-						{
-							direction = jp.getDestination()->getConnectionPlace()->getName26();
-						}
-						if(direction.empty())
-						{
-							direction = jp.getDestination()->getConnectionPlace()->getName();
-						}
-						direction = iconv.convert(direction);
-
-						// Provenance
-						string provenance = jp.getOrigin()->getConnectionPlace()->getName26();
-						if(provenance.empty())
-						{
-							provenance = jp.getOrigin()->getConnectionPlace()->getName();
-						}
-						provenance = iconv.convert(provenance);
-					
-						// XML generation
-						result <<
-							"<AZBFahrtLoeschen Zst=\"";
-						ToXsdDateTime(result, now);
-						result <<
-							"\">" <<
-							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
-							"<FahrtID>" <<
-							"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
-							"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
-							"</FahrtID>" <<
-							"<HstSeqZaehler>1</HstSeqZaehler>" <<
-							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
-							"<LinienText>" << line.getShortName() << "</LinienText>" <<
-							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
-							"<RichtungsText>" << direction << "</RichtungsText>" <<
-							"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
-							"<Ursache></Ursache>" <<
-							"<AufAZB>false</AufAZB>" <<
-							"<FahrtStatus>Ist</FahrtStatus>" << 
-							"</AZBFahrtLoeschen>"
-						;
-					}
-
 					// Addings
 					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getAddings())
 					{
@@ -432,6 +348,88 @@ namespace synthese
 						}
 						result << "<HaltID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</HaltID>";
 						result << "</AZBFahrplanlage>";
+					}
+
+					// Deletions
+					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getDeletions())
+					{
+						// Local variables
+						const ServicePointer& sp(dep.second);
+						const CommercialLine& line(
+							*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
+						);
+						const JourneyPattern& jp(
+							*static_cast<const JourneyPattern*>(sp.getService()->getPath())
+						);
+						const TransportNetwork& network(
+							*line.getNetwork()
+						);
+						string networkId(
+							network.getACodeBySource(
+								*_vdvClient->get<DataSource>()
+						)	);
+						string serviceNumber;
+						if(!networkId.empty())
+						{
+							serviceNumber = networkId + "-";
+						}
+						if(sp.getService()->getServiceNumber().empty())
+						{
+							serviceNumber += "00000";
+						}
+						else
+						{
+							serviceNumber += sp.getService()->getServiceNumber();
+						}
+						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
+						string direction;
+						if(jp.getDirectionObj())
+						{
+							direction = jp.getDirectionObj()->getDisplayedText();
+						}
+						else if(!jp.getDirection().empty())
+						{
+							direction = jp.getDirection();
+						}
+						trim(direction);
+						if(direction.empty())
+						{
+							direction = jp.getDestination()->getConnectionPlace()->getName26();
+						}
+						if(direction.empty())
+						{
+							direction = jp.getDestination()->getConnectionPlace()->getName();
+						}
+						direction = iconv.convert(direction);
+
+						// Provenance
+						string provenance = jp.getOrigin()->getConnectionPlace()->getName26();
+						if(provenance.empty())
+						{
+							provenance = jp.getOrigin()->getConnectionPlace()->getName();
+						}
+						provenance = iconv.convert(provenance);
+					
+						// XML generation
+						result <<
+							"<AZBFahrtLoeschen Zst=\"";
+						ToXsdDateTime(result, now);
+						result <<
+							"\">" <<
+							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
+							"<FahrtID>" <<
+							"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
+							"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+							"</FahrtID>" <<
+							"<HstSeqZaehler>1</HstSeqZaehler>" <<
+							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
+							"<LinienText>" << line.getShortName() << "</LinienText>" <<
+							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
+							"<RichtungsText>" << direction << "</RichtungsText>" <<
+							"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
+							"<Ursache></Ursache>" <<
+							"</AZBFahrtLoeschen>"
+						;
 					}
 					result << "</AZBNachricht>";
 					
