@@ -87,7 +87,16 @@ namespace synthese
 			try
 			{
 				string sender(allNode.getAttribute("Sender"));
-				_client = &DataExchangeModule::GetVDVClient(sender);
+				try
+				{
+					_client = &DataExchangeModule::GetVDVClient(sender);
+				}
+				catch (...)
+				{
+					//Client was not found
+					_ok = false;
+					return;
+				}
 
 				// Trace
 				_client->trace("StatusAnfrage", request);
@@ -127,17 +136,20 @@ namespace synthese
 
 			// Check if new data
 			bool newData = false;
-			BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _client->getSubscriptions())
+			if (_client)
 			{
-				// Run an update
-				it.second->checkUpdate();
-				if(it.second->getDeletions().empty() && it.second->getAddings().empty())
+				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _client->getSubscriptions())
 				{
-					continue;
+					// Run an update
+					it.second->checkUpdate();
+					if(it.second->getDeletions().empty() && it.second->getAddings().empty())
+					{
+						continue;
+					}
+					// There is new data
+					newData = true;
+					break;
 				}
-				// There is new data
-				newData = true;
-				break;
 			}
 			
 			// XML
@@ -166,7 +178,10 @@ namespace synthese
 			stream << result.str();
 
 			// Trace
-			_client->trace("StatusAntwort", result.str());
+			if (_client)
+			{
+				_client->trace("StatusAntwort", result.str());
+			}
 
 			// Map return
 			return map;
