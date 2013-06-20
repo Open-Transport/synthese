@@ -60,6 +60,7 @@ namespace synthese
 			FIELD(ReplyPort),
 			FIELD(ClientControlCentreCode),
 			FIELD(ServerControlCentreCode),
+			FIELD(ServiceUrl),
 			FIELD(ServiceCode),
 			FIELD(impex::DataSource),
 			FIELD(DefaultDirection),
