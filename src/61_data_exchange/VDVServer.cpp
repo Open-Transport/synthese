@@ -57,6 +57,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(data_exchange::ServerPort, "port", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServerControlCentreCode, "server_control_centre_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ClientControlCentreCode, "client_control_centre_code", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ServiceUrl, "service_url", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServiceCode, "service_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(TracePath, "trace_path", SQL_TEXT)
 	
@@ -77,6 +78,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServerPort),
 					FIELD_DEFAULT_CONSTRUCTOR(ServerControlCentreCode),
 					FIELD_VALUE_CONSTRUCTOR(ClientControlCentreCode, "synthese"),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceUrl),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
@@ -90,7 +92,7 @@ namespace synthese
 
 		std::string VDVServer::_getURL( const std::string& request ) const
 		{
-			return "/" + get<ClientControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
+			return "/" + get<ServiceUrl>() + "/" + get<ClientControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
 		}
 
 

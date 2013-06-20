@@ -78,6 +78,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ReplyPort),
 					FIELD_DEFAULT_CONSTRUCTOR(ClientControlCentreCode),
 					FIELD_VALUE_CONSTRUCTOR(ServerControlCentreCode, "synthese"),
+					FIELD_DEFAULT_CONSTRUCTOR(ServiceUrl),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
@@ -168,7 +169,7 @@ namespace synthese
 
 		std::string VDVClient::_getURL( const std::string& request ) const
 		{
-			return "/" + get<ServerControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
+			return "/" + get<ServiceUrl>() + "/" + get<ServerControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
 		}
 
 
