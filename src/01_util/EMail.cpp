@@ -22,6 +22,8 @@
 
 #include "EMail.h"
 
+#include "Base64.hpp"
+
 #include <boost/foreach.hpp>
 #include <boost/asio.hpp>
 #define CRLF "\r\n"                 // carriage-return/line feed pair
@@ -129,36 +131,34 @@ namespace synthese
 			request_stream << "HELO " << _smtpServer << CRLF;
 			Local::_Process(socket, request, response);
 
-			// Send MAIL FROM: <sender@mydomain.com>
-			request_stream << "MAIL FROM:<" << _sender << ">" << CRLF;
-			Local::_Process(socket, request, response);
-
-			// Send RCPT TO: <receiver@domain.com>
+			// Loop on recipients
 			BOOST_FOREACH(const _Recipients::value_type& recipient, _recipients)
 			{
+				// Send MAIL FROM: <sender@mydomain.com>
+				request_stream << "MAIL FROM:<" << _sender << ">" << CRLF;
+				Local::_Process(socket, request, response);
+
+				// Send RCPT TO: <receiver@domain.com>
 				request_stream << "RCPT TO:<" << recipient.first << ">" << CRLF;
 				Local::_Process(socket, request, response);
-			}
 
-			// Send DATA
-			request_stream << "DATA" << CRLF;
-			Local::_Process(socket, request, response);
+				// Send DATA
+				request_stream << "DATA" << CRLF;
+				Local::_Process(socket, request, response);
 
-			request_stream <<
-				"Subject: " << _subject << CRLF <<
-				"From: ";
-			if(_senderName.empty())
-			{
-				request_stream << _sender;
-			}
-			else
-			{
-				request_stream << _senderName << " <" << _sender << ">";
-			}
-			request_stream << CRLF;
+				request_stream <<
+					"Subject: =?UTF-8?B?"<< base64::encode(_subject) <<"?="<< CRLF <<
+					"From: ";
+				if(_senderName.empty())
+				{
+					request_stream << _sender;
+				}
+				else
+				{
+					request_stream << _senderName << " <" << _sender << ">";
+				}
+				request_stream << CRLF;
 
-			BOOST_FOREACH(const _Recipients::value_type& recipient, _recipients)
-			{
 				request_stream << "To: ";
 				if(recipient.second.empty())
 				{
@@ -166,21 +166,21 @@ namespace synthese
 				}
 				else
 				{
-					request_stream << recipient.second << " <" << recipient.first << ">";
+					request_stream << "=?UTF-8?B?" << base64::encode(recipient.second) << "?= <" << recipient.first << ">";
 				}
 				request_stream << CRLF;
-			}
+		
+				if(_format == EMAIL_HTML)
+				{
+					request_stream <<
+						"MIME-version: 1.0" << CRLF <<
+						"Content-type: text/html; charset=utf-8" << CRLF
+					;
+				}
 
-			if(_format == EMAIL_HTML)
-			{
-				request_stream <<
-					"MIME-version: 1.0" << CRLF <<
-					"Content-type: text/html; charset=utf-8" << CRLF
-				;
+				request_stream << _content << CRLF << "." << CRLF;
+				Local::_Process(socket, request, response);
 			}
-
-			request_stream << _content << CRLF << "." << CRLF;
-			Local::_Process(socket, request, response);
 
 			// Send QUIT
 			request_stream << "QUIT" << CRLF;
