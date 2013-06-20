@@ -126,7 +126,7 @@
 	   <select name="actionParam_field_data_source_id">
 	    <option<@(0==data_source_id)?" selected=\"true\"":""@>>(aucune)</option>
 	    <?data_sources&template=<{data_source&template=
-	    	<option<@(id==data_source_id)?" selected=\"true\"":""@>><@name@></option>
+	    	<option<@(id==data_source_id)?" selected=\"true\"":""@> value="<@id@>"><@name@></option>
 	    }>?>
 	   </select>
 	  </td>
