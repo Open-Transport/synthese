@@ -26,7 +26,6 @@
 
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
-#include "InterSYNTHESESlaveTableSync.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 #include "RequestException.h"
 #include "Request.h"
@@ -133,9 +132,7 @@ namespace synthese
 			// Record the request as slave activity
 			// Even if the slave crashed and don't get the results,
 			// we won't rebuild the full database on the new slave_update
-			ptime now(second_clock::local_time());
-			_slave->set<LastActivityReport>(now);
-			InterSYNTHESESlaveTableSync::Save(_slave.get());
+			_slave->markAsUpToDate();
 
 			return ParametersMap();
 		}
@@ -189,9 +186,7 @@ namespace synthese
 					// Record the request as slave activity
 					// Even if the slave crashed and don't get the results,
 					// we won't rebuild the full database on the new slave_update
-					ptime now(second_clock::local_time());
-					slave->set<LastActivityReport>(now);
-					InterSYNTHESESlaveTableSync::Save(slave.get());
+					slave->markAsUpToDate();
 
 					slave.reset();
 				}

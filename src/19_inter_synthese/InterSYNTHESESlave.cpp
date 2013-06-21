@@ -27,6 +27,7 @@
 #include "InterSYNTHESEConfigItem.hpp"
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
+#include "InterSYNTHESESlaveTableSync.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 #include "ServerModule.h"
@@ -254,10 +255,21 @@ namespace synthese
 			);
 		}
 
-
+		// In the Master/Slave communication, it is possible to have one
+		// thread calling isObsolete() and one calling markAsUpToDate()
+		// In this case we can have a race around our config that is
+		// rewritten by the DB stack.
+		void InterSYNTHESESlave::markAsUpToDate()
+		{
+			recursive_mutex::scoped_lock lock(_slaveChangeMutex);
+			ptime now(second_clock::local_time());
+			set<LastActivityReport>(now);
+			InterSYNTHESESlaveTableSync::Save(this);
+		}
 
 		bool InterSYNTHESESlave::isObsolete() const
 		{
+			recursive_mutex::scoped_lock lock(_slaveChangeMutex);
 			ptime now(second_clock::local_time());
 			return
 				get<LastActivityReport>().is_not_a_date_time() ||
