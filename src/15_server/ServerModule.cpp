@@ -73,7 +73,6 @@ namespace synthese
 		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
 		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service, &ServerModule::HandleRequest));
 		ServerModule::Threads ServerModule::_threads;
-		size_t ServerModule::_availableHTTPThreads(0);
 		recursive_mutex ServerModule::_threadManagementMutex;
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
 		string ServerModule::_autoLoginUser("");
@@ -264,7 +263,6 @@ namespace synthese
 		){
 			try
 			{
-				UseHTTPThread();
 				Log::GetInstance ().debug ("Received request : " +
 					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" +
 					(req.postData.empty() ?
@@ -413,7 +411,6 @@ namespace synthese
 				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);
 			}
 
-			ReleaseHTTPThread();
 			SetCurrentThreadWaiting();
 		}
 
@@ -520,7 +517,6 @@ namespace synthese
 					"HTTP",
 					true
 			)	);
-			++_availableHTTPThreads;
 			return theThread->get_id();
 		}
 
@@ -664,24 +660,4 @@ namespace synthese
 			return _serverStartingTime;
 		}
 
-
-
-		void ServerModule::UseHTTPThread()
-		{
-			recursive_mutex::scoped_lock lock(_threadManagementMutex);
-			--_availableHTTPThreads;
-			if(_availableHTTPThreads == 0)
-			{
-				AddHTTPThread();
-				Log::GetInstance ().info ("Raised HTTP threads number to "+ lexical_cast<string>(_threads.size()) +" due to pool saturation.");
-			}
-		}
-
-
-
-		void ServerModule::ReleaseHTTPThread()
-		{
-			recursive_mutex::scoped_lock lock(_threadManagementMutex);
-			++_availableHTTPThreads;
-		}
 }	}
