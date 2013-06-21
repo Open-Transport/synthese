@@ -8,5 +8,7 @@ target_link_libraries(s3-proxy
   15_server
   11_cms
 )
-
+if(UNIX)
+  target_link_libraries(s3-proxy pthread)
+endif()
 install(TARGETS s3-proxy DESTINATION bin)

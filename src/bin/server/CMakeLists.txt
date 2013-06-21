@@ -43,5 +43,8 @@ foreach(module ${MODULES})
 endforeach(module)
 
 target_link_libraries(s3-server ${Boost_LIBRARIES})
+if(UNIX)
+  target_link_libraries(s3-server pthread)
+endif()
 
 install(TARGETS s3-server DESTINATION bin)
