@@ -147,6 +147,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_SRID = "srid";
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_XY("departure_place_XY");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_XY("arrival_place_XY");
+		const string RoutePlannerFunction::PARAMETER_INVERT_XY("invert_XY");
 
 		const string RoutePlannerFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string RoutePlannerFunction::VALUE_ADMIN_HTML = "admin";
@@ -603,6 +604,7 @@ namespace synthese
 
 				string originPlaceXY = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY);
 				string destinationPlaceXY = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY);
+				bool invertXY = map.getDefault<bool>(PARAMETER_INVERT_XY);
 
 				// Get departure place
 
@@ -648,7 +650,7 @@ namespace synthese
 				{
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem);
+					placesListService.setCoordinatesSystem(_coordinatesSystem, invertXY);
 					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
 					placesListService.setCoordinatesXY(originPlaceXY, invertXY);
@@ -699,7 +701,7 @@ namespace synthese
 				{
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem);
+					placesListService.setCoordinatesSystem(_coordinatesSystem, invertXY);
 					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
 					placesListService.setCoordinatesXY(destinationPlaceXY, invertXY);
