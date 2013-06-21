@@ -89,6 +89,7 @@ namespace synthese
 			mutable Queue _queue;
 			mutable QueueRange _lastSentRange;
 			mutable boost::recursive_mutex _queueMutex;
+			mutable boost::recursive_mutex _slaveChangeMutex;
 
 			// Keep the previous config at unlink time and use it at link
 			// time only if it has changed. Don't forget to unlink it in
@@ -101,6 +102,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				void markAsUpToDate();
 				bool isObsolete() const;
 
 				bool fullUpdateNeeded() const;
