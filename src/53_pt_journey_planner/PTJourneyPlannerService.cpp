@@ -490,7 +490,7 @@ namespace synthese
 					placesListService.setNumber(1);
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY));
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
 					_departure_place.placeResult = placesListService.getPlaceFromBestResult(
 						placesListService.runWithoutOutput()
 					);
@@ -543,7 +543,7 @@ namespace synthese
 					placesListService.setNumber(1);
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY));
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
 					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
 						placesListService.runWithoutOutput()
 					);
