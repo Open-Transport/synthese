@@ -256,7 +256,7 @@ namespace synthese
 
 			if(!_coordinatesXY.empty())
 			{
-				_parseCoordinates();
+				_parseCoordinates(false);
 			}
 
 			// Output
@@ -1261,7 +1261,7 @@ namespace synthese
 			(*houseMap)->insert(pair<const SortHouseByDistanceToOriginPoint,const boost::shared_ptr<House> >(keyHouse,house));
 		}
 
-		void PlacesListService::_parseCoordinates() {
+		void PlacesListService::_parseCoordinates(bool invertXY) {
 			vector< string > parsed_coordinatesXY;
 			split(parsed_coordinatesXY, _coordinatesXY, is_any_of(",; ") );
 
@@ -1272,7 +1272,14 @@ namespace synthese
 
 			try
 			{
-				_originPoint = _coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[0]), lexical_cast<double>(parsed_coordinatesXY[1]));
+				if (invertXY)
+				{
+					_originPoint = _coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[1]), lexical_cast<double>(parsed_coordinatesXY[0]));
+				}
+				else
+				{
+					_originPoint = _coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[0]), lexical_cast<double>(parsed_coordinatesXY[1]));
+				}
 			}
 			catch(bad_lexical_cast)
 			{

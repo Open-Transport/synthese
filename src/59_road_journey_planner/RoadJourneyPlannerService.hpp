@@ -49,6 +49,7 @@ namespace synthese
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_DEPARTURE_PLACE_XY;
 			static const std::string PARAMETER_ARRIVAL_PLACE_XY;
+			static const std::string PARAMETER_INVERT_XY;
 
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_BOARD_PAGE;
