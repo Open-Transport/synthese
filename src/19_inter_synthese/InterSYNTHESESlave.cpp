@@ -181,6 +181,12 @@ namespace synthese
 				}
 				deleteTransaction.run();
 
+				boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
+				if(!lock.owns_lock())
+				{
+					throw ActionException("InterSYNTHESESlaveUpdateService: Already running");
+				}
+
 				// Load new queue items
 				BOOST_FOREACH(
 					const InterSYNTHESEConfig::Items::value_type& it,
