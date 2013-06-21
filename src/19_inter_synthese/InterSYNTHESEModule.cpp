@@ -27,6 +27,8 @@
 #include "InterSYNTHESEPackage.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlave.hpp"
+#include "InterSYNTHESESlaveUpdateService.hpp"
+#include "ServerModule.h"
 #include "URI.hpp"
 #include "User.h"
 
@@ -86,6 +88,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
 		{
+			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "Inter-SYNTHESE slave full updater");
 		}
 
 

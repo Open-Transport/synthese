@@ -173,8 +173,17 @@ namespace synthese
 		}
 
 
+		bool InterSYNTHESESlave::fullUpdateNeeded() const
+		{
+			if(!get<InterSYNTHESEConfig>())
+			{
+				throw Exception("Invalid slave configuration");
+			}
 
-		InterSYNTHESESlave::QueueRange InterSYNTHESESlave::getQueueRange() const
+			return(isObsolete() || get<InterSYNTHESEConfig>()->get<ForceDump>());
+		}
+
+		void InterSYNTHESESlave::processFullUpdate() const
 		{
 			if(!get<InterSYNTHESEConfig>())
 			{
@@ -212,6 +221,15 @@ namespace synthese
 						it->get<SyncPerimeter>()
 					);
 				}
+			}
+
+		}
+
+		InterSYNTHESESlave::QueueRange InterSYNTHESESlave::getQueueRange() const
+		{
+			if(!get<InterSYNTHESEConfig>())
+			{
+				throw Exception("Invalid slave configuration");
 			}
 
 			if(_queue.empty())

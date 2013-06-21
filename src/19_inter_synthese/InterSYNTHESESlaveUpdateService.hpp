@@ -25,8 +25,11 @@
 #ifndef SYNTHESE_InterSYNTHESESlaveUpdateService_H__
 #define SYNTHESE_InterSYNTHESESlaveUpdateService_H__
 
+#include <boost/thread/thread.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
 #include "FactorableTemplate.h"
 #include "Function.h"
+#include "InterSYNTHESESlave.hpp"
 
 namespace synthese
 {
@@ -84,7 +87,10 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 			
-			
+			static bool bgUpdaterDone;
+			static boost::mutex bgMutex;
+			static boost::shared_ptr<InterSYNTHESESlave> bgNextSlave;
+
 		public:
 			//! @name Setters
 			//@{
@@ -119,6 +125,12 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual std::string getOutputMimeType() const;
+
+
+			bool bgProcessSlave(const boost::shared_ptr<InterSYNTHESESlave> &slave) const;
+			static void RunBackgroundUpdater();
+
+
 		};
 }	}
 
