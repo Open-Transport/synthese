@@ -651,7 +651,7 @@ namespace synthese
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
 					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
-					placesListService.setCoordinatesXY(originPlaceXY);
+					placesListService.setCoordinatesXY(originPlaceXY, invertXY);
 					_departure_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
 
@@ -702,7 +702,7 @@ namespace synthese
 					placesListService.setCoordinatesSystem(_coordinatesSystem);
 					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
-					placesListService.setCoordinatesXY(destinationPlaceXY);
+					placesListService.setCoordinatesXY(destinationPlaceXY, invertXY);
 					_arrival_place.placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
 				}
 			}
