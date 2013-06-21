@@ -136,6 +136,12 @@ namespace synthese
 			static const std::string REVISION;
 			static const std::string BUILD_DATE;
 
+			// SYNTHESE is not lock protected against changing the base content
+			// while reading or writing it. Take this mutex if you change the base
+			// in a service.
+			// @FIXME This should be used by all services appropriately.
+			static boost::shared_mutex baseWriterMutex;
+
 		private:
 
 			/// The io_service used to perform asynchronous operations.
