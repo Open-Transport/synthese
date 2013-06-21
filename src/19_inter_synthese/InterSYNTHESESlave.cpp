@@ -22,12 +22,14 @@
 
 #include "InterSYNTHESESlave.hpp"
 
+#include "ActionException.h"
 #include "BasicClient.h"
 #include "InterSYNTHESEConfigItem.hpp"
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
+#include "ServerModule.h"
 
 using namespace boost;
 using namespace std;
@@ -67,16 +69,29 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
 					FIELD_VALUE_CONSTRUCTOR(Active, false)
 			)	),
-			_lastSentRange(make_pair(_queue.end(), _queue.end()))
+			_lastSentRange(make_pair(_queue.end(), _queue.end())),
+			_previousConfig(NULL)
 		{
 		}
 
+		InterSYNTHESESlave::~InterSYNTHESESlave()
+		{
+			if(_previousConfig)
+			{
+				_previousConfig->eraseSlave(this);
+			}
+		}
 
 
 		void InterSYNTHESESlave::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			if(get<InterSYNTHESEConfig>())
+			if(get<InterSYNTHESEConfig>() && _previousConfig != get_pointer(get<InterSYNTHESEConfig>()))
 			{
+				if(_previousConfig)
+				{
+					_previousConfig->eraseSlave(this);
+					_previousConfig = NULL;
+				}
 				get<InterSYNTHESEConfig>()->insertSlave(this);
 			}
 		}
@@ -87,7 +102,7 @@ namespace synthese
 		{
 			if(get<InterSYNTHESEConfig>())
 			{
-				get<InterSYNTHESEConfig>()->eraseSlave(this);
+				_previousConfig = get_pointer(get<InterSYNTHESEConfig>());
 			}
 		}
 
