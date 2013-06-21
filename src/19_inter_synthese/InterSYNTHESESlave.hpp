@@ -103,6 +103,8 @@ namespace synthese
 			//@{
 				bool isObsolete() const;
 
+				bool fullUpdateNeeded() const;
+				void processFullUpdate() const;
 				QueueRange getQueueRange() const;
 
 				void enqueue(
