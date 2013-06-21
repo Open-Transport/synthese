@@ -650,7 +650,7 @@ namespace synthese
 				{
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem, invertXY);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
 					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
 					placesListService.setCoordinatesXY(originPlaceXY, invertXY);
@@ -701,7 +701,7 @@ namespace synthese
 				{
 					PlacesListService placesListService;
 					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem, invertXY);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
 					placesListService.setCitiesWithAtLeastAStop(false);
 					placesListService.addRequiredUserClass(_accessParameters.getUserClass());
 					placesListService.setCoordinatesXY(destinationPlaceXY, invertXY);
