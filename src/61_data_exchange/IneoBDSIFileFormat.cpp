@@ -44,6 +44,7 @@
 #include "ScenarioTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "SentScenario.h"
+#include "ServerModule.h"
 #include "StopPoint.hpp"
 
 #include <boost/filesystem.hpp>
@@ -118,6 +119,12 @@ namespace synthese
 			boost::optional<const server::Request&> request
 		) const {
 			date today(day_clock::local_day());
+
+			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
+			if(!lock.owns_lock())
+			{
+				throw ActionException("IneoBDSIFileFormat: Already running");
+			}
 
 			//////////////////////////////////////////////////////////////////////////
 			// Preparation of list of objects to remove

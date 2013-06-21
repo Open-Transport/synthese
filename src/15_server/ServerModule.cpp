@@ -102,6 +102,7 @@ namespace synthese
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
+		boost::shared_mutex ServerModule::baseWriterMutex;
 
 		template<> void ModuleClassTemplate<ServerModule>::PreInit()
 		{
