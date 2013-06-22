@@ -654,6 +654,15 @@ namespace synthese
 			const Schedules& departureSchedules, 
 			const Schedules& arrivalSchedules
 		){
+			// Do not process new schedules if none has changed
+			if((_RTDepartureSchedules == departureSchedules) &&
+			   (_RTArrivalSchedules == arrivalSchedules)
+			)
+			{
+				_hasRealTimeData = true;
+				return;
+			}
+
 			_RTDepartureSchedules = departureSchedules;
 			_RTArrivalSchedules = arrivalSchedules;
 			_computeNextRTUpdate();

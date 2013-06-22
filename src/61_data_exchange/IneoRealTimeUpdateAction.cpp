@@ -76,7 +76,8 @@ namespace synthese
 		const string IneoRealTimeUpdateAction::PARAMETER_PLANNED_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_th_ds";
 		const string IneoRealTimeUpdateAction::PARAMETER_REAL_TIME_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_rt_ds";
 		const string IneoRealTimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
-		
+		const string IneoRealTimeUpdateAction::PARAMETER_TIME_FLOOR = "time_floor"; // In seconds
+
 		
 		ParametersMap IneoRealTimeUpdateAction::getParametersMap() const
 		{
@@ -123,6 +124,9 @@ namespace synthese
 			{
 				throw ActionException("No such real time data source");
 			}
+
+			// Time Floor
+			_timeFloor = map.getDefault<int>(PARAMETER_TIME_FLOOR, 1);
 
 			// Database
 			_database = map.get<string>(PARAMETER_DATABASE);
@@ -936,7 +940,7 @@ namespace synthese
 				// Loop on services to update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToUpdate)
 				{
-					it->updateService(*it->syntheseService);
+					it->updateService(*it->syntheseService, _timeFloor);
 				}
 
 				// Loop on services to move and update
@@ -951,7 +955,7 @@ namespace synthese
 					links.erase(dataSourceOnUpdateEnv);
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
 					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(*it->syntheseService);
+					it->updateService(*it->syntheseService, _timeFloor);
 				}
 
 				// Loop on services to link and update
@@ -966,7 +970,7 @@ namespace synthese
 					links.erase(dataSourceOnUpdateEnv);
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
 					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(*it->syntheseService);
+					it->updateService(*it->syntheseService, _timeFloor);
 				}
 
 				// Remove services from today
@@ -1149,18 +1153,30 @@ namespace synthese
 		}
 
 
+		// Round the given time to the closest minute
+		time_duration
+		IneoRealTimeUpdateAction::Course::_applyTimeFloor(
+			const time_duration &td,
+			size_t timeFloor
+		) const
+		{
+			time_duration tdResult( seconds(td.total_seconds() - td.total_seconds() % timeFloor) );
+			return tdResult;
+		}
 
 
-
-		void IneoRealTimeUpdateAction::Course::updateService( pt::ScheduledService& service ) const
+		void IneoRealTimeUpdateAction::Course::updateService(
+			pt::ScheduledService& service,
+			size_t timeFloor
+		) const
 		{
 			// Update of the real time schedules
 			SchedulesBasedService::Schedules departureSchedules;
 			SchedulesBasedService::Schedules arrivalSchedules;
 			for(size_t i(0); i<horaires.size(); ++i)
 			{
-				departureSchedules.push_back(horaires[i].hrd);
-				arrivalSchedules.push_back(horaires[i].hra);
+				departureSchedules.push_back(_applyTimeFloor(horaires[i].hrd, timeFloor));
+				arrivalSchedules.push_back(_applyTimeFloor(horaires[i].hra, timeFloor));
 			}
 			service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
 		}

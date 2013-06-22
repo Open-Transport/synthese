@@ -77,12 +77,15 @@ namespace synthese
 			static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 			static const std::string PARAMETER_REAL_TIME_DATASOURCE_ID;
 			static const std::string PARAMETER_DATABASE;
-	
+			static const std::string PARAMETER_TIME_FLOOR;
+
 		private:
 			boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 			boost::shared_ptr<const impex::DataSource> _realTimeDataSource;
 			boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 			std::string _database;
+			// A number of seconds used to floor the real time date
+			size_t _timeFloor;
 
 			struct Arret
 			{
@@ -148,7 +151,10 @@ namespace synthese
 				bool operator==(const pt::SchedulesBasedService::Schedules& schedules) const;
 
 				bool mustBeImported() const;
-				void updateService(pt::ScheduledService& service) const;
+				void updateService(pt::ScheduledService& service, size_t timeFloor) const;
+
+				boost::posix_time::time_duration
+				_applyTimeFloor(const boost::posix_time::time_duration &td, size_t timeFloor) const;
 			};
 
 			struct Destinataire
