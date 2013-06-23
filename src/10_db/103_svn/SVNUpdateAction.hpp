@@ -55,12 +55,14 @@ namespace synthese
 			public:
 				static const std::string PARAMETER_USER;
 				static const std::string PARAMETER_PASSWORD;
+				static const std::string PARAMETER_NO_WC_SAVE;
 				static const std::string PARAMETER_OBJECT_ID;
 
 			private:
 				boost::shared_ptr<ObjectBase> _object;
 				std::string _user;
 				std::string _password;
+				bool _noWCSave;
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////

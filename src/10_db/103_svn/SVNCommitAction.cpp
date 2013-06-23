@@ -51,6 +51,8 @@ namespace synthese
 			const string SVNCommitAction::PARAMETER_USER = Action_PARAMETER_PREFIX + "_user";
 			const string SVNCommitAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "_password";
 			const string SVNCommitAction::PARAMETER_MESSAGE = Action_PARAMETER_PREFIX + "_message";
+			const string SVNCommitAction::PARAMETER_NO_COMMIT = Action_PARAMETER_PREFIX + "_no_commit";
+			const string SVNCommitAction::PARAMETER_NO_UPDATE = Action_PARAMETER_PREFIX + "_no_update";
 
 			
 			
@@ -107,6 +109,12 @@ namespace synthese
 
 				// Message
 				_message = map.getDefault<string>(PARAMETER_MESSAGE);
+
+				// No commit
+				_noCommit = map.getDefault<bool>(PARAMETER_NO_COMMIT, false);
+
+				// No update
+				_noUpdate = map.getDefault<bool>(PARAMETER_NO_UPDATE, false);
 			}
 			
 			
@@ -115,7 +123,7 @@ namespace synthese
 				Request& request
 			){
 				SVNWorkingCopy& wc(const_cast<SVNWorkingCopy&>(_object->dynamic_get<SVNWorkingCopy>()));
-				wc.commit(_message, _user, _password);
+				wc.commit(_message, _user, _password, _noCommit, _noUpdate);
 			}
 			
 			
