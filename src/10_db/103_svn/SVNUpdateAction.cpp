@@ -50,7 +50,8 @@ namespace synthese
 			const string SVNUpdateAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "_object_id";
 			const string SVNUpdateAction::PARAMETER_USER = Action_PARAMETER_PREFIX + "_user";
 			const string SVNUpdateAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "_password";
-			
+			const string SVNUpdateAction::PARAMETER_NO_WC_SAVE = Action_PARAMETER_PREFIX + "_no_wc_save";
+
 			
 			
 			ParametersMap SVNUpdateAction::getParametersMap() const
@@ -115,6 +116,9 @@ namespace synthese
 
 				// Password
 				_password = map.getDefault<string>(PARAMETER_PASSWORD);
+
+				// Do not save the site to the Working Copy
+				_noWCSave = map.getDefault<bool>(PARAMETER_NO_WC_SAVE, false);
 			}
 			
 			
@@ -126,7 +130,7 @@ namespace synthese
 					const_cast<SVNWorkingCopy&>(
 						_object->dynamic_get<SVNWorkingCopy>()
 				)	);
-				wc.update(_user, _password);
+				wc.update(_user, _password, false, _noWCSave);
 			}
 			
 			
