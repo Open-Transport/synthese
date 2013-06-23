@@ -336,7 +336,10 @@ namespace synthese
 				// Field names
 				ParametersMap attributesMap;
 				object.toParametersMap(attributesMap, false, false);
-				ofstream dumpStream(dumpFilePath.file_string().c_str());
+				ofstream dumpStream(
+					dumpFilePath.file_string().c_str(),
+					std::ios_base::out | std::ios_base::binary
+				);
 				dumpStream << object.getTableName() << "(";
 				bool first(true);
 				BOOST_FOREACH(const ParametersMap::Map::value_type& item, attributesMap.getMap())
@@ -459,7 +462,10 @@ namespace synthese
 					// Creation if the fake file if necessary
 					if(creation)
 					{
-						ofstream nameStream(namePath.file_string().c_str());
+						ofstream nameStream(
+							namePath.file_string().c_str(),
+							std::ios_base::out | std::ios_base::binary
+						);
 						nameStream << endl;
 						nameStream.close();
 						_svnAdd(namePath);
