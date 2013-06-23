@@ -113,4 +113,7 @@ target_link_libraries(15_server
   14_admin
 )
 
+# Explicitly say that the executable depends on custom svn target
+add_dependencies(15_server revisiontag)
+
 install(TARGETS 15_server DESTINATION lib)
