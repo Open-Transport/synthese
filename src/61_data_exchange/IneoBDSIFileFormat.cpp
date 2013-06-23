@@ -97,7 +97,7 @@ namespace synthese
 			}
 			catch(ObjectNotFoundException<DataSource>&)
 			{
-				throw ActionException("No such real time data source");
+				throw ActionException("No such planned data source");
 			}
 
 			// Messages recipients datasource
