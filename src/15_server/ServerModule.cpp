@@ -25,6 +25,7 @@
 #include "EMail.h"
 #include "Log.h"
 #include "15_server/version.h"
+#include "15_server/svnversion.h"
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
