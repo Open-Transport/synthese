@@ -574,13 +574,19 @@ namespace synthese
 			/// @param message the message to attach to the commit
 			/// @param user valid login on the server
 			/// @param password password corresponding to the login
+			/// @param noCommit to avoid commit (will only save to the working copy)
 			void SVNWorkingCopy::commit(
 				const std::string& message,
 				const std::string& user,
-				const std::string& password
+				const std::string& password,
+				const bool noCommit,
+				const bool noUpdate
 			){
-				update(user, password);
-				_svnCommit(message, user, password,	_path);
+				update(user, password, noUpdate, false /* Save to WC */);
+				if(!noCommit)
+				{
+					_svnCommit(message, user, password,	_path);
+				}
 			}
 
 
@@ -623,12 +629,20 @@ namespace synthese
 
 			void SVNWorkingCopy::update(
 				const std::string& user,
-				const std::string& password
+				const std::string& password,
+				bool noUpdate,
+				bool noWCSave
 			){
 				if(exists(_path))
 				{
-					_exportToWC();
-					_svnUpdate(user, password, _path);
+					if(!noWCSave)
+					{
+						_exportToWC();
+					}
+					if(!noUpdate)
+					{
+						_svnUpdate(user, password, _path);
+					}
 				}
 				else
 				{

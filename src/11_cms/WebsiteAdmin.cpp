@@ -329,6 +329,13 @@ namespace synthese
 								SVNUpdateAction::PARAMETER_PASSWORD,
 								string()
 						)	);
+						stream << pt.cell(
+							"Écraser mes modifications",
+							pt.getForm().getCheckBox(
+								SVNUpdateAction::PARAMETER_NO_WC_SAVE,
+								string(),
+								false
+						)	);
 						stream << pt.close();
 					}
 
@@ -364,6 +371,20 @@ namespace synthese
 							pt.getForm().getPasswordInput(
 								SVNCommitAction::PARAMETER_PASSWORD,
 								string()
+						)	);
+						stream << pt.cell(
+							"Ne pas commiter, sauvegarde uniquement en local",
+							pt.getForm().getCheckBox(
+								SVNCommitAction::PARAMETER_NO_COMMIT,
+								string(),
+								false
+						)	);
+						stream << pt.cell(
+							"Ne pas mettre à jour la copie de travail",
+							pt.getForm().getCheckBox(
+								SVNCommitAction::PARAMETER_NO_UPDATE,
+								string(),
+								false
 						)	);
 						stream << pt.close();
 					}
