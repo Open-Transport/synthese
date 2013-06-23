@@ -165,10 +165,11 @@ namespace synthese
 
 
 
-					void commit(
-						const std::string& message,
+					void commit(const std::string& message,
 						const std::string& user,
-						const std::string& password
+						const std::string& password,
+						const bool noCommit,
+						const bool noUpdate
 					);
 
 
@@ -182,10 +183,13 @@ namespace synthese
 					///    are lost.
 					/// @param user valid login on the server
 					/// @param password password corresponding to the login
-					void update(
-						const std::string& user,
-						const std::string& password
-					);
+					/// @param noUpdate do not perform a svn update
+					/// @param noWCSave do not save the current site to the Working Copy
+					/// thus loosing the current changes.
+					void update(const std::string& user,
+						const std::string& password,
+						bool noUpdate,
+						bool noWCSave);
 				//@}
 
 				void from_string(

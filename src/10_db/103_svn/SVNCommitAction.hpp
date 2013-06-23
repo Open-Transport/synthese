@@ -57,12 +57,16 @@ namespace synthese
 				static const std::string PARAMETER_PASSWORD;
 				static const std::string PARAMETER_OBJECT_ID;
 				static const std::string PARAMETER_MESSAGE;
+				static const std::string PARAMETER_NO_COMMIT;
+				static const std::string PARAMETER_NO_UPDATE;
 
 			private:
 				boost::shared_ptr<ObjectBase> _object;
 				std::string _user;
 				std::string _password;
 				std::string _message;
+				bool _noCommit;
+				bool _noUpdate;
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////
