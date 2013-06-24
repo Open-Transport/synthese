@@ -570,7 +570,7 @@ namespace synthese
 
 			void SVNWorkingCopy::create(
 				const std::string& user,
-				const std::string& password
+				const std::string& password,
 				const bool noCommit
 			) const	{
 				if (!noCommit)
