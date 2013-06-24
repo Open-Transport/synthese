@@ -59,12 +59,14 @@ namespace synthese
 				static const std::string PARAMETER_PASSWORD;
 				static const std::string PARAMETER_OBJECT_ID;
 				static const std::string PARAMETER_REPO_URL;
+				static const std::string PARAMETER_NO_COMMIT;
 
 			private:
 				boost::shared_ptr<ObjectBase> _object;
 				std::string _user;
 				std::string _password;
 				SVNRepository _repo;
+				bool _noCommit;
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////

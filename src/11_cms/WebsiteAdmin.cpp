@@ -290,6 +290,13 @@ namespace synthese
 							SVNWorkingCopyCreateAction::PARAMETER_PASSWORD,
 							string()
 					)	);
+					stream << pt.cell(
+						"Ne pas commiter, sauvegarde uniquement en local",
+						pt.getForm().getCheckBox(
+						SVNWorkingCopyCreateAction::PARAMETER_NO_COMMIT,
+						string(),
+						false
+					)	);
 					stream << pt.close();
 				}
 				else
