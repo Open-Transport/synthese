@@ -321,7 +321,8 @@ namespace synthese
 
 			void SVNWorkingCopy::_export(
 				const ObjectBase& object,
-				const boost::filesystem::path& dirPath
+				const boost::filesystem::path& dirPath,
+				const bool noCommit
 			) const	{
 
 				RegistryKeyType key(object.getKey());
@@ -379,7 +380,7 @@ namespace synthese
 				dumpStream.close();
 
 				// If creation, svn add
-				if(creation)
+				if(creation && !noCommit)
 				{
 					_svnAdd(dumpFilePath);
 				}
@@ -402,7 +403,7 @@ namespace synthese
 							it->path().filename().substr(0, fileNameMainPart.size()) == fileNameMainPart
 						){
 							creation = false;
-							if(it->path().filename() != fileNameWithExtension)
+							if(it->path().filename() != fileNameWithExtension && !noCommit)
 							{
 								_svnMove(it->path(), filePath);
 							}
@@ -416,7 +417,7 @@ namespace synthese
 					fileStream.close();
 
 					// If creation, svn add
-					if(creation)
+					if(creation && !noCommit)
 					{
 						_svnAdd(filePath);
 					}
@@ -452,7 +453,8 @@ namespace synthese
 						string fileName(it->path().filename());
 						if(	(fileName.size() >= commonFileName.size() + nameExtension.size()) &&
 							fileName.substr(0, commonFileName.size()) == commonFileName &&
-							fileName.substr(fileName.size() - nameExtension.size()) == nameExtension
+							fileName.substr(fileName.size() - nameExtension.size()) == nameExtension &&
+							!noCommit
 						){
 							_svnMove(it->path(), namePath);
 							break;
@@ -468,7 +470,10 @@ namespace synthese
 						);
 						nameStream << endl;
 						nameStream.close();
-						_svnAdd(namePath);
+						if (!noCommit)
+						{
+							_svnAdd(namePath);
+						}
 					}
 				}
 
@@ -509,7 +514,7 @@ namespace synthese
 						existingIds.insert(subObject->getKey());
 
 						// Export of the object (recursion)
-						_export(*subObject, subdirPath);
+						_export(*subObject, subdirPath, noCommit);
 					}
 
 					// Loop on existing files in the path and remove files that correspond
@@ -550,7 +555,7 @@ namespace synthese
 
 
 
-			void SVNWorkingCopy::_exportToWC() const
+			void SVNWorkingCopy::_exportToWC(const bool noCommit) const
 			{
 				// Check if the object is defined
 				if(!_object)
@@ -558,7 +563,7 @@ namespace synthese
 					return;
 				}
 
-				_export(*_object, _path);
+				_export(*_object, _path, noCommit);
 			}
 
 
@@ -566,11 +571,23 @@ namespace synthese
 			void SVNWorkingCopy::create(
 				const std::string& user,
 				const std::string& password
+				const bool noCommit
 			) const	{
-				_repo.mkdir(user, password);
-				_repo.checkout(user, password, _path);
-				_exportToWC();
-				_svnCommit("Object creation", user, password, _path);
+				if (!noCommit)
+				{
+					_repo.mkdir(user, password);
+					_repo.checkout(user, password, _path);
+				}
+				else
+				{
+					// Creation of the local repository
+					create_directory(_path);
+				}
+				_exportToWC(noCommit);
+				if (!noCommit)
+				{
+					_svnCommit("Object creation", user, password, _path);
+				}
 			}
 
 
@@ -643,7 +660,7 @@ namespace synthese
 				{
 					if(!noWCSave)
 					{
-						_exportToWC();
+						_exportToWC(false);
 					}
 					if(!noUpdate)
 					{

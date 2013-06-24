@@ -101,7 +101,8 @@ namespace synthese
 				/// @param dirPath the directory where to export the files
 				void _export(
 					const ObjectBase& object,
-					const boost::filesystem::path& dirPath
+					const boost::filesystem::path& dirPath,
+					const bool noCommit
 				) const;
 
 
@@ -111,7 +112,7 @@ namespace synthese
 				/// The export process maintains the working copy at a compliant status :
 				///  - new files are declared as added
 				///  - files that no longer exists are declared as removed
-				void _exportToWC() const;
+				void _exportToWC(const bool noCommit) const;
 
 
 
@@ -149,7 +150,8 @@ namespace synthese
 					/// @pre the repository URL must point to an inexistent directory
 					void create(
 						const std::string& user,
-						const std::string& password
+						const std::string& password,
+						const bool noCommit
 					) const;
 
 

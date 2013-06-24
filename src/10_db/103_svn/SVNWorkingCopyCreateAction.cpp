@@ -53,6 +53,7 @@ namespace synthese
 			const string SVNWorkingCopyCreateAction::PARAMETER_USER = Action_PARAMETER_PREFIX + "_user";
 			const string SVNWorkingCopyCreateAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "_password";
 			const string SVNWorkingCopyCreateAction::PARAMETER_REPO_URL = Action_PARAMETER_PREFIX + "_repo_url";
+			const string SVNWorkingCopyCreateAction::PARAMETER_NO_COMMIT = Action_PARAMETER_PREFIX + "_no_commit";
 			
 			
 			
@@ -107,9 +108,12 @@ namespace synthese
 				// Password
 				_password = map.getDefault<string>(PARAMETER_PASSWORD);
 
+				// No commit
+				_noCommit = map.getDefault<bool>(PARAMETER_NO_COMMIT, false);
+
 				// Repository URL
 				_repo = SVNRepository(map.getDefault<string>(PARAMETER_REPO_URL));
-				if(_repo.getURL().empty())
+				if(_repo.getURL().empty() && !_noCommit)
 				{
 					throw ActionException("Repository URL must be non empty");
 				}
@@ -125,7 +129,7 @@ namespace synthese
 
 				wc.setRepo(_repo);
 				_object->dynamic_set<SVNWorkingCopy>(wc);
-				wc.create(_user, _password);
+				wc.create(_user, _password, _noCommit);
 
 				RegistryTableType tableId(decodeTableId(_object->getKey()));
 				boost::shared_ptr<DBDirectTableSync> tableSync(
