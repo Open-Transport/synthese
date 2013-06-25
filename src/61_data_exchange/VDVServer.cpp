@@ -205,6 +205,7 @@ namespace synthese
 			}
 			catch(...)
 			{
+				Log::GetInstance().warn("Error while reading StatusAntwort");
 				_online = false;
 				return;
 			}
