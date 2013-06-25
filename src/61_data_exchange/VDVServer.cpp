@@ -196,7 +196,7 @@ namespace synthese
 				ptime startServiceTime(
 					XmlToolkit::GetXsdDateTime(
 						startServiceNode.getText()
-				)	);
+				) + diff_from_utc); //We are supposed to receive the UTC time
 				if(startServiceTime != _startServiceTimeStamp)
 				{
 					reloadNeeded = true;
