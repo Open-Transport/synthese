@@ -149,7 +149,7 @@ namespace synthese
 			stringstream statusAnfrage;
 			statusAnfrage <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-				"<Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
+				"<StatusAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(statusAnfrage, now);
 			statusAnfrage <<
 				"\"/>";
