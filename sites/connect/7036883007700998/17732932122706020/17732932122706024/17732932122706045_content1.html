@@ -4,7 +4,7 @@
   <select name="<@name@>" is_parameter="true"><@input_value=<@~variable(name)@>@>
    <option value="">(non défini)</option>
    <?PTNetworksListFunction&template=<{network&template=
-       <option value="<@network_id@>" <@(id==input_value)?"selected=\"true\"":""@>><@name@></option>
+       <option value="<@network_id@>" <@(network_id==input_value)?"selected=\"true\"":""@>><@name@></option>
    }>?>
   </select>
  </div>
