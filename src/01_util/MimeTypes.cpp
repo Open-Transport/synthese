@@ -43,6 +43,7 @@ namespace synthese
 		const MimeType MimeTypes::TEXT("text", "plain", "txt", "");
 		const MimeType MimeTypes::GIF("image", "gif", "gif", "");
 		const MimeType MimeTypes::PDF("application", "pdf", "pdf", "");
+		const MimeType MimeTypes::TTF("application", "x-font-ttf", "ttf", "");
 
 
 

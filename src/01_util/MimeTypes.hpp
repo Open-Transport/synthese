@@ -51,6 +51,7 @@ namespace synthese
 			static const MimeType PNG;
 			static const MimeType TEXT;
 			static const MimeType XML;
+			static const MimeType TTF;
 			
 			static const MimeType& GetMimeTypeByExtension(
 				const std::string& extension
