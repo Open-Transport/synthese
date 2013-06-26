@@ -23,6 +23,7 @@
 #include "CustomBroadcastPoint.hpp"
 
 #include "Alarm.h"
+#include "BroadcastPointAlarmRecipient.hpp"
 
 using namespace boost;
 using namespace std;
@@ -82,6 +83,39 @@ namespace synthese
 			const Alarm::LinkedObjects& recipients,
 			const util::ParametersMap& parameters
 		) const	{
+
+			//////////////////////////////////////////////////////////////////////////
+			// Check if the broadcast point or one of its parents is in the recipients list
+
+			// Check if the message has at least a broadcast point linked
+			Alarm::LinkedObjects::const_iterator it(
+				recipients.find(BroadcastPointAlarmRecipient::FACTORY_KEY)
+			);
+			if(it == recipients.end())
+			{ // No broadcast point is linked
+				return false;
+			}
+
+			// Search in the linked broadcast points the current broadcast point or one of its parents
+			bool ok(false);
+			for(const CustomBroadcastPoint* cbp(this); cbp != NULL; cbp = cbp->getParent())
+			{
+				BOOST_FOREACH(const AlarmObjectLink* link, it->second)
+				{
+					if(link->getObjectId() == cbp->getKey())
+					{
+						ok = true;
+						break;
+					}
+				}
+			}
+			if(!ok)
+			{
+				return false;
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			// Now check the parameters according to the custom display rule defined in the object
 
 			// Populates the parameters map
 			ParametersMap pm(parameters);
