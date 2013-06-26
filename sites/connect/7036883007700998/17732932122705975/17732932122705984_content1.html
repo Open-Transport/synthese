@@ -118,7 +118,7 @@
 	  <td>Code du client</td>
 	  <td><input type="text" value="<@client_control_centre_code@>" name="actionParam_field_client_control_centre_code" /></td>
 	 </tr><tr>
-     </tr><tr>
+	 </tr><tr>
 	  <td>URL d'accès au service</td>
 	  <td><input type="text" value="<@service_url@>" name="actionParam_field_service_url" /></td>
 	 </tr><tr>
@@ -148,12 +148,13 @@
 	<div class="tab-pane <@(tab=="subscriptions")?"active":""@>" id="subscriptions">
 	
 	<?form&
-	  target=/client/vdv/subscription&
+	  target=/client&
 	  name=add_subscription&
 	  a=ObjectCreate&
 	  actionParam_table_id=98&
 	  actionParam_field_vdv_server_id=<@roid@>&
 	  co=1&
+	  roid=<@roid@>&
 	?>
 	<table class="table table-striped table-condensed"><thead>
 	 <tr><th></th><th>nom</th><th>arrêt</th><th>statut</th><th></th></tr>
@@ -174,6 +175,11 @@
 	   <button type="submit" class="btn btn-warning">Ajouter</button>
 	  </td>
 	 </tr>
+	</table>
+	</form>
+	<table class="table table-striped table-condensed"><thead>
+	 <tr><th></th><th>nom</th><th>arrêt</th><th>statut</th><th></th></tr>
+	</thead><tbody>
 	 <{subscription&template=
 	 	<tr>
 	 	 <td>
