@@ -85,6 +85,10 @@ namespace synthese
 			try
 			{
 				boost::shared_ptr<const Import> import(ImportTableSync::Get(importId, *_env));
+				if(!import->get<DataSource>())
+				{
+					throw RequestException("The id system of the specified import is not defined.");
+				}
 
 				// Log path
 				bool outputLogs(map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false));
