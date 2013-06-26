@@ -599,7 +599,9 @@ namespace synthese
 				}
 
 				// Insertion of the item in the current map
-				_map.insert(make_pair(key, it.second));
+				_map.insert(
+					make_pair(key, other.getValue(it.first))
+				);
 			}
 
 			// Merge the submap
