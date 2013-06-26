@@ -175,6 +175,7 @@ namespace synthese
 			_parameters.remove(PARAMETER_PRIORITY_ORDER);
 			_parameters.remove(PARAMETER_DATE);
 			_parameters.remove(PARAMETER_END_DATE);
+			_parameters.remove(PARAMETER_OUTPUT_FORMAT);
 		}
 
 
