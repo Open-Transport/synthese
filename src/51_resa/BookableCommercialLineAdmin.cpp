@@ -202,12 +202,24 @@ namespace synthese
 				bool globalReadRight(
 					_request.getUser()->getProfile()->isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
 				);
+				if (!globalReadRight && _line.get())
+				{
+					globalReadRight = _request.getUser()->getProfile()->isAuthorized<ResaRight>(security::READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+				}
 				bool globalDeleteRight(
 					_request.getUser()->getProfile()->isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
 				);
+				if (!globalDeleteRight && _line.get())
+				{
+					globalDeleteRight = _request.getUser()->getProfile()->isAuthorized<ResaRight>(security::DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+				}
 				bool globalCancelRight(
 					_request.getUser()->getProfile()->isAuthorized<ResaRight>(security::CANCEL, UNKNOWN_RIGHT_LEVEL)
 				);
+				if (!globalCancelRight && _line.get())
+				{
+					globalCancelRight = _request.getUser()->getProfile()->isAuthorized<ResaRight>(security::CANCEL, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+				}
 
 				// Requests
 				AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request, *this);
