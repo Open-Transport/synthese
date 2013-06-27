@@ -79,6 +79,7 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_LINE_PAGE_ID = "line_page_id";
 		const string StopAreasListFunction::PARAMETER_TERMINUS_ID = "terminus_id";
 		const string StopAreasListFunction::PARAMETER_OUTPUT_STOPS = "output_stops";
+		const string StopAreasListFunction::PARAMETER_OUTPUT_LINES_IN_STOPS = "output_lines_in_stops";
 		const string StopAreasListFunction::PARAMETER_GROUP_BY_CITIES = "group_by_cities";
 		const string StopAreasListFunction::PARAMETER_STOPS_DIRECTIONS = "stops_directions";
 
@@ -147,6 +148,11 @@ namespace synthese
 			{
 				result.insert(PARAMETER_GROUP_BY_CITIES, _groupByCities);
 			}
+
+			if(_outputLinesInStops)
+			{
+				result.insert(PARAMETER_OUTPUT_LINES_IN_STOPS, _outputLinesInStops);
+			}
 			return result;
 		}
 
@@ -192,6 +198,9 @@ namespace synthese
 
 			// Output stops ?
 			_outputStops = map.isTrue(PARAMETER_OUTPUT_STOPS);
+
+			// Output lines in stops ?
+			_outputLinesInStops = map.isTrue(PARAMETER_OUTPUT_LINES_IN_STOPS);
 
 			// Group by cities ?
 			_groupByCities = map.isTrue(PARAMETER_GROUP_BY_CITIES);
@@ -270,6 +279,7 @@ namespace synthese
 			_coordinatesSystem(NULL),
 			_outputLines(true),
 			_outputStops(false),
+			_outputLinesInStops(false),
 			_groupByCities(false),
 			_stopsDirections(0)
 		{}
@@ -429,6 +439,18 @@ namespace synthese
 
 						boost::shared_ptr<ParametersMap> sPm(new ParametersMap);
 						stop.toParametersMap(*sPm);
+
+						// Lines
+						if(_outputLinesInStops)
+						{
+							StopPoint::LinesSet lines(stop.getCommercialLines());
+							BOOST_FOREACH(const StopPoint::LinesSet::value_type& line, lines)
+							{
+								shared_ptr<ParametersMap> linePM(new ParametersMap);
+								line->toParametersMap(*linePM);
+								sPm->insert(DATA_LINE, linePM);
+							}
+						}
 
 						// Stops directions
 						if(_stopsDirections)
