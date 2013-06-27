@@ -11,6 +11,7 @@
         "display0"
     ], 
     "kiosk_name": "synthese_kiosk", 
+    "offline_cache_dir": "/tmp/offline_cache", 
     "secret_key": "changeme", 
     "synthese_url": "http://example.com"
 }
