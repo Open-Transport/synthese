@@ -214,6 +214,11 @@ namespace synthese
 				mutable boost::posix_time::time_duration _minTransferDelay;
 			//@}
 
+			//! @Location
+			//@{
+				boost::shared_ptr<geos::geom::Point> _location;
+			//@}
+
 
 		public:
 
@@ -230,6 +235,7 @@ namespace synthese
 				boost::posix_time::time_duration	getDefaultTransferDelay() const { return _defaultTransferDelay; }
 				const TransferDelaysMap& getTransferDelays() const { return _transferDelays; }
 				const std::string& getTimetableName() const { return _timetableName; }
+				const boost::shared_ptr<geos::geom::Point>& getLocation() const { return _location; }
 			//@}
 
 			//! @name Setters
@@ -239,6 +245,7 @@ namespace synthese
 				);
 				void setTimetableName(const std::string& value){ _timetableName = value; }
 				void setAllowedConnection(bool value) { _allowedConnection = value; }
+				void setLocation(const boost::shared_ptr<geos::geom::Point>& value){ _location = value; }
 			//@}
 
 			//! @name Update methods.

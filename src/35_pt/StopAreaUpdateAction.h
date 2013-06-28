@@ -31,12 +31,22 @@
 
 #include <boost/date_time/time_duration.hpp>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
+
 namespace synthese
 {
 	namespace geography
 	{
 		class City;
 	}
+
+	class CoordinatesSystem;
 
 	namespace pt
 	{
@@ -77,6 +87,9 @@ namespace synthese
 			static const std::string PARAMETER_LONG_NAME;
 			static const std::string PARAMETER_CITY_ID;
 			static const std::string PARAMETER_IS_MAIN;
+			static const std::string PARAMETER_X;
+			static const std::string PARAMETER_Y;
+			static const std::string PARAMETER_SRID;
 
 		private:
 			boost::shared_ptr<pt::StopArea> _place;
@@ -88,6 +101,8 @@ namespace synthese
 			boost::shared_ptr<geography::City> _city;
 			boost::optional<bool> _isMain;
 			boost::optional<std::string> _timetableName;
+			boost::shared_ptr<geos::geom::Point> _point;
+			const CoordinatesSystem* _coordinatesSystem;
 
 
 		protected:

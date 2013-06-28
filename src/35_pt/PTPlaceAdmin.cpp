@@ -351,6 +351,19 @@ namespace synthese
 					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
 					stream << t.cell("Nom moyen", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_LONG_NAME, _connectionPlace->getName26()));
 					stream << t.cell("Nom pour fiche horaire", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_TIMETABLE_NAME, _connectionPlace->getTimetableName()));
+					stream << t.title("Localisation");
+					stream << t.cell(
+						"X",
+						t.getForm().getTextInput(
+							StopAreaUpdateAction::PARAMETER_X,
+							_connectionPlace->getLocation().get() ? lexical_cast<string>(_connectionPlace->getLocation()->getX()) : string()
+					)	);
+					stream << t.cell(
+						"Y",
+						t.getForm().getTextInput(
+							StopAreaUpdateAction::PARAMETER_Y,
+							_connectionPlace->getLocation().get() ? lexical_cast<string>(_connectionPlace->getLocation()->getY()) : string()
+					)	);
 					stream << t.close();
 				}
 

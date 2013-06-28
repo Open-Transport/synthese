@@ -72,6 +72,9 @@ namespace synthese
 		const string StopAreaUpdateAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
 		const string StopAreaUpdateAction::PARAMETER_IS_MAIN = Action_PARAMETER_PREFIX + "ma";
 		const string StopAreaUpdateAction::PARAMETER_TIMETABLE_NAME = Action_PARAMETER_PREFIX + "tn";
+		const string StopAreaUpdateAction::PARAMETER_X = Action_PARAMETER_PREFIX + "x";
+		const string StopAreaUpdateAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
+		const string StopAreaUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "srid";
 
 
 
@@ -113,6 +116,12 @@ namespace synthese
 			if(_timetableName)
 			{
 				map.insert(PARAMETER_TIMETABLE_NAME, *_timetableName);
+			}
+			if(_point.get() && !_point->isEmpty())
+			{
+				map.insert(PARAMETER_X, _point->getX());
+				map.insert(PARAMETER_Y, _point->getY());
+				map.insert(PARAMETER_SRID, _point->getSRID());
 			}
 
 			// Importable
@@ -178,6 +187,20 @@ namespace synthese
 				_defaultTransferDuration = minutes(map.get<int>(PARAMETER_DEFAULT_TRANSFER_DURATION));
 			}
 
+			if(	!map.getDefault<string>(PARAMETER_X).empty() &&
+				!map.getDefault<string>(PARAMETER_Y).empty()
+			){
+				CoordinatesSystem::SRID srid(
+					map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+				);
+				_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+				_point = _coordinatesSystem->createPoint(
+					map.get<double>(PARAMETER_X),
+					map.get<double>(PARAMETER_Y)
+				);
+			}
+
 			// Importable
 			_setImportableUpdateFromParametersMap(*_env, map);
 		}
@@ -236,47 +259,15 @@ namespace synthese
 				_place->setTimetableName(*_timetableName);
 			}
 
+			if(_point)
+			{
+				_place->setLocation(_point);
+			}
+
 			// Importable
 			_doImportableUpdate(*_place, request);
 
-            // TODO : do we have to load everything of these ?
-			// at least it actually works.
-            StopPointTableSync::SearchResult stops(
-                StopPointTableSync::Search(*_env, _place->getKey())
-            );
-            CommercialLineTableSync::SearchResult lines(
-                CommercialLineTableSync::Search(*_env)
-            );
-            JourneyPatternTableSync::SearchResult journeyPatterns(
-                JourneyPatternTableSync::Search(*_env)
-            );
-            LineStopTableSync::SearchResult lineStops(
-                LineStopTableSync::Search(*_env)
-            );
-
-            _place->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-
-            DBTransaction transaction;
-
-            StopAreaTableSync::Save(_place.get(), transaction);
-            BOOST_FOREACH(const boost::shared_ptr<StopPoint>& stop, stops)
-            {
-                StopPointTableSync::Save(stop.get(), transaction);
-            }
-            BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
-            {
-                CommercialLineTableSync::Save(line.get(), transaction);
-            }
-            BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& line, journeyPatterns)
-            {
-                JourneyPatternTableSync::Save(line.get(), transaction);
-            }
-            BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStops)
-            {
-                LineStopTableSync::Save(lineStop.get(), transaction);
-            }
-
-            transaction.run();
+			StopAreaTableSync::Save(_place.get(), transaction);
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
