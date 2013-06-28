@@ -267,7 +267,7 @@ namespace synthese
 			// Importable
 			_doImportableUpdate(*_place, request);
 
-			StopAreaTableSync::Save(_place.get(), transaction);
+			StopAreaTableSync::Save(_place.get());
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
