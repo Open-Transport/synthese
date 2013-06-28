@@ -65,6 +65,8 @@ namespace synthese
 			static const std::string COL_CODE_BY_SOURCE;
 			static const std::string COL_TIMETABLE_NAME;
 			static const std::string COL_HANDICAPPED_COMPLIANCE_ID;
+			static const std::string COL_X;
+			static const std::string COL_Y;
 
 			static const std::string FORBIDDEN_DELAY_SYMBOL;
 

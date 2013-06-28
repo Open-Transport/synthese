@@ -39,6 +39,8 @@
 #include "AllowedUseRule.h"
 #include "ForbiddenUseRule.h"
 
+#include <geos/geom/Point.h>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 #include <assert.h>
@@ -46,6 +48,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -74,6 +77,8 @@ namespace synthese
 		const string StopAreaTableSync::COL_CODE_BY_SOURCE = "code_by_source";
 		const string StopAreaTableSync::COL_TIMETABLE_NAME = "timetable_name";
 		const string StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID = "handicapped_compliance_id";
+		const string StopAreaTableSync::COL_X = "x";
+		const string StopAreaTableSync::COL_Y = "y";
 
 		const string StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL = "F";
 	}
@@ -98,6 +103,9 @@ namespace synthese
 			Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
 			Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
 			Field(StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
+			Field(StopAreaTableSync::COL_X, SQL_DOUBLE),
+			Field(StopAreaTableSync::COL_Y, SQL_DOUBLE),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
 
@@ -217,6 +225,27 @@ namespace synthese
 				}	}
 				cp->setRules(rules);
 
+				// Position : Lon/lat prior to x/y
+				if(!rows->getText(TABLE_COL_GEOMETRY).empty())
+				{
+					boost::shared_ptr<Point> point(
+						static_pointer_cast<Point, Geometry>(
+							rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
+					)	);
+					if(point.get())
+					{
+						cp->setLocation(point);
+					}
+				}
+				else if(rows->getDouble(StopAreaTableSync::COL_X) > 0 && rows->getDouble(StopAreaTableSync::COL_Y) > 0)
+				{
+					cp->setLocation(
+						CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+							rows->getDouble(StopAreaTableSync::COL_X),
+							rows->getDouble(StopAreaTableSync::COL_Y)
+					)	);
+				}
+
 				// Registration to all places matcher
 				if(	&env == &Env::GetOfficialEnv() &&
 					cp->getCity() &&
@@ -321,6 +350,28 @@ namespace synthese
 				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
 			);
+
+			// X Y (deprecated)
+			if(object->getLocation())
+			{
+				query.addField(object->getLocation()->getX());
+				query.addField(object->getLocation()->getY());
+			}
+			else
+			{
+				query.addFieldNull();
+				query.addFieldNull();
+			}
+
+			// Geometry
+			if(object->getLocation())
+			{
+				query.addField(static_pointer_cast<Geometry,Point>(object->getLocation()));
+			}
+			else
+			{
+				query.addFieldNull();
+			}
 
 			query.execute(transaction);
 		}
