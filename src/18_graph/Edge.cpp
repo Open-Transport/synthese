@@ -490,7 +490,7 @@ namespace synthese
 
 			if(	getParentPath() &&
 				getParentPath()->getEdge(getRankInPath()) == this &&
-				getParentPath()->getEdges().size() != getRankInPath()+1 &&
+				getParentPath()->getEdges().size() > getRankInPath()+1 &&
 				getFromVertex()->hasGeometry() &&
 				getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->hasGeometry()
 			){
