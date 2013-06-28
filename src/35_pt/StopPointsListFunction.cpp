@@ -40,6 +40,7 @@
 #include "CommercialLine.h"
 #include "City.h"
 #include "Webpage.h"
+#include "DRTArea.hpp"
 
 #ifndef UNIX
 #include <geos/util/math.h>
@@ -642,7 +643,10 @@ namespace synthese
 					++*index;
 					departureDateTime = servicePointer.getDepartureDateTime();
 					if(sp.getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
-						continue;
+					{
+						if (!dynamic_cast<const DRTArea*>(servicePointer.getRealTimeDepartureVertex()))
+							continue;
+					}
 
 					const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
 					if(journeyPattern == NULL) // Could be a junction
