@@ -23,6 +23,8 @@
 #include "SingleOperatorExpression.hpp"
 
 #include "ModuleClass.h"
+#include "ConstantExpression.hpp"
+#include "VariableExpression.hpp"
 #include "WebsiteConfig.hpp"
 
 #include <cmath>
@@ -120,19 +122,40 @@ namespace synthese
 
 			case VARIABLE:
 				{
-					ParametersMap::Map::const_iterator it(
-						variables.getMap().find(value)
-					);
-					if(it != variables.getMap().end())
+					VariableExpression::Items variable;
+					VariableExpression::Item item;
+					variable.push_back(item);
+
+					// Variable name parsing
+					for(string::const_iterator it(value.begin()); it != value.end(); ++it)
 					{
-						return lexical_cast<string>(it->second);
+						// Alphanum chars
+						if( (*it >= 'a' && *it <= 'z') ||
+							(*it >= 'A' && *it <= 'Z') ||
+							(*it >= '0' && *it <= '9') ||
+							*it == '_'
+						){
+							variable.rbegin()->key.push_back(*it);
+						}
+						else if(*it == '[')
+						{	// Index
+							string index;
+							for(++it; it != value.end() && *it != ']'; ++it)
+							{
+								index.push_back(*it);
+							}
+							variable.rbegin()->index = boost::shared_ptr<Expression>(new ConstantExpression(index));
+						}
+						else if(*it == '.')
+						{	// Sub map
+							VariableExpression::Item item;
+							variable.push_back(item);
+						}
 					}
-					it = additionalParametersMap.getMap().find(value);
-					if(it != additionalParametersMap.getMap().end())
-					{
-						return it->second;
-					}
-					return string();
+
+					// Variable expression
+					VariableExpression v(variable);
+					return v.eval(request, additionalParametersMap,page, variables);
 				}
 
 			case LENGTH:
