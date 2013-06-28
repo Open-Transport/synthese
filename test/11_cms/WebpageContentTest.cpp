@@ -21,8 +21,10 @@
 */
 
 #include "IfFunction.hpp"
+#include "ServerModule.h"
 #include "StrLenFunction.hpp"
 #include "StrFillFunction.hpp"
+#include "VersionService.hpp"
 #include "ParametersMap.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -45,6 +47,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	IfFunction::integrate();
 	StrLenFunction::integrate();
 	StrFillFunction::integrate();
+	VersionService::integrate();
 
 	StaticFunctionRequest<WebPageDisplayFunction> request;
 	ParametersMap additionalParametersMap;
@@ -921,6 +924,58 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(wpc.empty(), false);
 		string eval(wpc.eval(request, additionalParametersMap, page, variables));
 		BOOST_CHECK_EQUAL(eval, "testa=b");
+	}
+
+	{ // Variable map set
+		string code("test<@newmap:=<?version?>@>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.hasSubMaps("newmap"), true);
+		if(variables.hasSubMaps("newmap"))
+		{
+			BOOST_CHECK_EQUAL(variables.getSubMaps("newmap").size(), 1);
+			BOOST_CHECK_EQUAL((*variables.getSubMaps("newmap").begin())->getDefault<string>(VersionService::ATTR_VERSION), ServerModule::VERSION);
+		}
+	}
+
+	{ // Second variable map set : should overwrite the first set
+		string code("test<@newmap:=<?version?>@>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.hasSubMaps("newmap"), true);
+		if(variables.hasSubMaps("newmap"))
+		{
+			BOOST_CHECK_EQUAL(variables.getSubMaps("newmap").size(), 1);
+			BOOST_CHECK_EQUAL((*variables.getSubMaps("newmap").begin())->getDefault<string>(VersionService::ATTR_VERSION), ServerModule::VERSION);
+		}
+	}
+
+	{ // Variable map set : two service calls
+		string code("test<@newmap:=<?version?><?version?>@>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.hasSubMaps("newmap"), true);
+		if(variables.hasSubMaps("newmap"))
+		{
+			BOOST_CHECK_EQUAL(variables.getSubMaps("newmap").size(), 2);
+			BOOST_CHECK_EQUAL((*variables.getSubMaps("newmap").begin())->getDefault<string>(VersionService::ATTR_VERSION), ServerModule::VERSION);
+			BOOST_CHECK_EQUAL((*variables.getSubMaps("newmap").rbegin())->getDefault<string>(VersionService::ATTR_VERSION), ServerModule::VERSION);
+		}
 	}
 }
 

@@ -54,6 +54,8 @@ LanguageSelectorService.cpp
 LanguageSelectorService.hpp
 MailService.cpp
 MailService.hpp
+MapUpdateNode.cpp
+MapUpdateNode.hpp
 NoOpService.cpp
 NoOpService.hpp
 NotService.cpp

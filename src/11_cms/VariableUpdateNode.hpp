@@ -64,7 +64,7 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// No display : updates the additionnalParametersMap
+			/// No display : updates the variables.
 			virtual void display(
 				std::ostream& stream,
 				const server::Request& request,

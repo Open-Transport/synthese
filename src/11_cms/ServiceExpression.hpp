@@ -91,6 +91,15 @@ namespace synthese
 				util::ParametersMap& variables
 			) const;
 
+			void runService(
+				std::ostream& stream,
+				util::ParametersMap& result,
+				const server::Request& request,
+				const util::ParametersMap& additionalParametersMap,
+				const Webpage& page,
+				util::ParametersMap& variables
+			) const;
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor by partial string parsing

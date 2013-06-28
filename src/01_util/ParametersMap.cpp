@@ -755,4 +755,15 @@ namespace synthese
 		{
 			return _map < rhs._map;
 		}
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Removes a submap from a map.
+		/// @param parameterName the submap to remove
+		void ParametersMap::removeSubMap(
+			const std::string& parameterName
+		){
+			SubParametersMap::iterator it(_subMap.find(parameterName));
+			if(it != _subMap.end()) _subMap.erase(it);
+		}
 }	}
