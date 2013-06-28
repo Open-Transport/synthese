@@ -311,6 +311,10 @@ namespace synthese
 
 		const boost::shared_ptr<Point>& StopArea::getPoint() const
 		{
+			if (_location.get())
+			{
+				return _location;
+			}
 			if (!_isoBarycentre.get())
 			{
 				Envelope e;
