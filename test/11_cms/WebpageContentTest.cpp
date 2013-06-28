@@ -960,6 +960,26 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		}
 	}
 
+	{ // Variable get in a map
+		string code("test<@newmap."+ VersionService::ATTR_VERSION +"@>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test"+ ServerModule::VERSION);
+	}
+
+	{ // Variable get in a map through ~variable
+		string code("test<@~variable(\"newmap."+ VersionService::ATTR_VERSION +"\")@>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test"+ ServerModule::VERSION);
+	}
+
 	{ // Variable map set : two service calls
 		string code("test<@newmap:=<?version?><?version?>@>");
 		CMSScript wpc(code);
