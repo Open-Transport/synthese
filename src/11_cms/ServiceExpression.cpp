@@ -78,14 +78,17 @@ namespace synthese
 
 
 
-		void ServiceExpression::display(
+		//////////////////////////////////////////////////////////////////////////
+		/// Runs the service and get the parameters map result.
+		/// Direct output is done on the stream.
+		void ServiceExpression::runService(
 			std::ostream& stream,
+			ParametersMap& result,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page,
 			util::ParametersMap& variables
 		) const	{
-
 			if(!_functionCreator)
 			{
 				return;
@@ -153,7 +156,6 @@ namespace synthese
 			}
 			function->setTemplateParameters(templateParametersMap);
 
-			ParametersMap result;
 			try
 			{
 				// Service initialization
@@ -182,6 +184,20 @@ namespace synthese
 			{
 				_addExceptionToVariable(variables, "Unhandled exception", function->getFactoryKey());
 			}
+		}
+
+
+
+		void ServiceExpression::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const util::ParametersMap& additionalParametersMap,
+			const Webpage& page,
+			util::ParametersMap& variables
+		) const	{
+
+			ParametersMap result;
+			runService(stream, result, request, additionalParametersMap, page, variables);
 
 			// Display of the result if inline template defined
 			if(!_inlineTemplate.empty())

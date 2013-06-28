@@ -28,6 +28,7 @@
 #include "IncludeExpression.hpp"
 #include "HTMLTable.h"
 #include "LabelNode.hpp"
+#include "MapUpdateNode.hpp"
 #include "Request.h"
 #include "ServiceExpression.hpp"
 #include "StaticFunctionRequest.h"
@@ -233,7 +234,7 @@ namespace synthese
 						// Escape if = or @ or out of double quotes
 						if(!inDoubleQuotes && !serviceRecursion)
 						{
-							if(*it2 == '=' || *it2 == '@')
+							if(*it2 == '=' || *it2 == ':' || *it2 == '@')
 							{
 								break;
 							}
@@ -342,6 +343,60 @@ namespace synthese
 							boost::shared_ptr<WebpageContentNode>(
 								new VariableUpdateNode(items, it, end)
 						)	);
+					}
+					else if(
+						it2 != end &&
+						*it2 == ':' &&
+						it2+1 != end &&
+						*(it2+1) == '='
+					){	// Is a map set ?
+						it = it2;
+						++it;
+						++it;
+
+						trim(parameter);
+
+						MapUpdateNode::Items items;
+						items.push_back(MapUpdateNode::Item());
+						for(string::const_iterator it3(parameter.begin()); it3!=parameter.end(); )
+						{
+							// Alphanum chars
+							if( (*it3 >= 'a' && *it3 <= 'z') ||
+								(*it3 >= 'A' && *it3 <= 'Z') ||
+								(*it3 >= '0' && *it3 <= '9') ||
+								*it3 == '_'
+							){
+								items.rbegin()->key.push_back(*it3);
+								++it3;
+								continue;
+							}
+
+							// Index
+							if(	*it3 == '[')
+							{
+								++it3;
+								items.rbegin()->index = Expression::Parse(it3, parameter.end(), "]");
+								continue;
+							}
+
+							// Sub map
+							if(	*it3 == '.')
+							{
+								++it3;
+								items.push_back(MapUpdateNode::Item());
+								continue;
+							}
+
+							// Ignored char
+							++it3;
+						}
+
+						// Node creation
+						_nodes.push_back(
+							boost::shared_ptr<WebpageContentNode>(
+								new MapUpdateNode(items, it, end)
+						)	);
+
 					}
 					else // Is an expression
 					{

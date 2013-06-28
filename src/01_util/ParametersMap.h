@@ -358,6 +358,10 @@ namespace synthese
 
 
 
+				void removeSubMap(const std::string& parameterName);
+
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Removes all parameters of the map.
 				/// @author Hugues Romain
