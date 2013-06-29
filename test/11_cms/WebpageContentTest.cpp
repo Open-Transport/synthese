@@ -875,6 +875,64 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL((*variables.getSubMaps("submap").begin())->getDefault<string>("variable"), "test2");
 	}
 
+	{ // Create submap in CMS
+		string code("<@submap[\"idx\"].submap2[\"idx\"]=test3@>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 8);
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 37);
+		BOOST_CHECK_EQUAL(variables.hasSubMaps("submap"), true);
+		if(variables.hasSubMaps("submap"))
+		{
+			const ParametersMap& submap(**variables.getSubMaps("submap").begin());
+			BOOST_CHECK_EQUAL(submap.getDefault<string>("id"), "idx");
+			BOOST_CHECK_EQUAL(submap.getDefault<string>("value"), "test1");
+			BOOST_CHECK_EQUAL(submap.getDefault<string>("variable"), "test2");
+			BOOST_CHECK_EQUAL(submap.hasSubMaps("submap2"), true);
+			if(submap.hasSubMaps("submap2"))
+			{
+				const ParametersMap& submap2(**submap.getSubMaps("submap2").begin());
+				BOOST_CHECK_EQUAL(submap2.getDefault<string>("id"), "idx");
+				BOOST_CHECK_EQUAL(submap2.getDefault<string>("value"), "test3");
+			}
+		}
+	}
+
+	{ // Access to a sub sub map through <{
+		string code("<{submap.submap2&template=<@value@>}>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test3");
+	}
+
+	{ // Access to a sub sub map through <{
+		string code("<{submap[\"idx\"].submap2&template=<@value@>}>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test3");
+	}
+
+	{ // Access to a sub sub map through <{
+		string code("<{submap[\"idx2\"].submap2&template=<@value@>}>");
+		CMSScript wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, string());
+	}
+
 	{ // Strlen
 		string code("test<?strlen&t=0123456789?>");
 		CMSScript wpc(code);
