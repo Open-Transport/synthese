@@ -18,12 +18,6 @@
 
 #include "RoadModule.h"
 
-#include "HousesCSVFileFormat.hpp"
-#include "IGNstreetsFileFormat.hpp"
-#include "NavstreetsFileFormat.hpp"
-#include "OSMFileFormat.hpp"
-#include "RoadShapeFileFormat.hpp"
-
 // Registries
 
 #include "Crossing.h"
@@ -60,12 +54,6 @@ void synthese::road::moduleRegister()
 	synthese::road::PublicPlaceEntranceCreationAction::integrate();
 
 	synthese::road::PublicPlaceAdmin::integrate();
-
-	synthese::road::HousesCSVFileFormat::integrate();
-	synthese::road::NavstreetsFileFormat::integrate();
-	synthese::road::OSMFileFormat::integrate();
-	synthese::road::RoadShapeFileFormat::integrate();
-	synthese::road::IGNstreetsFileFormat::integrate();
 
 	// Registries
 

@@ -54,6 +54,7 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace algorithm;
+	using namespace data_exchange;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
@@ -64,10 +65,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,NavstreetsFileFormat>::FACTORY_KEY("Navstreets");
+		template<> const string FactorableTemplate<FileFormat, NavstreetsFileFormat>::FACTORY_KEY("Navstreets");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		const string NavstreetsFileFormat::Importer_::FILE_MTDAREA("1mtdarea");
 		const string NavstreetsFileFormat::Importer_::FILE_STREETS("2streets");
@@ -119,7 +120,7 @@ namespace synthese
 		"");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		bool NavstreetsFileFormat::Importer_::_checkPathsMap() const
 		{

@@ -51,6 +51,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace road;
 	using namespace util;
 	using namespace impex;
@@ -65,7 +66,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,IGNstreetsFileFormat>::FACTORY_KEY("IGNstreets");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		const string IGNstreetsFileFormat::Importer_::FILE_ADDRESS("address");
 		const string IGNstreetsFileFormat::Importer_::PARAMETER_DISPLAY_STATS("display_stats");
@@ -84,7 +85,7 @@ namespace synthese
 		"");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		const std::string IGNstreetsFileFormat::Importer_::TAG_MISSING_STREET = "missing_street";
 		const std::string IGNstreetsFileFormat::Importer_::ATTR_SOURCE_NAME = "source_name";

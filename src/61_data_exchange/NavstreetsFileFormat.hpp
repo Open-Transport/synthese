@@ -52,7 +52,7 @@ namespace synthese
 		class City;
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 34.16 : Navstreets file format class.
@@ -188,12 +188,12 @@ namespace synthese
 
 				static const int _maxDistance = 100;
 
-				mutable impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync> _roadPlaces;
+				mutable impex::ImportableTableSync::ObjectBySource<road::RoadPlaceTableSync> _roadPlaces;
 
-				static MainRoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
+				static road::MainRoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
 					const std::string& addressSchema
 				);
-				static MainRoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
+				static road::MainRoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
 					const std::string& minAddress,
 					const std::string& maxAddress
 				);

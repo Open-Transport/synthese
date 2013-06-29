@@ -113,8 +113,6 @@ ForcedDestinationsArrivalDepartureTableGenerator.cpp
 ForcedDestinationsArrivalDepartureTableGenerator.h
 GetDepartureBoardsService.hpp
 GetDepartureBoardsService.cpp
-IneoDepartureBoardsFileFormat.cpp
-IneoDepartureBoardsFileFormat.hpp
 ParseDisplayReturnInterfacePage.cpp
 ParseDisplayReturnInterfacePage.h
 PhysicalStopDepartureTableGenerator.cpp
