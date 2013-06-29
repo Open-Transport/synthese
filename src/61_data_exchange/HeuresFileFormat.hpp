@@ -122,6 +122,9 @@ namespace synthese
 				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
 				boost::shared_ptr<const impex::DataSource> _stopsDataSource;
 
+				mutable ImportableStopPoints _linkedStopPoints;
+				mutable ImportableStopPoints _nonLinkedStopPoints;
+
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
 
