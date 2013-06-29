@@ -66,20 +66,22 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace algorithm;
+	using namespace data_exchange;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
-	using namespace html;
 	using namespace impex;
 	using namespace osm;
+	using namespace road;
 	using namespace util;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat, road::OSMFileFormat>::FACTORY_KEY("OpenStreetMap");
+		template<>
+		const string FactorableTemplate<FileFormat, OSMFileFormat>::FACTORY_KEY("OpenStreetMap");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		const string OSMFileFormat::Importer_::PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE("add_central_chunk_reference");
 

@@ -58,8 +58,6 @@
 #include "DisplayScreenTransferDestinationRemoveAction.h"
 #include "DisplayScreenUpdateDisplayedStopAreaAction.hpp"
 
-#include "IneoDepartureBoardsFileFormat.hpp"
-
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayMaintenanceRight.h"
 
@@ -144,8 +142,6 @@ void synthese::departure_boards::moduleRegister()
 
 	synthese::departure_boards::ArrivalDepartureTableLog::integrate();
 	synthese::departure_boards::DisplayMaintenanceLog::integrate();
-
-	synthese::departure_boards::IneoDepartureBoardsFileFormat::integrate();
 
 	synthese::departure_boards::DisplayScreen::integrate();
 

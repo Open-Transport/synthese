@@ -49,10 +49,6 @@ DriverServiceTableSync.cpp
 DriverServiceTableSync.hpp
 DriverServiceUpdateAction.cpp
 DriverServiceUpdateAction.hpp
-IneoOperationFileFormat.cpp
-IneoOperationFileFormat.hpp
-PTOperationFileFormat.cpp
-PTOperationFileFormat.hpp
 PTOperationModule.cpp
 PTOperationModule.gen.cpp
 PTOperationModuleRegister.cpp

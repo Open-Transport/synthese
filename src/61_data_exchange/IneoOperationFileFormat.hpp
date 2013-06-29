@@ -59,7 +59,10 @@ namespace synthese
 		class DriverAllocation;
 		class DriverAllocationTemplate;
 		class DriverService;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Ineo file format.
 		//////////////////////////////////////////////////////////////////////////
@@ -92,9 +95,9 @@ namespace synthese
 				typedef std::map<std::string, std::vector<std::string> > FieldMaps;
 				mutable FieldMaps _fieldsMap;
 
-				mutable std::set<boost::shared_ptr<const DriverAllocation> > _driverAllocationsToRemove;
-				mutable std::set<boost::shared_ptr<const DriverAllocationTemplate> > _driverAllocationTemplatesToRemove;
-				mutable std::set<boost::shared_ptr<const DriverService> > _driverServicesToRemove;
+				mutable std::set<boost::shared_ptr<const pt_operation::DriverAllocation> > _driverAllocationsToRemove;
+				mutable std::set<boost::shared_ptr<const pt_operation::DriverAllocationTemplate> > _driverAllocationTemplatesToRemove;
+				mutable std::set<boost::shared_ptr<const pt_operation::DriverService> > _driverServicesToRemove;
 
 				mutable std::map<std::string, std::string> _line;
 				mutable std::string _section;

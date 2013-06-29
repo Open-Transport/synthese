@@ -33,7 +33,10 @@ namespace synthese
 	namespace departure_boards
 	{
 		class DisplayType;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Ineo departure boards file format.
 		//////////////////////////////////////////////////////////////////////////
@@ -56,7 +59,7 @@ namespace synthese
 				//! @name Parameters
 				//@{
 					boost::shared_ptr<const impex::DataSource> _ptDataSource;
-					boost::shared_ptr<const DisplayType> _defaultDisplayType;
+					boost::shared_ptr<const departure_boards::DisplayType> _defaultDisplayType;
 				//@}
 
 			protected:

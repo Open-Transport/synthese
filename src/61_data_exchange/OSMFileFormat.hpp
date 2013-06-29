@@ -45,7 +45,10 @@ namespace synthese
 	{
 		class Crossing;
 		class MainRoadPart;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// OSM file format.
 		//////////////////////////////////////////////////////////////////////////
@@ -66,9 +69,9 @@ namespace synthese
 				typedef std::map<util::RegistryKeyType, std::vector<road::MainRoadChunk::HouseNumber> > ChunkHouseNumberList;
 				typedef std::map<unsigned long long int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
 				typedef std::map<unsigned long long int, boost::shared_ptr<geography::City> > _CitiesMap;
-				typedef std::map<std::string, boost::shared_ptr<RoadPlace> > _RecentlyCreatedRoadPlaces;
-				typedef std::map<unsigned long long int, boost::shared_ptr<RoadPlace> > _LinkBetweenWayAndRoadPlaces;
-				typedef std::map<unsigned long long int, boost::shared_ptr<MainRoadPart> > _RecentlyCreatedRoadParts;
+				typedef std::map<std::string, boost::shared_ptr<road::RoadPlace> > _RecentlyCreatedRoadPlaces;
+				typedef std::map<unsigned long long int, boost::shared_ptr<road::RoadPlace> > _LinkBetweenWayAndRoadPlaces;
+				typedef std::map<unsigned long long int, boost::shared_ptr<road::MainRoadPart> > _RecentlyCreatedRoadParts;
 
 				mutable _CrossingsMap _crossingsMap;
 				mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;
