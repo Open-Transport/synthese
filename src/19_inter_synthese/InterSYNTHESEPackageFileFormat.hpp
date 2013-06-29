@@ -24,7 +24,6 @@
 #define SYNTHESE_InterSYNTHESEPackageFileFormat_H__
 
 #include "FileFormatTemplate.h"
-
 #include "ConnectionImporter.hpp"
 #include "NoExportPolicy.hpp"
 
@@ -71,7 +70,6 @@ namespace synthese
 
 
 				virtual bool _read(
-					boost::optional<const server::Request&> request
 				) const;
 
 
@@ -79,7 +77,10 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 
 

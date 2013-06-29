@@ -27,6 +27,7 @@
 #include <string>
 #include <iostream>
 
+#include "CalendarLink.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "OldLoadSavePolicy.hpp"
 

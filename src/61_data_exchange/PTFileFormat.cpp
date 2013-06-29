@@ -23,7 +23,6 @@
 #include "PTFileFormat.hpp"
 
 #include "DesignatedLinePhysicalStop.hpp"
-#include "ImportLogger.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
@@ -35,17 +34,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "LineStopTableSync.h"
-#include "PTPlaceAdmin.h"
-#include "StopAreaAddAction.h"
-#include "AdminActionFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
-#include "StopPointAdmin.hpp"
-#include "StopPointAddAction.hpp"
-#include "AdminFunctionRequest.hpp"
-#include "HTMLModule.h"
-#include "HTMLTable.h"
 #include "City.h"
-#include "StopPointUpdateAction.hpp"
 #include "DestinationTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "RollingStockTableSync.hpp"
@@ -69,18 +58,46 @@ namespace synthese
 
 	namespace data_exchange
 	{
-		boost::shared_ptr<JourneyPattern> PTFileFormat::CreateJourneyPattern(
+		const std::string PTFileFormat::ATTR_DISTANCE = "distance";
+		const std::string PTFileFormat::ATTR_SOURCE_CODE = "source_code";
+		const std::string PTFileFormat::ATTR_SOURCE_CITY_NAME = "source_city_name";
+		const std::string PTFileFormat::ATTR_SOURCE_NAME = "source_name";
+		const std::string PTFileFormat::ATTR_SOURCE_X = "source_x";
+		const std::string PTFileFormat::ATTR_SOURCE_Y = "source_y";
+		const std::string PTFileFormat::ATTR_SOURCE_SYNTHESE_X = "source_synthese_x";
+		const std::string PTFileFormat::ATTR_SOURCE_SYNTHESE_Y = "source_synthese_y";
+		const std::string PTFileFormat::TAG_LINKED_STOP_AREA = "linked_stop_area";
+		const std::string PTFileFormat::TAG_LINKED_STOP_POINT = "linked_stop_point";
+		const std::string PTFileFormat::TAG_STOP_AREA = "stop_area";
+		const std::string PTFileFormat::TAG_STOP_POINT = "stop_point";
+
+
+
+		PTFileFormat::PTFileFormat(
+			util::Env& env,
+			const impex::Import& import,
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
+		{}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// The created object is owned by the environment (it is not required to
+		/// maintain the returned shared pointer)
+		boost::shared_ptr<JourneyPattern> PTFileFormat::_createJourneyPattern(
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& stops,
 			CommercialLine& line,
-			const impex::DataSource& source,
-			Env& env,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			boost::shared_ptr<JourneyPattern> route(new JourneyPattern);
 			route->setCommercialLine(&line);
 			route->addCodeBySource(source, string());
 			route->setKey(JourneyPatternTableSync::getId());
-			env.getEditableRegistry<JourneyPattern>().add(route);
+			_env.getEditableRegistry<JourneyPattern>().add(route);
 			line.addPath(route.get());
 
 			size_t rank(0);
@@ -98,7 +115,7 @@ namespace synthese
 						stop._withTimes
 				)	);
 				route->addEdge(*ls);
-				env.getEditableRegistry<LineStop>().add(ls);
+				_env.getEditableRegistry<LineStop>().add(ls);
 
 				++rank;
 			}
@@ -108,28 +125,26 @@ namespace synthese
 
 
 
-		TransportNetwork* PTFileFormat::CreateOrUpdateNetwork(
+		//////////////////////////////////////////////////////////////////////////
+		/// @return the created network object.
+		/// The created object is owned by the environment (it is not required to
+		/// maintain the returned shared pointer)
+		TransportNetwork* PTFileFormat::_createOrUpdateNetwork(
 			impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync>& networks,
 			const std::string& id,
 			const std::string& name,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			TransportNetwork* network;
 			if(networks.contains(id))
 			{
 				set<TransportNetwork*> loadedNetworks(networks.get(id));
 				if(loadedNetworks.size() > 1)
 				{
-					importLogger.log(
-						ImportLogger::WARN, 
-						"More than one network with key "+ id
-					);
+					_logWarning("More than one network with key "+ id);
 				}
 				network = *loadedNetworks.begin();
-				importLogger.log(
-					ImportLogger::LOAD,
+				_logLoad(
 					"Use of existing network "+ lexical_cast<string>(network->getKey()) +" ("+ network->getName() +")"
 				);
 			}
@@ -141,10 +156,9 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				network->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<TransportNetwork>().add(boost::shared_ptr<TransportNetwork>(network));
+				_env.getEditableRegistry<TransportNetwork>().add(boost::shared_ptr<TransportNetwork>(network));
 				networks.add(*network);
-				importLogger.log(
-					ImportLogger::CREA,
+				_logCreation(
 					"Creation of the network with key "+ id +" ("+ name + ")"
 				);
 			}
@@ -154,13 +168,12 @@ namespace synthese
 
 
 
-		std::set<StopArea*> PTFileFormat::GetStopAreas(
+		std::set<StopArea*> PTFileFormat::_getStopAreas(
 			const impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 			const std::string& id,
 			boost::optional<const std::string&> name,
-			const impex::ImportLogger& importLogger,
 			bool errorIfNotFound /*= true */
-		){
+		) const {
 			if(stopAreas.contains(id))
 			{
 				set<StopArea*> loadedStopAreas(stopAreas.get(id));
@@ -177,7 +190,7 @@ namespace synthese
 				{
 					logStream << sp->getKey() << " (" << sp->getFullName() << ") ";
 				}
-				importLogger.log(ImportLogger::LOAD, logStream.str());
+				_logLoad(logStream.str());
 
 				return loadedStopAreas;
 			}
@@ -190,7 +203,7 @@ namespace synthese
 				{
 					logStream << " (" << *name << ")";
 				}
-				importLogger.log(ImportLogger::ERROR, logStream.str());
+				_logError(logStream.str());
 			}
 			return set<StopArea*>();
 		}
@@ -199,17 +212,15 @@ namespace synthese
 
 
 
-		StopArea* PTFileFormat::CreateStopArea(
+		StopArea* PTFileFormat::_createStopArea(
 			impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 			const std::string& id,
 			const std::string& name,
 			geography::City& city,
 			boost::posix_time::time_duration defaultTransferDuration,
 			bool mainStopArea,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			StopArea* stopArea(
 				new StopArea(
 					StopAreaTableSync::getId(),
@@ -224,10 +235,10 @@ namespace synthese
 			{
 				city.addIncludedPlace(*stopArea);
 			}
-			env.getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(stopArea));
+			_env.getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(stopArea));
 			stopAreas.add(*stopArea);
 
-			importLogger.logCreation(
+			_logCreation(
 				"Creation of the stop area with key "+ id +" ("+ city.getName() +" "+ name + ")"
 			);
 
@@ -236,19 +247,17 @@ namespace synthese
 
 
 
-		set<StopArea*> PTFileFormat::CreateOrUpdateStopAreas(
+		set<StopArea*> PTFileFormat::_createOrUpdateStopAreas(
 			impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 			const std::string& id,
 			const std::string& name,
 			const geography::City* city,
 			bool updateCityIfExists,
 			boost::posix_time::time_duration defaultTransferDuration,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			// Load if possible
-			set<StopArea*> result(GetStopAreas(stopAreas, id, name, importLogger, false));
+			set<StopArea*> result(_getStopAreas(stopAreas, id, name, false));
 
 			// Create if necessary
 			if(result.empty())
@@ -256,24 +265,21 @@ namespace synthese
 				// Abort if undefined city
 				if(!city)
 				{
-					importLogger.log(
-						ImportLogger::WARN,
+					_logWarning(
 						"The stop area "+ name +" cannot be created because of undefined city."
 					);
 					return result;
 				}
 
 				result.insert(
-					CreateStopArea(
+					_createStopArea(
 						stopAreas,
 						id,
 						name,
 						*const_cast<geography::City*>(city), // Possible because of false in main parameter
 						defaultTransferDuration,
 						false,
-						source,
-						env,
-						importLogger
+						source
 				)	);
 			}
 
@@ -292,13 +298,12 @@ namespace synthese
 
 
 
-		std::set<StopPoint*> PTFileFormat::GetStopPoints(
+		std::set<StopPoint*> PTFileFormat::_getStopPoints(
 			const impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
 			const std::string& id,
 			boost::optional<const std::string&> name,
-			const impex::ImportLogger& importLogger,
 			bool errorIfNotFound
-		){
+		) const {
 			if(stopPoints.contains(id))
 			{
 				set<StopPoint*> loadedStopPoints(stopPoints.get(id));
@@ -314,7 +319,7 @@ namespace synthese
 				{
 					logStream << sp->getKey() << " (" << sp->getConnectionPlace()->getFullName() << ") ";
 				}
-				importLogger.log(ImportLogger::LOAD, logStream.str());
+				_logLoad(logStream.str());
 
 				return loadedStopPoints;
 			}
@@ -326,22 +331,20 @@ namespace synthese
 				{
 					logStream << " (" << *name << ")";
 				}
-				importLogger.log(ImportLogger::ERROR, logStream.str());
+				_logError(logStream.str());
 			}
 			return set<StopPoint*>();
 		}
 
 
 
-		StopPoint* PTFileFormat::CreateStop(
+		StopPoint* PTFileFormat::_createStop(
 			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
 			const std::string& code,
 			boost::optional<const std::string&> name,
 			const StopArea& stopArea,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			// Object creation
 			StopPoint* stop(
 				new StopPoint(
@@ -354,7 +357,7 @@ namespace synthese
 			Importable::DataSourceLinks links;
 			links.insert(make_pair(&source, code));
 			stop->setDataSourceLinksWithoutRegistration(links);
-			env.getEditableRegistry<StopPoint>().add(boost::shared_ptr<StopPoint>(stop));
+			_env.getEditableRegistry<StopPoint>().add(boost::shared_ptr<StopPoint>(stop));
 			stops.add(*stop);
 
 			// Properties
@@ -370,7 +373,7 @@ namespace synthese
 			{
 				logStream << " (" << *name <<  ")";
 			}
-			importLogger.log(ImportLogger::CREA, logStream.str());
+			_logCreation(logStream.str());
 
 			// Return
 			return stop;
@@ -378,7 +381,22 @@ namespace synthese
 
 
 
-		set<StopPoint*> PTFileFormat::CreateOrUpdateStop(
+		//////////////////////////////////////////////////////////////////////////
+		///	Stop creation or update.
+		/// The stop is identified by the specified datasource and the code.
+		/// If the stop is not found, a stop is created in the specified stop area, if defined in
+		/// the corresponding parameter. If not, a error message is written on the log stream.
+		/// @param stops the stops which are registered to the data source
+		/// @param code the code of the stop to update or create, as known by the datasource
+		/// @param name the name of the stop (updated only if defined)
+		/// @param stopArea the stop area which the stop belongs to (updated only if defined)
+		/// @param geometry the location of the stop (updated only if defined)
+		/// @param source the data source
+		/// @param env the environment to read and populate
+		/// @param logStream the stream to write the logs on
+		/// @return the updated or created stops. Empty is no stop was neither found nor created in case
+		/// of the stop area parameter is not defined
+		set<StopPoint*> PTFileFormat::_createOrUpdateStop(
 			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
 			const std::string& code,
 			boost::optional<const std::string&> name,
@@ -386,13 +404,11 @@ namespace synthese
 			boost::optional<const StopArea*> stopArea,
 			boost::optional<const StopPoint::Geometry*> geometry,
 			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger,
 			bool doNotUpdate
-		){
+		) const {
 			// Load if possible
 			bool creation(false);
-			set<StopPoint*> result(GetStopPoints(stops, code, name, importLogger, false));
+			set<StopPoint*> result(_getStopPoints(stops, code, name, false));
 
 			// Creation if necessary
 			if(result.empty())
@@ -403,14 +419,12 @@ namespace synthese
 				}
 
 				result.insert(
-					CreateStop(
+					_createStop(
 						stops,
 						code,
 						name,
 						**stopArea,
-						source,
-						env,
-						importLogger
+						source
 				)	);
 				creation = true;
 			}
@@ -422,7 +436,7 @@ namespace synthese
 				{
 					logStream << " (" << *name <<  ")";
 				}
-				importLogger.log(ImportLogger::LOAD, logStream.str());
+				_logLoad(logStream.str());
 			}
 
 			// Update
@@ -460,7 +474,9 @@ namespace synthese
 
 
 
-		set<StopPoint*> PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+		//////////////////////////////////////////////////////////////////////////
+		/// Stop creation or update with creation of a stop area based on the name if necessary.
+		set<StopPoint*> PTFileFormat::_createOrUpdateStopWithStopAreaAutocreation(
 			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
 			const std::string& code,
 			const std::string& name,
@@ -468,12 +484,10 @@ namespace synthese
 			const geography::City& cityForStopAreaAutoGeneration,
 			boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger,
 			boost::optional<const graph::RuleUser::Rules&> rules
-		){
+		) const {
 			// Load if possible
-			set<StopPoint*> result(GetStopPoints(stops, code, name, importLogger, false));
+			set<StopPoint*> result(_getStopPoints(stops, code, name, false));
 
 			// Creation if necessary
 			if(result.empty())
@@ -482,7 +496,7 @@ namespace synthese
 				StopArea* curStop(NULL);
 				StopAreaTableSync::SearchResult stopAreas(
 					StopAreaTableSync::Search(
-						env,
+						_env,
 						cityForStopAreaAutoGeneration.getKey(),
 						logic::indeterminate,
 						optional<string>(),
@@ -490,7 +504,7 @@ namespace synthese
 				)	);
 				if(stopAreas.empty())
 				{
-					BOOST_FOREACH(Registry<StopArea>::value_type stopArea, env.getRegistry<StopArea>())
+					BOOST_FOREACH(Registry<StopArea>::value_type stopArea, _env.getRegistry<StopArea>())
 					{
 						if((stopArea.second->getName() == name) && (cityForStopAreaAutoGeneration.getKey() == stopArea.second->getCity()->getKey()))
 						{
@@ -511,16 +525,14 @@ namespace synthese
 						}
 						curStop->setName(name);
 						curStop->setCity(&cityForStopAreaAutoGeneration);
-						env.getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(curStop));
-						importLogger.log(
-							ImportLogger::CREA,
+						_env.getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(curStop));
+						_logCreation(
 							"Auto generation of the commercial stop for stop "+ code +" ("+ name +")"
 						);
 					}
 					else
 					{
-						importLogger.log(
-							ImportLogger::LOAD,
+						_logLoad(
 							"Link with existing commercial stop "+ curStop->getFullName() +" for stop "+ code +" ("+ name +")"
 						);
 					}
@@ -528,28 +540,24 @@ namespace synthese
 				else
 				{
 					curStop = stopAreas.begin()->get();
-					importLogger.log(
-						ImportLogger::LOAD,
+					_logLoad(
 						"Link with existing commercial stop "+ curStop->getFullName() +" for stop "+ code +" ("+ name +")"
 					);
 				}
 
 				// Stop creation
 				result.insert(
-					CreateStop(
+					_createStop(
 						stops,
 						code,
 						name,
 						*curStop,
-						source,
-						env,
-						importLogger
+						source
 				)	);
 			}
 			else
 			{
-				importLogger.log(
-					ImportLogger::LOAD,
+				_logLoad(
 					"Link with existing stop "+ (*result.begin())->getName() +" for stop "+ code +" ("+ name +")"
 				);
 			}
@@ -559,8 +567,7 @@ namespace synthese
 			{
 				if(stop->getName() != name)
 				{
-					importLogger.log(
-						ImportLogger::INFO,
+					_logInfo(
 						"Stop "+ code +" ("+ stop->getName() +") renamed to "+ name
 					);
 					stop->setName(name);
@@ -582,7 +589,12 @@ namespace synthese
 
 
 
-		CommercialLine* PTFileFormat::CreateOrUpdateLine(
+		//////////////////////////////////////////////////////////////////////////
+		/// @return the created network object.
+		/// The created object is owned by the environment (it is not required to
+		/// maintain the returned shared pointer)
+		/// The network of the line is never changed if an existing line is returned.
+		CommercialLine* PTFileFormat::_createOrUpdateLine(
 			impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
 			const std::string& id,
 			optional<const std::string&> name,
@@ -590,17 +602,13 @@ namespace synthese
 			boost::optional<util::RGBColor> color,
 			TransportNetwork& defaultNetwork,
 			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger,
 			bool restrictInDefaultNetwork
-		){
+		) const {
 			CommercialLine* line(
-				GetLine(
+				_getLine(
 					lines,
 					id,
 					source,
-					env,
-					importLogger,
 					restrictInDefaultNetwork ? optional<TransportNetwork&>(defaultNetwork) : optional<TransportNetwork&>()
 			)	);
 			if(!line)
@@ -613,13 +621,13 @@ namespace synthese
 				{
 					logStream << " (" << *name <<  ")";
 				}
-				importLogger.log(ImportLogger::CREA, logStream.str());
+				_logCreation(logStream.str());
 
 				line->setParent(defaultNetwork);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				line->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<CommercialLine>().add(boost::shared_ptr<CommercialLine>(line));
+				_env.getEditableRegistry<CommercialLine>().add(boost::shared_ptr<CommercialLine>(line));
 				lines.add(*line);
 			}
 
@@ -641,7 +649,13 @@ namespace synthese
 
 
 
-		JourneyPattern* PTFileFormat::CreateOrUpdateRoute(
+		//////////////////////////////////////////////////////////////////////////
+		/// Search for an existing route which matches with the defined parameters, or create a new one if no existing route is compliant.
+		/// @param line The line
+		/// @param removeOldCodes Removes codes on similar routes with the same code for the data source (routes with different stops are not cleaned)
+		/// @pre The line object must link to all existing routes (use JourneyPatternTableSync::Search to populate the object)
+		/// @author Hugues Romain
+		JourneyPattern* PTFileFormat::_createOrUpdateRoute(
 			pt::CommercialLine& line,
 			boost::optional<const std::string&> id,
 			boost::optional<const std::string&> name,
@@ -652,13 +666,11 @@ namespace synthese
 			vehicle::RollingStock* rollingStock,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger,
 			bool removeOldCodes,
 			bool updateMetricOffsetOnUpdate,
 			bool attemptToCopyExistingGeometries,
 			bool allowDifferentStopPointsInSameStopArea
-		){
+		) const {
 			// Declaration
 			bool creation(false);
 
@@ -688,8 +700,7 @@ namespace synthese
 				){
 					if(!result)
 					{
-						importLogger.log(
-							ImportLogger::LOAD,
+						_logLoad(
 							"Use of route "+ lexical_cast<string>(jp->getKey()) +" ("+ jp->getName() +") for "+ (id ? *id : string("unknown")) +")"
 						);
 						result = jp;
@@ -704,15 +715,13 @@ namespace synthese
 						{
 							jp->removeSourceLink(source, *id);
 							jp->addCodeBySource(source, string());
-							importLogger.log(
-								ImportLogger::INFO,
+							_logInfo(
 								"Code "+ *id +" was removed from route "+ lexical_cast<string>(jp->getKey())
 							);
 						}
 						else
 						{
-							importLogger.log(
-								ImportLogger::WARN,
+							_logWarning(
 								"Route "+ *id +") is defined twice or more."
 							);
 						}
@@ -724,8 +733,7 @@ namespace synthese
 			if(!result)
 			{
 				creation = true;
-				importLogger.log(
-					ImportLogger::CREA,
+				_logCreation(
 					"Creation of route "+ (name ? *name : string()) +" for "+ (id ? *id : string("unknown"))
 				);
 				result = new JourneyPattern(
@@ -749,7 +757,7 @@ namespace synthese
 				result->setDataSourceLinksWithoutRegistration(links);
 
 				// Storage in the environment
-				env.getEditableRegistry<JourneyPattern>().add(boost::shared_ptr<JourneyPattern>(result));
+				_env.getEditableRegistry<JourneyPattern>().add(boost::shared_ptr<JourneyPattern>(result));
 
 				// Served stops
 				size_t rank(0);
@@ -767,7 +775,7 @@ namespace synthese
 							stop._withTimes ? *stop._withTimes : true
 					)	);
 					result->addEdge(*ls);
-					env.getEditableRegistry<LineStop>().add(ls);
+					_env.getEditableRegistry<LineStop>().add(ls);
 					++rank;
 				}
 
@@ -869,24 +877,21 @@ namespace synthese
 
 
 
-		ScheduledService* PTFileFormat::CreateOrUpdateService(
+		ScheduledService* PTFileFormat::_createOrUpdateService(
 			JourneyPattern& route,
 			const SchedulesBasedService::Schedules& departureSchedules,
 			const SchedulesBasedService::Schedules& arrivalSchedules,
 			const std::string& number,
 			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger,
 			boost::optional<const std::string&> team,
 			boost::optional<const graph::RuleUser::Rules&> rules,
 			boost::optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices
-		){
+		) const {
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
 				route.getScheduledStopsNumber() != arrivalSchedules.size()
 			){
-				importLogger.log(
-					ImportLogger::WARN,
+				_logWarning(
 					"Inconsistent schedules size in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 				);
 				return NULL;
@@ -897,8 +902,7 @@ namespace synthese
 			{
 				if(td.is_not_a_date_time())
 				{
-					importLogger.log(
-						ImportLogger::WARN,
+					_logWarning(
 						"At least an undefined time in departure schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 					);
 					return NULL;
@@ -908,8 +912,7 @@ namespace synthese
 			{
 				if(ta.is_not_a_date_time())
 				{
-					importLogger.log(
-						ImportLogger::WARN,
+					_logWarning(
 						"At least an undefined time in arrival schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 					);
 					return NULL;
@@ -987,17 +990,15 @@ namespace synthese
 				}
 
 				route.addService(*result, false);
-				env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(result));
+				_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(result));
 
-				importLogger.log(
-					ImportLogger::CREA,
+				_logCreation(
 					"Creation of service "+ result->getServiceNumber() +" for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 				);
 			}
 			else
 			{
-				importLogger.log(
-					ImportLogger::LOAD,
+				_logLoad(
 					"Use of service "+ lexical_cast<string>(result->getKey()) +" ("+ result->getServiceNumber() +") for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 				);
 			}
@@ -1007,23 +1008,20 @@ namespace synthese
 
 
 
-		ContinuousService* PTFileFormat::CreateOrUpdateContinuousService(
+		ContinuousService* PTFileFormat::_createOrUpdateContinuousService(
 			JourneyPattern& route,
 			const SchedulesBasedService::Schedules& departureSchedules,
 			const SchedulesBasedService::Schedules& arrivalSchedules,
 			const std::string& number,
 			const boost::posix_time::time_duration& range,
 			const boost::posix_time::time_duration& waitingTime,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
 				route.getScheduledStopsNumber() != arrivalSchedules.size()
 			){
-				importLogger.log(
-					ImportLogger::WARN,
+				_logWarning(
 					"Inconsistent schedules size in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 				);
 				return NULL;
@@ -1034,8 +1032,7 @@ namespace synthese
 			{
 				if(td.is_not_a_date_time())
 				{
-					importLogger.log(
-						ImportLogger::WARN,
+					_logWarning(
 						"At least an undefined time in departure schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 					);
 					return NULL;
@@ -1045,8 +1042,7 @@ namespace synthese
 			{
 				if(ta.is_not_a_date_time())
 				{
-					importLogger.log(
-						ImportLogger::WARN,
+					_logWarning(
 						"At least an undefined time in arrival schedules in the service "+ number +" at "+ lexical_cast<string>(departureSchedules[0]) +" on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 					);
 					return NULL;
@@ -1087,17 +1083,15 @@ namespace synthese
 				result->setSchedules(departureSchedules, arrivalSchedules, true);
 				result->setPath(&route);
 				route.addService(*result, false);
-				env.getEditableRegistry<ContinuousService>().add(boost::shared_ptr<ContinuousService>(result));
+				_env.getEditableRegistry<ContinuousService>().add(boost::shared_ptr<ContinuousService>(result));
 
-				importLogger.log(
-					ImportLogger::CREA,
+				_logCreation(
 					"Creation of continuous service "+ result->getServiceNumber() +" for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 				);
 			}
 			else
 			{
-				importLogger.log(
-					ImportLogger::LOAD,
+				_logLoad(
 					"Use of continuous service "+ lexical_cast<string>(result->getKey()) +" ("+ result->getServiceNumber() +") for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 				);
 			}
@@ -1107,342 +1101,118 @@ namespace synthese
 
 
 
-		void PTFileFormat::DisplayStopAreaImportScreen(
-			const ImportableStopAreas& objects,
-			const server::Request& request,
-			bool createCityIfNecessary,
-			bool createPhysicalStop,
-			boost::shared_ptr<const geography::City> defaultCity,
-			util::Env& env,
-			const impex::DataSource& source,
-			const impex::ImportLogger& importLogger
-		){
-			if(objects.empty())
-			{
-				return;
-			}
-
-			// Variables
-			bool linked(!objects.begin()->linkedStopAreas.empty());
-			AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
-			stringstream stream;
-
-			// Title
-			stream << "<h1>Zones d'arrêt ";
-			if(!linked)
-			{
-				stream << "non ";
-			}
-			stream << "liés à SYNTHESE</h1>";
-
-			// Header
-			HTMLTable::ColsVector c;
-			c.push_back("Code");
-			c.push_back("Localité");
-			c.push_back("Nom");
-			if(linked)
-			{
-				c.push_back("Zone d'arrêt SYNTHESE");
-			}
-			if(!linked)
-			{
-				c.push_back("Actions");
-			}
-
-			// Table
-			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-			stream << t.open();
-			stream.precision(0);
-			AdminActionFunctionRequest<StopAreaAddAction, DataSourceAdmin> addRequest(request);
+		void PTFileFormat::_exportStopAreas(
+			const ImportableStopAreas& objects
+		) const {
+			// Loop on source stop areas
 			BOOST_FOREACH(const ImportableStopAreas::value_type& object, objects)
 			{
-				stream << t.row();
-				stream << t.col();
-				stream << object.operatorCode;
+				// The parameters map of the object
+				boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
+				_pm.insert(TAG_STOP_AREA, stopAreaPM);
 
-				stream << t.col();
-				stream << object.cityName;
+				// Attributes
+				stopAreaPM->insert(ATTR_SOURCE_CODE, object.operatorCode);
+				stopAreaPM->insert(ATTR_SOURCE_CITY_NAME, object.cityName);
+				stopAreaPM->insert(ATTR_SOURCE_NAME, object.name);
 
-				stream << t.col();
-				stream << object.name;
-
-				if(linked)
+				// Linked stop areas
+				BOOST_FOREACH(StopArea* stopArea, object.linkedStopAreas)
 				{
-					stream << t.col();
-					bool first(true);
-					BOOST_FOREACH(StopArea* stopArea, object.linkedStopAreas)
-					{
-						if(first)
-						{
-							first = false;
-						}
-						else
-						{
-							stream << "<br />";
-						}
-						openRequest.getPage()->setConnectionPlace(
-							env.getSPtr(stopArea)
-						);
-						stream << HTMLModule::getHTMLLink(
-							openRequest.getURL(), stopArea->getFullName()
-						);
-					}
-				}
-
-				if(!linked)
-				{
-					stream << t.col();
-					Importable::DataSourceLinks links;
-					links.insert(make_pair(&source, object.operatorCode));
-					addRequest.getAction()->setDataSourceLinks(links);
-					addRequest.getAction()->setCreateCityIfNecessary(createCityIfNecessary);
-					addRequest.getAction()->setName(object.name);
-					HTMLForm f(addRequest.getHTMLForm("addStop"+ object.operatorCode));
-					stream << f.open();
-					stream << f.getTextInput(
-						StopAreaAddAction::PARAMETER_CITY_NAME,
-						object.cityName.empty() ?
-						(defaultCity.get() ? defaultCity->getName() : string()) :
-						object.cityName
-						);
-					stream << f.getSubmitButton("Ajouter");
-					stream << f.close();
+					// Submap
+					boost::shared_ptr<ParametersMap> linkPM(new ParametersMap);
+					stopAreaPM->insert(TAG_LINKED_STOP_AREA, linkPM);
+					
+					// Export
+					stopArea->toParametersMap(*stopAreaPM);
 				}
 			}
-			stream << t.close();
-
-			importLogger.logRaw(stream.str());
 		}
 
 
 
-		void PTFileFormat::DisplayStopPointImportScreen(
-			const ImportableStopPoints& objects,
-			const server::Request& request,
-			util::Env& env,
-			const impex::DataSource& source,
-			const impex::ImportLogger& importLogger
-		){
-			if(objects.empty())
-			{
-				return;
-			}
+		//////////////////////////////////////////////////////////////////////////
+		/// Exports a list of stop points in the import result parameters map.
+		/// @param objects the stop points to export
+		void PTFileFormat::_exportStopPoints(
+			const ImportableStopPoints& objects
+		) const {
 
-			// Variables
-			bool linked(!objects.begin()->linkedStopPoints.empty());
-			AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
-			AdminFunctionRequest<StopPointAdmin> openStopPointRequest(request);
-			stringstream stream;
-
-			// Title
-			stream << "<h1>Arrêts ";
-			if(!linked)
-			{
-				stream << "non ";
-			}
-			stream << "liés à SYNTHESE</h1>";
-
-			// Header
-			HTMLTable::ColsVector c;
-			c.push_back("Code");
-			c.push_back("Localité");
-			c.push_back("Nom");
-			c.push_back("Zone d'arrêt");
-			c.push_back("Coords fichier");
-			c.push_back("Coords fichier");
-			c.push_back("Coords fichier (origine)");
-			c.push_back("Coords fichier (origine)");
-			if(linked)
-			{
-				c.push_back("Arrêt SYNTHESE");
-				c.push_back("Coords SYNTHESE");
-				c.push_back("Coords SYNTHESE");
-				c.push_back("Distance");
-			}
-			c.push_back("Actions");
-
-			// Table
-			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-			stream << t.open();
-			stream.precision(0);
-			AdminActionFunctionRequest<StopPointAddAction, DataSourceAdmin> addRequest(request);
 			BOOST_FOREACH(const ImportableStopPoints::value_type& object, objects)
 			{
-				stream << t.row();
-				stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-				stream << object.operatorCode;
+				// The parameters map of the object
+				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
+				_pm.insert(TAG_STOP_POINT, stopPM);
 
-				stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-				stream << object.cityName;
-
-				stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-				stream << object.name;
-
-				stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
+				// Properties
+				stopPM->insert(ATTR_SOURCE_CODE, object.operatorCode);
+				stopPM->insert(ATTR_SOURCE_CITY_NAME, object.cityName);
+				stopPM->insert(ATTR_SOURCE_NAME, object.name);
 				if(object.stopArea)
 				{
-					openRequest.getPage()->setConnectionPlace(env.getSPtr(object.stopArea));
-					stream << HTMLModule::getHTMLLink(openRequest.getURL(), object.stopArea->getFullName());
+					boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
+					object.stopArea->toParametersMap(*stopAreaPM);
+					stopPM->insert(TAG_LINKED_STOP_AREA, stopAreaPM);
 				}
 
+				// Coordinates
 				boost::shared_ptr<geos::geom::Point> projectedPoint;
 				if(object.coords.get())
 				{
 					projectedPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*object.coords);
 
-					stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-					stream << fixed << projectedPoint->getX();
-
-					stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-					stream << fixed << projectedPoint->getY();
-
-					stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-					stream << fixed << object.coords->getX();
-
-					stream << t.col(1, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-					stream << fixed << object.coords->getY();
-				}
-				else
-				{
-					stream << t.col(4, string(), false, string(), linked ? object.linkedStopPoints.size() : 1);
-					stream << "(non localisé)";
+					stopPM->insert(ATTR_SOURCE_SYNTHESE_X, projectedPoint->getX());
+					stopPM->insert(ATTR_SOURCE_SYNTHESE_Y, projectedPoint->getY());
+					stopPM->insert(ATTR_SOURCE_X, object.coords->getX());
+					stopPM->insert(ATTR_SOURCE_Y, object.coords->getY());
 				}
 
-				if(linked)
+				// Linked stop points
+				BOOST_FOREACH(StopPoint* stopPoint, object.linkedStopPoints)
 				{
-					bool first(true);
-					BOOST_FOREACH(StopPoint* stopPoint, object.linkedStopPoints)
+					// Submap
+					boost::shared_ptr<ParametersMap> linkPM(new ParametersMap);
+					stopPM->insert(TAG_LINKED_STOP_POINT, linkPM);
+
+					// StopPoint
+					stopPoint->toParametersMap(*linkPM);
+
+					// Distance between source and synthese stop
+					if (stopPoint->getGeometry().get() && object.coords.get())
 					{
-						if(first)
-						{
-							first = false;
-						}
-						else
-						{
-							stream << t.row();
-						}
-
-						stream << t.col();
-						openRequest.getPage()->setConnectionPlace(
-							env.getSPtr(stopPoint->getConnectionPlace())
+						double distance(
+							geos::operation::distance::DistanceOp::distance(*projectedPoint, *stopPoint->getGeometry())
 						);
-						stream << HTMLModule::getHTMLLink(
-							openRequest.getURL(), stopPoint->getConnectionPlace()->getFullName()
-						);
-						stream << " ";
-						openStopPointRequest.getPage()->setStop(
-							env.getSPtr(stopPoint)
-						);
-						stream << HTMLModule::getHTMLLink(
-							openStopPointRequest.getURL(), stopPoint->getName()
-						);
-
-						stream << t.col();
-						if(stopPoint->getGeometry().get())
-						{
-							stream << std::fixed << stopPoint->getGeometry()->getX();
-						}
-
-						stream << t.col();
-						if(stopPoint->getGeometry().get())
-						{
-							stream << std::fixed << stopPoint->getGeometry()->getY();
-						}
-						else
-						{
-							stream << "(non localisé)";
-						}
-
-						double distance(-1);
-						if (stopPoint->getGeometry().get() && object.coords.get())
-						{
-							distance = geos::operation::distance::DistanceOp::distance(*projectedPoint, *stopPoint->getGeometry());
-						}
-
-						stream << t.col();
-						if(distance == 0)
-						{
-							stream << "identiques";
-						}
-						if(distance > 0)
-						{
-							stream << distance << " m";
-						}
-
-						stream << t.col();
-						if(distance > 0)
-						{
-							AdminActionFunctionRequest<StopPointUpdateAction, DataSourceAdmin> moveRequest(request);
-							moveRequest.getAction()->setStop(
-								env.getEditableSPtr(stopPoint)
-							);
-							moveRequest.getAction()->setPoint(
-								object.coords
-							);
-							stream << HTMLModule::getLinkButton(moveRequest.getHTMLForm().getURL(), "Mettre à jour coordonnées");
-						}
-				}	}
-
-				if(!linked)
-				{
-					stream << t.col();
-
-					Importable::DataSourceLinks links;
-					links.insert(make_pair(&source, object.operatorCode));
-					addRequest.getAction()->setDataSourceLinks(links);
-					addRequest.getAction()->setName(object.name);
-					if(object.coords)
-					{
-						addRequest.getAction()->setPoint(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*object.coords));
-					}
-					if(object.stopArea)
-					{
-						addRequest.getAction()->setPlace(env.getEditableSPtr(const_cast<StopArea*>(object.stopArea)));
-						stream << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
-					}
-					else
-					{
-						addRequest.getAction()->setCreateCityIfNecessary(true);
-						HTMLForm f(addRequest.getHTMLForm("create"+lexical_cast<string>(object.operatorCode)));
-						stream << f.open();
-						stream << "ID zone arrêt : " << f.getTextInput(StopPointAddAction::PARAMETER_PLACE_ID, string());
-						stream << " ou création : commune zone d'arrêt : " << f.getTextInput(StopPointAddAction::PARAMETER_CITY_NAME, string());
-						stream << " " << f.getSubmitButton("Créer");
-						stream << f.close();
-						addRequest.getAction()->setCreateCityIfNecessary(false);
+						_pm.insert(ATTR_DISTANCE, distance);
 					}
 				}
 			}
-			stream << t.close();
-
-			importLogger.logRaw(stream.str());
 		}
 
 
 
-		Destination* PTFileFormat::CreateOrUpdateDestination(
+		//////////////////////////////////////////////////////////////////////////
+		/// The created object is owned by the environment (it is not required to
+		/// maintain the returned shared pointer)
+		Destination* PTFileFormat::_createOrUpdateDestination(
 			impex::ImportableTableSync::ObjectBySource<DestinationTableSync>& destinations,
 			const std::string& id,
 			const std::string& displayText,
 			const std::string& ttsText,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			Destination* destination;
 			if(destinations.contains(id))
 			{
 				set<Destination*> loadedDestination(destinations.get(id));
 				if(loadedDestination.size() > 1)
 				{
-					importLogger.log(
-						ImportLogger::WARN,
+					_logWarning(
 						"More than one destination with key "+ id
 					);
 				}
 				destination = *loadedDestination.begin();
-				importLogger.log(
-					ImportLogger::LOAD,
+				_logLoad(
 					"Use of existing destination "+ lexical_cast<string>(destination->getKey()) +" ("+ destination->getDisplayedText() +")"
 				);
 			}
@@ -1454,10 +1224,9 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				destination->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<Destination>().add(boost::shared_ptr<Destination>(destination));
+				_env.getEditableRegistry<Destination>().add(boost::shared_ptr<Destination>(destination));
 				destinations.add(*destination);
-				importLogger.log(
-					ImportLogger::CREA,
+				_logCreation(
 					"Creation of the destination with key "+ id +" ("+ displayText +")"
 				);
 			}
@@ -1468,14 +1237,12 @@ namespace synthese
 
 
 
-		CommercialLine* PTFileFormat::GetLine(
+		CommercialLine* PTFileFormat::_getLine(
 			impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
 			const std::string& id,
 			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& importLogger,
 			optional<TransportNetwork&> network
-		){
+		) const {
 			CommercialLine* line(NULL);
 			if(lines.contains(id))
 			{
@@ -1496,8 +1263,7 @@ namespace synthese
 				{
 					if(loadedLines.size() > 1)
 					{
-						importLogger.log(
-							ImportLogger::WARN,
+						_logWarning(
 							"More than one line with key "+ id
 						);
 					}
@@ -1508,17 +1274,16 @@ namespace synthese
 				{
 					if(line->getPaths().empty())
 					{
-						JourneyPatternTableSync::Search(env, line->getKey());
-						ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
-						ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+						JourneyPatternTableSync::Search(_env, line->getKey());
+						ScheduledServiceTableSync::Search(_env, optional<RegistryKeyType>(), line->getKey());
+						ContinuousServiceTableSync::Search(_env, optional<RegistryKeyType>(), line->getKey());
 						BOOST_FOREACH(const Path* route, line->getPaths())
 						{
-							LineStopTableSync::Search(env, route->getKey());
+							LineStopTableSync::Search(_env, route->getKey());
 						}
 					}
 
-					importLogger.log(
-						ImportLogger::LOAD,
+					_logLoad(
 						"Use of existing commercial line "+ lexical_cast<string>(line->getKey()) +" ("+ line->getName() +")"
 					);
 				}
@@ -1528,12 +1293,11 @@ namespace synthese
 
 
 
-		std::set<JourneyPattern*> PTFileFormat::GetRoutes(
+		std::set<JourneyPattern*> PTFileFormat::_getRoutes(
 			pt::CommercialLine& line,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
-			const impex::DataSource& source,
-			const impex::ImportLogger& importLogger
-		){
+			const impex::DataSource& source
+		) const {
 			// Attempting to find an existing route by value comparison
 			set<JourneyPattern*> result;
 			BOOST_FOREACH(Path* route, line.getPaths())
@@ -1554,8 +1318,7 @@ namespace synthese
 				if(	*jp == servedStops
 				){
 					result.insert(jp);
-					importLogger.log(
-						ImportLogger::LOAD,
+					_logLoad(
 						"Use of existing route "+ lexical_cast<string>(jp->getKey()) +" ("+ jp->getName() +")"
 					);
 				}
@@ -1565,21 +1328,17 @@ namespace synthese
 
 
 
-		RollingStock* PTFileFormat::GetTransportMode(
+		RollingStock* PTFileFormat::_getTransportMode(
 			const impex::ImportableTableSync::ObjectBySource<RollingStockTableSync>& transportModes,
-			const std::string& id,
-			const impex::ImportLogger& importLogger
-		){
+			const std::string& id
+		) const {
 			RollingStock* transportMode(NULL);
 			if(transportModes.contains(id))
 			{
 				set<RollingStock*> loadedTransportModes(transportModes.get(id));
 				if(loadedTransportModes.size() > 1)
 				{
-					importLogger.log(
-						ImportLogger::WARN,
-						"more than one transport mode with key "+ id
-					);
+					_logWarning("more than one transport mode with key "+ id);
 				}
 				transportMode = *loadedTransportModes.begin();
 			}

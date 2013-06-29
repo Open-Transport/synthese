@@ -23,34 +23,45 @@
 #ifndef SYNTHESE_calendar_CalendarFileFormat_hpp__
 #define SYNTHESE_calendar_CalendarFileFormat_hpp__
 
+#include "Importer.hpp"
+
 #include "ImportableTableSync.hpp"
 
 namespace synthese
 {
-	namespace impex
-	{
-		class ImportLogger;
-	}
-
 	namespace calendar
 	{
 		class CalendarTemplateTableSync;
 		class CalendarTemplate;
+	}
+
+	namespace data_exchange
+	{
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Calendar import helpers library.
 		///	@ingroup m31
-		class CalendarFileFormat
+		class CalendarFileFormat:
+			public virtual impex::Importer
 		{
 		public:
-			static CalendarTemplate* GetCalendarTemplate(
-				impex::ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>& calendars,
-				const std::string& code,
-				const impex::ImportLogger& logger
+			CalendarFileFormat(
+				util::Env& env,
+				const impex::Import& import,
+				impex::ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
 			);
+
+
+
+			calendar::CalendarTemplate* _getCalendarTemplate(
+				impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync>& calendars,
+				const std::string& code
+			) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_calendar_CalendarFileFormat_hpp__
 

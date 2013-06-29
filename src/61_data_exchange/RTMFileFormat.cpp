@@ -24,44 +24,22 @@
 
 #include "Import.hpp"
 #include "PTModule.h"
-#include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
-#include "StopArea.hpp"
-#include "PTFileFormat.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "ImpExModule.h"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "AdminActionFunctionRequest.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
-#include "PTPlaceAdmin.h"
-#include "StopPointAdmin.hpp"
-#include "StopAreaAddAction.h"
-#include "StopArea.hpp"
 #include "DataSource.h"
 #include "Importer.hpp"
-#include "AdminActionFunctionRequest.hpp"
-#include "HTMLModule.h"
-#include "HTMLForm.h"
 #include "DBModule.h"
-#include "RTMFileFormat.hpp"
-#include "City.h"
-#include "PTFileFormat.hpp"
 #include "CityTableSync.h"
-#include "Junction.hpp"
 #include "JunctionTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "PTUseRuleTableSync.h"
 #include "IConv.hpp"
 #include "CommercialLineTableSync.h"
-#include "RollingStock.hpp"
 #include "RollingStockTableSync.hpp"
 
 #include <fstream>
@@ -173,10 +151,14 @@ namespace synthese
 		RTMFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			MultipleFileTypesImporter<RTMFileFormat>(env, import, logger),
-			PTDataCleanerFileFormat(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			MultipleFileTypesImporter<RTMFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_importStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
@@ -187,18 +169,17 @@ namespace synthese
 
 		bool RTMFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const std::string& key,
-			boost::optional<const server::Request&> request
+			const std::string& key
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
-				throw Exception("Could no open the file " + filePath.file_string());
+				_logError("Could not open the file " + filePath.file_string());
+				throw Exception("Could not open the file " + filePath.file_string());
 			}
 			string line;
-			_log(
-				ImportLogger::DEBG,
+			_logDebug(
 				"Loading file "+ filePath.file_string() +" as "+ key
 			);
 
@@ -226,8 +207,7 @@ namespace synthese
 		
 					if(cities.empty())
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"City Marseille not found"
 						);
 					}
@@ -264,16 +244,14 @@ namespace synthese
 						}
 						catch(boost::bad_lexical_cast&)
 						{
-							_log(
-								ImportLogger::WARN,
+							_logWarning(
 								"Stop "+ code +" has invalid coordinate 1"
 							);
 						}
 					}
 					else
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Stop "+ code +" has invalid coordinate"
 						);
 					}
@@ -288,7 +266,7 @@ namespace synthese
 					optional<const RuleUser::Rules&> handicappedUseRule(handicappedRules);
 					
 					// Stop creation
-					PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+					_createOrUpdateStopWithStopAreaAutocreation(
 						_stopPoints,
 						code,
 						name,
@@ -296,8 +274,6 @@ namespace synthese
 						*cityForStopAreaAutoGeneration,
 						_stopAreaDefaultTransferDuration,
 						dataSource,
-						_env,
-						_logger,
  						handicappedUseRule
 					);
 					cout << "test arrets ok" << endl;
@@ -474,8 +450,7 @@ namespace synthese
 					// Line
 					if(!lines.contains(trip.lineCode))
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Inconsistent line id "+ trip.lineCode +" in the trip "+ trip.code
 						);
 						continue;
@@ -538,25 +513,7 @@ namespace synthese
 			return true;
 		}
 
-		void RTMFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			stream << "<h1>Fichiers</h1>";
 
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			t.getForm().addHiddenField(PARAMETER_FROM_TODAY, string("1"));
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
-			//stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
-			stream << t.title("Fichiers");
-			stream << t.cell("Fichier arrêts", t.getForm().getTextInput(_getFileParameterName(FILE_ARRETS), _pathsMap[FILE_ARRETS].file_string()));
-			stream << t.cell("Fichier pilote", t.getForm().getTextInput(_getFileParameterName(FILE_LIGNES_ITI_COURSES), _pathsMap[FILE_LIGNES_ITI_COURSES].file_string()));
-			stream << t.close();
-		}
 
 		db::DBTransaction RTMFileFormat::Importer_::_save() const
 		{

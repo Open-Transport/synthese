@@ -88,15 +88,22 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 	map.insert(IneoFileFormat::Importer_::FILE_HOR, ineoFilePattern + ".hor");
 	map.insert(IneoFileFormat::Importer_::FILE_CAL, ineoFilePattern + ".cal");
 
-	stringstream logstream;
-	ImportLogger logger(ImportLogger::ALL, string(), logstream);
-	boost::shared_ptr<Importer> importer(import->getImporter(env, logger));
+	stringstream logStream;
+	ParametersMap pm;
+	boost::shared_ptr<Importer> importer(
+		import->getImporter(
+			env,
+			IMPORT_LOG_ALL,
+			string(), 
+			logStream,
+			pm
+	)	);
 	importer->setFromParametersMap(map, true);
 
 	bool doImport(
 		importer->beforeParsing()
 	);
-	doImport &= importer->parseFiles(boost::optional<const Request&>());
+	doImport &= importer->parseFiles();
 	doImport &= importer->afterParsing();
 	
 	

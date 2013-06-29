@@ -23,40 +23,45 @@
 #ifndef SYNTHESE_pt_operation_PTOperationFileFormat_hpp__
 #define SYNTHESE_pt_operation_PTOperationFileFormat_hpp__
 
+#include "Importer.hpp"
+
 #include "ImportableTableSync.hpp"
 
 namespace synthese
 {
-	namespace impex
-	{
-		class ImportLogger;
-	}
-
 	namespace pt_operation
 	{
 		class VehicleService;
 		class VehicleServiceTableSync;
 		class DriverAllocation;
 		class DriverAllocationTableSync;
+	}
 
+	namespace data_exchange
+	{
 		/** PTOperationFileFormat class.
 			@ingroup m37
 		*/
-		class PTOperationFileFormat
+		class PTOperationFileFormat:
+			public virtual impex::Importer
 		{
 		public:
 
-			//////////////////////////////////////////////////////////////////////////
-			/// @return the created network object.
-			/// The created object is owned by the environment (it is not required to
-			/// maintain the returned shared pointer)
-			static VehicleService* CreateOrUpdateVehicleService(
-				impex::ImportableTableSync::ObjectBySource<VehicleServiceTableSync>& vehicleServices,
-				const std::string& id,
-				const impex::DataSource& source,
+			PTOperationFileFormat(
 				util::Env& env,
-				const impex::ImportLogger& logger
+				const impex::Import& import,
+				impex::ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
 			);
+
+
+
+			pt_operation::VehicleService* _createOrUpdateVehicleService(
+				impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync>& vehicleServices,
+				const std::string& id
+			) const;
 		};
 	}
 }

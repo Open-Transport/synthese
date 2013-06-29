@@ -60,7 +60,6 @@ namespace synthese
 
 
 		bool RSSFileFormat::Importer_::_read(
-			boost::optional<const server::Request&> adminRequest
 		) const	{
 
 			// Get the content
@@ -278,9 +277,12 @@ namespace synthese
 		RSSFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			ConnectionImporter<RSSFileFormat>(env, import, logger)
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			ConnectionImporter<RSSFileFormat>(env, import, minLogLevel, logPath, outputStream, pm)
 		{}
 
 

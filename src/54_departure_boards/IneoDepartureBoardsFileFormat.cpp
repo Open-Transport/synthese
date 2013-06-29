@@ -23,16 +23,12 @@
 #include "IneoDepartureBoardsFileFormat.hpp"
 
 #include "Import.hpp"
-#include "PropertiesHTMLTable.h"
 #include "DataSource.h"
-#include "AdminFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
 #include "DataSourceTableSync.h"
 #include "DBTransaction.hpp"
 #include "ImportableTableSync.hpp"
 #include "DisplayScreenTableSync.h"
 #include "StopPointTableSync.hpp"
-#include "PTFileFormat.hpp"
 #include "DisplayTypeTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "DeparturesTableModule.h"
@@ -50,9 +46,7 @@ namespace synthese
 {
 	using namespace data_exchange;
 	using namespace server;
-	using namespace html;
 	using namespace util;
-	using namespace admin;
 	using namespace impex;
 	using namespace db;
 	using namespace graph;
@@ -68,8 +62,9 @@ namespace synthese
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_PT_DATASOURCE_ID("ps");
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_DEFAULT_DISPLAY_TYPE_ID("dt");
 
+
+
 		bool IneoDepartureBoardsFileFormat::Importer_::_read(
-			optional<const server::Request&> adminRequest
 		) const	{
 			if(_database.empty() || !_ptDataSource.get())
 			{
@@ -144,12 +139,10 @@ namespace synthese
 				while(linesResult->next())
 				{
 					CommercialLine* line(
-						PTFileFormat::GetLine(
+						_getLine(
 							lines,
 							linesResult->getText("ref_ligne"),
-							*_ptDataSource,
-							_env,
-							_logger
+							*_ptDataSource
 					)	);
 					if(!line)
 					{
@@ -176,11 +169,10 @@ namespace synthese
 					string stopCode(stopsResult->getText("mnemol"));
 
 					set<StopPoint*> stopSet(
-						PTFileFormat::GetStopPoints(
+						_getStopPoints(
 							stops,
 							stopCode,
 							optional<const string&>(),
-							_logger,
 							false
 					)	);
 
@@ -221,35 +213,14 @@ namespace synthese
 		IneoDepartureBoardsFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			DatabaseReadImporter<IneoDepartureBoardsFileFormat>(env, import, logger)
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			DatabaseReadImporter<IneoDepartureBoardsFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm)
 		{}
-
-
-
-		void IneoDepartureBoardsFileFormat::Importer_::displayAdmin( std::ostream& os, const server::Request& request ) const
-		{
-			os << "<h1>Paramètres</h1>";
-
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			os << t.open();
-			os << t.title("Mode");
-			os << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			os << t.title("Bases de données");
-			os << t.cell("Base de données SIV", t.getForm().getTextInput(DatabaseReadImporter<IneoDepartureBoardsFileFormat>::PARAMETER_DATABASE, _database));
-			os << t.title("Paramètres");
-			os << t.cell("Source de données transport liée", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDataSource.get() ? lexical_cast<string>(_ptDataSource->getKey()) : string()));
-			os << t.cell(
-				"Type d'afficheur par défaut",
-				t.getForm().getSelectInput(
-					PARAMETER_DEFAULT_DISPLAY_TYPE_ID,
-					DeparturesTableModule::getDisplayTypeLabels(false, true),
-					_defaultDisplayType.get() ? _defaultDisplayType->getKey() : optional<RegistryKeyType>()
-			)	);
-			os << t.close();
-		}
 
 
 

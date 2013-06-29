@@ -23,29 +23,39 @@
 #include "CalendarFileFormat.hpp"
 
 #include "CalendarTemplateTableSync.h"
-#include "ImportLogger.hpp"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace calendar;
 	using namespace impex;
 	
-	namespace calendar
+	namespace data_exchange
 	{
-		CalendarTemplate* CalendarFileFormat::GetCalendarTemplate(
+		CalendarFileFormat::CalendarFileFormat(
+			util::Env& env,
+			const impex::Import& import,
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
+		{}
+
+
+
+		CalendarTemplate* CalendarFileFormat::_getCalendarTemplate(
 			impex::ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>& calendars,
-			const std::string& code,
-			const impex::ImportLogger& logger
-		){
+			const std::string& code
+		) const {
 			// Search for a road place linked with the datasource
 			if(calendars.contains(code))
 			{
 				set<CalendarTemplate*> loadedCalendars(calendars.get(code));
 				if(loadedCalendars.size() > 1)
 				{
-					logger.log(
-						ImportLogger::WARN,
+					_logWarning(
 						"More than one calendar template with key "+ code
 					);
 				}
@@ -53,13 +63,11 @@ namespace synthese
 			}
 			else
 			{
-				logger.log(
-					ImportLogger::WARN,
+				_logWarning(
 					"No calendar template with key "+ code
 				);
 				return NULL;
 			}
 		}
-	}
-}
+}	}
 

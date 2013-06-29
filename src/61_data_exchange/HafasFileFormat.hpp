@@ -28,6 +28,7 @@
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "PTDataCleanerFileFormat.hpp"
+#include "PTFileFormat.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
@@ -113,7 +114,8 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::MultipleFileTypesImporter<HafasFileFormat>,
-				public PTDataCleanerFileFormat
+				public PTDataCleanerFileFormat,
+				public PTFileFormat
 			{
 
 			public:
@@ -276,10 +278,6 @@ namespace synthese
 					std::string _getField(std::size_t start) const;
 				//@}
 
-				void _showBahnhofScreen(
-					boost::optional<const server::Request&> adminRequest
-				) const;
-
 				bool _importObjects() const;
 
 			protected:
@@ -288,8 +286,7 @@ namespace synthese
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					const std::string& key,
-					boost::optional<const server::Request&> adminRequest
+					const std::string& key
 				) const;
 
 
@@ -298,23 +295,12 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 				
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
-
-
 
 
 				//////////////////////////////////////////////////////////////////////////

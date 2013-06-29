@@ -23,32 +23,14 @@
 #include "StopsShapeFileFormat.hpp"
 
 #include "Import.hpp"
-#include "StopArea.hpp"
-#include "PTFileFormat.hpp"
 #include "ImpExModule.h"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "AdminActionFunctionRequest.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
-#include "PTPlaceAdmin.h"
-#include "StopPointAdmin.hpp"
-#include "StopAreaAddAction.h"
-#include "StopArea.hpp"
 #include "DataSource.h"
 #include "CoordinatesSystem.hpp"
 #include "IConv.hpp"
 #include "Importer.hpp"
-#include "AdminActionFunctionRequest.hpp"
-#include "HTMLModule.h"
-#include "HTMLForm.h"
 #include "DBModule.h"
-#include "City.h"
-#include "PTFileFormat.hpp"
 #include "CityTableSync.h"
 #include "VirtualShapeVirtualTable.hpp"
 
@@ -73,8 +55,6 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace graph;
-	using namespace html;
-	using namespace admin;
 	using namespace server;
 	using namespace geography;
 
@@ -125,10 +105,14 @@ namespace synthese
 		StopsShapeFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			MultipleFileTypesImporter<StopsShapeFileFormat>(env, import, logger),
-			PTDataCleanerFileFormat(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			MultipleFileTypesImporter<StopsShapeFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_displayLinkedStops(false),
 			_stopPoints(*import.get<DataSource>(), _env)
 		{}
@@ -137,8 +121,7 @@ namespace synthese
 
 		bool StopsShapeFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const std::string& key,
-			boost::optional<const server::Request&> request
+			const std::string& key
 		) const {
 			PTFileFormat::ImportableStopPoints linkedStopPoints;
 			PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
@@ -251,26 +234,27 @@ namespace synthese
 					}
 				}
 
-				if(request)
+				PTFileFormat::ImportableStopPoint isp;
+				isp.operatorCode = stopOperatorCode;
+				isp.name = stopPointName;
+				isp.linkedStopPoints = _stopPoints.get(stopOperatorCode);
+				isp.coords = geometry;
+				if(city.get())
 				{
-					PTFileFormat::ImportableStopPoint isp;
-					isp.operatorCode = stopOperatorCode;
-					isp.name = stopPointName;
-					isp.linkedStopPoints = _stopPoints.get(stopOperatorCode);
-					isp.coords = geometry;
-					if(city.get())
-						isp.cityName = city->getName();
-					else if(_defaultCity.get())
-						isp.cityName = _defaultCity->getName();
+					isp.cityName = city->getName();
+				}
+				else if(_defaultCity.get())
+				{
+					isp.cityName = _defaultCity->getName();
+				}
 
-					if(isp.linkedStopPoints.empty())
-					{
-						nonLinkedStopPoints.push_back(isp);
-					}
-					else if(_displayLinkedStops)
-					{
-						linkedStopPoints.push_back(isp);
-					}
+				if(isp.linkedStopPoints.empty())
+				{
+					nonLinkedStopPoints.push_back(isp);
+				}
+				else if(_displayLinkedStops)
+				{
+					linkedStopPoints.push_back(isp);
 				}
 
 				const City* cityForStopAreaAutoGeneration;
@@ -291,21 +275,19 @@ namespace synthese
 
 				if(_updateOnly)
 				{
-					PTFileFormat::CreateOrUpdateStop(
+					_createOrUpdateStop(
 						_stopPoints,
 						stopOperatorCode,
 						stopPointName,
 						optional<const graph::RuleUser::Rules&>(),
 						optional<const StopArea*>(),
 						geometry.get(),
-						dataSource,
-						_env,
-						_logger
+						dataSource
 					);
 				}
 				else
 				{
-					PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+					_createOrUpdateStopWithStopAreaAutocreation(
 						_stopPoints,
 						stopOperatorCode,
 						stopPointName,
@@ -313,71 +295,18 @@ namespace synthese
 						*cityForStopAreaAutoGeneration,
 						_stopAreaDefaultTransferDuration,
 						dataSource,
-						_env,
-						_logger,
 						boost::optional<const graph::RuleUser::Rules&>()
 					);
 				}
 			}
 
-			if(request)
+			_exportStopPoints(nonLinkedStopPoints);
+			if(_displayLinkedStops)
 			{
-				PTFileFormat::DisplayStopPointImportScreen(
-					nonLinkedStopPoints,
-					*request,
-					_env,
-					dataSource,
-					_logger
-				);
-				if(_displayLinkedStops)
-				{
-					PTFileFormat::DisplayStopPointImportScreen(
-						linkedStopPoints,
-						*request,
-						_env,
-						dataSource,
-						_logger
-					);
-				}
+				_exportStopPoints(linkedStopPoints);
 			}
+
 			return true;
-		}
-
-
-
-		void StopsShapeFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			stream << "<h1>Fichiers</h1>";
-
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			t.getForm().addHiddenField(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, string("1"));
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, false));
-			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
-			stream << t.cell("Uniquement mise à jour des arrêts existants", t.getForm().getOuiNonRadioInput(PARAMETER_UPDATE_ONLY, _updateOnly));
-			stream << t.title("Fichiers");
-			stream << t.cell("Fichier ShapeFile (arrêts)", t.getForm().getTextInput(_getFileParameterName(FILE_SHAPE), _pathsMap[FILE_SHAPE].file_string()));
-			stream << t.title("Paramètres Généraux");
-			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
-			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
-			stream << t.title("Attributs du fichier arrêts");
-			stream << t.cell("Nom principal de l'arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_NAME1, _stopName1 ? *_stopName1 : string()));
-			stream << t.cell("Sens de l'arrêt physique", t.getForm().getTextInput(PARAMETER_FIELD_STOP_DIRECTION,  _stopDirection ? *_stopDirection : string()));
-			stream << t.cell("Code Opérateur de l'arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_OPERATOR_CODE,  _stopOperatorCode ? *_stopOperatorCode : string()));
-			stream << t.cell("Nom de la commune", t.getForm().getTextInput(PARAMETER_FIELD_CITY_NAME, _cityName ? *_cityName : string()));
-			stream << t.cell("Code de la commune", t.getForm().getTextInput(PARAMETER_FIELD_CITY_CODE, _cityCode ? *_cityCode : string()));
-			stream << t.title("Génération code opérateur personnalisé");
-			stream << t.cell("Utiliser le sens", t.getForm().getOuiNonRadioInput(PARAMETER_USE_DIRECTION, _useDirection));
-			stream << t.cell("Code aller", t.getForm().getTextInput(PARAMETER_VALUE_FORWARD_DIRECTION, _valueForwardDirection ? *_valueForwardDirection : string()));
-			stream << t.cell("Code retour", t.getForm().getTextInput(PARAMETER_VALUE_BACKWARD_DIRECTION, _valueBackwardDirection ? *_valueBackwardDirection : string()));
-			stream << t.cell("Code aller/retour", t.getForm().getTextInput(PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION, _valueForwardBackwardDirection ? *_valueForwardBackwardDirection : string()));
-			stream << t.close();
 		}
 
 

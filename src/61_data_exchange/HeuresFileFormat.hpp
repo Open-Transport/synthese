@@ -24,10 +24,15 @@
 #define SYNTHESE_HeuresFileFormat_H__
 
 #include "FileFormatTemplate.h"
-#include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "OneFileExporter.hpp"
 #include "PTDataCleanerFileFormat.hpp"
+#include "PTOperationFileFormat.hpp"
+#include "PTFileFormat.hpp"
+
+#include "DepotTableSync.hpp"
+#include "DriverService.hpp"
+#include "ScheduledService.h"
 
 #include <iostream>
 #include <map>
@@ -66,6 +71,13 @@ namespace synthese
 		class TransportNetwork;
 	}
 
+	namespace pt_operation
+	{
+		class Depot;
+		class DeadRun;
+		class VehicleService;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -87,7 +99,9 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::MultipleFileTypesImporter<HeuresFileFormat>,
-				public PTDataCleanerFileFormat
+				public PTDataCleanerFileFormat,
+				public PTFileFormat,
+				public PTOperationFileFormat
 			{
 
 			public:
@@ -110,14 +124,50 @@ namespace synthese
 
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
-				typedef std::set<std::pair<int, std::string> > IgnoredRoutes;
-				mutable IgnoredRoutes _technicalRoutes;
 
-				typedef std::map<std::pair<int, int>, std::vector<pt::ScheduledService*> > ServicesMap;
+				typedef std::map<std::pair<int, int>, std::vector<pt::SchedulesBasedService*> > ServicesMap;
 				mutable ServicesMap _services;
 
 				typedef std::map<int, pt::Destination*> DestinationsMap;
 				mutable DestinationsMap _destinations;
+
+				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DepotTableSync> _depots;
+
+				struct ScheduleMapElement
+				{
+					typedef std::vector<std::pair<int, int> > TechnicalLink;
+					TechnicalLink technicalLink; // technical line, elementary service number
+					pt::ScheduledService::Schedules departure;
+					pt::ScheduledService::Schedules arrival;
+					std::vector<pt_operation::VehicleService*> vehicleServices;
+					typedef std::vector<
+						std::pair<
+							boost::shared_ptr<pt_operation::DriverService::Chunk>,
+							std::size_t // Rank in the chunk
+						>
+					> DriverServices;
+					DriverServices driverServices;
+				};
+
+				struct DeadRunRoute
+				{
+					bool depotToStop;
+					pt_operation::Depot* depot;
+					pt::StopPoint* stop;
+					graph::MetricOffset length;
+				};
+
+				typedef std::map<
+					std::pair<int, std::string>,
+					DeadRunRoute
+				> DeadRunRoutes;
+				mutable DeadRunRoutes _deadRunRoutes;
+
+				typedef std::map<
+					std::string,
+					boost::shared_ptr<pt_operation::DriverService::Chunk>
+				> Troncons;
+				mutable Troncons _troncons;
 
 			protected:
 
@@ -125,8 +175,7 @@ namespace synthese
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					const std::string& key,
-					boost::optional<const server::Request&> adminRequest
+					const std::string& key
 				) const;
 
 
@@ -135,22 +184,13 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
-				):	impex::Importer(env, import, logger),
-					impex::MultipleFileTypesImporter<HeuresFileFormat>(env, import, logger),
-					PTDataCleanerFileFormat(env, import, logger)
-				{}
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
+				);
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
+
 
 				virtual db::DBTransaction _save() const;
 
@@ -208,7 +248,6 @@ namespace synthese
 				virtual std::string getFileName() const { return "Heures.zip"; }
 			};
 		};
-	}
-}
+}	}
 
 #endif

@@ -53,8 +53,7 @@ namespace synthese
 
 		protected:
 			virtual bool _parse(
-				const boost::filesystem::path& filePath,
-				boost::optional<const server::Request&> request
+				const boost::filesystem::path& filePath
 			) const = 0;
 
 			FilePathsSet _pathsSet;
@@ -68,9 +67,13 @@ namespace synthese
 			OneFileTypeImporter(
 				util::Env& env,
 				const Import& import,
-				const impex::ImportLogger& logger
-			):	Importer(env, import, logger)
+				impex::ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
+			):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
 			{}
+
 
 
 			void setFromParametersMap(
@@ -130,13 +133,12 @@ namespace synthese
 
 
 			bool parseFiles(
-				boost::optional<const server::Request&> request
 			) const {
 
 				bool result(true);
 				BOOST_FOREACH(const FilePathsSet::value_type& path, _pathsSet)
 				{
-					result &= _parse(path, request);
+					result &= _parse(path);
 				}
 				return result;
 			}

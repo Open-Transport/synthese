@@ -53,6 +53,10 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_LOGS;
 			static const std::string PARAMETER_MIN_LOG_LEVEL;
 
+			static const std::string ATTR_SUCCESS;
+			static const std::string ATTR_DONE;
+			static const std::string TAG_LOG_ENTRY;
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			/// Initializes a dedicated environment for the storage of the imported
@@ -63,8 +67,9 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				bool							_doImport;
+				bool							_importDone;
 				boost::shared_ptr<Importer>		_importer;
-				boost::shared_ptr<ImportLogger>	_importLogger;
+				mutable util::ParametersMap		_result;
 			//@}
 
 			mutable std::stringstream _output;

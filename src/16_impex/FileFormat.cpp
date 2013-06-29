@@ -22,6 +22,8 @@
 
 #include "FileFormat.h"
 
+#include "ParametersMap.h"
+
 using namespace std;
 
 namespace synthese

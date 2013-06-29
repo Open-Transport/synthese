@@ -52,7 +52,6 @@ namespace synthese
 
 
 		bool InterSYNTHESEFileFormat::Importer_::_read(
-			boost::optional<const server::Request&> request
 		) const	{
 			try
 			{
@@ -266,9 +265,12 @@ namespace synthese
 		InterSYNTHESEFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			ConnectionImporter<InterSYNTHESEFileFormat>(env, import, logger)
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			ConnectionImporter<InterSYNTHESEFileFormat>(env, import, minLogLevel, logPath, outputStream, pm)
 		{}
 }	}
 

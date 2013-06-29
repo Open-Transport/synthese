@@ -24,38 +24,18 @@
 
 #include "Import.hpp"
 #include "TransportNetwork.h"
-#include "StopArea.hpp"
 #include "Destination.hpp"
-#include "PTFileFormat.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "ImpExModule.h"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "AdminActionFunctionRequest.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
-#include "PTPlaceAdmin.h"
-#include "StopPointAdmin.hpp"
-#include "StopAreaAddAction.h"
 #include "RollingStock.hpp"
-#include "StopArea.hpp"
 #include "DataSource.h"
 #include "Importer.hpp"
-#include "AdminActionFunctionRequest.hpp"
-#include "HTMLModule.h"
-#include "HTMLForm.h"
 #include "DBModule.h"
-#include "GTFSFileFormat.hpp"
-#include "City.h"
-#include "PTFileFormat.hpp"
 #include "CityTableSync.h"
-#include "Junction.hpp"
 #include "JunctionTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "PTUseRuleTableSync.h"
@@ -92,8 +72,6 @@ namespace synthese
 	using namespace db;
 	using namespace calendar;
 	using namespace graph;
-	using namespace html;
-	using namespace admin;
 	using namespace server;
 	using namespace geography;
 	using namespace vehicle;
@@ -175,10 +153,14 @@ namespace synthese
 		GTFSFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& importLogger
-		):	Importer(env, import, importLogger),
-			MultipleFileTypesImporter<GTFSFileFormat>(env, import, importLogger),
-			PTDataCleanerFileFormat(env, import, importLogger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			MultipleFileTypesImporter<GTFSFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_importStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
@@ -191,8 +173,7 @@ namespace synthese
 
 		bool GTFSFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const std::string& key,
-			boost::optional<const server::Request&> request
+			const std::string& key
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -207,7 +188,7 @@ namespace synthese
 			}
 			_loadFieldsMap(line);
 
-			_log(ImportLogger::INFO, "Loading file "+ filePath.file_string() +" as "+ key);
+			_logInfo("Loading file "+ filePath.file_string() +" as "+ key);
 
 			DataSource& dataSource(*_import.get<DataSource>());
 
@@ -235,63 +216,38 @@ namespace synthese
 						string id(_getValue("stop_id"));
 						string name(_getValue("stop_name"));
 
-						if(request)
-						{
-							PTFileFormat::ImportableStopArea isa;
-							isa.operatorCode = id;
-							isa.name = name;
-							isa.linkedStopAreas = stopAreas.get(id);
+						PTFileFormat::ImportableStopArea isa;
+						isa.operatorCode = id;
+						isa.name = name;
+						isa.linkedStopAreas = stopAreas.get(id);
 
-							if(isa.linkedStopAreas.empty())
-							{
-								nonLinkedStopAreas.push_back(isa);
-							}
-							else if(_displayLinkedStops)
-							{
-								linkedStopAreas.push_back(isa);
-							}
-						}
-						else
+						if(isa.linkedStopAreas.empty())
 						{
-							PTFileFormat::CreateOrUpdateStopAreas(
-								stopAreas,
-								id,
-								name,
-								_defaultCity.get(),
-								false,
-								_stopAreaDefaultTransferDuration,
-								dataSource,
-								_env,
-								_logger
-							);
+							nonLinkedStopAreas.push_back(isa);
 						}
+						else if(_displayLinkedStops)
+						{
+							linkedStopAreas.push_back(isa);
+						}
+						_createOrUpdateStopAreas(
+							stopAreas,
+							id,
+							name,
+							_defaultCity.get(),
+							false,
+							_stopAreaDefaultTransferDuration,
+							dataSource
+						);
 					}
 
-					if(request)
+					_exportStopAreas(
+						nonLinkedStopAreas
+					);
+					if(_displayLinkedStops)
 					{
-						PTFileFormat::DisplayStopAreaImportScreen(
-							nonLinkedStopAreas,
-							*request,
-							true,
-							false,
-							_defaultCity,
-							_env,
-							dataSource,
-							_logger
+						_exportStopAreas(
+							linkedStopAreas
 						);
-						if(_displayLinkedStops)
-						{
-							PTFileFormat::DisplayStopAreaImportScreen(
-								linkedStopAreas,
-								*request,
-								true,
-								false,
-								_defaultCity,
-								_env,
-								dataSource,
-								_logger
-							);
-						}
 					}
 				}
 
@@ -327,8 +283,7 @@ namespace synthese
 					}
 					else
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"inconsistent stop area id "+ stopAreaId +" in the stop point "+ id
 						);
 						continue;
@@ -352,50 +307,37 @@ namespace synthese
 					isp.stopArea = stopArea;
 					isp.coords = point;
 
-					if(request && isp.linkedStopPoints.empty())
+					if(isp.linkedStopPoints.empty())
 					{
 						nonLinkedStopPoints.push_back(isp);
 					}
-					else if(request && _displayLinkedStops)
+					else if(_displayLinkedStops)
 					{
 						linkedStopPoints.push_back(isp);
 					}
 					else
 					{
 						// Creation or update
-						PTFileFormat::CreateOrUpdateStop(
+						_createOrUpdateStop(
 							_stopPoints,
 							id,
 							name,
 							optional<const RuleUser::Rules&>(),
 							stopArea,
 							point.get(),
-							dataSource,
-							_env,
-							_logger
+							dataSource
 						);
 					}
 				}
 
-				if(request)
+				_exportStopPoints(
+					nonLinkedStopPoints
+				);
+				if(_displayLinkedStops)
 				{
-					PTFileFormat::DisplayStopPointImportScreen(
-						nonLinkedStopPoints,
-						*request,
-						_env,
-						dataSource,
-						_logger
+					_exportStopPoints(
+						linkedStopPoints
 					);
-					if(_displayLinkedStops)
-					{
-						PTFileFormat::DisplayStopPointImportScreen(
-							linkedStopPoints,
-							*request,
-							_env,
-							dataSource,
-							_logger
-						);
-					}
 				}
 
 				if(!nonLinkedStopPoints.empty())
@@ -413,13 +355,11 @@ namespace synthese
 				{
 					_loadLine(line);
 
-					PTFileFormat::CreateOrUpdateNetwork(
+					_createOrUpdateNetwork(
 						_networks,
 						_getValue("agency_id"),
 						_getValue("agency_name"),
-						dataSource,
-						_env,
-						_logger
+						dataSource
 					);
 				}
 			}
@@ -444,8 +384,7 @@ namespace synthese
 					}
 					else
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Inconsistent network id "+ networkId +" in the line "+ id
 						);
 						continue;
@@ -463,16 +402,14 @@ namespace synthese
 						color = RGBColor::FromXMLColor(colorStr);
 					}
 
-					PTFileFormat::CreateOrUpdateLine(
+					_createOrUpdateLine(
 						_lines,
 						id,
 						_getValue("route_long_name"),
 						_getValue("route_short_name"),
 						color,
 						*network,
-						dataSource,
-						_env,
-						_logger
+						dataSource
 					);
 				}
 			}
@@ -498,8 +435,7 @@ namespace synthese
 					string endDateStr(_getValue("end_date"));
 					if(startDateStr.size() != 8 || endDateStr.size() != 8)
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Inconsistent dates in "+ line +" ("+ startDateStr +" and "+ endDateStr +")"
 						);
 						continue;
@@ -541,8 +477,7 @@ namespace synthese
 					string dateStr(_getValue("date"));
 					if(dateStr.size() != 8)
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Inconsistent date in "+ line
 						);
 						continue;
@@ -577,8 +512,7 @@ namespace synthese
 					string lineCode(_getValue("route_id"));
 					if(!_lines.contains(lineCode))
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Inconsistent line id "+ lineCode +" in the trip "+ id
 						);
 						continue;
@@ -602,8 +536,7 @@ namespace synthese
 					Calendars::const_iterator it(_calendars.find(calendarCode));
 					if(it == _calendars.end())
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Inconsistent service id "+ calendarCode +" in the trip "+ id
 						);
 						continue;
@@ -636,8 +569,7 @@ namespace synthese
 						TripsMap::const_iterator it(_trips.find(lastTripCode));
 						if(it == _trips.end())
 						{
-							_log(
-								ImportLogger::WARN,
+							_logWarning(
 								"Inconsistent trip id "+ lastTripCode +" in the trip stops file"
 							);
 							continue;
@@ -662,7 +594,7 @@ namespace synthese
 						rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = trip.useRule;
 
 						JourneyPattern* route(
-							PTFileFormat::CreateOrUpdateRoute(
+							_createOrUpdateRoute(
 								*trip.line,
 								optional<const string&>(),
 								optional<const string&>(),
@@ -673,8 +605,6 @@ namespace synthese
 								NULL,
 								stops,
 								dataSource,
-								_env,
-								_logger,
 								true,
 								true
 						)	);
@@ -692,14 +622,12 @@ namespace synthese
 						}
 
 						ScheduledService* service(
-							PTFileFormat::CreateOrUpdateService(
+							_createOrUpdateService(
 								*route,
 								departures,
 								arrivals,
 								lastTripCode,
-								dataSource,
-								_env,
-								_logger
+								dataSource
 						)	);
 						if(service)
 						{
@@ -749,8 +677,7 @@ namespace synthese
 					string stopCode(_getValue("stop_id"));
 					if(!_stopPoints.contains(stopCode))
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"inconsistent stop id "+ stopCode +" in the trip "+ tripCode
 						);
 						continue;

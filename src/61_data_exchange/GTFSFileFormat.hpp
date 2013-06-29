@@ -23,10 +23,11 @@
 #ifndef SYNTHESE_GTFSFileFormat_H__
 #define SYNTHESE_GTFSFileFormat_H__
 
-#include "FileFormatTemplate.h"
 #include "Calendar.h"
+#include "FileFormatTemplate.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "OneFileExporter.hpp"
+#include "PTFileFormat.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
@@ -80,7 +81,8 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::MultipleFileTypesImporter<GTFSFileFormat>,
-				public PTDataCleanerFileFormat
+				public PTDataCleanerFileFormat,
+				public PTFileFormat
 			{
 			public:
 				static const std::string FILE_STOPS;
@@ -158,8 +160,7 @@ namespace synthese
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					const std::string& key,
-					boost::optional<const server::Request&> adminRequest
+					const std::string& key
 				) const;
 
 
@@ -167,7 +168,10 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& importLogger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 
 

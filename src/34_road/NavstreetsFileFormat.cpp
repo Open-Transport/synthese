@@ -22,23 +22,16 @@
 
 #include "NavstreetsFileFormat.hpp"
 
-#include "AdminFunctionRequest.hpp"
 #include "CityTableSync.h"
 #include "CoordinatesSystem.hpp"
-#include "Crossing.h"
 #include "CrossingTableSync.hpp"
 #include "DataSource.h"
-#include "DataSourceAdmin.h"
 #include "DBTransaction.hpp"
 #include "EdgeProjector.hpp"
 #include "Import.hpp"
-#include "ImportFunction.h"
 #include "PublicPlaceTableSync.h"
 #include "PublicPlaceEntranceTableSync.hpp"
-#include "PropertiesHTMLTable.h"
-#include "Road.h"
 #include "RoadChunkTableSync.h"
-#include "RoadFileFormat.hpp"
 #include "RoadPlaceTableSync.h"
 #include "RoadTableSync.h"
 #include "VirtualShapeVirtualTable.hpp"
@@ -61,11 +54,9 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace algorithm;
-	using namespace admin;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
-	using namespace html;
 	using namespace impex;
 	using namespace road;
 	using namespace server;
@@ -156,8 +147,7 @@ namespace synthese
 
 		bool NavstreetsFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const std::string& key,
-			boost::optional<const server::Request&> adminRequest
+			const std::string& key
 		) const {
 
 			DataSource& dataSource(*_import.get<DataSource>());
@@ -469,18 +459,15 @@ namespace synthese
 						}
 
 						// RoadPlace
-						RoadPlace* roadPlace = RoadFileFormat::CreateOrUpdateRoadPlace(
+						RoadPlace* roadPlace = _createOrUpdateRoadPlace(
 							_roadPlaces,
 							roadCode,
 							roadName,
-							*city,
-							dataSource,
-							_env,
-							_logger
+							*city
 						);
 
 						// Chunk insertion
-						RoadFileFormat::AddRoadChunk(
+						_addRoadChunk(
 							*roadPlace,
 							*leftNode,
 							*rightNode,
@@ -489,7 +476,6 @@ namespace synthese
 							leftHouseNumberingPolicy,
 							rightHouseNumberBounds,
 							leftHouseNumberBounds,
-							_env,
 							Road::ROAD_TYPE_UNKNOWN
 						);
 					}
@@ -564,15 +550,12 @@ namespace synthese
 
 							// PublicPlace
 							PublicPlace* publicPlace(
-								RoadFileFormat::CreateOrUpdatePublicPlace(
+								_createOrUpdatePublicPlace(
 									publicPlaces,
 									poiId,
 									poiName,
 									geometry,
-									*city,
-									dataSource,
-									_env,
-									_logger
+									*city
 							)	);
 
 							// PublicPlaceEntrance
@@ -585,17 +568,14 @@ namespace synthese
 								roadChunk->getMetricOffset()
 							);
 
-							RoadFileFormat::CreateOrUpdatePublicPlaceEntrance(
+							_createOrUpdatePublicPlaceEntrance(
 								publicPlaceEntrances,
 								poiId,
 								optional<const string&>(),
 								metricOffset,
 								houseNumber,
 								*roadChunk,
-								*publicPlace,
-								dataSource,
-								_env,
-								_logger
+								*publicPlace
 							);
 						}
 						catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
@@ -696,25 +676,6 @@ namespace synthese
 
 
 
-		void NavstreetsFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
-			PropertiesHTMLTable t(importRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Propriétés");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.title("Données");
-			stream << t.cell("Rues (streets)", t.getForm().getTextInput(_getFileParameterName(FILE_STREETS), _pathsMap[FILE_STREETS].file_string()));
-			stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(_getFileParameterName(FILE_MTDAREA), _pathsMap[FILE_MTDAREA].file_string()));
-			stream << t.cell("Lieux publics (poi)", t.getForm().getTextInput(_getFileParameterName(FILE_PUBLIC_PLACES), _pathsMap[FILE_PUBLIC_PLACES].file_string()));
-			stream << t.cell("Auto création des communes", t.getForm().getOuiNonRadioInput(PARAMETER_CITIES_AUTO_CREATION, false));
-			stream << t.close();
-		}
-
-
-
 		util::ParametersMap NavstreetsFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap result;
@@ -734,9 +695,13 @@ namespace synthese
 		NavstreetsFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	impex::Importer(env, import, logger),
-			impex::MultipleFileTypesImporter<NavstreetsFileFormat>(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	impex::Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			impex::MultipleFileTypesImporter<NavstreetsFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			RoadFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_roadPlaces(*import.get<DataSource>(), env)
 		{}
 }	}
