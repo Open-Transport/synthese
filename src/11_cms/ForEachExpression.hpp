@@ -58,8 +58,13 @@ namespace synthese
 			static const std::string PARAMETER_TEMPLATE;
 			static const std::string PARAMETER_RECURSIVE;
 
-
-			std::string _arrayCode;
+			struct Item
+			{
+				std::string key;
+				boost::shared_ptr<Expression> index;
+			};
+			typedef std::vector<Item> Items;
+			Items _variable;
 
 			CMSScript _pageCode;
 			CMSScript _inlineTemplate;
