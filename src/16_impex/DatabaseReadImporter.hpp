@@ -45,16 +45,17 @@ namespace synthese
 			DatabaseReadImporter(
 				util::Env& env,
 				const Import& import,
-				const impex::ImportLogger& logger
-			):	Importer(env, import, logger)
+				impex::ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
+			):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
 			{}
 
 		protected:
 			std::string _database;
 
-			virtual bool _read(
-				boost::optional<const server::Request&> request
-			) const = 0;
+			virtual bool _read() const = 0;
 
 			virtual void _setFromParametersMap(const util::ParametersMap& map) {}
 
@@ -78,10 +79,9 @@ namespace synthese
 
 
 			bool parseFiles(
-				boost::optional<const server::Request&> request
 			) const {
 				bool result(true);
-				result &= _read(request);
+				result &= _read();
 				return result;
 			}
 		};

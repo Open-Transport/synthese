@@ -23,9 +23,11 @@
 #ifndef SYNTHESE_impex_Importer_hpp__
 #define SYNTHESE_impex_Importer_hpp__
 
-#include "ImportLogger.hpp"
+#include "ImpExTypes.hpp"
+#include "ImportableTableSync.hpp"
 
 #include <ostream>
+#include <fstream>
 #include <boost/optional.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -50,7 +52,6 @@ namespace synthese
 	namespace impex
 	{
 		class Import;
-		class ImportLogger;
 
 		/** Importer class.
 			@ingroup m16
@@ -59,29 +60,58 @@ namespace synthese
 		{
 		public:
 
+			static const std::string ATTR_IMPORT_START_TIME;
+			static const std::string TAG_LOG_ENTRY;
+			static const std::string ATTR_LEVEL;
+			static const std::string ATTR_TEXT;
+
 			Importer(
 				util::Env& env,
 				const Import& import,
-				const ImportLogger& logger
+				ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
 			);
 
 		protected:
 			util::Env&				_env;
 			const Import&			_import;
-			const ImportLogger&		_logger;
+			mutable ImportLogLevel _maxLoggedLevel;	//!< Records the worse log level of the content
+			const ImportLogLevel _minLogLevel;	//!< Minimal level of entries to store in the content
+			mutable std::auto_ptr<std::ofstream> _fileStream;		//!< Stream on the file where the content must be sent
+			mutable boost::optional<std::ostream&> _outputStream;		//!< An output stream where the content must be sent
+			mutable util::ParametersMap& _pm;	//!< Parameters map where entries must be stored
+
 
 			virtual db::DBTransaction _save() const = 0;
 
+		private:
 			void _log(
-				ImportLogger::Level level,
+				ImportLogLevel level,
 				const std::string& content
 			) const;
+
+		protected:
 			void _logError(const std::string& content) const;
 			void _logWarning(const std::string& content) const;
 			void _logDebug(const std::string& content) const;
 			void _logInfo(const std::string& content) const;
 			void _logLoad(const std::string& content) const;
 			void _logCreation(const std::string& content) const;
+			void _logRaw(
+				const std::string& content
+			) const;
+
+			ImportLogLevel _getMaxLoggedLevel() const { return _maxLoggedLevel; }
+
+			template<class T>
+			typename T::ObjectType* _loadOrCreateObject(
+				impex::ImportableTableSync::ObjectBySource<T>& objects,
+				const std::string& id,
+				const impex::DataSource& source,
+				const std::string& logName
+			) const;
 
 		public:
 			//! @name Getters
@@ -124,11 +154,9 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Launches the parsing of the files, with output on an admin page.
-			/// @param request
+			/// @param result the parameters map where output can be done
 			/// @return true if it is allowed to save the data
-			virtual bool parseFiles(
-				boost::optional<const server::Request&> request
-			) const = 0;
+			virtual bool parseFiles() const = 0;
 
 
 
@@ -137,6 +165,47 @@ namespace synthese
 			/// @return transaction to run
 			db::DBTransaction save() const;
 		};
+
+
+
+		template<class T>
+		typename T::ObjectType* Importer::_loadOrCreateObject(
+			ImportableTableSync::ObjectBySource<T>& objects,
+			const std::string& id,
+			const impex::DataSource& source,
+			const std::string& logName
+		) const {
+			std::set<typename T::ObjectType*> loadedObjects(objects.get(id));
+			if(!loadedObjects.empty())
+			{
+				if(!logName.empty())
+				{
+					std::stringstream logStream;
+					logStream << "Link between " << logName << " " << id << " and ";
+					BOOST_FOREACH(typename T::ObjectType* o, loadedObjects)
+					{
+						logStream << o->getKey();
+					}
+					_logLoad(logStream.str());
+				}
+				return *loadedObjects.begin();
+			}
+			boost::shared_ptr<typename T::ObjectType> o(new typename T::ObjectType(T::getId()));
+
+			Importable::DataSourceLinks links;
+			links.insert(make_pair(&source, id));
+			o->setDataSourceLinksWithoutRegistration(links);
+			_env.getEditableRegistry<typename T::ObjectType>().add(o);
+			objects.add(*o);
+
+			if(!logName.empty())
+			{
+				_logCreation(
+					"Creation of the "+ logName +"  with key "+ id
+				);
+			}
+			return o.get();
+		}
 }	}
 
 #endif // SYNTHESE_impex_Importer_hpp__

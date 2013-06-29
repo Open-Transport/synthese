@@ -54,11 +54,16 @@ namespace synthese
 		const string ImportFunction::PARAMETER_MIN_LOG_LEVEL = "min_log_level";
 		const string ImportFunction::PARAMETER_OUTPUT_LOGS = "output_logs";
 
+		const string ImportFunction::ATTR_SUCCESS = "success";
+		const string ImportFunction::ATTR_DONE = "done";
+		const string ImportFunction::TAG_LOG_ENTRY = "log_entry";
+
 
 
 		ImportFunction::ImportFunction():
 			FactorableTemplate<Function, ImportFunction>(),
-			_doImport(false)
+			_doImport(false),
+			_importDone(false)
 		{
 			setEnv(boost::shared_ptr<Env>(new Env));
 		}
@@ -94,10 +99,10 @@ namespace synthese
 				bool outputLogs(map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false));
 
 				// Min log force
-				ImportLogger::Level minLogLevel(import->get<MinLogLevel>());
+				ImportLogLevel minLogLevel(import->get<MinLogLevel>());
 				if(map.isDefined(PARAMETER_MIN_LOG_LEVEL))
 				{
-					minLogLevel = static_cast<ImportLogger::Level>(map.get<int>(PARAMETER_MIN_LOG_LEVEL));
+					minLogLevel = static_cast<ImportLogLevel>(map.get<int>(PARAMETER_MIN_LOG_LEVEL));
 				}
 
 				// Log path force
@@ -110,30 +115,33 @@ namespace synthese
 				// Logger generation
 				if(outputLogs)
 				{
-					_importLogger.reset(
-						new ImportLogger(
-							minLogLevel,
-							logPath,
-							_output
-					)	);
+					// Importer generation
+					_importer = import->getImporter(
+						*_env,
+						minLogLevel,
+						logPath,
+						_output,
+						_result
+					);
 				}
 				else
 				{
-					_importLogger.reset(
-						new ImportLogger(
+					// Importer generation
+					_importer = import->getImporter(
+						*_env,
 						minLogLevel,
 						logPath,
-						optional<ostream&>()
-					)	);
+						optional<ostream&>(),
+						_result
+					);
 				}
 
-				// Importer generation
-				_importer = import->getImporter(*_env, *_importLogger);
 				_importer->setFromParametersMap(map, true);
 
-				_doImport = _importer->beforeParsing();
-				_doImport &= _importer->parseFiles(optional<const Request&>()) && map.isTrue(PARAMETER_DO_IMPORT);
-				_doImport &=_importer->afterParsing();
+				_doImport = map.isTrue(PARAMETER_DO_IMPORT);
+				_importDone = _importer->beforeParsing();
+				_importDone &= _importer->parseFiles();
+				_importDone &=_importer->afterParsing();
 			}
 			catch(ObjectNotFoundException<DataSource> e)
 			{
@@ -152,31 +160,22 @@ namespace synthese
 			const Request& request
 		) const	{
 
-			ParametersMap pm;
-
-			if(_doImport)
+			if(_doImport && _importDone)
 			{
 				_importer->save().run();
 
-				// If no log output
-				if(!_importLogger->getOutputStream())
-				{
-					stream << "0";
-				}
+				// Result
+				_result.insert(ATTR_DONE, true);
+				_result.insert(ATTR_SUCCESS, true);
 			}
 			else
 			{
-				if(!_importLogger->getOutputStream())
-				{
-					stream << "1";
-				}
-			}
-			if(_importLogger->getOutputStream())
-			{
-				stream << _output.str();
+				// Result
+				_result.insert(ATTR_DONE, false);
+				_result.insert(ATTR_SUCCESS, _importDone);
 			}
 
-			return pm;
+			return _result;
 		}
 
 

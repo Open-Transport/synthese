@@ -24,6 +24,7 @@
 #define SYNTHESE_pt_PTDataCleanerFileFormat_hpp__
 
 #include "Importer.hpp"
+
 #include "Calendar.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
@@ -74,7 +75,10 @@ namespace synthese
 			PTDataCleanerFileFormat(
 				util::Env& env,
 				const impex::Import& import,
-				const impex::ImportLogger& importLogger
+				impex::ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
 			);
 
 			virtual bool beforeParsing();

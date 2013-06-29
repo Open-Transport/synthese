@@ -81,8 +81,7 @@ namespace synthese
 			protected:
 
 				virtual bool _parse(
-					const boost::filesystem::path& filePath,
-					boost::optional<const server::Request&> adminRequest
+					const boost::filesystem::path& filePath
 				) const;
 
 			public:
@@ -96,20 +95,11 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @author Sylvain Pasche
-				/// @date 2011
-				/// @since 3.3.0
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
 
 
 

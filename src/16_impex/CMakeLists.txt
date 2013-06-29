@@ -32,6 +32,7 @@ ImpExModule.gen.cpp
 ImpExModuleRegister.cpp
 ImpExModule.h
 ImpExModule.inc.cpp
+ImpExTypes.hpp
 Import.cpp
 Import.hpp
 Importable.cpp
@@ -45,8 +46,6 @@ Importer.cpp
 Importer.hpp
 ImportFunction.cpp
 ImportFunction.h
-ImportLogger.cpp
-ImportLogger.hpp
 ImportsService.cpp
 ImportsService.hpp
 ImportTableSync.cpp

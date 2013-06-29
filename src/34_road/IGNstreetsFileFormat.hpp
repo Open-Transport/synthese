@@ -83,6 +83,16 @@ namespace synthese
 					static const std::string PARAMETER_MAX_HOUSE_DISTANCE;
 				//@}
 
+				static const std::string TAG_MISSING_STREET;
+				static const std::string ATTR_SOURCE_NAME;
+				static const std::string TAG_CITY;
+				static const std::string ATTR_IMPORTED_ADDRESSES;
+				static const std::string ATTR_NOT_IMPORTED_CITY_NOT_FOUND;
+				static const std::string ATTR_NOT_IMPORTED_STREET_NOT_FOUND;
+				static const std::string ATTR_NOT_IMPORTED_EMPTY_STREET_NAME;
+				static const std::string ATTR_NOT_IMPORTED_STREET_TOO_FAR;
+
+
 
 			protected:
 				bool _displayStats;
@@ -105,8 +115,7 @@ namespace synthese
 				/// @date 2010
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					const std::string& key,
-					boost::optional<const server::Request&> request
+					const std::string& key
 				) const;
 
 
@@ -114,7 +123,10 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 
 				//////////////////////////////////////////////////////////////////////////
@@ -133,16 +145,6 @@ namespace synthese
 				/// @since 3.1.16
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
 
 
 				//////////////////////////////////////////////////////////////////////////

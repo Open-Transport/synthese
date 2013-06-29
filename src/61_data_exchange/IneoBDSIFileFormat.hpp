@@ -30,7 +30,6 @@
 #include "FileFormatTemplate.h"
 #include "NoExportPolicy.hpp"
 
-#include "ImportLogger.hpp"
 #include "SchedulesBasedService.h"
 
 namespace synthese
@@ -188,8 +187,7 @@ namespace synthese
 				typedef std::map<int, Chainage> Chainages;
 				typedef std::map<int, Programmation> Programmations;
 
-				void _logLoad(
-					impex::ImportLogger::Level level,
+				void _logLoadDetail(
 					const std::string& table,
 					const std::string& localId,
 					const std::string& locaName,
@@ -200,6 +198,27 @@ namespace synthese
 					const std::string& remarks
 				) const;
 
+				void _logWarningDetail(
+					const std::string& table,
+					const std::string& localId,
+					const std::string& locaName,
+					const util::RegistryKeyType syntheseId,
+					const std::string& syntheseName,
+					const std::string& oldValue,
+					const std::string& newValue,
+					const std::string& remarks
+				) const;
+
+				void _logDebugDetail(
+					const std::string& table,
+					const std::string& localId,
+					const std::string& locaName,
+					const util::RegistryKeyType syntheseId,
+					const std::string& syntheseName,
+					const std::string& oldValue,
+					const std::string& newValue,
+					const std::string& remarks
+				) const;
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////
@@ -219,7 +238,10 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 
 
@@ -228,9 +250,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// The action execution code.
-				/// @param request the request which has launched the action
 				virtual bool _read(
-					boost::optional<const server::Request&> request
 				) const;
 			};
 

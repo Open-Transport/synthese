@@ -25,10 +25,12 @@
 #define SYNTHESE_IMPEX_TRIDENTEXPORT_H
 
 #include "FileFormatTemplate.h"
-#include "CoordinatesSystem.hpp"
 #include "OneFileTypeImporter.hpp"
 #include "OneFileExporter.hpp"
 #include "PTDataCleanerFileFormat.hpp"
+#include "PTFileFormat.hpp"
+
+#include "CoordinatesSystem.hpp"
 #include "ImportableTableSync.hpp"
 #include "CalendarTemplateTableSync.h"
 #include "StopPointTableSync.hpp"
@@ -130,7 +132,8 @@ namespace synthese
 
 			class Importer_:
 				public impex::OneFileTypeImporter<Importer_>,
-				public PTDataCleanerFileFormat
+				public PTDataCleanerFileFormat,
+				public PTFileFormat
 			{
 			private:
 				//! @name Import parameters
@@ -180,7 +183,10 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 
 
@@ -202,6 +208,8 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.1.16
 				virtual util::ParametersMap _getParametersMap() const;
+
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
@@ -225,26 +233,12 @@ namespace synthese
 				///		<li>Scheduled services (ScheduledService) : all. Not imported if the service runs never.
 				/// </ul>
 				virtual bool _parse(
-					const boost::filesystem::path& filePath,
-					boost::optional<const server::Request&> adminRequest
+					const boost::filesystem::path& filePath
 				) const;
+
+
 
 				virtual db::DBTransaction _save() const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @author Hugues Romain
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
-
 			};
 
 			class Exporter_:

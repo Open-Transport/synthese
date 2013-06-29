@@ -36,9 +36,6 @@
 #include "DBTransaction.hpp"
 #include "VirtualShapeVirtualTable.hpp"
 #include "AdminFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
-#include "ImportFunction.h"
-#include "PropertiesHTMLTable.h"
 #include "FrenchPhoneticString.h"
 
 #include <boost/lexical_cast.hpp>
@@ -89,6 +86,16 @@ namespace synthese
 		const string HousesCSVFileFormat::PARAMETER_FIELD_NUMBER = "field_number";
 		const string HousesCSVFileFormat::PARAMETER_FIELD_GEOMETRY_X = "field_x";
 		const string HousesCSVFileFormat::PARAMETER_FIELD_GEOMETRY_Y = "field_y";
+
+		const std::string HousesCSVFileFormat::Importer_::TAG_MISSING_CITY = "missing_city";
+		const std::string HousesCSVFileFormat::Importer_::TAG_MISSING_STREET = "missing_street";
+		const std::string HousesCSVFileFormat::Importer_::ATTR_SOURCE_NAME = "source_name";
+		const std::string HousesCSVFileFormat::Importer_::TAG_CITY = "city";
+		const std::string HousesCSVFileFormat::Importer_::ATTR_IMPORTED_ADDRESSES = "imported_addresses";
+		const std::string HousesCSVFileFormat::Importer_::ATTR_NOT_IMPORTED_CITY_NOT_FOUND = "not_imported_city_not_found";
+		const std::string HousesCSVFileFormat::Importer_::ATTR_NOT_IMPORTED_STREET_NOT_FOUND = "not_imported_street_not_found";
+		const std::string HousesCSVFileFormat::Importer_::ATTR_NOT_IMPORTED_EMPTY_STREET_NAME = "not_imported_empty_street_name";
+		const std::string HousesCSVFileFormat::Importer_::ATTR_NOT_IMPORTED_STREET_TOO_FAR = "not_imported_street_too_far";
 	}
 
 	namespace impex
@@ -100,6 +107,21 @@ namespace synthese
 
 	namespace road
 	{
+		HousesCSVFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	impex::Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			impex::MultipleFileTypesImporter<HousesCSVFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			_displayStats(false),
+			_maxHouseDistance(200)
+		{}
+
+
+
 		bool HousesCSVFileFormat::Importer_::_checkPathsMap() const
 		{
 			// ADDRESS
@@ -117,8 +139,7 @@ namespace synthese
 
 		bool HousesCSVFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const std::string& key,
-			boost::optional<const server::Request&> adminRequest
+			const std::string& key
 		) const {
 			// 1 : Administrative areas
 
@@ -307,88 +328,40 @@ namespace synthese
 
 				}
 
-				if(!missingCities.empty())
+				// Export of missing cities
+				BOOST_FOREACH(const string missingCity, missingCities)
 				{
-					stringstream os;
-					os << "<h1>Villes non trouvées</h1>";
+					// Parameters map
+					boost::shared_ptr<ParametersMap> cityPM(new ParametersMap);
+					_pm.insert(TAG_MISSING_CITY, cityPM);
 
-					// Header
-					HTMLTable::ColsVector c;
-					c.push_back("Commune");
-
-					// Table
-					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-					os << t.open();
-					BOOST_FOREACH(const string missingCity, missingCities)
-					{
-						os << t.row();
-						os << t.col() << missingCity;
-					}
-					os << t.close();
-					_logger.logRaw(os.str());
+					// Name
+					cityPM->insert(ATTR_SOURCE_NAME, missingCity);
 				}
 
-				if(!missingStreets.empty())
+				// Export of missing streets
+				BOOST_FOREACH(const MissingStreets::value_type& missingStreet, missingStreets)
 				{
-					stringstream os;
-					os << "<h1>Rues non trouvées</h1>";
+					// Parameters map
+					boost::shared_ptr<ParametersMap> streetPM(new ParametersMap);
+					_pm.insert(TAG_MISSING_STREET, streetPM);
 
-					// Header
-					HTMLTable::ColsVector c;
-					c.push_back("Commune");
-					c.push_back("Rue");
+					// Name
+					streetPM->insert(ATTR_SOURCE_NAME, missingStreet.second);
 
-					// Table
-					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-					os << t.open();
-					BOOST_FOREACH(const MissingStreets::value_type& missingStreet, missingStreets)
-					{
-						os << t.row();
-						os << t.col() << missingStreet.first->getName();
-						os << t.col() << missingStreet.second;
-					}
-					os << t.close();
-					_logger.logRaw(os.str());
+					// City
+					boost::shared_ptr<ParametersMap> cityPM(new ParametersMap);
+					missingStreet.first->toParametersMap(*streetPM);
+					streetPM->insert(TAG_CITY, cityPM);
 				}
 
 				if(_displayStats)
 				{
-					size_t total(ok + cityNotFound + roadNotFound + emptyStreetName + badGeometry + streetTooFar);
-
-					stringstream os;
-					os << "<h1>Statistiques</h1>";
-
-					// Header
-					HTMLTable::ColsVector c;
-					c.push_back("Métrique");
-					c.push_back("Nombre");
-					c.push_back("%");
-
-					// Table
-					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-					os << t.open();
-					os << t.row();
-					os << t.col() << "Adresses importées";
-					os << t.col() << ok;
-					os << t.col() << floor(100 * (double(ok) / double(total)));
-					os << t.row();
-					os << t.col() << "Commune non trouvée";
-					os << t.col() << cityNotFound;
-					os << t.col() << floor(100 * (double(cityNotFound) / double(total)));
-					os << t.row();
-					os << t.col() << "Rue non trouvée";
-					os << t.col() << roadNotFound;
-					os << t.col() << floor(100 * (double(roadNotFound) / double(total)));
-					os << t.row();
-					os << t.col() << "Nom de rue vide";
-					os << t.col() << emptyStreetName;
-					os << t.col() << floor(100 * (double(emptyStreetName) / double(total)));
-					os << t.row();
-					os << t.col() << "Rue trop éloignée";
-					os << t.col() << streetTooFar;
-					os << t.col() << floor(100 * (double(streetTooFar) / double(total)));
-					os << t.close();
-					_logger.logRaw(os.str());
+					_pm.insert(ATTR_IMPORTED_ADDRESSES, ok);
+					_pm.insert(ATTR_NOT_IMPORTED_CITY_NOT_FOUND, cityNotFound);
+					_pm.insert(ATTR_NOT_IMPORTED_STREET_NOT_FOUND, roadNotFound);
+					_pm.insert(ATTR_NOT_IMPORTED_EMPTY_STREET_NAME, emptyStreetName);
+					_pm.insert(ATTR_NOT_IMPORTED_STREET_TOO_FAR, streetTooFar);	
 				}
 			}
 
@@ -407,33 +380,6 @@ namespace synthese
 				HouseTableSync::Save(house.second.get(), transaction);
 			}
 			return transaction;
-		}
-
-
-
-		void HousesCSVFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
-			PropertiesHTMLTable t(importRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Propriétés");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Distance maximale adresse rue", t.getForm().getTextInput(PARAMETER_MAX_HOUSE_DISTANCE, lexical_cast<string>(_maxHouseDistance)));
-			stream << t.title("Données");
-			stream << t.cell("Fichier Adresses", t.getForm().getTextInput(_getFileParameterName(FILE_ADDRESS), _pathsMap[FILE_ADDRESS].file_string()));
-			stream << t.cell("Nombre de lignes d'entête à ignorer", t.getForm().getTextInput(PARAMETER_NUMBER_OF_LINES_TO_IGNORE, lexical_cast<string>(_numberOfLinesToIgnore)));
-			stream << t.title("Numéro des champs");
-			stream << t.cell("Code de la ville", t.getForm().getTextInput(PARAMETER_FIELD_CITY_CODE, _cityCodeField ? lexical_cast<string>(*_cityCodeField) : string()));
-			stream << t.cell("Nom de la ville", t.getForm().getTextInput(PARAMETER_FIELD_CITY_NAME, _cityNameField ? lexical_cast<string>(*_cityNameField) : string()));
-			stream << t.cell("Nom de la rue", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_NAME, _roadNameField ? lexical_cast<string>(*_roadNameField) : string()));
-			stream << t.cell("Numéro de l'adresse", t.getForm().getTextInput(PARAMETER_FIELD_NUMBER, _numberField ? lexical_cast<string>(*_numberField) : string()));
-			stream << t.cell("Coordonnée X", t.getForm().getTextInput(PARAMETER_FIELD_GEOMETRY_X, _geometryXField ? lexical_cast<string>(*_geometryXField) : string()));
-			stream << t.cell("Coordonnée Y", t.getForm().getTextInput(PARAMETER_FIELD_GEOMETRY_Y, _geometryYField ? lexical_cast<string>(*_geometryYField) : string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Afficher statistiques", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_STATS, _displayStats));
-			stream << t.close();
 		}
 
 

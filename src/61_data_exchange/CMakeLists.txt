@@ -1,6 +1,8 @@
 set_source_groups()
 
 set(data_exchange_SRCS
+  CalendarFileFormat.cpp
+  CalendarFileFormat.hpp
   DataExchangeModule.cpp
   DataExchangeModule.gen.cpp
   DataExchangeModule.inc.cpp

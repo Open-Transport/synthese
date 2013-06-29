@@ -62,7 +62,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(AutoImportTime, time_duration(not_a_date_time)),
 					FIELD_VALUE_CONSTRUCTOR(Active, true),
 					FIELD_DEFAULT_CONSTRUCTOR(LogPath),
-					FIELD_VALUE_CONSTRUCTOR(MinLogLevel, ImportLogger::WARN),
+					FIELD_VALUE_CONSTRUCTOR(MinLogLevel, IMPORT_LOG_WARN),
 					FIELD_DEFAULT_CONSTRUCTOR(Documentation)
 			)	),
 			_nextAutoImport(not_a_date_time)
@@ -77,11 +77,14 @@ namespace synthese
 		/// @param logPath if defined, override the the log path with the specified value
 		boost::shared_ptr<Importer> Import::getImporter(
 			util::Env& env,
-			const ImportLogger& importLogger
+			ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
 		) const {
 
 			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
-			return fileFormat->getImporter(env, *this, importLogger);
+			return fileFormat->getImporter(env, *this, minLogLevel, logPath, outputStream, pm);
 		}
 
 
@@ -140,17 +143,20 @@ namespace synthese
 			{
 				boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 				_autoImporterEnv.reset(new Env);
-				ImportLogger importLogger(
+				ParametersMap pm;
+				_autoImporter = fileFormat->getImporter(
+					*_autoImporterEnv,
+					*this,
 					get<MinLogLevel>(),
 					get<LogPath>(),
-					optional<ostream&>()
+					optional<ostream&>(),
+					pm
 				);
-				_autoImporter = fileFormat->getImporter(*_autoImporterEnv, *this, importLogger);
 				_autoImporter->setFromParametersMap(get<Parameters>(), true);
 			}
 
 			_autoImporterEnv->clear();
-			bool result(_autoImporter->parseFiles(optional<const Request&>()));
+			bool result(_autoImporter->parseFiles());
 			if(result)
 			{
 				_autoImporter->save();

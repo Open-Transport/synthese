@@ -23,14 +23,10 @@
 #include "OGTFileFormat.hpp"
 
 #include "Import.hpp"
-#include "PTFileFormat.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledServiceTableSync.h"
-#include "AdminFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
-#include "PropertiesHTMLTable.h"
 #include "CalendarTemplateTableSync.h"
 
 #include <fstream>
@@ -48,8 +44,6 @@ namespace synthese
 	using namespace calendar;
 	using namespace db;
 	using namespace util;
-	using namespace admin;
-	using namespace html;
 
 	namespace util
 	{
@@ -59,17 +53,15 @@ namespace synthese
 	namespace data_exchange
 	{
 		bool OGTFileFormat::Importer_::_parse(
-			const boost::filesystem::path& filePath,
-			boost::optional<const server::Request&> adminRequest
+			const boost::filesystem::path& filePath
 		) const {
 
-			ExpatParser parser(*_import.get<DataSource>(), _env, _logger, _calendar);
+			ExpatParser parser(*_import.get<DataSource>(), *this);
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
-				_log(
-					ImportLogger::ERROR,
+				_logError(
 					"Could not open the file " + filePath.file_string()
 				);
 				throw Exception("Could not open the file " + filePath.file_string());
@@ -104,35 +96,15 @@ namespace synthese
 		OGTFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			OneFileTypeImporter<OGTFileFormat>(env, import, logger),
-			PTDataCleanerFileFormat(env, import, logger)
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			OneFileTypeImporter<OGTFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm)
 		{}
-
-
-
-		void OGTFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const {
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.title("Fichier");
-			stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
-			stream << t.cell("Calendrier",
-				t.getForm().getSelectInput(
-					PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
-					CalendarTemplateTableSync::GetCalendarTemplatesList(),
-					optional<RegistryKeyType>(_calendarTemplate.get() ? _calendarTemplate->getKey() : RegistryKeyType(0))
-			)	);
-			stream << t.close();
-		}
 
 
 
@@ -150,7 +122,10 @@ namespace synthese
 			if(tag == "SCHEDULE")
 			{
 				string lineCode(attributes["APPLICATION_AREA"]);
-				ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines(user_data->_dataSource, user_data->_env);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines(
+					user_data->_dataSource,
+					user_data->_importer._env
+				);
 				impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Set lines(
 					_lines.get(lineCode)
 				);
@@ -186,11 +161,10 @@ namespace synthese
 						if(attributes["SITUATION"] == "REVENUE_SERVICE")
 						{
 							std::set<StopPoint*> stops(
-								PTFileFormat::GetStopPoints(
+								user_data->_importer._getStopPoints(
 									user_data->stopPoints,
 									attributes["TOP"],
 									boost::optional<const std::string&>(),
-									user_data->_logger,
 									true
 							)	);
 							if(!user_data->tripStops.empty())
@@ -221,8 +195,10 @@ namespace synthese
 
 
 
-		void OGTFileFormat::Importer_::ExpatParser::endElement( void *d, const XML_Char* name ) throw(Exception)
-		{
+		void OGTFileFormat::Importer_::ExpatParser::endElement(
+			void *d,
+			const XML_Char* name
+		) throw(Exception) {
 			expat_user_data *user_data = (expat_user_data*)d;
 			string tag(name);
 
@@ -236,7 +212,7 @@ namespace synthese
 				if(user_data->importTrip && user_data->line)
 				{
 					JourneyPattern* route(
-						PTFileFormat::CreateOrUpdateRoute(
+						user_data->_importer._createOrUpdateRoute(
 							*user_data->line,
 							boost::optional<const std::string&>(),
 							user_data->tripNumber,
@@ -247,24 +223,20 @@ namespace synthese
 							NULL, // (rolling stock)
 							user_data->tripStops,
 							user_data->_dataSource,
-							user_data->_env,
-							user_data->_logger,
 							true,
 							true
 					)	);
 					ScheduledService* service(
-						PTFileFormat::CreateOrUpdateService(
+						user_data->_importer._createOrUpdateService(
 							*route,
 							user_data->departureSchedules,
 							user_data->arrivalSchedules,
 							user_data->tripNumber,
-							user_data->_dataSource,
-							user_data->_env,
-							user_data->_logger
+							user_data->_dataSource
 					)	);
 					if(service)
 					{
-						*service |= user_data->_calendar;
+						*service |= user_data->_importer._calendar;
 						service->addCodeBySource(user_data->_dataSource, user_data->tripNumber);
 					}
 				}
@@ -280,14 +252,10 @@ namespace synthese
 
 		OGTFileFormat::Importer_::ExpatParser::ExpatParser(
 			const impex::DataSource& dataSource,
-			util::Env& env,
-			const impex::ImportLogger& logger,
-			const Calendar& calendar
+			const Importer_& importer
 		):	user_data(
 				dataSource,
-				env,
-				logger,
-				calendar
+				importer
 			)
 		{}
 
@@ -365,16 +333,12 @@ namespace synthese
 
 		OGTFileFormat::Importer_::ExpatParser::expat_user_data::expat_user_data(
 			const impex::DataSource& dataSource,
-			util::Env& env,
-			const impex::ImportLogger& logger,
-			const Calendar& calendar
-		):	_calendar(calendar),
-			_dataSource(dataSource),
-			_env(env),
-			_logger(logger),
+			const Importer_& importer
+		):	_dataSource(dataSource),
+			_importer(importer),
 			line(NULL),
 			wayBack(false),
-			stopPoints(dataSource, env)
+			stopPoints(dataSource, importer._env)
 		{
 		}
 

@@ -80,6 +80,17 @@ namespace synthese
 				static const std::string PARAMETER_MAX_HOUSE_DISTANCE;
 				static const std::string PARAMETER_NUMBER_OF_LINES_TO_IGNORE;
 
+				static const std::string TAG_MISSING_CITY;
+				static const std::string TAG_MISSING_STREET;
+				static const std::string ATTR_SOURCE_NAME;
+				static const std::string TAG_CITY;
+				static const std::string ATTR_IMPORTED_ADDRESSES;
+				static const std::string ATTR_NOT_IMPORTED_CITY_NOT_FOUND;
+				static const std::string ATTR_NOT_IMPORTED_STREET_NOT_FOUND;
+				static const std::string ATTR_NOT_IMPORTED_EMPTY_STREET_NAME;
+				static const std::string ATTR_NOT_IMPORTED_STREET_TOO_FAR;
+				
+
 			private:
 				static const std::string SEP;
 
@@ -112,9 +123,10 @@ namespace synthese
 				/// @date 2012
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					const std::string& key,
-					boost::optional<const server::Request&> adminRequest
+					const std::string& key
 				) const;
+
+
 
 				std::string _getValue(const std::size_t field) const;
 				void _loadLine(const std::string& line) const;
@@ -123,12 +135,11 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
-				):	impex::Importer(env, import, logger),
-					impex::MultipleFileTypesImporter<HousesCSVFileFormat>(env, import, logger),
-					_displayStats(false),
-					_maxHouseDistance(200)
-				{}
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
+				);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
@@ -138,6 +149,8 @@ namespace synthese
 				/// @since 3.3.0
 				virtual util::ParametersMap _getParametersMap() const;
 
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
 				/// @param map Parameters map to interpret
@@ -146,16 +159,6 @@ namespace synthese
 				/// @since 3.3.0
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.3.0
-				/// @date 2012
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
 
 
 				//////////////////////////////////////////////////////////////////////////

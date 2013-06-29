@@ -25,9 +25,11 @@
 #define SYNTHESE_road_RoadShapeFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
-#include "MainRoadChunk.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "RoadFileFormat.hpp"
+
+#include "MainRoadChunk.hpp"
 #include "ImportableTableSync.hpp"
 #include "RoadPlaceTableSync.h"
 
@@ -70,7 +72,8 @@ namespace synthese
 		public:
 
 			class Importer_:
-				public impex::MultipleFileTypesImporter<RoadShapeFileFormat>
+				public impex::MultipleFileTypesImporter<RoadShapeFileFormat>,
+				public RoadFileFormat
 			{
 				friend class impex::MultipleFileTypesImporter<RoadShapeFileFormat>;
 
@@ -147,8 +150,7 @@ namespace synthese
 				/// @date 2010
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					const std::string& key,
-					boost::optional<const server::Request&> request
+					const std::string& key
 				) const;
 
 
@@ -156,11 +158,13 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
-				):	impex::Importer(env, import, logger),
-					impex::MultipleFileTypesImporter<RoadShapeFileFormat>(env, import, logger),
-					_roadPlaces(*import.get<impex::DataSource>(), env)
-				{}
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
+				);
+
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
@@ -170,6 +174,8 @@ namespace synthese
 				/// @since 3.1.16
 				virtual util::ParametersMap _getParametersMap() const;
 
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
 				/// @param map Parameters map to interpret
@@ -178,16 +184,6 @@ namespace synthese
 				/// @since 3.1.16
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
 
 
 				//////////////////////////////////////////////////////////////////////////

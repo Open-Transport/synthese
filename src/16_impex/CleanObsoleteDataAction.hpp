@@ -28,13 +28,14 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 
+#include "ParametersMap.h"
+
 namespace synthese
 {
 	namespace impex
 	{
 		class Importer;
 		class Import;
-		class ImportLogger;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 16.15 Action : CleanObsoleteDataAction.
@@ -58,8 +59,8 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<Importer> _importer;
-			boost::shared_ptr<ImportLogger> _importLogger;
 			std::stringstream _output;
+			util::ParametersMap _pm;
 
 			boost::gregorian::date _firstDate;
 

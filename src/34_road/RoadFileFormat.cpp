@@ -24,7 +24,7 @@
 
 #include "CityTableSync.h"
 #include "CrossingTableSync.hpp"
-#include "ImportLogger.hpp"
+#include "Import.hpp"
 #include "MainRoadPart.hpp"
 #include "PublicPlaceEntranceTableSync.hpp"
 #include "PublicPlaceTableSync.h"
@@ -46,15 +46,24 @@ namespace synthese
 
 	namespace road
 	{
-		RoadPlace* RoadFileFormat::CreateOrUpdateRoadPlace(
+		RoadFileFormat::RoadFileFormat(
+			util::Env& env,
+			const impex::Import& import,
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
+		{}
+
+
+
+		RoadPlace* RoadFileFormat::_createOrUpdateRoadPlace(
 			impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync>& roadPlaces,
 			const std::string& code,
 			const std::string& name,
-			const geography::City& city,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& logger
-		){
+			const geography::City& city
+		) const {
 			RoadPlace* roadPlace(NULL);
 
 			// Search for a road place linked with the datasource
@@ -63,10 +72,10 @@ namespace synthese
 				set<RoadPlace*> loadedRoadPlaces(roadPlaces.get(code));
 				if(loadedRoadPlaces.size() > 1)
 				{
-					logger.logWarning("More than one road place with key "+ code);
+					_logWarning("More than one road place with key "+ code);
 				}
 				roadPlace = *loadedRoadPlaces.begin();
-				logger.logLoad(
+				_logLoad(
 					"Use of existing road place "+ lexical_cast<string>(roadPlace->getKey()) +
 						" ("+ roadPlace->getFullName() +")"
 				);
@@ -77,11 +86,11 @@ namespace synthese
 					RoadPlaceTableSync::getId()
 				);
 				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, code));
+				links.insert(make_pair(&*_import.get<DataSource>(), code));
 				roadPlace->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<RoadPlace>().add(boost::shared_ptr<RoadPlace>(roadPlace));
+				_env.getEditableRegistry<RoadPlace>().add(boost::shared_ptr<RoadPlace>(roadPlace));
 				roadPlaces.add(*roadPlace);
-				logger.logCreation(
+				_logCreation(
 					"Creation of the road place with key "+ code +" ("+ city.getName() +" "+ name +")"
 				);
 			}
@@ -95,16 +104,13 @@ namespace synthese
 
 
 
-		PublicPlace* RoadFileFormat::CreateOrUpdatePublicPlace(
+		PublicPlace* RoadFileFormat::_createOrUpdatePublicPlace(
 			impex::ImportableTableSync::ObjectBySource<PublicPlaceTableSync>& publicPlaces,
 			const std::string& code,
 			const std::string& name,
 			boost::optional<boost::shared_ptr<geos::geom::Point> > geometry,
-			const geography::City& city,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& logger
-		){
+			const geography::City& city
+		) const {
 			PublicPlace* publicPlace(NULL);
 
 			// Search for a public place linked with the datasource
@@ -113,12 +119,12 @@ namespace synthese
 				set<PublicPlace*> loadedPublicPlaces(publicPlaces.get(code));
 				if(loadedPublicPlaces.size() > 1)
 				{
-					logger.logWarning(
+					_logWarning(
 						"More than one public place with key "+ code
 					);
 				}
 				publicPlace = *loadedPublicPlaces.begin();
-				logger.logLoad(
+				_logLoad(
 					"Use of existing public place "+ lexical_cast<string>(publicPlace->getKey()) +" ("+ publicPlace->getFullName() +")"
 				);
 			}
@@ -128,11 +134,11 @@ namespace synthese
 					PublicPlaceTableSync::getId()
 				);
 				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, code));
+				links.insert(make_pair(&*_import.get<DataSource>(), code));
 				publicPlace->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<PublicPlace>().add(boost::shared_ptr<PublicPlace>(publicPlace));
+				_env.getEditableRegistry<PublicPlace>().add(boost::shared_ptr<PublicPlace>(publicPlace));
 				publicPlaces.add(*publicPlace);
-				logger.logCreation(
+				_logCreation(
 					"Creation of the public place with key "+ code +" ("+ city.getName() +" "+ name +")"
 				);
 			}
@@ -150,40 +156,34 @@ namespace synthese
 
 
 
-		RoadPlace* RoadFileFormat::GetRoadPlace(
+		RoadPlace* RoadFileFormat::_getRoadPlace(
 			impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync>& roadPlaces,
-			const std::string& code,
-			const impex::ImportLogger& logger
-		){
+			const std::string& code
+		) const {
 			// Search for a road place linked with the datasource
 			if(roadPlaces.contains(code))
 			{
 				set<RoadPlace*> loadedRoadPlaces(roadPlaces.get(code));
 				if(loadedRoadPlaces.size() > 1)
 				{
-					logger.logWarning("More than one road place with key "+ code);
+					_logWarning("More than one road place with key "+ code);
 				}
 				return *loadedRoadPlaces.begin();
 			}
 			else
 			{
-				logger.logWarning(
-					"WARN : no road place with key "+ code
-				);
+				_logWarning("No road place with key "+ code);
 				return NULL;
 			}
 		}
 
 
 
-		Crossing* RoadFileFormat::CreateOrUpdateCrossing(
+		Crossing* RoadFileFormat::_createOrUpdateCrossing(
 			impex::ImportableTableSync::ObjectBySource<CrossingTableSync>& crossings,
 			const std::string& code,
-			boost::shared_ptr<geos::geom::Point> geometry,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& logger
-		){
+			boost::shared_ptr<geos::geom::Point> geometry
+		) const {
 			Crossing* crossing(NULL);
 
 			// Search for a road place linked with the datasource
@@ -192,12 +192,12 @@ namespace synthese
 				set<Crossing*> loadedCrossings(crossings.get(code));
 				if(loadedCrossings.size() > 1)
 				{
-					logger.logWarning(
+					_logWarning(
 						"More than one crossing with key "+ code
 					);
 				}
 				crossing = *loadedCrossings.begin();
-				logger.logLoad(
+				_logLoad(
 					"Use of existing crossing "+ lexical_cast<string>(crossing->getKey())
 				);
 			}
@@ -211,11 +211,11 @@ namespace synthese
 					false
 				);
 				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, code));
+				links.insert(make_pair(&*_import.get<DataSource>(), code));
 				crossing->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<Crossing>().add(boost::shared_ptr<Crossing>(crossing));
+				_env.getEditableRegistry<Crossing>().add(boost::shared_ptr<Crossing>(crossing));
 				crossings.add(*crossing);
-				logger.logCreation(
+				_logCreation(
 					"Creation of the crossing with key "+ code
 				);
 			}
@@ -228,7 +228,7 @@ namespace synthese
 
 
 
-		MainRoadChunk* RoadFileFormat::AddRoadChunk(
+		MainRoadChunk* RoadFileFormat::_addRoadChunk(
 			RoadPlace& roadPlace,
 			Crossing& startNode,
 			Crossing& endNode,
@@ -237,9 +237,8 @@ namespace synthese
 			MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
 			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
 			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds,
-			util::Env& env,
 			Road::RoadType roadType
-		){
+		) const {
 			// Declarations
 			MainRoadChunk* result(NULL);
 
@@ -286,7 +285,7 @@ namespace synthese
 				secondRoadChunk->setMetricOffset(startMetricOffset + length);
 				secondRoadChunk->setKey(RoadChunkTableSync::getId());
 				road->addRoadChunk(*secondRoadChunk);
-				env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
+				_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
 
 				// Search for a second existing road which starts at the right node
 				MainRoadPart* road2 = NULL;
@@ -308,8 +307,8 @@ namespace synthese
 				{
 					RegistryKeyType lastEdgeId(road->getLastEdge()->getKey());
 					road->merge(*road2);
-					env.getEditableRegistry<MainRoadChunk>().remove(lastEdgeId);
-					env.getEditableRegistry<MainRoadPart>().remove(road2->getKey());
+					_env.getEditableRegistry<MainRoadChunk>().remove(lastEdgeId);
+					_env.getEditableRegistry<MainRoadPart>().remove(road2->getKey());
 				}
 			}
 			else
@@ -348,14 +347,14 @@ namespace synthese
 					);
 					result = firstRoadChunk.get();
 
-					env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
+					_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
 				}
 				else
 				{
 					boost::shared_ptr<MainRoadPart> road(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
 					road->setRoadPlace(roadPlace);
 					road->setKey(RoadTableSync::getId());
-					env.getEditableRegistry<MainRoadPart>().add(road);
+					_env.getEditableRegistry<MainRoadPart>().add(road);
 
 					// First road chunk
 					boost::shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
@@ -375,7 +374,7 @@ namespace synthese
 					);
 					result = firstRoadChunk.get();
 
-					env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
+					_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
 
 					// Second road chunk
 					boost::shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
@@ -385,7 +384,7 @@ namespace synthese
 					secondRoadChunk->setMetricOffset(length);
 					secondRoadChunk->setKey(RoadChunkTableSync::getId());
 					road->addRoadChunk(*secondRoadChunk);
-					env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
+					_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
 				}
 			}
 
@@ -411,18 +410,15 @@ namespace synthese
 
 
 
-		PublicPlaceEntrance* RoadFileFormat::CreateOrUpdatePublicPlaceEntrance(
+		PublicPlaceEntrance* RoadFileFormat::_createOrUpdatePublicPlaceEntrance(
 			ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync>& publicPlaceEntrances,
 			const std::string& code,
 			boost::optional<const std::string&> name,
 			MetricOffset metricOffset,
 			boost::optional<MainRoadChunk::HouseNumber> number,
 			MainRoadChunk& roadChunk,
-			PublicPlace& publicPlace,
-			const impex::DataSource& source,
-			util::Env& env,
-			const impex::ImportLogger& logger
-		){
+			PublicPlace& publicPlace
+		) const {
 			PublicPlaceEntrance* publicPlaceEntrance(NULL);
 
 			// Search for a public place linked with the datasource
@@ -431,12 +427,12 @@ namespace synthese
 				set<PublicPlaceEntrance*> loadedPublicPlaceEntrances(publicPlaceEntrances.get(code));
 				if(loadedPublicPlaceEntrances.size() > 1)
 				{
-					logger.logWarning(
+					_logWarning(
 						"More than one public place entrance with key "+ code
 					);
 				}
 				publicPlaceEntrance = *loadedPublicPlaceEntrances.begin();
-				logger.logLoad(
+				_logLoad(
 					"Use of existing public place entrance "+ lexical_cast<string>(publicPlaceEntrance->getKey()) +
 						" ("+ publicPlaceEntrance->getName() +")"
 				);
@@ -447,9 +443,9 @@ namespace synthese
 					PublicPlaceEntranceTableSync::getId()
 				);
 				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, code));
+				links.insert(make_pair(&*_import.get<DataSource>(), code));
 				publicPlaceEntrance->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<PublicPlaceEntrance>().add(boost::shared_ptr<PublicPlaceEntrance>(publicPlaceEntrance));
+				_env.getEditableRegistry<PublicPlaceEntrance>().add(boost::shared_ptr<PublicPlaceEntrance>(publicPlaceEntrance));
 				publicPlaceEntrances.add(*publicPlaceEntrance);
 				stringstream logStream;
 				logStream << "Creation of the public place entrance with key " << code << " (" << publicPlace.getFullName();
@@ -458,7 +454,7 @@ namespace synthese
 					logStream << " " << *name;
 				}
 				logStream << ")";
-				logger.logCreation(logStream.str());
+				_logCreation(logStream.str());
 			}
 
 			// Properties update
