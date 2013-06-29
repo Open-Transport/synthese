@@ -86,6 +86,7 @@ namespace synthese
 			static const std::string TAG_LINKED_STOP_POINT;
 			static const std::string TAG_STOP_POINT;
 			static const std::string TAG_STOP_AREA;
+			static const std::string TAG_SOURCE_LINE;
 
 
 
@@ -195,16 +196,16 @@ namespace synthese
 
 			struct ImportableStopPoint
 			{
-				std::string operatorCode;
 				std::string cityName;
 				std::string name;
 				boost::shared_ptr<geos::geom::Point> coords;
 				const pt::StopArea* stopArea;
 				std::set<pt::StopPoint*> linkedStopPoints;
+				std::set<std::string> lineCodes;
 
 				ImportableStopPoint(): stopArea(NULL) {}
 			};
-			typedef std::vector<ImportableStopPoint> ImportableStopPoints;
+			typedef std::map<std::string, ImportableStopPoint> ImportableStopPoints;
 
 
 			void _exportStopAreas(

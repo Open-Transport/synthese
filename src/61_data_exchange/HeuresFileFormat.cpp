@@ -217,8 +217,6 @@ namespace synthese
 			{
 				// Declarations
 				string line;
-				PTFileFormat::ImportableStopPoints linkedStopPoints;
-				PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
 				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : dataSource);
 				ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(stopsDataSource, _env);
 				ImportableTableSync::ObjectBySource<DestinationTableSync> destinations(stopsDataSource, _env);
@@ -226,11 +224,6 @@ namespace synthese
 
 				while(getline(inFile, line))
 				{
-					if(!dataSource.get<Charset>().empty())
-					{
-						line = IConv(stopsDataSource.get<Charset>(), "UTF-8").convert(line);
-					}
-
 					// ID
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
 
@@ -256,6 +249,10 @@ namespace synthese
 					string name(
 						boost::algorithm::trim_copy(line.substr(5, 50))
 					);
+					if(!dataSource.get<Charset>().empty())
+					{
+						name = IConv(stopsDataSource.get<Charset>(), "UTF-8").convert(name);
+					}
 					
 					// Case depots
 					if(boost::algorithm::trim_copy(line.substr(55, 3)) == "DEP")
@@ -297,39 +294,30 @@ namespace synthese
 					else
 					{ // Case stops
 						PTFileFormat::ImportableStopPoint isp;
-						isp.operatorCode = id;
 						isp.name = name;
 						isp.linkedStopPoints = stopPoints.get(id);
 
 						if(isp.linkedStopPoints.empty())
 						{
-							nonLinkedStopPoints.push_back(isp);
+							_nonLinkedStopPoints.insert(
+								make_pair(id, isp)
+							);
 						}
-						else if(_displayLinkedStops)
+						else
 						{
-							linkedStopPoints.push_back(isp);
+							_linkedStopPoints.insert(
+								make_pair(id, isp)
+							);
 						}
 					}
 				}
 				inFile.close();
 
-				_exportStopPoints(
-					nonLinkedStopPoints
-				);
-				if(_displayLinkedStops)
-				{
-					_exportStopPoints(
-						linkedStopPoints
-					);
-				}
-				if(!nonLinkedStopPoints.empty())
-				{
-					_logError("At least a stop could not be linked.");
-					return false;
-				}
+				return true;
 			}
 			if(key == FILE_ITINERAI) // 1 : Routes
 			{
+				bool atLeastAnIgnoredRoute(false);
 				if(!_network.get())
 				{
 					_logError("The transport network was not specified.");
@@ -391,7 +379,7 @@ namespace synthese
 						{
 							if(line.size() < i+9)
 							{
-								_logWarning(
+								_logError(
 									"Inconsistent line size "+ line
 								);
 								ignoreRoute = true;
@@ -424,7 +412,7 @@ namespace synthese
 
 							if(!stops.contains(stopNumber))
 							{
-								_logWarning("Stop "+ stopNumber +" not found");
+								_logError("Stop "+ stopNumber +" not found");
 								ignoreRoute = true;
 							}
 
@@ -436,10 +424,36 @@ namespace synthese
 									true,
 									regul
 							)	);
+
+							// Register the line in the stop
+							ImportableStopPoints::iterator itStop(
+								_linkedStopPoints.find(stopNumber)
+							);
+							if(itStop != _linkedStopPoints.end())
+							{
+								itStop->second.lineCodes.insert(
+									lexical_cast<string>(commercialLineNumber)
+								);
+							}
+							else
+							{
+								itStop = _nonLinkedStopPoints.find(stopNumber);
+								if(itStop != _nonLinkedStopPoints.end())
+								{
+									itStop->second.lineCodes.insert(
+										lexical_cast<string>(commercialLineNumber)
+									);
+								}
+								else
+								{
+									_logWarning("The stop "+ stopNumber +" is not present in the stops file.");
+								}
+							}
 						}
 
 						if(ignoreRoute)
 						{
+							atLeastAnIgnoredRoute = true;
 							continue;
 						}
 
@@ -520,6 +534,22 @@ namespace synthese
 								route
 						)	);
 				}	}
+
+				_exportStopPoints(
+					_nonLinkedStopPoints
+				);
+				if(_displayLinkedStops)
+				{
+					_exportStopPoints(
+						_linkedStopPoints
+					);
+				}
+
+				if(atLeastAnIgnoredRoute)
+				{
+					return false;
+				}
+
 			} // 2 : Nodes
 			else if(key == FILE_TRONCONS)
 			{

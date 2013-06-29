@@ -70,6 +70,7 @@ namespace synthese
 		const std::string PTFileFormat::TAG_LINKED_STOP_POINT = "linked_stop_point";
 		const std::string PTFileFormat::TAG_STOP_AREA = "stop_area";
 		const std::string PTFileFormat::TAG_STOP_POINT = "stop_point";
+		const std::string PTFileFormat::TAG_SOURCE_LINE = "source_line";
 
 
 
@@ -1145,30 +1146,38 @@ namespace synthese
 				_pm.insert(TAG_STOP_POINT, stopPM);
 
 				// Properties
-				stopPM->insert(ATTR_SOURCE_CODE, object.operatorCode);
-				stopPM->insert(ATTR_SOURCE_CITY_NAME, object.cityName);
-				stopPM->insert(ATTR_SOURCE_NAME, object.name);
-				if(object.stopArea)
+				stopPM->insert(ATTR_SOURCE_CODE, object.first);
+				stopPM->insert(ATTR_SOURCE_CITY_NAME, object.second.cityName);
+				stopPM->insert(ATTR_SOURCE_NAME, object.second.name);
+				if(object.second.stopArea)
 				{
 					boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
-					object.stopArea->toParametersMap(*stopAreaPM);
+					object.second.stopArea->toParametersMap(*stopAreaPM);
 					stopPM->insert(TAG_LINKED_STOP_AREA, stopAreaPM);
+				}
+
+				// Lines
+				BOOST_FOREACH(const string& line, object.second.lineCodes)
+				{
+					boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+					linePM->insert(ATTR_SOURCE_CODE, line);
+					stopPM->insert(TAG_SOURCE_LINE, linePM);
 				}
 
 				// Coordinates
 				boost::shared_ptr<geos::geom::Point> projectedPoint;
-				if(object.coords.get())
+				if(object.second.coords.get())
 				{
-					projectedPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*object.coords);
+					projectedPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*object.second.coords);
 
 					stopPM->insert(ATTR_SOURCE_SYNTHESE_X, projectedPoint->getX());
 					stopPM->insert(ATTR_SOURCE_SYNTHESE_Y, projectedPoint->getY());
-					stopPM->insert(ATTR_SOURCE_X, object.coords->getX());
-					stopPM->insert(ATTR_SOURCE_Y, object.coords->getY());
+					stopPM->insert(ATTR_SOURCE_X, object.second.coords->getX());
+					stopPM->insert(ATTR_SOURCE_Y, object.second.coords->getY());
 				}
 
 				// Linked stop points
-				BOOST_FOREACH(StopPoint* stopPoint, object.linkedStopPoints)
+				BOOST_FOREACH(StopPoint* stopPoint, object.second.linkedStopPoints)
 				{
 					// Submap
 					boost::shared_ptr<ParametersMap> linkPM(new ParametersMap);
@@ -1178,7 +1187,7 @@ namespace synthese
 					stopPoint->toParametersMap(*linkPM);
 
 					// Distance between source and synthese stop
-					if (stopPoint->getGeometry().get() && object.coords.get())
+					if (stopPoint->getGeometry().get() && object.second.coords.get())
 					{
 						double distance(
 							geos::operation::distance::DistanceOp::distance(*projectedPoint, *stopPoint->getGeometry())

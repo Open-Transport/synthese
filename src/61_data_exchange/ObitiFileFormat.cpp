@@ -294,7 +294,6 @@ namespace synthese
 					boost::shared_ptr<geos::geom::Point> point;
 
 					PTFileFormat::ImportableStopPoint isp;
-					isp.operatorCode = id;
 					isp.name = name;
 					isp.cityName = _getValue("nom_commune");
 					isp.linkedStopPoints = _stopPoints.get(id);
@@ -303,7 +302,9 @@ namespace synthese
 
 					if(isp.linkedStopPoints.empty())
 					{
-						nonLinkedStopPoints.push_back(isp);
+						nonLinkedStopPoints.insert(
+							make_pair(id, isp)
+						);
 					}
 
 					// Creation or update
