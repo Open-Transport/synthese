@@ -23,6 +23,7 @@
 #include "ForEachExpression.hpp"
 
 #include "ParametersMap.h"
+#include "VariableExpression.hpp"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 #include "alphanum.hpp"
@@ -93,11 +94,39 @@ namespace synthese
 			_recursive(false)
 		{
 			// function name
+			string arrayCode;
 			for(;it != end && *it != '&' && *it != '}'; ++it)
 			{
-				_arrayCode.push_back(*it);
+				arrayCode.push_back(*it);
 			}
-			_arrayCode = ParametersMap::Trim(_arrayCode);
+			arrayCode = ParametersMap::Trim(arrayCode);
+			Item item;
+			_variable.push_back(item);
+
+			// Variable name parsing
+			string::const_iterator it2(arrayCode.begin());
+			while(it2 != arrayCode.end())
+			{
+				// Alphanum chars
+				if( (*it2 >= 'a' && *it2 <= 'z') ||
+					(*it2 >= 'A' && *it2 <= 'Z') ||
+					(*it2 >= '0' && *it2 <= '9') ||
+					*it2 == '_'
+				){
+					_variable.rbegin()->key.push_back(*it2);
+					++it2;
+				}
+				else if(*it2 == '[')
+				{	// Index
+					_variable.rbegin()->index = Expression::Parse(it2, arrayCode.end(), "]");
+				}
+				else if(*it2 == '.')
+				{	// Sub map
+					Item item;
+					_variable.push_back(item);
+					++it2;
+				}
+			}
 
 			// parameters
 			if(it != end && *it == '}')
@@ -220,9 +249,77 @@ namespace synthese
 				);
 			}
 
+
+			// Loop on items
+			const ParametersMap* pm(NULL);
+			for(size_t rank(0); (rank+1) < _variable.size(); ++rank)
+			{
+				const Item& item(_variable[rank]);
+
+				// If first rank, select the source map
+				if(rank == 0)
+				{
+					// Variable first
+					if(variables.hasSubMaps(item.key))
+					{
+						pm = &variables;
+					} // Else parameters
+					else if(additionalParametersMap.hasSubMaps(item.key))
+					{
+						pm = &additionalParametersMap;
+					}
+					else // Sub map does not exist
+					{
+						break;
+					}
+				}
+
+				// Submap check
+				if(!pm->hasSubMaps(item.key))
+				{
+					break;
+				}
+
+				// If no index specified, take the first submap item
+				if(!item.index.get())
+				{
+					pm = pm->getSubMaps(item.key).begin()->get();
+				}
+				else // Else search for the specified item
+				{
+					string idx(
+						item.index->eval(request,additionalParametersMap,page,variables)
+					);
+					const ParametersMap::SubParametersMap::mapped_type& subMaps(
+						pm->getSubMaps(item.key)
+					);
+					pm = NULL;
+					BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& subMapItem, subMaps)
+					{
+						if(subMapItem->getDefault<string>(VariableExpression::FIELD_ID) == idx)
+						{
+							pm = subMapItem.get();
+							break;
+						}
+					}
+
+					// Index was not found
+					if(!pm)
+					{
+						break;
+					}
+				}
+			}
+			const string& arrayCode(_variable.rbegin()->key);
+
 			// No items to display
-			if(	!additionalParametersMap.hasSubMaps(_arrayCode) &&
-				!variables.hasSubMaps(_arrayCode)
+			if(	(	pm &&
+					!pm->hasSubMaps(arrayCode)
+				) || (
+					!pm &&
+					!additionalParametersMap.hasSubMaps(arrayCode) &&
+					!variables.hasSubMaps(arrayCode)
+				)
 			){
 				_emptyTemplate.display(stream, request, baseParametersMap, page, variables);
 				return;
@@ -230,9 +327,13 @@ namespace synthese
 
 			// Items read
 			const ParametersMap::SubParametersMap::mapped_type& items(
-				additionalParametersMap.hasSubMaps(_arrayCode) ?
-				additionalParametersMap.getSubMaps(_arrayCode) :
-				variables.getSubMaps(_arrayCode)
+				pm ?
+				pm->getSubMaps(arrayCode) :
+				(
+					additionalParametersMap.hasSubMaps(arrayCode) ?
+					additionalParametersMap.getSubMaps(arrayCode) :
+					variables.getSubMaps(arrayCode)
+				)
 			);
 			size_t itemsCount(items.size());
 
@@ -416,7 +517,7 @@ namespace synthese
 						stringstream recursiveContent;
 
 						// Recursion
-						if(_recursive && item.second->hasSubMaps(_arrayCode))
+						if(_recursive && item.second->hasSubMaps(arrayCode))
 						{
 							display(
 								recursiveContent,
@@ -452,7 +553,7 @@ namespace synthese
 						stringstream recursiveContent;
 
 						// Recursion
-						if(_recursive && item.second->hasSubMaps(_arrayCode))
+						if(_recursive && item.second->hasSubMaps(arrayCode))
 						{
 							display(
 								recursiveContent,
@@ -494,7 +595,7 @@ namespace synthese
 						}
 
 						// Recursion
-						if(_recursive && item->hasSubMaps(_arrayCode))
+						if(_recursive && item->hasSubMaps(arrayCode))
 						{
 							display(
 								recursiveContent,
