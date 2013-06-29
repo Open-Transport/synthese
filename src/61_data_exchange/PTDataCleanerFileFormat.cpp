@@ -68,8 +68,11 @@ namespace synthese
 		PTDataCleanerFileFormat::PTDataCleanerFileFormat(
 			util::Env& env,
 			const Import& import,
-			const impex::ImportLogger& importLogger
-		):	Importer(env, import, importLogger),
+			ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			_fromToday(false),
 			_cleanOldData(true),
 			_cleanUnusedStops(false),

@@ -45,7 +45,6 @@ namespace synthese
 
 		protected:
 			virtual bool _read(
-				boost::optional<const server::Request&> request
 			) const = 0;
 
 			std::string _address;
@@ -59,8 +58,11 @@ namespace synthese
 			ConnectionImporter(
 				util::Env& env,
 				const Import& import,
-				const impex::ImportLogger& logger
-			):	Importer(env, import, logger)
+				impex::ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
+			):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
 			{}
 
 
@@ -87,12 +89,11 @@ namespace synthese
 
 
 			bool parseFiles(
-				boost::optional<const server::Request&> request
 			) const {
 
 				if(!_address.empty())
 				{
-					return _read(request);
+					return _read();
 				}
 				return false;
 			}

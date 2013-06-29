@@ -26,20 +26,13 @@
 #include "DBModule.h"
 #include "GraphConstants.h"
 #include "Import.hpp"
-#include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
-#include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
-#include "City.h"
 #include "CityTableSync.h"
-#include "Service.h"
-#include "RollingStock.hpp"
-#include "NonConcurrencyRule.h"
 #include "NonConcurrencyRuleTableSync.h"
-#include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
 #include "PTUseRule.h"
 #include "PTConstants.h"
@@ -49,12 +42,7 @@
 #include "CityAliasTableSync.hpp"
 #include "JunctionTableSync.hpp"
 #include "RollingStockTableSync.hpp"
-#include "ImportFunction.h"
-#include "PropertiesHTMLTable.h"
 #include "RequestException.h"
-#include "AdminFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
-#include "PTFileFormat.hpp"
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "CalendarTemplateElementTableSync.h"
@@ -90,8 +78,6 @@ namespace synthese
 	using namespace db;
 	using namespace pt;
 	using namespace server;
-	using namespace admin;
-	using namespace html;
 	using namespace calendar;
 	using namespace vehicle;
 
@@ -120,15 +106,21 @@ namespace synthese
 		string ToXsdTime (const time_duration& time);
 		time_duration FromXsdDuration(const std::string& text);
 
+
+
 		//////////////////////////////////////////////////////////////////////////
 		// CONSTRUCTOR
 		TridentFileFormat::Importer_::Importer_(
 			Env& env,
 			const Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			OneFileTypeImporter<Importer_>(env, import, logger),
-			PTDataCleanerFileFormat(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			OneFileTypeImporter<Importer_>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_importStops(false),
 			_autoGenerateStopAreas(false),
 			_importJunctions(false),
@@ -141,6 +133,7 @@ namespace synthese
 			_networks(*import.get<DataSource>(), env),
 			_lines(*import.get<DataSource>(), env)
 		{}
+
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -248,8 +241,8 @@ namespace synthese
 			);
 
 			bool resaIsCompulsory=false;
-                        BOOST_FOREACH(Registry<PTUseRule>::value_type r, _env.getRegistry<PTUseRule>())
-                        {
+            BOOST_FOREACH(Registry<PTUseRule>::value_type r, _env.getRegistry<PTUseRule>())
+            {
 				const PTUseRule& rule(*r.second);
 
 				if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))       continue;
@@ -1052,8 +1045,7 @@ namespace synthese
 		// INPUT
 
 		bool TridentFileFormat::Importer_::_parse(
-			const path& filePath,
-			boost::optional<const server::Request&> adminRequest
+			const path& filePath
 		) const {
 			bool failure(false);
 
@@ -1130,18 +1122,16 @@ namespace synthese
 			XMLNode networkNameNode = networkNode.getChildNode("name", 0);
 
 			TransportNetwork* network(
-				PTFileFormat::CreateOrUpdateNetwork(
+				_createOrUpdateNetwork(
 					_networks,
 					networkIdNode.getText(),
 					charset_converter.convert(networkNameNode.getText()),
-					dataSource,
-					_env,
-					_logger
+					dataSource
 			)	);
 
 			// Commercial lines
 			CommercialLine* cline(
-				PTFileFormat::CreateOrUpdateLine(
+				_createOrUpdateLine(
 					_lines,
 					lineKeyNode.getText(),
 					clineNameNode.isEmpty() || !clineNameNode.nText() ?
@@ -1152,9 +1142,7 @@ namespace synthese
 						optional<const string&>(charset_converter.convert(clineShortNameNode.getText())),
 					optional<RGBColor>(),
 					*network,
-					dataSource,
-					_env,
-					_logger
+					dataSource
 			)	);
 
 			// Transport mode
@@ -1298,11 +1286,10 @@ namespace synthese
 					// Search of an existing connection place with the same code
 					StopArea* curStop(NULL);
 					set<StopArea*> cstops(
-						PTFileFormat::GetStopAreas(
+						_getStopAreas(
 							_stopAreas,
 							stopKey,
 							optional<const string&>(),
-							_logger,
 							false
 					)	);
 					if(cstops.size() > 1)
@@ -1352,16 +1339,14 @@ namespace synthese
 						}
 
 						// Stop area creation
-						curStop = PTFileFormat::CreateStopArea(
+						curStop = _createStopArea(
 							_stopAreas,
 							stopKey,
 							name,
 							*city,
 							_defaultTransferDuration,
 							false,
-							dataSource,
-							_env,
-							_logger
+							dataSource
 						);
 					}
 					else
@@ -1522,21 +1507,19 @@ namespace synthese
 
 					if(curStop)
 					{
-						stopPoints = PTFileFormat::CreateOrUpdateStop(
+						stopPoints = _createOrUpdateStop(
 							_stops,
 							stopKey,
 							name,
 							optional<const RuleUser::Rules&>(),
 							curStop,
 							geometry.get(),
-							dataSource,
-							_env,
-							_logger
+							dataSource
 						);
 					}
 					else if(_autoGenerateStopAreas && city)
 					{
-						stopPoints = PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+						stopPoints = _createOrUpdateStopWithStopAreaAutocreation(
 							_stops,
 							stopKey,
 							name,
@@ -1544,8 +1527,6 @@ namespace synthese
 							*city,
 							_defaultTransferDuration,
 							dataSource,
-							_env,
-							_logger,
 							boost::optional<const graph::RuleUser::Rules&>()
 						);
 					}
@@ -1560,11 +1541,10 @@ namespace synthese
 				}
 				else
 				{
-					if(	PTFileFormat::GetStopPoints(
+					if(	_getStopPoints(
 							_stops,
 							stopKey,
-							name,
-							_logger
+							name
 						).empty()
 					){
 						failure = true;
@@ -1795,7 +1775,7 @@ namespace synthese
 				else
 				{
 					// Route creation
-					journeyPattern = PTFileFormat::CreateOrUpdateRoute(
+					journeyPattern = _createOrUpdateRoute(
 						*cline,
 						(_mergeRoutes || updatedRoute) ? optional<const string&>() : optional<const string&>(route.objectId),
 						optional<const string&>(route.name),
@@ -1806,8 +1786,6 @@ namespace synthese
 						rollingStock.get(),
 						route.stops,
 						dataSource,
-						_env,
-						_logger,
 						true,
 						true
 					);
@@ -1819,14 +1797,12 @@ namespace synthese
 
 				// Service creation
 				ScheduledService* service(
-					PTFileFormat::CreateOrUpdateService(
+					_createOrUpdateService(
 						*journeyPattern,
 						deps,
 						arrs,
 						serviceNumber,
-						dataSource,
-						_env,
-						_logger
+						dataSource
 				)	);
 				if(service)
 				{
@@ -2332,32 +2308,5 @@ namespace synthese
 				throw Exception("Trident SRID not found");
 			}
 			return it->second;
-		}
-
-
-
-		void TridentFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
-			PropertiesHTMLTable t(importRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Propriétés");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
-			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
-			stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
-			stream << t.cell("Autogénérer arrêts commerciaux", t.getForm().getOuiNonRadioInput(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas));
-			stream << t.cell("Fusionner itinéraires par valeur", t.getForm().getOuiNonRadioInput(PARAMETER_MERGE_ROUTES, _mergeRoutes));
-			stream << t.cell("Traiter tous les StopArea en tant qu'arrêts physiques", t.getForm().getOuiNonRadioInput(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay));
-			stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_JUNCTIONS, _importJunctions));
-			stream << t.cell("Importer calendriers en tant que modèles", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates));
-			stream << t.cell("Ignorer données passées", t.getForm().getOuiNonRadioInput(PARAMETER_FROM_TODAY, _fromToday));
-			stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(PARAMETER_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_defaultTransferDuration.total_seconds() / 60)));
-			stream << t.title("Données (remplir un des deux champs)");
-			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, (_pathsSet.size() == 1) ? _pathsSet.begin()->file_string() : string()));
-			stream << t.cell("Répertoire", t.getForm().getTextInput(PARAMETER_DIRECTORY, _dirPath.file_string()));
-			stream << t.close();
 		}
 }	}

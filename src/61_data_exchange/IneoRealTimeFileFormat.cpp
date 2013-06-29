@@ -23,17 +23,13 @@
 #include "IneoRealTimeFileFormat.hpp"
 
 #include "Import.hpp"
-#include "PropertiesHTMLTable.h"
 #include "DataSource.h"
-#include "AdminFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
 #include "DataSourceTableSync.h"
 #include "DBTransaction.hpp"
 #include "ImportableTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "CommercialLineTableSync.h"
-#include "PTFileFormat.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
@@ -50,9 +46,7 @@ namespace synthese
 	using namespace data_exchange;
 	using namespace pt;
 	using namespace server;
-	using namespace html;
 	using namespace util;
-	using namespace admin;
 	using namespace impex;
 	using namespace db;
 	using namespace graph;
@@ -73,7 +67,6 @@ namespace synthese
 
 
 		bool IneoRealTimeFileFormat::Importer_::_read(
-			boost::optional<const server::Request&> adminRequest
 		) const	{
 			if(_database.empty() || !_plannedDataSource.get())
 			{
@@ -152,24 +145,20 @@ namespace synthese
 				string chainage(result->getText("chainage"));
 				string ligneRef(result->getText("ligne_ref"));
 
-				_log(
-					ImportLogger::DEBG,
+				_logDebug(
 					"Processing serviceRef="+ serviceRef +" chainage="+	chainage +" ligneRef="+ ligneRef
 				);
 
 				CommercialLine* line(
-					PTFileFormat::GetLine(
+					_getLine(
 						lines,
 						ligneRef,
-						*_plannedDataSource,
-						_env,
-						_logger
+						*_plannedDataSource
 				)	);
 
 				if(!line)
 				{
-					_log(
-						ImportLogger::WARN,
+					_logWarning(
 						"Line "+ ligneRef +" was not found for service "+ serviceRef
 					);
 					continue;
@@ -198,16 +187,14 @@ namespace synthese
 					bool referenceStop(type != "N");
 
 					std::set<StopPoint*> stopsSet(
-						PTFileFormat::GetStopPoints(
+						_getStopPoints(
 							stops,
 							_stopCodePrefix + stopCode,
-							boost::optional<const std::string&>(),
-							_logger
+							boost::optional<const std::string&>()
 					)	);
 					if(stopsSet.empty())
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Can't find stops for code "+ _stopCodePrefix + stopCode
 						);
 						continue;
@@ -249,11 +236,10 @@ namespace synthese
 				}
 
 				set<JourneyPattern*> routes(
-					PTFileFormat::GetRoutes(
+					_getRoutes(
 						*line,
 						servedStops,
-						*_plannedDataSource,
-						_logger
+						*_plannedDataSource
 				)	);
 
 				if(routes.empty())
@@ -267,8 +253,7 @@ namespace synthese
 						string routeName(routeResult->getText("nom"));
 						bool wayBack(routeResult->getText("sens") != "A");
 
-						_log(
-							ImportLogger::CREA,
+						_logCreation(
 							"Creation of route "+ routeName
 						);
 
@@ -308,7 +293,7 @@ namespace synthese
 				BOOST_FOREACH(JourneyPattern* route, routes)
 				{
 					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*route->sharedServicesMutex
+						*route->sharedServicesMutex
 					);
 					BOOST_FOREACH(Service* sservice, route->getServices())
 					{
@@ -320,8 +305,7 @@ namespace synthese
 						if(	service->isActive(today) &&
 							service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 						){
-							_log(
-								ImportLogger::LOAD,
+							_logLoad(
 								"Use of service "+ lexical_cast<string>(service->getKey()) +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route->getKey()) +" ("+ route->getName() +")"
 							);
 							service->addCodeBySource(dataSource, serviceRef);
@@ -354,15 +338,13 @@ namespace synthese
 						_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(service));
 						_services.insert(service);
 
-						_log(
-							ImportLogger::CREA,
+						_logCreation(
 							"Creation of service ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route->getKey()) +" ("+ route->getName() +")"
 						);
 					}
 					else
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Service (ref="+ serviceRef +") has empty departure or arrival schedules, not creating"
 						);
 					}
@@ -401,8 +383,7 @@ namespace synthese
 								!sservice->hasLinkWithSource(dataSource)
 							){
 								const_cast<ScheduledService*>(sservice)->setInactive(today);
-								_log(
-									ImportLogger::INFO,
+								_logInfo(
 									"Deactivating unlinked service "+ lexical_cast<string>(sservice->getKey()) +
 										" on route "+ lexical_cast<string>(sservice->getRoute()->getKey()) +" (" +
 										sservice->getRoute()->getName() +")"
@@ -419,29 +400,14 @@ namespace synthese
 		IneoRealTimeFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			DatabaseReadImporter<IneoRealTimeFileFormat>(env, import, logger)
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			DatabaseReadImporter<IneoRealTimeFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm)
 		{}
-
-
-
-		void IneoRealTimeFileFormat::Importer_::displayAdmin( std::ostream& os, const server::Request& request ) const
-		{
-			os << "<h1>Paramètres</h1>";
-
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			os << t.open();
-			os << t.title("Mode");
-			os << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			os << t.title("Bases de données");
-			os << t.cell("Base de données SIV", t.getForm().getTextInput(DatabaseReadImporter<IneoRealTimeFileFormat>::PARAMETER_DATABASE, _database));
-			os << t.cell("Chaîne de connexion base de donnée", t.getForm().getTextInput(PARAMETER_DB_CONN_STRING, _dbConnString ? *_dbConnString : ""));
-			os << t.title("Paramètres");
-			os << t.cell("Source de données théorique liée", t.getForm().getTextInput(PARAMETER_PLANNED_DATASOURCE_ID, _plannedDataSource.get() ? lexical_cast<string>(_plannedDataSource->getKey()) : string()));
-			os << t.close();
-		}
 
 
 

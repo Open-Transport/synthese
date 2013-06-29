@@ -22,38 +22,24 @@
 
 #include "IneoFileFormat.hpp"
 
-#include "AdminActionFunctionRequest.hpp"
-#include "AdminFunctionRequest.hpp"
 #include "AllowedUseRule.h"
 #include "CityTableSync.h"
 #include "DataSource.h"
-#include "DataSourceAdmin.h"
 #include "DBModule.h"
 #include "DeadRunTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DriverAllocationTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
 #include "ForbiddenUseRule.h"
-#include "HTMLForm.h"
-#include "HTMLModule.h"
 #include "IConv.hpp"
 #include "ImpExModule.h"
 #include "Import.hpp"
-#include "Importer.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
-#include "PropertiesHTMLTable.h"
-#include "PTFileFormat.hpp"
 #include "PTModule.h"
-#include "PTOperationFileFormat.hpp"
-#include "PTPlaceAdmin.h"
-#include "PTUseRule.h"
 #include "PTUseRuleTableSync.h"
 #include "ScheduledServiceTableSync.h"
-#include "StopArea.hpp"
-#include "StopAreaAddAction.h"
 #include "StopAreaTableSync.hpp"
-#include "StopPointAdmin.hpp"
 #include "TransportNetwork.h"
 #include "UserTableSync.h"
 #include "VehicleServiceTableSync.hpp"
@@ -74,13 +60,11 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace admin;
 	using namespace calendar;
 	using namespace data_exchange;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
-	using namespace html;
 	using namespace impex;
 	using namespace pt;
 	using namespace pt_operation;
@@ -90,7 +74,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,IneoFileFormat>::FACTORY_KEY("Ineo");
+		template<> const string FactorableTemplate<FileFormat,IneoFileFormat>::FACTORY_KEY = "Ineo";
 	}
 
 	namespace data_exchange
@@ -177,10 +161,15 @@ namespace synthese
 		IneoFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			MultipleFileTypesImporter<IneoFileFormat>(env, import, logger),
-			PTDataCleanerFileFormat(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			MultipleFileTypesImporter<IneoFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTOperationFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_autoImportStops(false),
 			_displayLinkedStops(false),
 			_interactive(false),
@@ -195,18 +184,16 @@ namespace synthese
 
 		bool IneoFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const string& key,
-			boost::optional<const server::Request&> request
+			const string& key
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
-				_log(
-					ImportLogger::ERROR,
-					"Could no open the file " + filePath.file_string()
+				_logError(
+					"Could not open the file " + filePath.file_string()
 				);
-				throw Exception("Could no open the file " + filePath.file_string());
+				throw Exception("Could not open the file " + filePath.file_string());
 			}
 			_clearFieldsMap();
 			date now(day_clock::local_day());
@@ -271,16 +258,14 @@ namespace synthese
 						}
 
 						// Stop area creation or update
-						PTFileFormat::CreateOrUpdateStopAreas(
+						_createOrUpdateStopAreas(
 							stopAreas,
 							stopAreaCode,
 							name,
 							city.get(),
 							!_stopCityCodeField.empty(),
 							_stopAreaDefaultTransferDuration,
-							dataSource,
-							_env,
-							_logger
+							dataSource
 						);
 				}	}
 
@@ -393,8 +378,7 @@ namespace synthese
 					set<StopArea*> stopAreasSet(stopAreas.get(stopAreaCode));
 					if(stopAreasSet.empty())
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Stop area "+ stopAreaCode +" was not found for stop "+ id +". Stop update or creation is ignored."
 						);
 						continue;
@@ -463,16 +447,14 @@ namespace synthese
 
 					// Create or update stop
 					set<StopPoint*> matchingStops(
-						PTFileFormat::CreateOrUpdateStop(
+						_createOrUpdateStop(
 							_stopPoints,
 							itStop.first,
 							itStop.second.name,
 							handicapped,
 							itStop.second.stopArea,
 							itStop.second.geometry.get(),
-							dataSource,
-							_env,
-							_logger
+							dataSource
 					)	);
 
 					if(_stopIdField != VALUE_MNLP)
@@ -581,14 +563,12 @@ namespace synthese
 					if(_section == "DST")
 					{
 						Destination* destination(
-							PTFileFormat::CreateOrUpdateDestination(
+							_createOrUpdateDestination(
 								_destinations,
 								_getValue("NDSTG"),
 								_getValue("DSTBL"),
 								_getValue("DSTTS"),
-								dataSource,
-								_env,
-								_logger
+								dataSource
 						)	);
 
 						// Destination overload
@@ -625,7 +605,7 @@ namespace synthese
 					if((_section == "L" || _section =="CH" || _section.empty()) && !stops.empty())
 					{
 						JourneyPattern* route(
-							PTFileFormat::CreateOrUpdateRoute(
+							_createOrUpdateRoute(
 								overloadedLine ? *overloadedLine : *line,
 								optional<const string&>(),
 								jpName,
@@ -636,8 +616,6 @@ namespace synthese
 								NULL,
 								stops,
 								dataSource,
-								_env,
-								_logger,
 								true,
 								true,
                                 true,
@@ -656,16 +634,14 @@ namespace synthese
 						// ID
 						lineId = _getValue("MNLG");
 
-						line = PTFileFormat::CreateOrUpdateLine(
+						line = _createOrUpdateLine(
 							lines,
 							lineId,
 							_getValue("LIBLG"),
 							_getValue(_lineShortNameField),
 							optional<RGBColor>(),
 							*_network,
-							dataSource,
-							_env,
-							_logger
+							dataSource
 						);
 					}
 					else if(_section == "CH")
@@ -691,8 +667,7 @@ namespace synthese
 							set<Destination*> destinations(_destinations.get(destinationCode));
 							if(destinations.empty())
 							{
-								_log(
-									ImportLogger::WARN,
+								_logWarning(
 									"Destination "+ destinationCode +" not found in journey pattern "+ jpKey
 								);
 							}
@@ -702,12 +677,10 @@ namespace synthese
 								map<Destination*,string>::const_iterator it(_destinationLineOverloads.find(destination));
 								if(it != _destinationLineOverloads.end())
 								{
-									overloadedLine = PTFileFormat::GetLine(
+									overloadedLine = _getLine(
 										lines,
 										it->second,
-										dataSource,
-										_env,
-										_logger
+										dataSource
 									);
 								}
 							}
@@ -729,8 +702,7 @@ namespace synthese
 							}
 							else
 							{
-								_log(
-									ImportLogger::WARN,
+								_logWarning(
 									"Distance between "+ lastStopCode +" and "+ stopCode +" not found."
 								);
 							}
@@ -836,14 +808,12 @@ namespace synthese
 						if(	route &&
 							(tcou == TCOU_Commercial || tcou == TCOU_HLP)
 						){
-							service = PTFileFormat::CreateOrUpdateService(
+							service = _createOrUpdateService(
 								*route,
 								departureSchedules,
 								arrivalSchedules,
 								string(),
-								dataSource,
-								_env,
-								_logger
+								dataSource
 							);
 						}
 						else if(
@@ -852,12 +822,10 @@ namespace synthese
 						){
 							// Load or creation of the object
 							DeadRun* deadRun(
-								FileFormat::LoadOrCreateObject(
+								_loadOrCreateObject(
 									deadRuns,
 									cidx,
 									dataSource,
-									_env,
-									_logger,
 									"haut le pied"
 							)	);
 
@@ -983,12 +951,9 @@ namespace synthese
 
 						// Vehicle service
 						string sb(_getValue("SB"));
-						vehicleService = PTOperationFileFormat::CreateOrUpdateVehicleService(
+						vehicleService = _createOrUpdateVehicleService(
 							vehicleServices,
-							sb + "/" + lexical_cast<string>(ph) + (_vehicleServiceSuffix.empty() ? string() : ("/"+ _vehicleServiceSuffix)),
-							dataSource,
-							_env,
-							_logger
+							sb + "/" + lexical_cast<string>(ph) + (_vehicleServiceSuffix.empty() ? string() : ("/"+ _vehicleServiceSuffix))
 						);
 						vehicleService->setName(sb);
 

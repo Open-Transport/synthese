@@ -24,13 +24,10 @@
 
 #include "FactoryBase.h"
 
-#include "Importable.h"
-#include "ImportableTableSync.hpp"
-#include "ImportLogger.hpp"
+#include "ImpExTypes.hpp"
 
-#include <boost/filesystem/path.hpp>
-#include <set>
-#include <map>
+#include <boost/optional.hpp>
+#include <boost/shared_ptr.hpp>
 
 ////////////////////////////////////////////////////////////////////
 /// @defgroup refFile 16 File formats
@@ -41,6 +38,7 @@ namespace synthese
 	namespace util
 	{
 		class Env;
+		class ParametersMap;
 	}
 
 	namespace impex
@@ -48,7 +46,6 @@ namespace synthese
 		class Import;
 		class Importer;
 		class Exporter;
-		class ImportLogger;
 
 		class FileFormat:
 			public util::FactoryBase<FileFormat>
@@ -64,71 +61,20 @@ namespace synthese
 			virtual boost::shared_ptr<Importer> getImporter(
 				util::Env& env,
 				const Import& import,
-				const ImportLogger& importLogger
+				ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
 			) const = 0;
 
 			virtual boost::shared_ptr<Exporter> getExporter(
 			) const	= 0;
 
 
-			template<class T>
-			static typename T::ObjectType* LoadOrCreateObject(
-				impex::ImportableTableSync::ObjectBySource<T>& objects,
-				const std::string& id,
-				const impex::DataSource& source,
-				util::Env& env,
-				const ImportLogger& logger,
-				const std::string& logName
-			);
-
 			void toParametersMap(
 				util::ParametersMap& pm
 			) const;
 		};
-
-
-
-		template<class T>
-		typename T::ObjectType* FileFormat::LoadOrCreateObject(
-			impex::ImportableTableSync::ObjectBySource<T>& objects,
-			const std::string& id,
-			const impex::DataSource& source,
-			util::Env& env,
-			const ImportLogger& logger,
-			const std::string& logName
-		){
-			std::set<typename T::ObjectType*> loadedObjects(objects.get(id));
-			if(!loadedObjects.empty())
-			{
-				if(!logName.empty())
-				{
-					std::stringstream logStream;
-					logStream << "Link between " << logName << " " << id << " and ";
-					BOOST_FOREACH(typename T::ObjectType* o, loadedObjects)
-					{
-						logStream << o->getKey();
-					}
-					logger.log(ImportLogger::LOAD, logStream.str());
-				}
-				return *loadedObjects.begin();
-			}
-			boost::shared_ptr<typename T::ObjectType> o(new typename T::ObjectType(T::getId()));
-
-			Importable::DataSourceLinks links;
-			links.insert(make_pair(&source, id));
-			o->setDataSourceLinksWithoutRegistration(links);
-			env.getEditableRegistry<typename T::ObjectType>().add(o);
-			objects.add(*o);
-
-			if(!logName.empty())
-			{
-				logger.log(
-					ImportLogger::CREA,
-					"Creation of the "+ logName +"  with key "+ id
-				);
-			}
-			return o.get();
-		}
 }	}
 
 #endif // SYNTHESE_impex_Import_h__

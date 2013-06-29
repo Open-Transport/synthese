@@ -62,7 +62,6 @@ namespace synthese
 				mutable std::set<util::RegistryKeyType> _messagesToRemove;
 
 				virtual bool _read(
-					boost::optional<const server::Request&> request
 				) const;
 
 				struct Item
@@ -79,7 +78,10 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 
 

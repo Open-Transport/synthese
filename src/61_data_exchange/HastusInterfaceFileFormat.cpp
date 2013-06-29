@@ -28,19 +28,14 @@
 #include "Import.hpp"
 #include "StopPoint.hpp"
 #include "ScheduledServiceTableSync.h"
-#include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
-#include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
-#include "City.h"
 #include "CityTableSync.h"
 #include "Service.h"
 #include "RollingStock.hpp"
-#include "NonConcurrencyRule.h"
 #include "NonConcurrencyRuleTableSync.h"
-#include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
 #include "PTUseRule.h"
 #include "PTConstants.h"
@@ -50,16 +45,10 @@
 #include "CityAliasTableSync.hpp"
 #include "JunctionTableSync.hpp"
 #include "RollingStockTableSync.hpp"
-#include "ImportFunction.h"
-#include "PropertiesHTMLTable.h"
 #include "RequestException.h"
-#include "AdminFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
-#include "PTFileFormat.hpp"
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "TransportNetworkTableSync.h"
-#include "CalendarFileFormat.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -92,8 +81,6 @@ namespace synthese
 	using namespace db;
 	using namespace pt;
 	using namespace server;
-	using namespace admin;
-	using namespace html;
 	using namespace calendar;
 	using namespace vehicle;	
 
@@ -113,10 +100,15 @@ namespace synthese
 		HastusInterfaceFileFormat::Importer_::Importer_(
 			Env& env,
 			const Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			OneFileTypeImporter<Importer_>(env, import, logger),
-			PTDataCleanerFileFormat(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			OneFileTypeImporter<Importer_>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			CalendarFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_fileNameIsACalendar(false),
 			_calendars(*import.get<DataSource>(), _env),
 			_lines(*import.get<DataSource>(), _env),
@@ -176,8 +168,7 @@ namespace synthese
 		// INPUT
 
 		bool HastusInterfaceFileFormat::Importer_::_parse(
-			const path& filePath,
-			boost::optional<const server::Request&> adminRequest
+			const path& filePath
 		) const {
 
 			// Missing calendars
@@ -195,10 +186,9 @@ namespace synthese
 			{
 				string fileName(filePath.filename());
 				CalendarTemplate* fileCalendar(
-					CalendarFileFormat::GetCalendarTemplate(
+					_getCalendarTemplate(
 						_calendars,
-						fileName,
-						_logger
+						fileName
 				)	);
 				if(fileCalendar)
 				{
@@ -258,16 +248,14 @@ namespace synthese
 				}
 
 				// Line import
-				PTFileFormat::CreateOrUpdateLine(
+				_createOrUpdateLine(
 					_lines,
 					lineCode,
 					name,
 					lineCode,
 					optional<RGBColor>(),
 					*_network,
-					dataSource,
-					_env,
-					_logger
+					dataSource
 				);
 			}
 
@@ -275,10 +263,9 @@ namespace synthese
 			_loadNextRecord(5);
 			string mainCalendarCode(_getTextField(4, 9));
 			CalendarTemplate* mainCalendar(
-				CalendarFileFormat::GetCalendarTemplate(
+				_getCalendarTemplate(
 					_calendars,
-					mainCalendarCode,
-					_logger
+					mainCalendarCode
 			)	);
 			Calendar mainMask;
 			if(mainCalendar)
@@ -383,11 +370,10 @@ namespace synthese
 			BOOST_FOREACH(StopCodes::value_type& stopCode, stopCodes)
 			{
 				// Stop
-				stopCode.second = PTFileFormat::GetStopPoints(
+				stopCode.second = _getStopPoints(
 					_stops,
 					stopCode.first,
 					optional<const string&>(),
-					_logger,
 					true
 				);
 				if(stopCode.second.empty())
@@ -401,16 +387,11 @@ namespace synthese
 			}
 			if(!success)
 			{
-				PTFileFormat::DisplayStopPointImportScreen(
-					nonLinkedStopPoints,
-					*adminRequest,
-					_env,
-					dataSource,
-					_logger
+				_exportStopPoints(
+					nonLinkedStopPoints
 				);
 
-				_log(
-					ImportLogger::ERROR,
+				_logError(
 					"Au moins un arrêt non trouvé : import interrompu"
 				);
 				return false;
@@ -421,17 +402,14 @@ namespace synthese
 			{
 				// Line
 				CommercialLine* line(
-					PTFileFormat::GetLine(
+					_getLine(
 						_lines,
 						service.lineCode,
-						dataSource,
-						_env,
-						_logger
+						dataSource
 				)	);
 				if(line == NULL)
 				{
-					_log(
-						ImportLogger::WARN,
+					_logWarning(
 						"Inconsistent line number "+ service.lineCode +" in service "+ service.code
 					);
 					continue;
@@ -502,8 +480,7 @@ namespace synthese
 				}
 				if(scheduledStopsI < service.scheduledStops.size())
 				{
-					_log(
-						ImportLogger::WARN,
+					_logWarning(
 						"A scheduled stop did not match with the full stop list : "+ service.scheduledStops[scheduledStopsI] +" after "+ service.stops[lastScheduledStop] +". Service is ignored."
 					);
 					continue;
@@ -511,7 +488,7 @@ namespace synthese
 
 				// Route
 				JourneyPattern* route(
-					PTFileFormat::CreateOrUpdateRoute(
+					_createOrUpdateRoute(
 						*line,
 						service.routeCode,
 						optional<const string&>(),
@@ -522,15 +499,12 @@ namespace synthese
 						lineTransportModes[service.lineCode].get(),
 						servedStops,
 						dataSource,
-						_env,
-						_logger,
 						true, // Remove old codes
 						false // Don't update metric offsets on update because default metric offset are approximations
 				)	);
 				if(route == NULL)
 				{
-					_log(
-						ImportLogger::WARN,
+					_logWarning(
 						"Route "+ service.routeCode +" was not built in service "+ service.code
 					);
 					continue;
@@ -538,22 +512,19 @@ namespace synthese
 
 				// Service
 				ScheduledService* sservice(
-					PTFileFormat::CreateOrUpdateService(
+					_createOrUpdateService(
 						*route,
 						service.schedules,
 						service.schedules,
 						service.code,
-						dataSource,
-						_env,
-						_logger
+						dataSource
 				)	);
 
 				// Calendar
 				CalendarTemplate* calendar(
-					CalendarFileFormat::GetCalendarTemplate(
+					_getCalendarTemplate(
 						_calendars,
-						service.calendar,
-						_logger
+						service.calendar
 				)	);
 				if(calendar && !mainMask.empty())
 				{
@@ -575,7 +546,7 @@ namespace synthese
 					os << "<li>" << code << "</li>";
 				}
 				os << "</ul>";
-				_log(ImportLogger::ERROR, os.str());
+				_logError(os.str());
 				return false;
 			}
 
@@ -801,28 +772,5 @@ namespace synthese
 				}
 			}
 			return result;
-		}
-
-
-
-		void HastusInterfaceFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
-			PropertiesHTMLTable t(importRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
-			stream << t.title("Données (remplir un des deux champs)");
-			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, (_pathsSet.size() == 1) ? _pathsSet.begin()->file_string() : string()));
-			stream << t.cell("Répertoire", t.getForm().getTextInput(PARAMETER_DIRECTORY, _dirPath.file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_TRANSPORT_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
-			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _calendar.empty() ? date(not_a_date_time) : _calendar.getFirstActiveDate()));
-			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _calendar.empty() ? date(not_a_date_time) : _calendar.getLastActiveDate()));
-			stream << t.cell("Nom de fichier est un calendrier", t.getForm().getOuiNonRadioInput(PARAMETER_FILE_NAME_IS_A_CALENDAR, _fileNameIsACalendar));
-			stream << t.close();
 		}
 }	}

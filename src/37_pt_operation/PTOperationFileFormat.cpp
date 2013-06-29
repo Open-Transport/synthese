@@ -22,7 +22,7 @@
 
 #include "PTOperationFileFormat.hpp"
 
-#include "ImportLogger.hpp"
+#include "Import.hpp"
 #include "VehicleServiceTableSync.hpp"
 
 using namespace std;
@@ -31,16 +31,29 @@ using namespace boost;
 namespace synthese
 {
 	using namespace impex;
+	using namespace pt_operation;
 
-	namespace pt_operation
+	namespace data_exchange
 	{
-		VehicleService* PTOperationFileFormat::CreateOrUpdateVehicleService(
-			impex::ImportableTableSync::ObjectBySource<VehicleServiceTableSync>& vehicleServices,
-			const std::string& id,
-			const impex::DataSource& source,
+		PTOperationFileFormat::PTOperationFileFormat(
 			util::Env& env,
-			const impex::ImportLogger& logger
-		){
+			const impex::Import& import,
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
+		{}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// The created object is owned by the environment (it is not required to
+		/// maintain the returned shared pointer)
+		VehicleService* PTOperationFileFormat::_createOrUpdateVehicleService(
+			impex::ImportableTableSync::ObjectBySource<VehicleServiceTableSync>& vehicleServices,
+			const std::string& id
+		) const {
 			set<VehicleService*> loadedVehicleServices(vehicleServices.get(id));
 			if(!loadedVehicleServices.empty())
 			{
@@ -50,23 +63,22 @@ namespace synthese
 				{
 					logStream << vs->getKey();
 				}
-				logger.log(ImportLogger::LOAD, logStream.str());
+				_logLoad(logStream.str());
 			}
 			else
 			{
-				boost::shared_ptr<VehicleService> vs(new VehicleService(VehicleServiceTableSync::getId()));
+				boost::shared_ptr<VehicleService> vs(
+					new VehicleService(VehicleServiceTableSync::getId())
+				);
 
 				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, id));
+				links.insert(make_pair(&*_import.get<DataSource>(), id));
 				vs->setDataSourceLinksWithoutRegistration(links);
-				env.getEditableRegistry<VehicleService>().add(vs);
+				_env.getEditableRegistry<VehicleService>().add(vs);
 				vehicleServices.add(*vs);
 				loadedVehicleServices.insert(vs.get());
 
-				logger.log(
-					ImportLogger::CREA,
-					"Creation of the vehicle service with key "+ id
-				);
+				_logCreation("Creation of the vehicle service with key "+ id);
 			}
 			return *loadedVehicleServices.begin();
 		}

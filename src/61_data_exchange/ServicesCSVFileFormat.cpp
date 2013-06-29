@@ -26,19 +26,10 @@
 
 #include "Import.hpp"
 #include "Importer.hpp"
-#include "PTFileFormat.hpp"
 #include "ImpExModule.h"
 #include "IConv.hpp"
-#include "HTMLForm.h"
-#include "PropertiesHTMLTable.h"
 #include "DataSource.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "City.h"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "RollingStock.hpp"
-#include "CalendarLink.hpp"
-#include "StopArea.hpp"
 #include "TransportNetwork.h"
 #include "CalendarTemplateTableSync.h"
 #include "CityTableSync.h"
@@ -74,8 +65,6 @@ namespace synthese
 	using namespace db;
 	using namespace calendar;
 	using namespace graph;
-	using namespace html;
-	using namespace admin;
 	using namespace server;
 	using namespace geography;
 
@@ -122,10 +111,14 @@ namespace synthese
 		ServicesCSVFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			MultipleFileTypesImporter<ServicesCSVFileFormat>(env, import, logger),
-			PTDataCleanerFileFormat(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			MultipleFileTypesImporter<ServicesCSVFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_interactive(true),
 			_lines(*import.get<DataSource>(), env),
 			_stopAreas(*import.get<DataSource>(), env),
@@ -136,8 +129,7 @@ namespace synthese
 
 		bool ServicesCSVFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const std::string& key,
-			boost::optional<const server::Request&> request
+			const std::string& key
 		) const {
 			ifstream inFile;
 			string line;
@@ -158,10 +150,7 @@ namespace synthese
 				}
 				else
 				{
-					_log(
-						ImportLogger::ERROR,
-						"Invalid path!"
-					);
+					_logError("Invalid path!");
 					return false;
 				}
 
@@ -173,10 +162,7 @@ namespace synthese
 				}
 				else
 				{
-					_log(
-						ImportLogger::ERROR,
-						"RollingStock not defined"
-					);
+					_logError("RollingStock not defined");
 					return false;
 				}
 
@@ -187,10 +173,7 @@ namespace synthese
 				}
 				else
 				{
-					_log(
-						ImportLogger::ERROR,
-						"No default city"
-					);
+					_logError("No default city");
 					return false;
 				}
 
@@ -202,15 +185,13 @@ namespace synthese
 				{
 					ifstream inFile;
 					string fileWithPath = filePath.file_string() + file;
-					_log(
-						ImportLogger::DEBG,
+					_logDebug(
 						"Loading file "+ fileWithPath
 					);
 					inFile.open(fileWithPath.c_str());
 					if(!inFile)
 					{
-						_log(
-							ImportLogger::ERROR,
+						_logError(
 							"Could no open the file "+ fileWithPath
 						);
 						return false;
@@ -222,8 +203,7 @@ namespace synthese
 							_loadLine(line);
 						else
 						{
-							_log(
-								ImportLogger::ERROR,
+							_logError(
 								"Error with the number of lines to ignore : "+ lexical_cast<string>(_numberOfLinesToIgnore)
 							);
 							return false;
@@ -245,8 +225,7 @@ namespace synthese
 					backwardStr = fields[1];
 					periodCalendarName = fields[2];
 					daysCalendarName = fields[3].substr(0,fields[3].size()-4);
-					_log(
-						ImportLogger::DEBG,
+					_logDebug(
 						periodCalendarName +" ; "+ daysCalendarName +" ; "+ lineNameStr +" ;"+ backwardStr
 					);
 
@@ -257,12 +236,11 @@ namespace synthese
 					}
 
 					CommercialLine* commercialLine(
-						PTFileFormat::GetLine(lines, lineNameStr, dataSource, _env, _logger)
+						_getLine(lines, lineNameStr, dataSource)
 					);
 					if(!commercialLine)
 					{
-						_log(
-							ImportLogger::ERROR,
+						_logError(
 							"No such line "+ lineNameStr
 						);
 						return false;
@@ -270,24 +248,21 @@ namespace synthese
 
 					if(!_serviceNumberField)
 					{
-						_log(
-							ImportLogger::ERROR,
+						_logError(
 							"Service number field not defined"
 						);
 						return false;
 					}
 					else if(!_timeField)
 					{
-						_log(
-							ImportLogger::ERROR,
+						_logError(
 							"Time field not defined"
 						);
 						return false;
 					}
 					else if(!_stopNameField && !_stopCodeField)
 					{
-						_log(
-							ImportLogger::ERROR,
+						_logError(
 							"Stop name field or stop code field must be defined"
 						);
 						return false;
@@ -300,8 +275,7 @@ namespace synthese
 					}
 					else
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Calendar <pre>\""+ periodCalendarName +"\"</pre> not found"
 						);
 					}
@@ -313,8 +287,7 @@ namespace synthese
 					}
 					else
 					{
-						_log(
-							ImportLogger::WARN,
+						_logWarning(
 							"Calendar <pre>\""+ daysCalendarName +"\"</pre> not found"
 						);
 					}
@@ -365,7 +338,7 @@ namespace synthese
 						}
 
 						// Stop
-						set<StopPoint*> stopPoints = PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+						set<StopPoint*> stopPoints = _createOrUpdateStopWithStopAreaAutocreation(
 							_stopPoints,
 							_stopCodeField ? stopCodeStr : string(),
 							_stopNameField ? stopNameStr : string(),
@@ -373,15 +346,12 @@ namespace synthese
 							*cityForStopAreaAutoGeneration.get(),
 							optional<time_duration>(),
 							dataSource,
-							_env,
-							_logger,
 							boost::optional<const graph::RuleUser::Rules&>()
 						);
 
 						if(stopPoints.empty())
 						{
-							_log(
-								ImportLogger::ERROR,
+							_logError(
 								"Physical stop not found "+ stopCodeStr +" - "+ stopNameStr
 							);
 							return false;
@@ -420,7 +390,7 @@ namespace synthese
 					{
 						// Route
 						JourneyPattern* route(
-							PTFileFormat::CreateOrUpdateRoute(
+							_createOrUpdateRoute(
 								*commercialLine,
 								commercialLine->getShortName(),
 								commercialLine->getShortName(),
@@ -431,15 +401,12 @@ namespace synthese
 								rollingStock,
 								serviceDetail.stops,
 								dataSource,
-								_env,
-								_logger,
 								true,
 								true
 						)	);
 						if(route == NULL)
 						{
-							_log(
-								ImportLogger::ERROR,
+							_logError(
 								"Failure at route creation ("+ commercialLine->getShortName() +")"
 							);
 							return false;
@@ -447,14 +414,12 @@ namespace synthese
 
 						// Service
 						ScheduledService* service(
-							PTFileFormat::CreateOrUpdateService(
+							_createOrUpdateService(
 								*route,
 								serviceDetail.departureSchedules,
 								serviceDetail.arrivalSchedules,
 								serviceDetail.serviceNumber,
-								dataSource,
-								_env,
-								_logger
+								dataSource
 						)	);
 
 						// Calendars
@@ -490,8 +455,7 @@ namespace synthese
 								}
 								else
 								{
-									_log(
-										ImportLogger::WARN,
+									_logWarning(
 										"Calendar <pre>\""+ periodCalendarName +"\"</pre> not found"
 									);
 								}
@@ -501,8 +465,7 @@ namespace synthese
 								}
 								else
 								{
-									_log(
-										ImportLogger::WARN,
+									_logWarning(
 										"Calendar <pre>\""+ daysCalendarName +"\"</pre> not found"
 									);
 								}
@@ -518,8 +481,7 @@ namespace synthese
 						}
 						else
 						{
-							_log(
-								ImportLogger::ERROR,
+							_logError(
 								"Failure at service creation ("+ serviceDetail.serviceNumber +")"
 							);
 							return false;
@@ -529,36 +491,6 @@ namespace synthese
 			}
 
 			return true;
-		}
-
-
-
-		void ServicesCSVFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			stream << "<h1>Fichiers</h1>";
-
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			t.getForm().addHiddenField(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, string("1"));
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, false));
-			stream << t.title("Import horaires");
-			stream << t.cell("Repertoire horaires", t.getForm().getTextInput(_getFileParameterName(PATH_SERVICES), _pathsMap[PATH_SERVICES].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Mode de transport (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID, _rollingStock.get() ? lexical_cast<string>(_rollingStock->getKey()) : string()));
-			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
-			stream << t.cell("Nombre de lignes d'entête à ignorer", t.getForm().getTextInput(PARAMETER_NUMBER_OF_LINES_TO_IGNORE, lexical_cast<string>(_numberOfLinesToIgnore)));
-			stream << t.cell("Masque règles d'utilisation", t.getForm().getTextInput(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks)));
-			stream << t.title("Ordre des champs");
-			stream << t.cell("Numéro de service", t.getForm().getTextInput(PARAMETER_FIELD_SERVICE_NUMBER, _serviceNumberField ? lexical_cast<string>(*_serviceNumberField) : string()));
-			stream << t.cell("Code arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_CODE, _stopCodeField ? lexical_cast<string>(*_stopCodeField) : string()));
-			stream << t.cell("Nom arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_NAME, _stopNameField ? lexical_cast<string>(*_stopNameField) : string()));
-			stream << t.cell("Heure de passage", t.getForm().getTextInput(PARAMETER_FIELD_TIME, _timeField? lexical_cast<string>(*_timeField) : string()));
-			stream << t.close();
 		}
 
 

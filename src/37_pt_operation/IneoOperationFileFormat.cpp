@@ -22,23 +22,15 @@
 
 #include "IneoOperationFileFormat.hpp"
 
-#include "AdminActionFunctionRequest.hpp"
-#include "AdminFunctionRequest.hpp"
 #include "DataSource.h"
-#include "DataSourceAdmin.h"
 #include "DBModule.h"
 #include "DriverAllocationTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
-#include "HTMLForm.h"
-#include "HTMLModule.h"
 #include "IConv.hpp"
 #include "ImpExModule.h"
 #include "Import.hpp"
 #include "Importer.hpp"
-#include "PropertiesHTMLTable.h"
-#include "PTFileFormat.hpp"
 #include "PTModule.h"
-#include "PTOperationFileFormat.hpp"
 #include "UserTableSync.h"
 #include "VehicleServiceTableSync.hpp"
 
@@ -58,13 +50,11 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace admin;
 	using namespace calendar;
 	using namespace data_exchange;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
-	using namespace html;
 	using namespace impex;
 	using namespace pt;
 	using namespace pt_operation;
@@ -109,9 +99,14 @@ namespace synthese
 		IneoOperationFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::Import& import,
-			const impex::ImportLogger& logger
-		):	Importer(env, import, logger),
-			MultipleFileTypesImporter<IneoOperationFileFormat>(env, import, logger),
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			MultipleFileTypesImporter<IneoOperationFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTOperationFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_startDate(not_a_date_time),
 			_endDate(not_a_date_time),
 			_activities(*import.get<DataSource>(), _env),
@@ -235,8 +230,7 @@ namespace synthese
 
 		bool IneoOperationFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const string& key,
-			boost::optional<const server::Request&> request
+			const string& key
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -285,12 +279,10 @@ namespace synthese
 
 						if(fullKey != lastKey)
 						{
-							ds = FileFormat::LoadOrCreateObject<DriverServiceTableSync>(
+							ds = _loadOrCreateObject<DriverServiceTableSync>(
 								driverServices,
 								fullKey,
 								dataSource,
-								_env,
-								_logger,
 								"driver service"
 							);
 							lastKey = fullKey;
@@ -302,12 +294,10 @@ namespace synthese
 							ds->setName(key);
 
 							// Allocation template
-							da = FileFormat::LoadOrCreateObject<DriverAllocationTemplateTableSync>(
+							da = _loadOrCreateObject<DriverAllocationTemplateTableSync>(
 								_driverAllocationTemplates,
 								fullKey,
 								dataSource,
-								_env,
-								_logger,
 								"driver allocation template"
 							);
 
@@ -507,12 +497,10 @@ namespace synthese
 						string fullKey(userKey +"/"+ dateStr);
 
 						// Object creation
-						DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
+						DriverAllocation* da = _loadOrCreateObject<DriverAllocationTableSync>(
 							driverAllocations,
 							fullKey,
 							dataSource,
-							_env,
-							_logger,
 							"allocation"
 						);
 
@@ -529,12 +517,10 @@ namespace synthese
 
 						// User
 						User* user(
-							FileFormat::LoadOrCreateObject<UserTableSync>(
+							_loadOrCreateObject<UserTableSync>(
 								users,
 								userKey,
 								dataSource,
-								_env,
-								_logger,
 								"conducteur"
 						)	);
 						da->set<Driver>(*user);
@@ -828,26 +814,5 @@ namespace synthese
 			}
 
 			return map;
-		}
-
-
-
-		void IneoOperationFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			stream << "<h1>Fichiers</h1>";
-
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.title("Fichiers");
-			stream << t.cell("Fichier SAB (services voiture)", t.getForm().getTextInput(_getFileParameterName(FILE_SAB), _pathsMap[FILE_SAB].file_string()));
-			stream << t.cell("Fichier AFA (affectations)", t.getForm().getTextInput(_getFileParameterName(FILE_AFA), _pathsMap[FILE_AFA].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Source de données offre de transport public", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDatasource.get() ? lexical_cast<string>(_ptDatasource->getKey()) : string()));
-			stream << t.close();
 		}
 }	}

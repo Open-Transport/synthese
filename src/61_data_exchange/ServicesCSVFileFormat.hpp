@@ -26,13 +26,14 @@
 #define SYNTHESE_ServicesCSVFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
+#include "MultipleFileTypesImporter.hpp"
+#include "NoExportPolicy.hpp"
+#include "PTDataCleanerFileFormat.hpp"
+#include "PTFileFormat.hpp"
 
 #include "CommercialLineTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
-#include "MultipleFileTypesImporter.hpp"
-#include "NoExportPolicy.hpp"
-#include "PTDataCleanerFileFormat.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
@@ -79,7 +80,8 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::MultipleFileTypesImporter<ServicesCSVFileFormat>,
-				public PTDataCleanerFileFormat
+				public PTDataCleanerFileFormat,
+				public PTFileFormat
 			{
 			public:
 				static const std::string PATH_SERVICES;
@@ -140,8 +142,7 @@ namespace synthese
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
-					const std::string& key,
-					boost::optional<const server::Request&> adminRequest
+					const std::string& key
 				) const;
 
 
@@ -149,21 +150,11 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
 
 
 

@@ -24,14 +24,16 @@
 #define SYNTHESE_OGTFileFormat_H__
 
 #include "FileFormatTemplate.h"
-#include "OneFileTypeImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "OneFileTypeImporter.hpp"
+#include "PTDataCleanerFileFormat.hpp"
+#include "PTFileFormat.hpp"
+
 #include "ImportableTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "JourneyPattern.hpp"
 #include "SchedulesBasedService.h"
-#include "PTDataCleanerFileFormat.hpp"
 
 #include <expat.h>
 
@@ -56,70 +58,62 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::OneFileTypeImporter<OGTFileFormat>,
-				public PTDataCleanerFileFormat
+				public PTDataCleanerFileFormat,
+				public PTFileFormat
 			{
 			public:
 
 			private:
 
-				//! @name Parameters
-				//@{
-				//@}
+				class ExpatParser
+				{
+				public:
+					ExpatParser(
+						const impex::DataSource& dataSource,
+						const Importer_& importer
+					);
+					virtual ~ExpatParser();
 
-					class ExpatParser
+					virtual void parse(std::istream &data) throw(std::runtime_error);
+
+				private:
+					static void startElement(void *d, const XML_Char* name, const XML_Char** attrs) throw(Exception);
+					static void endElement(void *d, const XML_Char* name) throw(Exception);
+					static void characters(void*, const XML_Char* txt, int txtlen);
+
+					struct expat_user_data
 					{
-					public:
-						ExpatParser(
+						const impex::DataSource& _dataSource;
+						const Importer_& _importer;
+						pt::CommercialLine* line;
+						bool wayBack;
+						bool importTrip;
+						std::string tripNumber;
+						pt::JourneyPattern::StopsWithDepartureArrivalAuthorization tripStops;
+						pt::SchedulesBasedService::Schedules departureSchedules;
+						pt::SchedulesBasedService::Schedules arrivalSchedules;
+						boost::posix_time::time_duration arrivalSchedule;
+						impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> stopPoints;
+
+						expat_user_data(
 							const impex::DataSource& dataSource,
-							util::Env& env,
-							const impex::ImportLogger& logger,
-							const calendar::Calendar& calendar
+							const Importer_& importer
 						);
-						virtual ~ExpatParser();
-
-						virtual void parse(std::istream &data) throw(std::runtime_error);
-
-					private:
-						static void startElement(void *d, const XML_Char* name, const XML_Char** attrs) throw(Exception);
-						static void endElement(void *d, const XML_Char* name) throw(Exception);
-						static void characters(void*, const XML_Char* txt, int txtlen);
-
-						struct expat_user_data
-						{
-							const calendar::Calendar& _calendar;
-							const impex::DataSource& _dataSource;
-							util::Env& _env;
-							const impex::ImportLogger& _logger;
-							pt::CommercialLine* line;
-							bool wayBack;
-							bool importTrip;
-							std::string tripNumber;
-							pt::JourneyPattern::StopsWithDepartureArrivalAuthorization tripStops;
-							pt::SchedulesBasedService::Schedules departureSchedules;
-							pt::SchedulesBasedService::Schedules arrivalSchedules;
-							boost::posix_time::time_duration arrivalSchedule;
-							impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> stopPoints;
-
-							expat_user_data(
-								const impex::DataSource& dataSource,
-								util::Env& env,
-								const impex::ImportLogger& logger,
-								const calendar::Calendar& calendar
-							);
-						};
-
-						expat_user_data user_data;
-
-						typedef std::map<std::string, std::string> AttributeMap;
-						static AttributeMap createAttributeMap(const XML_Char **attrs);
 					};
+
+					expat_user_data user_data;
+
+					typedef std::map<std::string, std::string> AttributeMap;
+					static AttributeMap createAttributeMap(const XML_Char **attrs);
+				};
+
+				friend class ExpatParser;
 
 
 			protected:
 
 				virtual bool _parse(
-					const boost::filesystem::path& filePath,
-					boost::optional<const server::Request&> adminRequest
+					const boost::filesystem::path& filePath
 				) const;
 
 
@@ -127,21 +121,11 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
-
-
 
 
 
@@ -164,12 +148,12 @@ namespace synthese
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 
+
 				virtual db::DBTransaction _save() const;
 			};
 
 			typedef impex::NoExportPolicy<OGTFileFormat> Exporter_;
 		};
-	}
-}
+}	}
 
 #endif

@@ -24,16 +24,13 @@
 #define SYNTHESE_road_RoadFileFormat_hpp__
 
 #include "ImportableTableSync.hpp"
+#include "Importer.hpp"
+
 #include "MainRoadChunk.hpp"
 #include "Road.h"
 
 namespace synthese
 {
-	namespace impex
-	{
-		class ImportLogger;
-	}
-
 	namespace geography
 	{
 		class City;
@@ -53,41 +50,46 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Helpers library for road import.
 		///	@ingroup m34
-		class RoadFileFormat
+		class RoadFileFormat:
+			public virtual impex::Importer
 		{
+		protected:
+			RoadFileFormat(
+				util::Env& env,
+				const impex::Import& import,
+				impex::ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
+			);
+
+
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Road place import helper.
 			//////////////////////////////////////////////////////////////////////////
 			/// @param code code of the road place for the data source.
-			static RoadPlace* CreateOrUpdateRoadPlace(
+			RoadPlace* _createOrUpdateRoadPlace(
 				impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync>& roadPlaces,
 				const std::string& code,
 				const std::string& name,
-				const geography::City& city,
-				const impex::DataSource& source,
-				util::Env& env,
-				const impex::ImportLogger& logger
-			);
+				const geography::City& city
+			) const;
 
 
-			static RoadPlace* GetRoadPlace(
+			RoadPlace* _getRoadPlace(
 				impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync>& roadPlaces,
-				const std::string& code,
-				const impex::ImportLogger& logger
-			);
+				const std::string& code
+			) const;
 
 
 
-			static Crossing* CreateOrUpdateCrossing(
+			Crossing* _createOrUpdateCrossing(
 				impex::ImportableTableSync::ObjectBySource<CrossingTableSync>& crossings,
 				const std::string& code,
-				boost::shared_ptr<geos::geom::Point> geometry,
-				const impex::DataSource& source,
-				util::Env& env,
-				const impex::ImportLogger& logger
-			);
+				boost::shared_ptr<geos::geom::Point> geometry
+			) const;
 
 
 
@@ -95,16 +97,13 @@ namespace synthese
 			/// Public place import helper.
 			//////////////////////////////////////////////////////////////////////////
 			/// @param code code of the road place for the data source.
-			static PublicPlace* CreateOrUpdatePublicPlace(
+			PublicPlace* _createOrUpdatePublicPlace(
 				impex::ImportableTableSync::ObjectBySource<PublicPlaceTableSync>& publicPlaces,
 				const std::string& code,
 				const std::string& name,
 				boost::optional<boost::shared_ptr<geos::geom::Point> > geometry,
-				const geography::City& city,
-				const impex::DataSource& source,
-				util::Env& env,
-				const impex::ImportLogger& logger
-			);
+				const geography::City& city
+			) const;
 
 
 
@@ -112,18 +111,15 @@ namespace synthese
 			/// Public place entrance import helper.
 			//////////////////////////////////////////////////////////////////////////
 			/// @param code code of the road place for the data source.
-			static PublicPlaceEntrance* CreateOrUpdatePublicPlaceEntrance(
+			PublicPlaceEntrance* _createOrUpdatePublicPlaceEntrance(
 				impex::ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync>& publicPlaceEntrances,
 				const std::string& code,
 				boost::optional<const std::string&> name,
 				graph::MetricOffset metricOffset,
 				boost::optional<MainRoadChunk::HouseNumber> number,
 				MainRoadChunk& roadChunk,
-				PublicPlace& publicPlace,
-				const impex::DataSource& source,
-				util::Env& env,
-				const impex::ImportLogger& logger
-			);
+				PublicPlace& publicPlace
+			) const;
 
 		private:
 			static void _setGeometryAndHouses(
@@ -136,7 +132,7 @@ namespace synthese
 			);
 
 		public:
-			static MainRoadChunk* AddRoadChunk(
+			MainRoadChunk* _addRoadChunk(
 				RoadPlace& roadPlace,
 				Crossing& startNode,
 				Crossing& endNode,
@@ -145,9 +141,8 @@ namespace synthese
 				MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
 				MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
 				MainRoadChunk::HouseNumberBounds leftHouseNumberBounds,
-				util::Env& env,
 				Road::RoadType roadType = Road::ROAD_TYPE_UNKNOWN
-			);
+			) const;
 		};
 }	}
 

@@ -25,7 +25,6 @@
 #include "CleanObsoleteDataAction.hpp"
 
 #include "ActionException.h"
-#include "ParametersMap.h"
 #include "Request.h"
 #include "ImportTableSync.hpp"
 #include "Importer.hpp"
@@ -109,8 +108,13 @@ namespace synthese
 		{
 			try
 			{
-				_importLogger.reset(new ImportLogger(ImportLogger::WARN, string(), _output));
-				_importer  = value.getImporter(*_env, *_importLogger);
+				_importer  = value.getImporter(
+					*_env,
+					IMPORT_LOG_WARN,
+					string(),
+					_output,
+					_pm
+				);
 			}
 			catch(FactoryException<FileFormat>&)
 			{

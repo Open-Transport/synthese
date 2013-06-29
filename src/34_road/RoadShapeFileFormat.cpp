@@ -28,15 +28,11 @@
 #include "Crossing.h"
 #include "CrossingTableSync.hpp"
 #include "DataSource.h"
-#include "DataSourceAdmin.h"
 #include "DBTransaction.hpp"
 #include "EdgeProjector.hpp"
-#include "ImportFunction.h"
-#include "PropertiesHTMLTable.h"
 #include "PublicPlaceTableSync.h"
 #include "PublicPlaceEntranceTableSync.hpp"
 #include "RoadChunkTableSync.h"
-#include "RoadFileFormat.hpp"
 #include "RoadTableSync.h"
 #include "VirtualShapeVirtualTable.hpp"
 
@@ -62,9 +58,7 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace db;
-	using namespace admin;
 	using namespace server;
-	using namespace html;
 
 	namespace util
 	{
@@ -108,6 +102,19 @@ namespace synthese
 
 	namespace road
 	{
+		RoadShapeFileFormat::Importer_::Importer_(
+			util::Env& env,
+			const impex::Import& import,
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
+		):	impex::Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			impex::MultipleFileTypesImporter<RoadShapeFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			RoadFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			_roadPlaces(*import.get<impex::DataSource>(), env)
+		{}
+
 		bool RoadShapeFileFormat::Importer_::_checkPathsMap() const
 		{
 			return true;
@@ -117,8 +124,7 @@ namespace synthese
 
 		bool RoadShapeFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			const std::string& key,
-			boost::optional<const server::Request&> adminRequest
+			const std::string& key
 		) const {
 
 			// DataSource
@@ -180,14 +186,11 @@ namespace synthese
 					}
 
 					// Import
-					RoadFileFormat::CreateOrUpdateRoadPlace(
+					_createOrUpdateRoadPlace(
 						_roadPlaces,
 						code,
 						name,
-						*city,
-						dataSource,
-						_env,
-						_logger
+						*city
 					);
 				}
 
@@ -240,10 +243,9 @@ namespace synthese
 
 					// RoadPlace
 					RoadPlace* roadPlace(
-						RoadFileFormat::GetRoadPlace(
+						_getRoadPlace(
 							_roadPlaces,
-							rows->getText(_roadChunksRoadPlaceField),
-							_logger
+							rows->getText(_roadChunksRoadPlaceField)
 					)	);
 					if(!roadPlace)
 					{
@@ -274,7 +276,7 @@ namespace synthese
 							geometry->getCoordinatesRO()->getY(0)
 					)	);
 					Crossing* startCrossing(
-						RoadFileFormat::CreateOrUpdateCrossing(crossings, startNodeCode, startPoint, dataSource, _env, _logger)
+						_createOrUpdateCrossing(crossings, startNodeCode, startPoint)
 					);
 
 					// End node
@@ -290,7 +292,7 @@ namespace synthese
 							geometry->getCoordinatesRO()->getY(geometry->getCoordinatesRO()->size() - 1)
 					)	);
 					Crossing* endCrossing(
-						RoadFileFormat::CreateOrUpdateCrossing(crossings, endNodeCode, endPoint, dataSource, _env, _logger)
+						_createOrUpdateCrossing(crossings, endNodeCode, endPoint)
 					);
 
 					// House numbers
@@ -345,7 +347,7 @@ namespace synthese
 					_roadChunks.insert(
 						make_pair(
 							code,
-							RoadFileFormat::AddRoadChunk(
+							_addRoadChunk(
 								*roadPlace,
 								*startCrossing,
 								*endCrossing,
@@ -353,8 +355,7 @@ namespace synthese
 								rightHouseNumberingPolicy,
 								leftHouseNumberingPolicy,
 								rightHouseNumbers,
-								leftHouseNumbers,
-								_env
+								leftHouseNumbers
 					)	)	);
 				}
 			}
@@ -430,15 +431,12 @@ namespace synthese
 
 					// Import
 					PublicPlace* publicPlace(
-						RoadFileFormat::CreateOrUpdatePublicPlace(
+						_createOrUpdatePublicPlace(
 							publicPlaces,
 							code,
 							name,
 							geometry,
-							*city,
-							dataSource,
-							_env,
-							_logger
+							*city
 					)	);
 
 
@@ -476,17 +474,14 @@ namespace synthese
 						);
 
 						// Import
-						RoadFileFormat::CreateOrUpdatePublicPlaceEntrance(
+						_createOrUpdatePublicPlaceEntrance(
 							publicPlaceEntrances,
 							code,
 							optional<const string&>(),
 							metricOffset,
 							houseNumber,
 							*roadChunk,
-							*publicPlace,
-							dataSource,
-							_env,
-							_logger
+							*publicPlace
 						);
 					}
 					catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
@@ -530,43 +525,6 @@ namespace synthese
 				PublicPlaceEntranceTableSync::Save(publicPlaceEntrance.second.get(), transaction);
 			}
 			return transaction;
-		}
-
-
-
-		void RoadShapeFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const server::Request& request
-		) const	{
-			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
-			PropertiesHTMLTable t(importRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Propriétés");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.title("Données");
-			stream << t.cell("Rues", t.getForm().getTextInput(_getFileParameterName(FILE_ROAD_PLACES), _pathsMap[FILE_ROAD_PLACES].file_string()));
-			stream << t.cell("Tronçons", t.getForm().getTextInput(_getFileParameterName(FILE_ROAD_CHUNKS), _pathsMap[FILE_ROAD_CHUNKS].file_string()));
-			stream << t.cell("Lieux publics", t.getForm().getTextInput(_getFileParameterName(FILE_PUBLIC_PLACES), _pathsMap[FILE_PUBLIC_PLACES].file_string()));
-			stream << t.title("Noms des champs fichier des noms de rues");
-			stream << t.cell("Code localité", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_PLACES_CITY_CODE, _roadPlacesCityCodeField));
-			stream << t.cell("Code", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_PLACES_CODE, _roadPlacesCodeField));
-			stream << t.cell("Nom", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_PLACES_NAME, _roadPlacesNameField));
-			stream << t.title("Noms des champs fichier des tronçons de rues");
-			stream << t.cell("Adresse début gauche", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_FROM_LEFT, _roadChunksFromLeftField));
-			stream << t.cell("Adresse fin gauche", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_TO_LEFT, _roadChunksToLeftField));
-			stream << t.cell("Adresse début droite", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_FROM_RIGHT, _roadChunksFromRightField));
-			stream << t.cell("Adresse fin droite", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_TO_RIGHT, _roadChunksToRightField));
-			stream << t.cell("Code nom de rue", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_ROAD_PLACE, _roadChunksRoadPlaceField));
-			stream << t.cell("Code", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_CODE, _roadChunksCodeField));
-			stream << t.cell("Noeud début", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_START_NODE, _roadChunksStartNodeField));
-			stream << t.cell("Noeud fin", t.getForm().getTextInput(PARAMETER_FIELD_ROAD_CHUNKS_END_NODE, _roadChunksEndNodeField));
-			stream << t.title("Noms des champs fichier des lieux publics");
-			stream << t.cell("Code", t.getForm().getTextInput(PARAMETER_FIELD_PUBLIC_PLACES_CODE, _publicPlacesCodeField));
-			stream << t.cell("Name", t.getForm().getTextInput(PARAMETER_FIELD_PUBLIC_PLACES_NAME, _publicPlacesNameField));
-			stream << t.cell("Tronçon de projection", t.getForm().getTextInput(PARAMETER_FIELD_PUBLIC_PLACES_ROAD_CHUNK, _publicPlacesRoadChunkField));
-			stream << t.cell("Numéro adresse", t.getForm().getTextInput(PARAMETER_FIELD_PUBLIC_PLACES_NUMBER, _publicPlacesNumberField));
-			stream << t.cell("Code localités", t.getForm().getTextInput(PARAMETER_FIELD_PUBLIC_PLACES_CITY_CODE, _publicPlacesCityCodeField));
-			stream << t.close();
 		}
 
 

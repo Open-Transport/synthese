@@ -24,9 +24,11 @@
 #ifndef SYNTHESE_IMPEX_HastusFileFormat_H
 #define SYNTHESE_IMPEX_HastusFileFormat_H
 
+#include "CalendarFileFormat.hpp"
 #include "FileFormatTemplate.h"
 #include "OneFileTypeImporter.hpp"
 #include "PTDataCleanerFileFormat.hpp"
+#include "PTFileFormat.hpp"
 #include "NoExportPolicy.hpp"
 
 #include "CalendarTemplateTableSync.h"
@@ -54,7 +56,9 @@ namespace synthese
 		public:
 			class Importer_:
 				public impex::OneFileTypeImporter<Importer_>,
-				public PTDataCleanerFileFormat
+				public PTDataCleanerFileFormat,
+				public PTFileFormat,
+				public CalendarFileFormat
 			{
 			private:
 				//! @name Import parameters
@@ -140,7 +144,10 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
 
 
@@ -170,26 +177,12 @@ namespace synthese
 				/// @param filePath path of the file to import
 				/// @author Hugues Romain
 				virtual bool _parse(
-					const boost::filesystem::path& filePath,
-					boost::optional<const server::Request&> adminRequest
+					const boost::filesystem::path& filePath
 				) const;
+
+
 
 				virtual db::DBTransaction _save() const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @author Hugues Romain
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
-
 			};
 
 			class Exporter_:

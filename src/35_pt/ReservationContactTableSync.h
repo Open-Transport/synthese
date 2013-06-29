@@ -25,6 +25,7 @@
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "OldLoadSavePolicy.hpp"
+#include "ReservationContact.h"
 
 #include <iostream>
 #include <vector>

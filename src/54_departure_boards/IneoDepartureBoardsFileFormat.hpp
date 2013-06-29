@@ -26,6 +26,7 @@
 #include "FileFormatTemplate.h"
 #include "DatabaseReadImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "PTFileFormat.hpp"
 
 namespace synthese
 {
@@ -44,7 +45,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::DatabaseReadImporter<IneoDepartureBoardsFileFormat>
+				public impex::DatabaseReadImporter<IneoDepartureBoardsFileFormat>,
+				public data_exchange::PTFileFormat
 			{
 			public:
 				static const std::string PARAMETER_PT_DATASOURCE_ID;
@@ -60,7 +62,6 @@ namespace synthese
 			protected:
 
 				virtual bool _read(
-					boost::optional<const server::Request&> adminRequest
 				) const;
 
 
@@ -68,19 +69,11 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::Import& import,
-					const impex::ImportLogger& logger
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
+					util::ParametersMap& pm
 				);
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Import screen to include in the administration console.
-				/// @param os stream to write the result on
-				/// @param request request for display of the administration console
-				/// @since 3.2.0
-				/// @date 2010
-				virtual void displayAdmin(
-					std::ostream& os,
-					const server::Request& request
-				) const;
 
 
 

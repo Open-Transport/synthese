@@ -25,19 +25,71 @@
 #include "DBTransaction.hpp"
 #include "Env.h"
 
+#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/path.hpp>
+
+using namespace boost::filesystem;
+using namespace boost::posix_time;
+using namespace std;
+
 namespace synthese
 {
 	using namespace db;
+	using namespace util;
 
 	namespace impex
 	{
+		const string Importer::ATTR_IMPORT_START_TIME = "import_start_time";
+		const string Importer::TAG_LOG_ENTRY = "log_entry";
+		const string Importer::ATTR_LEVEL = "level";
+		const string Importer::ATTR_TEXT = "text";
+
+
+
 		//////////////////////////////////////////////////////////////////////////
-		/// Shortcut to Importlogger::log
 		void Importer::_log(
-			ImportLogger::Level level,
+			ImportLogLevel level,
 			const std::string& content
 		) const	{
-			_logger.log(level, content);
+			if(level >= _minLogLevel)
+			{
+				// String level code
+				string levelStr;
+				switch(level)
+				{
+				case IMPORT_LOG_DEBG: levelStr = "DEBG"; break;
+				case IMPORT_LOG_LOAD: levelStr = "LOAD"; break;
+				case IMPORT_LOG_CREA: levelStr = "CREA"; break;
+				case IMPORT_LOG_INFO: levelStr = "INFO"; break;
+				case IMPORT_LOG_WARN: levelStr = "WARN"; break;
+				case IMPORT_LOG_NOTI: levelStr = "NOTI"; break;
+				case IMPORT_LOG_ERROR: levelStr = "ERR "; break;
+				case IMPORT_LOG_ALL: levelStr = "ALL "; break;
+				case IMPORT_LOG_NOLOG: levelStr = "NOLOG "; break;
+				}
+
+				// Output stream
+				if(_outputStream)
+				{
+					*_outputStream << levelStr << " " << content << "<br />";
+				}
+
+				// File stream
+				if(_fileStream.get())
+				{
+					*_fileStream << levelStr << " " << content << "<br />";
+				}
+
+				// Parameters map
+				boost::shared_ptr<ParametersMap> entryPM(new ParametersMap);
+				entryPM->insert(ATTR_LEVEL, levelStr);
+				entryPM->insert(ATTR_TEXT, content);
+				_pm.insert(TAG_LOG_ENTRY, entryPM);
+			}
+			if(level > _maxLoggedLevel)
+			{
+				_maxLoggedLevel = level;
+			}
 		}
 
 
@@ -45,11 +97,52 @@ namespace synthese
 		Importer::Importer(
 			util::Env& env,
 			const Import& import,
-			const ImportLogger& logger
+			ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
+			util::ParametersMap& pm
 		):	_env(env),
 			_import(import),
-			_logger(logger)
-		{}
+			_minLogLevel(minLogLevel),
+			_outputStream(outputStream),
+			_pm(pm)
+		{
+			ptime now(second_clock::local_time());
+
+			// File stream
+			if(!logPath.empty())
+			{
+				stringstream dateDirName;
+				dateDirName <<
+					now.date().year() << "-" <<
+					setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+					setw(2) << setfill('0') << now.date().day()
+					;
+				stringstream fileName;
+				fileName <<
+					setw(2) << setfill('0') << now.time_of_day().hours() << "-" <<
+					setw(2) << setfill('0') << now.time_of_day().minutes() << "-" <<
+					setw(2) << setfill('0') << now.time_of_day().seconds() <<
+					".log"
+					;
+				path p(logPath);
+				p = p / dateDirName.str();
+				create_directories(p);
+				p = p / fileName.str();
+				_fileStream.reset(new ofstream(p.file_string().c_str()));
+			}
+
+			// Parameters map
+			stringstream dateStr;
+			dateStr <<
+				now.date().year() << "-" <<
+				setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+				setw(2) << setfill('0') << now.date().day() << " " <<
+				setw(2) << setfill('0') << now.time_of_day().hours() << ":" <<
+				setw(2) << setfill('0') << now.time_of_day().minutes() << ":" <<
+				setw(2) << setfill('0') << now.time_of_day().seconds();
+			_pm.insert(ATTR_IMPORT_START_TIME, dateStr.str());
+		}
 
 
 
@@ -63,42 +156,63 @@ namespace synthese
 
 		void Importer::_logError( const std::string& content ) const
 		{
-			_logger.logError(content);
+			_log(IMPORT_LOG_ERROR, content);
 		}
 
 
 
 		void Importer::_logWarning( const std::string& content ) const
 		{
-			_logger.logWarning(content);
+			_log(IMPORT_LOG_WARN, content);
 		}
 
 
 
 		void Importer::_logDebug( const std::string& content ) const
 		{
-			_logger.logDebug(content);
+			_log(IMPORT_LOG_DEBG, content);
 		}
 
 
 
 		void Importer::_logInfo( const std::string& content ) const
 		{
-			_logger.logInfo(content);
-
+			_log(IMPORT_LOG_INFO, content);
 		}
 
 
 
 		void Importer::_logLoad( const std::string& content ) const
 		{
-			_logger.logLoad(content);
+			_log(IMPORT_LOG_LOAD, content);
 		}
 
 
 
 		void Importer::_logCreation( const std::string& content ) const
 		{
-			_logger.logCreation(content);
+			_log(IMPORT_LOG_CREA, content);
+		}
+
+
+
+		void Importer::_logRaw( const std::string& content ) const
+		{
+			// Output stream
+			if(_outputStream)
+			{
+				*_outputStream << content;
+			}
+
+			// File stream
+			if(_fileStream.get())
+			{
+				*_fileStream << content;
+			}
+
+			// Parameters map
+			boost::shared_ptr<ParametersMap> entryPM(new ParametersMap);
+			entryPM->insert(ATTR_TEXT, content);
+			_pm.insert(TAG_LOG_ENTRY, entryPM);
 		}
 }	}
