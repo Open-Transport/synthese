@@ -157,7 +157,7 @@ namespace synthese
 
 				stream << t.row();
 				stream << t.col() << dataSource->getKey();
-				stream << t.col() << dataSource->getName();
+				stream << t.col() << dataSource->get<Name>();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getHTMLForm().getURL(), "Ouvrir", string(), "/admin/img/database_edit.png");
 				stream << t.col() << HTMLModule::getLinkButton(removeRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la source de données "+ dataSource->getName() +" ?", "/admin/img/database_delete.png");
 			}
