@@ -1,7 +1,7 @@
 <div class="control-group">
  <label class="control-label"><@label@> <?if&cond=<@help@>&then=<#forms/help_button&content=<@help@>&title=<@label@>#>?></label>
  <div class="controls">
-  <label class="radio inline"><input type="radio" name="<@name@>" value="1" <@(~variable(name))?"checked=\"true\"":""@> is_parameter="true" /> OUI</label>
-  <label class="radio inline"><input type="radio" name="<@name@>" value="0" <@(~variable(name))?"":"checked=\"true\""@> is_parameter="true" /> NON</label>
+  <label class="radio inline"><input type="radio" name="<@name@>" value="1" <@(~variable("import."+name))?"checked=\"true\"":""@> is_parameter="true" /> OUI</label>
+  <label class="radio inline"><input type="radio" name="<@name@>" value="0" <@(~variable("import."+name))?"":"checked=\"true\""@> is_parameter="true" /> NON</label>
  </div>
 </div>
