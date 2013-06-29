@@ -1,7 +1,7 @@
 <div class="control-group">
  <label class="control-label"><@label?label:"Réseau de transport"@></label>
  <div class="controls">
-  <select name="<@name@>" is_parameter="true"><@input_value=<@~variable(name)@>@>
+  <select name="<@name@>" is_parameter="true"><@input_value=<@~variable("import."+name)@>@>
    <option value="">(non défini)</option>
    <?PTNetworksListFunction&template=<{network&template=
        <option value="<@network_id@>" <@(network_id==input_value)?"selected=\"true\"":""@>><@name@></option>
