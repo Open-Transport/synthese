@@ -1,10 +1,10 @@
 <div class="control-group">
  <label class="control-label"><@label@> <?if&cond=<@help@>&then=<#forms/help_button&content=<@help@>&title=<@label@>#>?></label>
  <div class="controls">
-   <?if&cond=<@label1@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value1@>" <@((~variable(name))==value1)?"checked=\"true\"":""@>" is_parameter="true" /> <@label1@></label>?>
-   <?if&cond=<@label2@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value2@>" <@((~variable(name))==value2)?"checked=\"true\"":""@>" is_parameter="true" /> <@label2@></label>?>
-   <?if&cond=<@label3@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value3@>" <@((~variable(name))==value3)?"checked=\"true\"":""@>" is_parameter="true" /> <@label3@></label>?>
-   <?if&cond=<@label4@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value4@>" <@((~variable(name))==value4)?"checked=\"true\"":""@>" is_parameter="true" /> <@label4@></label>?>
-   <?if&cond=<@label5@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value5@>" <@((~variable(name))==value5)?"checked=\"true\"":""@>" is_parameter="true" /> <@label5@></label>?>
+   <?if&cond=<@label1@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value1@>" <@((~variable("import."+name))==value1)?"checked=\"true\"":""@>" is_parameter="true" /> <@label1@></label>?>
+   <?if&cond=<@label2@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value2@>" <@((~variable("import."+name))==value2)?"checked=\"true\"":""@>" is_parameter="true" /> <@label2@></label>?>
+   <?if&cond=<@label3@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value3@>" <@((~variable("import."+name))==value3)?"checked=\"true\"":""@>" is_parameter="true" /> <@label3@></label>?>
+   <?if&cond=<@label4@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value4@>" <@((~variable("import."+name))==value4)?"checked=\"true\"":""@>" is_parameter="true" /> <@label4@></label>?>
+   <?if&cond=<@label5@>&then=<label class="radio<@inline?" inline":""@>"><input type="radio" name="<@name@>" value="<@value5@>" <@((~variable("import."+name))==value5)?"checked=\"true\"":""@>" is_parameter="true" /> <@label5@></label>?>
  </div>
 </div>
