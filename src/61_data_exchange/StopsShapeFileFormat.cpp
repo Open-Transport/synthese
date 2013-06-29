@@ -235,7 +235,6 @@ namespace synthese
 				}
 
 				PTFileFormat::ImportableStopPoint isp;
-				isp.operatorCode = stopOperatorCode;
 				isp.name = stopPointName;
 				isp.linkedStopPoints = _stopPoints.get(stopOperatorCode);
 				isp.coords = geometry;
@@ -250,11 +249,15 @@ namespace synthese
 
 				if(isp.linkedStopPoints.empty())
 				{
-					nonLinkedStopPoints.push_back(isp);
+					nonLinkedStopPoints.insert(
+						make_pair(stopOperatorCode, isp)
+					);
 				}
 				else if(_displayLinkedStops)
 				{
-					linkedStopPoints.push_back(isp);
+					linkedStopPoints.insert(
+						make_pair(stopOperatorCode, isp)
+					);
 				}
 
 				const City* cityForStopAreaAutoGeneration;

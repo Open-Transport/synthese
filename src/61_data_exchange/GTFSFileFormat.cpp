@@ -301,7 +301,6 @@ namespace synthese
 					}
 
 					PTFileFormat::ImportableStopPoint isp;
-					isp.operatorCode = id;
 					isp.name = name;
 					isp.linkedStopPoints = _stopPoints.get(id);
 					isp.stopArea = stopArea;
@@ -309,11 +308,15 @@ namespace synthese
 
 					if(isp.linkedStopPoints.empty())
 					{
-						nonLinkedStopPoints.push_back(isp);
+						nonLinkedStopPoints.insert(
+							make_pair(id, isp)
+						);
 					}
 					else if(_displayLinkedStops)
 					{
-						linkedStopPoints.push_back(isp);
+						linkedStopPoints.insert(
+							make_pair(id, isp)
+						);
 					}
 					else
 					{

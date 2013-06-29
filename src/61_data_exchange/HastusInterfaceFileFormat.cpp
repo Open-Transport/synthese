@@ -379,9 +379,10 @@ namespace synthese
 				if(stopCode.second.empty())
 				{
 					PTFileFormat::ImportableStopPoint isp;
-					isp.operatorCode = stopCode.first;
 					isp.name = stopCode.first;
-					nonLinkedStopPoints.push_back(isp);
+					nonLinkedStopPoints.insert(
+						make_pair(stopCode.first, isp)
+					);
 					success = false;
 				}
 			}
