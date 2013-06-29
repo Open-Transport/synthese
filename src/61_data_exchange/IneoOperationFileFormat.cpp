@@ -67,7 +67,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat, IneoOperationFileFormat>::FACTORY_KEY("IneoOperation");
 	}
 
-	namespace pt_operation
+	namespace data_exchange
 	{
 		const string IneoOperationFileFormat::Importer_::FILE_AFA = "afa";
 		const string IneoOperationFileFormat::Importer_::FILE_SAB = "sab";
@@ -85,7 +85,7 @@ namespace synthese
 	}
 
 
-	namespace pt_operation
+	namespace data_exchange
 	{
 		bool IneoOperationFileFormat::Importer_::_checkPathsMap() const
 		{

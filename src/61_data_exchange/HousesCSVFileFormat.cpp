@@ -55,15 +55,14 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace road;
 	using namespace util;
 	using namespace impex;
 	using namespace geography;
 	using namespace graph;
 	using namespace db;
-	using namespace admin;
 	using namespace server;
-	using namespace html;
 	using namespace lexical_matcher;
 
 	namespace util
@@ -71,7 +70,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,HousesCSVFileFormat>::FACTORY_KEY("HousesCSV");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		const string HousesCSVFileFormat::Importer_::SEP(";");
 
@@ -105,7 +104,7 @@ namespace synthese
 		"");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		HousesCSVFileFormat::Importer_::Importer_(
 			util::Env& env,

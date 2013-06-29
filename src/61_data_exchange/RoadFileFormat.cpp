@@ -42,9 +42,11 @@ namespace synthese
 {
 	using namespace impex;
 	using namespace graph;
+	using namespace road;
 	using namespace util;
+	
 
-	namespace road
+	namespace data_exchange
 	{
 		RoadFileFormat::RoadFileFormat(
 			util::Env& env,

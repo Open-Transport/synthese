@@ -13,6 +13,8 @@
 #include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
 #include "IneoBDSIFileFormat.hpp"
+#include "IneoDepartureBoardsFileFormat.hpp"
+#include "IneoOperationFileFormat.hpp"
 #include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
 #include "ObitiFileFormat.hpp"
@@ -21,6 +23,11 @@
 #include "TridentFileFormat.h"
 #include "StopsShapeFileFormat.hpp"
 #include "ServicesCSVFileFormat.hpp"
+#include "HousesCSVFileFormat.hpp"
+#include "IGNstreetsFileFormat.hpp"
+#include "NavstreetsFileFormat.hpp"
+#include "OSMFileFormat.hpp"
+#include "RoadShapeFileFormat.hpp"
 
 #include "VDVSubscriptionService.hpp"
 #include "VDVDataReadyService.hpp"
@@ -68,7 +75,9 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::HastusInterfaceFileFormat::integrate();
 	synthese::data_exchange::HeuresFileFormat::integrate();
 	synthese::data_exchange::IneoBDSIFileFormat::integrate();
+	synthese::data_exchange::IneoDepartureBoardsFileFormat::integrate();
 	synthese::data_exchange::IneoFileFormat::integrate();
+	synthese::data_exchange::IneoOperationFileFormat::integrate();
 	synthese::data_exchange::IneoRealTimeFileFormat::integrate();
 	synthese::data_exchange::OGTFileFormat::integrate();
 	synthese::data_exchange::ObitiFileFormat::integrate();
@@ -77,7 +86,11 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::TridentFileFormat::integrate();
 	synthese::data_exchange::StopsShapeFileFormat::integrate();
 	synthese::data_exchange::ServicesCSVFileFormat::integrate();
-	
+	synthese::data_exchange::HousesCSVFileFormat::integrate();
+	synthese::data_exchange::NavstreetsFileFormat::integrate();
+	synthese::data_exchange::OSMFileFormat::integrate();
+	synthese::data_exchange::RoadShapeFileFormat::integrate();
+	synthese::data_exchange::IGNstreetsFileFormat::integrate();
 
 
 	// Registries

@@ -45,6 +45,7 @@ using namespace boost::algorithm;
 namespace synthese
 {
 	using namespace data_exchange;
+	using namespace departure_boards;
 	using namespace server;
 	using namespace util;
 	using namespace impex;
@@ -54,10 +55,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,departure_boards::IneoDepartureBoardsFileFormat>::FACTORY_KEY("Ineo SIV bornes");
+		template<> const string FactorableTemplate<FileFormat, IneoDepartureBoardsFileFormat>::FACTORY_KEY("Ineo SIV bornes");
 	}
 
-	namespace departure_boards
+	namespace data_exchange
 	{
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_PT_DATASOURCE_ID("ps");
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_DEFAULT_DISPLAY_TYPE_ID("dt");

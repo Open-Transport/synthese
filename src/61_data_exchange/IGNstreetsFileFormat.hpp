@@ -1,7 +1,7 @@
 
-/** RoadShapeFileFormat class header.
-	@file RoadShapeFileFormat.hpp
-	@author Hugues Romain
+/** IGNstreetsFileFormat class header.
+	@file IGNstreetsFileFormat.hpp
+	@author Gaël Sauvanet
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -21,19 +21,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_road_RoadShapeFileFormat_hpp__
-#define SYNTHESE_road_RoadShapeFileFormat_hpp__
+#ifndef SYNTHESE_road_IGNstreetFileFormat_hpp__
+#define SYNTHESE_road_IGNstreetFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
-#include "RoadFileFormat.hpp"
-
 #include "MainRoadChunk.hpp"
-#include "ImportableTableSync.hpp"
-#include "RoadPlaceTableSync.h"
-
-#include "Import.hpp"
 
 #include <map>
 #include <ostream>
@@ -49,90 +43,60 @@ namespace geos
 
 namespace synthese
 {
-	namespace geography
-	{
-		class City;
-	}
-
-	namespace road
+	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 34.16 : Road ShapeFile file format class.
+		/// 34.16 : IGNstreets file format class.
 		///	@ingroup m34
-		/// @author Hugues Romain
+		/// @author Gaël Sauvanet
 		/// @since 3.2.0
-		/// @date 2010
-		/// @todo Replace cdbfile.h use by shapefil.h dbf support and remove cdbfile.h
-		/// @bug the imported files must allow writing (it is not used by synthese)
-		/// @bug the circulation side on the streets is forced to right
+		/// @date 2011
 		//////////////////////////////////////////////////////////////////////////
-		class RoadShapeFileFormat:
-			public impex::FileFormatTemplate<RoadShapeFileFormat>
+		class IGNstreetsFileFormat:
+			public impex::FileFormatTemplate<IGNstreetsFileFormat>
 		{
+		protected:
+			//! @name Fields of address table
+			//@{
+				static const std::string _FIELD_NOM_VOIE;
+				static const std::string _FIELD_NUMERO;
+				static const std::string _FIELD_GEOMETRY;
+				static const std::string _FIELD_INSEE_COMM;
+			//@}
+
 		public:
 
 			class Importer_:
-				public impex::MultipleFileTypesImporter<RoadShapeFileFormat>,
-				public RoadFileFormat
+				public impex::MultipleFileTypesImporter<IGNstreetsFileFormat>
 			{
-				friend class impex::MultipleFileTypesImporter<RoadShapeFileFormat>;
+				friend class impex::MultipleFileTypesImporter<IGNstreetsFileFormat>;
 
 			private:
 				//! @name Tables
 				//@{
-					static const std::string FILE_ROAD_PLACES;
-					static const std::string FILE_ROAD_CHUNKS;
-					static const std::string FILE_PUBLIC_PLACES;
+					static const std::string FILE_ADDRESS;
 				//@}
 
 				//! @name Parameters
 				//@{
-					static const std::string PARAMETER_FIELD_ROAD_PLACES_CITY_CODE;
-					static const std::string PARAMETER_FIELD_ROAD_PLACES_CODE;
-					static const std::string PARAMETER_FIELD_ROAD_PLACES_NAME;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_FROM_LEFT;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_TO_LEFT;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_FROM_RIGHT;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_TO_RIGHT;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_ROAD_PLACE;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_CODE;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_START_NODE;
-					static const std::string PARAMETER_FIELD_ROAD_CHUNKS_END_NODE;
-					static const std::string PARAMETER_FIELD_PUBLIC_PLACES_CODE;
-					static const std::string PARAMETER_FIELD_PUBLIC_PLACES_NAME;
-					static const std::string PARAMETER_FIELD_PUBLIC_PLACES_ROAD_CHUNK;
-					static const std::string PARAMETER_FIELD_PUBLIC_PLACES_NUMBER;
-					static const std::string PARAMETER_FIELD_PUBLIC_PLACES_CITY_CODE;
+					static const std::string PARAMETER_DISPLAY_STATS;
+					static const std::string PARAMETER_MAX_HOUSE_DISTANCE;
 				//@}
 
-				//! @name Fields
-				//@{
-					static const std::string FIELD_GEOMETRY;
-				//@}
-
-				std::string _roadPlacesCityCodeField;
-				std::string _roadPlacesCodeField;
-				std::string _roadPlacesNameField;
-				std::string _roadChunksFromLeftField;
-				std::string _roadChunksToLeftField;
-				std::string _roadChunksFromRightField;
-				std::string _roadChunksToRightField;
-				std::string _roadChunksRoadPlaceField;
-				std::string _roadChunksCodeField;
-				std::string _roadChunksStartNodeField;
-				std::string _roadChunksEndNodeField;
-				std::string _publicPlacesCodeField;
-				std::string _publicPlacesNameField;
-				std::string _publicPlacesRoadChunkField;
-				std::string _publicPlacesNumberField;
-				std::string _publicPlacesCityCodeField;
-
-				mutable impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync> _roadPlaces;
-				mutable std::map<std::string, MainRoadChunk*> _roadChunks;
+				static const std::string TAG_MISSING_STREET;
+				static const std::string ATTR_SOURCE_NAME;
+				static const std::string TAG_CITY;
+				static const std::string ATTR_IMPORTED_ADDRESSES;
+				static const std::string ATTR_NOT_IMPORTED_CITY_NOT_FOUND;
+				static const std::string ATTR_NOT_IMPORTED_STREET_NOT_FOUND;
+				static const std::string ATTR_NOT_IMPORTED_EMPTY_STREET_NAME;
+				static const std::string ATTR_NOT_IMPORTED_STREET_TOO_FAR;
 
 
 
 			protected:
+				bool _displayStats;
+				double _maxHouseDistance;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks that all necessary input files are available.
@@ -144,6 +108,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Reads an input files and load its content to the memory.
 				/// @param filePath file to read
+				/// @param os stream to write log messages on
 				/// @param key type of the file
 				/// @author Hugues Romain
 				/// @since 3.2.0
@@ -164,22 +129,18 @@ namespace synthese
 					util::ParametersMap& pm
 				);
 
-
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
 				/// @return Generated parameters map
-				/// @author Hugues Romain
+				/// @author Gaël Sauvanet
 				/// @date 2010
 				/// @since 3.1.16
 				virtual util::ParametersMap _getParametersMap() const;
 
-
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
 				/// @param map Parameters map to interpret
-				/// @author Hugues Romain
+				/// @author Gaël Sauvanet
 				/// @date 2010
 				/// @since 3.1.16
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
@@ -189,16 +150,16 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Saves all imported data.
 				/// @return SQL transaction to run
-				/// @author Hugues Romain
+				/// @author Gaël Sauvanet
 				/// @since 3.2.0
 				/// @date 2010
 				virtual db::DBTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<RoadShapeFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<IGNstreetsFileFormat> Exporter_;
 
 			friend class Importer_;
 		};
 }	}
 
-#endif
+#endif // SYNTHESE_road_IGNstreetFileFormat_hpp__

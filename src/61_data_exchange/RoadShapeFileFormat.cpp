@@ -52,6 +52,7 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace algorithm;
+	using namespace data_exchange;
 	using namespace road;
 	using namespace util;
 	using namespace impex;
@@ -65,7 +66,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,RoadShapeFileFormat>::FACTORY_KEY("RoadShapeFile");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		const string RoadShapeFileFormat::Importer_::FILE_ROAD_PLACES = "road_places";
 		const string RoadShapeFileFormat::Importer_::FILE_ROAD_CHUNKS = "road_chunks";
@@ -100,7 +101,7 @@ namespace synthese
 		"");
 	}
 
-	namespace road
+	namespace data_exchange
 	{
 		RoadShapeFileFormat::Importer_::Importer_(
 			util::Env& env,

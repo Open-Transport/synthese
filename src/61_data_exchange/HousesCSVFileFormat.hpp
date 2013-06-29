@@ -1,6 +1,6 @@
 
-/** IGNstreetsFileFormat class header.
-	@file IGNstreetsFileFormat.hpp
+/** HousesCSVFileFormat class header.
+	@file HousesCSVFileFormat.hpp
 	@author Gaël Sauvanet
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -21,8 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_road_IGNstreetFileFormat_hpp__
-#define SYNTHESE_road_IGNstreetFileFormat_hpp__
+#ifndef SYNTHESE_HousesCSVFileFormat_hpp__
+#define SYNTHESE_HousesCSVFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
 #include "MultipleFileTypesImporter.hpp"
@@ -43,46 +43,44 @@ namespace geos
 
 namespace synthese
 {
-	namespace road
+	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 34.16 : IGNstreets file format class.
+		/// 34.16 : HousesCSV file format class.
 		///	@ingroup m34
 		/// @author Gaël Sauvanet
 		/// @since 3.2.0
-		/// @date 2011
+		/// @date 2012
 		//////////////////////////////////////////////////////////////////////////
-		class IGNstreetsFileFormat:
-			public impex::FileFormatTemplate<IGNstreetsFileFormat>
+		class HousesCSVFileFormat:
+			public impex::FileFormatTemplate<HousesCSVFileFormat>
 		{
 		protected:
 			//! @name Fields of address table
 			//@{
-				static const std::string _FIELD_NOM_VOIE;
-				static const std::string _FIELD_NUMERO;
-				static const std::string _FIELD_GEOMETRY;
-				static const std::string _FIELD_INSEE_COMM;
+				static const std::string PARAMETER_FIELD_CITY_CODE;
+				static const std::string PARAMETER_FIELD_CITY_NAME;
+				static const std::string PARAMETER_FIELD_ROAD_NAME;
+				static const std::string PARAMETER_FIELD_NUMBER;
+				static const std::string PARAMETER_FIELD_GEOMETRY_X;
+				static const std::string PARAMETER_FIELD_GEOMETRY_Y;
 			//@}
 
 		public:
 
 			class Importer_:
-				public impex::MultipleFileTypesImporter<IGNstreetsFileFormat>
+				public impex::MultipleFileTypesImporter<HousesCSVFileFormat>
 			{
-				friend class impex::MultipleFileTypesImporter<IGNstreetsFileFormat>;
+				friend class impex::MultipleFileTypesImporter<HousesCSVFileFormat>;
 
-			private:
-				//! @name Tables
-				//@{
-					static const std::string FILE_ADDRESS;
-				//@}
+			public:
+				static const std::string FILE_ADDRESS;
 
-				//! @name Parameters
-				//@{
-					static const std::string PARAMETER_DISPLAY_STATS;
-					static const std::string PARAMETER_MAX_HOUSE_DISTANCE;
-				//@}
+				static const std::string PARAMETER_DISPLAY_STATS;
+				static const std::string PARAMETER_MAX_HOUSE_DISTANCE;
+				static const std::string PARAMETER_NUMBER_OF_LINES_TO_IGNORE;
 
+				static const std::string TAG_MISSING_CITY;
 				static const std::string TAG_MISSING_STREET;
 				static const std::string ATTR_SOURCE_NAME;
 				static const std::string TAG_CITY;
@@ -91,12 +89,23 @@ namespace synthese
 				static const std::string ATTR_NOT_IMPORTED_STREET_NOT_FOUND;
 				static const std::string ATTR_NOT_IMPORTED_EMPTY_STREET_NAME;
 				static const std::string ATTR_NOT_IMPORTED_STREET_TOO_FAR;
+				
 
+			private:
+				static const std::string SEP;
 
-
-			protected:
 				bool _displayStats;
 				double _maxHouseDistance;
+				int _numberOfLinesToIgnore;
+
+				boost::optional<std::size_t> _cityCodeField;
+				boost::optional<std::size_t> _cityNameField;
+				boost::optional<std::size_t> _roadNameField;
+				boost::optional<std::size_t> _numberField;
+				boost::optional<std::size_t> _geometryXField;
+				boost::optional<std::size_t> _geometryYField;
+
+				mutable std::vector<std::string> _line;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks that all necessary input files are available.
@@ -108,16 +117,19 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Reads an input files and load its content to the memory.
 				/// @param filePath file to read
-				/// @param os stream to write log messages on
 				/// @param key type of the file
-				/// @author Hugues Romain
-				/// @since 3.2.0
-				/// @date 2010
+				/// @author Gaël Sauvanet
+				/// @since 3.3.0
+				/// @date 2012
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
 					const std::string& key
 				) const;
 
+
+
+				std::string _getValue(const std::size_t field) const;
+				void _loadLine(const std::string& line) const;
 
 			public:
 				Importer_(
@@ -133,16 +145,18 @@ namespace synthese
 				/// Conversion from attributes to generic parameter maps.
 				/// @return Generated parameters map
 				/// @author Gaël Sauvanet
-				/// @date 2010
-				/// @since 3.1.16
+				/// @date 2012
+				/// @since 3.3.0
 				virtual util::ParametersMap _getParametersMap() const;
+
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
 				/// @param map Parameters map to interpret
 				/// @author Gaël Sauvanet
-				/// @date 2010
-				/// @since 3.1.16
+				/// @date 2012
+				/// @since 3.3.0
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 
@@ -151,15 +165,15 @@ namespace synthese
 				/// Saves all imported data.
 				/// @return SQL transaction to run
 				/// @author Gaël Sauvanet
-				/// @since 3.2.0
-				/// @date 2010
+				/// @since 3.3.0
+				/// @date 2012
 				virtual db::DBTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<IGNstreetsFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<HousesCSVFileFormat> Exporter_;
 
 			friend class Importer_;
 		};
 }	}
 
-#endif // SYNTHESE_road_IGNstreetFileFormat_hpp__
+#endif // SYNTHESE_HousesCSVFileFormat_hpp__
