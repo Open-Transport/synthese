@@ -1,0 +1,20 @@
+<{result&template=
+<?if&
+  cond=<@~length("stop_point")@>&
+  then=
+  	<h4>Points d'arrêt</h4>
+  	<table class="table table-condensed table-striped">
+  	<{stop_point&template=
+  		<tr>
+  		 <td><@source_code@></td>
+  		 <td><@source_city_name@></td>
+  		 <td><@source_name@></td>
+  		 <td><?if&
+  		       cond=<@~length("linked_stop_point")@>&
+  		       then=<{linked_stop_point&template=<{stopArea&template=<@city_name+" "+stop_name@>}>: <@distance@>m }>&
+  		       else=<span class="label label-important">Pas de lien</span>&
+  		     ?>
+  		 </td>
+  		</tr>
+  	}></table>
+?>}>

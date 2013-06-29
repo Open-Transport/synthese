@@ -315,11 +315,22 @@
 	   <div class="well">
 	    <h3>Résultat de l'exécution<@(run_import==1)?" (simulation)":""@></h3>
 	    
-	    <?ImportFunction&
+	    <@result:=<?ImportFunction&
 	      import_id=<@roid@>&
 	      di=<@run_import-1@>&
 	      repeat_parameters=1&
-	    ?>
+	    ?>@>
+	    
+	    <p>Heure de démarrage : <@result.import_start_time@> - Statut : <@result.success?"Réussi":"Echec"@></p>
+	    
+	    <h4>Journal d'import</h4>
+	    
+	    <table class="table table-condensed table-striped">
+	    <{result.log_entry&template=
+	    	<tr><td class="log_<@level@>"><@level@></td><td><@text@></td></tr>
+	    }></table>
+	    
+	    <#formats/<@import.file_format@>/result#>
 	    
 	    <?if&cond=<@exceptions@>&then=
 	  	<div class="alert"><strong>Exception</strong> <@exceptions@></div>
