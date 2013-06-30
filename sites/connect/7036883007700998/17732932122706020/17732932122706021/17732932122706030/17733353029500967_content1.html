@@ -9,10 +9,11 @@
   		 <td><@source_code@></td>
   		 <td><@source_city_name@></td>
   		 <td><@source_name@></td>
+  		 <td><{source_line&template=<@source_code@> }></td>
   		 <td><?if&
   		       cond=<@~length("linked_stop_point")@>&
-  		       then=<{linked_stop_point&template=<{stopArea&template=<@city_name+" "+stop_name@>}>: <@distance@>m }>&
-  		       else=<span class="label label-important">Pas de lien</span>&
+  		       then=<{linked_stop_point&template=<{stopArea&template=<@city_name+" "+stop_name@>}>: <@(distance=="")?"":(distance+"m")@> }>&
+  		       else=<span class="label label-<@(~length("source_line"))?"important":"warning"@>">Pas de lien</span>&
   		     ?>
   		 </td>
   		</tr>
