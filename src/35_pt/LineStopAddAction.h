@@ -28,6 +28,9 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 
+#include "ContinuousServiceTableSync.h"
+#include "ScheduledServiceTableSync.h"
+
 namespace synthese
 {
 	namespace pt
@@ -76,15 +79,19 @@ namespace synthese
 			static const std::string PARAMETER_AREA;
 			static const std::string PARAMETER_WITH_SCHEDULES;
 			static const std::string PARAMETER_RESERVATION_NEEDED;
+			static const std::string PARAMETER_DURATION_TO_ADD;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
+			ScheduledServiceTableSync::SearchResult _scheduledServices;
+			ContinuousServiceTableSync::SearchResult _continuousServices;
 			boost::shared_ptr<StopPoint> _stop;
 			boost::shared_ptr<DRTArea> _area;
 			std::size_t _rank;
 			double _metricOffset;
 			bool _withSchedules;
 			bool _reservationNeeded;
+			boost::posix_time::time_duration _durationToAdd;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
