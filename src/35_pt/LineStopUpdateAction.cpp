@@ -74,13 +74,15 @@ namespace synthese
 		const string LineStopUpdateAction::PARAMETER_WITH_SCHEDULES = Action_PARAMETER_PREFIX + "with_schedules";
 		const string LineStopUpdateAction::PARAMETER_READ_LENGTH_FROM_GEOMETRY = Action_PARAMETER_PREFIX + "read_length_from_geometry";
 		const string LineStopUpdateAction::PARAMETER_RESERVATION_NEEDED = Action_PARAMETER_PREFIX + "_reservation_needed";
+		const string LineStopUpdateAction::PARAMETER_CLEAR_GEOM = Action_PARAMETER_PREFIX + "_clear_geom";
 
 
 
 		LineStopUpdateAction::LineStopUpdateAction():
 			_nextLineStop(NULL),
 			_prevLineStop(NULL),
-			_readLengthFromGeometry(false)
+			_readLengthFromGeometry(false),
+			_clearGeom(false)
 		{}
 
 
@@ -125,6 +127,7 @@ namespace synthese
 				);
 			}
 			map.insert(PARAMETER_READ_LENGTH_FROM_GEOMETRY, _readLengthFromGeometry);
+			map.insert(PARAMETER_CLEAR_GEOM, _clearGeom);
 			return map;
 		}
 
@@ -210,6 +213,9 @@ namespace synthese
 				_reservationNeeded = map.get<bool>(PARAMETER_RESERVATION_NEEDED);
 			}
 
+			// Clear geom
+			_clearGeom = map.getDefault<bool>(PARAMETER_CLEAR_GEOM, false);
+
 			// Geometry
 			if(map.isDefined(ObjectUpdateAction::GetInputName<LineStringGeometry>()))
 			{
@@ -218,8 +224,9 @@ namespace synthese
 					static_cast<LineString*>(
 						reader.read(map.get<string>(ObjectUpdateAction::GetInputName<LineStringGeometry>()))
 				)	);
+				_clearGeom = false;
 			}
-
+			
 			// Read length from geometry
 			_readLengthFromGeometry = map.getDefault<bool>(PARAMETER_READ_LENGTH_FROM_GEOMETRY, false);
 		}
@@ -311,6 +318,12 @@ namespace synthese
 			if(_geometry)
 			{
 				_lineStop->setGeometry(*_geometry);
+			}
+
+			// Clear geometry
+			if(_clearGeom)
+			{
+				_lineStop->setGeometry(boost::shared_ptr<LineString>());
 			}
 
 			// Savings
