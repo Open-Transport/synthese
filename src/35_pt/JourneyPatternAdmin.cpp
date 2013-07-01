@@ -434,8 +434,7 @@ namespace synthese
 							HTMLModule::getHTMLImage("/admin/img/ftv2vertline.png", "Horaire non fourni à cet arrêt")
 						);
 
-						if(	_line->getServices().empty() &&
-							edge->getRankInPath() != 0 &&
+						if(	edge->getRankInPath() != 0 &&
 							edge->getRankInPath() != (*_line->getEdges().rbegin())->getRankInPath()
 						){
 							lineStopUpdateAction.getAction()->setWithSchedules(!linePhysicalStop->getScheduleInput());
