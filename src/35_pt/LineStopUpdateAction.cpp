@@ -321,18 +321,24 @@ namespace synthese
 			}
 			LineStopTableSync::Save(_lineStop.get(), transaction);
 
-			if(_readLengthFromGeometry && _lineStop->getGeometry())
+			if(	_readLengthFromGeometry && _lineStop->getGeometry())
 			{
 				LineStopTableSync::ChangeLength(
 					*_lineStop,
 					floor(_lineStop->getGeometry()->getLength()),
 					transaction
 				);
+			}
+
+			if(	(_readLengthFromGeometry && _lineStop->getGeometry()) ||
+				_withSchedules
+			){
 				JourneyPatternTableSync::ReloadServices(
 					_lineStop->getKey(),
 					transaction
 				);
 			}
+
 			transaction.run();
 
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
