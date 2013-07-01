@@ -498,6 +498,11 @@ namespace synthese
 				);
 
 				stream << t.col(1,string(),false,string(),2);
+				if(!_line->getServices().empty())
+				{
+					stream << "Durée du trajet nouveau : " << f.getTextInput(LineStopAddAction::PARAMETER_DURATION_TO_ADD, string());
+				}
+
 				stream << t.col(1,string(),false,string(),2);
 				stream << t.col(1,string(),false,string(),2);
 				stream << t.col(1,string(),false,string(),2);
@@ -789,6 +794,17 @@ namespace synthese
 						JourneyPatternUpdateAction::PARAMETER_TRANSPORT_MODE_ID,
 						RollingStockTableSync::GetLabels(),
 						_line->getRollingStock() ? _line->getRollingStock()->getKey() : optional<RegistryKeyType>()
+				)	);
+				stream << p.cell(
+					"Ligne",
+					p.getForm().getSelectInput(
+						JourneyPatternUpdateAction::PARAMETER_LINE_ID,
+						PTModule::getCommercialLineLabels(
+							_request.getUser()->getProfile()->getRightsForModuleClass<TransportNetworkRight>(),
+							_request.getUser()->getProfile()->getGlobalPublicRight<TransportNetworkRight>() >= READ,
+						READ
+						),
+						_line->getCommercialLine() ? _line->getCommercialLine()->getKey() : optional<RegistryKeyType>()
 				)	);
 				stream << p.cell(
 					"Direction (texte)",

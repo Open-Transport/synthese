@@ -47,9 +47,12 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
+	using namespace graph;
 	using namespace server;
 	using namespace security;
 	using namespace util;
@@ -70,6 +73,7 @@ namespace synthese
 		const string LineStopAddAction::PARAMETER_AREA = Action_PARAMETER_PREFIX + "ar";
 		const string LineStopAddAction::PARAMETER_WITH_SCHEDULES = Action_PARAMETER_PREFIX + "with_schedules";
 		const string LineStopAddAction::PARAMETER_RESERVATION_NEEDED = Action_PARAMETER_PREFIX + "_reservation_needed";
+		const string LineStopAddAction::PARAMETER_DURATION_TO_ADD = Action_PARAMETER_PREFIX + "_duration_to_add";
 
 
 
@@ -92,6 +96,10 @@ namespace synthese
 			map.insert(PARAMETER_RANK, _rank);
 			map.insert(PARAMETER_WITH_SCHEDULES, _withSchedules);
 			map.insert(PARAMETER_RESERVATION_NEEDED, _reservationNeeded);
+			if(!_durationToAdd.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_DURATION_TO_ADD, _durationToAdd.total_seconds() / 60);
+			}
 			return map;
 		}
 
@@ -172,10 +180,28 @@ namespace synthese
 			}
 
 			// With schedules
-			_withSchedules = map.getDefault<bool>(PARAMETER_WITH_SCHEDULES, true);
+			if(_rank == 0 || _rank == _route->getEdges().size())
+			{
+				_withSchedules = true;
+				_durationToAdd = minutes(map.getDefault<long>(PARAMETER_DURATION_TO_ADD, 1));
+			}
+			else
+			{
+				_withSchedules = map.getDefault<bool>(PARAMETER_WITH_SCHEDULES, true);
+			}
 
 			// Reservation needed
 			_reservationNeeded = map.getDefault<bool>(PARAMETER_RESERVATION_NEEDED, true);
+
+			// Store the services in case of update
+			_scheduledServices = ScheduledServiceTableSync::Search(
+				*_env,
+				_route->getKey()
+			);
+			_continuousServices = ContinuousServiceTableSync::Search(
+				*_env, 
+				_route->getKey()
+			);
 		}
 
 
@@ -187,40 +213,143 @@ namespace synthese
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			//_object->setAttribute(_value);
 
+			// Transaction
+			DBTransaction transaction;
+
+			// Add the stop
+			boost::shared_ptr<LineStop> lineStop;
 			if(_stop.get())
 			{
-				DesignatedLinePhysicalStop lineStop(
-					0,
-					_route.get(),
-					_rank,
-					true,
-					true,
-					_metricOffset,
-					_stop.get(),
-					_withSchedules,
-					_reservationNeeded
-				);
-				LineStopTableSync::InsertStop(lineStop);
+				lineStop.reset(
+					new DesignatedLinePhysicalStop(
+						0,
+						_route.get(),
+						_rank,
+						true,
+						true,
+						_metricOffset,
+						_stop.get(),
+						_withSchedules,
+						_reservationNeeded
+				)	);
+				LineStopTableSync::InsertStop(*lineStop, transaction);
 			}
 			if(_area.get())
 			{
-				LineArea lineStop(
-					0,
-					_route.get(),
-					_rank,
-					true,
-					true,
-					_metricOffset,
-					_area.get(),
-					_withSchedules
-				);
-				LineStopTableSync::InsertStop(lineStop);
+				lineStop.reset(
+					new LineArea(
+						0,
+						_route.get(),
+						_rank,
+						true,
+						true,
+						_metricOffset,
+						_area.get(),
+						_withSchedules
+				)	);
+				LineStopTableSync::InsertStop(*lineStop, transaction);
 			}
 
-			// Reload of services
-			JourneyPatternTableSync::ReloadServices(
-				_route->getKey()
-			);
+			// Update each service with an additional schedule at the beginning
+			if(_rank == 0)
+			{
+				// Update the path with a fake line stop
+				BOOST_FOREACH(Edge* edge, _route->getEdges())
+				{
+					edge->setRankInPath(edge->getRankInPath()+1);
+				}
+				_route->addEdge(*lineStop);
+
+				// Update of the schedules of each existing service
+				BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, _scheduledServices)
+				{
+					// Departure schedules update
+					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					time_duration departureSchedule(*departureSchedules.begin());
+					departureSchedule -= _durationToAdd;
+					departureSchedules.insert(departureSchedules.begin(), departureSchedule);
+
+					// Arrival schedules update
+					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					time_duration arrivalSchedule(*arrivalSchedules.begin());
+					arrivalSchedule -= _durationToAdd;
+					arrivalSchedules.insert(arrivalSchedules.begin(), arrivalSchedule);
+
+					// Service update
+					service->setSchedules(departureSchedules, arrivalSchedules, false);
+				}
+				BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& service, _continuousServices)
+				{
+					// Departure schedules update
+					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					time_duration departureSchedule(*departureSchedules.begin());
+					departureSchedule -= _durationToAdd;
+					departureSchedules.insert(departureSchedules.begin(), departureSchedule);
+
+					// Arrival schedules update
+					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					time_duration arrivalSchedule(*arrivalSchedules.begin());
+					arrivalSchedule -= _durationToAdd;
+					arrivalSchedules.insert(arrivalSchedules.begin(), arrivalSchedule);
+
+					// Service update
+					service->setSchedules(departureSchedules, arrivalSchedules, false);
+				}
+			}
+			else if(_rank == _route->getEdges().size())
+			{
+				// Update the path with a fake line stop
+				_route->addEdge(*lineStop);
+
+				// Update of the schedules of each existing service
+				BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, _scheduledServices)
+				{
+					// Departure schedules update
+					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					time_duration departureSchedule(*departureSchedules.rbegin());
+					departureSchedule += _durationToAdd;
+					departureSchedules.push_back(departureSchedule);
+
+					// Arrival schedules update
+					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					time_duration arrivalSchedule(*arrivalSchedules.rbegin());
+					arrivalSchedule += _durationToAdd;
+					arrivalSchedules.push_back(arrivalSchedule);
+
+					// Service update
+					service->setSchedules(departureSchedules, arrivalSchedules, false);
+				}
+				BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& service, _continuousServices)
+				{
+					// Departure schedules update
+					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					time_duration departureSchedule(*departureSchedules.rbegin());
+					departureSchedule += _durationToAdd;
+					departureSchedules.push_back(departureSchedule);
+
+					// Arrival schedules update
+					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					time_duration arrivalSchedule(*arrivalSchedules.rbegin());
+					arrivalSchedule += _durationToAdd;
+					arrivalSchedules.push_back(arrivalSchedule);
+
+					// Service update
+					service->setSchedules(departureSchedules, arrivalSchedules, false);
+				}
+			}
+
+			// Store the services
+			BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, _scheduledServices)
+			{
+				ScheduledServiceTableSync::Save(service.get(), transaction);
+			}
+			BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& cservice, _continuousServices)
+			{
+				ContinuousServiceTableSync::Save(cservice.get(), transaction);
+			}
+
+			// Run the transaction
+			transaction.run();
 
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

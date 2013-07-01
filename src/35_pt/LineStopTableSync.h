@@ -101,7 +101,8 @@ namespace synthese
 			/// @since 3.1.16
 			//////////////////////////////////////////////////////////////////////////
 			static void InsertStop(
-				LineStop& lineStop
+				LineStop& lineStop,
+				db::DBTransaction& transaction
 			);
 
 
