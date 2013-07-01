@@ -364,6 +364,14 @@ namespace synthese
 							);
 						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(false);
 					}
+					lineStopUpdateAction.getAction()->setClearGeom(true);
+					stream <<
+						HTMLModule::getHTMLLink(
+							lineStopUpdateAction.getHTMLForm().getURL(),
+							HTMLModule::getHTMLImage("/admin/img/cross.png", "Supprimer géométrie"),
+							"Etes-vous sûr de vouloir supprimer la géométrie ?"
+						);
+					lineStopUpdateAction.getAction()->setClearGeom(false);
 
 					// DRT area
 					if(lineArea.get())
