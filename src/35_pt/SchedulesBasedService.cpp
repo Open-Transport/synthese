@@ -156,6 +156,13 @@ namespace synthese
 							}
 						}
 
+						// Check
+						if(	itDeparture == departureSchedules.end() ||
+							itArrival == arrivalSchedules.end()
+						){
+							throw BadSchedulesException();
+						}
+
 						// Store the schedules
 						_departureSchedules.push_back(*itDeparture);
 						_arrivalSchedules.push_back(*itArrival);
@@ -175,9 +182,6 @@ namespace synthese
 			}	}
 			else
 			{
-				assert(departureSchedules.size() == _path->getEdges().size());
-				assert(arrivalSchedules.size() == _path->getEdges().size());
-
 				_departureSchedules = departureSchedules;
 				_arrivalSchedules = arrivalSchedules;
 			}

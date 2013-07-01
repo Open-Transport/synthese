@@ -42,6 +42,7 @@ namespace synthese
 
 	namespace pt
 	{
+		class CommercialLine;
 		class JourneyPattern;
 		class Destination;
 
@@ -67,6 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_WAYBACK;
 			static const std::string PARAMETER_MAIN;
 			static const std::string PARAMETER_PLANNED_LENGTH;
+			static const std::string PARAMETER_LINE_ID;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
@@ -78,6 +80,7 @@ namespace synthese
 			boost::optional<bool> _wayback;
 			boost::optional<bool> _main;
 			boost::optional<graph::MetricOffset> _plannedLength;
+			boost::optional<boost::shared_ptr<CommercialLine> > _line;
 
 
 		protected:

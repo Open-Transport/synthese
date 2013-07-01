@@ -488,10 +488,9 @@ namespace synthese
 
 
 		void LineStopTableSync::InsertStop(
-			LineStop& lineStop
+			LineStop& lineStop,
+			DBTransaction& transaction
 		){
-			DBTransaction transaction;
-
 			if(!lineStop.getParentPath()->getEdges().empty())
 			{
 				for(size_t rank((*lineStop.getParentPath()->getEdges().rbegin())->getRankInPath()); rank >= lineStop.getRankInPath(); --rank)
@@ -514,8 +513,6 @@ namespace synthese
 			}	}
 
 			Save(&lineStop, transaction);
-
-			transaction.run();
 		}
 
 
