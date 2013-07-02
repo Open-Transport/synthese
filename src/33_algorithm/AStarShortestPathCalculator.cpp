@@ -120,8 +120,8 @@ namespace synthese
 				return result;
 			}
 
-			VertexAccessMap startingVertices = _departurePlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID);
-			VertexAccessMap endingVertices = _arrivalPlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID);
+			VertexAccessMap startingVertices = _departurePlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0);
+			VertexAccessMap endingVertices = _arrivalPlace->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0);
 
 			if(startingVertices.getMap().empty() || endingVertices.getMap().empty())
 			{
@@ -240,7 +240,11 @@ namespace synthese
 						boost::shared_ptr<LineString> chunkGeom = linkChunk->getRealGeometry();
 						
 						if(chunkGeom)
-							distance = CGAlgorithms::length(chunkGeom->getCoordinates());
+						{
+							CoordinateSequence* coordinates = chunkGeom->getCoordinates();
+							distance = CGAlgorithms::length(coordinates);
+							delete coordinates;
+						}
 
 						double speed(_accessParameters.getApproachSpeed());
 						if(_accessParameters.getUserClass() == USER_CAR && linkChunk->getCarSpeed() > 0)

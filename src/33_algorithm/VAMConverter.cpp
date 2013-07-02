@@ -22,6 +22,8 @@
 
 #include "VAMConverter.hpp"
 
+#include "AlgorithmModule.h"
+#include "AStarShortestPathCalculator.hpp"
 #include "Edge.h"
 #include "Hub.h"
 #include "IntegralSearcher.h"
@@ -66,136 +68,149 @@ namespace synthese
 
 			VertexAccessMap result;
 
-			// Create origin vam from integral search on roads
-			JourneysResult resultJourneys(
-				direction == DEPARTURE_TO_ARRIVAL ?
-				_lowestDepartureTime :
-				_highestArrivalTime,
-				direction
-			);
-			VertexAccessMap emptyMap;
-			BestVertexReachesMap bvrmd(
-				direction,
-				vam,
-				emptyMap,
-				Vertex::GetMaxIndex()
-			); // was optim=true
-
-			ptime highestArrivalTime(direction == DEPARTURE_TO_ARRIVAL ? _highestArrivalTime : _lowestDepartureTime);
-			IntegralSearcher iso(
-				direction,
-				_accessParameters,
-				_whatToSearch,
-				false,
-				_graphToUse,
-				resultJourneys,
-				bvrmd,
-				destinationVam,
-				direction == DEPARTURE_TO_ARRIVAL ? _lowestDepartureTime : _highestArrivalTime,
-				direction == DEPARTURE_TO_ARRIVAL ? _highestDepartureTime : _lowestArrivalTime,
-				highestArrivalTime,
-				direction == DEPARTURE_TO_ARRIVAL ? false : true,
-				false,
-				_accessParameters.getMaxApproachTime(),
-				_accessParameters.getApproachSpeed(),
-				false,
-				_logger
-			);
-			iso.integralSearch(vam, optional<size_t>(), optional<time_duration>());
-
-			// Include physical stops from originVam into result of integral search
-			// (cos not taken into account in returned journey vector).
-			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
+			if(AlgorithmModule::GetUseAStarForPhysicalStopsExtender())
 			{
-				const Vertex* vertex(itps.first);
-
-				if(	vertex->getGraphType() == _whatToSearch
-				){
-					result.insert(vertex, itps.second);
-				}
-
-				VertexAccessMap vam2;
-				vertex->getHub()->getVertexAccessMap(
-					vam2,
-					_whatToSearch,
-					*vertex,
-					direction == DEPARTURE_TO_ARRIVAL
+				AStarShortestPathCalculator asspc(
+					(direction == DEPARTURE_TO_ARRIVAL ? _lowestDepartureTime : _highestArrivalTime),
+					_accessParameters,
+					direction
 				);
-				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
-				{
-					result.insert(
-						it.first,
-						VertexAccess(
-                            it.second.approachTime +
-							(	direction == DEPARTURE_TO_ARRIVAL ?
-								vertex->getHub()->getTransferDelay(*vertex, *it.first) :
-								vertex->getHub()->getTransferDelay(*it.first, *vertex)
-							),
-                            it.second.approachDistance,
-                            it.second.approachJourney
-					)	);
-				}
+
+				result = asspc.roadPlanningToClosePhysicalStops(vam, destinationVam);
 			}
-
-
-			Journey candidate;
-			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, resultJourneys.getJourneys())
+			else
 			{
-				JourneysResult::ResultSet::key_type oj(it.first);
+				// Create origin vam from integral search on roads
+				JourneysResult resultJourneys(
+					direction == DEPARTURE_TO_ARRIVAL ?
+					_lowestDepartureTime :
+					_highestArrivalTime,
+					direction
+				);
+				VertexAccessMap emptyMap;
+				BestVertexReachesMap bvrmd(
+					direction,
+					vam,
+					emptyMap,
+					Vertex::GetMaxIndex()
+				); // was optim=true
 
-				// Store each reached physical stop with full approach time addition :
-				//	- approach time in departure place
-				//	- duration of the approach journey
-				//	- transfer delay between approach journey end address and physical stop
-				posix_time::time_duration commonApproachTime(
-					vam.getVertexAccess(
-						direction == DEPARTURE_TO_ARRIVAL ?
-						oj->getOrigin()->getFromVertex() :
-						oj->getDestination()->getFromVertex()
-					).approachTime + minutes(static_cast<long>(ceil(oj->getDuration().total_seconds() / double(60))))
-				);
-				double commonApproachDistance(
-					vam.getVertexAccess(
-						direction == DEPARTURE_TO_ARRIVAL ?
-						oj->getOrigin()->getFromVertex() :
-						oj->getDestination()->getFromVertex()
-					).approachDistance + oj->getDistance ()
-				);
-				VertexAccessMap vam2;
-				const Hub* cp(
-					(	direction == DEPARTURE_TO_ARRIVAL ?
-						oj->getDestination() :
-						oj->getOrigin()
-					)->getHub()
-				);
-				const Vertex& v(
-					*(	direction == DEPARTURE_TO_ARRIVAL ?
-						oj->getDestination() :
-						oj->getOrigin()
-					)->getFromVertex()
-				);
-				cp->getVertexAccessMap(
-					vam2,
+				ptime highestArrivalTime(direction == DEPARTURE_TO_ARRIVAL ? _highestArrivalTime : _lowestDepartureTime);
+				IntegralSearcher iso(
+					direction,
+					_accessParameters,
 					_whatToSearch,
-					v,
-					direction == DEPARTURE_TO_ARRIVAL
+					false,
+					_graphToUse,
+					resultJourneys,
+					bvrmd,
+					destinationVam,
+					direction == DEPARTURE_TO_ARRIVAL ? _lowestDepartureTime : _highestArrivalTime,
+					direction == DEPARTURE_TO_ARRIVAL ? _highestDepartureTime : _lowestArrivalTime,
+					highestArrivalTime,
+					direction == DEPARTURE_TO_ARRIVAL ? false : true,
+					false,
+					_accessParameters.getMaxApproachTime(),
+					_accessParameters.getApproachSpeed(),
+					false,
+					_logger
 				);
-				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
+				iso.integralSearch(vam, optional<size_t>(), optional<time_duration>());
+
+				// Include physical stops from originVam into result of integral search
+				// (cos not taken into account in returned journey vector).
+				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
 				{
-					result.insert(
-						it.first,
-						VertexAccess(
-							commonApproachTime + (
-								(&v == it.first) ?
-								seconds(0) :
-								(
-									direction == DEPARTURE_TO_ARRIVAL ?
-									cp->getTransferDelay(v, *it.first) :
-									cp->getTransferDelay(*it.first, v)
-							)	),
-							commonApproachDistance,
-							*oj
-					)	);
+					const Vertex* vertex(itps.first);
+
+					if(	vertex->getGraphType() == _whatToSearch
+					){
+						result.insert(vertex, itps.second);
+					}
+
+					VertexAccessMap vam2;
+					vertex->getHub()->getVertexAccessMap(
+						vam2,
+						_whatToSearch,
+						*vertex,
+						direction == DEPARTURE_TO_ARRIVAL
+					);
+					BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
+					{
+						result.insert(
+							it.first,
+							VertexAccess(
+		                        it.second.approachTime +
+								(	direction == DEPARTURE_TO_ARRIVAL ?
+									vertex->getHub()->getTransferDelay(*vertex, *it.first) :
+									vertex->getHub()->getTransferDelay(*it.first, *vertex)
+								),
+		                        it.second.approachDistance,
+		                        it.second.approachJourney
+						)	);
+					}
+				}
+
+
+				Journey candidate;
+				BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, resultJourneys.getJourneys())
+				{
+					JourneysResult::ResultSet::key_type oj(it.first);
+
+					// Store each reached physical stop with full approach time addition :
+					//	- approach time in departure place
+					//	- duration of the approach journey
+					//	- transfer delay between approach journey end address and physical stop
+					posix_time::time_duration commonApproachTime(
+						vam.getVertexAccess(
+							direction == DEPARTURE_TO_ARRIVAL ?
+							oj->getOrigin()->getFromVertex() :
+							oj->getDestination()->getFromVertex()
+						).approachTime + minutes(static_cast<long>(ceil(oj->getDuration().total_seconds() / double(60))))
+					);
+					double commonApproachDistance(
+						vam.getVertexAccess(
+							direction == DEPARTURE_TO_ARRIVAL ?
+							oj->getOrigin()->getFromVertex() :
+							oj->getDestination()->getFromVertex()
+						).approachDistance + oj->getDistance ()
+					);
+					VertexAccessMap vam2;
+					const Hub* cp(
+						(	direction == DEPARTURE_TO_ARRIVAL ?
+							oj->getDestination() :
+							oj->getOrigin()
+						)->getHub()
+					);
+					const Vertex& v(
+						*(	direction == DEPARTURE_TO_ARRIVAL ?
+							oj->getDestination() :
+							oj->getOrigin()
+						)->getFromVertex()
+					);
+					cp->getVertexAccessMap(
+						vam2,
+						_whatToSearch,
+						v,
+						direction == DEPARTURE_TO_ARRIVAL
+					);
+					BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
+					{
+						result.insert(
+							it.first,
+							VertexAccess(
+								commonApproachTime + (
+									(&v == it.first) ?
+									seconds(0) :
+									(
+										direction == DEPARTURE_TO_ARRIVAL ?
+										cp->getTransferDelay(v, *it.first) :
+										cp->getTransferDelay(*it.first, v)
+								)	),
+								commonApproachDistance,
+								*oj
+						)	);
+					}
 				}
 			}
 

@@ -66,10 +66,21 @@ namespace synthese
 		class AlgorithmModule:
 			public server::ModuleClassTemplate<AlgorithmModule>
 		{
-		private:
+		public:
+			static const std::string MODULE_PARAM_USE_ASTAR_FOR_PHYSICAL_STOPS_EXTENDER;
 
+		private:
+			static bool _useAStarForPhysicalStopsExtender;
 
 		public:
+			static bool GetUseAStarForPhysicalStopsExtender(){ return _useAStarForPhysicalStopsExtender; }
+
+
+
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
+			);
 		};
 	}
 	/** @} */
