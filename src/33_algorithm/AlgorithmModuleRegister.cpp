@@ -1,9 +1,14 @@
-
-
+#include "AlgorithmModule.h"
 
 #include "AlgorithmModule.inc.cpp"
 
-void synthese::algorithm::moduleRegister()
+namespace synthese
 {
-
+	namespace algorithm
+	{
+		void moduleRegister()
+		{
+			AlgorithmModule::integrate();
+		}
+	}
 }
