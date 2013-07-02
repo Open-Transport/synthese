@@ -124,6 +124,11 @@ namespace synthese
 					daysMoment = ptime(daysMoment.date(), _hourDeadLine);
 				}
 			}
+			else if ( _hourDeadLine.hours() > 0)
+			{
+				daysMoment = daysMoment - time_duration(23,59,59);
+				daysMoment = ptime(daysMoment.date(), _hourDeadLine);
+			}
 
 			// Choosing worse delay
 			ptime result(
