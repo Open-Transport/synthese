@@ -295,7 +295,7 @@ namespace synthese
 		    if (_withTisseoExtension)
 				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  https://extranet.rcsmobility.com/projects/synthese/repository/raw/doc/include/35_pt/trident2-tisseo/tisseo-chouette-extension.xsd'>" << "\n";
 			else
-				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  http://www.rcsmobility.com/synthese/include/35_pt/chouette/Chouette.xsd'>" << "\n";
+				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  https://extranet.rcsmobility.com/projects/synthese/repository/raw/doc/include/35_pt/chouette/Chouette.xsd'>" << "\n";
 
 			// --------------------------------------------------- PTNetwork
 			const TransportNetwork* tn(_line->getNetwork());
