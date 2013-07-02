@@ -23,6 +23,7 @@
 #include "RoadModule.h"
 #include "GeographyModule.h"
 #include "MainRoadChunk.hpp"
+#include "StopArea.hpp"
 #include "House.hpp"
 #include "RoadPlace.h"
 
@@ -259,12 +260,35 @@ namespace synthese
 				}
 			}
 
+			City::PlacesMatcher::MatchResult stopsAndRoadsVector;
 
-			// Text points to a stop or a street
-			City::PlacesMatcher::MatchResult places(
-				cityResult.value->getAllPlacesMatcher().bestMatches(placeName, resultsNumber)
+			// Text points to a stop
+			City::PlacesMatcher::MatchResult stops = cityResult.value->getLexicalMatcher(pt::StopArea::FACTORY_KEY).bestMatches(
+				placeName,
+				resultsNumber
 			);
-			BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
+
+			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& stop, stops)
+			{
+				stopsAndRoadsVector.push_back(stop);
+			}
+
+			// Text points to a street
+			City::PlacesMatcher::MatchResult places = cityResult.value->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
+				placeName,
+				resultsNumber
+			);
+
+			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, places)
+			{
+				stopsAndRoadsVector.push_back(place);
+			}
+
+			City::PlacesMatcher::MatchHitSort hitSort;
+			std::sort(stopsAndRoadsVector.begin(), stopsAndRoadsVector.end(), hitSort);
+			size_t index(0);
+
+			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, stopsAndRoadsVector)
 			{
 				ExtendedFetchPlaceResult placeResult;
 				placeResult.cityResult = cityResult;
@@ -273,6 +297,10 @@ namespace synthese
 				placeResult.placeResult.value = place.value;
 
 				result.push_back(placeResult);
+
+				index++;
+				if(index >= resultsNumber)
+					break;
 			}
 
 			return result;
