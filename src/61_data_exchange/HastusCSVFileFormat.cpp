@@ -197,9 +197,10 @@ namespace synthese
 					);
 					if(cities.empty())
 					{
-						_logWarning(
-							"City "+ cityCode +" not found"
+						_logError(
+							"ERR : City " + cityCode + " not found used by stopPoint : " + name + ",  " + code + ", " + x + ", " + y + "<br />"
 						);
+						continue;
 					}
 					else
 					{
