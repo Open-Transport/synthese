@@ -57,6 +57,8 @@ namespace synthese
 
 	boost::shared_ptr<geos::geom::Geometry> CoordinatesSystem::convertGeometry( const geos::geom::Geometry& source ) const
 	{
+		mutex::scoped_lock lock (_proj4Mutex);
+
 		boost::shared_ptr<geos::geom::Geometry> result(_geometryFactory.createGeometry(&source));
 
 		CoordinatesSystem::ConversionFilter filter(
