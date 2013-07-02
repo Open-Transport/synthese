@@ -15,6 +15,8 @@ namespace osm {
 const std::string Element::TAG_HIGHWAY("highway");
 const std::string Element::TAG_RAILWAY("railway");
 const std::string Element::TAG_AMENITY("amenity");
+const std::string Element::TAG_JUNCTION("junction");
+const std::string Element::TAG_SERVICE("service");
 const std::string Element::TAG_FOOT("foot");
 const std::string Element::TAG_BICYCLE("bicycle");
 const std::string Element::TAG_MOTOR_VEHICLE("motor_vehicle");

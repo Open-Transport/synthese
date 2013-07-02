@@ -89,6 +89,8 @@ public:
    static const std::string TAG_HIGHWAY;
    static const std::string TAG_RAILWAY;
    static const std::string TAG_AMENITY;
+   static const std::string TAG_JUNCTION;
+   static const std::string TAG_SERVICE;
    static const std::string TAG_FOOT;
    static const std::string TAG_BICYCLE;
    static const std::string TAG_MOTOR_VEHICLE;
@@ -186,6 +188,8 @@ public:
 
    static std::map<std::string, road::Road::RoadType> highwayTypes;
    static std::map<road::Road::RoadType, double> defaultSpeed;
+   static std::map<std::string, double> implicitSpeed;
+   static std::map<std::string, std::string> defaultName;
 
    Way(AttributeMap &attrs) throw(Exception);
 
@@ -236,7 +240,7 @@ public:
 
    double getAssociatedSpeed();
 
-
+   std::string getName();
 
 protected:
    /// the \ref Node "nodes" referenced by the way

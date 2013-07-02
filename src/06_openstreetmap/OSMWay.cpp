@@ -45,6 +45,15 @@ namespace synthese
 			("steps", Road::ROAD_TYPE_STEPS)
 			("unclassified", Road::ROAD_TYPE_UNKNOWN);
 
+		std::map<std::string, std::string> Way::defaultName = boost::assign::map_list_of
+			("service", "Voie sans nom")
+			("pedestrian", "Chemin piéton")
+			("path", "Chemin piéton")
+			("cycleway", "Piste cyclable")
+			("footway", "Chemin piéton")
+			("steps", "Escaliers")
+			("unclassified", "Voie sans nom");
+
 		std::map<Road::RoadType, double> Way::defaultSpeed = boost::assign::map_list_of
 			(Road::ROAD_TYPE_MOTORWAY, 110 / 3.6)
 			(Road::ROAD_TYPE_ACCESSROAD, 50 / 3.6)
@@ -58,6 +67,12 @@ namespace synthese
 			(Road::ROAD_TYPE_STREET, 50 / 3.6)
 			(Road::ROAD_TYPE_HIGHWAY, 50 / 3.6)
 			(Road::ROAD_TYPE_SERVICE, 50 / 3.6);
+
+		std::map<std::string, double> Way::implicitSpeed = boost::assign::map_list_of
+			("FR:walk", 6 / 3.6)
+			("FR:urban", 50 / 3.6)
+			("FR:rural", 90 / 3.6)
+			("FR:motorway", 130 / 3.6);
 
 		Way::Way(AttributeMap &attrs) throw(Exception): Element(attrs)
 		{
@@ -120,7 +135,7 @@ namespace synthese
 			if(hasTag(TAG_HIGHWAY))
 			{
 				std::string highway = getTag(TAG_HIGHWAY);
-				if(highway == "motorway" || highway == "motorway_link")
+				if(highway == "motorway" || highway == "motorway_link" || highway == "cycleway")
 					isWalkable = false;
 				else if(highwayTypes.find(highway) == highwayTypes.end())
 					isWalkable = false;
@@ -128,7 +143,8 @@ namespace synthese
 
 			if(hasTag(TAG_ACCESS))
 			{
-				if(getTag(TAG_ACCESS) == "no")
+				std::string access = getTag(TAG_ACCESS);
+				if(access == "no" || access == "private")
 					isWalkable = false;
 			}
 
@@ -138,6 +154,11 @@ namespace synthese
 				if(access == "no")
 					isWalkable = false;
 				else if(access == "yes")
+					isWalkable = true;
+			}
+			else if(hasTag(TAG_BICYCLE))
+			{
+				if(hasTag(TAG_HIGHWAY) && getTag(TAG_HIGHWAY) != "cycleway" && getTag(TAG_BICYCLE) == "yes")
 					isWalkable = true;
 			}
 
@@ -159,7 +180,8 @@ namespace synthese
 
 			if(hasTag(TAG_ACCESS))
 			{
-				if(getTag(TAG_ACCESS) == "no")
+				std::string access = getTag(TAG_ACCESS);
+				if(access == "no" || access == "private")
 					isDrivable = false;
 			}
 
@@ -199,7 +221,8 @@ namespace synthese
 
 			if(hasTag(TAG_ACCESS))
 			{
-				if(getTag(TAG_ACCESS) == "no")
+				std::string access = getTag(TAG_ACCESS);
+				if(access == "no" || access == "private")
 					isBikable = false;
 			}
 
@@ -258,24 +281,36 @@ namespace synthese
 
 		double Way::getAssociatedSpeed()
 		{
-			double maxSpeed = 50 / 3.6;
+			double maxSpeed = 0;
 			if(hasTag("maxspeed"))
 			{
-				try
+				std::string maxSpeedTag(getTag("maxspeed"));
+				if(implicitSpeed.find(maxSpeedTag) != implicitSpeed.end())
 				{
-					maxSpeed = boost::lexical_cast<double>(getTag("maxspeed")) / 3.6;
-					return maxSpeed;
+					maxSpeed = implicitSpeed.find(maxSpeedTag)->second;
 				}
-				catch(boost::bad_lexical_cast &)
+				else
 				{
+					try
+					{
+						maxSpeed = boost::lexical_cast<double>(maxSpeedTag) / 3.6;
+					}
+					catch(boost::bad_lexical_cast &)
+					{
+					}
 				}
 			}
 
-			Road::RoadType type = getAssociatedRoadType();
-			std::map<Road::RoadType, double>::iterator it = defaultSpeed.find(type);
+			if(!maxSpeed)
+			{
+				Road::RoadType type = getAssociatedRoadType();
+				std::map<Road::RoadType, double>::iterator it = defaultSpeed.find(type);
 
-			if(it != defaultSpeed.end())
-				maxSpeed = it->second;
+				if(it != defaultSpeed.end())
+					maxSpeed = it->second;
+				else
+					maxSpeed = 50 / 3.6;
+			}
 
 			return maxSpeed;
 		}
@@ -287,6 +322,29 @@ namespace synthese
 			{
 				node.second->ways.push_back(this);
 			}
+		}
+
+		std::string Way::getName()
+		{
+			std::string roadName;
+
+			if(hasTag(Element::TAG_NAME))
+				roadName = getTag(Element::TAG_NAME);
+			else if(hasTag(TAG_JUNCTION) && getTag(TAG_JUNCTION) == "roundabout")
+				roadName = "Rond-point";
+			else if(hasTag(TAG_HIGHWAY))
+			{
+				if(getTag(TAG_HIGHWAY) == "service" && hasTag(TAG_SERVICE) && getTag(TAG_SERVICE) == "parking_aisle")
+					roadName = "Parking";
+				else
+				{
+					std::map<std::string, std::string>::iterator it = defaultName.find(getTag(TAG_HIGHWAY));
+					if(it != defaultName.end())
+						roadName = it->second;
+				}
+			}
+
+			return roadName;
 		}
 	}
 }

@@ -270,7 +270,9 @@ namespace synthese
 					// Check if the central chunk is allowed for everybody
 					if(_addCentralChunkReference && !nonWalkableWay && !nonDrivableWay && !nonBikableWay)
 					{
-						double distance = fabs(distance::DistanceOp::distance(*centroid, *way->toGeometry()->getCentroid()));
+						Geometry* wayCentroid = way->toGeometry()->getCentroid();
+						double distance = fabs(distance::DistanceOp::distance(*centroid, *wayCentroid));
+						delete wayCentroid;
 						if(closestWayFromCentroid.second > distance)
 						{
 							closestWayFromCentroid = make_pair(way->getId(), distance);
@@ -450,51 +452,87 @@ namespace synthese
 					// If there is at least one
 					if(!waysList.empty())
 					{
-						boost::shared_ptr<RoadPlace> refRoadPlace;
-						// Loop over every ways
-						BOOST_FOREACH(WayPtr curWay, waysList)
+						role = string("house");
+						list<NodePtr> housesList = rel.second->getNodes(role);
+
+						if(!housesList.empty())
 						{
-							// If we find a road place linked to this way
-							_LinkBetweenWayAndRoadPlaces::iterator itWay(_linkBetweenWayAndRoadPlaces.find(curWay->getId()));
-							if(itWay != _linkBetweenWayAndRoadPlaces.end())
+							boost::shared_ptr<RoadPlace> refRoadPlace;
+
+							BOOST_FOREACH(WayPtr curWay, waysList)
 							{
-								refRoadPlace = itWay->second;
-								break;
+								// If we find a road place linked to this way
+								_LinkBetweenWayAndRoadPlaces::iterator itWay(_linkBetweenWayAndRoadPlaces.find(curWay->getId()));
+								if(itWay != _linkBetweenWayAndRoadPlaces.end())
+								{
+									refRoadPlace = itWay->second;
+									break;
+								}
+							}
+
+							if(refRoadPlace.get())
+							{
+								std::vector<MainRoadChunk*> refRoadChunks;
+
+								// Get every road chunk of the RoadPlace
+								BOOST_FOREACH(Path* path, refRoadPlace->getPaths())
+								{
+									if(!dynamic_cast<MainRoadPart*>(path))
+										continue;
+
+									BOOST_FOREACH(Edge* edge, path->getEdges())
+									{
+										refRoadChunks.push_back(static_cast<MainRoadChunk*>(edge));
+									}
+								}
+
+								// Get all the houses
+								BOOST_FOREACH(NodePtr house, housesList)
+								{
+									if(house->hasTag("addr:housenumber"))
+									{
+										_projectHouseAndUpdateChunkHouseNumberBounds(house, refRoadChunks, false);
+									}
+								}
+
+								BOOST_FOREACH(MainRoadChunk* chunk, refRoadChunks)
+								{
+									_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(chunk);
+								}
 							}
 						}
 
-						// If we have our road place
-						if(refRoadPlace.get())
+						role = string("sidewalk");
+						list<WayPtr> sidewalkList = rel.second->getWays(role);
+
+						if(!sidewalkList.empty())
 						{
-							role = string("house");
-							list<NodePtr> housesList = rel.second->getNodes(role);
+							boost::shared_ptr<RoadPlace> refRoadPlace;
 
-							std::vector<MainRoadChunk*> refRoadChunks;
-
-							// Get every road chunk of the RoadPlace
-							BOOST_FOREACH(Path* path, refRoadPlace->getPaths())
+							BOOST_FOREACH(WayPtr curWay, waysList)
 							{
-								if(!dynamic_cast<MainRoadPart*>(path))
-									continue;
-
-								BOOST_FOREACH(Edge* edge, path->getEdges())
+								// If we find a road place linked to this way with a name
+								_LinkBetweenWayAndRoadPlaces::iterator itWay(_linkBetweenWayAndRoadPlaces.find(curWay->getId()));
+								if(itWay != _linkBetweenWayAndRoadPlaces.end() && !itWay->second->getName().empty())
 								{
-									refRoadChunks.push_back(static_cast<MainRoadChunk*>(edge));
+									refRoadPlace = itWay->second;
+									break;
 								}
 							}
 
-							// Get all the houses
-							BOOST_FOREACH(NodePtr house, housesList)
+							if(refRoadPlace.get())
 							{
-								if(house->hasTag("addr:housenumber"))
+								BOOST_FOREACH(WayPtr curWay, sidewalkList)
 								{
-									_projectHouseAndUpdateChunkHouseNumberBounds(house, refRoadChunks, false);
+									if(!curWay->hasTag("name"))
+									{
+										_LinkBetweenWayAndRoadPlaces::iterator itWay(_linkBetweenWayAndRoadPlaces.find(curWay->getId()));
+										if(itWay != _linkBetweenWayAndRoadPlaces.end())
+										{
+											itWay->second->setName(refRoadPlace->getName());
+										}
+									}
 								}
-							}
-
-							BOOST_FOREACH(MainRoadChunk* chunk, refRoadChunks)
-							{
-								_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(chunk);
 							}
 						}
 					}
@@ -580,14 +618,11 @@ namespace synthese
 			string roadName;
 			string plainRoadName;
 
-			// Search for a recently created road place
-			if(way->hasTag(Element::TAG_NAME))
-			{
-				roadName = way->getTag(Element::TAG_NAME);
-				plainRoadName = _toAlphanumericString(roadName);
-			}
+			roadName = way->getName();
+			plainRoadName = _toAlphanumericString(roadName);
 
-			if(!roadName.empty())
+			// Search for a recently created road place
+			if(way->hasTag(Element::TAG_NAME) && !roadName.empty())
 			{
 				_RecentlyCreatedRoadPlaces::iterator it(_recentlyCreatedRoadPlaces.find(city->getName() + string(" ") + plainRoadName));
 				if(it != _recentlyCreatedRoadPlaces.end())
@@ -603,7 +638,7 @@ namespace synthese
 			roadPlace->setName(roadName);
 			roadPlace->setKey(RoadPlaceTableSync::getId());
 			_env.getEditableRegistry<RoadPlace>().add(roadPlace);
-			if(!roadName.empty())
+			if(way->hasTag(Element::TAG_NAME) && !roadName.empty())
 			{
 				_recentlyCreatedRoadPlaces[city->getName() + string(" ") + plainRoadName] = roadPlace;
 			}
