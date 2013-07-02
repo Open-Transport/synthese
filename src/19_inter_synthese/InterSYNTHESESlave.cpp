@@ -153,7 +153,7 @@ namespace synthese
 			util::ParametersMap& map,
 			std::string prefix /*= std::string() */
 		) const	{
-
+			recursive_mutex::scoped_lock lock(_queueMutex);
 			map.insert(prefix + TAG_QUEUE_SIZE, _queue.size());
 
 			size_t count(30);
