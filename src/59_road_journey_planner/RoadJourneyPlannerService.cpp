@@ -303,7 +303,7 @@ namespace synthese
 			Place* departure = _departure_place.placeResult.value.get();
 			Place* arrival = _arrival_place.placeResult.value.get();
 
-			if(departure->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID).intersercts(arrival->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID)))
+			if(departure->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0).intersercts(arrival->getVertexAccessMap(_accessParameters, RoadModule::GRAPH_ID, 0)))
 			{
 				result.insert(DATA_ERROR_MESSAGE, string("Same place"));
 
@@ -381,7 +381,11 @@ namespace synthese
 
 					double distance(0);
 					if(geometry)
-						distance = CGAlgorithms::length(geometry->getCoordinates());
+					{
+						CoordinateSequence* coordinates = geometry->getCoordinates();
+						distance = CGAlgorithms::length(coordinates);
+						delete coordinates;
+					}
 
 					double speed(_accessParameters.getApproachSpeed());
 					if(_accessParameters.getUserClass() == USER_CAR && chunk->getCarSpeed() > 0)
@@ -417,12 +421,20 @@ namespace synthese
 						step->insert(DATA_STEP_DURATION, arrivalTime - departureTime);
 						step->insert(DATA_WKT, multiLineString->toText());
 
+						delete multiLineString;
+
 						board->insert(DATA_STEP_MAP, step);
 
 						curDistance = static_cast<int>(distance);
 						departureTime = arrivalTime;
 						arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
 						curRoadPlace = road->getRoadPlace();
+
+						BOOST_FOREACH(Geometry* geomToDelete, curGeom)
+						{
+							delete geomToDelete;
+						}
+
 						curGeom.clear();
 						curGeom.push_back(geometryProjected.get()->clone());
 						rank++;
@@ -434,6 +446,12 @@ namespace synthese
 				MultiLineString* multiLineString = _coordinatesSystem->getGeometryFactory().createMultiLineString(curGeom);
 				geometries.push_back(multiLineString->clone());
 
+				BOOST_FOREACH(Geometry* geomToDelete, curGeom)
+				{
+					delete geomToDelete;
+				}
+				curGeom.clear();
+
 				boost::shared_ptr<ParametersMap> step(new ParametersMap);
 				step->insert(DATA_RANK, rank);
 				step->insert(DATA_ROAD_NAME, curRoadPlace->getName());
@@ -444,6 +462,8 @@ namespace synthese
 				step->insert(DATA_STEP_DURATION, arrivalTime - departureTime);
 				step->insert(DATA_WKT, multiLineString->toText());
 
+				delete multiLineString;
+
 				board->insert(DATA_STEP_MAP, step);
 				board->insert(DATA_DISTANCE, total_distance);
 
@@ -453,7 +473,14 @@ namespace synthese
 				result.insert(DATA_BOARD_MAP, board);
 
 				GeometryCollection* geometryCollection(_coordinatesSystem->getGeometryFactory().createGeometryCollection(geometries));
+				BOOST_FOREACH(Geometry* geomToDelete, geometries)
+				{
+					delete geomToDelete;
+				}
+				geometries.clear();
+
 				result.insert(DATA_WKT, geometryCollection->toText());
+				delete geometryCollection;
 			}
 			else if(_errorPage.get())
 			{

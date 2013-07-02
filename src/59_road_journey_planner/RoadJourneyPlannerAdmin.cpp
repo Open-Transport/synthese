@@ -76,7 +76,8 @@ namespace synthese
 
 
 		RoadJourneyPlannerAdmin::RoadJourneyPlannerAdmin(
-		):	AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>()
+		):	AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>(),
+			_accessibility(0)
 		{ }
 
 
