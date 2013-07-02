@@ -1193,18 +1193,13 @@ namespace synthese
 				_ignoreReservationRules,
 				*_logger,
 				_maxTransferDuration,
+				_minMaxDurationRatioFilter,
 				PTModule::isTheoreticalAllowed(),
 				PTModule::isRealTimeAllowed()
 			);
 
 			// Computing
 			_result.reset(new PTRoutePlannerResult(r.run()));
-
-			// Min max duration filter
-			if(_minMaxDurationRatioFilter)
-			{
-				_result->filterOnDurationRatio(*_minMaxDurationRatioFilter);
-			}
 
 			// Min waiting time filter
 			if(_minWaitingTimeFilter)

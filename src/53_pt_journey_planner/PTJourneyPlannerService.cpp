@@ -824,17 +824,12 @@ namespace synthese
 				planningOrder,
 				false,
 				*_logger,
-				_maxTransferDuration
+				_maxTransferDuration,
+				_minMaxDurationRatioFilter
 			);
 
 			// Computing
 			_result.reset(new PTRoutePlannerResult(r.run()));
-
-			// Min max duration filter
-			if(_minMaxDurationRatioFilter)
-			{
-				_result->filterOnDurationRatio(*_minMaxDurationRatioFilter);
-			}
 
 			// Min waiting time filter
 			if(_minWaitingTimeFilter)

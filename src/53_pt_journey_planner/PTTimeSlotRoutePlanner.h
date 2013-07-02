@@ -121,6 +121,7 @@ namespace synthese
 				bool								ignoreReservation,
 				const algorithm::AlgorithmLogger& algorithmLogger,
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true
 			);

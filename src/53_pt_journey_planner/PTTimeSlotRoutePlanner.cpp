@@ -68,6 +68,7 @@ namespace synthese
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
+			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime
 		):	TimeSlotRoutePlanner(
@@ -89,6 +90,7 @@ namespace synthese
 				ignoreReservation,
 				logger,
 				maxTransferDuration,
+				minMaxDurationRatioFilter,
 				enableTheoretical,
 				enableRealTime
 			),
@@ -211,6 +213,7 @@ namespace synthese
 					_ignoreReservation,
 					_logger,
 					_maxTransferDuration,
+					_minMaxDurationRatioFilter,
 					_enableTheoretical,
 					_enableRealTime
 				);
@@ -237,6 +240,7 @@ namespace synthese
 					_ignoreReservation,
 					_logger,
 					_maxTransferDuration,
+					_minMaxDurationRatioFilter,
 					_enableTheoretical,
 					_enableRealTime
 				);
