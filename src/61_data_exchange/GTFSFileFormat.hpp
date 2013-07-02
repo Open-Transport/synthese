@@ -224,15 +224,8 @@ namespace synthese
 					util::RegistryKeyType trip,
 					util::RegistryKeyType service,
 					util::RegistryKeyType route,
-					std::string tripHeadSign
-				) const;
-
-				void _addStopTimes(std::stringstream& stop_times_txt,
-					util::RegistryKeyType tripId,
-					util::RegistryKeyType stopId,
-					std::size_t rang,
-					std::string arrivalTime,
-					std::string departureTime
+					std::string tripHeadSign,
+					bool tripDirection
 				) const;
 
 				void _addFrequencies(std::stringstream& frequencies,
@@ -255,7 +248,8 @@ namespace synthese
 					const pt::LineStopTableSync::SearchResult linestops,
 					const pt::SchedulesBasedService* service,
 					bool& stopTimesExist,
-					bool isContinious
+					bool isContinious,
+					bool isReservationMandandatory
 				) const;
 
 				void _addCalendars(std::stringstream& calendar,
@@ -266,6 +260,7 @@ namespace synthese
 				) const;
 
 				static const std::string LABEL_TAD;
+				static const std::string LABEL_NO_EXPORT_GTFS;
 				static const int WGS84_SRID;
 
 				static std::map<std::string,util::RegistryKeyType> shapeId;

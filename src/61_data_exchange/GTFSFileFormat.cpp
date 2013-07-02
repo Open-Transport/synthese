@@ -105,6 +105,7 @@ namespace synthese
 
 		const std::string GTFSFileFormat::Exporter_::PARAMETER_NETWORK_ID("ni");
 		const std::string GTFSFileFormat::Exporter_::LABEL_TAD("tad");
+		const std::string GTFSFileFormat::Exporter_::LABEL_NO_EXPORT_GTFS("NO Export GTFS");
 		const int GTFSFileFormat::Exporter_::WGS84_SRID(4326);
 
 		std::map<std::string, util::RegistryKeyType> GTFSFileFormat::Exporter_::shapeId;
@@ -270,8 +271,12 @@ namespace synthese
 					string id(_getValue("stop_id"));
 					string name(_getValue("stop_name"));
 
+					string stopAreaId;
+
 					// Stop area
-					string stopAreaId(_getValue("parent_station"));
+					if(_fieldsMap.find("parent_station") != _fieldsMap.end())
+						stopAreaId = _getValue("parent_station");
+
 					const StopArea* stopArea(NULL);
 					if(stopAreas.contains(stopAreaId))
 					{
@@ -1022,13 +1027,15 @@ namespace synthese
 			RegistryKeyType tripId,
 			RegistryKeyType service,
 			RegistryKeyType route,
-			string tripHeadSign
+			string tripHeadSign,
+			bool tripDirection
 		) const
 		{
 			trips << tripId << "," // trip_id
 				<< service << "," // service_id
 				<< route << "," // route_id
-				<< tripHeadSign << ","; // trip_head_sign
+				<< tripHeadSign << "," // trip_head_sign
+				<< tripDirection << ","; // direction_id
 		}
 
 		void GTFSFileFormat::Exporter_::_addCalendars( stringstream& calendar,
@@ -1038,72 +1045,71 @@ namespace synthese
 			bool isContinuous
 		) const
 		{
+		try
+		{
+			boost::gregorian::date currentDay, firstActiveDay, lastActiveDay;
 			try
 			{
-				boost::gregorian::date currentDay, firstActiveDay, lastActiveDay;
-				try
-					{
-					lastActiveDay = service->getLastActiveDate();
-				}
-				catch(...)
-				{
-					throw Exception("Service LastActiveDate is corrupted");
-				}
-				bool weekDays [7];
-
-				try
-				{
-					currentDay = firstActiveDay = service->getFirstActiveDate();
-				}
-				catch(...)
-				{
-					throw Exception("Service FirstActiveDate is corrupted");
-				}
-
-				boost::gregorian::date::day_of_week_type dayOfWeek = firstActiveDay.day_of_week();
-				unsigned int firstActiveDayIndex = (dayOfWeek + 6) % 7; // 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
-
-				// 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
-				for(int i = 0; i<7; i++)
-				{
-					weekDays[(i+firstActiveDayIndex) % 7] = service->isActive(firstActiveDay + date_duration(i));
-				}
-
-				calendar << serviceId << ",";
-
-				for(int i=0; i<7; i++)
-				{
-					calendar << weekDays[i] << ",";
-				}
-
-				calendar << to_iso_string(service->getFirstActiveDate()) << ","
-					<< to_iso_string(service->getLastActiveDate())
-					<< endl;
-
-				// END CALENDAR.TXT
-
-				// BEGIN CALENDAR_DATES.TXT
-				for(int i = 0; currentDay <= lastActiveDay;i++)
-				{
-					bool isNormalyActive = weekDays[(firstActiveDayIndex + i) % 7];
-					if(isNormalyActive != service->isActive(currentDay))
-					{
-						calendarDates << serviceId << ","
-							<< to_iso_string(currentDay) << ","
-							<< (2 - service->isActive(currentDay))
-							<< endl;
-					}
-					currentDay += date_duration(1);
-				}
-			}
-			catch(const Exception & e)
-			{
-				throw Exception("Exception when wrinting calendars for service " + lexical_cast<string>(serviceId) + " : " + e.getMessage());
+				lastActiveDay = service->getLastActiveDate();
 			}
 			catch(...)
 			{
-				throw Exception("Unknown exception when wrinting calendars for service " + lexical_cast<string>(serviceId));
+				throw Exception("Service LastActiveDate is corrupted");
 			}
+			bool weekDays [7];
+
+			try
+			{
+				currentDay = firstActiveDay = service->getFirstActiveDate();
+			}
+			catch(...)
+			{
+				throw Exception("Service FirstActiveDate is corrupted");
+			}
+			boost::gregorian::date::day_of_week_type dayOfWeek = firstActiveDay.day_of_week();
+			unsigned int firstActiveDayIndex = (dayOfWeek + 6) % 7; // 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
+
+			// 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
+			for(int i = 0; i<7; i++)
+			{
+				weekDays[(i+firstActiveDayIndex) % 7] = service->isActive(firstActiveDay + date_duration(i));
+			}
+
+			calendar << serviceId << ",";
+
+			for(int i=0; i<7; i++)
+			{
+				calendar << weekDays[i] << ",";
+			}
+
+			calendar << to_iso_string(service->getFirstActiveDate()) << ","
+				<< to_iso_string(service->getLastActiveDate())
+				<< endl;
+
+			// END CALENDAR.TXT
+
+			// BEGIN CALENDAR_DATES.TXT
+			for(int i = 0; currentDay <= lastActiveDay;i++)
+			{
+				bool isNormalyActive = weekDays[(firstActiveDayIndex + i) % 7];
+				if(isNormalyActive != service->isActive(currentDay))
+				{
+					calendarDates << serviceId << ","
+						<< to_iso_string(currentDay) << ","
+						<< (2 - service->isActive(currentDay))
+						<< endl;
+				}
+				currentDay += date_duration(1);
+			}
+		}
+		catch(const Exception & e)
+		{
+			throw Exception("Exception when wrinting calendars for service " + lexical_cast<string>(serviceId) + " : " + e.getMessage());
+		}
+		catch(...)
+		{
+			throw Exception("Unknown exception when wrinting calendars for service " + lexical_cast<string>(serviceId));
+		}
 		}
 
 		void GTFSFileFormat::Exporter_::_addFrequencies(stringstream& frequencies,
@@ -1126,7 +1132,8 @@ namespace synthese
 			const LineStopTableSync::SearchResult linestops,
 			const SchedulesBasedService* service,
 			bool& stopTimesExist,
-			bool isContinuous
+			bool isContinuous,
+			bool isReservationMandandatory
 		) const
 		{
 			bool passMidnight = false;
@@ -1193,8 +1200,9 @@ namespace synthese
 						<< arrivalTimeStr.substr(0, 8) << ","
 						<< departureTimeStr.substr(0, 8) << ","
 						<< ","
-						<< ","
-						<< ","
+
+						<< (isReservationMandandatory ? "2," : "0,") // pickup_type
+						<< (isReservationMandandatory ? "2," : "0,") // drop_off_type
 						<< endl;
 					stopTimesExist = true;
 				}
@@ -1214,120 +1222,129 @@ namespace synthese
 		{
 			try
 			{
-				RegistryKeyType serviceKey;
-				RegistryKeyType routeId;
-				string tripHeadSign,journeyName;
-				bool stopTimesExist = false;
+			RegistryKeyType serviceKey;
+			RegistryKeyType routeId;
+			string tripHeadSign,journeyName;
+			bool stopTimesExist = false;
+			bool tripDirection;
 
-				routeId = _key(static_cast<const JourneyPattern *>(&(*service->getPath()))->getCommercialLine()->getKey());
+			routeId = _key(static_cast<const JourneyPattern *>(&(*service->getPath()))->getCommercialLine()->getKey());
 
-				const JourneyPattern * line = static_cast<const JourneyPattern *>(&(*service->getPath()));
+			const JourneyPattern * line = static_cast<const JourneyPattern *>(&(*service->getPath()));
 
-				string lineDirection(
-					line->getDirection().empty() && line->getDirectionObj() ?
-					line->getDirectionObj()->getDisplayedText() :
-					line->getDirection()
-				);
-				tripHeadSign = _Str(lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection);
+			string lineDirection(
+				line->getDirection().empty() && line->getDirectionObj() ?
+				line->getDirectionObj()->getDisplayedText() :
+				line->getDirection()
+			);
+			tripHeadSign = _Str(lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection);
 
-				journeyName = _SubLine(_Str(line->getName()));
+			tripDirection = !line->getWayBack(); 
 
-				RegistryKeyType tripId = _key(service->getKey(), 1);
-				const Path * path = service->getPath();
+			journeyName = _SubLine(_Str(line->getName()));
 
-				// BEGIN STOP_TIMES.TXT 1/2
+			RegistryKeyType tripId = _key(service->getKey(), 1);
+			const Path * path = service->getPath();
 
-				LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, service->getPath()->getKey()));
+			// BEGIN STOP_TIMES.TXT 1/2
 
-				_addStopTimes(stopTimesTxt,
-					lineStops,
-					service,
-					stopTimesExist,
-					isContinuous
-				);
+			LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, service->getPath()->getKey()));
 
-				// END STOP_TIMES.TXT 1/2
+			bool isReservationMandandatory = false;
+			RollingStock * rs = line->getRollingStock();
+			if ((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) != string::npos)
+				isReservationMandandatory = true;
 
-				const Calendar * currentCal = static_cast<const Calendar *>(service);
-				list <pair<const Calendar *, RegistryKeyType> >::iterator itCal = calendarMap.begin();
-				bool alreadyExist = false;
-				while(itCal != calendarMap.end())
+			_addStopTimes(stopTimesTxt,
+				lineStops,
+				service,
+				stopTimesExist,
+				isContinuous,
+				isReservationMandandatory
+			);
+
+			// END STOP_TIMES.TXT 1/2
+
+			const Calendar * currentCal = static_cast<const Calendar *>(service);
+			list <pair<const Calendar *, RegistryKeyType> >::iterator itCal = calendarMap.begin();
+			bool alreadyExist = false;
+			while(itCal != calendarMap.end())
+			{
+				if(*(itCal->first) == *currentCal)
 				{
-					if(*(itCal->first) == *currentCal)
-					{
-						alreadyExist = true;
-						break;
-					}
-					itCal++;
+					alreadyExist = true;
+					break;
 				}
+				itCal++;
+			}
 
-				if(!alreadyExist)
+			if(!alreadyExist)
+			{
+				serviceKey = _key(service->getKey());
+
+				calendarMap.push_back(make_pair(currentCal, serviceKey));
+
+				// BEGIN TRIPS.TXT 1.1
+				// trip_id,service_id,route_id,trip_headsign
+				if(stopTimesExist) // only trips wich have stops_times will be added
 				{
-					serviceKey = _key(service->getKey());
-
-					calendarMap.push_back(make_pair(currentCal, serviceKey));
-
-					// BEGIN TRIPS.TXT 1.1
-					// trip_id,service_id,route_id,trip_headsign
-					if(stopTimesExist) // only trips wich have stops_times will be added
+					if(isContinuous)
 					{
-						if(isContinuous)
-						{
-							// BEGIN FREQUENCIES.TXT 1_2
+						// BEGIN FREQUENCIES.TXT 1_2
 
-							_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
+						_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
 
-							// END FREQUENCIES.TXT 1_2
-						}
-
-						_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
-
-						// BEGIN SHAPES.TXT 1.1
-
-						_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
-
-						// END SHAPES.TXT 1.1
-
-						tripsTxt << endl;
-
-						// END TRIPS.TXT 1.1
+						// END FREQUENCIES.TXT 1_2
 					}
 
-					// BEGIN CALENDAR.TX & CALENDAR_DATES 1/2
+					_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign, tripDirection);
 
-					_addCalendars(calendarTxt, calendarDatesTxt, service, serviceKey, isContinuous);
+					// BEGIN SHAPES.TXT 1.1
 
-					// END CALENDAR.TX & CALENDAR_DATES 1/2
+					_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
+
+					// END SHAPES.TXT 1.1
+
+					tripsTxt << endl;
+
+					// END TRIPS.TXT 1.1
 				}
-				else
+
+				// BEGIN CALENDAR.TX & CALENDAR_DATES 1/2
+
+				_addCalendars(calendarTxt, calendarDatesTxt, service, serviceKey, isContinuous);
+
+				// END CALENDAR.TX & CALENDAR_DATES 1/2
+			}
+			else
+			{
+				serviceKey = itCal->second;
+
+				// BEGIN TRIPS.TXT 1.2
+				// trip_id,service_id,route_id,trip_headsign
+				if(stopTimesExist)
 				{
-					serviceKey = itCal->second;
+					_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign, tripDirection);
 
-					// BEGIN TRIPS.TXT 1.2
-					// trip_id,service_id,route_id,trip_headsign
-					if(stopTimesExist)
+					if(isContinuous)
 					{
-						_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
+						// BEGIN FREQUENCIES.TXT 2_2
 
-						if(isContinuous)
-						{
-							// BEGIN FREQUENCIES.TXT 2_2
+						_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
 
-							_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
-
-							// END FREQUENCIES.TXT 2_2
-						}
-
-						// BEGIN SHAPES.TXT 1.2
-
-						_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
-
-						// END SHAPES.TXT 1.2
-
-						tripsTxt << endl;
+						// END FREQUENCIES.TXT 2_2
 					}
-					// END TRIPS.TXT
+
+					// BEGIN SHAPES.TXT 1.2
+
+					_addShapes(path, tripId, shapesTxt, tripsTxt, journeyName);
+
+					// END SHAPES.TXT 1.2
+
+					tripsTxt << endl;
 				}
+				// END TRIPS.TXT
+			}
 			}
 			catch (const Exception & e)
 			{
@@ -1359,7 +1376,7 @@ namespace synthese
 			agencyTxt << "agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang" << endl;
 			stopsTxt << "stop_id,stop_code,stop_name,stop_lat,stop_lon,location_type,parent_station" << endl;
 			routesTxt << "route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color" << endl;
-			tripsTxt << "trip_id,service_id,route_id,trip_headsign,shape_id" << endl;
+			tripsTxt << "trip_id,service_id,route_id,trip_headsign,direction_id,shape_id" << endl;
 			stopTimesTxt << "trip_id,stop_id,stop_sequence,arrival_time,departure_time,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled" << endl;
 			calendarTxt << "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date" << endl;
 			calendarDatesTxt << "﻿service_id,date,exception_type" << endl;
@@ -1449,10 +1466,23 @@ namespace synthese
 			{
 				// route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
 
+				// Check if Commercial Line musn't exported
+				bool mustBeExported = true;
+				for (multimap<const DataSource*, string>::const_iterator it= myLine.second->getDataSourceLinks().begin(); it != myLine.second->getDataSourceLinks().end(); ++it) 
+				{
+					if(it->first->getName() == LABEL_NO_EXPORT_GTFS)
+					{
+						mustBeExported = false;
+						break;
+					}
+				}
+				if(!mustBeExported)
+					continue;
+
 				if((myLine.second->getPaths().begin()) != (myLine.second->getPaths().end()))
 				{
 					rs = static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock();
-					if((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) == string::npos)
+					if(rs != NULL)
 					{
 						string color;
 
@@ -1474,7 +1504,7 @@ namespace synthese
 							<< _Str(myLine.second->getShortName()) << "," //route_short_name
 							<< _Str(myLine.second->getLongName()) << "," //route_long_name
 							<< _Str(myLine.second->getRuleUserName()) << "," //route_desc
-							<< static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getGTFSKey() << "," //route_type
+							<< rs->getGTFSKey() << "," //route_type
 							<< "," //route_url
 							<< (color != "" ? color : "000000") << "," //route_color
 							<< "FFFFFF" //route_text_color
@@ -1497,7 +1527,20 @@ namespace synthese
 				{
 					rs = static_cast<const JourneyPattern *>(sdService->getPath())->getRollingStock();
 
-					if((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) == string::npos)
+					bool mustBeExported = true;
+					const multimap<const DataSource*, string>& dataSourcesMap = static_cast<const JourneyPattern *>(sdService->getPath())->getCommercialLine()->getDataSourceLinks();
+                                	for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
+					{
+                                        	if(it->first->getName() == LABEL_NO_EXPORT_GTFS)
+                                        	{
+                                               	 	mustBeExported = false;
+                                                	break;
+                                        	}
+                                	}
+                                	if(!mustBeExported)
+                                        	continue;
+
+					if(rs != NULL)
 					{
 						_filesProvider(sdService,
 							stopTimesTxt,
@@ -1527,9 +1570,22 @@ namespace synthese
 
 				if(csService)
 				{
-					rs = static_cast<const JourneyPattern *>(csService->getPath())->getRollingStock();
+					bool mustBeExported = true;
+					const multimap<const DataSource*, string>& dataSourcesMap = static_cast<const JourneyPattern *>(csService->getPath())->getCommercialLine()->getDataSourceLinks();
+					for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
+					{
+						if(it->first->getName() == LABEL_NO_EXPORT_GTFS)
+						{
+							mustBeExported = false;
+							break;
+						}
+				}
 
-					if((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) == string::npos)
+				if(!mustBeExported)
+					continue;
+
+					rs = static_cast<const JourneyPattern *>(csService->getPath())->getRollingStock();
+					if(rs != NULL)
 					{
 						_filesProvider(csService,
 							stopTimesTxt,
