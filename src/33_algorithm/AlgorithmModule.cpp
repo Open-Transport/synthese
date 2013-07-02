@@ -22,6 +22,8 @@
 
 #include "AlgorithmModule.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
 
 namespace synthese
@@ -31,8 +33,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<>
-		const string FactorableTemplate<ModuleClass,AlgorithmModule>::FACTORY_KEY("33_algorithm");
+		template<> const string FactorableTemplate<ModuleClass, AlgorithmModule>::FACTORY_KEY = "33_algorithm";
 	}
 
 	namespace server
@@ -41,14 +42,26 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<AlgorithmModule>::PreInit()
 		{
+			RegisterParameter(AlgorithmModule::MODULE_PARAM_USE_ASTAR_FOR_PHYSICAL_STOPS_EXTENDER, "0", &AlgorithmModule::ParameterCallback);
 		}
+
+
 
 		template<> void ModuleClassTemplate<AlgorithmModule>::Init()
 		{
 		}
 
+
+
+		template<> void ModuleClassTemplate<AlgorithmModule>::Start()
+		{
+		}
+
+
+
 		template<> void ModuleClassTemplate<AlgorithmModule>::End()
 		{
+			UnregisterParameter(AlgorithmModule::MODULE_PARAM_USE_ASTAR_FOR_PHYSICAL_STOPS_EXTENDER);
 		}
 
 
@@ -60,6 +73,7 @@ namespace synthese
 
 
 
+
 		template<> void ModuleClassTemplate<AlgorithmModule>::CloseThread(
 			
 			){
@@ -68,5 +82,17 @@ namespace synthese
 
 	namespace algorithm
 	{
+		const string AlgorithmModule::MODULE_PARAM_USE_ASTAR_FOR_PHYSICAL_STOPS_EXTENDER = "astar_for_walk";
+
+		bool AlgorithmModule::_useAStarForPhysicalStopsExtender = false;
+		void AlgorithmModule::ParameterCallback(
+			const string& name,
+			const string& value
+		){
+			if(name == MODULE_PARAM_USE_ASTAR_FOR_PHYSICAL_STOPS_EXTENDER)
+			{
+				_useAStarForPhysicalStopsExtender = !value.empty() && boost::lexical_cast<bool>(value);
+			}
+		}
 	}
 }
