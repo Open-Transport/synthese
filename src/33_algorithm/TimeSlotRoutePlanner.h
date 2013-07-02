@@ -69,6 +69,7 @@ namespace synthese
 				double								_vmax;
 				bool								_ignoreReservation;
 				boost::optional<boost::posix_time::time_duration>	_maxTransferDuration;
+				boost::optional<double> _minMaxDurationRatioFilter;
 				bool								_enableTheoretical;
 				bool								_enableRealTime;
 				
@@ -107,6 +108,7 @@ namespace synthese
 				bool							ignoreReservation,
 				const AlgorithmLogger& logger,
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true
 			);
@@ -137,6 +139,7 @@ namespace synthese
 				bool							ignoreReservation,
 				const AlgorithmLogger& logger,
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true
 			);

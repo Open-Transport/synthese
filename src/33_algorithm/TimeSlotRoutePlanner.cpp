@@ -58,6 +58,7 @@ namespace synthese
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
+			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime
 		):	_originVam(originVam),
@@ -75,6 +76,7 @@ namespace synthese
 			_vmax(vmax),
 			_ignoreReservation(ignoreReservation),
 			_maxTransferDuration(maxTransferDuration),
+			_minMaxDurationRatioFilter(minMaxDurationRatioFilter),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
 			_logger(logger),
@@ -97,6 +99,7 @@ namespace synthese
 			bool ignoreReservation,
 			const AlgorithmLogger& logger,
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
+			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime
 		):	_originVam(originVam),
@@ -119,6 +122,7 @@ namespace synthese
 			_vmax(vmax),
 			_ignoreReservation(ignoreReservation),
 			_maxTransferDuration(maxTransferDuration),
+			_minMaxDurationRatioFilter(minMaxDurationRatioFilter),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
 			_logger(logger),
@@ -156,6 +160,8 @@ namespace synthese
 		TimeSlotRoutePlanner::Result TimeSlotRoutePlanner::run()
 		{
 			Result result;
+			time_duration lowestDuration(not_a_date_time);
+			time_duration highestDuration(not_a_date_time);
 
 			// Time loop
 			for(ptime originDateTime(_planningOrder == DEPARTURE_FIRST ? _lowestDepartureTime : _highestArrivalTime);
@@ -250,6 +256,41 @@ namespace synthese
 				if(!result.empty() && result.back().getContinuousServiceRange().total_seconds() == 60)
 				{
 					// TODO
+				}
+
+				if(_minMaxDurationRatioFilter)
+				{
+					if(lowestDuration.is_not_a_date_time() || lowestDuration > journey.getDuration())
+					{
+						lowestDuration = journey.getDuration();
+						highestDuration = time_duration(seconds(long(ceil(double(lowestDuration.total_seconds()) * (*_minMaxDurationRatioFilter)))));
+					}
+
+					Result tempResult;
+					BOOST_FOREACH(const Result::value_type& currentJourney, result)
+					{
+						if(currentJourney.getDuration() <= highestDuration)
+						{
+							tempResult.push_back(currentJourney);
+						}
+					}
+
+					if(result.size() > tempResult.size())
+					{
+						if(_planningOrder == DEPARTURE_FIRST)
+						{
+							const Journey& last(result.back());
+							originDateTime = last.getLastDepartureTime();
+						}
+						else
+						{
+							const Journey& first(result.front());
+							originDateTime = first.getFirstArrivalTime();
+						}
+
+						result = tempResult;
+						continue;
+					}
 				}
 
 				if(_maxSolutionsNumber && result.size() >= *_maxSolutionsNumber)
