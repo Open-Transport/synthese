@@ -440,6 +440,11 @@ namespace synthese
 		std::string SchedulesBasedService::encodeSchedules(
 			boost::posix_time::time_duration shiftArrivals
 		) const {
+			if(!_path)
+			{
+				return _rawSchedule;
+			}
+
 			stringstream str;
 			size_t i(0);
 			BOOST_FOREACH(const Edge* edge, _path->getEdges())
@@ -468,6 +473,12 @@ namespace synthese
 		){
 			typedef tokenizer<char_separator<char> > tokenizer;
 
+			_rawSchedule = value;
+			if(!_path)
+			{
+				// No need to parse the data an complete our init
+				return;
+			}
 			// Parse all schedules arrival#departure,arrival#departure...
 			tokenizer schedulesTokens (value, char_separator<char>(","));
 

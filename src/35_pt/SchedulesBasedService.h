@@ -83,6 +83,9 @@ namespace synthese
 					const std::vector<boost::posix_time::time_period> &excludeRanges
 			) const;
 
+			// This is the schedule as we got it when loaded from the base
+			std::string _rawSchedule;
+
 		protected:
 
 			//! @name Theoretical data
