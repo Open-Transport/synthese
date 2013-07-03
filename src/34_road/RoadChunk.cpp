@@ -154,7 +154,7 @@ namespace synthese
 			}
 			if(metricOffset > geometry->getLength())
 			{
-				return boost::shared_ptr<Point>(static_cast<Point*>(geometry->getEndPoint()->clone()));
+				return boost::shared_ptr<Point>(geometry->getEndPoint());
 			}
 			return boost::shared_ptr<Point>(
 				geometry->getFactory()->createPoint(

@@ -1266,10 +1266,46 @@ namespace synthese
 						_period->getCaption() << "\" />"
 					;
 				}
-				stream <<
-					"<places departureCity=\"" << _departure_place.cityResult.key.getSource() << "\" departureCityNameTrust=\"" << _departure_place.cityResult.score.phoneticScore << "\"" <<
-					" arrivalCity=\"" << _arrival_place.cityResult.key.getSource() << "\" arrivalCityNameTrust=\"" << _arrival_place.cityResult.score.phoneticScore << "\""
-				;
+	
+				stream << "<places";
+ 
+				if(_departure_place.cityResult.value.get())
+				{
+					stream << " departureCity=\"" << _departure_place.placeResult.key.getSource() << "\" departureCityNameTrust=\"" << _departure_place.cityResult.score.phoneticScore << "\"";
+				}
+				else
+				{
+					string cityName;
+					if(dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value.get()))
+					{
+						cityName = dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value.get())->getCity()->getName();
+					}
+					else
+					{
+						cityName = dynamic_cast<const City*>(_departure_place.placeResult.value.get())->getName();
+					}
+					stream << " departureCity=\"" << cityName << "\" departureCityNameTrust=\"1\"";
+				}
+
+				if(_arrival_place.cityResult.value.get())
+				{
+					stream << " arrivalCity=\"" << _arrival_place.cityResult.key.getSource() << "\" arrivalCityNameTrust=\"" << _arrival_place.cityResult.score.phoneticScore << "\"";
+				}
+				else
+				{
+					string cityName;
+					if(dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value.get()))
+					{
+						cityName = dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value.get())->getCity()->getName();
+					}
+					else
+					{
+						cityName = dynamic_cast<const City*>(_arrival_place.placeResult.value.get())->getName();
+					}
+					stream << " arrivalCity=\"" << cityName << "\" arrivalCityNameTrust=\"1\"";
+				}
+
+
 				if(dynamic_cast<Place*>(_departure_place.cityResult.value.get()) != dynamic_cast<Place*>(_departure_place.placeResult.value.get()))
 				{
 					stream <<
@@ -2185,7 +2221,6 @@ namespace synthese
 			pm.insert(DATA_DESTINATION_CITY_TEXT, destinationCity->getName());
 			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
-			pm.insert(DATA_PERIOD_ID, periodId);
 			pm.insert(DATA_FILTERED_JOURNEYS, object.getFiltered());
 
 			// Text formatted date
@@ -2198,6 +2233,7 @@ namespace synthese
 
 			if(period)
 			{
+				pm.insert(DATA_PERIOD_ID, periodId);
 				pm.insert(DATA_PERIOD, period->getCaption());
 			}
 			pm.insert(DATA_SOLUTIONS_NUMBER, object.getJourneys().size());
