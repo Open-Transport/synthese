@@ -11,19 +11,19 @@ function addTextInputAutoComplete(params) {
   var content;
 
   // Add divs
-  content = "<div id=\\"div" + params.fieldId + "Selection\\" style=\\"min-width:170px\\">";
-  content = content + "<input type=\\"text\\" name=\\"" + (params.useId ? params.name + "Selection": params.name) + "\\" value=\\"" + params.valueName + "\\" id=\\"" + fieldIdAutoComplete + "\\" style=\\"width:144px; margin-right:0px;\\"/>";
+  content = "<div id=\"div" + params.fieldId + "Selection\" style=\"min-width:170px\">";
+  content = content + "<input type=\"text\" name=\"" + (params.useId ? params.name + "Selection": params.name) + "\" value=\"" + params.valueName + "\" id=\"" + fieldIdAutoComplete + "\" style=\"width:144px; margin-right:0px;\"/>";
   if (params.bottomButton) {
-    content = content + "<input type=\\"button\\" value=\\"v\\" onclick=\\"if ($('.ui-autocomplete').is(':visible')) $('#" + fieldIdAutoComplete + "').autocomplete('close','');else {$('#" + fieldIdAutoComplete + "').autocomplete('search','');$('#" + fieldIdAutoComplete + "').focus();}\\" style=\\"margin-left:0px;margin-right:0px;\\"/> ";
+    content = content + "<input type=\"button\" value=\"v\" onclick=\"if ($('.ui-autocomplete').is(':visible')) $('#" + fieldIdAutoComplete + "').autocomplete('close','');else {$('#" + fieldIdAutoComplete + "').autocomplete('search','');$('#" + fieldIdAutoComplete + "').focus();}\" style=\"margin-left:0px;margin-right:0px;\"/> ";
   }
   if (params.idButton) {
-    content = content + "<input type=\\"button\\" value=\\"ID\\" onclick=\\"$('#div" + params.fieldId + "Selection').hide();$('#div" + params.fieldId + "').show();\\" style=\\"margin-left:0px;\\"/>";
+    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.fieldId + "Selection').hide();$('#div" + params.fieldId + "').show();\" style=\"margin-left:0px;\"/>";
   }
   content = content + "</div>";
   if (params.useId) {
-    content = content + "<div id=\\"div" + params.fieldId + "\\" style=\\"display:none\\">";
-    content = content + "<input type=\\"text\\" name=\\"" + params.name + "\\" value=\\"" + params.valueId + "\\" id=\\"" + params.fieldId + "\\" style=\\"margin-right:0px;\\" />";
-    content = content + "<input type=\\"button\\" value=\\"ID\\" onclick=\\"$('#div" + params.fieldId + "Selection').show();$('#div" + params.fieldId + "').hide();\\" style=\\"margin-left:0px;\\" />";
+    content = content + "<div id=\"div" + params.fieldId + "\" style=\"display:none\">";
+    content = content + "<input type=\"text\" name=\"" + params.name + "\" value=\"" + params.valueId + "\" id=\"" + params.fieldId + "\" style=\"margin-right:0px;\" />";
+    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.fieldId + "Selection').show();$('#div" + params.fieldId + "').hide();\" style=\"margin-left:0px;\" />";
     content = content + "</div>";
   }
 
@@ -328,12 +328,12 @@ function add_row(tableId, values) {
       newCell.innerHTML = '<input type="hidden" value="'+ values[i][0] +'"  />';
       newCell.innerHTML += values[i][1];
     } else if (i == addRow.cells.length-1) {
-      var html = '<a href="#" onclick="remove_row(this); return false;"><img src="delete.png" alt="-" title="Supprimer l\\'Ã©lÃ©ment" /></a>';
+      var html = '<a href="#" onclick="remove_row(this); return false;"><img src="delete.png" alt="-" title="Supprimer l\'Ã©lÃ©ment" /></a>';
       if (tblBody.className != 'autoorder') {
         html += '<span class="up_down_button"></span><span class="up_down_button">';
         if (tblBody.rows.length > 1) {
-          html += '<a href="#" onclick="up_row(this); return false;"><img src="arrow_up.png" alt="-" title="Monter l\\'Ã©lÃ©ment" /></a>';
-          tblBody.rows[j-1].cells[tblBody.rows[j-1].cells.length-1].childNodes[1].innerHTML = '<a href="#" onclick="down_row(this); return false;"><img src="arrow_down.png" alt="-" title="Descendre l\\'Ã©lÃ©ment" /></a>';
+          html += '<a href="#" onclick="up_row(this); return false;"><img src="arrow_up.png" alt="-" title="Monter l\'Ã©lÃ©ment" /></a>';
+          tblBody.rows[j-1].cells[tblBody.rows[j-1].cells.length-1].childNodes[1].innerHTML = '<a href="#" onclick="down_row(this); return false;"><img src="arrow_down.png" alt="-" title="Descendre l\'Ã©lÃ©ment" /></a>';
         }
         html += '</span>';
       }
