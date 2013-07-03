@@ -119,6 +119,29 @@ namespace synthese
 
 
 
+		PlacesListService::~PlacesListService()
+		{
+			/*
+				The delete below is needed to fix a leak on _houseMap, which is never destroy.
+				However, having this delete cause a "double free or corruption" crash when loading the admin interface.
+
+				*** glibc detected *** ./s3-server: double free or corruption (fasttop): 0x00007f500c00c560 ***
+				======= Backtrace: =========
+				/lib64/libc.so.6[0x34a4675916]
+				(...)/lib56_pt_website.so(_ZN8synthese10pt_website17PlacesListServiceD2Ev+0x37)[0x7f5021dbc5d7]
+				(...)/lib35_pt.so(_ZN8synthese2pt13PTCitiesAdminD0Ev+0x22)[0x7f5024619102]
+
+				PTCitiesAdmin has a PlacesListService attribute which is allocated by his constructor, PTCitiesAdmin also
+				inherits from AdminInterfaceElementTemplate<PTCitiesAdmin>.
+				PTCitiesAdmin destructor call PlacesListService destructor, which will delete _houseMap. In this case
+				_houseMap has never been allocated, causing this crash.
+
+				This mean that the "PTCitiesAdmin" object we have has never been trully allocated, we have possibly did
+				a static pointer cast like static_cast<PTCitiesAdmin*>(PointerOnInheritedClass), causing this issue.
+			*/
+			//delete _houseMap;
+		}
+
 		ParametersMap PlacesListService::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -1208,7 +1231,7 @@ namespace synthese
 		}
 
 		//Sort house by distance to originPoint
-		PlacesListService::SortHouseByDistanceToOriginPoint::SortHouseByDistanceToOriginPoint(const House * house, int distanceToOriginPoint, string name):
+		PlacesListService::SortHouseByDistanceToOriginPoint::SortHouseByDistanceToOriginPoint(const boost::shared_ptr<House> house, int distanceToOriginPoint, string name):
 			_house(house),
 			_distanceToOriginPoint(distanceToOriginPoint),
 			_name(name)
@@ -1225,7 +1248,7 @@ namespace synthese
 			return _distanceToOriginPoint;
 		}
 
-		const House* PlacesListService::SortHouseByDistanceToOriginPoint::getHouse() const
+		const boost::shared_ptr<House> PlacesListService::SortHouseByDistanceToOriginPoint::getHouse() const
 		{
 			return _house;
 		}
@@ -1252,12 +1275,12 @@ namespace synthese
 
 		void PlacesListService::addHouse(
 				HouseMapType* const* houseMap,
-				const boost::shared_ptr<House> & house,
+				const boost::shared_ptr<House> house,
 				string name
 			) const {
 
 			int distanceToOriginPoint = CalcDistanceToOriginPoint(house);
-			SortHouseByDistanceToOriginPoint keyHouse(house.get(), distanceToOriginPoint, name);
+			SortHouseByDistanceToOriginPoint keyHouse(house, distanceToOriginPoint, name);
 			(*houseMap)->insert(pair<const SortHouseByDistanceToOriginPoint,const boost::shared_ptr<House> >(keyHouse,house));
 		}
 
