@@ -48,7 +48,8 @@ namespace synthese
 				DECODE_TABLE,
 				LENGTH,
 				VARIABLE,
-				HTML_ENCODE
+				HTML_ENCODE,
+				ESCAPE_DOUBLE_QUOTES
 			};
 
 		private:
