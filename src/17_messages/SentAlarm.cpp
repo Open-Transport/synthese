@@ -152,8 +152,9 @@ namespace synthese
 			{
 				// Then refer to the simple start/end date of the scenario
 				return
-					getScenario()->getPeriodStart() <= when &&
-					getScenario()->getPeriodEnd() >= when;
+					(getScenario()->getPeriodStart().is_not_a_date_time() || getScenario()->getPeriodStart() <= when) &&
+					(getScenario()->getPeriodEnd().is_not_a_date_time() || getScenario()->getPeriodEnd() >= when)
+				;
 			}
 		}
 
