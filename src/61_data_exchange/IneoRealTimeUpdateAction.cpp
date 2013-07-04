@@ -1139,13 +1139,11 @@ namespace synthese
 				}
 
 				if(	(	edge.isArrivalAllowed() &&
-					(	horaires[i].hta.hours() != service.getArrivalSchedule(false, i).hours() ||
-						horaires[i].hta.minutes() != service.getArrivalSchedule(false, i).minutes()
-				)	) || (
+						_applyTimeFloor(horaires[i].hta, 60) != _applyTimeFloor(service.getArrivalSchedule(false, i), 60)
+				) || (
 					edge.isDepartureAllowed() &&
-					(	horaires[i].htd.hours() != service.getDepartureSchedule(false, i).hours() ||
-						horaires[i].htd.minutes() != service.getDepartureSchedule(false, i).minutes()
-				)	)	){
+						_applyTimeFloor(horaires[i].htd, 60) != _applyTimeFloor(service.getDepartureSchedule(false, i), 60)
+				)	){
 						return false;
 				}
 			}
