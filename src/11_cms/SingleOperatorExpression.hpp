@@ -47,7 +47,8 @@ namespace synthese
 				READ_CONFIG,
 				DECODE_TABLE,
 				LENGTH,
-				VARIABLE
+				VARIABLE,
+				HTML_ENCODE
 			};
 
 		private:

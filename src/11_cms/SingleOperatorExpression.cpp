@@ -24,6 +24,7 @@
 
 #include "ModuleClass.h"
 #include "ConstantExpression.hpp"
+#include "HTMLModule.h"
 #include "VariableExpression.hpp"
 #include "WebsiteConfig.hpp"
 
@@ -37,6 +38,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace html;
 	using namespace server;
 	using namespace util;
 	
@@ -169,6 +171,9 @@ namespace synthese
 				}
 				return "0";
 
+			case HTML_ENCODE:
+				return HTMLModule::HTMLEncode(value);
+
 			case READ_CONFIG:
 				WebsiteConfig* config(
 					page.getRoot()->getConfig()
@@ -229,6 +234,10 @@ namespace synthese
 			if(	CompareText(it, end, "~variable"))
 			{
 				return VARIABLE;
+			}
+			if(	CompareText(it, end, "~html_encode"))
+			{
+				return HTML_ENCODE;
 			}
 			return optional<Operator>();
 		}
