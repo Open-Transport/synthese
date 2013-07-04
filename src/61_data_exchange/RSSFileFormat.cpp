@@ -266,10 +266,10 @@ namespace synthese
 			}
 			catch(...)
 			{
-				
+				return false;
 			}
 			
-			return false;
+			return true;
 		}
 
 
