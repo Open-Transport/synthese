@@ -1,24 +1,16 @@
-<div class="control-group">
- <label class="control-label">URL</label>
- <div class="controls">
-  <input name="address" type="text" value="<@address@>" is_parameter="true" />
- </div>
-</div>
-<div class="control-group">
- <label class="control-label">ID Destinataire ligne</label>
- <div class="controls">
-  <input name="line_recipient_id" type="text" value="<@line_recipient_id@>" is_parameter="true" />
- </div>
-</div>
-<div class="control-group">
- <label class="control-label">ID Destinataire arrêt</label>
- <div class="controls">
-  <input name="stop_recipient_id" type="text" value="<@stop_recipient_id@>" is_parameter="true" />
- </div>
-</div>
-<div class="control-group">
- <label class="control-label">ID Destinataire point de diffusion</label>
- <div class="controls">
-  <input name="broadcast_point_recipient_id" type="text" value="<@broadcast_point_recipient_id@>" is_parameter="true" />
- </div>
-</div>
+<#forms/text_input&
+  label=URL&
+  name=address&
+#>
+<#forms/text_input&
+  label=ID Destinataire ligne&
+  name=line_recipient_id&
+#>
+<#forms/text_input&
+  label=ID Destinataire arrêt&
+  name=stop_recipient_id&
+#>
+<#forms/text_input&
+  label=ID Destinataire point de diffusion&
+  name=broadcast_point_recipient_id&
+#>
