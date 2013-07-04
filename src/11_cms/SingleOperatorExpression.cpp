@@ -174,6 +174,9 @@ namespace synthese
 			case HTML_ENCODE:
 				return HTMLModule::HTMLEncode(value);
 
+			case ESCAPE_DOUBLE_QUOTES:
+				return HTMLModule::EscapeDoubleQuotes(value);
+
 			case READ_CONFIG:
 				WebsiteConfig* config(
 					page.getRoot()->getConfig()
@@ -238,6 +241,10 @@ namespace synthese
 			if(	CompareText(it, end, "~html_encode"))
 			{
 				return HTML_ENCODE;
+			}
+			if(	CompareText(it, end, "~escape_double_quotes"))
+			{
+				return ESCAPE_DOUBLE_QUOTES;
 			}
 			return optional<Operator>();
 		}
