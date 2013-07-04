@@ -668,11 +668,7 @@ namespace synthese
 
 		util::ParametersMap DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			boost::shared_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
-			if(!lock.owns_lock())
-			{
-				throw ActionException("DisplayScreenContentFunction: Cannot be run because a base writter has the lock");
-			}
+			boost::shared_lock<shared_mutex> lock(ServerModule::baseWriterMutex);
 
 			if(!_screen->getType())
 			{
