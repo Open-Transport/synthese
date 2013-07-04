@@ -926,7 +926,6 @@ namespace synthese
 					}
 					course.syntheseService->setSchedules(departureSchedules, arrivalSchedules, true);
 					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
-					course.syntheseService->addCodeBySource(*_realTimeDataSource, lexical_cast<string>(course.ref));
 					course.syntheseService->setActive(today);
 					updatesEnv.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(course.syntheseService));
 
