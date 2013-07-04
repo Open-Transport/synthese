@@ -949,7 +949,8 @@ namespace synthese
 					shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it->syntheseService->getKey(),
-							updatesEnv
+							updatesEnv,
+							FIELDS_ONLY_LOAD_LEVEL
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
@@ -964,7 +965,8 @@ namespace synthese
 					shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it->syntheseService->getKey(),
-							updatesEnv
+							updatesEnv,
+							FIELDS_ONLY_LOAD_LEVEL
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
@@ -979,7 +981,8 @@ namespace synthese
 					shared_ptr<ScheduledService> oldService(
 						ScheduledServiceTableSync::GetEditable(
 							it.second->getKey(),
-							updatesEnv
+							updatesEnv,
+							FIELDS_ONLY_LOAD_LEVEL
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
