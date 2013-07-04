@@ -207,7 +207,7 @@ namespace synthese
 				}
 				deleteTransaction.run();
 
-				boost::mutex::scoped_lock lock(ServerModule::baseWriterMutex, boost::try_to_lock);
+				boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
 				if(!lock.owns_lock())
 				{
 					throw ActionException("InterSYNTHESESlaveUpdateService: Already running a base update");

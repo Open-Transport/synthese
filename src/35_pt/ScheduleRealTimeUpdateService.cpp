@@ -31,6 +31,7 @@
 #include "ScheduledService.h"
 #include "SchedulesBasedService.h"
 #include "LineStop.h"
+#include "ServerModule.h"
 #include "StopPoint.hpp"
 #include "DataSourceTableSync.h"
 #include "JourneyPattern.hpp"
@@ -210,7 +211,13 @@ namespace synthese
 				return pm;
 			}
 
-			BOOST_FOREACH(Record record, _records ) 
+			boost::shared_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
+			if(!lock.owns_lock())
+			{
+				throw ActionException("ScheduleRealTimeUpdateService: Cannot be run because a base writter has the lock");
+			}
+
+			BOOST_FOREACH(Record record, _records )
 			{
 				//
 				// Resync the all services that are between the old scheduled date and the

@@ -23,6 +23,7 @@
 #include "DisplayScreenContentFunction.h"
 
 #include "AccessParameters.h"
+#include "ActionException.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
@@ -50,6 +51,7 @@
 #include "PTUseRule.h"
 #include "Destination.hpp"
 #include "RoutePlanningTableGenerator.h"
+#include "ServerModule.h"
 #include "DisplayScreenAlarmRecipient.h"
 #include "InterfacePageException.h"
 #include "MimeTypes.hpp"
@@ -666,6 +668,12 @@ namespace synthese
 
 		util::ParametersMap DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
+			boost::shared_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
+			if(!lock.owns_lock())
+			{
+				throw ActionException("DisplayScreenContentFunction: Cannot be run because a base writter has the lock");
+			}
+
 			if(!_screen->getType())
 			{
 				return ParametersMap();
