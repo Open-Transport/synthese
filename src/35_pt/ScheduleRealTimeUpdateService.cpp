@@ -211,11 +211,7 @@ namespace synthese
 				return pm;
 			}
 
-			boost::shared_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
-			if(!lock.owns_lock())
-			{
-				throw ActionException("ScheduleRealTimeUpdateService: Cannot be run because a base writter has the lock");
-			}
+			boost::shared_lock<shared_mutex> lock(ServerModule::baseWriterMutex);
 
 			BOOST_FOREACH(Record record, _records )
 			{
