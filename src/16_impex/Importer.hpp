@@ -81,7 +81,7 @@ namespace synthese
 			const ImportLogLevel _minLogLevel;	//!< Minimal level of entries to store in the content
 			mutable std::auto_ptr<std::ofstream> _fileStream;		//!< Stream on the file where the content must be sent
 			mutable boost::optional<std::ostream&> _outputStream;		//!< An output stream where the content must be sent
-			mutable util::ParametersMap& _pm;	//!< Parameters map where entries must be stored
+			util::ParametersMap& _pm;	//!< Parameters map where entries must be stored
 
 
 			virtual db::DBTransaction _save() const = 0;
