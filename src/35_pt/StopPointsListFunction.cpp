@@ -456,7 +456,6 @@ namespace synthese
 									}
 								}
 
-								std::cout << "================" << std::endl;
 								BOOST_FOREACH(sortedMapType::value_type it, sortedMap)
 								{
 									std::cout << it.first << std::endl;
