@@ -211,7 +211,7 @@ namespace synthese
 				return pm;
 			}
 
-			boost::shared_lock<shared_mutex> lock(ServerModule::baseWriterMutex);
+			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex);
 
 			BOOST_FOREACH(Record record, _records )
 			{
