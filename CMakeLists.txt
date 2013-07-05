@@ -174,27 +174,11 @@ include(global_vars.cmake)
 
 add_subdirectory(3rd)
 add_subdirectory(src)
+add_subdirectory(packages)
+add_subdirectory(projects)
+add_subdirectory(tools)
 add_subdirectory(test)
-
-OPTION(WITH_PACKAGES "Build and install packages" ON)
-if(WITH_PACKAGES)
-  add_subdirectory(packages)
-endif()
-
-OPTION(WITH_PROJECTS "Build and install projects" ON)
-if(WITH_PROJECTS)
-  add_subdirectory(projects)
-endif()
-
-OPTION(WITH_TOOLS "Build and install tools" ON)
-if(WITH_TOOLS)
-  add_subdirectory(tools)
-endif()
-
-OPTION(WITH_UTILS "Build and install utils" ON)
-if(WITH_UTILS)
-  add_subdirectory(utils)
-endif()
+add_subdirectory(utils)
 
 # build a CPack driven installer package
 #include(InstallRequiredSystemLibraries)
