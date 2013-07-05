@@ -186,7 +186,7 @@ if(WITH_PROJECTS)
   add_subdirectory(projects)
 endif()
 
-OPTION(WITH_TOOLS "Build and install tools")
+OPTION(WITH_TOOLS "Build and install tools" ON)
 if(WITH_TOOLS)
   add_subdirectory(tools)
 endif()
