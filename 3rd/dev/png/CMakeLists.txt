@@ -1,7 +1,10 @@
 file(GLOB png_SRCS "src/*.c" "src/*.h")
-list(REMOVE_ITEM png_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/png/src/pnggccrd.c")
 
-#find_package(zlib REQUIRED)
+if(not WIN32)
+  add_definitions(-DPNG_USE_PNGGCCRD)
+  add_definitions(-funroll-loops)
+  add_definitions(-fomit-frame-pointer)
+endif()
 
 include_directories(${PNG_INCLUDE_DIRS})
 include_directories(${ZLIB_INCLUDE_DIRS})
