@@ -48,7 +48,7 @@ public:
 	{};
 
 	const RegistryKeyType getNetworkId() const { return _networkId; }
-	const std::string& getName() const { return _name; }
+	virtual std::string getName() const { return _name; }
 	const std::string& getShortName() const { return _shortName; }
 
 	void setNetworkId(const RegistryKeyType networkId) { _networkId = networkId; }
