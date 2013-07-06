@@ -26,6 +26,7 @@
 #include "SimpleObjectFieldDefinition.hpp"
 
 #include "FrameworkTypes.hpp"
+#include "SchemaMacros.hpp"
 
 #include <boost/lexical_cast.hpp>
 
