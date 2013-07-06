@@ -27,7 +27,7 @@ namespace synthese
 	using namespace analysis;
 
 	CLASS_DEFINITION(TrafficForecast, "t111_traffic_forecasts", 112)
-	FIELD_DEFINITION_OF_OBJECT(OpeningTime, "traffic_forecast_id", "traffic_forecasts_ids")
+	FIELD_DEFINITION_OF_OBJECT(TrafficForecast, "traffic_forecast_id", "traffic_forecasts_ids")
 
 	FIELD_DEFINITION_OF_TYPE(Departure, "departure_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(Arrival, "arrival_id", SQL_INTEGER)
