@@ -117,7 +117,7 @@ namespace synthese
 			BOOST_FOREACH(const boost::shared_ptr<ScenarioFolder>& cfolder, folders)
 			{
 				boost::shared_ptr<ParametersMap> folderPM(new ParametersMap);
-				cfolder->toParametersMap(*folderPM);
+				cfolder->toParametersMap(*folderPM, true);
 				pm.insert(TAG_FOLDER, folderPM);
 
 				if(!_maxDepth || depth < *_maxDepth)

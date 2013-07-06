@@ -273,7 +273,7 @@ namespace synthese
 						)	);
 						if(mObject.get())
 						{
-							BOOST_FOREACH(ObjectBase* subObject, mObject->getSubObjects())
+							BOOST_FOREACH(Registrable* subObject, mObject->getSubObjects())
 							{
 								if(subObjects.find(subObject->getKey()) == subObjects.end())
 								{
@@ -320,7 +320,7 @@ namespace synthese
 
 
 			void SVNWorkingCopy::_export(
-				const ObjectBase& object,
+				const Registrable& object,
 				const boost::filesystem::path& dirPath,
 				const bool noCommit
 			) const	{

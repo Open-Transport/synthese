@@ -65,8 +65,7 @@ namespace synthese
 			boost::shared_ptr<Point> geometry,
 			bool withIndexation
 		):	Registrable(id),
-			Vertex(place, geometry, withIndexation),
-			Named(name)
+			Vertex(place, geometry, withIndexation)
 		{
 		}
 
@@ -246,5 +245,21 @@ namespace synthese
 				getConnectionPlace()->toParametersMap(*stopAreaPM, &coordinatesSystem);
 				pm.insert(TAG_STOP_AREA, stopAreaPM);
 			}
+		}
+
+
+
+		void StopPoint::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
+			std::string prefix /*= std::string() */
+		) const	{
+			toParametersMap(
+				pm,
+				withAdditionalParameters,
+				CoordinatesSystem::GetInstanceCoordinatesSystem(),
+				prefix
+			);
 		}
 }	}

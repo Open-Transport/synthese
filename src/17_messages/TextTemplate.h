@@ -58,7 +58,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string&	getName()			const;
+				virtual std::string	getName()			const;
 				const std::string&	getShortMessage()	const;
 				const std::string&	getLongMessage()	const;
 				AlarmLevel			getAlarmLevel()		const;

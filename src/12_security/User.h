@@ -122,7 +122,7 @@ namespace synthese
 				*/
 				const std::string&	getPassword()			const;
 				const std::string&	getPasswordHash()		const;
-				const std::string&	getName()				const;
+				virtual std::string	getName()				const;
 				const std::string&	getSurname()			const;
 				const std::string&	getAddress()			const;
 				const std::string&	getPostCode()			const;
@@ -142,8 +142,11 @@ namespace synthese
 			//@{
 				void verifyPassword(const std::string& password) const;
 				std::string	getFullName()	const;
-				void toParametersMap(
-					util::ParametersMap& pm
+				virtual void toParametersMap(
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
 				) const;
 			//@}
 		};

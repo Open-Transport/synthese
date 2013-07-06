@@ -150,7 +150,7 @@ namespace synthese
 		) const	{
 
 			// Road place informations
-			getRoadChunk()->getRoad()->getRoadPlace()->toParametersMap(pm, DATA_ROAD_PREFIX);
+			getRoadChunk()->getRoad()->getRoadPlace()->toParametersMap(pm, coordinatesSystem, DATA_ROAD_PREFIX);
 
 			// Number
 			if(getHouseNumber())
@@ -173,17 +173,15 @@ namespace synthese
 
 		void House::toParametersMap(
 			util::ParametersMap& pm,
-			const std::string& prefix
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
 		) const	{
-			toParametersMap(pm,&CoordinatesSystem::GetInstanceCoordinatesSystem(),prefix);
-		}
-
-
-
-		void House::toParametersMap( util::ParametersMap& pm ) const
-		{
-			string emptyPrefix;
-			toParametersMap(pm, emptyPrefix);
+			toParametersMap(
+				pm,
+				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
+				prefix
+			);
 		}
 
 

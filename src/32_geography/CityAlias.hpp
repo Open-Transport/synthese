@@ -66,7 +66,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				bool getVisible() const;
-				const std::string& getName() const;
+				virtual std::string getName() const;
 				const std::string& getCode() const;
 			//@}
 

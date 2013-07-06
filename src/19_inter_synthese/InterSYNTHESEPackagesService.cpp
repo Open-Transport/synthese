@@ -91,7 +91,7 @@ namespace synthese
 				if(_tableFilter || _objectFilter)
 				{
 					bool ok(false);
-					BOOST_FOREACH(ObjectBase* obj, package.get<Objects>())
+					BOOST_FOREACH(Registrable* obj, package.get<Objects>())
 					{
 						if(	(_objectFilter && obj->getKey() == *_objectFilter) ||
 							(_tableFilter && obj->getClassNumber() == *_tableFilter)

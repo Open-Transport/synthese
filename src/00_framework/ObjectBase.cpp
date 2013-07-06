@@ -51,12 +51,5 @@ namespace synthese
 			" ("+ lexical_cast<string>(object.getKey()) + ") : " + problem
 		)
 	{}
-
-
-
-	void ObjectBase::toParametersMap( util::ParametersMap& map ) const
-	{
-		toParametersMap(map, false);
-	}
 }
 

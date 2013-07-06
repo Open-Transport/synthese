@@ -134,7 +134,7 @@ namespace synthese
 			if(get<LockUser>())
 			{
 				boost::shared_ptr<ParametersMap> lockUserPM(new ParametersMap);
-				get<LockUser>()->toParametersMap(*lockUserPM);
+				get<LockUser>()->toParametersMap(*lockUserPM, true);
 				map.insert(TAG_LOCK_USER, lockUserPM);
 			}
 
@@ -142,7 +142,7 @@ namespace synthese
 			BOOST_FOREACH(const Objects::Type::value_type& item, get<Objects>())
 			{
 				boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
-				item->toParametersMap(*objectPM);
+				item->toParametersMap(*objectPM, false);
 				map.insert(TAG_OBJECT, objectPM);
 			}
 		}
@@ -281,7 +281,7 @@ namespace synthese
 		/// @retval pm the parameters map to populate with the object data
 		/// @retval binaryStream the stream where the binary data is written
 		void InterSYNTHESEPackage::_dumpObject(
-			const ObjectBase& object,
+			const Registrable& object,
 			util::ParametersMap& pm,
 			std::stringstream& binaryStream
 		){

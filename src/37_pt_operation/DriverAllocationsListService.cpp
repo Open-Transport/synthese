@@ -224,7 +224,7 @@ namespace synthese
 						alloc.get<DriverAllocationTemplate>()->get<DriverService::Vector>()
 					){
 						boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
-						service->toParametersMap(*servicePM);
+						service->toParametersMap(*servicePM, true);
 						allocPM->insert("service", servicePM);
 					}
 				}

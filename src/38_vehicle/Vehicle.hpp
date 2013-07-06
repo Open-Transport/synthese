@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_vehicle_Vehicle_hpp__
 #define SYNTHESE_vehicle_Vehicle_hpp__
 
-#include "Named.h"
 #include "ImportableTemplate.hpp"
 #include "Registrable.h"
 #include "Registry.h"
@@ -49,7 +48,6 @@ namespace synthese
 			@ingroup m38
 		*/
 		class Vehicle:
-			public util::Named,
 			public virtual util::Registrable,
 			public impex::ImportableTemplate<Vehicle>
 		{
@@ -72,6 +70,7 @@ namespace synthese
 			bool _available;
 			std::string _url;
 			std::string _registrationNumbers;
+			std::string _name;
 
 		public:
 			Vehicle(util::RegistryKeyType id=0);
@@ -85,6 +84,7 @@ namespace synthese
 				void setAvailable(bool value){ _available = value; }
 				void setURL(const std::string& value){ _url = value; }
 				void setRegistrationNumbers(const std::string& value){ _registrationNumbers = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Getters
@@ -96,6 +96,7 @@ namespace synthese
 				bool getAvailable() const { return _available; }
 				const std::string& getURL() const { return _url; }
 				const std::string& getRegistrationNumbers() const { return _registrationNumbers; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Updaters
@@ -104,8 +105,11 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				void toParametersMap(
-					util::ParametersMap& pm
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
 				) const;
 			//@}
 		};

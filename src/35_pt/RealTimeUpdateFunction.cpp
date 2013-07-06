@@ -203,7 +203,7 @@ namespace synthese
 			);
 
 			// Line
-			lineStop.getLine()->getCommercialLine()->toParametersMap(pm);
+			lineStop.getLine()->getCommercialLine()->toParametersMap(pm, true);
 
 			// service_number
 			pm.insert(DATA_SERVICE_NUMBER, service.getServiceNumber());

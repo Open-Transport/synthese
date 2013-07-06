@@ -820,7 +820,9 @@ namespace synthese
 
 		void DisplayScreen::toParametersMap(
 			util::ParametersMap& pm,
-			std::string prefix /*= std::string() */
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
 		) const {
 
 			pm.insert(prefix + DATA_IS_ONLINE, _maintenanceIsOnline);
@@ -1052,7 +1054,7 @@ namespace synthese
 			ParametersMap pm;
 
 			boost::shared_ptr<ParametersMap> screenPM(new ParametersMap);
-			toParametersMap(*screenPM);
+			toParametersMap(*screenPM, true);
 			pm.insert("screen", screenPM);
 			pm.insert(VAR_BROADCAST_POINT_TYPE, VALUE_DISPLAY_SCREEN);
 			boost::shared_ptr<ParametersMap> recipientsPM(new ParametersMap);

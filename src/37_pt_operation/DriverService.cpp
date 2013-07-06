@@ -218,6 +218,21 @@ namespace synthese
 
 
 
+		void DriverService::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
+			std::string prefix /*= std::string() */
+		) const	{
+			toParametersMap(
+				pm,
+				true,
+				NULL
+			);
+		}
+
+
+
 		time_duration DriverService::getWorkRange() const
 		{
 			return getServiceEnd() - getServiceBeginning();

@@ -90,7 +90,7 @@ namespace synthese
 					if(request.getSession()->getUser())
 					{
 						boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
-						request.getSession()->getUser()->toParametersMap(*userPM);
+						request.getSession()->getUser()->toParametersMap(*userPM, true);
 						pm.insert(TAG_USER, userPM);
 					}
 				}

@@ -105,8 +105,11 @@ namespace synthese
 			void setBacklightSpeed(int value){ _backlightSpeed = value; }
 			int getBacklightSpeed(){ return _backlightSpeed; }
 
-			void toParametersMap(
-				util::ParametersMap& pm
+			virtual void toParametersMap(
+				util::ParametersMap& pm,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles = boost::logic::indeterminate,
+				std::string prefix = std::string()
 			) const;
 		};
 }	}

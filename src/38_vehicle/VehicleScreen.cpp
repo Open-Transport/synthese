@@ -65,8 +65,11 @@ namespace synthese
 
 
 
-        void VehicleScreen::toParametersMap(
-			util::ParametersMap& pm
+		void VehicleScreen::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
 		) const	{
 			pm.insert(ATTR_NAME, _name);
 			pm.insert(ATTR_CONNECTED, _connected);

@@ -25,7 +25,7 @@
 
 #include "SimpleObjectFieldDefinition.hpp"
 
-#include "DBModule.h"
+#include "DBModule.h" // Temporary modules dependencies rule violation : will be useless when Env::getEditable will be able to chose a registry dynamically.
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -217,22 +217,22 @@ namespace synthese
 	/// ObjectBase Pointers vector field.
 	/// @ingroup m00
 	template<class C>
-	class PointersVectorField<C, ObjectBase>:
+	class PointersVectorField<C, util::Registrable>:
 		public SimpleObjectFieldDefinition<C>
 	{
 	public:
-		typedef std::vector<ObjectBase*> Type;
+		typedef std::vector<util::Registrable*> Type;
 
 	private:
 		//////////////////////////////////////////////////////////////////////////
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _vectorToString(const typename PointersVectorField<C, ObjectBase>::Type& p)
+		static std::string _vectorToString(const typename PointersVectorField<C, util::Registrable>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
-			BOOST_FOREACH(ObjectBase* ptr, p)
+			BOOST_FOREACH(util::Registrable* ptr, p)
 			{
 				if(!ptr)
 				{
@@ -254,7 +254,7 @@ namespace synthese
 
 	public:
 		static void LoadFromRecord(
-			typename PointersVectorField<C, ObjectBase>::Type& fieldObject,
+			typename PointersVectorField<C, util::Registrable>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -276,19 +276,18 @@ namespace synthese
 			{
 				try
 				{
-					ObjectBase* object(
-						dynamic_cast<ObjectBase*>(
-							db::DBModule::GetEditableObject(
-								boost::lexical_cast<util::RegistryKeyType>(item),
-								const_cast<util::Env&>(env)
-							).get()
-					)	);
-					if(!object)
+					util::Registrable* lObject(
+						db::DBModule::GetEditableObject( // Temporary modules dependencies rule violation : will be useless when Env::getEditable will be able to chose a registry dynamically.
+							boost::lexical_cast<util::RegistryKeyType>(item),
+							const_cast<util::Env&>(env)
+						).get()
+					);
+					if(!lObject)
 					{
 						continue;
 					}
 					fieldObject.push_back(
-						object
+						lObject
 					);
 				}
 				catch(boost::bad_lexical_cast&)
@@ -313,7 +312,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename PointersVectorField<C, ObjectBase>::Type& fieldObject,
+			const typename PointersVectorField<C, util::Registrable>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -327,7 +326,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename PointersVectorField<C, ObjectBase>::Type& fieldObject,
+			const typename PointersVectorField<C, util::Registrable>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
@@ -345,7 +344,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename PointersVectorField<C, ObjectBase>::Type& fieldObject,
+			const typename PointersVectorField<C, util::Registrable>::Type& fieldObject,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
@@ -363,7 +362,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename PointersVectorField<C, ObjectBase>::Type& fieldObject,
+			const typename PointersVectorField<C, util::Registrable>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){

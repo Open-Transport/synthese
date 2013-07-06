@@ -75,7 +75,7 @@ namespace synthese
 			_parent = value;
 		}
 
-		const std::string& Profile::getName() const
+		std::string Profile::getName() const
 		{
 			return _name;
 		}

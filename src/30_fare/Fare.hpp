@@ -79,7 +79,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string& getName() const { return _name; }
+				virtual std::string getName() const { return _name; }
 				const boost::shared_ptr<FareType> getType() const { return _type; }
 				const std::string& getCurrency() const { return _currency; }
 				const boost::optional<int> getPermittedConnectionsNumber() const { return _permittedConnectionsNumber; }

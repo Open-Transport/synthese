@@ -28,8 +28,6 @@
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "Profile.h"
-#include "ReplaceQuery.h"
-#include "ReservationContact.h"
 #include "Session.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
@@ -48,15 +46,6 @@ namespace synthese
 
 	template<> const string util::FactorableTemplate<DBTableSync,ReservationContactTableSync>::FACTORY_KEY = "35.10.06 Reservation contacts";
 
-	namespace pt
-	{
-		const string ReservationContactTableSync::COL_NAME = "name";
-		const string ReservationContactTableSync::COL_PHONEEXCHANGENUMBER = "phone_exchange_number";
-		const string ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS = "phone_exchange_opening_hours";
-		const string ReservationContactTableSync::COL_DESCRIPTION = "description";
-		const string ReservationContactTableSync::COL_WEBSITEURL = "web_site_url";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ReservationContactTableSync>::TABLE(
@@ -67,12 +56,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<ReservationContactTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(ReservationContactTableSync::COL_NAME, SQL_TEXT),
-			Field(ReservationContactTableSync::COL_PHONEEXCHANGENUMBER, SQL_TEXT),
-			Field(ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS, SQL_TEXT),
-			Field(ReservationContactTableSync::COL_DESCRIPTION, SQL_TEXT),
-			Field(ReservationContactTableSync::COL_WEBSITEURL, SQL_TEXT),
 			Field()
 		};
 
@@ -82,60 +65,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<ReservationContactTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ReservationContactTableSync,ReservationContact>::Load(
-			ReservationContact* rr,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Name
-			rr->setName(rows->getText(ReservationContactTableSync::COL_NAME));
-
-			string phoneExchangeNumber (
-				rows->getText (ReservationContactTableSync::COL_PHONEEXCHANGENUMBER)
-			);
-			rr->setPhoneExchangeNumber (phoneExchangeNumber);
-
-			string phoneExchangeOpeningHours (
-				rows->getText (ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS)
-			);
-			rr->setPhoneExchangeOpeningHours (phoneExchangeOpeningHours);
-
-			string description (
-				rows->getText (ReservationContactTableSync::COL_DESCRIPTION)
-			);
-			rr->setDescription (description);
-
-			string webSiteUrl (
-				rows->getText (ReservationContactTableSync::COL_WEBSITEURL)
-			);
-			rr->setWebSiteUrl (webSiteUrl);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ReservationContactTableSync,ReservationContact>::Save(
-			ReservationContact* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<ReservationContactTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getPhoneExchangeNumber());
-			query.addField(object->getPhoneExchangeOpeningHours());
-			query.addField(object->getDescription());
-			query.addField(object->getWebSiteUrl());
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<ReservationContactTableSync,ReservationContact>::Unlink(
-			ReservationContact* obj
-		){
 		}
 
 
@@ -189,11 +118,11 @@ namespace synthese
 			// Name filter
 			if(name)
 			{
-				query.addWhereField(COL_NAME, *name, ComposedExpression::OP_LIKE);
+				query.addWhereField(Name::FIELD.name, *name, ComposedExpression::OP_LIKE);
 			}
 			if(orderByName)
 			{
-				query.addOrderField(COL_NAME, raisingOrder);
+				query.addOrderField(Name::FIELD.name, raisingOrder);
 			}
 			if(number)
 			{

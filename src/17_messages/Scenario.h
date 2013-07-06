@@ -26,8 +26,6 @@
 #define SYNTHESE_Scenario_h__
 
 #include "ImportableTemplate.hpp"
-#include "Named.h"
-#include "ParametersMap.h"
 #include "Registrable.h"
 #include "Registry.h"
 
@@ -49,8 +47,7 @@ namespace synthese
 		///		- the sent scenario
 		class Scenario:
 			public virtual util::Registrable,
-			public impex::ImportableTemplate<Scenario>,
-			public util::Named
+			public impex::ImportableTemplate<Scenario>
 		{
 		public:
 			typedef std::set<const MessagesSection*> Sections;
@@ -60,7 +57,7 @@ namespace synthese
 		private:
 
 			Sections _sections;
-
+			std::string _name;
 			mutable Messages _messages;
 			mutable ScenarioCalendars _calendars;
 
@@ -81,6 +78,7 @@ namespace synthese
 			//@{
 				void setSections(const Sections& value){ _sections = value; }
 				void setCalendars(const ScenarioCalendars& value) const { _calendars = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			/// @name Getters
@@ -88,6 +86,7 @@ namespace synthese
 				const Messages& getMessages() const { return _messages; }
 				const ScenarioCalendars& getCalendars() const { return _calendars; }
 				const Sections& getSections() const { return _sections; }
+				virtual std::string getName() const { return _name; }
 			//@}
 		};
 	}

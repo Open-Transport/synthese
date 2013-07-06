@@ -254,8 +254,7 @@ namespace synthese
 						rObject->setKey(key);
 						_env.addRegistrable(rObject);
 					}
-					boost::shared_ptr<ObjectBase> object(dynamic_pointer_cast<ObjectBase, Registrable>(rObject));
-					result.push_back(object.get());
+					result.push_back(rObject.get());
 
 
 					//////////////////////////////////////////////////////////////////////////
@@ -267,33 +266,26 @@ namespace synthese
 					// Load properties of the current object
 					// Placed after the load of the sub objects to prevent bad link
 					// in case of link to a sub object
-					object->loadFromRecord(map, _env);
+					rObject->loadFromRecord(map, _env);
 
 					// Removal detection
 					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
-					if( registry.contains(object->getKey()))
+					if( registry.contains(rObject->getKey()))
 					{
-						boost::shared_ptr<ObjectBase> mObject(
-							dynamic_pointer_cast<ObjectBase, Registrable>(
-								registry.getEditableObject(object->getKey())
-						)	);
-						if(mObject.get())
+						BOOST_FOREACH(Registrable* subObject, registry.getEditableObject(rObject->getKey())->getSubObjects())
 						{
-							BOOST_FOREACH(ObjectBase* subObject, mObject->getSubObjects())
+							bool found(false);
+							BOOST_FOREACH(const Registrable* object, subObjects)
 							{
-								bool found(false);
-								BOOST_FOREACH(const ObjectBase* object, subObjects)
+								if(object->getKey() == subObject->getKey())
 								{
-									if(object->getKey() == subObject->getKey())
-									{
-										found = true;
-										break;
-									}
+									found = true;
+									break;
 								}
-								if(!found)
-								{
-									_objectsToRemove.insert(subObject->getKey());
-								}
+							}
+							if(!found)
+							{
+								_objectsToRemove.insert(subObject->getKey());
 							}
 						}
 					}

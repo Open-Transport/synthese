@@ -23,6 +23,7 @@
 
 #include "Registrable.h"
 
+#include "DBModule.h" // Temporary modules dependencies rule violation : will be useless when all objects will iherit from ObjectBase
 #include "ParametersMap.h"
 #include "RegistryKeyException.h"
 #include "ObjectNotFoundException.h"
@@ -52,8 +53,82 @@ namespace synthese
 
 
 
-		void Registrable::toParametersMap( util::ParametersMap& pm ) const
+		//////////////////////////////////////////////////////////////////////////
+		/// Exports the content of the object into a ParametersMap object.
+		///
+		/// The default version exports only the id of the object and do not
+		/// validate the postcondition.
+		///
+		/// @post The parameters map should contain all necessary field to re-import
+		/// the object through loadFromRecord
+		/// @param withFiles Exports fields as independent files
+		/// @param withAdditionalParameters if true the map is filled up by
+		/// addAdditionalParameters
+		/// @retval map the ParametersMap to populate
+		void Registrable::toParametersMap(
+			util::ParametersMap& map,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
+			std::string prefix /*= std::string() */
+		) const	{
+			map.insert(ATTR_ID, _key);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Exports the content of the object into a FilesMap object (fields to store as files only).
+		/// The default implementation exports nothing.
+		/// @param map the FilesMap to fill
+		void Registrable::toFilesMap( FilesMap& map ) const
 		{
-			pm.insert(ATTR_ID, _key);
+		}
+
+
+
+		synthese::SubObjects Registrable::getSubObjects() const
+		{
+			return SubObjects();
+		}
+
+
+
+		void Registrable::loadFromRecord( const Record& record, util::Env& env )
+		{
+			throw Exception("Method loadFromRecord not implemented for the object "+ lexical_cast<string>(_key));
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the class number of the object.
+		/// The default implementation reads the class number in the object key.
+		/// Without defined key, the method can not work.
+		/// @return the number of the class of the object
+		/// @throw Exception if the object has no id
+		util::RegistryTableType Registrable::getClassNumber() const
+		{
+			// Without id, the class number cannot be guessed
+			if(!_key)
+			{
+				throw Exception("Method getClassNumber not implemented for an old-style object without id");
+			}
+
+			return decodeTableId(_key);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the name of the table corresponding to the class
+		/// @return the name of the table corresponding to the class of the object
+		/// @throw Exception if the object has no id
+		const std::string& Registrable::getTableName() const
+		{
+			RegistryTableType tableId(getClassNumber());
+			boost::shared_ptr<db::DBTableSync> tableSync(
+				db::DBModule::GetTableSync(tableId) // Temporary modules dependencies rule violation : will be useless when all objects will iherit from ObjectBase
+			);
+			return tableSync->getFormat().NAME;
 		}
 }	}

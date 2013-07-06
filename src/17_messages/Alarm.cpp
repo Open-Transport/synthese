@@ -168,13 +168,6 @@ namespace synthese
 
 
 
-		void Alarm::toParametersMap( util::ParametersMap& pm ) const
-		{
-			toParametersMap(pm, true);
-		}
-
-
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Checks if the message must be displayed on the specified broadcast point
 		/// according to the display parameters

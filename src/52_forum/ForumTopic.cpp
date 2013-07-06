@@ -41,7 +41,6 @@ namespace synthese
 	{
 		ForumTopic::ForumTopic(RegistryKeyType id):
 			Registrable(id),
-			Named(),
 			_node(0),
 			_user(NULL),
 			_date(second_clock::local_time()),

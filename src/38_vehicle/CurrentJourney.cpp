@@ -61,7 +61,7 @@ namespace synthese
 			if(_line)
 			{
 				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
-				_line->toParametersMap(*linePM);
+				_line->toParametersMap(*linePM, true);
 				pm.insert(TAG_COMMERCIAL_LINE, linePM);
 			}
 

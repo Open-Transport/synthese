@@ -30,8 +30,21 @@
 #include "Field.hpp"
 #include "UtilConstants.h"
 
+#include <boost/logic/tribool.hpp>
+
 namespace synthese
 {
+	class FilesMap;
+	class Record;
+
+	namespace util
+	{
+		class Env;
+		class Registrable;
+	}
+
+	typedef std::vector<util::Registrable*> SubObjects;
+
 	namespace util
 	{
 		class ParametersMap;
@@ -83,9 +96,6 @@ namespace synthese
 
 
 				virtual FieldsList getFields() const { return FieldsList(); }
-
-
-				virtual void toParametersMap(util::ParametersMap& pm) const;
 			//@}
 
 			//! \name Setters
@@ -95,6 +105,33 @@ namespace synthese
 				///	@param key the ID of the object to set
 				////////////////////////////////////////////////////////////////////
 				virtual void setKey(RegistryKeyType key){ _key = key; }
+			//@}
+
+			/// @name Importers/Exporters
+			//@{
+				virtual void toParametersMap(
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
+
+				virtual void toFilesMap(
+					FilesMap& map
+				) const;
+
+				virtual SubObjects getSubObjects() const;
+
+				virtual void loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual util::RegistryTableType getClassNumber() const;
+
+				virtual std::string getName() const { return std::string(); }
+
+				virtual const std::string& getTableName() const;
 			//@}
 		};
 }	}

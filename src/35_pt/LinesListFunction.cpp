@@ -804,7 +804,7 @@ namespace synthese
 				{
 					boost::shared_ptr<const CommercialLine> line = it.second;
 					boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
-					line->toParametersMap(*linePM);
+					line->toParametersMap(*linePM, true);
 
 					// Rolling stock
 					set<RollingStock *> rollingStocks;
@@ -823,7 +823,7 @@ namespace synthese
 					BOOST_FOREACH(RollingStock * rs, rollingStocks)
 					{
 						boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
-						rs->toParametersMap(*rsPM);
+						rs->toParametersMap(*rsPM, true);
 						linePM->insert(DATA_TRANSPORT_MODE, rsPM);
 					}
 

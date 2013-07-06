@@ -164,17 +164,17 @@ namespace synthese
 
 
 
-		void PublicPlace::toParametersMap( util::ParametersMap& pm, const std::string& prefix ) const
-		{
-			toParametersMap(pm,&CoordinatesSystem::GetInstanceCoordinatesSystem(),prefix);
-		}
-
-
-
-		void PublicPlace::toParametersMap( util::ParametersMap& pm ) const
-		{
-			string emptyPrefix;
-			toParametersMap(pm, emptyPrefix);
+		void PublicPlace::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const	{
+			toParametersMap(
+				pm,
+				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
+				prefix
+			);
 		}
 
 

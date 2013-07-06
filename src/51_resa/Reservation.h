@@ -242,6 +242,13 @@ namespace synthese
 					boost::optional<Language> language,
 					std::string prefix = std::string()
 				) const;
+
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 }	}

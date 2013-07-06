@@ -33,7 +33,6 @@ MimeType.cpp
 MimeType.hpp
 MimeTypes.cpp
 MimeTypes.hpp
-Named.h
 ObjectNotFoundException.h
 ObjectNotFoundInRegistryException.h
 ParametersMap.cpp

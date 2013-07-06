@@ -31,7 +31,6 @@
 #include "Path.h"
 #include "ImportableTemplate.hpp"
 #include "Registry.h"
-#include "Named.h"
 #include "Calendar.h"
 #include "Edge.h"
 
@@ -87,7 +86,6 @@ namespace synthese
 		class JourneyPattern:
 			public graph::Path,
 			public impex::ImportableTemplate<JourneyPattern>,
-			public util::Named,
 			public calendar::Calendar
 		{
 		public:
@@ -103,7 +101,7 @@ namespace synthese
 			std::string _timetableName; //!< Name for timetable
 			std::string _direction;		//!< Direction (shown on vehicles)
 			Destination* _directionObj;
-
+			std::string _name;
 			bool _isWalkingLine;
 
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
@@ -137,6 +135,7 @@ namespace synthese
 				Destination*		getDirectionObj()			const { return _directionObj; }
 				bool				getMain()					const { return _main; }
 				graph::MetricOffset	getPlannedLength()			const { return _plannedLength; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 
@@ -152,6 +151,7 @@ namespace synthese
 				void setDirectionObj(Destination* value){ _directionObj = value; }
 				void setMain(bool value){ _main = value; }
 				void setPlannedLength(graph::MetricOffset value){ _plannedLength = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 

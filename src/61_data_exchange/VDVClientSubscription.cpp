@@ -166,13 +166,13 @@ namespace synthese
 			if(_stopArea)
 			{
 				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
-				_stopArea->toParametersMap(*stopPM);
+				_stopArea->toParametersMap(*stopPM, true);
 				pm.insert(TAG_STOP_AREA, stopPM);
 			}
 			if(_line)
 			{
 				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
-				_line->toParametersMap(*linePM);
+				_line->toParametersMap(*linePM, true);
 				pm.insert(TAG_LINE, linePM);
 			}
 			pm.insert(ATTR_TIME_SPAN, _timeSpan.total_seconds() / 60);

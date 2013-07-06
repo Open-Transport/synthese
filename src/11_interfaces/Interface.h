@@ -121,7 +121,7 @@ namespace synthese
 
 
 				const std::string& getNoSessionDefaultPageCode() const;
-				const std::string& getName() const;
+				virtual std::string getName() const;
 				const std::string& getDefaultClientURL() const;
 			//@}
 

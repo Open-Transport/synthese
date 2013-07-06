@@ -130,7 +130,7 @@ namespace synthese
 			if(_calendarTemplate)
 			{
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
-				_calendarTemplate->toParametersMap(*calendarPM);
+				_calendarTemplate->toParametersMap(*calendarPM, true);
 				pm.insert(TAG_CALENDAR, calendarPM);
 			}
 		}

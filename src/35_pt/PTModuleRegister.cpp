@@ -70,7 +70,6 @@
 #include "CleanAllStopPointProjectionsAction.hpp"
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
 #include "CommercialLineUpdateAction.h"
-#include "ContactCenterUpdateAction.hpp"
 #include "CopyGeometriesAction.hpp"
 #include "DestinationUpdateAction.hpp"
 #include "DRTAreaUpdateAction.hpp"
@@ -213,7 +212,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::CleanAllStopPointProjectionsAction::integrate();
 	synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
 	synthese::pt::CommercialLineUpdateAction::integrate();
-	synthese::pt::ContactCenterUpdateAction::integrate();
 	synthese::pt::ContinuousServiceUpdateAction::integrate();
 	synthese::pt::CopyGeometriesAction::integrate();
 	synthese::pt::DestinationUpdateAction::integrate();

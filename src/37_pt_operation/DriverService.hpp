@@ -25,7 +25,6 @@
 
 #include "ImportableTemplate.hpp"
 #include "Calendar.h"
-#include "Named.h"
 #include "PointerField.hpp"
 #include "PointersVectorField.hpp"
 
@@ -45,7 +44,6 @@ namespace synthese
 			@ingroup m37
 		*/
 		class DriverService:
-			public util::Named,
 			public impex::ImportableTemplate<DriverService>,
 			public calendar::Calendar,
 			public virtual util::Registrable,
@@ -121,6 +119,7 @@ namespace synthese
 
 		private:
 			Chunks _chunks;
+			std::string _name;
 
 		public:
 			DriverService(util::RegistryKeyType id = 0);
@@ -128,20 +127,30 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const Chunks& getChunks() const { return _chunks; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setChunks(const Chunks& value);
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			/// @name Services
 			//@{
 				void toParametersMap(
 					util::ParametersMap& map,
-					bool recursive = true,
-					const VehicleService* vehicleServiceFilter = NULL
+					bool recursive,
+					const VehicleService* vehicleServiceFilter
 				) const;
+
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
+
 				boost::posix_time::time_duration getWorkRange() const;
 				boost::posix_time::time_duration getWorkDuration() const;
 				boost::posix_time::time_duration getServiceBeginning() const;

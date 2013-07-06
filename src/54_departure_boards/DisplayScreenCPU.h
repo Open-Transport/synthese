@@ -26,7 +26,6 @@
 #ifndef SYNTHESE_departurestable_DisplayScreenCPU_h__
 #define SYNTHESE_departurestable_DisplayScreenCPU_h__
 
-#include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "TreeAlphabeticalOrderingPolicy.hpp"
@@ -57,7 +56,6 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////////
 		class DisplayScreenCPU:
 			public util::Registrable,
-			public util::Named,
 			public tree::TreeRoot<DisplayScreen, tree::TreeAlphabeticalOrderingPolicy>
 		{
 		public:
@@ -70,6 +68,7 @@ namespace synthese
 			boost::posix_time::time_duration					_monitoring_delay;
 			bool												_is_online;
 			std::string											_maintenance_message;
+			std::string _name;
 
 		public:
 			////////////////////////////////////////////////////////////////////
@@ -93,6 +92,7 @@ namespace synthese
 				boost::posix_time::time_duration					getMonitoringDelay()	const;
 				bool												getIsOnline()			const;
 				const std::string&									getMaintenanceMessage()	const;
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
@@ -102,6 +102,7 @@ namespace synthese
 				void setMonitoringDelay(const boost::posix_time::time_duration value);
 				void setIsOnline(const bool value);
 				void setMaintenanceMessage(const std::string& value);
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Queries

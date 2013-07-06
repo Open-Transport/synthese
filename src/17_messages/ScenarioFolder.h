@@ -58,7 +58,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				ScenarioFolder*		getParent()	const;
-				const std::string&	getName()	const;
+				virtual std::string	getName()	const;
 			//@}
 
 			//! @name Setters
@@ -79,7 +79,10 @@ namespace synthese
 
 
 				virtual void toParametersMap(
-					util::ParametersMap& pm
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
 				) const;
 			//@}
 
