@@ -181,7 +181,7 @@ namespace synthese
 			BOOST_FOREACH(const LinesSet::value_type& line, result)
 			{
 				boost::shared_ptr<ParametersMap> lineMap(new ParametersMap);
-				line->toParametersMap(*lineMap);
+				line->toParametersMap(*lineMap, true);
 				map.insert(TAG_LINE, lineMap);
 			}
 			return map;

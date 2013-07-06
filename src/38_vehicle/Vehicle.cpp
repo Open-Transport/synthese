@@ -53,8 +53,12 @@ namespace synthese
 
 
 
-		void Vehicle::toParametersMap( util::ParametersMap& pm ) const
-		{
+		void Vehicle::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const	{
 			pm.insert(DATA_NAME, getName());
 			pm.insert(DATA_NUMBER, getNumber());
 			pm.insert(DATA_PICTURE, getPicture());

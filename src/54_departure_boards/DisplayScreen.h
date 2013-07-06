@@ -28,7 +28,6 @@
 #include "BroadcastPoint.hpp"
 #include "DisplayScreenCPU.h"
 #include "ImportableTemplate.hpp"
-#include "Named.h"
 #include "PlaceWithDisplayBoards.hpp"
 #include "Registrable.h"
 #include "TreeNode.hpp"
@@ -103,7 +102,6 @@ namespace synthese
 					PlaceWithDisplayBoards,
 					DisplayScreenCPU
 			>	>,
-			public util::Named,
 			public impex::ImportableTemplate<DisplayScreen>,
 			public util::FactorableTemplate<messages::BroadcastPoint, DisplayScreen>
 		{
@@ -144,6 +142,7 @@ namespace synthese
 				int													_comPort;
 				std::string											_macAddress;
 				pt::StopPoint*										_stopPointLocation;
+				std::string _name;
 			//@}
 
 			//! \name Appearance
@@ -273,6 +272,7 @@ namespace synthese
 				void	setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value){ _physicalStops = value; }
 				void	setAllowCanceled(bool value){ _allowCanceled = value; }
 				void	setStopPointLocation(pt::StopPoint* value){ _stopPointLocation = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! \name Modifiers
@@ -346,6 +346,7 @@ namespace synthese
 				const LineFilter&				getAllowedLines()				const { return _allowedLines; }
 				bool							getAllowCanceled()				const { return _allowCanceled; }
 				pt::StopPoint*					getStopPointLocation()			const { return _stopPointLocation; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! \name Services
@@ -402,8 +403,10 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @since 3.3.0
 				/// @date 2011
-				void toParametersMap(
+				virtual void toParametersMap(
 					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
 			//@}

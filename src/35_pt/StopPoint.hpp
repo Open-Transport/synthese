@@ -26,7 +26,6 @@
 #include "UtilConstants.h"
 #include "Vertex.h"
 #include "ImportableTemplate.hpp"
-#include "Named.h"
 #include "Address.h"
 #include "ReachableFromCrossing.hpp"
 
@@ -55,7 +54,6 @@ namespace synthese
 		class StopPoint:
 			public graph::Vertex,
 			public impex::ImportableTemplate<StopPoint>,
-			public util::Named,
 			public road::ReachableFromCrossing
 		{
 		public:
@@ -75,6 +73,7 @@ namespace synthese
 
 		private:
 			road::Address _projectedPoint;
+			std::string _name;
 
 		public:
 
@@ -92,11 +91,13 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const road::Address& getProjectedPoint() const { return _projectedPoint; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setProjectedPoint(const road::Address& value){ _projectedPoint = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Services
@@ -147,8 +148,15 @@ namespace synthese
 				/// @author Hugues Romain
 				void toParametersMap(
 					util::ParametersMap& pm,
-					bool withStopAreaData = true,
-					const CoordinatesSystem& coordinatesSystem = CoordinatesSystem::GetInstanceCoordinatesSystem(),
+					bool withStopAreaData,
+					const CoordinatesSystem& coordinatesSystem,
+					std::string prefix = std::string()
+				) const;
+
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
 			//@}

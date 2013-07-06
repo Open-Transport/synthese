@@ -192,7 +192,7 @@ namespace synthese
 			){
 				// Template scenario
 				boost::shared_ptr<ParametersMap> templatePM(new ParametersMap);
-				getTemplate()->toParametersMap(*templatePM);
+				getTemplate()->toParametersMap(*templatePM, true);
 				pm.insert(TAG_TEMPLATE_SCENARIO, templatePM);
 
 				// Variables

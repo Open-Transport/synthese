@@ -140,7 +140,7 @@ namespace synthese
 				}
 
 				boost::shared_ptr<ParametersMap> vsMap(new ParametersMap);
-				vs.toParametersMap(*vsMap);
+				vs.toParametersMap(*vsMap, true);
 				map.insert(TAG_VEHICLE_SERVICE, vsMap);
 			}
 

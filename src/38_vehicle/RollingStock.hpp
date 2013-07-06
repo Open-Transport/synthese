@@ -26,7 +26,6 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "PathClass.h"
-#include "Named.h"
 #include "ImportableTemplate.hpp"
 
 #include <string>
@@ -48,7 +47,6 @@ namespace synthese
 		class RollingStock:
 			public virtual util::Registrable,
 			public graph::PathClass,
-			public util::Named,
 			public impex::ImportableTemplate<RollingStock>
 		{
 		private:
@@ -72,6 +70,7 @@ namespace synthese
 			double _CO2Emissions;
 			double _energyConsumption;
 			bool _isTridentKeyReference;
+			std::string _name;
 
 		public:
 
@@ -89,6 +88,7 @@ namespace synthese
 				bool getIsTridentKeyReference() const { return _isTridentKeyReference; }
 				double getCO2Emissions() const { return _CO2Emissions; }
 				double getEnergyConsumption() const { return _energyConsumption; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 
@@ -100,14 +100,17 @@ namespace synthese
 				void setIsTridentKeyReference(bool value) { _isTridentKeyReference = value; }
 				void setCO2Emissions(double value) { _CO2Emissions = value; }
 				void setEnergyConsumption(double value) { _energyConsumption = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Services
 			//@{
 				virtual PathClass::Identifier getIdentifier() const;
 
-				void toParametersMap(
+				virtual void toParametersMap(
 					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
 			//@}

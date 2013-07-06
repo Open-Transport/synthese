@@ -179,7 +179,7 @@ namespace synthese
 
 			ParametersMap pm(getTemplateParameters());
 
-			vehicle.toParametersMap(pm);
+			vehicle.toParametersMap(pm, true);
 			pm.insert(DATA_RANK, rank);
 
 			// Launch of the display

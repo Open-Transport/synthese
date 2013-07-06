@@ -321,7 +321,7 @@ namespace synthese
 			if(_acknowledgeUser)
 			{
 				boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
-				_acknowledgeUser->toParametersMap(*userPM);
+				_acknowledgeUser->toParametersMap(*userPM, true);
 				pm.insert(DATA_ACKNOWLEDGE_USER, userPM);
 			}
 
@@ -339,7 +339,7 @@ namespace synthese
 			if(_cancellationAcknowledgeUser)
 			{
 				boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
-				_cancellationAcknowledgeUser->toParametersMap(*userPM);
+				_cancellationAcknowledgeUser->toParametersMap(*userPM, true);
 				pm.insert(DATA_CANCELLATION_ACKNOWLEDGE_USER, userPM);
 			}
 
@@ -363,5 +363,12 @@ namespace synthese
 			{
 				pm.insert(DATA_LANGUAGE, user->getLanguage()->getName(*language));
 			}
+		}
+
+
+
+		void Reservation::toParametersMap( util::ParametersMap& pm, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
+		{
+			toParametersMap(pm, optional<Language>(), prefix);
 		}
 }	}

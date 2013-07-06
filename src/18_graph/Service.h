@@ -247,12 +247,12 @@ namespace synthese
 			static boost::posix_time::time_duration GetTimeOfDay(const boost::posix_time::time_duration& value);
 
 
-			void toParametersMap(
-				util::ParametersMap& pm,
-				const std::string& prefix
+			virtual void toParametersMap(
+				util::ParametersMap& map,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles = boost::logic::indeterminate,
+				std::string prefix = std::string()
 			) const;
-
-			virtual void toParametersMap(util::ParametersMap& pm) const;
 		};
 	}
 }

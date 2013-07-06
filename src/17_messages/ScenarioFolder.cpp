@@ -47,7 +47,7 @@ namespace synthese
 			return _parent;
 		}
 
-		const std::string& ScenarioFolder::getName() const
+		std::string ScenarioFolder::getName() const
 		{
 			return _name;
 		}
@@ -83,8 +83,12 @@ namespace synthese
 
 
 
-		void ScenarioFolder::toParametersMap( util::ParametersMap& pm ) const
-		{
+		void ScenarioFolder::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const	{
 			pm.insert(ATTR_ID, getKey());
 			pm.insert(ATTR_NAME, getName());
 		}

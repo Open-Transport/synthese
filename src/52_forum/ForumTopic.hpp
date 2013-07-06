@@ -25,7 +25,6 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "Named.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -45,8 +44,7 @@ namespace synthese
 		/// @since 3.1.18
 		/// @date 2010
 		class ForumTopic:
-			public util::Registrable,
-			public util::Named
+			public util::Registrable
 		{
 		public:
 			/// Chosen registry class.
@@ -62,6 +60,7 @@ namespace synthese
 			bool _published;
 			bool _closed;
 			std::string _ip;
+			std::string _name;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -83,6 +82,7 @@ namespace synthese
 				bool getPublished() const { return _published; }
 				bool getClosed() const { return _closed; }
 				const std::string& getIP() const { return _ip; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
@@ -96,6 +96,7 @@ namespace synthese
 				void setPublished(bool value){ _published = value; }
 				void setClosed(bool value){ _closed = value; }
 				void setIP(const std::string& value){ _ip = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 		};

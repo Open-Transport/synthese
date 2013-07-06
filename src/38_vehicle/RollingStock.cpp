@@ -101,7 +101,9 @@ namespace synthese
 
 		void RollingStock::toParametersMap(
 			util::ParametersMap& pm,
-			std::string prefix /*= std::string() */
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
 		) const {
 
 			pm.insert(DATA_ID, getKey());

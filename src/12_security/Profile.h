@@ -82,7 +82,7 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				const std::string&	getName()	const;
+				virtual std::string getName()	const;
 				const Profile*		getParent()	const;
 				const RightsVector&	getRights()	const;
 			//@}

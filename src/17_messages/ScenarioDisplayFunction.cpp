@@ -171,7 +171,7 @@ namespace synthese
 
 			ParametersMap pm;
 
-			_scenario->toParametersMap(pm);
+			_scenario->toParametersMap(pm, true);
 			
 			// Output
 			if(_mainTemplate.get()) // CMS output

@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_pt_operation_Depot_hpp__
 #define SYNTHESE_pt_operation_Depot_hpp__
 
-#include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "Vertex.h"
@@ -38,17 +37,22 @@ namespace synthese
 			@ingroup m37
 		*/
 		class Depot:
-			public util::Named,
 			public graph::Vertex,
 			public graph::Hub,
 			public impex::ImportableTemplate<Depot>
 		{
+		private:
+			std::string _name;
+
 		public:
 			typedef util::Registry<Depot> Registry;
 
 			Depot(util::RegistryKeyType id = 0);
 
 			virtual graph::GraphIdType getGraphType() const;
+			virtual std::string getName() const { return _name; }
+
+			void setName(const std::string& value){ _name = value; }
 
 			virtual boost::posix_time::time_duration getMinTransferDelay() const;
 			virtual void getVertexAccessMap(synthese::graph::VertexAccessMap &,synthese::graph::GraphIdType,const synthese::graph::Vertex &,bool) const;

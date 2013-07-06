@@ -140,8 +140,11 @@ namespace synthese
 			pt_operation::Depot* getDepot() const { return _depot; }
 			bool getInStopArea() const { return _inStopArea; }
 
-			void toParametersMap(
-				util::ParametersMap& pm
+			virtual void toParametersMap(
+				util::ParametersMap& pm,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles = boost::logic::indeterminate,
+				std::string prefix = std::string()
 			) const;
 		};
 }	}

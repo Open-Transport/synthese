@@ -27,7 +27,6 @@
 #include "CalendarTemplateElement.h"
 #include "Exception.h"
 #include "ImportableTemplate.hpp"
-#include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "TreeAlphabeticalOrderingPolicy.hpp"
@@ -52,7 +51,6 @@ namespace synthese
 		class CalendarTemplate:
 			public virtual util::Registrable,
 			public impex::ImportableTemplate<CalendarTemplate>,
-			public util::Named,
 			public tree::TreeNode<
 				CalendarTemplate,
 				tree::TreeAlphabeticalOrderingPolicy,
@@ -129,6 +127,7 @@ namespace synthese
 
 		private:
 			Elements	_elements;
+			std::string _name;
 			Category								_category;
 
 		public:
@@ -170,8 +169,11 @@ namespace synthese
 				/// @return true if the min and max dates are not infinite.
 				bool isLimited() const;
 
-				void toParametersMap(
-					util::ParametersMap& pm
+				virtual void toParametersMap(
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
 				) const;
 			//@}
 
@@ -179,11 +181,13 @@ namespace synthese
 			//@{
 				Category getCategory() const;
 				Elements getElements() const { return _elements; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void	setCategory(Category value);
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Modifiers

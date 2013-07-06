@@ -546,6 +546,18 @@ namespace synthese
 
 
 
+		void StopArea::toParametersMap( util::ParametersMap& pm, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
+		{
+			toParametersMap(
+				pm,
+				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
+				boost::logic::indeterminate,
+				prefix
+			);
+		}
+
+
+
 		std::string StopArea::getRuleUserName() const
 		{
 			return "Zone d'arrêt";

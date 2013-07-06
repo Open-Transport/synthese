@@ -497,7 +497,7 @@ namespace synthese
 			std::size_t rank
 		) const {
 
-			object.toParametersMap(pm);
+			object.toParametersMap(pm, true);
 			pm.insert(ATTR_TIMETABLE_RANK, rank);
 
 			// Content
@@ -711,7 +711,7 @@ namespace synthese
 				dynamic_cast<const StopArea*>(place.getPlace()))
 			{
 				boost::shared_ptr<ParametersMap> placePM(new ParametersMap);
-				dynamic_cast<const StopArea*>(place.getPlace())->toParametersMap(*placePM);
+				dynamic_cast<const StopArea*>(place.getPlace())->toParametersMap(*placePM, true);
 				pm.insert(TAG_PLACE, placePM);
 			}
 

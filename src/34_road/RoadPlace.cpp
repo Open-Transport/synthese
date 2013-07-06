@@ -373,16 +373,14 @@ namespace synthese
 
 		void RoadPlace::toParametersMap(
 			util::ParametersMap& pm,
-			const std::string& prefix
-		) const	{
-			toParametersMap(pm,&CoordinatesSystem::GetInstanceCoordinatesSystem(),prefix);
-		}
-
-
-
-		void RoadPlace::toParametersMap( util::ParametersMap& pm ) const
-		{
-			string emptyPrefix;
-			toParametersMap(pm, emptyPrefix);
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const {
+			toParametersMap(
+				pm,
+				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
+				prefix
+			);
 		}
 }	}

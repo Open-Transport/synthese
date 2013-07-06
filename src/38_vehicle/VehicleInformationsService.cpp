@@ -102,18 +102,18 @@ namespace synthese
 			// Informations about the vehicle
 			if(_vehicle.get())
 			{
-				_vehicle->toParametersMap(map);
+				_vehicle->toParametersMap(map, true);
 			}
 			else if(VehicleModule::GetCurrentVehiclePosition().getVehicle())
 			{
-				VehicleModule::GetCurrentVehiclePosition().getVehicle()->toParametersMap(map);
+				VehicleModule::GetCurrentVehiclePosition().getVehicle()->toParametersMap(map, true);
 			}
 
 			// Position of the vehicle
 			if(!_vehicle.get())
 			{
 				// Current vehicle position
-				VehicleModule::GetCurrentVehiclePosition().toParametersMap(map);
+				VehicleModule::GetCurrentVehiclePosition().toParametersMap(map, true);
 
 				// Journey
 				VehicleModule::GetCurrentJourney().toParametersMap(map);
@@ -127,7 +127,7 @@ namespace synthese
 				{
 					// Insert a submap for each screen
 					boost::shared_ptr<ParametersMap> subScreenMap(new ParametersMap);
-					item.second.toParametersMap(*subScreenMap);
+					item.second.toParametersMap(*subScreenMap, true);
 					screenMap->insert(TAG_SCREEN, subScreenMap);
 				}
 				map.insert(TAG_SCREENS, screenMap);

@@ -24,7 +24,6 @@
 #define SYNTHESE_geography_MapSource_hpp__
 
 #include "Registrable.h"
-#include "Named.h"
 #include "Exception.h"
 #include "Registry.h"
 
@@ -60,8 +59,7 @@ namespace synthese
 		/// Table Id is 75.
 		/// Object Id must be 0 or belong to [21110623253299200,21392098230009855]
 		class MapSource:
-			public util::Registrable,
-			public util::Named
+			public util::Registrable
 		{
 		public:
 			static const std::string SESSION_VARIABLE_CURRENT_MAPSOURCE;
@@ -114,12 +112,14 @@ namespace synthese
 			std::string _url;
 			const synthese::CoordinatesSystem* _coordinatesSystem;
 			Type _type;
+			std::string _name;
 
 		public:
 			//! @name Getters
 			//@{
 				const std::string& getURL() const { return _url; }
 				Type getType() const { return _type; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Queries
@@ -189,6 +189,7 @@ namespace synthese
 			//@{
 				void setURL(const std::string& value){ _url = value; }
 				void setType(Type value){ _type = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Modifiers

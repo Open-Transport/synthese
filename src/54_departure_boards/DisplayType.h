@@ -25,7 +25,6 @@
 #ifndef SYNTHESE_DisplayType_H__
 #define SYNTHESE_DisplayType_H__
 
-#include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
 
@@ -63,8 +62,7 @@ namespace synthese
 		///		- monitoring : The display type cannot be monitored
 		////////////////////////////////////////////////////////////////////
 		class DisplayType:
-			public virtual util::Registrable,
-			public util::Named
+			public virtual util::Registrable
 		{
 		public:
 			static const std::string ATTR_ID;
@@ -95,6 +93,8 @@ namespace synthese
 
 			messages::MessageType* _messageType;
 
+			std::string _name;
+
 		public:
 
 
@@ -123,6 +123,7 @@ namespace synthese
 				const cms::Webpage* getMonitoringParserPage() const { return _monitoringParserPage; }
 				const cms::Webpage* getMessageIsDisplayedPage() const { return _messageIsDisplayedPage; }
 				messages::MessageType* getMessageType() const { return _messageType; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
@@ -140,12 +141,18 @@ namespace synthese
 				void setMonitoringParserPage(const cms::Webpage* value){ _monitoringParserPage = value; }
 				void setMessageIsDisplayedPage(const cms::Webpage* value){ _messageIsDisplayedPage = value; }
 				void setMessageType(messages::MessageType* value){ _messageType = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Exports the object to a parameters map.
 			/// @param pm the parameters map to populate
-			void toParametersMap(util::ParametersMap& pm) const;
+			virtual void toParametersMap(
+				util::ParametersMap& pm,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles = boost::logic::indeterminate,
+				std::string prefix = std::string()
+			) const;
 		};
 	}
 }

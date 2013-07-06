@@ -290,8 +290,12 @@ namespace synthese
 
 
 
-		void ScenarioTemplate::toParametersMap( util::ParametersMap& pm ) const
-		{
+		void ScenarioTemplate::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const	{
 			// roid
 			pm.insert(DATA_SCENARIO_ID, getKey());
 			pm.insert(Request::PARAMETER_OBJECT_ID, getKey()); // Deprecated

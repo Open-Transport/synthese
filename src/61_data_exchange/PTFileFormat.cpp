@@ -1125,7 +1125,7 @@ namespace synthese
 					stopAreaPM->insert(TAG_LINKED_STOP_AREA, linkPM);
 					
 					// Export
-					stopArea->toParametersMap(*stopAreaPM);
+					stopArea->toParametersMap(*stopAreaPM, true);
 				}
 			}
 		}
@@ -1152,7 +1152,7 @@ namespace synthese
 				if(object.second.stopArea)
 				{
 					boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
-					object.second.stopArea->toParametersMap(*stopAreaPM);
+					object.second.stopArea->toParametersMap(*stopAreaPM, true);
 					stopPM->insert(TAG_LINKED_STOP_AREA, stopAreaPM);
 				}
 
@@ -1184,7 +1184,7 @@ namespace synthese
 					stopPM->insert(TAG_LINKED_STOP_POINT, linkPM);
 
 					// StopPoint
-					stopPoint->toParametersMap(*linkPM);
+					stopPoint->toParametersMap(*linkPM, true);
 
 					// Distance between source and synthese stop
 					if (stopPoint->getGeometry().get() && object.second.coords.get())

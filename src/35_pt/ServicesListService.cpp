@@ -286,7 +286,7 @@ namespace synthese
 						boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 						if(baseCalendar.first)
 						{
-							baseCalendar.first->toParametersMap(*calendarPM);
+							baseCalendar.first->toParametersMap(*calendarPM, true);
 						}
 						else
 						{

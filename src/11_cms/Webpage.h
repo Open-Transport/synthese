@@ -30,7 +30,6 @@
 #include "TreeNodeField.hpp"
 #include "TreeRankOrderingPolicy.hpp"
 #include "TreeOtherClassRootPolicy.hpp"
-#include "Named.h"
 
 #include "MinutesField.hpp"
 #include "NumericField.hpp"

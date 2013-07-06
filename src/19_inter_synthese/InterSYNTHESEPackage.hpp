@@ -42,7 +42,7 @@ namespace synthese
 	FIELD_PTIME(LockTime)
 	FIELD_STRING(LockServerName)
 	FIELD_STRING(LastJSON)
-	FIELD_POINTERS_VECTOR(Objects, ObjectBase)
+	FIELD_POINTERS_VECTOR(Objects, util::Registrable)
 	FIELD_BOOL(Public)
 	
 	namespace inter_synthese
@@ -109,7 +109,7 @@ namespace synthese
 		
 		private:
 			static void _dumpObject(
-				const ObjectBase& object,
+				const util::Registrable& object,
 				util::ParametersMap& pm,
 				std::stringstream& binaryStream
 			);

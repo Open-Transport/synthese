@@ -103,13 +103,11 @@ namespace synthese
 					const std::string& prefix = std::string()
 				) const;
 
-				void toParametersMap(
-					util::ParametersMap& pm,
-					const std::string& prefix
-				) const;
-
-				void toParametersMap(
-					util::ParametersMap& pm
+				virtual void toParametersMap(
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
 				) const;
 
 				virtual std::string getRuleUserName() const;

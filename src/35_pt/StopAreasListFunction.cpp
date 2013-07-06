@@ -438,7 +438,7 @@ namespace synthese
 						const StopPoint& stop(*itStop.second);
 
 						boost::shared_ptr<ParametersMap> sPm(new ParametersMap);
-						stop.toParametersMap(*sPm);
+						stop.toParametersMap(*sPm, true);
 
 						// Lines
 						if(_outputLinesInStops)
@@ -447,7 +447,7 @@ namespace synthese
 							BOOST_FOREACH(const StopPoint::LinesSet::value_type& line, lines)
 							{
 								shared_ptr<ParametersMap> linePM(new ParametersMap);
-								line->toParametersMap(*linePM);
+								line->toParametersMap(*linePM, true);
 								sPm->insert(DATA_LINE, linePM);
 							}
 						}
@@ -507,7 +507,7 @@ namespace synthese
 						// For CMS output
 						boost::shared_ptr<ParametersMap> pmLine(new ParametersMap);
 
-						itLine->toParametersMap(*pmLine);
+						itLine->toParametersMap(*pmLine, true);
 
 						// Rolling stock
 						set<RollingStock *> rollingStocks;
@@ -526,7 +526,7 @@ namespace synthese
 						BOOST_FOREACH(RollingStock * rs, rollingStocks)
 						{
 							boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
-							rs->toParametersMap(*transportModePM);
+							rs->toParametersMap(*transportModePM, true);
 							pmLine->insert("transportMode", transportModePM);
 						}
 

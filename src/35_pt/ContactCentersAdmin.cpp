@@ -25,6 +25,7 @@
 #include "ContactCentersAdmin.hpp"
 
 #include "AdminParametersException.h"
+#include "ObjectCreateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PTModule.h"
@@ -37,7 +38,6 @@
 #include "HTMLModule.h"
 #include "RemoveObjectAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "ContactCenterUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -103,7 +103,8 @@ namespace synthese
 
 			AdminActionFunctionRequest<RemoveObjectAction, ContactCentersAdmin> deleteRequest(request, *this);
 
-			AdminActionFunctionRequest<ContactCenterUpdateAction, ContactCenterAdmin> addRequest(request);
+			AdminActionFunctionRequest<ObjectCreateAction, ContactCenterAdmin> addRequest(request);
+			addRequest.getAction()->setTable<ReservationContact>();
 			addRequest.setActionWillCreateObject();
 			addRequest.setActionFailedPage<ContactCentersAdmin>();
 
@@ -134,11 +135,11 @@ namespace synthese
 
 				// Name
 				stream << t.col();
-				stream << it.second->getName();
+				stream << it.second->get<Name>();
 
 				// Phone number
 				stream << t.col();
-				stream << it.second->getPhoneExchangeNumber();
+				stream << it.second->get<PhoneExchangeNumber>();
 
 				// Delete button
 				stream << t.col();
@@ -150,8 +151,8 @@ namespace synthese
 			stream << t.row();
 			stream << t.col();
 			stream << t.col();
-			stream << f.getTextInput(ContactCenterUpdateAction::PARAMETER_NAME, string(), "(nom)");
-			stream << t.col() << f.getTextInput(ContactCenterUpdateAction::PARAMETER_PHONE_NUMBER, string(), "(numéro)");
+			stream << f.getTextInput(ObjectCreateAction::GetInputName<Name>(), string(), "(nom)");
+			stream << t.col() << f.getTextInput(ObjectCreateAction::GetInputName<PhoneExchangeNumber>(), string(), "(numéro)");
 			stream << t.col() << f.getSubmitButton("Ajouter");
 
 			stream << t.close();

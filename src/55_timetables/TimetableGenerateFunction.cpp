@@ -985,7 +985,7 @@ namespace synthese
 			pm.insert(DATA_CELL_RANK, colRank); //1
 			pm.insert(DATA_ROW_RANK, 0); //2
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey()); //3
-			object.toParametersMap(pm);
+			object.toParametersMap(pm, true);
 
 			_cellPage->display(stream, request, pm);
 		}
@@ -1359,7 +1359,7 @@ namespace synthese
 				)	);
 				if(ptUseRule)
 				{
-					ptUseRule->toParametersMap(pm);
+					ptUseRule->toParametersMap(pm, true);
 				}
 			}
 

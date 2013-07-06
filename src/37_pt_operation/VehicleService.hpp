@@ -24,7 +24,6 @@
 #define SYNTHESE_pt_operations_VehicleService_hpp__
 
 #include "Calendar.h"
-#include "Named.h"
 #include "ImportableTemplate.hpp"
 #include "Registrable.h"
 #include "Registry.h"
@@ -48,7 +47,6 @@ namespace synthese
 			@ingroup m37
 		*/
 		class VehicleService:
-			public util::Named,
 			public calendar::Calendar,
 			public impex::ImportableTemplate<VehicleService>,
 			public virtual util::Registrable
@@ -72,6 +70,7 @@ namespace synthese
 		private:
 			Services _services;
 			DriverServiceChunks _driverServiceChunks;
+			std::string _name;
 
 		public:
 			VehicleService(util::RegistryKeyType id=0);
@@ -79,12 +78,14 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setServices(const Services& value){ _services = value; }
+				void setName(const std::string& value){ _name = value; }
 				void setDriverServices(const DriverServiceChunks& value){ _driverServiceChunks = value; }
 			//@}
 
 			//! @name Getters
 			//@{
 				const Services& getServices() const { return _services; }
+				virtual std::string getName() const { return _name; }
 				const DriverServiceChunks& getDriverServiceChunks() const { return _driverServiceChunks; }
 			//@}
 
@@ -104,8 +105,12 @@ namespace synthese
 				/// @return the nth service of the vehicle service, NULL if non existent
 				pt::SchedulesBasedService* getService(std::size_t rank) const;
 
-
-				void toParametersMap(util::ParametersMap& map, bool recursive = true) const;
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 }	}
