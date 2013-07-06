@@ -284,7 +284,7 @@ namespace synthese
 		) const	{
 			BOOST_FOREACH(const SubObjects::value_type& so, getSubObjects())
 			{
-				const Webpage& page(static_cast<const Webpage&>(*so));
+				const Webpage& page(dynamic_cast<const Webpage&>(*so));
 				result.push_back(make_pair(page.getKey(), prefix + page.getName()));
 				page.getPagesList(result, prefix + "   ");
 			}

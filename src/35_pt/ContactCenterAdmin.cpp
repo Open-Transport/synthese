@@ -25,13 +25,13 @@
 #include "ContactCenterAdmin.hpp"
 
 #include "AdminParametersException.h"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
 #include "ReservationContact.h"
-#include "ContactCenterUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 
@@ -43,6 +43,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
+	using namespace db;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -116,8 +117,8 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			// Properties update form
 			stream << "<h1>Propriétés</h1>";
-			AdminActionFunctionRequest<ContactCenterUpdateAction, ContactCenterAdmin> updateRequest(request, *this);
-			updateRequest.getAction()->setContactCenter(const_pointer_cast<ReservationContact>(_contactCenter));
+			AdminActionFunctionRequest<ObjectUpdateAction, ContactCenterAdmin> updateRequest(request, *this);
+			updateRequest.getAction()->setObject(*_contactCenter);
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 			stream << t.open();
 
@@ -131,40 +132,40 @@ namespace synthese
 			stream << t.cell(
 				"Nom",
 				t.getForm().GetTextInput(
-					ContactCenterUpdateAction::PARAMETER_NAME,
-					_contactCenter->getName()
+					ObjectUpdateAction::GetInputName<Name>(),
+					_contactCenter->get<Name>()
 			)	);
 
 			// Phone number
 			stream << t.cell(
 				"Numéro de téléphone",
 				t.getForm().GetTextInput(
-					ContactCenterUpdateAction::PARAMETER_PHONE_NUMBER,
-					_contactCenter->getPhoneExchangeNumber()
+					ObjectUpdateAction::GetInputName<PhoneExchangeNumber>(),
+					_contactCenter->get<PhoneExchangeNumber>()
 			)	);
 
 			// Phone opening hours
 			stream << t.cell(
 				"Heures d'ouverture",
 				t.getForm().GetTextInput(
-					ContactCenterUpdateAction::PARAMETER_PHONE_OPENING_HOURS,
-					_contactCenter->getPhoneExchangeOpeningHours()
+					ObjectUpdateAction::GetInputName<PhoneExchangeOpeningHours>(),
+					_contactCenter->get<PhoneExchangeOpeningHours>()
 			)	);
 
 			// Website
 			stream << t.cell(
 				"URL site de réservation",
 				t.getForm().GetTextInput(
-					ContactCenterUpdateAction::PARAMETER_WEBSITE_URL,
-					_contactCenter->getWebSiteUrl()
+					ObjectUpdateAction::GetInputName<WebsiteURL>(),
+					_contactCenter->get<WebsiteURL>()
 			)	);
 
 			// Description
 			stream << t.cell(
 				"Description",
 				t.getForm().GetTextInput(
-					ContactCenterUpdateAction::PARAMETER_DESCRIPTION,
-					_contactCenter->getDescription()
+					ObjectUpdateAction::GetInputName<Description>(),
+					_contactCenter->get<Description>()
 			)	);
 
 			// Closing

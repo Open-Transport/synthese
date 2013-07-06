@@ -25,7 +25,6 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "Named.h"
 #include "PathClass.h"
 #include "ImportableTemplate.hpp"
 #include "TreeFolderRoot.hpp"
@@ -52,7 +51,6 @@ namespace synthese
 		class TransportNetwork:
 			virtual public util::Registrable,
 			public graph::PathClass,
-			public util::Named,
 			public impex::ImportableTemplate<TransportNetwork>,
 			public tree::TreeFolderRoot
 		{
@@ -67,6 +65,7 @@ namespace synthese
 		protected:
 			calendar::CalendarTemplate* _daysCalendarsParent;
 			calendar::CalendarTemplate* _periodsCalendarsParent;
+			std::string _name;
 
 		public:
 
@@ -80,12 +79,14 @@ namespace synthese
 			//@{
 				calendar::CalendarTemplate* getDaysCalendarsParent() const { return _daysCalendarsParent; }
 				calendar::CalendarTemplate* getPeriodsCalendarsParent() const { return _periodsCalendarsParent; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setDaysCalendarsParent(calendar::CalendarTemplate* value){ _daysCalendarsParent = value; }
 				void setPeriodsCalendarsParent(calendar::CalendarTemplate* value){ _periodsCalendarsParent = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Services
@@ -102,8 +103,10 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @since 3.3.0
 				/// @date 2011
-				void toParametersMap(
+				virtual void toParametersMap(
 					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
 			//@}

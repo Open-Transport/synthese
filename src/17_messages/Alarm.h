@@ -166,9 +166,6 @@ namespace synthese
 
 
 
-				virtual void toParametersMap(util::ParametersMap& pm) const;
-
-
 				static void LinkedObjectsToParametersMap(
 					const LinkedObjects& linkedObjects,
 					util::ParametersMap& pm

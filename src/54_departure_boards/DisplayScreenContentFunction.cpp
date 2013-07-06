@@ -624,7 +624,7 @@ namespace synthese
 			if(rs)
 			{
 				boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
-				rs->toParametersMap(*rsPM);
+				rs->toParametersMap(*rsPM, true);
 				journeyPm->insert("rollingStock", rsPM);
 			}
 
@@ -633,7 +633,7 @@ namespace synthese
 			if(commercialLine)
 			{
 				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
-				commercialLine->toParametersMap(*linePM);
+				commercialLine->toParametersMap(*linePM, true);
 				journeyPm->insert("line", linePM);
 			}
 
@@ -641,7 +641,7 @@ namespace synthese
 				*journeyPattern->getOrigin()->getConnectionPlace()
 			);
 			boost::shared_ptr<ParametersMap> originPM(new ParametersMap);
-			origin.toParametersMap(*originPM);
+			origin.toParametersMap(*originPM, true);
 			journeyPm->insert("origin", originPM);
 
 
@@ -649,11 +649,11 @@ namespace synthese
 				*journeyPattern->getDestination()->getConnectionPlace()
 			);
 			boost::shared_ptr<ParametersMap> destinationPM(new ParametersMap);
-			destination.toParametersMap(*destinationPM);
+			destination.toParametersMap(*destinationPM, true);
 			journeyPm->insert("destination", destinationPM);
 
 			boost::shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
-			connPlace->toParametersMap(*connPlacePM);
+			connPlace->toParametersMap(*connPlacePM, true);
 			journeyPm->insert("stopArea", connPlacePM);
 
 			pm.insert("journey", journeyPm);
@@ -1209,7 +1209,7 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
 			if(row.first.getService())
 			{
-				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm);
+				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);
 
 				// Waiting time
 				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
@@ -1261,7 +1261,7 @@ namespace synthese
 				);
 
 				// Line
-				dynamic_cast<const CommercialLine&>(*row.first.getService()->getPath()->getPathGroup()).toParametersMap(pm);
+				dynamic_cast<const CommercialLine&>(*row.first.getService()->getPath()->getPathGroup()).toParametersMap(pm, true);
 
 				// Transport mode
 				const JourneyPattern* line(static_cast<const JourneyPattern*>(row.first.getService()->getPath()));
@@ -1392,7 +1392,7 @@ namespace synthese
 			)	);
 
 			ParametersMap pm(getTemplateParameters());
-			place->toParametersMap(pm);
+			place->toParametersMap(pm, true);
 			pm.insert(DATA_IS_SAME_CITY, lastDisplayedStopWasInTheSameCity);
 			pm.insert(DATA_TIME, to_iso_extended_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).date()) +" "+ to_simple_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).time_of_day()));
 			pm.insert(DATA_IS_END_STATION, isTheEndStation);
@@ -1474,8 +1474,8 @@ namespace synthese
 				pm.insert(DATA_TRANSPORT_MODE, line->getRollingStock()->getKey());
 			}
 
-			line->getCommercialLine()->toParametersMap(pm);
-			place->toParametersMap(pm);
+			line->getCommercialLine()->toParametersMap(pm, true);
+			place->toParametersMap(pm, true);
 
 			{ // Departure time
 				stringstream s;
@@ -1542,7 +1542,7 @@ namespace synthese
 			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
 			pm.insert(DATA_WITH_TRANSFER, screen.getRoutePlanningWithTransfer());
-			screen.getDisplayedPlace()->toParametersMap(pm);
+			screen.getDisplayedPlace()->toParametersMap(pm, true);
 
 			// Rows
 			if(rowPage.get())
@@ -1660,7 +1660,7 @@ namespace synthese
 				}
 
 				// Line
-				static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine()->toParametersMap(pm);
+				static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine()->toParametersMap(pm, true);
 
 				// Transport mode
 				const JourneyPattern* jp(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
@@ -1679,7 +1679,7 @@ namespace synthese
 					str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
 					pm.insert(DATA_SECOND_TIME, str.str());
 
-					static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine()->toParametersMap(pm, DATA_SECOND_);
+					static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine()->toParametersMap(pm, true, boost::logic::indeterminate, DATA_SECOND_);
 
 					const JourneyPattern* jp(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
 					if(jp->getRollingStock())
@@ -1731,7 +1731,7 @@ namespace synthese
 			const pt::StopArea& place
 		) const {
 			ParametersMap pm(getTemplateParameters());
-			place.toParametersMap(pm);
+			place.toParametersMap(pm, true);
 
 			// Launch of the display
 			page->display(stream, request, pm);

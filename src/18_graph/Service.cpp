@@ -228,9 +228,11 @@ namespace synthese
 
 
 		void Service::toParametersMap(
-			ParametersMap& pm,
-			const string& prefix
-		) const	{
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const {
 
 			// ID
 			pm.insert(prefix + ATTR_SERVICE_ID, getKey());
@@ -243,13 +245,5 @@ namespace synthese
 			{
 				pm.insert(prefix + ATTR_JOURNEY_PATTERN_ID, _path->getKey());
 			}
-		}
-
-
-
-		void Service::toParametersMap( util::ParametersMap& pm ) const
-		{
-			static string fakePrefix;
-			toParametersMap(pm, fakePrefix);
 		}
 }	}

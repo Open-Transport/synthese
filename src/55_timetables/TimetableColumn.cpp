@@ -542,7 +542,7 @@ namespace synthese
 			BOOST_FOREACH(const Services::value_type& service, _services)
 			{
 				boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
-				service->toParametersMap(*servicePM);
+				service->toParametersMap(*servicePM, true);
 				pm.insert(TAG_SERVICE, servicePM);
 			}
 
@@ -550,7 +550,7 @@ namespace synthese
 			if(_line && _line->getCommercialLine())
 			{
 				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
-				_line->getCommercialLine()->toParametersMap(*linePM);
+				_line->getCommercialLine()->toParametersMap(*linePM, true);
 				pm.insert(TAG_LINE, linePM);
 			}
 
@@ -558,7 +558,7 @@ namespace synthese
 			if(_line && _line->getRollingStock())
 			{
 				boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
-				_line->getRollingStock()->toParametersMap(*transportModePM);
+				_line->getRollingStock()->toParametersMap(*transportModePM, true);
 				pm.insert(TAG_TRANSPORT_MODE, transportModePM);
 			}
 
@@ -572,7 +572,7 @@ namespace synthese
 				if(ptUseRule)
 				{
 					boost::shared_ptr<ParametersMap> useRulePM(new ParametersMap);
-					ptUseRule->toParametersMap(*useRulePM);
+					ptUseRule->toParametersMap(*useRulePM, true);
 					pm.insert(TAG_USE_RULE, useRulePM);
 				}
 			}

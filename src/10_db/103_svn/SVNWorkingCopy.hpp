@@ -100,7 +100,7 @@ namespace synthese
 				/// @param object the object to export
 				/// @param dirPath the directory where to export the files
 				void _export(
-					const ObjectBase& object,
+					const util::Registrable& object,
 					const boost::filesystem::path& dirPath,
 					const bool noCommit
 				) const;

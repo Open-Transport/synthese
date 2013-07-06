@@ -133,7 +133,7 @@ namespace synthese
 
 
 
-		const std::string& Interface::getName() const
+		std::string Interface::getName() const
 		{
 			return _name;
 		}

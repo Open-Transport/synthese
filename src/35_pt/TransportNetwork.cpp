@@ -47,7 +47,6 @@ namespace synthese
 			std::string name
 		):	util::Registrable(id),
 			graph::PathClass(),
-			Named(name),
 			_daysCalendarsParent(NULL),
 			_periodsCalendarsParent(NULL)
 		{}
@@ -64,7 +63,9 @@ namespace synthese
 
 		void TransportNetwork::toParametersMap(
 			util::ParametersMap& pm,
-			std::string prefix /*= std::string() */
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
 		) const	{
 			pm.insert(prefix + DATA_NETWORK_ID, getKey());
 			pm.insert(prefix + DATA_NAME, getName());

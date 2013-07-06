@@ -219,7 +219,7 @@ namespace synthese
 
 					// City
 					boost::shared_ptr<ParametersMap> cityPM(new ParametersMap);
-					missingStreet.first->toParametersMap(*streetPM);
+					missingStreet.first->toParametersMap(*streetPM, true);
 					streetPM->insert(TAG_CITY, cityPM);
 				}
 

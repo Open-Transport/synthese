@@ -391,10 +391,16 @@ namespace synthese
 				/// @date 2011
 				void toParametersMap(
 					util::ParametersMap& pm,
-					const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
+					const CoordinatesSystem* coordinatesSystem,
 					std::string prefix = std::string()
 				) const;
 
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
 
 
 				typedef std::set<FreeDRTArea*> FreeDRTs;

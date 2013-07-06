@@ -23,8 +23,6 @@ ContactCenterAdmin.cpp
 ContactCenterAdmin.hpp
 ContactCentersAdmin.cpp
 ContactCentersAdmin.hpp
-ContactCenterUpdateAction.cpp
-ContactCenterUpdateAction.hpp
 ContinuousService.cpp
 ContinuousService.h
 ContinuousServiceTableSync.cpp

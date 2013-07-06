@@ -140,7 +140,7 @@ namespace synthese
 			BOOST_FOREACH(const boost::shared_ptr<User>& user, users)
 			{
 				boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
-				user->toParametersMap(*userPM);
+				user->toParametersMap(*userPM, true);
 				result.insert(TAG_USER, userPM);
 			}
 

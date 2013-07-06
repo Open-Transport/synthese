@@ -162,13 +162,17 @@ namespace synthese
 
 
 
-		void City::toParametersMap( util::ParametersMap& pm ) const
-		{
+		void City::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const {
 			static string fakePrefix;
 			toParametersMap(
 				pm,
 				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
-				fakePrefix
+				prefix
 			);
 		}
 

@@ -178,7 +178,7 @@ namespace synthese
 				if(user.get())
 				{
 					boost::shared_ptr<ParametersMap> userPM(new ParametersMap);
-					user->toParametersMap(*userPM);
+					user->toParametersMap(*userPM, true);
 					entryPM->insert("user", userPM);
 				}
 

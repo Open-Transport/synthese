@@ -40,7 +40,6 @@ namespace synthese
 			std::string name,
 			Stops stops
 		):	Registrable(id),
-			Named(name),
 			Vertex(NULL, boost::shared_ptr<geos::geom::Point>()),
 			_stops(stops)
 		{}

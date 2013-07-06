@@ -30,89 +30,29 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 
-	namespace util
-	{
-		template<> const string Registry<ReservationContact>::KEY("ReservationRule");
-	}
+	CLASS_DEFINITION(ReservationContact, "t021_reservation_contacts", 21)
+	FIELD_DEFINITION_OF_OBJECT(ReservationContact, "reservation_contact_id", "reservation_contact_ids")
+
+	FIELD_DEFINITION_OF_TYPE(PhoneExchangeNumber, "phone_exchange_number", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(PhoneExchangeOpeningHours, "phone_exchange_opening_hours", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Description, "description", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(WebsiteURL, "web_site_url", SQL_TEXT)
 
 	namespace pt
 	{
 		ReservationContact::ReservationContact(
 			RegistryKeyType key
-		):	Registrable(key)
-		{
-		}
-
-		ReservationContact::~ReservationContact()
-		{
-		}
-
-
-
-		const std::string&
-		ReservationContact::getPhoneExchangeOpeningHours () const
-		{
-			return _phoneExchangeOpeningHours;
-		}
-
-
-
-		void
-		ReservationContact::setPhoneExchangeOpeningHours (const std::string& phoneExchangeOpeningHours)
-		{
-			_phoneExchangeOpeningHours = phoneExchangeOpeningHours;
-		}
-
-
-
-
-		const std::string&
-		ReservationContact::getWebSiteUrl () const
-		{
-			return _webSiteUrl;
-		}
-
-
-		void
-		ReservationContact::setWebSiteUrl (const std::string& webSiteUrl)
-		{
-			_webSiteUrl = webSiteUrl;
-		}
-
-
-
-
-		void
-		ReservationContact::setPhoneExchangeNumber (const std::string& phoneExchangeNumber)
-		{
-			_phoneExchangeNumber = phoneExchangeNumber;
-		}
-
-
-
-
-		const std::string&
-		ReservationContact::getPhoneExchangeNumber () const
-		{
-			return _phoneExchangeNumber;
-		}
-
-
-
-
-		const std::string& ReservationContact::getDescription() const
-		{
-			return _description;
-		}
-
-
-
-		void
-		ReservationContact::setDescription (const std::string& description)
-		{
-			_description = description;
-		}
-
+		):	Registrable(key),
+			Object<ReservationContact, ReservationContactSchema>(
+			Schema(
+				FIELD_VALUE_CONSTRUCTOR(Key, key),
+				FIELD_DEFAULT_CONSTRUCTOR(Name),
+				FIELD_DEFAULT_CONSTRUCTOR(PhoneExchangeNumber),
+				FIELD_DEFAULT_CONSTRUCTOR(PhoneExchangeOpeningHours),
+				FIELD_DEFAULT_CONSTRUCTOR(Description),
+				FIELD_DEFAULT_CONSTRUCTOR(WebsiteURL)
+			)	)
+		{}
 
 
 
@@ -120,5 +60,4 @@ namespace synthese
 		{
 			return false;
 		}
-	}
-}
+}	}

@@ -233,8 +233,11 @@ namespace synthese
 
 
 		void CalendarTemplate::toParametersMap(
-			util::ParametersMap& pm
-		) const	{
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const {
 
 			pm.insert(ATTR_ID, getKey());
 			pm.insert(ATTR_NAME, getName());

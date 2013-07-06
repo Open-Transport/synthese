@@ -66,7 +66,7 @@ namespace synthese
 
 				/** Gets name of this place.
 				*/
-				const std::string& getName () const { return _name; }
+				virtual std::string getName () const { return _name; }
 				const std::string& getName13() const { return _name13; }
 				const std::string& getName26() const { return _name26; }
 

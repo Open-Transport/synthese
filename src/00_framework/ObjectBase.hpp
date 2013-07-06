@@ -29,7 +29,6 @@
 #include "FrameworkTypes.hpp"
 
 #include <string>
-#include <boost/logic/tribool.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -62,7 +61,6 @@ namespace synthese
 	class Record;
 	class FilesMap;
 
-	typedef std::vector<ObjectBase*> SubObjects;
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Object base interface.
@@ -101,8 +99,6 @@ namespace synthese
 
 		/// @name Methods to overload if necessary
 		//@{
-			virtual std::string getName() const { return std::string(); }
-			virtual SubObjects getSubObjects() const { return SubObjects(); }
 			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false) {}
 			virtual void unlink() {}
 			virtual void checkIntegrity() const throw(IntegrityException) {}
@@ -129,53 +125,10 @@ namespace synthese
 
 		/// @name Methods automatically defined by the Object template
 		//@{
-			virtual util::RegistryTableType getClassNumber() const = 0;
 			virtual const std::string& getClassName() const = 0;
-			virtual const std::string& getTableName() const = 0;
 			virtual FieldsList getFields() const = 0;
 			virtual const void* _dynamic_get(const std::string& fieldKey) const = 0;
 			virtual void _dynamic_set(const void* value, const std::string& fieldKey) = 0;
-			
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Loads the content of a record into the current object.
-			/// @param record the record to load
-			/// @param env the environment to read to get the linked objects
-			/// @warning be sure the environment is populated before the load
-			virtual void loadFromRecord(
-				const Record& record,
-				util::Env& env
-			) = 0;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Exports the content of the object into a ParametersMap object.
-			/// @param withFiles Exports fields as independant files
-			/// @param withAdditionalParameters if true the map is filled up by
-			/// addAdditionalParameters
-			/// @param map the generated ParametersMap
-			virtual void toParametersMap(
-				util::ParametersMap& map,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles = boost::logic::indeterminate,
-				std::string prefix = std::string()
-			) const = 0;
-
-
-
-			virtual void toParametersMap(
-				util::ParametersMap& map
-			) const;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Exports the content of the object into a FilesMap object (fields to store as files only).
-			/// @param map the FilesMap to fill
-			virtual void toFilesMap(
-				FilesMap& map
-			) const = 0;
 
 
 

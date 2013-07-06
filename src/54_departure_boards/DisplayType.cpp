@@ -128,8 +128,12 @@ namespace synthese
 
 
 
-		void DisplayType::toParametersMap( util::ParametersMap& pm ) const
-		{
+		void DisplayType::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const	{
 			pm.insert(ATTR_ID, getKey());
 			pm.insert(ATTR_NAME, getName());
 			pm.insert(ATTR_MESSAGE_TYPE_ID, _messageType ? _messageType->getKey() : RegistryKeyType(0));

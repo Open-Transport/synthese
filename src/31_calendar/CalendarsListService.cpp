@@ -142,7 +142,7 @@ namespace synthese
 			{
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 
-				it->toParametersMap(*calendarPM);
+				it->toParametersMap(*calendarPM, true);
 
 				map.insert(TAG_CALENDAR, calendarPM);
 			}

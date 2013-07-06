@@ -70,7 +70,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string& getName() const { return _name; }
+				virtual std::string getName() const { return _name; }
 				bool getAuthorizedOnly() const { return _authorized_only; }
 				const List& getList() const { return _list; }
 				const PTServiceConfig* getSite() const { return _site; }

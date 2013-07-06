@@ -121,7 +121,7 @@ namespace synthese
 				// Declaration
 				boost::shared_ptr<ParametersMap> pmScreen(new ParametersMap);
 
-				screen->toParametersMap(*pmScreen);
+				screen->toParametersMap(*pmScreen, true);
 
 				pm.insert(DATA_SCREEN, pmScreen);
 			}

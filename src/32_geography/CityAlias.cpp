@@ -52,7 +52,7 @@ namespace synthese
 
 
 
-		const std::string& CityAlias::getName() const
+		std::string CityAlias::getName() const
 		{
 			return _name;
 		}

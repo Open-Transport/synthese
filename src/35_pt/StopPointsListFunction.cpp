@@ -370,7 +370,7 @@ namespace synthese
 							boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 
 							// Main parameters
-							line.second->toParametersMap(*linePM);
+							line.second->toParametersMap(*linePM, true);
 
 							// Rolling stock
 							set<RollingStock *> rollingStocks;
@@ -389,7 +389,7 @@ namespace synthese
 							BOOST_FOREACH(RollingStock * rs, rollingStocks)
 							{
 								boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
-								rs->toParametersMap(*transportModePM);
+								rs->toParametersMap(*transportModePM, true);
 								linePM->insert("transportMode", transportModePM);
 							}
 

@@ -792,9 +792,9 @@ namespace synthese
 						departureName = dynamic_cast<const NamedPlace*>(startEdge->getHub())->getFullName();
 					}
 					// Handle DRTArea as departure
-					else if(dynamic_cast<const Named*>(startEdge->getFromVertex()))
+					else
 					{
-						departureName = dynamic_cast<const Named*>(startEdge->getFromVertex())->getName();
+						departureName = startEdge->getFromVertex()->getName();
 					}
 
 					ptime date(_date, services[0]->getDepartureSchedule(false, 0));

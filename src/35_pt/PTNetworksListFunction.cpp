@@ -96,7 +96,7 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> networkPM(new ParametersMap);
 
 				// Parameters
-				it->toParametersMap(*networkPM);
+				it->toParametersMap(*networkPM, true);
 
 				// Registering the network
 				pm.insert(TAG_NETWORK, networkPM);

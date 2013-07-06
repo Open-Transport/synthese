@@ -1515,8 +1515,8 @@ namespace synthese
 			BOOST_FOREACH(const ReservationContact* rc, resaRules)
 			{
 				sPhones <<
-					rc->getPhoneExchangeNumber() <<
-					" (" << rc->getPhoneExchangeOpeningHours() << ") "
+					rc->get<PhoneExchangeNumber>() <<
+					" (" << rc->get<PhoneExchangeOpeningHours>() << ") "
 				;
 				if (!OnlineReservationRule::GetOnlineReservationRule(rc))
 				{
@@ -1881,8 +1881,8 @@ namespace synthese
 					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
 				"9999"
 			); // 11
-			commercialLine->toParametersMap(pm);
-			serviceUse.getService()->toParametersMap(pm);
+			commercialLine->toParametersMap(pm, false);
+			serviceUse.getService()->toParametersMap(pm, false);
 			if(continuousService)
 			{
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);

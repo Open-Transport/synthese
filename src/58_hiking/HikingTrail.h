@@ -25,7 +25,6 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "Named.h"
 
 #include <vector>
 
@@ -42,8 +41,7 @@ namespace synthese
 			@ingroup m56
 		*/
 		class HikingTrail:
-			public virtual util::Registrable,
-			public util::Named
+			public virtual util::Registrable
 		{
 		public:
 
@@ -58,6 +56,7 @@ namespace synthese
 			std::string _profile;
 			std::string _url;
 			Stops _stops;
+			std::string _name;
 
 		public:
 			HikingTrail(util::RegistryKeyType id = 0);
@@ -69,6 +68,7 @@ namespace synthese
 				const std::string& getProfile() const { return _profile; }
 				const std::string& getURL() const { return _url; }
 				const Stops& getStops() const { return _stops; }
+				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Setters
@@ -78,6 +78,7 @@ namespace synthese
 				void setProfile(const std::string& value){ _profile = value; }
 				void setURL(const std::string& value){ _url = value; }
 				void setStops(const Stops& value){ _stops = value; }
+				void setName(const std::string& value){ _name = value; }
 			//@}
 		};
 	}

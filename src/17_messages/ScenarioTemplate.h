@@ -193,8 +193,11 @@ namespace synthese
 			/// @param pm the ParametersMap object to populate
 			/// @author Hugues Romain
 			/// @date 2012
-			void toParametersMap(
-				util::ParametersMap& pm
+			virtual void toParametersMap(
+				util::ParametersMap& pm,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles = boost::logic::indeterminate,
+				std::string prefix = std::string()
 			) const;
 		};
 	}

@@ -209,9 +209,12 @@ namespace synthese
 
 
 		void CommercialLine::toParametersMap(
-			ParametersMap& pm,
-			std::string prefix /*= std::string() */
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
 		) const {
+
 			pm.insert(prefix + DATA_LINE_ID, getKey());
 			pm.insert(prefix + "id", getKey()); // For StopAreasList and LinesListFunction compatibility
 			pm.insert(prefix + DATA_LINE_SHORT_NAME, getShortName());

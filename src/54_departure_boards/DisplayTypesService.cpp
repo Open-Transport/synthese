@@ -73,7 +73,7 @@ namespace synthese
 			BOOST_FOREACH(const DisplayType::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<DisplayType>())
 			{
 				boost::shared_ptr<ParametersMap> displayTypePM(new ParametersMap);
-				it.second->toParametersMap(*displayTypePM);
+				it.second->toParametersMap(*displayTypePM, true);
 				map.insert(TAG_DISPLAY_TYPE, displayTypePM);
 			}
 			return map;

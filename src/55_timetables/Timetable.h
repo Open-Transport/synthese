@@ -234,8 +234,11 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Export of the object properties into a parameters map.
 				/// @param pm the parameters map to populate
-				void toParametersMap(
-					util::ParametersMap& pm
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
 				) const;
 			//@}
 		};

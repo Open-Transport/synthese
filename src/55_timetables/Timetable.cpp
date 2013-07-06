@@ -331,7 +331,10 @@ namespace synthese
 
 
 		void Timetable::toParametersMap(
-			util::ParametersMap& pm
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
 		) const	{
 			// Common parameters
 			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(getContentType()));

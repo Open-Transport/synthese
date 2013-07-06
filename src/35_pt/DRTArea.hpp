@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_pt_DRTArea_hpp__
 #define SYNTHESE_pt_DRTArea_hpp__
 
-#include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "Vertex.h"
@@ -40,7 +39,6 @@ namespace synthese
 		*/
 		class DRTArea:
 			virtual public util::Registrable,
-			public util::Named,
 			public graph::Vertex
 		{
 		public:
@@ -51,6 +49,7 @@ namespace synthese
 
 		private:
 			Stops _stops;
+			std::string _name;
 
 		public:
 			DRTArea(
@@ -60,8 +59,10 @@ namespace synthese
 			);
 
 			void setStops(const Stops& value){ _stops = value; }
+			void setName(const std::string& value){ _name = value; }
 
 			const Stops& getStops() const { return _stops; }
+			virtual std::string getName() const { return _name; }
 
 			virtual graph::GraphIdType getGraphType() const;
 

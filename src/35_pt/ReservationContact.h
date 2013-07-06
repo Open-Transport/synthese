@@ -23,60 +23,44 @@
 #ifndef SYNTHESE_ENV_RESERVATIONRULE_H
 #define SYNTHESE_ENV_RESERVATIONRULE_H
 
-#include "Named.h"
-#include "Registrable.h"
+#include "Object.hpp"
 
-#include "Registry.h"
+#include "NumericField.hpp"
+#include "StringField.hpp"
 
 namespace synthese
 {
+	FIELD_STRING(PhoneExchangeNumber) //!< Phone number for reservation
+	FIELD_STRING(PhoneExchangeOpeningHours) //!< Opening hours for phone exchange
+	FIELD_STRING(Description) //!< Additional info about phone exchange or reservation mode
+	FIELD_STRING(WebsiteURL) //!< URL of a website allowing online reservation
+
+	typedef boost::fusion::map<
+		FIELD(Key),
+		FIELD(Name),
+		FIELD(PhoneExchangeNumber),
+		FIELD(PhoneExchangeOpeningHours),
+		FIELD(Description),
+		FIELD(WebsiteURL)
+	> ReservationContactSchema;
+
+
 	namespace pt
 	{
 		/** Reservation contact.
 			@ingroup m35
 		*/
 		class ReservationContact:
-			public virtual util::Registrable,
-			public util::Named
+			public Object<ReservationContact, ReservationContactSchema>,
+			public virtual util::Registrable
 		{
-		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<ReservationContact>	Registry;
-
-		private:
-
-			std::string _phoneExchangeNumber;  //!< Phone number for reservation
-			std::string _phoneExchangeOpeningHours;  //!< Opening hours for phone exchange
-			std::string _description;   //!< Additional info about phone exchange or reservation mode
-			std::string _webSiteUrl;    //!< URL of a website allowing online reservation
-
 		 public:
 			ReservationContact(
 				util::RegistryKeyType key = 0
 			);
-			virtual ~ReservationContact();
-
-			//! @name Getters
-			//@{
-				const std::string&	getPhoneExchangeNumber()		const;
-				const std::string&	getPhoneExchangeOpeningHours()	const;
-				const std::string&	getWebSiteUrl ()				const;
-				const std::string&	getDescription ()				const;
-			//@}
-
-			//! @name Setters
-			//@{
-				void setPhoneExchangeNumber (const std::string& phoneExchangeNumber);
-				void setPhoneExchangeOpeningHours (const std::string& phoneExchangeOpeningHours);
-				void setWebSiteUrl (const std::string& webSiteUrl);
-				void setDescription (const std::string& description);
-			//@}
 
 			virtual bool getOnline() const;
-
 		};
-	}
-}
+}	}
 
 #endif

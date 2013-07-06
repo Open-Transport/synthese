@@ -253,7 +253,7 @@ namespace synthese
 
 				// Export of the scenario
 				boost::shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
-				scenario->toParametersMap(*scenarioPM);
+				scenario->toParametersMap(*scenarioPM, true);
 				pm.insert(TAG_SCENARIO, scenarioPM);
 			}
 

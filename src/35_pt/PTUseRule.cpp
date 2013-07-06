@@ -392,8 +392,12 @@ namespace synthese
 
 
 
-		void PTUseRule::toParametersMap( util::ParametersMap& pm, std::string prefix /*= std::string() */ ) const
-		{
+		void PTUseRule::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix
+		) const {
 			pm.insert(prefix + DATA_RESERVATION_COMPULSORY, _reservationType == RESERVATION_RULE_COMPULSORY);
 			pm.insert(prefix + DATA_RESERVATION_POSSIBLE, _reservationType != RESERVATION_RULE_FORBIDDEN);
 			if(_reservationType != RESERVATION_RULE_FORBIDDEN)

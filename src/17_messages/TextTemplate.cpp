@@ -77,7 +77,7 @@ namespace synthese
 			return _short_message;
 		}
 
-		const std::string& TextTemplate::getName() const
+		std::string TextTemplate::getName() const
 		{
 			return _name;
 		}

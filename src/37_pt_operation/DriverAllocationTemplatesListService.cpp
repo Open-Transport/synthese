@@ -300,7 +300,7 @@ namespace synthese
 				BOOST_FOREACH(const DriverService::Vector::Type::value_type& service, alloc.get<DriverService::Vector>())
 				{
 					boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
-					service->toParametersMap(*servicePM);
+					service->toParametersMap(*servicePM, true);
 					allocPM->insert("service", servicePM);
 				}
 

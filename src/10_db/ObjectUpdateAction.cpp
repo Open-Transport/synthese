@@ -114,7 +114,7 @@ namespace synthese
 				);
 			}
 			ParametersMap existingMap;
-			_object->toParametersMap(existingMap);
+			_object->toParametersMap(existingMap, false);
 			record.merge(existingMap);
 
 			// Record read

@@ -43,7 +43,7 @@ namespace synthese
 
 		Scenario::Scenario(
 			const std::string name /*= std::string()*/
-		):	Named(name)
+		)
 		{}
 
 
