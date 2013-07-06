@@ -54,6 +54,7 @@ set(MODULES
 37_pt_operation
 38_vehicle
 39_map
+40_pdf_cms
 51_resa
 52_forum
 53_pt_journey_planner
