@@ -531,9 +531,9 @@ SAVE(PTUseRule, ur54);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ReservationContact rc05(5910974511914805ULL);
-rc05.setPhoneExchangeNumber("0800 929 929 (gratuit depuis un poste fixe) ou 05 34 25 33 75");
-rc05.setPhoneExchangeOpeningHours("entre 6h30 et 22h30");
-rc05.setDescription("Test");
+rc05.set<PhoneExchangeNumber>("0800 929 929 (gratuit depuis un poste fixe) ou 05 34 25 33 75");
+rc05.set<PhoneExchangeOpeningHours>("entre 6h30 et 22h30");
+rc05.set<Description>("Test");
 SAVE(ReservationContact, rc05);
 
 OnlineReservationRule or33(13229323905400833ULL);
