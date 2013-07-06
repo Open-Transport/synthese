@@ -37,6 +37,7 @@ if(WIN32)
   set(Boost_USE_STATIC_RUNTIME ON)
 else()
   add_definitions(-DBOOST_ALL_DYN_LINK)
+  add_definitions(-DPNG_NO_MMX_CODE)
 endif()
 
 add_definitions(-DFUSION_MAX_VECTOR_SIZE=30)
