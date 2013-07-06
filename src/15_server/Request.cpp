@@ -330,9 +330,23 @@ namespace synthese
 
 		Request::~Request()
 		{
+			// Run the "on destroy" functions
+			BOOST_FOREACH(OnDestroyFunction f, _onDestroyFunctions)
+			{
+				f(*this);
+			}
+
+			// Unlink the request from the session
 			if(_session)
 			{
 				_session->unregisterRequest(*this);
 			}
+		}
+
+
+
+		void Request::addOnDestroyFunction( OnDestroyFunction f ) const
+		{
+			_onDestroyFunctions.insert(f);
 		}
 }	}
