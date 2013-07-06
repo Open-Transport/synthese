@@ -221,7 +221,8 @@ namespace synthese
 				BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
 				{
 					// Try in the scenario name
-					if(find_first(scenario->getName(), *_textSearch))
+					string scenarioName(scenario->getName());
+					if(find_first(scenarioName, *_textSearch))
 					{
 						newScenarios.push_back(scenario);
 						continue;
