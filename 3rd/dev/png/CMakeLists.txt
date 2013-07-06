@@ -4,6 +4,7 @@ list(REMOVE_ITEM png_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/png/src/example.c")
 
 if(!WIN32)
   add_definitions(-funroll-loops)
+  add_definitions(-DPNG_NO_MMX_CODE)
 endif()
 
 include_directories(${PNG_INCLUDE_DIRS})
