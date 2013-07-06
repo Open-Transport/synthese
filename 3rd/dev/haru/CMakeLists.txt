@@ -1,7 +1,7 @@
 file(GLOB haru_SRCS "src/*.c" "include/*.h")
 
-find_package(png REQUIRED)
-find_package(zlib REQUIRED)
+#find_package(png REQUIRED)
+#find_package(zlib REQUIRED)
 
 # create hpdf_config.h
 CONFIGURE_FILE(
