@@ -1,6 +1,6 @@
 file(GLOB png_SRCS "src/*.c" "src/*.h")
 
-find_package(zlib REQUIRED)
+#find_package(zlib REQUIRED)
 
 include_directories(${PNG_INCLUDE_DIRS})
 include_directories(${ZLIB_INCLUDE_DIRS})
