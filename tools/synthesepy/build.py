@@ -388,6 +388,19 @@ class Builder(object):
         if self.boost_lib_dir:
             env['BOOST_LIBRARYDIR'] = self.boost_lib_dir
 
+        # Enable subdirs
+        args.append('-DWITH_TEST:BOOL=ON')
+        if self.config.do_not_build_python:
+            args.append('-DWITH_PACKAGES:BOOL=OFF')
+            args.append('-DWITH_PROJECTS:BOOL=OFF')
+            args.append('-DWITH_TOOLS:BOOL=OFF')
+            args.append('-DWITH_UTILS:BOOL=OFF')
+        else:
+            args.append('-DWITH_PACKAGES:BOOL=ON')
+            args.append('-DWITH_PROJECTS:BOOL=ON')
+            args.append('-DWITH_TOOLS:BOOL=ON')
+            args.append('-DWITH_UTILS:BOOL=ON')
+
         # TODO: check that Python Cygwin is not in the path?
 
         if not os.path.isdir(self.env.env_path):

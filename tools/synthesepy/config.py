@@ -148,6 +148,7 @@ DEFAULTS = {
     'should_build_package': lambda env: False,
     'force_create_package': False,
     'no_tests': False,
+    'do_not_build_python': False,
 
     # system_install
     'synthese_user': 'synthese',
