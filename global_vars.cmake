@@ -23,3 +23,15 @@ set(EXPAT_INCLUDE_DIRS
 set(ICONV_INCLUDE_DIRS
 "${PROJECT_SOURCE_DIR}/3rd/dev/iconv/include"
 )
+
+set(HARU_INCLUDE_DIRS
+"${PROJECT_SOURCE_DIR}/3rd/dev/haru/include"
+)
+
+set(PNG_INCLUDE_DIRS
+"${PROJECT_SOURCE_DIR}/3rd/dev/png/src"
+)
+
+set(ZLIB_INCLUDE_DIRS
+"${PROJECT_SOURCE_DIR}/3rd/dev/zlib/src"
+)
