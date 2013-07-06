@@ -172,6 +172,9 @@ namespace synthese
 			static const std::string PARAMETER_ACTION_WILL_CREATE_OBJECT;
 			static const std::string PARAMETER_NO_REDIRECT_AFTER_ACTION;
 
+			typedef void (*OnDestroyFunction)(const Request&);
+			typedef std::set<OnDestroyFunction> OnDestroyFunctions;
+
 		protected:
 			boost::shared_ptr<Action> _action;
 			boost::shared_ptr<Function> _function;
@@ -183,6 +186,7 @@ namespace synthese
 			boost::optional<util::RegistryKeyType>	_actionCreatedId;
 			bool									_redirectAfterAction;
 			std::string								_actionErrorMessage;
+			mutable OnDestroyFunctions			_onDestroyFunctions;
 
 		private:
 			CookiesMap _cookiesMap;
@@ -238,6 +242,7 @@ namespace synthese
 				void setCookie(std::string name, std::string value, int maxAge);
 				void removeCookie(std::string name);
 				void setRedirectAfterAction(bool value){ _redirectAfterAction = value; }
+				void addOnDestroyFunction(OnDestroyFunction f) const;
 			//@}
 
 			//! \name Modifiers
