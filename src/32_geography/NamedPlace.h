@@ -120,7 +120,7 @@ namespace synthese
 				/** Gets official name of this place.
 				* The default implementation is to return this name.
 				*/
-				virtual const std::string& getOfficialName () const;
+				virtual const std::string getOfficialName () const;
 			//@}
 		};
 }	}
