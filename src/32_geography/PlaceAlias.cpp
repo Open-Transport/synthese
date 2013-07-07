@@ -62,7 +62,7 @@ namespace synthese
 
 
 
-		const std::string& PlaceAlias::getOfficialName () const
+		const string PlaceAlias::getOfficialName() const
 		{
 			return getAliasedPlace()->getOfficialName ();
 		}
