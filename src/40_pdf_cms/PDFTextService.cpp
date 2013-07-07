@@ -102,7 +102,7 @@ namespace synthese
 
 			// Write the text
 			pdf.drawText(
-				IConv::IConv("UTF-8", "CP1252").convert(_text),
+				IConv("UTF-8", "CP1252").convert(_text),
 				PDF::GetPixelsFromMM(_x),
 				PDF::GetPixelsFromMM(_y)
 			);
