@@ -66,7 +66,7 @@ namespace synthese
 
 					@return aliased place official name.
 				 */
-				const std::string& getOfficialName () const;
+				const std::string getOfficialName () const;
 
 
 				/** Gets aliased place.

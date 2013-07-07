@@ -36,7 +36,7 @@ namespace synthese
 		public:
 			typedef std::string OrderingKeyType;
 
-			const OrderingKeyType& getTreeOrderingKey() const { return static_cast<const T*>(this)->getName(); }
+			const OrderingKeyType getTreeOrderingKey() const { return static_cast<const T*>(this)->getName(); }
 
 		};
 	}

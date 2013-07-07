@@ -44,7 +44,7 @@ namespace synthese
 
 
 
-		const std::string& NamedPlace::getOfficialName() const
+		const std::string NamedPlace::getOfficialName() const
 		{
 			return getName();
 		}
