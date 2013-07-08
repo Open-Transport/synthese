@@ -104,6 +104,8 @@ namespace synthese
 
 		void Import::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
+			// Compute the time of the next auto import
+			_computeNextAutoImport();
 		}
 
 
@@ -176,6 +178,9 @@ namespace synthese
 		) const	{
 
 			map.merge(get<Parameters>());
+
+			// Compute the time of the next auto import
+			_computeNextAutoImport();
 
 		}
 }	}
