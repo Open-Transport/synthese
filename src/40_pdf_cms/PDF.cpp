@@ -100,7 +100,7 @@ namespace synthese
 			{
 				HPDF_BYTE buf[4096];
 				HPDF_UINT32 siz = 4096;
-				HPDF_STATUS ret = HPDF_ReadFromStream (_curDoc, buf, &siz);
+				HPDF_ReadFromStream (_curDoc, buf, &siz);
 
 				if (siz == 0)
 				{
