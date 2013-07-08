@@ -141,11 +141,11 @@ namespace synthese
 
 		void Import::runAutoImport() const
 		{
+			ParametersMap pm;
 			if(!_autoImporter.get())
 			{
 				boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 				_autoImporterEnv.reset(new Env);
-				ParametersMap pm;
 				_autoImporter = fileFormat->getImporter(
 					*_autoImporterEnv,
 					*this,
