@@ -551,7 +551,6 @@ namespace synthese
 			toParametersMap(
 				pm,
 				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
-				boost::logic::indeterminate,
 				prefix
 			);
 		}
