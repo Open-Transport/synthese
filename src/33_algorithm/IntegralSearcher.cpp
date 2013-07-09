@@ -39,7 +39,6 @@
 #include "Crossing.h"
 #include "ReverseRoadPart.hpp"
 #include "ReverseRoadChunk.hpp"
-#include "Junction.hpp"
 
 #include <sstream>
 #include <limits>
@@ -380,20 +379,6 @@ namespace synthese
 						optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
 						set<const Edge*> nonServedEdges;
 						ptime departureMoment(correctedDesiredTime);
-                        // If path is a junction, we use the desiredTime instead of the corrected desired time
-                        const Junction* junction(dynamic_cast<const Junction*> (&path));
-                        if (junction != NULL)
-                        {
-                            departureMoment = desiredTime;
-							if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-							{
-								fullApproachJourney.setStartApproachDuration(minutes(0));
-							}
-							else
-							{
-								fullApproachJourney.setEndApproachDuration(minutes(0));
-							}
-                        }
 						while(true)
 						{
 							this_thread::interruption_point();
