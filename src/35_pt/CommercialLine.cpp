@@ -245,7 +245,7 @@ namespace synthese
 			}
 			if(getNetwork())
 			{
-				getNetwork()->toParametersMap(pm, "line_network_");
+				getNetwork()->toParametersMap(pm, withAdditionalParameters, withFiles, "line_network_");
 			}
 			pm.insert(prefix + DATA_LINE_IMAGE, getImage());
 			pm.insert(prefix + "lineImage", getImage()); // For StopAreasList compatibility
