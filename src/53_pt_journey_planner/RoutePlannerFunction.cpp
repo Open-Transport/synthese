@@ -1316,7 +1316,6 @@ namespace synthese
 					bool hasALineAlert(false); // Interactive
 					bool hasAStopAlert(false); // Interactive
 					bool pedestrianMode = false;
-					bool lastPedestrianMode = false;
 
 					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
 					PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator itPlaces(placesList.begin());
@@ -1455,7 +1454,6 @@ namespace synthese
 							**itSheetRow << " />";
 
 							++itPlaces; ++itSheetRow;
-							lastPedestrianMode = pedestrianMode;
 						}
 
 						if(	PTRoutePlannerResult::HaveToDisplayArrivalStopOnGrid(itl, jl)

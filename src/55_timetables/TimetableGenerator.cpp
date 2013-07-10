@@ -75,7 +75,6 @@ namespace synthese
 			}
 
 			bool result(false);
-			bool passageOk(false);
 			Path::Edges::const_iterator itEdge;
 			const Path::Edges& edges(journeyPattern.getEdges());
 
@@ -115,8 +114,6 @@ namespace synthese
 							)
 						){
 							result = true;
-							if (itRow->getIsArrival() || itRow->getCompulsory() == TimetableRow::PassageSuffisant)
-								passageOk = true;
 							break;
 						}
 					}
