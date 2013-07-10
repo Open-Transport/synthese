@@ -1178,7 +1178,7 @@ namespace synthese
 				departureSchedules.push_back(_applyTimeFloor(horaires[i].hrd, timeFloor));
 				arrivalSchedules.push_back(_applyTimeFloor(horaires[i].hra, timeFloor));
 			}
-			Log::GetInstance().info("IneoRealTimeUpdateAction: Applying RealTime update to service " + service.getKey());
+			Log::GetInstance().info("IneoRealTimeUpdateAction: Applying RealTime update to service " + lexical_cast<string>(service.getKey()));
 			service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
 		}
 
