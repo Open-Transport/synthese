@@ -169,11 +169,12 @@ namespace synthese
 				ss->setDatesToBypass(dates);
 			}
 
+			// Path
+			path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
+			ss->setPath(path);
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Path
-				path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
-				ss->setPath(path);
 				if(path->getEdges().empty())
 				{
 					LineStopTableSync::Search(env, pathId);
