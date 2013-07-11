@@ -674,6 +674,7 @@ namespace synthese
 				return;
 			}
 
+			Log::GetInstance().info("SchedulesBasedService: Applying RealTime update to service " + lexical_cast<string>(getKey()));
 			_RTDepartureSchedules = departureSchedules;
 			_RTArrivalSchedules = arrivalSchedules;
 			_computeNextRTUpdate();

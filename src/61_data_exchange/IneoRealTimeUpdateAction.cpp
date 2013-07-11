@@ -925,7 +925,6 @@ namespace synthese
 						arrivalSchedules.push_back(course.horaires[i].hta);
 					}
 					course.syntheseService->setSchedules(departureSchedules, arrivalSchedules, true);
-					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
 					course.syntheseService->setActive(today);
 					updatesEnv.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(course.syntheseService));
 
@@ -1178,7 +1177,6 @@ namespace synthese
 				departureSchedules.push_back(_applyTimeFloor(horaires[i].hrd, timeFloor));
 				arrivalSchedules.push_back(_applyTimeFloor(horaires[i].hra, timeFloor));
 			}
-			Log::GetInstance().info("IneoRealTimeUpdateAction: Applying RealTime update to service " + lexical_cast<string>(service.getKey()));
 			service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
 		}
 
