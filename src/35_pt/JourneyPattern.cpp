@@ -255,7 +255,7 @@ namespace synthese
 			return true;
 		}
 
-		const JourneyPattern::SubLines JourneyPattern::getSubLines() const
+		const JourneyPattern::SubLines& JourneyPattern::getSubLines() const
 		{
 			return _subLines;
 		}

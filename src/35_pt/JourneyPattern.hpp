@@ -128,7 +128,7 @@ namespace synthese
                                 pt::TransportNetwork*	getNetwork()				const;
 				bool				getWalkingLine ()			const;
 				CommercialLine*		getCommercialLine()			const;
-				const SubLines		getSubLines()				const;
+				const SubLines&		getSubLines()				const;
 				bool				getWayBack()				const { return _wayBack; }
 				Destination*		getDirectionObj()			const { return _directionObj; }
 				bool				getMain()					const { return _main; }
