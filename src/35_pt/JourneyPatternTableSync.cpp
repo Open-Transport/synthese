@@ -237,7 +237,13 @@ namespace synthese
 			JourneyPattern* object,
 			optional<DBTransaction&> transaction
 		){
-			if(!object->getCommercialLine()) throw Exception("JourneyPattern save error. Missing commercial line");
+			if(!object->getCommercialLine())
+			{
+				throw Exception("JourneyPattern save error. "
+								"Missing commercial line for JourneyPattern " +
+								lexical_cast<string>(object->getKey())
+				);
+			}
 			ReplaceQuery<JourneyPatternTableSync> query(*object);
 			query.addField(object->getCommercialLine()->getKey());
 			query.addField(object->getName());
