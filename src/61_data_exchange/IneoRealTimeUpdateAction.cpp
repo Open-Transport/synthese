@@ -402,17 +402,6 @@ namespace synthese
 									Horaire()
 							)	);
 							horaire.ref = horaireResult->getInt("ref");
-							horaire.had = duration_from_string(horaireResult->getText("had"));
-							// Patch for schedules after midnight
-							if(horaire.had < dayBreakTime)
-							{
-								horaire.had += hours(24);
-							}
-							horaire.haa = duration_from_string(horaireResult->getText("haa"));
-							if(horaire.haa < dayBreakTime)
-							{
-								horaire.haa += hours(24);
-							}
 							horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
 							if(horaire.hrd < dayBreakTime)
 							{

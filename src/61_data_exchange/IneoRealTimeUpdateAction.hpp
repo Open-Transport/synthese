@@ -129,8 +129,6 @@ namespace synthese
 				int ref;
 				boost::posix_time::time_duration htd;
 				boost::posix_time::time_duration hta;
-				boost::posix_time::time_duration had;
-				boost::posix_time::time_duration haa;
 				boost::posix_time::time_duration hrd;
 				boost::posix_time::time_duration hra;
 			};
