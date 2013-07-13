@@ -169,12 +169,19 @@ namespace synthese
 				ss->setDatesToBypass(dates);
 			}
 
-			// Path
-			path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
-			ss->setPath(path);
+			if (linkLevel == FIELDS_ONLY_LOAD_LEVEL)
+			{
+				// We just load an empty path object which only as its key set
+				path = JourneyPatternTableSync::GetEditable(pathId, env, UNKNOWN_LOAD_LEVEL).get();
+				ss->setPath(path);
+			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				// Path
+				path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
+				ss->setPath(path);
+
 				if(path->getEdges().empty())
 				{
 					LineStopTableSync::Search(env, pathId);
@@ -219,7 +226,8 @@ namespace synthese
 			{
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, e.getMessage());
 			}
-			if(	path &&
+			if( linkLevel > FIELDS_ONLY_LOAD_LEVEL &&
+				path &&
 				path->getEdges().size() != ss->getArrivalSchedules(true, false).size()
 			){
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");

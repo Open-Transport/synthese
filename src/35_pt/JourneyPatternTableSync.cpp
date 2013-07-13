@@ -120,6 +120,10 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			if(linkLevel == UNKNOWN_LOAD_LEVEL)
+			{
+				return;
+			}
 			string name (
 			    rows->getText (JourneyPatternTableSync::COL_NAME));
 			string timetableName (
@@ -237,6 +241,11 @@ namespace synthese
 			JourneyPattern* object,
 			optional<DBTransaction&> transaction
 		){
+			if(!object->getCommercialLine() && !object->getEdges().size())
+			{
+				return;
+			}
+
 			if(!object->getCommercialLine())
 			{
 				throw Exception("JourneyPattern save error. "
