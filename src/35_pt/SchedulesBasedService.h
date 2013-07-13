@@ -112,6 +112,9 @@ namespace synthese
 				boost::posix_time::time_duration departureShift,
 				bool updateFollowingSchedules
 			);
+
+			void _initRTVertices();
+
 		public:
 			SchedulesBasedService(
 				std::string serviceNumber,

@@ -532,7 +532,14 @@ namespace synthese
 				stream << ts.close();
 
 				stream << "<h1>Informations temps réel</h1>";
-				stream << "<p>Information temps réel valables jusqu'à : " << posix_time::to_simple_string(_service->getNextRTUpdate()) << "</p>";
+				if(_service->getNextRTUpdate().is_not_a_date_time())
+				{
+					stream << "<p>Aucune</p>";
+				}
+				else
+				{
+					stream << "<p>Information temps réel valables jusqu'à : " << posix_time::to_simple_string(_service->getNextRTUpdate()) << "</p>";
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////
