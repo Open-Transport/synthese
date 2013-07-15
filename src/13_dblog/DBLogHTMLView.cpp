@@ -404,7 +404,7 @@ namespace synthese
 
 		ParametersMap DBLogHTMLView::getParametersMap(
 		) const {
-			ParametersMap m(_requestParameters.getParametersMap());
+			ParametersMap m(_requestParameters.getParametersMap(PARAMETER_PREFIX + _code));
 			if(_searchUserId)
 			{
 				m.insert(_getParameterName(PARAMETER_SEARCH_USER), *_searchUserId);
