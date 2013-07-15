@@ -57,38 +57,65 @@ namespace synthese
 
 			try
 			{
-				first = lexical_cast<size_t>(m.getValue(_PARAMETER_FIRST));
-			}
-			catch(...)
+				first = lexical_cast<size_t>(m.getValue(_prefix + _PARAMETER_FIRST));
+			}catch(...)
 			{
-				first = 0;
-			}
-
-			try
-			{
-				orderField = m.getValue(_PARAMETER_ORDER_FIELD);
-			}
-			catch(...)
-			{
-				orderField = defaultOrderField;
+				try
+				{
+					first = lexical_cast<size_t>(m.getValue(_PARAMETER_FIRST));
+				}
+				catch(...)
+				{
+					first = 0;
+				}
 			}
 
 			try
 			{
-				raisingOrder = lexical_cast<bool>(m.getValue(_PARAMETER_RAISING_ORDER));
+				orderField = m.getValue(_prefix + _PARAMETER_ORDER_FIELD);
 			}
-            catch(...)
+			catch(...)
 			{
-                raisingOrder = defaultRaisingOrder;
+				try
+				{
+					orderField = m.getValue(_PARAMETER_ORDER_FIELD);
+				}
+				catch(...)
+				{
+					orderField = defaultOrderField;
+				}
 			}
 
 			try
 			{
-				maxSize = lexical_cast<size_t>(m.getValue(_PARAMETER_MAX_SIZE));
+				raisingOrder = lexical_cast<bool>(m.getValue(_prefix + _PARAMETER_RAISING_ORDER));
 			}
 			catch(...)
 			{
-				maxSize = defaultMaxSize;
+				try
+				{
+					raisingOrder = lexical_cast<bool>(m.getValue(_PARAMETER_RAISING_ORDER));
+				}
+				catch(...)
+				{
+					raisingOrder = defaultRaisingOrder;
+				}
+			}
+
+			try
+			{
+				maxSize = lexical_cast<size_t>(m.getValue(_prefix + _PARAMETER_MAX_SIZE));
+			}
+			catch(...)
+			{
+				try
+				{
+					maxSize = lexical_cast<size_t>(m.getValue(_PARAMETER_MAX_SIZE));
+				}
+				catch(...)
+				{
+					maxSize = defaultMaxSize;
+				}
 			}
 		}
 
@@ -145,15 +172,15 @@ namespace synthese
 			return s.str();
 		}
 
-		std::map<std::string, std::string> ResultHTMLTable::RequestParameters::getParametersMap() const
+		std::map<std::string, std::string> ResultHTMLTable::RequestParameters::getParametersMap(const string& prefix) const
 		{
 			std::map<std::string, std::string> map;
-			map.insert(make_pair(_getParameterCode(_PARAMETER_FIRST), lexical_cast<string>(first)));
+			map.insert(make_pair(_getParameterCode(prefix + _PARAMETER_FIRST), lexical_cast<string>(first)));
 			if(maxSize)
-				map.insert(make_pair(_getParameterCode(_PARAMETER_MAX_SIZE), lexical_cast<string>(*maxSize)));
-			map.insert(make_pair(_getParameterCode(_PARAMETER_ORDER_FIELD), orderField));
+				map.insert(make_pair(_getParameterCode(prefix + _PARAMETER_MAX_SIZE), lexical_cast<string>(*maxSize)));
+			map.insert(make_pair(_getParameterCode(prefix + _PARAMETER_ORDER_FIELD), orderField));
 			map.insert(make_pair(
-				_getParameterCode(_PARAMETER_RAISING_ORDER),
+				_getParameterCode(prefix + _PARAMETER_RAISING_ORDER),
 				lexical_cast<string>(raisingOrder)
 			)	);
 			return map;

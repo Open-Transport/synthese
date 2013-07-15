@@ -92,7 +92,9 @@ namespace synthese
 					const std::string& prefix = std::string()
 				);
 
-				std::map<std::string, std::string> getParametersMap() const;
+				std::map<std::string, std::string> getParametersMap(
+					const std::string& prefix = std::string()
+				) const;
 			};
 
 		private:
