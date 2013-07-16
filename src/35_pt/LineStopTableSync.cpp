@@ -24,6 +24,7 @@
 
 #include "LineStopTableSync.h"
 
+#include "ContinuousServiceTableSync.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DRTAreaTableSync.hpp"
 #include "JourneyPatternCopy.hpp"
@@ -31,6 +32,7 @@
 #include "LineArea.hpp"
 #include "LinkException.h"
 #include "Profile.h"
+#include "ScheduledServiceTableSync.h"
 #include "Session.h"
 #include "StopPointTableSync.hpp"
 #include "User.h"
@@ -374,6 +376,41 @@ namespace synthese
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
+			Env env;
+			boost::shared_ptr<LineStop> lineStop(LineStopTableSync::GetEditable(id, env));
+			if(lineStop->getScheduleInput())
+			{
+				LineStopTableSync::Search(env, lineStop->getParentPath()->getKey());
+				ScheduledServiceTableSync::Search(
+					env,
+					lineStop->getParentPath()->getKey()
+				);
+				ContinuousServiceTableSync::Search(
+					env,
+					lineStop->getParentPath()->getKey()
+				);
+				lineStop->getParentPath()->removeEdge(*lineStop);
+				BOOST_FOREACH(const ScheduledService::Registry::value_type& it, env.getRegistry<ScheduledService>())
+				{
+					ScheduledService& service(*it.second);
+					ScheduledService::Schedules dp(service.getDepartureSchedules(true, false));
+					dp.erase(dp.begin() + lineStop->getRankInPath());
+					ScheduledService::Schedules ar(service.getDepartureSchedules(true, false));
+					ar.erase(ar.begin() + lineStop->getRankInPath());
+					service.setSchedules(dp, ar, false);
+					ScheduledServiceTableSync::Save(&service, transaction);
+				}
+				BOOST_FOREACH(const ContinuousService::Registry::value_type& it, env.getRegistry<ContinuousService>())
+				{
+					ContinuousService& service(*it.second);
+					ContinuousService::Schedules dp(service.getDepartureSchedules(true, false));
+					dp.erase(dp.begin() + lineStop->getRankInPath());
+					ContinuousService::Schedules ar(service.getDepartureSchedules(true, false));
+					ar.erase(ar.begin() + lineStop->getRankInPath());
+					service.setSchedules(dp, ar, false);
+					ContinuousServiceTableSync::Save(&service, transaction);
+				}
+			}
 		}
 
 
