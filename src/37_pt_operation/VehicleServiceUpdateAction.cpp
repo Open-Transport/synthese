@@ -47,6 +47,7 @@ namespace synthese
 	{
 		const string VehicleServiceUpdateAction::PARAMETER_VEHICLE_SERVICE_ID = Action_PARAMETER_PREFIX + "vehicle_service_id";
 		const string VehicleServiceUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
+		const string VehicleServiceUpdateAction::PARAMETER_FIELD_SERVICES = Action_PARAMETER_PREFIX + "_field_services";
 
 
 
@@ -64,6 +65,11 @@ namespace synthese
 			if(_name)
 			{
 				map.insert(PARAMETER_NAME, *_name);
+			}
+
+			if(_services)
+			{
+				map.insert(PARAMETER_FIELD_SERVICES, VehicleServiceTableSync::SerializeServices(*_services));
 			}
 			return map;
 		}
@@ -95,6 +101,15 @@ namespace synthese
 			{
 				_name = map.get<string>(PARAMETER_NAME);
 			}
+
+			// Services
+			if(map.isDefined(PARAMETER_FIELD_SERVICES))
+			{
+				_services = VehicleServiceTableSync::UnserializeServices(
+					map.get<string>(PARAMETER_FIELD_SERVICES),
+					*_env
+				);
+			}
 		}
 
 
@@ -116,6 +131,11 @@ namespace synthese
 			if(_name)
 			{
 				_vehicleService->setName(*_name);
+			}
+
+			if(_services)
+			{
+				_vehicleService->setServices(*_services);
 			}
 
 			VehicleServiceTableSync::Save(_vehicleService.get());
