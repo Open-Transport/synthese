@@ -25,6 +25,7 @@
 #include "LineStopUpdateAction.hpp"
 
 #include "ActionException.h"
+#include "ContinuousServiceTableSync.h"
 #include "DBModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
@@ -36,6 +37,7 @@
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Request.h"
+#include "ScheduledServiceTableSync.h"
 #include "Session.h"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkRight.h"
@@ -229,6 +231,20 @@ namespace synthese
 			
 			// Read length from geometry
 			_readLengthFromGeometry = map.getDefault<bool>(PARAMETER_READ_LENGTH_FROM_GEOMETRY, false);
+
+			// Load services if update should be necessary
+			if(	(_readLengthFromGeometry && _lineStop->getGeometry()) ||
+				_withSchedules
+			){
+				ScheduledServiceTableSync::Search(
+					*_env,
+					_lineStop->getParentPath()->getKey()
+				);
+				ContinuousServiceTableSync::Search(
+					*_env,
+					_lineStop->getParentPath()->getKey()
+				);
+			}
 		}
 
 
@@ -343,13 +359,14 @@ namespace synthese
 				);
 			}
 
-			if(	(_readLengthFromGeometry && _lineStop->getGeometry()) ||
-				_withSchedules
-			){
-				JourneyPatternTableSync::ReloadServices(
-					_lineStop->getParentPath()->getKey(),
-					transaction
-				);
+			// Some line stop updates can impact the service schedules
+			BOOST_FOREACH(const ScheduledService::Registry::value_type& it, _env->getRegistry<ScheduledService>())
+			{
+				ScheduledServiceTableSync::Save(it.second.get(), transaction);
+			}
+			BOOST_FOREACH(const ContinuousService::Registry::value_type& it, _env->getRegistry<ContinuousService>())
+			{
+				ContinuousServiceTableSync::Save(it.second.get(), transaction);
 			}
 
 			transaction.run();

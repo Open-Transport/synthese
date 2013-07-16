@@ -372,30 +372,4 @@ namespace synthese
 			}
 			return LoadFromQuery(query, env, linkLevel);
 		}
-
-
-		void JourneyPatternTableSync::ReloadServices(
-			RegistryKeyType journeyPatternId,
-			optional<DBTransaction&> transaction
-		){
-			Env env;
-			ScheduledServiceTableSync::SearchResult services(
-				ScheduledServiceTableSync::Search(
-					env,
-					journeyPatternId
-			)	);
-			BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, services)
-			{
-				ScheduledServiceTableSync::Save(service.get(), transaction);
-			}
-			ContinuousServiceTableSync::SearchResult cservices(
-				ContinuousServiceTableSync::Search(
-					env,
-					journeyPatternId
-			)	);
-			BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& cservice, cservices)
-			{
-				ContinuousServiceTableSync::Save(cservice.get(), transaction);
-			}
-		}
 }	}

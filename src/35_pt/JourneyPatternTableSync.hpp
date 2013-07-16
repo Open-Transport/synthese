@@ -90,13 +90,6 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				boost::optional<bool> wayback = boost::optional<bool>()
 			);
-
-
-
-			static void ReloadServices(
-				util::RegistryKeyType journeyPatternId,
-				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
-			);
 		};
 }	}
 
