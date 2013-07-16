@@ -424,7 +424,7 @@ namespace synthese
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isDepartureAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"))
+							(lineStop->isDepartureAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Départ impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>());
 
@@ -603,9 +603,9 @@ namespace synthese
 							map.addPoint(
 								HTMLMap::MapPoint(
 									*(*itEdge)->getFromVertex()->getGeometry(),
-									"arret-rouge-blanc-8px.png",
-									"arret-rouge-blanc-8px.png",
-									"arret-rouge-blanc-8px.png",
+									"/admin/img/arret-rouge-blanc-8px.png",
+									"/admin/img/arret-rouge-blanc-8px.png",
+									"/admin/img/arret-rouge-blanc-8px.png",
 									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? stopPointUpdateRequest.getURL() : string(),
 									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ?
 										static_cast<StopPoint*>((*itEdge)->getFromVertex())->getConnectionPlace()->getFullName() :
