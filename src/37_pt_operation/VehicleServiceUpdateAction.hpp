@@ -29,12 +29,12 @@
 #include "FactorableTemplate.h"
 #include "BaseImportableUpdateAction.hpp"
 
+#include "VehicleService.hpp"
+
 namespace synthese
 {
 	namespace pt_operation
 	{
-		class VehicleService;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// 37.15 Action : VehicleServiceUpdateAction.
 		/// @ingroup m37Actions refActions
@@ -55,10 +55,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_VEHICLE_SERVICE_ID;
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_FIELD_SERVICES;
 
 		private:
 			boost::shared_ptr<VehicleService> _vehicleService;
 			boost::optional<std::string> _name;
+			boost::optional<VehicleService::Services> _services;
 
 
 		protected:
