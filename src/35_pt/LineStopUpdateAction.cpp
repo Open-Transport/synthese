@@ -347,7 +347,7 @@ namespace synthese
 				_withSchedules
 			){
 				JourneyPatternTableSync::ReloadServices(
-					_lineStop->getKey(),
+					_lineStop->getParentPath()->getKey(),
 					transaction
 				);
 			}
