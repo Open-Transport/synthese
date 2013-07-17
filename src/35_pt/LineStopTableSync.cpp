@@ -376,8 +376,21 @@ namespace synthese
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<LineStopTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
 			Env env;
 			boost::shared_ptr<LineStop> lineStop(LineStopTableSync::GetEditable(id, env));
+
+			RankUpdateQuery<LineStopTableSync> query(LineStopTableSync::COL_RANKINPATH, -1, lineStop->getRankInPath()+1);
+			query.addWhereField(LineStopTableSync::COL_LINEID, lineStop->getLine()->getKey());
+			query.execute(transaction);
+
 			if(lineStop->getScheduleInput())
 			{
 				LineStopTableSync::Search(env, lineStop->getParentPath()->getKey());
@@ -411,20 +424,6 @@ namespace synthese
 					ContinuousServiceTableSync::Save(&service, transaction);
 				}
 			}
-		}
-
-
-
-		template<> void DBTableSyncTemplate<LineStopTableSync>::AfterDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-			Env env;
-			boost::shared_ptr<const LineStop> lineStop(LineStopTableSync::Get(id, env));
-
-			RankUpdateQuery<LineStopTableSync> query(LineStopTableSync::COL_RANKINPATH, -1, lineStop->getRankInPath()+1);
-			query.addWhereField(LineStopTableSync::COL_LINEID, lineStop->getLine()->getKey());
-			query.execute(transaction);
 		}
 
 
