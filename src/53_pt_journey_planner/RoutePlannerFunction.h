@@ -76,6 +76,7 @@ namespace synthese
 		class StopArea;
 		class ReservationContact;
 		class StopPoint;
+		class Junction;
 	}
 
 	namespace server
@@ -161,10 +162,12 @@ namespace synthese
 			static const std::string PARAMETER_DATE_TIME_PAGE;
 			static const std::string PARAMETER_STOP_CELL_PAGE;
 			static const std::string PARAMETER_SERVICE_CELL_PAGE;
+			static const std::string PARAMETER_ROAD_CELL_PAGE;
 			static const std::string PARAMETER_JUNCTION_CELL_PAGE;
 			static const std::string PARAMETER_TICKET_CELL_PAGE;
 			static const std::string PARAMETER_MAP_STOP_PAGE;
 			static const std::string PARAMETER_MAP_SERVICE_PAGE;
+			static const std::string PARAMETER_MAP_ROAD_PAGE;
 			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_RESULT_ROW_PAGE;
@@ -285,11 +288,17 @@ namespace synthese
 				static const std::string DATA_USER_CLASS_CODE;
 			//@}
 
-			//! @name Junction cells
+			//! @name Road cells
 			//@{
 				static const std::string DATA_REACHED_PLACE_IS_NAMED;
 				static const std::string DATA_ROAD_NAME;
 				static const std::string DATA_LENGTH;
+			//@}
+
+			//! @name Junction cells
+			//@{
+				static const std::string DATA_START_STOP_NAME;
+				static const std::string DATA_END_STOP_NAME;
 			//@}
 
 			//! @name Service cells
@@ -372,10 +381,12 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _dateTimePage;
 				boost::shared_ptr<const cms::Webpage> _stopCellPage;
 				boost::shared_ptr<const cms::Webpage> _serviceCellPage;
+				boost::shared_ptr<const cms::Webpage> _roadPage;
 				boost::shared_ptr<const cms::Webpage> _junctionPage;
 				boost::shared_ptr<const cms::Webpage> _ticketCellPage;
 				boost::shared_ptr<const cms::Webpage> _mapStopCellPage;
 				boost::shared_ptr<const cms::Webpage> _mapServiceCellPage;
+				boost::shared_ptr<const cms::Webpage> _mapRoadPage;
 				boost::shared_ptr<const cms::Webpage> _mapJunctionPage;
 				boost::shared_ptr<const cms::Webpage> _resultRowPage;
 			//@}
@@ -679,6 +690,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				boost::shared_ptr<const cms::Webpage> stopCellPage,
 				boost::shared_ptr<const cms::Webpage> serviceCellPage,
+				boost::shared_ptr<const cms::Webpage> roadPage,
 				boost::shared_ptr<const cms::Webpage> junctionPage,
 				const server::Request& request,
 				std::size_t n,
@@ -719,6 +731,33 @@ namespace synthese
 				bool isFirstLeg
 			) const;
 
+			/** Display of road cell.
+				See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-pedestrian-chunk
+				@param stream Stream to display on
+				@param page page to use to display
+				@param request current request
+				@param alarm Alarm to display for the road use
+				@param color Odd or even row in the journey board
+				@param distance Length of the junction
+			*/
+			void _displayRoadCell(
+				std::ostream& stream,
+				boost::shared_ptr<const cms::Webpage> page,
+				const server::Request& request,
+				bool color,
+				double distance,
+				const geos::geom::Geometry* geometry,
+				const road::Road* road,
+				const graph::Vertex& departureVertex,
+				const graph::Vertex& arrivalVertex,
+				bool isLastLeg,
+				bool isFirstLeg,
+				bool isFirstFoot,
+				const boost::posix_time::ptime departureTime,
+				const boost::posix_time::ptime arrivalTime,
+				size_t userClassRank
+			) const;
+
 
 
 			/** Display of junction cell.
@@ -737,7 +776,7 @@ namespace synthese
 				bool color,
 				double distance,
 				const geos::geom::Geometry* geometry,
-				const road::Road* road,
+				const pt::Junction* junction,
 				const graph::Vertex& departureVertex,
 				const graph::Vertex& arrivalVertex,
 				bool isLastLeg,
@@ -745,7 +784,9 @@ namespace synthese
 				bool isFirstFoot,
 				const boost::posix_time::ptime departureTime,
 				const boost::posix_time::ptime arrivalTime,
-				size_t userClassRank
+				size_t userClassRank,
+				const std::string startStopName,
+				const std::string endStopName
 			) const;
 
 
