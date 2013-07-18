@@ -168,11 +168,13 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_DATE_TIME_PAGE("date_time_page");
 		const string RoutePlannerFunction::PARAMETER_STOP_CELL_PAGE("stop_cell_page");
 		const string RoutePlannerFunction::PARAMETER_SERVICE_CELL_PAGE("service_cell_page");
-		const string RoutePlannerFunction::PARAMETER_JUNCTION_CELL_PAGE("junction_cell_page");
+		const string RoutePlannerFunction::PARAMETER_ROAD_CELL_PAGE("junction_cell_page");
+		const string RoutePlannerFunction::PARAMETER_JUNCTION_CELL_PAGE("external_junction_cell_page");
 		const string RoutePlannerFunction::PARAMETER_TICKET_CELL_PAGE("ticket_cell_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_STOP_PAGE("map_stop_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
-		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
+		const string RoutePlannerFunction::PARAMETER_MAP_ROAD_PAGE("map_junction_page");
+		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_external_junction_page");
 		const string RoutePlannerFunction::PARAMETER_RESULT_ROW_PAGE("result_row_page");
 		const string RoutePlannerFunction::PARAMETER_IGNORE_RESERVATION_RULES("irr");
 
@@ -287,10 +289,14 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_IS_FIRST_LEG("is_first_leg");
 		const string RoutePlannerFunction::DATA_USER_CLASS_CODE("ac");
 
-		// Junction cells
+		// Road cells
 		const string RoutePlannerFunction::DATA_REACHED_PLACE_IS_NAMED("reached_place_is_named");
 		const string RoutePlannerFunction::DATA_ROAD_NAME("road_name");
 		const string RoutePlannerFunction::DATA_LENGTH("length");
+
+		// Junction cells
+		const string RoutePlannerFunction::DATA_START_STOP_NAME("startStop");
+		const string RoutePlannerFunction::DATA_END_STOP_NAME("endStop");
 
 		// Service cells
 		const string RoutePlannerFunction::DATA_FIRST_DEPARTURE_TIME("first_departure_time");
@@ -985,6 +991,18 @@ namespace synthese
 			}
 			try
 			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_ROAD_CELL_PAGE));
+				if(id)
+				{
+					_roadPage = Env::GetOfficialEnv().get<Webpage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<Webpage>& e)
+			{
+				throw RequestException("No such road cell page : "+ e.getMessage());
+			}
+			try
+			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_JUNCTION_CELL_PAGE));
 				if(id)
 				{
@@ -993,7 +1011,12 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
-				throw RequestException("No such junction cell page : "+ e.getMessage());
+				/*
+					* Retrocompatibility : give a junction page is not mandatory
+					* some transport network don't use it and don't pass it in CMS pages
+					* @TODO : throw when all CMS pages will be updated
+				*/
+				Log::GetInstance().warn("No such junction (external) cell page : "+ e.getMessage());
 			}
 			try
 			{
@@ -1032,6 +1055,20 @@ namespace synthese
 				throw RequestException("No such map service page : "+ e.getMessage());
 			}
 
+			// Map road page
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_ROAD_PAGE));
+				if(id)
+				{
+					_mapRoadPage = Env::GetOfficialEnv().get<Webpage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<Webpage>& e)
+			{
+				throw RequestException("No such map road page : "+ e.getMessage());
+			}
+
 			// Map junction page
 			try
 			{
@@ -1043,7 +1080,12 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
-				throw RequestException("No such map junction page : "+ e.getMessage());
+				/*
+					* Retrocompatibility : give a map junction page is not mandatory
+					* some transport network don't use it and don't pass it in CMS pages
+					* @TODO : throw when all CMS pages will be updated
+				*/
+				Log::GetInstance().warn("No such map junction (external) page : "+ e.getMessage());
 			}
 
 			// Warning check page
@@ -1657,8 +1699,8 @@ namespace synthese
 							}
 							stream <<
 								">";
-							_xmlDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
-							_xmlDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
+							_xmlDisplayPhysicalStop(stream, DATA_START_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
+							_xmlDisplayPhysicalStop(stream, DATA_END_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
 							_xmlDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*(*line->getAllEdges().rbegin())->getFromVertex()),_showCoords);
 							if(!line->isPedestrianMode())
 							{
@@ -1711,8 +1753,8 @@ namespace synthese
 									" length=\"" << ceil(leg.getDistance()) << "\"" <<
 									" departureTime=\"" << posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"" <<
 									" arrivalTime=\"" << posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\">";
-							_xmlDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
-							_xmlDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
+							_xmlDisplayPhysicalStop(stream, DATA_START_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
+							_xmlDisplayPhysicalStop(stream, DATA_END_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
 							stream << "</junction>";
 						}
 
@@ -2435,6 +2477,7 @@ namespace synthese
 						_boardPage,
 						_stopCellPage,
 						_serviceCellPage,
+						_roadPage,
 						_junctionPage,
 						request,
 						i,
@@ -2625,6 +2668,7 @@ namespace synthese
 						_mapPage,
 						_mapStopCellPage,
 						_mapServiceCellPage,
+						_mapRoadPage,
 						_mapJunctionPage,
 						request,
 						i,
@@ -2970,6 +3014,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> stopCellPage,
 			boost::shared_ptr<const cms::Webpage> serviceCellPage,
+			boost::shared_ptr<const cms::Webpage> roadPage,
 			boost::shared_ptr<const cms::Webpage> junctionPage,
 			const server::Request& request,
 			std::size_t n,
@@ -3260,7 +3305,7 @@ namespace synthese
 			pm.insert(DATA_ONLINE_RESERVATION, onlineBooking);
 
 			// Content
-			if(stopCellPage.get() && serviceCellPage.get() && junctionPage.get())
+			if(stopCellPage.get() && serviceCellPage.get() && roadPage.get())
 			{
 				stringstream content;
 
@@ -3376,23 +3421,54 @@ namespace synthese
 								geometries
 						)	);
 
-						_displayJunctionCell(
-							content,
-							junctionPage,
-							request,
-							__Couleur,
-							distance,
-							multiLineString.get(),
-							dynamic_cast<const Road*>(leg.getService()->getPath()),
-							*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
-							*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
-							it+1 == services.end(),
-							*(roadServiceUses.begin()) == services.begin(),
-							isFirstFoot,
-							(*roadServiceUses.begin())->getDepartureDateTime(),
-							(*roadServiceUses.rbegin())->getArrivalDateTime(),
-							(*roadServiceUses.begin())->getUserClassRank()
-						);
+						if(dynamic_cast<const Road*>(leg.getService()->getPath()))
+						{
+							_displayRoadCell(
+								content,
+								roadPage,
+								request,
+								__Couleur,
+								distance,
+								multiLineString.get(),
+								dynamic_cast<const Road*>(leg.getService()->getPath()),
+								*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
+								*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
+								it+1 == services.end(),
+								*(roadServiceUses.begin()) == services.begin(),
+								isFirstFoot,
+								(*roadServiceUses.begin())->getDepartureDateTime(),
+								(*roadServiceUses.rbegin())->getArrivalDateTime(),
+								(*roadServiceUses.begin())->getUserClassRank()
+							);
+						}
+						else if (dynamic_cast<const Junction*>(leg.getService()->getPath()) && junctionPage.get())
+						{
+							string startStopName = (dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex())).getName();
+							string endStopName =  (dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex())).getName();
+							_displayJunctionCell(
+								content,
+								roadPage,
+								request,
+								__Couleur,
+								distance,
+								multiLineString.get(),
+								dynamic_cast<const Junction*>(leg.getService()->getPath()),
+								*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
+								*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
+								it+1 == services.end(),
+								*(roadServiceUses.begin()) == services.begin(),
+								isFirstFoot,
+								(*roadServiceUses.begin())->getDepartureDateTime(),
+								(*roadServiceUses.rbegin())->getArrivalDateTime(),
+								(*roadServiceUses.begin())->getUserClassRank(),
+								startStopName,
+								endStopName
+							);
+						}
+						else
+						{
+							throw Exception("Leg is not a Road neither a Junction");
+						}
 
 						roadServiceUses.clear();
 						__Couleur = !__Couleur;
@@ -3514,7 +3590,7 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::_displayJunctionCell(
+		void RoutePlannerFunction::_displayRoadCell(
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
@@ -3587,6 +3663,78 @@ namespace synthese
 				}
 			}
 
+			page->display(stream, request, pm);
+		}
+
+		void RoutePlannerFunction::_displayJunctionCell(
+			std::ostream& stream,
+			boost::shared_ptr<const cms::Webpage> page,
+			const server::Request& request,
+			bool color,
+			double distance,
+			const geos::geom::Geometry* geometry,
+			const pt::Junction* junction,
+			const graph::Vertex& departureVertex,
+			const graph::Vertex& arrivalVertex,
+			bool isLastLeg,
+			bool isFirstLeg,
+			bool isFirstFoot,
+			const posix_time::ptime departureTime,
+			const posix_time::ptime arrivalTime,
+			size_t userClassRank,
+			const string startStopName,
+			const string endStopName
+		) const {
+			ParametersMap pm(getTemplateParameters());
+
+			// Departure point
+			if(	departureVertex.getGeometry().get() &&
+				!departureVertex.getGeometry()->isEmpty()
+			){
+				shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(
+						*departureVertex.getGeometry()
+				)	);
+				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
+				pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
+			}
+			// Arrival point
+			if(	arrivalVertex.getGeometry().get() &&
+				!arrivalVertex.getGeometry()->isEmpty()
+			){
+				shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(
+						*arrivalVertex.getGeometry()
+				)	);
+				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
+				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
+			}
+			
+			pm.insert(DATA_ODD_ROW, color);
+			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
+			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
+			
+			pm.insert(DATA_DEPARTURE_TIME, departureTime.time_of_day());
+			pm.insert(DATA_ARRIVAL_TIME, arrivalTime.time_of_day());
+			pm.insert(DATA_DURATION, arrivalTime - departureTime);
+			pm.insert(DATA_USER_CLASS_CODE, USER_CLASS_CODE_OFFSET + userClassRank);
+			
+			pm.insert(DATA_START_STOP_NAME, startStopName);
+			pm.insert(DATA_END_STOP_NAME, endStopName);
+			
+			// WKT
+			if(geometry)
+			{
+				shared_ptr<Geometry> geometryProjected(
+					_coordinatesSystem->convertGeometry(
+						*geometry
+				)	);
+				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				if(geometryProjected.get() && !geometryProjected->isEmpty())
+				{
+					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
+				}
+			}
 			page->display(stream, request, pm);
 		}
 
