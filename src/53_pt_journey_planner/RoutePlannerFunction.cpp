@@ -174,7 +174,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_RESULT_ROW_PAGE("result_row_page");
 		const string RoutePlannerFunction::PARAMETER_IGNORE_RESERVATION_RULES("irr");
 
-		//XML output only:
+		//XML output only: 
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
 		const string RoutePlannerFunction::PARAMETER_SHOW_COORDINATES("showCoords");
 
