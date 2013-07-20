@@ -176,7 +176,7 @@ namespace synthese
 
 				BOOST_FOREACH(Registry<ScheduledService>::value_type& service, Env::GetOfficialEnv().getEditableRegistry<ScheduledService>())
 				{
-					if(!service.second->getNextRTUpdate().is_not_a_date_time() && now > service.second->getNextRTUpdate())
+					if(now > service.second->getNextRTUpdate())
 					{
 						service.second->clearRTData();
 					}

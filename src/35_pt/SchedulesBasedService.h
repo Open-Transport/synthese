@@ -113,8 +113,6 @@ namespace synthese
 				bool updateFollowingSchedules
 			);
 
-			void _initRTVertices();
-
 		public:
 			SchedulesBasedService(
 				std::string serviceNumber,

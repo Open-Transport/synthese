@@ -63,22 +63,16 @@ namespace synthese
 			std::string serviceNumber,
 			graph::Path* path
 		):	NonPermanentService(serviceNumber, path),
-			_nextRTUpdate(boost::gregorian::not_a_date_time),
-			_hasRealTimeData(false)
+			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
 		{
 			clearStops();
+            clearRTData();
 		}
 
 
 
 		void SchedulesBasedService::_computeNextRTUpdate()
 		{
-			if(!_hasRealTimeData)
-			{
-				_nextRTUpdate = boost::gregorian::not_a_date_time;
-				return;
-			}
-
 			if(!_arrivalSchedules.empty())
 			{
 				const time_duration& lastThSchedule(*(_arrivalSchedules.end() - 1));
@@ -373,8 +367,14 @@ namespace synthese
 			}
 		}
 
-		void SchedulesBasedService::_initRTVertices()
-		{
+		void SchedulesBasedService::clearRTData()
+        {
+            _hasRealTimeData = false;
+            _RTDepartureSchedules = _departureSchedules;
+            _RTArrivalSchedules = _arrivalSchedules;
+            // Assuming arrival and departure schedules have the same size
+            _RTTimestamps.assign(_departureSchedules.size(), boost::posix_time::ptime());
+            _emptySchedules.assign(_departureSchedules.size(), not_a_date_time);
 			if(getPath())
 			{
 				_RTVertices.clear();
@@ -395,22 +395,6 @@ namespace synthese
 					}
 				}
 			}
-		}
-
-		void SchedulesBasedService::clearRTData()
-		{
-			if(!_hasRealTimeData)
-			{
-				return;
-			}
-			_hasRealTimeData = false;
-			_RTDepartureSchedules = _departureSchedules;
-			_RTArrivalSchedules = _arrivalSchedules;
-			// Assuming arrival and departure schedules have the same size
-			_RTTimestamps.assign(_departureSchedules.size(), boost::posix_time::ptime());
-			_emptySchedules.assign(_departureSchedules.size(), not_a_date_time);
-
-			_initRTVertices();
 			_computeNextRTUpdate();
 		}
 
@@ -455,7 +439,7 @@ namespace synthese
 		std::string SchedulesBasedService::encodeSchedules(
 			boost::posix_time::time_duration shiftArrivals
 		) const {
-			if(!_path || _path->getEdges().size() == 0)
+			if(!_path)
 			{
 				return _rawSchedule;
 			}
@@ -489,7 +473,7 @@ namespace synthese
 			typedef tokenizer<char_separator<char> > tokenizer;
 
 			_rawSchedule = value;
-			if(!_path || _path->getEdges().size() == 0)
+			if(!_path)
 			{
 				// No need to parse the data an complete our init
 				return;
@@ -680,13 +664,12 @@ namespace synthese
 			const Schedules& departureSchedules, 
 			const Schedules& arrivalSchedules
 		){
-			_hasRealTimeData = true;
 			// Do not process new schedules if none has changed
 			if((_RTDepartureSchedules == departureSchedules) &&
 			   (_RTArrivalSchedules == arrivalSchedules)
 			)
 			{
-				// We already get this information, nothing to do
+                _hasRealTimeData = true;
 				return;
 			}
 
@@ -720,7 +703,6 @@ namespace synthese
 			{
 				_vertices.clear();
 				_vertices.assign(getPath()->getEdges().size(), NULL);
-				_initRTVertices();
 			}
 		}
 
