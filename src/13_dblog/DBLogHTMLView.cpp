@@ -73,7 +73,11 @@ namespace synthese
 			_fixedText(true),
 			_fixedObjectId(true),
 			_fixedObjectId2(true)
-		{}
+		{
+			_requestParameters.orderField = _getParameterName(PARAMETER_START_DATE);
+			_requestParameters.raisingOrder = false;
+			_requestParameters.maxSize = 200;
+		}
 
 
 
