@@ -1199,7 +1199,15 @@ namespace synthese
 					}
 					else
 					{
-						placeResult.value = _houseMap->begin()->second;	
+						if (_houseMap->empty())
+						{
+							// _houseMap is empty so give back the road
+							placeResult.value = roadPlace;
+						}
+						else
+						{
+							placeResult.value = _houseMap->begin()->second;	
+						}
 					}
 				}
 			}
