@@ -1011,12 +1011,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
-				/*
-					* Retrocompatibility : give a junction page is not mandatory
-					* some transport network don't use it and don't pass it in CMS pages
-					* @TODO : throw when all CMS pages will be updated
-				*/
-				Log::GetInstance().warn("No such junction (external) cell page : "+ e.getMessage());
+				throw RequestException("No such junction (external) cell page : "+ e.getMessage());
 			}
 			try
 			{
@@ -1080,12 +1075,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
-				/*
-					* Retrocompatibility : give a map junction page is not mandatory
-					* some transport network don't use it and don't pass it in CMS pages
-					* @TODO : throw when all CMS pages will be updated
-				*/
-				Log::GetInstance().warn("No such map junction (external) page : "+ e.getMessage());
+				throw RequestException("No such map junction (external) page : "+ e.getMessage());
 			}
 
 			// Warning check page
@@ -3441,29 +3431,32 @@ namespace synthese
 								(*roadServiceUses.begin())->getUserClassRank()
 							);
 						}
-						else if (dynamic_cast<const Junction*>(leg.getService()->getPath()) && junctionPage.get())
+						else if (dynamic_cast<const Junction*>(leg.getService()->getPath()))
 						{
-							string startStopName = (dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex())).getName();
-							string endStopName =  (dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex())).getName();
-							_displayJunctionCell(
-								content,
-								roadPage,
-								request,
-								__Couleur,
-								distance,
-								multiLineString.get(),
-								dynamic_cast<const Junction*>(leg.getService()->getPath()),
-								*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
-								*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
-								it+1 == services.end(),
-								*(roadServiceUses.begin()) == services.begin(),
-								isFirstFoot,
-								(*roadServiceUses.begin())->getDepartureDateTime(),
-								(*roadServiceUses.rbegin())->getArrivalDateTime(),
-								(*roadServiceUses.begin())->getUserClassRank(),
-								startStopName,
-								endStopName
-							);
+							if(junctionPage.get())
+							{
+								string startStopName = (dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex())).getName();
+								string endStopName =  (dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex())).getName();
+								_displayJunctionCell(
+									content,
+									roadPage,
+									request,
+									__Couleur,
+									distance,
+									multiLineString.get(),
+									dynamic_cast<const Junction*>(leg.getService()->getPath()),
+									*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
+									*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
+									it+1 == services.end(),
+									*(roadServiceUses.begin()) == services.begin(),
+									isFirstFoot,
+									(*roadServiceUses.begin())->getDepartureDateTime(),
+									(*roadServiceUses.rbegin())->getArrivalDateTime(),
+									(*roadServiceUses.begin())->getUserClassRank(),
+									startStopName,
+									endStopName
+								);
+							}
 						}
 						else
 						{
