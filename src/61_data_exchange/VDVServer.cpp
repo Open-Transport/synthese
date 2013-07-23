@@ -210,7 +210,7 @@ namespace synthese
 				if(!datenBereitServiceNode.isEmpty())
 				{
 					string datenBereitValue(datenBereitServiceNode.getText());
-					if(datenBereitValue == "ok")
+					if(datenBereitValue == "true")
 					{
 						// New data available !
 						updateFromServer = true;
