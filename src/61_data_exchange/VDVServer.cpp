@@ -27,6 +27,7 @@
 #include "Env.h"
 #include "VDVServerSubscription.hpp"
 #include "XmlToolkit.h"
+#include "ServerModule.h"
 
 #include <boost/date_time/local_time_adjustor.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
@@ -155,6 +156,7 @@ namespace synthese
 				"\"/>";
 
 			bool reloadNeeded(!_online);
+			bool updateFromServer(false);
 			try
 			{
 				string statusAntwortStr(
@@ -202,6 +204,18 @@ namespace synthese
 					reloadNeeded = true;
 					_startServiceTimeStamp = startServiceTime;
 				}
+
+				// Check if new data available (DatenBereit)
+				XMLNode datenBereitServiceNode = allNode.getChildNode("DatenBereit");
+				if(!datenBereitServiceNode.isEmpty())
+				{
+					string datenBereitValue(datenBereitServiceNode.getText());
+					if(datenBereitValue == "ok")
+					{
+						// New data available !
+						updateFromServer = true;
+					}
+				}
 			}
 			catch(...)
 			{
@@ -230,6 +244,12 @@ namespace synthese
 						break;
 					}
 				}
+			}
+
+			if (updateFromServer)
+			{
+				// Run the update in a separate thread
+				ServerModule::AddThread(boost::bind(&VDVServer::updateSYNTHESEFromServer, this), "VDV servers connector");
 			}
 
 			if(!reloadNeeded)
