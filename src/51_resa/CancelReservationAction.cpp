@@ -190,14 +190,37 @@ namespace synthese
 				return false;
 			}
 
-			return
-				session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
+			if(session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
 				(_transaction->getCustomerUserId() == session->getUser()->getKey() &&
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)) ||
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) ||
 				(_transaction->getCustomerUserId() == session->getUser()->getKey() &&
-				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, CANCEL))
-			;
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, CANCEL)))
+			{
+				return true;
+			}
+
+			// User has no global right to cancel reservation, maybe he has specific right for the line
+			BOOST_FOREACH(const Reservation* resa, _transaction->getReservations())
+			{
+				util::RegistryKeyType lineId = resa->getLineId();
+				bool hasRight = false;
+				if (session->getUser()->getProfile()->isAuthorized<ResaRight>(security::WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(lineId)))
+				{
+					hasRight = true;
+					continue;
+				}
+				if (session->getUser()->getProfile()->isAuthorized<ResaRight>(security::CANCEL, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(lineId)))
+				{
+					hasRight = true;
+					continue;
+				}
+				if (!hasRight)
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 }
