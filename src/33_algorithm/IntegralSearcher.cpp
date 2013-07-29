@@ -393,7 +393,7 @@ namespace synthese
 						{
 							const Junction* currentJunction(dynamic_cast<const Junction*>(currentJourney.getEndEdge().getParentPath()));
 							if(currentJunction != NULL &&
-								(_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey() != origin->getKey())
+								((_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey() != origin->getKey()))
 								continue;
 						}
 						while(true)
