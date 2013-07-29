@@ -74,6 +74,7 @@ namespace synthese
 
 		public:
 			TimetableResult(boost::shared_ptr<Warnings> warnings);
+			TimetableResult copy() const;
 
 			//! @name Getters
 			//@{

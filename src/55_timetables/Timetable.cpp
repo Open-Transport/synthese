@@ -60,7 +60,8 @@ namespace synthese
 			_transferTimetableBefore(NULL),
 			_transferTimetableAfter(NULL),
 			_ignoreEmptyRows(false),
-			_mergeColsWithSameTimetables(true)
+			_mergeColsWithSameTimetables(true),
+			_compression(false)
 		{}
 
 
@@ -117,6 +118,7 @@ namespace synthese
 				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
 				g->setWaybackFilter(_wayBackFilter);
 				g->setAutoIntermediateStops(_autoIntermediateStops);
+				g->setCompression(_compression);
 				if(_transferTimetableBefore)
 				{
 					g->setBeforeTransferTimetable(_transferTimetableBefore->getGenerator(env, mask));
