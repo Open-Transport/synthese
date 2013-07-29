@@ -39,6 +39,8 @@
 #include "Crossing.h"
 #include "ReverseRoadPart.hpp"
 #include "ReverseRoadChunk.hpp"
+#include "Junction.hpp"
+#include "StopPoint.hpp"
 
 #include <sstream>
 #include <limits>
@@ -379,6 +381,21 @@ namespace synthese
 						optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
 						set<const Edge*> nonServedEdges;
 						ptime departureMoment(correctedDesiredTime);
+						// If path is a junction, we verify that the origin vertex is the same
+						const Junction* junction(dynamic_cast<const Junction*> (&path));
+						if (junction != NULL)
+						{
+							if (!currentJourney.empty() &&
+								origin->getKey() != currentJourney.getEndEdge().getFromVertex()->getKey())
+								continue;
+						}
+						if(!currentJourney.empty())
+						{
+							const Junction* currentJunction(dynamic_cast<const Junction*>(currentJourney.getEndEdge().getParentPath()));
+							if(currentJunction != NULL &&
+								(_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey() != origin->getKey())
+								continue;
+						}
 						while(true)
 						{
 							this_thread::interruption_point();
