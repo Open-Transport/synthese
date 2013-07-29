@@ -23,6 +23,7 @@
 #include "PDF.hpp"
 
 #include "Exception.h"
+#include "RGBColor.h"
 
 #include <boost/lexical_cast.hpp>
 #include <hpdf_utils.h>
@@ -345,6 +346,15 @@ namespace synthese
 			red(red_),
 			green(green_),
 			blue(blue_)
+		{}
+
+
+
+		PDF::RGBColor::RGBColor(
+			const util::RGBColor& value
+		):	red(float(value.r) / 256),
+			green(float(value.g) / 256),
+			blue(float(value.b) / 256)
 		{}
 
 
