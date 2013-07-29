@@ -73,6 +73,7 @@ namespace synthese
 		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE("transfer_timetable_before");
 		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER("transfer_timetable_after");
 		const std::string TimetableTableSync::COL_IGNORE_EMPTY_ROWS = "ignore_empty_rows";
+		const std::string TimetableTableSync::COL_COMPRESSION = "compression";
 	}
 
 	namespace db
@@ -96,6 +97,7 @@ namespace synthese
 			Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE, SQL_INTEGER),
 			Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER, SQL_INTEGER),
 			Field(TimetableTableSync::COL_IGNORE_EMPTY_ROWS, SQL_BOOLEAN),
+			Field(TimetableTableSync::COL_COMPRESSION, SQL_BOOLEAN),
 			Field()
 		};
 
@@ -128,6 +130,7 @@ namespace synthese
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setContentType(static_cast<Timetable::ContentType>(rows->getInt(TimetableTableSync::COL_FORMAT)));
 			object->setIgnoreEmptyRows(rows->getBool(TimetableTableSync::COL_IGNORE_EMPTY_ROWS));
+			object->setCompression(rows->getBool(TimetableTableSync::COL_COMPRESSION));
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -270,6 +273,7 @@ namespace synthese
 			query.addField(object->getTransferTimetableBefore(1) ? object->getTransferTimetableBefore(1)->getKey() : RegistryKeyType(0));
 			query.addField(object->getTransferTimetableAfter(1) ? object->getTransferTimetableAfter(1)->getKey() : RegistryKeyType(0));
 			query.addField(object->getIgnoreEmptyRows());
+			query.addField(object->getCompression());
 			query.execute(transaction);
 		}
 

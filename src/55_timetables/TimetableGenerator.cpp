@@ -57,7 +57,8 @@ namespace synthese
 			_transferTimetableAfter(NULL),
 			_withContinuousServices(true),
 			_env(env),
-			_mergeColsWithSameTimetables(true)
+			_mergeColsWithSameTimetables(true),
+			_compression(false)
 		{}
 
 
@@ -552,6 +553,109 @@ namespace synthese
 					}
 				}
 
+				// Compression
+				if(_compression)
+				{
+					TimetableResult newResult(result.copy());
+					const TimetableResult::Columns& allColumns(result.getColumns());
+					pair<TimetableResult::Columns::const_iterator, TimetableResult::Columns::const_iterator> lastColSet(
+						make_pair(allColumns.end(), allColumns.end())
+					);
+					vector<size_t> sequence;
+
+					// Loop on columns
+					long nextHour(0);
+					for(TimetableResult::Columns::const_iterator itCol(allColumns.begin()); itCol != allColumns.end(); ++itCol)
+					{
+						// If no last col set, begin a new hour
+						if(lastColSet.first == allColumns.end())
+						{
+							lastColSet.first = itCol;
+							lastColSet.second = itCol;
+							newResult.getColumns().push_back(*itCol);
+							sequence.clear();
+							sequence.push_back(newResult.getColumns().size() - 1);
+							nextHour = itCol->getHour() + 1;
+							continue;
+						}
+
+						// Check if the current col is in the last col set
+						if(itCol->getHour() == lastColSet.first->getHour())
+						{
+							lastColSet.second = itCol;
+							newResult.getColumns().push_back(*itCol);
+							sequence.push_back(newResult.getColumns().size() - 1);
+							continue;
+						}
+
+						// We are in the next col set : search for repeated sequence
+						size_t repeats(0);
+						TimetableResult::Columns::const_iterator itCurCol(itCol);
+
+						for(time_duration delta(hours(1)); ; delta += hours(1))
+						{
+							// The next sequence
+							TimetableResult::Columns::const_iterator seqEnd(allColumns.end());
+							for(TimetableResult::Columns::const_iterator itCol2(itCol); itCol2 != allColumns.end() && itCol2->getHour() == nextHour; ++itCol2)
+							{
+								seqEnd = itCol2;
+							}
+
+							// Comparison of the sequence
+							if(	seqEnd != allColumns.end() &&
+								seqEnd - itCol == lastColSet.second - lastColSet.first
+							){
+								bool ok(true);
+								for(size_t curSetColRank(0); curSetColRank<=seqEnd - itCol; ++curSetColRank)
+								{
+									if(	!(itCol+curSetColRank)->isLike(*(lastColSet.first + curSetColRank), delta)
+									){
+										ok = false;
+										break;
+									}
+								}
+
+								if(ok)
+								{
+									++repeats;
+									++nextHour;
+									itCol = seqEnd + 1;
+								}
+								else
+								{
+									--itCol;
+									lastColSet = make_pair(allColumns.end(), allColumns.end());
+									break;
+								}
+							}
+							else
+							{
+								--itCol;
+								lastColSet = make_pair(allColumns.end(), allColumns.end());
+								break;
+							}
+						}
+
+						// If at least 2 repeats, then cut the result
+						if(repeats >= 2)
+						{
+							size_t compressionRank(0);
+							BOOST_FOREACH(size_t colRank, sequence)
+							{
+								newResult.getColumns().at(colRank).setCompression(
+									compressionRank++,
+									repeats
+								);
+							}
+						}
+
+						if(itCol == allColumns.end())
+						{
+							break;
+						}
+					}
+					return newResult;
+				}
 			}
 			return result;
 		}

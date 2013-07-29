@@ -602,4 +602,72 @@ namespace synthese
 				}
 			}
 		}
+
+
+
+		void TimetableColumn::setCompression( size_t rank, size_t repeated )
+		{
+			_compressionRank = rank;
+			_compressionRepeated = repeated;
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the hour of the first defined cell.
+		long TimetableColumn::getHour() const
+		{
+			BOOST_FOREACH(const Content::value_type& cell, _content)
+			{
+				if(cell.second.is_not_a_date_time())
+				{
+					continue;
+				}
+				return cell.second.hours();
+			}
+			throw Exception("Corrupted timetable : column without any data");
+			return 0;
+		}
+
+
+
+		bool TimetableColumn::isLike(
+			const TimetableColumn& other,
+			const boost::posix_time::time_duration& delta
+		) const	{
+			// Same columns must have the same calendar
+			if(_calendar != other._calendar)
+			{
+				return false;
+			}
+
+			// Loop on cells
+			TimetableColumn::Content::const_iterator itOther(other._content.begin());
+			BOOST_FOREACH(const Content::value_type& cell, _content)
+			{
+				// Undefined status must be the same
+				if(cell.second.is_not_a_date_time() != itOther->second.is_not_a_date_time())
+				{
+					return false;
+				}
+
+				// If undefined jump to the next cell
+				if(cell.second.is_not_a_date_time())
+				{
+					++itOther;
+					continue;
+				}
+
+				// Compare the times
+				if(cell.second - itOther->second != delta)
+				{
+					return false;
+				}
+
+				// OK check the next cell
+				++itOther;
+			}
+
+			return true;
+		}
 }	}

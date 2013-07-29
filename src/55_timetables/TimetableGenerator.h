@@ -86,6 +86,7 @@ namespace synthese
 				const util::Env&			_env;
 				boost::optional<std::size_t> _autoIntermediateStops;
 				bool _mergeColsWithSameTimetables;
+				bool _compression;
 			//@}
 
 			/// @name Result
@@ -152,6 +153,7 @@ namespace synthese
 				void setWaybackFilter(boost::optional<bool> value){ _wayBackFilter = value; }
 				void setAutoIntermediateStops(boost::optional<std::size_t> value){ _autoIntermediateStops = value; }
 				void setMergeColsWithSameTimetables(bool value){ _mergeColsWithSameTimetables = value; }
+				void setCompression(bool value){ _compression = value; }
 			//@}
 		};
 	}
