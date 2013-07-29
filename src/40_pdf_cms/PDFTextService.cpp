@@ -48,6 +48,7 @@ namespace synthese
 		const string PDFTextService::PARAMETER_Y = "y";
 		const string PDFTextService::PARAMETER_FONT = "font";
 		const string PDFTextService::PARAMETER_SIZE = "size";
+		const string PDFTextService::PARAMETER_COLOR = "color";
 		
 
 
@@ -74,6 +75,12 @@ namespace synthese
 
 			// Size
 			_size = map.getOptional<float>(PARAMETER_SIZE);
+
+			// Color
+			if(!map.getDefault<string>(PARAMETER_COLOR).empty())
+			{
+				_color = util::RGBColor(map.get<string>(PARAMETER_COLOR));
+			}
 		}
 
 
@@ -97,6 +104,14 @@ namespace synthese
 			{
 				pdf.setTextSize(
 					PDF::GetPixelsFromMM(*_size)
+				);
+			}
+
+			// Change the color
+			if(_color)
+			{
+				pdf.setStrokeColor(
+					PDF::RGBColor(*_color)
 				);
 			}
 

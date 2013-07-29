@@ -28,6 +28,8 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
+#include "RGBColor.h"
+
 namespace synthese
 {
 	namespace pdf_cms
@@ -59,7 +61,7 @@ namespace synthese
 				float _x2;
 				float _y2;
 				boost::optional<float> _width;
-				boost::optional<PDF::RGBColor> _color;
+				boost::optional<util::RGBColor> _color;
 			//@}
 			
 			
