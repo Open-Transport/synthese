@@ -28,6 +28,8 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
+#include "RGBColor.h"
+
 namespace synthese
 {
 	namespace pdf_cms
@@ -49,6 +51,7 @@ namespace synthese
 			static const std::string PARAMETER_Y;
 			static const std::string PARAMETER_FONT;
 			static const std::string PARAMETER_SIZE;
+			static const std::string PARAMETER_COLOR;
 
 
 
@@ -60,6 +63,7 @@ namespace synthese
 				float _y;
 				boost::optional<std::string> _font;
 				boost::optional<float> _size;
+				boost::optional<util::RGBColor> _color;
 			//@}
 			
 			

@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		struct RGBColor;
+	}
+
 	namespace pdf_cms
 	{
 		/** PDF class.
@@ -43,6 +48,7 @@ namespace synthese
 				HPDF_REAL green;
 				HPDF_REAL blue;
 				RGBColor(HPDF_REAL red_, HPDF_REAL green_, HPDF_REAL blue_);
+				RGBColor(const util::RGBColor& value);
 				bool operator!=(const RGBColor& rhs) const;
 			};
 
