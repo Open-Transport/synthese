@@ -131,6 +131,7 @@ namespace synthese
 				boost::optional<std::size_t> _autoIntermediateStops;
 				bool _ignoreEmptyRows;
 				bool _mergeColsWithSameTimetables;
+				bool _compression;
 			//@}
 
 
@@ -167,6 +168,7 @@ namespace synthese
 				void setRows(const RowGroups& value){ _rowGroups = value; }
 				void setIgnoreEmptyRows(bool value){ _ignoreEmptyRows = value; }
 				void setMergeColsWithSameTimetables(bool value){ _mergeColsWithSameTimetables = value; }
+				void setCompression(bool value){ _compression = value; }
 			//@}
 
 			//! @name Modifiers
@@ -197,6 +199,7 @@ namespace synthese
 				boost::optional<bool>	getWaybackFilter() const { return _wayBackFilter; }
 				bool getIgnoreEmptyRows() const { return _ignoreEmptyRows; }
 				bool getMergeColsWithSameTimetables() const { return _mergeColsWithSameTimetables; }
+				bool getCompression() const { return _compression; }
 			//@}
 
 			//! @name Services

@@ -60,6 +60,7 @@ namespace synthese
 			static const std::string COL_TRANSFER_TIMETABLE_BEFORE;
 			static const std::string COL_TRANSFER_TIMETABLE_AFTER;
 			static const std::string COL_IGNORE_EMPTY_ROWS;
+			static const std::string COL_COMPRESSION;
 
 			TimetableTableSync() {}
 

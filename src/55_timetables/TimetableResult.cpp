@@ -183,6 +183,13 @@ namespace synthese
 
 
 
+		TimetableResult TimetableResult::copy() const
+		{
+			return TimetableResult(_warnings);
+		}
+
+
+
 		TimetableResult::RowServicesVector TimetableResult::getRowServices() const
 		{
 			RowServicesVector result;

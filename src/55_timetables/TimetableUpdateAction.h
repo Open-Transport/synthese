@@ -62,6 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_FORMAT;
 			static const std::string PARAMETER_CONTAINER_ID;
 			static const std::string PARAMETER_IGNORE_EMPTY_ROWS;
+			static const std::string PARAMETER_FIELD_COMPRESSION;
 
 		private:
 			boost::shared_ptr<Timetable> _timetable;
@@ -70,7 +71,7 @@ namespace synthese
 			std::string _title;
 			Timetable::ContentType _format;
 			boost::optional<bool> _ignoreEmptyRows;
-
+			boost::optional<bool> _compression;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

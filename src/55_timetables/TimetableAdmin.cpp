@@ -195,6 +195,12 @@ namespace synthese
 						TimetableUpdateAction::PARAMETER_IGNORE_EMPTY_ROWS,
 						_timetable->getIgnoreEmptyRows()
 				)	);
+				stream << pt.cell(
+					"Compression",
+					pt.getForm().getOuiNonRadioInput(
+						TimetableUpdateAction::PARAMETER_FIELD_COMPRESSION,
+						_timetable->getCompression()
+				)	);
 
 				stream << pt.close();
 			}

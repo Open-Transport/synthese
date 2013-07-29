@@ -61,6 +61,7 @@ namespace synthese
 		const string TimetableUpdateAction::PARAMETER_FORMAT = Action_PARAMETER_PREFIX + "fo";
 		const string TimetableUpdateAction::PARAMETER_CONTAINER_ID = Action_PARAMETER_PREFIX + "co";
 		const string TimetableUpdateAction::PARAMETER_IGNORE_EMPTY_ROWS = Action_PARAMETER_PREFIX + "_ignore_empty_rows";
+		const string TimetableUpdateAction::PARAMETER_FIELD_COMPRESSION = Action_PARAMETER_PREFIX + "_field_compression";
 
 
 
@@ -124,6 +125,12 @@ namespace synthese
 			_title = map.get<string>(PARAMETER_TITLE);
 			_format = static_cast<Timetable::ContentType>(map.get<int>(PARAMETER_FORMAT));
 
+			// Compression
+			if(map.isDefined(PARAMETER_FIELD_COMPRESSION))
+			{
+				_compression = map.get<bool>(PARAMETER_FIELD_COMPRESSION);
+			}
+
 			// Ignore empty rows
 			_ignoreEmptyRows = map.getOptional<bool>(PARAMETER_IGNORE_EMPTY_ROWS);
 		}
@@ -139,6 +146,10 @@ namespace synthese
 			if(_ignoreEmptyRows)
 			{
 				_timetable->setIgnoreEmptyRows(*_ignoreEmptyRows);
+			}
+			if(_compression)
+			{
+				_timetable->setCompression(*_compression);
 			}
 
 			TimetableTableSync::Save(_timetable.get());
