@@ -59,6 +59,11 @@ namespace synthese
 		const string Reservation::DATA_LANGUAGE("language");
 		const string Reservation::DATA_NAME("name");
 		const string Reservation::DATA_PHONE = "phone";
+		const string Reservation::DATA_EMAIL = "email";
+		const string Reservation::DATA_ADDRESS = "address";
+		const string Reservation::DATA_POSTCODE = "postcode";
+		const string Reservation::DATA_CITYTEXT = "cityText";
+		const string Reservation::DATA_COUNTRY = "country";
 		const string Reservation::DATA_TRANSACTION_ID("transaction_id");
 		const string Reservation::DATA_SEATS_NUMBER("seats_number");
 		const string Reservation::DATA_VEHICLE_ID("vehicle_id");
@@ -284,6 +289,12 @@ namespace synthese
 			pm.insert(DATA_COMMENT, getTransaction()->getComment());
 			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
 			pm.insert(DATA_PHONE, getTransaction()->getCustomerPhone());
+			security::User* customer = UserTableSync::GetEditable(getTransaction()->getCustomerUserId(), Env::GetOfficialEnv()).get();
+			pm.insert(DATA_EMAIL, customer->getEMail());
+			pm.insert(DATA_ADDRESS, customer->getAddress());
+			pm.insert(DATA_POSTCODE, customer->getPostCode());
+			pm.insert(DATA_CITYTEXT, customer->getCityText());
+			pm.insert(DATA_COUNTRY, customer->getCountry());
 
 			// Transaction
 			pm.insert(DATA_TRANSACTION_ID, getTransaction()->getKey());
