@@ -102,6 +102,10 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_CUSTOMER_ALLOW_EMPTY_SURNAME = Action_PARAMETER_PREFIX + "aes";
 		const string BookReservationAction::PARAMETER_CUSTOMER_PHONE = Action_PARAMETER_PREFIX + "cuph";
 		const string BookReservationAction::PARAMETER_CUSTOMER_EMAIL = Action_PARAMETER_PREFIX + "cupe";
+		const string BookReservationAction::PARAMETER_CUSTOMER_ADDRESS = Action_PARAMETER_PREFIX + "cupa";
+		const string BookReservationAction::PARAMETER_CUSTOMER_POSTCODE = Action_PARAMETER_PREFIX + "cupp";
+		const string BookReservationAction::PARAMETER_CUSTOMER_CITYTEXT = Action_PARAMETER_PREFIX + "cupc";
+		const string BookReservationAction::PARAMETER_CUSTOMER_COUNTRY = Action_PARAMETER_PREFIX + "cupco";
 		const string BookReservationAction::PARAMETER_CUSTOMER_LANGUAGE = Action_PARAMETER_PREFIX + "cl";
 
 		const string BookReservationAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pass";
@@ -225,6 +229,10 @@ namespace synthese
 					}
 
 					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
+					_customer->setAddress(map.getDefault<string>(PARAMETER_CUSTOMER_ADDRESS));
+					_customer->setPostCode(map.getDefault<string>(PARAMETER_CUSTOMER_POSTCODE));
+					_customer->setCityText(map.getDefault<string>(PARAMETER_CUSTOMER_CITYTEXT));
+					_customer->setCountry(map.getDefault<string>(PARAMETER_CUSTOMER_COUNTRY));
 					_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
 
 					if(map.getOptional<string>(PARAMETER_CUSTOMER_LANGUAGE))
