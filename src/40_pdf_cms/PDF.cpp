@@ -46,6 +46,7 @@ namespace synthese
 		{
 			setTextFont("Helvetica");
 			HPDF_SetInfoAttr(_curDoc, HPDF_INFO_CREATOR, "SYNTHESE");
+			HPDF_SetCompressionMode(_curDoc, HPDF_COMP_ALL);
 		}
 
 
