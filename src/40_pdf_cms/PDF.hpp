@@ -137,7 +137,9 @@ namespace synthese
 				HPDF_REAL x1,
 				HPDF_REAL y1,
 				HPDF_REAL x2,
-				HPDF_REAL y2
+				HPDF_REAL y2,
+				bool stroke,
+				bool fill
 			);
 			void output(
 				std::ostream& stream
