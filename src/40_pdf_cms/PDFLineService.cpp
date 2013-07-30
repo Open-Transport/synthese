@@ -98,16 +98,16 @@ namespace synthese
 			if(_width)
 			{
 				pdf.setLineWidth(
-					*_width
+					PDF::GetPixelsFromMM(*_width)
 				);
 			}
 
 			// Draw the line
 			pdf.drawLine(
-				_x1,
-				_y1,
-				_x2,
-				_y2
+				PDF::GetPixelsFromMM(_x1),
+				PDF::GetPixelsFromMM(_y1),
+				PDF::GetPixelsFromMM(_x2),
+				PDF::GetPixelsFromMM(_y2)
 			);
 
 
