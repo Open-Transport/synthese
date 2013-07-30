@@ -100,6 +100,8 @@ namespace synthese
 		const string TimetableBuildService::ATTR_TIME = "time";
 		const string TimetableBuildService::TAG_SERVICE = "service";
 		const string TimetableBuildService::ATTR_ID = "id";
+		const string TimetableBuildService::ATTR_COMPRESSION_RANK = "compression_rank";
+		const string TimetableBuildService::ATTR_COMPRESSION_REPEATED = "compression_repeated";
 
 
 
@@ -583,6 +585,7 @@ namespace synthese
 								row,
 								times,
 								services,
+								result.getColumns(),
 								true,
 								depth
 							);
@@ -615,6 +618,7 @@ namespace synthese
 							row,
 							times,
 							services,
+							result.getColumns(),
 							false,
 							0
 						);
@@ -652,6 +656,7 @@ namespace synthese
 								row,
 								times,
 								services,
+								result.getColumns(),
 								false,
 								depth
 							);
@@ -696,6 +701,7 @@ namespace synthese
 			const TimetableRow& place,
 			const TimetableResult::RowTimesVector& times,
 			const TimetableResult::RowServicesVector& services,
+			const TimetableResult::Columns& columns,
 			bool isBeforeTransfer,
 			std::size_t depth
 		) const {
@@ -742,6 +748,13 @@ namespace synthese
 					boost::shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
 					duration.first->toParametersMap(*stopPointPM, false);
 					cellPM->insert(TAG_STOP_POINT, stopPointPM);
+				}
+
+				// Compression
+				if(columns.at(rank).isCompression())
+				{
+					cellPM->insert(ATTR_COMPRESSION_RANK, columns.at(rank).getCompressionRank());
+					cellPM->insert(ATTR_COMPRESSION_REPEATED, columns.at(rank).getCompressionRepeated());
 				}
 
 				// Link to the main parameters map
