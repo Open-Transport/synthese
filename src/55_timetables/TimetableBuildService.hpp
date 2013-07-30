@@ -95,6 +95,8 @@ namespace synthese
 			static const std::string ATTR_TIME;
 			static const std::string TAG_SERVICE;
 			static const std::string ATTR_ID;
+			static const std::string ATTR_COMPRESSION_RANK;
+			static const std::string ATTR_COMPRESSION_REPEATED;
 
 		protected:
 			//! \name Page parameters
@@ -212,6 +214,7 @@ namespace synthese
 				const TimetableRow& place,
 				const TimetableResult::RowTimesVector& times,
 				const TimetableResult::RowServicesVector& services,
+				const TimetableResult::Columns& columns,
 				bool isBeforeTransfer,
 				std::size_t depth
 			) const;
