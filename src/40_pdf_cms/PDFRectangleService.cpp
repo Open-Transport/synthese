@@ -122,7 +122,9 @@ namespace synthese
 				_x1,
 				_y1,
 				_x2,
-				_y2
+				_y2,
+				_color || _width,
+				_backgroundColor
 			);
 
 
