@@ -124,6 +124,7 @@ namespace synthese
 			HPDF_REAL x,
 			HPDF_REAL y
 		){
+			HPDF_Page_SetTextRenderingMode (_curPage, HPDF_FILL);
 			HPDF_Page_BeginText(_curPage);
 			HPDF_Page_SetFontAndSize(_curPage, _curFont, _curTextSize);
 			HPDF_Page_TextOut(_curPage, x, y, text.c_str());
@@ -335,9 +336,27 @@ namespace synthese
 
 
 
-		void PDF::drawRectangle( HPDF_REAL x1, HPDF_REAL y1, HPDF_REAL x2, HPDF_REAL y2 )
-		{
+		void PDF::drawRectangle(
+			HPDF_REAL x1,
+			HPDF_REAL y1,
+			HPDF_REAL x2,
+			HPDF_REAL y2,
+			bool stroke,
+			bool fill
+		){
 			HPDF_Page_Rectangle(_curPage, x1, y1, x2, y2);
+			if(stroke && fill)
+			{
+				HPDF_Page_FillStroke(_curPage);
+			}
+			else if(stroke)
+			{
+				HPDF_Page_Stroke(_curPage);
+			}
+			else if(fill)
+			{
+				HPDF_Page_Fill(_curPage);
+			}
 		}
 
 

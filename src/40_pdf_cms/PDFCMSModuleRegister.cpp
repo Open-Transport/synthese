@@ -6,6 +6,8 @@
 #include "PDFImageService.hpp"
 #include "PDFOpenService.hpp"
 #include "PDFTextService.hpp"
+#include "PDFLineService.hpp"
+#include "PDFRectangleService.hpp"
 
 #include "PDFCMSModule.inc.cpp"
 
@@ -18,4 +20,6 @@ void synthese::pdf_cms::moduleRegister()
 	synthese::pdf_cms::PDFImageService::integrate();
 	synthese::pdf_cms::PDFOpenService::integrate();
 	synthese::pdf_cms::PDFTextService::integrate();
+	synthese::pdf_cms::PDFLineService::integrate();
+	synthese::pdf_cms::PDFRectangleService::integrate();
 }

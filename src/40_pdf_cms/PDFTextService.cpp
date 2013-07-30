@@ -110,7 +110,7 @@ namespace synthese
 			// Change the color
 			if(_color)
 			{
-				pdf.setStrokeColor(
+				pdf.setFillColor(
 					PDF::RGBColor(*_color)
 				);
 			}
