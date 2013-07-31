@@ -92,13 +92,16 @@ namespace synthese
 				throw ActionException("No such timetable");
 			}
 
-			try
+			if(map.getDefault<RegistryKeyType>(PARAMETER_TRANSFER_TIMETABLE_ID, 0))
 			{
-				_transferTimetable = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TRANSFER_TIMETABLE_ID), *_env);
-			}
-			catch(ObjectNotFoundException<Timetable>&)
-			{
-				throw ActionException("No such transfer timetable");
+				try
+				{
+					_transferTimetable = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TRANSFER_TIMETABLE_ID), *_env);
+				}
+				catch(ObjectNotFoundException<Timetable>&)
+				{
+					throw ActionException("No such transfer timetable");
+				}
 			}
 		}
 
