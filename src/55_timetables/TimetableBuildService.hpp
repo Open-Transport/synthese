@@ -95,6 +95,8 @@ namespace synthese
 			static const std::string ATTR_TIME;
 			static const std::string TAG_SERVICE;
 			static const std::string ATTR_ID;
+
+			static const std::string TAG_COMPRESSION_CELL;
 			static const std::string ATTR_COMPRESSION_RANK;
 			static const std::string ATTR_COMPRESSION_REPEATED;
 
@@ -216,7 +218,17 @@ namespace synthese
 				const TimetableResult::RowServicesVector& services,
 				const TimetableResult::Columns& columns,
 				bool isBeforeTransfer,
-				std::size_t depth
+				size_t depth
+			) const;
+
+
+
+			boost::shared_ptr<util::ParametersMap> _outputCell(
+				const TimetableResult::RowTimesVector& times,
+				const TimetableResult::RowServicesVector& services,
+				const TimetableResult::Columns& columns,
+				size_t rank,
+				bool extractCompression
 			) const;
 		};
 }	}

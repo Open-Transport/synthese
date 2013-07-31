@@ -103,6 +103,7 @@ namespace synthese
 		const string TimetableBuildService::ATTR_COMPRESSION_RANK = "compression_rank";
 		const string TimetableBuildService::ATTR_COMPRESSION_REPEATED = "compression_repeated";
 
+		const string TimetableBuildService::TAG_COMPRESSION_CELL = "compression_cell";
 
 
 		TimetableBuildService::TimetableBuildService():
@@ -722,53 +723,90 @@ namespace synthese
 			}
 
 			// Loop on cells
-			size_t rank(0);
-			BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& duration, times)
+			for(size_t rank(0); rank < times.size(); ++rank)
 			{
-				// New parameters map
-				boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
-
-				// Time
-				if(!duration.second.is_not_a_date_time())
-				{ 
-					cellPM->insert(ATTR_TIME, duration.second);
-				}
-
-				// Service ID
-				BOOST_FOREACH(const TimetableColumn::Services::value_type& service, services.at(rank))
-				{
-					boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
-					servicePM->insert(ATTR_ID, service->getKey());
-					cellPM->insert(TAG_SERVICE, servicePM);
-				}
-
-				// Stop point
-				if(duration.first)
-				{
-					boost::shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
-					duration.first->toParametersMap(*stopPointPM, false);
-					cellPM->insert(TAG_STOP_POINT, stopPointPM);
-				}
-
-				// Compression
-				if(columns.at(rank).isCompression())
-				{
-					cellPM->insert(ATTR_COMPRESSION_RANK, columns.at(rank).getCompressionRank());
-					cellPM->insert(ATTR_COMPRESSION_REPEATED, columns.at(rank).getCompressionRepeated());
-				}
-
 				// Link to the main parameters map
-				pm.insert(TAG_CELL, cellPM);
-
-				++rank;
+				pm.insert(
+					TAG_CELL,
+					_outputCell(
+						times,
+						services,
+						columns,
+						rank,
+						true
+				)	);
 			}
 		}
 
 
 
+		boost::shared_ptr<ParametersMap> TimetableBuildService::_outputCell(
+			const TimetableResult::RowTimesVector& times,
+			const TimetableResult::RowServicesVector& services,
+			const TimetableResult::Columns& columns,
+			size_t rank,
+			bool extractCompression
+		) const	{
+			// New parameters map
+			boost::shared_ptr<ParametersMap> cellPM(new ParametersMap);
 
+			const TimetableResult::RowTimesVector::value_type& duration(
+				times.at(rank)
+			);
 
+			// Time
+			if(!duration.second.is_not_a_date_time())
+			{ 
+				cellPM->insert(ATTR_TIME, duration.second);
+			}
 
+			// Service ID
+			BOOST_FOREACH(const TimetableColumn::Services::value_type& service, services.at(rank))
+			{
+				boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
+				servicePM->insert(ATTR_ID, service->getKey());
+				cellPM->insert(TAG_SERVICE, servicePM);
+			}
+
+			// Stop point
+			if(duration.first)
+			{
+				boost::shared_ptr<ParametersMap> stopPointPM(new ParametersMap);
+				duration.first->toParametersMap(*stopPointPM, false);
+				cellPM->insert(TAG_STOP_POINT, stopPointPM);
+			}
+
+			// Compression
+			if(columns.at(rank).isCompression())
+			{
+				cellPM->insert(ATTR_COMPRESSION_RANK, columns.at(rank).getCompressionRank());
+				cellPM->insert(ATTR_COMPRESSION_REPEATED, columns.at(rank).getCompressionRepeated());
+
+				// Insert following cells which are integrated to the compression
+				if(extractCompression)
+				{
+					for(size_t compressionRank(rank); 
+						(	compressionRank<columns.size() &&
+							columns.at(compressionRank).isCompression() &&
+							columns.at(compressionRank).getCompressionRank()
+						);
+						++compressionRank
+					){
+						cellPM->insert(
+							TAG_COMPRESSION_CELL,
+							_outputCell(
+								times,
+								services,
+								columns,
+								compressionRank,
+								false
+						)	);
+					}
+				}
+			}
+
+			return cellPM;
+		}
 
 
 
