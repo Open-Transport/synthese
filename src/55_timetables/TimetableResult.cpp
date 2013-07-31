@@ -185,7 +185,16 @@ namespace synthese
 
 		TimetableResult TimetableResult::copy() const
 		{
-			return TimetableResult(_warnings);
+			TimetableResult result(_warnings);
+			if(_beforeTransfers.get())
+			{
+				result._beforeTransfers.reset(new TimetableResult(_beforeTransfers->_warnings));
+			}
+			if(_afterTransfers.get())
+			{
+				result._afterTransfers.reset(new TimetableResult(_afterTransfers->_warnings));
+			}
+			return result;
 		}
 
 
