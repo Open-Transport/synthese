@@ -116,10 +116,10 @@ namespace synthese
 			item.set<TimetableRowGroup>(*_rowGroup);
 
 			DBTransaction transaction;
-
 			item.beforeCreate(transaction);
+			TimetableRowGroupItemTableSync::Save(&item, transaction);
 
-			TimetableRowGroupItemTableSync::Save(&item);
+			transaction.run();
 
 			if(request.getActionWillCreateObject())
 			{
