@@ -1,4 +1,4 @@
-
+﻿
 /** OnlineReservationRule class implementation.
 	@file OnlineReservationRule.cpp
 
@@ -91,7 +91,7 @@ namespace synthese
 
 		const std::string OnlineReservationRule::TYPE_SUBJECT("subject");
 		const std::string OnlineReservationRule::TYPE_CONTENT("content");
-		const std::string OnlineReservationRule::TYPE_UNCHANGED_PASSWORD("Mot de passe inchang�");
+		const std::string OnlineReservationRule::TYPE_UNCHANGED_PASSWORD("Mot de passe inchangé");
 
 		OnlineReservationRule::OnlineReservationRule(
 			RegistryKeyType key
