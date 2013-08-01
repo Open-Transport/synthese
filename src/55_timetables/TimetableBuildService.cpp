@@ -788,7 +788,7 @@ namespace synthese
 					for(size_t compressionRank(rank); 
 						(	compressionRank<columns.size() &&
 							columns.at(compressionRank).isCompression() &&
-							columns.at(compressionRank).getCompressionRank()
+							(compressionRank == rank || columns.at(compressionRank).getCompressionRank())
 						);
 						++compressionRank
 					){

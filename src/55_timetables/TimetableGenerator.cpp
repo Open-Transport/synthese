@@ -219,7 +219,7 @@ namespace synthese
 
 								departureOK = true;
 								if(	firstIsForbidden != edges.end() &&
-									!forbiddenEdgeBefore
+									forbiddenEdgeBefore
 								){
 									return false;
 								}
@@ -259,6 +259,7 @@ namespace synthese
 				{
 					result = false;
 					const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
+					const Edge* firstIsForbidden(NULL);
 
 					for (++itRowGroup; itRowGroup != _rowGroups.end(); ++itRowGroup)
 					{
@@ -275,18 +276,38 @@ namespace synthese
 						bool arrivalOK(false);
 						BOOST_FOREACH(const TimetableRowGroupItem* item, rowGroup.getItems())
 						{
+							bool forbiddenEdgeBefore(!firstIsForbidden);
 							for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
 								arrivalLinestop != NULL;
 								arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 							){
+								if(firstIsForbidden && arrivalLinestop == firstIsForbidden)
+								{
+									forbiddenEdgeBefore = true;
+								}
+
 								if(	dynamic_cast<const StopArea*>(arrivalLinestop->getFromVertex()->getHub()) == &(*item->get<StopArea>())
 								){
+									// Avoid first is forbidden rows
+									if(!arrivalOK &&
+										rowGroup.get<TimetableRowRule>() == FirstIsForbidden
+									){
+										firstIsForbidden = arrivalLinestop;
+										break;
+									}
+
+									if(	firstIsForbidden &&
+										forbiddenEdgeBefore
+									){
+										return false;
+									}
+
 									arrivalOK = true;
 									break;
 								}
 							}
 
-							if (arrivalOK)
+							if (arrivalOK || firstIsForbidden)
 							{
 								break;
 							}
