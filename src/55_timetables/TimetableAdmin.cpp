@@ -554,29 +554,64 @@ namespace synthese
 
 							// Arrival
 							stream << t.col(1, string(), true);
-							if(rowGroup->get<IsArrival>())
-							{
-								stream << "A";
-							}
-							else
-							{
-								stream << "-";
-							}
+							rowGroupUpdateRequest.getAction()->set<IsArrival>(
+								!rowGroup->get<IsArrival>()
+							);
+							stream << HTMLModule::getHTMLLink(
+								rowGroupUpdateRequest.getURL(),
+								rowGroup->get<IsArrival>() ? "A" : "-"
+							);
+							rowGroupUpdateRequest.getAction()->set<IsArrival>(
+								rowGroup->get<IsArrival>()
+							);
 
 							// Departure
 							stream << t.col(1, string(), true);
-							if(rowGroup->get<IsDeparture>())
-							{
-								stream << "D";
-							}
-							else
-							{
-								stream << "-";
-							}
+							rowGroupUpdateRequest.getAction()->set<IsDeparture>(
+								!rowGroup->get<IsDeparture>()
+							);
+							stream << HTMLModule::getHTMLLink(
+								rowGroupUpdateRequest.getURL(),
+								rowGroup->get<IsDeparture>() ? "D" : "-"
+							);
+							rowGroupUpdateRequest.getAction()->set<IsDeparture>(
+								rowGroup->get<IsDeparture>()
+							);
 
 							// Rule
 							stream << t.col(1, string(), true);
-							stream << rowGroup->get<TimetableRowRule>();
+							TimetableRowRule::Type val(rowGroup->get<TimetableRowRule>());
+							string label;
+							switch(val)
+							{
+							case FirstIsForbidden:
+								val = NeutralRow;
+								label = "Interdit si en premier";
+								break;
+
+							case NeutralRow:
+								val = NecessaryRow;
+								label = "Neutre";
+								break;
+
+							case NecessaryRow:
+								val = SufficientRow;
+								label = "Nécessaire";
+								break;
+
+							case SufficientRow:
+								val = FirstIsForbidden;
+								label = "Suffisant";
+								break;
+							}
+							rowGroupUpdateRequest.getAction()->set<TimetableRowRule>(val);
+							stream << HTMLModule::getHTMLLink(
+								rowGroupUpdateRequest.getURL(),
+								label
+							);
+							rowGroupUpdateRequest.getAction()->set<TimetableRowRule>(
+								rowGroup->get<TimetableRowRule>()
+							);
 
 							// Sorting
 							stream << t.col(1, string(), true);
@@ -598,7 +633,7 @@ namespace synthese
 
 							// Removal
 							stream << t.col(1, string(), true);
-							if(rowGroup->getItems().empty())
+							if(rowGroup->getItems().empty	())
 							{
 								removeRequest.getAction()->setObjectId(rowGroup->getKey());
 								stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le groupe ?");
@@ -606,7 +641,19 @@ namespace synthese
 
 							//////////////////////////////////////////////////////////////////////////
 							// Items
+							stream << t.row();
+							stream << t.col(8);
+
 							size_t itemRank(0);
+							rowGroupItemCreationRequest.getAction()->setRowGroup(Env::GetOfficialEnv().getEditableSPtr(rowGroup));
+							HTMLForm f(
+								rowGroupItemCreationRequest.getHTMLForm(
+									"addItem"+ lexical_cast<string>(rowGroup->get<Rank>())
+								)
+							);
+							stream << f.open();
+							HTMLTable t2;
+							stream << t2.open();
 							BOOST_FOREACH(const TimetableRowGroup::Items::value_type& item, rowGroup->getItems())
 							{
 								itemRank = item->get<Rank>();
@@ -627,117 +674,75 @@ namespace synthese
 								}
 
 								// New row
-								stream << t.row();
+								stream << t2.row();
 
 								// Row group
-								stream << t.col();
+								stream << t2.col();
 								stream << rowGroup->get<Rank>();
 
 								// Place
-								stream << t.col();
+								stream << t2.col();
 								stream << item->get<StopArea>()->getFullName();
 
-								// Arrival
-								stream << t.col();
-								if(rowGroup->get<IsArrival>())
-								{
-									stream << "A";
-								}
-								else
-								{
-									stream << "-";
-								}
-
-								// Departure
-								stream << t.col();
-								if(rowGroup->get<IsDeparture>())
-								{
-									stream << "D";
-								}
-								else
-								{
-									stream << "-";
-								}
-
-								// Rule
-								stream << t.col();
-								stream << rowGroup->get<TimetableRowRule>();
-
 								// Sorting
-								stream << t.col();
+								stream << t2.col();
 								if(!rowGroup->get<AutoRowsOrder>())
 								{
 									stream << item->get<Rank>();
 								}
 
 								// Insertion
-								stream << t.col();
+								stream << t2.col();
+								stream << f.getRadioInput(
+									TimetableRowGroupItemAddAction::PARAMETER_RANK,
+									optional<size_t>(item->get<Rank>()),
+									optional<size_t>(),
+									string(),
+									false,
+									string()
+								); 
 
 								// Removal
-								stream << t.col();
+								stream << t2.col();
 								removeRequest.getAction()->setObjectId(item->get<Key>());
 								stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le groupe ?");
 							}
 
 							//////////////////////////////////////////////////////////////////////////
 							// New item at the end
-							stream << t.row();
+							stream << t2.row();
 
 							// New row
-							stream << t.row();
+							stream << t2.row();
 
 							// Row group
-							stream << t.col();
+							stream << t2.col();
 							stream << rowGroup->get<Rank>();
 
 							// Place
-							stream << t.col();
-							rowGroupItemCreationRequest.getAction()->setRank(itemRank + 1);
-							rowGroupItemCreationRequest.getAction()->setRowGroup(Env::GetOfficialEnv().getEditableSPtr(rowGroup));
-							HTMLForm f(
-								rowGroupItemCreationRequest.getHTMLForm(
-									"addItem"+ lexical_cast<string>(rowGroup->get<Rank>())
-								)
-							);
-							stream << f.open();
+							stream << t2.col();
 							stream << f.getTextInput(TimetableRowGroupItemAddAction::PARAMETER_PLACE_NAME, string());
 							stream << f.getSubmitButton("Insérer");
-							stream << f.close();
-
-							// Arrival
-							stream << t.col();
-							if(rowGroup->get<IsArrival>())
-							{
-								stream << "A";
-							}
-							else
-							{
-								stream << "-";
-							}
-
-							// Departure
-							stream << t.col();
-							if(rowGroup->get<IsDeparture>())
-							{
-								stream << "D";
-							}
-							else
-							{
-								stream << "-";
-							}
-
-							// Rule
-							stream << t.col();
-							stream << rowGroup->get<TimetableRowRule>();
 
 							// Sorting
-							stream << t.col();
+							stream << t2.col();
 
 							// Insertion
-							stream << t.col();
+							stream << t2.col();
+							stream << f.getRadioInput(
+								TimetableRowGroupItemAddAction::PARAMETER_RANK,
+								optional<size_t>(itemRank+1),
+								optional<size_t>(itemRank+1),
+								string(),
+								false,
+								string()
+							); 
 							
 							// Removal
-							stream << t.col();
+							stream << t2.col();
+
+							stream << t2.close();
+							stream << f.close();
 							
 						}
 
