@@ -42,7 +42,8 @@ namespace synthese
 		{
 			NeutralRow = 0,
 			NecessaryRow = 1,
-			SufficientRow = 2
+			SufficientRow = 2,
+			FirstIsForbidden = 3
 		};
 
 		FIELD_BOOL(IsDeparture)

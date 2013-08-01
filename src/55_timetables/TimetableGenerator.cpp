@@ -78,7 +78,7 @@ namespace synthese
 			bool result(false);
 			bool passageOk(false);
 			Path::Edges::const_iterator itEdge;
-			const Path::Edges& edges(journeyPattern.getEdges());
+			const Path::Edges& edges(journeyPattern.getAllEdges());
 
 			// JourneyPattern is authorized according to :
 			//  - authorized lines
@@ -178,6 +178,7 @@ namespace synthese
 				// A1: JourneyPattern selection : there must be at least a departure stop of the line in the departures rows
 				bool departureOK(false);
 				RowGroups::const_iterator itRowGroup;
+				Path::Edges::const_iterator firstIsForbidden(edges.end());
 				for(itRowGroup = _rowGroups.begin(); itRowGroup != _rowGroups.end(); ++itRowGroup)
 				{
 					const TimetableRowGroup& rowGroup(**itRowGroup);
@@ -192,8 +193,14 @@ namespace synthese
 					// Search for a matching edge / row pair
 					BOOST_FOREACH(const TimetableRowGroupItem* item, rowGroup.getItems())
 					{
+						bool forbiddenEdgeBefore(firstIsForbidden == edges.end());
 						for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 						{
+							if(firstIsForbidden != edges.end() && itEdge == firstIsForbidden)
+							{
+								forbiddenEdgeBefore = true;
+							}
+
 							if(	(*itEdge)->isDeparture() &&
 								(itEdge+1) != edges.end() &&
 								(*itEdge)->getHub() &&
@@ -202,22 +209,37 @@ namespace synthese
 									_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
 								)
 							){
+								// Avoid first is forbidden rows
+								if(!departureOK &&
+									rowGroup.get<TimetableRowRule>() == FirstIsForbidden
+								){
+									firstIsForbidden = itEdge;
+									break;
+								}
+
 								departureOK = true;
+								if(	firstIsForbidden != edges.end() &&
+									!forbiddenEdgeBefore
+								){
+									return false;
+								}
+
+								firstIsForbidden = edges.end();
 								if(rowGroup.get<TimetableRowRule>() == SufficientRow)
 								{
-									result = true;
+									return true;
 								}
 								break;
 							}
 						}
 
-						if(departureOK)
+						if(departureOK || firstIsForbidden != edges.end())
 						{
 							break;
 						}
 					}
 
-					if (result || departureOK)
+					if (departureOK)
 					{
 						break;
 					}
@@ -227,10 +249,6 @@ namespace synthese
 				if(!departureOK)
 				{
 					return false;
-				}
-				if(result)
-				{
-					return true;
 				}
 
 
