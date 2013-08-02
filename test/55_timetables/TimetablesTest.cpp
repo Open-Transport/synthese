@@ -578,6 +578,64 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	SAVE(ScheduledService, ss07);
 	li92->addService(ss07, true);
 
+
+	ScheduledService ss08(45035996273705058ULL, "8", li92.get());
+	{
+		ScheduledService::Schedules a;
+		ScheduledService::Schedules d;
+		a.push_back(time_duration(0,0,0));
+		d.push_back(time_duration(10,30,0));
+
+		a.push_back(time_duration(10,35,0));
+		d.push_back(time_duration(10,35,0));
+
+		a.push_back(time_duration(10,40,0));
+		d.push_back(time_duration(10,39,0));
+
+		a.push_back(time_duration(10,45,0));
+		d.push_back(time_duration(10,44,0));
+
+		a.push_back(time_duration(10,50,0));
+		d.push_back(time_duration(0,0,0));
+
+		ss08.setSchedules(d,a, true);
+	}
+	ss08.setActive(day_clock::local_day());
+	ss08.setActive(day_clock::local_day() + days(1));
+	ss08.setActive(day_clock::local_day() + days(2));
+	SAVE(ScheduledService, ss08);
+	li92->addService(ss08, true);
+
+
+	ScheduledService ss09(45035996273705059ULL, "9", li92.get());
+	{
+		ScheduledService::Schedules a;
+		ScheduledService::Schedules d;
+		a.push_back(time_duration(0,0,0));
+		d.push_back(time_duration(11,0,0));
+
+		a.push_back(time_duration(11,5,0));
+		d.push_back(time_duration(11,5,0));
+
+		a.push_back(time_duration(11,10,0));
+		d.push_back(time_duration(11,9,0));
+
+		a.push_back(time_duration(11,15,0));
+		d.push_back(time_duration(11,14,0));
+
+		a.push_back(time_duration(11,20,0));
+		d.push_back(time_duration(0,0,0));
+
+		ss09.setSchedules(d,a, true);
+	}
+	ss09.setActive(day_clock::local_day());
+	ss09.setActive(day_clock::local_day() + days(1));
+	ss09.setActive(day_clock::local_day() + days(2));
+	SAVE(ScheduledService, ss09);
+	li92->addService(ss09, true);
+	ss.push_back(&ss09);
+
+
 	{
 		std::auto_ptr<TimetableGenerator> generator(
 			tt1.getGenerator(
@@ -599,7 +657,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 			if(column.isCompression())
 			{
 				BOOST_CHECK_EQUAL(column.getCompressionRank(), 0);
-				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 2);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 3);
 			}
 			for(size_t i(0); i<column.getContent().size(); ++i)
 			{
@@ -616,7 +674,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 			if(column.isCompression())
 			{
 				BOOST_CHECK_EQUAL(column.getCompressionRank(), 1);
-				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 2);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 3);
 			}
 			for(size_t i(0); i<column.getContent().size(); ++i)
 			{
@@ -634,7 +692,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 			{
 				BOOST_CHECK_EQUAL(
 					to_simple_string(column.getContent().at(i).second),
-					to_simple_string(i+1 == column.getContent().size() ? ss04.getArrivalSchedule(false, i) : ss04.getDepartureSchedule(false, i))
+					to_simple_string(i+1 == column.getContent().size() ? ss09.getArrivalSchedule(false, i) : ss09.getDepartureSchedule(false, i))
 				);
 			}
 		}
