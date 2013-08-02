@@ -662,14 +662,12 @@ namespace synthese
 								}
 								else
 								{
-									--itCol;
 									lastColSet = make_pair(allColumns.end(), allColumns.end());
 									break;
 								}
 							}
 							else
 							{
-								--itCol;
 								lastColSet = make_pair(allColumns.end(), allColumns.end());
 								break;
 							}
@@ -686,7 +684,7 @@ namespace synthese
 									repeats
 								);
 							}
-							itCol += (repeats * sequence.size());
+							itCol += (repeats * sequence.size() - 1);
 						}
 					
 						if(itCol == allColumns.end())
