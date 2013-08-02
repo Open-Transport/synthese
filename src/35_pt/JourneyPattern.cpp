@@ -57,6 +57,11 @@ namespace synthese
 
 	namespace pt
 	{
+		const string JourneyPattern::ATTR_DIRECTION_TEXT = "direction_text";
+		const string JourneyPattern::ATTR_ID = "id";
+
+
+
 		JourneyPattern::JourneyPattern(
 			util::RegistryKeyType id,
 			std::string name
@@ -448,6 +453,18 @@ namespace synthese
 			}
 
 			return true;
+		}
+
+
+
+		void JourneyPattern::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
+			std::string prefix /*= std::string() */
+		) const	{
+			pm.insert(ATTR_ID, getKey());
+			pm.insert(ATTR_DIRECTION_TEXT, _direction);
 		}
 
 
