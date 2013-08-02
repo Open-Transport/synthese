@@ -675,8 +675,8 @@ namespace synthese
 							}
 						}
 
-						// If at least 2 repeats, then cut the result
-						if(repeats >= 2)
+						// If at least 4 repeats, then cut the result
+						if(repeats >= 4)
 						{
 							size_t compressionRank(0);
 							BOOST_FOREACH(size_t colRank, sequence)
