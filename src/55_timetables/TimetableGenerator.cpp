@@ -687,7 +687,7 @@ namespace synthese
 						else
 						{
 							lastColSet = make_pair(allColumns.end(), allColumns.end());
-							newResult.getColumns().push_back(*itCol);
+							--itCol;
 						}
 					
 						if(itCol == allColumns.end())
