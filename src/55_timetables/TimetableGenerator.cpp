@@ -630,25 +630,24 @@ namespace synthese
 
 						// We are in the next col set : search for repeated sequence
 						size_t repeats(0);
-						TimetableResult::Columns::const_iterator itCurCol(itCol);
-
+						TimetableResult::Columns::const_iterator itColStart(itCol);
 						for(time_duration delta(hours(1)); ; delta += hours(1))
 						{
 							// The next sequence
 							TimetableResult::Columns::const_iterator seqEnd(allColumns.end());
-							for(TimetableResult::Columns::const_iterator itCol2(itCol); itCol2 != allColumns.end() && itCol2->getHour() == nextHour; ++itCol2)
+							for(TimetableResult::Columns::const_iterator itCol2(itColStart); itCol2 != allColumns.end() && itCol2->getHour() == nextHour; ++itCol2)
 							{
 								seqEnd = itCol2;
 							}
 
 							// Comparison of the sequence
 							if(	seqEnd != allColumns.end() &&
-								seqEnd - itCol == lastColSet.second - lastColSet.first
+								seqEnd - itColStart == lastColSet.second - lastColSet.first
 							){
 								bool ok(true);
-								for(size_t curSetColRank(0); curSetColRank<=seqEnd - itCol; ++curSetColRank)
+								for(size_t curSetColRank(0); curSetColRank<=seqEnd - itColStart; ++curSetColRank)
 								{
-									if(	!(itCol+curSetColRank)->isLike(*(lastColSet.first + curSetColRank), delta)
+									if(	!(itColStart+curSetColRank)->isLike(*(lastColSet.first + curSetColRank), delta)
 									){
 										ok = false;
 										break;
@@ -657,6 +656,7 @@ namespace synthese
 
 								if(ok)
 								{
+									itColStart = seqEnd + 1;
 									++repeats;
 									++nextHour;
 								}
