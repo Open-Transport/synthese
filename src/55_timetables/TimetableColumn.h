@@ -95,6 +95,7 @@ namespace synthese
 			static const std::string ATTR_COMPRESSION_RANK;
 			static const std::string ATTR_COMPRESSION_REPEATED;
 			static const std::string TAG_JOURNEY_PATTERN;
+			static const std::string TAG_COMPRESSION_CELL;
 
 		public:
 			// Constructor
@@ -122,7 +123,9 @@ namespace synthese
 				/// @param withSchedules export the schedules in sub parameters maps
 				void toParametersMap(
 					util::ParametersMap& pm,
-					bool withSchedules
+					bool withSchedules,
+					boost::optional<const std::vector<TimetableColumn>&> resultForCompressionOutput,
+					size_t rank
 				) const;
 
 

@@ -668,12 +668,15 @@ namespace synthese
 				}
 
 				// Columns
+				size_t rank(0);
 				BOOST_FOREACH(const TimetableResult::Columns::value_type& col, result.getColumns())
 				{
 					boost::shared_ptr<ParametersMap> colPM(new ParametersMap);
 					col.toParametersMap(
 						*colPM,
-						object.getContentType() == Timetable::TABLE_SERVICES_IN_ROWS
+						object.getContentType() == Timetable::TABLE_SERVICES_IN_ROWS,
+						result.getColumns(),
+						rank++
 					);
 					pm.insert(TAG_COL, colPM);
 				}

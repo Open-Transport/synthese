@@ -60,6 +60,10 @@ namespace synthese
 		const string TimetableColumn::TAG_STOP_POINT = "stop_point";
 		const string TimetableColumn::TAG_CELL = "cell";
 		const string TimetableColumn::TAG_JOURNEY_PATTERN = "journey_pattern";
+		const string TimetableColumn::TAG_COMPRESSION_CELL = "compression_cell";
+		const string TimetableColumn::ATTR_COMPRESSION_RANK = "compression_rank";
+		const string TimetableColumn::ATTR_COMPRESSION_REPEATED = "compression_repeated";
+		const string TimetableColumn::ATTR_IS_COMPRESSION = "is_compression";
 
 
 
@@ -528,7 +532,9 @@ namespace synthese
 
 		void TimetableColumn::toParametersMap(
 			ParametersMap& pm,
-			bool withSchedules
+			bool withSchedules,
+			boost::optional<const std::vector<TimetableColumn>&> resultForCompressionOutput,
+			size_t rank
 		) const	{
 
 			// Note
@@ -609,6 +615,36 @@ namespace synthese
 
 					pm.insert(TAG_CELL, cellPM);
 				}
+			}
+
+			// Compression
+			pm.insert(ATTR_IS_COMPRESSION, isCompression());
+			if(isCompression())
+			{
+				pm.insert(ATTR_COMPRESSION_RANK, _compressionRank);
+				pm.insert(ATTR_COMPRESSION_REPEATED, _compressionRepeated);
+
+				// Insert following cells which are integrated to the compression
+				if(resultForCompressionOutput)
+				{
+					for(size_t compressionRank(rank);
+						(	compressionRank<resultForCompressionOutput->size() &&
+							resultForCompressionOutput->at(compressionRank).isCompression() &&
+							(compressionRank == rank || resultForCompressionOutput->at(compressionRank).getCompressionRank())
+						);
+						++compressionRank
+					){
+						boost::shared_ptr<ParametersMap> colPM(new ParametersMap);
+						resultForCompressionOutput->at(compressionRank).toParametersMap(
+							*colPM,
+							withSchedules,
+							boost::optional<const TimetableResult::Columns&>(),
+							compressionRank
+						);
+						pm.insert(TAG_COMPRESSION_CELL, colPM);
+					}
+				}
+
 			}
 		}
 
