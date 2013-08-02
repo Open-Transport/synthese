@@ -372,8 +372,8 @@ namespace synthese
 			typedef int CalendarId;
 			typedef unordered_map<CalendarId, Calendar> CalendarMap;
 			struct ServiceKey;
-			typedef unordered_map<ServiceKey, CalendarId> ServiceToCalendarIdMap;
-			typedef unordered_map<ServiceKey, Calendar> ServiceToCalendarMap;
+			typedef unordered_multimap<ServiceKey, CalendarId> ServiceToCalendarIdMap;
+			typedef unordered_multimap<ServiceKey, Calendar> ServiceToCalendarMap;
 
 			struct ServiceKey
 			{
@@ -807,7 +807,7 @@ namespace synthese
 				ServiceKey serviceKey(
 					parser.getCell("CS_COD_ITINERAIR"), parser.getCell("CS_DAT_DEBVALID"),
 					parser.getCellInt("CS_COD_SERVICE"));
-				serviceToCalendarId[serviceKey] = parser.getCellInt("CS_CALENDRIER");
+				serviceToCalendarId.insert(make_pair(serviceKey, parser.getCellInt("CS_CALENDRIER")));
 			}
 
 			ServiceToCalendarMap serviceToCalendar;
@@ -819,58 +819,78 @@ namespace synthese
 					parser.getCell("SER_COD_ITINERAIR"), parser.getCell("SER_DAT_ITINERAIR"),
 					parser.getCellInt("SER_COD_SERVICE"));
 
-				if(serviceToCalendarId.find(serviceKey) == serviceToCalendarId.end())
+				// Looking for calendars
+				bool noCalendarFound(true);
+				BOOST_FOREACH(const ServiceToCalendarIdMap::value_type& calendarId, serviceToCalendarId)
 				{
-					continue;
-				}
-				CalendarId calendarId = serviceToCalendarId[serviceKey];
-				if(calendars.find(calendarId) == calendars.end())
-				{
-					continue;
-				}
-
-				Calendar cal = calendars[calendarId];
-
-				// Week starts on Monday
-				string runningDaysString = parser.getCell("SER_JOU_FONCT");
-				// Week starts on Sunday
-				bool runningDays[7];
-
-				for(int i = 0; i <= 5; i++)
-				{
-					runningDays[i + 1] = runningDaysString[i] != '-';
-				}
-				runningDays[0] = runningDaysString[6] != '-';
-
-				if(cal.empty())
-				{
-					_logWarning(
-						"Calendar id: "+ lexical_cast<string>(calendarId) +" from service "+ lexical_cast<string>(serviceKey) +" is empty"
-					);
-					continue;
-				}
-
-				if(cal.getFirstActiveDate() > cal.getLastActiveDate())
-				{
-					_logWarning(
-						"Calendar id: "+ lexical_cast<string>(calendarId) +" from service "+ lexical_cast<string>(serviceKey) +
-							" has a last active date ("+ lexical_cast<string>(cal.getLastActiveDate()) +
-							") lower than its first active date ("+ lexical_cast<string>(cal.getFirstActiveDate()) +
-							")"
-					);
-					continue;
-				}
-				assert(cal.getFirstActiveDate() <= cal.getLastActiveDate());
-
-				date lastActiveDate(cal.getLastActiveDate());
-				for(date d(cal.getFirstActiveDate()); d <= lastActiveDate; d += days(1))
-				{
-					if(!runningDays[d.day_of_week()])
+					if (calendarId.first == serviceKey)
 					{
-						cal.setInactive(d);
+						noCalendarFound = false;
+						break;
 					}
 				}
-				serviceToCalendar[serviceKey] = cal;
+				
+				if(noCalendarFound)
+				{
+					continue;
+				}
+
+				// Loop on each calendar of the service
+				BOOST_FOREACH(const ServiceToCalendarIdMap::value_type& calendarId, serviceToCalendarId)
+				{
+					if (!(calendarId.first == serviceKey))
+					{
+						continue;
+					}
+
+					if(calendars.find(calendarId.second) == calendars.end())
+					{
+						continue;
+					}
+
+					Calendar cal = calendars[calendarId.second];
+
+					// Week starts on Monday
+					string runningDaysString = parser.getCell("SER_JOU_FONCT");
+					// Week starts on Sunday
+					bool runningDays[7];
+
+					for(int i = 0; i <= 5; i++)
+					{
+						runningDays[i + 1] = runningDaysString[i] != '-';
+					}
+					runningDays[0] = runningDaysString[6] != '-';
+
+					if(cal.empty())
+					{
+						_logWarning(
+							"Calendar id: "+ lexical_cast<string>(calendarId.second) +" from service "+ lexical_cast<string>(serviceKey) +" is empty"
+						);
+						continue;
+					}
+
+					if(cal.getFirstActiveDate() > cal.getLastActiveDate())
+					{
+						_logWarning(
+							"Calendar id: "+ lexical_cast<string>(calendarId.second) +" from service "+ lexical_cast<string>(serviceKey) +
+								" has a last active date ("+ lexical_cast<string>(cal.getLastActiveDate()) +
+								") lower than its first active date ("+ lexical_cast<string>(cal.getFirstActiveDate()) +
+								")"
+						);
+						continue;
+					}
+					assert(cal.getFirstActiveDate() <= cal.getLastActiveDate());
+
+					date lastActiveDate(cal.getLastActiveDate());
+					for(date d(cal.getFirstActiveDate()); d <= lastActiveDate; d += days(1))
+					{
+						if(!runningDays[d.day_of_week()])
+						{
+							cal.setInactive(d);
+						}
+					}
+					serviceToCalendar.insert(make_pair(serviceKey, cal));
+				}
 			}
 
 			// RollingStock
@@ -1015,14 +1035,31 @@ namespace synthese
 				);
 				if(service)
 				{
-					if(serviceToCalendar.find(serviceKey) == serviceToCalendar.end())
+					// Looking for calendars
+					bool noCalendarFound(true);
+					BOOST_FOREACH(const ServiceToCalendarMap::value_type& calendar, serviceToCalendar)
+					{
+						if (calendar.first == serviceKey)
+						{
+							noCalendarFound = false;
+							break;
+						}
+					}
+					
+					if(noCalendarFound)
 					{
 						_logWarning(
 							"Service has no calendar. service key: "+ lexical_cast<string>(serviceKey)
 						);
 						continue;
 					}
-					*service |= serviceToCalendar[serviceKey];
+					// Loop on each calendar of the service
+					BOOST_FOREACH(const ServiceToCalendarMap::value_type& calendar, serviceToCalendar)
+					{
+						if (!(calendar.first == serviceKey))
+							continue;
+						*service |= calendar.second;
+					}
 				}
 			}
 
