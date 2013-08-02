@@ -59,6 +59,7 @@ namespace synthese
 		const string TimetableColumn::ATTR_TIME = "time";
 		const string TimetableColumn::TAG_STOP_POINT = "stop_point";
 		const string TimetableColumn::TAG_CELL = "cell";
+		const string TimetableColumn::TAG_JOURNEY_PATTERN = "journey_pattern";
 
 
 
@@ -544,6 +545,14 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
 				service->toParametersMap(*servicePM, true);
 				pm.insert(TAG_SERVICE, servicePM);
+			}
+
+			// Journey pattern
+			if(_line)
+			{
+				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+				_line->toParametersMap(*linePM, true);
+				pm.insert(TAG_JOURNEY_PATTERN, linePM);
 			}
 
 			// Line

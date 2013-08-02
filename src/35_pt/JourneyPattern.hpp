@@ -89,6 +89,8 @@ namespace synthese
 			public calendar::Calendar
 		{
 		public:
+			static const std::string ATTR_ID;
+			static const std::string ATTR_DIRECTION_TEXT;
 
 			/// Chosen registry class.
 			typedef util::Registry<JourneyPattern>	Registry;
@@ -197,6 +199,12 @@ namespace synthese
 				const pt::StopPoint* getDestination () const;
 				const pt::StopPoint* getOrigin () const;
 
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Line stop getter.

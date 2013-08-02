@@ -94,6 +94,7 @@ namespace synthese
 			static const std::string ATTR_IS_COMPRESSION;
 			static const std::string ATTR_COMPRESSION_RANK;
 			static const std::string ATTR_COMPRESSION_REPEATED;
+			static const std::string TAG_JOURNEY_PATTERN;
 
 		public:
 			// Constructor
