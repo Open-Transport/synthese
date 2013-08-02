@@ -495,7 +495,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	}
 	
 
-	// A B A B A B A sequence -> AB x 3 + A
+	// A B A B A B A B A sequence -> AB x 4 + A
 
 	ScheduledService ss05(4503599627370505ULL, "5", li92.get());
 	{
@@ -687,6 +687,198 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		if(result.getColumns().size() >= 3)
 		{
 			const TimetableColumn& column(*(result.getColumns().begin() + 2));
+			BOOST_CHECK(!column.isCompression());
+			for(size_t i(0); i<column.getContent().size(); ++i)
+			{
+				BOOST_CHECK_EQUAL(
+					to_simple_string(column.getContent().at(i).second),
+					to_simple_string(i+1 == column.getContent().size() ? ss09.getArrivalSchedule(false, i) : ss09.getDepartureSchedule(false, i))
+				);
+			}
+		}
+	}
+
+	// A B C A B C A B C A B C A sequence -> ABC x 4 + A
+
+	ScheduledService ss10(4503599627370510ULL, "10", li92.get());
+	{
+		ScheduledService::Schedules a;
+		ScheduledService::Schedules d;
+		a.push_back(time_duration(0,0,0));
+		d.push_back(time_duration(7,40,0));
+
+		a.push_back(time_duration(7,45,0));
+		d.push_back(time_duration(7,45,0));
+
+		a.push_back(time_duration(7,50,0));
+		d.push_back(time_duration(7,49,0));
+
+		a.push_back(time_duration(7,55,0));
+		d.push_back(time_duration(7,54,0));
+
+		a.push_back(time_duration(8,00,0));
+		d.push_back(time_duration(0,0,0));
+
+		ss10.setSchedules(d,a, true);
+	}
+	ss10.setActive(day_clock::local_day());
+	ss10.setActive(day_clock::local_day() + days(1));
+	ss10.setActive(day_clock::local_day() + days(2));
+	SAVE(ScheduledService, ss10);
+	li92->addService(ss10, true);
+
+	ScheduledService ss11(4503599627370511ULL, "11", li92.get());
+	{
+		ScheduledService::Schedules a;
+		ScheduledService::Schedules d;
+		a.push_back(time_duration(0,0,0));
+		d.push_back(time_duration(8,40,0));
+
+		a.push_back(time_duration(8,45,0));
+		d.push_back(time_duration(8,45,0));
+
+		a.push_back(time_duration(8,50,0));
+		d.push_back(time_duration(8,49,0));
+
+		a.push_back(time_duration(8,55,0));
+		d.push_back(time_duration(8,54,0));
+
+		a.push_back(time_duration(9,00,0));
+		d.push_back(time_duration(0,0,0));
+
+		ss11.setSchedules(d,a, true);
+	}
+	ss11.setActive(day_clock::local_day());
+	ss11.setActive(day_clock::local_day() + days(1));
+	ss11.setActive(day_clock::local_day() + days(2));
+	SAVE(ScheduledService, ss11);
+	li92->addService(ss11, true);
+
+	ScheduledService ss13(4503599627370513ULL, "13", li92.get());
+	{
+		ScheduledService::Schedules a;
+		ScheduledService::Schedules d;
+		a.push_back(time_duration(0,0,0));
+		d.push_back(time_duration(9,40,0));
+
+		a.push_back(time_duration(9,45,0));
+		d.push_back(time_duration(9,45,0));
+
+		a.push_back(time_duration(9,50,0));
+		d.push_back(time_duration(9,49,0));
+
+		a.push_back(time_duration(9,55,0));
+		d.push_back(time_duration(9,54,0));
+
+		a.push_back(time_duration(10,0,0));
+		d.push_back(time_duration(0,0,0));
+
+		ss13.setSchedules(d,a, true);
+	}
+	ss13.setActive(day_clock::local_day());
+	ss13.setActive(day_clock::local_day() + days(1));
+	ss13.setActive(day_clock::local_day() + days(2));
+	SAVE(ScheduledService, ss13);
+	li92->addService(ss13, true);
+
+
+	ScheduledService ss12(4503599627370512ULL, "12", li92.get());
+	{
+		ScheduledService::Schedules a;
+		ScheduledService::Schedules d;
+		a.push_back(time_duration(0,0,0));
+		d.push_back(time_duration(10,40,0));
+
+		a.push_back(time_duration(10,45,0));
+		d.push_back(time_duration(10,45,0));
+
+		a.push_back(time_duration(10,50,0));
+		d.push_back(time_duration(10,49,0));
+
+		a.push_back(time_duration(10,55,0));
+		d.push_back(time_duration(10,54,0));
+
+		a.push_back(time_duration(11,0,0));
+		d.push_back(time_duration(0,0,0));
+
+		ss12.setSchedules(d,a, true);
+	}
+	ss12.setActive(day_clock::local_day());
+	ss12.setActive(day_clock::local_day() + days(1));
+	ss12.setActive(day_clock::local_day() + days(2));
+	SAVE(ScheduledService, ss12);
+	li92->addService(ss12, true);
+
+
+
+	{
+		std::auto_ptr<TimetableGenerator> generator(
+			tt1.getGenerator(
+				env
+		)	);
+		boost::shared_ptr<TimetableResult::Warnings> warnings(new TimetableResult::Warnings);
+
+		TimetableResult result(
+			generator->build(
+				false,
+				warnings
+		)	);
+
+		BOOST_CHECK_EQUAL(result.getColumns().size(), 4);
+		if(result.getColumns().size() >= 1)
+		{
+			const TimetableColumn& column(*result.getColumns().begin());
+			BOOST_CHECK(column.isCompression());
+			if(column.isCompression())
+			{
+				BOOST_CHECK_EQUAL(column.getCompressionRank(), 0);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 4);
+			}
+			for(size_t i(0); i<column.getContent().size(); ++i)
+			{
+				BOOST_CHECK_EQUAL(
+					to_simple_string(column.getContent().at(i).second),
+					to_simple_string(i+1 == column.getContent().size() ? ss01.getArrivalSchedule(false, i) : ss01.getDepartureSchedule(false, i))
+				);
+			}
+		}
+		if(result.getColumns().size() >= 2)
+		{
+			const TimetableColumn& column(*(result.getColumns().begin() + 1));
+			BOOST_CHECK(column.isCompression());
+			if(column.isCompression())
+			{
+				BOOST_CHECK_EQUAL(column.getCompressionRank(), 1);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 4);
+			}
+			for(size_t i(0); i<column.getContent().size(); ++i)
+			{
+				BOOST_CHECK_EQUAL(
+					to_simple_string(column.getContent().at(i).second),
+					to_simple_string(i+1 == column.getContent().size() ? ss05.getArrivalSchedule(false, i) : ss05.getDepartureSchedule(false, i))
+				);
+			}
+		}
+		if(result.getColumns().size() >= 3)
+		{
+			const TimetableColumn& column(*(result.getColumns().begin() + 2));
+			BOOST_CHECK(column.isCompression());
+			if(column.isCompression())
+			{
+				BOOST_CHECK_EQUAL(column.getCompressionRank(), 1);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 4);
+			}
+			for(size_t i(0); i<column.getContent().size(); ++i)
+			{
+				BOOST_CHECK_EQUAL(
+					to_simple_string(column.getContent().at(i).second),
+					to_simple_string(i+1 == column.getContent().size() ? ss10.getArrivalSchedule(false, i) : ss10.getDepartureSchedule(false, i))
+				);
+			}
+		}
+		if(result.getColumns().size() >= 4)
+		{
+			const TimetableColumn& column(*(result.getColumns().begin() + 3));
 			BOOST_CHECK(!column.isCompression());
 			for(size_t i(0); i<column.getContent().size(); ++i)
 			{
