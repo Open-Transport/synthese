@@ -755,10 +755,10 @@ namespace synthese
 			);
 
 			// Time
-			if(!duration.second.is_not_a_date_time())
-			{ 
-				cellPM->insert(ATTR_TIME, duration.second);
-			}
+			cellPM->insert(
+				ATTR_TIME,
+				duration.second.is_not_a_date_time() ? string() : lexical_cast<string>(duration.second)
+			);
 
 			// Service ID
 			BOOST_FOREACH(const TimetableColumn::Services::value_type& service, services.at(rank))
