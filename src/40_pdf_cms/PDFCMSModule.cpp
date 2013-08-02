@@ -57,20 +57,22 @@ namespace synthese
 		void PDFCMSModule::CreateRequestPDF( const server::Request& request )
 		{
 			// Check if the request already has a pdf
-			DestroyRequestPDF(request);
+			RequestPDFs::iterator it(_requestPDFs.find(&request));
+			if(it == _requestPDFs.end())
+			{
+				// Create the new PDF
+				boost::shared_ptr<PDF> pdf(new PDF);
 
-			// Create the new PDF
-			boost::shared_ptr<PDF> pdf(new PDF);
+				// Register the new PDF into the list
+				_requestPDFs.insert(
+					make_pair(
+						&request,
+						pdf		
+				)	);
 
-			// Register the new PDF into the list
-			_requestPDFs.insert(
-				make_pair(
-					&request,
-					pdf		
-			)	);
-
-			// Register the destroyer into the request
-			request.addOnDestroyFunction(&PDFCMSModule::DestroyRequestPDF);
+				// Register the destroyer into the request
+				request.addOnDestroyFunction(&PDFCMSModule::DestroyRequestPDF);
+			}
 		}
 
 
