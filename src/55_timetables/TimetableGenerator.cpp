@@ -601,6 +601,7 @@ namespace synthese
 						make_pair(allColumns.end(), allColumns.end())
 					);
 					vector<size_t> sequence;
+					vector<TimetableColumn> standByColumns;
 
 					// Loop on columns
 					long nextHour(0);
@@ -658,7 +659,6 @@ namespace synthese
 								{
 									++repeats;
 									++nextHour;
-									itCol = seqEnd + 1;
 								}
 								else
 								{
@@ -686,8 +686,9 @@ namespace synthese
 									repeats
 								);
 							}
+							itCol += (repeats * sequence.size());
 						}
-
+					
 						if(itCol == allColumns.end())
 						{
 							break;
