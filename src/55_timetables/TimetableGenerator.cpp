@@ -662,13 +662,11 @@ namespace synthese
 								}
 								else
 								{
-									lastColSet = make_pair(allColumns.end(), allColumns.end());
 									break;
 								}
 							}
 							else
 							{
-								lastColSet = make_pair(allColumns.end(), allColumns.end());
 								break;
 							}
 						}
@@ -685,6 +683,11 @@ namespace synthese
 								);
 							}
 							itCol += (repeats * sequence.size() - 1);
+						}
+						else
+						{
+							lastColSet = make_pair(allColumns.end(), allColumns.end());
+							newResult.getColumns().push_back(*itCol);
 						}
 					
 						if(itCol == allColumns.end())
