@@ -228,7 +228,7 @@ namespace synthese
 						++it;
 						++it;
 
-						expr.reset(new ForEachExpression(it, end));
+						expr.reset(new ForEachExpression(it, end, false));
 						break;
 					}
 
