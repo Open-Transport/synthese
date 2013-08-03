@@ -832,7 +832,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 			if(column.isCompression())
 			{
 				BOOST_CHECK_EQUAL(column.getCompressionRank(), 0);
-				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 4);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 3);
 			}
 			for(size_t i(0); i<column.getContent().size(); ++i)
 			{
@@ -849,7 +849,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 			if(column.isCompression())
 			{
 				BOOST_CHECK_EQUAL(column.getCompressionRank(), 1);
-				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 4);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 3);
 			}
 			for(size_t i(0); i<column.getContent().size(); ++i)
 			{
@@ -865,8 +865,8 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 			BOOST_CHECK(column.isCompression());
 			if(column.isCompression())
 			{
-				BOOST_CHECK_EQUAL(column.getCompressionRank(), 1);
-				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 4);
+				BOOST_CHECK_EQUAL(column.getCompressionRank(), 2);
+				BOOST_CHECK_EQUAL(column.getCompressionRepeated(), 3);
 			}
 			for(size_t i(0); i<column.getContent().size(); ++i)
 			{
