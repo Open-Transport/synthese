@@ -75,8 +75,9 @@ namespace synthese
 		CMSScript::CMSScript(
 			string::const_iterator& it,
 			string::const_iterator end,
-			std::set<string> termination
-		):	_ignoreWhiteChars(false),
+			std::set<string> termination,
+			bool ignoreWhiteChars
+		):	_ignoreWhiteChars(ignoreWhiteChars),
 			_doNotEvaluate(false),
 			_sharedMutex(new synthese::util::shared_recursive_mutex)
 		{
@@ -428,7 +429,7 @@ namespace synthese
 
 					_nodes.push_back(
 						boost::shared_ptr<WebpageContentNode>(
-							new ForEachExpression(it, end)
+							new ForEachExpression(it, end, _ignoreWhiteChars)
 					)	);
 
 				} // Shortcut to WebpageDisplayFunction

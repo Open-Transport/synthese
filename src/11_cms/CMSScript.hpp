@@ -85,7 +85,8 @@ namespace synthese
 			CMSScript(
 				std::string::const_iterator& it,
 				std::string::const_iterator end,
-				std::set<std::string> termination
+				std::set<std::string> termination,
+				bool ignoreWhiteChars = false
 			);
 			
 			/// @name Services

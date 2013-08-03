@@ -89,7 +89,8 @@ namespace synthese
 
 		ForEachExpression::ForEachExpression(
 			std::string::const_iterator& it,
-			std::string::const_iterator end
+			std::string::const_iterator end,
+			bool ignoreWhiteChars
 		):	_resultsInASubmap(false),
 			_recursive(false)
 		{
@@ -146,7 +147,7 @@ namespace synthese
 
 					if(it != end)
 					{
-						CMSScript parameterNodes(it, end, functionTermination);
+						CMSScript parameterNodes(it, end, functionTermination, ignoreWhiteChars);
 						string parameterNameStr(ParametersMap::Trim(parameterName.str()));
 						
 						if(parameterNameStr == WebPageDisplayFunction::PARAMETER_PAGE_ID)
