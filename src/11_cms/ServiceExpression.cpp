@@ -214,7 +214,8 @@ namespace synthese
 
 		ServiceExpression::ServiceExpression(
 			std::string::const_iterator& it,
-			std::string::const_iterator end
+			std::string::const_iterator end,
+			bool ignoreWhiteChars
 		):	_functionCreator(NULL),
 			_repeatParameters(false)
 		{
@@ -268,7 +269,7 @@ namespace synthese
 						
 						// Parsing of the nodes
 						++it;
-						CMSScript parameterNodes(it, end, functionTermination);
+						CMSScript parameterNodes(it, end, functionTermination, ignoreWhiteChars);
 						string parameterNameStr(ParametersMap::Trim(parameterName.str()));
 
 						// Special template parameter
