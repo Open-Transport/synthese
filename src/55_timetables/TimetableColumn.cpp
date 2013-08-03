@@ -621,8 +621,8 @@ namespace synthese
 			pm.insert(ATTR_IS_COMPRESSION, isCompression());
 			if(isCompression())
 			{
-				pm.insert(ATTR_COMPRESSION_RANK, _compressionRank);
-				pm.insert(ATTR_COMPRESSION_REPEATED, _compressionRepeated);
+				pm.insert(ATTR_COMPRESSION_RANK, *_compressionRank);
+				pm.insert(ATTR_COMPRESSION_REPEATED, *_compressionRepeated);
 
 				// Insert following cells which are integrated to the compression
 				if(resultForCompressionOutput)
