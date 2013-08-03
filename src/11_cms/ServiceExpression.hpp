@@ -105,7 +105,8 @@ namespace synthese
 			/// Constructor by partial string parsing
 			ServiceExpression(
 				std::string::const_iterator& it,
-				std::string::const_iterator end
+				std::string::const_iterator end,
+				bool ignoreWhiteChars = false
 			);
 		};
 	}
