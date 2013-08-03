@@ -1126,7 +1126,7 @@ namespace synthese
 				);
 			}
 
-			return util::ParametersMap();
+			return pm;
 		}
 
 
