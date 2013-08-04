@@ -115,7 +115,8 @@ namespace synthese
 			void drawText(
 				const std::string& text,
 				HPDF_REAL x,
-				HPDF_REAL y
+				HPDF_REAL y,
+				float angle = 0
 			);
 
 			void drawImage(
