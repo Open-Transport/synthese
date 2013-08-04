@@ -1,4 +1,4 @@
-﻿
+
 /** OnlineReservationRule class implementation.
 	@file OnlineReservationRule.cpp
 
