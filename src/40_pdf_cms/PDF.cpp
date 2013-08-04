@@ -123,12 +123,28 @@ namespace synthese
 		void PDF::drawText(
 			const std::string& text,
 			HPDF_REAL x,
-			HPDF_REAL y
+			HPDF_REAL y,
+			float angle
 		){
 			HPDF_Page_SetTextRenderingMode (_curPage, HPDF_FILL);
 			HPDF_Page_BeginText(_curPage);
 			HPDF_Page_SetFontAndSize(_curPage, _curFont, _curTextSize);
-			HPDF_Page_TextOut(_curPage, x, y, text.c_str());
+			if(angle)
+			{
+				float rad1(
+					angle / 180 * 3.141592
+				);
+				HPDF_Page_SetTextMatrix(
+					_curPage,
+					cos(rad1), sin(rad1), -sin(rad1), cos(rad1),
+					x, y
+				);
+				HPDF_Page_ShowText(_curPage, text.c_str());
+			}
+			else
+			{
+				HPDF_Page_TextOut(_curPage, x, y, text.c_str());
+			}
 			HPDF_Page_EndText(_curPage);
 		}
 

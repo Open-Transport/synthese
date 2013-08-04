@@ -49,6 +49,7 @@ namespace synthese
 		const string PDFTextService::PARAMETER_FONT = "font";
 		const string PDFTextService::PARAMETER_SIZE = "size";
 		const string PDFTextService::PARAMETER_COLOR = "color";
+		const string PDFTextService::PARAMETER_ANGLE = "angle";
 		
 
 
@@ -81,6 +82,9 @@ namespace synthese
 			{
 				_color = util::RGBColor(map.get<string>(PARAMETER_COLOR));
 			}
+
+			// Angle
+			_angle = map.getDefault<float>(PARAMETER_ANGLE, 0);
 		}
 
 
@@ -119,7 +123,8 @@ namespace synthese
 			pdf.drawText(
 				IConv("UTF-8", "CP1252").convert(_text),
 				PDF::GetPixelsFromMM(_x),
-				PDF::GetPixelsFromMM(_y)
+				PDF::GetPixelsFromMM(_y),
+				_angle
 			);
 
 			// Return informations about the text
@@ -146,6 +151,7 @@ namespace synthese
 
 		PDFTextService::PDFTextService():
 			_x(0),
-			_y(0)
+			_y(0),
+			_angle(0)
 		{}
 }	}

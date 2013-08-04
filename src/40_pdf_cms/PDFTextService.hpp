@@ -52,6 +52,7 @@ namespace synthese
 			static const std::string PARAMETER_FONT;
 			static const std::string PARAMETER_SIZE;
 			static const std::string PARAMETER_COLOR;
+			static const std::string PARAMETER_ANGLE;
 
 
 
@@ -64,6 +65,7 @@ namespace synthese
 				boost::optional<std::string> _font;
 				boost::optional<float> _size;
 				boost::optional<util::RGBColor> _color;
+				float _angle;
 			//@}
 			
 			
