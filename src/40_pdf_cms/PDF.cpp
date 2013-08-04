@@ -27,6 +27,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <hpdf_utils.h>
+#include <math.h>
 
 using namespace boost;
 using namespace std;
