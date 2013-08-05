@@ -314,6 +314,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_WKT("wkt");
 		const string RoutePlannerFunction::DATA_LINE_MARKERS("line_markers");
 		const string RoutePlannerFunction::DATA_NETWORK("network");
+		const string RoutePlannerFunction::DATA_SERVICE_NUMBER("service_number");
 
 		RoutePlannerFunction::RoutePlannerFunction(
 		):	_startDate(not_a_date_time),
@@ -2345,7 +2346,8 @@ namespace synthese
 								true,
 								pedestrianMode && !lastPedestrianMode,
 								itPlaces->isOrigin,
-								itPlaces->isDestination
+								itPlaces->isDestination,
+								leg.getService()->getServiceNumber()
 							);
 							++itPlaces; ++itSheetRow;
 							lastPedestrianMode = pedestrianMode;
@@ -2378,7 +2380,8 @@ namespace synthese
 								itPlaces->isDestination && itl+1 == jl.end(),
 								false,
 								itPlaces->isOrigin,
-								itPlaces->isDestination
+								itPlaces->isDestination,
+								leg.getService()->getServiceNumber()
 							);
 						}
 					}
@@ -2744,7 +2747,8 @@ namespace synthese
 			bool isLastWriting,
 			bool isFirstFoot,
 			bool isOriginRow,
-			bool isDestinationRow
+			bool isDestinationRow,
+			string serviceNumber
 		) const {
 			ParametersMap pm(getTemplateParameters());
 
@@ -2771,6 +2775,7 @@ namespace synthese
 			pm.insert(DATA_IS_FIRST_WRITING, isFirstWriting);
 			pm.insert(DATA_IS_LAST_WRITING, isLastWriting);
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
+			pm.insert(DATA_SERVICE_NUMBER, serviceNumber);
 
 			_schedulesCellPage->display(stream ,request, pm);
 		}
