@@ -318,6 +318,7 @@ namespace synthese
 				static const std::string DATA_CONTINUOUS_SERVICE_WAITING;
 				static const std::string DATA_WKT;
 				static const std::string DATA_NETWORK;
+				static const std::string DATA_SERVICE_NUMBER;
 			//@}
 
 			//! @name Result row
@@ -596,7 +597,8 @@ namespace synthese
 				bool isLastWriting,
 				bool isFirstFoot,
 				bool isOriginRow,
-				bool isDestinationRow
+				bool isDestinationRow,
+				std::string serviceNumber = ""
 			) const;
 
 
