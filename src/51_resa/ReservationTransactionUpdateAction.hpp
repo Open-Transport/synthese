@@ -27,9 +27,15 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "StopArea.hpp"
 
 namespace synthese
 {
+	namespace pt
+	{
+		class StopArea;
+	}
+
 	namespace resa
 	{
 		class ReservationTransaction;
@@ -54,11 +60,19 @@ namespace synthese
 			static const std::string PARAMETER_RESERVATION_TRANSACTION_ID;
 			static const std::string PARAMETER_SEATS;
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_DEPARTURE_PLACE_ID;
+			static const std::string PARAMETER_ARRIVAL_PLACE_ID;
+			static const std::string PARAMETER_DEPARTURE_TIME;
+			static const std::string PARAMETER_ARRIVAL_TIME;
 
 		private:
 			boost::shared_ptr<ReservationTransaction> _reservationTransaction;
 			boost::optional<std::size_t> _seats;
 			boost::optional<std::string> _name;
+			boost::shared_ptr<pt::StopArea> _departurePlace;
+			boost::shared_ptr<pt::StopArea> _arrivalPlace;
+			boost::posix_time::ptime _departureTime;
+			boost::posix_time::ptime _arrivalTime;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
