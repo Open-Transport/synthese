@@ -370,7 +370,7 @@ namespace synthese
 
 					case AT_WORK:
 						stream << HTMLModule::getLinkButton(
-							cancelRequest.getURL(),
+							cancelRequest.getURL() + "&absence=1",
 							"Noter absence",
 							"Etes-vous sûr de noter l'absence du client à l'arrêt ?",
 							ResaModule::GetStatusIcon(NO_SHOW)

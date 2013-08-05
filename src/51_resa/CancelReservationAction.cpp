@@ -66,6 +66,7 @@ namespace synthese
 	namespace resa
 	{
 		const string CancelReservationAction::PARAMETER_RESERVATION_TRANSACTION_ID = Action_PARAMETER_PREFIX + "rt";
+		const string CancelReservationAction::PARAMETER_IS_BECAUSE_OF_ABSENCE = "absence";
 
 
 
@@ -92,6 +93,15 @@ namespace synthese
 			catch(...)
 			{
 				throw ActionException("No such reservation");
+			}
+
+			if(map.isDefined(PARAMETER_IS_BECAUSE_OF_ABSENCE))
+			{
+				_absence = map.get<bool>(PARAMETER_IS_BECAUSE_OF_ABSENCE);
+			}
+			else
+			{
+				_absence = false;
 			}
 
 			// Tests if the reservation is already cancelled
@@ -122,7 +132,17 @@ namespace synthese
 						(!request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) ||
 						request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE))
 					)
+					{
+						// Search for specific right
+						util::RegistryKeyType lineId = resa->getLineId();
+						if (request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(security::CANCEL, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(lineId)))
+						{
+							// User has specific cancel right
+							if (!(now > resa->getArrivalTime() + hours(24)))
+								break;
+						}
 						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
+					}
 					else if (request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(CANCEL) &&
 						now > resa->getArrivalTime() + hours(24)
 					)
@@ -167,7 +187,7 @@ namespace synthese
             _transaction->setCustomer(UserTableSync::GetEditable(_transaction->getCustomerUserId(), *_env, UP_LINKS_LOAD_LEVEL).get());
 			if(	customer.get() && !customer->getEMail().empty() && reservationContact)
 			{
-				reservationContact->sendCustomerCancellationEMail(*_transaction);
+				reservationContact->sendCustomerCancellationEMail(*_transaction, _absence);
 
 				ResaDBLog::AddEMailEntry(*request.getSession(), *customer, "Annulation de réservation");
 			}

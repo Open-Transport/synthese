@@ -42,9 +42,11 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_RESERVATION_TRANSACTION_ID;
+			static const std::string PARAMETER_IS_BECAUSE_OF_ABSENCE;
 
 		private:
 			boost::shared_ptr<ReservationTransaction>	_transaction;
+			bool _absence;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

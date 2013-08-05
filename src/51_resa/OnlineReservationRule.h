@@ -98,6 +98,7 @@ namespace synthese
 			static const std::string DATA_USER_PHONE;
 			static const std::string DATA_USER_EMAIL;
 			static const std::string DATA_USER_PASSWORD;
+			static const std::string DATA_CANCELLATION_BECAUSE_OF_ABSENCE;
 
 
 			static const std::string TYPE_SUBJECT;
@@ -209,7 +210,8 @@ namespace synthese
 
 
 				bool sendCustomerCancellationEMail(
-					const ReservationTransaction& resa
+					const ReservationTransaction& resa,
+					bool isBecauseOfAbsence = false
 				) const;
 			//@}
 
