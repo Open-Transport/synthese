@@ -255,6 +255,10 @@ namespace synthese
 				// Export of the scenario
 				boost::shared_ptr<ParametersMap> scenarioPM(new ParametersMap);
 				scenario->toParametersMap(*scenarioPM, true);
+				if(dynamic_cast<const SentScenario*>(scenario.get()))
+				{
+					static_cast<const SentScenario*>(scenario.get())->toParametersMap(*scenarioPM);
+				}
 				pm.insert(TAG_SCENARIO, scenarioPM);
 			}
 

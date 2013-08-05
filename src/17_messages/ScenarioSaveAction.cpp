@@ -1243,6 +1243,10 @@ namespace synthese
 
 			transaction.run();
 
+			// Variables !!
+			if(_sscenario.get())
+				ScenarioTableSync::WriteVariablesIntoMessages(*_sscenario);
+
 			if(_sscenario.get())
 			{
 				MessagesLog::addUpdateEntry(_sscenario.get(), text.str(), request.getUser().get());
