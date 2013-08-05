@@ -88,6 +88,7 @@ namespace synthese
 		const std::string OnlineReservationRule::DATA_USER_PHONE("user_phone");
 		const std::string OnlineReservationRule::DATA_USER_EMAIL("user_email");
 		const std::string OnlineReservationRule::DATA_USER_PASSWORD("user_password");
+		const std::string OnlineReservationRule::DATA_CANCELLATION_BECAUSE_OF_ABSENCE("cancellation_because_of_absence");
 
 		const std::string OnlineReservationRule::TYPE_SUBJECT("subject");
 		const std::string OnlineReservationRule::TYPE_CONTENT("content");
@@ -519,7 +520,8 @@ namespace synthese
 
 
 		bool OnlineReservationRule::sendCustomerCancellationEMail(
-			const ReservationTransaction& resa
+			const ReservationTransaction& resa,
+			bool isBecauseOfAbsence
 		) const	{
 			if((	_eMailInterface == NULL ||
 				_eMailInterface->getPage<ReservationCancellationEMailSubjectInterfacePage>() == NULL ||
@@ -591,6 +593,7 @@ namespace synthese
 					subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resa.getReservations().begin())->getDeparturePlaceNameNoCity());
 					subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
 					subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
+					subjectMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
 					_cmsCancellationEMail.get()->display(subject, subjectMap);
 					
@@ -634,6 +637,7 @@ namespace synthese
                     {
                         contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
                     }
+					contentMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
 					_cmsCancellationEMail.get()->display(content, contentMap);
 					email.setContent(content.str());
