@@ -266,7 +266,10 @@ namespace synthese
 					// Load properties of the current object
 					// Placed after the load of the sub objects to prevent bad link
 					// in case of link to a sub object
-					rObject->loadFromRecord(map, _env);
+					if(rObject->loadFromRecord(map, _env))
+					{
+						_objectsToSave.push_back(rObject.get());
+					}
 
 					// Removal detection
 					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
@@ -310,6 +313,9 @@ namespace synthese
 			}
 
 			// Insertions
-			DBModule::SaveEntireEnv(_env, transaction);
+			BOOST_FOREACH(const Registrable* object, _objectsToSave)
+			{
+				DBModule::SaveObject(*object, transaction);
+			}
 		}
 }	}
