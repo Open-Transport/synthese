@@ -236,7 +236,7 @@ namespace synthese
 
 
 
-			static void LoadFromRecord(
+			static bool LoadFromRecord(
 				CoordinatesSystem::Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,

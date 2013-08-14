@@ -47,7 +47,7 @@ namespace synthese
 
 
 		public:
-			static void LoadFromRecord(
+			static bool LoadFromRecord(
 				typename TreeNodeField<C, T>::Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,
@@ -55,14 +55,20 @@ namespace synthese
 			){
 				assert(dynamic_cast<T*>(&object));
 				T& t(static_cast<T&>(object));
+				bool result(false);
 
 				if(record.isDefined(ComplexObjectFieldDefinition<C>::FIELDS[2].name))
 				{
-					t.setRank(
+					size_t value(
 						record.getDefault<size_t>(
 							ComplexObjectFieldDefinition<C>::FIELDS[2].name,
 							0
 					)	);
+					if(value != t.getRank())
+					{
+						result = true;
+						t.setRank(value);
+					}
 				}
 
 				if(record.isDefined(ComplexObjectFieldDefinition<C>::FIELDS[1].name))
@@ -76,7 +82,14 @@ namespace synthese
 					{
 						try
 						{
-							t.setParent(env.getEditable<T>(up_id).get());
+							T* value(
+								env.getEditable<T>(up_id).get()
+							);
+							if(value != t.getParent())
+							{
+								t.setParent(env.getEditable<T>(up_id).get());
+								result = true;
+							}
 						}
 						catch(util::ObjectNotFoundException<T>&)
 						{
@@ -88,7 +101,11 @@ namespace synthese
 					}
 					else
 					{
-						t.setParent(NULL);
+						if(t.getParent() != NULL)
+						{
+							t.setParent(NULL);
+							result = true;
+						}
 					}
 				}
 
@@ -103,7 +120,12 @@ namespace synthese
 					{
 						try
 						{
-							t.setRoot(env.getEditable<typename T::RootType>(id).get());
+							typename T::RootType* value(env.getEditable<typename T::RootType>(id).get());
+							if(t.getRoot() != value)
+							{
+								t.setRoot(value);
+								result = true;
+							}
 						}
 						catch(util::ObjectNotFoundException<typename T::RootType>&)
 						{
@@ -114,6 +136,8 @@ namespace synthese
 						}
 					}
 				}
+
+				return result;
 			}
 
 

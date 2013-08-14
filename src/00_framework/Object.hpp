@@ -227,7 +227,7 @@ namespace synthese
 		/// @param record the record to load
 		/// @param env the environment to read to get the linked objects
 		/// @warning be sure the environment is populated before the load
-		virtual void loadFromRecord(
+		virtual bool loadFromRecord(
 			const Record& record,
 			util::Env& env
 		);
@@ -298,20 +298,23 @@ namespace synthese
 			const Record& _record;
 			const util::Env& _env;
 			Object<ObjectClass_, Schema_>& _object;
+			bool& _loadResult;
 
 			LoadOperator(
 				const Record& record,
 				Object<ObjectClass_, Schema_>& object,
-				const util::Env& env
+				const util::Env& env,
+				bool& loadResult
 			):	_record(record),
 				_env(env),
-				_object(object)
+				_object(object),
+				_loadResult(loadResult)
 			{}
 
 			template <typename Pair>
 			void operator()(Pair& data) const
 			{
-				Pair::first_type::LoadFromRecord(data.second, _object, _record, _env);
+				_loadResult |= Pair::first_type::LoadFromRecord(data.second, _object, _record, _env);
 			}
 		};
 
@@ -558,12 +561,14 @@ namespace synthese
 
 
 	template<class ObjectClass_, class Schema_>
-	void Object<ObjectClass_, Schema_>::loadFromRecord(
+	bool Object<ObjectClass_, Schema_>::loadFromRecord(
 		const Record& record,
 		util::Env& env
 	){
-		LoadOperator op(record, *this, env);
+		bool loadResult(false);
+		LoadOperator op(record, *this, env, loadResult);
 		boost::fusion::for_each(_schema, op);
+		return loadResult;
 	}
 
 

@@ -74,7 +74,7 @@ namespace synthese
 	public:
 
 
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename SimpleMapField<C, V1, V2>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -82,36 +82,45 @@ namespace synthese
 		){
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				return;
+				return false;
 			}
 
-			fieldObject.clear();
+			typename SimpleMapField<C, V1, V2>::Type value;
 			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
-			if(text.empty())
+			if(!text.empty())
 			{
-				return;
+				std::vector<std::string> s;
+				boost::algorithm::split(s, text, boost::is_any_of("|"));
+				BOOST_FOREACH(const std::string& pair, s)
+				{
+					std::vector<std::string> v;
+					boost::algorithm::split(v, pair, boost::is_any_of(","));
+					try
+					{
+						value.insert(
+							std::make_pair(
+								boost::lexical_cast<V1>(v[0]),
+								boost::lexical_cast<V2>(v[1])
+						)	);
+					}
+					catch(boost::bad_lexical_cast&)
+					{
+						util::Log::GetInstance().warn(
+							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey())
+						);
+					}
+				}
 			}
-			std::vector<std::string> s;
-			boost::algorithm::split(s, text, boost::is_any_of("|"));
-			BOOST_FOREACH(const std::string& pair, s)
+
+			if(value == fieldObject)
 			{
-				std::vector<std::string> v;
-				boost::algorithm::split(v, pair, boost::is_any_of(","));
-				try
-				{
-					fieldObject.insert(
-						std::make_pair(
-							boost::lexical_cast<V1>(v[0]),
-							boost::lexical_cast<V2>(v[1])
-					)	);
-				}
-				catch(boost::bad_lexical_cast&)
-				{
-					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
-						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey())
-					);
-				}
+				return false;
+			}
+			else
+			{
+				fieldObject = value;
+				return true;
 			}
 		}
 

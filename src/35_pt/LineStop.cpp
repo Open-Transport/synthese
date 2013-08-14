@@ -21,13 +21,28 @@
 */
 
 #include "LineStop.h"
-#include "JourneyPattern.hpp"
+
+#include "DBConstants.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "DRTAreaTableSync.hpp"
+#include "JourneyPatternCopy.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineArea.hpp"
+#include "LineStopTableSync.h"
+#include "PTModule.h"
+#include "StopArea.hpp"
+#include "StopPointTableSync.hpp"
 #include "Vertex.h"
 
+#include <geos/geom/LineString.h>
+
+using namespace boost;
+using namespace geos::geom;
 using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
@@ -110,5 +125,265 @@ namespace synthese
 		bool LineStop::isArrivalAllowed() const
 		{
 			return _isArrival;
+		}
+
+
+
+		bool LineStop::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			// Geometry
+			if(record.isDefined(TABLE_COL_GEOMETRY))
+			{
+				boost::shared_ptr<LineString> value;
+				string viaPointsStr(record.get<string>(TABLE_COL_GEOMETRY));
+				if(!viaPointsStr.empty())
+				{
+					value = boost::dynamic_pointer_cast<LineString, geos::geom::Geometry>(
+						record.getGeometryFromWKT(TABLE_COL_GEOMETRY)
+					);
+				}
+				if(	(!value && getGeometry()) ||
+					(value && !getGeometry()) ||
+					(value && getGeometry() && value->equalsExact(getGeometry().get()))
+				){
+					setGeometry(value);
+					result = true;
+				}
+			}
+
+			// Metric offset
+			if(record.isDefined(LineStopTableSync::COL_METRICOFFSET))
+			{
+				double metricOffset(
+					record.getDefault<MetricOffset>(
+						LineStopTableSync::COL_METRICOFFSET,
+						0
+				)	);
+				if(metricOffset != _metricOffset)
+				{
+					_metricOffset = metricOffset;
+					result = true;
+				}
+			}
+
+			// Is arrival
+			if(record.isDefined(LineStopTableSync::COL_ISARRIVAL))
+			{
+				bool isArrival(
+					record.getDefault<bool>(
+						LineStopTableSync::COL_ISARRIVAL,
+						true
+				)	);
+				if(isArrival != _isArrival)
+				{
+					_isArrival = isArrival;
+					result = true;
+				}
+			}
+
+			// Is departure
+			if(record.isDefined(LineStopTableSync::COL_ISDEPARTURE))
+			{
+				bool isDeparture(
+					record.getDefault<bool>(
+						LineStopTableSync::COL_ISDEPARTURE,
+						true
+				)	);
+				if(isDeparture != _isDeparture)
+				{
+					_isDeparture = isDeparture;
+					result = true;
+				}
+			}
+
+			// Rank in path
+			if(record.isDefined(LineStopTableSync::COL_RANKINPATH))
+			{
+				int rankInPath(
+					record.getDefault<int>(
+						LineStopTableSync::COL_RANKINPATH,
+						0
+				)	);
+				if(rankInPath != getRankInPath())
+				{
+					setRankInPath(rankInPath);
+					result = true;
+				}
+			}
+
+			// Line
+			if(record.isDefined(LineStopTableSync::COL_LINEID))
+			{
+				JourneyPattern* value(NULL);
+				util::RegistryKeyType lineId(
+					record.getDefault<RegistryKeyType>(
+						LineStopTableSync::COL_LINEID,
+						0
+				)	);
+				if(lineId > 0)
+				{
+					value = JourneyPatternTableSync::GetEditable(lineId, env).get();
+				}
+				if(value != getLine())
+				{
+					setLine(value);
+					result = true;
+				}
+			}
+
+			// Stop / DRT area
+			if(dynamic_cast<DesignatedLinePhysicalStop*>(this))
+			{
+				DesignatedLinePhysicalStop& dls(static_cast<DesignatedLinePhysicalStop&>(*this));
+
+				// Schedule input
+				if(record.isDefined(LineStopTableSync::COL_SCHEDULEINPUT))
+				{
+					bool value(
+						record.getDefault<bool>(
+							LineStopTableSync::COL_SCHEDULEINPUT,
+							true
+					)	);
+					if(value != getScheduleInput())
+					{
+						dls.setScheduleInput(value);
+						result = true;
+					}
+				}
+
+				// Reservation needed
+				if(record.isDefined(LineStopTableSync::COL_RESERVATION_NEEDED))
+				{
+					bool value(
+						record.getDefault<bool>(
+							LineStopTableSync::COL_RESERVATION_NEEDED,
+							true
+					)	);
+					if(value != getReservationNeeded())
+					{
+						dls.setReservationNeeded(value);
+						result = true;
+					}
+				}
+
+//				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+//				{
+					// Stop point
+					if(record.isDefined(LineStopTableSync::COL_PHYSICALSTOPID))
+					{
+						util::RegistryKeyType fromPhysicalStopId(
+							record.getDefault<RegistryKeyType>(LineStopTableSync::COL_PHYSICALSTOPID, 0)
+						);
+						StopPoint* value(
+							StopPointTableSync::GetEditable(fromPhysicalStopId, env).get()
+						);
+
+						if(dls.getPhysicalStop() != value)
+						{
+							dls.setPhysicalStop(*value);
+
+							// Line update
+							dls.getLine()->addEdge(dls);
+
+							// Sublines update
+							BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+							{
+								DesignatedLinePhysicalStop* newEdge(
+									new DesignatedLinePhysicalStop(
+										0,
+										copy,
+										dls.getRankInPath(),
+										dls.isDeparture(),
+										dls.isArrival(),
+										dls.getMetricOffset(),
+										dls.getPhysicalStop(),
+										dls.getScheduleInput()
+								)	);
+								copy->addEdge(*newEdge);
+							}
+
+							// Useful transfer calculation
+							dls.getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+
+							result = true;
+						}
+					}
+//				}
+			}
+			else if(dynamic_cast<LineArea*>(this))
+			{
+				LineArea& lineArea(static_cast<LineArea&>(*this));
+
+				// Internal service
+				if(record.isDefined(LineStopTableSync::COL_INTERNAL_SERVICE))
+				{
+					bool value(
+						record.getDefault<bool>(
+							LineStopTableSync::COL_INTERNAL_SERVICE,
+							true
+					)	);
+					if(value != lineArea.getInternalService())
+					{
+						lineArea.setInternalService(value);
+						result = true;
+					}
+				}
+
+//				if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+//				{
+					// DRT Area
+					if(record.isDefined(LineStopTableSync::COL_PHYSICALSTOPID))
+					{
+						RegistryKeyType areaId(
+							record.getDefault<RegistryKeyType>(LineStopTableSync::COL_PHYSICALSTOPID, 0)
+						);
+						DRTArea* value(NULL);
+						if(areaId) try
+						{
+							value = DRTAreaTableSync::GetEditable(areaId, env).get();
+						}
+						catch(ObjectNotFoundException<DRTArea>& e)
+						{
+							throw Exception(lexical_cast<string>(LineStopTableSync::COL_PHYSICALSTOPID)+" not found");
+						}
+
+						if(value != lineArea.getArea())
+						{
+							lineArea.setArea(*value);
+							result = true;
+
+							// Line update
+							lineArea.getLine()->addEdge(lineArea);
+
+							// Sublines update
+							BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+							{
+								LineArea* newEdge(
+									new LineArea(
+										0,
+										copy,
+										lineArea.getRankInPath(),
+										lineArea.isDeparture(),
+										lineArea.isArrival(),
+										lineArea.getMetricOffset(),
+										lineArea.getArea(),
+										lineArea.getInternalService()
+								)	);
+								copy->addEdge(*newEdge);
+							}
+
+							// Useful transfer calculation
+							BOOST_FOREACH(StopArea* stopArea, lineArea.getArea()->getStops())
+							{
+								stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+							}
+						}
+					}
+//				}
+			}
+
+			return result;
 		}
 }	}

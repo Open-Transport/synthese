@@ -194,14 +194,14 @@ namespace synthese
 						bool noWCSave);
 				//@}
 
-				void from_string(
+				bool from_string(
 					const std::string& text
 				);
 
 				std::string to_string(
 				) const;
 
-				static void LoadFromRecord(
+				static bool LoadFromRecord(
 					Type& fieldObject,
 					ObjectBase& object,
 					const Record& record,

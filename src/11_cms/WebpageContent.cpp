@@ -47,18 +47,21 @@ namespace synthese
 
 	namespace cms
 	{
-		void WebpageContent::LoadFromRecord(
+		bool WebpageContent::LoadFromRecord(
 			WebpageContent& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
+			bool result(false);
+
 			if(record.isDefined(FIELDS[2].name))
 			{
 				string value(record.getDefault<string>(FIELDS[2].name));
+				MimeType mtValue;
 				try
 				{
-					fieldObject._mimeType = MimeTypes::GetMimeTypeByString(value);
+					mtValue = MimeTypes::GetMimeTypeByString(value);
 				}
 				catch(Exception&)
 				{
@@ -66,16 +69,22 @@ namespace synthese
 					boost::algorithm::split(parts, value, boost::is_any_of("/"));
 					if(parts.size() >= 2)
 					{
-						fieldObject._mimeType = MimeType(parts[0], parts[1], "");
+						mtValue = MimeType(parts[0], parts[1], "");
 					}
 					else
 					{
-						fieldObject._mimeType = MimeTypes::HTML;
+						mtValue = MimeTypes::HTML;
 					}
+				}
+
+				if(fieldObject._mimeType != mtValue)
+				{
+					fieldObject._mimeType = mtValue;
+					result = true;
 				}
 			}
 
-			fieldObject._script.update(
+			result |= fieldObject._script.update(
 				record.isDefined(FIELDS[0].name) ?
 					record.get<string>(FIELDS[0].name) :
 					fieldObject.getCMSScript().getCode(),
@@ -86,6 +95,8 @@ namespace synthese
 					record.getDefault<bool>(FIELDS[3].name, false) :
 					fieldObject.getCMSScript().getDoNotEvaluate()
 			);
+
+			return result;
 		}
 
 

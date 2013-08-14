@@ -54,7 +54,7 @@ namespace synthese
 
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename StringField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -62,9 +62,22 @@ namespace synthese
 		){
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				return;
+				return false;
 			}
-			fieldObject = record.get<typename StringField<C>::Type>(SimpleObjectFieldDefinition<C>::FIELD.name);
+
+			typename StringField<C>::Type value(
+				record.get<typename StringField<C>::Type>(SimpleObjectFieldDefinition<C>::FIELD.name)
+			);
+
+			if(value == fieldObject)
+			{
+				return false;
+			}
+			else
+			{
+				fieldObject = value;
+				return true;
+			}
 		}
 
 

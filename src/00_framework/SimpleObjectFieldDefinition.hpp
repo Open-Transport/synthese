@@ -54,7 +54,7 @@ namespace synthese
 
 
 		template<class T>
-		static void _LoadFromStringWithDefaultValue(
+		static bool _LoadFromStringWithDefaultValue(
 			T& fieldObject,
 			const Record& record,
 			T (*reader)(const std::string&),
@@ -65,56 +65,82 @@ namespace synthese
 				try
 				{
 					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
-					fieldObject = text.empty() ? default_value : reader(text);
+					T value(text.empty() ? default_value : reader(text));
+					if(fieldObject == value)
+					{
+						return false;
+					}
+					else
+					{
+						fieldObject = value;
+						return true;
+					}
 				}
 				catch(...)
 				{
-					fieldObject = default_value;
+					if(fieldObject == default_value)
+					{
+						return false;
+					}
+					else
+					{
+						fieldObject = default_value;
+						return true;
+					}
 				}
 			}
+
+			return false;
 		}
 
 
 
 		template<class T>
-		static void _LoadFromStringWithDefaultValue(
+		static bool _LoadFromStringWithDefaultValue(
 			T& fieldObject,
 			const Record& record,
 			T (*reader)(const std::string),
 			const T& default_value
 		){
+			bool result(false);
 			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
 				try
 				{
 					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
-					fieldObject = text.empty() ? default_value : reader(text);
+					T value(text.empty() ? default_value : reader(text));
+					result = (fieldObject == value);
+					fieldObject = value;
 				}
 				catch(...)
 				{
+					result = (fieldObject == default_value);
 					fieldObject = default_value;
 				}
 			}
+			return result;
 		}
 
 
 		template<class T>
-		static void _UpdateFromString(
+		static bool _UpdateFromString(
 			T& fieldObject,
 			const Record& record,
-			void (T::*reader)(const std::string&)
+			bool (T::*reader)(const std::string&)
 		){
+			bool result(false);
 			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
 				try
 				{
 					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
-					(fieldObject.*reader)(text);
+					result = (fieldObject.*reader)(text);
 				}
 				catch(...)
 				{
 				}
 			}
+			return result;
 		}
 
 

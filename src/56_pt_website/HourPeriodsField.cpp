@@ -83,13 +83,13 @@ namespace synthese
 
 
 
-		void HourPeriodsField::LoadFromRecord(
+		bool HourPeriodsField::LoadFromRecord(
 			Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<HourPeriodsField>::_LoadFromStringWithDefaultValue(
+			return SimpleObjectFieldDefinition<HourPeriodsField>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				UnSerialize,

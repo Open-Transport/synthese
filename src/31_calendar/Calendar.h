@@ -61,23 +61,67 @@ namespace synthese
 			typedef std::set<CalendarLink*> CalendarLinks;
 
 		private:
+			class BitSets
+			{
+			public:
+				typedef std::map<
+					boost::gregorian::greg_year,
+					std::bitset<366>
+				> _BitSets;
 
-			typedef std::map<
-				boost::gregorian::greg_year,
-				std::bitset<366>
-			> _BitSets;
+			private:
+				_BitSets _value;
 
-			_BitSets _markedDates;
-			
+				static size_t _BitPos(const boost::gregorian::date& d);
+
+			public:
+
+				BitSets(
+					const boost::gregorian::date& firstDate,
+					const boost::gregorian::date& lastDate,
+					boost::gregorian::date_duration step = boost::gregorian::days(1)
+				);
+				BitSets();
+				BitSets& operator|= (const BitSets& op);
+				BitSets& operator&= (const BitSets& op);
+				bool operator==(const BitSets& op) const;
+				BitSets& operator-= (const BitSets& op);
+				const _BitSets getValue() const { return _value; }
+				boost::gregorian::date getFirstActiveDate() const;
+				boost::gregorian::date getLastActiveDate() const;
+				bool empty() const;
+				DatesVector getActiveDates () const;
+				bool isActive(
+					const boost::gregorian::date& date
+				) const;
+				void setActive(const boost::gregorian::date& date);
+				void setInactive(const boost::gregorian::date& date);
+				void clear();
+				bool hasAtLeastOneCommonDateWith(const BitSets& op) const;
+				size_t size() const;
+				void copyDates(const BitSets& calendar);
+				void serialize(std::ostream& stream) const;
+				void setFromSerializedString(const std::string& value);
+				BitSets& operator<<= (std::size_t i);
+			};
+
+			/// @name Base data
+			//@{
+				BitSets _markedDates;
+				DatesSet _datesToForce;
+				DatesSet _datesToBypass;
+				CalendarLinks _calendarLinks;
+			//@}
+		
+			mutable boost::shared_ptr<boost::recursive_mutex> _mutex;
 			mutable boost::optional<boost::gregorian::date> _firstActiveDate;
 			mutable boost::optional<boost::gregorian::date> _lastActiveDate;
-			DatesSet _datesToForce;
-			DatesSet _datesToBypass;
+			mutable boost::optional<BitSets> _datesCache; ///< Dates coming from the links or the marked dates
+		
+			void _resetDatesCache() const;
 
-			static size_t _BitPos(const boost::gregorian::date& d);
+			const BitSets& _getDatesCache() const;
 
-			CalendarLinks _calendarLinks;
-			mutable boost::shared_ptr<boost::recursive_mutex> _mutex;
 
 		public:
 			//! @name Constructors
@@ -137,6 +181,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				bool empty() const;
 				bool isLinked() const;
 
 				boost::gregorian::date getFirstActiveDate() const;
@@ -178,17 +223,10 @@ namespace synthese
 				/// @since 3.2.0
 				bool includesDates(const Calendar& other) const;
 
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Tests if the calendar has no activated date.
-				/// @return true if the calendar has no activated date.
-				bool empty() const;
-
 				size_t size() const;
 
-				Calendar& operator<<= (std::size_t i);
-				Calendar operator<< (std::size_t i);
+				Calendar& operator<<= (size_t i);
+				Calendar operator<< (size_t i) const;
 				Calendar& operator&= (const Calendar& op);
 				Calendar& operator-= (const Calendar& op);
 				virtual Calendar& operator|= (const Calendar& op);
@@ -217,14 +255,13 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void setCalendarFromLinks();
 				void removeCalendarLink(const CalendarLink& link, bool updateCalendar);
 				void addCalendarLink(const CalendarLink& link, bool updateCalendar);
 
 				virtual void setActive(const boost::gregorian::date& date);
 				virtual void setInactive(const boost::gregorian::date& date);
-				void clear();
 				void copyDates(const Calendar& calendar);
+				void clear();
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Fullfill the calendar upon a serialized string.
@@ -236,6 +273,8 @@ namespace synthese
 				/// The serialized string comes from Calendar::serialize.
 				void setFromSerializedString(const std::string& value);
 			//@}
+
+			friend class CalendarLink;
 		};
 }	}
 

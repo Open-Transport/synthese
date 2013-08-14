@@ -49,7 +49,7 @@ namespace synthese
 
 
 		public:
-			static void LoadFromRecord(
+			static bool LoadFromRecord(
 				typename CalendarField<C>::Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,
@@ -60,8 +60,16 @@ namespace synthese
 
 				if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 				{
-					t.setFromSerializedString(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					Calendar value;
+					value.setFromSerializedString(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					if(value != t)
+					{
+						t = value;
+						return true;
+					}
 				}
+
+				return false;
 			}
 
 

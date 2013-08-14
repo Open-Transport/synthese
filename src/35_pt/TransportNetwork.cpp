@@ -21,14 +21,21 @@
 */
 
 #include "TransportNetwork.h"
+
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "ImportableTableSync.hpp"
 #include "ParametersMap.h"
+#include "TransportNetworkTableSync.h"
 
 using namespace std;
 
 namespace synthese
 {
+	using namespace calendar;
 	using namespace util;
 	using namespace graph;
+	using namespace impex;
 
 	namespace util
 	{
@@ -56,10 +63,14 @@ namespace synthese
 		TransportNetwork::~TransportNetwork()
 		{}
 
-                PathClass::Identifier TransportNetwork::getIdentifier() const
-                {
-                        return getKey();
-                }
+
+
+        PathClass::Identifier TransportNetwork::getIdentifier() const
+        {
+			return getKey();
+        }
+
+
 
 		void TransportNetwork::toParametersMap(
 			util::ParametersMap& pm,
@@ -69,5 +80,111 @@ namespace synthese
 		) const	{
 			pm.insert(prefix + DATA_NETWORK_ID, getKey());
 			pm.insert(prefix + DATA_NAME, getName());
+		}
+
+
+		
+		bool TransportNetwork::loadFromRecord(
+			const Record& record,
+			util::Env& env
+		){
+			bool result(false);
+
+			// Name
+			if(record.isDefined(TransportNetworkTableSync::COL_NAME))
+			{
+				std::string name(
+					record.get<string>(TransportNetworkTableSync::COL_NAME)
+				);
+				if(name != _name)
+				{
+					result = true;
+					_name = name;
+				}
+			}
+
+			// Data source links
+			if(record.isDefined(TransportNetworkTableSync::COL_CREATOR_ID))
+			{
+				std::string creatorId(
+					record.get<string>(TransportNetworkTableSync::COL_CREATOR_ID)
+				);
+				DataSourceLinks links(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(creatorId, env)
+				);
+				if(getDataSourceLinks() != links)
+				{
+					setDataSourceLinksWithoutRegistration(links);
+					result = true;
+				}
+			}
+
+			// Days calendars parent
+			if(record.isDefined(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID))
+			{
+				CalendarTemplate* value(NULL);
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(
+						TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID,
+						0
+				)	);
+				if(id > 0) try
+				{
+					value = CalendarTemplateTableSync::GetEditable(
+						id, env
+					).get();
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, e);
+				}
+
+				if(value != _daysCalendarsParent)
+				{
+					_daysCalendarsParent = value;
+					result = true;
+				}
+			}
+
+			// Periods calendars parent
+			if(record.isDefined(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID))
+			{
+				CalendarTemplate* value(NULL);
+
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(
+						TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID,
+						0
+				)	);
+				if(id > 0) try
+				{
+					value = CalendarTemplateTableSync::GetEditable(
+						id, env
+					).get();
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, e);
+				}
+
+				if(value != _periodsCalendarsParent)
+				{
+					_periodsCalendarsParent = value;
+					result = true;
+				}
+			}
+
+			return result;
+		}
+
+		synthese::SubObjects TransportNetwork::getSubObjects() const
+		{
+			SubObjects r;
+			CommercialLineTableSync::SearchResult lines(CommercialLineTableSync::Search(Env::GetOfficialEnv(), getKey()));
+			BOOST_FOREACH(const boost::shared_ptr<CommercialLine> line, lines)
+			{
+				r.push_back(line.get());
+			}
+			return r;
 		}
 }	}

@@ -466,7 +466,7 @@ namespace synthese
 
 
 
-		void SchedulesBasedService::decodeSchedules(
+		SchedulesBasedService::SchedulesPair SchedulesBasedService::DecodeSchedules(
 			const std::string value,
 			boost::posix_time::time_duration shiftArrivals
 		){
@@ -517,11 +517,7 @@ namespace synthese
 				throw BadSchedulesException();
 			}
 
-			setSchedules(
-				departureSchedules,
-				arrivalSchedules,
-				true
-			);
+			return make_pair(departureSchedules, arrivalSchedules);
 		}
 
 
@@ -723,11 +719,12 @@ namespace synthese
 
 
 
-		void SchedulesBasedService::decodeStops(
+		SchedulesBasedService::ServedVertices SchedulesBasedService::decodeStops(
 			const std::string& value,
 			util::Env& env
-		){
-			_vertices.clear();
+		) const {
+			SchedulesBasedService::ServedVertices result;
+
 			if(!value.empty())
 			{
 				vector<string> stops;
@@ -743,21 +740,21 @@ namespace synthese
 							StopPoint* stop(StopPointTableSync::GetEditable(stopId, env).get());
 							if(stop->getHub() == _path->getEdge(rank)->getHub())
 							{
-								_vertices.push_back(stop);
+								result.push_back(stop);
 							}
 							else
 							{
-								_vertices.push_back(NULL);
+								result.push_back(NULL);
 							}
 						}
 						catch(ObjectNotFoundException<StopPoint>&)
 						{
-							_vertices.push_back(NULL);
+							result.push_back(NULL);
 						}
 					}
 					else
 					{
-						_vertices.push_back(NULL);
+						result.push_back(NULL);
 					}
 					++rank;
 				}
@@ -768,7 +765,7 @@ namespace synthese
 					Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
 					for(; rank<_path->getEdges().size(); ++rank)
 					{
-						_vertices.push_back(NULL);
+						result.push_back(NULL);
 					}
 				}
 			}
@@ -776,9 +773,11 @@ namespace synthese
 			{
 				for(size_t rank(0); rank<_path->getEdges().size(); ++rank)
 				{
-					_vertices.push_back(NULL);
+					result.push_back(NULL);
 				}
 			}
+
+			return result;
 		}
 
 

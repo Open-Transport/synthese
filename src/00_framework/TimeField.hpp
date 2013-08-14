@@ -65,13 +65,13 @@ namespace synthese
 		typedef boost::posix_time::time_duration Type;
 
 
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename TimeField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
+			return SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				boost::posix_time::duration_from_string,
