@@ -11,8 +11,8 @@
 #include "IsochronService.hpp"
 #include "ServiceLengthService.hpp"
 
-#include "OpeningTimeTableSync.hpp"
-#include "TrafficForecastTableSync.hpp"
+//#include "OpeningTimeTableSync.hpp"
+//#include "TrafficForecastTableSync.hpp"
 
 // Registries
 
@@ -33,9 +33,9 @@ void synthese::analysis::moduleRegister()
 	synthese::analysis::IsochronService::integrate();
 	synthese::analysis::ServiceLengthService::integrate();
 
-	synthese::analysis::OpeningTimeTableSync::integrate();
-	synthese::analysis::TrafficForecastTableSync::integrate();
+//	synthese::analysis::OpeningTimeTableSync::integrate();
+//	synthese::analysis::TrafficForecastTableSync::integrate();
 
-	synthese::util::Env::Integrate<synthese::analysis::OpeningTime>();
-	synthese::util::Env::Integrate<synthese::analysis::TrafficForecast>();
+//	synthese::util::Env::Integrate<synthese::analysis::OpeningTime>();
+//	synthese::util::Env::Integrate<synthese::analysis::TrafficForecast>();
 }

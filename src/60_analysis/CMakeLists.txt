@@ -12,17 +12,18 @@ IsochronAdmin.cpp
 IsochronAdmin.hpp
 IsochronService.cpp
 IsochronService.hpp
-OpeningTime.cpp
-OpeningTime.hpp
-OpeningTimeTableSync.cpp
-OpeningTimeTableSync.hpp
 ServiceLengthService.cpp
 ServiceLengthService.hpp
-TrafficForecast.cpp
-TrafficForecast.hpp
-TrafficForecastTableSync.cpp
-TrafficForecastTableSync.hpp
 )
+
+#OpeningTime.cpp
+#OpeningTime.hpp
+#OpeningTimeTableSync.cpp
+#OpeningTimeTableSync.hpp
+#TrafficForecast.cpp
+#TrafficForecast.hpp
+#TrafficForecastTableSync.cpp
+#TrafficForecastTableSync.hpp
 
 set_source_files_properties(AnalysisModule.gen.cpp AnalysisModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
