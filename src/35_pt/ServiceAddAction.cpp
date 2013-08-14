@@ -258,7 +258,6 @@ namespace synthese
 						object.addCalendarLink(newLink,true);
 						CalendarLinkTableSync::Save(&newLink, transaction);
 					}
-					object.setCalendarFromLinks();
 				}
 
 				request.setActionCreatedId(object.getKey());

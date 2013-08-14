@@ -189,6 +189,11 @@ namespace synthese
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
+
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
 			//@}
 		};
 	}

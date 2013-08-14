@@ -378,27 +378,7 @@ namespace synthese
 
 		bool JourneyPattern::isActive( const boost::gregorian::date& date ) const
 		{
-			if(!_calendar)
-			{
-				Calendar value;
-				BOOST_FOREACH(const ServiceSet::value_type& service, getServices())
-				{
-					if(	dynamic_cast<Calendar*>(service) &&
-						dynamic_cast<NonPermanentService*>(service)
-					){
-						Calendar copyCalendar(*dynamic_cast<Calendar*>(service));
-						for(int i(service->getDepartureSchedule(false,0).hours() / 24);
-							i<= dynamic_cast<NonPermanentService*>(service)->getLastArrivalSchedule(false).hours() / 24;
-							++i
-						){
-							value |= copyCalendar;
-							copyCalendar <<= 1;
-						}
-					}
-				}
-				_calendar = value;
-			}
-			return _calendar->isActive(date);
+			return getCalendarCache().isActive(date);
 		}
 
 
@@ -804,5 +784,30 @@ namespace synthese
 			}
 			return r;
 
+		}
+
+		Calendar& JourneyPattern::getCalendarCache() const
+		{
+			if(!_calendar)
+			{
+				Calendar value;
+				BOOST_FOREACH(const ServiceSet::value_type& service, getServices())
+				{
+					if(	dynamic_cast<Calendar*>(service) &&
+						dynamic_cast<NonPermanentService*>(service)
+					){
+						Calendar copyCalendar(*dynamic_cast<Calendar*>(service));
+						for(int i(service->getDepartureSchedule(false,0).hours() / 24);
+							i<= dynamic_cast<NonPermanentService*>(service)->getLastArrivalSchedule(false).hours() / 24;
+							++i
+						){
+							value |= copyCalendar;
+							copyCalendar <<= 1;
+						}
+					}
+				}
+				_calendar = value;
+			}
+			return *_calendar;
 		}
 }	}
