@@ -209,12 +209,12 @@ namespace synthese
 				// Calendar filter
 				if(_calendar.get())
 				{
-					bool result(thisRoute->hasAtLeastOneCommonDateWith(calendarFilter));
+					bool result(thisRoute->getCalendarCache().hasAtLeastOneCommonDateWith(calendarFilter));
 					if(!result)
 					{
 						BOOST_FOREACH(JourneyPatternCopy* subline, thisRoute->getSubLines())
 						{
-							if(subline->hasAtLeastOneCommonDateWith(calendarFilter))
+							if(subline->getCalendarCache().hasAtLeastOneCommonDateWith(calendarFilter))
 							{
 								result = true;
 								break;

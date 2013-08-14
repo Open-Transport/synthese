@@ -36,6 +36,11 @@
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class Calendar;
+	}
+
 	namespace geography
 	{
 		class City;
@@ -138,6 +143,7 @@ namespace synthese
 				bool				getMain()					const { return _main; }
 				graph::MetricOffset	getPlannedLength()			const { return _plannedLength; }
 				virtual std::string getName() const { return _name; }
+				calendar::Calendar& getCalendarCache() const;
 			//@}
 
 
