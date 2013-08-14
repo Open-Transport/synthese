@@ -53,6 +53,7 @@ namespace synthese
 			boost::property_tree::ptree _objects;
 			typedef std::map<std::pair<util::RegistryKeyType, std::string>, std::string> ContentMap;
 			std::set<util::RegistryKeyType> _objectsToRemove;
+			std::vector<const util::Registrable*> _objectsToSave;
 
 			Objects::Type _loadObjects(
 				const boost::property_tree::ptree& node,
