@@ -1260,12 +1260,12 @@ namespace synthese
 				// Calendar check
 				if(timetable.getBaseCalendar()->isLimited())
 				{
-					bool result(jp->hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()));
+					bool result(jp->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()));
 					if(!result)
 					{
 						BOOST_FOREACH(JourneyPatternCopy* subline, jp->getSubLines())
 						{
-							if(subline->hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()))
+							if(subline->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()))
 							{
 								result = true;
 								break;
