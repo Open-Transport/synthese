@@ -78,18 +78,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Name
-		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
-
-			// Code
-		    object->setCode(rows->getText ( CityTableSync::TABLE_COL_CODE));
-
-			// Lexical matchers
-			if (linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				// Add to cities and all places matcher
-				GeographyModule::AddToCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(object));
-			}
+			object->loadFromRecord(*rows, env);
 		}
 
 
