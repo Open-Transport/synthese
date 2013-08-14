@@ -704,7 +704,6 @@ namespace synthese
 
 										_env.getEditableRegistry<CalendarLink>().add(boost::shared_ptr<CalendarLink>(serviceCalendarLink));
 									}
-									service->setCalendarFromLinks();
 								}
 								else
 								{
