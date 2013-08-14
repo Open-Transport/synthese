@@ -51,7 +51,6 @@ namespace synthese
 			_commercialSpeed(0),
 			_maxSpeed(0)
 		{
-			setCalendarFromLinks();
 		}
 
 

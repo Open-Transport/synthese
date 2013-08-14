@@ -186,7 +186,6 @@ namespace synthese
 					{
 						object->addCalendarLink(*link, false);
 					}
-					object->setCalendarFromLinks();
 				}
 			}
 			else

@@ -172,7 +172,11 @@ namespace synthese
 			}
 
 			// Schedules
-			object->decodeSchedules(rows->getText(DeadRunTableSync::COL_SCHEDULES));
+			SchedulesBasedService::SchedulesPair value(
+				SchedulesBasedService::DecodeSchedules(
+					rows->get<string>(DeadRunTableSync::COL_SCHEDULES)
+			)	);
+			object->setSchedules(value.first, value.second, true);
 
 			// Dates
 			object->setFromSerializedString(rows->getText(DeadRunTableSync::COL_DATES));
