@@ -26,6 +26,8 @@
 #include "Registry.h"
 #include "Registrable.h"
 
+#include "Calendar.h"
+
 #include <boost/date_time/gregorian/greg_date.hpp>
 
 namespace synthese
@@ -90,8 +92,7 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				/// @pre _calendar is not null
-				void addDatesToCalendar() const;
+				void addDatesToBitSets(Calendar::BitSets& bitsets) const;
 			//@}
 		};
 }	}

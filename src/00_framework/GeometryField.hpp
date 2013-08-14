@@ -107,13 +107,13 @@ namespace synthese
 
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename GeometryField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
+			return SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				_stringToGeom,

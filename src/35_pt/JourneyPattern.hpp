@@ -85,8 +85,7 @@ namespace synthese
 		*/
 		class JourneyPattern:
 			public graph::Path,
-			public impex::ImportableTemplate<JourneyPattern>,
-			public calendar::Calendar
+			public impex::ImportableTemplate<JourneyPattern>
 		{
 		public:
 			static const std::string ATTR_ID;
@@ -105,6 +104,7 @@ namespace synthese
 			Destination* _directionObj;
 			std::string _name;
 			bool _isWalkingLine;
+			mutable boost::optional<calendar::Calendar> _calendar;
 
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
@@ -184,6 +184,13 @@ namespace synthese
 					graph::Service& service,
 					bool ensureLineTheory
 				);
+
+
+
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
 			//@}
 
 			//! @name Services
@@ -195,6 +202,8 @@ namespace synthese
 				virtual bool isPedestrianMode() const;
 
 				bool isReservable () const;
+
+				void clearCalendarCache() const { _calendar.reset(); }
 
 				const pt::StopPoint* getDestination () const;
 				const pt::StopPoint* getOrigin () const;
@@ -276,6 +285,8 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks if the journey pattern calls at the specified city
 				bool callsAtCity(const geography::City& city) const;
+
+				virtual SubObjects getSubObjects() const;
 			//@}
 		};
 	}

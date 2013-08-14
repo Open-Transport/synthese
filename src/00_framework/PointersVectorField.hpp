@@ -73,7 +73,7 @@ namespace synthese
 
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename PointersVectorField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -81,41 +81,50 @@ namespace synthese
 		){
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				return;
+				return false;
 			}
 
-			fieldObject.clear();
+			typename PointersVectorField<C, T>::Type value;
 			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
-			if(text.empty())
+			if(!text.empty())
 			{
-				return;
+				std::vector<std::string> s;
+				boost::algorithm::split(s, text, boost::is_any_of(","));
+				BOOST_FOREACH(const std::string& item, s)
+				{
+					try
+					{
+						value.push_back(
+							env.getEditable<T>(boost::lexical_cast<util::RegistryKeyType>(item)).get()
+						);
+					}
+					catch(boost::bad_lexical_cast&)
+					{
+						util::Log::GetInstance().warn(
+							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
+							item + " is not a valid id."
+						);
+					}
+					catch(util::ObjectNotFoundException<T>&)
+					{
+						util::Log::GetInstance().warn(
+							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
+							item + " was not found."
+						);
+					}
+				}
 			}
-			std::vector<std::string> s;
-			boost::algorithm::split(s, text, boost::is_any_of(","));
-			BOOST_FOREACH(const std::string& item, s)
+
+			if(value == fieldObject)
 			{
-				try
-				{
-					fieldObject.push_back(
-						env.getEditable<T>(boost::lexical_cast<util::RegistryKeyType>(item)).get()
-					);
-				}
-				catch(boost::bad_lexical_cast&)
-				{
-					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
-						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
-						item + " is not a valid id."
-					);
-				}
-				catch(util::ObjectNotFoundException<T>&)
-				{
-					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
-						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
-						item + " was not found."
-					);
-				}
+				return false;
+			}
+			else
+			{
+				fieldObject = value;
+				return true;
 			}
 		}
 
@@ -253,7 +262,7 @@ namespace synthese
 
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename PointersVectorField<C, util::Registrable>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -261,51 +270,60 @@ namespace synthese
 		){
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				return;
+				return false;
 			}
 
-			fieldObject.clear();
+			typename PointersVectorField<C, util::Registrable>::Type value;
 			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
-			if(text.empty())
+			if(!text.empty())
 			{
-				return;
-			}
-			std::vector<std::string> s;
-			boost::algorithm::split(s, text, boost::is_any_of(","));
-			BOOST_FOREACH(const std::string& item, s)
-			{
-				try
+				std::vector<std::string> s;
+				boost::algorithm::split(s, text, boost::is_any_of(","));
+				BOOST_FOREACH(const std::string& item, s)
 				{
-					util::Registrable* lObject(
-						db::DBModule::GetEditableObject( // Temporary modules dependencies rule violation : will be useless when Env::getEditable will be able to chose a registry dynamically.
-							boost::lexical_cast<util::RegistryKeyType>(item),
-							const_cast<util::Env&>(env)
-						).get()
-					);
-					if(!lObject)
+					try
 					{
-						continue;
+						util::Registrable* lObject(
+							db::DBModule::GetEditableObject( // Temporary modules dependencies rule violation : will be useless when Env::getEditable will be able to chose a registry dynamically.
+								boost::lexical_cast<util::RegistryKeyType>(item),
+								const_cast<util::Env&>(env)
+							).get()
+						);
+						if(!lObject)
+						{
+							continue;
+						}
+						value.push_back(
+							lObject
+						);
 					}
-					fieldObject.push_back(
-						lObject
-					);
+					catch(boost::bad_lexical_cast&)
+					{
+						util::Log::GetInstance().warn(
+							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
+							item + " is not a valid id."
+						);
+					}
+					catch(util::ObjectNotFoundException<ObjectBase>&)
+					{
+						util::Log::GetInstance().warn(
+							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
+							item + " was not found."
+						);
+					}
 				}
-				catch(boost::bad_lexical_cast&)
-				{
-					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
-						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
-						item + " is not a valid id."
-					);
-				}
-				catch(util::ObjectNotFoundException<ObjectBase>&)
-				{
-					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
-						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
-						item + " was not found."
-					);
-				}
+			}
+
+			if(value == fieldObject)
+			{
+				return false;
+			}
+			else
+			{
+				fieldObject = value;
+				return true;
 			}
 		}
 

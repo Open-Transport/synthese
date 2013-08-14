@@ -86,6 +86,15 @@ namespace synthese
 
 
 
+		bool CMSScript::operator==(const CMSScript& other) const
+		{
+			return _ignoreWhiteChars == other._ignoreWhiteChars &&
+				_doNotEvaluate == other._doNotEvaluate &&
+				_code == other._code;
+		}
+
+
+
 		void CMSScript::_updateNodes()
 		{
 			boost::unique_lock<shared_recursive_mutex> lock(*_sharedMutex);
@@ -120,7 +129,7 @@ namespace synthese
 
 
 
-		void CMSScript::update(
+		bool CMSScript::update(
 			const std::string& code,
 			bool ignoreWhiteChars,
 			bool doNotEvaluate
@@ -137,6 +146,8 @@ namespace synthese
 			{
 				_updateNodes();
 			}
+
+			return toUpdate;
 		}
 
 

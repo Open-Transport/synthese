@@ -150,10 +150,19 @@ namespace synthese
 					const graph::AccessParameters& accessParameters,
 					const boost::posix_time::ptime& date
 				) const;
+
+
+
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				
+				virtual SubObjects getSubObjects() const;
 			//@}
 
 		};
-
 	}
 }
 

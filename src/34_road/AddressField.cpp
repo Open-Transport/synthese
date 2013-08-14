@@ -45,10 +45,15 @@ namespace synthese
 		using namespace graph;
 		using namespace util;
 
-		void AddressField::LoadFromRecord( Type& fieldObject, ObjectBase& object, const Record& record, const util::Env& env )
-		{
+		bool AddressField::LoadFromRecord(
+			Type& fieldObject,
+			ObjectBase& object,
+			const Record& record,
+			const util::Env& env
+		){
 			assert(dynamic_cast<Address*>(&object));
 			Address& address(dynamic_cast<Address&>(object));
+			bool result(false);
 
 			if(	record.isDefined(FIELDS[0].name) &&
 				record.isDefined(FIELDS[1].name)
@@ -65,9 +70,14 @@ namespace synthese
 					// Road chunk
 					try
 					{
-						address.setRoadChunk(
+						MainRoadChunk* value(
 							env.getEditable<MainRoadChunk>(chunkId).get()
 						);
+						if(value != address.getRoadChunk())
+						{
+							address.setRoadChunk(value);
+							result = true;
+						}
 					}
 					catch (ObjectNotFoundException<MainRoadChunk>&)
 					{
@@ -77,10 +87,17 @@ namespace synthese
 					}
 
 					// Metric offset
-					address.setMetricOffset(
-						record.get<MetricOffset>(
-							FIELDS[1].name
-					)	);
+					{
+						MetricOffset value(
+							record.get<MetricOffset>(
+								FIELDS[1].name
+						)	);
+						if(value != address.getMetricOffset())
+						{
+							address.setMetricOffset(value);
+							result = true;
+						}
+					}
 
 					// Geometry generation
 					if(address.getRoadChunk())
@@ -108,6 +125,7 @@ namespace synthese
 				);
 			}
 
+			return result;
 		}
 
 

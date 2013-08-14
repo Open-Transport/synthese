@@ -54,13 +54,13 @@ namespace synthese
 		public:
 			typedef CMSScript Type;
 			
-			static void LoadFromRecord(
+			static bool LoadFromRecord(
 				CMSScript& fieldObject,
 				ObjectBase& object,
 				const Record& record,
 				const util::Env& env
 			){
-				SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
+				return SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 					fieldObject,
 					record,
 					StringToCMSScript,

@@ -66,7 +66,7 @@ namespace synthese
 
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename PointerField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -74,10 +74,10 @@ namespace synthese
 		){
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				return;
+				return false;
 			}
 
-			fieldObject = boost::none;
+			typename PointerField<C, T>::Type value(boost::none);
 			try
 			{
 				util::RegistryKeyType id(
@@ -87,7 +87,7 @@ namespace synthese
 				)	);
 				if(id > 0)
 				{
-					fieldObject = *env.getEditable<T>(id);
+					value = *env.getEditable<T>(id);
 				}
 			}
 			catch(boost::bad_lexical_cast&)
@@ -105,6 +105,17 @@ namespace synthese
 					object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
 					record.getValue(SimpleObjectFieldDefinition<C>::FIELD.name) + " object was not found."
 				);
+			}
+
+			if(	(!value && !fieldObject) ||
+				(value && fieldObject && &*value==&*fieldObject)
+			){
+				return false;
+			}
+			else
+			{
+				fieldObject = value;
+				return true;
 			}
 		}
 
@@ -225,7 +236,7 @@ namespace synthese
 
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename PointerField<C, util::Registrable>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -233,10 +244,10 @@ namespace synthese
 		){
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				return;
+				return false;
 			}
 
-			fieldObject = boost::none;
+			typename PointerField<C, util::Registrable>::Type value(boost::none);
 			try
 			{
 				util::RegistryKeyType id(
@@ -246,7 +257,7 @@ namespace synthese
 				)	);
 				if(id > 0)
 				{
-					fieldObject = *db::DBModule::GetEditableObject(
+					value = *db::DBModule::GetEditableObject(
 						id,
 						const_cast<util::Env&>(env)
 					); // Temporary modules dependencies rule violation : will be useless when Env::getEditable will be able to chose a registry dynamically.
@@ -267,6 +278,16 @@ namespace synthese
 					object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
 					record.getValue(SimpleObjectFieldDefinition<C>::FIELD.name) + " object was not found."
 				);
+			}
+
+			if(fieldObject == value)
+			{
+				return false;
+			}
+			else
+			{
+				fieldObject = value;
+				return true;
 			}
 		}
 

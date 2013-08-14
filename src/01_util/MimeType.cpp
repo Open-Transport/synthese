@@ -117,6 +117,12 @@ namespace synthese
 		}
 
 
+		bool MimeType::operator!=( const MimeType& v ) const
+		{
+			return _mainType != v._mainType || _subType != v._subType;
+		}
+
+
 		bool operator==( const std::string& v, const MimeType& v1 )
 		{
 			return v == string(v1);

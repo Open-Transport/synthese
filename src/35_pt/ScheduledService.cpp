@@ -23,13 +23,18 @@
 #include "ScheduledService.h"
 
 #include "AccessParameters.h"
+#include "CalendarLink.hpp"
 #include "CommercialLine.h"
 #include "Edge.h"
 #include "Path.h"
 #include "Registry.h"
 #include "GraphConstants.h"
-#include "JourneyPattern.hpp"
+#include "ImportableTableSync.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "NonConcurrencyRule.h"
+#include "PTUseRuleTableSync.h"
+#include "ScheduledServiceTableSync.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 
@@ -40,6 +45,8 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace calendar;
+	using namespace impex;
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
@@ -390,6 +397,288 @@ namespace synthese
 				}
 			}
 			return originPtr;
+		}
+
+
+
+		bool ScheduledService::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			// Service number
+			if(record.isDefined(ScheduledServiceTableSync::COL_SERVICENUMBER))
+			{
+				string serviceNumber(
+					record.get<string>(ScheduledServiceTableSync::COL_SERVICENUMBER)
+				);
+				if(serviceNumber != getServiceNumber())
+				{
+					setServiceNumber(serviceNumber);
+					result = true;
+				}
+			}
+
+			// Team
+			if(record.isDefined(ScheduledServiceTableSync::COL_TEAM))
+			{
+				string value(
+					record.get<string>(ScheduledServiceTableSync::COL_TEAM)
+				);
+				if(value != getTeam())
+				{
+					setTeam(value);
+					result = true;
+				}
+			}
+
+			// Calendar dates
+			if(record.isDefined(ScheduledServiceTableSync::COL_DATES))
+			{
+				Calendar value;
+				value.setFromSerializedString(
+					record.get<string>(ScheduledServiceTableSync::COL_DATES)
+				);
+				if(value != *this)
+				{
+					copyDates(value);
+					result = true;
+				}
+			}
+
+			// Path
+			bool pathUpdated(false);
+			if(record.isDefined(ScheduledServiceTableSync::COL_PATHID))
+			{
+				util::RegistryKeyType pathId(
+					record.getDefault<RegistryKeyType>(
+						ScheduledServiceTableSync::COL_PATHID,
+						0
+				)	);
+				Path* path(
+					JourneyPatternTableSync::GetEditable(pathId, env).get()
+				);
+
+				if(path != getPath())
+				{
+					setPath(path);
+					if(path->getEdges().empty())
+					{
+						LineStopTableSync::Search(env, pathId);
+					}
+					result = true;
+					pathUpdated = true;
+				}
+			}
+
+
+			// Physical stops
+			if(record.isDefined(ScheduledServiceTableSync::COL_STOPS))
+			{
+				SchedulesBasedService::ServedVertices value(
+					decodeStops(
+						record.get<string>(ScheduledServiceTableSync::COL_STOPS),
+						env
+				)	);
+				if(value != getVertices(false))
+				{
+					setVertices(value);
+					result = true;
+				}
+			}
+
+
+			// Dates to force
+			if(record.isDefined(ScheduledServiceTableSync::COL_DATES_TO_FORCE))
+			{
+				string datesStr(
+					record.get<string>(ScheduledServiceTableSync::COL_DATES_TO_FORCE)
+				);
+				vector<string> datesVec;
+				split(datesVec, datesStr, is_any_of(","), token_compress_on);
+				Calendar::DatesSet dates;
+				BOOST_FOREACH(const string& dateStr, datesVec)
+				{
+					if(dateStr.empty())
+					{
+						continue;
+					}
+					dates.insert(from_string(dateStr));
+				}
+
+				if(dates != getDatesToForce())
+				{
+					setDatesToForce(dates);
+					result = true;
+				}
+			}
+
+			// Dates to bypass
+			if(record.isDefined(ScheduledServiceTableSync::COL_DATES_TO_BYPASS))
+			{
+				string datesStr(
+					record.get<string>(ScheduledServiceTableSync::COL_DATES_TO_BYPASS)
+				);
+				vector<string> datesVec;
+				split(datesVec, datesStr, is_any_of(","), token_compress_on);
+				Calendar::DatesSet dates;
+				BOOST_FOREACH(const string& dateStr, datesVec)
+				{
+					if(dateStr.empty())
+					{
+						continue;
+					}
+					dates.insert(from_string(dateStr));
+				}
+
+				if(dates != getDatesToBypass())
+				{
+					setDatesToBypass(dates);
+					result = true;
+				}
+			}
+
+//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+//			{
+				// Use rules
+				RuleUser::Rules rules(getRules());
+
+				// Use rules
+				if(record.isDefined(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID))
+				{
+					RegistryKeyType bikeComplianceId(
+						record.getDefault<RegistryKeyType>(
+							ScheduledServiceTableSync::COL_BIKECOMPLIANCEID,
+							0
+					)	);
+					const PTUseRule* value(NULL);
+					if(bikeComplianceId > 0)
+					{
+						 value = PTUseRuleTableSync::Get(bikeComplianceId, env).get();
+					}
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = value;
+				}
+				if(record.isDefined(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID))
+				{
+					RegistryKeyType handicappedComplianceId(
+						record.getDefault<RegistryKeyType>(
+							ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID,
+							0
+					)	);
+					const PTUseRule* value(NULL);
+					if(handicappedComplianceId > 0)
+					{
+						value = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
+					}
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = value;
+				}
+				if(record.isDefined(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID))
+				{
+					RegistryKeyType pedestrianComplianceId(
+						record.getDefault<RegistryKeyType>(
+							ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID,
+							0
+					)	);
+					const PTUseRule* value(NULL);
+					if(pedestrianComplianceId > 0)
+					{
+						value = PTUseRuleTableSync::Get(pedestrianComplianceId, env).get();
+					}
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = value;
+				}
+				if(rules != getRules())
+				{
+					setRules(rules);
+					result = true;
+				}
+//			}
+
+			// Schedules
+			if(record.isDefined(ScheduledServiceTableSync::COL_SCHEDULES))
+			{
+				try
+				{
+					SchedulesBasedService::SchedulesPair value(
+						SchedulesBasedService::DecodeSchedules(
+							record.get<string>(ScheduledServiceTableSync::COL_SCHEDULES)
+					)	);
+					if(	getPath() &&
+						getPath()->getEdges().size() != value.second.size()
+					){
+						throw Exception("Inconsistent schedules size : different from path edges number");
+					}
+					if(	value.first != _departureSchedules ||
+						value.second != _arrivalSchedules
+					){
+						setSchedules(
+							value.first,
+							value.second,
+							true
+						);
+						result = true;
+					}
+				}
+				catch(SchedulesBasedService::BadSchedulesException&)
+				{
+					throw Exception("Inconsistent schedules size");
+				}
+			}
+
+
+			// Registration in path
+			if( pathUpdated &&
+				getPath() &&
+				getPath()->getPathGroup())
+			{
+				getPath()->addService(
+					*this,
+					&env == &Env::GetOfficialEnv()
+				);
+				updatePathCalendar();
+			}
+
+			// Registration in the line
+//			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				if(	pathUpdated &&
+					getRoute() &&
+					getRoute()->getCommercialLine()
+				){
+					getRoute()->getCommercialLine()->registerService(*this);
+			}	}
+
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+			if(record.isDefined(ScheduledServiceTableSync::COL_DATASOURCE_LINKS))
+			{
+				Importable::DataSourceLinks dsl(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						record.get<string>(ScheduledServiceTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				if(dsl != getDataSourceLinks())	
+				{
+					if(&env == &Env::GetOfficialEnv())
+					{
+						setDataSourceLinksWithRegistration(dsl);
+					}
+					else
+					{
+						setDataSourceLinksWithoutRegistration(dsl);
+					}
+					result = true;
+				}
+			}
+
+			return result;
+		}
+
+		synthese::SubObjects ScheduledService::getSubObjects() const
+		{
+			SubObjects r;
+			BOOST_FOREACH(CalendarLink* link, getCalendarLinks())
+			{
+				r.push_back(link);
+			}
+			return r;
 		}
 	}
 }

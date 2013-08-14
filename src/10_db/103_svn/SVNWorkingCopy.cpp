@@ -688,20 +688,28 @@ namespace synthese
 
 
 
-			void SVNWorkingCopy::from_string( const std::string& text )
+			bool SVNWorkingCopy::from_string( const std::string& text )
 			{
-				setRepo(SVNRepository(text));
+				if(getRepo().getURL() == text)
+				{
+					return false;
+				}
+				else
+				{
+					setRepo(SVNRepository(text));
+					return true;
+				}
 			}
 
 
 
-			void SVNWorkingCopy::LoadFromRecord(
+			bool SVNWorkingCopy::LoadFromRecord(
 				Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,
 				const util::Env& env
 			){
-				SimpleObjectFieldDefinition<SVNWorkingCopy>::_UpdateFromString(
+				return SimpleObjectFieldDefinition<SVNWorkingCopy>::_UpdateFromString(
 					fieldObject,
 					record,
 					&SVNWorkingCopy::from_string

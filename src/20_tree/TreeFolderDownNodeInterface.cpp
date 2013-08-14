@@ -55,7 +55,7 @@ namespace synthese
 
 
 
-		void TreeFolderDownNodeInterface::LoadFromRecord(
+		bool TreeFolderDownNodeInterface::LoadFromRecord(
 			Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -63,17 +63,24 @@ namespace synthese
 		){
 			assert(dynamic_cast<TreeFolderDownNodeInterface*>(&object));
 			TreeFolderDownNodeInterface& node(dynamic_cast<TreeFolderDownNodeInterface&>(object));
-
+			bool result(false);
+			
 			if(record.isDefined(FIELD.name))
 			{
 				// Name
 				try
 				{
 					RegistryKeyType id(record.get<RegistryKeyType>(FIELD.name));
-					node.setTableId(decodeTableId(id));
+					RegistryTableType tableId(decodeTableId(id));
 
-					if(node.getTableId())
+					if(tableId)
 					{
+						if(tableId != node.getTableId())
+						{
+							node.setTableId(tableId);
+							result = true;
+						}
+
 						boost::shared_ptr<DBTableSync> ts(DBModule::GetTableSync(node.getTableId()));
 						if(!dynamic_cast<DBDirectTableSync*>(ts.get()))
 						{
@@ -87,12 +94,22 @@ namespace synthese
 						{
 							throw ObjectNotFoundException<TreeFolderUpNode>(id, "forbidden class");
 						}
-						node._setParent(*dynamic_cast<TreeFolderUpNode*>(parent.get()));
-						fieldObject = dynamic_cast<TreeFolderUpNode*>(parent.get());
+
+						TreeFolderUpNode* parentValue(dynamic_cast<TreeFolderUpNode*>(parent.get()));
+						if(parentValue != node._getParent())
+						{
+							node._setParent(*parentValue);
+							result = true;
+						}
+						fieldObject = parentValue;
 					}
 					else
 					{
-						node.setTableId(id);
+						if(node.getTableId() != id)
+						{
+							node.setTableId(id);
+							result = true;
+						}
 					}
 				}
 				catch(ObjectNotFoundException<Registrable>&)
@@ -108,6 +125,8 @@ namespace synthese
 					);
 				}
 			}
+
+			return result;
 		}
 
 

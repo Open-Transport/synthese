@@ -304,7 +304,6 @@ namespace synthese
 								object2.addCalendarLink(newLink,true);
 								CalendarLinkTableSync::Save(&newLink, transaction);
 							}
-							object2.setCalendarFromLinks();
 						}
 					}
 				}

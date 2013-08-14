@@ -306,6 +306,15 @@ namespace synthese
 				/// @param rule the rule to remove
 				/// This method cleans non concurrency cache of all the services of the line.
 				void removeConcurrencyRule( const pt::NonConcurrencyRule* rule );
+
+				
+				
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual SubObjects getSubObjects() const;
 			//@}
 		};
 }	}

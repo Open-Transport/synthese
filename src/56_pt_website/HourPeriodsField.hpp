@@ -54,7 +54,7 @@ namespace synthese
 			static Type UnSerialize(const std::string& text);
 			static std::string Serialize(const Type& value);
 
-			static void LoadFromRecord(
+			static bool LoadFromRecord(
 				Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,
