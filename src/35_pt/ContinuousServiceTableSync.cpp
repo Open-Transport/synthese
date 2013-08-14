@@ -175,9 +175,15 @@ namespace synthese
 			// Schedules
 			try
 			{
-				cs->decodeSchedules(
-					rows->getText(ContinuousServiceTableSync::COL_SCHEDULES),
-					maxWaitingTime
+				SchedulesBasedService::SchedulesPair value(
+					SchedulesBasedService::DecodeSchedules(
+						rows->get<string>(ContinuousServiceTableSync::COL_SCHEDULES),
+						maxWaitingTime
+				)	);
+				cs->setSchedules(
+					value.first,
+					value.second,
+					true
 				);
 			}
 			catch(...)
@@ -209,7 +215,6 @@ namespace synthese
 					{
 						cs->addCalendarLink(*link, false);
 					}
-					cs->setCalendarFromLinks();
 				}
 			}
 			else
