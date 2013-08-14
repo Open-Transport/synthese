@@ -75,35 +75,14 @@ namespace synthese
 		){
 			// Mark the date in service calendar
 			Calendar::setActive(d);
-
-			if(dynamic_cast<JourneyPattern*>(getPath()))
-			{
-				date newDate(d);
-				for(int i(getDepartureSchedule(false, 0).hours() / 24);
-					i <= getLastArrivalSchedule(false).hours() / 24;
-					++i
-				){
-					static_cast<JourneyPattern*>(getPath())->setActive(newDate + days(i));
-				}
-			}
-			//environment.updateMinMaxDatesInUse (newDate, marked);
+			updatePathCalendar();
 		}
 
 
 
 		void NonPermanentService::updatePathCalendar()
 		{
-			if(dynamic_cast<JourneyPattern*>(getPath()))
-			{
-				Calendar& pathC(*static_cast<JourneyPattern*>(getPath()));
-				Calendar copyCalendar(*this);
-				for(int i(getDepartureSchedule(false,0).hours() / 24);
-					i<= getLastArrivalSchedule(false).hours() / 24;
-					++i
-				){
-					pathC |= (copyCalendar << i);
-				}
-			}
+			static_cast<JourneyPattern*>(getPath())->clearCalendarCache();
 		}
 
 

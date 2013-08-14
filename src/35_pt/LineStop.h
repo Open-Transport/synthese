@@ -107,6 +107,13 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 				void setLine(JourneyPattern* line);
+
+				
+				
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
 			//@}
 		};
 }	}

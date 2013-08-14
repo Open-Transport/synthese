@@ -52,6 +52,8 @@ namespace synthese
 //			HourPeriod(const HourPeriod& period);
 			~HourPeriod ();
 
+			bool operator==(const HourPeriod& op) const;
+
 			//! @name Getters/Setters
 			//@{
 				const std::string& getCaption () const;

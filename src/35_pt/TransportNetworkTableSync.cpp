@@ -95,50 +95,12 @@ namespace synthese
 
 		template<>
 		void OldLoadSavePolicy<TransportNetworkTableSync,TransportNetwork>::Load(
-			TransportNetwork* object,
+			TransportNetwork* obj,
 			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Name
-			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
-			object->setName(name);
-
-			// Data source links
-			std::string creatorId(rows->getText (TransportNetworkTableSync::COL_CREATOR_ID));
-			object->setDataSourceLinksWithoutRegistration(ImportableTableSync::GetDataSourceLinksFromSerializedString(creatorId, env));
-
-			{ // Days calendars parent
-				object->setDaysCalendarsParent(NULL);
-				RegistryKeyType id(rows->getLongLong(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID));
-				if(id > 0) try
-				{
-					object->setDaysCalendarsParent(
-						CalendarTemplateTableSync::GetEditable(
-							id, env, linkLevel
-						).get()
-					);
-				}
-				catch(ObjectNotFoundException<CalendarTemplate>& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, e);
-			}	}
-
-			{ // Periods calendars parent
-				object->setPeriodsCalendarsParent(NULL);
-				RegistryKeyType id(rows->getLongLong(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID));
-				if(id > 0) try
-				{
-					object->setPeriodsCalendarsParent(
-						CalendarTemplateTableSync::GetEditable(
-							id, env, linkLevel
-						).get()
-					);
-				}
-				catch(ObjectNotFoundException<CalendarTemplate>& e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, e);
-			}	}
+			obj->loadFromRecord(*rows, env);
 		}
 
 

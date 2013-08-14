@@ -766,4 +766,19 @@ namespace synthese
 			SubParametersMap::iterator it(_subMap.find(parameterName));
 			if(it != _subMap.end()) _subMap.erase(it);
 		}
+
+
+		bool ParametersMap::empty() const
+		{
+			return _map.empty() && _files.empty() && _subMap.empty();
+		}
+
+
+
+		bool ParametersMap::operator==(
+			const util::ParametersMap& other
+		) const {
+			return _map == other._map;
+		}
+
 }	}

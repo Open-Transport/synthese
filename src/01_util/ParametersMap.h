@@ -278,6 +278,9 @@ namespace synthese
 				) const;
 
 
+				bool empty() const;
+
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the value of a field
@@ -348,6 +351,12 @@ namespace synthese
 				void operator=(
 					const ParametersMap& other
 				);
+
+
+
+				bool operator==(
+					const util::ParametersMap& other
+				) const;
 
 
 

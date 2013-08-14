@@ -89,6 +89,14 @@ namespace synthese
 				void setName(const std::string& value){ _name = value; }
 			//@}
 
+			/// @name Modifiers
+			//@{
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+			//@}
+
 			//! @name Services
 			//@{
 				virtual std::string getRuleUserName() const { return "Réseau " + getName(); }
@@ -109,6 +117,8 @@ namespace synthese
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
+
+				virtual SubObjects getSubObjects() const;
 			//@}
 		};
 	}

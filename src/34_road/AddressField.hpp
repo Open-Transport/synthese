@@ -54,7 +54,7 @@ namespace synthese
 			
 
 
-			static void LoadFromRecord(
+			static bool LoadFromRecord(
 				Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,

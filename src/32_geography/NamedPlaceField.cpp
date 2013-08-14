@@ -44,15 +44,25 @@ namespace synthese
 		using namespace graph;
 		using namespace util;
 
-		void NamedPlaceField::LoadFromRecord( Type& fieldObject, ObjectBase& object, const Record& record, const util::Env& env )
-		{
+		bool NamedPlaceField::LoadFromRecord(
+			Type& fieldObject,
+			ObjectBase& object,
+			const Record& record,
+			const util::Env& env
+		){
 			assert(dynamic_cast<NamedPlace*>(&object));
 			NamedPlace& place(dynamic_cast<NamedPlace&>(object));
+			bool result(false);
 
 			if(record.isDefined(FIELDS[0].name))
 			{
 				// Name
-				place.setName(record.getDefault<string>(FIELDS[0].name));
+				string value(record.getDefault<string>(FIELDS[0].name));
+				if(place.getName() != value)
+				{
+					place.setName(value);
+					result = true;
+				}
 			}
 
 			if(record.isDefined(FIELDS[1].name))
@@ -64,7 +74,11 @@ namespace synthese
 					try
 					{
 						City* city(env.getEditable<City>(city_id).get());
-						place.setCity(city);
+						if(place.getCity() != city)
+						{
+							place.setCity(city);
+							result = true;
+						}
 					}
 					catch(ObjectNotFoundException<City>&)
 					{
@@ -75,6 +89,8 @@ namespace synthese
 					}
 				}
 			}
+
+			return result;
 		}
 
 

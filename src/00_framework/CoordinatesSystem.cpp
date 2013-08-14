@@ -171,13 +171,13 @@ namespace synthese
 
 
 
-	void CoordinatesSystem::LoadFromRecord(
+	bool CoordinatesSystem::LoadFromRecord(
 		CoordinatesSystem::Type& fieldObject,
 		ObjectBase& object,
 		const Record& record,
 		const util::Env& env
 	){
-		SimpleObjectFieldDefinition<CoordinatesSystem>::_LoadFromStringWithDefaultValue(
+		return SimpleObjectFieldDefinition<CoordinatesSystem>::_LoadFromStringWithDefaultValue(
 			fieldObject,
 			record,
 			_stringToPointer,

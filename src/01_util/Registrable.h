@@ -122,7 +122,7 @@ namespace synthese
 
 				virtual SubObjects getSubObjects() const;
 
-				virtual void loadFromRecord(
+				virtual bool loadFromRecord(
 					const Record& record,
 					util::Env& env
 				);

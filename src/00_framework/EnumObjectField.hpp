@@ -46,17 +46,22 @@ namespace synthese
 		}
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename EnumObjectField<C, P>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
+			bool result(false);
 			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
 				try
 				{
-					fieldObject = static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					typename EnumObjectField<C, P>::Type value(
+						static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name))
+					);
+					result = (value == fieldObject);
+					fieldObject = value;
 				}
 				catch(Record::MissingParameterException& e)
 				{
@@ -69,6 +74,7 @@ namespace synthese
 					util::Log::GetInstance().warn(message.str(), e);
 				}
 			}
+			return result;
 		}
 
 

@@ -93,9 +93,10 @@ namespace synthese
 
 
 
-		void Registrable::loadFromRecord( const Record& record, util::Env& env )
+		bool Registrable::loadFromRecord( const Record& record, util::Env& env )
 		{
 			throw Exception("Method loadFromRecord not implemented for the object "+ lexical_cast<string>(_key));
+			return false;
 		}
 
 

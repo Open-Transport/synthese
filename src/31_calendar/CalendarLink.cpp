@@ -51,10 +51,8 @@ namespace synthese
 
 
 
-		void CalendarLink::addDatesToCalendar() const
+		void CalendarLink::addDatesToBitSets(Calendar::BitSets& bitsets) const
 		{
-			assert(_calendar);
-
 			// Do nothing if both calendar templates are null
 			if(!_calendarTemplate && !_calendarTemplate2)
 			{
@@ -86,16 +84,16 @@ namespace synthese
 				Calendar result(_calendarTemplate->getResult(mask));
 				if(_calendarTemplate2)
 				{
-					*_calendar |= _calendarTemplate2->getResult(result);
+					bitsets |= _calendarTemplate2->getResult(result)._getDatesCache();
 				}
 				else
 				{
-					*_calendar |= result;
+					bitsets |= result._getDatesCache();
 				}
 			}
 			else
 			{
-				*_calendar |= _calendarTemplate2->getResult(mask);
+				bitsets |= _calendarTemplate2->getResult(mask)._getDatesCache();
 			}
 		}
 }	}

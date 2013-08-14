@@ -118,7 +118,7 @@ namespace synthese
 
 
 
-			static void LoadFromRecord(
+			static bool LoadFromRecord(
 				typename DataSourceLinksField<C>::Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,
@@ -126,20 +126,28 @@ namespace synthese
 			){
 				if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 				{
-					return;
+					return false;
 				}
 
 				impex::Importable& impObject(dynamic_cast<impex::Importable&>(object));
 				impex::Importable::DataSourceLinks l;
 				DataSourceLinksField<C>::UnSerialize(l, record.getValue(SimpleObjectFieldDefinition<C>::FIELD.name), env);
 
-				if(&env == &util::Env::GetOfficialEnv())
+				if(impObject.getDataSourceLinks() == l)
 				{
-					impObject.setDataSourceLinksWithRegistration(l);
+					return false;
 				}
 				else
 				{
-					impObject.setDataSourceLinksWithoutRegistration(l);
+					if(&env == &util::Env::GetOfficialEnv())
+					{
+						impObject.setDataSourceLinksWithRegistration(l);
+					}
+					else
+					{
+						impObject.setDataSourceLinksWithoutRegistration(l);
+					}
+					return true;
 				}
 			}
 

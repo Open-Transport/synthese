@@ -74,5 +74,12 @@ namespace synthese
 		{
 			return _endHour;
 		}
+
+		bool HourPeriod::operator==( const HourPeriod& op ) const
+		{
+			return _startHour == op._startHour &&
+				_endHour == op._endHour &&
+				_caption == op._caption;
+		}
 	}
 }

@@ -71,6 +71,7 @@ namespace synthese
 			operator std::string() const;
 			bool operator==(const std::string& v) const;
 			bool operator==(const MimeType& v) const;
+			bool operator!=(const MimeType& v) const;
 		};
 
 		bool operator==(const std::string& v, const MimeType& v1);

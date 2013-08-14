@@ -74,7 +74,7 @@ namespace synthese
 
 
 	public:
-		static void LoadFromRecord(
+		static bool LoadFromRecord(
 			typename ParametersMapField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
@@ -82,17 +82,35 @@ namespace synthese
 		){
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				return;
+				return false;
 			}
 
-			fieldObject.clear();
 			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
 			if(text.empty())
 			{
-				return;
+				if(fieldObject.empty())
+				{
+					return false;
+				}
+				else
+				{
+					fieldObject.clear();
+					return true;
+				}
 			}
-
-			fieldObject = util::ParametersMap(text);
+			else
+			{
+				util::ParametersMap pm(text);
+				if(fieldObject == pm)
+				{
+					return false;
+				}
+				else
+				{
+					fieldObject = pm;
+					return true;
+				}
+			}
 		}
 
 

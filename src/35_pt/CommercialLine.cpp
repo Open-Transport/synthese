@@ -23,18 +23,24 @@
 #include "CommercialLine.h"
 
 #include "AccessParameters.h"
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLineTableSync.h"
 #include "Edge.h"
+#include "ForbiddenUseRule.h"
 #include "DataSourceLinksField.hpp"
+#include "PTUseRuleTableSync.h"
 #include "Registry.h"
+#include "ReservationContactTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
 #include "JourneyPattern.hpp"
 #include "NonPermanentService.h"
 #include "JourneyPatternCopy.hpp"
-#include "CalendarTemplate.h"
 #include "ImportableTableSync.hpp"
 #include "ParametersMap.h"
-#include "TransportNetwork.h"
+#include "TransportNetworkTableSync.h"
+#include "TreeFolderTableSync.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -45,12 +51,13 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace util;
-	using namespace graph;
-	using namespace pt;
-	using namespace vehicle;
 	using namespace calendar;
+	using namespace graph;
 	using namespace impex;
+	using namespace pt;
+	using namespace tree;
+	using namespace util;
+	using namespace vehicle;
 
 	namespace util
 	{
@@ -423,5 +430,377 @@ namespace synthese
 			}
 
 			return false;
+		}
+
+
+		bool CommercialLine::loadFromRecord(
+			const Record& record,
+			util::Env& env
+		){
+			bool result(false);
+
+			// Name
+			if(record.isDefined(CommercialLineTableSync::COL_NAME))
+			{
+				string value(
+					record.get<string>(CommercialLineTableSync::COL_NAME)
+				);
+				if(value != _name)
+				{
+					_name = value;
+					result = true;
+				}
+			}
+
+			// Short name
+			if(record.isDefined(CommercialLineTableSync::COL_SHORT_NAME))
+			{
+				string value(
+					record.get<string>(CommercialLineTableSync::COL_SHORT_NAME)
+				);
+				if(value != _shortName)
+				{
+					_shortName = value;
+					result = true;
+				}
+			}
+
+			// Long name
+			if(record.isDefined(CommercialLineTableSync::COL_LONG_NAME))
+			{
+				string value(
+					record.get<string>(CommercialLineTableSync::COL_LONG_NAME)
+				);
+				if(value != _longName)
+				{
+					_longName = value;
+					result = true;
+				}
+			}
+
+			// Map url
+			if(record.isDefined(CommercialLineTableSync::COL_MAP_URL))
+			{
+				string value(
+					record.get<string>(CommercialLineTableSync::COL_MAP_URL)
+				);
+				if(value != _mapURL)
+				{
+					_mapURL = value;
+					result = true;
+				}
+			}
+
+			// Doc url
+			if(record.isDefined(CommercialLineTableSync::COL_DOC_URL))
+			{
+				string value(
+					record.get<string>(CommercialLineTableSync::COL_DOC_URL)
+				);
+				if(value != _docURL)
+				{
+					_docURL = value;
+					result = true;
+				}
+			}
+
+			// Timetable id
+			if(record.isDefined(CommercialLineTableSync::COL_TIMETABLE_ID))
+			{
+				RegistryKeyType value(
+					record.getDefault<RegistryKeyType>(
+						CommercialLineTableSync::COL_TIMETABLE_ID,
+						0
+				)	);
+				if(value != _timetableId)
+				{
+					_timetableId = value;
+					result = true;
+				}
+			}
+
+			// Display duration before first departure
+			if(record.isDefined(CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE))
+			{
+				time_duration value(not_a_date_time);
+				string str(
+					record.get<string>(
+						CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE
+				)	);
+				if(!str.empty())
+				{
+					value = minutes(
+						record.getDefault<long>(
+							CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE,
+							0
+					)	);
+				}
+
+				if(value != _displayDurationBeforeFirstDeparture)
+				{
+					_displayDurationBeforeFirstDeparture = value;
+					result = true;
+				}
+			}
+
+			// Color
+			if(record.isDefined(CommercialLineTableSync::COL_COLOR))
+			{
+				optional<RGBColor> value;
+				string color(record.get<string>(CommercialLineTableSync::COL_COLOR));
+				if(!color.empty())
+				{
+					try
+					{
+						value = RGBColor::FromXMLColor(color);
+					}
+					catch(RGBColor::Exception&)
+					{
+						Log::GetInstance().warn("No such color "+ color +" in commercial line "+ lexical_cast<string>(getKey()));
+					}
+				}
+				if(value != _color)
+				{
+					_color = value;
+					result = true;
+				}
+			}
+
+			// Style
+			if(record.isDefined(CommercialLineTableSync::COL_STYLE))
+			{
+				string value(record.get<string>(CommercialLineTableSync::COL_STYLE));
+				if(value != _style)
+				{
+					_style = value;
+					result = true;
+				}
+			}
+
+			// Image
+			if(record.isDefined(CommercialLineTableSync::COL_IMAGE))
+			{
+				string value(record.get<string>(CommercialLineTableSync::COL_IMAGE));
+				if(value != _image)
+				{
+					_image = value;
+					result = true;
+				}
+			}
+
+//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+//			{
+				// Transport network
+				if(record.isDefined(CommercialLineTableSync::COL_NETWORK_ID))
+				{
+					TreeFolderUpNode* value(NULL);
+					try
+					{
+						RegistryKeyType parentId(
+							record.getDefault<RegistryKeyType>(
+								CommercialLineTableSync::COL_NETWORK_ID,
+								0
+						)	);
+						if(decodeTableId(parentId) == TransportNetworkTableSync::TABLE.ID)
+						{
+							value = TransportNetworkTableSync::GetEditable(parentId, env).get();
+						}
+						else if(decodeTableId(parentId) == TreeFolder::CLASS_NUMBER)
+						{
+							value = TreeFolderTableSync::GetEditable(parentId, env).get();
+						}
+					}
+					catch(ObjectNotFoundException<TransportNetwork>&)
+					{
+						Log::GetInstance().warn("No such network in commercial line "+ lexical_cast<string>(getKey()));
+					}
+					catch(ObjectNotFoundException<TreeFolderTableSync>&)
+					{
+						Log::GetInstance().warn("No such folder in commercial line "+ lexical_cast<string>(getKey()));
+					}
+
+					if(value != _getParent())
+					{
+						if(value)
+						{
+							_setParent(*value);
+						}
+						else
+						{
+							setNullParent();
+						}
+						result = true;
+					}
+				}
+
+				// Calendar template
+				if(record.isDefined(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID))
+				{
+					CalendarTemplate* value(NULL);
+					RegistryKeyType id(
+						record.getDefault<RegistryKeyType>(
+							CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID,
+							0
+					)	);
+					if(id > 0)
+					{
+						try
+						{
+							value = CalendarTemplateTableSync::GetEditable(id, env).get();
+						}
+						catch(ObjectNotFoundException<CalendarTemplate>&)
+						{
+							Log::GetInstance().warn("No such calendar template in commercial line "+ lexical_cast<string>(getKey()));
+						}
+					}
+					if(value != _calendarTemplate)
+					{
+						_calendarTemplate = value;
+						result = true;
+					}
+				}
+
+				// Places with optional reservation
+				// Parse all optional reservation places separated by ,
+				if(record.isDefined(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES))
+				{
+					std::vector<std::string> stops;
+					CommercialLine::PlacesSet placesWithOptionalReservation;
+					string colORP(record.get<string>(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
+					boost::split(
+						stops,
+						colORP,
+						boost::is_any_of(",")
+					);
+					BOOST_FOREACH(const string& stop, stops)
+					{
+						if(stop.empty()) continue;
+						try
+						{
+							placesWithOptionalReservation.insert(
+								StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop),env).get()
+							);
+						}
+						catch(ObjectNotFoundException<StopArea>&)
+						{
+							Log::GetInstance().warn("No such place "+ stop +" in optional reservation places of commercial line "+ lexical_cast<string>(getKey()));
+						}
+					}
+					if(placesWithOptionalReservation != _optionalReservationPlaces)
+					{
+						_optionalReservationPlaces = placesWithOptionalReservation;
+						result = true;
+					}
+				}
+
+				// Use rules
+				RuleUser::Rules rules(getRules());
+
+				// Bike compliance
+				if(record.isDefined(CommercialLineTableSync::COL_BIKE_USE_RULE))
+				{
+					RegistryKeyType bikeComplianceId(
+						record.getDefault<RegistryKeyType>(CommercialLineTableSync::COL_BIKE_USE_RULE, 0)
+					);
+					if(bikeComplianceId > 0)
+					{
+						rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env).get();
+					}
+					else
+					{
+						rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = NULL;
+					}
+				}
+
+				// Handicapped compliance
+				if(record.isDefined(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE))
+				{
+					RegistryKeyType handicappedComplianceId(
+						record.getDefault<RegistryKeyType>(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, 0)
+					);
+					if(handicappedComplianceId > 0)
+					{
+						rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
+					}
+					else
+					{
+						rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = NULL;
+					}
+				}
+
+				// Pedestrian compliance
+				if(record.isDefined(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE))
+				{
+					RegistryKeyType pedestrianComplianceId(
+						record.getDefault<RegistryKeyType>(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, 0)
+					);
+					if(pedestrianComplianceId > 0)
+					{
+						rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env).get();
+					}
+					else
+					{
+						rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = NULL;
+					}
+				}
+
+				if(rules != getRules())
+				{
+					setRules(rules);
+					result = true;
+				}
+
+				// Reservation contact
+				if(record.isDefined(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID))
+				{
+					const ReservationContact* value(NULL);
+					RegistryKeyType reservationContactId(
+						record.get<RegistryKeyType>(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID)
+					);
+					if(reservationContactId > 0)
+					{
+						value = ReservationContactTableSync::Get(reservationContactId, env).get();
+					}
+					if(value != _reservationContact)
+					{
+						_reservationContact = value;
+						result = true;
+					}
+				}
+//			}
+
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+			if(record.isDefined(CommercialLineTableSync::COL_CREATOR_ID))
+			{
+				Importable::DataSourceLinks value(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						record.get<string>(CommercialLineTableSync::COL_CREATOR_ID),
+						env
+				)	);
+				if(value != getDataSourceLinks())
+				{
+					if(&env == &Env::GetOfficialEnv())
+					{
+						setDataSourceLinksWithRegistration(value);
+					}
+					else
+					{
+						setDataSourceLinksWithoutRegistration(value);
+					}
+					result = true;
+				}
+			}
+
+			return result;
+		}
+
+		synthese::SubObjects CommercialLine::getSubObjects() const
+		{
+			SubObjects r;
+			BOOST_FOREACH(Path* path, getPaths())
+			{
+				r.push_back(path);
+			}
+			return r;
 		}
 }	}
