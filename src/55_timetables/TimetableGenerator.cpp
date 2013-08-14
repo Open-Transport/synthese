@@ -346,13 +346,13 @@ namespace synthese
 				}
 
 				// Insertion in the journey patterns list
-				if(_baseCalendar.hasAtLeastOneCommonDateWith(journeyPattern))
+				if(_baseCalendar.hasAtLeastOneCommonDateWith(journeyPattern.getCalendarCache()))
 				{
 					journeyPatterns.push_back(&journeyPattern);
 				}
 				BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, journeyPattern.getSubLines())
 				{
-					if (!_baseCalendar.hasAtLeastOneCommonDateWith(*subline))
+					if (!_baseCalendar.hasAtLeastOneCommonDateWith(subline->getCalendarCache()))
 					{
 						continue;
 					}
