@@ -73,7 +73,6 @@ namespace synthese
 		Log& Log::GetInstance (const std::string& logName)
 		{
 			if (logName.empty ()) return _defaultLog;
-			std::map<std::string, Log*>::iterator it = _logs.find (logName);
 			if (_logs.find (logName) == _logs.end ())
 			{
 				_logs.insert (std::make_pair (logName, new Log ()));
