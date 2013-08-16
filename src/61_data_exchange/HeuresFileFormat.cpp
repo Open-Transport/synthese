@@ -1058,12 +1058,9 @@ namespace synthese
 			}
 
 			// Stops and services
-			const RollingStock* rollingStock(NULL);
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type itjp, _env.getRegistry<JourneyPattern>())
 			{
 				const JourneyPattern& line(*itjp.second);
-				if (line.getRollingStock())
-					rollingStock = line.getRollingStock();
 				LineStopTableSync::Search(
 					_env,
 					line.getKey(),

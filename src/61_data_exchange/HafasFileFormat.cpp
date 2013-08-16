@@ -310,7 +310,6 @@ namespace synthese
 			const path& filePath,
 			const std::string& key
 		) const {
-			bool error(false);
 			if(!_openFile(filePath))
 			{
 				throw Exception("Could no open the file " + filePath.file_string());
@@ -501,8 +500,6 @@ namespace synthese
 			else if(key == FILE_ECKDATEN)
 			{
 				// This file should already loaded at parameters reading
-				error = _calendar.empty();
-
 			} // 2 : Nodes
 			else if(key == FILE_BITFELD)
 			{

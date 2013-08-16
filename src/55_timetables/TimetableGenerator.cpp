@@ -76,7 +76,6 @@ namespace synthese
 			}
 
 			bool result(false);
-			bool passageOk(false);
 			Path::Edges::const_iterator itEdge;
 			const Path::Edges& edges(journeyPattern.getAllEdges());
 
@@ -116,8 +115,6 @@ namespace synthese
 							)
 						){
 							result = true;
-							if (itRow->getIsArrival() || itRow->getCompulsory() == TimetableRow::PassageSuffisant)
-								passageOk = true;
 							break;
 						}
 					}
@@ -645,7 +642,7 @@ namespace synthese
 								seqEnd - itColStart == lastColSet.second - lastColSet.first
 							){
 								bool ok(true);
-								for(size_t curSetColRank(0); curSetColRank<=seqEnd - itColStart; ++curSetColRank)
+								for(size_t curSetColRank(0); curSetColRank<=(size_t)(seqEnd - itColStart); ++curSetColRank)
 								{
 									if(	!(itColStart+curSetColRank)->isLike(*(lastColSet.first + curSetColRank), delta)
 									){
