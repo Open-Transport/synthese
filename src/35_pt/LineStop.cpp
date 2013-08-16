@@ -201,7 +201,7 @@ namespace synthese
 			// Rank in path
 			if(record.isDefined(LineStopTableSync::COL_RANKINPATH))
 			{
-				int rankInPath(
+				size_t rankInPath(
 					record.getDefault<int>(
 						LineStopTableSync::COL_RANKINPATH,
 						0
