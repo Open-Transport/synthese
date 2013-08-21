@@ -438,7 +438,7 @@ namespace synthese
 				value.setFromSerializedString(
 					record.get<string>(ScheduledServiceTableSync::COL_DATES)
 				);
-				if(value != *this)
+				if(value.getMarkedDates() != getMarkedDates())
 				{
 					copyDates(value);
 					result = true;
@@ -597,15 +597,11 @@ namespace synthese
 			{
 				try
 				{
+					_rawSchedule = record.get<string>(ScheduledServiceTableSync::COL_SCHEDULES);
 					SchedulesBasedService::SchedulesPair value(
 						SchedulesBasedService::DecodeSchedules(
-							record.get<string>(ScheduledServiceTableSync::COL_SCHEDULES)
+							_rawSchedule
 					)	);
-					if(	getPath() &&
-						getPath()->getEdges().size() != value.second.size()
-					){
-						throw Exception("Inconsistent schedules size : different from path edges number");
-					}
 					if(	value.first != _departureSchedules ||
 						value.second != _arrivalSchedules
 					){
@@ -614,6 +610,12 @@ namespace synthese
 							value.second,
 							true
 						);
+						if(	getPath() &&
+							(	getPath()->getEdges().size() != _departureSchedules.size() ||
+								getPath()->getEdges().size() != _arrivalSchedules.size()
+						)	){
+							throw Exception("Inconsistent schedules size : different from path edges number");
+						}
 						result = true;
 					}
 				}

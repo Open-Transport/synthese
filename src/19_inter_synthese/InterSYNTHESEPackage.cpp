@@ -22,6 +22,7 @@
 
 #include "InterSYNTHESEPackage.hpp"
 
+#include "DBDirectTableSync.hpp"
 #include "InterSYNTHESEModule.hpp"
 #include "Import.hpp"
 #include "MD5Wrapper.h"
@@ -33,6 +34,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace impex;
 	using namespace inter_synthese;
 	using namespace security;
@@ -47,6 +49,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(LockServerName, "lock_server_name", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(LastJSON, "last_json", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Objects, "object_ids", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(FullTables, "full_tables", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Public, "public", SQL_BOOLEAN)
 
 	namespace inter_synthese
@@ -55,7 +58,10 @@ namespace synthese
 		const string InterSYNTHESEPackage::TAG_LOCK_USER = "lock_user";
 		const string InterSYNTHESEPackage::TAG_OBJECT = "object";
 		const string InterSYNTHESEPackage::SEPARATOR = ":";
-
+		const string InterSYNTHESEPackage::TAG_TABLE = "table";
+		const string InterSYNTHESEPackage::ATTR_ID = "id";
+		const string InterSYNTHESEPackage::ATTR_NAME = "name";
+		
 
 
 		InterSYNTHESEPackage::InterSYNTHESEPackage(
@@ -67,6 +73,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_DEFAULT_CONSTRUCTOR(Code),
 					FIELD_DEFAULT_CONSTRUCTOR(Objects),
+					FIELD_DEFAULT_CONSTRUCTOR(FullTables),
 					FIELD_DEFAULT_CONSTRUCTOR(Import),
 					FIELD_DEFAULT_CONSTRUCTOR(LockUser),
 					FIELD_DEFAULT_CONSTRUCTOR(LockTime),
@@ -144,6 +151,15 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
 				item->toParametersMap(*objectPM, false);
 				map.insert(TAG_OBJECT, objectPM);
+			}
+
+			// Tables
+			BOOST_FOREACH(const FullTables::Type::value_type& table, get<FullTables>())
+			{
+				boost::shared_ptr<ParametersMap> tablePM(new ParametersMap);
+				tablePM->insert(ATTR_ID, lexical_cast<string>(table->getFormat().ID));
+				tablePM->insert(ATTR_NAME, table->getFormat().NAME);
+				map.insert(TAG_TABLE, tablePM);
 			}
 		}
 
@@ -250,12 +266,37 @@ namespace synthese
 			}
 			map.insert(Public::FIELD.name, get<Public>());
 
-			// Objects
+			// Unique objects
 			BOOST_FOREACH(const Objects::Type::value_type& item, get<Objects>())
 			{
 				boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
 				_dumpObject(*item, *objectPM, binaryStream);
 				map.insert(TAG_OBJECT, objectPM);
+			}
+
+			// Full tables
+			Env fullTablesEnv;
+			BOOST_FOREACH(const FullTables::Type::value_type& table, get<FullTables>())
+			{
+				boost::shared_ptr<DBDirectTableSync> directTableSync(
+					boost::dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
+						table
+				)	);
+				if(!directTableSync.get())
+				{
+					continue;
+				}
+				DBDirectTableSync::RegistrableSearchResult objects(
+					directTableSync->search(
+						string(),
+						fullTablesEnv
+				)	);
+				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
+				{
+					boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
+					_dumpObject(*item, *objectPM, binaryStream);
+					map.insert(TAG_OBJECT, objectPM);
+				}
 			}
 
 			// JSON generation

@@ -292,6 +292,16 @@ namespace synthese
 					const graph::Vertex& toVertex
 				) const;
 
+				virtual bool isConnectionAllowed(
+					util::RegistryKeyType fromId,
+					util::RegistryKeyType toId
+				) const;
+
+				virtual boost::posix_time::time_duration getTransferDelay(
+					util::RegistryKeyType fromId,
+					util::RegistryKeyType toId
+				) const;
+
 
 				/** Score getter.
 					@return int the score of the place
@@ -410,8 +420,15 @@ namespace synthese
 				FreeDRTs getFreeDRTs() const;
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Retunr true if StopArea is contained in a DRTArea
+				/// Return true if StopArea is contained in a DRTArea
 				bool isInDRT() const;
+
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual SubObjects getSubObjects() const;
 			//@}
 		};
 }	}
