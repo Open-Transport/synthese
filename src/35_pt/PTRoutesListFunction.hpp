@@ -45,6 +45,7 @@ namespace synthese
 
 	namespace pt
 	{
+		class StopPoint;
 		class CommercialLine;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -65,6 +66,7 @@ namespace synthese
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_CALENDAR_ID;
 			static const std::string PARAMETER_FILTER_MAIN_ROUTES;
+			static const std::string PARAMETER_STOP_ID;
 
 			static const std::string DATA_NAME;
 			static const std::string DATA_LENGTH;
@@ -87,6 +89,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _page;
 				boost::optional<boost::posix_time::ptime> _date;
 				boost::shared_ptr<const calendar::CalendarTemplate> _calendar;
+				boost::shared_ptr<const pt::StopPoint> _stop;
 				bool _mergeSameRoutes;
 				bool _mergeIncludingRoutes;
 				boost::optional<bool> _filterMainRoutes;

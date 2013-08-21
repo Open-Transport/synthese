@@ -65,6 +65,7 @@ namespace synthese
 		const string PTRoutesListFunction::PARAMETER_DATE("date");
 		const string PTRoutesListFunction::PARAMETER_CALENDAR_ID("calendar_id");
 		const string PTRoutesListFunction::PARAMETER_FILTER_MAIN_ROUTES("fmr");
+		const string PTRoutesListFunction::PARAMETER_STOP_ID = "stop_id";
 
 		const std::string PTRoutesListFunction::DATA_NAME("name");
 		const std::string PTRoutesListFunction::DATA_LENGTH("length");
@@ -133,13 +134,32 @@ namespace synthese
 			// Filter on the "main route" attribute
 			_filterMainRoutes = map.getOptional<bool>(PARAMETER_FILTER_MAIN_ROUTES);
 
-			try
+			RegistryKeyType lineId(
+				map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0)
+			);
+			if(lineId) try
 			{
-				_line = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				_line = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(
+					lineId
+				);
 			}
 			catch (ObjectNotFoundException<CommercialLine>&)
 			{
 				throw RequestException("No such line");
+			}
+
+			RegistryKeyType stopId(
+				map.getDefault<RegistryKeyType>(PARAMETER_STOP_ID, 0)
+			);
+			if(stopId) try
+			{
+				_stop = Env::GetOfficialEnv().getRegistry<StopPoint>().get(
+					stopId
+				);
+			}
+			catch (ObjectNotFoundException<StopPoint>&)
+			{
+				throw RequestException("No such stop point");
 			}
 
 			// Date
@@ -192,7 +212,22 @@ namespace synthese
 			{
 				calendarFilter = _calendar->getResult();
 			}
-			BOOST_FOREACH(const Path* path, _line->getPaths())
+			set<const Path*> paths;
+			if(_line.get())
+			{
+				BOOST_FOREACH(const Path* path, _line->getPaths())
+				{
+					paths.insert(path);
+				}
+			}
+			else if(_stop.get())
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stop->getDepartureEdges())
+				{
+					paths.insert(edge.first);
+				}
+			}
+			BOOST_FOREACH(const Path* path, paths)
 			{
 				const JourneyPattern* thisRoute = dynamic_cast<const JourneyPattern*>(path);
 				if(!thisRoute)
