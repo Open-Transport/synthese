@@ -175,6 +175,7 @@ namespace synthese
 			// Schedules
 			try
 			{
+				cs->setRawSchedules(rows->get<string>(ContinuousServiceTableSync::COL_SCHEDULES));
 				SchedulesBasedService::SchedulesPair value(
 					SchedulesBasedService::DecodeSchedules(
 						rows->get<string>(ContinuousServiceTableSync::COL_SCHEDULES),

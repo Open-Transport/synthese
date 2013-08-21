@@ -21,6 +21,7 @@
 */
 
 #include "RuleUser.h"
+#include "AllowedUseRule.h"
 #include "ForbiddenUseRule.h"
 #include "Exception.h"
 #include "AccessParameters.h"
@@ -48,7 +49,9 @@ namespace synthese
 			{
 				return parentRuleUser->getUseRule(rank);
 			}
-			return *ForbiddenUseRule::INSTANCE;
+			return (rank == USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET) ?
+				static_cast<const UseRule&>(*AllowedUseRule::INSTANCE) :
+				static_cast<const UseRule&>(*ForbiddenUseRule::INSTANCE);
 		}
 
 

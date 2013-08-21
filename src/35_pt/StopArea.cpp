@@ -23,19 +23,24 @@
 #include "StopArea.hpp"
 
 #include "AllowedUseRule.h"
+#include "CityTableSync.h"
 #include "CommercialLine.h"
 #include "Crossing.h"
+#include "DBConstants.h"
 #include "Edge.h"
 #include "Env.h"
 #include "ForbiddenUseRule.h"
 #include "FreeDRTArea.hpp"
 #include "DRTArea.hpp"
+#include "ImportableTableSync.hpp"
 #include "JourneyPattern.hpp"
 #include "ParametersMap.h"
 #include "PTModule.h"
+#include "PTUseRuleTableSync.h"
 #include "Registry.h"
 #include "ReverseRoadChunk.hpp"
 #include "RoadModule.h"
+#include "StopAreaTableSync.hpp"
 #include "StopPoint.hpp"
 #include "VertexAccessMap.h"
 
@@ -50,6 +55,8 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
+	using namespace impex;
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
@@ -373,14 +380,26 @@ namespace synthese
 			return !getTransferDelay(fromVertex, toVertex).is_not_a_date_time();
 		}
 
+		bool StopArea::isConnectionAllowed( util::RegistryKeyType fromId, util::RegistryKeyType toId ) const
+		{
+			return !getTransferDelay(fromId, toId).is_not_a_date_time();
+		}
+
 
 
 		boost::posix_time::time_duration StopArea::getTransferDelay(
 			const graph::Vertex& fromVertex,
 			const graph::Vertex& toVertex
 		) const	{
+			return getTransferDelay(fromVertex.getKey(), toVertex.getKey());
+		}
+
+
+
+		boost::posix_time::time_duration StopArea::getTransferDelay( util::RegistryKeyType fromId, util::RegistryKeyType toId ) const
+		{
 			TransferDelaysMap::const_iterator it(
-				_transferDelays.find(make_pair(fromVertex.getKey(), toVertex.getKey()))
+				_transferDelays.find(make_pair(fromId, toId))
 			);
 
 			// If not defined in map, return default transfer delay
@@ -599,5 +618,297 @@ namespace synthese
 				}
 			}
 			return result;
+		}
+
+
+
+		bool StopArea::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			// Name
+			if(record.isDefined(StopAreaTableSync::TABLE_COL_NAME))
+			{
+				string name(
+					record.get<string>(StopAreaTableSync::TABLE_COL_NAME)
+				);
+				trim(name);
+				if(name != getName())
+				{
+					setName(name);
+					result = true;
+				}
+			}
+
+			// Name 13
+			if(record.isDefined(StopAreaTableSync::COL_NAME13))
+			{
+				string name13(
+					record.get<string>(StopAreaTableSync::COL_NAME13)
+				);
+				if(name13 != getName13())
+				{
+					setName13(name13);
+					result = true;
+				}
+			}
+
+			// Name 26
+			if(record.isDefined(StopAreaTableSync::COL_NAME26))
+			{
+				string name26(
+					record.get<string>(StopAreaTableSync::COL_NAME26)
+				);
+				if(name26 != getName26())
+				{
+					setName26(name26);
+					result = true;
+				}
+			}
+
+			// Transfer is allowed
+			if(record.isDefined(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE))
+			{
+				bool connectionType(
+					record.getDefault<bool>(
+						StopAreaTableSync::TABLE_COL_CONNECTIONTYPE,
+						true
+				)	);
+				if(connectionType != getAllowedConnection())
+				{
+					setAllowedConnection(connectionType);
+					result = true;
+				}
+			}
+	
+			// Default transfer duration
+			if(record.isDefined(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY))
+			{
+				posix_time::time_duration defaultTransferDelay(
+					posix_time::minutes(
+						record.getDefault<long>(
+							StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY,
+							2
+				)	)	);
+				if(defaultTransferDelay != getDefaultTransferDelay())
+				{
+					clearTransferDelays();
+					setDefaultTransferDelay(defaultTransferDelay);
+					result = true;
+				}
+			}
+
+			// Timetable name
+			if(record.isDefined(StopAreaTableSync::COL_TIMETABLE_NAME))
+			{
+				string value(
+					record.get<string>(StopAreaTableSync::COL_TIMETABLE_NAME)
+				);
+				if(value != getTimetableName())
+				{
+					setTimetableName(value);
+					result = true;
+				}
+			}
+
+			// Transfer delay matrix
+			if(record.isDefined(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS))
+			{
+				string transferDelaysStr(
+					record.get<string>(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS)
+				);
+				typedef tokenizer<char_separator<char> > tokenizer;
+				char_separator<char> sep1 (",");
+				char_separator<char> sep2 (":");
+				tokenizer tripletTokens (transferDelaysStr, sep1);
+				for (tokenizer::iterator tripletIter = tripletTokens.begin();
+					tripletIter != tripletTokens.end (); ++tripletIter)
+				{
+					tokenizer valueTokens (*tripletIter, sep2);
+					tokenizer::iterator valueIter = valueTokens.begin();
+
+					// departureRank:arrivalRank:transferDelay
+					RegistryKeyType startStop(lexical_cast<RegistryKeyType>(*valueIter));
+					RegistryKeyType endStop(lexical_cast<RegistryKeyType>(*(++valueIter)));
+					const string delay(*(++valueIter));
+					if(delay == StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL)
+					{
+						if(isConnectionAllowed(startStop, endStop))
+						{
+							addForbiddenTransferDelay(startStop, endStop);
+							result = true;
+						}
+					}
+					else
+					{
+						time_duration value(posix_time::minutes(lexical_cast<long>(delay)));
+						if(	!isConnectionAllowed(startStop, endStop) ||
+							getTransferDelay(startStop, endStop) != value)
+						{
+							addTransferDelay(startStop, endStop, value);
+							result = true;
+						}
+					}
+				}
+			}
+
+//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+//			{
+				// City
+				if(record.isDefined(StopAreaTableSync::TABLE_COL_CITYID))
+				{
+					City* value(NULL);
+					RegistryKeyType cityId(
+						record.getDefault<RegistryKeyType>(StopAreaTableSync::TABLE_COL_CITYID, 0)
+					);
+					if(cityId > 0) try
+					{
+						value = CityTableSync::GetEditable(cityId, env).get();
+					}
+					catch(ObjectNotFoundException<City>&)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(cityId) + " for city in stop area " + lexical_cast<string>(getKey()));
+					}
+					if(value != getCity())
+					{
+						setCity(value);
+						value->addPlaceToMatcher(env.getEditableSPtr(this));
+						result = true;
+					}
+				}
+
+				// City main connexion
+				bool isCityMain();
+				if(record.isDefined(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION))
+				{
+					bool value(record.getDefault<bool>(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, false));
+					if(value != (getCity() ? getCity()->includes(*this) : false))
+					{
+						if(getCity())
+						{
+							if (value)
+							{
+								const_cast<City*>(getCity())->addIncludedPlace(*this);
+							}
+							else
+							{
+								const_cast<City*>(getCity())->removeIncludedPlace(*this);
+							}
+						}
+						result = true;
+					}
+				}
+
+				// Handicapped compliance
+				if(record.isDefined(StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID))
+				{
+					RuleUser::Rules rules(getRules());
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+					RegistryKeyType handicappedComplianceId(
+						record.getDefault<RegistryKeyType>(
+							StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID,
+							0
+					)	);
+					if(handicappedComplianceId > 0)
+					{
+						try
+						{
+							rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
+						}
+						catch(ObjectNotFoundException<PTUseRule>&)
+						{
+							Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in stop area " + lexical_cast<string>(getKey()));
+					}	}
+					if(rules != getRules())
+					{
+						setRules(rules);
+						result = true;
+					}
+				}
+
+				// Position : Lon/lat prior to x/y
+				if(record.isDefined(TABLE_COL_GEOMETRY))
+				{
+					boost::shared_ptr<Point> point;
+					if(!record.get<string>(TABLE_COL_GEOMETRY).empty())
+					{
+						point =	static_pointer_cast<Point, Geometry>(
+							record.getGeometryFromWKT(TABLE_COL_GEOMETRY)
+						);
+					}
+					else if(
+						record.getDefault<double>(StopAreaTableSync::COL_X, 0) > 0 &&
+						record.getDefault<double>(StopAreaTableSync::COL_Y, 0) > 0
+					){
+						point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+							record.getDefault<double>(StopAreaTableSync::COL_X, 0),
+							record.getDefault<double>(StopAreaTableSync::COL_Y, 0)
+						);
+					}
+					if(	(!point.get() && getLocation().get()) ||
+						(point.get() && !getLocation().get()) ||
+						(point.get() && getLocation().get() && point->equalsExact(getLocation().get()))
+					){
+						setLocation(point);
+						result = true;
+					}
+				}
+
+				// Registration to all places matcher
+				if(	&env == &Env::GetOfficialEnv() &&
+					getCity()
+				){
+					GeographyModule::GetGeneralAllPlacesMatcher().add(
+						getFullName(),
+						env.getEditableSPtr(this)
+					);
+				}
+
+				// Registration to road places matcher
+				if(	&env == &Env::GetOfficialEnv() &&
+					getCity()
+				){
+					PTModule::GetGeneralStopsMatcher().add(
+						getFullName(),
+						env.getEditableSPtr(this)
+					);
+				}
+
+				// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+				if(record.isDefined(StopAreaTableSync::COL_CODE_BY_SOURCE))
+				{
+					Importable::DataSourceLinks value(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							record.get<string>(StopAreaTableSync::COL_CODE_BY_SOURCE),
+							env
+					)	);
+					if(value != getDataSourceLinks())
+					{
+						if(&env == &Env::GetOfficialEnv())
+						{
+							setDataSourceLinksWithRegistration(value);
+						}
+						else
+						{
+							setDataSourceLinksWithoutRegistration(value);
+						}
+					}
+				}
+//			}
+
+			return result;
+		}
+
+
+
+		synthese::SubObjects StopArea::getSubObjects() const
+		{
+			SubObjects r;
+			BOOST_FOREACH(const PhysicalStops::value_type& stop, getPhysicalStops())
+			{
+				r.push_back(const_cast<StopPoint*>(stop.second));
+			}
+			return r;
 		}
 }	}

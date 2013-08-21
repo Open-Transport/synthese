@@ -85,7 +85,7 @@ namespace synthese
 							T* value(
 								env.getEditable<T>(up_id).get()
 							);
-							if(value != t.getParent())
+							if(value != t.getParent(true))
 							{
 								t.setParent(env.getEditable<T>(up_id).get());
 								result = true;
@@ -101,7 +101,7 @@ namespace synthese
 					}
 					else
 					{
-						if(t.getParent() != NULL)
+						if(t.getParent(true) != NULL)
 						{
 							t.setParent(NULL);
 							result = true;

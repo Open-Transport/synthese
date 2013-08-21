@@ -21,9 +21,15 @@
 */
 
 #include "StopPoint.hpp"
+
+#include "Crossing.h"
+#include "ImportableTableSync.hpp"
 #include "Registry.h"
 #include "PTModule.h"
-#include "StopArea.hpp"
+#include "PTUseRuleTableSync.h"
+#include "RoadChunkTableSync.h"
+#include "StopAreaTableSync.hpp"
+#include "StopPointTableSync.hpp"
 #include "ReverseRoadChunk.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
@@ -37,10 +43,14 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
+	using namespace impex;
 	using namespace util;
 	using namespace pt;
 	using namespace graph;
 	using namespace impex;
+	using namespace road;
+	
 
 	namespace util
 	{
@@ -261,5 +271,158 @@ namespace synthese
 				CoordinatesSystem::GetInstanceCoordinatesSystem(),
 				prefix
 			);
+		}
+
+		bool StopPoint::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			// Name
+			if(record.isDefined(StopPointTableSync::COL_NAME))
+			{
+				string value(record.get<string>(StopPointTableSync::COL_NAME));
+				if(value != getName())
+				{
+					setName(value);
+					result = true;
+				}
+			}
+
+			// Position : Lon/lat prior to x/y
+			if(	record.isDefined(TABLE_COL_GEOMETRY) ||
+				(record.isDefined(StopPointTableSync::COL_X) && record.isDefined(StopPointTableSync::COL_Y))
+			){
+				boost::shared_ptr<Point> value;
+				if(!record.get<string>(TABLE_COL_GEOMETRY).empty())
+				{
+					value = static_pointer_cast<Point, geos::geom::Geometry>(
+						record.getGeometryFromWKT(TABLE_COL_GEOMETRY)
+					);
+				}
+				else if(
+					record.getDefault<double>(StopPointTableSync::COL_X, 0) > 0 &&
+					record.getDefault<double>(StopPointTableSync::COL_Y, 0) > 0
+				){
+					value = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+						record.getDefault<double>(StopPointTableSync::COL_X, 0),
+						record.getDefault<double>(StopPointTableSync::COL_Y, 0)
+					);
+				}
+				if( (!value.get() && getGeometry().get()) ||
+					(value.get() && !getGeometry().get()) ||
+					(value.get() && getGeometry().get() && value->equalsExact(getGeometry().get()))
+				){
+					setGeometry(value);
+					result = true;
+				}
+			}
+
+//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+//			{
+				// Stop area
+			if(record.isDefined(StopPointTableSync::COL_PLACEID))
+			{
+				StopArea* place(NULL);
+				try
+				{
+					place = StopAreaTableSync::GetEditable(
+						record.getDefault<RegistryKeyType>(StopPointTableSync::COL_PLACEID, 0),
+						env
+					).get();
+				}
+				catch (ObjectNotFoundException<StopArea>& e)
+				{
+					throw Exception("Not found");
+				}
+				if(place != getConnectionPlace())
+				{
+					setHub(place);
+
+					if(place)
+					{
+						place->addPhysicalStop(*this);
+					}
+
+					result = true;
+				}
+			}
+
+			// Projected point
+			if(	record.isDefined(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID) &&
+				record.isDefined(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET)
+			){
+				RegistryKeyType chunkId(
+					record.getDefault<RegistryKeyType>(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,0));
+				MainRoadChunk* chunk(NULL);
+				MetricOffset metricOffset(0);
+				if(chunkId > 0)
+				{
+					try
+					{
+						chunk = RoadChunkTableSync::GetEditable(chunkId, env).get();
+						metricOffset = record.getDefault<double>(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, 0);
+					}
+					catch (ObjectNotFoundException<MainRoadChunk>&)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(getKey()));
+					}
+				}
+				if(	getProjectedPoint().getRoadChunk() != chunk ||
+					getProjectedPoint().getMetricOffset() != metricOffset
+				){
+					if(chunk)
+					{
+						setProjectedPoint(Address(*chunk, metricOffset));
+						chunk->getFromCrossing()->addReachableVertex(this);
+					}
+					else
+					{
+						setProjectedPoint(Address());
+					}
+					result = true;
+				}
+			}
+
+
+				// Handicapped compliance
+				if(record.isDefined(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID))
+				{
+					RuleUser::Rules rules(getRules());
+					RegistryKeyType handicappedComplianceId(
+						record.getDefault<RegistryKeyType>(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID, 0)
+					);
+					if(handicappedComplianceId > 0)
+					{
+						try
+						{
+							rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
+						}
+						catch(ObjectNotFoundException<PTUseRule>&)
+						{
+							Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in stop " + lexical_cast<string>(getKey()));
+					}	}
+					if(rules != getRules())
+					{
+						setRules(rules);
+						result = true;
+					}
+				}
+
+				// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+				if(record.isDefined(StopPointTableSync::COL_OPERATOR_CODE))
+				{
+					Importable::DataSourceLinks value(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							record.get<string>(StopPointTableSync::COL_OPERATOR_CODE),
+							env
+					)	);
+					if(value != getDataSourceLinks())
+					{
+						setDataSourceLinksWithRegistration(value);
+						result = true;
+					}
+				}
+//			}
+			return result;
 		}
 }	}

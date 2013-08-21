@@ -84,6 +84,8 @@ namespace synthese
 			) const;
 
 		protected:
+			// This is the schedule as we got it when loaded from the base
+			std::string _rawSchedule;
 
 			//! @name Theoretical data
 			//@{
@@ -139,6 +141,8 @@ namespace synthese
 					const Schedules& arrivalSchedules,
 					bool onlyScheduledEdges
 				);
+
+				void setRawSchedules(const std::string& value){ _rawSchedule = value; }
 
 
 				virtual void setPath(graph::Path* path);
