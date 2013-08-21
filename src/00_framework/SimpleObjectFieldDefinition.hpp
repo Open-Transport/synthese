@@ -109,13 +109,19 @@ namespace synthese
 				{
 					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
 					T value(text.empty() ? default_value : reader(text));
-					result = (fieldObject == value);
-					fieldObject = value;
+					if(fieldObject != value)
+					{
+						fieldObject = value;
+						result = true;
+					}
 				}
 				catch(...)
 				{
-					result = (fieldObject == default_value);
-					fieldObject = default_value;
+					if(fieldObject != default_value)
+					{
+						fieldObject = default_value;
+						result = true;
+					}
 				}
 			}
 			return result;

@@ -82,7 +82,10 @@ namespace synthese
 
 		void NonPermanentService::updatePathCalendar()
 		{
-			static_cast<JourneyPattern*>(getPath())->clearCalendarCache();
+			if(dynamic_cast<JourneyPattern*>(getPath()))
+			{
+				static_cast<JourneyPattern*>(getPath())->clearCalendarCache();
+			}
 		}
 
 

@@ -24,6 +24,7 @@
 #include "AlgorithmLogger.hpp"
 #include "BestVertexReachesMap.h"
 #include "JourneysResult.h"
+#include "Junction.hpp"
 #include "RoadPlace.h"
 #include "VertexAccessMap.h"
 #include "Vertex.h"

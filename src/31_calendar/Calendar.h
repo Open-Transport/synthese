@@ -85,6 +85,7 @@ namespace synthese
 				BitSets& operator|= (const BitSets& op);
 				BitSets& operator&= (const BitSets& op);
 				bool operator==(const BitSets& op) const;
+				bool operator!=(const BitSets& op) const;
 				BitSets& operator-= (const BitSets& op);
 				const _BitSets getValue() const { return _value; }
 				boost::gregorian::date getFirstActiveDate() const;
@@ -170,6 +171,7 @@ namespace synthese
 				const CalendarLinks& getCalendarLinks() const { return _calendarLinks; }
 				const DatesSet& getDatesToForce() const { return _datesToForce; }
 				const DatesSet& getDatesToBypass() const { return _datesToBypass; }
+				const BitSets& getMarkedDates() const { return _markedDates; }
 			//@}
 
 			//! @name Setters

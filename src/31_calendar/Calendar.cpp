@@ -456,7 +456,7 @@ namespace synthese
 		bool Calendar::operator!=( const Calendar& op ) const
 		{
 			recursive_mutex::scoped_lock lock(*_mutex);
-			return !(_getDatesCache() == op._getDatesCache());
+			return _getDatesCache() != op._getDatesCache();
 		}
 
 
@@ -750,5 +750,13 @@ namespace synthese
 		bool Calendar::BitSets::operator==( const BitSets& op ) const
 		{
 			return _value == op._value;
+		}
+
+
+
+
+		bool Calendar::BitSets::operator!=( const BitSets& op ) const
+		{
+			return _value != op._value;
 		}
 }	}

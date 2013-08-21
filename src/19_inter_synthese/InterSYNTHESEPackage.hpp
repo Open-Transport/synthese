@@ -31,6 +31,7 @@
 #include "PtimeField.hpp"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
+#include "TablesVectorField.hpp"
 #include "User.h"
 
 #include <boost/thread/mutex.hpp>
@@ -44,6 +45,7 @@ namespace synthese
 	FIELD_STRING(LastJSON)
 	FIELD_POINTERS_VECTOR(Objects, util::Registrable)
 	FIELD_BOOL(Public)
+	FIELD_TABLES_VECTOR(FullTables)
 	
 	namespace inter_synthese
 	{
@@ -52,6 +54,7 @@ namespace synthese
 			FIELD(Name),
 			FIELD(Code),
 			FIELD(Objects),
+			FIELD(FullTables),
 			FIELD(impex::Import),
 			FIELD(LockUser),
 			FIELD(LockTime),
@@ -105,6 +108,9 @@ namespace synthese
 			static const std::string TAG_IMPORT;
 			static const std::string TAG_LOCK_USER;
 			static const std::string TAG_OBJECT;
+			static const std::string TAG_TABLE;
+			static const std::string ATTR_ID;
+			static const std::string ATTR_NAME;
 			static const std::string SEPARATOR;
 		
 		private:
