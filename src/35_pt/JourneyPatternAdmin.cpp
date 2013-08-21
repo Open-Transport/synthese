@@ -330,6 +330,7 @@ namespace synthese
 						*/
 						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStops())
 						{
+							stream << "<span title=\"" << ps.second->getCodeBySources() << "\">";
 							if(ps.second == linePhysicalStop->getPhysicalStop())
 							{
 								stream << "[";
@@ -345,7 +346,7 @@ namespace synthese
 							{
 								stream << "]";
 							}
-							stream << " ";
+							stream << "</span> ";
 						}
 					}
 
