@@ -322,9 +322,12 @@ namespace synthese
 				// XML header
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<directions xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/PTRoutesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""<<
-					" lineName=\"" << _line->getName() <<
-					"\">";
+					"<directions xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/PTRoutesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
+				if(_line.get())
+				{
+					stream << " lineName=\"" << _line->getName() << "\"";
+				}
+				stream << ">";
 			}
 
 			ParametersMap result;
