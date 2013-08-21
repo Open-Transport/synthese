@@ -681,10 +681,10 @@ namespace synthese
 			const boost::posix_time::time_duration& delta
 		) const	{
 			// Same columns must have the same calendar
-			if(_calendar != other._calendar)
-			{
-				return false;
-			}
+//			if(_calendar != other._calendar)
+//			{
+//				return false;
+//			}
 
 			// Loop on cells
 			TimetableColumn::Content::const_iterator itOther(other._content.begin());
