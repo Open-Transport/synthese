@@ -30,17 +30,9 @@
 
 <h3>Liens avec la base SYNTHESE</h3>
 
-<div class="control-group">
- <label class="control-label">Réseau de transport</label>
- <div class="controls">
-  <select name="network_id" is_parameter="true">
-   <option value="">(non défini)</option>
-   <?PTNetworksListFunction&template=<{network&template=
-       <option value="<@id@>" <@(id==network_id)?"selected=\"true\"":""@>><@name@></option>
-   }>?>
-  </select>
- </div>
-</div>
+<#forms/network_selector&
+  name=net&
+#>
 
 <div class="control-group">
  <label class="control-label">Période de couverture de l'import</label>
