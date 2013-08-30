@@ -153,7 +153,7 @@ namespace synthese
 			const Session* session
 		) const {
 			return (session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(READ)) ||
-				(session && session->getUser() && session->getUser()->getKey() == _user->getKey());
+				(session && session->getUser() && _user && session->getUser()->getKey() == _user->getKey());
 		}
 
 
