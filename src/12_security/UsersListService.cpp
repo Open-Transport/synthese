@@ -152,7 +152,8 @@ namespace synthese
 		bool UsersListService::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(READ);
+			return (session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(READ)) ||
+				(session && session->getUser() && session->getUser()->getKey() == _user->getKey());
 		}
 
 
