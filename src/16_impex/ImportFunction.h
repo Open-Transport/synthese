@@ -107,4 +107,4 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_TridentExportFunction_H__
+#endif // SYNTHESE_ImportFunction_H__
