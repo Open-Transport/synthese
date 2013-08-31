@@ -3,8 +3,6 @@ set_source_groups()
 set(geography_SRCS
 City.cpp
 City.h
-CityAddAction.cpp
-CityAddAction.h
 CityAlias.cpp
 CityAlias.hpp
 CityAliasTableSync.cpp
@@ -13,8 +11,6 @@ CityNameValueInterfaceElement.cpp
 CityNameValueInterfaceElement.h
 CityTableSync.cpp
 CityTableSync.h
-CityUpdateAction.cpp
-CityUpdateAction.h
 GeographyModule.cpp
 GeographyModule.gen.cpp
 GeographyModuleRegister.cpp

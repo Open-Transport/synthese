@@ -57,6 +57,13 @@ namespace synthese
 
 			void setScheduleInput(bool value) { _scheduleInput = value; }
 			void setReservationNeeded(bool value) { _reservationNeeded = value; }
+
+			virtual void toParametersMap(
+				util::ParametersMap& pm,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles = boost::logic::indeterminate,
+				std::string prefix = std::string()
+			) const;
 		};
 	}
 }

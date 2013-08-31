@@ -25,8 +25,11 @@
 #include "ContinuousService.h"
 
 #include "AccessParameters.h"
+#include "ContinuousServiceTableSync.h"
+#include "DBConstants.h"
 #include "Edge.h"
 #include "JourneyPattern.hpp"
+#include "PTUseRule.h"
 #include "Registry.h"
 
 using namespace std;
@@ -36,6 +39,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 	using namespace graph;
 
@@ -369,5 +373,53 @@ namespace synthese
 		}
 
 
+
+		void ContinuousService::toParametersMap( util::ParametersMap& map, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
+		{
+			Service::toParametersMap(map, withAdditionalParameters, withFiles, prefix);
+
+			// Dates preparation
+			stringstream datesStr;
+			if(getCalendarLinks().empty())
+			{
+				serialize(datesStr);
+			}
+
+			map.insert(TABLE_COL_ID, getKey());
+			map.insert(ContinuousServiceTableSync::COL_SERVICENUMBER, getServiceNumber());
+			map.insert(ContinuousServiceTableSync::COL_SCHEDULES, encodeSchedules(-getMaxWaitingTime()));
+			map.insert(
+				ContinuousServiceTableSync::COL_PATHID, 
+				getPath() ? getPath()->getKey() : 0
+			);
+			map.insert(
+				ContinuousServiceTableSync::COL_RANGE,
+				getRange().total_seconds() / 60
+			);
+			map.insert(
+				ContinuousServiceTableSync::COL_MAXWAITINGTIME,
+				getMaxWaitingTime().total_seconds() / 60
+			);
+
+			map.insert(
+				ContinuousServiceTableSync::COL_BIKE_USE_RULE,
+				(	getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(getRule(USER_BIKE)) ?
+					static_cast<const PTUseRule*>(getRule(USER_BIKE))->getKey() :
+					RegistryKeyType(0)
+			)	);
+			map.insert(
+				ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE,
+				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
+					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
+					RegistryKeyType(0)
+			)	);
+			map.insert(
+				ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE,
+				(	getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN)) ?
+					static_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN))->getKey() :
+					RegistryKeyType(0)
+			)	);
+			map.insert(ContinuousServiceTableSync::COL_DATES, datesStr.str());
+		}
 	}
 }

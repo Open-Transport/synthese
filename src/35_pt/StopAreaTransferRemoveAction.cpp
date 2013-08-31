@@ -101,10 +101,15 @@ namespace synthese
 		void StopAreaTransferRemoveAction::run(
 			Request& request
 		){
-			const_cast<StopArea*>(_from->getConnectionPlace())->removeTransferDelay(
-				_from->getKey(),
-				_to->getKey()
+			StopArea::TransferDelaysMap value(
+				_from->getConnectionPlace()->getTransferDelays()
 			);
+			value.erase(
+				make_pair(
+					_from->getKey(),
+					_to->getKey()
+			)	);
+			const_cast<StopArea*>(_from->getConnectionPlace())->setTransferDelaysMatrix(value);
 
 			StopAreaTableSync::Save(const_cast<StopArea*>(_from->getConnectionPlace()));
 		}

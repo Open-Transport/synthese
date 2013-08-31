@@ -111,11 +111,11 @@ namespace synthese
 
 		template<>
 		boost::shared_ptr<Composition> InheritanceLoadSavePolicy<CompositionTableSync,Composition>::GetNewObject(
-			const DBResultSPtr& row
+			const Record& row
 		){
-			return row->getLongLong(CompositionTableSync::COL_SERVICE_ID) ?
-				boost::shared_ptr<Composition>(new ServiceComposition(row->getKey())) :
-				boost::shared_ptr<Composition>(new VehicleServiceComposition(row->getKey()))
+			return row.getDefault<RegistryKeyType>(CompositionTableSync::COL_SERVICE_ID, 0) ?
+				boost::shared_ptr<Composition>(new ServiceComposition(row.getDefault<RegistryKeyType>(TABLE_COL_ID, 0))) :
+				boost::shared_ptr<Composition>(new VehicleServiceComposition(row.getDefault<RegistryKeyType>(TABLE_COL_ID, 0)))
 			;
 		}
 

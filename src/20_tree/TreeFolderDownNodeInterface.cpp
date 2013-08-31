@@ -248,10 +248,7 @@ namespace synthese
 
 		void TreeFolderDownNodeInterface::_setParent(TreeFolderUpNode& value)
 		{
-			if(_parent)
-			{
-				_parent->removeChild(*this);
-			}
+			removeParentLink();
 			_parent = &value;
 			_parent->addChild(*this);
 			if(dynamic_cast<TreeFolderDownNodeInterface*>(_parent))
@@ -272,10 +269,7 @@ namespace synthese
 
 		void TreeFolderDownNodeInterface::setNullParent()
 		{
-			if(_parent)
-			{
-				_parent->removeChild(*this);
-			}
+			removeParentLink();
 			_parent = NULL;
 			_root = NULL;
 		}
@@ -294,5 +288,23 @@ namespace synthese
 				}
 			}
 			return false;
+		}
+
+
+
+		void TreeFolderDownNodeInterface::removeParentLink()
+		{
+			if(_parent)
+			{
+				_parent->removeChild(*this);
+			}
+		}
+
+		void TreeFolderDownNodeInterface::setParentLink()
+		{
+			if(_parent)
+			{
+				_parent->addChild(*this);
+			}
 		}
 }	}

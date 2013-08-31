@@ -78,7 +78,7 @@ namespace synthese
 
 
 
-		void LinePhysicalStop::clearPhysicalStop()
+		void LinePhysicalStop::clearPhysicalStopLinks()
 		{
 			StopPoint* stop(getPhysicalStop());
 			if(stop == NULL)
@@ -121,7 +121,5 @@ namespace synthese
 					delete it.second;
 				}
 			}
-
-			setFromVertex(NULL);
 		}
 }	}

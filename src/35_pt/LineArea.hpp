@@ -87,6 +87,13 @@ namespace synthese
 				DRTArea* getArea() const;
 
 				virtual bool getScheduleInput() const { return true; }
+
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 }	}

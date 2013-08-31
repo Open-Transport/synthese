@@ -10,8 +10,6 @@
 #include "MapSourceTableSync.hpp"
 #include "PlaceAliasTableSync.h"
 
-#include "CityAddAction.h"
-#include "CityUpdateAction.h"
 #include "MapSourceUpdateAction.hpp"
 
 #include "GetMapOpenLayersConstructorService.hpp"
@@ -47,8 +45,6 @@ namespace synthese
 
 			PlaceAlias::integrate();
 
-			CityAddAction::integrate();
-			CityUpdateAction::integrate();
 			MapSourceUpdateAction::integrate();
 
 			GetMapOpenLayersConstructorService::integrate();

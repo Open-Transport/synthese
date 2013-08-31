@@ -38,7 +38,6 @@
 
 namespace synthese
 {
-	FIELD_STRING(Code)
 	FIELD_POINTER(LockUser, security::User)
 	FIELD_PTIME(LockTime)
 	FIELD_STRING(LockServerName)

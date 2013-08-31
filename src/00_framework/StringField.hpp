@@ -167,6 +167,7 @@ namespace synthese
 
 	FIELD_STRING(Title)
 	FIELD_STRING(Name)
+	FIELD_STRING(Code)
 }
 
 #endif

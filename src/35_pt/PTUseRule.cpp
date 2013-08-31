@@ -21,7 +21,8 @@
 */
 
 #include "PTUseRule.h"
-#include "Edge.h"
+
+#include "LineStop.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "ServicePointer.h"
@@ -201,7 +202,10 @@ namespace synthese
 
 			case RESERVATION_RULE_COMPULSORY:
 				return
-					IsReservationPossible(getReservationAvailability(servicePointer, ignoreReservation)) ?
+					(	!dynamic_cast<const LineStop*>(servicePointer.getDepartureEdge()) ||
+						!static_cast<const LineStop*>(servicePointer.getDepartureEdge())->getReservationNeeded() ||
+						IsReservationPossible(getReservationAvailability(servicePointer, ignoreReservation))
+					) ?
 					RUN_POSSIBLE :
 					RUN_NOT_POSSIBLE
 				;

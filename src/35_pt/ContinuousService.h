@@ -134,6 +134,13 @@ namespace synthese
 					std::size_t rankInPath
 				) const;
 
+				virtual void toParametersMap(
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
+
 			//@}
 
 		};

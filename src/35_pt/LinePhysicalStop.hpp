@@ -67,7 +67,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Clears all the links between the linestop and the stop.
-				void clearPhysicalStop();
+				void clearPhysicalStopLinks();
 			//@}
 		};
 }	}

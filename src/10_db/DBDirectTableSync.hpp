@@ -87,6 +87,12 @@ namespace synthese
 
 
 
+			virtual boost::shared_ptr<util::Registrable> newObject(
+				const Record& record
+			) const = 0;
+
+
+
 			virtual void saveRegistrable(
 				util::Registrable& obj,
 				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()

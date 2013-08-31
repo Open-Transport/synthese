@@ -29,7 +29,7 @@
 #include <iostream>
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
+#include "StandardLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -45,9 +45,7 @@ namespace synthese
 		class CityTableSync:
 			public db::DBDirectTableSyncTemplate<
 				CityTableSync,
-				City,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				City
 			>
 		{
 		public:

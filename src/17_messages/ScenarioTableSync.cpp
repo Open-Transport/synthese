@@ -129,11 +129,11 @@ namespace synthese
 
 		template<>
 		shared_ptr<Scenario> InheritanceLoadSavePolicy<ScenarioTableSync, Scenario>::GetNewObject(
-			const DBResultSPtr& row
+			const Record& row
 		){
-			return row->getBool(ScenarioTableSync::COL_IS_TEMPLATE)
-				? shared_ptr<Scenario>(new ScenarioTemplate(row->getKey()))
-				: shared_ptr<Scenario>(new SentScenario(row->getKey()))
+			return row.getDefault<bool>(ScenarioTableSync::COL_IS_TEMPLATE, false)
+				? shared_ptr<Scenario>(new ScenarioTemplate(row.getDefault<RegistryKeyType>(TABLE_COL_ID)))
+				: shared_ptr<Scenario>(new SentScenario(row.getDefault<RegistryKeyType>(TABLE_COL_ID)))
 			;
 		}
 
