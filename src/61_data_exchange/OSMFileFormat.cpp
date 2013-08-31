@@ -174,9 +174,9 @@ namespace synthese
 				if(cities.empty())
 				{
 					city = boost::shared_ptr<City>(new City);
-					city->setName(cityName);
-					city->setCode(cityCode);
-					city->setKey(CityTableSync::getId());
+					city->set<Name>(cityName);
+					city->set<Code>(cityCode);
+					city->set<Key>(CityTableSync::getId());
 					_env.getEditableRegistry<City>().add(city);
 					closestWayFromCentroid = make_pair(0, 9999.9);
 				}

@@ -70,6 +70,8 @@ namespace synthese
 
 		public:
 			void setNullParent();
+			void removeParentLink();
+			void setParentLink();
 			void _setParent(TreeFolderUpNode& value);
 
 			/// @name Getters

@@ -48,6 +48,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace geography;
 	using namespace pt;
 	using namespace util;
 	using namespace vehicle;
@@ -289,7 +290,7 @@ namespace synthese
 			{
 				if(updateCityIfExists)
 				{
-					stopArea->setCity(city);
+					stopArea->setCity(const_cast<City*>(city));
 				}
 				stopArea->setName(name);
 			}
@@ -525,7 +526,7 @@ namespace synthese
 							curStop->setDefaultTransferDelay(*defaultTransferDuration);
 						}
 						curStop->setName(name);
-						curStop->setCity(&cityForStopAreaAutoGeneration);
+						curStop->setCity(const_cast<City*>(&cityForStopAreaAutoGeneration));
 						_env.getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(curStop));
 						_logCreation(
 							"Auto generation of the commercial stop for stop "+ code +" ("+ name +")"

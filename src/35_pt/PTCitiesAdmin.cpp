@@ -27,11 +27,11 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
-#include "CityAddAction.h"
 #include "FrenchSentence.h"
 #include "GeographyModule.h"
 #include "House.hpp"
 #include "MimeTypes.hpp"
+#include "ObjectCreateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
@@ -181,7 +181,8 @@ namespace synthese
 
 				// Requests
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(request);
-				AdminActionFunctionRequest<CityAddAction,PTPlacesAdmin> creationRequest(request);
+				AdminActionFunctionRequest<ObjectCreateAction, PTPlacesAdmin> creationRequest(request);
+				creationRequest.getAction()->setTable<City>();
 				creationRequest.setActionWillCreateObject();
 				creationRequest.setActionFailedPage(getNewCopiedPage());
 				HTMLForm creationForm(creationRequest.getHTMLForm("create_city"));
@@ -247,8 +248,8 @@ namespace synthese
 				// Creation row
 				stream << t.row();
 				stream << t.col();
-				stream << t.col() << creationForm.getTextInput(CityAddAction::PARAMETER_NAME, string(), "(nom de la localité)");
-				stream << t.col() << creationForm.getTextInput(CityAddAction::PARAMETER_CODE, string(), "(code de la localité)");
+				stream << t.col() << creationForm.getTextInput(ObjectCreateAction::GetInputName<Name>(), string(), "(nom de la localité)");
+				stream << t.col() << creationForm.getTextInput(ObjectCreateAction::GetInputName<Code>(), string(), "(code de la localité)");
 				stream << t.col();
 				stream << t.col();
 				stream << t.col();

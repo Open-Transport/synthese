@@ -41,6 +41,7 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace impex;
+	using namespace geography;
 	using namespace graph;
 	using namespace road;
 	using namespace util;
@@ -99,7 +100,7 @@ namespace synthese
 
 			// Properties update
 			roadPlace->setName(name);
-			roadPlace->setCity(&city);
+			roadPlace->setCity(const_cast<City*>(&city));
 
 			return roadPlace;
 		}
@@ -147,7 +148,7 @@ namespace synthese
 
 			// Properties update
 			publicPlace->setName(name);
-			publicPlace->setCity(&city);
+			publicPlace->setCity(const_cast<City*>(&city));
 			if(geometry)
 			{
 				publicPlace->set<PointGeometry>(*geometry);

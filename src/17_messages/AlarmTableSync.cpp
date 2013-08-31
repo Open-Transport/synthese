@@ -105,15 +105,15 @@ namespace synthese
 
 		template<>
 		boost::shared_ptr<Alarm> InheritanceLoadSavePolicy<AlarmTableSync, Alarm>::GetNewObject(
-			const DBResultSPtr& row
+			const Record& row
 		){
-			if(row->getBool(AlarmTableSync::COL_IS_TEMPLATE))
+			if(row.getDefault<bool>(AlarmTableSync::COL_IS_TEMPLATE, false))
 			{
-				return boost::shared_ptr<Alarm>(new AlarmTemplate(row->getKey()));
+				return boost::shared_ptr<Alarm>(new AlarmTemplate(row.getDefault<RegistryKeyType>(TABLE_COL_ID)));
 			}
 			else
 			{
-				return boost::shared_ptr<Alarm>(new SentAlarm(row->getKey()));
+				return boost::shared_ptr<Alarm>(new SentAlarm(row.getDefault<RegistryKeyType>(TABLE_COL_ID)));
 			}
 		}
 

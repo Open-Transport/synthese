@@ -298,7 +298,9 @@ place93.setName("93");
 place93.setCity(&city54);
 place93.setAllowedConnection(true);
 city54.addIncludedPlace(place93);
-place93.addTransferDelay(562949953421389ULL,3377699720880573ULL,minutes(0));
+StopArea::TransferDelaysMap delays93;
+StopArea::_addTransferDelay(delays93, 562949953421389ULL,3377699720880573ULL,minutes(0));
+place93.setTransferDelaysMatrix(delays93);
 
 Coordinate cops73(521000.0,1847000.0);
 StopPoint ps73(
@@ -320,12 +322,14 @@ StopArea place94(1970324837184594ULL,false,minutes(8));
 place94.setName("94");
 place94.setCity(&city54);
 place94.setAllowedConnection(true);
-place94.addTransferDelay(3377699720880574ULL,3377699720880575ULL,minutes(11));
-place94.addTransferDelay(3377699720880575ULL,3377699720880574ULL,minutes(12));
-place94.addTransferDelay(3377699720880574ULL,562949953421374ULL,minutes(0));
-place94.addTransferDelay(562949953421374ULL,3377699720880574ULL,minutes(0));
-place94.addTransferDelay(3377699720880575ULL,562949953421374ULL,minutes(0));
-place94.addTransferDelay(562949953421374ULL,3377699720880575ULL,minutes(0));
+StopArea::TransferDelaysMap delays94;
+StopArea::_addTransferDelay(delays94,3377699720880574ULL,3377699720880575ULL,minutes(11));
+StopArea::_addTransferDelay(delays94,3377699720880575ULL,3377699720880574ULL,minutes(12));
+StopArea::_addTransferDelay(delays94,3377699720880574ULL,562949953421374ULL,minutes(0));
+StopArea::_addTransferDelay(delays94,562949953421374ULL,3377699720880574ULL,minutes(0));
+StopArea::_addTransferDelay(delays94,3377699720880575ULL,562949953421374ULL,minutes(0));
+StopArea::_addTransferDelay(delays94,562949953421374ULL,3377699720880575ULL,minutes(0));
+place94.setTransferDelaysMatrix(delays94);
 
 Coordinate cops75(523000.0,1845000.0);
 StopPoint ps75(3377699720880575ULL,"94/75", &place94, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops75)));
@@ -341,7 +345,9 @@ StopArea place95(1970324837184595ULL,false,minutes(8));
 place95.setName("95");
 place95.setCity(&city95);
 place95.setAllowedConnection(false);
-place95.addTransferDelay(562949953421397ULL,377699720880576ULL,minutes(0));
+StopArea::TransferDelaysMap delays95;
+StopArea::_addTransferDelay(delays95,562949953421397ULL,377699720880576ULL,minutes(0));
+place95.setTransferDelaysMatrix(delays94);
 
 Coordinate cops76(523266.0,1845339.0);
 StopPoint ps76(3377699720880576ULL,"95/76", &place95, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops76)));
@@ -375,10 +381,12 @@ place97.setName("97");
 place97.setCity(&city38);
 place97.setAllowedConnection(true);
 city38.addIncludedPlace(place97);
-place97.addTransferDelay(562949953421396ULL,3377699720880580ULL,minutes(0));
-place97.addTransferDelay(562949953421399ULL,3377699720880579ULL,minutes(0));
-place97.addTransferDelay(3377699720880580ULL,562949953421396ULL,minutes(0));
-place97.addTransferDelay(3377699720880579ULL,562949953421399ULL,minutes(0));
+StopArea::TransferDelaysMap delays97;
+StopArea::_addTransferDelay(delays97,562949953421396ULL,3377699720880580ULL,minutes(0));
+StopArea::_addTransferDelay(delays97,562949953421399ULL,3377699720880579ULL,minutes(0));
+StopArea::_addTransferDelay(delays97,3377699720880580ULL,562949953421396ULL,minutes(0));
+StopArea::_addTransferDelay(delays97,3377699720880579ULL,562949953421399ULL,minutes(0));
+place97.setTransferDelaysMatrix(delays97);
 
 Coordinate cops79(526000,1845000);
 StopPoint ps79(3377699720880579ULL,"97/79", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops79)));
@@ -425,8 +433,10 @@ place99.setName("99");
 place99.setCity(&city38);
 // connection type 5
 city38.addIncludedPlace(place99);
-place99.addTransferDelay(3377699720880585ULL,562949953421390ULL,minutes(0));
-place99.addTransferDelay(562949953421390ULL,3377699720880585ULL,minutes(0));
+StopArea::TransferDelaysMap delays99;
+StopArea::_addTransferDelay(delays99,3377699720880585ULL,562949953421390ULL,minutes(0));
+StopArea::_addTransferDelay(delays99,562949953421390ULL,3377699720880585ULL,minutes(0));
+place99.setTransferDelaysMatrix(delays99);
 
 Coordinate cops83(528000.0,1849000.0);
 StopPoint ps83(3377699720880583ULL,"99/83", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops83)));
@@ -455,7 +465,9 @@ StopArea place05(1970324837184605ULL, true, minutes(8));
 place05.setName("05");
 place05.setCity(&city54);
 place05.setAllowedConnection(true);
-place05.addTransferDelay(562949953421410ULL,3377699720880586ULL,minutes(0));
+StopArea::TransferDelaysMap delays05;
+StopArea::_addTransferDelay(delays05,562949953421410ULL,3377699720880586ULL,minutes(0));
+place05.setTransferDelaysMatrix(delays05);
 
 Coordinate cops86(520000,1845000.0);
 StopPoint ps86(3377699720880586ULL,"05/86", &place05,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops86)));

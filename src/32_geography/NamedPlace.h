@@ -50,7 +50,7 @@ namespace synthese
 			std::string _name;  //!< The name
 			std::string _name13;
 			std::string _name26;
-			const City* _city; //!< The city where this place is located
+			City* _city; //!< The city where this place is located
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -72,13 +72,13 @@ namespace synthese
 
 				/** Gets city where this place is located.
 				*/
-				const City* getCity () const { return _city; }
+				City* getCity () const { return _city; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setName (const std::string& value){ _name = value; }
-				void setCity(const City* value){ _city = value; }
+				void setCity(City* value){ _city = value; }
 				void setName13(const std::string& value){ _name13 = value; }
 				void setName26(const std::string& value){ _name26 = value; }
 			//@}

@@ -109,8 +109,15 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			}
 			object->loadFromRecord(*rows, env);
-
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+			}
 		}
 
 
@@ -224,14 +231,23 @@ namespace synthese
 			{
 				boost::shared_ptr<const StopPoint> stopPoint(StopPointTableSync::Get(id, env));
 				StopArea::TransferDelaysMap tdMap(stopPoint->getConnectionPlace()->getTransferDelays());
+				StopArea::TransferDelaysMap value(stopPoint->getConnectionPlace()->getTransferDelays());
 				BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& td, tdMap)
 				{
 					if(td.first.first == id || td.first.second == id)
 					{
-						const_cast<StopArea*>(stopPoint->getConnectionPlace())->removeTransferDelay(td.first.first, td.first.second);
+						value.erase(
+							make_pair(
+								td.first.first,
+								td.first.second
+						)	);
 					}
 				}
-				StopAreaTableSync::Save(const_cast<StopArea*>(stopPoint->getConnectionPlace()), transaction);
+				if(value != tdMap)
+				{
+					const_cast<StopArea*>(stopPoint->getConnectionPlace())->setTransferDelaysMatrix(value);
+					StopAreaTableSync::Save(const_cast<StopArea*>(stopPoint->getConnectionPlace()), transaction);
+				}
 			}
 			catch (...)
 			{}

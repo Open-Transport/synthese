@@ -112,7 +112,7 @@ namespace synthese
 				RegistryKeyType cityId(rows->getLongLong(RoadPlaceTableSync::COL_CITYID));
 
 				// City
-				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
+				object->setCity(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 
 				// Registration to city matcher

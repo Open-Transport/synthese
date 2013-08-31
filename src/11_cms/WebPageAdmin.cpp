@@ -316,7 +316,7 @@ namespace synthese
 						t.getForm().getSelectInput(
 							WebPageUpdateAction::PARAMETER_UP_ID,
 							_page->getRoot()->getPagesList("(racine)"),
-							optional<RegistryKeyType>(_page->getParent() ? _page->getParent()->getKey() : 0)
+							optional<RegistryKeyType>(_page->getParent(true) ? _page->getParent()->getKey() : 0)
 					)	);
 					stream << t.cell("Chemin URL (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_PATH, _page->get<SmartURLPath>()));
 					stream << t.cell("Champ par défaut paramètre (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME, _page->get<SmartURLDefaultParameterName>()));

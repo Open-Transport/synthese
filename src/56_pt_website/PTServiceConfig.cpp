@@ -206,8 +206,8 @@ namespace synthese
 				string oldName(it->first.getSource());
 				boost::shared_ptr<City> oldCity(it->second);
 				_citiesMatcher.remove(oldName);
-				_citiesMatcher.add(oldName + " (" + oldCity->getCode().substr(0,2) + ")", oldCity);
-				name += " (" + city->getCode().substr(0,2) + ")";
+				_citiesMatcher.add(oldName + " (" + oldCity->get<Code>().substr(0,2) + ")", oldCity);
+				name += " (" + city->get<Code>().substr(0,2) + ")";
 			}
 
 			// Already resolved conflict control

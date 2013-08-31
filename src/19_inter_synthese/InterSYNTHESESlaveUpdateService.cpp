@@ -168,6 +168,7 @@ namespace synthese
 
 		void InterSYNTHESESlaveUpdateService::RunBackgroundUpdater()
 		{
+			bool fakeBool(true);
 			bgUpdaterDone = false;
 			boost::shared_ptr<InterSYNTHESESlave> slave;
 
@@ -181,7 +182,14 @@ namespace synthese
 				}
 				if(slave.get())
 				{
-					slave->processFullUpdate();
+					try
+					{
+						slave->processFullUpdate();
+					}
+					catch(synthese::Exception& e)
+					{
+						Log::GetInstance().warn("Exception in Inter-SYNTHESE full update process", e);
+					}
 
 					// Record the request as slave activity
 					// Even if the slave crashed and don't get the results,

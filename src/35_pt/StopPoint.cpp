@@ -23,6 +23,7 @@
 #include "StopPoint.hpp"
 
 #include "Crossing.h"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 #include "Registry.h"
 #include "PTModule.h"
@@ -234,17 +235,171 @@ namespace synthese
 			std::string prefix /*= std::string() */
 		) const	{
 
-			// Main data
-			pm.insert(DATA_ID, getKey());
-			pm.insert(DATA_NAME, getName());
-			pm.insert(DATA_OPERATOR_CODE, getCodeBySources());
+			pm.insert(prefix + TABLE_COL_ID, getKey());
+			pm.insert(prefix + StopPointTableSync::COL_NAME, getName());
+
+			// Stop area
+			pm.insert(
+				prefix + StopPointTableSync::COL_PLACEID,
+				(	dynamic_cast<const StopArea*>(getHub()) ?
+					dynamic_cast<const StopArea*>(getHub())->getKey() :
+					RegistryKeyType(0)
+			)	);
+
+			// X Y (deprecated)
+			if(hasGeometry())
+			{
+				pm.insert(
+					prefix + StopPointTableSync::COL_X,
+					getGeometry()->getX()
+				);
+				pm.insert(
+					prefix + StopPointTableSync::COL_Y,
+					getGeometry()->getY()
+				);
+			}
+			else
+			{
+				pm.insert(
+					prefix + StopPointTableSync::COL_X,
+					string()
+				);
+				pm.insert(
+					prefix + StopPointTableSync::COL_Y,
+					string()
+				);
+			}
+
+			// Data source links
+			pm.insert(
+				prefix + StopPointTableSync::COL_OPERATOR_CODE,
+				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
+			);
+
+			// Projected point
+			if(getProjectedPoint().getRoadChunk())
+			{
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,
+					getProjectedPoint().getRoadChunk()->getKey()
+				);
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					getProjectedPoint().getMetricOffset()
+				);
+			}
+			else
+			{
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,
+					string()
+				);
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					string()
+				);
+			}
+
+			// Handicapped compliance
+			pm.insert(
+				prefix + StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID,
+				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
+					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
+					RegistryKeyType(0)
+			)	);
+
+			// Geometry
+			if(hasGeometry())
+			{
+				pm.insert(
+					prefix + TABLE_COL_GEOMETRY,
+					static_pointer_cast<geos::geom::Geometry, Point>(getGeometry())
+				);
+			}
+			else
+			{
+				pm.insert(
+					prefix + TABLE_COL_GEOMETRY,
+					string()
+				);
+			}
+
+			pm.insert(prefix + DATA_ID, getKey());
+			pm.insert(prefix + DATA_NAME, getName());
+			pm.insert(
+				prefix + StopPointTableSync::COL_PLACEID,
+				(	dynamic_cast<const StopArea*>(getHub()) ?
+					dynamic_cast<const StopArea*>(getHub())->getKey() :
+					RegistryKeyType(0)
+			)	);
+			pm.insert(
+				prefix + StopPointTableSync::COL_OPERATOR_CODE,
+				impex::DataSourceLinks::Serialize(getDataSourceLinks())
+			);
+
+			// Projected point
+			if(getProjectedPoint().getRoadChunk())
+			{
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, 
+					getProjectedPoint().getRoadChunk()->getKey()
+				);
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					getProjectedPoint().getMetricOffset()
+				);
+			}
+			else
+			{
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, 
+					0
+				);
+				pm.insert(
+					prefix + StopPointTableSync::COL_PROJECTED_METRIC_OFFSET,
+					0
+				);
+			}
+
+			// Handicapped compliance
+			pm.insert(
+				prefix + StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID,
+				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
+					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
+					RegistryKeyType(0)
+			)	);
+
+			// Geometry
+			if(hasGeometry())
+			{
+				boost::shared_ptr<geos::geom::Geometry> projected(getGeometry());
+				if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+					static_cast<CoordinatesSystem::SRID>(getGeometry()->getSRID())
+				){
+					projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*getGeometry());
+				}
+
+				geos::io::WKTWriter writer;
+				pm.insert(
+					prefix + TABLE_COL_GEOMETRY,
+					writer.write(projected.get())
+				);
+			}
+			else
+			{
+				pm.insert(prefix + TABLE_COL_GEOMETRY, string());
+			}
+
+
+
+			pm.insert(prefix + DATA_OPERATOR_CODE, getCodeBySources());
 			if(getGeometry().get())
 			{
 				boost::shared_ptr<Point> gp = coordinatesSystem.convertPoint(*getGeometry());
 				if(gp.get())
 				{
-					pm.insert(DATA_X, gp->getX());
-					pm.insert(DATA_Y, gp->getY());
+					pm.insert(prefix + DATA_X, gp->getX());
+					pm.insert(prefix + DATA_Y, gp->getY());
 				}
 			}
 
@@ -337,12 +492,6 @@ namespace synthese
 				if(place != getConnectionPlace())
 				{
 					setHub(place);
-
-					if(place)
-					{
-						place->addPhysicalStop(*this);
-					}
-
 					result = true;
 				}
 			}
@@ -373,7 +522,6 @@ namespace synthese
 					if(chunk)
 					{
 						setProjectedPoint(Address(*chunk, metricOffset));
-						chunk->getFromCrossing()->addReachableVertex(this);
 					}
 					else
 					{
@@ -424,5 +572,22 @@ namespace synthese
 				}
 //			}
 			return result;
+		}
+
+		synthese::LinkedObjectsIds StopPoint::getLinkedObjectsIds( const Record& record ) const
+		{
+			return LinkedObjectsIds();
+		}
+
+		void StopPoint::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(getConnectionPlace())
+			{
+				const_cast<StopArea*>(getConnectionPlace())->addPhysicalStop(*this);
+			}
+			if(getProjectedPoint().getRoadChunk())
+			{
+				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
+			}
 		}
 }	}

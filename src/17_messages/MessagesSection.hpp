@@ -31,7 +31,6 @@
 
 namespace synthese
 {
-	FIELD_STRING(Code)
 	FIELD_STRING(Color)
 
 	namespace messages

@@ -89,7 +89,7 @@ namespace synthese
 			/// This static method can be overloaded.
 			////////////////////////////////////////////////////////////////////
 			static boost::shared_ptr<T> GetNewObject(
-				const DBResultSPtr& row
+				const Record& row
 			);
 
 
@@ -115,9 +115,9 @@ namespace synthese
 	
 		template<class K, class T>
 		boost::shared_ptr<T> OldLoadSavePolicy<K, T>::GetNewObject(
-			const DBResultSPtr& row
+			const Record& row
 		){
-			return boost::shared_ptr<T>(new T(row->getKey()));
+			return boost::shared_ptr<T>(new T(row.getDefault<util::RegistryKeyType>(TABLE_COL_ID, 0)));
 		}
 
 	

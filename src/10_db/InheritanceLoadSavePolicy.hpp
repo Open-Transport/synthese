@@ -104,7 +104,7 @@ namespace synthese
 			/// This static method can be overloaded.
 			////////////////////////////////////////////////////////////////////
 			static boost::shared_ptr<T> GetNewObject(
-				const DBResultSPtr& row
+				const Record& row
 			);
 
 

@@ -189,10 +189,13 @@ namespace synthese
 	namespace interfaces
 	{
 		boost::shared_ptr<InterfacePage> InterfacePageTableSync::GetNewObject(
-			const DBResultSPtr& row
+			const Record& row
 		){
-			boost::shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(row->getText(InterfacePageTableSync::TABLE_COL_CLASS)));
-			page->setKey(row->getKey());
+			boost::shared_ptr<InterfacePage> page(
+				Factory<InterfacePage>::create(
+					row.get<string>(InterfacePageTableSync::TABLE_COL_CLASS)
+			)	);
+			page->setKey(row.getDefault<util::RegistryKeyType>(TABLE_COL_ID, 0));
 			return page;
 		}
 

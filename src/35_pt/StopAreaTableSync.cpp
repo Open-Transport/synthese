@@ -125,7 +125,15 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				DBModule::LoadObjects(cp->getLinkedObjectsIds(*rows), env, linkLevel);
+			}
 			cp->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				cp->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+			}
 		}
 
 
@@ -152,23 +160,7 @@ namespace synthese
 			query.addField(object->getDefaultTransferDelay().total_seconds() / 60);
 
 			// Transfer delay matrix
-			stringstream delays;
-			bool first(true);
-			BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& td, object->getTransferDelays())
-			{
-				if(!first) delays << ",";
-				delays << td.first.first << ":" << td.first.second << ":";
-				if(td.second.is_not_a_date_time())
-				{
-					delays << StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL;
-				}
-				else
-				{
-					delays << (td.second.total_seconds() / 60);
-				}
-				first = false;
-			}
-			query.addField(delays.str());
+			query.addField(StopArea::SerializeTransferDelaysMatrix(object->getTransferDelays()));
 
 			// Name 13
 			query.addField(object->getName13());
@@ -221,13 +213,6 @@ namespace synthese
 		template<> void OldLoadSavePolicy<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){
-			// Handicapped compliance
-			RuleUser::Rules rules(RuleUser::GetEmptyRules());
-			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-			cp->setRules(rules);
-
 			// City
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)

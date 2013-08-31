@@ -84,7 +84,7 @@ namespace synthese
 			boost::shared_ptr<StopArea> p(
 				new StopArea(id, type, defaultTransferDelay)
 			);
-			p->setCity(city.get());
+			p->setCity(const_cast<City*>(city.get()));
 			p->setName(name);
 
 			return p;

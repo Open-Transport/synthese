@@ -156,7 +156,7 @@ namespace synthese
 					}
 					else
 					{
-						boost::shared_ptr<T> object(K::GetNewObject(rows));
+						boost::shared_ptr<T> object(K::GetNewObject(*rows));
 						registry.add(object);
 						K::Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
