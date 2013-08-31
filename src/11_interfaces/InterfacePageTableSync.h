@@ -60,7 +60,7 @@ namespace synthese
 			*/
 			InterfacePageTableSync() {}
 
-			static boost::shared_ptr<InterfacePage> GetNewObject(const db::DBResultSPtr& row);
+			static boost::shared_ptr<InterfacePage> GetNewObject(const Record& row);
 
 			static boost::shared_ptr<InterfacePage> GetNewObject();
 

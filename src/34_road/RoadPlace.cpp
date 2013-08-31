@@ -349,7 +349,7 @@ namespace synthese
 			// City
 			if(getCity())
 			{
-				getCity()->toParametersMap(pm, NULL, prefix);
+				getCity()->toParametersMap(pm, NULL, prefix + "city_");
 			}
 
 			// Coordinates

@@ -93,7 +93,6 @@ namespace synthese
 			public impex::ImportableTemplate<JourneyPattern>
 		{
 		public:
-			static const std::string ATTR_ID;
 			static const std::string ATTR_DIRECTION_TEXT;
 
 			/// Chosen registry class.
@@ -293,6 +292,12 @@ namespace synthese
 				bool callsAtCity(const geography::City& city) const;
 
 				virtual SubObjects getSubObjects() const;
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const;
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			//@}
 		};
 	}

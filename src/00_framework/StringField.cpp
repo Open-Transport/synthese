@@ -27,5 +27,6 @@
 namespace synthese
 {
 	FIELD_DEFINITION_OF_TYPE(Name, "name", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Code, "code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Title, "title", SQL_TEXT)
 }

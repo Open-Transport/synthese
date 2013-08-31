@@ -371,8 +371,8 @@ namespace synthese
 									else
 									{
 										boost::shared_ptr<City> newCity = boost::shared_ptr<City>(new City);
-										newCity->setName(itc->second);
-										newCity->setKey(CityTableSync::getId());
+										newCity->set<Name>(itc->second);
+										newCity->set<Key>(CityTableSync::getId());
 										_env.getEditableRegistry<City>().add(newCity);
 										city = newCity.get();
 										_citiesMap.insert(make_pair(

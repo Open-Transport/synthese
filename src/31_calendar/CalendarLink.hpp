@@ -27,6 +27,7 @@
 #include "Registrable.h"
 
 #include "Calendar.h"
+#include "FrameworkTypes.hpp"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -88,10 +89,27 @@ namespace synthese
 
 			//! @name Update methods.
 			//@{
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
 			//@}
 
 			//! @name Queries
 			//@{
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const;
+
 				void addDatesToBitSets(Calendar::BitSets& bitsets) const;
 			//@}
 		};

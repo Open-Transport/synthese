@@ -289,7 +289,7 @@ namespace synthese
 				DBDirectTableSync::RegistrableSearchResult objects(
 					directTableSync->search(
 						string(),
-						fullTablesEnv
+						Env::GetOfficialEnv() // TODO replace by fullTableEnv in case of non full synchro table
 				)	);
 				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
 				{

@@ -910,7 +910,7 @@ namespace synthese
 				}
 				else
 				{
-					boost::shared_ptr<DisplayScreen> object(DisplayScreenTableSync::GetNewObject(rows));
+					boost::shared_ptr<DisplayScreen> object(DisplayScreenTableSync::GetNewObject(*rows));
 					registry.add(object);
 					Load(object.get(), rows, env, linkLevel);
 					return object;

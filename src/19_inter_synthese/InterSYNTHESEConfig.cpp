@@ -73,7 +73,11 @@ namespace synthese
 
 		void InterSYNTHESEConfig::unlink()
 		{
-
+			if(	get<LinkBreakMinutes>().is_not_a_date_time() ||
+				get<LinkBreakMinutes>() < minutes(15)
+			){
+				set<LinkBreakMinutes>(minutes(15));
+			}
 		}
 
 

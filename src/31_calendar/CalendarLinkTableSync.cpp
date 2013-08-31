@@ -25,7 +25,6 @@
 #include "Calendar.h"
 #include "CalendarLink.hpp"
 #include "CalendarTemplateTableSync.h"
-#include "Fetcher.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 
@@ -91,54 +90,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Start date
-			object->setStartDate(rows->getDate(CalendarLinkTableSync::COL_START_DATE));
-
-			// End date
-			object->setEndDate(rows->getDate(CalendarLinkTableSync::COL_END_DATE));
-
-			if (linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Calendar template
-				object->setCalendarTemplate(NULL);
-				RegistryKeyType calendarTemplateId(rows->getLongLong(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID));
-				if(calendarTemplateId > 0) try
-				{
-					object->setCalendarTemplate(CalendarTemplateTableSync::GetEditable(calendarTemplateId, env).get());
-				}
-				catch(ObjectNotFoundException<CalendarTemplate>)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(calendarTemplateId) + " for calendar in service calendar link " + lexical_cast<string>(object->getKey()));
-				}
-
-				// Calendar template 2
-				object->setCalendarTemplate2(NULL);
-				RegistryKeyType calendarTemplateId2(rows->getLongLong(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2));
-				if(calendarTemplateId2 > 0) try
-				{
-					object->setCalendarTemplate2(CalendarTemplateTableSync::GetEditable(calendarTemplateId2, env).get());
-				}
-				catch(ObjectNotFoundException<CalendarTemplate>)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(calendarTemplateId) + " for calendar 2 in service calendar link " + lexical_cast<string>(object->getKey()));
-				}
-
-				// Service
-				// Must stay at the last position because the service reads the object content
-				object->setCalendar(NULL);
-				RegistryKeyType serviceId(rows->getLongLong(CalendarLinkTableSync::COL_SERVICE_ID));
-				if(serviceId > 0) try
-				{
-					object->setCalendar(dynamic_cast<Calendar*>(Fetcher<Calendar>::FetchEditable(serviceId, env).get()));
-					if(linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-					{
-						object->getCalendar()->addCalendarLink(*object, true);
-					}
-				}
-				catch(ObjectNotFoundException<Calendar>)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(serviceId) + " for calendar in link " + lexical_cast<string>(object->getKey()));
-				}
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			}
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 

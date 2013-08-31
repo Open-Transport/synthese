@@ -23,6 +23,8 @@
 #include "JourneyPattern.hpp"
 
 #include "CommercialLineTableSync.h"
+#include "DataSourceLinksField.hpp"
+#include "DBConstants.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DestinationTableSync.hpp"
 #include "ImportableTableSync.hpp"
@@ -47,6 +49,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace geography;
 	using namespace graph;
 	using namespace util;
@@ -63,7 +66,6 @@ namespace synthese
 	namespace pt
 	{
 		const string JourneyPattern::ATTR_DIRECTION_TEXT = "direction_text";
-		const string JourneyPattern::ATTR_ID = "id";
 
 
 
@@ -467,8 +469,84 @@ namespace synthese
 			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
 			std::string prefix /*= std::string() */
 		) const	{
-			pm.insert(ATTR_ID, getKey());
-			pm.insert(ATTR_DIRECTION_TEXT, _direction);
+
+			if(!getCommercialLine() && !getEdges().size())
+			{
+				return;
+			}
+
+			if(!getCommercialLine())
+			{
+				throw Exception("JourneyPattern save error. "
+								"Missing commercial line for JourneyPattern " +
+								lexical_cast<string>(getKey())
+				);
+			}
+
+			pm.insert(prefix + TABLE_COL_ID, getKey());
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID,
+				getCommercialLine()->getKey()
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_NAME,
+				getName()
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_TIMETABLENAME,
+				getTimetableName()
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_DIRECTION,
+				getDirection()
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_DIRECTION_ID,
+				getDirectionObj() ? getDirectionObj()->getKey() : RegistryKeyType(0)
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_ISWALKINGLINE,
+				getWalkingLine()
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_ROLLINGSTOCKID,
+				getRollingStock() ? getRollingStock()->getKey() : RegistryKeyType(0)
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_BIKECOMPLIANCEID,
+				(	getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(getRule(USER_BIKE)) ?
+					static_cast<const PTUseRule*>(getRule(USER_BIKE))->getKey() :
+					RegistryKeyType(0)
+			)	);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID,
+				(	getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(getRule(USER_HANDICAPPED)) ?
+					static_cast<const PTUseRule*>(getRule(USER_HANDICAPPED))->getKey() :
+					RegistryKeyType(0)
+			)	);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID,
+				(	getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN)) ?
+					static_cast<const PTUseRule*>(getRule(USER_PEDESTRIAN))->getKey() :
+					RegistryKeyType(0)
+			)	);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_WAYBACK,
+				getWayBack()
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_DATASOURCE_ID,
+				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_MAIN,
+				getMain()
+			);
+			pm.insert(
+				prefix + JourneyPatternTableSync::COL_PLANNED_LENGTH,
+				getPlannedLength()
+			);
+			pm.insert(prefix + ATTR_DIRECTION_TEXT, _direction);
 		}
 
 
@@ -620,7 +698,6 @@ namespace synthese
 						if(cline)
 						{
 							setNetwork(cline->getNetwork());
-							cline->addPath(this);
 						}
 						else
 						{
@@ -782,6 +859,15 @@ namespace synthese
 			{
 				r.push_back(service);
 			}
+
+			// Services of the sublines
+			BOOST_FOREACH(const SubLines::value_type& subline, _subLines)
+			{
+				BOOST_FOREACH(Service* service, subline->getServices())
+				{
+					r.push_back(service);
+				}
+			}
 			return r;
 
 		}
@@ -809,5 +895,18 @@ namespace synthese
 				_calendar = value;
 			}
 			return *_calendar;
+		}
+
+		synthese::LinkedObjectsIds JourneyPattern::getLinkedObjectsIds( const Record& record ) const
+		{
+			return LinkedObjectsIds();
+		}
+
+		void JourneyPattern::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(getCommercialLine())
+			{
+				const_cast<CommercialLine*>(getCommercialLine())->addPath(this);
+			}
 		}
 }	}

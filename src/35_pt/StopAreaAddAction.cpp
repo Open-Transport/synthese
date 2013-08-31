@@ -133,7 +133,7 @@ namespace synthese
 			if(!_city.get())
 			{
 				_city.reset(new City);
-				_city->setName(_cityName);
+				_city->set<Name>(_cityName);
 				CityTableSync::Save(_city.get(), transaction);
 			}
 			stopArea.setCity(_city.get());

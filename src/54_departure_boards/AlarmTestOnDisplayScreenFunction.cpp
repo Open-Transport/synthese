@@ -115,7 +115,7 @@ namespace synthese
 			ArrivalDepartureList displayedObject;
 
 			City city;
-			city.setName("CITY");
+			city.set<Name>("CITY");
 			StopArea place;
 			place.setName("TEST");
 			place.setCity(&city);

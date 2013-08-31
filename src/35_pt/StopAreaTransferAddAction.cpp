@@ -119,9 +119,13 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
+			StopArea::TransferDelaysMap value(
+				_from->getConnectionPlace()->getTransferDelays()
+			);
 			if(_duration)
 			{
-				const_cast<StopArea*>(_from->getConnectionPlace())->addTransferDelay(
+				StopArea::_addTransferDelay(
+					value,
 					_from->getKey(),
 					_to->getKey(),
 					*_duration
@@ -129,11 +133,13 @@ namespace synthese
 			}
 			else
 			{
-				const_cast<StopArea*>(_from->getConnectionPlace())->addForbiddenTransferDelay(
+				StopArea::_addForbiddenTransferDelay(
+					value,
 					_from->getKey(),
 					_to->getKey()
 				);
 			}
+			const_cast<StopArea*>(_from->getConnectionPlace())->setTransferDelaysMatrix(value);
 
 			StopAreaTableSync::Save(const_cast<StopArea*>(_from->getConnectionPlace()));
 

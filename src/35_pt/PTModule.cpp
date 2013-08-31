@@ -304,7 +304,7 @@ namespace synthese
 				City* city(const_cast<City*>(dynamic_pointer_cast<NamedPlace,Place>(place.value)->getCity()));
 
 				GeographyModule::CitiesMatcher::MatchResult::value_type cityResult;
-				cityResult.key = FrenchSentence(city->getName()+" "+ city->getCode());
+				cityResult.key = FrenchSentence(city->get<Name>()+" "+ city->get<Code>());
 				cityResult.score.levenshtein = 0;
 				cityResult.score.phoneticScore = 1;
 				cityResult.value = Env::GetOfficialEnv().getEditableSPtr(city);

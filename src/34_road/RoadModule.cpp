@@ -178,7 +178,7 @@ namespace synthese
 			std::size_t resultsNumber
 		){
 			GeographyModule::CitiesMatcher::MatchResult::value_type cityResult;
-			cityResult.key = FrenchSentence(city->getName()+" "+ city->getCode());
+			cityResult.key = FrenchSentence(city->get<Name>()+" "+ city->get<Code>());
 			cityResult.score.levenshtein = 0;
 			cityResult.score.phoneticScore = 1;
 			cityResult.value = city;

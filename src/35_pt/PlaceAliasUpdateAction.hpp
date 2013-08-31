@@ -61,7 +61,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<geography::PlaceAlias> _alias;
 			boost::optional<boost::shared_ptr<const StopArea> > _stopArea;
-			boost::optional<boost::shared_ptr<const geography::City> > _city;
+			boost::optional<boost::shared_ptr<geography::City> > _city;
 			boost::optional<std::string> _name;
 			boost::optional<bool> _isCityMainPlace;
 

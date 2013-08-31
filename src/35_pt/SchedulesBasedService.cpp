@@ -454,6 +454,12 @@ namespace synthese
 					++i;
 					continue;
 				}
+				// Avoid corrupted data
+				if(	i >= _arrivalSchedules.size() ||
+					i >= _departureSchedules.size()
+				){
+					break;
+				}
 				if(i)
 				{
 					str << ",";

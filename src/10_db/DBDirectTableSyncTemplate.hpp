@@ -201,10 +201,20 @@ namespace synthese
 			}
 
 
+
+			virtual boost::shared_ptr<util::Registrable> newObject(
+				const Record& record
+			) const {
+				return boost::dynamic_pointer_cast<util::Registrable, T>(
+					K::GetNewObject(record)
+				);
+			}
+
+
 			virtual boost::shared_ptr<util::Registrable> createRegistrable(
 				const DBResultSPtr& row
 			) const	{
-				return boost::dynamic_pointer_cast<util::Registrable, T>(K::GetNewObject(row));
+				return boost::dynamic_pointer_cast<util::Registrable, T>(K::GetNewObject(*row));
 			}
 
 
@@ -245,7 +255,7 @@ namespace synthese
 						}
 						else
 						{
-							boost::shared_ptr<T> object(K::GetNewObject(rows));
+							boost::shared_ptr<T> object(K::GetNewObject(*rows));
 							registry.add(object);
 							K::Load(object.get(), rows, env, linkLevel);
 							result.push_back(object);
@@ -475,7 +485,7 @@ namespace synthese
 					else
 					{
 						boost::shared_ptr<T> object(
-							K::GetNewObject(rows)
+							K::GetNewObject(*rows)
 						);
 						registry.add(object);
 						Load(object.get(), rows, env, linkLevel);
@@ -518,7 +528,7 @@ namespace synthese
 			try
 			{
 				DBResultSPtr rows(DBTableSyncTemplate<K>::_GetRow(key));
-				object = K::GetNewObject(rows);
+				object = K::GetNewObject(*rows);
 				env.getEditableRegistry<T>().add(object);
 				K::Load(object.get(), rows, env, linkLevel);
 			}

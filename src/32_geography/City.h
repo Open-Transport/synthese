@@ -23,8 +23,11 @@
 #ifndef SYNTHESE_ENV_CITY_H
 #define SYNTHESE_ENV_CITY_H
 
+#include "Object.hpp"
+
 #include "CoordinatesSystem.hpp"
 #include "Registry.h"
+#include "StringField.hpp"
 #include "LexicalMatcher.h"
 #include "IncludingPlace.h"
 #include "NamedPlace.h"
@@ -46,6 +49,12 @@ namespace synthese
 	{
 		class NamedPlace;
 
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Code)		//!< Unique code identifier for city within its country (france => INSEE code)
+		> CitySchema;
+
 		/** City class.
 
 			A city holds in its included places the main connection places
@@ -54,8 +63,8 @@ namespace synthese
 			@ingroup m32
 		*/
 		class City:
-			public IncludingPlace<NamedPlace>,
-			public virtual util::Registrable
+			public Object<City, CitySchema>,
+			public IncludingPlace<NamedPlace>
 		{
 		public:
 
@@ -76,11 +85,7 @@ namespace synthese
 			PlacesMatcher	_allPlacesMatcher;
 			PlacesMatchers _lexicalMatchers;
 
-			std::string _name;
-			std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
-
 		public:
-
 			City(
 				util::RegistryKeyType key = 0,
 				std::string name = std::string(),
@@ -92,11 +97,6 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-				const std::string& getCode () const { return _code; }
-				void setCode (const std::string& code) { _code = code; }
-				virtual std::string getName() const { return _name; }
-				void setName(const std::string& code) { _name = code; }
-
 				PlacesMatcher& getLexicalMatcher(
 					const std::string& key
 				);
@@ -113,7 +113,8 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
 
 			//! @name Services
@@ -189,6 +190,9 @@ namespace synthese
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
+
+				virtual std::string getName() const { return get<Name>(); }
+
 
 				virtual bool loadFromRecord(
 					const Record& record,

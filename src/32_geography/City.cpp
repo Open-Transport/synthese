@@ -39,12 +39,11 @@ namespace synthese
 {
 	using namespace lexical_matcher;
 	using namespace util;
+	using namespace geography;
 	using namespace graph;
 
-	namespace util
-	{
-		template<> const string Registry<geography::City>::KEY("City");
-	}
+	CLASS_DEFINITION(City, "t006_cities", 6)
+	FIELD_DEFINITION_OF_OBJECT(City, "city_id", "city_ids")
 
 	namespace geography
 	{
@@ -61,9 +60,13 @@ namespace synthese
 			std::string name,
 			std::string code
 		):	Registrable(key),
-			IncludingPlace<NamedPlace>(),
-			_name(name),
-			_code (code)
+			Object<City, CitySchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_VALUE_CONSTRUCTOR(Name, name),
+					FIELD_VALUE_CONSTRUCTOR(Code, code)
+			)	),
+			IncludingPlace<NamedPlace>()
 		{
 			Factory<NamedPlace>::Keys keys(Factory<NamedPlace>::GetKeys());
 			BOOST_FOREACH(const string& key, keys)
@@ -135,14 +138,20 @@ namespace synthese
 			const CoordinatesSystem* coordinatesSystem,
 			const string& prefix
 		) const {
+
+			// TODO remove this method and move the additional elements into addAdditionalParameters
+			pm.insert(prefix + Key::FIELD.name, get<Key>());
+			pm.insert(prefix + Name::FIELD.name, get<Name>());
+			pm.insert(prefix + Code::FIELD.name, get<Code>());
+
 			// Id
 			pm.insert(prefix + DATA_CITY_ID, getKey());
 
 			// Name
-			pm.insert(prefix + DATA_CITY_NAME, getName());
+			pm.insert(prefix + DATA_CITY_NAME, get<Name>());
 
 			// Code
-			pm.insert(prefix + DATA_CITY_CODE, _code);
+			pm.insert(prefix + DATA_CITY_CODE, get<Code>());
 
 			// X and Y
 			if(coordinatesSystem && getPoint().get())
@@ -225,13 +234,7 @@ namespace synthese
 				if(value != getName())
 				{
 					updated = true;
-					setName(value);
-
-					if(&env == &Env::GetOfficialEnv())
-					{
-						// Add to cities and all places matcher
-						GeographyModule::AddToCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(this));
-					}
+					set<Name>(value);
 				}
 			}
 
@@ -241,13 +244,47 @@ namespace synthese
 				string value(
 					record.get<string>(CityTableSync::TABLE_COL_CODE)
 				);
-				if(value != getCode())
+				if(value != get<Code>())
 				{
-					setCode(value);
+					set<Code>(value);
 					updated = true;
 				}
 			}
 
 			return updated;
+		}
+
+
+
+		void City::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(&env == &Env::GetOfficialEnv())
+			{
+				// Add to cities and all places matcher
+				GeographyModule::AddToCitiesMatchers(env.getEditableSPtr(this));
+			}
+		}
+
+
+
+		void City::unlink()
+		{
+			// Remove from cities matcher
+			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(this));
+
+			// Adds a city with same name if necessary
+			CityTableSync::SearchResult others(
+				CityTableSync::Search(
+					Env::GetOfficialEnv(),
+					get<Name>()
+			)	);
+			BOOST_FOREACH(boost::shared_ptr<City> other, others)
+			{
+				if(other->getKey() != getKey())
+				{
+					GeographyModule::AddToCitiesMatchers(other);
+					break;
+				}
+			}
 		}
 }	}

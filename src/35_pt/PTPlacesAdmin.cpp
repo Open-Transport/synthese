@@ -26,6 +26,7 @@
 
 #include "AdminParametersException.h"
 #include "ObjectCreateAction.hpp"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "PublicPlaceAdmin.hpp"
@@ -47,7 +48,6 @@
 #include "Profile.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
-#include "CityUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "StopAreaAddAction.h"
 #include "StopAreaTableSync.hpp"
@@ -545,13 +545,13 @@ namespace synthese
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				AdminActionFunctionRequest<CityUpdateAction,PTPlacesAdmin> updateRequest(request);
-				updateRequest.getAction()->setCity(const_pointer_cast<City>(_city));
+				AdminActionFunctionRequest<ObjectUpdateAction,PTPlacesAdmin> updateRequest(request);
+				updateRequest.getAction()->setObject(*const_pointer_cast<City>(_city));
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_city->getKey()));
-				stream << t.cell("Nom", t.getForm().getTextInput(CityUpdateAction::PARAMETER_NAME, _city->getName()));
-				stream << t.cell("Code", t.getForm().getTextInput(CityUpdateAction::PARAMETER_CODE, _city->getCode()));
+				stream << t.cell("Nom", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Name>(), _city->get<Name>()));
+				stream << t.cell("Code", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Code>(), _city->get<Code>()));
 				stream << t.close();
 			}
 

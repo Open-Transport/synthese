@@ -72,50 +72,6 @@ namespace synthese
 			return r;
 		}
 
-		template<> void OldLoadSavePolicy<CityTableSync,City>::Load(
-			City* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->loadFromRecord(*rows, env);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CityTableSync,City>::Unlink(City* obj)
-		{
-			// Remove from cities matcher
-			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(obj));
-
-			// Adds a city with same name if necessary
-			CityTableSync::SearchResult others(
-				CityTableSync::Search(
-					Env::GetOfficialEnv(),
-					obj->getName()
-			)	);
-			BOOST_FOREACH(boost::shared_ptr<City> other, others)
-			{
-				if(other->getKey() != obj->getKey())
-				{
-					GeographyModule::AddToCitiesMatchers(other);
-					break;
-				}
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CityTableSync,City>::Save(
-			City* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<CityTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getCode());
-			query.execute(transaction);
-		}
-
 
 
 		template<> bool DBTableSyncTemplate<CityTableSync>::CanDelete(

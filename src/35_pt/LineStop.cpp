@@ -283,30 +283,6 @@ namespace synthese
 						if(dls.getPhysicalStop() != value)
 						{
 							dls.setPhysicalStop(*value);
-
-							// Line update
-							dls.getLine()->addEdge(dls);
-
-							// Sublines update
-							BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
-							{
-								DesignatedLinePhysicalStop* newEdge(
-									new DesignatedLinePhysicalStop(
-										0,
-										copy,
-										dls.getRankInPath(),
-										dls.isDeparture(),
-										dls.isArrival(),
-										dls.getMetricOffset(),
-										dls.getPhysicalStop(),
-										dls.getScheduleInput()
-								)	);
-								copy->addEdge(*newEdge);
-							}
-
-							// Useful transfer calculation
-							dls.getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-
 							result = true;
 						}
 					}
@@ -353,37 +329,90 @@ namespace synthese
 						{
 							lineArea.setArea(*value);
 							result = true;
-
-							// Line update
-							lineArea.getLine()->addEdge(lineArea);
-
-							// Sublines update
-							BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
-							{
-								LineArea* newEdge(
-									new LineArea(
-										0,
-										copy,
-										lineArea.getRankInPath(),
-										lineArea.isDeparture(),
-										lineArea.isArrival(),
-										lineArea.getMetricOffset(),
-										lineArea.getArea(),
-										lineArea.getInternalService()
-								)	);
-								copy->addEdge(*newEdge);
-							}
-
-							// Useful transfer calculation
-							BOOST_FOREACH(StopArea* stopArea, lineArea.getArea()->getStops())
-							{
-								stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-							}
 						}
 					}
 //				}
 			}
 
 			return result;
+		}
+
+
+
+		synthese::LinkedObjectsIds LineStop::getLinkedObjectsIds( const Record& record ) const
+		{
+			return LinkedObjectsIds();
+		}
+
+
+
+		void LineStop::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			DesignatedLinePhysicalStop* dls(
+				dynamic_cast<DesignatedLinePhysicalStop*>(this)
+			);
+			LineArea* la(
+				dynamic_cast<LineArea*>(this)
+			);
+
+			if(getLine())
+			{
+				// Line update
+				getLine()->addEdge(*this);
+
+				// Sublines update
+				if(dls)
+				{
+					BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+					{
+						DesignatedLinePhysicalStop* newEdge(
+							new DesignatedLinePhysicalStop(
+								0,
+								copy,
+								getRankInPath(),
+								isDeparture(),
+								isArrival(),
+								getMetricOffset(),
+								dls->getPhysicalStop(),
+								dls->getScheduleInput()
+						)	);
+						copy->addEdge(*newEdge);
+					}
+				}
+				if(la)
+				{
+					// Sublines update
+					BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+					{
+						LineArea* newEdge(
+							new LineArea(
+								0,
+								copy,
+								getRankInPath(),
+								isDeparture(),
+								isArrival(),
+								getMetricOffset(),
+								la->getArea(),
+								la->getInternalService()
+						)	);
+						copy->addEdge(*newEdge);
+					}
+				}
+
+			}
+
+			if(dls && dls->getPhysicalStop())
+			{
+				// Useful transfer calculation
+				dls->getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+			}
+			if(la && la->getArea())
+			{
+				// Useful transfer calculation
+				BOOST_FOREACH(StopArea* stopArea, la->getArea()->getStops())
+				{
+					stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+				}
+			}
 		}
 }	}

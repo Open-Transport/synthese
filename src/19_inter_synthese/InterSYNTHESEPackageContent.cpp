@@ -238,21 +238,32 @@ namespace synthese
 					boost::shared_ptr<Registrable> rObject;
 					if(directTableSync.contains(key))
 					{
-						rObject = directTableSync.getEditableRegistrable(
-							key,
-							_env
-						);
+						try
+						{
+							rObject = directTableSync.getEditableRegistrable(
+								key,
+								_env
+							);
+						}
+						catch(...) // Avoid break of the package installation because of bad value in existing data
+							       // In case of exception, the object will be considered as created
+						{
+						}
 					}
-					else
+					if(!rObject.get())
 					{
-						rObject = directTableSync.newObject();
-						// Forbidden for inheritance classes
+						rObject = directTableSync.newObject(map);
+						// Should never happen
 						if(!rObject.get())
 						{
 							throw synthese::Exception("Forbidden table");
 						}
 						rObject->setKey(key);
-						_env.addRegistrable(rObject);
+						const RegistryBase& registry(directTableSync.getRegistry(_env));
+						if( !registry.contains(rObject->getKey()))
+						{
+							_env.addRegistrable(rObject);
+						}
 					}
 					result.push_back(rObject.get());
 
@@ -266,9 +277,17 @@ namespace synthese
 					// Load properties of the current object
 					// Placed after the load of the sub objects to prevent bad link
 					// in case of link to a sub object
-					if(rObject->loadFromRecord(map, _env))
+					try
 					{
-						_objectsToSave.push_back(rObject.get());
+						if(rObject->loadFromRecord(map, _env))
+						{
+							_objectsToSave.push_back(rObject.get());
+						}
+					}
+					catch(...) // Avoid break of the package installation because of bad value in new data
+							   // The object update will be ignored
+					{
+						
 					}
 
 					// Removal detection

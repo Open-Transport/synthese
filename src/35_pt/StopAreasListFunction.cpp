@@ -438,7 +438,7 @@ namespace synthese
 						const StopPoint& stop(*itStop.second);
 
 						boost::shared_ptr<ParametersMap> sPm(new ParametersMap);
-						stop.toParametersMap(*sPm, true);
+						stop.toParametersMap(*sPm, false, _coordinatesSystem);
 
 						// Lines
 						if(_outputLinesInStops)
