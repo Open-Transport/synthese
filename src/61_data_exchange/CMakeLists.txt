@@ -10,6 +10,10 @@ set(data_exchange_SRCS
   DataExchangeModuleRegister.cpp
   GTFSFileFormat.cpp
   GTFSFileFormat.hpp
+  GpsFileFormat.cpp
+  GpsFileFormat.h
+  GpsPoller.cpp
+  GpsPoller.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
   HastusCSVFileFormat.cpp
@@ -68,6 +72,8 @@ set(data_exchange_SRCS
   StopsShapeFileFormat.hpp
   TridentFileFormat.cpp
   TridentFileFormat.h
+  ValidatorVIXv6000Poller.cpp
+  ValidatorVIXv6000Poller.hpp
   VDVSubscriptionService.cpp
   VDVSubscriptionService.hpp
   VDVClient.cpp
@@ -94,6 +100,19 @@ set(data_exchange_SRCS
   VDVServerTableSync.hpp
   VDVStatusService.cpp
   VDVStatusService.hpp
+  vix/VIX-BSC-defines.hpp
+  vix/VIX-CIntSurvMsg.cpp
+  vix/VIX-CIntSurvMsg.hpp
+  vix/VIX-Ccrc16.cpp
+  vix/VIX-Ccrc16.hpp
+  vix/VIX-ComPortMgr.cpp
+  vix/VIX-ComPortMgr.hpp
+  vix/VIX-SerialReader.cpp
+  vix/VIX-SerialReader.hpp
+  vix/VIX-rs232.cpp
+  vix/VIX-rs232.hpp
+  vix/VIX-timeutil.cpp
+  vix/VIX-timeutil.hpp
 )
 
 set_source_files_properties(DataExchangeModule.gen.cpp DataExchangeModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
