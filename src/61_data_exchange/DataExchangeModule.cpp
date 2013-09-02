@@ -26,6 +26,8 @@
 #include "MGScreenConnection.hpp"
 #include "ServerModule.h"
 #include "StopButtonFilePoller.hpp"
+#include "ValidatorVIXv6000Poller.hpp"
+#include "GpsPoller.hpp"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
 #include "VDVServer.hpp"
@@ -109,6 +111,12 @@ namespace synthese
 
 			// Stop Button File Poller
 			ServerModule::AddThread(&StopButtonFilePoller::RunThread, "Stop Button File Poller");
+
+			// Validator VIX V6000 Poller
+			//ServerModule::AddThread(&ValidatorVIXv6000Poller::RunThread, "Validator VIX V6000 Poller");
+
+			// GPS Poller
+			//ServerModule::AddThread(&GpsPoller::RunThread, "GPS Poller");
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()
