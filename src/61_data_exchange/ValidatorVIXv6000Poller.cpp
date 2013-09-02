@@ -27,9 +27,9 @@
 #include "Log.h"
 
 //temporary validator stuffs
-#include "VIX-CIntSurvMsg.hpp"
-#include "VIX-SerialReader.hpp"
-#include "VIX-timeutil.hpp"
+#include "vix/VIX-CIntSurvMsg.hpp"
+#include "vix/VIX-SerialReader.hpp"
+#include "vix/VIX-timeutil.hpp"
 #include "gps.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
