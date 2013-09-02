@@ -28,6 +28,7 @@
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
 #include "RoadShapeFileFormat.hpp"
+#include "GpsFileFormat.h"
 
 #include "VDVSubscriptionService.hpp"
 #include "VDVDataReadyService.hpp"
@@ -91,6 +92,8 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
+	synthese::data_exchange::GpsFileFormat::integrate();
+
 
 
 	// Registries

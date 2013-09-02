@@ -118,6 +118,8 @@ namespace synthese
 		bool IneoBDSIFileFormat::Importer_::_read(
 		) const {
 			date today(day_clock::local_day());
+			date tomorrowday(today + days(1));
+			ptime timenow(second_clock::local_time());
 
 			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
 			if(!lock.owns_lock())
@@ -148,6 +150,8 @@ namespace synthese
 			Programmations programmations;
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
+			string tomorrowStr("'"+ to_iso_extended_string(tomorrowday) +"'");
+			string timenowStr("'"+ to_simple_string(timenow) +"'");
 
 			// Arrets
 			{
@@ -343,11 +347,17 @@ namespace synthese
 
 			// Courses
 			{
+				
+				// no need to query to tomorrow.
+				// as we place to import every day very early in the morning.
+
 				string horaireQuery(
 					"SELECT "+ _database +".HORAIRE.* FROM "+ _database +".HORAIRE "+
 					"INNER JOIN "+ _database +".ARRETCHN ON "+ _database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+
 					_database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
-					"WHERE "+ _database +".HORAIRE.jour="+ todayStr +" ORDER BY "+ _database +".HORAIRE.course, "+ _database +".ARRETCHN.pos"
+					"WHERE ("+ _database +".HORAIRE.jour="+ todayStr + "AND "+ _database +".HORAIRE.hra> "+ timenowStr +
+					") AND ("+ _database +".HORAIRE.jour="+ tomorrowStr + "AND "+ _database +".HORAIRE.hra< "+ timenowStr +
+					") ORDER BY "+ _database +".HORAIRE.course, "+ _database +".ARRETCHN.pos"
 				);
 				string query(
 					"SELECT * FROM "+ _database +".COURSE WHERE jour="+ todayStr
