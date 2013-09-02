@@ -43,7 +43,7 @@ TimeUtil::~TimeUtil()
 	  return value;
 	}
 
-	void sleep(unsigned long ms){
+	void TimeUtil::sleep(unsigned long ms){
 		usleep(ms*1000);
 	}
 #endif
