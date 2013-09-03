@@ -72,6 +72,8 @@ set(data_exchange_SRCS
   StopsShapeFileFormat.hpp
   TridentFileFormat.cpp
   TridentFileFormat.h
+  TestPoller.cpp
+  TestPoller.hpp
   ValidatorVIXv6000Poller.cpp
   ValidatorVIXv6000Poller.hpp
   VDVSubscriptionService.cpp
