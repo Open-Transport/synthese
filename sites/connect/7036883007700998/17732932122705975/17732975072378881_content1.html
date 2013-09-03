@@ -1,0 +1,154 @@
+<ul class="breadcrumb">
+  <li><?link&target=/&text=Connect?> <span class="divider">/</span></li>
+  <li class="active">Vue client</li>
+</ul>
+
+<div class="row-fluid">
+  <div class="span3" id="tree">
+    <ul class="nav nav-list well">
+      <li class="<@roid?"":"active"@>">
+        <?link
+        &target=<@p@>
+        &text=Systèmes configurés<div class="pull-right" id="device_add_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>
+        ?>
+      </li>
+<?permanent_threads
+&template=<{permanent_thread&template=
+      <li class="tree_1<@(roid==id)?" active":""@>">
+        <?link
+        &target=<@p@>
+        &roid=<@id@>
+        &text=<span class="status status-<@active@>">\&nbsp;</span><span data-content="name"><@name?name:"(sans nom)"@> (<@device@>)</span>
+<@(id==roid)?("<div class=\"pull-right\" id=\"device_remove_link\" data-id=\""+ id +"\" data-placement=\"right\" data-toggle=\"tooltip\" title=\"Supprimer le device "+ name +"\"><i class=\"icon-remove icon-white\"></i></div>"):""@>
+        ?>
+      </li>
+}>?>
+    </ul>
+  </div>
+  <div class="span9">
+<?if
+&cond=<@~decode_table(roid)==115@>
+&then=
+	<@permanentThread:=<?object&roid=<@roid@>&additional_parameters=1?>@>
+	<@tabs["properties"]=Propriétés@>
+	<@tabs["parameters"]=Paramètres par défaut@>
+	<@tabs["doc"]=Documentation@>
+	<@tab=<@tab?tab:"properties"@>@>
+
+    <ul class="nav nav-tabs">
+	<{tabs&template=
+      <li <@(tab==id)?" class=\"active\"":""@>><a href="#<@id@>" data-toggle="tab"><@value@></a></li>
+	}>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane <@(tab=="properties")?"active":""@>" id="properties">
+        <?form
+        &target=<@p@>
+        &a=ObjectUpdate
+        &actionParam_object_id=<@roid@>
+        &roid=<@roid@>
+        &class=form-horizontal
+        &tab=properties
+        ?>
+          <div class="control-group">
+            <label class="control-label">Type</label>
+            <div class="controls"><@permanentThread.device@></div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" value="<@permanentThread.name@>" /></div>
+          </div>
+          <div class="control-group">
+            <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="tab-pane <@(tab=="parameters")?"active":""@>" id="parameters">
+        <?form
+        &target=<@p@>
+        &name=update_parameters
+        &a=ObjectUpdate
+        &actionParam_object_id=<@permanentThread.id@>
+        &roid=<@permanentThread.id@>
+        &class=form-horizontal
+        &tab=parameters
+        &actionParam_field_parameters=<@permanentThread.parameters@>
+        &form_id=update_parameters
+        ?>
+          <#formats/<@permanentThread.device@>/form&for=template#>
+          <div class="control-group">
+            <div class="controls"><button class="btn btn-warning">Enregistrer</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="tab-pane <@(tab=="doc")?"active":""@>" id="doc">
+        <div>
+          <div class="pull-right btn btn-warning" id="doc_switch">Modifier</div>
+          <div class="pull-right btn btn-primary" style="display:none" id="doc_cancel">Annuler</div>
+          <div id="doc_view"><@permanentThread.documentation@></div>
+          <div id="doc_edit" style="display:none"><textarea id="mce_editor" class="mceEditor" save_url="/connect?a=ObjectUpdate\&actionParam_object_id=<@roid@>\&co=0\&nr=1"><@permanentThread.documentation@></textarea></div>
+        </div>
+      </div>
+      <div class="tab-pane <@(tab=="device")?"active":""@>" id="device">
+        <#devices/<@permanentThread.device@>/doc#>
+      </div>
+    </div>
+    <script type="text/javascript" src="/lib/tiny_mce/tiny_mce.js"></script>
+    <script type="text/javascript" src="/connect/js/import.js"></script>
+?>
+  </div>
+</div>
+<div id="new_connection" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Nouveau device</h3>
+  </div>
+  <div class="modal-body">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#permanent_thread" data-toggle="tab">Threads permanents</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="permanent_thread">
+        <?form
+        &name=new_permanentThread
+        &target=<@p@>
+        &a=ObjectCreate
+        &actionParam_table_id=115
+        &class=form-horizontal
+        &co=1
+        &form_id=new_permanentThread_form
+        ?>
+          <div class="control-group">
+            <label class="control-label">Nom</label>
+            <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Type de système</label>
+            <div class="controls">
+              <select name="actionParam_field_device">
+<?devices
+&template=<{device&template=
+                <option value="<@key@>"><@key@></option>
+}>?>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-warning">Ajouter</button>
+            </div>
+          </div>
+        </form>
+        <script>
+$('#new_permanentThread_form').submit(function(){
+  return true;
+});
+        </script>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn btn-primary">Fermer</a>
+  </div>
+</div>
+<script src="/connect/js/client.js"></script>
