@@ -55,6 +55,7 @@
 #include "Function.h"
 #include "RequestException.h"
 #include "ActionException.h"
+#include "PermanentThread.hpp"
 
 using namespace boost;
 using namespace std;
@@ -157,6 +158,9 @@ namespace synthese
 		template<> void ModuleClassTemplate<ServerModule>::Start()
 		{
 			// FIXME: Should move the RunHTTPServer in the Start
+
+			// Launch the permanent threads
+			ServerModule::_LaunchPermanentThreads();
 		}
 
 		void ServerModule::RunHTTPServer()
@@ -661,6 +665,24 @@ namespace synthese
 		const boost::posix_time::ptime& ServerModule::GetStartingTime()
 		{
 			return _serverStartingTime;
+		}
+
+
+		void ServerModule::_LaunchPermanentThreads()
+		{
+			// Loop on permanent threads
+			BOOST_FOREACH(const Registry<PermanentThread>::value_type& it, Env::GetOfficialEnv().getRegistry<PermanentThread>())
+			{
+				PermanentThread& permanentThread(*it.second);
+
+				// Run activated pollers to do
+				if(	!permanentThread.get<Active>())
+				{
+					continue;
+				}
+
+				permanentThread.launch();
+			}
 		}
 
 }	}
