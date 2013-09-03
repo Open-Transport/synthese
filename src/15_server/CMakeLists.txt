@@ -13,6 +13,11 @@ ClientException.cpp
 ClientException.h
 DbModuleConfigTableSync.cpp
 DbModuleConfigTableSync.h
+DeviceTemplate.h
+Device.h
+Device.cpp
+DevicesService.hpp
+DevicesService.cpp
 DynamicRequest.cpp
 DynamicRequest.h
 Function.cpp
@@ -50,6 +55,14 @@ ModuleClass.cpp
 ModuleClass.h
 ModuleClassTemplate.hpp
 ModuleException.h
+PermanentThread.hpp
+PermanentThread.cpp
+PermanentThreadsService.hpp
+PermanentThreadsService.cpp
+PermanentThreadTableSync.hpp
+PermanentThreadTableSync.cpp
+Poller.hpp
+Poller.cpp
 QuitAction.cpp
 QuitAction.hpp
 RedirectService.cpp
