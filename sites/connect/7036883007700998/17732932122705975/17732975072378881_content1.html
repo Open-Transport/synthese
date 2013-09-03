@@ -9,7 +9,7 @@
       <li class="<@roid?"":"active"@>">
         <?link
         &target=<@p@>
-        &text=Systèmes configurés<div class="pull-right" id="device_add_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>
+        &text=SystÃ¨mes configurÃ©s<div class="pull-right" id="device_add_link"><i class="icon-plus <@roid?"":"icon-white"@>"></i></div>
         ?>
       </li>
 <?permanent_threads
@@ -30,8 +30,8 @@
 &cond=<@~decode_table(roid)==115@>
 &then=
 	<@permanentThread:=<?object&roid=<@roid@>&additional_parameters=1?>@>
-	<@tabs["properties"]=Propriétés@>
-	<@tabs["parameters"]=Paramètres par défaut@>
+	<@tabs["properties"]=PropriÃ©tÃ©s@>
+	<@tabs["parameters"]=ParamÃ¨tres par dÃ©faut@>
 	<@tabs["doc"]=Documentation@>
 	<@tab=<@tab?tab:"properties"@>@>
 
@@ -123,7 +123,7 @@
             <div class="controls"><input type="text" class="input-medium" name="actionParam_field_name" /></div>
           </div>
           <div class="control-group">
-            <label class="control-label">Type de système</label>
+            <label class="control-label">Type de systÃ¨me</label>
             <div class="controls">
               <select name="actionParam_field_device">
 <?devices
