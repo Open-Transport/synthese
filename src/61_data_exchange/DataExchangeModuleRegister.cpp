@@ -47,6 +47,9 @@
 #include "VDVServer.hpp"
 #include "VDVServerSubscription.hpp"
 
+// Devices
+#include "TestPoller.hpp"
+
 #include "DataExchangeModule.inc.cpp"
 
 void synthese::data_exchange::moduleRegister()
@@ -93,6 +96,8 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
 	synthese::data_exchange::GpsFileFormat::integrate();
+
+	synthese::data_exchange::TestPoller::integrate();
 
 
 
