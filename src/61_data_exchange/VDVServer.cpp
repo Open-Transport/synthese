@@ -628,7 +628,6 @@ namespace synthese
 							CityTableSync::SearchResult cities(
 								CityTableSync::Search(
 									Env::GetOfficialEnv(),
-									optional<string>(),
 									cityName
 							)	);
 							City* city = NULL;
