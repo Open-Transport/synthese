@@ -1,15 +1,19 @@
 #pragma once
 
-class Ccrc16
+namespace synthese
 {
-	static unsigned short crctable[256];
 
-public:
-	Ccrc16(void);
-	~Ccrc16(void);
+	class Ccrc16
+	{
+		static unsigned short crctable[256];
 
-	void crc_calc( unsigned char ch , unsigned short * crc );
-	unsigned short calculCrc16_ForTransparent_Mode( unsigned char * buffer, int len, int init );
+	public:
+		Ccrc16(void);
+		~Ccrc16(void);
 
-	bool testCRC();
-};
+		void crc_calc( unsigned char ch , unsigned short * crc );
+		unsigned short calculCrc16_ForTransparent_Mode( unsigned char * buffer, int len, int init );
+
+		bool testCRC();
+	};
+}
