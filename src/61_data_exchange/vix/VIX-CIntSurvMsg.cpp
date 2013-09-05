@@ -22,23 +22,6 @@ CIntSurvMsg::CIntSurvMsg(void)
 	num_journey	= 21;	// course NOT USED in VIX code.
 	num_stop	= 2045;//2050;
 	direction	= 0;
-// Donnée d'essai chez VIX
-/*
-	year		= 113;
-	month		= 8;
-	day		= 19;
-	hour		= 12;
-	min		= 10;
-	sec		= 50;
-	num_driver	= 4320;
-	num_park	= 104;
-	etat_expl	= 1;
-	num_line	= 06;
-	num_service	= 4024;	// No service agent
-	num_journey	= 247;	// course
-	num_stop	= 1743;
-	direction	= 1;
-*/
 }
 
 CIntSurvMsg::~CIntSurvMsg(void)
@@ -101,6 +84,9 @@ int CIntSurvMsg::insertCharToBufferTransparentMode(unsigned char *buf, int bufSi
 
 int CIntSurvMsg::StreamToBuffer(unsigned char *buf, int bufSize)
 {
+	// Vehicle info planned be update in the gps poller. => VehiclePosition setGeometry 
+	//TODO:	UpdateVariablesFromEnv();
+
 	if(bufSize<INT_SURV_BUF_SIZE){
 		printf("CIntSurv::StreamToBuffer INVALID buffer size. size:%d. Must be at least: %d\n", bufSize, INT_SURV_BUF_SIZE);
 		return 0;

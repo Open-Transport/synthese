@@ -1,6 +1,6 @@
 
-/** GpsPoller class header.
-	@file GpsPoller.hpp
+/** ValidatorVIXv6000Poller class header.
+	@file ValidatorVIXv6000Poller.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,35 +20,31 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_pt_GpsPoller_hpp__
-#define SYNTHESE_pt_GpsPoller_hpp__
+#ifndef SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
+#define SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
 
 #include <boost/shared_ptr.hpp>
 #include <string>
 
 namespace synthese
 {
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace data_exchange
 	{
-		/** GpsPoller class.
+		/** ValidatorVIXv6000Poller class.
 			@ingroup m61
 		*/
-		class GpsPoller
+		class ValidatorVIXv6000DevicePoller
 		{
-		#define GPS_POLLER_SOCKET_PORT 2947
-
 		private:
-			static boost::shared_ptr<GpsPoller> _theConnection;
-			mutable double _longitude;
-			mutable double _latitude;
-			mutable bool _bGpsOk;
+			static boost::shared_ptr<ValidatorVIXv6000DevicePoller> _theConnection;
 
 		public:
-			GpsPoller();
-
-			const double getLongitude() const { return _longitude; }
-			const double getLatitude() const { return _latitude; }
-			const double getGpsStatus() const { return _bGpsOk; }
+			ValidatorVIXv6000DevicePoller();
 
 			static void RunThread();
 
@@ -59,5 +55,5 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_pt_GpsPoller_hpp__
+#endif // SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
 

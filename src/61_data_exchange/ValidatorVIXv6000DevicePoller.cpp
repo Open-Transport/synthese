@@ -1,6 +1,6 @@
 
-/** ValidatorVIXv6000Poller class implementation.
-	@file ValidatorVIXv6000Poller.cpp
+/** ValidatorVIXv6000DevicePoller class implementation.
+	@file ValidatorVIXv6000DevicePoller.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ValidatorVIXv6000Poller.hpp"
+#include "ValidatorVIXv6000DevicePoller.hpp"
 
 #include "Env.h"
 #include "Exception.h"
@@ -44,15 +44,15 @@ namespace synthese
 {
 	namespace data_exchange
 	{
-		boost::shared_ptr<ValidatorVIXv6000Poller> ValidatorVIXv6000Poller::_theConnection(new ValidatorVIXv6000Poller);
+		boost::shared_ptr<ValidatorVIXv6000DevicePoller> ValidatorVIXv6000DevicePoller::_theConnection(new ValidatorVIXv6000DevicePoller);
 		
 
-		ValidatorVIXv6000Poller::ValidatorVIXv6000Poller()
+		ValidatorVIXv6000DevicePoller::ValidatorVIXv6000DevicePoller()
 		{
 		}
 
 
-		void ValidatorVIXv6000Poller::RunThread()
+		void ValidatorVIXv6000DevicePoller::RunThread()
 		{
 			SerialReader srt;
 			CIntSurvMsg int_surv;
@@ -104,7 +104,7 @@ namespace synthese
 		}
 
 
-		void ValidatorVIXv6000Poller::ParameterCallback( const std::string& name,
+		void ValidatorVIXv6000DevicePoller::ParameterCallback( const std::string& name,
 													  const std::string& value )
 		{
 		}
