@@ -193,8 +193,8 @@ namespace synthese
 			os << "{\"class\":\"TPV\",\"tag\":\"GLL\",\"device\":\"/dev/ttyS4\",\"mode\":3,\"time\":\"2013-08-22T12:27:03.000Z\",\"ept\":0.005,\"lat\":47.622858500,\"lon\":6.857120333,\"alt\":452.100,\"epv\":2299.770,\"track\":293.7200,\"speed\":0.000,\"climb\":0.000}" << std::endl;
 
 			if(readGSPJsonAnswers(ss, m_longitude, m_latitude)){
-				util::Log::GetInstance().debug("longitude=" + lexical_cast<string>(m_longitude));
-				util::Log::GetInstance().debug("latitude=" + lexical_cast<string>(m_latitude));
+				util::Log::GetInstance().debug("longitude=" + boost::lexical_cast<string>(m_longitude));
+				util::Log::GetInstance().debug("latitude=" + boost::lexical_cast<string>(m_latitude));
 			}
 			
 			if(m_longitude!=6.857120333){
