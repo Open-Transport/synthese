@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "Log.h"
+
 #include "VIX-CIntSurvMsg.hpp"
 #include "VIX-BSC-defines.hpp"
 
@@ -78,7 +80,7 @@ namespace synthese
 		if(nbInserted==0)
 		{
 			// got an error. buffer too small
-			printf("CIntSurv::insertCharToBufferTransparentMode CANNOT insert char. Buffer too small\n");
+			util::Log::GetInstance().error("CIntSurv::insertCharToBufferTransparentMode CANNOT insert char. Buffer too small");
 		}
 
 		return nbInserted;
@@ -91,7 +93,8 @@ namespace synthese
 		//TODO:	UpdateVariablesFromEnv();
 
 		if(bufSize<INT_SURV_BUF_SIZE){
-			printf("CIntSurv::StreamToBuffer INVALID buffer size. size:%d. Must be at least: %d\n", bufSize, INT_SURV_BUF_SIZE);
+			// buf size Must be at least equal to INT_SURV_BUF_SIZE
+			util::Log::GetInstance().error("CIntSurv::StreamToBuffer INVALID buffer size");
 			return 0;
 		}
 

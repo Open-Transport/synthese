@@ -69,7 +69,7 @@ namespace synthese
 				CHECKFORCOM com = srt.CheckForCommunication();
 				if(com==POLLING)
 				{
-					printf("got polled from master at our address\n");
+					util::Log::GetInstance().debug("got polled from master at our address\n");
 					int iToBeWritten = 0;
 					// check if we have to send something
 					if(timeNextMessage<tu.GetTickCount()){
@@ -89,7 +89,7 @@ namespace synthese
 
 				}else if(com==SELECTING)
 				{
-					printf("got selected from master at our address\n");
+					util::Log::GetInstance().debug("got selected from master at our address\n");
 					// master wants to talk to us. Have to empty his queue.
 
 					// tell master we are ready to answer.
