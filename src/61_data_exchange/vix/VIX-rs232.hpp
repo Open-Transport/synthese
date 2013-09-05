@@ -39,9 +39,6 @@
 #include <stdio.h>
 #include <string.h>
 
-namespace synthese
-{
-
 	#ifdef __linux__
 
 	#include <termios.h>
@@ -58,6 +55,9 @@ namespace synthese
 
 	#endif
 
+namespace synthese
+{
+
 	int RS232_OpenComport(int, int);
 	int RS232_PollComport(int, unsigned char *, int);
 	int RS232_SendByte(int, unsigned char);
@@ -71,7 +71,7 @@ namespace synthese
 	void RS232_enableRTS(int);
 	void RS232_disableRTS(int);
 
-
-	#endif
 }
+
+#endif
 
