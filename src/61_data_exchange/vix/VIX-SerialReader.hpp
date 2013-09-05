@@ -5,42 +5,46 @@
 #include "VIX-ComPortMgr.hpp"
 #include "VIX-Ccrc16.hpp"
 
-#define COM_PORT_BUFF_SIZE 255
+namespace synthese
+	{
 
-enum CHECKFORCOM {
-	NOTHING,
-	POLLING,
-	SELECTING
-};
+	#define COM_PORT_BUFF_SIZE 255
 
-class SerialReader
-{
-private:
-	CComPortMgr *m_pCom;
-	bool m_comOk;
-	unsigned char m_buf[COM_PORT_BUFF_SIZE];
-	FILE* m_logfile;
-	std::deque<unsigned char> m_deque;
-	Ccrc16 m_crc;
+	enum CHECKFORCOM {
+		NOTHING,
+		POLLING,
+		SELECTING
+	};
 
-public:
-	SerialReader(void);
-	~SerialReader(void);
+	class SerialReader
+	{
+	private:
+		CComPortMgr *m_pCom;
+		bool m_comOk;
+		unsigned char m_buf[COM_PORT_BUFF_SIZE];
+		FILE* m_logfile;
+		std::deque<unsigned char> m_deque;
+		Ccrc16 m_crc;
 
-	CHECKFORCOM CheckForCommunication();
+	public:
+		SerialReader(void);
+		~SerialReader(void);
 
-	bool PollingAnswerIntSurv(unsigned char *p, int nbOfCharToWrite);
-	bool WaitForAck1();
-	bool WriteEOT();
-	bool WriteDleAct0();
-	bool ValidateMasterMessage();
+		CHECKFORCOM CheckForCommunication();
 
-private:
-	bool FillUpQueue(unsigned int iAmoutOfCharNeeded);
-	bool WaitForDleStx();
-	bool ReadMessageUntilDleEtx();
-	bool ReadCrc(unsigned char &crc1, unsigned char &crc2);
-	bool WriteDleAct1();
-	bool WaitForEOT();
-};
+		bool PollingAnswerIntSurv(unsigned char *p, int nbOfCharToWrite);
+		bool WaitForAck1();
+		bool WriteEOT();
+		bool WriteDleAct0();
+		bool ValidateMasterMessage();
 
+	private:
+		bool FillUpQueue(unsigned int iAmoutOfCharNeeded);
+		bool WaitForDleStx();
+		bool ReadMessageUntilDleEtx();
+		bool ReadCrc(unsigned char &crc1, unsigned char &crc2);
+		bool WriteDleAct1();
+		bool WaitForEOT();
+	};
+
+}
