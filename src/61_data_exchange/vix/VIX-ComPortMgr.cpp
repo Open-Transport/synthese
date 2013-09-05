@@ -1,6 +1,8 @@
 #include <queue>
 #include <stdio.h>
 
+#include "Log.h"
+
 #include "VIX-ComPortMgr.hpp"
 #include "VIX-BSC-defines.hpp"
 #include "VIX-rs232.hpp"
@@ -10,6 +12,7 @@
 
 namespace synthese
 {
+
 	CComPortMgr::CComPortMgr(int cport_nr, int bdrate)
 	{
 		m_cport_nr=cport_nr;	// com port ID. Start from 0. IE: /dev/ttyS0 (COM1 on windows)
@@ -31,12 +34,14 @@ namespace synthese
 		bool bRet = false; 
 
 		RS232_CloseComport(m_cport_nr);
+		std::string msg;
+		msg.append("CComPortMgr::Open FAILED. port index: %d. Baud: %d", m_cport_nr, m_bdrate);
 
 		if(RS232_OpenComport(m_cport_nr, m_bdrate)){
-			printf("CComPortMgr::Open FAILED. port index: %d. Baud: %d\n", m_cport_nr, m_bdrate);
+			util::Log::GetInstance().error(msg);
 			bRet = false;
 		}else{
-			printf("CComPortMgr::Open succeed. port index: %d. Baud: %d\n", m_cport_nr, m_bdrate);
+			util::Log::GetInstance().debug(msg);
 			bRet = true;
 		}
 
@@ -139,7 +144,7 @@ namespace synthese
 	#endif
 		if(nBytesWritten<0)
 		{
-			printf("CComPortMgr::WriteBuffer FAILED. buffer maybe not sent!");
+			util::Log::GetInstance().error("CComPortMgr::WriteBuffer FAILED. buffer maybe not sent!");
 			bRet = false;
 		}
 
@@ -162,7 +167,7 @@ namespace synthese
 
 		if(nBytesWritten<0)
 		{
-			printf("CComPortMgr::WriteByte FAILED. buffer maybe not sent!");
+			util::Log::GetInstance().error("CComPortMgr::WriteByte FAILED. buffer maybe not sent!");
 			bRet = false;
 		}
 

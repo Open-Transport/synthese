@@ -39,6 +39,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace util;
 	
 	namespace data_exchange
 	{	
@@ -56,7 +57,7 @@ namespace synthese
 			_theConnection->_bGpsOk = false;
 			double lon=0.0;
 			double lat=0.0;
-//TODO(JD): move GpsDevicePoller into "FileFormat"
+
 			// Main loop (never ends)
 			while(true)
 			{
@@ -69,7 +70,7 @@ namespace synthese
 					{
 						// fail to open connection to GOS socket.
 						// Add a timeout before to retry
-						std::cout << "GpsDevicePoller failed to open GPS connection socket" << std::endl;
+						util::Log::GetInstance().warn("GpsDevicePoller failed to open GPS connection socket");
 						this_thread::sleep(seconds(30));
 					}
 				}
@@ -81,10 +82,6 @@ namespace synthese
 						g.getLatLong(lon,lat);
 						_theConnection->_longitude=lon;
 						_theConnection->_latitude=lat;
-
-						//TODO(JD): remove this log garbage when working fine.
-						std::cout << "longitude=" << lon <<std::endl;
-						std::cout << "latitude=" << lat <<std::endl;
 					}
 					//TODO Should we retry to reconnect if updateFromGps fail too much?
 				}

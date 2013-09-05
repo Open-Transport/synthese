@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include "Log.h"
+
 #include "VIX-Ccrc16.hpp"
 #include "VIX-BSC-defines.hpp"
 namespace synthese
@@ -40,8 +42,8 @@ namespace synthese
 				i++;
 				if(buffer[i]!=BSC_CODE_ASCII_DLE)
 				{	
-					//TODO(JD) error message.
-					printf("**ERROR. Invalid buffer. Transparent mode not respected. Missing some DLE?\n");
+					//Invalid condition. Are we missing a DLE?
+					util::Log::GetInstance().error("Invalid buffer. Transparent mode not respected. Missing some DLE?");
 				}
 			}
 				

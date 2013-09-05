@@ -33,9 +33,11 @@
 
 /* For more info and how to use this libray, visit: http://www.teuniz.net/RS-232/ */
 #include "VIX-rs232.hpp"
+#include "Log.h"
 
 namespace synthese
 {
+	using namespace std;
 
 	#ifdef __linux__   /* Linux */
 
@@ -61,7 +63,7 @@ namespace synthese
 
 	  if((comport_number>29)||(comport_number<0))
 	  {
-		printf("illegal comport number\n");
+		util::Log::GetInstance().error("illegal comport number");
 		return(1);
 	  }
 
@@ -113,7 +115,7 @@ namespace synthese
 					   break;
 		case 1000000 : baudr = B1000000;
 					   break;
-		default      : printf("invalid baudrate\n");
+		default      : util::Log::GetInstance().error("invalid baudrate");
 					   return(1);
 					   break;
 	  }
@@ -343,7 +345,7 @@ namespace synthese
 	{
 	  if((comport_number>15)||(comport_number<0))
 	  {
-		printf("illegal comport number\n");
+		util::Log::GetInstance().error("illegal comport number");
 		return(1);
 	  }
 
@@ -379,7 +381,7 @@ namespace synthese
 					   break;
 		case 1000000 : strcpy_s(baudr, BAUDR_ARRAY_SIZE, "baud=1000000 data=8 parity=N stop=1 dtr=on rts=on");
 					   break;
-		default      : printf("invalid baudrate\n");
+		default      : util::Log::GetInstance().error("invalid baudrate");
 					   return(1);
 					   break;
 	  }
@@ -394,7 +396,7 @@ namespace synthese
 
 	  if(Cport[comport_number]==INVALID_HANDLE_VALUE)
 	  {
-		printf("unable to open comport\n");
+		util::Log::GetInstance().error("unable to open comport");
 		return(1);
 	  }
 
@@ -404,14 +406,14 @@ namespace synthese
 
 	  if(!BuildCommDCBA(baudr, &port_settings))
 	  {
-		printf("unable to set comport dcb settings\n");
+		util::Log::GetInstance().error("unable to set comport dcb settings");
 		CloseHandle(Cport[comport_number]);
 		return(1);
 	  }
 
 	  if(!SetCommState(Cport[comport_number], &port_settings))
 	  {
-		printf("unable to set comport cfg settings\n");
+		util::Log::GetInstance().error("unable to set comport cfg settings");
 		CloseHandle(Cport[comport_number]);
 		return(1);
 	  }
@@ -427,7 +429,7 @@ namespace synthese
 
 	  if(!SetCommTimeouts(Cport[comport_number], &Cptimeouts))
 	  {
-		printf("unable to set comport time-out settings\n");
+		util::Log::GetInstance().error("unable to set comport time-out settings");
 		CloseHandle(Cport[comport_number]);
 		return(1);
 	  }

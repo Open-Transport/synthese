@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include "Log.h"
+
 #include "VIX-SerialReader.hpp"
 #include "VIX-BSC-defines.hpp"
 #include "VIX-timeutil.hpp"
@@ -23,9 +25,9 @@ namespace synthese
 	#ifdef _DEBUG
 		Ccrc16 crc;
 		if( crc.testCRC()){
-			printf(">CComPortMgr::WriteBuffer crc test SUCCEEDED!.\n");
+			util::Log::GetInstance().debug(">CComPortMgr::WriteBuffer crc test SUCCEEDED!");
 		}else{
-			printf(">CComPortMgr::WriteBuffer crc test FAILED!.\n");
+			util::Log::GetInstance().error(">CComPortMgr::WriteBuffer crc test FAILED!");
 		}
 	#endif
 
@@ -39,7 +41,7 @@ namespace synthese
 		}
 
 		if(!m_comOk){
-			printf("Cannot open the port\n");
+			util::Log::GetInstance().error("SerialReader: Cannot open the port");
 		}
 	#ifdef RAW_DATA_SIMULATION_TEST
 		m_comOk = true;
@@ -199,7 +201,7 @@ namespace synthese
 			m_pCom->WriteByte(crc16 & 0x00FF);
 			m_pCom->WriteByte((crc16 & 0xFF00)>>8);
 
-			printf("*** Validator wrote survey message. Done! ");
+			//util::Log::GetInstance().debug("*** Validator wrote survey message. Done! ");
 		}
 
 		return true;
