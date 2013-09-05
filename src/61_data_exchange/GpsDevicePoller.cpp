@@ -1,6 +1,6 @@
 
-/** GpsPoller class implementation.
-	@file GpsPoller.cpp
+/** GpsDevicePoller class implementation.
+	@file GpsDevicePoller.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "GpsPoller.hpp"
+#include "GpsDevicePoller.hpp"
 
 #include "Env.h"
 #include "Exception.h"
@@ -42,21 +42,21 @@ namespace synthese
 	
 	namespace data_exchange
 	{	
-		boost::shared_ptr<GpsPoller> GpsPoller::_theConnection(new GpsPoller);
+		boost::shared_ptr<GpsDevicePoller> GpsDevicePoller::_theConnection(new GpsDevicePoller);
 		
-		GpsPoller::GpsPoller():
+		GpsDevicePoller::GpsDevicePoller():
 			_longitude(0.0),
 			_latitude(0.0),
 			_bGpsOk(false)
 		{}
 
-		void GpsPoller::RunThread()
+		void GpsDevicePoller::RunThread()
 		{
 			gps g;
 			_theConnection->_bGpsOk = false;
 			double lon=0.0;
 			double lat=0.0;
-//TODO(JD): move GpsPoller into "FileFormat"
+//TODO(JD): move GpsDevicePoller into "FileFormat"
 			// Main loop (never ends)
 			while(true)
 			{
@@ -69,7 +69,7 @@ namespace synthese
 					{
 						// fail to open connection to GOS socket.
 						// Add a timeout before to retry
-						std::cout << "GpsPoller failed to open GPS connection socket" << std::endl;
+						std::cout << "GpsDevicePoller failed to open GPS connection socket" << std::endl;
 						this_thread::sleep(seconds(30));
 					}
 				}
@@ -94,7 +94,7 @@ namespace synthese
 		}
 
 
-		void GpsPoller::ParameterCallback(
+		void GpsDevicePoller::ParameterCallback(
 			const std::string& name,
 			const std::string& value )
 		{
