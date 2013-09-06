@@ -77,7 +77,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ServiceUrl, "service_url", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServiceCode, "service_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(TracePath, "trace_path", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(TransportNetworID, "transport_network_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TransportNetworkID, "transport_network_id", SQL_INTEGER)
 	
 	namespace data_exchange
 	{
@@ -99,7 +99,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceUrl),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
-					FIELD_DEFAULT_CONSTRUCTOR(TransportNetworID),
+					FIELD_DEFAULT_CONSTRUCTOR(TransportNetworkID),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
 			)	),
 			_startServiceTimeStamp(not_a_date_time),
@@ -447,7 +447,7 @@ namespace synthese
 				trace("DatenAbrufenAnfrage", request.str());
 				trace("DatenAbrufenAntwort", result);
 
-				boost::shared_ptr<pt::TransportNetwork> network = TransportNetworkTableSync::GetEditable(get<TransportNetworID>(), Env::GetOfficialEnv());
+				boost::shared_ptr<pt::TransportNetwork> network = TransportNetworkTableSync::GetEditable(get<TransportNetworkID>(), Env::GetOfficialEnv());
 				if (!network.get())
 				{
 					// The network does not exist : log so that the user knows he has to configure it

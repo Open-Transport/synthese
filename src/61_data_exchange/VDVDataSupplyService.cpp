@@ -39,6 +39,7 @@
 #include "TransportNetwork.h"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
+#include "VDVServer.hpp"
 #include "XmlToolkit.h"
 
 #include <boost/date_time/local_time_adjustor.hpp>
@@ -220,6 +221,9 @@ namespace synthese
 						const TransportNetwork& network(
 							*line.getNetwork()
 						);
+						// Check that network is OK
+						if (network.getKey() != _vdvClient->get<TransportNetworkID>())
+							continue;
 						ptime departureDateTime(sp.getDepartureDateTime());
 						departureDateTime -= diff_from_utc;
 						ptime plannedDepartureDateTime(sp.getTheoreticalDepartureDateTime());
