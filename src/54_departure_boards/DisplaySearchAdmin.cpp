@@ -251,7 +251,7 @@ namespace synthese
 
 				BOOST_FOREACH(const boost::shared_ptr<DisplayScreen>& screen, screens)
 				{
-					if(screen->getParent())
+					if(screen->getParent(true))
 					{
 						continue;
 					}
