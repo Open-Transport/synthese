@@ -63,6 +63,7 @@ namespace synthese
 			FIELD(ServiceUrl),
 			FIELD(ServiceCode),
 			FIELD(impex::DataSource),
+			FIELD(TransportNetworkID),
 			FIELD(DefaultDirection),
 			FIELD(Active),
 			FIELD(TracePath),

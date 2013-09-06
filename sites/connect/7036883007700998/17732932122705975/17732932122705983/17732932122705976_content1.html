@@ -223,6 +223,16 @@
 		    }>?>
 		   </select>
 	          </div>
+             </div><div class="control-group">
+	          <label class="control-label">Réseau</label>
+	          <div class="controls">
+		        <select name="actionParam_field_transport_network_id" is_parameter="true">
+                  <option value="">(non défini)</option>
+                  <?PTNetworksListFunction&template=<{network&template=
+                  <option value="<@network_id@>" <?if&cond=<?=&l=<@id@>&r=<@transport_network_id@>?>&then=selected=\"true\"?>><@name@></option>
+                  }>?>
+                </select>
+	          </div>
 	         </div><div class="control-group">
 	          <label class="control-label">Direction par défaut</label>
 	          <div class="controls">

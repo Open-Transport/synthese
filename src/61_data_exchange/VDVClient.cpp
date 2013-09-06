@@ -81,6 +81,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceUrl),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
+					FIELD_DEFAULT_CONSTRUCTOR(TransportNetworkID),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
 					FIELD_VALUE_CONSTRUCTOR(Active, true),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath),
