@@ -23,37 +23,69 @@
 #ifndef SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
 #define SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
 
-#include <boost/shared_ptr.hpp>
 #include <string>
+
+#include "DeviceTemplate.h"
+#include "Poller.hpp"
 
 namespace synthese
 {
-	namespace impex
-	{
-		class DataSource;
-	}
-
 	namespace data_exchange
 	{
-		/** ValidatorVIXv6000Poller class.
-			@ingroup m61
-		*/
-		class ValidatorVIXv6000DevicePoller
+		//////////////////////////////////////////////////////////////////////////
+		/// Test poller.
+		//////////////////////////////////////////////////////////////////////////
+		/// @author RCS
+		/// @ingroup m61
+		class ValidatorVIXv6000DevicePoller:
+			public server::DeviceTemplate<ValidatorVIXv6000DevicePoller>
 		{
-		private:
-			static boost::shared_ptr<ValidatorVIXv6000DevicePoller> _theConnection;
-
 		public:
-			ValidatorVIXv6000DevicePoller();
 
-			static void RunThread();
+			//////////////////////////////////////////////////////////////////////////
+			class Poller_:
+				public server::Poller
+			{
+			public:
+				static const std::string PARAMETER_VALIDATOR_COM_PORT_NUMBER;
+				static const std::string PARAMETER_VALIDATOR_COM_PORT_RATE;
 
-			static void ParameterCallback(
-				const std::string& name,
-				const std::string& value
-			);
+			private:
+				static int _ComPortNb;
+				static int _ComPortRate;
+
+			protected:
+
+				virtual bool launchPoller() const;
+
+			public:
+				Poller_(
+					util::Env& env,
+					const server::PermanentThread& permanentThread,
+					util::ParametersMap& pm
+					);
+
+				void startPolling() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author RCS
+				/// @date 2013
+				/// @since 3.9.0
+				virtual util::ParametersMap getParametersMap() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author RCS
+				/// @date 2013
+				/// @since 3.9.0
+				virtual void setFromParametersMap(const util::ParametersMap& map);
+			};
 		};
-}	}
+	}
+}
 
 #endif // SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
 

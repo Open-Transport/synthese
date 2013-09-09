@@ -19,7 +19,7 @@ namespace synthese
 
 	//TODO: reconnect COM port automatically when lost.
 
-	SerialReader::SerialReader(void)
+	SerialReader::SerialReader(int comport, int baudrate)
 	{
 	  
 	#ifdef _DEBUG
@@ -34,7 +34,7 @@ namespace synthese
 		// create and open the communication port
 		m_comOk = false;
 		//TODO(JD): make the com port variable using parameters
-		m_pCom = new CComPortMgr(8, 9600);
+		m_pCom = new CComPortMgr(comport, baudrate);
 		
 		if(m_pCom){
 			m_comOk = m_pCom->Open();

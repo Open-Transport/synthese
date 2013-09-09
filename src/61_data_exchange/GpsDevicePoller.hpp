@@ -23,41 +23,76 @@
 #ifndef SYNTHESE_pt_GpsDevicePoller_hpp__
 #define SYNTHESE_pt_GpsDevicePoller_hpp__
 
-#include <boost/shared_ptr.hpp>
-#include <string>
+#include "DeviceTemplate.h"
+#include "Poller.hpp"
+
+#include "Log.h"
+#include "ParametersMap.h"
+
+#include <boost/thread.hpp>
+
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	namespace data_exchange
 	{
-		/** GpsDevicePoller class.
-			@ingroup m61
-		*/
-		class GpsDevicePoller
-		{
 		#define GPS_POLLER_SOCKET_PORT 2947
 
-		private:
-			static boost::shared_ptr<GpsDevicePoller> _theConnection;
-			mutable double _longitude;
-			mutable double _latitude;
-			mutable bool _bGpsOk;
+		class GpsDevicePoller:
+			public server::DeviceTemplate<GpsDevicePoller>
+		{
 
 		public:
-			GpsDevicePoller();
 
-			const double getLongitude() const { return _longitude; }
-			const double getLatitude() const { return _latitude; }
-			const double getGpsStatus() const { return _bGpsOk; }
+			//////////////////////////////////////////////////////////////////////////
+			/// Test poller.
+			//////////////////////////////////////////////////////////////////////////
+			/// @author RCS
+			/// @ingroup m61
+			class Poller_:
+				public server::Poller
+			{
+			public:
+				static const std::string PARAMETER_VALIDATOR_NET_PORT_NUMBER;
 
-			static void RunThread();
+			private:
+				static int _NetPortNb;
 
-			static void ParameterCallback(
-				const std::string& name,
-				const std::string& value
-			);
+			protected:
+
+				virtual bool launchPoller() const;
+
+			public:
+				Poller_(
+					util::Env& env,
+					const server::PermanentThread& permanentThread,
+					util::ParametersMap& pm
+					);
+
+				void startPolling() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author RCS
+				/// @date 2013
+				/// @since 3.9.0
+				virtual util::ParametersMap getParametersMap() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author RCS
+				/// @date 2013
+				/// @since 3.9.0
+				virtual void setFromParametersMap(const util::ParametersMap& map);
+
+			};
 		};
-}	}
+	}	
+}
 
 #endif // SYNTHESE_pt_GpsDevicePoller_hpp__
 

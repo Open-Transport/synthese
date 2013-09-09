@@ -26,8 +26,6 @@
 #include "MGScreenConnection.hpp"
 #include "ServerModule.h"
 #include "StopButtonFilePoller.hpp"
-#include "ValidatorVIXv6000DevicePoller.hpp"
-#include "GpsDevicePoller.hpp"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
 #include "VDVServer.hpp"
