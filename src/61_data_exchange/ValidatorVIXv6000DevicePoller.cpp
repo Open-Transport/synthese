@@ -22,48 +22,85 @@
 
 #include "ValidatorVIXv6000DevicePoller.hpp"
 
-#include "Env.h"
-#include "Exception.h"
 #include "Log.h"
+#include "PermanentThread.hpp"
+#include "ServerModule.h"
 
-//temporary validator stuffs
 #include "vix/VIX-CIntSurvMsg.hpp"
 #include "vix/VIX-SerialReader.hpp"
 #include "vix/VIX-timeutil.hpp"
-#include "gps.h"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <iostream>
-#include <fstream>
+#include <boost/thread.hpp>
+#include <boost/format.hpp>
 
-using namespace boost;
-using namespace boost::posix_time;
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
+	using namespace data_exchange;
+	using namespace server;
+	using namespace util;
+	using namespace db;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Device, ValidatorVIXv6000DevicePoller>::FACTORY_KEY = "ValidatorVIXv6000Device_Poller";
+	}
+
 	namespace data_exchange
 	{
-		boost::shared_ptr<ValidatorVIXv6000DevicePoller> ValidatorVIXv6000DevicePoller::_theConnection(new ValidatorVIXv6000DevicePoller);
-		
+		const std::string ValidatorVIXv6000DevicePoller::Poller_::PARAMETER_VALIDATOR_COM_PORT_NUMBER("validator_com_port_number");
+		const std::string ValidatorVIXv6000DevicePoller::Poller_::PARAMETER_VALIDATOR_COM_PORT_RATE("validator_com_port_rate");
+		int ValidatorVIXv6000DevicePoller::Poller_::_ComPortNb=1;
+		int ValidatorVIXv6000DevicePoller::Poller_::_ComPortRate=9600;
 
-		ValidatorVIXv6000DevicePoller::ValidatorVIXv6000DevicePoller()
+		bool ValidatorVIXv6000DevicePoller::Poller_::launchPoller(
+			) const {
+
+				// Launch the thread and returns true
+				ServerModule::AddThread(boost::bind(&ValidatorVIXv6000DevicePoller::Poller_::startPolling, this), "ValidatorVIXv6000DevicePoller");
+
+				return true;
+		}
+
+		ValidatorVIXv6000DevicePoller::Poller_::Poller_(
+			util::Env& env,
+			const server::PermanentThread& permanentThread,
+			util::ParametersMap& pm
+			):	Poller(env, permanentThread, pm)
+		{}
+
+		util::ParametersMap ValidatorVIXv6000DevicePoller::Poller_::getParametersMap() const
 		{
+			ParametersMap map;
+
+			map.insert(PARAMETER_VALIDATOR_COM_PORT_NUMBER, _ComPortNb);
+			map.insert(PARAMETER_VALIDATOR_COM_PORT_RATE, _ComPortRate);
+
+			return map;
+		}
+
+		void ValidatorVIXv6000DevicePoller::Poller_::setFromParametersMap(const util::ParametersMap& map)
+		{
+			_ComPortNb = map.getDefault<int>(PARAMETER_VALIDATOR_COM_PORT_NUMBER, 8);
+			_ComPortRate = map.getDefault<int>(PARAMETER_VALIDATOR_COM_PORT_RATE, 9600);
 		}
 
 
-		void ValidatorVIXv6000DevicePoller::RunThread()
+		void ValidatorVIXv6000DevicePoller::Poller_::startPolling() const
 		{
-			SerialReader srt;
+			SerialReader srt(_ComPortNb,_ComPortRate);
 			CIntSurvMsg int_surv;
 			unsigned char buf[COM_PORT_BUFF_SIZE];
 			unsigned long long timeNextMessage = 0;
 			TimeUtil tu;
 
-			// Main loop (never ends)
-			while(true)
+			while (true)
 			{
-				// WARNING: the sleep is into the lower level
+				Log::GetInstance().info(str(format("ValidatorVIXv6000DevicePoller: PortNumber=%d. Rate=%d") % _ComPortNb % _ComPortRate));
+
+				// WARNING: the sleep is into the lower level. (look into  SerialReader::FillUpQueue)
 				// This is critical NOT to put it here. 
 				// Timings are critical in rs485 protocols
 				CHECKFORCOM com = srt.CheckForCommunication();
@@ -102,11 +139,6 @@ namespace synthese
 				}
 			}
 		}
-
-
-		void ValidatorVIXv6000DevicePoller::ParameterCallback( const std::string& name,
-													  const std::string& value )
-		{
-		}
-}	}
+	}
+}
 

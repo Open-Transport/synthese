@@ -7,11 +7,13 @@
 #include "VIX-BSC-defines.hpp"
 #include "VIX-rs232.hpp"
 
+#include <boost/format.hpp>
 // cool info at http://ckp.made-it.com/bisync.html
 
 
 namespace synthese
 {
+	using namespace boost;
 
 	CComPortMgr::CComPortMgr(int cport_nr, int bdrate)
 	{
@@ -34,14 +36,12 @@ namespace synthese
 		bool bRet = false; 
 
 		RS232_CloseComport(m_cport_nr);
-		std::string msg;
-		msg.append("CComPortMgr::Open FAILED. port index: %d. Baud: %d", m_cport_nr, m_bdrate);
 
 		if(RS232_OpenComport(m_cport_nr, m_bdrate)){
-			util::Log::GetInstance().error(msg);
+			util::Log::GetInstance().error(str(format("CComPortMgr::Open FAILED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
 			bRet = false;
 		}else{
-			util::Log::GetInstance().debug(msg);
+			util::Log::GetInstance().debug(str(format("CComPortMgr::Open FAILED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
 			bRet = true;
 		}
 

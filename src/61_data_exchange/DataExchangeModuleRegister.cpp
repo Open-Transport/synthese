@@ -48,7 +48,8 @@
 #include "VDVServerSubscription.hpp"
 
 // Devices
-#include "TestPoller.hpp"
+#include "ValidatorVIXv6000DevicePoller.hpp"
+#include "GpsDevicePoller.hpp"
 
 #include "DataExchangeModule.inc.cpp"
 
@@ -97,9 +98,8 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
 	synthese::data_exchange::GpsFileFormat::integrate();
 
-	synthese::data_exchange::TestPoller::integrate();
-
-
+	synthese::data_exchange::ValidatorVIXv6000DevicePoller::integrate();
+	synthese::data_exchange::GpsDevicePoller::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::data_exchange::VDVClient>();

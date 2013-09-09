@@ -27,7 +27,7 @@ namespace synthese
 		Ccrc16 m_crc;
 
 	public:
-		SerialReader(void);
+		SerialReader(int comport, int baudrate);
 		~SerialReader(void);
 
 		CHECKFORCOM CheckForCommunication();
