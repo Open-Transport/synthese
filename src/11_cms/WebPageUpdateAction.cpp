@@ -168,9 +168,10 @@ namespace synthese
 				try
 				{
 					_up = WebPageTableSync::GetEditable(id, *_env);
-					for(Webpage* page(_up->get()); page != NULL; page = page->getParent())
+					for(Webpage* page(_up->get()); page != NULL; page = page->getParent(true))
 					{
-						if(page == _page.get())
+						if(page &&
+							page == _page.get())
 						{
 							throw ActionException("A page cannot be moved into a subpage node");
 						}
