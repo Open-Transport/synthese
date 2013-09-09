@@ -33,40 +33,81 @@
 #include <iostream>
 #include <fstream>
 
+
+#include "PermanentThread.hpp"
+#include "ServerModule.h"
+
+#include <boost/thread.hpp>
+#include <boost/format.hpp>
+
+using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
-using namespace std;
 
 namespace synthese
 {
+	using namespace data_exchange;
+	using namespace server;
 	using namespace util;
-	
+	using namespace db;
+
+	namespace util
+	{
+		template<> const string FactorableTemplate<Device, GpsDevicePoller>::FACTORY_KEY = "GpsDevice_Poller";
+	}
+
 	namespace data_exchange
-	{	
-		boost::shared_ptr<GpsDevicePoller> GpsDevicePoller::_theConnection(new GpsDevicePoller);
-		
-		GpsDevicePoller::GpsDevicePoller():
-			_longitude(0.0),
-			_latitude(0.0),
-			_bGpsOk(false)
+	{
+		const std::string GpsDevicePoller::Poller_::PARAMETER_VALIDATOR_NET_PORT_NUMBER("gps_net_port_number");
+		int GpsDevicePoller::Poller_::_NetPortNb=0;
+
+		bool GpsDevicePoller::Poller_::launchPoller(
+			) const {
+
+				// Launch the thread and returns true
+				ServerModule::AddThread(boost::bind(&GpsDevicePoller::Poller_::startPolling, this), "GpsDevicePoller");
+
+				return true;
+		}
+
+		GpsDevicePoller::Poller_::Poller_(
+			util::Env& env,
+			const server::PermanentThread& permanentThread,
+			util::ParametersMap& pm
+			): Poller(env, permanentThread, pm)
 		{}
 
-		void GpsDevicePoller::RunThread()
+		util::ParametersMap GpsDevicePoller::Poller_::getParametersMap() const
 		{
+			ParametersMap map;
+
+			map.insert(PARAMETER_VALIDATOR_NET_PORT_NUMBER, _NetPortNb);
+
+			return map;
+		}
+
+		void GpsDevicePoller::Poller_::setFromParametersMap(const util::ParametersMap& map)
+		{
+			_NetPortNb = map.getDefault<int>(PARAMETER_VALIDATOR_NET_PORT_NUMBER, GPS_POLLER_SOCKET_PORT);
+		}
+
+		void GpsDevicePoller::Poller_::startPolling() const
+		{
+			bool bGpsOk=false;
 			gps g;
-			_theConnection->_bGpsOk = false;
 			double lon=0.0;
 			double lat=0.0;
 
-			// Main loop (never ends)
-			while(true)
+			while (true)
 			{
+				Log::GetInstance().info(str(format("GpsDevicePoller: NetPortNumber=%d") % _NetPortNb));
+
 				// get actual GPS location
-				if(!_theConnection->_bGpsOk)	// goes into this at least once!
+				if(!bGpsOk)	// goes into this at least once!
 				{
-					g.initSocket("127.0.0.1", GPS_POLLER_SOCKET_PORT);
-					_theConnection->_bGpsOk = g.enableTalk();
-					if(!_theConnection->_bGpsOk)
+					g.initSocket("127.0.0.1", _NetPortNb);
+					bGpsOk = g.enableTalk();
+					if(!bGpsOk)
 					{
 						// fail to open connection to GOS socket.
 						// Add a timeout before to retry
@@ -75,13 +116,11 @@ namespace synthese
 					}
 				}
 
-				if(_theConnection->_bGpsOk){
+				if(bGpsOk){
 					// We have a valid gps socket opened. Use it.
 					if(g.updateFromGps()){
 						//TODO: eventually check value coherency.
 						g.getLatLong(lon,lat);
-						_theConnection->_longitude=lon;
-						_theConnection->_latitude=lat;
 					}
 					//TODO Should we retry to reconnect if updateFromGps fail too much?
 				}
@@ -89,14 +128,5 @@ namespace synthese
 				this_thread::sleep(seconds(1));
 			}
 		}
-
-
-		void GpsDevicePoller::ParameterCallback(
-			const std::string& name,
-			const std::string& value )
-		{
-	
-		}
-
-}	}
-
+	}
+}
