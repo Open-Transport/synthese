@@ -44,6 +44,7 @@ namespace synthese
 		const string InterSYNTHESEPackagesService::PARAMETER_TABLE_FILTER = "table_filter";
 		const string InterSYNTHESEPackagesService::PARAMETER_OBJECT_FILTER = "object_filter";
 
+		const string InterSYNTHESEPackagesService::TAG_PACKAGES = "packages";
 		const string InterSYNTHESEPackagesService::TAG_PACKAGE = "package";
 		
 
@@ -51,6 +52,10 @@ namespace synthese
 		ParametersMap InterSYNTHESEPackagesService::_getParametersMap() const
 		{
 			ParametersMap map;
+			if(!_outputFormat.empty())
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
 			return map;
 		}
 
@@ -71,6 +76,8 @@ namespace synthese
 			{
 				_objectFilter = objectFilter;
 			}
+
+			setOutputFormatFromMap(map, string());
 		}
 
 
@@ -111,6 +118,17 @@ namespace synthese
 				package.toParametersMap(*packagePM, true);
 				map.insert(TAG_PACKAGE, packagePM);
 			}
+
+			// Output
+			if(_outputFormat == MimeTypes::XML)
+			{
+				map.outputXML(stream, TAG_PACKAGES, true);
+			}
+			else if(_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, string());
+			}
+
 			return map;
 		}
 		
@@ -126,6 +144,6 @@ namespace synthese
 
 		std::string InterSYNTHESEPackagesService::getOutputMimeType() const
 		{
-			return "text/html";
+			return _outputFormat.empty() ? "text/plain" : _outputFormat;
 		}
 }	}

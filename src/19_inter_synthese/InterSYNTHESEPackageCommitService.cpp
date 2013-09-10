@@ -145,7 +145,7 @@ namespace synthese
 
 				// Prepare the saving transaction
 				DBTransaction transaction;
-				_content->save(transaction);
+				_content->save(transaction, optional<const impex::Importer&>());
 
 				// Run the saving transaction
 				transaction.run();

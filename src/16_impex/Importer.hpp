@@ -92,7 +92,7 @@ namespace synthese
 				const std::string& content
 			) const;
 
-		protected:
+		public:
 			void _logError(const std::string& content) const;
 			void _logWarning(const std::string& content) const;
 			void _logDebug(const std::string& content) const;
@@ -103,6 +103,7 @@ namespace synthese
 				const std::string& content
 			) const;
 
+		protected:
 			ImportLogLevel _getMaxLoggedLevel() const { return _maxLoggedLevel; }
 
 			template<class T>

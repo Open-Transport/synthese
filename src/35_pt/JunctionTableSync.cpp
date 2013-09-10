@@ -110,31 +110,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				RegistryKeyType sid(rows->getLongLong(JunctionTableSync::COL_START_PHYSICAL_STOP_ID));
-				RegistryKeyType eid(rows->getLongLong(JunctionTableSync::COL_END_PHYSICAL_STOP_ID));
-				double length(rows->getDouble(JunctionTableSync::COL_LENGTH));
-				time_duration duration(minutes(rows->getInt(JunctionTableSync::COL_DURATION)));
-				bool bidir(rows->getBool(JunctionTableSync::COL_BIDIRECTIONAL));
-
-				if(sid > 0 && eid > 0)
-				{
-					try
-					{
-						object->setStops(
-							StopPointTableSync::GetEditable(sid, env, linkLevel).get(),
-							StopPointTableSync::GetEditable(eid, env, linkLevel).get(),
-							length,
-							duration,
-							bidir
-						);
-					}
-					catch(ObjectNotFoundException<StopPoint>&)
-					{
-						Log::GetInstance().warn("No such stop in Junction "+ lexical_cast<string>(object->getKey()));
-					}
-				}
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			}
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 

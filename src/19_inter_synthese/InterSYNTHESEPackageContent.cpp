@@ -26,6 +26,7 @@
 #include "DBModule.h"
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
+#include "Importer.hpp"
 #include "InterSYNTHESEPackage.hpp"
 
 #include <boost/property_tree/json_parser.hpp>
@@ -175,6 +176,7 @@ namespace synthese
 			_package->set<Objects>(
 				_loadObjects(_objects, contentMap)
 			);
+			_objectsToSave.push_back(_package.get());
 		}
 
 
@@ -248,6 +250,11 @@ namespace synthese
 						catch(...) // Avoid break of the package installation because of bad value in existing data
 							       // In case of exception, the object will be considered as created
 						{
+							const RegistryBase& registry(directTableSync.getRegistry(_env));
+							if( registry.contains(key))
+							{
+								rObject = registry.getEditableObject(key);
+							}
 						}
 					}
 					if(!rObject.get())
@@ -283,6 +290,7 @@ namespace synthese
 						{
 							_objectsToSave.push_back(rObject.get());
 						}
+						rObject->link(_env, false);
 					}
 					catch(...) // Avoid break of the package installation because of bad value in new data
 							   // The object update will be ignored
@@ -323,18 +331,28 @@ namespace synthese
 		/// Deletes the removed objects too.
 		//////////////////////////////////////////////////////////////////////////
 		/// @retval transaction the transaction to populate
-		void InterSYNTHESEPackageContent::save( DBTransaction& transaction ) const
-		{
+		void InterSYNTHESEPackageContent::save(
+			DBTransaction& transaction,
+			boost::optional<const impex::Importer&> importer
+		) const	{
 			// Deletions
 			BOOST_FOREACH(RegistryKeyType id, _objectsToRemove)
 			{
 				transaction.addDeleteStmt(id);
+				if(importer)
+				{
+					importer->_logDebug("Delete "+ lexical_cast<string>(id));
+				}
 			}
 
 			// Insertions
 			BOOST_FOREACH(const Registrable* object, _objectsToSave)
 			{
 				DBModule::SaveObject(*object, transaction);
+				if(importer)
+				{
+					importer->_logDebug("Save "+ lexical_cast<string>(object->getKey()));
+				}
 			}
 		}
 }	}

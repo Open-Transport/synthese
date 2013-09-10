@@ -51,12 +51,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,DRTAreaTableSync>::FACTORY_KEY("35.40.05 DRT Areas");
 	}
 
-	namespace pt
-	{
-		const string DRTAreaTableSync::COL_NAME("name");
-		const string DRTAreaTableSync::COL_STOPS("stops");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DRTAreaTableSync>::TABLE(
@@ -67,9 +61,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DRTAreaTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(DRTAreaTableSync::COL_NAME, SQL_TEXT),
-			Field(DRTAreaTableSync::COL_STOPS, SQL_TEXT),
 			Field()
 		};
 
@@ -78,34 +69,6 @@ namespace synthese
 		template<> DBTableSync::Indexes DBTableSyncTemplate<DRTAreaTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DRTAreaTableSync,DRTArea>::Load(
-			DRTArea* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setName(rows->getText(DRTAreaTableSync::COL_NAME));
-
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				object->setStops(DRTAreaTableSync::UnserializeStops(rows->getText(DRTAreaTableSync::COL_STOPS), env));
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DRTAreaTableSync,DRTArea>::Save(
-			DRTArea* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<DRTAreaTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(DRTAreaTableSync::SerializeStops(object->getStops()));
-			query.execute(transaction);
 		}
 
 
@@ -186,53 +149,6 @@ namespace synthese
 
 
 
-		std::string DRTAreaTableSync::SerializeStops( const DRTArea::Stops& value )
-		{
-			stringstream s;
-			bool first(true);
-			BOOST_FOREACH(const DRTArea::Stops::value_type& stop, value)
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					s << ",";
-				}
-				s << stop->getKey();
-			}
-			return s.str();
-		}
-
-
-
-		DRTArea::Stops DRTAreaTableSync::UnserializeStops( const std::string& value, util::Env& env )
-		{
-			DRTArea::Stops result;
-			if(!value.empty())
-			{
-				vector<string> stops;
-				split(stops, value, is_any_of(","));
-				BOOST_FOREACH(const string& stop, stops)
-				{
-					try
-					{
-						RegistryKeyType placeId(lexical_cast<RegistryKeyType>(stop));
-						result.insert(
-							StopAreaTableSync::GetEditable(placeId, env).get()
-						);
-						StopPointTableSync::Search(env, placeId);
-					}
-					catch(ObjectNotFoundException<StopArea>&)
-					{
-
-					}
-				}
-			}
-			return result;
-		}
-
 		db::RowsList DRTAreaTableSync::SearchForAutoComplete(
 			const boost::optional<std::string> prefix,
 			const boost::optional<std::size_t> limit,
@@ -244,13 +160,13 @@ namespace synthese
 				Env env;
 				if(prefix)
 				{
-					query.addWhereField(COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+					query.addWhereField(Name::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 				}
 				if(limit)
 				{
 					query.setNumber(*limit);
 				}
-				query.addOrderField(COL_NAME,true);
+				query.addOrderField(Name::FIELD.name, true);
 				DRTAreaTableSync::SearchResult areas(DRTAreaTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 				BOOST_FOREACH(const boost::shared_ptr<DRTArea>& area, areas)
 				{

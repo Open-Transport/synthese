@@ -83,6 +83,10 @@ namespace synthese
 					util::ParametersMap& pm
 				);
 
+				const std::string& getSmartURL() const { return _smartURL; }
+				const std::string& getUser() const { return _user; }
+				const std::string& getPassword() const { return _password; }
+
 
 
 				//////////////////////////////////////////////////////////////////////////

@@ -107,8 +107,12 @@ namespace synthese
 				virtual void setKey(RegistryKeyType key){ _key = key; }
 			//@}
 
+
 			/// @name Importers/Exporters
 			//@{
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false) {}
+				virtual void unlink() {}
+
 				virtual void toParametersMap(
 					util::ParametersMap& map,
 					bool withAdditionalParameters,

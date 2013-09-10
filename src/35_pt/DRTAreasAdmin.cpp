@@ -25,6 +25,7 @@
 #include "DRTAreasAdmin.hpp"
 
 #include "AdminParametersException.h"
+#include "ObjectCreateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PTModule.h"
@@ -37,7 +38,6 @@
 #include "HTMLModule.h"
 #include "RemoveObjectAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "DRTAreaUpdateAction.hpp"
 #include "LineArea.hpp"
 
 using namespace std;
@@ -120,7 +120,8 @@ namespace synthese
 
 			AdminActionFunctionRequest<RemoveObjectAction, DRTAreasAdmin> deleteRequest(request, *this);
 
-			AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> addRequest(request);
+			AdminActionFunctionRequest<ObjectCreateAction, DRTAreaAdmin> addRequest(request);
+			addRequest.getAction()->setTable<DRTArea>();
 			addRequest.setActionWillCreateObject();
 			addRequest.setActionFailedPage<DRTAreasAdmin>();
 
@@ -144,7 +145,7 @@ namespace synthese
 				stream << it.first;
 
 				stream << t.col();
-				stream << it.second->getName();
+				stream << it.second->get<Name>();
 
 				stream << t.col();
 				openRequest.getPage()->setArea(it.second);
@@ -181,7 +182,7 @@ namespace synthese
 			stream << t.row();
 			stream << t.col();
 			stream << t.col();
-			stream << f.getTextInput(DRTAreaUpdateAction::PARAMETER_NAME, string(), "(nom)");
+			stream << f.getTextInput(ObjectCreateAction::GetInputName<Name>(), string(), "(nom)");
 			stream << t.col(2);
 			stream << f.getSubmitButton("Ajouter");
 

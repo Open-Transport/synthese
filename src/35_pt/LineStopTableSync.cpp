@@ -226,7 +226,7 @@ namespace synthese
 				object.getLine()->removeEdge(*obj);
 
 				// Useful transfer calculation
-				BOOST_FOREACH(StopArea* stopArea, object.getArea()->getStops())
+				BOOST_FOREACH(StopArea* stopArea, object.getArea()->get<Stops>())
 				{
 					stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
 				}
