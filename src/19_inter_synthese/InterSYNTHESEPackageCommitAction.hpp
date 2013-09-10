@@ -49,6 +49,10 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_PACKAGE_ID;
 			static const std::string PARAMETER_RELEASE_LOCK;
+			static const std::string PARAMETER_REMOTE_ADDRESS;
+			static const std::string PARAMETER_REMOTE_PORT;
+			static const std::string PARAMETER_REMOTE_USER;
+			static const std::string PARAMETER_REMOTE_PASSWORD;
 			
 		protected:
 			//! \name Page parameters
@@ -59,6 +63,10 @@ namespace synthese
 				bool _releaseLock;
 				std::string _contentStr;
 				std::auto_ptr<InterSYNTHESEPackageContent> _content;
+				std::string _remoteAddress; ///< In case of remote package creation
+				std::string _remotePort;    ///< In case of remote package creation
+				std::string _remoteUser;    ///< In case of remote package creation
+				std::string _remotePassword;///< In case of remote package creation
 			//@}
 			
 			
