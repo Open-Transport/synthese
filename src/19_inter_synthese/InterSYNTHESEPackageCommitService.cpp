@@ -33,6 +33,7 @@
 #include "UserTableSync.h"
 
 using namespace boost;
+using namespace boost::posix_time;
 using namespace std;
 
 namespace synthese
@@ -52,6 +53,7 @@ namespace synthese
 		const string InterSYNTHESEPackageCommitService::PARAMETER_PASSWORD = "password";
 		const string InterSYNTHESEPackageCommitService::PARAMETER_RELEASE_LOCK = "release_lock";
 		const string InterSYNTHESEPackageCommitService::PARAMETER_CONTENT = "content";
+		const string InterSYNTHESEPackageCommitService::PARAMETER_CREATE_PACKAGE = "create_package";
 		
 
 
@@ -72,6 +74,7 @@ namespace synthese
 			// Actions
 			map.insert(PARAMETER_RELEASE_LOCK, _releaseLock);
 			map.insert(PARAMETER_CONTENT, _contentStr);
+			map.insert(PARAMETER_CREATE_PACKAGE, _createPackage);
 
 			return map;
 		}
@@ -80,41 +83,51 @@ namespace synthese
 
 		void InterSYNTHESEPackageCommitService::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Package
-			try
-			{
-				_package = InterSYNTHESEPackageTableSync::GetEditable(
-					map.get<RegistryKeyType>(PARAMETER_PACKAGE_ID),
-					*_env
-				).get();
-			}
-			catch(ObjectNotFoundException<InterSYNTHESEPackage>&)
-			{
-				throw RequestException("No such package");
-			}
-
 			// User
-			boost::shared_ptr<User> user;
 			try
 			{
-				user = UserTableSync::getUserFromLogin(
+				_user = UserTableSync::getUserFromLogin(
 					map.get<string>(PARAMETER_USER)
 				);
-				user->verifyPassword(map.getDefault<string>(PARAMETER_PASSWORD));
+				_user->verifyPassword(map.getDefault<string>(PARAMETER_PASSWORD));
 			}
 			catch(UserException&)
 			{
 				throw RequestException("Bad user");
 			}
 
-			// Release lock
-			_releaseLock = map.getDefault<bool>(PARAMETER_RELEASE_LOCK, false);
+			// Package
+			RegistryKeyType packageId(map.get<RegistryKeyType>(PARAMETER_PACKAGE_ID));
+			_createPackage = map.getDefault<bool>(PARAMETER_CREATE_PACKAGE, false);
+			if(	InterSYNTHESEPackageTableSync::Contains(packageId))
+			{
+				_package = InterSYNTHESEPackageTableSync::GetEditable(
+					packageId,
+					*_env
+				).get();
+			}
+			else
+			{
+				if(_createPackage)
+				{
+					_package = new InterSYNTHESEPackage;
+					_package->setKey(packageId);
+					_env->add(shared_ptr<InterSYNTHESEPackage>(_package));
+					ptime now(second_clock::local_time());
+					_package->set<LockTime>(now);
+					_package->set<LockUser>(*_user);
+				}
+				else
+				{
+					throw RequestException("No such package");
+				}
+			}
 
 			// Check if the user has already locked the package
 			if(	!_package->isRepository() ||
 				_package->get<LockTime>().is_not_a_date_time() ||
 				!_package->get<LockUser>() ||
-				_package->get<LockUser>()->getKey() != user->getKey()
+				_package->get<LockUser>()->getKey() != _user->getKey()
 			){
 				throw Request::ForbiddenRequestException();
 			}
@@ -126,6 +139,9 @@ namespace synthese
 					map.get<string>(PARAMETER_CONTENT),
 					*_package
 			)	);
+
+			// Release lock
+			_releaseLock = map.getDefault<bool>(PARAMETER_RELEASE_LOCK, false);
 		}
 
 
@@ -145,6 +161,7 @@ namespace synthese
 
 				// Prepare the saving transaction
 				DBTransaction transaction;
+				InterSYNTHESEPackageTableSync::Save(_package, transaction);
 				_content->save(transaction, optional<const impex::Importer&>());
 
 				// Run the saving transaction
@@ -179,6 +196,9 @@ namespace synthese
 
 
 		InterSYNTHESEPackageCommitService::InterSYNTHESEPackageCommitService()
+		:	_package(NULL),
+			_releaseLock(false),
+			_createPackage(false)
 		{
 			setEnv(shared_ptr<Env>(new Env));
 		}

@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace inter_synthese
 	{
 		class InterSYNTHESEPackageContent;
@@ -52,16 +57,19 @@ namespace synthese
 			static const std::string PARAMETER_PASSWORD;
 			static const std::string PARAMETER_RELEASE_LOCK;
 			static const std::string PARAMETER_CONTENT;
+			static const std::string PARAMETER_CREATE_PACKAGE;
 			
 		protected:
 			//! \name Page parameters
 			//@{
+				boost::shared_ptr<security::User> _user; // Here because the user is read at the save query
 				InterSYNTHESEPackage* _package;
 				std::string _userLogin;
 				std::string _password;
 				bool _releaseLock;
 				std::string _contentStr;
 				std::auto_ptr<InterSYNTHESEPackageContent> _content;
+				bool _createPackage;
 			//@}
 			
 			
@@ -101,6 +109,7 @@ namespace synthese
 				void setPassword(const std::string& value){ _password = value; }
 				void setContentStr(const std::string& value){ _contentStr = value; }
 				void setReleaseLock(bool value){ _releaseLock = value; }
+				void setCreatePackage(bool value){ _createPackage = value; }
 			//@}
 
 
