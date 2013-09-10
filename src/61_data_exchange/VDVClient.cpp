@@ -286,7 +286,8 @@ namespace synthese
 				fileName <<
 					setw(2) << setfill('0') << now.time_of_day().hours() << "-" <<
 					setw(2) << setfill('0') << now.time_of_day().minutes() << "-" <<
-					setw(2) << setfill('0') << now.time_of_day().seconds() <<
+					setw(2) << setfill('0') << now.time_of_day().seconds() << "-" <<
+					setw(2) << setfill('0') << now.time_of_day().total_milliseconds() <<
 					"_" << tag << ".xml"
 				;
 				path p(get<TracePath>());
