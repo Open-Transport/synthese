@@ -558,16 +558,16 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	StopPoint s8(8, "s8", &p8);
 	p8.addPhysicalStop(s8);
 
-	DRTArea::Stops ds1;
+	Stops::Type ds1;
 	ds1.insert(&p3);
 	ds1.insert(&p4);
 	ds1.insert(&p5);
 	ds1.insert(&p6);
 	DRTArea d1(0, "DRT1", ds1);
 
-	BOOST_CHECK_EQUAL (d1.getStops().size(), 4);
+	BOOST_CHECK_EQUAL (d1.get<Stops>().size(), 4);
 
-	DRTArea::Stops ds2;
+	Stops::Type ds2;
 	ds2.insert(&p7);
 	ds2.insert(&p8);
 	DRTArea d2(0, "DRT2", ds2);

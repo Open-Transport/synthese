@@ -27,20 +27,48 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace util;
+	using namespace pt;
 
-	namespace util
-	{
-		template<> const std::string Registry<pt::NonConcurrencyRule>::KEY("NonConcurrencyRule");
-	}
+	CLASS_DEFINITION(NonConcurrencyRule, "t056_non_concurrency_rules", 56)
+	FIELD_DEFINITION_OF_OBJECT(NonConcurrencyRule, "non_concurrency_rule_id", "non_concurrency_rule_ids")
+
+	FIELD_DEFINITION_OF_TYPE(PriorityLine, "priority_line_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(HiddenLine, "hidden_line_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Delay, "delay", SQL_INTEGER)
+
 
 	namespace pt
 	{
 		NonConcurrencyRule::NonConcurrencyRule(
 			RegistryKeyType key
 		):	Registrable(key),
-			_prorityLine(NULL),
-			_hiddenLine(NULL),
-			_delay(minutes(0))
+			Object<NonConcurrencyRule, NonConcurrencyRuleSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(PriorityLine),
+					FIELD_DEFAULT_CONSTRUCTOR(HiddenLine),
+					FIELD_VALUE_CONSTRUCTOR(Delay, minutes(0))
+			)	)
 		{}
+
+
+
+		void NonConcurrencyRule::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(get<HiddenLine>())
+			{
+				get<HiddenLine>()->addConcurrencyRule(this);
+			}
+		}
+
+
+
+		void NonConcurrencyRule::unlink()
+		{
+			if(get<HiddenLine>())
+			{
+				get<HiddenLine>()->removeConcurrencyRule(this);
+			}
+		}
 	}
 }

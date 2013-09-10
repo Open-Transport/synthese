@@ -27,21 +27,27 @@ namespace synthese
 {
 	using namespace util;
 	using namespace graph;
+	using namespace pt;
 
-	namespace util
-	{
-		template<> const std::string Registry<pt::DRTArea>::KEY("DRTArea");
-	}
+	CLASS_DEFINITION(DRTArea, "t071_drt_areas", 71)
+	FIELD_DEFINITION_OF_OBJECT(DRTArea, "drt_area_id", "drt_area_ids")
+
+	FIELD_DEFINITION_OF_TYPE(Stops, "stops", SQL_TEXT)
 
 	namespace pt
 	{
 		DRTArea::DRTArea(
 			const util::RegistryKeyType id,
 			std::string name,
-			Stops stops
+			Stops::Type stops
 		):	Registrable(id),
-			Vertex(NULL, boost::shared_ptr<geos::geom::Point>()),
-			_stops(stops)
+			Object<DRTArea, DRTAreaSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_VALUE_CONSTRUCTOR(Name, name),
+					FIELD_VALUE_CONSTRUCTOR(Stops, stops)
+			)	),
+			Vertex(NULL, boost::shared_ptr<geos::geom::Point>())
 		{}
 
 
@@ -62,6 +68,6 @@ namespace synthese
 
 		bool DRTArea::contains( const StopArea& stopArea ) const
 		{
-			return _stops.find(&const_cast<StopArea&>(stopArea)) != _stops.end();
+			return get<Stops>().find(&const_cast<StopArea&>(stopArea)) != get<Stops>().end();
 		}
 }	}

@@ -56,13 +56,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("35.25.02 Non concurrency rules");
 	}
 
-	namespace pt
-	{
-		const std::string NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID("priority_line_id");
-		const std::string NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID("hidden_line_id");
-		const std::string NonConcurrencyRuleTableSync::COL_DELAY("delay");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE(
@@ -71,10 +64,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<NonConcurrencyRuleTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER),
-			Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER),
-			Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
 			Field()
 		};
 
@@ -85,67 +74,11 @@ namespace synthese
 		}
 
 
-		template<> void OldLoadSavePolicy<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
-			NonConcurrencyRule* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Properties
-			object->setDelay(minutes(rows->getInt(NonConcurrencyRuleTableSync::COL_DELAY)));
-			object->setHiddenLine(NULL);
-			object->setPriorityLine(NULL);
-
-			if(linkLevel < UP_LINKS_LOAD_LEVEL) return;
-
-			try
-			{
-				object->setPriorityLine(CommercialLineTableSync::GetEditable(
-						rows->getLongLong(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID),
-						env
-				).get()	);
-			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
-			{
-				throw LinkException<NonConcurrencyRuleTableSync>(rows, NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, e);
-			}
-
-			try
-			{
-				object->setHiddenLine(CommercialLineTableSync::GetEditable(
-					rows->getLongLong(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID),
-					env
-				).get()	);
-			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
-			{
-				throw LinkException<NonConcurrencyRuleTableSync>(rows, NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, e);
-			}
-
-			if(linkLevel < ALGORITHMS_OPTIMIZATION_LOAD_LEVEL) return;
-
-			object->getHiddenLine()->addConcurrencyRule(object);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Save(
-			NonConcurrencyRule* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<NonConcurrencyRuleTableSync> query(*object);
-			query.addField(object->getPriorityLine()->getKey());
-			query.addField(object->getHiddenLine()->getKey());
-			query.addField(static_cast<int>(object->getDelay().total_seconds() / 60));
-			query.execute(transaction);
-		}
-
-
 
 		template<> void OldLoadSavePolicy<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
 			NonConcurrencyRule* obj
 		){
-			if(obj->getHiddenLine()) obj->getHiddenLine()->removeConcurrencyRule(obj);
+			obj->unlink();
 		}
 
 
@@ -207,14 +140,14 @@ namespace synthese
 			if(orderByPriorityLine)
 			{
 				query <<
-					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_PRIORITY_LINE_ID <<
+					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << PriorityLine::FIELD.name <<
 					" INNER JOIN " << TransportNetworkTableSync::TABLE.NAME << " n ON n." << TABLE_COL_ID << "=c." << CommercialLineTableSync::COL_NETWORK_ID
 				;
 			}
 			else if(orderByHiddenLine)
 			{
 				query <<
-					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_HIDDEN_LINE_ID <<
+					" INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << HiddenLine::FIELD.name <<
 					" INNER JOIN " << TransportNetworkTableSync::TABLE.NAME << " n ON n." << TABLE_COL_ID << "=c." << CommercialLineTableSync::COL_NETWORK_ID
 				;
 			}
@@ -223,11 +156,11 @@ namespace synthese
 			if (priorityLineId || hiddenLineId)
 				query << " AND (";
 			if (priorityLineId)
-				query << COL_PRIORITY_LINE_ID << "=" << *priorityLineId;
+				query << PriorityLine::FIELD.name << "=" << *priorityLineId;
 			if (priorityLineId && hiddenLineId)
 				query << (hiddenAndPriority ? " AND " : " OR ");
 			if (hiddenLineId)
-				query << COL_HIDDEN_LINE_ID << "=" << *hiddenLineId;
+				query << HiddenLine::FIELD.name << "=" << *hiddenLineId;
 			if (priorityLineId || hiddenLineId)
 				query << ")";
 
@@ -239,7 +172,7 @@ namespace synthese
 				;
 			}
 			else if(orderByDelay)
-				query << " ORDER BY " << COL_DELAY << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY " << Delay::FIELD.name << (raisingOrder ? " ASC" : " DESC");
 
 			if (number)
 			{

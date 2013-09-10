@@ -55,6 +55,7 @@ namespace synthese
 
 			static const std::string ATTR_SUCCESS;
 			static const std::string ATTR_DONE;
+			static const std::string ATTR_LOGS;
 			static const std::string TAG_LOG_ENTRY;
 
 			//////////////////////////////////////////////////////////////////////////

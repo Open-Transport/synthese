@@ -56,6 +56,7 @@ namespace synthese
 
 		const string ImportFunction::ATTR_SUCCESS = "success";
 		const string ImportFunction::ATTR_DONE = "done";
+		const string ImportFunction::ATTR_LOGS = "logs";
 		const string ImportFunction::TAG_LOG_ENTRY = "log_entry";
 
 
@@ -174,6 +175,7 @@ namespace synthese
 				_result.insert(ATTR_DONE, false);
 				_result.insert(ATTR_SUCCESS, _importDone);
 			}
+			_result.insert(ATTR_LOGS, _output.str());
 
 			return _result;
 		}

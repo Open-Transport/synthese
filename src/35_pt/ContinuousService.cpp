@@ -25,11 +25,13 @@
 #include "ContinuousService.h"
 
 #include "AccessParameters.h"
+#include "CalendarLink.hpp"
+#include "CommercialLine.h"
 #include "ContinuousServiceTableSync.h"
 #include "DBConstants.h"
-#include "Edge.h"
-#include "JourneyPattern.hpp"
-#include "PTUseRule.h"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
+#include "PTUseRuleTableSync.h"
 #include "Registry.h"
 
 using namespace std;
@@ -39,6 +41,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace calendar;
 	using namespace db;
 	using namespace util;
 	using namespace graph;
@@ -420,6 +423,228 @@ namespace synthese
 					RegistryKeyType(0)
 			)	);
 			map.insert(ContinuousServiceTableSync::COL_DATES, datesStr.str());
+		}
+
+
+
+		bool ContinuousService::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			// Service number
+			if(record.isDefined(ContinuousServiceTableSync::COL_SERVICENUMBER))
+			{
+				string serviceNumber(
+					record.get<string>(ContinuousServiceTableSync::COL_SERVICENUMBER)
+				);
+				if(serviceNumber != getServiceNumber())
+				{
+					setServiceNumber(serviceNumber);
+					result = true;
+				}
+			}
+
+			// Range
+			if(record.isDefined(ContinuousServiceTableSync::COL_RANGE))
+			{
+				boost::posix_time::time_duration range(
+					minutes(record.getDefault<long>(ContinuousServiceTableSync::COL_RANGE, 0))
+				);
+				if(range != getRange())
+				{
+					setRange(range);
+					result = true;
+				}
+			}
+
+			// Max waiting time
+			if(record.isDefined(ContinuousServiceTableSync::COL_MAXWAITINGTIME))
+			{
+				boost::posix_time::time_duration maxWaitingTime(
+					minutes(record.getDefault<long>(ContinuousServiceTableSync::COL_MAXWAITINGTIME, 0))
+				);
+				if(maxWaitingTime != getMaxWaitingTime())
+				{
+					setMaxWaitingTime(maxWaitingTime);
+					result = true;
+				}
+			}
+
+			// Calendar dates
+			if(record.isDefined(ContinuousServiceTableSync::COL_DATES))
+			{
+				Calendar value;
+				value.setFromSerializedString(
+					record.get<string>(ContinuousServiceTableSync::COL_DATES)
+				);
+				if(value.getMarkedDates() != getMarkedDates())
+				{
+					copyDates(value);
+					result = true;
+				}
+			}
+
+
+			// Path
+			if(record.isDefined(ContinuousServiceTableSync::COL_PATHID))
+			{
+				util::RegistryKeyType pathId(
+					record.getDefault<RegistryKeyType>(
+						ContinuousServiceTableSync::COL_PATHID,
+						0
+				)	);
+				Path* path(
+					JourneyPatternTableSync::GetEditable(pathId, env).get()
+				);
+
+				if(path != getPath())
+				{
+					setPath(path);
+					if(path->getEdges().empty())
+					{
+						LineStopTableSync::Search(env, pathId);
+					}
+					result = true;
+				}
+			}
+
+			// Use rules
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+
+//			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				// Use rules
+				RuleUser::Rules rules(getRules());
+
+				// Use rules
+				if(record.isDefined(ContinuousServiceTableSync::COL_BIKE_USE_RULE))
+				{
+					RegistryKeyType bikeComplianceId(
+						record.getDefault<RegistryKeyType>(
+							ContinuousServiceTableSync::COL_BIKE_USE_RULE,
+							0
+					)	);
+					const PTUseRule* value(NULL);
+					if(bikeComplianceId > 0)
+					{
+						 value = PTUseRuleTableSync::Get(bikeComplianceId, env).get();
+					}
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = value;
+				}
+				if(record.isDefined(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE))
+				{
+					RegistryKeyType handicappedComplianceId(
+						record.getDefault<RegistryKeyType>(
+							ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE,
+							0
+					)	);
+					const PTUseRule* value(NULL);
+					if(handicappedComplianceId > 0)
+					{
+						value = PTUseRuleTableSync::Get(handicappedComplianceId, env).get();
+					}
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = value;
+				}
+				if(record.isDefined(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE))
+				{
+					RegistryKeyType pedestrianComplianceId(
+						record.getDefault<RegistryKeyType>(
+							ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE,
+							0
+					)	);
+					const PTUseRule* value(NULL);
+					if(pedestrianComplianceId > 0)
+					{
+						value = PTUseRuleTableSync::Get(pedestrianComplianceId, env).get();
+					}
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = value;
+				}
+				if(rules != getRules())
+				{
+					setRules(rules);
+					result = true;
+				}
+			}
+
+			// Schedules
+			if(record.isDefined(ContinuousServiceTableSync::COL_SCHEDULES))
+			{
+				try
+				{
+					_rawSchedule = record.get<string>(ContinuousServiceTableSync::COL_SCHEDULES);
+					SchedulesBasedService::SchedulesPair value(
+						SchedulesBasedService::DecodeSchedules(
+							_rawSchedule,
+							_maxWaitingTime
+					)	);
+					if(	value.first != _departureSchedules ||
+						value.second != _arrivalSchedules
+					){
+						setSchedules(
+							value.first,
+							value.second,
+							true
+						);
+						if(	getPath() &&
+							(	getPath()->getEdges().size() != _departureSchedules.size() ||
+								getPath()->getEdges().size() != _arrivalSchedules.size()
+						)	){
+							throw Exception("Inconsistent schedules size : different from path edges number");
+						}
+						result = true;
+					}
+				}
+				catch(SchedulesBasedService::BadSchedulesException&)
+				{
+					throw Exception("Inconsistent schedules size");
+				}
+			}
+
+			return result;
+		}
+
+
+
+		void ContinuousService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			// Registration in path
+			if( getPath() &&
+				getPath()->getPathGroup())
+			{
+				getPath()->addService(
+					*this,
+					&env == &Env::GetOfficialEnv()
+				);
+				updatePathCalendar();
+			}
+
+			// Registration in the line
+//			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				if(	getRoute() &&
+					getRoute()->getCommercialLine()
+				){
+					getRoute()->getCommercialLine()->registerService(*this);
+			}	}
+		}
+
+
+
+		synthese::SubObjects ContinuousService::getSubObjects() const
+		{
+			SubObjects r;
+			BOOST_FOREACH(CalendarLink* link, getCalendarLinks())
+			{
+				r.push_back(link);
+			}
+			return r;
+		}
+
+
+
+		synthese::LinkedObjectsIds ContinuousService::getLinkedObjectsIds( const Record& record ) const
+		{
+			return LinkedObjectsIds();
 		}
 	}
 }

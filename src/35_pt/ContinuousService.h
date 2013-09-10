@@ -141,6 +141,18 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+			
+				virtual SubObjects getSubObjects() const;
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const;
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			//@}
 
 		};

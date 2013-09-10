@@ -118,122 +118,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Service number
-			string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
-			cs->setServiceNumber(serviceNumber);
-
-			// Range
-			boost::posix_time::time_duration range (minutes(rows->getInt (ContinuousServiceTableSync::COL_RANGE)));
-			cs->setRange(range);
-
-			// Max waiting time
-			boost::posix_time::time_duration maxWaitingTime (minutes(rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
-			cs->setMaxWaitingTime(maxWaitingTime);
-
-			// Path
-			util::RegistryKeyType pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
-			Path* path(NULL);
-
-			// Use rules
-			RuleUser::Rules rules(RuleUser::GetEmptyRules());
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Path
-				path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
-				cs->setPath(path);
-				if(path->getEdges().empty())
-				{
-					LineStopTableSync::Search(env, pathId);
-				}
-
-				// Use rules
-				util::RegistryKeyType bikeComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_BIKE_USE_RULE)
-				);
-				if(bikeComplianceId > 0)
-				{
-					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
-				}
-				util::RegistryKeyType handicappedComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE)
-				);
-				if(handicappedComplianceId > 0)
-				{
-					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
-				}
-				util::RegistryKeyType pedestrianComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE)
-				);
-				if(pedestrianComplianceId > 0)
-				{
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
-				}
+				DBModule::LoadObjects(cs->getLinkedObjectsIds(*rows), env, linkLevel);
 			}
-			cs->setRules(rules);
-
-			// Schedules
-			try
+			cs->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				cs->setRawSchedules(rows->get<string>(ContinuousServiceTableSync::COL_SCHEDULES));
-				SchedulesBasedService::SchedulesPair value(
-					SchedulesBasedService::DecodeSchedules(
-						rows->get<string>(ContinuousServiceTableSync::COL_SCHEDULES),
-						maxWaitingTime
-				)	);
-				cs->setSchedules(
-					value.first,
-					value.second,
-					true
-				);
-			}
-			catch(...)
-			{
-				throw LoadException<ContinuousServiceTableSync>(rows, ContinuousServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
-			}
-			if(	cs->getPath() &&
-				cs->getPath()->getEdges().size() != cs->getArrivalSchedules(true, false).size()
-			){
-				throw LoadException<ContinuousServiceTableSync>(rows, ContinuousServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
-			}
-
-			// Calendar
-			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				// Search of calendar template links (overrides manually defined calendar)
-				CalendarLinkTableSync::SearchResult links(
-					CalendarLinkTableSync::Search(
-						env,
-						cs->getKey()
-				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
-				if(links.empty())
-				{
-					cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
-				}
-				else
-				{
-					BOOST_FOREACH(const boost::shared_ptr<CalendarLink>& link, links)
-					{
-						cs->addCalendarLink(*link, false);
-					}
-				}
-			}
-			else
-			{
-				cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
-			}
-
-			// Registration in path
-			if(path && path->getPathGroup())
-			{
-				path->addService(*cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-				cs->updatePathCalendar();
-			}
-
-			// Registration in the line
-			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				cs->getRoute()->getCommercialLine()->registerService(*cs);
+				cs->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 

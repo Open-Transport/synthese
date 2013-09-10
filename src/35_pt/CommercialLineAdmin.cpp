@@ -28,7 +28,7 @@
 #include "PTModule.h"
 #include "User.h"
 #include "NonConcurrencyRuleTableSync.h"
-#include "NonConcurrencyRule.h"
+#include "ObjectCreateAction.hpp"
 #include "TransportNetwork.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
@@ -38,7 +38,6 @@
 #include "TransportNetworkRight.h"
 #include "AdminInterfaceElement.h"
 #include "AdminFunctionRequest.hpp"
-#include "NonConcurrencyRuleAddAction.h"
 #include "AdminParametersException.h"
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -405,8 +404,9 @@ namespace synthese
 			// TAB NON CONCURRENCY
 			if (openTabContent(stream, TAB_NON_CONCURRENCY))
 			{
-				AdminActionFunctionRequest<NonConcurrencyRuleAddAction,CommercialLineAdmin> addRequest(_request, *this);
-				addRequest.getAction()->setHiddenLine(_cline);
+				AdminActionFunctionRequest<ObjectCreateAction, CommercialLineAdmin> addRequest(_request, *this);
+				addRequest.getAction()->setTable<NonConcurrencyRule>();
+				addRequest.getAction()->set<HiddenLine>(const_cast<CommercialLine&>(*_cline));
 
 				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request, *this);
 				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request, *this);
@@ -435,14 +435,14 @@ namespace synthese
 					removeRequest.getAction()->setObjectId(rule->getKey());
 
 					stream << t.row();
-					stream << t.col() << rule->getPriorityLine()->getNetwork()->getName();
-					stream << t.col(1, rule->getPriorityLine()->getStyle()) << rule->getPriorityLine()->getShortName();
-					stream << t.col() << rule->getDelay().total_seconds() / 60;
+					stream << t.col() << rule->get<PriorityLine>()->getNetwork()->getName();
+					stream << t.col(1, rule->get<PriorityLine>()->getStyle()) << rule->get<PriorityLine>()->getShortName();
+					stream << t.col() << rule->get<Delay>().total_seconds() / 60;
 					stream << t.col() <<
 						HTMLModule::getLinkButton(
 							removeRequest.getURL(),
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer la règle de non concurrence avec la ligne " + rule->getPriorityLine()->getShortName() + " ?",
+							"Etes-vous sûr de vouloir supprimer la règle de non concurrence avec la ligne " + rule->get<PriorityLine>()->getShortName() + " ?",
 							"lock_delete.png"
 						)
 					;
@@ -451,7 +451,7 @@ namespace synthese
 				stream << t.row();
 				stream << t.col(2);
 				stream << t.getActionForm().getSelectInput(
-					NonConcurrencyRuleAddAction::PARAMETER_PRIORITY_LINE_ID,
+					ObjectCreateAction::GetInputName<PriorityLine>(),
 					PTModule::getCommercialLineLabels(
 						_request.getUser()->getProfile()->getRightsForModuleClass<TransportNetworkRight>(),
 						_request.getUser()->getProfile()->getGlobalPublicRight<TransportNetworkRight>() >= READ,
@@ -461,7 +461,7 @@ namespace synthese
 				);
 				stream << t.col() <<
 					t.getActionForm().getSelectNumberInput(
-						NonConcurrencyRuleAddAction::PARAMETER_DURATION,
+						ObjectCreateAction::GetInputName<Delay>(),
 						0, 120
 					)
 				;

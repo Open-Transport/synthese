@@ -77,10 +77,12 @@ namespace synthese
 				InterSYNTHESEPackage& pacakge
 			);
 
-			void save(db::DBTransaction& transaction) const;
+			void save(
+				db::DBTransaction& transaction,
+				boost::optional<const impex::Importer&> importer
+			) const;
 		};
 	}
 }
 
 #endif // SYNTHESE_inter_synthese_InterSYNTHESEPackageContent_hpp__
-

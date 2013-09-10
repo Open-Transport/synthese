@@ -25,6 +25,8 @@
 
 #include "Path.h"
 
+#include "FrameworkTypes.hpp"
+
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
@@ -98,6 +100,28 @@ namespace synthese
 					bool doBack
 				);
 			//@}
+
+				
+				
+			virtual void toParametersMap(
+				util::ParametersMap& pm,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles = boost::logic::indeterminate,
+				std::string prefix = std::string()
+			) const;
+				
+			virtual bool loadFromRecord(
+				const Record& record,
+				util::Env& env
+			);
+
+			virtual SubObjects getSubObjects() const;
+
+			virtual LinkedObjectsIds getLinkedObjectsIds(
+				const Record& record
+			) const;
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 
 		};
 	}

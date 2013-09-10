@@ -23,54 +23,41 @@
 #ifndef SYNTHESE_env_NonConcurrencyRule_h__
 #define SYNTHESE_env_NonConcurrencyRule_h__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
 
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include "CommercialLine.h"
+#include "MinutesField.hpp"
+#include "PointerField.hpp"
 
 namespace synthese
 {
-	namespace pt
-	{
-		class CommercialLine;
-	}
+	FIELD_POINTER(PriorityLine, pt::CommercialLine)
+	FIELD_POINTER(HiddenLine, pt::CommercialLine)
+	FIELD_MINUTES(Delay)
+
+	typedef boost::fusion::map<
+		FIELD(Key),
+		FIELD(PriorityLine),
+		FIELD(HiddenLine),
+		FIELD(Delay)
+	> NonConcurrencyRuleSchema;
 
 	namespace pt
 	{
 		/** Non-concurrency rule class.
 			@ingroup m35
 		*/
-		class NonConcurrencyRule
-		:	public virtual util::Registrable
+		class NonConcurrencyRule:
+			public Object<NonConcurrencyRule, NonConcurrencyRuleSchema>,
+			public virtual util::Registrable
 		{
-		public:
-
-			/// Chosen registry class.
-			typedef util::Registry<NonConcurrencyRule>	Registry;
-
-		protected:
-			pt::CommercialLine* _prorityLine;
-			pt::CommercialLine* _hiddenLine;
-			boost::posix_time::time_duration	_delay;
-
 		public:
 			NonConcurrencyRule(
 				util::RegistryKeyType key = 0
 			);
 
-			//! @name Getters
-			//@{
-				pt::CommercialLine* getPriorityLine()	const { return _prorityLine; }
-				pt::CommercialLine*	getHiddenLine()		const { return _hiddenLine; }
-				const boost::posix_time::time_duration&	getDelay()			const { return _delay; }
-			//@}
-
-			//! @name Setters
-			//@{
-				void setPriorityLine(pt::CommercialLine* value) { _prorityLine = value; }
-				void setHiddenLine(pt::CommercialLine* value) { _hiddenLine = value; }
-				void setDelay(const boost::posix_time::time_duration& value) { _delay = value; }
-			//@}
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
 		};
 	}
 }

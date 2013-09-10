@@ -29,6 +29,8 @@ ObjectBase.hpp
 ParametersMapField.cpp
 ParametersMapField.hpp
 PointerField.hpp
+PointersSetField.hpp
+PointersVectorField.hpp
 PtimeField.cpp
 PtimeField.hpp
 PtreeRecord.cpp
@@ -43,7 +45,6 @@ StringField.cpp
 StringField.hpp
 TimeField.cpp
 TimeField.hpp
-PointersVectorField.hpp
 WithGeometry.hpp
 )
 

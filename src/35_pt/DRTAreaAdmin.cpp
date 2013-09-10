@@ -25,13 +25,13 @@
 #include "DRTAreaAdmin.hpp"
 
 #include "AdminParametersException.h"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
 #include "DRTArea.hpp"
-#include "DRTAreaUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AjaxVectorFieldEditor.hpp"
@@ -46,6 +46,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
+	using namespace db;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -118,21 +119,21 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> updateRequest(request, *this);
-				updateRequest.getAction()->setArea(const_pointer_cast<DRTArea>(_area));
+				AdminActionFunctionRequest<ObjectUpdateAction, DRTAreaAdmin> updateRequest(request, *this);
+				updateRequest.getAction()->setObject(*_area);
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_area->getKey()));
-				stream << t.cell("Nom", t.getForm().GetTextInput(DRTAreaUpdateAction::PARAMETER_NAME, _area->getName()));
+				stream << t.cell("Nom", t.getForm().GetTextInput(ObjectUpdateAction::GetInputName<Name>(), _area->get<Name>()));
 				stream << t.close();
 			}
 
 			{
 				stream << "<h1>Arrêts</h1>";
 
-				StaticActionRequest<DRTAreaUpdateAction> updateRequest(request);
-				updateRequest.getAction()->setArea(const_pointer_cast<DRTArea>(_area));
+				StaticActionRequest<ObjectUpdateAction> updateRequest(request);
+				updateRequest.getAction()->setObject(*_area);
 
 				AjaxVectorFieldEditor::Fields fields;
 
@@ -140,7 +141,7 @@ namespace synthese
 				fields.push_back(boost::shared_ptr<AjaxVectorFieldEditor::Field>(
 					new AjaxVectorFieldEditor::TextAutoCompleteInputField(
 						"Arrêt",
-						DRTAreaUpdateAction::PARAMETER_STOPS,
+						ObjectUpdateAction::GetInputName<Stops>(),
 						string(),
 						string(),
 						pt_website::PlacesListFunction::FACTORY_KEY,
@@ -154,14 +155,14 @@ namespace synthese
 
 				// Creation of the editor
 				AjaxVectorFieldEditor editor(
-					DRTAreaUpdateAction::PARAMETER_STOPS,
+					ObjectUpdateAction::GetInputName<Stops>(),
 					updateRequest.getURL(),
 					fields,
 					true
 				);
 
 				// Insertion of existing values
-				BOOST_FOREACH(const DRTArea::Stops::value_type& stop, _area->getStops())
+				BOOST_FOREACH(const Stops::Type::value_type& stop, _area->get<Stops>())
 				{
 					AjaxVectorFieldEditor::Row row;
 					vector<string> field;

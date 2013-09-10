@@ -23,52 +23,47 @@
 #ifndef SYNTHESE_pt_DRTArea_hpp__
 #define SYNTHESE_pt_DRTArea_hpp__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
 #include "Vertex.h"
-#include <set>
+
+#include "PointersSetField.hpp"
+#include "StopArea.hpp"
+#include "StringField.hpp"
 
 namespace synthese
 {
+	FIELD_POINTERS_SET(Stops, pt::StopArea)
+
+	typedef boost::fusion::map<
+		FIELD(Key),
+		FIELD(Name),
+		FIELD(Stops)
+	> DRTAreaSchema;
+
 	namespace pt
 	{
-		class StopArea;
-
 		/** DRTArea class.
 			@ingroup m35
 		*/
 		class DRTArea:
+			public Object<DRTArea, DRTAreaSchema>,
 			virtual public util::Registrable,
 			public graph::Vertex
 		{
 		public:
-			typedef std::set<StopArea*> Stops;
-
-			/// Chosen registry class.
-			typedef util::Registry<DRTArea> Registry;
-
-		private:
-			Stops _stops;
-			std::string _name;
-
-		public:
 			DRTArea(
 				const util::RegistryKeyType id = 0,
 				std::string name = std::string(),
-				Stops stops = Stops()
+				Stops::Type stops = Stops::Type()
 			);
-
-			void setStops(const Stops& value){ _stops = value; }
-			void setName(const std::string& value){ _name = value; }
-
-			const Stops& getStops() const { return _stops; }
-			virtual std::string getName() const { return _name; }
 
 			virtual graph::GraphIdType getGraphType() const;
 
 			virtual std::string getRuleUserName() const;
 
 			bool contains(const StopArea& stopArea) const;
+
+			virtual std::string getName() const { return get<Name>(); }
 		};
 }	}
 

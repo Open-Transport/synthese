@@ -990,9 +990,9 @@ namespace synthese
 					const NonConcurrencyRule& rule(*itrule.second);
 					os << "<LineConflict>" << "\n";
 					os << "<objectId>" << TridentId (peerid, "LineConflict", rule) << "</objectId>" << "\n";
-					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.getHiddenLine()->getKey()) << "</forbiddenLine>" << "\n";
-					os << "<usedLine>" << TridentId (peerid, "Line", rule.getPriorityLine()->getKey()) << "</usedLine>" << "\n";
-					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay()) << "</conflictDelay>" << "\n";
+					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.get<HiddenLine>()->getKey()) << "</forbiddenLine>" << "\n";
+					os << "<usedLine>" << TridentId (peerid, "Line", rule.get<PriorityLine>()->getKey()) << "</usedLine>" << "\n";
+					os << "<conflictDelay>" << ToXsdDuration(rule.get<Delay>()) << "</conflictDelay>" << "\n";
 					os << "</LineConflict>" << "\n";
 				}
 

@@ -409,7 +409,7 @@ namespace synthese
 			if(la && la->getArea())
 			{
 				// Useful transfer calculation
-				BOOST_FOREACH(StopArea* stopArea, la->getArea()->getStops())
+				BOOST_FOREACH(StopArea* stopArea, la->getArea()->get<Stops>())
 				{
 					stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
 				}

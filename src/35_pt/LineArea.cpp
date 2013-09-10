@@ -67,7 +67,7 @@ namespace synthese
 		void LineArea::_addAllStops(
 			bool isForArrival
 		){
-			BOOST_FOREACH(StopArea* stopArea, getArea()->getStops())
+			BOOST_FOREACH(StopArea* stopArea, getArea()->get<Stops>())
 			{
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stopPoint, stopArea->getPhysicalStops())
 				{
