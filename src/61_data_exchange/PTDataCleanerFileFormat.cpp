@@ -305,7 +305,7 @@ namespace synthese
 					// Check if the stop is not used in a DRT Area
 					BOOST_FOREACH(const DRTArea::Registry::value_type& drtArea, _env.getRegistry<DRTArea>())
 					{
-						BOOST_FOREACH(StopArea* stopArea, drtArea.second->getStops())
+						BOOST_FOREACH(StopArea* stopArea, drtArea.second->get<Stops>())
 						{
 							if(stopArea->getKey() == stop.getConnectionPlace()->getKey())
 							{

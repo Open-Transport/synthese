@@ -603,8 +603,7 @@ namespace synthese
 						SchedulesBasedService::DecodeSchedules(
 							_rawSchedule
 					)	);
-					if(	value.first != _departureSchedules ||
-						value.second != _arrivalSchedules
+					if( !comparePlannedSchedules(value.first, value.second)
 					){
 						setSchedules(
 							value.first,

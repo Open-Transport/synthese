@@ -224,7 +224,8 @@ namespace synthese
 					headers.find("Content-Encoding")
 				);
 				if(	it != headers.end() &&
-					it->second == "gzip"
+					it->second == "gzip" &&
+					!tmp.str().empty()
 				){
 					stringstream os;
 					filtering_stream<input> fs;

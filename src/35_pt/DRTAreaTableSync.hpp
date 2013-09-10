@@ -27,7 +27,6 @@
 
 #include "DRTArea.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -42,22 +41,10 @@ namespace synthese
 		class DRTAreaTableSync:
 			public db::DBDirectTableSyncTemplate<
 				DRTAreaTableSync,
-				DRTArea,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				DRTArea
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_NAME;
-				static const std::string COL_STOPS;
-			//@}
-
-
-			static std::string SerializeStops(const DRTArea::Stops& value);
-			static DRTArea::Stops UnserializeStops(const std::string& value, util::Env& env);
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////

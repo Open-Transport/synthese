@@ -135,7 +135,7 @@ namespace synthese
 		DBTransaction InterSYNTHESEPackageFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			_content->save(transaction);
+			_content->save(transaction, *this);
 			return transaction;
 		}
 

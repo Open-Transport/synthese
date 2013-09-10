@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class MimeType;
+	}
+
 	namespace inter_synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -47,6 +52,7 @@ namespace synthese
 			static const std::string PARAMETER_TABLE_FILTER;
 			static const std::string PARAMETER_OBJECT_FILTER;
 
+			static const std::string TAG_PACKAGES;
 			static const std::string TAG_PACKAGE;
 			
 		protected:
@@ -85,7 +91,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
+				void setOutputFormat(const util::MimeType& value){ _outputFormat = value; }
 			//@}
 
 

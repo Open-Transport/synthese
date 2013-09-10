@@ -260,8 +260,8 @@ BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
 	TestJourney tj2(jp2, testAreaMap);
 	// Set a non concurrency rule
 	NonConcurrencyRule ncr2(123456);
-	ncr2.setDelay(time_duration(0, 5, 0));
-	ncr2.setPriorityLine(&cl1);
+	ncr2.set<Delay>(time_duration(0, 5, 0));
+	ncr2.set<PriorityLine>(cl1);
 	CommercialLine::NonConcurrencyRules ncrs2;
 	ncrs2.insert(&ncr2);
 	cl2.setNonConcurrencyRules(ncrs2);
@@ -346,8 +346,8 @@ BOOST_AUTO_TEST_CASE (scheduledVScontinuous)
 	TestJourney tj2(jp2, testAreaMap);
 	// Set a non concurrency rule
 	NonConcurrencyRule ncr2(123456);
-	ncr2.setDelay(time_duration(0, 10, 0));
-	ncr2.setPriorityLine(&cl1);
+	ncr2.set<Delay>(time_duration(0, 10, 0));
+	ncr2.set<PriorityLine>(cl1);
 	CommercialLine::NonConcurrencyRules ncrs2;
 	ncrs2.insert(&ncr2);
 	cl2.setNonConcurrencyRules(ncrs2);
@@ -439,8 +439,8 @@ BOOST_AUTO_TEST_CASE (continuousVSscheduled)
 	TestJourney tj1(jp1, testAreaMap);
 	// Set a non concurrency rule
 	NonConcurrencyRule ncr1(123456);
-	ncr1.setDelay(time_duration(0, 10, 0));
-	ncr1.setPriorityLine(&cl2);
+	ncr1.set<Delay>(time_duration(0, 10, 0));
+	ncr1.set<PriorityLine>(cl2);
 	CommercialLine::NonConcurrencyRules ncrs1;
 	ncrs1.insert(&ncr1);
 	cl1.setNonConcurrencyRules(ncrs1);
@@ -524,8 +524,8 @@ BOOST_AUTO_TEST_CASE (continuousVScontinuous)
 	TestJourney tj2(jp2, testAreaMap);
 	// Set a non concurrency rule
 	NonConcurrencyRule ncr2(123456);
-	ncr2.setDelay(time_duration(0, 10, 0));
-	ncr2.setPriorityLine(&cl1);
+	ncr2.set<Delay>(time_duration(0, 10, 0));
+	ncr2.set<PriorityLine>(cl1);
 	CommercialLine::NonConcurrencyRules ncrs2;
 	ncrs2.insert(&ncr2);
 	cl2.setNonConcurrencyRules(ncrs2);

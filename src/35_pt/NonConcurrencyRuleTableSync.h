@@ -32,7 +32,6 @@
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "NonConcurrencyRule.h"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -44,18 +43,10 @@ namespace synthese
 		class NonConcurrencyRuleTableSync:
 			public db::DBDirectTableSyncTemplate<
 				NonConcurrencyRuleTableSync,
-				NonConcurrencyRule,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				NonConcurrencyRule
 			>
 		{
 		public:
-			static const std::string COL_PRIORITY_LINE_ID;
-			static const std::string COL_HIDDEN_LINE_ID;
-			static const std::string COL_DELAY;
-
-
-
 			/** NonConcurrencyRule search.
 				@param hiddenLineId ID of the hidden line to filter (undefined = no filter)
 				@param priorityLineId ID of the priority line to filter (undefined = no filter)

@@ -51,8 +51,6 @@ DRTAreasAdmin.cpp
 DRTAreasAdmin.hpp
 DRTAreaTableSync.cpp
 DRTAreaTableSync.hpp
-DRTAreaUpdateAction.cpp
-DRTAreaUpdateAction.hpp
 EnvironmentSyncException.cpp
 EnvironmentSyncException.h
 FreeDRTArea.cpp
@@ -117,8 +115,6 @@ NetworkLineBasedRight.cpp
 NetworkLineBasedRight.h
 NonConcurrencyRule.cpp
 NonConcurrencyRule.h
-NonConcurrencyRuleAddAction.cpp
-NonConcurrencyRuleAddAction.h
 NonConcurrencyRuleTableSync.cpp
 NonConcurrencyRuleTableSync.h
 NonPermanentService.cpp

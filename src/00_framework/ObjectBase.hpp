@@ -99,8 +99,6 @@ namespace synthese
 
 		/// @name Methods to overload if necessary
 		//@{
-			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false) {}
-			virtual void unlink() {}
 			virtual void checkIntegrity() const throw(IntegrityException) {}
 			virtual bool allowUpdate(const server::Session* session) const { return true; }
 			virtual void beforeUpdate(const ObjectBase& existingObject, boost::optional<db::DBTransaction&> transaction) const { }

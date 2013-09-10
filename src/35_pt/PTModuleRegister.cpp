@@ -72,13 +72,11 @@
 #include "CommercialLineUpdateAction.h"
 #include "CopyGeometriesAction.hpp"
 #include "DestinationUpdateAction.hpp"
-#include "DRTAreaUpdateAction.hpp"
 #include "FreeDRTAreaUpdateAction.hpp"
 #include "FreeDRTTimeSlotUpdateAction.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JunctionUpdateAction.hpp"
-#include "NonConcurrencyRuleAddAction.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ScheduleRealTimeUpdateService.h"
 #include "ServiceAddAction.h"
@@ -215,13 +213,11 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ContinuousServiceUpdateAction::integrate();
 	synthese::pt::CopyGeometriesAction::integrate();
 	synthese::pt::DestinationUpdateAction::integrate();
-	synthese::pt::DRTAreaUpdateAction::integrate();
 	synthese::pt::FreeDRTAreaUpdateAction::integrate();
 	synthese::pt::FreeDRTTimeSlotUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JourneyPatternRankContinuityRestoreAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();
-	synthese::pt::NonConcurrencyRuleAddAction::integrate();
 	synthese::pt::PlaceAliasUpdateAction::integrate();
 	synthese::pt::PTUseRuleUpdateAction::integrate();
 	synthese::pt::ScheduleRealTimeUpdateAction::integrate();

@@ -46,16 +46,28 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,PackagesService>
 		{
 		public:
-			static const std::string PARAMETER_SVN_URL;
-			static const std::string PARAMETER_SVN_USER;
-			static const std::string PARAMETER_SVN_PASSWORD;
+			static const std::string PARAMETER_REPO_URL;
+			static const std::string PARAMETER_USER;
+			static const std::string PARAMETER_PASSWORD;
+			static const std::string PARAMETER_REPO_TYPE;
+			static const std::string PARAMETER_DO_IMPORT;
+			static const std::string PARAMETER_PACKAGE_TO_INSTALL;
+
+			typedef enum 
+			{
+				INTER_SYNTHESE_REPO,
+				SVN_REPO
+			} RepositoryType;
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				db::svn::SVNRepository _repo;
-				std::string _svnUser;
-				std::string _svnPassword;
+				RepositoryType _repoType;
+				db::svn::SVNRepository _svnRepo;
+				std::string _interSYNTHESERepoURL;
+				std::string _user;
+				std::string _password;
+				boost::optional<std::string> _packageToInstall;
 			//@}
 			
 			
@@ -111,6 +123,10 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual std::string getOutputMimeType() const;
+
+
+
+			void setPackageToInstall(boost::optional<std::string>& value){ _packageToInstall = value; }
 		};
 }	}
 
