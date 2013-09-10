@@ -77,6 +77,7 @@ namespace synthese
 				const ChildrenType& getChildren() const { return _children; }
 				ChildrenType& getChildren() { return _children; }
 				ObjectType* getParent(bool allowNULL = false) const;
+				bool isParentDefined() const { return _parent; }
 			//@}
 
 			//! @name Setters

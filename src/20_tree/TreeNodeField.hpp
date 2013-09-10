@@ -101,8 +101,9 @@ namespace synthese
 					}
 					else
 					{
-						if(t.getParent(true) != NULL)
-						{
+						if( !t.isParentDefined() ||
+							t.getParent() != NULL
+						){
 							t.setParent(NULL);
 							result = true;
 						}

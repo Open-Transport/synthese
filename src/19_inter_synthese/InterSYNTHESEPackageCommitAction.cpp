@@ -37,6 +37,7 @@
 #include "UserException.h"
 #include "UserTableSync.h"
 
+using namespace boost;
 using namespace boost::posix_time;
 using namespace std;
 
@@ -56,6 +57,10 @@ namespace synthese
 	{
 		const string InterSYNTHESEPackageCommitAction::PARAMETER_PACKAGE_ID = Action_PARAMETER_PREFIX + "_package";
 		const string InterSYNTHESEPackageCommitAction::PARAMETER_RELEASE_LOCK = Action_PARAMETER_PREFIX + "_release_lock";
+		const string InterSYNTHESEPackageCommitAction::PARAMETER_REMOTE_ADDRESS = Action_PARAMETER_PREFIX + "_remote_address";
+		const string InterSYNTHESEPackageCommitAction::PARAMETER_REMOTE_PORT = Action_PARAMETER_PREFIX + "_remote_port";
+		const string InterSYNTHESEPackageCommitAction::PARAMETER_REMOTE_USER = Action_PARAMETER_PREFIX + "_remote_user";
+		const string InterSYNTHESEPackageCommitAction::PARAMETER_REMOTE_PASSWORD = Action_PARAMETER_PREFIX + "_remote_password";
 		
 
 
@@ -91,14 +96,20 @@ namespace synthese
 				throw ActionException("No such package");
 			}
 
+			// Release lock
+			_releaseLock = map.getDefault<bool>(PARAMETER_RELEASE_LOCK, false);
+
+			// Remote address
+			_remoteAddress = map.getDefault<string>(PARAMETER_REMOTE_ADDRESS);
+			_remotePort = map.getDefault<string>(PARAMETER_REMOTE_PORT, "80");
+			_remoteUser = map.getDefault<string>(PARAMETER_REMOTE_USER);
+			_remotePassword = map.getDefault<string>(PARAMETER_REMOTE_PASSWORD);
+
 			// Check that the server is not the repository of the package
-			if(!_package->get<Import>())
+			if(!_package->get<Import>() && _remoteAddress.empty())
 			{
 				throw ActionException("The package is already on its repository");
 			}
-
-			// Release lock
-			_releaseLock = map.getDefault<bool>(PARAMETER_RELEASE_LOCK, false);
 		}
 
 
@@ -107,24 +118,38 @@ namespace synthese
 			Request& request
 		){
 			// Get the import
-			const Import& import(*_package->get<Import>());
-
 			StaticFunctionRequest<InterSYNTHESEPackageCommitService> r;
-			r.getFunction()->setUser(
-				import.get<Parameters>().get<string>(InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_USER)
-			);
-			r.getFunction()->setPassword(
-				import.get<Parameters>().get<string>(InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_PASSWORD)
-			);
+
+			optional<InterSYNTHESEPackage::PackageAddress> address;
+			if(_package->get<Import>())
+			{
+				const Import& import(*_package->get<Import>());
+				r.getFunction()->setUser(
+					import.get<Parameters>().get<string>(InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_USER)
+				);
+				r.getFunction()->setPassword(
+					import.get<Parameters>().get<string>(InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_PASSWORD)
+				);
+				address = InterSYNTHESEPackage::PackageAddress(
+					import.get<Parameters>().get<string>(InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_URL)
+				);
+			}
+			else
+			{
+				r.getFunction()->setUser(
+					_remoteUser
+				);
+				r.getFunction()->setPassword(
+					_remotePassword
+				);
+			}
 			r.getFunction()->setPackage(_package);
 			r.getFunction()->setReleaseLock(_releaseLock);
 			r.getFunction()->setContentStr(_package->buildDump());
-			InterSYNTHESEPackage::PackageAddress address(
-				import.get<Parameters>().get<string>(InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_URL)
-			);
+			r.getFunction()->setCreatePackage(!_remoteAddress.empty());
 			BasicClient c(
-				address.host,
-				address.port
+				(address && _remoteAddress.empty()) ? address->host : _remoteAddress,
+				(address && _remoteAddress.empty()) ? address->port : _remotePort
 			);
 			string contentStr(
 				c.post(

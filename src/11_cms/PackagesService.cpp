@@ -219,7 +219,7 @@ namespace synthese
 				HTMLForm f(svnRequest.getHTMLForm());
 				p << f.open();
 				p << "Type : " << f.getSelectInput(PARAMETER_REPO_TYPE, repoTypes, optional<RepositoryType>(_repoType));
-				p << "Chemin SVN : " << f.getTextInput(PARAMETER_REPO_URL, (_repoType == SVN_REPO) ? _svnRepo.getURL() : _interSYNTHESERepoURL);
+				p << "URL : " << f.getTextInput(PARAMETER_REPO_URL, (_repoType == SVN_REPO) ? _svnRepo.getURL() : _interSYNTHESERepoURL);
 				p << " Utilisateur : " << f.getTextInput(PARAMETER_USER, _user);
 				p << " Mot de passe : " << f.getPasswordInput(PARAMETER_PASSWORD, _password);
 				p << " " << f.getSubmitButton("Changer");
