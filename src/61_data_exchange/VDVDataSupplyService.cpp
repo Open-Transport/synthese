@@ -225,9 +225,11 @@ namespace synthese
 						if (network.getKey() != _vdvClient->get<TransportNetworkID>())
 							continue;
 						ptime departureDateTime(sp.getDepartureDateTime());
-						departureDateTime -= diff_from_utc;
+						if (!departureDateTime.is_not_a_date_time())
+							departureDateTime -= diff_from_utc;
 						ptime plannedDepartureDateTime(sp.getTheoreticalDepartureDateTime());
-						plannedDepartureDateTime -= diff_from_utc;
+						if (!plannedDepartureDateTime.is_not_a_date_time())
+							plannedDepartureDateTime -= diff_from_utc;
 						
 						ptime arrivalDateTime(
 							(sp.getDepartureEdge() && sp.getDepartureEdge()->isArrival() && sp.getDepartureEdge()->getRankInPath()) ?
@@ -239,7 +241,8 @@ namespace synthese
 							)	):
 							ptime(not_a_date_time)
 						);
-						arrivalDateTime -= diff_from_utc;
+						if (!arrivalDateTime.is_not_a_date_time())
+							arrivalDateTime -= diff_from_utc;
 						ptime plannedArrivalDateTime(
 							(sp.getDepartureEdge() && sp.getDepartureEdge()->isArrival() && sp.getDepartureEdge()->getRankInPath()) ?
 							ptime(
@@ -250,7 +253,8 @@ namespace synthese
 							)	):
 							ptime(not_a_date_time)
 						);
-						plannedArrivalDateTime -= diff_from_utc;
+						if (!plannedArrivalDateTime.is_not_a_date_time())
+							plannedArrivalDateTime -= diff_from_utc;
 						string networkId(
 							network.getACodeBySource(
 								*_vdvClient->get<DataSource>()
@@ -309,6 +313,14 @@ namespace synthese
 						ToXsdDateTime(result, now);
 						result << "\" VerfallZst=\"";
 						ToXsdDateTime(result, expirationTime);
+
+						// Halt ID
+						string haltID = "";
+						if (dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
+						{
+							const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
+							haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
+						}
 						result <<
 							"\">" <<
 							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
@@ -350,7 +362,7 @@ namespace synthese
 							ToXsdDateTime(result, departureDateTime);
 							result << "</AbfahrtszeitAZBPrognose>";
 						}
-						result << "<HaltID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</HaltID>";
+						result << "<HaltID>" << haltID << "</HaltID>";
 						result << "</AZBFahrplanlage>";
 					}
 
@@ -368,6 +380,9 @@ namespace synthese
 						const TransportNetwork& network(
 							*line.getNetwork()
 						);
+						// Check that network is OK
+						if (network.getKey() != _vdvClient->get<TransportNetworkID>())
+							continue;
 						string networkId(
 							network.getACodeBySource(
 								*_vdvClient->get<DataSource>()
