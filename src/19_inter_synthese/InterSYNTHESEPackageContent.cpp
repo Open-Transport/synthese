@@ -73,9 +73,9 @@ namespace synthese
 		InterSYNTHESEPackageContent::InterSYNTHESEPackageContent(
 			Env& env,
 			const std::string& s,
-			InterSYNTHESEPackage& package
+			const boost::shared_ptr<InterSYNTHESEPackage>& package
 		):	_env(env),
-			_package(&package)
+			_package(package)
 		{
 			_parseAndLoad(s);
 		}
