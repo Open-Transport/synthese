@@ -402,6 +402,8 @@ namespace synthese
 								serviceDetail.stops,
 								dataSource,
 								true,
+								true,
+								true,
 								true
 						)	);
 						if(route == NULL)
