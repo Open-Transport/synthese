@@ -74,7 +74,7 @@ namespace synthese
 			InterSYNTHESEPackageContent(
 				util::Env& env,
 				const std::string& s,
-				InterSYNTHESEPackage& pacakge
+				const boost::shared_ptr<InterSYNTHESEPackage>& pacakge
 			);
 
 			void save(
