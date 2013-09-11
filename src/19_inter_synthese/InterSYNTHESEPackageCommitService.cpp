@@ -99,23 +99,24 @@ namespace synthese
 			// Package
 			RegistryKeyType packageId(map.get<RegistryKeyType>(PARAMETER_PACKAGE_ID));
 			_createPackage = map.getDefault<bool>(PARAMETER_CREATE_PACKAGE, false);
+			shared_ptr<InterSYNTHESEPackage> package;
 			if(	InterSYNTHESEPackageTableSync::Contains(packageId))
 			{
-				_package = InterSYNTHESEPackageTableSync::GetEditable(
+				package = InterSYNTHESEPackageTableSync::GetEditable(
 					packageId,
 					*_env
-				).get();
+				);
 			}
 			else
 			{
 				if(_createPackage)
 				{
-					_package = new InterSYNTHESEPackage;
-					_package->setKey(packageId);
-					_env->add(shared_ptr<InterSYNTHESEPackage>(_package));
+					package.reset(new InterSYNTHESEPackage);
+					package->setKey(packageId);
+					_env->add(package);
 					ptime now(second_clock::local_time());
-					_package->set<LockTime>(now);
-					_package->set<LockUser>(*_user);
+					package->set<LockTime>(now);
+					package->set<LockUser>(*_user);
 				}
 				else
 				{
@@ -124,10 +125,10 @@ namespace synthese
 			}
 
 			// Check if the user has already locked the package
-			if(	!_package->isRepository() ||
-				_package->get<LockTime>().is_not_a_date_time() ||
-				!_package->get<LockUser>() ||
-				_package->get<LockUser>()->getKey() != _user->getKey()
+			if(	!package->isRepository() ||
+				package->get<LockTime>().is_not_a_date_time() ||
+				!package->get<LockUser>() ||
+				package->get<LockUser>()->getKey() != _user->getKey()
 			){
 				throw Request::ForbiddenRequestException();
 			}
@@ -137,8 +138,11 @@ namespace synthese
 				new InterSYNTHESEPackageContent(
 					*_env,
 					map.get<string>(PARAMETER_CONTENT),
-					*_package
+					package
 			)	);
+
+			// Package
+			_package = package.get();
 
 			// Release lock
 			_releaseLock = map.getDefault<bool>(PARAMETER_RELEASE_LOCK, false);
