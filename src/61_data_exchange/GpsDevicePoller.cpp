@@ -98,9 +98,10 @@ namespace synthese
 			double lon=0.0;
 			double lat=0.0;
 
+			Log::GetInstance().info(str(format("GpsDevicePoller: NetPortNumber=%d") % _NetPortNb));
+
 			while (true)
 			{
-				Log::GetInstance().info(str(format("GpsDevicePoller: NetPortNumber=%d") % _NetPortNb));
 
 				// get actual GPS location
 				if(!bGpsOk)	// goes into this at least once!
