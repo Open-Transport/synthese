@@ -144,7 +144,7 @@ namespace synthese
 						editCalendar.getURL(),
 						"Ouvrir",
 						string(),
-						"calendar_edit.png"
+						"/admin/img/calendar_edit.png"
 					)
 				;
 				stream << t.col();

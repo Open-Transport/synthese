@@ -729,7 +729,7 @@ namespace synthese
 
 				// Open button
 				stream << t.col();
-				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
+				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "/admin/img/chart_line_edit.png");
 
 				// Name
 				stream << t.col();
@@ -833,7 +833,7 @@ namespace synthese
 
 				// Remove button
 				stream << t.col();
-				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "/admin/icon/chart_line_delete.png");
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "/admin/img/chart_line_delete.png");
 			}
 
 			stream << t.row(string());
