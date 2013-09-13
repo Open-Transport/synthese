@@ -425,7 +425,7 @@ namespace synthese
 			ptime date(_dateTime);
 			date -= days(1);
 			searchRequest.getPage()->_dateTime = date;
-			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "rewind_blue.png") << " ";
+			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "/admin/img/rewind_blue.png") << " ";
 
 			if(!jv.getJourneys().empty())
 			{
@@ -444,7 +444,7 @@ namespace synthese
 			searchRequest.getPage()->_startPlace = _endPlace;
 			searchRequest.getPage()->_endCity = _startCity;
 			searchRequest.getPage()->_endPlace = _startPlace;
-			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Trajet retour", string(), "arrow_undo.png") << " ";
+			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Trajet retour", string(), "/admin/img/arrow_undo.png") << " ";
 			searchRequest.getPage()->_startCity = _startCity;
 			searchRequest.getPage()->_startPlace = _startPlace;
 			searchRequest.getPage()->_endCity = _endCity;
@@ -463,7 +463,7 @@ namespace synthese
 			date = _dateTime;
 			date += days(1);
 			searchRequest.getPage()->_dateTime = date;
-			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour suivant", string(), "forward_blue.png");
+			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour suivant", string(), "/admin/img/forward_blue.png");
 
 			stream << "</p>";
 

@@ -208,7 +208,7 @@ namespace synthese
 
 				// Folder creation form
 				stream << l.element("folder");
-				stream << f.getImageSubmitButton("add.png", "Ajouter");
+				stream << f.getImageSubmitButton("/admin/img/add.png", "Ajouter");
 				stream << f.getTextInput(db::ObjectCreateAction::GetInputName<Name>(), std::string(), "(Entrez le nom du répertoire ici)");
 
 				// Form and list footer
@@ -249,7 +249,7 @@ namespace synthese
 							removeFolderRequest.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer le répertoire "+ folder.getName() +" ?",
-							"folder_delete.png"
+							"/admin/img/folder_delete.png"
 						) << "</p>"
 					;
 				}

@@ -181,7 +181,7 @@ namespace synthese
 				// Open button
 				stream << t.col();
 				lineOpenRequest.getPage()->setCommercialLine(line);
-				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
+				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "/admin/img/chart_line_edit.png");
 
 				// Short name
 				stream << t.col(1, line->getStyle(), true);

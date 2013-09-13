@@ -415,7 +415,7 @@ namespace synthese
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isArrivalAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"))
+							(lineStop->isArrivalAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Arrivée impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>());
 
