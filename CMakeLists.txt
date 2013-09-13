@@ -96,6 +96,9 @@ if(WIN32)
   # fatal error C1128: number of sections exceeded object file format limit : compile with /bigobj
   add_definitions(/bigobj)
 
+  # Multi process builder
+  add_definitions(/MP)
+
   # This is to avoid:
   # error C2471: cannot update program database
   add_definitions(/Z7)

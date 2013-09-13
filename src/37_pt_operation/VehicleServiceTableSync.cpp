@@ -99,24 +99,6 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Name
-			object->setName(rows->getText(VehicleServiceTableSync::COL_NAME));
-
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				// Services
-				object->setServices(VehicleServiceTableSync::UnserializeServices(rows->getText(VehicleServiceTableSync::COL_SERVICES), env, linkLevel));
-			}
-
-			// Dates
-			object->setFromSerializedString(rows->getText(VehicleServiceTableSync::COL_DATES));
-
-			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
-			object->setDataSourceLinksWithRegistration(
-				ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					rows->getText(VehicleServiceTableSync::COL_DATASOURCE_LINKS),
-					env
-			)	);
 		}
 
 

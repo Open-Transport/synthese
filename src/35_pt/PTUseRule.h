@@ -28,6 +28,8 @@
 #include "Registry.h"
 #include "ParametersMap.h"
 
+#include "FrameworkTypes.hpp"
+
 #include <string>
 #include <boost/optional.hpp>
 #include <set>
@@ -318,6 +320,18 @@ namespace synthese
 					bool withAdditionalParameters,
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
+				) const;
+
+				
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
 				) const;
 			//@}
 		};

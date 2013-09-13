@@ -39,6 +39,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace db;
+	using namespace impex;
 	using namespace util;
 	using namespace server;
 	using namespace security;
@@ -138,7 +139,8 @@ namespace synthese
 				new InterSYNTHESEPackageContent(
 					*_env,
 					map.get<string>(PARAMETER_CONTENT),
-					package
+					package,
+					boost::optional<const impex::Importer&>()
 			)	);
 
 			// Package
@@ -166,7 +168,7 @@ namespace synthese
 				// Prepare the saving transaction
 				DBTransaction transaction;
 				InterSYNTHESEPackageTableSync::Save(_package, transaction);
-				_content->save(transaction, optional<const impex::Importer&>());
+				_content->save(transaction);
 
 				// Run the saving transaction
 				transaction.run();
