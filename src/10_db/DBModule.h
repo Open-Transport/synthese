@@ -184,6 +184,13 @@ namespace synthese
 
 
 
+			static void DeleteObject(
+				util::RegistryKeyType id,
+				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
+			);
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// @since 3.2.0
 			static const TablesByNameMap& GetTablesByName(){ return _tableSyncMap; }

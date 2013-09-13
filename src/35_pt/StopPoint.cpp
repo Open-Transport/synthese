@@ -465,7 +465,7 @@ namespace synthese
 				}
 				if( (!value.get() && getGeometry().get()) ||
 					(value.get() && !getGeometry().get()) ||
-					(value.get() && getGeometry().get() && value->equalsExact(getGeometry().get()))
+					(value.get() && getGeometry().get() && !value->equalsExact(getGeometry().get(), 0.01))
 				){
 					setGeometry(value);
 					result = true;

@@ -64,7 +64,7 @@ namespace synthese
 
 
 
-		void LineArea::_addAllStops(
+		void LineArea::addAllStops(
 			bool isForArrival
 		){
 			BOOST_FOREACH(StopArea* stopArea, getArea()->get<Stops>())
@@ -90,20 +90,6 @@ namespace synthese
 		void LineArea::setArea( DRTArea& value )
 		{
 			setFromVertex(static_cast<Vertex*>(&value));
-
-			// Add links and generated line stops here
-			if(isArrivalAllowed() && !_internalService)
-			{
-				_addAllStops(true);
-			}
-			if(isDepartureAllowed())
-			{
-				_addAllStops(false);
-			}
-			if(isArrivalAllowed() && _internalService)
-			{
-				_addAllStops(true);
-			}
 		}
 
 

@@ -53,12 +53,13 @@ namespace synthese
 		InterSYNTHESEPackageContent::InterSYNTHESEPackageContent(
 			util::Env& env,
 			const std::string& s,
-			impex::Import& import
+			impex::Import& import,
+			boost::optional<const impex::Importer&> importer
 		):	_env(env),
 			_package(new InterSYNTHESEPackage)
 		{
 			_package->set<Import>(import);
-			_parseAndLoad(s);
+			_parseAndLoad(s, importer);
 			_env.add(_package);
 		}
 
@@ -73,11 +74,12 @@ namespace synthese
 		InterSYNTHESEPackageContent::InterSYNTHESEPackageContent(
 			Env& env,
 			const std::string& s,
-			const boost::shared_ptr<InterSYNTHESEPackage>& package
+			const boost::shared_ptr<InterSYNTHESEPackage>& package,
+			boost::optional<const impex::Importer&> importer
 		):	_env(env),
 			_package(package)
 		{
-			_parseAndLoad(s);
+			_parseAndLoad(s, importer);
 		}
 
 
@@ -88,7 +90,8 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// @param s the serialized string to parse to populate the object
 		void InterSYNTHESEPackageContent::_parseAndLoad(
-			const string& s
+			const string& s,
+			boost::optional<const impex::Importer&> importer
 		){
 			ContentMap contentMap;
 
@@ -174,9 +177,13 @@ namespace synthese
 				_objects.get<bool>(Public::FIELD.name)
 			);
 			_package->set<Objects>(
-				_loadObjects(_objects, contentMap)
+				_loadObjects(_objects, contentMap, importer)
 			);
 			_objectsToSave.push_back(_package.get());
+			if(importer)
+			{
+				importer->_logDebug("Save "+ lexical_cast<string>(_package->getKey()) + " (t111_inter_synthese_packages / "+  _package->getName() + ")");
+			}
 		}
 
 
@@ -189,7 +196,8 @@ namespace synthese
 		/// @return the ids of the objects loaded at the next recursion level
 		Objects::Type InterSYNTHESEPackageContent::_loadObjects(
 			const boost::property_tree::ptree& node,
-			const ContentMap& contentMap
+			const ContentMap& contentMap,
+			boost::optional<const impex::Importer&> importer
 		){
 			Objects::Type result;
 
@@ -278,7 +286,7 @@ namespace synthese
 					//////////////////////////////////////////////////////////////////////////
 					// Recursion
 					Objects::Type subObjects(
-						_loadObjects(objectNode.second, contentMap)
+						_loadObjects(objectNode.second, contentMap, importer)
 					);
 
 					// Load properties of the current object
@@ -289,6 +297,12 @@ namespace synthese
 						if(rObject->loadFromRecord(map, _env))
 						{
 							_objectsToSave.push_back(rObject.get());
+							if(importer)
+							{
+								RegistryTableType tableId(decodeTableId(rObject->getKey()));
+								boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
+								importer->_logDebug("Save "+ lexical_cast<string>(rObject->getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  rObject->getName() + ")"  );
+							}
 						}
 						rObject->link(_env, false);
 					}
@@ -316,6 +330,12 @@ namespace synthese
 							if(!found)
 							{
 								_objectsToRemove.insert(subObject->getKey());
+								if(importer)
+								{
+									RegistryTableType tableId(decodeTableId(subObject->getKey()));
+									boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
+									importer->_logDebug("Delete "+ lexical_cast<string>(subObject->getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  subObject->getName() + ")");
+								}
 							}
 						}
 					}
@@ -332,27 +352,18 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// @retval transaction the transaction to populate
 		void InterSYNTHESEPackageContent::save(
-			DBTransaction& transaction,
-			boost::optional<const impex::Importer&> importer
+			DBTransaction& transaction
 		) const	{
 			// Deletions
 			BOOST_FOREACH(RegistryKeyType id, _objectsToRemove)
 			{
-				transaction.addDeleteStmt(id);
-				if(importer)
-				{
-					importer->_logDebug("Delete "+ lexical_cast<string>(id));
-				}
+				DBModule::DeleteObject(id, transaction);
 			}
 
 			// Insertions
 			BOOST_FOREACH(const Registrable* object, _objectsToSave)
 			{
 				DBModule::SaveObject(*object, transaction);
-				if(importer)
-				{
-					importer->_logDebug("Save "+ lexical_cast<string>(object->getKey()));
-				}
 			}
 		}
 }	}

@@ -29,6 +29,8 @@
 #include "Registry.h"
 #include "DriverService.hpp"
 
+#include "FrameworkTypes.hpp"
+
 #include <set>
 #include <vector>
 
@@ -110,6 +112,18 @@ namespace synthese
 					bool withAdditionalParameters,
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
+				) const;
+
+				
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
 				) const;
 			//@}
 		};

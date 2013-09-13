@@ -47,10 +47,6 @@ namespace synthese
 			GeneratedLineStops _generatedLineStops;
 			bool _internalService;
 
-			void _addAllStops(
-				bool isForArrival
-			);
-
 		public:
 			Edge::SubEdges getSubEdges() const;
 
@@ -80,6 +76,10 @@ namespace synthese
 				void setArea(DRTArea& value);
 
 				void clearArea();
+
+				void addAllStops(
+					bool isForArrival
+				);
 			//@}
 
 			//! @name Services

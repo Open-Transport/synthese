@@ -146,7 +146,7 @@ namespace synthese
 				}
 				if(	(!value && getGeometry()) ||
 					(value && !getGeometry()) ||
-					(value && getGeometry() && value->equalsExact(getGeometry().get()))
+					(value && getGeometry() && !value->equalsExact(getGeometry().get(), 0.01))
 				){
 					setGeometry(value);
 					result = true;
@@ -405,6 +405,17 @@ namespace synthese
 			{
 				// Useful transfer calculation
 				dls->getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+
+				
+				// Links from stop to the linestop
+				if(getIsArrival())
+				{
+					dls->getPhysicalStop()->addArrivalEdge((Edge*) this);
+				}
+				if(getIsDeparture())
+				{
+					dls->getPhysicalStop()->addDepartureEdge((Edge*) this);
+				}
 			}
 			if(la && la->getArea())
 			{
@@ -412,6 +423,20 @@ namespace synthese
 				BOOST_FOREACH(StopArea* stopArea, la->getArea()->get<Stops>())
 				{
 					stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+				}
+
+				// Add links and generated line stops here
+				if(isArrivalAllowed() && !la->getInternalService())
+				{
+					la->addAllStops(true);
+				}
+				if(isDepartureAllowed())
+				{
+					la->addAllStops(false);
+				}
+				if(isArrivalAllowed() && la->getInternalService())
+				{
+					la->addAllStops(true);
 				}
 			}
 		}
