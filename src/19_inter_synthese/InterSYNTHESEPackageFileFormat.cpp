@@ -82,7 +82,8 @@ namespace synthese
 					new InterSYNTHESEPackageContent(
 						_env,
 						result,
-						const_cast<Import&>(this->getImport())
+						const_cast<Import&>(this->getImport()),
+						*this
 				)	);
 			}
 			catch(std::exception& e)
@@ -135,7 +136,7 @@ namespace synthese
 		DBTransaction InterSYNTHESEPackageFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			_content->save(transaction, *this);
+			_content->save(transaction);
 			return transaction;
 		}
 

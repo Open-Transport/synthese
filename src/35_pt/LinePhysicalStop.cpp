@@ -57,16 +57,6 @@ namespace synthese
 		{
 			// Saving of the attribute
 			setFromVertex(&stop);
-
-			// Links from stop to the linestop
-			if(getIsArrival())
-			{
-				stop.addArrivalEdge((Edge*) this);
-			}
-			if(getIsDeparture())
-			{
-				stop.addDepartureEdge((Edge*) this);
-			}
 		}
 
 

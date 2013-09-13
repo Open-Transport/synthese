@@ -57,29 +57,32 @@ namespace synthese
 
 			Objects::Type _loadObjects(
 				const boost::property_tree::ptree& node,
-				const ContentMap& contentMap
+				const ContentMap& contentMap,
+				boost::optional<const impex::Importer&> importer
 			);
 
 			void _parseAndLoad(
-				const std::string& s
+				const std::string& s,
+				boost::optional<const impex::Importer&> importer
 			);
 
 		public:
 			InterSYNTHESEPackageContent(
 				util::Env& env,
 				const std::string& s,
-				impex::Import& import
+				impex::Import& import,
+				boost::optional<const impex::Importer&> importer
 			);
 
 			InterSYNTHESEPackageContent(
 				util::Env& env,
 				const std::string& s,
-				const boost::shared_ptr<InterSYNTHESEPackage>& pacakge
+				const boost::shared_ptr<InterSYNTHESEPackage>& pacakge,
+				boost::optional<const impex::Importer&> importer
 			);
 
 			void save(
-				db::DBTransaction& transaction,
-				boost::optional<const impex::Importer&> importer
+				db::DBTransaction& transaction
 			) const;
 		};
 	}

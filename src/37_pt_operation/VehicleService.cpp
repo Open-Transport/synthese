@@ -22,9 +22,11 @@
 
 #include "VehicleService.hpp"
 
+#include "ImportableTableSync.hpp"
 #include "NumericField.hpp"
 #include "ScheduledService.h"
 #include "StringField.hpp"
+#include "VehicleServiceTableSync.hpp"
 
 using namespace boost;
 using namespace std;
@@ -32,8 +34,9 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace util;
+	using namespace impex;
 	using namespace pt;
+	using namespace util;
 
 	namespace util
 	{
@@ -133,6 +136,101 @@ namespace synthese
 
 				map.insert(TAG_SERVICE, serviceMap);
 			}
+		}
+
+
+
+		bool VehicleService::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			// Name
+			if(record.isDefined(VehicleServiceTableSync::COL_NAME))
+			{
+				string value(record.get<string>(VehicleServiceTableSync::COL_NAME));
+				if(value != getName())
+				{
+					result = true;
+					setName(value);
+				}
+			}
+
+//			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
+			{
+				// Services
+				if(record.isDefined(VehicleServiceTableSync::COL_SERVICES))
+				{
+					VehicleService::Services value(
+						VehicleServiceTableSync::UnserializeServices(
+							record.get<string>(VehicleServiceTableSync::COL_SERVICES),
+							env
+					)	);
+					if(value != getServices())
+					{
+						result = true;
+						setServices(value);
+					}
+				}
+			}
+
+			// Dates
+			if(record.isDefined(VehicleServiceTableSync::COL_DATES))
+			{
+				Calendar value;
+				value.setFromSerializedString(
+					record.get<string>(VehicleServiceTableSync::COL_DATES)
+				);
+				if(value != *this)
+				{
+					result = true;
+					setFromSerializedString(record.get<string>(VehicleServiceTableSync::COL_DATES));
+				}
+			}
+
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+			if(record.isDefined(VehicleServiceTableSync::COL_DATASOURCE_LINKS))
+			{
+				Importable::DataSourceLinks value(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						record.get<string>(VehicleServiceTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				if(value != getDataSourceLinks())
+				{
+					result = true;
+					setDataSourceLinksWithRegistration(value);
+				}
+			}
+
+			return result;
+		}
+
+
+
+		void VehicleService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+
+		}
+
+
+
+		synthese::LinkedObjectsIds VehicleService::getLinkedObjectsIds( const Record& record ) const
+		{
+			LinkedObjectsIds result;
+			if(record.isDefined(VehicleServiceTableSync::COL_DATASOURCE_LINKS))
+			{
+				Env env;
+				Importable::DataSourceLinks value(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						record.get<string>(VehicleServiceTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				BOOST_FOREACH(const Importable::DataSourceLinks::value_type& item, value)
+				{
+					result.push_back(item.first->getKey());
+				}
+			}
+			return result;
 		}
 
 

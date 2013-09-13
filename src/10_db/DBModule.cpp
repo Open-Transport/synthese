@@ -381,4 +381,30 @@ namespace synthese
 				}
 			}
 		}
+
+
+
+		void DBModule::DeleteObject(
+			util::RegistryKeyType id,
+			boost::optional<DBTransaction&> transaction /*= boost::optional<DBTransaction&>() */
+		){
+			RegistryTableType tableId(decodeTableId(id)); // If the key is not defined, the table is not decoded
+			boost::shared_ptr<DBTableSync> tableSync(
+				GetTableSync(tableId)
+			);
+			if(!tableSync.get())
+			{
+				throw Exception("Incompatible table");
+			}
+			DBTransaction localTransaction;
+			tableSync->deleteRecord(
+				NULL,
+				id,
+				transaction ? *transaction : localTransaction
+			);
+			if(!transaction)
+			{
+				localTransaction.run();
+			}
+		}
 }	}

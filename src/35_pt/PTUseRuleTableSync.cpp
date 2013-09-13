@@ -113,82 +113,18 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Rule type
-			PTUseRule::ReservationRuleType ruleType(static_cast<PTUseRule::ReservationRuleType>(rows->getInt(PTUseRuleTableSync::COL_RESERVATION_TYPE)));
-			rr->setReservationType(ruleType);
-
-			// Origin is reference
-			bool originIsReference(rows->getBool (PTUseRuleTableSync::COL_ORIGINISREFERENCE));
-			rr->setOriginIsReference (originIsReference);
-
-			// Min minutes delay (default=0)
-			try
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				time_duration minDelayMinutes = minutes(rows->getInt (PTUseRuleTableSync::COL_MINDELAYMINUTES));
-				rr->setMinDelayMinutes(minDelayMinutes);
+				DBModule::LoadObjects(rr->getLinkedObjectsIds(*rows), env, linkLevel);
 			}
-			catch(...)
+			rr->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				rr->setMinDelayMinutes(minutes(0));
-			}
-
-			// Min days delay (default=0)
-			try
-			{
-				date_duration minDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MINDELAYDAYS));
-				rr->setMinDelayDays (minDelayDays);
-			}
-			catch(...)
-			{
-				rr->setMinDelayDays(days(0));
-			}
-
-			// Max days delay
-			try
-			{
-				date_duration maxDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MAXDELAYDAYS));
-				rr->setMaxDelayDays(maxDelayDays.days() > 0 ? maxDelayDays : optional<date_duration>());
-			}
-			catch(...)
-			{
-				rr->setMaxDelayDays(optional<date_duration>());
-			}
-
-			// Hour deadline
-			time_duration hourDeadline(rows->getHour(PTUseRuleTableSync::COL_HOURDEADLINE));
-			rr->setHourDeadLine (hourDeadline);
-
-			// Reservation min departure time
-			rr->setReservationMinDepartureTime(rows->getHour(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME));
-
-			// Reservation forbidden days
-			string forbiddenDays(rows->getText(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS));
-			rr->setReservationForbiddenDays(PTUseRuleTableSync::UnserializeForbiddenDays(forbiddenDays));
-
-			// Name
-			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
-			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
-			rr->setForbiddenInDepartureBoards(rows->getBool(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS));
-			rr->setForbiddenInTimetables(rows->getBool(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES));
-			rr->setForbiddenInJourneyPlanning(rows->getBool(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING));
-
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				// Default fare
-				RegistryKeyType id(rows->getLongLong(PTUseRuleTableSync::COL_DEFAULT_FARE));
-				if(id > 0)
-				{
-					try
-					{
-						rr->setDefaultFare(FareTableSync::Get(id, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<Fare> e)
-					{
-						Log::GetInstance().warn("Fare "+ lexical_cast<string>(id) +" not found in PT Use Rule "+ lexical_cast<string>(rr->getKey()));
-					}
-				}
+				rr->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
+
+
 
 		template<> void OldLoadSavePolicy<PTUseRuleTableSync,PTUseRule>::Save(
 			PTUseRule* object,
