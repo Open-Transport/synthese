@@ -191,7 +191,7 @@ namespace synthese
 				if(result.empty())
 				{
 					stream << " " <<
-					HTMLModule::getLinkButton(removeCalendar.getURL(), "Supprimer le calendrier", "Etes-vous sûr de vouloir supprimer le calendrier "+ _calendar->getName() +" ?", "calendar_delete.png");
+					HTMLModule::getLinkButton(removeCalendar.getURL(), "Supprimer le calendrier", "Etes-vous sûr de vouloir supprimer le calendrier "+ _calendar->getName() +" ?", "/admin/img/calendar_delete.png");
 				}
 				stream << "</p>";
 
