@@ -27,6 +27,8 @@
 #include "Calendar.h"
 #include "Registry.h"
 
+#include "FrameworkTypes.hpp"
+
 #include <boost/optional.hpp>
 
 namespace synthese
@@ -80,7 +82,7 @@ namespace synthese
 				util::RegistryKeyType id = 0
 			);
 
-			//! @name Queries
+			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
 				/// Applies the element definition on the result calendar according to the mask.
@@ -98,6 +100,12 @@ namespace synthese
 				/// Max date getter which takes into account of included calendar.
 				boost::gregorian::date	getRealMaxDate()	const;
 
+				virtual void toParametersMap(
+					util::ParametersMap& map,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
 			//@}
 
 			//! @name Getters
@@ -124,6 +132,17 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const;
 			//@}
 		};
 	}

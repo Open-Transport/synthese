@@ -60,7 +60,6 @@ namespace synthese
 			>	>
 		{
 		public:
-			static const std::string ATTR_PARENT_ID;
 			static const std::string ATTR_NAME;
 
 			/// Chosen registry class.
@@ -126,7 +125,7 @@ namespace synthese
 			typedef std::map<std::size_t, CalendarTemplateElement> Elements;
 
 		private:
-			Elements	_elements;
+			mutable Elements	_elements;
 			std::string _name;
 			Category								_category;
 
@@ -141,7 +140,7 @@ namespace synthese
 				const boost::gregorian::date& day
 			);
 
-			//! @name Queries
+			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
 				/// Result calendar generation according to a mask.
@@ -175,12 +174,14 @@ namespace synthese
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
+
+				virtual SubObjects getSubObjects() const;
 			//@}
 
 			//! @name Getters
 			//@{
 				Category getCategory() const;
-				Elements getElements() const { return _elements; }
+				const Elements& getElements() const { return _elements; }
 				virtual std::string getName() const { return _name; }
 			//@}
 
@@ -195,9 +196,19 @@ namespace synthese
 				void	clearElements();
 				void	addElement(const CalendarTemplateElement& element);
 				void	removeElement(const CalendarTemplateElement& element);
+
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const;
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_timetables_CalendarTemplate_h__

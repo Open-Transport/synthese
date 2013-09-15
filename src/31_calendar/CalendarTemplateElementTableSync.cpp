@@ -112,63 +112,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Rank
-			object->setRank(static_cast<size_t>(rows->getInt(CalendarTemplateElementTableSync::COL_RANK)));
-
-			// Min date
-			object->setMinDate(
-				rows->getText(CalendarTemplateElementTableSync::COL_MIN_DATE).empty() ?
-				date(neg_infin) :
-				from_string(rows->getText(CalendarTemplateElementTableSync::COL_MIN_DATE))
-			);
-
-			// Max date
-			object->setMaxDate(
-				rows->getText(CalendarTemplateElementTableSync::COL_MAX_DATE).empty() ?
-				date(pos_infin) :
-				from_string(rows->getText(CalendarTemplateElementTableSync::COL_MAX_DATE))
-			);
-
-			// Days modulo
-			object->setStep(days(rows->getInt(CalendarTemplateElementTableSync::COL_INTERVAL)));
-
-			// Operation
-			object->setOperation(
-				static_cast<CalendarTemplateElement::Operation>(
-					rows->getInt(CalendarTemplateElementTableSync::COL_POSITIVE)
-			)	);
-
-			// Included calendar
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				try
-				{
-					RegistryKeyType iid(rows->getLongLong(CalendarTemplateElementTableSync::COL_INCLUDE_ID));
-					if(iid > 0)
-					{
-						object->setInclude(CalendarTemplateTableSync::Get(rows->getLongLong(CalendarTemplateElementTableSync::COL_INCLUDE_ID), env, UP_DOWN_LINKS_LOAD_LEVEL).get());
-					}
-				}
-				catch (ObjectNotFoundException<CalendarTemplate> e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_INCLUDE_ID, e);
-				}
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
 			}
-
-			// Link with calendar template
-			// Warning : let this link a the last position because the element is copyied into the template and so must be completely initialized
-			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				try
-				{
-					boost::shared_ptr<CalendarTemplate> cal(CalendarTemplateTableSync::GetEditable(rows->getLongLong(CalendarTemplateElementTableSync::COL_CALENDAR_ID), env, FIELDS_ONLY_LOAD_LEVEL));
-					object->setCalendar(cal.get());
-					cal->addElement(*object);
-				}
-				catch (ObjectNotFoundException<CalendarTemplate> e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_CALENDAR_ID, e);
-				}
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 
@@ -196,10 +147,7 @@ namespace synthese
 		void OldLoadSavePolicy<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
 			CalendarTemplateElement* obj
 		){
-			if(obj->getCalendar())
-			{
-				const_cast<CalendarTemplate*>(obj->getCalendar())->removeElement(*obj);
-			}
+			obj->unlink();
 		}
 
 

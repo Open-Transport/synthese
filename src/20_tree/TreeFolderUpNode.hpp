@@ -133,6 +133,9 @@ namespace synthese
 				std::string prefix = std::string(),
 				boost::optional<util::RegistryKeyType> forbiddenId = boost::optional<util::RegistryKeyType>()
 			) const;
+
+
+			virtual SubObjects getSubObjects() const;
 		};
 }	}
 

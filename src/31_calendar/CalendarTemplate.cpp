@@ -22,6 +22,11 @@
 
 #include "CalendarTemplate.h"
 
+#include "CalendarTemplateElement.h"
+#include "CalendarTemplateTableSync.h"
+#include "DataSourceLinksField.hpp"
+#include "ImportableTableSync.hpp"
+
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -31,6 +36,8 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace db;
+	using namespace impex;
 	using namespace util;
 
 	namespace util
@@ -41,8 +48,7 @@ namespace synthese
 	namespace calendar
 	{
 		const string CalendarTemplate::ATTR_NAME = "name";
-		const string CalendarTemplate::ATTR_PARENT_ID = "parent_id";
-
+	
 
 
 		CalendarTemplate::CalendarTemplate(
@@ -241,12 +247,160 @@ namespace synthese
 
 			pm.insert(ATTR_ID, getKey());
 			pm.insert(ATTR_NAME, getName());
-			if(getParent())
-			{
-				pm.insert(ATTR_PARENT_ID, getParent()->getKey());
-			}
 			dataSourceLinksToParametersMap(pm);
 
+			pm.insert(
+				CalendarTemplateTableSync::COL_TEXT,
+				getName()
+			);
+			pm.insert(
+				CalendarTemplateTableSync::COL_CATEGORY,
+				static_cast<int>(getCategory())
+			);
+			pm.insert(
+				CalendarTemplateTableSync::COL_DATASOURCE_LINKS,
+				impex::DataSourceLinks::Serialize(getDataSourceLinks())
+			);
+			pm.insert(
+				CalendarTemplateTableSync::COL_PARENT_ID,
+				getParent(true) ? getParent()->getKey() : 0
+			);
+		}
+
+
+
+		bool CalendarTemplate::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			if(record.isDefined(TABLE_COL_ID))
+			{
+				RegistryKeyType id(record.getDefault<RegistryKeyType>(TABLE_COL_ID, 0));
+				if(id != getKey())
+				{
+					result = true;
+					setKey(id);
+				}
+
+			}
+
+			if(record.isDefined(CalendarTemplateTableSync::COL_TEXT))
+			{
+				string value(record.get<string>(CalendarTemplateTableSync::COL_TEXT));
+				if(value != getName())
+				{
+					result = true;
+					setName(value);
+				}
+			}
+
+			if(record.isDefined(CalendarTemplateTableSync::COL_CATEGORY))
+			{
+				CalendarTemplate::Category value(
+					static_cast<CalendarTemplate::Category>(
+						record.getDefault<int>(CalendarTemplateTableSync::COL_CATEGORY, 0)
+				)	);
+				if(value != getCategory())
+				{
+					result = true;
+					setCategory(value);
+				}
+			}
+
+//			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				// Elements
+ /*				CalendarTemplateElementTableSync::SearchResult elements(
+ 					CalendarTemplateElementTableSync::Search(
+ 						env,
+ 						object->getKey(),
+						optional<RegistryKeyType>(),
+ 						0, optional<size_t>(),
+ 						UP_LINKS_LOAD_LEVEL
+ 				)	);
+ 				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& e, elements)
+ 				{
+ 					object->addElement(*e);
+ 				}
+*/
+				// Data source links
+				if(record.isDefined(CalendarTemplateTableSync::COL_DATASOURCE_LINKS))
+				{
+					Importable::DataSourceLinks value(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							record.get<string>(CalendarTemplateTableSync::COL_DATASOURCE_LINKS),
+							env
+					)	);
+					if(value != getDataSourceLinks())
+					{
+						result = true;
+						setDataSourceLinksWithoutRegistration(value);
+					}
+				}
+
+				// Parent
+				if(record.isDefined(CalendarTemplateTableSync::COL_PARENT_ID))
+				{
+					CalendarTemplate* value(NULL);
+					RegistryKeyType id(
+						record.getDefault<RegistryKeyType>(CalendarTemplateTableSync::COL_PARENT_ID, 0)
+					);
+						
+					if(id > 0) try
+					{
+						value = CalendarTemplateTableSync::GetEditable(
+							id, env
+						).get();
+					}
+					catch (ObjectNotFoundException<CalendarTemplate>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + CalendarTemplateTableSync::TABLE.NAME + "/" + CalendarTemplateTableSync::COL_PARENT_ID +" (" + lexical_cast<string>(getKey()) + ")", e);
+					}
+
+					if(value != getParent(true))
+					{
+						result = true;
+						setParent(value);
+					}
+				}
+			}
+
+			return result;
+		}
+
+
+
+		void CalendarTemplate::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			registerInParentOrRoot();
+		}
+
+
+
+		synthese::LinkedObjectsIds CalendarTemplate::getLinkedObjectsIds( const Record& record ) const
+		{
+			return LinkedObjectsIds();
+		}
+
+
+
+		SubObjects CalendarTemplate::getSubObjects() const
+		{
+			SubObjects result;
+
+			// Calendars
+			BOOST_FOREACH(const ChildrenType::value_type& it, getChildren())
+			{
+				result.push_back(it.second);
+			}
+
+			// Elements
+			BOOST_FOREACH(const Elements::value_type& element, getElements())
+			{
+				result.push_back(const_cast<CalendarTemplateElement*>(&element.second));
+			}
+
+			return result;
 		}
 
 
