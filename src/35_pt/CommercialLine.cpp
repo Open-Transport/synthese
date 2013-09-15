@@ -79,7 +79,6 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_MAP_URL("line_map_url");
 		const string CommercialLine::DATA_LINE_DOC_URL("line_doc_url");
 		const string CommercialLine::DATA_LINE_TIMETABLE_ID("line_timetable_id");
-		const string CommercialLine::DATA_LINE_NETWORK_ID = "network_id";
 		const string CommercialLine::DATA_MAX_DISPLAY_DELAY = "max_display_delay";
 
 
@@ -334,10 +333,6 @@ namespace synthese
 			pm.insert(prefix + "lineStyle", getStyle()); // For StopAreasList compatibility
 			pm.insert(prefix + DATA_LINE_MAP_URL, getMapURL());
 			pm.insert(prefix + DATA_LINE_DOC_URL, getDocURL());
-			if(getNetwork())
-			{
-				pm.insert(prefix + DATA_LINE_NETWORK_ID, getNetwork()->getKey());
-			}
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,
 				getDataSourceLinks().size() == 1 ?
 				lexical_cast<string>(getDataSourceLinks().begin()->second) :

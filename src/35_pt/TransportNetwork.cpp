@@ -29,6 +29,7 @@
 #include "ImportableTableSync.hpp"
 #include "ParametersMap.h"
 #include "TransportNetworkTableSync.h"
+#include "TreeFolder.hpp"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ namespace synthese
 {
 	using namespace calendar;
 	using namespace db;
+	using namespace tree;
 	using namespace util;
 	using namespace graph;
 	using namespace impex;
@@ -194,17 +196,6 @@ namespace synthese
 			}
 
 			return result;
-		}
-
-		synthese::SubObjects TransportNetwork::getSubObjects() const
-		{
-			SubObjects r;
-			CommercialLineTableSync::SearchResult lines(CommercialLineTableSync::Search(Env::GetOfficialEnv(), getKey()));
-			BOOST_FOREACH(const boost::shared_ptr<CommercialLine> line, lines)
-			{
-				r.push_back(line.get());
-			}
-			return r;
 		}
 
 
