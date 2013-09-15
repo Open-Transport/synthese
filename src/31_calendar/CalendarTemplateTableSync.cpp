@@ -89,59 +89,19 @@ namespace synthese
 
 		template<>
 		void OldLoadSavePolicy<CalendarTemplateTableSync,CalendarTemplate>::Load(
-			CalendarTemplate* object
-			, const db::DBResultSPtr& rows,
+			CalendarTemplate* object,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Columns reading
-			RegistryKeyType id(rows->getLongLong(TABLE_COL_ID));
-
-			// Properties
-			object->setKey(id);
-			object->setName(rows->getText(CalendarTemplateTableSync::COL_TEXT));
-			object->setCategory(static_cast<CalendarTemplate::Category>(rows->getInt(CalendarTemplateTableSync::COL_CATEGORY)));
-
-			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Elements
- 				CalendarTemplateElementTableSync::SearchResult elements(
- 					CalendarTemplateElementTableSync::Search(
- 						env,
- 						object->getKey(),
-						optional<RegistryKeyType>(),
- 						0, optional<size_t>(),
- 						UP_LINKS_LOAD_LEVEL
- 				)	);
- 				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& e, elements)
- 				{
- 					object->addElement(*e);
- 				}
-
-				// Data source links
-				object->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(CalendarTemplateTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-
-				// Parent
-				object->setParent(NULL);
-				try
-				{
-					RegistryKeyType id(rows->getLongLong(CalendarTemplateTableSync::COL_PARENT_ID));
-					if(id > 0)
-					{
-						object->setParent(
-							CalendarTemplateTableSync::GetEditable(rows->getLongLong(CalendarTemplateTableSync::COL_PARENT_ID), env, linkLevel).get()
-						);
-					}
-				}
-				catch (ObjectNotFoundException<CalendarTemplate> e)
-				{
-					Log::GetInstance().warn("Data corrupted in " + CalendarTemplateTableSync::TABLE.NAME + "/" + CalendarTemplateTableSync::COL_PARENT_ID, e);
-				}
-				object->registerInParentOrRoot();
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			}
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 

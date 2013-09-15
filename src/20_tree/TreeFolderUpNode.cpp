@@ -91,5 +91,21 @@ namespace synthese
 		{
 			return _children.empty();
 		}
+
+
+
+		/// Gets all children of the object.
+		SubObjects TreeFolderUpNode::getSubObjects() const
+		{
+			SubObjects r;
+
+			// Lines and folders in a single call
+			BOOST_FOREACH(Registrable* item, getChildren<Registrable>())
+			{
+				r.push_back(item);
+			}
+
+			return r;
+		}
 }	}
 
