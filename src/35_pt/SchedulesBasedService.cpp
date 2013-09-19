@@ -1188,11 +1188,13 @@ namespace synthese
 				return true;
 			}
 			const SchedulesBasedService& sother(static_cast<const SchedulesBasedService&>(other));
-			assert(
-				_dataDepartureSchedules.size() == sother._dataDepartureSchedules.size() &&
-				_dataArrivalSchedules.size() == sother._dataArrivalSchedules.size() &&
-				_dataDepartureSchedules.size() == _dataArrivalSchedules.size()
-			);
+			if(	_dataDepartureSchedules.size() != sother._dataDepartureSchedules.size() ||
+				_dataArrivalSchedules.size() != sother._dataArrivalSchedules.size() ||
+				_dataDepartureSchedules.size() != _dataArrivalSchedules.size()
+			){
+				Log::GetInstance().warn("Inconsistent schedules size in "+ lexical_cast<string>(getKey()));
+				return false;
+			}
 
 			// Loop on each stop
 			bool timeOrder;
