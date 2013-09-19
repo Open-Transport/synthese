@@ -92,7 +92,7 @@ public:
 				d.push_back(startTime);
 			}
 
-			_scheduledService->setSchedules(d, a, false /* non interpolated */);
+			_scheduledService->setDataSchedules(d, a);
 		}
 		jp.addService(*_scheduledService, true);
 		_scheduledService->setActive(day_clock::local_day());
@@ -129,7 +129,7 @@ public:
 				d.push_back(startTime);
 			}
 
-			_continuousService->setSchedules(d, a, false /* non interpolated */);
+			_continuousService->setDataSchedules(d, a);
 			_continuousService->setRange(range);
 			_continuousService->setMaxWaitingTime(time_duration(0,5,0));
 		}

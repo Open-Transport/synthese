@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(7,20,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss01.setSchedules(d,a, true);
+		ss01.setDataSchedules(d,a);
 	}
 	ss01.setActive(day_clock::local_day());
 	ss01.setActive(day_clock::local_day() + days(1));
@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(8,20,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss02.setSchedules(d,a, true);
+		ss02.setDataSchedules(d,a);
 	}
 	ss02.setActive(day_clock::local_day());
 	ss02.setActive(day_clock::local_day() + days(1));
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(9,20,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss03.setSchedules(d,a, true);
+		ss03.setDataSchedules(d,a);
 	}
 	ss03.setActive(day_clock::local_day());
 	ss03.setActive(day_clock::local_day() + days(1));
@@ -424,7 +424,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(10,20,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss04.setSchedules(d,a, true);
+		ss04.setDataSchedules(d,a);
 	}
 	ss04.setActive(day_clock::local_day());
 	ss04.setActive(day_clock::local_day() + days(1));
@@ -516,7 +516,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(7,50,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss05.setSchedules(d,a, true);
+		ss05.setDataSchedules(d,a);
 	}
 	ss05.setActive(day_clock::local_day());
 	ss05.setActive(day_clock::local_day() + days(1));
@@ -543,7 +543,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(8,50,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss06.setSchedules(d,a, true);
+		ss06.setDataSchedules(d,a);
 	}
 	ss06.setActive(day_clock::local_day());
 	ss06.setActive(day_clock::local_day() + days(1));
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(9,50,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss07.setSchedules(d,a, true);
+		ss07.setDataSchedules(d,a);
 	}
 	ss07.setActive(day_clock::local_day());
 	ss07.setActive(day_clock::local_day() + days(1));
@@ -598,7 +598,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(10,50,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss08.setSchedules(d,a, true);
+		ss08.setDataSchedules(d,a);
 	}
 	ss08.setActive(day_clock::local_day());
 	ss08.setActive(day_clock::local_day() + days(1));
@@ -626,7 +626,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(11,20,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss09.setSchedules(d,a, true);
+		ss09.setDataSchedules(d,a);
 	}
 	ss09.setActive(day_clock::local_day());
 	ss09.setActive(day_clock::local_day() + days(1));
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(8,00,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss10.setSchedules(d,a, true);
+		ss10.setDataSchedules(d,a);
 	}
 	ss10.setActive(day_clock::local_day());
 	ss10.setActive(day_clock::local_day() + days(1));
@@ -746,7 +746,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(9,00,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss11.setSchedules(d,a, true);
+		ss11.setDataSchedules(d,a);
 	}
 	ss11.setActive(day_clock::local_day());
 	ss11.setActive(day_clock::local_day() + days(1));
@@ -773,7 +773,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(10,0,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss13.setSchedules(d,a, true);
+		ss13.setDataSchedules(d,a);
 	}
 	ss13.setActive(day_clock::local_day());
 	ss13.setActive(day_clock::local_day() + days(1));
@@ -801,7 +801,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		a.push_back(time_duration(11,0,0));
 		d.push_back(time_duration(0,0,0));
 
-		ss12.setSchedules(d,a, true);
+		ss12.setDataSchedules(d,a);
 	}
 	ss12.setActive(day_clock::local_day());
 	ss12.setActive(day_clock::local_day() + days(1));

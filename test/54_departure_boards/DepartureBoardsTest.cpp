@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	jp1ser1D.push_back(time_duration(8,20,0));
 	jp1ser1D.push_back(time_duration(8,30,0));
 	jp1ser1D.push_back(time_duration(8,40,0));
-	jp1ser1.setSchedules(jp1ser1D, jp1ser1D, true);
+	jp1ser1.setDataSchedules(jp1ser1D, jp1ser1D);
 	jp1ser1.setActive(tomorrow);
 	jp1.addService(jp1ser1, true);
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	jp1ser2D.push_back(time_duration(9,11,0));
 	jp1ser2D.push_back(time_duration(9,12,0));
 	jp1ser2D.push_back(time_duration(9,13,0));
-	jp1ser2.setSchedules(jp1ser2D, jp1ser2D, true);
+	jp1ser2.setDataSchedules(jp1ser2D, jp1ser2D);
 	jp1ser2.setActive(tomorrow);
 	jp1.addService(jp1ser2, true);
 
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	ScheduledService::Schedules jp2ser1D;
 	jp2ser1D.push_back(time_duration(8,0,0));
 	jp2ser1D.push_back(time_duration(8,1,0));
-	jp2ser1.setSchedules(jp2ser1D, jp2ser1D, true);
+	jp2ser1.setDataSchedules(jp2ser1D, jp2ser1D);
 	jp2ser1.setActive(tomorrow);
 	jp2.addService(jp2ser1, true);
 
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	ScheduledService::Schedules jp2ser2D;
 	jp2ser2D.push_back(time_duration(8,10,0));
 	jp2ser2D.push_back(time_duration(8,11,0));
-	jp2ser2.setSchedules(jp2ser2D, jp2ser2D, true);
+	jp2ser2.setDataSchedules(jp2ser2D, jp2ser2D);
 	jp2ser2.setActive(tomorrow);
 	jp2.addService(jp2ser2, true);
 
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	ScheduledService::Schedules jp2ser3D;
 	jp2ser3D.push_back(time_duration(8,20,0));
 	jp2ser3D.push_back(time_duration(8,21,0));
-	jp2ser3.setSchedules(jp2ser3D, jp2ser3D, true);
+	jp2ser3.setDataSchedules(jp2ser3D, jp2ser3D);
 	jp2ser3.setActive(tomorrow);
 	jp2.addService(jp2ser3, true);
 
