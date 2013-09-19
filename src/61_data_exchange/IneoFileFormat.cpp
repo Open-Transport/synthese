@@ -867,10 +867,9 @@ namespace synthese
 								);
 
 								// Schedules
-								deadRun->setSchedules(
+								deadRun->setDataSchedules(
 									departureSchedules,
-									arrivalSchedules,
-									false
+									arrivalSchedules
 								);
 
 								// Network

@@ -126,7 +126,7 @@ namespace synthese
 
 			TransportNetworkTableSync::SearchResult networks(
 				TransportNetworkTableSync::Search(
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					_searchName,
 					string(),
 					_requestParameters.first,
@@ -169,10 +169,7 @@ namespace synthese
 
 					// Remove button
 					stream << t.col();
-					CommercialLineTableSync::SearchResult lines(
-						CommercialLineTableSync::Search(_getEnv(), network->getKey(), optional<string>(), optional<string>(), 0, 1)
-					);
-					if(lines.empty())
+					if(network->getChildren<Registrable>().empty())
 					{
 						removeRequest.getAction()->setObjectId(network->getKey());
 						stream << HTMLModule::getLinkButton(
