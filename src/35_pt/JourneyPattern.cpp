@@ -920,12 +920,17 @@ namespace synthese
 		size_t JourneyPattern::getRankInDefinedSchedulesVector( size_t rank ) const
 		{
 			size_t result(0);
-			for(size_t i(1); i<=rank; ++i)
+			size_t i(1);
+			for(; i<=rank && i<_edges.size(); ++i)
 			{
 				if(	static_cast<LineStop*>(_edges[i])->getScheduleInput())
 				{
 					++result;
 				}
+			}
+			if(i == _edges.size())
+			{
+				Log::GetInstance().warn("Bad schedules size in journey pattern "+ lexical_cast<string>(getKey()));
 			}
 			return result;
 		}
