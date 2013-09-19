@@ -114,7 +114,7 @@ namespace synthese
 			size_t edgeIndex(edge.getRankInPath());
 
 			// Check of real time vertex
-			if(	RTData && !allowCanceled && !_RTVertices[edgeIndex])
+			if(	RTData && !allowCanceled && edgeIndex < _RTVertices.size() && !_RTVertices[edgeIndex])
 			{
 				return ServicePointer();
 			}
@@ -152,7 +152,7 @@ namespace synthese
 
 			if(getDeparture)
 			{
-				if(RTData && !_RTVertices[edgeIndex])
+				if(RTData && edgeIndex < _RTVertices.size() && !_RTVertices[edgeIndex])
 				{
 					ptr.setDepartureInformations(
 						edge,
@@ -166,13 +166,13 @@ namespace synthese
 						edge,
 						actualTime,
 						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
-						*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
 			}
 			else
 			{
-				if(RTData && !_RTVertices[edgeIndex])
+				if(RTData && edgeIndex < _RTVertices.size() && !_RTVertices[edgeIndex])
 				{
 					ptr.setArrivalInformations(
 						edge,
@@ -186,7 +186,7 @@ namespace synthese
 						edge,
 						actualTime,
 						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
-						*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
 			}
@@ -224,7 +224,7 @@ namespace synthese
 					servicePointer.getOriginDateTime() +
 						(getArrivalSchedules(true, false)[edgeIndex] -
 						 getDepartureSchedule(servicePointer.getRTData(), 0)),
-					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
+					*((servicePointer.getRTData() && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
 			else
@@ -239,7 +239,7 @@ namespace synthese
 					servicePointer.getOriginDateTime() +
 						(getDepartureSchedules(true, false)[edgeIndex] -
 						 getDepartureSchedule(servicePointer.getRTData(), 0)),
-					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
+					*((servicePointer.getRTData() && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
 		}
@@ -389,7 +389,7 @@ namespace synthese
 					originPtr.getOriginDateTime() + (getArrivalSchedule(true, edge->getRankInPath()) - getArrivalSchedule(true, 0))
 				);
 
-				if(RTdata && !_RTVertices[edge->getRankInPath()])
+				if(RTdata && edge->getRankInPath() < _RTVertices.size() && !_RTVertices[edge->getRankInPath()])
 				{
 					continue;
 				}
@@ -402,7 +402,7 @@ namespace synthese
 						*edge,
 						originPtr.getOriginDateTime() + (getDepartureSchedule(true, edge->getRankInPath()) - getDepartureSchedule(false, 0)),
 						originPtr.getOriginDateTime() + (getDepartureSchedule(false, edge->getRankInPath()) - getDepartureSchedule(false, 0)),
-						*(RTdata ? _RTVertices[edge->getRankInPath()] : edge->getFromVertex())
+						*((RTdata && edge->getRankInPath() < _RTVertices.size()) ? _RTVertices[edge->getRankInPath()] : edge->getFromVertex())
 					);
 					return result;
 				}
