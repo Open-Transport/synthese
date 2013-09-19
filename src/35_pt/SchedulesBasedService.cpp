@@ -1268,12 +1268,20 @@ namespace synthese
 		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
 		{
 			assert(i < _dataDepartureSchedules.size());
+			if(i >= _dataDepartureSchedules.size())
+			{
+				return *_dataDepartureSchedules.rbegin();
+			}
 			return _dataDepartureSchedules.at(i);
 		}
 
 		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
 		{
 			assert(i < _dataArrivalSchedules.size());
+			if(i >= _dataArrivalSchedules.size())
+			{
+				return *_dataArrivalSchedules.rbegin();
+			}
 			return _dataArrivalSchedules.at(i);
 		}
 
