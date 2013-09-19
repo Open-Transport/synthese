@@ -136,7 +136,7 @@ namespace synthese
 			}
 
 			// Check of real time vertex
-			if(	RTData && !_RTVertices[edge.getRankInPath()])
+			if(	RTData && edge.getRankInPath() < _RTVertices.size() && !_RTVertices[edge.getRankInPath()])
 			{
 				return ServicePointer();
 			}
