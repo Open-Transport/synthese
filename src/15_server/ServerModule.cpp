@@ -564,6 +564,7 @@ namespace synthese
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
 				ThreadInfo& info(GetThreadInfo());
+				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)  +") is now running the action "+ info.queryString);
 				info.status = ThreadInfo::THREAD_RUNNING_ACTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
@@ -580,6 +581,7 @@ namespace synthese
 			{
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
 				ThreadInfo& info(GetThreadInfo());
+				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)  +") is now running the service "+ info.queryString);
 				info.status = ThreadInfo::THREAD_RUNNING_FUNCTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
@@ -597,6 +599,7 @@ namespace synthese
 				recursive_mutex::scoped_lock lock(_threadManagementMutex);
 				ThreadInfo& info(GetThreadInfo());
 				if(info.status == ThreadInfo::THREAD_WAITING) return;
+				Log::GetInstance().trace("Thread "+ info.description +"("+ lexical_cast<string>(info.theThread)  +") is now waiting");
 				info.status = ThreadInfo::THREAD_WAITING;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
