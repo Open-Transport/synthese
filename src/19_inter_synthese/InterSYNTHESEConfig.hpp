@@ -44,13 +44,15 @@ namespace synthese
 		FIELD_MINUTES(LinkBreakMinutes)
 		FIELD_SIZE_T(MaxQueriesNumber)
 		FIELD_BOOL(ForceDump)
+		FIELD_BOOL(Multimaster)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
 			FIELD(LinkBreakMinutes),
 			FIELD(MaxQueriesNumber),
-			FIELD(ForceDump)
+			FIELD(ForceDump),
+			FIELD(Multimaster)
 		> InterSYNTHESEConfigRecord;
 
 

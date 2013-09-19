@@ -338,7 +338,11 @@ namespace synthese
 				DBTransaction transaction;
 
 				// Add the clean request
-				transaction.addQuery("DELETE FROM "+ tableSync->getFormat().NAME);
+				if(	!slave.get<InterSYNTHESEConfig>() ||
+					!slave.get<InterSYNTHESEConfig>()->get<Multimaster>()
+				){
+					transaction.addQuery("DELETE FROM "+ tableSync->getFormat().NAME);
+				}
 
 				// Build the dump
 				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& it, result)
