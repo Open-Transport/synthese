@@ -868,7 +868,7 @@ namespace synthese
 							}
 							departureSchedules.push_back(theoricalDepartureTimeAtEndStop);
 							arrivalSchedules.push_back(theoricalArrivalTimeAtEndStop);
-							service->setSchedules(departureSchedules, arrivalSchedules, false);
+							service->setDataSchedules(departureSchedules, arrivalSchedules);
 							service->setPath(journeyPattern);
 							service->addCodeBySource(*(get<DataSource>()), serviceCode);
 							date today(day_clock::local_day());

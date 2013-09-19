@@ -230,7 +230,11 @@ namespace synthese
 					bool ignoreUnscheduledStops = false
 				) const;
 
-				std::size_t getScheduledStopsNumber() const;
+				size_t getRankInDefinedSchedulesVector(
+					size_t rank
+				) const;
+
+				size_t getScheduledStopsNumber() const;
 
 				/** Tests if the line theory would be respected if the service were inserted into the line.
 					@param service service to test
@@ -239,7 +243,6 @@ namespace synthese
 					@date 2008
 				*/
 				bool respectsLineTheory(
-					bool RTData,
 					const graph::Service& service
 				) const;
 

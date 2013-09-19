@@ -203,6 +203,8 @@ namespace synthese
 		void InheritanceLoadSavePolicy<LineStopTableSync, LineStop>::Unlink(
 			LineStop* obj
 		){
+			obj->getLine()->removeEdge(*obj);
+
 			if(dynamic_cast<DesignatedLinePhysicalStop*>(obj))
 			{
 				DesignatedLinePhysicalStop& object(
@@ -223,13 +225,13 @@ namespace synthese
 					dynamic_cast<LineArea&>(*obj)
 				);
 
-				object.getLine()->removeEdge(*obj);
-
 				// Useful transfer calculation
 				BOOST_FOREACH(StopArea* stopArea, object.getArea()->get<Stops>())
 				{
 					stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
 				}
+
+				object.clearArea();
 			}
 		}
 
@@ -276,24 +278,25 @@ namespace synthese
 					lineStop->getParentPath()->getKey()
 				);
 				lineStop->getParentPath()->removeEdge(*lineStop);
+				size_t rank(lineStop->getLine()->getRankInDefinedSchedulesVector(lineStop->getRankInPath()));
 				BOOST_FOREACH(const ScheduledService::Registry::value_type& it, env.getRegistry<ScheduledService>())
 				{
 					ScheduledService& service(*it.second);
-					ScheduledService::Schedules dp(service.getDepartureSchedules(true, false));
-					dp.erase(dp.begin() + lineStop->getRankInPath());
-					ScheduledService::Schedules ar(service.getDepartureSchedules(true, false));
-					ar.erase(ar.begin() + lineStop->getRankInPath());
-					service.setSchedules(dp, ar, false);
+					ScheduledService::Schedules dp(service.getDataDepartureSchedules());
+					dp.erase(dp.begin() + rank);
+					ScheduledService::Schedules ar(service.getDataArrivalSchedules());
+					ar.erase(ar.begin() + rank);
+					service.setDataSchedules(dp, ar);
 					ScheduledServiceTableSync::Save(&service, transaction);
 				}
 				BOOST_FOREACH(const ContinuousService::Registry::value_type& it, env.getRegistry<ContinuousService>())
 				{
 					ContinuousService& service(*it.second);
-					ContinuousService::Schedules dp(service.getDepartureSchedules(true, false));
-					dp.erase(dp.begin() + lineStop->getRankInPath());
-					ContinuousService::Schedules ar(service.getDepartureSchedules(true, false));
-					ar.erase(ar.begin() + lineStop->getRankInPath());
-					service.setSchedules(dp, ar, false);
+					ContinuousService::Schedules dp(service.getDataDepartureSchedules());
+					dp.erase(dp.begin() + rank);
+					ContinuousService::Schedules ar(service.getDataDepartureSchedules());
+					ar.erase(ar.begin() + rank);
+					service.setDataSchedules(dp, ar);
 					ContinuousServiceTableSync::Save(&service, transaction);
 				}
 			}

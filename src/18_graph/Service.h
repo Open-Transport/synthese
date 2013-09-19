@@ -159,10 +159,9 @@ namespace synthese
 					@date 2008
 					@warning the method must be used only at a time where the service knows its path, so use the method on the currently registered service, taking the new one as parameter
 				*/
-				bool respectsLineTheoryWith(
-					bool RTData,
+				virtual bool respectsLineTheoryWith(
 					const Service& other
-				) const;
+				) const { return true; }
 
 
 

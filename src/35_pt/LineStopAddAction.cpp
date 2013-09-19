@@ -264,36 +264,36 @@ namespace synthese
 				BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, _scheduledServices)
 				{
 					// Departure schedules update
-					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					SchedulesBasedService::Schedules departureSchedules(service->getDataDepartureSchedules());
 					time_duration departureSchedule(*departureSchedules.begin());
 					departureSchedule -= _durationToAdd;
 					departureSchedules.insert(departureSchedules.begin(), departureSchedule);
 
 					// Arrival schedules update
-					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					SchedulesBasedService::Schedules arrivalSchedules(service->getDataArrivalSchedules());
 					time_duration arrivalSchedule(*arrivalSchedules.begin());
 					arrivalSchedule -= _durationToAdd;
 					arrivalSchedules.insert(arrivalSchedules.begin(), arrivalSchedule);
 
 					// Service update
-					service->setSchedules(departureSchedules, arrivalSchedules, false);
+					service->setDataSchedules(departureSchedules, arrivalSchedules);
 				}
 				BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& service, _continuousServices)
 				{
 					// Departure schedules update
-					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					SchedulesBasedService::Schedules departureSchedules(service->getDataDepartureSchedules());
 					time_duration departureSchedule(*departureSchedules.begin());
 					departureSchedule -= _durationToAdd;
 					departureSchedules.insert(departureSchedules.begin(), departureSchedule);
 
 					// Arrival schedules update
-					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					SchedulesBasedService::Schedules arrivalSchedules(service->getDataArrivalSchedules());
 					time_duration arrivalSchedule(*arrivalSchedules.begin());
 					arrivalSchedule -= _durationToAdd;
 					arrivalSchedules.insert(arrivalSchedules.begin(), arrivalSchedule);
 
 					// Service update
-					service->setSchedules(departureSchedules, arrivalSchedules, false);
+					service->setDataSchedules(departureSchedules, arrivalSchedules);
 				}
 			}
 			else if(_rank == _route->getEdges().size())
@@ -305,36 +305,36 @@ namespace synthese
 				BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, _scheduledServices)
 				{
 					// Departure schedules update
-					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					SchedulesBasedService::Schedules departureSchedules(service->getDataDepartureSchedules());
 					time_duration departureSchedule(*departureSchedules.rbegin());
 					departureSchedule += _durationToAdd;
 					departureSchedules.push_back(departureSchedule);
 
 					// Arrival schedules update
-					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					SchedulesBasedService::Schedules arrivalSchedules(service->getDataArrivalSchedules());
 					time_duration arrivalSchedule(*arrivalSchedules.rbegin());
 					arrivalSchedule += _durationToAdd;
 					arrivalSchedules.push_back(arrivalSchedule);
 
 					// Service update
-					service->setSchedules(departureSchedules, arrivalSchedules, false);
+					service->setDataSchedules(departureSchedules, arrivalSchedules);
 				}
 				BOOST_FOREACH(const boost::shared_ptr<ContinuousService>& service, _continuousServices)
 				{
 					// Departure schedules update
-					SchedulesBasedService::Schedules departureSchedules(service->getDepartureSchedules(true, false));
+					SchedulesBasedService::Schedules departureSchedules(service->getDataDepartureSchedules());
 					time_duration departureSchedule(*departureSchedules.rbegin());
 					departureSchedule += _durationToAdd;
 					departureSchedules.push_back(departureSchedule);
 
 					// Arrival schedules update
-					SchedulesBasedService::Schedules arrivalSchedules(service->getArrivalSchedules(true, false));
+					SchedulesBasedService::Schedules arrivalSchedules(service->getDataArrivalSchedules());
 					time_duration arrivalSchedule(*arrivalSchedules.rbegin());
 					arrivalSchedule += _durationToAdd;
 					arrivalSchedules.push_back(arrivalSchedule);
 
 					// Service update
-					service->setSchedules(departureSchedules, arrivalSchedules, false);
+					service->setDataSchedules(departureSchedules, arrivalSchedules);
 				}
 			}
 

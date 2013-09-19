@@ -32,7 +32,6 @@
 #include "User.h"
 #include "Request.h"
 #include "SchedulesBasedService.h"
-#include "Fetcher.h"
 #include "ServiceAdmin.h"
 
 using namespace std;
@@ -87,13 +86,17 @@ namespace synthese
 		{
 			try
 			{
-				_service = Fetcher<SchedulesBasedService>::FetchEditable(
-					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID),
-					*_env,
-					UP_LINKS_LOAD_LEVEL
-				);
+				_service = dynamic_pointer_cast<SchedulesBasedService, Registrable>(
+					DBModule::GetEditableObject(
+						map.get<RegistryKeyType>(PARAMETER_SERVICE_ID),
+						*_env
+				)	);
 			}
-			catch(ObjectNotFoundException<SchedulesBasedService>&)
+			catch(Exception&)
+			{
+				throw ActionException("No such service");
+			}
+			if(!_service)
 			{
 				throw ActionException("No such service");
 			}
@@ -121,16 +124,17 @@ namespace synthese
 		void ServiceTimetableUpdateAction::run(
 			Request& request
 		){
-			SchedulesBasedService::Schedules departureSchedules(_service->getDepartureSchedules(true, false));
-			SchedulesBasedService::Schedules arrivalSchedules(_service->getArrivalSchedules(true, false));
+			size_t rank(static_cast<JourneyPattern*>(_service->getPath())->getRankInDefinedSchedulesVector(_rank));
+			SchedulesBasedService::Schedules departureSchedules(_service->getDataDepartureSchedules());
+			SchedulesBasedService::Schedules arrivalSchedules(_service->getDataArrivalSchedules());
 
 			if(!_shifting_delay.is_not_a_date_time())
 			{
-				for(SchedulesBasedService::Schedules::iterator it(departureSchedules.begin() + _rank); it != departureSchedules.end(); ++it)
+				for(SchedulesBasedService::Schedules::iterator it(departureSchedules.begin() + rank); it != departureSchedules.end(); ++it)
 				{
 					*it += _shifting_delay;
 				}
-				for(SchedulesBasedService::Schedules::iterator it(arrivalSchedules.begin() + _rank + (_updateArrival ? 0 : 1)); it != arrivalSchedules.end(); ++it)
+				for(SchedulesBasedService::Schedules::iterator it(arrivalSchedules.begin() + rank + (_updateArrival ? 0 : 1)); it != arrivalSchedules.end(); ++it)
 				{
 					*it += _shifting_delay;
 				}
@@ -139,17 +143,17 @@ namespace synthese
 			{
 				if(_updateArrival)
 				{
-					arrivalSchedules[_rank] = _time;
+					arrivalSchedules[rank] = _time;
 				}
 				else
 				{
-					departureSchedules[_rank] = _time;
+					departureSchedules[rank] = _time;
 				}
 			}
 
-			_service->setSchedules(departureSchedules, arrivalSchedules, false);
+			_service->setDataSchedules(departureSchedules, arrivalSchedules);
 
-			Fetcher<SchedulesBasedService>::FetchSave(*_service);
+			DBModule::SaveObject(*_service);
 
 			// Saving the rank in the session variables
 			request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_ID, lexical_cast<string>(_service->getKey()));

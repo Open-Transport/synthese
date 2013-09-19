@@ -110,8 +110,10 @@ namespace synthese
 		bool JourneyPatternCopy::addServiceIfCompatible(
 			Service& service
 		){
-			if (!respectsLineTheory(false, service))
+			if (!respectsLineTheory(service))
+			{
 				return false;
+			}
 
 			Path::addService(service, false);
 			service.setPath(this);
