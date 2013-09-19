@@ -204,6 +204,9 @@ namespace synthese
 			// Loop on objects
 			if(node.count(InterSYNTHESEPackage::TAG_OBJECT))
 			{
+				vector<ParametersMap> pms;
+
+				// Loading or creating objects
 				BOOST_FOREACH(const ptree::value_type& objectNode, node.get_child(InterSYNTHESEPackage::TAG_OBJECT))
 				{
 					// The object key
@@ -233,6 +236,7 @@ namespace synthese
 							map.insert(item.first, binaryIt->second);
 						}
 					}
+					pms.push_back(map);
 
 					//////////////////////////////////////////////////////////////////////////
 					/// Transforming into object
@@ -282,6 +286,19 @@ namespace synthese
 					}
 					result.push_back(rObject.get());
 
+				}
+
+				Objects::Type::iterator itObject(result.begin());
+				vector<ParametersMap>::iterator itPM(pms.begin());
+				BOOST_FOREACH(const ptree::value_type& objectNode, node.get_child(InterSYNTHESEPackage::TAG_OBJECT))
+				{
+					// The object key
+					Registrable* rObject(*itObject);
+					++itObject;
+
+					// The ParametersMap corresponding to the current JSON level
+					const ParametersMap& map(*itPM);
+					++itPM;
 
 					//////////////////////////////////////////////////////////////////////////
 					// Recursion
@@ -296,7 +313,7 @@ namespace synthese
 					{
 						if(rObject->loadFromRecord(map, _env))
 						{
-							_objectsToSave.push_back(rObject.get());
+							_objectsToSave.push_back(rObject);
 							if(importer)
 							{
 								RegistryTableType tableId(decodeTableId(rObject->getKey()));
@@ -313,6 +330,13 @@ namespace synthese
 					}
 
 					// Removal detection
+					RegistryTableType classId(decodeTableId(rObject->getKey()));
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
+					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+					{
+						throw synthese::Exception("Bad table");
+					}
+					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
 					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
 					if( registry.contains(rObject->getKey()))
 					{

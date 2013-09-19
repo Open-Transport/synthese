@@ -83,14 +83,15 @@ namespace synthese
 					const std::vector<boost::posix_time::time_period> &excludeRanges
 			) const;
 
-		protected:
-			// This is the schedule as we got it when loaded from the base
-			std::string _rawSchedule;
-
+		private:
 			//! @name Theoretical data
 			//@{
-				Schedules	_departureSchedules;	//!< Departure schedules
-				Schedules	_arrivalSchedules;		//!< Arrival schedules
+				Schedules _dataDepartureSchedules;
+				Schedules _dataArrivalSchedules;
+				mutable Schedules	_generatedDepartureSchedules;	//!< Departure schedules
+				mutable Schedules	_generatedArrivalSchedules;		//!< Arrival schedules
+				mutable boost::recursive_mutex _generatedSchedulesMutex;
+		protected:
 				ServedVertices	_vertices;			//!< Edges
 			//@}
 
@@ -102,7 +103,6 @@ namespace synthese
 				boost::posix_time::ptime _nextRTUpdate;
 				TimestampSchedules _RTTimestamps; 	//!< Hold the time stamp of updates
 				Schedules	_emptySchedules;	//!< Always empty departure schedules
-				bool _hasRealTimeData;
 			//@}
 
 			void _applyRealTimeShiftDuration(
@@ -111,6 +111,11 @@ namespace synthese
 				boost::posix_time::time_duration departureShift,
 				bool updateFollowingSchedules
 			);
+
+			void _clearGeneratedSchedules() const;
+			void _generateSchedules() const;
+			void _initRTSchedulesFromPlanned();
+
 		public:
 			SchedulesBasedService(
 				std::string serviceNumber,
@@ -120,15 +125,18 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const Schedules& getDepartureSchedules(bool THData, bool RTData) const;
-				const Schedules& getArrivalSchedules(bool THData, bool RTData) const;
+				const Schedules& getDataDepartureSchedules() const { return _dataDepartureSchedules; }
+				const Schedules& getDataArrivalSchedules() const { return _dataArrivalSchedules; }
 				const ServedVertices& getVertices(bool RTData) const;
 				const boost::posix_time::ptime& getNextRTUpdate() const;
+				const boost::posix_time::time_duration& getDataFirstDepartureSchedule(size_t i) const;
+				const boost::posix_time::time_duration& getDataFirstArrivalSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration& getDataLastDepartureSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration& getDataLastArrivalSchedule(size_t i) const;
 			//@}
 
 			//! @name Setters
 			//@{
-
 				/** Schedules update.
 					Updates both theoretical and real time data.
 					@param departureSchedules Departure schedules of the service
@@ -136,18 +144,23 @@ namespace synthese
 					@param onlyScheduledEdges Only schedules at scheduled edges are present in the data to load. The missing schedules will be interpolated.
 					@author Hugues Romain
 				*/
-				void setSchedules(
+				void setDataSchedules(
 					const Schedules& departureSchedules,
-					const Schedules& arrivalSchedules,
-					bool onlyScheduledEdges
+					const Schedules& arrivalSchedules
 				);
-
-				void setRawSchedules(const std::string& value){ _rawSchedule = value; }
-
 
 				virtual void setPath(graph::Path* path);
 			//@}
 
+			/// @name Services
+			//@{
+				virtual bool respectsLineTheoryWith(
+					const Service& other
+				) const;
+
+				const Schedules& getDepartureSchedules(bool THData, bool RTData) const;
+				const Schedules& getArrivalSchedules(bool THData, bool RTData) const;
+			
 
 				const graph::Vertex* getRealTimeVertex(
 					std::size_t rank
@@ -158,7 +171,7 @@ namespace synthese
 					std::size_t rank
 				) const;
 
-
+				bool hasRealTimeData() const;
 
 
 				/** Gets a departure schedule for this service.
@@ -178,6 +191,7 @@ namespace synthese
 					const boost::posix_time::time_duration& schedule,
 					bool departure
 				) const;
+			//@}
 
 			//! @name Update methods
 			//@{

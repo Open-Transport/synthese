@@ -330,7 +330,7 @@ namespace synthese
 							string(),
 							route
 						);
-						service->setSchedules(departureSchedules, arrivalSchedules, true);
+						service->setDataSchedules(departureSchedules, arrivalSchedules);
 						service->setPath(route);
 						service->addCodeBySource(dataSource, serviceRef);
 						service->setActive(today);

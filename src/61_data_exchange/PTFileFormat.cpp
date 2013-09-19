@@ -953,7 +953,7 @@ namespace synthese
 					number,
 					&route
 				);
-				result->setSchedules(departureSchedules, arrivalSchedules, true);
+				result->setDataSchedules(departureSchedules, arrivalSchedules);
 				result->setPath(&route);
 
 				if(team)
@@ -1082,7 +1082,7 @@ namespace synthese
 					range,
 					waitingTime
 				);
-				result->setSchedules(departureSchedules, arrivalSchedules, true);
+				result->setDataSchedules(departureSchedules, arrivalSchedules);
 				result->setPath(&route);
 				route.addService(*result, false);
 				_env.getEditableRegistry<ContinuousService>().add(boost::shared_ptr<ContinuousService>(result));

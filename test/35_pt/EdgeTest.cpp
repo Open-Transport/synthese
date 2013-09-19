@@ -46,262 +46,490 @@ using namespace synthese;
 BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 {
 	GeographyModule::PreInit();
+	{
+		JourneyPattern l;
 
-	JourneyPattern l;
+		StopArea p1(0, true);
+		StopArea p2(0, false);
+		StopArea p3(0, false);
+		StopArea p4(0, false);
+		StopArea p5(0, true);
+		StopArea p6(0, true);
+		StopArea p7(0, false);
+		StopArea p8(0, false);
 
-	StopArea p1(0, true);
-	StopArea p2(0, false);
-	StopArea p3(0, false);
-	StopArea p4(0, false);
-	StopArea p5(0, true);
-	StopArea p6(0, true);
-	StopArea p7(0, false);
-	StopArea p8(0, false);
+		StopPoint s1(0, "s1", &p1);
+		StopPoint s2(0, "s1", &p2);
+		StopPoint s3(0, "s1", &p3);
+		StopPoint s4(0, "s1", &p4);
+		StopPoint s5(0, "s1", &p5);
+		StopPoint s6(0, "s1", &p6);
+		StopPoint s7(0, "s1", &p7);
+		StopPoint s8(0, "s1", &p8);
 
-	StopPoint s1(0, "s1", &p1);
-	StopPoint s2(0, "s1", &p2);
-	StopPoint s3(0, "s1", &p3);
-	StopPoint s4(0, "s1", &p4);
-	StopPoint s5(0, "s1", &p5);
-	StopPoint s6(0, "s1", &p6);
-	StopPoint s7(0, "s1", &p7);
-	StopPoint s8(0, "s1", &p8);
+		DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1);
+		DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,0,&s2);
+		DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true, 0,&s3);
+		DesignatedLinePhysicalStop l4A(0, &l, 3, false, true,0,&s4);
+		DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,0,&s5);
+		DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,0,&s6);
+		DesignatedLinePhysicalStop l7AD(0, &l, 6, true, true,0,&s7);
+		DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,0,&s8);
+		DesignatedLinePhysicalStop* lNULL(NULL);
 
-	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1);
-	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,0,&s2);
-	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true, 0,&s3);
-	DesignatedLinePhysicalStop l4A(0, &l, 3, false, true,0,&s4);
-	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,0,&s5);
-	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,0,&s6);
-	DesignatedLinePhysicalStop l7AD(0, &l, 6, true, true,0,&s7);
-	DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,0,&s8);
-	DesignatedLinePhysicalStop* lNULL(NULL);
+		l.addEdge(l1D);
 
-	l.addEdge(l1D);
+		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getNext(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getNext(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		l.addEdge(l2D);
 
-	l.addEdge(l2D);
+		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getNext(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getNext(), lNULL);
-	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		l.addEdge(l3AD);
 
-	l.addEdge(l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
+		BOOST_CHECK_EQUAL (l3AD.getNext(), lNULL);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
-	BOOST_CHECK_EQUAL (l3AD.getNext(), lNULL);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		l.addEdge(l4A);
 
-	l.addEdge(l4A);
+		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
+		BOOST_CHECK_EQUAL (l3AD.getNext(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
-	BOOST_CHECK_EQUAL (l3AD.getNext(), &l4A);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		l.addEdge(l5D);
 
-	l.addEdge(l5D);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		l.addEdge(l6AD);
 
-	l.addEdge(l6AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
-	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
-	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
 
-	BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
-	BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
+		l.addEdge(l7AD);
 
-	l.addEdge(l7AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
-	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
-	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7AD);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
 
-	BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7AD);
-	BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
-	BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
+		BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
+		BOOST_CHECK_EQUAL (l7AD.getPreviousDepartureForFineSteppingOnly(), &l6AD);
 
-	BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
-	BOOST_CHECK_EQUAL (l7AD.getPreviousDepartureForFineSteppingOnly(), &l6AD);
+		l.addEdge(l8A);
 
-	l.addEdge(l8A);
+		JourneyPattern::Edges edges = l.getEdges();
 
-	JourneyPattern::Edges edges = l.getEdges();
+		BOOST_CHECK_EQUAL (edges[0], &l1D);
+		BOOST_CHECK_EQUAL (edges[1], &l2D);
+		BOOST_CHECK_EQUAL (edges[2], &l3AD);
+		BOOST_CHECK_EQUAL (edges[3], &l4A);
+		BOOST_CHECK_EQUAL (edges[4], &l5D);
+		BOOST_CHECK_EQUAL (edges[5], &l6AD);
+		BOOST_CHECK_EQUAL (edges[6], &l7AD);
+		BOOST_CHECK_EQUAL (edges[7], &l8A);
 
-	BOOST_CHECK_EQUAL (edges[0], &l1D);
-	BOOST_CHECK_EQUAL (edges[1], &l2D);
-	BOOST_CHECK_EQUAL (edges[2], &l3AD);
-	BOOST_CHECK_EQUAL (edges[3], &l4A);
-	BOOST_CHECK_EQUAL (edges[4], &l5D);
-	BOOST_CHECK_EQUAL (edges[5], &l6AD);
-	BOOST_CHECK_EQUAL (edges[6], &l7AD);
-	BOOST_CHECK_EQUAL (edges[7], &l8A);
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
 
-	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
-	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
-	BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-	BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
-	BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
-	BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
-	BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7AD);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
 
-	BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7AD);
-	BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
-	BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
+		BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), &l8A);
+		BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
+		BOOST_CHECK_EQUAL (l7AD.getPreviousDepartureForFineSteppingOnly(), &l6AD);
 
-	BOOST_CHECK_EQUAL (l7AD.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l7AD.getFollowingArrivalForFineSteppingOnly(), &l8A);
-	BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
-	BOOST_CHECK_EQUAL (l7AD.getPreviousDepartureForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getPreviousConnectionDeparture(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getPreviousDepartureForFineSteppingOnly(), &l7AD);
+	}
+	{	// Removal test
+		JourneyPattern l;
 
-	BOOST_CHECK_EQUAL (l8A.getFollowingConnectionArrival(), lNULL);
-	BOOST_CHECK_EQUAL (l8A.getFollowingArrivalForFineSteppingOnly(), lNULL);
-	BOOST_CHECK_EQUAL (l8A.getPreviousConnectionDeparture(), &l6AD);
-	BOOST_CHECK_EQUAL (l8A.getPreviousDepartureForFineSteppingOnly(), &l7AD);
+		StopArea p1(0, true);
+		StopArea p2(0, false);
+		StopArea p3(0, false);
+		StopArea p4(0, false);
+		StopArea p5(0, true);
+		StopArea p6(0, true);
+		StopArea p7(0, false);
+		StopArea p8(0, false);
 
+		StopPoint s1(0, "s1", &p1);
+		StopPoint s2(0, "s1", &p2);
+		StopPoint s3(0, "s1", &p3);
+		StopPoint s4(0, "s1", &p4);
+		StopPoint s5(0, "s1", &p5);
+		StopPoint s6(0, "s1", &p6);
+		StopPoint s7(0, "s1", &p7);
+		StopPoint s8(0, "s1", &p8);
+
+		DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1);
+		DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,0,&s2);
+		DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true, 0,&s3);
+		DesignatedLinePhysicalStop l4A(0, &l, 3, false, true,0,&s4);
+		DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,0,&s5);
+		DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,0,&s6);
+		DesignatedLinePhysicalStop l7A(0, &l, 6, false, true,0,&s7);
+		DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,0,&s8);
+		DesignatedLinePhysicalStop* lNULL(NULL);
+
+		l.addEdge(l1D);
+		l.addEdge(l2D);
+		l.addEdge(l3AD);
+		l.addEdge(l4A);
+		l.addEdge(l5D);
+		l.addEdge(l6AD);
+		l.addEdge(l7A);
+		l.addEdge(l8A);
+
+		{
+			JourneyPattern::Edges edges = l.getEdges();
+
+			BOOST_CHECK_EQUAL (edges[0], &l1D);
+			BOOST_CHECK_EQUAL (edges[1], &l2D);
+			BOOST_CHECK_EQUAL (edges[2], &l3AD);
+			BOOST_CHECK_EQUAL (edges[3], &l4A);
+			BOOST_CHECK_EQUAL (edges[4], &l5D);
+			BOOST_CHECK_EQUAL (edges[5], &l6AD);
+			BOOST_CHECK_EQUAL (edges[6], &l7A);
+			BOOST_CHECK_EQUAL (edges[7], &l8A);
+		}
+
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
+
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
+
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
+		BOOST_CHECK_EQUAL (l3AD.getNext(), &l4A);
+
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l4A.getPrevious(), &l3AD);
+		BOOST_CHECK_EQUAL (l4A.getNext(), &l5D);
+
+		BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l5D.getPrevious(), &l4A);
+		BOOST_CHECK_EQUAL (l5D.getNext(), &l6AD);
+
+		BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l7A);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPrevious(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getNext(), &l7A);
+
+		BOOST_CHECK_EQUAL (l7A.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l7A.getFollowingArrivalForFineSteppingOnly(), &l8A);
+		BOOST_CHECK_EQUAL (l7A.getPreviousConnectionDeparture(), &l6AD);
+		BOOST_CHECK_EQUAL (l7A.getPreviousDepartureForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l7A.getPrevious(), &l6AD);
+		BOOST_CHECK_EQUAL (l7A.getNext(), &l8A);
+
+		BOOST_CHECK_EQUAL (l8A.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getPreviousConnectionDeparture(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getPreviousDepartureForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getPrevious(), &l7A);
+		BOOST_CHECK_EQUAL (l8A.getNext(), lNULL);
+
+		l.removeEdge(l7A);
+
+		{
+			JourneyPattern::Edges edges = l.getEdges();
+
+			BOOST_CHECK_EQUAL (edges[0], &l1D);
+			BOOST_CHECK_EQUAL (edges[1], &l2D);
+			BOOST_CHECK_EQUAL (edges[2], &l3AD);
+			BOOST_CHECK_EQUAL (edges[3], &l4A);
+			BOOST_CHECK_EQUAL (edges[4], &l5D);
+			BOOST_CHECK_EQUAL (edges[5], &l6AD);
+			BOOST_CHECK_EQUAL (edges[6], &l8A);
+		}
+
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
+
+		BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
+		BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
+
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
+		BOOST_CHECK_EQUAL (l3AD.getNext(), &l4A);
+
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l4A.getPrevious(), &l3AD);
+		BOOST_CHECK_EQUAL (l4A.getNext(), &l5D);
+
+		BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l5D.getPrevious(), &l4A);
+		BOOST_CHECK_EQUAL (l5D.getNext(), &l6AD);
+
+		BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l8A);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPrevious(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getNext(), &l8A);
+
+		BOOST_CHECK_EQUAL (l8A.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getPreviousConnectionDeparture(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getPreviousDepartureForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getPrevious(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getNext(), lNULL);
+
+		l.removeEdge(l2D);
+
+		{
+			JourneyPattern::Edges edges = l.getEdges();
+
+			BOOST_CHECK_EQUAL (edges[0], &l1D);
+			BOOST_CHECK_EQUAL (edges[1], &l3AD);
+			BOOST_CHECK_EQUAL (edges[2], &l4A);
+			BOOST_CHECK_EQUAL (edges[3], &l5D);
+			BOOST_CHECK_EQUAL (edges[4], &l6AD);
+			BOOST_CHECK_EQUAL (edges[5], &l8A);
+		}
+
+		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL (l1D.getNext(), &l3AD);
+
+		BOOST_CHECK_EQUAL (l3AD.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l1D);
+		BOOST_CHECK_EQUAL (l3AD.getNext(), &l4A);
+
+		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l4A.getPrevious(), &l3AD);
+		BOOST_CHECK_EQUAL (l4A.getNext(), &l5D);
+
+		BOOST_CHECK_EQUAL (l5D.getFollowingConnectionArrival(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getFollowingArrivalForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
+		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL (l5D.getPrevious(), &l4A);
+		BOOST_CHECK_EQUAL (l5D.getNext(), &l6AD);
+
+		BOOST_CHECK_EQUAL (l6AD.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l6AD.getFollowingArrivalForFineSteppingOnly(), &l8A);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getPrevious(), &l5D);
+		BOOST_CHECK_EQUAL (l6AD.getNext(), &l8A);
+
+		BOOST_CHECK_EQUAL (l8A.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL (l8A.getPreviousConnectionDeparture(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getPreviousDepartureForFineSteppingOnly(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getPrevious(), &l6AD);
+		BOOST_CHECK_EQUAL (l8A.getNext(), lNULL);
+
+	}
 }
 
 
