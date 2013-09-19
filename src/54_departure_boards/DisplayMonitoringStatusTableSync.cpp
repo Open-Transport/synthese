@@ -247,6 +247,7 @@ namespace synthese
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= 0*/,
 			bool orderByScreenId,
+			bool orderByTime,
 			bool raisingOrder,
 			LinkLevel linkLevel
 		){
@@ -258,6 +259,11 @@ namespace synthese
 			if (orderByScreenId)
 			{
 				query.addOrderField(COL_SCREEN_ID, raisingOrder);
+				query.addOrderField(COL_TIME, raisingOrder);
+			}
+			else if(orderByTime)
+			{
+				query.addOrderField(COL_TIME, raisingOrder);
 			}
 			if (number)
 			{
@@ -278,7 +284,7 @@ namespace synthese
 		){
 			Env env;
 			SearchResult entries(
-				Search(env, screen.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL)
+				Search(env, screen.getKey(), 0, 1, false, true, true, FIELDS_ONLY_LOAD_LEVEL)
 			);
 
 			if(entries.empty())
@@ -302,7 +308,7 @@ namespace synthese
 		){
 			Env env;
 			SearchResult entries(
-				Search(env, cpu.getKey(), 0, 1, true, true, FIELDS_ONLY_LOAD_LEVEL)
+				Search(env, cpu.getKey(), 0, 1, false, true, true, FIELDS_ONLY_LOAD_LEVEL)
 			);
 
 			if(entries.empty())
@@ -317,6 +323,30 @@ namespace synthese
 			}
 
 			return status->getTime();
+		}
+
+
+
+		boost::shared_ptr<DisplayMonitoringStatus> DisplayMonitoringStatusTableSync::UpdateStatus( const DisplayScreen& screen, bool archive )
+		{
+			boost::shared_ptr<DisplayMonitoringStatus> result;
+			if(!archive)
+			{
+				Env env;
+				SearchResult entries(Search(env, screen.getKey(), 0, 1, false, true, false));
+				if(!entries.empty())
+				{
+					result = *entries.begin();
+				}
+			}
+			if(!result)
+			{
+				result.reset(new DisplayMonitoringStatus);
+				result->setScreen(&screen);
+			}
+			ptime now(microsec_clock::local_time());
+			result->setTime(now);
+			return result;
 		}
 	}
 }

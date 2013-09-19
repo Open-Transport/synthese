@@ -28,6 +28,10 @@
 
 namespace synthese
 {
+	namespace departure_boards
+	{
+		class DisplayScreenCPU;
+	}
 
 	namespace data_exchange
 	{
@@ -43,6 +47,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_MG_SCREEN_VALUE;
 			static const std::string MODULE_PARAM_MG_SCREEN_MIN;
 			static const std::string MODULE_PARAM_MG_SCREEN_MAX;
+			static const std::string MODULE_PARAM_MG_CPU_NAME;
+			static const std::string MODULE_PARAM_MG_ARCHIVE_MONITORING;
 
 			enum Status
 			{
@@ -61,6 +67,9 @@ namespace synthese
 			int _mgScreenValue;
 			int _mgScreenMin;
 			int _mgScreenMax;
+			std::string _mgCPUName;
+			departure_boards::DisplayScreenCPU* _cpu;
+			bool _mgArchiveMonitoring;
 
 			mutable Status _status;
 

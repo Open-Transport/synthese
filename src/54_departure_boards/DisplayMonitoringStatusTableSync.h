@@ -92,6 +92,7 @@ namespace synthese
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByScreenId = true,
+				bool orderByTime = false,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
@@ -131,6 +132,12 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			static boost::posix_time::ptime GetLastContact(
 				const DisplayScreenCPU& cpu
+			);
+
+
+			static boost::shared_ptr<DisplayMonitoringStatus> UpdateStatus(
+				const DisplayScreen& screen,
+				bool archive
 			);
 		};
 	}
