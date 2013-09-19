@@ -89,7 +89,7 @@ public:
 				d.push_back(startTime);
 			}
 
-			_scheduledService->setSchedules(d, a, false /* non interpolated */);
+			_scheduledService->setDataSchedules(d, a);
 		}
 		jp.addService(*_scheduledService, true);
 		_scheduledService->setActive(day_clock::local_day());

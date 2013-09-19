@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	a.push_back(time_duration(3, 10, 0));
 	d.push_back(time_duration(3, 10, 0));
 
-	s.setSchedules(d, a, true);
+	s.setDataSchedules(d, a);
 	s.setActive(today);
 
 	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, false));
@@ -418,7 +418,7 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 	a.push_back(time_duration(3, 10, 0));
 	d.push_back(time_duration(3, 10, 0));
 
-	s.setSchedules(d, a, true);
+	s.setDataSchedules(d, a);
 	// Apply a RealTime shift
 	s.applyRealTimeShiftDuration(0, time_duration(0, 10, 0), time_duration(0, 10, 0), true);
 	s.setActive(today);
@@ -564,7 +564,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	a.push_back(time_duration(3, 10, 0));
 	d.push_back(time_duration(3, 10, 0));
 
-	s.setSchedules(d, a, true);
+	s.setDataSchedules(d, a);
 	s.setActive(today);
 
 	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, false));
