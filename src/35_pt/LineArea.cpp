@@ -27,6 +27,7 @@
 #include "JourneyPattern.hpp"
 #include "LineStopTableSync.h"
 #include "StopArea.hpp"
+#include "StopPoint.hpp"
 
 #include <boost/foreach.hpp>
 #include <geos/geom/LineString.h>
@@ -82,6 +83,17 @@ namespace synthese
 							this
 					)	);
 					_generatedLineStops.push_back(generatedLineStop);
+
+					
+					// Links from stop to the linestop
+					if(isForArrival)
+					{
+						const_cast<StopPoint*>(stopPoint.second)->addArrivalEdge(generatedLineStop.get());
+					}
+					else
+					{
+						const_cast<StopPoint*>(stopPoint.second)->addDepartureEdge(generatedLineStop.get());
+					}
 				}
 			}
 		}

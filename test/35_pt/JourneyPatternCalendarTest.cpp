@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(8, 0, 0));
 		schedules.push_back(time_duration(9, 0, 0));
-		s.setSchedules(schedules, schedules, true);
+		s.setDataSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(8, 0, 0));
 		schedules.push_back(time_duration(25, 0, 0));
-		s.setSchedules(schedules, schedules, true);
+		s.setDataSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(26, 0, 0));
 		schedules.push_back(time_duration(32, 0, 0));
-		s.setSchedules(schedules, schedules, true);
+		s.setDataSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(26, 0, 0));
 		schedules.push_back(time_duration(49, 0, 0));
-		s.setSchedules(schedules, schedules, true);
+		s.setDataSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);

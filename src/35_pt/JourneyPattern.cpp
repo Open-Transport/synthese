@@ -225,7 +225,7 @@ namespace synthese
 
 			/// Test of the respect of the line theory
 			/// If OK call the normal Path service insertion
-			if (!ensureLineTheory || respectsLineTheory(false, service))
+			if (!ensureLineTheory || respectsLineTheory(service))
 			{
 				Path::addService(service, ensureLineTheory);
 				return;
@@ -250,26 +250,31 @@ namespace synthese
 
 
 		bool JourneyPattern::respectsLineTheory(
-			bool RTData,
 			const Service& service
 		) const {
 			ServiceSet::const_iterator last_it;
 			ServiceSet::const_iterator it;
 			for(it = _services.begin();
-				it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(RTData, 0) < service.getDepartureEndScheduleToIndex(RTData, 0);
+				it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(false, 0) < service.getDepartureEndScheduleToIndex(false, 0);
 				last_it = it++);
 
 			// Same departure time is forbidden
-			if (it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(RTData, 0) == service.getDepartureEndScheduleToIndex(RTData, 0))
+			if (it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(false, 0) == service.getDepartureEndScheduleToIndex(false, 0))
+			{
 				return false;
+			}
 
 			// Check of the next service if existing
-			if (it != _services.end() && !(*it)->respectsLineTheoryWith(RTData, service))
+			if (it != _services.end() && !(*it)->respectsLineTheoryWith(service))
+			{
 				return false;
+			}
 
 			// Check of the previous service if existing
-			if (it != _services.begin() && !(*last_it)->respectsLineTheoryWith(RTData, service))
+			if (it != _services.begin() && !(*last_it)->respectsLineTheoryWith(service))
+			{
 				return false;
+			}
 
 			return true;
 		}
@@ -908,5 +913,25 @@ namespace synthese
 			{
 				const_cast<CommercialLine*>(getCommercialLine())->addPath(this);
 			}
+		}
+
+
+
+		size_t JourneyPattern::getRankInDefinedSchedulesVector( size_t rank ) const
+		{
+			size_t result(0);
+			size_t i(1);
+			for(; i<=rank && i<_edges.size(); ++i)
+			{
+				if(	static_cast<LineStop*>(_edges[i])->getScheduleInput())
+				{
+					++result;
+				}
+			}
+			if(i == _edges.size())
+			{
+				Log::GetInstance().warn("Bad schedules size in journey pattern "+ lexical_cast<string>(getKey()));
+			}
+			return result;
 		}
 }	}

@@ -357,12 +357,12 @@ namespace synthese
 
 			if(getLine())
 			{
-				// Line update
-				getLine()->addEdge(*this);
-
 				// Sublines update
 				if(dls)
 				{
+					// Line update
+					getLine()->addEdge(*this);
+
 					BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
 					{
 						DesignatedLinePhysicalStop* newEdge(
@@ -438,6 +438,9 @@ namespace synthese
 				{
 					la->addAllStops(true);
 				}
+
+				// Line update
+				getLine()->addEdge(*this);
 			}
 		}
 }	}

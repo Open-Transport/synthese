@@ -118,8 +118,6 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 
-				virtual SubObjects getSubObjects() const;
-
 				virtual LinkedObjectsIds getLinkedObjectsIds(
 					const Record& record
 				) const;

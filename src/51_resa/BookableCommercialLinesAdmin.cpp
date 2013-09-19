@@ -122,7 +122,7 @@ namespace synthese
 				stream << t.row();
 				stream << t.col(1, line->getStyle()) << line->getShortName();
 				stream << t.col() << line->getName();
-				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "chart_line.png");
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/chart_line.png");
 			}
 			stream << t.close();
 

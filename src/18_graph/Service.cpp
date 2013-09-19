@@ -132,64 +132,6 @@ namespace synthese
 
 
 
-		bool Service::respectsLineTheoryWith(
-			bool RTData,
-			const Service& other
-		) const {
-			assert (_path != NULL);
-
-			// Loop on each stop
-			bool timeOrder;
-			bool orderDefined(false);
-			const Path::Edges& edges(_path->getEdges());
-			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
-			{
-				const size_t i((*it)->getRankInPath());
-
-				if ((*it)->isDeparture())
-				{
-					/// - Test 1 : Conflict between continuous service range or identical schedule
-					if (getDepartureBeginScheduleToIndex(RTData, i) <= other.getDepartureEndScheduleToIndex(RTData, i) && getDepartureEndScheduleToIndex(RTData, i) >= other.getDepartureBeginScheduleToIndex(RTData, i))
-						return false;
-
-					/// - Test 2 : Order of times
-					if (!orderDefined)
-					{
-						timeOrder = (getDepartureBeginScheduleToIndex(RTData, i) < other.getDepartureBeginScheduleToIndex(RTData, i));
-						orderDefined = true;
-					}
-					else
-					{
-						if ((getDepartureBeginScheduleToIndex(RTData, i) < other.getDepartureBeginScheduleToIndex(RTData, i)) != timeOrder)
-							return false;
-					}
-				}
-				if ((*it)->isArrival())
-				{
-					/// - Test 1 : Conflict between continuous service range or identical schedule
-					if (getArrivalBeginScheduleToIndex(RTData, i) <= other.getArrivalEndScheduleToIndex(RTData, i) && getArrivalEndScheduleToIndex(RTData, i) >= other.getArrivalBeginScheduleToIndex(RTData, i))
-						return false;
-
-					/// - Test 2 : Order of times
-					if (!orderDefined)
-					{
-						timeOrder = (getArrivalBeginScheduleToIndex(RTData, i) < other.getArrivalBeginScheduleToIndex(RTData, i));
-						orderDefined = true;
-					}
-					else
-					{
-						if ((getArrivalBeginScheduleToIndex(RTData, i) < other.getArrivalBeginScheduleToIndex(RTData, i)) != timeOrder)
-							return false;
-					}
-				}
-			}
-
-			// No failure : return OK
-			return true;
-		}
-
-
-
 		bool Service::nonConcurrencyRuleOK(
 			ptime &time,
 			time_duration &range,

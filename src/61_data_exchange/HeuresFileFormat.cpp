@@ -683,7 +683,7 @@ namespace synthese
 								SchedulesBasedService::Schedules departureSchedules;
 								departureSchedules.push_back(departureSchedule);
 								departureSchedules.push_back(arrivalSchedule);
-								deadRun->setSchedules(arrivalSchedules, departureSchedules, false);
+								deadRun->setDataSchedules(arrivalSchedules, departureSchedules);
 
 								// Registration
 								_env.getEditableRegistry<DeadRun>().add(boost::shared_ptr<DeadRun>(deadRun));

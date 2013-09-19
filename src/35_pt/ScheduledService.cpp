@@ -105,7 +105,7 @@ namespace synthese
 			}
 
 			// Check Theoretical and Real Time validity
-			if(!THData && RTData && !_hasRealTimeData)
+			if(!THData && RTData && !hasRealTimeData())
 			{
 				return ServicePointer();
 			}
@@ -114,14 +114,14 @@ namespace synthese
 			size_t edgeIndex(edge.getRankInPath());
 
 			// Check of real time vertex
-			if(	RTData && !allowCanceled && !_RTVertices[edgeIndex])
+			if(	RTData && !allowCanceled && edgeIndex < _RTVertices.size() && !_RTVertices[edgeIndex])
 			{
 				return ServicePointer();
 			}
 
 			// Actual time
-			const time_duration& thSchedule(getDeparture ? _departureSchedules[edgeIndex] : _arrivalSchedules[edgeIndex]);
-			const time_duration& rtSchedule(getDeparture ? _RTDepartureSchedules[edgeIndex] : _RTArrivalSchedules[edgeIndex]);
+			const time_duration& thSchedule(getDeparture ? getDepartureSchedule(false, edgeIndex) : getArrivalSchedule(false, edgeIndex));
+			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
 			if(	(getDeparture && presenceDateTime.time_of_day() > timeOfDay) ||
@@ -131,7 +131,7 @@ namespace synthese
 			}
 
 			// Initializations
-			const time_duration& departureSchedule(RTData ? _RTDepartureSchedules[0] : _departureSchedules[0]);
+			const time_duration& departureSchedule(getDepartureSchedule(RTData, 0));
 			ptime actualTime(presenceDateTime.date(), timeOfDay);
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
@@ -152,7 +152,7 @@ namespace synthese
 
 			if(getDeparture)
 			{
-				if(RTData && !_RTVertices[edgeIndex])
+				if(RTData && edgeIndex < _RTVertices.size() && !_RTVertices[edgeIndex])
 				{
 					ptr.setDepartureInformations(
 						edge,
@@ -166,13 +166,13 @@ namespace synthese
 						edge,
 						actualTime,
 						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
-						*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
 			}
 			else
 			{
-				if(RTData && !_RTVertices[edgeIndex])
+				if(RTData && edgeIndex < _RTVertices.size() && !_RTVertices[edgeIndex])
 				{
 					ptr.setArrivalInformations(
 						edge,
@@ -186,7 +186,7 @@ namespace synthese
 						edge,
 						actualTime,
 						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
-						*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
 			}
@@ -224,7 +224,7 @@ namespace synthese
 					servicePointer.getOriginDateTime() +
 						(getArrivalSchedules(true, false)[edgeIndex] -
 						 getDepartureSchedule(servicePointer.getRTData(), 0)),
-					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
+					*((servicePointer.getRTData() && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
 			else
@@ -239,7 +239,7 @@ namespace synthese
 					servicePointer.getOriginDateTime() +
 						(getDepartureSchedules(true, false)[edgeIndex] -
 						 getDepartureSchedule(servicePointer.getRTData(), 0)),
-					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
+					*((servicePointer.getRTData() && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
 		}
@@ -248,11 +248,19 @@ namespace synthese
 
 		time_duration ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			if(rankInPath == 0 && !RTData)
+			{
+				return getDataDepartureSchedules()[0];
+			}
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
 		time_duration ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			if(rankInPath == 0 && !RTData)
+			{
+				return getDataDepartureSchedules()[0];
+			}
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
@@ -378,10 +386,10 @@ namespace synthese
 			for(edge = edge->getFollowingArrivalForFineSteppingOnly(); edge; edge = edge->getFollowingArrivalForFineSteppingOnly())
 			{
 				ptime arrivalTime(
-					originPtr.getOriginDateTime() + (getArrivalSchedules(true, false)[edge->getRankInPath()] - _departureSchedules[0])
+					originPtr.getOriginDateTime() + (getArrivalSchedule(true, edge->getRankInPath()) - getArrivalSchedule(true, 0))
 				);
 
-				if(RTdata && !_RTVertices[edge->getRankInPath()])
+				if(RTdata && edge->getRankInPath() < _RTVertices.size() && !_RTVertices[edge->getRankInPath()])
 				{
 					continue;
 				}
@@ -392,9 +400,9 @@ namespace synthese
 					ServicePointer result(true, RTdata, accessParameters.getUserClassRank(), *this, originPtr.getOriginDateTime());
 					result.setDepartureInformations(
 						*edge,
-						originPtr.getOriginDateTime() + (_RTDepartureSchedules[edge->getRankInPath()] - _departureSchedules[0]),
-						originPtr.getOriginDateTime() + (_departureSchedules[edge->getRankInPath()] - _departureSchedules[0]),
-						*(RTdata ? _RTVertices[edge->getRankInPath()] : edge->getFromVertex())
+						originPtr.getOriginDateTime() + (getDepartureSchedule(true, edge->getRankInPath()) - getDepartureSchedule(false, 0)),
+						originPtr.getOriginDateTime() + (getDepartureSchedule(false, edge->getRankInPath()) - getDepartureSchedule(false, 0)),
+						*((RTdata && edge->getRankInPath() < _RTVertices.size()) ? _RTVertices[edge->getRankInPath()] : edge->getFromVertex())
 					);
 					return result;
 				}
@@ -598,25 +606,17 @@ namespace synthese
 			{
 				try
 				{
-					_rawSchedule = record.get<string>(ScheduledServiceTableSync::COL_SCHEDULES);
+					string rawSchedule(
+						record.get<string>(ScheduledServiceTableSync::COL_SCHEDULES)
+					);
 					SchedulesBasedService::SchedulesPair value(
 						SchedulesBasedService::DecodeSchedules(
-							_rawSchedule
+							rawSchedule
 					)	);
 					if( !comparePlannedSchedules(value.first, value.second)
 					){
-						setSchedules(
-							value.first,
-							value.second,
-							true
-						);
-						if(	getPath() &&
-							(	getPath()->getEdges().size() != _departureSchedules.size() ||
-								getPath()->getEdges().size() != _arrivalSchedules.size()
-						)	){
-							throw Exception("Inconsistent schedules size : different from path edges number");
-						}
 						result = true;
+						setDataSchedules(value.first, value.second);
 					}
 				}
 				catch(SchedulesBasedService::BadSchedulesException&)

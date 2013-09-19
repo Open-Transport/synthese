@@ -21,7 +21,9 @@
 */
 
 #include "CalendarTemplateElement.h"
-#include "CalendarTemplate.h"
+
+#include "CalendarTemplateElementTableSync.h"
+#include "CalendarTemplateTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -29,6 +31,7 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 
 	namespace util
@@ -219,6 +222,223 @@ namespace synthese
 			else
 			{
 				return _maxDate;
+			}
+		}
+
+
+
+		void CalendarTemplateElement::toParametersMap( util::ParametersMap& map, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
+		{
+			map.insert(TABLE_COL_ID, getKey());
+			map.insert(
+				CalendarTemplateElementTableSync::COL_CALENDAR_ID,
+				getCalendar() ? getCalendar()->getKey() : RegistryKeyType(0)
+			);
+			map.insert(
+				CalendarTemplateElementTableSync::COL_RANK,
+				getRank()
+			);
+			map.insert(
+				CalendarTemplateElementTableSync::COL_MIN_DATE,
+				getMinDate().is_special() ? string() : to_iso_extended_string(getMinDate())
+			);
+			map.insert(
+				CalendarTemplateElementTableSync::COL_MAX_DATE,
+				getMaxDate().is_special() ? string() : to_iso_extended_string(getMaxDate())
+			);
+			map.insert(
+				CalendarTemplateElementTableSync::COL_INTERVAL,
+				boost::lexical_cast<std::string>(static_cast<int>(getStep().days()))
+			);
+			map.insert(
+				CalendarTemplateElementTableSync::COL_POSITIVE,
+				static_cast<int>(getOperation())
+			);
+			map.insert(
+				CalendarTemplateElementTableSync::COL_INCLUDE_ID,
+				getInclude() ? getInclude()->getKey() : RegistryKeyType(0)
+			);
+		}
+
+
+
+		bool CalendarTemplateElement::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			if(record.isDefined(TABLE_COL_ID))
+			{
+				RegistryKeyType value(record.getDefault<RegistryKeyType>(TABLE_COL_ID, 0));
+				if(value != getKey())
+				{
+					result = true;
+					setKey(value);
+				}
+			}
+
+			// Rank
+			if(record.isDefined(CalendarTemplateElementTableSync::COL_RANK))
+			{
+				size_t value(
+					record.getDefault<size_t>(CalendarTemplateElementTableSync::COL_RANK, 0)
+				);
+				if(value != getRank())
+				{
+					result = true;
+					setRank(value);
+				}
+			}
+
+			// Min date
+			if(record.isDefined(CalendarTemplateElementTableSync::COL_MIN_DATE))
+			{
+				date value(neg_infin);
+				if(!record.get<string>(CalendarTemplateElementTableSync::COL_MIN_DATE).empty())
+				{
+					try
+					{
+						value = from_string(record.get<string>(CalendarTemplateElementTableSync::COL_MIN_DATE));
+					}
+					catch(...)
+					{
+					}
+				}
+				if(value != getMinDate())
+				{
+					result = true;
+					setMinDate(value);
+				}
+			}
+
+			// Max date
+			if(record.isDefined(CalendarTemplateElementTableSync::COL_MAX_DATE))
+			{
+				date value(pos_infin);
+				if(!record.get<string>(CalendarTemplateElementTableSync::COL_MAX_DATE).empty())
+				{
+					try
+					{
+						value = from_string(record.get<string>(CalendarTemplateElementTableSync::COL_MAX_DATE));
+					}
+					catch(...)
+					{
+					}
+				}
+				if(value != getMaxDate())
+				{
+					result = true;
+					setMaxDate(value);
+				}
+			}
+
+			// Days modulo
+			if(record.isDefined(CalendarTemplateElementTableSync::COL_INTERVAL))
+			{
+				days value(
+					record.getDefault<long>(CalendarTemplateElementTableSync::COL_INTERVAL, 0)
+				);
+				if(value != getStep())
+				{
+					result = true;
+					setStep(value);
+				}
+			}
+
+			// Operation
+			if(record.isDefined(CalendarTemplateElementTableSync::COL_POSITIVE))
+			{
+				Operation value(
+					static_cast<Operation>(
+						record.getDefault<int>(CalendarTemplateElementTableSync::COL_POSITIVE, 0)
+				)	);
+				if(value != getOperation())
+				{
+					result = true;
+					setOperation(value);
+				}
+			}
+
+			// Included calendar
+//			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				if(record.isDefined(CalendarTemplateElementTableSync::COL_INCLUDE_ID))
+				{
+					CalendarTemplate* value(NULL);
+					RegistryKeyType iid(
+						record.getDefault<RegistryKeyType>(
+							CalendarTemplateElementTableSync::COL_INCLUDE_ID,
+							0
+					)	);
+					if(iid > 0)	try
+					{
+						value = CalendarTemplateTableSync::GetEditable(iid, env).get();
+					}
+					catch (ObjectNotFoundException<CalendarTemplate> e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_INCLUDE_ID, e);
+					}
+					if(value != getInclude())
+					{
+						result = true;
+						setInclude(value);
+					}
+				}
+			}
+
+			// Link with calendar template
+//			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				if(record.isDefined(CalendarTemplateElementTableSync::COL_CALENDAR_ID))
+				{
+					CalendarTemplate* value(NULL);
+					RegistryKeyType id(
+						record.getDefault<RegistryKeyType>(
+							CalendarTemplateElementTableSync::COL_CALENDAR_ID,
+							0
+					)	);
+					if(id > 0) try
+					{
+						value = CalendarTemplateTableSync::GetEditable(id, env).get();
+					}
+					catch (ObjectNotFoundException<CalendarTemplate> e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + CalendarTemplateElementTableSync::TABLE.NAME + "/" + CalendarTemplateElementTableSync::COL_CALENDAR_ID, e);
+					}
+					if(value != getCalendar())
+					{
+						result = true;
+						setCalendar(value);
+					}
+				}
+			}
+
+			return result;
+		}
+
+
+
+		void CalendarTemplateElement::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(getCalendar())
+			{
+				const_cast<CalendarTemplate*>(getCalendar())->addElement(*this);
+			}
+		}
+
+
+
+		synthese::LinkedObjectsIds CalendarTemplateElement::getLinkedObjectsIds( const Record& record ) const
+		{
+			return LinkedObjectsIds();
+		}
+
+
+
+		void CalendarTemplateElement::unlink()
+		{
+			if(getCalendar())
+			{
+				const_cast<CalendarTemplate*>(getCalendar())->removeElement(*this);
 			}
 		}
 }	}

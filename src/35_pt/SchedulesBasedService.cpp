@@ -73,10 +73,10 @@ namespace synthese
 
 		void SchedulesBasedService::_computeNextRTUpdate()
 		{
-			if(!_arrivalSchedules.empty())
+			if(!_dataArrivalSchedules.empty())
 			{
-				const time_duration& lastThSchedule(*(_arrivalSchedules.end() - 1));
-				const time_duration& lastRTSchedule(*(_RTArrivalSchedules.end() - 1));
+				const time_duration& lastThSchedule(*_dataArrivalSchedules.rbegin());
+				const time_duration& lastRTSchedule(*(_RTArrivalSchedules.empty() ? _dataArrivalSchedules.rbegin() : _RTArrivalSchedules.rbegin()));
 				const time_duration& lastSchedule = (lastThSchedule < lastRTSchedule) ? lastRTSchedule : lastThSchedule;
 
 				boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
@@ -90,103 +90,18 @@ namespace synthese
 
 
 
-		void SchedulesBasedService::setSchedules(
+		void SchedulesBasedService::setDataSchedules(
 			const Schedules& departureSchedules,
-			const Schedules& arrivalSchedules,
-			bool onlyScheduledEdges
+			const Schedules& arrivalSchedules
 		){
-			if(!_path)
+			_dataDepartureSchedules = departureSchedules;
+			_dataArrivalSchedules = arrivalSchedules;
+			
+			if(_path)
 			{
-				throw BadSchedulesException();
+				_path->markScheduleIndexesUpdateNeeded(false);
 			}
-
-			if(onlyScheduledEdges)
-			{
-				_departureSchedules.clear();
-				_arrivalSchedules.clear();
-				Schedules::const_iterator itDeparture(departureSchedules.begin());
-				Schedules::const_iterator itArrival(arrivalSchedules.begin());
-				Path::Edges::const_iterator lastScheduledEdge(_path->getEdges().end());
-				bool atLeastOneUnscheduledEdge(false);
-				for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
-				{
-					const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-					if(	!lineStop || lineStop->getScheduleInput())
-					{
-						const Edge& edge(**itEdge);
-
-						// Interpolation of preceding schedules
-						if(atLeastOneUnscheduledEdge)
-						{
-							if(lastScheduledEdge == _path->getEdges().end())
-							{
-								throw PathBeginsWithUnscheduledStopException(*_path);
-							}
-
-							MetricOffset totalDistance(edge.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
-							size_t totalRankDiff(edge.getRankInPath() - (*lastScheduledEdge)->getRankInPath());
-							time_duration originDepartureSchedule(*_departureSchedules.rbegin());
-							time_duration totalTime(*itArrival - originDepartureSchedule);
-							for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
-							{
-								double minutesToAdd(0);
-								if(totalDistance != 0)
-								{
-									MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
-									minutesToAdd = (totalTime.total_seconds() / 60) * (distance / totalDistance);
-								}
-								else
-								{
-									assert(totalRankDiff);
-									size_t rankDiff((*it)->getRankInPath() - (*lastScheduledEdge)->getRankInPath());
-									minutesToAdd = (totalTime.total_seconds() / 60) * (double(rankDiff) / double(totalRankDiff));
-								}
-
-								time_duration departureSchedule(originDepartureSchedule);
-								time_duration arrivalSchedule(originDepartureSchedule);
-								departureSchedule += minutes(
-									static_cast<long>(floor(minutesToAdd))
-								);
-								arrivalSchedule += minutes(
-									static_cast<long>(ceil(minutesToAdd))
-								);
-
-								_departureSchedules.push_back(departureSchedule);
-								_arrivalSchedules.push_back(arrivalSchedule);
-							}
-						}
-
-						// Check
-						if(	itDeparture == departureSchedules.end() ||
-							itArrival == arrivalSchedules.end()
-						){
-							throw BadSchedulesException();
-						}
-
-						// Store the schedules
-						_departureSchedules.push_back(*itDeparture);
-						_arrivalSchedules.push_back(*itArrival);
-
-						// Store the last scheduled edge
-						lastScheduledEdge = itEdge;
-						atLeastOneUnscheduledEdge = false;
-
-						// Increment iterators
-						++itDeparture;
-						++itArrival;
-					}
-					else
-					{
-						atLeastOneUnscheduledEdge = true;
-					}
-			}	}
-			else
-			{
-				_departureSchedules = departureSchedules;
-				_arrivalSchedules = arrivalSchedules;
-			}
-
-			_path->markScheduleIndexesUpdateNeeded(false);
+			_clearGeneratedSchedules();
 			clearRTData();
 			_computeNextRTUpdate();
 		}
@@ -227,6 +142,10 @@ namespace synthese
 
 		boost::posix_time::time_duration SchedulesBasedService::getDepartureSchedule( bool RTData, std::size_t rank ) const
 		{
+			if(!RTData && rank == 0)
+			{
+				return *getDataDepartureSchedules().begin();
+			}
 			return getDepartureSchedules(true, RTData).at(rank);
 		}
 
@@ -252,33 +171,73 @@ namespace synthese
 
 		const boost::posix_time::time_duration& SchedulesBasedService::getLastArrivalSchedule( bool RTData ) const
 		{
-			Schedules::const_iterator it(getArrivalSchedules(true, RTData).end() - 1);
-			return *it;
+			if(!RTData)
+			{
+				return *getDataArrivalSchedules().rbegin();
+			}
+			return *getArrivalSchedules(true, RTData).rbegin();
 		}
 
 
 
 		const SchedulesBasedService::Schedules& SchedulesBasedService::getDepartureSchedules( bool THData, bool RTData ) const
 		{
-			if(RTData && _hasRealTimeData)
+			if(RTData && !_RTDepartureSchedules.empty())
 			{
 				return _RTDepartureSchedules;
 			}
 
-			return THData ? _departureSchedules : _emptySchedules;
+			if(THData)
+			{
+				recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+				if(_generatedDepartureSchedules.empty())
+				{
+					_generateSchedules();
+				}
+				return _generatedDepartureSchedules;
+			}
+
+			return _emptySchedules;
 		}
 
 
 
 		const SchedulesBasedService::Schedules& SchedulesBasedService::getArrivalSchedules( bool THData, bool RTData ) const
 		{
-			if(RTData && _hasRealTimeData)
+			if(RTData && !_RTArrivalSchedules.empty())
 			{
 				return _RTArrivalSchedules;
 			}
 
-			return THData ? _arrivalSchedules : _emptySchedules;
+			if(THData)
+			{
+				recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+				if(_generatedArrivalSchedules.empty())
+				{
+					_generateSchedules();
+				}
+				return _generatedArrivalSchedules;
+			}
+
+			return _emptySchedules;
 		}
+
+
+
+		void SchedulesBasedService::_initRTSchedulesFromPlanned()
+		{
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			if(_generatedArrivalSchedules.empty())
+			{
+				_generateSchedules();
+			}
+			if(_RTArrivalSchedules.empty())
+			{
+				_RTDepartureSchedules = _generatedDepartureSchedules;
+				_RTArrivalSchedules = _generatedArrivalSchedules;
+			}
+		}
+
 
 
 		void SchedulesBasedService::_applyRealTimeShiftDuration( 
@@ -286,9 +245,10 @@ namespace synthese
 			boost::posix_time::time_duration arrivalShift,
 			boost::posix_time::time_duration departureShift,
 			bool updateFollowingSchedules
-		)
-		{
-			_hasRealTimeData = true;
+		){
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			_initRTSchedulesFromPlanned();
+
 			// TODO Use a constant or a param for the accepted delay
 			if(!_RTTimestamps[rank].is_not_a_date_time() &&
 				_RTTimestamps[rank] > second_clock::local_time() - boost::posix_time::minutes(5))
@@ -301,19 +261,19 @@ namespace synthese
 
 			// Arrival shift
 			{
-				time_duration schedule(_arrivalSchedules[rank]);
+				time_duration schedule(_generatedArrivalSchedules[rank]);
 				schedule += arrivalShift;
 				_RTArrivalSchedules[rank] = schedule;
 			}
 
 			// Departure shift
 			{
-				time_duration schedule(_departureSchedules[rank]);
+				time_duration schedule(_generatedDepartureSchedules[rank]);
 				schedule += departureShift;
 				_RTDepartureSchedules[rank] = schedule;
 			}
 
-			if(updateFollowingSchedules && rank + 1 < _arrivalSchedules.size())
+			if(updateFollowingSchedules && rank + 1 < _generatedArrivalSchedules.size())
 			{
 				_applyRealTimeShiftDuration(
 					rank + 1,
@@ -322,7 +282,7 @@ namespace synthese
 					true
 				);
 			}
-			if(rank + 1 == _arrivalSchedules.size())
+			if(rank + 1 == _generatedArrivalSchedules.size())
 			{
 				_computeNextRTUpdate();
 			}
@@ -336,8 +296,9 @@ namespace synthese
 			boost::posix_time::time_duration departureShift,
 			bool updateFollowingSchedules,
 			bool recordTimeStamp
-		)
-		{
+		){
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+
 			// Clear the time stamp in all cases
 			// If we had a timestamp here, we assume that the
 			// new update should be processed so we clear it.
@@ -371,17 +332,20 @@ namespace synthese
 			}
 		}
 
+
+
 		void SchedulesBasedService::clearRTData()
 		{
-			_hasRealTimeData = false;
-			_RTDepartureSchedules = _departureSchedules;
-			_RTArrivalSchedules = _arrivalSchedules;
-			// Assuming arrival and departure schedules have the same size
-			_RTTimestamps.assign(_departureSchedules.size(), boost::posix_time::ptime());
-			_emptySchedules.assign(_departureSchedules.size(), not_a_date_time);
-
+			// Real time schedules
+			{
+				recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+				_RTArrivalSchedules.clear();
+				_RTDepartureSchedules.clear();
+			}
+		
 			if(getPath())
 			{
+				_RTTimestamps.assign(getPath()->getEdges().size(), boost::posix_time::ptime());
 				_RTVertices.clear();
 				size_t i(0);
 				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
@@ -445,27 +409,13 @@ namespace synthese
 			boost::posix_time::time_duration shiftArrivals
 		) const {
 			stringstream str;
-			size_t i(0);
-			BOOST_FOREACH(const Edge* edge, _path->getEdges())
+			for(size_t i(0); i<_dataArrivalSchedules.size() && i<_dataDepartureSchedules.size(); ++i)
 			{
-				if(	dynamic_cast<const LineStop*>(edge) &&
-					!static_cast<const LineStop*>(edge)->getScheduleInput()
-				){
-					++i;
-					continue;
-				}
-				// Avoid corrupted data
-				if(	i >= _arrivalSchedules.size() ||
-					i >= _departureSchedules.size()
-				){
-					break;
-				}
-				if(i)
+				if(i>0)
 				{
 					str << ",";
 				}
-				str << EncodeSchedule(_arrivalSchedules[i] + shiftArrivals) << "#" << EncodeSchedule(_departureSchedules[i]);
-				++i;
+				str << EncodeSchedule(_dataArrivalSchedules[i] + shiftArrivals) << "#" << EncodeSchedule(_dataDepartureSchedules[i]);
 			}
 			return str.str();
 		}
@@ -542,15 +492,22 @@ namespace synthese
 			Schedules departureSchedules;
 			Schedules arrivalSchedules;
 
-			for(size_t i(0); i<other._departureSchedules.size(); ++i)
+			for(size_t i(0); i<other._dataDepartureSchedules.size() && i<other._dataArrivalSchedules.size(); ++i)
 			{
-				departureSchedules.push_back(other._departureSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._departureSchedules[i] + shift));
-				arrivalSchedules.push_back(other._arrivalSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._arrivalSchedules[i] + shift));
+				departureSchedules.push_back(
+					other._dataDepartureSchedules[i].is_not_a_date_time() ?
+					not_a_date_time :
+					(other._dataDepartureSchedules[i] + shift)
+				);
+				arrivalSchedules.push_back(
+					other._dataArrivalSchedules[i].is_not_a_date_time() ?
+					not_a_date_time :
+					(other._dataArrivalSchedules[i] + shift)
+				);
 			}
-			setSchedules(
+			setDataSchedules(
 				departureSchedules,
-				arrivalSchedules,
-				false
+				arrivalSchedules
 			);
 		}
 
@@ -559,17 +516,21 @@ namespace synthese
 		void SchedulesBasedService::generateIncrementalSchedules(
 			time_duration firstSchedule
 		){
+			if(!_path)
+			{
+				return;
+			}
 
 			Schedules departureSchedules;
 			Schedules arrivalSchedules;
 
-			departureSchedules.assign(_path->getEdges().size(), firstSchedule);
-			arrivalSchedules.assign(_path->getEdges().size(), firstSchedule);
+			size_t numberOfSchedules(static_cast<JourneyPattern*>(_path)->getScheduledStopsNumber());
+			departureSchedules.assign(numberOfSchedules, firstSchedule);
+			arrivalSchedules.assign(numberOfSchedules, firstSchedule);
 
-			setSchedules(
+			setDataSchedules(
 				departureSchedules,
-				arrivalSchedules,
-				false
+				arrivalSchedules
 			);
 		}
 
@@ -577,35 +538,8 @@ namespace synthese
 
 		bool SchedulesBasedService::comparePlannedSchedules( const Schedules& departure, const Schedules& arrival ) const
 		{
-			size_t i(0);
-			Schedules::const_iterator itd(departure.begin());
-			Schedules::const_iterator ita(arrival.begin());
-			BOOST_FOREACH(const Edge* edge, _path->getEdges())
-			{
-				// Detect inconsistent sizes
-				if( i >= _departureSchedules.size() ||
-					i >= _arrivalSchedules.size() ||
-					itd == departure.end() ||
-					ita == arrival.end()
-				){
-					return false;
-				}
-
-				if(!static_cast<const LineStop*>(edge)->getScheduleInput())
-				{
-					++i;
-					continue;
-				}
-				if(	_departureSchedules[i] != *itd ||
-					_arrivalSchedules[i] != *ita
-				){
-					return false;
-				}
-				++i;
-				++itd;
-				++ita;
-			}
-			return true;
+			return	(_dataDepartureSchedules == departure) &&
+					(_dataArrivalSchedules == arrival);
 		}
 
 
@@ -618,11 +552,14 @@ namespace synthese
 
 			Path::Edges edges(_path->getAllEdges());
 
+			const Schedules& departureSchedules(getDepartureSchedules(true, false));
+			const Schedules& arrivalSchedules(getArrivalSchedules(true, false));
+
 			BOOST_FOREACH(Edge* edge, edges)
 			{
 				if(	edge->getFromVertex()->getHub() == stopPoint.getHub() &&
-					(	(departure && edge->isDepartureAllowed() && schedule == _departureSchedules[edge->getRankInPath()] - _departureSchedules[0]) ||
-						(!departure && edge->isArrivalAllowed() && schedule == _arrivalSchedules[edge->getRankInPath()] - _departureSchedules[0])
+					(	(departure && edge->isDepartureAllowed() && schedule == departureSchedules[edge->getRankInPath()] - departureSchedules[0]) ||
+						(!departure && edge->isArrivalAllowed() && schedule == arrivalSchedules[edge->getRankInPath()] - departureSchedules[0])
 				)	){
 					return edge;
 				}
@@ -637,6 +574,9 @@ namespace synthese
 			boost::posix_time::time_duration departureSchedule,
 			boost::posix_time::time_duration arrivalSchedule
 		){
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			_initRTSchedulesFromPlanned();
+
 			if(!departureSchedule.is_not_a_date_time())
 			{
 				_RTDepartureSchedules[rank] = departureSchedule;
@@ -644,13 +584,12 @@ namespace synthese
 			if(!arrivalSchedule.is_not_a_date_time())
 			{
 				_RTArrivalSchedules[rank] = arrivalSchedule;
-				if(rank + 1 == _arrivalSchedules.size())
+				if(rank + 1 == _RTArrivalSchedules.size())
 				{
 					_computeNextRTUpdate();
 				}
 			}
 			_path->markScheduleIndexesUpdateNeeded(true);
-			_hasRealTimeData = true;
 
 
 			// Inter-SYNTHESE sync
@@ -674,11 +613,11 @@ namespace synthese
 			const Schedules& departureSchedules, 
 			const Schedules& arrivalSchedules
 		){
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
 			_RTDepartureSchedules = departureSchedules;
 			_RTArrivalSchedules = arrivalSchedules;
 			_computeNextRTUpdate();
 			_path->markScheduleIndexesUpdateNeeded(true);
-			_hasRealTimeData = true;
 
 
 			// Inter-SYNTHESE sync
@@ -712,8 +651,10 @@ namespace synthese
 		void SchedulesBasedService::setPath( Path* path )
 		{
 			NonPermanentService::setPath(path);
+			_clearGeneratedSchedules();
 			clearStops();
 			clearRTData();
+			_emptySchedules.assign(getPath()->getEdges().size(), not_a_date_time);
 		}
 
 
@@ -894,6 +835,8 @@ namespace synthese
 			}
 		}
 
+
+
 		/**
 		 * @brief SchedulesBasedService::isInTimeRange checks if the given time is
 		 * within one of the ranges in excludesRanges
@@ -913,12 +856,12 @@ namespace synthese
 				{
 					if(period.end() > time + range)
 					{
-						// The unallowed slot goes after the whole range: not allowed
+						// The forbidden slot goes after the whole range: not allowed
 						return true;
 					}
 					else
 					{
-						// Shift after the unallowed time slot
+						// Shift after the forbidden time slot
 						ptime newTime = period.end();
 						ptime ptEnd(time); ptEnd += range;
 						range = ptEnd - newTime;
@@ -935,6 +878,8 @@ namespace synthese
 			}
 			return false;
 		}
+
+
 
 		bool SchedulesBasedService::nonConcurrencyRuleOK(
 			ptime& time,
@@ -1061,7 +1006,7 @@ namespace synthese
 
 										if ( isContinuous() )
 										{
-											// There maybe some more non concurent services to record
+											// There maybe some more non concurrent services to record
 											break;
 										} else
 										{
@@ -1098,11 +1043,251 @@ namespace synthese
 		}
 
 
+
 		void SchedulesBasedService::clearNonConcurrencyCache() const
 		{
 			recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
 			_nonConcurrencyCache.clear();
 		}
+
+
+
+		void SchedulesBasedService::_clearGeneratedSchedules() const
+		{
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			_generatedArrivalSchedules.clear();
+			_generatedDepartureSchedules.clear();
+		}
+
+
+
+		void SchedulesBasedService::_generateSchedules() const
+		{
+			// Lock the cache
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+
+			// Clear existing data
+			_generatedArrivalSchedules.clear();
+			_generatedDepartureSchedules.clear();
+
+			// The generation loop
+			Schedules::const_iterator itDeparture(_dataDepartureSchedules.begin());
+			Schedules::const_iterator itArrival(_dataArrivalSchedules.begin());
+			Path::Edges::const_iterator lastScheduledEdge(_path->getEdges().end());
+			bool atLeastOneUnscheduledEdge(false);
+			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
+			{
+				// In case of insufficient defined schedules number
+				if(	itArrival == _dataArrivalSchedules.end() ||
+					itDeparture == _dataDepartureSchedules.end() 
+				){
+					Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()));
+					time_duration departureSchedule(
+						_generatedDepartureSchedules.empty() ?
+						seconds(0) :
+						*_generatedDepartureSchedules.rbegin()
+					);
+					time_duration arrivalSchedule(
+						_generatedArrivalSchedules.empty() ?
+						seconds(0) :
+						*_generatedArrivalSchedules.rbegin()
+					);
+					for(;itEdge != _path->getEdges().end(); ++itEdge)
+					{
+						_generatedDepartureSchedules.push_back(departureSchedule);
+						_generatedArrivalSchedules.push_back(arrivalSchedule);
+					}
+					break;
+				}
+
+				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
+				if(	!lineStop || lineStop->getScheduleInput())
+				{
+					const Edge& edge(**itEdge);
+
+					// Interpolation of preceding schedules
+					if(atLeastOneUnscheduledEdge)
+					{
+						if(lastScheduledEdge == _path->getEdges().end())
+						{
+							throw PathBeginsWithUnscheduledStopException(*_path);
+						}
+
+						MetricOffset totalDistance(edge.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+						size_t totalRankDiff(edge.getRankInPath() - (*lastScheduledEdge)->getRankInPath());
+						time_duration originDepartureSchedule(*_generatedDepartureSchedules.rbegin());
+						time_duration totalTime(*itArrival - originDepartureSchedule);
+						for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
+						{
+							double minutesToAdd(0);
+							if(totalDistance != 0)
+							{
+								MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+								minutesToAdd = (totalTime.total_seconds() / 60) * (distance / totalDistance);
+							}
+							else
+							{
+								assert(totalRankDiff);
+								size_t rankDiff((*it)->getRankInPath() - (*lastScheduledEdge)->getRankInPath());
+								minutesToAdd = (totalTime.total_seconds() / 60) * (double(rankDiff) / double(totalRankDiff));
+							}
+
+							time_duration departureSchedule(originDepartureSchedule);
+							time_duration arrivalSchedule(originDepartureSchedule);
+							departureSchedule += minutes(
+								static_cast<long>(floor(minutesToAdd))
+							);
+							arrivalSchedule += minutes(
+								static_cast<long>(ceil(minutesToAdd))
+							);
+
+							_generatedDepartureSchedules.push_back(departureSchedule);
+							_generatedArrivalSchedules.push_back(arrivalSchedule);
+						}
+					}
+
+					// Check
+					if(	itDeparture == _dataDepartureSchedules.end() ||
+						itArrival == _dataArrivalSchedules.end()
+					){
+						throw BadSchedulesException();
+					}
+
+					// Store the schedules
+					_generatedDepartureSchedules.push_back(*itDeparture);
+					_generatedArrivalSchedules.push_back(*itArrival);
+
+					// Store the last scheduled edge
+					lastScheduledEdge = itEdge;
+					atLeastOneUnscheduledEdge = false;
+
+					// Increment iterators
+					++itDeparture;
+					++itArrival;
+				}
+				else
+				{
+					atLeastOneUnscheduledEdge = true;
+				}
+			}
+		}
+
+
+
+		bool SchedulesBasedService::hasRealTimeData() const
+		{
+			return !_RTArrivalSchedules.empty();
+		}
+
+
+
+		bool SchedulesBasedService::respectsLineTheoryWith( const Service& other ) const
+		{
+			if(!dynamic_cast<const SchedulesBasedService*>(&other))
+			{
+				return true;
+			}
+			const SchedulesBasedService& sother(static_cast<const SchedulesBasedService&>(other));
+			if(	_dataDepartureSchedules.size() != sother._dataDepartureSchedules.size() ||
+				_dataArrivalSchedules.size() != sother._dataArrivalSchedules.size() ||
+				_dataDepartureSchedules.size() != _dataArrivalSchedules.size()
+			){
+				Log::GetInstance().warn("Inconsistent schedules size in "+ lexical_cast<string>(getKey()));
+				return false;
+			}
+
+			// Loop on each stop
+			bool timeOrder;
+			bool orderDefined(false);
+			
+			size_t i(0);
+			const Path::Edges& edges(getPath()->getEdges());
+			for(Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
+			{
+				// Jump over stops with interpolated schedules
+				if(!static_cast<LineStop*>(*it)->getScheduleInput())
+				{
+					continue;
+				}
+
+				if((*it)->isDeparture())
+				{
+					/// - Test 1 : Conflict between continuous service range or identical schedule
+					if(	getDataFirstDepartureSchedule(i) <= sother.getDataLastDepartureSchedule(i) &&
+						getDataLastDepartureSchedule(i) >= sother.getDataLastDepartureSchedule(i)
+					){
+						return false;
+					}
+
+					/// - Test 2 : Order of times
+					if (!orderDefined)
+					{
+						timeOrder = (getDataFirstDepartureSchedule(i) < sother.getDataFirstDepartureSchedule(i));
+						orderDefined = true;
+					}
+					else
+					{
+						if ((getDataFirstDepartureSchedule(i) < sother.getDataFirstDepartureSchedule(i)) != timeOrder)
+						{
+							return false;
+						}
+					}
+				}
+				if ((*it)->isArrival())
+				{
+					/// - Test 1 : Conflict between continuous service range or identical schedule
+					if(	getDataFirstArrivalSchedule(i) <= sother.getDataLastArrivalSchedule(i) &&
+						getDataLastArrivalSchedule(i) >= sother.getDataFirstArrivalSchedule(i)
+					){
+						return false;
+					}
+
+					/// - Test 2 : Order of times
+					if (!orderDefined)
+					{
+						timeOrder = (getDataFirstArrivalSchedule(i) < sother.getDataFirstArrivalSchedule(i));
+						orderDefined = true;
+					}
+					else
+					{
+						if((getDataFirstArrivalSchedule(i) < sother.getDataFirstArrivalSchedule(i)) != timeOrder)
+						{
+							return false;
+						}
+					}
+				}
+				++i;
+			}
+
+			// No failure : return OK
+			return true;
+		}
+
+
+
+		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
+		{
+			assert(i < _dataDepartureSchedules.size());
+			return _dataDepartureSchedules.at(i);
+		}
+
+		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
+		{
+			assert(i < _dataArrivalSchedules.size());
+			return _dataArrivalSchedules.at(i);
+		}
+
+		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastDepartureSchedule( size_t i ) const
+		{
+			return getDataFirstDepartureSchedule(i);
+		}
+
+		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
+		{
+			return getDataFirstArrivalSchedule(i);
+		}
+
+
 
 		bool operator==(const SchedulesBasedService& first, const SchedulesBasedService& second)
 		{

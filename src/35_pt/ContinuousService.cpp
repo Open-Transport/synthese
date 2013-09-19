@@ -130,13 +130,13 @@ namespace synthese
 			}
 
 			// Check Theoretical and Real Time validity
-			if(!THData && RTData && !_hasRealTimeData)
+			if(!THData && RTData && !hasRealTimeData())
 			{
 				return ServicePointer();
 			}
 
 			// Check of real time vertex
-			if(	RTData && !_RTVertices[edge.getRankInPath()])
+			if(	RTData && edge.getRankInPath() < _RTVertices.size() && !_RTVertices[edge.getRankInPath()])
 			{
 				return ServicePointer();
 			}
@@ -148,7 +148,7 @@ namespace synthese
 
 			if (getDeparture)
 			{
-				schedule = (RTData ? _RTDepartureSchedules : _departureSchedules).at(edgeIndex);
+				schedule = getDepartureSchedule(RTData, edgeIndex);
 				time_duration endSchedule(schedule + _range);
 
 				if(	GetTimeOfDay(schedule) <= GetTimeOfDay(endSchedule)
@@ -197,7 +197,7 @@ namespace synthese
 			}
 			else
 			{
-				schedule = (RTData ? _RTArrivalSchedules : _arrivalSchedules).at(edgeIndex) + _maxWaitingTime;
+				schedule = getArrivalSchedule(RTData, edgeIndex) + _maxWaitingTime;
 				time_duration endSchedule(schedule + _range);
 				if (GetTimeOfDay(schedule) <= GetTimeOfDay(endSchedule))
 				{
@@ -212,8 +212,8 @@ namespace synthese
 				}
 				else
 				{
-					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule)
-						&& presenceDateTime.time_of_day() < GetTimeOfDay(schedule)
+					if(	presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule) &&
+						presenceDateTime.time_of_day() < GetTimeOfDay(schedule)
 					){
 						// If (reversed) waiting time > 2hours, we are before schedule and not after endSchedule
 						if(presenceDateTime.time_of_day() - GetTimeOfDay(endSchedule) > hours(2))
@@ -253,7 +253,7 @@ namespace synthese
 			}
 
 			// Origin departure time
-			const time_duration& departureSchedule(_departureSchedules.at(0));
+			const time_duration& departureSchedule(getDepartureSchedule(false, 0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
 			if(	(!getDeparture && !inverted) ||
 				(getDeparture && inverted)
@@ -316,25 +316,25 @@ namespace synthese
 			if(servicePointer.getArrivalEdge() == NULL)
 			{
 				time_duration schedule(
-					(servicePointer.getRTData() ? _RTArrivalSchedules : _arrivalSchedules).at(edgeIndex)
+					getArrivalSchedule(servicePointer.getRTData(), edgeIndex)
 				);
 				schedule += _maxWaitingTime;
 				servicePointer.setArrivalInformations(
 					edge,
 					servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
-					servicePointer.getOriginDateTime() + (_arrivalSchedules[edgeIndex] + _maxWaitingTime - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() + (getArrivalSchedule(false, edgeIndex) + _maxWaitingTime - getDepartureSchedule(servicePointer.getRTData(), 0)),
 					*edge.getFromVertex()
 				);
 			}
 			else
 			{
 				time_duration schedule(
-					(servicePointer.getRTData() ? _RTDepartureSchedules : _departureSchedules).at(edgeIndex)
+					getDepartureSchedule(servicePointer.getRTData(), edgeIndex)
 				);
 				servicePointer.setDepartureInformations(
 					edge,
 					servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
-					servicePointer.getOriginDateTime() + (_departureSchedules[edgeIndex] - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() + (getDepartureSchedule(false, edgeIndex) - getDepartureSchedule(servicePointer.getRTData(), 0)),
 					*edge.getFromVertex()
 				);
 			}
@@ -345,7 +345,11 @@ namespace synthese
 		time_duration ContinuousService::getDepartureBeginScheduleToIndex(
 			bool RTData, size_t rankInPath
 		) const	{
-			return _departureSchedules.at(rankInPath);
+			if(rankInPath == 0 && !RTData)
+			{
+				return getDataDepartureSchedules()[0];
+			}
+			return getDepartureSchedule(RTData, rankInPath);
 		}
 
 
@@ -354,7 +358,11 @@ namespace synthese
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
-			return _departureSchedules.at(rankInPath) + _range;
+			if(rankInPath == 0 && !RTData)
+			{
+				return getDataDepartureSchedules()[0] + _range;
+			}
+			return getDepartureSchedule(RTData, rankInPath) + _range;
 		}
 
 
@@ -363,7 +371,7 @@ namespace synthese
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
-			return _arrivalSchedules.at(rankInPath) + _maxWaitingTime;
+			return getArrivalSchedule(RTData, rankInPath) + _maxWaitingTime;
 		}
 
 
@@ -372,7 +380,7 @@ namespace synthese
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
-			return _arrivalSchedules.at(rankInPath) + _range + _maxWaitingTime;
+			return getArrivalSchedule(RTData, rankInPath) + _range + _maxWaitingTime;
 		}
 
 
@@ -571,27 +579,17 @@ namespace synthese
 			{
 				try
 				{
-					_rawSchedule = record.get<string>(ContinuousServiceTableSync::COL_SCHEDULES);
+					string rawSchedule = record.get<string>(ContinuousServiceTableSync::COL_SCHEDULES);
 					SchedulesBasedService::SchedulesPair value(
 						SchedulesBasedService::DecodeSchedules(
-							_rawSchedule,
+							rawSchedule,
 							_maxWaitingTime
 					)	);
-					if(	value.first != _departureSchedules ||
-						value.second != _arrivalSchedules
+					if(	value.first != getDataDepartureSchedules() ||
+						value.second != getDataArrivalSchedules()
 					){
-						setSchedules(
-							value.first,
-							value.second,
-							true
-						);
-						if(	getPath() &&
-							(	getPath()->getEdges().size() != _departureSchedules.size() ||
-								getPath()->getEdges().size() != _arrivalSchedules.size()
-						)	){
-							throw Exception("Inconsistent schedules size : different from path edges number");
-						}
 						result = true;
+						setDataSchedules(value.first, value.second);
 					}
 				}
 				catch(SchedulesBasedService::BadSchedulesException&)
@@ -645,6 +643,16 @@ namespace synthese
 		synthese::LinkedObjectsIds ContinuousService::getLinkedObjectsIds( const Record& record ) const
 		{
 			return LinkedObjectsIds();
+		}
+
+		const boost::posix_time::time_duration& ContinuousService::getDataLastDepartureSchedule( size_t i ) const
+		{
+			return getDataFirstDepartureSchedule(i) + _range;
+		}
+
+		const boost::posix_time::time_duration& ContinuousService::getDataLastArrivalSchedule( size_t i ) const
+		{
+			return getDataFirstArrivalSchedule(i) + _range + _maxWaitingTime;
 		}
 	}
 }

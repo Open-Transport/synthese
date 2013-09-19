@@ -922,7 +922,7 @@ namespace synthese
 						departureSchedules.push_back(course.horaires[i].htd);
 						arrivalSchedules.push_back(course.horaires[i].hta);
 					}
-					course.syntheseService->setSchedules(departureSchedules, arrivalSchedules, true);
+					course.syntheseService->setDataSchedules(departureSchedules, arrivalSchedules);
 					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
 					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), lexical_cast<string>(course.ref));
 					course.syntheseService->setActive(today);

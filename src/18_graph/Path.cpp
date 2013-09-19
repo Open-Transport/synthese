@@ -570,7 +570,7 @@ namespace synthese
 				Edge* lastRealEdge(firstEdge.getPrevious());
 				Edge* firstRealEdge(lastEdge.getNext());
 
-				// Next arrival and next in path of the previous
+				// Next arrival pointers
 				if(removalPosition != _edges.begin() && edge.isArrivalAllowed() && lastRealEdge)
 				{
 					Edge* nextArrival(lastEdge.getFollowingArrivalForFineSteppingOnly());
@@ -595,11 +595,15 @@ namespace synthese
 						){
 							it->setFollowingConnectionArrival(nextConnectingArrival);
 					}	}
+				}
 
+				// Next in path of the previous
+				if(lastRealEdge)
+				{
 					lastRealEdge->setNext(firstRealEdge);
 				}
 
-				// Previous departure
+				// Previous departure pointers
 				if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed() && firstRealEdge)
 				{
 					Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
@@ -624,7 +628,11 @@ namespace synthese
 						){
 							it->setPreviousConnectionDeparture(previousConnectingDeparture);
 					}	}
+				}
 
+				// Previous in path of the next
+				if(firstRealEdge)
+				{
 					firstRealEdge->setPrevious(lastRealEdge);
 				}
 			}
@@ -828,6 +836,7 @@ namespace synthese
 			}
 			throw VertexNotFoundException();
 		}
+
 
 
 		Path::InvalidOffsetException::InvalidOffsetException(
