@@ -247,7 +247,7 @@ ScheduledService ss01(4503599627370501ULL, "1", li92.get());
 	a.push_back(time_duration(7,20,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss01.setSchedules(d,a, true);
+	ss01.setDataSchedules(d,a);
 }
 ss01.setActive(day_clock::local_day());
 ss01.setActive(day_clock::local_day() + days(1));
