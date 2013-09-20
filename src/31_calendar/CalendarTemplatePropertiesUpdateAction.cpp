@@ -25,6 +25,7 @@
 #include "CalendarTemplatePropertiesUpdateAction.h"
 
 #include "ActionException.h"
+#include "CalendarTemplateElementTableSync.h"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Session.h"
@@ -93,10 +94,9 @@ namespace synthese
 			{ // Load
 				try
 				{
-					_calendar = CalendarTemplateTableSync::GetEditable(
-						map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID),
-						*_env
-					);
+					RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID));
+					_calendar = CalendarTemplateTableSync::GetEditable(id, *_env);
+					CalendarTemplateElementTableSync::Search(*_env, id);
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>& e)
 				{
@@ -115,10 +115,9 @@ namespace synthese
 				{
 					if(map.get<RegistryKeyType>(PARAMETER_PARENT_ID) != 0)
 					{
-						_parent = CalendarTemplateTableSync::GetEditable(
-							map.get<RegistryKeyType>(PARAMETER_PARENT_ID),
-							*_env
-						);
+						RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_PARENT_ID));
+						_parent = CalendarTemplateTableSync::GetEditable(id, *_env);
+						CalendarTemplateElementTableSync::Search(*_env, id);
 					}
 					else
 					{
