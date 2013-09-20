@@ -509,12 +509,28 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
+							MainRoadChunk::HouseNumber number;
+							string roadName;
 							try
 							{
-								MainRoadChunk::HouseNumber number(lexical_cast<MainRoadChunk::HouseNumber>(words[0]));
+								number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+								roadName = _text.substr(words[0].size() + 1);
+							}
+							catch (bad_lexical_cast)
+							{
+								// Try number at the end
+								try
+								{
+									number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size() - 1]);
+									roadName = _text.substr(0, _text.size() - words[words.size() - 1].size() - 1);
+								}
+								catch (bad_lexical_cast)
+								{
+								}
+							}
 
-								string roadName(_text.substr(words[0].size() + 1));
-
+							if (!roadName.empty())
+							{
 								City::PlacesMatcher::MatchResult places(
 									_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 										roadName,
@@ -550,9 +566,6 @@ namespace synthese
 									houseList
 								);
 								result.insert(DATA_ADDRESSES, pm);
-							}
-							catch (bad_lexical_cast)
-							{
 							}
 						}
 
@@ -624,12 +637,28 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
+							MainRoadChunk::HouseNumber number;
+							string roadName;
 							try
 							{
-								MainRoadChunk::HouseNumber number(lexical_cast<MainRoadChunk::HouseNumber>(words[0]));
+								number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+								roadName = _text.substr(words[0].size() + 1);
+							}
+							catch (bad_lexical_cast)
+							{
+								// Try number at the end
+								try
+								{
+									number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size() - 1]);
+									roadName = _text.substr(0, _text.size() - words[words.size() - 1].size() - 1);
+								}
+								catch (bad_lexical_cast)
+								{
+								}
+							}
 
-								string roadName(_text.substr(words[0].size() + 1));
-
+							if (!roadName.empty())
+							{
 								RoadModule::GeneralRoadsMatcher::MatchResult places(
 									RoadModule::GetGeneralRoadsMatcher().bestMatches(
 										roadName,
@@ -670,9 +699,6 @@ namespace synthese
 									houseList
 								);
 								result.insert(DATA_ADDRESSES, pm);
-							}
-							catch (bad_lexical_cast)
-							{
 							}
 						}
 
