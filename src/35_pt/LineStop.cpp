@@ -377,6 +377,19 @@ namespace synthese
 								dls->getScheduleInput()
 						)	);
 						copy->addEdge(*newEdge);
+
+						// Links from stop to the linestop
+						if(dls->getPhysicalStop())
+						{
+							if(getIsArrival())
+							{
+								dls->getPhysicalStop()->addArrivalEdge(newEdge);
+							}
+							if(getIsDeparture())
+							{
+								dls->getPhysicalStop()->addDepartureEdge(newEdge);
+							}
+						}
 					}
 				}
 				if(la)
@@ -396,6 +409,23 @@ namespace synthese
 								la->getInternalService()
 						)	);
 						copy->addEdge(*newEdge);
+
+						if(la->getArea())
+						{
+							// Add links and generated line stops here
+							if(isArrivalAllowed() && !la->getInternalService())
+							{
+								newEdge->addAllStops(true);
+							}
+							if(isDepartureAllowed())
+							{
+								newEdge->addAllStops(false);
+							}
+							if(isArrivalAllowed() && la->getInternalService())
+							{
+								newEdge->addAllStops(true);
+							}
+						}
 					}
 				}
 

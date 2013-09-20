@@ -1267,13 +1267,19 @@ namespace synthese
 
 		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
 		{
-			assert(i < _dataDepartureSchedules.size());
+			if(i >= _dataDepartureSchedules.size())
+			{
+				return *_dataDepartureSchedules.rbegin();
+			}
 			return _dataDepartureSchedules.at(i);
 		}
 
 		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
 		{
-			assert(i < _dataArrivalSchedules.size());
+			if(i >= _dataArrivalSchedules.size())
+			{
+				return *_dataArrivalSchedules.rbegin();
+			}
 			return _dataArrivalSchedules.at(i);
 		}
 
@@ -1285,6 +1291,40 @@ namespace synthese
 		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
 		{
 			return getDataFirstArrivalSchedule(i);
+		}
+
+
+
+		void SchedulesBasedService::regenerateDataSchedules()
+		{
+			if(!_path)
+			{
+				throw Exception("A path is needed");
+			}
+
+			// Lock the cache
+			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+
+			Schedules newDepartureSchedules;
+			Schedules newArrivalSchedules;
+			
+			size_t rank(0);
+			BOOST_FOREACH(const Path::Edges::value_type& itEdge, _path->getEdges())
+			{
+				// Jump over stops with interpolated schedules
+				if(!static_cast<LineStop*>(itEdge)->getScheduleInput())
+				{
+					++rank;
+					continue;
+				}
+
+				newDepartureSchedules.push_back(getDepartureSchedule(false, rank));
+				newArrivalSchedules.push_back(getArrivalSchedule(false, rank));
+
+				++rank;
+			}
+
+			setDataSchedules(newDepartureSchedules, newArrivalSchedules);
 		}
 
 

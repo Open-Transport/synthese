@@ -143,10 +143,18 @@ namespace synthese
 			{
 				if(_updateArrival)
 				{
+					if(rank >= arrivalSchedules.size())
+					{
+						throw ActionException("Bad schedules size");
+					}
 					arrivalSchedules[rank] = _time;
 				}
 				else
 				{
+					if(rank >= departureSchedules.size())
+					{
+						throw ActionException("Bad schedules size");
+					}
 					departureSchedules[rank] = _time;
 				}
 			}
