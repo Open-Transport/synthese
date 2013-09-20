@@ -21,10 +21,15 @@
 */
 
 #include "JourneyPatternCopy.hpp"
+
 #include "DesignatedLinePhysicalStop.hpp"
+#include "DRTArea.hpp"
 #include "LineArea.hpp"
 #include "PathGroup.h"
+#include "PTModule.h"
 #include "Service.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -80,11 +85,21 @@ namespace synthese
 					)	);
 					newEdge->setGeometry(lineStop.getGeometry());
 					addEdge(*newEdge);
+
+					// Links from stop to the linestop
+					if(lineStop.getIsArrival())
+					{
+						lineStop.getPhysicalStop()->addArrivalEdge(newEdge);
+					}
+					if(lineStop.getIsDeparture())
+					{
+						lineStop.getPhysicalStop()->addDepartureEdge(newEdge);
+					}
 				}
 				if(dynamic_cast<const LineArea*>(*it))
 				{
 					const LineArea& lineStop(static_cast<const LineArea&>(**it));
-					Edge* newEdge(
+					LineArea* newEdge(
 						new LineArea(
 							0,
 							this,
@@ -96,6 +111,20 @@ namespace synthese
 							lineStop.getInternalService()
 					)	);
 					addEdge(*newEdge);
+					
+					// Add links and generated line stops here
+					if(lineStop.isArrivalAllowed() && !lineStop.getInternalService())
+					{
+						newEdge->addAllStops(true);
+					}
+					if(lineStop.isDepartureAllowed())
+					{
+						newEdge->addAllStops(false);
+					}
+					if(lineStop.isArrivalAllowed() && lineStop.getInternalService())
+					{
+						newEdge->addAllStops(true);
+					}
 				}
 			}
 
@@ -127,6 +156,35 @@ namespace synthese
 		{
 			for (Path::Edges::iterator it(_edges.begin()); it != _edges.end(); ++it)
 			{
+				if(dynamic_cast<DesignatedLinePhysicalStop*>(*it))
+				{
+					DesignatedLinePhysicalStop& object(
+						dynamic_cast<DesignatedLinePhysicalStop&>(**it)
+					);
+
+					// Useful transfer calculation
+					if(object.getPhysicalStop())
+					{
+						object.getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+					}
+
+					object.clearPhysicalStopLinks();
+				}
+				else if(dynamic_cast<LineArea*>(*it))
+				{
+					LineArea& object(
+						dynamic_cast<LineArea&>(**it)
+					);
+
+					// Useful transfer calculation
+					BOOST_FOREACH(StopArea* stopArea, object.getArea()->get<Stops>())
+					{
+						stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+					}
+
+					object.clearArea();
+				}
+
 				delete *it;
 			}
 			assert(_pathGroup);

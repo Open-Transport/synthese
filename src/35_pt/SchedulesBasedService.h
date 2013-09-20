@@ -233,8 +233,6 @@ namespace synthese
 				bool comparePlannedStops(const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedVertices) const;
 
 
-			//! @name Update methods
-			//@{
 				//////////////////////////////////////////////////////////////////////////
 				/// Update a served edge at real time.
 				/// @param rank Rank of the edge to update
@@ -260,6 +258,9 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Clears stops data.
 				void clearStops();
+
+
+				void regenerateDataSchedules();
 			//@}
 
 			//! @name Encoding / decoding
