@@ -22,6 +22,7 @@
 
 #include "HeuresFileFormat.hpp"
 
+#include "CalendarTemplateElementTableSync.h"
 #include "CityTableSync.h"
 #include "DataSourceTableSync.h"
 #include "DeadRunTableSync.hpp"
@@ -1005,7 +1006,9 @@ namespace synthese
 			{
 				try
 				{
-					_day7CalendarTemplate = CalendarTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DAY7_CALENDAR_ID), _env);
+					RegistryKeyType calendarId(map.get<RegistryKeyType>(PARAMETER_DAY7_CALENDAR_ID));
+					_day7CalendarTemplate = CalendarTemplateTableSync::Get(calendarId, _env);
+					CalendarTemplateElementTableSync::Search(_env, calendarId);
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>&)
 				{
