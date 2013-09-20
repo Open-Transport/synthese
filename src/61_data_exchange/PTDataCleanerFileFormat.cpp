@@ -23,6 +23,7 @@
 #include "PTDataCleanerFileFormat.hpp"
 
 #include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateElementTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "DBTransaction.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
@@ -433,6 +434,7 @@ namespace synthese
 			if(calendarId) try
 			{
 				_calendarTemplate = CalendarTemplateTableSync::Get(calendarId, _env);
+				CalendarTemplateElementTableSync::Search(_env, calendarId);
 			}
 			catch(ObjectNotFoundException<CalendarTemplate>&)
 			{

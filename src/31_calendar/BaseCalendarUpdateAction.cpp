@@ -23,7 +23,7 @@
 #include "BaseCalendarUpdateAction.hpp"
 
 #include "ActionException.h"
-#include "CalendarTemplate.h"
+#include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateTableSync.h"
 #include "DeleteQuery.hpp"
 #include "CalendarLinkTableSync.hpp"
@@ -166,6 +166,7 @@ namespace synthese
 			if(cid > 0) try
 			{
 				_calendarTemplate = CalendarTemplateTableSync::GetEditable(cid, env);
+				CalendarTemplateElementTableSync::Search(env, cid);
 			}
 			catch(ObjectNotFoundException<CalendarTemplate>&)
 			{
@@ -177,6 +178,7 @@ namespace synthese
 			if(cid2 > 0) try
 			{
 				_calendarTemplate2 = CalendarTemplateTableSync::GetEditable(cid2, env);
+				CalendarTemplateElementTableSync::Search(env, cid2);
 			}
 			catch(ObjectNotFoundException<CalendarTemplate>&)
 			{

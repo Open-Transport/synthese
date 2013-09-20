@@ -1336,6 +1336,7 @@ namespace synthese
 				first.getServiceNumber() == second.getServiceNumber() &&
 				first.getDepartureSchedules(true, false) == second.getDepartureSchedules(true, false) &&
 				first.getArrivalSchedules(true, false) == second.getArrivalSchedules(true, false)
+
 			;
 		}
 
