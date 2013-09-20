@@ -236,14 +236,21 @@ namespace synthese
 			if(	(_readLengthFromGeometry && _lineStop->getGeometry()) ||
 				_withSchedules
 			){
-				ScheduledServiceTableSync::Search(
+				BOOST_FOREACH(boost::shared_ptr<ScheduledService> serv, ScheduledServiceTableSync::Search(
 					*_env,
 					_lineStop->getParentPath()->getKey()
-				);
-				ContinuousServiceTableSync::Search(
+				)){
+					serv->getDepartureSchedules(true, false);
+					serv->getArrivalSchedules(true, false);
+				}
+
+				BOOST_FOREACH(boost::shared_ptr<ContinuousService> serv, ContinuousServiceTableSync::Search(
 					*_env,
 					_lineStop->getParentPath()->getKey()
-				);
+				)){
+					serv->getDepartureSchedules(true, false);
+					serv->getArrivalSchedules(true, false);
+				}
 			}
 		}
 
@@ -324,7 +331,7 @@ namespace synthese
 				 dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())->setScheduleInput(*_withSchedules);
 			}
 
-			// With schedules
+			// With reservation
 			if(_reservationNeeded && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
 			{
 				dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())->setReservationNeeded(*_reservationNeeded);
@@ -362,10 +369,12 @@ namespace synthese
 			// Some line stop updates can impact the service schedules
 			BOOST_FOREACH(const ScheduledService::Registry::value_type& it, _env->getRegistry<ScheduledService>())
 			{
+				it.second->regenerateDataSchedules();
 				ScheduledServiceTableSync::Save(it.second.get(), transaction);
 			}
 			BOOST_FOREACH(const ContinuousService::Registry::value_type& it, _env->getRegistry<ContinuousService>())
 			{
+				it.second->regenerateDataSchedules();
 				ContinuousServiceTableSync::Save(it.second.get(), transaction);
 			}
 
