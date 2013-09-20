@@ -136,6 +136,7 @@ namespace synthese
 
 
 			static boost::shared_ptr<DisplayMonitoringStatus> UpdateStatus(
+				util::Env& env,
 				const DisplayScreen& screen,
 				bool archive
 			);

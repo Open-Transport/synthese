@@ -424,6 +424,7 @@ namespace synthese
 
 			try
 			{
+				Env env;
 				string responseType(pt.get<string>("params.objectName"));
 				if(responseType == "InfovisionDisplayState")
 				{
@@ -481,6 +482,7 @@ namespace synthese
 						{
 							boost::shared_ptr<DisplayMonitoringStatus> status(
 								DisplayMonitoringStatusTableSync::UpdateStatus(
+									env,
 									*screen.getScreen(),
 									_mgArchiveMonitoring
 							)	);

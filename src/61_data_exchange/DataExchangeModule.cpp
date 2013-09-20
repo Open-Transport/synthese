@@ -82,7 +82,7 @@ namespace synthese
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_VALUE, "60", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_MIN, "1", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_SCREEN_MAX, "255", &MGScreenConnection::ParameterCallback);
-			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_CPU_NAME, "MG CPU", &MGScreenConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_ARCHIVE_MONITORING, "0", &MGScreenConnection::ParameterCallback);
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_FILE, "", &StopButtonFilePoller::ParameterCallback);
 			RegisterParameter(StopButtonFilePoller::MODULE_PARAM_STOP_MONITORING_PERIOD_MS, "", &StopButtonFilePoller::ParameterCallback);
 		}
@@ -92,6 +92,7 @@ namespace synthese
 			// In the init section in order to read this parameter after the data load (DBModule::Init)
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_DATASOURCE_ID, "", &IneoNCEConnection::ParameterCallback);
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_WITH_LOCAL_MESSAGE, "1", &IneoNCEConnection::ParameterCallback);
+			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_CPU_NAME, "MG CPU", &MGScreenConnection::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::Start()

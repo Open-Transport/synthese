@@ -327,12 +327,14 @@ namespace synthese
 
 
 
-		boost::shared_ptr<DisplayMonitoringStatus> DisplayMonitoringStatusTableSync::UpdateStatus( const DisplayScreen& screen, bool archive )
-		{
+		boost::shared_ptr<DisplayMonitoringStatus> DisplayMonitoringStatusTableSync::UpdateStatus(
+			Env& env,
+			const DisplayScreen& screen,
+			bool archive
+		){
 			boost::shared_ptr<DisplayMonitoringStatus> result;
 			if(!archive)
 			{
-				Env env;
 				SearchResult entries(Search(env, screen.getKey(), 0, 1, false, true, false));
 				if(!entries.empty())
 				{
