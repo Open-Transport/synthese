@@ -24,7 +24,7 @@
 
 #include "TimetableTableSync.h"
 
-#include "CalendarTemplate.h"
+#include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateTableSync.h"
 #include "CommercialLine.h"
 #include "Conversion.h"
@@ -180,12 +180,11 @@ namespace synthese
 				{
 					try
 					{
+						RegistryKeyType baseCalendarId(rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID));
 						object->setBaseCalendar(
-							CalendarTemplateTableSync::Get(
-								rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID),
-								Env::GetOfficialEnv()
-							).get()
+							CalendarTemplateTableSync::Get(baseCalendarId, env).get()
 						);
+						CalendarTemplateElementTableSync::Search(env, baseCalendarId);
 					}
 					catch(ObjectNotFoundException<CalendarTemplate>)
 					{

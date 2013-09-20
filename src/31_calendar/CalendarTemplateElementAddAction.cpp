@@ -33,7 +33,6 @@
 #include "Request.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
-#include "CalendarTemplateElement.h"
 #include "CalendarTemplateElementTableSync.h"
 
 using namespace std;
@@ -86,10 +85,9 @@ namespace synthese
 		{
 			try
 			{
-				_calendar = CalendarTemplateTableSync::GetEditable(
-					map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID),
-					*_env
-				);
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID));
+				_calendar = CalendarTemplateTableSync::GetEditable(id, *_env);
+				CalendarTemplateElementTableSync::Search(*_env, id);
 			}
 			catch (...)
 			{
