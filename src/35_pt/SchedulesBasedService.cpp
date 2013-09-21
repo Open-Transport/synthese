@@ -1070,106 +1070,244 @@ namespace synthese
 			_generatedArrivalSchedules.clear();
 			_generatedDepartureSchedules.clear();
 
-			// The generation loop
+			// Avoid multiple useless logs
+			bool badSchedulesLogged(false);
+
+			// Departure loop
 			Schedules::const_iterator itDeparture(_dataDepartureSchedules.begin());
 			Schedules::const_iterator itArrival(_dataArrivalSchedules.begin());
-			Path::Edges::const_iterator lastScheduledEdge(_path->getEdges().end());
-			bool atLeastOneUnscheduledEdge(false);
+			Path::Edges::const_iterator lastDepartureScheduledEdge(_path->getEdges().end());
+			time_duration lastDefinedDepartureSchedule;
+			bool atLeastOneDepartureUnscheduledEdge(false);
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
-				// In case of insufficient defined schedules number
-				if(	itArrival == _dataArrivalSchedules.end() ||
-					itDeparture == _dataDepartureSchedules.end() 
-				){
-					Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()));
-					time_duration departureSchedule(
-						_generatedDepartureSchedules.empty() ?
-						seconds(0) :
-						*_generatedDepartureSchedules.rbegin()
-					);
-					time_duration arrivalSchedule(
-						_generatedArrivalSchedules.empty() ?
-						seconds(0) :
-						*_generatedArrivalSchedules.rbegin()
-					);
-					for(;itEdge != _path->getEdges().end(); ++itEdge)
-					{
-						_generatedDepartureSchedules.push_back(departureSchedule);
-						_generatedArrivalSchedules.push_back(arrivalSchedule);
-					}
-					break;
-				}
-
 				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-				if(	!lineStop || lineStop->getScheduleInput())
-				{
+				if(	lineStop &&
+					lineStop->getScheduleInput() &&
+					(lineStop->getIsDeparture() || (itEdge+1) == _path->getEdges().end())
+				){
+					// In case of insufficient defined schedules number
+					time_duration departureSchedule;
+					if(	itDeparture == _dataDepartureSchedules.end() 
+					){
+						if(!badSchedulesLogged)
+						{
+							Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()) +" (missing schedules)");
+							badSchedulesLogged = true;
+						}
+						departureSchedule =
+							_generatedDepartureSchedules.empty() ?
+							seconds(0) :
+							*_generatedDepartureSchedules.rbegin()
+						;
+					}
+					else
+					{
+						departureSchedule = *itDeparture;
+					}
+					time_duration arrivalSchedule(not_a_date_time);
+					if(	itArrival != _dataArrivalSchedules.end() 
+					){
+						arrivalSchedule = *itArrival;
+					}
+
 					const Edge& edge(**itEdge);
 
-					// Interpolation of preceding schedules
-					if(atLeastOneUnscheduledEdge)
+					// Interpolation of preceding departure schedules
+					if(atLeastOneDepartureUnscheduledEdge)
 					{
-						if(lastScheduledEdge == _path->getEdges().end())
+						if(lastDepartureScheduledEdge == _path->getEdges().end())
 						{
 							throw PathBeginsWithUnscheduledStopException(*_path);
 						}
 
-						MetricOffset totalDistance(edge.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
-						size_t totalRankDiff(edge.getRankInPath() - (*lastScheduledEdge)->getRankInPath());
-						time_duration originDepartureSchedule(*_generatedDepartureSchedules.rbegin());
-						time_duration totalTime(*itArrival - originDepartureSchedule);
-						for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
+						MetricOffset totalDistance(edge.getMetricOffset() - (*lastDepartureScheduledEdge)->getMetricOffset());
+						size_t totalRankDiff(edge.getRankInPath() - (*lastDepartureScheduledEdge)->getRankInPath());
+						time_duration totalTime(
+							(	(	!lineStop->isDeparture() ||
+									(lineStop->isArrival() && !arrivalSchedule.is_not_a_date_time() && arrivalSchedule < departureSchedule)
+								) ?
+								arrivalSchedule :
+								departureSchedule
+							) - lastDefinedDepartureSchedule
+						);
+						for(Path::Edges::const_iterator it(lastDepartureScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
 							double minutesToAdd(0);
 							if(totalDistance != 0)
 							{
-								MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+								MetricOffset distance((*it)->getMetricOffset() - (*lastDepartureScheduledEdge)->getMetricOffset());
 								minutesToAdd = (totalTime.total_seconds() / 60) * (distance / totalDistance);
 							}
 							else
 							{
 								assert(totalRankDiff);
-								size_t rankDiff((*it)->getRankInPath() - (*lastScheduledEdge)->getRankInPath());
+								size_t rankDiff((*it)->getRankInPath() - (*lastDepartureScheduledEdge)->getRankInPath());
 								minutesToAdd = (totalTime.total_seconds() / 60) * (double(rankDiff) / double(totalRankDiff));
 							}
 
-							time_duration departureSchedule(originDepartureSchedule);
-							time_duration arrivalSchedule(originDepartureSchedule);
+							time_duration departureSchedule(lastDefinedDepartureSchedule);
 							departureSchedule += minutes(
 								static_cast<long>(floor(minutesToAdd))
 							);
-							arrivalSchedule += minutes(
-								static_cast<long>(ceil(minutesToAdd))
-							);
-
 							_generatedDepartureSchedules.push_back(departureSchedule);
-							_generatedArrivalSchedules.push_back(arrivalSchedule);
 						}
-					}
 
-					// Check
-					if(	itDeparture == _dataDepartureSchedules.end() ||
-						itArrival == _dataArrivalSchedules.end()
-					){
-						throw BadSchedulesException();
+						atLeastOneDepartureUnscheduledEdge = false;
 					}
 
 					// Store the schedules
-					_generatedDepartureSchedules.push_back(*itDeparture);
-					_generatedArrivalSchedules.push_back(*itArrival);
+					_generatedDepartureSchedules.push_back(lineStop->isDeparture() ? *itDeparture : *itArrival);
+					lastDepartureScheduledEdge = itEdge;
+					lastDefinedDepartureSchedule = departureSchedule;
+				}
+				else
+				{
+					atLeastOneDepartureUnscheduledEdge = true;
+				}
 
-					// Store the last scheduled edge
-					lastScheduledEdge = itEdge;
-					atLeastOneUnscheduledEdge = false;
-
+				if(	lineStop && lineStop->getScheduleInput())
+				{
 					// Increment iterators
 					++itDeparture;
 					++itArrival;
 				}
+			}
+
+			// Check if there is too much schedules in the database
+			if(itDeparture != _dataDepartureSchedules.end())
+			{
+				Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()) +" (too much schedules)");
+			}
+			
+
+			// Arrival loop
+			itDeparture = _dataDepartureSchedules.begin();
+			itArrival = _dataArrivalSchedules.begin();
+			Path::Edges::const_iterator lastArrivalScheduledEdge(_path->getEdges().begin());
+			time_duration lastDefinedArrivalSchedule(*_dataDepartureSchedules.begin());
+			bool atLeastOneArrivalUnscheduledEdge(false);
+			Schedules::const_iterator itGeneratedDepartureSchedules(_generatedDepartureSchedules.begin());
+			bool neverSeenAScheduledEdge(true);
+			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
+			{
+				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
+				if(	lineStop &&
+					lineStop->getScheduleInput() &&
+					(lineStop->isArrival() || lastArrivalScheduledEdge == _path->getEdges().begin())
+				){
+					neverSeenAScheduledEdge = false;
+
+					// In case of insufficient defined schedules number
+					time_duration arrivalSchedule;
+					if(	itArrival == _dataArrivalSchedules.end() 
+					){
+						if(!badSchedulesLogged)
+						{
+							Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()) +" (missing schedules)");
+							badSchedulesLogged = true;
+						}
+						arrivalSchedule =
+							_generatedArrivalSchedules.empty() ?
+							seconds(0) :
+							*_generatedArrivalSchedules.rbegin()
+						;
+			
+					}
+					else
+					{
+						arrivalSchedule = *itArrival;
+					}
+					time_duration departureSchedule(not_a_date_time);
+					if(	itDeparture != _dataDepartureSchedules.end() 
+					){
+						departureSchedule = *itDeparture;
+					}
+
+					const Edge& edge(**itEdge);
+
+					// Interpolation of preceding schedules
+					if(atLeastOneArrivalUnscheduledEdge && lineStop->isArrival())
+					{
+						if(lastArrivalScheduledEdge == _path->getEdges().end())
+						{
+							throw PathBeginsWithUnscheduledStopException(*_path);
+						}
+
+						MetricOffset totalDistance(edge.getMetricOffset() - (*lastArrivalScheduledEdge)->getMetricOffset());
+						size_t totalRankDiff(edge.getRankInPath() - (*lastArrivalScheduledEdge)->getRankInPath());
+						time_duration totalTime(*itArrival - lastDefinedArrivalSchedule);
+						for(Path::Edges::const_iterator it(lastArrivalScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
+						{
+							double minutesToAdd(0);
+							if(totalDistance != 0)
+							{
+								MetricOffset distance((*it)->getMetricOffset() - (*lastArrivalScheduledEdge)->getMetricOffset());
+								minutesToAdd = (totalTime.total_seconds() / 60) * (distance / totalDistance);
+							}
+							else
+							{
+								assert(totalRankDiff);
+								size_t rankDiff((*it)->getRankInPath() - (*lastArrivalScheduledEdge)->getRankInPath());
+								minutesToAdd = (totalTime.total_seconds() / 60) * (double(rankDiff) / double(totalRankDiff));
+							}
+
+							time_duration arrivalSchedule(lastDefinedArrivalSchedule);
+							arrivalSchedule += minutes(
+								static_cast<long>(ceil(minutesToAdd))
+							);
+							_generatedArrivalSchedules.push_back(arrivalSchedule);
+						}
+
+						atLeastOneArrivalUnscheduledEdge = false;
+					}
+
+					// Store the schedules
+					_generatedArrivalSchedules.push_back(lineStop->isArrival() ? *itArrival : *itDeparture);
+					lastArrivalScheduledEdge = itEdge;
+					lastDefinedArrivalSchedule = 
+						(lineStop->isDeparture() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
+						departureSchedule :
+						arrivalSchedule
+					;
+				}
 				else
 				{
-					atLeastOneUnscheduledEdge = true;
+					if(	neverSeenAScheduledEdge)
+					{
+						if(itGeneratedDepartureSchedules != _generatedDepartureSchedules.end())
+						{
+							_generatedArrivalSchedules.push_back(*itGeneratedDepartureSchedules);
+							++itGeneratedDepartureSchedules;
+						}
+						else
+						{
+							_generatedArrivalSchedules.push_back(*_generatedDepartureSchedules.rbegin());
+						}
+					}
+					else
+					{
+						atLeastOneArrivalUnscheduledEdge = true;
+					}
+				}
+
+				if(	lineStop && lineStop->getScheduleInput())
+				{
+					// Increment iterators
+					++itDeparture;
+					++itArrival;
 				}
 			}
+
+			// Check if there is too much schedules in the database
+			if(itArrival != _dataArrivalSchedules.end())
+			{
+				Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()) +" (too much schedules)");
+			}
+
+			// Check if the method did the job properly in debug mode
+			assert(_generatedDepartureSchedules.size() == _path->getEdges().size());
+			assert(_generatedArrivalSchedules.size() == _path->getEdges().size());
 		}
 
 
