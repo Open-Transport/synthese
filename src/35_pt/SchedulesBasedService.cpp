@@ -1082,10 +1082,10 @@ namespace synthese
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
 				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-				if(	lineStop &&
-					lineStop->getScheduleInput() &&
-					(lineStop->getIsDeparture() || (itEdge+1) == _path->getEdges().end())
-				){
+				if(	!lineStop ||
+					(	lineStop->getScheduleInput() &&
+						(lineStop->getIsDeparture() || (itEdge+1) == _path->getEdges().end())
+				)	){
 					// In case of insufficient defined schedules number
 					time_duration departureSchedule;
 					if(	itDeparture == _dataDepartureSchedules.end() 
@@ -1124,8 +1124,8 @@ namespace synthese
 						MetricOffset totalDistance(edge.getMetricOffset() - (*lastDepartureScheduledEdge)->getMetricOffset());
 						size_t totalRankDiff(edge.getRankInPath() - (*lastDepartureScheduledEdge)->getRankInPath());
 						time_duration totalTime(
-							(	(	!lineStop->isDeparture() ||
-									(lineStop->isArrival() && !arrivalSchedule.is_not_a_date_time() && arrivalSchedule < departureSchedule)
+							(	(	!edge.isDeparture() ||
+									(edge.isArrival() && !arrivalSchedule.is_not_a_date_time() && arrivalSchedule < departureSchedule)
 								) ?
 								arrivalSchedule :
 								departureSchedule
@@ -1157,7 +1157,7 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedDepartureSchedules.push_back(lineStop->isDeparture() ? *itDeparture : *itArrival);
+					_generatedDepartureSchedules.push_back(edge.isDeparture() ? *itDeparture : *itArrival);
 					lastDepartureScheduledEdge = itEdge;
 					lastDefinedDepartureSchedule = departureSchedule;
 				}
@@ -1192,10 +1192,10 @@ namespace synthese
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
 				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-				if(	lineStop &&
-					lineStop->getScheduleInput() &&
-					(lineStop->isArrival() || lastArrivalScheduledEdge == _path->getEdges().begin())
-				){
+				if(	!lineStop ||
+					(	lineStop->getScheduleInput() &&
+						(lineStop->isArrival() || lastArrivalScheduledEdge == _path->getEdges().begin())
+				)	){
 					neverSeenAScheduledEdge = false;
 
 					// In case of insufficient defined schedules number
@@ -1227,7 +1227,7 @@ namespace synthese
 					const Edge& edge(**itEdge);
 
 					// Interpolation of preceding schedules
-					if(atLeastOneArrivalUnscheduledEdge && lineStop->isArrival())
+					if(atLeastOneArrivalUnscheduledEdge)
 					{
 						if(lastArrivalScheduledEdge == _path->getEdges().end())
 						{
@@ -1263,10 +1263,10 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedArrivalSchedules.push_back(lineStop->isArrival() ? *itArrival : *itDeparture);
+					_generatedArrivalSchedules.push_back(edge.isArrival() ? *itArrival : *itDeparture);
 					lastArrivalScheduledEdge = itEdge;
 					lastDefinedArrivalSchedule = 
-						(lineStop->isDeparture() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
+						(edge.isDeparture() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
 						departureSchedule :
 						arrivalSchedule
 					;
@@ -1291,7 +1291,7 @@ namespace synthese
 					}
 				}
 
-				if(	lineStop && lineStop->getScheduleInput())
+				if(	!lineStop || lineStop->getScheduleInput())
 				{
 					// Increment iterators
 					++itDeparture;
