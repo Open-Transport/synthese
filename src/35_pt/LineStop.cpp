@@ -408,7 +408,6 @@ namespace synthese
 								la->getArea(),
 								la->getInternalService()
 						)	);
-						copy->addEdge(*newEdge);
 
 						if(la->getArea())
 						{
@@ -426,6 +425,9 @@ namespace synthese
 								newEdge->addAllStops(true);
 							}
 						}
+	
+						// After addAllStops calls because _generatedLineStops must be populated befort addEdge
+						copy->addEdge(*newEdge);
 					}
 				}
 
