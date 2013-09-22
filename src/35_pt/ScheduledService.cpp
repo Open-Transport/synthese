@@ -787,6 +787,8 @@ namespace synthese
 				setDataSourceLinksWithRegistration(getDataSourceLinks());
 			}
 
+			// Clear cache in case of non detected change in external objects (like path edges number)
+			_clearGeneratedSchedules();
 		}
 	}
 }
