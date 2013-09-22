@@ -118,7 +118,7 @@ namespace synthese
 		{
 			string targetStr(map.get<string>(PARAMETER_ROOT_ID));
 			ParametersMap::Trim(targetStr);
-			if(targetStr[0] >= '0' && targetStr[0] <= '9')
+			if(!targetStr.empty() && targetStr[0] >= '0' && targetStr[0] <= '9')
 			{
 				_rootId = map.getOptional<RegistryKeyType>(PARAMETER_ROOT_ID);
 				if(_rootId)

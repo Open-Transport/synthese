@@ -77,7 +77,7 @@ namespace synthese
 			// Target
 			string targetStr(map.get<string>(PARAMETER_TARGET));
 			ParametersMap::Trim(targetStr);
-			if(targetStr[0] >= '0' && targetStr[0] <= '9')
+			if(!targetStr.empty() && targetStr[0] >= '0' && targetStr[0] <= '9')
 			{	// Page by ID
 				try
 				{
