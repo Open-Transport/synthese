@@ -112,11 +112,12 @@ namespace synthese
 				bool updateFollowingSchedules
 			);
 
-			void _clearGeneratedSchedules() const;
 			void _generateSchedules() const;
 			void _initRTSchedulesFromPlanned();
 
 		public:
+			void _clearGeneratedSchedules() const;
+
 			SchedulesBasedService(
 				std::string serviceNumber,
 				graph::Path* path
