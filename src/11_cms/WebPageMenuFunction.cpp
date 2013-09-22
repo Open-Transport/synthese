@@ -485,7 +485,10 @@ namespace synthese
 
 
 		WebPageMenuFunction::WebPageMenuFunction():
-			_minDepth(0), _maxDepth(0),
+			_root(NULL),
+			_rootSite(NULL),
+			_minDepth(0),
+			_maxDepth(0),
 			_rawData(false)
 		{}
 }	}
