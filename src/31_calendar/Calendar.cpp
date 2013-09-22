@@ -640,6 +640,33 @@ namespace synthese
 
 
 
+		void Calendar::setCalendarLinks( const CalendarLinks& value )
+		{
+			recursive_mutex::scoped_lock lock(*_mutex);
+			_calendarLinks = value;
+			_resetDatesCache();
+		}
+
+
+
+		void Calendar::setDatesToForce( const DatesSet& value )
+		{
+			recursive_mutex::scoped_lock lock(*_mutex);
+			_datesToForce = value;
+			_resetDatesCache();
+		}
+
+
+
+		void Calendar::setDatesToBypass( const DatesSet& value )
+		{
+			recursive_mutex::scoped_lock lock(*_mutex);
+			_datesToBypass = value;
+			_resetDatesCache();
+		}
+
+
+
 		Calendar::BitSets& Calendar::BitSets::operator|=( const Calendar::BitSets& op )
 		{
 			set<greg_year> years;
