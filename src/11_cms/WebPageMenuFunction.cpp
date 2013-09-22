@@ -44,7 +44,7 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 
-	template<> const string util::FactorableTemplate<Function,cms::WebPageMenuFunction>::FACTORY_KEY("menu");
+	template<> const string util::FactorableTemplate<FunctionWithSite<false>,cms::WebPageMenuFunction>::FACTORY_KEY("menu");
 
 	namespace cms
 	{
