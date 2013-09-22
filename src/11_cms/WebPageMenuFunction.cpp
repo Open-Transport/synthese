@@ -39,6 +39,7 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace cms;
 	using namespace util;
 	using namespace server;
 	using namespace security;
