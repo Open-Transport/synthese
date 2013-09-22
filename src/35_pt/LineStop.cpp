@@ -30,6 +30,7 @@
 #include "LineArea.hpp"
 #include "LineStopTableSync.h"
 #include "PTModule.h"
+#include "SchedulesBasedService.h"
 #include "StopArea.hpp"
 #include "StopPointTableSync.hpp"
 #include "Vertex.h"
@@ -332,6 +333,18 @@ namespace synthese
 						}
 					}
 //				}
+			}
+
+			// Clear cache in case of non detected change in external objects (like path edges number)
+			if(getLine())
+			{
+				BOOST_FOREACH(const ServiceSet::value_type& service, getLine()->getServices())
+				{
+					if(dynamic_cast<SchedulesBasedService*>(service))
+					{
+						static_cast<SchedulesBasedService*>(service)->_clearGeneratedSchedules();
+					}
+				}
 			}
 
 			return result;
