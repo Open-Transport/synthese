@@ -77,7 +77,7 @@ namespace synthese
 		ParametersMap WebPageMenuFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_ROOT_ID, _root.get() ? _root->getKey() : RegistryKeyType(0));
+			map.insert(PARAMETER_ROOT_ID, _root ? _root->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_MIN_DEPTH, _minDepth);
 			map.insert(PARAMETER_MAX_DEPTH, _maxDepth);
 
@@ -115,25 +115,39 @@ namespace synthese
 
 		void WebPageMenuFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_rootId = map.getOptional<RegistryKeyType>(PARAMETER_ROOT_ID);
-			if(_rootId)
+			string targetStr(map.get<string>(PARAMETER_ROOT_ID));
+			ParametersMap::Trim(targetStr);
+			if(targetStr[0] >= '0' && targetStr[0] <= '9')
 			{
-				if(decodeTableId(*_rootId) == Webpage::CLASS_NUMBER) try
+				_rootId = map.getOptional<RegistryKeyType>(PARAMETER_ROOT_ID);
+				if(_rootId)
 				{
-					_root = Env::GetOfficialEnv().get<Webpage>(*_rootId);
+					if(decodeTableId(*_rootId) == Webpage::CLASS_NUMBER) try
+					{
+						_root = Env::GetOfficialEnv().get<Webpage>(*_rootId).get();
+					}
+					catch (ObjectNotFoundException<Webpage>&)
+					{
+						throw RequestException("No such root page");
+					}
+					else if(decodeTableId(*_rootId) == Website::CLASS_NUMBER) try
+					{
+						_rootSite = Env::GetOfficialEnv().get<Website>(*_rootId).get();
+					}
+					catch (ObjectNotFoundException<Webpage>&)
+					{
+						throw RequestException("No such root site");
+					}
 				}
-				catch (ObjectNotFoundException<Webpage>&)
+			}
+			else
+			{	// Page by smart URL
+				_root = getSite()->getPageBySmartURL(targetStr);
+				if(!_root)
 				{
-					throw RequestException("No such root page");
+					throw RequestException("No such web page");
 				}
-				else if(decodeTableId(*_rootId) == Website::CLASS_NUMBER) try
-				{
-					_rootSite = Env::GetOfficialEnv().get<Website>(*_rootId);
-				}
-				catch (ObjectNotFoundException<Webpage>&)
-				{
-					throw RequestException("No such root site");
-				}
+				_rootId = _root->getKey();
 			}
 
 			_minDepth = map.getDefault<size_t>(PARAMETER_MIN_DEPTH, 1);
@@ -202,7 +216,7 @@ namespace synthese
 
 			// Root page
 			const Webpage* currentPage(CMSModule::GetWebPage(request));
-			const Webpage* rootPage(_rootId ? _root.get() : currentPage);
+			const Webpage* rootPage(_rootId ? _root : currentPage);
 
 			// RSS header
 			if(!_itemPage.get() && _outputFormat == VALUE_RSS)
@@ -231,7 +245,7 @@ namespace synthese
 
 			// Content
 			ParametersMap pm;
-			if(_rootSite.get())
+			if(_rootSite)
 			{
 				BOOST_FOREACH(const Website::ChildrenType::value_type& it, _rootSite->getChildren())
 				{

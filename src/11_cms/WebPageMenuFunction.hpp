@@ -26,7 +26,7 @@
 #define SYNTHESE_WebPageMenuFunction_H__
 
 #include "FactorableTemplate.h"
-#include "Function.h"
+#include "FunctionWithSite.h"
 
 #include <map>
 
@@ -50,7 +50,7 @@ namespace synthese
 		///	<ul>
 		///	</ul>
 		class WebPageMenuFunction:
-			public util::FactorableTemplate<server::Function,WebPageMenuFunction>
+			public util::FactorableTemplate<FunctionWithSite<false>,WebPageMenuFunction>
 		{
 		private:
 			static const std::string DATA_RANK;
@@ -92,8 +92,8 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::optional<util::RegistryKeyType> _rootId;
-				boost::shared_ptr<const Webpage> _root;
-				boost::shared_ptr<const Website> _rootSite;
+				const Webpage* _root;
+				const Website* _rootSite;
 				boost::optional<std::size_t> _maxNumber;
 				std::size_t _minDepth;
 				std::size_t _maxDepth;
