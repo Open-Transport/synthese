@@ -176,9 +176,9 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setCalendarLinks(const CalendarLinks& value){ _calendarLinks = value; }
-				void setDatesToForce(const DatesSet& value){ _datesToForce = value; }
-				void setDatesToBypass(const DatesSet& value){ _datesToBypass = value; }
+				void setCalendarLinks(const CalendarLinks& value);
+				void setDatesToForce(const DatesSet& value);
+				void setDatesToBypass(const DatesSet& value);
 			//@}
 
 			//! @name Services
