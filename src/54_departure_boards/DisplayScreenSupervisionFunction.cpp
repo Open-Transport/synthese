@@ -112,7 +112,7 @@ namespace synthese
 
 			// Last monitoring status
 			DisplayMonitoringStatusTableSync::SearchResult entries(
-				DisplayMonitoringStatusTableSync::Search(*_env, _displayScreen->getKey(), 0, 1, true, false)
+				DisplayMonitoringStatusTableSync::Search(*_env, _displayScreen->getKey(), 0, 1, false, true, false)
 			);
 
 			// Parsing
