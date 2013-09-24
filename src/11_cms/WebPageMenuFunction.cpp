@@ -141,7 +141,7 @@ namespace synthese
 					}
 				}
 			}
-			else
+			else if(!targetStr.empty())
 			{	// Page by smart URL
 				_root = getSite()->getPageBySmartURL(targetStr);
 				if(!_root)
