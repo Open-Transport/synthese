@@ -116,7 +116,7 @@ namespace synthese
 
 		void WebPageMenuFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			string targetStr(map.get<string>(PARAMETER_ROOT_ID));
+			string targetStr(map.getDefault<string>(PARAMETER_ROOT_ID));
 			ParametersMap::Trim(targetStr);
 			if(!targetStr.empty() && targetStr[0] >= '0' && targetStr[0] <= '9')
 			{
