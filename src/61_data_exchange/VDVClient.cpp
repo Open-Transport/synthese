@@ -240,6 +240,14 @@ namespace synthese
 
 			if( get<SBBMode>()
 			){
+				if(	get<DataSource>() &&
+					jp.hasLinkWithSource(*get<DataSource>()) &&
+					!jp.getACodeBySource(*get<DataSource>()).empty())
+				{
+					// The journey has a link with the Datasource so we use its code
+					return jp.getACodeBySource(*get<DataSource>());
+				}
+
 				if(	jp.getCommercialLine()->hasLinkWithSource(*get<DataSource>())
 				){
 					stringstream result;
