@@ -22,6 +22,9 @@
 
 #include "MGScreenConnection.hpp"
 
+#include "DisplayScreenTableSync.h"
+#include "DisplayScreenCPUTableSync.h"
+#include "DisplayMonitoringStatusTableSync.h"
 #include "Env.h"
 #include "Exception.h"
 #include "Log.h"
@@ -49,6 +52,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace db;
+	using namespace departure_boards;
 	using namespace impex;
 	using namespace pt;
 	using namespace server;
@@ -64,6 +68,8 @@ namespace synthese
 		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_VALUE = "mg_screen_value";
 		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_MIN = "mg_screen_min";
 		const string MGScreenConnection::MODULE_PARAM_MG_SCREEN_MAX = "mg_screen_max";
+		const string MGScreenConnection::MODULE_PARAM_MG_CPU_NAME = "mg_cpu_name";
+		const string MGScreenConnection::MODULE_PARAM_MG_ARCHIVE_MONITORING = "mg_archive_monitoring";
 
 		boost::shared_ptr<MGScreenConnection> MGScreenConnection::_theConnection(new MGScreenConnection);
 
@@ -74,6 +80,8 @@ namespace synthese
 			_mgScreenValue(0),
 			_mgScreenMin(0),
 			_mgScreenMax(0),
+			_cpu(NULL),
+			_mgArchiveMonitoring(false),
 			_status(offline),
 			_io_service(),
 			_deadline(_io_service),
@@ -86,7 +94,6 @@ namespace synthese
 
 			// Start the persistent actor that checks for deadline expiry.
 			checkDeadline();
-
 		}
 
 
@@ -288,11 +295,46 @@ namespace synthese
 				changed = true;
 			}
 
+			if(name == MODULE_PARAM_MG_ARCHIVE_MONITORING)
+			{
+				_theConnection->_mgArchiveMonitoring = lexical_cast<bool>(value);
+			}
+
+			if(name == MODULE_PARAM_MG_CPU_NAME)
+			{
+				_theConnection->_mgCPUName = value;
+				
+				// Search for an existing CPU
+				_theConnection->_cpu = NULL;
+				BOOST_FOREACH(const DisplayScreenCPU::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<DisplayScreenCPU>())
+				{
+					if(it.second->getName() == value)
+					{
+						_theConnection->_cpu = it.second.get();
+						break;
+					}
+				}
+
+				// If no existing CPU, auto generation
+				if(!_theConnection->_cpu)
+				{
+					DisplayScreenCPU cpu;
+					cpu.setName(value);
+					cpu.setIsOnline(true);
+					DisplayScreenCPUTableSync::Save(&cpu);
+					_theConnection->_cpu = Env::GetOfficialEnv().getEditable<DisplayScreenCPU>(cpu.getKey()).get();
+				}
+
+				changed = true;
+			}
+
 			if(changed)
 			{
 				_theConnection->_initialized = false;
 			}
 		}
+
+
 
 		void MGScreenConnection::registerData(
 		) const	{
@@ -382,13 +424,48 @@ namespace synthese
 
 			try
 			{
+				Env env;
 				string responseType(pt.get<string>("params.objectName"));
 				if(responseType == "InfovisionDisplayState")
 				{
 					BOOST_FOREACH(boost::property_tree::ptree::value_type &v, pt.get_child("params.Display"))
 					{
-						VehicleScreen &screen(VehicleModule::GetVehicleScreen(v.second.get<string>("Address")));
-						screen.setName(v.second.get<string>("Address"));
+						string wiringCodeStr(v.second.get<string>("Address"));
+						int wiringCode(lexical_cast<int>(wiringCodeStr));
+						VehicleScreen &screen(VehicleModule::GetVehicleScreen(wiringCodeStr));
+						
+						if(_cpu)
+						{
+							// Search a compliant existing screen if not already linked
+							if(!screen.getScreen())
+							{
+								BOOST_FOREACH(DisplayScreenCPU::ChildrenType::value_type& child, _cpu->getChildren())
+								{
+									if(child.second->getWiringCode() == wiringCode)
+									{
+										screen.setScreen(child.second);
+										break;
+									}
+								}
+							}
+
+							// Generation of the screen if it not exists
+							if(!screen.getScreen())
+							{
+								DisplayScreen child;
+								child.setWiringCode(wiringCode);
+								child.setName(_mgCPUName +" "+ wiringCodeStr);
+								child.setMaintenanceIsOnline(true);
+								child.setRoot(_cpu);
+								child.setParent(NULL);
+								DisplayScreenTableSync::Save(&child);
+								screen.setScreen(
+									Env::GetOfficialEnv().getEditable<DisplayScreen>(child.getKey()).get()
+								);
+							}
+						}
+
+						screen.setName(wiringCodeStr);
 						screen.setConnected( v.second.get<string>("ConnectionState") == "connected" ? true : false);
 						screen.setBacklight1_OK(v.second.get<bool>("BacklightInternal_1_OK"));
 						screen.setBacklight2_OK(v.second.get<bool>("BacklightInternal_2_OK"));
@@ -399,6 +476,28 @@ namespace synthese
 							screen.setBacklightMin(panel.second.get<int>("BacklightMin"));
 							screen.setBacklightMax(panel.second.get<int>("BacklightMax"));
 							screen.setBacklightSpeed(panel.second.get<int>("BacklightSpeed"));
+						}
+
+						if(screen.getScreen())
+						{
+							boost::shared_ptr<DisplayMonitoringStatus> status(
+								DisplayMonitoringStatusTableSync::UpdateStatus(
+									env,
+									*screen.getScreen(),
+									_mgArchiveMonitoring
+							)	);
+							status->setLightStatus(
+								(screen.getBacklight1_OK() && screen.getBacklight2_OK()) ?
+								DisplayMonitoringStatus::DISPLAY_MONITORING_OK :
+								DisplayMonitoringStatus::DISPLAY_MONITORING_ERROR
+							);
+							status->setGeneralStatus(
+								screen.getConnected() ?
+								DisplayMonitoringStatus::DISPLAY_MONITORING_OK :
+								DisplayMonitoringStatus::DISPLAY_MONITORING_ERROR
+							);
+							status->setLightDetail(lexical_cast<string>(screen.getBacklightValue()));
+							DisplayMonitoringStatusTableSync::Save(status.get());
 						}
 					}
 
