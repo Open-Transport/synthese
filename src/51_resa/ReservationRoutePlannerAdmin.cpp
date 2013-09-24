@@ -256,6 +256,10 @@ namespace synthese
 			}
 
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request, *this);
+			ParametersMap tpm(searchRequest.getFunction()->getTemplateParameters());
+			tpm.remove(Request::PARAMETER_OBJECT_ID);
+			searchRequest.getFunction()->setTemplateParameters(tpm);
+
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune départ", st.getForm().getTextInputAutoCompleteFromService(

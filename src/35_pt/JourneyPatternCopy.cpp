@@ -110,7 +110,6 @@ namespace synthese
 							lineStop.getArea(),
 							lineStop.getInternalService()
 					)	);
-					addEdge(*newEdge);
 					
 					// Add links and generated line stops here
 					if(lineStop.isArrivalAllowed() && !lineStop.getInternalService())
@@ -125,6 +124,9 @@ namespace synthese
 					{
 						newEdge->addAllStops(true);
 					}
+
+					// After addAllStops calls because _generatedLineStops must be populated befort addEdge
+					addEdge(*newEdge);
 				}
 			}
 

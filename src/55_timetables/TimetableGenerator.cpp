@@ -190,6 +190,12 @@ namespace synthese
 					// Search for a matching edge / row pair
 					BOOST_FOREACH(const TimetableRowGroupItem* item, rowGroup.getItems())
 					{
+						// Jump over undefined rows
+						if(!item->get<StopArea>())
+						{
+							continue;
+						}
+
 						bool forbiddenEdgeBefore(firstIsForbidden == edges.end());
 						for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 						{
@@ -273,6 +279,12 @@ namespace synthese
 						bool arrivalOK(false);
 						BOOST_FOREACH(const TimetableRowGroupItem* item, rowGroup.getItems())
 						{
+							// Jump over undefined rows
+							if(!item->get<StopArea>())
+							{
+								continue;
+							}
+
 							bool forbiddenEdgeBefore(!firstIsForbidden);
 							for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
 								arrivalLinestop != NULL;
@@ -433,6 +445,12 @@ namespace synthese
 					{
 						BOOST_FOREACH(const TimetableRowGroup::Items::value_type& item, rowGroup.getItems())
 						{
+							// Jump over undefined rows
+							if(!item->get<StopArea>())
+							{
+								continue;
+							}
+
 							TimetableRow row;
 							row.setIsDeparture(rowGroup.get<IsDeparture>());
 							row.setIsArrival(rowGroup.get<IsArrival>());
