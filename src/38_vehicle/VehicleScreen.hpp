@@ -35,6 +35,11 @@ namespace synthese
 		class ParametersMap;
 	}
 
+	namespace departure_boards
+	{
+		class DisplayScreen;
+	}
+
 	namespace vehicle
 	{
 		class Vehicle;
@@ -62,6 +67,7 @@ namespace synthese
 
 
 		private:
+			departure_boards::DisplayScreen* _screen;
 			std::string _name;
 			bool _connected;
 			bool _backlight1_OK;
@@ -78,8 +84,12 @@ namespace synthese
 			);
 
 			void setName(const std::string& value){ _name = value; }
+			void setScreen(departure_boards::DisplayScreen* value){ _screen = value; }
+			departure_boards::DisplayScreen* getScreen() const { return _screen; }
+
 			std::string getName(){ return _name; }
 
+			
 			void setConnected(bool value){ _connected = value; }
 			bool getConnected(){ return _connected; }
 
