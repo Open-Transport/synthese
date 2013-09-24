@@ -53,6 +53,7 @@ namespace synthese
         VehicleScreen::VehicleScreen(
 			RegistryKeyType id
 		):	Registrable(id),
+			_screen(NULL),
             _connected(false),
 			_backlight1_OK(false),
 			_backlight2_OK(false),

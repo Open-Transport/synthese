@@ -255,6 +255,8 @@ namespace synthese
 			);
 		}
 
+
+
 		// In the Master/Slave communication, it is possible to have one
 		// thread calling isObsolete() and one calling markAsUpToDate()
 		// In this case we can have a race around our config that is
@@ -267,9 +269,19 @@ namespace synthese
 			InterSYNTHESESlaveTableSync::Save(this);
 		}
 
+
+
 		bool InterSYNTHESESlave::isObsolete() const
 		{
 			recursive_mutex::scoped_lock lock(_slaveChangeMutex);
+
+			// In multimaster mode can not handle obsolescence after the first sync
+			if(	get<InterSYNTHESEConfig>() &&
+				get<InterSYNTHESEConfig>()->get<Multimaster>()
+			){
+				return get<LastActivityReport>().is_not_a_date_time();
+			}
+
 			ptime now(second_clock::local_time());
 			return
 				get<LastActivityReport>().is_not_a_date_time() ||
