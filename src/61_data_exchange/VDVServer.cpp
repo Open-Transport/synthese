@@ -612,8 +612,8 @@ namespace synthese
 						
 						for (unsigned int cptStops=0;cptStops<vectStrStops.size();cptStops++)
 						{
-							// Get name and code
-							string codeStop = vectStrStops[cptStops];
+							// Get name
+							// vectStrStops[cptStops] is the priority of the stop (in a CFF meaning, we don't use it)
 							if (vectStrStops.size()<=cptStops+1)
 							{
 								// Stop with no name, we don't insert it
@@ -648,16 +648,16 @@ namespace synthese
 							
 							// Search (and create if not exists) stop area
 							StopArea* stopArea = NULL;
-							if(stopAreas.contains(codeStop))
+							if(stopAreas.contains(nameStop))
 							{
-								stopArea = *stopAreas.get(codeStop).begin();
+								stopArea = *stopAreas.get(nameStop).begin();
 							}
 							else
 							{
-								Log::GetInstance().info("Create stopArea " + nameStop + " (" + codeStop + ")");
+								Log::GetInstance().info("Create stopArea " + nameStop + " (with code " + nameStop + ")");
 								stopArea = new StopArea(StopAreaTableSync::getId());
 								Importable::DataSourceLinks links;
-								links.insert(make_pair(&*(get<DataSource>()), codeStop));
+								links.insert(make_pair(&*(get<DataSource>()), nameStop));
 								stopArea->setDataSourceLinksWithoutRegistration(links);
 								stopArea->setCity(city);
 								Env::GetOfficialEnv().getEditableRegistry<StopArea>().add(boost::shared_ptr<StopArea>(stopArea));
@@ -670,16 +670,16 @@ namespace synthese
 							
 							//Search (and create if not exists) stop point
 							StopPoint* stopPoint = NULL;
-							if (stops.contains(codeStop))
+							if (stops.contains(nameStop))
 							{
-								stopPoint = *stops.get(codeStop).begin();
+								stopPoint = *stops.get(nameStop).begin();
 							}
 							else
 							{
-								Log::GetInstance().info("Create stopPoint " + nameStop + " (" + codeStop + ")");
+								Log::GetInstance().info("Create stopPoint " + nameStop + " (with code " + nameStop + ")");
 								stopPoint = new StopPoint(StopPointTableSync::getId());
 								Importable::DataSourceLinks links;
-								links.insert(make_pair(&*(get<DataSource>()), codeStop));
+								links.insert(make_pair(&*(get<DataSource>()), nameStop));
 								stopPoint->setDataSourceLinksWithoutRegistration(links);
 								stopPoint->setHub(stopArea);
 								Env::GetOfficialEnv().getEditableRegistry<StopPoint>().add(boost::shared_ptr<StopPoint>(stopPoint));
@@ -692,7 +692,7 @@ namespace synthese
 							
 							ImportableTableSync::ObjectBySource<StopPointTableSync>::Set linkedStops(
 								stops.get(
-									codeStop
+									nameStop
 							)	);
 							
 							JourneyPattern::StopWithDepartureArrivalAuthorization stopOfRoute(
