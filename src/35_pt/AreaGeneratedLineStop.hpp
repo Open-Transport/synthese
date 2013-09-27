@@ -58,6 +58,8 @@ namespace synthese
 			LineArea* getLineArea() const { return _lineArea; }
 
 			virtual bool getScheduleInput() const { return false; }
+
+			virtual void _unlink() {}
 		};
 }	}
 
