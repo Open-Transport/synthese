@@ -83,10 +83,12 @@ namespace synthese
 			public:
 				static const std::string PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID;
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
+				static const std::string PARAMETER_HYSTERESIS;
 		
 			private:
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
+				boost::posix_time::time_duration _hysteresis;
 	
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
@@ -156,7 +158,10 @@ namespace synthese
 					bool operator==(const pt::SchedulesBasedService::Schedules& schedules) const;
 
 					bool mustBeImported() const;
-					void updateService(pt::ScheduledService& service) const;
+					void updateService(
+						const boost::posix_time::time_duration& hysteresis,
+						pt::ScheduledService& service
+					) const;
 				};
 
 				struct Destinataire

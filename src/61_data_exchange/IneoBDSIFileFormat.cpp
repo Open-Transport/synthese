@@ -75,6 +75,7 @@ namespace synthese
 	{
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = "mr_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		
 		
 		
@@ -111,6 +112,11 @@ namespace synthese
 			{
 				throw RequestException("No such messages recipients data source");
 			}
+
+			// Hysteresis
+			_hysteresis = seconds(
+				map.getDefault<long>(PARAMETER_HYSTERESIS, 0)
+			);
 		}
 		
 		
@@ -938,7 +944,7 @@ namespace synthese
 				// Loop on services to update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToUpdate)
 				{
-					it->updateService(*it->syntheseService);
+					it->updateService(_hysteresis, *it->syntheseService);
 				}
 
 				// Loop on services to move and update
@@ -953,7 +959,7 @@ namespace synthese
 					links.erase(dataSourceOnUpdateEnv);
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
 					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(*it->syntheseService);
+					it->updateService(_hysteresis, *it->syntheseService);
 				}
 
 				// Loop on services to link and update
@@ -968,7 +974,7 @@ namespace synthese
 					links.erase(dataSourceOnUpdateEnv);
 					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
 					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(*it->syntheseService);
+					it->updateService(_hysteresis, *it->syntheseService);
 				}
 
 				// Remove services from today
@@ -999,7 +1005,8 @@ namespace synthese
 			boost::optional<std::ostream&> outputStream,
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
-			DatabaseReadImporter<IneoBDSIFileFormat>(env, import, minLogLevel, logPath, outputStream, pm)
+			DatabaseReadImporter<IneoBDSIFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
+			_hysteresis(seconds(0))
 		{}
 
 
@@ -1183,17 +1190,42 @@ namespace synthese
 
 
 
-		void IneoBDSIFileFormat::Importer_::Course::updateService( pt::ScheduledService& service ) const
-		{
+		void IneoBDSIFileFormat::Importer_::Course::updateService(
+			const boost::posix_time::time_duration& hysteresis,
+			pt::ScheduledService& service
+		) const	{
 			// Update of the real time schedules
-			SchedulesBasedService::Schedules departureSchedules;
-			SchedulesBasedService::Schedules arrivalSchedules;
+			SchedulesBasedService::Schedules departureSchedules(
+				service.getDepartureSchedules(true, true)
+			);
+			SchedulesBasedService::Schedules arrivalSchedules(
+				service.getArrivalSchedules(true, true)
+			);
+			bool updated(false);
 			for(size_t i(0); i<horaires.size(); ++i)
 			{
-				departureSchedules.push_back(horaires[i].hrd);
-				arrivalSchedules.push_back(horaires[i].hra);
+				time_duration delta(departureSchedules[i] - horaires[i].hrd);
+				if(delta < -hysteresis || delta > hysteresis)
+				{
+					updated = true;
+					break;
+				}
+				delta = arrivalSchedules[i] - horaires[i].hra;
+				if(delta < -hysteresis || delta > hysteresis)
+				{
+					updated = true;
+					break;
+				}
 			}
-			service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
+			if(updated)
+			{
+				for(size_t i(0); i<horaires.size(); ++i)
+				{
+					departureSchedules[i] = horaires[i].hrd;
+					arrivalSchedules[i] = horaires[i].hra;
+				}
+				service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
+			}
 		}
 
 
