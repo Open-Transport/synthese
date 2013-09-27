@@ -26,6 +26,7 @@
 #include "DRTArea.hpp"
 #include "JourneyPattern.hpp"
 #include "LineStopTableSync.h"
+#include "PTModule.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 
@@ -187,5 +188,18 @@ namespace synthese
 				prefix + LineStopTableSync::COL_RESERVATION_NEEDED,
 				true
 			);
+		}
+
+
+
+		void LineArea::_unlink()
+		{
+			// Useful transfer calculation
+			BOOST_FOREACH(StopArea* stopArea, getArea()->get<Stops>())
+			{
+				stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+			}
+
+			clearArea();
 		}
 }	}

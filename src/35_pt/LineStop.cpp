@@ -488,4 +488,28 @@ namespace synthese
 				getLine()->addEdge(*this);
 			}
 		}
+
+
+
+		void LineStop::unlink()
+		{
+			if(getLine())
+			{
+				getLine()->removeEdge(*this);
+			}
+
+			_unlink();
+
+			// Clear cache in case of non detected change in external objects (like path edges number)
+			if(getLine())
+			{
+				BOOST_FOREACH(const ServiceSet::value_type& service, getLine()->getServices())
+				{
+					if(dynamic_cast<SchedulesBasedService*>(service))
+					{
+						static_cast<SchedulesBasedService*>(service)->_clearGeneratedSchedules();
+					}
+				}
+			}
+		}
 }	}

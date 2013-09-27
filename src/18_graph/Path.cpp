@@ -606,8 +606,8 @@ namespace synthese
 				// Previous departure pointers
 				if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed() && firstRealEdge)
 				{
-					Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
-					Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
+					Edge* previousDeparture(firstEdge.getPreviousDepartureForFineSteppingOnly());
+					Edge* previousConnectingDeparture(firstEdge.getPreviousConnectionDeparture());
 
 					{
 						Edge* oldPreviousDeparture(firstRealEdge->getPreviousDepartureForFineSteppingOnly());

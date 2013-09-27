@@ -76,40 +76,17 @@ namespace synthese
 				return;
 			}
 
-			// Collecting all line stops to unlink including journey pattern copies
-			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
-			ToClean toClean;
-			toClean.push_back(make_pair(getLine(), this));
-			BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+			// Removing edge from journey pattern
+			getLine()->removeEdge(*this);
+
+			// Removing edge from stop point
+			if(getIsArrival())
 			{
-				toClean.push_back(
-					make_pair(
-						copy,
-						const_cast<LinePhysicalStop*>(static_cast<const LinePhysicalStop*>(
-							copy->getEdge(getRankInPath()))
-						)
-				)	);
+				stop->removeArrivalEdge(this);
 			}
-
-			BOOST_FOREACH(const ToClean::value_type& it, toClean)
+			if(getIsDeparture())
 			{
-				// Removing edge from journey pattern
-				it.first->removeEdge(*it.second);
-
-				// Removing edge from stop point
-				if(it.second->getIsArrival())
-				{
-					stop->removeArrivalEdge(it.second);
-				}
-				if(it.second->getIsDeparture())
-				{
-					stop->removeDepartureEdge(it.second);
-				}
-
-				if(it.second != this)
-				{
-					delete it.second;
-				}
+				stop->removeDepartureEdge(this);
 			}
 		}
 }	}
