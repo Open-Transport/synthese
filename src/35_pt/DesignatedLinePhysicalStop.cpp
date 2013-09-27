@@ -22,8 +22,10 @@
 
 #include "DesignatedLinePhysicalStop.hpp"
 
+#include "Hub.h"
 #include "JourneyPattern.hpp"
 #include "LineStopTableSync.h"
+#include "PTModule.h"
 #include "StopPoint.hpp"
 
 #include <geos/geom/LineString.h>
@@ -117,5 +119,18 @@ namespace synthese
 			{
 				pm.insert(prefix + TABLE_COL_GEOMETRY, string());
 			}
+		}
+
+
+
+		void DesignatedLinePhysicalStop::_unlink()
+		{
+			// Useful transfer calculation
+			if(getPhysicalStop())
+			{
+				getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+			}
+
+			clearPhysicalStopLinks();
 		}
 }	}

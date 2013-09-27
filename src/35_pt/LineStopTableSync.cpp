@@ -203,51 +203,7 @@ namespace synthese
 		void InheritanceLoadSavePolicy<LineStopTableSync, LineStop>::Unlink(
 			LineStop* obj
 		){
-			if(obj->getLine())
-			{
-				obj->getLine()->removeEdge(*obj);
-			}
-
-			if(dynamic_cast<DesignatedLinePhysicalStop*>(obj))
-			{
-				DesignatedLinePhysicalStop& object(
-					dynamic_cast<DesignatedLinePhysicalStop&>(*obj)
-				);
-
-				// Useful transfer calculation
-				if(object.getPhysicalStop())
-				{
-					object.getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-				}
-
-				object.clearPhysicalStopLinks();
-			}
-			else if(dynamic_cast<LineArea*>(obj))
-			{
-				LineArea& object(
-					dynamic_cast<LineArea&>(*obj)
-				);
-
-				// Useful transfer calculation
-				BOOST_FOREACH(StopArea* stopArea, object.getArea()->get<Stops>())
-				{
-					stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-				}
-
-				object.clearArea();
-			}
-
-			// Clear cache in case of non detected change in external objects (like path edges number)
-			if(obj->getLine())
-			{
-				BOOST_FOREACH(const ServiceSet::value_type& service, obj->getLine()->getServices())
-				{
-					if(dynamic_cast<SchedulesBasedService*>(service))
-					{
-						static_cast<SchedulesBasedService*>(service)->_clearGeneratedSchedules();
-					}
-				}
-			}
+			obj->unlink();
 		}
 
 
