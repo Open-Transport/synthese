@@ -39,6 +39,7 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
+using namespace std;
 using namespace synthese::util;
 using namespace synthese::pt;
 using namespace synthese::geography;
@@ -816,6 +817,16 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+	{
+		pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> it(s1.getDepartureEdges().equal_range(&l));
+		BOOST_CHECK_EQUAL(s1.getDepartureEdges().count(&l), 1);
+		if(s1.getDepartureEdges().count(&l) == 1)
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().lower_bound(&l)->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().count(&l), 0);
+	}
+
 
 	l2D.link(env);
 
@@ -839,6 +850,7 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 			break;
 		}
 	}
+
 
 	BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
@@ -865,7 +877,41 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	const AreaGeneratedLineStop& ld1AD2(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(2)));
 	const AreaGeneratedLineStop& ld1AD3(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(3)));
 
+	{
+		pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> it(s1.getDepartureEdges().equal_range(&l));
+		BOOST_CHECK_EQUAL(s1.getDepartureEdges().count(&l), 1);
+		if(s1.getDepartureEdges().count(&l) == 1)
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().lower_bound(&l)->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().count(&l), 0);
+	}
+
+	{
+		pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> it(s3.getDepartureEdges().equal_range(&l));
+		BOOST_CHECK_EQUAL(s3.getDepartureEdges().count(&l), 1);
+		if(s3.getDepartureEdges().count(&l) == 1)
+		{
+			BOOST_CHECK(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second));
+			if(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second))
+			{
+				BOOST_CHECK_EQUAL(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second)->getLineArea(), &ld1AD);
+			}
+		}
+		BOOST_CHECK_EQUAL(s3.getArrivalEdges().count(&l), 1);
+		{
+			BOOST_CHECK(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second));
+			if(dynamic_cast<const AreaGeneratedLineStop*>(s3.getArrivalEdges().lower_bound(&l)->second))
+			{
+				BOOST_CHECK_EQUAL(dynamic_cast<const AreaGeneratedLineStop*>(s3.getArrivalEdges().lower_bound(&l)->second)->getLineArea(), &ld1AD);
+			}
+		}
+	}
+
 	ld1AD.unlink();
+
+	BOOST_CHECK_EQUAL(s3.getDepartureEdges().count(&l), 0);
+	BOOST_CHECK_EQUAL(s3.getArrivalEdges().count(&l), 0);
 
 	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
