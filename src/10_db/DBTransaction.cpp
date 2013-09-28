@@ -66,10 +66,7 @@ namespace synthese
 			_modifEvents.push_back(modifEvent);
 
 			// Keep the modification (delete or update) for further checks
-			if(modifEvent.type == DB::MODIF_UPDATE || modifEvent.type == DB::MODIF_DELETE)
-			{
-				_modifiedRows.insert(key);
-			}
+			_modifiedRows.insert(key);
 		}
 
 
