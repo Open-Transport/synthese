@@ -353,19 +353,34 @@ namespace synthese
 							}
 							if(!found)
 							{
-								_objectsToRemove.insert(subObject->getKey());
-								if(importer)
-								{
-									RegistryTableType tableId(decodeTableId(subObject->getKey()));
-									boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
-									importer->_logDebug("Delete "+ lexical_cast<string>(subObject->getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  subObject->getName() + ")");
-								}
+								_deleteWithSubObjects(*subObject, importer);
 							}
 						}
 					}
 			}	}
 
 			return result;
+		}
+
+
+
+		void InterSYNTHESEPackageContent::_deleteWithSubObjects(
+			util::Registrable& object,
+			boost::optional<const impex::Importer&> importer
+		){
+ 			BOOST_REVERSE_FOREACH(Registrable* subObject, object.getSubObjects()) // Reverse order to maintain dependencies between objects
+			{
+				_deleteWithSubObjects(*subObject, importer);
+			}
+			_objectsToRemove.push_back(object.getKey()); // After the sub-objects to maintain dependencies 
+			if(importer)
+			{
+				RegistryTableType tableId(decodeTableId(object.getKey()));
+				boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
+				importer->_logDebug(
+					"Delete "+ lexical_cast<string>(object.getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  object.getName() + ")"
+				);
+			}
 		}
 
 
@@ -381,7 +396,7 @@ namespace synthese
 			// Deletions
 			BOOST_FOREACH(RegistryKeyType id, _objectsToRemove)
 			{
-				DBModule::DeleteObject(id, transaction);
+				DBModule::GetDB()->deleteStmt(id, transaction); // Not the Remove function because the cascaded updates are already done by the object comparisons
 			}
 
 			// Insertions
