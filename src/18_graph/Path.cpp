@@ -357,9 +357,13 @@ namespace synthese
 
 		void Path::markScheduleIndexesUpdateNeeded(bool RTDataOnly)
 		{
-			for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
+			BOOST_FOREACH(const Edges::value_type& edge, _edges)
 			{
-				(*it)->markServiceIndexUpdateNeeded(RTDataOnly);
+				Edge::SubEdges subEdges(edge->getSubEdges());
+				BOOST_FOREACH(Edge::SubEdges::value_type& subEdge, subEdges)
+				{
+					subEdge->markServiceIndexUpdateNeeded(RTDataOnly);
+				}
 			}
 		}
 
