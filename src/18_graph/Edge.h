@@ -136,6 +136,7 @@ namespace synthese
 
 			mutable boost::recursive_mutex _indexMutex;
 
+		public:
 			/** Updates service indices.
 				@param RTData indicates if real time or theoretical indices must be updated
 				@author Hugues Romain
