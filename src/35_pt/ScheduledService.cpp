@@ -790,5 +790,22 @@ namespace synthese
 			// Clear cache in case of non detected change in external objects (like path edges number)
 			_clearGeneratedSchedules();
 		}
-	}
-}
+
+
+
+		void ScheduledService::unlink()
+		{
+			if(getPath())
+			{
+				getPath()->removeService(*this);
+			}
+
+			cleanDataSourceLinks(true);
+
+			// Unregister from the line
+			if(getRoute() && getRoute()->getCommercialLine())
+			{
+				getRoute()->getCommercialLine()->unregisterService(*this);
+			}
+		}
+}	}
