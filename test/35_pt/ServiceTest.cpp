@@ -21,8 +21,11 @@
 
 #include "AccessParameters.h"
 #include "AllowedUseRule.h"
+#include "CommercialLine.h"
 #include "ContinuousService.h"
+#include "DRTArea.hpp"
 #include "JourneyPattern.hpp"
+#include "LineArea.hpp"
 #include "PermanentService.h"
 #include "ScheduledService.h"
 #include "GeographyModule.h"
@@ -1196,4 +1199,164 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	BOOST_CHECK_EQUAL(sp7.getTheoreticalArrivalDateTime(), ptime(today - days(1), time_duration(3,36,0)));
 	BOOST_CHECK_EQUAL(sp7.getOriginDateTime(), ptime(today - days(1), time_duration(3,21,0)));
 	BOOST_CHECK_EQUAL(sp7.getServiceRange(), hours(24));
+}
+
+BOOST_AUTO_TEST_CASE (testServcesIndices)
+{
+	Env env;
+	GeographyModule::PreInit();
+
+	date today(day_clock::local_day());
+
+	RuleUser::Rules r;
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	CommercialLine line;
+	JourneyPattern l(5678);
+	l.setCommercialLine(&line);
+	l.setRules(r);
+
+	StopArea p1(0, true);
+	StopArea p2(0, false);
+	StopArea p3(0, false);
+	StopArea p4(0, false);
+	
+	DRTArea a23;
+	{
+		Stops::Type stops;
+		stops.insert(&p2);
+		stops.insert(&p3);
+		a23.set<Stops>(stops);
+	}
+
+	StopPoint s1(0, "s1", &p1);
+	s1.link(env, true);
+	StopPoint s2(0, "s1", &p2);
+	s2.link(env, true);
+	StopPoint s3(0, "s1", &p3);
+	s3.link(env, true);
+	StopPoint s4(0, "s1", &p4);
+	s4.link(env, true);
+
+	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
+	l1D.link(env, true);
+
+	LineArea l23AD(0, &l, 1, true, true,50,&a23, false);
+	l23AD.link(env, true);
+
+	DesignatedLinePhysicalStop l4A(0, &l, 2, false, true,200,&s4, true);
+	l4A.link(env, true);
+
+	DesignatedLinePhysicalStop* lNULL(NULL);
+
+	SchedulesBasedService::Schedules d;
+	SchedulesBasedService::Schedules a;
+
+	a.push_back(time_duration(2, 0, 0));
+	d.push_back(time_duration(2, 0, 0));
+
+	a.push_back(time_duration(2, 30, 0));
+	d.push_back(time_duration(2, 25, 0));
+
+	a.push_back(time_duration(2, 35, 0));
+	d.push_back(time_duration(2, 35, 0));
+
+	ScheduledService s(1234, "1234AB", &l);
+
+	BOOST_CHECK_EQUAL(s.getKey(), 1234);
+	BOOST_CHECK_EQUAL(s.getServiceNumber(), "1234AB");
+	BOOST_CHECK_EQUAL(s.getPath(), &l);
+	BOOST_CHECK_EQUAL(s.isContinuous(), false);
+
+	s.setDataSchedules(d, a);
+	s.setActive(today);
+
+	s.link(env, true);
+
+	BOOST_CHECK_EQUAL(l.getServices().size(), 1);
+	if(l.getServices().size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*l.getServices().begin(), &s);
+	}
+
+	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+
+	AccessParameters ap;
+	ptime time7(today, time_duration(1,36,0));
+	ptime tomorrow(time7 + days(1));
+	boost::optional<Edge::DepartureServiceIndex::Value> lastIndex;
+	ServicePointer sp7(
+		l1D.getNextService(
+			ap,
+			time7,
+			tomorrow,
+			true,
+			lastIndex
+	)	);
+	
+	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(true)); // Only RT because the search was for today
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+
+	tomorrow += days(1);
+	ptime after_tomorrow(time7 + days(3));
+	ServicePointer sp8(
+		l1D.getNextService(
+			ap,
+			tomorrow,
+			after_tomorrow,
+			true,
+			lastIndex
+	)	);
+
+	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(false)); // Now planned index too, because the second search was for tomorrow
+	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+
+	ServicePointer sp7b(
+		l23AD.getSubEdges().at(0)->getNextService(
+			ap,
+			time7,
+			tomorrow,
+			true,
+			lastIndex
+	)	);
+
+	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(!l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true)); // Because of last call
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+
+	s.unlink();
+
+	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
+	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
 }
