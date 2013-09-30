@@ -96,7 +96,7 @@ namespace synthese
 
 				struct Arret
 				{
-					int ref;
+					std::string ref;
 					std::string nom;
 
 					pt::StopPoint* syntheseStop;
@@ -105,14 +105,14 @@ namespace synthese
 
 				struct Ligne
 				{
-					int ref;
+					std::string ref;
 
 					pt::CommercialLine* syntheseLine;
 				};
 
 				struct ArretChn
 				{
-					int ref;
+					std::string dateRef;
 					Arret* arret;
 					int pos;
 					std::string type;
@@ -120,7 +120,7 @@ namespace synthese
 
 				struct Chainage
 				{
-					int ref;
+					std::string dateRef;
 					std::string nom;
 					Ligne* ligne;
 					bool sens;
@@ -133,7 +133,7 @@ namespace synthese
 
 				struct Horaire
 				{
-					int ref;
+					std::string dateRef;
 					boost::posix_time::time_duration htd;
 					boost::posix_time::time_duration hta;
 					boost::posix_time::time_duration had;
@@ -145,7 +145,7 @@ namespace synthese
 
 				struct Course
 				{
-					int ref;
+					std::string dateRef;
 					Chainage* chainage;
 					typedef std::vector<Horaire> Horaires;
 					Horaires horaires;
@@ -159,7 +159,7 @@ namespace synthese
 
 					bool mustBeImported() const;
 					void updateService(
-						const boost::posix_time::time_duration& hysteresis,
+						const Importer_& importer,
 						pt::ScheduledService& service
 					) const;
 				};
@@ -186,10 +186,10 @@ namespace synthese
 					Destinataires destinataires;
 				};
 
-				typedef std::map<int, Course> Courses;
-				typedef std::map<int, Ligne> Lignes;
-				typedef std::map<int, Arret> Arrets;
-				typedef std::map<int, Chainage> Chainages;
+				typedef std::map<std::string, Course> Courses;
+				typedef std::map<std::string, Ligne> Lignes;
+				typedef std::map<std::string, Arret> Arrets;
+				typedef std::map<std::string, Chainage> Chainages;
 				typedef std::map<int, Programmation> Programmations;
 
 				void _logLoadDetail(
@@ -224,6 +224,18 @@ namespace synthese
 					const std::string& newValue,
 					const std::string& remarks
 				) const;
+
+				void _logTraceDetail(
+					const std::string& table,
+					const std::string& localId,
+					const std::string& locaName,
+					const util::RegistryKeyType syntheseId,
+					const std::string& syntheseName,
+					const std::string& oldValue,
+					const std::string& newValue,
+					const std::string& remarks
+				) const;
+				const boost::posix_time::time_duration& getHysteresis() const { return _hysteresis; }
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////

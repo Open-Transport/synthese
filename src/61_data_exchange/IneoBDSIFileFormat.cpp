@@ -157,12 +157,12 @@ namespace synthese
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
 			string tomorrowStr("'"+ to_iso_extended_string(tomorrowday) +"'");
-			string timenowStr("'"+ to_simple_string(timenow) +"'");
+			string timenowStr("'"+ to_simple_string(timenow.time_of_day()) +"'");
 
 			// Arrets
 			{
 				string query(
-					"SELECT * FROM "+ _database +".ARRET WHERE jour="+ todayStr
+					"SELECT * FROM "+ _database +".ARRET GROUP BY ref ORDER BY ref"
 				);
 				DBResultSPtr result(db.execQuery(query));
 				while(result->next())
@@ -199,7 +199,7 @@ namespace synthese
 					}	}
 
 					// Ref
-					int ref(result->getInt("ref"));
+					string ref(result->get<string>("ref"));
 
 					// Registration
 					Arret& arret(
@@ -246,7 +246,7 @@ namespace synthese
 					}
 
 					// Ref
-					int ref(result->getInt("ref"));
+					string ref(result->get<string>("ref"));
 
 					// Registration
 					Ligne& ligne(
@@ -266,222 +266,214 @@ namespace synthese
 			// Chainages
 			{
 				string chainageQuery(
-					"SELECT * FROM "+ _database +".ARRETCHN "+
-					"WHERE jour="+ todayStr +" ORDER BY "+ _database +".ARRETCHN.chainage, "+ _database +".ARRETCHN.pos"
-				);
-				string query(
-					"SELECT * FROM "+ _database +".CHAINAGE WHERE jour="+ todayStr + "ORDER BY ref"
+					"SELECT "+ _database +".ARRETCHN.*,"+ _database +".CHAINAGE.nom,"+ _database +".CHAINAGE.nom,"+ _database +".CHAINAGE.sens,"+ _database +".CHAINAGE.ligne "+
+					" FROM "+ _database +".ARRETCHN "+
+					" INNER JOIN "+ _database +".CHAINAGE ON "+ _database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+
+					_database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
+					"WHERE "+ _database +".CHAINAGE.jour="+ todayStr +" OR "+ _database +".CHAINAGE.jour="+ tomorrowStr +
+					" ORDER BY "+ _database +".ARRETCHN.jour, "+ _database +".ARRETCHN.chainage, "+ _database +".ARRETCHN.pos"
 				);
 			
 				DBResultSPtr chainageResult(db.execQuery(chainageQuery));
-				DBResultSPtr result(db.execQuery(query));
-				chainageResult->next();
-				while(result->next())
+				string lastDateRef;
+				Chainage* chainage(NULL);
+				while(chainageResult->next())
 				{
-					int ref(result->getInt("ref"));
-					string name(result->getText("nom"));
+					string dateRef(chainageResult->getText("chainage")+"/"+chainageResult->getText("jour"));
 
-					Chainage& chainage(
-						chainages.insert(
-							make_pair(
-								ref,
-								Chainage()
-						)	).first->second
-					);
-					chainage.ref = ref;
-					
-					Lignes::iterator it(lignes.find(result->getInt("ligne")));
-					if(it == lignes.end())
+					// Entering new chainage
+					if(dateRef != lastDateRef)
 					{
-						_logWarningDetail(
-							"JOURNEYPATTERN",lexical_cast<string>(ref),name,0,string(),string(), string(),"LINE NOT FOUND"
+						lastDateRef = dateRef;
+						string name(chainageResult->getText("nom"));
+
+						chainage = &(
+							chainages.insert(
+								make_pair(
+									dateRef,
+									Chainage()
+							)	).first->second
 						);
-						chainages.erase(ref);
-						do
-						{
-							int chainage_ref(chainageResult->getInt("chainage"));
-							if(chainage_ref != ref)
-							{
-								break;
-							}
-						} while(chainageResult->next());
-						continue;
-					}
-					chainage.ligne = &it->second;
-					chainage.nom = name;
-					chainage.sens = (result->getText("sens") == "R");
-					_logLoadDetail(
-						"JOURNEYPATTERN",lexical_cast<string>(ref),name,0,string(),string(), string(),"OK"
-					);
+						chainage->dateRef = dateRef;
 					
-					// Arretchn loop
-					do
-					{
-						int chainage_ref(chainageResult->getInt("chainage"));
-						if(chainage_ref != ref)
-						{
-							break;
-						}
-
-						ArretChn& arretChn(
-							*chainage.arretChns.insert(
-								chainage.arretChns.end(),
-								ArretChn()
+						Lignes::iterator it(
+							lignes.find(
+								chainageResult->get<string>("ligne")
 						)	);
-						arretChn.ref = chainageResult->getInt("ref");
-
-						Arrets::iterator it(arrets.find(chainageResult->getInt("arret")));
-						if(it == arrets.end())
+						if(it == lignes.end())
 						{
 							_logWarningDetail(
-								"STOPPOINT",lexical_cast<string>(arretChn.ref),lexical_cast<string>(arretChn.ref),0,string(),string(), string(),"Bad arret field in arretchn"
+								"JOURNEYPATTERN",dateRef,name,0,string(),string(), string(),"LINE NOT FOUND"
 							);
-							chainage.arretChns.pop_back();
+							chainages.erase(dateRef);
+							do
+							{
+								string chainage_ref(chainageResult->get<string>("chainage")+"/"+chainageResult->get<string>("jour"));
+								if(chainage_ref != dateRef)
+								{
+									break;
+								}
+							} while(chainageResult->next());
 							continue;
 						}
-						arretChn.arret = &it->second;
-						arretChn.pos = chainageResult->getInt("pos");
-						arretChn.type = chainageResult->getText("type");
+						chainage->ligne = &it->second;
+						chainage->nom = name;
+						chainage->sens = (chainageResult->getText("sens") == "R");
 						_logLoadDetail(
-							"STOPPOINT",lexical_cast<string>(arretChn.ref),arretChn.arret->nom,0,string(),string(), string(),"OK"
+							"JOURNEYPATTERN",dateRef,name,0,string(),string(), string(),"OK"
 						);
+					}
+					
+					ArretChn& arretChn(
+						*chainage->arretChns.insert(
+							chainage->arretChns.end(),
+							ArretChn()
+					)	);
+					arretChn.dateRef = chainageResult->get<string>("ref")+"/"+chainageResult->get<string>("jour");
 
-					} while(chainageResult->next());
+					Arrets::iterator it(
+						arrets.find(
+							chainageResult->get<string>("arret")
+					)	);
+					if(it == arrets.end())
+					{
+						_logWarningDetail(
+							"STOPPOINT",arretChn.dateRef,arretChn.dateRef,0,string(),string(), string(),"Bad arret field in arretchn"
+						);
+						chainage->arretChns.pop_back();
+						continue;
+					}
+					arretChn.arret = &it->second;
+					arretChn.pos = chainageResult->getInt("pos");
+					arretChn.type = chainageResult->getText("type");
+					_logLoadDetail(
+						"STOPPOINT",arretChn.dateRef,arretChn.arret->nom,0,string(),string(), string(),"OK"
+					);
 				}
 			}
 
-
 			// Courses
 			{
-				
-				// no need to query to tomorrow.
-				// as we place to import every day very early in the morning.
-
 				string horaireQuery(
-					"SELECT "+ _database +".HORAIRE.* FROM "+ _database +".HORAIRE "+
+					"SELECT "+ _database +".HORAIRE.*,"+ _database +".ARRETCHN.chainage FROM "+ _database +".HORAIRE "+
 					"INNER JOIN "+ _database +".ARRETCHN ON "+ _database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+
 					_database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
-					"WHERE ("+ _database +".HORAIRE.jour="+ todayStr + "AND "+ _database +".HORAIRE.hra> "+ timenowStr +
-					") AND ("+ _database +".HORAIRE.jour="+ tomorrowStr + "AND "+ _database +".HORAIRE.hra< "+ timenowStr +
+					"WHERE ("+ _database +".HORAIRE.jour="+ todayStr + " AND "+ _database +".HORAIRE.hra>"+ timenowStr +
+					") OR ("+ _database +".HORAIRE.jour="+ tomorrowStr + " AND "+ _database +".HORAIRE.hra<"+ timenowStr +
 					") ORDER BY "+ _database +".HORAIRE.course, "+ _database +".ARRETCHN.pos"
 				);
-				string query(
-					"SELECT * FROM "+ _database +".COURSE WHERE jour="+ todayStr
-				);
 				DBResultSPtr horaireResult(db.execQuery(horaireQuery));
-				DBResultSPtr result(db.execQuery(query));
-				horaireResult->next();
-				while(result->next())
+				
+				time_duration now(second_clock::local_time().time_of_day());
+				const time_duration dayBreakTime(hours(3));
+				time_duration now_plus_35(now);
+				now_plus_35 += seconds(35);
+				string lastCourseRef;
+				Course* course(NULL);
+				while(horaireResult->next())
 				{
-					int ref(result->getInt("ref"));
-					Course& course(
-						courses.insert(
-							make_pair(
-								ref,
-								Course()
-						)	).first->second
-					);
-					course.ref = ref;
-					Chainages::iterator it(chainages.find(result->getInt("chainage")));
-					if(it == chainages.end())
+					string courseRef(horaireResult->get<string>("course")+"/"+horaireResult->get<string>("jour"));
+					if(courseRef != lastCourseRef)
 					{
-						_logWarningDetail(
-							"SERVICE",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),string(), string(),"Bad chainage field in course "
+						course = &(
+							courses.insert(
+								make_pair(
+									courseRef,
+									Course()
+							)	).first->second
 						);
-						courses.erase(ref);
-					}
-					else
-					{
-						_logLoadDetail(
-							"SERVICE",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),string(), string(),"OK"
-						);
-						course.chainage = &it->second;
-						course.syntheseService = NULL;
-					}
+						course->dateRef = courseRef;
 
-					// Horaires loop
-					time_duration now(second_clock::local_time().time_of_day());
-					const time_duration dayBreakTime(hours(3));
-
-					// Patch for mistake in real time departure of the vehicle from the stop
-					time_duration now_plus_35(second_clock::local_time().time_of_day());
-					now_plus_35 += seconds(35);
-
-					do
-					{
-						int course_ref(horaireResult->getInt("course"));
-						if(course_ref != ref)
+						Chainages::iterator it(
+							chainages.find(
+								horaireResult->get<string>("chainage")+"/"+horaireResult->get<string>("jour")
+						)	);
+						if(it == chainages.end())
 						{
-							break;
+							_logWarningDetail(
+								"SERVICE",courseRef,courseRef,0,string(),string(), string(),"Bad chainage field in course "
+							);
+							courses.erase(courseRef);
+							course = NULL;
+						}
+						else
+						{
+							_logLoadDetail(
+								"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
+							);
+							course->chainage = &it->second;
+							course->syntheseService = NULL;
 						}
 
-						if(it != chainages.end())
+						lastCourseRef = courseRef;
+					}
+
+					if(course)
+					{
+						Horaire& horaire(
+							*course->horaires.insert(
+								course->horaires.end(),
+								Horaire()
+						)	);
+						horaire.dateRef = horaireResult->get<string>("ref")+"/"+horaireResult->get<string>("jour");
+						horaire.had = duration_from_string(horaireResult->getText("had"));
+						// Patch for schedules after midnight
+						if(horaire.had < dayBreakTime)
 						{
-							Horaire& horaire(
-								*course.horaires.insert(
-									course.horaires.end(),
-									Horaire()
-							)	);
-							horaire.ref = horaireResult->getInt("ref");
-							horaire.had = duration_from_string(horaireResult->getText("had"));
-							// Patch for schedules after midnight
-							if(horaire.had < dayBreakTime)
-							{
-								horaire.had += hours(24);
-							}
-							horaire.haa = duration_from_string(horaireResult->getText("haa"));
-							if(horaire.haa < dayBreakTime)
-							{
-								horaire.haa += hours(24);
-							}
-							horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
-							if(horaire.hrd < dayBreakTime)
-							{
-								horaire.hrd += hours(24);
-							}
-							horaire.hra = duration_from_string(horaireResult->getText("hra"));
-							if(horaire.hra < dayBreakTime)
-							{
-								horaire.hra += hours(24);
-							}
-							horaire.htd = duration_from_string(horaireResult->getText("htd"));
-							if(horaire.htd < dayBreakTime)
-							{
-								horaire.htd += hours(24);
-							}
-							horaire.hta = duration_from_string(horaireResult->getText("hta"));
-							if(horaire.hta < dayBreakTime)
-							{
-								horaire.hta += hours(24);
-							}
-
-							// Patch for bad schedules when the bus is at stop
-							if(	(	(	horaireResult->getText("etat_harr") == "R" &&
-										horaireResult->getText("etat_hdep") == "E"
-									) || (
-										horaire.hrd > now
-									)
-								) &&
-								horaire.hrd <= now_plus_35
-							){
-								horaire.hrd = now_plus_35;
-							}
-
-							_logDebugDetail(
-								"SCHEDULE_HTD",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
-							);
-							_logDebugDetail(
-								"SCHEDULE_HTA",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("hta"),to_simple_string(horaire.hta),"OK"
-							);
-							_logDebugDetail(
-								"SCHEDULE_HRD",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("hrd"),to_simple_string(horaire.hrd),"OK"
-							);
-							_logDebugDetail(
-								"SCHEDULE_HRA",lexical_cast<string>(ref),lexical_cast<string>(ref),0,string(),horaireResult->getText("hra"),to_simple_string(horaire.hra),"OK"
-							);
+							horaire.had += hours(24);
+						}
+						horaire.haa = duration_from_string(horaireResult->getText("haa"));
+						if(horaire.haa < dayBreakTime)
+						{
+							horaire.haa += hours(24);
+						}
+						horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
+						if(horaire.hrd < dayBreakTime)
+						{
+							horaire.hrd += hours(24);
+						}
+						horaire.hra = duration_from_string(horaireResult->getText("hra"));
+						if(horaire.hra < dayBreakTime)
+						{
+							horaire.hra += hours(24);
+						}
+						horaire.htd = duration_from_string(horaireResult->getText("htd"));
+						if(horaire.htd < dayBreakTime)
+						{
+							horaire.htd += hours(24);
+						}
+						horaire.hta = duration_from_string(horaireResult->getText("hta"));
+						if(horaire.hta < dayBreakTime)
+						{
+							horaire.hta += hours(24);
 						}
 
-					} while(horaireResult->next());
+						// Patch for bad schedules when the bus is at stop
+						if(	(	(	horaireResult->getText("etat_harr") == "R" &&
+									horaireResult->getText("etat_hdep") == "E"
+								) || (
+									horaire.hrd > now
+								)
+							) &&
+							horaire.hrd <= now_plus_35
+						){
+							horaire.hrd = now_plus_35;
+						}
+
+						_logTraceDetail(
+							"SCHEDULE_HTD",courseRef,courseRef,0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
+						);
+						_logTraceDetail(
+							"SCHEDULE_HTA",courseRef,courseRef,0,string(),horaireResult->getText("hta"),to_simple_string(horaire.hta),"OK"
+						);
+						_logTraceDetail(
+							"SCHEDULE_HRD",courseRef,courseRef,0,string(),horaireResult->getText("hrd"),to_simple_string(horaire.hrd),"OK"
+						);
+						_logTraceDetail(
+							"SCHEDULE_HRA",courseRef,courseRef,0,string(),horaireResult->getText("hra"),to_simple_string(horaire.hra),"OK"
+						);
+					}
+
 			}	}
 			
 
@@ -738,7 +730,7 @@ namespace synthese
 
 					// Known ref ?
 					ScheduledService* service(
-						_import.get<DataSource>()->getObjectByCode<ScheduledService>(lexical_cast<string>(course.ref))
+						_import.get<DataSource>()->getObjectByCode<ScheduledService>(course.dateRef)
 					);
 					if(!service)
 					{
@@ -754,7 +746,7 @@ namespace synthese
 					// OK the service is sent to simple update
 					course.syntheseService = service;
 					servicesToUpdate.push_back(&course);
-					servicesToRemove.erase(lexical_cast<string>(course.ref));
+					servicesToRemove.erase(lexical_cast<string>(course.dateRef));
 				}
 
 				// Search for existing services with other key
@@ -847,7 +839,7 @@ namespace synthese
 							jp->setName(course.chainage->nom);
 							jp->addCodeBySource(
 								*_import.get<DataSource>(),
-								lexical_cast<string>(course.chainage->ref)
+								course.chainage->dateRef
 							);
 							_env.getEditableRegistry<JourneyPattern>().add(jp);
 							course.chainage->syntheseJourneyPatterns.push_back(jp.get());
@@ -893,7 +885,7 @@ namespace synthese
 							){
 								course.syntheseService = service;
 								servicesToLinkAndUpdate.push_back(&course);
-								servicesToRemove.erase(lexical_cast<string>(course.ref));
+								servicesToRemove.erase(course.dateRef);
 								break;
 							}
 						}
@@ -930,7 +922,7 @@ namespace synthese
 					}
 					course.syntheseService->setDataSchedules(departureSchedules, arrivalSchedules);
 					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
-					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), lexical_cast<string>(course.ref));
+					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), course.dateRef);
 					course.syntheseService->setActive(today);
 					_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(course.syntheseService));
 
@@ -944,7 +936,7 @@ namespace synthese
 				// Loop on services to update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToUpdate)
 				{
-					it->updateService(_hysteresis, *it->syntheseService);
+					it->updateService(*this, *it->syntheseService);
 				}
 
 				// Loop on services to move and update
@@ -957,9 +949,9 @@ namespace synthese
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
-					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
+					links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
 					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(_hysteresis, *it->syntheseService);
+					it->updateService(*this, *it->syntheseService);
 				}
 
 				// Loop on services to link and update
@@ -972,9 +964,9 @@ namespace synthese
 					)	);
 					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 					links.erase(dataSourceOnUpdateEnv);
-					links.insert(make_pair(dataSourceOnUpdateEnv, lexical_cast<string>(it->ref)));
+					links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
 					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(_hysteresis, *it->syntheseService);
+					it->updateService(*this, *it->syntheseService);
 				}
 
 				// Remove services from today
@@ -1092,6 +1084,33 @@ namespace synthese
 
 
 
+		void IneoBDSIFileFormat::Importer_::_logTraceDetail(
+			const std::string& table,
+			const std::string& localId,
+			const std::string& locaName,
+			const util::RegistryKeyType syntheseId,
+			const std::string& syntheseName,
+			const std::string& oldValue,
+			const std::string& newValue,
+			const std::string& remarks
+		) const	{
+
+			stringstream content;
+			content <<
+				table << ";" <<
+				localId << ";" <<
+				locaName << ";" <<
+				(syntheseId ? lexical_cast<string>(syntheseId) : string()) << ";" <<
+				syntheseName << ";" <<
+				oldValue << ";" <<
+				newValue << ";" <<
+				remarks
+			;
+			_logTrace(content.str());
+		}
+
+
+
 		DBTransaction IneoBDSIFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
@@ -1191,7 +1210,7 @@ namespace synthese
 
 
 		void IneoBDSIFileFormat::Importer_::Course::updateService(
-			const boost::posix_time::time_duration& hysteresis,
+			const Importer_& importer,
 			pt::ScheduledService& service
 		) const	{
 			// Update of the real time schedules
@@ -1202,16 +1221,34 @@ namespace synthese
 				service.getArrivalSchedules(true, true)
 			);
 			bool updated(false);
+			time_duration maxDelta(seconds(0));
+			time_duration minDelta(seconds(0));
 			for(size_t i(0); i<horaires.size(); ++i)
 			{
 				time_duration delta(departureSchedules[i] - horaires[i].hrd);
-				if(delta < -hysteresis || delta > hysteresis)
+				if(delta<minDelta)
+				{
+					minDelta = delta;
+				}
+				if(delta>maxDelta)
+				{
+					maxDelta = delta;
+				}
+				if(delta < -importer.getHysteresis() || delta > importer.getHysteresis())
 				{
 					updated = true;
 					break;
 				}
 				delta = arrivalSchedules[i] - horaires[i].hra;
-				if(delta < -hysteresis || delta > hysteresis)
+				if(delta<minDelta)
+				{
+					minDelta = delta;
+				}
+				if(delta>maxDelta)
+				{
+					maxDelta = delta;
+				}
+				if(delta < -importer.getHysteresis() || delta > importer.getHysteresis())
 				{
 					updated = true;
 					break;
@@ -1225,6 +1262,16 @@ namespace synthese
 					arrivalSchedules[i] = horaires[i].hra;
 				}
 				service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
+				importer._logDebugDetail(
+					"SCHEDULES UPDATE",
+					dateRef,
+					chainage->ligne->ref+"/"+chainage->dateRef,
+					service.getKey(),
+					service.getServiceNumber(),
+					string(),
+					lexical_cast<string>(minDelta)+"s/"+lexical_cast<string>(maxDelta)+"s",
+					string()
+				);
 			}
 		}
 

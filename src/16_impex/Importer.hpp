@@ -96,6 +96,7 @@ namespace synthese
 			void _logError(const std::string& content) const;
 			void _logWarning(const std::string& content) const;
 			void _logDebug(const std::string& content) const;
+			void _logTrace(const std::string& content) const;
 			void _logInfo(const std::string& content) const;
 			void _logLoad(const std::string& content) const;
 			void _logCreation(const std::string& content) const;
