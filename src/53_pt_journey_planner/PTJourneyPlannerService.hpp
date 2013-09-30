@@ -130,6 +130,7 @@ namespace synthese
 			static const std::string PARAMETER_DEPARTURE_PLACE_XY;
 			static const std::string PARAMETER_ARRIVAL_PLACE_XY;
 			static const std::string PARAMETER_INVERT_XY;
+			static const std::string PARAMETER_CONCATENATE_CONTIGUOUS_FOOT_LEGS;
 			static const std::string PARAMETER_SHOW_COORDINATES;
 			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
@@ -321,6 +322,7 @@ namespace synthese
 				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
 				std::string									_outputFormat;
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
+				bool _concatenateContiguousFootLegs;
 			//@}
 
 			//! @name Pages
@@ -541,7 +543,8 @@ namespace synthese
 				const road::Road* road,
 				const graph::Vertex& departureVertex,
 				const graph::Vertex& arrivalVertex,
-				bool isFirstFoot
+				bool isFirstFoot,
+				bool concatenatedFootLegs
 			) const;
 
 

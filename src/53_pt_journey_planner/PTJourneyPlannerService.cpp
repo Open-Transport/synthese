@@ -141,6 +141,7 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PLACE_XY = "departure_place_XY";
 		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_XY = "arrival_place_XY";
 		const string PTJourneyPlannerService::PARAMETER_INVERT_XY = "invert_XY";
+		const string PTJourneyPlannerService::PARAMETER_CONCATENATE_CONTIGUOUS_FOOT_LEGS = "concatenate_contiguous_foot_legs";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -708,6 +709,9 @@ namespace synthese
 			{
 				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
+
+			// Param to concatenate contiguous foot legs
+			_concatenateContiguousFootLegs = map.getDefault<bool>(PARAMETER_CONCATENATE_CONTIGUOUS_FOOT_LEGS, false);
 		}
 
 
@@ -1535,6 +1539,10 @@ namespace synthese
 			bool __Couleur = false;
 			bool isFirstFoot(true);
 			vector<Journey::ServiceUses::const_iterator> roadServiceUses;
+			vector<Journey::ServiceUses::const_iterator> contiguousFootLegs;
+			bool concatenatingFootLegs = false;
+			bool moreThanOneLeg = false;
+			bool isFirstLeg = true;
 
 			const Hub* lastPlace(NULL);
 			const StopPoint* lastStop(NULL);
@@ -1544,13 +1552,16 @@ namespace synthese
 			{
 				boost::shared_ptr<ParametersMap> legPM(new ParametersMap);
 				const ServicePointer& leg(*it);
+				bool legWritten = false;
 
 				const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath()));
 				const Junction* junction(dynamic_cast<const Junction*> (leg.getService()->getPath()));
 				if(	road == NULL &&
-					junction == NULL
+					junction == NULL &&
+					(!_concatenateContiguousFootLegs || !concatenatingFootLegs)
 				){
 					isFirstFoot = true;
+					moreThanOneLeg = true;
 
 					// Departure stop
 					_displayStopCell(
@@ -1596,6 +1607,117 @@ namespace synthese
 					lastPlace = leg.getArrivalEdge()->getHub();
 					lastStop = dynamic_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex());
 					__Couleur = !__Couleur;
+					legWritten = true;
+					isFirstLeg = false;
+				}
+				else if (road == NULL &&
+					junction == NULL &&
+					_concatenateContiguousFootLegs &&
+					concatenatingFootLegs
+				)
+				{
+					// Concatenate and write the foot leg
+					// Distance and geometry
+					moreThanOneLeg = true;
+					double distance(0);
+					vector<Geometry*> geometries;
+					vector<boost::shared_ptr<Geometry> > geometriesSPtr;
+					BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, contiguousFootLegs)
+					{
+						distance += itLeg->getDistance();
+						boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
+						if(geometry.get())
+						{
+							boost::shared_ptr<Geometry> geometryProjected(
+								_coordinatesSystem->convertGeometry(
+									*static_cast<Geometry*>(geometry.get())
+							)	);
+							geometriesSPtr.push_back(geometryProjected);
+							geometries.push_back(geometryProjected.get());
+						}
+					}
+					
+					boost::shared_ptr<MultiLineString> multiLineString(
+						_coordinatesSystem->getGeometryFactory().createMultiLineString(
+							geometries
+					)	);
+					
+					_displayJunctionCell(
+						*legPM,
+						__Couleur,
+						distance,
+						multiLineString.get(),
+						dynamic_cast<const Road*>((*contiguousFootLegs.begin())->getService()->getPath()),
+						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
+						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
+						isFirstFoot,
+						true
+					);
+					
+					concatenatingFootLegs = false;
+					contiguousFootLegs.clear();
+					
+					legPM->insert(DATA_IS_LAST_LEG, false);
+					legPM->insert(DATA_IS_FIRST_LEG, isFirstLeg);
+					
+					pm.insert(ITEM_LEG, legPM);
+					
+					legPM.reset(new ParametersMap);
+					
+					// Write the service
+					isFirstFoot = true;
+					
+					// Departure stop
+					_displayStopCell(
+						*legPM,
+						false,
+						false,
+						leg.getDepartureEdge()->getHub() != lastPlace,
+						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
+						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
+						__Couleur,
+						leg.getDepartureDateTime(),
+						journey.getContinuousServiceRange()
+						);
+					
+					lastPlace = leg.getDepartureEdge()->getHub();
+					__Couleur = !__Couleur;
+					
+					// Service
+					_displayServiceCell(
+						*legPM,
+						leg,
+						journey.getContinuousServiceRange(),
+						handicappedFilter,
+						bikeFilter,
+						__Couleur
+					);
+					
+					__Couleur = !__Couleur;
+					
+					// Arrival stop
+					_displayStopCell(
+						*legPM,
+						true,
+						leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub(),
+						false,
+						static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex()),
+						false,
+						__Couleur,
+						leg.getArrivalDateTime(),
+						journey.getContinuousServiceRange()
+					);
+					
+					lastPlace = leg.getArrivalEdge()->getHub();
+					lastStop = dynamic_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex());
+					__Couleur = !__Couleur;
+					legWritten = true;
+					isFirstLeg = false;
+				}
+				else if (_concatenateContiguousFootLegs)
+				{
+					contiguousFootLegs.push_back(it);
+					concatenatingFootLegs = true;
 				}
 				else
 				{
@@ -1642,16 +1764,70 @@ namespace synthese
 						dynamic_cast<const Road*>(leg.getService()->getPath()),
 						*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
 						*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
-						isFirstFoot
+						isFirstFoot,
+						false
 					);
 
 					roadServiceUses.clear();
 					__Couleur = !__Couleur;
 					isFirstFoot = false;
+					legWritten = true;
+					isFirstLeg = false;
 				}
-				legPM->insert(DATA_IS_LAST_LEG, it+1 == services.end());
-				legPM->insert(DATA_IS_FIRST_LEG, it == services.begin());
-
+				if (legWritten)
+				{
+					legPM->insert(DATA_IS_LAST_LEG, it+1 == services.end());
+					legPM->insert(DATA_IS_FIRST_LEG, it == services.begin());
+					
+					pm.insert(ITEM_LEG, legPM);
+				}
+			}
+			if (_concatenateContiguousFootLegs && concatenatingFootLegs)
+			{
+				boost::shared_ptr<ParametersMap> legPM(new ParametersMap);
+				// Write the final foot leg
+				// Distance and geometry
+				double distance(0);
+				vector<Geometry*> geometries;
+				vector<boost::shared_ptr<Geometry> > geometriesSPtr;
+				BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, contiguousFootLegs)
+				{
+					distance += itLeg->getDistance();
+					boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
+					if(geometry.get())
+					{
+						boost::shared_ptr<Geometry> geometryProjected(
+							_coordinatesSystem->convertGeometry(
+								*static_cast<Geometry*>(geometry.get())
+						)	);
+						geometriesSPtr.push_back(geometryProjected);
+						geometries.push_back(geometryProjected.get());
+					}
+				}
+				
+				boost::shared_ptr<MultiLineString> multiLineString(
+					_coordinatesSystem->getGeometryFactory().createMultiLineString(
+						geometries
+				)	);
+				
+				_displayJunctionCell(
+					*legPM,
+					__Couleur,
+					distance,
+					multiLineString.get(),
+					dynamic_cast<const Road*>((*contiguousFootLegs.begin())->getService()->getPath()),
+					*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
+					*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
+					isFirstFoot,
+					true
+				);
+				
+				concatenatingFootLegs = false;
+				contiguousFootLegs.clear();
+				
+				legPM->insert(DATA_IS_LAST_LEG, true);
+				legPM->insert(DATA_IS_FIRST_LEG, !moreThanOneLeg);
+				
 				pm.insert(ITEM_LEG, legPM);
 			}
 		}
@@ -1753,7 +1929,8 @@ namespace synthese
 			const road::Road* road,
 			const graph::Vertex& departureVertex,
 			const graph::Vertex& arrivalVertex,
-			bool isFirstFoot
+			bool isFirstFoot,
+			bool concatenatedFootLegs
 		) const {
 			// Departure point
 			if(	departureVertex.getGeometry().get() &&
@@ -1780,7 +1957,7 @@ namespace synthese
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
-			if(road && road->getRoadPlace())
+			if(road && road->getRoadPlace() && !concatenatedFootLegs)
 			{
 				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
 			}
