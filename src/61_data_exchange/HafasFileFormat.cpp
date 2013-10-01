@@ -341,6 +341,8 @@ namespace synthese
 					// Names
 					vector<string> cols;
 					std::string nameStr(_getField(34));
+					if (nameStr.substr(0,2) == "% ")
+						nameStr = _getField(36);
 					boost::algorithm::split(cols, nameStr, boost::algorithm::is_any_of(","));
 					bahnhof.cityName = cols[0];
 					if(cols.size() == 1)
