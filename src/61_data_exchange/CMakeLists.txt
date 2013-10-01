@@ -42,6 +42,8 @@ set(data_exchange_SRCS
   MGScreenConnection.hpp
   NavstreetsFileFormat.cpp
   NavstreetsFileFormat.hpp
+  NCEStatusService.cpp
+  NCEStatusService.hpp
   ObitiFileFormat.cpp
   ObitiFileFormat.hpp
   OGTFileFormat.cpp
