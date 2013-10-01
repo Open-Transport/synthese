@@ -33,6 +33,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -54,6 +55,7 @@ namespace synthese
 		const string ImportFunction::PARAMETER_MIN_LOG_LEVEL = "min_log_level";
 		const string ImportFunction::PARAMETER_OUTPUT_LOGS = "output_logs";
 
+		const string ImportFunction::ATTR_IMPORT_END_TIME = "import_end_time";
 		const string ImportFunction::ATTR_SUCCESS = "success";
 		const string ImportFunction::ATTR_DONE = "done";
 		const string ImportFunction::ATTR_LOGS = "logs";
@@ -175,6 +177,17 @@ namespace synthese
 				_result.insert(ATTR_DONE, false);
 				_result.insert(ATTR_SUCCESS, _importDone);
 			}
+
+			stringstream dateStr;
+			ptime now(second_clock::local_time());
+			dateStr <<
+				now.date().year() << "-" <<
+				setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+				setw(2) << setfill('0') << now.date().day() << " " <<
+				setw(2) << setfill('0') << now.time_of_day().hours() << ":" <<
+				setw(2) << setfill('0') << now.time_of_day().minutes() << ":" <<
+				setw(2) << setfill('0') << now.time_of_day().seconds();
+			_result.insert(ATTR_IMPORT_END_TIME, dateStr.str());
 			_result.insert(ATTR_LOGS, _output.str());
 
 			return _result;
