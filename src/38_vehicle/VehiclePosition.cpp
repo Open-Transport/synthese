@@ -48,6 +48,7 @@ namespace synthese
 		const string VehiclePosition::ATTR_Y = "y";
 		const string VehiclePosition::ATTR_METER_OFFSET = "meter_offset";
 		const string VehiclePosition::ATTR_STATUS = "status";
+		const string VehiclePosition::ATTR_VEHICLE_NUMBER = "vehicle_number";
 		const string VehiclePosition::TAG_STOP = "stop";
 		const string VehiclePosition::ATTR_IN_STOP_AREA = "in_stop_area";
 
@@ -115,6 +116,7 @@ namespace synthese
 			pm.insert(ATTR_METER_OFFSET, _meterOffset);
 			pm.insert(ATTR_STATUS, _status);
 			pm.insert(ATTR_IN_STOP_AREA, _inStopArea);
+			pm.insert(ATTR_VEHICLE_NUMBER, _vehicleNumber);
 			if(_stopPoint)
 			{
 				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
