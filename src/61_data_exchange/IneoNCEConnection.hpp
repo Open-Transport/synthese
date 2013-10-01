@@ -101,7 +101,7 @@ namespace synthese
 
 			// Message management
 			boost::shared_ptr<messages::SentScenario> _sentScenario;
-			// There are serveral messages to hold, the key is the message type
+			// There are several messages to hold, the key is the message type
 			typedef std::map<const std::string, boost::shared_ptr<messages::SentAlarm> > MessageMap;
 			mutable MessageMap _messages;
 			mutable boost::shared_ptr<messages::AlarmObjectLink> _alarmObjectLink;
@@ -143,6 +143,8 @@ namespace synthese
 				const std::string& name,
 				const std::string& value
 			);
+
+			static boost::shared_ptr<IneoNCEConnection> GetTheConnection(){ return _theConnection; }
 		};
 }	}
 
