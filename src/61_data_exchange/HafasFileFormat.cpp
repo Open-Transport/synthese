@@ -330,7 +330,7 @@ namespace synthese
 
 					// Point
 					double x(1000 * lexical_cast<double>(_getField(11, 10)));
-					double y(1000 * lexical_cast<double>(_getField(22, 10)));
+					double y(1000 * lexical_cast<double>(_getField(22, 8)));
 					if(x && y)
 					{
 						bahnhof.point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
