@@ -60,8 +60,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string StopPoint::DATA_ID = "id";
-		const string StopPoint::DATA_NAME = "name";
 		const string StopPoint::DATA_OPERATOR_CODE = "operatorCode";
 		const string StopPoint::DATA_X = "x";
 		const string StopPoint::DATA_Y = "y";
@@ -230,7 +228,7 @@ namespace synthese
 
 		void StopPoint::toParametersMap(
 			util::ParametersMap& pm,
-			bool withStopAreaData /*= true*/,
+			bool withAdditionalParameters /*= true*/,
 			const CoordinatesSystem& coordinatesSystem /*= CoordinatesSystem::GetInstanceCoordinatesSystem()*/,
 			std::string prefix /*= std::string() */
 		) const	{
@@ -269,12 +267,6 @@ namespace synthese
 					string()
 				);
 			}
-
-			// Data source links
-			pm.insert(
-				prefix + StopPointTableSync::COL_OPERATOR_CODE,
-				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
-			);
 
 			// Projected point
 			if(getProjectedPoint().getRoadChunk())
@@ -324,8 +316,6 @@ namespace synthese
 				);
 			}
 
-			pm.insert(prefix + DATA_ID, getKey());
-			pm.insert(prefix + DATA_NAME, getName());
 			pm.insert(
 				prefix + StopPointTableSync::COL_PLACEID,
 				(	dynamic_cast<const StopArea*>(getHub()) ?
@@ -404,11 +394,14 @@ namespace synthese
 			}
 
 			// Stop area data
-			if(withStopAreaData)
+			if(withAdditionalParameters)
 			{
 				boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
 				getConnectionPlace()->toParametersMap(*stopAreaPM, &coordinatesSystem);
 				pm.insert(TAG_STOP_AREA, stopAreaPM);
+
+				// Extended data source links export
+				dataSourceLinksToParametersMap(pm);
 			}
 		}
 
