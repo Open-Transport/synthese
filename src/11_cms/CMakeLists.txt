@@ -144,6 +144,8 @@ WebsiteConfig.cpp
 WebsiteConfig.hpp
 WebsiteConfigTableSync.cpp
 WebsiteConfigTableSync.hpp
+WebsiteRankCleanupAction.cpp
+WebsiteRankCleanupAction.hpp
 WebsitesService.cpp
 WebsitesService.hpp
 )
