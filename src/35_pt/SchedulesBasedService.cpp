@@ -1173,6 +1173,18 @@ namespace synthese
 					++itArrival;
 				}
 			}
+			if(atLeastOneDepartureUnscheduledEdge)
+			{
+				if(lastDepartureScheduledEdge == _path->getEdges().end())
+				{
+					throw PathBeginsWithUnscheduledStopException(*_path);
+				}
+
+				for(Path::Edges::const_iterator it(lastDepartureScheduledEdge+1); it != _path->getEdges().end(); ++it)
+				{
+					_generatedDepartureSchedules.push_back(lastDefinedDepartureSchedule);
+				}
+			}
 
 			// Check if there is too much schedules in the database
 			if(itDeparture != _dataDepartureSchedules.end())
@@ -1296,6 +1308,18 @@ namespace synthese
 					// Increment iterators
 					++itDeparture;
 					++itArrival;
+				}
+			}
+			if(atLeastOneArrivalUnscheduledEdge)
+			{
+				if(lastArrivalScheduledEdge == _path->getEdges().end())
+				{
+					throw PathBeginsWithUnscheduledStopException(*_path);
+				}
+
+				for(Path::Edges::const_iterator it(lastArrivalScheduledEdge+1); it != _path->getEdges().end(); ++it)
+				{
+					_generatedArrivalSchedules.push_back(lastDefinedArrivalSchedule);
 				}
 			}
 
