@@ -281,7 +281,7 @@ namespace synthese
 				/// @date 2011
 				virtual void addAdditionalParameters(
 					util::ParametersMap& pm,
-					const std::string& prefix
+					const std::string prefix
 				) const;
 
 
