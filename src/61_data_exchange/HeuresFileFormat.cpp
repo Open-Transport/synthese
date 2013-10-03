@@ -1118,6 +1118,40 @@ namespace synthese
 					_writeTextAndSpaces(pointsarretsStream, string(), 4);
 					_writeTextAndSpaces(pointsarretsStream, iconv.convert(stop.getConnectionPlace()->getCity()->getName()), 30);
 					_writeTextAndSpaces(pointsarretsStream, string(), 15);
+					
+					// Lon / Lat
+					if(stop.getGeometry())
+					{
+						boost::shared_ptr<StopPoint::Geometry> geometry(
+							CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+								*stop.getGeometry()
+						)	);
+						double lon(geometry->getX());
+						double lat(geometry->getY());
+
+						pointsarretsStream << setw(2) << setfill('0') << floor(lon);
+						pointsarretsStream << ",";
+						string lonFloatStr(lexical_cast<string>(int(100000*(lon-floor(lon)))).substr(0,6));
+						pointsarretsStream << lonFloatStr;
+						for(size_t i(lonFloatStr.length()); i<6; ++i)
+						{
+							pointsarretsStream << "0";
+						}
+						pointsarretsStream << " ";
+						pointsarretsStream << setw(2) << setfill('0') << floor(lat);
+						pointsarretsStream << ",";
+						string latFloatStr(lexical_cast<string>(int(100000*(lat-floor(lat)))).substr(0,6));
+						pointsarretsStream << latFloatStr;
+						for(size_t i(latFloatStr.length()); i<6; ++i)
+						{
+							pointsarretsStream << "0";
+						}
+					}
+					else
+					{
+						pointsarretsStream << "00,000000 00,000000";
+					}
+
 					pointsarretsStream << endl;
 				}
 			}
