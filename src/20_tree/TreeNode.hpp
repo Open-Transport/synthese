@@ -257,10 +257,10 @@ namespace synthese
 			{
 				if(*_parent)
 				{
-					std::pair<ChildrenType::iterator, ChildrenType::iterator> eqr(
+					std::pair<typename ChildrenType::iterator, typename ChildrenType::iterator> eqr(
 						(*_parent)->_children.equal_range(OrderingPolicy::getTreeOrderingKey())
 					);
-					for(ChildrenType::iterator it(eqr.first); it!=eqr.second; ++it)
+					for(typename ChildrenType::iterator it(eqr.first); it!=eqr.second; ++it)
 					{
 						if(it->second == this)
 						{
