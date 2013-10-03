@@ -936,51 +936,75 @@ namespace synthese
 				// Loop on services to update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToUpdate)
 				{
-					it->updateService(*this, *it->syntheseService);
+					try
+					{
+						it->updateService(*this, *it->syntheseService);
+					}
+					catch (...)
+					{
+					}
 				}
 
 				// Loop on services to move and update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToMoveAndUpdate)
 				{
-					boost::shared_ptr<ScheduledService> oldService(
-						ScheduledServiceTableSync::GetEditable(
-							it->syntheseService->getKey(),
-							_env
-					)	);
-					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
-					links.erase(dataSourceOnUpdateEnv);
-					links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
-					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(*this, *it->syntheseService);
+					try
+					{
+						boost::shared_ptr<ScheduledService> oldService(
+							ScheduledServiceTableSync::GetEditable(
+								it->syntheseService->getKey(),
+								_env
+						)	);
+						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
+						links.erase(dataSourceOnUpdateEnv);
+						links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
+						oldService->setDataSourceLinksWithoutRegistration(links);
+						it->updateService(*this, *it->syntheseService);
+					}
+					catch (...)
+					{
+					}
 				}
 
 				// Loop on services to link and update
 				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToLinkAndUpdate)
 				{
-					boost::shared_ptr<ScheduledService> oldService(
-						ScheduledServiceTableSync::GetEditable(
-							it->syntheseService->getKey(),
-							_env
-					)	);
-					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
-					links.erase(dataSourceOnUpdateEnv);
-					links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
-					oldService->setDataSourceLinksWithoutRegistration(links);
-					it->updateService(*this, *it->syntheseService);
+					try
+					{
+						boost::shared_ptr<ScheduledService> oldService(
+							ScheduledServiceTableSync::GetEditable(
+								it->syntheseService->getKey(),
+								_env
+						)	);
+						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
+						links.erase(dataSourceOnUpdateEnv);
+						links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
+						oldService->setDataSourceLinksWithoutRegistration(links);
+						it->updateService(*this, *it->syntheseService);
+					}
+					catch (...)
+					{
+					}
 				}
 
 				// Remove services from today
 				BOOST_FOREACH(const ServicesToRemove::value_type& it, servicesToRemove)
 				{
-					boost::shared_ptr<ScheduledService> oldService(
-						ScheduledServiceTableSync::GetEditable(
-							it.second->getKey(),
-							_env
-					)	);
-					Importable::DataSourceLinks links(oldService->getDataSourceLinks());
-					links.erase(dataSourceOnUpdateEnv);
-					oldService->setDataSourceLinksWithoutRegistration(links);
-					oldService->setInactive(today);
+					try
+					{
+						boost::shared_ptr<ScheduledService> oldService(
+							ScheduledServiceTableSync::GetEditable(
+								it.second->getKey(),
+								_env
+						)	);
+						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
+						links.erase(dataSourceOnUpdateEnv);
+						oldService->setDataSourceLinksWithoutRegistration(links);
+						oldService->setInactive(today);
+					}
+					catch (...)
+					{
+					}
 				}
 			}
 
