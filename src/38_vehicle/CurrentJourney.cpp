@@ -46,14 +46,15 @@ namespace synthese
 			_line(NULL),
 			_stopRequested(false),
 			_terminusDepartureTime(boost::posix_time::not_a_date_time)
-		{
-
-		}
+		{}
 
 
 
 		void CurrentJourney::toParametersMap( util::ParametersMap& pm ) const
 		{
+			// Lock of the object during the export
+			mutex::scoped_lock lock(_mutex);
+
 			// Stop requested
 			pm.insert(ATTR_STOP_REQUESTED, _stopRequested);
 
@@ -84,5 +85,21 @@ namespace synthese
 			{
 				pm.insert(TAG_TERMINUS_DEPARTURE_TIME, _terminusDepartureTime);
 			}
+		}
+
+
+
+		void CurrentJourney::setNextStops( const NextStops& value )
+		{
+			mutex::scoped_lock lock(_mutex);
+			_nextStops = value;
+		}
+
+
+
+		void CurrentJourney::setLineNumber( const std::string& value )
+		{
+			mutex::scoped_lock lock(_mutex);
+			_lineNumber = value;
 		}
 }	}

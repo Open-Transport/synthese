@@ -684,16 +684,19 @@ namespace synthese
 				if(inZoneHasChanged)
 				{
 					CurrentJourney::NextStops nextStops;
-					const CurrentJourney::NextStops& lastNextStops(
-						VehicleModule::GetCurrentJourney().getNextStops()
-					);
-					BOOST_FOREACH(const CurrentJourney::NextStops::value_type& nextStop, lastNextStops)
 					{
-						if(nextStop.getInStopArea())
+						mutex::scoped_lock lock(VehicleModule::GetCurrentJourney().getMutex());
+						const CurrentJourney::NextStops& lastNextStops(
+							VehicleModule::GetCurrentJourney().getNextStops()
+						);
+						BOOST_FOREACH(const CurrentJourney::NextStops::value_type& nextStop, lastNextStops)
 						{
-							continue;
+							if(nextStop.getInStopArea())
+							{
+								continue;
+							}
+							nextStops.push_back(nextStop);
 						}
-						nextStops.push_back(nextStop);
 					}
 					VehicleModule::GetCurrentJourney().setNextStops(nextStops);
 				}
