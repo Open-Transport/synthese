@@ -162,7 +162,7 @@ namespace synthese
 				{
 					ParametersMap pagePM(getTemplateParameters());
 					curPage->toParametersMap(pagePM, true, false);
-					_displayPage->display(stream, request, pm);
+					_displayPage->display(stream, request, pagePM);
 				}
 				else
 				{
