@@ -204,7 +204,7 @@ namespace synthese
 
 		void Webpage::addAdditionalParameters(
 			util::ParametersMap& pm,
-			const std::string prefix
+			std::string prefix
 		) const {
 
 			// Deprecated : for backward compatibility, use start_time instead
