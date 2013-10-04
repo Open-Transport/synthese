@@ -133,6 +133,7 @@ namespace synthese
 				static const std::string PARAMETER_IMPORT_FULL_SERVICES;
 				static const std::string PARAMETER_IMPORT_STOPS;
 				static const std::string PARAMETER_LINES_FILTER;
+				static const std::string PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE;
 
 			private:
 				struct LineFilter
@@ -163,6 +164,7 @@ namespace synthese
 					bool _importFullServices;
 					bool _importStops;
 					LinesFilter _linesFilter;
+					bool _gleisHasOneStopPerLine;
 				//@}
 
 				const LineFilter* _lineIsIncluded(const std::string& lineNumber) const;
