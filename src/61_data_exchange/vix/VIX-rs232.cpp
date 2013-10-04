@@ -173,9 +173,8 @@ namespace synthese
 	{
 	  int n;
 
-	#ifndef __STRICT_ANSI__                       /* __STRICT_ANSI__ is defined when the -ansi option is used for gcc */
-	  if(size>SSIZE_MAX)  size = (int)SSIZE_MAX;  /* SSIZE_MAX is defined in limits.h */
-	#else
+	#ifdef __STRICT_ANSI__                       /* __STRICT_ANSI__ is defined when the -ansi option is used for gcc */
+	  /// @FIXME Why do we do this, this should not happen.
 	  if(size>4096)  size = 4096;
 	#endif
 
