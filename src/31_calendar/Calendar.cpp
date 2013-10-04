@@ -62,10 +62,10 @@ namespace synthese
 			const Calendar& other
 		):	Registrable(0),
 			_markedDates(other._markedDates),
-			_firstActiveDate(other._firstActiveDate),
 			_calendarLinks(other._calendarLinks),
-			_lastActiveDate(other._lastActiveDate),
-			_mutex(new recursive_mutex)
+			_mutex(new recursive_mutex),
+			_firstActiveDate(other._firstActiveDate),
+			_lastActiveDate(other._lastActiveDate)
 		{}
 
 
