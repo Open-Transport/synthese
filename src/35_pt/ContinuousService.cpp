@@ -648,12 +648,12 @@ namespace synthese
 			return LinkedObjectsIds();
 		}
 
-		const boost::posix_time::time_duration& ContinuousService::getDataLastDepartureSchedule( size_t i ) const
+		const boost::posix_time::time_duration ContinuousService::getDataLastDepartureSchedule( size_t i ) const
 		{
 			return getDataFirstDepartureSchedule(i) + _range;
 		}
 
-		const boost::posix_time::time_duration& ContinuousService::getDataLastArrivalSchedule( size_t i ) const
+		const boost::posix_time::time_duration ContinuousService::getDataLastArrivalSchedule( size_t i ) const
 		{
 			return getDataFirstArrivalSchedule(i) + _range + _maxWaitingTime;
 		}

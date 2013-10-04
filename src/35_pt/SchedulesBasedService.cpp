@@ -1423,7 +1423,7 @@ namespace synthese
 
 
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
 		{
 			if(i >= _dataDepartureSchedules.size())
 			{
@@ -1432,7 +1432,7 @@ namespace synthese
 			return _dataDepartureSchedules.at(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
 		{
 			if(i >= _dataArrivalSchedules.size())
 			{
@@ -1441,12 +1441,12 @@ namespace synthese
 			return _dataArrivalSchedules.at(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastDepartureSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataLastDepartureSchedule( size_t i ) const
 		{
 			return getDataFirstDepartureSchedule(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
 		{
 			return getDataFirstArrivalSchedule(i);
 		}
