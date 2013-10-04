@@ -311,6 +311,7 @@ namespace synthese
 					// in case of link to a sub object
 					try
 					{
+						DBModule::LoadObjects(rObject->getLinkedObjectsIds(map), _env, UP_LINKS_LOAD_LEVEL);
 						if(rObject->loadFromRecord(map, _env))
 						{
 							_objectsToSave.push_back(rObject);
