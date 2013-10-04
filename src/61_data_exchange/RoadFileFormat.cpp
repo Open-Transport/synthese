@@ -354,19 +354,19 @@ namespace synthese
 				}
 				else
 				{
-					boost::shared_ptr<MainRoadPart> road(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
-					road->setRoadPlace(roadPlace);
-					road->setKey(RoadTableSync::getId());
-					_env.getEditableRegistry<MainRoadPart>().add(road);
+					boost::shared_ptr<MainRoadPart> roadsp(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
+					roadsp->setRoadPlace(roadPlace);
+					roadsp->setKey(RoadTableSync::getId());
+					_env.getEditableRegistry<MainRoadPart>().add(roadsp);
 
 					// First road chunk
 					boost::shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
-					firstRoadChunk->setRoad(road.get());
+					firstRoadChunk->setRoad(roadsp.get());
 					firstRoadChunk->setFromCrossing(&startNode);
 					firstRoadChunk->setRankInPath(0);
 					firstRoadChunk->setMetricOffset(0);
 					firstRoadChunk->setKey(RoadChunkTableSync::getId());
-					road->addRoadChunk(*firstRoadChunk);
+					roadsp->addRoadChunk(*firstRoadChunk);
 					_setGeometryAndHouses(
 						*firstRoadChunk,
 						geometry,
@@ -381,12 +381,12 @@ namespace synthese
 
 					// Second road chunk
 					boost::shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
-					secondRoadChunk->setRoad(road.get());
+					secondRoadChunk->setRoad(roadsp.get());
 					secondRoadChunk->setFromCrossing(&endNode);
 					secondRoadChunk->setRankInPath(1);
 					secondRoadChunk->setMetricOffset(length);
 					secondRoadChunk->setKey(RoadChunkTableSync::getId());
-					road->addRoadChunk(*secondRoadChunk);
+					roadsp->addRoadChunk(*secondRoadChunk);
 					_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
 				}
 			}
