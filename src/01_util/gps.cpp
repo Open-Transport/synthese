@@ -18,10 +18,10 @@ namespace synthese
 	using namespace std;
 
 	gps::gps():
-	  m_socket(m_ios),
 	  m_longitude(0.0),
 	  m_latitude(0.0),
-	  m_bEnabled(false)
+	  m_bEnabled(false),
+	  m_socket(m_ios)
 	{
 	}
 
@@ -178,9 +178,6 @@ namespace synthese
 	{
 		try
 		{
-			double longitude=0.0;
-			double latitude=0.0;
-
 			boost::asio::streambuf ss;
 			std::ostream os(&ss);
 			// for debug and test purpose.
