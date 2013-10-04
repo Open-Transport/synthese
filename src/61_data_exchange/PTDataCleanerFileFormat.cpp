@@ -233,14 +233,6 @@ namespace synthese
 						);
 						_env.getEditableRegistry<LineStop>().remove(edge->getKey());
 					}
-					if(static_cast<const LineStop*>(edge)->getIsArrival())
-					{
-						edge->getFromVertex()->removeArrivalEdge(edge);
-					}
-					if(static_cast<const LineStop*>(edge)->getIsDeparture())
-					{
-						edge->getFromVertex()->removeDepartureEdge(edge);
-					}
 				}
 				_env.getEditableRegistry<JourneyPattern>().remove(journeyPattern->getKey());
 			}

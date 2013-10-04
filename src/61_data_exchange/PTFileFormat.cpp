@@ -696,6 +696,7 @@ namespace synthese
 				if(	(!rollingStock || jp->getRollingStock() == rollingStock) &&
 					(!id || jp->hasCodeBySource(source, *id)) &&
 					(!rules || jp->getRules() == *rules) &&
+					(!wayBack || jp->getWayBack() == *wayBack) &&
 					(	(allowDifferentStopPointsInSameStopArea && jp->compareStopAreas(servedStops)) ||
 						(!allowDifferentStopPointsInSameStopArea && *jp == servedStops)
 					)
@@ -765,6 +766,16 @@ namespace synthese
 				size_t rank(0);
 				BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 				{
+					// Check if the stop is linked to an existing synthese object
+					// If not, jump over the stop
+					if(stop._stop.empty())
+					{
+						_logWarning(
+							"Stop at rank "+ lexical_cast<string>(rank) +" on route "+ (id ? *id : string()) +" "+ (name ? *name : string()) +" is ignored because not linked to a synthese stop"
+						);
+						continue;
+					}
+
 					boost::shared_ptr<DesignatedLinePhysicalStop> ls(
 						new DesignatedLinePhysicalStop(
 							LineStopTableSync::getId(),
@@ -820,6 +831,13 @@ namespace synthese
 					{
 						const_cast<Edge*>(*it)->setMetricOffset(*stop._metricOffset);
 					}
+					if(it == result->getEdges().end())
+					{
+						_logWarning(
+							"Inconsistent stop number on route "+ (id ? *id : string()) +" "+ (name ? *name : string()) +" is ignored because not linked to a synthese stop"
+						);
+						break;
+					}
 					++it;
 				}
 			}
@@ -828,6 +846,13 @@ namespace synthese
 			size_t rank(0);
 			BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 			{
+				if(rank >= result->getEdges().size())
+				{
+					_logWarning(
+						"Inconsistent stop number on route "+ (id ? *id : string()) +" "+ (name ? *name : string()) +" is ignored because not linked to a synthese stop"
+					);
+					break;
+				}
 				if(stop._geometry.get())
 				{
 					const_cast<Edge*>(result->getEdge(rank))->setGeometry(stop._geometry);
