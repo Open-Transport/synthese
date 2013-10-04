@@ -109,7 +109,7 @@ namespace synthese
 			printf("<ReadBuffer %i bytes: ", nBytesRed);
 			for(int i=0; i < nBytesRed; i++)
 			{
-				//printf("¦%04X:%02X", tick, buf[i]);
+				//printf("|%04X:%02X", tick, buf[i]);
 				printf("%02X", buf[i]);
 			}
 
