@@ -117,6 +117,7 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 		const string PTJourneyPlannerService::PARAMETER_MAX_DEPTH = "md";
 		const string PTJourneyPlannerService::PARAMETER_APPROACH_SPEED = "apsp";
+		const string PTJourneyPlannerService::PARAMETER_MAX_APPROACH_DISTANCE = "mad";
 		const string PTJourneyPlannerService::PARAMETER_DAY = "dy";
 		const string PTJourneyPlannerService::PARAMETER_PERIOD_ID = "pi";
 		const string PTJourneyPlannerService::PARAMETER_ACCESSIBILITY = "ac";
@@ -682,6 +683,12 @@ namespace synthese
 				_accessParameters.setApproachSpeed(*(map.getOptional<double>(PARAMETER_APPROACH_SPEED)));
 			}
 
+			// Max Approach distance
+			if(map.getOptional<double>(PARAMETER_MAX_APPROACH_DISTANCE))
+			{
+				_accessParameters.setMaxApproachDistance(*(map.getOptional<double>(PARAMETER_MAX_APPROACH_DISTANCE)));
+			}
+			
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
 				return;
