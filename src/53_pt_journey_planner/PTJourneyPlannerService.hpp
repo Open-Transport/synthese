@@ -324,6 +324,7 @@ namespace synthese
 				std::string									_outputFormat;
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
 				bool _concatenateContiguousFootLegs;
+				vector<string> _vectMad;
 			//@}
 
 			//! @name Pages

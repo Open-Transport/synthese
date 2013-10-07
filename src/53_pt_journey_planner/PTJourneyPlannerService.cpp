@@ -686,7 +686,11 @@ namespace synthese
 			// Max Approach distance
 			if(map.getOptional<double>(PARAMETER_MAX_APPROACH_DISTANCE))
 			{
-				_accessParameters.setMaxApproachDistance(*(map.getOptional<double>(PARAMETER_MAX_APPROACH_DISTANCE)));
+				optional<string> strMad = map.getOptional<string>(PARAMETER_MAX_APPROACH_DISTANCE);
+				if (strMad)
+					split(_vectMad, *strMad, is_any_of(","));
+				if (_vectMad.size() == 1)
+					_accessParameters.setMaxApproachDistance(*(map.getOptional<double>(PARAMETER_MAX_APPROACH_DISTANCE)));
 			}
 			
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
@@ -824,25 +828,59 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			// Journey planning
 
-			// Initialization
-			PTTimeSlotRoutePlanner r(
-				_departure_place.placeResult.value.get(),
-				_arrival_place.placeResult.value.get(),
-				startDate,
-				endDate,
-				startArrivalDate,
-				endArrivalDate,
-				_maxSolutionsNumber,
-				_accessParameters,
-				planningOrder,
-				false,
-				*_logger,
-				_maxTransferDuration,
-				_minMaxDurationRatioFilter
-			);
-
-			// Computing
-			_result.reset(new PTRoutePlannerResult(r.run()));
+			// loop on run if multiple Max Approach Distance
+			if (_vectMad.size() > 1)
+			{
+				for (size_t cptMad=0;cptMad<_vectMad.size();cptMad++)
+				{
+					graph::AccessParameters localAccessParameters(_accessParameters);
+					try {
+						localAccessParameters.setMaxApproachDistance(lexical_cast<int>(_vectMad[cptMad]));
+					}
+					catch (bad_lexical_cast&)
+					{}
+					// Initialization
+					PTTimeSlotRoutePlanner r(
+						_departure_place.placeResult.value.get(),
+						_arrival_place.placeResult.value.get(),
+						startDate,
+						endDate,
+						startArrivalDate,
+						endArrivalDate,
+						_maxSolutionsNumber,
+						localAccessParameters,
+						planningOrder,
+						false,
+						*_logger,
+						_maxTransferDuration,
+						_minMaxDurationRatioFilter
+					);
+					_result.reset(new PTRoutePlannerResult(r.run()));
+					if (_result->getJourneys().size() > 0)
+						break;
+				}
+			}
+			else
+			{
+				// Initialization
+				PTTimeSlotRoutePlanner r(
+					_departure_place.placeResult.value.get(),
+					_arrival_place.placeResult.value.get(),
+					startDate,
+					endDate,
+					startArrivalDate,
+					endArrivalDate,
+					_maxSolutionsNumber,
+					_accessParameters,
+					planningOrder,
+					false,
+					*_logger,
+					_maxTransferDuration,
+					_minMaxDurationRatioFilter
+				);
+				// Computing
+				_result.reset(new PTRoutePlannerResult(r.run()));
+			}
 
 			// Min waiting time filter
 			if(_minWaitingTimeFilter)
