@@ -93,6 +93,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_FULL_SERVICES = "import_full_services";
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_STOPS = "import_stops";
 		const string HafasFileFormat::Importer_::PARAMETER_LINES_FILTER = "lines_filter";
+		const string HafasFileFormat::Importer_::PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE = "gleis_has_one_stop_per_line";
 	}
 
 	namespace impex
@@ -330,7 +331,7 @@ namespace synthese
 
 					// Point
 					double x(1000 * lexical_cast<double>(_getField(11, 10)));
-					double y(1000 * lexical_cast<double>(_getField(22, 10)));
+					double y(1000 * lexical_cast<double>(_getField(22, 8)));
 					if(x && y)
 					{
 						bahnhof.point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
@@ -341,6 +342,8 @@ namespace synthese
 					// Names
 					vector<string> cols;
 					std::string nameStr(_getField(34));
+					if (nameStr.substr(0,2) == "% ")
+						nameStr = nameStr.substr(2,nameStr.size()-2);
 					boost::algorithm::split(cols, nameStr, boost::algorithm::is_any_of(","));
 					bahnhof.cityName = cols[0];
 					if(cols.size() == 1)
@@ -366,32 +369,69 @@ namespace synthese
 
 				while(_loadLine())
 				{
-					// New service
-					if(_getField(0,1) == "@")
+					if (!_gleisHasOneStopPerLine)
 					{
-						itService = _gleisMap.insert(
-							make_pair(
-								boost::make_tuple(
-									_getField(3, 5),
-									_getField(9, 6),
-									lexical_cast<size_t>(_getField(16, 2))
-								),
-								GleisMap::mapped_type()
-						)	).first;
-					}
-					else if(itService != _gleisMap.end())
-					{
-						// Fields
-						string stopCode(_getField(0, 7));
-						string gleisCode(_getField(10, 6));
+						// New service
+						if(_getField(0,1) == "@")
+						{
+							itService = _gleisMap.insert(
+								make_pair(
+									boost::make_tuple(
+										_getField(3, 5),
+										_getField(9, 6),
+										lexical_cast<size_t>(_getField(16, 2))
+									),
+									GleisMap::mapped_type()
+							)	).first;
+						}
+						else if(itService != _gleisMap.end())
+						{
+							// Fields
+							string stopCode(_getField(0, 7));
+							string gleisCode(_getField(10, 6));
 
+							// Search of the bahnhof
+							Bahnhofs::iterator itBahnhof(_bahnhofs.find(stopCode));
+							if(itBahnhof == _bahnhofs.end())
+							{
+								continue;
+							}
+
+							// Record of the gleis in the bahnhof
+							itBahnhof->second.gleisSet.insert(gleisCode);
+
+							// Record of the gleis in the service
+							itService->second.insert(
+								make_pair(
+									stopCode,
+									gleisCode
+							)	);
+						}
+					}
+					else
+					{
+						string serviceCode(_getField(8, 5));
+						string lineNumber(_getField(14, 6));
+						string stopCode(_getField(0, 7));
+						string gleisCode(_getField(21, 6));
+						itService = _gleisMap.find(boost::make_tuple(serviceCode, lineNumber, 0));
+						if (itService == _gleisMap.end())
+						{
+							// We create the service
+							itService = _gleisMap.insert(
+								make_pair(
+									boost::make_tuple(serviceCode, lineNumber, 0),
+									GleisMap::mapped_type()
+							)	).first;
+						}
+						
 						// Search of the bahnhof
 						Bahnhofs::iterator itBahnhof(_bahnhofs.find(stopCode));
 						if(itBahnhof == _bahnhofs.end())
 						{
 							continue;
 						}
-
+						
 						// Record of the gleis in the bahnhof
 						itBahnhof->second.gleisSet.insert(gleisCode);
 
@@ -623,7 +663,14 @@ namespace synthese
 						itZug = _zugs.insert(_zugs.end(), Zug());
 						itZug->lineFilter = lineFilter;
 						itZug->number = _getField(3,5);
-						itZug->version = lexical_cast<size_t>(_getField(16, 2));
+						try {
+							itZug->version = lexical_cast<size_t>(_getField(16, 2));
+						}
+						catch (bad_lexical_cast&)
+						{
+							itZug->version = 0;
+						}
+
 						zugNumber = itZug->number +"/"+ lineNumber;
 						if(lineFilter->lineNumberStart && lineFilter->lineNumberEnd)
 						{
@@ -653,7 +700,13 @@ namespace synthese
 						if(itZug != _zugs.end())
 						{
 							Zug::CalendarUse calendarUse;
-							calendarUse.calendarNumber = lexical_cast<size_t>(_getField(22, 6));
+							try {
+								calendarUse.calendarNumber = lexical_cast<size_t>(_getField(22, 6));
+							}
+							catch (bad_lexical_cast&)
+							{
+								calendarUse.calendarNumber = 0;
+							}
 							calendarUse.startStopCode = _getField(6, 7);
 							calendarUse.endStopCode = _getField(14, 7);
 							itZug->calendars.push_back(calendarUse);
@@ -695,6 +748,18 @@ namespace synthese
 						// Departure times
 						string departureTimeStr(_getField(34, 4));
 						string arrivalTimeStr(_getField(29, 4));
+						if (_gleisHasOneStopPerLine)
+						{
+							// Format is different when gleis file has one stop per line
+							// If it is found a set of file where gleis file is by section
+							// and departure time is on #38 and arrival on 31
+							// OR a set of file where gleis file has one stop per line and
+							// and departure time is on #34 and arrival on 29
+							// then it will be needed another parameter to manage it independantly
+							departureTimeStr = _getField(38, 4);
+							arrivalTimeStr = _getField(31, 4);
+						}
+						
 						bool isDeparture(departureTimeStr != "9999" && !departureTimeStr.empty());
 						bool isArrival(arrivalTimeStr != "9999" && !arrivalTimeStr.empty());
 						if(!isArrival && !isDeparture)
@@ -706,17 +771,29 @@ namespace synthese
 						itStop->stopCode = stopCode;
 						if(isDeparture)
 						{
-							itStop->departureTime =
-								hours(lexical_cast<int>(departureTimeStr.substr(0,2))) +
-								minutes(lexical_cast<int>(departureTimeStr.substr(2,2)))
-							;
+							try {
+								itStop->departureTime =
+									hours(lexical_cast<int>(departureTimeStr.substr(0,2))) +
+									minutes(lexical_cast<int>(departureTimeStr.substr(2,2)))
+								;
+							}
+							catch (bad_lexical_cast&)
+							{
+								itStop->departureTime = time_duration(0,0,0);
+							}
 						}
 						if(isArrival)
 						{
-							itStop->arrivalTime =
-								hours(lexical_cast<int>(arrivalTimeStr.substr(0,2))) +
-								minutes(lexical_cast<int>(arrivalTimeStr.substr(2,2)))
-							;
+							try {
+								itStop->arrivalTime =
+									hours(lexical_cast<int>(arrivalTimeStr.substr(0,2))) +
+									minutes(lexical_cast<int>(arrivalTimeStr.substr(2,2)))
+								;
+							}
+							catch (bad_lexical_cast&)
+							{
+								itStop->departureTime = time_duration(0,0,0);
+							}
 						}
 
 						// Gleis
@@ -776,6 +853,9 @@ namespace synthese
 
 			// Lines filter
 			pm.insert(PARAMETER_LINES_FILTER, LinesFilterToString(_linesFilter));
+
+			// Gleis file format
+			pm.insert(PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE, _gleisHasOneStopPerLine);
 
 			return pm;
 		}
@@ -840,6 +920,9 @@ namespace synthese
 
 			// Lines filter
 			_linesFilter = getLinesFilter(pm.getDefault<string>(PARAMETER_LINES_FILTER));
+
+			// Gleis file format
+			_gleisHasOneStopPerLine = pm.getDefault<bool>(PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE, false);
 		}
 
 

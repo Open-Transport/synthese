@@ -168,7 +168,6 @@ namespace synthese
 
 		void InterSYNTHESESlaveUpdateService::RunBackgroundUpdater()
 		{
-			bool fakeBool(true);
 			bgUpdaterDone = false;
 			boost::shared_ptr<InterSYNTHESESlave> slave;
 

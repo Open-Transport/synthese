@@ -228,89 +228,81 @@ namespace synthese
 			try
 			{
 				_functionCreator = Factory<Function>::GetCreator(ParametersMap::Trim(functionName));
-
-				// parameters
-				if(it != end && *it == '?')
-				{
-					it += 2;
-				}
-				else
-				{
-					set<string> functionTermination;
-					functionTermination.insert("&");
-					functionTermination.insert("?>");
-					while(it != end && *it == '&')
-					{
-						stringstream parameterName;
-						for(++it;
-							it!= end && *it != '=' && !(*it == '?' && (it+1 == end || *(it+1)=='>'));
-							++it
-						){
-							parameterName.put(*it);
-						}
-
-						if(it == end)
-						{
-							break;
-						}
-
-						if(*it == '?' && it+1 == end)
-						{
-							++it;
-							break;
-						}
-
-						if(*it == '?' && *(it+1) == '>')
-						{
-							++it;
-							++it;
-							break;
-						}
-						
-						// Parsing of the nodes
-						++it;
-						CMSScript parameterNodes(it, end, functionTermination, ignoreWhiteChars);
-						string parameterNameStr(ParametersMap::Trim(parameterName.str()));
-
-						// Special template parameter
-						if(parameterNameStr == PARAMETER_TEMPLATE)
-						{
-							_inlineTemplate = parameterNodes;
-						}
-						else if(parameterNameStr == PARAMETER_REPEAT_PARAMETERS)
-						{
-							_repeatParameters = true;
-						}
-						else
-						{
-							// Storage in template parameters if begins with VAR else in service parameters
-							if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
-							{
-								_serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
-							}
-							else
-							{
-								_templateParameters.push_back(make_pair(parameterNameStr.substr(PARAMETER_VAR.size()), parameterNodes));
-							}
-						}
-
-						if(*(it-1) != '&')
-						{
-							break;
-						}
-						--it;
-				}	}
 			}
 			catch(FactoryException<Function>&)
 			{
-				for(; it != end && it+1 != end && *it != '?' && *(it+1) != '>' ; ++it) ;
-				if(it != end && *it == '?')
+			}
+		
+			// parameters
+			if(it != end && *it == '?')
+			{
+				it += 2;
+			}
+			else
+			{
+				set<string> functionTermination;
+				functionTermination.insert("&");
+				functionTermination.insert("?>");
+				while(it != end && *it == '&')
 				{
-					++it;
-					if(it != end && *it == '>')
+					stringstream parameterName;
+					for(++it;
+						it!= end && *it != '=' && !(*it == '?' && (it+1 == end || *(it+1)=='>'));
+						++it
+					){
+						parameterName.put(*it);
+					}
+
+					if(it == end)
+					{
+						break;
+					}
+
+					if(*it == '?' && it+1 == end)
 					{
 						++it;
-				}	}
-			}
+						break;
+					}
+
+					if(*it == '?' && *(it+1) == '>')
+					{
+						++it;
+						++it;
+						break;
+					}
+					
+					// Parsing of the nodes
+					++it;
+					CMSScript parameterNodes(it, end, functionTermination, ignoreWhiteChars);
+					string parameterNameStr(ParametersMap::Trim(parameterName.str()));
+
+					// Special template parameter
+					if(parameterNameStr == PARAMETER_TEMPLATE)
+					{
+						_inlineTemplate = parameterNodes;
+					}
+					else if(parameterNameStr == PARAMETER_REPEAT_PARAMETERS)
+					{
+						_repeatParameters = true;
+					}
+					else
+					{
+						// Storage in template parameters if begins with VAR else in service parameters
+						if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
+						{
+							_serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
+						}
+						else
+						{
+							_templateParameters.push_back(make_pair(parameterNameStr.substr(PARAMETER_VAR.size()), parameterNodes));
+						}
+					}
+
+					if(*(it-1) != '&')
+					{
+						break;
+					}
+					--it;
+			}	}
 		}
 }	}

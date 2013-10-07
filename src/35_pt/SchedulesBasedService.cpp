@@ -1084,7 +1084,7 @@ namespace synthese
 				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
 				if(	!lineStop ||
 					(	lineStop->getScheduleInput() &&
-						(lineStop->getIsDeparture() || (itEdge+1) == _path->getEdges().end())
+						(lineStop->isDepartureAllowed() || (itEdge+1) == _path->getEdges().end())
 				)	){
 					// In case of insufficient defined schedules number
 					time_duration departureSchedule;
@@ -1110,6 +1110,10 @@ namespace synthese
 					){
 						arrivalSchedule = *itArrival;
 					}
+					else
+					{
+						arrivalSchedule = departureSchedule;
+					}
 
 					const Edge& edge(**itEdge);
 
@@ -1124,8 +1128,8 @@ namespace synthese
 						MetricOffset totalDistance(edge.getMetricOffset() - (*lastDepartureScheduledEdge)->getMetricOffset());
 						size_t totalRankDiff(edge.getRankInPath() - (*lastDepartureScheduledEdge)->getRankInPath());
 						time_duration totalTime(
-							(	(	!edge.isDeparture() ||
-									(edge.isArrival() && !arrivalSchedule.is_not_a_date_time() && arrivalSchedule < departureSchedule)
+							(	(	!edge.isDepartureAllowed() ||
+									(edge.isArrivalAllowed() && !arrivalSchedule.is_not_a_date_time() && arrivalSchedule < departureSchedule)
 								) ?
 								arrivalSchedule :
 								departureSchedule
@@ -1157,7 +1161,7 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedDepartureSchedules.push_back(edge.isDeparture() ? *itDeparture : *itArrival);
+					_generatedDepartureSchedules.push_back(edge.isDepartureAllowed() ? departureSchedule : arrivalSchedule);
 					lastDepartureScheduledEdge = itEdge;
 					lastDefinedDepartureSchedule = departureSchedule;
 				}
@@ -1169,8 +1173,14 @@ namespace synthese
 				if(	lineStop && lineStop->getScheduleInput())
 				{
 					// Increment iterators
-					++itDeparture;
-					++itArrival;
+					if(itDeparture != _dataDepartureSchedules.end())
+					{
+						++itDeparture;
+					}
+					if(itArrival != _dataArrivalSchedules.end())
+					{
+						++itArrival;
+					}
 				}
 			}
 
@@ -1194,7 +1204,7 @@ namespace synthese
 				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
 				if(	!lineStop ||
 					(	lineStop->getScheduleInput() &&
-						(lineStop->isArrival() || lastArrivalScheduledEdge == _path->getEdges().begin())
+						(lineStop->isArrivalAllowed() || lastArrivalScheduledEdge == _path->getEdges().begin())
 				)	){
 					neverSeenAScheduledEdge = false;
 
@@ -1223,6 +1233,10 @@ namespace synthese
 					){
 						departureSchedule = *itDeparture;
 					}
+					else
+					{
+						departureSchedule = arrivalSchedule;
+					}
 
 					const Edge& edge(**itEdge);
 
@@ -1236,7 +1250,7 @@ namespace synthese
 
 						MetricOffset totalDistance(edge.getMetricOffset() - (*lastArrivalScheduledEdge)->getMetricOffset());
 						size_t totalRankDiff(edge.getRankInPath() - (*lastArrivalScheduledEdge)->getRankInPath());
-						time_duration totalTime(*itArrival - lastDefinedArrivalSchedule);
+						time_duration totalTime(arrivalSchedule - lastDefinedArrivalSchedule);
 						for(Path::Edges::const_iterator it(lastArrivalScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
 							double minutesToAdd(0);
@@ -1263,10 +1277,10 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedArrivalSchedules.push_back(edge.isArrival() ? *itArrival : *itDeparture);
+					_generatedArrivalSchedules.push_back(edge.isArrivalAllowed() ? arrivalSchedule : departureSchedule);
 					lastArrivalScheduledEdge = itEdge;
 					lastDefinedArrivalSchedule = 
-						(edge.isDeparture() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
+						(edge.isDepartureAllowed() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
 						departureSchedule :
 						arrivalSchedule
 					;
@@ -1294,8 +1308,14 @@ namespace synthese
 				if(	!lineStop || lineStop->getScheduleInput())
 				{
 					// Increment iterators
-					++itDeparture;
-					++itArrival;
+					if(itDeparture != _dataDepartureSchedules.end())
+					{
+						++itDeparture;
+					}
+					if(itArrival != _dataArrivalSchedules.end())
+					{
+						++itArrival;
+					}
 				}
 			}
 
@@ -1403,7 +1423,7 @@ namespace synthese
 
 
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
 		{
 			if(i >= _dataDepartureSchedules.size())
 			{
@@ -1412,7 +1432,7 @@ namespace synthese
 			return _dataDepartureSchedules.at(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
 		{
 			if(i >= _dataArrivalSchedules.size())
 			{
@@ -1421,12 +1441,12 @@ namespace synthese
 			return _dataArrivalSchedules.at(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastDepartureSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataLastDepartureSchedule( size_t i ) const
 		{
 			return getDataFirstDepartureSchedule(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
 		{
 			return getDataFirstArrivalSchedule(i);
 		}

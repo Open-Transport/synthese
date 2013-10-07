@@ -130,10 +130,10 @@ namespace synthese
 				const Schedules& getDataArrivalSchedules() const { return _dataArrivalSchedules; }
 				const ServedVertices& getVertices(bool RTData) const;
 				const boost::posix_time::ptime& getNextRTUpdate() const;
-				const boost::posix_time::time_duration& getDataFirstDepartureSchedule(size_t i) const;
-				const boost::posix_time::time_duration& getDataFirstArrivalSchedule(size_t i) const;
-				virtual const boost::posix_time::time_duration& getDataLastDepartureSchedule(size_t i) const;
-				virtual const boost::posix_time::time_duration& getDataLastArrivalSchedule(size_t i) const;
+				const boost::posix_time::time_duration getDataFirstDepartureSchedule(size_t i) const;
+				const boost::posix_time::time_duration getDataFirstArrivalSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration getDataLastDepartureSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration getDataLastArrivalSchedule(size_t i) const;
 			//@}
 
 			//! @name Setters
