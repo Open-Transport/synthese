@@ -1499,7 +1499,8 @@ namespace synthese
 								dataSource,
 								optional<const string&>(),
 								optional<const RuleUser::Rules&>(),
-								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops)
+								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
+								zug.number
 							);
 						}
 						else
