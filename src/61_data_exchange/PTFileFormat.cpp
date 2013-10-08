@@ -887,7 +887,8 @@ namespace synthese
 			const impex::DataSource& source,
 			boost::optional<const std::string&> team,
 			boost::optional<const graph::RuleUser::Rules&> rules,
-			boost::optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices
+			boost::optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&> servedVertices,
+			boost::optional<const std::string&> id
 		) const {
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
@@ -992,6 +993,18 @@ namespace synthese
 				}
 
 				route.addService(*result, false);
+
+				// Source links
+				Importable::DataSourceLinks links;
+				if(id)
+				{
+					links.insert(make_pair(&source, *id));
+				}
+				else
+				{
+					links.insert(make_pair(&source, string()));
+				}
+				result->setDataSourceLinksWithoutRegistration(links);
 				_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(result));
 
 				_logCreation(
@@ -1000,6 +1013,20 @@ namespace synthese
 			}
 			else
 			{
+				if (!result->hasLinkWithSource(source))
+				{
+					// Add source link (service may have been created by another source)
+					Importable::DataSourceLinks links;
+					if(id)
+					{
+						links.insert(make_pair(&source, *id));
+					}
+					else
+					{
+						links.insert(make_pair(&source, string()));
+					}
+					result->setDataSourceLinksWithoutRegistration(links);
+				}
 				_logLoad(
 					"Use of service "+ lexical_cast<string>(result->getKey()) +" ("+ result->getServiceNumber() +") for "+ number +" ("+ lexical_cast<string>(departureSchedules[0]) +") on route "+ lexical_cast<string>(route.getKey()) +" ("+ route.getName() +")"
 				);
