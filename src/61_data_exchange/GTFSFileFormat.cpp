@@ -614,6 +614,8 @@ namespace synthese
 								stops,
 								dataSource,
 								true,
+								true,
+								true,
 								true
 						)	);
 
@@ -635,7 +637,11 @@ namespace synthese
 								departures,
 								arrivals,
 								lastTripCode,
-								dataSource
+								dataSource,
+								optional<const string&>(),
+								optional<const RuleUser::Rules&>(),
+								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
+								lastTripCode
 						)	);
 						if(service)
 						{
