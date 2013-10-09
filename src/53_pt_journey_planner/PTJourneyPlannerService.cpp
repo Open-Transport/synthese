@@ -684,7 +684,7 @@ namespace synthese
 			}
 
 			// Max Approach distance
-			if(map.getOptional<double>(PARAMETER_MAX_APPROACH_DISTANCE))
+			if(map.getOptional<string>(PARAMETER_MAX_APPROACH_DISTANCE))
 			{
 				optional<string> strMad = map.getOptional<string>(PARAMETER_MAX_APPROACH_DISTANCE);
 				if (strMad)
