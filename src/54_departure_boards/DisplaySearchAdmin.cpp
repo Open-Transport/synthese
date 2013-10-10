@@ -398,8 +398,8 @@ namespace synthese
 							}
 						}
 					}
-					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Ouvrir", string(), "monitor_edit.png");
-					stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "monitor_go.png");
+					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Ouvrir", string(), "/admin/img/monitor_edit.png");
+					stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Simuler", string(), "/admin/img/monitor_go.png");
 				}
 
 				if (tabHasWritePermissions())
@@ -488,7 +488,7 @@ namespace synthese
 
 					stream << t.col();
 
-					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Ouvrir", string(), "monitor_edit.png");
+					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Ouvrir", string(), "/admin/img/monitor_edit.png");
 
 				}
 

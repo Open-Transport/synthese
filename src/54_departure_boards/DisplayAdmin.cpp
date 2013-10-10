@@ -269,7 +269,7 @@ namespace synthese
 								goCPURequest.getHTMLForm().getLinkButton(
 									"Ouvrir",
 									string(),
-									"server.png"
+									"/admin/img/server.png"
 								) :
 								string()
 							)
@@ -297,7 +297,7 @@ namespace synthese
 				{
 					stream << "<h1>Suppression</h1>";
 					stream << "<p>";
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'afficheur " + _displayScreen->getFullName() + " ?", "/admin/img/monitor_delete.png") << " ";
 					stream << "</p>";
 				}
 			}
@@ -413,7 +413,7 @@ namespace synthese
 					stream << l.element() << "Dernière mesure le " << to_simple_string(_status->getTime());
 					stream << l.element() << "Dernier état mesuré : " <<
 						HTMLModule::getHTMLImage(
-							DisplayMonitoringStatus::GetStatusIcon(globalStatus),
+							"/admin/img/" + DisplayMonitoringStatus::GetStatusIcon(globalStatus),
 							DisplayMonitoringStatus::GetStatusString(globalStatus)
 						) <<
 						" " <<
@@ -709,7 +709,7 @@ namespace synthese
 					}
 
 					stream << l.element("broadcastpoint");
-					stream << ant.getImageSubmitButton("add.png", "Ajouter");
+					stream << ant.getImageSubmitButton("/admin/img/add.png", "Ajouter");
 					stream << ant.getSelectInput(
 						AddForbiddenPlaceToDisplayScreenAction::PARAMETER_PLACE,
 						_displayScreen->getSortedAvailableDestinationsLabels(
@@ -812,8 +812,8 @@ namespace synthese
 						stream << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.getDisplayedPlace()->getFullName());
 					}
 					stream << td.col() << screen.getKey();
-					stream << td.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor.png");
-					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le contenu "+ screen.getName() + " ?", "monitor_delete.png");
+					stream << td.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "/admin/img/monitor.png");
+					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le contenu "+ screen.getName() + " ?", "/admin/img/monitor_delete.png");
 				}
 
 				// Creation form
@@ -1087,7 +1087,7 @@ namespace synthese
 						stream << t2.col();
 
 						viewMessageRequest.getPage()->setMessage(alarm);
-						stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Ouvrir", string(), "note.png");
+						stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Ouvrir", string(), "/admin/img/note.png");
 					}
 					stream << t2.close();
 				}
