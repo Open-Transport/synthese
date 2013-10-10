@@ -1038,7 +1038,7 @@ namespace synthese
 					stream << t.col();
 
 					viewMessageRequest.getPage()->setMessage(alarm);
-					stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Ouvrir", string(), "note.png");
+					stream << HTMLModule::getLinkButton(viewMessageRequest.getURL(), "Ouvrir", string(), "/admin/img/note.png");
 				}
 
 				if (DisplayScreenTableSync::GetIsAtLeastALineDisplayed(_displayScreen->getKey()))
