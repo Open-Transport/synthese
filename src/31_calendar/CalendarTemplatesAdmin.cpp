@@ -159,7 +159,7 @@ namespace synthese
 							removeCalendar.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer le calendrier "+ ct->getName() +" ?",
-							"calendar_delete.png"
+							"/admin/img/calendar_delete.png"
 						)
 					;
 				}
