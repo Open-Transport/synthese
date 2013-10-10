@@ -199,7 +199,7 @@ namespace synthese
 
 				stream <<
 					t.col() <<
-					openRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor_edit.png")
+					openRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "/admin/img/monitor_edit.png")
 				;
 				if (writeRight)
 				{
@@ -209,7 +209,7 @@ namespace synthese
 							deleteRequest.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?",
-							"monitor_delete.png"
+							"/admin/img/monitor_delete.png"
 						)
 					;
 				}

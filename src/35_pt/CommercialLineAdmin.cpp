@@ -443,7 +443,7 @@ namespace synthese
 							removeRequest.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer la règle de non concurrence avec la ligne " + rule->get<PriorityLine>()->getShortName() + " ?",
-							"lock_delete.png"
+							"/admin/img/lock_delete.png"
 						)
 					;
 				}

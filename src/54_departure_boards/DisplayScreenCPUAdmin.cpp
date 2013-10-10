@@ -292,12 +292,12 @@ namespace synthese
 					stream << t.col() << screen->getComPort();
 					stream << t.col() << screen->getWiringCode();
 					stream << t.col() << screen->getKey();
-					stream << t.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor.png");
+					stream << t.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "/admin/img/monitor.png");
 				}
 
 				stream << t.close();
 
-				stream << createDisplayRequest.getHTMLForm().getLinkButton("Créer un nouvel afficheur sur l'unité centrale", string(), "monitor_add.png");
+				stream << createDisplayRequest.getHTMLForm().getLinkButton("Créer un nouvel afficheur sur l'unité centrale", string(), "/admin/img/monitor_add.png");
 			}
 
 			////////////////////////////////////////////////////////////////////
