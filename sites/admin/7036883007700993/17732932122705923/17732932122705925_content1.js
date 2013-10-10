@@ -328,12 +328,12 @@ function add_row(tableId, values) {
       newCell.innerHTML = '<input type="hidden" value="'+ values[i][0] +'"  />';
       newCell.innerHTML += values[i][1];
     } else if (i == addRow.cells.length-1) {
-      var html = '<a href="#" onclick="remove_row(this); return false;"><img src="delete.png" alt="-" title="Supprimer l\'Ã©lÃ©ment" /></a>';
+      var html = '<a href="#" onclick="remove_row(this); return false;"><img src="/admin/img/delete.png" alt="-" title="Supprimer l\'Ã©lÃ©ment" /></a>';
       if (tblBody.className != 'autoorder') {
         html += '<span class="up_down_button"></span><span class="up_down_button">';
         if (tblBody.rows.length > 1) {
-          html += '<a href="#" onclick="up_row(this); return false;"><img src="arrow_up.png" alt="-" title="Monter l\'Ã©lÃ©ment" /></a>';
-          tblBody.rows[j-1].cells[tblBody.rows[j-1].cells.length-1].childNodes[1].innerHTML = '<a href="#" onclick="down_row(this); return false;"><img src="arrow_down.png" alt="-" title="Descendre l\'Ã©lÃ©ment" /></a>';
+          html += '<a href="#" onclick="up_row(this); return false;"><img src="/admin/img/arrow_up.png" alt="-" title="Monter l\'Ã©lÃ©ment" /></a>';
+          tblBody.rows[j-1].cells[tblBody.rows[j-1].cells.length-1].childNodes[1].innerHTML = '<a href="#" onclick="down_row(this); return false;"><img src="/admin/img/arrow_down.png" alt="-" title="Descendre l\'Ã©lÃ©ment" /></a>';
         }
         html += '</span>';
       }

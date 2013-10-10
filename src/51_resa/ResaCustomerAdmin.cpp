@@ -246,9 +246,9 @@ namespace synthese
 			_tabs.clear();
 			bool writeRight(profile.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "/admin/img/user.png"));
-			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "/admin/img/cog.png"));
-			_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "/admin/img/book.png"));
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "user.png"));
+			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "cog.png"));
+			_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
 
 			_tabBuilded = true;
 		}

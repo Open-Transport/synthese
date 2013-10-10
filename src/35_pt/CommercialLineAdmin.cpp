@@ -394,7 +394,7 @@ namespace synthese
 
 					stream <<
 						"<p class=\"info\">Les contrôle de dates sont désactivées par défaut.<br /><br />" <<
-						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), ICON) <<
+						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), "/admin/img/" + ICON) <<
 						"</p>"
 					;
 				}
