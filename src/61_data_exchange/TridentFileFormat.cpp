@@ -1787,6 +1787,8 @@ namespace synthese
 						route.stops,
 						dataSource,
 						true,
+						true,
+						true,
 						true
 					);
 					if(!updatedRoute)
