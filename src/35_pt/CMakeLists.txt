@@ -223,6 +223,8 @@ StopAreaTransferRemoveAction.cpp
 StopAreaTransferRemoveAction.hpp
 StopAreaUpdateAction.cpp
 StopAreaUpdateAction.h
+StopAreaMergeAction.cpp
+StopAreaMergeAction.hpp
 StopPoint.cpp
 StopPoint.hpp
 StopPointAddAction.cpp

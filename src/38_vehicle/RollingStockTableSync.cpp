@@ -225,6 +225,21 @@ namespace synthese
 
 
 
+		RollingStockTableSync::SearchResult RollingStockTableSync::SearchUsedModes(
+			Env& env,
+			LinkLevel linkLevel
+		){
+			stringstream query;
+
+			query 	<< "SELECT *"
+					<< "FROM " << TABLE.NAME 
+					<< " WHERE id IN (SELECT DISTINCT rolling_stock_id FROM t009_lines)";
+
+			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
 		RollingStockTableSync::Labels RollingStockTableSync::GetLabels(
 			std::string unknownLabel
 		){

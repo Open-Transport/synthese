@@ -99,6 +99,14 @@ namespace synthese
 				, int number = 0
 				, util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+			
+			
+			static SearchResult SearchSameName(
+				StopArea const& stoparea, 
+				util::Env& env,
+				util::LinkLevel linkLevel
+			);
 		};
 	}
 }

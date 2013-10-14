@@ -83,6 +83,7 @@
 #include "ServiceVertexUpdateAction.hpp"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "StopAreaUpdateAction.h"
+#include "StopAreaMergeAction.hpp"
 #include "StopAreaTransferRemoveAction.hpp"
 #include "TransportNetworkUpdateAction.hpp"
 #include "ContinuousServiceUpdateAction.h"
@@ -228,6 +229,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
 	synthese::pt::ServiceVertexUpdateAction::integrate();
 	synthese::pt::StopAreaUpdateAction::integrate();
+	synthese::pt::StopAreaMergeAction::integrate();
 	synthese::pt::StopAreaTransferRemoveAction::integrate();
 	synthese::pt::TransportNetworkUpdateAction::integrate();
 	synthese::pt::JourneyPatternUpdateAction::integrate();
