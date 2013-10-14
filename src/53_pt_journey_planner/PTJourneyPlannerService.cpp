@@ -1656,6 +1656,40 @@ namespace synthese
 					isFirstLeg = false;
 				}
 				else if (road == NULL &&
+					(!_concatenateContiguousFootLegs || !concatenatingFootLegs)
+				)
+				{
+					boost::shared_ptr<Geometry> geometryProjected(
+						_coordinatesSystem->convertGeometry(
+							*static_cast<Geometry*>(it->getGeometry().get())
+					)	);
+					
+					vector<Geometry*> geometries;
+					geometries.push_back(geometryProjected.get());
+					boost::shared_ptr<MultiLineString> multiLineString(
+						_coordinatesSystem->getGeometryFactory().createMultiLineString(
+							geometries
+					)   );
+					
+					_displayJunctionCell(
+						*legPM,
+						__Couleur,
+						it->getDistance(),
+						multiLineString.get(),
+						dynamic_cast<const Road*>(leg.getService()->getPath()),
+						*leg.getDepartureEdge()->getFromVertex(),
+						*leg.getArrivalEdge()->getFromVertex(),
+						isFirstFoot,
+						false
+					);
+					
+					roadServiceUses.clear();
+					__Couleur = !__Couleur;
+					isFirstFoot = false;
+					legWritten = true;
+					isFirstLeg = false;
+				}
+				else if (road == NULL &&
 					junction == NULL &&
 					_concatenateContiguousFootLegs &&
 					concatenatingFootLegs
@@ -1756,6 +1790,107 @@ namespace synthese
 					lastPlace = leg.getArrivalEdge()->getHub();
 					lastStop = dynamic_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex());
 					__Couleur = !__Couleur;
+					legWritten = true;
+					isFirstLeg = false;
+				}
+				else if (road == NULL &&
+					_concatenateContiguousFootLegs &&
+					concatenatingFootLegs
+				)
+				{
+					// Concatenate and write the foot leg
+					// Distance and geometry
+					moreThanOneLeg = true;
+					double distance(0);
+					vector<Geometry*> geometries;
+					vector<boost::shared_ptr<Geometry> > geometriesSPtr;
+					BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, contiguousFootLegs)
+					{
+						distance += itLeg->getDistance();
+						boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
+						if(geometry.get())
+						{
+							boost::shared_ptr<Geometry> geometryProjected(
+								_coordinatesSystem->convertGeometry(
+									*static_cast<Geometry*>(geometry.get())
+							)	);
+							geometriesSPtr.push_back(geometryProjected);
+							geometries.push_back(geometryProjected.get());
+						}
+					}
+					
+					boost::shared_ptr<MultiLineString> multiLineString(
+						_coordinatesSystem->getGeometryFactory().createMultiLineString(
+							geometries
+					)	);
+					
+					_displayJunctionCell(
+						*legPM,
+						__Couleur,
+						distance,
+						multiLineString.get(),
+						dynamic_cast<const Road*>((*contiguousFootLegs.begin())->getService()->getPath()),
+						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
+						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
+						isFirstFoot,
+						true
+					);
+					
+					concatenatingFootLegs = false;
+					contiguousFootLegs.clear();
+					
+					legPM->insert(DATA_IS_LAST_LEG, false);
+					legPM->insert(DATA_IS_FIRST_LEG, isFirstLeg);
+					
+					pm.insert(ITEM_LEG, legPM);
+					
+					legPM.reset(new ParametersMap);
+					
+					// Write the service
+					isFirstFoot = true;
+					
+					// Departure stop
+					_displayStopCell(
+						*legPM,
+						false,
+						false,
+						leg.getDepartureEdge()->getHub() != lastPlace,
+						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
+						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
+						__Couleur,
+						leg.getDepartureDateTime(),
+						journey.getContinuousServiceRange()
+					);
+					
+					lastPlace = leg.getDepartureEdge()->getHub();
+					__Couleur = !__Couleur;
+					
+					boost::shared_ptr<Geometry> geometryProjected(
+						_coordinatesSystem->convertGeometry(
+							*static_cast<Geometry*>(it->getGeometry().get())
+					)	);
+					
+					geometries.clear();
+					geometries.push_back(geometryProjected.get());
+					
+					multiLineString.reset(
+						_coordinatesSystem->getGeometryFactory().createMultiLineString(
+							geometries
+					)   );
+					
+					_displayJunctionCell(
+						*legPM,
+						__Couleur,
+						it->getDistance(),
+						multiLineString.get(),
+						dynamic_cast<const Road*>(leg.getService()->getPath()),
+						*leg.getDepartureEdge()->getFromVertex(),
+						*leg.getArrivalEdge()->getFromVertex(),
+						isFirstFoot,
+						false
+					);
+					__Couleur = !__Couleur;
+					isFirstFoot = false;
 					legWritten = true;
 					isFirstLeg = false;
 				}
