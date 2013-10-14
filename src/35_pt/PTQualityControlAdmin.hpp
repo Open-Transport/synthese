@@ -44,9 +44,26 @@ namespace synthese
 			/// @name Parameter identifiers
 			//@{
 				static const std::string PARAM_RUN_CONTROL;
+				static const std::string PARAM_LINES;
+				static const std::string PARAM_DISTANCE;
+				static const std::string PARAM_SPEED;
 
+				static const std::string TAB_STOPS_TOO_CLOSE;
+				static const std::string TAB_STOPS_TOO_FAR;
 				static const std::string TAB_STOPS_WITHOUT_COORDINATE;
+				static const std::string TAB_STOPS_NOT_PROJECTED;
+				static const std::string TAB_STOPAREAS_WITHOUT_CITY;
+				static const std::string TAB_STOPAREAS_HOMONYM;
+				static const std::string TAB_STOPAREAS_NAME_STOPS_NAME;
+				static const std::string TAB_CITIES_WITHOUT_STREET;
+				static const std::string TAB_CITIES_WITHOUT_STOP;
 				static const std::string TAB_CITIES_WITHOUT_MAIN_STOP;
+				static const std::string TAB_LINES_WITHOUT_ITINERARY;
+				static const std::string TAB_EDGES_WITHOUT_GEOMETRIES;
+				static const std::string TAB_BUS_TOO_FAST;
+				static const std::string TAB_BUS_TOO_SLOW;
+				static const std::string TAB_BUS_LINES_WITHOUT_SERVICES;
+				static const std::string TAB_METRO_LINES_WITHOUT_SERVICES;
 				static const std::string TAB_EDGES_AND_GEOMETRIES;
 				static const std::string TAB_RANK_CONTINUITY;
 				static const std::string TAB_DOUBLE_ROUTES;
@@ -58,6 +75,8 @@ namespace synthese
 			/// @name Search parameters
 			//@{
 				bool _runControl;
+				std::string _ignoredLines, _networks, _transportModes;
+				int _stopsDistance, _transportSpeed;
 			//@}
 
 		protected:
@@ -81,6 +100,8 @@ namespace synthese
 			PTQualityControlAdmin();
 
 			void setRunControl(bool value){ _runControl = value; }
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.

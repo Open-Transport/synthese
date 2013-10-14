@@ -339,5 +339,34 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
+
+	
+	
+		StopAreaTableSync::SearchResult StopAreaTableSync::SearchSameName(
+			StopArea const& stoparea, 
+			Env& env,
+			LinkLevel linkLevel
+		){
+			SelectQuery<StopAreaTableSync> query;
+			std::stringstream subQuery;
+
+			if(stoparea.getCity())
+			{
+				subQuery << stoparea.getKey() << " != t007_connection_places.id AND "
+					<< "\"" << stoparea.getName() << "\"" << " = t007_connection_places.name AND " 
+					<< stoparea.getCity()->getKey() << " = t007_connection_places.city_id";
+			}
+			else
+			{
+				subQuery << stoparea.getKey() << " != t007_connection_places.id AND "
+				<< "\"" << stoparea.getName() << "\"" << " = t007_connection_places.name"; 
+			}
+			
+			query.addWhere(
+				SubQueryExpression::Get(subQuery.str())
+			);
+
+			return LoadFromQuery(query, env, linkLevel);
+		}
 	}
 }

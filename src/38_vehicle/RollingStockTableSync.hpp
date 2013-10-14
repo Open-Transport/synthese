@@ -68,6 +68,7 @@ namespace synthese
 			RollingStockTableSync() {}
 
 
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Vehicle types search.
 			/// @param env environment to populate when loading objects
@@ -91,6 +92,21 @@ namespace synthese
 				int number = 0,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Vehicle types used in t009_lines search .
+			/// @param env environment to populate when loading objects
+			/// @param linkLevel level of link to use when loading objects
+			///	@return the found vehicle types used in t009_lines.
+			///	@author Hugues Romain
+			///	@date 2007
+			static SearchResult SearchUsedModes(
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
 
 
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;

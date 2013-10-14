@@ -477,6 +477,27 @@ namespace synthese
 			return getRadioInputCollection(name, m, optional<int>(value ? 1 : 0));
 		}
 
+
+
+		std::string HTMLForm::getCheckBox2( const std::string& name, const std::string& value, bool checked )
+		{
+			if (!_updateRight)
+				return checked ? "OUI" : "NON";
+
+			removeHiddenFieldIfExists(name, value);
+			stringstream s;
+			s	<< "<input "
+				<< "type=\"checkbox\" "
+				<< "value=\"" << value << "\" "
+				<< "name=\"" << name << "\" "
+				<< (checked ? "checked=\"true\" " : "")
+				<< "id=\"" << _getFieldId(name) << "\" "
+				<< "/>";
+			return s.str();
+		}
+
+
+
 		std::string HTMLForm::getCheckBox( const std::string& name, const std::string& value, bool checked )
 		{
 			if (!_updateRight)
