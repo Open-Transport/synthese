@@ -91,16 +91,29 @@ namespace synthese
 				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(cityName, false) << "%'";
 			if (!placeName.empty())
 				query << " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(placeName, false) << "%'";
-			if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
+
+			if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT && DBModule::GetDB()->isBackend(DB::MYSQL_BACKEND))
 			{
-				query << " AND bc+cc ";
+				// In mysql, HAVING clause should be after GROUP clause
+				// Grouping
+				query << " GROUP BY p." << TABLE_COL_ID;
+				query << " HAVING bc+cc ";
 				if (bpPresence == AT_LEAST_ONE_BROADCASTPOINT)
 					query << ">0";
 				if (bpPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
-			// Grouping
-			query << " GROUP BY p." << TABLE_COL_ID;
+			else if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
+			{
+				// In sqlite, WHERE clause works on result of SELECT COUNT AS
+				query << " AND bc+cc ";
+				if (bpPresence == AT_LEAST_ONE_BROADCASTPOINT)
+					query << ">0";
+				if (bpPresence == NO_BROADCASTPOINT)
+					query << "=0";
+				// Grouping
+				query << " GROUP BY p." << TABLE_COL_ID;
+			}
 			// Order
 			if (orderByCity)
 			{
