@@ -1003,13 +1003,16 @@ namespace synthese
 				setDataSourceLinksWithRegistration(getDataSourceLinks());
 			}
 
-			if (_isMainPlaceOfCity && getCity())
+			if(getCity())
 			{
-				const_cast<City*>(getCity())->addIncludedPlace(*this);
-			}
-			else
-			{
-				const_cast<City*>(getCity())->removeIncludedPlace(*this);
+				if (_isMainPlaceOfCity)
+				{
+					const_cast<City*>(getCity())->addIncludedPlace(*this);
+				}
+				else
+				{
+					const_cast<City*>(getCity())->removeIncludedPlace(*this);
+				}
 			}
 		}
 

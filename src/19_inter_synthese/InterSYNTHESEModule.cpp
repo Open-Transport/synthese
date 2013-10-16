@@ -188,6 +188,10 @@ namespace synthese
 			{
 				if(Env::GetOfficialEnv().getRegistry<Import>().contains(FAKE_IMPORT_ID))
 				{
+					boost::shared_ptr<Import> import(
+						Env::GetOfficialEnv().getRegistry<Import>().getEditable(FAKE_IMPORT_ID)
+					);
+					import->unlink();
 					Env::GetOfficialEnv().getEditableRegistry<Import>().remove(FAKE_IMPORT_ID);
 				}
 			}
@@ -216,6 +220,7 @@ namespace synthese
 				import->set<synthese::Parameters>(pm);
 
 				import->set<AutoImportDelay>(_syncWaitingTime);
+				import->link(Env::GetOfficialEnv(), true);
 				if(created)
 				{
 					Env::GetOfficialEnv().getEditableRegistry<Import>().add(import);

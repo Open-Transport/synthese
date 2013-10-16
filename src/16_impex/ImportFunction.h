@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_LOGS;
 			static const std::string PARAMETER_MIN_LOG_LEVEL;
 
+			static const std::string ATTR_IMPORT_END_TIME;
 			static const std::string ATTR_SUCCESS;
 			static const std::string ATTR_DONE;
 			static const std::string ATTR_LOGS;

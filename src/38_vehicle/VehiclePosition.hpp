@@ -73,6 +73,7 @@ namespace synthese
 			static const std::string ATTR_METER_OFFSET;
 			static const std::string ATTR_STATUS;
 			static const std::string ATTR_IN_STOP_AREA;
+			static const std::string ATTR_VEHICLE_NUMBER;
 			static const std::string TAG_STOP;
 
 		public:
@@ -101,6 +102,7 @@ namespace synthese
 		private:
 			Status _status;
 			Vehicle* _vehicle;
+			std::string _vehicleNumber;
 			boost::posix_time::ptime _time;
 			Meters _meterOffset;
 			pt::StopPoint* _stopPoint;
@@ -127,6 +129,7 @@ namespace synthese
 			void setPassangers(std::size_t value){ _passengers = value; }
 			void setDepot(pt_operation::Depot* value){ _depot = value; }
 			void setInStopArea(bool value){ _inStopArea = value; }
+			void setVehicleNumber(const std::string& value){ _vehicleNumber = value; }
 
 			const Status& getStatus() const { return _status; }
 			Vehicle* getVehicle() const { return _vehicle; }
@@ -139,6 +142,7 @@ namespace synthese
 			std::size_t getPassengers() const { return _passengers; }
 			pt_operation::Depot* getDepot() const { return _depot; }
 			bool getInStopArea() const { return _inStopArea; }
+			const std::string& getVehicleNumber() const { return _vehicleNumber; }
 
 			virtual void toParametersMap(
 				util::ParametersMap& pm,
