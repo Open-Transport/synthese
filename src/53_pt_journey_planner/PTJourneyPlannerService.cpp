@@ -74,6 +74,8 @@
 #include "HTMLForm.h"
 #include "CMSModule.hpp"
 #include "PTUseRule.h"
+#include "GetMessagesFunction.hpp"
+#include "CustomBroadcastPoint.hpp"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -143,6 +145,7 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_XY = "arrival_place_XY";
 		const string PTJourneyPlannerService::PARAMETER_INVERT_XY = "invert_XY";
 		const string PTJourneyPlannerService::PARAMETER_CONCATENATE_CONTIGUOUS_FOOT_LEGS = "concatenate_contiguous_foot_legs";
+		const string PTJourneyPlannerService::PARAMETER_BROADCAST_POINT_ID = "broadcast_point";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -194,6 +197,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_IS_FIRST_WRITING("is_first_writing");
 		const string PTJourneyPlannerService::DATA_IS_LAST_WRITING("is_last_writing");
 		const string PTJourneyPlannerService::DATA_IS_FIRST_FOOT("is_first_foot");
+		const string PTJourneyPlannerService::TAG_LINE = "line";
 
 		const string PTJourneyPlannerService::ITEM_LEG = "leg";
 		const string PTJourneyPlannerService::PREFIX_ARRIVAL = "arrival_";
@@ -281,6 +285,7 @@ namespace synthese
 			_endArrivalDate(not_a_date_time),
 			_period(NULL),
 			_logger(new AlgorithmLogger()),
+			_broadcastPoint(NULL),
 			_page(NULL)
 		{}
 
@@ -386,6 +391,12 @@ namespace synthese
 			if(	_maxSolutionsNumber)
 			{
 				map.insert(PARAMETER_MAX_SOLUTIONS_NUMBER, *_maxSolutionsNumber);
+			}
+
+			// Output messages
+			if(_broadcastPoint)
+			{
+				map.insert(PARAMETER_BROADCAST_POINT_ID, _broadcastPoint->getKey());
 			}
 
 			return map;
@@ -721,6 +732,22 @@ namespace synthese
 				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
 
+			// Output messages
+			RegistryKeyType broadcastPointId(
+				map.getDefault<RegistryKeyType>(PARAMETER_BROADCAST_POINT_ID, 0)
+			);
+			if(broadcastPointId)
+			{
+				try
+				{
+					_broadcastPoint = Env::GetOfficialEnv().get<CustomBroadcastPoint>(broadcastPointId).get();
+				}
+				catch(ObjectNotFoundException<CustomBroadcastPoint>&)
+				{
+					throw RequestException("No such broadcast point");
+				}
+			}
+
 			// Param to concatenate contiguous foot legs
 			_concatenateContiguousFootLegs = map.getDefault<bool>(PARAMETER_CONCATENATE_CONTIGUOUS_FOOT_LEGS, false);
 		}
@@ -945,7 +972,19 @@ namespace synthese
 				pm.insert(DATA_USER_ID, request.getUser()->getKey());
 			}
 
-
+			// Messages
+			ParametersMap messagesOnBroadCastPoint;
+			if(_broadcastPoint)
+			{
+				// Parameters map
+				ParametersMap parameters;
+				
+				GetMessagesFunction f(
+					_broadcastPoint,
+					parameters
+				);
+				messagesOnBroadCastPoint = f.run(stream, request);
+			}
 
 			// Schedule rows
 			stringstream rows;
@@ -1131,7 +1170,8 @@ namespace synthese
 						*_result->getArrivalPlace(),
 						hFilter,
 						bFilter,
-						it+1 == _result->getJourneys().end()
+						it+1 == _result->getJourneys().end(),
+						messagesOnBroadCastPoint
 					);
 					pm.insert(ITEM_BOARD, boardPM);
 				}
@@ -1310,7 +1350,8 @@ namespace synthese
 			const geography::Place& arrivalPlace,
 			boost::logic::tribool handicappedFilter,
 			boost::logic::tribool bikeFilter,
-			bool isTheLast
+			bool isTheLast,
+			util::ParametersMap messagesOnBroadCastPoint
 		) const	{
 			// Rank
 			pm.insert(DATA_RANK, n);
@@ -1631,7 +1672,8 @@ namespace synthese
 						journey.getContinuousServiceRange(),
 						handicappedFilter,
 						bikeFilter,
-						__Couleur
+						__Couleur,
+						messagesOnBroadCastPoint
 					);
 
 					__Couleur = !__Couleur;
@@ -1769,7 +1811,8 @@ namespace synthese
 						journey.getContinuousServiceRange(),
 						handicappedFilter,
 						bikeFilter,
-						__Couleur
+						__Couleur,
+						messagesOnBroadCastPoint
 					);
 					
 					__Couleur = !__Couleur;
@@ -2168,7 +2211,8 @@ namespace synthese
 			boost::posix_time::time_duration continuousServiceRange,
 			boost::logic::tribool handicappedFilterStatus,
 			boost::logic::tribool bikeFilterStatus,
-			bool color
+			bool color,
+			util::ParametersMap messagesOnBroadCastPoint
 		) const {
 			// Continuous service
 			ptime lastDepartureDateTime(serviceUse.getDepartureDateTime());
@@ -2261,6 +2305,35 @@ namespace synthese
 				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
+				}
+			}
+
+			// Messages output
+			BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, messagesOnBroadCastPoint.getSubMaps("message"))
+			{
+				bool displayMessage(false);
+				if(pmMessage->hasSubMaps(Alarm::TAG_RECIPIENTS))
+				{
+					BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmRecipient, pmMessage->getSubMaps(Alarm::TAG_RECIPIENTS))
+					{
+						if (pmRecipient->hasSubMaps(TAG_LINE))
+						{
+							BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pmRecipient->getSubMaps(TAG_LINE))
+							{
+								if (pmLine->getValue(Registrable::ATTR_ID) == lexical_cast<string>(line->getCommercialLine()->getKey()))
+								{
+									displayMessage = true;
+									break;
+								}
+							}
+						}
+						if (displayMessage)
+							break;
+					}
+				}
+				if (displayMessage)
+				{
+					pm.merge(*pmMessage, std::string(), true );
 				}
 			}
 		}

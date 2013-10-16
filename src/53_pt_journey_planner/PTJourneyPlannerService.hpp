@@ -57,6 +57,11 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace messages
+	{
+		class CustomBroadcastPoint;
+	}
+
 	namespace pt_website
 	{
 		class HourPeriod;
@@ -139,6 +144,7 @@ namespace synthese
 			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 			static const std::string PARAMETER_FARE_CALCULATION;
+			static const std::string PARAMETER_BROADCAST_POINT_ID;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
@@ -282,6 +288,7 @@ namespace synthese
 				static const std::string DATA_BIKE_PLACES_NUMBER;
 				static const std::string DATA_CONTINUOUS_SERVICE_WAITING;
 				static const std::string DATA_WKT;
+				static const std::string TAG_LINE;
 			//@}
 
 			//! @name Result row
@@ -325,6 +332,7 @@ namespace synthese
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
 				bool _concatenateContiguousFootLegs;
 				vector<string> _vectMad;
+				const messages::CustomBroadcastPoint* _broadcastPoint;
 			//@}
 
 			//! @name Pages
@@ -498,7 +506,8 @@ namespace synthese
 				const geography::Place& arrivalPlace,
 				boost::logic::tribool handicappedFilter,
 				boost::logic::tribool bikeFilter,
-				bool isTheLast
+				bool isTheLast,
+				util::ParametersMap messagesOnBroadCastPoint
 			) const;
 
 
@@ -569,7 +578,8 @@ namespace synthese
 				boost::posix_time::time_duration continuousServiceRange,
 				boost::logic::tribool handicappedFilterStatus,
 				boost::logic::tribool bikeFilterStatus,
-				bool color
+				bool color,
+				util::ParametersMap messagesOnBroadCastPoint
 			) const;
 		};
 }	}
