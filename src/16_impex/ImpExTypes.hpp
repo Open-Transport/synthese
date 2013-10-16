@@ -29,6 +29,7 @@ namespace synthese
 		typedef enum
 		{
 			IMPORT_LOG_ALL = 0,
+			IMPORT_LOG_TRAC = 5,
 			IMPORT_LOG_DEBG = 10,
 			IMPORT_LOG_LOAD = 20,
 			IMPORT_LOG_CREA = 25,

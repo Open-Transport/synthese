@@ -209,13 +209,16 @@ namespace synthese
 
 			if(tag == "TRIP")
 			{
-				if(user_data->importTrip && user_data->line)
+				if(user_data->importTrip && user_data->line && !user_data->tripStops.empty())
 				{
+					user_data->tripStops.begin()->_arrival = false;
+					user_data->tripStops.rbegin()->_departure = false;
+
 					JourneyPattern* route(
 						user_data->_importer._createOrUpdateRoute(
 							*user_data->line,
 							boost::optional<const std::string&>(),
-							user_data->tripNumber,
+							boost::optional<const std::string&>(),
 							boost::optional<const std::string&>(),
 							optional<Destination*>(),
 							optional<const RuleUser::Rules&>(),
