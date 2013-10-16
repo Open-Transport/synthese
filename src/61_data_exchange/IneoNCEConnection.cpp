@@ -223,6 +223,7 @@ namespace synthese
 						util::Log::GetInstance().info(
 							string("IneoNCEConnection : ") + e.what()
 						);
+						_theConnection->_status = connect;
 					}
 					catch(thread_interrupted)
 					{
@@ -230,7 +231,7 @@ namespace synthese
 					}
 					catch(...)
 					{
-
+						_theConnection->_status = connect;
 					}
 				}
 				
@@ -575,6 +576,7 @@ namespace synthese
 				if(!nparcNode.isEmpty())
 				{
 					string vehicleNumber(nparcNode.getText());
+					VehicleModule::GetCurrentVehiclePosition().setVehicleNumber(vehicleNumber);
 					Vehicle* vehicle(VehicleModule::GetCurrentVehiclePosition().getVehicle());
 					if(!vehicle || (vehicle->getNumber() != vehicleNumber) )
 					{
@@ -682,16 +684,19 @@ namespace synthese
 				if(inZoneHasChanged)
 				{
 					CurrentJourney::NextStops nextStops;
-					const CurrentJourney::NextStops& lastNextStops(
-						VehicleModule::GetCurrentJourney().getNextStops()
-					);
-					BOOST_FOREACH(const CurrentJourney::NextStops::value_type& nextStop, lastNextStops)
 					{
-						if(nextStop.getInStopArea())
+						mutex::scoped_lock lock(VehicleModule::GetCurrentJourney().getMutex());
+						const CurrentJourney::NextStops& lastNextStops(
+							VehicleModule::GetCurrentJourney().getNextStops()
+						);
+						BOOST_FOREACH(const CurrentJourney::NextStops::value_type& nextStop, lastNextStops)
 						{
-							continue;
+							if(nextStop.getInStopArea())
+							{
+								continue;
+							}
+							nextStops.push_back(nextStop);
 						}
-						nextStops.push_back(nextStop);
 					}
 					VehicleModule::GetCurrentJourney().setNextStops(nextStops);
 				}

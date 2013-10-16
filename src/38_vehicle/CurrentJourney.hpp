@@ -25,6 +25,7 @@
 
 #include "NextStop.hpp"
 
+#include <boost/thread/mutex.hpp>
 #include <vector>
 
 namespace synthese
@@ -56,6 +57,7 @@ namespace synthese
 			static const std::string TAG_COMMERCIAL_LINE;
 			static const std::string TAG_TERMINUS_DEPARTURE_TIME;
 
+			mutable boost::mutex _mutex;
 			NextStops _nextStops;
 			pt::CommercialLine* _line;
 			std::string _lineNumber;
@@ -65,18 +67,25 @@ namespace synthese
 		public:
 			CurrentJourney();
 
-			void setNextStops(const NextStops& value){ _nextStops = value; }
+			void setNextStops(const NextStops& value);
 			void setLine(pt::CommercialLine* value){ _line = value; }
-			void setLineNumber(const std::string& value){ _lineNumber = value; }
+			void setLineNumber(const std::string& value);
 			void setStopRequested(bool value){ _stopRequested = value; }
 			void setTerminusDepartureTime(boost::posix_time::ptime value)
 			{
 				_terminusDepartureTime = value;
 			}
 
+			boost::mutex& getMutex() const { return _mutex; }
+
+			/// @pre the object mutex must be locked as an iteration is done on the nextstops variable
 			const NextStops& getNextStops() const { return _nextStops; }
+
+			/// @pre the object mutex must be locked as an iteration is done on the nextstops variable
 			NextStops& getNextStops(){ return _nextStops; }
 			pt::CommercialLine* getLine() const { return _line; }
+
+			/// @pre the object mutex must be locked as the line number is used
 			const std::string& getLineNumber() const { return _lineNumber; }
 			bool getStopRequested() const { return _stopRequested; }
 			boost::posix_time::ptime getTerminusDepartureTime()

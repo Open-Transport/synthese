@@ -57,6 +57,7 @@ namespace synthese
 				string levelStr;
 				switch(level)
 				{
+				case IMPORT_LOG_TRAC: levelStr = "TRAC"; break;
 				case IMPORT_LOG_DEBG: levelStr = "DEBG"; break;
 				case IMPORT_LOG_LOAD: levelStr = "LOAD"; break;
 				case IMPORT_LOG_CREA: levelStr = "CREA"; break;
@@ -171,6 +172,13 @@ namespace synthese
 		void Importer::_logDebug( const std::string& content ) const
 		{
 			_log(IMPORT_LOG_DEBG, content);
+		}
+
+
+
+		void Importer::_logTrace( const std::string& content ) const
+		{
+			_log(IMPORT_LOG_TRAC, content);
 		}
 
 
