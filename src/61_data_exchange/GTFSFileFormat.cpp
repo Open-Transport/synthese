@@ -1193,8 +1193,8 @@ namespace synthese
 						<< departureTimeStr.substr(0, 8) << ","
 						<< ","
 
-						<< (isReservationMandandatory ? "2," : "0,") // pickup_type
-						<< (isReservationMandandatory ? "2," : "0,") // drop_off_type
+						<< (ls->isDepartureAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
+						<< (ls->isArrivalAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
 						<< endl;
 					stopTimesExist = true;
 				}
