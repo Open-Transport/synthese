@@ -323,19 +323,16 @@ namespace synthese
 							make_pair(id, isp)
 						);
 					}
-					else
-					{
-						// Creation or update
-						_createOrUpdateStop(
-							_stopPoints,
-							id,
-							name,
-							optional<const RuleUser::Rules&>(),
-							stopArea,
-							point.get(),
-							dataSource
-						);
-					}
+					// Creation or update
+					_createOrUpdateStop(
+						_stopPoints,
+						id,
+						name,
+						optional<const RuleUser::Rules&>(),
+						stopArea,
+						point.get(),
+						dataSource
+					);
 				}
 
 				_exportStopPoints(
