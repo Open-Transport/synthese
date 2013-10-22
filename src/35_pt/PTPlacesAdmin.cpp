@@ -208,7 +208,7 @@ namespace synthese
 							stream << t.col() << it.key.getPhoneticString();
 							stream << t.col() << it.score.phoneticScore;
 							stream << t.col() << it.score.levenshtein;
-							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "/admin/img/building.png");
 						}
 						else if(dynamic_pointer_cast<StopArea>(it.value).get())
 						{
@@ -222,7 +222,7 @@ namespace synthese
 							stream << t.col() << it.key.getPhoneticString();
 							stream << t.col() << it.score.phoneticScore;
 							stream << t.col() << it.score.levenshtein;
-							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "/admin/img/building.png");
 						}
 						else if(dynamic_cast<const PlaceAlias*>(it.value.get()))
 						{
@@ -239,7 +239,7 @@ namespace synthese
 								stream << t.col() << it.key.getPhoneticString();
 								stream << t.col() << it.score.phoneticScore;
 								stream << t.col() << it.score.levenshtein;
-								stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+								stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "/admin/img/building.png");
 							}
 						}
 						else if(dynamic_cast<const PublicPlace*>(it.value.get()))
@@ -254,7 +254,7 @@ namespace synthese
 							stream << t.col() << it.key.getPhoneticString();
 							stream << t.col() << it.score.phoneticScore;
 							stream << t.col() << it.score.levenshtein;
-							stream << t.col() << HTMLModule::getLinkButton(openPPRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openPPRequest.getURL(), "Ouvrir", string(), "/admin/img/building.png");
 						}
 						else
 						{
@@ -296,7 +296,7 @@ namespace synthese
 							stream << t.col();
 							stream << t.col() << "Route";
 							stream << t.col() << roadPlace->getName();
-							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "/admin/img/building.png");
 						}
 						else if(dynamic_cast<const StopArea*>(it))
 						{
@@ -306,7 +306,7 @@ namespace synthese
 							stream << t.col();
 							stream << t.col() << "Zone d'arrêt";
 							stream << t.col() << connectionPlace->getName();
-							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "/admin/img/building.png");
 						}
 						else if(dynamic_cast<const PublicPlace*>(it))
 						{
@@ -316,7 +316,7 @@ namespace synthese
 							stream << t.col();
 							stream << t.col() << "Lieu public";
 							stream << t.col() << publicPlace->getName();
-							stream << t.col() << HTMLModule::getLinkButton(openPPRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openPPRequest.getURL(), "Ouvrir", string(), "/admin/img/building.png");
 						}
 						else
 						{
