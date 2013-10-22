@@ -69,7 +69,7 @@ namespace synthese
 	namespace admin
 	{
 		template<>
-		const string AdminInterfaceElementTemplate<PublicPlaceAdmin>::ICON = "building";
+		const string AdminInterfaceElementTemplate<PublicPlaceAdmin>::ICON = "building.png";
 
 		template<>
 		const string AdminInterfaceElementTemplate<PublicPlaceAdmin>::DEFAULT_TITLE = "Lieu public";
