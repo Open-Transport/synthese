@@ -52,6 +52,8 @@ namespace synthese
 			static const std::string PARAMETER_COUNTRY;
 			static const std::string PARAMETER_EMAIL;
 			static const std::string PARAMETER_PHONE;
+			static const std::string PARAMETER_CREATION_DATE;
+			static const std::string PARAMETER_CREATOR_ID;
 
 		private:
 			std::string _login;
@@ -64,6 +66,8 @@ namespace synthese
 			std::string _city;
 			std::string _country;
 			std::string _phone;
+			boost::gregorian::date _creationDate;
+			std::string _creatorId;
 			std::string _email;
 
 		protected:
