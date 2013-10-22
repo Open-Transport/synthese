@@ -31,6 +31,7 @@
 #include "RoadChunkTableSync.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "CommercialLineTableSync.h"
 #include "ReverseRoadChunk.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
@@ -243,6 +244,27 @@ namespace synthese
 					dynamic_cast<const StopArea*>(getHub())->getKey() :
 					RegistryKeyType(0)
 			)	);
+
+			// Commercial lines
+			set<string> linesSet;
+			boost::shared_ptr<ParametersMap> linesPm(new ParametersMap);
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
+			{
+				if(dynamic_cast<const LineStop*>(edge.second))
+					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
+			}
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
+			{
+				if(dynamic_cast<const LineStop*>(edge.second))
+					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
+			}
+			BOOST_FOREACH(string line, linesSet)
+			{
+				boost::shared_ptr<ParametersMap> linePm(new ParametersMap);
+				linePm->insert(prefix + CommercialLineTableSync::COL_SHORT_NAME,line);
+				linesPm->insert(prefix + "line",linePm);
+			}
+			pm.insert(prefix + "lines", linesPm);
 
 			// X Y (deprecated)
 			if(hasGeometry())
