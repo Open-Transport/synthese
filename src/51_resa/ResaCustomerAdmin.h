@@ -52,6 +52,10 @@ namespace synthese
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_PARAMETERS;
 			static const std::string TAB_LOG;
+			static const std::string TAB_RESERVATIONS;
+			static const std::string TAB_CANCELS;
+			static const std::string TAB_CANCELS_DEADLINE;
+			static const std::string TAB_ABSENCES;
 
 		public:
 

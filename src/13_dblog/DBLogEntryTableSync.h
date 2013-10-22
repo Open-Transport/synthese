@@ -95,6 +95,20 @@ namespace synthese
 			);
 
 
+
+			/** DBLog search by user in object_id column
+			 * @param objectId ID of user
+			 * @return Vector of shared pointers to found DBLog linked-objects.
+			 * @date 2013
+			 */
+			static SearchResult SearchByUser(
+				util::Env& env,
+				util::RegistryKeyType objectId,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+
 			static void Purge(
 				const std::string& logKey,
 				const boost::posix_time::ptime& endDate

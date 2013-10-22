@@ -69,6 +69,11 @@ namespace synthese
 			static const std::string PARAMETER_OBJECT_ID;
 			static const std::string PARAMETER_OBJECT_ID2;
 
+			static const std::string FILTER_ALL;
+			static const std::string FILTER_RESA;
+			static const std::string FILTER_ABS;
+			static const std::string FILTER_CANCEL;
+			static const std::string FILTER_CANC_D;
 
 		private:
 			// Attributes
@@ -147,7 +152,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& searchRequest,
 					bool withForm = true,
-					bool withLinkToAdminPage = false
+					bool withLinkToAdminPage = false,
+					const std::string& type = FILTER_ALL
 				) const;
 
 				bool isAuthorized(

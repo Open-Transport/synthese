@@ -33,6 +33,7 @@
 #include "DBLogModule.h"
 #include "DBLogEntryTableSync.h"
 #include "DBLogRight.h"
+#include "ResaDBLog.h"
 #include "Request.h"
 #include "Profile.h"
 #include "SecurityModule.h"
@@ -48,6 +49,7 @@ namespace synthese
 	using namespace security;
 	using namespace server;
 	using namespace html;
+	using namespace resa;
 
 	namespace dblog
 	{
@@ -59,6 +61,14 @@ namespace synthese
 		const string DBLogHTMLView::PARAMETER_SEARCH_TEXT = "dlvsx";
 		const string DBLogHTMLView::PARAMETER_OBJECT_ID = "dlvoi";
 		const string DBLogHTMLView::PARAMETER_OBJECT_ID2 = "dlvo2";
+		
+		const string DBLogHTMLView::FILTER_ALL = "All";
+		const string DBLogHTMLView::FILTER_RESA = "Réservation";
+		const string DBLogHTMLView::FILTER_ABS = "Absence";
+		const string DBLogHTMLView::FILTER_CANCEL = "Annulation";
+		const string DBLogHTMLView::FILTER_CANC_D = "hors délai";
+
+
 
 		DBLogHTMLView::DBLogHTMLView(
 			const std::string& code
@@ -188,11 +198,13 @@ namespace synthese
 		}
 
 
+
 		void DBLogHTMLView::display(
 			std::ostream& stream,
 			const Request& searchRequest,
 			bool withForm,
-			bool withLinkToAdminPage
+			bool withLinkToAdminPage,
+			const std::string& type
 		) const {
 
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("searchlog"+ _code));
@@ -277,25 +289,50 @@ namespace synthese
 				v.push_back(make_pair(string(), col));
 			}
 
-			// Search
-			DBLogEntryTableSync::SearchResult entries(
-				DBLogEntryTableSync::Search(
-					_env,
-					_dbLog->getFactoryKey()
-					, _searchStartDate
-					, _searchEndDate
-					, _searchUserId
-					, _searchLevel
-					, _searchObjectId,
-					_searchObjectId2,
-					_searchText
-					, _requestParameters.first
-					, _requestParameters.maxSize
-					, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
-					, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
-					, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
-					, _requestParameters.raisingOrder
-			)	);
+			DBLogEntryTableSync::SearchResult entries;
+
+			if (type == FILTER_ALL)
+			{
+				// Search all entries for one user
+				entries = DBLogEntryTableSync::Search(
+						_env,
+						_dbLog->getFactoryKey()
+						, _searchStartDate
+						, _searchEndDate
+						, _searchUserId
+						, _searchLevel
+						, _searchObjectId
+						, _searchObjectId2
+						, _searchText
+						, _requestParameters.first
+						, _requestParameters.maxSize
+						, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
+						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
+						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
+						, _requestParameters.raisingOrder
+				);
+			}
+			else
+			{
+				// Search specific level entries for one user
+				entries = DBLogEntryTableSync::Search(
+						_env,
+						_dbLog->getFactoryKey()
+						, _searchStartDate
+						, _searchEndDate
+						, _searchUserId
+						, _searchLevel
+						, _searchObjectId
+						, _searchObjectId2
+						, type
+						, _requestParameters.first
+						, _requestParameters.maxSize
+						, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
+						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
+						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
+						, _requestParameters.raisingOrder
+				);
+			}
 
 			ResultHTMLTable t(
 				v,
@@ -305,65 +342,74 @@ namespace synthese
 			);
 
 			stream << t.open();
+
 			BOOST_FOREACH(const boost::shared_ptr<DBLogEntry>& dbe, entries)
 			{
-				boost::shared_ptr<const User> user;
-				try
-				{
-					user = UserTableSync::Get(dbe->getUserId(), _env);
-				}
-				catch (...)
-				{
-				}
-				stream << t.row();
-				stream <<
-					t.col() <<
-					HTMLModule::getHTMLImage(
-						"/admin/img/" + DBLogModule::getEntryIcon(dbe->getLevel()),
-						DBLogModule::getEntryLevelLabel(dbe->getLevel())
-					)
-				;
-				stream << t.col() << to_simple_string(dbe->getDate());
-				if(!_fixedUserId)
-				{
-					stream <<
-						t.col() <<
-						(	user.get() ?
-							user->getLogin() :
-							((dbe->getUserId() > 0) ? "(supprimé)" : "(robot)")
-						)
-					;
-				}
-				if(!_fixedObjectId && !_dbLog->getObjectColumnName().empty())
-				{
-					stream <<
-						t.col() <<
-						(	(dbe->getObjectId() > 0) ?
-							_dbLog->getObjectName(dbe->getObjectId(), searchRequest) :
-							string()
-						)
-					;
-				}
-				if(!_fixedObjectId2 && !_dbLog->getObject2ColumnName().empty())
-				{
-					stream <<
-						t.col() <<
-						(	(dbe->getObjectId2() > 0) ?
-							_dbLog->getObjectName(dbe->getObjectId2(), searchRequest) :
-							string()
-						)
-					;
-				}
+				const DBLogEntry::Content& content(dbe->getContent());
+				const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
+				if (
+					(type == FILTER_ALL) or 
+					(type == FILTER_RESA and (entryType == ResaDBLog::RESERVATION_ENTRY or entryType == ResaDBLog::RESERVATION_UPDATE)) or 
+					(type == FILTER_CANCEL and entryType == ResaDBLog::CANCELLATION_ENTRY) or 
+					(type == FILTER_CANC_D and entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) or 
+					(type == FILTER_ABS and entryType == ResaDBLog::NO_SHOW_ENTRY)
+				){
+					boost::shared_ptr<const User> user;
+					try
+					{
+						user = UserTableSync::Get(dbe->getUserId(), _env);
+					}
+					catch (...)
+					{
+					}
 
-				DBLog::ColumnsVector cols = _dbLog->parse(*dbe, searchRequest);
-				BOOST_FOREACH(const DBLog::ColumnsVector::value_type& col, cols)
-				{
-					stream << t.col() << col;
+					stream << t.row();
+					stream <<
+						t.col() <<
+						HTMLModule::getHTMLImage(
+							"/admin/img/" + DBLogModule::getEntryIcon(dbe->getLevel()),
+							DBLogModule::getEntryLevelLabel(dbe->getLevel())
+						)
+					;
+					stream << t.col() << to_simple_string(dbe->getDate());
+					if(!_fixedUserId)
+					{
+						stream <<
+							t.col() <<
+							(	user.get() ?
+								user->getLogin() :
+								((dbe->getUserId() > 0) ? "(supprimé)" : "(robot)")
+							)
+						;
+					}
+					if(!_fixedObjectId && !_dbLog->getObjectColumnName().empty())
+					{
+						stream <<
+							t.col() <<
+							(	(dbe->getObjectId() > 0) ?
+								_dbLog->getObjectName(dbe->getObjectId(), searchRequest) :
+								string()
+							)
+						;
+					}
+					if(!_fixedObjectId2 && !_dbLog->getObject2ColumnName().empty())
+					{
+						stream <<
+							t.col() <<
+							(	(dbe->getObjectId2() > 0) ?
+								_dbLog->getObjectName(dbe->getObjectId2(), searchRequest) :
+								string()
+							)
+						;
+					}
+					DBLog::ColumnsVector cols = _dbLog->parse(*dbe, searchRequest);
+					BOOST_FOREACH(const DBLog::ColumnsVector::value_type& col, cols)
+					{
+						stream << t.col() << col;
+					}
 				}
 			}
-
 			stream << t.close();
-
 		}
 
 		string DBLogHTMLView::getLogKey() const
