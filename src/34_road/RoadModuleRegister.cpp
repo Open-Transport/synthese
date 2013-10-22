@@ -13,6 +13,9 @@
 
 #include "ProjectAddressAction.hpp"
 #include "PublicPlaceEntranceCreationAction.hpp"
+#include "ProjectAllPublicPlacesAction.hpp"
+
+#include "PublicPlacesListService.hpp"
 
 #include "PublicPlaceAdmin.hpp"
 
@@ -52,6 +55,9 @@ void synthese::road::moduleRegister()
 
 	synthese::road::ProjectAddressAction::integrate();
 	synthese::road::PublicPlaceEntranceCreationAction::integrate();
+	synthese::road::ProjectAllPublicPlacesAction::integrate();
+
+	synthese::road::PublicPlacesListService::integrate();
 
 	synthese::road::PublicPlaceAdmin::integrate();
 

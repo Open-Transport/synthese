@@ -28,6 +28,7 @@
 #include "NamedPlaceField.hpp"
 #include "NamedPlaceTemplate.h"
 #include "NumericField.hpp"
+#include "StringField.hpp"
 #include "Object.hpp"
 #include "ImportableTemplate.hpp"
 #include "WithGeometry.hpp"
@@ -48,10 +49,15 @@ namespace synthese
 	{
 		class PublicPlaceEntrance;
 
+		FIELD_STRING(Category)
+		FIELD_STRING(Details)
+
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(geography::NamedPlaceField),
 			FIELD(impex::DataSourceLinks),
+			FIELD(Category),
+			FIELD(Details),
 			FIELD(PointGeometry)
 		> PublicPlaceSchema;
 
@@ -71,6 +77,8 @@ namespace synthese
 		public:
 			static const std::string DATA_ID;
 			static const std::string DATA_NAME;
+			static const std::string DATA_CATEGORY;
+			static const std::string DATA_DETAILS;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
 
@@ -87,7 +95,9 @@ namespace synthese
 			typedef util::Registry<PublicPlace>	Registry;
 
 			PublicPlace (
-				util::RegistryKeyType id = 0
+				util::RegistryKeyType id = 0,
+				std::string category = std::string(),
+				std::string details = std::string()
 			);
 
 			virtual ~PublicPlace ();
