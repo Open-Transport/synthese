@@ -32,6 +32,8 @@
 #include "Request.h"
 #include "ParametersMap.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -39,6 +41,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace boost::posix_time;
 
 	template<> const std::string util::FactorableTemplate<Action, security::AddUserAction>::FACTORY_KEY("sau");
 
@@ -55,6 +58,8 @@ namespace synthese
 		const std::string AddUserAction::PARAMETER_CITY(Action_PARAMETER_PREFIX + "city");
 		const std::string AddUserAction::PARAMETER_COUNTRY(Action_PARAMETER_PREFIX + "country");
 		const std::string AddUserAction::PARAMETER_PHONE(Action_PARAMETER_PREFIX + "phon");
+		const std::string AddUserAction::PARAMETER_CREATION_DATE(Action_PARAMETER_PREFIX + "creadate");
+		const std::string AddUserAction::PARAMETER_CREATOR_ID(Action_PARAMETER_PREFIX + "creaid");
 		const std::string AddUserAction::PARAMETER_EMAIL(Action_PARAMETER_PREFIX + "email");
 
 		ParametersMap AddUserAction::getParametersMap() const
@@ -65,6 +70,8 @@ namespace synthese
 			if (_profile.get())
 				map.insert(PARAMETER_PROFILE_ID, _profile->getKey());
 			return map;
+			const ptime now(second_clock::local_time());
+			map.insert(PARAMETER_CREATION_DATE,now); 
 		}
 
 		void AddUserAction::_setFromParametersMap(const ParametersMap& map )
@@ -96,7 +103,7 @@ namespace synthese
 				if (pass2 != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
 			}
-			
+		
 			_surname = map.getDefault<string>(PARAMETER_SURNAME);
 			_address = map.getDefault<string>(PARAMETER_ADDRESS);
 			_postalCode = map.getDefault<string>(PARAMETER_POSTAL_CODE);
@@ -104,6 +111,8 @@ namespace synthese
 			_city = map.getDefault<string>(PARAMETER_CITY);
 			_country = map.getDefault<string>(PARAMETER_COUNTRY);
 			_email = map.getDefault<string>(PARAMETER_EMAIL);
+			_creationDate = boost::gregorian::day_clock::local_day();
+			_creatorId = map.getDefault<RegistryKeyType>(PARAMETER_CREATOR_ID);
 		}
 
 		void AddUserAction::run(Request& request)
@@ -128,6 +137,9 @@ namespace synthese
 				user.setCountry(_country);
 			if (!_email.empty())
 				user.setEMail(_email);
+			user.setCreationDate(_creationDate);
+			if (!_creatorId.empty() && request.getSession())
+				user.setCreatorId(request.getSession()->getUser()->getKey());
 			UserTableSync::Save(&user);
 
 			request.setActionCreatedId(user.getKey());
