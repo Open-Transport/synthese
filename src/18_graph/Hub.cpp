@@ -101,7 +101,7 @@ namespace synthese
 				{
 					// previous hub before the current one for the incoming path
 					const Hub* previousIncomingHub(
-						itIncomingEdge.second->getPreviousDepartureForFineSteppingOnly() ?
+						itIncomingEdge.second->getPreviousDepartureForFineSteppingOnly() && itIncomingEdge.second->getPreviousDepartureForFineSteppingOnly()->getFromVertex() ?
 						itIncomingEdge.second->getPreviousDepartureForFineSteppingOnly()->getFromVertex()->getHub() :
 						NULL
 					);
