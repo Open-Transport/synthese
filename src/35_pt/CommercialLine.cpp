@@ -257,7 +257,7 @@ namespace synthese
 				getLongName()
 			);
 			pm.insert(
-				prefix + CommercialLineTableSync::COL_COLOR,
+				prefix + "xmlcolor",
 				getColor() ? getColor()->toXMLColor() : string()
 			);
 			pm.insert(
