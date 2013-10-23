@@ -343,17 +343,34 @@ namespace synthese
 
 			stream << t.open();
 
+			bool displayFilter = false;
+
 			BOOST_FOREACH(const boost::shared_ptr<DBLogEntry>& dbe, entries)
 			{
-				const DBLogEntry::Content& content(dbe->getContent());
-				const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
-				if (
-					(type == FILTER_ALL) or 
-					(type == FILTER_RESA and (entryType == ResaDBLog::RESERVATION_ENTRY or entryType == ResaDBLog::RESERVATION_UPDATE)) or 
-					(type == FILTER_CANCEL and entryType == ResaDBLog::CANCELLATION_ENTRY) or 
-					(type == FILTER_CANC_D and entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) or 
-					(type == FILTER_ABS and entryType == ResaDBLog::NO_SHOW_ENTRY)
-				){
+				if (type != FILTER_ALL)
+				{
+					const DBLogEntry::Content& content(dbe->getContent());
+					const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
+					if (
+						(type == FILTER_RESA and (entryType == ResaDBLog::RESERVATION_ENTRY or entryType == ResaDBLog::RESERVATION_UPDATE)) or 
+						(type == FILTER_CANCEL and entryType == ResaDBLog::CANCELLATION_ENTRY) or 
+						(type == FILTER_CANC_D and entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) or 
+						(type == FILTER_ABS and entryType == ResaDBLog::NO_SHOW_ENTRY)
+					){
+						displayFilter = true;
+					}
+					else
+					{
+						displayFilter = false;
+					}
+				}
+				else
+				{
+					displayFilter = true;
+				}
+
+				if (displayFilter)
+				{
 					boost::shared_ptr<const User> user;
 					try
 					{
