@@ -2308,6 +2308,7 @@ namespace synthese
 				}
 			}
 
+			boost::shared_ptr<ParametersMap> pmMessages(new ParametersMap);
 			// Messages output
 			BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, messagesOnBroadCastPoint.getSubMaps("message"))
 			{
@@ -2333,9 +2334,11 @@ namespace synthese
 				}
 				if (displayMessage)
 				{
-					pm.merge(*pmMessage, std::string(), true );
+					pmMessages->insert(string("message"), pmMessage);
 				}
 			}
+
+			pm.insert(string("messages"), pmMessages);
 		}
 
 
