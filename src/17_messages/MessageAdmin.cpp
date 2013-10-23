@@ -51,6 +51,7 @@
 #include "AdminInterfaceElement.h"
 #include "ActionException.h"
 #include "TinyMCE.hpp"
+#include "ImportableAdmin.hpp"
 #include "StaticActionRequest.h"
 
 #include <boost/foreach.hpp>
@@ -62,6 +63,7 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace server;
+	using namespace impex;
 	using namespace util;
 	using namespace html;
 	using namespace messages;
@@ -81,6 +83,7 @@ namespace synthese
 	namespace messages
 	{
 		const string MessageAdmin::TAB_PARAMS("tp");
+		const string MessageAdmin::TAB_DATASOURCES("s");
 
 		void MessageAdmin::setFromParametersMap(
 			const ParametersMap& map
@@ -211,6 +214,15 @@ namespace synthese
 				}
 			}
 
+			// TAB DATASOURCES
+			if (openTabContent(stream, TAB_DATASOURCES))
+			{
+				// Source id
+				StaticActionRequest<UpdateAlarmMessagesAction> updateOnlyRequest(_request);
+				updateOnlyRequest.getAction()->setAlarmId(_alarm->getKey());
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_alarm, updateOnlyRequest);
+			}
+
 
 			////////////////////////////////////////////////////////////////////
 			// END TABS
@@ -232,6 +244,8 @@ namespace synthese
 			{
 				_tabs.push_back(Tab(recipient->getTitle(), recipient->getFactoryKey(), true));
 			}
+
+			_tabs.push_back(Tab("Source de données", TAB_DATASOURCES, true));
 
 			_tabBuilded = true;
 		}

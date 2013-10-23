@@ -40,6 +40,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
+	using namespace impex;
 
 	template<> const Field SimpleObjectFieldDefinition<messages::Alarm>::FIELD = Field("alarm_id", SQL_INTEGER);
 	template<> const std::string util::Registry<messages::Alarm>::KEY("Alarm");
@@ -164,6 +165,8 @@ namespace synthese
 			}
 
 			pm.insert(ATTR_CALENDAR_ID, _calendar ? _calendar->getKey() : 0);
+
+			dataSourceLinksToParametersMap(pm);
 		}
 
 
