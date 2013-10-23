@@ -23,7 +23,7 @@
 #include "DesignatedLinePhysicalStop.hpp"
 
 #include "Hub.h"
-#include "JourneyPattern.hpp"
+#include "JourneyPatternCopy.hpp"
 #include "LineStopTableSync.h"
 #include "PTModule.h"
 #include "StopPoint.hpp"
@@ -132,5 +132,29 @@ namespace synthese
 			}
 
 			clearPhysicalStopLinks();
+
+			// Collecting all line stops to unlink including journey pattern copies
+			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
+			ToClean toClean;
+			BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+			{
+				toClean.push_back(
+					make_pair(
+						copy,
+						const_cast<LinePhysicalStop*>(static_cast<const LinePhysicalStop*>(
+							copy->getEdge(getRankInPath()))
+						)
+				)	);
+			}
+
+			BOOST_FOREACH(const ToClean::value_type& it, toClean)
+			{
+				it.second->clearPhysicalStopLinks();
+
+				if(it.second != this)
+				{
+					delete it.second;
+				}
+			}
 		}
 }	}
