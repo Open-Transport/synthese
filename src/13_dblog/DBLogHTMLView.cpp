@@ -352,10 +352,10 @@ namespace synthese
 					const DBLogEntry::Content& content(dbe->getContent());
 					const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
 					if (
-						(type == FILTER_RESA and (entryType == ResaDBLog::RESERVATION_ENTRY or entryType == ResaDBLog::RESERVATION_UPDATE)) or 
-						(type == FILTER_CANCEL and entryType == ResaDBLog::CANCELLATION_ENTRY) or 
-						(type == FILTER_CANC_D and entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) or 
-						(type == FILTER_ABS and entryType == ResaDBLog::NO_SHOW_ENTRY)
+						(type == FILTER_RESA && (entryType == ResaDBLog::RESERVATION_ENTRY || entryType == ResaDBLog::RESERVATION_UPDATE)) ||
+						(type == FILTER_CANCEL && entryType == ResaDBLog::CANCELLATION_ENTRY) || 
+						(type == FILTER_CANC_D && entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) ||
+						(type == FILTER_ABS && entryType == ResaDBLog::NO_SHOW_ENTRY)
 					){
 						displayFilter = true;
 					}
