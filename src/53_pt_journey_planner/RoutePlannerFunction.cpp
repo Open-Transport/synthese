@@ -77,6 +77,8 @@
 #include "HTMLForm.h"
 #include "CMSModule.hpp"
 #include "PTUseRule.h"
+#include "GetMessagesFunction.hpp"
+#include "CustomBroadcastPoint.hpp"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -148,6 +150,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_XY("departure_place_XY");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_XY("arrival_place_XY");
 		const string RoutePlannerFunction::PARAMETER_INVERT_XY("invert_XY");
+		const string RoutePlannerFunction::PARAMETER_BROADCAST_POINT_ID = "broadcast_point";
 
 		const string RoutePlannerFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string RoutePlannerFunction::VALUE_ADMIN_HTML = "admin";
@@ -323,7 +326,8 @@ namespace synthese
 			_endArrivalDate(not_a_date_time),
 			_period(NULL),
 			_logger(new AlgorithmLogger()),
-			_config(NULL)
+			_config(NULL),
+			_broadcastPoint(NULL)
 		{}
 
 
@@ -438,6 +442,12 @@ namespace synthese
 			if(	_maxSolutionsNumber)
 			{
 				map.insert(PARAMETER_MAX_SOLUTIONS_NUMBER, *_maxSolutionsNumber);
+			}
+
+			// Output messages
+			if(_broadcastPoint)
+			{
+				map.insert(PARAMETER_BROADCAST_POINT_ID, _broadcastPoint->getKey());
 			}
 
 			return map;
@@ -807,6 +817,22 @@ namespace synthese
 				&&(*showCoordsLabel=="no"))
 			{
 				_showCoords = false;
+			}
+
+			// Output messages
+			RegistryKeyType broadcastPointId(
+				map.getDefault<RegistryKeyType>(PARAMETER_BROADCAST_POINT_ID, 0)
+			);
+			if(broadcastPointId)
+			{
+				try
+				{
+					_broadcastPoint = Env::GetOfficialEnv().get<CustomBroadcastPoint>(broadcastPointId).get();
+				}
+				catch(ObjectNotFoundException<CustomBroadcastPoint>&)
+				{
+					throw RequestException("No such broadcast point");
+				}
 			}
 
 			// Pages
@@ -1240,6 +1266,19 @@ namespace synthese
 				_result->filterOnWaitingTime(*_minWaitingTimeFilter);
 			}
 
+			// Messages
+			ParametersMap messagesOnBroadCastPoint;
+			if(_broadcastPoint)
+			{
+				// Parameters map
+				ParametersMap parameters;
+
+				GetMessagesFunction f(
+					_broadcastPoint,
+					parameters
+				);
+				messagesOnBroadCastPoint = f.run(stream, request);
+			}
 
 			//////////////////////////////////////////////////////////////////////////
 			// Display
@@ -1256,7 +1295,8 @@ namespace synthese
 					_departure_place.placeResult.value.get(),
 					_arrival_place.placeResult.value.get(),
 					_period,
-					_accessParameters
+					_accessParameters,
+					messagesOnBroadCastPoint
 				);
 			}
 			else if(_outputFormat == VALUE_ADMIN_HTML)
@@ -1732,6 +1772,36 @@ namespace synthese
 										" name=\"" << line->getRollingStock()->getName() << "\"" <<
 										" />";
 								}
+
+								boost::shared_ptr<ParametersMap> pmMessages(new ParametersMap);
+								BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, messagesOnBroadCastPoint.getSubMaps("message"))
+								{
+									bool displayMessage(false);
+									if(pmMessage->hasSubMaps(Alarm::TAG_RECIPIENTS))
+									{
+										BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmRecipient, pmMessage->getSubMaps(Alarm::TAG_RECIPIENTS))
+										{
+											if (pmRecipient->hasSubMaps("line"))
+											{
+												BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pmRecipient->getSubMaps("line"))
+												{
+													if (pmLine->getValue(Registrable::ATTR_ID) == lexical_cast<string>(line->getCommercialLine()->getKey()))
+													{
+														displayMessage = true;
+														break;
+													}
+												}
+											}
+											if (displayMessage)
+												break;
+										}
+									}
+									if (displayMessage)
+									{
+										pmMessages->insert(string("message"), pmMessage);
+									}
+								}
+								pmMessages->outputXML(stream, "messages");
 							}
 							stream << "</transport>";
 						}
@@ -2225,7 +2295,8 @@ namespace synthese
 			const geography::Place* originPlace,
 			const geography::Place* destinationPlace,
 			const pt_website::HourPeriod* period,
-			const graph::AccessParameters& accessParameters
+			const graph::AccessParameters& accessParameters,
+			util::ParametersMap& messagesOnBroadCastPoint
 		) const	{
 			ParametersMap pm(getTemplateParameters());
 
@@ -2477,7 +2548,8 @@ namespace synthese
 						*object.getArrivalPlace(),
 						hFilter,
 						bFilter,
-						it+1 == object.getJourneys().end()
+						it+1 == object.getJourneys().end(),
+						messagesOnBroadCastPoint
 					);
 				}
 
@@ -2668,7 +2740,8 @@ namespace synthese
 						*object.getArrivalPlace(),
 						hFilter,
 						bFilter,
-						it+1 != object.getJourneys().end()
+						it+1 != object.getJourneys().end(),
+						messagesOnBroadCastPoint
 					);
 				}
 
@@ -3016,7 +3089,8 @@ namespace synthese
 			const geography::Place& arrivalPlace,
 			boost::logic::tribool handicappedFilter,
 			boost::logic::tribool bikeFilter,
-			bool isTheLast
+			bool isTheLast,
+			util::ParametersMap messagesOnBroadCastPoint
 		) const	{
 			ParametersMap pm(getTemplateParameters());
 
@@ -3353,7 +3427,8 @@ namespace synthese
 							bikeFilter,
 							__Couleur,
 							it+1 == services.end(),
-							it == services.begin()
+							it == services.begin(),
+							messagesOnBroadCastPoint
 						);
 
 						__Couleur = !__Couleur;
@@ -3788,7 +3863,8 @@ namespace synthese
 			boost::logic::tribool bikeFilterStatus,
 			bool color,
 			bool isLastLeg,
-			bool isFirstLeg
+			bool isFirstLeg,
+			util::ParametersMap& messagesOnBroadCastPoint
 		) const {
 			ParametersMap pm(getTemplateParameters());
 
@@ -3866,6 +3942,38 @@ namespace synthese
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
 				}
 			}
+
+			boost::shared_ptr<ParametersMap> pmMessages(new ParametersMap);
+			// Messages output
+			BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, messagesOnBroadCastPoint.getSubMaps("message"))
+			{
+				bool displayMessage(false);
+				if(pmMessage->hasSubMaps(Alarm::TAG_RECIPIENTS))
+				{
+					BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmRecipient, pmMessage->getSubMaps(Alarm::TAG_RECIPIENTS))
+					{
+						if (pmRecipient->hasSubMaps("line"))
+						{
+							BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pmRecipient->getSubMaps("line"))
+							{
+								if (pmLine->getValue(Registrable::ATTR_ID) == lexical_cast<string>(line->getCommercialLine()->getKey()))
+								{
+									displayMessage = true;
+									break;
+								}
+							}
+						}
+						if (displayMessage)
+							break;
+					}
+				}
+				if (displayMessage)
+				{
+					pmMessages->insert(string("message"), pmMessage);
+				}
+			}
+
+			pm.insert(string("messages"), pmMessages);
 
 			page->display(stream, request, pm);
 		}
