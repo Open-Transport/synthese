@@ -29,6 +29,8 @@
 #include "FactorableTemplate.h"
 #include "MessagesTypes.h"
 
+#include "BaseImportableUpdateAction.hpp"
+
 #include <boost/optional.hpp>
 
 namespace synthese
@@ -51,7 +53,9 @@ namespace synthese
 
 			@ingroup m17Actions refActions
 		*/
-		class UpdateAlarmMessagesAction : public util::FactorableTemplate<server::Action, UpdateAlarmMessagesAction>
+		class UpdateAlarmMessagesAction :
+			public util::FactorableTemplate<server::Action, UpdateAlarmMessagesAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_TYPE;
@@ -61,15 +65,19 @@ namespace synthese
 			static const std::string PARAMETER_RAW_EDITOR;
 			static const std::string PARAMETER_DONE;
 			static const std::string PARAMETER_SCENARIO_ID;
+			static const std::string PARAMETER_ALARM_DATASOURCE_ID;
 
 		private:
 			boost::shared_ptr<Alarm>		_alarm;
+			boost::shared_ptr<const impex::DataSource> _alarmDataSource;
 			boost::optional<boost::shared_ptr<Scenario> >		_scenario;
 			boost::optional<AlarmLevel>		_type;
 			boost::optional<std::string> _shortMessage;
 			boost::optional<std::string> _longMessage;
 			boost::optional<bool> _rawEditor;
 			boost::optional<bool> _done;
+
+			std::string _dataSourceLinkId;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

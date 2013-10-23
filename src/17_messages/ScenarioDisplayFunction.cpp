@@ -208,6 +208,7 @@ namespace synthese
 
 				// Backward compatibility (deprecated tag)
 				pm.insert(Request::PARAMETER_OBJECT_ID, _scenario->getKey());
+				pm.merge(getTemplateParameters());
 
 				_mainTemplate->display(stream, request, pm);
 			}

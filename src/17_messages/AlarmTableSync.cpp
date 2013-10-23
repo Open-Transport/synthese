@@ -23,7 +23,10 @@
 
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTemplate.h"
+#include "DataSource.h"
+#include "DataSourceLinksField.hpp"
 #include "DBResult.hpp"
+#include "ImportableTableSync.hpp"
 #include "MessageAlternativeTableSync.hpp"
 #include "MessagesLibraryLog.h"
 #include "MessagesLibraryRight.h"
@@ -48,6 +51,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace messages;
+	using namespace impex;
 	using namespace util;
 	using namespace security;
 
@@ -71,6 +75,7 @@ namespace synthese
 		const string AlarmTableSync::COL_DONE = "done";
 		const string AlarmTableSync::COL_MESSAGES_SECTION_ID = "messages_section_id";
 		const string AlarmTableSync::COL_CALENDAR_ID = "calendar_id";
+		const string AlarmTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 	}
 
 	namespace db
@@ -92,6 +97,7 @@ namespace synthese
 			Field(AlarmTableSync::COL_DONE, SQL_BOOLEAN),
 			Field(AlarmTableSync::COL_MESSAGES_SECTION_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_CALENDAR_ID, SQL_INTEGER),
+			Field(AlarmTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field()
 		};
 
@@ -144,6 +150,23 @@ namespace synthese
 				catch (ObjectNotFoundException<MessagesSection>& e)
 				{
 					Log::GetInstance().warn("Invalid section", e);
+				}
+
+				if(&env == &Env::GetOfficialEnv())
+				{
+					alarm->setDataSourceLinksWithRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(AlarmTableSync::COL_DATASOURCE_LINKS),
+							env
+					)	);
+				}
+				else
+				{
+					alarm->setDataSourceLinksWithoutRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(AlarmTableSync::COL_DATASOURCE_LINKS),
+							env
+					)	);
 				}
 			}
 
@@ -264,6 +287,10 @@ namespace synthese
 				object->getCalendar()->getKey() :
 				RegistryKeyType(0)
 			);
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks()
+			)	);
 			query.execute(transaction);
 		}
 

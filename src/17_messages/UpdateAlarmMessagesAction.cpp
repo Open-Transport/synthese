@@ -43,6 +43,8 @@
 #include "DBLogModule.h"
 #include "MessagesLibraryLog.h"
 #include "MessagesLog.h"
+#include "DataSourceTableSync.h"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -51,6 +53,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace db;
+	using namespace impex;
 	using namespace security;
 	using namespace dblog;
 	using namespace util;
@@ -66,6 +69,7 @@ namespace synthese
 		const string UpdateAlarmMessagesAction::PARAMETER_RAW_EDITOR = Action_PARAMETER_PREFIX + "raw_editor";
 		const string UpdateAlarmMessagesAction::PARAMETER_DONE = Action_PARAMETER_PREFIX + "done";
 		const string UpdateAlarmMessagesAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "_scenario_id";
+		const string UpdateAlarmMessagesAction::PARAMETER_ALARM_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_datasource_id";
 
 
 
@@ -92,13 +96,44 @@ namespace synthese
 			{
 				map.insert(PARAMETER_RAW_EDITOR, *_rawEditor);
 			}
+
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
 		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Alarm
-			if(map.getDefault<RegistryKeyType>(PARAMETER_ALARM_ID, 0))
+			// Update an alarm identified by data source
+			// (data source id is memorized in case of creation)
+			if(	map.getDefault<RegistryKeyType>(PARAMETER_ALARM_DATASOURCE_ID, 0) &&
+				!map.getDefault<string>(PARAMETER_ALARM_ID).empty()
+			){
+				// Data source
+				try
+				{
+					_alarmDataSource = DataSourceTableSync::Get(
+						map.get<RegistryKeyType>(PARAMETER_ALARM_DATASOURCE_ID),
+						*_env
+					);
+				}
+				catch(ObjectNotFoundException<DataSource>& e)
+				{
+					throw ActionException("No such data source for alarm id : "+ e.getMessage());
+				}
+
+				// Id
+				_dataSourceLinkId = map.get<string>(PARAMETER_ALARM_ID);
+
+				// Update or creation ?
+				ImportableTableSync::ObjectBySource<AlarmTableSync> alarms(*_alarmDataSource, *_env);
+				ImportableTableSync::ObjectBySource<AlarmTableSync>::Set alarmSet(alarms.get(_dataSourceLinkId));
+				if(!alarmSet.empty())
+				{
+					_alarm = _env->getEditableSPtr(*alarmSet.begin());
+				}
+			}
+			else if(map.getDefault<RegistryKeyType>(PARAMETER_ALARM_ID, 0))
 			{
 				try
 				{
@@ -109,7 +144,8 @@ namespace synthese
 					throw ActionException(e, *this);
 				}
 			}
-			else
+
+			if(!_alarm.get())
 			{
 				_alarm.reset(new SentAlarm);
 			}
@@ -160,6 +196,8 @@ namespace synthese
 			{
 				_done = map.get<bool>(PARAMETER_DONE);
 			}
+
+			_setImportableUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -180,6 +218,15 @@ namespace synthese
 				);
 				_alarm->setLevel(*_type);
 			}
+
+			if(_alarmDataSource.get() && !_dataSourceLinkId.empty())
+			{
+				Importable::DataSourceLinks links;
+				links.insert(Importable::DataSourceLinks::value_type(_alarmDataSource.get(), _dataSourceLinkId));
+				_alarm->setDataSourceLinksWithoutRegistration(links);
+			}
+
+			_doImportableUpdate(*_alarm, request);
 
 			if(_scenario)
 			{

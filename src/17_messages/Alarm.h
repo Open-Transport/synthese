@@ -25,6 +25,7 @@
 
 #include "PointerField.hpp"
 
+#include "ImportableTemplate.hpp"
 #include "MessagesTypes.h"
 #include "Registrable.h"
 
@@ -50,7 +51,8 @@ namespace synthese
 
 		class Alarm:
 			public virtual util::Registrable,
-			public PointerField<Alarm, Alarm>
+			public PointerField<Alarm, Alarm>,
+			public impex::ImportableTemplate<Alarm>
 		{
 		public:
 			/// Chosen registry class.
