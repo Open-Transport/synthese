@@ -211,7 +211,7 @@ namespace synthese
 
 		std::string DataSourceAdmin::getTitle() const
 		{
-			return _dataSource.get() ? _dataSource->getName() : DEFAULT_TITLE;
+			return _dataSource.get() ? _dataSource->get<Name>() : DEFAULT_TITLE;
 		}
 
 
