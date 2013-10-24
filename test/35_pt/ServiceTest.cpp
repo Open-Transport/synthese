@@ -24,7 +24,7 @@
 #include "CommercialLine.h"
 #include "ContinuousService.h"
 #include "DRTArea.hpp"
-#include "JourneyPattern.hpp"
+#include "JourneyPatternCopy.hpp"
 #include "LineArea.hpp"
 #include "PermanentService.h"
 #include "ScheduledService.h"
@@ -1359,4 +1359,178 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
 	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
 	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+}
+
+BOOST_AUTO_TEST_CASE (testSubline)
+{
+	GeographyModule::PreInit();
+
+	date today(day_clock::local_day());
+
+	CommercialLine cl;
+	JourneyPattern l(5678);
+	l.setCommercialLine(&cl);
+	l.link(Env::GetOfficialEnv(), true);
+
+	BOOST_CHECK_EQUAL(cl.getPaths().size(), 1);
+	if(cl.getPaths().size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*cl.getPaths().begin(), &l);
+	}
+
+	RuleUser::Rules r;
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	l.setRules(r);
+
+	StopArea p1(0, true);
+	StopArea p2(0, false);
+	StopArea p3(0, false);
+	StopArea p4(0, false);
+	StopArea p5(0, true);
+	StopArea p6(0, true);
+	StopArea p7(0, false);
+	StopArea p8(0, false);
+
+	StopPoint sp1(0, "s1", &p1);
+	sp1.link(Env::GetOfficialEnv(), true);
+	StopPoint sp2(0, "s1", &p2);
+	sp2.link(Env::GetOfficialEnv(), true);
+	StopPoint sp3(0, "s1", &p3);
+	sp3.link(Env::GetOfficialEnv(), true);
+	StopPoint sp4(0, "s1", &p4);
+	sp4.link(Env::GetOfficialEnv(), true);
+	StopPoint sp5(0, "s1", &p5);
+	sp5.link(Env::GetOfficialEnv(), true);
+	StopPoint sp6(0, "s1", &p6);
+	sp6.link(Env::GetOfficialEnv(), true);
+	StopPoint sp7(0, "s1", &p7);
+	sp7.link(Env::GetOfficialEnv(), true);
+	StopPoint sp8(0, "s1", &p8);
+	sp8.link(Env::GetOfficialEnv(), true);
+
+	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&sp1, true);
+	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&sp2, false);
+	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true,160,&sp3, false);
+	DesignatedLinePhysicalStop l4A(0, &l, 3, true, true,200,&sp4, true);
+	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,250,&sp5, false);
+	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,450,&sp6, false);
+	DesignatedLinePhysicalStop l7AD(0, &l, 6, false, true,500,&sp7, true);
+	DesignatedLinePhysicalStop l71A(0, &l, 7, false, true,500,&sp7, false);
+	DesignatedLinePhysicalStop l8A(0, &l, 8, false, true,500,&sp8, true);
+	DesignatedLinePhysicalStop* lNULL(NULL);
+
+	l1D.link(Env::GetOfficialEnv(), true);
+	l2D.link(Env::GetOfficialEnv(), true);
+	l3AD.link(Env::GetOfficialEnv(), true);
+	l4A.link(Env::GetOfficialEnv(), true);
+	l5D.link(Env::GetOfficialEnv(), true);
+	l6AD.link(Env::GetOfficialEnv(), true);
+	l7AD.link(Env::GetOfficialEnv(), true);
+	l71A.link(Env::GetOfficialEnv(), true);
+	l8A.link(Env::GetOfficialEnv(), true);
+
+	ScheduledService s1(1234, "1234AB", &l);
+	ScheduledService s2(1235, "1235AB", &l);
+
+	BOOST_CHECK_EQUAL(s1.getPath(), &l);
+	BOOST_CHECK_EQUAL(s2.getPath(), &l);
+
+	SchedulesBasedService::Schedules d;
+	SchedulesBasedService::Schedules a;
+
+	a.push_back(time_duration(2, 0, 0));
+	d.push_back(time_duration(2, 0, 0));
+
+	a.push_back(time_duration(2, 24, 0));
+	d.push_back(time_duration(2, 30, 0));
+
+	a.push_back(time_duration(2, 34, 0));
+	d.push_back(time_duration(not_a_date_time));
+
+	a.push_back(time_duration(3, 10, 0));
+	d.push_back(time_duration(3, 10, 0));
+
+	s1.setDataSchedules(d, a);
+	s1.setActive(today);
+	s2.setDataSchedules(d, a);
+	s2.setActive(today);
+
+	BOOST_CHECK(!l.isActive(today));
+
+	// The service #1 is now linked to the environment
+	s1.link(Env::GetOfficialEnv(), true);
+
+	// The path has no subline
+	BOOST_CHECK(l.getSubLines().empty());
+
+	// Path of s1 has not changed
+	BOOST_CHECK_EQUAL(s1.getPath(), &l);
+	BOOST_CHECK_EQUAL(s2.getPath(), &l);
+
+	// The service is registered in the path
+	BOOST_CHECK_EQUAL(l.getServices().size(), 1);
+	if(l.getServices().size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*l.getServices().begin(), &s1);
+	}
+	BOOST_CHECK(l.isActive(today));
+
+	// The service is registered in the line
+	BOOST_CHECK_EQUAL(l.getCommercialLine()->getServices().size(), 1);
+	if(l.getCommercialLine()->getServices().size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*l.getCommercialLine()->getServices().begin(), &s1);
+	}
+	BOOST_CHECK_EQUAL(l.getCommercialLine()->getServices(s1.getServiceNumber()).size(), 1);
+	if(l.getCommercialLine()->getServices(s1.getServiceNumber()).size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*l.getCommercialLine()->getServices(s1.getServiceNumber()).begin(), &s1);
+	}
+	BOOST_CHECK(l.getCommercialLine()->getServices(s2.getServiceNumber()).empty());
+
+
+	// The service #2 is now linked to the environment
+	s2.link(Env::GetOfficialEnv(), true);
+
+	// The path has a subline
+	BOOST_CHECK_EQUAL(l.getSubLines().size(), 1);
+	JourneyPatternCopy* sl(*l.getSubLines().begin());
+	BOOST_CHECK_EQUAL(sl->getCommercialLine(), l.getCommercialLine());
+	BOOST_CHECK_EQUAL(sl->getEdges().size(), l.getEdges().size());
+	BOOST_CHECK_EQUAL(cl.getPaths().size(), 2);
+	BOOST_CHECK(cl.getPaths().find(sl) != cl.getPaths().end());
+
+	// Path of s2 is the new subline
+	BOOST_CHECK_EQUAL(s1.getPath(), &l);
+	BOOST_CHECK_EQUAL(s2.getPath(), sl);
+
+	// The service is registered in the path
+	BOOST_CHECK_EQUAL(l.getServices().size(), 1);
+	BOOST_CHECK_EQUAL(sl->getServices().size(), 1);
+	if(l.getServices().size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*l.getServices().begin(), &s1);
+	}
+	if(sl->getServices().size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*sl->getServices().begin(), &s2);
+	}
+	BOOST_CHECK(l.isActive(today));
+	BOOST_CHECK(sl->isActive(today));
+
+	// The service is registered in the line
+	BOOST_CHECK_EQUAL(l.getCommercialLine()->getServices().size(), 2);
+	BOOST_CHECK_EQUAL(l.getCommercialLine()->getServices(s1.getServiceNumber()).size(), 1);
+	if(l.getCommercialLine()->getServices(s1.getServiceNumber()).size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*l.getCommercialLine()->getServices(s1.getServiceNumber()).begin(), &s1);
+	}
+	BOOST_CHECK_EQUAL(l.getCommercialLine()->getServices(s2.getServiceNumber()).size(), 1);
+	if(l.getCommercialLine()->getServices(s2.getServiceNumber()).size() == 1)
+	{
+		BOOST_CHECK_EQUAL(*l.getCommercialLine()->getServices(s2.getServiceNumber()).begin(), &s2);
+	}
+
 }
