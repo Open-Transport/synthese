@@ -25,11 +25,12 @@
 #include "DB.hpp"
 
 #include "CoordinatesSystem.hpp"
+#include "DBDeleteInterSYNTHESEContent.hpp"
 #include "DBException.hpp"
 #include "DBInterSYNTHESE.hpp"
 #include "DBModule.h"
+#include "DBReplaceInterSYNTHESEContent.hpp"
 #include "Factory.h"
-#include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
@@ -485,13 +486,10 @@ namespace synthese
 #endif
 
 			// Inter-SYNTHESE sync
-			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
-			{
-				inter_synthese::InterSYNTHESEContent content(
-					DBInterSYNTHESE::FACTORY_KEY,
-					lexical_cast<string>(r.getTable()->getFormat().ID),
-					DBInterSYNTHESE::GetReplaceStmtContent(r)
-				);
+			if(	Factory<InterSYNTHESESyncTypeFactory>::size() && // Avoid in unit tests
+				(!transaction || transaction->getWithInterSYNTHESESync()) // Only if the transaction has to store synchronization requests
+			){
+				DBReplaceInterSYNTHESEContent content(r);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
 					transaction
@@ -531,13 +529,10 @@ namespace synthese
 #endif
 
 			// Inter-SYNTHESE sync
-			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
-			{
-				inter_synthese::InterSYNTHESEContent content(
-					DBInterSYNTHESE::FACTORY_KEY,
-					lexical_cast<string>(tableId),
-					DBInterSYNTHESE::GetDeleteStmtContent(objectId)
-				);
+			if(	Factory<InterSYNTHESESyncTypeFactory>::size() && // Avoid in unit tests
+				(!transaction || transaction->getWithInterSYNTHESESync()) // Only if the transaction has to store synchronization requests
+			){
+				DBDeleteInterSYNTHESEContent content(objectId);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
 					transaction

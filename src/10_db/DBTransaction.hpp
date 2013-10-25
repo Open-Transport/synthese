@@ -57,8 +57,12 @@ namespace synthese
 			Queries _queries;
 			DBModifEvents _modifEvents;
 			ModifiedRows _modifiedRows;
+			const bool _withInterSYNTHESESync;
 
 		public:
+			DBTransaction(
+				bool withInterSYNTHESESync = true
+			);
 			void addQuery(const std::string& query);
 			void addReplaceStmt(const DBRecord& record);
 			void addDeleteStmt(util::RegistryKeyType id);
@@ -66,6 +70,7 @@ namespace synthese
 			const Queries& getQueries() const;
 			const DBModifEvents& getDBModifEvents() const;
 			void run();
+			bool getWithInterSYNTHESESync() const { return _withInterSYNTHESESync; }
 		};
 }	}
 

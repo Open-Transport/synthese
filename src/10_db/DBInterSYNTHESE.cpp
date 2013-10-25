@@ -25,10 +25,10 @@
 #include "DBException.hpp"
 #include "DBDirectTableSync.hpp"
 #include "DBModule.h"
+#include "DBSQLInterSYNTHESEContent.hpp"
 #include "DBTransaction.hpp"
 #include "Env.h"
 #include "Field.hpp"
-#include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
@@ -113,10 +113,9 @@ namespace synthese
 							);
 
 							// Inter-SYNTHESE sync
-							inter_synthese::InterSYNTHESEContent content(
-								DBInterSYNTHESE::FACTORY_KEY,
-								lexical_cast<string>(decodeTableId(id)),
-								DBInterSYNTHESE::GetSQLContent(sql)
+							DBSQLInterSYNTHESEContent content(
+								decodeTableId(id),
+								sql
 							);
 							inter_synthese::InterSYNTHESEModule::Enqueue(
 								content,
@@ -329,13 +328,16 @@ namespace synthese
 				}
 
 				// Getting all requests
-				Env env;
+/*				Env env;
 				DBDirectTableSync::RegistrableSearchResult result(
 					directTableSync->search(
 						string(),
-						env
-				)	);
-				DBTransaction transaction;
+						env,
+						FIELDS_ONLY_LOAD_LEVEL
+				)	); */
+				DBResultSPtr rows(directTableSync->searchRecords(string()));
+
+				DBTransaction transaction(false);
 
 				// Add the clean request
 				if(	!slave.get<InterSYNTHESEConfig>() ||
@@ -345,9 +347,19 @@ namespace synthese
 				}
 
 				// Build the dump
-				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& it, result)
+				while (rows->next())
+				//BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& it, result)
 				{
-					directTableSync->saveRegistrable(*it, transaction);
+					size_t cols(rows->getNbColumns());
+					DBContent content;
+					for(size_t col(0); col < cols; ++col)
+					{
+						content.push_back(rows->getText(col));
+					}
+					DBRecord r(*tableSync);
+					r.setContent(content);
+					transaction.addReplaceStmt(r);
+//					directTableSync->saveRegistrable(*it, transaction);
 				}
 
 				// Export
@@ -378,37 +390,6 @@ namespace synthese
 
 
 
-		string DBInterSYNTHESE::GetSQLContent( const std::string& sql )
-		{
-			stringstream content;
-			RequestEnqueue visitor(content);
-			visitor(sql);
-			return content.str();
-		}
-
-
-
-		string DBInterSYNTHESE::GetReplaceStmtContent(
-			const DBRecord& r
-		){
-			stringstream content;
-			RequestEnqueue visitor(content);
-			visitor(r);
-			return content.str();
-		}
-
-
-
-		std::string DBInterSYNTHESE::GetDeleteStmtContent( util::RegistryKeyType id )
-		{
-			stringstream content;
-			RequestEnqueue visitor(content);
-			visitor(id);
-			return content.str();
-		}
-
-
-
 		DBInterSYNTHESE::RequestEnqueue::RequestEnqueue(
 			std::stringstream& result
 		):	_result(result)
@@ -428,10 +409,7 @@ namespace synthese
 
 		bool DBInterSYNTHESE::RequestEnqueue::operator()( const DBRecord& r )
 		{
-			if(r.getTable()->getFormat().ID == InterSYNTHESEQueue::CLASS_NUMBER)
-			{
-				return false;
-			}
+			assert(r.getTable()->getFormat().ID != InterSYNTHESEQueue::CLASS_NUMBER);
 			_result <<
 				DBInterSYNTHESE::TYPE_REPLACE_STATEMENT << DBInterSYNTHESE::FIELD_SEPARATOR <<
 				r.getTable()->getFormat().ID << DBInterSYNTHESE::FIELD_SEPARATOR;

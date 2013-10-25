@@ -1,6 +1,6 @@
 
-/** InterSYNTHESEContent class implementation.
-	@file InterSYNTHESEContent.cpp
+/** DBSQLInterSYNTHESEContent class implementation.
+	@file DBSQLInterSYNTHESEContent.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,22 +20,44 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "InterSYNTHESEContent.hpp"
+#include "DBSQLInterSYNTHESEContent.hpp"
 
-#include "Factory.h"
-#include "InterSYNTHESESyncTypeFactory.hpp"
+#include "DBInterSYNTHESE.hpp"
 
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
 
-	namespace inter_synthese
+	namespace db
 	{
-		InterSYNTHESEContent::InterSYNTHESEContent(
-			const string& type
-		):	_type(Factory<InterSYNTHESESyncTypeFactory>::create(type))
+		DBSQLInterSYNTHESEContent::DBSQLInterSYNTHESEContent(
+			RegistryTableType tableId,
+			const std::string& sql
+		):	_tableId(tableId),
+			_sql(sql),
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
 		{
+		}
+
+
+
+		std::string DBSQLInterSYNTHESEContent::getPerimeter() const
+		{
+			return lexical_cast<string>(_tableId);	
+		}
+
+
+
+		std::string DBSQLInterSYNTHESEContent::getContent() const
+		{
+			stringstream content;
+			DBInterSYNTHESE::RequestEnqueue visitor(content);
+			visitor(_sql);
+			return content.str();
 		}
 }	}
