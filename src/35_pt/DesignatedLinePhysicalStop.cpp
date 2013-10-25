@@ -55,6 +55,51 @@ namespace synthese
 			_reservationNeeded(reservationNeeded)
 		{}
 
+		DesignatedLinePhysicalStop::~DesignatedLinePhysicalStop()
+		{
+			// Collecting all line stops to unlink including journey pattern copies
+			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
+			ToClean toClean;
+			toClean.push_back(make_pair(getLine(), this));
+			BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+			{
+				if (copy->getLineStop(getRankInPath()))
+				{
+					toClean.push_back(
+						make_pair(
+							copy,
+							const_cast<LinePhysicalStop*>(static_cast<const LinePhysicalStop*>(
+								copy->getEdge(getRankInPath()))
+							)
+					)	);
+				}
+			}
+			
+			BOOST_FOREACH(const ToClean::value_type& it, toClean)
+			{
+				// Removing edge from journey pattern
+				it.first->removeEdge(*it.second);
+				
+				// Removing edge from stop point
+				if (getPhysicalStop())
+				{
+					if(it.second->getIsArrival())
+					{
+						getPhysicalStop()->removeArrivalEdge(it.second);
+					}
+					if(it.second->getIsDeparture())
+					{
+						getPhysicalStop()->removeDepartureEdge(it.second);
+					}
+				}
+				
+				if(it.second != this)
+				{
+					delete it.second;
+				}
+			}
+		}
+
 
 
 		void DesignatedLinePhysicalStop::toParametersMap( util::ParametersMap& pm, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
@@ -125,14 +170,6 @@ namespace synthese
 
 		void DesignatedLinePhysicalStop::_unlink()
 		{
-			// Useful transfer calculation
-			if(getPhysicalStop())
-			{
-				getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-			}
-
-			clearPhysicalStopLinks();
-
 			// Collecting all line stops to unlink including journey pattern copies
 			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
 			ToClean toClean;
@@ -149,12 +186,30 @@ namespace synthese
 
 			BOOST_FOREACH(const ToClean::value_type& it, toClean)
 			{
-				it.second->clearPhysicalStopLinks();
+				// Removing edge from journey pattern
+				it.first->removeEdge(*it.second);
 
-				if(it.second != this)
+				// Removing edge from stop point
+				if (getPhysicalStop())
 				{
-					delete it.second;
+					if(it.second->getIsArrival())
+					{
+						getPhysicalStop()->removeArrivalEdge(it.second);
+					}
+					if(it.second->getIsDeparture())
+					{
+						getPhysicalStop()->removeDepartureEdge(it.second);
+					}
 				}
 			}
+
+			
+			// Useful transfer calculation
+			if(getPhysicalStop())
+			{
+				getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+			}
+
+			clearPhysicalStopLinks();
 		}
 }	}
