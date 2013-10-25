@@ -316,6 +316,9 @@ namespace synthese
 
 			if(dynamic_cast<SentAlarm*>(obj))
 			{
+				// Prevent the message to stay active
+				obj->setScenario(NULL);
+
 				MessagesModule::UpdateActivatedMessages();
 			}
 		}
