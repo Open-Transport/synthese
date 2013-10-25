@@ -320,10 +320,8 @@ namespace synthese
 			// Inter-SYNTHESE sync
 			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
 			{
-				inter_synthese::InterSYNTHESEContent content(
-					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
-					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
-					RealTimePTDataInterSYNTHESE::GetContent(*this)
+				RealTimePTDataInterSYNTHESE::Content content(
+					*this
 				);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
@@ -595,11 +593,7 @@ namespace synthese
 			// Inter-SYNTHESE sync
 			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
 			{
-				inter_synthese::InterSYNTHESEContent content(
-					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
-					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
-					RealTimePTDataInterSYNTHESE::GetContent(*this)
-				);
+				RealTimePTDataInterSYNTHESE::Content content(*this);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
 					boost::optional<db::DBTransaction&>()
@@ -623,11 +617,7 @@ namespace synthese
 			// Inter-SYNTHESE sync
 			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
 			{
-				inter_synthese::InterSYNTHESEContent content(
-					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
-					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
-					RealTimePTDataInterSYNTHESE::GetContent(*this)
-				);
+				RealTimePTDataInterSYNTHESE::Content content(*this);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
 					boost::optional<db::DBTransaction&>()
@@ -775,11 +765,7 @@ namespace synthese
 			// Inter-SYNTHESE sync
 			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
 			{
-				inter_synthese::InterSYNTHESEContent content(
-					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
-					lexical_cast<string>(getRoute()->getCommercialLine()->getKey()),
-					RealTimePTDataInterSYNTHESE::GetContent(*this)
-				);
+				RealTimePTDataInterSYNTHESE::Content content(*this);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
 					boost::optional<db::DBTransaction&>()
