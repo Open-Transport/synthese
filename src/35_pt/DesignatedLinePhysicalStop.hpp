@@ -52,6 +52,8 @@ namespace synthese
 				bool reservationNeeded = true
 			);
 
+			~DesignatedLinePhysicalStop();
+
 			virtual bool getScheduleInput()	const { return _scheduleInput; }
 			virtual bool getReservationNeeded() const { return _reservationNeeded; }
 
