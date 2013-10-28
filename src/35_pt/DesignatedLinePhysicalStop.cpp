@@ -57,6 +57,8 @@ namespace synthese
 
 		DesignatedLinePhysicalStop::~DesignatedLinePhysicalStop()
 		{
+			if(!getLine())
+				return;
 			// Collecting all line stops to unlink including journey pattern copies
 			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
 			ToClean toClean;
@@ -170,6 +172,10 @@ namespace synthese
 
 		void DesignatedLinePhysicalStop::_unlink()
 		{
+			StopPoint* stop(NULL);
+            if (getPhysicalStop())
+                stop = getPhysicalStop();
+
 			// Collecting all line stops to unlink including journey pattern copies
 			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
 			ToClean toClean;
@@ -190,24 +196,26 @@ namespace synthese
 				it.first->removeEdge(*it.second);
 
 				// Removing edge from stop point
-				if (getPhysicalStop())
+				if (stop)
 				{
 					if(it.second->getIsArrival())
 					{
-						getPhysicalStop()->removeArrivalEdge(it.second);
+						stop->removeArrivalEdge(it.second);
 					}
 					if(it.second->getIsDeparture())
 					{
-						getPhysicalStop()->removeDepartureEdge(it.second);
+						stop->removeDepartureEdge(it.second);
 					}
 				}
+
+				it.second->setFromVertex(NULL);
 			}
 
 			
 			// Useful transfer calculation
-			if(getPhysicalStop())
+			if(stop)
 			{
-				getPhysicalStop()->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+				stop->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
 			}
 
 			clearPhysicalStopLinks();
