@@ -57,7 +57,7 @@ namespace synthese
 			public RuleUser
 		{
 		public:
-			typedef std::multimap<const Path*, const Edge*> Edges;
+			typedef std::multimap<const Path*, Edge*> Edges;
 
 		protected:
 			const Hub*	_hub;
@@ -99,10 +99,10 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-				void addDepartureEdge ( const Edge* edge );
-				void addArrivalEdge ( const Edge* edge );
-				void removeArrivalEdge(const Edge* edge);
-				void removeDepartureEdge(const Edge* edge);
+				void addDepartureEdge ( Edge* edge );
+				void addArrivalEdge ( Edge* edge );
+				void removeArrivalEdge(Edge* edge);
+				void removeDepartureEdge(Edge* edge);
 			//@}
 
 

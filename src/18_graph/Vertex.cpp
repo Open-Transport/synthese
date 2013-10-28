@@ -47,7 +47,17 @@ namespace synthese
 
 
 		Vertex::~Vertex ()
-		{}
+		{
+			// Vertex will be destroyed, so all the edges refering to it should be unlinked
+			for(Edges::iterator it(_arrivalEdges.begin());it!=_arrivalEdges.end();it++)
+			{
+				it->second->setFromVertex(NULL);
+			}
+			for(Edges::iterator it(_departureEdges.begin());it!=_departureEdges.end();it++)
+			{
+				it->second->setFromVertex(NULL);
+			}
+		}
 
 
 
@@ -74,7 +84,7 @@ namespace synthese
 
 
 		void
-		Vertex::addDepartureEdge ( const Edge* edge )
+		Vertex::addDepartureEdge ( Edge* edge )
 		{
 			assert(edge);
 			assert(edge->getParentPath());
@@ -85,7 +95,7 @@ namespace synthese
 
 
 		void
-		Vertex::addArrivalEdge ( const Edge* edge )
+		Vertex::addArrivalEdge ( Edge* edge )
 		{
 			assert(edge);
 			assert(edge->getParentPath());
@@ -103,13 +113,18 @@ namespace synthese
 
 
 
-		void Vertex::removeArrivalEdge( const Edge* edge )
+		void Vertex::removeArrivalEdge( Edge* edge )
 		{
 			assert(edge);
 			assert(edge->getParentPath());
 
 			pair<Edges::iterator, Edges::iterator> range(_arrivalEdges.equal_range(edge->getParentPath()));
-			assert(range.first != _arrivalEdges.end() && range.first->first == edge->getParentPath());
+			//assert(range.first != _arrivalEdges.end() && range.first->first == edge->getParentPath());
+			if (!(range.first != _arrivalEdges.end() && range.first->first == edge->getParentPath()))
+			{
+				// May happen if edge was already removed
+				return;
+			}
 
 			vector<Edges::iterator> toDelete;
 			for(Edges::iterator it(range.first); it!= range.second; ++it)
@@ -127,13 +142,18 @@ namespace synthese
 
 
 
-		void Vertex::removeDepartureEdge( const Edge* edge )
+		void Vertex::removeDepartureEdge( Edge* edge )
 		{
 			assert(edge);
 			assert(edge->getParentPath());
 
 			pair<Edges::iterator, Edges::iterator> range(_departureEdges.equal_range(edge->getParentPath()));
-			assert(range.first != _departureEdges.end() && range.first->first == edge->getParentPath());
+			//assert(range.first != _departureEdges.end() && range.first->first == edge->getParentPath());
+			if (!(range.first != _departureEdges.end() && range.first->first == edge->getParentPath()))
+			{
+				// May happen if edge was already removed
+				return;
+			}
 
 			vector<Edges::iterator> toDelete;
 			for(Edges::iterator it(range.first); it!= range.second; ++it)
