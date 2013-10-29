@@ -146,6 +146,7 @@ namespace synthese
 				stream << rt.col() << "Recherche client";
 				stream << rt.col() << "Nom : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_NAME, string());
 				stream << "	Prénom : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_SURNAME, string());
+				stream << " Téléphone : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_PHONE, string());
 
 				stream << HTMLModule::GetHTMLJavascriptOpen();
 				stream
@@ -158,6 +159,7 @@ namespace synthese
 					<< ",'" << customerSearchRequest.getURL()
 					<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
 					<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
+					<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_PHONE <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_PHONE) << "').value"
 					<< "); };";
 				stream << "document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').onkeyup = "
 					<< "function(){ programCustomerUpdate("
@@ -168,6 +170,18 @@ namespace synthese
 					<< ",'" << customerSearchRequest.getURL()
 					<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
 					<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
+					<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_PHONE <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_PHONE) << "').value"
+					<< "); };";
+				stream << "document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_PHONE) << "').onkeyup = "
+					<< "function(){ programCustomerUpdate("
+					<< "'" << rf.getName() << "'"
+					<< ",'" << BookReservationAction::PARAMETER_CREATE_CUSTOMER << "'"
+					<< ",'ie_bug_curstomer_div'"
+					<< ",'" << BookReservationAction::PARAMETER_CUSTOMER_ID << "'"
+					<< ",'" << customerSearchRequest.getURL()
+					<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
+					<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
+					<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_PHONE <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_PHONE) << "').value"
 					<< "); };";
 				stream <<
 					"document.forms." << rf.getName() << ".onsubmit = " <<
