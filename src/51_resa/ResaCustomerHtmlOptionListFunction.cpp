@@ -51,6 +51,7 @@ namespace synthese
 		const string ResaCustomerHtmlOptionListFunction::PARAMETER_NAME("na");
 		const string ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME("sn");
 		const string ResaCustomerHtmlOptionListFunction::PARAMETER_NUMBER("nu");
+		const string ResaCustomerHtmlOptionListFunction::PARAMETER_PHONE("ph");
 
 		ParametersMap ResaCustomerHtmlOptionListFunction::_getParametersMap() const
 		{
@@ -58,6 +59,7 @@ namespace synthese
 			if(_name) map.insert(PARAMETER_NAME, *_name);
 			if(_surname) map.insert(PARAMETER_NUMBER, *_surname);
 			map.insert(PARAMETER_NUMBER, static_cast<int>(_number));
+			if(_phone) map.insert(PARAMETER_PHONE, *_phone);
 			return map;
 		}
 
@@ -72,6 +74,10 @@ namespace synthese
 				_name = map.getOptional<string>(PARAMETER_NAME);
 			}
 			_number = map.getDefault<size_t>(PARAMETER_NUMBER, 20);
+			if(!map.getDefault<string>(PARAMETER_PHONE).empty())
+			{
+				_phone = map.getOptional<string>(PARAMETER_PHONE);
+			}
 		}
 
 
@@ -80,7 +86,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const	{
-			if (!_name && !_surname)
+			if (!_name && !_surname && !_phone)
 			{
 				return util::ParametersMap();
 			}
@@ -92,7 +98,7 @@ namespace synthese
 					optional<string>(),
 					_name ? "%"+ *_name +"%" : _name,
 					_surname ? "%"+ *_surname +"%" : _surname,
-					optional<string>(),
+					_phone ? "%"+ *_phone +"%" : _phone,
 					optional<RegistryKeyType>(),
 					logic::indeterminate,
 					false,
