@@ -190,7 +190,7 @@ namespace synthese
 
 
 
-		std::string HTMLTable::row(string className)
+		std::string HTMLTable::row(string className, std::string idName)
 		{
 			stringstream s;
 			_closeRow(s);
@@ -202,6 +202,10 @@ namespace synthese
 			else
 			{
 				s << "r" << ((_curRow % 2) ? "1" : "2");
+			}
+			if (!idName.empty())
+			{
+				s << "\" id=\"" << idName;
 			}
 			s << "\">";
 			++_curRow;
