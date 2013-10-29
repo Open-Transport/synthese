@@ -435,9 +435,12 @@ namespace synthese
 				HTMLTable t(c,"adminresults");
 				stream << t.open();
 
+				int serviceIdNumber = 0;
+
 				// Display of services
 				BOOST_FOREACH(const boost::shared_ptr<ReservableService>& service, sortedServices)
 				{
+					serviceIdNumber++;
 					const string& serviceNumber(
 						dynamic_cast<Service*>(service.get())->getServiceNumber()
 					);
@@ -451,7 +454,7 @@ namespace synthese
 					// Display
 					if(!_serviceNumber)
 					{
-						stream << t.row();
+						stream << t.row(string(), "service" + lexical_cast<string>(serviceIdNumber));
 
 						stream << t.col(1, string(), true);
 
@@ -642,7 +645,7 @@ namespace synthese
 										break;
 
 									case SHOULD_BE_AT_WORK:
-										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1", "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "/admin/img/" + ResaModule::GetStatusIcon(NO_SHOW));
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1#service" + lexical_cast<string>(serviceIdNumber), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "/admin/img/" + ResaModule::GetStatusIcon(NO_SHOW));
 										break;
 									default:
 										break;
@@ -656,7 +659,7 @@ namespace synthese
 									case DONE:
 									case SHOULD_BE_DONE:
 									case SHOULD_BE_AT_WORK:
-										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1", "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "/admin/img/" + ResaModule::GetStatusIcon(NO_SHOW));
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1#service" + lexical_cast<string>(serviceIdNumber), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "/admin/img/" + ResaModule::GetStatusIcon(NO_SHOW));
 										break;
 									default:
 									break;
