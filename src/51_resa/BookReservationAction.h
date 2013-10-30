@@ -114,7 +114,7 @@ namespace synthese
 			std::size_t							_seatsNumber;
 			bool								_ignoreReservation;
 			double								_approachSpeed;
-			std::string _comment;
+			std::string 						_comment;
 
 			//! @name Reservation on a scheduled service
 			//@{
