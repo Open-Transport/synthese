@@ -51,8 +51,7 @@ namespace synthese
 	FIELD_SECONDS(AutoImportDelay)
 	FIELD_TIME(AutoImportTime)
 	FIELD_ENUM(MinLogLevel, impex::ImportLogLevel)
-	FIELD_CMS_SCRIPT(Documentation)
-	
+		
 	namespace impex
 	{
 		typedef boost::fusion::map<
