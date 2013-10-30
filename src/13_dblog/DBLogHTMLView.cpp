@@ -349,19 +349,25 @@ namespace synthese
 			{
 				if (type != FILTER_ALL)
 				{
-					const DBLogEntry::Content& content(dbe->getContent());
-					const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
-					if (
-						(type == FILTER_RESA && (entryType == ResaDBLog::RESERVATION_ENTRY || entryType == ResaDBLog::RESERVATION_UPDATE)) ||
-						(type == FILTER_CANCEL && entryType == ResaDBLog::CANCELLATION_ENTRY) || 
-						(type == FILTER_CANC_D && entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) ||
-						(type == FILTER_ABS && entryType == ResaDBLog::NO_SHOW_ENTRY)
-					){
-						displayFilter = true;
+					try {
+						const DBLogEntry::Content& content(dbe->getContent());
+						const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
+
+						if (
+							(type == FILTER_RESA && (entryType == ResaDBLog::RESERVATION_ENTRY || entryType == ResaDBLog::RESERVATION_UPDATE)) ||
+							(type == FILTER_CANCEL && entryType == ResaDBLog::CANCELLATION_ENTRY) || 
+							(type == FILTER_CANC_D && entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) ||
+							(type == FILTER_ABS && entryType == ResaDBLog::NO_SHOW_ENTRY)
+						){
+							displayFilter = true;
+						}
+						else
+						{
+							displayFilter = false;
+						}
 					}
-					else
+					catch(bad_lexical_cast)
 					{
-						displayFilter = false;
 					}
 				}
 				else

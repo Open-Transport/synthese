@@ -324,28 +324,32 @@ namespace synthese
 
 			BOOST_FOREACH(const boost::shared_ptr<DBLogEntry>& dbe, entries)
 			{
-				const DBLogEntry::Content& content(dbe->getContent());
-				const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
-				
-				switch(entryType)
-				{
-					case ResaDBLog::RESERVATION_ENTRY:
-					case ResaDBLog::RESERVATION_UPDATE:
+				try {
+					const DBLogEntry::Content& content(dbe->getContent());
+					const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
+					const string entryText(lexical_cast<string>(content[1]));
+
+					switch(entryType)
 					{
-						resa++;
-						break;
+						case ResaDBLog::RESERVATION_ENTRY:
+							if (!entryText.empty())
+								resa++;
+							break;
+						case ResaDBLog::CANCELLATION_ENTRY:
+							cancel++;
+							break;
+						case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
+							cancel_d++;
+							break;
+						case ResaDBLog::NO_SHOW_ENTRY:
+							abs++;
+							break;
+						default:
+							continue;
 					}
-					case ResaDBLog::CANCELLATION_ENTRY:
-						cancel++;
-						break;
-					case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-						cancel_d++;
-						break;
-					case ResaDBLog::NO_SHOW_ENTRY:
-						abs++;
-						break;
-					default:
-						continue;
+				}
+				catch(bad_lexical_cast)
+				{
 				}
 			}
 
