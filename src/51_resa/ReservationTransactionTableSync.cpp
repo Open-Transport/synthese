@@ -305,6 +305,8 @@ namespace synthese
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
+
+
 		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::Search(
 			Env& env,
 			boost::optional<RegistryKeyType> userId
@@ -336,6 +338,35 @@ namespace synthese
 				if (first > 0)
 					query << " OFFSET " << first;
 			}
+
+			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::SearchByUser(
+			Env& env,
+			boost::optional<RegistryKeyType> userId
+			, const ptime& minDate
+			, const ptime& maxDate
+			, bool withCancelled,
+			LinkLevel linkLevel
+		){
+			stringstream query;
+			query
+				<< " SELECT " << TABLE.NAME << ".*"
+				<< " FROM " << TABLE.NAME
+				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
+				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
+				<< " WHERE " << COL_CUSTOMER_ID << "=" << *userId;
+			if (!minDate.is_not_a_date_time())
+				query << " AND " << TABLE.NAME << "." << COL_BOOKING_TIME << ">='" << to_iso_extended_string(minDate.date()) << " " << to_simple_string(minDate.time_of_day()) << "'";
+			if (!maxDate.is_not_a_date_time())
+				query << " AND " << TABLE.NAME << "." << COL_BOOKING_TIME << "<='" << to_iso_extended_string(maxDate.date()) << " " << to_simple_string(maxDate.time_of_day()) << "'";
+			if (!withCancelled)
+				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
+			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
+			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME << " DESC";
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
