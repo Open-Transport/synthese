@@ -98,9 +98,11 @@ namespace synthese
 #ifdef WIN32 // CMake is not able to extract the current revision number and the build date in other OS than linux right now
 		const std::string ServerModule::REVISION("");
 		const std::string ServerModule::BUILD_DATE("");
+		const std::string ServerModule::SYNTHESE_URL("");
 #else
 		const std::string ServerModule::REVISION(SYNTHESE_REVISION);
 		const std::string ServerModule::BUILD_DATE(SYNTHESE_BUILD_DATE);
+		const std::string ServerModule::SYNTHESE_URL(SYNTHESE_SVN_URL);
 #endif
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");

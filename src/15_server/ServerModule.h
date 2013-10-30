@@ -135,6 +135,7 @@ namespace synthese
 			static const std::string VERSION;
 			static const std::string REVISION;
 			static const std::string BUILD_DATE;
+			static const std::string SYNTHESE_URL;
 
 			// SYNTHESE is not lock protected against changing the base content
 			// while reading or writing it. Take this mutex if you change the base
