@@ -603,4 +603,30 @@ namespace synthese
 				" ORDER BY t." << TABLE_COL_ID;
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+
+
+
+		ReservationTableSync::SearchResult ReservationTableSync::SearchByService(
+			util::Env& env,
+			util::RegistryKeyType serviceId,
+			boost::optional<boost::posix_time::ptime> departureTime,
+			boost::optional<boost::posix_time::ptime> arrivalTime,
+			util::LinkLevel linkLevel
+		){
+			stringstream query;
+			query <<
+				"SELECT * " <<
+				"FROM " << TABLE.NAME <<
+				" WHERE " << COL_SERVICE_ID << " = " << serviceId;
+
+			if (departureTime)
+				query <<
+					" AND " << COL_DEPARTURE_TIME << " = '" << boost::gregorian::to_iso_extended_string((*departureTime).date()) << " " << boost::posix_time::to_simple_string((*departureTime).time_of_day()) << "'";
+			
+			if (arrivalTime)
+				query <<
+					" AND " << COL_ARRIVAL_TIME << " = '" << boost::gregorian::to_iso_extended_string((*arrivalTime).date()) << " " << boost::posix_time::to_simple_string((*arrivalTime).time_of_day()) << "'";
+
+			return LoadFromQuery(query.str(), env, linkLevel);
+		}
 }	}

@@ -87,6 +87,8 @@ namespace synthese
 		const std::string ResaModule::DATA_CURRENT_CALL_ID("current_call_id");
 		const std::string ResaModule::DATA_CURRENT_CALL_TIMESTAMP("current_call_timestamp");
 
+		const std::string ResaModule::MODULE_PARAMETER_MAX_SEATS_ALLOWED("max_seats_number_allowed");
+
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		boost::shared_ptr<Profile> ResaModule::_basicProfile;
 		boost::shared_ptr<Profile> ResaModule::_autoresaProfile;
@@ -96,6 +98,7 @@ namespace synthese
 		boost::shared_ptr<PTServiceConfig> ResaModule::_journeyPlannerConfig;
 		ResaModule::ReservationsByService ResaModule::_reservationsByService;
 		boost::recursive_mutex ResaModule::_reservationsByServiceMutex;
+		size_t ResaModule::_maxSeats;
 	}
 
 	namespace server
@@ -108,6 +111,7 @@ namespace synthese
 		{
 			RegisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER, "0", &ResaModule::ParameterCallback);
 			RegisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE, "0", &ResaModule::ParameterCallback);
+			RegisterParameter(ResaModule::MODULE_PARAMETER_MAX_SEATS_ALLOWED, "0", &ResaModule::ParameterCallback);
 		}
 
 
@@ -168,6 +172,7 @@ namespace synthese
 		{
 			UnregisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER);
 			UnregisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE);
+			UnregisterParameter(ResaModule::MODULE_PARAMETER_MAX_SEATS_ALLOWED);
 		}
 
 
@@ -364,6 +369,21 @@ namespace synthese
 					_journeyPlannerConfig.reset();
 				}
 			}
+			else if(name == MODULE_PARAMETER_MAX_SEATS_ALLOWED)
+			{
+				try
+				{
+					size_t number(lexical_cast<size_t>(value));
+
+					if(number > 0)
+					{
+						_maxSeats = number;
+					}
+				}
+				catch(bad_lexical_cast)
+				{
+				}
+			}
 		}
 
 
@@ -417,6 +437,13 @@ namespace synthese
 		pt_website::PTServiceConfig* ResaModule::GetJourneyPlannerWebsite()
 		{
 			return _journeyPlannerConfig.get();
+		}
+
+
+
+		size_t ResaModule::GetMaxSeats()
+		{
+			return _maxSeats;
 		}
 
 
