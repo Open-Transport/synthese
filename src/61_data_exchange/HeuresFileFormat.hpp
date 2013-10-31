@@ -225,12 +225,18 @@ namespace synthese
 				boost::shared_ptr<const pt::TransportNetwork> _network;
 				boost::shared_ptr<tree::TreeFolder> _folder;
 				boost::shared_ptr<const impex::DataSource> _dataSource;
+				bool _generateRouteCode;
+				typedef std::map<const pt::JourneyPattern*, size_t> RouteCodes;
+				mutable RouteCodes _routeCodes;
+				size_t _serviceNumberPosition;
 
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_DATASOURCE_ID;
+				static const std::string PARAMETER_GENERATE_ROUTE_CODE;
+				static const std::string PARAMETER_SERVICE_NUMBER_POSITION;
 
-				Exporter_(){}
+				Exporter_();
 
 				virtual util::ParametersMap getParametersMap() const;
 
