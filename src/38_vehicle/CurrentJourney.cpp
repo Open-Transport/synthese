@@ -27,6 +27,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -39,13 +40,14 @@ namespace synthese
 		const string CurrentJourney::TAG_NEXT_STOP = "next_stop";
 		const string CurrentJourney::TAG_COMMERCIAL_LINE = "commercial_line";
 		const string CurrentJourney::TAG_TERMINUS_DEPARTURE_TIME = "terminus_departure_time";
+		const string CurrentJourney::TAG_TERMINUS_SECONDS = "terminus_seconds";
 
 
 
 		CurrentJourney::CurrentJourney():
 			_line(NULL),
 			_stopRequested(false),
-			_terminusDepartureTime(boost::posix_time::not_a_date_time)
+			_terminusDeparture(boost::posix_time::not_a_date_time)
 		{}
 
 
@@ -79,11 +81,14 @@ namespace synthese
 				pm.insert(TAG_NEXT_STOP, stopPM);
 			}
 			
-			// Terminus departure time
+			// Terminus departure time and seconds
 			// only valid when status indicates VehiclePosition::TERMINUS_START
-			if(! _terminusDepartureTime.is_not_a_date_time())
+			if(! _terminusDeparture.is_not_a_date_time() && _terminusDeparture.total_seconds() >= 0)
 			{
-				pm.insert(TAG_TERMINUS_DEPARTURE_TIME, _terminusDepartureTime);
+				ptime departureTime(second_clock::local_time() + _terminusDeparture);
+				pm.insert(TAG_TERMINUS_DEPARTURE_TIME, departureTime);
+
+				pm.insert(TAG_TERMINUS_SECONDS, _terminusDeparture.total_seconds());
 			}
 		}
 

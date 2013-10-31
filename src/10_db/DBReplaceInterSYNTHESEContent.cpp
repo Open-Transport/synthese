@@ -1,6 +1,6 @@
 
-/** InterSYNTHESEContent class implementation.
-	@file InterSYNTHESEContent.cpp
+/** DBReplaceInterSYNTHESEContent class implementation.
+	@file DBReplaceInterSYNTHESEContent.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,22 +20,41 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "InterSYNTHESEContent.hpp"
+#include "DBReplaceInterSYNTHESEContent.hpp"
 
-#include "Factory.h"
-#include "InterSYNTHESESyncTypeFactory.hpp"
+#include "DBInterSYNTHESE.hpp"
+#include "DBRecord.hpp"
+#include "DBTableSync.hpp"
 
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
-	using namespace util;
-
-	namespace inter_synthese
+	namespace db
 	{
-		InterSYNTHESEContent::InterSYNTHESEContent(
-			const string& type
-		):	_type(Factory<InterSYNTHESESyncTypeFactory>::create(type))
+		DBReplaceInterSYNTHESEContent::DBReplaceInterSYNTHESEContent( const DBRecord& r ):
+			_record(r),
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
+		{}
+
+
+
+		std::string DBReplaceInterSYNTHESEContent::getContent() const
 		{
+			stringstream content;
+			DBInterSYNTHESE::RequestEnqueue visitor(content);
+			visitor(_record);
+			return content.str();
+		}
+
+
+
+		std::string DBReplaceInterSYNTHESEContent::getPerimeter() const
+		{
+			return lexical_cast<string>(_record.getTable()->getFormat().ID);
 		}
 }	}
+

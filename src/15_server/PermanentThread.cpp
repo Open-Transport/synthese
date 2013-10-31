@@ -38,7 +38,6 @@ namespace synthese
 
 
 	FIELD_DEFINITION_OF_TYPE(DeviceKey, "device", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(Documentation, "documentation", SQL_TEXT)
 
 	namespace server
 	{

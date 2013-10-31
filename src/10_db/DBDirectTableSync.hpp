@@ -118,6 +118,12 @@ namespace synthese
 
 
 
+			virtual DBResultSPtr searchRecords(
+				const std::string& whereClause
+			) const = 0;
+
+
+
 			virtual const util::RegistryBase& getRegistry(
 				const util::Env& env
 			) const = 0;

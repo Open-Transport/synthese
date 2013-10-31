@@ -396,6 +396,12 @@ namespace synthese
 
 
 
+			virtual DBResultSPtr searchRecords(
+				const std::string& whereClause
+			) const;
+
+
+
 			virtual void rowsAdded(
 				DB* db,
 				const DBResultSPtr& rows
@@ -447,6 +453,33 @@ namespace synthese
 
 
 
+			
+
+
+		template <
+			class K, // Table sync class
+			class T, // Object class
+			template <class, class> class SynchronizationPolicy,
+			template <class, class> class LoadSavePolicy // for compatibility with old classes
+		>
+		DBResultSPtr synthese::db::DBDirectTableSyncTemplate<K, T, SynchronizationPolicy, LoadSavePolicy>::searchRecords(
+			const std::string& whereClause
+		) const	{
+
+			std::stringstream query;
+			query <<
+				"SELECT " << DBTableSyncTemplate<K>::GetFieldsGetter() <<
+				" FROM " << K::TABLE.NAME;
+			if(!whereClause.empty())
+			{
+				query << " WHERE " << whereClause;
+			}
+			return DBModule::GetDB()->execQuery(query.str());
+
+		}
+
+
+
 		template <
 			class K, // Table sync class
 			class T, // Object class
@@ -459,17 +492,10 @@ namespace synthese
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		) const	{
 
-			std::stringstream query;
-			query <<
-				"SELECT " << DBTableSyncTemplate<K>::GetFieldsGetter() <<
-				" FROM " << K::TABLE.NAME;
-			if(!whereClause.empty())
-			{
-				query << " WHERE " << whereClause;
-			}
+			DBResultSPtr rows(searchRecords(whereClause));
 			RegistrableSearchResult result;
 			util::Registry<T>& registry(env.template getEditableRegistry<T>());
-			DBResultSPtr rows = DBModule::GetDB()->execQuery(query.str());
+
 			while (rows->next ())
 			{
 				util::RegistryKeyType key(rows->getKey());
@@ -500,7 +526,7 @@ namespace synthese
 					{
 						registry.remove(key);
 					}
-					util::Log::GetInstance().warn("Skipped object in results load of " + query.str(), e);
+					util::Log::GetInstance().warn("Skipped object in results load of "+ boost::lexical_cast<std::string>(rows->getKey()) +" in search query with where clause="+ whereClause, e);
 			}	}
 			return result;
 

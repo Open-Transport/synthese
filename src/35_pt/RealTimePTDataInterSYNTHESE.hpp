@@ -24,6 +24,7 @@
 #define SYNTHESE_pt_RealTimePTDataInterSYNTHESE_hpp__
 
 #include "FactorableTemplate.h"
+#include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 
 #include <boost/optional.hpp>
@@ -52,6 +53,26 @@ namespace synthese
 			static const std::string FIELD_SEPARATOR;
 
 		public:
+			class Content:
+				public inter_synthese::InterSYNTHESEContent
+			{
+			public:
+				typedef std::vector<bool> RanksToSync;
+
+			private:
+				const SchedulesBasedService& _service;
+				boost::optional<const RanksToSync&> _ranksToSync;
+
+			public:
+				Content(
+					const SchedulesBasedService& service,
+					boost::optional<const RanksToSync&> ranksToSync = boost::optional<const RanksToSync&>()
+				);
+
+				virtual std::string getPerimeter() const;
+				virtual std::string getContent() const;
+			};
+
 			RealTimePTDataInterSYNTHESE();
 
 			virtual bool mustBeEnqueued(
@@ -74,13 +95,6 @@ namespace synthese
 				const inter_synthese::InterSYNTHESESlave& slave,
 				const std::string& perimeter
 			) const;
-
-			typedef std::vector<bool> RanksToSync;
-
-			static std::string GetContent(
-				const SchedulesBasedService& service,
-				boost::optional<const RanksToSync&> ranksToSync = boost::optional<const RanksToSync&>()
-			);
 		};
 	}
 }
