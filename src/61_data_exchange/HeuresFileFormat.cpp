@@ -99,6 +99,8 @@ namespace synthese
 
 		const std::string HeuresFileFormat::Exporter_::PARAMETER_DATASOURCE_ID = "datasource_id";
 		const std::string HeuresFileFormat::Exporter_::PARAMETER_NETWORK_ID = "network_id";
+		const std::string HeuresFileFormat::Exporter_::PARAMETER_GENERATE_ROUTE_CODE = "generate_route_code";
+		const std::string HeuresFileFormat::Exporter_::PARAMETER_SERVICE_NUMBER_POSITION = "service_number_position";
 	}
 
 	namespace impex
@@ -1166,6 +1168,8 @@ namespace synthese
 
 			// Itinerai
 			stringstream itineraiStream;
+			typedef std::map<const pt::CommercialLine*, size_t> NextRouteCodes;
+			NextRouteCodes nextRouteCodes;
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type itjp, _env.getRegistry<JourneyPattern>())
 			{
 				bool hasArea(false);
@@ -1185,7 +1189,21 @@ namespace synthese
 				const JourneyPattern& jp(*itjp.second);
 				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 4);
 				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 3, false);
-				_writeTextAndSpaces(itineraiStream, jp.getName(), 2, false);
+				if(_generateRouteCode)
+				{
+					NextRouteCodes::iterator itRouteCode(nextRouteCodes.find(jp.getCommercialLine()));
+					if(itRouteCode == nextRouteCodes.end())
+					{
+						itRouteCode = nextRouteCodes.insert(make_pair(jp.getCommercialLine(), 0)).first;
+					}
+					_routeCodes.insert(make_pair(&jp, itRouteCode->second));
+					_writeTextAndSpaces(itineraiStream, lexical_cast<string>(itRouteCode->second), 2, false);
+					++itRouteCode->second;
+				}
+				else
+				{
+					_writeTextAndSpaces(itineraiStream, jp.getName(), 2, false);
+				}
 				itineraiStream << jp.getWayBack();
 				Path::Edges::const_iterator itLastEdge(jp.getEdges().end());
 				for(Path::Edges::const_iterator itEdge(jp.getEdges().begin()); itEdge != jp.getEdges().end(); ++itEdge)
@@ -1205,7 +1223,12 @@ namespace synthese
 					}
 					else
 					{
-						itineraiStream << setw(5) << setfill(' ') << ((*itEdge)->getMetricOffset() - (*itLastEdge)->getMetricOffset());
+						double distance((*itEdge)->getMetricOffset() - (*itLastEdge)->getMetricOffset());
+						if(distance < 0)
+						{
+							distance = 0;
+						}
+						itineraiStream << setw(5) << setfill(' ') << distance;
 					}
 					itLastEdge = itEdge;
 				}
@@ -1234,14 +1257,32 @@ namespace synthese
 				const ScheduledService& ss(*itss.second);
 
 				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
-				_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 3, false);
+				_writeTextAndSpaces(
+					tronconsStream,
+					(	ss.getServiceNumber().size() > _serviceNumberPosition ?
+						ss.getServiceNumber().substr(_serviceNumberPosition, 3) :
+						string()
+					),
+					3,
+					false
+				);
 				tronconsStream << "2";
 				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>(ss.getPath()->getEdge(0)->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
 				_writeHour(tronconsStream, ss.getDepartureSchedule(false, 0));
 				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>(ss.getPath()->getLastEdge()->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
 				_writeHour(tronconsStream, ss.getLastArrivalSchedule(false));
 				tronconsStream << "000000";
-				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getName(), 2, false);
+				if(_generateRouteCode)
+				{
+					size_t routeCode(
+						_routeCodes[static_cast<const JourneyPattern*>(ss.getPath())]
+					);
+					_writeTextAndSpaces(tronconsStream, lexical_cast<string>(routeCode), 2, false);
+				}
+				else
+				{
+					_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getName(), 2, false);
+				}
 				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 4);
 				_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 5, false, '0');
 
@@ -1287,7 +1328,15 @@ namespace synthese
 				_writeTextAndSpaces(servicesStream, ss.getServiceNumber(), 6, false);
 				servicesStream << "1111111";
 				_writeTextAndSpaces(servicesStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
-				_writeTextAndSpaces(servicesStream, ss.getServiceNumber(), 3, false);
+				_writeTextAndSpaces(
+					tronconsStream,
+					(	ss.getServiceNumber().size() > _serviceNumberPosition ?
+						ss.getServiceNumber().substr(_serviceNumberPosition, 3) :
+						string()
+					),
+					3,
+					false
+				);
 				servicesStream << "2";
 				servicesStream << "0000000000000000000000";
 				servicesStream << endl;
@@ -1338,6 +1387,12 @@ namespace synthese
 			{
 				throw Exception("Data source " + lexical_cast<string>(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID)) + " not found");
 			}
+
+			// Generate route code
+			_generateRouteCode = map.getDefault<bool>(PARAMETER_GENERATE_ROUTE_CODE, false);
+
+			// Service number position
+			_serviceNumberPosition = map.getDefault<size_t>(PARAMETER_SERVICE_NUMBER_POSITION, 0);
 		}
 
 
@@ -1352,6 +1407,14 @@ namespace synthese
 			if(_dataSource.get())
 			{
 				map.insert(PARAMETER_DATASOURCE_ID, _dataSource->getKey());
+			}
+			if(_generateRouteCode)
+			{
+				map.insert(PARAMETER_GENERATE_ROUTE_CODE, _generateRouteCode);
+			}
+			if(_serviceNumberPosition > 0)
+			{
+				map.insert(PARAMETER_SERVICE_NUMBER_POSITION, _serviceNumberPosition);
 			}
 			return map;
 		}
@@ -1388,5 +1451,14 @@ namespace synthese
 					os << spaceChar;
 				}
 			}
+		}
+
+
+
+		HeuresFileFormat::Exporter_::Exporter_():
+			_generateRouteCode(false),
+			_serviceNumberPosition(0)
+		{
+
 		}
 }	}
