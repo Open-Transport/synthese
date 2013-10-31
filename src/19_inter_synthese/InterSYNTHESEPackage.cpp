@@ -43,7 +43,6 @@ namespace synthese
 	CLASS_DEFINITION(InterSYNTHESEPackage, "t111_inter_synthese_packages", 111)
 	FIELD_DEFINITION_OF_OBJECT(InterSYNTHESEPackage, "inter_synthese_package_id", "inter_synthese_package_ids")
 
-	FIELD_DEFINITION_OF_TYPE(Code, "code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(LockUser, "lock_user_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(LockTime, "lock_time", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(LockServerName, "lock_server_name", SQL_TEXT)

@@ -113,10 +113,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				DBModule::LoadObjects(rr->getLinkedObjectsIds(*rows), env, linkLevel);
-			}
+			DBModule::LoadObjects(rr->getLinkedObjectsIds(*rows), env, linkLevel);
 			rr->loadFromRecord(*rows, env);
 			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{

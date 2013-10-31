@@ -1,6 +1,6 @@
 
-/** InterSYNTHESEContent class implementation.
-	@file InterSYNTHESEContent.cpp
+/** CMSScriptField class implementation.
+	@file CMSScriptField.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,22 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "InterSYNTHESEContent.hpp"
+#include "CMSScriptField.hpp"
 
-#include "Factory.h"
-#include "InterSYNTHESESyncTypeFactory.hpp"
-
-using namespace std;
+#include "SchemaMacros.hpp"
 
 namespace synthese
 {
-	using namespace util;
-
-	namespace inter_synthese
-	{
-		InterSYNTHESEContent::InterSYNTHESEContent(
-			const string& type
-		):	_type(Factory<InterSYNTHESESyncTypeFactory>::create(type))
-		{
-		}
-}	}
+	FIELD_DEFINITION_OF_TYPE(Documentation, "documentation", SQL_TEXT)
+}

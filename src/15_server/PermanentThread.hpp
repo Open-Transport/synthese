@@ -45,7 +45,6 @@ namespace synthese
 	}
 
 	FIELD_STRING(DeviceKey)
-	FIELD_CMS_SCRIPT(Documentation)
 	
 	namespace server
 	{

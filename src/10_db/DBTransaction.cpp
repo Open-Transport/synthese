@@ -95,4 +95,11 @@ namespace synthese
 		{
 			return _modifEvents;
 		}
+
+
+
+		DBTransaction::DBTransaction(
+			bool withInterSYNTHESESync /*= true */
+		):	_withInterSYNTHESESync(withInterSYNTHESESync)
+		{}
 }	}

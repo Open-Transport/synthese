@@ -56,13 +56,14 @@ namespace synthese
 			static const std::string TAG_NEXT_STOP;
 			static const std::string TAG_COMMERCIAL_LINE;
 			static const std::string TAG_TERMINUS_DEPARTURE_TIME;
+			static const std::string TAG_TERMINUS_SECONDS;
 
 			mutable boost::mutex _mutex;
 			NextStops _nextStops;
 			pt::CommercialLine* _line;
 			std::string _lineNumber;
 			bool _stopRequested;
-			boost::posix_time::ptime _terminusDepartureTime;
+			boost::posix_time::time_duration _terminusDeparture;
 			
 		public:
 			CurrentJourney();
@@ -71,10 +72,7 @@ namespace synthese
 			void setLine(pt::CommercialLine* value){ _line = value; }
 			void setLineNumber(const std::string& value);
 			void setStopRequested(bool value){ _stopRequested = value; }
-			void setTerminusDepartureTime(boost::posix_time::ptime value)
-			{
-				_terminusDepartureTime = value;
-			}
+			void setTerminusDeparture(boost::posix_time::time_duration value){ _terminusDeparture = value; }
 
 			boost::mutex& getMutex() const { return _mutex; }
 
@@ -88,10 +86,7 @@ namespace synthese
 			/// @pre the object mutex must be locked as the line number is used
 			const std::string& getLineNumber() const { return _lineNumber; }
 			bool getStopRequested() const { return _stopRequested; }
-			boost::posix_time::ptime getTerminusDepartureTime()
-			{
-				return _terminusDepartureTime;
-			}
+			boost::posix_time::time_duration getTerminusDeparture() const { return _terminusDeparture; }
 
 			void toParametersMap(
 				util::ParametersMap& pm

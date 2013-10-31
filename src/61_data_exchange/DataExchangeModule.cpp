@@ -91,7 +91,7 @@ namespace synthese
 		{
 			// In the init section in order to read this parameter after the data load (DBModule::Init)
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_DATASOURCE_ID, "", &IneoNCEConnection::ParameterCallback);
-			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_WITH_LOCAL_MESSAGE, "1", &IneoNCEConnection::ParameterCallback);
+			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_MESSAGE_RECIPIENTS, "", &IneoNCEConnection::ParameterCallback);
 			RegisterParameter(MGScreenConnection::MODULE_PARAM_MG_CPU_NAME, "MG CPU", &MGScreenConnection::ParameterCallback);
 		}
 

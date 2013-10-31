@@ -112,7 +112,7 @@ namespace synthese
 			try
 			{
 				const Registrable* object(
-					DBModule::GetObject(broadcastPointId, *_env).get()
+					DBModule::GetObject(broadcastPointId, Env::GetOfficialEnv()).get()
 				);
 				if(dynamic_cast<const BroadcastPoint*>(object))
 				{
@@ -201,7 +201,7 @@ namespace synthese
 			optional<AlarmLevel> bestPriority;
 			if(_priorityOrder) // TODO HOW THIS CAN WORK ?
 			{
-				BOOST_FOREACH(const SentAlarm* message, messages)
+				BOOST_FOREACH(boost::shared_ptr<const SentAlarm> message, messages)
 				{
 					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
 					{
@@ -222,12 +222,12 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(const SentAlarm* message, messages)
+				BOOST_FOREACH(boost::shared_ptr<SentAlarm> message, messages)
 				{
 					bestPriority = message->getLevel();
 					break;
 				}
-				BOOST_REVERSE_FOREACH(const SentAlarm* message, messages)
+				BOOST_REVERSE_FOREACH(boost::shared_ptr<SentAlarm> message, messages)
 				{
 					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
 					{

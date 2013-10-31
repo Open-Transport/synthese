@@ -76,7 +76,7 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
-			typedef std::set<SentAlarm*> ActivatedMessages;
+			typedef std::set<boost::shared_ptr<SentAlarm> > ActivatedMessages;
 
 		private:
 			static ActivatedMessages _activatedMessages;

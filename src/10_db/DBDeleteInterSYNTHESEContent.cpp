@@ -1,6 +1,6 @@
 
-/** InterSYNTHESEContent class implementation.
-	@file InterSYNTHESEContent.cpp
+/** DBDeleteInterSYNTHESEContent class implementation.
+	@file DBDeleteInterSYNTHESEContent.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,22 +20,41 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "InterSYNTHESEContent.hpp"
+#include "DBDeleteInterSYNTHESEContent.hpp"
 
-#include "Factory.h"
-#include "InterSYNTHESESyncTypeFactory.hpp"
+#include "DBInterSYNTHESE.hpp"
 
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
 
-	namespace inter_synthese
+	namespace db
 	{
-		InterSYNTHESEContent::InterSYNTHESEContent(
-			const string& type
-		):	_type(Factory<InterSYNTHESESyncTypeFactory>::create(type))
+		DBDeleteInterSYNTHESEContent::DBDeleteInterSYNTHESEContent( util::RegistryKeyType id ):
+			_id(id),
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
 		{
+		}
+	
+
+
+		std::string DBDeleteInterSYNTHESEContent::getPerimeter() const
+		{
+			return lexical_cast<string>(decodeTableId(_id));
+		}
+
+
+
+		std::string DBDeleteInterSYNTHESEContent::getContent() const
+		{
+			stringstream content;
+			DBInterSYNTHESE::RequestEnqueue visitor(content);
+			visitor(_id);
+			return content.str();
 		}
 }	}

@@ -196,29 +196,45 @@ namespace synthese
 
 
 
-		string RealTimePTDataInterSYNTHESE::GetContent(
+		RealTimePTDataInterSYNTHESE::Content::Content(
 			const SchedulesBasedService& service,
-			optional<const RanksToSync&> ranksToSync
-		){
+			boost::optional<const RanksToSync&> ranksToSync /*= boost::optional<const RanksToSync&>() */
+		):	_service(service),
+			_ranksToSync(ranksToSync),
+			InterSYNTHESEContent(RealTimePTDataInterSYNTHESE::FACTORY_KEY)
+		{
+		}
+
+
+
+		std::string RealTimePTDataInterSYNTHESE::Content::getPerimeter() const
+		{
+			return lexical_cast<string>(_service.getRoute()->getCommercialLine()->getKey());
+		}
+
+
+
+		std::string RealTimePTDataInterSYNTHESE::Content::getContent() const
+		{
 			stringstream result;
-			result << service.getKey();
-			size_t maxRank(service.getRoute()->getEdges().size());
+			result << _service.getKey();
+			size_t maxRank(_service.getRoute()->getEdges().size());
 			for(size_t i(0); i<maxRank; ++i)
 			{
-				if(!ranksToSync || ranksToSync->at(i))
+				if(!_ranksToSync || _ranksToSync->at(i))
 				{
 					result <<
 						FIELD_SEPARATOR <<
 						i <<
 						FIELD_SEPARATOR <<
-						to_simple_string(service.getArrivalSchedule(true, i)) <<
+						to_simple_string(_service.getArrivalSchedule(true, i)) <<
 						FIELD_SEPARATOR <<
-						to_simple_string(service.getDepartureSchedule(true, i)) <<
+						to_simple_string(_service.getDepartureSchedule(true, i)) <<
 						FIELD_SEPARATOR
 					;
-					if(service.getRealTimeVertex(i))
+					if(_service.getRealTimeVertex(i))
 					{
-						result << service.getRealTimeVertex(i)->getKey();
+						result << _service.getRealTimeVertex(i)->getKey();
 					}
 				}
 			}

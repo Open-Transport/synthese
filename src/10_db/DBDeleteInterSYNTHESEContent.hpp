@@ -1,6 +1,6 @@
 
-/** InterSYNTHESEContent class implementation.
-	@file InterSYNTHESEContent.cpp
+/** DBDeleteInterSYNTHESEContent class header.
+	@file DBDeleteInterSYNTHESEContent.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,22 +20,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef SYNTHESE_db_DBDeleteInterSYNTHESEContent_hpp__
+#define SYNTHESE_db_DBDeleteInterSYNTHESEContent_hpp__
+
 #include "InterSYNTHESEContent.hpp"
 
-#include "Factory.h"
-#include "InterSYNTHESESyncTypeFactory.hpp"
-
-using namespace std;
+#include "UtilTypes.h"
 
 namespace synthese
 {
-	using namespace util;
-
-	namespace inter_synthese
+	namespace db
 	{
-		InterSYNTHESEContent::InterSYNTHESEContent(
-			const string& type
-		):	_type(Factory<InterSYNTHESESyncTypeFactory>::create(type))
+		/** DBDeleteInterSYNTHESEContent class.
+			@ingroup m10
+		*/
+		class DBDeleteInterSYNTHESEContent:
+			public inter_synthese::InterSYNTHESEContent
 		{
-		}
-}	}
+			util::RegistryKeyType _id;
+
+		public:
+			DBDeleteInterSYNTHESEContent(util::RegistryKeyType id);
+
+			virtual std::string getPerimeter() const;
+			virtual std::string getContent() const;
+
+		};
+	}
+}
+
+#endif // SYNTHESE_db_DBDeleteInterSYNTHESEContent_hpp__

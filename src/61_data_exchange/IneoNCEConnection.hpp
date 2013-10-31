@@ -53,7 +53,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_INEO_NCE_HOST;
 			static const std::string MODULE_PARAM_INEO_NCE_PORT;
 			static const std::string MODULE_PARAM_INEO_NCE_DATASOURCE_ID;
-			static const std::string MODULE_PARAM_INEO_NCE_WITH_LOCAL_MESSAGE;
+			static const std::string MODULE_PARAM_INEO_NCE_MESSAGE_RECIPIENTS;
 
 			enum Status
 			{
@@ -68,7 +68,9 @@ namespace synthese
 			std::string _nceAddress;
 			std::string _ncePort;
 			const impex::DataSource* _dataSource;
-			bool _withLocalMessage;
+
+			typedef std::set<util::RegistryKeyType> MessageRecipients;
+			MessageRecipients _messageRecipients;
 
 			mutable Status _status;
 
@@ -100,24 +102,9 @@ namespace synthese
 			void checkDeadline();
 
 			// Message management
-			boost::shared_ptr<messages::SentScenario> _sentScenario;
-			// There are several messages to hold, the key is the message type
-			typedef std::map<const std::string, boost::shared_ptr<messages::SentAlarm> > MessageMap;
-			mutable MessageMap _messages;
-			mutable boost::shared_ptr<messages::AlarmObjectLink> _alarmObjectLink;
-			bool initScenario();
-			void createScenario();
-			void initMessage(const std::string &messageName);
-			void createMessage(const std::string &messageName);
-			bool hasMessage() const;
-			void createScenarioLinks(pt::CommercialLine *line) const;
-			void createScenarioLink(const std::string &messageName,
-									pt::CommercialLine *line) const;
-			void clearScenarioLinks() const;
-			void clearScenarioLink(const std::string &messageName) const;
-			void setMessage(const std::string &messageName,
-							const std::string &message) const;
-			void setScenarioLine(pt::CommercialLine *line) const;
+			boost::shared_ptr<messages::SentScenario> _getScenario(bool createIfNoExistingScenario) const;
+			typedef std::map<std::string, std::string> MessagesByType;
+			void _setMessages(const MessagesByType& value) const;
 			
 		public:
 			IneoNCEConnection();
