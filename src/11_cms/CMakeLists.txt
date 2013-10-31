@@ -20,6 +20,7 @@ CMSRight.cpp
 CMSRight.hpp
 CMSScript.cpp
 CMSScript.hpp
+CMSScriptField.cpp
 CMSScriptField.hpp
 ConstantExpression.cpp
 ConstantExpression.hpp

@@ -271,10 +271,10 @@ namespace synthese
 				Env::GetOfficialEnv().getRegistry<Alarm>()
 			){
 				// Avoid library messages
-				SentAlarm* sentMessage(
-					dynamic_cast<SentAlarm*>(message.second.get())
+				boost::shared_ptr<SentAlarm> sentMessage(
+					dynamic_pointer_cast<SentAlarm, Alarm>(message.second)
 				);
-				if(sentMessage == NULL)
+				if(!sentMessage)
 				{
 					continue;
 				}
@@ -337,7 +337,7 @@ namespace synthese
 			ActivatedMessages result;
 
 			// Check each message
-			BOOST_FOREACH(SentAlarm* message, _activatedMessages)
+			BOOST_FOREACH(boost::shared_ptr<SentAlarm> message, _activatedMessages)
 			{
 				// Check the message
 				if(message->isOnBroadcastPoint(

@@ -37,19 +37,15 @@ namespace synthese
 		class InterSYNTHESEContent
 		{
 			std::auto_ptr<InterSYNTHESESyncTypeFactory> _type;
-			std::string _perimeter;
-			std::string _content;
 
 		public:
 			InterSYNTHESEContent(
-				const std::string& type,
-				const std::string& perimeter,
-				const std::string& content
+				const std::string& type
 			);
 
 			const InterSYNTHESESyncTypeFactory& getType() const { return *_type; }
-			const std::string getPerimeter() const { return _perimeter; }
-			const std::string getContent() const { return _content; }
+			virtual std::string getPerimeter() const = 0;
+			virtual std::string getContent() const = 0;
 		};
 }	}
 

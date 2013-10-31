@@ -86,18 +86,6 @@ namespace synthese
 				const std::string& perimeter
 			) const;
 
-			static std::string GetSQLContent(
-				const std::string& sql
-			);
-
-			static std::string GetReplaceStmtContent(
-				const DBRecord& r
-			);
-
-			static std::string GetDeleteStmtContent(
-				util::RegistryKeyType id
-			);
-
 			class RequestEnqueue:
 				public boost::static_visitor<bool>
 			{

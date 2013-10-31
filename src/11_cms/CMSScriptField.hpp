@@ -26,9 +26,17 @@
 #include "SimpleObjectFieldDefinition.hpp"
 
 #include "CMSScript.hpp"
+#include "FrameworkTypes.hpp"
 
 namespace synthese
 {
+	class ObjectBase;
+
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace cms
 	{
 		/** CMSScriptField class.
@@ -150,6 +158,8 @@ namespace synthese
 }	}
 
 #define FIELD_CMS_SCRIPT(N) struct N : public synthese::cms::CMSScriptField<N> {};
+
+FIELD_CMS_SCRIPT(Documentation)
 
 #endif // SYNTHESE_cms_CMSScriptField_hpp__
 

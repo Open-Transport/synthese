@@ -13,6 +13,8 @@ DBDirectTableSyncTemplate.hpp
 DBEmptyResultException.h
 DBException.cpp
 DBException.hpp
+DBDeleteInterSYNTHESEContent.cpp
+DBDeleteInterSYNTHESEContent.hpp
 DBInterSYNTHESE.cpp
 DBInterSYNTHESE.hpp
 DBModule.cpp
@@ -22,8 +24,12 @@ DBModule.h
 DBModule.inc.cpp
 DBRecord.cpp
 DBRecord.hpp
+DBReplaceInterSYNTHESEContent.cpp
+DBReplaceInterSYNTHESEContent.cpp
 DBResult.cpp
 DBResult.hpp
+DBSQLInterSYNTHESEContent.cpp
+DBSQLInterSYNTHESEContent.cpp
 DBTableSync.cpp
 DBTableSync.hpp
 DBTableSyncTemplate.hpp

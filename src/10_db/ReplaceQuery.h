@@ -27,7 +27,6 @@
 #include "DBModule.h"
 #include "DBInterSYNTHESE.hpp"
 #include "DBRecord.hpp"
-#include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
 #include "ParametersMap.h"
 #include "SQLExpression.hpp"

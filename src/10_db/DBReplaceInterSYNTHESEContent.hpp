@@ -1,6 +1,6 @@
 
-/** InterSYNTHESEContent class implementation.
-	@file InterSYNTHESEContent.cpp
+/** DBInterSYNTHESEContent class header.
+	@file DBInterSYNTHESEContent.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,22 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#ifndef SYNTHESE_db_DBReplaceInterSYNTHESEContent_hpp__
+#define SYNTHESE_db_DBReplaceInterSYNTHESEContent_hpp__
+
 #include "InterSYNTHESEContent.hpp"
-
-#include "Factory.h"
-#include "InterSYNTHESESyncTypeFactory.hpp"
-
-using namespace std;
 
 namespace synthese
 {
-	using namespace util;
-
-	namespace inter_synthese
+	namespace db
 	{
-		InterSYNTHESEContent::InterSYNTHESEContent(
-			const string& type
-		):	_type(Factory<InterSYNTHESESyncTypeFactory>::create(type))
+		class DBRecord;
+
+		/** DBInterSYNTHESEContent class.
+			@ingroup m10
+		*/
+		class DBReplaceInterSYNTHESEContent:
+			public inter_synthese::InterSYNTHESEContent
 		{
-		}
-}	}
+			const DBRecord& _record;
+
+		public:
+			DBReplaceInterSYNTHESEContent(const DBRecord& r);
+
+			virtual std::string getPerimeter() const;
+			virtual std::string getContent() const;
+		};
+	}
+}
+
+#endif // SYNTHESE_db_DBInterSYNTHESEContent_hpp__

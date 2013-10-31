@@ -30,7 +30,6 @@ namespace synthese
 	CLASS_DEFINITION(messages::MessagesSection, "t109_messages_sections", 109)
 	FIELD_DEFINITION_OF_OBJECT(messages::MessagesSection, "messages_section_id", "messages_section_ids")
 
-	FIELD_DEFINITION_OF_TYPE(Code, "code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Color, "color", SQL_TEXT)
 
 	using namespace db;
