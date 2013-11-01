@@ -223,4 +223,15 @@ namespace synthese
 			entryPM->insert(ATTR_TEXT, content);
 			_pm.insert(TAG_LOG_ENTRY, entryPM);
 		}
+
+
+
+		void Importer::closeLogFile() const
+		{
+			// File stream
+			if(_fileStream.get())
+			{
+				_fileStream.reset();
+			}
+		}
 }	}
