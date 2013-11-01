@@ -164,6 +164,7 @@ namespace synthese
 				DBTransaction transaction(_autoImporter->save());
 				transaction.run();
 			}
+			_autoImporter->closeLogFile();
 
 			// TODO clean
 
