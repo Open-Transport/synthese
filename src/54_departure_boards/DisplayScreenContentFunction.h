@@ -100,6 +100,29 @@ namespace synthese
 
 			static const std::string DATA_IS_REAL_TIME;
 
+			//Direct connection SAE structures :
+                        struct ServiceRealTime
+                        {
+                                std::string date;
+                                std::string Realtime;
+                                std::string oc;
+                                std::string arret;
+                                std::string nom_ligne;
+                                std::string lineShortName;
+                                std::string LineStyle;
+                                std::string lineColor;
+                                std::string lineXmlColor;
+                                std::string depart;
+                                std::string cityName_begin;
+                                std::string arrivee;
+                                std::string cityName_end;
+                                std::string cityName_current;
+                                util::RegistryKeyType cityId_current;
+                                util::RegistryKeyType stopAreaId;
+                                util::RegistryKeyType stop_id;
+                                util::RegistryKeyType networkId;
+                        };
+
 		private:
 			//! \name Page parameters
 			//@{
@@ -143,7 +166,10 @@ namespace synthese
 				const pt::StopPoint* stop
 			)const;
 
-
+			void concatXMLResultRealTime(
+				std::ostream& stream,
+				ServiceRealTime& serviceReal
+			)const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Add journey information to the given parameters map.
@@ -152,6 +178,11 @@ namespace synthese
 				util::ParametersMap& pm,
 				graph::ServicePointer& servicePointer,
 				const pt::StopPoint* stop
+			) const;
+			
+			void addJourneyToParametersMapRealTime(
+				util::ParametersMap& pm,
+				ServiceRealTime& serviceReal
 			) const;
 
 			void displayFullDate(
