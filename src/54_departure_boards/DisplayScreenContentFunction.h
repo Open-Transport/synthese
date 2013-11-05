@@ -78,6 +78,7 @@ namespace synthese
 			static const std::string PARAMETER_LINE_ID;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_GENERATION_METHOD;
+			static const std::string PARAMETER_USE_SAE_DIRECT_CONNECTION;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -86,14 +87,18 @@ namespace synthese
 			static const std::string PARAMETER_ROW_PAGE_ID;
 			static const std::string PARAMETER_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_TRANSFER_DESTINATION_PAGE_ID;
+			static const std::string PARAMETER_DATA_SOURCE_NAME_FILTER;
 
 			static const std::string DATA_STOP_ID;
 			static const std::string DATA_OPERATOR_CODE;
+			static const std::string DATA_NETWORK_NAME;
 
 			static const std::string DATA_STOP_AREA_ID;
 			static const std::string DATA_STOP_AREA_NAME;
 			static const std::string DATA_STOP_AREA_CITY_NAME;
 			static const std::string DATA_STOP_AREA_CITY_ID;
+
+			static const std::string DATA_IS_REAL_TIME;
 
 		private:
 			//! \name Page parameters
@@ -104,6 +109,9 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> _lineToDisplay;
 				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
 				bool _wayIsBackward;
+				boost::optional<std::string> _dataSourceName;
+				static std::vector<std::string> _SAELine;
+				bool _useSAEDirectConnection;
 
 				boost::shared_ptr<const cms::Webpage> _mainPage;
 				boost::shared_ptr<const cms::Webpage> _rowPage;

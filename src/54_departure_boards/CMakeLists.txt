@@ -141,6 +141,8 @@ UpdateDisplayTypeAction.h
 
 set_source_files_properties(DeparturesTableModule.gen.cpp DeparturesTableModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
+include_directories(${MYSQL_INCLUDE_DIR})
+
 add_library(54_departure_boards ${departure_boards_SRCS})
 
 target_link_libraries(54_departure_boards
@@ -152,6 +154,7 @@ target_link_libraries(54_departure_boards
   33_algorithm
   35_pt
   11_cms
+  ${MYSQL_LIBRARIES}
 )
 
 install(TARGETS 54_departure_boards DESTINATION lib)

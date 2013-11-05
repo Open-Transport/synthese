@@ -48,10 +48,14 @@
 #include "RoadModule.h"
 #include "PTUseRule.h"
 #include "Destination.hpp"
+#ifdef __gnu_linux__
+	#include "Connector.hpp"
+#endif
 #include "RoutePlanningTableGenerator.h"
 #include "ServerModule.h"
 #include "InterfacePageException.h"
 #include "MimeTypes.hpp"
+#include "TransportNetwork.h"
 
 #include <sstream>
 
@@ -108,6 +112,7 @@ namespace synthese
 
 		const string DisplayScreenContentFunction::DATA_STOP_ID("stop_id");
 		const string DisplayScreenContentFunction::DATA_OPERATOR_CODE("operatorCode");
+		const string DisplayScreenContentFunction::DATA_NETWORK_NAME("networkName");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_ID("stop_area_id");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_NAME("stop_area_name");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_CITY_NAME("stop_area_city_name");
@@ -157,6 +162,13 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_ROW_PAGE_ID("row_page_id");
 		const string DisplayScreenContentFunction::PARAMETER_DESTINATION_PAGE_ID("destination_page_id");
 		const string DisplayScreenContentFunction::PARAMETER_TRANSFER_DESTINATION_PAGE_ID("transfer_destination_page_id");
+
+		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER("data_source_name_filter");
+		const string DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION("use_sae_direct_connection");
+
+		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
+
+		vector<string> DisplayScreenContentFunction::_SAELine;
 
 		FunctionAPI DisplayScreenContentFunction::getAPI() const
 		{
@@ -219,7 +231,14 @@ namespace synthese
 						  "'with_forced_destinations_method', 'route_planning' or "
 						  "'display_children_only'. The default is 'standard_method'",
 						  false);
-
+			api.addParams(DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER,
+						  "Specify the datasource stops and lines you want to see in the answer",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION,
+						  "Specify if SAE Direct Connection is needed for RealTime, "
+						  "this will open unix sockets to a MySQL BDSI INEO server. \n"
+						  "Works only on Linux",
+						  false);
 			return api;
 		}
 
@@ -251,6 +270,10 @@ namespace synthese
 			if(_rollingStockFilter.get() != NULL)
 			{
 				map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
+			}
+			if(_dataSourceName)
+			{
+				map.insert(PARAMETER_DATA_SOURCE_NAME_FILTER, *_dataSourceName);
 			}
 			return map;
 		}
@@ -446,6 +469,19 @@ namespace synthese
 						throw RequestException("No such RollingStockFilter");
 					}
 
+					// Check if need to use SAE RealTime Direct Connection
+					_useSAEDirectConnection = false;
+					optional<string> rtStr(map.getOptional<string>(PARAMETER_USE_SAE_DIRECT_CONNECTION));
+					if(rtStr && (*rtStr) == "1")
+					{
+					#ifdef __gnu_linux__
+						_useSAEDirectConnection = true;
+					#else
+						throw RequestException("SAE Direct Connection works only on Linux platforms");
+					#endif
+					}
+
+					
 					screen->setType(_type.get());
 					//If request contains an interface : build a screen, else prepare custom xml answer
 					optional<RegistryKeyType> idReg(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
@@ -460,7 +496,7 @@ namespace synthese
 							throw RequestException("No such screen type");
 						}
 					}
-					else if(_mainPage.get())
+					else if(_mainPage.get() && !_useSAEDirectConnection)
 					{
 						_type->setDisplayMainPage(_mainPage.get());
 						_type->setDisplayRowPage(_rowPage.get());
@@ -505,6 +541,8 @@ namespace synthese
 			{
 				throw RequestException("Physical stop not found "+ e.getMessage());
 			}
+
+			_dataSourceName = map.getOptional<string>(PARAMETER_DATA_SOURCE_NAME_FILTER);
 		}
 
 		void DisplayScreenContentFunction::concatXMLResult(
@@ -517,9 +555,12 @@ namespace synthese
 			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
 
 			//Here we got our service !
+			//TODO: check if service schedules are realtime in the !_useSAEDirectConnection case
+			//(Instead of saying "yes" every time)
 			stream <<"<journey routeId=\""<< journeyPattern->getKey() <<
 				"\" dateTime=\""    << servicePointer.getDepartureDateTime() <<
 				"\" blink=\"" << "0" <<
+				"\" "<< DATA_IS_REAL_TIME <<"=\"" << (_useSAEDirectConnection ? "no" : "yes") <<
 				"\">";
 
 			stream << "<stop id=\"" << stop->getKey() <<
@@ -551,6 +592,7 @@ namespace synthese
 					"\" shortName=\"" << commercialLine->getShortName() <<
 					"\" longName=\""  << commercialLine->getLongName() <<
 					"\" color=\""     << commercialLine->getColor() <<
+					"\" xmlColor=\""  << commercialLine->getColor()->toString() <<					
 					"\" style=\""     << commercialLine->getStyle() <<
 					"\" image=\""     << commercialLine->getImage() <<
 					"\" direction=\"" << (
