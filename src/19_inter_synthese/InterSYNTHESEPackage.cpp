@@ -372,7 +372,8 @@ namespace synthese
 			util::ParametersMap& pm,
 			std::stringstream& binaryStream
 		){
-			apply_visitor(ItemDumper(pm, binaryStream), object.getValue());
+			TableOrObject::Value objectValue(object.getValue());
+			apply_visitor(ItemDumper(pm, binaryStream), objectValue);
 		}
 
 
