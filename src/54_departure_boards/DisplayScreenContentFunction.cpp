@@ -168,6 +168,7 @@ namespace synthese
 
 		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
 
+		const string PIPO_KEY("00");
 		vector<string> DisplayScreenContentFunction::_SAELine;
 
 		FunctionAPI DisplayScreenContentFunction::getAPI() const
@@ -592,7 +593,7 @@ namespace synthese
 					"\" shortName=\"" << commercialLine->getShortName() <<
 					"\" longName=\""  << commercialLine->getLongName() <<
 					"\" color=\""     << commercialLine->getColor() <<
-					"\" xmlColor=\""  << commercialLine->getColor()->toString() <<					
+					"\" xmlColor=\""  << commercialLine->getColor()->toString() <<
 					"\" style=\""     << commercialLine->getStyle() <<
 					"\" image=\""     << commercialLine->getImage() <<
 					"\" direction=\"" << (
@@ -631,7 +632,169 @@ namespace synthese
 			stream << "</journey>";
 		}
 
+		struct MapValue
+		{
+			vector<DisplayScreenContentFunction::ServiceRealTime> serviceRealTimeVect;
+			vector<graph::ServicePointer> servicePointerVect;
+		};	
 
+		// RETURN AN ITERATOR FOR THE FIRST SAE SERVICE AFTER SQL REQUEST
+		// but if it reached the maximum number of display => break
+		map<long long, MapValue>::iterator findFirstRealTime(
+				map<long long, MapValue> &servicePointerAll,
+				int NbDisplayMin
+		)
+		{
+			map<long long,MapValue>::iterator it = servicePointerAll.begin();
+
+			for(;it!=servicePointerAll.end();it++)//For each minute
+			{
+				// IF A REAL TIME SERVICE IS FOUNDED OR THE THE NUMBER OF DISPLAY IS REACHED WE RETURN THE POSITION OF THE ITERATOR
+				if(!it->second.serviceRealTimeVect.empty() || distance(it, servicePointerAll.end()) <= NbDisplayMin)
+					return it;
+			}
+
+			return it;
+		}
+
+		void DisplayScreenContentFunction::concatXMLResultRealTime(
+				std::ostream& stream,
+				ServiceRealTime& serviceReal
+		) const {
+			// DISPLAY RESULT
+			stream <<"<journey routeId=\"" << PIPO_KEY <<
+					"\" dateTime=\"" << serviceReal.date <<
+					"\" blink=\"" << "0" <<
+					"\" "<< DATA_IS_REAL_TIME <<"=\"" << serviceReal.Realtime <<
+					"\">";
+
+			// Stop point
+			stream << "<stop id=\"" << PIPO_KEY <<
+					"\" operatorCode=\"" << serviceReal.oc <<
+					"\" name=\"" << serviceReal.arret <<
+					"\" />";
+
+			// Transport Mode
+			stream <<"<transportMode id=\""<< PIPO_KEY <<
+					"\" name=\"" << "bus" <<
+					"\" article=\"" << "le" <<
+					"\" />";
+
+			// Line ID TODO : get Style ?
+			stream <<"<line id=\""<< PIPO_KEY <<
+					"\" creatorId=\"" << PIPO_KEY <<
+					"\" name=\"" << serviceReal.nom_ligne <<
+					"\" shortName=\"" << serviceReal.lineShortName <<
+					"\" longName=\"" << "" <<
+					"\" color=\"" << serviceReal.lineColor <<
+					"\" xmlColor=\"" << serviceReal.lineXmlColor <<
+					"\" style=\"" << serviceReal.LineStyle <<
+					"\" network_id=\"" << serviceReal.networkId <<
+					"\" image=\"" << "" <<
+					"\" direction=\"" << "" <<
+					"\" />";
+
+			// Origin
+			stream << "<origin id=\""  << PIPO_KEY <<
+					"\" name=\"" << serviceReal.depart <<
+					"\" cityName=\"" << serviceReal.cityName_begin <<
+					"\" />";
+
+			// Destination
+			stream << "<destination id=\"" << PIPO_KEY <<
+					"\" name=\"" << serviceReal.arrivee <<
+					"\" cityName=\"" << serviceReal.cityName_end <<
+					"\" />";
+
+			// Stop Area
+			stream << "<stopArea id=\""<< PIPO_KEY <<
+					"\" name=\"" << serviceReal.arret <<
+					"\" cityId=\"" << serviceReal.cityId_current <<
+					"\" cityName=\"" << serviceReal.cityName_current <<
+					"\" directionAlias=\"" << "" <<
+					"\" />";
+
+			stream << "</journey>";
+		}
+
+		void DisplayScreenContentFunction::addJourneyToParametersMapRealTime(
+			ParametersMap& pm,
+			ServiceRealTime& serviceReal
+		) const {
+			//Stop Point
+			pm.insert(DATA_STOP_ID, serviceReal.stop_id);
+			pm.insert(DATA_OPERATOR_CODE, serviceReal.oc);
+
+			//StopArea
+			pm.insert(DATA_STOP_AREA_ID, serviceReal.stopAreaId);
+			pm.insert(DATA_STOP_AREA_NAME, serviceReal.arret);
+			pm.insert(DATA_STOP_AREA_CITY_NAME, serviceReal.cityName_current);
+			pm.insert(DATA_STOP_AREA_CITY_ID, serviceReal.cityId_current);
+
+			shared_ptr<ParametersMap> journeyPm(new ParametersMap());
+			journeyPm->insert("route_id", PIPO_KEY);
+			journeyPm->insert("date_time", serviceReal.date);
+			journeyPm->insert("realTime", serviceReal.Realtime);
+
+			shared_ptr<ParametersMap> stopPM(new ParametersMap);
+			stopPM->insert("id", PIPO_KEY);
+			stopPM->insert("operatorCode", serviceReal.oc);
+			stopPM->insert("name", serviceReal.arret);
+			journeyPm->insert("stop", stopPM);
+			
+			shared_ptr<ParametersMap> rsPM(new ParametersMap);
+			rsPM->insert("id", PIPO_KEY);
+			rsPM->insert("name", "bus");
+			rsPM->insert("article", "le");
+			journeyPm->insert("rollingStock", rsPM);
+			
+			shared_ptr<ParametersMap> linePM(new ParametersMap);
+			linePM->insert("id", PIPO_KEY);
+			linePM->insert("creatorId", PIPO_KEY);
+			linePM->insert("name", serviceReal.nom_ligne);
+			linePM->insert("shortName" , serviceReal.lineShortName);
+			linePM->insert("color",serviceReal.lineColor);
+			linePM->insert("xmlcolor",serviceReal.lineXmlColor);
+			linePM->insert("style",serviceReal.LineStyle);
+			linePM->insert("network_id",serviceReal.networkId);
+			
+			journeyPm->insert("line", linePM);
+			
+			shared_ptr<ParametersMap> originPM(new ParametersMap);
+			originPM->insert("id", PIPO_KEY);
+			originPM->insert("name", serviceReal.depart);
+			originPM->insert("cityName", serviceReal.cityName_begin);
+			journeyPm->insert("origin", originPM);
+
+			shared_ptr<ParametersMap> destinationPM(new ParametersMap);
+			destinationPM->insert("id", PIPO_KEY);
+			destinationPM->insert("name", serviceReal.arrivee);
+			destinationPM->insert("cityName", serviceReal.cityName_end);
+			journeyPm->insert("destination", destinationPM);
+
+			shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
+			connPlacePM->insert("id", PIPO_KEY);
+			connPlacePM->insert("name", serviceReal.arret);
+			connPlacePM->insert("cityId", serviceReal.cityId_current);
+			connPlacePM->insert("cityName", serviceReal.cityName_current);
+			journeyPm->insert("stopArea", connPlacePM);
+			pm.insert("stop_name", serviceReal.arret);
+			pm.insert("journey", journeyPm);
+		}
+
+		string formatLineName(string commercialLineName)
+		{
+			string comLineName = commercialLineName;
+
+			// Set lowercase for comparaison
+			std::transform(comLineName.begin(), comLineName.end(), comLineName.begin(), ::tolower);
+
+			// Add zero to line shortName before compare to database value
+			if ((comLineName.length() < 2) || ((comLineName.length() == 2) && (comLineName[1]=='s')))
+				comLineName = "0" + comLineName;
+
+			return comLineName;
+		}
 
 		void DisplayScreenContentFunction::addJourneyToParametersMap(
 			ParametersMap& pm,
@@ -701,7 +864,6 @@ namespace synthese
 
 			pm.insert("journey", journeyPm);
 		}
-
 
 
 		util::ParametersMap DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
