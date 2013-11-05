@@ -219,7 +219,7 @@ namespace synthese
 
 					HTMLForm gf(goRequest.getHTMLForm());
 					gf.addHiddenField(DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID, lexical_cast<string>(pl->place->getKey()));
-					stream << t.col() << gf.getLinkButton("Ouvrir", string(), "building_edit.png");
+					stream << t.col() << gf.getLinkButton("Ouvrir", string(), "/admin/img/building_edit.png");
 				}
 				catch (...)
 				{

@@ -220,7 +220,7 @@ namespace synthese
 				stream << HTMLModule::GetHTMLJavascriptOpen("http://svn.osgeo.org/metacrs/proj4js/trunk/lib/defs/EPSG900913.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("http://trac.osgeo.org/proj4js/raw-attachment/ticket/32/EPSG27572.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("/lib/openlayers/OpenLayers.js");
-				stream << HTMLModule::GetHTMLJavascriptOpen("/lib/pedestrianroutemap.js");
+				stream << HTMLModule::GetHTMLJavascriptOpen("/admin/pedestrianroutemap.js");
 			}
 		}
 

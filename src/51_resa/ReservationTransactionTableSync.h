@@ -97,6 +97,7 @@ namespace synthese
 			);
 
 
+
 			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> userId,
@@ -107,6 +108,28 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			/** ReservationTransaction SearchByUser.
+			 * Returns reservation transactions linked to a userId and which
+			 * booking time is between two dates passed as arguments.
+			 * @param userId attached to this transaction
+			 * @param minDate the min booking time
+			 * @param maxDate the max booking time
+			 * @param withCancelled returns or not cancelled reservations
+			 * @return Found ReservationTransaction objects
+			 * @date 2013
+			 */
+			static SearchResult SearchByUser(
+				util::Env& env,
+				boost::optional<util::RegistryKeyType> userId,
+				const boost::posix_time::ptime& minDate,
+				const boost::posix_time::ptime& maxDate,
+				bool withCancelled = false,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
 		};
 }	}
 

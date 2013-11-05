@@ -141,8 +141,28 @@ UpdateDisplayTypeAction.h
 
 set_source_files_properties(DeparturesTableModule.gen.cpp DeparturesTableModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
+# MySQL
+
+if(WITH_MYSQL)
+  add_definitions(-DWITH_MYSQL)
+  include_directories(${MYSQL_INCLUDE_DIR})
+endif(WITH_MYSQL)
+
 add_library(54_departure_boards ${departure_boards_SRCS})
 
+if(WITH_MYSQL)
+target_link_libraries(54_departure_boards
+  07_lexical_matcher
+  10_db
+  17_messages
+  18_graph
+  32_geography
+  33_algorithm
+  35_pt
+  11_cms
+  ${MYSQL_LIBRARIES}
+)
+else(WITH_MYSQL)
 target_link_libraries(54_departure_boards
   07_lexical_matcher
   10_db
@@ -153,5 +173,6 @@ target_link_libraries(54_departure_boards
   35_pt
   11_cms
 )
+endif(WITH_MYSQL)
 
 install(TARGETS 54_departure_boards DESTINATION lib)

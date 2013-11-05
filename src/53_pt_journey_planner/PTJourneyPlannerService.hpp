@@ -57,6 +57,11 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace messages
+	{
+		class CustomBroadcastPoint;
+	}
+
 	namespace pt_website
 	{
 		class HourPeriod;
@@ -109,6 +114,7 @@ namespace synthese
 			static const std::string PARAMETER_CONFIG_ID;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
 			static const std::string PARAMETER_APPROACH_SPEED;
+			static const std::string PARAMETER_MAX_APPROACH_DISTANCE;
 			static const std::string PARAMETER_MAX_DEPTH;
 			static const std::string PARAMETER_DEPARTURE_CITY_TEXT;
 			static const std::string PARAMETER_ARRIVAL_CITY_TEXT;
@@ -130,6 +136,7 @@ namespace synthese
 			static const std::string PARAMETER_DEPARTURE_PLACE_XY;
 			static const std::string PARAMETER_ARRIVAL_PLACE_XY;
 			static const std::string PARAMETER_INVERT_XY;
+			static const std::string PARAMETER_CONCATENATE_CONTIGUOUS_FOOT_LEGS;
 			static const std::string PARAMETER_SHOW_COORDINATES;
 			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
@@ -137,6 +144,7 @@ namespace synthese
 			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 			static const std::string PARAMETER_FARE_CALCULATION;
+			static const std::string PARAMETER_BROADCAST_POINT_ID;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
@@ -280,6 +288,7 @@ namespace synthese
 				static const std::string DATA_BIKE_PLACES_NUMBER;
 				static const std::string DATA_CONTINUOUS_SERVICE_WAITING;
 				static const std::string DATA_WKT;
+				static const std::string TAG_LINE;
 			//@}
 
 			//! @name Result row
@@ -321,6 +330,9 @@ namespace synthese
 				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
 				std::string									_outputFormat;
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
+				bool _concatenateContiguousFootLegs;
+				vector<string> _vectMad;
+				const messages::CustomBroadcastPoint* _broadcastPoint;
 			//@}
 
 			//! @name Pages
@@ -494,7 +506,8 @@ namespace synthese
 				const geography::Place& arrivalPlace,
 				boost::logic::tribool handicappedFilter,
 				boost::logic::tribool bikeFilter,
-				bool isTheLast
+				bool isTheLast,
+				util::ParametersMap messagesOnBroadCastPoint
 			) const;
 
 
@@ -541,7 +554,8 @@ namespace synthese
 				const road::Road* road,
 				const graph::Vertex& departureVertex,
 				const graph::Vertex& arrivalVertex,
-				bool isFirstFoot
+				bool isFirstFoot,
+				bool concatenatedFootLegs
 			) const;
 
 
@@ -564,7 +578,8 @@ namespace synthese
 				boost::posix_time::time_duration continuousServiceRange,
 				boost::logic::tribool handicappedFilterStatus,
 				boost::logic::tribool bikeFilterStatus,
-				bool color
+				bool color,
+				util::ParametersMap messagesOnBroadCastPoint
 			) const;
 		};
 }	}

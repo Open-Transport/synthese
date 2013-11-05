@@ -9,6 +9,7 @@
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
+#include "WebsiteRankCleanupAction.hpp"
 
 #include "AddService.hpp"
 #include "BitAndFunction.hpp"
@@ -118,6 +119,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::WebPageLinkAddAction::integrate();
 	synthese::cms::WebPageLinkRemoveAction::integrate();
 	synthese::cms::WebPageMoveAction::integrate();
+	synthese::cms::WebsiteRankCleanupAction::integrate();
 
 	synthese::cms::CMSInstallRight::integrate();
 	synthese::cms::CMSRight::integrate();

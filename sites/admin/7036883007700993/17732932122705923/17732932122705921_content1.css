@@ -145,10 +145,10 @@ table.adminresults, table.propertysheet {margin-top:0.4em; margin-left:30px;  bo
 
 /* MODULE ICONS : TO BE MOVED INTO MODULE SPECIFIC STYLESHEETS */
 
-li.broadcastpoint { background-image:url(building.png); }  
-li.folder { background-image:url(folder.png);  }  
-li.display { background-image:url(monitor.png); }  
-li.log { background-image:url(book_open.png); }  
+li.broadcastpoint { background-image:url(/admin/img/building.png); }  
+li.folder { background-image:url(/admin/img/folder.png);  }  
+li.display { background-image:url(/admin/img/monitor.png); }  
+li.log { background-image:url(/admin/img/book_open.png); }  
 
 #calls { text-align:right; padding-right:5px; }
 

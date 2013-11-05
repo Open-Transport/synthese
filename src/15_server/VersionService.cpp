@@ -27,6 +27,8 @@
 #include "Request.h"
 #include "ServerModule.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 
 namespace synthese
@@ -43,6 +45,7 @@ namespace synthese
 		const string VersionService::ATTR_VERSION = "version";
 		const string VersionService::ATTR_REVISION = "revision";
 		const string VersionService::ATTR_BUILD_DATE = "build_date";
+		const string VersionService::ATTR_BRANCH = "branch";
 		
 
 
@@ -68,6 +71,17 @@ namespace synthese
 			map.insert(ATTR_VERSION, ServerModule::VERSION);
 			map.insert(ATTR_REVISION, ServerModule::REVISION);
 			map.insert(ATTR_BUILD_DATE, ServerModule::BUILD_DATE);
+			std::vector<std::string> urlVector;
+			boost::algorithm::split(urlVector, ServerModule::SYNTHESE_URL, boost::is_any_of("/"));
+			if (urlVector.size() > 0)
+			{
+				if (urlVector.at(urlVector.size()-1) == "trunk")
+					map.insert(ATTR_BRANCH, urlVector.at(urlVector.size()-1));
+				else if (urlVector.size() > 1)
+					map.insert(ATTR_BRANCH, urlVector.at(urlVector.size()-2) + "/" + urlVector.at(urlVector.size()-1));
+			}
+			else
+				map.insert(ATTR_BRANCH, "");
 			return map;
 		}
 		

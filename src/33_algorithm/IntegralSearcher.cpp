@@ -389,12 +389,24 @@ namespace synthese
 							if (!currentJourney.empty() &&
 								origin->getKey() != currentJourney.getEndEdge().getFromVertex()->getKey())
 								continue;
+							// Junction should not follow a road path (it may exist a road approach to do the same, junction should always follow PT path)
+							if (!currentJourney.empty() &&
+								dynamic_cast<const Road*>(currentJourney.getEndEdge().getParentPath()))
+								continue;
 						}
 						if(!currentJourney.empty())
 						{
 							const Junction* currentJunction(dynamic_cast<const Junction*>(currentJourney.getEndEdge().getParentPath()));
 							if(currentJunction != NULL &&
-								((_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey() != origin->getKey()))
+								(((_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey()) != origin->getKey()))
+								continue;
+						}
+						const Road* roadApproach(dynamic_cast<const Road*> (&path));
+						if (roadApproach != NULL && !currentJourney.empty())
+						{
+							// Junction should not follow a road path (it may exist a road approach to do the same, junction should always follow PT path)
+							const Junction* currentJunction(dynamic_cast<const Junction*>(currentJourney.getEndEdge().getParentPath()));
+							if(currentJunction != NULL)
 								continue;
 						}
 						while(true)

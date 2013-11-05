@@ -20,7 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DRTArea.hpp"
 #include "JourneyPattern.hpp"
+#include "LineArea.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "Path.h"
 #include "Hub.h"
@@ -37,6 +39,7 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
+using namespace std;
 using namespace synthese::util;
 using namespace synthese::pt;
 using namespace synthese::geography;
@@ -754,6 +757,8 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 
 BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 {
+	Env env;
+
 	JourneyPattern l;
 
 	StopArea p1(0, true);
@@ -806,30 +811,24 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	LineArea ld2DA(0, &l, 3, true, true,0,&d2, true);
 	DesignatedLinePhysicalStop* lNULL(NULL);
 
-	BOOST_CHECK_EQUAL (ld1AD.getSubEdges().size(), 12);
-	const AreaGeneratedLineStop& ld1AD0(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(0)));
-	const AreaGeneratedLineStop& ld1AD1(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(1)));
-	const AreaGeneratedLineStop& ld1AD2(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(2)));
-	const AreaGeneratedLineStop& ld1AD3(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(3)));
-
-	const Edge* firstEdgeWithTransfer(NULL);
-	BOOST_FOREACH(const Edge* edge, ld1AD.getSubEdges())
-	{
-		if(static_cast<const AreaGeneratedLineStop&>(*edge).getPhysicalStop()->getConnectionPlace()->getAllowedConnection())
-		{
-			firstEdgeWithTransfer = static_cast<const AreaGeneratedLineStop*>(edge);
-			break;
-		}
-	}
-
-	l.addEdge(l1D);
+	l1D.link(env);
 
 	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+	{
+		pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> it(s1.getDepartureEdges().equal_range(&l));
+		BOOST_CHECK_EQUAL(s1.getDepartureEdges().count(&l), 1);
+		if(s1.getDepartureEdges().count(&l) == 1)
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().lower_bound(&l)->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().count(&l), 0);
+	}
 
-	l.addEdge(l2D);
+
+	l2D.link(env);
 
 	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
@@ -841,7 +840,17 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	l.addEdge(ld1AD);
+	ld1AD.link(env);
+	const Edge* firstEdgeWithTransfer(NULL);
+	BOOST_FOREACH(const Edge* edge, ld1AD.getSubEdges())
+	{
+		if(static_cast<const AreaGeneratedLineStop&>(*edge).getPhysicalStop()->getConnectionPlace()->getAllowedConnection())
+		{
+			firstEdgeWithTransfer = static_cast<const AreaGeneratedLineStop*>(edge);
+			break;
+		}
+	}
+
 
 	BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
@@ -862,7 +871,47 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	BOOST_CHECK_EQUAL (ld1AD.getSubEdges().at(0)->getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (ld1AD.getSubEdges().at(0)->getPreviousDepartureForFineSteppingOnly(), &l2D);
 
-	l.removeEdge(ld1AD);
+	BOOST_CHECK_EQUAL (ld1AD.getSubEdges().size(), 12);
+	const AreaGeneratedLineStop& ld1AD0(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(0)));
+	const AreaGeneratedLineStop& ld1AD1(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(1)));
+	const AreaGeneratedLineStop& ld1AD2(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(2)));
+	const AreaGeneratedLineStop& ld1AD3(static_cast<const AreaGeneratedLineStop&>(*ld1AD.getSubEdges().at(3)));
+
+	{
+		pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> it(s1.getDepartureEdges().equal_range(&l));
+		BOOST_CHECK_EQUAL(s1.getDepartureEdges().count(&l), 1);
+		if(s1.getDepartureEdges().count(&l) == 1)
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().lower_bound(&l)->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().count(&l), 0);
+	}
+
+	{
+		pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> it(s3.getDepartureEdges().equal_range(&l));
+		BOOST_CHECK_EQUAL(s3.getDepartureEdges().count(&l), 1);
+		if(s3.getDepartureEdges().count(&l) == 1)
+		{
+			BOOST_CHECK(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second));
+			if(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second))
+			{
+				BOOST_CHECK_EQUAL(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second)->getLineArea(), &ld1AD);
+			}
+		}
+		BOOST_CHECK_EQUAL(s3.getArrivalEdges().count(&l), 1);
+		{
+			BOOST_CHECK(dynamic_cast<const AreaGeneratedLineStop*>(s3.getDepartureEdges().lower_bound(&l)->second));
+			if(dynamic_cast<const AreaGeneratedLineStop*>(s3.getArrivalEdges().lower_bound(&l)->second))
+			{
+				BOOST_CHECK_EQUAL(dynamic_cast<const AreaGeneratedLineStop*>(s3.getArrivalEdges().lower_bound(&l)->second)->getLineArea(), &ld1AD);
+			}
+		}
+	}
+
+	ld1AD.unlink();
+
+	BOOST_CHECK_EQUAL(s3.getDepartureEdges().count(&l), 0);
+	BOOST_CHECK_EQUAL(s3.getArrivalEdges().count(&l), 0);
 
 	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
 	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
@@ -874,6 +923,100 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
 
-	l.addEdge(ld2DA);
+	ld2DA.link(env);
+	ld1AD.link(env);
+
+
+	// Area 
+	{
+		JourneyPattern l;
+
+		StopArea p1(0, true);
+		StopArea p2(0, false);
+		StopArea p3(0, false);
+		StopArea p4(0, false);
+		StopArea p5(0, true);
+		StopArea p6(0, true);
+		StopArea p7(0, false);
+		StopArea p8(0, false);
+
+		StopPoint s1(1, "s1", &p1);
+		p1.addPhysicalStop(s1);
+		StopPoint s2(2, "s2", &p2);
+		p2.addPhysicalStop(s2);
+		StopPoint s3(3, "s3", &p3);
+		p3.addPhysicalStop(s3);
+		StopPoint s41(41, "s41", &p4);
+		p4.addPhysicalStop(s41);
+		StopPoint s42(42, "s42", &p4);
+		p4.addPhysicalStop(s42);
+		StopPoint s5(5, "s5", &p5);
+		p5.addPhysicalStop(s5);
+		StopPoint s61(61, "s61", &p6);
+		p6.addPhysicalStop(s61);
+		StopPoint s62(62, "s62", &p6);
+		p6.addPhysicalStop(s62);
+		StopPoint s7(7, "s7", &p7);
+		p7.addPhysicalStop(s7);
+		StopPoint s8(8, "s8", &p8);
+		p8.addPhysicalStop(s8);
+
+
+		DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1);
+		DesignatedLinePhysicalStop l2AD(0, &l, 1, true, true,0,&s2);
+		DesignatedLinePhysicalStop l6A(0, &l, 3, false, true,0,&s61);
+		DesignatedLinePhysicalStop* lNULL(NULL);
+
+		l1D.link(env);
+		l2AD.link(env);
+
+
+		{
+			DRTArea a345;
+			Stops::Type stops;
+			stops.insert(&p3);
+			stops.insert(&p4);
+			stops.insert(&p5);
+			a345.set<Stops>(stops);
+			LineArea l345AD(0, &l, 2, true, true, 0, &a345);
+			l345AD.link(env);
+
+			l6A.link(env);
+
+			BOOST_CHECK_EQUAL(l345AD.getSubEdges().size(), 8);
+
+			l345AD.unlink();
+
+			BOOST_CHECK_EQUAL (l2AD.getPrevious(), &l1D);
+			BOOST_CHECK_EQUAL (l2AD.getNext(), &l6A);
+			BOOST_CHECK_EQUAL (l2AD.getFollowingConnectionArrival(), &l6A);
+			BOOST_CHECK_EQUAL (l2AD.getFollowingArrivalForFineSteppingOnly(), &l6A);
+			BOOST_CHECK_EQUAL (l2AD.getPreviousConnectionDeparture(), &l1D);
+			BOOST_CHECK_EQUAL (l2AD.getPreviousDepartureForFineSteppingOnly(), &l1D);
+
+			BOOST_CHECK_EQUAL (l6A.getPrevious(), &l2AD);
+			BOOST_CHECK_EQUAL (l6A.getNext(), lNULL);
+			BOOST_CHECK_EQUAL (l6A.getFollowingConnectionArrival(), lNULL);
+			BOOST_CHECK_EQUAL (l6A.getFollowingArrivalForFineSteppingOnly(), lNULL);
+			BOOST_CHECK_EQUAL (l6A.getPreviousConnectionDeparture(), &l1D);
+			BOOST_CHECK_EQUAL (l6A.getPreviousDepartureForFineSteppingOnly(), &l2AD);
+
+		}
+
+		{
+			DRTArea a345;
+			Stops::Type stops;
+			stops.insert(&p3);
+			stops.insert(&p4);
+			stops.insert(&p5);
+			a345.set<Stops>(stops);
+			LineArea l345AD(0, &l, 2, true, true, 0, &a345);
+			l345AD.link(env);
+
+			BOOST_CHECK_EQUAL(l345AD.getSubEdges().size(), 8);
+
+			l345AD.unlink();
+		}
+	}
 }
 

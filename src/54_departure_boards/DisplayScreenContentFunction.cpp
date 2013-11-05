@@ -48,10 +48,14 @@
 #include "RoadModule.h"
 #include "PTUseRule.h"
 #include "Destination.hpp"
+#ifdef __gnu_linux__
+	#include "Connector.hpp"
+#endif
 #include "RoutePlanningTableGenerator.h"
 #include "ServerModule.h"
 #include "InterfacePageException.h"
 #include "MimeTypes.hpp"
+#include "TransportNetwork.h"
 
 #include <sstream>
 
@@ -108,6 +112,7 @@ namespace synthese
 
 		const string DisplayScreenContentFunction::DATA_STOP_ID("stop_id");
 		const string DisplayScreenContentFunction::DATA_OPERATOR_CODE("operatorCode");
+		const string DisplayScreenContentFunction::DATA_NETWORK_NAME("networkName");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_ID("stop_area_id");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_NAME("stop_area_name");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_CITY_NAME("stop_area_city_name");
@@ -157,6 +162,16 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_ROW_PAGE_ID("row_page_id");
 		const string DisplayScreenContentFunction::PARAMETER_DESTINATION_PAGE_ID("destination_page_id");
 		const string DisplayScreenContentFunction::PARAMETER_TRANSFER_DESTINATION_PAGE_ID("transfer_destination_page_id");
+
+		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER("data_source_name_filter");
+		const string DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION("use_sae_direct_connection");
+
+		const string DisplayScreenContentFunction::PARAMETER_STOPS_LIST("stops_list");
+
+		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
+
+		const string PIPO_KEY("00");
+		vector<string> DisplayScreenContentFunction::_SAELine;
 
 		FunctionAPI DisplayScreenContentFunction::getAPI() const
 		{
@@ -219,7 +234,14 @@ namespace synthese
 						  "'with_forced_destinations_method', 'route_planning' or "
 						  "'display_children_only'. The default is 'standard_method'",
 						  false);
-
+			api.addParams(DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER,
+						  "Specify the datasource stops and lines you want to see in the answer",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION,
+						  "Specify if SAE Direct Connection is needed for RealTime, "
+						  "this will open unix sockets to a MySQL BDSI INEO server. \n"
+						  "Works only on Linux",
+						  false);
 			return api;
 		}
 
@@ -251,6 +273,10 @@ namespace synthese
 			if(_rollingStockFilter.get() != NULL)
 			{
 				map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
+			}
+			if(_dataSourceName)
+			{
+				map.insert(PARAMETER_DATA_SOURCE_NAME_FILTER, *_dataSourceName);
 			}
 			return map;
 		}
@@ -375,7 +401,52 @@ namespace synthese
 						stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
 						screen->setStops(stopsFilter);
 					}
+					// 5 by id list
+					else if(!map.getDefault<string>(PARAMETER_STOPS_LIST).empty())
+					{
+						string stopsStr(map.getDefault<string>(PARAMETER_STOPS_LIST));
+						try
+						{
+							if(!stopsStr.empty())
+							{
+								vector<string> stopsVect;
+								split(stopsVect, stopsStr, is_any_of(",; "));
 
+								screen->setAllPhysicalStopsDisplayed(false);
+								ArrivalDepartureTableGenerator::PhysicalStops stopsFilter;
+
+								BOOST_FOREACH(string& stopItem, stopsVect)
+								{
+									RegistryKeyType stopId = lexical_cast<RegistryKeyType>(stopItem);
+									if(decodeTableId(stopId) == StopPointTableSync::TABLE.ID)
+									{
+										boost::shared_ptr<const StopPoint> stop(
+											Env::GetOfficialEnv().get<StopPoint>(stopId)
+										);
+										screen->setDisplayedPlace(stop->getConnectionPlace());
+										stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
+									}
+									else if (decodeTableId(stopId) == StopAreaTableSync::TABLE.ID)
+									{
+										boost::shared_ptr<const StopArea> stop(
+											Env::GetOfficialEnv().get<StopArea>(stopId)
+										);
+										BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stop->getPhysicalStops())
+										{
+											const StopPoint& stop(*itStop.second);
+											screen->setDisplayedPlace(stop.getConnectionPlace());
+											stopsFilter.insert(make_pair(stop.getKey(), &stop));
+										}
+									}
+								}
+								screen->setStops(stopsFilter);
+							}
+						}
+						catch(bad_lexical_cast&)
+						{
+							throw RequestException("Stops List is unreadable");
+						}
+					}
 					// 3.2 by operator code
 					//4.1 by operator code
 					else if(!map.getDefault<string>(PARAMETER_OPERATOR_CODE).empty())
@@ -446,6 +517,19 @@ namespace synthese
 						throw RequestException("No such RollingStockFilter");
 					}
 
+					// Check if need to use SAE RealTime Direct Connection
+					_useSAEDirectConnection = false;
+					optional<string> rtStr(map.getOptional<string>(PARAMETER_USE_SAE_DIRECT_CONNECTION));
+					if(rtStr && (*rtStr) == "1")
+					{
+					#ifdef __gnu_linux__
+						_useSAEDirectConnection = true;
+					#else
+						throw RequestException("SAE Direct Connection works only on Linux platforms");
+					#endif
+					}
+
+					
 					screen->setType(_type.get());
 					//If request contains an interface : build a screen, else prepare custom xml answer
 					optional<RegistryKeyType> idReg(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
@@ -460,7 +544,7 @@ namespace synthese
 							throw RequestException("No such screen type");
 						}
 					}
-					else if(_mainPage.get())
+					else if(_mainPage.get() && !_useSAEDirectConnection)
 					{
 						_type->setDisplayMainPage(_mainPage.get());
 						_type->setDisplayRowPage(_rowPage.get());
@@ -505,6 +589,8 @@ namespace synthese
 			{
 				throw RequestException("Physical stop not found "+ e.getMessage());
 			}
+
+			_dataSourceName = map.getOptional<string>(PARAMETER_DATA_SOURCE_NAME_FILTER);
 		}
 
 		void DisplayScreenContentFunction::concatXMLResult(
@@ -517,9 +603,12 @@ namespace synthese
 			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
 
 			//Here we got our service !
+			//TODO: check if service schedules are realtime in the !_useSAEDirectConnection case
+			//(Instead of saying "yes" every time)
 			stream <<"<journey routeId=\""<< journeyPattern->getKey() <<
 				"\" dateTime=\""    << servicePointer.getDepartureDateTime() <<
 				"\" blink=\"" << "0" <<
+				"\" "<< DATA_IS_REAL_TIME <<"=\"" << (_useSAEDirectConnection ? "no" : "yes") <<
 				"\">";
 
 			stream << "<stop id=\"" << stop->getKey() <<
@@ -551,6 +640,7 @@ namespace synthese
 					"\" shortName=\"" << commercialLine->getShortName() <<
 					"\" longName=\""  << commercialLine->getLongName() <<
 					"\" color=\""     << commercialLine->getColor() <<
+					"\" xmlColor=\""  << commercialLine->getColor()->toString() <<
 					"\" style=\""     << commercialLine->getStyle() <<
 					"\" image=\""     << commercialLine->getImage() <<
 					"\" direction=\"" << (
@@ -589,7 +679,169 @@ namespace synthese
 			stream << "</journey>";
 		}
 
+		struct MapValue
+		{
+			vector<DisplayScreenContentFunction::ServiceRealTime> serviceRealTimeVect;
+			vector<graph::ServicePointer> servicePointerVect;
+		};	
 
+		// RETURN AN ITERATOR FOR THE FIRST SAE SERVICE AFTER SQL REQUEST
+		// but if it reached the maximum number of display => break
+		map<long long, MapValue>::iterator findFirstRealTime(
+				map<long long, MapValue> &servicePointerAll,
+				int NbDisplayMin
+		)
+		{
+			map<long long,MapValue>::iterator it = servicePointerAll.begin();
+
+			for(;it!=servicePointerAll.end();it++)//For each minute
+			{
+				// IF A REAL TIME SERVICE IS FOUNDED OR THE THE NUMBER OF DISPLAY IS REACHED WE RETURN THE POSITION OF THE ITERATOR
+				if(!it->second.serviceRealTimeVect.empty() || distance(it, servicePointerAll.end()) <= NbDisplayMin)
+					return it;
+			}
+
+			return it;
+		}
+
+		void DisplayScreenContentFunction::concatXMLResultRealTime(
+				std::ostream& stream,
+				ServiceRealTime& serviceReal
+		) const {
+			// DISPLAY RESULT
+			stream <<"<journey routeId=\"" << PIPO_KEY <<
+					"\" dateTime=\"" << serviceReal.date <<
+					"\" blink=\"" << "0" <<
+					"\" "<< DATA_IS_REAL_TIME <<"=\"" << serviceReal.Realtime <<
+					"\">";
+
+			// Stop point
+			stream << "<stop id=\"" << PIPO_KEY <<
+					"\" operatorCode=\"" << serviceReal.oc <<
+					"\" name=\"" << serviceReal.arret <<
+					"\" />";
+
+			// Transport Mode
+			stream <<"<transportMode id=\""<< PIPO_KEY <<
+					"\" name=\"" << "bus" <<
+					"\" article=\"" << "le" <<
+					"\" />";
+
+			// Line ID TODO : get Style ?
+			stream <<"<line id=\""<< PIPO_KEY <<
+					"\" creatorId=\"" << PIPO_KEY <<
+					"\" name=\"" << serviceReal.nom_ligne <<
+					"\" shortName=\"" << serviceReal.lineShortName <<
+					"\" longName=\"" << "" <<
+					"\" color=\"" << serviceReal.lineColor <<
+					"\" xmlColor=\"" << serviceReal.lineXmlColor <<
+					"\" style=\"" << serviceReal.LineStyle <<
+					"\" network_id=\"" << serviceReal.networkId <<
+					"\" image=\"" << "" <<
+					"\" direction=\"" << "" <<
+					"\" />";
+
+			// Origin
+			stream << "<origin id=\""  << PIPO_KEY <<
+					"\" name=\"" << serviceReal.depart <<
+					"\" cityName=\"" << serviceReal.cityName_begin <<
+					"\" />";
+
+			// Destination
+			stream << "<destination id=\"" << PIPO_KEY <<
+					"\" name=\"" << serviceReal.arrivee <<
+					"\" cityName=\"" << serviceReal.cityName_end <<
+					"\" />";
+
+			// Stop Area
+			stream << "<stopArea id=\""<< PIPO_KEY <<
+					"\" name=\"" << serviceReal.arret <<
+					"\" cityId=\"" << serviceReal.cityId_current <<
+					"\" cityName=\"" << serviceReal.cityName_current <<
+					"\" directionAlias=\"" << "" <<
+					"\" />";
+
+			stream << "</journey>";
+		}
+
+		void DisplayScreenContentFunction::addJourneyToParametersMapRealTime(
+			ParametersMap& pm,
+			ServiceRealTime& serviceReal
+		) const {
+			//Stop Point
+			pm.insert(DATA_STOP_ID, serviceReal.stop_id);
+			pm.insert(DATA_OPERATOR_CODE, serviceReal.oc);
+
+			//StopArea
+			pm.insert(DATA_STOP_AREA_ID, serviceReal.stopAreaId);
+			pm.insert(DATA_STOP_AREA_NAME, serviceReal.arret);
+			pm.insert(DATA_STOP_AREA_CITY_NAME, serviceReal.cityName_current);
+			pm.insert(DATA_STOP_AREA_CITY_ID, serviceReal.cityId_current);
+
+			shared_ptr<ParametersMap> journeyPm(new ParametersMap());
+			journeyPm->insert("route_id", PIPO_KEY);
+			journeyPm->insert("date_time", serviceReal.date);
+			journeyPm->insert("realTime", serviceReal.Realtime);
+
+			shared_ptr<ParametersMap> stopPM(new ParametersMap);
+			stopPM->insert("id", PIPO_KEY);
+			stopPM->insert("operatorCode", serviceReal.oc);
+			stopPM->insert("name", serviceReal.arret);
+			journeyPm->insert("stop", stopPM);
+			
+			shared_ptr<ParametersMap> rsPM(new ParametersMap);
+			rsPM->insert("id", PIPO_KEY);
+			rsPM->insert("name", "bus");
+			rsPM->insert("article", "le");
+			journeyPm->insert("rollingStock", rsPM);
+			
+			shared_ptr<ParametersMap> linePM(new ParametersMap);
+			linePM->insert("id", PIPO_KEY);
+			linePM->insert("creatorId", PIPO_KEY);
+			linePM->insert("name", serviceReal.nom_ligne);
+			linePM->insert("shortName" , serviceReal.lineShortName);
+			linePM->insert("color",serviceReal.lineColor);
+			linePM->insert("xmlcolor",serviceReal.lineXmlColor);
+			linePM->insert("style",serviceReal.LineStyle);
+			linePM->insert("network_id",serviceReal.networkId);
+			
+			journeyPm->insert("line", linePM);
+			
+			shared_ptr<ParametersMap> originPM(new ParametersMap);
+			originPM->insert("id", PIPO_KEY);
+			originPM->insert("name", serviceReal.depart);
+			originPM->insert("cityName", serviceReal.cityName_begin);
+			journeyPm->insert("origin", originPM);
+
+			shared_ptr<ParametersMap> destinationPM(new ParametersMap);
+			destinationPM->insert("id", PIPO_KEY);
+			destinationPM->insert("name", serviceReal.arrivee);
+			destinationPM->insert("cityName", serviceReal.cityName_end);
+			journeyPm->insert("destination", destinationPM);
+
+			shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
+			connPlacePM->insert("id", PIPO_KEY);
+			connPlacePM->insert("name", serviceReal.arret);
+			connPlacePM->insert("cityId", serviceReal.cityId_current);
+			connPlacePM->insert("cityName", serviceReal.cityName_current);
+			journeyPm->insert("stopArea", connPlacePM);
+			pm.insert("stop_name", serviceReal.arret);
+			pm.insert("journey", journeyPm);
+		}
+
+		string formatLineName(string commercialLineName)
+		{
+			string comLineName = commercialLineName;
+
+			// Set lowercase for comparaison
+			std::transform(comLineName.begin(), comLineName.end(), comLineName.begin(), ::tolower);
+
+			// Add zero to line shortName before compare to database value
+			if ((comLineName.length() < 2) || ((comLineName.length() == 2) && (comLineName[1]=='s')))
+				comLineName = "0" + comLineName;
+
+			return comLineName;
+		}
 
 		void DisplayScreenContentFunction::addJourneyToParametersMap(
 			ParametersMap& pm,
@@ -659,7 +911,6 @@ namespace synthese
 
 			pm.insert("journey", journeyPm);
 		}
-
 
 
 		util::ParametersMap DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
@@ -769,6 +1020,7 @@ namespace synthese
 				ParametersMap result;
 				bool isOutputXML = _outputFormat == MimeTypes::XML;
 				AccessParameters ap;
+				map<long long, MapValue> servicePointerAll;
 
 				if(isOutputXML)
 				{

@@ -54,23 +54,32 @@ namespace synthese
 	CLASS_DEFINITION(PublicPlace, "t013_public_places", 13)
 	FIELD_DEFINITION_OF_OBJECT(PublicPlace, "public_place_id", "public_place_ids")
 
+	FIELD_DEFINITION_OF_TYPE(Category, "type", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Details, "details", SQL_TEXT)
+
 	namespace road
 	{
 		const string PublicPlace::DATA_ID = "id";
 		const string PublicPlace::DATA_NAME = "name";
+		const string PublicPlace::DATA_CATEGORY = "type";
+		const string PublicPlace::DATA_DETAILS = "details";
 		const string PublicPlace::DATA_X = "x";
 		const string PublicPlace::DATA_Y = "y";
 
 
 
 		PublicPlace::PublicPlace (
-			util::RegistryKeyType id
+			util::RegistryKeyType id,
+			string category,
+			string details
 		):	Registrable(id),
 			Object<PublicPlace, PublicPlaceSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(NamedPlaceField),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_VALUE_CONSTRUCTOR(Category, category),
+					FIELD_VALUE_CONSTRUCTOR(Details, details),
 					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
 			)	),
 		  NamedPlaceTemplate<PublicPlace>()
@@ -142,6 +151,12 @@ namespace synthese
 			{
 				getCity()->toParametersMap(pm, NULL, prefix + "city_");
 			}
+
+			// Category
+			pm.insert(prefix + DATA_CATEGORY, get<Category>());
+
+			// Details
+			pm.insert(prefix + DATA_DETAILS, get<Details>());
 
 			// Coordinates
 			if(coordinatesSystem && getPoint())

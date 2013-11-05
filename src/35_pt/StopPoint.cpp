@@ -31,6 +31,7 @@
 #include "RoadChunkTableSync.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "CommercialLineTableSync.h"
 #include "ReverseRoadChunk.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
@@ -60,8 +61,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string StopPoint::DATA_ID = "id";
-		const string StopPoint::DATA_NAME = "name";
 		const string StopPoint::DATA_OPERATOR_CODE = "operatorCode";
 		const string StopPoint::DATA_X = "x";
 		const string StopPoint::DATA_Y = "y";
@@ -230,7 +229,7 @@ namespace synthese
 
 		void StopPoint::toParametersMap(
 			util::ParametersMap& pm,
-			bool withStopAreaData /*= true*/,
+			bool withAdditionalParameters /*= true*/,
 			const CoordinatesSystem& coordinatesSystem /*= CoordinatesSystem::GetInstanceCoordinatesSystem()*/,
 			std::string prefix /*= std::string() */
 		) const	{
@@ -245,6 +244,27 @@ namespace synthese
 					dynamic_cast<const StopArea*>(getHub())->getKey() :
 					RegistryKeyType(0)
 			)	);
+
+			// Commercial lines
+			set<string> linesSet;
+			boost::shared_ptr<ParametersMap> linesPm(new ParametersMap);
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
+			{
+				if(dynamic_cast<const LineStop*>(edge.second))
+					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
+			}
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
+			{
+				if(dynamic_cast<const LineStop*>(edge.second))
+					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
+			}
+			BOOST_FOREACH(string line, linesSet)
+			{
+				boost::shared_ptr<ParametersMap> linePm(new ParametersMap);
+				linePm->insert(prefix + CommercialLineTableSync::COL_SHORT_NAME,line);
+				linesPm->insert(prefix + "line",linePm);
+			}
+			pm.insert(prefix + "lines", linesPm);
 
 			// X Y (deprecated)
 			if(hasGeometry())
@@ -269,12 +289,6 @@ namespace synthese
 					string()
 				);
 			}
-
-			// Data source links
-			pm.insert(
-				prefix + StopPointTableSync::COL_OPERATOR_CODE,
-				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
-			);
 
 			// Projected point
 			if(getProjectedPoint().getRoadChunk())
@@ -324,8 +338,6 @@ namespace synthese
 				);
 			}
 
-			pm.insert(prefix + DATA_ID, getKey());
-			pm.insert(prefix + DATA_NAME, getName());
 			pm.insert(
 				prefix + StopPointTableSync::COL_PLACEID,
 				(	dynamic_cast<const StopArea*>(getHub()) ?
@@ -404,11 +416,14 @@ namespace synthese
 			}
 
 			// Stop area data
-			if(withStopAreaData)
+			if(withAdditionalParameters)
 			{
 				boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
 				getConnectionPlace()->toParametersMap(*stopAreaPM, &coordinatesSystem);
 				pm.insert(TAG_STOP_AREA, stopAreaPM);
+
+				// Extended data source links export
+				dataSourceLinksToParametersMap(pm);
 			}
 		}
 

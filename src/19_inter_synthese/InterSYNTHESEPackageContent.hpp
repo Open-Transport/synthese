@@ -55,6 +55,15 @@ namespace synthese
 			std::set<util::RegistryKeyType> _objectsToRemove;
 			typedef std::deque<const util::Registrable*> ObjectsToSave;
 			ObjectsToSave _objectsToSave;
+			std::vector<util::RegistryKeyType> _orderedObjectsToRemove;
+
+			void _prepareObjectsToRemove(
+				const boost::property_tree::ptree& node
+			);
+
+			void _prepareObjectsToRemoveRecursion(
+				const util::Registrable& object
+			);
 
 			Objects::Type _loadObjects(
 				const boost::property_tree::ptree& node,
@@ -65,6 +74,16 @@ namespace synthese
 
 			void _parseAndLoad(
 				const std::string& s,
+				boost::optional<const impex::Importer&> importer
+			);
+
+			void _deleteObjectsToRemove(
+				const boost::property_tree::ptree& node,
+				boost::optional<const impex::Importer&> importer
+			);
+
+			void _deleteObjectsToRemoveRecursive(
+				const util::Registrable& object,
 				boost::optional<const impex::Importer&> importer
 			);
 

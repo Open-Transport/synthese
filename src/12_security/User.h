@@ -78,6 +78,8 @@ namespace synthese
 			std::string		_country;
 			std::string		_email;
 			std::string		_phone;
+			boost::gregorian::date		_creationDate;
+			util::RegistryKeyType		_creatorId;
 			bool			_isConnectionAllowed;
 			boost::gregorian::date	_birthDate;
 			const Language*	_language;
@@ -103,6 +105,8 @@ namespace synthese
 				void setCountry(const std::string& country);
 				void setEMail(const std::string& email);
 				void setPhone(const std::string& phone);
+				void setCreationDate(const boost::gregorian::date& date);
+				void setCreatorId(util::RegistryKeyType creatorId) { _creatorId = creatorId; }
 				void setConnectionAllowed(bool value);
 				void setBirthDate(const boost::gregorian::date& date);
 				void setRandomPassword();
@@ -131,6 +135,8 @@ namespace synthese
 				const std::string&	getCountry()			const;
 				const std::string&	getEMail()				const;
 				const std::string&	getPhone()				const;
+				const boost::gregorian::date&	getCreationDate()		const;
+				util::RegistryKeyType	getCreatorId()		const { return _creatorId; }
 				bool				getConnectionAllowed()	const;
 				const boost::gregorian::date&	getBirthDate()			const;
 				const Language*		getLanguage() const { return _language; }

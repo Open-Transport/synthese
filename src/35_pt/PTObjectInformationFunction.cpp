@@ -171,6 +171,10 @@ namespace synthese
 				{
 					stream << _route->getDestination()->getConnectionPlace()->getName();
 				}
+				else if(_info == "name" && _route->getEdges().size() > 1)
+				{
+					stream << _route->getName();
+				}
 			}
 			else if(_stop.get())
 			{

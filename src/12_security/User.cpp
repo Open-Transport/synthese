@@ -194,6 +194,11 @@ namespace synthese
 			_phone = phone;
 		}
 
+		void User::setCreationDate( const boost::gregorian::date& creationDate )
+		{
+			_creationDate = creationDate;
+		}
+
 		const std::string& User::getAddress() const
 		{
 			return _address;
@@ -222,6 +227,11 @@ namespace synthese
 		const std::string& User::getPhone() const
 		{
 			return _phone;
+		}
+
+		const boost::gregorian::date& User::getCreationDate() const
+		{
+			return _creationDate;
 		}
 
 		void User::setConnectionAllowed( bool value )
@@ -282,6 +292,11 @@ namespace synthese
 			if(_profile)
 			{
 				pm.insert("profile_id", _profile->getKey());
+			}
+			pm.insert("creation_date", _creationDate);
+			if(_creatorId)
+			{
+				pm.insert("creator_id", _creatorId);
 			}
 		}
 	}

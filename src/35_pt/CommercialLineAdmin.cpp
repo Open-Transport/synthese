@@ -394,7 +394,7 @@ namespace synthese
 
 					stream <<
 						"<p class=\"info\">Les contrôle de dates sont désactivées par défaut.<br /><br />" <<
-						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), ICON) <<
+						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), "/admin/img/" + ICON) <<
 						"</p>"
 					;
 				}
@@ -443,7 +443,7 @@ namespace synthese
 							removeRequest.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer la règle de non concurrence avec la ligne " + rule->get<PriorityLine>()->getShortName() + " ?",
-							"lock_delete.png"
+							"/admin/img/lock_delete.png"
 						)
 					;
 				}

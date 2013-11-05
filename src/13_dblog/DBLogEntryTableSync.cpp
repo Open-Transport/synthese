@@ -299,6 +299,20 @@ namespace synthese
 
 
 
+		DBLogEntryTableSync::SearchResult DBLogEntryTableSync::SearchByUser(
+			Env& env,
+			util::RegistryKeyType objectId,
+			LinkLevel linkLevel
+		){
+			SelectQuery<DBLogEntryTableSync> query;
+
+			if (objectId)
+				query.addWhereField(COL_OBJECT_ID, objectId);
+			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
 		void DBLogEntryTableSync::Purge( const std::string& logKey, const ptime& endDate )
 		{
 			DeleteQuery<DBLogEntryTableSync> query;

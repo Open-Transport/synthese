@@ -29,8 +29,12 @@ PublicPlaceEntranceCreationAction.cpp
 PublicPlaceEntranceCreationAction.hpp
 PublicPlaceEntranceTableSync.cpp
 PublicPlaceEntranceTableSync.hpp
+PublicPlacesListService.cpp
+PublicPlacesListService.hpp
 PublicPlaceTableSync.cpp
 PublicPlaceTableSync.h
+ProjectAllPublicPlacesAction.cpp
+ProjectAllPublicPlacesAction.hpp
 ReachableFromCrossing.hpp
 ReverseRoadChunk.cpp
 ReverseRoadChunk.hpp

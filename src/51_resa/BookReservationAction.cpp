@@ -23,6 +23,7 @@
 #include "BookReservationAction.h"
 
 #include "ActionException.h"
+#include "ClientException.h"
 #include "AlgorithmLogger.hpp"
 #include "City.h"
 #include "CommercialLine.h"
@@ -422,6 +423,75 @@ namespace synthese
 				UserTableSync::Save(_customer.get());
 
 				ResaDBLog::AddCustomerCreationEntry(*request.getSession(), *_customer);
+			}
+
+			/* Before creating new reservation, some checks are done here:
+			 * For every customer who want to create a new reservation
+			 * check the seat number is correct
+			 * check the same reservation wasn't alerady sent
+			 */
+			if ( _customer && request.getSession()->hasProfile() && 
+				_customer->getKey() == request.getSession()->getUser()->getKey() &&
+				request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) &&
+				!request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE))
+			{
+				ptime minTime(second_clock::local_time());
+				minTime -= seconds(20);
+				ptime now(second_clock::local_time());
+
+				ReservationTransactionTableSync::SearchResult check(ReservationTransactionTableSync::SearchByUser(
+					*_env, _customer->getKey(), minTime, now, false));
+
+				if (check.size() > 0)
+					throw ClientException("Reservation already sent");
+				
+				if (ResaModule::GetMaxSeats() > 0 && _seatsNumber > ResaModule::GetMaxSeats())
+				{
+					throw ClientException("Maximum number of seats reached");
+				}
+
+				/* Check customer haven't sent a reservation on same service before registering the new one */
+				if(!_journey.empty())
+				{
+					for(Journey::ServiceUses::const_iterator itSu(_journey.getServiceUses().begin());
+						itSu != _journey.getServiceUses().end();
+						++itSu
+					){
+
+						const ServicePointer& su(*itSu);
+
+						assert(su.getService() != NULL);
+						assert(su.getDepartureEdge() != NULL);
+						assert(su.getDepartureEdge()->getHub() != NULL);
+						assert(su.getArrivalEdge() != NULL);
+						assert(su.getArrivalEdge()->getHub() != NULL);
+
+						ReservationTableSync::SearchResult reservations(ReservationTableSync::SearchByService(
+							Env::GetOfficialEnv(), su.getService()->getKey(),
+							boost::optional<boost::posix_time::ptime>(su.getDepartureDateTime()),
+							boost::optional<boost::posix_time::ptime>(su.getArrivalDateTime()), UP_LINKS_LOAD_LEVEL));
+			
+						BOOST_FOREACH(ReservationTableSync::SearchResult::value_type& reservation, reservations)
+						{
+							User* customer = UserTableSync::GetEditable(reservation->getTransaction()->getCustomerUserId(), 
+								Env::GetOfficialEnv()).get();
+
+							if ((reservation->getServiceId() == su.getService()->getKey()) &&
+								(customer->getKey() == _customer->getKey()) &&
+								(reservation->getDepartureTime() == su.getDepartureDateTime() &&
+								 reservation->getArrivalTime() == su.getArrivalDateTime())
+							){
+								const ReservationStatus& status(reservation->getStatus());
+	
+								if (status != CANCELLED && status != CANCELLATION_TO_ACK && 
+									status != CANCELLED_AFTER_DELAY && status != ACKNOWLEDGED_CANCELLED_AFTER_DELAY
+								){
+									throw ClientException("Reservation on this service already sent.");
+								}
+							}
+						}		
+					}
+				}
 			}
 
 			// New ReservationTransaction

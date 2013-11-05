@@ -323,19 +323,16 @@ namespace synthese
 							make_pair(id, isp)
 						);
 					}
-					else
-					{
-						// Creation or update
-						_createOrUpdateStop(
-							_stopPoints,
-							id,
-							name,
-							optional<const RuleUser::Rules&>(),
-							stopArea,
-							point.get(),
-							dataSource
-						);
-					}
+					// Creation or update
+					_createOrUpdateStop(
+						_stopPoints,
+						id,
+						name,
+						optional<const RuleUser::Rules&>(),
+						stopArea,
+						point.get(),
+						dataSource
+					);
 				}
 
 				_exportStopPoints(
@@ -614,6 +611,8 @@ namespace synthese
 								stops,
 								dataSource,
 								true,
+								true,
+								true,
 								true
 						)	);
 
@@ -635,7 +634,11 @@ namespace synthese
 								departures,
 								arrivals,
 								lastTripCode,
-								dataSource
+								dataSource,
+								optional<const string&>(),
+								optional<const RuleUser::Rules&>(),
+								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
+								lastTripCode
 						)	);
 						if(service)
 						{
@@ -1136,8 +1139,6 @@ namespace synthese
 			bool isReservationMandandatory
 		) const
 		{
-			bool passMidnight = false;
-
 			BOOST_FOREACH(const boost::shared_ptr<LineStop>& ls, linestops)
 			{
 				boost::shared_ptr<geos::geom::Point> gp;
@@ -1148,32 +1149,20 @@ namespace synthese
 
 				if (ls->getRankInPath() > 0 && ls->isArrival())
 				{
-					arrival = Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()));
+					arrival = service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 				else
 				{
-					arrival = Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+					arrival = service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 
 				if (ls->getRankInPath()+1 != linestops.size() && ls->isDeparture())
 				{
-					departure = Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+					departure = service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 				else
 				{
-					departure = Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()));
-				}
-
-				// Correct trips over midnight
-				if(arrival.hours() >= 22 || departure.hours() >= 22)
-				passMidnight = true;
-
-				if(passMidnight)
-				{
-					if(arrival.hours() < 12)
-						arrival = arrival + hours(24);
-					if(departure.hours() < 12)
-						departure = departure + hours(24);
+					departure = service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 
 				boost::posix_time::time_duration diff = arrival - departure;
@@ -1201,8 +1190,8 @@ namespace synthese
 						<< departureTimeStr.substr(0, 8) << ","
 						<< ","
 
-						<< (isReservationMandandatory ? "2," : "0,") // pickup_type
-						<< (isReservationMandandatory ? "2," : "0,") // drop_off_type
+						<< (ls->isDepartureAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
+						<< (ls->isArrivalAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
 						<< endl;
 					stopTimesExist = true;
 				}

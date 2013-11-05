@@ -100,6 +100,7 @@ namespace synthese
 		{
 		public:
 			static const std::string TAB_PARAMS;
+			static const std::string TAB_DATASOURCES;
 
 		private:
 			boost::shared_ptr<const Alarm>	_alarm;

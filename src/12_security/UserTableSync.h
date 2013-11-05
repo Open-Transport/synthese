@@ -61,6 +61,8 @@ namespace synthese
 			static const std::string TABLE_COL_COUNTRY;
 			static const std::string TABLE_COL_EMAIL;
 			static const std::string TABLE_COL_PHONE;
+			static const std::string TABLE_COL_CREATION_DATE;
+			static const std::string TABLE_COL_CREATOR_ID;
 			static const std::string COL_LOGIN_AUTHORIZED;
 			static const std::string COL_BIRTH_DATE;
 			static const std::string COL_LANGUAGE;

@@ -134,8 +134,8 @@ namespace synthese
 					std::size_t rankInPath
 				) const;
 
-				virtual const boost::posix_time::time_duration& getDataLastDepartureSchedule(size_t i) const;
-				virtual const boost::posix_time::time_duration& getDataLastArrivalSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration getDataLastDepartureSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration getDataLastArrivalSchedule(size_t i) const;
 
 				virtual void toParametersMap(
 					util::ParametersMap& map,

@@ -44,6 +44,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_SURNAME;
 			static const std::string PARAMETER_NUMBER;
+			static const std::string PARAMETER_PHONE;
 
 		protected:
 			//! \name Page parameters
@@ -51,6 +52,7 @@ namespace synthese
 				boost::optional<std::string> _name;
 				boost::optional<std::string> _surname;
 				size_t						_number;
+				boost::optional<std::string> _phone;
 			//@}
 
 

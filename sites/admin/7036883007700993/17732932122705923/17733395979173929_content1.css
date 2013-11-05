@@ -1,0 +1,156 @@
+.violet {
+	background: purple !important;
+	font-style: normal !important;
+	color: white!important;
+}
+
+.violetclair {
+	background: #b291ff !important;
+	font-style: normal !important;
+	color: white!important;
+}
+
+.rouge { 
+	background: red !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.bleufonce { 
+	background: rgb(0,0,128) !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.vertclair { 
+	background: #00D900 !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.beige { 
+	background: #B35900 !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.bleuclair { 
+	background: #05BDFA !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.vertfonce { 
+	background: #067928 !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.rosefonce { 
+	background: #C03070 !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.rose { 
+	background: #FF84C1 !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.marron { 
+	background: #804000 !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.jaune { 
+	background: #FEEB01 !important;
+	color: black !important;
+	font-style: normal !important;
+	}
+
+.taxi { 
+	background: #FEEB01 !important;
+	color: red !important;
+	font-style: normal !important;
+	}
+
+.orange { 
+	background: orange !important;
+	font-style: normal !important;
+	color: white!important;
+	}
+
+.aero
+{
+	background: #A0A0A0 !important;
+	font-style: normal !important;
+	color: white!important;
+}
+
+table.grosselignetbdepgare td.aero
+{
+	font-size: 20pt !important;
+}
+
+table.ligne td.aero
+{
+	font-size: 6pt !important;
+}
+
+.carter
+{
+	background: #A0A0A0 !important;
+	font-style: italic !important;
+	color: white!important;
+}
+
+.carmip
+{
+	background: red !important;
+	color: yellow !important;
+	font-style: italic !important;
+}
+
+.aveyron
+{
+	background: darkblue !important;
+	color: gold !important;
+	font-style: normal !important;
+}
+
+.tarn
+{
+	background: white !important;
+	color: green !important;
+	font-style: normal !important;
+}
+
+table.grosselignetbdepgare td.carter
+{
+	font-size: 22pt !important;
+}
+
+table.ligne td.carter
+{
+	font-size: 8pt !important;
+}
+
+table.grosselignetbdepgare td.carter span.petitter
+{
+	font-size: 15pt !important;
+}
+
+.nuit { background: gray !important; color: #000080 !important; font-style: normal !important; }
+.gris { background: #A0A0A0 !important; font-style: normal !important; }
+.blanc { background: white !important; font-style: normal !important; }
+.ter { background: #A0A0A0 !important; font-style: italic !important; }
+.tgv { background: #A0A0A0 !important; font-family: sncftwo !important; font-style: normal !important; font-weight: 100 !important; }
+table.ligne td.tgv { font-size: 18pt !important; }
+table.grosselignetbdepgare td.tgv { font-size: 65pt !important; line-height: 45pt; }
+
+.jaune_kaki { background:#00D900 !important;  font-style:normal !important; color:gold; }
+
+/* for load control purpose : do not remove or modify following element, do not place any element after it */
+#stylefin { }

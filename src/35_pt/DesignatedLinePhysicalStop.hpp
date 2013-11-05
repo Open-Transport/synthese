@@ -52,6 +52,8 @@ namespace synthese
 				bool reservationNeeded = true
 			);
 
+			~DesignatedLinePhysicalStop();
+
 			virtual bool getScheduleInput()	const { return _scheduleInput; }
 			virtual bool getReservationNeeded() const { return _reservationNeeded; }
 
@@ -64,6 +66,8 @@ namespace synthese
 				boost::logic::tribool withFiles = boost::logic::indeterminate,
 				std::string prefix = std::string()
 			) const;
+
+			virtual void _unlink();
 		};
 	}
 }

@@ -22,8 +22,10 @@
 
 #include "DesignatedLinePhysicalStop.hpp"
 
-#include "JourneyPattern.hpp"
+#include "Hub.h"
+#include "JourneyPatternCopy.hpp"
 #include "LineStopTableSync.h"
+#include "PTModule.h"
 #include "StopPoint.hpp"
 
 #include <geos/geom/LineString.h>
@@ -52,6 +54,53 @@ namespace synthese
 			_scheduleInput(scheduleInput),
 			_reservationNeeded(reservationNeeded)
 		{}
+
+		DesignatedLinePhysicalStop::~DesignatedLinePhysicalStop()
+		{
+			if(!getLine())
+				return;
+			// Collecting all line stops to unlink including journey pattern copies
+			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
+			ToClean toClean;
+			toClean.push_back(make_pair(getLine(), this));
+			BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+			{
+				if (copy->getLineStop(getRankInPath()))
+				{
+					toClean.push_back(
+						make_pair(
+							copy,
+							const_cast<LinePhysicalStop*>(static_cast<const LinePhysicalStop*>(
+								copy->getEdge(getRankInPath()))
+							)
+					)	);
+				}
+			}
+			
+			BOOST_FOREACH(const ToClean::value_type& it, toClean)
+			{
+				// Removing edge from journey pattern
+				it.first->removeEdge(*it.second);
+				
+				// Removing edge from stop point
+				if (getPhysicalStop())
+				{
+					if(it.second->getIsArrival())
+					{
+						getPhysicalStop()->removeArrivalEdge(it.second);
+					}
+					if(it.second->getIsDeparture())
+					{
+						getPhysicalStop()->removeDepartureEdge(it.second);
+					}
+				}
+				
+				if(it.second != this)
+				{
+					delete it.second;
+				}
+			}
+		}
 
 
 
@@ -117,5 +166,58 @@ namespace synthese
 			{
 				pm.insert(prefix + TABLE_COL_GEOMETRY, string());
 			}
+		}
+
+
+
+		void DesignatedLinePhysicalStop::_unlink()
+		{
+			StopPoint* stop(NULL);
+            if (getPhysicalStop())
+                stop = getPhysicalStop();
+
+			// Collecting all line stops to unlink including journey pattern copies
+			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
+			ToClean toClean;
+			BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
+			{
+				toClean.push_back(
+					make_pair(
+						copy,
+						const_cast<LinePhysicalStop*>(static_cast<const LinePhysicalStop*>(
+							copy->getEdge(getRankInPath()))
+						)
+				)	);
+			}
+
+			BOOST_FOREACH(const ToClean::value_type& it, toClean)
+			{
+				// Removing edge from journey pattern
+				it.first->removeEdge(*it.second);
+
+				// Removing edge from stop point
+				if (stop)
+				{
+					if(it.second->getIsArrival())
+					{
+						stop->removeArrivalEdge(it.second);
+					}
+					if(it.second->getIsDeparture())
+					{
+						stop->removeDepartureEdge(it.second);
+					}
+				}
+
+				it.second->setFromVertex(NULL);
+			}
+
+			
+			// Useful transfer calculation
+			if(stop)
+			{
+				stop->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+			}
+
+			clearPhysicalStopLinks();
 		}
 }	}

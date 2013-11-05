@@ -62,8 +62,6 @@ namespace synthese
 			typedef util::Registry<StopPoint>	Registry;
 
 		private:
-			static const std::string DATA_ID;
-			static const std::string DATA_NAME;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
 			static const std::string DATA_OPERATOR_CODE;
@@ -148,7 +146,7 @@ namespace synthese
 				/// @author Hugues Romain
 				void toParametersMap(
 					util::ParametersMap& pm,
-					bool withStopAreaData,
+					bool withAdditionalParameters,
 					const CoordinatesSystem& coordinatesSystem,
 					std::string prefix = std::string()
 				) const;

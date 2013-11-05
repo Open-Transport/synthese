@@ -299,6 +299,32 @@ namespace synthese
 			return LoadFromQuery(query, env, linkLevel);
 		}
 
+		
+		
+		StopPointTableSync::SearchResult StopPointTableSync::SearchDistance(
+			StopPoint const& point,
+			Env& env,
+			bool insideSameStopArea,
+			double const& distance,
+			LinkLevel linkLevel
+		){
+			SelectQuery<StopPointTableSync> query;
+			std::stringstream subQuery;
+
+			subQuery << "Glength(GeomFromText('LINESTRING(" << lexical_cast<string>(point.getGeometry()->getX()) << " " 
+				<< lexical_cast<string>(point.getGeometry()->getY()) << ", '||" << "t012_physical_stops.x" 
+				<< "||' '||" << "t012_physical_stops.y" << "||')'))>" << distance 
+				<< " AND " << point.getKey() <<"!=" << "t012_physical_stops.id ";
+			if(insideSameStopArea)
+				subQuery << "AND " << point.getConnectionPlace()->getKey() << "=" << "t012_physical_stops.place_id";
+
+			query.addWhere(
+				SubQueryExpression::Get(subQuery.str())
+			);
+			
+			return LoadFromQuery(query, env, linkLevel);
+		}
+
 
 
 		db::RowsList StopPointTableSync::SearchForAutoComplete(

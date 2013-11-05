@@ -159,6 +159,8 @@ namespace synthese
 				h.push_back(make_pair(string(), "Prénom"));
 				h.push_back(make_pair(string(), "Téléphone"));
 				h.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
+				h.push_back(make_pair(string(), "Date de création"));
+				h.push_back(make_pair(string(), "Créateur"));
 				h.push_back(make_pair(string(), "Action"));
 
 				ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, users);
@@ -175,6 +177,22 @@ namespace synthese
 					stream << t.col() << user->getSurname();
 					stream << t.col() << user->getPhone();
 					stream << t.col() << user->getLogin();
+
+					if(to_iso_extended_string(user->getCreationDate())=="not-a-date-time")
+						stream << t.col() << "Inconnue";
+					else
+						stream << t.col() << to_iso_extended_string(user->getCreationDate());
+
+					if (user != NULL && user->getCreatorId() != 0)
+					{
+						boost::shared_ptr<const User> creator = UserTableSync::Get(user->getCreatorId(), Env::GetOfficialEnv());
+						if (creator != NULL)
+							stream << t.col() << creator->getLogin();
+						else
+							stream << t.col() << user->getCreatorId();
+					}
+					else
+						stream << t.col() << "Inconnu";
 
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/user.png");
 				}

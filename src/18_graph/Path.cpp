@@ -357,9 +357,13 @@ namespace synthese
 
 		void Path::markScheduleIndexesUpdateNeeded(bool RTDataOnly)
 		{
-			for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
+			BOOST_FOREACH(const Edges::value_type& edge, _edges)
 			{
-				(*it)->markServiceIndexUpdateNeeded(RTDataOnly);
+				Edge::SubEdges subEdges(edge->getSubEdges());
+				BOOST_FOREACH(Edge::SubEdges::value_type& subEdge, subEdges)
+				{
+					subEdge->markServiceIndexUpdateNeeded(RTDataOnly);
+				}
 			}
 		}
 
@@ -606,8 +610,8 @@ namespace synthese
 				// Previous departure pointers
 				if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed() && firstRealEdge)
 				{
-					Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
-					Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
+					Edge* previousDeparture(firstEdge.getPreviousDepartureForFineSteppingOnly());
+					Edge* previousConnectingDeparture(firstEdge.getPreviousConnectionDeparture());
 
 					{
 						Edge* oldPreviousDeparture(firstRealEdge->getPreviousDepartureForFineSteppingOnly());

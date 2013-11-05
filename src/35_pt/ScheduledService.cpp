@@ -124,15 +124,15 @@ namespace synthese
 			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
-			if(	(getDeparture && presenceDateTime.time_of_day() > timeOfDay) ||
-				(!getDeparture && presenceDateTime.time_of_day() < timeOfDay)
+			if(	(getDeparture && presenceDateTime.time_of_day() > schedule) ||
+				(!getDeparture && presenceDateTime.time_of_day() < schedule)
 			){
 				return ServicePointer();
 			}
 
 			// Initializations
 			const time_duration& departureSchedule(getDepartureSchedule(RTData, 0));
-			ptime actualTime(presenceDateTime.date(), timeOfDay);
+			ptime actualTime(presenceDateTime.date(), schedule);
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
 
@@ -790,5 +790,22 @@ namespace synthese
 			// Clear cache in case of non detected change in external objects (like path edges number)
 			_clearGeneratedSchedules();
 		}
-	}
-}
+
+
+
+		void ScheduledService::unlink()
+		{
+			if(getPath())
+			{
+				getPath()->removeService(*this);
+			}
+
+			cleanDataSourceLinks(true);
+
+			// Unregister from the line
+			if(getRoute() && getRoute()->getCommercialLine())
+			{
+				getRoute()->getCommercialLine()->unregisterService(*this);
+			}
+		}
+}	}

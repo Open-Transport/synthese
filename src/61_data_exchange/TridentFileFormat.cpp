@@ -385,25 +385,33 @@ namespace synthese
 				_env.getRegistry<StopArea>()
 			){
 				const StopArea* cp(itcp.second.get());
-				os << "<StopArea>" << "\n";
-				os << "<objectId>" << TridentId (peerid, "StopArea", *cp) << "</objectId>" << "\n";
-				os << "<name>" << cp->getName () << "</name>" << "\n";
-
-				// Contained physical stops
 				const StopArea::PhysicalStops& stops(cp->getPhysicalStops());
-				for(StopArea::PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
+
+				// Don't export empty StopArea, not valid.
+				// When NonConcurrency rules are loaded above, StopAreas are added to the environnement without any StopPoints associated.
+				// It breaks the XML file validation.
+				if(stops.size() > 0)
 				{
-					os << "<contains>" << TridentId (peerid, "StopArea", *it->second)  << "</contains>" << "\n";
+					os << "<StopArea>" << "\n";
+					os << "<objectId>" << TridentId (peerid, "StopArea", *cp) << "</objectId>" << "\n";
+					os << "<name>" << cp->getName () << "</name>" << "\n";
+
+					// Contained physical stops
+
+					for(StopArea::PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
+					{
+						os << "<contains>" << TridentId (peerid, "StopArea", *it->second)  << "</contains>" << "\n";
+					}
+
+					// Decide what to take for centroidOfArea of a connectionPlace. Only regarding physical stops coordinates
+					// or also regarding addresses coordinates, or fixed manually ?
+					// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << "\n";
+
+					os << "<StopAreaExtension>" << "\n";
+					os << "<areaType>" << "CommercialStopPoint" << "</areaType>" << "\n";
+					os << "</StopAreaExtension>" << "\n";
+					os << "</StopArea>" << "\n";
 				}
-
-				// Decide what to take for centroidOfArea of a connectionPlace. Only regarding physical stops coordinates
-				// or also regarding addresses coordinates, or fixed manually ?
-				// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << "\n";
-
-				os << "<StopAreaExtension>" << "\n";
-				os << "<areaType>" << "CommercialStopPoint" << "</areaType>" << "\n";
-				os << "</StopAreaExtension>" << "\n";
-				os << "</StopArea>" << "\n";
 			}
 
 
@@ -1786,6 +1794,8 @@ namespace synthese
 						rollingStock.get(),
 						route.stops,
 						dataSource,
+						true,
+						true,
 						true,
 						true
 					);
