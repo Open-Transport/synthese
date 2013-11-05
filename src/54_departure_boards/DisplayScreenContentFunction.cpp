@@ -166,6 +166,8 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER("data_source_name_filter");
 		const string DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION("use_sae_direct_connection");
 
+		const string DisplayScreenContentFunction::PARAMETER_STOPS_LIST("stops_list");
+
 		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
 
 		const string PIPO_KEY("00");
@@ -399,7 +401,52 @@ namespace synthese
 						stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
 						screen->setStops(stopsFilter);
 					}
+					// 5 by id list
+					else if(!map.getDefault<string>(PARAMETER_STOPS_LIST).empty())
+					{
+						string stopsStr(map.getDefault<string>(PARAMETER_STOPS_LIST));
+						try
+						{
+							if(!stopsStr.empty())
+							{
+								vector<string> stopsVect;
+								split(stopsVect, stopsStr, is_any_of(",; "));
 
+								screen->setAllPhysicalStopsDisplayed(false);
+								ArrivalDepartureTableGenerator::PhysicalStops stopsFilter;
+
+								BOOST_FOREACH(string& stopItem, stopsVect)
+								{
+									RegistryKeyType stopId = lexical_cast<RegistryKeyType>(stopItem);
+									if(decodeTableId(stopId) == StopPointTableSync::TABLE.ID)
+									{
+										boost::shared_ptr<const StopPoint> stop(
+											Env::GetOfficialEnv().get<StopPoint>(stopId)
+										);
+										screen->setDisplayedPlace(stop->getConnectionPlace());
+										stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
+									}
+									else if (decodeTableId(stopId) == StopAreaTableSync::TABLE.ID)
+									{
+										boost::shared_ptr<const StopArea> stop(
+											Env::GetOfficialEnv().get<StopArea>(stopId)
+										);
+										BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stop->getPhysicalStops())
+										{
+											const StopPoint& stop(*itStop.second);
+											screen->setDisplayedPlace(stop.getConnectionPlace());
+											stopsFilter.insert(make_pair(stop.getKey(), &stop));
+										}
+									}
+								}
+								screen->setStops(stopsFilter);
+							}
+						}
+						catch(bad_lexical_cast&)
+						{
+							throw RequestException("Stops List is unreadable");
+						}
+					}
 					// 3.2 by operator code
 					//4.1 by operator code
 					else if(!map.getDefault<string>(PARAMETER_OPERATOR_CODE).empty())
@@ -973,6 +1020,7 @@ namespace synthese
 				ParametersMap result;
 				bool isOutputXML = _outputFormat == MimeTypes::XML;
 				AccessParameters ap;
+				map<long long, MapValue> servicePointerAll;
 
 				if(isOutputXML)
 				{

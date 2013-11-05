@@ -89,6 +89,8 @@ namespace synthese
 			static const std::string PARAMETER_TRANSFER_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_DATA_SOURCE_NAME_FILTER;
 
+			static const std::string PARAMETER_STOPS_LIST;
+
 			static const std::string DATA_STOP_ID;
 			static const std::string DATA_OPERATOR_CODE;
 			static const std::string DATA_NETWORK_NAME;
