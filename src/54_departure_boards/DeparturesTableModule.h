@@ -98,8 +98,30 @@ namespace synthese
 		class DeparturesTableModule:
 			public server::ModuleClassTemplate<DeparturesTableModule>
 		{
+			friend class server::ModuleClassTemplate<DeparturesTableModule>;
+
 		public:
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+			static const std::string PARAMETER_INEO_SERVER_IP;
+			static const std::string PARAMETER_INEO_SERVER_PORT;
+			static const std::string PARAMETER_INEO_SERVER_DB_LOGIN;
+			static const std::string PARAMETER_INEO_SERVER_DB_PASSWORD;
+			static const std::string PARAMETER_INEO_SERVER_DB_NAME;
+
+		private:
+			static std::string _ineoServerIP;
+			static int _ineoServerPort;
+			static std::string _ineoServerDBLogin;
+			static std::string _ineoServerDBPassword;
+			static std::string _ineoServerDBName;
+
+		public:
+			static std::string GetIneoServerIP(){ return _ineoServerIP; }
+			static int GetIneoServerPort(){ return _ineoServerPort; }
+			static std::string GetIneoServerDBLogin(){ return _ineoServerDBLogin; }
+			static std::string GetIneoServerDBPassword(){ return _ineoServerDBPassword; }
+			static std::string GetIneoServerDBName(){ return _ineoServerDBName; }
 
 			static PlaceWithDisplayBoards* GetPlaceWithDisplayBoards(
 				const geography::NamedPlace* place,
@@ -123,6 +145,11 @@ namespace synthese
 			);
 
 			static Labels	getCommercialLineWithBroadcastLabels(bool withAll = false);
+
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
+			);
 		};
 	}
 
