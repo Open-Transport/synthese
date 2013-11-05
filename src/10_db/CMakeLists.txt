@@ -64,7 +64,9 @@ SQLService.cpp
 SQLService.hpp
 SQLSingleOperatorExpression.cpp
 SQLSingleOperatorExpression.hpp
-TablesVectorField.hpp
+TableOrObject.cpp
+TableOrObject.hpp
+TablesOrObjectsVectorField.hpp
 TablesViewService.cpp
 TablesViewService.hpp
 UpdateQuery.cpp

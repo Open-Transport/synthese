@@ -1,6 +1,6 @@
 
-/** TablesVectorField class header.
-	@file TablesVectorField.hpp
+/** TablesOrObjectsVectorField class header.
+	@file TablesOrObjectsVectorField.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,13 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE__TablesVectorField_hpp__
-#define SYNTHESE__TablesVectorField_hpp__
+#ifndef SYNTHESE__TablesOrObjectsVectorField_hpp__
+#define SYNTHESE__TablesOrObjectsVectorField_hpp__
 
 #include "SimpleObjectFieldDefinition.hpp"
 
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBTableSync.hpp"
+#include "TableOrObject.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -38,20 +40,20 @@ namespace synthese
 	/// Pointers vector field.
 	/// @ingroup m00
 	template<class C>
-	class TablesVectorField:
+	class TablesOrObjectsVectorField:
 		public SimpleObjectFieldDefinition<C>
 	{
 	public:
-		typedef std::vector<boost::shared_ptr<db::DBTableSync> > Type;
+		typedef std::vector<db::TableOrObject> Type;
 
 	private:
 		//////////////////////////////////////////////////////////////////////////
 		/// @return the converted string
-		static std::string _vectorToString(const typename TablesVectorField<C>::Type& p)
+		static std::string _vectorToString(const typename TablesOrObjectsVectorField<C>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
-			BOOST_FOREACH(boost::shared_ptr<db::DBTableSync> table, p)
+			BOOST_FOREACH(const typename TablesOrObjectsVectorField<C>::Type::value_type& item, p)
 			{
 				if(first)
 				{
@@ -61,7 +63,7 @@ namespace synthese
 				{
 					s << ",";
 				}
-				s << table->getFormat().ID;
+				s << item.getKey();
 			}
 			return s.str();
 		}
@@ -69,7 +71,7 @@ namespace synthese
 
 	public:
 		static bool LoadFromRecord(
-			typename TablesVectorField<C>::Type& fieldObject,
+			typename TablesOrObjectsVectorField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -79,7 +81,7 @@ namespace synthese
 				return false;
 			}
 
-			typename TablesVectorField<C>::Type value;
+			typename TablesOrObjectsVectorField<C>::Type value;
 			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
 			if(!text.empty())
 			{
@@ -90,15 +92,30 @@ namespace synthese
 					try
 					{
 						value.push_back(
-							db::DBModule::GetTableSync(
-								boost::lexical_cast<util::RegistryTableType>(item)
-						)	);
+							db::TableOrObject(boost::lexical_cast<util::RegistryKeyType>(item), env)
+						);
 					}
 					catch(boost::bad_lexical_cast&)
 					{
 						util::Log::GetInstance().warn(
 							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
+							item + " is not a valid value."
+						);
+					}
+					catch(util::ObjectNotFoundException<util::Registrable>&)
+					{
+						util::Log::GetInstance().warn(
+							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
+							item + " was not found."
+						);
+					}
+					catch(db::DBException&)
+					{
+						util::Log::GetInstance().warn(
+							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+							object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
 							item + " is not a valid table id."
 						);
 					}
@@ -119,7 +136,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename TablesVectorField<C>::Type& fieldObject,
+			const typename TablesOrObjectsVectorField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -133,7 +150,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename TablesVectorField<C>::Type& fieldObject,
+			const typename TablesOrObjectsVectorField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
@@ -151,7 +168,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename TablesVectorField<C>::Type& fieldObject,
+			const typename TablesOrObjectsVectorField<C>::Type& fieldObject,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
@@ -169,7 +186,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename TablesVectorField<C>::Type& fieldObject,
+			const typename TablesOrObjectsVectorField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
@@ -187,7 +204,7 @@ namespace synthese
 		}
 	};
 
-	#define FIELD_TABLES_VECTOR(N) struct N : public TablesVectorField<N> {};
+	#define FIELD_TABLES_OR_OBJECTS_VECTOR(N) struct N : public TablesOrObjectsVectorField<N> {};
 }
 
 #endif

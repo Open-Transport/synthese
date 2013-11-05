@@ -31,7 +31,7 @@
 #include "PtimeField.hpp"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
-#include "TablesVectorField.hpp"
+#include "TablesOrObjectsVectorField.hpp"
 #include "User.h"
 
 #include <boost/thread/mutex.hpp>
@@ -42,9 +42,8 @@ namespace synthese
 	FIELD_PTIME(LockTime)
 	FIELD_STRING(LockServerName)
 	FIELD_STRING(LastJSON)
-	FIELD_POINTERS_VECTOR(Objects, util::Registrable)
+	FIELD_TABLES_OR_OBJECTS_VECTOR(Objects)
 	FIELD_BOOL(Public)
-	FIELD_TABLES_VECTOR(FullTables)
 	
 	namespace inter_synthese
 	{
@@ -53,7 +52,6 @@ namespace synthese
 			FIELD(Name),
 			FIELD(Code),
 			FIELD(Objects),
-			FIELD(FullTables),
 			FIELD(impex::Import),
 			FIELD(LockUser),
 			FIELD(LockTime),
@@ -106,15 +104,29 @@ namespace synthese
 		public:
 			static const std::string TAG_IMPORT;
 			static const std::string TAG_LOCK_USER;
-			static const std::string TAG_OBJECT;
-			static const std::string TAG_TABLE;
-			static const std::string ATTR_ID;
-			static const std::string ATTR_NAME;
 			static const std::string SEPARATOR;
 		
 		private:
-			static void _dumpObject(
-				const util::Registrable& object,
+			class ItemDumper:
+				public boost::static_visitor<>
+			{
+			private:
+				util::ParametersMap& _pm;
+				std::stringstream& _binaryStream;
+
+			public:
+				ItemDumper(
+					util::ParametersMap& pm,
+					std::stringstream& binaryStream
+				);
+
+				void operator()(boost::shared_ptr<db::DBTableSync> value) const;
+				void operator()(boost::shared_ptr<util::Registrable> value) const;
+				void operator()(util::Registrable* value) const;
+			};
+
+			static void _dumpItem(
+				const db::TableOrObject& item,
 				util::ParametersMap& pm,
 				std::stringstream& binaryStream
 			);
