@@ -1,7 +1,7 @@
 #include <queue>
 #include <stdio.h>
 
-#include "Log.h"
+//#include "Log.h"
 
 #include "VIX-ComPortMgr.hpp"
 #include "VIX-BSC-defines.hpp"
@@ -32,20 +32,22 @@ namespace synthese
 		return true;
 	#endif
 
-		//printf(">CComPortMgr::Open ENTER.\n");
+		printf(">CComPortMgr::Open ENTER.\n");
 		bool bRet = false; 
 
-		RS232_CloseComport(m_cport_nr);
+		//RS232_CloseComport(m_cport_nr);
 
 		if(RS232_OpenComport(m_cport_nr, m_bdrate)){
-			util::Log::GetInstance().error(str(format("CComPortMgr::Open FAILED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
+			//printf(str(format("CComPortMgr::Open FAILED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
+			printf("CComPortMgr::Open FAILED. port index: %d. Baud: %d\n", m_cport_nr, m_bdrate);
 			bRet = false;
 		}else{
-			util::Log::GetInstance().debug(str(format("CComPortMgr::Open SUCCEDDED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
+			//printf(str(format("CComPortMgr::Open SUCCEDDED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
+			printf("CComPortMgr::Open SUCCEDDED. port index: %d. Baud: %d\n", m_cport_nr, m_bdrate);
 			bRet = true;
 		}
 
-		//printf("<CComPortMgr::Open EXIT.\n");
+		printf("<CComPortMgr::Open EXIT.\n");
 		return bRet;
 	}
 
@@ -53,7 +55,6 @@ namespace synthese
 	{
 		//printf(">CComPortMgr::ReadBuffer ENTER.\n");
 	#ifdef RAW_DATA_SIMULATION_TEST
-
 
 		static int index=0;
 		index++;
@@ -63,7 +64,7 @@ namespace synthese
 		{
 		case 1:
 			buf[0]=0x04;buf[1]=0xC1;buf[2]=0xC1;buf[3]=0x05;
-			nBytesRed=4;
+			nBytesRed=4;d
 			break;
 		case 2:
 			buf[0]=0x04;buf[1]=0xCC;buf[2]=0xCC;buf[3]=0x05;
@@ -144,7 +145,7 @@ namespace synthese
 	#endif
 		if(nBytesWritten<0)
 		{
-			util::Log::GetInstance().error("CComPortMgr::WriteBuffer FAILED. buffer maybe not sent!");
+			printf("CComPortMgr::WriteBuffer FAILED. buffer maybe not sent!\n");
 			bRet = false;
 		}
 
@@ -167,7 +168,7 @@ namespace synthese
 
 		if(nBytesWritten<0)
 		{
-			util::Log::GetInstance().error("CComPortMgr::WriteByte FAILED. buffer maybe not sent!");
+			printf("CComPortMgr::WriteByte FAILED. buffer maybe not sent!\n");
 			bRet = false;
 		}
 
