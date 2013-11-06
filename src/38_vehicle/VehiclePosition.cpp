@@ -1,4 +1,3 @@
-
 /** VehiclePosition class implementation.
 	@file VehiclePosition.cpp
 

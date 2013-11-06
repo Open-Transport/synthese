@@ -72,9 +72,11 @@ namespace synthese
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_RANK_IN_PATH;
 			static const std::string PARAMETER_PASSENGERS;
+			static const std::string PARAMETER_SET_AS_CURRENT_POSITION;
 
 		private:
 			boost::shared_ptr<VehiclePosition> _vehiclePosition;
+			bool _setAsCurrentPosition;
 			boost::optional<boost::shared_ptr<Vehicle> > _vehicle;
 			boost::optional<VehiclePosition::Status> _status;
 			boost::optional<boost::posix_time::ptime> _time;
@@ -101,6 +103,8 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
+			VehiclePositionUpdateAction();
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
