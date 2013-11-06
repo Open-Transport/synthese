@@ -108,7 +108,7 @@ namespace synthese
 			Log::GetInstance().info(str(format("GpsDevicePoller: NetPortNumber=%d") % _NetPortNb));
 
 			VehicleModule::GetCurrentVehiclePosition().setStatus(VehiclePosition::UNKNOWN_STATUS);
-			VehicleModule::GetCurrentJourney().setTerminusDepartureTime(posix_time::not_a_date_time);
+			VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
 
 			while (true)
 			{
