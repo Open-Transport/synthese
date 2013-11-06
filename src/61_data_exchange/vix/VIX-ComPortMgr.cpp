@@ -41,7 +41,7 @@ namespace synthese
 			util::Log::GetInstance().error(str(format("CComPortMgr::Open FAILED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
 			bRet = false;
 		}else{
-			util::Log::GetInstance().debug(str(format("CComPortMgr::Open FAILED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
+			util::Log::GetInstance().debug(str(format("CComPortMgr::Open SUCCEDDED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
 			bRet = true;
 		}
 
