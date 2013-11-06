@@ -27,6 +27,7 @@
 
 #include "DeviceTemplate.h"
 #include "Poller.hpp"
+#include "UtilTypes.h"
 
 namespace synthese
 {
@@ -49,10 +50,12 @@ namespace synthese
 			public:
 				static const std::string PARAMETER_VALIDATOR_COM_PORT_NUMBER;
 				static const std::string PARAMETER_VALIDATOR_COM_PORT_RATE;
+				static const std::string PARAMETER_VALIDATOR_DATA_SOURCE_KEY;
 
 			private:
 				static int _ComPortNb;
 				static int _ComPortRate;
+				static util::RegistryKeyType _dataSourceKey;
 
 			protected:
 

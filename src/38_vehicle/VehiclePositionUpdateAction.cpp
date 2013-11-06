@@ -31,6 +31,7 @@
 #include "StopPointTableSync.hpp"
 #include "Request.h"
 #include "DepotTableSync.hpp"
+#include "VehicleModule.hpp"
 
 using namespace std;
 using namespace boost;
@@ -63,8 +64,12 @@ namespace synthese
 		const string VehiclePositionUpdateAction::PARAMETER_TIME = Action_PARAMETER_PREFIX + "ti";
 		const string VehiclePositionUpdateAction::PARAMETER_VEHICLE_ID = Action_PARAMETER_PREFIX + "ve";
 		const string VehiclePositionUpdateAction::PARAMETER_VEHICLE_POSITION_ID = Action_PARAMETER_PREFIX + "vi";
+		const string VehiclePositionUpdateAction::PARAMETER_SET_AS_CURRENT_POSITION = Action_PARAMETER_PREFIX + "_set_as_current_position";
 
-
+		VehiclePositionUpdateAction::VehiclePositionUpdateAction() :
+			_setAsCurrentPosition(false)
+		{
+		}
 
 		ParametersMap VehiclePositionUpdateAction::getParametersMap() const
 		{
@@ -77,6 +82,12 @@ namespace synthese
 			{
 				map.insert(PARAMETER_VEHICLE_POSITION_ID, _vehiclePosition->getKey());
 			}
+
+			if(_setAsCurrentPosition)
+			{
+				map.insert(PARAMETER_SET_AS_CURRENT_POSITION, _setAsCurrentPosition);
+			}
+
 			// Warning : Export other parameters if setters are implemented
 			return map;
 		}
@@ -106,7 +117,7 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_VEHICLE_ID));
 				if(id > 0) try
 				{
-					_vehicle = VehicleTableSync::GetEditable(id, *_env);
+					_vehicle = Env::GetOfficialEnv().getEditable<Vehicle>(id);
 				}
 				catch(ObjectNotFoundException<Vehicle>&)
 				{
@@ -133,7 +144,7 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
 				if(id > 0) try
 				{
-					_service = ScheduledServiceTableSync::GetEditable(id, *_env);
+					_service = Env::GetOfficialEnv().getEditable<ScheduledService>(id);
 				}
 				catch(ObjectNotFoundException<ScheduledService>&)
 				{
@@ -152,12 +163,12 @@ namespace synthese
 				{
 					if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
 					{
-						_stopPoint = StopPointTableSync::GetEditable(id, *_env);
+						_stopPoint = Env::GetOfficialEnv().getEditable<StopPoint>(id);
 						_depot = boost::shared_ptr<Depot>();
 					}
 					else if(decodeTableId(id) == DepotTableSync::TABLE.ID)
 					{
-						_depot = DepotTableSync::GetEditable(id, *_env);
+						_depot = Env::GetOfficialEnv().getEditable<Depot>(id);
 						_stopPoint = boost::shared_ptr<StopPoint>();
 					}
 					else
@@ -200,6 +211,12 @@ namespace synthese
 			{
 				_time = time_from_string(map.get<string>(PARAMETER_TIME));
 			}
+
+			if(map.isDefined(PARAMETER_SET_AS_CURRENT_POSITION))
+			{
+				_setAsCurrentPosition = map.get<bool>(PARAMETER_SET_AS_CURRENT_POSITION);
+			}
+			
 		}
 
 
@@ -249,6 +266,24 @@ namespace synthese
 			}
 
 			VehiclePositionTableSync::Save(_vehiclePosition.get());
+
+			if(_setAsCurrentPosition)
+			{
+				VehiclePosition &vp = VehicleModule::GetCurrentVehiclePosition();
+
+				vp.setComment(_vehiclePosition->getComment());
+				vp.setStatus( _vehiclePosition->getStatus());
+				vp.setTime(_vehiclePosition->getTime());
+				vp.setPassangers(_vehiclePosition->getPassengers());
+				vp.setInStopArea(_vehiclePosition->getInStopArea());
+				vp.setMeterOffset(_vehiclePosition->getMeterOffset());
+				vp.setRankInPath(_vehiclePosition->getRankInPath());
+
+				vp.setVehicle(_vehiclePosition->getVehicle());
+				vp.setStopPoint(_vehiclePosition->getStopPoint());
+				vp.setService(_vehiclePosition->getService());
+				vp.setDepot(_vehiclePosition->getDepot());
+			}
 
 			if(request.getActionWillCreateObject())
 			{

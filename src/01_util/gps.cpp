@@ -10,7 +10,7 @@
 
 using boost::asio::ip::tcp;
 
-//#define RAW_DATA_SIMULATION_TEST 1
+#define RAW_DATA_SIMULATION_TEST 1
 
 namespace synthese
 {
