@@ -2,7 +2,7 @@
 
 #include "VIX-BSC-defines.hpp"
 
-#include "datasource.h"
+#include "DataSource.h"
 
 namespace synthese
 {
