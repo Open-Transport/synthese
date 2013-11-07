@@ -140,7 +140,7 @@ namespace synthese
 				}
 
 				pt::CommercialLine* line(pService->getRoute()->getCommercialLine());
-				std::vector<std::string> &result = line->getCodesBySource(*dataSource);
+				const std::vector<std::string> &result = line->getCodesBySource(*dataSource);
 				
 				if(result.size()>0)
  				{
@@ -155,7 +155,7 @@ namespace synthese
 			pt::StopPoint* pStoppoint = vp.getStopPoint();
 			if(pStoppoint)
 			{
-				std::vector<std::string> &result = pStoppoint->getCodesBySource(*dataSource);
+				const std::vector<std::string> &result = pStoppoint->getCodesBySource(*dataSource);
 
 				if(result.size()>0)
  				{
