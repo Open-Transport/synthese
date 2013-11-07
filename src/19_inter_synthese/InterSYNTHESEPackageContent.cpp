@@ -283,7 +283,8 @@ namespace synthese
 
 					// Update or creation
 					boost::shared_ptr<Registrable> rObject;
-					if(directTableSync.contains(key))
+					const RegistryBase& registry(directTableSync.getRegistry(_env));
+					if( registry.contains(key) || directTableSync.contains(key))
 					{
 						try
 						{
