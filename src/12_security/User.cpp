@@ -99,6 +99,11 @@ namespace synthese
 			setPasswordHash(hash);
 		}
 
+		void User::resetTempPassword()
+		{
+			_password = "";
+		}
+
 		void User::setPasswordHash( const std::string& passwordHash )
 		{
 			_passwordHash = passwordHash;
