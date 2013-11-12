@@ -154,6 +154,11 @@ namespace synthese
 					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
+
+				/* In order to prevent clear password available in memory,
+				 * this function reset private _password value accessible after
+				 * setPassword(). */
+				void resetTempPassword();
 			//@}
 		};
 	}

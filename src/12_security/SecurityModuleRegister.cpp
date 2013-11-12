@@ -14,6 +14,8 @@
 #include "12_security/UpdateProfileAction.h"
 #include "12_security/UserUpdateAction.h"
 #include "12_security/UserPasswordUpdateAction.h"
+#include "12_security/UserPasswordRecoveryAction.hpp"
+#include "12_security/UserPasswordChangeAction.hpp"
 
 #include "12_security/UserNameInterfaceElement.h"
 #include "12_security/UserPhoneInterfaceElement.h"
@@ -59,6 +61,8 @@ void synthese::security::moduleRegister()
 	synthese::security::UpdateProfileAction::integrate();
 	synthese::security::UserUpdateAction::integrate();
 	synthese::security::UserPasswordUpdateAction::integrate();
+	synthese::security::UserPasswordRecoveryAction::integrate();
+	synthese::security::UserPasswordChangeAction::integrate();
 
 	synthese::security::GlobalRight::integrate();
 	synthese::security::SecurityRight::integrate();
