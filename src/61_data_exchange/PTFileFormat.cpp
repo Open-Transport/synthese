@@ -574,8 +574,11 @@ namespace synthese
 					);
 					stop->setName(name);
 				}
-				if(geometry && *geometry)
+				if(geometry && *geometry && (!stop->getGeometry() || (stop->getGeometry()->toString() != (*geometry)->toString())))
 				{
+					_logInfo(
+						"Stop "+ code +" ("+ stop->getName() +") moved from " + stop->getGeometry()->toString() + " to " + (*geometry)->toString()
+					);
 					stop->setGeometry(
 						CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(**geometry)
 					);
