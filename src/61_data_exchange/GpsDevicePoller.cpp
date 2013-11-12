@@ -52,6 +52,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace data_exchange;
+	using namespace pt;
 	using namespace server;
 	using namespace util;
 	using namespace db;
@@ -126,14 +127,15 @@ namespace synthese
 						this_thread::sleep(seconds(30));
 					}
 				}
-
-				if(bGpsOk){
+lon=6.921083;
+lat=47.552028;
+//				if(bGpsOk){
 					// We have a valid gps socket opened. Use it.
-					if(g.updateFromGps()){
+//					if(g.updateFromGps()){
 						//TODO: eventually check value coherency.
 						double lonOld=lon;
 						double latOld=lat;
-						g.getLatLong(lon,lat);
+//						g.getLatLong(lon,lat);
 /*DEBUG(JD)
 						// GPS position has changed. check if we need to change the stop point
 						if(lon!=lonOld || lat!=latOld)
@@ -142,31 +144,43 @@ DEBUG(JD)*/
 
 							// Create the coordinate point
 							boost::shared_ptr<Point> point(
-								CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(lon,lat));
+								CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(lon,lat)
+							);
+							boost::shared_ptr<Point> projectedPoint(
+								CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*point)
+							);
 
-							//TODO: 
-							// VehicleModule -> position -> StopPoint
-							//TODO: use RoadChunkTableSync::SearchByMaxDistance ?
-							double maxdistance = 20.0;
+							// Nearest stop point
+							StopPoint* nearestStopPoint(NULL);
+							double maxdistance(3000.0);
+							double lastDistance(0.0);
 							pt::StopPointTableSync::SearchResult  sr = pt::StopPointTableSync::SearchByMaxDistance(
-								*point.get(),
+								*projectedPoint.get(),
 								maxdistance, //distance  to originPoint
 								Env::GetOfficialEnv(),
-								UP_LINKS_LOAD_LEVEL);
+								UP_LINKS_LOAD_LEVEL
+							);
 
-							int iNbOfChunks = sr.size();
-							if(iNbOfChunks>0)
+							BOOST_FOREACH(boost::shared_ptr<StopPoint> sp, sr)
 							{
-								VehicleModule::GetCurrentVehiclePosition().setStopPoint(sr.begin()->get());
+								double dst(sp->getGeometry()->distance(projectedPoint.get()));
+
+								if(!nearestStopPoint || dst < lastDistance)
+								{
+									lastDistance = dst;
+									nearestStopPoint = sp.get();
+								}
 							}
+							VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
 							
 
 							// update Vehicle position.
 							VehicleModule::GetCurrentVehiclePosition().setGeometry(
-								CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*point) );
-						}
+								projectedPoint
+							);
+//						}
 
-					}
+//					}
 					//TODO Should we retry to reconnect if updateFromGps fail too much?
 				}
 
