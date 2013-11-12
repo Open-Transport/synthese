@@ -35,6 +35,7 @@
 #include "StrFillFunction.hpp"
 #include "StrLenFunction.hpp"
 #include "SubStrFunction.hpp"
+#include "StripTagsFunction.hpp"
 #include "WebPageMenuFunction.hpp"
 #include "WebPageLinkFunction.hpp"
 #include "WebPageFormFunction.hpp"
@@ -102,6 +103,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::StrFillFunction::integrate();
 	synthese::cms::StrLenFunction::integrate();
 	synthese::cms::SubStrFunction::integrate();
+	synthese::cms::StripTagsFunction::integrate();
 	synthese::cms::WebPageMenuFunction::integrate();
 	synthese::cms::WebPageLinkFunction::integrate();
 	synthese::cms::WebPageFormFunction::integrate();
