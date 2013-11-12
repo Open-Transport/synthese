@@ -79,6 +79,8 @@ StrFillFunction.cpp
 StrFillFunction.hpp
 StrLenFunction.cpp
 StrLenFunction.hpp
+StripTagsFunction.cpp
+StripTagsFunction.hpp
 SubstractFunction.cpp
 SubstractFunction.hpp
 SubStrFunction.cpp
