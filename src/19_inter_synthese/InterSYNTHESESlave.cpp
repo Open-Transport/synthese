@@ -153,6 +153,9 @@ namespace synthese
 			std::string prefix /*= std::string() */
 		) const	{
 
+			// Lock the queue
+			recursive_mutex::scoped_lock lock(_queueMutex);
+
 			map.insert(prefix + TAG_QUEUE_SIZE, _queue.size());
 
 			size_t count(30);
@@ -246,6 +249,8 @@ namespace synthese
 
 
 
+		/// @pre The queue must be locked by the caller of the function until the returned
+		/// QueueRange is destroyed. Use getQueueMutex to lock the queue.
 		InterSYNTHESESlave::QueueRange InterSYNTHESESlave::getQueueRange() const
 		{
 			if(!get<InterSYNTHESEConfig>())
