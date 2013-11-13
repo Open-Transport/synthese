@@ -31,6 +31,45 @@ namespace synthese
 {
 	namespace cms
 	{
+		struct TranslateHTMLChars {
+			typedef std::vector<std::pair<std::string, std::string> > HTMLChars;
+			HTMLChars _htmlchars;
+
+			TranslateHTMLChars() : _htmlchars()
+			{
+				_htmlchars.push_back(HTMLChars::value_type("nbsp"," "));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","é"));
+				_htmlchars.push_back(HTMLChars::value_type("egrave","è"));
+				_htmlchars.push_back(HTMLChars::value_type("agrave","à"));
+				_htmlchars.push_back(HTMLChars::value_type("ugrave","ù"));
+				_htmlchars.push_back(HTMLChars::value_type("lt","<"));
+				_htmlchars.push_back(HTMLChars::value_type("gt",">"));
+				_htmlchars.push_back(HTMLChars::value_type("#39","'"));
+				_htmlchars.push_back(HTMLChars::value_type("#34","\""));
+				_htmlchars.push_back(HTMLChars::value_type("quot","\""));
+				_htmlchars.push_back(HTMLChars::value_type("#38","&"));
+				_htmlchars.push_back(HTMLChars::value_type("amp","&"));
+				_htmlchars.push_back(HTMLChars::value_type("ocirc","ô"));
+				_htmlchars.push_back(HTMLChars::value_type("ecirc","ê"));
+				_htmlchars.push_back(HTMLChars::value_type("iuml","ï"));
+				_htmlchars.push_back(HTMLChars::value_type("euml","ë"));
+				_htmlchars.push_back(HTMLChars::value_type("laquo","«"));
+				_htmlchars.push_back(HTMLChars::value_type("raquo","»"));
+				_htmlchars.push_back(HTMLChars::value_type("rsquo","’"));
+				_htmlchars.push_back(HTMLChars::value_type("lsquo","‘"));
+				_htmlchars.push_back(HTMLChars::value_type("rdquo","”"));
+				_htmlchars.push_back(HTMLChars::value_type("ldquo","“"));
+				_htmlchars.push_back(HTMLChars::value_type("Eacute","É"));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","È"));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","Ê"));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","Ë"));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","Ï"));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","À"));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","Ô"));
+				_htmlchars.push_back(HTMLChars::value_type("eacute","Ù"));
+			}
+		};
+
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : StripTagsFunction.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/String_manipulation#Substring
@@ -46,9 +85,10 @@ namespace synthese
 
 		protected:
 			/// Parameters
-				std::string _text;
-				bool _decode;
-
+			std::string _text;
+			bool _decode;
+			static const TranslateHTMLChars HTML_CHARS;
+			static const int MAX_CODE_LENGTH;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.

@@ -25,9 +25,12 @@
 #include "Request.h"
 #include "StripTagsFunction.hpp"
 
+#include <boost/foreach.hpp>
 #include <stdio.h>
 
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -41,8 +44,8 @@ namespace synthese
 	{
 		const string StripTagsFunction::PARAMETER_TEXT("t");
 		const string StripTagsFunction::PARAMETER_CODE("d");
-
-
+		const TranslateHTMLChars StripTagsFunction::HTML_CHARS = TranslateHTMLChars();
+		const int StripTagsFunction::MAX_CODE_LENGTH(8);
 
 		ParametersMap StripTagsFunction::_getParametersMap() const
 		{
@@ -56,7 +59,8 @@ namespace synthese
 		{
 			_text = map.getDefault<string>(PARAMETER_TEXT);
 			_decode = map.getDefault<bool>(PARAMETER_CODE, false);
-	
+
+			/* If specified, decode url encoded content */
 			if(_decode)
 			{
 				_text = urlDecode(_text);
@@ -71,25 +75,74 @@ namespace synthese
 		) const {
 			if(_text.size() > 0)
 			{
-				int flag = 0;
+				int html_flag = 0;
+				bool special_char_flag = false;
+				string htmlcode;
+
+				/* Initialize special characters to convert */
+													
 				for (std::string::const_iterator it=_text.begin(); it!=_text.end(); ++it)
 				{
 					if (*it == '<')
 					{
-						flag++;
+						html_flag++;
 					}
-					else if (*it == '>' && flag > 0)
+					else if (*it == '>' && html_flag > 0)
 					{
-						flag--;
+						html_flag--;
 					}
+					else if (*it == '&' && html_flag == 0)
+					{
+						special_char_flag = true;
+						for (int i=1; i < MAX_CODE_LENGTH; i++)
+						{
+							if ((it+i == _text.end() || *(it+i) == ' ') || (i == MAX_CODE_LENGTH-1 && *(it+i) != ';'))
+							{
+								special_char_flag = false;
+								break;
+							}
+							
+							if (*(it+i) != ';')
+							{
+								htmlcode += *(it+i);
+							}
+							else
+							{
+								it = it+i;
+								break;
+							}
 
-					if (flag == 0 && *it != '>')
+						}
+
+						if (special_char_flag)
+						{
+							BOOST_FOREACH(const TranslateHTMLChars::HTMLChars::value_type& sc, HTML_CHARS._htmlchars)
+							{
+								if (htmlcode == sc.first)
+								{
+									stream << sc.second;
+									htmlcode.clear();
+									break;
+								}
+							}
+							if (!htmlcode.empty())
+							{
+								stream << "&" << htmlcode << ";";
+								htmlcode.clear();
+							}
+						}
+						else
+						{
+							stream << *it;
+						}
+					}
+					else if (*it != '>' && html_flag == 0)
 					{
 						stream << *it;
 					}
 				}
 			}
-				
+
 			return util::ParametersMap();
 		}
 
