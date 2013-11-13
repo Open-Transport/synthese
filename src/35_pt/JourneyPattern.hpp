@@ -117,6 +117,8 @@ namespace synthese
 
 			graph::MetricOffset _plannedLength; //!< For DRT
 
+			mutable boost::mutex _calendarCacheMutex;
+
 		public:
 
 			JourneyPattern(
