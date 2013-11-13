@@ -81,6 +81,8 @@ StrLenFunction.cpp
 StrLenFunction.hpp
 StripTagsFunction.cpp
 StripTagsFunction.hpp
+StrReplaceFunction.cpp
+StrReplaceFunction.hpp
 SubstractFunction.cpp
 SubstractFunction.hpp
 SubStrFunction.cpp
