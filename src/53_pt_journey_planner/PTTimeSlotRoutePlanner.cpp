@@ -182,7 +182,7 @@ namespace synthese
 				resultJourney.shift(
 					getLowestDepartureTime() - resultJourney.getFirstDepartureTime()
 				);
-				resultJourney.forceContinuousServiceRange(hours(24));
+				resultJourney.forceContinuousServiceRange(getHighestArrivalTime() - getLowestDepartureTime());
 
 				result.push_back(resultJourney);
 			}
