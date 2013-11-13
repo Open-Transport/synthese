@@ -51,7 +51,7 @@ namespace synthese
 		FIELD_STRING(ServiceUrl)
 		FIELD_STRING(ServiceCode)
 		FIELD_STRING(TracePath)
-		FIELD_ID(TransportNetworkID)
+		FIELD_ID(PlannedDataSourceID)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -63,7 +63,7 @@ namespace synthese
 			FIELD(ServiceUrl),
 			FIELD(ServiceCode),
 			FIELD(impex::DataSource),
-			FIELD(TransportNetworkID),
+			FIELD(PlannedDataSourceID),
 			FIELD(TracePath)
 		> VDVServerRecord;
 
