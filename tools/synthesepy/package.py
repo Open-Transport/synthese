@@ -85,6 +85,9 @@ def run(env, args):
         '--owner=0', '--group=0',
         '--numeric-owner', '--mode=go-w', prefix_tail])
 
+    log.info('Remove the build directory in %r' % config.prefix)
+    utils.RemoveDirectory(config.prefix)
+
     # Deploy script
 
     deploy_script_path = join(package_dir, 'install_synthese.py')
