@@ -350,6 +350,9 @@ def add_default_subparsers(subparsers):
     parser_continuous_integration.add_argument(
         '--do-not-build-python', action='store_true',
         help='Don\'t build python env, kiosk, tools, utils, projects, packages.')
+    parser_continuous_integration.add_argument(
+        '--prefix-with-svnrelease', action='store_true',
+        help='Append the svn release number to the install prefix')
 
     parser_continuous_integration = subparsers.add_parser(
         'system_install',

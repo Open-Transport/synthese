@@ -147,6 +147,7 @@ DEFAULTS = {
     'suites': None,
     'should_build_package': lambda env: False,
     'force_create_package': False,
+    'prefix_with_svnrelease': False,
     'no_tests': False,
     'do_not_build_python': False,
 
