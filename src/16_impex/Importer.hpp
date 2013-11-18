@@ -128,6 +128,7 @@ namespace synthese
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
 
+			void closeLogFile() const;
 
 
 			//////////////////////////////////////////////////////////////////////////

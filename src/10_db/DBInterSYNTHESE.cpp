@@ -29,6 +29,7 @@
 #include "DBTransaction.hpp"
 #include "Env.h"
 #include "Field.hpp"
+#include "InterSYNTHESEConfigItem.hpp"
 #include "InterSYNTHESEModule.hpp"
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
@@ -302,6 +303,17 @@ namespace synthese
 
 
 
+		boost::shared_ptr<DBTableSync> DBInterSYNTHESE::_getTableSync( const std::string& perimeter )
+		{
+			// Detection of the table by id
+			RegistryTableType tableId(
+				lexical_cast<RegistryTableType>(perimeter)
+			);
+			return DBModule::GetTableSync(tableId);
+		}
+
+
+
 		void DBInterSYNTHESE::initQueue(
 			const InterSYNTHESESlave& slave,
 			const std::string& perimeter
@@ -309,14 +321,7 @@ namespace synthese
 
 			try
 			{
-				// Detection of the table by id
-				RegistryTableType tableId(
-					lexical_cast<RegistryTableType>(perimeter)
-				);
-				boost::shared_ptr<DBTableSync> tableSync(
-					DBModule::GetTableSync(
-						tableId
-				)	);
+				boost::shared_ptr<DBTableSync> tableSync(_getTableSync(perimeter));
 
 				boost::shared_ptr<DBDirectTableSync> directTableSync(
 					dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
@@ -603,6 +608,40 @@ namespace synthese
 
 			_transaction->run();
 			_transaction.reset();
+		}
+
+
+
+		bool DBInterSYNTHESE::ItemsLess::operator()( const InterSYNTHESEConfigItem* lhs, const InterSYNTHESEConfigItem* rhs ) const
+		{
+			if(lhs == NULL && rhs == NULL)
+			{
+				return false;
+			}
+
+			if(lhs == NULL)
+			{
+				return true;
+			}
+
+			if(rhs == NULL)
+			{
+				return false;
+			}
+
+			boost::shared_ptr<DBTableSync> table1(_getTableSync(lhs->get<SyncPerimeter>()));
+			boost::shared_ptr<DBTableSync> table2(_getTableSync(rhs->get<SyncPerimeter>()));
+
+			return table1->getFactoryKey() < table2->getFactoryKey();
+		}
+
+
+
+		DBInterSYNTHESE::SortedItems DBInterSYNTHESE::sort( const RandomItems& randItems ) const
+		{
+			set<const InterSYNTHESEConfigItem*, ItemsLess> sortedSet(randItems.begin(), randItems.end());
+			SortedItems result(sortedSet.begin(), sortedSet.end());
+			return result;
 		}
 }	}
 

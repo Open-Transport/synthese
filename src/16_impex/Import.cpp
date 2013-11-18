@@ -32,6 +32,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace server;
 	using namespace util;
 
@@ -160,8 +161,10 @@ namespace synthese
 			bool result(_autoImporter->parseFiles());
 			if(result)
 			{
-				_autoImporter->save();
+				DBTransaction transaction(_autoImporter->save());
+				transaction.run();
 			}
+			_autoImporter->closeLogFile();
 
 			// TODO clean
 

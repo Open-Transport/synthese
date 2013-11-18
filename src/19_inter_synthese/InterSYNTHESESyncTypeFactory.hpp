@@ -25,12 +25,15 @@
 
 #include "FactoryBase.h"
 
+#include <vector>
+
 namespace synthese
 {
 	namespace inter_synthese
 	{
 		class InterSYNTHESEIdFilter;
 		class InterSYNTHESESlave;
+		class InterSYNTHESEConfigItem;
 
 
 
@@ -63,6 +66,10 @@ namespace synthese
 				const std::string& configPerimeter,
 				const std::string& messagePerimeter
 			) const = 0;
+
+			typedef std::vector<const InterSYNTHESEConfigItem*> SortedItems;
+			typedef std::vector<const InterSYNTHESEConfigItem*> RandomItems;
+			virtual SortedItems sort(const RandomItems& randItems) const = 0;
 		};
 	}
 }

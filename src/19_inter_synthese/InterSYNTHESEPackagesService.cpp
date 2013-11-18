@@ -32,6 +32,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 	using namespace server;
 	using namespace security;
@@ -98,10 +99,10 @@ namespace synthese
 				if(_tableFilter || _objectFilter)
 				{
 					bool ok(false);
-					BOOST_FOREACH(Registrable* obj, package.get<Objects>())
+					BOOST_FOREACH(const TableOrObject& item, package.get<Objects>())
 					{
-						if(	(_objectFilter && obj->getKey() == *_objectFilter) ||
-							(_tableFilter && obj->getClassNumber() == *_tableFilter)
+						if(	(_objectFilter && item.getKey() == *_objectFilter) ||
+							(_tableFilter && (decodeTableId(item.getKey()) == *_tableFilter || item.getKey() == *_tableFilter))
 						){
 							ok = true;
 							break;

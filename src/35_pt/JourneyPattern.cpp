@@ -879,6 +879,8 @@ namespace synthese
 
 		Calendar& JourneyPattern::getCalendarCache() const
 		{
+			mutex::scoped_lock lock(_calendarCacheMutex);
+
 			if(!_calendar)
 			{
 				Calendar value;
