@@ -643,7 +643,11 @@ namespace synthese
 					"\" shortName=\"" << commercialLine->getShortName() <<
 					"\" longName=\""  << commercialLine->getLongName() <<
 					"\" color=\""     << commercialLine->getColor() <<
-					"\" xmlColor=\""  << commercialLine->getColor()->toString() <<
+					"\" xmlColor=\""  << (
+						commercialLine->getColor() ?
+						commercialLine->getColor()->toString():
+						""
+					) <<
 					"\" style=\""     << commercialLine->getStyle() <<
 					"\" image=\""     << commercialLine->getImage() <<
 					"\" direction=\"" << (
