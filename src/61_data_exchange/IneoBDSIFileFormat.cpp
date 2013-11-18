@@ -124,7 +124,7 @@ namespace synthese
 		bool IneoBDSIFileFormat::Importer_::_read(
 		) const {
 			date today(day_clock::local_day());
-			date tomorrowday(today + days(1));
+			date tomorrowday(today + hours(20));
 			ptime timenow(second_clock::local_time());
 
 			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
