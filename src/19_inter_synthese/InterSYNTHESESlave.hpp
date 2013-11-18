@@ -109,6 +109,8 @@ namespace synthese
 				void processFullUpdate() const;
 				QueueRange getQueueRange() const;
 
+				boost::recursive_mutex& getQueueMutex() const { return _queueMutex; }
+
 				void enqueue(
 					const std::string& interSYNTHESEType,
 					const std::string& parameter,
@@ -121,6 +123,9 @@ namespace synthese
 				void removeFromQueue(
 					util::RegistryKeyType id
 				) const;
+
+				/// @pre The queue must be locked by the caller of the function until the returned
+				/// QueueRange is destroyed. Use getQueueMutex to lock the queue.
 				Queue& getQueue() const { return _queue; }
 
 				//////////////////////////////////////////////////////////////////////////
@@ -133,6 +138,8 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 
+				/// @pre The queue must be locked by the caller of the function until the returned
+				/// QueueRange is destroyed. Use getQueueMutex to lock the queue.
 				const QueueRange& getLastSentRange() const { return _lastSentRange; }
 			//@}
 
