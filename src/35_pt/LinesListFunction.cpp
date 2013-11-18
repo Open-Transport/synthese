@@ -120,6 +120,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER = "display_duration_before_first_departure_filter";
 		const string LinesListFunction::PARAMETER_BROADCAST_POINT_ID = "broadcast_point_id";
 		const string LinesListFunction::PARAMETER_WITH_DIRECTIONS = "with_directions";
+		const string LinesListFunction::PARAMETER_SHORT_NAME_FILTER = "short_name_filter";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -270,6 +271,24 @@ namespace synthese
 			catch(ObjectNotFoundException<CommercialLine>&)
 			{
 				throw RequestException("Line " + lexical_cast<string>(lineId) + " not found");
+			}
+
+			// Selection by line short name
+			string shortName(
+				map.getDefault<string>(PARAMETER_SHORT_NAME_FILTER)
+			);
+			if(!shortName.empty())
+			{
+				BOOST_FOREACH(const CommercialLine::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<CommercialLine>())
+                                {
+                                        if(it.second->getShortName() == shortName)
+                                        {
+                                                _line = it.second;
+                                        	break;
+					}
+                                }
+				if(!_line.get())
+					throw RequestException("Line " + shortName + " not found");
 			}
 
 			// Networks and tree selectors

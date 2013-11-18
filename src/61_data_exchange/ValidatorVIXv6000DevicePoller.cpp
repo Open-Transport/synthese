@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "PermanentThread.hpp"
 #include "ServerModule.h"
+#include "DataSource.h"
 
 #include "vix/VIX-CIntSurvMsg.hpp"
 #include "vix/VIX-SerialReader.hpp"
@@ -52,9 +53,12 @@ namespace synthese
 	{
 		const std::string ValidatorVIXv6000DevicePoller::Poller_::PARAMETER_VALIDATOR_COM_PORT_NUMBER("validator_com_port_number");
 		const std::string ValidatorVIXv6000DevicePoller::Poller_::PARAMETER_VALIDATOR_COM_PORT_RATE("validator_com_port_rate");
+		const std::string ValidatorVIXv6000DevicePoller::Poller_::PARAMETER_VALIDATOR_DATA_SOURCE_KEY("validator_data_source_key");
+
 		int ValidatorVIXv6000DevicePoller::Poller_::_ComPortNb=1;
 		int ValidatorVIXv6000DevicePoller::Poller_::_ComPortRate=9600;
-
+		util::RegistryKeyType ValidatorVIXv6000DevicePoller::Poller_::_dataSourceKey=0;
+		
 		bool ValidatorVIXv6000DevicePoller::Poller_::launchPoller(
 			) const {
 
@@ -77,6 +81,7 @@ namespace synthese
 
 			map.insert(PARAMETER_VALIDATOR_COM_PORT_NUMBER, _ComPortNb);
 			map.insert(PARAMETER_VALIDATOR_COM_PORT_RATE, _ComPortRate);
+			map.insert(PARAMETER_VALIDATOR_DATA_SOURCE_KEY, _dataSourceKey);
 
 			return map;
 		}
@@ -85,8 +90,8 @@ namespace synthese
 		{
 			_ComPortNb = map.getDefault<int>(PARAMETER_VALIDATOR_COM_PORT_NUMBER, 8);
 			_ComPortRate = map.getDefault<int>(PARAMETER_VALIDATOR_COM_PORT_RATE, 9600);
+			_dataSourceKey = map.getDefault<util::RegistryKeyType>(PARAMETER_VALIDATOR_DATA_SOURCE_KEY, 0);
 		}
-
 
 		void ValidatorVIXv6000DevicePoller::Poller_::startPolling() const
 		{
@@ -96,7 +101,13 @@ namespace synthese
 			unsigned long long timeNextMessage = 0;
 			TimeUtil tu;
 
+			/*DEBUG(JD)*/
+			_dataSourceKey= 16607027920896001;// TODO: TOID RTTB urbain
+			/*DEBUG(JD)*/
+
 			Log::GetInstance().info(str(format("ValidatorVIXv6000DevicePoller: PortNumber=%d. Rate=%d") % _ComPortNb % _ComPortRate));
+
+			boost::shared_ptr<const impex::DataSource> dataSource = Env::GetOfficialEnv().get<impex::DataSource>(_dataSourceKey);
 
 			while (true)
 			{
@@ -113,9 +124,13 @@ namespace synthese
 					// check if we have to send something
 					if(timeNextMessage<tu.GetTickCount()){
 						// create data char array
-						iToBeWritten = int_surv.StreamToBuffer(buf, COM_PORT_BUFF_SIZE-1);
+
+						//
+
+						iToBeWritten = int_surv.StreamToBuffer(buf, COM_PORT_BUFF_SIZE-1, dataSource);
 						timeNextMessage = tu.GetTickCount() + BSC_SURV_TIME_MS;
-					}
+					}			
+
 					srt.PollingAnswerIntSurv(buf,iToBeWritten);
 
 					if(srt.WaitForAck1())

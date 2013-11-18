@@ -48,8 +48,11 @@
 #include "RoadModule.h"
 #include "PTUseRule.h"
 #include "Destination.hpp"
-#ifdef __gnu_linux__
-	#include "Connector.hpp"
+#ifdef WITH_MYSQL
+	#ifdef __gnu_linux__
+		#define MYSQL_CONNECTOR_AVAILABLE 1
+		#include "Connector.hpp"
+	#endif
 #endif
 #include "RoutePlanningTableGenerator.h"
 #include "ServerModule.h"
@@ -522,10 +525,10 @@ namespace synthese
 					optional<string> rtStr(map.getOptional<string>(PARAMETER_USE_SAE_DIRECT_CONNECTION));
 					if(rtStr && (*rtStr) == "1")
 					{
-					#ifdef __gnu_linux__
+					#ifdef MYSQL_CONNECTOR_AVAILABLE
 						_useSAEDirectConnection = true;
 					#else
-						throw RequestException("SAE Direct Connection works only on Linux platforms");
+						throw RequestException("SAE Direct Connection works only on Linux platforms and build with MySQL enabled");
 					#endif
 					}
 

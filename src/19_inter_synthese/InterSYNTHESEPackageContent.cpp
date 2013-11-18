@@ -283,7 +283,8 @@ namespace synthese
 
 					// Update or creation
 					boost::shared_ptr<Registrable> rObject;
-					if(directTableSync.contains(key))
+					const RegistryBase& registry(directTableSync.getRegistry(_env));
+					if( registry.contains(key) || directTableSync.contains(key))
 					{
 						try
 						{
@@ -349,7 +350,7 @@ namespace synthese
 				{
 					try
 					{
-						DBModule::LoadObjects(rObject->getLinkedObjectsIds(map), _env, UP_LINKS_LOAD_LEVEL);
+//						DBModule::LoadObjects(rObject->getLinkedObjectsIds(map), _env, UP_LINKS_LOAD_LEVEL);
 						if(rObject->loadFromRecord(map, _env))
 						{
 							localObjectsToSave.push_front(rObject);

@@ -50,6 +50,7 @@ namespace synthese
 
 		FIELD_STRING(ReplyAddress)
 		FIELD_STRING(ReplyPort)
+		FIELD_ID(TransportNetworkID)
 		FIELD_STRING(DefaultDirection)
 		FIELD_BOOL(SBBMode)
 

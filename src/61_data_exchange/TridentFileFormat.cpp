@@ -31,9 +31,12 @@
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
+#include "LineArea.hpp"
+#include "DRTArea.hpp"
 #include "CityTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
 #include "ReservationContactTableSync.h"
+#include "PTModule.h"
 #include "PTUseRule.h"
 #include "PTConstants.h"
 #include "CoordinatesSystem.hpp"
@@ -266,6 +269,38 @@ namespace synthese
 					true, true,
 					UP_LINKS_LOAD_LEVEL
 				);
+			}
+
+			// Link DRTAreas physical stops
+			BOOST_FOREACH(const Registry<LineStop>::value_type& itls, _env.getRegistry<LineStop>())
+			{
+				if(dynamic_cast<LineArea*>(itls.second.get()))
+				{
+					LineArea* la = static_cast<LineArea*>(itls.second.get());
+					BOOST_FOREACH(const Stops::Type::value_type stopArea, la->getArea()->get<Stops>())
+					{
+						StopPointTableSync::Search(_env, stopArea->getKey());
+						stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+					}
+
+					if(la->isArrivalAllowed() && !la->getInternalService())
+					{
+						la->addAllStops(true);
+					}
+					if(la->isDepartureAllowed())
+					{
+						la->addAllStops(false);
+					}
+					if(la->isArrivalAllowed() && la->getInternalService())
+					{
+						la->addAllStops(true);
+					}
+				}
+			}
+
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env.getRegistry<JourneyPattern>())
+			{
+				const JourneyPattern& line(*itline.second);
 				ScheduledServiceTableSync::Search(
 					_env,
 					line.getKey(),

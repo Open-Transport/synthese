@@ -52,7 +52,7 @@ namespace synthese
 			boost::shared_ptr<InterSYNTHESEPackage> _package;
 			boost::property_tree::ptree _objects;
 			typedef std::map<std::pair<util::RegistryKeyType, std::string>, std::string> ContentMap;
-			std::set<util::RegistryKeyType> _objectsToRemove;
+			std::vector<util::RegistryKeyType> _objectsToRemove;
 			typedef std::deque<const util::Registrable*> ObjectsToSave;
 			ObjectsToSave _objectsToSave;
 			std::vector<util::RegistryKeyType> _orderedObjectsToRemove;

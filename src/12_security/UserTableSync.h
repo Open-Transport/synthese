@@ -80,6 +80,17 @@ namespace synthese
 			*/
 			static boost::shared_ptr<User> getUserFromLogin(const std::string& login);
 
+
+
+			/** Gets a user in the database, founded by his mail address.
+				@param mail mail to search
+				@return boost::shared_ptr<User> Shared pointer to a new user linked-object.
+				@date 2013
+			*/
+			static boost::shared_ptr<User> getUserFromMail(const std::string& mail);
+
+
+
 			static bool loginExists(const std::string& login);
 
 			/** User search.
