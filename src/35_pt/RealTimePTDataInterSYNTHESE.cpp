@@ -196,6 +196,13 @@ namespace synthese
 
 
 
+		RealTimePTDataInterSYNTHESE::SortedItems RealTimePTDataInterSYNTHESE::sort( const RandomItems& randItems ) const
+		{
+			return randItems;
+		}
+
+
+
 		RealTimePTDataInterSYNTHESE::Content::Content(
 			const SchedulesBasedService& service,
 			boost::optional<const RanksToSync&> ranksToSync /*= boost::optional<const RanksToSync&>() */

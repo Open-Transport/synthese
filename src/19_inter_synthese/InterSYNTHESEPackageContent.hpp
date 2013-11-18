@@ -53,11 +53,22 @@ namespace synthese
 			boost::property_tree::ptree _objects;
 			typedef std::map<std::pair<util::RegistryKeyType, std::string>, std::string> ContentMap;
 			std::vector<util::RegistryKeyType> _objectsToRemove;
-			std::vector<const util::Registrable*> _objectsToSave;
+			typedef std::deque<const util::Registrable*> ObjectsToSave;
+			ObjectsToSave _objectsToSave;
+			std::vector<util::RegistryKeyType> _orderedObjectsToRemove;
+
+			void _prepareObjectsToRemove(
+				const boost::property_tree::ptree& node
+			);
+
+			void _prepareObjectsToRemoveRecursion(
+				const util::Registrable& object
+			);
 
 			Objects::Type _loadObjects(
 				const boost::property_tree::ptree& node,
 				const ContentMap& contentMap,
+				ObjectsToSave& objectsToSave,
 				boost::optional<const impex::Importer&> importer
 			);
 
@@ -66,8 +77,13 @@ namespace synthese
 				boost::optional<const impex::Importer&> importer
 			);
 
-			void _deleteWithSubObjects(
-				util::Registrable& object,
+			void _deleteObjectsToRemove(
+				const boost::property_tree::ptree& node,
+				boost::optional<const impex::Importer&> importer
+			);
+
+			void _deleteObjectsToRemoveRecursive(
+				const util::Registrable& object,
 				boost::optional<const impex::Importer&> importer
 			);
 

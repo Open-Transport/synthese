@@ -95,9 +95,10 @@ namespace synthese
 				const inter_synthese::InterSYNTHESESlave& slave,
 				const std::string& perimeter
 			) const;
+
+			virtual SortedItems sort(const RandomItems& randItems) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_RealTimePTDataInterSYNTHESE_hpp__
 
