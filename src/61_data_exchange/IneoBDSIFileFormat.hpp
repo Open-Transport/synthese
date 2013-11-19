@@ -84,11 +84,13 @@ namespace synthese
 				static const std::string PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID;
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 				static const std::string PARAMETER_HYSTERESIS;
+				static const std::string PARAMETER_DELAY_BUS_STOP;
 		
 			private:
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 				boost::posix_time::time_duration _hysteresis;
+				boost::posix_time::time_duration _delay_bus_stop;
 	
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
