@@ -113,6 +113,7 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER;
 			static const std::string PARAMETER_BROADCAST_POINT_ID;
 			static const std::string PARAMETER_WITH_DIRECTIONS;
+			static const std::string PARAMETER_SHORT_NAME_FILTER;
 
 			static const std::string FORMAT_WKT;
 

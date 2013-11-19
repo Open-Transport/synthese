@@ -32,9 +32,15 @@
 
 namespace synthese
 {
+	namespace inter_synthese
+	{
+		class InterSYNTHESEConfigItem;
+	}
+
 	namespace db
 	{
 		class DBRecord;
+		class DBTableSync;
 		class DBTransaction;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -60,6 +66,11 @@ namespace synthese
 			static const std::string TYPE_REPLACE_STATEMENT;
 			static const std::string TYPE_DELETE_STATEMENT;
 			static const std::string FIELD_SEPARATOR;
+
+		private:
+			static boost::shared_ptr<DBTableSync> _getTableSync(const std::string& perimeter);
+
+		public:
 
 			DBInterSYNTHESE();
 
@@ -126,6 +137,17 @@ namespace synthese
 				void operator()(const boost::optional<Blob>& blob) const;
 				void operator()(const boost::shared_ptr<geos::geom::Geometry>& geom) const;
 			};
+
+			class ItemsLess
+			{
+			public:
+				bool operator()(
+					const inter_synthese::InterSYNTHESEConfigItem* lhs,
+					const inter_synthese::InterSYNTHESEConfigItem* rhs
+				) const;
+			};
+
+			virtual SortedItems sort(const RandomItems& randItems) const;
 		};
 }	}
 

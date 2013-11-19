@@ -156,6 +156,8 @@ namespace synthese
 					!boost::algorithm::find_first(code, "<%")
 				);
 
+				bool isPdf(_page->getMimeType() == "application/pdf");
+
 				stream << "<h1>Visualisation</h1>";
 				stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "/admin/img/page_go.png") << "</p>";
 
@@ -164,68 +166,78 @@ namespace synthese
 
 				stream << "<p>";
 
-				if(canBeWYSIWYG)
+				if (!isPdf)
 				{
-					AdminActionFunctionRequest<WebPageUpdateAction,WebPageAdmin> rawEditorUpdateRequest(request, *this);
-					rawEditorUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
-					rawEditorUpdateRequest.getAction()->setRawEditor(!_page->get<RawEditor>());
-					stream <<
-						HTMLModule::getLinkButton(
-							rawEditorUpdateRequest.getHTMLForm().getURL(),
-							"Passer à l'éditeur "+ string(_page->get<RawEditor>() ? "WYSIWYG" : "technique")
-						);
+					if(canBeWYSIWYG)
+					{
+						AdminActionFunctionRequest<WebPageUpdateAction,WebPageAdmin> rawEditorUpdateRequest(request, *this);
+						rawEditorUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
+						rawEditorUpdateRequest.getAction()->setRawEditor(!_page->get<RawEditor>());
+						stream <<
+							HTMLModule::getLinkButton(
+								rawEditorUpdateRequest.getHTMLForm().getURL(),
+								"Passer à l'éditeur "+ string(_page->get<RawEditor>() ? "WYSIWYG" : "technique")
+							);
+					}
+					else
+					{
+						stream << HTMLModule::getLinkButton("/admin/service_api", "Services API", string(), "/admin/img/help.png");
+						stream << " L'éditeur technique est obligatoire à cause de la présence de balise d'appel aux services SYNTHESE dans le contenu de la page.";
+					}
 				}
 				else
 				{
-					stream << HTMLModule::getLinkButton("/admin/service_api", "Services API", string(), "/admin/img/help.png");
-					stream << " L'éditeur technique est obligatoire à cause de la présence de balise d'appel aux services SYNTHESE dans le contenu de la page.";
+					stream << " L'éditeur ne permet pas d'afficher ce fichier à cause du type MIME (application/pdf, que vous pouvez modifier sur l'onglet Propriétés).";
 				}
 				stream << "</p>";
 
 				StaticActionRequest<WebPageUpdateAction> contentUpdateRequest(request);
 				contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 
-				TinyMCE tinyMCE;
-				tinyMCE.setAjaxSaveURL(contentUpdateRequest.getURL());
-				stream << tinyMCE.open();
+				if (!isPdf)
+				{
+					TinyMCE tinyMCE;
+					tinyMCE.setAjaxSaveURL(contentUpdateRequest.getURL());
+					stream << tinyMCE.open();
 
-				if(	canBeWYSIWYG &&
-					!_page->get<RawEditor>()
-				){
-					if(_page->get<WebpageContent>().getMimeType() == MimeTypes::HTML)
-					{
-						stream <<
-							TinyMCE::GetFakeFormWithInput(
-								WebPageUpdateAction::PARAMETER_CONTENT1,
-								_page->get<WebpageContent>().getCMSScript().getCode()
-							)
-						;
-					}
-					else if(_page->get<WebpageContent>().getMimeType() == MimeTypes::PNG ||
-						_page->get<WebpageContent>().getMimeType() == MimeTypes::GIF ||
-						_page->get<WebpageContent>().getMimeType() == MimeTypes::JPEG
+					if(	canBeWYSIWYG &&
+						!_page->get<RawEditor>()
 					){
-						stream << "<p><img src=\"" << viewRequest.getURL() << "\" /></p>";
+						if(_page->get<WebpageContent>().getMimeType() == MimeTypes::HTML)
+						{
+							stream <<
+								TinyMCE::GetFakeFormWithInput(
+									WebPageUpdateAction::PARAMETER_CONTENT1,
+									_page->get<WebpageContent>().getCMSScript().getCode()
+								)
+							;
+						}
+						else if(_page->get<WebpageContent>().getMimeType() == MimeTypes::PNG ||
+							_page->get<WebpageContent>().getMimeType() == MimeTypes::GIF ||
+							_page->get<WebpageContent>().getMimeType() == MimeTypes::JPEG
+						){
+							stream << "<p><img src=\"" << viewRequest.getURL() << "\" /></p>";
+						}
+						else
+						{
+							stream << "<iframe src=\"" << viewRequest.getURL() << "\"></iframe>";
+						}
 					}
 					else
 					{
-						stream << "<iframe src=\"" << viewRequest.getURL() << "\"></iframe>";
+						AjaxForm f(contentUpdateRequest.getAjaxForm("update_content"));
+						stream << f.open();
+						EditArea editArea(stream);
+						editArea.getAjaxForm(
+							stream,
+							contentUpdateRequest.getURL(),
+							WebPageUpdateAction::PARAMETER_CONTENT1,
+							_page->get<WebpageContent>().getCMSScript().getCode(),
+							20, 80
+						);
+						stream << f.getSubmitButton("Sauvegarder");
+						stream << f.close();
 					}
-				}
-				else
-				{
-					AjaxForm f(contentUpdateRequest.getAjaxForm("update_content"));
-					stream << f.open();
-					EditArea editArea(stream);
-					editArea.getAjaxForm(
-						stream,
-						contentUpdateRequest.getURL(),
-						WebPageUpdateAction::PARAMETER_CONTENT1,
-						_page->get<WebpageContent>().getCMSScript().getCode(),
-						20, 80
-					);
-					stream << f.getSubmitButton("Sauvegarder");
-					stream << f.close();
 				}
 
 				// File upload

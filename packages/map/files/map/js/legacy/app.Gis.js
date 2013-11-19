@@ -342,6 +342,11 @@ window.app.Gis.prototype = {
     addDeferedControls: function() {
         var map = this.map;
 
+	// Disable scrollwhell
+	controls = map.getControlsByClass('OpenLayers.Control.Navigation');
+	for(var i = 0; i < controls.length; ++i)
+	    controls[i].disableZoomWheel();
+
         map.addControl(new OpenLayers.Control.MapTypePanel());
 
         var control = new OpenLayers.Control.SelectFeature(

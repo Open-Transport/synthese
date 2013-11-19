@@ -52,6 +52,10 @@ UserNameInterfaceElement.cpp
 UserNameInterfaceElement.h
 UserPasswordUpdateAction.cpp
 UserPasswordUpdateAction.h
+UserPasswordRecoveryAction.cpp
+UserPasswordRecoveryAction.hpp
+UserPasswordChangeAction.cpp
+UserPasswordChangeAction.hpp
 UserPhoneInterfaceElement.cpp
 UserPhoneInterfaceElement.h
 UserPrefPanel.h

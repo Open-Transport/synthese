@@ -28,6 +28,7 @@
 #include "RequestException.h"
 #include "Request.h"
 
+using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
 
@@ -72,6 +73,7 @@ namespace synthese
 				_slave = Env::GetOfficialEnv().getEditable<InterSYNTHESESlave>(
 					map.get<RegistryKeyType>(PARAMETER_SLAVE_ID)
 				);
+				_queueMutex.reset(new recursive_mutex::scoped_lock(_slave->getQueueMutex()));
 				_range = make_pair(
 					_slave->getQueue().end(),
 					_slave->getQueue().end()

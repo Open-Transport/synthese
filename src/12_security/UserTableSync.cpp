@@ -329,6 +329,33 @@ namespace synthese
 
 
 
+		boost::shared_ptr<User> UserTableSync::getUserFromMail(const string& mail)
+		{
+			Env& env(Env::GetOfficialEnv());
+			DB* db = DBModule::GetDB();
+			stringstream query;
+			query
+				<< "SELECT *"
+				<< " FROM " << TABLE.NAME
+				<< " WHERE " << TABLE_COL_EMAIL << "=" << Conversion::ToDBString(mail);
+			try
+			{
+				db::DBResultSPtr rows = db->execQuery(query.str());
+				if (rows->next () == false)
+					throw Exception("Mail "+ mail + " not found in database.");
+
+				boost::shared_ptr<User> user (new User(rows->getKey()));
+				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);
+				return user;
+			}
+			catch (DBException e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+
+
+
 		UserTableSync::SearchResult UserTableSync::Search(
 			Env& env,
 			optional<string> login,

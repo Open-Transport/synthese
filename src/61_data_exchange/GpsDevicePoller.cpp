@@ -33,9 +33,14 @@
 #include <iostream>
 #include <fstream>
 
-
 #include "PermanentThread.hpp"
 #include "ServerModule.h"
+
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
+#include "Vehicle.hpp"
+#include "VehicleModule.hpp"
+#include "StopPointTableSync.hpp"
 
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
@@ -47,9 +52,12 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace data_exchange;
+	using namespace pt;
 	using namespace server;
 	using namespace util;
 	using namespace db;
+	using namespace geos::geom;
+	using namespace vehicle;
 
 	namespace util
 	{
@@ -100,6 +108,9 @@ namespace synthese
 
 			Log::GetInstance().info(str(format("GpsDevicePoller: NetPortNumber=%d") % _NetPortNb));
 
+			VehicleModule::GetCurrentVehiclePosition().setStatus(VehiclePosition::UNKNOWN_STATUS);
+			VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
+
 			while (true)
 			{
 
@@ -116,13 +127,60 @@ namespace synthese
 						this_thread::sleep(seconds(30));
 					}
 				}
-
-				if(bGpsOk){
+lon=6.921083;
+lat=47.552028;
+//				if(bGpsOk){
 					// We have a valid gps socket opened. Use it.
-					if(g.updateFromGps()){
+//					if(g.updateFromGps()){
 						//TODO: eventually check value coherency.
-						g.getLatLong(lon,lat);
-					}
+						double lonOld=lon;
+						double latOld=lat;
+//						g.getLatLong(lon,lat);
+/*DEBUG(JD)
+						// GPS position has changed. check if we need to change the stop point
+						if(lon!=lonOld || lat!=latOld)
+DEBUG(JD)*/
+						{	//TODO: we could add longitude and latitude change tolerance
+
+							// Create the coordinate point
+							boost::shared_ptr<Point> point(
+								CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(lon,lat)
+							);
+							boost::shared_ptr<Point> projectedPoint(
+								CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*point)
+							);
+
+							// Nearest stop point
+							StopPoint* nearestStopPoint(NULL);
+							double maxdistance(3000.0);
+							double lastDistance(0.0);
+							pt::StopPointTableSync::SearchResult  sr = pt::StopPointTableSync::SearchByMaxDistance(
+								*projectedPoint.get(),
+								maxdistance, //distance  to originPoint
+								Env::GetOfficialEnv(),
+								UP_LINKS_LOAD_LEVEL
+							);
+
+							BOOST_FOREACH(boost::shared_ptr<StopPoint> sp, sr)
+							{
+								double dst(sp->getGeometry()->distance(projectedPoint.get()));
+
+								if(!nearestStopPoint || dst < lastDistance)
+								{
+									lastDistance = dst;
+									nearestStopPoint = sp.get();
+								}
+							}
+							VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
+							
+
+							// update Vehicle position.
+							VehicleModule::GetCurrentVehiclePosition().setGeometry(
+								projectedPoint
+							);
+//						}
+
+//					}
 					//TODO Should we retry to reconnect if updateFromGps fail too much?
 				}
 

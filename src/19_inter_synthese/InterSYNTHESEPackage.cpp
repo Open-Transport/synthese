@@ -48,18 +48,13 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(LockServerName, "lock_server_name", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(LastJSON, "last_json", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Objects, "object_ids", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(FullTables, "full_tables", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Public, "public", SQL_BOOLEAN)
 
 	namespace inter_synthese
 	{
 		const string InterSYNTHESEPackage::TAG_IMPORT = "import";
 		const string InterSYNTHESEPackage::TAG_LOCK_USER = "lock_user";
-		const string InterSYNTHESEPackage::TAG_OBJECT = "object";
 		const string InterSYNTHESEPackage::SEPARATOR = ":";
-		const string InterSYNTHESEPackage::TAG_TABLE = "table";
-		const string InterSYNTHESEPackage::ATTR_ID = "id";
-		const string InterSYNTHESEPackage::ATTR_NAME = "name";
 		
 
 
@@ -72,7 +67,6 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_DEFAULT_CONSTRUCTOR(Code),
 					FIELD_DEFAULT_CONSTRUCTOR(Objects),
-					FIELD_DEFAULT_CONSTRUCTOR(FullTables),
 					FIELD_DEFAULT_CONSTRUCTOR(Import),
 					FIELD_DEFAULT_CONSTRUCTOR(LockUser),
 					FIELD_DEFAULT_CONSTRUCTOR(LockTime),
@@ -144,21 +138,10 @@ namespace synthese
 				map.insert(TAG_LOCK_USER, lockUserPM);
 			}
 
-			// Objects
+			// Objects or tables
 			BOOST_FOREACH(const Objects::Type::value_type& item, get<Objects>())
 			{
-				boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
-				item->toParametersMap(*objectPM, false);
-				map.insert(TAG_OBJECT, objectPM);
-			}
-
-			// Tables
-			BOOST_FOREACH(const FullTables::Type::value_type& table, get<FullTables>())
-			{
-				boost::shared_ptr<ParametersMap> tablePM(new ParametersMap);
-				tablePM->insert(ATTR_ID, lexical_cast<string>(table->getFormat().ID));
-				tablePM->insert(ATTR_NAME, table->getFormat().NAME);
-				map.insert(TAG_TABLE, tablePM);
+				item.toParametersMap(map);
 			}
 		}
 
@@ -265,37 +248,10 @@ namespace synthese
 			}
 			map.insert(Public::FIELD.name, get<Public>());
 
-			// Unique objects
+			// Objects or tables
 			BOOST_FOREACH(const Objects::Type::value_type& item, get<Objects>())
 			{
-				boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
-				_dumpObject(*item, *objectPM, binaryStream);
-				map.insert(TAG_OBJECT, objectPM);
-			}
-
-			// Full tables
-			Env fullTablesEnv;
-			BOOST_FOREACH(const FullTables::Type::value_type& table, get<FullTables>())
-			{
-				boost::shared_ptr<DBDirectTableSync> directTableSync(
-					boost::dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
-						table
-				)	);
-				if(!directTableSync.get())
-				{
-					continue;
-				}
-				DBDirectTableSync::RegistrableSearchResult objects(
-					directTableSync->search(
-						string(),
-						Env::GetOfficialEnv() // TODO replace by fullTableEnv in case of non full synchro table
-				)	);
-				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
-				{
-					boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
-					_dumpObject(*item, *objectPM, binaryStream);
-					map.insert(TAG_OBJECT, objectPM);
-				}
+				_dumpItem(item, map, binaryStream);
 			}
 
 			// JSON generation
@@ -315,23 +271,70 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Recursive object dump.
-		/// @param object the object to dump
-		/// @retval pm the parameters map to populate with the object data
-		/// @retval binaryStream the stream where the binary data is written
-		void InterSYNTHESEPackage::_dumpObject(
-			const Registrable& object,
-			util::ParametersMap& pm,
-			std::stringstream& binaryStream
-		){
+		InterSYNTHESEPackage::ItemDumper::ItemDumper(
+			ParametersMap& pm,
+			stringstream& binaryStream
+		):	_pm(pm),
+			_binaryStream(binaryStream)
+		{}
+
+
+
+		void InterSYNTHESEPackage::ItemDumper::operator()(
+			boost::shared_ptr<db::DBTableSync> value
+		) const	{
+
+			// New parameters map
+			boost::shared_ptr<ParametersMap> tablePM(new ParametersMap);
+
+			// Export of the table id
+			tablePM->insert(TableOrObject::ATTR_ID, lexical_cast<string>(value->getFormat().ID));
+
+			// Export of all objects of the table
+			Env fullTablesEnv;
+			boost::shared_ptr<DBDirectTableSync> directTableSync(
+				boost::dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
+					value
+			)	);
+			if(directTableSync.get())
+			{
+				DBDirectTableSync::RegistrableSearchResult objects(
+					directTableSync->search(
+						string(),
+						Env::GetOfficialEnv() // TODO replace by fullTableEnv in case of non full synchro table
+				)	);
+				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
+				{
+					_dumpItem(TableOrObject(item), *tablePM, _binaryStream);
+				}
+			}
+
+			// Export of the data to the parameters map
+			_pm.insert(TableOrObject::TAG_OBJECT, tablePM);
+		}
+
+
+
+		void InterSYNTHESEPackage::ItemDumper::operator()(
+			boost::shared_ptr<util::Registrable> value
+		) const	{
+
+			operator()(value.get());
+		}
+
+
+
+		void InterSYNTHESEPackage::ItemDumper::operator()( util::Registrable* value ) const
+		{
+			boost::shared_ptr<ParametersMap> objectPM(new ParametersMap);
+			
 			// Object non binary fields
-			object.toParametersMap(pm, false, false);
+			value->toParametersMap(*objectPM, false, false);
 
 			// Object binary fields
 			MD5Wrapper md5;
 			FilesMap filesMap;
-			object.toFilesMap(filesMap);
+			value->toFilesMap(filesMap);
 			BOOST_FOREACH(const FilesMap::Map::value_type& item, filesMap.getMap())
 			{
 				// Variables
@@ -339,22 +342,38 @@ namespace synthese
 				const string& content(item.second.content);
 
 				// Md5 of the content
-				pm.insert(
+				objectPM->insert(
 					fieldName,
 					md5.getHashFromString(content)
 				);
 
 				// Raw binary content
-				binaryStream <<SEPARATOR<< object.getKey() <<SEPARATOR<< fieldName <<SEPARATOR<< content.size() <<SEPARATOR<< content;
+				_binaryStream <<SEPARATOR<< value->getKey() <<SEPARATOR<< fieldName <<SEPARATOR<< content.size() <<SEPARATOR<< content;
 			}
 
 			// Sub objects
-			BOOST_FOREACH(const SubObjects::value_type& it, object.getSubObjects())
+			BOOST_FOREACH(const SubObjects::value_type& it, value->getSubObjects())
 			{
-				boost::shared_ptr<ParametersMap> subObjectPM(new ParametersMap);
-				_dumpObject(*it, *subObjectPM, binaryStream);
-				pm.insert(TAG_OBJECT, subObjectPM);
+				_dumpItem(TableOrObject(it), *objectPM, _binaryStream);
 			}
+
+			_pm.insert(TableOrObject::TAG_OBJECT, objectPM);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Recursive object dump.
+		/// @param object the object to dump
+		/// @retval pm the parameters map to populate with the object data
+		/// @retval binaryStream the stream where the binary data is written
+		void InterSYNTHESEPackage::_dumpItem(
+			const TableOrObject& object,
+			util::ParametersMap& pm,
+			std::stringstream& binaryStream
+		){
+			TableOrObject::Value objectValue(object.getValue());
+			apply_visitor(ItemDumper(pm, binaryStream), objectValue);
 		}
 
 

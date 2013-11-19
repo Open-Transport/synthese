@@ -102,6 +102,7 @@ namespace synthese
 				return ParametersMap();
 			}
 
+			recursive_mutex::scoped_lock queueLock(_slave->getQueueMutex());
 			InterSYNTHESESlave::QueueRange range(_slave->getQueueRange());
 			if(range.first == _slave->getQueue().end())
 			{

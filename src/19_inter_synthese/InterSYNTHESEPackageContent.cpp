@@ -176,9 +176,20 @@ namespace synthese
 			_package->set<Public>(
 				_objects.get<bool>(Public::FIELD.name)
 			);
+			_prepareObjectsToRemove(_objects);
 			_package->set<Objects>(
-				_loadObjects(_objects, contentMap, importer)
+				_loadObjects(_objects, contentMap, _objectsToSave, importer)
 			);
+			_deleteObjectsToRemove(_objects, importer);
+			if(importer)
+			{
+				BOOST_FOREACH(const Registrable* object, _objectsToSave)
+				{
+					RegistryTableType tableId(decodeTableId(object->getKey()));
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
+					importer->_logDebug("Save "+ lexical_cast<string>(object->getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  object->getName() + ")"  );
+				}
+			}
 			_objectsToSave.push_back(_package.get());
 			if(importer)
 			{
@@ -197,28 +208,50 @@ namespace synthese
 		Objects::Type InterSYNTHESEPackageContent::_loadObjects(
 			const boost::property_tree::ptree& node,
 			const ContentMap& contentMap,
+			ObjectsToSave& objectsToSave,
 			boost::optional<const impex::Importer&> importer
 		){
 			Objects::Type result;
 
-			// Loop on objects
-			if(node.count(InterSYNTHESEPackage::TAG_OBJECT))
+			// Empty content : exit
+			if(!node.count(TableOrObject::TAG_OBJECT))
 			{
-				vector<ParametersMap> pms;
+				return result;
+			}
+			
+			vector<ParametersMap> pms;
 
-				// Loading or creating objects
-				BOOST_FOREACH(const ptree::value_type& objectNode, node.get_child(InterSYNTHESEPackage::TAG_OBJECT))
+			// Loop for Loading or creating objects
+			BOOST_FOREACH(const ptree::value_type& it, node.get_child(TableOrObject::TAG_OBJECT))
+			{
+				// The object key
+				RegistryKeyType key(it.second.get<RegistryKeyType>(Key::FIELD.name));
+				RegistryTableType tableId(decodeTableId(key));
+
+				if(tableId == 0) // Case full table
 				{
-					// The object key
-					RegistryKeyType key(objectNode.second.get<RegistryKeyType>(Key::FIELD.name));
+					tableId = static_cast<RegistryTableType>(key);
+
+					// Register the table
+					Env fakeEnv; // Useless because we know that the id corresponds to a table id, but needed by the constructor prototype
+					result.push_back(TableOrObject(tableId, fakeEnv));
+
+					// Fake fields
+					ParametersMap map;
+					map.insert(TableOrObject::ATTR_ID, key);
+					pms.push_back(map);
+				}
+				else // Case unique object
+				{
+					_objectsToRemove.erase(key);
 
 					//////////////////////////////////////////////////////////////////////////
 					/// Ptree read
 					ParametersMap map;
-					BOOST_FOREACH(const ptree::value_type& item, objectNode.second)
+					BOOST_FOREACH(const ptree::value_type& item, it.second)
 					{
 						// Jump over sub-objects
-						if(item.first == InterSYNTHESEPackage::TAG_OBJECT)
+						if(item.first == TableOrObject::TAG_OBJECT)
 						{
 							continue;
 						}
@@ -250,7 +283,8 @@ namespace synthese
 
 					// Update or creation
 					boost::shared_ptr<Registrable> rObject;
-					if(directTableSync.contains(key))
+					const RegistryBase& registry(directTableSync.getRegistry(_env));
+					if( registry.contains(key) || directTableSync.contains(key))
 					{
 						try
 						{
@@ -260,7 +294,7 @@ namespace synthese
 							);
 						}
 						catch(...) // Avoid break of the package installation because of bad value in existing data
-							       // In case of exception, the object will be considered as created
+								   // In case of exception, the object will be considered as created
 						{
 							const RegistryBase& registry(directTableSync.getRegistry(_env));
 							if( registry.contains(key))
@@ -284,104 +318,56 @@ namespace synthese
 							_env.addRegistrable(rObject);
 						}
 					}
-					result.push_back(rObject.get());
+					result.push_back(TableOrObject(rObject));
+			}	}
 
-				}
+			// Second loop : removal detection and recursive calls
+			Objects::Type::iterator itItem(result.begin());
+			vector<ParametersMap>::iterator itPM(pms.begin());
+			BOOST_FOREACH(const ptree::value_type& it, node.get_child(TableOrObject::TAG_OBJECT))
+			{
+				// The object key
+				const TableOrObject& rItem(*itItem);
+				++itItem;
 
-				Objects::Type::iterator itObject(result.begin());
-				vector<ParametersMap>::iterator itPM(pms.begin());
-				BOOST_FOREACH(const ptree::value_type& objectNode, node.get_child(InterSYNTHESEPackage::TAG_OBJECT))
+				// The ParametersMap corresponding to the current JSON level
+				const ParametersMap& map(*itPM);
+				++itPM;
+
+				ObjectsToSave localObjectsToSave;
+
+				//////////////////////////////////////////////////////////////////////////
+				// Recursion
+				Objects::Type packageSubObjects(
+					_loadObjects(it.second, contentMap, localObjectsToSave, importer)
+				);
+
+				// Load properties of the current object (for objects only)
+				// Placed after the load of the sub objects to prevent bad link
+				// in case of link to a sub object
+				Registrable* rObject(rItem.getObject());
+				if(rObject)
 				{
-					// The object key
-					Registrable* rObject(*itObject);
-					++itObject;
-
-					// The ParametersMap corresponding to the current JSON level
-					const ParametersMap& map(*itPM);
-					++itPM;
-
-					//////////////////////////////////////////////////////////////////////////
-					// Recursion
-					Objects::Type subObjects(
-						_loadObjects(objectNode.second, contentMap, importer)
-					);
-
-					// Load properties of the current object
-					// Placed after the load of the sub objects to prevent bad link
-					// in case of link to a sub object
 					try
 					{
-						DBModule::LoadObjects(rObject->getLinkedObjectsIds(map), _env, UP_LINKS_LOAD_LEVEL);
+//						DBModule::LoadObjects(rObject->getLinkedObjectsIds(map), _env, UP_LINKS_LOAD_LEVEL);
 						if(rObject->loadFromRecord(map, _env))
 						{
-							_objectsToSave.push_back(rObject);
-							if(importer)
-							{
-								RegistryTableType tableId(decodeTableId(rObject->getKey()));
-								boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
-								importer->_logDebug("Save "+ lexical_cast<string>(rObject->getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  rObject->getName() + ")"  );
-							}
+							localObjectsToSave.push_front(rObject);
 						}
 						rObject->link(_env, false);
 					}
 					catch(...) // Avoid break of the package installation because of bad value in new data
-							   // The object update will be ignored
+						// The object update will be ignored
 					{
-						
-					}
 
-					// Removal detection
-					RegistryTableType classId(decodeTableId(rObject->getKey()));
-					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
-					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
-					{
-						throw synthese::Exception("Bad table");
 					}
-					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
-					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
-					if( registry.contains(rObject->getKey()))
-					{
-						BOOST_FOREACH(Registrable* subObject, registry.getEditableObject(rObject->getKey())->getSubObjects())
-						{
-							bool found(false);
-							BOOST_FOREACH(const Registrable* object, subObjects)
-							{
-								if(object->getKey() == subObject->getKey())
-								{
-									found = true;
-									break;
-								}
-							}
-							if(!found)
-							{
-								_deleteWithSubObjects(*subObject, importer);
-							}
-						}
-					}
-			}	}
+				}
+
+				objectsToSave.insert(objectsToSave.end(), localObjectsToSave.begin(), localObjectsToSave.end());
+			}
 
 			return result;
-		}
-
-
-
-		void InterSYNTHESEPackageContent::_deleteWithSubObjects(
-			util::Registrable& object,
-			boost::optional<const impex::Importer&> importer
-		){
- 			BOOST_REVERSE_FOREACH(Registrable* subObject, object.getSubObjects()) // Reverse order to maintain dependencies between objects
-			{
-				_deleteWithSubObjects(*subObject, importer);
-			}
-			_objectsToRemove.push_back(object.getKey()); // After the sub-objects to maintain dependencies 
-			if(importer)
-			{
-				RegistryTableType tableId(decodeTableId(object.getKey()));
-				boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
-				importer->_logDebug(
-					"Delete "+ lexical_cast<string>(object.getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  object.getName() + ")"
-				);
-			}
 		}
 
 
@@ -404,6 +390,146 @@ namespace synthese
 			BOOST_FOREACH(const Registrable* object, _objectsToSave)
 			{
 				DBModule::SaveObject(*object, transaction);
+			}
+		}
+
+
+
+		void InterSYNTHESEPackageContent::_prepareObjectsToRemoveRecursion( const util::Registrable& object )
+		{
+			_objectsToRemove.insert(object.getKey());
+			BOOST_FOREACH(Registrable* subObject, object.getSubObjects())
+			{
+				_prepareObjectsToRemoveRecursion(*subObject);
+			}
+		}
+
+
+
+		void InterSYNTHESEPackageContent::_prepareObjectsToRemove( const boost::property_tree::ptree& node )
+		{
+			// Empty content : exit
+			if(!node.count(TableOrObject::TAG_OBJECT))
+			{
+				return;
+			}
+			
+			// Loop for Loading or creating objects
+			BOOST_FOREACH(const ptree::value_type& it, node.get_child(TableOrObject::TAG_OBJECT))
+			{
+				// The object key
+				RegistryKeyType key(it.second.get<RegistryKeyType>(Key::FIELD.name));
+				RegistryTableType classId(decodeTableId(key));
+
+				if(classId > 0)
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
+					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+					{
+						continue;
+					}
+					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
+					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
+					if( registry.contains(key))
+					{
+						_prepareObjectsToRemoveRecursion(*registry.getEditableObject(key));
+					}
+				}
+				else
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(static_cast<RegistryTableType>(key)));
+					DBDirectTableSync* directTableSync(dynamic_cast<DBDirectTableSync*>(tableSync.get()));
+					if(!directTableSync)
+					{
+						continue;
+					}
+
+					DBDirectTableSync::RegistrableSearchResult objects(
+						directTableSync->search(
+							string(),
+							Env::GetOfficialEnv()
+					)	);
+					BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
+					{
+						_prepareObjectsToRemoveRecursion(*item);
+					}
+				}
+			}
+		}
+
+
+
+		void InterSYNTHESEPackageContent::_deleteObjectsToRemove(
+			const boost::property_tree::ptree& node,
+			boost::optional<const impex::Importer&> importer
+		){
+			// Empty content : exit
+			if(!node.count(TableOrObject::TAG_OBJECT))
+			{
+				return;
+			}
+			
+			// Loop for Loading or creating objects
+			BOOST_FOREACH(const ptree::value_type& it, node.get_child(TableOrObject::TAG_OBJECT))
+			{
+				// The object key
+				RegistryKeyType key(it.second.get<RegistryKeyType>(Key::FIELD.name));
+				RegistryTableType classId(decodeTableId(key));
+
+				if(classId > 0)
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
+					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+					{
+						continue;
+					}
+					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
+					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
+					if( registry.contains(key))
+					{
+						_deleteObjectsToRemoveRecursive(*registry.getEditableObject(key), importer);
+					}
+				}
+				else
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(static_cast<RegistryTableType>(key)));
+					DBDirectTableSync* directTableSync(dynamic_cast<DBDirectTableSync*>(tableSync.get()));
+					if(!directTableSync)
+					{
+						continue;
+					}
+
+					DBDirectTableSync::RegistrableSearchResult objects(
+						directTableSync->search(
+							string(),
+							Env::GetOfficialEnv()
+					)	);
+					BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
+					{
+						_deleteObjectsToRemoveRecursive(*item, importer);
+					}
+				}
+			}
+		}
+
+
+
+		void InterSYNTHESEPackageContent::_deleteObjectsToRemoveRecursive( const util::Registrable& object, boost::optional<const impex::Importer&> importer )
+		{
+			BOOST_FOREACH(Registrable* subObject, object.getSubObjects())
+			{
+				_deleteObjectsToRemoveRecursive(*subObject, importer);
+			}
+
+			if(_objectsToRemove.find(object.getKey()) != _objectsToRemove.end())
+			{
+				_orderedObjectsToRemove.push_back(object.getKey());
+				if(importer)
+				{
+					RegistryTableType tableId(decodeTableId(object.getKey()));
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(tableId));
+					importer->_logDebug("Delete "+ lexical_cast<string>(object.getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  object.getName() + ")");
+				}
 			}
 		}
 }	}
