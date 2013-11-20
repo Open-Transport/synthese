@@ -38,8 +38,7 @@ namespace synthese
 		Calendar::Calendar(
 			util::RegistryKeyType id
 		):
-			Registrable(id),
-			_mutex(new recursive_mutex)
+			Registrable(id)
 		{}
 
 
@@ -50,7 +49,6 @@ namespace synthese
 			date_duration step
 		):	Registrable(0),
 			_markedDates(firstDate, lastDate, step),
-			_mutex(new recursive_mutex),
 			_firstActiveDate(firstDate)
 			// last active date cannot be constructed at this time
 		{
@@ -62,18 +60,16 @@ namespace synthese
 			const Calendar& other
 		):	Registrable(0),
 			_markedDates(other._markedDates),
-			_firstActiveDate(other._firstActiveDate),
 			_calendarLinks(other._calendarLinks),
-			_lastActiveDate(other._lastActiveDate),
-			_mutex(new recursive_mutex)
+			_firstActiveDate(other._firstActiveDate),
+			_lastActiveDate(other._lastActiveDate)
 		{}
 
 
 
 		Calendar::Calendar(
 			const std::string& serialized
-		):	Registrable(0),
-			_mutex(new recursive_mutex)
+		):	Registrable(0)
 		{
 			setFromSerializedString(serialized);
 		}
@@ -108,7 +104,7 @@ namespace synthese
 		) const {
 			if(!_firstActiveDate)
 			{
-				recursive_mutex::scoped_lock lock(*_mutex);
+				recursive_mutex::scoped_lock lock(_mutex);
 				_firstActiveDate = _getDatesCache().getFirstActiveDate();
 			}
 			return *_firstActiveDate;
@@ -174,7 +170,7 @@ namespace synthese
 
 		Calendar::DatesVector Calendar::getActiveDates(
 		) const {
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return _getDatesCache().getActiveDates();
 		}
 
@@ -190,7 +186,7 @@ namespace synthese
 
 		bool Calendar::isActive(const date& d) const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return _getDatesCache().isActive(d);
 		}
 
@@ -215,7 +211,7 @@ namespace synthese
 		{
 			assert(!d.is_not_a_date());
 
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_markedDates.setActive(d);
 		
 			_resetDatesCache();
@@ -225,7 +221,7 @@ namespace synthese
 
 		void Calendar::clear()
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_markedDates.clear();
 			_calendarLinks.clear();
 			_datesToBypass.clear();
@@ -255,7 +251,7 @@ namespace synthese
 
 		void Calendar::setInactive(const date& d)
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			assert(!d.is_not_a_date());
 
 			_markedDates.setInactive(d);
@@ -291,7 +287,7 @@ namespace synthese
 
 		Calendar& Calendar::operator&= (const Calendar& op)
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 
 			_markedDates &= op._getDatesCache();
 
@@ -304,7 +300,7 @@ namespace synthese
 		Calendar& Calendar::operator|=(
 			const Calendar& op
 		){
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 
 			_markedDates.operator |=(op._getDatesCache());
 
@@ -349,7 +345,7 @@ namespace synthese
 
 		bool Calendar::hasAtLeastOneCommonDateWith( const Calendar& op ) const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return _getDatesCache().hasAtLeastOneCommonDateWith(op._getDatesCache());
 		}
 
@@ -357,7 +353,7 @@ namespace synthese
 
 		bool Calendar::operator==( const Calendar& op ) const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return _getDatesCache() == op._getDatesCache();
 		}
 
@@ -395,7 +391,7 @@ namespace synthese
 
 		Calendar& Calendar::operator-=( const Calendar& op )
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 
 			_markedDates -= op._getDatesCache();
 			_resetDatesCache();
@@ -428,7 +424,7 @@ namespace synthese
 		
 		bool Calendar::empty() const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return _getDatesCache().empty();
 		}
 
@@ -447,7 +443,7 @@ namespace synthese
 
 		size_t Calendar::size() const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return _getDatesCache().size();
 		}
 
@@ -455,7 +451,7 @@ namespace synthese
 
 		bool Calendar::operator!=( const Calendar& op ) const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			return _getDatesCache() != op._getDatesCache();
 		}
 
@@ -471,7 +467,7 @@ namespace synthese
 
 		void Calendar::copyDates( const Calendar& op )
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_markedDates = op._getDatesCache();
 			_resetDatesCache();
 		}
@@ -491,7 +487,7 @@ namespace synthese
 
 		void Calendar::serialize( std::ostream& stream ) const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_markedDates.serialize(stream);
 		}
 
@@ -520,7 +516,7 @@ namespace synthese
 
 		void Calendar::setFromSerializedString( const std::string& value )
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_markedDates.setFromSerializedString(value);
 			_resetDatesCache();
 		}
@@ -540,7 +536,7 @@ namespace synthese
 
 		Calendar& Calendar::operator<<=( size_t i )
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_markedDates <<= i;
 			_resetDatesCache();
 			return *this;
@@ -548,9 +544,31 @@ namespace synthese
 
 
 
+		Calendar& Calendar::operator=( Calendar const& rhs )
+		{
+			// Both objects are now locked
+			recursive_mutex::scoped_lock lock(_mutex);
+			recursive_mutex::scoped_lock rhsLock(rhs._mutex);
+
+			// Base data
+			_markedDates = rhs._markedDates;
+			_datesToForce = rhs._datesToForce;
+			_datesToBypass = rhs._datesToBypass;
+			_calendarLinks = rhs._calendarLinks;
+
+			// Cache copy
+			_firstActiveDate = rhs._firstActiveDate;
+			_lastActiveDate = rhs._lastActiveDate;
+			_datesCache = rhs._datesCache;
+
+			return *this;
+		}
+
+
+
 		Calendar Calendar::operator<<( size_t i ) const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			Calendar obj(*this);
 			obj <<= i;
 			return obj;
@@ -569,7 +587,7 @@ namespace synthese
 			const CalendarLink& link,
 			bool updateCalendar
 		){
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_calendarLinks.erase(const_cast<CalendarLink*>(&link));
 			_resetDatesCache();
 		}
@@ -580,7 +598,7 @@ namespace synthese
 			const CalendarLink& link,
 			bool updateCalendar
 		){
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_calendarLinks.insert(const_cast<CalendarLink*>(&link));
 			_resetDatesCache();
 		}
@@ -605,7 +623,7 @@ namespace synthese
 
 		const Calendar::BitSets& Calendar::_getDatesCache() const
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			if(!_datesCache)
 			{
 				if(_calendarLinks.empty())
@@ -642,7 +660,7 @@ namespace synthese
 
 		void Calendar::setCalendarLinks( const CalendarLinks& value )
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_calendarLinks = value;
 			_resetDatesCache();
 		}
@@ -651,7 +669,7 @@ namespace synthese
 
 		void Calendar::setDatesToForce( const DatesSet& value )
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_datesToForce = value;
 			_resetDatesCache();
 		}
@@ -660,7 +678,7 @@ namespace synthese
 
 		void Calendar::setDatesToBypass( const DatesSet& value )
 		{
-			recursive_mutex::scoped_lock lock(*_mutex);
+			recursive_mutex::scoped_lock lock(_mutex);
 			_datesToBypass = value;
 			_resetDatesCache();
 		}
