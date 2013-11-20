@@ -77,6 +77,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_HOURS_TO_KEEP = "hours_to_keep";
 		
 		
 		
@@ -122,6 +123,11 @@ namespace synthese
 			// Delay for bus at stop
 			_delay_bus_stop = seconds(
 				map.getDefault<long>(PARAMETER_DELAY_BUS_STOP, 35)
+			);
+
+			// Time of RT data to keep
+			_time_to_keep = hours(
+				map.getDefault<long>(PARAMETER_HOURS_TO_KEEP, 20)
 			);
 		}
 		
@@ -374,6 +380,8 @@ namespace synthese
 				const time_duration dayBreakTime(hours(3));
 				time_duration now_plus_delay(now);
 				now_plus_delay += _delay_bus_stop;
+				time_duration limit_to_keep(now);
+				limit_to_keep += _time_to_keep;
 				string lastCourseRef;
 				Course* course(NULL);
 				while(horaireResult->next())
@@ -416,6 +424,14 @@ namespace synthese
 
 					if(course)
 					{
+						// Patch for not update the RT services after time to keep
+						time_duration htd = duration_from_string(horaireResult->getText("htd"));
+						if(htd < dayBreakTime)
+						{
+							htd += hours(24);
+						}
+						bool notUpdateRTData = htd > limit_to_keep;
+
 						Horaire& horaire(
 							*course->horaires.insert(
 								course->horaires.end(),
@@ -452,6 +468,12 @@ namespace synthese
 						if(horaire.hta < dayBreakTime)
 						{
 							horaire.hta += hours(24);
+						}
+
+						if (notUpdateRTData)
+						{
+							horaire.hra = horaire.hta;
+							horaire.hrd = horaire.htd;
 						}
 
 						// Patch for bad schedules when the bus is at stop
