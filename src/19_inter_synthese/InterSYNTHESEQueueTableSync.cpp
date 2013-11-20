@@ -53,6 +53,8 @@ namespace synthese
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<InterSYNTHESEQueueTableSync>::GetIndexes()
 		{
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<InterSYNTHESESlave>::FIELD.name.c_str(), ""));
 			return DBTableSync::Indexes();
 		}
 
