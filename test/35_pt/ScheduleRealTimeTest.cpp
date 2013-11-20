@@ -108,7 +108,7 @@ public:
 
 	void checkRealDepartureSchedule(size_t stopIndex, time_duration startTime)
 	{
-		for(size_t i = stopIndex ; i < _scheduledService->getDepartureSchedules(true, true).size() ; ++i)
+		for(size_t i = stopIndex ; i < _scheduledService->getDepartureSchedules(true, true).size() - 1 ; ++i)
 		{
 			BOOST_CHECK(_scheduledService->getDepartureSchedules(true, true)[i] == startTime);
 			startTime += time_duration(0,5,0);
