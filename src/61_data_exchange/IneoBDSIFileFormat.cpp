@@ -76,6 +76,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = "mr_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		
 		
 		
@@ -116,6 +117,11 @@ namespace synthese
 			// Hysteresis
 			_hysteresis = seconds(
 				map.getDefault<long>(PARAMETER_HYSTERESIS, 0)
+			);
+
+			// Delay for bus at stop
+			_delay_bus_stop = seconds(
+				map.getDefault<long>(PARAMETER_DELAY_BUS_STOP, 35)
 			);
 		}
 		
@@ -266,7 +272,7 @@ namespace synthese
 			// Chainages
 			{
 				string chainageQuery(
-					"SELECT "+ _database +".ARRETCHN.*,"+ _database +".CHAINAGE.nom,"+ _database +".CHAINAGE.nom,"+ _database +".CHAINAGE.sens,"+ _database +".CHAINAGE.ligne "+
+					"SELECT "+ _database +".ARRETCHN.*,"+ _database +".CHAINAGE.nom,"+ _database +".CHAINAGE.sens,"+ _database +".CHAINAGE.ligne "+
 					" FROM "+ _database +".ARRETCHN "+
 					" INNER JOIN "+ _database +".CHAINAGE ON "+ _database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+
 					_database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
@@ -366,8 +372,8 @@ namespace synthese
 				
 				time_duration now(second_clock::local_time().time_of_day());
 				const time_duration dayBreakTime(hours(3));
-				time_duration now_plus_35(now);
-				now_plus_35 += seconds(35);
+				time_duration now_plus_delay(now);
+				now_plus_delay += _delay_bus_stop;
 				string lastCourseRef;
 				Course* course(NULL);
 				while(horaireResult->next())
@@ -455,9 +461,9 @@ namespace synthese
 									horaire.hrd > now
 								)
 							) &&
-							horaire.hrd <= now_plus_35
+							horaire.hrd <= now_plus_delay
 						){
-							horaire.hrd = now_plus_35;
+							horaire.hrd = now_plus_delay;
 						}
 
 						_logTraceDetail(
