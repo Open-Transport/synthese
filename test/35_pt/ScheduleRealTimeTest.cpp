@@ -206,6 +206,10 @@ public:
 				0, &*_stopPoints[i]))
 			);
 			jp.addEdge(*(_designatedLinePhysicalStops[i].get()));
+			if (i < _numberOfStops - 1)
+				_stopPoints[i]->addDepartureEdge(_designatedLinePhysicalStops[i].get());
+			if (i > 0)
+				_stopPoints[i]->addArrivalEdge(_designatedLinePhysicalStops[i].get());
 		}
 	}
 
