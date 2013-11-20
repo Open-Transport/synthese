@@ -124,15 +124,15 @@ namespace synthese
 			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
-			if(	(getDeparture && ((presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) > schedule)) ||
-				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) < schedule))
+			if(	(getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) > schedule)) ||
+				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) < schedule))
 			){
 				return ServicePointer();
 			}
 
 			// Initializations
 			const time_duration& departureSchedule(getDepartureSchedule(RTData, 0));
-			ptime actualTime(presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), schedule);
+			ptime actualTime(presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), schedule);
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
 
@@ -157,7 +157,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
 					);
 				}
 				else
@@ -165,7 +165,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
@@ -177,7 +177,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
 					);
 				}
 				else
@@ -185,7 +185,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}

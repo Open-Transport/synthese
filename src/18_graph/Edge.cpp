@@ -181,7 +181,7 @@ namespace synthese
 			bool RTData(enableRealTime && departureMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
 
 			// Search schedule
-			DepartureServiceIndex::Value next(getDepartureFromIndex(RTData, departureMoment.time_of_day().hours() < 3 ? 23 : departureMoment.time_of_day().hours()));
+			DepartureServiceIndex::Value next(getDepartureFromIndex(RTData, departureMoment.time_of_day().hours()));
 
 			if(	minNextServiceIndex &&
 				(*minNextServiceIndex == services.end() || services.value_comp()(*next, **minNextServiceIndex))
