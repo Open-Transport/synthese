@@ -1051,7 +1051,9 @@ namespace synthese
 						//If way is backward : endDateTime = _date
 						endDateTime = (_date ? *_date : second_clock::local_time());
 						//and startDateTime is begin of the day (a day begin at 3:00):
-						startDateTime = endDateTime - endDateTime.time_of_day() + hours(3);
+						startDateTime = endDateTime.time_of_day().hours() < 3 ?
+							endDateTime - endDateTime.time_of_day() - hours(21) :
+							endDateTime - endDateTime.time_of_day() + hours(3);
 					}
 					else //Way is forward
 					{
@@ -1059,7 +1061,9 @@ namespace synthese
 						startDateTime = (_date ? *_date : second_clock::local_time());
 						//startDateTime -= minutes(0); //substract clearing delay
 						//and endDateTime is end of the day (a day end at 27:00):
-						endDateTime = startDateTime - startDateTime.time_of_day() + hours(27);
+						endDateTime = startDateTime.time_of_day().hours() < 3 ?
+							startDateTime - startDateTime.time_of_day() + hours(3) :
+							startDateTime - startDateTime.time_of_day() + hours(27);
 					}
 
 					//We populate a map of vector : key is minutes of departures
