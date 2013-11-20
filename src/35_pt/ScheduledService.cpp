@@ -125,7 +125,7 @@ namespace synthese
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
 			if(	(getDeparture && ((presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) > schedule)) ||
-				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day())
+				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) < schedule))
 			){
 				return ServicePointer();
 			}
