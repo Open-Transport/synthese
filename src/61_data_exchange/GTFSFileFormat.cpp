@@ -1391,7 +1391,12 @@ namespace synthese
 				Env::GetOfficialEnv().getRegistry<StopPoint>()
 			){
 				const StopPoint& stopPoint(*itps.second);
-				if (stopPoint.getDepartureEdges().empty() && stopPoint.getArrivalEdges().empty()) continue;
+				if (stopPoint.getDepartureEdges().empty() && stopPoint.getArrivalEdges().empty()) 
+				{
+					LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, boost::optional<RegistryKeyType>(), stopPoint.getKey()));	
+					if (lineStops.empty())
+						continue;
+				}
 
 				boost::shared_ptr<geos::geom::Point> gp;
 				if(stopPoint.hasGeometry())
@@ -1401,8 +1406,12 @@ namespace synthese
 
 				if(gp.get())
 				{
+					/* GTFS Format will match commas in operatorCode field as delimiter */
+					std::string operatorCodes = stopPoint.getCodeBySources();
+					std::replace(operatorCodes.begin(), operatorCodes.end(), ',', '|');
+					
 					stopsTxt << _key(stopPoint.getKey()) << "," // stop_id
-						<< stopPoint.getCodeBySources() << "," // stop_code
+						<< operatorCodes << "," // stop_code
 						<< _Str(((stopPoint.getName()) == "" ? stopPoint.getConnectionPlace()->getName():stopPoint.getName())) << "," // stop_name
 						<< gp->getY() << "," // stop_lat
 						<< gp->getX() << "," // stop_lon
