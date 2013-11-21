@@ -887,6 +887,11 @@ namespace synthese
 										arretChn.type != "N"
 								)	);
 								jp->addEdge(*ls);
+								// Add the edge to the vertex
+								if (rank+1 < course.chainage->arretChns.size())
+									(arretChn.arret->syntheseStop)->addDepartureEdge(ls.get());
+								if (rank > 0)
+									(arretChn.arret->syntheseStop)->addArrivalEdge(ls.get());
 								_env.getEditableRegistry<LineStop>().add(ls);
 								++rank;
 							}
