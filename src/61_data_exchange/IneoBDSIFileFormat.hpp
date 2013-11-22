@@ -148,12 +148,11 @@ namespace synthese
 
 				struct Course
 				{
+					typedef std::vector<Horaire> Horaires;
+
 					std::string dateRef;
 					Chainage* chainage;
-					typedef std::vector<Horaire> Horaires;
 					Horaires horaires;
-					bool mapped;
-					boost::gregorian::date day;
 
 					pt::ScheduledService* syntheseService;
 

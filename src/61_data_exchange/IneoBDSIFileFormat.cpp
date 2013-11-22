@@ -129,9 +129,14 @@ namespace synthese
 		
 		bool IneoBDSIFileFormat::Importer_::_read(
 		) const {
+
+			const time_duration dayBreakTime(hours(3));
 			date today(day_clock::local_day());
-			date tomorrowday(today + days(1));
-			ptime timenow(second_clock::local_time());
+			ptime now(second_clock::local_time());
+			if(now.time_of_day() < dayBreakTime)
+			{
+				today -= days(1);
+			}
 
 			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
 			if(!lock.owns_lock())
@@ -162,9 +167,7 @@ namespace synthese
 			Programmations programmations;
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
-			string tomorrowStr("'"+ to_iso_extended_string(tomorrowday) +"'");
-			string timenowStr("'"+ to_simple_string(timenow.time_of_day()) +"'");
-
+			
 			// Arrets
 			{
 				string query(
@@ -276,7 +279,7 @@ namespace synthese
 					" FROM "+ _database +".ARRETCHN "+
 					" INNER JOIN "+ _database +".CHAINAGE ON "+ _database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+
 					_database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
-					"WHERE "+ _database +".CHAINAGE.jour="+ todayStr +" OR "+ _database +".CHAINAGE.jour="+ tomorrowStr +
+					"WHERE "+ _database +".CHAINAGE.jour="+ todayStr +
 					" ORDER BY "+ _database +".ARRETCHN.jour, "+ _database +".ARRETCHN.chainage, "+ _database +".ARRETCHN.pos"
 				);
 			
@@ -364,110 +367,118 @@ namespace synthese
 					"SELECT "+ _database +".HORAIRE.*,"+ _database +".ARRETCHN.chainage FROM "+ _database +".HORAIRE "+
 					"INNER JOIN "+ _database +".ARRETCHN ON "+ _database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+
 					_database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
-					"WHERE ("+ _database +".HORAIRE.jour="+ todayStr + " AND "+ _database +".HORAIRE.hra>"+ timenowStr +
-					") OR ("+ _database +".HORAIRE.jour="+ tomorrowStr + " AND "+ _database +".HORAIRE.hra<"+ timenowStr +
-					") ORDER BY "+ _database +".HORAIRE.course, "+ _database +".ARRETCHN.pos"
+					"WHERE "+ _database +".HORAIRE.jour="+ todayStr + " ORDER BY "+ _database +".HORAIRE.course, "+ _database +".ARRETCHN.pos"
 				);
 				DBResultSPtr horaireResult(db.execQuery(horaireQuery));
 				
-				time_duration now(second_clock::local_time().time_of_day());
-				const time_duration dayBreakTime(hours(3));
-				time_duration now_plus_delay(now);
+				ptime now_plus_delay(now);
 				now_plus_delay += _delay_bus_stop;
 				string lastCourseRef;
 				Course* course(NULL);
+				Course::Horaires horaires;
 				while(horaireResult->next())
 				{
 					string courseRef(horaireResult->get<string>("course")+"/"+horaireResult->get<string>("jour"));
-					if(courseRef != lastCourseRef)
-					{
-						course = &(
-							courses.insert(
-								make_pair(
-									courseRef,
-									Course()
-							)	).first->second
-						);
-						course->dateRef = courseRef;
-						course->day = from_string(horaireResult->get<string>("jour"));
 
-						Chainages::iterator it(
+
+					if(!lastCourseRef.empty() && courseRef != lastCourseRef)
+					{
+						// Jump over the useless services
+						Horaire& lastHoraire(*horaires.rbegin());
+						bool useful(
+							now.time_of_day() < minutes(0) ?
+							(lastHoraire.hra > now.time_of_day() || lastHoraire.hta > now.time_of_day() || lastHoraire.hra < dayBreakTime || lastHoraire.hta < dayBreakTime) :
+							(lastHoraire.hra > now.time_of_day() || lastHoraire.hta > now.time_of_day())
+						);
+
+						// Check of the chainage
+						Chainages::iterator itChainage(
 							chainages.find(
 								horaireResult->get<string>("chainage")+"/"+horaireResult->get<string>("jour")
 						)	);
-						if(it == chainages.end())
+						if(itChainage == chainages.end())
 						{
 							_logWarningDetail(
 								"SERVICE",courseRef,courseRef,0,string(),string(), string(),"Bad chainage field in course "
 							);
-							courses.erase(courseRef);
-							course = NULL;
+							useful = false;
 						}
-						else
+
+				
+						if(useful)
 						{
+							course = &(
+								courses.insert(
+									make_pair(
+										courseRef,
+										Course()
+								)	).first->second
+							);
+							course->dateRef = courseRef;
+							course->horaires = horaires;
+
 							_logLoadDetail(
 								"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
 							);
-							course->chainage = &it->second;
+							course->chainage = &itChainage->second;
 							course->syntheseService = NULL;
 						}
 
 						lastCourseRef = courseRef;
+						horaires.clear();
 					}
 
-					if(course)
+					Horaire& horaire(
+						*horaires.insert(
+							horaires.end(),
+							Horaire()
+					)	);
+					horaire.dateRef = horaireResult->get<string>("ref")+"/"+horaireResult->get<string>("jour");
+					horaire.had = duration_from_string(horaireResult->getText("had"));
+					// Patch for schedules after midnight
+					if(horaire.had < dayBreakTime)
 					{
-						Horaire& horaire(
-							*course->horaires.insert(
-								course->horaires.end(),
-								Horaire()
-						)	);
-						horaire.dateRef = horaireResult->get<string>("ref")+"/"+horaireResult->get<string>("jour");
-						horaire.had = duration_from_string(horaireResult->getText("had"));
-						// Patch for schedules after midnight
-						if(horaire.had < dayBreakTime)
-						{
-							horaire.had += hours(24);
-						}
-						horaire.haa = duration_from_string(horaireResult->getText("haa"));
-						if(horaire.haa < dayBreakTime)
-						{
-							horaire.haa += hours(24);
-						}
-						horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
-						if(horaire.hrd < dayBreakTime)
-						{
-							horaire.hrd += hours(24);
-						}
-						horaire.hra = duration_from_string(horaireResult->getText("hra"));
-						if(horaire.hra < dayBreakTime)
-						{
-							horaire.hra += hours(24);
-						}
-						horaire.htd = duration_from_string(horaireResult->getText("htd"));
-						if(horaire.htd < dayBreakTime)
-						{
-							horaire.htd += hours(24);
-						}
-						horaire.hta = duration_from_string(horaireResult->getText("hta"));
-						if(horaire.hta < dayBreakTime)
-						{
-							horaire.hta += hours(24);
-						}
+						horaire.had += hours(24);
+					}
+					horaire.haa = duration_from_string(horaireResult->getText("haa"));
+					if(horaire.haa < dayBreakTime)
+					{
+						horaire.haa += hours(24);
+					}
+					horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
+					if(horaire.hrd < dayBreakTime)
+					{
+						horaire.hrd += hours(24);
+					}
+					horaire.hra = duration_from_string(horaireResult->getText("hra"));
+					if(horaire.hra < dayBreakTime)
+					{
+						horaire.hra += hours(24);
+					}
+					horaire.htd = duration_from_string(horaireResult->getText("htd"));
+					if(horaire.htd < dayBreakTime)
+					{
+						horaire.htd += hours(24);
+					}
+					horaire.hta = duration_from_string(horaireResult->getText("hta"));
+					if(horaire.hta < dayBreakTime)
+					{
+						horaire.hta += hours(24);
+					}
 
-						// Patch for bad schedules when the bus is at stop
-						if(	(	(	horaireResult->getText("etat_harr") == "R" &&
-									horaireResult->getText("etat_hdep") == "E"
-								) || (
-									horaire.hrd > now
-								)
-							) &&
-							horaire.hrd <= now_plus_delay
-						){
-							horaire.hrd = now_plus_delay;
-						}
+					// Patch for bad schedules when the bus is at stop
+					if(	(	(	horaireResult->getText("etat_harr") == "R" &&
+								horaireResult->getText("etat_hdep") == "E"
+							) || (
+								horaire.hrd > now.time_of_day()
+							)
+						) &&
+						horaire.hrd <= now_plus_delay.time_of_day()
+					){
+						horaire.hrd = now_plus_delay.time_of_day();
+					}
 
-						_logTraceDetail(
+/*						_logTraceDetail(
 							"SCHEDULE_HTD",courseRef,courseRef,0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
 						);
 						_logTraceDetail(
@@ -479,10 +490,52 @@ namespace synthese
 						_logTraceDetail(
 							"SCHEDULE_HRA",courseRef,courseRef,0,string(),horaireResult->getText("hra"),to_simple_string(horaire.hra),"OK"
 						);
-					}
+*/
+				}
 
-			}	}
+				if(!lastCourseRef.empty())
+				{
+					// Jump over the useless services
+					Horaire& lastHoraire(*horaires.rbegin());
+					bool useful(
+						now.time_of_day() < minutes(0) ?
+						(lastHoraire.hra > now.time_of_day() || lastHoraire.hta > now.time_of_day() || lastHoraire.hra < dayBreakTime || lastHoraire.hta < dayBreakTime) :
+						(lastHoraire.hra > now.time_of_day() || lastHoraire.hta > now.time_of_day())
+					);
+
+					// Check of the chainage
+					Chainages::iterator itChainage(
+						chainages.find(
+							horaireResult->get<string>("chainage")+"/"+horaireResult->get<string>("jour")
+					)	);
+					if(itChainage == chainages.end())
+					{
+						_logWarningDetail(
+							"SERVICE",lastCourseRef,lastCourseRef,0,string(),string(), string(),"Bad chainage field in course "
+						);
+						useful = false;
+					}
 			
+					if(useful)
+					{
+						course = &(
+							courses.insert(
+								make_pair(
+									lastCourseRef,
+									Course()
+							)	).first->second
+						);
+						course->dateRef = lastCourseRef;
+						course->horaires = horaires;
+
+						_logLoadDetail(
+							"SERVICE",lastCourseRef,lastCourseRef,0,string(),string(), string(),"OK"
+						);
+						course->chainage = &itChainage->second;
+						course->syntheseService = NULL;
+					}
+				}
+			}			
 
 			// Programmations
 			{
@@ -898,7 +951,7 @@ namespace synthese
 							{
 								continue;
 							}
-							if(	service->isActive(course.day) &&
+							if(	service->isActive(today) &&
 								course == *service
 							){
 								course.syntheseService = service;
@@ -941,7 +994,7 @@ namespace synthese
 					course.syntheseService->setDataSchedules(departureSchedules, arrivalSchedules);
 					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
 					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), course.dateRef);
-					course.syntheseService->setActive(course.day);
+					course.syntheseService->setActive(today);
 					_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(course.syntheseService));
 
 					servicesToLinkAndUpdate.push_back(&course);
