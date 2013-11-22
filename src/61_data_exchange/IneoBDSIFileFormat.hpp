@@ -153,6 +153,7 @@ namespace synthese
 					typedef std::vector<Horaire> Horaires;
 					Horaires horaires;
 					bool mapped;
+					boost::gregorian::date day;
 
 					pt::ScheduledService* syntheseService;
 

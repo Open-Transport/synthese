@@ -81,7 +81,7 @@ namespace synthese
 
 				boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
 				_nextRTUpdate = boost::posix_time::ptime(now.date(), GetTimeOfDay(lastSchedule));
-				if(now.time_of_day() > GetTimeOfDay(lastSchedule))
+				if(now.time_of_day() > GetTimeOfDay(lastSchedule) + minutes(1))
 				{
 					_nextRTUpdate += boost::gregorian::days(1);
 				}

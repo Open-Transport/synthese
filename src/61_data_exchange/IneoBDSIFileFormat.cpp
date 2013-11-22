@@ -389,6 +389,7 @@ namespace synthese
 							)	).first->second
 						);
 						course->dateRef = courseRef;
+						course->day = from_string(horaireResult->get<string>("jour"));
 
 						Chainages::iterator it(
 							chainages.find(
@@ -562,6 +563,10 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			// Import content analyzing
 
+			DataSource* dataSourceOnSharedEnv(
+				Env::GetOfficialEnv().getEditable<DataSource>(_import.get<DataSource>()->getKey()).get()
+			);
+
 			{ // Scenarios and messages
 
 				// Loop on objects present in the database (search for creations and updates)
@@ -573,7 +578,7 @@ namespace synthese
 					boost::shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
-							_import.get<DataSource>()->getObjectByCode<Scenario>(
+							dataSourceOnSharedEnv->getObjectByCode<Scenario>(
 								lexical_cast<string>(programmation.ref)
 					)	)	);
 					Alarm* message(NULL);
@@ -704,7 +709,7 @@ namespace synthese
 				// Management of the ref field
 				typedef vector<const Course*> ServicesToUpdate;
 				ServicesToUpdate servicesToUpdate; // Old = New
-				typedef map<string, const ScheduledService*> ServicesToRemove;
+				typedef map<string, pair<const ScheduledService*, date> > ServicesToRemove;
 				ServicesToRemove servicesToRemove; // Old
 
 				ServicesToUpdate servicesToLinkAndUpdate; // New
@@ -719,8 +724,10 @@ namespace synthese
 					servicesToRemove.insert(
 						make_pair(
 							existingService.first,
-							static_cast<ScheduledService*>(existingService.second)
-					)	);
+							make_pair(
+								static_cast<ScheduledService*>(existingService.second),
+								static_cast<ScheduledService*>(existingService.second)->getNextRTUpdate().date()
+					)	)	);
 				}
 
 				// Search for existing service with same key
@@ -772,13 +779,13 @@ namespace synthese
 					BOOST_FOREACH(const ServicesToRemove::value_type& itService, servicesToRemove)
 					{
 						// Check if the service matches
-						if(	course != *itService.second)
+						if(	course != *itService.second.first)
 						{
 							continue;
 						}
 
 						// OK
-						course.syntheseService = const_cast<ScheduledService*>(itService.second);
+						course.syntheseService = const_cast<ScheduledService*>(itService.second.first);
 						servicesToMoveAndUpdate.push_back(&course);
 						servicesToRemove.erase(itService.first);
 						break;
@@ -891,7 +898,7 @@ namespace synthese
 							{
 								continue;
 							}
-							if(	service->isActive(today) &&
+							if(	service->isActive(course.day) &&
 								course == *service
 							){
 								course.syntheseService = service;
@@ -934,7 +941,7 @@ namespace synthese
 					course.syntheseService->setDataSchedules(departureSchedules, arrivalSchedules);
 					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
 					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), course.dateRef);
-					course.syntheseService->setActive(today);
+					course.syntheseService->setActive(course.day);
 					_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(course.syntheseService));
 
 					servicesToLinkAndUpdate.push_back(&course);
@@ -1005,12 +1012,12 @@ namespace synthese
 					{
 						boost::shared_ptr<ScheduledService> oldService(
 							Env::GetOfficialEnv().getEditable<ScheduledService>(
-								it.second->getKey()
+								it.second.first->getKey()
 						)	);
 						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 						links.erase(dataSourceOnUpdateEnv);
 						oldService->setDataSourceLinksWithoutRegistration(links);
-						oldService->setInactive(today);
+						oldService->setInactive(it.second.second);
 						_servicesToSave.push_back(oldService);
 					}
 					catch (...)
