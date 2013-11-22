@@ -743,7 +743,7 @@ namespace synthese
 
 					// Known ref ?
 					ScheduledService* service(
-						_import.get<DataSource>()->getObjectByCode<ScheduledService>(course.dateRef)
+						dataSourceOnSharedEnv->getObjectByCode<ScheduledService>(course.dateRef)
 					);
 					if(!service)
 					{
