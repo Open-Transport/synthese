@@ -428,6 +428,11 @@ namespace synthese
 						horaires.clear();
 					}
 
+					if(lastCourseRef.empty())
+					{
+						lastCourseRef = courseRef;
+					}
+
 					Horaire& horaire(
 						*horaires.insert(
 							horaires.end(),
