@@ -50,10 +50,9 @@ namespace synthese
 			typedef std::vector<Query> Queries;
 
 			typedef std::vector<DB::DBModifEvent> DBModifEvents;
-
-		private:
 			typedef std::set<std::pair<std::string, util::RegistryKeyType> > ModifiedRows;
 
+		private:
 			Queries _queries;
 			DBModifEvents _modifEvents;
 			ModifiedRows _modifiedRows;
@@ -69,6 +68,7 @@ namespace synthese
 			void addDBModifEvent(const DB::DBModifEvent& modifEvent);
 			const Queries& getQueries() const;
 			const DBModifEvents& getDBModifEvents() const;
+			const ModifiedRows& getUpdatedRows() const { return _modifiedRows; }
 			void run();
 			bool getWithInterSYNTHESESync() const { return _withInterSYNTHESESync; }
 		};
