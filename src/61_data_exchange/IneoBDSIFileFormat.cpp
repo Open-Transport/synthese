@@ -376,6 +376,7 @@ namespace synthese
 				string lastCourseRef;
 				Course* course(NULL);
 				Course::Horaires horaires;
+				Chainages::iterator itChainage(chainages.end());
 				while(horaireResult->next())
 				{
 					string courseRef(horaireResult->get<string>("course")+"/"+horaireResult->get<string>("jour"));
@@ -392,10 +393,6 @@ namespace synthese
 						);
 
 						// Check of the chainage
-						Chainages::iterator itChainage(
-							chainages.find(
-								horaireResult->get<string>("chainage")+"/"+horaireResult->get<string>("jour")
-						)	);
 						if(itChainage == chainages.end())
 						{
 							_logWarningDetail(
@@ -432,6 +429,11 @@ namespace synthese
 					{
 						lastCourseRef = courseRef;
 					}
+
+					// Check of the chainage
+					itChainage = chainages.find(
+						horaireResult->get<string>("chainage")+"/"+horaireResult->get<string>("jour")
+					);
 
 					Horaire& horaire(
 						*horaires.insert(
@@ -509,10 +511,6 @@ namespace synthese
 					);
 
 					// Check of the chainage
-					Chainages::iterator itChainage(
-						chainages.find(
-							horaireResult->get<string>("chainage")+"/"+horaireResult->get<string>("jour")
-					)	);
 					if(itChainage == chainages.end())
 					{
 						_logWarningDetail(
