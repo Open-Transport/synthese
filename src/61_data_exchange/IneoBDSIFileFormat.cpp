@@ -1173,6 +1173,11 @@ namespace synthese
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
 
+			BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+			{
+				_logWarning(query.first +" "+ lexical_cast<string>(query.second));
+			}
+
 			return transaction;
 		}
 
