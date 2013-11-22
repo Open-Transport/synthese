@@ -91,10 +91,11 @@ namespace synthese
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
-	
+
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
 				mutable std::set<util::RegistryKeyType> _messagesToRemove;
+				mutable std::vector<boost::shared_ptr<pt::ScheduledService> > _servicesToSave;
 
 				struct Arret
 				{

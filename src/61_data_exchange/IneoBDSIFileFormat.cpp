@@ -962,15 +962,15 @@ namespace synthese
 					try
 					{
 						boost::shared_ptr<ScheduledService> oldService(
-							ScheduledServiceTableSync::GetEditable(
-								it->syntheseService->getKey(),
-								_env
+							Env::GetOfficialEnv().getEditable<ScheduledService>(
+								it->syntheseService->getKey()
 						)	);
 						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 						links.erase(dataSourceOnUpdateEnv);
 						links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
 						oldService->setDataSourceLinksWithoutRegistration(links);
 						it->updateService(*this, *it->syntheseService);
+						_servicesToSave.push_back(oldService);
 					}
 					catch (...)
 					{
@@ -983,15 +983,15 @@ namespace synthese
 					try
 					{
 						boost::shared_ptr<ScheduledService> oldService(
-							ScheduledServiceTableSync::GetEditable(
-								it->syntheseService->getKey(),
-								_env
+							Env::GetOfficialEnv().getEditable<ScheduledService>(
+								it->syntheseService->getKey()
 						)	);
 						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 						links.erase(dataSourceOnUpdateEnv);
 						links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
 						oldService->setDataSourceLinksWithoutRegistration(links);
 						it->updateService(*this, *it->syntheseService);
+						_servicesToSave.push_back(oldService);
 					}
 					catch (...)
 					{
@@ -1004,14 +1004,14 @@ namespace synthese
 					try
 					{
 						boost::shared_ptr<ScheduledService> oldService(
-							ScheduledServiceTableSync::GetEditable(
-								it.second->getKey(),
-								_env
+							Env::GetOfficialEnv().getEditable<ScheduledService>(
+								it.second->getKey()
 						)	);
 						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
 						links.erase(dataSourceOnUpdateEnv);
 						oldService->setDataSourceLinksWithoutRegistration(links);
 						oldService->setInactive(today);
+						_servicesToSave.push_back(oldService);
 					}
 					catch (...)
 					{
@@ -1152,6 +1152,12 @@ namespace synthese
 
 			// Saving
 			DBModule::SaveEntireEnv(_env, transaction);
+
+			// Updated services
+			BOOST_FOREACH(boost::shared_ptr<ScheduledService> service, _servicesToSave)
+			{
+				ScheduledServiceTableSync::Save(service.get(), transaction);
+			}
 
 			// Removals
 			BOOST_FOREACH(RegistryKeyType id, _alarmObjectLinksToRemove)
