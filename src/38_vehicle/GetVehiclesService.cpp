@@ -29,6 +29,7 @@
 #include "CommercialLine.h"
 #include "VehicleTableSync.hpp"
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -122,7 +123,9 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(const Vehicle::Registry::value_type& vehicle, Env::GetOfficialEnv().getRegistry<Vehicle>())
+				const Vehicle::Registry& registry(Env::GetOfficialEnv().getRegistry<Vehicle>());
+				recursive_mutex::scoped_lock lock(registry.getMutex());
+				BOOST_FOREACH(const Vehicle::Registry::value_type& vehicle, registry)
 				{
 					if(_line.get())
 					{

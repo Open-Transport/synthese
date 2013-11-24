@@ -459,11 +459,6 @@ namespace synthese
 				// 1. Get the services linked to the datasource
 				// 2. Read the XML data and update the data
 
-				// Services linked to the planned source
-				DataSource::Links::mapped_type existingServices(
-					plannedDataSource->getLinkedObjects<ScheduledService>()
-				);
-				
 				// 1 : clean the old references to the current source
 				ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(*(get<DataSource>()), Env::GetOfficialEnv());
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<ScheduledServiceTableSync>::Map::value_type& itService, sourcedServices.getMap())
@@ -530,10 +525,9 @@ namespace synthese
 							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service avec un code différentde XXX-XXXX-XXXX");
 							continue;
 						}
-						ScheduledService* service(NULL);
-						// Search for existing service with same key
-						if (existingServices.find(vectServiceCode[1]) != existingServices.end())
-							service = static_cast<ScheduledService*>(existingServices[vectServiceCode[1]]);
+						ScheduledService* service(
+							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
+						);
 						
 						if (service)
 						{

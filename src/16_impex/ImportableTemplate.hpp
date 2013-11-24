@@ -102,7 +102,10 @@ namespace synthese
 				// Unregister old links
 				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
 				{
-					link.first->removeLink(static_cast<T&>(*this), link.second);
+					if(link.first)
+					{
+						link.first->removeLink(static_cast<T&>(*this), link.second);
+					}
 				}
 
 				// Saving new links
@@ -111,7 +114,10 @@ namespace synthese
 				// Registering new links
 				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
 				{
-					link.first->addLink(static_cast<T&>(*this), link.second);
+					if(link.first)
+					{
+						link.first->addLink(static_cast<T&>(*this), link.second);
+					}
 				}
 			}
 
