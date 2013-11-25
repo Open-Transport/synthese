@@ -429,6 +429,7 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 	// Apply a RealTime shift
 	s.applyRealTimeShiftDuration(0, time_duration(0, 10, 0), time_duration(0, 10, 0), true);
 	s.setActive(today);
+	s.setActive(today + days(2));
 
 	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, true));
 	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(true, true));
@@ -469,12 +470,28 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 			true,
 			true
 	)	);
+	// From departure, before the departure time but today + 2 days (so scheduled time should be received)
+	ptime time2(today + days(2), time_duration(1,50,0));
+	ServicePointer sp2(
+		s.getFromPresenceTime(
+			ap,
+			true,
+			true,
+			true,
+			l3AD,
+			time2,
+			false,
+			false,
+			true,
+			true
+	)	);
 	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
 	BOOST_CHECK(sp1.getArrivalEdge() == NULL);
 	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
 	BOOST_CHECK(sp1.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(2,29,0)));
+	BOOST_CHECK_EQUAL(sp2.getDepartureDateTime(), ptime(today + days(2), time_duration(2,19,0)));
 	BOOST_CHECK(sp1.getArrivalDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp1.getTheoreticalDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK(sp1.getTheoreticalArrivalDateTime().is_not_a_date_time());
