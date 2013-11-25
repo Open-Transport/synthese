@@ -119,10 +119,17 @@ namespace synthese
 				return ServicePointer();
 			}
 
+			// Force the use of theorical schedule if date is after today
+			//  - RT data is only available today !
+			//  - day finishes at (day+1,03:00)
+			bool forceTheorical(presenceDateTime.date() > day_clock::local_day());
+			forceTheorical &= presenceDateTime.time_of_day().hours() > 3;
+			forceTheorical |= presenceDateTime.date() > day_clock::local_day() + days(1);
+
 			// Actual time
 			const time_duration& thSchedule(getDeparture ? getDepartureSchedule(false, edgeIndex) : getArrivalSchedule(false, edgeIndex));
 			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
-			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
+			const time_duration& schedule((RTData && !forceTheorical) ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
 			if(	(getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) > schedule)) ||
 				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) < schedule))
