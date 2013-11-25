@@ -234,7 +234,10 @@ namespace synthese
 						return servicePointer;
 				}	}
 
-				departureMoment = ptime(departureMoment.date(), hours(24));
+				if (departureMoment.time_of_day().hours() < 3)
+					departureMoment = ptime(departureMoment.date(), hours(3));
+				else
+					departureMoment = ptime(departureMoment.date(), hours(27));
 
 				next = _departureIndex[0].get(RTData);
 			}

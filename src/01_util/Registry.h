@@ -36,6 +36,7 @@
 
 #include <map>
 #include <boost/foreach.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace synthese
 {
@@ -99,6 +100,7 @@ namespace synthese
 		private:
 
 			 Map	_registry;
+			 mutable boost::recursive_mutex _mutex;
 
 		 public:
 
@@ -111,8 +113,11 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
+				boost::recursive_mutex& getMutex() const { return _mutex; }
+
 				virtual bool contains (RegistryKeyType key) const
 				{
+					boost::recursive_mutex::scoped_lock lock(_mutex);
 					return _registry.find(key) != _registry.end();
 				}
 
@@ -165,7 +170,11 @@ namespace synthese
 			//@{
 				/** Removes and destroy all the registered objects.
 				*/
-				void clear () { _registry.clear(); }
+				void clear ()
+				{
+					boost::recursive_mutex::scoped_lock lock(_mutex);
+					_registry.clear();
+				}
 
 
 
@@ -236,6 +245,7 @@ namespace synthese
 		RegistryBase::RegistrablesVector Registry<T>::getRegistrablesVector() const
 		{
 			RegistrablesVector r;
+			boost::recursive_mutex::scoped_lock lock(_mutex);
 			BOOST_FOREACH(const typename Registry<T>::Map::value_type& item, _registry)
 			{
 				r.push_back(boost::static_pointer_cast<Registrable, T>(item.second));
@@ -251,6 +261,7 @@ namespace synthese
 		const boost::shared_ptr<T>& Registry<T>::getEditable(
 			RegistryKeyType key
 		) const {
+			boost::recursive_mutex::scoped_lock lock(_mutex);
 			typename Map::const_iterator it(_registry.find(key));
 
 			if(it == _registry.end())
@@ -267,6 +278,7 @@ namespace synthese
 		boost::shared_ptr<const T> Registry<T>::get(
 			RegistryKeyType key
 		) const	{
+			boost::recursive_mutex::scoped_lock lock(_mutex);
 			typename Map::const_iterator it(_registry.find(key));
 
 			if(it == _registry.end())
@@ -283,6 +295,8 @@ namespace synthese
 		void Registry<T>::add(
 			const boost::shared_ptr<T>& ptr
 		){
+			boost::recursive_mutex::scoped_lock lock(_mutex);
+
 			if (ptr->getKey() == 0)
 			{
 				throw RegistryKeyException<T>("Object with unknown key cannot be registered.", 0);
@@ -302,6 +316,7 @@ namespace synthese
 		void Registry<T>::replace(
 			const boost::shared_ptr<T>& ptr
 		){
+			boost::recursive_mutex::scoped_lock lock(_mutex);
 			remove (ptr->getKey ());
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
 		}
@@ -312,10 +327,15 @@ namespace synthese
 		void Registry<T>::remove (RegistryKeyType key)
 		{
 			if (key == 0)
+			{
 				throw typename util::RegistryKeyException<T>("Neutral object cannot be removed at execution time", 0);
+			}
 
+			boost::recursive_mutex::scoped_lock lock(_mutex);
 			if (contains (key) == false)
+			{
 				throw typename util::ObjectNotFoundInRegistryException<T>(key);
+			}
 
 			_registry.erase (key);
 		}
