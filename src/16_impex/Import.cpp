@@ -141,6 +141,7 @@ namespace synthese
 
 		void Import::runAutoImport() const
 		{
+			ptime startTime(second_clock::local_time());
 			ParametersMap pm;
 			if(!_autoImporter.get())
 			{
@@ -164,7 +165,11 @@ namespace synthese
 				DBTransaction transaction(_autoImporter->save());
 				transaction.run();
 			}
-			_autoImporter->closeLogFile();
+			_autoImporter->closeLogFile(
+				result,
+				false,
+				startTime
+			);
 
 			// TODO clean
 

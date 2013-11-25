@@ -94,10 +94,15 @@ namespace synthese
 					std::string, // Code
 					Importable* // Object
 			>	> Links;
+			typedef std::map<
+				std::string,
+				std::set<Importable*>
+			> LinksWithoutCode;
 
 
 		private:
 			mutable Links _links;
+			mutable LinksWithoutCode _linksWithoutCode;
 
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -120,9 +125,16 @@ namespace synthese
 				template<class T>
 				void addLink(T& object, const std::string& code) const
 				{
-					_links[T::Registry::KEY].insert(
-						std::make_pair(code, static_cast<Importable*>(&object))
-					);
+					if(code.empty())
+					{
+						_linksWithoutCode[T::Registry::KEY].insert(static_cast<Importable*>(&object));
+					}
+					else
+					{
+						_links[T::Registry::KEY].insert(
+							std::make_pair(code, static_cast<Importable*>(&object))
+						);
+					}
 				}
 
 				template<class T>
@@ -138,10 +150,21 @@ namespace synthese
 				template<class T>
 				void removeLink(T& object, const std::string& code) const
 				{
-					Links::iterator it(_links.find(T::Registry::KEY));
-					if(it != _links.end())
+					if(code.empty())
 					{
-						it->second.erase(code);
+						LinksWithoutCode::iterator it(_linksWithoutCode.find(T::Registry::KEY));
+						if(it != _linksWithoutCode.end())
+						{
+							it->second.erase(&object);
+						}
+					}
+					else
+					{
+						Links::iterator it(_links.find(T::Registry::KEY));
+						if(it != _links.end())
+						{
+							it->second.erase(code);
+						}
 					}
 				}
 			//@}
@@ -167,15 +190,35 @@ namespace synthese
 					}
 				}
 
+				typedef std::vector<std::pair<std::string, Importable*> > LinkedObjects;
+
 				template<class T>
-				Links::mapped_type getLinkedObjects() const
+				LinkedObjects getLinkedObjects() const
 				{
+					LinkedObjects result;
+
+					// Adding objects with codes
 					Links::const_iterator it(_links.find(T::Registry::KEY));
-					if(it == _links.end())
+					if(it != _links.end())
 					{
-						return Links::mapped_type();
+						result.insert(
+							result.end(),
+							it->second.begin(),
+							it->second.end()
+						);
 					}
-					return it->second;
+
+					// Adding objects without code
+					LinksWithoutCode::const_iterator itWithoutCode(_linksWithoutCode.find(T::Registry::KEY));
+					if(itWithoutCode != _linksWithoutCode.end())
+					{
+						BOOST_FOREACH(Importable* obj, itWithoutCode->second)
+						{
+							result.push_back(std::make_pair(std::string(), obj));
+						}
+					}
+
+					return result;
 				}
 
 				const CoordinatesSystem& getActualCoordinateSystem() const;

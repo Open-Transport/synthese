@@ -77,7 +77,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
-		const string IneoBDSIFileFormat::Importer_::PARAMETER_HOURS_TO_KEEP = "hours_to_keep";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
 		
 		
 		
@@ -125,19 +125,126 @@ namespace synthese
 				map.getDefault<long>(PARAMETER_DELAY_BUS_STOP, 35)
 			);
 
-			// Time of RT data to keep
-			_time_to_keep = hours(
-				map.getDefault<long>(PARAMETER_HOURS_TO_KEEP, 20)
+			// Day break time
+			_dayBreakTime = duration_from_string(
+				map.getDefault<string>(PARAMETER_DAY_BREAK_TIME, "03:00:00")
 			);
+		}
+
+
+
+		void IneoBDSIFileFormat::Importer_::_selectAndLoadCourse(
+			Courses& courses,
+			const Course::Horaires& horaires,
+			const Chainage& chainage,
+			const std::string& courseRef,
+			const time_duration& nowDuration
+		) const {
+
+			// Select only services with at least a stop after now
+			const Horaire& lastHoraire(*horaires.rbegin());
+			time_duration timeToCompare(
+				lastHoraire.hra > lastHoraire.hta ?
+				lastHoraire.hra :
+				lastHoraire.hta
+			);
+			if(	timeToCompare < nowDuration)
+			{
+				return;
+			}
+
+			// Jump over courses with incomplete chainages
+			if(horaires.size() != chainage.arretChns.size())
+			{
+				_logWarningDetail(
+					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"Bad horaire number compared to chainage arretchn number "
+				);
+				return;
+			}
+
+			// Jump over dead runs
+			BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
+			{
+				if(!it.arret->syntheseStop)
+				{
+					return;
+				}
+			}
+	
+			// OK let's store the service
+			Course& course(
+				courses.insert(
+					make_pair(
+						courseRef,
+						Course()
+				)	).first->second
+			);
+			course.ref = courseRef;
+			course.horaires = horaires;
+			course.chainage = &chainage;
+			course.syntheseService = NULL;
+
+			// Trace
+			_logLoadDetail(
+				"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
+			);
+		}
+
+
+
+		void IneoBDSIFileFormat::Importer_::_selectAndLoadChainage(
+			Chainages& chainages,
+			const Chainage::ArretChns& arretchns,
+			const Ligne& ligne,
+			const std::string& nom,
+			bool sens,
+			const std::string& ref
+		) const	{
+
+			// Check if arretchns is long enough
+			if(arretchns.size() < 2)
+			{
+				_logWarningDetail(
+					"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),arretchns.empty() ? "JOURNEYPATTERN HAS NO STOPS" : "JOURNEYPATTERN HAS ONLY ONE STOP"
+				);
+				return;
+			}
+
+			Chainage& chainage(
+				chainages.insert(
+					make_pair(
+						ref,
+						Chainage()
+				)	).first->second
+			);
+			chainage.ref = ref;
+			chainage.ligne = &ligne;
+			chainage.nom = nom;
+			chainage.sens = sens;
+			chainage.arretChns = arretchns;
+			_logLoadDetail(
+				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
+			);
+
 		}
 		
 		
 		
 		bool IneoBDSIFileFormat::Importer_::_read(
 		) const {
+
+			const time_duration dayBreakTime(hours(3));
 			date today(day_clock::local_day());
-			date tomorrowday(today + days(1));
-			ptime timenow(second_clock::local_time());
+			ptime now(second_clock::local_time());
+			if(now.time_of_day() < dayBreakTime)
+			{
+				today -= days(1);
+			}
+			ptime nextDayBreak(now.date(), dayBreakTime);
+			if(now.time_of_day() >= dayBreakTime)
+			{
+				nextDayBreak += hours(24);
+			}
 
 			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
 			if(!lock.owns_lock())
@@ -149,10 +256,10 @@ namespace synthese
 			// Preparation of list of objects to remove
 
 			// Scenarios
-			DataSource::Links::mapped_type existingScenarios(
+			DataSource::LinkedObjects existingScenarios(
 				_import.get<DataSource>()->getLinkedObjects<Scenario>()
 			);
-			BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingScenario, existingScenarios)
+			BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
 			{
 				_scenariosToRemove.insert(existingScenario.second->getKey());
 			}
@@ -168,21 +275,21 @@ namespace synthese
 			Programmations programmations;
 			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
-			string tomorrowStr("'"+ to_iso_extended_string(tomorrowday) +"'");
-			string timenowStr("'"+ to_simple_string(timenow.time_of_day()) +"'");
-
+			
 			// Arrets
 			{
 				string query(
-					"SELECT * FROM "+ _database +".ARRET GROUP BY ref ORDER BY ref"
+					"SELECT ref, mnemol, nom FROM "+ _database +".ARRET GROUP BY ref ORDER BY ref"
 				);
 				DBResultSPtr result(db.execQuery(query));
 				while(result->next())
 				{
-					// SYNTHESE stop point
-					string mnemol(result->getText("mnemol"));
-					string name(result->getText("nom"));
+					// Fields load
+					string mnemol(result->get<string>("mnemol"));
+					string name(result->get<string>("nom"));
+					string ref(result->get<string>("ref"));
 
+					// SYNTHESE stop point
 					StopPoint* stopPoint(
 						_plannedDataSource->getObjectByCode<StopPoint>(mnemol)
 					);
@@ -210,9 +317,6 @@ namespace synthese
 							continue;
 					}	}
 
-					// Ref
-					string ref(result->get<string>("ref"));
-
 					// Registration
 					Arret& arret(
 						arrets.insert(
@@ -232,13 +336,16 @@ namespace synthese
 			// Lignes
 			{
 				string query(
-					"SELECT * FROM "+ _database +".LIGNE WHERE jour="+ todayStr
+					"SELECT ref, mnemo FROM "+ _database +".LIGNE WHERE jour="+ todayStr
 				);
 				DBResultSPtr result(db.execQuery(query));
 				while(result->next())
 				{
+					// Fields load
+					string mnemo(result->get<string>("mnemo"));
+					string ref(result->get<string>("ref"));
+
 					// SYNTHESE line
-					string mnemo(result->getText("mnemo"));
 					CommercialLine* line(
 						_plannedDataSource->getObjectByCode<CommercialLine>(mnemo)
 					);
@@ -256,9 +363,6 @@ namespace synthese
 						);
 						continue;
 					}
-
-					// Ref
-					string ref(result->get<string>("ref"));
 
 					// Registration
 					Ligne& ligne(
@@ -278,88 +382,121 @@ namespace synthese
 			// Chainages
 			{
 				string chainageQuery(
-					"SELECT "+ _database +".ARRETCHN.*,"+ _database +".CHAINAGE.nom,"+ _database +".CHAINAGE.sens,"+ _database +".CHAINAGE.ligne "+
-					" FROM "+ _database +".ARRETCHN "+
-					" INNER JOIN "+ _database +".CHAINAGE ON "+ _database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+
-					_database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
-					"WHERE "+ _database +".CHAINAGE.jour="+ todayStr +" OR "+ _database +".CHAINAGE.jour="+ tomorrowStr +
-					" ORDER BY "+ _database +".ARRETCHN.jour, "+ _database +".ARRETCHN.chainage, "+ _database +".ARRETCHN.pos"
-				);
-			
+					"SELECT "+
+						_database +".ARRETCHN.ref,"+
+						_database +".ARRETCHN.arret,"+
+						_database +".ARRETCHN.pos,"+
+						_database +".ARRETCHN.type,"+
+						_database +".ARRETCHN.chainage,"+
+						_database +".CHAINAGE.nom,"+
+						_database +".CHAINAGE.sens,"+
+						_database +".CHAINAGE.ligne "+
+					" FROM "+
+						_database +".ARRETCHN "+
+						" INNER JOIN "+ _database +".CHAINAGE ON "+
+							_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
+					"WHERE "+
+						_database +".CHAINAGE.jour="+ todayStr +
+					" ORDER BY "+
+						_database +".ARRETCHN.chainage, "+
+						_database +".ARRETCHN.pos"
+				);			
 				DBResultSPtr chainageResult(db.execQuery(chainageQuery));
-				string lastDateRef;
-				Chainage* chainage(NULL);
+				string lastRef;
+				const Ligne* ligne(NULL);
+				Chainage::ArretChns arretChns;
+				bool sens(false);
+				string nom;
 				while(chainageResult->next())
 				{
-					string dateRef(chainageResult->getText("chainage")+"/"+chainageResult->getText("jour"));
+					// Fields load
+					string ref(chainageResult->getText("chainage"));
+
+					// The chainage ref has changed : transform last collected data into a chainage if selected
+					if(	ligne &&
+						lastRef != ref
+					){
+						_selectAndLoadChainage(
+							chainages,
+							arretChns,
+							*ligne,
+							nom,
+							sens,
+							lastRef
+						);
+					}
 
 					// Entering new chainage
-					if(dateRef != lastDateRef)
+					if(ref != lastRef)
 					{
-						lastDateRef = dateRef;
-						string name(chainageResult->getText("nom"));
+						string ligneRef(chainageResult->get<string>("ligne"));
+						nom = chainageResult->getText("nom");
 
-						chainage = &(
-							chainages.insert(
-								make_pair(
-									dateRef,
-									Chainage()
-							)	).first->second
+						// Check of the ligne
+						Lignes::const_iterator it(
+							lignes.find(ligneRef)
 						);
-						chainage->dateRef = dateRef;
-					
-						Lignes::iterator it(
-							lignes.find(
-								chainageResult->get<string>("ligne")
-						)	);
 						if(it == lignes.end())
 						{
+							ligne = NULL;
 							_logWarningDetail(
-								"JOURNEYPATTERN",dateRef,name,0,string(),string(), string(),"LINE NOT FOUND"
+								"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"LINE NOT FOUND"
 							);
-							chainages.erase(dateRef);
-							do
-							{
-								string chainage_ref(chainageResult->get<string>("chainage")+"/"+chainageResult->get<string>("jour"));
-								if(chainage_ref != dateRef)
-								{
-									break;
-								}
-							} while(chainageResult->next());
-							continue;
 						}
-						chainage->ligne = &it->second;
-						chainage->nom = name;
-						chainage->sens = (chainageResult->getText("sens") == "R");
-						_logLoadDetail(
-							"JOURNEYPATTERN",dateRef,name,0,string(),string(), string(),"OK"
+						else
+						{
+							ligne = &it->second;
+							sens = (chainageResult->getText("sens") == "R");
+						}
+
+						// Beginning load of the next ref
+						lastRef = ref;
+						arretChns.clear();
+					}
+
+					// Avoid useless work
+					if(!ligne)
+					{
+						continue;
+					}
+
+					// Fields load
+					string arretChnRef(chainageResult->get<string>("ref"));
+					string arret(chainageResult->get<string>("arret"));
+
+					// Check of arret
+					Arrets::iterator itArret(arrets.find(arret));
+					if(itArret == arrets.end())
+					{
+						_logWarningDetail(
+							"STOPPOINT",arretChnRef,arretChnRef,0,string(),string(), string(),"Bad arret field in arretchn"
 						);
+						continue;
 					}
 					
 					ArretChn& arretChn(
-						*chainage->arretChns.insert(
-							chainage->arretChns.end(),
+						*arretChns.insert(
+							arretChns.end(),
 							ArretChn()
 					)	);
-					arretChn.dateRef = chainageResult->get<string>("ref")+"/"+chainageResult->get<string>("jour");
-
-					Arrets::iterator it(
-						arrets.find(
-							chainageResult->get<string>("arret")
-					)	);
-					if(it == arrets.end())
-					{
-						_logWarningDetail(
-							"STOPPOINT",arretChn.dateRef,arretChn.dateRef,0,string(),string(), string(),"Bad arret field in arretchn"
-						);
-						chainage->arretChns.pop_back();
-						continue;
-					}
-					arretChn.arret = &it->second;
+					arretChn.ref = arretChnRef;
+					arretChn.arret = &itArret->second;
 					arretChn.pos = chainageResult->getInt("pos");
 					arretChn.type = chainageResult->getText("type");
 					_logLoadDetail(
-						"STOPPOINT",arretChn.dateRef,arretChn.arret->nom,0,string(),string(), string(),"OK"
+						"STOPPOINT",arretChnRef,arretChn.arret->nom,0,string(),string(), string(),"OK"
+					);
+				}
+				// Load the last chainage
+				if(	ligne
+				){
+					_selectAndLoadChainage(
+						chainages,
+						arretChns,
+						*ligne,
+						nom,
+						sens,
+						lastRef
 					);
 				}
 			}
@@ -367,143 +504,149 @@ namespace synthese
 			// Courses
 			{
 				string horaireQuery(
-					"SELECT "+ _database +".HORAIRE.*,"+ _database +".ARRETCHN.chainage FROM "+ _database +".HORAIRE "+
-					"INNER JOIN "+ _database +".ARRETCHN ON "+ _database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+
-					_database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
-					"WHERE ("+ _database +".HORAIRE.jour="+ todayStr + " AND "+ _database +".HORAIRE.hra>"+ timenowStr +
-					") OR ("+ _database +".HORAIRE.jour="+ tomorrowStr + " AND "+ _database +".HORAIRE.hra<"+ timenowStr +
-					") ORDER BY "+ _database +".HORAIRE.course, "+ _database +".ARRETCHN.pos"
+					"SELECT "+
+						_database +".HORAIRE.hra,"+
+						_database +".HORAIRE.hrd,"+
+						_database +".HORAIRE.hta,"+
+						_database +".HORAIRE.htd,"+
+						_database +".HORAIRE.etat_harr,"+
+						_database +".HORAIRE.etat_hdep,"+
+						_database +".HORAIRE.course,"+
+						_database +".ARRETCHN.chainage "+
+					"FROM "+
+						_database +".HORAIRE "+
+						"INNER JOIN "+ _database +".ARRETCHN ON "+
+							_database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+ _database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
+					"WHERE "+
+						_database +".HORAIRE.jour="+ todayStr +
+					" ORDER BY "+
+						_database +".HORAIRE.course, "+
+						_database +".ARRETCHN.pos"
 				);
 				DBResultSPtr horaireResult(db.execQuery(horaireQuery));
-				
-				time_duration now(second_clock::local_time().time_of_day());
-				const time_duration dayBreakTime(hours(3));
-				time_duration now_plus_delay(now);
-				now_plus_delay += _delay_bus_stop;
-				time_duration limit_to_keep(now);
-				limit_to_keep += _time_to_keep;
+				time_duration nowDuration(now.time_of_day() < _dayBreakTime ? now.time_of_day() + hours(24) : now.time_of_day());
+				time_duration nowPlusDelay(nowDuration + _delay_bus_stop);
 				string lastCourseRef;
-				Course* course(NULL);
+				Course::Horaires horaires;
+				const Chainage* chainage(NULL);
 				while(horaireResult->next())
 				{
-					string courseRef(horaireResult->get<string>("course")+"/"+horaireResult->get<string>("jour"));
+					string courseRef(horaireResult->get<string>("course"));
+
+					// The course ref has changed : transform last collected data into a course if selected
+					if(	chainage &&
+						courseRef != lastCourseRef
+					){
+						_selectAndLoadCourse(
+							courses,
+							horaires,
+							*chainage,
+							lastCourseRef,
+							nowDuration
+						);
+					}
+
+					// Entering new course : check if the chainage exists
 					if(courseRef != lastCourseRef)
 					{
-						course = &(
-							courses.insert(
-								make_pair(
-									courseRef,
-									Course()
-							)	).first->second
-						);
-						course->dateRef = courseRef;
-
-						Chainages::iterator it(
+						// Check of the chainage
+						Chainages::const_iterator itChainage(
 							chainages.find(
-								horaireResult->get<string>("chainage")+"/"+horaireResult->get<string>("jour")
+								horaireResult->get<string>("chainage")
 						)	);
-						if(it == chainages.end())
+						if(itChainage == chainages.end())
 						{
+							chainage = NULL;
 							_logWarningDetail(
 								"SERVICE",courseRef,courseRef,0,string(),string(), string(),"Bad chainage field in course "
 							);
-							courses.erase(courseRef);
-							course = NULL;
 						}
 						else
 						{
-							_logLoadDetail(
-								"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
-							);
-							course->chainage = &it->second;
-							course->syntheseService = NULL;
+							chainage = &itChainage->second;
 						}
 
+						// Now entering in the new course
 						lastCourseRef = courseRef;
+						horaires.clear();
 					}
 
-					if(course)
+					// Avoid useless work
+					if(!chainage)
 					{
-						// Patch for not update the RT services after time to keep
-						time_duration htd = duration_from_string(horaireResult->getText("htd"));
-						if(htd < dayBreakTime)
-						{
-							htd += hours(24);
-						}
-						bool notUpdateRTData = htd > limit_to_keep;
-
-						Horaire& horaire(
-							*course->horaires.insert(
-								course->horaires.end(),
-								Horaire()
-						)	);
-						horaire.dateRef = horaireResult->get<string>("ref")+"/"+horaireResult->get<string>("jour");
-						horaire.had = duration_from_string(horaireResult->getText("had"));
-						// Patch for schedules after midnight
-						if(horaire.had < dayBreakTime)
-						{
-							horaire.had += hours(24);
-						}
-						horaire.haa = duration_from_string(horaireResult->getText("haa"));
-						if(horaire.haa < dayBreakTime)
-						{
-							horaire.haa += hours(24);
-						}
-						horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
-						if(horaire.hrd < dayBreakTime)
-						{
-							horaire.hrd += hours(24);
-						}
-						horaire.hra = duration_from_string(horaireResult->getText("hra"));
-						if(horaire.hra < dayBreakTime)
-						{
-							horaire.hra += hours(24);
-						}
-						horaire.htd = duration_from_string(horaireResult->getText("htd"));
-						if(horaire.htd < dayBreakTime)
-						{
-							horaire.htd += hours(24);
-						}
-						horaire.hta = duration_from_string(horaireResult->getText("hta"));
-						if(horaire.hta < dayBreakTime)
-						{
-							horaire.hta += hours(24);
-						}
-
-						if (notUpdateRTData)
-						{
-							horaire.hra = horaire.hta;
-							horaire.hrd = horaire.htd;
-						}
-
-						// Patch for bad schedules when the bus is at stop
-						if(	(	(	horaireResult->getText("etat_harr") == "R" &&
-									horaireResult->getText("etat_hdep") == "E"
-								) || (
-									horaire.hrd > now
-								)
-							) &&
-							horaire.hrd <= now_plus_delay
-						){
-							horaire.hrd = now_plus_delay;
-						}
-
-						_logTraceDetail(
-							"SCHEDULE_HTD",courseRef,courseRef,0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
-						);
-						_logTraceDetail(
-							"SCHEDULE_HTA",courseRef,courseRef,0,string(),horaireResult->getText("hta"),to_simple_string(horaire.hta),"OK"
-						);
-						_logTraceDetail(
-							"SCHEDULE_HRD",courseRef,courseRef,0,string(),horaireResult->getText("hrd"),to_simple_string(horaire.hrd),"OK"
-						);
-						_logTraceDetail(
-							"SCHEDULE_HRA",courseRef,courseRef,0,string(),horaireResult->getText("hra"),to_simple_string(horaire.hra),"OK"
-						);
+						continue;
 					}
 
-			}	}
-			
+					// New horaire
+					Horaire& horaire(
+						*horaires.insert(
+							horaires.end(),
+							Horaire()
+					)	);
+
+					// Fields load
+					horaire.hrd = duration_from_string(horaireResult->getText("hrd"));
+					horaire.hra = duration_from_string(horaireResult->getText("hra"));
+					horaire.htd = duration_from_string(horaireResult->getText("htd"));
+					horaire.hta = duration_from_string(horaireResult->getText("hta"));
+
+					// Patch for schedules after midnight
+					if(horaire.hrd < dayBreakTime)
+					{
+						horaire.hrd += hours(24);
+					}
+					if(horaire.hra < dayBreakTime)
+					{
+						horaire.hra += hours(24);
+					}
+					if(horaire.htd < dayBreakTime)
+					{
+						horaire.htd += hours(24);
+					}
+					if(horaire.hta < dayBreakTime)
+					{
+						horaire.hta += hours(24);
+					}
+
+					// Patch for bad schedules when the bus is at stop
+					if(	(	(	horaireResult->getText("etat_harr") == "R" &&
+								horaireResult->getText("etat_hdep") == "E"
+							) || (
+								horaire.hrd > nowDuration
+							)
+						) &&
+						horaire.hrd <= nowPlusDelay
+					){
+						horaire.hrd = nowPlusDelay;
+					}
+
+					// Trace
+					_logTraceDetail(
+						"SCHEDULE_HTD",courseRef,courseRef,0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
+					);
+					_logTraceDetail(
+						"SCHEDULE_HTA",courseRef,courseRef,0,string(),horaireResult->getText("hta"),to_simple_string(horaire.hta),"OK"
+					);
+					_logTraceDetail(
+						"SCHEDULE_HRD",courseRef,courseRef,0,string(),horaireResult->getText("hrd"),to_simple_string(horaire.hrd),"OK"
+					);
+					_logTraceDetail(
+						"SCHEDULE_HRA",courseRef,courseRef,0,string(),horaireResult->getText("hra"),to_simple_string(horaire.hra),"OK"
+					);
+				}
+
+				// Load lastly collected data
+				if(chainage)
+				{
+					_selectAndLoadCourse(
+						courses,
+						horaires,
+						*chainage,
+						lastCourseRef,
+						nowDuration
+					);
+				}
+			}			
 
 			// Programmations
 			{
@@ -584,6 +727,10 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			// Import content analyzing
 
+			DataSource* dataSourceOnSharedEnv(
+				Env::GetOfficialEnv().getEditable<DataSource>(_import.get<DataSource>()->getKey()).get()
+			);
+
 			{ // Scenarios and messages
 
 				// Loop on objects present in the database (search for creations and updates)
@@ -595,7 +742,7 @@ namespace synthese
 					boost::shared_ptr<Alarm> updatedMessage;
 					SentScenario* scenario(
 						static_cast<SentScenario*>(
-							_import.get<DataSource>()->getObjectByCode<Scenario>(
+							dataSourceOnSharedEnv->getObjectByCode<Scenario>(
 								lexical_cast<string>(programmation.ref)
 					)	)	);
 					Alarm* message(NULL);
@@ -723,42 +870,110 @@ namespace synthese
 
 			// Services
 			{
-				// Management of the ref field
-				typedef vector<const Course*> ServicesToUpdate;
-				ServicesToUpdate servicesToUpdate; // Old = New
-				typedef map<string, const ScheduledService*> ServicesToRemove;
-				ServicesToRemove servicesToRemove; // Old
+				typedef set<ScheduledService*> ServicesSet;
+				typedef vector<const Course*> CoursesVector;
+				ServicesSet servicesToRemove; // Services running this day and canceled
+				ServicesSet servicesToUnlink; // Services linked to this datasource to unlink
+				ServicesSet servicesToMove;
+				CoursesVector servicesToLink;
+				CoursesVector servicesToUpdate; // Update of the schedules must be done on these services
+			
+				
 
-				ServicesToUpdate servicesToLinkAndUpdate; // New
-				ServicesToUpdate servicesToMoveAndUpdate; // Old -> New
-
-				// Services
-				DataSource::Links::mapped_type existingServices(
-					_plannedDataSource->getLinkedObjects<ScheduledService>()
+				// Existing services coming from theoretical data
+				DataSource::LinkedObjects existingJourneyPatterns(
+					_plannedDataSource->getLinkedObjects<JourneyPattern>()
 				);
-				BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingService, existingServices)
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingJourneyPattern, existingJourneyPatterns)
 				{
-					servicesToRemove.insert(
-						make_pair(
-							existingService.first,
-							static_cast<ScheduledService*>(existingService.second)
-					)	);
+					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
+
+					BOOST_FOREACH(const ServiceSet::value_type& existingService, journeyPattern.getServices())
+					{
+						// Jump over continuous services
+						ScheduledService* service(dynamic_cast<ScheduledService*>(existingService));
+						if(!service)
+						{
+							continue;
+						}
+
+						// Jump over non active services
+						if(!service->isActive(today))
+						{
+							continue;
+						}
+
+						// Jump over non imported services
+						if(service->getNextRTUpdate() > nextDayBreak)
+						{
+							continue;
+						}
+
+						servicesToRemove.insert(service);
+					}
+
+					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, journeyPattern.getSubLines())
+					{
+						BOOST_FOREACH(const ServiceSet::value_type& existingService, subline->getServices())
+						{
+							// Jump over continuous services
+							ScheduledService* service(dynamic_cast<ScheduledService*>(existingService));
+							if(!service)
+							{
+								continue;
+							}
+
+							// Jump over non active services
+							if(!service->isActive(today))
+							{
+								continue;
+							}
+
+							// Jump over non imported services
+							if(service->getNextRTUpdate() > nextDayBreak)
+							{
+								continue;
+							}
+
+							servicesToRemove.insert(service);
+						}
+					}
 				}
 
-				// Search for existing service with same key
-				// If found, take the service into servicesToUpdate and remove it from servicesToRemove
-				BOOST_FOREACH(Courses::value_type& itCourse, courses)
+				// Existing services coming from last real time imports
+				DataSource::LinkedObjects existingServices(
+					dataSourceOnSharedEnv->getLinkedObjects<ScheduledService>()
+				);
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingService, existingServices)
 				{
-					Course& course(itCourse.second);
+					ScheduledService* service(static_cast<ScheduledService*>(existingService.second));
 
-					if(!course.mustBeImported())
+					servicesToUnlink.insert(service);
+
+					// Jump over non imported services
+					if(service->getNextRTUpdate() > nextDayBreak)
 					{
 						continue;
 					}
 
+					// Jump over non active services
+					if(!service->isActive(today))
+					{
+						continue;
+					}
+
+					servicesToRemove.insert(service); // Should already be present if not created by this import
+				}
+
+
+				// Search for existing service with same key
+				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
+				{
+					const Course& course(itCourse.second);
+
 					// Known ref ?
 					ScheduledService* service(
-						_import.get<DataSource>()->getObjectByCode<ScheduledService>(course.dateRef)
+						dataSourceOnSharedEnv->getObjectByCode<ScheduledService>(course.ref)
 					);
 					if(!service)
 					{
@@ -773,136 +988,40 @@ namespace synthese
 
 					// OK the service is sent to simple update
 					course.syntheseService = service;
+
+					// This service must not be unlinked
+					servicesToUnlink.erase(service);
+
+					// This service must be updated
 					servicesToUpdate.push_back(&course);
-					servicesToRemove.erase(lexical_cast<string>(course.dateRef));
+
+					// This service must not be removed
+					servicesToRemove.erase(service);
 				}
 
-				// Search for existing services with other key
-				// If found, take the service into servicesToMoveAndUpdate and remove it from servicesToRemove
-				BOOST_FOREACH(Courses::value_type& itCourse, courses)
+				// Search for existing services
+				size_t createdServices(0);
+				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
 				{
-					Course& course(itCourse.second);
+					const Course& course(itCourse.second);
 
 					// Jump over already joined services
-					if( course.syntheseService ||
-						!course.mustBeImported()
+					if( course.syntheseService
 					){
 						continue;
 					}
 
-					// Loop on non linked services
-					BOOST_FOREACH(const ServicesToRemove::value_type& itService, servicesToRemove)
-					{
-						// Check if the service matches
-						if(	course != *itService.second)
-						{
-							continue;
-						}
-
-						// OK
-						course.syntheseService = const_cast<ScheduledService*>(itService.second);
-						servicesToMoveAndUpdate.push_back(&course);
-						servicesToRemove.erase(itService.first);
-						break;
-					}
-					if(course.syntheseService)
-					{
-						continue;
-					}
-
-					// If not found, attempt to find a non linked service
-					// Get SYNTHESE Journey pattern(s)
-					if(course.chainage->syntheseJourneyPatterns.empty())
-					{
-						BOOST_FOREACH(Path* path, course.chainage->ligne->syntheseLine->getPaths())
-						{
-							if(!dynamic_cast<JourneyPattern*>(path)
-							){
-								continue;
-							}
-
-							const JourneyPattern& jp(*static_cast<JourneyPattern*>(path));
-
-							if(	!jp.hasLinkWithSource(*_plannedDataSource) &&
-								!jp.hasLinkWithSource(*_import.get<DataSource>())
-							){
-								continue;
-							}
-
-							if(	jp.getWayBack() != course.chainage->sens ||
-								jp.getEdges().size() != course.chainage->arretChns.size()
-							){
-								continue;
-							}
-
-							// Stops comparison
-							bool ok(true);
-							for(size_t i(0); i<course.chainage->arretChns.size(); ++i)
-							{
-								if(jp.getEdge(i)->getFromVertex()->getKey() != course.chainage->arretChns[i].arret->syntheseStop->getKey())
-								{
-									ok = false;
-									break;
-								}
-							}
-							if(!ok)
-							{
-								continue;
-							}
-
-							// Register the journey pattern
-							course.chainage->syntheseJourneyPatterns.push_back(&jp);
-							BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, jp.getSubLines())
-							{
-								course.chainage->syntheseJourneyPatterns.push_back(subline);
-							}
-						}
-
-						// If no journey pattern was found, creation of a new journey pattern
-						if(course.chainage->syntheseJourneyPatterns.empty())
-						{
-							boost::shared_ptr<JourneyPattern> jp(new JourneyPattern(JourneyPatternTableSync::getId()));
-							jp->setCommercialLine(course.chainage->ligne->syntheseLine);
-							jp->setWayBack(course.chainage->sens);
-							jp->setName(course.chainage->nom);
-							jp->addCodeBySource(
-								*_import.get<DataSource>(),
-								course.chainage->dateRef
-							);
-							_env.getEditableRegistry<JourneyPattern>().add(jp);
-							course.chainage->syntheseJourneyPatterns.push_back(jp.get());
-
-							size_t rank(0);
-							BOOST_FOREACH(const Chainage::ArretChns::value_type& arretChn, course.chainage->arretChns)
-							{
-								boost::shared_ptr<DesignatedLinePhysicalStop> ls(
-									new DesignatedLinePhysicalStop(
-										LineStopTableSync::getId(),
-										jp.get(),
-										rank,
-										rank+1 < course.chainage->arretChns.size(),
-										rank > 0,
-										0,
-										arretChn.arret->syntheseStop,
-										arretChn.type != "N"
-								)	);
-								jp->addEdge(*ls);
-								// Add the edge to the vertex
-								if (rank+1 < course.chainage->arretChns.size())
-									(arretChn.arret->syntheseStop)->addDepartureEdge(ls.get());
-								if (rank > 0)
-									(arretChn.arret->syntheseStop)->addArrivalEdge(ls.get());
-								_env.getEditableRegistry<LineStop>().add(ls);
-								++rank;
-							}
-						}
-					}
-
 					// Search for a service with the same planned schedules
-					BOOST_FOREACH(const JourneyPattern* route, course.chainage->syntheseJourneyPatterns)
-					{
+					BOOST_FOREACH(
+						const JourneyPattern* route,
+						course.chainage->getSYNTHESEJourneyPatterns(
+							*_plannedDataSource,
+							*dataSourceOnSharedEnv,
+							_env
+						)
+					){
 						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-									*route->sharedServicesMutex
+							*route->sharedServicesMutex
 						);
 						BOOST_FOREACH(Service* sservice, route->getServices())
 						{
@@ -917,8 +1036,15 @@ namespace synthese
 								course == *service
 							){
 								course.syntheseService = service;
-								servicesToLinkAndUpdate.push_back(&course);
-								servicesToRemove.erase(course.dateRef);
+
+								// The service must be updated
+								servicesToUpdate.push_back(&course);
+
+								// The service must not be removed
+								servicesToRemove.erase(service);
+
+								// The service must be linked
+								servicesToLink.push_back(&course);
 								break;
 							}
 						}
@@ -932,113 +1058,151 @@ namespace synthese
 						continue;
 					}
 
-					// Creation
-					const JourneyPattern* route(
-						*course.chainage->syntheseJourneyPatterns.begin()
-						);
-					course.syntheseService = new ScheduledService(
-						ScheduledServiceTableSync::getId(),
+					// No existing service has been found : creation of a new service
+					course.createService(today, _env);
+
+					// Log
+					++createdServices;
+					_logDebugDetail(
+						"SERVICE CREATION",
+						course.ref,
 						string(),
-						const_cast<JourneyPattern*>(route)
+						course.syntheseService->getKey(),
+						course.syntheseService->getServiceNumber(),
+						string(),
+						string(),
+						string()
 					);
-					SchedulesBasedService::Schedules departureSchedules;
-					SchedulesBasedService::Schedules arrivalSchedules;
-					for(size_t i(0); i<course.horaires.size(); ++i)
-					{
-						if(!static_cast<const DesignatedLinePhysicalStop*>(route->getEdge(i))->getScheduleInput())
-						{
-							continue;
-						}
 
-						departureSchedules.push_back(course.horaires[i].htd);
-						arrivalSchedules.push_back(course.horaires[i].hta);
-					}
-					course.syntheseService->setDataSchedules(departureSchedules, arrivalSchedules);
-					course.syntheseService->setPath(const_cast<JourneyPattern*>(route));
-					course.syntheseService->addCodeBySource(*_import.get<DataSource>(), course.dateRef);
-					course.syntheseService->setActive(today);
-					_env.getEditableRegistry<ScheduledService>().add(boost::shared_ptr<ScheduledService>(course.syntheseService));
+					// This service must be linked
+					servicesToLink.push_back(&course);
 
-					servicesToLinkAndUpdate.push_back(&course);
+					// This service must be updated
+					servicesToUpdate.push_back(&course);
 				}
 
-				DataSource* dataSourceOnUpdateEnv(
-					DataSourceTableSync::GetEditable(_import.get<DataSource>()->getKey(), _env).get()
-				);
+				// Loop on services to unlink
+				BOOST_FOREACH(ScheduledService* service, servicesToUnlink)
+				{
+					string oldCode;
+					try
+					{
+						if(service->hasLinkWithSource(*dataSourceOnSharedEnv))
+						{
+							oldCode = service->getACodeBySource(*dataSourceOnSharedEnv);
+						}
+						Importable::DataSourceLinks links(service->getDataSourceLinks());
+						links.erase(dataSourceOnSharedEnv);
+						service->setDataSourceLinksWithoutRegistration(links);
+						_servicesToSave.insert(service);
+
+						_logDebugDetail(
+							"SERVICE UNLINK",
+							oldCode,
+							string(),
+							service->getKey(),
+							service->getServiceNumber(),
+							string(),
+							string(),
+							string()
+						);
+					}
+					catch(...)
+					{
+						assert(false);
+					}
+				}
 
 				// Loop on services to update
-				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToUpdate)
+				size_t updated(0);
+				BOOST_FOREACH(const Course* course, servicesToUpdate)
 				{
 					try
 					{
-						it->updateService(*this, *it->syntheseService);
+						Course::UpdateDeltas result(
+							course->updateService(getHysteresis())
+						);
+						if(result)
+						{
+							++updated;
+							_logDebugDetail(
+								"REAL-TIME SCHEDULES UPDATE",
+								course->ref,
+								course->chainage->ligne->ref+"/"+course->chainage->ref,
+								course->syntheseService->getKey(),
+								course->syntheseService->getServiceNumber(),
+								string(),
+								lexical_cast<string>(result->first)+"s/"+lexical_cast<string>(result->second)+"s",
+								string()
+							);
+						}
 					}
 					catch (...)
 					{
+						assert(false);
 					}
 				}
 
-				// Loop on services to move and update
-				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToMoveAndUpdate)
-				{
-					try
-					{
-						boost::shared_ptr<ScheduledService> oldService(
-							ScheduledServiceTableSync::GetEditable(
-								it->syntheseService->getKey(),
-								_env
-						)	);
-						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
-						links.erase(dataSourceOnUpdateEnv);
-						links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
-						oldService->setDataSourceLinksWithoutRegistration(links);
-						it->updateService(*this, *it->syntheseService);
-					}
-					catch (...)
-					{
-					}
-				}
 
-				// Loop on services to link and update
-				BOOST_FOREACH(const ServicesToUpdate::value_type& it, servicesToLinkAndUpdate)
+				// Loop on services to link
+				BOOST_FOREACH(const Course* course, servicesToLink)
 				{
 					try
 					{
-						boost::shared_ptr<ScheduledService> oldService(
-							ScheduledServiceTableSync::GetEditable(
-								it->syntheseService->getKey(),
-								_env
-						)	);
-						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
-						links.erase(dataSourceOnUpdateEnv);
-						links.insert(make_pair(dataSourceOnUpdateEnv, it->dateRef));
-						oldService->setDataSourceLinksWithoutRegistration(links);
-						it->updateService(*this, *it->syntheseService);
+						Importable::DataSourceLinks links(course->syntheseService->getDataSourceLinks());
+						links.insert(make_pair(dataSourceOnSharedEnv, course->ref));
+						course->syntheseService->setDataSourceLinksWithoutRegistration(links);
+						_servicesToSave.insert(course->syntheseService);
+
+						_logDebugDetail(
+							"SERVICE LINK",
+							course->ref,
+							string(),
+							course->syntheseService->getKey(),
+							course->syntheseService->getServiceNumber(),
+							string(),
+							string(),
+							string()
+						);
 					}
 					catch (...)
 					{
+						assert(false);
 					}
 				}
 
 				// Remove services from today
-				BOOST_FOREACH(const ServicesToRemove::value_type& it, servicesToRemove)
+				BOOST_FOREACH(ScheduledService* service, servicesToRemove)
 				{
 					try
 					{
-						boost::shared_ptr<ScheduledService> oldService(
-							ScheduledServiceTableSync::GetEditable(
-								it.second->getKey(),
-								_env
-						)	);
-						Importable::DataSourceLinks links(oldService->getDataSourceLinks());
-						links.erase(dataSourceOnUpdateEnv);
-						oldService->setDataSourceLinksWithoutRegistration(links);
-						oldService->setInactive(today);
+						service->setInactive(today);
+						_servicesToSave.insert(service);
+
+						_logDebugDetail(
+							"SERVICE DEACTIVATION",
+							string(),
+							string(),
+							service->getKey(),
+							service->getServiceNumber(),
+							string(),
+							string(),
+							string()
+						);
 					}
 					catch (...)
 					{
+						assert(false);
 					}
 				}
+
+				// Log
+				_logInfo("Courses attachées : "+ lexical_cast<string>(servicesToLink.size()));
+				_logInfo("Courses détachées : "+ lexical_cast<string>(servicesToUnlink.size()));
+				_logInfo("Courses avec mise à jour des horaires temps réel : "+ lexical_cast<string>(updated));
+				_logInfo("Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
+				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
+				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
 			}
 
 			return true;
@@ -1172,8 +1336,48 @@ namespace synthese
 		{
 			DBTransaction transaction;
 
-			// Saving
-			DBModule::SaveEntireEnv(_env, transaction);
+			// Created journey patterns
+			BOOST_FOREACH(const JourneyPattern::Registry::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
+			{
+				JourneyPatternTableSync::Save(journeyPattern.second.get(), transaction);
+			}
+
+			// Created line stops
+			BOOST_FOREACH(const LineStop::Registry::value_type& lineStop, _env.getRegistry<LineStop>())
+			{
+				LineStopTableSync::Save(lineStop.second.get(), transaction);
+			}
+
+			// Created services
+			BOOST_FOREACH(const ScheduledService::Registry::value_type& service, _env.getRegistry<ScheduledService>())
+			{
+				ScheduledServiceTableSync::Save(service.second.get(), transaction);
+				_servicesToSave.erase(service.second.get()); // Avoid double save
+			}
+
+			// Updated services
+			BOOST_FOREACH(ScheduledService* service, _servicesToSave)
+			{
+				ScheduledServiceTableSync::Save(service, transaction);
+			}
+
+			// Scenarios
+			BOOST_FOREACH(const Scenario::Registry::value_type& scenario, _env.getRegistry<Scenario>())
+			{
+				ScenarioTableSync::Save(scenario.second.get(), transaction);
+			}
+
+			// Messages
+			BOOST_FOREACH(const Alarm::Registry::value_type& alarm, _env.getRegistry<Alarm>())
+			{
+				AlarmTableSync::Save(alarm.second.get(), transaction);
+			}
+
+			// Message links
+			BOOST_FOREACH(const AlarmObjectLink::Registry::value_type& aol, _env.getRegistry<AlarmObjectLink>())
+			{
+				AlarmObjectLinkTableSync::Save(aol.second.get(), transaction);
+			}
 
 			// Removals
 			BOOST_FOREACH(RegistryKeyType id, _alarmObjectLinksToRemove)
@@ -1189,29 +1393,13 @@ namespace synthese
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
 
+			// Output of SQL queries in debug mode
+			BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+			{
+				_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+			}
+
 			return transaction;
-		}
-
-
-
-		bool IneoBDSIFileFormat::Importer_::Course::mustBeImported() const
-		{
-			// Jump over courses with incomplete chainages
-			if(horaires.size() != chainage->arretChns.size())
-			{
-				return false;
-			}
-
-			// Jump over dead runs
-			BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage->arretChns)
-			{
-				if(!it.arret->syntheseStop)
-				{
-					return false;
-				}
-			}
-
-			return true;
 		}
 
 
@@ -1265,17 +1453,17 @@ namespace synthese
 
 
 
-
-		void IneoBDSIFileFormat::Importer_::Course::updateService(
-			const Importer_& importer,
-			pt::ScheduledService& service
+		/// @return true if the update has been done
+		IneoBDSIFileFormat::Importer_::Course::UpdateDeltas IneoBDSIFileFormat::Importer_::Course::updateService(
+			const boost::posix_time::time_duration& hysteresis
 		) const	{
+
 			// Update of the real time schedules
 			SchedulesBasedService::Schedules departureSchedules(
-				service.getDepartureSchedules(true, true)
+				syntheseService->getDepartureSchedules(true, true)
 			);
 			SchedulesBasedService::Schedules arrivalSchedules(
-				service.getArrivalSchedules(true, true)
+				syntheseService->getArrivalSchedules(true, true)
 			);
 			bool updated(false);
 			time_duration maxDelta(seconds(0));
@@ -1291,7 +1479,7 @@ namespace synthese
 				{
 					maxDelta = delta;
 				}
-				if(delta < -importer.getHysteresis() || delta > importer.getHysteresis())
+				if(delta < -hysteresis || delta > hysteresis)
 				{
 					updated = true;
 					break;
@@ -1305,31 +1493,24 @@ namespace synthese
 				{
 					maxDelta = delta;
 				}
-				if(delta < -importer.getHysteresis() || delta > importer.getHysteresis())
+				if(delta < -hysteresis || delta > hysteresis)
 				{
 					updated = true;
 					break;
 				}
 			}
-			if(updated)
+			if(!updated)
 			{
-				for(size_t i(0); i<horaires.size(); ++i)
-				{
-					departureSchedules[i] = horaires[i].hrd;
-					arrivalSchedules[i] = horaires[i].hra;
-				}
-				service.setRealTimeSchedules(departureSchedules, arrivalSchedules);
-				importer._logDebugDetail(
-					"SCHEDULES UPDATE",
-					dateRef,
-					chainage->ligne->ref+"/"+chainage->dateRef,
-					service.getKey(),
-					service.getServiceNumber(),
-					string(),
-					lexical_cast<string>(minDelta)+"s/"+lexical_cast<string>(maxDelta)+"s",
-					string()
-				);
+				return UpdateDeltas();
 			}
+
+			for(size_t i(0); i<horaires.size(); ++i)
+			{
+				departureSchedules[i] = horaires[i].hrd;
+				arrivalSchedules[i] = horaires[i].hra;
+			}
+			syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
+			return make_pair(minDelta, maxDelta);
 		}
 
 
@@ -1337,6 +1518,172 @@ namespace synthese
 		bool IneoBDSIFileFormat::Importer_::Course::operator!=( const pt::ScheduledService& op ) const
 		{
 			return !operator==(op);
+		}
+
+
+
+		void IneoBDSIFileFormat::Importer_::Course::createService(
+			const date& today,
+			util::Env& temporaryEnvironment
+		) const	{
+			const JourneyPattern* route(
+				*chainage->syntheseJourneyPatterns.begin()
+			);
+
+			// Service creation
+			boost::shared_ptr<ScheduledService> service(
+				new ScheduledService(
+					ScheduledServiceTableSync::getId(),
+					string(),
+					const_cast<JourneyPattern*>(route)
+			)	);
+
+			// Properties
+			service->setPath(const_cast<JourneyPattern*>(route));
+			service->setActive(today);
+
+			// Theoretical schedules
+			SchedulesBasedService::Schedules departureSchedules;
+			SchedulesBasedService::Schedules arrivalSchedules;
+			for(size_t i(0); i<horaires.size(); ++i)
+			{
+				if(!static_cast<const DesignatedLinePhysicalStop*>(route->getEdge(i))->getScheduleInput())
+				{
+					continue;
+				}
+
+				departureSchedules.push_back(horaires[i].htd);
+				arrivalSchedules.push_back(horaires[i].hta);
+			}
+			service->setDataSchedules(departureSchedules, arrivalSchedules);
+
+			// Registration of the service in the temporary environment
+			temporaryEnvironment.getEditableRegistry<ScheduledService>().add(service);
+
+			// Registration of the service in the course
+			syntheseService = service.get();
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Get corresponding journey patterns from SYNTHESE, compared by value.
+		/// If no existing journey pattern was found, a new one is created in the temporary environment
+		const IneoBDSIFileFormat::Importer_::Chainage::SYNTHESEJourneyPatterns& IneoBDSIFileFormat::Importer_::Chainage::getSYNTHESEJourneyPatterns(
+			const DataSource& theoreticalDataSource,
+			const DataSource& realTimeDataSource,
+			Env& temporaryEnvironment
+		) const	{
+			// If the cache is empty, search or create journey patterns
+			if(syntheseJourneyPatterns.empty())
+			{
+				// Search existing journey patterns on the line of the chainage
+				BOOST_FOREACH(Path* path, ligne->syntheseLine->getPaths())
+				{
+					// Jump over Free DRT areas
+					if(!dynamic_cast<JourneyPattern*>(path)
+					){
+						continue;
+					}
+
+					const JourneyPattern& jp(*static_cast<JourneyPattern*>(path));
+
+					// Jump over non imported journey patterns
+					if(	!jp.hasLinkWithSource(theoreticalDataSource) &&
+						!jp.hasLinkWithSource(realTimeDataSource)
+					){
+						continue;
+					}
+
+					// Check the direction and the stops size
+					if(	jp.getWayBack() != sens ||
+						jp.getEdges().size() != arretChns.size()
+					){
+						continue;
+					}
+
+					// Stops comparison
+					bool ok(true);
+					for(size_t i(0); i<arretChns.size(); ++i)
+					{
+						if(jp.getEdge(i)->getFromVertex() != arretChns[i].arret->syntheseStop)
+						{
+							ok = false;
+							break;
+						}
+					}
+					if(!ok)
+					{
+						continue;
+					}
+
+					// Register the journey pattern
+					syntheseJourneyPatterns.push_back(&jp);
+					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, jp.getSubLines())
+					{
+						syntheseJourneyPatterns.push_back(subline);
+					}
+				}
+			}
+
+			// If no journey pattern was found, creation of a new journey pattern
+			if(syntheseJourneyPatterns.empty())
+			{
+				// Object creation
+				boost::shared_ptr<JourneyPattern> jp(
+					new JourneyPattern(JourneyPatternTableSync::getId())
+				);
+
+				// Properties
+				jp->setCommercialLine(ligne->syntheseLine);
+				jp->setWayBack(sens);
+				jp->setName(nom);
+				jp->addCodeBySource(realTimeDataSource, ref);
+
+				// Stops
+				size_t rank(0);
+				BOOST_FOREACH(const ArretChns::value_type& arretChn, arretChns)
+				{
+					// Line stop creation
+					boost::shared_ptr<DesignatedLinePhysicalStop> ls(
+						new DesignatedLinePhysicalStop(
+							LineStopTableSync::getId(),
+							jp.get(),
+							rank,
+							rank+1 < arretChns.size(),
+							rank > 0,
+							0,
+							arretChn.arret->syntheseStop,
+							arretChn.type != "N"
+					)	);
+
+					// registration of the line stop into the journey pattern
+					jp->addEdge(*ls);
+
+					// Add the edge to the vertex
+/*						if (rank+1 < course.chainage->arretChns.size())
+					{
+						(arretChn.arret->syntheseStop)->addDepartureEdge(ls.get());
+					}
+					if (rank > 0)
+					{
+						(arretChn.arret->syntheseStop)->addArrivalEdge(ls.get());
+					}
+*/
+					// Registration of the line stop into the temporary environment, to be saved after the import
+					temporaryEnvironment.getEditableRegistry<LineStop>().add(ls);
+					++rank;
+				}
+
+				// Registration of the journey pattern in the temporary environment, to be saved after the import
+				temporaryEnvironment.getEditableRegistry<JourneyPattern>().add(jp);
+
+				// Registration of the created journey pattern in the cache
+				syntheseJourneyPatterns.push_back(jp.get());
+			}
+
+			return syntheseJourneyPatterns;
+			
 		}
 }	}
 

@@ -85,18 +85,19 @@ namespace synthese
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 				static const std::string PARAMETER_HYSTERESIS;
 				static const std::string PARAMETER_DELAY_BUS_STOP;
-				static const std::string PARAMETER_HOURS_TO_KEEP;
+				static const std::string PARAMETER_DAY_BREAK_TIME;
 		
 			private:
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
-				boost::posix_time::time_duration _time_to_keep;
-	
+				boost::posix_time::time_duration _dayBreakTime;
+
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
 				mutable std::set<util::RegistryKeyType> _messagesToRemove;
+				mutable std::set<pt::ScheduledService*> _servicesToSave;
 
 				struct Arret
 				{
@@ -106,6 +107,7 @@ namespace synthese
 					pt::StopPoint* syntheseStop;
 					pt_operation::Depot* syntheseDepot;
 				};
+				typedef std::map<std::string, Arret> Arrets;
 
 				struct Ligne
 				{
@@ -113,10 +115,11 @@ namespace synthese
 
 					pt::CommercialLine* syntheseLine;
 				};
+				typedef std::map<std::string, Ligne> Lignes;
 
 				struct ArretChn
 				{
-					std::string dateRef;
+					std::string ref;
 					Arret* arret;
 					int pos;
 					std::string type;
@@ -124,24 +127,38 @@ namespace synthese
 
 				struct Chainage
 				{
-					std::string dateRef;
+					std::string ref;
 					std::string nom;
-					Ligne* ligne;
+					const Ligne* ligne;
 					bool sens;
 					typedef std::vector<ArretChn> ArretChns;
 					ArretChns arretChns;
 
 					typedef std::vector<const pt::JourneyPattern*> SYNTHESEJourneyPatterns;
-					SYNTHESEJourneyPatterns syntheseJourneyPatterns;
+					mutable SYNTHESEJourneyPatterns syntheseJourneyPatterns;
+
+					const SYNTHESEJourneyPatterns& getSYNTHESEJourneyPatterns(
+						const impex::DataSource& theoreticalDataSource,
+						const impex::DataSource& realTimeDataSource,
+						util::Env& temporaryEnvironment
+					) const;
 				};
+				typedef std::map<std::string, Chainage> Chainages;
+				void _selectAndLoadChainage(
+					Chainages& chainages,
+					const Chainage::ArretChns& arretchns,
+					const Ligne& ligne,
+					const std::string& nom,
+					bool sens,
+					const std::string& chainageRef
+				) const;
+
+
 
 				struct Horaire
 				{
-					std::string dateRef;
 					boost::posix_time::time_duration htd;
 					boost::posix_time::time_duration hta;
-					boost::posix_time::time_duration had;
-					boost::posix_time::time_duration haa;
 					boost::posix_time::time_duration hrd;
 					boost::posix_time::time_duration hra;
 				};
@@ -149,24 +166,38 @@ namespace synthese
 
 				struct Course
 				{
-					std::string dateRef;
-					Chainage* chainage;
 					typedef std::vector<Horaire> Horaires;
-					Horaires horaires;
-					bool mapped;
 
-					pt::ScheduledService* syntheseService;
+					std::string ref;
+					const Chainage* chainage;
+					Horaires horaires;
+
+					mutable pt::ScheduledService* syntheseService;
 
 					bool operator!=(const pt::ScheduledService& op) const;
 					bool operator==(const pt::ScheduledService& service) const;
 					bool operator==(const pt::SchedulesBasedService::Schedules& schedules) const;
 
-					bool mustBeImported() const;
-					void updateService(
-						const Importer_& importer,
-						pt::ScheduledService& service
+					void createService(
+						const boost::gregorian::date& today,
+						util::Env& temporaryEnvironment
+					) const;
+
+					typedef boost::optional<std::pair<boost::posix_time::time_duration, boost::posix_time::time_duration> > UpdateDeltas;
+					UpdateDeltas updateService(
+						const boost::posix_time::time_duration& hysteresis
 					) const;
 				};
+				typedef std::map<std::string, Course> Courses;
+				void _selectAndLoadCourse(
+					Courses& courses,
+					const Course::Horaires& horaires,
+					const Chainage& chainage,
+					const std::string& courseRef,
+					const boost::posix_time::time_duration& nowDuration
+				) const;
+
+
 
 				struct Destinataire
 				{
@@ -189,12 +220,8 @@ namespace synthese
 					typedef std::vector<Destinataire> Destinataires;
 					Destinataires destinataires;
 				};
-
-				typedef std::map<std::string, Course> Courses;
-				typedef std::map<std::string, Ligne> Lignes;
-				typedef std::map<std::string, Arret> Arrets;
-				typedef std::map<std::string, Chainage> Chainages;
 				typedef std::map<int, Programmation> Programmations;
+
 
 				void _logLoadDetail(
 					const std::string& table,
@@ -240,6 +267,7 @@ namespace synthese
 					const std::string& remarks
 				) const;
 				const boost::posix_time::time_duration& getHysteresis() const { return _hysteresis; }
+
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////

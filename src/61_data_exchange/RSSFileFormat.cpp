@@ -139,10 +139,10 @@ namespace synthese
 				DataSource& dataSource(*_import.get<DataSource>());
 
 				// Scenarios
-				DataSource::Links::mapped_type existingScenarios(
+				DataSource::LinkedObjects existingScenarios(
 					dataSource.getLinkedObjects<Scenario>()
 				);
-				BOOST_FOREACH(const DataSource::Links::mapped_type::value_type& existingScenario, existingScenarios)
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
 				{
 					_scenariosToRemove.insert(existingScenario.second->getKey());
 				}

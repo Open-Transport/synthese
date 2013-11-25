@@ -114,7 +114,7 @@ namespace synthese
 				CalendarLinks _calendarLinks;
 			//@}
 		
-			mutable boost::shared_ptr<boost::recursive_mutex> _mutex;
+			mutable boost::recursive_mutex _mutex;
 			mutable boost::optional<boost::gregorian::date> _firstActiveDate;
 			mutable boost::optional<boost::gregorian::date> _lastActiveDate;
 			mutable boost::optional<BitSets> _datesCache; ///< Dates coming from the links or the marked dates
@@ -238,6 +238,7 @@ namespace synthese
 				bool operator==(const Calendar& op) const;
 				bool operator!=(const Calendar& op) const;
 
+				Calendar& operator=(Calendar const& rhs);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Serialization for storage in SQL compatible string.

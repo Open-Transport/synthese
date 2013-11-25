@@ -722,7 +722,7 @@ namespace synthese
 					)	);
 					if(value != getDataSourceLinks())
 					{
-						setDataSourceLinksWithoutRegistration(value);
+						setDataSourceLinksWithRegistration(value);
 						result = true;
 					}
 				}
