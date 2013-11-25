@@ -128,7 +128,11 @@ namespace synthese
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
 
-			void closeLogFile() const;
+			void closeLogFile(
+				bool result,
+				bool simulation,
+				const boost::posix_time::ptime& startTime
+			) const;
 
 
 			//////////////////////////////////////////////////////////////////////////

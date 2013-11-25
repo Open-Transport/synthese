@@ -226,8 +226,42 @@ namespace synthese
 
 
 
-		void Importer::closeLogFile() const
-		{
+		void Importer::closeLogFile(
+			bool result,
+			bool simulation,
+			const boost::posix_time::ptime& startTime
+		) const	{
+
+			{
+				stringstream dateStr;
+				ptime now(second_clock::local_time());
+				dateStr <<
+					now.date().year() << "-" <<
+					setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+					setw(2) << setfill('0') << now.date().day() << " " <<
+					setw(2) << setfill('0') << now.time_of_day().hours() << ":" <<
+					setw(2) << setfill('0') << now.time_of_day().minutes() << ":" <<
+					setw(2) << setfill('0') << now.time_of_day().seconds();
+
+				_logInfo("Import has ended at "+ dateStr.str());
+			}
+
+			{
+				stringstream dateStr;
+				dateStr <<
+					startTime.date().year() << "-" <<
+					setw(2) << setfill('0') << int(startTime.date().month()) << "-" <<
+					setw(2) << setfill('0') << startTime.date().day() << " " <<
+					setw(2) << setfill('0') << startTime.time_of_day().hours() << ":" <<
+					setw(2) << setfill('0') << startTime.time_of_day().minutes() << ":" <<
+					setw(2) << setfill('0') << startTime.time_of_day().seconds();
+
+				_logInfo("Import was started at "+ dateStr.str());
+			}
+
+			_logInfo("Import was done in "+ string(simulation ? "simulation" : "real") +" mode.");
+			_logInfo("Import has "+ string(result ? "succeeded" : "failed") +".");
+
 			// File stream
 			if(_fileStream.get())
 			{
