@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_DisplayScreenContentRequest_H__
 #define SYNTHESE_DisplayScreenContentRequest_H__
 
+#include "CommercialLine.h"
 #include "FunctionWithSite.h"
 #include "FactorableTemplate.h"
 #include "UtilTypes.h"
@@ -79,17 +80,18 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_GENERATION_METHOD;
 			static const std::string PARAMETER_USE_SAE_DIRECT_CONNECTION;
+			static const std::string PARAMETER_DATA_SOURCE_NAME_FILTER;
+			static const std::string PARAMETER_STOPS_LIST;
+			static const std::string PARAMETER_TIMETABLE_GROUPED_BY_AREA;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
+			static const std::string DATA_ONLY_REAL_TIME;
 
 			static const std::string PARAMETER_MAIN_PAGE_ID;
 			static const std::string PARAMETER_ROW_PAGE_ID;
 			static const std::string PARAMETER_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_TRANSFER_DESTINATION_PAGE_ID;
-			static const std::string PARAMETER_DATA_SOURCE_NAME_FILTER;
-
-			static const std::string PARAMETER_STOPS_LIST;
 
 			static const std::string DATA_STOP_ID;
 			static const std::string DATA_OPERATOR_CODE;
@@ -100,30 +102,63 @@ namespace synthese
 			static const std::string DATA_STOP_AREA_CITY_NAME;
 			static const std::string DATA_STOP_AREA_CITY_ID;
 
-			static const std::string DATA_IS_REAL_TIME;
+			static const std::string DATA_TIMETABLE;
+			static const std::string DATA_SCHEDULE;
+			static const std::string DATA_JOURNEY;
+			static const std::string DATA_DESTINATION;
+			static const std::string DATA_ROUTE_ID;
+			static const std::string DATA_DATE_TIME;
+			static const std::string DATA_ROLLING_STOCK;
+			static const std::string DATA_COMMERCIAL_LINE;
+			static const std::string DATA_STOP_AREA;
+			static const std::string DATA_STOP_POINT;
 
-			//Direct connection SAE structures :
-                        struct ServiceRealTime
-                        {
-                                std::string date;
-                                std::string Realtime;
-                                std::string oc;
-                                std::string arret;
-                                std::string nom_ligne;
-                                std::string lineShortName;
-                                std::string LineStyle;
-                                std::string lineColor;
-                                std::string lineXmlColor;
-                                std::string depart;
-                                std::string cityName_begin;
-                                std::string arrivee;
-                                std::string cityName_end;
-                                std::string cityName_current;
-                                util::RegistryKeyType cityId_current;
-                                util::RegistryKeyType stopAreaId;
-                                util::RegistryKeyType stop_id;
-                                util::RegistryKeyType networkId;
-                        };
+			static const std::string DATA_IS_REAL_TIME;
+			static const std::string DATA_DUMMY_KEY;
+
+			static const boost::posix_time::time_duration endOfService;
+
+			typedef std::pair<const pt::CommercialLine*, const pt::StopArea*> LineDestinationKey;
+			typedef std::map<const pt::StopPoint*, LineDestinationKey> LineDestinationFilter;
+
+			// Direct connection SAE structures :
+			struct RealTimeService
+			{
+				boost::posix_time::ptime datetime;
+				bool realTime;
+				boost::shared_ptr<const pt::CommercialLine> commercialLine;
+				boost::shared_ptr<const pt::StopPoint> stop;
+				const pt::StopArea* destination;
+
+				RealTimeService():
+					realTime(false),
+					destination(NULL)
+				{}
+			};
+
+			struct Spointer_comparator {
+				bool operator()(const graph::ServicePointer& s1, const graph::ServicePointer& s2)
+				{
+					return s1.getDepartureDateTime() < s2.getDepartureDateTime();
+				}
+
+				bool operator()(const RealTimeService& s1, const RealTimeService& s2)
+				{
+					return s1.datetime < s2.datetime;
+				}
+			};
+
+			struct LineDestinationKey_comparator {
+				bool operator()(const LineDestinationKey& ldk1, const LineDestinationKey& ldk2)
+				{
+					if(*(ldk1.first) < *(ldk2.first))
+						return true;
+					else if(*(ldk2.first) < *(ldk1.first))
+						return false;
+					else
+						return ldk1.second->getName() < ldk2.second->getName();
+				}
+			};
 
 		private:
 			//! \name Page parameters
@@ -135,8 +170,13 @@ namespace synthese
 				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
 				bool _wayIsBackward;
 				boost::optional<std::string> _dataSourceName;
-				static std::vector<std::string> _SAELine;
 				bool _useSAEDirectConnection;
+				bool _timetableGroupedByArea;
+				LineDestinationFilter _lineDestinationFilter;
+
+				typedef std::map<std::string, util::RegistryKeyType> SAELine;
+				static SAELine _SAELine;
+				static boost::posix_time::ptime _nextUpdateLine;
 
 				boost::shared_ptr<const cms::Webpage> _mainPage;
 				boost::shared_ptr<const cms::Webpage> _rowPage;
@@ -164,13 +204,12 @@ namespace synthese
 			*/
 			void concatXMLResult(
 				std::ostream& stream,
-				graph::ServicePointer& servicePointer,
-				const pt::StopPoint* stop
+				graph::ServicePointer& servicePointer
 			)const;
 
 			void concatXMLResultRealTime(
 				std::ostream& stream,
-				ServiceRealTime& serviceReal
+				RealTimeService& serviceReal
 			)const;
 
 			//////////////////////////////////////////////////////////////////////////
@@ -178,13 +217,12 @@ namespace synthese
 			/// @author Sylvain Pasche
 			void addJourneyToParametersMap(
 				util::ParametersMap& pm,
-				graph::ServicePointer& servicePointer,
-				const pt::StopPoint* stop
+				graph::ServicePointer& servicePointer
 			) const;
 			
 			void addJourneyToParametersMapRealTime(
 				util::ParametersMap& pm,
-				ServiceRealTime& serviceReal
+				RealTimeService& serviceReal
 			) const;
 
 			void displayFullDate(

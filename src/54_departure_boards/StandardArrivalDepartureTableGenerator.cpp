@@ -72,9 +72,8 @@ namespace synthese
 
 			AccessParameters ap;
 
-			// Loop on the stops of the current stop area
-			const StopArea::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
-			BOOST_FOREACH(PhysicalStops::value_type it, physicalStops)
+			// Loop on the stops
+			BOOST_FOREACH(PhysicalStops::value_type it, _physicalStops)
 			{
 				// Loop on journey patterns calling at the stop
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
