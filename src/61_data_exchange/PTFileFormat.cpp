@@ -574,14 +574,20 @@ namespace synthese
 					);
 					stop->setName(name);
 				}
-				if(geometry && *geometry && (!stop->getGeometry() || (stop->getGeometry()->toString() != (*geometry)->toString())))
+				if(geometry && *geometry)
 				{
-					_logInfo(
-						"Stop "+ code +" ("+ stop->getName() +") moved from " + stop->getGeometry()->toString() + " to " + (*geometry)->toString()
-					);
+					boost::shared_ptr<const Geometry> exGeom(stop->getGeometry());
 					stop->setGeometry(
 						CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(**geometry)
 					);
+					boost::shared_ptr<const Geometry> newGeom(stop->getGeometry());
+
+					if(exGeom->distance(newGeom.get()) > 1)
+					{
+						_logInfo(
+							"Stop "+ code +" ("+ stop->getName() +") moved from " + stop->getGeometry()->toString() + " to " + (*geometry)->toString()
+						);
+					}
 				}
 
 				if(rules)
