@@ -32,7 +32,6 @@
 #include <iconv.h>
 #include <stdlib.h>
 #include <boost/lexical_cast.hpp>
-//#include <my_global.h> //break compilation : is this usefull ?
 
 #include "Log.h"
 #include "DeparturesTableModule.h"
@@ -45,7 +44,7 @@
 struct st_mysql;
 typedef struct st_mysql MYSQL;
 
-const int MYSQL_CONNECTION_NB = 2;
+const int MYSQL_CONNECTION_NB = 5;
 
 struct ConnectionInfo
 {
@@ -62,6 +61,7 @@ typedef struct
 	bool queryIsOver;
 	const char * requestStr;
 	int connectionIndex;
+	bool serverIsGone;
 } queryArgs;
 
 
@@ -116,7 +116,6 @@ class MySQLconnector
 		static boost::mutex _connectionFullMutex;
 		static int _usedConnectionNb;
 
-		//void doQuery(char * str,bool & queryIsOK);
 		static void *launchQuery(void *argPtr);
 
 		int _connectionIndex;
@@ -180,7 +179,7 @@ void MySQLResult::_ensurePosition() const
 	if(_pos == -1)
 	{
 		//TODO : throw exception ?
-		synthese::util::Log::GetInstance().warn("Not inside result (use next ())...");
+		synthese::util::Log::GetInstance().warn("MySQLResult::_ensurePosition not inside result (use next ())");
 		return;
 	}
 }
@@ -240,8 +239,11 @@ string MySQLResult::getColumnName(int column) const
 
 string MySQLResult::getText(int column) const
 {
-	if (!_row)
-		return "ERROR : NO SQL RESULTS";
+	if(!_row)
+	{
+		synthese::util::Log::GetInstance().warn("MySQLResult::getText no row selected");
+		return string();
+	}
 
 	string text = string(_row[column]);
 	
@@ -265,7 +267,7 @@ string MySQLResult::getText(int column) const
 	if(iconv(_iconv, &pBuf, &len, &pUtfbuf, &utf8len) == (size_t) (-1))
 	{
 		free(utf8buf);
-		synthese::util::Log::GetInstance().warn("MySQLResult::getText canno't convert to UTF-8 !!!");
+		synthese::util::Log::GetInstance().warn("MySQLResult::getText cannot convert to UTF-8");
 		return text;
 	}
 
@@ -280,15 +282,15 @@ string MySQLResult::getText(int column) const
 
 std::string MySQLResult::getInfo(std::string text) const
 {
-	std::string LOG = "";
-
-	for(int i=0; i < getNbColumns(); i++){
+	for(int i=0; i < getNbColumns(); i++)
+	{
 		if (getColumnName(i) == text)
 			return getText(i);
-		LOG += getColumnName(i) + " ; ";
 	}
 
-	return "ERROR : LOG > " + LOG + " and UNKNOW COLUMN > " + text;
+	synthese::util::Log::GetInstance().warn("MySQLResult::getInfo unknown column " + text);
+
+	return string();
 }
 
 void MySQLconnector::_initConnection(int index)
@@ -299,31 +301,32 @@ void MySQLconnector::_initConnection(int index)
 	_connInfo.db = synthese::departure_boards::DeparturesTableModule::GetIneoServerDBName();
 	_connInfo.port = synthese::departure_boards::DeparturesTableModule::GetIneoServerPort();
 
-	stringstream warnStart;
-	warnStart << "MySQL initConnexion start, connection index = " << index << " !!";
-	synthese::util::Log::GetInstance().warn(warnStart.str());
+	stringstream indexStr;
+	indexStr << index;
+#ifdef DEBUG_RT_FULL
+	synthese::util::Log::GetInstance().info("MySQLconnector::_initConnection MySQL initConnexion start, connection index = " + indexStr.str());
+#endif
 
 	if(!mysql_thread_safe())
 	{
 		//TODO : throw Exception ?
-		synthese::util::Log::GetInstance().warn("MySQL client not compiled as thread-safe.");
+		synthese::util::Log::GetInstance().warn("MySQLconnector::_initConnection MySQL client is not compiled as thread-safe");
 		return;
 	}
 
 	if(_connections[index] != NULL)
 	{
-		stringstream warnMsg;
-		warnMsg << "MySQL _connection wasn't NULL close previous connexion, connection index = " << index << " !!";
-		synthese::util::Log::GetInstance().warn(warnMsg.str());
+#ifdef DEBUG_RT_FULL
+		synthese::util::Log::GetInstance().info("MySQL _connection wasn't NULL. Closing previous connection, connection index = " + indexStr.str());
+#endif
 		mysql_close(_connections[index]);
 	}
 
 	_connections[index] = mysql_init(NULL);
+
 	if(_connections[index] == NULL)
 	{
-		stringstream warnMsg1;
-		warnMsg1 << "mysql_init() failed, connection index = " << index << " !!";
-		synthese::util::Log::GetInstance().warn(warnMsg1.str());
+		synthese::util::Log::GetInstance().warn("MySQLconnector::_initConnection mysql_init() failed, connection index = " + indexStr.str());
 		return;
 	}
   
@@ -332,66 +335,69 @@ void MySQLconnector::_initConnection(int index)
 		_connInfo.passwd.c_str(), _connInfo.db.c_str(),
 		_connInfo.port, NULL, CLIENT_MULTI_STATEMENTS) == NULL)
 	{
-		stringstream warnMsg2;
-		warnMsg2 << "Can't connect to MySQL server, connection index = " << index << " !!";
-		synthese::util::Log::GetInstance().warn(warnMsg2.str());
+		synthese::util::Log::GetInstance().warn("MySQLconnector::_initConnection can't connect to MySQL server, connection index = " + indexStr.str());
 		return;
 	}
 
 #ifdef DEBUG_RT_FULL
-	stringstream warnMsg3;
-	warnMsg3 << "MySQL connexion is OK, connection index = " << index << " !!";
-	synthese::util::Log::GetInstance().warn(warnMsg3.str());
+	synthese::util::Log::GetInstance().info("MySQLconnector::_initConnection MySQL connection is ok, connection index = " + indexStr.str());
 #endif
 }
 
-
-//POSIX Thread Method
+// POSIX Thread Method
 void* MySQLconnector::launchQuery(void *argPtr)
 {
 	queryArgs *args = (queryArgs*)argPtr;
+	stringstream indexStr;
+	indexStr << args->connectionIndex;
 
 #ifdef DEBUG_RT_FULL
-	stringstream warnStart;
-	warnStart << "MySQL launchQuery start, connection index = " << args->connectionIndex << " !!";
-	synthese::util::Log::GetInstance().warn(warnStart.str());
+	synthese::util::Log::GetInstance().info("MySQLconnector::launchQuery MySQL launchQuery start, connection index = " + indexStr.str());
 #endif
 	
-	const int NUM_QUERY_RETRY = 10;
+	const int NUM_QUERY_RETRY = 5;
     
 	for(int i=0; i<NUM_QUERY_RETRY; i++)
 	{
 		if(_connections[args->connectionIndex] == NULL)  
 		{
-			stringstream warnMsg;
-			warnMsg << "MySQL launchQuery : connexion " << args->connectionIndex << "was NULL : try reconnect";
-			synthese::util::Log::GetInstance().warn(warnMsg.str());
+			synthese::util::Log::GetInstance().warn("MySQLconnector::launchQuery connexion " + indexStr.str() + " is NULL, (re)connecting in progress");
+			args->serverIsGone = true;
 			_initConnection(args->connectionIndex);
+			args->serverIsGone = false;
 		}
 		else
 		{
 			if(mysql_query(_connections[args->connectionIndex],args->requestStr))
 			{
-				unsigned int myxaverrno = mysql_errno(_connections[args->connectionIndex]);
+				unsigned int myErrno = mysql_errno(_connections[args->connectionIndex]);
+				stringstream errnoStr;
+				errnoStr << myErrno;
 				args->queryIsOK = false;
 
-				stringstream errnoQuery;
-				errnoQuery << "MySQL mysql_query failed : errno = " << myxaverrno << ", connection nb = " << args->connectionIndex;
+				// Server gone, informe the SYNTHESE thread to give more time to the thread to complete
+				if(myErrno == 2006)
+					args->serverIsGone = true;
 
-				// CR_SERVER_GONE_ERROR
-				if(myxaverrno == 2006)
+				synthese::util::Log::GetInstance().warn("MySQLconnector::launchQuery error during mysql_query() with code " + errnoStr.str());
+#ifdef DEBUG_RT
+				synthese::util::Log::GetInstance().warn(mysql_error(_connections[args->connectionIndex]));
+#endif
+				// Clientside error, trying again
+				if(myErrno >= 2000)
 				{
-					synthese::util::Log::GetInstance().warn("MySQL disconected CR_SERVER_GONE_ERROR");
+					_initConnection(args->connectionIndex);
+					args->serverIsGone = false;
 				}
-
-				synthese::util::Log::GetInstance().warn(errnoQuery.str());
-				_initConnection(args->connectionIndex);
+				// Server side error, do not worth a retry
+				else
+					break;
 			}
 			else
 			{
-				stringstream warnMsg2;
-				warnMsg2 << "MySQL mysql_query sucess, connection index = " << args->connectionIndex << " !!";
-				synthese::util::Log::GetInstance().warn(warnMsg2.str());
+#ifdef DEBUG_RT_FULL
+				synthese::util::Log::GetInstance().info("MySQLconnector::launchQuery MySQL query success, connection index = " + indexStr.str());
+#endif
 				args->queryIsOK = true;
 				break;
 			}
@@ -401,9 +407,7 @@ void* MySQLconnector::launchQuery(void *argPtr)
 	args->queryIsOver = true;
 
 #ifdef DEBUG_RT_FULL
-	stringstream warnEnd;
-	warnEnd << "MySQL launchQuery end, connection index = " << args->connectionIndex << " !!";
-	synthese::util::Log::GetInstance().warn(warnEnd.str());
+	synthese::util::Log::GetInstance().info("MySQLconnector::launchQuery MySQL launchQuery end, connection index = " + indexStr.str());
 #endif
 	return NULL;
 }
@@ -412,20 +416,23 @@ void MySQLconnector::freeUsedConnection()
 {
 	boost::recursive_mutex::scoped_lock lock(_connectionMutex);
 
-#ifdef DEBUG_RT_FULL	
-	stringstream warnMsg;
-	warnMsg << "freeUsedConnection, connection index = " << _connectionIndex << ", usedConnectionNb = " << _usedConnectionNb << "!!";
-	synthese::util::Log::GetInstance().warn(warnMsg.str());
+#ifdef DEBUG_RT_FULL
+	stringstream startMessage;
+	startMessage << "MySQLconnector::freeUsedConnection MySQL freeUsedConnection start,"
+				 << "connection index = " << _connectionIndex << ", usedConnectionNb = " << _usedConnectionNb;
+	synthese::util::Log::GetInstance().info(startMessage.str());
 #endif
 
-	// Write connection not in use
-	_availableConnections[_connectionIndex]=true;
+	// Flag the connection as available
+	_availableConnections[_connectionIndex] = true;
 	_usedConnectionNb--;
 
 	// If _connectionFullMutex was locked, now we unlock it 
 	if(_usedConnectionNb == MYSQL_CONNECTION_NB - 1)
 	{
-		synthese::util::Log::GetInstance().warn("unlock FULL connection mutex");
+#ifdef DEBUG_RT_FULL
+		synthese::util::Log::GetInstance().info("MySQLconnector::freeUsedConnection unlock connection full mutex");
+#endif
 		_connectionFullMutex.unlock();
 	}
 }
@@ -433,31 +440,30 @@ void MySQLconnector::freeUsedConnection()
 void MySQLconnector::waitForAConnection()
 {
 #ifdef DEBUG_RT_FULL
-	synthese::util::Log::GetInstance().warn("waitForAConnection : wait for _connectionFullMutex");
+	synthese::util::Log::GetInstance().info("MySQLconnector::waitForAConnection waiting for _connectionFullMutex lock");
 #endif
 
 	// First : we stop if _connections is FULL
 	_connectionFullMutex.lock();
 
 #ifdef DEBUG_RT_FULL
-	synthese::util::Log::GetInstance().warn("waitForAConnection : wait for _connectionMutex");
+	synthese::util::Log::GetInstance().info("MySQLconnector::waitForAConnection _connectionFullMutex locked");
 #endif
 
-	// Now we are sure that at less there is one connection FREE
-	// Now lock on read/write operations 
+	// Now we are sure that there is at least one connection free, lock on read write
 	boost::recursive_mutex::scoped_lock lock(_connectionMutex);
 
 #ifdef DEBUG_RT_FULL
-	//synthese::util::Log::GetInstance().warn("waitForAConnection : AFTER MUTEX");
+	synthese::util::Log::GetInstance().info("MySQLconnector::waitForAConnection _connectionMutex locked");
 #endif
 
 	_connectionIndex = -1;
 
-	// Check if it is first access to BDD
+	// Check if it is the first access to database
 	if(_availableConnections == NULL)
 	{
 #ifdef DEBUG_RT
-		synthese::util::Log::GetInstance().warn("_availableConnections==NULL : first BDD connection");
+		synthese::util::Log::GetInstance().info("MySQLconnector::waitForAConnection _availableConnections is NULL, first database connection");
 #endif
 
 		// Allocate and initialise static vars
@@ -471,12 +477,11 @@ void MySQLconnector::waitForAConnection()
 		}
 		_connectionIndex = 0;
 	}
-	// That is not the first access to BDD
 	else
 	{
 		for(int i=0; i<MYSQL_CONNECTION_NB; i++)
 		{
-			// Stop on first available connection (it must be one because connection is not FULL)
+			// Stop on first available connection (there is one because _connectionFullMutex wasn't locked)
 			if(_availableConnections[i])
 			{
 				_connectionIndex = i;
@@ -485,34 +490,18 @@ void MySQLconnector::waitForAConnection()
 		}
 	}
 
-	// Write connection in use
+	// Flag the connection we're using
 	_availableConnections[_connectionIndex] = false;
 	_usedConnectionNb++;
 
-#ifdef DEBUG_RT_FULL
-	for(int i=0;i<MYSQL_CONNECTION_NB;i++){
-		stringstream warnMsg1;
-		warnMsg1 << "after _availableConnections["
-				<< i << "] = " << _availableConnections[i];
-		synthese::util::Log::GetInstance().warn(warnMsg1.str());
-	}
-
-	stringstream warnMsg;
-	warnMsg << "waitForAConnection, GO for connection index = " << _connectionIndex
-			<< ", usedConnectionNb = " << _usedConnectionNb << "!!";
-	synthese::util::Log::GetInstance().warn(warnMsg.str());
-#endif
-
-	// If connection index is not last one, _connections is not FULL
+	// If connection index is not the last one, don't need to lock _connectionFullMutex anymore
 	if(_usedConnectionNb != MYSQL_CONNECTION_NB)
 	{
-		//synthese::util::Log::GetInstance().warn("unlock _connectionFullMutex");
 		_connectionFullMutex.unlock();
 	}
-	// _connectionFullMutex stay locked
 	else
 	{
-		synthese::util::Log::GetInstance().warn("FULL !!!!! _connectionFullMutex stay locked");
+		synthese::util::Log::GetInstance().warn("MySQLconnector::waitForAConnection _connectionFullMutex stay locked, all threads are busy");
 	}
 }
 
@@ -527,11 +516,12 @@ shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synth
 	args->queryIsOver = false;
 	args->requestStr = sql.c_str();
 	args->connectionIndex = _connectionIndex;
+	args->serverIsGone = false;
 
 	bool queryTimedout = true;
 
 #ifdef DEBUG_RT_FULL
-	synthese::util::Log::GetInstance().warn("MySQL try to create thread ");
+	synthese::util::Log::GetInstance().info("MySQLconnector::execQuery try to create thread");
 #endif
 	
 	pthread_attr_t attr;
@@ -545,71 +535,80 @@ shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synth
 	if (ret)
 	{
 		stringstream errnoCreate;
-		errnoCreate << "MySQL failed thread creation : errno = " << ret;
+		errnoCreate << "MySQLconnector::execQuery failed thread creation : errno = " << ret;
 		synthese::util::Log::GetInstance().warn(errnoCreate.str());
 		
 		stringstream err1,err2,err3,err4;
-		err1 << "EAGAIN = " << EAGAIN;
-		err2 << "EINVAL = " << EINVAL;
-		err3 << "EPERM  = " << EPERM;
-		err4 << "ENOMEM = " << ENOMEM;
+		err1 << "\tMySQLconnector::execQuery EAGAIN = " << EAGAIN;
+		err2 << "\tMySQLconnector::execQuery EINVAL = " << EINVAL;
+		err3 << "\tMySQLconnector::execQuery EPERM  = " << EPERM;
+		err4 << "\tMySQLconnector::execQuery ENOMEM = " << ENOMEM;
 
 		synthese::util::Log::GetInstance().warn(err1.str());
-		synthese::util::Log::GetInstance().warn(err3.str());
 		synthese::util::Log::GetInstance().warn(err2.str());
+		synthese::util::Log::GetInstance().warn(err3.str());
 		synthese::util::Log::GetInstance().warn(err4.str());
+
 		freeUsedConnection();
 		free(args);
 
-		throw synthese::Exception("MySQL connector : can't create new thread");
+		throw synthese::Exception("MySQLconnector : can't create new thread");
 	}
 
 	unsigned int cpt = 0;
+	bool reconnecting = false;
 
-	// Total wait 5000ms
-	while(cpt < 500)
+	// Total wait 500ms, except if MySQL server was gone
+	while((cpt < 250) || reconnecting)
 	{
-		// Wait 10000 usec = 10 msec
-		usleep(10000);
+		// Wait 2000 usec = 2 msec
+		usleep(2000);
 		cpt++;
 
 		if(args->queryIsOver)
 		{
+#ifdef DEBUG_RT
+			stringstream durationMsg;
+			durationMsg << "MySQLconnector::execQuery ended, duration = " << cpt*2 << " ms";
+			synthese::util::Log::GetInstance().info(durationMsg.str());
+#endif
 			queryTimedout = false;
-			stringstream warnMsg;
-			warnMsg << "Mysql query duration = " << cpt*10 << " ms";
-			synthese::util::Log::GetInstance().warn(warnMsg.str());
 			break;
+		}
+		else if(!reconnecting && args->serverIsGone)
+		{
+			// Give it time to reconnect
+			reconnecting = true;
+		}
+		else if(reconnecting && !args->serverIsGone)
+		{
+			// Reconnected, reset the counter to 0
+			reconnecting = false;
+			cpt = 0;
 		}
 	}
 
 	if(queryTimedout)
 	{
-		synthese::util::Log::GetInstance().warn("MYSQL TOO LONG (more than 5000 ms) ");
+		synthese::util::Log::GetInstance().warn("MySQLconnector::execQuery MySQL too long (more than 500 ms)");
 		// Don't forget to kill thread
 		pthread_cancel(thread_handle);
 		freeUsedConnection();
 		free(args);
-		throw synthese::Exception("MySQL connector : MYSQL TOO LONG");
+		throw synthese::Exception("MySQLconnector : MySQL too long");
 	}
 	if(!args->queryIsOK)
 	{
-		synthese::util::Log::GetInstance().warn("MYSQL thread query failed");
+		synthese::util::Log::GetInstance().warn("MySQLconnector::execQuery MySQL thread query failed");
 		freeUsedConnection();
 		free(args);
-		throw synthese::Exception("MySQL connector : MYSQL thread query failed");
+		throw synthese::Exception("MySQLconnector : MySQL thread query failed");
 	}
 
 	MYSQL_RES* result = mysql_store_result(_connections[_connectionIndex]);
 
 	free(args);
-	if(!result)
-	{
-		synthese::util::Log::GetInstance().warn("MySQL error in mysql_store_result()");
-		freeUsedConnection();
-		synthese::Exception("MySQL connector : MySQL error in mysql_store_result()");
-	}
-
 	freeUsedConnection();
+
 	return shared_ptr<MySQLResult>(new MySQLResult(result));
 }

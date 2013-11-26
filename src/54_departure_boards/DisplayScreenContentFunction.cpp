@@ -25,6 +25,7 @@
 #include "AccessParameters.h"
 #include "RequestException.h"
 #include "Request.h"
+#include "CommercialLineTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "ServicePointer.h"
 #include "DisplayScreen.h"
@@ -41,7 +42,6 @@
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
-#include "CommercialLine.h"
 #include "City.h"
 #include "Alarm.h"
 #include "Webpage.h"
@@ -97,6 +97,10 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
 		const string DisplayScreenContentFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string DisplayScreenContentFunction::PARAMETER_GENERATION_METHOD = "generation_method";
+		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER("data_source_name_filter");
+		const string DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION("use_sae_direct_connection");
+		const string DisplayScreenContentFunction::PARAMETER_STOPS_LIST("stops_list");
+		const string DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA("timetable_grouped_by_area");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -112,6 +116,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_SUBSCREEN_("subscreen_");
 		const string DisplayScreenContentFunction::DATA_FIRST_DEPARTURE_TIME("first_departure_time");
 		const string DisplayScreenContentFunction::DATA_LAST_DEPARTURE_TIME("last_departure_time");
+		const string DisplayScreenContentFunction::DATA_ONLY_REAL_TIME("onlyRealTime");
 
 		const string DisplayScreenContentFunction::DATA_STOP_ID("stop_id");
 		const string DisplayScreenContentFunction::DATA_OPERATOR_CODE("operatorCode");
@@ -166,15 +171,24 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_DESTINATION_PAGE_ID("destination_page_id");
 		const string DisplayScreenContentFunction::PARAMETER_TRANSFER_DESTINATION_PAGE_ID("transfer_destination_page_id");
 
-		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER("data_source_name_filter");
-		const string DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION("use_sae_direct_connection");
-
-		const string DisplayScreenContentFunction::PARAMETER_STOPS_LIST("stops_list");
+		const string DisplayScreenContentFunction::DATA_TIMETABLE("timetable");
+		const string DisplayScreenContentFunction::DATA_SCHEDULE("schedule");
+		const string DisplayScreenContentFunction::DATA_JOURNEY("journey");
+		const string DisplayScreenContentFunction::DATA_DESTINATION("destination");
+		const string DisplayScreenContentFunction::DATA_ROUTE_ID("route_id");
+		const string DisplayScreenContentFunction::DATA_DATE_TIME("date_time");
+		const string DisplayScreenContentFunction::DATA_ROLLING_STOCK("rolling_stock");
+		const string DisplayScreenContentFunction::DATA_COMMERCIAL_LINE("commercial_line");
+		const string DisplayScreenContentFunction::DATA_STOP_AREA("stop_area");
+		const string DisplayScreenContentFunction::DATA_STOP_POINT("stop_point");
 
 		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
+		const string DisplayScreenContentFunction::DATA_DUMMY_KEY("0");
 
-		const string PIPO_KEY("00");
-		vector<string> DisplayScreenContentFunction::_SAELine;
+		const time_duration DisplayScreenContentFunction::endOfService = hours(3);
+
+		DisplayScreenContentFunction::SAELine DisplayScreenContentFunction::_SAELine;
+		ptime DisplayScreenContentFunction::_nextUpdateLine = second_clock::local_time();
 
 		FunctionAPI DisplayScreenContentFunction::getAPI() const
 		{
@@ -244,6 +258,10 @@ namespace synthese
 						  "Specify if SAE Direct Connection is needed for RealTime, "
 						  "this will open unix sockets to a MySQL BDSI INEO server. \n"
 						  "Works only on Linux",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA,
+						  "Group the results by StopArea, displaying next departures for each <Line, Destination> pair."
+						  "Pairs are ordered by default Commercial Line order and destination order (alphanumeric).",
 						  false);
 			return api;
 		}
@@ -420,7 +438,36 @@ namespace synthese
 
 								BOOST_FOREACH(string& stopItem, stopsVect)
 								{
-									RegistryKeyType stopId = lexical_cast<RegistryKeyType>(stopItem);
+									vector<string> tripletVect;
+									split(tripletVect, stopItem, is_any_of("|"));
+									const CommercialLine* lineFilter = NULL;
+									const StopArea* destinationFilter = NULL;
+									const StopPoint* curStop = NULL;
+
+									if(tripletVect.size() > 1)
+									{
+										RegistryKeyType lineId = lexical_cast<RegistryKeyType>(tripletVect[1]);
+										if(decodeTableId(lineId) == CommercialLineTableSync::TABLE.ID)
+										{
+											boost::shared_ptr<const CommercialLine> commercialLine(
+												Env::GetOfficialEnv().get<CommercialLine>(lineId)
+											);
+											lineFilter = commercialLine.get();
+										}
+									}
+									if(tripletVect.size() > 2)
+									{
+										RegistryKeyType destId = lexical_cast<RegistryKeyType>(tripletVect[2]);
+										if(decodeTableId(destId) == StopAreaTableSync::TABLE.ID)
+										{
+											boost::shared_ptr<const StopArea> stopArea(
+												Env::GetOfficialEnv().get<StopArea>(destId)
+											);
+											destinationFilter = stopArea.get();
+										}
+									}
+
+									RegistryKeyType stopId = lexical_cast<RegistryKeyType>(tripletVect[0]);
 									if(decodeTableId(stopId) == StopPointTableSync::TABLE.ID)
 									{
 										boost::shared_ptr<const StopPoint> stop(
@@ -428,6 +475,7 @@ namespace synthese
 										);
 										screen->setDisplayedPlace(stop->getConnectionPlace());
 										stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
+										_lineDestinationFilter.insert(LineDestinationFilter::value_type(stop.get(), make_pair(lineFilter, destinationFilter)));
 									}
 									else if (decodeTableId(stopId) == StopAreaTableSync::TABLE.ID)
 									{
@@ -439,6 +487,7 @@ namespace synthese
 											const StopPoint& stop(*itStop.second);
 											screen->setDisplayedPlace(stop.getConnectionPlace());
 											stopsFilter.insert(make_pair(stop.getKey(), &stop));
+											_lineDestinationFilter.insert(LineDestinationFilter::value_type(&stop, make_pair(lineFilter, destinationFilter)));
 										}
 									}
 								}
@@ -532,6 +581,7 @@ namespace synthese
 					#endif
 					}
 
+					_timetableGroupedByArea = map.getDefault<bool>(PARAMETER_TIMETABLE_GROUPED_BY_AREA, false);
 					
 					screen->setType(_type.get());
 					//If request contains an interface : build a screen, else prepare custom xml answer
@@ -547,7 +597,7 @@ namespace synthese
 							throw RequestException("No such screen type");
 						}
 					}
-					else if(_mainPage.get() && !_useSAEDirectConnection)
+					else if(_mainPage.get() && !_useSAEDirectConnection && !_timetableGroupedByArea)
 					{
 						_type->setDisplayMainPage(_mainPage.get());
 						_type->setDisplayRowPage(_rowPage.get());
@@ -572,6 +622,16 @@ namespace synthese
 				if(!map.getDefault<string>(PARAMETER_DATE).empty() && map.getDefault<string>(PARAMETER_DATE) != "A")
 				{
 					_date = time_from_string(map.get<string>(PARAMETER_DATE));
+
+					// SAE real time only for the current service day
+					ptime now = second_clock::local_time();
+					time_period period(ptime(now.date(), endOfService), hours(24));
+
+					if(now.time_of_day() < endOfService)
+						period.shift(hours(-24));
+
+					if(!period.contains(*_date))
+						_useSAEDirectConnection = false;
 				}
 
 				// Type control
@@ -596,14 +656,16 @@ namespace synthese
 			_dataSourceName = map.getOptional<string>(PARAMETER_DATA_SOURCE_NAME_FILTER);
 		}
 
+
+
 		void DisplayScreenContentFunction::concatXMLResult(
 			std::ostream& stream,
-			ServicePointer& servicePointer,
-			const StopPoint* stop
+			ServicePointer& servicePointer
 		) const {
-
 			const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
 			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
+			const StopPoint* stop = static_cast<const StopPoint*>(servicePointer.getDepartureEdge()->getFromVertex());
+			const StopArea* connPlace(stop->getConnectionPlace());
 
 			//Here we got our service !
 			//TODO: check if service schedules are realtime in the !_useSAEDirectConnection case
@@ -612,6 +674,7 @@ namespace synthese
 				"\" dateTime=\""    << servicePointer.getDepartureDateTime() <<
 				"\" blink=\"" << "0" <<
 				"\" "<< DATA_IS_REAL_TIME <<"=\"" << (_useSAEDirectConnection ? "no" : "yes") <<
+				"\" "<< DATA_WAITING_TIME <<"=\"" << to_simple_string(servicePointer.getDepartureDateTime() - second_clock::local_time()) <<
 				"\">";
 
 			stream << "<stop id=\"" << stop->getKey() <<
@@ -642,10 +705,14 @@ namespace synthese
 					"\" name=\""      << commercialLine->getName() <<
 					"\" shortName=\"" << commercialLine->getShortName() <<
 					"\" longName=\""  << commercialLine->getLongName() <<
-					"\" color=\""     << commercialLine->getColor() <<
-					"\" xmlColor=\""  << (
+					"\" color=\""  << (
 						commercialLine->getColor() ?
 						commercialLine->getColor()->toString():
+						""
+					) <<
+					"\" xmlColor=\""  << (
+						commercialLine->getColor() ?
+						commercialLine->getColor()->toXMLColor():
 						""
 					) <<
 					"\" style=\""     << commercialLine->getStyle() <<
@@ -674,7 +741,60 @@ namespace synthese
 					"\" cityName=\""       << destination.getCity()->getName() <<
 					"\" />";
 
+			stream << "<stopArea id=\""<< connPlace->getKey()<<
+				"\" name=\""           << connPlace->getName() <<
+				"\" cityId=\""         << connPlace->getCity()->getKey() <<
+				"\" cityName=\""       << connPlace->getCity()->getName() <<
+				"\" directionAlias=\"" << connPlace->getName26() <<
+				"\" />";
+
+			stream << "</journey>";
+		}
+
+
+
+		void DisplayScreenContentFunction::concatXMLResultRealTime(
+				std::ostream& stream,
+				RealTimeService& serviceReal
+		) const {
+			boost::shared_ptr<const StopPoint> stop = serviceReal.stop;
 			const StopArea* connPlace(stop->getConnectionPlace());
+
+			stream <<"<journey routeId=\""<< DATA_DUMMY_KEY <<
+				"\" dateTime=\""    << serviceReal.datetime <<
+				"\" blink=\"" << "0" <<
+				"\" "<< DATA_IS_REAL_TIME <<"=\"" << (serviceReal.realTime ? "yes" : "no") <<
+				"\" "<< DATA_WAITING_TIME <<"=\"" << to_simple_string(serviceReal.datetime - second_clock::local_time()) <<
+				"\">";
+
+			stream << "<stop id=\"" << stop->getKey() <<
+				"\" operatorCode=\""<< stop->getCodeBySources() <<
+				"\" name=\""        << stop->getName() <<
+				"\" />";
+
+			if(serviceReal.commercialLine)
+			{
+				stream <<"<line id=\""<< serviceReal.commercialLine->getKey() <<
+					"\" creatorId=\"";
+				if(!serviceReal.commercialLine->getDataSourceLinks().empty())
+				{
+					stream << serviceReal.commercialLine->getDataSourceLinks().begin()->second;
+				}
+				stream <<
+					"\" name=\""      << serviceReal.commercialLine->getName() <<
+					"\" shortName=\"" << serviceReal.commercialLine->getShortName() <<
+					"\" longName=\""  << serviceReal.commercialLine->getLongName() <<
+					"\" color=\""     << (serviceReal.commercialLine->getColor() ? serviceReal.commercialLine->getColor()->toString() : "") <<
+					"\" xmlColor=\""  << (serviceReal.commercialLine->getColor() ? serviceReal.commercialLine->getColor()->toXMLColor() : "") <<
+					"\" style=\""     << serviceReal.commercialLine->getStyle() <<
+					"\" image=\""     << serviceReal.commercialLine->getImage() <<
+					"\" />";
+			}
+
+			stream << "<destination id=\"" << serviceReal.destination->getKey() <<
+					"\" name=\""           << serviceReal.destination->getName() <<
+					"\" cityName=\""       << serviceReal.destination->getCity()->getName() <<
+					"\" />";
 
 			stream << "<stopArea id=\""<< connPlace->getKey()<<
 				"\" name=\""           << connPlace->getName() <<
@@ -686,186 +806,20 @@ namespace synthese
 			stream << "</journey>";
 		}
 
-		struct MapValue
-		{
-			vector<DisplayScreenContentFunction::ServiceRealTime> serviceRealTimeVect;
-			vector<graph::ServicePointer> servicePointerVect;
-		};	
 
-		// RETURN AN ITERATOR FOR THE FIRST SAE SERVICE AFTER SQL REQUEST
-		// but if it reached the maximum number of display => break
-		map<long long, MapValue>::iterator findFirstRealTime(
-				map<long long, MapValue> &servicePointerAll,
-				int NbDisplayMin
-		)
-		{
-			map<long long,MapValue>::iterator it = servicePointerAll.begin();
-
-			for(;it!=servicePointerAll.end();it++)//For each minute
-			{
-				// IF A REAL TIME SERVICE IS FOUNDED OR THE THE NUMBER OF DISPLAY IS REACHED WE RETURN THE POSITION OF THE ITERATOR
-				if(!it->second.serviceRealTimeVect.empty() || distance(it, servicePointerAll.end()) <= NbDisplayMin)
-					return it;
-			}
-
-			return it;
-		}
-
-		void DisplayScreenContentFunction::concatXMLResultRealTime(
-				std::ostream& stream,
-				ServiceRealTime& serviceReal
-		) const {
-			// DISPLAY RESULT
-			stream <<"<journey routeId=\"" << PIPO_KEY <<
-					"\" dateTime=\"" << serviceReal.date <<
-					"\" blink=\"" << "0" <<
-					"\" "<< DATA_IS_REAL_TIME <<"=\"" << serviceReal.Realtime <<
-					"\">";
-
-			// Stop point
-			stream << "<stop id=\"" << PIPO_KEY <<
-					"\" operatorCode=\"" << serviceReal.oc <<
-					"\" name=\"" << serviceReal.arret <<
-					"\" />";
-
-			// Transport Mode
-			stream <<"<transportMode id=\""<< PIPO_KEY <<
-					"\" name=\"" << "bus" <<
-					"\" article=\"" << "le" <<
-					"\" />";
-
-			// Line ID TODO : get Style ?
-			stream <<"<line id=\""<< PIPO_KEY <<
-					"\" creatorId=\"" << PIPO_KEY <<
-					"\" name=\"" << serviceReal.nom_ligne <<
-					"\" shortName=\"" << serviceReal.lineShortName <<
-					"\" longName=\"" << "" <<
-					"\" color=\"" << serviceReal.lineColor <<
-					"\" xmlColor=\"" << serviceReal.lineXmlColor <<
-					"\" style=\"" << serviceReal.LineStyle <<
-					"\" network_id=\"" << serviceReal.networkId <<
-					"\" image=\"" << "" <<
-					"\" direction=\"" << "" <<
-					"\" />";
-
-			// Origin
-			stream << "<origin id=\""  << PIPO_KEY <<
-					"\" name=\"" << serviceReal.depart <<
-					"\" cityName=\"" << serviceReal.cityName_begin <<
-					"\" />";
-
-			// Destination
-			stream << "<destination id=\"" << PIPO_KEY <<
-					"\" name=\"" << serviceReal.arrivee <<
-					"\" cityName=\"" << serviceReal.cityName_end <<
-					"\" />";
-
-			// Stop Area
-			stream << "<stopArea id=\""<< PIPO_KEY <<
-					"\" name=\"" << serviceReal.arret <<
-					"\" cityId=\"" << serviceReal.cityId_current <<
-					"\" cityName=\"" << serviceReal.cityName_current <<
-					"\" directionAlias=\"" << "" <<
-					"\" />";
-
-			stream << "</journey>";
-		}
-
-		void DisplayScreenContentFunction::addJourneyToParametersMapRealTime(
-			ParametersMap& pm,
-			ServiceRealTime& serviceReal
-		) const {
-			//Stop Point
-			pm.insert(DATA_STOP_ID, serviceReal.stop_id);
-			pm.insert(DATA_OPERATOR_CODE, serviceReal.oc);
-
-			//StopArea
-			pm.insert(DATA_STOP_AREA_ID, serviceReal.stopAreaId);
-			pm.insert(DATA_STOP_AREA_NAME, serviceReal.arret);
-			pm.insert(DATA_STOP_AREA_CITY_NAME, serviceReal.cityName_current);
-			pm.insert(DATA_STOP_AREA_CITY_ID, serviceReal.cityId_current);
-
-			shared_ptr<ParametersMap> journeyPm(new ParametersMap());
-			journeyPm->insert("route_id", PIPO_KEY);
-			journeyPm->insert("date_time", serviceReal.date);
-			journeyPm->insert("realTime", serviceReal.Realtime);
-
-			shared_ptr<ParametersMap> stopPM(new ParametersMap);
-			stopPM->insert("id", PIPO_KEY);
-			stopPM->insert("operatorCode", serviceReal.oc);
-			stopPM->insert("name", serviceReal.arret);
-			journeyPm->insert("stop", stopPM);
-			
-			shared_ptr<ParametersMap> rsPM(new ParametersMap);
-			rsPM->insert("id", PIPO_KEY);
-			rsPM->insert("name", "bus");
-			rsPM->insert("article", "le");
-			journeyPm->insert("rollingStock", rsPM);
-			
-			shared_ptr<ParametersMap> linePM(new ParametersMap);
-			linePM->insert("id", PIPO_KEY);
-			linePM->insert("creatorId", PIPO_KEY);
-			linePM->insert("name", serviceReal.nom_ligne);
-			linePM->insert("shortName" , serviceReal.lineShortName);
-			linePM->insert("color",serviceReal.lineColor);
-			linePM->insert("xmlcolor",serviceReal.lineXmlColor);
-			linePM->insert("style",serviceReal.LineStyle);
-			linePM->insert("network_id",serviceReal.networkId);
-			
-			journeyPm->insert("line", linePM);
-			
-			shared_ptr<ParametersMap> originPM(new ParametersMap);
-			originPM->insert("id", PIPO_KEY);
-			originPM->insert("name", serviceReal.depart);
-			originPM->insert("cityName", serviceReal.cityName_begin);
-			journeyPm->insert("origin", originPM);
-
-			shared_ptr<ParametersMap> destinationPM(new ParametersMap);
-			destinationPM->insert("id", PIPO_KEY);
-			destinationPM->insert("name", serviceReal.arrivee);
-			destinationPM->insert("cityName", serviceReal.cityName_end);
-			journeyPm->insert("destination", destinationPM);
-
-			shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
-			connPlacePM->insert("id", PIPO_KEY);
-			connPlacePM->insert("name", serviceReal.arret);
-			connPlacePM->insert("cityId", serviceReal.cityId_current);
-			connPlacePM->insert("cityName", serviceReal.cityName_current);
-			journeyPm->insert("stopArea", connPlacePM);
-			pm.insert("stop_name", serviceReal.arret);
-			pm.insert("journey", journeyPm);
-		}
-
-		string formatLineName(string commercialLineName)
-		{
-			string comLineName = commercialLineName;
-
-			// Set lowercase for comparaison
-			std::transform(comLineName.begin(), comLineName.end(), comLineName.begin(), ::tolower);
-
-			// Add zero to line shortName before compare to database value
-			if ((comLineName.length() < 2) || ((comLineName.length() == 2) && (comLineName[1]=='s')))
-				comLineName = "0" + comLineName;
-
-			return comLineName;
-		}
 
 		void DisplayScreenContentFunction::addJourneyToParametersMap(
 			ParametersMap& pm,
-			ServicePointer& servicePointer,
-			const StopPoint* stop
+			ServicePointer& servicePointer
 		) const {
-
 			const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
 			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
+			const StopPoint* stop = static_cast<const StopPoint*>(servicePointer.getDepartureEdge()->getFromVertex());
+			const StopArea* connPlace(stop->getConnectionPlace());
 
-			//Stop Point
 			pm.insert(DATA_STOP_ID, stop->getKey());
 			pm.insert(DATA_STOP_NAME, stop->getName());
 			pm.insert(DATA_OPERATOR_CODE, stop->getCodeBySources());
-
-			//StopArea
-			const StopArea* connPlace(stop->getConnectionPlace());
 
 			pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
 			pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
@@ -875,6 +829,8 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> journeyPm(new ParametersMap());
 			journeyPm->insert("route_id", journeyPattern->getKey());
 			journeyPm->insert("date_time", servicePointer.getDepartureDateTime());
+			journeyPm->insert(DATA_IS_REAL_TIME, (_useSAEDirectConnection ? "no" : "yes"));
+			journeyPm->insert(DATA_WAITING_TIME, to_simple_string(servicePointer.getDepartureDateTime() - second_clock::local_time()));
 
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 			stop->toParametersMap(*stopPM, false);
@@ -918,6 +874,53 @@ namespace synthese
 
 			pm.insert("journey", journeyPm);
 		}
+
+
+
+		void DisplayScreenContentFunction::addJourneyToParametersMapRealTime(
+			ParametersMap& pm,
+			RealTimeService& serviceReal
+		) const {
+			boost::shared_ptr<const StopPoint> stop = serviceReal.stop;
+			const StopArea* connPlace(stop->getConnectionPlace());
+
+			pm.insert(DATA_STOP_ID, stop->getKey());
+			pm.insert(DATA_STOP_NAME, stop->getName());
+			pm.insert(DATA_OPERATOR_CODE, stop->getCodeBySources());
+
+			pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
+			pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
+			pm.insert(DATA_STOP_AREA_CITY_NAME, connPlace->getCity()->getName());
+			pm.insert(DATA_STOP_AREA_CITY_ID, connPlace->getCity()->getKey());
+
+			boost::shared_ptr<ParametersMap> journeyPm(new ParametersMap());
+			journeyPm->insert("route_id", DATA_DUMMY_KEY);
+			journeyPm->insert("date_time", serviceReal.datetime);
+			journeyPm->insert("realTime", (serviceReal.realTime ? "yes" : "no"));
+			journeyPm->insert(DATA_WAITING_TIME, to_simple_string(serviceReal.datetime - second_clock::local_time()));
+
+			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
+			stop->toParametersMap(*stopPM, false);
+			journeyPm->insert("stop", stopPM);
+
+			if(serviceReal.commercialLine)
+			{
+				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+				serviceReal.commercialLine->toParametersMap(*linePM, true);
+				journeyPm->insert("line", linePM);
+			}
+
+			boost::shared_ptr<ParametersMap> destinationPM(new ParametersMap);
+			serviceReal.destination->toParametersMap(*destinationPM, true);
+			journeyPm->insert("destination", destinationPM);
+
+			boost::shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
+			connPlace->toParametersMap(*connPlacePM, true);
+			journeyPm->insert("stopArea", connPlacePM);
+
+			pm.insert("journey", journeyPm);
+		}
+
 
 
 		util::ParametersMap DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
@@ -1021,13 +1024,505 @@ namespace synthese
 				{
 				}
 
+				return util::ParametersMap();
+			}
+
+		#ifdef MYSQL_CONNECTOR_AVAILABLE
+			string SAEDateString, SAEHourString;
+			string SAELimit = boost::lexical_cast<string>(_screen->getType()->getRowNumber());
+			ptime SAEDate, now = second_clock::local_time();
+			bool noRealTime(true);
+
+			if(_useSAEDirectConnection)
+			{
+				shared_ptr<MySQLconnector> connector(new MySQLconnector());
+
+				SAEDate = (_date ? *_date : now);
+				// SAE system only work on one day, representing service after midnight at its start
+				if(SAEDate.time_of_day() < endOfService)
+					SAEDate -= hours(24);
+
+				SAEDateString = boost::gregorian::to_iso_extended_string(SAEDate.date());
+				SAEHourString = boost::posix_time::to_simple_string(SAEDate.time_of_day());
+
+				// First realTime request, cache list of lines handled by the SAE
+				if(_SAELine.empty() || (now >= _nextUpdateLine))
+				{
+					try
+					{
+						// Standard output, without leading 0 lowercase
+						string lineListRequest = "SELECT LOWER(TRIM(LEADING '0' FROM mnemo)) AS mnemo FROM LIGNE where jour = '" + SAEDateString + "';";
+						shared_ptr<MySQLResult> result = connector->execQuery(lineListRequest);
+
+						while(result->next())
+							_SAELine.insert(SAELine::value_type(result->getInfo("mnemo"), 0));
+
+						// Retrieve commercial line from short name
+						BOOST_FOREACH(const Registry<CommercialLine>::value_type& curLine, Env::GetOfficialEnv().getRegistry<CommercialLine>())
+						{
+							// Case insensitive and remove leading 0 : 02S = 2s
+							string curShortName = boost::algorithm::to_lower_copy(
+								trim_left_copy_if(curLine.second->getShortName(), is_any_of("0"))
+							);
+							BOOST_FOREACH(SAELine::value_type& linePair, _SAELine)
+							{
+								if(curShortName == linePair.first)
+									_SAELine[linePair.first] = curLine.second->getKey();
+							}
+						}
+
+						_nextUpdateLine = ptime(_nextUpdateLine.date(), hours(4));
+						if(SAEDate.time_of_day() >= hours(4))
+							_nextUpdateLine += hours(24);
+					}
+					catch(Exception &e)
+					{
+						util::Log::GetInstance().warn(string("Exception while querying lines list : ") + e.what());
+					}
+				}
+			}
+		#endif
+
+			if(_timetableGroupedByArea)
+			{
+				ParametersMap result;
+				AccessParameters ap;
+
+				typedef set<ServicePointer, Spointer_comparator> OrderedServiceSet;
+				typedef set<RealTimeService, Spointer_comparator> OrderedRealTimeServiceSet;
+				typedef pair<OrderedRealTimeServiceSet, OrderedServiceSet> OrderedServices;
+
+				typedef map<LineDestinationKey, OrderedServices, LineDestinationKey_comparator> DeparturesByDestination;
+				typedef map<const StopArea*, DeparturesByDestination> DestinationsServicesByArea;
+
+				DestinationsServicesByArea serviceMap;
+
+			#ifdef MYSQL_CONNECTOR_AVAILABLE
+				if(_useSAEDirectConnection)
+				{
+					noRealTime = false;
+					shared_ptr<MySQLconnector> connector(new MySQLconnector());
+
+					stringstream operatorCodes, filters, request;
+
+					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
+					{
+						operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
+						operatorCodes << "'" << setfill('0') << setw(5) << it.second->getCodeBySources();
+						operatorCodes << "'";
+					}
+
+					// Limit the research to X hour after date, X is 1 hour times the number of result we wish for
+					time_duration searchDepth(hours(1) * _screen->getType()->getRowNumber());
+
+					filters << "((h.hrd > '" << SAEHourString << "' AND h.hrd <= ADDTIME('" << SAEHourString << "', '" << to_simple_string(searchDepth) << "')) ";
+					// If after midnight, check if we do not cross over end of service
+					if(SAEDate.time_of_day() < endOfService)
+						filters << "AND h.hrd <= '" << to_simple_string(endOfService) << "')";
+					// Otherwise make sure, if we are just before midnight that we get after midnight services, without crossing end of service
+					else
+						filters << "OR (h.hrd <= LEAST(TIMEDIFF(ADDTIME('" << SAEHourString + "', '" << to_simple_string(searchDepth) << "') , '24:00:00'), '" << to_simple_string(endOfService) << "')))";
+
+					if(_lineToDisplay)
+					{
+						shared_ptr<const CommercialLine> commercialLine(_env->getRegistry<CommercialLine>().get(*_lineToDisplay));
+						string shortNameToDisplay = boost::algorithm::to_lower_copy(
+							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+						);
+						filters << " AND LOWER(TRIM(LEADING '0' FROM h.ligne)) = '" << shortNameToDisplay << "'";
+					}
+
+					try
+					{
+						string requestInitVars("SET @num = 0, @itineraire_dest = '', @itineraire_lign_com = '', @itineraire_arret = ''");
+						connector->execQuery(requestInitVars);
+
+						request << " SELECT"
+								<< "	@num := IF(@itineraire_lign_com = ligne, IF(@itineraire_dest = oc_arrivee, IF(@itineraire_arret = arret_oc, @num + 1, 1), 1), 1) AS row_number,"
+								<< "	horaire, fiable, @itineraire_arret := arret_oc AS arret_oc, @itineraire_dest := oc_arrivee AS oc_arrivee, @itineraire_lign_com := ligne AS ligne"
+								<< " FROM ("
+								<< "	SELECT"
+								<< "		h.hrd AS horaire, fiable, a.nol AS arret_oc, a_arrivee.nol AS oc_arrivee, LOWER(TRIM(LEADING '0' FROM h.ligne)) AS ligne"
+								<< "	FROM HORAIRE h FORCE INDEX (idx_horaire_arret)"
+								<< "	JOIN ARRET a"
+								<< "		ON a.ref = h.ref_arret AND a.jour = h.jour"
+								<< "	JOIN ARRETCHN achn"
+								<< "		ON achn.ref = h.ref_arretchn AND achn.jour = h.jour"
+								<< "	JOIN ARRETCHN achn_arrivee"
+								<< "		ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
+								<< "	JOIN ARRET a_arrivee"
+								<< "		ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
+								<< " 	WHERE"
+								<< "			a.mnemol IN (" << operatorCodes.str() << ")"
+								<< "		AND " << filters.str()
+								<< "		AND h.jour = '" << SAEDateString << "'"
+								<< "		AND h.isArretNeutralise = 0"
+								<< "		AND h.typeCourse = 'C'"
+								<< "		AND h.isVehiculeNeutralise = 0"
+								<< "		AND h.isInhibHoraire = 0"
+								<< "		AND h.isDeviation = 0"
+								<< "		AND h.isInhibMontee = 0"
+								<< "		AND achn_arrivee.type = 'A'"
+								<< "		AND a.nol != a_arrivee.nol"
+								<< " 	ORDER BY"
+								<< "		oc_arrivee, ligne, arret_oc, hrd < '" << boost::posix_time::to_simple_string(endOfService) << "', hrd"
+								<< " ) AS result"
+								<< " WHERE"
+								<< "	IF(@num >= " << SAELimit << ", IF(@itineraire_lign_com = ligne, IF(@itineraire_dest = oc_arrivee, IF(@itineraire_arret = arret_oc, FALSE, TRUE), TRUE), TRUE), TRUE)"
+						;
+
+						shared_ptr<MySQLResult> result = connector->execQuery(request.str());
+
+						typedef map<string, boost::shared_ptr<StopPoint> > OCStops;
+						OCStops ocStops;
+
+						while(result->next())
+						{
+							ocStops[result->getInfo("oc_arrivee")];
+							ocStops[result->getInfo("arret_oc")];
+						}
+
+						result->reset();
+						BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
+						{
+							if(ocStops.find(curStop.second->getCodeBySources()) != ocStops.end())
+								ocStops[curStop.second->getCodeBySources()] = curStop.second;
+						}
+
+						while(result->next())
+						{
+							RealTimeService realTimeService;
+
+							realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
+							if(ocStops.find(result->getInfo("oc_arrivee"))->second)
+								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
+
+							const StopArea* area = realTimeService.stop->getConnectionPlace();
+
+							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+								continue;
+
+							RegistryKeyType idLine = _SAELine.find(result->getInfo("ligne"))->second;
+							try
+							{
+								realTimeService.commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+							}
+							catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+							{
+								continue;
+							}
+
+							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
+							{
+								LineDestinationKey filter = _lineDestinationFilter.find(realTimeService.stop.get())->second;
+								if(filter.first && filter.first != realTimeService.commercialLine.get())
+									continue;
+								else if(filter.second && filter.second != realTimeService.destination)
+									continue;
+							}
+
+							if(result->getInfo("fiable") == "F")
+								realTimeService.realTime = true;
+
+							ptime SAEResultPtime(time_from_string(SAEDateString + " " + result->getInfo("horaire")));
+							time_duration tod = SAEResultPtime.time_of_day();
+
+							if(tod < endOfService)
+								SAEResultPtime += boost::gregorian::days(1);
+
+							realTimeService.datetime = SAEResultPtime;
+
+							LineDestinationKey ldKey = make_pair(realTimeService.commercialLine.get(), realTimeService.destination);
+							bool serviceInserted(false);
+							// StopArea already in the map
+							if(serviceMap.find(area) != serviceMap.end())
+							{
+								BOOST_FOREACH(DeparturesByDestination::value_type& departureByDestination, serviceMap.find(area)->second)
+								{
+									const DeparturesByDestination::key_type& key = departureByDestination.first;
+									if(key == ldKey)
+									{
+										serviceMap[area][key].first.insert(realTimeService);
+										serviceInserted = true;
+										break;
+									}
+								}
+							}
+
+							// Destination or StopArea doesn't exist yet
+							if(!serviceInserted)
+							{
+								OrderedServices tmpSetPair;
+								tmpSetPair.first.insert(realTimeService);
+								serviceMap[area][ldKey] = tmpSetPair;
+							}
+						}
+					}
+					catch(Exception &e)
+					{
+						// If an exception is thrown, disable realTime
+						noRealTime = true;
+						util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
+					}
+				}
+			#endif
+
+				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
+				{
+					const StopPoint* stop = it.second;
+					const StopArea* area = stop->getConnectionPlace();
+
+					ptime startDateTime,endDateTime;
+					if(_wayIsBackward)
+					{
+						endDateTime = (_date ? *_date : now);
+						startDateTime = endDateTime.time_of_day().hours() < 3 ?
+							endDateTime - endDateTime.time_of_day() - hours(21) :
+							endDateTime - endDateTime.time_of_day() + hours(3);
+					}
+					else
+					{
+						startDateTime = (_date ? *_date : now);
+						endDateTime = startDateTime.time_of_day().hours() < 3 ?
+							startDateTime - startDateTime.time_of_day() + hours(3) :
+							startDateTime - startDateTime.time_of_day() + hours(27);
+					}
+
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
+					{
+						// Jump over junctions
+						if(!dynamic_cast<const LineStop*>(edge.second))
+						{
+							continue;
+						}
+
+						const LineStop* ls = static_cast<const LineStop*>(edge.second);
+
+						const UseRule& useRule(ls->getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+						if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
+						{
+							continue;
+						}
+
+						ptime departureDateTime = startDateTime;
+						optional<Edge::DepartureServiceIndex::Value> index;
+
+						while(true)
+						{
+							ServicePointer servicePointer(
+								ls->getNextService(
+									ap,
+									departureDateTime,
+									endDateTime,
+									false,
+									index,
+									false,
+									false,
+									false,
+									PTModule::isTheoreticalAllowed(),
+									PTModule::isRealTimeAllowed()
+								)
+							);
+
+							if (!servicePointer.getService())
+								break;
+
+							++*index;
+
+							departureDateTime = servicePointer.getDepartureDateTime();
+							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+								continue;
+
+							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+							const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
+							const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
+
+							if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
+							{
+								LineDestinationKey filter = _lineDestinationFilter.find(stop)->second;
+								if(filter.first && filter.first != commercialLine)
+									continue;
+								else if(filter.second && filter.second != destination)
+									continue;
+							}
+
+							//If a lineid arg was passed : only one line will be displayed
+							if(_lineToDisplay)
+							{
+								if(commercialLine->getKey()!=(*_lineToDisplay))
+									continue;
+							}
+
+							// Filter by Rolling stock id
+							if(_rollingStockFilter.get())
+							{
+								// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+								bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+								set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+								BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+								{
+									if(commercialLine->usesTransportMode(*rollingStock))
+									{
+										atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+										break;
+									}
+								}
+
+								// If the line doesn't respect the filter, skip it
+								if(!atLeastOneMode)
+								{
+									continue;
+								}
+							}
+
+							LineDestinationKey ldKey = make_pair(commercialLine, destination);
+							bool serviceInserted(false);
+							// StopArea already in the map
+							if(serviceMap.find(area) != serviceMap.end())
+							{
+								BOOST_FOREACH(DeparturesByDestination::value_type& departureByDestination, serviceMap.find(area)->second)
+								{
+									const DeparturesByDestination::key_type& key = departureByDestination.first;
+									if(key == ldKey)
+									{
+										serviceMap[area][ldKey].second.insert(servicePointer);
+										serviceInserted = true;
+										break;
+									}
+								}
+							}
+
+							// Destination or StopArea doesn't exist yet
+							if(!serviceInserted)
+							{
+								OrderedServices tmpSetPair;
+								tmpSetPair.second.insert(servicePointer);
+								serviceMap[area][ldKey] = tmpSetPair;
+							}
+						}
+					}
+				}
+
+				BOOST_FOREACH(DestinationsServicesByArea::value_type& areaMap, serviceMap)
+				{
+					boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap());
+					areaMap.first->toParametersMap(*stopAreaPM, true);
+
+					BOOST_FOREACH(DeparturesByDestination::value_type& destinationMap, areaMap.second)
+					{
+						const CommercialLine* commercialLine(destinationMap.first.first);
+						const StopArea* destination(destinationMap.first.second);
+
+						string curShortName = boost::algorithm::to_lower_copy(
+							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+						);
+
+						boost::shared_ptr<ParametersMap> schedulePM(new ParametersMap());
+
+						boost::shared_ptr<ParametersMap> linePM(new ParametersMap());
+						commercialLine->toParametersMap(*linePM, true);
+
+						boost::shared_ptr<ParametersMap> destinationPM(new ParametersMap());
+						destination->toParametersMap(*destinationPM, true);
+
+						boost::shared_ptr<ParametersMap> journeysPM(new ParametersMap());
+
+						const StopPoint* stop(NULL);
+
+						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+						{
+							BOOST_FOREACH(const OrderedServices::second_type::value_type& servicePointer, destinationMap.second.second)
+							{
+								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+								{
+									break;
+								}
+
+								stop = static_cast<const StopPoint*>(servicePointer.getDepartureEdge()->getFromVertex());
+
+								const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
+								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
+
+								boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
+								journeyPM->insert(DATA_DATE_TIME, servicePointer.getDepartureDateTime());
+								journeyPM->insert(DATA_WAITING_TIME, to_simple_string(servicePointer.getDepartureDateTime() - now));
+								journeyPM->insert(DATA_IS_REAL_TIME, noRealTime || !_useSAEDirectConnection);
+
+								RollingStock* rs = journeyPattern->getRollingStock();
+								if(rs)
+								{
+									boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
+									rs->toParametersMap(*rsPM, true);
+									journeyPM->insert(DATA_ROLLING_STOCK, rsPM);
+								}
+
+								journeysPM->insert(DATA_JOURNEY, journeyPM);
+							}
+						}
+						else
+						{
+							BOOST_FOREACH(const OrderedServices::first_type::value_type& realTimeService, destinationMap.second.first)
+							{
+								boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
+								journeyPM->insert(DATA_DATE_TIME, realTimeService.datetime);
+								journeyPM->insert(DATA_WAITING_TIME, to_simple_string(realTimeService.datetime - now));
+								journeyPM->insert(DATA_IS_REAL_TIME, realTimeService.realTime);
+								journeysPM->insert(DATA_JOURNEY, journeyPM);
+
+								stop = realTimeService.stop.get();
+
+								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+								{
+									break;
+								}
+							}
+						}
+
+						// No journey or no real time journeys for a line handled by SAE
+						if(journeysPM->getSubMaps(DATA_JOURNEY).size() == 0)
+							continue;
+
+						if(stop)
+						{
+							boost::shared_ptr<ParametersMap> stopPointPM(new ParametersMap());
+							stop->toParametersMap(*stopPointPM, false);
+							schedulePM->insert(DATA_STOP_POINT, stopPointPM);
+						}
+
+						schedulePM->insert(DATA_DESTINATION, destinationPM);
+						schedulePM->insert(DATA_JOURNEYS, journeysPM);
+						schedulePM->insert(DATA_COMMERCIAL_LINE, linePM);
+
+						stopAreaPM->insert(DATA_SCHEDULE, schedulePM);
+					}
+
+					result.insert(DATA_STOP_AREA, stopAreaPM);
+				}
+
+				if(_mainPage.get())
+				{
+					result.merge(getTemplateParameters());
+					_mainPage->display(stream, request, result);
+				}
+				else
+				{
+					outputParametersMap(
+						result,
+						stream,
+						DATA_TIMETABLE,
+						""
+					);
+				}
+
+				return result;
 			}
 			else
 			{
 				ParametersMap result;
 				bool isOutputXML = _outputFormat == MimeTypes::XML;
 				AccessParameters ap;
-				map<long long, MapValue> servicePointerAll;
+				typedef map<int, pair<vector<RealTimeService>, vector<ServicePointer> > > OrderedDeparturesMap;
+				OrderedDeparturesMap servicePointerAll;
 
 				if(isOutputXML)
 				{
@@ -1038,38 +1533,175 @@ namespace synthese
 						;
 				}
 
+				// Calculate start time and end time of the searched interval
+				ptime startDateTime, endDateTime;
+				if(_wayIsBackward)
+				{
+					endDateTime = (_date ? *_date : now);
+					if(endDateTime.time_of_day() > endOfService)
+						startDateTime = ptime(endDateTime.date(), endOfService);
+					else
+						startDateTime = ptime(endDateTime.date() - boost::gregorian::days(1), endOfService);
+				}
+				else 
+				{
+					startDateTime = (_date ? *_date : now);
+					if(startDateTime.time_of_day() > endOfService)
+						endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+					else
+						endDateTime = ptime(startDateTime.date(), endOfService);
+				}
+
+			#ifdef MYSQL_CONNECTOR_AVAILABLE
+				// RealTime part
+				if(_useSAEDirectConnection)
+				{
+					// Consider there is going to be realTime data
+					noRealTime = false;
+					stringstream operatorCodes, filters, request;
+
+					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
+					{
+						operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
+						operatorCodes << "'" << setfill('0') << setw(5) << it.second->getCodeBySources();
+						operatorCodes << "'";
+					}
+
+					shared_ptr<MySQLconnector> connector(new MySQLconnector());
+
+					string sortingOrder(_wayIsBackward ? "DESC" : "ASC");
+
+					if(_wayIsBackward)
+					{
+						filters << "(h.hrd < '" << SAEHourString << "' ";
+						filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd > '" << boost::posix_time::to_simple_string(endOfService) << "')";
+					}
+					else
+					{
+						filters << "(h.hrd > '" << SAEHourString << "' ";
+						filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd <= '" << boost::posix_time::to_simple_string(endOfService) << "')";
+					}
+
+					if(_lineToDisplay)
+					{
+						shared_ptr<const CommercialLine> commercialLine(_env->getRegistry<CommercialLine>().get(*_lineToDisplay));
+						string shortNameToDisplay = boost::algorithm::to_lower_copy(
+							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+						);
+						filters << " AND LOWER(TRIM(LEADING '0' FROM h.ligne)) = '" << shortNameToDisplay << "'";
+					}
+
+					request << " SELECT"
+							<< "	hrd AS horaire, fiable, LOWER(TRIM(LEADING '0' FROM ligne)) AS ligne,"
+							<< "	a.nol AS arret_oc, a_arrivee.nol AS oc_arrivee"
+							<< " FROM HORAIRE h FORCE INDEX(idx_horaire_arret)"
+							<< " JOIN ARRET a"
+							<< "	 ON a.ref = h.ref_arret AND a.jour = h.jour"
+							<< " JOIN ARRETCHN achn"
+							<< "	 ON achn.ref = h.ref_arretchn AND achn.jour = h.jour"
+							<< " JOIN ARRETCHN achn_arrivee"
+							<< "	 ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
+							<< " JOIN ARRET a_arrivee"
+							<< "	 ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
+							<< " WHERE"
+							<< "		a.mnemol IN (" << operatorCodes.str() << ")"
+							<< "	AND " << filters.str()
+							<< "	AND h.jour = '" << SAEDateString << "'"
+							<< "	AND h.typeCourse = 'C'"
+							<< "	AND h.isVehiculeNeutralise = 0"
+							<< "	AND h.isInhibHoraire = 0"
+							<< "	AND h.isDeviation = 0"
+							<< "	AND h.isInhibMontee = 0"
+							<< "	AND h.isArretNeutralise = 0"
+							<< "	AND achn_arrivee.type = 'A'"
+							<< " ORDER BY"
+							<< "	hrd <= '" << boost::posix_time::to_simple_string(endOfService) << "' " << sortingOrder << ", horaire " << sortingOrder
+							<< " LIMIT " << SAELimit
+					;
+
+					try
+					{
+						shared_ptr<MySQLResult> result = connector->execQuery(request.str());
+
+						typedef map<string, boost::shared_ptr<StopPoint> > OCStops;
+						OCStops ocStops;
+
+						while(result->next())
+						{
+							ocStops[result->getInfo("oc_arrivee")];
+							ocStops[result->getInfo("arret_oc")];
+						}
+
+						result->reset();
+						BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
+						{
+							if(ocStops.find(curStop.second->getCodeBySources()) != ocStops.end())
+								ocStops[curStop.second->getCodeBySources()] = curStop.second;
+						}
+
+						while(result->next())
+						{
+							RealTimeService realTimeService;
+
+							realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
+							if(ocStops.find(result->getInfo("oc_arrivee"))->second)
+								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
+
+							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+								continue;
+
+							RegistryKeyType idLine = _SAELine.find(result->getInfo("ligne"))->second;
+							try
+							{
+								realTimeService.commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+							}
+							catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+							{
+								continue;
+							}
+
+							if(result->getInfo("fiable") == "F")
+								realTimeService.realTime = true;
+
+							ptime SAEResultPtime(time_from_string(SAEDateString + " " + result->getInfo("horaire")));
+							time_duration tod = SAEResultPtime.time_of_day();
+							int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
+
+							if(tod < endOfService)
+							{
+								SAEResultPtime += boost::gregorian::days(1);
+								mapKeyMinutes += 86400;
+							}
+
+							realTimeService.datetime = SAEResultPtime;
+
+							OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
+							if(it == servicePointerAll.end())
+							{
+								vector<RealTimeService> tmpVect;
+								tmpVect.push_back(realTimeService);
+								servicePointerAll[mapKeyMinutes].first = tmpVect;
+							}
+							else
+							{
+								servicePointerAll[mapKeyMinutes].first.push_back(realTimeService);
+							}
+						}
+					}
+					catch(Exception &e)
+					{
+						// If an exception is thrown, disable realTime
+						noRealTime = true;
+						util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
+					}
+				}
+			#endif
+
 				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
 				{
 					const StopPoint * stop = it.second;
 
-					//Calculate start time and end time of the searched interval
-					ptime startDateTime,endDateTime;
-					if(_wayIsBackward)
-					{
-						//ptime(gregorian::date d,time_duration_type td):
-
-						//If way is backward : endDateTime = _date
-						endDateTime = (_date ? *_date : second_clock::local_time());
-						//and startDateTime is begin of the day (a day begin at 3:00):
-						startDateTime = endDateTime.time_of_day().hours() < 3 ?
-							endDateTime - endDateTime.time_of_day() - hours(21) :
-							endDateTime - endDateTime.time_of_day() + hours(3);
-					}
-					else //Way is forward
-					{
-						// If way is forward : realStartDateTime = date
-						startDateTime = (_date ? *_date : second_clock::local_time());
-						//startDateTime -= minutes(0); //substract clearing delay
-						//and endDateTime is end of the day (a day end at 27:00):
-						endDateTime = startDateTime.time_of_day().hours() < 3 ?
-							startDateTime - startDateTime.time_of_day() + hours(3) :
-							startDateTime - startDateTime.time_of_day() + hours(27);
-					}
-
-					//We populate a map of vector : key is minutes of departures
-					//each vector contain all service wich pass in the same minute
-					map<long long,vector<ServicePointer> > servicePointerMap;
-
+					// Theoretical time part
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
 						// Jump over junctions
@@ -1143,98 +1775,137 @@ namespace synthese
 									continue;
 								}
 							}
-							long long mapKeyMinutes = departureDateTime.time_of_day().minutes()
-								+ departureDateTime.time_of_day().hours()*60 //Add hour *60
-								+ (departureDateTime.date().day_number()-startDateTime.date().day_number())*1440;// Add 0 or 1 day * 1440
 
-							map<long long,vector<ServicePointer> >::iterator it;
-							it=servicePointerMap.find(mapKeyMinutes);
+							time_duration tod = departureDateTime.time_of_day();
+							int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
+							if(departureDateTime.date() > startDateTime.date())
+								mapKeyMinutes += 86400;
 
+							OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
 							//Check if a service is already inserted for this date
-
-							if(it==servicePointerMap.end()) //There is no service for this minute
+							if(it == servicePointerAll.end())
 							{
 								vector<ServicePointer> tmpVect;
-
 								tmpVect.push_back(servicePointer);
-
-								//Call copy constructor of vector
-								servicePointerMap[mapKeyMinutes] = tmpVect;
+								servicePointerAll[mapKeyMinutes].second = tmpVect;
 							}
-							else //A service already exist for this minute
+							else
 							{
-								servicePointerMap[mapKeyMinutes].push_back(servicePointer);
+								servicePointerAll[mapKeyMinutes].second.push_back(servicePointer);
 							}
 						}
 					}
+				}
 
-					//If backward : reverse display
-					if(_wayIsBackward)
+				OrderedDeparturesMap::iterator it;
+				int maxRow(_screen->getType()->getRowNumber());
+				int displayedResults(0);
+
+				if(_wayIsBackward)
+				{
+					it = servicePointerAll.end();
+					for(; it != servicePointerAll.begin() ; it--)
 					{
-						//Loop backward on vector
-						int lastIndex = servicePointerMap.size() - _screen->getType()->getRowNumber();
-						if(lastIndex<0)
-						{
-							lastIndex=0;
-						}
-
-						map<long long,vector<ServicePointer> >::iterator it = servicePointerMap.begin();
-						int minutesCounter=0;
-						for(;it!=servicePointerMap.end();it++)//For each minute
-						{
-							if(minutesCounter>=lastIndex)
-							{
-								for(size_t i(0); i<it->second.size(); ++i)//For each service at this minute
-								{
-									if(isOutputXML)
-									{
-										concatXMLResult(
-											stream,
-											it->second[i],
-											stop
-										);
-									}
-									else
-									{
-										addJourneyToParametersMap(result, it->second[i], stop);
-									}
-								}
-							}
-							++minutesCounter;
-						}
+						if(distance(it, servicePointerAll.end()) >= maxRow)
+							break;
 					}
-					else//If forward : normal display
+				}
+				else
+					it = servicePointerAll.begin();
+
+				for(; it != servicePointerAll.end() ; it++)
+				{
+					BOOST_FOREACH(RealTimeService& rts, it->second.first)
 					{
-						map<long long,vector<ServicePointer> >::iterator it = servicePointerMap.begin();
-						size_t minutesCounter=0;
-						for(;it!=servicePointerMap.end();it++)//For each minute
+						if(displayedResults >= maxRow)
+							break;
+						else if(isOutputXML)
+							concatXMLResultRealTime(stream, rts);
+						else
+						    addJourneyToParametersMapRealTime(result, rts);
+
+						displayedResults++;
+					}
+
+					BOOST_FOREACH(ServicePointer& sp, it->second.second)
+					{
+						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
+						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+						string curShortName = boost::algorithm::to_lower_copy(
+							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+						);
+
+						// If realTime request didn't output any results or line isn't in the SAE
+						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
 						{
-							if(minutesCounter >= _screen->getType()->getRowNumber())
+							if(displayedResults >= maxRow)
 								break;
-							minutesCounter++;
-							for(size_t i(0); i<it->second.size(); ++i)//For each service at this minute
-							{
-								if(isOutputXML)
-								{
-									concatXMLResult(
-										stream,
-										it->second[i],
-										stop
-									);
-								}
-								else
-								{
-									addJourneyToParametersMap(result, it->second[i], stop);
-								}
-							}
+							else if(isOutputXML)
+								concatXMLResult(stream,	sp);
+							else
+								addJourneyToParametersMap(result, sp);
+
+							displayedResults++;
 						}
 					}
+
+					if(displayedResults >= maxRow)
+						break;
 				}
 
 				if(isOutputXML)
 				{
 					// XML footer
 					stream << "</timeTable>";
+				}
+				else if(_mainPage.get())
+				{
+					if(result.hasSubMaps("journey") && _rowPage.get())
+					{
+						vector<shared_ptr<ParametersMap> > journeys = result.getSubMaps("journey");
+						if(!journeys.empty())
+						{
+							result.insert(DATA_FIRST_DEPARTURE_TIME, (*journeys.begin())->getValue("date_time"));
+							result.insert(DATA_LAST_DEPARTURE_TIME, (*journeys.rbegin())->getValue("date_time"));
+						}
+
+						size_t rank(0);
+						bool onlyRealTime = true;
+						stringstream rowStream;
+						BOOST_FOREACH(const shared_ptr<ParametersMap>& journey, journeys)
+						{
+							if(journey->hasSubMaps("destination") && _destinationPage.get())
+							{
+								stringstream destinationStream;
+								BOOST_FOREACH(const shared_ptr<ParametersMap>& dest, journey->getSubMaps("destination"))
+								{
+									dest->merge(getTemplateParameters());
+									_destinationPage->display(destinationStream, request, *dest);
+								}
+								journey->insert(DATA_DESTINATIONS, destinationStream.str());
+							}
+							
+							if(journey->hasSubMaps("line"))
+							{
+								BOOST_FOREACH(const shared_ptr<ParametersMap>& linemerge, journey->getSubMaps("line"))
+								{
+									journey->merge(*linemerge);
+								}
+							}
+
+							if(!journey->isDefined("realTime") || journey->getValue("realTime") == "no")
+							{
+								onlyRealTime = false;
+							}
+							journey->merge(getTemplateParameters());
+							journey->insert("rank", ++rank);
+							_rowPage->display(rowStream, request, *journey);
+						}
+						result.insert(DATA_ONLY_REAL_TIME, (onlyRealTime ? 1 : 0));
+						result.insert(DATA_ROWS, rowStream.str());
+					}
+					result.merge(getTemplateParameters());
+					_mainPage->display(stream, request, result);
 				}
 				else
 				{
@@ -1281,6 +1952,11 @@ namespace synthese
 			{
 				return _screen->getType()->getDisplayMainPage()->getMimeType();
 			}
+			else if(_mainPage.get())
+			{
+				return _mainPage->getMimeType();
+			}
+
 			return getOutputMimeTypeFromOutputFormat(MimeTypes::XML);
 		}
 
