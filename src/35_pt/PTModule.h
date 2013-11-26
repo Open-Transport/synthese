@@ -133,11 +133,13 @@ namespace synthese
 
 			static const std::string MODULE_PARAM_ENABLE_THEORETICAL;
 			static const std::string MODULE_PARAM_ENABLE_REAL_TIME;
+			static const std::string MODULE_PARAM_SORT_LETTERS_BEFORE_NUMBERS;
 
 		private:
 			static GeneralStopsMatcher _generalStopsMatcher;
 			static bool _theoreticalAllowed;
 			static bool _realTimeAllowed;
+			static bool _sortLettersBeforeNumbers;
 
 		public:
 			static GeneralStopsMatcher& GetGeneralStopsMatcher(){ return _generalStopsMatcher; }
@@ -216,6 +218,8 @@ namespace synthese
 			 * @return true if is is allowed to use the real time values in a report.
 			 */
 			static bool isRealTimeAllowed();
+
+			static bool getSortLettersBeforeNumbers(){ return _sortLettersBeforeNumbers; }
 		};
 	}
 	/** @} */

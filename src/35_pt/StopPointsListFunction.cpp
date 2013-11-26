@@ -37,7 +37,6 @@
 #include "LineStop.h"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
-#include "CommercialLine.h"
 #include "City.h"
 #include "Webpage.h"
 #include "DRTArea.hpp"
@@ -364,17 +363,17 @@ namespace synthese
 					// Lines
 					if(!_commercialLineID)
 					{
-						BOOST_FOREACH(const CommercialLineMapType::value_type& line, destination.second.second)
+						BOOST_FOREACH(const CommercialLineSetType::value_type& line, destination.second.second)
 						{
 							// Declaration
 							boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 
 							// Main parameters
-							line.second->toParametersMap(*linePM, true);
+							line->toParametersMap(*linePM, true);
 
 							// Rolling stock
 							set<RollingStock *> rollingStocks;
-							BOOST_FOREACH(Path* path, line.second->getPaths())
+							BOOST_FOREACH(Path* path, line->getPaths())
 							{
 								if(!dynamic_cast<const JourneyPattern*>(path))
 									continue;
@@ -560,42 +559,27 @@ namespace synthese
 
 
 
-		StopPointsListFunction::SortableLineKey::SortableLineKey(RegistryKeyType key, string lineShortName):
-			_key(key),
-			_lineShortName(lineShortName, false)
-		{
-		}
-
-
-
-		bool StopPointsListFunction::SortableLineKey::operator<(SortableLineKey const &otherLineKey) const
-		{
-			return util::alphanum_text_first_comp(_lineShortName, otherLineKey.getShortName()) < 0;
-		}
-
-
-
-		string StopPointsListFunction::SortableLineKey::getShortName() const
-		{
-			return _lineShortName;
-		}
-
-
 		StopPointsListFunction::SortableStopArea::SortableStopArea(RegistryKeyType key, string destinationName):
 			_key(key),
 			_destinationName(destinationName)
 		{
 		}
 
+
+
 		bool StopPointsListFunction::SortableStopArea::operator<(SortableStopArea const &otherStopArea) const
 		{
 			return util::alphanum_text_first_comp(_destinationName, otherStopArea.getDestinationName()) < 0;
 		}
 
+
+
 		string StopPointsListFunction::SortableStopArea::getDestinationName() const
 		{
 			return _destinationName;
 		}
+
+
 
 		RegistryKeyType StopPointsListFunction::SortableStopArea::getKey() const
 		{
@@ -691,7 +675,6 @@ namespace synthese
 					int distanceToBboxCenter = CalcDistanceToBboxCenter(sp);
 					SortableStopPoint keySP(&sp,distanceToBboxCenter,_isSortByDistanceToBboxCenter);
 					SortableStopArea keySA(destination->getKey(), destination->getName());
-					SortableLineKey keyL(commercialLine->getKey(), commercialLine->getShortName());
 					if(spHaveZeroDestination)
 					{
 						StopAreaDestinationMapType stopAreaMap;
@@ -702,15 +685,13 @@ namespace synthese
 					StopAreaDestinationMapType::iterator it = stopPointMap[keySP].find(keySA);
 					if(it == stopPointMap[keySP].end()) // test if destination stop already in the map
 					{
-						CommercialLineMapType lineMap;
-						lineMap[keyL] = commercialLine;
-						stopPointMap[keySP][keySA] = make_pair(destination, lineMap);
+						CommercialLineSetType lineSet;
+						lineSet.insert(commercialLine);
+						stopPointMap[keySP][keySA] = make_pair(destination, lineSet);
 					}
 					else // destination stop is already in the map
 					{
-						CommercialLineMapType::iterator lineIt = stopPointMap[keySP][keySA].second.find(keyL);
-						if(lineIt == stopPointMap[keySP][keySA].second.end()) // test if commercialLine already in the sub map
-							stopPointMap[keySP][keySA].second[keyL] = commercialLine;
+						stopPointMap[keySP][keySA].second.insert(commercialLine);
 					}
 				}
 			}

@@ -104,6 +104,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_DOC_URL("doc_url");
 		const string CommercialLineTableSync::COL_TIMETABLE_ID("timetable_id");
 		const string CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE = "display_duration_before_first_departure";
+		const string CommercialLineTableSync::COL_WEIGHT_FOR_SORTING = "weight_for_sorting";
 	}
 
 	namespace db
@@ -134,6 +135,7 @@ namespace synthese
 			Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
 			Field(CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_WEIGHT_FOR_SORTING, SQL_INTEGER),
 			Field()
 		};
 
@@ -254,6 +256,7 @@ namespace synthese
 				string() :
 				lexical_cast<string>(object->getDisplayDurationBeforeFirstDeparture().total_seconds() / 60)
 			);
+			query.addField(object->getWeightForSorting());
 			query.execute(transaction);
 		}
 

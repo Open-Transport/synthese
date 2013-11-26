@@ -22,6 +22,7 @@
 
 #include "CommercialLine.h"
 
+#include "alphanum.hpp"
 #include "AccessParameters.h"
 #include "CalendarTemplateTableSync.h"
 #include "CommercialLineTableSync.h"
@@ -29,6 +30,7 @@
 #include "Edge.h"
 #include "ForbiddenUseRule.h"
 #include "DataSourceLinksField.hpp"
+#include "PTModule.h"
 #include "PTUseRuleTableSync.h"
 #include "Registry.h"
 #include "ReservationContactTableSync.h"
@@ -90,7 +92,8 @@ namespace synthese
 			_reservationContact(NULL),
 			_calendarTemplate(NULL),
 			_timetableId(0),
-			_displayDurationBeforeFirstDeparture(not_a_date_time)
+			_displayDurationBeforeFirstDeparture(not_a_date_time),
+			_weightForSorting(0)
 		{
 			// Default use rules
 			RuleUser::Rules rules(getRules());
@@ -150,6 +153,28 @@ namespace synthese
 					service->clearNonConcurrencyCache();
 				}
 			}
+		}
+
+
+
+		bool CommercialLine::operator<(
+			const CommercialLine& cl
+		) const {
+			if(getWeightForSorting() == cl.getWeightForSorting())
+			{
+				// Handle empty short names
+				if(getShortName().empty() && cl.getShortName().empty())
+					return getKey() < cl.getKey();
+				else
+				{
+					if(PTModule::getSortLettersBeforeNumbers())
+						return (alphanum_text_first_comp<string>(getShortName(), cl.getShortName()) < 0);
+					else
+						return (alphanum_comp<string>(getShortName(), cl.getShortName()) < 0);
+				}
+			}
+			else
+				return (getWeightForSorting() > cl.getWeightForSorting());
 		}
 
 
@@ -666,6 +691,16 @@ namespace synthese
 				if(value != _style)
 				{
 					_style = value;
+					result = true;
+				}
+			}
+
+			if(record.isDefined(CommercialLineTableSync::COL_WEIGHT_FOR_SORTING))
+			{
+				int value(record.getDefault<int>(CommercialLineTableSync::COL_WEIGHT_FOR_SORTING, 0));
+				if(value != _weightForSorting)
+				{
+					_weightForSorting = value;
 					result = true;
 				}
 			}

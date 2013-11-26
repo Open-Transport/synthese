@@ -168,6 +168,8 @@ namespace synthese
 				m.push_back(make_pair(optional<RegistryKeyType>(), "(toutes)"));
 			}
 			vector<boost::shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints(env);
+			std::sort(c.begin(), c.end(), CommercialLine::PointerComparator());
+
 			BOOST_FOREACH(const boost::shared_ptr<const CommercialLine>& line, c)
 			{
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
