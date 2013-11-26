@@ -119,6 +119,7 @@ namespace synthese
 					, _requestParameters.maxSize
 					, false, true, true, true
 			)	);
+			std::sort(lines.begin(), lines.end(), CommercialLine::PointerComparator());
 
 			// Requests
 			AdminFunctionRequest<ResaStatisticsMenuAdmin> searchRequest(request, *this);
@@ -196,6 +197,8 @@ namespace synthese
 					optional<size_t>()
 					, false, true, true, true
 			)	);
+			std::sort(lines.begin(), lines.end(), CommercialLine::PointerComparator());
+
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
 				boost::shared_ptr<ResaStatisticsAdmin> p(

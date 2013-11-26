@@ -92,6 +92,7 @@ namespace synthese
 		{
 			RegisterParameter(PTModule::MODULE_PARAM_ENABLE_THEORETICAL, "1", &PTModule::ParameterCallback);
 			RegisterParameter(PTModule::MODULE_PARAM_ENABLE_REAL_TIME, "1", &PTModule::ParameterCallback);
+			RegisterParameter(PTModule::MODULE_PARAM_SORT_LETTERS_BEFORE_NUMBERS, "0", &PTModule::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<PTModule>::Init()
@@ -127,8 +128,10 @@ namespace synthese
 		PTModule::GeneralStopsMatcher PTModule::_generalStopsMatcher;
 		bool PTModule::_theoreticalAllowed(true);
 		bool PTModule::_realTimeAllowed(true);
+		bool PTModule::_sortLettersBeforeNumbers(false);
 		const string PTModule::MODULE_PARAM_ENABLE_THEORETICAL ("enable_theoretical");
 		const string PTModule::MODULE_PARAM_ENABLE_REAL_TIME ("enable_real_time");
+		const string PTModule::MODULE_PARAM_SORT_LETTERS_BEFORE_NUMBERS("sort_letters_before_numbers");
 
 		void PTModule::RTDataCleaner()
 		{
@@ -167,6 +170,8 @@ namespace synthese
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(Env::GetOfficialEnv(), rights, totalControl, neededLevel)
 			);
+			std::sort(lines.begin(), lines.end(), CommercialLine::PointerComparator());
+
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			return m;
@@ -345,6 +350,10 @@ namespace synthese
 			else if (name == MODULE_PARAM_ENABLE_REAL_TIME)
 			{
 				_realTimeAllowed = lexical_cast<bool>(value);
+			}
+			else if (name == MODULE_PARAM_SORT_LETTERS_BEFORE_NUMBERS)
+			{
+				_sortLettersBeforeNumbers = lexical_cast<bool>(value);
 			}
 		}
 		

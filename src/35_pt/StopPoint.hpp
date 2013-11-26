@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_ENV_PHYSICALSTOP_H
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
+#include "CommercialLine.h"
 #include "UtilConstants.h"
 #include "Vertex.h"
 #include "ImportableTemplate.hpp"
@@ -42,7 +43,6 @@ namespace synthese
 	{
 		class LineStop;
 		class StopArea;
-		class CommercialLine;
 		class JourneyPattern;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ namespace synthese
 
 
 
-				typedef std::set<const CommercialLine*> LinesSet;
+				typedef std::set<const CommercialLine*, CommercialLine::PointerComparator> LinesSet;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// List of lines calling at the stop.
