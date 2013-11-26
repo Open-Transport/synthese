@@ -361,6 +361,8 @@ namespace synthese
 			std::size_t rank,
 			bool ignoreUnscheduledStops
 		) const	{
+			if (_edges.size() <= rank)
+				return NULL;
 			if(ignoreUnscheduledStops)
 			{
 				size_t edgeRank(0);
