@@ -120,6 +120,8 @@ namespace synthese
 					alarm->getKey(),
 					this->getFactoryKey()
 			)	);
+			std::sort(dsv.begin(), dsv.end(), CommercialLine::PointerComparator());
+
 			set<util::RegistryKeyType> usedLines;
 
 			stream << "<h1>Lignes destinataires</h1>";
@@ -174,6 +176,7 @@ namespace synthese
 					searchNetworkId,
 					string("%"+searchName+"%")
 			)	);
+			std::sort(lines.begin(), lines.end(), CommercialLine::PointerComparator());
 
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), "N°"));

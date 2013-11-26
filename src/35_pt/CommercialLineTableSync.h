@@ -74,6 +74,7 @@ namespace synthese
 			static const std::string COL_DOC_URL;
 			static const std::string COL_TIMETABLE_ID;
 			static const std::string COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
+			static const std::string COL_WEIGHT_FOR_SORTING;
 
 
 

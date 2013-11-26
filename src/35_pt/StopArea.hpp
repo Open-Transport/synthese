@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_pt_StopArea_hpp__
 #define SYNTHESE_pt_StopArea_hpp__
 
+#include "CommercialLine.h"
 #include "CoordinatesSystem.hpp"
 #include "Hub.h"
 #include "ImportableTemplate.hpp"
@@ -56,7 +57,6 @@ namespace synthese
 	{
 		class FreeDRTArea;
 		class StopPoint;
-		class CommercialLine;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Stop area.
@@ -369,7 +369,7 @@ namespace synthese
 				PhysicalStopsLabels	getPhysicalStopLabels(const PhysicalStops& noDisplay) const;
 
 
-				typedef std::set<CommercialLine*> Lines;
+				typedef std::set<CommercialLine*, CommercialLine::PointerComparator> Lines;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// List of the lines which call at a stop of the stop area.

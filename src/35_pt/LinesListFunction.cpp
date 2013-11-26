@@ -28,6 +28,7 @@
 #include "alphanum.hpp"
 #include "CalendarTemplate.h"
 #include "CityTableSync.h"
+#include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "CustomBroadcastPoint.hpp"
 #include "Destination.hpp"
@@ -105,8 +106,6 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES = "ittd";
 		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES = "ijpd";
 		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES = "idbd";
-		const string LinesListFunction::PARAMETER_IGNORE_LINE_SHORT_NAME = "ilsn";
-		const string LinesListFunction::PARAMETER_LETTERS_BEFORE_NUMBERS = "letters_before_numbers";
 		const string LinesListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
 		const string LinesListFunction::PARAMETER_RIGHT_CLASS = "right_class";
@@ -169,9 +168,6 @@ namespace synthese
 				result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 			}
 
-			// Letters before numbers
-			result.insert(PARAMETER_LETTERS_BEFORE_NUMBERS, _lettersBeforeNumbers);
-
 			// Output geometry
 			result.insert(PARAMETER_OUTPUT_GEOMETRY, _outputGeometry);
 
@@ -209,7 +205,6 @@ namespace synthese
 			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
 			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
 			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
-			result.insert(PARAMETER_IGNORE_LINE_SHORT_NAME, _ignoreLineShortName);
 
 			// Rolling stock filter
 			if(_rollingStockFilter.get() != NULL)
@@ -337,9 +332,6 @@ namespace synthese
 				}
 			}
 
-			// Letters before numbers
-			_lettersBeforeNumbers = map.isTrue(PARAMETER_LETTERS_BEFORE_NUMBERS);
-
 			// Right class
 			_rightClass = map.getDefault<string>(PARAMETER_RIGHT_CLASS);
 			if(	!_rightClass.empty() &&
@@ -409,7 +401,6 @@ namespace synthese
 			_ignoreDeparturesBoardExcludedLines = map.isTrue(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES);
 			_ignoreJourneyPlannerExcludedLines = map.isTrue(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES);
 			_ignoreTimetableExcludedLines = map.isTrue(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES);
-			_ignoreLineShortName = map.isTrue(PARAMETER_IGNORE_LINE_SHORT_NAME);
 
 			// Rolling stock filter
 			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
@@ -735,44 +726,14 @@ namespace synthese
 				_rights = request.getUser()->getProfile()->getRights(_rightClass);
 			}
 
-			// Sorting is made on numerical order
-			//   (except for line number which doesn't begin by a number)
-			//   then alphabetic order.
-			//
-			// So, linesMap is like that:
-			//
-			// [1]  -> ligne 1 : XXX - XXX
-			// [2]  -> ligne 2 : XXX - XXX
-			// [2S] -> ligne 2S: XXX - XXX
-			// [A]  -> ligne A : XXX - XXX
-			// [A1] -> ligne A1: XXX - XXX
-			//
-
-			util::alphanum_less<string> comparatorAlphanum;
-			util::alphanum_text_first_less<string> comparatorAlphanumTextFirst;
-			boost::function<bool(const std::string &, const std::string &)> comparator;
-			if(_lettersBeforeNumbers)
-			{
-				comparator = comparatorAlphanumTextFirst;
-			}
-			else
-			{
-				comparator = comparatorAlphanum;
-			}
-
-			typedef map<string, boost::shared_ptr<const CommercialLine>, 
-					boost::function<bool(const string &, const string &)> > SortedItems;
+			typedef set<boost::shared_ptr<const CommercialLine>, CommercialLine::PointerComparator> SortedItems;
 			typedef std::map<const RollingStock*, SortedItems> LinesMapType;
 			LinesMapType linesMap;
 
 			// Specified line ID
 			if(_line.get())
 			{
-				if(linesMap.find(NULL) == linesMap.end())
-				{
-					linesMap[NULL] = SortedItems(boost::bind(comparator, _1, _2));					
-				}
-				linesMap[NULL][_line->getShortName()] = _line;
+				linesMap[NULL].insert(_line);
 			}
 			else
 			{
@@ -801,15 +762,7 @@ namespace synthese
 						// Transport mode check
 						if(!tm.get() || line->usesTransportMode(*tm))
 						{
-							// Insert respecting order described up there
-							if(linesMap.find(tm.get()) == linesMap.end())
-							{
-								linesMap[tm.get()] = SortedItems(boost::bind(comparator, _1, _2));					
-							}
-							if(!_ignoreLineShortName)
-								linesMap[tm.get()][line->getShortName()] = const_pointer_cast<const CommercialLine>(line);
-							else
-								linesMap[tm.get()][boost::lexical_cast<std::string>(line->getKey())] = const_pointer_cast<const CommercialLine>(line);
+							linesMap[tm.get()].insert(line);
 							alreadyShownLines.insert(line.get());
 						}
 				}	}
@@ -821,7 +774,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const LinesMapType::mapped_type::value_type& it, linesMap[tm.get()])
 				{
-					boost::shared_ptr<const CommercialLine> line = it.second;
+					boost::shared_ptr<const CommercialLine> line = it;
 					boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 					line->toParametersMap(*linePM, true);
 
@@ -1109,9 +1062,7 @@ namespace synthese
 			_ignoreTimetableExcludedLines(false),
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false),
-			_ignoreLineShortName(false),
 			_withDirections(false),
-			_lettersBeforeNumbers(true),
 			_displayDurationBeforeFirstDepartureFilter(false),
 			_broadcastPoint(NULL)
 		{}

@@ -130,6 +130,7 @@ namespace synthese
 				std::string _docURL;
 				util::RegistryKeyType _timetableId;
 				boost::posix_time::time_duration _displayDurationBeforeFirstDeparture;
+				int _weightForSorting;
 			//@}
 
 			/// @name Mutexes
@@ -167,6 +168,7 @@ namespace synthese
 				const std::string& getDocURL() const { return _docURL; }
 				util::RegistryKeyType getTimetableId() const { return _timetableId; }
 				const boost::posix_time::time_duration& getDisplayDurationBeforeFirstDeparture() const { return _displayDurationBeforeFirstDeparture; }
+				int getWeightForSorting() const { return _weightForSorting; }
 				virtual std::string getName() const { return _name; }
 			//@}
 
@@ -185,6 +187,7 @@ namespace synthese
 				void setDocURL(const std::string& value){ _docURL = value; }
 				void setTimetableId(util::RegistryKeyType value){ _timetableId = value; }
 				void setDisplayDurationBeforeFirstDeparture(const boost::posix_time::time_duration& value){ _displayDurationBeforeFirstDeparture = value; }
+				void setWeightForSorting(int weightForSorting) { _weightForSorting = weightForSorting; }
 				void setName(const std::string& value){ _name = value; }
 			//@}
 
@@ -306,8 +309,30 @@ namespace synthese
 				/// This method cleans non concurrency cache of all the services of the line.
 				void removeConcurrencyRule( const pt::NonConcurrencyRule* rule );
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Comparator overload.
+				/// @param cl the other commercial line to compare with
+				/// Return true if current line is inferior (according to its weight and sorting on short name).
+				bool operator<(const CommercialLine& cl) const;
+
 				
-				
+
+				struct PointerComparator {
+					bool operator()(boost::shared_ptr<const CommercialLine> cl1, boost::shared_ptr<const CommercialLine> cl2) const
+					{
+						return *cl1 < *cl2;
+					}
+
+					bool operator()(const CommercialLine* cl1, const CommercialLine* cl2) const
+					{
+						return *cl1 < *cl2;
+					}
+				};
+
+
+
 				virtual bool loadFromRecord(
 					const Record& record,
 					util::Env& env
