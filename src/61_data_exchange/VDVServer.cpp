@@ -451,7 +451,7 @@ namespace synthese
 				if (!plannedDataSource.get())
 				{
 					// The planned does not exist : log so that the user knows he has to configure it
-					Log::GetInstance().warn("La source des données plannifiées associée à la connexion VDV n'a pas été trouvée");
+					Log::GetInstance().warn("La source des donnÃ©es plannifiÃ©es associÃ©e Ã  la connexion VDV n'a pas Ã©tÃ© trouvÃ©e");
 					return;
 				}
 
@@ -474,7 +474,7 @@ namespace synthese
 				if (datenAbrufenAntwortResults.error != eXMLErrorNone ||
 					datenAbrufenAntwortNode.isEmpty()
 				){
-					Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort vide ou mal formé");
+					Log::GetInstance().warn("RÃ©ception d'un DatenAbrufenAntwort vide ou mal formÃ©");
 					return;
 				}
 				
@@ -498,7 +498,7 @@ namespace synthese
 					// If no corresponding subscription, log it and continue
 					if (!currentSubscription)
 					{
-						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant à aucun abonnement");
+						Log::GetInstance().warn("RÃ©ception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant Ã  aucun abonnement");
 						continue;
 					}
 					
@@ -512,7 +512,7 @@ namespace synthese
 						string readAZBID = AZBFahrplanlageNode.getChildNode("AZBID").getText();
 						if (readAZBID != currentSubscription->get<StopArea>()->getACodeBySource(*get<DataSource>()))
 						{
-							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant à l'abonnement");
+							Log::GetInstance().warn("RÃ©ception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant Ã  l'abonnement");
 							break;
 						}
 						
@@ -522,7 +522,7 @@ namespace synthese
 						split(vectServiceCode, serviceCode, is_any_of("-"));
 						if (vectServiceCode.size() != 3)
 						{
-							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service avec un code différentde XXX-XXXX-XXXX");
+							Log::GetInstance().warn("RÃ©ception d'un DatenAbrufenAntwort contenant un service avec un code diffÃ©rentde XXX-XXXX-XXXX");
 							continue;
 						}
 						ScheduledService* service(
@@ -593,7 +593,7 @@ namespace synthese
 						}
 						
 						// The service is not found in the theorical data, it has to be created
-						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service non connu, création du service non codée");
+						Log::GetInstance().warn("RÃ©ception d'un DatenAbrufenAntwort contenant un service non connu, crÃ©ation du service non codÃ©e");
 						// TO-DO ? : code the creation of the service (why not in a different network to easily detect errors in HAFAS or special events received ?)
 					}
 				}
