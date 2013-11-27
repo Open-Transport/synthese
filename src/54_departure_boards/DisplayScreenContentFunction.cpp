@@ -442,7 +442,6 @@ namespace synthese
 									split(tripletVect, stopItem, is_any_of("|"));
 									const CommercialLine* lineFilter = NULL;
 									const StopArea* destinationFilter = NULL;
-									const StopPoint* curStop = NULL;
 
 									if(tripletVect.size() > 1)
 									{
@@ -1027,11 +1026,13 @@ namespace synthese
 				return util::ParametersMap();
 			}
 
+			ptime now = second_clock::local_time();
+			bool noRealTime(true);
+
 		#ifdef MYSQL_CONNECTOR_AVAILABLE
 			string SAEDateString, SAEHourString;
 			string SAELimit = boost::lexical_cast<string>(_screen->getType()->getRowNumber());
-			ptime SAEDate, now = second_clock::local_time();
-			bool noRealTime(true);
+			ptime SAEDate;
 
 			if(_useSAEDirectConnection)
 			{
