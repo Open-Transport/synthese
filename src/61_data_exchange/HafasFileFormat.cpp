@@ -94,6 +94,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_STOPS = "import_stops";
 		const string HafasFileFormat::Importer_::PARAMETER_LINES_FILTER = "lines_filter";
 		const string HafasFileFormat::Importer_::PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE = "gleis_has_one_stop_per_line";
+		const string HafasFileFormat::Importer_::PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME = "complete_empty_stop_area_name";
 	}
 
 	namespace impex
@@ -351,6 +352,8 @@ namespace synthese
 					if(cols.size() == 1)
 					{
 						bahnhof.main = true;
+						if (!_complete_empty_stop_area_name.empty())
+							bahnhof.name = cols[0] + _complete_empty_stop_area_name;
 					}
 					else
 					{
@@ -859,6 +862,9 @@ namespace synthese
 			// Gleis file format
 			pm.insert(PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE, _gleisHasOneStopPerLine);
 
+			// String to complete empty stop area name
+			pm.insert(PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME, _complete_empty_stop_area_name);
+
 			return pm;
 		}
 
@@ -925,6 +931,9 @@ namespace synthese
 
 			// Gleis file format
 			_gleisHasOneStopPerLine = pm.getDefault<bool>(PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE, false);
+
+			// String to complete empty stop area name
+			_complete_empty_stop_area_name = pm.getDefault<string>(PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME);
 		}
 
 
