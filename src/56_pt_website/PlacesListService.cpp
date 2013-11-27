@@ -113,34 +113,7 @@ namespace synthese
 			_coordinatesSystem(NULL),
 			_maxDistance(300),
 			_requiredUserClasses()
-		{
-			 _houseMap = new HouseMapType();
-		}
-
-
-
-		PlacesListService::~PlacesListService()
-		{
-			/*
-				The delete below is needed to fix a leak on _houseMap, which is never destroy.
-				However, having this delete cause a "double free or corruption" crash when loading the admin interface.
-
-				*** glibc detected *** ./s3-server: double free or corruption (fasttop): 0x00007f500c00c560 ***
-				======= Backtrace: =========
-				/lib64/libc.so.6[0x34a4675916]
-				(...)/lib56_pt_website.so(_ZN8synthese10pt_website17PlacesListServiceD2Ev+0x37)[0x7f5021dbc5d7]
-				(...)/lib35_pt.so(_ZN8synthese2pt13PTCitiesAdminD0Ev+0x22)[0x7f5024619102]
-
-				PTCitiesAdmin has a PlacesListService attribute which is allocated by his constructor, PTCitiesAdmin also
-				inherits from AdminInterfaceElementTemplate<PTCitiesAdmin>.
-				PTCitiesAdmin destructor call PlacesListService destructor, which will delete _houseMap. In this case
-				_houseMap has never been allocated, causing this crash.
-
-				This mean that the "PTCitiesAdmin" object we have has never been trully allocated, we have possibly did
-				a static pointer cast like static_cast<PTCitiesAdmin*>(PointerOnInheritedClass), causing this issue.
-			*/
-			//delete _houseMap;
-		}
+		{}
 
 		ParametersMap PlacesListService::_getParametersMap() const
 		{
@@ -400,18 +373,18 @@ namespace synthese
 
 					if(name == "")continue;
 
-					addHouse(&_houseMap,house, name);
+					addHouse(_houseMap, house, name);
 				}
 
 				// Best place
-				if(!_houseMap->empty())
+				if(!_houseMap.empty())
 				{
 					size_t nbResult = 0;
 					vector<lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit > houseList, roadList;
 					vector<int> distanceHouseList;
 					set<string> insertedRoadName;
 
-					BOOST_FOREACH(const HouseMapType::value_type& it, (*_houseMap))
+					BOOST_FOREACH(const HouseMapType::value_type& it, _houseMap)
 					{
 						boost::shared_ptr<House> house = it.second;
 
@@ -509,7 +482,7 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
-							MainRoadChunk::HouseNumber number;
+							MainRoadChunk::HouseNumber number(0);
 							string roadName;
 							try
 							{
@@ -637,7 +610,7 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
-							MainRoadChunk::HouseNumber number;
+							MainRoadChunk::HouseNumber number(0);
 							string roadName;
 							try
 							{
@@ -1248,14 +1221,14 @@ namespace synthese
 					}
 					else
 					{
-						if (_houseMap->empty())
+						if (_houseMap.empty())
 						{
 							// _houseMap is empty so give back the road
 							placeResult.value = roadPlace;
 						}
 						else
 						{
-							placeResult.value = _houseMap->begin()->second;	
+							placeResult.value = _houseMap.begin()->second;	
 						}
 					}
 				}
@@ -1308,14 +1281,14 @@ namespace synthese
 		}
 
 		void PlacesListService::addHouse(
-				HouseMapType* const* houseMap,
+				HouseMapType& houseMap,
 				const boost::shared_ptr<House> house,
 				string name
 			) const {
 
 			int distanceToOriginPoint = CalcDistanceToOriginPoint(house);
 			SortHouseByDistanceToOriginPoint keyHouse(house, distanceToOriginPoint, name);
-			(*houseMap)->insert(pair<const SortHouseByDistanceToOriginPoint,const boost::shared_ptr<House> >(keyHouse,house));
+			houseMap.insert(pair<const SortHouseByDistanceToOriginPoint,const boost::shared_ptr<House> >(keyHouse,house));
 		}
 
 		void PlacesListService::_parseCoordinates(bool invertXY) {
