@@ -38,6 +38,7 @@
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
 #include "JourneyPattern.hpp"
+#include "RollingStock.hpp"
 #include "NonPermanentService.h"
 #include "JourneyPatternCopy.hpp"
 #include "ImportableTableSync.hpp"
@@ -380,6 +381,10 @@ namespace synthese
 			pm.insert(prefix + DATA_LINE_IMAGE, getImage());
 			pm.insert(prefix + "lineImage", getImage()); // For StopAreasList compatibility
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
+			BOOST_FOREACH(const Path* path, _paths)
+			{
+				pm.insert(prefix + "transportMode", static_cast<const JourneyPattern*>(path)->getRollingStock()->getName());
+			}
 			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());
 			if(!_displayDurationBeforeFirstDeparture.is_not_a_date_time())
 			{
