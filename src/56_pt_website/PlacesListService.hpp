@@ -181,10 +181,6 @@ namespace synthese
 
 
 
-			~PlacesListService();
-
-
-
 			/// @name Getters
 			//@{
 				const std::string& getText() const { return _text; }
@@ -275,7 +271,7 @@ namespace synthese
 
 			// Add the house to the house map
 			void addHouse(
-				HouseMapType* const* houseMap,
+				HouseMapType& houseMap,
 				const boost::shared_ptr<road::House> house,
 				std::string _name
 			) const;
@@ -283,7 +279,7 @@ namespace synthese
 			int CalcDistanceToOriginPoint(const boost::shared_ptr<road::House> & house) const;
 
 		private:
-			HouseMapType* _houseMap;
+			mutable HouseMapType _houseMap;
 			template<class T>
 			void _registerItems(
 				util::ParametersMap& map,
