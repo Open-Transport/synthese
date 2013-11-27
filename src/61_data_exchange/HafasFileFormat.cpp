@@ -330,8 +330,10 @@ namespace synthese
 					bahnhof.operatorCode = _getField(0, 7);
 
 					// Point
-					double x(1000 * lexical_cast<double>(_getField(11, 10)));
-					double y(1000 * lexical_cast<double>(_getField(22, 8)));
+					std::string strX = _getField(10, 7);
+					std::string strY = _getField(20, 7); 
+					double x(1000 * lexical_cast<double>(strX));
+					double y(1000 * lexical_cast<double>(strY));
 					if(x && y)
 					{
 						bahnhof.point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
