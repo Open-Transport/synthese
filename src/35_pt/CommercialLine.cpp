@@ -160,21 +160,26 @@ namespace synthese
 		bool CommercialLine::operator<(
 			const CommercialLine& cl
 		) const {
-			if(getWeightForSorting() == cl.getWeightForSorting())
+			if(getNetwork() == cl.getNetwork())
 			{
-				// Handle empty short names
-				if(getShortName().empty() && cl.getShortName().empty())
-					return getKey() < cl.getKey();
-				else
+				if(getWeightForSorting() == cl.getWeightForSorting())
 				{
-					if(PTModule::getSortLettersBeforeNumbers())
-						return (alphanum_text_first_comp<string>(getShortName(), cl.getShortName()) < 0);
+					// Handle empty short names
+					if(getShortName().empty() && cl.getShortName().empty())
+						return getKey() < cl.getKey();
 					else
-						return (alphanum_comp<string>(getShortName(), cl.getShortName()) < 0);
+					{
+						if(PTModule::getSortLettersBeforeNumbers())
+							return (alphanum_text_first_comp<string>(getShortName(), cl.getShortName()) < 0);
+						else
+							return (alphanum_comp<string>(getShortName(), cl.getShortName()) < 0);
+					}
 				}
+				else
+					return (getWeightForSorting() > cl.getWeightForSorting());
 			}
 			else
-				return (getWeightForSorting() > cl.getWeightForSorting());
+				return (getNetwork()->getKey() < cl.getNetwork()->getKey());
 		}
 
 
