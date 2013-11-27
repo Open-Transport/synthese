@@ -1197,12 +1197,12 @@ namespace synthese
 				}
 
 				// Log
-				_logInfo("Courses attachées : "+ lexical_cast<string>(servicesToLink.size()));
-				_logInfo("Courses détachées : "+ lexical_cast<string>(servicesToUnlink.size()));
-				_logInfo("Courses avec mise à jour des horaires temps réel : "+ lexical_cast<string>(updated));
-				_logInfo("Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
-				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
-				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
+				_logInfo("Courses attachÃ©es : "+ lexical_cast<string>(servicesToLink.size()));
+				_logInfo("Courses dÃ©tachÃ©es : "+ lexical_cast<string>(servicesToUnlink.size()));
+				_logInfo("Courses avec mise Ã  jour des horaires temps rÃ©el : "+ lexical_cast<string>(updated));
+				_logInfo("Courses sans mise Ã  jour des horaires temps rÃ©el : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
+				_logInfo("Courses crÃ©Ã©es : "+ lexical_cast<string>(createdServices));
+				_logInfo("Courses supprimÃ©es : "+ lexical_cast<string>(servicesToRemove.size()));
 			}
 
 			return true;
