@@ -141,7 +141,7 @@ namespace synthese
 			// dataSourceFilter
 			if(_dataSourceFilter)
 			{
-				result.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter);
+				result.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
 
 			// Output stops ?
