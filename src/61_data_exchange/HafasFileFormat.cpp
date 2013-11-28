@@ -1404,7 +1404,7 @@ namespace synthese
 						mergedCalendar &= _calendar;
 
 						// Jump over useless combinations
-						if(mergedCalendar.empty())
+						if(mergedCalendar.empty() && !_importEvenIfNoDate)
 						{
 							continue;
 						}
