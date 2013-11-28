@@ -252,18 +252,6 @@ namespace synthese
 				throw RequestException("IneoBDSIFileFormat: Already running");
 			}
 
-			//////////////////////////////////////////////////////////////////////////
-			// Preparation of list of objects to remove
-
-			// Scenarios
-			DataSource::LinkedObjects existingScenarios(
-				_import.get<DataSource>()->getLinkedObjects<Scenario>()
-			);
-			BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
-			{
-				_scenariosToRemove.insert(existingScenario.second->getKey());
-			}
-
 
 			//////////////////////////////////////////////////////////////////////////
 			// Pre-loading objects from BDSI
@@ -732,6 +720,14 @@ namespace synthese
 			);
 
 			{ // Scenarios and messages
+				// Scenarios
+				DataSource::LinkedObjects existingScenarios(
+					dataSourceOnSharedEnv->getLinkedObjects<Scenario>()
+				);
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
+				{
+					_scenariosToRemove.insert(existingScenario.second->getKey());
+				}
 
 				// Loop on objects present in the database (search for creations and updates)
 				BOOST_FOREACH(const Programmations::value_type& itProg, programmations)
