@@ -80,6 +80,7 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_OMIT_SAME_AREA_DESTINATIONS = "omitSameAreaDestinations";
 		const string StopPointsListFunction::PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER = "sortByDistance";
 		const string StopPointsListFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
+		const string StopPointsListFunction::PARAMETER_DATA_SOURCE_FILTER = "data_source_filter";
 
 		const string StopPointsListFunction::TAG_PHYSICAL_STOPS = "physicalStops";
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
@@ -158,6 +159,12 @@ namespace synthese
 			if(_maxSolutionsNumber)
 			{
 				map.insert(PARAMETER_MAX_SOLUTIONS_NUMBER, *_maxSolutionsNumber);
+			}
+			
+			// dataSourceFilter
+			if(_dataSourceFilter)
+			{
+				map.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
 
 			return map;
@@ -285,7 +292,15 @@ namespace synthese
 			{
 				_isSortByDistanceToBboxCenter = true;
 			}
-		
+
+			if(map.getOptional<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER)) try
+			{
+				_dataSourceFilter = Env::GetOfficialEnv().get<impex::DataSource>(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER));
+			}
+			catch (ObjectNotFoundException<impex::DataSource>&)
+			{
+				throw RequestException("No such data source");
+			}
 		}
 
 
@@ -312,6 +327,9 @@ namespace synthese
 				const StopArea::PhysicalStops& stops(_stopArea->get()->getPhysicalStops());
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stopPoint, stops)
 				{
+					if(_dataSourceFilter && !stopPoint.second->hasLinkWithSource(*_dataSourceFilter))
+						continue;
+
 					addStop(stopPointMap, *stopPoint.second, startDateTime, endDateTime);
 				}
 			}
@@ -319,12 +337,14 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Registry<StopPoint>::value_type& stopPoint, Env::GetOfficialEnv().getRegistry<StopPoint>())
 				{
-					if(_bbox &&
+					if((_bbox &&
 						(!stopPoint.second->getGeometry() ||
-						!_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate())))
-					{
+						!_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))) ||
+						(_dataSourceFilter && !stopPoint.second->hasLinkWithSource(*_dataSourceFilter))
+					){
 						continue;
 					}
+
 					addStop(stopPointMap, *stopPoint.second, startDateTime, endDateTime);
 				}
 			}

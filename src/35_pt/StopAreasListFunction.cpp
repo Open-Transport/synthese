@@ -82,6 +82,7 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_OUTPUT_LINES_IN_STOPS = "output_lines_in_stops";
 		const string StopAreasListFunction::PARAMETER_GROUP_BY_CITIES = "group_by_cities";
 		const string StopAreasListFunction::PARAMETER_STOPS_DIRECTIONS = "stops_directions";
+		const string StopAreasListFunction::PARAMETER_DATA_SOURCE_FILTER = "data_source_filter";
 
 
 		const string StopAreasListFunction::TAG_DIRECTION = "direction";
@@ -135,6 +136,12 @@ namespace synthese
 			if(_terminusId)
 			{
 				result.insert(PARAMETER_TERMINUS_ID, *_terminusId);
+			}
+
+			// dataSourceFilter
+			if(_dataSourceFilter)
+			{
+				result.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter);
 			}
 
 			// Output stops ?
@@ -271,6 +278,15 @@ namespace synthese
 
 			// Stops directions
 			_stopsDirections = map.getDefault<size_t>(PARAMETER_STOPS_DIRECTIONS, 0);
+			
+			if(map.getOptional<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER)) try
+			{
+				_dataSourceFilter = Env::GetOfficialEnv().get<impex::DataSource>(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER));
+			}
+			catch (ObjectNotFoundException<impex::DataSource>&)
+			{
+				throw RequestException("No such data source");
+			}
 		}
 
 
@@ -418,6 +434,9 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> cityPM;
 			BOOST_FOREACH(StopSet::value_type it, stopSet)
 			{
+				if(_dataSourceFilter && !it->hasLinkWithSource(*_dataSourceFilter))
+					continue;
+
 				// Group by cities
 				if(_groupByCities && it->getCity() != lastCity)
 				{

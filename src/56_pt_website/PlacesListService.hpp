@@ -79,6 +79,7 @@ namespace synthese
 			static const std::string PARAMETER_COORDINATES_XY;
 			static const std::string PARAMETER_MAX_DISTANCE;
 			static const std::string PARAMETER_COMPATIBLE_USER_CLASSES_LIST;
+			static const std::string PARAMETER_DATA_SOURCE_FILTER;
 
 			static const std::string DATA_BEST_PLACE;
 			static const std::string DATA_CLASS;
@@ -123,6 +124,7 @@ namespace synthese
 				double _maxDistance;
 				boost::shared_ptr<geos::geom::Point> _originPoint;
 				CompatibleUserClassesRequired _requiredUserClasses;
+				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
 			//@}
 
 		public:
