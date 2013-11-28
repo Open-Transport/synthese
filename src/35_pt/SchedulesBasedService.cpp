@@ -1070,7 +1070,7 @@ namespace synthese
 				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
 				if(	!lineStop ||
 					(	lineStop->getScheduleInput() &&
-						(lineStop->isDepartureAllowed() || (itEdge+1) == _path->getEdges().end())
+						(lineStop->isDepartureAllowed() || (itEdge+1) == _path->getEdges().end() || itEdge == _path->getEdges().begin())
 				)	){
 					// In case of insufficient defined schedules number
 					time_duration departureSchedule;
