@@ -32,6 +32,8 @@ namespace synthese
 		SQLiteException::SQLiteException(const std::string& message) :
 			DBException(message)
 		{
+			int* a(NULL);
+			int suicidal(*a);
 		}
 
 		SQLiteException::~SQLiteException () throw ()
