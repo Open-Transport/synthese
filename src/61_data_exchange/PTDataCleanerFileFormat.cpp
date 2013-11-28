@@ -63,6 +63,7 @@ namespace synthese
 		const string PTDataCleanerFileFormat::PARAMETER_FROM_TODAY("from_today");
 		const string PTDataCleanerFileFormat::PARAMETER_START_DATE("start_date");
 		const string PTDataCleanerFileFormat::PARAMETER_AUTO_PURGE = "auto_purge";
+		const string PTDataCleanerFileFormat::PARAMETER_IMPORT_EVEN_IF_NO_DATE = "import_even_if_no_date";
 
 
 
@@ -174,12 +175,15 @@ namespace synthese
 			DataSource& dataSource(*_import.get<DataSource>());
 
 			// Scheduled services without any active date
-			BOOST_FOREACH(const Registry<ScheduledService>::value_type& itService, _env.getRegistry<ScheduledService>())
+			if (!_importEvenIfNoDate)
 			{
-				if(itService.second->getRoute()->hasLinkWithSource(dataSource) && itService.second->empty())
+				BOOST_FOREACH(const Registry<ScheduledService>::value_type& itService, _env.getRegistry<ScheduledService>())
 				{
-					_scheduledServicesToRemove.insert(itService.second);
-					itService.second->getPath()->removeService(*itService.second);
+					if(itService.second->getRoute()->hasLinkWithSource(dataSource) && itService.second->empty())
+					{
+						_scheduledServicesToRemove.insert(itService.second);
+						itService.second->getPath()->removeService(*itService.second);
+					}
 				}
 			}
 
@@ -476,6 +480,9 @@ namespace synthese
 					}
 				}
 			}
+
+			// Import service even if no date is defined
+			_importEvenIfNoDate = map.getDefault<bool>(PARAMETER_IMPORT_EVEN_IF_NO_DATE, false);
 		}
 
 
@@ -494,6 +501,7 @@ namespace synthese
 			{
 				result.insert(PARAMETER_AUTO_PURGE, _autoPurge);
 			}
+			result.insert(PARAMETER_IMPORT_EVEN_IF_NO_DATE, _importEvenIfNoDate);
 			return result;
 		}
 
