@@ -233,6 +233,7 @@ namespace synthese
 			links.insert(make_pair(&source, id));
 			stopArea->setDataSourceLinksWithoutRegistration(links);
 			stopArea->setCity(&city);
+			stopArea->setName(name);
 			if(mainStopArea)
 			{
 				city.addIncludedPlace(*stopArea);
