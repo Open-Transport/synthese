@@ -45,6 +45,11 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
@@ -71,6 +76,7 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_LINES_IN_STOPS;
 			static const std::string PARAMETER_GROUP_BY_CITIES;
 			static const std::string PARAMETER_STOPS_DIRECTIONS;
+			static const std::string PARAMETER_DATA_SOURCE_FILTER;
 
 		private:
 			static const std::string TAG_CITY;
@@ -99,6 +105,7 @@ namespace synthese
 				bool _outputLinesInStops;
 				bool _groupByCities;
 				size_t _stopsDirections;
+				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
 			//@}
 
 			//! @name Setters

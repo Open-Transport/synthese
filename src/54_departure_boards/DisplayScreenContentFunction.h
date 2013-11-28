@@ -80,9 +80,9 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_GENERATION_METHOD;
 			static const std::string PARAMETER_USE_SAE_DIRECT_CONNECTION;
-			static const std::string PARAMETER_DATA_SOURCE_NAME_FILTER;
 			static const std::string PARAMETER_STOPS_LIST;
 			static const std::string PARAMETER_TIMETABLE_GROUPED_BY_AREA;
+			static const std::string PARAMETER_DATA_SOURCE_FILTER;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -169,10 +169,10 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> _lineToDisplay;
 				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
 				bool _wayIsBackward;
-				boost::optional<std::string> _dataSourceName;
 				bool _useSAEDirectConnection;
 				bool _timetableGroupedByArea;
 				LineDestinationFilter _lineDestinationFilter;
+				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
 
 				typedef std::map<std::string, util::RegistryKeyType> SAELine;
 				static SAELine _SAELine;

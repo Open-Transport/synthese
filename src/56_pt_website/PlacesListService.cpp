@@ -80,6 +80,7 @@ namespace synthese
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
 		const string PlacesListService::PARAMETER_COMPATIBLE_USER_CLASSES_LIST = "acList";
+		const string PlacesListService::PARAMETER_DATA_SOURCE_FILTER = "data_source_filter";
 
 		const string PlacesListService::DATA_ADDRESS = "address";
 		const string PlacesListService::DATA_ADDRESSES = "addresses";
@@ -191,6 +192,12 @@ namespace synthese
 			if(_maxDistance>0)
 			{
 				map.insert(PARAMETER_MAX_DISTANCE, _maxDistance);
+			}
+			
+			// dataSourceFilter
+			if(_dataSourceFilter)
+			{
+				map.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
 
 			return map;
@@ -308,6 +315,15 @@ namespace synthese
 			catch(bad_lexical_cast&)
 			{
 				throw RequestException("Bad user class code in acList parameter.");
+			}
+
+			if(map.getOptional<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER)) try
+			{
+				_dataSourceFilter = Env::GetOfficialEnv().get<impex::DataSource>(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER));
+			}
+			catch (ObjectNotFoundException<impex::DataSource>&)
+			{
+				throw RequestException("No such data source");
 			}
 		}
 
@@ -465,13 +481,33 @@ namespace synthese
 					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
 						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
-						_registerItems<NamedPlace>(
-							*pm,
-							_city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
+
+						LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchResult stopResult;
+						LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchResult newStopResult;
+
+						stopResult = _city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
 								_minScore
-						)	);
+						);
+
+						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit& item, stopResult)
+						{
+							const pt::StopArea* stop(dynamic_cast<const pt::StopArea*>(&(*item.value)));
+							if(stop)
+							{
+								if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
+									continue;
+							}
+
+							newStopResult.push_back(item);
+						}
+
+						_registerItems<NamedPlace>(
+							*pm,
+							newStopResult
+						);
+
 						result.insert(DATA_STOPS, pm);
 					}
 
@@ -592,13 +628,33 @@ namespace synthese
 					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
 						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
-						_registerItems<StopArea>(
-							*pm,
-							PTModule::GetGeneralStopsMatcher().bestMatches(
+
+						LexicalMatcher<boost::shared_ptr<StopArea> >::MatchResult stopResult;
+						LexicalMatcher<boost::shared_ptr<StopArea> >::MatchResult newStopResult;
+
+						stopResult = PTModule::GetGeneralStopsMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
 								_minScore
-						)	);
+						);
+
+						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHit& item, stopResult)
+						{
+							const pt::StopArea* stop(dynamic_cast<const pt::StopArea*>(&(*item.value)));
+							if(stop)
+							{
+								if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
+									continue;
+							}
+
+							newStopResult.push_back(item);
+						}
+
+						_registerItems<StopArea>(
+							*pm,
+							newStopResult
+						);
+
 						result.insert(DATA_STOPS, pm);
 					}
 

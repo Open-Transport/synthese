@@ -97,10 +97,10 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
 		const string DisplayScreenContentFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string DisplayScreenContentFunction::PARAMETER_GENERATION_METHOD = "generation_method";
-		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER("data_source_name_filter");
 		const string DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION("use_sae_direct_connection");
 		const string DisplayScreenContentFunction::PARAMETER_STOPS_LIST("stops_list");
 		const string DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA("timetable_grouped_by_area");
+		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -251,8 +251,8 @@ namespace synthese
 						  "'with_forced_destinations_method', 'route_planning' or "
 						  "'display_children_only'. The default is 'standard_method'",
 						  false);
-			api.addParams(DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_NAME_FILTER,
-						  "Specify the datasource stops and lines you want to see in the answer",
+			api.addParams(DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER,
+						  "Filter the stops in the answer linked with this data source",
 						  false);
 			api.addParams(DisplayScreenContentFunction::PARAMETER_USE_SAE_DIRECT_CONNECTION,
 						  "Specify if SAE Direct Connection is needed for RealTime, "
@@ -295,9 +295,9 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
 			}
-			if(_dataSourceName)
+			if(_dataSourceFilter)
 			{
-				map.insert(PARAMETER_DATA_SOURCE_NAME_FILTER, *_dataSourceName);
+				map.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
 			return map;
 		}
@@ -362,6 +362,14 @@ namespace synthese
 					throw RequestException("No such transfer destination page");
 				}
 
+				if(map.getOptional<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER)) try
+				{
+					_dataSourceFilter = Env::GetOfficialEnv().get<impex::DataSource>(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER));
+				}
+				catch (ObjectNotFoundException<impex::DataSource>&)
+				{
+					throw RequestException("No such data source");
+				}
 
 				// Way 1 : pre-configured display screen
 
@@ -416,11 +424,14 @@ namespace synthese
 								Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 						);
 
-						screen->setDisplayedPlace(stop->getConnectionPlace());
-						screen->setAllPhysicalStopsDisplayed(false);
-						ArrivalDepartureTableGenerator::PhysicalStops stopsFilter;
-						stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
-						screen->setStops(stopsFilter);
+						if(!_dataSourceFilter || stop->hasLinkWithSource(*_dataSourceFilter))
+						{
+							screen->setDisplayedPlace(stop->getConnectionPlace());
+							screen->setAllPhysicalStopsDisplayed(false);
+							ArrivalDepartureTableGenerator::PhysicalStops stopsFilter;
+							stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
+							screen->setStops(stopsFilter);
+						}
 					}
 					// 5 by id list
 					else if(!map.getDefault<string>(PARAMETER_STOPS_LIST).empty())
@@ -472,6 +483,10 @@ namespace synthese
 										boost::shared_ptr<const StopPoint> stop(
 											Env::GetOfficialEnv().get<StopPoint>(stopId)
 										);
+
+										if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
+											continue;
+
 										screen->setDisplayedPlace(stop->getConnectionPlace());
 										stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
 										_lineDestinationFilter.insert(LineDestinationFilter::value_type(stop.get(), make_pair(lineFilter, destinationFilter)));
@@ -484,6 +499,9 @@ namespace synthese
 										BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stop->getPhysicalStops())
 										{
 											const StopPoint& stop(*itStop.second);
+											if(_dataSourceFilter && !stop.hasLinkWithSource(*_dataSourceFilter))
+												continue;
+
 											screen->setDisplayedPlace(stop.getConnectionPlace());
 											stopsFilter.insert(make_pair(stop.getKey(), &stop));
 											_lineDestinationFilter.insert(LineDestinationFilter::value_type(&stop, make_pair(lineFilter, destinationFilter)));
@@ -512,6 +530,9 @@ namespace synthese
 						{
 							if(myStop.second->getCodeBySources() == oc)
 							{
+								if(_dataSourceFilter && !myStop.second->hasLinkWithSource(*_dataSourceFilter))
+									continue;
+
 								pstops.insert(make_pair(myStop.second->getKey(), myStop.second.get()));
 								screen->setDisplayedPlace(myStop.second->getConnectionPlace());
 								screen->setAllPhysicalStopsDisplayed(false);
@@ -651,8 +672,6 @@ namespace synthese
 			{
 				throw RequestException("Physical stop not found "+ e.getMessage());
 			}
-
-			_dataSourceName = map.getOptional<string>(PARAMETER_DATA_SOURCE_NAME_FILTER);
 		}
 
 
