@@ -180,7 +180,7 @@ namespace synthese
 			{
 				// Ignore white chars
 				if(	_ignoreWhiteChars &&
-					(*it == ' ' || *it == '\r' || *it == '\n')
+					(*it == ' ' || *it == '\r' || *it == '\n' || *it == '\t')
 				){
 					++it;
 					continue;
@@ -210,7 +210,7 @@ namespace synthese
 
 					// Parsing service node
 					boost::shared_ptr<ServiceExpression> node(
-						new ServiceExpression(it, end)
+						new ServiceExpression(it, end, _ignoreWhiteChars)
 					);
 
 					if(node->getFunctionCreator())
