@@ -48,7 +48,6 @@ def run(env, args):
             log.info('Package directory already exists (%r) not building.',
                 package_dir)
             return
-        utils.RemoveDirectory(package_dir)
 
     try:
         os.makedirs(package_dir)
