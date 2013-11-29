@@ -602,8 +602,7 @@ namespace synthese
 						if(!value.empty())
 						{
 							vector<string> recipients;
-							string recipientStr(map.get<string>(PARAMETER_RECIPIENT_ID));
-							boost::algorithm::split(recipients, recipientStr, is_any_of(","));
+							boost::algorithm::split(recipients, value, is_any_of(","));
 							BOOST_FOREACH(const string& recipient, recipients)
 							{
 								vector<string> recipientParams;
