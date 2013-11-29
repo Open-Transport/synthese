@@ -111,6 +111,7 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
+		const string ScenarioSaveAction::PARAMETER_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_recipients_";
 		
 		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
 		const string ScenarioSaveAction::VALUES_PARAMETERS_SEPARATOR = "|";
@@ -591,6 +592,47 @@ namespace synthese
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
 
+
+					_recipients = Recipients::value_type();
+
+					// New recipient lists (but cannot read data source id)
+					BOOST_FOREACH(const string& key, Factory<AlarmRecipient>::GetKeys())
+					{
+						string value(map.getDefault<string>(PARAMETER_RECIPIENTS_ + key));
+						if(!value.empty())
+						{
+							vector<string> recipients;
+							string recipientStr(map.get<string>(PARAMETER_RECIPIENT_ID));
+							boost::algorithm::split(recipients, recipientStr, is_any_of(","));
+							BOOST_FOREACH(const string& recipient, recipients)
+							{
+								vector<string> recipientParams;
+								boost::algorithm::split(recipientParams, recipient, is_any_of("|"));
+								Recipients::value_type::value_type rec;
+
+								try
+								{
+									if(!lexical_cast<RegistryKeyType>(value))
+									{
+										rec.first = 0;
+									}
+									else
+									{
+										rec.first = lexical_cast<RegistryKeyType>(value);
+									}
+
+									rec.second = key;
+
+									_recipients->push_back(rec);
+								}
+								catch(...)
+								{
+
+								}
+							}
+						}
+					}
+
 					if(!map.getDefault<string>(PARAMETER_RECIPIENT_ID).empty())
 					{
 						// Recipient data source
@@ -606,7 +648,6 @@ namespace synthese
 						vector<string> recipients;
 						string recipientStr(map.get<string>(PARAMETER_RECIPIENT_ID));
 						boost::algorithm::split(recipients, recipientStr, is_any_of(","));
-						_recipients = Recipients::value_type();
 						BOOST_FOREACH(const string& recipient, recipients)
 						{
 							vector<string> recipientParams;
