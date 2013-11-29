@@ -36,8 +36,8 @@ namespace synthese
 	namespace db
 	{
 		DBReplaceInterSYNTHESEContent::DBReplaceInterSYNTHESEContent( const DBRecord& r ):
-			_record(r),
-			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY),
+			_record(r)
 		{}
 
 

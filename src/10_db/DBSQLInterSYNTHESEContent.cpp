@@ -39,8 +39,8 @@ namespace synthese
 			RegistryTableType tableId,
 			const std::string& sql
 		):	_tableId(tableId),
-			_sql(sql),
-			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY),
+			_sql(sql)
 		{
 		}
 
