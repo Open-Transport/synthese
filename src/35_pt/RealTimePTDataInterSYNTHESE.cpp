@@ -207,8 +207,8 @@ namespace synthese
 			const SchedulesBasedService& service,
 			boost::optional<const RanksToSync&> ranksToSync /*= boost::optional<const RanksToSync&>() */
 		):	_service(service),
-			_ranksToSync(ranksToSync),
-			InterSYNTHESEContent(RealTimePTDataInterSYNTHESE::FACTORY_KEY)
+			InterSYNTHESEContent(RealTimePTDataInterSYNTHESE::FACTORY_KEY),
+			_ranksToSync(ranksToSync)
 		{
 		}
 

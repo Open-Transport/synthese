@@ -1468,7 +1468,7 @@ namespace synthese
 				bool mustBeExported = true;
 				for (multimap<const DataSource*, string>::const_iterator it= myLine.second->getDataSourceLinks().begin(); it != myLine.second->getDataSourceLinks().end(); ++it) 
 				{
-					if(it->first->getName() == LABEL_NO_EXPORT_GTFS)
+					if(it->first->get<Name>() == LABEL_NO_EXPORT_GTFS)
 					{
 						mustBeExported = false;
 						break;
@@ -1527,16 +1527,16 @@ namespace synthese
 
 					bool mustBeExported = true;
 					const multimap<const DataSource*, string>& dataSourcesMap = static_cast<const JourneyPattern *>(sdService->getPath())->getCommercialLine()->getDataSourceLinks();
-                                	for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
+					for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
 					{
-                                        	if(it->first->getName() == LABEL_NO_EXPORT_GTFS)
-                                        	{
-                                               	 	mustBeExported = false;
-                                                	break;
-                                        	}
-                                	}
-                                	if(!mustBeExported)
-                                        	continue;
+						if(it->first->get<Name>() == LABEL_NO_EXPORT_GTFS)
+						{
+							mustBeExported = false;
+							break;
+						}
+					}
+					if(!mustBeExported)
+						continue;
 
 					if(rs != NULL)
 					{

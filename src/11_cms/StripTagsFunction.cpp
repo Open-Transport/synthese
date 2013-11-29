@@ -167,7 +167,7 @@ namespace synthese
 		{
 			std::string ret;
 			char ch;
-			int i, j;
+			unsigned int i, j;
 			
 			for (i=0; i < todecode.length(); i++)
 			{
