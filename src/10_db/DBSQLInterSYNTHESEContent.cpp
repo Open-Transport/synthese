@@ -38,8 +38,8 @@ namespace synthese
 		DBSQLInterSYNTHESEContent::DBSQLInterSYNTHESEContent(
 			RegistryTableType tableId,
 			const std::string& sql
-		):	_tableId(tableId),
-			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY),
+		):	InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY),
+			_tableId(tableId),
 			_sql(sql)
 		{
 		}
