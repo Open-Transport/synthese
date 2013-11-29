@@ -611,15 +611,7 @@ namespace synthese
 
 								try
 								{
-									if(!lexical_cast<RegistryKeyType>(value))
-									{
-										rec.first = 0;
-									}
-									else
-									{
-										rec.first = lexical_cast<RegistryKeyType>(value);
-									}
-
+									rec.first = lexical_cast<RegistryKeyType>(recipient);
 									rec.second = key;
 
 									_recipients->push_back(rec);
