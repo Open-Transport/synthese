@@ -847,7 +847,7 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> journeyPm(new ParametersMap());
 			journeyPm->insert("route_id", journeyPattern->getKey());
 			journeyPm->insert("date_time", servicePointer.getDepartureDateTime());
-			journeyPm->insert(DATA_IS_REAL_TIME, (_useSAEDirectConnection ? "no" : "yes"));
+			journeyPm->insert(DATA_IS_REAL_TIME, (_useSAEDirectConnection ? string("no") : string("yes")));
 			journeyPm->insert(DATA_WAITING_TIME, to_simple_string(servicePointer.getDepartureDateTime() - second_clock::local_time()));
 
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
@@ -914,7 +914,7 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> journeyPm(new ParametersMap());
 			journeyPm->insert("route_id", DATA_DUMMY_KEY);
 			journeyPm->insert("date_time", serviceReal.datetime);
-			journeyPm->insert("realTime", (serviceReal.realTime ? "yes" : "no"));
+			journeyPm->insert(DATA_IS_REAL_TIME, (serviceReal.realTime ? string("yes") : string("no")));
 			journeyPm->insert(DATA_WAITING_TIME, to_simple_string(serviceReal.datetime - second_clock::local_time()));
 
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
@@ -1080,6 +1080,9 @@ namespace synthese
 						// Retrieve commercial line from short name
 						BOOST_FOREACH(const Registry<CommercialLine>::value_type& curLine, Env::GetOfficialEnv().getRegistry<CommercialLine>())
 						{
+							if(_dataSourceFilter && !curLine.second->hasLinkWithSource(*_dataSourceFilter))
+								continue;
+
 							// Case insensitive and remove leading 0 : 02S = 2s
 							string curShortName = boost::algorithm::to_lower_copy(
 								trim_left_copy_if(curLine.second->getShortName(), is_any_of("0"))
@@ -1851,6 +1854,10 @@ namespace synthese
 					{
 						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
 						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+
+						if(_dataSourceFilter && !commercialLine->hasLinkWithSource(*_dataSourceFilter))
+							continue;
+
 						string curShortName = boost::algorithm::to_lower_copy(
 							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
 						);
@@ -1913,7 +1920,7 @@ namespace synthese
 								}
 							}
 
-							if(!journey->isDefined("realTime") || journey->getValue("realTime") == "no")
+							if(!journey->isDefined(DATA_IS_REAL_TIME) || journey->getValue(DATA_IS_REAL_TIME) == "no")
 							{
 								onlyRealTime = false;
 							}
