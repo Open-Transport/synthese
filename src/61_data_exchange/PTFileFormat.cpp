@@ -583,10 +583,11 @@ namespace synthese
 					);
 					boost::shared_ptr<const Geometry> newGeom(stop->getGeometry());
 
-					if(exGeom->distance(newGeom.get()) > 1)
+					// If there was a previous geometry
+					if(exGeom && (!newGeom || exGeom->distance(newGeom.get()) > 1))
 					{
 						_logInfo(
-							"Stop "+ code +" ("+ stop->getName() +") moved from " + stop->getGeometry()->toString() + " to " + (*geometry)->toString()
+							"Stop "+ code +" ("+ stop->getName() +") moved from " + exGeom->toString() + " to " + (newGeom ? newGeom->toString() : "POINT(0 0)")
 						);
 					}
 				}
