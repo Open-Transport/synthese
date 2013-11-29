@@ -607,12 +607,16 @@ namespace synthese
 							{
 								vector<string> recipientParams;
 								boost::algorithm::split(recipientParams, recipient, is_any_of("|"));
-								Recipients::value_type::value_type rec;
 
+								Recipients::value_type::value_type rec;
 								try
 								{
-									rec.first = lexical_cast<RegistryKeyType>(recipient);
-									rec.second = key;
+									rec.first = key;
+									rec.second.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
+									if(recipientParams.size() > 1)
+									{
+										rec.second.second = recipientParams[1];
+									}
 
 									_recipients->push_back(rec);
 								}
@@ -647,13 +651,14 @@ namespace synthese
 
 							try
 							{
+								rec.first = _recipientType;
 								if(!lexical_cast<RegistryKeyType>(recipientParams[0]))
 								{
-									rec.first = 0;
+									rec.second.first = 0;
 								}
 								else if(_recipientDataSource.get())
 								{
-									rec.first =
+									rec.second.first =
 										DBModule::GetEditableObject(
 											recipientType->getObjectIdBySource(
 												*_recipientDataSource,
@@ -666,12 +671,12 @@ namespace synthese
 								}
 								else
 								{
-									rec.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
+									rec.second.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
 								}
 
 								if(recipientParams.size() > 1)
 								{
-									rec.second = recipientParams[1];
+									rec.second.second = recipientParams[1];
 								}
 
 								_recipients->push_back(rec);
@@ -1194,12 +1199,12 @@ namespace synthese
 					BOOST_FOREACH(const Recipients::value_type::value_type& recipient, *_recipients)
 					{
 						AlarmObjectLink link;
-						link.setRecipient(_recipientType);
+						link.setRecipient(recipient.first);
 						link.setAlarm(message.get());
-						link.setObjectId(recipient.first);
-						if(recipient.second)
+						link.setObjectId(recipient.second.first);
+						if(recipient.second.second)
 						{
-							link.setParameter(*recipient.second);
+							link.setParameter(*recipient.second.second);
 						}
 						AlarmObjectLinkTableSync::Save(&link, transaction);
 					}

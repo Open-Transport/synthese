@@ -144,8 +144,10 @@ namespace synthese
 				typedef 
 				boost::optional<
 					std::vector<
-					std::pair<util::RegistryKeyType, boost::optional<std::string> >
-				>	>	Recipients;
+						std::pair<
+							std::string,
+							std::pair<util::RegistryKeyType, boost::optional<std::string> >
+				>	>	> Recipients;
 				Recipients _recipients;
 				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;
