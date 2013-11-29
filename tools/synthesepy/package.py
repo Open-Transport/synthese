@@ -50,7 +50,8 @@ def run(env, args):
             return
 
     try:
-        os.makedirs(package_dir)
+        if not os.path.isdir(package_dir):
+            os.makedirs(package_dir)
     except:
         raise Exception('Failed to create the '
             'directory in %r, cannot continue' % package_dir)
