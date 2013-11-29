@@ -72,8 +72,9 @@ def run(env, args):
             f.write('Environment sealed\n')
 
     # Archive
-
     ARCHIVE_NAME = 'synthese.tar.bz2'
+    if config.prefix_with_svnrelease:
+        ARCHIVE_NAME = 'synthese-relative-' +  revision_path + '.tar.bz2'
     archive_path = join(package_dir, ARCHIVE_NAME)
 
     log.info('Creating archive %r', archive_path)
