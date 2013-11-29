@@ -36,8 +36,8 @@ namespace synthese
 	namespace db
 	{
 		DBDeleteInterSYNTHESEContent::DBDeleteInterSYNTHESEContent( util::RegistryKeyType id ):
-			_id(id),
-			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY),
+			_id(id)
 		{
 		}
 	

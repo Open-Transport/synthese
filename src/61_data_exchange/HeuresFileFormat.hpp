@@ -158,6 +158,11 @@ namespace synthese
 					pt_operation::Depot* depot;
 					pt::StopPoint* stop;
 					graph::MetricOffset length;
+
+					DeadRunRoute() :
+						depot(NULL),
+						stop(NULL)
+					{}
 				};
 
 				typedef std::map<
