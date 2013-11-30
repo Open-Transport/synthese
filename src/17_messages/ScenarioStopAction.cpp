@@ -119,7 +119,7 @@ namespace synthese
 			if(_remove)
 			{
 				DBTransaction transaction;
-				ScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction);
+				ScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction, false);
 				transaction.run();
 			}
 			else

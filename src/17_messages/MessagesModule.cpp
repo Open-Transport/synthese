@@ -266,6 +266,7 @@ namespace synthese
 			ActivatedMessages decativatedMessages(_activatedMessages);
 
 			// Loop on all messages
+			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
 			BOOST_FOREACH(
 				const Registry<Alarm>::value_type& message,
 				Env::GetOfficialEnv().getRegistry<Alarm>()
@@ -349,6 +350,25 @@ namespace synthese
 			}
 
 			return result;
+		}
+
+
+
+		void MessagesModule::ClearAllBroadcastCaches()
+		{
+			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
+			BOOST_FOREACH(const Alarm::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<Alarm>())
+			{
+				// Jump over scenarios
+				SentAlarm* alarm(dynamic_cast<SentAlarm*>(it.second.get()));
+				if(!alarm)
+				{
+					continue;
+				}
+
+				// Clear the cache
+				alarm->clearBroadcastPointsCache();
+			}
 		}
 
 

@@ -149,6 +149,8 @@ namespace synthese
 			static std::string							getLevelLabel(const AlarmLevel& level);
 
 			static void MessagesActivationThread();
+
+			static void ClearAllBroadcastCaches();
 		};
 	}
 	/** @} */
