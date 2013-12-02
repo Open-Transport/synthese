@@ -174,7 +174,7 @@ namespace synthese
 				LineDestinationFilter _lineDestinationFilter;
 				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
 
-				typedef std::map<std::string, util::RegistryKeyType> SAELine;
+				typedef std::map<std::string, std::set<util::RegistryKeyType> > SAELine;
 				static SAELine _SAELine;
 				static boost::posix_time::ptime _nextUpdateLine;
 
