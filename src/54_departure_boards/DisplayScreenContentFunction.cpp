@@ -1075,14 +1075,11 @@ namespace synthese
 						shared_ptr<MySQLResult> result = connector->execQuery(lineListRequest);
 
 						while(result->next())
-							_SAELine.insert(SAELine::value_type(result->getInfo("mnemo"), 0));
+							_SAELine.insert(SAELine::value_type(result->getInfo("mnemo"), SAELine::mapped_type()));
 
 						// Retrieve commercial line from short name
 						BOOST_FOREACH(const Registry<CommercialLine>::value_type& curLine, Env::GetOfficialEnv().getRegistry<CommercialLine>())
 						{
-							if(_dataSourceFilter && !curLine.second->hasLinkWithSource(*_dataSourceFilter))
-								continue;
-
 							// Case insensitive and remove leading 0 : 02S = 2s
 							string curShortName = boost::algorithm::to_lower_copy(
 								trim_left_copy_if(curLine.second->getShortName(), is_any_of("0"))
@@ -1090,7 +1087,7 @@ namespace synthese
 							BOOST_FOREACH(SAELine::value_type& linePair, _SAELine)
 							{
 								if(curShortName == linePair.first)
-									_SAELine[linePair.first] = curLine.second->getKey();
+									_SAELine[linePair.first].insert(curLine.second->getKey());
 							}
 						}
 
@@ -1225,15 +1222,32 @@ namespace synthese
 							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
 								continue;
 
-							RegistryKeyType idLine = _SAELine.find(result->getInfo("ligne"))->second;
-							try
+							BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
 							{
-								realTimeService.commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+								try
+								{
+									boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+									BOOST_FOREACH(Path* path, curLine->getPaths())
+									{
+										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
+										if(destination && destination->getCodeBySources() == result->getInfo("oc_arrivee"))
+										{
+											realTimeService.commercialLine = curLine;
+											break;
+										}
+									}
+
+									if(realTimeService.commercialLine)
+										break;
+								}
+								catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+								{
+									continue;
+								}
 							}
-							catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
-							{
+
+							if(!realTimeService.commercialLine)
 								continue;
-							}
 
 							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
 							{
@@ -1673,15 +1687,32 @@ namespace synthese
 							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
 								continue;
 
-							RegistryKeyType idLine = _SAELine.find(result->getInfo("ligne"))->second;
-							try
+							BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
 							{
-								realTimeService.commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+								try
+								{
+									boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+									BOOST_FOREACH(Path* path, curLine->getPaths())
+									{
+										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
+										if(destination && destination->getCodeBySources() == result->getInfo("oc_arrivee"))
+										{
+											realTimeService.commercialLine = curLine;
+											break;
+										}
+									}
+
+									if(realTimeService.commercialLine)
+										break;
+								}
+								catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+								{
+									continue;
+								}
 							}
-							catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
-							{
+
+							if(!realTimeService.commercialLine)
 								continue;
-							}
 
 							if(result->getInfo("fiable") == "F")
 								realTimeService.realTime = true;
@@ -1854,9 +1885,6 @@ namespace synthese
 					{
 						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
 						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-
-						if(_dataSourceFilter && !commercialLine->hasLinkWithSource(*_dataSourceFilter))
-							continue;
 
 						string curShortName = boost::algorithm::to_lower_copy(
 							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
