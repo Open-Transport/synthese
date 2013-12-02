@@ -123,6 +123,7 @@ namespace synthese
 				static const std::string FILE_BITFELD;
 				static const std::string FILE_ZUGDAT;
 				static const std::string FILE_KOORD;
+				static const std::string FILE_BAHNOF;
 				static const std::string FILE_GLEIS;
 				static const std::string FILE_METABHF;
 				static const std::string FILE_UMSTEIGB;
@@ -135,6 +136,7 @@ namespace synthese
 				static const std::string PARAMETER_LINES_FILTER;
 				static const std::string PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE;
 				static const std::string PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME;
+				static const std::string PARAMETER_NO_GLEIS_FILE;
 
 			private:
 				struct LineFilter
@@ -167,6 +169,7 @@ namespace synthese
 					LinesFilter _linesFilter;
 					bool _gleisHasOneStopPerLine;
 					std::string _complete_empty_stop_area_name;
+					bool _noGleisFile;
 				//@}
 
 				const LineFilter* _lineIsIncluded(const std::string& lineNumber) const;
