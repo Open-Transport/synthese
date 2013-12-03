@@ -177,6 +177,7 @@ namespace synthese
 			bool updateFromServer(false);
 			try
 			{
+				Log::GetInstance().warn("Envoie d'une requête de statut à " + _getURL("status"));
 				string statusAntwortStr(
 					c.post(_getURL("status"), statusAnfrage.str(), contentType)
 				);
