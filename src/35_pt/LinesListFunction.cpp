@@ -74,6 +74,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace calendar;
+	using namespace db;
 	using namespace util;
 	using namespace server;
 	using namespace pt;
@@ -1017,7 +1018,7 @@ namespace synthese
 					{
 						// Parameters map
 						ParametersMap parameters;
-						parameters.insert("line_id", linePM);
+						parameters.insert("line_id", linePM->get<RegistryKeyType>(TABLE_COL_ID));
 
 						GetMessagesFunction f(
 							_broadcastPoint,
