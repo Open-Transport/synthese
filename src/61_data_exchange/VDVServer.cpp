@@ -406,6 +406,8 @@ namespace synthese
 		{
 			this_thread::sleep(boost::posix_time::seconds(5));
 
+			date today(day_clock::local_day());
+
 			// Local variables
 			ptime now(second_clock::local_time());
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
@@ -587,6 +589,9 @@ namespace synthese
 							links.erase(&*(get<DataSource>()));
 							links.insert(make_pair(&*(get<DataSource>()), serviceCode));
 							service->setDataSourceLinksWithoutRegistration(links);
+
+							// Set the service active
+							service->setActive(today);
 							
 							// Save the updated service
 							ScheduledServiceTableSync::Save(service, transaction);
