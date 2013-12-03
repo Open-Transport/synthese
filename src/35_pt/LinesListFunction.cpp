@@ -1017,7 +1017,7 @@ namespace synthese
 					{
 						// Parameters map
 						ParametersMap parameters;
-						parameters.insert(TAG_LINE, linePM);
+						parameters.insert("line_id", linePM);
 
 						GetMessagesFunction f(
 							_broadcastPoint,
