@@ -358,7 +358,7 @@ namespace synthese
 					);
 					string contentStr(
 						c.post(
-							host,
+							"/",
 							r.getURI(),
 							"application/x-www-form-urlencoded"
 					)	);
