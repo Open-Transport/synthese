@@ -28,6 +28,7 @@
 #include "DeadRunTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
 #include "Import.hpp"
+#include "LineArea.hpp"
 #include "NonConcurrencyRuleTableSync.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
@@ -1172,20 +1173,6 @@ namespace synthese
 			NextRouteCodes nextRouteCodes;
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type itjp, _env.getRegistry<JourneyPattern>())
 			{
-				bool hasArea(false);
-				BOOST_FOREACH(Edge* edge, itjp.second->getEdges())
-				{
-					if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
-					{
-						hasArea = true;
-						continue;
-					}
-				}
-				if(hasArea)
-				{
-					continue;
-				}
-
 				const JourneyPattern& jp(*itjp.second);
 				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 4);
 				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 3, false);
@@ -1194,7 +1181,7 @@ namespace synthese
 					NextRouteCodes::iterator itRouteCode(nextRouteCodes.find(jp.getCommercialLine()));
 					if(itRouteCode == nextRouteCodes.end())
 					{
-						itRouteCode = nextRouteCodes.insert(make_pair(jp.getCommercialLine(), 0)).first;
+						itRouteCode = nextRouteCodes.insert(make_pair(jp.getCommercialLine(), 3)).first;
 					}
 					_routeCodes.insert(make_pair(&jp, itRouteCode->second));
 					_writeTextAndSpaces(itineraiStream, lexical_cast<string>(itRouteCode->second), 2, false);
@@ -1205,19 +1192,15 @@ namespace synthese
 					_writeTextAndSpaces(itineraiStream, jp.getName(), 2, false);
 				}
 				itineraiStream << jp.getWayBack();
-				Path::Edges::const_iterator itLastEdge(jp.getEdges().end());
-				for(Path::Edges::const_iterator itEdge(jp.getEdges().begin()); itEdge != jp.getEdges().end(); ++itEdge)
+				Path::Edges allEdges(jp.getAllEdges());
+				Path::Edges::const_iterator itLastEdge(allEdges.end());
+				for(Path::Edges::const_iterator itEdge(allEdges.begin()); itEdge != allEdges.end(); ++itEdge)
 				{
-					if(!dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge))
-					{
-						continue;
-					}
-
-					const DesignatedLinePhysicalStop& ls(*static_cast<DesignatedLinePhysicalStop*>(*itEdge));
+					const LinePhysicalStop& ls(*static_cast<LinePhysicalStop*>(*itEdge));
 					const StopPoint& stop(*ls.getPhysicalStop());
 					_writeTextAndSpaces(itineraiStream, *stop.getCodesBySource(*_dataSource).begin(), 4, false);
 					itineraiStream << ls.getScheduleInput();
-					if(itLastEdge == jp.getEdges().end())
+					if(itLastEdge == allEdges.end())
 					{
 						itineraiStream << "    0";
 					}
@@ -1240,20 +1223,6 @@ namespace synthese
 
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itss, _env.getRegistry<ScheduledService>())
 			{
-				bool hasArea(false);
-				BOOST_FOREACH(Edge* edge, itss.second->getPath()->getEdges())
-				{
-					if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
-					{
-						hasArea = true;
-						continue;
-					}
-				}
-				if(hasArea)
-				{
-					continue;
-				}
-
 				const ScheduledService& ss(*itss.second);
 
 				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
@@ -1267,9 +1236,10 @@ namespace synthese
 					false
 				);
 				tronconsStream << "2";
-				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>(ss.getPath()->getEdge(0)->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
+				Path::Edges allEdges(ss.getPath()->getAllEdges());
+				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.begin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
 				_writeHour(tronconsStream, ss.getDepartureSchedule(false, 0));
-				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>(ss.getPath()->getLastEdge()->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
+				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.rbegin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
 				_writeHour(tronconsStream, ss.getLastArrivalSchedule(false));
 				tronconsStream << "000000";
 				if(_generateRouteCode)
@@ -1288,18 +1258,45 @@ namespace synthese
 
 				// Schedules
 				size_t schedulesNumber(ss.getDepartureSchedules(true, false).size());
+				time_duration lastSchedule(not_a_date_time);
+				const Path::Edges& edges(ss.getPath()->getEdges());
 				for(size_t i(0); i<schedulesNumber; ++i)
 				{
 					time_duration departureSchedule(ss.getDepartureSchedule(false, i));
 					time_duration arrivalSchedule(ss.getArrivalSchedule(false, i));
-					_writeHour(
-						tronconsStream,
+
+					size_t writings(1);
+					if(dynamic_cast<LineArea*>(edges[i]))
+					{
+						writings = dynamic_cast<LineArea*>(edges[i])->getSubEdges().size();
+					}
+
+					// Arrival time
+					time_duration firstSchedule(
 						(i== 0 || arrivalSchedule > departureSchedule) ? departureSchedule : arrivalSchedule
 					);
-					_writeHour(
-						tronconsStream,
+					if(!lastSchedule.is_not_a_date_time() && firstSchedule < lastSchedule)
+					{
+						firstSchedule = lastSchedule;
+					}
+					lastSchedule = firstSchedule;
+
+					// Departure time
+					time_duration secondSchedule(
 						(i+1 == schedulesNumber) ? arrivalSchedule : departureSchedule
 					);
+					if(!lastSchedule.is_not_a_date_time() && secondSchedule < lastSchedule)
+					{
+						secondSchedule = lastSchedule;
+					}
+					lastSchedule = secondSchedule;
+
+					// A schedule per generated edge
+					for(size_t i(0); i<writings; ++i)
+					{
+						_writeHour(tronconsStream, (i>0 ? secondSchedule : firstSchedule));
+						_writeHour(tronconsStream, secondSchedule);
+					}
 				}
 				tronconsStream << ";" << endl;
 			}
@@ -1309,27 +1306,13 @@ namespace synthese
 
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itss, _env.getRegistry<ScheduledService>())
 			{
-				bool hasArea(false);
-				BOOST_FOREACH(Edge* edge, itss.second->getPath()->getEdges())
-				{
-					if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
-					{
-						hasArea = true;
-						continue;
-					}
-				}
-				if(hasArea)
-				{
-					continue;
-				}
-
 				const ScheduledService& ss(*itss.second);
 
 				_writeTextAndSpaces(servicesStream, ss.getServiceNumber(), 6, false);
 				servicesStream << "1111111";
 				_writeTextAndSpaces(servicesStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
 				_writeTextAndSpaces(
-					tronconsStream,
+					servicesStream,
 					(	ss.getServiceNumber().size() > _serviceNumberPosition ?
 						ss.getServiceNumber().substr(_serviceNumberPosition, 3) :
 						string()
