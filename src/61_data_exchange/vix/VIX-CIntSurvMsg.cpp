@@ -160,8 +160,7 @@ namespace synthese
 
 				if(result.size()>0)
  				{
-				//	num_stop = boost::lexical_cast<unsigned int>(*result.begin());
-				//	num_stop = 267;
+					num_stop = boost::lexical_cast<unsigned int>(*result.begin());
  				}
 			}
 			else
@@ -170,10 +169,10 @@ namespace synthese
 			}
 
 			//TODO: lower priority, but we need to get those too
-			//num_driver	= 1;	// TODO: low priority
-			//num_park	= 799;	// TODO: low priority
-			//etat_expl	= 1;	// TODO: low priority
-			//num_journey	= 1;	// Don't care: course NOT USED in VIX code.
+			num_driver	= 1;	// TODO: low priority
+			num_park	= 799;	// TODO: low priority
+			etat_expl	= 1;	// TODO: low priority
+			num_journey	= 1;	// Don't care: course NOT USED in VIX code.
 
 			bUpdated=true;
 		}
