@@ -16,6 +16,9 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <boost/format.hpp>
+// cool info at http://ckp.made-it.com/bisync.html
+
 namespace synthese
 {
 	using namespace boost::posix_time;
@@ -33,12 +36,12 @@ namespace synthese
 		min			= 10;
 		sec			= 50;
 		num_driver	= 4320;
-		num_park	= 104;
+		num_park	= 799;
 		etat_expl	= 1;
-		num_line	= 6;    // 3; //6; //3;
+		num_line	= 3;    // 3; //6; //3;
 		num_service	= 4024;	// No service agent
-		num_journey	= 0;	// course NOT USED in VIX code.
-		num_stop	= 2045; // 1949; //2045; //2050;
+		num_journey	= 21;	// course NOT USED in VIX code.
+		num_stop	= 268; // 1949; //2045; //2050;
 		direction	= 0;
 	}
 
@@ -112,8 +115,6 @@ namespace synthese
 			// add time and date.
 			ptime now(second_clock::local_time());	
 			year	= now.date().year()-2000;
-			if(year<0)
-				year=0;
 			month	= now.date().month();
 			day		= now.date().day();
 			hour	= now.time_of_day().hours();
@@ -159,7 +160,8 @@ namespace synthese
 
 				if(result.size()>0)
  				{
- 					num_stop = boost::lexical_cast<unsigned int>(*result.begin());
+				//	num_stop = boost::lexical_cast<unsigned int>(*result.begin());
+				//	num_stop = 267;
  				}
 			}
 			else
@@ -168,10 +170,10 @@ namespace synthese
 			}
 
 			//TODO: lower priority, but we need to get those too
-			num_driver	= 1;	// TODO: low priority
-			num_park	= 1;	// TODO: low priority
-			etat_expl	= 1;	// TODO: low priority
-			num_journey	= 1;	// Don't care: course NOT USED in VIX code.
+			//num_driver	= 1;	// TODO: low priority
+			//num_park	= 799;	// TODO: low priority
+			//etat_expl	= 1;	// TODO: low priority
+			//num_journey	= 1;	// Don't care: course NOT USED in VIX code.
 
 			bUpdated=true;
 		}
@@ -191,9 +193,7 @@ namespace synthese
 			return 0;
 		}
 
-		int o = 0;
-		buf[o] = INT_SURV_DATA_SIZE;
-		o+=1;
+		int o = 1;
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, type);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, year);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, month);
@@ -227,9 +227,11 @@ namespace synthese
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, (num_stop>>8) & 0xFF);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, num_stop & 0xFF);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, direction);
+		buf[0] = o - 1;
 
 		/*DEBUG(JD)*/
-		printf("num_driver=%d, num_park=%d, num_service=%d, num_journey=%d, num_stop=%d, direction=%d\n", num_driver, num_park, num_service, num_journey, num_stop, direction);
+		util::Log::GetInstance().debug(boost::str(boost::format("ValidatorVIXv6000DevicePoller: num_driver=%d, num_park=%d, num_service=%d, num_journey=%d, num_stop=%d, num_line=%d, direction=%c")
+									 % num_driver % num_park % num_service % num_journey % num_stop % num_line % direction));
 		/*DEBUG(JD)*/
 
 		return o;

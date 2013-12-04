@@ -118,7 +118,7 @@ namespace synthese
 				CHECKFORCOM com = srt.CheckForCommunication();
 				if(com==POLLING)
 				{
-					//util::Log::GetInstance().debug("got polled from master at our address\n");
+					util::Log::GetInstance().debug("got polled from master at our address\n");
 
 					int iToBeWritten = 0;
 					// check if we have to send something

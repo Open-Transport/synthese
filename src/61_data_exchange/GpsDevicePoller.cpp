@@ -129,15 +129,15 @@ namespace synthese
 						this_thread::sleep(seconds(30));
 					}
 				}
-lon=6.921083;
-lat=47.552028;
-//				if(bGpsOk){
+lon=0;
+lat=0;
+				if(bGpsOk){
 					// We have a valid gps socket opened. Use it.
-//					if(g.updateFromGps()){
+					if(g.updateFromGps()){
 						//TODO: eventually check value coherency.
 						double lonOld=lon;
 						double latOld=lat;
-//						g.getLatLong(lon,lat);
+						g.getLatLong(lon,lat);
 /*DEBUG(JD)
 						// GPS position has changed. check if we need to change the stop point
 						if(lon!=lonOld || lat!=latOld)
@@ -204,9 +204,9 @@ DEBUG(JD)*/
 							VehicleModule::GetCurrentVehiclePosition().setGeometry(
 								projectedPoint
 							);
-//						}
+						}
 
-//					}
+					}
 					//TODO Should we retry to reconnect if updateFromGps fail too much?
 				}
 
