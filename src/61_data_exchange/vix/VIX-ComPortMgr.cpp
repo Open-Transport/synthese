@@ -9,7 +9,7 @@
 
 #include <boost/format.hpp>
 // cool info at http://ckp.made-it.com/bisync.html
-#define _DEBUG_ME 1
+//#define _DEBUG_ME 1
 
 namespace synthese
 {
