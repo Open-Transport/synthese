@@ -97,6 +97,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE = "gleis_has_one_stop_per_line";
 		const string HafasFileFormat::Importer_::PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME = "complete_empty_stop_area_name";
 		const string HafasFileFormat::Importer_::PARAMETER_NO_GLEIS_FILE = "no_gleis_file";
+		const string HafasFileFormat::Importer_::PARAMETER_TRY_TO_READ_LINE_SHORT_NAME = "try_to_read_line_short_name";
 	}
 
 	namespace impex
@@ -760,6 +761,13 @@ namespace synthese
 							itZug->transportModeCode = _getField(3, 3);
 						}
 					}
+					else if(_getField(0, 2) == "*L" && _tryToReadShortName) // Short name of the line
+					{
+						if(itZug != _zugs.end())
+						{
+							itZug->lineShortName = _getField(3, 10);
+						}
+					}
 					else if(_getField(0, 1) != "*") // Stop
 					{
 						// Stop code
@@ -917,6 +925,9 @@ namespace synthese
 			// No gleis file
 			pm.insert(PARAMETER_NO_GLEIS_FILE, _noGleisFile);
 
+			// No gleis file
+			pm.insert(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, _tryToReadShortName);
+
 			return pm;
 		}
 
@@ -988,7 +999,10 @@ namespace synthese
 			_complete_empty_stop_area_name = pm.getDefault<string>(PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME);
 
 			// No gleis file
-			_noGleisFile = pm.getDefault<bool>(PARAMETER_NO_GLEIS_FILE);
+			_noGleisFile = pm.getDefault<bool>(PARAMETER_NO_GLEIS_FILE, false);
+			
+			// Line short name
+			_tryToReadShortName = pm.getDefault<bool>(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, false);
 		}
 
 
@@ -1412,6 +1426,10 @@ namespace synthese
 						line->setName(zug.lineNumber);
 					}
 				}
+
+				// Update the short name if possible
+				if (_tryToReadShortName && !zug.lineShortName.empty())
+					line->setShortName(zug.lineShortName);
 
 				// Wayback
 				int numericServiceNumber(0);

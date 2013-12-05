@@ -137,6 +137,7 @@ namespace synthese
 				static const std::string PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE;
 				static const std::string PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME;
 				static const std::string PARAMETER_NO_GLEIS_FILE;
+				static const std::string PARAMETER_TRY_TO_READ_LINE_SHORT_NAME;
 
 			private:
 				struct LineFilter
@@ -170,6 +171,7 @@ namespace synthese
 					bool _gleisHasOneStopPerLine;
 					std::string _complete_empty_stop_area_name;
 					bool _noGleisFile;
+					bool _tryToReadShortName;
 				//@}
 
 				const LineFilter* _lineIsIncluded(const std::string& lineNumber) const;
@@ -206,6 +208,7 @@ namespace synthese
 
 					std::string number;
 					std::string lineNumber;
+					std::string lineShortName;
 					size_t version;
 					std::vector<CalendarUse> calendars;
 					std::string transportModeCode;
