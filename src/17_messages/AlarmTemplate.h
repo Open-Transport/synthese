@@ -83,6 +83,18 @@ namespace synthese
 			/// Scenario getter.
 			/// @return the scenario
 			const ScenarioTemplate* getScenario() const;
+
+			void toParametersMap(
+				util::ParametersMap& pm,
+				bool withAdditionalParameters,
+				boost::logic::tribool withFiles,
+				std::string prefix
+			) const;
+
+			bool loadFromRecord(
+				const Record& record,
+				util::Env& env
+			);
 		};
 }	}
 

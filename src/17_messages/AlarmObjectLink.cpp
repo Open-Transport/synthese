@@ -21,15 +21,23 @@
 */
 
 #include "AlarmObjectLink.h"
-#include "Registry.h"
-#include "Factory.h"
+
+#include "Alarm.h"
 #include "AlarmRecipient.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "AlarmTableSync.h"
+#include "Factory.h"
+#include "Registry.h"
+#include "SentAlarm.h"
 
 #include <boost/foreach.hpp>
+
+using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace db;
 
 	namespace util
 	{
@@ -52,6 +60,122 @@ namespace synthese
 			_recipient.reset(
 				Factory<AlarmRecipient>::create(key)
 			);
+		}
+
+		void AlarmObjectLink::toParametersMap( util::ParametersMap& pm, bool withScenario, boost::logic::tribool withRecipients /*= false */, std::string prefix /*= std::string()*/ ) const
+		{
+			// Inter synthese package
+			pm.insert(prefix + TABLE_COL_ID, getKey());
+			pm.insert(
+				prefix + AlarmObjectLinkTableSync::COL_RECIPIENT_KEY,
+				getRecipient()->getFactoryKey()
+			);
+			pm.insert(
+				prefix + AlarmObjectLinkTableSync::COL_OBJECT_ID,
+				getObjectId()
+			);
+			pm.insert(
+				prefix + AlarmObjectLinkTableSync::COL_ALARM_ID,
+				getAlarm() ? getAlarm()->getKey() : RegistryKeyType(0)
+			);
+			pm.insert(
+				prefix + AlarmObjectLinkTableSync::COL_PARAMETER,
+				getParameter()
+			);
+		}
+
+		bool AlarmObjectLink::loadFromRecord(
+			const Record& record,
+			util::Env& env
+		){
+			bool result(false);
+
+			// Recipient
+			if(record.isDefined(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY))
+			{
+				string value(
+					record.get<string>(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY)
+				);
+				if(value != getRecipient()->getFactoryKey())
+				{
+					setRecipient(value);
+					result = true;
+				}
+			}
+
+			// Parameter
+			if(record.isDefined(AlarmObjectLinkTableSync::COL_PARAMETER))
+			{
+				string value(
+					record.get<string>(AlarmObjectLinkTableSync::COL_PARAMETER)
+				);
+				if(value != getParameter())
+				{
+					setParameter(value);
+					result = true;
+				}
+			}
+
+			// Object id
+			if(record.isDefined(AlarmObjectLinkTableSync::COL_OBJECT_ID))
+			{
+				RegistryKeyType value(
+					record.getDefault<RegistryKeyType>(
+						AlarmObjectLinkTableSync::COL_OBJECT_ID,
+						0
+				)	);
+				if(value != getObjectId())
+				{
+					setObjectId(value);
+					result = true;
+				}
+			}
+
+			// Alarm
+			if(record.isDefined(AlarmObjectLinkTableSync::COL_ALARM_ID))
+			{
+				Alarm* value(NULL);
+				try
+				{
+					RegistryKeyType alarmId(
+						record.getDefault<RegistryKeyType>(
+							AlarmObjectLinkTableSync::COL_ALARM_ID,
+							0
+					)	);
+					if(decodeTableId(alarmId) == AlarmTableSync::TABLE.ID)
+					{
+						value = AlarmTableSync::GetEditable(alarmId, env).get();
+					}
+				}
+				catch(ObjectNotFoundException<Alarm>&)
+				{
+					Log::GetInstance().warn("No such alarm in alarm object link "+ lexical_cast<string>(getKey()));
+				}
+
+				if(value != getAlarm())
+				{
+					if(value)
+					{
+						setAlarm(value);
+						getAlarm()->addLinkedObject(*this);
+						SentAlarm* sentAlarm(
+							dynamic_cast<SentAlarm*>(
+								value
+						)	);
+						if(sentAlarm)
+						{
+							sentAlarm->clearBroadcastPointsCache();
+						}
+					}
+					else
+					{
+						setAlarm(NULL);
+					}
+					result = true;
+				}
+			}
+
+			return result;
 		}
 }	}
 

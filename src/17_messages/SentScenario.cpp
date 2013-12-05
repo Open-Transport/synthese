@@ -22,13 +22,20 @@
 
 #include "SentScenario.h"
 
+#include "DataSourceLinksField.hpp"
+#include "DBConstants.h"
+#include "ImportableTableSync.hpp"
 #include "MessagesSection.hpp"
+#include "MessagesSectionTableSync.hpp"
 #include "ScenarioCalendar.hpp"
+#include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
 #include "SentAlarm.h"
 #include "ParametersMap.h"
 #include "Registry.h"
 #include "Request.h"
+
+#include <sstream>
 
 using namespace boost;
 using namespace std;
@@ -36,8 +43,10 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace server;
 	using namespace util;
+	using namespace impex;
 
 	namespace messages
 	{
@@ -226,7 +235,7 @@ namespace synthese
 			{
 				// Calendar export
 				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
-				calendar->toParametersMap(*calendarPM, true);
+				calendar->toParametersMap(*calendarPM, true, false, string());
 				pm.insert(TAG_CALENDAR, calendarPM);
 
 				// Messages loop
@@ -247,7 +256,7 @@ namespace synthese
 
 					// Message export
 					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
-					alarm->toParametersMap(*messagePM, false, string(), true);
+					alarm->toParametersMap(*messagePM, false, true, string());
 					calendarPM->insert(TAG_MESSAGE, messagePM);
 				}
 			}
@@ -274,7 +283,7 @@ namespace synthese
 
 					// Message export
 					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
-					alarm->toParametersMap(*messagePM, false, string(), true);
+					alarm->toParametersMap(*messagePM, false, true, string());
 					calendarPM->insert(TAG_MESSAGE, messagePM);
 				}
 			}
@@ -313,5 +322,315 @@ namespace synthese
 
 			// active
 			pm.insert(DATA_ACTIVE, getIsEnabled());
+		}
+
+		void SentScenario::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles,
+			std::string prefix /*= std::string() */
+		) const	{
+			// Inter synthese package
+			pm.insert(prefix + TABLE_COL_ID, getKey());
+			pm.insert(
+				prefix + ScenarioTableSync::COL_IS_TEMPLATE,
+				false
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_ENABLED,
+				getIsEnabled()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_NAME,
+				getName()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_PERIODSTART,
+				getPeriodStart()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_PERIODEND,
+				getPeriodEnd()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_FOLDER_ID,
+				RegistryKeyType(0)
+			);
+			stringstream vars;
+			const SentScenario::VariablesMap& variables(getVariables());
+			bool firstVar(true);
+			BOOST_FOREACH(const SentScenario::VariablesMap::value_type& variable, variables)
+			{
+				if(!firstVar)
+				{
+					vars << ScenarioTableSync::VARIABLES_SEPARATOR;
+				}
+				else
+				{
+					firstVar = false;
+				}
+				vars << variable.first << ScenarioTableSync::VARIABLES_OPERATOR << variable.second;
+			}
+			pm.insert(
+				prefix + ScenarioTableSync::COL_VARIABLES,
+				vars.str()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_TEMPLATE,
+				getTemplate() ? getTemplate()->getKey() : RegistryKeyType(0)
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_DATASOURCE_LINKS,
+				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
+			);
+			bool first(true);
+			stringstream sectionsStr;
+			BOOST_FOREACH(const MessagesSection* section, this->getSections())
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					sectionsStr << ScenarioTableSync::SECTIONS_SEPARATOR;
+				}
+				sectionsStr << section->getKey();
+			}
+			pm.insert(
+				prefix + ScenarioTableSync::COL_SECTIONS,
+				sectionsStr.str()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_EVENT_START,
+				getEventStart()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_EVENT_END,
+				getEventEnd()
+			);
+			pm.insert(
+				prefix + ScenarioTableSync::COL_ARCHIVED,
+				getArchived()
+			);
+		}
+
+		bool SentScenario::loadFromRecord(
+			const Record& record,
+			util::Env& env
+		){
+			bool result(false);
+
+			// Enabled
+			if(record.isDefined(ScenarioTableSync::COL_ENABLED))
+			{
+				bool value(
+					record.get<bool>(ScenarioTableSync::COL_ENABLED)
+				);
+				if(value != getIsEnabled())
+				{
+					setIsEnabled(value);
+					result = true;
+				}
+			}
+
+			// Name
+			if(record.isDefined(ScenarioTableSync::COL_NAME))
+			{
+				string value(
+					record.get<string>(ScenarioTableSync::COL_NAME)
+				);
+				if(value != getName())
+				{
+					setName(value);
+					result = true;
+				}
+			}
+
+			// Period start
+			if(record.isDefined(ScenarioTableSync::COL_PERIODSTART))
+			{
+				string strValue(
+					record.get<string>(ScenarioTableSync::COL_PERIODSTART)
+				);
+				if (!strValue.empty())
+				{
+					ptime value = time_from_string(strValue);
+					if(value != getPeriodStart())
+					{
+						setPeriodStart(value);
+						result = true;
+					}
+				}
+			}
+
+			// Period end
+			if(record.isDefined(ScenarioTableSync::COL_PERIODEND))
+			{
+				string strValue(
+					record.get<string>(ScenarioTableSync::COL_PERIODEND)
+				);
+				if (!strValue.empty())
+				{
+					ptime value = time_from_string(strValue);
+					if(value != getPeriodEnd())
+					{
+						setPeriodEnd(value);
+						result = true;
+					}
+				}
+			}
+
+			// Variables
+			const string txtVariables(record.get<string>(ScenarioTableSync::COL_VARIABLES));
+			SentScenario::VariablesMap variables;
+			vector<string> tokens;
+			split(tokens, txtVariables, is_any_of(ScenarioTableSync::VARIABLES_SEPARATOR));
+			BOOST_FOREACH(const string& token, tokens)
+			{
+				if(token.empty()) continue;
+
+				typedef split_iterator<string::const_iterator> string_split_iterator;
+				string_split_iterator it(
+					make_split_iterator(
+						token,
+						first_finder(ScenarioTableSync::VARIABLES_OPERATOR, is_iequal())
+				)	);
+				string code = copy_range<string>(*it);
+				++it;
+				if (it == string_split_iterator())
+				{
+					Log::GetInstance().warn("Bad value for variable definition on scenario table");
+					continue;
+				}
+				variables.insert(make_pair(code, copy_range<string>(*it)));
+			}
+			setVariables(variables);
+
+			//Template
+			if(record.isDefined(ScenarioTableSync::COL_TEMPLATE))
+			{
+				ScenarioTemplate* value(NULL);
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(
+						ScenarioTableSync::COL_TEMPLATE,
+						0
+				)	);
+				if(id > 0)
+				{
+					try
+					{
+						value = static_cast<ScenarioTemplate*>(ScenarioTableSync::GetEditable(id, env).get());
+					}
+					catch(ObjectNotFoundException<ScenarioTemplate>&)
+					{
+						Log::GetInstance().warn("No such scenario template in sent scenario "+ lexical_cast<string>(getKey()));
+					}
+				}
+				if(value != getTemplate())
+				{
+					setTemplate(value);
+					result = true;
+				}
+			}
+
+			// Sections
+			const string txtSections(record.get<string>(ScenarioTableSync::COL_SECTIONS));
+			Scenario::Sections sections;
+			if(!txtSections.empty())
+			{
+				vector<string> tokens;
+				split(tokens, txtSections, is_any_of(ScenarioTableSync::SECTIONS_SEPARATOR));
+				BOOST_FOREACH(const string& token, tokens)
+				{
+					try
+					{
+						sections.insert(
+							MessagesSectionTableSync::Get(
+								lexical_cast<RegistryKeyType>(token),
+								env
+							).get()
+						);
+					}
+					catch (bad_lexical_cast&)
+					{
+					}
+					catch(ObjectNotFoundException<MessagesSection>&)
+					{
+					}
+				}
+			}
+			setSections(sections);
+
+			// Event start
+			if(record.isDefined(ScenarioTableSync::COL_EVENT_START))
+			{
+				string strValue(
+					record.get<string>(ScenarioTableSync::COL_EVENT_START)
+				);
+				if (!strValue.empty())
+				{
+					ptime value = time_from_string(strValue);
+					if(value != getEventStart())
+					{
+						setEventStart(value);
+						result = true;
+					}
+				}
+			}
+
+			// Event end
+			if(record.isDefined(ScenarioTableSync::COL_EVENT_END))
+			{
+				string strValue(
+					record.get<string>(ScenarioTableSync::COL_EVENT_END)
+				);
+				if (!strValue.empty())
+				{
+					ptime value = time_from_string(strValue);
+					if(value != getEventEnd())
+					{
+						setEventEnd(value);
+						result = true;
+					}
+				}
+			}
+
+			// Archived
+			if(record.isDefined(ScenarioTableSync::COL_ARCHIVED))
+			{
+				bool value(
+					record.get<bool>(ScenarioTableSync::COL_ARCHIVED)
+				);
+				if(value != getArchived())
+				{
+					setArchived(value);
+					result = true;
+				}
+			}
+
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+			if(record.isDefined(ScenarioTableSync::COL_DATASOURCE_LINKS))
+			{
+				Importable::DataSourceLinks value(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						record.get<string>(ScenarioTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				if(value != getDataSourceLinks())
+				{
+					if(&env == &Env::GetOfficialEnv())
+					{
+						setDataSourceLinksWithRegistration(value);
+					}
+					else
+					{
+						setDataSourceLinksWithoutRegistration(value);
+					}
+					result = true;
+				}
+			}
+
+			return result;
 		}
 }	}

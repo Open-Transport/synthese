@@ -22,10 +22,16 @@
 
 #include "Scenario.h"
 
+#include "Alarm.h"
+#include "MessagesSection.hpp"
+#include "ScenarioCalendar.hpp"
+
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 
 	namespace util
@@ -58,5 +64,25 @@ namespace synthese
 		void Scenario::removeMessage( const Alarm& message ) const
 		{
 			_messages.erase(&message);
+		}
+
+		synthese::SubObjects Scenario::getSubObjects() const
+		{
+			SubObjects r;
+			BOOST_FOREACH(const Sections::value_type& section, getSections())
+			{
+				r.push_back(const_cast<MessagesSection*>(section));
+			}
+
+			BOOST_FOREACH(const ScenarioCalendars::value_type& scenarioCalendar, getCalendars())
+			{
+				r.push_back(const_cast<ScenarioCalendar*>(scenarioCalendar));
+			}
+
+			BOOST_FOREACH(const Alarm* message, getMessages())
+			{
+				r.push_back(const_cast<Alarm*>(message));
+			}
+			return r;
 		}
 }	}
