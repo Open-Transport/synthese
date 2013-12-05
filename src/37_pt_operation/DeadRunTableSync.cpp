@@ -172,11 +172,18 @@ namespace synthese
 			}
 
 			// Schedules
-			SchedulesBasedService::SchedulesPair value(
-				SchedulesBasedService::DecodeSchedules(
-					rows->get<string>(DeadRunTableSync::COL_SCHEDULES)
-			)	);
-			object->setDataSchedules(value.first, value.second);
+			try
+			{
+				SchedulesBasedService::SchedulesPair value(
+					SchedulesBasedService::DecodeSchedules(
+						rows->get<string>(DeadRunTableSync::COL_SCHEDULES)
+				)	);
+				object->setDataSchedules(value.first, value.second);
+			}
+			catch(BadSchedulesException&)
+			{
+				Log::GetInstance().warn("Bad schedules in the dead run "+ lexical_cast<string>(object->getKey()));
+			}
 
 			// Dates
 			object->setFromSerializedString(rows->getText(DeadRunTableSync::COL_DATES));

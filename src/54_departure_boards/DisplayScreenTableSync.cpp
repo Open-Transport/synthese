@@ -229,7 +229,7 @@ namespace synthese
 				catch(ObjectNotFoundException<StopArea>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : location "+ lexical_cast<string>(placeId) + " not found"
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen "+ lexical_cast<string>(object->getKey()) +" : location "+ lexical_cast<string>(placeId) + " not found"
 					);
 				}
 
@@ -246,7 +246,7 @@ namespace synthese
 				catch(ObjectNotFoundException<StopPoint>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : stop point location "+ lexical_cast<string>(stopId) + " not found"
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen "+ lexical_cast<string>(object->getKey()) +" : stop point location "+ lexical_cast<string>(stopId) + " not found"
 					);
 				}
 
@@ -310,7 +310,7 @@ namespace synthese
 				catch(ObjectNotFoundException<DisplayType>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : type " +
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen "+ lexical_cast<string>(object->getKey()) +" : type " +
 						lexical_cast<string>(typeId) + " not found"
 					);
 				}
@@ -331,7 +331,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopPoint>&)
 					{
-						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS +" "+ lexical_cast<string>(object->getKey()));
 					}
 				}
 				object->setStops(pstops);
@@ -346,7 +346,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS +" "+ lexical_cast<string>(object->getKey()), e);
 					}
 				}
 
@@ -360,7 +360,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS +"  "+ lexical_cast<string>(object->getKey()), e);
 					}
 				}
 
@@ -374,7 +374,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS +"  "+ lexical_cast<string>(object->getKey()), e);
 				}	}
 
 				// Transfers
@@ -397,7 +397,7 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
-						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
+						Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS +"  "+ lexical_cast<string>(object->getKey()), e);
 					}
 				}
 
