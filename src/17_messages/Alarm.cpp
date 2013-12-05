@@ -118,7 +118,7 @@ namespace synthese
 		void Alarm::toParametersMapAlarm(
 			util::ParametersMap& pm,
 			bool withScenario,
-			bool withRecipients,
+			boost::logic::tribool withRecipients,
 			std::string prefix /*= std::string() */
 		) const	{
 			pm.insert(prefix + "roid", getKey()); // Backward compatibility, deprecated
