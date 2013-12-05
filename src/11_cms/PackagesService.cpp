@@ -409,9 +409,13 @@ namespace synthese
 
 								// Action
 								optional<string> packageURL("http://" + host +":" + port + "/"+ packageNode.second.get(Code::FIELD.name, string()));
-								installRequest.getFunction()->setPackageToInstall(packageURL);;
-								p << t.col() << HTMLModule::getHTMLLink(installRequest.getURL(), "Installer", "Etes-vous sûr de vouloir installer le paquet "+ packageName);
-							}	
+								installRequest.getFunction()->setPackageToInstall(packageURL);
+								p << t.col() << HTMLModule::getHTMLLink(
+									installRequest.getURL(),
+									installed ? "Mettre à jour" : "Installer",
+									"Êtes-vous sûr de vouloir " + string(installed ? "mettre à jour" : "installer") + " le paquet " + packageName
+								);
+							}
 
 							p << t.close();
 						}
