@@ -765,7 +765,7 @@ namespace synthese
 					{
 						if(itZug != _zugs.end())
 						{
-							itZug->lineShortName = _getField(3, 10);
+							itZug->lineShortName = _getField(3, 8);
 						}
 					}
 					else if(_getField(0, 1) != "*") // Stop
