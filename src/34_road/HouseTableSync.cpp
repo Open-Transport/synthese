@@ -123,13 +123,15 @@ namespace synthese
 				boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(roadId, env));
 				object->setRoadChunkFromRoadPlace(roadPlace);
 			}
-			catch(ObjectNotFoundException<RoadPlace>&)
+			catch(ObjectNotFoundException<RoadPlace>& e)
 			{
 				Log::GetInstance().warn("No such road place "+ lexical_cast<string>(roadId) +" in house "+ lexical_cast<string>(object->getKey()));
+				throw e;
 			}
-			catch(EdgeProjector<MainRoadChunk*>::NotFoundException&)
+			catch(EdgeProjector<MainRoadChunk*>::NotFoundException& e)
 			{
 				Log::GetInstance().warn("No chunk was found near the house "+ lexical_cast<string>(object->getKey() +" in the road place "+ lexical_cast<string>(roadId)));
+				throw e;
 			}
 		}
 
