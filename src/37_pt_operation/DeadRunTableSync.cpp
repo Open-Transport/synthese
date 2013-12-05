@@ -180,7 +180,7 @@ namespace synthese
 				)	);
 				object->setDataSchedules(value.first, value.second);
 			}
-			catch(BadSchedulesException&)
+			catch(SchedulesBasedService::BadSchedulesException&)
 			{
 				Log::GetInstance().warn("Bad schedules in the dead run "+ lexical_cast<string>(object->getKey()));
 			}
