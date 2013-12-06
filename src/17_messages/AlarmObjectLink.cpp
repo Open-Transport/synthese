@@ -96,7 +96,8 @@ namespace synthese
 				string value(
 					record.get<string>(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY)
 				);
-				if(value != getRecipient()->getFactoryKey())
+				if((getRecipient() && value != getRecipient()->getFactoryKey()) ||
+					(!getRecipient() && !value.empty()))
 				{
 					setRecipient(value);
 					result = true;
