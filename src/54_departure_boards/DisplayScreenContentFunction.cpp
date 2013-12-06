@@ -1251,10 +1251,21 @@ namespace synthese
 
 							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
 							{
-								LineDestinationKey filter = _lineDestinationFilter.find(realTimeService.stop.get())->second;
-								if(filter.first && filter.first != realTimeService.commercialLine.get())
-									continue;
-								else if(filter.second && filter.second != realTimeService.destination)
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+									displayDeparture = goodLine & goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
 									continue;
 							}
 
@@ -1376,10 +1387,21 @@ namespace synthese
 
 							if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
 							{
-								LineDestinationKey filter = _lineDestinationFilter.find(stop)->second;
-								if(filter.first && filter.first != commercialLine)
-									continue;
-								else if(filter.second && filter.second != destination)
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(stop);
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == commercialLine));
+									bool goodDest(!it->second.second || (it->second.second == destination));
+									displayDeparture = goodLine && goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
 									continue;
 							}
 
@@ -1714,6 +1736,26 @@ namespace synthese
 							if(!realTimeService.commercialLine)
 								continue;
 
+							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
+							{
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+									displayDeparture = goodLine && goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
+									continue;
+							}
+
 							if(result->getInfo("fiable") == "F")
 								realTimeService.realTime = true;
 
@@ -1797,11 +1839,33 @@ namespace synthese
 							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 								continue;
 
+							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+							const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
+
+							if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
+							{
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(stop);
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == commercialLine));
+									bool goodDest(!it->second.second || (it->second.second == destination));
+									displayDeparture = goodLine && goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
+									continue;
+							}
+
 							//If a lineid arg was passed : only one line will be displayed
 							if(_lineToDisplay)
 							{
-								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
 								if(commercialLine->getKey()!=(*_lineToDisplay))
 									continue;
 							}
