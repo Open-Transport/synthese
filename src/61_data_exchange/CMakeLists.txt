@@ -10,8 +10,6 @@ set(data_exchange_SRCS
   DataExchangeModuleRegister.cpp
   GTFSFileFormat.cpp
   GTFSFileFormat.hpp
-  GpsFileFormat.cpp
-  GpsFileFormat.h
   GpsDevicePoller.cpp
   GpsDevicePoller.hpp
   HafasFileFormat.cpp

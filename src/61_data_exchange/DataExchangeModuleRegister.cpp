@@ -28,7 +28,6 @@
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
 #include "RoadShapeFileFormat.hpp"
-#include "GpsFileFormat.h"
 
 #include "NCEStatusService.hpp"
 #include "VDVSubscriptionService.hpp"
@@ -98,7 +97,6 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
-	synthese::data_exchange::GpsFileFormat::integrate();
 
 	synthese::data_exchange::ValidatorVIXv6000DevicePoller::integrate();
 	synthese::data_exchange::GpsDevicePoller::integrate();
