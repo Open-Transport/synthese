@@ -10,8 +10,8 @@ set(data_exchange_SRCS
   DataExchangeModuleRegister.cpp
   GTFSFileFormat.cpp
   GTFSFileFormat.hpp
-  GpsDevicePoller.cpp
-  GpsDevicePoller.hpp
+  GPSdFileFormat.cpp
+  GPSdFileFormat.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
   HastusCSVFileFormat.cpp
@@ -72,8 +72,8 @@ set(data_exchange_SRCS
   StopsShapeFileFormat.hpp
   TridentFileFormat.cpp
   TridentFileFormat.h
-  ValidatorVIXv6000DevicePoller.cpp
-  ValidatorVIXv6000DevicePoller.hpp
+  VIXv6000FileFormat.cpp
+  VIXv6000FileFormat.hpp
   VDVSubscriptionService.cpp
   VDVSubscriptionService.hpp
   VDVClient.cpp
