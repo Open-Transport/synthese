@@ -1,6 +1,6 @@
 
-/** ValidatorVIXv6000Poller class header.
-	@file ValidatorVIXv6000Poller.hpp
+/** VixV6000FileFormat class header.
+	@file VixV6000FileFormat.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
-#define SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
+#ifndef SYNTHESE_pt_VixV6000FileFormat_hpp__
+#define SYNTHESE_pt_VixV6000FileFormat_hpp__
 
 #include "FileFormatTemplate.h"
 #include "NoImportPolicy.hpp"
@@ -41,16 +41,16 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// @author RCS
 		/// @ingroup m61
-		class ValidatorVIXv6000DevicePoller:
-			public impex::FileFormatTemplate<ValidatorVIXv6000DevicePoller>
+		class VixV6000FileFormat:
+			public impex::FileFormatTemplate<VixV6000FileFormat>
 		{
 		public:
-			typedef impex::NoImportPolicy<ValidatorVIXv6000DevicePoller> Importer_;
+			typedef impex::NoImportPolicy<VixV6000FileFormat> Importer_;
 
 
 			//////////////////////////////////////////////////////////////////////////
 			class Exporter_:
-				public impex::PermanentThreadExporterTemplate<ValidatorVIXv6000DevicePoller>
+				public impex::PermanentThreadExporterTemplate<VixV6000FileFormat>
 			{
 			public:
 				static const std::string PARAMETER_COM_PORT_NUMBER;
@@ -110,5 +110,5 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_pt_ValidatorVIXv6000Poller_hpp__
+#endif // SYNTHESE_pt_VixV6000FileFormat_hpp__
 

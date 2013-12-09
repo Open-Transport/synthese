@@ -1,6 +1,6 @@
 
-/** GpsDevicePoller class implementation.
-	@file GpsDevicePoller.cpp
+/** GPSdFileFormat class implementation.
+	@file GPSdFileFormat.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "GpsDevicePoller.hpp"
+#include "GPSdFileFormat.hpp"
 
 #include "Env.h"
 #include "Exception.h"
@@ -57,24 +57,24 @@ namespace synthese
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<FileFormat, GpsDevicePoller>::FACTORY_KEY = "gpsd";
+		const string FactorableTemplate<FileFormat, GPSdFileFormat>::FACTORY_KEY = "gpsd";
 	}
 
 	namespace data_exchange
 	{
-		const std::string GpsDevicePoller::Importer_::PARAMETER_ADDRESS = "address";
-		const std::string GpsDevicePoller::Importer_::PARAMETER_PORT = "port";
+		const std::string GPSdFileFormat::Importer_::PARAMETER_ADDRESS = "address";
+		const std::string GPSdFileFormat::Importer_::PARAMETER_PORT = "port";
 
 
 
-		GpsDevicePoller::Importer_::Importer_(
+		GPSdFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const Import& import,
 			impex::ImportLogLevel minLogLevel,
 			const std::string& logPath,
 			boost::optional<std::ostream&> outputStream,
 			util::ParametersMap& pm
-		):	PermanentThreadImporterTemplate<GpsDevicePoller>(env, import, minLogLevel, logPath, outputStream, pm),
+		):	PermanentThreadImporterTemplate<GPSdFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			_gpsStatus(OFFLINE),
 			_socket(_ios)
@@ -82,7 +82,7 @@ namespace synthese
 
 
 
-		util::ParametersMap GpsDevicePoller::Importer_::getParametersMap() const
+		util::ParametersMap GPSdFileFormat::Importer_::getParametersMap() const
 		{
 			ParametersMap map;
 
@@ -94,7 +94,7 @@ namespace synthese
 
 
 
-		void GpsDevicePoller::Importer_::setFromParametersMap(
+		void GPSdFileFormat::Importer_::setFromParametersMap(
 			const util::ParametersMap& map,
 			bool doImport
 		){
@@ -104,7 +104,7 @@ namespace synthese
 
 
 
-		void GpsDevicePoller::Importer_::_onStart() const
+		void GPSdFileFormat::Importer_::_onStart() const
 		{
 			_onStop();
 			_gpsStatus = WAITING;
@@ -125,7 +125,7 @@ namespace synthese
 				}
 				else
 				{
-					_logWarning("GpsDevicePoller failed to open GPS connection socket");
+					_logWarning("GPSdFileFormat failed to open GPS connection socket");
 				}
 			}
 			catch (std::exception const& e)
@@ -136,7 +136,7 @@ namespace synthese
 
 
 
-		void GpsDevicePoller::Importer_::_loop() const
+		void GPSdFileFormat::Importer_::_loop() const
 		{
 			if(_gpsStatus != ONLINE)
 			{
@@ -246,7 +246,7 @@ namespace synthese
 
 
 
-		boost::posix_time::time_duration GpsDevicePoller::Importer_::_getWaitingTime() const
+		boost::posix_time::time_duration GPSdFileFormat::Importer_::_getWaitingTime() const
 		{
 			if(_gpsStatus == WAITING)
 			{
@@ -258,7 +258,7 @@ namespace synthese
 
 
 
-		void GpsDevicePoller::Importer_::_onStop() const
+		void GPSdFileFormat::Importer_::_onStop() const
 		{
 			_socket.close();
 			_gpsStatus = OFFLINE;
@@ -266,7 +266,7 @@ namespace synthese
 
 
 
-		void GpsDevicePoller::Importer_::_updateFromGps(
+		void GPSdFileFormat::Importer_::_updateFromGps(
 			optional<ptree>& result
 		) const {
 			try
@@ -292,7 +292,7 @@ namespace synthese
 
 
 
-		bool GpsDevicePoller::Importer_::_loadPositionJSON(
+		bool GPSdFileFormat::Importer_::_loadPositionJSON(
 			boost::asio::streambuf &ss,
 			optional<ptree>& result
 		) const {

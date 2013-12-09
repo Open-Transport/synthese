@@ -1,6 +1,6 @@
 
-/** GpsDevicePoller class header.
-	@file GpsDevicePoller.hpp
+/** GPSdFileFormat class header.
+	@file GPSdFileFormat.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_pt_GpsDevicePoller_hpp__
-#define SYNTHESE_pt_GpsDevicePoller_hpp__
+#ifndef SYNTHESE_pt_GPSdFileFormat_hpp__
+#define SYNTHESE_pt_GPSdFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
 #include "NoExportPolicy.hpp"
@@ -37,8 +37,8 @@ namespace synthese
 {
 	namespace data_exchange
 	{
-		class GpsDevicePoller:
-			public impex::FileFormatTemplate<GpsDevicePoller>
+		class GPSdFileFormat:
+			public impex::FileFormatTemplate<GPSdFileFormat>
 		{
 
 		public:
@@ -49,7 +49,7 @@ namespace synthese
 			/// @author RCS
 			/// @ingroup m61
 			class Importer_:
-				public impex::PermanentThreadImporterTemplate<GpsDevicePoller>
+				public impex::PermanentThreadImporterTemplate<GPSdFileFormat>
 			{
 			public:
 				static const std::string PARAMETER_ADDRESS;
@@ -121,9 +121,9 @@ namespace synthese
 				);
 			};
 
-			typedef impex::NoExportPolicy<GpsDevicePoller> Exporter_;
+			typedef impex::NoExportPolicy<GPSdFileFormat> Exporter_;
 		};
 }	}
 
-#endif // SYNTHESE_pt_GpsDevicePoller_hpp__
+#endif // SYNTHESE_pt_GPSdFileFormat_hpp__
 

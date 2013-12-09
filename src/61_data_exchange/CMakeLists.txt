@@ -72,8 +72,6 @@ set(data_exchange_SRCS
   StopsShapeFileFormat.hpp
   TridentFileFormat.cpp
   TridentFileFormat.h
-  VIXv6000FileFormat.cpp
-  VIXv6000FileFormat.hpp
   VDVSubscriptionService.cpp
   VDVSubscriptionService.hpp
   VDVClient.cpp
@@ -100,6 +98,8 @@ set(data_exchange_SRCS
   VDVServerTableSync.hpp
   VDVStatusService.cpp
   VDVStatusService.hpp
+  VixV6000FileFormat.cpp
+  VixV6000FileFormat.hpp
   vix/VIX-BSC-defines.hpp
   vix/VIX-CIntSurvMsg.cpp
   vix/VIX-CIntSurvMsg.hpp

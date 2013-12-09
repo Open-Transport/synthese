@@ -1,6 +1,6 @@
 
-/** ValidatorVIXv6000DevicePoller class implementation.
-	@file ValidatorVIXv6000DevicePoller.cpp
+/** VixV6000FileFormat class implementation.
+	@file VixV6000FileFormat.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ValidatorVIXv6000DevicePoller.hpp"
+#include "VixV6000FileFormat.hpp"
 
 #include "Log.h"
 #include "ServerModule.h"
@@ -51,20 +51,20 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat, ValidatorVIXv6000DevicePoller>::FACTORY_KEY = "ValidatorVIXv6000Device_Poller";
+		template<> const string FactorableTemplate<FileFormat, VixV6000FileFormat>::FACTORY_KEY = "vix_v6000";
 	}
 
 	namespace data_exchange
 	{
-		const std::string ValidatorVIXv6000DevicePoller::Exporter_::PARAMETER_COM_PORT_NUMBER = "com_port_number";
-		const std::string ValidatorVIXv6000DevicePoller::Exporter_::PARAMETER_COM_PORT_RATE = "com_port_rate";
-		const std::string ValidatorVIXv6000DevicePoller::Exporter_::PARAMETER_DATASOURCE_ID = "data_source_id";
+		const std::string VixV6000FileFormat::Exporter_::PARAMETER_COM_PORT_NUMBER = "com_port_number";
+		const std::string VixV6000FileFormat::Exporter_::PARAMETER_COM_PORT_RATE = "com_port_rate";
+		const std::string VixV6000FileFormat::Exporter_::PARAMETER_DATASOURCE_ID = "data_source_id";
 
 
 
-		ValidatorVIXv6000DevicePoller::Exporter_::Exporter_(
+		VixV6000FileFormat::Exporter_::Exporter_(
 			const Export& export_
-		):	PermanentThreadExporterTemplate<ValidatorVIXv6000DevicePoller>(export_),
+		):	PermanentThreadExporterTemplate<VixV6000FileFormat>(export_),
 			Exporter(export_),
 			_status(OFFLINE),
 			_timeNextMessage(0)
@@ -72,7 +72,7 @@ namespace synthese
 
 
 
-		util::ParametersMap ValidatorVIXv6000DevicePoller::Exporter_::getParametersMap() const
+		util::ParametersMap VixV6000FileFormat::Exporter_::getParametersMap() const
 		{
 			ParametersMap map;
 
@@ -88,7 +88,7 @@ namespace synthese
 
 
 
-		void ValidatorVIXv6000DevicePoller::Exporter_::setFromParametersMap(const util::ParametersMap& map)
+		void VixV6000FileFormat::Exporter_::setFromParametersMap(const util::ParametersMap& map)
 		{
 			_comPortNb = map.getDefault<int>(PARAMETER_COM_PORT_NUMBER, 8);
 			_comPortRate = map.getDefault<int>(PARAMETER_COM_PORT_RATE, 9600);
@@ -107,12 +107,12 @@ namespace synthese
 
 
 
-		void ValidatorVIXv6000DevicePoller::Exporter_::_onStart() const
+		void VixV6000FileFormat::Exporter_::_onStart() const
 		{
 			_srt.reset(new SerialReader(_comPortNb, _comPortRate));
 			_timeNextMessage = 0;
 			
-			Log::GetInstance().info(str(format("ValidatorVIXv6000DevicePoller: PortNumber=%d. Rate=%d") % _comPortNb % _comPortRate));
+			Log::GetInstance().info(str(format("VixV6000FileFormat: PortNumber=%d. Rate=%d") % _comPortNb % _comPortRate));
 
 			if(!_dataSource)
 			{
@@ -122,7 +122,7 @@ namespace synthese
 
 
 
-		void ValidatorVIXv6000DevicePoller::Exporter_::_loop() const
+		void VixV6000FileFormat::Exporter_::_loop() const
 		{
 			if(_status == INCONSISTENT_PARAMETERS)
 			{
@@ -185,7 +185,7 @@ namespace synthese
 
 
 
-		boost::posix_time::time_duration ValidatorVIXv6000DevicePoller::Exporter_::_getWaitingTime() const
+		boost::posix_time::time_duration VixV6000FileFormat::Exporter_::_getWaitingTime() const
 		{
 			if(_status == ONLINE_POLLING || _status == ONLINE_SELECTING)
 			{
@@ -197,14 +197,14 @@ namespace synthese
 
 
 
-		void ValidatorVIXv6000DevicePoller::Exporter_::_onStop() const
+		void VixV6000FileFormat::Exporter_::_onStop() const
 		{
 			_srt.reset();
 		}
 
 
 
-		synthese::CIntSurvMsg ValidatorVIXv6000DevicePoller::Exporter_::_getMessage() const
+		synthese::CIntSurvMsg VixV6000FileFormat::Exporter_::_getMessage() const
 		{
 			CIntSurvMsg result;
 
