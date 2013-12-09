@@ -235,17 +235,27 @@ namespace synthese
 						boost::algorithm::trim(roadName);
 
 						if(_line.size() > *_numberField)
-							number = lexical_cast<int>(_getValue(*_numberField));
+						{
+							try
+							{
+								number = lexical_cast<int>(_getValue(*_numberField));
+							}
+							catch (bad_lexical_cast)
+							{
+								number = 0;
+								_logWarning("Road number set to 0 because not integer. Value was " + (_getValue(*_numberField).empty() ? "empty" : _getValue(*_numberField)));
+							}
+						}
 						else
 							continue;
 						
 						if(_line.size() > *_geometryXField)
-							x = lexical_cast<int>(_getValue(*_geometryXField));
+							x = lexical_cast<double>(_getValue(*_geometryXField));
 						else
 							continue;
 
 						if(_line.size() > *_geometryYField)
-							y = lexical_cast<int>(_getValue(*_geometryYField));
+							y = lexical_cast<double>(_getValue(*_geometryYField));
 						else
 							continue;					
 						boost::shared_ptr<Point> geometry(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
