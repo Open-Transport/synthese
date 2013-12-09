@@ -387,11 +387,11 @@ namespace synthese
 			boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env));
 			if (dynamic_cast<const SentAlarm*>(alarm.get()))
 			{
-				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(alarm.get()), session->getUser().get());
+				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(alarm.get()), (session ? session->getUser().get() : NULL));
 			}
 			else
 			{
-				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(alarm.get()), session->getUser().get());
+				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(alarm.get()), (session ? session->getUser().get() : NULL));
 			}
 		}
 	}
