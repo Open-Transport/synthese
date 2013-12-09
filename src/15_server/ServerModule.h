@@ -219,9 +219,6 @@ namespace synthese
 				HTTPReply& httpReply,
 				const CookiesMap& cookiesMap
 			);
-
-			// Launch the permanent threads
-			static void _LaunchPermanentThreads();
 		};
 
 

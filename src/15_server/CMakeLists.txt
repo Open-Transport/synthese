@@ -50,8 +50,6 @@ ModuleClass.cpp
 ModuleClass.h
 ModuleClassTemplate.hpp
 ModuleException.h
-Poller.hpp
-Poller.cpp
 QuitAction.cpp
 QuitAction.hpp
 RedirectService.cpp
