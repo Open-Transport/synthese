@@ -38,6 +38,12 @@ namespace synthese
 		{
 		public:
 			static const bool EXPORTABLE;
+			static const bool IS_PERMANENT_THREAD;
+
+			NoExportPolicy(
+				const Export& export_
+			):	Exporter(export_)
+			{}
 
 			virtual void build(std::ostream&) const {}
 
@@ -54,6 +60,9 @@ namespace synthese
 
 		template<class FF>
 		const bool NoExportPolicy<FF>::EXPORTABLE(false);
+
+		template<class FF>
+		const bool NoExportPolicy<FF>::IS_PERMANENT_THREAD(false);
 }	}
 
 #endif // SYNTHESE_impex_NoExportPolicy_hpp__

@@ -185,11 +185,7 @@ namespace synthese
 				virtual db::DBTransaction _save() const;
 			};
 
-			class Exporter_:
-				public impex::NoExportPolicy<HastusInterfaceFileFormat>
-			{
-			public:
-			};
+			typedef impex::NoExportPolicy<HastusInterfaceFileFormat> Exporter_;
 
 			friend class Importer_;
 			friend class Exporter_;

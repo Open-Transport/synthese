@@ -19,9 +19,15 @@ DataSourceLinksField.cpp
 DataSourceLinksField.hpp
 DataSourceTableSync.cpp
 DataSourceTableSync.h
+Export.cpp
+Export.hpp
 Exporter.hpp
 ExportFunction.cpp
 ExportFunction.hpp
+ExportTableSync.cpp
+ExportTableSync.hpp
+ExportsService.cpp
+ExportsService.hpp
 FileFormat.cpp
 FileFormat.h
 FileFormatsService.cpp
@@ -55,6 +61,7 @@ NoExportPolicy.hpp
 NoImportPolicy.hpp
 OneFileExporter.hpp
 OneFileTypeImporter.hpp
+PermanentThreadImporterTemplate.hpp
 )
 
 set_source_files_properties(ImpExModule.gen.cpp ImpExModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

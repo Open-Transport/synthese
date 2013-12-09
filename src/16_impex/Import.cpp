@@ -102,18 +102,50 @@ namespace synthese
 
 
 
+		bool Import::isPermanentThread() const
+		{
+			if(!Factory<FileFormat>::contains(get<FileFormatKey>()))
+			{
+				return false;
+			}
+
+			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
+			return fileFormat->isImportPermanentThread();
+		}
+
+
+
 		void Import::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			// Compute the time of the next auto import
-			_computeNextAutoImport();
+			if(canImport())
+			{
+				// Compute the time of the next auto import
+				_computeNextAutoImport();
+			}
+			else if(isPermanentThread())
+			{
+				if(get<Active>())
+				{
+					_getAutoImporter()->runPermanentThread();
+				}
+			}
 		}
 
 
 
 		void Import::unlink()
 		{
-			// Delete the auto importer cache in case of parameter update
-			_autoImporter.reset();
+			// Kill the thread if exists
+			if(_autoImporter)
+			{
+				if(isPermanentThread())
+				{
+					_autoImporter->killPermanentThread();
+				}
+
+				// Delete the auto importer cache in case of parameter update
+				_autoImporter.reset();
+			}
 		}
 
 
@@ -139,12 +171,11 @@ namespace synthese
 
 
 
-		void Import::runAutoImport() const
+		boost::shared_ptr<Importer> Import::_getAutoImporter() const
 		{
-			ptime startTime(second_clock::local_time());
-			ParametersMap pm;
 			if(!_autoImporter.get())
 			{
+				ParametersMap pm;
 				boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 				_autoImporterEnv.reset(new Env);
 				_autoImporter = fileFormat->getImporter(
@@ -157,15 +188,23 @@ namespace synthese
 				);
 				_autoImporter->setFromParametersMap(get<Parameters>(), true);
 			}
+			return _autoImporter;
+		}
+
+
+
+		void Import::runAutoImport() const
+		{
+			ptime startTime(second_clock::local_time());
 
 			_autoImporterEnv->clear();
-			bool result(_autoImporter->parseFiles());
+			bool result(_getAutoImporter()->parseFiles());
 			if(result)
 			{
-				DBTransaction transaction(_autoImporter->save());
+				DBTransaction transaction(_getAutoImporter()->save());
 				transaction.run();
 			}
-			_autoImporter->closeLogFile(
+			_getAutoImporter()->closeLogFile(
 				result,
 				false,
 				startTime

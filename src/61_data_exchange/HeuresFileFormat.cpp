@@ -1455,7 +1455,9 @@ namespace synthese
 
 
 
-		HeuresFileFormat::Exporter_::Exporter_():
+		HeuresFileFormat::Exporter_::Exporter_(
+			const Export& export_
+		):	OneFileExporter<HeuresFileFormat>(export_),
 			_generateRouteCode(false),
 			_serviceNumberPosition(0)
 		{

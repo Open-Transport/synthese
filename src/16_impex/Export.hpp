@@ -1,6 +1,6 @@
 
-/** PermanentThread class header.
-	@file Import.hpp
+/** Export class header.
+	@file Export.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,22 +20,22 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_server_PermanentThread_hpp__
-#define SYNTHESE_server_PermanentThread_hpp__
+#ifndef SYNTHESE_server_Export_hpp__
+#define SYNTHESE_server_Export_hpp__
 
 #include "Object.hpp"
 
 #include "CoordinatesSystem.hpp"
 #include "CMSScriptField.hpp"
 #include "EnumObjectField.hpp"
+#include "Exporter.hpp"
+#include "FileFormat.h"
 #include "ParametersMapField.hpp"
 #include "PointerField.hpp"
 #include "Poller.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 #include "SchemaMacros.hpp"
-#include "SecondsField.hpp"
-#include "StringField.hpp"
 
 namespace synthese
 {
@@ -44,49 +44,46 @@ namespace synthese
 		class Env;
 	}
 
-	FIELD_STRING(DeviceKey)
-	
-	namespace server
+	namespace impex
 	{
+		class Exporter;
+
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
-			FIELD(DeviceKey),
+			FIELD(FileFormatKey),
 			FIELD(Parameters),
 			FIELD(Active),
 			FIELD(Documentation)
-		> PermanentThreadRecord;
+		> ExportRecord;
 
 
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Import class.
-		///	@ingroup m19
+		/// Export class.
+		///	@ingroup m16
 		/// @author Camille Hue
 		/// @since 3.9.0
-		class PermanentThread:
-			public Object<PermanentThread, PermanentThreadRecord>
+		class Export:
+			public Object<Export, ExportRecord>
 		{
 		public:
 			/// Chosen registry class.
-			typedef util::Registry<PermanentThread>	Registry;
+			typedef util::Registry<Export>	Registry;
 
 		private:
-			mutable boost::shared_ptr<Poller> _poller;
-			mutable boost::shared_ptr<util::Env> _pollerEnv;
+			mutable boost::shared_ptr<Exporter> _autoExporter;
 		
+			boost::shared_ptr<Exporter> _getAutoExporter() const;
+
 		public:
-			PermanentThread(util::RegistryKeyType id = 0);
+			Export(util::RegistryKeyType id = 0);
 
 			//! @name Services
 			//@{
-				boost::shared_ptr<Poller> getPoller(
-					util::Env& env,
-					util::ParametersMap& pm
-				) const;
-
-				void launch() const;
-				virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix) const;
+				bool canExport() const;
+				bool isPermanentThread() const;
+				boost::shared_ptr<Exporter> getExporter() const;
 			//@}
 
 			//! @name Modifiers
@@ -97,4 +94,4 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_server_PermanentThread_hpp__
+#endif // SYNTHESE_server_Export_hpp__

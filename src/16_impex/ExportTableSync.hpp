@@ -1,7 +1,8 @@
+
 ////////////////////////////////////////////////////////////////////////////////
-///	PermanentThread Table synchronizer class header.
-///	@file PermanentThreadTableSync.h
-///	@author Camille Hue
+///	Export Table synchronizer class header.
+///	@file ExportTableSync.hpp
+///	@author Hugues Romain
 ///	@date 2013
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -23,38 +24,35 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SYNTHESE_server_PermanentThreadTableSync_H
-#define SYNTHESE_server_PermanentThreadTableSync_H
+#ifndef SYNTHESE_server_ExportTableSync_H
+#define SYNTHESE_server_ExportTableSync_H
 
 #include <string>
 #include <iostream>
 
-#include "PermanentThread.hpp"
+#include "Export.hpp"
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "StandardLoadSavePolicy.hpp"
 
 namespace synthese
 {
-	namespace server
+	namespace impex
 	{
-		/** PermanentThread table synchronizer.
-			Automatic synchronization : none
-			@ingroup m15LS refLS
+		/** Export table synchronizer.
+			@ingroup m16LS refLS
 		*/
-		class PermanentThreadTableSync:
+		class ExportTableSync:
 			public db::DBDirectTableSyncTemplate<
-				PermanentThreadTableSync,
-				PermanentThread,
-				db::FullSynchronizationPolicy,
-				db::StandardLoadSavePolicy
+				ExportTableSync,
+				Export
 			>
 		{
 		public:
 
-			PermanentThreadTableSync() {}
+			ExportTableSync() {}
 
-			/** PermanentThread search.
+			/** Export search.
 				@param env Environment to read and populate
 				@param format Filter on the format of the data source
 				@param first First PermanentThread object to answer
@@ -79,4 +77,4 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_server_PermanentThreadTableSync_H
+#endif

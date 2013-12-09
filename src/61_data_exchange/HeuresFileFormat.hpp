@@ -234,6 +234,7 @@ namespace synthese
 				typedef std::map<const pt::JourneyPattern*, size_t> RouteCodes;
 				mutable RouteCodes _routeCodes;
 				size_t _serviceNumberPosition;
+				mutable util::Env _env;
 
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
@@ -241,7 +242,7 @@ namespace synthese
 				static const std::string PARAMETER_GENERATE_ROUTE_CODE;
 				static const std::string PARAMETER_SERVICE_NUMBER_POSITION;
 
-				Exporter_();
+				Exporter_(const impex::Export& export_);
 
 				virtual util::ParametersMap getParametersMap() const;
 

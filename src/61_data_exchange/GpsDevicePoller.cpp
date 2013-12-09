@@ -24,36 +24,29 @@
 
 #include "Env.h"
 #include "Exception.h"
-#include "Log.h"
 #include "ScheduledService.h"
-
-#include "gps.h"
-
-#include <boost/thread/thread.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <iostream>
-#include <fstream>
-
-#include "PermanentThread.hpp"
 #include "ServerModule.h"
-
 #include "StopArea.hpp"
-#include "StopPoint.hpp"
+#include "StopPointTableSync.hpp"
 #include "Vehicle.hpp"
 #include "VehicleModule.hpp"
-#include "StopPointTableSync.hpp"
 
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::property_tree;
+using boost::asio::ip::tcp;
 
 namespace synthese
 {
 	using namespace data_exchange;
-	using namespace graph;	
+	using namespace graph;
+	using namespace impex;
 	using namespace pt;
 	using namespace server;
 	using namespace util;
@@ -63,155 +56,273 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Device, GpsDevicePoller>::FACTORY_KEY = "GpsDevice_Poller";
+		template<>
+		const string FactorableTemplate<FileFormat, GpsDevicePoller>::FACTORY_KEY = "gpsd";
 	}
 
 	namespace data_exchange
 	{
-		const std::string GpsDevicePoller::Poller_::PARAMETER_VALIDATOR_NET_PORT_NUMBER("gps_net_port_number");
-		int GpsDevicePoller::Poller_::_NetPortNb=0;
+		const std::string GpsDevicePoller::Importer_::PARAMETER_ADDRESS = "address";
+		const std::string GpsDevicePoller::Importer_::PARAMETER_PORT = "port";
 
-		bool GpsDevicePoller::Poller_::launchPoller(
-			) const {
 
-				// Launch the thread and returns true
-				ServerModule::AddThread(boost::bind(&GpsDevicePoller::Poller_::startPolling, this), "GpsDevicePoller");
 
-				return true;
-		}
-
-		GpsDevicePoller::Poller_::Poller_(
+		GpsDevicePoller::Importer_::Importer_(
 			util::Env& env,
-			const server::PermanentThread& permanentThread,
+			const Import& import,
+			impex::ImportLogLevel minLogLevel,
+			const std::string& logPath,
+			boost::optional<std::ostream&> outputStream,
 			util::ParametersMap& pm
-			): Poller(env, permanentThread, pm)
+		):	PermanentThreadImporterTemplate<GpsDevicePoller>(env, import, minLogLevel, logPath, outputStream, pm),
+			Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			_gpsStatus(OFFLINE),
+			_socket(_ios)
 		{}
 
-		util::ParametersMap GpsDevicePoller::Poller_::getParametersMap() const
+
+
+		util::ParametersMap GpsDevicePoller::Importer_::getParametersMap() const
 		{
 			ParametersMap map;
 
-			map.insert(PARAMETER_VALIDATOR_NET_PORT_NUMBER, _NetPortNb);
+			map.insert(PARAMETER_PORT, _port);
+			map.insert(PARAMETER_ADDRESS, _address);
 
 			return map;
 		}
 
-		void GpsDevicePoller::Poller_::setFromParametersMap(const util::ParametersMap& map)
-		{
-			_NetPortNb = map.getDefault<int>(PARAMETER_VALIDATOR_NET_PORT_NUMBER, GPS_POLLER_SOCKET_PORT);
+
+
+		void GpsDevicePoller::Importer_::setFromParametersMap(
+			const util::ParametersMap& map,
+			bool doImport
+		){
+			_address = map.getDefault<string>(PARAMETER_ADDRESS, "127.0.0.1");
+			_port = map.getDefault<int>(PARAMETER_PORT, 2947);
 		}
 
-		void GpsDevicePoller::Poller_::startPolling() const
+
+
+		void GpsDevicePoller::Importer_::_onStart() const
 		{
-			bool bGpsOk=false;
-			gps g;
-			double lon=0.0;
-			double lat=0.0;
+			_onStop();
+			_gpsStatus = WAITING;
 
-			Log::GetInstance().info(str(format("GpsDevicePoller: NetPortNumber=%d") % _NetPortNb));
+  			try
+			{	
+				tcp::endpoint endpoint(boost::asio::ip::address::from_string(_address), _port);
+				_socket.connect(endpoint);
 
-			VehicleModule::GetCurrentVehiclePosition().setStatus(VehiclePosition::UNKNOWN_STATUS);
-			VehicleModule::GetCurrentJourney().setTerminusDeparture(posix_time::not_a_date_time);
-
-			while (true)
-			{
-
-				// get actual GPS location
-				if(!bGpsOk)	// goes into this at least once!
+				// Set the request format
+				boost::asio::streambuf request;
+				ostream request_stream(&request);
+				request_stream << "?WATCH={\"enable\":true,\"json\":true}";
+				if(boost::asio::write(_socket, request)>0)
 				{
-					g.initSocket("127.0.0.1", _NetPortNb);
-					bGpsOk = g.enableTalk();
-					if(!bGpsOk)
+					_gpsStatus = ONLINE;
+					return;
+				}
+				else
+				{
+					_logWarning("GpsDevicePoller failed to open GPS connection socket");
+				}
+			}
+			catch (std::exception const& e)
+			{
+				_logWarning(e.what());
+			}	
+		}
+
+
+
+		void GpsDevicePoller::Importer_::_loop() const
+		{
+			if(_gpsStatus != ONLINE)
+			{
+				_onStart();
+			}
+
+			if(_gpsStatus != ONLINE)
+			{
+				return;
+			}
+
+			// We have a valid gps socket opened. Use it.
+			optional<ptree> currentPosition;
+			_updateFromGps(currentPosition);
+			if(!currentPosition)
+			{
+				_gpsStatus = WAITING;
+				return;
+			}
+
+			// JSON reading
+			try
+			{
+				double lon(
+					lexical_cast<double>(currentPosition->get<string>("lon"))
+				);
+				double lat(
+					lexical_cast<double>(currentPosition->get<string>("lat"))
+				);
+
+				//TODO: eventually check value coherency.
+	//			double lonOld=0;
+	//			double latOld=0;
+	/*DEBUG(JD)
+				// GPS position has changed. check if we need to change the stop point
+				if(lon!=lonOld || lat!=latOld)
+	DEBUG(JD)*/
+				//TODO: we could add longitude and latitude change tolerance
+
+				// Create the coordinate point
+				boost::shared_ptr<Point> point(
+					CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(lon,lat)
+				);
+				boost::shared_ptr<Point> projectedPoint(
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*point)
+				);
+
+				// Nearest stop point
+				StopPoint* nearestStopPoint(NULL);
+				double maxdistance(3000.0);
+				double lastDistance(0.0);
+				pt::StopPointTableSync::SearchResult  sr = pt::StopPointTableSync::SearchByMaxDistance(
+					*projectedPoint.get(),
+					maxdistance, //distance  to originPoint
+					Env::GetOfficialEnv(),
+					UP_LINKS_LOAD_LEVEL
+				);
+
+				Path::Edges allEdges;
+				if(VehicleModule::GetCurrentVehiclePosition().getService())
+				{
+					allEdges = VehicleModule::GetCurrentVehiclePosition().getService()->getPath()->getAllEdges();
+				}
+				
+				BOOST_FOREACH(boost::shared_ptr<StopPoint> sp, sr)
+				{
+					// Jump over stops not in the current route
+					if(VehicleModule::GetCurrentVehiclePosition().getService())
 					{
-						// fail to open connection to GOS socket.
-						// Add a timeout before to retry
-						util::Log::GetInstance().warn("GpsDevicePoller failed to open GPS connection socket");
-						this_thread::sleep(seconds(30));
-					}
-				}
-lon=0;
-lat=0;
-				if(bGpsOk){
-					// We have a valid gps socket opened. Use it.
-					if(g.updateFromGps()){
-						//TODO: eventually check value coherency.
-						double lonOld=lon;
-						double latOld=lat;
-						g.getLatLong(lon,lat);
-/*DEBUG(JD)
-						// GPS position has changed. check if we need to change the stop point
-						if(lon!=lonOld || lat!=latOld)
-DEBUG(JD)*/
-						{	//TODO: we could add longitude and latitude change tolerance
-
-							// Create the coordinate point
-							boost::shared_ptr<Point> point(
-								CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(lon,lat)
-							);
-							boost::shared_ptr<Point> projectedPoint(
-								CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*point)
-							);
-
-							// Nearest stop point
-							StopPoint* nearestStopPoint(NULL);
-							double maxdistance(3000.0);
-							double lastDistance(0.0);
-							pt::StopPointTableSync::SearchResult  sr = pt::StopPointTableSync::SearchByMaxDistance(
-								*projectedPoint.get(),
-								maxdistance, //distance  to originPoint
-								Env::GetOfficialEnv(),
-								UP_LINKS_LOAD_LEVEL
-							);
-
-							Path::Edges allEdges;
-							if(VehicleModule::GetCurrentVehiclePosition().getService())
+						bool found(false);
+						BOOST_FOREACH(const Path::Edges::value_type& edge, allEdges)
+						{
+							if(edge->getFromVertex() == sp.get())
 							{
-								allEdges = VehicleModule::GetCurrentVehiclePosition().getService()->getPath()->getAllEdges();
+								found = true;
+								break;
 							}
-							
-							BOOST_FOREACH(boost::shared_ptr<StopPoint> sp, sr)
-							{
-								// Jump over stops not in the current route
-								if(VehicleModule::GetCurrentVehiclePosition().getService())
-								{
-									bool found(false);
-									BOOST_FOREACH(const Path::Edges::value_type& edge, allEdges)
-									{
-										if(edge->getFromVertex() == sp.get())
-										{
-											found = true;
-											break;
-										}
-									}
-									if(!found)
-									{
-										continue;
-									}
-								}
-
-								double dst(sp->getGeometry()->distance(projectedPoint.get()));
-
-								if(!nearestStopPoint || dst < lastDistance)
-								{
-									lastDistance = dst;
-									nearestStopPoint = sp.get();
-								}
-							}
-							VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
-							
-
-							// update Vehicle position.
-							VehicleModule::GetCurrentVehiclePosition().setGeometry(
-								projectedPoint
-							);
 						}
-
+						if(!found)
+						{
+							continue;
+						}
 					}
-					//TODO Should we retry to reconnect if updateFromGps fail too much?
-				}
 
-				this_thread::sleep(seconds(1));
+					double dst(sp->getGeometry()->distance(projectedPoint.get()));
+
+					if(!nearestStopPoint || dst < lastDistance)
+					{
+						lastDistance = dst;
+						nearestStopPoint = sp.get();
+					}
+				}
+				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
+				
+
+				// update Vehicle position.
+				VehicleModule::GetCurrentVehiclePosition().setGeometry(
+					projectedPoint
+				);
+			}
+			catch(bad_lexical_cast&)
+			{
+				_logWarning("Bad cast in JSON properties reading. Current position was not updated by GPSd import");
+				return;
 			}
 		}
-	}
-}
+
+
+
+		boost::posix_time::time_duration GpsDevicePoller::Importer_::_getWaitingTime() const
+		{
+			if(_gpsStatus == WAITING)
+			{
+				return seconds(10);
+			}
+
+			return seconds(1);
+		}
+
+
+
+		void GpsDevicePoller::Importer_::_onStop() const
+		{
+			_socket.close();
+			_gpsStatus = OFFLINE;
+		}
+
+
+
+		void GpsDevicePoller::Importer_::_updateFromGps(
+			optional<ptree>& result
+		) const {
+			try
+			{
+				//TODO: make it loops until we got new data.
+				//TODO: should we have a clean timeout and reconnect to the socket when we fail too much?
+				//	But this should never fail as today we use a local port on local host.
+				for(int i=0;i<100;i++)
+				{	// Theoretically should success after two maximum 3 loops
+					boost::asio::streambuf response;
+					boost::asio::read_until(_socket, response, "\r\n");
+					if(_loadPositionJSON(response, result))
+					{
+						break;
+					}
+				}
+			}
+			catch (std::exception const& e)
+			{
+				_logWarning(e.what());
+			}
+		}
+
+
+
+		bool GpsDevicePoller::Importer_::_loadPositionJSON(
+			boost::asio::streambuf &ss,
+			optional<ptree>& result
+		) const {
+
+			// warning, we could have mode than one JSON at the time.
+			// but all separated by a new line.
+			std::string token;
+			std::istream str(&ss); 
+
+			while(std::getline(str, token))
+			{
+				try
+				{	
+					boost::property_tree::ptree pt;
+					istringstream iss(token);
+					boost::property_tree::json_parser::read_json(iss,pt);
+					
+					string response(pt.get<string>("class"));
+					if(response == "TPV")
+					{
+						result = pt;
+						return true;
+					}
+				}
+				catch (std::exception const& e)
+				{
+					_logWarning(e.what());
+				}
+			} 
+			
+			return false;
+		}
+}	}
