@@ -32,7 +32,6 @@
 #include "FileFormat.h"
 #include "ParametersMapField.hpp"
 #include "PointerField.hpp"
-#include "Poller.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 #include "SchemaMacros.hpp"
