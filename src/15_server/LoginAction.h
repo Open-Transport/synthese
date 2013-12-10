@@ -44,10 +44,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_LOGIN;
 			static const std::string PARAMETER_PASSWORD;
+			static const std::string PARAMETER_TOKEN;
 
 		private:
 			std::string _login;
 			std::string _password;
+			std::string _token;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

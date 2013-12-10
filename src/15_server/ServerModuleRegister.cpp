@@ -8,6 +8,7 @@
 #include "QuitAction.hpp"
 #include "SetSessionVariableAction.hpp"
 #include "ThreadKillAction.h"
+#include "LoginToken.hpp"
 
 #include "HtmlFormInterfaceElement.h"
 #include "ValidSessionInterfaceElement.h"

@@ -65,6 +65,7 @@ namespace synthese
 			static const std::string COL_CONFIRMATION_EMAIL_CMS_ID;
 			static const std::string COL_CANCELLATION_EMAIL_CMS_ID;
 			static const std::string COL_PASSWORD_EMAIL_CMS_ID;
+			static const std::string COL_MULTI_RESERVATIONS_EMAIL_CMS_ID;
 
 
 
