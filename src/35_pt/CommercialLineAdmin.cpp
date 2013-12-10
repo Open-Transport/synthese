@@ -493,6 +493,7 @@ namespace synthese
 						_cline->getNetwork()->getSubFoldersLabels(),
 						boost::optional<util::RegistryKeyType>(_cline->_getParent()->getKey())
 				)	);
+				stream << t.cell("Poids (tri)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_WEIGHT_FOR_SORTING, boost::lexical_cast<string>(_cline->getWeightForSorting())));
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
 				stream << t.cell("Nom long (feuille de route)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_LONG_NAME, _cline->getLongName()));
