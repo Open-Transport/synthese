@@ -33,6 +33,8 @@
 #include "CustomerPasswordEMailContentInterfacePage.h"
 #include "CustomerPasswordEMailSubjectInterfacePage.h"
 #include "User.h"
+#include "UserTableSync.h"
+#include "LoginToken.hpp"
 #include "ReservationCancellationEMailContentInterfacePage.h"
 #include "ReservationCancellationEMailSubjectInterfacePage.h"
 #include "ReservationContact.h"
@@ -73,6 +75,7 @@ namespace synthese
         const std::string OnlineReservationRule::DATA_IS_RESERVATION_POSSIBLE("is_reservation_possible");
 		const std::string OnlineReservationRule::DATA_ARRIVAL_TIME("arrival_time");
 		const std::string OnlineReservationRule::DATA_LINE_CODE("line_code");
+		const std::string OnlineReservationRule::DATA_SEATS_NUMBER("seats_number");
 		const std::string OnlineReservationRule::DATA_ROAD_RESAS("road_resas");
 		const std::string OnlineReservationRule::DATA_ROAD_RESA("road_resa");
 		const std::string OnlineReservationRule::DATA_KEY_RESA("key_resa");
@@ -89,6 +92,11 @@ namespace synthese
 		const std::string OnlineReservationRule::DATA_USER_EMAIL("user_email");
 		const std::string OnlineReservationRule::DATA_USER_PASSWORD("user_password");
 		const std::string OnlineReservationRule::DATA_CANCELLATION_BECAUSE_OF_ABSENCE("cancellation_because_of_absence");
+		const std::string OnlineReservationRule::DATA_RESERVATIONS_NUMBER("reservations_number");
+		const std::string OnlineReservationRule::DATA_SERVICES_NUMBER("services_number");
+		const std::string OnlineReservationRule::DATA_RESERVATIONS("reservations");
+		const std::string OnlineReservationRule::DATA_TRANSACTION_RESERVATION("reservation_transaction");
+		const std::string OnlineReservationRule::DATA_TOKEN_CANCELLATION("token_cancel");
 
 		const std::string OnlineReservationRule::TYPE_SUBJECT("subject");
 		const std::string OnlineReservationRule::TYPE_CONTENT("content");
@@ -353,6 +361,124 @@ namespace synthese
 
 
 
+		bool OnlineReservationRule::sendCustomerEMail(
+			const std::vector<ReservationTransaction>& resas
+		) const {
+
+			if(( _eMailInterface == NULL || !_cmsMultiReservationsEMail.get())
+			){
+				return false;
+			}
+			
+			try
+			{
+				EMail email(ServerModule::GetEMailSender());
+
+				// MIME type
+				string mimeType = _cmsMultiReservationsEMail.get()->getMimeType();
+				if (mimeType == "text/html") {
+					email.setFormat(EMail::EMAIL_HTML);
+				}
+				else
+				{
+					email.setFormat(EMail::EMAIL_TEXT);
+				}
+				email.setSender(_senderEMail);
+				email.setSenderName(_senderName);
+
+				stringstream subject;
+				ParametersMap subjectMap;
+
+				subjectMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_SUBJECT);
+				subjectMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resas.front().getReservations().begin())->getDepartureTime().date()));
+				subjectMap.insert(DATA_DEPARTURE_CITY_NAME, (*resas.front().getReservations().begin())->getDepartureCityName());
+				subjectMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resas.front().getReservations().begin())->getDeparturePlaceNameNoCity());
+				subjectMap.insert(DATA_ARRIVAL_CITY_NAME, (*resas.front().getReservations().rbegin())->getArrivalCityName());
+				subjectMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				subjectMap.insert(DATA_RESERVATIONS_NUMBER, resas.size());
+
+				_cmsMultiReservationsEMail.get()->display(subject, subjectMap);
+
+				email.setSubject(subject.str());
+
+				email.addRecipient(resas.front().getCustomerEMail(), resas.front().getCustomerName());
+
+				boost::shared_ptr<const User> customer = UserTableSync::Get(resas.front().getCustomerUserId(), Env::GetOfficialEnv());
+
+				stringstream content;
+				ParametersMap contentMap;
+
+				contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
+	
+				int servicesNumber = 0;
+				boost::shared_ptr<ParametersMap> resasMap(new ParametersMap);
+				BOOST_FOREACH(const ReservationTransaction resa, resas)
+				{
+					boost::shared_ptr<ParametersMap> resaTransactionMap(new ParametersMap);
+					boost::shared_ptr<ParametersMap> resaRoadMap(new ParametersMap);
+
+					servicesNumber = 0;
+					BOOST_FOREACH(const Reservation* r, resa.getReservations())
+					{
+						boost::shared_ptr<ParametersMap> resaMap(new ParametersMap);
+						resaMap->insert(DATA_DEPARTURE_TIME, to_simple_string(r->getDepartureTime().time_of_day()));
+						resaMap->insert(DATA_DEPARTURE_CITY_NAME, r->getDepartureCityName());
+						resaMap->insert(DATA_DEPARTURE_PLACE_NAME, r->getDeparturePlaceNameNoCity());
+						resaMap->insert(DATA_ARRIVAL_TIME, to_simple_string(r->getArrivalTime().time_of_day()));
+						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
+						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
+						resaMap->insert(DATA_LINE_CODE, r->getLineCode());
+                   		resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+						resaRoadMap->insert(DATA_ROAD_RESA, resaMap);
+
+						if (r->getReservationPossible())
+							servicesNumber++;
+					}
+
+					LoginToken token(LoginToken(lexical_cast<string>(customer->getLogin()),lexical_cast<string>(customer->getPasswordHash()),resa.getKey()));
+
+					resaTransactionMap->insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
+					resaTransactionMap->insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
+					resaTransactionMap->insert(DATA_TOKEN_CANCELLATION, token.toString());
+					resaTransactionMap->insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+					resaTransactionMap->insert(DATA_SERVICES_NUMBER, servicesNumber);
+					resaTransactionMap->insert(DATA_ROAD_RESAS, resaRoadMap);
+
+					resasMap->insert(DATA_TRANSACTION_RESERVATION, resaTransactionMap);
+				}
+			
+				contentMap.insert(DATA_RESERVATIONS, resasMap);
+				contentMap.insert(DATA_RESERVATIONS_NUMBER, resas.size());
+				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resas.front().getCustomerUserId()));
+				contentMap.insert(DATA_RESERVATION_DEAD_LINE_DATE, to_simple_string(resas.front().getReservationDeadLine().date()));
+				contentMap.insert(DATA_RESERVATION_DEAD_LINE_TIME, to_simple_string(resas.front().getReservationDeadLine().time_of_day()));
+				contentMap.insert(DATA_DEPARTURE_CITY_NAME, (*resas.front().getReservations().begin())->getDepartureCityName());
+				contentMap.insert(DATA_DEPARTURE_PLACE_NAME, (*resas.front().getReservations().begin())->getDeparturePlaceNameNoCity());
+				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resas.front().getReservations().rbegin())->getArrivalCityName());
+				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->getArrivalPlaceNameNoCity());
+				contentMap.insert(DATA_CUSTOMER_PHONE, resas.front().getCustomerPhone());
+				
+				if (resas.front().getCustomer())
+				{
+					contentMap.insert(DATA_CUSTOMER_NAME, resas.front().getCustomer()->getName());
+					contentMap.insert(DATA_USER_SURNAME, resas.front().getCustomer()->getSurname());
+				}
+
+				_cmsMultiReservationsEMail.get()->display(content, contentMap);
+
+				email.setContent(content.str());
+
+				email.send();
+				return true;
+			}
+			catch(boost::system::system_error)
+			{
+				return false;
+			}
+		}
+
+
+
 		bool OnlineReservationRule::sendCustomerEMail( const security::User& customer ) const
 		{
 			if((	_eMailInterface == NULL ||
@@ -498,6 +624,11 @@ namespace synthese
 		void OnlineReservationRule::setConfirmationEMailCMS( boost::shared_ptr<const cms::Webpage> value )
 		{
 			_cmsConfirmationEMail = value;
+		}
+
+		void OnlineReservationRule::setMultiReservationsEMailCMS( boost::shared_ptr<const cms::Webpage> value )
+		{
+			_cmsMultiReservationsEMail = value;
 		}
 
 		void OnlineReservationRule::setCancellationEMailCMS( boost::shared_ptr<const cms::Webpage> value )

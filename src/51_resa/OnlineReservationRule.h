@@ -83,6 +83,7 @@ namespace synthese
             static const std::string DATA_IS_RESERVATION_POSSIBLE;
 			static const std::string DATA_ARRIVAL_TIME;
 			static const std::string DATA_LINE_CODE;
+			static const std::string DATA_SEATS_NUMBER;
 			static const std::string DATA_ROAD_RESAS;
 			static const std::string DATA_ROAD_RESA;
 			static const std::string DATA_KEY_RESA;
@@ -99,6 +100,11 @@ namespace synthese
 			static const std::string DATA_USER_EMAIL;
 			static const std::string DATA_USER_PASSWORD;
 			static const std::string DATA_CANCELLATION_BECAUSE_OF_ABSENCE;
+			static const std::string DATA_RESERVATIONS_NUMBER;
+			static const std::string DATA_SERVICES_NUMBER;
+			static const std::string DATA_RESERVATIONS;
+			static const std::string DATA_TRANSACTION_RESERVATION;
+			static const std::string DATA_TOKEN_CANCELLATION;
 
 
 			static const std::string TYPE_SUBJECT;
@@ -125,6 +131,7 @@ namespace synthese
 				std::string _senderName;
 				interfaces::Interface*	_eMailInterface;
 				boost::shared_ptr<const cms::Webpage> _cmsConfirmationEMail;
+				boost::shared_ptr<const cms::Webpage> _cmsMultiReservationsEMail;
 				boost::shared_ptr<const cms::Webpage> _cmsCancellationEMail;
 				boost::shared_ptr<const cms::Webpage> _cmsPasswordEMail;
 			//@}
@@ -134,14 +141,14 @@ namespace synthese
 				boost::logic::tribool	_needsSurname;			//!< Prénom du client (Indifferent = champ affiché, remplissage facultatif)
 				boost::logic::tribool	_needsAddress;			//!< Adresse du client (Indifferent = champ affiché, remplissage facultatif)
 				boost::logic::tribool	_needsPhone;			//!< Numéro de téléphone du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsCustomerNumber;		//!< Numéro d'abonné du client (Indifferent = champ affiché, remplissage facultatif)
+				boost::logic::tribool	_needsCustomerNumber;	//!< Numéro d'abonné du client (Indifferent = champ affiché, remplissage facultatif)
 				boost::logic::tribool	_needsEMail;			//!< Adresse e-mail du client (Indifferent = champ affiché, remplissage facultatif)
 			//@}
 
 			//! \name Capacity
 			//@{
-				boost::optional<size_t>		_maxSeats;				//!< Nombre maximal de réservations par service (undefined = unlimited capacity)
-				CapacityThresholds	_thresholds;				//!< Paliers de nombre de réservations générant un envoi de mail d'alerte
+				boost::optional<size_t>	_maxSeats;				//!< Nombre maximal de réservations par service (undefined = unlimited capacity)
+				CapacityThresholds		_thresholds;			//!< Paliers de nombre de réservations générant un envoi de mail d'alerte
 			//@}
 
 		public:
@@ -181,6 +188,7 @@ namespace synthese
 				void	setSenderName(const std::string& value);
 				void	setEMailInterface(interfaces::Interface* value);
 				void	setConfirmationEMailCMS(boost::shared_ptr<const cms::Webpage> value);
+				void	setMultiReservationsEMailCMS(boost::shared_ptr<const cms::Webpage> value);
 				void	setCancellationEMailCMS(boost::shared_ptr<const cms::Webpage> value);
 				void	setPasswordEMailCMS(boost::shared_ptr<const cms::Webpage> value);
 			//@}
@@ -195,6 +203,17 @@ namespace synthese
 				/// @date 2009
 				bool	sendCustomerEMail(
 					const ReservationTransaction& resa
+				) const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Sends resume e-mail to the customer after booking a new reservation.
+				/// @param resa Reservation transaction
+				/// @return true if the e-mail is sent.
+				/// @author Hugues Romain
+				/// @date 2009
+				bool	sendCustomerEMail(
+					const std::vector<ReservationTransaction>& resas
 				) const;
 
 

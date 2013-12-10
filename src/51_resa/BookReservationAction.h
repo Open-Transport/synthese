@@ -102,19 +102,26 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
 			static const std::string PARAMETER_APPROACH_SPEED;
 
+			static const std::string PARAMETER_MULTI_RESERVATIONS_NUMBER;
+			static const std::string PARAMETER_MULTI_RESERVATIONS_DATES;
+			static const std::string PARAMETER_MULTI_RESERVATIONS_MODE;
+
 		private:
 			void updatePlace();
 
 
 			//! @name All reservation modes
 			//@{
-			boost::shared_ptr<security::User>	_customer;
-			bool								_createCustomer;
-			graph::AccessParameters				_accessParameters;
-			std::size_t							_seatsNumber;
-			bool								_ignoreReservation;
-			double								_approachSpeed;
-			std::string 						_comment;
+			boost::shared_ptr<security::User>		_customer;
+			bool									_createCustomer;
+			graph::AccessParameters					_accessParameters;
+			std::size_t								_seatsNumber;
+			bool									_ignoreReservation;
+			double									_approachSpeed;
+			std::string 							_comment;
+			std::size_t								_reservationsNumber;
+			std::vector<boost::posix_time::ptime>	_reservationsDates;
+			bool									_multiReservationsMode;
 
 			//! @name Reservation on a scheduled service
 			//@{
@@ -135,6 +142,7 @@ namespace synthese
 			//@{
 				pt_journey_planner::RoutePlannerFunction _journeyPlanner;
 				graph::Journey _journey;
+				std::vector<graph::Journey> _journeys;
 				boost::shared_ptr<const pt_website::PTServiceConfig> _site;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 			//@}
@@ -182,6 +190,8 @@ namespace synthese
 				void setFreeDRTTimeSlot(boost::shared_ptr<const pt::FreeDRTTimeSlot> value){ _freeDRTTimeSlot = value; }
 				void setDeparturePlace(boost::shared_ptr<const geography::Place> value){ _departurePlace = value; }
 				void setArrivalPlace(boost::shared_ptr<const geography::Place> value){ _arrivalPlace = value; }
+				void setReservationsNumber(size_t value){ _reservationsNumber = value; }
+				void setReservationsDates(const std::vector<boost::posix_time::ptime>& reservationsDates){ _reservationsDates = reservationsDates; }
 			//@}
 
 			/// @name Getters

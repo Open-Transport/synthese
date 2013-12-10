@@ -116,6 +116,8 @@ namespace synthese
 						"<email>" << request.getUser()->getEMail() << "</email>" <<
 						"<user_id>" << request.getUser()->getKey() << "</user_id>"
 					;
+					if (!(request.getSession()->getSessionVariable("reservation").empty()))
+						stream << "<reservation>" << request.getSession()->getSessionVariable("reservation") << "</reservation>";
 				}
 
 				stream << "</login>";

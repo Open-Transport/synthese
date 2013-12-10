@@ -158,7 +158,6 @@ namespace synthese
 					_request
 				);
 				routeplannerRequest.getPage()->setCustomer(_user);
-
 				
 				// Display
 				stream << "<h1>Liens</h1>";
