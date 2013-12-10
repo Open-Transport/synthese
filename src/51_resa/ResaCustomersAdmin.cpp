@@ -177,19 +177,12 @@ namespace synthese
 					stream << t.col() << user->getSurname();
 					stream << t.col() << user->getPhone();
 					stream << t.col() << user->getLogin();
+					stream << t.col() << (to_iso_extended_string(user->getCreationDate()) != "not-a-date-time" ? to_iso_extended_string(user->getCreationDate()) : "Inconnue");
 
-					if(to_iso_extended_string(user->getCreationDate())=="not-a-date-time")
-						stream << t.col() << "Inconnue";
-					else
-						stream << t.col() << to_iso_extended_string(user->getCreationDate());
-
-					if (user != NULL && user->getCreatorId() != 0)
+					if (user->getCreatorId() != 0)
 					{
 						boost::shared_ptr<const User> creator = UserTableSync::Get(user->getCreatorId(), Env::GetOfficialEnv());
-						if (creator != NULL)
-							stream << t.col() << creator->getLogin();
-						else
-							stream << t.col() << user->getCreatorId();
+						stream << t.col() << (creator != NULL ? creator->getLogin() : "Inconnu");
 					}
 					else
 						stream << t.col() << "Inconnu";
