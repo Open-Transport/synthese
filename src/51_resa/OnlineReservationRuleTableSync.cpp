@@ -71,6 +71,7 @@ namespace synthese
 		const string OnlineReservationRuleTableSync::COL_CONFIRMATION_EMAIL_CMS_ID("confirmation_email_cms_id");
 		const string OnlineReservationRuleTableSync::COL_CANCELLATION_EMAIL_CMS_ID("cancellation_email_cms_id");
 		const string OnlineReservationRuleTableSync::COL_PASSWORD_EMAIL_CMS_ID("password_email_cms_id");
+		const string OnlineReservationRuleTableSync::COL_MULTI_RESERVATIONS_EMAIL_CMS_ID("multi_reservations_email_cms_id");
 	}
 
 	namespace db
@@ -98,6 +99,7 @@ namespace synthese
 			Field(OnlineReservationRuleTableSync::COL_CONFIRMATION_EMAIL_CMS_ID, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_CANCELLATION_EMAIL_CMS_ID, SQL_TEXT),
 			Field(OnlineReservationRuleTableSync::COL_PASSWORD_EMAIL_CMS_ID, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_MULTI_RESERVATIONS_EMAIL_CMS_ID, SQL_TEXT),
 			Field()
 		};
 
@@ -205,6 +207,21 @@ namespace synthese
 				catch (...)
 				{
                     Log::GetInstance().info("Password E-Mail CMS webpage not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
+					warningToDisplayForEmailCMS = true;
+				}
+				try
+				{
+					// CMS Multi Reservations EMail
+					object->setMultiReservationsEMailCMS(
+						WebPageTableSync::GetEditable(
+							rows->getLongLong(OnlineReservationRuleTableSync::COL_MULTI_RESERVATIONS_EMAIL_CMS_ID),
+							env,
+							linkLevel)
+					);
+				}
+				catch (...)
+				{
+					Log::GetInstance().info("Multi Reservations E-Mail CMS webpage not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
 					warningToDisplayForEmailCMS = true;
 				}
 
