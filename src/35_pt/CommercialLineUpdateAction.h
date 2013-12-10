@@ -81,6 +81,7 @@ namespace synthese
 			static const std::string PARAMETER_DOC_URL;
 			static const std::string PARAMETER_TIMETABLE_ID;
 			static const std::string PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
+			static const std::string PARAMETER_WEIGHT_FOR_SORTING;
 
 		private:
 			boost::shared_ptr<pt::CommercialLine> _line;
@@ -97,6 +98,7 @@ namespace synthese
 			boost::optional<std::string> _docURL;
 			boost::optional<util::RegistryKeyType> _timetableId;
 			boost::optional<boost::posix_time::time_duration> _displayDurationBeforeFirstDeparture;
+			boost::optional<int> _weightForSorting;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
