@@ -426,8 +426,10 @@ namespace synthese
 			//@{
 				void setMaxSolutions(boost::optional<std::size_t> value){ _maxSolutionsNumber = value; }
 				void setOutputFormat(const std::string& value){ _outputFormat = value; }
+				void setStartDepartureDate(const boost::posix_time::ptime& value){ _startDate = value; }
 				void setStartArrivalDate(const boost::posix_time::ptime& value){ _startArrivalDate = value; }
 				void setEndDepartureDate(const boost::posix_time::ptime& value){ _endDate = value; }
+				void setEndArrivalDate(const boost::posix_time::ptime& value){ _endArrivalDate = value; }
 				void setOriginCityText(const std::string& value){ _originCityText = value; }
 				void setOriginPlaceText(const std::string& value){ _originPlaceText = value; }
 				void setDestinationCityText(const std::string& value){ _destinationCityText = value; }
