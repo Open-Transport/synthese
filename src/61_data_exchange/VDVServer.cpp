@@ -530,12 +530,15 @@ namespace synthese
 						while (vectServiceCode[1].size() < 5)
 							vectServiceCode[1] = "0" + vectServiceCode[1];
 
+						Log::GetInstance().debug("On reçoit des infos pour le service " + vectServiceCode[1]);
+
 						ScheduledService* service(
 							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
 						);
 						
 						if (service)
 						{
+							Log::GetInstance().debug("On a trouve le service correspondant : " + lexical_cast<string>(service->getKey()));
 							// UPDATE RT OF THE SERVICE
 							SchedulesBasedService::Schedules departureSchedules(
 								service->getDepartureSchedules(true, true)
@@ -556,6 +559,7 @@ namespace synthese
 									break;
 								}
 							}
+							Log::GetInstance().debug("Rang de l'arret courant dans le service' : " + lexical_cast<string>(rank));
 							ptime rtArrivalDate(not_a_date_time);
 							int numAnkunftszeitAZBPrognose = AZBFahrplanlageNode.nChildNode("AnkunftszeitAZBPrognose");
 							if (numAnkunftszeitAZBPrognose > 0)
@@ -593,6 +597,10 @@ namespace synthese
 
 							// Set the service active
 							service->setActive(today);
+
+							// Update RT
+							Log::GetInstance().debug("Mise à jour avec un départ à : " + to_simple_string(departureSchedules[rank]));
+							service->setRealTimeSchedules(departureSchedules, arrivalSchedules);
 							
 							// Save the updated service
 							ScheduledServiceTableSync::Save(service, transaction);
