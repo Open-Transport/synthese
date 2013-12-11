@@ -316,7 +316,8 @@ namespace synthese
 							continue;
 
 						const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(service->getPath());
-						if(!journeyPattern->isCompatibleWith(_accessParameters) ||
+						if(!journeyPattern || 
+							!journeyPattern->isCompatibleWith(_accessParameters) ||
 							!_accessParameters.isAllowedPathClass
 							(
 								journeyPattern->getPathClass() ? journeyPattern->getPathClass()->getIdentifier() : 0,
