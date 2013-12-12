@@ -112,7 +112,7 @@ namespace synthese
 					break;
 				}
 
-				this_thread::sleep(_getWaitingTime());
+				boost::this_thread::sleep(_getWaitingTime());
 			}
 
 			_onStop();
