@@ -2246,6 +2246,16 @@ namespace synthese
 			return ss.str ();
 		}
 
+
+
+		TridentFileFormat::Exporter_::Exporter_(
+			const impex::Export& export_
+		):	OneFileExporter<TridentFileFormat>(export_),
+			_withTisseoExtension(false)
+		{}
+
+
+
 		string ToXsdDaysDuration (date_duration daysDelay)
 		{
 			stringstream s;

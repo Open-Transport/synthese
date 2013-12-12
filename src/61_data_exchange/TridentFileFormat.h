@@ -263,10 +263,7 @@ namespace synthese
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
 
 			public:
-				Exporter_(const impex::Export& export_):
-					OneFileExporter<TridentFileFormat>(export_),
-					_withTisseoExtension(false)
-				{}
+				Exporter_(const impex::Export& export_);
 
 				//! @name Setters
 				//@{
