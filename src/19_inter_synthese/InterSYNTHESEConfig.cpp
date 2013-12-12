@@ -138,6 +138,7 @@ namespace synthese
 				slave->enqueue(
 					content.getType().getFactoryKey(),
 					content.getContent(),
+					content.getExpirationTime(),
 					transaction
 				);
 			}

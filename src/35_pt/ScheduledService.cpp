@@ -216,6 +216,10 @@ namespace synthese
 			const AccessParameters&
 		) const	{
 
+			// Lock the vertices and the schedules
+			recursive_mutex::scoped_lock lock1(getVerticesMutex());
+			recursive_mutex::scoped_lock lock2(getSchedulesMutex());
+
 			size_t edgeIndex(edge.getRankInPath());
 			if(servicePointer.getArrivalEdge() == NULL)
 			{
@@ -255,15 +259,21 @@ namespace synthese
 
 		time_duration ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(rankInPath == 0 && !RTData)
 			{
 				return getDataDepartureSchedules()[0];
 			}
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
+
+
 
 		time_duration ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(rankInPath == 0 && !RTData)
 			{
 				return getDataDepartureSchedules()[0];
@@ -271,13 +281,19 @@ namespace synthese
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
+
+
 		time_duration ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
+
+
 		time_duration ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
@@ -287,6 +303,8 @@ namespace synthese
 		{
 			_team = team;
 		}
+
+
 
 		std::string ScheduledService::getTeam() const
 		{

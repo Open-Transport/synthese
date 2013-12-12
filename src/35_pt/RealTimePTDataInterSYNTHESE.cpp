@@ -150,10 +150,13 @@ namespace synthese
 					if(	i+3 < fields.size() &&
 						!fields[i+3].empty()
 					){
-						string vertexIdStr = idFilter->convertId(0, string(), fields[i+3]);
-						vertex = Env::GetOfficialEnv().getEditable<StopPoint>(
-							lexical_cast<RegistryKeyType>(vertexIdStr)
-						).get();
+						RegistryKeyType vertexId(
+							lexical_cast<RegistryKeyType>(
+								idFilter ?
+								idFilter->convertId(0, string(), fields[i+3]) :
+								fields[i+3]
+						)	);
+						vertex = Env::GetOfficialEnv().getEditable<StopPoint>(vertexId).get();
 					}
 
 					// Saving
@@ -246,5 +249,12 @@ namespace synthese
 				}
 			}
 			return result.str();
+		}
+
+
+
+		ptime RealTimePTDataInterSYNTHESE::Content::getExpirationTime() const
+		{
+			return _service.getNextRTUpdate();
 		}
 }	}

@@ -47,6 +47,7 @@ namespace synthese
 		FIELD_STRING(ServerAddress)
 		FIELD_STRING(ServerPort)
 		FIELD_PTIME(LastActivityReport)
+		FIELD_ID(PassiveModeImportId)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -55,7 +56,8 @@ namespace synthese
 			FIELD(ServerPort),
 			FIELD(LastActivityReport),
 			FIELD(InterSYNTHESEConfig),
-			FIELD(Active)
+			FIELD(Active),
+			FIELD(PassiveModeImportId)
 		> InterSYNTHESESlaveRecord;
 
 
@@ -114,6 +116,7 @@ namespace synthese
 				void enqueue(
 					const std::string& interSYNTHESEType,
 					const std::string& parameter,
+					const boost::posix_time::ptime& expirationTime,
 					boost::optional<db::DBTransaction&> transaction,
 					bool force = false
 				) const;
@@ -148,6 +151,11 @@ namespace synthese
 				void setLastSentRange(const QueueRange& value) const { _lastSentRange = value; }
 
 				void clearLastSentRange() const;
+				void clearUselessQueueEntries(db::DBTransaction& transaction) const;
+				void sendToSlave(
+					std::ostream& stream,
+					const QueueRange& range
+				) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();

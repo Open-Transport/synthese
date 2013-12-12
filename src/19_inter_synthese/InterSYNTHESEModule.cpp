@@ -22,13 +22,16 @@
 
 #include "InterSYNTHESEModule.hpp"
 
+#include "BasicClient.h"
 #include "Import.hpp"
 #include "InterSYNTHESEFileFormat.hpp"
 #include "InterSYNTHESEPackage.hpp"
+#include "InterSYNTHESEUpdatePushService.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlave.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "ServerModule.h"
+#include "StaticFunctionRequest.h"
 #include "URI.hpp"
 #include "User.h"
 
@@ -42,6 +45,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace impex;
 	using namespace inter_synthese;
 	using namespace server;
@@ -89,6 +93,9 @@ namespace synthese
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
 		{
 			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "Inter-SYNTHESE slave full updater");
+
+			// Expired queue entries cleaner
+			ServerModule::AddThread(&InterSYNTHESEModule::QueueCleaner, "Inter-SYNTHESE queue cleaner");
 		}
 
 
@@ -252,6 +259,112 @@ namespace synthese
 				return NULL;
 			}
 			return it->second;
+		}
+
+
+
+		void InterSYNTHESEModule::QueueCleaner()
+		{
+			while(true)
+			{
+				ServerModule::SetCurrentThreadRunningAction();
+
+				DBTransaction transaction;
+
+				// Loop on slaves
+				{
+					const InterSYNTHESESlave::Registry& registry(Env::GetOfficialEnv().getRegistry<InterSYNTHESESlave>());
+					recursive_mutex::scoped_lock lock(registry.getMutex());
+					BOOST_FOREACH(const InterSYNTHESESlave::Registry::value_type& it, registry)
+					{
+						it.second->clearUselessQueueEntries(transaction);
+					}
+				}
+
+				if(!transaction.getQueries().empty())
+				{
+					// Log in debug mode
+					Log::GetInstance().debug("Cleaned "+ lexical_cast<string>(transaction.getQueries().size()) + " useless Inter-SYNTHESE queue items.");
+
+					transaction.run();
+				}
+	
+				ServerModule::SetCurrentThreadWaiting();
+				boost::this_thread::sleep(boost::posix_time::minutes(1));
+			}
+		}
+
+
+
+		void InterSYNTHESEModule::PassiveSlavesUpdater()
+		{
+			while(true)
+			{
+				ServerModule::SetCurrentThreadRunningAction();
+
+				// Loop on slaves
+				{
+					const InterSYNTHESESlave::Registry& registry(Env::GetOfficialEnv().getRegistry<InterSYNTHESESlave>());
+					recursive_mutex::scoped_lock lock(registry.getMutex());
+					BOOST_FOREACH(const InterSYNTHESESlave::Registry::value_type& it, registry)
+					{
+						try
+						{
+							// Handle only slaves in passive mode
+							if(!it.second->get<PassiveModeImportId>())
+							{
+								continue;
+							}
+
+							// Jump over empty queues
+							if(it.second->getQueue().empty())
+							{
+								continue;
+							}
+
+							InterSYNTHESESlave::QueueRange range(it.second->getQueueRange());
+							stringstream data;
+							it.second->sendToSlave(
+								data,
+								range
+							);
+
+							StaticFunctionRequest<InterSYNTHESEUpdatePushService> r;
+
+							r.getFunction()->setImportId(it.second->get<PassiveModeImportId>());
+							r.getFunction()->setSlaveId(it.second->getKey());
+							r.getFunction()->setContent(data.str());
+
+							BasicClient c(
+								it.second->get<ServerAddress>(),
+								it.second->get<ServerPort>()
+							);
+							string responseStr(
+								c.post(
+									r.getClientURL(),
+									r.getURI(),
+									"application/x-www-form-urlencoded"
+							)	);
+
+							vector<string> rangeStr;
+							split(rangeStr, responseStr, is_any_of(InterSYNTHESEUpdatePushService::RANGE_SEPARATOR));
+							if(	rangeStr.size() == 2 &&
+								lexical_cast<RegistryKeyType>(rangeStr[0]) == it.second->getLastSentRange().first->first &&
+								lexical_cast<RegistryKeyType>(rangeStr[1]) == it.second->getLastSentRange().second->first
+							){
+								it.second->clearLastSentRange();
+							}
+						}
+						catch(...)
+						{
+
+						}
+					}
+				}
+
+				ServerModule::SetCurrentThreadWaiting();
+				boost::this_thread::sleep(boost::posix_time::seconds(10));
+			}
 		}
 }	}
 

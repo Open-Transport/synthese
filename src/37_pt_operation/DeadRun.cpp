@@ -26,6 +26,7 @@
 #include "StopPoint.hpp"
 #include "ForbiddenUseRule.h"
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -141,6 +142,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
@@ -148,6 +150,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
@@ -155,6 +158,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
@@ -162,6 +166,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 

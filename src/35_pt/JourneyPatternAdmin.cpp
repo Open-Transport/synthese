@@ -660,6 +660,7 @@ namespace synthese
 					string number("S"+ lexical_cast<string>(i++));
 					services[service.get()] = number;
 
+					recursive_mutex::scoped_lock lock(service->getSchedulesMutex());
 					time_duration ds(service->getDepartureSchedule(false, 0));
 					time_duration as(service->getLastArrivalSchedule(false));
 

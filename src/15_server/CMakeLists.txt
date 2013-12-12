@@ -97,6 +97,8 @@ SetSessionVariableAction.hpp
 StaticActionFunctionRequest.h
 StaticActionRequest.h
 StaticFunctionRequest.h
+SuicidalAction.cpp
+SuicidalAction.hpp
 SYNTHESEInformationService.cpp
 SYNTHESEInformationService.hpp
 ThreadKillAction.cpp

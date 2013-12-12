@@ -263,6 +263,9 @@ namespace synthese
 				return t1 < t2;
 			}
 
+			recursive_mutex::scoped_lock lock1(s1.getSchedulesMutex());
+			recursive_mutex::scoped_lock lock2(s2.getSchedulesMutex());
+
 			const time_duration& at1(s1.getLastArrivalSchedule(false));
 			const time_duration& at2(s2.getLastArrivalSchedule(false));
 

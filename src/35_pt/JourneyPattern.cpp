@@ -889,9 +889,13 @@ namespace synthese
 					if(	dynamic_cast<Calendar*>(service) &&
 						dynamic_cast<NonPermanentService*>(service)
 					){
+						const boost::posix_time::time_duration& lastArrivalSchedule(
+							dynamic_cast<NonPermanentService*>(service)->getLastArrivalSchedule(false)
+						);
+
 						Calendar copyCalendar(*dynamic_cast<Calendar*>(service));
 						for(int i(service->getDepartureSchedule(false,0).hours() / 24);
-							i<= dynamic_cast<NonPermanentService*>(service)->getLastArrivalSchedule(false).hours() / 24;
+							i<= lastArrivalSchedule.hours() / 24;
 							++i
 						){
 							value |= copyCalendar;

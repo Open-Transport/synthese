@@ -28,7 +28,7 @@
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveTableSync.hpp"
-#include "InterSYNTHESESlaveUpdateService.hpp"
+#include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 #include "ServerModule.h"
 
@@ -49,6 +49,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ServerAddress, "address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServerPort, "port", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(LastActivityReport, "last_activity_report", SQL_DATETIME)
+	FIELD_DEFINITION_OF_TYPE(PassiveModeImportId, "passive_mode_import_id", SQL_INTEGER)
 	
 	namespace inter_synthese
 	{
@@ -68,7 +69,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(ServerPort, "8080"),
 					FIELD_VALUE_CONSTRUCTOR(LastActivityReport, posix_time::not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
-					FIELD_VALUE_CONSTRUCTOR(Active, false)
+					FIELD_VALUE_CONSTRUCTOR(Active, false),
+					FIELD_VALUE_CONSTRUCTOR(PassiveModeImportId, 0)
 			)	),
 			_lastSentRange(make_pair(_queue.end(), _queue.end())),
 			_previousConfig(NULL)
@@ -112,6 +114,7 @@ namespace synthese
 		void InterSYNTHESESlave::enqueue(
 			const std::string& interSYNTHESEType,
 			const std::string& parameter,
+			const boost::posix_time::ptime& expirationTime,
 			boost::optional<db::DBTransaction&> transaction,
 			bool force
 		) const	{
@@ -127,6 +130,7 @@ namespace synthese
 			q.set<RequestTime>(now);
 			q.set<SyncType>(interSYNTHESEType);
 			q.set<SyncContent>(parameter);
+			q.set<ExpirationTime>(expirationTime);
 			InterSYNTHESEQueueTableSync::Save(&q, transaction);
 		}
 
@@ -328,7 +332,7 @@ namespace synthese
 				for(Queue::iterator it(_lastSentRange.first);
 					it != _queue.end();
 					++it
-					){
+				){
 					DBModule::GetDB()->deleteStmt(it->first, transaction);
 					// Exit on last item
 					if(it == _lastSentRange.second)
@@ -340,6 +344,53 @@ namespace synthese
 				_lastSentRange = make_pair(_queue.end(), _queue.end());
 			}
 			transaction.run();
+		}
+
+
+
+		void InterSYNTHESESlave::clearUselessQueueEntries(DBTransaction& transaction) const
+		{
+			ptime now(second_clock::local_time());
+
+			// Do no run transation with the lock or we will deadlock if
+			// a transaction triggers a real time update
+			recursive_mutex::scoped_lock lock(_queueMutex);
+
+			BOOST_FOREACH(const Queue::value_type& it, _queue)
+			{
+				if(	isObsolete() || (!it.second->get<ExpirationTime>().is_not_a_date_time() && it.second->get<ExpirationTime>() > now))
+				{
+					DBModule::GetDB()->deleteStmt(it.first, transaction);
+				}
+			}
+		}
+
+
+
+		void InterSYNTHESESlave::sendToSlave(
+			std::ostream& stream,
+			const QueueRange& range
+		) const	{
+			recursive_mutex::scoped_lock lock(_queueMutex);
+
+			for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _queue.end(); ++it)
+			{
+				stream <<
+					it->second->get<Key>() << InterSYNTHESEPacket::FIELDS_SEPARATOR <<
+					it->second->get<SyncType>() << InterSYNTHESEPacket::FIELDS_SEPARATOR <<
+					it->second->get<SyncContent>().size() << InterSYNTHESEPacket::FIELDS_SEPARATOR <<
+					it->second->get<SyncContent>() <<
+					InterSYNTHESEPacket::SYNCS_SEPARATOR;
+				;
+
+				// Exit on last item
+				if(it == range.second)
+				{
+					break;
+				}
+			}
+
+			setLastSentRange(range);
 		}
 }	}
 

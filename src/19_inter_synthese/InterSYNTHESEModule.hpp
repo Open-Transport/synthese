@@ -121,6 +121,10 @@ namespace synthese
 			static void RemovePackage(
 				const std::string& smartURL
 			);
+
+			static void QueueCleaner();
+
+			static void PassiveSlavesUpdater();
 		};
 
 		/** @} */
