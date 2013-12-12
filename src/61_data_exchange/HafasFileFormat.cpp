@@ -98,6 +98,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME = "complete_empty_stop_area_name";
 		const string HafasFileFormat::Importer_::PARAMETER_NO_GLEIS_FILE = "no_gleis_file";
 		const string HafasFileFormat::Importer_::PARAMETER_TRY_TO_READ_LINE_SHORT_NAME = "try_to_read_line_short_name";
+		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 	}
 
 	namespace impex
@@ -747,7 +748,7 @@ namespace synthese
 							}
 							catch (bad_lexical_cast&)
 							{
-								calendarUse.calendarNumber = 0;
+								calendarUse.calendarNumber = _defaultCalendarCode;
 							}
 							calendarUse.startStopCode = _getField(6, 7);
 							calendarUse.endStopCode = _getField(14, 7);
@@ -928,6 +929,9 @@ namespace synthese
 			// No gleis file
 			pm.insert(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, _tryToReadShortName);
 
+			// Calendar default code
+			pm.insert(PARAMETER_CALENDAR_DEFAULT_CODE, _defaultCalendarCode);
+
 			return pm;
 		}
 
@@ -1003,6 +1007,9 @@ namespace synthese
 			
 			// Line short name
 			_tryToReadShortName = pm.getDefault<bool>(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, false);
+
+			// Calendar default code
+			_defaultCalendarCode = pm.getDefault<size_t>(PARAMETER_CALENDAR_DEFAULT_CODE, 0);
 		}
 
 
