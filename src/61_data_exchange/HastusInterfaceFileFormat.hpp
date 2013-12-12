@@ -188,9 +188,7 @@ namespace synthese
 			typedef impex::NoExportPolicy<HastusInterfaceFileFormat> Exporter_;
 
 			friend class Importer_;
-			friend class Exporter_;
 		};
-	}
-}
+}	}
 
 #endif
