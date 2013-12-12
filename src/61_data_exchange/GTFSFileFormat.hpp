@@ -269,9 +269,7 @@ namespace synthese
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
 
-				Exporter_(const impex::Export& export_):
-					OneFileExporter<GTFSFileFormat>(export_)
-				{}
+				Exporter_(const impex::Export& export_);
 
 				virtual util::ParametersMap getParametersMap() const;
 
@@ -284,7 +282,6 @@ namespace synthese
 
 			};
 		};
-	}
-}
+}	}
 
 #endif
