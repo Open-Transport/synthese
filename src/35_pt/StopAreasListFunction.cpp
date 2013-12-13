@@ -25,6 +25,7 @@
 
 #include "StopAreasListFunction.hpp"
 
+#include "AccessParameters.h"
 #include "Destination.hpp"
 #include "RequestException.h"
 #include "StopAreaTableSync.hpp"
@@ -35,6 +36,7 @@
 #include "RollingStock.hpp"
 #include "Request.h"
 #include "JourneyPattern.hpp"
+#include "LineStop.h"
 #include "Path.h"
 #include "Edge.h"
 #include "City.h"
@@ -83,6 +85,9 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_GROUP_BY_CITIES = "group_by_cities";
 		const string StopAreasListFunction::PARAMETER_STOPS_DIRECTIONS = "stops_directions";
 		const string StopAreasListFunction::PARAMETER_DATA_SOURCE_FILTER = "data_source_filter";
+		const string StopAreasListFunction::PARAMETER_IGNORE_UNSERVED_AREAS = "ignore_unserved_areas";
+		const string StopAreasListFunction::PARAMETER_DAYS_CHECK_IF_STOP_SERVED = "days_check_if_stop_served";
+		const string StopAreasListFunction::PARAMETER_OUTPUT_ARRIVAL_LINES = "output_arrival_lines";
 
 
 		const string StopAreasListFunction::TAG_DIRECTION = "direction";
@@ -150,6 +155,12 @@ namespace synthese
 				result.insert(PARAMETER_OUTPUT_STOPS, _outputStops);
 			}
 
+			// Ignore unserved areas ?
+			if(_ignoreUnservedAreas)
+			{
+				result.insert(PARAMETER_IGNORE_UNSERVED_AREAS, _ignoreUnservedAreas);
+			}
+
 			// Group by cities ?
 			if(_groupByCities)
 			{
@@ -211,6 +222,12 @@ namespace synthese
 
 			// Group by cities ?
 			_groupByCities = map.isTrue(PARAMETER_GROUP_BY_CITIES);
+
+			// Ignore unserved areas ?
+			_ignoreUnservedAreas = map.isTrue(PARAMETER_IGNORE_UNSERVED_AREAS);
+
+			// Output arrival lines ?
+			_outputArrivalLines = map.isTrue(PARAMETER_OUTPUT_ARRIVAL_LINES);
 
 			// SRID
 			CoordinatesSystem::SRID srid(
@@ -287,6 +304,8 @@ namespace synthese
 			{
 				throw RequestException("No such data source");
 			}
+
+			_daysCheckIfStopServed = boost::gregorian::date_duration(map.getDefault<int>(PARAMETER_DAYS_CHECK_IF_STOP_SERVED, 15));
 		}
 
 
@@ -397,7 +416,7 @@ namespace synthese
 					bool isAreaOfTerminus= false;
 					if(_terminusId)
 					{
-						BOOST_FOREACH(const StopArea::Lines::value_type& itLine, stopArea.second->getLines(false))
+						BOOST_FOREACH(const StopArea::Lines::value_type& itLine, stopArea.second->getLines(_outputArrivalLines))
 						{
 							BOOST_FOREACH(Path* path, itLine->getPaths())
 							{
@@ -449,10 +468,64 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> stopPm(new ParametersMap);
 				it->toParametersMap(*stopPm, _coordinatesSystem);
 
+				const StopArea::PhysicalStops physicalStops = it->getPhysicalStops();
+
+				if(_ignoreUnservedAreas)
+				{
+					bool served(false);
+					boost::posix_time::ptime date = boost::posix_time::second_clock::local_time();
+					boost::posix_time::ptime startDateTime = date - date.time_of_day() + boost::posix_time::hours(3);
+					boost::posix_time::ptime endDateTime = date - date.time_of_day() + _daysCheckIfStopServed + boost::posix_time::hours(27);
+					AccessParameters ap(USER_PEDESTRIAN);
+
+					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, physicalStops)
+					{
+						Vertex::Edges::const_iterator itDep(itStop.second->getDepartureEdges().begin());
+						Vertex::Edges::const_iterator itArr(itStop.second->getArrivalEdges().begin());
+
+						while(!served && itDep != itStop.second->getDepartureEdges().end() && itArr != itStop.second->getArrivalEdges().end())
+						{
+							const LineStop* lineStop;
+							if(itDep != itStop.second->getDepartureEdges().end())
+							{
+								lineStop = dynamic_cast<const LineStop*>(itDep->second);
+								itDep++;
+							}
+							else
+							{
+								lineStop = dynamic_cast<const LineStop*>(itArr->second);
+								itArr++;
+							}
+
+							if(lineStop && (lineStop->isDepartureAllowed() || lineStop->isArrivalAllowed()))
+							{
+								optional<Edge::DepartureServiceIndex::Value> index;
+								ServicePointer servicePointer(
+									lineStop->getNextService(
+										ap,
+										startDateTime,
+										endDateTime,
+										false,
+										index
+									)
+								);
+
+								if(servicePointer.getService())
+									served = true;
+							}
+						}
+					}
+
+					if(!served)
+					{
+						continue;
+					}
+				}
+
 				// Output stops
 				if(_outputStops)
 				{
-					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, it->getPhysicalStops())
+					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, physicalStops)
 					{
 						const StopPoint& stop(*itStop.second);
 
@@ -521,7 +594,7 @@ namespace synthese
 				// Lines calling at the stop
 				if(_outputLines)
 				{
-					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(false))
+					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(_outputArrivalLines))
 					{
 						// For CMS output
 						boost::shared_ptr<ParametersMap> pmLine(new ParametersMap);
