@@ -33,9 +33,11 @@
 
 #include <boost/thread.hpp>
 #include <boost/format.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -154,6 +156,10 @@ namespace synthese
 					//TODO: read an validate CRC of Master message.
 					// if ok, DLE ACK1 then wait on EOT
 					// if not, NAK 3 times
+				}
+				else
+				{
+					this_thread::sleep(seconds(1));
 				}
 			}
 		}
