@@ -25,6 +25,7 @@
 #include "Env.h"
 #include "Exception.h"
 #include "Log.h"
+#include "ScheduledService.h"
 
 #include "gps.h"
 
@@ -52,6 +53,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace data_exchange;
+	using namespace graph;	
 	using namespace pt;
 	using namespace server;
 	using namespace util;
@@ -161,8 +163,32 @@ DEBUG(JD)*/
 								UP_LINKS_LOAD_LEVEL
 							);
 
+							Path::Edges allEdges;
+							if(VehicleModule::GetCurrentVehiclePosition().getService())
+							{
+								allEdges = VehicleModule::GetCurrentVehiclePosition().getService()->getPath()->getAllEdges();
+							}
+							
 							BOOST_FOREACH(boost::shared_ptr<StopPoint> sp, sr)
 							{
+								// Jump over stops not in the current route
+								if(VehicleModule::GetCurrentVehiclePosition().getService())
+								{
+									bool found(false);
+									BOOST_FOREACH(const Path::Edges::value_type& edge, allEdges)
+									{
+										if(edge->getFromVertex() == sp.get())
+										{
+											found = true;
+											break;
+										}
+									}
+									if(!found)
+									{
+										continue;
+									}
+								}
+
 								double dst(sp->getGeometry()->distance(projectedPoint.get()));
 
 								if(!nearestStopPoint || dst < lastDistance)
