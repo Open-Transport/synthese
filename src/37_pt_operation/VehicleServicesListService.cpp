@@ -53,13 +53,16 @@ namespace synthese
 	namespace pt_operation
 	{
 		const string VehicleServicesListService::PARAMETER_PAGE = "p";
+		const string VehicleServicesListService::PARAMETER_WITH_DETAIL = "with_detail";
+
 		const string VehicleServicesListService::TAG_VEHICLE_SERVICE = "vehicleService";
 		const string VehicleServicesListService::TAG_VEHICLE_SERVICES = "vehicleServices";
 
 
 
 		VehicleServicesListService::VehicleServicesListService():
-			_page(NULL)
+			_page(NULL),
+			_withDetail(true)
 		{}
 
 
@@ -83,6 +86,10 @@ namespace synthese
 			if(!_name.empty())
 			{
 				map.insert(Name::FIELD.name, _name);
+			}
+			if(!_withDetail)
+			{
+				map.insert(PARAMETER_WITH_DETAIL, _withDetail);
 			}
 			return map;
 		}
@@ -108,6 +115,20 @@ namespace synthese
 
 			// Name
 			_name = map.getDefault<string>(Name::FIELD.name);
+
+			// Detail
+			_withDetail = map.getDefault<bool>(PARAMETER_WITH_DETAIL, true);
+
+			// id filter
+			RegistryKeyType id(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0));
+			if(id) try
+			{
+				_service = Env::GetOfficialEnv().get<VehicleService>(id);
+			}
+			catch(ObjectNotFoundException<VehicleService>&)
+			{
+				throw RequestException("No such vehicle service");
+			}
 		}
 
 
@@ -119,29 +140,35 @@ namespace synthese
 
 			ParametersMap map;
 
-			BOOST_FOREACH(const VehicleService::Registry::value_type& item, _env->getRegistry<VehicleService>())
+			if(_service)
 			{
-				const VehicleService& vs(*item.second);
-
-				// Date filter
-				if(!_date.is_not_a_date() && !vs.isActive(_date))
+				_exportService(*_service, map);
+			}
+			else
+			{
+				recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<VehicleService>().getMutex());
+				BOOST_FOREACH(const VehicleService::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<VehicleService>())
 				{
-					continue;
-				}
+					const VehicleService& vs(*item.second);
 
-				// Name filter
-				if(!_name.empty())
-				{
-					if(	vs.getName().size() < _name.size() ||
-						vs.getName().substr(0, _name.size()) != _name
-					){
+					// Date filter
+					if(!_date.is_not_a_date() && !vs.isActive(_date))
+					{
 						continue;
 					}
-				}
 
-				boost::shared_ptr<ParametersMap> vsMap(new ParametersMap);
-				vs.toParametersMap(*vsMap, true);
-				map.insert(TAG_VEHICLE_SERVICE, vsMap);
+					// Name filter
+					if(!_name.empty())
+					{
+						if(	vs.getName().size() < _name.size() ||
+							vs.getName().substr(0, _name.size()) != _name
+						){
+							continue;
+						}
+					}
+
+					_exportService(vs, map);
+				}
 			}
 
 			if(_page)
@@ -180,5 +207,14 @@ namespace synthese
 		std::string VehicleServicesListService::getOutputMimeType() const
 		{
 			return _page ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat();
+		}
+
+
+
+		void VehicleServicesListService::_exportService( const VehicleService& vs, util::ParametersMap& map ) const
+		{
+			boost::shared_ptr<ParametersMap> vsMap(new ParametersMap);
+			vs.toParametersMap(*vsMap, _withDetail);
+			map.insert(TAG_VEHICLE_SERVICE, vsMap);
 		}
 }	}
