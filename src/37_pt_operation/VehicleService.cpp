@@ -127,14 +127,17 @@ namespace synthese
 			map.insert(Name::FIELD.name, getName());
 
 			// Services
-			BOOST_FOREACH(const Services::value_type& service, _services)
+			if(withAdditionalParameters)
 			{
-				boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
+				BOOST_FOREACH(const Services::value_type& service, _services)
+				{
+					boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
 
-				serviceMap->insert(ATTR_CLASS, dynamic_cast<ScheduledService*>(service) ? VALUE_COMMERCIAL : VALUE_DEAD_RUN);
-				service->toParametersMap(*serviceMap, false);
+					serviceMap->insert(ATTR_CLASS, dynamic_cast<ScheduledService*>(service) ? VALUE_COMMERCIAL : VALUE_DEAD_RUN);
+					service->toParametersMap(*serviceMap, false);
 
-				map.insert(TAG_SERVICE, serviceMap);
+					map.insert(TAG_SERVICE, serviceMap);
+				}
 			}
 		}
 
