@@ -39,6 +39,7 @@
 using namespace boost;
 using namespace boost::gregorian;
 using namespace boost::logic;
+using namespace boost::posix_time;
 using namespace std;
 
 namespace synthese
@@ -80,6 +81,9 @@ namespace synthese
 		const string ServicesListService::ATTR_STOP_NAME = "stop_name";
 		const string ServicesListService::ATTR_DEPARTURE_TIME = "departure_time";
 		const string ServicesListService::ATTR_ARRIVAL_TIME = "arrival_time";
+		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
+		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
+		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
 
 
 		ParametersMap ServicesListService::_getParametersMap() const
@@ -156,6 +160,27 @@ namespace synthese
 			{
 				_displayDate = from_string(map.get<string>(PARAMETER_DISPLAY_DATE));
 			}
+
+			// Min departure time
+			string minDepartureTimeStr(map.getDefault<string>(PARAMETER_MIN_DEPARTURE_TIME));
+			if(!minDepartureTimeStr.empty())
+			{
+				_minDepartureTime = duration_from_string(minDepartureTimeStr);
+			}
+
+			// Max departure time
+			string maxDepartureTimeStr(map.getDefault<string>(PARAMETER_MAX_DEPARTURE_TIME));
+			if(!maxDepartureTimeStr.empty())
+			{
+				_maxDepartureTime = duration_from_string(maxDepartureTimeStr);
+			}
+
+			// Departure place id
+			RegistryKeyType departurePlaceId(map.getDefault<RegistryKeyType>(PARAMETER_DEPARTURE_PLACE, 0));
+			if(departurePlaceId)
+			{
+				_departurePlaceId = departurePlaceId;
+			}
 		}
 
 
@@ -193,12 +218,33 @@ namespace synthese
 						continue;
 					}
 
+					// Departure place filter
+					if(	_departurePlaceId &&
+						dynamic_cast<const NamedPlace*>(journeyPattern.getEdge(0)->getFromVertex()->getHub())->getKey() != *_departurePlaceId
+					){
+						continue;
+					}
+
 					// Gets all services
 					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 								*journeyPattern.sharedServicesMutex
 					);
 					BOOST_FOREACH(Service* service, journeyPattern.getServices())
 					{
+						// Min departure time filter
+						if(	_minDepartureTime &&
+							static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) < *_minDepartureTime
+						){
+							continue;
+						}
+
+						// Max departure time filter
+						if(	_maxDepartureTime &&
+							static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) > *_maxDepartureTime
+						){
+							continue;
+						}
+
 						result.insert(service);
 					}
 
@@ -206,7 +252,7 @@ namespace synthese
 					BOOST_FOREACH(JourneyPatternCopy* subPath, journeyPattern.getSubLines())
 					{
 						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-									*subPath->sharedServicesMutex
+							*subPath->sharedServicesMutex
 						);
 						BOOST_FOREACH(Service* service, subPath->getServices())
 						{
