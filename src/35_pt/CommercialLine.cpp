@@ -383,6 +383,12 @@ namespace synthese
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
 			BOOST_FOREACH(const Path* path, _paths)
 			{
+				// Jump over paths with non defined transport mode
+				if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
+				{
+					continue;
+				}
+
 				pm.insert(prefix + "transportMode", static_cast<const JourneyPattern*>(path)->getRollingStock()->getName());
 			}
 			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());

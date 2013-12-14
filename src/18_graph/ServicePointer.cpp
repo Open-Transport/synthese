@@ -25,6 +25,8 @@
 #include "UseRule.h"
 #include "Edge.h"
 #include "AccessParameters.h"
+#include "Vertex.h"
+#include "AreaGeneratedLineStop.hpp"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
@@ -312,8 +314,42 @@ namespace synthese
 			);
 
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+			bool drtAreaSequence = false;
+			bool hasGeometry = false;
+			bool hasDRTArea = false;
+			Coordinate previousCoordinates = NULL;
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
+				if(dynamic_cast<const pt::AreaGeneratedLineStop*>(edge))
+				{
+					hasDRTArea = true;	
+					if(!drtAreaSequence) // True only for first DRTArea visited
+					{
+						drtAreaSequence = true;
+						if(edge->getFromVertex()->getGeometry())
+						{
+							cs->add(*edge->getFromVertex()->getGeometry()->getCoordinate(),false);
+						}
+					}
+					else
+					{
+						if(edge->getFromVertex()->getGeometry())
+						{
+							previousCoordinates = *edge->getFromVertex()->getGeometry()->getCoordinate();
+						}
+					}
+					continue;
+				}
+				else
+				{
+					if(drtAreaSequence) // True if a DRTArea sequence is followed by a stop sequence
+					{
+						cs->add(previousCoordinates,false);
+						drtAreaSequence = false;
+					}
+				}
+				if(edge->getGeometry().get())
+					hasGeometry = true;
 				boost::shared_ptr<LineString> geometry(edge->getRealGeometry());
 				if(!geometry.get())
 				{
@@ -323,6 +359,17 @@ namespace synthese
 				{
 					cs->add(geometry->getCoordinateN(i));
 				}
+			}
+			if(drtAreaSequence) // Service end by DRTAreas
+			{
+				cs->add(previousCoordinates,false);
+			}
+			if(!hasGeometry && hasDRTArea) // Service is virtual TAD without mixed regular stops
+			{
+				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+				csTwoPoints->add(cs->getAt(0));
+				csTwoPoints->add(cs->getAt(cs->getSize()-1));
+				return boost::shared_ptr<LineString>(geometryFactory.createLineString(csTwoPoints));
 			}
 			if(cs->size() < 2)
 			{

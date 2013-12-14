@@ -22,6 +22,8 @@
 #include "ResaDBLog.h"
 #include "ResaRight.h"
 #include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "ResaLogAdmin.h"
 #include "Reservation.h"
 #include "ReservationTransaction.h"
 #include "ResaModule.h"
@@ -340,14 +342,9 @@ namespace synthese
 				if(entryType == RESERVATION_ENTRY)
 				{
 					// Cancel request
-					boost::shared_ptr<CancelReservationAction> action(new CancelReservationAction);
-					action->setTransaction(tr);
-					Request cancelRequest(
-						searchRequest,
-						static_pointer_cast<Action, CancelReservationAction>(action),
-						boost::shared_ptr<Function>(searchRequest.getFunction()->clone())
-					);
-
+					AdminActionFunctionRequest<CancelReservationAction, ResaLogAdmin> cancelRequest(searchRequest);
+					cancelRequest.getAction()->setTransaction(tr);
+					
 					switch(status)
 					{
 					case OPTION:

@@ -119,7 +119,7 @@ namespace synthese
 			static const boost::posix_time::time_duration endOfService;
 
 			typedef std::pair<const pt::CommercialLine*, const pt::StopArea*> LineDestinationKey;
-			typedef std::map<const pt::StopPoint*, LineDestinationKey> LineDestinationFilter;
+			typedef std::multimap<const pt::StopPoint*, LineDestinationKey> LineDestinationFilter;
 
 			// Direct connection SAE structures :
 			struct RealTimeService

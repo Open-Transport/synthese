@@ -77,6 +77,9 @@ namespace synthese
 			static const std::string PARAMETER_GROUP_BY_CITIES;
 			static const std::string PARAMETER_STOPS_DIRECTIONS;
 			static const std::string PARAMETER_DATA_SOURCE_FILTER;
+			static const std::string PARAMETER_IGNORE_UNSERVED_AREAS;
+			static const std::string PARAMETER_DAYS_CHECK_IF_STOP_SERVED;
+			static const std::string PARAMETER_OUTPUT_ARRIVAL_LINES;
 
 		private:
 			static const std::string TAG_CITY;
@@ -104,8 +107,11 @@ namespace synthese
 				bool _outputStops;
 				bool _outputLinesInStops;
 				bool _groupByCities;
+				bool _ignoreUnservedAreas;
+				bool _outputArrivalLines;
 				size_t _stopsDirections;
 				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
+				boost::gregorian::date_duration _daysCheckIfStopServed;
 			//@}
 
 			//! @name Setters

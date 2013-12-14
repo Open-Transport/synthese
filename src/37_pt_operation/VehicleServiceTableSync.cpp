@@ -99,6 +99,12 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
+			{
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+			}
 		}
 
 

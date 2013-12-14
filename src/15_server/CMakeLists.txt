@@ -42,6 +42,8 @@ LoginAction.cpp
 LoginAction.h
 LoginInterfacePage.cpp
 LoginInterfacePage.h
+LoginToken.cpp
+LoginToken.hpp
 LogoutAction.cpp
 LogoutAction.h
 MemoryStatisticsAdmin.cpp

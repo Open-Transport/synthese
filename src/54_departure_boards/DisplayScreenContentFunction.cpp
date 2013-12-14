@@ -523,23 +523,34 @@ namespace synthese
 						//If an oc was given we search corresponding physical stop
 						string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
 
+						set<string> stopsSet;
+						split(stopsSet, oc, is_any_of(",; "));
+
 						//Get StopPoint Global Registry
 						typedef const pair<const RegistryKeyType, boost::shared_ptr<StopPoint> > myType;
 						ArrivalDepartureTableGenerator::PhysicalStops pstops;
-						BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
+						BOOST_FOREACH(myType& myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
 						{
-							if(myStop.second->getCodeBySources() == oc)
+							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, myStop.second->getDataSourceLinks())
 							{
-								if(_dataSourceFilter && !myStop.second->hasLinkWithSource(*_dataSourceFilter))
-									continue;
+								BOOST_FOREACH(string code, stopsSet)
+								{
+									if(dataSourceLink.second == code)
+									{
+										if(_dataSourceFilter && dataSourceLink.first->getKey() != _dataSourceFilter->getKey())
+											continue;
 
-								pstops.insert(make_pair(myStop.second->getKey(), myStop.second.get()));
-								screen->setDisplayedPlace(myStop.second->getConnectionPlace());
-								screen->setAllPhysicalStopsDisplayed(false);
-								screen->setStops(pstops);
-								break;
+										stopsSet.erase(code);
+										pstops.insert(make_pair(myStop.second->getKey(), myStop.second.get()));
+										screen->setDisplayedPlace(myStop.second->getConnectionPlace());
+										break;
+									}
+								}
 							}
 						}
+
+						screen->setAllPhysicalStopsDisplayed(false);
+						screen->setStops(pstops);
 					}
 
 					// Way 2 : connection place
@@ -1127,9 +1138,15 @@ namespace synthese
 
 					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
 					{
-						operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
-						operatorCodes << "'" << setfill('0') << setw(5) << it.second->getCodeBySources();
-						operatorCodes << "'";
+						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
+						{
+							if(!dataSourceLink.second.empty())
+							{
+								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
+								operatorCodes << "'" << setfill('0') << setw(5) << dataSourceLink.second;
+								operatorCodes << "'";
+							}
+						}
 					}
 
 					// Limit the research to X hour after date, X is 1 hour times the number of result we wish for
@@ -1205,8 +1222,11 @@ namespace synthese
 						result->reset();
 						BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
 						{
-							if(ocStops.find(curStop.second->getCodeBySources()) != ocStops.end())
-								ocStops[curStop.second->getCodeBySources()] = curStop.second;
+							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
+							{
+								if(ocStops.find(dataSourceLink.second) != ocStops.end())
+									ocStops[dataSourceLink.second] = curStop.second;
+							}
 						}
 
 						while(result->next())
@@ -1230,10 +1250,19 @@ namespace synthese
 									BOOST_FOREACH(Path* path, curLine->getPaths())
 									{
 										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
-										if(destination && destination->getCodeBySources() == result->getInfo("oc_arrivee"))
+										if(destination)
 										{
-											realTimeService.commercialLine = curLine;
-											break;
+											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
+											{
+												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
+												{
+													realTimeService.commercialLine = curLine;
+													break;
+												}
+											}
+
+											if(realTimeService.commercialLine)
+												break;
 										}
 									}
 
@@ -1251,10 +1280,21 @@ namespace synthese
 
 							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
 							{
-								LineDestinationKey filter = _lineDestinationFilter.find(realTimeService.stop.get())->second;
-								if(filter.first && filter.first != realTimeService.commercialLine.get())
-									continue;
-								else if(filter.second && filter.second != realTimeService.destination)
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+									displayDeparture = goodLine & goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
 									continue;
 							}
 
@@ -1376,10 +1416,21 @@ namespace synthese
 
 							if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
 							{
-								LineDestinationKey filter = _lineDestinationFilter.find(stop)->second;
-								if(filter.first && filter.first != commercialLine)
-									continue;
-								else if(filter.second && filter.second != destination)
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(stop);
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == commercialLine));
+									bool goodDest(!it->second.second || (it->second.second == destination));
+									displayDeparture = goodLine && goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
 									continue;
 							}
 
@@ -1599,9 +1650,15 @@ namespace synthese
 
 					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
 					{
-						operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
-						operatorCodes << "'" << setfill('0') << setw(5) << it.second->getCodeBySources();
-						operatorCodes << "'";
+						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
+						{
+							if(!dataSourceLink.second.empty())
+							{
+								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
+								operatorCodes << "'" << setfill('0') << setw(5) << dataSourceLink.second;
+								operatorCodes << "'";
+							}
+						}
 					}
 
 					shared_ptr<MySQLconnector> connector(new MySQLconnector());
@@ -1672,8 +1729,11 @@ namespace synthese
 						result->reset();
 						BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
 						{
-							if(ocStops.find(curStop.second->getCodeBySources()) != ocStops.end())
-								ocStops[curStop.second->getCodeBySources()] = curStop.second;
+							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
+							{
+								if(ocStops.find(dataSourceLink.second) != ocStops.end())
+									ocStops[dataSourceLink.second] = curStop.second;
+							}
 						}
 
 						while(result->next())
@@ -1695,10 +1755,19 @@ namespace synthese
 									BOOST_FOREACH(Path* path, curLine->getPaths())
 									{
 										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
-										if(destination && destination->getCodeBySources() == result->getInfo("oc_arrivee"))
+										if(destination)
 										{
-											realTimeService.commercialLine = curLine;
-											break;
+											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
+											{
+												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
+												{
+													realTimeService.commercialLine = curLine;
+													break;
+												}
+											}
+
+											if(realTimeService.commercialLine)
+												break;
 										}
 									}
 
@@ -1713,6 +1782,26 @@ namespace synthese
 
 							if(!realTimeService.commercialLine)
 								continue;
+
+							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
+							{
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+									displayDeparture = goodLine && goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
+									continue;
+							}
 
 							if(result->getInfo("fiable") == "F")
 								realTimeService.realTime = true;
@@ -1797,11 +1886,33 @@ namespace synthese
 							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 								continue;
 
+							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+							const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
+
+							if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
+							{
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(stop);
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == commercialLine));
+									bool goodDest(!it->second.second || (it->second.second == destination));
+									displayDeparture = goodLine && goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
+									continue;
+							}
+
 							//If a lineid arg was passed : only one line will be displayed
 							if(_lineToDisplay)
 							{
-								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
 								if(commercialLine->getKey()!=(*_lineToDisplay))
 									continue;
 							}

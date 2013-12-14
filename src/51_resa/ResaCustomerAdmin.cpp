@@ -158,7 +158,7 @@ namespace synthese
 					_request
 				);
 				routeplannerRequest.getPage()->setCustomer(_user);
-
+				
 				// Display
 				stream << "<h1>Liens</h1>";
 				stream << "<p>";
@@ -184,7 +184,16 @@ namespace synthese
 				stream << t.cell("Ville", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_CITY, _user->getCityText()));
 				stream << t.cell("Téléphone",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
+				
+				if (_user->getCreatorId() != 0)
+				{
+					boost::shared_ptr<const User> creator = UserTableSync::Get(_user->getCreatorId(), Env::GetOfficialEnv());
+					stream << t.cell("Créateur", creator != NULL ? creator->getLogin() : "Inconnu");
+				}
+				else
+					stream << t.cell("Créateur", "Inconnu");
 
+				stream << t.cell("Date de création", to_iso_extended_string(_user->getCreationDate()) != "not-a-date-time" ? to_iso_extended_string(_user->getCreationDate()) : "Inconnue");
 				stream << t.title("Droits");
 				stream << t.cell("Accès site web",t.getForm().getOuiNonRadioInput(ReservationUserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
 

@@ -28,6 +28,7 @@
 #include "Session.h"
 #include "Request.h"
 #include "ParametersMap.h"
+#include "LoginToken.hpp"
 
 #include <boost/shared_ptr.hpp>
 
@@ -50,6 +51,7 @@ namespace synthese
 	{
 		const std::string LoginAction::PARAMETER_LOGIN = Action_PARAMETER_PREFIX + "login";
 		const std::string LoginAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pwd";
+		const std::string LoginAction::PARAMETER_TOKEN = Action_PARAMETER_PREFIX + "tk";
 
 		ParametersMap LoginAction::getParametersMap() const
 		{
@@ -63,6 +65,10 @@ namespace synthese
 			{
 				_login = map.get<string>(PARAMETER_LOGIN);
 				_password = map.get<string>(PARAMETER_PASSWORD, false);
+				optional<string> token(map.getOptional<string>(PARAMETER_TOKEN));
+
+				if (token)
+					_token = *token; 
 			}
 			catch(ParametersMap::MissingParameterException e)
 			{
@@ -75,12 +81,29 @@ namespace synthese
 			// Fetch user
 			try
 			{
-				if (_login.empty() || _password.empty())
+				if ((_login.empty() || _password.empty()) && _token.empty())
 					throw ActionException("Champ utilisateur ou mot de passe vide");
-
-				boost::shared_ptr<User> user = UserTableSync::getUserFromLogin(_login);
-				user->verifyPassword(_password);
-
+				
+				boost::shared_ptr<User> user;
+				if (!_login.empty() && !_password.empty())
+				{
+					user = UserTableSync::getUserFromLogin(_login);
+					user->verifyPassword(_password);
+				}
+				else
+				{
+					LoginToken token = LoginToken();
+					if (token.Decode(_token))
+					{
+						user = UserTableSync::getUserFromLogin(token.getLogin());
+						user->verifyPassword(token.getPassword());
+					}
+					else
+					{
+						throw ActionException("Invalid token");
+					}
+				}
+				
 				// Disallow deactivated users and users without profile
 				if (!user->getConnectionAllowed() || !user->getProfile())
 				{
@@ -91,7 +114,16 @@ namespace synthese
 				request.setSession(session);
 				session->setUser(user);
 				session->setSessionIdCookie(request);
-				
+
+				if (!_token.empty())
+				{
+					LoginToken token = LoginToken();
+					if (token.Decode(_token))
+					{
+						session->setSessionVariable("reservation", lexical_cast<string>(token.getReservationTransaction()));
+					}
+				}
+
 				SecurityLog::addUserLogin(user.get());
 			}
 			catch (UserException e)

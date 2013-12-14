@@ -80,6 +80,7 @@ namespace synthese
 	namespace data_exchange
 	{
 		const string HafasFileFormat::Importer_::FILE_KOORD = "koord";
+		const string HafasFileFormat::Importer_::FILE_BAHNOF = "bahnof";
 		const string HafasFileFormat::Importer_::FILE_BITFELD = "bitfeld";
 		const string HafasFileFormat::Importer_::FILE_ECKDATEN = "eckdaten";
 		const string HafasFileFormat::Importer_::FILE_ZUGDAT = "zugdat";
@@ -95,12 +96,16 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_LINES_FILTER = "lines_filter";
 		const string HafasFileFormat::Importer_::PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE = "gleis_has_one_stop_per_line";
 		const string HafasFileFormat::Importer_::PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME = "complete_empty_stop_area_name";
+		const string HafasFileFormat::Importer_::PARAMETER_NO_GLEIS_FILE = "no_gleis_file";
+		const string HafasFileFormat::Importer_::PARAMETER_TRY_TO_READ_LINE_SHORT_NAME = "try_to_read_line_short_name";
+		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 	}
 
 	namespace impex
 	{
 		template<> const MultipleFileTypesImporter<HafasFileFormat>::Files MultipleFileTypesImporter<HafasFileFormat>::FILES(
 			HafasFileFormat::Importer_::FILE_KOORD.c_str(),
+			HafasFileFormat::Importer_::FILE_BAHNOF.c_str(),
 			HafasFileFormat::Importer_::FILE_GLEIS.c_str(),
 			HafasFileFormat::Importer_::FILE_UMSTEIGB.c_str(),
 			HafasFileFormat::Importer_::FILE_UMSTEIGZ.c_str(),
@@ -314,7 +319,10 @@ namespace synthese
 		) const {
 			if(!_openFile(filePath))
 			{
-				throw Exception("Could no open the file " + filePath.file_string());
+				// It is possible to have no GLEIS file, but it will lead to a different parsing
+				// File bahnof is optional
+				if (key != FILE_BAHNOF && (!(key == FILE_GLEIS && _noGleisFile)))
+					throw Exception("Could no open the file " + filePath.file_string());
 			}
 
 			DataSource& dataSource(*_import.get<DataSource>());
@@ -368,7 +376,37 @@ namespace synthese
 					)	);
 				}
 			}
-			else if(key == FILE_GLEIS)
+			else if (key == FILE_BAHNOF)
+			{
+				while(_loadLine())
+				{
+					// operator code
+					string operatorCode = _getField(0, 7);
+					// Search of the bahnhof
+					Bahnhofs::iterator itBahnhof(_bahnhofs.find(operatorCode));
+					if(itBahnhof == _bahnhofs.end())
+					{
+						continue;
+					}
+					
+					// Names
+					vector<string> cols;
+					std::string nameStr(_getField(12));
+					boost::algorithm::split(cols, nameStr, boost::algorithm::is_any_of(","));
+					itBahnhof->second.cityName = cols[0];
+					if(cols.size() == 1)
+					{
+						itBahnhof->second.main = true;
+						if (!_complete_empty_stop_area_name.empty())
+							itBahnhof->second.name = cols[0] + _complete_empty_stop_area_name;
+					}
+					else
+					{
+						itBahnhof->second.name = cols[1];
+					}
+				}
+			}
+			else if(key == FILE_GLEIS && !_noGleisFile)
 			{
 				GleisMap::iterator itService(_gleisMap.end());
 
@@ -710,7 +748,7 @@ namespace synthese
 							}
 							catch (bad_lexical_cast&)
 							{
-								calendarUse.calendarNumber = 0;
+								calendarUse.calendarNumber = _defaultCalendarCode;
 							}
 							calendarUse.startStopCode = _getField(6, 7);
 							calendarUse.endStopCode = _getField(14, 7);
@@ -722,6 +760,13 @@ namespace synthese
 						if(itZug != _zugs.end())
 						{
 							itZug->transportModeCode = _getField(3, 3);
+						}
+					}
+					else if(_getField(0, 2) == "*L" && _tryToReadShortName) // Short name of the line
+					{
+						if(itZug != _zugs.end())
+						{
+							itZug->lineShortName = _getField(3, 8);
 						}
 					}
 					else if(_getField(0, 1) != "*") // Stop
@@ -823,6 +868,19 @@ namespace synthese
 								itStop->gleisCode = itStopArea->second;
 							}
 						}
+						else if (_noGleisFile)
+						{
+							// Creation of the _gleis here
+							_gleisMap.insert(
+								make_pair(
+									boost::make_tuple(
+										itZug->number,
+										itZug->lineNumber,
+										0
+									),
+									GleisMap::mapped_type()
+							)	);
+						}
 					}
 				}
 
@@ -864,6 +922,15 @@ namespace synthese
 
 			// String to complete empty stop area name
 			pm.insert(PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME, _complete_empty_stop_area_name);
+
+			// No gleis file
+			pm.insert(PARAMETER_NO_GLEIS_FILE, _noGleisFile);
+
+			// No gleis file
+			pm.insert(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, _tryToReadShortName);
+
+			// Calendar default code
+			pm.insert(PARAMETER_CALENDAR_DEFAULT_CODE, _defaultCalendarCode);
 
 			return pm;
 		}
@@ -934,6 +1001,15 @@ namespace synthese
 
 			// String to complete empty stop area name
 			_complete_empty_stop_area_name = pm.getDefault<string>(PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME);
+
+			// No gleis file
+			_noGleisFile = pm.getDefault<bool>(PARAMETER_NO_GLEIS_FILE, false);
+			
+			// Line short name
+			_tryToReadShortName = pm.getDefault<bool>(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, false);
+
+			// Calendar default code
+			_defaultCalendarCode = pm.getDefault<size_t>(PARAMETER_CALENDAR_DEFAULT_CODE, 0);
 		}
 
 
@@ -1358,6 +1434,10 @@ namespace synthese
 					}
 				}
 
+				// Update the short name if possible
+				if (_tryToReadShortName && !zug.lineShortName.empty())
+					line->setShortName(zug.lineShortName);
+
 				// Wayback
 				int numericServiceNumber(0);
 				try
@@ -1404,7 +1484,7 @@ namespace synthese
 						mergedCalendar &= _calendar;
 
 						// Jump over useless combinations
-						if(mergedCalendar.empty())
+						if(mergedCalendar.empty() && !_importEvenIfNoDate)
 						{
 							continue;
 						}

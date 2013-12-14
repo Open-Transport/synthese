@@ -55,6 +55,9 @@ namespace synthese
 			static const std::string PARAMETER_WAYBACK;
 			static const std::string PARAMETER_DISPLAY_DATE;
 			static const std::string PARAMETER_BASE_CALENDAR_ID;
+			static const std::string PARAMETER_MIN_DEPARTURE_TIME;
+			static const std::string PARAMETER_MAX_DEPARTURE_TIME;
+			static const std::string PARAMETER_DEPARTURE_PLACE;
 
 			static const std::string DATA_ID;
 			static const std::string DATA_DEPARTURE_SCHEDULE;
@@ -84,6 +87,9 @@ namespace synthese
 				boost::shared_ptr<const CommercialLine> _line;
 				boost::gregorian::date _displayDate;
 				boost::shared_ptr<const calendar::CalendarTemplate> _baseCalendar;
+				boost::optional<boost::posix_time::time_duration> _minDepartureTime;
+				boost::optional<boost::posix_time::time_duration> _maxDepartureTime;
+				boost::optional<util::RegistryKeyType> _departurePlaceId;
 			//@}
 
 

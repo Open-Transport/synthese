@@ -81,6 +81,8 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER = "sortByDistance";
 		const string StopPointsListFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 		const string StopPointsListFunction::PARAMETER_DATA_SOURCE_FILTER = "data_source_filter";
+		const string StopPointsListFunction::PARAMETER_DAYS_CHECK_IF_STOP_SERVED = "days_check_if_stop_served";
+		const string StopPointsListFunction::PARAMETER_OUTPUT_ONLY_ARRIVAL_STOPS = "output_only_arrival_stops";
 
 		const string StopPointsListFunction::TAG_PHYSICAL_STOPS = "physicalStops";
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
@@ -301,6 +303,10 @@ namespace synthese
 			{
 				throw RequestException("No such data source");
 			}
+
+			_daysCheckIfStopServed = boost::gregorian::date_duration(map.getDefault<int>(PARAMETER_DAYS_CHECK_IF_STOP_SERVED, 0));
+
+			_outputOnlyArrivalStops = map.isTrue(PARAMETER_OUTPUT_ONLY_ARRIVAL_STOPS);
 		}
 
 
@@ -317,7 +323,7 @@ namespace synthese
 			// and startDateTime is begin of the day (a day begin at 3:00):
 			startDateTime = date - date.time_of_day() + hours(3);
 			// and endDateTime is end of the day (a day end at 27:00):
-			endDateTime = date - date.time_of_day() + hours(27);
+			endDateTime = date - date.time_of_day() + _daysCheckIfStopServed + hours(27);
 
 			// Search for stopPoints
 			StopPointMapType stopPointMap;
@@ -615,15 +621,36 @@ namespace synthese
 			ptime & endDateTime
 		) const {
 			bool spHaveZeroDestination = true;
-			BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getDepartureEdges())
+			Vertex::Edges::const_iterator itDep(sp.getDepartureEdges().begin());
+			Vertex::Edges::const_iterator itArr(sp.getArrivalEdges().begin());
+			const Edge* edge;
+			while(true)
 			{
+				if(itDep != sp.getDepartureEdges().end())
+				{
+					edge = itDep->second;
+					itDep++;
+				}
+				else
+				{
+					if(_outputOnlyArrivalStops && itArr != sp.getArrivalEdges().end())
+					{
+						edge = itArr->second;
+						itArr++;
+					}
+					else
+					{
+						break;
+					}
+				}
+
 				// Jump over junctions
-				if(!dynamic_cast<const LineStop*>(edge.second))
+				if(!dynamic_cast<const LineStop*>(edge))
 				{
 					continue;
 				}
 
-				const LineStop* ls = static_cast<const LineStop*>(edge.second);
+				const LineStop* ls = static_cast<const LineStop*>(edge);
 
 				ptime departureDateTime = startDateTime;
 				// Loop on services
