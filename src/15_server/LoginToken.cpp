@@ -39,11 +39,6 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<server::LoginToken>::KEY("LoginToken");
-	}
-
 
 	namespace {
 		const int SALT_LENGTH = 32;
