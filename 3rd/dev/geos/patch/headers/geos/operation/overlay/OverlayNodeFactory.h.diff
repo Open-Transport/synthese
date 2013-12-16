@@ -1,7 +1,5 @@
-Index: dev/geos/src/headers/geos/operation/overlay/OverlayNodeFactory.h
-===================================================================
---- dev/geos/src/headers/geos/operation/overlay/OverlayNodeFactory.h	(révision 3823)
-+++ dev/geos/src/headers/geos/operation/overlay/OverlayNodeFactory.h	(copie de travail)
+--- src/headers/geos/operation/overlay/OverlayNodeFactory.h	2013-12-16 13:03:32.704218930 +0100
++++ patch/headers/geos/operation/overlay/OverlayNodeFactory.h	2013-12-16 13:02:33.320221781 +0100
 @@ -8,7 +8,7 @@
   *
   * This is free software; you can redistribute and/or modify it under
