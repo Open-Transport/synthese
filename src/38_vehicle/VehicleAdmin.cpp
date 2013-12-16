@@ -187,7 +187,7 @@ namespace synthese
 				stream << "<h1>Résultats</h1>";
 
 				AdminActionFunctionRequest<VehiclePositionUpdateAction,VehicleAdmin> addRequest(request, *this);
-				addRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
+				addRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle).get());
 
 				AdminActionFunctionRequest<RemoveObjectAction, VehicleAdmin> removeRequest(request, *this);
 
