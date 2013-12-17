@@ -45,6 +45,7 @@ namespace synthese
 
 		private:
 			mutable bool _hasToStop;
+			mutable boost::shared_ptr<boost::thread> _theThread;
 
 		protected:
 			virtual void _onStart() const = 0;
@@ -81,7 +82,7 @@ namespace synthese
 		template<class FF>
 		void PermanentThreadImporterTemplate<FF>::runPermanentThread() const
 		{
-			server::ServerModule::AddThread(
+			_theThread = server::ServerModule::AddThread(
 				boost::bind(&PermanentThreadImporterTemplate<FF>::_threadRun, this),
 				_import.get<Name>() + " (" + FF::FACTORY_KEY +")"
 			);
@@ -93,6 +94,10 @@ namespace synthese
 		void PermanentThreadImporterTemplate<FF>::killPermanentThread() const
 		{
 			_hasToStop = true;
+			if(_theThread)
+			{
+				_theThread->join();
+			}
 		}
 
 
