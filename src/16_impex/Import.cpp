@@ -124,7 +124,7 @@ namespace synthese
 			}
 			else if(isPermanentThread())
 			{
-				if(get<Active>())
+				if(get<Active>() && (&env == &Env::GetOfficialEnv()))
 				{
 					_getAutoImporter()->runPermanentThread();
 				}
@@ -175,7 +175,6 @@ namespace synthese
 		{
 			if(!_autoImporter.get())
 			{
-				ParametersMap pm;
 				boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 				_autoImporterEnv.reset(new Env);
 				_autoImporter = fileFormat->getImporter(
@@ -184,7 +183,7 @@ namespace synthese
 					get<MinLogLevel>(),
 					get<LogPath>(),
 					optional<ostream&>(),
-					pm
+					_autoImporterPM
 				);
 				_autoImporter->setFromParametersMap(get<Parameters>(), true);
 			}

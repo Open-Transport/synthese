@@ -82,6 +82,7 @@ namespace synthese
 
 		private:
 			mutable boost::posix_time::ptime _nextAutoImport;
+			mutable util::ParametersMap _autoImporterPM;
 			mutable boost::shared_ptr<Importer> _autoImporter;
 			mutable boost::shared_ptr<util::Env> _autoImporterEnv;
 			void _computeNextAutoImport() const;
