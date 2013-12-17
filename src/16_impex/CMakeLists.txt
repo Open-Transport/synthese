@@ -61,6 +61,7 @@ NoExportPolicy.hpp
 NoImportPolicy.hpp
 OneFileExporter.hpp
 OneFileTypeImporter.hpp
+PermanentThreadExporterTemplate.hpp
 PermanentThreadImporterTemplate.hpp
 )
 
