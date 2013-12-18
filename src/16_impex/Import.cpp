@@ -25,6 +25,7 @@
 #include "Env.h"
 #include "FileFormat.h"
 #include "Importer.hpp"
+#include "ServerModule.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -162,6 +163,21 @@ namespace synthese
 			bool result(_autoImporter->parseFiles());
 			if(result)
 			{
+				// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
+				boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
+				int tries = 10;
+				while (!lock.owns_lock() && tries > 0)
+				{
+					lock.try_lock();
+					this_thread::sleep((seconds(1)));
+					Log::GetInstance().debug("Import::runAutoImport locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
+					tries--;
+				}
+				if(!lock.owns_lock())
+				{
+					Log::GetInstance().error("Import::runAutoImport locked by interSyntheseVersusRTMutex (max tries reached)");
+					return;
+				}
 				DBTransaction transaction(_autoImporter->save());
 				transaction.run();
 			}
