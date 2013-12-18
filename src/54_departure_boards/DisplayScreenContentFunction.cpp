@@ -1131,9 +1131,6 @@ namespace synthese
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
 				if(_useSAEDirectConnection)
 				{
-					noRealTime = false;
-					shared_ptr<MySQLconnector> connector(new MySQLconnector());
-
 					stringstream operatorCodes, filters, request;
 
 					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
@@ -1149,197 +1146,203 @@ namespace synthese
 						}
 					}
 
-					// Limit the research to X hour after date, X is 1 hour times the number of result we wish for
-					time_duration searchDepth(hours(1) * _screen->getType()->getRowNumber());
-
-					filters << "((h.hrd > '" << SAEHourString << "' AND h.hrd <= ADDTIME('" << SAEHourString << "', '" << to_simple_string(searchDepth) << "')) ";
-					// If after midnight, check if we do not cross over end of service
-					if(SAEDate.time_of_day() < endOfService)
-						filters << "AND h.hrd <= '" << to_simple_string(endOfService) << "')";
-					// Otherwise make sure, if we are just before midnight that we get after midnight services, without crossing end of service
-					else
-						filters << "OR (h.hrd <= LEAST(TIMEDIFF(ADDTIME('" << SAEHourString + "', '" << to_simple_string(searchDepth) << "') , '24:00:00'), '" << to_simple_string(endOfService) << "')))";
-
-					if(_lineToDisplay)
+					if(!operatorCodes.str().empty())
 					{
-						shared_ptr<const CommercialLine> commercialLine(_env->getRegistry<CommercialLine>().get(*_lineToDisplay));
-						string shortNameToDisplay = boost::algorithm::to_lower_copy(
-							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-						);
-						filters << " AND LOWER(TRIM(LEADING '0' FROM h.ligne)) = '" << shortNameToDisplay << "'";
-					}
+						noRealTime = false;
+						shared_ptr<MySQLconnector> connector(new MySQLconnector());
 
-					try
-					{
-						string requestInitVars("SET @num = 0, @itineraire_dest = '', @itineraire_lign_com = '', @itineraire_arret = ''");
-						connector->execQuery(requestInitVars);
+						// Limit the research to X hour after date, X is 1 hour times the number of result we wish for
+						time_duration searchDepth(hours(1) * _screen->getType()->getRowNumber());
 
-						request << " SELECT"
-								<< "	@num := IF(@itineraire_lign_com = ligne, IF(@itineraire_dest = oc_arrivee, IF(@itineraire_arret = arret_oc, @num + 1, 1), 1), 1) AS row_number,"
-								<< "	horaire, fiable, @itineraire_arret := arret_oc AS arret_oc, @itineraire_dest := oc_arrivee AS oc_arrivee, @itineraire_lign_com := ligne AS ligne"
-								<< " FROM ("
-								<< "	SELECT"
-								<< "		h.hrd AS horaire, fiable, a.nol AS arret_oc, a_arrivee.nol AS oc_arrivee, LOWER(TRIM(LEADING '0' FROM h.ligne)) AS ligne"
-								<< "	FROM HORAIRE h FORCE INDEX (idx_horaire_arret)"
-								<< "	JOIN ARRET a"
-								<< "		ON a.ref = h.ref_arret AND a.jour = h.jour"
-								<< "	JOIN ARRETCHN achn"
-								<< "		ON achn.ref = h.ref_arretchn AND achn.jour = h.jour"
-								<< "	JOIN ARRETCHN achn_arrivee"
-								<< "		ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
-								<< "	JOIN ARRET a_arrivee"
-								<< "		ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
-								<< " 	WHERE"
-								<< "			a.mnemol IN (" << operatorCodes.str() << ")"
-								<< "		AND " << filters.str()
-								<< "		AND h.jour = '" << SAEDateString << "'"
-								<< "		AND h.isArretNeutralise = 0"
-								<< "		AND h.typeCourse = 'C'"
-								<< "		AND h.isVehiculeNeutralise = 0"
-								<< "		AND h.isInhibHoraire = 0"
-								<< "		AND h.isDeviation = 0"
-								<< "		AND h.isInhibMontee = 0"
-								<< "		AND achn_arrivee.type = 'A'"
-								<< "		AND a.nol != a_arrivee.nol"
-								<< " 	ORDER BY"
-								<< "		oc_arrivee, ligne, arret_oc, hrd < '" << boost::posix_time::to_simple_string(endOfService) << "', hrd"
-								<< " ) AS result"
-								<< " WHERE"
-								<< "	IF(@num >= " << SAELimit << ", IF(@itineraire_lign_com = ligne, IF(@itineraire_dest = oc_arrivee, IF(@itineraire_arret = arret_oc, FALSE, TRUE), TRUE), TRUE), TRUE)"
-						;
+						filters << "((h.hrd > '" << SAEHourString << "' AND h.hrd <= ADDTIME('" << SAEHourString << "', '" << to_simple_string(searchDepth) << "')) ";
+						// If after midnight, check if we do not cross over end of service
+						if(SAEDate.time_of_day() < endOfService)
+							filters << "AND h.hrd <= '" << to_simple_string(endOfService) << "')";
+						// Otherwise make sure, if we are just before midnight that we get after midnight services, without crossing end of service
+						else
+							filters << "OR (h.hrd <= LEAST(TIMEDIFF(ADDTIME('" << SAEHourString + "', '" << to_simple_string(searchDepth) << "') , '24:00:00'), '" << to_simple_string(endOfService) << "')))";
 
-						shared_ptr<MySQLResult> result = connector->execQuery(request.str());
-
-						typedef map<string, boost::shared_ptr<StopPoint> > OCStops;
-						OCStops ocStops;
-
-						while(result->next())
+						if(_lineToDisplay)
 						{
-							ocStops[result->getInfo("oc_arrivee")];
-							ocStops[result->getInfo("arret_oc")];
+							shared_ptr<const CommercialLine> commercialLine(_env->getRegistry<CommercialLine>().get(*_lineToDisplay));
+							string shortNameToDisplay = boost::algorithm::to_lower_copy(
+								trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+							);
+							filters << " AND LOWER(TRIM(LEADING '0' FROM h.ligne)) = '" << shortNameToDisplay << "'";
 						}
 
-						result->reset();
-						BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
+						try
 						{
-							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
+							string requestInitVars("SET @num = 0, @itineraire_dest = '', @itineraire_lign_com = '', @itineraire_arret = ''");
+							connector->execQuery(requestInitVars);
+
+							request << " SELECT"
+									<< "	@num := IF(@itineraire_lign_com = ligne, IF(@itineraire_dest = oc_arrivee, IF(@itineraire_arret = arret_oc, @num + 1, 1), 1), 1) AS row_number,"
+									<< "	horaire, fiable, @itineraire_arret := arret_oc AS arret_oc, @itineraire_dest := oc_arrivee AS oc_arrivee, @itineraire_lign_com := ligne AS ligne"
+									<< " FROM ("
+									<< "	SELECT"
+									<< "		h.hrd AS horaire, fiable, a.nol AS arret_oc, a_arrivee.nol AS oc_arrivee, LOWER(TRIM(LEADING '0' FROM h.ligne)) AS ligne"
+									<< "	FROM HORAIRE h FORCE INDEX (idx_horaire_arret)"
+									<< "	JOIN ARRET a"
+									<< "		ON a.ref = h.ref_arret AND a.jour = h.jour"
+									<< "	JOIN ARRETCHN achn"
+									<< "		ON achn.ref = h.ref_arretchn AND achn.jour = h.jour"
+									<< "	JOIN ARRETCHN achn_arrivee"
+									<< "		ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
+									<< "	JOIN ARRET a_arrivee"
+									<< "		ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
+									<< " 	WHERE"
+									<< "			a.mnemol IN (" << operatorCodes.str() << ")"
+									<< "		AND " << filters.str()
+									<< "		AND h.jour = '" << SAEDateString << "'"
+									<< "		AND h.isArretNeutralise = 0"
+									<< "		AND h.typeCourse = 'C'"
+									<< "		AND h.isVehiculeNeutralise = 0"
+									<< "		AND h.isInhibHoraire = 0"
+									<< "		AND h.isDeviation = 0"
+									<< "		AND h.isInhibMontee = 0"
+									<< "		AND achn_arrivee.type = 'A'"
+									<< "		AND a.nol != a_arrivee.nol"
+									<< " 	ORDER BY"
+									<< "		oc_arrivee, ligne, arret_oc, hrd < '" << boost::posix_time::to_simple_string(endOfService) << "', hrd"
+									<< " ) AS result"
+									<< " WHERE"
+									<< "	IF(@num >= " << SAELimit << ", IF(@itineraire_lign_com = ligne, IF(@itineraire_dest = oc_arrivee, IF(@itineraire_arret = arret_oc, FALSE, TRUE), TRUE), TRUE), TRUE)"
+							;
+
+							shared_ptr<MySQLResult> result = connector->execQuery(request.str());
+
+							typedef map<string, boost::shared_ptr<StopPoint> > OCStops;
+							OCStops ocStops;
+
+							while(result->next())
 							{
-								if(ocStops.find(dataSourceLink.second) != ocStops.end())
-									ocStops[dataSourceLink.second] = curStop.second;
+								ocStops[result->getInfo("oc_arrivee")];
+								ocStops[result->getInfo("arret_oc")];
 							}
-						}
 
-						while(result->next())
-						{
-							RealTimeService realTimeService;
-
-							realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
-							if(ocStops.find(result->getInfo("oc_arrivee"))->second)
-								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
-
-							const StopArea* area = realTimeService.stop->getConnectionPlace();
-
-							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
-								continue;
-
-							BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
+							result->reset();
+							BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
 							{
-								try
+								BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
 								{
-									boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
-									BOOST_FOREACH(Path* path, curLine->getPaths())
-									{
-										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
-										if(destination)
-										{
-											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
-											{
-												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
-												{
-													realTimeService.commercialLine = curLine;
-													break;
-												}
-											}
+									if(ocStops.find(dataSourceLink.second) != ocStops.end())
+										ocStops[dataSourceLink.second] = curStop.second;
+								}
+							}
 
-											if(realTimeService.commercialLine)
-												break;
+							while(result->next())
+							{
+								RealTimeService realTimeService;
+
+								realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
+								if(ocStops.find(result->getInfo("oc_arrivee"))->second)
+									realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
+
+								const StopArea* area = realTimeService.stop->getConnectionPlace();
+
+								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+									continue;
+
+								BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
+								{
+									try
+									{
+										boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+										BOOST_FOREACH(Path* path, curLine->getPaths())
+										{
+											const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
+											if(destination)
+											{
+												BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
+												{
+													if(dataSourceLink.second == result->getInfo("oc_arrivee"))
+													{
+														realTimeService.commercialLine = curLine;
+														break;
+													}
+												}
+
+												if(realTimeService.commercialLine)
+													break;
+											}
+										}
+
+										if(realTimeService.commercialLine)
+											break;
+									}
+									catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+									{
+										continue;
+									}
+								}
+
+								if(!realTimeService.commercialLine)
+									continue;
+
+								if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
+								{
+									bool displayDeparture(false);
+									typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+									RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+									for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+									{
+										bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+										bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+										displayDeparture = goodLine & goodDest;
+
+										if(displayDeparture)
+											break;
+									}
+
+									if(!displayDeparture)
+										continue;
+								}
+
+								if(result->getInfo("fiable") == "F")
+									realTimeService.realTime = true;
+
+								ptime SAEResultPtime(time_from_string(SAEDateString + " " + result->getInfo("horaire")));
+								time_duration tod = SAEResultPtime.time_of_day();
+
+								if(tod < endOfService)
+									SAEResultPtime += boost::gregorian::days(1);
+
+								realTimeService.datetime = SAEResultPtime;
+
+								LineDestinationKey ldKey = make_pair(realTimeService.commercialLine.get(), realTimeService.destination);
+								bool serviceInserted(false);
+								// StopArea already in the map
+								if(serviceMap.find(area) != serviceMap.end())
+								{
+									BOOST_FOREACH(DeparturesByDestination::value_type& departureByDestination, serviceMap.find(area)->second)
+									{
+										const DeparturesByDestination::key_type& key = departureByDestination.first;
+										if(key == ldKey)
+										{
+											serviceMap[area][key].first.insert(realTimeService);
+											serviceInserted = true;
+											break;
 										}
 									}
-
-									if(realTimeService.commercialLine)
-										break;
 								}
-								catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+
+								// Destination or StopArea doesn't exist yet
+								if(!serviceInserted)
 								{
-									continue;
+									OrderedServices tmpSetPair;
+									tmpSetPair.first.insert(realTimeService);
+									serviceMap[area][ldKey] = tmpSetPair;
 								}
-							}
-
-							if(!realTimeService.commercialLine)
-								continue;
-
-							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
-							{
-								bool displayDeparture(false);
-								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
-								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
-
-								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
-								{
-									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
-									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
-									displayDeparture = goodLine & goodDest;
-
-									if(displayDeparture)
-										break;
-								}
-
-								if(!displayDeparture)
-									continue;
-							}
-
-							if(result->getInfo("fiable") == "F")
-								realTimeService.realTime = true;
-
-							ptime SAEResultPtime(time_from_string(SAEDateString + " " + result->getInfo("horaire")));
-							time_duration tod = SAEResultPtime.time_of_day();
-
-							if(tod < endOfService)
-								SAEResultPtime += boost::gregorian::days(1);
-
-							realTimeService.datetime = SAEResultPtime;
-
-							LineDestinationKey ldKey = make_pair(realTimeService.commercialLine.get(), realTimeService.destination);
-							bool serviceInserted(false);
-							// StopArea already in the map
-							if(serviceMap.find(area) != serviceMap.end())
-							{
-								BOOST_FOREACH(DeparturesByDestination::value_type& departureByDestination, serviceMap.find(area)->second)
-								{
-									const DeparturesByDestination::key_type& key = departureByDestination.first;
-									if(key == ldKey)
-									{
-										serviceMap[area][key].first.insert(realTimeService);
-										serviceInserted = true;
-										break;
-									}
-								}
-							}
-
-							// Destination or StopArea doesn't exist yet
-							if(!serviceInserted)
-							{
-								OrderedServices tmpSetPair;
-								tmpSetPair.first.insert(realTimeService);
-								serviceMap[area][ldKey] = tmpSetPair;
 							}
 						}
-					}
-					catch(Exception &e)
-					{
-						// If an exception is thrown, disable realTime
-						noRealTime = true;
-						util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
+						catch(Exception &e)
+						{
+							// If an exception is thrown, disable realTime
+							noRealTime = true;
+							util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
+						}
 					}
 				}
 			#endif
@@ -1644,8 +1647,6 @@ namespace synthese
 				// RealTime part
 				if(_useSAEDirectConnection)
 				{
-					// Consider there is going to be realTime data
-					noRealTime = false;
 					stringstream operatorCodes, filters, request;
 
 					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
@@ -1661,181 +1662,185 @@ namespace synthese
 						}
 					}
 
-					shared_ptr<MySQLconnector> connector(new MySQLconnector());
-
-					string sortingOrder(_wayIsBackward ? "DESC" : "ASC");
-
-					if(_wayIsBackward)
+					if(!operatorCodes.str().empty())
 					{
-						filters << "(h.hrd < '" << SAEHourString << "' ";
-						filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd > '" << boost::posix_time::to_simple_string(endOfService) << "')";
-					}
-					else
-					{
-						filters << "(h.hrd > '" << SAEHourString << "' ";
-						filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd <= '" << boost::posix_time::to_simple_string(endOfService) << "')";
-					}
+						noRealTime = false;
+						shared_ptr<MySQLconnector> connector(new MySQLconnector());
 
-					if(_lineToDisplay)
-					{
-						shared_ptr<const CommercialLine> commercialLine(_env->getRegistry<CommercialLine>().get(*_lineToDisplay));
-						string shortNameToDisplay = boost::algorithm::to_lower_copy(
-							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-						);
-						filters << " AND LOWER(TRIM(LEADING '0' FROM h.ligne)) = '" << shortNameToDisplay << "'";
-					}
+						string sortingOrder(_wayIsBackward ? "DESC" : "ASC");
 
-					request << " SELECT"
-							<< "	hrd AS horaire, fiable, LOWER(TRIM(LEADING '0' FROM ligne)) AS ligne,"
-							<< "	a.nol AS arret_oc, a_arrivee.nol AS oc_arrivee"
-							<< " FROM HORAIRE h FORCE INDEX(idx_horaire_arret)"
-							<< " JOIN ARRET a"
-							<< "	 ON a.ref = h.ref_arret AND a.jour = h.jour"
-							<< " JOIN ARRETCHN achn"
-							<< "	 ON achn.ref = h.ref_arretchn AND achn.jour = h.jour"
-							<< " JOIN ARRETCHN achn_arrivee"
-							<< "	 ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
-							<< " JOIN ARRET a_arrivee"
-							<< "	 ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
-							<< " WHERE"
-							<< "		a.mnemol IN (" << operatorCodes.str() << ")"
-							<< "	AND " << filters.str()
-							<< "	AND h.jour = '" << SAEDateString << "'"
-							<< "	AND h.typeCourse = 'C'"
-							<< "	AND h.isVehiculeNeutralise = 0"
-							<< "	AND h.isInhibHoraire = 0"
-							<< "	AND h.isDeviation = 0"
-							<< "	AND h.isInhibMontee = 0"
-							<< "	AND h.isArretNeutralise = 0"
-							<< "	AND achn_arrivee.type = 'A'"
-							<< " ORDER BY"
-							<< "	hrd <= '" << boost::posix_time::to_simple_string(endOfService) << "' " << sortingOrder << ", horaire " << sortingOrder
-							<< " LIMIT " << SAELimit
-					;
-
-					try
-					{
-						shared_ptr<MySQLResult> result = connector->execQuery(request.str());
-
-						typedef map<string, boost::shared_ptr<StopPoint> > OCStops;
-						OCStops ocStops;
-
-						while(result->next())
+						if(_wayIsBackward)
 						{
-							ocStops[result->getInfo("oc_arrivee")];
-							ocStops[result->getInfo("arret_oc")];
+							filters << "(h.hrd < '" << SAEHourString << "' ";
+							filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd > '" << boost::posix_time::to_simple_string(endOfService) << "')";
+						}
+						else
+						{
+							filters << "(h.hrd > '" << SAEHourString << "' ";
+							filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd <= '" << boost::posix_time::to_simple_string(endOfService) << "')";
 						}
 
-						result->reset();
-						BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
+						if(_lineToDisplay)
 						{
-							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
+							shared_ptr<const CommercialLine> commercialLine(_env->getRegistry<CommercialLine>().get(*_lineToDisplay));
+							string shortNameToDisplay = boost::algorithm::to_lower_copy(
+								trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+							);
+							filters << " AND LOWER(TRIM(LEADING '0' FROM h.ligne)) = '" << shortNameToDisplay << "'";
+						}
+
+						request << " SELECT"
+								<< "	hrd AS horaire, fiable, LOWER(TRIM(LEADING '0' FROM ligne)) AS ligne,"
+								<< "	a.nol AS arret_oc, a_arrivee.nol AS oc_arrivee"
+								<< " FROM HORAIRE h FORCE INDEX(idx_horaire_arret)"
+								<< " JOIN ARRET a"
+								<< "	 ON a.ref = h.ref_arret AND a.jour = h.jour"
+								<< " JOIN ARRETCHN achn"
+								<< "	 ON achn.ref = h.ref_arretchn AND achn.jour = h.jour"
+								<< " JOIN ARRETCHN achn_arrivee"
+								<< "	 ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
+								<< " JOIN ARRET a_arrivee"
+								<< "	 ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
+								<< " WHERE"
+								<< "		a.mnemol IN (" << operatorCodes.str() << ")"
+								<< "	AND " << filters.str()
+								<< "	AND h.jour = '" << SAEDateString << "'"
+								<< "	AND h.typeCourse = 'C'"
+								<< "	AND h.isVehiculeNeutralise = 0"
+								<< "	AND h.isInhibHoraire = 0"
+								<< "	AND h.isDeviation = 0"
+								<< "	AND h.isInhibMontee = 0"
+								<< "	AND h.isArretNeutralise = 0"
+								<< "	AND achn_arrivee.type = 'A'"
+								<< " ORDER BY"
+								<< "	hrd <= '" << boost::posix_time::to_simple_string(endOfService) << "' " << sortingOrder << ", horaire " << sortingOrder
+								<< " LIMIT " << SAELimit
+						;
+
+						try
+						{
+							shared_ptr<MySQLResult> result = connector->execQuery(request.str());
+
+							typedef map<string, boost::shared_ptr<StopPoint> > OCStops;
+							OCStops ocStops;
+
+							while(result->next())
 							{
-								if(ocStops.find(dataSourceLink.second) != ocStops.end())
-									ocStops[dataSourceLink.second] = curStop.second;
+								ocStops[result->getInfo("oc_arrivee")];
+								ocStops[result->getInfo("arret_oc")];
 							}
-						}
 
-						while(result->next())
-						{
-							RealTimeService realTimeService;
-
-							realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
-							if(ocStops.find(result->getInfo("oc_arrivee"))->second)
-								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
-
-							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
-								continue;
-
-							BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
+							result->reset();
+							BOOST_FOREACH(const Registry<StopPoint>::value_type& curStop, Env::GetOfficialEnv().getRegistry<StopPoint>())
 							{
-								try
+								BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
 								{
-									boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
-									BOOST_FOREACH(Path* path, curLine->getPaths())
-									{
-										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
-										if(destination)
-										{
-											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
-											{
-												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
-												{
-													realTimeService.commercialLine = curLine;
-													break;
-												}
-											}
+									if(ocStops.find(dataSourceLink.second) != ocStops.end())
+										ocStops[dataSourceLink.second] = curStop.second;
+								}
+							}
 
-											if(realTimeService.commercialLine)
-												break;
+							while(result->next())
+							{
+								RealTimeService realTimeService;
+
+								realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
+								if(ocStops.find(result->getInfo("oc_arrivee"))->second)
+									realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
+
+								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+									continue;
+
+								BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
+								{
+									try
+									{
+										boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
+										BOOST_FOREACH(Path* path, curLine->getPaths())
+										{
+											const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
+											if(destination)
+											{
+												BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
+												{
+													if(dataSourceLink.second == result->getInfo("oc_arrivee"))
+													{
+														realTimeService.commercialLine = curLine;
+														break;
+													}
+												}
+
+												if(realTimeService.commercialLine)
+													break;
+											}
 										}
+
+										if(realTimeService.commercialLine)
+											break;
+									}
+									catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+									{
+										continue;
+									}
+								}
+
+								if(!realTimeService.commercialLine)
+									continue;
+
+								if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
+								{
+									bool displayDeparture(false);
+									typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+									RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+									for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+									{
+										bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+										bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+										displayDeparture = goodLine && goodDest;
+
+										if(displayDeparture)
+											break;
 									}
 
-									if(realTimeService.commercialLine)
-										break;
+									if(!displayDeparture)
+										continue;
 								}
-								catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
+
+								if(result->getInfo("fiable") == "F")
+									realTimeService.realTime = true;
+
+								ptime SAEResultPtime(time_from_string(SAEDateString + " " + result->getInfo("horaire")));
+								time_duration tod = SAEResultPtime.time_of_day();
+								int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
+
+								if(tod < endOfService)
 								{
-									continue;
+									SAEResultPtime += boost::gregorian::days(1);
+									mapKeyMinutes += 86400;
 								}
-							}
 
-							if(!realTimeService.commercialLine)
-								continue;
+								realTimeService.datetime = SAEResultPtime;
 
-							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
-							{
-								bool displayDeparture(false);
-								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
-								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
-
-								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
+								if(it == servicePointerAll.end())
 								{
-									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
-									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
-									displayDeparture = goodLine && goodDest;
-
-									if(displayDeparture)
-										break;
+									vector<RealTimeService> tmpVect;
+									tmpVect.push_back(realTimeService);
+									servicePointerAll[mapKeyMinutes].first = tmpVect;
 								}
-
-								if(!displayDeparture)
-									continue;
-							}
-
-							if(result->getInfo("fiable") == "F")
-								realTimeService.realTime = true;
-
-							ptime SAEResultPtime(time_from_string(SAEDateString + " " + result->getInfo("horaire")));
-							time_duration tod = SAEResultPtime.time_of_day();
-							int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
-
-							if(tod < endOfService)
-							{
-								SAEResultPtime += boost::gregorian::days(1);
-								mapKeyMinutes += 86400;
-							}
-
-							realTimeService.datetime = SAEResultPtime;
-
-							OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
-							if(it == servicePointerAll.end())
-							{
-								vector<RealTimeService> tmpVect;
-								tmpVect.push_back(realTimeService);
-								servicePointerAll[mapKeyMinutes].first = tmpVect;
-							}
-							else
-							{
-								servicePointerAll[mapKeyMinutes].first.push_back(realTimeService);
+								else
+								{
+									servicePointerAll[mapKeyMinutes].first.push_back(realTimeService);
+								}
 							}
 						}
-					}
-					catch(Exception &e)
-					{
-						// If an exception is thrown, disable realTime
-						noRealTime = true;
-						util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
+						catch(Exception &e)
+						{
+							// If an exception is thrown, disable realTime
+							noRealTime = true;
+							util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
+						}
 					}
 				}
 			#endif
