@@ -476,14 +476,12 @@ namespace synthese
 											newDestination->merge(*destination);
 											newDestination->insert(TAG_LINE, line);
 											sortedMap.insert(make_pair(line->get<string>("line_short_name"), newDestination));
-											std::cout << line->get<string>("line_short_name") << std::endl;
 										}
 									}
 								}
 
 								BOOST_FOREACH(sortedMapType::value_type it, sortedMap)
 								{
-									std::cout << it.first << std::endl;
 									sortedDestinationVect.push_back(it.second);
 								}
 							}
