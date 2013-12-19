@@ -383,7 +383,8 @@ namespace synthese
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
 			BOOST_FOREACH(const Path* path, _paths)
 			{
-				pm.insert(prefix + "transportMode", static_cast<const JourneyPattern*>(path)->getRollingStock()->getName());
+				if (static_cast<const JourneyPattern*>(path)->getRollingStock())
+					pm.insert(prefix + "transportMode", static_cast<const JourneyPattern*>(path)->getRollingStock()->getName());
 			}
 			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());
 			if(!_displayDurationBeforeFirstDeparture.is_not_a_date_time())
