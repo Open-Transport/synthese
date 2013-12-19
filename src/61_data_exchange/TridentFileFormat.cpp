@@ -2075,6 +2075,9 @@ namespace synthese
 								if(ct && scl->getCalendarTemplate() == ct)
 								{
 									serviceCalendarLink = scl;
+									_logLoad(
+										"Use of calendar_link "+ lexical_cast<string>(scl->getKey()) +" for service "+ lexical_cast<string>(service->getKey()) + " and calendar " + ct->getName()
+									);
 								}
 							}
 						}
@@ -2097,6 +2100,10 @@ namespace synthese
 							serviceCalendarLink->setCalendar(service);
 
 							service->addCalendarLink(*serviceCalendarLink,true);
+
+							_logCreation(
+								"Creation of calendar_link "+ lexical_cast<string>(serviceCalendarLink->getKey()) +" for service "+ lexical_cast<string>(service->getKey()) + " and calendar " + ct->getName()
+							);
 
 							_env.getEditableRegistry<CalendarLink>().add(boost::shared_ptr<CalendarLink>(serviceCalendarLink));
 						}
