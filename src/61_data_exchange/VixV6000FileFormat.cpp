@@ -245,7 +245,7 @@ namespace synthese
 				util::Log::GetInstance().debug("VixV6000FileFormat : service "+ servicenumber);
 				try
 				{
-					result.num_service	= boost::lexical_cast<short>(servicenumber);
+					result.num_journey = boost::lexical_cast<short>(servicenumber);
 				}
 				catch(bad_lexical_cast&)
 				{
@@ -254,11 +254,11 @@ namespace synthese
 
 				if(pService->getRoute()->getWayBack())
 				{
-					result.direction = 0;
+					result.direction = 1;
 				}
 				else
 				{
-					result.direction = 1;
+					result.direction = 0;
 				}
 
 				pt::CommercialLine* line(pService->getRoute()->getCommercialLine());
@@ -307,7 +307,7 @@ namespace synthese
 			result.num_driver	= 1;	// TODO: low priority
 			result.num_park	= 799;	// TODO: low priority
 			result.etat_expl	= 1;	// TODO: low priority
-			result.num_journey	= 1;	// Don't care: course NOT USED in VIX code.
+			result.num_service	= 1;	// Don't care: course NOT USED in VIX code.
 		
 			return result;
 		}
