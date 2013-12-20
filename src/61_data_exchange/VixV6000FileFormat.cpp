@@ -153,7 +153,7 @@ namespace synthese
 					iToBeWritten = int_surv.StreamToBuffer(buf, COM_PORT_BUFF_SIZE-1);
 					util::Log::GetInstance().debug("VixV6000FileFormat : message sending.\n");
 
-					_timeNextMessage = _tu.GetTickCount() + 50; //BSC_SURV_TIME_MS;
+					_timeNextMessage = _tu.GetTickCount() + 1000; //BSC_SURV_TIME_MS;
 				}
 				else
 				{
