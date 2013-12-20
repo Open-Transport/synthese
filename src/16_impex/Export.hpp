@@ -83,6 +83,7 @@ namespace synthese
 				bool canExport() const;
 				bool isPermanentThread() const;
 				boost::shared_ptr<Exporter> getExporter() const;
+				virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix) const;
 			//@}
 
 			//! @name Modifiers

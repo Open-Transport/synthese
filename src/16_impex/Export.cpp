@@ -56,7 +56,7 @@ namespace synthese
 		{
 			if(isPermanentThread())
 			{
-				if(get<Active>())
+				if(get<Active>() && (&env == &Env::GetOfficialEnv()))
 				{
 					_getAutoExporter()->runPermanentThread();
 				}
@@ -86,6 +86,13 @@ namespace synthese
 		{
 			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
 			return fileFormat->getExporter(*this);
+		}
+
+
+
+		void Export::addAdditionalParameters( util::ParametersMap& map, std::string prefix ) const
+		{
+			map.merge(get<Parameters>());
 		}
 
 

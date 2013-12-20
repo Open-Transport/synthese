@@ -94,11 +94,12 @@ namespace synthese
 			_comPortRate = map.getDefault<int>(PARAMETER_COM_PORT_RATE, 9600);
 
 			// Datasource
-			try
+			RegistryKeyType dataSourceId(
+				map.getDefault<RegistryKeyType>(PARAMETER_DATASOURCE_ID, 0)
+			);
+			if(dataSourceId) try
 			{
-				_dataSource = Env::GetOfficialEnv().get<DataSource>(
-					map.get<util::RegistryKeyType>(PARAMETER_DATASOURCE_ID)
-				);
+				_dataSource = Env::GetOfficialEnv().get<DataSource>(dataSourceId);
 			}
 			catch(ObjectNotFoundException<DataSource>&)
 			{
