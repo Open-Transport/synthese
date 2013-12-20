@@ -173,6 +173,8 @@ namespace synthese
 			}
 			else if(com==SELECTING)
 			{
+				util::Log::GetInstance().debug("VixV6000FileFormat : selecting");
+
 				//util::Log::GetInstance().debug("got selected from master at our address\n");
 				_status = ONLINE_SELECTING;
 
@@ -236,6 +238,7 @@ namespace synthese
 			if(pService)
 			{
 				const std::string &servicenumber = pService->getServiceNumber();
+				util::Log::GetInstance().debug("VixV6000FileFormat : service "+ servicenumber);
 				try
 				{
 					result.num_service	= boost::lexical_cast<short>(servicenumber);
