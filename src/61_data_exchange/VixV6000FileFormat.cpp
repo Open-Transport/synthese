@@ -254,11 +254,11 @@ namespace synthese
 
 				if(pService->getRoute()->getWayBack())
 				{
-					result.direction = 1;
+					result.direction = 0;
 				}
 				else
 				{
-					result.direction = 0;
+					result.direction = 1;
 				}
 
 				pt::CommercialLine* line(pService->getRoute()->getCommercialLine());

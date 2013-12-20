@@ -140,7 +140,7 @@ namespace synthese
 		buf[0] = o - 1;
 
 		/*DEBUG(JD)*/
-		util::Log::GetInstance().debug(boost::str(boost::format("VixV6000FileFormat: num_driver=%d, num_park=%d, num_service=%d, num_journey=%d, num_stop=%d, num_line=%d, direction=%c")
+		util::Log::GetInstance().debug(boost::str(boost::format("VixV6000FileFormat: num_driver=%d, num_park=%d, num_service=%d, num_journey=%d, num_stop=%d, num_line=%d, direction=%d")
 									 % num_driver % num_park % num_service % num_journey % num_stop % num_line % direction));
 		/*DEBUG(JD)*/
 
