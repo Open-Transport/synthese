@@ -149,7 +149,7 @@ namespace synthese
 					CIntSurvMsg int_surv(_getMessage());
 			
 					iToBeWritten = int_surv.StreamToBuffer(buf, COM_PORT_BUFF_SIZE-1);
-					_timeNextMessage = _tu.GetTickCount() + 5; //BSC_SURV_TIME_MS;
+					_timeNextMessage = _tu.GetTickCount() + 50; //BSC_SURV_TIME_MS;
 				}
 
 				_srt->PollingAnswerIntSurv(buf,iToBeWritten);
