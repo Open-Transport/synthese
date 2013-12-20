@@ -136,7 +136,7 @@ namespace synthese
 			CHECKFORCOM com = _srt->CheckForCommunication();
 			if(com==POLLING)
 			{
-				util::Log::GetInstance().debug("got polled from master at our address\n");
+				util::Log::GetInstance().debug("VixV6000FileFormat : got polled from master at our address\n");
 				_status = ONLINE_POLLING;
 
 				int iToBeWritten = 0;
@@ -146,10 +146,17 @@ namespace synthese
 				if(_tu.GetTickCount() > _timeNextMessage)
 				{
 					// create data char array
+					util::Log::GetInstance().debug("VixV6000FileFormat : message creation.\n");
 					CIntSurvMsg int_surv(_getMessage());
 			
 					iToBeWritten = int_surv.StreamToBuffer(buf, COM_PORT_BUFF_SIZE-1);
+					util::Log::GetInstance().debug("VixV6000FileFormat : message is sent.\n");
+
 					_timeNextMessage = _tu.GetTickCount() + 50; //BSC_SURV_TIME_MS;
+				}
+				else
+				{
+					util::Log::GetInstance().debug("VixV6000FileFormat : writing is ignored because the last message was sent too recently.\n");
 				}
 
 				_srt->PollingAnswerIntSurv(buf,iToBeWritten);
