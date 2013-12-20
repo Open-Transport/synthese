@@ -40,7 +40,7 @@ namespace synthese
 	using namespace impex;
 
 	template<> const string util::FactorableTemplate<DBTableSync,ExportTableSync>::FACTORY_KEY(
-		"16.02 Exports"
+		"99.16.02 Exports"
 	);
 
 	namespace db
