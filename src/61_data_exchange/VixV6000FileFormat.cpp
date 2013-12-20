@@ -148,9 +148,10 @@ namespace synthese
 					// create data char array
 					util::Log::GetInstance().debug("VixV6000FileFormat : message creation.\n");
 					CIntSurvMsg int_surv(_getMessage());
+					util::Log::GetInstance().debug("VixV6000FileFormat : message binarisation.\n");
 			
 					iToBeWritten = int_surv.StreamToBuffer(buf, COM_PORT_BUFF_SIZE-1);
-					util::Log::GetInstance().debug("VixV6000FileFormat : message is sent.\n");
+					util::Log::GetInstance().debug("VixV6000FileFormat : message sending.\n");
 
 					_timeNextMessage = _tu.GetTickCount() + 50; //BSC_SURV_TIME_MS;
 				}
