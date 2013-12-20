@@ -198,7 +198,7 @@ namespace synthese
 
 		boost::posix_time::time_duration VixV6000FileFormat::Exporter_::_getWaitingTime() const
 		{
-			if(_status == ONLINE_POLLING || _status == ONLINE_SELECTING)
+//			if(_status == ONLINE_POLLING || _status == ONLINE_SELECTING)
 			{
 				return seconds(0);
 			}
