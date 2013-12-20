@@ -236,7 +236,14 @@ namespace synthese
 			if(pService)
 			{
 				const std::string &servicenumber = pService->getServiceNumber();
-				result.num_service	= boost::lexical_cast<short>(servicenumber);
+				try
+				{
+					result.num_service	= boost::lexical_cast<short>(servicenumber);
+				}
+				catch(bad_lexical_cast&)
+				{
+
+				}
 
 				if(pService->getRoute()->getWayBack())
 				{
@@ -252,7 +259,14 @@ namespace synthese
 				
 				if(lineCodes.size()>0)
 				{
-					result.num_line = boost::lexical_cast<unsigned int>(*lineCodes.begin());
+					try
+					{
+						result.num_line = boost::lexical_cast<unsigned int>(*lineCodes.begin());
+					}
+					catch(bad_lexical_cast&)
+					{
+
+					}
 				}
 			}
 			else
@@ -267,7 +281,14 @@ namespace synthese
 
 				if(stopCodes.size()>0)
 				{
-					result.num_stop = boost::lexical_cast<unsigned int>(*stopCodes.begin());
+					try
+					{
+						result.num_stop = boost::lexical_cast<unsigned int>(*stopCodes.begin());
+					}
+					catch(bad_lexical_cast&)
+					{
+
+					}
 				}
 			}
 			else
