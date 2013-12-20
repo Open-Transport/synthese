@@ -237,7 +237,11 @@ namespace synthese
 			pt::ScheduledService *pService = vp.getService(); 
 			if(pService)
 			{
-				const std::string &servicenumber = pService->getServiceNumber();
+				std::string servicenumber = pService->getServiceNumber();
+				if(servicenumber.length() > 3)
+				{
+					servicenumber = servicenumber.substr(2);
+				}
 				util::Log::GetInstance().debug("VixV6000FileFormat : service "+ servicenumber);
 				try
 				{
