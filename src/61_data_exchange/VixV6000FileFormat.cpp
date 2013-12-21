@@ -305,7 +305,7 @@ namespace synthese
 
 			//TODO: lower priority, but we need to get those too
 			result.num_driver	= 1;	// TODO: low priority
-			result.num_park	= 799;	// TODO: low priority
+			result.num_park	= 798;	// TODO: low priority
 			result.etat_expl	= 1;	// TODO: low priority
 			result.num_service	= 1;	// Don't care: course NOT USED in VIX code.
 		
