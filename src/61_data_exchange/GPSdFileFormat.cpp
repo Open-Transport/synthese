@@ -77,7 +77,9 @@ namespace synthese
 		):	PermanentThreadImporterTemplate<GPSdFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			_gpsStatus(OFFLINE),
-			_socket(_ios)
+			_socket(_ios),
+			_lastStopPoint(NULL),
+			_lastStorage(not_a_date_time)
 		{}
 
 
@@ -157,9 +159,9 @@ namespace synthese
 				return;
 			}
 
-			// JSON reading
 			try
 			{
+				// JSON reading
 				double lon(
 					lexical_cast<double>(currentPosition->get<string>("lon"))
 				);
@@ -167,14 +169,7 @@ namespace synthese
 					lexical_cast<double>(currentPosition->get<string>("lat"))
 				);
 
-				//TODO: eventually check value coherency.
-	//			double lonOld=0;
-	//			double latOld=0;
-	/*DEBUG(JD)
-				// GPS position has changed. check if we need to change the stop point
-				if(lon!=lonOld || lat!=latOld)
-	DEBUG(JD)*/
-				//TODO: we could add longitude and latitude change tolerance
+
 
 				// Create the coordinate point
 				boost::shared_ptr<Point> point(
@@ -187,7 +182,6 @@ namespace synthese
 				// Nearest stop point
 				StopPoint* nearestStopPoint(NULL);
 				double maxdistance(3000.0);
-				double lastDistance(0.0);
 				pt::StopPointTableSync::SearchResult  sr = pt::StopPointTableSync::SearchByMaxDistance(
 					*projectedPoint.get(),
 					maxdistance, //distance  to originPoint
@@ -223,19 +217,35 @@ namespace synthese
 
 					double dst(sp->getGeometry()->distance(projectedPoint.get()));
 
-					if(!nearestStopPoint || dst < lastDistance)
-					{
-						lastDistance = dst;
-						nearestStopPoint = sp.get();
-					}
+					nearestStopPoint = sp.get();
 				}
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
-				
 
 				// update Vehicle position.
 				VehicleModule::GetCurrentVehiclePosition().setGeometry(
 					projectedPoint
 				);
+
+				// Storage only if the new point is far enough from the last point or if the last update is too old
+				ptime now(second_clock::local_time());
+				if(	(	_lastStorage.is_not_a_date_time() ||
+						now - _lastStorage > seconds(30)
+					) || (
+						!_lastPosition ||
+						_lastPosition->distance(projectedPoint.get()) > 100
+					) || (
+						(!_lastStopPoint && nearestStopPoint) ||
+						(_lastStopPoint && !nearestStopPoint) ||
+						(_lastStopPoint && nearestStopPoint && _lastStopPoint != nearestStopPoint)
+				)	){
+					// Store the position in the table if the current vehicle is known
+					VehicleModule::StoreCurrentVehiclePosition();
+
+					// Update values for the next check
+					_lastStorage = now;
+					_lastPosition = projectedPoint;
+					_lastStopPoint = nearestStopPoint;
+				}
 			}
 			catch(bad_lexical_cast&)
 			{

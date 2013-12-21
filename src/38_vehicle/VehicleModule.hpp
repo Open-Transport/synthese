@@ -117,6 +117,7 @@ namespace synthese
 			static ServiceCompositions::mapped_type GetCompositions(const pt::ScheduledService& service);
 
 			static VehiclePosition& GetCurrentVehiclePosition(){ return _currentVehiclePosition; }
+			static void StoreCurrentVehiclePosition();
 
 			static CurrentJourney& GetCurrentJourney(){ return _currentJourney; }
 

@@ -25,6 +25,7 @@
 #include "RollingStockTableSync.hpp"
 #include "ServiceComposition.hpp"
 #include "Vehicle.hpp"
+#include "VehiclePositionTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -171,5 +172,22 @@ namespace synthese
 			const pt::CommercialLine& line
 		){
 			return _linesAllowedVehicles[&line];
+		}
+
+
+
+		/// This method stores the current vehicle position in the database, only if the current vehicle is identified
+		void VehicleModule::StoreCurrentVehiclePosition()
+		{
+			// Do not store the position if we do not know which vehicle is used
+			if(!_currentVehiclePosition.getVehicle())
+			{
+				return;
+			}
+
+			VehiclePosition vpCopy(_currentVehiclePosition);
+			vpCopy.setKey(VehiclePositionTableSync::getId());
+			vpCopy.setTime(second_clock::local_time());
+			VehiclePositionTableSync::Save(&vpCopy);
 		}
 }	}

@@ -35,6 +35,11 @@ using namespace boost;
 
 namespace synthese
 {
+	namespace pt
+	{
+		class StopPoint;
+	}
+
 	namespace data_exchange
 	{
 		class GPSdFileFormat:
@@ -69,6 +74,9 @@ namespace synthese
 				mutable GpsStatus _gpsStatus;
 				mutable boost::asio::io_service _ios;  
 				mutable boost::asio::ip::tcp::socket _socket;
+				mutable boost::shared_ptr<geos::geom::Point> _lastPosition;
+				mutable pt::StopPoint* _lastStopPoint;
+				mutable boost::posix_time::ptime _lastStorage;
 
 				void _updateFromGps(
 					boost::optional<boost::property_tree::ptree>& result
