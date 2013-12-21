@@ -234,9 +234,9 @@ namespace synthese
 				ptime now(second_clock::local_time());
 				if(	(	_lastStorage.is_not_a_date_time() ||
 						now - _lastStorage > seconds(30)
-					) || (
-						!_lastPosition ||
-						_lastPosition->distance(projectedPoint.get()) > 100
+				//	) || (
+				//		!_lastPosition ||
+				//		_lastPosition->distance(projectedPoint.get()) > 100
 					) || (
 						(!_lastStopPoint && nearestStopPoint) ||
 						(_lastStopPoint && !nearestStopPoint) ||
