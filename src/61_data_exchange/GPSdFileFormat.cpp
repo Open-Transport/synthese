@@ -224,6 +224,7 @@ namespace synthese
 					}
 				}
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
+				util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
 
 				// update Vehicle position.
 				VehicleModule::GetCurrentVehiclePosition().setGeometry(
@@ -242,6 +243,8 @@ namespace synthese
 						(_lastStopPoint && !nearestStopPoint) ||
 						(_lastStopPoint && nearestStopPoint && _lastStopPoint != nearestStopPoint)
 				)	){
+					util::Log::GetInstance().debug("GPSdFileFormat : storage of position. Stop is "+ nearestStopPoint->getCodeBySources());
+
 					// Store the position in the table if the current vehicle is known
 					VehicleModule::StoreCurrentVehiclePosition();
 
