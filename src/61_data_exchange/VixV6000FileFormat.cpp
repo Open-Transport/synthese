@@ -219,39 +219,28 @@ namespace synthese
 		{
 			CIntSurvMsg result;
 
-			//TODO: add NULL pointer 
-			//TODO?: add timer not to update too often
-			// add time and date.
-			ptime now(second_clock::local_time());	
-			result.year	= now.date().year()-2000;
-			result.month	= now.date().month();
-			result.day		= now.date().day();
-			result.hour	= now.time_of_day().hours();
-			result.min		= now.time_of_day().minutes();
-			result.sec		= now.time_of_day().seconds();
-
-			// Get stop number, direction and line.
 			VehiclePosition &vp = VehicleModule::GetCurrentVehiclePosition();
 			// TODO: clue: in Synthese all services are unique and there is one service number per bus path. (service = Time+AtoZ)
 
+			// Current service / line
 			pt::ScheduledService *pService = vp.getService(); 
 			if(pService)
 			{
+				// Serviec
 				std::string servicenumber = pService->getServiceNumber();
 				if(servicenumber.length() > 3)
 				{
 					servicenumber = servicenumber.substr(2);
 				}
-				util::Log::GetInstance().debug("VixV6000FileFormat : service "+ servicenumber);
 				try
 				{
 					result.num_journey = boost::lexical_cast<short>(servicenumber);
 				}
 				catch(bad_lexical_cast&)
 				{
-
 				}
 
+				// Direction
 				if(pService->getRoute()->getWayBack())
 				{
 					result.direction = 1;
@@ -261,9 +250,9 @@ namespace synthese
 					result.direction = 0;
 				}
 
+				// Line
 				pt::CommercialLine* line(pService->getRoute()->getCommercialLine());
 				const std::vector<std::string> &lineCodes = line->getCodesBySource(*_dataSource);
-				
 				if(lineCodes.size()>0)
 				{
 					try
@@ -271,16 +260,14 @@ namespace synthese
 						result.num_line = boost::lexical_cast<unsigned int>(*lineCodes.begin());
 					}
 					catch(bad_lexical_cast&)
-					{
-
-					}
+					{}
 				}
-			}
-			else
-			{
-				//TODO: unknown service
+
+				// Status
+				result.etat_expl = 1;
 			}
 
+			// Stop point
 			pt::StopPoint* pStoppoint = vp.getStopPoint();
 			if(pStoppoint)
 			{
@@ -293,21 +280,25 @@ namespace synthese
 						result.num_stop = boost::lexical_cast<unsigned int>(*stopCodes.begin());
 					}
 					catch(bad_lexical_cast&)
-					{
-
-					}
+					{}
 				}
 			}
-			else
+
+			// Vehicle
+			if(vp.getVehicle())
 			{
-				//TODO: unknown position. use non located
+				try
+				{
+					result.num_park = lexical_cast<short>(
+						vp.getVehicle()->getNumber()
+					); // TODO replace it by data source links
+				}
+				catch(bad_lexical_cast&)
+				{}
 			}
 
-			//TODO: lower priority, but we need to get those too
-			result.num_driver	= 1;	// TODO: low priority
-			result.num_park	= 798;	// TODO: low priority
-			result.etat_expl	= 1;	// TODO: low priority
-			result.num_service	= 1;	// Don't care: course NOT USED in VIX code.
+			result.num_driver	= 1;	// TODO : driver user id
+			result.num_service	= 1;	// TODO : driver service
 		
 			return result;
 		}

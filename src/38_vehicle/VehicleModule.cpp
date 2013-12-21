@@ -53,6 +53,7 @@ namespace synthese
 		VehicleModule::VehicleScreensMap VehicleModule::_currentScreens;
 		VehicleModule::ExtraParameterMap VehicleModule::_extraParameters;
 		bool VehicleModule::_ignition(false);
+		const string VehicleModule::MODULE_PARAM_CURRENT_VEHICLE_ID = "current_vehicle_id";
 	}
 
 	namespace server
@@ -99,7 +100,12 @@ namespace synthese
 					RollingStockTableSync::Save(&s);
 				}
 			}
+
+			// In the init section in order to read this parameter after the data load (DBModule::Init)
+			RegisterParameter(VehicleModule::MODULE_PARAM_CURRENT_VEHICLE_ID, "", &VehicleModule::ParameterCallback);
 		}
+
+
 
 		template<> void ModuleClassTemplate<VehicleModule>::Start()
 		{
@@ -189,5 +195,32 @@ namespace synthese
 			vpCopy.setKey(VehiclePositionTableSync::getId());
 			vpCopy.setTime(second_clock::local_time());
 			VehiclePositionTableSync::Save(&vpCopy);
+		}
+
+
+
+		void VehicleModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			if(name == MODULE_PARAM_CURRENT_VEHICLE_ID)
+			{
+				Vehicle* newCurrentVehicle(NULL);
+				try
+				{
+					RegistryKeyType vehicleId(
+						lexical_cast<RegistryKeyType>(value)
+					);
+					newCurrentVehicle = Env::GetOfficialEnv().getEditable<Vehicle>(vehicleId).get();
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
+				catch(ObjectNotFoundException<Vehicle>&)
+				{
+				}
+				GetCurrentVehiclePosition().setVehicle(newCurrentVehicle);
+				StoreCurrentVehiclePosition();
+			}
 		}
 }	}

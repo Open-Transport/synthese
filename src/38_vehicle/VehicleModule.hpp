@@ -98,6 +98,8 @@ namespace synthese
 			typedef std::map<std::string, VehicleScreen> VehicleScreensMap;
 			typedef std::map<std::string, std::string> ExtraParameterMap;
 
+			static const std::string MODULE_PARAM_CURRENT_VEHICLE_ID;
+
 		private:
 			static CurrentJourney _currentJourney;
 			static LinesAllowedVehicles _linesAllowedVehicles;
@@ -131,6 +133,11 @@ namespace synthese
 
 			static bool getIgnition() { return _ignition; }
 			static void setIgnition(bool value) { _ignition = value; }
+
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
+			);
 		};
 	}
 	/** @} */

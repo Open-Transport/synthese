@@ -18,26 +18,30 @@ namespace synthese
 	CIntSurvMsg::CIntSurvMsg(void)
 	{
 		type		= INT_SURV;
-		//TODO(JD): set those values to 0 by default when debug done
-		year		= 113;
-		month		= 8;
-		day			= 19;
-		hour		= 12;
-		min			= 10;
-		sec			= 50;
-		num_driver	= 4320;
-		num_park	= 799;
-		etat_expl	= 1;
-		num_line	= 3;    // 3; //6; //3;
-		num_service	= 4024;	// No service agent
-		num_journey	= 21;	// course NOT USED in VIX code.
-		num_stop	= 268; // 1949; //2045; //2050;
+		ptime now(second_clock::local_time());
+		year	= now.date().year()-2000;
+		month	= now.date().month();
+		day		= now.date().day();
+		hour	= now.time_of_day().hours();
+		min		= now.time_of_day().minutes();
+		sec		= now.time_of_day().seconds();
+		num_driver	= 1;
+		num_park	= 798;
+		etat_expl	= 0;
+		num_line	= 9998;
+		num_service	= 1;
+		num_journey	= 998;
+		num_stop	= 9998;
 		direction	= 0;
 	}
+
+
 
 	CIntSurvMsg::~CIntSurvMsg(void)
 	{
 	}
+
+
 
 	void CIntSurvMsg::IntLigneToString(char *p, unsigned int i)
 	{
