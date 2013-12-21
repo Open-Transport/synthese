@@ -195,6 +195,7 @@ namespace synthese
 					allEdges = VehicleModule::GetCurrentVehiclePosition().getService()->getPath()->getAllEdges();
 				}
 				
+				double lastDistance(0.0);
 				BOOST_FOREACH(boost::shared_ptr<StopPoint> sp, sr)
 				{
 					// Jump over stops not in the current route
@@ -216,8 +217,11 @@ namespace synthese
 					}
 
 					double dst(sp->getGeometry()->distance(projectedPoint.get()));
-
-					nearestStopPoint = sp.get();
+					if(!nearestStopPoint || dst < lastDistance)
+					{
+						lastDistance = dst;
+						nearestStopPoint = sp.get();
+					}
 				}
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
 
