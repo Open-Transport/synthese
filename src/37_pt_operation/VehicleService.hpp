@@ -96,6 +96,7 @@ namespace synthese
 				void addDriverServiceChunk(const DriverService::Chunk& value);
 				void removeDriverServiceChunk(const DriverService::Chunk& value);
 				void insert(pt::SchedulesBasedService& value);
+				void remove(pt::SchedulesBasedService& value);
 				void clearServices();
 			//@}
 
