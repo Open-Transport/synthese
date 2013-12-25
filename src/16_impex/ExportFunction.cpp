@@ -68,8 +68,10 @@ namespace synthese
 				string fileFormatKey(map.get<string>(PARAMETER_FILE_FORMAT));
 				_export.reset(new Export);
 				_export->set<FileFormatKey>(fileFormatKey);
-				_export->set<Parameters>(map);
 			}
+			_exporter = _export->getExporter();
+
+			_exporter->setFromParametersMap(map);
 		}
 
 
@@ -79,7 +81,7 @@ namespace synthese
 			const Request& request
 		) const {
 			util::ParametersMap pm;
-			_export->getExporter()->build(stream);
+			_exporter->build(stream);
 			return pm;
 		}
 

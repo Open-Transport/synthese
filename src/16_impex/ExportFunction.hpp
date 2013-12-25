@@ -33,6 +33,7 @@ namespace synthese
 	namespace impex
 	{
 		class Export;
+		class Exporter;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	16.15 Function : ExportFunction.
@@ -53,6 +54,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<Export> _export;
+				boost::shared_ptr<Exporter> _exporter;
 				util::ParametersMap _pm;
 			//@}
 
