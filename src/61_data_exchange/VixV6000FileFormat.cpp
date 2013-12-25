@@ -146,13 +146,8 @@ namespace synthese
 				if(_tu.GetTickCount() > _timeNextMessage)
 				{
 					// create data char array
-					util::Log::GetInstance().debug("VixV6000FileFormat : message creation.\n");
 					CIntSurvMsg int_surv(_getMessage());
-					util::Log::GetInstance().debug("VixV6000FileFormat : message binarisation.\n");
-			
 					iToBeWritten = int_surv.StreamToBuffer(buf, COM_PORT_BUFF_SIZE-1);
-					util::Log::GetInstance().debug("VixV6000FileFormat : message sending.\n");
-
 					_timeNextMessage = _tu.GetTickCount() + 1000; //BSC_SURV_TIME_MS;
 				}
 				else
