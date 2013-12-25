@@ -26,6 +26,7 @@
 
 #include "DriverService.hpp"
 #include "MimeTypes.hpp"
+#include "OperationUnit.hpp"
 #include "PTOperationModule.hpp"
 #include "RequestException.h"
 #include "Request.h"
@@ -134,6 +135,17 @@ namespace synthese
 			}
 
 			_key = map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0);
+
+			// Operation unit filter
+			RegistryKeyType unitId(map.getDefault<RegistryKeyType>(OperationUnit::FIELD.name, 0));
+			if(unitId) try
+			{
+				_operationUnit = *Env::GetOfficialEnv().get<OperationUnit>(unitId);
+			}
+			catch(ObjectNotFoundException<OperationUnit>&)
+			{
+				throw RequestException("No such operation unit");
+			}
 		}
 
 
@@ -152,6 +164,12 @@ namespace synthese
 
 				// Date filter
 				if(!service.isActive(_date))
+				{
+					continue;
+				}
+
+				// Operation unit filter
+				if(_operationUnit && (!service.getOperationUnit() || &*service.getOperationUnit() != &*_operationUnit))
 				{
 					continue;
 				}

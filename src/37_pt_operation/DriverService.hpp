@@ -38,6 +38,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		class DriverActivity;
+		class OperationUnit;
 		class VehicleService;
 
 		/** DriverService class.
@@ -120,6 +121,7 @@ namespace synthese
 		private:
 			Chunks _chunks;
 			std::string _name;
+			boost::optional<OperationUnit&> _operationUnit;
 
 		public:
 			DriverService(util::RegistryKeyType id = 0);
@@ -128,12 +130,14 @@ namespace synthese
 			//@{
 				const Chunks& getChunks() const { return _chunks; }
 				virtual std::string getName() const { return _name; }
+				const boost::optional<OperationUnit&>& getOperationUnit() const { return _operationUnit; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setChunks(const Chunks& value);
 				void setName(const std::string& value){ _name = value; }
+				void setOperationUnit(const boost::optional<OperationUnit&>& value){ _operationUnit = value; }
 			//@}
 
 			/// @name Services
