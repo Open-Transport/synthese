@@ -42,6 +42,11 @@
 
 namespace synthese
 {
+	namespace tree
+	{
+		class TreeFolderUpNode;
+	}
+
 	namespace calendar
 	{
 		class CalendarTemplate;
@@ -228,13 +233,18 @@ namespace synthese
 			{
 			private:
 				boost::shared_ptr<const pt::TransportNetwork> _network;
-				boost::shared_ptr<tree::TreeFolder> _folder;
+				boost::shared_ptr<const tree::TreeFolder> _folder;
 				boost::shared_ptr<const impex::DataSource> _dataSource;
 				bool _generateRouteCode;
 				typedef std::map<const pt::JourneyPattern*, size_t> RouteCodes;
 				mutable RouteCodes _routeCodes;
 				size_t _serviceNumberPosition;
 				mutable util::Env _env;
+
+				static void _addLines(
+					std::vector<const pt::CommercialLine*>& lines,
+					const tree::TreeFolderUpNode& node
+				);
 
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
