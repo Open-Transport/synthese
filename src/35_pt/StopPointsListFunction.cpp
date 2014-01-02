@@ -387,39 +387,36 @@ namespace synthese
 					destinationPM->insert("cityName", destination.second.first->getCity()->getName());
 
 					// Lines
-					if(!_commercialLineID)
+					BOOST_FOREACH(const CommercialLineSetType::value_type& line, destination.second.second)
 					{
-						BOOST_FOREACH(const CommercialLineSetType::value_type& line, destination.second.second)
+						// Declaration
+						boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+
+						// Main parameters
+						line->toParametersMap(*linePM, true);
+
+						// Rolling stock
+						set<RollingStock *> rollingStocks;
+						BOOST_FOREACH(Path* path, line->getPaths())
 						{
-							// Declaration
-							boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+							if(!dynamic_cast<const JourneyPattern*>(path))
+								continue;
 
-							// Main parameters
-							line->toParametersMap(*linePM, true);
+							if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
+								continue;
 
-							// Rolling stock
-							set<RollingStock *> rollingStocks;
-							BOOST_FOREACH(Path* path, line->getPaths())
-							{
-								if(!dynamic_cast<const JourneyPattern*>(path))
-									continue;
-
-								if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
-									continue;
-
-								rollingStocks.insert(
-									static_cast<const JourneyPattern*>(path)->getRollingStock()
-								);
-							}
-							BOOST_FOREACH(RollingStock * rs, rollingStocks)
-							{
-								boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
-								rs->toParametersMap(*transportModePM, true);
-								linePM->insert("transportMode", transportModePM);
-							}
-
-							destinationPM->insert(TAG_LINE, linePM);
+							rollingStocks.insert(
+								static_cast<const JourneyPattern*>(path)->getRollingStock()
+							);
 						}
+						BOOST_FOREACH(RollingStock * rs, rollingStocks)
+						{
+							boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
+							rs->toParametersMap(*transportModePM, true);
+							linePM->insert("transportMode", transportModePM);
+						}
+
+						destinationPM->insert(TAG_LINE, linePM);
 					}
 
 					stopPM->insert(TAG_DESTINATION, destinationPM);
