@@ -76,7 +76,13 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
-			typedef std::set<boost::shared_ptr<SentAlarm> > ActivatedMessages;
+			struct SentAlarmLess : public std::binary_function<boost::shared_ptr<SentAlarm>, boost::shared_ptr<SentAlarm>, bool>
+			{
+				//////////////////////////////////////////////////////////////////////////
+				/// Order by decreasing priority level, then by line number, then by start date, then by address
+				bool operator()(boost::shared_ptr<SentAlarm> left, boost::shared_ptr<SentAlarm> right) const;
+			};
+			typedef std::set<boost::shared_ptr<SentAlarm>, SentAlarmLess> ActivatedMessages;
 
 		private:
 			static ActivatedMessages _activatedMessages;
@@ -90,17 +96,6 @@ namespace synthese
 				const BroadcastPoint& broadcastPoint,
 				const util::ParametersMap& parameters
 			);
-
-			struct SentAlarmLess : public std::binary_function<SentAlarm*, SentAlarm*, bool>
-			{
-				//////////////////////////////////////////////////////////////////////////
-				/// Order by decreasing priority level, then by start date, then by address
-				/// NULL addresses are forbidden
-				bool operator()(SentAlarm* left, SentAlarm* right) const;
-			};
-
-
-
 
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
