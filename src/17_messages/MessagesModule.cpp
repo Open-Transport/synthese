@@ -354,8 +354,8 @@ namespace synthese
 
 
 		bool MessagesModule::SentAlarmLess::operator()(
-			SentAlarm* left,
-			SentAlarm* right
+			shared_ptr<SentAlarm> left,
+			shared_ptr<SentAlarm> right
 		) const {
 			assert(left && right);
 
@@ -383,7 +383,7 @@ namespace synthese
 				}
 			}
 
-			return left < right;
+			return left.get() < right.get();
 		}
 	}
 }
