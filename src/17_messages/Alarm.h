@@ -183,6 +183,11 @@ namespace synthese
 				LinkedObjects::mapped_type getLinkedObjects(
 					const std::string& recipientKey
 				) const;
+
+				LinkedObjects & getLinkedObjects() const
+				{
+					return _linkedObjects;
+				}			
 			//@}
 		};
 }	}
