@@ -178,6 +178,7 @@ namespace synthese
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_RESULT_ROW_PAGE;
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
+			static const std::string PARAMETER_RESERVATION_DELAY_TYPE;
 
 		private:
 			static const std::string DATA_LINES;
@@ -360,6 +361,7 @@ namespace synthese
 				bool _showResTab;
 				bool _showCoords;
 				bool _ignoreReservationRules;
+				int _reservationRulesDelayType;
 				const CoordinatesSystem* _coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;

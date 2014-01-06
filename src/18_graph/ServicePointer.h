@@ -217,7 +217,8 @@ namespace synthese
 					@date 2007
 				*/
 				UseRule::RunPossibilityType isUseRuleCompliant(
-					bool ignoreReservation
+					bool ignoreReservation,
+					int reservationRulesDelayType = 0
 				);
 
 

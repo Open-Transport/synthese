@@ -111,6 +111,7 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration>	_maxTransferDuration;
 				bool _enableTheoretical;
 				bool _enableRealTime;
+				int _reservationRulesDelayType;
 			//@}
 
 			//! @name Logging
@@ -167,7 +168,8 @@ namespace synthese
 				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>(),
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
 				bool enableTheoretical = true,
-				bool enableRealTime = true
+				bool enableRealTime = true,
+				int reservationRulesDelayType = 0
 			);
 
 
