@@ -357,29 +357,33 @@ namespace synthese
 			shared_ptr<SentAlarm> left,
 			shared_ptr<SentAlarm> right
 		) const {
-			assert(left && right);
+			assert(left.get() && right.get());
 
 			if(left->getLevel() != right->getLevel())
 			{
 				return left->getLevel() > right->getLevel();
 			}
 
-			if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
+			
+			if(left->getScenario() && right->getScenario())
 			{
-				if(right->getScenario()->getPeriodStart().is_not_a_date_time())
+				if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
 				{
-					return true;
+					if(right->getScenario()->getPeriodStart().is_not_a_date_time())
+					{
+						return true;
+					}
+					if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
+					{
+						return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
+					}
 				}
-				if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
+				else
 				{
-					return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
-				}
-			}
-			else
-			{
-				if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
-				{
-					return false;
+					if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
+					{
+						return false;
+					}
 				}
 			}
 
