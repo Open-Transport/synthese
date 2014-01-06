@@ -90,6 +90,7 @@ namespace synthese
 				bool										_ignoreReservation;
 				bool										_enableTheoretical;
 				bool										_enableRealTime;
+				int											_reservationRulesDelayType;
 			//@}
 
 			//! @name Route planning data
@@ -174,7 +175,8 @@ namespace synthese
 				int													totalDistance = 0,
 				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>(),
 				bool 												enableTheoretical = true,
-				bool												enableRealTime = true
+				bool												enableRealTime = true,
+				int													reservationRulesDelayType = 0
 			);
 
 

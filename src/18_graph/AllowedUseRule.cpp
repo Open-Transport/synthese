@@ -36,7 +36,8 @@ namespace synthese
 
 		boost::posix_time::ptime AllowedUseRule::getReservationDeadLine(
 			const boost::posix_time::ptime& originTime,
-			const boost::posix_time::ptime& departureTime
+			const boost::posix_time::ptime& departureTime,
+			const ReservationDelayType& reservationRuleDelayType
 		) const	{
 			return departureTime;
 		}
@@ -53,14 +54,16 @@ namespace synthese
 
 		UseRule::RunPossibilityType AllowedUseRule::isRunPossible(
 			const ServicePointer& servicePointer,
-			bool ignoreReservation
+			bool ignoreReservation,
+			int reservationRulesDelayType
 		) const	{
 			return RUN_POSSIBLE;
 		}
 
 		UseRule::ReservationAvailabilityType AllowedUseRule::getReservationAvailability(
 			const ServicePointer& serviceUse,
-			bool ignoreReservationDeadline
+			bool ignoreReservationDeadline,
+			int reservationRulesDelayType
 		) const	{
 			return RESERVATION_FORBIDDEN;
 		}

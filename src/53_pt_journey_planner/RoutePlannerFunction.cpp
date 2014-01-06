@@ -180,6 +180,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_external_junction_page");
 		const string RoutePlannerFunction::PARAMETER_RESULT_ROW_PAGE("result_row_page");
 		const string RoutePlannerFunction::PARAMETER_IGNORE_RESERVATION_RULES("irr");
+		const string RoutePlannerFunction::PARAMETER_RESERVATION_DELAY_TYPE("delay_type");
 
 		//XML output only:
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
@@ -795,6 +796,9 @@ namespace synthese
 			// Ignore Reservation Rules
 			_ignoreReservationRules = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
 
+			// Reservation Rules Delay type
+			_reservationRulesDelayType = map.getDefault<int>(PARAMETER_RESERVATION_DELAY_TYPE, 0);
+
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
 				return;
@@ -1254,7 +1258,8 @@ namespace synthese
 				_maxTransferDuration,
 				_minMaxDurationRatioFilter,
 				PTModule::isTheoreticalAllowed(),
-				PTModule::isRealTimeAllowed()
+				PTModule::isRealTimeAllowed(),
+				_reservationRulesDelayType
 			);
 
 			// Computing

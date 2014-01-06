@@ -91,7 +91,8 @@ namespace synthese
 				bool controlIfTheServiceIsReachable,
 				bool inverted,
 				bool ingoreReservation,
-				bool allowCanceled
+				bool allowCanceled,
+				int reservationRulesDelayType = 0 
 			) const;
 
 			virtual void completeServicePointer(

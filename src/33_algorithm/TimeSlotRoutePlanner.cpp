@@ -60,7 +60,8 @@ namespace synthese
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
-			bool enableRealTime
+			bool enableRealTime,
+			int reservationRulesDelayType
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(lowerDepartureTime),
@@ -80,7 +81,8 @@ namespace synthese
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
 			_logger(logger),
-			_journeyTemplates(graphToUse)
+			_journeyTemplates(graphToUse),
+			_reservationRulesDelayType(reservationRulesDelayType)
 		{}
 
 
@@ -101,7 +103,8 @@ namespace synthese
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
-			bool enableRealTime
+			bool enableRealTime,
+			int reservationRulesDelayType
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(continuousService.getFirstDepartureTime()),
@@ -126,7 +129,8 @@ namespace synthese
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
 			_logger(logger),
-			_journeyTemplates(graphToUse)
+			_journeyTemplates(graphToUse),
+			_reservationRulesDelayType(reservationRulesDelayType)
 		{}
 
 
@@ -187,7 +191,8 @@ namespace synthese
 					_journeyTemplates,
 					_maxTransferDuration,
 					_enableTheoretical,
-					_enableRealTime							
+					_enableRealTime,
+					_reservationRulesDelayType
 				);
 				Journey journey(r.run());
 
@@ -212,7 +217,8 @@ namespace synthese
 						_vmax,
 						_ignoreReservation,
 						_logger,
-						_maxTransferDuration
+						_maxTransferDuration,
+						_reservationRulesDelayType
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));
 

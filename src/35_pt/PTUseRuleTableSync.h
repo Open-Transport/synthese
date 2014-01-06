@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string COL_RESERVATION_TYPE;
 			static const std::string COL_ORIGINISREFERENCE;
 			static const std::string COL_MINDELAYMINUTES;
+			static const std::string COL_MINDELAYMINUTESEXTERNAL;
 			static const std::string COL_MINDELAYDAYS;
 			static const std::string COL_MAXDELAYDAYS;
 			static const std::string COL_HOURDEADLINE;

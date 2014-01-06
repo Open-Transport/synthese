@@ -83,6 +83,12 @@ namespace synthese
 				RUN_DEPENDING_ON_DEPARTURE_PLACE = 2
 			} RunPossibilityType;
 
+			
+			typedef enum
+			{
+				RESERVATION_INTERNAL_DELAY = 0,
+				RESERVATION_EXTERNAL_DELAY = 1
+			} ReservationDelayType;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Maximal seats number for the user category.
@@ -125,7 +131,8 @@ namespace synthese
 				*/
 				virtual boost::posix_time::ptime getReservationDeadLine (
 					const boost::posix_time::ptime& originTime,
-					const boost::posix_time::ptime& departureTime
+					const boost::posix_time::ptime& departureTime,
+					const ReservationDelayType& reservationRuleDelayType = RESERVATION_INTERNAL_DELAY
 				) const = 0;
 
 
@@ -156,7 +163,8 @@ namespace synthese
 				*/
 				virtual RunPossibilityType isRunPossible (
 					const ServicePointer& servicePointer,
-					bool ignoreReservation
+					bool ignoreReservation,
+					int reservationRulesDelayType = 0
 				) const = 0;
 
 
@@ -173,7 +181,8 @@ namespace synthese
 				*/
 				virtual ReservationAvailabilityType getReservationAvailability(
 					const ServicePointer& servicePointer,
-					bool ignoreReservationDeadline
+					bool ignoreReservationDeadline,
+					int reservationRulesDelayType = 0
 				) const = 0;
 
 
