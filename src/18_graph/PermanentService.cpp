@@ -49,7 +49,8 @@ namespace synthese
 			bool controlIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation,
-			bool canceled
+			bool canceled,
+			int reservationRulesDelayType
 		) const	{
 
 			// Access parameters check

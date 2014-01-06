@@ -86,7 +86,8 @@ namespace synthese
 			int totalDistance,
 			boost::optional<const JourneyTemplates&> journeyTemplates,
 			bool enableTheoretical,
-			bool enableRealTime
+			bool enableRealTime,
+			int reservationRulesDelayType
 		):	_accessParameters(accessParameters),
 			_accessDirection(accessDirection),
 			_whatToSearch(whatToSearch),
@@ -107,7 +108,8 @@ namespace synthese
 			_enableRealTime(enableRealTime),
 			_destinationVam(destinationVam),
 			_totalDistance(totalDistance),
-			_journeyTemplates(journeyTemplates)
+			_journeyTemplates(journeyTemplates),
+			_reservationRulesDelayType(reservationRulesDelayType)
 		{}
 
 
@@ -426,7 +428,8 @@ namespace synthese
 									_ignoreReservation,
 									false, // allowCanceledService
 									_enableTheoretical,
-									_enableRealTime
+									_enableRealTime,
+									_reservationRulesDelayType
 								):
 								edge.getPreviousService(
 									_accessParameters,
@@ -438,7 +441,8 @@ namespace synthese
 									_ignoreReservation,
 									false, // allowCanceledService
 									_enableTheoretical,
-									_enableRealTime
+									_enableRealTime,
+									_reservationRulesDelayType
 							)	);
 
 							// If no service, advance to the next edge
@@ -531,7 +535,7 @@ namespace synthese
 
 								// Storage of the useful solution
 								ServicePointer serviceUse(serviceInstance, *curEdge, _accessParameters);
-								if (serviceUse.isUseRuleCompliant(_ignoreReservation) == UseRule::RUN_NOT_POSSIBLE)
+								if (serviceUse.isUseRuleCompliant(_ignoreReservation, _reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE)
 								{
 									nonServedEdges.insert(curEdge);
 									continue;

@@ -22,8 +22,11 @@ namespace synthese
 	{
 		boost::shared_ptr<const ForbiddenUseRule> ForbiddenUseRule::INSTANCE(new ForbiddenUseRule);
 
-		ptime ForbiddenUseRule::getReservationDeadLine( const ptime& originTime, const ptime& departureTime ) const
-		{
+		ptime ForbiddenUseRule::getReservationDeadLine(
+			const ptime& originTime,
+			const ptime& departureTime,
+			const ReservationDelayType& reservationRuleDelayType
+		) const {
 			return ptime(neg_infin);
 		}
 
@@ -41,7 +44,8 @@ namespace synthese
 
 		UseRule::RunPossibilityType ForbiddenUseRule::isRunPossible(
 			const ServicePointer& servicePointer,
-			bool ignoreReservation
+			bool ignoreReservation,
+			int reservationRulesDelayType
 		) const	{
 			return RUN_NOT_POSSIBLE;
 		}
@@ -50,7 +54,8 @@ namespace synthese
 
 		UseRule::ReservationAvailabilityType ForbiddenUseRule::getReservationAvailability(
 			const ServicePointer& servicePointer,
-			bool ignoreReservationDeadline
+			bool ignoreReservationDeadline,
+			int reservationRulesDelayType
 		) const	{
 			return RESERVATION_FORBIDDEN;
 		}

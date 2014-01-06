@@ -64,6 +64,7 @@ namespace synthese
 		const string PTUseRuleUpdateAction::PARAMETER_MAX_DELAY_DAYS = Action_PARAMETER_PREFIX + "mx";
 		const string PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_DAYS = Action_PARAMETER_PREFIX + "md";
 		const string PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES = Action_PARAMETER_PREFIX + "mm";
+		const string PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES_EXTERNAL = Action_PARAMETER_PREFIX + "me";
 		const string PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE = Action_PARAMETER_PREFIX + "dl";
 		const string PTUseRuleUpdateAction::PARAMETER_RESERVATION_MIN_DEPARTURE_TIME = Action_PARAMETER_PREFIX + "_reservation_min_departure_time";
 		const string PTUseRuleUpdateAction::PARAMETER_RESERVATION_FORBIDDEN_DAYS = Action_PARAMETER_PREFIX + "_reservation_forbidden_days";
@@ -127,6 +128,10 @@ namespace synthese
 			if(_minDelayMinutes)
 			{
 				map.insert(PARAMETER_MIN_DELAY_MINUTES, _minDelayMinutes->total_seconds() / 60);
+			}
+			if(_minDelayMinutesExternal)
+			{
+				map.insert(PARAMETER_MIN_DELAY_MINUTES_EXTERNAL, _minDelayMinutesExternal->total_seconds() / 60);
 			}
 			if(_hourDeadLine)
 			{
@@ -254,6 +259,11 @@ namespace synthese
 			{
 				_minDelayMinutes = minutes(map.getDefault<long>(PARAMETER_MIN_DELAY_MINUTES, 0));
 			}
+			
+			if(map.isDefined(PARAMETER_MIN_DELAY_MINUTES_EXTERNAL))
+			{
+				_minDelayMinutesExternal = minutes(map.getDefault<long>(PARAMETER_MIN_DELAY_MINUTES_EXTERNAL, 0));
+			}
 
 			// Minimal delay (days)
 			if(map.isDefined(PARAMETER_MIN_DELAY_DAYS))
@@ -365,6 +375,11 @@ namespace synthese
 			if(_minDelayMinutes)
 			{
 				_rule->setMinDelayMinutes(*_minDelayMinutes);
+			}
+			
+			if(_minDelayMinutesExternal)
+			{
+				_rule->setMinDelayMinutesExternal(*_minDelayMinutesExternal);
 			}
 
 			if(_reservationMinDepartureTime)

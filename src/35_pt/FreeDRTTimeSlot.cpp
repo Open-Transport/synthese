@@ -159,7 +159,8 @@ namespace synthese
 			bool checkIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation,
-			bool allowCanceled
+			bool allowCanceled,
+			int reservationRulesDelayType
 		) const	{
 			return ServicePointer();
 		}

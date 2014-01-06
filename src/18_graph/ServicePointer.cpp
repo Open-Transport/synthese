@@ -149,7 +149,8 @@ namespace synthese
 
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
-			bool ignoreReservation
+			bool ignoreReservation,
+			int reservationRulesDelayType
 		)	{
 			ptime originDateTimeRef(_originDateTime);
 
@@ -177,7 +178,7 @@ namespace synthese
 			}
 
 			// Check of use rule
-			if(getUseRule().isRunPossible(*this, ignoreReservation) != UseRule::RUN_POSSIBLE)
+			if(getUseRule().isRunPossible(*this, ignoreReservation, reservationRulesDelayType) != UseRule::RUN_POSSIBLE)
 			{
 				return UseRule::RUN_NOT_POSSIBLE;
 			}

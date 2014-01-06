@@ -95,7 +95,8 @@ namespace synthese
 			bool checkIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation,
-			bool allowCanceled
+			bool allowCanceled,
+			int reservationRulesDelayType
 		) const {
 
 			// Check of access parameters
@@ -200,7 +201,7 @@ namespace synthese
 
 			// Reservation check
 			if(	checkIfTheServiceIsReachable &&
-				ptr.isUseRuleCompliant(ignoreReservation) == UseRule::RUN_NOT_POSSIBLE
+				ptr.isUseRuleCompliant(ignoreReservation, reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE
 			){
 				return ServicePointer();
 			}
