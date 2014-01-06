@@ -32,6 +32,8 @@
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
 #include "TextTemplate.h"
+#include "CommercialLine.h"
+#include "AlarmObjectLink.h"
 
 #include <boost/foreach.hpp>
 
@@ -384,6 +386,48 @@ namespace synthese
 					{
 						return false;
 					}
+				}
+			}
+
+			// Sort by commercial line if both alarm are linked to
+			{
+				shared_ptr<const pt::CommercialLine> firstLineLeft, firstLineRight;
+				BOOST_FOREACH(Alarm::LinkedObjects::value_type& leftId, left->getLinkedObjects())
+				{
+					if(leftId.first != "line")continue;
+					BOOST_FOREACH(const AlarmObjectLink* link, leftId.second)
+					{
+						shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
+						if(line.get())
+						{
+							firstLineLeft = line;
+							break;
+						}
+					}
+					break;
+				}
+				BOOST_FOREACH(Alarm::LinkedObjects::value_type& rightId, right->getLinkedObjects())
+				{
+					if(rightId.first != "line")continue;
+					BOOST_FOREACH(const AlarmObjectLink* link, rightId.second)
+					{
+						shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
+						if(line.get())
+						{
+							firstLineRight = line;
+							break;
+						}
+					}
+					break;
+				}
+				if(firstLineLeft.get() && firstLineRight.get())
+				{
+					return *firstLineLeft.get() < *firstLineRight.get();
+				}
+				else
+				{
+					if(firstLineLeft.get())return true; // Only left is associated to a line
+					if(firstLineRight.get())return false; // Only right is associated to a line
 				}
 			}
 
