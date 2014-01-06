@@ -112,7 +112,17 @@ namespace synthese
 				util::Env& env,
 				bool insideSameStopArea = false,
 				double const& distance = 300,
+				bool maxDistance = true, 
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+
+			static bool SearchDistance(
+				StopPoint const& point1,
+				StopPoint const& point2,
+				double const& distance = 300,
+				bool maxDistance = true 
 			);
 
 
