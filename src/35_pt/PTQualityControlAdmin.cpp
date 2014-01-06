@@ -142,7 +142,7 @@ namespace synthese
 		){
 			_runControl = map.getDefault<bool>(PARAM_RUN_CONTROL);
 			_ignoredLines = map.getDefault<string>(PARAM_LINES);
-			_stopsDistance = map.getDefault<int>(PARAM_DISTANCE);
+			_stopsDistance = map.getDefault<double>(PARAM_DISTANCE);
 			_transportSpeed = map.getDefault<int>(PARAM_SPEED);
 
 			TransportNetworkTableSync::SearchResult networks(TransportNetworkTableSync::Search(Env::GetOfficialEnv()));
@@ -199,7 +199,7 @@ namespace synthese
 				if(_runControl && getCurrentTab() == getActiveTab())
 				{
 					/* Get value from input field placed in URL if already specified */
-					int distance=0;
+					double distance = 0;
 					if (_stopsDistance)
 						distance = _stopsDistance;
 
@@ -217,46 +217,53 @@ namespace synthese
 					StopPointTableSync::SearchResult stops(StopPointTableSync::Search(Env::GetOfficialEnv(),
 						boost::optional<util::RegistryKeyType>(),NULL,false));
 
-					BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& it, stops)
+					BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& stop, stops)
 					{
-						/* If so, search in database for physical stops which are too close from the current one (less than 0.5 meter) */
-						if(it->getGeometry() && !it->getGeometry()->isEmpty())
+						/* If so, search in database for physical stops which are too close from the current one */
+						if(stop->getGeometry() && !stop->getGeometry()->isEmpty())
 						{
-							StopPointTableSync::SearchResult near(StopPointTableSync::SearchByMaxDistance(*it->getGeometry(),
-								(distance == 0 ? 0.5 : distance),Env::GetOfficialEnv(),UP_LINKS_LOAD_LEVEL));
+							/* Search few points too close from this one with an innaccurate precision if distance is low */
+							StopPointTableSync::SearchResult near(StopPointTableSync::SearchByMaxDistance(*stop->getGeometry(),	
+								(distance+10),Env::GetOfficialEnv(),UP_LINKS_LOAD_LEVEL));
 
 							BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& nr, near)
 							{
-								/* Don't display the result if the physical stop is the same in both loops or has already been checked */
-								if ((it == nr) || ((!Ids.empty()) && (std::find(Ids.begin(),Ids.end(),nr->getKey())!=Ids.end())))
+								/* Don't check this one if the physical stop is the same in both loops or has already been checked */
+								if ((stop == nr) || ((!Ids.empty()) && (std::find(Ids.begin(),Ids.end(),nr->getKey())!=Ids.end())))
 								{
 									continue;
 								}
 								else
 								{
 									/* Remember that this physical stop has been checked in order to avoid twins */
-									Ids.push_back(it->getKey());
+									Ids.push_back(stop->getKey());
+	
+									/* Now search with more accuracy all stop points which are too close from this one */
+									if (StopPointTableSync::SearchDistance(*stop, *nr, distance, false))
+									{	
 
-									AdminFunctionRequest<StopPointAdmin> openStop1Request(request);
-									AdminFunctionRequest<StopPointAdmin> openStop2Request(request);
-									stream << t.row();
+										AdminFunctionRequest<StopPointAdmin> openStop1Request(request);
+										AdminFunctionRequest<StopPointAdmin> openStop2Request(request);
+										stream << t.row();
 
-									openStop1Request.getPage()->setStop(nr);
-									
-									/* Check data isn't corrupted in order to avoid potential crash */
-									if(nr->getConnectionPlace()->getCity()!=NULL)
-										stream << t.col() << nr->getConnectionPlace()->getCity()->getName();
-									else
-										stream << t.col() << "<b><font color=red>Pas de commune</font></b>";
+										openStop2Request.getPage()->setStop(nr);
 
-									stream << t.col() << HTMLModule::getLinkButton(openStop1Request.getURL(),
-										nr->getName(), string(), "/admin/img/" + StopPointAdmin::ICON);
-									stream << t.col() << nr->getKey();
+										/* Check data isn't corrupted in order to avoid potential crash */
+										if(nr->getConnectionPlace()->getCity()!=NULL)
+											stream << t.col() << nr->getConnectionPlace()->getCity()->getName();
+										else
+											stream << t.col() << "<b><font color=red>Pas de commune</font></b>";
 
-									openStop2Request.getPage()->setStop(it);
-									stream << t.col() << HTMLModule::getLinkButton(openStop2Request.getURL(),
-										it->getName(), string(), "/admin/img/" + StopPointAdmin::ICON);
-									stream << t.col() << it->getKey();
+										stream << t.col() << HTMLModule::getLinkButton(openStop2Request.getURL(),
+											nr->getName(), string(), "/admin/img/" + StopPointAdmin::ICON);
+										stream << t.col() << nr->getKey();
+
+										openStop1Request.getPage()->setStop(stop);
+										stream << t.col() << HTMLModule::getLinkButton(openStop1Request.getURL(),
+											stop->getName(), string(), "/admin/img/" + StopPointAdmin::ICON);
+										stream << t.col() << stop->getKey();
+
+									}
 								}
 							}
 						}
@@ -317,7 +324,7 @@ namespace synthese
 
 						/* Check if the current StopPoint is distant of more than 300 meters from the other StopPoints in its StopArea */
 						StopPointTableSync::SearchResult far(StopPointTableSync::SearchDistance(*stop,
-							Env::GetOfficialEnv(),true,(distance == 0 ? 300 : distance),UP_LINKS_LOAD_LEVEL));
+							Env::GetOfficialEnv(),true,(distance == 0 ? 300 : distance),true,UP_LINKS_LOAD_LEVEL));
 
 						BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& fr, far)
 						{

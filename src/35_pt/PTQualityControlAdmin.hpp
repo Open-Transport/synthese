@@ -76,7 +76,8 @@ namespace synthese
 			//@{
 				bool _runControl;
 				std::string _ignoredLines, _networks, _transportModes;
-				int _stopsDistance, _transportSpeed;
+				double _stopsDistance; 
+				int _transportSpeed;
 			//@}
 
 		protected:
