@@ -759,6 +759,7 @@ namespace synthese
 					contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
+					contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
                     if (resa.getCustomer())
                     {
                         contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());

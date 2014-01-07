@@ -227,6 +227,14 @@ namespace synthese
 				stringstream content;
 				ParametersMap contentMap;
 
+				contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
+				contentMap.insert(DATA_USER_LOGIN, user.getLogin());
+				contentMap.insert(DATA_USER_PASSWORD, user.getPassword());
+				contentMap.insert(DATA_USER_EMAIL, user.getEMail());
+				contentMap.insert(DATA_USER_PHONE, user.getPhone());
+				contentMap.insert(DATA_USER_NAME, user.getName());
+				contentMap.insert(DATA_USER_SURNAME, user.getSurname());
+
 				_cmsPasswordChangeEMail.get()->display(content, contentMap);
 				email.setContent(content.str());
 
