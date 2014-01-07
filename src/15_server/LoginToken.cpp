@@ -40,11 +40,6 @@ namespace synthese
 	using namespace util;
 
 
-	namespace {
-		const int SALT_LENGTH = 32;
-	}
-
-
 	namespace server
 	{
 		const string LoginToken::DATA_LOGIN = "login";
