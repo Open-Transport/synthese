@@ -42,6 +42,8 @@ using namespace boost::posix_time;
 using namespace boost::property_tree;
 using boost::asio::ip::tcp;
 
+#define GPSD_NEWLINE "\n"
+
 namespace synthese
 {
 	using namespace data_exchange;
@@ -74,8 +76,8 @@ namespace synthese
 			const std::string& logPath,
 			boost::optional<std::ostream&> outputStream,
 			util::ParametersMap& pm
-		):	PermanentThreadImporterTemplate<GPSdFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-			Importer(env, import, minLogLevel, logPath, outputStream, pm),
+		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
+			PermanentThreadImporterTemplate<GPSdFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			_gpsStatus(OFFLINE),
 			_socket(_ios),
 			_lastStopPoint(NULL),
@@ -116,13 +118,21 @@ namespace synthese
 				tcp::endpoint endpoint(boost::asio::ip::address::from_string(_address), _port);
 				_socket.connect(endpoint);
 
-				// Set the request format
-				boost::asio::streambuf request;
-				ostream request_stream(&request);
-				request_stream << "?WATCH={\"enable\":true,\"json\":true}";
-				if(boost::asio::write(_socket, request)>0)
+				// Flush "{"class":"VERSION", ... }
+				boost::asio::streambuf response;
+				boost::asio::read_until(_socket, response, GPSD_NEWLINE);
+
+				// Start gpsd daemon polling
+				if(boost::asio::write(_socket, boost::asio::buffer("?WATCH={\"enable\":true}"))>0)
 				{
 					_gpsStatus = ONLINE;
+
+					boost::asio::streambuf response;
+					// flush {"class":"DEVICES"
+					boost::asio::read_until(_socket, response, GPSD_NEWLINE);
+					// flush {"class":"WATCH",
+					boost::asio::read_until(_socket, response, GPSD_NEWLINE);
+
 					return;
 				}
 				else
@@ -151,9 +161,9 @@ namespace synthese
 			}
 
 			// We have a valid gps socket opened. Use it.
-			optional<ptree> currentPosition;
-			_updateFromGps(currentPosition);
-			if(!currentPosition)
+			double lon;
+			double lat;
+			if(!_updateFromGps(lon, lat))
 			{
 				_gpsStatus = WAITING;
 				return;
@@ -161,16 +171,6 @@ namespace synthese
 
 			try
 			{
-				// JSON reading
-				double lon(
-					lexical_cast<double>(currentPosition->get<string>("lon"))
-				);
-				double lat(
-					lexical_cast<double>(currentPosition->get<string>("lat"))
-				);
-
-
-
 				// Create the coordinate point
 				boost::shared_ptr<Point> point(
 					CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(lon,lat)
@@ -224,7 +224,13 @@ namespace synthese
 					}
 				}
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
-				util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
+				if(nearestStopPoint)
+				{
+					util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
+				} else {
+					util::Log::GetInstance().debug("GPSdFileFormat : No nearest stop found ");
+
+				}
 
 				// update Vehicle position.
 				VehicleModule::GetCurrentVehiclePosition().setGeometry(
@@ -243,7 +249,7 @@ namespace synthese
 						(_lastStopPoint && !nearestStopPoint) ||
 						(_lastStopPoint && nearestStopPoint && _lastStopPoint != nearestStopPoint)
 				)	){
-					util::Log::GetInstance().debug("GPSdFileFormat : storage of position. Stop is "+ nearestStopPoint->getCodeBySources());
+					util::Log::GetInstance().debug("GPSdFileFormat : storage of position.");
 
 					// Store the position in the table if the current vehicle is known
 					VehicleModule::StoreCurrentVehiclePosition();
@@ -283,39 +289,40 @@ namespace synthese
 
 
 
-		void GPSdFileFormat::Importer_::_updateFromGps(
-			optional<ptree>& result
+		bool GPSdFileFormat::Importer_::_updateFromGps(
+			double &lon,
+			double &lat
 		) const {
 			try
 			{
-				//TODO: make it loops until we got new data.
-				//TODO: should we have a clean timeout and reconnect to the socket when we fail too much?
-				//	But this should never fail as today we use a local port on local host.
-				for(int i=0;i<100;i++)
-				{	// Theoretically should success after two maximum 3 loops
-					boost::asio::streambuf response;
-					boost::asio::read_until(_socket, response, "\r\n");
-					if(_loadPositionJSON(response, result))
-					{
-						break;
-					}
+				// Request a POLL to gpsd
+				if(boost::asio::write(_socket, boost::asio::buffer("?POLL;")) == 0)
+				{
+					_logWarning("GPSdFileFormat failed to request a poll");
+					return false;
+				}
+
+				boost::asio::streambuf response;
+				boost::asio::read_until(_socket, response, GPSD_NEWLINE);
+				if(_loadPositionJSON(response, lon, lat))
+				{
+					return true;
 				}
 			}
 			catch (std::exception const& e)
 			{
-				_logWarning(e.what());
+				_logWarning("GPSdFileFormat updateFromGps: " + string(e.what()));
 			}
+			return false;
 		}
-
 
 
 		bool GPSdFileFormat::Importer_::_loadPositionJSON(
 			boost::asio::streambuf &ss,
-			optional<ptree>& result
+			double &lat,
+			double &lon
 		) const {
 
-			// warning, we could have mode than one JSON at the time.
-			// but all separated by a new line.
 			std::string token;
 			std::istream str(&ss); 
 
@@ -325,21 +332,33 @@ namespace synthese
 				{	
 					boost::property_tree::ptree pt;
 					istringstream iss(token);
-					boost::property_tree::json_parser::read_json(iss,pt);
-					
-					string response(pt.get<string>("class"));
-					if(response == "TPV")
+					boost::property_tree::json_parser::read_json(iss, pt);
+
+					// The returned data looks like this:
+					// {"class":"POLL","time":"2012-04-05T15:00:01.501Z","active":1,
+					//	"tpv":[
+					//	{"class":"TPV","tag":"MID7","device":"/dev/ttyUSB0","mode":3,"time":"2012-04-05T15:00:00.000Z",
+					//		"ept":0.005,"lat":40.035083522,"lon":-75.519982905,"alt":166.145,"epx":9.125,"epy":17.778,
+					//		"epv":34.134,"track":0.0000,"speed":0.000,"climb":0.000,"eps":36.61}],
+					//   ...
+
+					if(pt.get<string>("class") == "POLL")
 					{
-						result = pt;
+						// We assume there is a single answer in tpv[]
+						// In a multi device configuration we should find our one in the
+						// device property.
+						lon = pt.get_child("tpv").front().second.get<double>("lon");
+						lat = pt.get_child("tpv").front().second.get<double>("lat");
 						return true;
 					}
 				}
 				catch (std::exception const& e)
 				{
-					_logWarning(e.what());
+					_logWarning("GPSdFileFormat failed to parse json: " + string(e.what()));
 				}
 			} 
 			
+			_logWarning("GPSdFileFormat failed to parse json");
 			return false;
 		}
 }	}
