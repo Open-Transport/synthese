@@ -161,9 +161,9 @@ namespace synthese
 			}
 
 			// We have a valid gps socket opened. Use it.
-			double lon;
 			double lat;
-			if(!_updateFromGps(lon, lat))
+			double lon;
+			if(!_updateFromGps(lat, lon))
 			{
 				_gpsStatus = WAITING;
 				return;
@@ -228,7 +228,9 @@ namespace synthese
 				{
 					util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
 				} else {
-					util::Log::GetInstance().debug("GPSdFileFormat : No nearest stop found ");
+					util::Log::GetInstance().debug("GPSdFileFormat : No nearest stop found for " +
+												   string("lat=") + boost::lexical_cast<std::string>(lat) +
+												   string("lon=") + boost::lexical_cast<std::string>(lon));
 
 				}
 
@@ -290,8 +292,8 @@ namespace synthese
 
 
 		bool GPSdFileFormat::Importer_::_updateFromGps(
-			double &lon,
-			double &lat
+			double &lat,
+			double &lon
 		) const {
 			try
 			{
@@ -304,7 +306,7 @@ namespace synthese
 
 				boost::asio::streambuf response;
 				boost::asio::read_until(_socket, response, GPSD_NEWLINE);
-				if(_loadPositionJSON(response, lon, lat))
+				if(_loadPositionJSON(response, lat, lon))
 				{
 					return true;
 				}
@@ -317,11 +319,9 @@ namespace synthese
 		}
 
 
-		bool GPSdFileFormat::Importer_::_loadPositionJSON(
-			boost::asio::streambuf &ss,
+		bool GPSdFileFormat::Importer_::_loadPositionJSON(boost::asio::streambuf &ss,
 			double &lat,
-			double &lon
-		) const {
+			double &lon) const {
 
 			std::string token;
 			std::istream str(&ss); 
@@ -347,8 +347,8 @@ namespace synthese
 						// We assume there is a single answer in tpv[]
 						// In a multi device configuration we should find our one in the
 						// device property.
-						lon = pt.get_child("tpv").front().second.get<double>("lon");
 						lat = pt.get_child("tpv").front().second.get<double>("lat");
+						lon = pt.get_child("tpv").front().second.get<double>("lon");
 						return true;
 					}
 				}

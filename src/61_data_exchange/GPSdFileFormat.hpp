@@ -78,15 +78,10 @@ namespace synthese
 				mutable pt::StopPoint* _lastStopPoint;
 				mutable boost::posix_time::ptime _lastStorage;
 
-				bool _updateFromGps(
-					double &lon,
-					double &lat
-				) const;
-				bool _loadPositionJSON(
-					boost::asio::streambuf &ss,
-					double &lon,
-					double &lat
-				) const;
+				bool _updateFromGps(double &lat, double &lon) const;
+				bool _loadPositionJSON(boost::asio::streambuf &ss,
+					double &lat,
+					double &lon) const;
 
 
 			protected:
