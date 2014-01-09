@@ -191,6 +191,8 @@ namespace synthese
 
 			static boost::posix_time::time_duration GetSessionMaxDuration();
 
+			static const std::string GetBranch();
+
 			/** Called whenever a parameter registered by this module is changed
 			 */
 			static void ParameterCallback(
