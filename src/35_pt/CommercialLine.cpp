@@ -372,7 +372,7 @@ namespace synthese
 			if(getColor())
 			{
 				pm.insert(prefix + DATA_LINE_COLOR, getColor()->toString());
-				pm.insert(prefix + "color", getColor()->toString()); // For LinesListFunction compatibility
+				pm.insert(prefix + CommercialLineTableSync::COL_COLOR, getColor()->toXMLColor()); // Maybe break CMS views ! but needed for load in inter_synthese_package
 			}
 			if(getNetwork())
 			{
