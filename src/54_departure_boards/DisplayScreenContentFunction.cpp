@@ -1743,7 +1743,7 @@ namespace synthese
 								<< " JOIN ARRETCHN achn_arrivee"
 								<< "	 ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
 								<< " JOIN ARRET a_arrivee"
-								<< "	 ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
+								<< "	 ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour AND a.ref != a_arrivee.ref"
 								<< " WHERE"
 								<< "		a.mnemol IN (" << operatorCodes.str() << ")"
 								<< "	AND " << filters.str()
