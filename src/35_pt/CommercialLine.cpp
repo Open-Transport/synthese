@@ -673,10 +673,10 @@ namespace synthese
 			}
 
 			// Color
-			if(record.isDefined(CommercialLineTableSync::COL_COLOR))
+			if(record.isDefined("xmlcolor"))
 			{
 				optional<RGBColor> value;
-				string color(record.get<string>(CommercialLineTableSync::COL_COLOR));
+				string color(record.get<string>("xmlcolor"));
 				if(!color.empty())
 				{
 					try
