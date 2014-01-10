@@ -38,6 +38,7 @@
 #include "Env.h"
 #include "LineStop.h"
 #include "PTModule.h"
+#include "ContinuousService.h"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
@@ -101,6 +102,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_STOPS_LIST("stops_list");
 		const string DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA("timetable_grouped_by_area");
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
+		const string DisplayScreenContentFunction::PARAMETER_SPLIT_CONTINUOUS_SERVICES("split_continuous_services");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -613,6 +615,7 @@ namespace synthese
 					}
 
 					_timetableGroupedByArea = map.getDefault<bool>(PARAMETER_TIMETABLE_GROUPED_BY_AREA, false);
+					_splitContinuousServices = map.getDefault<bool>(PARAMETER_SPLIT_CONTINUOUS_SERVICES, false);
 					
 					screen->setType(_type.get());
 					//If request contains an interface : build a screen, else prepare custom xml answer
@@ -1409,7 +1412,7 @@ namespace synthese
 
 							++*index;
 
-							departureDateTime = servicePointer.getDepartureDateTime();
+							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 								continue;
 
@@ -1522,38 +1525,83 @@ namespace synthese
 
 						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
 						{
-							BOOST_FOREACH(const OrderedServices::second_type::value_type& servicePointer, destinationMap.second.second)
+							for(OrderedServices::second_type::const_iterator it = destinationMap.second.second.begin() ; it != destinationMap.second.second.end() ; it++)
 							{
 								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
 								{
 									break;
 								}
 
+								const ServicePointer& servicePointer = *it;
 								stop = static_cast<const StopPoint*>(servicePointer.getDepartureEdge()->getFromVertex());
 
 								const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
 								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
 
-								boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
-								journeyPM->insert(DATA_DATE_TIME, servicePointer.getDepartureDateTime());
-								journeyPM->insert(DATA_WAITING_TIME, to_simple_string(servicePointer.getDepartureDateTime() - now));
-								journeyPM->insert(DATA_IS_REAL_TIME, noRealTime || !_useSAEDirectConnection);
+								const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(servicePointer.getService());
 
-								RollingStock* rs = journeyPattern->getRollingStock();
-								if(rs)
+								if(_splitContinuousServices && continuousService)
 								{
-									boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
-									rs->toParametersMap(*rsPM, true);
-									journeyPM->insert(DATA_ROLLING_STOCK, rsPM);
-								}
+									boost::posix_time::ptime firstDeparture = servicePointer.getDepartureDateTime() + continuousService->getMaxWaitingTime();
+									boost::posix_time::ptime lastDeparture = firstDeparture + servicePointer.getServiceRange();
+									RollingStock* rs = journeyPattern->getRollingStock();
 
-								journeysPM->insert(DATA_JOURNEY, journeyPM);
+									it++;
+									if(it != destinationMap.second.second.end())
+									{
+										lastDeparture = (lastDeparture > it->getDepartureDateTime() ? it->getDepartureDateTime() : lastDeparture);
+									}
+									it--;
+
+									for(boost::posix_time::ptime departureTime = firstDeparture ; departureTime < lastDeparture ; departureTime += continuousService->getMaxWaitingTime())
+									{
+										if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+										{
+											break;
+										}
+
+										boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
+										journeyPM->insert(DATA_DATE_TIME, departureTime);
+										journeyPM->insert(DATA_WAITING_TIME, to_simple_string(departureTime - now));
+										journeyPM->insert(DATA_IS_REAL_TIME, false);
+
+										if(rs)
+										{
+											boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
+											rs->toParametersMap(*rsPM, true);
+											journeyPM->insert(DATA_ROLLING_STOCK, rsPM);
+										}
+										journeysPM->insert(DATA_JOURNEY, journeyPM);
+									}
+								}
+								else
+								{
+									boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
+									journeyPM->insert(DATA_DATE_TIME, servicePointer.getDepartureDateTime());
+									journeyPM->insert(DATA_WAITING_TIME, to_simple_string(servicePointer.getDepartureDateTime() - now));
+									journeyPM->insert(DATA_IS_REAL_TIME, noRealTime || !_useSAEDirectConnection);
+
+									RollingStock* rs = journeyPattern->getRollingStock();
+									if(rs)
+									{
+										boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
+										rs->toParametersMap(*rsPM, true);
+										journeyPM->insert(DATA_ROLLING_STOCK, rsPM);
+									}
+
+									journeysPM->insert(DATA_JOURNEY, journeyPM);
+								}
 							}
 						}
 						else
 						{
 							BOOST_FOREACH(const OrderedServices::first_type::value_type& realTimeService, destinationMap.second.first)
 							{
+								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+								{
+									break;
+								}
+
 								boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
 								journeyPM->insert(DATA_DATE_TIME, realTimeService.datetime);
 								journeyPM->insert(DATA_WAITING_TIME, to_simple_string(realTimeService.datetime - now));
@@ -1561,11 +1609,6 @@ namespace synthese
 								journeysPM->insert(DATA_JOURNEY, journeyPM);
 
 								stop = realTimeService.stop.get();
-
-								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
-								{
-									break;
-								}
 							}
 						}
 
@@ -1883,11 +1926,13 @@ namespace synthese
 									false,
 									PTModule::isTheoreticalAllowed(),
 									PTModule::isRealTimeAllowed()
-											)	);
+							)	);
+
 							if (!servicePointer.getService())
 								break;
 							++*index;
-							departureDateTime = servicePointer.getDepartureDateTime();
+
+							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 								continue;
 
@@ -1946,9 +1991,9 @@ namespace synthese
 								}
 							}
 
-							time_duration tod = departureDateTime.time_of_day();
+							time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
 							int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
-							if(departureDateTime.date() > startDateTime.date())
+							if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
 								mapKeyMinutes += 86400;
 
 							OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
@@ -1983,8 +2028,73 @@ namespace synthese
 				else
 					it = servicePointerAll.begin();
 
+				typedef map<graph::ServicePointer, pair<int, int>, Spointer_comparator> ContinuousServicesToMerge;
+				ContinuousServicesToMerge continuousServicesToMerge;
+
 				for(; it != servicePointerAll.end() ; it++)
 				{
+					bool serviceDisplayed(false);
+					do
+					{
+						serviceDisplayed = false;
+						for(ContinuousServicesToMerge::iterator itCs = continuousServicesToMerge.begin() ; itCs != continuousServicesToMerge.end() ; itCs++)
+						{
+							ContinuousServicesToMerge::value_type continuousToDisplay(*itCs);
+							if(continuousToDisplay.second.first < it->first && continuousToDisplay.second.first <= continuousToDisplay.second.second)
+							{
+								ServicePointer sp(continuousToDisplay.first);
+
+								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
+								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+								const ContinuousService* continuousService = static_cast<const ContinuousService*>(sp.getService());
+
+								string curShortName = boost::algorithm::to_lower_copy(
+									trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+								);
+
+								// If realTime request didn't output any results or line isn't in the SAE
+								if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+								{
+									if(displayedResults >= maxRow)
+										break;
+									else if(isOutputXML)
+										concatXMLResult(stream,	sp);
+									else
+										addJourneyToParametersMap(result, sp);
+
+									displayedResults++;
+									serviceDisplayed = true;
+
+									sp.setDepartureInformations(
+										*(sp.getDepartureEdge()),
+										sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
+										sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
+										*(sp.getRealTimeDepartureVertex())
+									);
+
+									if(continuousToDisplay.second.first + continuousService->getMaxWaitingTime().total_seconds() < continuousToDisplay.second.second)
+									{
+										continuousServicesToMerge.insert(
+											ContinuousServicesToMerge::value_type(
+												sp,
+												make_pair(
+													continuousToDisplay.second.first + continuousService->getMaxWaitingTime().total_seconds(),
+													continuousToDisplay.second.second
+										)	)	);
+									}
+								}
+
+								continuousServicesToMerge.erase(itCs);
+								break;
+							}
+							else if(continuousToDisplay.second.first > continuousToDisplay.second.second)
+							{
+								continuousServicesToMerge.erase(itCs);
+								break;
+							}
+						}
+					} while(serviceDisplayed);
+
 					BOOST_FOREACH(RealTimeService& rts, it->second.first)
 					{
 						if(displayedResults >= maxRow)
@@ -1997,10 +2107,29 @@ namespace synthese
 						displayedResults++;
 					}
 
-					BOOST_FOREACH(ServicePointer& sp, it->second.second)
+					BOOST_FOREACH(ServicePointer sp, it->second.second)
 					{
 						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
 						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+						const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(sp.getService());
+
+						if(_splitContinuousServices && continuousService)
+						{
+							sp.setDepartureInformations(
+								*(sp.getDepartureEdge()),
+								sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
+								sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
+								*(sp.getRealTimeDepartureVertex())
+							);
+							continuousServicesToMerge.insert(
+								ContinuousServicesToMerge::value_type(
+									sp,
+									make_pair(
+										it->first + continuousService->getMaxWaitingTime().total_seconds(),
+										it->first + sp.getServiceRange().total_seconds()
+							)	)	);
+							continue;
+						}
 
 						string curShortName = boost::algorithm::to_lower_copy(
 							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
