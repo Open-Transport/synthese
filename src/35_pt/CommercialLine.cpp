@@ -167,20 +167,38 @@ namespace synthese
 				{
 					// Handle empty short names
 					if(getShortName().empty() && cl.getShortName().empty())
+					{
 						return getKey() < cl.getKey();
+					}
 					else
 					{
 						if(PTModule::getSortLettersBeforeNumbers())
+						{
 							return (alphanum_text_first_comp<string>(getShortName(), cl.getShortName()) < 0);
+						}
 						else
+						{
 							return (alphanum_comp<string>(getShortName(), cl.getShortName()) < 0);
+						}
 					}
 				}
 				else
+				{
 					return (getWeightForSorting() > cl.getWeightForSorting());
+				}
+			}
+			else if(!getNetwork())
+			{
+				return false;
+			}
+			else if(!cl.getNetwork())
+			{
+				return true;
 			}
 			else
+			{
 				return (getNetwork()->getKey() < cl.getNetwork()->getKey());
+			}
 		}
 
 
