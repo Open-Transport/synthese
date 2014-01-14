@@ -254,7 +254,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LONGITUDE("departure_longitude");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LATITUDE("departure_latitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_TIME("arrival_time");
-		const string RoutePlannerFunction::DATA_ARRIVAL_DATE("arrival_time");
+		const string RoutePlannerFunction::DATA_ARRIVAL_DATE("arrival_date");
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME("continuous_service_last_arrival_time");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LONGITUDE("arrival_longitude");
