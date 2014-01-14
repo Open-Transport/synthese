@@ -244,6 +244,7 @@ namespace synthese
 				static const std::string DATA_DEPARTURE_TIME;
 				static const std::string DATA_DEPARTURE_PLACE_NAME;
 				static const std::string DATA_ARRIVAL_TIME;
+				static const std::string DATA_ARRIVAL_DATE;
 				static const std::string DATA_ARRIVAL_PLACE_NAME;
 				static const std::string DATA_DURATION;
 				static const std::string DATA_DEPARTURE_DATE;
