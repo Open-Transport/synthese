@@ -254,6 +254,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LONGITUDE("departure_longitude");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LATITUDE("departure_latitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_TIME("arrival_time");
+		const string RoutePlannerFunction::DATA_ARRIVAL_DATE("arrival_time");
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME("continuous_service_last_arrival_time");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LONGITUDE("arrival_longitude");
@@ -3280,6 +3281,16 @@ namespace synthese
 				stringstream s;
 				s << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().minutes();
 				pm.insert(DATA_ARRIVAL_TIME, s.str());
+			}
+			if(_dateTimePage.get())
+			{
+				stringstream sDate;
+				DateTimeInterfacePage::Display(sDate, _dateTimePage, request, journey.getFirstArrivalTime());
+				pm.insert(DATA_ARRIVAL_DATE, sDate.str());
+			}
+			else
+			{
+				pm.insert(DATA_ARRIVAL_DATE, journey.getFirstArrivalTime());
 			}
 
 			if(journey.getContinuousServiceRange().total_seconds())
