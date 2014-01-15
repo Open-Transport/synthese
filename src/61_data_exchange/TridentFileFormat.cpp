@@ -375,7 +375,13 @@ namespace synthese
 			BOOST_FOREACH(Registry<StopPoint>::value_type itps, _env.getRegistry<StopPoint>())
 			{
 				const StopPoint* ps(itps.second.get());
-				if (ps->getDepartureEdges().empty() && ps->getArrivalEdges().empty()) continue;
+				util::Env fakeEnv;
+				LineStopTableSync::SearchResult lineStops(
+					LineStopTableSync::Search(fakeEnv, boost::optional<RegistryKeyType>(), ps->getKey())
+				);
+
+				if (lineStops.empty())
+					continue;
 
 				os << "<StopArea>" << "\n";
 
@@ -389,16 +395,7 @@ namespace synthese
 					os << ps->getName ();
 				os << "</name>" << "\n";
 
-				set<const Edge*> edges;
-				BOOST_FOREACH(const Vertex::Edges::value_type& cEdge, ps->getDepartureEdges())
-				{
-					edges.insert(cEdge.second);
-				}
-				BOOST_FOREACH(const Vertex::Edges::value_type& cEdge, ps->getArrivalEdges())
-				{
-					edges.insert(cEdge.second);
-				}
-				BOOST_FOREACH(const Edge* ls, edges)
+				BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& ls, lineStops)
 				{
 					os << "<contains>" << TridentId(peerid, "StopPoint", *ls)  << "</contains>" << "\n";
 				}
@@ -822,6 +819,19 @@ namespace synthese
 						os << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath())));
 					}
 					os	<< "</departureTime>" << "\n";
+
+					if(!ls->isDeparture() && !ls->isArrival())
+					{
+						os << "<boardingAlightingPossibility>NeitherBoardOrAlight</boardingAlightingPossibility>\n";
+					}
+					else if(!ls->isDeparture())
+					{
+						os << "<boardingAlightingPossibility>AlightOnly</boardingAlightingPossibility>\n";
+					}
+					else if(!ls->isArrival())
+					{
+						os << "<boardingAlightingPossibility>BoardOnly</boardingAlightingPossibility>\n";
+					}
 
 					os << "</vehicleJourneyAtStop>" << "\n";
 				}
@@ -1787,12 +1797,12 @@ namespace synthese
 						stopRank + 1 < stopsNumber
 					){
 						string bap(vjsNode.getChildNode("boardingAlightingPossibility").getText());
-						if(bap == "BoardOnly")
+						if(bap == "BoardOnly" || bap == "NeitherBoardOrAlight")
 						{
 							route.stops[stopRank - ignoredStops]._arrival = false;
 							updatedRoute = true;
 						}
-						else if(bap == "AlightOnly")
+						else if(bap == "AlightOnly" || bap == "NeitherBoardOrAlight")
 						{
 							route.stops[stopRank - ignoredStops]._departure = false;
 							updatedRoute = true;
