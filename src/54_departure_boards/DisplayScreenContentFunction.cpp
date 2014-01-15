@@ -1067,6 +1067,15 @@ namespace synthese
 			string SAELimit = boost::lexical_cast<string>(_screen->getType()->getRowNumber());
 			ptime SAEDate;
 
+			boost::shared_ptr<const impex::DataSource> SAEDataSource;
+			try
+			{
+				SAEDataSource = util::Env::GetOfficialEnv().get<impex::DataSource>(DeparturesTableModule::GetIneoStopsDataSourceId());
+			}
+			catch (ObjectNotFoundException<impex::DataSource>&)
+			{
+			}
+
 			if(_useSAEDirectConnection)
 			{
 				shared_ptr<MySQLconnector> connector(new MySQLconnector());
@@ -1140,6 +1149,9 @@ namespace synthese
 					{
 						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
 						{
+							if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+								continue;
+
 							if(!dataSourceLink.second.empty())
 							{
 								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
@@ -1229,6 +1241,9 @@ namespace synthese
 							{
 								BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
 								{
+									if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+										continue;
+
 									if(ocStops.find(dataSourceLink.second) != ocStops.end())
 										ocStops[dataSourceLink.second] = curStop.second;
 								}
@@ -1259,6 +1274,9 @@ namespace synthese
 											{
 												BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
 												{
+													if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+														continue;
+
 													if(dataSourceLink.second == result->getInfo("oc_arrivee"))
 													{
 														realTimeService.commercialLine = curLine;
@@ -1696,6 +1714,9 @@ namespace synthese
 					{
 						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
 						{
+							if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+								continue;
+
 							if(!dataSourceLink.second.empty())
 							{
 								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
@@ -1778,6 +1799,9 @@ namespace synthese
 							{
 								BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
 								{
+									if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+										continue;
+
 									if(ocStops.find(dataSourceLink.second) != ocStops.end())
 										ocStops[dataSourceLink.second] = curStop.second;
 								}
@@ -1806,6 +1830,9 @@ namespace synthese
 											{
 												BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
 												{
+													if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+														continue;
+
 													if(dataSourceLink.second == result->getInfo("oc_arrivee"))
 													{
 														realTimeService.commercialLine = curLine;
