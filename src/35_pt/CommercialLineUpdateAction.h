@@ -73,6 +73,7 @@ namespace synthese
 			static const std::string PARAMETER_SHORT_NAME;
 			static const std::string PARAMETER_LONG_NAME;
 			static const std::string PARAMETER_COLOR;
+			static const std::string PARAMETER_FOREGROUND_COLOR;
 			static const std::string PARAMETER_STYLE;
 			static const std::string PARAMETER_IMAGE;
 			static const std::string PARAMETER_NETWORK_ID;
@@ -88,7 +89,8 @@ namespace synthese
 			boost::optional<std::string>	_name;		//!< Name (code)
 			boost::optional<std::string>	_shortName;	//!< Name (cartouche)
 			boost::optional<std::string>	_longName;	//!< Name for schedule card
-			boost::optional<boost::optional<util::RGBColor> >		_color;		//!< JourneyPattern color
+			boost::optional<boost::optional<util::RGBColor> >		_color;		//!< CommercialLine color
+			boost::optional<boost::optional<util::RGBColor> >		_fgColor;		//!< CommercialLine foreground color
 			boost::optional<std::string>			_style;		//!< CSS style (cartouche)
 			boost::optional<std::string>			_image;		//!< Display image (cartouche)
 			boost::optional<boost::shared_ptr<TransportNetwork> >	_network;	//!< Network

@@ -63,6 +63,7 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_SHORT_NAME = Action_PARAMETER_PREFIX + "sn";
 		const string CommercialLineUpdateAction::PARAMETER_LONG_NAME = Action_PARAMETER_PREFIX + "ln";
 		const string CommercialLineUpdateAction::PARAMETER_COLOR = Action_PARAMETER_PREFIX + "co";
+		const string CommercialLineUpdateAction::PARAMETER_FOREGROUND_COLOR = Action_PARAMETER_PREFIX + "foreground_color";
 		const string CommercialLineUpdateAction::PARAMETER_STYLE = Action_PARAMETER_PREFIX + "st";
 		const string CommercialLineUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
 		const string CommercialLineUpdateAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
@@ -85,6 +86,10 @@ namespace synthese
 			if(_color)
 			{
 				map.insert(PARAMETER_COLOR, *_color ? (*_color)->toXMLColor() : string());
+			}
+			if(_fgColor)
+			{
+				map.insert(PARAMETER_FOREGROUND_COLOR, *_fgColor ? (*_fgColor)->toXMLColor() : string());
 			}
 			if(_image)
 			{
@@ -193,6 +198,13 @@ namespace synthese
 				_color = color.empty() ? optional<RGBColor>() : RGBColor::FromXMLColor(color);
 			}
 
+			// Foreground Color
+			if(map.isDefined(PARAMETER_FOREGROUND_COLOR))
+			{
+				string color(map.getDefault<string>(PARAMETER_FOREGROUND_COLOR));
+				_fgColor = color.empty() ? optional<RGBColor>() : RGBColor::FromXMLColor(color);
+			}
+
 			// Importable
 			_setImportableUpdateFromParametersMap(*_env, map);
 
@@ -292,6 +304,11 @@ namespace synthese
 			if(_color)
 			{
 				_line->setColor(*_color);
+			}
+
+			if(_fgColor)
+			{
+				_line->setFgColor(*_fgColor);
 			}
 
 			// Importable
