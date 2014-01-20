@@ -160,6 +160,11 @@ namespace synthese
 					*_env
 				);
 			}
+			else
+			{
+				// @TODO A site is provided, remove all its pages
+			}
+
 
 			_importDir( _parent.get(), path(_directoryPath));
 
