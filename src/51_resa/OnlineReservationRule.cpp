@@ -328,6 +328,7 @@ namespace synthese
                         resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
 						roadResaMap->insert(DATA_ROAD_RESA, resaMap);
 					}
+
 					contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
 					contentMap.insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
 					contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resa.getCustomerUserId()));
@@ -339,10 +340,16 @@ namespace synthese
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
                     contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
+	                contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+
                     if (resa.getCustomer())
                     {
                         contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
                         contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
+
+						LoginToken token(LoginToken(lexical_cast<string>(resa.getCustomer()->getLogin()),lexical_cast<string>(resa.getCustomer()->getPasswordHash()),resa.getKey()));
+	                    contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
+
                     }
 
 					_cmsConfirmationEMail.get()->display(content, contentMap);
