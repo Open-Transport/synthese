@@ -123,6 +123,7 @@ namespace synthese
 				static const std::string FILE_BITFELD;
 				static const std::string FILE_ZUGDAT;
 				static const std::string FILE_KOORD;
+				static const std::string FILE_BAHNOF;
 				static const std::string FILE_GLEIS;
 				static const std::string FILE_METABHF;
 				static const std::string FILE_UMSTEIGB;
@@ -135,6 +136,9 @@ namespace synthese
 				static const std::string PARAMETER_LINES_FILTER;
 				static const std::string PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE;
 				static const std::string PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME;
+				static const std::string PARAMETER_NO_GLEIS_FILE;
+				static const std::string PARAMETER_TRY_TO_READ_LINE_SHORT_NAME;
+				static const std::string PARAMETER_CALENDAR_DEFAULT_CODE;
 
 			private:
 				struct LineFilter
@@ -167,6 +171,9 @@ namespace synthese
 					LinesFilter _linesFilter;
 					bool _gleisHasOneStopPerLine;
 					std::string _complete_empty_stop_area_name;
+					bool _noGleisFile;
+					bool _tryToReadShortName;
+					size_t _defaultCalendarCode;
 				//@}
 
 				const LineFilter* _lineIsIncluded(const std::string& lineNumber) const;
@@ -203,6 +210,7 @@ namespace synthese
 
 					std::string number;
 					std::string lineNumber;
+					std::string lineShortName;
 					size_t version;
 					std::vector<CalendarUse> calendars;
 					std::string transportModeCode;
