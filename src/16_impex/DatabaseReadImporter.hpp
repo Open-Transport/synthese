@@ -40,6 +40,7 @@ namespace synthese
 		{
 		public:
 			static const bool IMPORTABLE;	//!< Name of the database to read at the import
+			static const bool IS_PERMANENT_THREAD;
 			static const std::string PARAMETER_DATABASE;	//!< Name of the database to read at the import
 
 			DatabaseReadImporter(
@@ -88,6 +89,9 @@ namespace synthese
 
 		template<class FF>
 		const bool DatabaseReadImporter<FF>::IMPORTABLE(true);
+
+		template<class FF>
+		const bool DatabaseReadImporter<FF>::IS_PERMANENT_THREAD(false);
 
 		template<class FF>
 		const std::string DatabaseReadImporter<FF>::PARAMETER_DATABASE("db");

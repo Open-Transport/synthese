@@ -1621,5 +1621,11 @@ namespace synthese
 
 			os << flush;
 		}
-	}
-}
+
+
+
+		GTFSFileFormat::Exporter_::Exporter_(
+			const impex::Export& export_
+		):	OneFileExporter<GTFSFileFormat>(export_)
+		{}
+}	}

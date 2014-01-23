@@ -127,6 +127,8 @@ namespace synthese
 
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
+			virtual void killPermanentThread() const {}
+			virtual void runPermanentThread() const {}
 
 			void closeLogFile(
 				bool result,

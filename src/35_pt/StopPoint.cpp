@@ -83,7 +83,18 @@ namespace synthese
 
 		StopPoint::~StopPoint()
 		{
+			// Unlink
+			unlink();
 
+			// Cleaning of the property type pointers
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
+			{
+				edge.second->setFromVertex(NULL);
+			}
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
+			{
+				edge.second->setFromVertex(NULL);
+			}
 		}
 
 

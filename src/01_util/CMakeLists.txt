@@ -19,8 +19,6 @@ FactorableTemplate.h
 Factory.h
 FactoryBase.h
 FactoryException.h
-gps.cpp
-gps.h
 IConv.cpp
 IConv.hpp
 Log.cpp

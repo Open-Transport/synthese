@@ -24,6 +24,7 @@
 
 #include "ImportableTableSync.hpp"
 #include "NumericField.hpp"
+#include "OperationUnitTableSync.hpp"
 #include "ScheduledService.h"
 #include "StringField.hpp"
 #include "VehicleServiceTableSync.hpp"
@@ -125,6 +126,7 @@ namespace synthese
 		) const	{
 			map.insert(Key::FIELD.name, getKey());
 			map.insert(Name::FIELD.name, getName());
+			map.insert(OperationUnit::FIELD.name, getOperationUnit() ? getOperationUnit()->getKey() : 0);
 
 			// Services
 			if(withAdditionalParameters)
@@ -205,6 +207,28 @@ namespace synthese
 				}
 			}
 
+			// Operation unit
+			if(record.isDefined(OperationUnit::FIELD.name))
+			{
+				optional<OperationUnit&> value;
+				RegistryKeyType unitId(record.getDefault<RegistryKeyType>(OperationUnit::FIELD.name, 0));
+				if(unitId) try
+				{
+					value = *OperationUnitTableSync::GetEditable(unitId, env);
+				}
+				catch(ObjectNotFoundException<OperationUnit>&)
+				{
+					Log::GetInstance().warn("Bad operation unit "+ lexical_cast<string>(unitId) +" in driver service "+ lexical_cast<string>(getKey()));
+				}
+				if(	(value || getOperationUnit()) &&
+					(!value || !getOperationUnit() || &*value!=&*getOperationUnit())
+				){
+					result = true;
+					setOperationUnit(value);
+				}
+			}
+
+
 			return result;
 		}
 
@@ -232,6 +256,11 @@ namespace synthese
 				{
 					result.push_back(item.first->getKey());
 				}
+			}
+			RegistryKeyType unitId(record.getDefault<RegistryKeyType>(OperationUnit::FIELD.name, 0));
+			if(unitId)
+			{
+				result.push_back(unitId);
 			}
 			return result;
 		}

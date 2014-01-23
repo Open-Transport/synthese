@@ -938,4 +938,17 @@ namespace synthese
 			}
 			return result;
 		}
+
+
+
+		synthese::graph::ServiceSet JourneyPattern::getAllServices() const
+		{
+			ServiceSet result;
+			result.insert(_services.begin(), _services.end());
+			BOOST_FOREACH(const SubLines::value_type& subline, _subLines)
+			{
+				result.insert(subline->_services.begin(), subline->_services.end());
+			}
+			return result;
+		}
 }	}

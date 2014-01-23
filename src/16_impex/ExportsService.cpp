@@ -1,8 +1,8 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///	DevicesService class implementation.
-///	@file DevicesService.cpp
-///	@author Camille Hue
+///	ExportsService class implementation.
+///	@file ExportsService.cpp
+///	@author hromain
 ///	@date 2013
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -22,9 +22,9 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "DevicesService.hpp"
+#include "ExportsService.hpp"
 
-#include "Device.h"
+#include "Export.hpp"
 #include "RequestException.h"
 #include "Request.h"
 
@@ -38,15 +38,15 @@ namespace synthese
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<Function,server::DevicesService>::FACTORY_KEY = "devices";
+	const string FactorableTemplate<Function,impex::ExportsService>::FACTORY_KEY = "exports";
 	
-	namespace server
+	namespace impex
 	{
-		const string DevicesService::TAG_DEVICE = "device";
+		const string ExportsService::TAG_EXPORT = "export";
 		
 
 
-		ParametersMap DevicesService::_getParametersMap() const
+		ParametersMap ExportsService::_getParametersMap() const
 		{
 			ParametersMap map;
 			return map;
@@ -54,23 +54,25 @@ namespace synthese
 
 
 
-		void DevicesService::_setFromParametersMap(const ParametersMap& map)
+		void ExportsService::_setFromParametersMap(const ParametersMap& map)
 		{
 		}
 
 
 
-		ParametersMap DevicesService::run(
+		ParametersMap ExportsService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			ParametersMap map;
-			
-			BOOST_FOREACH(boost::shared_ptr<Device> device, Factory<Device>::GetNewCollection())
+
+			const Export::Registry& registry(Env::GetOfficialEnv().getRegistry<Export>());
+			recursive_mutex::scoped_lock lock(registry.getMutex());
+			BOOST_FOREACH(const Export::Registry::value_type& it, registry)
 			{
-				boost::shared_ptr<ParametersMap> devicePM(new ParametersMap);
-				device->toParametersMap(*devicePM);
-				map.insert(TAG_DEVICE, devicePM);
+				boost::shared_ptr<ParametersMap> exportPM(new ParametersMap);
+				it.second->toParametersMap(*exportPM, true);
+				map.insert(TAG_EXPORT, exportPM);
 			}
 
 			return map;
@@ -78,7 +80,7 @@ namespace synthese
 		
 		
 		
-		bool DevicesService::isAuthorized(
+		bool ExportsService::isAuthorized(
 			const Session* session
 		) const {
 			return true;
@@ -86,7 +88,7 @@ namespace synthese
 
 
 
-		std::string DevicesService::getOutputMimeType() const
+		std::string ExportsService::getOutputMimeType() const
 		{
 			return "text/html";
 		}

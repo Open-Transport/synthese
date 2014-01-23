@@ -27,9 +27,11 @@
 #include "DataSourceTableSync.h"
 #include "DeadRunTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
+#include "DRTArea.hpp"
 #include "Import.hpp"
 #include "LineArea.hpp"
 #include "NonConcurrencyRuleTableSync.h"
+#include "PTModule.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
@@ -1042,52 +1044,27 @@ namespace synthese
 			// Load
 
 			// Lines
-			CommercialLineTableSync::Search(
-				_env,
-				_network.get() ? _network->getKey() : _folder->getKey()
-			);
-			
-			// Journey patterns
-			BOOST_FOREACH(Registry<CommercialLine>::value_type itline, _env.getRegistry<CommercialLine>())
+			vector<const CommercialLine*> lines;
+			if(_network)
 			{
-				JourneyPatternTableSync::Search(
-					_env,
-					itline.second->getKey()
-				);
-
-				NonConcurrencyRuleTableSync::Search(
-					_env,
-					itline.second->getKey(),
-					itline.second->getKey(),
-					false
-				);
+				_addLines(lines, *_network);
 			}
-
-			// Stops and services
-			BOOST_FOREACH(Registry<JourneyPattern>::value_type itjp, _env.getRegistry<JourneyPattern>())
+			if(_folder)
 			{
-				const JourneyPattern& line(*itjp.second);
-				LineStopTableSync::Search(
-					_env,
-					line.getKey(),
-					optional<RegistryKeyType>(),
-					0,
-					optional<size_t>(),
-					true, true,
-					UP_LINKS_LOAD_LEVEL
-				);
-				ScheduledServiceTableSync::Search(
-					_env,
-					line.getKey(),
-					optional<RegistryKeyType>(),
-					optional<RegistryKeyType>(),
-					optional<string>(),
-					false,
-					0,
-					optional<size_t>(),
-					true, true,
-					UP_DOWN_LINKS_LOAD_LEVEL
-				);
+				_addLines(lines, *_folder);
+			}
+			
+			// Stop points
+			set<const StopPoint*> stops;
+			BOOST_FOREACH(const CommercialLine* line, lines)
+			{
+				BOOST_FOREACH(const Path* jp, line->getPaths())
+				{
+					BOOST_FOREACH(const Edge* edge, static_cast<const JourneyPattern*>(jp)->getAllEdges())
+					{
+						stops.insert(static_cast<const StopPoint*>(edge->getFromVertex()));
+					}
+				}
 			}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -1096,10 +1073,10 @@ namespace synthese
 			// Pointsarrets
 			stringstream pointsarretsStream;
 			bool oneStopWithoutCode(false);
-			BOOST_FOREACH(Registry<StopPoint>::value_type itstop, _env.getRegistry<StopPoint>())
+			BOOST_FOREACH(const StopPoint* itstop, stops)
 			{
 				// Local variables
-				const StopPoint& stop(*itstop.second);
+				const StopPoint& stop(*itstop);
 
 				// Data source code
 				vector<string> codes(stop.getCodesBySource(*_dataSource));
@@ -1168,162 +1145,155 @@ namespace synthese
 
 
 			// Itinerai
+			// Troncons
+			// Services
+			stringstream servicesStream;
+			stringstream tronconsStream;
 			stringstream itineraiStream;
-			typedef std::map<const pt::CommercialLine*, size_t> NextRouteCodes;
-			NextRouteCodes nextRouteCodes;
-			BOOST_FOREACH(Registry<JourneyPattern>::value_type itjp, _env.getRegistry<JourneyPattern>())
+			BOOST_FOREACH(const CommercialLine* line, lines)
 			{
-				const JourneyPattern& jp(*itjp.second);
-				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 4);
-				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 3, false);
-				if(_generateRouteCode)
+				size_t routeCode(0);
+				BOOST_FOREACH(const Path* itjp, line->getPaths())
 				{
-					NextRouteCodes::iterator itRouteCode(nextRouteCodes.find(jp.getCommercialLine()));
-					if(itRouteCode == nextRouteCodes.end())
+					const JourneyPattern& jp(static_cast<const JourneyPattern&>(*itjp));
+					_writeTextAndSpaces(itineraiStream, line->getCodeBySources(), 4);
+					_writeTextAndSpaces(itineraiStream, line->getCodeBySources(), 3, false);
+					if(_generateRouteCode)
 					{
-						itRouteCode = nextRouteCodes.insert(make_pair(jp.getCommercialLine(), 3)).first;
-					}
-					_routeCodes.insert(make_pair(&jp, itRouteCode->second));
-					_writeTextAndSpaces(itineraiStream, lexical_cast<string>(itRouteCode->second), 2, false);
-					++itRouteCode->second;
-				}
-				else
-				{
-					_writeTextAndSpaces(itineraiStream, jp.getName(), 2, false);
-				}
-				itineraiStream << jp.getWayBack();
-				Path::Edges allEdges(jp.getAllEdges());
-				Path::Edges::const_iterator itLastEdge(allEdges.end());
-				for(Path::Edges::const_iterator itEdge(allEdges.begin()); itEdge != allEdges.end(); ++itEdge)
-				{
-					const LinePhysicalStop& ls(*static_cast<LinePhysicalStop*>(*itEdge));
-					const StopPoint& stop(*ls.getPhysicalStop());
-					_writeTextAndSpaces(itineraiStream, *stop.getCodesBySource(*_dataSource).begin(), 4, false);
-					itineraiStream << ls.getScheduleInput();
-					if(itLastEdge == allEdges.end())
-					{
-						itineraiStream << "    0";
+						++routeCode;
+						_writeTextAndSpaces(itineraiStream, lexical_cast<string>(routeCode), 2, false);
 					}
 					else
 					{
-						double distance((*itEdge)->getMetricOffset() - (*itLastEdge)->getMetricOffset());
-						if(distance < 0)
+						_writeTextAndSpaces(itineraiStream, jp.getName(), 2, false);
+					}
+					itineraiStream << jp.getWayBack();
+					Path::Edges allEdges(jp.getAllEdges());
+					Path::Edges::const_iterator itLastEdge(allEdges.end());
+					for(Path::Edges::const_iterator itEdge(allEdges.begin()); itEdge != allEdges.end(); ++itEdge)
+					{
+						const LinePhysicalStop& ls(*static_cast<LinePhysicalStop*>(*itEdge));
+						const StopPoint& stop(*ls.getPhysicalStop());
+						_writeTextAndSpaces(itineraiStream, *stop.getCodesBySource(*_dataSource).begin(), 4, false);
+						itineraiStream << ls.getScheduleInput();
+						if(itLastEdge == allEdges.end())
 						{
-							distance = 0;
+							itineraiStream << "    0";
 						}
-						itineraiStream << setw(5) << setfill(' ') << distance;
+						else
+						{
+							double distance((*itEdge)->getMetricOffset() - (*itLastEdge)->getMetricOffset());
+							if(distance < 0)
+							{
+								distance = 0;
+							}
+							itineraiStream << setw(5) << setfill(' ') << distance;
+						}
+						itLastEdge = itEdge;
 					}
-					itLastEdge = itEdge;
-				}
-				itineraiStream << endl;
-			}
+					itineraiStream << endl;
 
-			// Troncons
-			stringstream tronconsStream;
 
-			BOOST_FOREACH(Registry<ScheduledService>::value_type itss, _env.getRegistry<ScheduledService>())
-			{
-				const ScheduledService& ss(*itss.second);
-
-				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
-				_writeTextAndSpaces(
-					tronconsStream,
-					(	ss.getServiceNumber().size() > _serviceNumberPosition ?
-						ss.getServiceNumber().substr(_serviceNumberPosition, 3) :
-						string()
-					),
-					3,
-					false
-				);
-				tronconsStream << "2";
-				Path::Edges allEdges(ss.getPath()->getAllEdges());
-				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.begin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
-				_writeHour(tronconsStream, ss.getDepartureSchedule(false, 0));
-				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.rbegin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
-				_writeHour(tronconsStream, ss.getLastArrivalSchedule(false));
-				tronconsStream << "000000";
-				if(_generateRouteCode)
-				{
-					size_t routeCode(
-						_routeCodes[static_cast<const JourneyPattern*>(ss.getPath())]
-					);
-					_writeTextAndSpaces(tronconsStream, lexical_cast<string>(routeCode), 2, false);
-				}
-				else
-				{
-					_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getName(), 2, false);
-				}
-				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 4);
-				_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 5, false, '0');
-
-				// Schedules
-				size_t schedulesNumber(ss.getDepartureSchedules(true, false).size());
-				time_duration lastSchedule(not_a_date_time);
-				const Path::Edges& edges(ss.getPath()->getEdges());
-				for(size_t i(0); i<schedulesNumber; ++i)
-				{
-					time_duration departureSchedule(ss.getDepartureSchedule(false, i));
-					time_duration arrivalSchedule(ss.getArrivalSchedule(false, i));
-
-					size_t writings(1);
-					if(dynamic_cast<LineArea*>(edges[i]))
+					// Troncons
+					BOOST_FOREACH(const Service* itss, jp.getAllServices())
 					{
-						writings = dynamic_cast<LineArea*>(edges[i])->getSubEdges().size();
-					}
+						if(!dynamic_cast<const ScheduledService*>(itss))
+						{
+							continue;
+						}
 
-					// Arrival time
-					time_duration firstSchedule(
-						(i== 0 || arrivalSchedule > departureSchedule) ? departureSchedule : arrivalSchedule
-					);
-					if(!lastSchedule.is_not_a_date_time() && firstSchedule < lastSchedule)
-					{
-						firstSchedule = lastSchedule;
-					}
-					lastSchedule = firstSchedule;
+						const ScheduledService& ss(static_cast<const ScheduledService&>(*itss));
 
-					// Departure time
-					time_duration secondSchedule(
-						(i+1 == schedulesNumber) ? arrivalSchedule : departureSchedule
-					);
-					if(!lastSchedule.is_not_a_date_time() && secondSchedule < lastSchedule)
-					{
-						secondSchedule = lastSchedule;
-					}
-					lastSchedule = secondSchedule;
+						_writeTextAndSpaces(tronconsStream, line->getCodeBySources(), 3, false);
+						_writeTextAndSpaces(
+							tronconsStream,
+							(	ss.getServiceNumber().size() > _serviceNumberPosition ?
+								ss.getServiceNumber().substr(_serviceNumberPosition, 3) :
+								string()
+							),
+							3,
+							false
+						);
+						tronconsStream << "2";
+						Path::Edges allEdges(ss.getPath()->getAllEdges());
+						_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.begin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
+						_writeHour(tronconsStream, ss.getDepartureSchedule(false, 0));
+						_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.rbegin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
+						_writeHour(tronconsStream, ss.getLastArrivalSchedule(false));
+						tronconsStream << "000000";
+						if(_generateRouteCode)
+						{
+							_writeTextAndSpaces(tronconsStream, lexical_cast<string>(routeCode), 2, false);
+						}
+						else
+						{
+							_writeTextAndSpaces(tronconsStream, jp.getName(), 2, false);
+						}
+						_writeTextAndSpaces(tronconsStream, line->getCodeBySources(), 4);
+						_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 5, false, '0');
 
-					// A schedule per generated edge
-					for(size_t i(0); i<writings; ++i)
-					{
-						_writeHour(tronconsStream, (i>0 ? secondSchedule : firstSchedule));
-						_writeHour(tronconsStream, secondSchedule);
-					}
-				}
-				tronconsStream << ";" << endl;
-			}
+						// Schedules
+						size_t schedulesNumber(ss.getDepartureSchedules(true, false).size());
+						time_duration lastSchedule(not_a_date_time);
+						const Path::Edges& edges(ss.getPath()->getEdges());
+						for(size_t i(0); i<schedulesNumber; ++i)
+						{
+							time_duration departureSchedule(ss.getDepartureSchedule(false, i));
+							time_duration arrivalSchedule(ss.getArrivalSchedule(false, i));
 
-			// Services
-			stringstream servicesStream;
+							size_t writings(1);
+							if(dynamic_cast<LineArea*>(edges[i]))
+							{
+								writings = dynamic_cast<LineArea*>(edges[i])->getSubEdges().size();
+							}
 
-			BOOST_FOREACH(Registry<ScheduledService>::value_type itss, _env.getRegistry<ScheduledService>())
-			{
-				const ScheduledService& ss(*itss.second);
+							// Arrival time
+							time_duration firstSchedule(
+								(i== 0 || arrivalSchedule > departureSchedule) ? departureSchedule : arrivalSchedule
+							);
+							if(!lastSchedule.is_not_a_date_time() && firstSchedule < lastSchedule)
+							{
+								firstSchedule = lastSchedule;
+							}
+							lastSchedule = firstSchedule;
 
-				_writeTextAndSpaces(servicesStream, ss.getServiceNumber(), 6, false);
-				servicesStream << "1111111";
-				_writeTextAndSpaces(servicesStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
-				_writeTextAndSpaces(
-					servicesStream,
-					(	ss.getServiceNumber().size() > _serviceNumberPosition ?
-						ss.getServiceNumber().substr(_serviceNumberPosition, 3) :
-						string()
-					),
-					3,
-					false
-				);
-				servicesStream << "2";
-				servicesStream << "0000000000000000000000";
-				servicesStream << endl;
-			}
+							// Departure time
+							time_duration secondSchedule(
+								(i+1 == schedulesNumber) ? arrivalSchedule : departureSchedule
+							);
+							if(!lastSchedule.is_not_a_date_time() && secondSchedule < lastSchedule)
+							{
+								secondSchedule = lastSchedule;
+							}
+							lastSchedule = secondSchedule;
+
+							// A schedule per generated edge
+							for(size_t i(0); i<writings; ++i)
+							{
+								_writeHour(tronconsStream, (i>0 ? secondSchedule : firstSchedule));
+								_writeHour(tronconsStream, secondSchedule);
+							}
+						}
+						tronconsStream << ";" << endl;
+		
+
+						// Services
+						_writeTextAndSpaces(servicesStream, ss.getServiceNumber(), 6, false);
+						servicesStream << "1111111";
+						_writeTextAndSpaces(servicesStream, line->getCodeBySources(), 3, false);
+						_writeTextAndSpaces(
+							servicesStream,
+							(	ss.getServiceNumber().size() > _serviceNumberPosition ?
+								ss.getServiceNumber().substr(_serviceNumberPosition, 3) :
+								string()
+							),
+							3,
+							false
+						);
+						servicesStream << "2";
+						servicesStream << "0000000000000000000000";
+						servicesStream << endl;
+			}	}	}
 
 			ZipWriter * zip = new ZipWriter(os);
 
@@ -1349,22 +1319,22 @@ namespace synthese
 
 				if(decodeTableId(id) == TransportNetworkTableSync::TABLE.ID)
 				{
-					_network = TransportNetworkTableSync::GetEditable(id, _env);
+					_network = Env::GetOfficialEnv().get<TransportNetwork>(id);
 				}
 				else if(decodeTableId(id) == TreeFolder::CLASS_NUMBER)
 				{
-					_folder = TreeFolderTableSync::GetEditable(id, _env);
+					_folder = Env::GetOfficialEnv().get<TreeFolder>(id);
 				}
 			}
 			catch (...)
 			{
-				throw Exception("Transport network " + lexical_cast<string>(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID)) + " not found");
+				throw Exception("Transport network " + lexical_cast<string>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) + " not found");
 			}
 
 			// Data source
 			try
 			{
-				_dataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID), _env);
+				_dataSource = Env::GetOfficialEnv().get<DataSource>(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID));
 			}
 			catch (...)
 			{
@@ -1438,10 +1408,24 @@ namespace synthese
 
 
 
-		HeuresFileFormat::Exporter_::Exporter_():
+		HeuresFileFormat::Exporter_::Exporter_(
+			const Export& export_
+		):	OneFileExporter<HeuresFileFormat>(export_),
 			_generateRouteCode(false),
 			_serviceNumberPosition(0)
 		{
 
+		}
+
+
+
+		void HeuresFileFormat::Exporter_::_addLines( std::vector<const pt::CommercialLine*>& lines, const TreeFolderUpNode& node )
+		{
+			vector<CommercialLine*> toadd(node.getChildren<CommercialLine>());
+			lines.insert(lines.end(), toadd.begin(), toadd.end());
+			BOOST_FOREACH(TreeFolder* folder, node.getSubFolders())
+			{
+				_addLines(lines, *folder);
+			}
 		}
 }	}

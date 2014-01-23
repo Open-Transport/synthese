@@ -1,6 +1,6 @@
 
-/** GpsDevicePoller class header.
-	@file GpsDevicePoller.hpp
+/** GPSdFileFormat class header.
+	@file GPSdFileFormat.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,28 +20,30 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_pt_GpsDevicePoller_hpp__
-#define SYNTHESE_pt_GpsDevicePoller_hpp__
+#ifndef SYNTHESE_pt_GPSdFileFormat_hpp__
+#define SYNTHESE_pt_GPSdFileFormat_hpp__
 
-#include "DeviceTemplate.h"
-#include "Poller.hpp"
+#include "FileFormatTemplate.h"
+#include "NoExportPolicy.hpp"
+#include "PermanentThreadImporterTemplate.hpp"
 
-#include "Log.h"
-#include "ParametersMap.h"
-
-#include <boost/thread.hpp>
+#include <boost/asio.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
+	namespace pt
+	{
+		class StopPoint;
+	}
+
 	namespace data_exchange
 	{
-		#define GPS_POLLER_SOCKET_PORT 2947
-
-		class GpsDevicePoller:
-			public server::DeviceTemplate<GpsDevicePoller>
+		class GPSdFileFormat:
+			public impex::FileFormatTemplate<GPSdFileFormat>
 		{
 
 		public:
@@ -51,27 +53,56 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// @author RCS
 			/// @ingroup m61
-			class Poller_:
-				public server::Poller
+			class Importer_:
+				public impex::PermanentThreadImporterTemplate<GPSdFileFormat>
 			{
 			public:
-				static const std::string PARAMETER_VALIDATOR_NET_PORT_NUMBER;
+				static const std::string PARAMETER_ADDRESS;
+				static const std::string PARAMETER_PORT;
 
 			private:
-				static int _NetPortNb;
+				std::string _address;
+				int _port;
+
+				typedef enum
+				{
+					OFFLINE,
+					ONLINE,
+					WAITING
+				} GpsStatus;
+
+				mutable GpsStatus _gpsStatus;
+				mutable boost::asio::io_service _ios;  
+				mutable boost::asio::ip::tcp::socket _socket;
+				mutable boost::shared_ptr<geos::geom::Point> _lastPosition;
+				mutable pt::StopPoint* _lastStopPoint;
+				mutable boost::posix_time::ptime _lastStorage;
+
+				bool _updateFromGps(double &lat, double &lon) const;
+				bool _loadPositionJSON(boost::asio::streambuf &ss,
+					double &lat,
+					double &lon) const;
+
 
 			protected:
 
-				virtual bool launchPoller() const;
+				virtual void _onStart() const;
+
+				virtual void _loop() const;
+
+				virtual boost::posix_time::time_duration _getWaitingTime() const;
+
+				virtual void _onStop() const;
 
 			public:
-				Poller_(
+				Importer_(
 					util::Env& env,
-					const server::PermanentThread& permanentThread,
+					const impex::Import& import,
+					impex::ImportLogLevel minLogLevel,
+					const std::string& logPath,
+					boost::optional<std::ostream&> outputStream,
 					util::ParametersMap& pm
-					);
-
-				void startPolling() const;
+				);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
@@ -81,18 +112,23 @@ namespace synthese
 				/// @since 3.9.0
 				virtual util::ParametersMap getParametersMap() const;
 
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
 				/// @param map Parameters map to interpret
 				/// @author RCS
 				/// @date 2013
 				/// @since 3.9.0
-				virtual void setFromParametersMap(const util::ParametersMap& map);
-
+				virtual void setFromParametersMap(
+					const util::ParametersMap& map,
+					bool doImport
+				);
 			};
-		};
-	}	
-}
 
-#endif // SYNTHESE_pt_GpsDevicePoller_hpp__
+			typedef impex::NoExportPolicy<GPSdFileFormat> Exporter_;
+		};
+}	}
+
+#endif // SYNTHESE_pt_GPSdFileFormat_hpp__
 

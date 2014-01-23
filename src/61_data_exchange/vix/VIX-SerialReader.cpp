@@ -50,6 +50,7 @@ namespace synthese
 	#ifdef _DEBUG
 		//m_logfile = NULL;
 		//m_logfile = ::CreateFile("c:\\temp\\logtemp.bin",GENERIC_WRITE,0,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		m_logfile = fopen ("/tmp/logtemp.bin","w");
 	 #ifdef _WIN32
 		m_logfile = fopen ("c:/temp/logtemp.bin","w");
 	 #else
@@ -201,7 +202,7 @@ namespace synthese
 			m_pCom->WriteByte(crc16 & 0x00FF);
 			m_pCom->WriteByte((crc16 & 0xFF00)>>8);
 
-			//util::Log::GetInstance().debug("*** Validator wrote survey message. Done! ");
+			util::Log::GetInstance().debug("*** Validator wrote survey message. Done! ");
 		}
 
 		return true;

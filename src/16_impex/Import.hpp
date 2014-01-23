@@ -28,12 +28,12 @@
 #include "CMSScriptField.hpp"
 #include "DataSource.h"
 #include "EnumObjectField.hpp"
+#include "FileFormat.h"
 #include "ImpExTypes.hpp"
 #include "ParametersMapField.hpp"
 #include "PtimeField.hpp"
 #include "SchemaMacros.hpp"
 #include "SecondsField.hpp"
-#include "StringField.hpp"
 #include "TimeField.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -46,7 +46,6 @@ namespace synthese
 		class Env;
 	}
 
-	FIELD_STRING(FileFormatKey)
 	FIELD_STRING(LogPath)
 	FIELD_SECONDS(AutoImportDelay)
 	FIELD_TIME(AutoImportTime)
@@ -79,15 +78,15 @@ namespace synthese
 			public Object<Import, ImportRecord>
 		{
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<Import>	Registry;
 
 
 		private:
 			mutable boost::posix_time::ptime _nextAutoImport;
+			mutable util::ParametersMap _autoImporterPM;
 			mutable boost::shared_ptr<Importer> _autoImporter;
 			mutable boost::shared_ptr<util::Env> _autoImporterEnv;
 			void _computeNextAutoImport() const;
+			boost::shared_ptr<Importer> _getAutoImporter() const;
 		
 		public:
 			Import(util::RegistryKeyType id = 0);
@@ -103,6 +102,7 @@ namespace synthese
 				) const;
 
 				bool canImport() const;
+				bool isPermanentThread() const;
 				const boost::posix_time::ptime& getNextAutoImport() const { return _nextAutoImport; }
 				void runAutoImport() const;
 				virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix) const;

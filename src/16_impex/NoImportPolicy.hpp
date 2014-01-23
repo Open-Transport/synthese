@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_impex_NoImportPolicy_hpp__
 #define SYNTHESE_impex_NoImportPolicy_hpp__
 
+#include "Importer.hpp"
+
 namespace synthese
 {
 	namespace impex
@@ -36,9 +38,16 @@ namespace synthese
 		{
 		public:
 			static const bool IMPORTABLE;
+			static const bool IS_PERMANENT_THREAD;
 
-			NoImportPolicy(const DataSource& dataSource)
-				: Importer(dataSource)
+			NoImportPolicy(
+				util::Env& env,
+				const Import& import,
+				ImportLogLevel minLogLevel,
+				const std::string& logPath,
+				boost::optional<std::ostream&> outputStream,
+				util::ParametersMap& pm
+			):	Importer(env, import, minLogLevel, logPath, outputStream, pm)
 			{}
 
 			virtual void setFromParametersMap(
@@ -49,11 +58,15 @@ namespace synthese
 
 			virtual util::ParametersMap getParametersMap() const { return util::ParametersMap(); }
 
-			virtual db::DBTransaction save() const { return db::DBTransaction(); }
+			virtual db::DBTransaction _save() const { return db::DBTransaction(); }
+			virtual bool parseFiles() const { return false; }
 		};
 
 		template<class FF>
 		const bool NoImportPolicy<FF>::IMPORTABLE(false);
+
+		template<class FF>
+		const bool NoImportPolicy<FF>::IS_PERMANENT_THREAD(false);
 }	}
 
 #endif // SYNTHESE_impex_NoImportPolicy_hpp__

@@ -6,6 +6,7 @@
 #include "DataExchangeModule.hpp"
 
 #include "CMSImport.hpp"
+#include "GPSdFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
@@ -29,7 +30,6 @@
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
 #include "RoadShapeFileFormat.hpp"
-#include "GpsFileFormat.h"
 
 #include "NCEStatusService.hpp"
 #include "VDVSubscriptionService.hpp"
@@ -50,8 +50,7 @@
 #include "VDVServerSubscription.hpp"
 
 // Devices
-#include "ValidatorVIXv6000DevicePoller.hpp"
-#include "GpsDevicePoller.hpp"
+#include "VixV6000FileFormat.hpp"
 
 #include "DataExchangeModule.inc.cpp"
 
@@ -76,6 +75,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::VDVServerTableSync::integrate();
 	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
 
+	synthese::data_exchange::GPSdFileFormat::integrate();
 	synthese::data_exchange::GTFSFileFormat::integrate();
 	synthese::data_exchange::HafasFileFormat::integrate();
 	synthese::data_exchange::HastusCSVFileFormat::integrate();
@@ -99,11 +99,9 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
-	synthese::data_exchange::GpsFileFormat::integrate();
 	synthese::data_exchange::CMSImport::integrate();
 
-	synthese::data_exchange::ValidatorVIXv6000DevicePoller::integrate();
-	synthese::data_exchange::GpsDevicePoller::integrate();
+	synthese::data_exchange::VixV6000FileFormat::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::data_exchange::VDVClient>();

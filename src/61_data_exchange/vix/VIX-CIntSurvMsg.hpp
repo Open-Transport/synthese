@@ -2,8 +2,6 @@
 
 #include "VIX-BSC-defines.hpp"
 
-#include "DataSource.h"
-
 namespace synthese
 {
 
@@ -40,8 +38,6 @@ namespace synthese
 
 		// prepare the INT_SURV message to be sent
 		// return the number of bytes to write. 0 if got an error.
-		int StreamToBuffer(unsigned char *buf, int bufSize, boost::shared_ptr<const impex::DataSource> &datasource);
-		
-		bool UpdateVariablesFromEnv(boost::shared_ptr<const impex::DataSource> &dataSource);
+		int StreamToBuffer(unsigned char *buf, int bufSize);
 	};
 }

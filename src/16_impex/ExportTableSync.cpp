@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-///	PermanentThread table synchronizer class implementation.
-///	@file PermanentThreadSync.cpp
-///	@author Camille Hue
+///	Export table synchronizer class implementation.
+///	@file ExportTableSync.cpp
+///	@author Hugues Romain
 ///	@date 2013
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -23,7 +23,7 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "PermanentThreadTableSync.hpp"
+#include "ExportTableSync.hpp"
 
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
@@ -37,31 +37,33 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace server;
+	using namespace impex;
 
-	template<> const string util::FactorableTemplate<DBTableSync,PermanentThreadTableSync>::FACTORY_KEY(
-		"15.01 PermanentThread"
+	template<> const string util::FactorableTemplate<DBTableSync,ExportTableSync>::FACTORY_KEY(
+		"99.16.02 Exports"
 	);
 
 	namespace db
 	{
-		template<> const DBTableSync::Format DBTableSyncTemplate<PermanentThreadTableSync>::TABLE(
-			"t115_permanent_threads"
+		template<>
+		const DBTableSync::Format DBTableSyncTemplate<ExportTableSync>::TABLE(
+			"t115_exports"
 		);
 
-		template<> const Field DBTableSyncTemplate<PermanentThreadTableSync>::_FIELDS[] = { Field() }; // Defined by the record
+		template<>
+		const Field DBTableSyncTemplate<ExportTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 
 
 		template<>
-		DBTableSync::Indexes DBTableSyncTemplate<PermanentThreadTableSync>::GetIndexes()
+		DBTableSync::Indexes DBTableSyncTemplate<ExportTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
 		}
 
 
 
-		template<> bool DBTableSyncTemplate<PermanentThreadTableSync>::CanDelete(
+		template<> bool DBTableSyncTemplate<ExportTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
@@ -71,7 +73,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<PermanentThreadTableSync>::BeforeDelete(
+		template<> void DBTableSyncTemplate<ExportTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -79,7 +81,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<PermanentThreadTableSync>::AfterDelete(
+		template<> void DBTableSyncTemplate<ExportTableSync>::AfterDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -87,7 +89,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<PermanentThreadTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ExportTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
@@ -95,9 +97,9 @@ namespace synthese
 		}
 	}
 
-	namespace server
+	namespace impex
 	{
-		PermanentThreadTableSync::SearchResult PermanentThreadTableSync::Search(
+		ExportTableSync::SearchResult ExportTableSync::Search(
 			Env& env,
 			int first /*= 0*/
 			, optional<size_t> number /*= 0*/
@@ -105,7 +107,7 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			SelectQuery<PermanentThreadTableSync> query;
+			SelectQuery<ExportTableSync> query;
 			if (orderByName)
 			{
 				query.addOrderField(Name::FIELD.name, raisingOrder);

@@ -208,6 +208,8 @@ namespace synthese
 
 				virtual bool isPedestrianMode() const;
 
+				graph::ServiceSet getAllServices() const;
+
 				bool isReservable () const;
 
 				void clearCalendarCache() const { _calendar.reset(); }

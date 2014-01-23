@@ -24,9 +24,6 @@
 #include "ThreadsAdmin.h"
 
 #include "DbModuleConfigTableSync.h"
-#include "PermanentThreadTableSync.hpp"
-#include "PermanentThreadsService.hpp"
-#include "DevicesService.hpp"
 
 #include "ActionService.hpp"
 #include "HardwareInformationService.hpp"
@@ -63,10 +60,6 @@ void synthese::server::moduleRegister()
 
 	synthese::server::DbModuleConfigTableSync::integrate();
 
-	synthese::server::PermanentThreadTableSync::integrate();
-	synthese::server::PermanentThreadsService::integrate();
-	synthese::server::DevicesService::integrate();
-
 	synthese::server::ServerAdminRight::integrate();
 
 	synthese::server::MemoryStatisticsAdmin::integrate();
@@ -81,5 +74,4 @@ void synthese::server::moduleRegister()
 	synthese::server::XMLSessionIsValidFunction::integrate();
 
 	// Registries
-	synthese::util::Env::Integrate<synthese::server::PermanentThread>();
 }

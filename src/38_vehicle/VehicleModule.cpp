@@ -25,6 +25,7 @@
 #include "RollingStockTableSync.hpp"
 #include "ServiceComposition.hpp"
 #include "Vehicle.hpp"
+#include "VehiclePositionTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -52,6 +53,7 @@ namespace synthese
 		VehicleModule::VehicleScreensMap VehicleModule::_currentScreens;
 		VehicleModule::ExtraParameterMap VehicleModule::_extraParameters;
 		bool VehicleModule::_ignition(false);
+		const string VehicleModule::MODULE_PARAM_CURRENT_VEHICLE_ID = "current_vehicle_id";
 	}
 
 	namespace server
@@ -98,7 +100,12 @@ namespace synthese
 					RollingStockTableSync::Save(&s);
 				}
 			}
+
+			// In the init section in order to read this parameter after the data load (DBModule::Init)
+			RegisterParameter(VehicleModule::MODULE_PARAM_CURRENT_VEHICLE_ID, "", &VehicleModule::ParameterCallback);
 		}
+
+
 
 		template<> void ModuleClassTemplate<VehicleModule>::Start()
 		{
@@ -171,5 +178,49 @@ namespace synthese
 			const pt::CommercialLine& line
 		){
 			return _linesAllowedVehicles[&line];
+		}
+
+
+
+		/// This method stores the current vehicle position in the database, only if the current vehicle is identified
+		void VehicleModule::StoreCurrentVehiclePosition()
+		{
+			// Do not store the position if we do not know which vehicle is used
+			if(!_currentVehiclePosition.getVehicle())
+			{
+				return;
+			}
+
+			VehiclePosition vpCopy(_currentVehiclePosition);
+			vpCopy.setKey(VehiclePositionTableSync::getId());
+			vpCopy.setTime(second_clock::local_time());
+			VehiclePositionTableSync::Save(&vpCopy);
+		}
+
+
+
+		void VehicleModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			if(name == MODULE_PARAM_CURRENT_VEHICLE_ID)
+			{
+				Vehicle* newCurrentVehicle(NULL);
+				try
+				{
+					RegistryKeyType vehicleId(
+						lexical_cast<RegistryKeyType>(value)
+					);
+					newCurrentVehicle = Env::GetOfficialEnv().getEditable<Vehicle>(vehicleId).get();
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
+				catch(ObjectNotFoundException<Vehicle>&)
+				{
+				}
+				GetCurrentVehiclePosition().setVehicle(newCurrentVehicle);
+				StoreCurrentVehiclePosition();
+			}
 		}
 }	}

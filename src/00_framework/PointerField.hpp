@@ -280,8 +280,9 @@ namespace synthese
 				);
 			}
 
-			if(fieldObject == value)
-			{
+			if(	(!value && !fieldObject) ||
+				(value && fieldObject && &*value==&*fieldObject)
+			){
 				return false;
 			}
 			else

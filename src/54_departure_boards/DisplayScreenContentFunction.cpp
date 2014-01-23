@@ -1149,8 +1149,14 @@ namespace synthese
 					{
 						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
 						{
-							if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
-								continue;
+							if(!dataSourceLink.second.empty())
+							{
+								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
+								operatorCodes << "'" << setfill('0') << setw(5) << dataSourceLink.second;
+								operatorCodes << "'";
+							}
+						}
+					}
 
 							if(!dataSourceLink.second.empty())
 							{
@@ -1188,8 +1194,12 @@ namespace synthese
 
 						try
 						{
-							string requestInitVars("SET @num = 0, @itineraire_dest = '', @itineraire_lign_com = '', @itineraire_arret = ''");
-							connector->execQuery(requestInitVars);
+							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
+							{
+								if(ocStops.find(dataSourceLink.second) != ocStops.end())
+									ocStops[dataSourceLink.second] = curStop.second;
+							}
+						}
 
 							request << " SELECT"
 									<< "	@num := IF(@itineraire_lign_com = ligne, IF(@itineraire_dest = oc_arrivee, IF(@itineraire_arret = arret_oc, @num + 1, 1), 1), 1) AS row_number,"
@@ -1266,31 +1276,20 @@ namespace synthese
 								{
 									try
 									{
-										boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
-										BOOST_FOREACH(Path* path, curLine->getPaths())
+										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
+										if(destination)
 										{
-											const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
-											if(destination)
+											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
 											{
-												BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
+												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
 												{
-													if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
-														continue;
-
-													if(dataSourceLink.second == result->getInfo("oc_arrivee"))
-													{
-														realTimeService.commercialLine = curLine;
-														break;
-													}
-												}
-
-												if(realTimeService.commercialLine)
+													realTimeService.commercialLine = curLine;
 													break;
+												}
 											}
-										}
 
-										if(realTimeService.commercialLine)
-											break;
+											if(realTimeService.commercialLine)
+												break;
 									}
 									catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
 									{
@@ -1307,11 +1306,25 @@ namespace synthese
 									typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
 									RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
 
-									for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
-									{
-										bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
-										bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
-										displayDeparture = goodLine & goodDest;
+							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
+							{
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+									displayDeparture = goodLine & goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
+									continue;
+							}
 
 										if(displayDeparture)
 											break;
@@ -1714,8 +1727,14 @@ namespace synthese
 					{
 						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
 						{
-							if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
-								continue;
+							if(!dataSourceLink.second.empty())
+							{
+								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
+								operatorCodes << "'" << setfill('0') << setw(5) << dataSourceLink.second;
+								operatorCodes << "'";
+							}
+						}
+					}
 
 							if(!dataSourceLink.second.empty())
 							{
@@ -1746,11 +1765,11 @@ namespace synthese
 
 						if(_lineToDisplay)
 						{
-							shared_ptr<const CommercialLine> commercialLine(_env->getRegistry<CommercialLine>().get(*_lineToDisplay));
-							string shortNameToDisplay = boost::algorithm::to_lower_copy(
-								trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-							);
-							filters << " AND LOWER(TRIM(LEADING '0' FROM h.ligne)) = '" << shortNameToDisplay << "'";
+							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
+							{
+								if(ocStops.find(dataSourceLink.second) != ocStops.end())
+									ocStops[dataSourceLink.second] = curStop.second;
+							}
 						}
 
 						request << " SELECT"
@@ -1822,31 +1841,20 @@ namespace synthese
 								{
 									try
 									{
-										boost::shared_ptr<const CommercialLine> curLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(idLine);
-										BOOST_FOREACH(Path* path, curLine->getPaths())
+										const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
+										if(destination)
 										{
-											const StopPoint* destination = dynamic_cast<const StopPoint*>(path->getLastEdge()->getFromVertex());
-											if(destination)
+											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
 											{
-												BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
+												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
 												{
-													if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
-														continue;
-
-													if(dataSourceLink.second == result->getInfo("oc_arrivee"))
-													{
-														realTimeService.commercialLine = curLine;
-														break;
-													}
-												}
-
-												if(realTimeService.commercialLine)
+													realTimeService.commercialLine = curLine;
 													break;
+												}
 											}
-										}
 
-										if(realTimeService.commercialLine)
-											break;
+											if(realTimeService.commercialLine)
+												break;
 									}
 									catch(util::ObjectNotFoundInRegistryException<CommercialLine>)
 									{
@@ -1880,9 +1888,28 @@ namespace synthese
 								if(result->getInfo("fiable") == "F")
 									realTimeService.realTime = true;
 
-								ptime SAEResultPtime(time_from_string(SAEDateString + " " + result->getInfo("horaire")));
-								time_duration tod = SAEResultPtime.time_of_day();
-								int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
+							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
+							{
+								bool displayDeparture(false);
+								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+								RangeIt range = _lineDestinationFilter.equal_range(realTimeService.stop.get());
+
+								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								{
+									bool goodLine(!it->second.first || (it->second.first == realTimeService.commercialLine.get()));
+									bool goodDest(!it->second.second || (it->second.second == realTimeService.destination));
+									displayDeparture = goodLine && goodDest;
+
+									if(displayDeparture)
+										break;
+								}
+
+								if(!displayDeparture)
+									continue;
+							}
+
+							if(result->getInfo("fiable") == "F")
+								realTimeService.realTime = true;
 
 								if(tod < endOfService)
 								{

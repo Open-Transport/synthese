@@ -89,6 +89,7 @@ namespace synthese
 
 			public:
 				static const bool IMPORTABLE;
+				static const bool IS_PERMANENT_THREAD;
 				static const std::string PARAMETER_DIRECTORY;
 				static const std::string PARAMETER_PARENT_ID;
 				static const std::string PARAMETER_IMPORT_SITE_ID;
@@ -129,7 +130,9 @@ namespace synthese
 			};
 
 			typedef impex::NoExportPolicy<CMSImport> Exporter_;
+
 		};
+
 	}
 }
 #endif // SYNTHESE_cms_CMSImport_H__

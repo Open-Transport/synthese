@@ -75,7 +75,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-//	using namespace data_exchange;
+	using namespace data_exchange;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -545,17 +545,19 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-				boost::shared_ptr<data_exchange::TridentFileFormat::Exporter_> exporter(new data_exchange::TridentFileFormat::Exporter_);
-				exporter->setLine(_cline);
-
 				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
-				tridentExportFunction.getFunction()->setExporter(static_pointer_cast<Exporter, data_exchange::TridentFileFormat::Exporter_>(exporter));
-
+				ParametersMap pm;
+				pm.insert(Request::PARAMETER_OBJECT_ID, _cline->getKey());
+				pm.insert(ExportFunction::PARAMETER_FILE_FORMAT, TridentFileFormat::FACTORY_KEY);
+				tridentExportFunction.getFunction()->setParametersMap(pm);
+				
 				stream << "<h1>Formats Trident</h1>";
 				stream << "<p>";
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident standard", string(), "/admin/img/page_white_go.png");
 				stream << " ";
-				exporter->setWithTisseoExtension(true);
+
+				pm.insert(TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION, true);
+				tridentExportFunction.getFunction()->setParametersMap(pm);
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "/admin/img/page_white_go.png");
 				stream << "</p>";
 			}

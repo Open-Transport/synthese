@@ -50,6 +50,8 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 {
 	GeographyModule::PreInit();
 	{
+		Env env;
+
 		JourneyPattern l;
 
 		StopArea p1(0, true);
@@ -80,16 +82,23 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,0,&s8);
 		DesignatedLinePhysicalStop* lNULL(NULL);
 
-		l.addEdge(l1D);
+		l1D.link(env, true);
 
-		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
-		BOOST_CHECK_EQUAL (l1D.getNext(), lNULL);
-		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
-		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
-		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
-		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
-
-		l.addEdge(l2D);
+		BOOST_CHECK_EQUAL(l1D.getPrevious(), lNULL);
+		BOOST_CHECK_EQUAL(l1D.getNext(), lNULL);
+		BOOST_CHECK_EQUAL(l1D.getFollowingConnectionArrival(), lNULL);
+		BOOST_CHECK_EQUAL(l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL(l1D.getPreviousConnectionDeparture(), lNULL);
+		BOOST_CHECK_EQUAL(l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL(s1.getDepartureEdges().size(), 1);
+		if(!s1.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().size(), 0);
+		
+		l2D.link(env, true);
 
 		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
@@ -97,6 +106,13 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL(s1.getDepartureEdges().size(), 1);
+		if(!s1.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().size(), 0);
 
 		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
 		BOOST_CHECK_EQUAL (l2D.getNext(), lNULL);
@@ -104,8 +120,15 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), lNULL);
 		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
 		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL(s2.getDepartureEdges().size(), 1);
+		if(!s2.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s2.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s2.getDepartureEdges().begin()->second, &l2D);
+		}
+		BOOST_CHECK_EQUAL(s2.getArrivalEdges().size(), 0);
 
-		l.addEdge(l3AD);
+		l3AD.link(env, true);
 
 		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
@@ -113,6 +136,13 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		BOOST_CHECK_EQUAL(s1.getDepartureEdges().size(), 1);
+		if(!s1.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().size(), 0);
 
 		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
 		BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
@@ -120,6 +150,13 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
 		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL(s2.getDepartureEdges().size(), 1);
+		if(!s2.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s2.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s2.getDepartureEdges().begin()->second, &l2D);
+		}
+		BOOST_CHECK_EQUAL(s2.getArrivalEdges().size(), 0);
 
 		BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
 		BOOST_CHECK_EQUAL (l3AD.getNext(), lNULL);
@@ -127,8 +164,20 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), lNULL);
 		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
 		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL(s3.getDepartureEdges().size(), 1);
+		if(!s3.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s3.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s3.getDepartureEdges().begin()->second, &l3AD);
+		}
+		BOOST_CHECK_EQUAL(s3.getArrivalEdges().size(), 1);
+		if(!s3.getArrivalEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s3.getArrivalEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s3.getArrivalEdges().begin()->second, &l3AD);
+		}
 
-		l.addEdge(l4A);
+		l4A.link(env, true);
 
 		BOOST_CHECK_EQUAL (l1D.getPrevious(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getNext(), &l2D);
@@ -136,6 +185,12 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 		BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+		if(!s1.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s1.getDepartureEdges().begin()->second, &l1D);
+		}
+		BOOST_CHECK_EQUAL(s1.getArrivalEdges().size(), 0);
 
 		BOOST_CHECK_EQUAL (l2D.getPrevious(), &l1D);
 		BOOST_CHECK_EQUAL (l2D.getNext(), &l3AD);
@@ -143,6 +198,13 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
 		BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
 		BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+		BOOST_CHECK_EQUAL(s2.getDepartureEdges().size(), 1);
+		if(!s2.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s2.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s2.getDepartureEdges().begin()->second, &l2D);
+		}
+		BOOST_CHECK_EQUAL(s2.getArrivalEdges().size(), 0);
 
 		BOOST_CHECK_EQUAL (l3AD.getPrevious(), &l2D);
 		BOOST_CHECK_EQUAL (l3AD.getNext(), &l4A);
@@ -150,13 +212,32 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l3AD.getFollowingArrivalForFineSteppingOnly(), &l4A);
 		BOOST_CHECK_EQUAL (l3AD.getPreviousConnectionDeparture(), &l1D);
 		BOOST_CHECK_EQUAL (l3AD.getPreviousDepartureForFineSteppingOnly(), &l2D);
+		BOOST_CHECK_EQUAL(s3.getDepartureEdges().size(), 1);
+		if(!s3.getDepartureEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s3.getDepartureEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s3.getDepartureEdges().begin()->second, &l3AD);
+		}
+		BOOST_CHECK_EQUAL(s3.getArrivalEdges().size(), 1);
+		if(!s3.getArrivalEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s3.getArrivalEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s3.getArrivalEdges().begin()->second, &l3AD);
+		}
 
 		BOOST_CHECK_EQUAL (l4A.getFollowingConnectionArrival(), lNULL);
 		BOOST_CHECK_EQUAL (l4A.getFollowingArrivalForFineSteppingOnly(), lNULL);
 		BOOST_CHECK_EQUAL (l4A.getPreviousConnectionDeparture(), &l1D);
 		BOOST_CHECK_EQUAL (l4A.getPreviousDepartureForFineSteppingOnly(), &l3AD);
+		BOOST_CHECK_EQUAL(s4.getDepartureEdges().size(), 0);
+		BOOST_CHECK_EQUAL(s4.getArrivalEdges().size(), 1);
+		if(!s4.getArrivalEdges().empty())
+		{
+			BOOST_CHECK_EQUAL(s4.getArrivalEdges().begin()->first, &l);
+			BOOST_CHECK_EQUAL(s4.getArrivalEdges().begin()->second, &l4A);
+		}
 
-		l.addEdge(l5D);
+		l5D.link(env, true);
 
 		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
 		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
@@ -183,7 +264,7 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l5D.getPreviousConnectionDeparture(), &l1D);
 		BOOST_CHECK_EQUAL (l5D.getPreviousDepartureForFineSteppingOnly(), &l3AD);
 
-		l.addEdge(l6AD);
+		l6AD.link(env, true);
 
 		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
 		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
@@ -215,7 +296,7 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l6AD.getPreviousConnectionDeparture(), &l5D);
 		BOOST_CHECK_EQUAL (l6AD.getPreviousDepartureForFineSteppingOnly(), &l5D);
 
-		l.addEdge(l7AD);
+		l7AD.link(env, true);
 
 		BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), &l6AD);
 		BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), &l3AD);
@@ -252,7 +333,7 @@ BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)
 		BOOST_CHECK_EQUAL (l7AD.getPreviousConnectionDeparture(), &l6AD);
 		BOOST_CHECK_EQUAL (l7AD.getPreviousDepartureForFineSteppingOnly(), &l6AD);
 
-		l.addEdge(l8A);
+		l8A.link(env, true);
 
 		JourneyPattern::Edges edges = l.getEdges();
 
@@ -754,6 +835,63 @@ BOOST_AUTO_TEST_CASE (testEdgeRandomLinking)
 
 }
 
+
+BOOST_AUTO_TEST_CASE (testStopPointDelete)
+{
+	Env env;
+
+	JourneyPattern l;
+
+	StopArea p1(0, true);
+	StopArea p2(0, false);
+	StopArea p3(0, false);
+	StopArea p4(0, false);
+	StopArea p5(0, true);
+	StopArea p6(0, true);
+	StopArea p7(0, false);
+	StopArea p8(0, false);
+
+	boost::shared_ptr<StopPoint> s1(new StopPoint(0, "s1", &p1));
+	boost::shared_ptr<StopPoint> s2(new StopPoint(0, "s1", &p2));
+	boost::shared_ptr<StopPoint> s3(new StopPoint(0, "s1", &p3));
+	StopPoint s4(0, "s1", &p4);
+	StopPoint s5(0, "s1", &p5);
+	StopPoint s6(0, "s1", &p6);
+	StopPoint s7(0, "s1", &p7);
+	StopPoint s8(0, "s1", &p8);
+
+	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,s1.get());
+	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,0,s2.get());
+	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true, 0,s3.get());
+	DesignatedLinePhysicalStop l4A(0, &l, 3, false, true,0,&s4);
+	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,0,&s5);
+	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,0,&s6);
+	DesignatedLinePhysicalStop l7AD(0, &l, 6, true, true,0,&s7);
+	DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,0,&s8);
+	DesignatedLinePhysicalStop* lNULL(NULL);
+
+	l4A.link(env, true);
+	l2D.link(env, true);
+	l7AD.link(env, true);
+	l5D.link(env, true);
+	l6AD.link(env, true);
+	l1D.link(env, true);
+	l3AD.link(env, true);
+	l8A.link(env, true);
+	
+	s1.reset();
+
+	BOOST_CHECK(l1D.getFromVertex() == NULL);
+
+	s2.reset();
+
+	BOOST_CHECK(l2D.getFromVertex() == NULL);
+
+	s3.reset();
+
+	BOOST_CHECK(l3AD.getFromVertex() == NULL);
+
+}
 
 BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 {
