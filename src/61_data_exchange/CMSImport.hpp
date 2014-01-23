@@ -48,7 +48,7 @@ namespace synthese
 		/// CMS Import
 		///
 		/// This feature import a given directory on the disk where SYNTHESE runs
-		/// in an existing CMS site of CMS page. In all cases DIRECTORY must
+		/// in an existing CMS site or CMS page. In all cases DIRECTORY must
 		/// be provided and one of:
 		///		- PARENT_ID : creation of a child of an other page after the last sibling if a child page already exists
 		///		- SITE_ID : creation of a page at the last position of a web site

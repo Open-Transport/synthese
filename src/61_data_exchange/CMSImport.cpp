@@ -163,6 +163,7 @@ namespace synthese
 		ParametersMap CMSImport::Importer_::getParametersMap() const
 		{
 			ParametersMap map;
+			map.insert(PARAMETER_DIRECTORY, _directory);
 			if(_parent.get())
 			{
 				map.insert(PARAMETER_PARENT_ID, _parent->getKey());
