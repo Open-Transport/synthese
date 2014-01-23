@@ -347,7 +347,8 @@ namespace synthese
                         contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
                         contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
 
-						LoginToken token(LoginToken(lexical_cast<string>(resa.getCustomer()->getLogin()),lexical_cast<string>(resa.getCustomer()->getPasswordHash()),resa.getKey()));
+						boost::shared_ptr<const User> customer = UserTableSync::getUserFromLogin(resa.getCustomer()->getLogin());
+						LoginToken token(LoginToken(customer->getLogin(),customer->getPasswordHash(),resa.getKey()));
 	                    contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
 
                     }
@@ -410,7 +411,7 @@ namespace synthese
 
 				email.addRecipient(resas.front().getCustomerEMail(), resas.front().getCustomerName());
 
-				boost::shared_ptr<const User> customer = UserTableSync::Get(resas.front().getCustomerUserId(), Env::GetOfficialEnv());
+				boost::shared_ptr<const User> customer = UserTableSync::getUserFromLogin(resas.front().getCustomer()->getLogin());
 
 				stringstream content;
 				ParametersMap contentMap;
@@ -442,7 +443,7 @@ namespace synthese
 							servicesNumber++;
 					}
 
-					LoginToken token(LoginToken(lexical_cast<string>(customer->getLogin()),lexical_cast<string>(customer->getPasswordHash()),resa.getKey()));
+					LoginToken token(LoginToken(customer->getLogin(),customer->getPasswordHash(),resa.getKey()));
 
 					resaTransactionMap->insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
 					resaTransactionMap->insert(DATA_KEY_RESA, lexical_cast<string>(resa.getKey()));
