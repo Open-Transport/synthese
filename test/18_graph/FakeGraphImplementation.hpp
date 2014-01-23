@@ -142,7 +142,7 @@ namespace synthese
 			virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData,std::size_t rankInPath) const {return boost::posix_time::minutes(0);}
 			virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool RTData,std::size_t rankInPath) const {return boost::posix_time::minutes(0);}
 			virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData,std::size_t rankInPath) const {return boost::posix_time::minutes(0);}
-			virtual ServicePointer getFromPresenceTime(const synthese::graph::AccessParameters&, bool THData, bool RTData,bool getDeparture, const Edge& edge, const boost::posix_time::ptime& presenceDateTime, bool controlIfTheServiceIsReachable, bool inverted, bool ignoreReservation, bool allowCanceled, int reservationRulesDelayType = 0) const {return ServicePointer();}
+			virtual ServicePointer getFromPresenceTime(const synthese::graph::AccessParameters&, bool THData, bool RTData,bool getDeparture, const Edge& edge, const boost::posix_time::ptime& presenceDateTime, bool controlIfTheServiceIsReachable, bool inverted, bool ignoreReservation, bool allowCanceled, graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY) const {return ServicePointer();}
 			virtual void completeServicePointer(synthese::graph::ServicePointer &,const synthese::graph::Edge &,const synthese::graph::AccessParameters &) const {}
 			virtual boost::posix_time::ptime getLeaveTime(const ServicePointer& servicePointer, const Edge* edge) const { return boost::posix_time::not_a_date_time; }
 			virtual boost::posix_time::time_duration getDepartureSchedule(bool RTData,size_t rank) const {return boost::posix_time::minutes(0); }
