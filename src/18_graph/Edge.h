@@ -301,7 +301,7 @@ namespace synthese
 					bool allowCanceledService = false,
 					bool enableTheoretical = true,
 					bool enableRealTime = true,
-					int reservationRulesDelayType = 0
+					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
 				) const;
 
 
@@ -329,7 +329,7 @@ namespace synthese
 					bool allowCanceledService = false,
 					bool enableTheoretical = true,
 					bool enableRealTime = true,
-					int reservationRulesDelayType = 0
+					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
 				) const;
 			//@}
 

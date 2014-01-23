@@ -71,7 +71,7 @@ namespace synthese
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0

@@ -218,13 +218,15 @@ namespace synthese
 				*/
 				UseRule::RunPossibilityType isUseRuleCompliant(
 					bool ignoreReservation,
-					int reservationRulesDelayType = 0
+					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
 				);
 
 
 				//////////////////////////////////////////////////////////////////////////
 				/// @pre departure informations must be set
-				boost::posix_time::ptime			getReservationDeadLine()	const;
+				boost::posix_time::ptime getReservationDeadLine(
+					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
+				) const;
 
 
 				//////////////////////////////////////////////////////////////////////////

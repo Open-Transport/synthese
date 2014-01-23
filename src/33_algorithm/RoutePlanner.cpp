@@ -72,7 +72,7 @@ namespace synthese
 			const optional<time_duration>	maxTransferDuration,
 			bool enableTheoretical,
 			bool enableRealTime,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_planningOrder(planningOrder),
@@ -89,13 +89,13 @@ namespace synthese
 			_maxTransferDuration(maxTransferDuration),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
+			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
 			_totalDistance(
 				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
 				int(destinationVam.getCentroid()->distance(originVam.getCentroid().get())) :
 				numeric_limits<int>::max()
-			),
-			_reservationRulesDelayType(reservationRulesDelayType)
+			)
 		{
 		}
 

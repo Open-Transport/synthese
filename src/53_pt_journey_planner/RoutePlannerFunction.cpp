@@ -798,7 +798,14 @@ namespace synthese
 			_ignoreReservationRules = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
 
 			// Reservation Rules Delay type
-			_reservationRulesDelayType = map.getDefault<int>(PARAMETER_RESERVATION_DELAY_TYPE, 0);
+			if(map.getDefault<int>(PARAMETER_RESERVATION_DELAY_TYPE, 0))
+			{
+				_reservationRulesDelayType = UseRule::RESERVATION_EXTERNAL_DELAY;
+			}
+			else
+			{
+				_reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY;
+			}
 
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
@@ -1473,7 +1480,7 @@ namespace synthese
 					stream << " " << DATA_DISTANCE << "=\"" << totalDistance << "\"";
 					stream << ">";
 
-					if(journey.getReservationCompliance(false) != false)
+					if(journey.getReservationCompliance(false, _reservationRulesDelayType) != false)
 					{
 						set<const ReservationContact*> resaRules;
 						BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
@@ -1482,7 +1489,7 @@ namespace synthese
 							if(line == NULL) continue;
 
 							if(	line->getCommercialLine()->getReservationContact() &&
-								UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false))
+								UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false, _reservationRulesDelayType))
 							){
 								resaRules.insert(line->getCommercialLine()->getReservationContact());
 							}
@@ -1502,7 +1509,7 @@ namespace synthese
 
 						stream << "<reservation" <<
 							" online=\"" << (onlineBooking ? "true" : "false") << "\"" <<
-							" type=\"" << (journey.getReservationCompliance(false) == true ? "compulsory" : "optional") << "\""
+							" type=\"" << (journey.getReservationCompliance(false, _reservationRulesDelayType) == true ? "compulsory" : "optional") << "\""
 						;
 						if(!sOpeningHours.str().empty())
 						{
@@ -1512,7 +1519,7 @@ namespace synthese
 						{
 							stream << " phoneNumber=\"" << sPhones.str() << "\"";
 						}
-						stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine()) << "\" />";
+						stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine(_reservationRulesDelayType)) << "\" />";
 					}
 					stream << "<chunks>";
 
@@ -2675,7 +2682,7 @@ namespace synthese
 				}
 
 				// Register the reservation availability
-				hasReservation |= bool(journey.getReservationCompliance(false) != false);
+				hasReservation |= bool(journey.getReservationCompliance(false, _reservationRulesDelayType) != false);
 			}
 			pm.insert(DATA_RESERVATIONS, reservations.str());
 			pm.insert(DATA_HAS_RESERVATION, hasReservation);
@@ -2961,7 +2968,7 @@ namespace synthese
 			pm.insert(DATA_ROW_NUMBER, rowNumber);
 
 			// Register the reservation availability
-			bool hasReservation = bool(journey.getReservationCompliance(false) != false);
+			bool hasReservation = bool(journey.getReservationCompliance(false, _reservationRulesDelayType) != false);
 			pm.insert(DATA_HAS_RESERVATION, hasReservation);
 
 			// Insert HOURS and MINUTES duration
@@ -3338,23 +3345,23 @@ namespace synthese
 
 			// Reservation
 			ptime now(second_clock::local_time());
-			ptime resaDeadLine(journey.getReservationDeadLine());
-			logic::tribool resaCompliance(journey.getReservationCompliance(false));
+			ptime resaDeadLine(journey.getReservationDeadLine(_reservationRulesDelayType));
+			logic::tribool resaCompliance(journey.getReservationCompliance(false, _reservationRulesDelayType));
 			pm.insert(DATA_RESERVATION_AVAILABLE, resaCompliance && resaDeadLine > now);
 			pm.insert(DATA_RESERVATION_COMPULSORY, resaCompliance == true);
 			pm.insert(DATA_RESERVATION_DELAY, resaDeadLine.is_not_a_date_time() ? 0 : (resaDeadLine - now).total_seconds() / 60);
 
-			if(!journey.getReservationDeadLine().is_not_a_date_time())
+			if(!journey.getReservationDeadLine(_reservationRulesDelayType).is_not_a_date_time())
 			{
 				if(_dateTimePage.get())
 				{
 					stringstream sResa;
-					DateTimeInterfacePage::Display(sResa, _dateTimePage, request, journey.getReservationDeadLine());
+					DateTimeInterfacePage::Display(sResa, _dateTimePage, request, journey.getReservationDeadLine(_reservationRulesDelayType));
 					pm.insert(DATA_RESERVATION_DEADLINE, sResa.str());
 				}
 				else
 				{
-					pm.insert(DATA_RESERVATION_DEADLINE, journey.getReservationDeadLine());
+					pm.insert(DATA_RESERVATION_DEADLINE, journey.getReservationDeadLine(_reservationRulesDelayType));
 				}
 			}
 
@@ -3366,7 +3373,7 @@ namespace synthese
 				if(line == NULL) continue;
 
 				if(	line->getCommercialLine()->getReservationContact() &&
-					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false))
+					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false, _reservationRulesDelayType))
 				){
 					resaRules.insert(line->getCommercialLine()->getReservationContact());
 				}

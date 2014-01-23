@@ -90,7 +90,7 @@ namespace synthese
 				bool										_ignoreReservation;
 				bool										_enableTheoretical;
 				bool										_enableRealTime;
-				int											_reservationRulesDelayType;
+				graph::UseRule::ReservationDelayType		_reservationRulesDelayType;
 			//@}
 
 			//! @name Route planning data
@@ -176,7 +176,7 @@ namespace synthese
 				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>(),
 				bool 												enableTheoretical = true,
 				bool												enableRealTime = true,
-				int													reservationRulesDelayType = 0
+				graph::UseRule::ReservationDelayType				reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
 

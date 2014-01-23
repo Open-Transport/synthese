@@ -72,7 +72,7 @@ namespace synthese
 				boost::optional<double> _minMaxDurationRatioFilter;
 				bool								_enableTheoretical;
 				bool								_enableRealTime;
-				int									_reservationRulesDelayType;
+				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
 			
 			//@}
 
@@ -112,7 +112,7 @@ namespace synthese
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true,
-				int reservationRulesDelayType = 0
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
 
@@ -144,7 +144,7 @@ namespace synthese
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true,
-				int	reservationRulesDelayType = 0
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
 			//! @name Getters

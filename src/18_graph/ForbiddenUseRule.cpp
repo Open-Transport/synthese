@@ -25,7 +25,7 @@ namespace synthese
 		ptime ForbiddenUseRule::getReservationDeadLine(
 			const ptime& originTime,
 			const ptime& departureTime,
-			const ReservationDelayType& reservationRuleDelayType
+			const ReservationDelayType reservationRulesDelayType
 		) const {
 			return ptime(neg_infin);
 		}
@@ -45,7 +45,7 @@ namespace synthese
 		UseRule::RunPossibilityType ForbiddenUseRule::isRunPossible(
 			const ServicePointer& servicePointer,
 			bool ignoreReservation,
-			int reservationRulesDelayType
+			ReservationDelayType reservationRulesDelayType
 		) const	{
 			return RUN_NOT_POSSIBLE;
 		}
@@ -55,7 +55,7 @@ namespace synthese
 		UseRule::ReservationAvailabilityType ForbiddenUseRule::getReservationAvailability(
 			const ServicePointer& servicePointer,
 			bool ignoreReservationDeadline,
-			int reservationRulesDelayType
+			ReservationDelayType reservationRulesDelayType
 		) const	{
 			return RESERVATION_FORBIDDEN;
 		}

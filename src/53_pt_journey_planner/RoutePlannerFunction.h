@@ -362,7 +362,7 @@ namespace synthese
 				bool _showResTab;
 				bool _showCoords;
 				bool _ignoreReservationRules;
-				int _reservationRulesDelayType;
+				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
 				const CoordinatesSystem* _coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
@@ -438,6 +438,7 @@ namespace synthese
 				void setDestinationCityText(const std::string& value){ _destinationCityText = value; }
 				void setDestinationPlaceText(const std::string& value){ _destinationPlaceText = value; }
 				void setCoordinatesSystem(const CoordinatesSystem* coordinatesSystem ){ _coordinatesSystem = coordinatesSystem; }
+				void setReservationRulesDelayType(const graph::UseRule::ReservationDelayType reservationRulesDelayType ){ _reservationRulesDelayType = reservationRulesDelayType; }
 			//@}
 
 			/// @name Modifiers
