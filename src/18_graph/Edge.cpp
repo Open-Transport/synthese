@@ -167,7 +167,7 @@ namespace synthese
 			bool allowCanceled,
 			bool enableTheoretical,
 			bool enableRealTime,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		) const	{
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 						*getParentPath()->sharedServicesMutex
@@ -259,7 +259,7 @@ namespace synthese
 			bool allowCanceled,
 			bool enableTheoretical,
 			bool enableRealTime,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		) const {
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 						*getParentPath()->sharedServicesMutex

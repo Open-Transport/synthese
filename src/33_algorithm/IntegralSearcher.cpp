@@ -87,7 +87,7 @@ namespace synthese
 			boost::optional<const JourneyTemplates&> journeyTemplates,
 			bool enableTheoretical,
 			bool enableRealTime,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	_accessParameters(accessParameters),
 			_accessDirection(accessDirection),
 			_whatToSearch(whatToSearch),
@@ -106,10 +106,10 @@ namespace synthese
 			_ignoreReservation(ignoreReservation),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
+			_reservationRulesDelayType(reservationRulesDelayType),
 			_destinationVam(destinationVam),
 			_totalDistance(totalDistance),
-			_journeyTemplates(journeyTemplates),
-			_reservationRulesDelayType(reservationRulesDelayType)
+			_journeyTemplates(journeyTemplates)
 		{}
 
 

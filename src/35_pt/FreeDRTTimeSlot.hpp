@@ -168,7 +168,7 @@ namespace synthese
 					bool inverted,
 					bool ignoreReservation,
 					bool allowCanceled,
-					int reservationRulesDelayType = 0
+					graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 				) const;
 
 				//////////////////////////////////////////////////////////////////////////

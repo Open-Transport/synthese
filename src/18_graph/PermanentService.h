@@ -92,7 +92,7 @@ namespace synthese
 				bool inverted,
 				bool ingoreReservation,
 				bool allowCanceled,
-				int reservationRulesDelayType = 0 
+				UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
 			) const;
 
 			virtual void completeServicePointer(
