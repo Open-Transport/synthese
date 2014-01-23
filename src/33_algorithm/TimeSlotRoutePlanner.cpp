@@ -61,7 +61,7 @@ namespace synthese
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(lowerDepartureTime),
@@ -80,9 +80,9 @@ namespace synthese
 			_minMaxDurationRatioFilter(minMaxDurationRatioFilter),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
+			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
-			_journeyTemplates(graphToUse),
-			_reservationRulesDelayType(reservationRulesDelayType)
+			_journeyTemplates(graphToUse)
 		{}
 
 
@@ -104,7 +104,7 @@ namespace synthese
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(continuousService.getFirstDepartureTime()),
@@ -128,9 +128,9 @@ namespace synthese
 			_minMaxDurationRatioFilter(minMaxDurationRatioFilter),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
+			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
-			_journeyTemplates(graphToUse),
-			_reservationRulesDelayType(reservationRulesDelayType)
+			_journeyTemplates(graphToUse)
 		{}
 
 

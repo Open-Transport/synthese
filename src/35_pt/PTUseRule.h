@@ -220,7 +220,7 @@ namespace synthese
 				virtual boost::posix_time::ptime getReservationDeadLine (
 					const boost::posix_time::ptime& originTime,
 					const boost::posix_time::ptime& departureTime,
-					const ReservationDelayType& reservationRuleDelayType = RESERVATION_INTERNAL_DELAY
+					const ReservationDelayType reservationRulesDelayType = RESERVATION_INTERNAL_DELAY
 				) const;
 
 
@@ -249,7 +249,7 @@ namespace synthese
 				virtual RunPossibilityType isRunPossible (
 					const graph::ServicePointer& servicePointer,
 					bool ignoreReservation,
-					int reservationRulesDelayType = 0
+					ReservationDelayType reservationRulesDelayType = RESERVATION_INTERNAL_DELAY
 				) const;
 
 
@@ -274,7 +274,7 @@ namespace synthese
 				virtual ReservationAvailabilityType getReservationAvailability(
 					const graph::ServicePointer& servicePointer,
 					bool ignoreReservationDeadline,
-					int reservationRulesDelayType = 0
+					ReservationDelayType reservationRulesDelayType = RESERVATION_INTERNAL_DELAY
 				) const;
 
 

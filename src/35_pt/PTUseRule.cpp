@@ -97,7 +97,7 @@ namespace synthese
 		ptime PTUseRule::getReservationDeadLine (
 			const ptime& originDateTime,
 			const ptime& departureTime,
-			const ReservationDelayType& reservationRuleDelayType
+			const ReservationDelayType reservationRulesDelayType
 		) const {
 
 			const ptime& referenceTime(
@@ -110,11 +110,11 @@ namespace synthese
 			ptime minutesMoment(referenceTime);
 			time_duration minDelayMinutes(minutes(0));
 
-			if (reservationRuleDelayType == RESERVATION_INTERNAL_DELAY)
+			if (reservationRulesDelayType == RESERVATION_INTERNAL_DELAY)
 			{
 				minDelayMinutes = _minDelayMinutes;
 			}
-			else if (reservationRuleDelayType == RESERVATION_EXTERNAL_DELAY)
+			else if (reservationRulesDelayType == RESERVATION_EXTERNAL_DELAY)
 			{
 				minDelayMinutes = _minDelayMinutesExternal;
 			}
@@ -177,7 +177,7 @@ namespace synthese
 		UseRule::RunPossibilityType PTUseRule::isRunPossible(
 			const graph::ServicePointer& servicePointer,
 			bool ignoreReservation,
-			int reservationRulesDelayType
+			ReservationDelayType reservationRulesDelayType
 		) const {
 
 			if(_accessCapacity && *_accessCapacity == 0)
@@ -238,17 +238,11 @@ namespace synthese
 		UseRule::ReservationAvailabilityType PTUseRule::getReservationAvailability(
 			const ServicePointer& servicePointer,
 			bool ignoreReservationDeadline,
-			int reservationRulesDelayType
+			ReservationDelayType reservationRulesDelayType
 		) const	{
 			if(!servicePointer.getDepartureEdge() && !servicePointer.getArrivalEdge())
 			{
 				return RESERVATION_FORBIDDEN;
-			}
-
-			ReservationDelayType reservationDelayType = RESERVATION_INTERNAL_DELAY;
-			if (reservationRulesDelayType == 1)
-			{
-				reservationDelayType = RESERVATION_EXTERNAL_DELAY;
 			}
 
 			switch(_reservationType)
@@ -270,7 +264,7 @@ namespace synthese
 					if(	servicePointer.getDepartureEdge())
 					{
 						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getDepartureDateTime(), reservationDelayType)
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_OPTIONAL_TOO_LATE;
 						}
@@ -279,12 +273,12 @@ namespace synthese
 					else
 					{
 						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getArrivalDateTime(), reservationDelayType)
+												servicePointer.getArrivalDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_OPTIONAL_TOO_LATE;
 						}
 						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getOriginDateTime(), reservationDelayType)
+												servicePointer.getOriginDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_OPTIONAL_POSSIBLE;
 						}
@@ -309,7 +303,7 @@ namespace synthese
 							return RESERVATION_OPTIONAL_TOO_EARLY;
 						}
 						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getDepartureDateTime(), reservationDelayType)
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_OPTIONAL_TOO_LATE;
 						}
@@ -320,7 +314,7 @@ namespace synthese
 							return RESERVATION_COMPULSORY_TOO_EARLY;
 						}
 						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getDepartureDateTime(), reservationDelayType)
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
 						}
@@ -345,7 +339,7 @@ namespace synthese
 					if(servicePointer.getDepartureEdge())
 					{
 						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getDepartureDateTime(), reservationDelayType)
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
 						}
@@ -354,12 +348,12 @@ namespace synthese
 					else
 					{
 						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getArrivalDateTime(), reservationDelayType)
+												servicePointer.getArrivalDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
 						}
 						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(),
-												servicePointer.getOriginDateTime(), reservationDelayType)
+												servicePointer.getOriginDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_POSSIBLE;
 						}

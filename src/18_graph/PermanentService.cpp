@@ -50,7 +50,7 @@ namespace synthese
 			bool inverted,
 			bool ignoreReservation,
 			bool canceled,
-			int reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType
 		) const	{
 
 			// Access parameters check

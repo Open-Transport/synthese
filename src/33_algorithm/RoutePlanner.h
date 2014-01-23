@@ -111,7 +111,7 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration>	_maxTransferDuration;
 				bool _enableTheoretical;
 				bool _enableRealTime;
-				int _reservationRulesDelayType;
+				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
 			//@}
 
 			//! @name Logging
@@ -169,7 +169,7 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true,
-				int reservationRulesDelayType = 0
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
 
