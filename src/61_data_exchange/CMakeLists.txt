@@ -3,8 +3,10 @@ set_source_groups()
 set(data_exchange_SRCS
   CalendarFileFormat.cpp
   CalendarFileFormat.hpp
-  CalendarOGTFileFormat.cpp
-  CalendarOGTFileFormat.hpp
+  CMSImport.cpp
+  CMSImport.hpp
+  CMSExport.cpp
+  CMSExport.hpp
   DataExchangeModule.cpp
   DataExchangeModule.gen.cpp
   DataExchangeModule.inc.cpp
@@ -12,10 +14,8 @@ set(data_exchange_SRCS
   DataExchangeModuleRegister.cpp
   GTFSFileFormat.cpp
   GTFSFileFormat.hpp
-  GpsFileFormat.cpp
-  GpsFileFormat.h
-  GpsDevicePoller.cpp
-  GpsDevicePoller.hpp
+  GPSdFileFormat.cpp
+  GPSdFileFormat.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
   HastusCSVFileFormat.cpp
@@ -76,8 +76,6 @@ set(data_exchange_SRCS
   StopsShapeFileFormat.hpp
   TridentFileFormat.cpp
   TridentFileFormat.h
-  ValidatorVIXv6000DevicePoller.cpp
-  ValidatorVIXv6000DevicePoller.hpp
   VDVSubscriptionService.cpp
   VDVSubscriptionService.hpp
   VDVClient.cpp
@@ -104,6 +102,8 @@ set(data_exchange_SRCS
   VDVServerTableSync.hpp
   VDVStatusService.cpp
   VDVStatusService.hpp
+  VixV6000FileFormat.cpp
+  VixV6000FileFormat.hpp
   vix/VIX-BSC-defines.hpp
   vix/VIX-CIntSurvMsg.cpp
   vix/VIX-CIntSurvMsg.hpp
@@ -144,3 +144,6 @@ target_link_libraries(61_data_exchange
 )
 
 install(TARGETS 61_data_exchange DESTINATION lib)
+
+add_subdirectory(testapps/ValidateurTestApp)
+
