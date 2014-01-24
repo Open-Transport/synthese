@@ -107,6 +107,17 @@ namespace synthese
 					continue;
 				}
 
+				// Special case, if this is a directory and there is a file without
+				// the .dir extension then its a page with content and is already
+				// handled in the page load
+				if( is_directory(*dir))
+				{
+					if(extension(*dir) == ".dir" && exists( change_extension(*dir, "")) )
+					{
+						continue;
+					}
+				}
+
 				Webpage *page = new Webpage(WebPageTableSync::getId());
 				_env.getEditableRegistry<Webpage>().add(boost::shared_ptr<Webpage>(page));
 				_pages.push_back(page);
@@ -146,6 +157,14 @@ namespace synthese
 								std::istreambuf_iterator<char>());
 					WebpageContent c(content, false, mimeType, true);
 					page->set<WebpageContent>(c);
+
+					// Special case, if there is a file with .dir extension
+					// then this page is its parent
+					if(exists(fullPath + ".dir"))
+					{
+						_logLoad("Creation of root page: " + pageName);
+						_importDir(directoryPath, page, path(fullPath + ".dir"));
+					}
 				}
 			}
 		}
