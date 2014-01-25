@@ -80,6 +80,7 @@ namespace synthese
 	{
 		class Depot;
 		class DeadRun;
+		class OperationUnit;
 		class VehicleService;
 	}
 
@@ -119,6 +120,7 @@ namespace synthese
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_DAY7_CALENDAR_ID;
 				static const std::string PARAMETER_STOPS_DATASOURCE_ID;
+				static const std::string PARAMETER_OPERATION_UNIT_ID;
 
 			private:
 
@@ -126,6 +128,7 @@ namespace synthese
 				boost::shared_ptr<pt::TransportNetwork> _network;
 				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
 				boost::shared_ptr<const impex::DataSource> _stopsDataSource;
+				boost::optional<pt_operation::OperationUnit&> _operationUnit;
 
 				mutable ImportableStopPoints _linkedStopPoints;
 				mutable ImportableStopPoints _nonLinkedStopPoints;

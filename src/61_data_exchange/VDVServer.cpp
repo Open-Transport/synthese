@@ -545,7 +545,9 @@ namespace synthese
 							JourneyPattern* route(static_cast<JourneyPattern*>(service->getPath()));
 							for (size_t cptRank(0);cptRank<route->getScheduledStopsNumber();cptRank++)
 							{
-								const StopArea* lineStopArea = dynamic_cast<const StopArea*>(route->getLineStop(cptRank, true)->getHub());
+								const StopArea* lineStopArea(
+									dynamic_cast<const StopPoint*>(&*route->getLineStop(cptRank, true)->get<LineNode>())->getConnectionPlace()
+								);
 								if (lineStopArea &&
 									lineStopArea->getKey() == currentSubscription->get<StopArea>()->getKey())
 								{

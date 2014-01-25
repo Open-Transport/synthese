@@ -1,6 +1,6 @@
 
-/** AreaGeneratedLineStop class header.
-	@file AreaGeneratedLineStop.hpp
+/** ChronologicalServicesCollection class header.
+	@file ChronologicalServicesCollection.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,40 +20,43 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_pt_AreaGeneratedLineStop_hpp__
-#define SYNTHESE_pt_AreaGeneratedLineStop_hpp__
+#ifndef SYNTHESE_graph_ChronologicalServicesCollection_hpp__
+#define SYNTHESE_graph_ChronologicalServicesCollection_hpp__
 
-#include "LinePhysicalStop.hpp"
+#include <set>
 
 namespace synthese
 {
-	namespace pt
+	namespace graph
 	{
-		class StopPoint;
-		class JourneyPattern;
+		class Service;
 
-		/** AreaGeneratedLineStop class.
-			@ingroup m35
+		struct cmpService
+		{
+		    bool operator() (const Service* s1, const Service* s2) const;
+		};
+
+		typedef std::set<Service*, cmpService> ServiceSet;
+
+		/** ChronologicalServicesCollection class.
+			@ingroup m18
 		*/
-		class AreaGeneratedLineStop:
-			public LinePhysicalStop
+		class ChronologicalServicesCollection
 		{
 		private:
-			bool _isDeparture;
-			bool _isArrival;
+			ServiceSet _services;
 
 		public:
-			AreaGeneratedLineStop(
-				LineStop& lineStop,
-				StopPoint& stop,
-				bool isDeparture,
-				bool isArrival
-			);
-			virtual ~AreaGeneratedLineStop();
+			ChronologicalServicesCollection();
 
-			virtual bool isDepartureAllowed() const;
-			virtual bool isArrivalAllowed() const;
+			ServiceSet&	getServices() { return _services; }
+			const ServiceSet& getServices() const { return _services; }
+
+			bool isCompatible(
+				const graph::Service& service
+			) const;
 		};
-}	}
+	}
+}
 
-#endif // SYNTHESE_pt_AreaGeneratedLineStop_hpp__
+#endif // SYNTHESE_graph_ChronologicalServicesCollection_hpp__

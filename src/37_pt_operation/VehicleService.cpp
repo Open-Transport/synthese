@@ -22,6 +22,7 @@
 
 #include "VehicleService.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 #include "NumericField.hpp"
 #include "OperationUnitTableSync.hpp"
@@ -124,13 +125,46 @@ namespace synthese
 			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
 			std::string prefix /*= std::string() */
 		) const	{
+
+			// Id
 			map.insert(Key::FIELD.name, getKey());
-			map.insert(Name::FIELD.name, getName());
-			map.insert(OperationUnit::FIELD.name, getOperationUnit() ? getOperationUnit()->getKey() : 0);
+			
+			// Name		
+			map.insert(VehicleServiceTableSync::COL_NAME, getName());
 
 			// Services
+			map.insert(
+				VehicleServiceTableSync::COL_SERVICES,
+				VehicleServiceTableSync::SerializeServices(getServices())
+			);
+			
+			// Source links
+			map.insert(
+				VehicleServiceTableSync::COL_DATASOURCE_LINKS,
+				impex::DataSourceLinks::Serialize(
+					getDataSourceLinks()
+			)	);
+
+			// Dates
+			stringstream datesStr;
+			serialize(datesStr);
+			map.insert(
+				VehicleServiceTableSync::COL_DATES,
+				datesStr.str()
+			);
+
+			// Unit
+			map.insert(
+				VehicleServiceTableSync::COL_OPERATION_UNIT_ID,
+				(	getOperationUnit() ?
+					getOperationUnit()->getKey() :
+					0
+			)	);
+
+			// Additional items
 			if(withAdditionalParameters)
 			{
+				// Services detail
 				BOOST_FOREACH(const Services::value_type& service, _services)
 				{
 					boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
@@ -241,9 +275,18 @@ namespace synthese
 
 
 
+		void VehicleService::unlink()
+		{
+
+		}
+
+
+
 		synthese::LinkedObjectsIds VehicleService::getLinkedObjectsIds( const Record& record ) const
 		{
 			LinkedObjectsIds result;
+
+			// Source links
 			if(record.isDefined(VehicleServiceTableSync::COL_DATASOURCE_LINKS))
 			{
 				Env env;
@@ -257,12 +300,24 @@ namespace synthese
 					result.push_back(item.first->getKey());
 				}
 			}
+
+			// Services
+			// TODO
+
+			// Operation unit
 			RegistryKeyType unitId(record.getDefault<RegistryKeyType>(OperationUnit::FIELD.name, 0));
 			if(unitId)
 			{
 				result.push_back(unitId);
 			}
 			return result;
+		}
+
+
+
+		VehicleService::~VehicleService()
+		{
+			unlink();
 		}
 
 

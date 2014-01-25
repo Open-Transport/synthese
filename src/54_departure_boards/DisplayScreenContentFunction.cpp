@@ -36,7 +36,7 @@
 #include "StopAreaTableSync.hpp"
 #include "Interface.h"
 #include "Env.h"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "PTModule.h"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
@@ -1368,124 +1368,128 @@ namespace synthese
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
 						// Jump over junctions
-						if(!dynamic_cast<const LineStop*>(edge.second))
+						if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
 						{
 							continue;
 						}
 
-						const LineStop* ls = static_cast<const LineStop*>(edge.second);
+						const LinePhysicalStop* ls = static_cast<const LinePhysicalStop*>(edge.second);
 
-						const UseRule& useRule(ls->getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+						const UseRule& useRule(ls->getParentPath()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
 						if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
 						{
 							continue;
 						}
 
-						ptime departureDateTime = startDateTime;
-						optional<Edge::DepartureServiceIndex::Value> index;
-
-						while(true)
+						BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls->getParentPath()->getServiceCollections())
 						{
-							ServicePointer servicePointer(
-								ls->getNextService(
-									ap,
-									departureDateTime,
-									endDateTime,
-									false,
-									index,
-									false,
-									false,
-									false,
-									PTModule::isTheoreticalAllowed(),
-									PTModule::isRealTimeAllowed()
-								)
-							);
+							ptime departureDateTime = startDateTime;
+							optional<Edge::DepartureServiceIndex::Value> index;
 
-							if (!servicePointer.getService())
-								break;
-
-							++*index;
-
-							departureDateTime = servicePointer.getDepartureDateTime();
-							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
-								continue;
-
-							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-							const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
-							const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
-
-							if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
+							while(true)
 							{
-								bool displayDeparture(false);
-								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
-								RangeIt range = _lineDestinationFilter.equal_range(stop);
+								ServicePointer servicePointer(
+									ls->getNextService(
+										*itCollection,
+										ap,
+										departureDateTime,
+										endDateTime,
+										false,
+										index,
+										false,
+										false,
+										false,
+										PTModule::isTheoreticalAllowed(),
+										PTModule::isRealTimeAllowed()
+									)
+								);
 
-								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+								if (!servicePointer.getService())
+									break;
+
+								++*index;
+
+								departureDateTime = servicePointer.getDepartureDateTime();
+								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+									continue;
+
+								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+								const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
+								const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
+
+								if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
 								{
-									bool goodLine(!it->second.first || (it->second.first == commercialLine));
-									bool goodDest(!it->second.second || (it->second.second == destination));
-									displayDeparture = goodLine && goodDest;
+									bool displayDeparture(false);
+									typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+									RangeIt range = _lineDestinationFilter.equal_range(stop);
 
-									if(displayDeparture)
-										break;
+									for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
+									{
+										bool goodLine(!it->second.first || (it->second.first == commercialLine));
+										bool goodDest(!it->second.second || (it->second.second == destination));
+										displayDeparture = goodLine && goodDest;
+
+										if(displayDeparture)
+											break;
+									}
+
+									if(!displayDeparture)
+										continue;
 								}
 
-								if(!displayDeparture)
-									continue;
-							}
-
-							//If a lineid arg was passed : only one line will be displayed
-							if(_lineToDisplay)
-							{
-								if(commercialLine->getKey()!=(*_lineToDisplay))
-									continue;
-							}
-
-							// Filter by Rolling stock id
-							if(_rollingStockFilter.get())
-							{
-								// Set the boolean to true or false depending on whether filter is inclusive or exclusive
-								bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
-								set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
-								BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+								//If a lineid arg was passed : only one line will be displayed
+								if(_lineToDisplay)
 								{
-									if(commercialLine->usesTransportMode(*rollingStock))
+									if(commercialLine->getKey()!=(*_lineToDisplay))
+										continue;
+								}
+
+								// Filter by Rolling stock id
+								if(_rollingStockFilter.get())
+								{
+									// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+									bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+									set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+									BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
 									{
-										atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
-										break;
+										if(commercialLine->usesTransportMode(*rollingStock))
+										{
+											atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+											break;
+										}
+									}
+
+									// If the line doesn't respect the filter, skip it
+									if(!atLeastOneMode)
+									{
+										continue;
 									}
 								}
 
-								// If the line doesn't respect the filter, skip it
-								if(!atLeastOneMode)
+								LineDestinationKey ldKey = make_pair(commercialLine, destination);
+								bool serviceInserted(false);
+								// StopArea already in the map
+								if(serviceMap.find(area) != serviceMap.end())
 								{
-									continue;
-								}
-							}
-
-							LineDestinationKey ldKey = make_pair(commercialLine, destination);
-							bool serviceInserted(false);
-							// StopArea already in the map
-							if(serviceMap.find(area) != serviceMap.end())
-							{
-								BOOST_FOREACH(DeparturesByDestination::value_type& departureByDestination, serviceMap.find(area)->second)
-								{
-									const DeparturesByDestination::key_type& key = departureByDestination.first;
-									if(key == ldKey)
+									BOOST_FOREACH(DeparturesByDestination::value_type& departureByDestination, serviceMap.find(area)->second)
 									{
-										serviceMap[area][ldKey].second.insert(servicePointer);
-										serviceInserted = true;
-										break;
+										const DeparturesByDestination::key_type& key = departureByDestination.first;
+										if(key == ldKey)
+										{
+											serviceMap[area][ldKey].second.insert(servicePointer);
+											serviceInserted = true;
+											break;
+										}
 									}
 								}
-							}
 
-							// Destination or StopArea doesn't exist yet
-							if(!serviceInserted)
-							{
-								OrderedServices tmpSetPair;
-								tmpSetPair.second.insert(servicePointer);
-								serviceMap[area][ldKey] = tmpSetPair;
+								// Destination or StopArea doesn't exist yet
+								if(!serviceInserted)
+								{
+									OrderedServices tmpSetPair;
+									tmpSetPair.second.insert(servicePointer);
+									serviceMap[area][ldKey] = tmpSetPair;
+								}
 							}
 						}
 					}
@@ -1848,115 +1852,119 @@ namespace synthese
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
 						// Jump over junctions
-						if(!dynamic_cast<const LineStop*>(edge.second))
+						if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
 						{
 							continue;
 						}
 
-						const LineStop* ls = static_cast<const LineStop*>(edge.second);
+						const LinePhysicalStop* ls = static_cast<const LinePhysicalStop*>(edge.second);
 
-						const UseRule& useRule(ls->getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+						const UseRule& useRule(ls->getParentPath()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
 						if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
 						{
 							continue;
 						}
 
-						ptime departureDateTime = startDateTime;
-						// Loop on services
-						optional<Edge::DepartureServiceIndex::Value> index;
-						while(true)
+						BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls->getParentPath()->getServiceCollections())
 						{
-							ServicePointer servicePointer(
-								ls->getNextService(
-									ap,
-									departureDateTime,
-									endDateTime,
-									false,
-									index,
-									false,
-									false,
-									false,
-									PTModule::isTheoreticalAllowed(),
-									PTModule::isRealTimeAllowed()
-											)	);
-							if (!servicePointer.getService())
-								break;
-							++*index;
-							departureDateTime = servicePointer.getDepartureDateTime();
-							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
-								continue;
-
-							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-							const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
-
-							if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
+							ptime departureDateTime = startDateTime;
+							// Loop on services
+							optional<Edge::DepartureServiceIndex::Value> index;
+							while(true)
 							{
-								bool displayDeparture(false);
-								typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
-								RangeIt range = _lineDestinationFilter.equal_range(stop);
-
-								for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
-								{
-									bool goodLine(!it->second.first || (it->second.first == commercialLine));
-									bool goodDest(!it->second.second || (it->second.second == destination));
-									displayDeparture = goodLine && goodDest;
-
-									if(displayDeparture)
-										break;
-								}
-
-								if(!displayDeparture)
+								ServicePointer servicePointer(
+									ls->getNextService(
+										*itCollection,
+										ap,
+										departureDateTime,
+										endDateTime,
+										false,
+										index,
+										false,
+										false,
+										false,
+										PTModule::isTheoreticalAllowed(),
+										PTModule::isRealTimeAllowed()
+								)	);
+								if (!servicePointer.getService())
+									break;
+								++*index;
+								departureDateTime = servicePointer.getDepartureDateTime();
+								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 									continue;
-							}
 
-							//If a lineid arg was passed : only one line will be displayed
-							if(_lineToDisplay)
-							{
-								if(commercialLine->getKey()!=(*_lineToDisplay))
-									continue;
-							}
-
-							// Filter by Rolling stock id
-							if(_rollingStockFilter.get())
-							{
 								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
 								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-								// Set the boolean to true or false depending on whether filter is inclusive or exclusive
-								bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
-								set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
-								BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+								const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
+
+								if(_lineDestinationFilter.find(stop) != _lineDestinationFilter.end())
 								{
-									if(commercialLine->usesTransportMode(*rollingStock))
+									bool displayDeparture(false);
+									typedef pair<LineDestinationFilter::const_iterator, LineDestinationFilter::const_iterator> RangeIt;
+									RangeIt range = _lineDestinationFilter.equal_range(stop);
+
+									for(LineDestinationFilter::const_iterator it = range.first ; it != range.second ; it++)
 									{
-										atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
-										break;
+										bool goodLine(!it->second.first || (it->second.first == commercialLine));
+										bool goodDest(!it->second.second || (it->second.second == destination));
+										displayDeparture = goodLine && goodDest;
+
+										if(displayDeparture)
+											break;
+									}
+
+									if(!displayDeparture)
+										continue;
+								}
+
+								//If a lineid arg was passed : only one line will be displayed
+								if(_lineToDisplay)
+								{
+									if(commercialLine->getKey()!=(*_lineToDisplay))
+										continue;
+								}
+
+								// Filter by Rolling stock id
+								if(_rollingStockFilter.get())
+								{
+									const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+									const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+									// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+									bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+									set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+									BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+									{
+										if(commercialLine->usesTransportMode(*rollingStock))
+										{
+											atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+											break;
+										}
+									}
+
+									// If the line doesn't respect the filter, skip it
+									if(!atLeastOneMode)
+									{
+										continue;
 									}
 								}
 
-								// If the line doesn't respect the filter, skip it
-								if(!atLeastOneMode)
+								time_duration tod = departureDateTime.time_of_day();
+								int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
+								if(departureDateTime.date() > startDateTime.date())
+									mapKeyMinutes += 86400;
+
+								OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
+								//Check if a service is already inserted for this date
+								if(it == servicePointerAll.end())
 								{
-									continue;
+									vector<ServicePointer> tmpVect;
+									tmpVect.push_back(servicePointer);
+									servicePointerAll[mapKeyMinutes].second = tmpVect;
 								}
-							}
-
-							time_duration tod = departureDateTime.time_of_day();
-							int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
-							if(departureDateTime.date() > startDateTime.date())
-								mapKeyMinutes += 86400;
-
-							OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
-							//Check if a service is already inserted for this date
-							if(it == servicePointerAll.end())
-							{
-								vector<ServicePointer> tmpVect;
-								tmpVect.push_back(servicePointer);
-								servicePointerAll[mapKeyMinutes].second = tmpVect;
-							}
-							else
-							{
-								servicePointerAll[mapKeyMinutes].second.push_back(servicePointer);
+								else
+								{
+									servicePointerAll[mapKeyMinutes].second.push_back(servicePointer);
+								}
 							}
 						}
 					}

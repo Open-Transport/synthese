@@ -25,12 +25,11 @@
 #include "CommercialLineTableSync.h"
 #include "DataSourceLinksField.hpp"
 #include "DBConstants.h"
-#include "DesignatedLinePhysicalStop.hpp"
 #include "DestinationTableSync.hpp"
 #include "ImportableTableSync.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
-#include "LineArea.hpp"
+#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "Log.h"
 #include "NonPermanentService.h"
 #include "PTUseRuleTableSync.h"
@@ -76,8 +75,8 @@ namespace synthese
 			Path(),
 			_directionObj(NULL),
 			_isWalkingLine (false),
-			_wayBack(false),
 			_main(false),
+			_wayBack(false),
 			_plannedLength(0)
 		{}
 
@@ -85,8 +84,6 @@ namespace synthese
 
 		JourneyPattern::~JourneyPattern ()
 		{
-			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
-				delete *it;
 		}
 
 
@@ -165,23 +162,6 @@ namespace synthese
 
 
 
-		const StopPoint* JourneyPattern::getOrigin() const
-		{
-			if (getEdges().empty())
-				return NULL;
-			return static_cast<const StopPoint*>((*getAllEdges().begin())->getFromVertex());
-		}
-
-
-		const StopPoint* JourneyPattern::getDestination() const
-		{
-			if (getEdges().empty())
-				return NULL;
-			return static_cast<const StopPoint*>((*getAllEdges().rbegin())->getFromVertex());
-		}
-
-
-
 		void JourneyPattern::setCommercialLine(CommercialLine* commercialLine )
 		{
 			_pathGroup = commercialLine;
@@ -203,89 +183,6 @@ namespace synthese
 
 
 
-		int JourneyPattern::addSubLine( JourneyPatternCopy* line )
-		{
-			SubLines::iterator it(_subLines.insert(_subLines.end(), line));
-			return (it - _subLines.begin());
-		}
-
-
-
-		void JourneyPattern::addService(
-			Service& service,
-			bool ensureLineTheory
-		){
-			// Check if the path is consistent
-			if(	!_edges.size() ||
-				_edges.size() != (*_edges.rbegin())->getRankInPath() + 1
-			){
-				Log::GetInstance().warn("Service "+ lexical_cast<string>(service.getKey()) +" is not added to the path "+ lexical_cast<string>(getKey()) +" due to inconsistent edges.");
-				return;
-			}
-
-			/// Test of the respect of the line theory
-			/// If OK call the normal Path service insertion
-			if (!ensureLineTheory || respectsLineTheory(service))
-			{
-				Path::addService(service, ensureLineTheory);
-				return;
-			}
-
-			/// If not OK test of the respect of the line theory on each subline and add to it
-			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
-			{
-				if ((*it)->addServiceIfCompatible(service))
-				{
-					return;
-				}
-			}
-
-			// If no subline can handle the service, create one for it
-			JourneyPatternCopy* subline(new JourneyPatternCopy(*this));
-			bool isok(subline->addServiceIfCompatible(service));
-
-			assert(isok);
-		}
-
-
-
-		bool JourneyPattern::respectsLineTheory(
-			const Service& service
-		) const {
-			ServiceSet::const_iterator last_it;
-			ServiceSet::const_iterator it;
-			for(it = _services.begin();
-				it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(false, 0) < service.getDepartureEndScheduleToIndex(false, 0);
-				last_it = it++);
-
-			// Same departure time is forbidden
-			if (it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(false, 0) == service.getDepartureEndScheduleToIndex(false, 0))
-			{
-				return false;
-			}
-
-			// Check of the next service if existing
-			if (it != _services.end() && !(*it)->respectsLineTheoryWith(service))
-			{
-				return false;
-			}
-
-			// Check of the previous service if existing
-			if (it != _services.begin() && !(*last_it)->respectsLineTheoryWith(service))
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-		const JourneyPattern::SubLines JourneyPattern::getSubLines() const
-		{
-			return _subLines;
-		}
-
-
-
 		bool JourneyPattern::operator==(const std::vector<StopPoint*>& stops) const
 		{
 			if(getEdges().size() != stops.size()) return false;
@@ -293,7 +190,7 @@ namespace synthese
 			size_t rank(0);
 			BOOST_FOREACH(const Edge* edge, getEdges())
 			{
-				if(static_cast<const LineStop*>(edge)->getFromVertex() != stops[rank]) return false;
+				if(static_cast<const LinePhysicalStop*>(edge)->getFromVertex() != stops[rank]) return false;
 				++rank;
 			}
 
@@ -315,9 +212,9 @@ namespace synthese
 			{
 				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
 				if( stop._stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop._stop.end() ||
-					(((rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure)) || edge->isArrival() != stop._arrival)) ||
-					((stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) &&
-					  *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())) ||
+					(rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure || edge->isArrival() != stop._arrival)) ||
+					((stop._withTimes && dynamic_cast<const LinePhysicalStop*>(edge) &&
+					  *stop._withTimes != static_cast<const LinePhysicalStop*>(edge)->getScheduleInput())) ||
 					(stop._metricOffset && stop._metricOffset != edge->getMetricOffset())
 				){
 					return false;
@@ -332,24 +229,32 @@ namespace synthese
 
 		bool JourneyPattern::operator==( const JourneyPattern& other ) const
 		{
-			if(getEdges().size() != other.getEdges().size())
+			if(_lineStops.size() != other._lineStops.size())
 			{
 				return false;
 			}
-
-			size_t rank(0);
-			BOOST_FOREACH(const Edge* edge, getEdges())
+			if(_lineStops.empty())
 			{
-				const Edge& otherEdge(*other.getEdge(rank));
-				if( edge->getFromVertex() != otherEdge.getFromVertex() ||
-					(rank > 0 && edge->isDeparture() != otherEdge.isDeparture()) ||
-					(rank+1 < getEdges().size() && edge->isArrival() != otherEdge.isArrival()) ||
-					(dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && static_cast<const DesignatedLinePhysicalStop*>(&otherEdge)->getScheduleInput() != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()) ||
-					otherEdge.getMetricOffset() != edge->getMetricOffset()
+				return true;
+			}
+
+			LineStops::const_iterator it2(other._lineStops.begin());
+			for(LineStops::const_iterator it1(_lineStops.begin());
+				it1 != _lineStops.end();
+				++it1, ++it2
+			){
+				LineStop& ls1(**it1);
+				LineStop& ls2(**it2);
+				if( (ls1.get<LineNode>() && !ls2.get<LineNode>()) ||
+					(!ls1.get<LineNode>() && ls2.get<LineNode>()) ||
+					(ls1.get<LineNode>() && ls2.get<LineNode>() && &*ls1.get<LineNode>() != &*ls2.get<LineNode>()) ||
+					(it1 != _lineStops.begin() && ls1.get<IsDeparture>() != ls2.get<IsDeparture>()) ||
+					(*it1 != *_lineStops.rbegin() && ls1.get<IsArrival>() != ls2.get<IsArrival>()) ||
+					(ls1.get<ScheduleInput>() != ls2.get<ScheduleInput>()) ||
+					ls1.get<MetricOffsetField>() != ls2.get<MetricOffsetField>()
 				){
 					return false;
 				}
-				++rank;
 			}
 
 			return true;
@@ -361,26 +266,38 @@ namespace synthese
 			std::size_t rank,
 			bool ignoreUnscheduledStops
 		) const	{
-			if (_edges.size() <= rank)
-				return NULL;
 			if(ignoreUnscheduledStops)
 			{
 				size_t edgeRank(0);
-				BOOST_FOREACH(const Edge* edge, _edges)
+				BOOST_FOREACH(const LineStop* edge, _lineStops)
 				{
-					if(	edge->getRankInPath() > 0 &&
-						(	!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ||
-							static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()
-					)	){
+					if(	edge->get<RankInPath>() > 0 &&
+						edge->get<ScheduleInput>()
+					){
 						++edgeRank;
 					}
 					if(rank == edgeRank)
 					{
-						return static_cast<const LineStop*>(edge);
+						return edge;
+					}
+				}
+				return NULL;
+			}
+			else
+			{
+				BOOST_FOREACH(const LineStop* edge, _lineStops)
+				{
+					if(	edge->get<RankInPath>() == rank)
+					{
+						return edge;
+					}
+					if(edge->get<RankInPath>() > rank)
+					{
+						return NULL;
 					}
 				}
 			}
-			return static_cast<const LineStop*>(getEdge(rank));
+			return NULL;
 		}
 
 
@@ -395,9 +312,9 @@ namespace synthese
 		std::size_t JourneyPattern::getScheduledStopsNumber() const
 		{
 			size_t result(0);
-			BOOST_FOREACH(const Edge* edge, _edges)
+			BOOST_FOREACH(const LineStop* edge, _lineStops)
 			{
-				if(	static_cast<const LineStop&>(*edge).getScheduleInput()
+				if(	edge->get<ScheduleInput>()
 				){
 					++result;
 				}
@@ -416,7 +333,7 @@ namespace synthese
 
 		bool JourneyPattern::callsAtCity( const City& city ) const
 		{
-			BOOST_FOREACH(Edge* edge, getAllEdges())
+			BOOST_FOREACH(Edge* edge, getEdges())
 			{
 				if(	static_cast<StopPoint*>(edge->getFromVertex())->getConnectionPlace()->getCity() == &city
 				){
@@ -456,8 +373,8 @@ namespace synthese
 				}
 
 				if( (rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure || edge->isArrival() != stop._arrival)) ||
-					((stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) &&
-					  *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())) ||
+					((stop._withTimes && dynamic_cast<const LinePhysicalStop*>(edge) &&
+					  *stop._withTimes != static_cast<const LinePhysicalStop*>(edge)->getScheduleInput())) ||
 					(stop._metricOffset && stop._metricOffset != edge->getMetricOffset())
 				){
 					return false;
@@ -855,6 +772,8 @@ namespace synthese
 			return result;
 		}
 
+
+
 		synthese::SubObjects JourneyPattern::getSubObjects() const
 		{
 			SubObjects r;
@@ -862,22 +781,14 @@ namespace synthese
 			{
 				r.push_back(edge);
 			}
-			BOOST_FOREACH(Service* service, getServices())
+			BOOST_FOREACH(Service* service, getAllServices())
 			{
 				r.push_back(service);
 			}
-
-			// Services of the sublines
-			BOOST_FOREACH(const SubLines::value_type& subline, _subLines)
-			{
-				BOOST_FOREACH(Service* service, subline->getServices())
-				{
-					r.push_back(service);
-				}
-			}
 			return r;
-
 		}
+
+
 
 		Calendar& JourneyPattern::getCalendarCache() const
 		{
@@ -886,7 +797,7 @@ namespace synthese
 			if(!_calendar)
 			{
 				Calendar value;
-				BOOST_FOREACH(const ServiceSet::value_type& service, getServices())
+				BOOST_FOREACH(const ServiceSet::value_type& service, getAllServices())
 				{
 					if(	dynamic_cast<Calendar*>(service) &&
 						dynamic_cast<NonPermanentService*>(service)
@@ -924,15 +835,16 @@ namespace synthese
 		size_t JourneyPattern::getRankInDefinedSchedulesVector( size_t rank ) const
 		{
 			size_t result(0);
+			LineStops::const_iterator it(_lineStops.begin());
 			size_t i(1);
-			for(; i<=rank && i<_edges.size(); ++i)
+			for(++it; i<=rank && it!=_lineStops.end(); ++it, ++i)
 			{
-				if(	static_cast<LineStop*>(_edges[i])->getScheduleInput())
+				if((*it)->get<ScheduleInput>())
 				{
 					++result;
 				}
 			}
-			if(i == _edges.size())
+			if(it == _lineStops.end())
 			{
 				Log::GetInstance().warn("Bad schedules size in journey pattern "+ lexical_cast<string>(getKey()));
 			}
@@ -941,14 +853,65 @@ namespace synthese
 
 
 
-		synthese::graph::ServiceSet JourneyPattern::getAllServices() const
+		void JourneyPattern::removeLineStop( const LineStop& lineStop ) const
 		{
-			ServiceSet result;
-			result.insert(_services.begin(), _services.end());
-			BOOST_FOREACH(const SubLines::value_type& subline, _subLines)
+			_lineStops.erase(const_cast<LineStop*>(&lineStop));
+		}
+
+
+
+		void JourneyPattern::addLineStop( const LineStop& lineStop ) const
+		{
+			_lineStops.insert(const_cast<LineStop*>(&lineStop));
+		}
+
+
+
+		const StopPoint* JourneyPattern::getDestination() const
+		{
+			return static_cast<const StopPoint*>(Path::getDestination());
+		}
+
+
+
+		const StopPoint* JourneyPattern::getOrigin() const
+		{
+			return static_cast<const StopPoint*>(Path::getOrigin());
+		}
+
+
+
+		bool cmpLineStop::operator()( const LineStop* s1, const LineStop* s2 ) const
+		{
+			// Same objects
+			if(s1 == s2)
 			{
-				result.insert(subline->_services.begin(), subline->_services.end());
+				return false;
 			}
-			return result;
+
+			// NULL after all
+			if(!s1)
+			{
+				assert(false); // This should not happen
+				return false;
+			}
+
+			// All before NULL
+			if(!s2)
+			{
+				assert(false); // This should not happen
+				return true;
+			}
+
+			// Line stops are not null : now comparison on rank
+
+			// Identical ranks : comparison on address
+			if(s1->get<RankInPath>() == s2->get<RankInPath>())
+			{
+				return s1 < s2;
+			}
+
+			// Comparison on rank
+			return s1->get<RankInPath>() < s2->get<RankInPath>();
 		}
 }	}

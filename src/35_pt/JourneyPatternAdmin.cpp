@@ -39,7 +39,6 @@
 #include "JourneyPattern.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JourneyPatternUpdateAction.hpp"
-#include "LineArea.hpp"
 #include "LineStopTableSync.h"
 #include "ObjectUpdateAction.hpp"
 #include "Profile.h"
@@ -226,75 +225,69 @@ namespace synthese
 
 				size_t expectedRank(0);
 				bool rankOk(true);
-				for(Path::Edges::const_iterator it(_line->getEdges().begin()); it != _line->getEdges().end(); ++it)
+				for(JourneyPattern::LineStops::const_iterator it(_line->getLineStops().begin()); it != _line->getLineStops().end(); ++it)
 				{
-					const Edge* edge(*it);
+					boost::shared_ptr<const LineStop> lineStop(
+						Env::GetOfficialEnv().getSPtr(*it)
+					);
 
 					// Rank check
-					if(edge->getRankInPath() != expectedRank)
+					if(lineStop->get<RankInPath>() != expectedRank)
 					{
 						rankOk = false;
 					}
 					++expectedRank;
 
-					boost::shared_ptr<const DesignatedLinePhysicalStop> linePhysicalStop(
-						dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ?
-						static_pointer_cast<const DesignatedLinePhysicalStop, const LineStop>(Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(edge))) :
-						boost::shared_ptr<const DesignatedLinePhysicalStop>()
+					// Place / area
+					StopPoint* stopPoint(
+						dynamic_cast<StopPoint*>(&*lineStop->get<LineNode>())
 					);
-					boost::shared_ptr<const LineArea> lineArea(
-						dynamic_cast<const LineArea*>(edge) ?
-						static_pointer_cast<const LineArea, const LineStop>(Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(edge))) :
-						boost::shared_ptr<const LineArea>()
-					);
-					boost::shared_ptr<const LineStop> lineStop(
-						linePhysicalStop.get() ?
-						static_pointer_cast<const LineStop, const LinePhysicalStop>(linePhysicalStop) :
-						static_pointer_cast<const LineStop, const LineArea>(lineArea)
+					DRTArea* area(
+						dynamic_cast<DRTArea*>(&*lineStop->get<LineNode>())
 					);
 
 					lineStopRemoveAction.getAction()->setObjectId(lineStop->getKey());
 					lineStopUpdateAction.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
 
-					if(	linePhysicalStop.get() &&
-						linePhysicalStop->getPhysicalStop()->getConnectionPlace()
+					if(	stopPoint &&
+						stopPoint->getConnectionPlace()
 					){
 						openPlaceRequest.getPage()->setConnectionPlace(
-							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace())
+							Env::GetOfficialEnv().getSPtr(stopPoint->getConnectionPlace())
 						);
-						if(linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity())
+						if(stopPoint->getConnectionPlace()->getCity())
 						{
 							openCityRequest.getPage()->setCity(
-								Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity())
+								Env::GetOfficialEnv().getSPtr(stopPoint->getConnectionPlace()->getCity())
 							);
 						}
 					}
 
-					if(lineArea.get())
+					if(area)
 					{
 						openDRTAreaRequest.getPage()->setArea(
-							Env::GetOfficialEnv().getSPtr(lineArea->getArea())
+							Env::GetOfficialEnv().getSPtr(area)
 						);
 					}
 
 					stream << t.row();
 
 					// Rank selector
-					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(lineStop->getRankInPath()), optional<size_t>());
+					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(lineStop->get<RankInPath>()), optional<size_t>());
 
 					// Rank
-					stream << t.col() << lineStop->getRankInPath();
+					stream << t.col() << lineStop->get<RankInPath>();
 
-					if(linePhysicalStop.get())
+					if(stopPoint)
 					{
 						// City
 						stream << t.col();
-						if(	linePhysicalStop->getPhysicalStop()->getConnectionPlace() &&
-							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity()
+						if(	stopPoint->getConnectionPlace() &&
+							stopPoint->getConnectionPlace()->getCity()
 						){
 							stream << HTMLModule::getHTMLLink(
 								openCityRequest.getURL(),
-								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()
+								stopPoint->getConnectionPlace()->getCity()->getName()
 							);
 						}
 						else
@@ -304,11 +297,11 @@ namespace synthese
 
 						// Stop area
 						stream << t.col();
-						if(	linePhysicalStop->getPhysicalStop()->getConnectionPlace()
+						if(	stopPoint->getConnectionPlace()
 						){
 							stream << HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
-								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getName()
+								stopPoint->getConnectionPlace()->getName()
 							);
 						}
 						else
@@ -328,10 +321,10 @@ namespace synthese
 						stream << f2.getSubmitButton("OK");
 						stream << f2.close();
 						*/
-						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStops())
+						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, stopPoint->getConnectionPlace()->getPhysicalStops())
 						{
 							stream << "<span title=\"" << ps.second->getCodeBySources() << "\">";
-							if(ps.second == linePhysicalStop->getPhysicalStop())
+							if(ps.second == stopPoint)
 							{
 								stream << "[";
 							}
@@ -342,7 +335,7 @@ namespace synthese
 							);
 							lineStopUpdateAction.getAction()->setPhysicalStop(boost::shared_ptr<StopPoint>());
 
-							if(ps.second == linePhysicalStop->getPhysicalStop())
+							if(ps.second == stopPoint)
 							{
 								stream << "]";
 							}
@@ -352,10 +345,12 @@ namespace synthese
 
 					// Metric offset
 					stream << t.col();
-					stream << lineStop->getMetricOffset();
-					if(	it+1 != _line->getEdges().end() &&
-						lineStop->getGeometry() &&
-						(*(it+1))->getMetricOffset() - lineStop->getMetricOffset() != floor(lineStop->getGeometry()->getLength())
+					stream << lineStop->get<MetricOffsetField>();
+					JourneyPattern::LineStops::const_iterator it2(it);
+					++it2;
+					if(	it2 != _line->getLineStops().end() &&
+						lineStop->get<LineStringGeometry>() &&
+						(*it2)->get<MetricOffsetField>() - lineStop->get<MetricOffsetField>() != floor(lineStop->get<LineStringGeometry>()->getLength())
 					){
 						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(true);
 						stream <<
@@ -375,29 +370,22 @@ namespace synthese
 					lineStopUpdateAction.getAction()->setClearGeom(false);
 
 					// DRT area
-					if(lineArea.get())
+					if(area)
 					{
 						// Area
 						stream << t.col();
 						stream << HTMLModule::getHTMLImage("/admin/img/" + DRTAreaAdmin::ICON, "Zone TAD");
-						if(lineArea->getArea())
-						{
-							stream << HTMLModule::getHTMLLink(
-								openDRTAreaRequest.getURL(),
-								lineArea->getArea()->getName()
-							);
-						}
-						else
-						{
-							stream << "Zone inconnue";
-						}
-
+						stream << HTMLModule::getHTMLLink(
+							openDRTAreaRequest.getURL(),
+							area->getName()
+						);
+					
 						// Internal service
 						stream << t.col(2);
 						stream << "Desserte interne : ";
 						AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> internalUpdateRequest(_request, *this);
 						internalUpdateRequest.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
-						if(lineArea->getInternalService())
+						if(lineStop->get<InternalService>())
 						{
 							internalUpdateRequest.getAction()->setAllowedInternal(false);
 							stream << "[OUI] " << HTMLModule::getHTMLLink(internalUpdateRequest.getURL(), "NON");
@@ -410,43 +398,43 @@ namespace synthese
 					}
 
 					// Allowed arrival
-					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>(!lineStop->isArrival()));
+					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>(!lineStop->get<IsArrival>()));
 					stream <<
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isArrivalAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Arrivée impossible"))
+							(lineStop->get<IsArrival>() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Arrivée impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>());
 
 					// Allowed departure
-					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>(!lineStop->isDeparture()));
+					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>(!lineStop->get<IsDeparture>()));
 					stream <<
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isDepartureAllowed() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Départ impossible"))
+							(lineStop->get<IsDeparture>() ? HTMLModule::getHTMLImage("/admin/img/bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("/admin/img/bullet_white.png", "Départ impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>());
 
 					// Scheduled stop
 					stream << t.col();
-					if(	lineArea.get())
+					if(	area)
 					{
 						stream << HTMLModule::getHTMLImage("/admin/img/time.png", "Horaire fourni (zonal)");
 					}
-					else if(linePhysicalStop)
+					else if(stopPoint)
 					{
 						string icon(
-							linePhysicalStop->getScheduleInput() ?
+							lineStop->get<ScheduleInput>() ?
 							HTMLModule::getHTMLImage("/admin/img/time.png", "Horaire fourni à cet arrêt") :
 							HTMLModule::getHTMLImage("/admin/img/ftv2vertline.png", "Horaire non fourni à cet arrêt")
 						);
 
-						if(	edge->getRankInPath() != 0 &&
-							edge->getRankInPath() != (*_line->getEdges().rbegin())->getRankInPath()
+						if(	lineStop->get<RankInPath>() != 0 &&
+							lineStop->get<RankInPath>() != (*_line->getLineStops().rbegin())->get<RankInPath>()
 						){
-							lineStopUpdateAction.getAction()->setWithSchedules(!linePhysicalStop->getScheduleInput());
+							lineStopUpdateAction.getAction()->setWithSchedules(!lineStop->get<ScheduleInput>());
 							stream << HTMLModule::getHTMLLink(lineStopUpdateAction.getHTMLForm().getURL(), icon);
 							lineStopUpdateAction.getAction()->setWithSchedules(optional<bool>());
 						}
@@ -458,19 +446,19 @@ namespace synthese
 
 					// Reservation
 					stream << t.col();
-					if(	lineArea.get())
+					if(	area)
 					{
 						stream << HTMLModule::getHTMLImage("/admin/img/resa_compulsory.png", "Règle de réservation applicable à cette zone");
 					}
-					else if(linePhysicalStop)
+					else if(stopPoint)
 					{
 						string icon(
-							linePhysicalStop->getReservationNeeded() ?
+							lineStop->get<ReservationNeeded>() ?
 							HTMLModule::getHTMLImage("/admin/img/resa_compulsory.png", "Règle de réservation applicable à cet arrêt") :
 							HTMLModule::getHTMLImage("/admin/img/ftv2vertline.png", "Arrêt sans réservation")
 						);
 
-						lineStopUpdateAction.getAction()->setReservationNeeded(!linePhysicalStop->getReservationNeeded());
+						lineStopUpdateAction.getAction()->setReservationNeeded(!lineStop->get<ReservationNeeded>());
 						stream << HTMLModule::getHTMLLink(lineStopUpdateAction.getHTMLForm().getURL(), icon);
 						lineStopUpdateAction.getAction()->setReservationNeeded(optional<bool>());
 					}
@@ -480,8 +468,8 @@ namespace synthese
 
 				// Stop add form
 				stream << t.row();
-				stream << t.col(1,string(),false,string(),2) << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
-				stream << t.col(1,string(),false,string(),2) << _line->getEdges().size();
+				stream << t.col(1,string(),false,string(),2) << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getLineStops().size()), optional<size_t>());
+				stream << t.col(1,string(),false,string(),2) << _line->getLineStops().size();
 
 				stream << t.col() << f.getTextInputAutoCompleteFromService(
 					LineStopAddAction::PARAMETER_CITY_NAME,
@@ -506,7 +494,7 @@ namespace synthese
 				);
 
 				stream << t.col(1,string(),false,string(),2);
-				if(!_line->getServices().empty())
+				if(!_line->getAllServices().empty())
 				{
 					stream << "Durée du trajet nouveau : " << f.getTextInput(LineStopAddAction::PARAMETER_DURATION_TO_ADD, string());
 				}
@@ -576,43 +564,75 @@ namespace synthese
 
 					StaticActionRequest<LineStopUpdateAction> lineStopUpdateRequest(_request);
 					StaticActionRequest<StopPointUpdateAction> stopPointUpdateRequest(_request);
-					for(Path::Edges::const_iterator itEdge(_line->getEdges().begin()); itEdge!=_line->getEdges().end(); ++itEdge)
+					for(JourneyPattern::LineStops::const_iterator itEdge(_line->getLineStops().begin()); itEdge!=_line->getLineStops().end(); ++itEdge)
 					{
-						if(dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge))
+						lineStopUpdateRequest.getAction()->setLineStop(
+							Env::GetOfficialEnv().getEditableSPtr(*itEdge)
+						);
+
+						StopPoint* stopPoint(
+							dynamic_cast<StopPoint*>(&*(*itEdge)->get<LineNode>())
+						);
+						DRTArea* area(
+							dynamic_cast<DRTArea*>(&*(*itEdge)->get<LineNode>())
+						);
+
+						JourneyPattern::LineStops::const_iterator it2(itEdge);
+						++it2;
+						if(it2 != _line->getLineStops().end())
 						{
-							lineStopUpdateRequest.getAction()->setLineStop(
-								Env::GetOfficialEnv().getEditableSPtr(static_cast<LineStop*>(*itEdge))
-							);
-							stopPointUpdateRequest.getAction()->setStop(
-								Env::GetOfficialEnv().getEditableSPtr(static_cast<StopPoint*>((*itEdge)->getFromVertex()))
-							);
-						}
-						if(itEdge+1 != _line->getEdges().end())
-						{
-							boost::shared_ptr<LineString> geom((*itEdge)->getRealGeometry());
-							if(geom.get())
+							boost::shared_ptr<LineString> geom((*itEdge)->get<LineStringGeometry>());
+							if(!geom && (*itEdge)->getGeneratedLineStops().size() == 1)
+							{
+								geom = (*(*itEdge)->getGeneratedLineStops().begin())->getRealGeometry();
+							}
+							if(geom)
 							{
 								map.addLineString(
 									HTMLMap::MapLineString(
 										*geom,
-										dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? lineStopUpdateRequest.getURL() : string()
+										lineStopUpdateRequest.getURL()
 								)	);
 							}
 						}
-						if((*itEdge)->getFromVertex()->getGeometry().get())
+
+						if(stopPoint)
 						{
-							map.addPoint(
-								HTMLMap::MapPoint(
-									*(*itEdge)->getFromVertex()->getGeometry(),
-									"/admin/img/arret-rouge-blanc-8px.png",
-									"/admin/img/arret-rouge-blanc-8px.png",
-									"/admin/img/arret-rouge-blanc-8px.png",
-									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? stopPointUpdateRequest.getURL() : string(),
-									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ?
-										static_cast<StopPoint*>((*itEdge)->getFromVertex())->getConnectionPlace()->getFullName() :
-										string(),
-									10, 10
-							)	);
+							stopPointUpdateRequest.getAction()->setStop(
+								Env::GetOfficialEnv().getEditableSPtr(stopPoint)
+							);
+							if(stopPoint->getGeometry())
+							{
+								map.addPoint(
+									HTMLMap::MapPoint(
+										*stopPoint->getGeometry(),
+										"/admin/img/arret-rouge-blanc-8px.png",
+										"/admin/img/arret-rouge-blanc-8px.png",
+										"/admin/img/arret-rouge-blanc-8px.png",
+										stopPointUpdateRequest.getURL(),
+										stopPoint->getConnectionPlace()->getFullName(),
+										10, 10
+								)	);
+							}
+						}
+						else if(area)
+						{
+							BOOST_FOREACH(StopArea* stop, area->get<Stops>())
+							{
+								if(stop->getPoint())
+								{
+									map.addPoint(
+										HTMLMap::MapPoint(
+											*stop->getPoint(),
+											"/admin/img/arret-rouge-blanc-8px.png",
+											"/admin/img/arret-rouge-blanc-8px.png",
+											"/admin/img/arret-rouge-blanc-8px.png",
+											string(),
+											stop->getFullName() + " (TAD)",
+											10, 10
+									)	);
+								}
+							}
 						}
 					}
 
@@ -871,39 +891,33 @@ namespace synthese
 
 				BOOST_FOREACH(const Path::Edges::value_type& edge, _line->getEdges())
 				{
-					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
-					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
-					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
-					lineStop.getDepartureFromIndex(false,0);
-					lineStop.getDepartureFromIndex(true,0);
-
+					const LinePhysicalStop& lineStop(dynamic_cast<const LinePhysicalStop&>(*edge));
+					
 					if(lineStop.isArrival())
 					{
 						stream << t.row();
 						stream << t.col(1, string(), true);
-						if(linePhysicalStop)
-						{
-							stream << linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName();
-						}
-						if(lineArea)
-						{
-							stream << lineArea->getArea()->getName();
-						}
+						stream << static_cast<const StopPoint*>(lineStop.getFromVertex())->getConnectionPlace()->getFullName();
 						stream << t.col(1, string(), true) << "A";
 
-						BOOST_FOREACH(const Edge::ArrivalServiceIndices::value_type& index, lineStop.getArrivalIndices())
+						for(int i(0); i<=23; ++i)
 						{
 							stream << t.col();
-
-							if(index.get(false) == lineStop.getParentPath()->getServices().rend())
+							BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, lineStop.getParentPath()->getServiceCollections())
 							{
-								stream << "-";
-							}
-							else
-							{
-								const Service* service(*index.get(false));
-								stream << services[service];
-								stream << "<br /><span class=\"mini\">" << service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()) << "</span>";
+								lineStop.getArrivalFromIndex(*itCollection, false, 0); // Update indices
+								Edge::ArrivalServiceIndices::mapped_type& indices(lineStop.getArrivalIndex(*itCollection));
+						
+								if(indices[i].get(false) == itCollection->getServices().rend())
+								{
+									stream << "-<br /><span class=\"mini\">-</span><br />";
+								}
+								else
+								{
+									const Service* service(*indices[i].get(false));
+									stream << services[service];
+									stream << "<br /><span class=\"mini\">" << service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()) << "</span><br />";
+								}
 							}
 						}
 					}
@@ -912,29 +926,27 @@ namespace synthese
 					{
 						stream << t.row();
 						stream << t.col(1, string(), true);
-						if(linePhysicalStop)
-						{
-							stream << linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName();
-						}
-						if(lineArea)
-						{
-							stream << lineArea->getArea()->getName();
-						}
+						stream << static_cast<const StopPoint*>(lineStop.getFromVertex())->getConnectionPlace()->getFullName();
 						stream << t.col(1, string(), true) << "D";
 
-						BOOST_FOREACH(const Edge::DepartureServiceIndices::value_type& index, lineStop.getDepartureIndices())
+						for(int i(0); i<=23; ++i)
 						{
 							stream << t.col();
-
-							if(index.get(false) == lineStop.getParentPath()->getServices().end())
+							BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, lineStop.getParentPath()->getServiceCollections())
 							{
-								stream << "-";
-							}
-							else
-							{
-								const Service* service(*index.get(false));
-								stream << services[service];
-								stream << "<br /><span class=\"mini\">" << service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()) << "</span>";
+								lineStop.getDepartureFromIndex(*itCollection, false, 0); // Update indices
+								Edge::DepartureServiceIndices::mapped_type& indices(lineStop.getDepartureIndex(*itCollection));
+								
+								if(indices[i].get(false) == itCollection->getServices().end())
+								{
+									stream << "-<br /><span class=\"mini\">-</span><br />";
+								}
+								else
+								{
+									const Service* service(*indices[i].get(false));
+									stream << services[service];
+									stream << "<br /><span class=\"mini\">" << service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()) << "</span><br />";
+								}
 							}
 						}
 					}

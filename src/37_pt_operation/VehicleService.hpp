@@ -71,12 +71,13 @@ namespace synthese
 
 		private:
 			Services _services;
-			DriverServiceChunks _driverServiceChunks;
+			mutable DriverServiceChunks _driverServiceChunks;
 			std::string _name;
 			boost::optional<OperationUnit&> _operationUnit;
 
 		public:
 			VehicleService(util::RegistryKeyType id=0);
+			~VehicleService();
 
 			//! @name Setters
 			//@{
@@ -124,6 +125,7 @@ namespace synthese
 				);
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 
 				virtual LinkedObjectsIds getLinkedObjectsIds(
 					const Record& record

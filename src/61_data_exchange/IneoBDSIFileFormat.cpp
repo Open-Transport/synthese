@@ -35,7 +35,6 @@
 #include "DBModule.h"
 #include "DBTransaction.hpp"
 #include "Import.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "ParametersMap.h"
@@ -888,7 +887,7 @@ namespace synthese
 				{
 					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
 
-					BOOST_FOREACH(const ServiceSet::value_type& existingService, journeyPattern.getServices())
+					BOOST_FOREACH(const ServiceSet::value_type& existingService, journeyPattern.getAllServices())
 					{
 						// Jump over continuous services
 						ScheduledService* service(dynamic_cast<ScheduledService*>(existingService));
@@ -910,33 +909,6 @@ namespace synthese
 						}
 
 						servicesToRemove.insert(service);
-					}
-
-					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, journeyPattern.getSubLines())
-					{
-						BOOST_FOREACH(const ServiceSet::value_type& existingService, subline->getServices())
-						{
-							// Jump over continuous services
-							ScheduledService* service(dynamic_cast<ScheduledService*>(existingService));
-							if(!service)
-							{
-								continue;
-							}
-
-							// Jump over non active services
-							if(!service->isActive(today))
-							{
-								continue;
-							}
-
-							// Jump over non imported services
-							if(service->getNextRTUpdate() > nextDayBreak)
-							{
-								continue;
-							}
-
-							servicesToRemove.insert(service);
-						}
 					}
 				}
 
@@ -1023,7 +995,7 @@ namespace synthese
 						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 							*route->sharedServicesMutex
 						);
-						BOOST_FOREACH(Service* sservice, route->getServices())
+						BOOST_FOREACH(Service* sservice, route->getAllServices())
 						{
 							ScheduledService* service(
 								dynamic_cast<ScheduledService*>(sservice)
@@ -1619,10 +1591,6 @@ namespace synthese
 
 					// Register the journey pattern
 					syntheseJourneyPatterns.push_back(&jp);
-					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, jp.getSubLines())
-					{
-						syntheseJourneyPatterns.push_back(subline);
-					}
 				}
 			}
 
@@ -1645,20 +1613,20 @@ namespace synthese
 				BOOST_FOREACH(const ArretChns::value_type& arretChn, arretChns)
 				{
 					// Line stop creation
-					boost::shared_ptr<DesignatedLinePhysicalStop> ls(
-						new DesignatedLinePhysicalStop(
+					boost::shared_ptr<LineStop> ls(
+						new LineStop(
 							LineStopTableSync::getId(),
 							jp.get(),
 							rank,
 							rank+1 < arretChns.size(),
 							rank > 0,
 							0,
-							arretChn.arret->syntheseStop,
-							arretChn.type != "N"
+							*arretChn.arret->syntheseStop
 					)	);
+					ls->set<ScheduleInput>(arretChn.type != "N");
 
 					// registration of the line stop into the journey pattern
-					jp->addEdge(*ls);
+					ls->link(temporaryEnvironment, true);
 
 					// Add the edge to the vertex
 /*						if (rank+1 < course.chainage->arretChns.size())

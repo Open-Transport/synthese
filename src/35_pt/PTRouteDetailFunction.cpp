@@ -24,7 +24,7 @@
 
 #include "PTRouteDetailFunction.hpp"
 #include "Request.h"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "StopPoint.hpp"
 #include "JourneyPattern.hpp"
 #include "RequestException.h"
@@ -35,7 +35,6 @@
 #include "SchedulesBasedService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
-#include "JourneyPatternCopy.hpp"
 #include "Destination.hpp"
 #include "MimeTypes.hpp"
 
@@ -141,8 +140,6 @@ namespace synthese
 				{
 					_service = static_pointer_cast<const SchedulesBasedService, const ScheduledService>(Env::GetOfficialEnv().get<ScheduledService>(id));
 					_journeyPattern = Env::GetOfficialEnv().getSPtr<JourneyPattern>(
-						dynamic_cast<const JourneyPatternCopy*>(_service->getPath()) ?
-						dynamic_cast<const JourneyPatternCopy*>(_service->getPath())->getMainLine() :
 						static_cast<const JourneyPattern*>(_service->getPath())
 					);
 				}
@@ -150,8 +147,6 @@ namespace synthese
 				{
 					_service = static_pointer_cast<const SchedulesBasedService, const ContinuousService>(Env::GetOfficialEnv().get<ContinuousService>(id));
 					_journeyPattern = Env::GetOfficialEnv().getSPtr<JourneyPattern>(
-						dynamic_cast<const JourneyPatternCopy*>(_service->getPath()) ?
-						dynamic_cast<const JourneyPatternCopy*>(_service->getPath())->getMainLine() :
 						static_cast<const JourneyPattern*>(_service->getPath())
 					);
 				}
@@ -239,7 +234,7 @@ namespace synthese
 
 			// Edges
 			const StopArea* lastConnPlace(NULL);
-			BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
+			BOOST_FOREACH(const Edge* edge, _journeyPattern->getEdges())
 			{
 				if(	(!edge->isDepartureAllowed() || !_displayDepartureStops) &&
 					(!edge->isArrivalAllowed() || !_displayArrivalStops)
@@ -256,7 +251,7 @@ namespace synthese
 					continue;
 				}
 				lastConnPlace = connPlace;
-				const LineStop* lineStop(static_cast<const LineStop*>(edge));
+				const LinePhysicalStop* lineStop(static_cast<const LinePhysicalStop*>(edge));
 
 				boost::shared_ptr<ParametersMap> sm(new ParametersMap);
 				sm->insert(DATA_ID, stopPoint->getKey());

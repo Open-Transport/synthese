@@ -285,7 +285,7 @@ namespace synthese
 				try
 				{
 					result.num_park = lexical_cast<short>(
-						vp.getVehicle()->getNumber()
+						vp.getVehicle()->get<Number>()
 					); // TODO replace it by data source links
 				}
 				catch(bad_lexical_cast&)

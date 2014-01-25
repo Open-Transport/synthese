@@ -146,6 +146,7 @@ namespace synthese
 		template<> void OldLoadSavePolicy<VehicleServiceTableSync,VehicleService>::Unlink(
 			VehicleService* obj
 		){
+			obj->unlink();
 		}
 
 

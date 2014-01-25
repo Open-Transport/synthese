@@ -50,6 +50,8 @@ set(data_exchange_SRCS
   OSMFileFormat.hpp
   PegaseFileFormat.cpp
   PegaseFileFormat.hpp
+  PhysicalStopsCSVExportFunction.cpp
+  PhysicalStopsCSVExportFunction.h
   PTDataCleanerFileFormat.cpp
   PTDataCleanerFileFormat.hpp
   PTFileFormat.cpp

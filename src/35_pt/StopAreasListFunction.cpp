@@ -36,9 +36,8 @@
 #include "RollingStock.hpp"
 #include "Request.h"
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "Path.h"
-#include "Edge.h"
 #include "City.h"
 #include "Webpage.h"
 #include "CommercialLineTableSync.h"
@@ -365,7 +364,7 @@ namespace synthese
 					bool isAreaOfTerminus= false;
 					if(_terminusId)
 					{
-						const StopArea * stopAreaTerminus = journey->getDestination()->getConnectionPlace();
+						const StopArea* stopAreaTerminus = journey->getDestination()->getConnectionPlace();
 
 						if (stopAreaTerminus->getKey() == *_terminusId)
 						{
@@ -373,7 +372,7 @@ namespace synthese
 						}
 					}
 
-					BOOST_FOREACH(const Edge* edge,journey->getAllEdges())
+					BOOST_FOREACH(const Edge* edge, journey->getEdges())
 					{
 						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea * connPlace(stopPoint->getConnectionPlace());
@@ -485,33 +484,39 @@ namespace synthese
 
 						while(!served && itDep != itStop.second->getDepartureEdges().end() && itArr != itStop.second->getArrivalEdges().end())
 						{
-							const LineStop* lineStop;
+							const LinePhysicalStop* lineStop;
 							if(itDep != itStop.second->getDepartureEdges().end())
 							{
-								lineStop = dynamic_cast<const LineStop*>(itDep->second);
+								lineStop = dynamic_cast<const LinePhysicalStop*>(itDep->second);
 								itDep++;
 							}
 							else
 							{
-								lineStop = dynamic_cast<const LineStop*>(itArr->second);
+								lineStop = dynamic_cast<const LinePhysicalStop*>(itArr->second);
 								itArr++;
 							}
 
 							if(lineStop && (lineStop->isDepartureAllowed() || lineStop->isArrivalAllowed()))
 							{
-								optional<Edge::DepartureServiceIndex::Value> index;
-								ServicePointer servicePointer(
-									lineStop->getNextService(
-										ap,
-										startDateTime,
-										endDateTime,
-										false,
-										index
-									)
-								);
+								BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, lineStop->getParentPath()->getServiceCollections())
+								{
+									optional<Edge::DepartureServiceIndex::Value> index;
+									ServicePointer servicePointer(
+										lineStop->getNextService(
+											*itCollection,
+											ap,
+											startDateTime,
+											endDateTime,
+											false,
+											index
+										)
+									);
 
-								if(servicePointer.getService())
-									served = true;
+									if(servicePointer.getService())
+									{
+										served = true;
+									}
+								}
 							}
 						}
 					}

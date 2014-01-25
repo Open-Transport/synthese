@@ -54,9 +54,12 @@ namespace synthese
 	namespace pt
 	{
 		class StopPoint;
+	}
 
+	namespace analysis
+	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Function : DensityService calculation Service.
+		/// 60.15 Function : DensityService calculation Service.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Density_Service
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35Functions refFunctions
@@ -171,13 +174,13 @@ namespace synthese
 			class SortableStopPoint
 			{
 			private:
-				const StopPoint * _sp;
+				const pt::StopPoint * _sp;
 				int _distanceToCenter;
 				std::string _opCode;
 			public:
-				SortableStopPoint(const StopPoint * sp, int distanceToCenter);
+				SortableStopPoint(const pt::StopPoint * sp, int distanceToCenter);
 				bool operator<(SortableStopPoint const &otherStopPoint) const;
-				const StopPoint * getStopPoint() const;
+				const pt::StopPoint * getStopPoint() const;
 				int getDistanceToCenter() const;
 				std::string getOpCode() const;
 			};
@@ -190,12 +193,12 @@ namespace synthese
 			/// @date 2013
 			void addStop(
 				StopPointSetType & stopPointSet,
-				const StopPoint & sp,
+				const pt::StopPoint & sp,
 				const boost::posix_time::ptime & startDateTime,
 				const boost::posix_time::ptime & endDateTime
 			) const;
 
-			int CalcDistanceToCenter (const StopPoint & stopPoint) const;
+			int CalcDistanceToCenter (const pt::StopPoint & stopPoint) const;
 		};
 	}
 }

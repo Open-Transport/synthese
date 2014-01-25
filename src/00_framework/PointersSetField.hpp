@@ -43,12 +43,13 @@ namespace synthese
 	public:
 		typedef std::set<T*> Type;
 
-	private:
+
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _setToString(const typename PointersSetField<C, T>::Type& p)
+		static std::string ToString(const typename PointersSetField<C, T>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
@@ -72,7 +73,7 @@ namespace synthese
 		}
 
 
-	public:
+
 		static bool LoadFromRecord(
 			typename PointersSetField<C, T>::Type& fieldObject,
 			ObjectBase& object,
@@ -138,7 +139,7 @@ namespace synthese
 			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
 				fieldObject,
 				map,
-				_setToString
+				ToString
 			);
 		}
 
@@ -156,7 +157,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_setToString
+				ToString
 			);
 		}
 
@@ -173,7 +174,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_setToString
+				ToString
 			);
 		}
 
@@ -185,7 +186,7 @@ namespace synthese
 			const ObjectBase& object,
 			DBContent& content
 		){
-			std::string s(_setToString(fieldObject));
+			std::string s(ToString(fieldObject));
 			content.push_back(Cell(s));
 		}
 
@@ -232,12 +233,13 @@ namespace synthese
 	public:
 		typedef std::set<util::Registrable*> Type;
 
-	private:
+
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _setToString(const typename PointersSetField<C, util::Registrable>::Type& p)
+		static std::string ToString(const typename PointersSetField<C, util::Registrable>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
@@ -261,7 +263,7 @@ namespace synthese
 		}
 
 
-	public:
+
 		static bool LoadFromRecord(
 			typename PointersSetField<C, util::Registrable>::Type& fieldObject,
 			ObjectBase& object,
@@ -337,7 +339,7 @@ namespace synthese
 			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
 				fieldObject,
 				map,
-				_setToString
+				ToString
 			);
 		}
 
@@ -355,7 +357,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_setToString
+				ToString
 			);
 		}
 
@@ -372,7 +374,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_setToString
+				ToString
 			);
 		}
 

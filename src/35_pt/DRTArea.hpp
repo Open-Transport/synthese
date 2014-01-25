@@ -47,8 +47,7 @@ namespace synthese
 		*/
 		class DRTArea:
 			public Object<DRTArea, DRTAreaSchema>,
-			virtual public util::Registrable,
-			public graph::Vertex
+			virtual public util::Registrable
 		{
 		public:
 			DRTArea(
@@ -56,6 +55,7 @@ namespace synthese
 				std::string name = std::string(),
 				Stops::Type stops = Stops::Type()
 			);
+			virtual ~DRTArea();
 
 			virtual graph::GraphIdType getGraphType() const;
 
@@ -64,6 +64,9 @@ namespace synthese
 			bool contains(const StopArea& stopArea) const;
 
 			virtual std::string getName() const { return get<Name>(); }
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
 		};
 }	}
 

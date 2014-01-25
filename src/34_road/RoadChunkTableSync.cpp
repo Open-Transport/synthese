@@ -126,158 +126,11 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Rank in road
-			int rankInRoad (rows->getInt (RoadChunkTableSync::COL_RANKINPATH));
-			object->setRankInPath(rankInRoad);
-
-			// Metric offset
-			object->setMetricOffset(rows->getDouble (RoadChunkTableSync::COL_METRICOFFSET));
-
-			// Geometry
-			string viaPointsStr(rows->getText (TABLE_COL_GEOMETRY));
-			if(viaPointsStr.empty())
+			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				object->setGeometry(boost::shared_ptr<LineString>());
-			}
-			else
-			{
-				object->setGeometry(
-					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKT(TABLE_COL_GEOMETRY))
-				);
-			}
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				bool noMotorVehicles(false);
-
-				try
-				{
-					boost::shared_ptr<MainRoadPart> road(RoadTableSync::GetEditable(rows->getLongLong(RoadChunkTableSync::COL_ROADID), env, linkLevel));
-					object->setRoad(road.get());
-					object->setFromCrossing(
-						CrossingTableSync::GetEditable(
-							rows->getLongLong(RoadChunkTableSync::COL_CROSSING_ID),
-							env,
-							linkLevel
-						).get()
-					);
-					road->addRoadChunk(*object);
-
-					/* 
-					TODO Backward compatibility.
-					Useless for OpenStreetMap datas since non_drivable field in database (r8381)
-					and after a fresh OSM import.
-					Now the OSM importer check those fields (and some more) and save it into DB.
-					Should be useless soon for OSM graph, might be still usefull for pure road
-					journey planning on NAVTEQ graph (must be pretty rare).
-					*/
-					switch(road->getType())
-					{
-						case Road::ROAD_TYPE_PEDESTRIANSTREET:
-						case Road::ROAD_TYPE_PEDESTRIANPATH:
-						case Road::ROAD_TYPE_STEPS:
-						case Road::ROAD_TYPE_PRIVATEWAY:
-							noMotorVehicles = true;
-						break;
-
-						default:
-							noMotorVehicles = false;
-						break;
-					}
-				}
-				catch (ObjectNotFoundException<Road>& e)
-				{
-					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_ROADID, e);
-				}
-				catch (ObjectNotFoundException<Crossing>& e)
-				{
-					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_CROSSING_ID, e);
-				}
-
-				// Left house number bounds
-				if(	!rows->getText(RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER).empty() &&
-					!rows->getText(RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER).empty()
-				){
-					object->setLeftHouseNumberBounds(
-						MainRoadChunk::HouseNumberBounds(MainRoadChunk::HouseNumberBounds::value_type(
-							rows->getInt(RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER),
-							rows->getInt(RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER)
-					)	));
-
-					// Left House numbering policy
-					object->setLeftHouseNumberingPolicy(
-						static_cast<MainRoadChunk::HouseNumberingPolicy>(rows->getInt(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY))
-					);
-				}
-
-
-				// Right house number bounds
-				if(	!rows->getText(RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER).empty() &&
-					!rows->getText(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER).empty()
-				){
-					object->setRightHouseNumberBounds(
-						MainRoadChunk::HouseNumberBounds(MainRoadChunk::HouseNumberBounds::value_type(
-							rows->getInt(RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER),
-							rows->getInt(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER)
-					)	));
-
-					// Right House numbering policy
-					object->setRightHouseNumberingPolicy(
-						static_cast<MainRoadChunk::HouseNumberingPolicy>(rows->getInt(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY))
-					);
-				}
-
-				RuleUser::Rules rules(RuleUser::GetEmptyRules());
-				rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-				rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-				rules[USER_CAR - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-
-				if(rows->getBool(RoadChunkTableSync::COL_NON_WALKABLE))
-				{
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-				}				
-
-				if(rows->getBool(RoadChunkTableSync::COL_NON_BIKABLE))
-				{
-					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-				}				
-
-				int oneWay = rows->getInt(RoadChunkTableSync::COL_ONE_WAY);
-				if(rows->getBool(RoadChunkTableSync::COL_NON_DRIVABLE) || noMotorVehicles)
-				{
-					rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-					object->getReverseRoadChunk()->setRules(rules);
-					object->setRules(rules);
-				}
-				else if(oneWay == 1)
-				{
-					object->setRules(rules);
-					rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-					object->getReverseRoadChunk()->setRules(rules);
-				}
-				else if(oneWay == -1)
-				{
-					object->getReverseRoadChunk()->setRules(rules);
-					rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-					object->setRules(rules);
-				}
-				else
-				{
-					object->getReverseRoadChunk()->setRules(rules);
-					object->setRules(rules);
-				}
-
-				double maxSpeed = rows->getDouble(RoadChunkTableSync::COL_CAR_SPEED);
-				object->setCarSpeed(maxSpeed);
-				object->getReverseRoadChunk()->setCarSpeed(maxSpeed);
-
-				if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-				{
-					// Useful transfer calculation
-					object->getHub()->clearAndPropagateUsefulTransfer(RoadModule::GRAPH_ID);
-				}
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 
@@ -286,11 +139,7 @@ namespace synthese
 		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Unlink(
 			MainRoadChunk* obj
 		){
-			// Useful transfer calculation
-			if(obj->getHub())
-			{
-				obj->getHub()->clearAndPropagateUsefulTransfer(RoadModule::GRAPH_ID);
-			}
+			obj->unlink();
 		}
 
 

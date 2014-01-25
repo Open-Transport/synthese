@@ -31,7 +31,6 @@
 #include "LineStopTableSync.h"
 #include "GeometryField.hpp"
 #include "JourneyPatternTableSync.hpp"
-#include "LineArea.hpp"
 #include "LineStopTableSync.h"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
@@ -148,24 +147,24 @@ namespace synthese
 			}
 
 			// Loading all line stops of the path
-			if(dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())) try
+			try
 			{
-				const Path& path(*_lineStop->getParentPath());
+				const JourneyPattern& path(*_lineStop->get<Line>());
 				LineStopTableSync::Search(
 					*_env,
 					path.getKey()
 				);
-				if(path.getEdge(_lineStop->getRankInPath()) != _lineStop.get())
+				if(path.getLineStop(_lineStop->get<RankInPath>()) != _lineStop.get())
 				{
 					throw ActionException("Rank are corrupted, use the fix utility");
 				}
-				if(_lineStop->getRankInPath() != 0)
+				if(_lineStop->get<RankInPath>() != 0)
 				{
-					_prevLineStop = dynamic_cast<DesignatedLinePhysicalStop*>(const_cast<Edge*>(path.getEdge(_lineStop->getRankInPath() - 1)));
+					_prevLineStop = const_cast<LineStop*>(path.getLineStop(_lineStop->get<RankInPath>() - 1));
 				}
-				if(_lineStop->getRankInPath()+1 != path.getEdges().size())
+				if(_lineStop->get<RankInPath>()+1 != path.getLineStops().size())
 				{
-					_nextLineStop = dynamic_cast<DesignatedLinePhysicalStop*>(const_cast<Edge*>(path.getEdge(_lineStop->getRankInPath() + 1)));
+					_nextLineStop = const_cast<LineStop*>(path.getLineStop(_lineStop->get<RankInPath>() + 1));
 				}
 			}
 			catch(...)
@@ -233,12 +232,12 @@ namespace synthese
 			_readLengthFromGeometry = map.getDefault<bool>(PARAMETER_READ_LENGTH_FROM_GEOMETRY, false);
 
 			// Load services if update should be necessary
-			if(	(_readLengthFromGeometry && _lineStop->getGeometry()) ||
+			if(	(_readLengthFromGeometry && _lineStop->get<LineStringGeometry>()) ||
 				_withSchedules
 			){
 				BOOST_FOREACH(boost::shared_ptr<ScheduledService> serv, ScheduledServiceTableSync::Search(
 					*_env,
-					_lineStop->getParentPath()->getKey()
+					_lineStop->get<Line>()->getKey()
 				)){
 					serv->getDepartureSchedules(true, false);
 					serv->getArrivalSchedules(true, false);
@@ -246,7 +245,7 @@ namespace synthese
 
 				BOOST_FOREACH(boost::shared_ptr<ContinuousService> serv, ContinuousServiceTableSync::Search(
 					*_env,
-					_lineStop->getParentPath()->getKey()
+					_lineStop->get<Line>()->getKey()
 				)){
 					serv->getDepartureSchedules(true, false);
 					serv->getArrivalSchedules(true, false);
@@ -267,86 +266,82 @@ namespace synthese
 				dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()) &&
 				_physicalStop.get() != dynamic_cast<DesignatedLinePhysicalStop&>(*_lineStop).getPhysicalStop()
 			){
-				DesignatedLinePhysicalStop& linePhysicalStop(
-					dynamic_cast<DesignatedLinePhysicalStop&>(*_lineStop)
-				);
-
 				// Automated update of geometry of preceding line stop if possible
-				if(_prevLineStop)
+				if(_prevLineStop && _prevLineStop->get<LineNode>() && dynamic_cast<StopPoint*>(&*_prevLineStop->get<LineNode>()))
 				{
 					Env env2;
-					boost::shared_ptr<DesignatedLinePhysicalStop> templateObject(
+					boost::shared_ptr<LineStop> templateObject(
 						LineStopTableSync::SearchSimilarLineStop(
-							*_prevLineStop->getPhysicalStop(),
+							dynamic_cast<StopPoint&>(*_prevLineStop->get<LineNode>()),
 							*_physicalStop,
 							env2
 					)	);
 					if(templateObject.get())
 					{
-						_prevLineStop->setGeometry(templateObject->getGeometry());
+						_prevLineStop->set<LineStringGeometry>(templateObject->get<LineStringGeometry>());
 					}
 				}
 
 				// Automated update of current geometry if possible and necessary
-				if(_nextLineStop && !_geometry)
+				if(_nextLineStop && !_geometry && _nextLineStop->get<LineNode>() && dynamic_cast<StopPoint*>(&*_nextLineStop->get<LineNode>()))
 				{
 					Env env2;
-					boost::shared_ptr<DesignatedLinePhysicalStop> templateObject(
+					boost::shared_ptr<LineStop> templateObject(
 						LineStopTableSync::SearchSimilarLineStop(
 							*_physicalStop,
-							*_nextLineStop->getPhysicalStop(),
+							dynamic_cast<StopPoint&>(*_nextLineStop->get<LineNode>()),
 							env2
 					)	);
 					if(templateObject.get())
 					{
-						_lineStop->setGeometry(templateObject->getGeometry());
+						_lineStop->set<LineStringGeometry>(templateObject->get<LineStringGeometry>());
 					}
 				}
 
 				// Change the physical stop
-				linePhysicalStop.setPhysicalStop(*_physicalStop);
+				_lineStop->set<LineNode>(*_physicalStop);
 			}
 
 			// Allowed internal
-			if(_allowedInternal && dynamic_cast<LineArea*>(_lineStop.get()))
+			if(_allowedInternal)
 			{
-				dynamic_cast<LineArea&>(*_lineStop).setInternalService(*_allowedInternal);
+				_lineStop->set<InternalService>(*_allowedInternal);
 			}
 
 			// Allowed arrival
 			if(_allowedArrival)
 			{
-				_lineStop->setIsArrival(*_allowedArrival);
+				_lineStop->set<IsArrival>(*_allowedArrival);
 			}
 
 			// Allowed departure
 			if(_allowedDeparture)
 			{
-				_lineStop->setIsDeparture(*_allowedDeparture);
+				_lineStop->set<IsDeparture>(*_allowedDeparture);
 			}
 
 			// With schedules
-			if(_withSchedules && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
+			if(_withSchedules)
 			{
-				 dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())->setScheduleInput(*_withSchedules);
+				 _lineStop->set<ScheduleInput>(*_withSchedules);
 			}
 
 			// With reservation
-			if(_reservationNeeded && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
+			if(_reservationNeeded)
 			{
-				dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())->setReservationNeeded(*_reservationNeeded);
+				_lineStop->set<ReservationNeeded>(*_reservationNeeded);
 			}
 
 			// Geometry
 			if(_geometry)
 			{
-				_lineStop->setGeometry(*_geometry);
+				_lineStop->set<LineStringGeometry>(*_geometry);
 			}
 
 			// Clear geometry
 			if(_clearGeom)
 			{
-				_lineStop->setGeometry(boost::shared_ptr<LineString>());
+				_lineStop->set<LineStringGeometry>(boost::shared_ptr<LineString>());
 			}
 
 			// Savings
@@ -357,11 +352,11 @@ namespace synthese
 			}
 			LineStopTableSync::Save(_lineStop.get(), transaction);
 
-			if(	_readLengthFromGeometry && _lineStop->getGeometry())
+			if(	_readLengthFromGeometry && _lineStop->get<LineStringGeometry>())
 			{
 				LineStopTableSync::ChangeLength(
 					*_lineStop,
-					floor(_lineStop->getGeometry()->getLength()),
+					floor(_lineStop->get<LineStringGeometry>()->getLength()),
 					transaction
 				);
 			}

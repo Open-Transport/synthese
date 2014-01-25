@@ -33,8 +33,7 @@
 #include "StopPoint.hpp"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
-#include "Edge.h"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
 #include "City.h"
@@ -645,100 +644,105 @@ namespace synthese
 				}
 
 				// Jump over junctions
-				if(!dynamic_cast<const LineStop*>(edge))
+				if(!dynamic_cast<const LinePhysicalStop*>(edge))
 				{
 					continue;
 				}
 
-				const LineStop* ls = static_cast<const LineStop*>(edge);
+				const LinePhysicalStop* ls = static_cast<const LinePhysicalStop*>(edge);
 
-				ptime departureDateTime = startDateTime;
-				// Loop on services
-				optional<Edge::DepartureServiceIndex::Value> index;
-				while(true)
+				BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls->getParentPath()->getServiceCollections())
 				{
-					AccessParameters ap(USER_PEDESTRIAN);
-					ServicePointer servicePointer(
-						ls->getNextService(
-							ap,
-							departureDateTime,
-							endDateTime,
-							false,
-							index,
-							false,
-							false
-					)	);
-					if (!servicePointer.getService())
-						break;
-					++*index;
-					departureDateTime = servicePointer.getDepartureDateTime();
-					if(sp.getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+
+					ptime departureDateTime = startDateTime;
+					// Loop on services
+					optional<Edge::DepartureServiceIndex::Value> index;
+					while(true)
 					{
-						if (!dynamic_cast<const DRTArea*>(servicePointer.getRealTimeDepartureVertex()))
-							continue;
-					}
-
-					const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-					if(journeyPattern == NULL) // Could be a junction
-						continue;
-
-					const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-					if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
-						continue;
-
-					// Filter by Rolling stock id
-					if(_rollingStockFilter.get())
-					{
-						// Set the boolean to true or false depending on whether filter is inclusive or exclusive
-						bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
-						set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
-						BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+						AccessParameters ap(USER_PEDESTRIAN);
+						ServicePointer servicePointer(
+							ls->getNextService(
+								*itCollection,
+								ap,
+								departureDateTime,
+								endDateTime,
+								false,
+								index,
+								false,
+								false
+						)	);
+						if (!servicePointer.getService())
+							break;
+						++*index;
+						departureDateTime = servicePointer.getDepartureDateTime();
+						if(sp.getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 						{
-							if(commercialLine->usesTransportMode(*rollingStock))
+							if (!dynamic_cast<const DRTArea*>(servicePointer.getRealTimeDepartureVertex()))
+								continue;
+						}
+
+						const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+						if(journeyPattern == NULL) // Could be a junction
+							continue;
+
+						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+						if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
+							continue;
+
+						// Filter by Rolling stock id
+						if(_rollingStockFilter.get())
+						{
+							// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+							bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+							set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+							BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
 							{
-								atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
-								break;
+								if(commercialLine->usesTransportMode(*rollingStock))
+								{
+									atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+									break;
+								}
+							}
+
+							// If the line doesn't respect the filter, skip it
+							if(!atLeastOneMode)
+							{
+								continue;
 							}
 						}
 
-						// If the line doesn't respect the filter, skip it
-						if(!atLeastOneMode)
+						const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
+
+						if(_omitSameAreaDestinations && _stopArea)
 						{
-							continue;
+							//Ignore if destination is the _stopArea himself
+							if(destination->getKey() == _stopArea->get()->getKey())
+							{
+								continue;
+							}
 						}
-					}
 
-					const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
-
-					if(_omitSameAreaDestinations && _stopArea)
-					{
-						//Ignore if destination is the _stopArea himself
-						if(destination->getKey() == _stopArea->get()->getKey())
+						int distanceToBboxCenter = CalcDistanceToBboxCenter(sp);
+						SortableStopPoint keySP(&sp,distanceToBboxCenter,_isSortByDistanceToBboxCenter);
+						SortableStopArea keySA(destination->getKey(), destination->getName());
+						if(spHaveZeroDestination)
 						{
-							continue;
+							StopAreaDestinationMapType stopAreaMap;
+							stopPointMap[keySP] = stopAreaMap;
+							spHaveZeroDestination = false;
 						}
-					}
 
-					int distanceToBboxCenter = CalcDistanceToBboxCenter(sp);
-					SortableStopPoint keySP(&sp,distanceToBboxCenter,_isSortByDistanceToBboxCenter);
-					SortableStopArea keySA(destination->getKey(), destination->getName());
-					if(spHaveZeroDestination)
-					{
-						StopAreaDestinationMapType stopAreaMap;
-						stopPointMap[keySP] = stopAreaMap;
-						spHaveZeroDestination = false;
-					}
-
-					StopAreaDestinationMapType::iterator it = stopPointMap[keySP].find(keySA);
-					if(it == stopPointMap[keySP].end()) // test if destination stop already in the map
-					{
-						CommercialLineSetType lineSet;
-						lineSet.insert(commercialLine);
-						stopPointMap[keySP][keySA] = make_pair(destination, lineSet);
-					}
-					else // destination stop is already in the map
-					{
-						stopPointMap[keySP][keySA].second.insert(commercialLine);
+						StopAreaDestinationMapType::iterator it = stopPointMap[keySP].find(keySA);
+						if(it == stopPointMap[keySP].end()) // test if destination stop already in the map
+						{
+							CommercialLineSetType lineSet;
+							lineSet.insert(commercialLine);
+							stopPointMap[keySP][keySA] = make_pair(destination, lineSet);
+						}
+						else // destination stop is already in the map
+						{
+							stopPointMap[keySP][keySA].second.insert(commercialLine);
+						}
 					}
 				}
 			}

@@ -29,8 +29,8 @@
 #include "DriverServiceTableSync.hpp"
 #include "DRTArea.hpp"
 #include "Import.hpp"
-#include "LineArea.hpp"
 #include "NonConcurrencyRuleTableSync.h"
+#include "OperationUnitTableSync.hpp"
 #include "PTModule.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
@@ -99,6 +99,7 @@ namespace synthese
 		const std::string HeuresFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_DAY7_CALENDAR_ID("day7_calendar_id");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_STOPS_DATASOURCE_ID("stops_datasource_id");
+		const std::string HeuresFileFormat::Importer_::PARAMETER_OPERATION_UNIT_ID = "operation_unit_id";
 
 		const std::string HeuresFileFormat::Exporter_::PARAMETER_DATASOURCE_ID = "datasource_id";
 		const std::string HeuresFileFormat::Exporter_::PARAMETER_NETWORK_ID = "network_id";
@@ -593,7 +594,8 @@ namespace synthese
 					VehicleService* vehicleService(
 						_createOrUpdateVehicleService(
 							vehicleServices,
-							vehicleServiceCode
+							vehicleServiceCode,
+							_operationUnit
 					)	);
 
 					Troncons::mapped_type troncon(new DriverService::Chunk(vehicleService));
@@ -698,6 +700,9 @@ namespace synthese
 								_logCreation("Creation of the dead run with key "+ lexical_cast<string>(deadRun->getKey()));
 							}
 
+							// Operation unit
+							deadRun->setOperationUnit(_operationUnit);
+
 							vehicleService->insert(*deadRun);
 							_services[lineKey].push_back(deadRun);
 
@@ -787,7 +792,7 @@ namespace synthese
 									if(!alreadyNonNull)
 									{
 										alreadyNonNull = true;
-										tronconElement.startRank = route->getLineStop(rank, true)->getRankInPath();
+										tronconElement.startRank = route->getLineStop(rank, true)->get<RankInPath>();
 									}
 								}
 								else
@@ -795,7 +800,7 @@ namespace synthese
 									if(!alreadyNull && alreadyNonNull)
 									{
 										alreadyNull = true;
-										tronconElement.endRank = route->getLineStop(rank - 1, true)->getRankInPath();
+										tronconElement.endRank = route->getLineStop(rank - 1, true)->get<RankInPath>();
 									}
 								}
 								if(arrivalSchedule != "9999")
@@ -809,7 +814,7 @@ namespace synthese
 							}
 							if(!alreadyNull)
 							{
-								tronconElement.endRank = route->getLineStop(rank - 1, true)->getRankInPath();
+								tronconElement.endRank = route->getLineStop(rank - 1, true)->get<RankInPath>();
 							}
 							troncon->elements.push_back(tronconElement);
 							itS->second.driverServices.push_back(
@@ -908,33 +913,13 @@ namespace synthese
 
 					
 					// Driver service
-					set<DriverService*> loadedDriverServices(driverServices.get(driverServiceCode));
-					if(!loadedDriverServices.empty())
-					{
-						stringstream logStream;
-						logStream << "Link between driver services " << driverServiceCode << " and ";
-						BOOST_FOREACH(DriverService* ds, loadedDriverServices)
-						{
-							logStream << ds->getKey();
-						}
-						_logLoad(logStream.str());
-					}
-					else
-					{
-						boost::shared_ptr<DriverService> ds(new DriverService(DriverServiceTableSync::getId()));
-
-						Importable::DataSourceLinks links;
-						links.insert(make_pair(&dataSource, driverServiceCode));
-						ds->setDataSourceLinksWithoutRegistration(links);
-						_env.getEditableRegistry<DriverService>().add(ds);
-						driverServices.add(*ds);
-						loadedDriverServices.insert(ds.get());
-
-						_logCreation("Creation of the driver service with key "+ driverServiceCode);
-					}
 					DriverService* driverService(
-						*loadedDriverServices.begin()
-					);
+						_createOrUpdateDriverService(
+							driverServices,
+							driverServiceCode,
+							_operationUnit
+					)	);
+
 					*driverService |= cal;
 					DriverService::Chunks services;
 
@@ -961,7 +946,10 @@ namespace synthese
 						}
 
 						// Driver services
-						services.push_back(*_troncons[line.substr(i,6)]);
+						string code(line.substr(i,6));
+						services.push_back(*_troncons[code]);
+
+						*_troncons[code]->vehicleService |= cal;
 					}
 
 					driverService->setChunks(services);
@@ -1030,7 +1018,17 @@ namespace synthese
 				{
 					throw RequestException("No such data source for stops");
 				}
+			}
 
+			// Operation unit
+			RegistryKeyType unitId(map.getDefault<RegistryKeyType>(PARAMETER_OPERATION_UNIT_ID, 0));
+			if(unitId) try
+			{
+				_operationUnit = *OperationUnitTableSync::GetEditable(unitId, _env);
+			}
+			catch(ObjectNotFoundException<OperationUnit&>)
+			{
+				throw RequestException("No such operation unit");
 			}
 		}
 
@@ -1060,7 +1058,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Path* jp, line->getPaths())
 				{
-					BOOST_FOREACH(const Edge* edge, static_cast<const JourneyPattern*>(jp)->getAllEdges())
+					BOOST_FOREACH(const Edge* edge, static_cast<const JourneyPattern*>(jp)->getEdges())
 					{
 						stops.insert(static_cast<const StopPoint*>(edge->getFromVertex()));
 					}
@@ -1168,7 +1166,7 @@ namespace synthese
 						_writeTextAndSpaces(itineraiStream, jp.getName(), 2, false);
 					}
 					itineraiStream << jp.getWayBack();
-					Path::Edges allEdges(jp.getAllEdges());
+					Path::Edges allEdges(jp.getEdges());
 					Path::Edges::const_iterator itLastEdge(allEdges.end());
 					for(Path::Edges::const_iterator itEdge(allEdges.begin()); itEdge != allEdges.end(); ++itEdge)
 					{
@@ -1215,7 +1213,7 @@ namespace synthese
 							false
 						);
 						tronconsStream << "2";
-						Path::Edges allEdges(ss.getPath()->getAllEdges());
+						Path::Edges allEdges(ss.getPath()->getEdges());
 						_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.begin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
 						_writeHour(tronconsStream, ss.getDepartureSchedule(false, 0));
 						_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>((*allEdges.rbegin())->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
@@ -1235,17 +1233,15 @@ namespace synthese
 						// Schedules
 						size_t schedulesNumber(ss.getDepartureSchedules(true, false).size());
 						time_duration lastSchedule(not_a_date_time);
-						const Path::Edges& edges(ss.getPath()->getEdges());
-						for(size_t i(0); i<schedulesNumber; ++i)
+						JourneyPattern::LineStops::const_iterator itEdge(static_cast<const JourneyPattern*>(ss.getPath())->getLineStops().begin());
+						for(size_t i(0); i<schedulesNumber; ++i, ++itEdge)
 						{
 							time_duration departureSchedule(ss.getDepartureSchedule(false, i));
 							time_duration arrivalSchedule(ss.getArrivalSchedule(false, i));
 
-							size_t writings(1);
-							if(dynamic_cast<LineArea*>(edges[i]))
-							{
-								writings = dynamic_cast<LineArea*>(edges[i])->getSubEdges().size();
-							}
+							size_t writings(
+								(*itEdge)->getGeneratedLineStops().size()
+							);
 
 							// Arrival time
 							time_duration firstSchedule(

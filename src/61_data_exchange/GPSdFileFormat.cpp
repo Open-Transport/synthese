@@ -192,7 +192,7 @@ namespace synthese
 				Path::Edges allEdges;
 				if(VehicleModule::GetCurrentVehiclePosition().getService())
 				{
-					allEdges = VehicleModule::GetCurrentVehiclePosition().getService()->getPath()->getAllEdges();
+					allEdges = VehicleModule::GetCurrentVehiclePosition().getService()->getPath()->getEdges();
 				}
 				
 				double lastDistance(0.0);

@@ -42,9 +42,10 @@ namespace synthese
 	using namespace pt;
 	using namespace calendar;
 
-	template<> const string util::FactorableTemplate<Function,pt::CheckLineCalendarFunction>::FACTORY_KEY("CheckLineCalendar");
+	template<>
+	const string util::FactorableTemplate<Function, analysis::CheckLineCalendarFunction>::FACTORY_KEY("CheckLineCalendar");
 
-	namespace pt
+	namespace analysis
 	{
 		const string CheckLineCalendarFunction::PARAMETER_DURATION("du");
 

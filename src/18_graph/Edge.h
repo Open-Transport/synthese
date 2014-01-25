@@ -23,8 +23,6 @@
 #ifndef SYNTHESE_ENV_EDGE_H
 #define SYNTHESE_ENV_EDGE_H
 
-#include <vector>
-
 #include "RuleUser.h"
 #include "UtilConstants.h"
 #include "Registrable.h"
@@ -49,7 +47,6 @@ namespace synthese
 {
 	namespace graph
 	{
-		class Path;
 		class Vertex;
 		class ServicePointer;
 		class Hub;
@@ -108,8 +105,8 @@ namespace synthese
 			typedef ServiceIndex<ServiceSet::const_iterator> DepartureServiceIndex;
 			typedef ServiceIndex<ServiceSet::const_reverse_iterator> ArrivalServiceIndex;
 
-			typedef std::vector<DepartureServiceIndex> DepartureServiceIndices;
-			typedef std::vector<ArrivalServiceIndex> ArrivalServiceIndices;
+			typedef std::map<const ChronologicalServicesCollection*, std::vector<DepartureServiceIndex> > DepartureServiceIndices;
+			typedef std::map<const ChronologicalServicesCollection*, std::vector<ArrivalServiceIndex> > ArrivalServiceIndices;
 
 		protected:
 			Vertex*	_fromVertex;
@@ -131,21 +128,27 @@ namespace synthese
 			mutable DepartureServiceIndices _departureIndex;	//!< First service index by departure hour of day
 			mutable ArrivalServiceIndices _arrivalIndex;		//!< First service index by arrival hour of day
 
-			mutable bool _serviceIndexUpdateNeeded;
-			mutable bool _RTserviceIndexUpdateNeeded;
+			typedef std::map<const ChronologicalServicesCollection*, bool> ServicesIndexUpdateNeeded;
+			mutable ServicesIndexUpdateNeeded _serviceIndexUpdateNeeded;
+			mutable ServicesIndexUpdateNeeded _RTserviceIndexUpdateNeeded;
 
 			mutable boost::recursive_mutex _indexMutex;
 
 		public:
+			DepartureServiceIndices::mapped_type& getDepartureIndex(const ChronologicalServicesCollection& collection) const;
+			ArrivalServiceIndices::mapped_type& getArrivalIndex(const ChronologicalServicesCollection& collection) const;
+
 			/** Updates service indices.
 				@param RTData indicates if real time or theoretical indices must be updated
 				@author Hugues Romain
 			*/
 			void _updateServiceIndex(
+				const ChronologicalServicesCollection& collection,
 				bool RTData
 			) const;
 
 			bool _getServiceIndexUpdateNeeded(
+				const ChronologicalServicesCollection& collection,
 				bool RTData
 			) const;
 
@@ -206,25 +209,19 @@ namespace synthese
 			//@{
 				virtual bool isDepartureAllowed() const = 0;
 				virtual bool isArrivalAllowed() const = 0;
-
-				typedef std::vector<graph::Edge*> SubEdges;
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Virtual method to get sub-edges to link instead of the edge registered
-				/// in the path (useful for area type vertices).
-				/// Default implementation return the object alone.
-				virtual SubEdges getSubEdges() const;
-
+				virtual bool getScheduleInput() const { return true; }
 				bool isConnectingEdge() const;
 
 				const Hub* getHub() const;
 
 				DepartureServiceIndex::Value getDepartureFromIndex(
+					const ChronologicalServicesCollection& collection,
 					bool RTData,
 					size_t hour
 				) const;
 
 				ArrivalServiceIndex::Value getArrivalFromIndex(
+					const ChronologicalServicesCollection& collection,
 					bool RTData,
 					size_t hour
 				) const;
@@ -291,6 +288,7 @@ namespace synthese
 					@param allowCanceledService returns real time canceled services too. The _canceled attribute of the service pointer would be set to true.
 				*/
 				ServicePointer getNextService(
+					const ChronologicalServicesCollection& collection,
 					const AccessParameters& accessParameters,
 					boost::posix_time::ptime departureMoment,
 					const boost::posix_time::ptime& maxDepartureMoment,
@@ -318,6 +316,7 @@ namespace synthese
 					@retval maxPreviousServiceIndex Index corresponding to the returned service
 				*/
 				ServicePointer getPreviousService(
+					const ChronologicalServicesCollection& collection,
 					const AccessParameters& accessParameters,
 					boost::posix_time::ptime arrivalMoment,
 					const boost::posix_time::ptime& minArrivalMoment,
@@ -333,7 +332,10 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-				void markServiceIndexUpdateNeeded(bool RTDataOnly) const;
+				void markServiceIndexUpdateNeeded(
+					const ChronologicalServicesCollection& collection,
+					bool RTDataOnly
+				) const;
 			//@}
 
 
@@ -343,8 +345,11 @@ namespace synthese
 
 
 				virtual std::string getRuleUserName() const { return "edge"; }
+
+				virtual bool getReservationNeeded() const { return false; }
 		};
 	}
 }
 
 #endif
+

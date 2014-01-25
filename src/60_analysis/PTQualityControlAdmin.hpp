@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace analysis
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// PTQualityControlAdmin Admin compound class.

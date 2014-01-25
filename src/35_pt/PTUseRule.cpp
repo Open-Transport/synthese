@@ -206,8 +206,8 @@ namespace synthese
 
 			case RESERVATION_RULE_COMPULSORY:
 				return
-					(	!dynamic_cast<const LineStop*>(servicePointer.getDepartureEdge()) ||
-						!static_cast<const LineStop*>(servicePointer.getDepartureEdge())->getReservationNeeded() ||
+					(	!servicePointer.getDepartureEdge() ||
+						!servicePointer.getDepartureEdge()->getReservationNeeded() ||
 						IsReservationPossible(getReservationAvailability(servicePointer, ignoreReservation))
 					) ?
 					RUN_POSSIBLE :

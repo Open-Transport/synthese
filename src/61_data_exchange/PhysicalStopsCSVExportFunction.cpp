@@ -47,9 +47,10 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<Function,pt::PhysicalStopsCSVExportFunction>::FACTORY_KEY("PhysicalStopsCSVExportFunction");
+	template<>
+	const string util::FactorableTemplate<Function, data_exchange::PhysicalStopsCSVExportFunction>::FACTORY_KEY("PhysicalStopsCSVExportFunction");
 
-	namespace pt
+	namespace data_exchange
 	{
 		const string PhysicalStopsCSVExportFunction::PARAMETER_BBOX("bbox");
 		const string PhysicalStopsCSVExportFunction::PARAMETER_SRID("srid");

@@ -134,7 +134,7 @@ namespace synthese
 	{
 		void VehicleModule::RegisterVehicle(const Vehicle& vehicle )
 		{
-			BOOST_FOREACH(const Vehicle::AllowedLines::value_type& line, vehicle.getAllowedLines())
+			BOOST_FOREACH(const AllowedLines::Type::value_type& line, vehicle.get<AllowedLines>())
 			{
 				_linesAllowedVehicles[line].insert(&vehicle);
 			}
@@ -144,7 +144,7 @@ namespace synthese
 
 		void VehicleModule::UnregisterVehicle(const Vehicle& vehicle )
 		{
-			BOOST_FOREACH(const Vehicle::AllowedLines::value_type& line, vehicle.getAllowedLines())
+			BOOST_FOREACH(const AllowedLines::Type::value_type& line, vehicle.get<AllowedLines>())
 			{
 				_linesAllowedVehicles[line].erase(&vehicle);
 			}

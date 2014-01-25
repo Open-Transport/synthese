@@ -871,7 +871,7 @@ namespace synthese
 
 							if(_outputTerminuses)
 							{
-								stopAreasTerminus.insert(static_cast<const JourneyPattern*>(path)->getDestination()->getConnectionPlace());
+								stopAreasTerminus.insert(static_cast<const StopPoint*>(path->getDestination())->getConnectionPlace());
 							}
 						}
 

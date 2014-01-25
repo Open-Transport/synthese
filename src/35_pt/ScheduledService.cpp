@@ -74,7 +74,9 @@ namespace synthese
 
 
 		ScheduledService::~ScheduledService ()
-		{}
+		{
+			unlink();
+		}
 
 
 
@@ -644,14 +646,7 @@ namespace synthese
 				)	);
 				if(dsl != getDataSourceLinks())	
 				{
-					if(&env == &Env::GetOfficialEnv())
-					{
-						setDataSourceLinksWithRegistration(dsl);
-					}
-					else
-					{
-						setDataSourceLinksWithoutRegistration(dsl);
-					}
+					setDataSourceLinksWithRegistration(dsl);
 					result = true;
 				}
 			}
@@ -770,12 +765,11 @@ namespace synthese
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Registration in path
-			if( getPath() &&
-				getPath()->getPathGroup())
+			if( getPath())
 			{
 				getPath()->addService(
 					*this,
-					&env == &Env::GetOfficialEnv()
+					true
 				);
 				updatePathCalendar();
 			}
@@ -789,11 +783,6 @@ namespace synthese
 					getRoute()->getCommercialLine()->registerService(*this);
 			}	}
 
-			if(&env == &Env::GetOfficialEnv())
-			{
-				setDataSourceLinksWithRegistration(getDataSourceLinks());
-			}
-
 			// Clear cache in case of non detected change in external objects (like path edges number)
 			_clearGeneratedSchedules();
 		}
@@ -806,8 +795,6 @@ namespace synthese
 			{
 				getPath()->removeService(*this);
 			}
-
-			cleanDataSourceLinks(true);
 
 			// Unregister from the line
 			if(getRoute() && getRoute()->getCommercialLine())

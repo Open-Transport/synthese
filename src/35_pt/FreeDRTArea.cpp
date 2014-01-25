@@ -123,7 +123,7 @@ namespace synthese
 
 			// Search for the best time slot
 			const FreeDRTTimeSlot* bestTimeSlot(NULL);
-			BOOST_FOREACH(const Service* service, _services)
+			BOOST_FOREACH(const Service* service, getAllServices())
 			{
 				// Declarations
 				const FreeDRTTimeSlot& timeSlot(static_cast<const FreeDRTTimeSlot&>(*service));

@@ -129,8 +129,11 @@ namespace synthese
 				{
 					if(_line.get())
 					{
-						Vehicle::AllowedLines::const_iterator it(vehicle.second->getAllowedLines().find(_line.get()));
-						if(it == vehicle.second->getAllowedLines().end())
+						AllowedLines::Type::const_iterator it(
+							vehicle.second->get<AllowedLines>().find(
+								const_cast<CommercialLine*>(_line.get())
+						)	);
+						if(it == vehicle.second->get<AllowedLines>().end())
 						{
 							continue;
 						}

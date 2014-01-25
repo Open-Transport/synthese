@@ -31,6 +31,7 @@
 #include "RoadShapeFileFormat.hpp"
 
 #include "NCEStatusService.hpp"
+#include "PhysicalStopsCSVExportFunction.h"
 #include "VDVSubscriptionService.hpp"
 #include "VDVDataReadyService.hpp"
 #include "VDVDataSupplyService.hpp"
@@ -63,6 +64,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::DataExchangeModule::integrate();
 
 	synthese::data_exchange::NCEStatusService::integrate();
+	synthese::data_exchange::PhysicalStopsCSVExportFunction::integrate();
 	synthese::data_exchange::VDVClientsListService::integrate();
 	synthese::data_exchange::VDVServersListService::integrate();
 	synthese::data_exchange::VDVSubscriptionService::integrate();

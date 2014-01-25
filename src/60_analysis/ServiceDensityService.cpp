@@ -32,7 +32,6 @@
 #include "RollingStock.hpp"
 #include "TransportNetwork.h"
 #include "Edge.h"
-#include "LineStop.h"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
@@ -61,10 +60,12 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace cms;
+	using namespace pt;
 
-	template<> const string util::FactorableTemplate<Function,pt::ServiceDensityService>::FACTORY_KEY("ServiceDensityService");
+	template<>
+	const string util::FactorableTemplate<Function, analysis::ServiceDensityService>::FACTORY_KEY("ServiceDensityService");
 
-	namespace pt
+	namespace analysis
 	{
 		const string ServiceDensityService::PARAMETER_START_DATE = "start_date";
 		const string ServiceDensityService::PARAMETER_END_DATE = "end_date";
@@ -290,81 +291,89 @@ namespace synthese
 				size_t nbServiceInStop = 0;
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getStopPoint()->getDepartureEdges())
 				{
-					const LineStop* ls = static_cast<const LineStop*>(edge.second);
+					const Edge& ls = *edge.second;
 
-					ptime departureDateTime = _startDate;
-					// Loop on services
-					optional<Edge::DepartureServiceIndex::Value> index;
-					while(true)
+					// Loop on services collections
+					BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls.getParentPath()->getServiceCollections())
 					{
-						ServicePointer servicePointer(
-							ls->getNextService(
-								_accessParameters,
-								departureDateTime,
-								_endDate,
-								false,
-								index,
-								false,
-								false
-						));
-						if(!servicePointer.getService())
-							break;
-						const Service * service = servicePointer.getService();
-						++*index;
-						departureDateTime = servicePointer.getDepartureDateTime();
-						if(sp.getStopPoint()->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
-							continue;
-
-						const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(service->getPath());
-						if(!journeyPattern || 
-							!journeyPattern->isCompatibleWith(_accessParameters) ||
-							!_accessParameters.isAllowedPathClass
-							(
-								journeyPattern->getPathClass() ? journeyPattern->getPathClass()->getIdentifier() : 0,
-								journeyPattern->getPathNetwork() ? journeyPattern->getPathNetwork()->getIdentifier() : 0
-							)
-						){
-							continue;
-						}
-
-						// Check if service already stored in map
-						if(serviceStored.find(service->getKey()) != serviceStored.end())
-							continue;
-						serviceStored.insert(service->getKey());
-
-						nbService++;
-						nbServiceInStop++;
-						maxDistance = sp.getDistanceToCenter();
-						if(_displayServices)
+						ptime departureDateTime = _startDate;
+						// Loop on services
+						optional<Edge::DepartureServiceIndex::Value> index;
+						while(true)
 						{
-							boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
-							serviceMap->insert(DATA_SERVICE_ID, service->getKey());
+							ServicePointer servicePointer(
+								ls.getNextService(
+									*itCollection,
+									_accessParameters,
+									departureDateTime,
+									_endDate,
+									false,
+									index,
+									false,
+									false
+							));
+							if(!servicePointer.getService())
+								break;
+							const Service * service = servicePointer.getService();
+							++*index;
+							departureDateTime = servicePointer.getDepartureDateTime();
+							if(sp.getStopPoint()->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+								continue;
 
-							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-							serviceMap->insert(DATA_COMMERCIAL_LINE_NAME, commercialLine->getName());
-							serviceMap->insert(DATA_LINE_NAME, journeyPattern->getName());
-
-							// Departure schedule
-							if(dynamic_cast<const SchedulesBasedService*>(service))
-							{
-								const SchedulesBasedService& sservice(
-									dynamic_cast<const SchedulesBasedService&>(*service)
-								);
-								serviceMap->insert(DATA_SERVICE_DEPARTURE_SCHEDULE, to_simple_string(sservice.getDepartureSchedule(false, 0)));
+							const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(service->getPath());
+							if(!journeyPattern || 
+								!journeyPattern->isCompatibleWith(_accessParameters) ||
+								!_accessParameters.isAllowedPathClass
+								(
+									journeyPattern->getPathClass() ? journeyPattern->getPathClass()->getIdentifier() : 0,
+									journeyPattern->getPathNetwork() ? journeyPattern->getPathNetwork()->getIdentifier() : 0
+								)
+							){
+								continue;
 							}
-							serviceMap->insert(DATA_SERVICE_NETWORK, journeyPattern->getNetwork()->getName());
-							serviceMap->insert(DATA_SERVICE_ROLLING_STOCK, journeyPattern->getRollingStock()->getName());
-							serviceMap->insert(DATA_SERVICE_RANK, nbServiceInStop);
 
-							stopMap->insert(DATA_SERVICE, serviceMap);
-						}
-						if (nbService >= _serviceNumberToReach)
-						{
-							isServiceNumberReadched = true;
-							break;
-						}
+							// Check if service already stored in map
+							if(serviceStored.find(service->getKey()) != serviceStored.end())
+								continue;
+							serviceStored.insert(service->getKey());
+
+							nbService++;
+							nbServiceInStop++;
+							maxDistance = sp.getDistanceToCenter();
+							if(_displayServices)
+							{
+								boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
+								serviceMap->insert(DATA_SERVICE_ID, service->getKey());
+
+								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+								serviceMap->insert(DATA_COMMERCIAL_LINE_NAME, commercialLine->getName());
+								serviceMap->insert(DATA_LINE_NAME, journeyPattern->getName());
+
+								// Departure schedule
+								if(dynamic_cast<const SchedulesBasedService*>(service))
+								{
+									const SchedulesBasedService& sservice(
+										dynamic_cast<const SchedulesBasedService&>(*service)
+									);
+									serviceMap->insert(DATA_SERVICE_DEPARTURE_SCHEDULE, to_simple_string(sservice.getDepartureSchedule(false, 0)));
+								}
+								serviceMap->insert(DATA_SERVICE_NETWORK, journeyPattern->getNetwork()->getName());
+								serviceMap->insert(DATA_SERVICE_ROLLING_STOCK, journeyPattern->getRollingStock()->getName());
+								serviceMap->insert(DATA_SERVICE_RANK, nbServiceInStop);
+
+								stopMap->insert(DATA_SERVICE, serviceMap);
+							}
+							if (nbService >= _serviceNumberToReach)
+							{
+								isServiceNumberReadched = true;
+								break;
+							}
+							
+						} //Service pointer loop
 						
-					} //Service pointer loop
+						if(isServiceNumberReadched)break;
+					}
+
 					if(isServiceNumberReadched)break;
 				} // Edge loop
 				if(nbServiceInStop > 0)

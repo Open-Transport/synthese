@@ -301,6 +301,11 @@ namespace synthese
 				{
 					BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk.elements)
 					{
+						if(!service.service)
+						{
+							Log::GetInstance().warn("Null service in driver service has been ignored");
+							continue;
+						}
 						if(firstService)
 						{
 							firstService = false;

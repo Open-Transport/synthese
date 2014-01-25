@@ -29,7 +29,6 @@
 #include "City.h"
 #include "CommercialLineTableSync.h"
 #include "DRTArea.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "ScheduledServiceTableSync.h"
@@ -227,9 +226,9 @@ namespace synthese
 
 					// Gets all services
 					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*journeyPattern.sharedServicesMutex
+						*journeyPattern.sharedServicesMutex
 					);
-					BOOST_FOREACH(Service* service, journeyPattern.getServices())
+					BOOST_FOREACH(Service* service, journeyPattern.getAllServices())
 					{
 						// Min departure time filter
 						if(	_minDepartureTime &&
@@ -246,18 +245,6 @@ namespace synthese
 						}
 
 						result.insert(service);
-					}
-
-					// Sub journey pattern
-					BOOST_FOREACH(JourneyPatternCopy* subPath, journeyPattern.getSubLines())
-					{
-						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*subPath->sharedServicesMutex
-						);
-						BOOST_FOREACH(Service* service, subPath->getServices())
-						{
-							result.insert(service);
-						}
 					}
 				}
 			}
@@ -342,7 +329,7 @@ namespace synthese
 					}
 
 					// Stops
-					BOOST_FOREACH(const Path::Edges::value_type& edge, service->getPath()->getAllEdges())
+					BOOST_FOREACH(const Path::Edges::value_type& edge, service->getPath()->getEdges())
 					{
 						boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 

@@ -24,6 +24,7 @@
 
 #include "CommercialLineAdmin.h"
 
+#include "LineStop.h"
 #include "TransportNetworkAdmin.h"
 #include "PTModule.h"
 #include "User.h"
@@ -50,7 +51,6 @@
 #include "PropertiesHTMLTable.h"
 #include "ReservationContact.h"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "LineArea.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "PTRuleUserAdmin.hpp"
@@ -63,7 +63,6 @@
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
 #include "DRTArea.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "FreeDRTAreaTableSync.hpp"
 #include "FreeDRTAreaUpdateAction.hpp"
 #include "FreeDRTAreaAdmin.hpp"
@@ -709,6 +708,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "Arrêts"));
 			h.push_back(make_pair(string(), "Long."));
 			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/car.png", "Services")));
+			h.push_back(make_pair(string(), "Date"));
 			h.push_back(make_pair(string(), "Source"));
 			h.push_back(make_pair(string(), "Actions"));
 
@@ -747,41 +747,43 @@ namespace synthese
 				{
 					{
 						stream << t.col();
-						const DesignatedLinePhysicalStop* lineStop(
-							dynamic_cast<const DesignatedLinePhysicalStop*>(
-								*line->getEdges().begin()
-						)	);
-						if(lineStop)
+						const LineStop& lineStop(
+							**line->getLineStops().begin()
+						);
+						StopPoint* stopPoint(
+							dynamic_cast<StopPoint*>(&*lineStop.get<LineNode>())
+						);
+						DRTArea* area(
+							dynamic_cast<DRTArea*>(&*lineStop.get<LineNode>())
+						);
+						if(stopPoint)
 						{
-							stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							stream << stopPoint->getConnectionPlace()->getFullName();
 						}
-						const LineArea* lineArea(
-							dynamic_cast<const LineArea*>(
-								*line->getEdges().begin()
-						)	);
-						if(lineArea)
+						if(area)
 						{
-							stream << lineArea->getArea()->getName();
+							stream << area->getName();
 						}
 					}
 
 					{
 						stream << t.col();
-						const DesignatedLinePhysicalStop* lineStop(
-							dynamic_cast<const DesignatedLinePhysicalStop*>(
-								*line->getEdges().rbegin()
-						)	);
-						if(lineStop)
+						const LineStop& lineStop(
+							**line->getLineStops().rbegin()
+						);
+						StopPoint* stopPoint(
+							dynamic_cast<StopPoint*>(&*lineStop.get<LineNode>())
+						);
+						DRTArea* area(
+							dynamic_cast<DRTArea*>(&*lineStop.get<LineNode>())
+						);
+						if(stopPoint)
 						{
-							stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							stream << stopPoint->getConnectionPlace()->getFullName();
 						}
-						const LineArea* lineArea(
-							dynamic_cast<const LineArea*>(
-								*line->getEdges().rbegin()
-						)	);
-						if(lineArea)
+						if(area)
 						{
-							stream << lineArea->getArea()->getName();
+							stream << area->getName();
 						}
 					}
 
@@ -796,12 +798,12 @@ namespace synthese
 
 				// Services number
 				stream << t.col();
-				size_t servicesNumber(line->getServices().size());
-				BOOST_FOREACH(JourneyPatternCopy* subline, line->getSubLines())
-				{
-					servicesNumber += subline->getServices().size();
-				}
+				size_t servicesNumber(line->getAllServices().size());
 				stream << servicesNumber;
+
+				// Date
+				stream << t.col();
+				stream << to_iso_extended_string(line->getCalendarCache().getLastActiveDate());
 
 				// Datasource
 				stream << t.col();

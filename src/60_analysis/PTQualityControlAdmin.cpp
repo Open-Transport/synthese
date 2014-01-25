@@ -36,7 +36,7 @@
 #include "User.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
-#include "PTModule.h"
+#include "AnalysisModule.hpp"
 #include "TransportNetworkRight.h"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
@@ -53,7 +53,6 @@
 #include "PTPlaceAdmin.h"
 #include "CopyGeometriesAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JourneyPatternAdmin.hpp"
 #include "JourneyPatternTableSync.hpp"
@@ -71,6 +70,7 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace admin;
+	using namespace analysis;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -94,7 +94,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<PTQualityControlAdmin>::DEFAULT_TITLE = "Contrôle qualité";
 	}
 
-	namespace pt
+	namespace analysis
 	{
 		const string PTQualityControlAdmin::PARAM_RUN_CONTROL = "rc";
 		const string PTQualityControlAdmin::PARAM_LINES = "lines";
@@ -1052,8 +1052,8 @@ namespace synthese
 							{
 								const Edge* nextEdge(itEdge.second->getNext());
 								// If the edge is a path termination/junction/noId, ignore it
-								if((!nextEdge || dynamic_cast<JourneyPatternCopy*>(edge->getParentPath())
-									|| edge->getGeometry()) 
+								if((!nextEdge ||
+									edge->getGeometry()) 
 									|| ((itEdge.second->getParentPath()) && (!itEdge.second->getParentPath()->getKey())) 
 									|| dynamic_cast<Junction*>(edge->getParentPath()))
 								{
@@ -1631,8 +1631,8 @@ namespace synthese
 							const Edge* nextEdge(edge->getNext());
 
 							// If the edge is a path termination, ignore it
-							if(!nextEdge || dynamic_cast<JourneyPatternCopy*>(edge->getParentPath()) 
-								|| dynamic_cast<Junction*>(edge->getParentPath()))
+							if(	!nextEdge ||
+								dynamic_cast<Junction*>(edge->getParentPath()))
 							{
 								continue;
 							}
@@ -1830,7 +1830,7 @@ namespace synthese
 						bool ok(true);
 						BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStops)
 						{
-							if(lineStop->getRankInPath() != rank)
+							if(lineStop->get<RankInPath>() != rank)
 							{
 								ok = false;
 								break;
@@ -2183,7 +2183,7 @@ namespace synthese
 
 			AdminInterfaceElement::PageLinks links;
 
-			if(	dynamic_cast<const PTModule*>(&module) &&
+			if(	dynamic_cast<const AnalysisModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())

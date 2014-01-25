@@ -35,8 +35,6 @@
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "DBTransaction.hpp"
-#include "LineArea.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
 
 #include <geos/geom/LineString.h>
 
@@ -155,110 +153,62 @@ namespace synthese
 				{
 					size_t rank(0);
 					const double maxMetricOffset(_template->getLastEdge()->getMetricOffset());
-					for(Path::Edges::const_reverse_iterator it(_template->getEdges().rbegin()); it != _template->getEdges().rend(); ++it)
+					for(JourneyPattern::LineStops::const_reverse_iterator it(_template->getLineStops().rbegin()); it != _template->getLineStops().rend(); ++it)
 					{
-						if(dynamic_cast<const DesignatedLinePhysicalStop*>(*it))
+						const LineStop& other(**it);
+						LineStop ls(
+							0,
+							&object,
+							rank++,
+							other.get<IsArrival>(),
+							other.get<IsDeparture>(),
+							maxMetricOffset - other.get<MetricOffsetField>(),
+							other.get<LineNode>()
+						);
+						ls.set<ScheduleInput>(other.get<ScheduleInput>());
+						ls.set<ReservationNeeded>(other.get<ReservationNeeded>());
+						ls.set<InternalService>(other.get<InternalService>());
+						JourneyPattern::LineStops::const_reverse_iterator it2(it);
+						++it2;
+						if(it2 != _template->getLineStops().rend())
 						{
-							const DesignatedLinePhysicalStop& other(static_cast<const DesignatedLinePhysicalStop&>(**it));
-							DesignatedLinePhysicalStop ls(
-								0,
-								&object,
-								rank++,
-								other.getIsArrival(),
-								other.getIsDeparture(),
-								maxMetricOffset - other.getMetricOffset(),
-								other.getPhysicalStop(),
-								other.getScheduleInput(),
-								other.getReservationNeeded()
-							);
-							if((it+1) != _template->getEdges().rend())
+							const LineStop& prevOther(**it2);
+							if(prevOther.get<LineStringGeometry>())
 							{
-								const DesignatedLinePhysicalStop& prevOther(
-									static_cast<const DesignatedLinePhysicalStop&>(**(it+1))
-								);
-								if(prevOther.getGeometry().get())
-								{
-									ls.setGeometry(
-										boost::shared_ptr<LineString>(
-											dynamic_cast<LineString*>(prevOther.getGeometry()->reverse())
-									)	);
-								}
-							}
-							LineStopTableSync::Save(&ls, transaction);
-						}
-						if(dynamic_cast<const LineArea*>(*it))
-						{
-							const LineArea& other(static_cast<const LineArea&>(**it));
-							LineArea ls(
-								0,
-								&object,
-								rank++,
-								other.getIsArrival(),
-								other.getIsDeparture(),
-								maxMetricOffset - other.getMetricOffset(),
-								other.getArea(),
-								other.getInternalService()
-							);
-							if(other.getGeometry().get())
-							{
-								ls.setGeometry(
+								ls.set<LineStringGeometry>(
 									boost::shared_ptr<LineString>(
-										dynamic_cast<LineString*>(other.getGeometry()->reverse())
+										dynamic_cast<LineString*>(prevOther.get<LineStringGeometry>()->reverse())
 								)	);
 							}
-							LineStopTableSync::Save(&ls, transaction);
 						}
+						LineStopTableSync::Save(&ls, transaction);
 					}
 				}
 				else
 				{
-					for(Path::Edges::const_iterator it(_template->getEdges().begin()); it != _template->getEdges().end(); ++it)
+					for(JourneyPattern::LineStops::const_iterator it(_template->getLineStops().begin()); it != _template->getLineStops().end(); ++it)
 					{
-						if(dynamic_cast<const DesignatedLinePhysicalStop*>(*it))
+						const LineStop& other(**it);
+						LineStop ls(
+							0,
+							&object,
+							other.get<RankInPath>(),
+							other.get<IsDeparture>(),
+							other.get<IsArrival>(),
+							other.get<MetricOffsetField>(),
+							other.get<LineNode>()
+						);
+						ls.set<ScheduleInput>(other.get<ScheduleInput>());
+						ls.set<ReservationNeeded>(other.get<ReservationNeeded>());
+						ls.set<InternalService>(other.get<InternalService>());
+						if(other.get<LineStringGeometry>())
 						{
-							const DesignatedLinePhysicalStop& other(static_cast<const DesignatedLinePhysicalStop&>(**it));
-							DesignatedLinePhysicalStop ls(
-								0,
-								&object,
-								other.getRankInPath(),
-								other.getIsDeparture(),
-								other.getIsArrival(),
-								other.getMetricOffset(),
-								other.getPhysicalStop(),
-								other.getScheduleInput(),
-								other.getReservationNeeded()
-							);
-							if(other.getGeometry().get())
-							{
-								ls.setGeometry(
-									boost::shared_ptr<LineString>(
-										dynamic_cast<LineString*>(other.getGeometry()->clone())
-								)	);
-							}
-							LineStopTableSync::Save(&ls, transaction);
+							ls.set<LineStringGeometry>(
+								boost::shared_ptr<LineString>(
+									dynamic_cast<LineString*>(other.get<LineStringGeometry>()->clone())
+							)	);
 						}
-						if(dynamic_cast<const LineArea*>(*it))
-						{
-							const LineArea& other(static_cast<const LineArea&>(**it));
-							LineArea ls(
-								0,
-								&object,
-								other.getRankInPath(),
-								other.getIsDeparture(),
-								other.getIsArrival(),
-								other.getMetricOffset(),
-								other.getArea(),
-								other.getInternalService()
-							);
-							if(other.getGeometry().get())
-							{
-								ls.setGeometry(
-									boost::shared_ptr<LineString>(
-										dynamic_cast<LineString*>(other.getGeometry()->clone())
-								)	);
-							}
-							LineStopTableSync::Save(&ls, transaction);
-						}
+						LineStopTableSync::Save(&ls, transaction);
 					}
 				}
 			}

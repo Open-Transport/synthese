@@ -24,6 +24,7 @@
 
 #include "Crossing.h"
 #include "DataSourceLinksField.hpp"
+#include "DRTArea.hpp"
 #include "ImportableTableSync.hpp"
 #include "Registry.h"
 #include "PTModule.h"
@@ -83,17 +84,15 @@ namespace synthese
 
 		StopPoint::~StopPoint()
 		{
-			// Unlink
 			unlink();
 
-			// Cleaning of the property type pointers
-			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
+			BOOST_FOREACH(const Vertex::Edges::value_type& it, getDepartureEdges())
 			{
-				edge.second->setFromVertex(NULL);
+				it.second->setFromVertex(NULL);
 			}
-			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
+			BOOST_FOREACH(const Vertex::Edges::value_type& it, getArrivalEdges())
 			{
-				edge.second->setFromVertex(NULL);
+				it.second->setFromVertex(NULL);
 			}
 		}
 
@@ -155,12 +154,12 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					if(!dynamic_cast<JourneyPattern*>(edge.second->getParentPath()))
 					{
 						continue;
 					}
 					lines.insert(
-						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+						dynamic_cast<JourneyPattern*>(edge.second->getParentPath())->getCommercialLine()
 					);
 			}	}
 
@@ -169,12 +168,12 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					if(!dynamic_cast<JourneyPattern*>(edge.second->getParentPath()))
 					{
 						continue;
 					}
 					lines.insert(
-						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+						dynamic_cast<JourneyPattern*>(edge.second->getParentPath())->getCommercialLine()
 					);
 			}	}
 
@@ -197,13 +196,14 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+					if(!jp)
 					{
 						continue;
 					}
 					journeyPatterns.insert(
 						make_pair(
-							static_cast<const LineStop*>(edge.second)->getLine(),
+							jp,
 							make_pair(false, true)
 					)	);
 			}	}
@@ -213,16 +213,17 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+					if(!jp)
 					{
 						continue;
 					}
-					JourneyPatternsMap::iterator it(journeyPatterns.find(static_cast<const LineStop*>(edge.second)->getLine()));
+					JourneyPatternsMap::iterator it(journeyPatterns.find(jp));
 					if(it == journeyPatterns.end())
 					{
 						journeyPatterns.insert(
 							make_pair(
-								static_cast<const LineStop*>(edge.second)->getLine(),
+								jp,
 								make_pair(true, false)
 						)	);
 					}
@@ -261,13 +262,21 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> linesPm(new ParametersMap);
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 			{
-				if(dynamic_cast<const LineStop*>(edge.second))
-					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
+				JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+				if(!jp)
+				{
+					continue;
+				}
+				linesSet.insert(jp->getCommercialLine()->getShortName());
 			}
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 			{
-				if(dynamic_cast<const LineStop*>(edge.second))
-					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
+				JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+				if(!jp)
+				{
+					continue;
+				}
+				linesSet.insert(jp->getCommercialLine()->getShortName());
 			}
 			BOOST_FOREACH(string line, linesSet)
 			{
@@ -614,6 +623,21 @@ namespace synthese
 			if(getProjectedPoint().getRoadChunk())
 			{
 				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
+			}
+		}
+
+
+
+		void StopPoint::unlink()
+		{
+			if(getConnectionPlace())
+			{
+				const_cast<StopArea*>(getConnectionPlace())->removePhysicalStop(*this);
+			}
+			if(	getProjectedPoint().getRoadChunk() &&
+				getProjectedPoint().getRoadChunk()->getFromCrossing()
+			){
+				getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(this);
 			}
 		}
 }	}

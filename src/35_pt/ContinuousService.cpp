@@ -68,7 +68,9 @@ namespace synthese
 
 
 		ContinuousService::~ContinuousService ()
-		{}
+		{
+			unlink();
+		}
 
 
 
@@ -606,12 +608,11 @@ namespace synthese
 		void ContinuousService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Registration in path
-			if( getPath() &&
-				getPath()->getPathGroup())
+			if( getPath())
 			{
 				getPath()->addService(
 					*this,
-					&env == &Env::GetOfficialEnv()
+					true
 				);
 				updatePathCalendar();
 			}
@@ -656,6 +657,24 @@ namespace synthese
 		const boost::posix_time::time_duration ContinuousService::getDataLastArrivalSchedule( size_t i ) const
 		{
 			return getDataFirstArrivalSchedule(i) + _range + _maxWaitingTime;
+		}
+
+
+
+		void ContinuousService::unlink()
+		{
+			// Unregister from the route
+			if(getPath())
+			{
+				getPath()->removeService(*this);
+			}
+
+			// Unregister from the line
+			if(	getRoute() &&
+				getRoute()->getCommercialLine()
+			){
+				getRoute()->getCommercialLine()->unregisterService(*this);
+			}
 		}
 	}
 }

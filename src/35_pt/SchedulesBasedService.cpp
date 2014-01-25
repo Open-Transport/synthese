@@ -26,7 +26,6 @@
 #include "CommercialLine.h"
 #include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
-#include "LineStop.h"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
 #include "RealTimePTDataInterSYNTHESE.hpp"
@@ -99,7 +98,7 @@ namespace synthese
 			
 			if(_path)
 			{
-				_path->markScheduleIndexesUpdateNeeded(false);
+				_path->markAllScheduleIndexesUpdateNeeded(false);
 			}
 			_clearGeneratedSchedules();
 			clearRTData();
@@ -548,7 +547,7 @@ namespace synthese
 			bool departure
 		) const {
 
-			Path::Edges edges(_path->getAllEdges());
+			Path::Edges edges(_path->getEdges());
 
 			const Schedules& departureSchedules(getDepartureSchedules(true, false));
 			const Schedules& arrivalSchedules(getArrivalSchedules(true, false));
@@ -587,7 +586,7 @@ namespace synthese
 					_computeNextRTUpdate();
 				}
 			}
-			_path->markScheduleIndexesUpdateNeeded(true);
+			_path->markAllScheduleIndexesUpdateNeeded(true);
 
 
 			// Inter-SYNTHESE sync
@@ -611,7 +610,7 @@ namespace synthese
 			_RTDepartureSchedules = departureSchedules;
 			_RTArrivalSchedules = arrivalSchedules;
 			_computeNextRTUpdate();
-			_path->markScheduleIndexesUpdateNeeded(true);
+			_path->markAllScheduleIndexesUpdateNeeded(true);
 
 
 			// Inter-SYNTHESE sync
@@ -910,6 +909,7 @@ namespace synthese
 				: (&Edge::getFollowingArrivalForFineSteppingOnly)
 			);
 
+			AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
 
 			BOOST_FOREACH(const NonConcurrencyRule* rule, rules)
 			{
@@ -944,69 +944,74 @@ namespace synthese
 						for(Vertex::Edges::const_iterator its(range.first); its != range.second; ++its)
 						{
 							const Edge& startEdge(*its->second);
-							// Search a service at the time of the possible
-							AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
-							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
-					
-							while(true)
-							{
-								ServicePointer serviceInstance(
-									startEdge.getNextService(
-										ap,
-										minStartTime,
-										maxStartTime,
-										true,
-										minServiceIndex,
-										false,
-										true
-								)	);
-								// If no service, advance to the next path
-								if (!serviceInstance.getService()) break;
-								++*minServiceIndex;
-								// This is needed because getNextService is broken if we keep calling
-								// it with a minStartTime on a non active day (infinite loop)
-								minStartTime = serviceInstance.getDepartureDateTime();
-								// Path traversal
-								for (const Edge* endEdge = (startEdge.*step) ();
-									 endEdge != NULL; endEdge = (endEdge->*step) ())
-								{
-									// Found eligible arrival place
-									if(endEdge->getHub() == arrivalHub)
-									{
-										time_period timePeriod(
-													serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
-													serviceInstance.getDepartureDateTime() +
-													serviceInstance.getServiceRange() + rule->get<Delay>()
-													);
-										if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
-										{
-											// Merge the last period and the new one. We assume we are always called
-											// in incremental time so the time_periods are sorted
-											excludeRanges[excludeRanges.size()-1] =
-													timePeriod.merge(excludeRanges.back());
-										}
-										else
-										{
-											excludeRanges.push_back(timePeriod);
-										}
 
-										if ( isContinuous() )
+							// Loop on services collections
+							BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path->getServiceCollections())
+							{
+								// Search a service at the time of the possible
+								optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
+						
+								while(true)
+								{
+									ServicePointer serviceInstance(
+										startEdge.getNextService(
+											*itCollection,
+											ap,
+											minStartTime,
+											maxStartTime,
+											true,
+											minServiceIndex,
+											false,
+											true
+									)	);
+									// If no service, advance to the next path
+									if (!serviceInstance.getService()) break;
+									++*minServiceIndex;
+									// This is needed because getNextService is broken if we keep calling
+									// it with a minStartTime on a non active day (infinite loop)
+									minStartTime = serviceInstance.getDepartureDateTime();
+									// Path traversal
+									for (const Edge* endEdge = (startEdge.*step) ();
+										 endEdge != NULL; endEdge = (endEdge->*step) ())
+									{
+										// Found eligible arrival place
+										if(endEdge->getHub() == arrivalHub)
 										{
-											// There maybe some more non concurrent services to record
-											break;
-										} else
-										{
-											// No need to search further for non continuous services
-											_nonConcurrencyCache.insert(
-														make_pair(
-															_NonConcurrencyCache::key_type(
-																&departureEdge,
-																&arrivalEdge,
-																userClassRank,
-																date
-																), excludeRanges
-															)	);
-											return false;
+											time_period timePeriod(
+														serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
+														serviceInstance.getDepartureDateTime() +
+														serviceInstance.getServiceRange() + rule->get<Delay>()
+														);
+											if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
+											{
+												// Merge the last period and the new one. We assume we are always called
+												// in incremental time so the time_periods are sorted
+												excludeRanges[excludeRanges.size()-1] =
+														timePeriod.merge(excludeRanges.back());
+											}
+											else
+											{
+												excludeRanges.push_back(timePeriod);
+											}
+
+											if ( isContinuous() )
+											{
+												// There maybe some more non concurrent services to record
+												break;
+											} else
+											{
+												// No need to search further for non continuous services
+												_nonConcurrencyCache.insert(
+															make_pair(
+																_NonConcurrencyCache::key_type(
+																	&departureEdge,
+																	&arrivalEdge,
+																	userClassRank,
+																	date
+																	), excludeRanges
+																)	);
+												return false;
+											}
 										}
 									}
 								}
@@ -1065,12 +1070,21 @@ namespace synthese
 			Path::Edges::const_iterator lastDepartureScheduledEdge(_path->getEdges().end());
 			time_duration lastDefinedDepartureSchedule;
 			bool atLeastOneDepartureUnscheduledEdge(false);
+			optional<size_t> lastRankInPath;
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
-				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-				if(	!lineStop ||
-					(	lineStop->getScheduleInput() &&
-						(lineStop->isDepartureAllowed() || (itEdge+1) == _path->getEdges().end() || itEdge == _path->getEdges().begin())
+				const Edge& edge(**itEdge);
+
+				// Stop over DRT generated stops
+				if(	(lastRankInPath && edge.getRankInPath() == *lastRankInPath)
+				){
+					continue;
+				}
+
+				if(	edge.getScheduleInput() &&
+					(	(itDeparture != _dataDepartureSchedules.end() && !itDeparture->is_not_a_date_time()) ||
+						(itEdge+1) == _path->getEdges().end() ||
+						itEdge == _path->getEdges().begin()
 				)	){
 					// In case of insufficient defined schedules number
 					time_duration departureSchedule;
@@ -1101,8 +1115,6 @@ namespace synthese
 						arrivalSchedule = departureSchedule;
 					}
 
-					const Edge& edge(**itEdge);
-
 					// Interpolation of preceding departure schedules
 					if(atLeastOneDepartureUnscheduledEdge)
 					{
@@ -1121,8 +1133,16 @@ namespace synthese
 								departureSchedule
 							) - lastDefinedDepartureSchedule
 						);
+						size_t lastRankInPath2((*lastDepartureScheduledEdge)->getRankInPath());
 						for(Path::Edges::const_iterator it(lastDepartureScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
+							// Stop over DRT generated stops
+							if(	(*it)->getRankInPath() == lastRankInPath2
+							){
+								continue;
+							}
+							lastRankInPath2 = (*it)->getRankInPath();
+
 							double minutesToAdd(0);
 							if(totalDistance != 0)
 							{
@@ -1147,18 +1167,11 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedDepartureSchedules.push_back(edge.isDepartureAllowed() ? departureSchedule : arrivalSchedule);
+					_generatedDepartureSchedules.push_back(departureSchedule.is_not_a_date_time() ? arrivalSchedule : departureSchedule);
 					lastDepartureScheduledEdge = itEdge;
 					lastDefinedDepartureSchedule = departureSchedule;
-				}
-				else
-				{
-					atLeastOneDepartureUnscheduledEdge = true;
-				}
 
-				if(	lineStop && lineStop->getScheduleInput())
-				{
-					// Increment iterators
+					// Incrementation of schedules iterators
 					if(itDeparture != _dataDepartureSchedules.end())
 					{
 						++itDeparture;
@@ -1168,6 +1181,24 @@ namespace synthese
 						++itArrival;
 					}
 				}
+				else
+				{
+					atLeastOneDepartureUnscheduledEdge = true;
+
+					// A schedule was ignored : we must jump over it
+					if(edge.getScheduleInput())
+					{
+						if(itDeparture != _dataDepartureSchedules.end() && itDeparture->is_not_a_date_time())
+						{
+							++itDeparture;
+							if(itArrival != _dataArrivalSchedules.end())
+							{
+								++itArrival;
+							}
+						}
+					}
+				}
+				lastRankInPath = edge.getRankInPath();
 			}
 			if(atLeastOneDepartureUnscheduledEdge)
 			{
@@ -1197,12 +1228,20 @@ namespace synthese
 			bool atLeastOneArrivalUnscheduledEdge(false);
 			Schedules::const_iterator itGeneratedDepartureSchedules(_generatedDepartureSchedules.begin());
 			bool neverSeenAScheduledEdge(true);
+			lastRankInPath = boost::none;
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
-				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-				if(	!lineStop ||
-					(	lineStop->getScheduleInput() &&
-						(lineStop->isArrivalAllowed() || lastArrivalScheduledEdge == _path->getEdges().begin())
+				const Edge& edge(**itEdge);
+
+				if(	lastRankInPath && edge.getRankInPath() == *lastRankInPath
+				){
+					continue;
+				}
+
+				if(	edge.getScheduleInput() &&
+					(	(itArrival != _dataArrivalSchedules.end() && !itArrival->is_not_a_date_time()) ||
+						(itEdge+1) == _path->getEdges().end() ||
+						itEdge == _path->getEdges().begin()
 				)	){
 					neverSeenAScheduledEdge = false;
 
@@ -1236,8 +1275,6 @@ namespace synthese
 						departureSchedule = arrivalSchedule;
 					}
 
-					const Edge& edge(**itEdge);
-
 					// Interpolation of preceding schedules
 					if(atLeastOneArrivalUnscheduledEdge)
 					{
@@ -1249,8 +1286,16 @@ namespace synthese
 						MetricOffset totalDistance(edge.getMetricOffset() - (*lastArrivalScheduledEdge)->getMetricOffset());
 						size_t totalRankDiff(edge.getRankInPath() - (*lastArrivalScheduledEdge)->getRankInPath());
 						time_duration totalTime(arrivalSchedule - lastDefinedArrivalSchedule);
+						size_t lastRankInPath2((*lastArrivalScheduledEdge)->getRankInPath());
 						for(Path::Edges::const_iterator it(lastArrivalScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
+							// Stop over DRT generated stops
+							if(	(*it)->getRankInPath() == lastRankInPath2
+							){
+								continue;
+							}
+							lastRankInPath2 = (*it)->getRankInPath();
+
 							double minutesToAdd(0);
 							if(totalDistance != 0)
 							{
@@ -1275,13 +1320,23 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedArrivalSchedules.push_back(edge.isArrivalAllowed() ? arrivalSchedule : departureSchedule);
+					_generatedArrivalSchedules.push_back(arrivalSchedule.is_not_a_date_time() ? departureSchedule : arrivalSchedule);
 					lastArrivalScheduledEdge = itEdge;
 					lastDefinedArrivalSchedule = 
 						(edge.isDepartureAllowed() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
 						departureSchedule :
 						arrivalSchedule
 					;
+
+					// Increment iterators
+					if(itDeparture != _dataDepartureSchedules.end())
+					{
+						++itDeparture;
+					}
+					if(itArrival != _dataArrivalSchedules.end())
+					{
+						++itArrival;
+					}
 				}
 				else
 				{
@@ -1301,20 +1356,22 @@ namespace synthese
 					{
 						atLeastOneArrivalUnscheduledEdge = true;
 					}
+
+					// A schedule was ignored : we must jump over it
+					if(edge.getScheduleInput())
+					{
+						if(itArrival != _dataArrivalSchedules.end() && itArrival->is_not_a_date_time())
+						{
+							++itArrival;
+							if(itDeparture != _dataDepartureSchedules.end())
+							{
+								++itDeparture;
+							}
+						}
+					}
 				}
 
-				if(	!lineStop || lineStop->getScheduleInput())
-				{
-					// Increment iterators
-					if(itDeparture != _dataDepartureSchedules.end())
-					{
-						++itDeparture;
-					}
-					if(itArrival != _dataArrivalSchedules.end())
-					{
-						++itArrival;
-					}
-				}
+				lastRankInPath = edge.getRankInPath();
 			}
 			if(atLeastOneArrivalUnscheduledEdge)
 			{
@@ -1334,10 +1391,6 @@ namespace synthese
 			{
 				Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()) +" (too much schedules)");
 			}
-
-			// Check if the method did the job properly in debug mode
-			assert(_generatedDepartureSchedules.size() == _path->getEdges().size());
-			assert(_generatedArrivalSchedules.size() == _path->getEdges().size());
 		}
 
 
@@ -1372,13 +1425,15 @@ namespace synthese
 			const Path::Edges& edges(getPath()->getEdges());
 			for(Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
 			{
+				const Edge& edge(**it);
+
 				// Jump over stops with interpolated schedules
-				if(!static_cast<LineStop*>(*it)->getScheduleInput())
+				if(!edge.getScheduleInput())
 				{
 					continue;
 				}
 
-				if((*it)->isDeparture())
+				if(edge.isDeparture())
 				{
 					/// - Test 1 : Conflict between continuous service range or identical schedule
 					if(	getDataFirstDepartureSchedule(i) <= sother.getDataLastDepartureSchedule(i) &&
@@ -1401,7 +1456,7 @@ namespace synthese
 						}
 					}
 				}
-				if ((*it)->isArrival())
+				if (edge.isArrival())
 				{
 					/// - Test 1 : Conflict between continuous service range or identical schedule
 					if(	getDataFirstArrivalSchedule(i) <= sother.getDataLastArrivalSchedule(i) &&
@@ -1480,7 +1535,7 @@ namespace synthese
 			BOOST_FOREACH(const Path::Edges::value_type& itEdge, _path->getEdges())
 			{
 				// Jump over stops with interpolated schedules
-				if(!static_cast<LineStop*>(itEdge)->getScheduleInput())
+				if(!itEdge->getScheduleInput())
 				{
 					++rank;
 					continue;
@@ -1504,9 +1559,6 @@ namespace synthese
 				first.getServiceNumber() == second.getServiceNumber() &&
 				first.getDepartureSchedules(true, false) == second.getDepartureSchedules(true, false) &&
 				first.getArrivalSchedules(true, false) == second.getArrivalSchedules(true, false)
-
 			;
 		}
-
-
 }	}

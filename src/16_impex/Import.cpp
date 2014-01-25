@@ -201,7 +201,16 @@ namespace synthese
 			if(result)
 			{
 				DBTransaction transaction(_getAutoImporter()->save());
-				transaction.run();
+				DBModule::DeactivateConditionalTablesUpdate();
+				try
+				{
+					transaction.run();
+				}
+				catch(...)
+				{
+
+				}
+				DBModule::ActivateConditionalTablesUpdate();
 			}
 			_getAutoImporter()->closeLogFile(
 				result,
