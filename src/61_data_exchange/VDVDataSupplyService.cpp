@@ -155,6 +155,7 @@ namespace synthese
 		) const {
 
 			// Client update
+			Log::GetInstance().debug("VDVDataSupply : starting run");
 			_vdvClient->clearLastDataReady();
 
 			// Map creation
@@ -186,6 +187,8 @@ namespace synthese
 				result << "<Fehlertext>" << _errorText << "</FehlerText>";
 			}
 			result << "</Bestaetigung>";
+			
+			Log::GetInstance().debug("VDVDataSupply : finished headers, starting content");
 
 			if(!error)
 			{
