@@ -535,6 +535,53 @@ namespace synthese
 						ScheduledService* service(
 							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
 						);
+
+						const CommercialLine& line(
+							*static_cast<CommercialLine*>(service->getPath()->getPathGroup())
+						);
+						vector<ScheduledService*> services;
+						BOOST_FOREACH(Path* route, line.getPaths())
+						{
+							// Avoid junctions
+							if(!dynamic_cast<JourneyPattern*>(route))
+							{
+								continue;
+							}
+							JourneyPattern* jp(static_cast<JourneyPattern*>(route));
+							boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*jp->sharedServicesMutex
+							);
+							BOOST_FOREACH(Service* tservice, jp->getServices())
+							{
+								ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
+								if(!curService) continue;
+								if (curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
+								{
+									// Add the service to vect
+									services.push_back(curService);
+								}
+							}
+						}
+						
+						Log::GetInstance().debug("On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
+						int numTheoricalActivatedServices(0);
+						BOOST_FOREACH(ScheduledService* sservice, services)
+						{
+							if (sservice->isActive(today))
+							{
+								numTheoricalActivatedServices++;
+								service = sservice;
+							}
+						}
+						
+						if (numTheoricalActivatedServices != 1)
+						{
+							Log::GetInstance().debug(lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont théoriquement activés aujourd'hui");
+						}
+						else
+						{
+							Log::GetInstance().debug("un seul service candidat est théoriquement activé aujourd'hui");
+						}
 						
 						if (service)
 						{
