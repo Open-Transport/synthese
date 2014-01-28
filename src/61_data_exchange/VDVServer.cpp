@@ -539,6 +539,10 @@ namespace synthese
 						// TODO : it can exist more than one service with this service code
 						// we should get all of them and select :
 						// - one already activated for today (theorical calendar OK)
+						if (service)
+						{
+							Log::GetInstance().debug("Service par défaut : " + lexical_cast<string>(service->getKey()));
+						}
 						vector<ScheduledService*> services;
 						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
 						BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::value_type& itLine, lines.getMap())
@@ -575,10 +579,6 @@ namespace synthese
 						//);
 						
 						Log::GetInstance().debug("On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
-						if (service)
-						{
-							Log::GetInstance().debug("Service par défaut : " + lexical_cast<string>(service->getKey()));
-						}
 						int numTheoricalActivatedServices(0);
 						BOOST_FOREACH(ScheduledService* sservice, services)
 						{
