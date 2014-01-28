@@ -566,7 +566,7 @@ namespace synthese
 						Log::GetInstance().debug("On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
 						if (service)
 						{
-							Log::GetInstance().debug("Service par défaut : " + lexical_cast<string>(service->getkey()));
+							Log::GetInstance().debug("Service par défaut : " + lexical_cast<string>(service->getKey()));
 						}
 						int numTheoricalActivatedServices(0);
 						BOOST_FOREACH(ScheduledService* sservice, services)
