@@ -1259,6 +1259,10 @@ namespace synthese
 
 								const StopArea* area = realTimeService.stop->getConnectionPlace();
 
+								// Ignore when destination and stop are on the same stop area
+								if(area->getKey() == realTimeService.destination->getKey())
+									continue;
+
 								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
 									continue;
 
@@ -1814,6 +1818,10 @@ namespace synthese
 								realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
 								if(ocStops.find(result->getInfo("oc_arrivee"))->second)
 									realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
+
+								// Ignore when destination and stop are on the same stop area
+								if(realTimeService.stop->getConnectionPlace()->getKey() == realTimeService.destination->getKey())
+									continue;
 
 								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
 									continue;
