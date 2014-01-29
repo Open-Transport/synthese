@@ -52,6 +52,7 @@
 #include "UserTableSync.h"
 #include "ReservationUserUpdateAction.h"
 #include "SendPasswordAction.h"
+#include "ResaCustomerMergeAdmin.hpp"
 #include "SecurityModule.h"
 
 #include <boost/foreach.hpp>
@@ -158,12 +159,17 @@ namespace synthese
 					_request
 				);
 				routeplannerRequest.getPage()->setCustomer(_user);
+
+				AdminFunctionRequest<ResaCustomerMergeAdmin> mergeRequest(
+					_request
+				);
 				
 				// Display
 				stream << "<h1>Liens</h1>";
 				stream << "<p>";
 				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", "/admin/img/" + ReservationRoutePlannerAdmin::ICON);
 				stream << "</p>";
+				stream << "<p>" << HTMLModule::getLinkButton(mergeRequest.getURL(), "Fusionner l'utilisateur", string(), "/admin/img/user.png") << "</p>";
 
 				stream << "<h1>Coordonnées</h1>";
 
