@@ -69,8 +69,9 @@ namespace synthese
 		const bool CMSImport::Importer_::IMPORTABLE(true);
 		const bool CMSImport::Importer_::IS_PERMANENT_THREAD(false);
 
-		bool CMSImport::Importer_::parseFiles() const	{
-			_importDir( path(_directory), _parent.get(), path(_directory));
+		bool CMSImport::Importer_::parseFiles() const
+		{
+			_importDir( path(_directory), _parent.get(), path());
 			return true;
 		}
 
@@ -93,14 +94,21 @@ namespace synthese
 		/// the page @parent
 		void CMSImport::Importer_::_importDir(const path &directoryPath,
 			cms::Webpage *parent,
-			path currentDir) const
+			path currentDir
+		) const
 		{
 			size_t rank(0);
-			for ( boost::filesystem::directory_iterator end, dir(currentDir);
+			for ( boost::filesystem::directory_iterator end, dir(directoryPath / currentDir);
 				   dir != end; ++dir )
 			{
 				string pageName(dir->path().filename());
-				string fullPath(dir->path().string());
+				string absPath(dir->path().string());
+				path relPath(currentDir / pageName);
+
+				if(pageName == "metadata.json")
+				{
+					continue;
+				}
 
 				if(_isExcluded(_excludeListRegEx, pageName))
 				{
@@ -110,12 +118,11 @@ namespace synthese
 				// Special case, if this is a directory and there is a file without
 				// the .dir extension then its a page with content and is already
 				// handled in the page load
-				if( is_directory(*dir))
+				if( is_directory(*dir) &&
+					extension(*dir) == ".dir" &&
+					exists( change_extension(*dir, "")) )
 				{
-					if(extension(*dir) == ".dir" && exists( change_extension(*dir, "")) )
-					{
-						continue;
-					}
+					continue;
 				}
 
 				Webpage *page = new Webpage(WebPageTableSync::getId());
@@ -125,12 +132,12 @@ namespace synthese
 				page->setRoot(_site.get());
 				page->setRank(rank++);
 				page->setParent(parent);
-				page->set<SmartURLPath>(fullPath.substr(directoryPath.string().length()));
+				page->set<SmartURLPath>(relPath.string());
 				_site->addPage(*page);
 				if( is_directory(*dir))
 				{
 					_logLoad("Creation of root page: " + pageName);
-					_importDir(directoryPath, page, *dir);
+					_importDir(directoryPath, page, relPath);
 				}
 				else
 				{
@@ -146,7 +153,7 @@ namespace synthese
 					}
 					MimeType mimeType(MimeTypes::GetMimeTypeByExtension(extension));
 
-					std::ifstream ifile(fullPath.c_str(), std::ifstream::in);
+					std::ifstream ifile(absPath.c_str(), std::ifstream::in);
 					std::string content;
 
 					ifile.seekg(0, std::ios::end);
@@ -160,10 +167,10 @@ namespace synthese
 
 					// Special case, if there is a file with .dir extension
 					// then this page is its parent
-					if(exists(fullPath + ".dir"))
+					if(exists(absPath + ".dir"))
 					{
 						_logLoad("Creation of root page: " + pageName);
-						_importDir(directoryPath, page, path(fullPath + ".dir"));
+						_importDir(directoryPath, page, path(relPath.string() + ".dir"));
 					}
 				}
 			}

@@ -159,7 +159,8 @@ namespace synthese
 		/// the page @parent
 		void CMSExport::Importer_::_exportDir(const path &directoryPath,
 			cms::Webpage *parent,
-			path currentDir) const
+			path currentDir
+		) const
 		{
 			WebpageContent content(parent->get<WebpageContent>());
 			string pageName( parent->get<Title>() );
@@ -178,14 +179,14 @@ namespace synthese
 			}
 
 			// savePage
-			create_directory( currentDir );
+			create_directory( directoryPath / currentDir );
 
 			// We create the page on disk if there is some content in it
 			// or if there is no subpages
 			if(!content.getCMSScript().getCode().empty() ||
 			   parent->getChildren().empty())
 			{
-				path currentFile(currentDir / pageNameWithExt);
+				path currentFile(directoryPath / currentDir / pageNameWithExt);
 				_logLoad("Creation of page: " + currentFile.string());
 				ofstream file( currentFile.string().c_str() );
 				file << content.getCMSScript().getCode().c_str();
@@ -215,7 +216,11 @@ namespace synthese
 			{
 				boost::shared_ptr<Webpage> page(*it);
 
-				_exportDir( path(_directory), page.get(), path(_directory));
+				_exportDir( path(_directory), page.get(), path());
+			}
+			if(_withMetadata)
+			{
+				// TODO Generate metadata file
 			}
 			return transaction;
 		}
