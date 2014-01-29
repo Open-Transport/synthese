@@ -16,6 +16,7 @@
 #include "ResaLogEntryUpdateAction.h"
 #include "ReservationTransactionUpdateAction.hpp"
 #include "ReservationUserUpdateAction.h"
+#include "ReservationUserMergeAction.hpp"
 #include "SendPasswordAction.h"
 #include "ReservationUpdateAction.hpp"
 
@@ -41,6 +42,7 @@
 #include "FreeDRTBookingAdmin.hpp"
 #include "ResaCustomerAdmin.h"
 #include "ResaCustomersAdmin.h"
+#include "ResaCustomerMergeAdmin.hpp"
 #include "ReservationRoutePlannerAdmin.h"
 #include "ResaLogAdmin.h"
 #include "ResaEditLogEntryAdmin.h"
@@ -71,6 +73,7 @@ void synthese::resa::moduleRegister()
 	synthese::resa::ResaLogEntryUpdateAction::integrate();
 	synthese::resa::ReservationTransactionUpdateAction::integrate();
 	synthese::resa::ReservationUserUpdateAction::integrate();
+	synthese::resa::ReservationUserMergeAction::integrate();
 	synthese::resa::SendPasswordAction::integrate();
 	synthese::resa::ReservationUpdateAction::integrate();
 
@@ -100,6 +103,7 @@ void synthese::resa::moduleRegister()
 	synthese::resa::FreeDRTBookingAdmin::integrate();
 	synthese::resa::ResaCustomerAdmin::integrate();
 	synthese::resa::ResaCustomersAdmin::integrate();
+	synthese::resa::ResaCustomerMergeAdmin::integrate();
 	synthese::resa::ReservationRoutePlannerAdmin::integrate();
 	synthese::resa::ResaLogAdmin::integrate();
 	synthese::resa::ResaEditLogEntryAdmin::integrate();

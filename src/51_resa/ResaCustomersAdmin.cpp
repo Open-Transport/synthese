@@ -30,6 +30,7 @@
 #include "ResaModule.h"
 #include "ResaRight.h"
 #include "ResaCustomerAdmin.h"
+#include "ResaCustomerMergeAdmin.hpp"
 
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
@@ -117,6 +118,8 @@ namespace synthese
 
 			AdminFunctionRequest<ResaCustomerAdmin> openRequest(_request);
 
+			AdminFunctionRequest<ResaCustomerMergeAdmin> mergeRequest(_request);
+
 			// Form
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << "<h1>Recherche</h1>";
@@ -170,7 +173,8 @@ namespace synthese
 				BOOST_FOREACH(const boost::shared_ptr<User>& user, users)
 				{
 					openRequest.getPage()->setUser(user);
-
+					mergeRequest.getPage()->setUserToMerge(user);
+					
 					stream << t.row();
 
 					stream << t.col() << user->getName();
@@ -188,6 +192,7 @@ namespace synthese
 						stream << t.col() << "Inconnu";
 
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/user.png");
+					stream << "      " << HTMLModule::getLinkButton(mergeRequest.getURL(), "Fusionner");
 				}
 
 				stream << t.close();
