@@ -124,8 +124,8 @@ namespace synthese
 			static SearchResult SearchByUser(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> userId,
-				const boost::posix_time::ptime& minDate,
-				const boost::posix_time::ptime& maxDate,
+				const boost::posix_time::ptime& minDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),
+				const boost::posix_time::ptime& maxDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),
 				bool withCancelled = false,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
