@@ -227,10 +227,14 @@ namespace synthese
 			static const std::string DATA_ORIGIN_CITY_TEXT;
 			static const std::string DATA_HANDICAPPED_FILTER;
 			static const std::string DATA_ORIGIN_PLACE_TEXT;
+			static const std::string DATA_ORIGIN_PLACE_LONGITUDE;
+			static const std::string DATA_ORIGIN_PLACE_LATITUDE;
 			static const std::string DATA_BIKE_FILTER;
 			static const std::string DATA_DESTINATION_CITY_TEXT;
 			static const std::string DATA_DESTINATION_PLACE_ID;
 			static const std::string DATA_DESTINATION_PLACE_TEXT;
+			static const std::string DATA_DESTINATION_PLACE_LONGITUDE;
+			static const std::string DATA_DESTINATION_PLACE_LATITUDE;
 			static const std::string DATA_PERIOD_ID;
 			static const std::string DATA_DATE;
 			static const std::string DATA_PERIOD;
