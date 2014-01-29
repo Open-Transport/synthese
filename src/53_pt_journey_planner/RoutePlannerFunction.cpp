@@ -205,10 +205,14 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_ORIGIN_CITY_TEXT("origin_city_text");
 		const string RoutePlannerFunction::DATA_HANDICAPPED_FILTER("handicapped_filter");
 		const string RoutePlannerFunction::DATA_ORIGIN_PLACE_TEXT("origin_place_text");
+		const string RoutePlannerFunction::DATA_ORIGIN_PLACE_LONGITUDE("origin_place_longitude");
+		const string RoutePlannerFunction::DATA_ORIGIN_PLACE_LATITUDE("origin_place_latitude");
 		const string RoutePlannerFunction::DATA_BIKE_FILTER("bike_filter");
 		const string RoutePlannerFunction::DATA_DESTINATION_CITY_TEXT("destination_city_text");
 		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_ID("destination_place_id");
 		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_TEXT("destination_place_text");
+		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_LONGITUDE("destination_place_longitude");
+		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_LATITUDE("destination_place_latitude");
 		const string RoutePlannerFunction::DATA_PERIOD_ID("period_id");
 		const string RoutePlannerFunction::DATA_DATE("date");
 		const string RoutePlannerFunction::DATA_PERIOD("period");
@@ -2328,14 +2332,27 @@ namespace synthese
 				destinationPlaceName = dynamic_cast<const NamedPlace*>(destinationPlace)->getName();
 			}
 
+			boost::shared_ptr<Point> originPoint(_coordinatesSystem->convertPoint(*(originPlace->getPoint())));
+			boost::shared_ptr<Point> destinationPoint(_coordinatesSystem->convertPoint(*(destinationPlace->getPoint())));
+
 			pm.insert(DATA_INTERNAL_DATE, to_iso_extended_string(date));
 			pm.insert(DATA_ORIGIN_CITY_TEXT, originCity->getName());
 			pm.insert(DATA_HANDICAPPED_FILTER, accessParameters.getUserClass() == USER_HANDICAPPED);
 			pm.insert(DATA_ORIGIN_PLACE_TEXT, originPlaceName);
+			if(originPoint)
+			{
+				pm.insert(DATA_ORIGIN_PLACE_LONGITUDE, originPoint->getX());
+				pm.insert(DATA_ORIGIN_PLACE_LATITUDE, originPoint->getY());
+			}
 			pm.insert(DATA_BIKE_FILTER, accessParameters.getUserClass() == USER_BIKE);
 			pm.insert(DATA_DESTINATION_CITY_TEXT, destinationCity->getName());
 			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
+			if(destinationPoint)
+			{
+				pm.insert(DATA_DESTINATION_PLACE_LONGITUDE, destinationPoint->getX());
+				pm.insert(DATA_DESTINATION_PLACE_LATITUDE, destinationPoint->getY());
+			}
 			pm.insert(DATA_FILTERED_JOURNEYS, object.getFiltered());
 
 			// Text formatted date
