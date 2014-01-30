@@ -92,14 +92,14 @@ namespace synthese
 				// Initialize the first item
 				if(it == value.rend())
 				{
-					value.push_back(string());
+					value.push_back(std::string());
 					it = value.rbegin();
 				}
 
 				// Case separator
 				if(	text[i] == ',')
 				{
-					value.push_back(string());
+					value.push_back(std::string());
 					it = value.rbegin();
 					continue;
 				}
