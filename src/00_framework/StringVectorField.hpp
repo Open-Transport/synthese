@@ -61,7 +61,7 @@ namespace synthese
 				{
 					s << ",";
 				}
-				string striped(
+				std::string striped(
 					boost::algorithm::replace_all_copy(item, "\\", "\\\\")
 				);
 				boost::algorithm::replace_all(striped, ",", "\\,");
