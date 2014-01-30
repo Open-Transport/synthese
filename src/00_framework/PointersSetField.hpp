@@ -386,7 +386,7 @@ namespace synthese
 			const ObjectBase& object,
 			DBContent& content
 		){
-			std::string s(_setToString(fieldObject));
+			std::string s(ToString(fieldObject));
 			content.push_back(Cell(s));
 		}
 
