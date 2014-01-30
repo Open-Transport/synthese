@@ -51,7 +51,6 @@ namespace synthese
 				static const std::string PARAM_SEARCH_NAME;
 				static const std::string PARAM_SEARCH_SURNAME;
 				static const std::string PARAM_SEARCH_LOGIN;
-				static const std::string PARAM_SWITCH;
 				static const std::string PARAM_USER_TO_DELETE;
 
 			private:
@@ -59,10 +58,7 @@ namespace synthese
 				boost::shared_ptr<const security::User>		_userToMerge;
 				boost::shared_ptr<const security::User>		_userToDelete;
 				bool										_search;
-
-				boost::optional<std::string>				_searchLogin;
-				boost::optional<std::string>				_searchName;
-				boost::optional<std::string>				_searchSurname;
+                std::string                                 _message;
 
 			public:
 

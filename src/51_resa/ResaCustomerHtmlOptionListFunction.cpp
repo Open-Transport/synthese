@@ -52,6 +52,7 @@ namespace synthese
 		const string ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME("sn");
 		const string ResaCustomerHtmlOptionListFunction::PARAMETER_NUMBER("nu");
 		const string ResaCustomerHtmlOptionListFunction::PARAMETER_PHONE("ph");
+        const string ResaCustomerHtmlOptionListFunction::PARAMETER_LOGIN("login");
 
 		ParametersMap ResaCustomerHtmlOptionListFunction::_getParametersMap() const
 		{
@@ -60,6 +61,7 @@ namespace synthese
 			if(_surname) map.insert(PARAMETER_NUMBER, *_surname);
 			map.insert(PARAMETER_NUMBER, static_cast<int>(_number));
 			if(_phone) map.insert(PARAMETER_PHONE, *_phone);
+            if(_login) map.insert(PARAMETER_LOGIN, *_login);
 			return map;
 		}
 
@@ -78,6 +80,10 @@ namespace synthese
 			{
 				_phone = map.getOptional<string>(PARAMETER_PHONE);
 			}
+            if(!map.getDefault<string>(PARAMETER_LOGIN).empty())
+            {
+                _login = map.getOptional<string>(PARAMETER_LOGIN);
+            }
 		}
 
 
@@ -86,7 +92,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const	{
-			if (!_name && !_surname && !_phone)
+            if (!_name && !_surname && !_phone && !_login)
 			{
 				return util::ParametersMap();
 			}
@@ -95,7 +101,7 @@ namespace synthese
 			UserTableSync::SearchResult users(
 				UserTableSync::Search(
 					env,
-					optional<string>(),
+                    _login ? "%"+ *_login +"%" : _login,
 					_name ? "%"+ *_name +"%" : _name,
 					_surname ? "%"+ *_surname +"%" : _surname,
 					_phone ? "%"+ *_phone +"%" : _phone,
