@@ -122,22 +122,6 @@ namespace synthese
 				return;
 			}
 
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lock.owns_lock() && tries > 0)
-			{
-				lock.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::enqueue locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lock.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::enqueue locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}
-
 			InterSYNTHESEQueue q;
 			q.set<InterSYNTHESESlave>(*const_cast<InterSYNTHESESlave*>(this));
 			q.set<RequestTime>(now);
@@ -304,22 +288,6 @@ namespace synthese
 		// rewritten by the DB stack.
 		void InterSYNTHESESlave::markAsUpToDate()
 		{
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			boost::unique_lock<shared_mutex> lockBase(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lockBase.owns_lock() && tries > 0)
-			{
-				lockBase.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::markAsUpToDate locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lockBase.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::markAsUpToDate locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}
-
 			recursive_mutex::scoped_lock lock(_slaveChangeMutex);
 			ptime now(second_clock::local_time());
 			set<LastActivityReport>(now);
@@ -351,22 +319,6 @@ namespace synthese
 
 		void InterSYNTHESESlave::clearLastSentRange() const
 		{
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lock.owns_lock() && tries > 0)
-			{
-				lock.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lock.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}
-
 			DBTransaction transaction;
 			{
 				// Do no run transation with the lock or we will deadlock if
