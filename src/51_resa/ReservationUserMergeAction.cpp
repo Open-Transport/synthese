@@ -138,6 +138,16 @@ namespace synthese
 
 		void ReservationUserMergeAction::run(Request& request)
 		{
+            bool forceUpdate = false;
+
+            // Check updates
+            if ((_userToMerge->getName() != _name && !_name.empty()) ||
+                (_userToMerge->getSurname() != _surname && !_surname.empty()) ||
+                (_userToMerge->getEMail() != _email && !_email.empty())
+            ){
+                forceUpdate = true;
+            }
+
 			// Merge user values to userToMerge
 			_userToMerge->setLogin(_login);
 			_userToMerge->setAddress(_address);
@@ -159,6 +169,24 @@ namespace synthese
 					(*_autoResaActivated ? ResaModule::GetAutoResaResaCustomerProfile() : ResaModule::GetBasicResaCustomerProfile()).get()
 				);
 			}
+
+            if (forceUpdate)
+            {
+                // Update reservation transactions values for userToMerge with new ones
+                ReservationTransactionTableSync::SearchResult transactions(ReservationTransactionTableSync::SearchByUser(
+                    *_env,
+                    _userToMerge->getKey(),
+                    boost::posix_time::ptime(boost::posix_time::not_a_date_time),
+                    boost::posix_time::ptime(boost::posix_time::not_a_date_time),
+                    true
+                ));
+                BOOST_FOREACH(const ReservationTransactionTableSync::SearchResult::value_type& transaction, transactions)
+                {
+                    transaction->setCustomerName(_userToMerge->getSurname()+" "+_userToMerge->getName());
+                    transaction->setCustomerEMail(_userToMerge->getEMail());
+                    ReservationTransactionTableSync::Save(transaction.get());
+                }
+            }
 
 			// Merge related logs
 			DBLogEntryTableSync::SearchResult logs(DBLogEntryTableSync::SearchByUser(*_env, _userToDelete->getKey(), UP_LINKS_LOAD_LEVEL));

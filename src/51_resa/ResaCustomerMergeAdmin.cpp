@@ -37,8 +37,9 @@
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
-#include "SearchFormHTMLTable.h"
 #include "PropertiesHTMLTable.h"
+#include "StaticFunctionRequest.h"
+#include "ResaCustomerHtmlOptionListFunction.h"
 
 #include <boost/foreach.hpp>
 
@@ -83,65 +84,16 @@ namespace synthese
 		void ResaCustomerMergeAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			// If userToDelete isn't accessible in URL yet, check the
-			// search form data has been posted in order to get it
+            // If userToDelete isn't accessible in URL yet, display search form
 			if (!map.getDefault<RegistryKeyType>(PARAM_USER_TO_DELETE))
 			{
-				if (!map.getDefault<string>(PARAM_SEARCH_NAME).empty())
-				{
-					_searchName = map.getOptional<string>(PARAM_SEARCH_NAME);
-				}
-				if (!map.getDefault<string>(PARAM_SEARCH_SURNAME).empty())
-				{
-					_searchSurname = map.getOptional<string>(PARAM_SEARCH_SURNAME);
-				}
-				if (!map.getDefault<string>(PARAM_SEARCH_LOGIN).empty())
-				{
-					_searchLogin = map.getOptional<string>(PARAM_SEARCH_LOGIN);
-				}
-				if (_searchName || _searchSurname || _searchLogin) 
-				{
-                    UserTableSync::SearchResult	user(
-						UserTableSync::Search(
-							_getEnv(),
-							_searchLogin ? "%" + *_searchLogin + "%" : _searchLogin,
-							_searchName ? "%" + *_searchName + "%" : _searchName,
-							_searchSurname ? "%" + *_searchSurname + "%" : _searchSurname,
-							optional<string>(),
-							optional<RegistryKeyType>(),
-							logic::indeterminate,
-							logic::indeterminate,
-							optional<RegistryKeyType>()
-						)
-					);
-					if (user.empty())
-					{
-                        _search = true;
-					}
-					else
-					{
-                        if (user.front()->getKey() == map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
-                        {
-                            _search = true;
-                        }
-                        else
-                        {
-                            _userToDelete = user.front();
-                            _search = false;
-                        }
-					}
-				}
-				else
-				{
-					_search = true;
-				}
+                _search = true;
 			}
-			// If userToDelete is accessible in URL, this page doesn't have to display
-			// the search form and purpose merging operation instead
+            // If userToDelete is accessible in URL, display merging form
 			else
 			{
 				_search = false;
-				if (map.get<RegistryKeyType>(PARAM_USER_TO_DELETE) != 0)
+                if (map.get<RegistryKeyType>(PARAM_USER_TO_DELETE) != 0)
 				{
 					try
 					{
@@ -171,6 +123,14 @@ namespace synthese
 					throw AdminParametersException("Bad user id");
 				}
 			}
+
+            // Check users aren't the same
+            if (_userToDelete && _userToMerge)
+            {
+                if (_userToDelete->getKey() == _userToMerge->getKey())
+                    _search = true;
+                    _message = "Vous ne pouvez pas fusionner un utilisateur avec lui-même.";
+            }
 		}
 
 
@@ -178,20 +138,14 @@ namespace synthese
 		util::ParametersMap ResaCustomerMergeAdmin::getParametersMap() const
 		{
 			ParametersMap m("rcmmap");
-			if (_searchName)
-				m.insert(PARAM_SEARCH_NAME, *_searchName);
-			if (_searchSurname)
-				m.insert(PARAM_SEARCH_SURNAME, *_searchSurname);
-			if (_searchLogin)
-				m.insert(PARAM_SEARCH_LOGIN, *_searchLogin);
 			if (_userToMerge.get())
 			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _userToMerge->getKey());
-			}
-			if (_userToDelete.get())
-			{
-				m.insert(PARAM_USER_TO_DELETE, _userToDelete->getKey());
-			}
+                if (_userToDelete.get() && _userToDelete->getKey() != _userToMerge->getKey())
+                {
+                    m.insert(PARAM_USER_TO_DELETE, _userToDelete->getKey());
+                }
+            }
 			return m;
 		}
 
@@ -206,18 +160,67 @@ namespace synthese
 				// Build search request
 				AdminFunctionRequest<ResaCustomerMergeAdmin> searchRequest(_request,*this);
 
-				// Display search form
-				SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
-				stream << "<h1>Recherche</h1>";
-				stream << "Veuillez renseigner l'utilisateur à fusionner avec " 
-						<< _userToMerge->getSurname() << " " << _userToMerge->getName() 
-						<< " en utilisant le formulaire de recherche.";
-				stream << st.open();
-				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
-				stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
-				stream << st.cell("Login", st.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin ? *_searchLogin : string()));
-				stream << st.close();
-				stream << st.getForm().setFocus(PARAM_SEARCH_NAME);
+                StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request, true);
+                customerSearchRequest.getFunction()->setNumber(20);
+
+                HTMLTable table(2,"searchTable");
+                HTMLForm st(searchRequest.getHTMLForm("search"));
+
+               // Display search form
+                stream << "<script type=\"text/javascript\" src=\"/lib/synthese/js/searchCustomer.js\"></script>";
+                stream << "<h1>Recherche</h1>";
+                stream << "Veuillez renseigner l'utilisateur à fusionner avec "
+                        << _userToMerge->getSurname() << " " << _userToMerge->getName()
+                        << " en utilisant le formulaire de recherche.";
+
+                stream << table.open();
+                stream << table.row() << table.col() << "<label>Nom : </label><td><input id=\""+PARAM_SEARCH_NAME+"\" type=\"text\"></td>";
+                stream << table.row() << table.col() << "<label>Prénom : </label>" << table.col() << "<input id=\""+PARAM_SEARCH_SURNAME+"\" type=\"text\">";
+                stream << table.row() << table.col() << "<label>Login : </label>" << table.col() << "<input id=\""+PARAM_SEARCH_LOGIN+"\" type=\"text\">";
+                stream << table.row() << table.col() << "<label>Client : </label>" << table.col();
+                stream << st.open() << "<select style=\"margin-right:20px;min-width:400px\" name=\""+PARAM_USER_TO_DELETE+"\" value=\"\" id=\""+PARAM_USER_TO_DELETE+"\"></select>";
+                stream << st.getSubmitButton("Choisir cet utilisateur") << st.close();
+                stream << table.row();
+                stream << table.col(2) << "<div class=\"result\">"+(_message.empty() ? "" : _message)+"</div>";
+                stream << table.close();
+
+                stream << HTMLModule::GetHTMLJavascriptOpen();
+                stream
+                    << "document.getElementById('" << PARAM_SEARCH_NAME << "').onkeyup = "
+                    << "function(){ programCustomerUpdate("
+                    << "'" << st.getName() << "'"
+                    << ",'" << PARAM_USER_TO_DELETE << "'"
+                    << ",'" << customerSearchRequest.getURL()
+                    << "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << PARAM_SEARCH_NAME << "').value"
+                    << "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << PARAM_SEARCH_SURNAME << "').value"
+                    << "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_LOGIN <<"='+document.getElementById('" << PARAM_SEARCH_LOGIN << "').value"
+                    << "); };";
+                stream << "document.getElementById('" << PARAM_SEARCH_SURNAME << "').onkeyup = "
+                    << "function(){ programCustomerUpdate("
+                    << "'" << st.getName() << "'"
+                    << ",'" << PARAM_USER_TO_DELETE << "'"
+                    << ",'" << customerSearchRequest.getURL()
+                    << "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << PARAM_SEARCH_NAME << "').value"
+                    << "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << PARAM_SEARCH_SURNAME << "').value"
+                    << "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_LOGIN <<"='+document.getElementById('" << PARAM_SEARCH_LOGIN << "').value"
+                    << "); };";
+                stream << "document.getElementById('" << PARAM_SEARCH_LOGIN << "').onkeyup = "
+                    << "function(){ programCustomerUpdate("
+                    << "'" << st.getName() << "'"
+                    << ",'" << PARAM_USER_TO_DELETE << "'"
+                    << ",'" << customerSearchRequest.getURL()
+                    << "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << PARAM_SEARCH_NAME << "').value"
+                    << "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << PARAM_SEARCH_SURNAME << "').value"
+                    << "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_LOGIN <<"='+document.getElementById('" << PARAM_SEARCH_LOGIN << "').value"
+                    << "); };";
+                stream <<
+                    "document.forms." << st.getName() << ".onsubmit = " <<
+                    "function(){" <<
+                        "document.getElementById('" << st.getFieldId(PARAM_USER_TO_DELETE) << "').value=" <<
+                        "document.getElementById('" << PARAM_USER_TO_DELETE << "').value;" <<
+                    "};"
+                ;
+                stream << HTMLModule::GetHTMLJavascriptClose();
 			}
 			else
 			{
@@ -238,7 +241,7 @@ namespace synthese
 				// Display merging form
 				PropertiesHTMLTable t(mergeRequest.getHTMLForm());
 
-				stream << "<script type=\"text/javascript\" src=\"/lib/synthese/js/merge.js\"></script>";
+                stream << "<script type=\"text/javascript\" src=\"/lib/synthese/js/mergeCustomer.js\"></script>";
 				stream << "<h1 style='text-align:center;'>FUSION DE COMPTE CLIENT</h1>";
                 stream << "<div style='text-align:center;'><br><br>" << HTMLModule::getLinkButton(permutationRequest.getURL(), "Permuter", "Vous vous apprêtez à permuter les deux clients : toutes vos modifications seront perdues. Voulez vous continuer ?") << "</div><br><br>";
 				stream << t.getForm().open() << "<table style=\"margin:auto;border:none;\" class=\"propertysheet\"><colgroup>";
