@@ -158,10 +158,18 @@ namespace synthese
 				;
 				stream <<
 					t.cell(
-						"Délai minimal en minutes",
+						"Délai minimal en minutes (interne)",
 						t.getForm().getTextInput(
 							PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES,
 							lexical_cast<string>(_rule->getMinDelayMinutes().total_seconds() / 60)
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Délai minimal en minutes (externe)",
+						t.getForm().getTextInput(
+							PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES_EXTERNAL,
+							lexical_cast<string>(_rule->getMinDelayMinutesExternal().total_seconds() / 60)
 					)	)
 				;
 				stream <<

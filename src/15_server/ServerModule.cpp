@@ -666,4 +666,23 @@ namespace synthese
 		{
 			return _serverStartingTime;
 		}
+
+		const string ServerModule::GetBranch()
+		{
+			string branch = "";
+			std::vector<std::string> urlVector;
+			boost::algorithm::split(urlVector, ServerModule::SYNTHESE_URL, boost::is_any_of("/"));
+			if (urlVector.size() > 0)
+			{
+				if (urlVector.at(urlVector.size()-1) == "trunk")
+				{
+					branch = urlVector.at(urlVector.size()-1);
+				}
+				else if (urlVector.size() > 1)
+				{
+					branch = urlVector.at(urlVector.size()-2) + "/" + urlVector.at(urlVector.size()-1);
+				}
+			}
+			return branch;
+		}
 }	}

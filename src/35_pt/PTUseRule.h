@@ -64,6 +64,7 @@ namespace synthese
 			static const std::string DATA_RESERVATION_POSSIBLE;
 			static const std::string DATA_RESERVATION_COMPULSORY;
 			static const std::string DATA_RESERVATION_MIN_DELAY_MINUTES;
+			static const std::string DATA_RESERVATION_MIN_DELAY_MINUTES_EXTERNAL;
 
 		public:
 			/// Chosen registry class.
@@ -120,6 +121,7 @@ namespace synthese
 				////
 				/// Minimum delay in minutes between reservation and reference moment
 				boost::posix_time::time_duration _minDelayMinutes;
+				
 				boost::gregorian::date_duration _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
 				boost::optional<boost::gregorian::date_duration> _maxDelayDays;  //!< Maxium number of days between reservation and departure.
 
@@ -127,10 +129,14 @@ namespace synthese
 				boost::posix_time::time_duration _reservationMinDepartureTime; //!< Minimal time for reservation the day of the departure. If departure time is before, then the reservation must be done the preceding day, before _hourDeadLine or midnight if not defined
 
 				ReservationForbiddenDays _reservationForbiddenDays;
-
+				
 				bool _forbiddenInDepartureBoards;
 				bool _forbiddenInTimetables;
 				bool _forbiddenInJourneyPlanning;
+
+				// Minimum external delay (used by Routeplanner if needed)
+				boost::posix_time::time_duration _minDelayMinutesExternal;
+
 			//@}
 
 
@@ -153,7 +159,8 @@ namespace synthese
 				bool								getOriginIsReference()	const { return _originIsReference; }
 				const boost::posix_time::time_duration&	getHourDeadLine()				const { return _hourDeadLine; }
 				boost::gregorian::date_duration		getMinDelayDays()				const { return _minDelayDays; }
-				boost::posix_time::time_duration					getMinDelayMinutes()			const { return _minDelayMinutes; }
+				boost::posix_time::time_duration	getMinDelayMinutes()			const { return _minDelayMinutes; }
+				boost::posix_time::time_duration	getMinDelayMinutesExternal()	const { return _minDelayMinutesExternal; }
 				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const { return _maxDelayDays; }
 				ReservationRuleType	getReservationType()			const { return _reservationType; }
 				const fare::Fare*	getDefaultFare()				const { return _defaultFare; }
@@ -173,6 +180,7 @@ namespace synthese
 				void setHourDeadLine (const boost::posix_time::time_duration& hourDeadLine);
 
 				void setMinDelayMinutes (boost::posix_time::time_duration value) { _minDelayMinutes = value; }
+				void setMinDelayMinutesExternal (boost::posix_time::time_duration value) { _minDelayMinutesExternal = value; }
 				void setMinDelayDays (boost::gregorian::date_duration value) { _minDelayDays = value; }
 				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> value){ _maxDelayDays = value; }
 				void setOriginIsReference (bool value){ _originIsReference = value; }
@@ -211,7 +219,8 @@ namespace synthese
 				*/
 				virtual boost::posix_time::ptime getReservationDeadLine (
 					const boost::posix_time::ptime& originTime,
-					const boost::posix_time::ptime& departureTime
+					const boost::posix_time::ptime& departureTime,
+					const ReservationDelayType reservationRulesDelayType = RESERVATION_INTERNAL_DELAY
 				) const;
 
 
@@ -239,7 +248,8 @@ namespace synthese
 				*/
 				virtual RunPossibilityType isRunPossible (
 					const graph::ServicePointer& servicePointer,
-					bool ignoreReservation
+					bool ignoreReservation,
+					ReservationDelayType reservationRulesDelayType = RESERVATION_INTERNAL_DELAY
 				) const;
 
 
@@ -263,7 +273,8 @@ namespace synthese
 				/// result of this method MUST be confirmed by a call on a full service pointer.
 				virtual ReservationAvailabilityType getReservationAvailability(
 					const graph::ServicePointer& servicePointer,
-					bool ignoreReservationDeadline
+					bool ignoreReservationDeadline,
+					ReservationDelayType reservationRulesDelayType = RESERVATION_INTERNAL_DELAY
 				) const;
 
 

@@ -198,8 +198,9 @@ namespace synthese
 
 			size_t number(0);
 
+			// This code works because of "messages" priority sorting
 			optional<AlarmLevel> bestPriority;
-			if(_priorityOrder) // TODO HOW THIS CAN WORK ?
+			if(_priorityOrder)
 			{
 				BOOST_FOREACH(boost::shared_ptr<const SentAlarm> message, messages)
 				{

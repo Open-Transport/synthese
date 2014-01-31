@@ -67,6 +67,7 @@ namespace synthese
 		):	Registrable(id),
 			_profile(NULL),
 			_cityId(0),
+			_creatorId(0),
 			_isConnectionAllowed(true),
 			_birthDate(not_a_date_time),
 			_language(NULL)

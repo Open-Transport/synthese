@@ -1,0 +1,13 @@
+diff -u /home/bcoudoin/Projets/3.8.beta1/utils/SyntheseKiosk/setup.py synthese-kiosk-HEAD/setup.py
+--- /home/bcoudoin/Projets/3.8.beta1/utils/SyntheseKiosk/setup.py	2013-03-28 14:44:16.000000000 +0100
++++ synthese-kiosk-HEAD/setup.py	2013-06-27 13:28:18.201915777 +0200
+@@ -20,7 +20,8 @@
+ #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ 
+ 
+-from setuptools import setup
++from distutils.core import setup
++#from setuptools import setup
+ 
+ setup(
+     name='SyntheseKiosk',

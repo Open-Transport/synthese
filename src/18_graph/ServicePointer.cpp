@@ -149,7 +149,8 @@ namespace synthese
 
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
-			bool ignoreReservation
+			bool ignoreReservation,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		)	{
 			ptime originDateTimeRef(_originDateTime);
 
@@ -177,7 +178,7 @@ namespace synthese
 			}
 
 			// Check of use rule
-			if(getUseRule().isRunPossible(*this, ignoreReservation) != UseRule::RUN_POSSIBLE)
+			if(getUseRule().isRunPossible(*this, ignoreReservation, reservationRulesDelayType) != UseRule::RUN_POSSIBLE)
 			{
 				return UseRule::RUN_NOT_POSSIBLE;
 			}
@@ -286,7 +287,9 @@ namespace synthese
 
 
 
-		boost::posix_time::ptime ServicePointer::getReservationDeadLine() const
+		boost::posix_time::ptime ServicePointer::getReservationDeadLine(
+			UseRule::ReservationDelayType reservationRulesDelayType
+		) const
 		{
 			assert(_departureEdge);
 
@@ -296,7 +299,8 @@ namespace synthese
 			){
 				return getUseRule().getReservationDeadLine(
 					_originDateTime,
-					getDepartureDateTime()
+					getDepartureDateTime(),
+					reservationRulesDelayType
 				);
 			}
 			return ptime(not_a_date_time);

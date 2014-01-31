@@ -39,6 +39,8 @@ ResaCustomerHtmlOptionListFunction.cpp
 ResaCustomerHtmlOptionListFunction.h
 ResaCustomersAdmin.cpp
 ResaCustomersAdmin.h
+ResaCustomerMergeAdmin.cpp
+ResaCustomerMergeAdmin.hpp
 ResaDBLog.cpp
 ResaDBLog.h
 ResaEditLogEntryAdmin.cpp
@@ -97,6 +99,8 @@ ReservationUpdateAction.cpp
 ReservationUpdateAction.hpp
 ReservationUserUpdateAction.cpp
 ReservationUserUpdateAction.h
+ReservationUserMergeAction.cpp
+ReservationUserMergeAction.hpp
 SendPasswordAction.cpp
 SendPasswordAction.h
 ServiceReservations.cpp

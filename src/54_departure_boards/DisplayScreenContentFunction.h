@@ -83,6 +83,7 @@ namespace synthese
 			static const std::string PARAMETER_STOPS_LIST;
 			static const std::string PARAMETER_TIMETABLE_GROUPED_BY_AREA;
 			static const std::string PARAMETER_DATA_SOURCE_FILTER;
+			static const std::string PARAMETER_SPLIT_CONTINUOUS_SERVICES;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -139,12 +140,18 @@ namespace synthese
 			struct Spointer_comparator {
 				bool operator()(const graph::ServicePointer& s1, const graph::ServicePointer& s2)
 				{
-					return s1.getDepartureDateTime() < s2.getDepartureDateTime();
+					if(s1.getDepartureDateTime() == s2.getDepartureDateTime())
+						return &s1 < &s2;
+					else
+						return s1.getDepartureDateTime() < s2.getDepartureDateTime();
 				}
 
 				bool operator()(const RealTimeService& s1, const RealTimeService& s2)
 				{
-					return s1.datetime < s2.datetime;
+					if(s1.datetime == s2.datetime)
+						return &s1 < &s2;
+					else
+						return s1.datetime < s2.datetime;
 				}
 			};
 
@@ -171,6 +178,7 @@ namespace synthese
 				bool _wayIsBackward;
 				bool _useSAEDirectConnection;
 				bool _timetableGroupedByArea;
+				bool _splitContinuousServices;
 				LineDestinationFilter _lineDestinationFilter;
 				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
 

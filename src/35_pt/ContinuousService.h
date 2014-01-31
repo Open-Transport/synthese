@@ -104,7 +104,8 @@ namespace synthese
 					bool checkIfTheServiceIsReachable,
 					bool inverted,
 					bool ignoreReservation,
-					bool allowCanceled
+					bool allowCanceled,
+					graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 				) const;
 
 				virtual void completeServicePointer(

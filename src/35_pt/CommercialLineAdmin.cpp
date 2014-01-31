@@ -501,6 +501,7 @@ namespace synthese
 				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
 				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
 				stream << t.cell("Couleur (format XML #rrggbb)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toXMLColor() : string()));
+				stream << t.cell("Couleur de police (format XML #rrggbb)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_FOREGROUND_COLOR, _cline->getFgColor() ? _cline->getFgColor()->toXMLColor() : string()));
 				stream << t.cell(
 					"Affichage avant premier départ (minutes)",
 					t.getForm().getTextInput(

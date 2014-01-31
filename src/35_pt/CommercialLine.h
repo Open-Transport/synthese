@@ -90,6 +90,7 @@ namespace synthese
 			static const std::string DATA_LINE_LONG_NAME;
 			static const std::string DATA_LINE_NAME;
 			static const std::string DATA_LINE_COLOR;
+			static const std::string DATA_LINE_FOREGROUND_COLOR;
 			static const std::string DATA_LINE_STYLE;
 			static const std::string DATA_LINE_IMAGE;
 			static const std::string DATA_LINE_ID;
@@ -115,7 +116,8 @@ namespace synthese
 				std::string			_longName;	//!< Name for schedule card
 				std::string _name;
 
-				boost::optional<util::RGBColor>		_color;		//!< JourneyPattern color
+				boost::optional<util::RGBColor>		_color;		//!< CommercialLine color
+				boost::optional<util::RGBColor>		_fgColor;		//!< CommercialLine foreground color
 				std::string			_style;		//!< CSS style (cartouche)
 				std::string			_image;		//!< Display image (cartouche)
 
@@ -159,6 +161,7 @@ namespace synthese
 				const std::string& getLongName () const { return _longName; }
 				const std::string& getImage () const { return _image; }
 				const boost::optional<util::RGBColor>& getColor () const { return _color; }
+				const boost::optional<util::RGBColor>& getFgColor () const { return _fgColor; }
 				const pt::ReservationContact* getReservationContact() const { return _reservationContact; }
 				const PlacesSet& getOptionalReservationPlaces() const { return _optionalReservationPlaces; }
 				const NonConcurrencyRules& getNonConcurrencyRules() const { return _nonConcurrencyRules; }
@@ -179,6 +182,7 @@ namespace synthese
 				void setLongName (const std::string& longName) { _longName = longName; }
 				void setImage (const std::string& image) { _image = image; }
 				void setColor (const boost::optional<util::RGBColor>& color) { _color = color; }
+				void setFgColor (const boost::optional<util::RGBColor>& color) { _fgColor = color; }
 				void setReservationContact(const pt::ReservationContact* value) { _reservationContact = value; }
 				void setCalendarTemplate(calendar::CalendarTemplate* value) { _calendarTemplate = value;}
 				void setNonConcurrencyRules(const NonConcurrencyRules& value) { _nonConcurrencyRules = value; }

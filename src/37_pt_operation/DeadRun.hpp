@@ -100,7 +100,7 @@ namespace synthese
 				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool,size_t) const;
 				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool,size_t) const;
 				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool,size_t) const;
-				virtual graph::ServicePointer getFromPresenceTime(const graph::AccessParameters&, bool, bool,bool, const synthese::graph::Edge &,const boost::posix_time::ptime &,bool,bool,bool,bool) const;
+				virtual graph::ServicePointer getFromPresenceTime(const graph::AccessParameters&, bool, bool,bool, const synthese::graph::Edge &,const boost::posix_time::ptime &,bool,bool,bool,bool, graph::UseRule::ReservationDelayType = graph::UseRule::RESERVATION_EXTERNAL_DELAY) const;
 				virtual void completeServicePointer(synthese::graph::ServicePointer &,const synthese::graph::Edge &,const synthese::graph::AccessParameters &) const;
 				virtual bool isPedestrianMode(void) const;
 				virtual bool isActive(const boost::gregorian::date &) const;

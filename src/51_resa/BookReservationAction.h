@@ -100,6 +100,7 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_RANK;
 
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
+			static const std::string PARAMETER_RESERVATION_DELAY_TYPE;
 			static const std::string PARAMETER_APPROACH_SPEED;
 
 			static const std::string PARAMETER_MULTI_RESERVATIONS_NUMBER;
@@ -122,6 +123,7 @@ namespace synthese
 			std::size_t								_reservationsNumber;
 			std::vector<boost::posix_time::ptime>	_reservationsDates;
 			bool									_multiReservationsMode;
+			graph::UseRule::ReservationDelayType 	_reservationRulesDelayType;
 
 			//! @name Reservation on a scheduled service
 			//@{

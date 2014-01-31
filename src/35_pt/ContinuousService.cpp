@@ -122,7 +122,8 @@ namespace synthese
 			bool checkIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation,
-			bool allowCanceled
+			bool allowCanceled,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		) const	{
 
 			// Check of access parameters

@@ -54,11 +54,13 @@ namespace synthese
 		const string DeparturesTableModule::PARAMETER_INEO_SERVER_DB_LOGIN = "ineo_server_db_login";
 		const string DeparturesTableModule::PARAMETER_INEO_SERVER_DB_PASSWORD = "ineo_server_db_password";
 		const string DeparturesTableModule::PARAMETER_INEO_SERVER_DB_NAME = "ineo_server_db_name";
+		const string DeparturesTableModule::PARAMETER_INEO_STOPS_DATASOURCE_ID = "ineo_stops_datasource_id";
 
 		string DeparturesTableModule::_ineoServerIP;
 		string DeparturesTableModule::_ineoServerDBLogin;
 		string DeparturesTableModule::_ineoServerDBPassword;
 		string DeparturesTableModule::_ineoServerDBName;
+		util::RegistryKeyType DeparturesTableModule::_stopsDataSourceId;
 		int DeparturesTableModule::_ineoServerPort = 0;
 	}
 
@@ -73,6 +75,7 @@ namespace synthese
 			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_LOGIN, "", &DeparturesTableModule::ParameterCallback);
 			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_PASSWORD, "", &DeparturesTableModule::ParameterCallback);
 			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_NAME, "", &DeparturesTableModule::ParameterCallback);
+			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_STOPS_DATASOURCE_ID, "", &DeparturesTableModule::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<DeparturesTableModule>::Init()
@@ -90,6 +93,7 @@ namespace synthese
 			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_LOGIN);
 			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_PASSWORD);
 			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_NAME);
+			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_STOPS_DATASOURCE_ID);
 		}
 
 
@@ -256,6 +260,17 @@ namespace synthese
 			else if(name == PARAMETER_INEO_SERVER_DB_NAME)
 			{
 				_ineoServerDBName = value;
+			}
+			else if(name == PARAMETER_INEO_STOPS_DATASOURCE_ID)
+			{
+				_stopsDataSourceId = util::RegistryKeyType(0);
+				try
+				{
+					_stopsDataSourceId = lexical_cast<util::RegistryKeyType>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
 			}
 		}
 }	}

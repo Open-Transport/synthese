@@ -38,6 +38,7 @@
 #include "Env.h"
 #include "LinePhysicalStop.hpp"
 #include "PTModule.h"
+#include "ContinuousService.h"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
@@ -101,6 +102,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_STOPS_LIST("stops_list");
 		const string DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA("timetable_grouped_by_area");
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
+		const string DisplayScreenContentFunction::PARAMETER_SPLIT_CONTINUOUS_SERVICES("split_continuous_services");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -613,6 +615,7 @@ namespace synthese
 					}
 
 					_timetableGroupedByArea = map.getDefault<bool>(PARAMETER_TIMETABLE_GROUPED_BY_AREA, false);
+					_splitContinuousServices = map.getDefault<bool>(PARAMETER_SPLIT_CONTINUOUS_SERVICES, false);
 					
 					screen->setType(_type.get());
 					//If request contains an interface : build a screen, else prepare custom xml answer
@@ -1064,6 +1067,15 @@ namespace synthese
 			string SAELimit = boost::lexical_cast<string>(_screen->getType()->getRowNumber());
 			ptime SAEDate;
 
+			boost::shared_ptr<const impex::DataSource> SAEDataSource;
+			try
+			{
+				SAEDataSource = util::Env::GetOfficialEnv().get<impex::DataSource>(DeparturesTableModule::GetIneoStopsDataSourceId());
+			}
+			catch (ObjectNotFoundException<impex::DataSource>&)
+			{
+			}
+
 			if(_useSAEDirectConnection)
 			{
 				shared_ptr<MySQLconnector> connector(new MySQLconnector());
@@ -1131,15 +1143,15 @@ namespace synthese
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
 				if(_useSAEDirectConnection)
 				{
-					noRealTime = false;
-					shared_ptr<MySQLconnector> connector(new MySQLconnector());
-
 					stringstream operatorCodes, filters, request;
 
 					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
 					{
 						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
 						{
+							if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+								continue;
+
 							if(!dataSourceLink.second.empty())
 							{
 								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
@@ -1148,6 +1160,11 @@ namespace synthese
 							}
 						}
 					}
+
+					if(!operatorCodes.str().empty())
+					{
+						noRealTime = false;
+						shared_ptr<MySQLconnector> connector(new MySQLconnector());
 
 					// Limit the research to X hour after date, X is 1 hour times the number of result we wish for
 					time_duration searchDepth(hours(1) * _screen->getType()->getRowNumber());
@@ -1224,6 +1241,9 @@ namespace synthese
 						{
 							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
 							{
+									if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+										continue;
+
 								if(ocStops.find(dataSourceLink.second) != ocStops.end())
 									ocStops[dataSourceLink.second] = curStop.second;
 							}
@@ -1238,6 +1258,10 @@ namespace synthese
 								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
 
 							const StopArea* area = realTimeService.stop->getConnectionPlace();
+
+								// Ignore when destination and stop are on the same stop area
+								if(area->getKey() == realTimeService.destination->getKey())
+									continue;
 
 							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
 								continue;
@@ -1254,6 +1278,9 @@ namespace synthese
 										{
 											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
 											{
+													if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+														continue;
+
 												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
 												{
 													realTimeService.commercialLine = curLine;
@@ -1342,6 +1369,7 @@ namespace synthese
 						util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
 					}
 				}
+				}
 			#endif
 
 				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
@@ -1409,7 +1437,7 @@ namespace synthese
 
 								++*index;
 
-								departureDateTime = servicePointer.getDepartureDateTime();
+							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 									continue;
 
@@ -1523,19 +1551,58 @@ namespace synthese
 
 						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
 						{
-							BOOST_FOREACH(const OrderedServices::second_type::value_type& servicePointer, destinationMap.second.second)
+							for(OrderedServices::second_type::const_iterator it = destinationMap.second.second.begin() ; it != destinationMap.second.second.end() ; it++)
 							{
 								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
 								{
 									break;
 								}
 
+								const ServicePointer& servicePointer = *it;
 								stop = static_cast<const StopPoint*>(servicePointer.getDepartureEdge()->getFromVertex());
 
 								const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
 								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
 
+								const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(servicePointer.getService());
+
+								if(_splitContinuousServices && continuousService)
+								{
+									boost::posix_time::ptime firstDeparture = servicePointer.getDepartureDateTime() + continuousService->getMaxWaitingTime();
+									boost::posix_time::ptime lastDeparture = firstDeparture + servicePointer.getServiceRange();
+									RollingStock* rs = journeyPattern->getRollingStock();
+
+									it++;
+									if(it != destinationMap.second.second.end())
+									{
+										lastDeparture = (lastDeparture > it->getDepartureDateTime() ? it->getDepartureDateTime() : lastDeparture);
+									}
+									it--;
+
+									for(boost::posix_time::ptime departureTime = firstDeparture ; departureTime < lastDeparture ; departureTime += continuousService->getMaxWaitingTime())
+									{
+										if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+										{
+											break;
+										}
+
 								boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
+										journeyPM->insert(DATA_DATE_TIME, departureTime);
+										journeyPM->insert(DATA_WAITING_TIME, to_simple_string(departureTime - now));
+										journeyPM->insert(DATA_IS_REAL_TIME, false);
+
+										if(rs)
+										{
+											boost::shared_ptr<ParametersMap> rsPM(new ParametersMap);
+											rs->toParametersMap(*rsPM, true);
+											journeyPM->insert(DATA_ROLLING_STOCK, rsPM);
+										}
+										journeysPM->insert(DATA_JOURNEY, journeyPM);
+									}
+								}
+								else
+								{
+									boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
 								journeyPM->insert(DATA_DATE_TIME, servicePointer.getDepartureDateTime());
 								journeyPM->insert(DATA_WAITING_TIME, to_simple_string(servicePointer.getDepartureDateTime() - now));
 								journeyPM->insert(DATA_IS_REAL_TIME, noRealTime || !_useSAEDirectConnection);
@@ -1551,10 +1618,16 @@ namespace synthese
 								journeysPM->insert(DATA_JOURNEY, journeyPM);
 							}
 						}
+						}
 						else
 						{
 							BOOST_FOREACH(const OrderedServices::first_type::value_type& realTimeService, destinationMap.second.first)
 							{
+								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+								{
+									break;
+								}
+
 								boost::shared_ptr<ParametersMap> journeyPM(new ParametersMap());
 								journeyPM->insert(DATA_DATE_TIME, realTimeService.datetime);
 								journeyPM->insert(DATA_WAITING_TIME, to_simple_string(realTimeService.datetime - now));
@@ -1562,13 +1635,8 @@ namespace synthese
 								journeysPM->insert(DATA_JOURNEY, journeyPM);
 
 								stop = realTimeService.stop.get();
-
-								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
-								{
-									break;
 								}
 							}
-						}
 
 						// No journey or no real time journeys for a line handled by SAE
 						if(journeysPM->getSubMaps(DATA_JOURNEY).size() == 0)
@@ -1648,14 +1716,15 @@ namespace synthese
 				// RealTime part
 				if(_useSAEDirectConnection)
 				{
-					// Consider there is going to be realTime data
-					noRealTime = false;
 					stringstream operatorCodes, filters, request;
 
 					BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
 					{
 						BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, it.second->getDataSourceLinks())
 						{
+							if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+								continue;
+
 							if(!dataSourceLink.second.empty())
 							{
 								operatorCodes << (operatorCodes.str().empty() ? "" : ","); 
@@ -1665,6 +1734,9 @@ namespace synthese
 						}
 					}
 
+					if(!operatorCodes.str().empty())
+					{
+						noRealTime = false;
 					shared_ptr<MySQLconnector> connector(new MySQLconnector());
 
 					string sortingOrder(_wayIsBackward ? "DESC" : "ASC");
@@ -1700,7 +1772,7 @@ namespace synthese
 							<< " JOIN ARRETCHN achn_arrivee"
 							<< "	 ON achn.jour = achn_arrivee.jour AND achn_arrivee.chainage = achn.chainage"
 							<< " JOIN ARRET a_arrivee"
-							<< "	 ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour"
+								<< "	 ON a_arrivee.ref = achn_arrivee.arret AND a_arrivee.jour = achn_arrivee.jour AND a.ref != a_arrivee.ref"
 							<< " WHERE"
 							<< "		a.mnemol IN (" << operatorCodes.str() << ")"
 							<< "	AND " << filters.str()
@@ -1735,6 +1807,9 @@ namespace synthese
 						{
 							BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, curStop.second->getDataSourceLinks())
 							{
+									if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+										continue;
+
 								if(ocStops.find(dataSourceLink.second) != ocStops.end())
 									ocStops[dataSourceLink.second] = curStop.second;
 							}
@@ -1747,6 +1822,10 @@ namespace synthese
 							realTimeService.stop = ocStops.find(result->getInfo("arret_oc"))->second;
 							if(ocStops.find(result->getInfo("oc_arrivee"))->second)
 								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
+
+								// Ignore when destination and stop are on the same stop area
+								if(realTimeService.stop->getConnectionPlace()->getKey() == realTimeService.destination->getKey())
+									continue;
 
 							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
 								continue;
@@ -1763,6 +1842,9 @@ namespace synthese
 										{
 											BOOST_FOREACH(const impex::Importable::DataSourceLinks::value_type& dataSourceLink, destination->getDataSourceLinks())
 											{
+													if(SAEDataSource && (SAEDataSource.get() != dataSourceLink.first))
+														continue;
+
 												if(dataSourceLink.second == result->getInfo("oc_arrivee"))
 												{
 													realTimeService.commercialLine = curLine;
@@ -1842,6 +1924,7 @@ namespace synthese
 						util::Log::GetInstance().warn(string("Exception while querying next departures : ") + e.what());
 					}
 				}
+				}
 			#endif
 
 				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
@@ -1886,10 +1969,12 @@ namespace synthese
 										PTModule::isTheoreticalAllowed(),
 										PTModule::isRealTimeAllowed()
 								)	);
+
 								if (!servicePointer.getService())
 									break;
 								++*index;
-								departureDateTime = servicePointer.getDepartureDateTime();
+
+							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 									continue;
 
@@ -1948,9 +2033,9 @@ namespace synthese
 									}
 								}
 
-								time_duration tod = departureDateTime.time_of_day();
+							time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
 								int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
-								if(departureDateTime.date() > startDateTime.date())
+							if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
 									mapKeyMinutes += 86400;
 
 								OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
@@ -1986,8 +2071,73 @@ namespace synthese
 				else
 					it = servicePointerAll.begin();
 
+				typedef map<graph::ServicePointer, pair<int, int>, Spointer_comparator> ContinuousServicesToMerge;
+				ContinuousServicesToMerge continuousServicesToMerge;
+
 				for(; it != servicePointerAll.end() ; it++)
 				{
+					bool serviceDisplayed(false);
+					do
+					{
+						serviceDisplayed = false;
+						for(ContinuousServicesToMerge::iterator itCs = continuousServicesToMerge.begin() ; itCs != continuousServicesToMerge.end() ; itCs++)
+						{
+							ContinuousServicesToMerge::value_type continuousToDisplay(*itCs);
+							if(continuousToDisplay.second.first < it->first && continuousToDisplay.second.first <= continuousToDisplay.second.second)
+							{
+								ServicePointer sp(continuousToDisplay.first);
+
+								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
+								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+								const ContinuousService* continuousService = static_cast<const ContinuousService*>(sp.getService());
+
+								string curShortName = boost::algorithm::to_lower_copy(
+									trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
+								);
+
+								// If realTime request didn't output any results or line isn't in the SAE
+								if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+								{
+									if(displayedResults >= maxRow)
+										break;
+									else if(isOutputXML)
+										concatXMLResult(stream,	sp);
+									else
+										addJourneyToParametersMap(result, sp);
+
+									displayedResults++;
+									serviceDisplayed = true;
+
+									sp.setDepartureInformations(
+										*(sp.getDepartureEdge()),
+										sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
+										sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
+										*(sp.getRealTimeDepartureVertex())
+									);
+
+									if(continuousToDisplay.second.first + continuousService->getMaxWaitingTime().total_seconds() < continuousToDisplay.second.second)
+									{
+										continuousServicesToMerge.insert(
+											ContinuousServicesToMerge::value_type(
+												sp,
+												make_pair(
+													continuousToDisplay.second.first + continuousService->getMaxWaitingTime().total_seconds(),
+													continuousToDisplay.second.second
+										)	)	);
+									}
+								}
+
+								continuousServicesToMerge.erase(itCs);
+								break;
+							}
+							else if(continuousToDisplay.second.first > continuousToDisplay.second.second)
+							{
+								continuousServicesToMerge.erase(itCs);
+								break;
+							}
+						}
+					} while(serviceDisplayed);
+
 					BOOST_FOREACH(RealTimeService& rts, it->second.first)
 					{
 						if(displayedResults >= maxRow)
@@ -2000,10 +2150,29 @@ namespace synthese
 						displayedResults++;
 					}
 
-					BOOST_FOREACH(ServicePointer& sp, it->second.second)
+					BOOST_FOREACH(ServicePointer sp, it->second.second)
 					{
 						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
 						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+						const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(sp.getService());
+
+						if(_splitContinuousServices && continuousService)
+						{
+							sp.setDepartureInformations(
+								*(sp.getDepartureEdge()),
+								sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
+								sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
+								*(sp.getRealTimeDepartureVertex())
+							);
+							continuousServicesToMerge.insert(
+								ContinuousServicesToMerge::value_type(
+									sp,
+									make_pair(
+										it->first + continuousService->getMaxWaitingTime().total_seconds(),
+										it->first + sp.getServiceRange().total_seconds()
+							)	)	);
+							continue;
+						}
 
 						string curShortName = boost::algorithm::to_lower_copy(
 							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))

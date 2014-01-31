@@ -74,6 +74,7 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_LONG_NAME("line_long_name");
 		const string CommercialLine::DATA_LINE_NAME("lineName");
 		const string CommercialLine::DATA_LINE_COLOR("line_color");
+		const string CommercialLine::DATA_LINE_FOREGROUND_COLOR("line_foreground_color");
 		const string CommercialLine::DATA_LINE_STYLE("line_style");
 		const string CommercialLine::DATA_LINE_IMAGE("line_image");
 		const string CommercialLine::DATA_LINE_ID("line_id");
@@ -166,20 +167,38 @@ namespace synthese
 				{
 					// Handle empty short names
 					if(getShortName().empty() && cl.getShortName().empty())
+					{
 						return getKey() < cl.getKey();
+					}
 					else
 					{
 						if(PTModule::getSortLettersBeforeNumbers())
+						{
 							return (alphanum_text_first_comp<string>(getShortName(), cl.getShortName()) < 0);
+						}
 						else
+						{
 							return (alphanum_comp<string>(getShortName(), cl.getShortName()) < 0);
+						}
 					}
 				}
 				else
+				{
 					return (getWeightForSorting() > cl.getWeightForSorting());
+				}
+			}
+			else if(!getNetwork())
+			{
+				return false;
+			}
+			else if(!cl.getNetwork())
+			{
+				return true;
 			}
 			else
+			{
 				return (getNetwork()->getKey() < cl.getNetwork()->getKey());
+			}
 		}
 
 
@@ -353,7 +372,12 @@ namespace synthese
 			if(getColor())
 			{
 				pm.insert(prefix + DATA_LINE_COLOR, getColor()->toString());
-				pm.insert(prefix + "color", getColor()->toString()); // For LinesListFunction compatibility
+				pm.insert(prefix + CommercialLineTableSync::COL_COLOR, getColor()->toXMLColor()); // Maybe break CMS views ! but needed for load in inter_synthese_package
+			}
+			if(getFgColor())
+			{
+				pm.insert(prefix + DATA_LINE_FOREGROUND_COLOR, getFgColor()->toString());
+				pm.insert(prefix + CommercialLineTableSync::COL_FOREGROUND_COLOR, getFgColor()->toXMLColor()); // Maybe break CMS views ! but needed for load in inter_synthese_package
 			}
 			if(getNetwork())
 			{
@@ -665,6 +689,29 @@ namespace synthese
 				if(value != _color)
 				{
 					_color = value;
+					result = true;
+				}
+			}
+
+			// Foreground Color
+			if(record.isDefined(CommercialLineTableSync::COL_FOREGROUND_COLOR))
+			{
+				optional<RGBColor> value;
+				string color(record.get<string>(CommercialLineTableSync::COL_FOREGROUND_COLOR));
+				if(!color.empty())
+				{
+					try
+					{
+						value = RGBColor::FromXMLColor(color);
+					}
+					catch(RGBColor::Exception&)
+					{
+						Log::GetInstance().warn("No such foreground color "+ color +" in commercial line "+ lexical_cast<string>(getKey()));
+					}
+				}
+				if(value != _fgColor)
+				{
+					_fgColor = value;
 					result = true;
 				}
 			}

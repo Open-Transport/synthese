@@ -118,6 +118,7 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_ARRIVAL_RANK = Action_PARAMETER_PREFIX + "ar";
 
 		const string BookReservationAction::PARAMETER_IGNORE_RESERVATION_RULES = Action_PARAMETER_PREFIX + "irr";
+		const string BookReservationAction::PARAMETER_RESERVATION_DELAY_TYPE = Action_PARAMETER_PREFIX + "rdt";
 		const string BookReservationAction::PARAMETER_APPROACH_SPEED = Action_PARAMETER_PREFIX + "apsp";
 
 		const string BookReservationAction::PARAMETER_MULTI_RESERVATIONS_NUMBER = Action_PARAMETER_PREFIX + "mrn";
@@ -180,6 +181,16 @@ namespace synthese
 			_ignoreReservation = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
 			_approachSpeed = map.getDefault<double>(PARAMETER_APPROACH_SPEED, 1.111);
 			_comment = map.getDefault<string>(PARAMETER_COMMENT);
+
+			// Reservation Rules Delay type
+			if(map.getDefault<int>(PARAMETER_RESERVATION_DELAY_TYPE, 0))
+			{
+				_reservationRulesDelayType = UseRule::RESERVATION_EXTERNAL_DELAY;
+			}
+			else
+			{
+				_reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY;
+			}
 
 			if(map.getDefault<bool>(PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME, false))
 			{
@@ -292,6 +303,7 @@ namespace synthese
 			_journeyPlanner.setMaxSolutions(1);
 			_journeyPlanner.setEndDepartureDate(_journeyPlanner.getStartDepartureDate());
 			_journeyPlanner.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
+			_journeyPlanner.setReservationRulesDelayType(_reservationRulesDelayType);
 
 			// Extraction of parameters from journey planner for other methods
 			_departurePlace = _journeyPlanner.getDeparturePlace().placeResult.value;
@@ -715,7 +727,7 @@ namespace synthese
 						}
 
                     	r->setReservationPossible(false);
-						if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation))
+						if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation, _reservationRulesDelayType))
 						){
 							if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
 								static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()
@@ -735,7 +747,8 @@ namespace synthese
 							r->setReservationDeadLine(
 								su.getUseRule().getReservationDeadLine(
 									su.getOriginDateTime(),
-									su.getDepartureDateTime()
+									su.getDepartureDateTime(),
+									_reservationRulesDelayType
 							)	);
                         	r->setReservationPossible(true);
 						}
@@ -809,7 +822,8 @@ namespace synthese
 				r->setReservationDeadLine(
 					_freeDRTTimeSlot->getUseRule(_userClassCode).getReservationDeadLine(
 						_departureDateTime,
-						_departureDateTime
+						_departureDateTime,
+						_reservationRulesDelayType
 				)	);
 				r->setServiceId(_freeDRTTimeSlot->getKey());
 				r->setServiceCode(_freeDRTTimeSlot->getServiceNumber());
