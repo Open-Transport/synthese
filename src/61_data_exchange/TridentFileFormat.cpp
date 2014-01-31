@@ -800,15 +800,15 @@ namespace synthese
 					}
 					os	<< "</departureTime>" << "\n";
 
-					if(!ls->isDeparture() && !ls->isArrival())
+					if(!ls->get<IsDeparture>() && !ls->get<IsArrival>())
 					{
 						os << "<boardingAlightingPossibility>NeitherBoardOrAlight</boardingAlightingPossibility>\n";
 					}
-					else if(!ls->isDeparture())
+					else if(!ls->get<IsDeparture>())
 					{
 						os << "<boardingAlightingPossibility>AlightOnly</boardingAlightingPossibility>\n";
 					}
-					else if(!ls->isArrival())
+					else if(!ls->get<IsArrival>())
 					{
 						os << "<boardingAlightingPossibility>BoardOnly</boardingAlightingPossibility>\n";
 					}
