@@ -3277,6 +3277,7 @@ namespace synthese
 					if(dynamic_cast<const ContinuousService*>(service.getService()))
 					{
 						pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, static_cast<const ContinuousService*>(service.getService())->getMaxWaitingTime().total_seconds() / 60);
+						break;
 					}
 				}
 
