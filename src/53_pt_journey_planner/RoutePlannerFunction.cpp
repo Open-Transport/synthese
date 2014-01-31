@@ -254,12 +254,14 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_DEPARTURE_DATE("departure_date");
 		const string RoutePlannerFunction::DATA_DEPARTURE_TIME_INTERNAL_FORMAT("internal_departure_time");
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME("continuous_service_last_departure_time");
+		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_DATE("continuous_service_last_departure_date");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LONGITUDE("departure_longitude");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LATITUDE("departure_latitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_TIME("arrival_time");
 		const string RoutePlannerFunction::DATA_ARRIVAL_DATE("arrival_date");
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME("continuous_service_last_arrival_time");
+		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_DATE("continuous_service_last_arrival_date");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LONGITUDE("arrival_longitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LATITUDE("arrival_latitude");
@@ -3270,6 +3272,15 @@ namespace synthese
 
 			if(journey.getContinuousServiceRange().total_seconds())
 			{
+				BOOST_FOREACH(const Journey::ServiceUses::value_type& service, journey.getServiceUses())
+				{
+					if(dynamic_cast<const ContinuousService*>(service.getService()))
+					{
+						pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, static_cast<const ContinuousService*>(service.getService())->getMaxWaitingTime().total_seconds() / 60);
+					}
+				}
+
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_DATE, to_simple_string(journey.getLastDepartureTime()));
 				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME, to_simple_string(journey.getLastDepartureTime().time_of_day()));
 			}
 
@@ -3319,6 +3330,7 @@ namespace synthese
 
 			if(journey.getContinuousServiceRange().total_seconds())
 			{
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_DATE, to_simple_string(journey.getLastArrivalTime()));
 				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME, to_simple_string(journey.getLastArrivalTime().time_of_day()));
 			}
 
