@@ -262,6 +262,8 @@ namespace synthese
 				static const std::string DATA_IS_THE_LAST_JOURNEY_BOARD;
 				static const std::string DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME;
 				static const std::string DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME;
+				static const std::string DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_DATE;
+				static const std::string DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_DATE;
 				static const std::string DATA_DEPARTURE_PLACE_LONGITUDE;
 				static const std::string DATA_DEPARTURE_PLACE_LATITUDE;
 				static const std::string DATA_ARRIVAL_PLACE_LONGITUDE;
