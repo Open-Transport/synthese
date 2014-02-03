@@ -28,6 +28,7 @@
 #include "DBTransaction.hpp"
 #include "FileFormatTemplate.h"
 #include "Importer.hpp"
+#include "InterSYNTHESEPackageContent.hpp"
 #include "NoExportPolicy.hpp"
 #include "OneFileTypeImporter.hpp"
 
@@ -75,7 +76,12 @@ namespace synthese
 				boost::posix_time::time_duration _maxAge;
 				std::string _excludeList;
 				std::vector<boost::regex> _excludeListRegEx;
-				mutable std::vector<cms::Webpage*> _pages;
+				mutable std::map<std::string, cms::Webpage*> _metadataPages;
+				mutable boost::shared_ptr<inter_synthese::InterSYNTHESEPackageContent> _ispc;
+
+				void _getPageFullPath(cms::Webpage *page, string &path) const;
+				cms::Website *_createDefaultSite() const;
+				void _readMetadata(std::string &metadata) const;
 
 				bool _isExcluded(
 					const vector<boost::regex> &regexps,
@@ -83,6 +89,7 @@ namespace synthese
 				) const;
 
 				void _importDir(const boost::filesystem::path &directoryPath,
+					boost::shared_ptr<cms::Website> &site,
 					cms::Webpage *parent,
 					boost::filesystem::path currentDir
 				) const;
