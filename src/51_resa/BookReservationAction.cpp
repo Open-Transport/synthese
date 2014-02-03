@@ -310,17 +310,17 @@ namespace synthese
 			_arrivalPlace = _journeyPlanner.getArrivalPlace().placeResult.value;
 			_departureDateTime = _journeyPlanner.getStartDepartureDate();
 			_userClassCode = _journeyPlanner.getAccessParameters().getUserClassRank();
-		
+
 			// Check extra reservations number and dates
 			_reservationsNumber = map.getDefault<size_t>(PARAMETER_MULTI_RESERVATIONS_NUMBER, 1);
 
 			if (_reservationsNumber > 6)
 			{
 				throw ActionException("Invalid reservations number (too high)");
-			} 
-			
+			}
+
 			_multiReservationsMode = map.getDefault<bool>(PARAMETER_MULTI_RESERVATIONS_MODE, false);
-			
+
 			if (_reservationsNumber > 1 && !_multiReservationsMode)
 				_multiReservationsMode = true;
 
@@ -484,7 +484,7 @@ namespace synthese
 						}
 						else
 						{
-							if (referenceArrivalTime.time_of_day() != 
+							if (referenceArrivalTime.time_of_day() !=
 									_journeyPlanner.getResult()->getJourneys().front().getLastArrivalTime().time_of_day()
 							){
 								throw ActionException("The route planning has found a different journey for multiple reservations");
@@ -516,7 +516,7 @@ namespace synthese
 			 * check the seat number is correct
 			 * check the same reservation wasn't alerady sent
 			 */
-			if ( _customer && request.getSession()->hasProfile() && 
+			if ( _customer && request.getSession()->hasProfile() &&
 				_customer->getKey() == request.getSession()->getUser()->getKey() &&
 				request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) &&
 				!request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE))
@@ -530,7 +530,7 @@ namespace synthese
 
 				if (check.size() > 0)
 					throw ClientException("Reservation already sent");
-				
+
 				if (ResaModule::GetMaxSeats() > 0 && _seatsNumber > ResaModule::GetMaxSeats())
 				{
 					throw ClientException("Maximum number of seats reached");
@@ -557,22 +557,22 @@ namespace synthese
 								Env::GetOfficialEnv(), su.getService()->getKey(),
 								boost::optional<boost::posix_time::ptime>(su.getDepartureDateTime()),
 								boost::optional<boost::posix_time::ptime>(su.getArrivalDateTime()), UP_LINKS_LOAD_LEVEL));
-			
+
 							BOOST_FOREACH(ReservationTableSync::SearchResult::value_type& reservation, reservations)
 							{
 								if (reservation->getReservationPossible())
 								{
-									User* customer = UserTableSync::GetEditable(reservation->getTransaction()->getCustomerUserId(), 
+									User* customer = UserTableSync::GetEditable(reservation->getTransaction()->getCustomerUserId(),
 										Env::GetOfficialEnv()).get();
 
 									if ((reservation->getServiceId() == su.getService()->getKey()) &&
 										(customer->getKey() == _customer->getKey()) &&
 										(reservation->getDepartureTime() == su.getDepartureDateTime() &&
-								 		reservation->getArrivalTime() == su.getArrivalDateTime())
+										reservation->getArrivalTime() == su.getArrivalDateTime())
 									){
 										const ReservationStatus& status(reservation->getStatus());
 
-										if (status != CANCELLED && status != CANCELLATION_TO_ACK && 
+										if (status != CANCELLED && status != CANCELLATION_TO_ACK &&
 											status != CANCELLED_AFTER_DELAY && status != ACKNOWLEDGED_CANCELLED_AFTER_DELAY &&
 											status != DONE && status != NO_RESERVATION
 										){
@@ -654,6 +654,7 @@ namespace synthese
 									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->getRoadPlace()->getKey()
 								);
 							}
+
 						}
 						if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
 						{
@@ -665,6 +666,18 @@ namespace synthese
 							);
 							r->setDeparturePlaceName(
 								dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getFullName()
+							);
+						}
+						else if (dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup()))
+						{
+							r->setDepartureCityName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getCity()->getName()
+							);
+							r->setDeparturePlaceNameNoCity(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getName()
+							);
+							r->setDeparturePlaceName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getFullName()
 							);
 						}
 						r->setDepartureTime(su.getDepartureDateTime());
@@ -709,6 +722,18 @@ namespace synthese
 								)->getFullName()
 							);
 						}
+						else if (dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup()))
+						{
+							r->setArrivalCityName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getCity()->getName()
+							);
+							r->setArrivalPlaceNameNoCity(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getName()
+							);
+							r->setArrivalPlaceName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getFullName()
+							);
+						}
 						r->setArrivalTime(su.getArrivalDateTime());
 
 						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
@@ -726,7 +751,7 @@ namespace synthese
 							r->setLineId(road->getKey());
 						}
 
-                    	r->setReservationPossible(false);
+						r->setReservationPossible(false);
 						if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation, _reservationRulesDelayType))
 						){
 							if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
@@ -750,7 +775,7 @@ namespace synthese
 									su.getDepartureDateTime(),
 									_reservationRulesDelayType
 							)	);
-                        	r->setReservationPossible(true);
+							r->setReservationPossible(true);
 						}
 						r->setServiceId(su.getService()->getKey());
 						r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
@@ -805,7 +830,7 @@ namespace synthese
 
 				r->setLineCode(_freeDRTTimeSlot->getArea()->getLine()->getShortName());
 				r->setLineId(_freeDRTTimeSlot->getArea()->getLine()->getKey());
-                r->setReservationPossible(false);
+				r->setReservationPossible(false);
 
 				reservationContact = OnlineReservationRule::GetOnlineReservationRule(
 					_freeDRTTimeSlot->getArea()->getLine()->getReservationContact()
@@ -817,7 +842,7 @@ namespace synthese
 						static_cast<const PTUseRule&>(
 							_freeDRTTimeSlot->getUseRule(_userClassCode)
 						).getKey()
-                    );
+					);
 				}
 				r->setReservationDeadLine(
 					_freeDRTTimeSlot->getUseRule(_userClassCode).getReservationDeadLine(
@@ -831,7 +856,7 @@ namespace synthese
 
 				ReservationTableSync::Save(r.get());
 			}
-			
+
 			// Log
 			BOOST_FOREACH(ReservationTransaction& rt, transactions)
 			{
@@ -840,7 +865,7 @@ namespace synthese
 
 			// Mail
 			if(!_ignoreReservation && !_customer->getEMail().empty() && reservationContact)
- 			{
+			{
 				if (_multiReservationsMode)
 				{
 					reservationContact->sendCustomerEMail(transactions);
@@ -851,7 +876,7 @@ namespace synthese
 				}
 
 				ResaDBLog::AddEMailEntry(*request.getSession(), *_customer, "Récapitulatif de réservation");
- 			}
+			}
 
 			// Redirect
 			if(request.getActionWillCreateObject())
