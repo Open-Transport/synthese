@@ -72,7 +72,7 @@ namespace synthese
 		const std::string OnlineReservationRule::DATA_ARRIVAL_CITY_NAME("arrival_city_name");
 		const std::string OnlineReservationRule::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const std::string OnlineReservationRule::DATA_DEPARTURE_TIME("departure_time");
-        const std::string OnlineReservationRule::DATA_IS_RESERVATION_POSSIBLE("is_reservation_possible");
+		const std::string OnlineReservationRule::DATA_IS_RESERVATION_POSSIBLE("is_reservation_possible");
 		const std::string OnlineReservationRule::DATA_ARRIVAL_TIME("arrival_time");
 		const std::string OnlineReservationRule::DATA_LINE_CODE("line_code");
 		const std::string OnlineReservationRule::DATA_SEATS_NUMBER("seats_number");
@@ -325,7 +325,7 @@ namespace synthese
 						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
 						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
 						resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-                        resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+						resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
 						roadResaMap->insert(DATA_ROAD_RESA, resaMap);
 					}
 
@@ -339,19 +339,19 @@ namespace synthese
 					contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resa.getReservations().rbegin())->getArrivalCityName());
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
-                    contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
-	                contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+					contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
+					contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
 
-                    if (resa.getCustomer())
-                    {
-                        contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
-                        contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
+					if (resa.getCustomer())
+					{
+						contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
+						contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
 
 						boost::shared_ptr<const User> customer = UserTableSync::getUserFromLogin(resa.getCustomer()->getLogin());
 						LoginToken token(LoginToken(customer->getLogin(),customer->getPasswordHash(),resa.getKey()));
-	                    contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
+						contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
 
-                    }
+					}
 
 					_cmsConfirmationEMail.get()->display(content, contentMap);
 
@@ -754,7 +754,7 @@ namespace synthese
 						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
 						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
 						resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-                        resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+						resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
 						roadResaMap->insert(DATA_ROAD_RESA, resaMap);
 					}
 					contentMap.insert(DATA_ROAD_RESAS, roadResaMap);
@@ -768,15 +768,15 @@ namespace synthese
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
 					contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
-                    if (resa.getCustomer())
-                    {
-                        contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
-                    }
+					if (resa.getCustomer())
+					{
+						contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
+					}
 					contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
-                    if (resa.getCustomer())
-                    {
-                        contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
-                    }
+					if (resa.getCustomer())
+					{
+						contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
+					}
 					contentMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
 					_cmsCancellationEMail.get()->display(content, contentMap);
