@@ -23,6 +23,7 @@
 #include "BookReservationAction.h"
 
 #include "ActionException.h"
+#include "RequestException.h"
 #include "ClientException.h"
 #include "AlgorithmLogger.hpp"
 #include "City.h"
@@ -301,7 +302,6 @@ namespace synthese
 			ParametersMap jpMap(map.getExtract(Action_PARAMETER_PREFIX));
 			_journeyPlanner._setFromParametersMap(jpMap);
 			_journeyPlanner.setMaxSolutions(1);
-			_journeyPlanner.setEndDepartureDate(_journeyPlanner.getStartDepartureDate());
 			_journeyPlanner.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
 			_journeyPlanner.setReservationRulesDelayType(_reservationRulesDelayType);
 
@@ -344,13 +344,13 @@ namespace synthese
 					}
 					catch (Exception e)
 					{
-						throw ActionException("Reservations dates are malformed here : " + date);
+						throw RequestException("Reservations dates are malformed here : " + date);
 					}
 				}
 			}
 			else if (!tempDates.empty() && _reservationsNumber == 1)
 			{
-				throw ActionException("The reservations number doesn't correspond to the reservations dates");
+				throw RequestException("The reservations number doesn't correspond to the reservations dates");
 			}
 
 			// Reservation on a service
@@ -466,12 +466,11 @@ namespace synthese
 					BOOST_FOREACH(const boost::posix_time::ptime& date, _reservationsDates)
 					{
 						_journeyPlanner.setStartDepartureDate(date);
-						_journeyPlanner.setEndDepartureDate(date);
 						_journeyPlanner.runWithoutOutput();
 
 						if (!_journeyPlanner.getResult().get() || _journeyPlanner.getResult()->getJourneys().empty())
 						{
-							throw ActionException("The route planning does not find a journey to book");
+							throw RequestException("The route planning does not find a journey to book");
 						}
 
 						_journey = _journeyPlanner.getResult()->getJourneys().front();
@@ -487,7 +486,7 @@ namespace synthese
 							if (referenceArrivalTime.time_of_day() !=
 									_journeyPlanner.getResult()->getJourneys().front().getLastArrivalTime().time_of_day()
 							){
-								throw ActionException("The route planning has found a different journey for multiple reservations");
+								throw RequestException("The route planning has found a different journey for multiple reservations");
 							}
 						}
 					}
