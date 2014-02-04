@@ -1740,7 +1740,7 @@ namespace synthese
 						if(_wayIsBackward)
 						{
 							filters << "(h.hrd < '" << SAEHourString << "' ";
-							filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd > '" << boost::posix_time::to_simple_string(endOfService) << "')";
+							filters << (SAEDate.time_of_day() < endOfService ? "OR" : "AND") <<  " h.hrd > '" << boost::posix_time::to_simple_string(endOfService) << "')";
 						}
 						else
 						{
@@ -2047,27 +2047,34 @@ namespace synthese
 					}
 				}
 
-				OrderedDeparturesMap::iterator it;
+				OrderedDeparturesMap::iterator it = servicePointerAll.begin();
+				OrderedDeparturesMap::iterator itStartTheoretical;
 				int maxRow(_screen->getType()->getRowNumber());
 				int displayedResults(0);
+				bool startDisplayTheoretical(false);
 
 				if(_wayIsBackward)
 				{
-					it = servicePointerAll.end();
-					for(; it != servicePointerAll.begin() ; it--)
+					// Realtime is already limited and ordered at maxRow results, theoretical is requested on the full day
+					int count(0);
+					for(itStartTheoretical = servicePointerAll.end() ; itStartTheoretical != servicePointerAll.begin() ; itStartTheoretical--)
 					{
-						if(distance(it, servicePointerAll.end()) >= maxRow)
+						// Only consider entry of servicePointerAll which have theoretical services
+						if(itStartTheoretical->second.second.size() && ++count >= maxRow)
 							break;
 					}
 				}
 				else
-					it = servicePointerAll.begin();
+					itStartTheoretical = servicePointerAll.begin();
 
 				typedef map<graph::ServicePointer, pair<int, int>, Spointer_comparator> ContinuousServicesToMerge;
 				ContinuousServicesToMerge continuousServicesToMerge;
 
 				for(; it != servicePointerAll.end() ; it++)
 				{
+					if(itStartTheoretical == it)
+						startDisplayTheoretical = true;
+
 					bool serviceDisplayed(false);
 					do
 					{
@@ -2142,45 +2149,48 @@ namespace synthese
 						displayedResults++;
 					}
 
-					BOOST_FOREACH(ServicePointer sp, it->second.second)
+					if(startDisplayTheoretical)
 					{
-						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
-						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-						const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(sp.getService());
-
-						if(_splitContinuousServices && continuousService)
+						BOOST_FOREACH(ServicePointer sp, it->second.second)
 						{
-							sp.setDepartureInformations(
-								*(sp.getDepartureEdge()),
-								sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
-								sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
-								*(sp.getRealTimeDepartureVertex())
+							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
+							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+							const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(sp.getService());
+
+							if(_splitContinuousServices && continuousService)
+							{
+								sp.setDepartureInformations(
+									*(sp.getDepartureEdge()),
+									sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
+									sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
+									*(sp.getRealTimeDepartureVertex())
+								);
+								continuousServicesToMerge.insert(
+									ContinuousServicesToMerge::value_type(
+										sp,
+										make_pair(
+											it->first + continuousService->getMaxWaitingTime().total_seconds(),
+											it->first + sp.getServiceRange().total_seconds()
+								)	)	);
+								continue;
+							}
+
+							string curShortName = boost::algorithm::to_lower_copy(
+								trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
 							);
-							continuousServicesToMerge.insert(
-								ContinuousServicesToMerge::value_type(
-									sp,
-									make_pair(
-										it->first + continuousService->getMaxWaitingTime().total_seconds(),
-										it->first + sp.getServiceRange().total_seconds()
-							)	)	);
-							continue;
-						}
 
-						string curShortName = boost::algorithm::to_lower_copy(
-							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-						);
+							// If realTime request didn't output any results or line isn't in the SAE
+							if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+							{
+								if(displayedResults >= maxRow)
+									break;
+								else if(isOutputXML)
+									concatXMLResult(stream,	sp);
+								else
+									addJourneyToParametersMap(result, sp);
 
-						// If realTime request didn't output any results or line isn't in the SAE
-						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
-						{
-							if(displayedResults >= maxRow)
-								break;
-							else if(isOutputXML)
-								concatXMLResult(stream,	sp);
-							else
-								addJourneyToParametersMap(result, sp);
-
-							displayedResults++;
+								displayedResults++;
+							}
 						}
 					}
 
