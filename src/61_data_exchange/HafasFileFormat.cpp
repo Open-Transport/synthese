@@ -98,6 +98,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME = "complete_empty_stop_area_name";
 		const string HafasFileFormat::Importer_::PARAMETER_NO_GLEIS_FILE = "no_gleis_file";
 		const string HafasFileFormat::Importer_::PARAMETER_TRY_TO_READ_LINE_SHORT_NAME = "try_to_read_line_short_name";
+		const string HafasFileFormat::Importer_::PARAMETER_READ_WAYBACK = "read_way_back";
 		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 	}
 
@@ -726,6 +727,8 @@ namespace synthese
 						{
 							itZug->lineNumber = lineNumber;
 						}
+						
+						itZug->readWayback = false;
 
 						// Continuous service
 						if(!_getField(21,4).empty())
@@ -767,6 +770,13 @@ namespace synthese
 						if(itZug != _zugs.end())
 						{
 							itZug->lineShortName = _getField(3, 8);
+						}
+					}
+					else if (_getField(0,2) == "*R" && _readWayback)
+					{
+						if (itZug != _zugs.end())
+						{
+							itZug->readWayback = (_getField(3, 1) == "R");
 						}
 					}
 					else if(_getField(0, 1) != "*") // Stop
@@ -926,8 +936,11 @@ namespace synthese
 			// No gleis file
 			pm.insert(PARAMETER_NO_GLEIS_FILE, _noGleisFile);
 
-			// No gleis file
+			// try to read lin short name
 			pm.insert(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, _tryToReadShortName);
+			
+			// Read wayback
+			pm.insert(PARAMETER_READ_WAYBACK, _readWayback);
 
 			// Calendar default code
 			pm.insert(PARAMETER_CALENDAR_DEFAULT_CODE, _defaultCalendarCode);
@@ -1007,6 +1020,9 @@ namespace synthese
 			
 			// Line short name
 			_tryToReadShortName = pm.getDefault<bool>(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, false);
+			
+			// Read wayback
+			_readWayback = pm.getDefault<bool>(PARAMETER_READ_WAYBACK, false);
 
 			// Calendar default code
 			_defaultCalendarCode = pm.getDefault<size_t>(PARAMETER_CALENDAR_DEFAULT_CODE, 0);
@@ -1448,6 +1464,12 @@ namespace synthese
 				{
 				}
 				bool wayBack = (numericServiceNumber % 2 == 1);
+				
+				// wayBack is overwritten if read in file
+				if (_readWayback)
+				{
+					wayBack = zug.readWayback;
+				}
 
 				// Transport mode (can be NULL)
 				RollingStock* transportMode(
