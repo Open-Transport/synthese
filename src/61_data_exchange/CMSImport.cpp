@@ -96,6 +96,9 @@ namespace synthese
 						_getPageFullPath(wp, path);
 						_logLoad(string("Loading page from metadata: ") + wp->getName()
 								 +  " path=" + path + " " + lexical_cast<string>(wp->getKey()));
+						// We keep the metadata loaded pages in a map where the key is
+						// the full page path to make it easy to find them in the file parsing
+						// stage.
 						_metadataPages[path] = wp;
 					}
 					else if(decodeTableId(reg->getKey()) == WebsiteTableSync::TABLE.ID)
@@ -251,6 +254,11 @@ namespace synthese
 				if(_metadataPages.find(fullPagePath) != _metadataPages.end())
 				{
 					page = _metadataPages[fullPagePath];
+
+					// We don't need this page anymore remove it thus the remaining
+					// pages in _metadataPages are those who are no more on disk
+					_metadataPages.erase(fullPagePath);
+
 					_logLoad("Reusing page from metadata: " + pageName + " " + lexical_cast<string>(page->getKey()));
 				}
 				else
@@ -424,19 +432,27 @@ namespace synthese
 		{
 			DBTransaction transaction;
 
-			if(_ispc.get())
-			{
-				_ispc->save(transaction);
-			}
-
-
 			if(_site.get())
 			{
+				Log::GetInstance().debug("CMS Import Save site: "+ lexical_cast<string>(_site->getKey()));
 				WebsiteTableSync::Save(_site.get(), transaction);
 			}
+
 			BOOST_FOREACH(const Registry<Webpage>::value_type& webPage, _env.getRegistry<Webpage>())
 			{
+				Log::GetInstance().debug("CMS Import Save: "+ lexical_cast<string>(webPage.second->getKey()));
 				WebPageTableSync::Save(webPage.second.get(), transaction);
+			}
+
+			// Deletions of metadata pages for which no file on disk where found
+			BOOST_FOREACH(MetadataPageMap::value_type &item, _metadataPages)
+			{
+				// Not the Remove function because the cascaded updates are already done by the object comparisons
+				Log::GetInstance().debug("CMS SAVE Delete uneeded pages: "+ lexical_cast<string>(item.second->getKey()));
+				DBModule::GetDB()->deleteStmt(
+					item.second->getKey(),
+					transaction
+				);
 			}
 			return transaction;
 		}
