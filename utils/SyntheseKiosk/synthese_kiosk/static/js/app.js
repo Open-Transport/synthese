@@ -8,6 +8,7 @@
 function ConfigViewModel() {
   this.kioskName = ko.observable();
   this.syntheseUrl = ko.observable();
+  this.kioskConfig = ko.observable();
   this.adminPassword = ko.observable();
   this.secretKey = ko.observable();
   this.availableBrowsers = ["firefox", "chrome", "opera", "custom"];
@@ -38,6 +39,7 @@ function ConfigViewModel() {
     console.log("config", config);
     self.kioskName(config.kiosk_name);
     self.syntheseUrl(config.synthese_url);
+    self.kioskConfig(config.kiosk_config);
     self.adminPassword(config.admin_password);
     self.secretKey(config.secret_key);
     self.browser(config.browser);
@@ -66,6 +68,7 @@ function ConfigViewModel() {
     var config = {
       kiosk_name: configObj.kioskName,
       synthese_url: configObj.syntheseUrl,
+      kiosk_config: configObj.kioskConfig,
       admin_password: configObj.adminPassword,
       secret_key: configObj.secretKey,
       browser: configObj.browser,
