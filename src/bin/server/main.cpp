@@ -401,4 +401,5 @@ int main( int argc, char **argv )
 	{
 		Log::GetInstance ().fatal ("Unexpected exception.");
 	}
+	exit(1);
 }
