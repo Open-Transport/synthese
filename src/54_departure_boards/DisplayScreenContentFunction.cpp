@@ -1259,11 +1259,11 @@ namespace synthese
 
 								const StopArea* area = realTimeService.stop->getConnectionPlace();
 
-								// Ignore when destination and stop are on the same stop area
-								if(area->getKey() == realTimeService.destination->getKey())
+								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end() || !realTimeService.destination)
 									continue;
 
-								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+								// Ignore when destination and stop are on the same stop area
+								if(area->getKey() == realTimeService.destination->getKey())
 									continue;
 
 								BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
@@ -1819,11 +1819,11 @@ namespace synthese
 								if(ocStops.find(result->getInfo("oc_arrivee"))->second)
 									realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
 
-								// Ignore when destination and stop are on the same stop area
-								if(realTimeService.stop->getConnectionPlace()->getKey() == realTimeService.destination->getKey())
+								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end() || !realTimeService.destination)
 									continue;
 
-								if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+								// Ignore when destination and stop are on the same stop area
+								if(realTimeService.stop->getConnectionPlace()->getKey() == realTimeService.destination->getKey())
 									continue;
 
 								BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
