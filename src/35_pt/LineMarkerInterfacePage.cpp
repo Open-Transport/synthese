@@ -50,6 +50,7 @@ namespace synthese
 		const string LineMarkerInterfacePage::DATA_SHORT_NAME("short_name");
 		const string LineMarkerInterfacePage::DATA_NAME("name");
 		const string LineMarkerInterfacePage::DATA_COLOR("color");
+		const string LineMarkerInterfacePage::DATA_FOREGROUND_COLOR("foreground_color");
 		const string LineMarkerInterfacePage::DATA_RANK("rank");
 		const string LineMarkerInterfacePage::DATA_RANK_IS_ODD("rank_is_odd");
 		const string LineMarkerInterfacePage::DATA_NETWORK_ID("network_id");
@@ -105,6 +106,11 @@ namespace synthese
 			{
 				pm.insert(DATA_COLOR, commercialLine.getColor()->toXMLColor());
 			}
+			if(commercialLine.getFgColor())
+			{
+				pm.insert(DATA_FOREGROUND_COLOR, commercialLine.getFgColor()->toXMLColor());
+			}
+
 			if(commercialLine.getNetwork())
 			{
 				pm.insert(DATA_NETWORK_ID, commercialLine.getNetwork()->getKey());
