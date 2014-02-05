@@ -53,8 +53,6 @@ thisdir = os.path.abspath(os.path.dirname(__file__))
 
 log = logging.getLogger(__name__)
 
-CONFIG_FILE = 'kiosk_config.json'
-
 def get_thirdparty_binary(dir_name, fatal=True):
     suffix = ''
     if sys.platform == 'win32':
@@ -119,6 +117,7 @@ class Display(object):
         config = kiosk.config
         self._kiosk = kiosk
         self._synthese_url = url
+        self._kiosk_config = config['kiosk_config']
         self._index = index
         self._name = name
         self._browser_name = config['browser']
@@ -224,6 +223,7 @@ def gen_password():
 DEFAULT_CONFIG = {
     'kiosk_name': socket.gethostname(),
     'synthese_url': None,
+    'kiosk_config': 'kiosk_config.json',
     'admin_password': gen_password(),
     'secret_key': gen_password(),
     'browser': 'firefox',
@@ -374,9 +374,11 @@ class SyntheseKiosk(object):
             sys.exit(1)
 
         self._cache_manager = CacheManager(self.config['offline_cache_dir'],
-                                           self.config['synthese_url'])
+                                           self.config['synthese_url'],
+                                           self.config['kiosk_config'])
         self._cache_manager.refresh_kiosk_config()
-        self._kiosk_config = KioskConfig(self.config['offline_cache_dir'])
+        self._kiosk_config = KioskConfig(self.config['offline_cache_dir'],
+                                         self.config['kiosk_config'])
         # If we don't have the kiosk_config.json file localy, we
         # download it now.
         while not self._kiosk_config.load():
@@ -651,9 +653,10 @@ class SyntheseKiosk(object):
 
 class CacheManager(object):
 
-    def __init__(self, cache_dir, synthese_url):
+    def __init__(self, cache_dir, synthese_url, kiosk_config):
         self._cache_dir = cache_dir
         self._synthese_url = synthese_url
+        self._kiosk_config = kiosk_config
 
     def _wget(self, directory, url):
         log.debug('running wget in ' + directory + " for url " + url)
@@ -697,17 +700,18 @@ class CacheManager(object):
 
     def refresh_kiosk_config(self):
         log.debug("refresh_kiosk_config")
-        cache_file = self._cache_dir + "/" + CONFIG_FILE
+        cache_file = self._cache_dir + "/" + self._kiosk_config
         if self._wget(self._cache_dir,
-                   self._synthese_url + "/" + CONFIG_FILE):
+                   self._synthese_url + "/" + self._kiosk_config):
             if os.path.isfile(cache_file + '.1'):
                 os.rename(cache_file + '.1', cache_file)
 
 class KioskConfig(object):
 
-    def __init__(self, cache_dir):
+    def __init__(self, cache_dir, kiosk_config):
         self._cache_dir = cache_dir
         self._config = None
+        self._kiosk_config = kiosk_config
 
     def _load(self):
         """
@@ -715,7 +719,7 @@ class KioskConfig(object):
         (loaded, changed)
         """
         previous_config = self._config
-        config_file = self._cache_dir + "/" + CONFIG_FILE
+        config_file = self._cache_dir + "/" + self._kiosk_config
         log.debug("load_kiosk_config " + config_file)
         if not os.path.isfile(config_file):
             print "Configuration file " + config_file + " not found"
