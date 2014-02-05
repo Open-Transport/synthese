@@ -18,6 +18,8 @@ FilesMap.hpp
 FrameworkTypes.hpp
 GeometryField.cpp
 GeometryField.hpp
+KillProcessException.h
+KillProcessException.cpp
 Language.cpp
 Language.hpp
 MinutesField.hpp
