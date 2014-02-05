@@ -76,7 +76,8 @@ namespace synthese
 				boost::posix_time::time_duration _maxAge;
 				std::string _excludeList;
 				std::vector<boost::regex> _excludeListRegEx;
-				mutable std::map<std::string, cms::Webpage*> _metadataPages;
+				typedef std::map<std::string, cms::Webpage*> MetadataPageMap;
+				mutable MetadataPageMap _metadataPages;
 				mutable boost::shared_ptr<inter_synthese::InterSYNTHESEPackageContent> _ispc;
 
 				void _getPageFullPath(cms::Webpage *page, string &path) const;
