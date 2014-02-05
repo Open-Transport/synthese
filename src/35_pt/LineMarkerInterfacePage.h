@@ -72,6 +72,7 @@ namespace synthese
 			static const std::string DATA_SHORT_NAME;
 			static const std::string DATA_NAME;
 			static const std::string DATA_COLOR;
+			static const std::string DATA_FOREGROUND_COLOR;
 			static const std::string DATA_RANK;
 			static const std::string DATA_RANK_IS_ODD;
 			static const std::string DATA_NETWORK_ID;
