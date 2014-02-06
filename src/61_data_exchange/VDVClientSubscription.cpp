@@ -76,7 +76,9 @@ namespace synthese
 					fp,
 					now,
 					end,
-					false
+					false,
+					boost::optional<std::size_t>(),
+					true
 			)	);
 		}
 

@@ -300,7 +300,8 @@ namespace synthese
 					bool ignoreReservation = false,
 					bool allowCanceledService = false,
 					bool enableTheoretical = true,
-					bool enableRealTime = true
+					bool enableRealTime = true,
+					bool maxDepartureMomentConcernsTheorical = false
 				) const;
 
 
