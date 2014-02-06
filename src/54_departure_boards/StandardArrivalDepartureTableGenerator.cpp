@@ -110,7 +110,6 @@ namespace synthese
 								_allowCanceled,
 								true,
 								true,
-								0,
 								_endDateTimeConcernsTheorical
 						)	);
 
