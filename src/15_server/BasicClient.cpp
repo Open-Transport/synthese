@@ -79,23 +79,29 @@ namespace synthese
 		   timer.expires_from_now(expiry_time);
 		   timer.async_wait(boost::bind(&BasicClient::set_result, this, &timer_result, _1));
 
-		   boost::system::error_code read_result;
+		   boost::system::error_code read_result(boost::asio::error::in_progress);
 		   async_read_until(sock, buffer, delim, boost::lambda::var(read_result) = boost::lambda::_1);
 
 		   sock.io_service().reset();
 		   while (sock.io_service().run_one())
 		   {
-			 if (read_result)
-			   timer.cancel();
-			 else if (timer_result)
-			   sock.cancel();
+			   if (timer_result)
+			   {
+				   sock.cancel();
+			   }
+			   else if (read_result == 0)
+			   {
+				   timer.cancel();
+			   }
 		   }
 
 		   if (read_result)
+		   {
 			   util::Log::GetInstance().error(
-				   "BasicClient network read error: " + string(boost::system::system_error(read_result).what())
+					"BasicClient network read error: " + string(boost::system::system_error(read_result).what())
 			   );
-		 }
+		   }
+		}
 
 		string BasicClient::_send(
 			const std::string& url,
