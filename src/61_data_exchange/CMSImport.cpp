@@ -117,7 +117,8 @@ namespace synthese
 					continue;
 				}
 
-				Webpage *page = new Webpage();
+				Webpage *page = new Webpage(WebPageTableSync::getId());
+				_env.getEditableRegistry<Webpage>().add(boost::shared_ptr<Webpage>(page));
 				_pages.push_back(page);
 				page->set<Title>(pageName);
 				page->setRoot(_site.get());
@@ -276,9 +277,9 @@ namespace synthese
 			DBTransaction transaction;
 
 			WebsiteTableSync::Save(_site.get(), transaction);
-			BOOST_FOREACH(Webpage* page, _pages)
+			BOOST_FOREACH(const Registry<Webpage>::value_type& webPage, _env.getRegistry<Webpage>())
 			{
-				WebPageTableSync::Save(page, transaction);
+				WebPageTableSync::Save(webPage.second.get(), transaction);
 			}
 			return transaction;
 		}
