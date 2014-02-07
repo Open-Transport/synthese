@@ -70,6 +70,7 @@ namespace synthese
 		const string CMSImport::Importer_::PARAMETER_EXCLUDE_LIST = "exclude_list";
 
 		const bool CMSImport::Importer_::IMPORTABLE(true);
+		const bool CMSImport::Importer_::IS_PERMANENT_THREAD(false);
 
 		bool CMSImport::Importer_::parseFiles() const
 		{
