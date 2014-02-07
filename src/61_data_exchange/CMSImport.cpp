@@ -69,17 +69,6 @@ namespace synthese
 		const bool CMSImport::Importer_::IMPORTABLE(true);
 
 		bool CMSImport::Importer_::parseFiles() const	{
-			_site->set<Name>(_directory);
-			// Take the last directory as the ClientURL
-			// The -2 avoids to count a trailing '/' in consideration
-			string::size_type found =
-				_directory.find_last_of("/",
-									   _directory.length() - 2);
-			if(found != string::npos)
-			{
-				_site->set<ClientURL>(_directory.substr(found));
-			}
-
 			_importDir( path(_directory), _parent.get(), path(_directory));
 			return true;
 		}
@@ -128,11 +117,13 @@ namespace synthese
 				_site->addPage(*page);
 				if( is_directory(*dir))
 				{
+					_logLoad("Creation of root page: " + pageName);
 					_importDir(directoryPath, page, *dir);
 				}
 				else
 				{
 					// It's a file, load its content
+					_logLoad("Creation of page: " + pageName);
 					page->set<MaxAge>(_maxAge);
 					string extension(dir->path().extension());
 					if(!extension.empty())
@@ -235,6 +226,20 @@ namespace synthese
 			if(!_site.get())
 			{
 				_site.reset(new Website());
+
+				// Take the last directory as the ClientURL
+				// The -2 avoids to count a trailing '/' in consideration
+				string::size_type found =
+					_directory.find_last_of("/",
+										   _directory.length() - 2);
+				if(found != string::npos)
+				{
+					_site->set<ClientURL>(_directory.substr(found));
+				}
+
+				string siteName(path(_directory).filename());
+				_site->set<Name>(siteName);
+				_logLoad("Creation of site: " + siteName);
 			}
 			else
 			{
