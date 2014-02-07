@@ -32,6 +32,7 @@
 #include "OneFileTypeImporter.hpp"
 
 #include "boost/filesystem.hpp"
+#include "boost/regex.hpp"
 
 namespace synthese
 {
@@ -73,7 +74,13 @@ namespace synthese
 				mutable boost::shared_ptr<cms::Website> _site;
 				boost::posix_time::time_duration _maxAge;
 				std::string _excludeList;
+				std::vector<boost::regex> _excludeListRegEx;
 				mutable std::vector<cms::Webpage*> _pages;
+
+				bool _isExcluded(
+					const vector<boost::regex> &regexps,
+					const std::string &fileName
+				) const;
 
 				void _importDir(const boost::filesystem::path &directoryPath,
 					cms::Webpage *parent,
