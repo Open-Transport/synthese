@@ -164,6 +164,7 @@ namespace synthese
 				);
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 
 				virtual LinkedObjectsIds getLinkedObjectsIds(
 					const Record& record

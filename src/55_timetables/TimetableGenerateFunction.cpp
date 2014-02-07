@@ -48,7 +48,6 @@
 #include "SchedulesBasedService.h"
 #include "TimetableServiceRowInterfacePage.h"
 #include "CommercialLineTableSync.h"
-#include "JourneyPatternCopy.hpp"
 #include "PTUseRule.h"
 
 #include <boost/date_time/time_duration.hpp>
@@ -1263,17 +1262,6 @@ namespace synthese
 					bool result(jp->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()));
 					if(!result)
 					{
-						BOOST_FOREACH(JourneyPatternCopy* subline, jp->getSubLines())
-						{
-							if(subline->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()))
-							{
-								result = true;
-								break;
-							}
-						}
-					}
-					if(!result)
-					{
 						continue;
 					}
 				}
@@ -1281,7 +1269,7 @@ namespace synthese
 				PlacesListConfiguration::List jlist;
 
 				// Build of the places list of the route
-				BOOST_FOREACH(Edge* edge, jp->getAllEdges())
+				BOOST_FOREACH(Edge* edge, jp->getEdges())
 				{
 					const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(edge));
 

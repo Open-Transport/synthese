@@ -61,7 +61,7 @@ namespace synthese
 
 		Road::~Road()
 		{
-			BOOST_FOREACH(ServiceSet::value_type service, _services)
+			BOOST_FOREACH(ServiceSet::value_type service, getAllServices())
 			{
 				delete service;
 			}

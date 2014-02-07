@@ -25,13 +25,12 @@
 
 #include "LineStop.h"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "InheritanceLoadSavePolicy.hpp"
 
 namespace synthese
 {
 	namespace pt
 	{
-		class DesignatedLinePhysicalStop;
+		class StopArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.10 Table : Route stop.
@@ -56,24 +55,11 @@ namespace synthese
 		class LineStopTableSync:
 			public db::DBDirectTableSyncTemplate<
 				LineStopTableSync,
-				LineStop,
-				db::FullSynchronizationPolicy,
-				db::InheritanceLoadSavePolicy
+				LineStop
 			>
 		{
 		public:
-			static const std::string COL_PHYSICALSTOPID;
-			static const std::string COL_LINEID;
-			static const std::string COL_RANKINPATH;
-			static const std::string COL_ISDEPARTURE;
-			static const std::string COL_ISARRIVAL;
-			static const std::string COL_METRICOFFSET;
-			static const std::string COL_SCHEDULEINPUT;
-			static const std::string COL_INTERNAL_SERVICE;
-			static const std::string COL_RESERVATION_NEEDED;
-
 			/** LineStop search.
-				(other search parameters)
 				@param first First LineStop object to answer
 				@param number Number of LineStop objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return Found LineStop objects.
@@ -154,7 +140,7 @@ namespace synthese
 
 
 
-			static boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+			static boost::shared_ptr<LineStop> SearchSimilarLineStop(
 				const StopArea& departure,
 				const StopArea& arrival,
 				util::Env& env
@@ -162,7 +148,7 @@ namespace synthese
 
 
 
-			static boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+			static boost::shared_ptr<LineStop> SearchSimilarLineStop(
 				const StopPoint& departure,
 				const StopPoint& arrival,
 				util::Env& env

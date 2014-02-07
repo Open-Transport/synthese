@@ -61,6 +61,7 @@ namespace synthese
 				double metricOffset = UNKNOWN_VALUE,
 				MainRoadChunk* mainRoadChunk = NULL
 			);
+			virtual ~ReverseRoadChunk();
 
 			bool isReversed() const { return true; };
 

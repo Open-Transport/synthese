@@ -8,12 +8,18 @@ AnalysisModule.hpp
 AnalysisModule.inc.cpp
 AnalysisRight.cpp
 AnalysisRight.hpp
+CheckLineCalendarFunction.cpp
+CheckLineCalendarFunction.hpp
 IsochronAdmin.cpp
 IsochronAdmin.hpp
 IsochronService.cpp
 IsochronService.hpp
+PTQualityControlAdmin.cpp
+PTQualityControlAdmin.hpp
 ServiceLengthService.cpp
 ServiceLengthService.hpp
+ServiceDensityService.cpp
+ServiceDensityService.hpp
 )
 
 #OpeningTime.cpp

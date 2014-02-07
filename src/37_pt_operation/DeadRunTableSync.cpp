@@ -25,6 +25,7 @@
 #include "DeadRunTableSync.hpp"
 
 #include "DataSourceLinksField.hpp"
+#include "OperationUnitTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "Depot.hpp"
@@ -64,6 +65,7 @@ namespace synthese
 		const std::string DeadRunTableSync::COL_SERVICE_NUMBER("service_number");
 		const std::string DeadRunTableSync::COL_LENGTH("length");
 		const std::string DeadRunTableSync::COL_DATASOURCE_LINKS("datasource_links");
+		const std::string DeadRunTableSync::COL_OPERATION_UNIT_ID = "operation_unit_id";
 	}
 
 	namespace db
@@ -86,6 +88,7 @@ namespace synthese
 			Field(DeadRunTableSync::COL_SERVICE_NUMBER, SQL_TEXT),
 			Field(DeadRunTableSync::COL_LENGTH, SQL_DOUBLE),
 			Field(DeadRunTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(DeadRunTableSync::COL_OPERATION_UNIT_ID, SQL_TEXT),
 			Field()
 		};
 
@@ -110,76 +113,12 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Service number
-			object->setServiceNumber(rows->getText(DeadRunTableSync::COL_SERVICE_NUMBER));
-
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
+			DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Network
-				object->setTransportNetwork(NULL);
-				RegistryKeyType id(rows->getLongLong(DeadRunTableSync::COL_NETWORK_ID));
-				if(id > 0) try
-				{
-					object->setTransportNetwork(
-						TransportNetworkTableSync::GetEditable(id, env, linkLevel).get()
-					);
-				}
-				catch(ObjectNotFoundException<TransportNetwork>&)
-				{
-					Log::GetInstance().warn("No such network "+ lexical_cast<string>(id) +" in Dead run "+ lexical_cast<string>(object->getKey()));
-				}
-
-				// Depot, stop point, direction, length
-				boost::shared_ptr<Depot> depot;
-				boost::shared_ptr<StopPoint> stop;
-				RegistryKeyType pid(rows->getLongLong(DeadRunTableSync::COL_DEPOT_ID));
-				RegistryKeyType stopId(rows->getLongLong(DeadRunTableSync::COL_STOP_ID));
-				try
-				{
-					if(pid > 0)
-					{
-						depot = DepotTableSync::GetEditable(pid, env, linkLevel);
-					}
-					if(stopId > 0)
-					{
-						stop = StopPointTableSync::GetEditable(stopId, env, linkLevel);
-					}
-				}
-				catch(ObjectNotFoundException<Depot>&)
-				{
-					Log::GetInstance().warn("No such depot "+ lexical_cast<string>(pid) +" in Dead run "+ lexical_cast<string>(object->getKey()));
-				}
-				catch(ObjectNotFoundException<StopPoint>&)
-				{
-					Log::GetInstance().warn("No such stop "+ lexical_cast<string>(stopId) +" in Dead run "+ lexical_cast<string>(object->getKey()));
-				}
-				if(depot.get() && stop.get())
-				{
-					object->setRoute(
-						*depot,
-						*stop,
-						rows->getDouble(DeadRunTableSync::COL_LENGTH),
-						rows->getBool(DeadRunTableSync::COL_DIRECTION)
-					);
-				}
-
-				// Data source links
-				object->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(DeadRunTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
+				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
-
-			// Schedules
-			SchedulesBasedService::SchedulesPair value(
-				SchedulesBasedService::DecodeSchedules(
-					rows->get<string>(DeadRunTableSync::COL_SCHEDULES)
-			)	);
-			object->setDataSchedules(value.first, value.second);
-
-			// Dates
-			object->setFromSerializedString(rows->getText(DeadRunTableSync::COL_DATES));
 		}
 
 
@@ -224,6 +163,11 @@ namespace synthese
 					object->getDataSourceLinks()
 			)	);
 
+			// Operation unit
+			query.addField(
+				object->getOperationUnit() ? object->getOperationUnit()->getKey() : RegistryKeyType(0)
+			);
+
 			query.execute(transaction);
 		}
 
@@ -232,6 +176,7 @@ namespace synthese
 		template<> void OldLoadSavePolicy<DeadRunTableSync, DeadRun>::Unlink(
 			DeadRun* obj
 		){
+			obj->unlink();
 		}
 
 

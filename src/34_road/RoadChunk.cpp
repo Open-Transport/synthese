@@ -21,9 +21,9 @@
 */
 
 #include "RoadChunk.h"
-#include "Road.h"
+
 #include "Crossing.h"
-#include "Registry.h"
+#include "Road.h"
 
 #include <geos/geom/LineString.h>
 #include <geos/linearref/LengthIndexedLine.h>
@@ -67,6 +67,7 @@ namespace synthese
 
 		RoadChunk::~RoadChunk ()
 		{
+			unlink();
 		}
 
 
@@ -117,13 +118,6 @@ namespace synthese
 
 
 
-		void RoadChunk::setCarSpeed(double& carSpeed)
-		{
-			_carSpeed = carSpeed;
-		}
-
-
-
 		void RoadChunk::setFromCrossing(Crossing* fromAddress)
 		{
 			_fromVertex = static_cast<Vertex*>(fromAddress);
@@ -132,7 +126,10 @@ namespace synthese
 			fromAddress->addArrivalEdge(static_cast<Edge*>(this));
 			fromAddress->addDepartureEdge(static_cast<Edge*>(this));
 
-			markServiceIndexUpdateNeeded(false);
+			BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, getParentPath()->getServiceCollections())
+			{
+				markServiceIndexUpdateNeeded(*itCollection, false);
+			}
 		}
 
 
@@ -160,5 +157,25 @@ namespace synthese
 				geometry->getFactory()->createPoint(
 					LengthIndexedLine(geometry.get()).extractPoint(metricOffset)
 			)	);
+		}
+
+
+
+		void RoadChunk::unlink()
+		{
+			if(getFromCrossing())
+			{
+				// Links from stop to the linestop
+				getFromCrossing()->removeArrivalEdge(static_cast<Edge*>(this));
+				getFromCrossing()->removeDepartureEdge(static_cast<Edge*>(this));
+			}
+
+			if(getParentPath())
+			{
+				BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, getParentPath()->getServiceCollections())
+				{
+					markServiceIndexUpdateNeeded(*itCollection, false);
+				}
+			}
 		}
 }	}

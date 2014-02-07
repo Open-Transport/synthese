@@ -30,6 +30,9 @@ namespace synthese
 {
 	namespace impex
 	{
+		class Export;
+
+
 		/** Exporter interface.
 			@ingroup m16
 			@since 3.2.0
@@ -38,9 +41,17 @@ namespace synthese
 		class Exporter
 		{
 		protected:
-			mutable util::Env						_env;
+			const Export& _export;
 
 		public:
+			Exporter(
+				const Export& export_
+			):	_export(export_)
+			{}
+
+			virtual void killPermanentThread() const {}
+			virtual void runPermanentThread() const {}
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// @param map Parameters map to interpret
@@ -66,9 +77,10 @@ namespace synthese
 				std::ostream& os
 			) const = 0;
 
+			virtual bool isPermanentThread() const { return false; }
+
 			virtual std::string getOutputMimeType() const = 0;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_impex_Exporter_hpp__

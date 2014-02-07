@@ -116,7 +116,7 @@ namespace synthese
 			//@{
 				void setFromCrossing(Crossing* value);
 				void setRoad(Road* road);
-				void setCarSpeed(double& carSpeed);
+				void setCarSpeed(double carSpeed){ _carSpeed = carSpeed; }
 			//@}
 
 
@@ -138,6 +138,9 @@ namespace synthese
 				boost::shared_ptr<geos::geom::Point> getPointFromOffset(
 					graph::MetricOffset metricOffset
 				) const;
+
+
+				void unlink();
 			//@}
 		};
 }	}

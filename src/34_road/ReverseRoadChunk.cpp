@@ -65,4 +65,11 @@ namespace synthese
 			else
 				return graph::Edge::getRealGeometry();
 		}
+
+
+
+		ReverseRoadChunk::~ReverseRoadChunk()
+		{
+			unlink();
+		}
 }	}

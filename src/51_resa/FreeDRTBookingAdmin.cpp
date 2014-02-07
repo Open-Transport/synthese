@@ -319,7 +319,7 @@ namespace synthese
 				f.addHiddenField(BookReservationAction::PARAMETER_SERVICE_ID, string());
 
 				// Time slots
-				BOOST_FOREACH(const Service* itServ, _area->getServices())
+				BOOST_FOREACH(const Service* itServ, _area->getAllServices())
 				{
 					// Declarations
 					const FreeDRTTimeSlot& timeSlot(static_cast<const FreeDRTTimeSlot&>(*itServ));

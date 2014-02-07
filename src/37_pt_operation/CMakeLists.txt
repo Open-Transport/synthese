@@ -49,6 +49,12 @@ DriverServiceTableSync.cpp
 DriverServiceTableSync.hpp
 DriverServiceUpdateAction.cpp
 DriverServiceUpdateAction.hpp
+OperationUnit.cpp
+OperationUnit.hpp
+OperationUnitTableSync.cpp
+OperationUnitTableSync.hpp
+OperationUnitsService.cpp
+OperationUnitsService.hpp
 PTOperationModule.cpp
 PTOperationModule.gen.cpp
 PTOperationModuleRegister.cpp

@@ -23,7 +23,6 @@
 
 #include "01_util/XmlToolkit.h"
 
-#include "35_pt/XmlBuilder.h"
 #include "JourneyPattern.hpp"
 
 #include "RequestException.h"
@@ -174,7 +173,7 @@ namespace synthese
 			for (int i=0; i<nbCities; ++i)
 			{
 				XMLNode cityNode = GetChildNode (citiesNode, "city", i);
-				_temporaryEnvironment.getEditableRegistry<City>().add (pt::XmlBuilder::CreateCity (cityNode));
+				_temporaryEnvironment.getEditableRegistry<City>().add (XmlBuilder::CreateCity (cityNode));
 			}
 
 			XMLNode connectionPlacesNode = GetChildNode (dataNode, "connectionPlaces", 0);
@@ -182,7 +181,7 @@ namespace synthese
 			for (int i=0; i<nbConnectionPlaces; ++i)
 			{
 				XMLNode connectionPlaceNode = GetChildNode (connectionPlacesNode, "connectionPlace", i);
-				_temporaryEnvironment.getEditableRegistry<StopArea>().add (synthese::pt::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _temporaryEnvironment.getEditableRegistry<City>()));
+				_temporaryEnvironment.getEditableRegistry<StopArea>().add (XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _temporaryEnvironment.getEditableRegistry<City>()));
 			}
 
 			XMLNode physicalStopsNode = GetChildNode (dataNode, "physicalStops", 0);
@@ -190,7 +189,7 @@ namespace synthese
 			for (int i=0; i<nbPhysicalStops; ++i)
 			{
 				XMLNode physicalStopNode = GetChildNode (physicalStopsNode, "physicalStop", i);
-				_temporaryEnvironment.getEditableRegistry<StopPoint>().add (synthese::pt::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<StopArea>()));
+				_temporaryEnvironment.getEditableRegistry<StopPoint>().add (XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<StopArea>()));
 			}
 
 			XMLNode commercialLinesNode = GetChildNode (dataNode, "commercialLines", 0);
@@ -198,7 +197,7 @@ namespace synthese
 			for (int i=0; i<nbCommercialLines; ++i)
 			{
 				XMLNode commercialLineNode = GetChildNode (commercialLinesNode, "commercialLine", i);
-				_temporaryEnvironment.getEditableRegistry<CommercialLine>().add (synthese::pt::XmlBuilder::CreateCommercialLine (commercialLineNode));
+				_temporaryEnvironment.getEditableRegistry<CommercialLine>().add (XmlBuilder::CreateCommercialLine (commercialLineNode));
 			}
 
 			XMLNode linesNode = GetChildNode (dataNode, "lines", 0);
@@ -207,7 +206,7 @@ namespace synthese
 			{
 				XMLNode lineNode = GetChildNode (linesNode, "line", i);
 				_temporaryEnvironment.getEditableRegistry<JourneyPattern>().add(
-					pt::XmlBuilder::CreateLine(
+					XmlBuilder::CreateLine(
 						lineNode,
 						_temporaryEnvironment.getEditableRegistry<CommercialLine>()
 				)	);
@@ -218,7 +217,7 @@ namespace synthese
 			for (int i=0; i<nbLineStops; ++i)
 			{
 				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
-				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));
+				_temporaryEnvironment.getEditableRegistry<LineStop>().add (XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));
 			}
 		}
 

@@ -380,8 +380,9 @@ namespace synthese
 		void InterSYNTHESEPackageContent::save(
 			DBTransaction& transaction
 		) const	{
+
 			// Deletions
-			BOOST_FOREACH(RegistryKeyType id, _objectsToRemove)
+			BOOST_FOREACH(RegistryKeyType id, _orderedObjectsToRemove)
 			{
 				DBModule::GetDB()->deleteStmt(id, transaction); // Not the Remove function because the cascaded updates are already done by the object comparisons
 			}

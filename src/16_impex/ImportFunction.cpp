@@ -165,7 +165,16 @@ namespace synthese
 
 			if(_doImport && _importDone)
 			{
-				_importer->save().run();
+				DBModule::DeactivateConditionalTablesUpdate();
+				try
+				{
+					_importer->save().run();
+				}
+				catch(...)
+				{
+
+				}
+				DBModule::ActivateConditionalTablesUpdate();
 
 				// Result
 				_result.insert(ATTR_DONE, true);

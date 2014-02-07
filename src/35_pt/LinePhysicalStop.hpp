@@ -23,35 +23,45 @@
 #ifndef SYNTHESE_pt_LinePhysicalStop_hpp__
 #define SYNTHESE_pt_LinePhysicalStop_hpp__
 
-#include "LineStop.h"
+#include "Edge.h"
 
 namespace synthese
 {
 	namespace pt
 	{
+		class JourneyPattern;
+		class LineStop;
+		class StopPoint;
+
 		/** LinePhysicalStop class.
 			@ingroup m35
 		*/
 		class LinePhysicalStop:
-			public LineStop
+			public virtual util::Registrable,
+			public graph::Edge
 		{
-		private:
-
+		protected:
+			LineStop* _lineStop;
+			
 		public:
 			LinePhysicalStop(
-				util::RegistryKeyType id = 0,
 				JourneyPattern* line = NULL,
 				std::size_t rankInPath = 0,
-				bool isDeparture = true,
-				bool isArrival = true,
 				double metricOffset = 0,
-				StopPoint* stop = NULL
+				StopPoint* stop = NULL,
+				LineStop* lineStop = NULL
 			);
+			virtual ~LinePhysicalStop();
 
 			//! @name Getters
 			//@{
-				StopPoint*	getPhysicalStop()	const;
+				StopPoint* getPhysicalStop() const;
+				LineStop* getLineStop() const { return _lineStop; }
 			//@}
+
+			virtual bool getReservationNeeded() const;
+			virtual bool getScheduleInput() const;
+			JourneyPattern* getJourneyPattern() const;
 
 			//! @name Modifiers
 			//@{
@@ -65,9 +75,8 @@ namespace synthese
 				void setPhysicalStop(StopPoint& stop);
 
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Clears all the links between the linestop and the stop.
-				void clearPhysicalStopLinks();
+				void link();
+				void unlink();
 			//@}
 		};
 }	}

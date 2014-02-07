@@ -39,6 +39,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		class Depot;
+		class OperationUnit;
 
 		/** Dead run class.
 			@ingroup m37
@@ -53,6 +54,7 @@ namespace synthese
 
 		private:
 			pt::TransportNetwork* _network;
+			boost::optional<pt_operation::OperationUnit&> _operationUnit;
 
 
 		public:
@@ -77,11 +79,13 @@ namespace synthese
 			//! @name Getters
 			//@{
 				pt::TransportNetwork* getTransportNetwork() const { return _network; }
+				const boost::optional<pt_operation::OperationUnit&>& getOperationUnit() const { return _operationUnit; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setTransportNetwork(pt::TransportNetwork* value){ _network = value; }
+				void setOperationUnit(const boost::optional<pt_operation::OperationUnit&>& value){ _operationUnit = value; }
 			//@}
 
 			//! @name Services
@@ -101,6 +105,26 @@ namespace synthese
 				virtual bool isPedestrianMode(void) const;
 				virtual bool isActive(const boost::gregorian::date &) const;
 				virtual std::string getRuleUserName() const;
+
+				virtual void toParametersMap(
+					util::ParametersMap& pm,
+					bool withAdditionalParameters,
+					boost::logic::tribool withFiles = boost::logic::indeterminate,
+					std::string prefix = std::string()
+				) const;
+
+				
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const;
 			//@}
 		};
 	}

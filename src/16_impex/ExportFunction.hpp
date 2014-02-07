@@ -32,6 +32,7 @@ namespace synthese
 {
 	namespace impex
 	{
+		class Export;
 		class Exporter;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -52,7 +53,9 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
+				boost::shared_ptr<Export> _export;
 				boost::shared_ptr<Exporter> _exporter;
+				util::ParametersMap _pm;
 			//@}
 
 
@@ -82,7 +85,8 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-				void setExporter(boost::shared_ptr<Exporter> value){ _exporter = value; }
+				void setExport(boost::shared_ptr<Export> value){ _export = value; }
+				void setParametersMap(const util::ParametersMap& pm){ _pm = pm; }
 			//@}
 
 

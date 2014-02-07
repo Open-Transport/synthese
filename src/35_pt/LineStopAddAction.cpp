@@ -41,7 +41,6 @@
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "LineArea.hpp"
 #include "DRTArea.hpp"
 #include "DRTAreaTableSync.hpp"
 
@@ -217,48 +216,31 @@ namespace synthese
 			DBTransaction transaction;
 
 			// Add the stop
-			boost::shared_ptr<LineStop> lineStop;
-			if(_stop.get())
-			{
-				lineStop.reset(
-					new DesignatedLinePhysicalStop(
-						0,
-						_route.get(),
-						_rank,
-						true,
-						true,
-						_metricOffset,
-						_stop.get(),
-						_withSchedules,
-						_reservationNeeded
-				)	);
-				LineStopTableSync::InsertStop(*lineStop, transaction);
-			}
-			if(_area.get())
-			{
-				lineStop.reset(
-					new LineArea(
-						0,
-						_route.get(),
-						_rank,
-						true,
-						true,
-						_metricOffset,
-						_area.get(),
-						_withSchedules
-				)	);
-				LineStopTableSync::InsertStop(*lineStop, transaction);
-			}
+			boost::shared_ptr<LineStop> lineStop(
+				new LineStop(
+					0,
+					_route.get(),
+					_rank,
+					true,
+					true,
+					_metricOffset,
+					_stop ?
+						static_cast<Registrable&>(*_stop) :
+						static_cast<Registrable&>(*_area)
+			)	);
+			lineStop->set<ScheduleInput>(_withSchedules);
+			lineStop->set<ReservationNeeded>(_reservationNeeded);
+			LineStopTableSync::InsertStop(*lineStop, transaction);
 
 			// Update each service with an additional schedule at the beginning
 			if(_rank == 0)
 			{
 				// Update the path with a fake line stop
-				BOOST_FOREACH(Edge* edge, _route->getEdges())
+				BOOST_FOREACH(LineStop* edge, _route->getLineStops())
 				{
-					edge->setRankInPath(edge->getRankInPath()+1);
+					edge->set<RankInPath>(edge->get<RankInPath>()+1);
 				}
-				_route->addEdge(*lineStop);
+				lineStop->link(*_env);
 
 				// Update of the schedules of each existing service
 				BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, _scheduledServices)
@@ -296,10 +278,10 @@ namespace synthese
 					service->setDataSchedules(departureSchedules, arrivalSchedules);
 				}
 			}
-			else if(_rank == _route->getEdges().size())
+			else if(_rank == _route->getLineStops().size())
 			{
 				// Update the path with a fake line stop
-				_route->addEdge(*lineStop);
+				lineStop->link(*_env);
 
 				// Update of the schedules of each existing service
 				BOOST_FOREACH(const boost::shared_ptr<ScheduledService>& service, _scheduledServices)
