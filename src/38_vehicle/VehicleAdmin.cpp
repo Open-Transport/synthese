@@ -25,6 +25,7 @@
 #include "VehicleAdmin.hpp"
 
 #include "AdminParametersException.h"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
@@ -32,7 +33,6 @@
 #include "User.h"
 #include "Vehicle.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "VehicleUpdateAction.hpp"
 #include "VehicleTableSync.hpp"
 #include "SearchFormHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
@@ -150,22 +150,22 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> updateRequest(request, *this);
-				updateRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
+				AdminActionFunctionRequest<ObjectUpdateAction, VehicleAdmin> updateRequest(request, *this);
+				updateRequest.getAction()->setObject(*_vehicle);
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update_form"));
 				stream << t.open();
-				stream << t.cell("Nom", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, _vehicle->getName()));
-				stream << t.cell("Numéro", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, _vehicle->getNumber()));
-				stream << t.cell("Image", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_PICTURE, _vehicle->getPicture()));
-				stream << t.cell("Places", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_SEATS, VehicleTableSync::SerializeSeats(_vehicle->getSeats())));
-				stream << t.cell("Lignes autorisées", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_ALLOWED_LINES, VehicleTableSync::SerializeAllowedLines(_vehicle->getAllowedLines())));
-				stream << t.cell("En service", t.getForm().getOuiNonRadioInput(VehicleUpdateAction::PARAMETER_AVAILABLE, _vehicle->getAvailable()));
-				stream << t.cell("URL", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_URL, _vehicle->getURL()));
-				stream << t.cell("Immatriculation", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_REGISTRATION_NUMBERS, _vehicle->getRegistrationNumbers()));
-				if(!_vehicle->getURL().empty())
+				stream << t.cell("Nom", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Name>(), _vehicle->get<Name>()));
+				stream << t.cell("Numéro", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Number>(), _vehicle->get<Number>()));
+				stream << t.cell("Image", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Picture>(), _vehicle->get<Picture>()));
+				stream << t.cell("Places", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Seats>(), Seats::ToString(_vehicle->get<Seats>())));
+				stream << t.cell("Lignes autorisées", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<AllowedLines>(), AllowedLines::ToString(_vehicle->get<AllowedLines>())));
+				stream << t.cell("En service", t.getForm().getOuiNonRadioInput(ObjectUpdateAction::GetInputName<Available>(), _vehicle->get<Available>()));
+				stream << t.cell("URL", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<URL>(), _vehicle->get<URL>()));
+				stream << t.cell("Immatriculation", t.getForm().getTextInput(ObjectUpdateAction::GetInputName<RegistrationNumber>(), _vehicle->get<RegistrationNumber>()));
+				if(!_vehicle->get<URL>().empty())
 				{
-					stream << t.cell("Lien", HTMLModule::getHTMLLink(_vehicle->getURL(), _vehicle->getURL(), string(), false, string(), string(), "target=\"_new\""));
+					stream << t.cell("Lien", HTMLModule::getHTMLLink(_vehicle->get<URL>(), _vehicle->get<URL>(), string(), false, string(), string(), "target=\"_new\""));
 				}
 				stream << t.close();
 			}
@@ -187,7 +187,7 @@ namespace synthese
 				stream << "<h1>Résultats</h1>";
 
 				AdminActionFunctionRequest<VehiclePositionUpdateAction,VehicleAdmin> addRequest(request, *this);
-				addRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
+				addRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle).get());
 
 				AdminActionFunctionRequest<RemoveObjectAction, VehicleAdmin> removeRequest(request, *this);
 
@@ -320,7 +320,7 @@ namespace synthese
 
 		std::string VehicleAdmin::getTitle() const
 		{
-			return _vehicle.get() ? (_vehicle->getName() + " ("+ _vehicle->getNumber() + ")") : DEFAULT_TITLE;
+			return _vehicle.get() ? (_vehicle->get<Name>() + " ("+ _vehicle->get<Number>() + ")") : DEFAULT_TITLE;
 		}
 
 

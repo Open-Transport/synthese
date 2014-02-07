@@ -40,7 +40,6 @@
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
 #include "NonPermanentService.h"
-#include "JourneyPatternCopy.hpp"
 #include "ImportableTableSync.hpp"
 #include "ParametersMap.h"
 #include "TransportNetworkTableSync.h"
@@ -125,9 +124,9 @@ namespace synthese
 			BOOST_FOREACH(const Path* path, _paths)
 			{
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*path->sharedServicesMutex
+					*path->sharedServicesMutex
 				);
-				BOOST_FOREACH(const Service* service, path->getServices())
+				BOOST_FOREACH(const Service* service, path->getAllServices())
 				{
 					service->clearNonConcurrencyCache();
 				}
@@ -148,9 +147,9 @@ namespace synthese
 			BOOST_FOREACH(const Path* path, _paths)
 			{
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*path->sharedServicesMutex
+					*path->sharedServicesMutex
 				);
-				BOOST_FOREACH(const Service* service, path->getServices())
+				BOOST_FOREACH(const Service* service, path->getAllServices())
 				{
 					service->clearNonConcurrencyCache();
 				}
@@ -229,9 +228,9 @@ namespace synthese
 			BOOST_FOREACH(const Path* path, _paths)
 			{
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*path->sharedServicesMutex
+					*path->sharedServicesMutex
 				);
-				BOOST_FOREACH(const Service* service, path->getServices())
+				BOOST_FOREACH(const Service* service, path->getAllServices())
 				{
 					if(dynamic_cast<const NonPermanentService*>(service))
 					{
@@ -240,24 +239,6 @@ namespace synthese
 					else
 					{
 						return mask;
-					}
-				}
-
-				BOOST_FOREACH(const JourneyPatternCopy* subline, static_cast<const JourneyPattern*>(path)->getSubLines())
-				{
-					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*subline->sharedServicesMutex
-					);
-					BOOST_FOREACH(const Service* service, subline->getServices())
-					{
-						if(dynamic_cast<const NonPermanentService*>(service))
-						{
-							result |= (*dynamic_cast<const NonPermanentService*>(service) & mask);
-						}
-						else
-						{
-							return mask;
-						}
 					}
 				}
 			}
@@ -556,24 +537,12 @@ namespace synthese
 				}
 
 				const Edge& edge(**path->getEdges().begin());
-				ServicePointer nextService(
-					edge.getNextService(
-						ap,
-						now,
-						maxTime,
-						false,
-						fakeIndex
-				)	);
-				if(nextService.getService())
-				{
-					return true;
-				}
 
-				BOOST_FOREACH(JourneyPatternCopy* subline, static_cast<JourneyPattern*>(path)->getSubLines())
+				BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path->getServiceCollections())
 				{
-					const Edge& edge(**subline->getEdges().begin());
 					ServicePointer nextService(
 						edge.getNextService(
+							*itCollection,
 							ap,
 							now,
 							maxTime,
@@ -990,12 +959,6 @@ namespace synthese
 			SubObjects r;
 			BOOST_FOREACH(Path* path, getPaths())
 			{
-				// Avoid sublines
-				if(dynamic_cast<JourneyPatternCopy*>(path))
-				{
-					continue;
-				}
-
 				r.push_back(path);
 			}
 			return r;

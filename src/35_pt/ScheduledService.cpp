@@ -74,7 +74,9 @@ namespace synthese
 
 
 		ScheduledService::~ScheduledService ()
-		{}
+		{
+			unlink();
+		}
 
 
 
@@ -217,6 +219,10 @@ namespace synthese
 			const AccessParameters&
 		) const	{
 
+			// Lock the vertices and the schedules
+			recursive_mutex::scoped_lock lock1(getVerticesMutex());
+			recursive_mutex::scoped_lock lock2(getSchedulesMutex());
+
 			size_t edgeIndex(edge.getRankInPath());
 			if(servicePointer.getArrivalEdge() == NULL)
 			{
@@ -256,15 +262,21 @@ namespace synthese
 
 		time_duration ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(rankInPath == 0 && !RTData)
 			{
 				return getDataDepartureSchedules()[0];
 			}
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
+
+
 
 		time_duration ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(rankInPath == 0 && !RTData)
 			{
 				return getDataDepartureSchedules()[0];
@@ -272,13 +284,19 @@ namespace synthese
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
+
+
 		time_duration ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
+
+
 		time_duration ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
@@ -288,6 +306,8 @@ namespace synthese
 		{
 			_team = team;
 		}
+
+
 
 		std::string ScheduledService::getTeam() const
 		{
@@ -645,14 +665,7 @@ namespace synthese
 				)	);
 				if(dsl != getDataSourceLinks())	
 				{
-					if(&env == &Env::GetOfficialEnv())
-					{
 						setDataSourceLinksWithRegistration(dsl);
-					}
-					else
-					{
-						setDataSourceLinksWithoutRegistration(dsl);
-					}
 					result = true;
 				}
 			}
@@ -771,12 +784,11 @@ namespace synthese
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Registration in path
-			if( getPath() &&
-				getPath()->getPathGroup())
+			if( getPath())
 			{
 				getPath()->addService(
 					*this,
-					&env == &Env::GetOfficialEnv()
+					true
 				);
 				updatePathCalendar();
 			}
@@ -790,11 +802,6 @@ namespace synthese
 					getRoute()->getCommercialLine()->registerService(*this);
 			}	}
 
-			if(&env == &Env::GetOfficialEnv())
-			{
-				setDataSourceLinksWithRegistration(getDataSourceLinks());
-			}
-
 			// Clear cache in case of non detected change in external objects (like path edges number)
 			_clearGeneratedSchedules();
 		}
@@ -807,8 +814,6 @@ namespace synthese
 			{
 				getPath()->removeService(*this);
 			}
-
-			cleanDataSourceLinks(true);
 
 			// Unregister from the line
 			if(getRoute() && getRoute()->getCommercialLine())

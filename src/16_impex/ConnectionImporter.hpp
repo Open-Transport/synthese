@@ -40,6 +40,7 @@ namespace synthese
 		{
 		public:
 			static const bool IMPORTABLE;
+			static const bool IS_PERMANENT_THREAD;
 			static const std::string PARAMETER_ADDRESS;
 			static const std::string PARAMETER_PORT;
 
@@ -101,6 +102,9 @@ namespace synthese
 
 		template<class FF>
 		const bool ConnectionImporter<FF>::IMPORTABLE(true);
+
+		template<class FF>
+		const bool ConnectionImporter<FF>::IS_PERMANENT_THREAD(false);
 
 		template<class FF>
 		const std::string ConnectionImporter<FF>::PARAMETER_ADDRESS("address");

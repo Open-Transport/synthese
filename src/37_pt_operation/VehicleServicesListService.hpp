@@ -34,6 +34,7 @@ namespace synthese
 {
 	namespace pt_operation
 	{
+		class OperationUnit;
 		class VehicleService;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -60,6 +61,7 @@ namespace synthese
 				Date::Type _date;
 				Name::Type _name;
 				const cms::Webpage* _page;
+				boost::optional<const OperationUnit&> _operationUnit;
 				boost::shared_ptr<const VehicleService> _service;
 				bool _withDetail;
 			//@}

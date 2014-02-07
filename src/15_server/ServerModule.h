@@ -142,6 +142,7 @@ namespace synthese
 			// in a service.
 			// @FIXME This should be used by all services appropriately.
 			static boost::shared_mutex baseWriterMutex;
+			//static boost::shared_mutex interSyntheseVersusRTMutex;
 
 		private:
 
@@ -221,9 +222,6 @@ namespace synthese
 				HTTPReply& httpReply,
 				const CookiesMap& cookiesMap
 			);
-
-			// Launch the permanent threads
-			static void _LaunchPermanentThreads();
 		};
 
 

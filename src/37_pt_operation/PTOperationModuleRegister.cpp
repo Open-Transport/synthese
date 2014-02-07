@@ -8,11 +8,13 @@
 #include "DriverAllocationTableSync.hpp"
 #include "DriverAllocationTemplateTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
+#include "OperationUnitTableSync.hpp"
 #include "VehicleServiceTableSync.hpp"
 
 #include "DriverAllocationsListService.hpp"
 #include "DriverAllocationTemplatesListService.hpp"
 #include "DriverServicesListService.hpp"
+#include "OperationUnitsService.hpp"
 #include "VehicleServicesListService.hpp"
 
 #include "DepotAdmin.hpp"
@@ -36,6 +38,7 @@
 #include "DriverAllocation.hpp"
 #include "DriverAllocationTemplate.hpp"
 #include "DriverService.hpp"
+#include "OperationUnit.hpp"
 #include "VehicleService.hpp"
 
 #include "PTOperationModule.inc.cpp"
@@ -51,6 +54,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::DriverAllocationTemplateTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync, synthese::pt_operation::DriverServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt_operation::DriverServiceTableSync>::integrate();
+	synthese::pt_operation::OperationUnitTableSync::integrate();
 	synthese::pt_operation::VehicleServiceTableSync::integrate();
 
 	synthese::pt_operation::PTOperationModule::integrate();
@@ -58,6 +62,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::DriverServicesListService::integrate();
 	synthese::pt_operation::DriverAllocationsListService::integrate();
 	synthese::pt_operation::DriverAllocationTemplatesListService::integrate();
+	synthese::pt_operation::OperationUnitsService::integrate();
 	synthese::pt_operation::VehicleServicesListService::integrate();
 
 	synthese::pt_operation::DepotUpdateAction::integrate();
@@ -81,5 +86,6 @@ void synthese::pt_operation::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocation>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocationTemplate>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverService>();
+	synthese::util::Env::Integrate<synthese::pt_operation::OperationUnit>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehicleService>();
 }

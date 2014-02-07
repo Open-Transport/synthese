@@ -40,6 +40,8 @@ InterSYNTHESEPackageTableSync.cpp
 InterSYNTHESEPackageTableSync.hpp
 InterSYNTHESEPackagesService.cpp
 InterSYNTHESEPackagesService.hpp
+InterSYNTHESEPacket.cpp
+InterSYNTHESEPacket.hpp
 InterSYNTHESEQueue.cpp
 InterSYNTHESEQueue.hpp
 InterSYNTHESEQueueTableSync.cpp
@@ -56,6 +58,8 @@ InterSYNTHESESyncTypeFactory.cpp
 InterSYNTHESESyncTypeFactory.hpp
 InterSYNTHESEUpdateAckService.cpp
 InterSYNTHESEUpdateAckService.hpp
+InterSYNTHESEUpdatePushService.cpp
+InterSYNTHESEUpdatePushService.hpp
 )
 
 set_source_files_properties(InterSYNTHESEModule.gen.cpp InterSYNTHESEModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

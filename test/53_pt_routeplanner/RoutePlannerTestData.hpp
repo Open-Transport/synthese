@@ -42,6 +42,8 @@ GeographyModule::PreInit();
 #define SAVE(_class, object) do {} while(0)
 #endif
 
+Env env;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Cities
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -589,25 +591,25 @@ li92.setTimetableName("92.1");
 li92.setRollingStock(&rs57);
 li92.setCommercialLine(&cl92);
 
-DesignatedLinePhysicalStop ls86(2814749767106586ULL, &li92, 0, true, false, 0, &ps86);
+LineStop ls86(2814749767106586ULL, &li92, 0, true, false, 0, ps86);
 SAVE(LineStop, ls86);
-li92.addEdge(ls86);
+ls86.link(env);
 
-DesignatedLinePhysicalStop ls63(2814749767106563ULL, &li92, 1, true, true, 100, &ps73);
+LineStop ls63(2814749767106563ULL, &li92, 1, true, true, 100, ps73);
 SAVE(LineStop, ls63);
-li92.addEdge(ls63);
+ls63.link(env);
 
-DesignatedLinePhysicalStop ls61(2814749767106561ULL, &li92, 2, true, true, 5500, &ps75);
+LineStop ls61(2814749767106561ULL, &li92, 2, true, true, 5500, ps75);
 SAVE(LineStop, ls61);
-li92.addEdge(ls61);
+ls61.link(env);
 
-DesignatedLinePhysicalStop ls62(2814749767106562ULL, &li92, 3, true, true, 6400, &ps79);
+LineStop ls62(2814749767106562ULL, &li92, 3, true, true, 6400, ps79);
 SAVE(LineStop, ls62);
-li92.addEdge(ls62);
+ls62.link(env);
 
-DesignatedLinePhysicalStop ls60(2814749767106560ULL, &li92, 4, false, true, 6500, &ps85);
+LineStop ls60(2814749767106560ULL, &li92, 4, false, true, 6500, ps85);
 SAVE(LineStop, ls60);
-li92.addEdge(ls60);
+ls60.link(env);
 
 ScheduledService ss01(4503599627370501ULL, "1", &li92);
 {
@@ -707,23 +709,23 @@ li93.setTimetableName("93.2");
 li93.setRollingStock(&rs57);
 li93.setCommercialLine(&cl93);
 
-DesignatedLinePhysicalStop ls64(2814749767106564ULL, &li93, 0, true, false, 6500, &ps73);
+LineStop ls64(2814749767106564ULL, &li93, 0, true, false, 6500, ps73);
 SAVE(LineStop, ls64);
-li93.addEdge(ls64);
+ls64.link(env);
 
-DesignatedLinePhysicalStop ls65(2814749767106565ULL, &li93, 1, true, true, 12141, &ps81);
+LineStop ls65(2814749767106565ULL, &li93, 1, true, true, 12141, ps81);
 SAVE(LineStop, ls65);
 {
-//	DesignatedLinePhysicalStop::ViaPoints v;
+//	LineStop::ViaPoints v;
 //	v.push_back(new Coordinate(523000,1843000));
 //	v.push_back(new Coordinate(525000,1843000));
 //	ls65.setViaPoints(v);
 }
-li93.addEdge(ls65);
+ls65.link(env);
 
-DesignatedLinePhysicalStop ls66(2814749767106566ULL, &li93, 2, false, true, 12141, &ps75);
+LineStop ls66(2814749767106566ULL, &li93, 2, false, true, 12141, ps75);
 SAVE(LineStop, ls66);
-li93.addEdge(ls66);
+ls66.link(env);
 
 ScheduledService ss18(4503599627370518ULL, "18", &li93);
 {
@@ -804,29 +806,29 @@ li94.setTimetableName("94.3");
 li94.setRollingStock(&rs57);
 li94.setCommercialLine(&cl94);
 
-DesignatedLinePhysicalStop ls67(2814749767106567ULL, &li94, 0, true, false, 14141, &ps83);
+LineStop ls67(2814749767106567ULL, &li94, 0, true, false, 14141, ps83);
 SAVE(LineStop, ls67);
-li94.addEdge(ls67);
+ls67.link(env);
 
-DesignatedLinePhysicalStop ls69(2814749767106569ULL, &li94, 1, true, true, 15141, &ps85);
+LineStop ls69(2814749767106569ULL, &li94, 1, true, true, 15141, ps85);
 SAVE(LineStop, ls69);
-li94.addEdge(ls69);
+ls69.link(env);
 
-DesignatedLinePhysicalStop ls71(2814749767106571ULL, &li94, 2, true, true, 16141, &ps80);
+LineStop ls71(2814749767106571ULL, &li94, 2, true, true, 16141, ps80);
 SAVE(LineStop, ls71);
-li94.addEdge(ls71);
+ls71.link(env);
 
-DesignatedLinePhysicalStop ls70(2814749767106570ULL, &li94, 3, true, true, 17141, &ps76);
+LineStop ls70(2814749767106570ULL, &li94, 3, true, true, 17141, ps76);
 SAVE(LineStop, ls70);
-li94.addEdge(ls70);
+ls70.link(env);
 
-DesignatedLinePhysicalStop ls68(2814749767106568ULL, &li94, 4, true, true, 17641, &ps73);
+LineStop ls68(2814749767106568ULL, &li94, 4, true, true, 17641, ps73);
 SAVE(LineStop, ls68);
-li94.addEdge(ls68);
+ls68.link(env);
 
-DesignatedLinePhysicalStop ls9407(2814749767109407ULL, &li94, 5, false, true, 18641, &ps07);
+LineStop ls9407(2814749767109407ULL, &li94, 5, false, true, 18641, ps07);
 SAVE(LineStop, ls9407);
-li94.addEdge(ls9407);
+ls9407.link(env);
 
 ScheduledService ss11(4503599627370511ULL, "11", &li94);
 {
@@ -905,13 +907,13 @@ li95.setTimetableName("95.1");
 li95.setRollingStock(&rs57);
 li95.setCommercialLine(&cl95);
 
-DesignatedLinePhysicalStop ls72(2814749767106572ULL, &li95, 0, true, false, 17641, &ps75);
+LineStop ls72(2814749767106572ULL, &li95, 0, true, false, 17641, ps75);
 SAVE(LineStop, ls72);
-li95.addEdge(ls72);
+ls72.link(env);
 
-DesignatedLinePhysicalStop ls73(2814749767106573ULL, &li95, 1, false, true, 17641, &ps84);
+LineStop ls73(2814749767106573ULL, &li95, 1, false, true, 17641, ps84);
 SAVE(LineStop, ls73);
-li95.addEdge(ls73);
+ls73.link(env);
 
 ScheduledService ss09(4503599627370509ULL, "09", &li95);
 {
@@ -966,13 +968,13 @@ li96.setTimetableName("96.1");
 li96.setRollingStock(&rs57);
 li96.setCommercialLine(&cl96);
 
-DesignatedLinePhysicalStop ls74(2814749767106574ULL, &li96, 0, true, false, 17641, &ps79);
+LineStop ls74(2814749767106574ULL, &li96, 0, true, false, 17641, ps79);
 SAVE(LineStop, ls74);
-li96.addEdge(ls74);
+ls74.link(env);
 
-DesignatedLinePhysicalStop ls75(2814749767106575ULL, &li96, 1, false, true, 17641, &ps85);
+LineStop ls75(2814749767106575ULL, &li96, 1, false, true, 17641, ps85);
 SAVE(LineStop, ls75);
-li96.addEdge(ls75);
+ls75.link(env);
 
 ScheduledService ss13(4503599627370513ULL, "13", &li96);
 {
@@ -1027,13 +1029,13 @@ li97.setTimetableName("97");
 li97.setRollingStock(&rs57);
 li97.setCommercialLine(&cl97);
 
-DesignatedLinePhysicalStop ls9773(2814749767109773ULL, &li97, 0, true, false, 0, &ps73);
+LineStop ls9773(2814749767109773ULL, &li97, 0, true, false, 0, ps73);
 SAVE(LineStop, ls9773);
-li97.addEdge(ls9773);
+ls9773.link(env);
 
-DesignatedLinePhysicalStop ls9706(2814749767109706ULL, &li97, 1, false, true, 2000, &ps06);
+LineStop ls9706(2814749767109706ULL, &li97, 1, false, true, 2000, ps06);
 SAVE(LineStop, ls9706);
-li97.addEdge(ls9706);
+ls9706.link(env);
 
 ContinuousService cs9701(4503599627379701ULL, "9701", &li97);
 {
@@ -1073,13 +1075,13 @@ li98.setTimetableName("98");
 li98.setRollingStock(&rs57);
 li98.setCommercialLine(&cl98);
 
-DesignatedLinePhysicalStop ls9806(2814749767109806ULL, &li98, 0, true, false, 0, &ps06);
+LineStop ls9806(2814749767109806ULL, &li98, 0, true, false, 0, ps06);
 SAVE(LineStop, ls9806);
-li98.addEdge(ls9806);
+ls9806.link(env);
 
-DesignatedLinePhysicalStop ls9807(2814749767109807ULL, &li98, 1, false, true, 2000, &ps07);
+LineStop ls9807(2814749767109807ULL, &li98, 1, false, true, 2000, ps07);
 SAVE(LineStop, ls9807);
-li98.addEdge(ls9807);
+ls9807.link(env);
 
 ContinuousService cs9801(4503599627379801ULL, "9801", &li98);
 {

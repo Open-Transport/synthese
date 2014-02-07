@@ -131,11 +131,14 @@ namespace synthese
 					}
 
 					// Store the stop area
-					nearbyStops.insert(
-						make_pair(
-							static_cast<const StopArea*>(itEdge.second->getNext()->getFromVertex()->getHub()),
-							LinesSet()
-					)	);
+					if(itEdge.second->getNext()) // Should always be true
+					{
+						nearbyStops.insert(
+							make_pair(
+								static_cast<const StopArea*>(itEdge.second->getNext()->getFromVertex()->getHub()),
+								LinesSet()
+						)	);
+					}
 				}
 			}
 

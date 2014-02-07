@@ -28,6 +28,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -59,5 +60,12 @@ namespace synthese
 			DBInterSYNTHESE::RequestEnqueue visitor(content);
 			visitor(_sql);
 			return content.str();
+		}
+
+
+
+		boost::posix_time::ptime DBSQLInterSYNTHESEContent::getExpirationTime() const
+		{
+			return ptime(not_a_date_time);
 		}
 }	}

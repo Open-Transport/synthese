@@ -33,7 +33,7 @@
 #include "ReservationContact.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
+#include "LineStop.h"
 #include "ScheduledService.h"
 #include "ContinuousService.h"
 #include "RoadPlace.h"

@@ -82,6 +82,7 @@ namespace synthese
 			mutable std::auto_ptr<std::ofstream> _fileStream;		//!< Stream on the file where the content must be sent
 			mutable boost::optional<std::ostream&> _outputStream;		//!< An output stream where the content must be sent
 			util::ParametersMap& _pm;	//!< Parameters map where entries must be stored
+			const std::string _logPath;
 
 
 			virtual db::DBTransaction _save() const = 0;
@@ -127,6 +128,10 @@ namespace synthese
 
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
+			virtual void killPermanentThread() const {}
+			virtual void runPermanentThread() const {}
+
+			void openLogFile() const;
 
 			void closeLogFile(
 				bool result,

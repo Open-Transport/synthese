@@ -992,7 +992,7 @@ namespace synthese
 			double lastx = 0.0;
 			double lasty = 0.0;
 
-			BOOST_FOREACH(Edge* edge, path->getAllEdges())
+			BOOST_FOREACH(Edge* edge, path->getEdges())
 			{
 				if( ! edge->getNext())
 					break;
@@ -1147,22 +1147,22 @@ namespace synthese
 				boost::posix_time::time_duration arrival;
 				boost::posix_time::time_duration departure;
 
-				if (ls->getRankInPath() > 0 && ls->isArrival())
+				if (ls->get<RankInPath>() > 0 && ls->get<IsArrival>())
 				{
-					arrival = service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath());
+					arrival = service->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 				else
 				{
-					arrival = service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath());
+					arrival = service->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 
-				if (ls->getRankInPath()+1 != linestops.size() && ls->isDeparture())
+				if (ls->get<RankInPath>()+1 != linestops.size() && ls->get<IsDeparture>())
 				{
-					departure = service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath());
+					departure = service->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 				else
 				{
-					departure = service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath());
+					departure = service->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 
 				boost::posix_time::time_duration diff = arrival - departure;
@@ -1174,7 +1174,7 @@ namespace synthese
 
 				arrivalTimeStr = to_simple_string(arrival);
 				departureTimeStr = to_simple_string(departure);
-				const StopPoint * stopPoint(static_cast<const StopPoint *>(ls->getFromVertex()));
+				const StopPoint * stopPoint(dynamic_cast<const StopPoint *>(&*ls->get<LineNode>()));
 
 				if(stopPoint->hasGeometry())
 				{
@@ -1185,13 +1185,13 @@ namespace synthese
 				{
 					stopTimes <<_key(service->getKey(), 1) << ","
 						<< _key(stopPoint->getKey()) << ","
-						<< ls->getRankInPath() << ","
+						<< ls->get<RankInPath>() << ","
 						<< arrivalTimeStr.substr(0, 8) << ","
 						<< departureTimeStr.substr(0, 8) << ","
 						<< ","
 
-						<< (ls->isDepartureAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
-						<< (ls->isArrivalAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
+						<< (ls->get<IsDeparture>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
+						<< (ls->get<IsArrival>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
 						<< endl;
 					stopTimesExist = true;
 				}
@@ -1621,5 +1621,11 @@ namespace synthese
 
 			os << flush;
 		}
-	}
-}
+
+
+
+		GTFSFileFormat::Exporter_::Exporter_(
+			const impex::Export& export_
+		):	OneFileExporter<GTFSFileFormat>(export_)
+		{}
+}	}

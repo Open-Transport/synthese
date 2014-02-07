@@ -11,13 +11,10 @@
 #include "LineStopGetService.hpp"
 #include "StopAreasListFunction.hpp"
 #include "StopPointsListFunction.hpp"
-#include "ServiceDensityService.hpp"
 #include "RealTimeUpdateFunction.h"
-#include "PhysicalStopsCSVExportFunction.h"
 #include "PTNetworksListFunction.hpp"
 #include "PTRoutesListFunction.hpp"
 #include "PTRouteDetailFunction.hpp"
-#include "CheckLineCalendarFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
 #include "ServicesListService.hpp"
 #include "ServiceQuotasListService.hpp"
@@ -48,7 +45,6 @@
 #include "FreeDRTTimeSlotAdmin.hpp"
 #include "FreeDRTTimeSlotTableSync.hpp"
 #include "FreeDRTTimeSlotUpdateAction.hpp"
-#include "PTQualityControlAdmin.hpp"
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
 #include "JourneyPatternAdmin.hpp"
@@ -174,7 +170,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DestinationsAdmin::integrate();
 	synthese::pt::FreeDRTAreaAdmin::integrate();
 	synthese::pt::FreeDRTTimeSlotAdmin::integrate();
-	synthese::pt::PTQualityControlAdmin::integrate();
 	synthese::pt::ServiceAdmin::integrate();
 	synthese::pt::TransportNetworkAdmin::integrate();
 	synthese::pt::CommercialLineAdmin::integrate();
@@ -193,15 +188,12 @@ void synthese::pt::moduleRegister()
 
 	synthese::pt::LineStopGetService::integrate();
 	synthese::pt::RealTimeUpdateFunction::integrate();
-	synthese::pt::PhysicalStopsCSVExportFunction::integrate();
 	synthese::pt::LinesListFunction::integrate();
 	synthese::pt::StopPointsListFunction::integrate();
-	synthese::pt::ServiceDensityService::integrate();
 	synthese::pt::StopAreasListFunction::integrate();
 	synthese::pt::PTNetworksListFunction::integrate();
 	synthese::pt::PTRoutesListFunction::integrate();
 	synthese::pt::PTRouteDetailFunction::integrate();
-	synthese::pt::CheckLineCalendarFunction::integrate();
 	synthese::pt::PTObjectInformationFunction::integrate();
 	synthese::pt::ServicesListService::integrate();
 	synthese::pt::ServiceQuotasListService::integrate();

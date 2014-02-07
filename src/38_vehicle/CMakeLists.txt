@@ -56,8 +56,6 @@ VehicleScreen.cpp
 VehicleScreen.hpp
 VehicleTableSync.cpp
 VehicleTableSync.hpp
-VehicleUpdateAction.cpp
-VehicleUpdateAction.hpp
 )
 
 set_source_files_properties(VehicleModule.gen.cpp VehicleModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
