@@ -7,7 +7,6 @@
 #include "AndFunction.hpp"
 #include "BitAndFunction.hpp"
 #include "ChrFunction.hpp"
-#include "CMSImport.hpp"
 #include "CMSInstallRight.hpp"
 #include "CMSRight.hpp"
 #include "DateService.hpp"
@@ -74,7 +73,6 @@ void synthese::cms::moduleRegister()
 	synthese::cms::AndFunction::integrate();
 	synthese::cms::BitAndFunction::integrate();
 	synthese::cms::ChrFunction::integrate();
-	synthese::cms::CMSImport::integrate();
 	synthese::cms::CMSInstallRight::integrate();
 	synthese::cms::CMSModule::integrate();
 	synthese::cms::CMSRight::integrate();
