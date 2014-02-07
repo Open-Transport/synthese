@@ -291,5 +291,4 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<ResaRight>(WRITE);
 		}
-	}
-}
+}	}
