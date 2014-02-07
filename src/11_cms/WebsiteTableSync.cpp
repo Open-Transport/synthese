@@ -22,9 +22,13 @@
 
 #include "WebsiteTableSync.hpp"
 
+#include "ObjectSiteLinkTableSync.h"
+#include "RollingStockFilterTableSync.h"
+#include "RollingStockFilter.h"
+#include "WebPageTableSync.h"
+
 #include "DBResult.hpp"
 #include "SelectQuery.hpp"
-#include "Webpage.h"
 
 #include <boost/foreach.hpp>
 
@@ -33,9 +37,10 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace util;
-	using namespace db;
 	using namespace cms;
+	using namespace db;
+	using namespace pt_website;
+	using namespace util;
 
 	namespace util
 	{
@@ -72,8 +77,40 @@ namespace synthese
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
-		}
+			Env env;
 
+			// Pages
+			WebPageTableSync::SearchResult pages(
+				WebPageTableSync::Search(env, id)
+			);
+			BOOST_FOREACH(const shared_ptr<Webpage>& webpage, pages)
+			{
+				WebPageTableSync::Remove(NULL, webpage->getKey(), transaction, false);
+			}
+
+#if 0
+			// @FIXME Cannot link this code due to circular dependency
+			//        The implementations are in 56_pt_website
+			// Object Site Links
+			ObjectSiteLinkTableSync::SearchResult links(
+				ObjectSiteLinkTableSync::Search(env, id)
+			);
+			BOOST_FOREACH(const shared_ptr<ObjectSiteLink>& link, links)
+			{
+				ObjectSiteLinkTableSync::Remove(NULL, link->getKey(), transaction, false);
+			}
+
+			// Rolling Stock Filters
+			RollingStockFilterTableSync::SearchResult filters(
+				RollingStockFilterTableSync::Search(env, id)
+			);
+			BOOST_FOREACH(const shared_ptr<RollingStockFilter>& filter, filters)
+			{
+				RollingStockFilterTableSync::Remove(NULL, filter->getKey(), transaction, false);
+			}
+#endif
+
+		}
 
 
 		template<> void DBTableSyncTemplate<WebsiteTableSync>::AfterDelete(
