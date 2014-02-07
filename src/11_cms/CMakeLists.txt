@@ -9,6 +9,8 @@ BitAndFunction.cpp
 BitAndFunction.hpp
 ChrFunction.cpp
 ChrFunction.hpp
+CMSImport.cpp
+CMSImport.hpp
 CMSInstallRight.cpp
 CMSInstallRight.hpp
 CMSModule.cpp
