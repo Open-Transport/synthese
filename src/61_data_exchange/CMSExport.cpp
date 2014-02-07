@@ -25,6 +25,7 @@
 #include "CMSExport.hpp"
 
 #include "CMSModule.hpp"
+#include "InterSYNTHESEPackage.hpp"
 #include "MimeType.hpp"
 #include "MimeTypes.hpp"
 #include "ParametersMap.h"
@@ -45,13 +46,14 @@ using namespace boost::filesystem;
 
 namespace synthese
 {
-	using namespace data_exchange;
 	using namespace cms;
-	using namespace impex;
-	using namespace server;
-	using namespace security;
-	using namespace util;
+	using namespace data_exchange;
 	using namespace db;
+	using namespace impex;
+	using namespace inter_synthese;
+	using namespace security;
+	using namespace server;
+	using namespace util;
 
 	namespace util
 	{
@@ -212,15 +214,39 @@ namespace synthese
 					(_parent.get() ?_parent->getKey() : RegistryKeyType(0))
 			)	);
 
+			Objects::Type objectToSave;
+			if(_site)
+			{
+				objectToSave.push_back(TableOrObject(_site));
+			}
+
 			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
 				boost::shared_ptr<Webpage> page(*it);
 
+				objectToSave.push_back(TableOrObject(page));
+
 				_exportDir( path(_directory), page.get(), path());
 			}
+
 			if(_withMetadata)
 			{
 				// TODO Generate metadata file
+				auto_ptr<InterSYNTHESEPackage> package(new InterSYNTHESEPackage);
+				package->set<Objects>( objectToSave );
+				ofstream metadataStream;
+				path metadataFile(_directory);
+				metadataFile /= "metadata.json";
+				metadataStream.open( metadataFile.string().c_str() );
+				if (metadataStream.is_open())
+				{
+					metadataStream << package->getNonBinaryDump();
+					metadataStream.close();
+				}
+				else
+				{
+					_logError("Failed to open file for writing: " + metadataFile.string());
+				}
 			}
 			return transaction;
 		}

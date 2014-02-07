@@ -25,6 +25,8 @@
 #include "CMSImport.hpp"
 
 #include "CMSModule.hpp"
+#include "InterSYNTHESEPackage.hpp"
+#include "InterSYNTHESEPackageContent.hpp"
 #include "MimeType.hpp"
 #include "MimeTypes.hpp"
 #include "ParametersMap.h"
@@ -48,6 +50,7 @@ namespace synthese
 	using namespace data_exchange;
 	using namespace cms;
 	using namespace impex;
+	using namespace inter_synthese;
 	using namespace server;
 	using namespace security;
 	using namespace util;
@@ -70,8 +73,115 @@ namespace synthese
 
 		bool CMSImport::Importer_::parseFiles() const
 		{
-			_importDir( path(_directory), _parent.get(), path());
+			// Load metadata if found
+			string metadata;
+			_readMetadata(metadata);
+			if(!metadata.empty())
+			{
+				metadata = lexical_cast<string>(metadata.size()) +
+					InterSYNTHESEPackage::SEPARATOR[0] +
+					metadata;
+
+				boost::shared_ptr<InterSYNTHESEPackage> package(new InterSYNTHESEPackage);
+				_ispc.reset(new InterSYNTHESEPackageContent(_env, metadata, package, *this));
+
+
+				BOOST_FOREACH(InterSYNTHESEPackageContent::LoadedObjects::value_type &reg, _ispc->getLoadedObjects())
+				{
+					if(decodeTableId(reg->getKey()) == WebPageTableSync::TABLE.ID)
+					{
+						Webpage *wp(dynamic_cast<Webpage*>(reg.get()));
+						string path;
+						_getPageFullPath(wp, path);
+						_logLoad(string("Loading page from metadata: ") + wp->getName()
+								 +  " path=" + path + " " + lexical_cast<string>(wp->getKey()));
+						_metadataPages[path] = wp;
+					}
+					else if(decodeTableId(reg->getKey()) == WebsiteTableSync::TABLE.ID)
+					{
+						_site = dynamic_pointer_cast<Website>(reg);
+						_logLoad("Reusing site from metadata: " + _site->getName() +
+								 " " + lexical_cast<string>(_site->getKey()));
+					}
+				}
+			}
+
+			if(!_site.get())
+			{
+				_site.reset(_createDefaultSite());
+			}
+			try {
+				_logDebug("Parsing file on disk");
+				_importDir( path(_directory), _site, _parent.get(), path());
+			} catch(Exception &e)
+			{
+				_logLoad(string("Exception in importDir: ") + e.what());
+			}
+
 			return true;
+		}
+
+		/// Return the full path in @path of the given @page
+		void CMSImport::Importer_::_getPageFullPath(Webpage *page, string &path) const
+		{
+			if(!page)
+			{
+				return;
+			}
+
+			if(path.empty())
+			{
+				path = page->getName();
+			}
+			else
+			{
+				path = page->getName() + "/" + path;
+			}
+
+			_getPageFullPath(page->getParent(true), path);
+		}
+
+		// Create a site based on the given directory name
+		Website *CMSImport::Importer_::_createDefaultSite() const
+		{
+			Website *site(new Website());
+
+			// Take the last directory as the ClientURL
+			// The -2 avoids to count a trailing '/' in consideration
+			string::size_type found =
+					_directory.find_last_of("/",
+											_directory.length() - 2);
+			if(found != string::npos)
+			{
+				site->set<ClientURL>(_directory.substr(found));
+			}
+
+			string siteName(path(_directory).filename());
+			site->set<Name>(siteName);
+			_logLoad("Creation of site: " + siteName);
+
+			return site;
+		}
+
+		void CMSImport::Importer_::_readMetadata(string &metadata) const
+		{
+			path metadataFile(_directory);
+			metadataFile /= "metadata.json";
+			ifstream metadataStream (metadataFile.string().c_str());
+			if (metadataStream.is_open())
+			{
+				string line;
+				while ( getline (metadataStream, line) )
+				{
+					metadata += line;
+				}
+				metadataStream.close();
+				_logLoad("Metadata file loaded");
+			}
+			else
+			{
+				_logWarning("No metadata file found");
+			}
 		}
 
 		bool CMSImport::Importer_::_isExcluded(
@@ -92,6 +202,7 @@ namespace synthese
 		/// Import recursively the files in directory @currentDir under
 		/// the page @parent
 		void CMSImport::Importer_::_importDir(const path &directoryPath,
+			shared_ptr<cms::Website> &site,
 			cms::Webpage *parent,
 			path currentDir
 		) const
@@ -124,24 +235,43 @@ namespace synthese
 					continue;
 				}
 
-				Webpage *page = new Webpage(WebPageTableSync::getId());
-				_env.getEditableRegistry<Webpage>().add(boost::shared_ptr<Webpage>(page));
-				_pages.push_back(page);
+				// Try to find this page in the metadata
+				Webpage *page;
+				string fullPagePath;
+				_getPageFullPath(parent, fullPagePath);
+				if(fullPagePath.empty())
+				{
+					fullPagePath = pageName;
+				}
+				else
+				{
+					fullPagePath += "/" + pageName;
+				}
+				if(_metadataPages.find(fullPagePath) != _metadataPages.end())
+				{
+					page = _metadataPages[fullPagePath];
+					_logLoad("Reusing page from metadata: " + pageName + " " + lexical_cast<string>(page->getKey()));
+				}
+				else
+				{
+					page = new Webpage(WebPageTableSync::getId());
+					_env.getEditableRegistry<Webpage>().add(boost::shared_ptr<Webpage>(page));
+					_logLoad("Creation of new page: " + pageName + " " + lexical_cast<string>(page->getKey()));
+				}
 				page->set<Title>(pageName);
-				page->setRoot(_site.get());
+				page->setRoot(site.get());
 				page->setRank(rank++);
 				page->setParent(parent);
 				page->set<SmartURLPath>(relPath.string());
-				_site->addPage(*page);
+				site->addPage(*page);
 				if( is_directory(*dir))
 				{
-					_logLoad("Creation of root page: " + pageName);
-					_importDir(directoryPath, page, relPath);
+					_logDebug("Recursing at: " + relPath.string());
+					_importDir(directoryPath, site, page, relPath);
 				}
 				else
 				{
 					// It's a file, load its content
-					_logLoad("Creation of page: " + pageName);
 					page->set<MaxAge>(_maxAge);
 					string extension(dir->path().extension());
 					if(!extension.empty())
@@ -152,15 +282,23 @@ namespace synthese
 					}
 					MimeType mimeType(MimeTypes::GetMimeTypeByExtension(extension));
 
-					std::ifstream ifile(absPath.c_str(), std::ifstream::in);
-					std::string content;
+					string content;
+					try
+					{
+						ifstream ifile;
+						ifile.exceptions ( ifstream::failbit | ifstream::badbit );
+						ifile.open(absPath.c_str(), ifstream::in);
+						ifile.seekg(0, std::ios::end);
+						content.reserve(ifile.tellg());
+						ifile.seekg(0, std::ios::beg);
+						content.assign((std::istreambuf_iterator<char>(ifile)),
+									std::istreambuf_iterator<char>());
+					}
+					catch(ifstream::failure &e)
+					{
+						_logWarning(string("Failed to load file '") + absPath + "': " + e.what());
+					}
 
-					ifile.seekg(0, std::ios::end);
-					content.reserve(ifile.tellg());
-					ifile.seekg(0, std::ios::beg);
-
-					content.assign((std::istreambuf_iterator<char>(ifile)),
-								std::istreambuf_iterator<char>());
 					WebpageContent c(content, false, mimeType, true);
 					page->set<WebpageContent>(c);
 
@@ -169,7 +307,8 @@ namespace synthese
 					if(exists(absPath + ".dir"))
 					{
 						_logLoad("Creation of root page: " + pageName);
-						_importDir(directoryPath, page, path(relPath.string() + ".dir"));
+						_importDir(directoryPath, site,
+								   page, path(relPath.string() + ".dir"));
 					}
 				}
 			}
@@ -249,30 +388,6 @@ namespace synthese
 				}
 			}
 
-			// Create a site if none provided
-			if(!_site.get())
-			{
-				_site.reset(new Website());
-
-				// Take the last directory as the ClientURL
-				// The -2 avoids to count a trailing '/' in consideration
-				string::size_type found =
-					_directory.find_last_of("/",
-										   _directory.length() - 2);
-				if(found != string::npos)
-				{
-					_site->set<ClientURL>(_directory.substr(found));
-				}
-
-				string siteName(path(_directory).filename());
-				_site->set<Name>(siteName);
-				_logLoad("Creation of site: " + siteName);
-			}
-			else
-			{
-				// @TODO A site is provided, remove all its pages
-			}
-
 			_maxAge = minutes(map.getDefault<long>(PARAMETER_MAX_AGE, 0));
 			_excludeList = map.getDefault<string>(PARAMETER_EXCLUDE_LIST);
 
@@ -308,7 +423,16 @@ namespace synthese
 		{
 			DBTransaction transaction;
 
-			WebsiteTableSync::Save(_site.get(), transaction);
+			if(_ispc.get())
+			{
+				_ispc->save(transaction);
+			}
+
+
+			if(_site.get())
+			{
+				WebsiteTableSync::Save(_site.get(), transaction);
+			}
 			BOOST_FOREACH(const Registry<Webpage>::value_type& webPage, _env.getRegistry<Webpage>())
 			{
 				WebPageTableSync::Save(webPage.second.get(), transaction);
