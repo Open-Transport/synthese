@@ -124,7 +124,7 @@ namespace synthese
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true,
-				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_EXTERNAL_DELAY
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
 			PTRoutePlannerResult run() const;
