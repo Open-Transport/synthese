@@ -5,6 +5,7 @@
 
 #include "DataExchangeModule.hpp"
 
+#include "CMSImport.hpp"
 #include "GPSdFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
@@ -100,6 +101,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
+	synthese::data_exchange::CMSImport::integrate();
 
 	synthese::data_exchange::VixV6000FileFormat::integrate();
 
