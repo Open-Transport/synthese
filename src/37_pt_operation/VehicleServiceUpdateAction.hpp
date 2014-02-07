@@ -55,11 +55,13 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_VEHICLE_SERVICE_ID;
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_OPERATION_UNIT_ID;
 			static const std::string PARAMETER_FIELD_SERVICES;
 
 		private:
 			boost::shared_ptr<VehicleService> _vehicleService;
 			boost::optional<std::string> _name;
+			boost::optional<boost::optional<OperationUnit&> > _operationUnit;
 			boost::optional<VehicleService::Services> _services;
 
 

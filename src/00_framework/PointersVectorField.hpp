@@ -43,12 +43,12 @@ namespace synthese
 	public:
 		typedef std::vector<T*> Type;
 
-	private:
+	public:
 		//////////////////////////////////////////////////////////////////////////
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _vectorToString(const typename PointersVectorField<C, T>::Type& p)
+		static std::string ToString(const typename PointersVectorField<C, T>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
@@ -138,7 +138,7 @@ namespace synthese
 			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
 				fieldObject,
 				map,
-				_vectorToString
+				ToString
 			);
 		}
 
@@ -156,7 +156,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_vectorToString
+				ToString
 			);
 		}
 
@@ -173,7 +173,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_vectorToString
+				ToString
 			);
 		}
 
@@ -185,7 +185,7 @@ namespace synthese
 			const ObjectBase& object,
 			DBContent& content
 		){
-			std::string s(_vectorToString(fieldObject));
+			std::string s(ToString(fieldObject));
 			content.push_back(Cell(s));
 		}
 
@@ -232,12 +232,11 @@ namespace synthese
 	public:
 		typedef std::vector<util::Registrable*> Type;
 
-	private:
 		//////////////////////////////////////////////////////////////////////////
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _vectorToString(const typename PointersVectorField<C, util::Registrable>::Type& p)
+		static std::string ToString(const typename PointersVectorField<C, util::Registrable>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
@@ -261,7 +260,7 @@ namespace synthese
 		}
 
 
-	public:
+
 		static bool LoadFromRecord(
 			typename PointersVectorField<C, util::Registrable>::Type& fieldObject,
 			ObjectBase& object,
@@ -337,7 +336,7 @@ namespace synthese
 			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
 				fieldObject,
 				map,
-				_vectorToString
+				ToString
 			);
 		}
 
@@ -355,7 +354,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_vectorToString
+				ToString
 			);
 		}
 
@@ -372,7 +371,7 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_vectorToString
+				ToString
 			);
 		}
 
@@ -384,7 +383,7 @@ namespace synthese
 			const ObjectBase& object,
 			DBContent& content
 		){
-			std::string s(_vectorToString(fieldObject));
+			std::string s(ToString(fieldObject));
 			content.push_back(Cell(s));
 		}
 

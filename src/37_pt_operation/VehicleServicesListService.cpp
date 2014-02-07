@@ -26,6 +26,7 @@
 
 #include "DateField.hpp"
 #include "MimeTypes.hpp"
+#include "OperationUnit.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "SchedulesBasedService.h"
@@ -129,6 +130,17 @@ namespace synthese
 			{
 				throw RequestException("No such vehicle service");
 			}
+
+			// Operation unit filter
+			RegistryKeyType unitId(map.getDefault<RegistryKeyType>(OperationUnit::FIELD.name, 0));
+			if(unitId) try
+			{
+				_operationUnit = *Env::GetOfficialEnv().get<OperationUnit>(unitId);
+			}
+			catch(ObjectNotFoundException<OperationUnit>&)
+			{
+				throw RequestException("No such operation unit");
+			}
 		}
 
 
@@ -153,6 +165,12 @@ namespace synthese
 
 					// Date filter
 					if(!_date.is_not_a_date() && !vs.isActive(_date))
+					{
+						continue;
+					}
+
+					// Operation unit filter
+					if(_operationUnit && (!vs.getOperationUnit() || &*vs.getOperationUnit() != &*_operationUnit))
 					{
 						continue;
 					}

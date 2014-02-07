@@ -230,25 +230,25 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	li92->setRollingStock(&rs57);
 	li92->setCommercialLine(&cl92);
 
-	DesignatedLinePhysicalStop ls86(2814749767106586ULL, li92.get(), 0, true, false, 0, &ps931);
+	LineStop ls86(2814749767106586ULL, li92.get(), 0, true, false, 0, ps931);
 	SAVE(LineStop, ls86);
-	li92->addEdge(ls86);
+	ls86.link(env);
 
-	DesignatedLinePhysicalStop ls63(2814749767106563ULL, li92.get(), 1, true, true, 100, &ps941);
+	LineStop ls63(2814749767106563ULL, li92.get(), 1, true, true, 100, ps941);
 	SAVE(LineStop, ls63);
-	li92->addEdge(ls63);
+	ls63.link(env);
 
-	DesignatedLinePhysicalStop ls61(2814749767106561ULL, li92.get(), 2, true, true, 5500, &ps951);
+	LineStop ls61(2814749767106561ULL, li92.get(), 2, true, true, 5500, ps951);
 	SAVE(LineStop, ls61);
-	li92->addEdge(ls61);
+	ls61.link(env);
 
-	DesignatedLinePhysicalStop ls62(2814749767106562ULL, li92.get(), 3, true, true, 6400, &ps961);
+	LineStop ls62(2814749767106562ULL, li92.get(), 3, true, true, 6400, ps961);
 	SAVE(LineStop, ls62);
-	li92->addEdge(ls62);
+	ls62.link(env);
 
-	DesignatedLinePhysicalStop ls60(2814749767106560ULL, li92.get(), 4, false, true, 6500, &ps971);
+	LineStop ls60(2814749767106560ULL, li92.get(), 4, false, true, 6500, ps971);
 	SAVE(LineStop, ls60);
-	li92->addEdge(ls60);
+	ls60.link(env);
 
 	vector<ScheduledService*> ss;
 

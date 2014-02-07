@@ -88,7 +88,7 @@ namespace synthese
 				}
 
 				// The departure edge
-				const Path::Edges& edges(service.getPath()->getAllEdges());
+				const Path::Edges& edges(service.getPath()->getEdges());
 				Path::Edges::const_iterator itEdge;
 				for(itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
@@ -210,7 +210,7 @@ namespace synthese
 			{ // Cells are populated according to the rows definitions
 				const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
 
-				const Path::Edges& edges(service.getPath()->getAllEdges());
+				const Path::Edges& edges(service.getPath()->getEdges());
 				Path::Edges::const_iterator itEdge(edges.begin());
 				bool first(true);
 

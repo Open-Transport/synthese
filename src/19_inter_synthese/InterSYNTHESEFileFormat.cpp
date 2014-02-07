@@ -25,8 +25,8 @@
 #include "BasicClient.h"
 #include "Import.hpp"
 #include "InterSYNTHESEIdFilter.hpp"
+#include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
-#include "InterSYNTHESESyncTypeFactory.hpp"
 #include "InterSYNTHESEUpdateAckService.hpp"
 #include "StaticFunctionRequest.h"
 
@@ -69,6 +69,7 @@ namespace synthese
 					c.get(r.getURL())
 				);
 
+				// Case no content to sync
 				if(contentStr == InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC)
 				{
 					_logDebug(
@@ -77,86 +78,22 @@ namespace synthese
 					return true;
 				}
 
-				bool ok(true);
-				typedef std::map<
-					util::RegistryKeyType,	// id of the update
-					std::pair<
-						std::string,		// synchronizer
-						std::string			// message
-				>	> ContentMap;
-				ContentMap content;
-	
-				size_t i(0);
-				while(i < contentStr.size())
-				{
-					ContentMap::mapped_type item;
+				// Case content to sync
+				InterSYNTHESEPacket packet(contentStr);
 
-					// ID + Search for next :
-					size_t l=i;
-					for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-					if(i == contentStr.size())
-					{
-						ok = false;
-						break;
-					}
-					RegistryKeyType id(lexical_cast<RegistryKeyType>(contentStr.substr(l, i-l)));
-					++i;
-
-					// Synchronizer + Search for next :
-					l=i;
-					for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-					if(i == contentStr.size())
-					{
-						ok = false;
-						break;
-					}
-					item.first = contentStr.substr(l, i-l);
-					++i;
-
-					// Size + Search for next :
-					l=i;
-					for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-					if(i == contentStr.size())
-					{
-						ok = false;
-						break;
-					}
-					size_t contentSize = lexical_cast<size_t>(contentStr.substr(l, i-l));
-					++i;
-
-					// Content
-					if(i+contentSize > contentStr.size())
-					{
-						ok = false;
-						break;
-					}
-					item.second = contentStr.substr(i, contentSize);
-					i += contentSize + InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
-
-					content.insert(
-						make_pair(
-							id,
-							item
-					)	);
-				}
-
-				if(!ok)
-				{
-					return false;
-				}
 				_logDebug(
-					"Inter-SYNTHESE : "+ _address +":"+ _port + " has sent "+ lexical_cast<string>(content.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
+					"Inter-SYNTHESE : "+ _address +":"+ _port + " has sent "+ lexical_cast<string>(packet.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
 				);
 
 				StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
 				ackRequest.getFunction()->setSlaveId(_slaveId);
-				if(!content.empty())
+				if(!packet.empty())
 				{
 					ackRequest.getFunction()->setRangeBegin(
-						content.begin()->first
+						packet.getIdRange().first
 					);
 					ackRequest.getFunction()->setRangeEnd(
-						content.rbegin()->first
+						packet.getIdRange().second
 					);
 				}
 				BasicClient c2(
@@ -168,47 +105,18 @@ namespace synthese
 				);
 				if(result2 == InterSYNTHESEUpdateAckService::VALUE_OK)
 				{
-					// Local variables
-					auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;
-					string lastFactoryKey;
-
-					// Reading the content
-					BOOST_FOREACH(const ContentMap::value_type& item, content)
-					{
-						try
-						{
-							const string& factoryKey(item.second.first);
-							if(factoryKey != lastFactoryKey)
-							{
-								if(interSYNTHESE.get())
-								{
-									interSYNTHESE->closeSync();
-								}
-								interSYNTHESE.reset(
-									Factory<InterSYNTHESESyncTypeFactory>::create(factoryKey)
-								);
-								lastFactoryKey = factoryKey;
-								interSYNTHESE->initSync();
-							}
-
-							interSYNTHESE->sync(
-								item.second.second,
-								_idFilter.get()
-							);
-						}
-						catch(...)
-						{
-							// Log
-						}
-					}
-					if(interSYNTHESE.get())
-					{
-						interSYNTHESE->closeSync();
-						_logDebug(
-							"Inter-SYNTHESE : "+ _address +":"+ _port + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
-						);
-					}
+					packet.load(_idFilter.get());
+					_logDebug(
+						"Inter-SYNTHESE : "+ _address +":"+ _port + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
+					);
 				}
+			}
+			catch(InterSYNTHESEPacket::BadPacketException&)
+			{
+				_logError(
+					"Inter-SYNTHESE : Synchronization with "+ _address +":"+ _port + " as slave id #"+ lexical_cast<string>(_slaveId) +" has failed : malformed packet"
+				);
+				return false;
 			}
 			catch(std::exception& e)
 			{

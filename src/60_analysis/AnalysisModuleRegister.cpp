@@ -7,9 +7,12 @@
 #include "AnalysisRight.hpp"
 
 #include "IsochronAdmin.hpp"
+#include "PTQualityControlAdmin.hpp"
 
+#include "CheckLineCalendarFunction.hpp"
 #include "IsochronService.hpp"
 #include "ServiceLengthService.hpp"
+#include "ServiceDensityService.hpp"
 
 //#include "OpeningTimeTableSync.hpp"
 //#include "TrafficForecastTableSync.hpp"
@@ -29,9 +32,12 @@ void synthese::analysis::moduleRegister()
 	synthese::analysis::AnalysisRight::integrate();
 
 	synthese::analysis::IsochronAdmin::integrate();
+	synthese::analysis::PTQualityControlAdmin::integrate();
 
+	synthese::analysis::CheckLineCalendarFunction::integrate();
 	synthese::analysis::IsochronService::integrate();
 	synthese::analysis::ServiceLengthService::integrate();
+	synthese::analysis::ServiceDensityService::integrate();
 
 //	synthese::analysis::OpeningTimeTableSync::integrate();
 //	synthese::analysis::TrafficForecastTableSync::integrate();

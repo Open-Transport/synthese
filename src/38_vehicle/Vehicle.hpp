@@ -23,20 +23,17 @@
 #ifndef SYNTHESE_vehicle_Vehicle_hpp__
 #define SYNTHESE_vehicle_Vehicle_hpp__
 
-#include "ImportableTemplate.hpp"
-#include "Registrable.h"
-#include "Registry.h"
+#include "DataSourceLinksField.hpp"
+#include "NumericField.hpp"
+#include "Object.hpp"
+#include "PointersSetField.hpp"
+#include "StringField.hpp"
+#include "StringVectorField.hpp"
 
-#include <set>
-#include <vector>
+#include "CommercialLine.h"
 
 namespace synthese
 {
-	namespace pt
-	{
-		class CommercialLine;
-	}
-
 	namespace util
 	{
 		class ParametersMap;
@@ -44,59 +41,50 @@ namespace synthese
 
 	namespace vehicle
 	{
+		class Vehicle;
+
+		FIELD_STRING(Number)
+		FIELD_POINTERS_SET(AllowedLines, pt::CommercialLine)
+		FIELD_STRING_VECTOR(Seats)
+		FIELD_STRING(Picture)
+		FIELD_BOOL(Available)
+		FIELD_STRING(URL)
+		FIELD_STRING(RegistrationNumber)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Number),
+			FIELD(AllowedLines),
+			FIELD(Seats),
+			FIELD(Picture),
+			FIELD(Available),
+			FIELD(URL),
+			FIELD(RegistrationNumber),
+			FIELD(impex::DataSourceLinks)
+		> VehicleRecord;
+
 		/** Vehicle class.
 			@ingroup m38
 		*/
 		class Vehicle:
 			public virtual util::Registrable,
-			public impex::ImportableTemplate<Vehicle>
+			public Object<Vehicle, VehicleRecord>
 		{
 		public:
-			typedef util::Registry<Vehicle> Registry;
-			typedef std::set<const pt::CommercialLine*> AllowedLines;
-			typedef std::vector<std::string> Seats;
-
-			static const std::string DATA_PICTURE;
-			static const std::string DATA_NAME;
-			static const std::string DATA_NUMBER;
-			static const std::string DATA_SEATS;
-			static const std::string DATA_VEHICLE_ID;
+			static const std::string TAG_SEAT;
 
 		private:
-			AllowedLines _allowedLines;
-			std::string _number;
-			Seats _seats;
-			std::string _picture;
-			bool _available;
-			std::string _url;
-			std::string _registrationNumbers;
-			std::string _name;
 
 		public:
 			Vehicle(util::RegistryKeyType id=0);
 
 			//! @name Setters
 			//@{
-				void setAllowedLines(const AllowedLines& value){ _allowedLines = value; }
-				void setNumber(const std::string& value){ _number = value; }
-				void setSeats(const Seats& value){ _seats = value; }
-				void setPicture(const std::string& value){ _picture = value; }
-				void setAvailable(bool value){ _available = value; }
-				void setURL(const std::string& value){ _url = value; }
-				void setRegistrationNumbers(const std::string& value){ _registrationNumbers = value; }
-				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				const AllowedLines& getAllowedLines() const { return _allowedLines; }
-				const std::string& getNumber() const { return _number; }
-				const Seats& getSeats() const { return _seats; }
-				const std::string& getPicture() const { return _picture; }
-				bool getAvailable() const { return _available; }
-				const std::string& getURL() const { return _url; }
-				const std::string& getRegistrationNumbers() const { return _registrationNumbers; }
-				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! @name Updaters
@@ -105,12 +93,13 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				virtual void toParametersMap(
+				virtual void addAdditionalParameters(
 					util::ParametersMap& pm,
-					bool withAdditionalParameters,
-					boost::logic::tribool withFiles = boost::logic::indeterminate,
 					std::string prefix = std::string()
 				) const;
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+				virtual std::string getName() const { return get<Name>(); }
 			//@}
 		};
 }	}

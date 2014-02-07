@@ -23,6 +23,7 @@
 #include "DriverService.hpp"
 
 #include "DriverActivity.hpp"
+#include "OperationUnit.hpp"
 #include "ScheduledService.h"
 #include "StopPoint.hpp"
 #include "VehicleService.hpp"
@@ -91,6 +92,7 @@ namespace synthese
 
 			map.insert(Key::FIELD.name, getKey());
 			map.insert(Name::FIELD.name, getName());
+			map.insert(OperationUnit::FIELD.name, getOperationUnit() ? getOperationUnit()->getKey() : 0);
 
 			// Service times
 			map.insert(ATTR_WORK_DURATION, getWorkDuration());
@@ -294,6 +296,8 @@ namespace synthese
 				const VehicleService::Services& services(_vehicleService->getServices());
 				BOOST_FOREACH(const VehicleService::Services::value_type& service, services)
 				{
+					recursive_mutex::scoped_lock lock(service->getSchedulesMutex());
+
 					if(	!service->isActive(date) ||
 						service->getLastArrivalSchedule(false) < startTime
 					){

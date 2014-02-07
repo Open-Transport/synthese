@@ -28,6 +28,7 @@
 #include "CalendarModule.h"
 #include "City.h"
 #include "HTMLModule.h"
+#include "LinePhysicalStop.hpp"
 #include "ObjectCreateAction.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
@@ -420,10 +421,13 @@ namespace synthese
 								{
 									BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop.second->getDepartureEdges())
 									{
-										if(dynamic_cast<const LineStop*>(edge.second))
+										JourneyPattern* jp(dynamic_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+										if(jp)
+										{
 									 		lines.insert(
-												(dynamic_cast<const LineStop*>(edge.second))->getLine()->getCommercialLine()
-										);
+												jp->getCommercialLine()
+											);
+										}
 									}
 								}
 							}
@@ -665,10 +669,12 @@ namespace synthese
 									{
 										BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop.second->getDepartureEdges())
 										{
-											if(dynamic_cast<const LineStop*>(edge.second))
+											if(dynamic_cast<const LinePhysicalStop*>(edge.second))
+											{
 												lines.insert(
-												(dynamic_cast<const LineStop*>(edge.second))->getLine()->getCommercialLine()
-											);
+													(dynamic_cast<const LinePhysicalStop*>(edge.second))->getJourneyPattern()->getCommercialLine()
+												);
+											}
 										}
 									}
 								}

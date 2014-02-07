@@ -56,8 +56,8 @@ namespace synthese
 			query
 				<< "SELECT ls." << TABLE_COL_ID << " FROM "
 				<< LineStopTableSync::TABLE.NAME << " AS ls "
-				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
-				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineNode::FIELD.name
+				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name
 				<< " WHERE "
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
 				<< " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
@@ -72,8 +72,8 @@ namespace synthese
 			query
 				<< "SELECT ls." << TABLE_COL_ID << " FROM "
 				<< LineStopTableSync::TABLE.NAME << " AS ls "
-				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
-				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineNode::FIELD.name
+				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name
 				<< " INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID
 				<< " WHERE "
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
@@ -88,16 +88,16 @@ namespace synthese
 			stringstream query;
 			query
 				<< "SELECT "
-				<< LineStopTableSync::COL_RANKINPATH
+				<< RankInPath::FIELD.name
 				<< " FROM " << LineStopTableSync::TABLE.NAME
 				<< " WHERE "
-				<< LineStopTableSync::COL_LINEID << "=" << line
-				<< " AND " << LineStopTableSync::COL_ISDEPARTURE << "=1"
+				<< Line::FIELD.name << "=" << line
+				<< " AND " << IsDeparture::FIELD.name << "=1"
 				<< " LIMIT 1";
 			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 			if (!rows->next())
 				throw Exception("The line does not exists or does not contains any line stop");
-			return rows->getInt(LineStopTableSync::COL_RANKINPATH);
+			return rows->getInt(RankInPath::FIELD.name);
 		}
 
 

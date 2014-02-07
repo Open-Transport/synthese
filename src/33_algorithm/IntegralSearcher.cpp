@@ -379,11 +379,6 @@ namespace synthese
 								(&Edge::getPreviousConnectionDeparture)
 						)	);
 
-						// Loop on services
-						optional<Edge::DepartureServiceIndex::Value> departureServiceNumber;
-						optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
-						set<const Edge*> nonServedEdges;
-						ptime departureMoment(correctedDesiredTime);
 						// If path is a junction, we verify that the origin vertex is the same
 						const Junction* junction(dynamic_cast<const Junction*> (&path));
 						if (junction != NULL)
@@ -411,6 +406,16 @@ namespace synthese
 							if(currentJunction != NULL)
 								continue;
 						}
+
+						// Loop on services collections
+						BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path.getServiceCollections())
+						{
+							set<const Edge*> nonServedEdges;
+							optional<Edge::DepartureServiceIndex::Value> departureServiceNumber;
+							optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
+							ptime departureMoment(correctedDesiredTime);
+
+							// Loop on services
 						while(true)
 						{
 							this_thread::interruption_point();
@@ -419,6 +424,7 @@ namespace synthese
 							ServicePointer serviceInstance(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
 								edge.getNextService(
+										*itCollection,
 									_accessParameters,
 									departureMoment,
 									correctedMinMaxDateTimeAtOrigin,
@@ -432,6 +438,7 @@ namespace synthese
 									_reservationRulesDelayType
 								):
 								edge.getPreviousService(
+										*itCollection,
 									_accessParameters,
 									departureMoment,
 									correctedMinMaxDateTimeAtOrigin,
@@ -644,6 +651,7 @@ sqrt(
 							if(nonServedEdges.empty())
 								break;
 						} // next service
+						} // next service collection
 					} // next departure edge
 				} // next vertex in vam
 			} // Next place to explore (todo)

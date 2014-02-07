@@ -95,6 +95,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 	{ // 05 -> 95
 		VertexAccessMap ovam(static_cast<Place&>(place05).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
 		VertexAccessMap dvam(static_cast<Place&>(place95).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
+		ptime next_day(tomorrow);
+		next_day += days(1);
 
 		JourneysResult	result(tomorrow, DEPARTURE_TO_ARRIVAL);
 		BestVertexReachesMap bestVertexReachesMap(

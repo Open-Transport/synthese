@@ -94,6 +94,7 @@ namespace synthese
 			static ConditionalTableSyncsToReload _conditionalTableSyncsToReload;
 			static util::RegistryNodeType _nodeId;
 			static unsigned int _thrCount;
+			static bool _conditionalTablesUpdateActive;
 
 
 
@@ -218,6 +219,8 @@ namespace synthese
 
 
 			static void UpdateConditionalTableSyncEnv();
+			static void ActivateConditionalTablesUpdate();
+			static void DeactivateConditionalTablesUpdate();
 		};
 	}
 

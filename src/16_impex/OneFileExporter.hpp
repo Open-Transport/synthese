@@ -38,12 +38,21 @@ namespace synthese
 		{
 		public:
 			static const bool EXPORTABLE;
+			static const bool IS_PERMANENT_THREAD;
 
 			virtual std::string getFileFormatKey() const { return FF::FACTORY_KEY; }
+
+			OneFileExporter(
+				const Export& export_
+			):	Exporter(export_)
+			{}
 		};
 
 		template<class FF>
 		const bool OneFileExporter<FF>::EXPORTABLE(true);
+
+		template<class FF>
+		const bool OneFileExporter<FF>::IS_PERMANENT_THREAD(false);
 }	}
 
 #endif // SYNTHESE_impex_OneFileExportPolicy_h__

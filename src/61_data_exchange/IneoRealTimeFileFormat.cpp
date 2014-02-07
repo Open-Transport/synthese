@@ -271,18 +271,18 @@ namespace synthese
 						size_t rank(0);
 						BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 						{
-							boost::shared_ptr<DesignatedLinePhysicalStop> ls(
-								new DesignatedLinePhysicalStop(
+							boost::shared_ptr<LineStop> ls(
+								new LineStop(
 									LineStopTableSync::getId(),
 									result,
 									rank,
 									rank+1 < servedStops.size() && stop._departure,
 									rank > 0 && stop._arrival,
 									*stop._metricOffset,
-									*stop._stop.begin(),
-									stop._withTimes ? *stop._withTimes : true
+									**stop._stop.begin()
 							)	);
-							result->addEdge(*ls);
+							ls->set<ScheduleInput>(stop._withTimes ? *stop._withTimes : true);
+							ls->link(_env, true);
 							_env.getEditableRegistry<LineStop>().add(ls);
 							++rank;
 					}	}
@@ -295,7 +295,7 @@ namespace synthese
 					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 						*route->sharedServicesMutex
 					);
-					BOOST_FOREACH(Service* sservice, route->getServices())
+					BOOST_FOREACH(Service* sservice, route->getAllServices())
 					{
 						service = dynamic_cast<ScheduledService*>(sservice);
 						if(!service)
@@ -375,7 +375,7 @@ namespace synthese
 						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 									*jp->sharedServicesMutex
 						);
-						BOOST_FOREACH(const Service* service, jp->getServices())
+						BOOST_FOREACH(const Service* service, jp->getAllServices())
 						{
 							const ScheduledService* sservice(dynamic_cast<const ScheduledService*>(service));
 							if(	sservice &&
@@ -460,9 +460,9 @@ namespace synthese
 				BOOST_FOREACH(ScheduledService* service, _services)
 				{
 					JourneyPatternTableSync::Save(static_cast<JourneyPattern*>(service->getPath()), transaction);
-					BOOST_FOREACH(Edge* edge, service->getPath()->getEdges())
+					BOOST_FOREACH(LineStop* edge, static_cast<JourneyPattern*>(service->getPath())->getLineStops())
 					{
-						LineStopTableSync::Save(static_cast<LineStop*>(edge), transaction);
+						LineStopTableSync::Save(edge, transaction);
 					}
 					ScheduledServiceTableSync::Save(service, transaction);
 			}	}

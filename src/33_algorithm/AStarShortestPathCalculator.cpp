@@ -387,8 +387,12 @@ namespace synthese
 			{
 				optional<Edge::DepartureServiceIndex::Value> departureIndex;
 				optional<Edge::ArrivalServiceIndex::Value> arrivalIndex;
-
+				
 				const RoadChunk* startChunk = *it;
+
+				// A road is supposed to have one and only one service collection
+				const ChronologicalServicesCollection& collection(**startChunk->getParentPath()->getServiceCollections().begin());
+	
 				/*
 					Retrieve the first, or last, edge of the path.
 					There is a little difference between SYNTHESE's representation of a path and the vector we have.
@@ -407,6 +411,7 @@ namespace synthese
 				ServicePointer service(
 					(_direction == algorithm::DEPARTURE_TO_ARRIVAL) ?
 					startChunk->getNextService(
+						collection,
 						_accessParameters,
 						departure,
 						departure,
@@ -417,6 +422,7 @@ namespace synthese
 						true
 					) :
 					startChunk->getPreviousService(
+						collection,
 						_accessParameters,
 						departure,
 						departure,

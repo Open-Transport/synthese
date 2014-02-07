@@ -57,6 +57,7 @@ namespace synthese
 	{
 		class FreeDRTArea;
 		class StopPoint;
+		class DRTArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Stop area.
@@ -189,6 +190,8 @@ namespace synthese
 				>, boost::posix_time::time_duration
 			> TransferDelaysMap;
 
+			typedef std::set<DRTArea*> DRTAreas;
+
 		private:
 
 			//! @name Content
@@ -210,6 +213,7 @@ namespace synthese
 			//@{
 				mutable boost::optional<graph::HubScore> _score;
 				mutable boost::posix_time::time_duration _minTransferDelay;
+				mutable DRTAreas _drtAreas;
 			//@}
 
 			//! @Location
@@ -234,6 +238,7 @@ namespace synthese
 				const TransferDelaysMap& getTransferDelays() const { return _transferDelays; }
 				const std::string& getTimetableName() const { return _timetableName; }
 				const boost::shared_ptr<geos::geom::Point>& getLocation() const { return _location; }
+				const DRTAreas& getDRTAreas() const { return _drtAreas; }
 			//@}
 
 			//! @name Setters
@@ -250,6 +255,8 @@ namespace synthese
 			//! @name Update methods.
 			//@{
 				void addPhysicalStop(const pt::StopPoint& physicalStop);
+				void addDRTArea(const DRTArea& area);
+				void removeDRTArea(const DRTArea& area);
 
 				static void _addTransferDelay(
 					TransferDelaysMap& map,

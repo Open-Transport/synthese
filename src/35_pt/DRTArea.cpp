@@ -46,8 +46,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_VALUE_CONSTRUCTOR(Name, name),
 					FIELD_VALUE_CONSTRUCTOR(Stops, stops)
-			)	),
-			Vertex(NULL, boost::shared_ptr<geos::geom::Point>())
+			)	)
 		{}
 
 
@@ -69,5 +68,32 @@ namespace synthese
 		bool DRTArea::contains( const StopArea& stopArea ) const
 		{
 			return get<Stops>().find(&const_cast<StopArea&>(stopArea)) != get<Stops>().end();
+		}
+
+
+
+		void DRTArea::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			BOOST_FOREACH(StopArea* stop, get<Stops>())
+			{
+				stop->addDRTArea(*this);
+			}
+		}
+
+
+
+		void DRTArea::unlink()
+		{
+			BOOST_FOREACH(StopArea* stop, get<Stops>())
+			{
+				stop->removeDRTArea(*this);
+			}
+		}
+
+
+
+		DRTArea::~DRTArea()
+		{
+			unlink();
 		}
 }	}

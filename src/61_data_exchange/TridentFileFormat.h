@@ -255,6 +255,7 @@ namespace synthese
 					boost::gregorian::date	_startDate;
 					boost::shared_ptr<const pt::CommercialLine> _line; //!< Commercial line to export
 					bool										_withTisseoExtension;
+					mutable util::Env _env;
 				//@}
 
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::RegistryKeyType& id);
@@ -262,9 +263,7 @@ namespace synthese
 				static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
 
 			public:
-				Exporter_():
-					_withTisseoExtension(false)
-				{}
+				Exporter_(const impex::Export& export_);
 
 				//! @name Setters
 				//@{

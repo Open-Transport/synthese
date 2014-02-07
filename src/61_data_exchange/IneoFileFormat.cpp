@@ -952,7 +952,8 @@ namespace synthese
 						string sb(_getValue("SB"));
 						vehicleService = _createOrUpdateVehicleService(
 							vehicleServices,
-							sb + "/" + lexical_cast<string>(ph) + (_vehicleServiceSuffix.empty() ? string() : ("/"+ _vehicleServiceSuffix))
+							sb + "/" + lexical_cast<string>(ph) + (_vehicleServiceSuffix.empty() ? string() : ("/"+ _vehicleServiceSuffix)),
+							optional<optional<OperationUnit&> >()
 						);
 						vehicleService->setName(sb);
 

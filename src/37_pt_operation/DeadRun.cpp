@@ -21,18 +21,28 @@
 */
 
 #include "DeadRun.hpp"
+
+#include "DataSourceLinksField.hpp"
+#include "DeadRunTableSync.hpp"
 #include "DeadRunEdge.hpp"
 #include "Depot.hpp"
+#include "ImportableTableSync.hpp"
+#include "OperationUnit.hpp"
 #include "StopPoint.hpp"
+#include "TransportNetwork.h"
 #include "ForbiddenUseRule.h"
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 	using namespace pt;
 	using namespace graph;
+	using namespace impex;
+
 
 	namespace util
 	{
@@ -60,6 +70,11 @@ namespace synthese
 			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
 			rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
 			Path::setRules(rules);
+
+			// Service auto registration
+			boost::shared_ptr<ChronologicalServicesCollection> collection(new ChronologicalServicesCollection);
+			_serviceCollections.push_back(collection);
+			collection->getServices().insert(this);
 		}
 
 
@@ -141,6 +156,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
@@ -148,6 +164,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
@@ -155,6 +172,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
@@ -162,6 +180,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
@@ -220,5 +239,304 @@ namespace synthese
 			}
 
 			return static_cast<StopPoint*>(getEdge(getFromDepotToStop() ? 1 : 0)->getFromVertex());
+		}
+
+
+
+		void DeadRun::toParametersMap(
+			util::ParametersMap& pm,
+			bool withAdditionalParameters,
+			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
+			std::string prefix /*= std::string() */
+		) const	{
+			pm.insert(prefix + TABLE_COL_ID, getKey());
+			
+			// Network
+			pm.insert(
+				prefix + DeadRunTableSync::COL_NETWORK_ID,
+				getTransportNetwork() ? getTransportNetwork()->getKey() : RegistryKeyType(0)
+			);
+
+			// Depot
+			Depot* depot(getDepot());
+			pm.insert(
+				prefix + DeadRunTableSync::COL_DEPOT_ID,
+				depot ? depot->getKey() : RegistryKeyType(0)
+			);
+
+			// Stop
+			StopPoint* stop(getStop());
+			pm.insert(
+				prefix + DeadRunTableSync::COL_STOP_ID,
+				stop ? stop->getKey() : RegistryKeyType(0)
+			);
+
+			// Direction
+			pm.insert(
+				prefix + DeadRunTableSync::COL_DIRECTION,
+				getFromDepotToStop()
+			);
+
+			// Schedules
+			pm.insert(
+				prefix + DeadRunTableSync::COL_SCHEDULES,
+				encodeSchedules()
+			);
+
+			// Dates
+			stringstream datesStr;
+			serialize(datesStr);
+			pm.insert(
+				prefix + DeadRunTableSync::COL_DATES,
+				datesStr.str()
+			);
+
+			// Service number
+			pm.insert(
+				prefix + DeadRunTableSync::COL_SERVICE_NUMBER,
+				getServiceNumber()
+			);
+
+			// Length
+			pm.insert(
+				prefix + DeadRunTableSync::COL_LENGTH,
+				isUndefined() ? 0 : getEdge(1)->getMetricOffset()
+			);
+
+			// Data source links
+			pm.insert(
+				prefix + DeadRunTableSync::COL_DATASOURCE_LINKS,
+				synthese::impex::DataSourceLinks::Serialize(
+					getDataSourceLinks()
+			)	);
+
+			// Operation unit
+			pm.insert(
+				prefix + DeadRunTableSync::COL_OPERATION_UNIT_ID,
+				getOperationUnit() ? getOperationUnit()->getKey() : RegistryKeyType(0)
+			);
+		}
+
+
+
+		bool DeadRun::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+
+			// Service number
+			{
+				string value(
+					record.getDefault<string>(DeadRunTableSync::COL_SERVICE_NUMBER)
+				);
+				if(value != getServiceNumber())
+				{
+					result = true;
+					setServiceNumber(value);
+				}
+			}
+
+			// Network
+			{
+				TransportNetwork* value(NULL);
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_NETWORK_ID, 0)
+				);
+				if(id > 0) try
+				{
+					value = env.getEditable<TransportNetwork>(id).get();
+				}
+				catch(ObjectNotFoundException<TransportNetwork>&)
+				{
+					Log::GetInstance().warn("No such network "+ lexical_cast<string>(id) +" in Dead run "+ lexical_cast<string>(getKey()));
+				}
+				if(value != getTransportNetwork())
+				{
+					result = true;
+					setTransportNetwork(value);
+				}
+			}
+				
+			// Operation unit
+			{
+				optional<OperationUnit&> value;
+				RegistryKeyType unitId(record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_OPERATION_UNIT_ID, 0));
+				if(unitId) try
+				{
+					value = *env.getEditable<OperationUnit>(unitId);
+				}
+				catch(ObjectNotFoundException<OperationUnit>&)
+				{
+					Log::GetInstance().warn("No such operation unit "+ lexical_cast<string>(unitId) +" in dead run "+ lexical_cast<string>(getKey()));
+				}
+
+				if(	(value && !getOperationUnit()) ||
+					(!value && getOperationUnit()) ||
+					(value && getOperationUnit() && &*value != &*getOperationUnit())
+				){
+					result = true;
+					setOperationUnit(value);
+				}
+			}
+
+
+
+			// Depot, stop point, direction, length
+			{
+				Depot* depot(NULL);
+				StopPoint* stop(NULL);
+				RegistryKeyType pid(record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_DEPOT_ID, 0));
+				RegistryKeyType stopId(record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_STOP_ID, 0));
+				MetricOffset length(record.getDefault(DeadRunTableSync::COL_LENGTH, 0));
+				bool dir(record.getDefault<bool>(DeadRunTableSync::COL_DIRECTION, false));
+				try
+				{
+					if(pid > 0)
+					{
+						depot = env.getEditable<Depot>(pid).get();
+					}
+					if(stopId > 0)
+					{
+						stop = env.getEditable<StopPoint>(stopId).get();
+					}
+				}
+				catch(ObjectNotFoundException<Depot>&)
+				{
+					Log::GetInstance().warn("No such depot "+ lexical_cast<string>(pid) +" in Dead run "+ lexical_cast<string>(getKey()));
+				}
+				catch(ObjectNotFoundException<StopPoint>&)
+				{
+					Log::GetInstance().warn("No such stop "+ lexical_cast<string>(stopId) +" in Dead run "+ lexical_cast<string>(getKey()));
+				}
+				if(	depot != getDepot() ||
+					stop != getStop() ||
+					length != (isUndefined() ? 0 : getEdge(1)->getMetricOffset()) ||
+					dir != getFromDepotToStop()
+				){
+					result = true;
+					if(depot &&	stop)
+					{
+						setRoute(*depot, *stop, length, dir);
+					}
+					else
+					{
+						setUndefined();
+					}
+				}
+			}
+
+			// Data source links
+			{
+				Importable::DataSourceLinks value(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						record.getDefault<string>(DeadRunTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				if(value != getDataSourceLinks())
+				{
+					result = true;
+					setDataSourceLinksWithRegistration(value);
+				}
+			}
+
+			// Schedules
+			{
+				SchedulesBasedService::SchedulesPair value(
+					SchedulesBasedService::DecodeSchedules(
+						record.getDefault<string>(DeadRunTableSync::COL_SCHEDULES)
+				)	);
+				if(	value.first != getDataDepartureSchedules() ||
+					value.second != getDataArrivalSchedules()
+				){
+					result = true;
+					setDataSchedules(value.first, value.second);
+				}
+			}
+
+			// Dates
+			{
+				Calendar value(
+					record.getDefault<string>(DeadRunTableSync::COL_DATES)
+				);
+				if(value != *this)
+				{
+					result = true;
+					copyDates(value);
+				}
+			}
+
+			return result;
+		}
+
+
+
+		void DeadRun::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+
+		}
+
+
+
+		void DeadRun::unlink()
+		{
+			// TODO Data source links should be removed from the data source
+		}
+
+
+
+		synthese::LinkedObjectsIds DeadRun::getLinkedObjectsIds( const Record& record ) const
+		{
+			LinkedObjectsIds result;
+
+			// Network
+			{
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_NETWORK_ID, 0)
+				);
+				if(id > 0)
+				{
+					result.push_back(id);
+				}
+			}
+
+			// Operation unit
+			{
+				RegistryKeyType unitId(
+					record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_OPERATION_UNIT_ID, 0)
+				);
+				if(unitId > 0)
+				{
+					result.push_back(unitId);
+				}
+			}
+
+			// Depot
+			{
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_DEPOT_ID, 0)
+				);
+				if(id > 0)
+				{
+					result.push_back(id);
+				}
+			}
+
+			// Stop
+			{
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(DeadRunTableSync::COL_STOP_ID, 0)
+				);
+				if(id > 0)
+				{
+					result.push_back(id);
+				}
+			}
+			
+			// Data source links
+			impex::DataSourceLinks::GetLinkedObjectsIdsFromText(
+				result,
+				record.getDefault<string>(DeadRunTableSync::COL_DATASOURCE_LINKS)
+			);
+
+			return result;
 		}
 }	}

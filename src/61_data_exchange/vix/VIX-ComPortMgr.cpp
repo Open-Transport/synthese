@@ -9,7 +9,7 @@
 
 #include <boost/format.hpp>
 // cool info at http://ckp.made-it.com/bisync.html
-
+//#define _DEBUG_ME 1
 
 namespace synthese
 {
@@ -35,7 +35,7 @@ namespace synthese
 		//printf(">CComPortMgr::Open ENTER.\n");
 		bool bRet = false; 
 
-		RS232_CloseComport(m_cport_nr);
+		//RS232_CloseComport(m_cport_nr);
 
 		if(RS232_OpenComport(m_cport_nr, m_bdrate)){
 			util::Log::GetInstance().error(str(format("CComPortMgr::Open FAILED. port index: %d. Baud: %d") % m_cport_nr % m_bdrate));
@@ -106,14 +106,14 @@ namespace synthese
 			}
 
 			//printf("received %i bytes:tick(%0x04x)", nBytesRed, tick);
-			printf("<ReadBuffer %i bytes: ", nBytesRed);
+			//printf("<ReadBuffer %i bytes: ", nBytesRed);
 			for(int i=0; i < nBytesRed; i++)
 			{
 				//printf("|%04X:%02X", tick, buf[i]);
-				printf("%02X", buf[i]);
+				//printf("%02X", buf[i]);
 			}
 
-			printf("\n");
+			//printf("\n");
 		}
 	#endif
 

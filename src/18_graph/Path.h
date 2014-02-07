@@ -25,13 +25,14 @@
 
 #include "Registrable.h"
 #include "RuleUser.h"
+
+#include "ChronologicalServicesCollection.hpp"
 #include "GraphTypes.h"
 #include "shared_recursive_mutex.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/optional.hpp>
 #include <vector>
-#include <set>
 
 namespace geos
 {
@@ -52,12 +53,6 @@ namespace synthese
 		class PathGroup;
 		class PathClass;
 
-		struct cmpService
-		{
-		    bool operator() (const Service* s1, const Service* s2) const;
-		};
-
-		typedef std::set<Service*, cmpService> ServiceSet;
 
 		/** Path abstract base class.
 			@author Marc Jambert
@@ -85,13 +80,14 @@ namespace synthese
 		public:
 			typedef std::vector<Edge*> Edges;
 			typedef std::map<MetricOffset, std::size_t> RankMap;
+			typedef std::vector<boost::shared_ptr<ChronologicalServicesCollection> > ServiceCollections;
 
 		protected:
 			PathGroup*		_pathGroup;	//!< Up link : path group
 			PathClass*		_pathClass;	//!< Up link : path class
 			PathClass*		_pathNetwork;	//!< Up link : path network class
 			Edges			_edges; 	//!< Down link 1 : edges
-			ServiceSet		_services;	//!< Down link 2 : services
+			ServiceCollections		_serviceCollections;	//!< Down link 2 : services
 			RankMap			_rankMap;	//!< Saves the first edge at each metric offset
 
 			/** Constructor.
@@ -107,14 +103,15 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				/// @warning Iterating over a ServiceSet must be protected
+				/// @warning Iterating over the service collections must be protected
 				/// by using a boost::shared_lock with _sharedServicesMutex.
-				const ServiceSet&	getServices()	const { return _services; }
+				
 				const Edges&		getEdges()		const { return _edges; }
 				Edges&				getEdges()			  { return _edges; }
 				PathClass*			getPathClass()	const { return _pathClass; }
-				PathClass*                      getPathNetwork()  const { return _pathNetwork; }
+				PathClass*          getPathNetwork()  const { return _pathNetwork; }
 				PathGroup*			getPathGroup()	const { return _pathGroup; }
+				const ServiceCollections& getServiceCollections() const { return _serviceCollections; }
 			//@}
 
 			//! @name Setters
@@ -258,16 +255,6 @@ namespace synthese
 
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Returns all edges including sub edges.
-				//////////////////////////////////////////////////////////////////////////
-				/// @author Hugues Romain
-				/// @since 3.2.1
-				/// @date 2011
-				Edges getAllEdges() const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
 				/// Search in the path for an edge starting at the specified vertex.
 				/// @param vertex vertex to search
 				/// @return an edge starting at the specified vertex
@@ -278,6 +265,9 @@ namespace synthese
 				/// @since 3.3.0
 				const Edge& findEdgeByVertex(const Vertex* vertex) const;
 				class VertexNotFoundException: public synthese::Exception { public: VertexNotFoundException() : synthese::Exception("Vertex was not found in the path.") {} };
+
+
+				bool contains(const Service& service) const;
 			//@}
 
 			//! @name Modifiers.
@@ -297,6 +287,9 @@ namespace synthese
 				);
 
 			public:
+				const Vertex* getDestination () const;
+				const Vertex* getOrigin () const;
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Inserts an edge in the path.
 				///	@param edge The edge to add
@@ -336,13 +329,9 @@ namespace synthese
 					@param ensureLineTheory
 					@author Hugues Romain
 					@date 2007
-
-					The method is virtual to avoid subclasses to have a different behavior than
-					the simple add to the services list (see JourneyPatternCopy).
-
 					@todo Update dates of the path
 				*/
-				virtual void addService(
+				void addService(
 					Service& service,
 					bool ensureLineTheory
 				);
@@ -356,6 +345,9 @@ namespace synthese
 				void removeService(
 					Service& service
 				);
+
+
+				ServiceSet getAllServices() const;
 
 
 
@@ -379,7 +371,21 @@ namespace synthese
 				/// Use this method when schedules have changed
 				/// @param RTDataOnly if true only the real time indexes are reseted
 				/// @author Hugues Romain
-				void markScheduleIndexesUpdateNeeded(bool RTDataOnly);
+				void markScheduleIndexesUpdateNeeded(
+					const ChronologicalServicesCollection& collection,
+					bool RTDataOnly
+				) const;
+
+				
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Reset all the schedules indexes.
+				/// Use this method when schedules have changed
+				/// @param RTDataOnly if true only the real time indexes are reseted
+				/// @author Hugues Romain
+				void markAllScheduleIndexesUpdateNeeded(
+					bool RTDataOnly
+				) const;
 			//@}
 		};
 }	}

@@ -80,9 +80,9 @@ namespace synthese
 			_minMaxDurationRatioFilter(minMaxDurationRatioFilter),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
-			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
-			_journeyTemplates(graphToUse)
+			_journeyTemplates(graphToUse),
+			_reservationRulesDelayType(reservationRulesDelayType)
 		{}
 
 

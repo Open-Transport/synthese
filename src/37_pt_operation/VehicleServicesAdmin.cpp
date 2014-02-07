@@ -134,6 +134,7 @@ namespace synthese
 				VehicleServiceTableSync::Search(
 					Env::GetOfficialEnv(),
 					_searchName,
+					optional<RegistryKeyType>(),
 					_requestParameters.first,
 					_requestParameters.maxSize,
 					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
