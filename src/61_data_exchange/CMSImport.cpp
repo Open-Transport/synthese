@@ -32,10 +32,12 @@
 #include "WebPageTableSync.h"
 #include "WebsiteTableSync.hpp"
 
-#include "boost/filesystem.hpp"
 #include <fstream>
 #include <streambuf>
 #include <stdio.h>
+
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
@@ -82,6 +84,21 @@ namespace synthese
 			return true;
 		}
 
+		bool CMSImport::Importer_::_isExcluded(
+			const vector<boost::regex> &regexps,
+			const std::string &fileName
+		) const
+		{
+			BOOST_FOREACH(const boost::regex &oneRegexp, regexps)
+			{
+				if(regex_match(fileName, oneRegexp))
+				{
+						return true;
+				}
+			}
+			return false;
+		}
+
 		/// Import recursively the files in directory @currentDir under
 		/// the page @parent
 		void CMSImport::Importer_::_importDir(const path &directoryPath,
@@ -92,10 +109,16 @@ namespace synthese
 			for ( boost::filesystem::directory_iterator end, dir(currentDir);
 				   dir != end; ++dir )
 			{
-				Webpage *page = new Webpage();
-				_pages.push_back(page);
 				string pageName(dir->path().filename());
 				string fullPath(dir->path().string());
+
+				if(_isExcluded(_excludeListRegEx, pageName))
+				{
+					continue;
+				}
+
+				Webpage *page = new Webpage();
+				_pages.push_back(page);
 				page->set<Title>(pageName);
 				page->setRoot(_site.get());
 				page->setRank(rank++);
@@ -131,7 +154,6 @@ namespace synthese
 					WebpageContent c(content, false, mimeType, true);
 					page->set<WebpageContent>(c);
 				}
-
 			}
 		}
 
@@ -220,6 +242,31 @@ namespace synthese
 
 			_maxAge = minutes(map.getDefault<long>(PARAMETER_MAX_AGE, 0));
 			_excludeList = map.getDefault<string>(PARAMETER_EXCLUDE_LIST);
+
+			// Regexp are compiled, create them once here
+			vector<string> excludes;
+			boost::split(excludes, _excludeList, boost::algorithm::is_any_of(" "));
+			BOOST_FOREACH(const string &oneexp, excludes)
+			{
+				try
+				{
+					if(oneexp[0] == '*')
+					{
+						// Special case to support regexp starting with * like in bash
+						// in this case with prepend a '.' to the '*' to create '.*'
+						_excludeListRegEx.push_back(boost::regex("." + oneexp));
+					}
+					else
+					{
+						_excludeListRegEx.push_back(boost::regex(oneexp));
+					}
+				}
+				catch(boost::regex_error& e)
+				{
+					throw Exception("Bad regular expression in exclude list: " + string(e.what()));
+				}
+			}
+
 		}
 
 
