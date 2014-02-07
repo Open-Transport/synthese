@@ -177,7 +177,6 @@ namespace synthese
 				}
 			}
 
-			std::cout << "_exportDir " << currentDir.string() << "/" << pageNameWithExt << std::endl;
 			// savePage
 			create_directory( currentDir );
 
@@ -187,10 +186,10 @@ namespace synthese
 			   parent->getChildren().empty())
 			{
 				path currentFile(currentDir / pageNameWithExt);
+				_logLoad("Creation of page: " + currentFile.string());
 				ofstream file( currentFile.string().c_str() );
 				file << content.getCMSScript().getCode().c_str();
 				file.close();
-				std::cout << "  savePage " << currentFile.string() << std::endl;
 				// If there are subpages we need to differentiate the file and the dir
 				pageName += ".dir";
 			}
