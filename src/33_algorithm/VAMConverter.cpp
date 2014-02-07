@@ -140,13 +140,13 @@ namespace synthese
 						result.insert(
 							it.first,
 							VertexAccess(
-		                        it.second.approachTime +
+		                        itps.second.approachTime +
 								(	direction == DEPARTURE_TO_ARRIVAL ?
 									vertex->getHub()->getTransferDelay(*vertex, *it.first) :
 									vertex->getHub()->getTransferDelay(*it.first, *vertex)
 								),
-		                        it.second.approachDistance,
-		                        it.second.approachJourney
+		                        itps.second.approachDistance,
+		                        itps.second.approachJourney
 						)	);
 					}
 				}
@@ -166,7 +166,7 @@ namespace synthese
 							direction == DEPARTURE_TO_ARRIVAL ?
 							oj->getOrigin()->getFromVertex() :
 							oj->getDestination()->getFromVertex()
-						).approachTime + minutes(static_cast<long>(ceil(oj->getDuration().total_seconds() / double(60))))
+						).approachTime + minutes(static_cast<long>(ceil(oj->getDuration(false).total_seconds() / double(60))))
 					);
 					double commonApproachDistance(
 						vam.getVertexAccess(
