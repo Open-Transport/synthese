@@ -22,7 +22,6 @@
 
 #include "BookReservationAction.h"
 
-#include "ActionException.h"
 #include "RequestException.h"
 #include "ClientException.h"
 #include "AlgorithmLogger.hpp"
@@ -210,19 +209,19 @@ namespace synthese
 					_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
 					if (_customer->getName().empty())
 					{
-						throw ActionException("Le nom du client doit être rempli");
+						throw RequestException("Le nom du client doit être rempli");
 					}
 
 					_customer->setSurname(map.getDefault<string>(PARAMETER_CUSTOMER_SURNAME));
 					if (_customer->getSurname().empty() && !map.getDefault<bool>(PARAMETER_CUSTOMER_ALLOW_EMPTY_SURNAME, false))
 					{
-						throw ActionException("Le prénom du client doit être rempli");
+						throw RequestException("Le prénom du client doit être rempli");
 					}
 
 					_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
 					if (_customer->getPhone().empty())
 					{
-						throw ActionException("Le numéro de téléphone doit être rempli");
+						throw RequestException("Le numéro de téléphone doit être rempli");
 					}
 
 					// Integrity test : the key is name + surname + phone
@@ -241,7 +240,7 @@ namespace synthese
 					);
 					if (!env.getRegistry<User>().empty())
 					{
-						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+						throw RequestException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
 					}
 
 					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
@@ -259,7 +258,7 @@ namespace synthese
 						}
 						catch(Language::LanguageNotFoundException&)
 						{
-							throw ActionException("Langue incorrecte");
+							throw RequestException("Langue incorrecte");
 						}
 					}
 				}
@@ -276,18 +275,18 @@ namespace synthese
 
 			if(!_customer.get())
 			{
-				throw ActionException("Undefined customer.");
+				throw RequestException("Undefined customer.");
 			}
 
 			// Deduce naming fields from the customer if already recognized
 			if (_customer->getName().empty())
 			{
-				throw ActionException("Client sans nom. Réservation impossible");
+				throw RequestException("Client sans nom. Réservation impossible");
 			}
 
 			if (_customer->getPhone().empty())
 			{
-				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
+				throw RequestException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
 			}
 
 			// Seats number
@@ -295,7 +294,7 @@ namespace synthese
 			/// TODO check seats number in UseRule ?
 			if (_seatsNumber < 1 || _seatsNumber > 499)
 			{
-				throw ActionException("Invalid seats number");
+				throw RequestException("Invalid seats number");
 			}
 
 			// Journey planner initialization
@@ -316,7 +315,7 @@ namespace synthese
 
 			if (_reservationsNumber > 6)
 			{
-				throw ActionException("Invalid reservations number (too high)");
+				throw RequestException("Invalid reservations number (too high)");
 			}
 
 			_multiReservationsMode = map.getDefault<bool>(PARAMETER_MULTI_RESERVATIONS_MODE, false);
@@ -367,7 +366,7 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<ScheduledService>&)
 					{
-						throw ActionException("No such service");
+						throw RequestException("No such service");
 					}
 
 					gregorian::date date = from_string(map.get<string>(
@@ -378,12 +377,12 @@ namespace synthese
 					size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
 					if(departureRank >= _service->getPath()->getEdges().size())
 					{
-						throw ActionException("Invalid departure rank");
+						throw RequestException("Invalid departure rank");
 					}
 					if(	arrivalRank >= _service->getPath()->getEdges().size() ||
 						arrivalRank <= departureRank
 					){
-						throw ActionException("Invalid arrival rank");
+						throw RequestException("Invalid arrival rank");
 					}
 
 					ServicePointer sp(
@@ -408,7 +407,7 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<FreeDRTTimeSlot>&)
 					{
-						throw ActionException("No such service");
+						throw RequestException("No such service");
 					}
 
 					/// TODO check if the user class code is allowed on this service
@@ -420,7 +419,7 @@ namespace synthese
 					if(	!_departurePlace.get() ||
 						!_departurePlace->getPoint().get()
 					){
-						throw ActionException("The origin place must be located");
+						throw RequestException("The origin place must be located");
 					}
 
 					/// TODO check if the destinations belong to the area
@@ -429,7 +428,7 @@ namespace synthese
 					if(	!_arrivalPlace.get() ||
 						!_arrivalPlace->getPoint().get()
 					){
-						throw ActionException("The destination place must be located");
+						throw RequestException("The destination place must be located");
 					}
 
 					/// TODO check the availability according to existing reservations
@@ -451,11 +450,11 @@ namespace synthese
 			{
 				if(!_departurePlace.get())
 				{
-					throw ActionException("Invalid destination place");
+					throw RequestException("Invalid destination place");
 				}
 				if(!_arrivalPlace.get())
 				{
-					throw ActionException("Invalid origin place");
+					throw RequestException("Invalid origin place");
 				}
 
 				// Check same services/hours journeys exist for all extra dates
@@ -493,7 +492,7 @@ namespace synthese
 				}
 				else
 				{
-					throw ActionException("The reservations number doesn't correspond to the reservations dates");
+					throw RequestException("The reservations number doesn't correspond to the reservations dates");
 				}
 			}
 		}
