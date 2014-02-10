@@ -583,10 +583,19 @@ namespace synthese
 					string fullCode(trim_copy(line.substr(23,6)));
 					vector<string> fullCodeVec;
 					split(fullCodeVec, fullCode, is_any_of("/"));
-					string vehicleServiceCode(
-						lexical_cast<string>(
+					string vehicleServiceCode = "";
+					if (fullCodeVec.size() > 1)
+					{
+						vehicleServiceCode = lexical_cast<string>(
 							lexical_cast<int>(fullCodeVec[0])*100+lexical_cast<int>(fullCodeVec[1])
-					)	);
+						);
+					}
+					else
+					{
+						vehicleServiceCode = lexical_cast<string>(
+							lexical_cast<int>(fullCodeVec[0])
+						);
+					}
 
 					VehicleService* vehicleService(
 						_createOrUpdateVehicleService(
@@ -720,7 +729,7 @@ namespace synthese
 							}
 							JourneyPattern* route(it->second);
 
-							string serviceNumber(trim_copy(line.substr(i+8,3)));
+							string serviceNumber(trim_copy(line.substr(i+6,4)));
 							SchedulesMap::iterator itS(services.find(make_pair(route, serviceNumber)));
 							if(itS != services.end())
 							{
@@ -761,7 +770,7 @@ namespace synthese
 							size_t rank(0);
 							bool alreadyNonNull(false);
 							bool alreadyNull(false);
-							for(i+=11; i<line.size() && line[i]!=';'; i+=8, ++rank)
+							for(i+=6; i<line.size() && line[i]!=';'; i+=8, ++rank)
 							{
 								string arrivalSchedule(line.substr(i, 4));
 								string departureSchedule(line.substr(i+4, 4));
