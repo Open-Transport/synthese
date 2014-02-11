@@ -74,7 +74,8 @@ namespace synthese
 
 			void _parseAndLoad(
 				const std::string& s,
-				boost::optional<const impex::Importer&> importer
+				boost::optional<const impex::Importer&> importer,
+				bool noSuppressTopLevel
 			);
 
 			void _deleteObjectsToRemove(

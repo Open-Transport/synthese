@@ -93,7 +93,8 @@ namespace synthese
 		/// @param s the serialized string to parse to populate the object
 		void InterSYNTHESEPackageContent::_parseAndLoad(
 			const string& s,
-			boost::optional<const impex::Importer&> importer
+			boost::optional<const impex::Importer&> importer,
+			bool noSuppressTopLevel
 		){
 			ContentMap contentMap;
 
