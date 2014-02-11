@@ -56,10 +56,11 @@ namespace synthese
 			impex::Import& import,
 			boost::optional<const impex::Importer&> importer
 		):	_env(env),
-			_package(new InterSYNTHESEPackage)
+			_package(new InterSYNTHESEPackage),
+			bool noSuppressTopLevel
 		{
 			_package->set<Import>(import);
-			_parseAndLoad(s, importer);
+			_parseAndLoad(s, importer, noSuppressTopLevel);
 			_env.add(_package);
 		}
 
@@ -77,9 +78,10 @@ namespace synthese
 			const boost::shared_ptr<InterSYNTHESEPackage>& package,
 			boost::optional<const impex::Importer&> importer
 		):	_env(env),
-			_package(package)
+			_package(package),
+			bool noSuppressTopLevel
 		{
-			_parseAndLoad(s, importer);
+			_parseAndLoad(s, importer, noSuppressTopLevel);
 		}
 
 
@@ -176,7 +178,10 @@ namespace synthese
 			_package->set<Public>(
 				_objects.get<bool>(Public::FIELD.name)
 			);
-			_prepareObjectsToRemove(_objects);
+			if (!noSuppressTopLevel)
+			{
+				_prepareObjectsToRemove(_objects);
+			}
 			_package->set<Objects>(
 				_loadObjects(_objects, contentMap, _objectsToSave, importer)
 			);
