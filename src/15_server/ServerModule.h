@@ -136,6 +136,7 @@ namespace synthese
 
 			static const std::string VERSION;
 			static const std::string REVISION;
+			static const std::string BRANCH;
 			static const std::string BUILD_DATE;
 			static const std::string SYNTHESE_URL;
 
