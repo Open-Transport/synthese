@@ -255,6 +255,7 @@ int main( int argc, char **argv )
 			if (vm.count("version"))
 			{
 				std::cout << "SYNTHESE " << ServerModule::VERSION << " " <<
+
 					ServerModule::REVISION <<
 					" (" << ServerModule::GetBranch() << " - " << ServerModule::BUILD_DATE << ")" <<
 #ifdef WITH_MYSQL
@@ -263,6 +264,7 @@ int main( int argc, char **argv )
 					" Without MYSQL" <<
 #endif
 					std::endl;
+
 				return 1;
 			}
 
