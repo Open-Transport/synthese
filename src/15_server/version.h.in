@@ -1,2 +1,5 @@
-#cmakedefine SYNTHESE_VERSION "@SYNTHESE_VERSION@"
-
+#define SYNTHESE_VERSION "@SYNTHESE_VERSION@"
+#define SYNTHESE_REVISION "@GIT_SHA1@"
+#define SYNTHESE_BRANCH "@GIT_REFSPEC@"
+#define SYNTHESE_BUILD_DATE ""
+#define SYNTHESE_SVN_URL "https://github.com/Open-Transport/synthese.git"
