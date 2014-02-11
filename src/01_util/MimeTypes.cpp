@@ -44,6 +44,7 @@ namespace synthese
 		const MimeType MimeTypes::GIF("image", "gif", "gif", "");
 		const MimeType MimeTypes::PDF("application", "pdf", "pdf", "");
 		const MimeType MimeTypes::TTF("application", "x-font-ttf", "ttf", "");
+		const MimeType MimeTypes::NONE("", "", "", "");
 
 
 
@@ -60,7 +61,7 @@ namespace synthese
 					}
 				}
 			}
-			throw Exception("Mime type not found");
+			return NONE;
 		}
 
 

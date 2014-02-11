@@ -337,10 +337,7 @@ namespace synthese
 
 				// Remove button
 				stream << t.col();
-				if(site.getChildren().empty())
-				{
-					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le site "+ site.get<Name>() +" ?");
-				}
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le site "+ site.get<Name>() +" ?");
 			}
 			stream << t.row();
 			stream << t.col();
