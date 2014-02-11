@@ -255,8 +255,9 @@ int main( int argc, char **argv )
 			if (vm.count("version"))
 			{
 				std::cout << "SYNTHESE " << ServerModule::VERSION << " " <<
-					ServerModule::REVISION <<
-					" (" << ServerModule::BUILD_DATE << ")" << std::endl;
+					ServerModule::REVISION << " " <<
+					ServerModule::BRANCH <<
+					" (" << ServerModule::GetBranch() << " - " << ServerModule::BUILD_DATE << ")" << std::endl;
 				return 1;
 			}
 
@@ -401,4 +402,5 @@ int main( int argc, char **argv )
 	{
 		Log::GetInstance ().fatal ("Unexpected exception.");
 	}
+	exit(1);
 }

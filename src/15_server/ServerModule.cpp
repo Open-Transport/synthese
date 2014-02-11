@@ -25,9 +25,6 @@
 #include "EMail.h"
 #include "Log.h"
 #include "15_server/version.h"
-#ifdef UNIX
-  #include "15_server/svnversion.h"
-#endif
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
@@ -95,15 +92,10 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_HTTP_FORCE_GZIP = "http_force_gzip";
 
 		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
-#ifdef WIN32 // CMake is not able to extract the current revision number and the build date in other OS than linux right now
-		const std::string ServerModule::REVISION("");
-		const std::string ServerModule::BUILD_DATE("");
-		const std::string ServerModule::SYNTHESE_URL("");
-#else
 		const std::string ServerModule::REVISION(SYNTHESE_REVISION);
+		const std::string ServerModule::BRANCH(SYNTHESE_BRANCH);
 		const std::string ServerModule::BUILD_DATE(SYNTHESE_BUILD_DATE);
 		const std::string ServerModule::SYNTHESE_URL(SYNTHESE_SVN_URL);
-#endif
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
