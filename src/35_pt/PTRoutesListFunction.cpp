@@ -35,6 +35,7 @@
 #include "LinePhysicalStop.hpp"
 #include "Destination.hpp"
 #include "CalendarTemplate.h"
+#include "JourneyPatternCopy.hpp"
 #include "MimeTypes.hpp"
 
 #include <boost/foreach.hpp>
@@ -246,6 +247,17 @@ namespace synthese
 					bool result(thisRoute->getCalendarCache().hasAtLeastOneCommonDateWith(calendarFilter));
 					if(!result)
 					{
+						BOOST_FOREACH(JourneyPatternCopy* subline, thisRoute->getSubLines())
+						{
+							if(subline->getCalendarCache().hasAtLeastOneCommonDateWith(calendarFilter))
+							{
+								result = true;
+								break;
+							}
+						}
+					}
+					if(!result)
+					{
 						continue;
 					}
 				}
@@ -338,7 +350,7 @@ namespace synthese
 						route->getDirection()
 					);
 					{
-						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getEdges().begin()));
+						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().begin()));
 						if(lineStop)
 						{
 							pm->insert(DATA_ORIGIN_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
@@ -346,7 +358,7 @@ namespace synthese
 						}
 					}
 					{
-						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getEdges().rbegin()));
+						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().rbegin()));
 						if(lineStop)
 						{
 							pm->insert(DATA_DESTINATION_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
@@ -380,8 +392,8 @@ namespace synthese
 							route->getDirection()
 						) << "\" >";
 
-					const StopArea& origin(
-						*static_cast<const StopPoint*>(route->getOrigin())->getConnectionPlace()
+					const StopArea & origin(
+						*route->getOrigin()->getConnectionPlace()
 					);
 					stream << "<origin id=\""  << origin.getKey() <<
 						"\" name=\""           << origin.getName() <<
@@ -390,8 +402,8 @@ namespace synthese
 						"\" directionAlias=\"" << origin.getName26() <<
 						"\" />";
 
-					const StopArea& destination(
-						*static_cast<const StopPoint*>(route->getDestination())->getConnectionPlace()
+					const StopArea & destination(
+						*route->getDestination()->getConnectionPlace()
 					);
 					stream << "<destination id=\"" << destination.getKey() <<
 						"\" name=\""           << destination.getName() <<

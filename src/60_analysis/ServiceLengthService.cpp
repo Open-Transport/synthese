@@ -108,7 +108,7 @@ namespace synthese
 
 			// Planned distance
 			MetricOffset distance(0);
-			Path::Edges edges(journeyPattern->getEdges());
+			Path::Edges edges(journeyPattern->getAllEdges());
 			if(!edges.empty() && (*edges.rbegin())->getMetricOffset())
 			{
 				distance = (*edges.rbegin())->getMetricOffset();

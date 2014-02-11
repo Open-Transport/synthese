@@ -135,14 +135,14 @@ namespace synthese
 		int nBytesWritten = RS232_SendBuf(m_cport_nr, buf, size);
 	#endif
 
-//	#ifdef _DEBUG_ME
+	#ifdef _DEBUG_ME
 		printf("CComPortMgr::WriteBuffer buffer: ");
 		for (int i=0;i<size;i++)
 		{
 			printf("%02X ",buf[i]);
 		}
 		printf("\n");
-//	#endif
+	#endif
 		if(nBytesWritten<0)
 		{
 			printf("CComPortMgr::WriteBuffer FAILED. buffer maybe not sent!\n");

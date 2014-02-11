@@ -7,7 +7,6 @@
 #include "LogoutAction.h"
 #include "QuitAction.hpp"
 #include "SetSessionVariableAction.hpp"
-#include "SuicidalAction.hpp"
 #include "ThreadKillAction.h"
 #include "LoginToken.hpp"
 
@@ -25,6 +24,9 @@
 #include "ThreadsAdmin.h"
 
 #include "DbModuleConfigTableSync.h"
+#include "PermanentThreadTableSync.hpp"
+#include "PermanentThreadsService.hpp"
+#include "DevicesService.hpp"
 
 #include "ActionService.hpp"
 #include "HardwareInformationService.hpp"
@@ -51,7 +53,6 @@ void synthese::server::moduleRegister()
 	synthese::server::LogoutAction::integrate();
 	synthese::server::QuitAction::integrate();
 	synthese::server::SetSessionVariableAction::integrate();
-	synthese::server::SuicidalAction::integrate();
 	synthese::server::ThreadKillAction::integrate();
 
 	synthese::server::HtmlFormInterfaceElement::integrate();
@@ -61,6 +62,10 @@ void synthese::server::moduleRegister()
 	synthese::server::ServerModuleVersionInterfaceElement::integrate();
 
 	synthese::server::DbModuleConfigTableSync::integrate();
+
+	synthese::server::PermanentThreadTableSync::integrate();
+	synthese::server::PermanentThreadsService::integrate();
+	synthese::server::DevicesService::integrate();
 
 	synthese::server::ServerAdminRight::integrate();
 
@@ -76,4 +81,5 @@ void synthese::server::moduleRegister()
 	synthese::server::XMLSessionIsValidFunction::integrate();
 
 	// Registries
+	synthese::util::Env::Integrate<synthese::server::PermanentThread>();
 }

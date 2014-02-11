@@ -181,30 +181,6 @@ namespace synthese
 
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Return the non binary dump of the package content without locking it.
-		/// This returns the non binary dump part without the size header.
-		//////////////////////////////////////////////////////////////////////////
-		string InterSYNTHESEPackage::getNonBinaryDump(
-		) const {
-			// Variables
-			ParametersMap map;
-
-			// Objects or tables
-			BOOST_FOREACH(const Objects::Type::value_type& item, get<Objects>())
-			{
-				_dumpItem(item, map);
-			}
-
-			// JSON generation
-			stringstream json;
-			map.outputJSON(json, string());
-
-			return json.str();
-		}
-
-
-
-		//////////////////////////////////////////////////////////////////////////
 		/// Locks the package by a local user.
 		//////////////////////////////////////////////////////////////////////////
 		/// @param user the user who locks the package
@@ -259,8 +235,7 @@ namespace synthese
 			const boost::posix_time::ptime& lockTime
 		) const	{
 			// Variables
-			stringstream ss;
-			boost::optional<stringstream &> binaryStream(ss);
+			stringstream binaryStream;
 			ParametersMap map;
 
 			// Export of the package itself
@@ -289,7 +264,7 @@ namespace synthese
 				lexical_cast<string>(jsonStr.size()) +
 				SEPARATOR +
 				jsonStr +
-				binaryStream->str()
+				binaryStream.str()
 			);
 			return result;
 		}
@@ -298,7 +273,7 @@ namespace synthese
 
 		InterSYNTHESEPackage::ItemDumper::ItemDumper(
 			ParametersMap& pm,
-			boost::optional<stringstream&> binaryStream
+			stringstream& binaryStream
 		):	_pm(pm),
 			_binaryStream(binaryStream)
 		{}
@@ -330,14 +305,7 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
 				{
-					if(_binaryStream)
-					{
-						_dumpItem(TableOrObject(item), *tablePM, _binaryStream.get());
-					}
-					else
-					{
-						_dumpItem(TableOrObject(item), *tablePM);
-					}
+					_dumpItem(TableOrObject(item), *tablePM, _binaryStream);
 				}
 			}
 
@@ -364,39 +332,29 @@ namespace synthese
 			value->toParametersMap(*objectPM, false, false);
 
 			// Object binary fields
-			if(_binaryStream)
+			MD5Wrapper md5;
+			FilesMap filesMap;
+			value->toFilesMap(filesMap);
+			BOOST_FOREACH(const FilesMap::Map::value_type& item, filesMap.getMap())
 			{
-				MD5Wrapper md5;
-				FilesMap filesMap;
-				value->toFilesMap(filesMap);
-				BOOST_FOREACH(const FilesMap::Map::value_type& item, filesMap.getMap())
-				{
-					// Variables
-					const string& fieldName(item.first);
-					const string& content(item.second.content);
+				// Variables
+				const string& fieldName(item.first);
+				const string& content(item.second.content);
 
-					// Md5 of the content
-					objectPM->insert(
-						fieldName,
-						md5.getHashFromString(content)
-					);
+				// Md5 of the content
+				objectPM->insert(
+					fieldName,
+					md5.getHashFromString(content)
+				);
 
-					// Raw binary content
-					*_binaryStream <<SEPARATOR<< value->getKey() <<SEPARATOR<< fieldName <<SEPARATOR<< content.size() <<SEPARATOR<< content;
-				}
+				// Raw binary content
+				_binaryStream <<SEPARATOR<< value->getKey() <<SEPARATOR<< fieldName <<SEPARATOR<< content.size() <<SEPARATOR<< content;
 			}
 
 			// Sub objects
 			BOOST_FOREACH(const SubObjects::value_type& it, value->getSubObjects())
 			{
-				if(_binaryStream)
-				{
-					_dumpItem(TableOrObject(it), *objectPM, _binaryStream.get());
-				}
-				else
-				{
-					_dumpItem(TableOrObject(it), *objectPM);
-				}
+				_dumpItem(TableOrObject(it), *objectPM, _binaryStream);
 			}
 
 			_pm.insert(TableOrObject::TAG_OBJECT, objectPM);
@@ -412,7 +370,7 @@ namespace synthese
 		void InterSYNTHESEPackage::_dumpItem(
 			const TableOrObject& object,
 			util::ParametersMap& pm,
-			boost::optional<stringstream &> binaryStream
+			std::stringstream& binaryStream
 		){
 			TableOrObject::Value objectValue(object.getValue());
 			apply_visitor(ItemDumper(pm, binaryStream), objectValue);

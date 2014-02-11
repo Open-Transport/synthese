@@ -106,7 +106,6 @@ namespace synthese
 			const InterSYNTHESEContent& content,
 			boost::optional<db::DBTransaction&> transaction
 		) const {
-
 			// Avoid useless check if no slave
 			if(_slaves.empty())
 			{
@@ -114,18 +113,16 @@ namespace synthese
 			}
 
 			// Check if the content must be sent to the slaves
-			bool nonPersistent(false);
 			{
 				bool mustBeEnqueued(false);
 				boost::recursive_mutex::scoped_lock lock(_configMutex);
 				BOOST_FOREACH(const Items::value_type& item, _items)
 				{
-					if(	item->mustBeEnqueued(
-							content.getType(),
-							content.getPerimeter()
+					if(item->mustBeEnqueued(
+						content.getType(),
+						content.getPerimeter()
 					)	){
 						mustBeEnqueued = true;
-						nonPersistent = item->get<NonPersistent>();
 						break;
 					}
 				}
@@ -141,9 +138,7 @@ namespace synthese
 				slave->enqueue(
 					content.getType().getFactoryKey(),
 					content.getContent(),
-					content.getExpirationTime(),
-					transaction,
-					nonPersistent
+					transaction
 				);
 			}
 		}

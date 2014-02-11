@@ -22,16 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "VehicleServiceUpdateAction.hpp"
-
 #include "ActionException.h"
-#include "OperationUnitTableSync.hpp"
 #include "ParametersMap.h"
+#include "VehicleServiceUpdateAction.hpp"
 #include "Request.h"
 #include "VehicleService.hpp"
 #include "VehicleServiceTableSync.hpp"
 
-using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -51,7 +48,6 @@ namespace synthese
 		const string VehicleServiceUpdateAction::PARAMETER_VEHICLE_SERVICE_ID = Action_PARAMETER_PREFIX + "vehicle_service_id";
 		const string VehicleServiceUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
 		const string VehicleServiceUpdateAction::PARAMETER_FIELD_SERVICES = Action_PARAMETER_PREFIX + "_field_services";
-		const string VehicleServiceUpdateAction::PARAMETER_OPERATION_UNIT_ID = Action_PARAMETER_PREFIX + "_field_operation_unit_id";
 
 
 
@@ -114,21 +110,6 @@ namespace synthese
 					*_env
 				);
 			}
-
-			// Operation unit
-			if(map.isDefined(PARAMETER_OPERATION_UNIT_ID))
-			{
-				_operationUnit = optional<OperationUnit&>();
-				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_OPERATION_UNIT_ID, 0));
-				if(id) try
-				{
-					_operationUnit = optional<OperationUnit&>(*OperationUnitTableSync::GetEditable(id, *_env));
-				}
-				catch (ObjectNotFoundException<OperationUnit>&)
-				{
-					throw ActionException("No such operation unit");
-				}
-			}
 		}
 
 
@@ -155,11 +136,6 @@ namespace synthese
 			if(_services)
 			{
 				_vehicleService->setServices(*_services);
-			}
-
-			if(_operationUnit)
-			{
-				_vehicleService->setOperationUnit(*_operationUnit);
 			}
 
 			VehicleServiceTableSync::Save(_vehicleService.get());

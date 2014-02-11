@@ -45,14 +45,10 @@ namespace synthese
 		{
 		public:
 			static const std::string TAG_FORMAT;
-			static const std::string PARAMETER_WITH_IMPORTS;
-			static const std::string PARAMETER_WITH_EXPORTS;
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				bool _withImports;
-				bool _withExports;
 			//@}
 			
 			
@@ -115,10 +111,6 @@ namespace synthese
 			/// @author hromain
 			/// @date 2013
 			virtual std::string getOutputMimeType() const;
-
-
-
-			FileFormatsService();
 		};
 }	}
 

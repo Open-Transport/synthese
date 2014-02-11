@@ -159,7 +159,7 @@ namespace synthese
 					_request
 				);
 				routeplannerRequest.getPage()->setCustomer(_user);
-				
+
 				AdminFunctionRequest<ResaCustomerMergeAdmin> mergeRequest(
 					_request
 				);

@@ -111,7 +111,6 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
-		const string ScenarioSaveAction::PARAMETER_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_recipients_";
 		
 		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
 		const string ScenarioSaveAction::VALUES_PARAMETERS_SEPARATOR = "|";
@@ -592,42 +591,6 @@ namespace synthese
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
 
-
-					_recipients = Recipients::value_type();
-
-					// New recipient lists (but cannot read data source id)
-					BOOST_FOREACH(const string& key, Factory<AlarmRecipient>::GetKeys())
-					{
-						string value(map.getDefault<string>(PARAMETER_RECIPIENTS_ + key));
-						if(!value.empty())
-						{
-							vector<string> recipients;
-							boost::algorithm::split(recipients, value, is_any_of(","));
-							BOOST_FOREACH(const string& recipient, recipients)
-							{
-								vector<string> recipientParams;
-								boost::algorithm::split(recipientParams, recipient, is_any_of("|"));
-
-								Recipients::value_type::value_type rec;
-								try
-								{
-									rec.first = key;
-									rec.second.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
-									if(recipientParams.size() > 1)
-									{
-										rec.second.second = recipientParams[1];
-									}
-
-									_recipients->push_back(rec);
-								}
-								catch(...)
-								{
-
-								}
-							}
-						}
-					}
-
 					if(!map.getDefault<string>(PARAMETER_RECIPIENT_ID).empty())
 					{
 						// Recipient data source
@@ -643,6 +606,7 @@ namespace synthese
 						vector<string> recipients;
 						string recipientStr(map.get<string>(PARAMETER_RECIPIENT_ID));
 						boost::algorithm::split(recipients, recipientStr, is_any_of(","));
+						_recipients = Recipients::value_type();
 						BOOST_FOREACH(const string& recipient, recipients)
 						{
 							vector<string> recipientParams;
@@ -651,14 +615,13 @@ namespace synthese
 
 							try
 							{
-								rec.first = _recipientType;
 								if(!lexical_cast<RegistryKeyType>(recipientParams[0]))
 								{
-									rec.second.first = 0;
+									rec.first = 0;
 								}
 								else if(_recipientDataSource.get())
 								{
-									rec.second.first =
+									rec.first =
 										DBModule::GetEditableObject(
 											recipientType->getObjectIdBySource(
 												*_recipientDataSource,
@@ -671,12 +634,12 @@ namespace synthese
 								}
 								else
 								{
-									rec.second.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
+									rec.first = lexical_cast<RegistryKeyType>(recipientParams[0]);
 								}
 
 								if(recipientParams.size() > 1)
 								{
-									rec.second.second = recipientParams[1];
+									rec.second = recipientParams[1];
 								}
 
 								_recipients->push_back(rec);
@@ -1199,12 +1162,12 @@ namespace synthese
 					BOOST_FOREACH(const Recipients::value_type::value_type& recipient, *_recipients)
 					{
 						AlarmObjectLink link;
-						link.setRecipient(recipient.first);
+						link.setRecipient(_recipientType);
 						link.setAlarm(message.get());
-						link.setObjectId(recipient.second.first);
-						if(recipient.second.second)
+						link.setObjectId(recipient.first);
+						if(recipient.second)
 						{
-							link.setParameter(*recipient.second.second);
+							link.setParameter(*recipient.second);
 						}
 						AlarmObjectLinkTableSync::Save(&link, transaction);
 					}

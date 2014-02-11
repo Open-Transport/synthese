@@ -79,8 +79,8 @@ namespace synthese
 					<< StopAreaTableSync::TABLE.NAME << " AS p"
 					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << StopAreaTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << StopPointTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineNode::FIELD.name
-					<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name;
+					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID
+					<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
 			// Where
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
@@ -179,8 +179,8 @@ namespace synthese
 				<< "c." << TABLE_COL_ID << " AS " << TABLE_COL_ID
 				<< " FROM " << CommercialLineTableSync::TABLE.NAME << " AS c "
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
-				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << Line::FIELD.name << "=l." << TABLE_COL_ID
-				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineNode::FIELD.name
+				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << LineStopTableSync::COL_LINEID << "=l." << TABLE_COL_ID
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineStopTableSync::COL_PHYSICALSTOPID
 				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << StopPointTableSync::COL_PLACEID
 				<< " GROUP BY c." << TABLE_COL_ID
 				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;

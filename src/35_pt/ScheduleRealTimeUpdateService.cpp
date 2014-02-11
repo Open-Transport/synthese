@@ -265,7 +265,6 @@ namespace synthese
 			const boost::shared_ptr<StopArea> &stopArea) const
 		{
 			int i(0);
-			recursive_mutex::scoped_lock lock(service->getVerticesMutex());
 			BOOST_FOREACH(const graph::Vertex *vertex, service->getVertices(true))
 			{
 				if(vertex->getHub() == stopArea.get())

@@ -36,7 +36,6 @@ namespace synthese
 	FIELD_DEFINITION_OF_OBJECT(InterSYNTHESEConfigItem, "config_item_id", "config_item_ids")
 
 	FIELD_DEFINITION_OF_TYPE(SyncPerimeter, "perimeter", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(NonPersistent, "non_persistent", SQL_BOOLEAN)
 
 	namespace inter_synthese
 	{
@@ -48,8 +47,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
 					FIELD_DEFAULT_CONSTRUCTOR(SyncType),
-					FIELD_DEFAULT_CONSTRUCTOR(SyncPerimeter),
-					FIELD_VALUE_CONSTRUCTOR(NonPersistent, false)
+					FIELD_DEFAULT_CONSTRUCTOR(SyncPerimeter)
 			)	)
 		{
 		}

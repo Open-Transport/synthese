@@ -54,7 +54,6 @@ namespace synthese
 				static const std::string COL_SERVICES;
 				static const std::string COL_DATASOURCE_LINKS;
 				static const std::string COL_DATES;
-				static const std::string COL_OPERATION_UNIT_ID;
 			//@}
 
 			//! @name Services
@@ -75,7 +74,6 @@ namespace synthese
 				static SearchResult Search(
 					util::Env& env,
 					boost::optional<std::string> name = boost::optional<std::string>(),
-					boost::optional<util::RegistryKeyType> searchUnit = boost::optional<util::RegistryKeyType>(),
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,

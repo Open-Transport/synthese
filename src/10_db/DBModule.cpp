@@ -68,7 +68,6 @@ namespace synthese
 		const string DBModule::PARAMETER_NODE_ID = "node_id";
 		RegistryNodeType DBModule::_nodeId = 1;
 		unsigned int DBModule::_thrCount = 0;
-		bool DBModule::_conditionalTablesUpdateActive = true;
 	}
 
 	namespace server
@@ -333,35 +332,32 @@ namespace synthese
 		{
 			while(true)
 			{
-				if(_conditionalTablesUpdateActive)
+				// Thread status update
+				ServerModule::SetCurrentThreadRunningAction();
+
+				// Loop on each conditional synchronized table
+				BOOST_FOREACH(boost::shared_ptr<ConditionalSynchronizationPolicyBase> sync, _conditionalTableSyncsToReload)
 				{
-					// Thread status update
-					ServerModule::SetCurrentThreadRunningAction();
-
-					// Loop on each conditional synchronized table
-					BOOST_FOREACH(boost::shared_ptr<ConditionalSynchronizationPolicyBase> sync, _conditionalTableSyncsToReload)
+					// Cleaning up the env with obsolete data
+					RegistryBase& registry(
+						dynamic_cast<DBDirectTableSync&>(*sync).getEditableRegistry(Env::GetOfficialEnv())
+					);
+					RowIdList objectsToRemove;
+					BOOST_FOREACH(const RegistryBase::RegistrablesVector::value_type& it, registry.getRegistrablesVector())
 					{
-						// Cleaning up the env with obsolete data
-						RegistryBase& registry(
-							dynamic_cast<DBDirectTableSync&>(*sync).getEditableRegistry(Env::GetOfficialEnv())
-							);
-						RowIdList objectsToRemove;
-						BOOST_FOREACH(const RegistryBase::RegistrablesVector::value_type& it, registry.getRegistrablesVector())
+						if(!sync->isLoaded(*it))
 						{
-							if(!sync->isLoaded(*it))
-							{
-								objectsToRemove.push_back(it->getKey());
-							}
+							objectsToRemove.push_back(it->getKey());
 						}
-						sync->removeObjects(objectsToRemove);
-
-						// Load new data
-						sync->loadCurrentData();
 					}
+					sync->removeObjects(objectsToRemove);
 
-					// Thread status update
-					ServerModule::SetCurrentThreadWaiting();
+					// Load new data
+					sync->loadCurrentData();
 				}
+
+				// Thread status update
+				ServerModule::SetCurrentThreadWaiting();
 
 				// Next load in 1 minutes
 				this_thread::sleep(DURATION_BETWEEN_CONDITONAL_SYNCS);
@@ -410,19 +406,5 @@ namespace synthese
 			{
 				localTransaction.run();
 			}
-		}
-
-
-
-		void DBModule::ActivateConditionalTablesUpdate()
-		{
-			_conditionalTablesUpdateActive = true;
-		}
-
-
-
-		void DBModule::DeactivateConditionalTablesUpdate()
-		{
-			_conditionalTablesUpdateActive = false;
 		}
 }	}

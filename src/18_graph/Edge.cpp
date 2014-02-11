@@ -41,8 +41,6 @@ using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace geos::geom;
 
-using namespace std;
-
 namespace synthese
 {
 	using namespace db;
@@ -66,7 +64,11 @@ namespace synthese
 			_previousDepartureForFineSteppingOnly(NULL),
 			_followingConnectionArrival(NULL),
 			_followingArrivalForFineSteppingOnly(NULL),
-			_next(NULL)
+			_next(NULL),
+			_departureIndex(INDICES_NUMBER),
+			_arrivalIndex(INDICES_NUMBER),
+			_serviceIndexUpdateNeeded (true),
+			_RTserviceIndexUpdateNeeded(true)
 		{
 			// Default accessibility
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
@@ -86,14 +88,22 @@ namespace synthese
 
 		bool Edge::isArrival() const
 		{
-			return _previousDepartureForFineSteppingOnly && isArrivalAllowed();
+			Edge::SubEdges edges(getSubEdges());
+			return
+				!edges.empty() &&
+				(*edges.begin())->_previousDepartureForFineSteppingOnly &&
+				isArrivalAllowed();
 		}
 
 
 
 		bool Edge::isDeparture() const
 		{
-			return _followingArrivalForFineSteppingOnly && isDepartureAllowed();
+			Edge::SubEdges edges(getSubEdges());
+			return
+				!edges.empty() &&
+				(*edges.rbegin())->_followingArrivalForFineSteppingOnly &&
+				isDepartureAllowed();
 		}
 
 
@@ -147,9 +157,7 @@ namespace synthese
 
 
 
-		ServicePointer Edge::getNextService(
-			const ChronologicalServicesCollection& collection,
-			const AccessParameters& accessParameters,
+		ServicePointer Edge::getNextService(const AccessParameters& accessParameters,
 			ptime departureMoment,
 			const ptime& maxDepartureMoment,
 			bool checkIfTheServiceIsReachable,
@@ -164,7 +172,7 @@ namespace synthese
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 						*getParentPath()->sharedServicesMutex
 			);
-			const ServiceSet& services(collection.getServices());
+			const ServiceSet& services(getParentPath()->getServices());
 
 			if(services.empty() || (!enableTheoretical && !enableRealTime))
 			{
@@ -174,12 +182,7 @@ namespace synthese
 			bool RTData(enableRealTime && departureMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
 
 			// Search schedule
-			DepartureServiceIndex::Value next(
-				getDepartureFromIndex(
-					collection,
-					RTData,
-					departureMoment.time_of_day().hours()
-			)	);
+			DepartureServiceIndex::Value next(getDepartureFromIndex(RTData, departureMoment.time_of_day().hours()));
 
 			if(	minNextServiceIndex &&
 				(*minNextServiceIndex == services.end() || services.value_comp()(*next, **minNextServiceIndex))
@@ -187,7 +190,6 @@ namespace synthese
 				next = *minNextServiceIndex;
 			}
 
-			DepartureServiceIndices::mapped_type& departureIndex(getDepartureIndex(collection));
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
 				// Look in schedule for when the line is in service
@@ -235,15 +237,11 @@ namespace synthese
 				}	}
 
 				if (departureMoment.time_of_day().hours() < 3)
-				{
 					departureMoment = ptime(departureMoment.date(), hours(3));
-				}
 				else
-				{
 					departureMoment = ptime(departureMoment.date(), hours(27));
-				}
 
-				next = departureIndex[0].get(RTData);
+				next = _departureIndex[0].get(RTData);
 			}
 
 			return ServicePointer();
@@ -251,9 +249,7 @@ namespace synthese
 
 
 
-		ServicePointer Edge::getPreviousService(
-			const ChronologicalServicesCollection& collection,
-			const AccessParameters& accessParameters,
+		ServicePointer Edge::getPreviousService(const AccessParameters& accessParameters,
 			ptime arrivalMoment,
 			const ptime& minArrivalMoment,
 			bool checkIfTheServiceIsReachable,
@@ -268,7 +264,7 @@ namespace synthese
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 						*getParentPath()->sharedServicesMutex
 			);
-			const ServiceSet& services(collection.getServices());
+			const ServiceSet& services(getParentPath()->getServices());
 
 			if(services.empty())
 			{
@@ -277,12 +273,7 @@ namespace synthese
 
 			bool RTData(enableRealTime && arrivalMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
 
-			ArrivalServiceIndex::Value previous(
-				getArrivalFromIndex(
-					collection,
-					RTData,
-					arrivalMoment.time_of_day().hours()
-			)	);
+			ArrivalServiceIndex::Value previous(getArrivalFromIndex(RTData, arrivalMoment.time_of_day().hours()));
 
 			if(	maxPreviousServiceIndex &&
 				(*maxPreviousServiceIndex == services.rend() || services.value_comp()(**maxPreviousServiceIndex, *previous))
@@ -290,7 +281,6 @@ namespace synthese
 				previous = *maxPreviousServiceIndex;
 			}
 
-			ArrivalServiceIndices::mapped_type& arrivalIndex(getArrivalIndex(collection));
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
 				if(	getParentPath()->isActive(arrivalMoment.date()))
@@ -339,7 +329,7 @@ namespace synthese
 				}	}
 
 				arrivalMoment = ptime(arrivalMoment.date(), -seconds(1));
-				previous = arrivalIndex[INDICES_NUMBER - 1].get(RTData);
+				previous = _arrivalIndex[INDICES_NUMBER - 1].get(RTData);
 			}
 
 			return ServicePointer();
@@ -348,7 +338,6 @@ namespace synthese
 
 
 		void Edge::_updateServiceIndex(
-			const ChronologicalServicesCollection& collection,
 			bool RTData
 		) const {
 
@@ -357,26 +346,22 @@ namespace synthese
 						*getParentPath()->sharedServicesMutex
 			);
 
-			// Get the indices
-			DepartureServiceIndices::mapped_type& departureIndex(getDepartureIndex(collection));
-			ArrivalServiceIndices::mapped_type& arrivalIndex(getArrivalIndex(collection));
-
-			const ServiceSet& services(collection.getServices());
+			const ServiceSet& services(getParentPath()->getServices());
 			size_t numHour;
 
 			// Reset
 			for ( numHour = 0; numHour < INDICES_NUMBER; ++numHour)
 			{
-				departureIndex[numHour].set(RTData, services.end());
-				arrivalIndex[numHour].set(RTData, services.rend());
+				_departureIndex[numHour].set(RTData, services.end());
+				_arrivalIndex[numHour].set(RTData, services.rend());
 			}
 			if(RTData)
 			{
-				_RTserviceIndexUpdateNeeded[&collection] = false;
+				_RTserviceIndexUpdateNeeded = false;
 			}
 			else
 			{
-				_serviceIndexUpdateNeeded[&collection] = false;
+				_serviceIndexUpdateNeeded = false;
 			}
 
 			if(services.empty()) return;
@@ -391,20 +376,20 @@ namespace synthese
 
 				for (numHour = 0; numHour <= endHours; ++numHour)
 				{
-					if(	departureIndex[numHour].get(RTData) == services.end() ||
-						(*departureIndex[numHour].get(RTData)) \
+					if(	_departureIndex[numHour].get(RTData) == services.end() ||
+						(*_departureIndex[numHour].get(RTData)) \
 							->getDepartureBeginScheduleToIndex(RTData, getRankInPath()) > endHour
 					){
-						departureIndex[numHour].set(RTData, it);
+						_departureIndex[numHour].set(RTData, it);
 					}
 				}
 				if (endHour < beginHour)
 				{
 					for (numHour = endHours; numHour < 24; ++numHour)
 					{
-						if(	departureIndex[numHour].get(RTData) == services.end())
+						if(	_departureIndex[numHour].get(RTData) == services.end())
 						{
-							departureIndex[numHour].set(RTData, it);
+							_departureIndex[numHour].set(RTData, it);
 						}
 					}
 				}
@@ -420,10 +405,10 @@ namespace synthese
 
 				for (numHour = 23; numHour >= beginHours; --numHour)
 				{
-					if(	arrivalIndex[numHour].get(RTData) == services.rend()	||
-						(*arrivalIndex[numHour].get(RTData))->getArrivalBeginScheduleToIndex(RTData, getRankInPath()) < beginHour
+					if(	_arrivalIndex[numHour].get(RTData) == services.rend()	||
+						(*_arrivalIndex[numHour].get(RTData))->getArrivalBeginScheduleToIndex(RTData, getRankInPath()) < beginHour
 					){
-						arrivalIndex[numHour].set(RTData, it);						
+						_arrivalIndex[numHour].set(RTData, it);						
 					}
 					if(numHour == 0) break;
 				}
@@ -431,9 +416,9 @@ namespace synthese
 				{
 					for (numHour = endHour.hours(); true; --numHour)
 					{
-						if(	arrivalIndex[numHour].get(RTData) == services.rend())
+						if(	_arrivalIndex[numHour].get(RTData) == services.rend())
 						{
-							arrivalIndex[numHour].set(RTData, it);
+							_arrivalIndex[numHour].set(RTData, it);
 						}
 						if(numHour == 0) break;
 					}
@@ -451,36 +436,33 @@ namespace synthese
 
 
 		void Edge::markServiceIndexUpdateNeeded(
-			const ChronologicalServicesCollection& collection,
 			bool RTDataOnly
 		) const {
 			if(!RTDataOnly)
 			{
-				_serviceIndexUpdateNeeded[&collection] = true;
+				_serviceIndexUpdateNeeded = true;
 			}
-			_RTserviceIndexUpdateNeeded[&collection] = true;
+			_RTserviceIndexUpdateNeeded = true;
 		}
 
 
 
 		Edge::DepartureServiceIndex::Value Edge::getDepartureFromIndex(
-			const ChronologicalServicesCollection& collection,
 			bool RTData,
 			size_t hour
 		) const {
-			if (_getServiceIndexUpdateNeeded(collection, RTData)) _updateServiceIndex(collection, RTData);
-			return getDepartureIndex(collection).at(hour).get(RTData);
+			if (_getServiceIndexUpdateNeeded(RTData)) _updateServiceIndex(RTData);
+			return  _departureIndex[hour].get(RTData);
 		}
 
 
 
 		Edge::ArrivalServiceIndex::Value Edge::getArrivalFromIndex(
-			const ChronologicalServicesCollection& collection,
 			bool RTData,
 			size_t hour
 		) const {
-			if (_getServiceIndexUpdateNeeded(collection, RTData)) _updateServiceIndex(collection, RTData);
-			return getArrivalIndex(collection).at(hour).get(RTData);
+			if (_getServiceIndexUpdateNeeded(RTData)) _updateServiceIndex(RTData);
+			return _arrivalIndex[hour].get(RTData);
 		}
 
 
@@ -494,30 +476,9 @@ namespace synthese
 
 
 
-		bool Edge::_getServiceIndexUpdateNeeded(
-			const ChronologicalServicesCollection& collection,
-			bool RTData
-		) const	{
-			if(RTData)
+		bool Edge::_getServiceIndexUpdateNeeded( bool RTData ) const
 		{
-				ServicesIndexUpdateNeeded::const_iterator it(_RTserviceIndexUpdateNeeded.find(&collection));
-				if(it == _RTserviceIndexUpdateNeeded.end())
-				{
-					_RTserviceIndexUpdateNeeded.insert(make_pair(&collection, true));
-					return true;
-		}
-				return it->second;
-			}
-			else
-			{
-				ServicesIndexUpdateNeeded::const_iterator it(_serviceIndexUpdateNeeded.find(&collection));
-				if(it == _serviceIndexUpdateNeeded.end())
-				{
-					_serviceIndexUpdateNeeded.insert(make_pair(&collection, true));
-					return true;
-				}
-				return it->second;
-			}
+			return RTData ? _RTserviceIndexUpdateNeeded : _serviceIndexUpdateNeeded;
 		}
 
 
@@ -566,35 +527,10 @@ namespace synthese
 
 
 
-		Edge::DepartureServiceIndices::mapped_type& Edge::getDepartureIndex(
-			const ChronologicalServicesCollection& collection
-		) const	{
-			DepartureServiceIndices::iterator it(_departureIndex.find(&collection));
-			if(it == _departureIndex.end())
+		Edge::SubEdges Edge::getSubEdges() const
 		{
-				it = _departureIndex.insert(
-					make_pair(
-						&collection,
-						DepartureServiceIndices::mapped_type(INDICES_NUMBER)
-				)	).first;
-		}
-			return it->second;
-		}
-
-
-
-		Edge::ArrivalServiceIndices::mapped_type& Edge::getArrivalIndex(
-			const ChronologicalServicesCollection& collection
-		) const	{
-			ArrivalServiceIndices::iterator it(_arrivalIndex.find(&collection));
-			if(it == _arrivalIndex.end())
-			{
-				it = _arrivalIndex.insert(
-					make_pair(
-						&collection,
-						ArrivalServiceIndices::mapped_type(INDICES_NUMBER)
-				)	).first;
-			}
-			return it->second;
+			SubEdges result;
+			result.push_back(const_cast<Edge*>(this));
+			return result;
 		}
 }	}

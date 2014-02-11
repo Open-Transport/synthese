@@ -81,8 +81,6 @@ namespace synthese
 
 
 
-				util::RegistryKeyType getSlaveId() const { return _slaveId; }
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
 				/// @return Generated parameters map

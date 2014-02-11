@@ -33,13 +33,14 @@
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
 #include "ContinuousServiceUpdateAction.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "DRTArea.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "HTMLForm.h"
 #include "ImportableAdmin.hpp"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternAdmin.hpp"
-#include "LineStop.h"
+#include "LineArea.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
@@ -171,10 +172,6 @@ namespace synthese
 			const Request& request
 		) const	{
 
-			const JourneyPattern* line(
-				static_cast<const JourneyPattern*>(_service->getPath())
-			);
-
 			////////////////////////////////////////////////////////////////////
 			// TAB SCHEDULES
 			if (openTabContent(stream, TAB_SCHEDULES))
@@ -208,103 +205,101 @@ namespace synthese
 
 				stream << ts.open();
 
+				const Path* line(_service->getPath());
 				size_t rank(0);
 				bool focusDone(false);
-				BOOST_FOREACH(const JourneyPattern::LineStops::value_type& edge, line->getLineStops())
+				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
 				{
 					const LineStop& lineStop(static_cast<const LineStop&>(*edge));
-					if(!lineStop.get<ScheduleInput>())
+					if(!lineStop.getScheduleInput())
 					{
 						continue;
 					}
 
-					timetableUpdateRequest.getAction()->setRank(edge->get<RankInPath>());
+					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
+					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
+
+					timetableUpdateRequest.getAction()->setRank(edge->getRankInPath());
 
 					stream << ts.row();
 
 					// Place / area
-					StopPoint* stopPoint(
-						dynamic_cast<StopPoint*>(&*lineStop.get<LineNode>())
-					);
-					DRTArea* area(
-						dynamic_cast<DRTArea*>(&*lineStop.get<LineNode>())
-					);
-					if(stopPoint)
+					if(linePhysicalStop)
 					{
 						stream << ts.col();
 						openPlaceRequest.getPage()->setConnectionPlace(
-							Env::GetOfficialEnv().getSPtr(stopPoint->getConnectionPlace())
+							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace())
 						);
 						stream <<
 							HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
-								stopPoint->getConnectionPlace()->getFullName()
+								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName()
 							);
 						stream << ts.col();
 
-						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, stopPoint->getConnectionPlace()->getPhysicalStops())
+						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStops())
 						{
-							if(ps.second == _service->getVertex(edge->get<RankInPath>()))
+							if(ps.second == _service->getVertex(edge->getRankInPath()))
 							{
 								stream << "[";
 							}
 
-							if(ps.second == stopPoint)
+							if(ps.second == linePhysicalStop->getPhysicalStop())
 							{
 								stream << "<b>";
 							}
 
 							serviceVertexUpdateAction.getAction()->setPhysicalStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(ps.second)));
-							serviceVertexUpdateAction.getAction()->setLineStopRank(lineStop.get<RankInPath>());
+							serviceVertexUpdateAction.getAction()->setLineStopRank(linePhysicalStop->getRankInPath());
 							stream << HTMLModule::getHTMLLink(
 								serviceVertexUpdateAction.getHTMLForm().getURL(),
 								ps.second->getName().empty() ? lexical_cast<string>(ps.second->getKey()) : ps.second->getName()
-							);
+								);
 							serviceVertexUpdateAction.getAction()->setPhysicalStop(boost::shared_ptr<StopPoint>());
 
-							if(ps.second == stopPoint)
+							if(ps.second == linePhysicalStop->getPhysicalStop())
 							{
 								stream << "</b>";
 							}
 
-							if(ps.second == _service->getVertex(edge->get<RankInPath>()))
+							if(ps.second == _service->getVertex(edge->getRankInPath()))
 							{
 								stream << "]";
 							}
 							stream << " ";
 						}
 					}
-					if(area)
+					if(lineArea)
 					{
 						stream << ts.col(2);
 						openAreaRequest.getPage()->setArea(
-							Env::GetOfficialEnv().getSPtr(area)
+							Env::GetOfficialEnv().getSPtr(lineArea->getArea())
 						);
 						stream <<
 							HTMLModule::getHTMLLink(
 								openAreaRequest.getURL(),
-								area->getName()
+								lineArea->getArea()->getName()
 							);
 					}
 
 					// Arrival time
 					stream << ts.col();
-					if(lineStop.get<IsArrival>())
+					if(lineStop.isArrivalAllowed())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(true);
-						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm("arrival"+ lexical_cast<string>(lineStop.get<RankInPath>())));
+						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm("arrival"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << tuForm.open();
 						stream << tuForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_TIME,
 							to_simple_string(
-								_service->getArrivalBeginScheduleToIndex(false, lineStop.get<RankInPath>())
+								_service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())
 							), string(),
 							AdminModule::CSS_TIME_INPUT
 						);
 						stream << tuForm.getSubmitButton("Change");
 						stream << tuForm.close();
 
-						HTMLForm suForm(timetableUpdateRequest.getHTMLForm("shiftarrival"+ lexical_cast<string>(lineStop.get<RankInPath>())));
+						HTMLForm suForm(timetableUpdateRequest.getHTMLForm("shiftarrival"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << suForm.open();
 						stream << suForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
@@ -320,7 +315,7 @@ namespace synthese
 							){
 								string sessionVariableRank(request.getSession()->getSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_SCHEDULE_RANK));
 								if(	!sessionVariableRank.empty() &&
-									lineStop.get<RankInPath>() >= (lexical_cast<size_t>(sessionVariableRank) + 1)
+									lineStop.getRankInPath() >= (lexical_cast<size_t>(sessionVariableRank) + 1)
 								){
 									stream << suForm.setFocus(ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY);
 									focusDone = true;
@@ -338,22 +333,22 @@ namespace synthese
 
 					// Departure time
 					stream << ts.col();
-					if(lineStop.get<IsDeparture>())
+					if(lineStop.isDepartureAllowed())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(false);
-						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm("departure"+ lexical_cast<string>(lineStop.get<RankInPath>())));
+						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm("departure"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << tuForm.open();
 						stream << tuForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_TIME,
 							to_simple_string(
-								_service->getDepartureBeginScheduleToIndex(false, lineStop.get<RankInPath>())
+								_service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())
 							), string(),
 							AdminModule::CSS_TIME_INPUT
 						);
 						stream << tuForm.getSubmitButton("Change");
 						stream << tuForm.close();
 
-						HTMLForm suForm(timetableUpdateRequest.getHTMLForm("shiftdeparture"+ lexical_cast<string>(lineStop.get<RankInPath>())));
+						HTMLForm suForm(timetableUpdateRequest.getHTMLForm("shiftdeparture"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << suForm.open();
 						stream << suForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
@@ -430,88 +425,84 @@ namespace synthese
 
 				stream << ts.open();
 
-				BOOST_FOREACH(const JourneyPattern::LineStops::value_type& edge, line->getLineStops())
+				const Path* line(_service->getPath());
+				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
 				{
 					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
 
-					// Place / area
-					StopPoint* stopPoint(
-						dynamic_cast<StopPoint*>(&*lineStop.get<LineNode>())
-					);
-					DRTArea* area(
-						dynamic_cast<DRTArea*>(&*lineStop.get<LineNode>())
-					);
+					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
+					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
 
 					stream << ts.row();
 
 					// Place / area
-					if(stopPoint)
+					if(linePhysicalStop)
 					{
 						stream << ts.col();
 						openPlaceRequest.getPage()->setConnectionPlace(
-							Env::GetOfficialEnv().getSPtr(stopPoint->getConnectionPlace())
+							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace())
 						);
 						stream <<
 							HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
-								stopPoint->getConnectionPlace()->getFullName()
+								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName()
 							);
 						stream << ts.col();
-						stream << stopPoint->getName();
+						stream << linePhysicalStop->getPhysicalStop()->getName();
 					}
-					if(area)
+					if(lineArea)
 					{
 						stream << ts.col(2);
 						openAreaRequest.getPage()->setArea(
-								Env::GetOfficialEnv().getSPtr(area)
+								Env::GetOfficialEnv().getSPtr(lineArea->getArea())
 							);
 						stream <<
 							HTMLModule::getHTMLLink(
 								openAreaRequest.getURL(),
-								area->getName()
+								lineArea->getArea()->getName()
 							);
 					}
 
 					// Arrival time
 					stream << ts.col();
-					if(lineStop.get<IsArrival>())
+					if(lineStop.isArrival())
 					{
 						stream << to_simple_string(
-							_service->getArrivalBeginScheduleToIndex(false, lineStop.get<RankInPath>())
+							_service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())
 						);
 					}
 
 					// Arrival real time
 					stream << ts.col();
-					if(lineStop.get<IsArrival>() && !(_service->getArrivalBeginScheduleToIndex(true, lineStop.get<RankInPath>()) == _service->getArrivalBeginScheduleToIndex(false, lineStop.get<RankInPath>())))
+					if(lineStop.isArrival() && !(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())))
 					{
-						time_duration delta(_service->getArrivalBeginScheduleToIndex(true, lineStop.get<RankInPath>()) - _service->getArrivalBeginScheduleToIndex(false, lineStop.get<RankInPath>()));
+						time_duration delta(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()));
 						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
 					}
 
 					// Departure time
 					stream << ts.col();
-					if(lineStop.get<IsDeparture>())
+					if(lineStop.isDeparture())
 					{
 						stream << to_simple_string(
-							_service->getDepartureBeginScheduleToIndex(false, lineStop.get<RankInPath>())
+							_service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())
 						);
 					}
 
 					// Departure real time
 					stream << ts.col();
-					if(lineStop.get<IsDeparture>() && !(_service->getDepartureBeginScheduleToIndex(true, lineStop.get<RankInPath>()) == _service->getDepartureBeginScheduleToIndex(false, lineStop.get<RankInPath>())))
+					if(lineStop.isDeparture() && !(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())))
 					{
-						time_duration delta(_service->getDepartureBeginScheduleToIndex(true, lineStop.get<RankInPath>()) - _service->getDepartureBeginScheduleToIndex(false, lineStop.get<RankInPath>()));
+						time_duration delta(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()));
 						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
 					}
-					scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.get<RankInPath>());
+					scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 					scheduleUpdateRequest.getAction()->setAtDeparture(true);
 					scheduleUpdateRequest.getAction()->setAtArrival(true);
-					vertexUpdateRequest.getAction()->setLineStopRank(lineStop.get<RankInPath>());
+					vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 
 					stream << ts.col();
-					HTMLForm f(scheduleUpdateRequest.getHTMLForm("delay"+lexical_cast<string>(lineStop.get<RankInPath>())));
+					HTMLForm f(scheduleUpdateRequest.getHTMLForm("delay"+lexical_cast<string>(lineStop.getRankInPath())));
 					stream << f.open();
 					stream << "Durée : " << f.getSelectNumberInput(ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES, 0, 500);
 					stream << "Propager : " << f.getOuiNonRadioInput(ScheduleRealTimeUpdateAction::PARAMETER_PROPAGATE_CONSTANTLY, true);
@@ -520,16 +511,16 @@ namespace synthese
 
 					// Served stop
 					stream << ts.col();
-					if(stopPoint)
+					if(linePhysicalStop)
 					{
-						HTMLForm f2(vertexUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.get<RankInPath>())));
+						HTMLForm f2(vertexUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.getRankInPath())));
 						stream << f2.open();
 						stream << "Quai : " << f.getSelectInput(
 							ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,
-							stopPoint->getConnectionPlace()->getPhysicalStopLabels(false, "Non desservi"),
+							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(false, "Non desservi"),
 							optional<RegistryKeyType>(
-								_service->getRealTimeVertex(lineStop.get<RankInPath>()) ?
-								_service->getRealTimeVertex(lineStop.get<RankInPath>())->getKey() :
+								_service->getRealTimeVertex(lineStop.getRankInPath()) ?
+								_service->getRealTimeVertex(lineStop.getRankInPath())->getKey() :
 								0
 							)
 						);

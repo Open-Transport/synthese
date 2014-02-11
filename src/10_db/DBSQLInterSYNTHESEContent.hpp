@@ -48,7 +48,6 @@ namespace synthese
 
 			virtual std::string getPerimeter() const;
 			virtual std::string getContent() const;
-			virtual boost::posix_time::ptime getExpirationTime() const;
 		};
 	}
 }

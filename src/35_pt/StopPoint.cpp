@@ -24,7 +24,6 @@
 
 #include "Crossing.h"
 #include "DataSourceLinksField.hpp"
-#include "DRTArea.hpp"
 #include "ImportableTableSync.hpp"
 #include "Registry.h"
 #include "PTModule.h"
@@ -84,16 +83,7 @@ namespace synthese
 
 		StopPoint::~StopPoint()
 		{
-			unlink();
 
-			BOOST_FOREACH(const Vertex::Edges::value_type& it, getDepartureEdges())
-			{
-				it.second->setFromVertex(NULL);
-			}
-			BOOST_FOREACH(const Vertex::Edges::value_type& it, getArrivalEdges())
-			{
-				it.second->setFromVertex(NULL);
-			}
 		}
 
 
@@ -154,12 +144,12 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 				{
-					if(!dynamic_cast<JourneyPattern*>(edge.second->getParentPath()))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
 					lines.insert(
-						dynamic_cast<JourneyPattern*>(edge.second->getParentPath())->getCommercialLine()
+						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
 					);
 			}	}
 
@@ -168,12 +158,12 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 				{
-					if(!dynamic_cast<JourneyPattern*>(edge.second->getParentPath()))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
 					lines.insert(
-						dynamic_cast<JourneyPattern*>(edge.second->getParentPath())->getCommercialLine()
+						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
 					);
 			}	}
 
@@ -196,14 +186,13 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 				{
-					JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
-					if(!jp)
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
 					journeyPatterns.insert(
 						make_pair(
-							jp,
+							static_cast<const LineStop*>(edge.second)->getLine(),
 							make_pair(false, true)
 					)	);
 			}	}
@@ -213,17 +202,16 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 				{
-					JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
-					if(!jp)
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPatternsMap::iterator it(journeyPatterns.find(jp));
+					JourneyPatternsMap::iterator it(journeyPatterns.find(static_cast<const LineStop*>(edge.second)->getLine()));
 					if(it == journeyPatterns.end())
 					{
 						journeyPatterns.insert(
 							make_pair(
-								jp,
+								static_cast<const LineStop*>(edge.second)->getLine(),
 								make_pair(true, false)
 						)	);
 					}
@@ -262,21 +250,13 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> linesPm(new ParametersMap);
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 			{
-				JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
-				if(!jp)
-				{
-					continue;
-				}
-				linesSet.insert(jp->getCommercialLine()->getShortName());
+				if(dynamic_cast<const LineStop*>(edge.second))
+					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
 			}
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 			{
-				JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
-				if(!jp)
-				{
-					continue;
-				}
-				linesSet.insert(jp->getCommercialLine()->getShortName());
+				if(dynamic_cast<const LineStop*>(edge.second))
+					linesSet.insert(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()->getShortName());
 			}
 			BOOST_FOREACH(string line, linesSet)
 			{
@@ -623,21 +603,6 @@ namespace synthese
 			if(getProjectedPoint().getRoadChunk())
 			{
 				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
-			}
-		}
-
-
-
-		void StopPoint::unlink()
-		{
-			if(getConnectionPlace())
-			{
-				const_cast<StopArea*>(getConnectionPlace())->removePhysicalStop(*this);
-			}
-			if(	getProjectedPoint().getRoadChunk() &&
-				getProjectedPoint().getRoadChunk()->getFromCrossing()
-			){
-				getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(this);
 			}
 		}
 }	}

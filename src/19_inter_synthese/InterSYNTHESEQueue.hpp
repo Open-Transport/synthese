@@ -66,21 +66,18 @@ namespace synthese
 			typedef util::Registry<InterSYNTHESEQueue>	Registry;
 
 		private:
-			bool _nonPersistent;
 		
 		public:
 			InterSYNTHESEQueue(util::RegistryKeyType id = 0);
 
 			//! @name Services
 			//@{
-				bool getNonPersistent() const { return _nonPersistent; }
 			//@}
 
 			//! @name Modifiers
 			//@{
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
-				void setNonPersistent(){ _nonPersistent = true; }
 			//@}
 		};
 }	}

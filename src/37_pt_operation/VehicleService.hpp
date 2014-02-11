@@ -71,20 +71,17 @@ namespace synthese
 
 		private:
 			Services _services;
-			mutable DriverServiceChunks _driverServiceChunks;
+			DriverServiceChunks _driverServiceChunks;
 			std::string _name;
-			boost::optional<OperationUnit&> _operationUnit;
 
 		public:
 			VehicleService(util::RegistryKeyType id=0);
-			~VehicleService();
 
 			//! @name Setters
 			//@{
 				void setServices(const Services& value){ _services = value; }
 				void setName(const std::string& value){ _name = value; }
 				void setDriverServices(const DriverServiceChunks& value){ _driverServiceChunks = value; }
-				void setOperationUnit(const boost::optional<OperationUnit&>& value){ _operationUnit = value; }
 			//@}
 
 			//! @name Getters
@@ -92,7 +89,6 @@ namespace synthese
 				const Services& getServices() const { return _services; }
 				virtual std::string getName() const { return _name; }
 				const DriverServiceChunks& getDriverServiceChunks() const { return _driverServiceChunks; }
-				const boost::optional<OperationUnit&>& getOperationUnit() const { return _operationUnit; }
 			//@}
 
 			//! @name Updaters
@@ -125,7 +121,6 @@ namespace synthese
 				);
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
-				virtual void unlink();
 
 				virtual LinkedObjectsIds getLinkedObjectsIds(
 					const Record& record

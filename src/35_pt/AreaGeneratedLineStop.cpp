@@ -22,47 +22,20 @@
 
 #include "AreaGeneratedLineStop.hpp"
 
-#include "LineStop.h"
-
 namespace synthese
 {
 	namespace pt
 	{
 		AreaGeneratedLineStop::AreaGeneratedLineStop(
-			LineStop& lineStop,
-			StopPoint& stop,
-			bool isDeparture,
-			bool isArrival
+			JourneyPattern* line /*= NULL*/,
+			std::size_t rankInPath /*= 0*/,
+			bool isDeparture /*= true*/,
+			bool isArrival /*= true*/,
+			double metricOffset /*= 0*/,
+			StopPoint* stop /*= NULL*/,
+			LineArea* lineArea
 		):	Registrable(0),
-			LinePhysicalStop(
-				lineStop.get<Line>() ? &*lineStop.get<Line>() : NULL,
-				lineStop.get<RankInPath>(),
-				lineStop.get<MetricOffsetField>(),
-				&stop,
-				&lineStop
-			),
-			_isDeparture(isDeparture),
-			_isArrival(isArrival)
+			LinePhysicalStop(0, line, rankInPath, isDeparture, isArrival, metricOffset, stop),
+			_lineArea(lineArea)
 		{}
-
-
-
-		AreaGeneratedLineStop::~AreaGeneratedLineStop()
-		{
-			unlink();
-		}
-
-
-
-		bool AreaGeneratedLineStop::isDepartureAllowed() const
-		{
-			return _isDeparture;
-		}
-
-
-
-		bool AreaGeneratedLineStop::isArrivalAllowed() const
-		{
-			return _isArrival;
-		}
 }	}

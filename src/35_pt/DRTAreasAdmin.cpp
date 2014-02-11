@@ -25,7 +25,6 @@
 #include "DRTAreasAdmin.hpp"
 
 #include "AdminParametersException.h"
-#include "LineStop.h"
 #include "ObjectCreateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
@@ -39,6 +38,7 @@
 #include "HTMLModule.h"
 #include "RemoveObjectAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
+#include "LineArea.hpp"
 
 using namespace std;
 using namespace boost;
@@ -154,14 +154,14 @@ namespace synthese
 				stream << t.col();
 
 				bool hasLine = false;
-				BOOST_FOREACH(LineStop::Registry::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineStop>())
+				BOOST_FOREACH(Registry<LineStop>::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineStop>())
 				{
-					if(	!lineArea.second->get<LineNode>() ||
-						!dynamic_cast<DRTArea*>(&*lineArea.second->get<LineNode>())
-					){
+					if(!dynamic_cast<LineArea*>(lineArea.second.get()))
+					{
 						continue;
 					}
-					if(lineArea.second->get<LineNode>()->getKey() == it.first && lineArea.second->get<Line>())
+					LineArea& la(static_cast<LineArea&>(*lineArea.second));
+					if(la.getArea()->getKey() == it.first && la.getLine())
 					{
 						hasLine = true;
 						break;

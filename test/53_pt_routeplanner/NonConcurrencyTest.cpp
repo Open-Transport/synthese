@@ -25,14 +25,15 @@
 #include "AreaGeneratedLineStop.hpp"
 #include "CommercialLine.h"
 #include "ContinuousService.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "DRTArea.hpp"
 #include "DynamicRequest.h"
 #include "FreeDRTArea.hpp"
 #include "GeographyModule.h"
 #include "HTTPRequest.hpp"
 #include "Hub.h"
-#include "LineStop.h"
 #include "JourneyPattern.hpp"
+#include "LineArea.hpp"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
 #include "PTTimeSlotRoutePlanner.h"
@@ -47,8 +48,6 @@
 #include <boost/test/auto_unit_test.hpp>
 
 #define NB_STOP 2
-
-using namespace boost::posix_time;
 
 using namespace synthese;
 using namespace synthese::algorithm;
@@ -176,10 +175,9 @@ public:
 class TestJourney
 {
 private:
-	vector<boost::shared_ptr<LineStop> > _designatedLinePhysicalStops;
+	vector<boost::shared_ptr<DesignatedLinePhysicalStop> > _designatedLinePhysicalStops;
 	vector<boost::shared_ptr<StopPoint> > _stopPoints;
 	size_t _numberOfStops;
-	Env _env;
 public:
 	TestJourney(JourneyPattern &jp, TestAreaMap &testAreaMap):
 		_stopPoints(testAreaMap.getStopPoints()),
@@ -188,13 +186,13 @@ public:
 		for(size_t i=0; i< _numberOfStops; ++i)
 		{
 			_designatedLinePhysicalStops.push_back(
-				boost::shared_ptr<LineStop>(
-				new LineStop(i, &jp, i,
+				boost::shared_ptr<DesignatedLinePhysicalStop>(
+				new DesignatedLinePhysicalStop(i, &jp, i,
 				(i < _numberOfStops - 1 ? true : false), // Departure
 				(i > 0 ? true : false),  // Arrival
-				0, *_stopPoints[i]))
+				0, &*_stopPoints[i]))
 			);
-			_designatedLinePhysicalStops[i]->link(_env);;
+			jp.addEdge(*(_designatedLinePhysicalStops[i].get()));
 		}
 	}
 
@@ -226,10 +224,10 @@ void checkJourneyEquals(size_t i, PTRoutePlannerResult::Journeys& journeys,
 	cout << "CheckJourneyEquals " << i << endl;
 	BOOST_CHECK_EQUAL(line->getCommercialLine()->getShortName(), expectedLine);
 
-	BOOST_CHECK_EQUAL(to_iso_extended_string(journey.getFirstDepartureTime()), to_iso_extended_string(expectedTime));
+	BOOST_CHECK(journey.getFirstDepartureTime() == expectedTime);
 	// There is a single leg
 	BOOST_CHECK_EQUAL(jl.size(), 1);
-	BOOST_CHECK_EQUAL(to_simple_string(leg.getServiceRange()), to_simple_string(expectedDuration));
+	BOOST_CHECK(leg.getServiceRange() == expectedDuration);
 	BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getKey(), 0);
 	
 	/// @FIXME In continuous case the ArrivalEdge is correct but not its key

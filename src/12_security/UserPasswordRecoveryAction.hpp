@@ -93,7 +93,7 @@ namespace synthese
 			 *	@return true if the e-mail is sent
 			 *	@date 2013
 			 */
-			bool sendPasswordRecoveryEMail(const security::User& user, const std::string senderEMail, const std::string senderName) const;
+			bool sendPasswordRecoveryEMail(const security::User& user, const std::string sender) const;
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

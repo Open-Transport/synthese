@@ -60,10 +60,16 @@ namespace synthese
 			// Object
 			try
 			{
-				_object = DBModule::GetObject(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					Env::GetOfficialEnv()
-				);
+				boost::shared_ptr<const Registrable> object(
+					DBModule::GetObject(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+						Env::GetOfficialEnv()
+				)	);
+				if(!dynamic_cast<const ObjectBase*>(object.get()))
+				{
+					throw RequestException("Bad object type");
+				}
+				_object = dynamic_pointer_cast<const ObjectBase, const Registrable>(object);
 			}
 			catch(ObjectNotFoundException<ObjectBase>& e)
 			{

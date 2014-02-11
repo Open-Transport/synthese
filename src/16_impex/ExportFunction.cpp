@@ -22,11 +22,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ExportFunction.hpp"
-
 #include "RequestException.h"
 #include "Request.h"
-#include "Export.hpp"
+#include "ExportFunction.hpp"
 #include "Exporter.hpp"
 #include "FileFormat.h"
 
@@ -49,28 +47,21 @@ namespace synthese
 
 		ParametersMap ExportFunction::_getParametersMap() const
 		{
-			return _pm;
+			ParametersMap map(_exporter.get() ? _exporter->getParametersMap() : ParametersMap());
+			if(_exporter.get())
+			{
+				map.insert(PARAMETER_FILE_FORMAT, _exporter->getFileFormatKey());
+			}
+			return map;
 		}
 
 
 
 		void ExportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Designated export
-			RegistryKeyType id(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0));
-			if(decodeTableId(id) == Export::CLASS_NUMBER)
-			{
-				_export = Env::GetOfficialEnv().getEditable<Export>(id);
-			}
-			else
-			{
-				// Case generated export
-				string fileFormatKey(map.get<string>(PARAMETER_FILE_FORMAT));
-				_export.reset(new Export);
-				_export->set<FileFormatKey>(fileFormatKey);
-			}
-			_exporter = _export->getExporter();
-
+			string fileFormatKey(map.get<string>(PARAMETER_FILE_FORMAT));
+			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(fileFormatKey));
+			_exporter = fileFormat->getExporter();
 			_exporter->setFromParametersMap(map);
 		}
 
@@ -97,7 +88,7 @@ namespace synthese
 
 		std::string ExportFunction::getOutputMimeType() const
 		{
-			return _export.get() ? _export->getExporter()->getOutputMimeType() : "text/plain";
+			return _exporter.get() ? _exporter->getOutputMimeType() : "text/plain";
 		}
 	}
 }

@@ -44,6 +44,7 @@ namespace synthese
 	{
 		class LineStop;
 		class StopPoint;
+		class DesignatedLinePhysicalStop;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : LineStopUpdateAction.
@@ -83,8 +84,8 @@ namespace synthese
 			boost::optional<bool> _allowedInternal;
 			boost::optional<bool> _withSchedules;
 			boost::optional<boost::shared_ptr<geos::geom::LineString> > _geometry;
-			LineStop* _nextLineStop;
-			LineStop* _prevLineStop;
+			DesignatedLinePhysicalStop* _nextLineStop;
+			DesignatedLinePhysicalStop* _prevLineStop;
 			bool _readLengthFromGeometry;
 			boost::optional<bool> _reservationNeeded;
 			bool _clearGeom;

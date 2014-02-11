@@ -31,6 +31,7 @@
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
+#include "LineArea.hpp"
 #include "DRTArea.hpp"
 #include "CityTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
@@ -271,9 +272,30 @@ namespace synthese
 			}
 
 			// Link DRTAreas physical stops
-			BOOST_FOREACH(const LineStop::Registry::value_type& itls, _env.getRegistry<LineStop>())
+			BOOST_FOREACH(const Registry<LineStop>::value_type& itls, _env.getRegistry<LineStop>())
 			{
-				itls.second->link(_env); // Todo : useful ?
+				if(dynamic_cast<LineArea*>(itls.second.get()))
+				{
+					LineArea* la = static_cast<LineArea*>(itls.second.get());
+					BOOST_FOREACH(const Stops::Type::value_type stopArea, la->getArea()->get<Stops>())
+					{
+						StopPointTableSync::Search(_env, stopArea->getKey());
+						stopArea->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+					}
+
+					if(la->isArrivalAllowed() && !la->getInternalService())
+					{
+						la->addAllStops(true);
+					}
+					if(la->isDepartureAllowed())
+					{
+						la->addAllStops(false);
+					}
+					if(la->isArrivalAllowed() && la->getInternalService())
+					{
+						la->addAllStops(true);
+					}
+				}
 			}
 
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env.getRegistry<JourneyPattern>())
@@ -596,13 +618,13 @@ namespace synthese
 
 				os << "<publishedName>";
 				{
-					const StopPoint* ps(static_cast<const StopPoint*>(line->getOrigin()));
+					const StopPoint* ps(line->getOrigin());
 					if (ps && ps->getConnectionPlace () && ps->getConnectionPlace ()->getCity ())
 						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
 				os << " -&gt; ";
 				{
-					const StopPoint* ps(static_cast<const StopPoint*>(line->getDestination()));
+					const StopPoint* ps(line->getDestination());
 					if (ps && ps->getConnectionPlace () && ps->getConnectionPlace ()->getCity ())
 						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
@@ -638,14 +660,12 @@ namespace synthese
 			// --------------------------------------------------- StopPoint
 			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 			{
-				StopPoint* ps(
-					dynamic_cast<StopPoint*>(
-						&*lineStop.second->get<LineNode>()
-				)	);
-				if(!ps)
+				if(!dynamic_cast<DesignatedLinePhysicalStop*>(lineStop.second.get()))
 				{
 					continue;
 				}
+				const DesignatedLinePhysicalStop& ls(static_cast<DesignatedLinePhysicalStop&>(*lineStop.second));
+				const StopPoint* ps = static_cast<const StopPoint*>(ls.getFromVertex());
 
 				boost::shared_ptr<Point> wgs84ps;
 				if(ps->hasGeometry())
@@ -655,7 +675,7 @@ namespace synthese
 
 				os << fixed;
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
-				os << "<objectId>" << TridentId (peerid, "StopPoint", *lineStop.second) << "</objectId>" << "\n";
+				os << "<objectId>" << TridentId (peerid, "StopPoint", ls) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySources() << "</creatorId>" << "\n";
 				os << "<longitude>" << (ps->hasGeometry() ? wgs84ps->getX() :0) << "</longitude>" << "\n";
 				os << "<latitude>" << (ps->hasGeometry() ? wgs84ps->getY() : 0) << "</latitude>" << "\n";
@@ -785,30 +805,30 @@ namespace synthese
 					os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
 					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
-					if (ls->get<RankInPath>() > 0 && ls->get<IsArrival>())
-						os << "<arrivalTime>" << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>())))
+					if (ls->getRankInPath() > 0 && ls->isArrival())
+						os << "<arrivalTime>" << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath())))
 						<< "</arrivalTime>" << "\n";
 
 					os	<< "<departureTime>";
-					if (ls->get<RankInPath>()+1 != linestops.size() && ls->get<IsDeparture>())
+					if (ls->getRankInPath()+1 != linestops.size() && ls->isDeparture())
 					{
-						os << ToXsdTime (Service::GetTimeOfDay(srv->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>())));
+						os << ToXsdTime (Service::GetTimeOfDay(srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath())));
 					}
 					else
 					{
-						os << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>())));
+						os << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath())));
 					}
 					os	<< "</departureTime>" << "\n";
 
-					if(!ls->get<IsDeparture>() && !ls->get<IsArrival>())
+					if(!ls->isDeparture() && !ls->isArrival())
 					{
 						os << "<boardingAlightingPossibility>NeitherBoardOrAlight</boardingAlightingPossibility>\n";
 					}
-					else if(!ls->get<IsDeparture>())
+					else if(!ls->isDeparture())
 					{
 						os << "<boardingAlightingPossibility>AlightOnly</boardingAlightingPossibility>\n";
 					}
-					else if(!ls->get<IsArrival>())
+					else if(!ls->isArrival())
 					{
 						os << "<boardingAlightingPossibility>BoardOnly</boardingAlightingPossibility>\n";
 					}
@@ -908,7 +928,7 @@ namespace synthese
 						os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
 						os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
-						const time_duration& schedule((ls->get<RankInPath>() > 0 && ls->get<IsArrival>()) ? srv->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>()) : srv->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>()));
+						const time_duration& schedule((ls->getRankInPath() > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()) : srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
 						os << "<elapseDuration>" << ToXsdDuration(schedule - srv->getDepartureBeginScheduleToIndex(false, 0)) << "</elapseDuration>" << "\n";
 						os << "<headwayFrequency>" << ToXsdDuration(srv->getMaxWaitingTime()) << "</headwayFrequency>" << "\n";
 
@@ -2235,16 +2255,6 @@ namespace synthese
 			ss << peer << ":" << clazz << ":" << obj.getKey();
 			return ss.str ();
 		}
-
-
-
-		TridentFileFormat::Exporter_::Exporter_(
-			const impex::Export& export_
-		):	OneFileExporter<TridentFileFormat>(export_),
-			_withTisseoExtension(false)
-		{}
-
-
 
 		string ToXsdDaysDuration (date_duration daysDelay)
 		{

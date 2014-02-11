@@ -82,13 +82,11 @@ namespace synthese
 			static const std::string ROOT_USER;
 
 			static const std::string MODULE_PARAMETER_SENDER_EMAIL;
-			static const std::string MODULE_PARAMETER_SENDER_NAME;
 
 		private:
 			static boost::shared_ptr<Profile>	_rootProfile;
 			static boost::shared_ptr<User>		_rootUser;
-			static std::string			_senderEMail;
-			static std::string			_senderName;
+			static std::string					_senderEMail;
 
 		public:
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
@@ -99,7 +97,6 @@ namespace synthese
 			static Labels getUserLabels(bool withAll=false, int first=0, int last=-1);
 			static FactoryKeysLabels getRightLabels(bool withAll=false);
 			static std::string getSenderEMail();
-			static std::string getSenderName();
 
 			/** List of the sub profiles of the current one.
 					@return std::vector<Profile*> List of the sub profiles of the current one.

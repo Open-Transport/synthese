@@ -43,8 +43,6 @@ namespace synthese
 	namespace impex
 	{
 		const string FileFormatsService::TAG_FORMAT = "format";
-		const string FileFormatsService::PARAMETER_WITH_EXPORTS = "with_exports";
-		const string FileFormatsService::PARAMETER_WITH_IMPORTS = "with_imports";
 		
 
 
@@ -58,8 +56,6 @@ namespace synthese
 
 		void FileFormatsService::_setFromParametersMap(const ParametersMap& map)
 		{
-			_withImports = map.getDefault<bool>(PARAMETER_WITH_IMPORTS, true);
-			_withExports = map.getDefault<bool>(PARAMETER_WITH_EXPORTS, true);
 		}
 
 
@@ -72,13 +68,6 @@ namespace synthese
 			
 			BOOST_FOREACH(boost::shared_ptr<FileFormat> format, Factory<FileFormat>::GetNewCollection())
 			{
-				// Apply filters
-				if(	(!_withExports && !format->canExport()) ||
-					(!_withImports && !format->canImport())
-				){
-					continue;
-				}
-
 				boost::shared_ptr<ParametersMap> formatPM(new ParametersMap);
 				format->toParametersMap(*formatPM);
 				map.insert(TAG_FORMAT, formatPM);
@@ -101,11 +90,4 @@ namespace synthese
 		{
 			return "text/html";
 		}
-
-
-
-		FileFormatsService::FileFormatsService():
-			_withImports(true),
-			_withExports(true)
-		{}
 }	}

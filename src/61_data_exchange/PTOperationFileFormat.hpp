@@ -31,11 +31,10 @@ namespace synthese
 {
 	namespace pt_operation
 	{
-		class DriverService;
-		class DriverServiceTableSync;
-		class OperationUnit;
 		class VehicleService;
 		class VehicleServiceTableSync;
+		class DriverAllocation;
+		class DriverAllocationTableSync;
 	}
 
 	namespace data_exchange
@@ -61,16 +60,7 @@ namespace synthese
 
 			pt_operation::VehicleService* _createOrUpdateVehicleService(
 				impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync>& vehicleServices,
-				const std::string& id,
-				boost::optional<boost::optional<pt_operation::OperationUnit&> > operationUnit
-			) const;
-
-
-
-			pt_operation::DriverService* _createOrUpdateDriverService(
-				impex::ImportableTableSync::ObjectBySource<pt_operation::DriverServiceTableSync>& driverServices,
-				const std::string& id,
-				boost::optional<boost::optional<pt_operation::OperationUnit&> > operationUnit
+				const std::string& id
 			) const;
 		};
 	}

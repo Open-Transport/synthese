@@ -370,7 +370,7 @@ namespace synthese
 					string vehicleNumber(nparcNode.getText());
 					VehicleModule::GetCurrentVehiclePosition().setVehicleNumber(vehicleNumber);
 					Vehicle* vehicle(VehicleModule::GetCurrentVehiclePosition().getVehicle());
-					if(!vehicle || (vehicle->get<Number>() != vehicleNumber) )
+					if(!vehicle || (vehicle->getNumber() != vehicleNumber) )
 					{
 						// Initial vehicle setting or
 						// we are now running in a different vehicle

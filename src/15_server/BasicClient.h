@@ -3,10 +3,7 @@
 
 #include <string>
 #include <map>
-#include <boost/asio.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/optional.hpp>
+
 
 namespace synthese
 {
@@ -17,8 +14,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Simple HTTP client.
 		/// @param m15
-		class BasicClient:
-			private boost::noncopyable
+		class BasicClient
 		{
 		private:
 
@@ -34,14 +30,6 @@ namespace synthese
 				const std::string& postData,
 				const std::string& contentType
 			) const;
-			void set_result(boost::optional<boost::system::error_code>* a,
-				const boost::system::error_code b
-			) const;
-			void read_until_with_timeout(boost::asio::ip::tcp::socket& sock,
-				boost::asio::streambuf &buffer,
-				const std::string &delim,
-				const boost::posix_time::time_duration &expiry_time) const;
-			void checkDeadline();
 
 		public:
 

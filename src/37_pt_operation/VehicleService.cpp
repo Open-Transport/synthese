@@ -22,10 +22,8 @@
 
 #include "VehicleService.hpp"
 
-#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 #include "NumericField.hpp"
-#include "OperationUnitTableSync.hpp"
 #include "ScheduledService.h"
 #include "StringField.hpp"
 #include "VehicleServiceTableSync.hpp"
@@ -125,46 +123,12 @@ namespace synthese
 			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
 			std::string prefix /*= std::string() */
 		) const	{
-
-			// Id
 			map.insert(Key::FIELD.name, getKey());
-
-			// Name		
-			map.insert(VehicleServiceTableSync::COL_NAME, getName());
+			map.insert(Name::FIELD.name, getName());
 
 			// Services
-			map.insert(
-				VehicleServiceTableSync::COL_SERVICES,
-				VehicleServiceTableSync::SerializeServices(getServices())
-			);
-			
-			// Source links
-			map.insert(
-				VehicleServiceTableSync::COL_DATASOURCE_LINKS,
-				impex::DataSourceLinks::Serialize(
-					getDataSourceLinks()
-			)	);
-
-			// Dates
-			stringstream datesStr;
-			serialize(datesStr);
-			map.insert(
-				VehicleServiceTableSync::COL_DATES,
-				datesStr.str()
-			);
-
-			// Unit
-			map.insert(
-				VehicleServiceTableSync::COL_OPERATION_UNIT_ID,
-				(	getOperationUnit() ?
-					getOperationUnit()->getKey() :
-					0
-			)	);
-
-			// Additional items
 			if(withAdditionalParameters)
 			{
-				// Services detail
 				BOOST_FOREACH(const Services::value_type& service, _services)
 				{
 					boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
@@ -241,28 +205,6 @@ namespace synthese
 				}
 			}
 
-			// Operation unit
-			if(record.isDefined(OperationUnit::FIELD.name))
-			{
-				optional<OperationUnit&> value;
-				RegistryKeyType unitId(record.getDefault<RegistryKeyType>(OperationUnit::FIELD.name, 0));
-				if(unitId) try
-				{
-					value = *OperationUnitTableSync::GetEditable(unitId, env);
-				}
-				catch(ObjectNotFoundException<OperationUnit>&)
-				{
-					Log::GetInstance().warn("Bad operation unit "+ lexical_cast<string>(unitId) +" in driver service "+ lexical_cast<string>(getKey()));
-				}
-				if(	(value || getOperationUnit()) &&
-					(!value || !getOperationUnit() || &*value!=&*getOperationUnit())
-				){
-					result = true;
-					setOperationUnit(value);
-				}
-			}
-
-
 			return result;
 		}
 
@@ -275,18 +217,9 @@ namespace synthese
 
 
 
-		void VehicleService::unlink()
-		{
-
-		}
-
-
-
 		synthese::LinkedObjectsIds VehicleService::getLinkedObjectsIds( const Record& record ) const
 		{
 			LinkedObjectsIds result;
-
-			// Source links
 			if(record.isDefined(VehicleServiceTableSync::COL_DATASOURCE_LINKS))
 			{
 				Env env;
@@ -300,24 +233,7 @@ namespace synthese
 					result.push_back(item.first->getKey());
 				}
 			}
-
-			// Services
-			// TODO
-
-			// Operation unit
-			RegistryKeyType unitId(record.getDefault<RegistryKeyType>(OperationUnit::FIELD.name, 0));
-			if(unitId)
-			{
-				result.push_back(unitId);
-			}
 			return result;
-		}
-
-
-
-		VehicleService::~VehicleService()
-		{
-			unlink();
 		}
 
 
@@ -349,9 +265,6 @@ namespace synthese
 			{
 				return t1 < t2;
 			}
-
-			recursive_mutex::scoped_lock lock1(s1.getSchedulesMutex());
-			recursive_mutex::scoped_lock lock2(s2.getSchedulesMutex());
 
 			const time_duration& at1(s1.getLastArrivalSchedule(false));
 			const time_duration& at2(s2.getLastArrivalSchedule(false));

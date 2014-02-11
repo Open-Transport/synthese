@@ -47,7 +47,6 @@ namespace synthese
 		FIELD_STRING(ServerAddress)
 		FIELD_STRING(ServerPort)
 		FIELD_PTIME(LastActivityReport)
-		FIELD_ID(PassiveModeImportId)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -56,8 +55,7 @@ namespace synthese
 			FIELD(ServerPort),
 			FIELD(LastActivityReport),
 			FIELD(InterSYNTHESEConfig),
-			FIELD(Active),
-			FIELD(PassiveModeImportId)
+			FIELD(Active)
 		> InterSYNTHESESlaveRecord;
 
 
@@ -91,6 +89,7 @@ namespace synthese
 			mutable Queue _queue;
 			mutable QueueRange _lastSentRange;
 			mutable boost::recursive_mutex _queueMutex;
+			mutable boost::recursive_mutex _slaveChangeMutex;
 
 			// Keep the previous config at unlink time and use it at link
 			// time only if it has changed. Don't forget to unlink it in
@@ -115,9 +114,7 @@ namespace synthese
 				void enqueue(
 					const std::string& interSYNTHESEType,
 					const std::string& parameter,
-					const boost::posix_time::ptime& expirationTime,
 					boost::optional<db::DBTransaction&> transaction,
-					bool nonPersistent,
 					bool force = false
 				) const;
 				void queue(
@@ -151,11 +148,6 @@ namespace synthese
 				void setLastSentRange(const QueueRange& value) const { _lastSentRange = value; }
 
 				void clearLastSentRange() const;
-				void clearUselessQueueEntries(db::DBTransaction& transaction) const;
-				void sendToSlave(
-					std::ostream& stream,
-					const QueueRange& range
-				) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();

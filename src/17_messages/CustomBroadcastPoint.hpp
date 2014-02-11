@@ -81,9 +81,6 @@ namespace synthese
 			) const;
 
 			virtual void getBrodcastPoints(BroadcastPoints& result) const;
-
-			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
-			virtual void unlink();
 		};
 	}
 }

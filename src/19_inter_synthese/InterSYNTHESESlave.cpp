@@ -28,7 +28,7 @@
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveTableSync.hpp"
-#include "InterSYNTHESEPacket.hpp"
+#include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 #include "ServerModule.h"
 
@@ -49,7 +49,6 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ServerAddress, "address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServerPort, "port", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(LastActivityReport, "last_activity_report", SQL_DATETIME)
-	FIELD_DEFINITION_OF_TYPE(PassiveModeImportId, "passive_mode_import_id", SQL_INTEGER)
 	
 	namespace inter_synthese
 	{
@@ -69,8 +68,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(ServerPort, "8080"),
 					FIELD_VALUE_CONSTRUCTOR(LastActivityReport, posix_time::not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
-					FIELD_VALUE_CONSTRUCTOR(Active, false),
-					FIELD_VALUE_CONSTRUCTOR(PassiveModeImportId, 0)
+					FIELD_VALUE_CONSTRUCTOR(Active, false)
 			)	),
 			_lastSentRange(make_pair(_queue.end(), _queue.end())),
 			_previousConfig(NULL)
@@ -111,18 +109,12 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Adds an item in the synchronization queue.
-		/// @param persistent Store the item in the database to prevent data loss in case of reboot
 		void InterSYNTHESESlave::enqueue(
 			const std::string& interSYNTHESEType,
 			const std::string& parameter,
-			const boost::posix_time::ptime& expirationTime,
 			boost::optional<db::DBTransaction&> transaction,
-			bool nonPersistent,
 			bool force
 		) const	{
-
 			ptime now(microsec_clock::local_time());
 
 			if(	!force && isObsolete()
@@ -130,42 +122,12 @@ namespace synthese
 				return;
 			}
 
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			/*boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lock.owns_lock() && tries > 0)
-			{
-				lock.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::enqueue locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lock.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::enqueue locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}*/
-
-			boost::shared_ptr<InterSYNTHESEQueue> q(new InterSYNTHESEQueue);
-			q->set<InterSYNTHESESlave>(*const_cast<InterSYNTHESESlave*>(this));
-			q->set<RequestTime>(now);
-			q->set<SyncType>(interSYNTHESEType);
-			q->set<SyncContent>(parameter);
-			q->set<ExpirationTime>(expirationTime);
-
-			if(nonPersistent)
-			{
-				// In non persistent mode, the object is only handled by the environment after explicit link method call
-				q->setKey(InterSYNTHESEQueueTableSync::getId());
-				q->setNonPersistent();
-				Env::GetOfficialEnv().add(q);
-				q->link(Env::GetOfficialEnv());
-			}
-			else
-			{
-				// In persistent mode, the object is stored then the standard environment load process will run
-				InterSYNTHESEQueueTableSync::Save(q.get(), transaction);
-			}
+			InterSYNTHESEQueue q;
+			q.set<InterSYNTHESESlave>(*const_cast<InterSYNTHESESlave*>(this));
+			q.set<RequestTime>(now);
+			q.set<SyncType>(interSYNTHESEType);
+			q.set<SyncContent>(parameter);
+			InterSYNTHESEQueueTableSync::Save(&q, transaction);
 		}
 
 
@@ -237,7 +199,7 @@ namespace synthese
 				// Clean the obsolete queue items
 				DBTransaction deleteTransaction;
 				{
-					// Do no run transaction with the lock or we will deadlock if
+					// Do no run transation with the lock or we will deadlock if
 					// a transaction triggers a real time update
 					recursive_mutex::scoped_lock lock(_queueMutex);
 					BOOST_FOREACH(const Queue::value_type& it, _queue)
@@ -326,22 +288,7 @@ namespace synthese
 		// rewritten by the DB stack.
 		void InterSYNTHESESlave::markAsUpToDate()
 		{
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			/*boost::unique_lock<shared_mutex> lockBase(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lockBase.owns_lock() && tries > 0)
-			{
-				lockBase.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::markAsUpToDate locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lockBase.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::markAsUpToDate locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}*/
-
+			recursive_mutex::scoped_lock lock(_slaveChangeMutex);
 			ptime now(second_clock::local_time());
 			set<LastActivityReport>(now);
 			InterSYNTHESESlaveTableSync::Save(this);
@@ -351,11 +298,11 @@ namespace synthese
 
 		bool InterSYNTHESESlave::isObsolete() const
 		{
-			optional<InterSYNTHESEConfig&> config(get<InterSYNTHESEConfig>());
+			recursive_mutex::scoped_lock lock(_slaveChangeMutex);
 
 			// In multimaster mode can not handle obsolescence after the first sync
-			if(	config &&
-				config->get<Multimaster>()
+			if(	get<InterSYNTHESEConfig>() &&
+				get<InterSYNTHESEConfig>()->get<Multimaster>()
 			){
 				return get<LastActivityReport>().is_not_a_date_time();
 			}
@@ -363,8 +310,8 @@ namespace synthese
 			ptime now(second_clock::local_time());
 			return
 				get<LastActivityReport>().is_not_a_date_time() ||
-				!config ||
-				now - get<LastActivityReport>() >= config->get<LinkBreakMinutes>()
+				!get<InterSYNTHESEConfig>() ||
+				now - get<LastActivityReport>() >= get<InterSYNTHESEConfig>()->get<LinkBreakMinutes>()
 			;
 		}
 
@@ -372,55 +319,17 @@ namespace synthese
 
 		void InterSYNTHESESlave::clearLastSentRange() const
 		{
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			/*boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lock.owns_lock() && tries > 0)
-			{
-				lock.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lock.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}*/
-
 			DBTransaction transaction;
 			{
-				// Do no run transaction with the lock or we will deadlock if
+				// Do no run transation with the lock or we will deadlock if
 				// a transaction triggers a real time update
 				recursive_mutex::scoped_lock lock(_queueMutex);
 
 				for(Queue::iterator it(_lastSentRange.first);
 					it != _queue.end();
 					++it
-				){
-					try
-					{
-						boost::shared_ptr<InterSYNTHESEQueue> q(
-							Env::GetOfficialEnv().getEditable<InterSYNTHESEQueue>(it->first)
-						);
-						if(q->getNonPersistent())
-						{
-							// The item was only stored in the environment : do a manually unload
-							q->unlink();
-
-							// The shared pointer will be destroyed just quiting the local scope since it was only linked in the environment
-							Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(it->first);
-						}
-						else
-						{
-							// The item was stored in the database : simply remove it, the standard unload process will run
-							DBModule::GetDB()->deleteStmt(it->first, transaction);
-						}
-					}
-					catch(ObjectNotFoundException<InterSYNTHESEQueue>&)
-					{
-					}
-
+					){
+					DBModule::GetDB()->deleteStmt(it->first, transaction);
 					// Exit on last item
 					if(it == _lastSentRange.second)
 					{
@@ -431,68 +340,6 @@ namespace synthese
 				_lastSentRange = make_pair(_queue.end(), _queue.end());
 			}
 			transaction.run();
-		}
-
-
-
-		void InterSYNTHESESlave::clearUselessQueueEntries(DBTransaction& transaction) const
-		{
-			ptime now(second_clock::local_time());
-
-			// Do no run transation with the lock or we will deadlock if
-			// a transaction triggers a real time update
-			recursive_mutex::scoped_lock lock(_queueMutex);
-
-			BOOST_FOREACH(const Queue::value_type& it, _queue)
-			{
-				if(	isObsolete() || (!it.second->get<ExpirationTime>().is_not_a_date_time() && it.second->get<ExpirationTime>() < now))
-				{
-					InterSYNTHESEQueue* q(
-						it.second
-					);
-					if(q->getNonPersistent())
-					{
-						// The item was only stored in the environment : do a manually unload
-						q->unlink();
-
-						// The shared pointer will be destroyed just quiting the local scope since it was only linked in the environment
-						Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(it.first);
-					}
-					else
-					{
-						// The item was stored in the database : simply remove it, the standard unload process will run
-						DBModule::GetDB()->deleteStmt(it.first, transaction);
-					}
-				}
-			}
-		}
-
-
-
-		void InterSYNTHESESlave::sendToSlave(
-			std::ostream& stream,
-			const QueueRange& range
-		) const	{
-			recursive_mutex::scoped_lock lock(_queueMutex);
-
-			for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _queue.end(); ++it)
-			{
-				stream <<
-					it->second->get<Key>() << InterSYNTHESEPacket::FIELDS_SEPARATOR <<
-					it->second->get<SyncType>() << InterSYNTHESEPacket::FIELDS_SEPARATOR <<
-					it->second->get<SyncContent>().size() << InterSYNTHESEPacket::FIELDS_SEPARATOR <<
-					it->second->get<SyncContent>() <<
-					InterSYNTHESEPacket::SYNCS_SEPARATOR;
-				;
-
-				// Exit on last item
-				if(it == range.second)
-				{
-					break;
-				}
-			}
-
-			setLastSentRange(range);
 		}
 }	}
 
