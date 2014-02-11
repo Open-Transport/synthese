@@ -56,7 +56,7 @@ def run(env, args):
 
 
     package_relative_dir = os.sep.join([
-        distro_name, env.mode, svn_info.branch, revision_path])
+        env.platform, env.mode, git_info.branch, revision_path])
 
     package_dir = join(config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):

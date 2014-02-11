@@ -483,6 +483,56 @@ class SVNInfo(object):
             self._fetch_svn_log()
         return self._last_msg
 
+class GITInfo(object):
+    '''Class to retrieve metadata from a git repository'''
+    def __init__(self, repo_path):
+        self.repo_path = repo_path
+
+        self._branch = None
+        self._version = None
+        self._last_msg = None
+
+    def _fetch_svn_info(self):
+        svn_info_output = subprocess.Popen(
+            ['svn', 'info', '--xml'],
+            cwd=self.repo_path,
+            stdout=subprocess.PIPE).communicate()[0]
+
+        info_tree = ElementTree.XML(svn_info_output)
+        self._branch = info_tree.find('entry/url').text.split('/')[-1]
+        self._version = info_tree.find('entry/commit').attrib['revision']
+
+    @property
+    def branch(self):
+        if not self._branch:
+            self._branch = subprocess.Popen(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                cwd=self.repo_path,
+                stdout=subprocess.PIPE).communicate()[0].strip('\n')
+        return self._branch
+
+    @property
+    def version(self):
+        if not self._version:
+            self._version = subprocess.Popen(
+                ['git', 'log', '-1', '--format=%h'],
+                cwd=self.repo_path,
+                stdout=subprocess.PIPE).communicate()[0].strip('\n')
+        return self._version
+
+    def _fetch_svn_log(self):
+        if not self._last_msg:
+            self._version = subprocess.Popen(
+                ['git', 'log', '-1', '--format=%s'],
+                cwd=self.repo_path,
+                stdout=subprocess.PIPE).communicate()[0].strip('\n')
+        return self._last_msg
+
+    @property
+    def last_msg(self):
+        if not self._last_msg:
+            self._fetch_svn_log()
+        return self._last_msg
 
         self._branch = self._get_branch_from_env()
         self._version = None
