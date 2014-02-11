@@ -134,21 +134,16 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
 endif()
 
 # Version info.
+include(FindGit)
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-if (NOT WIN32)
-  # TODO: not adding svn revision on Windows. It expects a native svn, and fails
-  # if Cygwin svn is found instead.
-
-  # A custom target that is always built
-  add_custom_target(revisiontag ALL)
-
-  # Creates svnversion.h using cmake script
-  add_custom_command(TARGET revisiontag COMMAND ${CMAKE_COMMAND}
-    -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
-    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/getsvn.cmake)
-else (NOT WIN32)
-  file(WRITE svnversion.h "#define SYNTHESE_REVISION \"\"\n")
-endif (NOT WIN32)
+# TODO: Get the git revision
+file(WRITE ${PROJECT_BINARY_DIR}/src/15_server/svnversion.h
+  "#define SYNTHESE_REVISION \"\"\n"
+  "#define SYNTHESE_BUILD_DATE \"\"\n"
+  "#define SYNTHESE_SVN_URL \"\"\n"
+)
 
 # Note: this is using a .h file and not defines, otherwise everything gets
 # rebuilt each time CMake is invoked.
