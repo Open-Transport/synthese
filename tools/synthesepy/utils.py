@@ -492,16 +492,6 @@ class GITInfo(object):
         self._version = None
         self._last_msg = None
 
-    def _fetch_svn_info(self):
-        svn_info_output = subprocess.Popen(
-            ['svn', 'info', '--xml'],
-            cwd=self.repo_path,
-            stdout=subprocess.PIPE).communicate()[0]
-
-        info_tree = ElementTree.XML(svn_info_output)
-        self._branch = info_tree.find('entry/url').text.split('/')[-1]
-        self._version = info_tree.find('entry/commit').attrib['revision']
-
     @property
     def branch(self):
         if not self._branch:
