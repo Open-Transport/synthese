@@ -36,8 +36,8 @@ def run(env, args):
     if not config.prefix:
         raise Exception('Prefix is required.')
 
-    svn_info = utils.SVNInfo(env.source_path)
-    revision_path = 'r{0}'.format(svn_info.version)
+    git_info = utils.GITInfo(env.source_path)
+    revision_path = 'r{0}'.format(git_info.version)
 
     # On Linux, lets pick a more precise name for the platform
     # through lsb_release (this package must be installed)
@@ -54,7 +54,7 @@ def run(env, args):
 
 
     package_relative_dir = os.sep.join([
-        distro_name, env.mode, svn_info.branch, revision_path])
+        env.platform, env.mode, git_info.branch, revision_path])
 
     package_dir = join(config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):
