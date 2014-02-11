@@ -93,14 +93,16 @@ namespace synthese
 				util::Env& env,
 				const std::string& s,
 				impex::Import& import,
-				boost::optional<const impex::Importer&> importer
+				boost::optional<const impex::Importer&> importer,
+				bool noSuppressTopLevel = false
 			);
 
 			InterSYNTHESEPackageContent(
 				util::Env& env,
 				const std::string& s,
 				const boost::shared_ptr<InterSYNTHESEPackage>& pacakge,
-				boost::optional<const impex::Importer&> importer
+				boost::optional<const impex::Importer&> importer,
+				bool noSuppressTopLevel = false
 			);
 
 			void save(
