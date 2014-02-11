@@ -21,9 +21,7 @@
 */
 
 #include "PTRoutePlannerResult.h"
-
 #include "Journey.h"
-#include "LinePhysicalStop.hpp"
 #include "Edge.h"
 #include "Crossing.h"
 #include "ResultHTMLTable.h"
@@ -210,12 +208,12 @@ namespace synthese
 				stream << t.col() << "<b>" << its->getDepartureDateTime() << "</b>";
 
 				// JourneyPattern
-				const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(its->getDepartureEdge()));
+				const LineStop* ls(dynamic_cast<const LineStop*>(its->getDepartureEdge()));
 				const JunctionStop* js(dynamic_cast<const JunctionStop*>(its->getDepartureEdge()));
-				stream << t.col(1, ls ? ls->getJourneyPattern()->getCommercialLine()->getStyle() : string());
+				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
 				if(ls)
 				{
-					stream << ls->getJourneyPattern()->getCommercialLine()->getShortName();
+					stream << ls->getLine()->getCommercialLine()->getShortName();
 				}
 				else if(js)
 				{

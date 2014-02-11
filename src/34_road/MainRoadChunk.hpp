@@ -67,7 +67,6 @@ namespace synthese
 			HouseNumberingPolicy _rightHouseNumberingPolicy;
 
 			Houses _houses;
-			int _carOneWay;
 
 			ReverseRoadChunk* _reverseRoadChunk;
 
@@ -85,7 +84,7 @@ namespace synthese
 				HouseNumber houseNumber,
 				graph::MetricOffset startOffset,
 				graph::MetricOffset endOffset
-			); 
+			);
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -102,7 +101,6 @@ namespace synthese
 				MainRoadPart* road = NULL,
 				double metricOffset = UNKNOWN_VALUE
 			);
-			virtual ~MainRoadChunk();
 
 			//! @name Setters
 			//@{
@@ -113,7 +111,6 @@ namespace synthese
 				void addHouse(House& house);
 				void removeHouse(House& house);
 				void setReverseRoadChunk(ReverseRoadChunk * value){ _reverseRoadChunk = value; }
-				void setCarOneWay(int value){ _carOneWay = value; }
 			//@}
 
 			//! @name Getters
@@ -125,7 +122,6 @@ namespace synthese
 				const Houses& getHouses() const { return _houses; }
 				ReverseRoadChunk* getReverseRoadChunk() const { return _reverseRoadChunk; }
 				MainRoadPart* getMainRoadPart() const;
-				int getCarOneWay() const { return _carOneWay; }
 
 				bool isReversed() const { return false; };
 
@@ -155,27 +151,6 @@ namespace synthese
 					HouseNumber houseNumber
 				) const;
 			//@}
-
-			virtual bool loadFromRecord(
-				const Record& record,
-				util::Env& env
-			);
-
-			virtual void toParametersMap(
-				util::ParametersMap& pm,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles = boost::logic::indeterminate,
-				std::string prefix = std::string()
-			) const;
-
-			virtual SubObjects getSubObjects() const;
-
-			virtual LinkedObjectsIds getLinkedObjectsIds(
-				const Record& record
-			) const;
-
-			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
-			virtual void unlink();
 		};
 }	}
 

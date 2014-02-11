@@ -50,9 +50,9 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(ExpirationTime, posix_time::not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(SyncType),
 					FIELD_DEFAULT_CONSTRUCTOR(SyncContent)
-			)	),
-			_nonPersistent(false)
-		{}
+			)	)
+		{
+		}
 
 
 

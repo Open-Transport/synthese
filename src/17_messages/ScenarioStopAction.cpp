@@ -22,8 +22,6 @@
 
 #include "ScenarioStopAction.h"
 
-#include "DataSource.h"
-#include "DBTransaction.hpp"
 #include "Profile.h"
 #include "ScenarioTableSync.h"
 #include "SentScenario.h"
@@ -42,8 +40,6 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace db;	
-	using namespace impex;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -52,104 +48,58 @@ namespace synthese
 
 	namespace messages
 	{
-		const string ScenarioStopAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "s";
-		const string ScenarioStopAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_datasource_id";
-		const string ScenarioStopAction::PARAMETER_REMOVE = Action_PARAMETER_PREFIX + "_remove";
-
-
+		const string ScenarioStopAction::PARAMETER_SCENARIO_ID(
+			Action_PARAMETER_PREFIX + "s"
+		);
 
 		ParametersMap ScenarioStopAction::getParametersMap() const
 		{
 			ParametersMap m;
-			if(_scenario)
-			{
-				m.insert(PARAMETER_SCENARIO_ID, _scenario->getKey());
-			}
+			if(_scenario.get()) m.insert(PARAMETER_SCENARIO_ID, _scenario->getKey());
 			return m;
 		}
 
-
-
 		void ScenarioStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Datasource
-			RegistryKeyType dataSourceId(map.getDefault<RegistryKeyType>(PARAMETER_DATASOURCE_ID, 0));
-			if(dataSourceId) try
+			try
 			{
-				_dataSource = Env::GetOfficialEnv().get<DataSource>(dataSourceId).get();
-			}
-			catch(...)
-			{
-				throw ActionException("No such data source");
-			}
-
-			// Scenario
-			if(_dataSource)
-			{
-				_scenario = dynamic_cast<SentScenario*>(
-					_dataSource->getObjectByCode<Scenario>(map.get<string>(PARAMETER_SCENARIO_ID))
+				_scenario = ScenarioTableSync::GetCastEditable<SentScenario>(
+					map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
+					*_env
 				);
-				if(!_scenario)
-				{
-					throw ActionException("No such scenario");
-				}
 			}
-			else
-			{
-				try
-				{
-					_scenario = ScenarioTableSync::GetCastEditable<SentScenario>(
-							map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID),
-							*_env
-						).get();
-				}
-				catch (...) {
-					throw ActionException("Invalid scenario");
-				}
+			catch (...) {
+				throw ActionException("Invalid scenario");
 			}
-
-			// True removal ?
-			_remove = map.getDefault<bool>(PARAMETER_REMOVE, false);
 		}
-
-
 
 		void ScenarioStopAction::run(Request& request)
 		{
-			if(_remove)
-			{
-				DBTransaction transaction;
-				ScenarioTableSync::Remove(NULL, _scenario->getKey(), transaction, false);
-				transaction.run();
-			}
-			else
-			{
-				// Action
-				_scenario->setPeriodEnd(_stopDateTime);
-				_scenario->setIsEnabled(false);
+			// Action
+			_scenario->setPeriodEnd(_stopDateTime);
+			_scenario->setIsEnabled(false);
 
-				ScenarioTableSync::Save(_scenario);
+			ScenarioTableSync::Save(_scenario.get());
 
-				// Log
-				MessagesLog::addUpdateEntry(_scenario, "Diffusion arrêtée le " + to_simple_string(_stopDateTime), request.getUser().get());
-			}
+			// Log
+			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + to_simple_string(_stopDateTime), request.getUser().get());
 		}
 
+		ScenarioStopAction::ScenarioStopAction()
+			: FactorableTemplate<Action, ScenarioStopAction>(), _stopDateTime(second_clock::local_time())
+		{
 
-
-		ScenarioStopAction::ScenarioStopAction(
-		): FactorableTemplate<Action, ScenarioStopAction>(),
-			_scenario(NULL),
-			_dataSource(NULL),
-			_stopDateTime(second_clock::local_time()),
-			_remove(false)
-		{}
+		}
 
 
 
 		bool ScenarioStopAction::isAuthorized(const Session* session
 		) const {
-			return true;
-			// return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 		}
-}	}
+
+		void ScenarioStopAction::setScenario(boost::shared_ptr<SentScenario> value){
+			_scenario = value;
+		}
+	}
+}

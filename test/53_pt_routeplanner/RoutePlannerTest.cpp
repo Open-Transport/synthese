@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 	AccessParameters a(
 		USER_PEDESTRIAN, false, false, 1000, boost::posix_time::minutes(23), 1.11, 10, pc
 	);
-	ptime tomorrow(day_clock::local_day(), hours(3));
+	ptime tomorrow(day_clock::local_day(), minutes(0));
 	tomorrow += days(1);
 	ptime next_day(tomorrow);
 	next_day += days(1);

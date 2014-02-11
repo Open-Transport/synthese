@@ -50,7 +50,6 @@ namespace synthese
 		const string GetVehiclesService::PARAMETER_LINE_ID("li");
 
 		const string GetVehiclesService::DATA_RANK = "rank";
-		const string GetVehiclesService::TAG_VEHICLE = "vehicle";
 
 		ParametersMap GetVehiclesService::_getParametersMap() const
 		{
@@ -111,46 +110,37 @@ namespace synthese
 
 
 
-		bool GetVehiclesService::_selectVehicle( const Vehicle& object ) const
-		{
-			// Line filter
-			if(_line.get())
-			{
-				AllowedLines::Type::const_iterator it(
-					object.get<AllowedLines>().find(
-						const_cast<CommercialLine*>(_line.get())
-				)	);
-				if(it == object.get<AllowedLines>().end())
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-
-
 		util::ParametersMap GetVehiclesService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 
-			Vehicle::Registry::ConstVector vehicles;
+			vector<const Vehicle*> vehicles;
 
 			if(_vehicle.get())
 			{
-				vehicles.push_back(_vehicle);
+				vehicles.push_back(_vehicle.get());
 			}
 			else
 			{
 				const Vehicle::Registry& registry(Env::GetOfficialEnv().getRegistry<Vehicle>());
-				vehicles = registry.getConstVector(bind(&GetVehiclesService::_selectVehicle, this, _1));
+				recursive_mutex::scoped_lock lock(registry.getMutex());
+				BOOST_FOREACH(const Vehicle::Registry::value_type& vehicle, registry)
+				{
+					if(_line.get())
+					{
+						Vehicle::AllowedLines::const_iterator it(vehicle.second->getAllowedLines().find(_line.get()));
+						if(it == vehicle.second->getAllowedLines().end())
+						{
+							continue;
+						}
+					}
+					vehicles.push_back(vehicle.second.get());
+				}
 			}
 
 			size_t rank(0);
-			ParametersMap pm;
-			BOOST_FOREACH(const Vehicle::Registry::ConstVector::value_type& vehicle, vehicles)
+			BOOST_FOREACH(const Vehicle* vehicle, vehicles)
 			{
 				if(_vehiclePage.get())
 				{
@@ -161,15 +151,9 @@ namespace synthese
 						rank++
 					);
 				}
-				else
-				{
-					boost::shared_ptr<ParametersMap> vPM(new ParametersMap);
-					vehicle->toParametersMap(*vPM, true);
-					pm.insert(TAG_VEHICLE, vPM);
-				}
 			}
 
-			return pm;
+			return util::ParametersMap();
 		}
 
 

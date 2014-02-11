@@ -39,7 +39,7 @@
 #include "InterfacePageException.h"
 #include "JourneyPattern.hpp"
 #include "LineAlarmRecipient.hpp"
-#include "LinePhysicalStop.hpp"
+#include "LineStop.h"
 #include "PTRoutePlannerResult.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "RoutePlanningTableGenerator.h"
@@ -1079,11 +1079,11 @@ namespace synthese
 				// Search on departure edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getDepartureEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine() == &line &&
 						(	!direction ||
 							path->getWayBack() == *direction
@@ -1095,11 +1095,11 @@ namespace synthese
 				// Search on arrival edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getArrivalEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine() == &line &&
 						(	!direction ||
 							path->getWayBack() == *direction
@@ -1131,11 +1131,11 @@ namespace synthese
 				// Search on departure edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getDepartureEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine() == &line)
 					{
 						return true;
@@ -1145,11 +1145,11 @@ namespace synthese
 				// Search on arrival edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getArrivalEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine() == &line)
 					{
 						return true;
@@ -1172,11 +1172,11 @@ namespace synthese
 				// Search on departure edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getDepartureEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine()->getNetwork() == &network)
 					{
 						return true;
@@ -1186,11 +1186,11 @@ namespace synthese
 				// Search on arrival edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getArrivalEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine()->getNetwork() == &network)
 					{
 						return true;
@@ -1220,11 +1220,11 @@ namespace synthese
 				// Search on departure edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getDepartureEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine()->getNetwork() == &network)
 					{
 						return true;
@@ -1234,11 +1234,11 @@ namespace synthese
 				// Search on arrival edges
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stopPoint.getArrivalEdges())
 				{
-					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					if(!dynamic_cast<const LineStop*>(edge.second))
 					{
 						continue;
 					}
-					JourneyPattern* path(static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+					JourneyPattern* path(static_cast<const LineStop*>(edge.second)->getLine());
 					if(	path->getCommercialLine()->getNetwork() == &network)
 					{
 						return true;

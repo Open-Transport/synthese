@@ -1749,7 +1749,7 @@ namespace synthese
 								">";
 							_xmlDisplayPhysicalStop(stream, DATA_START_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
 							_xmlDisplayPhysicalStop(stream, DATA_END_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
-							_xmlDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*(*line->getEdges().rbegin())->getFromVertex()),_showCoords);
+							_xmlDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*(*line->getAllEdges().rbegin())->getFromVertex()),_showCoords);
 							if(!line->isPedestrianMode())
 							{
 								stream <<

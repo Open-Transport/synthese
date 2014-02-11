@@ -41,7 +41,6 @@
 using namespace boost;
 using namespace std;
 using namespace geos::io;
-using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -379,9 +378,7 @@ namespace synthese
 						slave.enqueue(
 							DBInterSYNTHESE::FACTORY_KEY,
 							content.str(),
-							not_a_date_time,
 							saveTransaction,
-							true,
 							true
 						);
 					}

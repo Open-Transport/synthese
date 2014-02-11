@@ -73,6 +73,13 @@ namespace synthese
 
 
 
+		template<> void OldLoadSavePolicy<DRTAreaTableSync,DRTArea>::Unlink(
+			DRTArea* obj
+		){
+		}
+
+
+
 		template<> bool DBTableSyncTemplate<DRTAreaTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id

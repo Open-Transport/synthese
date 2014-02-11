@@ -49,6 +49,8 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,InterSYNTHESESlaveUpdateService>
 		{
 		public:
+			static const std::string FIELDS_SEPARATOR;
+			static const std::string SYNCS_SEPARATOR;
 			static const std::string NO_CONTENT_TO_SYNC;
 			
 			static const std::string PARAMETER_SLAVE_ID;

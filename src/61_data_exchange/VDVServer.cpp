@@ -526,7 +526,7 @@ namespace synthese
 						// Service code is on 5 characters in the planned datasource
 						while (vectServiceCode[1].size() < 5)
 							vectServiceCode[1] = "0" + vectServiceCode[1];
-						
+
 						ScheduledService* service(
 							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
 						);
@@ -545,9 +545,7 @@ namespace synthese
 							JourneyPattern* route(static_cast<JourneyPattern*>(service->getPath()));
 							for (size_t cptRank(0);cptRank<route->getScheduledStopsNumber();cptRank++)
 							{
-								const StopArea* lineStopArea(
-									dynamic_cast<const StopPoint*>(&*route->getLineStop(cptRank, true)->get<LineNode>())->getConnectionPlace()
-								);
+								const StopArea* lineStopArea = dynamic_cast<const StopArea*>(route->getLineStop(cptRank, true)->getHub());
 								if (lineStopArea &&
 									lineStopArea->getKey() == currentSubscription->get<StopArea>()->getKey())
 								{

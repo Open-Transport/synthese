@@ -24,7 +24,6 @@
 
 #include "Alarm.h"
 #include "BroadcastPointAlarmRecipient.hpp"
-#include "MessagesModule.h"
 
 using namespace boost;
 using namespace std;
@@ -122,12 +121,6 @@ namespace synthese
 			ParametersMap pm(parameters);
 			Alarm::LinkedObjectsToParametersMap(recipients, pm);
 
-			// If the rule has no code, then the message is always displayed
-			if(get<BroadcastRule>().empty())
-			{
-				return true;
-			}
-
 			// Evaluation of the customized rule
 			string s(get<BroadcastRule>().eval(pm));
 			trim(s);
@@ -146,20 +139,6 @@ namespace synthese
 			){
 				result.push_back(it.second.get());
 			}
-		}
-
-
-
-		void CustomBroadcastPoint::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
-		{
-			MessagesModule::ClearAllBroadcastCaches();
-		}
-
-
-
-		void CustomBroadcastPoint::unlink()
-		{
-			MessagesModule::ClearAllBroadcastCaches();
 		}
 }	}
 

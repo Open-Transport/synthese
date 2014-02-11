@@ -25,7 +25,6 @@
 
 #include <memory>
 #include <string>
-#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
@@ -47,7 +46,6 @@ namespace synthese
 			const InterSYNTHESESyncTypeFactory& getType() const { return *_type; }
 			virtual std::string getPerimeter() const = 0;
 			virtual std::string getContent() const = 0;
-			virtual boost::posix_time::ptime getExpirationTime() const = 0;
 		};
 }	}
 

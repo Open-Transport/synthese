@@ -29,6 +29,7 @@ namespace synthese
 {
 	namespace pt
 	{
+		class LineArea;
 		class StopPoint;
 		class JourneyPattern;
 
@@ -39,20 +40,26 @@ namespace synthese
 			public LinePhysicalStop
 		{
 		private:
-			bool _isDeparture;
-			bool _isArrival;
+			LineArea* _lineArea;
 
 		public:
 			AreaGeneratedLineStop(
-				LineStop& lineStop,
-				StopPoint& stop,
-				bool isDeparture,
-				bool isArrival
+				JourneyPattern* line = NULL,
+				std::size_t rankInPath = 0,
+				bool isDeparture = true,
+				bool isArrival = true,
+				double metricOffset = 0,
+				StopPoint* stop = NULL,
+				LineArea* lineArea = NULL
 			);
-			virtual ~AreaGeneratedLineStop();
 
-			virtual bool isDepartureAllowed() const;
-			virtual bool isArrivalAllowed() const;
+			void setLineArea(LineArea* value){ _lineArea = value; }
+
+			LineArea* getLineArea() const { return _lineArea; }
+
+			virtual bool getScheduleInput() const { return false; }
+
+			virtual void _unlink() {}
 		};
 }	}
 

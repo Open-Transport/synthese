@@ -283,15 +283,15 @@ namespace synthese
 			pm.insert(DATA_RANK, rank);
 
 			// Picture
-			pm.insert(DATA_PICTURE, vehicle.get<Picture>());
+			pm.insert(DATA_PICTURE, vehicle.getPicture());
 
-			pm.insert(DATA_SEATS, vehicle.get<Seats>().size());
+			pm.insert(DATA_SEATS, vehicle.getSeats().size());
 
 			// Name
-			pm.insert(DATA_NAME, vehicle.get<Name>());
+			pm.insert(DATA_NAME, vehicle.getName());
 
 			// Number
-			pm.insert(DATA_NUMBER, vehicle.get<Number>());
+			pm.insert(DATA_NUMBER, vehicle.getNumber());
 
 			// ID
 			pm.insert(DATA_VEHICLE_ID, vehicle.getKey());

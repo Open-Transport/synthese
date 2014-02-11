@@ -46,7 +46,6 @@ namespace synthese
 		{
 		public:
 			static const bool IMPORTABLE;
-			static const bool IS_PERMANENT_THREAD;
 			static const std::string PARAMETER_PATH;	//!< Path of the files to import
 			static const std::string PARAMETER_DIRECTORY;
 
@@ -147,9 +146,6 @@ namespace synthese
 
 		template<class FF>
 		const bool OneFileTypeImporter<FF>::IMPORTABLE(true);
-
-		template<class FF>
-		const bool OneFileTypeImporter<FF>::IS_PERMANENT_THREAD(false);
 
 		template<class FF>
 		const std::string OneFileTypeImporter<FF>::PARAMETER_PATH("pa");

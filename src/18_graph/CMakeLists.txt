@@ -4,8 +4,6 @@ set(graph_SRCS
 AccessParameters.h
 AllowedUseRule.cpp
 AllowedUseRule.h
-ChronologicalServicesCollection.cpp
-ChronologicalServicesCollection.hpp
 Edge.cpp
 Edge.h
 ForbiddenUseRule.cpp

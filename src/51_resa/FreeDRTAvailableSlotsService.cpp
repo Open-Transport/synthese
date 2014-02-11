@@ -147,7 +147,7 @@ namespace synthese
 			)	);
 
 			// Time slots
-			BOOST_FOREACH(const Service* itServ, _area->getAllServices())
+			BOOST_FOREACH(const Service* itServ, _area->getServices())
 			{
 				// Declarations
 				const FreeDRTTimeSlot& timeSlot(static_cast<const FreeDRTTimeSlot&>(*itServ));

@@ -25,7 +25,6 @@
 #include "VehicleServiceTableSync.hpp"
 
 #include "DataSourceLinksField.hpp"
-#include "OperationUnit.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "ScheduledService.h"
@@ -64,7 +63,6 @@ namespace synthese
 		const string VehicleServiceTableSync::COL_SERVICES = "services";
 		const string VehicleServiceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 		const string VehicleServiceTableSync::COL_DATES = "dates";
-		const string VehicleServiceTableSync::COL_OPERATION_UNIT_ID = "operation_unit_id";
 	}
 
 	namespace db
@@ -82,7 +80,6 @@ namespace synthese
 			Field(VehicleServiceTableSync::COL_SERVICES, SQL_TEXT),
 			Field(VehicleServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field(VehicleServiceTableSync::COL_DATES, SQL_TEXT),
-			Field(VehicleServiceTableSync::COL_OPERATION_UNIT_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -91,9 +88,7 @@ namespace synthese
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<VehicleServiceTableSync>::GetIndexes()
 		{
-			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(VehicleServiceTableSync::COL_OPERATION_UNIT_ID.c_str(), ""));
-			return r;
+			return DBTableSync::Indexes();
 		}
 
 
@@ -131,13 +126,6 @@ namespace synthese
 			object->serialize(datesStr);
 			query.addField(datesStr.str());
 
-			// Unit
-			query.addField(
-				object->getOperationUnit() ?
-				object->getOperationUnit()->getKey() :
-				0
-			);
-
 			query.execute(transaction);
 		}
 
@@ -146,7 +134,6 @@ namespace synthese
 		template<> void OldLoadSavePolicy<VehicleServiceTableSync,VehicleService>::Unlink(
 			VehicleService* obj
 		){
-			obj->unlink();
 		}
 
 
@@ -192,7 +179,6 @@ namespace synthese
 		VehicleServiceTableSync::SearchResult VehicleServiceTableSync::Search(
 			util::Env& env,
 			boost::optional<std::string> name,
-			boost::optional<util::RegistryKeyType> searchUnit,
 			size_t first /*= 0*/,
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
@@ -203,10 +189,6 @@ namespace synthese
 			if(name)
 			{
 				query.addWhereField(COL_NAME, "%"+ *name +"%", ComposedExpression::OP_LIKE);
-			}
-			if(searchUnit)
-			{
-				query.addWhereField(COL_OPERATION_UNIT_ID, *searchUnit);
 			}
 			if(orderByName)
 			{

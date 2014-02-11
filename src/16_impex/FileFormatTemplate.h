@@ -38,8 +38,6 @@ namespace synthese
 		public:
 			virtual bool canImport() const { return FF::Importer_::IMPORTABLE; }
 			virtual bool canExport() const { return FF::Exporter_::EXPORTABLE; }
-			virtual bool isImportPermanentThread() const { return FF::Importer_::IS_PERMANENT_THREAD; }
-			virtual bool isExportPermanentThread() const { return FF::Exporter_::IS_PERMANENT_THREAD; }
 
 			virtual boost::shared_ptr<Importer> getImporter(
 				util::Env& env,
@@ -58,12 +56,11 @@ namespace synthese
 			}
 
 			virtual boost::shared_ptr<Exporter> getExporter(
-				const Export& export_
 			) const	{
 				return
 					boost::static_pointer_cast<Exporter, typename FF::Exporter_>(
 						boost::shared_ptr<typename FF::Exporter_>(
-							new typename FF::Exporter_(export_)
+							new typename FF::Exporter_()
 					)	);
 			}
 		};

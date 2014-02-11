@@ -62,7 +62,6 @@
 #include "HTMLList.h"
 #include "Interface.h"
 #include "JourneyPattern.hpp"
-#include "LinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
 #include "MessageAdmin.h"
 #include "MessagesScenarioAdmin.h"
@@ -632,13 +631,13 @@ namespace synthese
 								BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 								{
 									// Jump over junctions
-									if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+									if(!dynamic_cast<const LineStop*>(edge.second))
 									{
 										continue;
 									}
 
 									lines.insert(
-										static_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern()->getCommercialLine()
+										static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
 									);
 								}
 								BOOST_FOREACH(const CommercialLine* line, lines)

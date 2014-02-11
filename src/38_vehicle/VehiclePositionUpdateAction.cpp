@@ -65,22 +65,18 @@ namespace synthese
 		const string VehiclePositionUpdateAction::PARAMETER_VEHICLE_ID = Action_PARAMETER_PREFIX + "ve";
 		const string VehiclePositionUpdateAction::PARAMETER_VEHICLE_POSITION_ID = Action_PARAMETER_PREFIX + "vi";
 		const string VehiclePositionUpdateAction::PARAMETER_SET_AS_CURRENT_POSITION = Action_PARAMETER_PREFIX + "_set_as_current_position";
-		const string VehiclePositionUpdateAction::PARAMETER_IN_STOP_AREA = Action_PARAMETER_PREFIX + "_in_stop_area";
-
-
 
 		VehiclePositionUpdateAction::VehiclePositionUpdateAction() :
 			_setAsCurrentPosition(false)
-		{}
-
-
+		{
+		}
 
 		ParametersMap VehiclePositionUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_vehicle)
 			{
-				map.insert(PARAMETER_VEHICLE_ID, _vehicle ? (*_vehicle)->getKey() : RegistryKeyType(0));
+				map.insert(PARAMETER_VEHICLE_ID, _vehicle->get() ? (*_vehicle)->getKey() : RegistryKeyType(0));
 			}
 			if(_vehiclePosition.get())
 			{
@@ -100,21 +96,11 @@ namespace synthese
 
 		void VehiclePositionUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Set as current position
-			if(map.isDefined(PARAMETER_SET_AS_CURRENT_POSITION))
-			{
-				_setAsCurrentPosition = map.get<bool>(PARAMETER_SET_AS_CURRENT_POSITION);
-			}
-
-			// The object to update
 			if(map.isDefined(PARAMETER_VEHICLE_POSITION_ID))
 			{
 				try
 				{
-					_vehiclePosition = VehiclePositionTableSync::GetEditable(
-						map.get<RegistryKeyType>(PARAMETER_VEHICLE_POSITION_ID),
-						*_env
-					);
+					_vehiclePosition = VehiclePositionTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_VEHICLE_POSITION_ID), *_env);
 				}
 				catch(ObjectNotFoundException<VehiclePosition>&)
 				{
@@ -124,24 +110,6 @@ namespace synthese
 			else
 			{
 				_vehiclePosition.reset(new VehiclePosition);
-
-				if(_setAsCurrentPosition)
-				{
-					// Copy the values of the current position in the object
-					const VehiclePosition &vp = VehicleModule::GetCurrentVehiclePosition();
-
-					_comment = vp.getComment();
-					_status = vp.getStatus();
-					_time = second_clock::local_time();
-					_passengers = vp.getPassengers();
-					_inStopArea = vp.getInStopArea();
-					_meterOffset = vp.getMeterOffset();
-					_rankInPath = vp.getRankInPath();
-					_vehicle = vp.getVehicle();
-					_stopPoint = vp.getStopPoint();
-					_service = vp.getService();
-					_depot = vp.getDepot();
-				}
 			}
 
 			if(map.isDefined(PARAMETER_VEHICLE_ID))
@@ -149,7 +117,7 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_VEHICLE_ID));
 				if(id > 0) try
 				{
-					_vehicle = Env::GetOfficialEnv().getEditable<Vehicle>(id).get();
+					_vehicle = Env::GetOfficialEnv().getEditable<Vehicle>(id);
 				}
 				catch(ObjectNotFoundException<Vehicle>&)
 				{
@@ -157,7 +125,7 @@ namespace synthese
 				}
 				else
 				{
-					_vehicle = (Vehicle*) NULL;
+					_vehicle = boost::shared_ptr<Vehicle>();
 				}
 			}
 
@@ -176,7 +144,7 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
 				if(id > 0) try
 				{
-					_service = Env::GetOfficialEnv().getEditable<ScheduledService>(id).get();
+					_service = Env::GetOfficialEnv().getEditable<ScheduledService>(id);
 				}
 				catch(ObjectNotFoundException<ScheduledService>&)
 				{
@@ -184,7 +152,7 @@ namespace synthese
 				}
 				else
 				{
-					_service = (ScheduledService*) NULL;
+					_service = boost::shared_ptr<ScheduledService>();
 				}
 			}
 
@@ -195,18 +163,18 @@ namespace synthese
 				{
 					if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
 					{
-						_stopPoint = Env::GetOfficialEnv().getEditable<StopPoint>(id).get();
-						_depot = (Depot*) NULL;
+						_stopPoint = Env::GetOfficialEnv().getEditable<StopPoint>(id);
+						_depot = boost::shared_ptr<Depot>();
 					}
 					else if(decodeTableId(id) == DepotTableSync::TABLE.ID)
 					{
-						_depot = Env::GetOfficialEnv().getEditable<Depot>(id).get();
-						_stopPoint = (StopPoint*) NULL;
+						_depot = Env::GetOfficialEnv().getEditable<Depot>(id);
+						_stopPoint = boost::shared_ptr<StopPoint>();
 					}
 					else
 					{
-						_stopPoint = (StopPoint*) NULL;
-						_depot = (Depot*) NULL;
+						_stopPoint = boost::shared_ptr<StopPoint>();
+						_depot = boost::shared_ptr<Depot>();
 					}
 				}
 				catch(ObjectNotFoundException<StopPoint>&)
@@ -219,8 +187,8 @@ namespace synthese
 				}
 				else
 				{
-					_stopPoint = (StopPoint*) NULL;
-					_depot = (Depot*) NULL;
+					_stopPoint = boost::shared_ptr<StopPoint>();
+					_depot = boost::shared_ptr<Depot>();
 				}
 			}
 
@@ -243,6 +211,12 @@ namespace synthese
 			{
 				_time = time_from_string(map.get<string>(PARAMETER_TIME));
 			}
+
+			if(map.isDefined(PARAMETER_SET_AS_CURRENT_POSITION))
+			{
+				_setAsCurrentPosition = map.get<bool>(PARAMETER_SET_AS_CURRENT_POSITION);
+			}
+			
 		}
 
 
@@ -250,97 +224,66 @@ namespace synthese
 		void VehiclePositionUpdateAction::run(
 			Request& request
 		){
-			VehiclePosition &vp = VehicleModule::GetCurrentVehiclePosition();
 			if(_vehicle)
 			{
-				_vehiclePosition->setVehicle(*_vehicle);
-				if(_setAsCurrentPosition)
-				{
-					vp.setVehicle(_vehiclePosition->getVehicle());
-				}
+				_vehiclePosition->setVehicle(_vehicle->get());
 			}
 			if(_passengers)
 			{
 				_vehiclePosition->setPassangers(*_passengers);
-				if(_setAsCurrentPosition)
-				{
-					vp.setPassangers(_vehiclePosition->getPassengers());
-				}
 			}
 			if(_rankInPath)
 			{
 				_vehiclePosition->setRankInPath(*_rankInPath);
-				if(_setAsCurrentPosition)
-				{
-					vp.setRankInPath(_vehiclePosition->getRankInPath());
-				}
 			}
 			if(_service)
 			{
-				_vehiclePosition->setService(*_service);
-				if(_setAsCurrentPosition)
-				{
-					vp.setService(_vehiclePosition->getService());
-				}
+				_vehiclePosition->setService(_service->get());
 			}
 			if(_comment)
 			{
 				_vehiclePosition->setComment(*_comment);
-				if(_setAsCurrentPosition)
-				{
-					vp.setComment(_vehiclePosition->getComment());
-				}
 			}
 			if(_status)
 			{
 				_vehiclePosition->setStatus(*_status);
-				if(_setAsCurrentPosition)
-				{
-					vp.setStatus( _vehiclePosition->getStatus());
-				}
 			}
 			if(_meterOffset)
 			{
 				_vehiclePosition->setMeterOffset(*_meterOffset);
-				if(_setAsCurrentPosition)
-				{
-					vp.setMeterOffset(_vehiclePosition->getMeterOffset());
-				}
 			}
 			if(_time)
 			{
 				_vehiclePosition->setTime(*_time);
-				if(_setAsCurrentPosition)
-				{
-					vp.setTime(_vehiclePosition->getTime());
-				}
 			}
 			if(_stopPoint)
 			{
-				_vehiclePosition->setStopPoint(*_stopPoint);
-				if(_setAsCurrentPosition)
-				{
-					vp.setStopPoint(_vehiclePosition->getStopPoint());
-				}
+				_vehiclePosition->setStopPoint(_stopPoint->get());
 			}
 			if(_depot)
 			{
-				_vehiclePosition->setDepot(*_depot);
-				if(_setAsCurrentPosition)
-				{
-					vp.setDepot(_vehiclePosition->getDepot());
-				}
-			}
-			if(_inStopArea)
-			{
-				_vehiclePosition->setInStopArea(*_inStopArea);
-				if(_setAsCurrentPosition)
-				{
-					vp.setInStopArea(_vehiclePosition->getInStopArea());
-				}
+				_vehiclePosition->setDepot(_depot->get());
 			}
 
 			VehiclePositionTableSync::Save(_vehiclePosition.get());
+
+			if(_setAsCurrentPosition)
+			{
+				VehiclePosition &vp = VehicleModule::GetCurrentVehiclePosition();
+
+				vp.setComment(_vehiclePosition->getComment());
+				vp.setStatus( _vehiclePosition->getStatus());
+				vp.setTime(_vehiclePosition->getTime());
+				vp.setPassangers(_vehiclePosition->getPassengers());
+				vp.setInStopArea(_vehiclePosition->getInStopArea());
+				vp.setMeterOffset(_vehiclePosition->getMeterOffset());
+				vp.setRankInPath(_vehiclePosition->getRankInPath());
+
+				vp.setVehicle(_vehiclePosition->getVehicle());
+				vp.setStopPoint(_vehiclePosition->getStopPoint());
+				vp.setService(_vehiclePosition->getService());
+				vp.setDepot(_vehiclePosition->getDepot());
+			}
 
 			if(request.getActionWillCreateObject())
 			{

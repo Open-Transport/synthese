@@ -32,6 +32,7 @@
 #include "TimetableRowGroupItem.hpp"
 #include "Env.h"
 #include "CalendarModule.h"
+#include "JourneyPatternCopy.hpp"
 #include "PTUseRule.h"
 
 #include <boost/foreach.hpp>
@@ -76,7 +77,7 @@ namespace synthese
 
 			bool result(false);
 			Path::Edges::const_iterator itEdge;
-			const Path::Edges& edges(journeyPattern.getEdges());
+			const Path::Edges& edges(journeyPattern.getAllEdges());
 
 			// JourneyPattern is authorized according to :
 			//  - authorized lines
@@ -133,7 +134,7 @@ namespace synthese
 				if(_rows.size() > 1)
 				{
 					result = false;
-					const Edge& departureLinestop(**itEdge);
+					const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
 
 					for (++itRow; itRow != _rows.end(); ++itRow)
 					{
@@ -151,7 +152,7 @@ namespace synthese
 	// 							itRow->getIsArrival()
 	// 						)
 						){
-							for(const Edge* arrivalLinestop(departureLinestop.getFollowingArrivalForFineSteppingOnly());
+							for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
 								arrivalLinestop != NULL;
 								arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 							){
@@ -260,7 +261,7 @@ namespace synthese
 				if(_rowGroups.size() > 1)
 				{
 					result = false;
-					const Edge& departureLinestop(**itEdge);
+					const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
 					const Edge* firstIsForbidden(NULL);
 
 					for (++itRowGroup; itRowGroup != _rowGroups.end(); ++itRowGroup)
@@ -285,7 +286,7 @@ namespace synthese
 							}
 
 							bool forbiddenEdgeBefore(!firstIsForbidden);
-							for(const Edge* arrivalLinestop(departureLinestop.getFollowingArrivalForFineSteppingOnly());
+							for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
 								arrivalLinestop != NULL;
 								arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 							){
@@ -358,6 +359,14 @@ namespace synthese
 				{
 					journeyPatterns.push_back(&journeyPattern);
 				}
+				BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, journeyPattern.getSubLines())
+				{
+					if (!_baseCalendar.hasAtLeastOneCommonDateWith(subline->getCalendarCache()))
+					{
+						continue;
+					}
+					journeyPatterns.push_back(subline);
+				}
 			}
 
 			// Rows list generation (new method)
@@ -380,7 +389,7 @@ namespace synthese
 
 							// Build of the places list of the route
 							bool beforeRowGroup(true);
-							BOOST_FOREACH(Edge* edge, jp->getEdges())
+							BOOST_FOREACH(Edge* edge, jp->getAllEdges())
 							{
 								const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(edge));
 								const StopArea& stopArea(*ls->getPhysicalStop()->getConnectionPlace());
@@ -714,7 +723,7 @@ namespace synthese
 			const pt::JourneyPattern& line
 		) const	{
 			// Loop on each service
-			BOOST_FOREACH(const Service* servicePtr, line.getAllServices())
+			BOOST_FOREACH(const Service* servicePtr, line.getServices())
 			{
 				// Permanent service filter
 				const SchedulesBasedService* service(dynamic_cast<const SchedulesBasedService*>(servicePtr));

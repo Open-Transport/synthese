@@ -25,7 +25,6 @@
 #include "Env.h"
 #include "FileFormat.h"
 #include "Importer.hpp"
-#include "ServerModule.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -103,51 +102,18 @@ namespace synthese
 
 
 
-		bool Import::isPermanentThread() const
-		{
-			if(!Factory<FileFormat>::contains(get<FileFormatKey>()))
-			{
-				return false;
-			}
-
-			boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
-			return fileFormat->isImportPermanentThread();
-		}
-
-
-
 		void Import::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			if(canImport())
-			{
 			// Compute the time of the next auto import
 			_computeNextAutoImport();
-		}
-			else if(isPermanentThread())
-			{
-				if(get<Active>() && (&env == &Env::GetOfficialEnv()))
-				{
-					_getAutoImporter()->runPermanentThread();
-				}
-			}
 		}
 
 
 
 		void Import::unlink()
 		{
-			// Kill the thread if exists
-			if(_autoImporter)
-			{
-				if(isPermanentThread())
-				{
-					_autoImporter->killPermanentThread();
-				}
-
 			// Delete the auto importer cache in case of parameter update
-			recursive_mutex::scoped_lock lock(_autoImportMutex);
 			_autoImporter.reset();
-		}
 		}
 
 
@@ -173,10 +139,10 @@ namespace synthese
 
 
 
-		boost::shared_ptr<Importer> Import::_getAutoImporter() const
+		void Import::runAutoImport() const
 		{
-
-			recursive_mutex::scoped_lock lock(_autoImportMutex);
+			ptime startTime(second_clock::local_time());
+			ParametersMap pm;
 			if(!_autoImporter.get())
 			{
 				boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
@@ -187,37 +153,19 @@ namespace synthese
 					get<MinLogLevel>(),
 					get<LogPath>(),
 					optional<ostream&>(),
-					_autoImporterPM
+					pm
 				);
 				_autoImporter->setFromParametersMap(get<Parameters>(), true);
 			}
-			return _autoImporter;
-		}
-
-
-
-		void Import::runAutoImport() const
-		{
-			ptime startTime(second_clock::local_time());
 
 			_autoImporterEnv->clear();
-			_autoImporter->openLogFile();
 			bool result(_autoImporter->parseFiles());
 			if(result)
 			{
-				DBTransaction transaction(_getAutoImporter()->save());
-				DBModule::DeactivateConditionalTablesUpdate();
-				try
-				{
+				DBTransaction transaction(_autoImporter->save());
 				transaction.run();
 			}
-				catch(...)
-				{
-
-				}
-				DBModule::ActivateConditionalTablesUpdate();
-			}
-			_getAutoImporter()->closeLogFile(
+			_autoImporter->closeLogFile(
 				result,
 				false,
 				startTime

@@ -26,7 +26,6 @@
 
 #include "DataSourceLinksField.hpp"
 #include "DriverActivityTableSync.hpp"
-#include "OperationUnitTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "ImportableTableSync.hpp"
@@ -66,7 +65,6 @@ namespace synthese
 		const string DriverServiceTableSync::COL_SERVICES = "services";
 		const string DriverServiceTableSync::COL_DATES = "dates";
 		const string DriverServiceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-		const string DriverServiceTableSync::COL_OPERATION_UNIT_ID = "operation_unit_id";
 	}
 
 	namespace db
@@ -84,7 +82,6 @@ namespace synthese
 			Field(DriverServiceTableSync::COL_SERVICES, SQL_TEXT),
 			Field(DriverServiceTableSync::COL_DATES, SQL_TEXT),
 			Field(DriverServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(DriverServiceTableSync::COL_OPERATION_UNIT_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -93,9 +90,7 @@ namespace synthese
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<DriverServiceTableSync>::GetIndexes()
 		{
-			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(DriverServiceTableSync::COL_OPERATION_UNIT_ID.c_str(), ""));
-			return r;
+			return DBTableSync::Indexes();
 		}
 
 
@@ -135,21 +130,6 @@ namespace synthese
 						rows->getText(DriverServiceTableSync::COL_DATASOURCE_LINKS),
 						env
 				)	);
-
-				// Operation unit
-				{
-					optional<OperationUnit&> value;
-					RegistryKeyType unitId(rows->getLongLong(OperationUnit::FIELD.name));
-					if(unitId) try
-					{
-						value = *OperationUnitTableSync::GetEditable(unitId, env, linkLevel);
-					}
-					catch(ObjectNotFoundException<OperationUnit>&)
-					{
-						Log::GetInstance().warn("Bad operation unit "+ lexical_cast<string>(unitId) +" in driver service "+ lexical_cast<string>(object->getKey()));
-					}
-					object->setOperationUnit(value);
-				}
 			}
 		}
 
@@ -171,11 +151,6 @@ namespace synthese
 				DataSourceLinks::Serialize(
 					object->getDataSourceLinks()
 			)	);
-			query.addField(
-				object->getOperationUnit() ?
-				object->getOperationUnit()->getKey() :
-				0
-			);
 			query.execute(transaction);
 		}
 
@@ -235,7 +210,6 @@ namespace synthese
 		DriverServiceTableSync::SearchResult DriverServiceTableSync::Search(
 			util::Env& env,
 			boost::optional<std::string> searchName,
-			boost::optional<util::RegistryKeyType> searchUnit,
 			size_t first /*= 0*/,
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
@@ -246,10 +220,6 @@ namespace synthese
 			if(searchName)
 			{
 				query.addWhereField(COL_NAME, *searchName, ComposedExpression::OP_LIKE);
-			}
-			if(searchUnit)
-			{
-				query.addWhereField(COL_OPERATION_UNIT_ID, *searchUnit);
 			}
 			if(orderByName)
 			{
@@ -301,11 +271,6 @@ namespace synthese
 				{
 					BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk.elements)
 					{
-						if(!service.service)
-						{
-							Log::GetInstance().warn("Null service in driver service has been ignored");
-							continue;
-						}
 						if(firstService)
 						{
 							firstService = false;

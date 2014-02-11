@@ -191,7 +191,7 @@ namespace synthese
 
 					// HACK : there is no interpoint concept in synthese. so refres gives interpoint id
 					// in metric offset...
-					boost::replace_all (href, "$id", lexical_cast<string>(ls->get<MetricOffsetField>()));
+					boost::replace_all (href, "$id", lexical_cast<string>(ls->getMetricOffset()));
 					_output << "<area href='" << href << "' shape='poly' coords='";
 
 					_output << (int) points1[i].x << "," << (int) (map.getHeight () - points1[i].y) << ",";

@@ -46,7 +46,6 @@ namespace synthese
 
 		public:
 			static const bool IMPORTABLE;
-			static const bool IS_PERMANENT_THREAD;
 
 			typedef std::string FileKey;
 			typedef std::map<FileKey, boost::filesystem::path> FilePathsMap;
@@ -173,9 +172,6 @@ namespace synthese
 
 		template<class FF>
 		const bool MultipleFileTypesImporter<FF>::IMPORTABLE(true);
-
-		template<class FF>
-		const bool MultipleFileTypesImporter<FF>::IS_PERMANENT_THREAD(false);
 
 		template<class FF>
 		const std::string MultipleFileTypesImporter<FF>::PARAMETER_PATH("pa");

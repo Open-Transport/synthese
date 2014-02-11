@@ -21,7 +21,7 @@
 */
 
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledService.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
@@ -32,7 +32,6 @@
 
 using namespace synthese::pt;
 using namespace synthese::geography;
-using namespace synthese::util;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace std;
@@ -42,21 +41,19 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 	GeographyModule::PreInit();
 
 	{
-		Env env;
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,sp);
-		LineStop ls2(0, &jp, 1, false, true,0,sp);
-		ls1.link(env);
-		ls2.link(env);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
+		jp.addEdge(ls1);
+		jp.addEdge(ls2);
 
 		ScheduledService s(0, string(), &jp);
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(8, 0, 0));
 		schedules.push_back(time_duration(9, 0, 0));
 		s.setDataSchedules(schedules, schedules);
-		s.link(env);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -73,21 +70,19 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 	}
 
 	{
-		Env env;
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,sp);
-		LineStop ls2(0, &jp, 1, false, true,0,sp);
-		ls1.link(env);
-		ls2.link(env);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
+		jp.addEdge(ls1);
+		jp.addEdge(ls2);
 
 		ScheduledService s(0, string(), &jp);
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(8, 0, 0));
 		schedules.push_back(time_duration(25, 0, 0));
 		s.setDataSchedules(schedules, schedules);
-		s.link(env);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -106,21 +101,19 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 	}
 
 	{ // Bug 8155
-		Env env;
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,sp);
-		LineStop ls2(0, &jp, 1, false, true,0,sp);
-		ls1.link(env);
-		ls2.link(env);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
+		jp.addEdge(ls1);
+		jp.addEdge(ls2);
 
 		ScheduledService s(0, string(), &jp);
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(26, 0, 0));
 		schedules.push_back(time_duration(32, 0, 0));
 		s.setDataSchedules(schedules, schedules);
-		s.link(env);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -139,21 +132,19 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 	}
 
 	{
-		Env(env);
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,sp);
-		LineStop ls2(0, &jp, 1, false, true,0,sp);
-		ls1.link(env);
-		ls2.link(env);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
+		jp.addEdge(ls1);
+		jp.addEdge(ls2);
 
 		ScheduledService s(0, string(), &jp);
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(26, 0, 0));
 		schedules.push_back(time_duration(49, 0, 0));
 		s.setDataSchedules(schedules, schedules);
-		s.link(env);
 
 		date d(day_clock::local_day());
 		s.setActive(d);

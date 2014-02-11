@@ -36,8 +36,9 @@
 #include "RollingStock.hpp"
 #include "Request.h"
 #include "JourneyPattern.hpp"
-#include "LinePhysicalStop.hpp"
+#include "LineStop.h"
 #include "Path.h"
+#include "Edge.h"
 #include "City.h"
 #include "Webpage.h"
 #include "CommercialLineTableSync.h"
@@ -372,7 +373,7 @@ namespace synthese
 						}
 					}
 
-					BOOST_FOREACH(const Edge* edge, journey->getEdges())
+					BOOST_FOREACH(const Edge* edge,journey->getAllEdges())
 					{
 						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea * connPlace(stopPoint->getConnectionPlace());
@@ -484,39 +485,33 @@ namespace synthese
 
 						while(!served && itDep != itStop.second->getDepartureEdges().end() && itArr != itStop.second->getArrivalEdges().end())
 						{
-							const LinePhysicalStop* lineStop;
+							const LineStop* lineStop;
 							if(itDep != itStop.second->getDepartureEdges().end())
 							{
-								lineStop = dynamic_cast<const LinePhysicalStop*>(itDep->second);
+								lineStop = dynamic_cast<const LineStop*>(itDep->second);
 								itDep++;
 							}
 							else
 							{
-								lineStop = dynamic_cast<const LinePhysicalStop*>(itArr->second);
+								lineStop = dynamic_cast<const LineStop*>(itArr->second);
 								itArr++;
 							}
 
 							if(lineStop && (lineStop->isDepartureAllowed() || lineStop->isArrivalAllowed()))
 							{
-								BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, lineStop->getParentPath()->getServiceCollections())
-								{
-									optional<Edge::DepartureServiceIndex::Value> index;
-									ServicePointer servicePointer(
-										lineStop->getNextService(
-											*itCollection,
-											ap,
-											startDateTime,
-											endDateTime,
-											false,
-											index
-										)
-									);
+								optional<Edge::DepartureServiceIndex::Value> index;
+								ServicePointer servicePointer(
+									lineStop->getNextService(
+										ap,
+										startDateTime,
+										endDateTime,
+										false,
+										index
+									)
+								);
 
-									if(servicePointer.getService())
-									{
-										served = true;
-									}
-								}
+								if(servicePointer.getService())
+									served = true;
 							}
 						}
 					}

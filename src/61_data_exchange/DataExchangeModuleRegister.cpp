@@ -5,9 +5,6 @@
 
 #include "DataExchangeModule.hpp"
 
-#include "CMSExport.hpp"
-#include "CMSImport.hpp"
-#include "GPSdFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
@@ -31,9 +28,9 @@
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
 #include "RoadShapeFileFormat.hpp"
+#include "GpsFileFormat.h"
 
 #include "NCEStatusService.hpp"
-#include "PhysicalStopsCSVExportFunction.h"
 #include "VDVSubscriptionService.hpp"
 #include "VDVDataReadyService.hpp"
 #include "VDVDataSupplyService.hpp"
@@ -52,7 +49,8 @@
 #include "VDVServerSubscription.hpp"
 
 // Devices
-#include "VixV6000FileFormat.hpp"
+#include "ValidatorVIXv6000DevicePoller.hpp"
+#include "GpsDevicePoller.hpp"
 
 #include "DataExchangeModule.inc.cpp"
 
@@ -66,7 +64,6 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::DataExchangeModule::integrate();
 
 	synthese::data_exchange::NCEStatusService::integrate();
-	synthese::data_exchange::PhysicalStopsCSVExportFunction::integrate();
 	synthese::data_exchange::VDVClientsListService::integrate();
 	synthese::data_exchange::VDVServersListService::integrate();
 	synthese::data_exchange::VDVSubscriptionService::integrate();
@@ -78,7 +75,6 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::VDVServerTableSync::integrate();
 	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
 
-	synthese::data_exchange::GPSdFileFormat::integrate();
 	synthese::data_exchange::GTFSFileFormat::integrate();
 	synthese::data_exchange::HafasFileFormat::integrate();
 	synthese::data_exchange::HastusCSVFileFormat::integrate();
@@ -102,10 +98,10 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
-	synthese::data_exchange::CMSExport::integrate();
-	synthese::data_exchange::CMSImport::integrate();
+	synthese::data_exchange::GpsFileFormat::integrate();
 
-	synthese::data_exchange::VixV6000FileFormat::integrate();
+	synthese::data_exchange::ValidatorVIXv6000DevicePoller::integrate();
+	synthese::data_exchange::GpsDevicePoller::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::data_exchange::VDVClient>();

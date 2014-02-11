@@ -36,14 +36,12 @@ namespace synthese
 		class InterSYNTHESESyncTypeFactory;
 
 		FIELD_STRING(SyncPerimeter)
-		FIELD_BOOL(NonPersistent)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(InterSYNTHESEConfig),
 			FIELD(SyncType),
-			FIELD(SyncPerimeter),
-			FIELD(NonPersistent)
+			FIELD(SyncPerimeter)
 		> InterSYNTHESEConfigItemRecord;
 
 

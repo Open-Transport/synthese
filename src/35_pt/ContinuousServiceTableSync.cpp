@@ -131,7 +131,11 @@ namespace synthese
 		template<> void OldLoadSavePolicy<ContinuousServiceTableSync,ContinuousService>::Unlink(
 			ContinuousService* obj
 		){
-			obj->unlink();
+			// Unregister from the route
+			obj->getPath()->removeService(*obj);
+
+			// Unregister from the line
+			obj->getRoute()->getCommercialLine()->unregisterService(*obj);
 		}
 
 

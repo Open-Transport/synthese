@@ -25,6 +25,7 @@
 #include "CopyGeometriesAction.hpp"
 
 #include "ActionException.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Session.h"
@@ -102,31 +103,24 @@ namespace synthese
 			RegistryKeyType templateId(map.getDefault<RegistryKeyType>(PARAMETER_EDGE_ID,0));
 			if(templateId) try
 			{
-				_edgeTemplate = LineStopTableSync::Get(
+				_edgeTemplate = LineStopTableSync::GetCast<DesignatedLinePhysicalStop>(
 					templateId,
 					*_env,
 					UP_LINKS_LOAD_LEVEL
 				);
-				LineStopTableSync::Search(
-					*_env,
-					_edgeTemplate->get<Line>()->getKey()
-				);
-				const LineStop* next(_edgeTemplate->get<Line>()->getLineStop(_edgeTemplate->get<RankInPath>() + 1));
-				if(	!_edgeTemplate->get<LineNode>() ||
-					dynamic_cast<const StopPoint*>(&*_edgeTemplate->get<LineNode>()) != _startingStop.get() ||
-					!next ||
-					!next->get<LineNode>() ||
-					&*next->get<LineNode>() != _endingStop.get()
+				if(	_edgeTemplate->getFromVertex() != _startingStop.get() ||
+					!_edgeTemplate->getNext() ||
+					_edgeTemplate->getNext()->getFromVertex() != _endingStop.get()
 				){
 					throw ActionException("The edge and the stops does not match");
 				}
 
-				if(!_edgeTemplate->get<LineStringGeometry>().get())
+				if(!_edgeTemplate->getGeometry().get())
 				{
 					throw ActionException("The edge does not define any geometry");
 				}
 			}
-			catch(ObjectNotFoundException<LineStop>&)
+			catch(ObjectNotFoundException<DesignatedLinePhysicalStop>&)
 			{
 				throw ActionException("No such edge");
 			}
@@ -151,17 +145,17 @@ namespace synthese
 
 			if(_edgeTemplate.get())
 			{
-				geom = _edgeTemplate->get<LineStringGeometry>();
+				geom = _edgeTemplate->getGeometry();
 			}
 			else
 			{
 				BOOST_FOREACH(const boost::shared_ptr<LineStop>& edge, edges)
 				{
 					// The most detailed geometry is selected as template
-					if(edge->get<LineStringGeometry>().get() &&
-						(!geom.get() || edge->get<LineStringGeometry>()->getCoordinatesRO()->getSize() > geom->getCoordinatesRO()->getSize())
+					if(edge->getGeometry().get() &&
+						(!geom.get() || edge->getGeometry()->getCoordinatesRO()->getSize() > geom->getCoordinatesRO()->getSize())
 					){
-						geom = edge->get<LineStringGeometry>();
+						geom = edge->getGeometry();
 					}
 				}
 			}
@@ -170,7 +164,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const boost::shared_ptr<LineStop>& edge, edges)
 				{
-					edge->set<LineStringGeometry>(geom);
+					edge->setGeometry(geom);
 					LineStopTableSync::Save(edge.get(), transaction);
 				}
 			}

@@ -23,14 +23,10 @@
 #ifndef SYNTHESE_ENV_LINESTOP_H
 #define SYNTHESE_ENV_LINESTOP_H
 
-#include "SchemaMacros.hpp"
-#include "NumericField.hpp"
-#include "Object.hpp"
-#include "PointerField.hpp"
-#include "GeometryField.hpp"
-#include "JourneyPattern.hpp"
+#include <string>
 
-#include <geos/geom/LineString.h>
+#include "Registry.h"
+#include "Edge.h"
 
 namespace synthese
 {
@@ -39,33 +35,10 @@ namespace synthese
 		class StopPoint;
 	}
 
-	FIELD_POINTER(LineNode, util::Registrable)
-	FIELD_POINTER(Line, pt::JourneyPattern)
-	FIELD_SIZE_T(RankInPath)
-	FIELD_BOOL(IsDeparture)
-	FIELD_BOOL(IsArrival)
-	FIELD_DOUBLE(MetricOffsetField)
-	FIELD_BOOL(ScheduleInput)
-	FIELD_BOOL(InternalService)
-	FIELD_BOOL(ReservationNeeded)
-
-	typedef boost::fusion::map<
-		FIELD(Key),
-		FIELD(LineNode),
-		FIELD(Line),
-		FIELD(RankInPath),
-		FIELD(IsDeparture),
-		FIELD(IsArrival),
-		FIELD(MetricOffsetField),
-		FIELD(ScheduleInput),
-		FIELD(InternalService),
-		FIELD(ReservationNeeded),
-		FIELD(LineStringGeometry)
-	> LineStopSchema;
-
 	namespace pt
 	{
-		class LinePhysicalStop;
+		class JourneyPattern;
+		class StopArea;
 
 		/** Association class between line and physical stop.
 			The linestop is the implementation of the edge of a transport line.
@@ -73,20 +46,18 @@ namespace synthese
 			@ingroup m35
 		*/
 		class LineStop:
-			public Object<LineStop, LineStopSchema>,
-			virtual public util::Registrable
+			public graph::Edge
 		{
 		public:
-			typedef std::vector<boost::shared_ptr<LinePhysicalStop> > GeneratedLineStops;
 
 		private:
-			mutable GeneratedLineStops _generatedLineStops;
+			bool	_isDeparture;		//!< The departure from the vertex is allowed
+			bool	_isArrival;			//!< The arrival at the vertex is allowed
 
-			void _generateDRTAreaAllStops(
-				bool isForArrival
-			) const;
 
 		public:
+			/// Chosen registry class.
+			typedef util::Registry<LineStop> Registry;
 
 			LineStop(
 				util::RegistryKeyType id = 0,
@@ -95,7 +66,7 @@ namespace synthese
 				bool isDeparture = true,
 				bool isArrival = true,
 				double metricOffset = 0,
-				boost::optional<util::Registrable&> node = boost::optional<util::Registrable&>()
+				graph::Vertex* vertex = NULL
 			);
 
 			~LineStop();
@@ -103,11 +74,14 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const GeneratedLineStops& getGeneratedLineStops() const { return _generatedLineStops; }
+				bool getIsDeparture()	const { return _isDeparture; }
+				bool getIsArrival()		const { return _isArrival; }
 			//@}
 
 			//!	@name Setters
 			//@{
+				void				setIsDeparture(bool value) { _isDeparture = value; }
+				void				setIsArrival(bool value) { _isArrival = value; }
 			//@}
 
 
@@ -118,14 +92,35 @@ namespace synthese
 					@param other Other line stop to compare.
 					@return true if data seems consistent, false otherwise.
 				*/
-//				bool seemsGeographicallyConsistent (const LineStop& other) const;
+				bool seemsGeographicallyConsistent (const LineStop& other) const;
+
+				virtual bool isDepartureAllowed() const;
+				virtual bool isArrivalAllowed() const;
+
+				virtual bool getScheduleInput() const = 0;
+				virtual bool getReservationNeeded() const { return true; }
+
+				JourneyPattern*				getLine()			const;
 			//@}
 
 
 			//! @name Modifiers
 			//@{
+				void setLine(JourneyPattern* line);
+			
+				
+				virtual bool loadFromRecord(
+					const Record& record,
+					util::Env& env
+				);
+
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const;
+
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
+				virtual void _unlink() = 0;
 			//@}
 		};
 }	}

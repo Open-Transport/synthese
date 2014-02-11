@@ -122,7 +122,19 @@ namespace synthese
 		template<> void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Unlink(
 			StopPoint* obj
 		){
-			obj->unlink();
+			// Hub
+			StopArea* place = const_cast<StopArea*>(obj->getConnectionPlace());
+			place->removePhysicalStop(*obj);
+			obj->setHub(NULL);
+
+			// Handicapped compliance
+			obj->setRules(RuleUser::GetEmptyRules());
+
+			// Projected point
+			if(obj->getProjectedPoint().getRoadChunk())
+			{
+				obj->getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(obj);
+			}
 		}
 
 

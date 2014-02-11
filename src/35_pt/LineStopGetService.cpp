@@ -22,12 +22,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "LineStopGetService.hpp"
-
-#include "LineStop.h"
-#include "LinePhysicalStop.hpp"
 #include "RequestException.h"
 #include "Request.h"
+#include "LineStopGetService.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "Webpage.h"
@@ -80,11 +78,11 @@ namespace synthese
 			{	// Load by id
 				try
 				{
-					_lineStop = Env::GetOfficialEnv().get<LineStop>(
+					_lineStop = Env::GetOfficialEnv().getCast<DesignatedLinePhysicalStop, LineStop>(
 						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 					);
 				}
-				catch(ObjectNotFoundException<LineStop>&)
+				catch(ObjectNotFoundException<DesignatedLinePhysicalStop>&)
 				{
 					throw RequestException("No such line stop");
 				}
@@ -112,7 +110,9 @@ namespace synthese
 							);
 
 							const Edge& edge(journeyPattern->findEdgeByVertex(stop.get()));
-							_lineStop = Env::GetOfficialEnv().getSPtr(static_cast<const LinePhysicalStop*>(&edge)->getLineStop());
+							_lineStop = static_pointer_cast<const DesignatedLinePhysicalStop, const LineStop>(
+								Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(&edge))
+							);
 						}
 						catch (ObjectNotFoundException<StopPoint>&)
 						{
@@ -134,7 +134,9 @@ namespace synthese
 								try
 								{
 									const Edge& edge(journeyPattern->findEdgeByVertex(itStop.second));
-									_lineStop = Env::GetOfficialEnv().getSPtr(static_cast<const LinePhysicalStop*>(&edge)->getLineStop());
+									_lineStop = static_pointer_cast<const DesignatedLinePhysicalStop, const LineStop>(
+										Env::GetOfficialEnv().getSPtr(static_cast<const LineStop*>(&edge))
+									);
 									break;
 								}
 								catch (Path::VertexNotFoundException&)
@@ -185,9 +187,9 @@ namespace synthese
 			ParametersMap pm;
 
 			pm.insert(DATA_LINE_STOP_ID, _lineStop->getKey());
-			pm.insert(DATA_RANK_IN_PATH, _lineStop->get<RankInPath>());
-			pm.insert(DATA_ROUTE_ID, _lineStop->get<Line>()->getKey());
-			pm.insert(DATA_STOP_ID, _lineStop->get<LineNode>()->getKey());
+			pm.insert(DATA_RANK_IN_PATH, _lineStop->getRankInPath());
+			pm.insert(DATA_ROUTE_ID, _lineStop->getParentPath()->getKey());
+			pm.insert(DATA_STOP_ID, _lineStop->getPhysicalStop()->getKey());
 
 			if(_page.get())
 			{	// CMS output

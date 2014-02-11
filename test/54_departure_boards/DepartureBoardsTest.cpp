@@ -1,6 +1,6 @@
 
 /** DepartureBoardsTest class implementation.
-	@file DepartureBoardsTest.cpp
+	@file ProjectionTest.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,13 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "LineStop.h"
 #include "StandardArrivalDepartureTableGenerator.h"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "CommercialLine.h"
 #include "JourneyPattern.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledService.h"
 #include "DeparturesTableTypes.h"
 
@@ -44,8 +44,6 @@ using namespace synthese;
 
 BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 {
-	Env env;
-
 	// Stops
 	StopArea a1(1);
 	a1.setName("A1");
@@ -84,17 +82,17 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	JourneyPattern jp1(1, "JP1");
 	jp1.setCommercialLine(&l);
 
-	LineStop jp1s1(0, &jp1, 0, true, true, 0, s11);
-	jp1s1.link(env);
+	DesignatedLinePhysicalStop jp1s1(0, &jp1, 0, true, true, 0, &s11);
+	jp1.addEdge(jp1s1);
 
-	LineStop jp1s2(0, &jp1, 1, true, true, 0, s2);
-	jp1s2.link(env);
+	DesignatedLinePhysicalStop jp1s2(0, &jp1, 1, true, true, 0, &s2);
+	jp1.addEdge(jp1s2);
 
-	LineStop jp1s3(0, &jp1, 2, true, true, 0, s3);
-	jp1s3.link(env);
+	DesignatedLinePhysicalStop jp1s3(0, &jp1, 2, true, true, 0, &s3);
+	jp1.addEdge(jp1s3);
 
-	LineStop jp1s4(0, &jp1, 3, true, true, 0, s4);
-	jp1s4.link(env);
+	DesignatedLinePhysicalStop jp1s4(0, &jp1, 3, true, true, 0, &s4);
+	jp1.addEdge(jp1s4);
 
 	ScheduledService jp1ser1(0, "Jp1Ser1", &jp1);
 	ScheduledService::Schedules jp1ser1D;
@@ -119,11 +117,11 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	JourneyPattern jp2(2, "JP2");
 	jp2.setCommercialLine(&l);
 
-	LineStop jp2s1(0, &jp2, 0, true, true, 0, s12);
-	jp2s1.link(env);
+	DesignatedLinePhysicalStop jp2s1(0, &jp2, 0, true, true, 0, &s12);
+	jp2.addEdge(jp2s1);
 
-	LineStop jp2s2(0, &jp2, 1, true, true, 0, s2);
-	jp2s2.link(env);
+	DesignatedLinePhysicalStop jp2s2(0, &jp2, 1, true, true, 0, &s2);
+	jp2.addEdge(jp2s2);
 
 	ScheduledService jp2ser1(0, "Jp2Ser1", &jp2);
 	ScheduledService::Schedules jp2ser1D;

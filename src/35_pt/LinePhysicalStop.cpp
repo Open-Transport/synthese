@@ -21,11 +21,8 @@
 */
 
 #include "LinePhysicalStop.hpp"
-
-#include "Hub.h"
-#include "LineStop.h"
-#include "PTModule.h"
 #include "StopPoint.hpp"
+#include "JourneyPatternCopy.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -38,14 +35,15 @@ namespace synthese
 	namespace pt
 	{
 		LinePhysicalStop::LinePhysicalStop(
+			util::RegistryKeyType id,
 			JourneyPattern* line,
 			std::size_t rankInPath,
+			bool isDeparture,
+			bool isArrival,
 			double metricOffset,
-			StopPoint* stop,
-			LineStop* lineStop
-		):	Registrable(0),
-			Edge(line, rankInPath, stop, metricOffset),
-			_lineStop(lineStop)
+			StopPoint* stop
+		):	Registrable(id),
+			LineStop(id, line, rankInPath, isDeparture, isArrival, metricOffset, stop)
 		{
 			if(stop)
 			{
@@ -70,78 +68,25 @@ namespace synthese
 
 
 
-		LinePhysicalStop::~LinePhysicalStop()
+		void LinePhysicalStop::clearPhysicalStopLinks()
 		{
-		}
-
-
-
-		bool LinePhysicalStop::getReservationNeeded() const
-		{
-			return _lineStop->get<ReservationNeeded>();
-		}
-
-
-
-		void LinePhysicalStop::link()
-		{
-			// Link on stop
-			if(_fromVertex)
+			StopPoint* stop(getPhysicalStop());
+			if(stop == NULL)
 			{
-				if(isArrivalAllowed())
-				{
-					_fromVertex->addArrivalEdge(this);
-				}
-				if(isDepartureAllowed())
-				{
-					_fromVertex->addDepartureEdge(this);
-				}
-
-				if(_fromVertex->getHub())
-				{
-					_fromVertex->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-				}
-			}
-			
-			// Link on path
-			if(_parentPath)
-			{
-				_parentPath->addEdge(*this);
-			}
-		}
-
-
-
-		void LinePhysicalStop::unlink()
-		{
-			if(_parentPath)
-			{
-				_parentPath->removeEdge(*this);
+				return;
 			}
 
-			if(_fromVertex)
+			// Removing edge from journey pattern
+			getLine()->removeEdge(*this);
+
+			// Removing edge from stop point
+			if(getIsArrival())
 			{
-				_fromVertex->removeArrivalEdge(this);
-				_fromVertex->removeDepartureEdge(this);
-
-				if(_fromVertex->getHub())
-				{
-					_fromVertex->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
-				}
+				stop->removeArrivalEdge(this);
 			}
-		}
-
-
-
-		bool LinePhysicalStop::getScheduleInput() const
-		{
-			return _lineStop->get<ScheduleInput>();
-		}
-
-
-
-		JourneyPattern* LinePhysicalStop::getJourneyPattern() const
-		{
-			return _lineStop->get<Line>() ? &*_lineStop->get<Line>() : NULL;
+			if(getIsDeparture())
+			{
+				stop->removeDepartureEdge(this);
+			}
 		}
 }	}

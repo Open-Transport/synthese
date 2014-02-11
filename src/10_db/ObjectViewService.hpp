@@ -30,10 +30,7 @@
 
 namespace synthese
 {
-	namespace util
-	{
-		class Registrable;
-	}
+	class ObjectBase;
 
 	namespace db
 	{
@@ -54,7 +51,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const util::Registrable> _object;
+				boost::shared_ptr<const ObjectBase> _object;
 				bool _additionalParameters;
 			//@}
 			

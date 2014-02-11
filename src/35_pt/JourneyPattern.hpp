@@ -60,17 +60,14 @@ namespace synthese
 	{
 		class TransportNetwork;
 		class StopPoint;
+		class JourneyPatternCopy;
 		class Destination;
 		class LineStop;
 		class LineAlarmBroadcast;
 		class CommercialLine;
 
-		struct cmpLineStop
-		{
-		    bool operator() (const LineStop* s1, const LineStop* s2) const;
-		};
 
-		/** Journey pattern.
+		/** Technical line.
 			TRIDENT JourneyPattern = Mission
 			 inherits from Route
 			@ingroup m35
@@ -86,6 +83,10 @@ namespace synthese
 				- Un service d'une ligne desservant un point d'arrêt avant un autre de la même ligne ne doit pas desservir un autre point d'arrêt après ce dernier&nbsp;: deux services ne doivent pas se doubler
 
 			NB : la correspondance entre deux services d'une même ligne est interdite, sauf dans les axes libres.
+
+			If a service is responsible of a break of the preceding rules, then the line is copied as a JourneyPatternCopy, and the service is linked to the new line. The _sublines container keeps a pointer on each JourneyPatternCopy.
+
+			@warning If a new attribute is added on the JourneyPattern class, don't forget to update the constructor of JourneyPatternCopy.
 		*/
 		class JourneyPattern:
 			public graph::Path,
@@ -97,24 +98,26 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<JourneyPattern>	Registry;
 
-			typedef std::set<LineStop*, cmpLineStop> LineStops;
+			typedef std::vector<pt::JourneyPatternCopy*> SubLines;
 
 		private:
+			// If a new attribute is added on the JourneyPattern class, don't forget to update the constructor of JourneyPatternCopy.
+
 			std::string _timetableName; //!< Name for timetable
 			std::string _direction;		//!< Direction (shown on vehicles)
 			Destination* _directionObj;
 			std::string _name;
 			bool _isWalkingLine;
 			mutable boost::optional<calendar::Calendar> _calendar;
-			bool _main;
+
+			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
 			bool _wayBack;	//!< true if back route, false else (forward route or unknown)
+			bool _main; //!< can be considered as a main route of the line
 
 			graph::MetricOffset _plannedLength; //!< For DRT
 
 			mutable boost::mutex _calendarCacheMutex;
-
-			mutable LineStops _lineStops;
 
 		public:
 
@@ -135,13 +138,13 @@ namespace synthese
                 TransportNetwork*	getNetwork()				const;
 				bool				getWalkingLine ()			const;
 				CommercialLine*		getCommercialLine()			const;
+				const SubLines		getSubLines()				const;
 				bool				getWayBack()				const { return _wayBack; }
 				Destination*		getDirectionObj()			const { return _directionObj; }
+				bool				getMain()					const { return _main; }
 				graph::MetricOffset	getPlannedLength()			const { return _plannedLength; }
 				virtual std::string getName() const { return _name; }
 				calendar::Calendar& getCalendarCache() const;
-				bool getMain() const { return _main; }
-				const LineStops& getLineStops() const { return _lineStops; }
 			//@}
 
 
@@ -155,30 +158,50 @@ namespace synthese
 				void setCommercialLine(CommercialLine* value);
 				void setWayBack(bool value) { _wayBack = value; }
 				void setDirectionObj(Destination* value){ _directionObj = value; }
+				void setMain(bool value){ _main = value; }
 				void setPlannedLength(graph::MetricOffset value){ _plannedLength = value; }
 				void setName(const std::string& value){ _name = value; }
-				void setMain(bool value){ _main = value; }
 			//@}
 
 
 
 			//! @name Update methods
 			//@{
+
+				/** Adds a sub-line to the line.
+					@param line sub-line to add
+					@return int rank of the sub-line in the array of sub-lines
+					@author Hugues Romain
+					@date 2008
+				*/
+				int addSubLine(pt::JourneyPatternCopy* line);
+
+
+				/** Adds a service to a line.
+					@param service Service to add
+					@param ensureLineTheory If true, the method verifies if the service is compatible
+							with the other ones, by the way of the lines theory. If not, then it attempts
+							to register the service in an existing JourneyPatternCopy, or creates one if necessary.
+							Note : in this case, the service is NOT added to the current line.
+
+					@author Hugues Romain
+					@date 2007
+				*/
+				virtual void addService(
+					graph::Service& service,
+					bool ensureLineTheory
+				);
+
+
+
 				virtual bool loadFromRecord(
 					const Record& record,
 					util::Env& env
 				);
-
-
-				void addLineStop(const LineStop& lineStop) const;
-				void removeLineStop(const LineStop& lineStop) const;
 			//@}
 
 			//! @name Services
 			//@{
-				const StopPoint* getDestination () const;
-				const StopPoint* getOrigin () const;
-
 				virtual std::string getRuleUserName() const;
 
 				virtual bool isActive(const boost::gregorian::date& date) const;
@@ -188,6 +211,9 @@ namespace synthese
 				bool isReservable () const;
 
 				void clearCalendarCache() const { _calendar.reset(); }
+
+				const pt::StopPoint* getDestination () const;
+				const pt::StopPoint* getOrigin () const;
 
 				virtual void toParametersMap(
 					util::ParametersMap& pm,
@@ -212,6 +238,15 @@ namespace synthese
 
 				size_t getScheduledStopsNumber() const;
 
+				/** Tests if the line theory would be respected if the service were inserted into the line.
+					@param service service to test
+					@return bool true if the line theory would be respected
+					@author Hugues Romain
+					@date 2008
+				*/
+				bool respectsLineTheory(
+					const graph::Service& service
+				) const;
 
 				/** Content comparison operator.
 					@param stops Array of physical stops
@@ -270,6 +305,7 @@ namespace synthese
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			//@}
 		};
-}	}
+	}
+}
 
 #endif

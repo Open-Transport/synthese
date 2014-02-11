@@ -22,17 +22,21 @@
 
 #include "PTFileFormat.hpp"
 
-#include "City.h"
-#include "CommercialLineTableSync.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "JourneyPatternTableSync.hpp"
-#include "LineStopTableSync.h"
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
 #include "StopAreaTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
+#include "LineStopTableSync.h"
+#include "City.h"
 #include "DestinationTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "RollingStockTableSync.hpp"
 
 #include <geos/operation/distance/DistanceOp.h>
@@ -101,18 +105,18 @@ namespace synthese
 			size_t rank(0);
 			BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
 			{
-				boost::shared_ptr<LineStop> ls(
-					new LineStop(
+				boost::shared_ptr<DesignatedLinePhysicalStop> ls(
+					new DesignatedLinePhysicalStop(
 						LineStopTableSync::getId(),
 						route.get(),
 						rank,
 						rank+1 < stops.size() && stop._departure,
 						rank > 0 && stop._arrival,
 						stop._metricOffset ? *stop._metricOffset : 0,
-						**stop._stop.begin()
+						*stop._stop.begin(),
+						stop._withTimes
 				)	);
-				ls->set<ScheduleInput>(stop._withTimes);
-				ls->link(_env, true);
+				route->addEdge(*ls);
 				_env.getEditableRegistry<LineStop>().add(ls);
 
 				++rank;
@@ -585,7 +589,7 @@ namespace synthese
 						_logInfo(
 							"Stop "+ code +" ("+ stop->getName() +") moved from " + exGeom->toString() + " to " + (newGeom ? newGeom->toString() : "POINT(0 0)")
 						);
-				}
+					}
 				}
 
 				if(rules)
@@ -783,18 +787,18 @@ namespace synthese
 						continue;
 					}
 
-					boost::shared_ptr<LineStop> ls(
-						new LineStop(
+					boost::shared_ptr<DesignatedLinePhysicalStop> ls(
+						new DesignatedLinePhysicalStop(
 							LineStopTableSync::getId(),
 							result,
 							rank,
 							rank+1 < servedStops.size() && stop._departure,
 							rank > 0 && stop._arrival,
 							0,
-							**stop._stop.begin()
+							*stop._stop.begin(),
+							stop._withTimes ? *stop._withTimes : true
 					)	);
-					ls->set<ScheduleInput>(stop._withTimes ? *stop._withTimes : true);
-					ls->link(_env, true);
+					result->addEdge(*ls);
 					_env.getEditableRegistry<LineStop>().add(ls);
 					++rank;
 				}
@@ -802,38 +806,24 @@ namespace synthese
 				// Geometries
 				if(attemptToCopyExistingGeometries)
 				{
-					for(JourneyPattern::LineStops::const_iterator itEdge(result->getLineStops().begin());
-						itEdge != result->getLineStops().end();
-						++itEdge
-					){
-						JourneyPattern::LineStops::const_iterator it2(itEdge);
-						++it2;
-						if(it2 == result->getLineStops().end())
-						{
-							break;
-						}
-
+					for(Path::Edges::iterator itEdge(result->getEdges().begin()); itEdge != result->getEdges().end() && itEdge+1 != result->getEdges().end(); ++itEdge)
+					{
 						// Don't update already defined geometry
-						if(	(*itEdge)->get<LineStringGeometry>() ||
-							!(*itEdge)->get<LineNode>() ||
-							!dynamic_cast<const StopPoint*>(&*(*itEdge)->get<LineNode>()) ||
-							!(*it2)->get<LineNode>() ||
-							!dynamic_cast<const StopPoint*>(&*(*it2)->get<LineNode>())
-						){
+						if((*itEdge)->getGeometry().get())
+						{
 							continue;
 						}
 
-
 						Env env2;
-						boost::shared_ptr<LineStop> templateObject(
+						boost::shared_ptr<DesignatedLinePhysicalStop> templateObject(
 							LineStopTableSync::SearchSimilarLineStop(
-								dynamic_cast<const StopPoint&>(*(*itEdge)->get<LineNode>()),
-								dynamic_cast<const StopPoint&>(*(*it2)->get<LineNode>()),
+								static_cast<const StopPoint&>(*(*itEdge)->getFromVertex()),
+								static_cast<const StopPoint&>(*(*(itEdge+1))->getFromVertex()),
 								env2
 						)	);
 						if(templateObject.get())
 						{
-							(*itEdge)->set<LineStringGeometry>(templateObject->get<LineStringGeometry>());
+							(*itEdge)->setGeometry(templateObject->getGeometry());
 						}
 				}	}
 			}
@@ -845,14 +835,14 @@ namespace synthese
 			// Metric offsets
 			if(creation || updateMetricOffsetOnUpdate)
 			{
-				JourneyPattern::LineStops::const_iterator it(result->getLineStops().begin());
+				Path::Edges::const_iterator it(result->getEdges().begin());
 				BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 				{
 					if(stop._metricOffset)
 					{
-						const_cast<LineStop*>(*it)->set<MetricOffsetField>(*stop._metricOffset);
+						const_cast<Edge*>(*it)->setMetricOffset(*stop._metricOffset);
 					}
-					if(it == result->getLineStops().end())
+					if(it == result->getEdges().end())
 					{
 						_logWarning(
 							"Inconsistent stop number on route "+ (id ? *id : string()) +" "+ (name ? *name : string()) +" is ignored because not linked to a synthese stop"
@@ -876,7 +866,7 @@ namespace synthese
 				}
 				if(stop._geometry.get())
 				{
-					const_cast<LineStop*>(result->getLineStop(rank))->set<LineStringGeometry>(stop._geometry);
+					const_cast<Edge*>(result->getEdge(rank))->setGeometry(stop._geometry);
 				}
 				++rank;
 			}
@@ -974,7 +964,7 @@ namespace synthese
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 					*route.sharedServicesMutex
 				);
-				BOOST_FOREACH(Service* tservice, route.getAllServices())
+				BOOST_FOREACH(Service* tservice, route.getServices())
 				{
 					ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
 
@@ -1129,7 +1119,7 @@ namespace synthese
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 				*route.sharedServicesMutex
 			);
-			BOOST_FOREACH(Service* tservice, route.getAllServices())
+			BOOST_FOREACH(Service* tservice, route.getServices())
 			{
 				ContinuousService* curService(dynamic_cast<ContinuousService*>(tservice));
 

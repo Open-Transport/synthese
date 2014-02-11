@@ -277,7 +277,7 @@ namespace synthese
 					services
 				);
 				stream << t.open();
-				BOOST_FOREACH(const Service* itService, _area->getAllServices())
+				BOOST_FOREACH(const Service* itService, _area->getServices())
 				{
 					// Declarations
 					const FreeDRTTimeSlot& service(static_cast<const FreeDRTTimeSlot&>(*itService));

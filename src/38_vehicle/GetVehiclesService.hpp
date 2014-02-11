@@ -60,7 +60,6 @@ namespace synthese
 			static const std::string PARAMETER_LINE_ID;
 
 			static const std::string DATA_RANK;
-			static const std::string TAG_VEHICLE;
 
 		protected:
 			//! \name Page parameters
@@ -101,10 +100,6 @@ namespace synthese
 				const server::Request& request,
 				const Vehicle& vehicle,
 				std::size_t rank
-			) const;
-
-			bool _selectVehicle(
-				const Vehicle& object
 			) const;
 
 

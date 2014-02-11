@@ -20,10 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Env.h"
 #include "PTModuleRegister.cpp"
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "Path.h"
 #include "Hub.h"
 #include "ImpExModuleRegister.cpp"
@@ -31,6 +30,7 @@
 #include "StopPoint.hpp"
 #include "GeographyModule.h"
 #include "DRTArea.hpp"
+#include "LineArea.hpp"
 #include "AreaGeneratedLineStop.hpp"
 #include "CommercialLine.h"
 #include "ScheduledService.h"
@@ -188,8 +188,7 @@ public:
 class TestJourney
 {
 private:
-	Env _env;
-	vector<boost::shared_ptr<LineStop> > _designatedLinePhysicalStops;
+	vector<boost::shared_ptr<DesignatedLinePhysicalStop> > _designatedLinePhysicalStops;
 	vector<boost::shared_ptr<StopPoint> > _stopPoints;
 	size_t _numberOfStops;
 public:
@@ -200,18 +199,17 @@ public:
 		for(size_t i=0; i< _numberOfStops; ++i)
 		{
 			_designatedLinePhysicalStops.push_back(
-				boost::shared_ptr<LineStop>(
-					new LineStop(
-						0,
-						&jp,
-						i,
-						(i < _numberOfStops - 1 ? true : false), // Departure
-						(i > 0 ? true : false),  // Arrival
-						0,
-						*_stopPoints[i]
-				)	)
+				boost::shared_ptr<DesignatedLinePhysicalStop>(
+				new DesignatedLinePhysicalStop(0, &jp, i,
+				(i < _numberOfStops - 1 ? true : false), // Departure
+				(i > 0 ? true : false),  // Arrival
+				0, &*_stopPoints[i]))
 			);
-			_designatedLinePhysicalStops[i]->link(_env);
+			jp.addEdge(*(_designatedLinePhysicalStops[i].get()));
+			if (i < _numberOfStops - 1)
+				_stopPoints[i]->addDepartureEdge(_designatedLinePhysicalStops[i].get());
+			if (i > 0)
+				_stopPoints[i]->addArrivalEdge(_designatedLinePhysicalStops[i].get());
 		}
 	}
 

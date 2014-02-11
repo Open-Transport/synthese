@@ -25,7 +25,6 @@
 #include "FactoryBase.h"
 
 #include "ImpExTypes.hpp"
-#include "StringField.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
@@ -36,8 +35,6 @@
 
 namespace synthese
 {
-	FIELD_STRING(FileFormatKey)
-
 	namespace util
 	{
 		class Env;
@@ -46,7 +43,6 @@ namespace synthese
 
 	namespace impex
 	{
-		class Export;
 		class Import;
 		class Importer;
 		class Exporter;
@@ -61,8 +57,6 @@ namespace synthese
 
 			virtual bool canImport() const = 0;
 			virtual bool canExport() const = 0;
-			virtual bool isImportPermanentThread() const = 0;
-			virtual bool isExportPermanentThread() const = 0;
 
 			virtual boost::shared_ptr<Importer> getImporter(
 				util::Env& env,
@@ -74,7 +68,6 @@ namespace synthese
 			) const = 0;
 
 			virtual boost::shared_ptr<Exporter> getExporter(
-				const Export& export_
 			) const	= 0;
 
 

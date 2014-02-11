@@ -636,8 +636,8 @@ namespace synthese
 
 				if (lineid || neededLevel > FORBIDDEN)
 				{
-					query.addTableAndEqualOtherJoin<LineStopTableSync,StopPointTableSync>(LineNode::FIELD.name, TABLE_COL_ID);
-					query.addTableAndEqualOtherJoin<JourneyPatternTableSync,LineStopTableSync>(TABLE_COL_ID, Line::FIELD.name);
+					query.addTableAndEqualOtherJoin<LineStopTableSync,StopPointTableSync>(LineStopTableSync::COL_PHYSICALSTOPID, TABLE_COL_ID);
+					query.addTableAndEqualOtherJoin<JourneyPatternTableSync,LineStopTableSync>(TABLE_COL_ID, LineStopTableSync::COL_LINEID);
 				}
 
 				if(orderByType)
@@ -843,15 +843,15 @@ namespace synthese
 			q	<< "SELECT l." << TABLE_COL_ID
 				<< " FROM " << TABLE.NAME << " AS d"
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS s ON s." << StopPointTableSync::COL_PLACEID << "=d." << COL_PLACE_ID
-				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l ON l." << LineNode::FIELD.name << "=s." << TABLE_COL_ID
+				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l ON l." << LineStopTableSync::COL_PHYSICALSTOPID << "=s." << TABLE_COL_ID
 				<< " WHERE d." << TABLE_COL_ID << "=" << screenId
 				<< " AND (d." << COL_ALL_PHYSICAL_DISPLAYED << " OR d." << COL_PHYSICAL_STOPS_IDS << " LIKE ('%'|| s." << TABLE_COL_ID << " ||'%'))"
-				<< " AND (l." << IsDeparture::FIELD.name << " AND d." << COL_DIRECTION << " OR l." << IsArrival::FIELD.name << " AND NOT d." << COL_DIRECTION << ")"
-				<< " AND (NOT d." << COL_ORIGINS_ONLY << " OR l." << RankInPath::FIELD.name << "=0)"
-				<< " AND NOT EXISTS(SELECT p2." << StopPointTableSync::COL_PLACEID << " FROM " << StopPointTableSync::TABLE.NAME << " AS p2 INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l2 ON l2." << LineNode::FIELD.name << "=p2." << TABLE_COL_ID
-				<< " WHERE l2." << Line::FIELD.name << "=l." << Line::FIELD.name
-				<< " AND l2." << RankInPath::FIELD.name << ">l." << RankInPath::FIELD.name
-				<< " AND l2." << IsArrival::FIELD.name
+				<< " AND (l." << LineStopTableSync::COL_ISDEPARTURE << " AND d." << COL_DIRECTION << " OR l." << LineStopTableSync::COL_ISARRIVAL << " AND NOT d." << COL_DIRECTION << ")"
+				<< " AND (NOT d." << COL_ORIGINS_ONLY << " OR l." << LineStopTableSync::COL_RANKINPATH << "=0)"
+				<< " AND NOT EXISTS(SELECT p2." << StopPointTableSync::COL_PLACEID << " FROM " << StopPointTableSync::TABLE.NAME << " AS p2 INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l2 ON l2." << LineStopTableSync::COL_PHYSICALSTOPID << "=p2." << TABLE_COL_ID
+				<< " WHERE l2." << LineStopTableSync::COL_LINEID << "=l." << LineStopTableSync::COL_LINEID
+				<< " AND l2." << LineStopTableSync::COL_RANKINPATH << ">l." << LineStopTableSync::COL_RANKINPATH
+				<< " AND l2." << LineStopTableSync::COL_ISARRIVAL
 				<< " AND ('%'|| p2." << StopPointTableSync::COL_PLACEID << " ||'%') LIKE d." << COL_FORBIDDEN_ARRIVAL_PLACES_IDS
 				<< ")"
 				<< " LIMIT 1";

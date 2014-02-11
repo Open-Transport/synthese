@@ -36,6 +36,7 @@
 #include "ImportableAdmin.hpp"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternAdmin.hpp"
+#include "JourneyPatternCopy.hpp"
 #include "LineStop.h"
 #include "MapSource.hpp"
 #include "ObjectUpdateAction.hpp"
@@ -334,6 +335,12 @@ namespace synthese
 					// Declarations
 					const JourneyPattern& journeyPattern(*it.first);
 
+					// Avoid sublines
+					if(dynamic_cast<const JourneyPatternCopy*>(&journeyPattern))
+					{
+						continue;
+					}
+
 					// Row
 					stream << t.row();
 
@@ -381,6 +388,22 @@ namespace synthese
 								)
 							;
 						}
+						else if(dynamic_cast<DRTArea*>(journeyPattern.getEdge(0)->getFromVertex()))
+						{
+							const DRTArea& drtArea(
+								*static_cast<DRTArea*>(journeyPattern.getEdge(0)->getFromVertex())
+							);
+							openDRTAreaRequest.getPage()->setArea(
+								Env::GetOfficialEnv().getSPtr(
+									&drtArea
+							)	);
+							stream <<
+								HTMLModule::getHTMLLink(
+									openDRTAreaRequest.getURL(),
+									drtArea.getName()
+								)
+							;
+						}
 					}
 
 					// Destination
@@ -400,6 +423,22 @@ namespace synthese
 								HTMLModule::getHTMLLink(
 									openPlaceRequest.getURL(),
 									stopArea.getFullName()
+								)
+							;
+						}
+						else if(dynamic_cast<DRTArea*>(journeyPattern.getLastEdge()->getFromVertex()))
+						{
+							const DRTArea& drtArea(
+								*static_cast<DRTArea*>(journeyPattern.getLastEdge()->getFromVertex())
+							);
+							openDRTAreaRequest.getPage()->setArea(
+								Env::GetOfficialEnv().getSPtr(
+									&drtArea
+							)	);
+							stream <<
+								HTMLModule::getHTMLLink(
+									openDRTAreaRequest.getURL(),
+									drtArea.getName()
 								)
 							;
 						}

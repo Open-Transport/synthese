@@ -25,7 +25,6 @@
 #include "VehiclesAdmin.hpp"
 
 #include "AdminParametersException.h"
-#include "ObjectCreateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "VehicleModule.hpp"
@@ -37,6 +36,7 @@
 #include "GlobalRight.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
+#include "VehicleUpdateAction.hpp"
 #include "VehicleTableSync.hpp"
 #include "RemoveObjectAction.hpp"
 
@@ -122,8 +122,7 @@ namespace synthese
 
 			AdminFunctionRequest<VehiclesAdmin> searchRequest(request, *this);
 
-			AdminActionFunctionRequest<ObjectCreateAction, VehicleAdmin> createRequest(request);
-			createRequest.getAction()->setTable<Vehicle>();
+			AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> createRequest(request);
 			createRequest.setActionFailedPage<VehiclesAdmin>();
 			createRequest.setActionWillCreateObject();
 
@@ -165,15 +164,15 @@ namespace synthese
 			BOOST_FOREACH(const boost::shared_ptr<Vehicle>& vehicle, vehicles)
 			{
 				stream << t.row(lexical_cast<string>(vehicle->getKey()));
-				stream << t.col() << vehicle->get<Name>();
-				stream << t.col() << vehicle->get<Number>();
-				stream << t.col() << vehicle->get<RegistrationNumber>();
+				stream << t.col() << vehicle->getName();
+				stream << t.col() << vehicle->getNumber();
+				stream << t.col() << vehicle->getRegistrationNumbers();
 
 				// Link
 				stream << t.col();
-				if(!vehicle->get<URL>().empty())
+				if(!vehicle->getURL().empty())
 				{
-					stream << HTMLModule::getLinkButton(vehicle->get<URL>(), "Lien");
+					stream << HTMLModule::getLinkButton(vehicle->getURL(), "Lien");
 				}
 
 				stream << t.col();
@@ -187,9 +186,9 @@ namespace synthese
 			}
 
 			stream << t.row(string());
-			stream << t.col() << t.getActionForm().getTextInput(ObjectCreateAction::GetInputName<Name>(), "", "Entrez le nom du véhicule ici");
-			stream << t.col() << t.getActionForm().getTextInput(ObjectCreateAction::GetInputName<Number>(), "", "Entrez le numéro du véhicule ici");
-			stream << t.col() << t.getActionForm().getTextInput(ObjectCreateAction::GetInputName<RegistrationNumber>(), "", "Entrez l'immatriculation ici");
+			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, "", "Entrez le nom du véhicule ici");
+			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, "", "Entrez le numéro du véhicule ici");
+			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_REGISTRATION_NUMBERS, "", "Entrez l'immatriculation ici");
 			stream << t.col();
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.col();

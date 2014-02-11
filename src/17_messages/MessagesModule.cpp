@@ -254,35 +254,13 @@ namespace synthese
 
 
 
-		bool MessagesModule::_selectMessagesToActivate( const Alarm& object )
-		{
-			// Now
-			ptime now(second_clock::local_time());
-
-			// Avoid library messages
-			const SentAlarm* sentMessage(
-				dynamic_cast<const SentAlarm*>(&object)
-			);
-			if(!sentMessage)
-			{
-				return false;
-			}
-
-			// Record active message
-			if(!sentMessage->isApplicable(now))
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Updates the activated messages cache
 		void MessagesModule::UpdateActivatedMessages()
 		{
+			// Now
+			ptime now(second_clock::local_time());
+
 			// Wait for the availability of the cache
 			mutex::scoped_lock(_activatedMessagesMutex);
 
@@ -290,33 +268,38 @@ namespace synthese
 			ActivatedMessages decativatedMessages(_activatedMessages);
 
 			// Loop on all messages
-			Alarm::Registry::Vector messagesToUpdate(
-				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectMessagesToActivate)
-			);
-
 			BOOST_FOREACH(
-				const Alarm::Registry::Vector::value_type& message,
-				messagesToUpdate
+				const Registry<Alarm>::value_type& message,
+				Env::GetOfficialEnv().getRegistry<Alarm>()
 			){
+				// Avoid library messages
 				boost::shared_ptr<SentAlarm> sentMessage(
-					dynamic_pointer_cast<SentAlarm, Alarm>(message)
+					dynamic_pointer_cast<SentAlarm, Alarm>(message.second)
 				);
-
-				// Remove the message as deactivated one
-				decativatedMessages.erase(sentMessage);
-
-				// Check if the message was already activated
-				if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
+				if(!sentMessage)
 				{
-					// Record the message as activated
-					_activatedMessages.insert(sentMessage);
+					continue;
+				}
 
-					// Run the display start trigger on each broadcast point
-					BOOST_FOREACH(
-						const BroadcastPoint::BroadcastPoints::value_type& bp,
-						BroadcastPoint::GetBroadcastPoints()
-					){
-						bp->onDisplayStart(*sentMessage);
+				// Record active message
+				if(sentMessage->isApplicable(now))
+				{
+					// Remove the message as deactivated one
+					decativatedMessages.erase(sentMessage);
+
+					// Check if the message was already activated
+					if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
+					{
+						// Record the message as activated
+						_activatedMessages.insert(sentMessage);
+
+						// Run the display start trigger on each broadcast point
+						BOOST_FOREACH(
+							const BroadcastPoint::BroadcastPoints::value_type& bp,
+							BroadcastPoint::GetBroadcastPoints()
+						){
+							bp->onDisplayStart(*sentMessage);
+						}
 					}
 				}
 			}
@@ -368,35 +351,6 @@ namespace synthese
 			}
 
 			return result;
-		}
-
-
-
-		bool MessagesModule::_selectSentAlarm( const Alarm& object )
-		{
-			if(!dynamic_cast<const SentAlarm*>(&object))
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-
-
-		void MessagesModule::ClearAllBroadcastCaches()
-		{
-			Alarm::Registry::Vector sentAlarms(
-				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectSentAlarm)
-			);
-			BOOST_FOREACH(const Alarm::Registry::Vector::value_type& alarm, sentAlarms)
-			{
-				// Jump over scenarios
-				SentAlarm& sentAlarm(static_cast<SentAlarm&>(*alarm));
-				
-				// Clear the cache
-				sentAlarm.clearBroadcastPointsCache();
-			}
 		}
 
 

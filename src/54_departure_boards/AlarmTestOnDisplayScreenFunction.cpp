@@ -24,7 +24,6 @@
 
 #include "AlarmTestOnDisplayScreenFunction.h"
 
-#include "LineStop.h"
 #include "MessagesModule.h"
 #include "Profile.h"
 #include "RequestException.h"
@@ -42,7 +41,7 @@
 #include "StopArea.hpp"
 #include "ServicePointer.h"
 #include "JourneyPattern.hpp"
-#include "LinePhysicalStop.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "City.h"
 #include "CommercialLine.h"
 #include "GraphConstants.h"
@@ -127,17 +126,17 @@ namespace synthese
 			JourneyPattern line;
 			line.setCommercialLine(&cline);
 			PermanentService s(0, &line, minutes(5));
-			LineStop lineStop;
-			lineStop.set<Line>(line);
-			lineStop.set<LineNode>(ps);
+			DesignatedLinePhysicalStop lineStop;
+			lineStop.setLine(&line);
+			lineStop.setPhysicalStop(ps);
 			ptime now(second_clock::local_time());
 			ptime d(now);
 
 			for (size_t i(0); i<_type->getRowNumber(); ++i)
 			{
 				ServicePointer sp(true, false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
-				sp.setDepartureInformations(**lineStop.getGeneratedLineStops().begin(), d, d, ps);
-				sp.setArrivalInformations(**lineStop.getGeneratedLineStops().begin(), d, d, ps);
+				sp.setDepartureInformations(lineStop, d, d, ps);
+				sp.setArrivalInformations(lineStop, d, d, ps);
 				ActualDisplayedArrivalsList destinations;
 
 				destinations.push_back(IntermediateStop(&place, sp));
