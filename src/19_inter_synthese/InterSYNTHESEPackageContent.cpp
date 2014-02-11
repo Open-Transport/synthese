@@ -54,10 +54,10 @@ namespace synthese
 			util::Env& env,
 			const std::string& s,
 			impex::Import& import,
-			boost::optional<const impex::Importer&> importer
-		):	_env(env),
-			_package(new InterSYNTHESEPackage),
+			boost::optional<const impex::Importer&> importer,
 			bool noSuppressTopLevel
+		):	_env(env),
+			_package(new InterSYNTHESEPackage)
 		{
 			_package->set<Import>(import);
 			_parseAndLoad(s, importer, noSuppressTopLevel);
@@ -76,10 +76,10 @@ namespace synthese
 			Env& env,
 			const std::string& s,
 			const boost::shared_ptr<InterSYNTHESEPackage>& package,
-			boost::optional<const impex::Importer&> importer
-		):	_env(env),
-			_package(package),
+			boost::optional<const impex::Importer&> importer,
 			bool noSuppressTopLevel
+		):	_env(env),
+			_package(package)
 		{
 			_parseAndLoad(s, importer, noSuppressTopLevel);
 		}
