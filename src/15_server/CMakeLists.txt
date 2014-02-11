@@ -33,6 +33,8 @@ HtmlFormInterfaceElement.cpp
 HtmlFormInterfaceElement.h
 HTTPConnection.cpp
 HTTPConnection.hpp
+HTTPClient.cpp
+HTTPClient.hpp
 HTTPReply.cpp
 HTTPReply.hpp
 HTTPRequest.hpp
