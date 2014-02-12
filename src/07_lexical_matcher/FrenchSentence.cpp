@@ -184,100 +184,76 @@ namespace synthese
 		FrenchSentence::ComparisonScore FrenchSentence::compare(
 			const FrenchSentence& s
 		) const {
+			typedef map<size_t, pair<size_t, double> > Relations;
 
-			double totalScores(0);
+			Relations othersToThis;
+			Relations thisToOthers;
 
-			if(!s.getPhoneticString().empty())
+			vector<string> lowerJ;
+			for(size_t j(0); j<s._words.size(); ++j)
 			{
-				typedef map<size_t, pair<size_t, double> > Relations;
+				lowerJ.push_back(s._words[j].getPlainLowerSource());
+			}
 
-				Relations othersToThis;
-				Relations thisToOthers;
+			// Storage of scores by words
+			for(size_t j(0); j<s._words.size(); ++j)
+			{
+				if(s._words[j].getPhonetic().empty()) continue;
 
-				vector<string> lowerJ;
-				for(size_t j(0); j<s._words.size(); ++j)
-				{
-					lowerJ.push_back(s._words[j].getPlainLowerSource());
-				}
+				double bestScore(0);
+				size_t bestIndex = 0;
 
-				// Storage of scores by words
 				for(size_t i(0); i<_words.size(); ++i)
 				{
 					if(_words[i].getPhonetic().empty()) continue;
 
-					double bestScore(0);
-					size_t bestIndex = 0;
+					double score = 0;
 
-					for(size_t j(0); j<s._words.size(); ++j)
+					//Add StartWith Bonus
+					string lowI = _words[i].getPlainLowerSource();
+					if(FrenchPhoneticString::startsWithExact(lowerJ[j], lowI))
 					{
-						if(s._words[j].getPhonetic().empty()) continue;
-
-						FrenchPhoneticString::LevenshteinDistance distance(
-							_words[i].levenshtein(s._words[j])
-						);
-						double score(
-							1 - static_cast<double>(distance) / static_cast<double>(distance > s._words[j].getPhonetic().size() ? distance : s._words[j].getPhonetic().size())
-						);
-
-						assert(score >= 0 && score <= 1);
-
-						//Add StartWith Bonus
-						if(score > 0 && _words[i].startsWith(s._words[j]))
-						{
-							score += (1 - score) * score;
-						}
-						if(FrenchPhoneticString::startsWithExact(lowerJ[j], _words[i].getPlainLowerSource()))
-						{
-							double minScore = 0.1 * lowerJ[j].size();
-							if(0.9 < minScore)
-								minScore = 0.9;
-							if(score < minScore)
-								score = minScore;
-						}
-
-						if(score > bestScore)
-						{
-							if(	othersToThis.find(j) == othersToThis.end() ||
-								othersToThis[j].second < score
-							)
-							{
-								bestScore = score;
-								bestIndex = j;
-							}
-						}
+						if(lowerJ[j].size() == lowI.size())
+							score = 1;
+						else
+							score = 0.75;
 					}
-					if(	bestScore > 0 )
-						othersToThis[bestIndex] = make_pair(i, bestScore);
-				}
+                                        else
+                                        {
+                                        	if(_words[i].startsWith(s._words[j]))
+							score = 0.65;
+                                        }
 
-
-				// Average score
-				for(size_t j(0); j<s._words.size(); ++j)
-				{
-					if(	othersToThis.find(j) != othersToThis.end()
-					){
-						totalScores += othersToThis[j].second;
-					}
-				}
-				totalScores /= s._words.size();
-
-				// Order
-				size_t lastIndex(_words.size());
-				size_t penalties(0);
-				BOOST_FOREACH(Relations::value_type s, othersToThis)
-				{
-					if(	lastIndex != _words.size() &&
-						s.second.first < lastIndex)
+					if(score > bestScore)
 					{
-						++penalties;
+						if(	othersToThis.find(i) == othersToThis.end() ||
+							othersToThis[i].second < score
+						)
+						{
+							bestScore = score;
+							bestIndex = i;
+						}
 					}
-					lastIndex = s.second.first;
+					else if((score > 0) && (score == bestScore))
+					{
+						bestScore += (1 - bestScore) * bestScore;
+					}
 				}
-				if(penalties)
-				{
-					totalScores /= (1 + 0.25 * penalties);
+				if( bestScore > 0 )
+					othersToThis[bestIndex] = make_pair(j, bestScore);
+			}
+
+
+			// Average score
+			double totalScores(0);
+			for(size_t j(0); j<_words.size(); ++j)
+			{
+				if(	othersToThis.find(j) != othersToThis.end()
+				){
+					totalScores += othersToThis[j].second;
 				}
 			}
+			totalScores /= s._words.size();
 
 			ComparisonScore score;
 			score.levenshtein = FrenchPhoneticString::Levenshtein(_lowerSource, s._lowerSource);

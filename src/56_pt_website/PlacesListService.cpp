@@ -29,6 +29,9 @@
 #include "House.hpp"
 #include "HTMLTable.h"
 #include "MimeTypes.hpp"
+#include "CommercialLine.h"
+#include "JourneyPattern.hpp"
+#include "RollingStock.hpp"
 #include "PTModule.h"
 #include "PublicPlace.h"
 #include "Request.h"
@@ -494,14 +497,48 @@ namespace synthese
 						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit& item, stopResult)
 						{
 							const pt::StopArea* stop(dynamic_cast<const pt::StopArea*>(&(*item.value)));
+							double score = item.score.phoneticScore;
 							if(stop)
 							{
 								if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
 									continue;
-							}
 
-							newStopResult.push_back(item);
+								boost::shared_ptr<ParametersMap> stopPm(new ParametersMap);
+								stop->toParametersMap(*stopPm, _coordinatesSystem);
+								
+								BOOST_FOREACH(const pt::StopArea::Lines::value_type& itLine, stop->getLines(false))
+								{
+									bool quit = false;
+									// If rolling stock = metro ou tram on augmente le score
+									BOOST_FOREACH(graph::Path* path, itLine->getPaths())
+									{
+										if(!dynamic_cast<const pt::JourneyPattern*>(path))
+											continue;
+
+										if(!static_cast<const pt::JourneyPattern*>(path)->getRollingStock())
+											continue;
+
+										vehicle::RollingStock * rs = static_cast<const pt::JourneyPattern*>(path)->getRollingStock();
+										if((rs->getTridentKey() == "Metro") || (rs->getTridentKey() == "Tramway"))
+										{
+											score += (1 - score) * score;
+											quit = true;
+											break;
+										}
+									}
+									if(quit)break;
+								}
+							}
+							lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit newHit;
+							newHit.score.phoneticScore = score;
+							newHit.score.levenshtein = item.score.levenshtein;
+							newHit.key = item.key;
+							newHit.value = item.value;
+							newStopResult.push_back(newHit);
 						}
+
+						lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHitSort hitSort;
+						std::sort (newStopResult.begin(), newStopResult.end(), hitSort);
 
 						_registerItems<NamedPlace>(
 							*pm,
@@ -641,14 +678,48 @@ namespace synthese
 						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHit& item, stopResult)
 						{
 							const pt::StopArea* stop(dynamic_cast<const pt::StopArea*>(&(*item.value)));
+							double score = item.score.phoneticScore;
 							if(stop)
 							{
 								if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
 									continue;
-							}
 
-							newStopResult.push_back(item);
+								boost::shared_ptr<ParametersMap> stopPm(new ParametersMap);
+								stop->toParametersMap(*stopPm, _coordinatesSystem);
+									
+								BOOST_FOREACH(const pt::StopArea::Lines::value_type& itLine, stop->getLines(false))
+								{
+									bool quit = false;
+									// If rolling stock = metro ou tram on augmente le score
+									BOOST_FOREACH(graph::Path* path, itLine->getPaths())
+									{
+										if(!dynamic_cast<const pt::JourneyPattern*>(path))
+											continue;
+
+										if(!static_cast<const pt::JourneyPattern*>(path)->getRollingStock())
+											continue;
+
+										vehicle::RollingStock * rs = static_cast<const pt::JourneyPattern*>(path)->getRollingStock();
+										if((rs->getTridentKey() == "Metro") || (rs->getTridentKey() == "Tramway"))
+										{
+											score += (1 - score) * score;
+											quit = true;
+											break;
+										}
+									}
+									if(quit)break;
+								}
+							}
+							lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHit newHit;
+							newHit.score.phoneticScore = score;
+							newHit.score.levenshtein = item.score.levenshtein;
+							newHit.key = item.key;
+							newHit.value = item.value;
+							newStopResult.push_back(newHit);
 						}
+
+						lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHitSort hitSort;
+						std::sort (newStopResult.begin(), newStopResult.end(), hitSort);
 
 						_registerItems<StopArea>(
 							*pm,

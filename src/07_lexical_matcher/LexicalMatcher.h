@@ -162,16 +162,18 @@ namespace synthese
 
 				if (hit.score.phoneticScore >= minScore)
 				{
-					if(value.first.startsWith(ppkey))
-					{
-						hit.score.phoneticScore += ((1 - hit.score.phoneticScore) * hit.score.phoneticScore ) / 2;
-					}
-					else
-					{
-						hit.score.phoneticScore *= 0.9;
-					}
 					hit.key = value.first;
 					hit.value = value.second;
+					double score = hit.score.phoneticScore;
+					
+					//Give bonus on Toulouse
+					size_t found = hit.key.getSource().find("TOULOUSE");
+					if (found != std::string::npos)
+					{
+						score += (1 - score) * score;
+					}
+					
+					hit.score.phoneticScore = score;
 					result.push_back(hit);
 				}
 
