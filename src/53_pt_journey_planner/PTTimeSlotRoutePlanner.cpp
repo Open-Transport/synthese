@@ -71,7 +71,8 @@ namespace synthese
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime,
-			UseRule::ReservationDelayType reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType,
+			boost::optional<AccessParameters> originVAMSpecificAccessParameter
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
@@ -97,7 +98,8 @@ namespace synthese
 				reservationRulesDelayType
 			),
 			_departurePlace(origin),
-			_arrivalPlace(destination)
+			_arrivalPlace(destination),
+			_originVAMSpecificAccessParameter(originVAMSpecificAccessParameter)
 		{
 		}
 
@@ -136,11 +138,34 @@ namespace synthese
 					getLowestArrivalTime(),
 					getHighestArrivalTime()
 				);
-				ovam = extenderToPhysicalStops.run(
-					_originVam,
-					_destinationVam,
-					DEPARTURE_TO_ARRIVAL
-				);
+
+				if(_originVAMSpecificAccessParameter)
+				{
+					VAMConverter originExtenderToPhysicalStops(
+						*_originVAMSpecificAccessParameter,
+						_logger,
+						PTModule::GRAPH_ID,
+						RoadModule::GRAPH_ID,
+						getLowestDepartureTime(),
+						getHighestDepartureTime(),
+						getLowestArrivalTime(),
+						getHighestArrivalTime()
+					);
+					ovam = originExtenderToPhysicalStops.run(
+						_originVam,
+						_destinationVam,
+						DEPARTURE_TO_ARRIVAL
+					);
+				}
+				else
+				{
+					ovam = extenderToPhysicalStops.run(
+						_originVam,
+						_destinationVam,
+						DEPARTURE_TO_ARRIVAL
+					);
+				}
+
 				dvam = extenderToPhysicalStops.run(
 					_destinationVam,
 					_originVam,

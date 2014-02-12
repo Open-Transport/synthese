@@ -85,6 +85,7 @@ namespace synthese
 		private:
 			const geography::Place* const _departurePlace;
 			const geography::Place* const _arrivalPlace;
+			const boost::optional<const graph::AccessParameters> _originVAMSpecificAccessParameter;
 			bool _showFullRoadJourney;
 
 
@@ -124,7 +125,8 @@ namespace synthese
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true,
-				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY,
+				boost::optional<graph::AccessParameters> originVAMSpecificAccessParameter = boost::optional<graph::AccessParameters>()
 			);
 
 			PTRoutePlannerResult run() const;
