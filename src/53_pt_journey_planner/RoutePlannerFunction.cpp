@@ -124,9 +124,11 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAX_DEPTH = "md";
 		const string RoutePlannerFunction::PARAMETER_APPROACH_SPEED = "apsp";
 		const string RoutePlannerFunction::PARAMETER_MAX_APPROACH_DISTANCE = "mad";
+		const string RoutePlannerFunction::PARAMETER_MAX_START_APPROACH_DISTANCE = "mcad";
 		const string RoutePlannerFunction::PARAMETER_DAY = "dy";
 		const string RoutePlannerFunction::PARAMETER_PERIOD_ID = "pi";
 		const string RoutePlannerFunction::PARAMETER_ACCESSIBILITY = "ac";
+		const string RoutePlannerFunction::PARAMETER_START_ACCESSIBILITY = "sac";
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT = "dct";
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT = "act";
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT = "dpt";
@@ -614,6 +616,24 @@ namespace synthese
 			if(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE))
 			{
 				_accessParameters.setMaxApproachDistance(*(map.getOptional<int>(PARAMETER_MAX_APPROACH_DISTANCE)));
+			}
+
+			optional<UserClassCode> userClassCode(map.getOptional<UserClassCode>(PARAMETER_START_ACCESSIBILITY));
+			double maxStartApproachDistance = map.getDefault<double>(PARAMETER_MAX_START_APPROACH_DISTANCE, 0);
+			if(userClassCode || maxStartApproachDistance)
+			{
+				if(userClassCode && *userClassCode == USER_PEDESTRIAN)
+				{
+					_startApproachAccessParameter = AccessParameters(USER_PEDESTRIAN, false, false, (maxStartApproachDistance ? maxStartApproachDistance : _accessParameters.getMaxApproachDistance()), boost::posix_time::hours(24), 1.111);
+				}
+				else if(userClassCode && *userClassCode == USER_BIKE)
+				{
+					_startApproachAccessParameter = AccessParameters(USER_BIKE, false, false, (maxStartApproachDistance ? maxStartApproachDistance : _accessParameters.getMaxApproachDistance()), boost::posix_time::hours(24), 4.167);
+				}
+				else if((userClassCode && *userClassCode == USER_CAR) || maxStartApproachDistance)
+				{
+					_startApproachAccessParameter = AccessParameters(USER_CAR, false, false, (maxStartApproachDistance ? maxStartApproachDistance : _accessParameters.getMaxApproachDistance()), boost::posix_time::hours(24), 13.889);
+				}
 			}
 
 			// Origin and destination places
@@ -1273,7 +1293,8 @@ namespace synthese
 				_minMaxDurationRatioFilter,
 				PTModule::isTheoreticalAllowed(),
 				PTModule::isRealTimeAllowed(),
-				_reservationRulesDelayType
+				_reservationRulesDelayType,
+				_startApproachAccessParameter
 			);
 
 			// Computing
@@ -2562,10 +2583,40 @@ namespace synthese
 				);
 
 				size_t i=1;
+
+				size_t specificPricing(0);
+				int idJourney(0);
+				string strId = (pm.isDefined("idJourney") ? trim_copy(pm.getValue("idJourney")) : "");
+				bool last(false);
+
+				if(strId == "MAX")
+					last = true;
+				else
+				{
+					try
+					{
+						idJourney = lexical_cast<int>(strId);
+					}
+					catch(bad_lexical_cast)
+					{
+					}
+				}
+
 				for(PTRoutePlannerResult::Journeys::const_iterator it(object.getJourneys().begin());
 					it != object.getJourneys().end();
 					++it, ++i
 				){
+					if((idJourney == 0) || (last ? ((it + 1) == object.getJourneys().end()) : (idJourney == i)))
+					{
+						BOOST_FOREACH(const ServicePointer& su, it->getServiceUses())
+						{
+							const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
+
+							if((line != NULL) && ((line->getCommercialLine()->getShortName() == "NAERO") || (line->getCommercialLine()->getShortName() == "AERO")))
+								specificPricing = 1;
+						}
+					}
+ 
 					_displayJourney(
 						boards,
 						_boardPage,
@@ -2585,6 +2636,7 @@ namespace synthese
 					);
 				}
 
+				pm.insert("isSpecificPricing", specificPricing);
 				pm.insert(DATA_BOARDS, boards.str());
 			}
 
@@ -2944,6 +2996,7 @@ namespace synthese
 
 			// Display Lines used
 			int junctionsNumber = -1; // junctionsNumber is legNumber -1
+			size_t specificPricing(0);
 			if(_lineMarkerPage.get())
 			{
 				stringstream lineMarkers;
@@ -2964,6 +3017,10 @@ namespace synthese
 							pmLine
 						);
 						junctionsNumber++;
+
+						string shortName(static_cast<const JourneyPattern*>(leg.getService()->getPath())->getCommercialLine()->getShortName());
+						if((shortName == "AERO") || (shortName == "NAERO"))
+							specificPricing = 1;
 					}
 				}
 				pm.insert(DATA_LINE_MARKERS, lineMarkers.str());
@@ -2982,6 +3039,7 @@ namespace synthese
 				pm
 			);
 
+			pm.insert("isSpecificPricing", specificPricing);
 			pm.insert(DATA_JUNCTIONS_NUMBER,junctionsNumber);
 			pm.insert(DATA_IS_CONTINUOUS_SERVICE, rangeDuration.total_seconds() > 0);
 			pm.insert(DATA_ROW_NUMBER, rowNumber);
@@ -3138,10 +3196,14 @@ namespace synthese
 			double co2Emissions = 0;
 			double energyConsumption = 0;
 			double totalDistance = 0;
+			size_t specificPricing(0);
 			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 			{
 				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
 				if((line == NULL)||(!line->getRollingStock())) continue;
+
+				if((line->getCommercialLine()->getShortName() == "NAERO") || (line->getCommercialLine()->getShortName() == "AERO"))
+					specificPricing = 1;
 
 				double distance = su.getDistance();
 
@@ -3162,6 +3224,7 @@ namespace synthese
 					totalDistance += distance;
 				}
 			}
+			pm.insert("isSpecificPricing", specificPricing);
 			// TODO : set precision outside of RoutePlannerFunction
 			stringstream sCO2Emissions, sEnergyConsumption;
 			sCO2Emissions << std::fixed << setprecision(2) << co2Emissions;

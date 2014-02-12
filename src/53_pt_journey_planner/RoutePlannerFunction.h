@@ -117,6 +117,7 @@ namespace synthese
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
 			static const std::string PARAMETER_APPROACH_SPEED;
 			static const std::string PARAMETER_MAX_APPROACH_DISTANCE;
+			static const std::string PARAMETER_MAX_START_APPROACH_DISTANCE;
 			static const std::string PARAMETER_MAX_DEPTH;
 			static const std::string PARAMETER_DEPARTURE_CITY_TEXT;
 			static const std::string PARAMETER_ARRIVAL_CITY_TEXT;
@@ -125,6 +126,7 @@ namespace synthese
 			static const std::string PARAMETER_DEPARTURE_CLASS_FILTER;
 			static const std::string PARAMETER_ARRIVAL_CLASS_FILTER;
 			static const std::string PARAMETER_ACCESSIBILITY;
+			static const std::string PARAMETER_START_ACCESSIBILITY;
 			static const std::string PARAMETER_FAVORITE_ID;
 			static const std::string PARAMETER_DAY;
 			static const std::string PARAMETER_PERIOD_ID;
@@ -360,6 +362,7 @@ namespace synthese
 				boost::posix_time::ptime					_startArrivalDate;
 				boost::posix_time::ptime					_endArrivalDate;
 				graph::AccessParameters						_accessParameters;
+				boost::optional<graph::AccessParameters>	_startApproachAccessParameter;
 				boost::optional<std::size_t>				_maxSolutionsNumber;
 				const pt_website::HourPeriod*			_period;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
