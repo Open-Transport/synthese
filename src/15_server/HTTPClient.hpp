@@ -29,7 +29,8 @@ namespace synthese
 
 			bool _gotHeader;
 			// Map of each http header received
-			std::map<std::string, std::string> _headers;
+			typedef std::map<std::string, std::string> Headers;
+			Headers _headers;
 			// The payload of the http response
 			std::string &_payload;
 			size_t _announcedContentLength;

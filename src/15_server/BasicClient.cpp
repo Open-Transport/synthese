@@ -6,40 +6,16 @@
 //
 //
 
-#include "Log.h"
 #include "BasicClient.h"
-
 #include "Exception.h"
-#include "ServerModule.h"
 #include "HTTPClient.hpp"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/read_until.hpp>
-#include <boost/asio/streambuf.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/bind.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <iostream>
-#include <istream>
-#include <map>
-#include <ostream>
-#include <string>
 
-using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;
-using namespace std;
-using namespace boost;
-using namespace boost::algorithm;
-using namespace boost::iostreams;
 using namespace boost::asio;
-using namespace boost::asio::ip;
+using namespace std;
 
 namespace synthese
 {
