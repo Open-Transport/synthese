@@ -2,11 +2,7 @@
 #define SYNTHESE_SERVER_BASIC_CLIENT_h__
 
 #include <string>
-#include <map>
-#include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/optional.hpp>
 
 namespace synthese
 {

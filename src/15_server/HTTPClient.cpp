@@ -68,6 +68,9 @@
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/bind.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 
@@ -78,6 +81,7 @@
 
 using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;
+using namespace boost::iostreams;
 using namespace std;
 
 namespace synthese
@@ -295,6 +299,24 @@ namespace synthese
 						util::Log::GetInstance().trace("HTTPClient: received payload size: " +
 													   boost::lexical_cast<string>(_payload.size())
 						);
+
+						// If the header indicates a zipped stream dezip it
+						Headers::const_iterator it(
+							_headers.find("Content-Encoding")
+						);
+						if(	it != _headers.end() &&
+							it->second == "gzip" &&
+							!_payload.empty()
+						){
+							ostringstream os;
+							istringstream tmp(_payload);
+							filtering_stream<input> fs;
+							fs.push(gzip_decompressor());
+							fs.push(tmp);
+							boost::iostreams::copy(fs, os);
+							_payload = os.str();
+						}
+
 					}
 				}
 				else
