@@ -49,6 +49,8 @@
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "CalendarTemplateElementTableSync.h"
+#include "PlaceAlias.h"
+#include "PlaceAliasTableSync.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -1383,8 +1385,9 @@ namespace synthese
 
 							if(cityAliasResult.empty())
 							{
-								_logError("Commercial stop point "+ stopKey +" does not link to a valid city ("+ cityCode +")");
-								failure = true;
+								// Patch on ignore et continue si une ville n'est pas trouvée !
+								//_logError("Commercial stop point "+ stopKey +" does not link to a valid city ("+ cityCode +")");
+								//failure = true;
 								continue;
 							}
 
@@ -1419,7 +1422,54 @@ namespace synthese
 						continue;
 					}
 
-					curStop->setName(name);
+					// Patch création d'un alias (t011_place_aliases) si un arrêt a été trouvé mais que les noms sont différents
+					if(curStop && name != curStop->getName() && curStop->getCity())
+					{
+						bool aliasExists(false);
+
+						BOOST_FOREACH(Registry<PlaceAlias>::value_type curAlias, _env.getRegistry<PlaceAlias>())
+						{
+							if((curAlias.second->getName() == name) && (curAlias.second->getAliasedPlace()->getKey() == curStop->getKey()))
+							{
+								aliasExists = true;
+								break;
+							}
+						}
+
+						if(!aliasExists)
+						{
+							PlaceAliasTableSync::SearchResult aliases = PlaceAliasTableSync::Search(
+								_env,
+								boost::optional<util::RegistryKeyType>(curStop->getKey())
+							);
+
+							BOOST_FOREACH(PlaceAliasTableSync::SearchResult::value_type curAlias, aliases)
+							{
+								if((curAlias->getName() == name) && (curAlias->getAliasedPlace()->getKey() == curStop->getKey()))
+								{
+									aliasExists = true;
+									break;
+								}
+							}
+						}
+
+						if(!aliasExists)
+						{
+							PlaceAlias* alias = new PlaceAlias(PlaceAliasTableSync::getId());
+							alias->setName(name);
+							alias->setAliasedPlace(curStop);
+							alias->setCity(curStop->getCity());
+							_env.getEditableRegistry<PlaceAlias>().add(boost::shared_ptr<PlaceAlias>(alias));
+							stringstream keyStream;
+							keyStream << curStop->getKey();
+							_logInfo(
+								"creating alias linked to stop area " + keyStream.str() + " (" + 
+								curStop->getName() + " with name " + name + ").<br />"
+							);
+						}
+					}
+
+					//curStop->setName(name);
 
 					// Link from physical stops
 					int pstopsNumber(stopAreaNode.nChildNode("contains"));
@@ -1535,10 +1585,11 @@ namespace synthese
 
 									if(cityAliasResult.empty())
 									{
-										_logError(
+										// Patch pour ignoré les arrêts avec villes inconnues
+										/*_logError(
 											"Stop point "+ stopKey +" with area centroid "+ areaCentroid.getChildNode("name").getText() +" does not link to a valid city ("+ addressNode.getChildNode("countryCode").getText() +")"
 										);
-										failure = true;
+										failure = true;*/
 										continue;
 									}
 
@@ -1626,11 +1677,12 @@ namespace synthese
 				set<StopPoint*> linkableStops(_stops.get(containedNode.getText()));
 				if(linkableStops.empty())
 				{
-					_logError(
+					// Patch on ignore et continue si un arrêt n'est pas trouvé !
+					/*_logError(
 						"Stop "+ string(containedNode.getText()) +" not found by stop point "+ 
 						string(spKeyNode.getText()) +")"
 					);
-					failure = true;
+					failure = true;*/
 					continue;
 				}
 				stopPoints[spKeyNode.getText()] = linkableStops;
@@ -1731,6 +1783,18 @@ namespace synthese
 						continue;
 					}
 					lastStopPoint = stopPointCode;
+					// Patch pour gérer les arrêts inconnus
+					if(stopPoints.find(stopPointCode) == stopPoints.end())
+					{
+						route.stops.push_back(
+							JourneyPattern::StopWithDepartureArrivalAuthorization(
+							set<StopPoint*>(),
+							boost::optional<graph::MetricOffset>(),
+							false,
+							false
+						)	);
+						continue;
+					}
 					route.stops.push_back(
 						JourneyPattern::StopWithDepartureArrivalAuthorization(
 							stopPoints[stopPointCode]
@@ -1749,7 +1813,8 @@ namespace synthese
 				XMLNode keyNode(serviceNode.getChildNode("objectId"));
 				XMLNode jpKeyNode(serviceNode.getChildNode("journeyPatternId"));
 				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
-				string serviceNumber(numberNode.isEmpty() ? string() : charset_converter.convert(numberNode.getText()));
+				// Patch .isEmpty causait un crash
+				string serviceNumber((numberNode.getText() == NULL) ? string() : charset_converter.convert(numberNode.getText()));
 
 				// Creation of the service
 
@@ -1784,7 +1849,13 @@ namespace synthese
 					XMLNode arrNode(vjsNode.getChildNode("arrivalTime"));
 
 					// Jump over non served stops
-					if(depNode.isEmpty() && arrNode.isEmpty())
+					// Patch, gère les arrêts ignoré à sauter
+					if(
+						(depNode.isEmpty() && arrNode.isEmpty()) || 
+						(route.stops[stopRank - ignoredStops]._stop.empty() &&
+						!route.stops[stopRank - ignoredStops]._departure &&
+						!route.stops[stopRank - ignoredStops]._arrival)
+					)
 					{
 						route.stops.erase(route.stops.begin() + (stopRank - ignoredStops));
 						++ignoredStops;
@@ -1820,48 +1891,52 @@ namespace synthese
 					arrs.push_back(arrSchedule);
 				}
 
-				JourneyPattern* journeyPattern(NULL);
-				if(!updatedRoute && route.journeyPattern)
+				// Patch gestion des arrêts ignorés
+				if(!route.stops.empty() || (!updatedRoute && route.journeyPattern))
 				{
-					journeyPattern = route.journeyPattern;
-				}
-				else
-				{
-					// Route creation
-					journeyPattern = _createOrUpdateRoute(
-						*cline,
-						(_mergeRoutes || updatedRoute) ? optional<const string&>() : optional<const string&>(route.objectId),
-						optional<const string&>(route.name),
-						optional<const string&>(),
-						optional<Destination*>(),
-						optional<const RuleUser::Rules&>(),
-						route.wayBack,
-						rollingStock.get(),
-						route.stops,
-						dataSource,
-						true,
-						true,
-						true,
-						true
-					);
-					if(!updatedRoute)
+					JourneyPattern* journeyPattern(NULL);
+					if(!updatedRoute && route.journeyPattern)
 					{
-						routes[route.objectId].journeyPattern = journeyPattern;
+						journeyPattern = route.journeyPattern;
 					}
-				}
+					else
+					{
+						// Route creation
+						journeyPattern = _createOrUpdateRoute(
+							*cline,
+							(_mergeRoutes || updatedRoute) ? optional<const string&>() : optional<const string&>(route.objectId),
+							optional<const string&>(route.name),
+							optional<const string&>(),
+							optional<Destination*>(),
+							optional<const RuleUser::Rules&>(),
+							route.wayBack,
+							rollingStock.get(),
+							route.stops,
+							dataSource,
+							true,
+							true,
+							true,
+							true
+						);
+						if(!updatedRoute)
+						{
+							routes[route.objectId].journeyPattern = journeyPattern;
+						}
+					}
 
-				// Service creation
-				ScheduledService* service(
-					_createOrUpdateService(
-						*journeyPattern,
-						deps,
-						arrs,
-						serviceNumber,
-						dataSource
-				)	);
-				if(service)
-				{
-					services[keyNode.getText()] = service;
+					// Service creation
+					ScheduledService* service(
+						_createOrUpdateService(
+							*journeyPattern,
+							deps,
+							arrs,
+							serviceNumber,
+							dataSource
+					)	);
+					if(service)
+					{
+						services[keyNode.getText()] = service;
+					}
 				}
 			}
 
@@ -2022,9 +2097,10 @@ namespace synthese
 					Calendar dates;
 					BOOST_FOREACH(const date_period& period, periods)
 					{
+						// Patch, period.end et non .last, ne gère pas les calendriers d'un seul jour sinon
 						Calendar periodMask(
 							period.begin(),
-							period.last()
+							period.end()
 						);
 
 						BOOST_FOREACH(CalendarTemplate* calendarTemplate, calendarTemplates)
@@ -2171,6 +2247,10 @@ namespace synthese
 				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
 				{
 					StopAreaTableSync::Save(cstop.second.get(), transaction);
+				}
+				BOOST_FOREACH(Registry<PlaceAlias>::value_type alias, _env.getRegistry<PlaceAlias>())
+				{
+					PlaceAliasTableSync::Save(alias.second.get(), transaction);
 				}
 				BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
 				{
