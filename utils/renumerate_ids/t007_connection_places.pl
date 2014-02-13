@@ -73,7 +73,6 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 	my $sql = "UPDATE t007_connection_places SET id = $tab_new_id[$cpt] WHERE id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un id !!";
 	#1.  Colonne optional_reservation_places de t042_commercial_lines (à splitter)
-	# !! Les splits modifiés doivent conserver leur valeur
 	$sth = $dbh->prepare("SELECT id, optional_reservation_places FROM t042_commercial_lines;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
