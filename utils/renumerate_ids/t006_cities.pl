@@ -58,6 +58,7 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 open(FILE,">replace_id_t006_cities.sql") or die"open: $!";
 $cpt=0;
 my %t082_free_drt_areas_cities = ();
+my %t105_imports_parameters = ();
 for ($cpt;$cpt<$num_id_to_change;$cpt++)
 {
 	print "Mise à jour $cpt de $num_id_to_change (".$tab_id_to_change[$cpt]." => ".$tab_new_id[$cpt].")\n";
@@ -98,10 +99,30 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 	#7. Colonne object_id de t001_object_site_links
 	my $sql = "UPDATE t001_object_site_links SET object_id = $tab_new_id[$cpt] WHERE object_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un object_id !!";
+	#8. Colonne parameters de t105_imports (à splitter)
+	$sth = $dbh->prepare("SELECT id, parameters FROM t105_imports;");
+	$sth->execute();
+	while (my $result = $sth->fetchrow_hashref())
+	{
+		my $id_import=$$result{'id'};
+		my $parameters=$$result{'parameters'};
+		my $parameters_copy = $parameters;
+		if( exists( $t105_imports_parameters{$id_import} ) )
+		{
+			$parameters_copy = $t105_imports_parameters{$id_import};
+		}
+		$parameters_copy =~ s/$tab_id_to_change[$cpt]/$tab_new_id[$cpt]/g;
+		$t105_imports_parameters{$id_import}=$parameters_copy;
+	}
+	$sth->finish();
 }
 
 foreach my $id_t082_free_drt_areas ( keys %t082_free_drt_areas_cities ) {
 	my $sql = "UPDATE t082_free_drt_areas SET cities = '$t082_free_drt_areas_cities{$id_t082_free_drt_areas}' WHERE id = $id_t082_free_drt_areas";
+	print FILE $sql.";\n";
+}
+foreach my $id_t105_imports_parameters ( keys %t105_imports_parameters ) {
+	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$t105_imports_parameters}' WHERE id = $t105_imports_parameters";
 	print FILE $sql.";\n";
 }
 
