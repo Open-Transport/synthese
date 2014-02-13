@@ -60,6 +60,10 @@ namespace synthese
 			void _prepareObjectsToRemove(
 				const boost::property_tree::ptree& node
 			);
+			
+			void _prepareObjectsToRemovenoTopLevel(
+				const boost::property_tree::ptree& node
+			);
 
 			void _prepareObjectsToRemoveRecursion(
 				const util::Registrable& object

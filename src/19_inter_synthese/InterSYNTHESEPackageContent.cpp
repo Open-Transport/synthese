@@ -183,6 +183,10 @@ namespace synthese
 			{
 				_prepareObjectsToRemove(_objects);
 			}
+			else
+			{
+				_prepareObjectsToRemovenoTopLevel(_objects);
+			}
 			_package->set<Objects>(
 				_loadObjects(_objects, contentMap, _objectsToSave, importer)
 			);
@@ -458,6 +462,82 @@ namespace synthese
 					BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
 					{
 						_prepareObjectsToRemoveRecursion(*item);
+					}
+				}
+			}
+		}
+		
+		void InterSYNTHESEPackageContent::_prepareObjectsToRemovenoTopLevel( const boost::property_tree::ptree& node )
+		{
+			// Empty content : exit
+			if(!node.count(TableOrObject::TAG_OBJECT))
+			{
+				return;
+			}
+			
+			// Loop for Loading or creating objects
+			BOOST_FOREACH(const ptree::value_type& it, node.get_child(TableOrObject::TAG_OBJECT))
+			{
+				// The object key
+				RegistryKeyType key(it.second.get<RegistryKeyType>(Key::FIELD.name));
+				RegistryTableType classId(decodeTableId(key));
+				
+				if(classId > 0)
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
+					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+					{
+						continue;
+					}
+					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
+					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
+					if( registry.contains(key))
+					{
+						_prepareObjectsToRemoveRecursion(*registry.getEditableObject(key));
+						_objectsToRemove.erase(key);
+					}
+				}
+				else
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(static_cast<RegistryTableType>(key)));
+					DBDirectTableSync* directTableSync(dynamic_cast<DBDirectTableSync*>(tableSync.get()));
+					if(!directTableSync)
+					{
+						continue;
+					}
+					
+					DBDirectTableSync::RegistrableSearchResult objects(
+						directTableSync->search(
+							string(),
+							Env::GetOfficialEnv()
+					)	);
+					BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
+					{
+						// Call only if item is in sent data
+						bool isSent(false);
+						BOOST_FOREACH(const ptree::value_type& it2, it.second.get_child(TableOrObject::TAG_OBJECT))
+						{
+							// The object key
+							RegistryKeyType key(it2.second.get<RegistryKeyType>(Key::FIELD.name));
+							RegistryTableType tableId(decodeTableId(key));
+							
+							if(tableId == 0) // Case full table
+							{
+							}
+							else // Case unique object
+							{
+								if (item->getKey() == key)
+								{
+									isSent = true;
+									break;
+								}
+							}
+						}
+						if (isSent)
+						{
+							_prepareObjectsToRemoveRecursion(*item);
+							_objectsToRemove.erase(item->getKey());
+						}
 					}
 				}
 			}
