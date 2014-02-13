@@ -138,7 +138,7 @@ DEFAULTS = {
     'test_daemon_only': False,
 
     # package
-    'packages_save_path': None,
+    'packages_save_path': os.path.expanduser('~/public_html/synthese/'),
     'packages_access_url': None,
     'no_package_overwrite': False,
 
