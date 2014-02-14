@@ -39,8 +39,20 @@ def run(env, args):
     svn_info = utils.SVNInfo(env.source_path)
     revision_path = 'r{0}'.format(svn_info.version)
 
+    # On Linux, lets pick a more precise name for the platform
+    # through lsb_release (this package must be installed)
+    distro_name = env.platform
+    if env.platform == 'lin':
+        try:
+            distro_name = subprocess.check_output("lsb_release -cs", shell=True)
+            distro_name = distro_name.rstrip()
+        except:
+            raise Exception('Failed to run lsb_release. '
+                            'Please install it (apt-get install lsb-release)')
+
+
     package_relative_dir = os.sep.join([
-        env.platform, env.mode, svn_info.branch, revision_path])
+        distro_name, env.mode, svn_info.branch, revision_path])
 
     package_dir = join(config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):
