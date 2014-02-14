@@ -15,9 +15,9 @@ my $dbh = DBI->connect(
 my $sth = $dbh->prepare("SELECT id FROM t007_connection_places ORDER BY id;");
 $sth->execute();
 
-# On parcourt les id de t007_connection_places en cherchant ceux de node_id 0 ou 1
-# On cherche en même temps le plus grand id respectant le node_id de notre base
-# c'est le dernier qui respecte le node_id vu qu'on a mis ORDER BY dans la requête
+# Run on id of t007_connection_places looking for those with node_id 0 or 1
+# In the same time we look for the highest id with node_id of our database
+# it is the last with node_id because of ORDER BY in the request
 my @tab_id_to_change = ();
 my $num_id_to_change = 0;
 my $last_id_of_this_node = 0;
@@ -25,7 +25,7 @@ while (my $ids = $sth->fetchrow_hashref())
 {
 	my $id=$$ids{'id'};
 	my $id_hex = sprintf("%x", $id);
-	my $node_id_hex = substr $id_hex, 3, 2; # Attention en copiant/collant cette ligne, elle est valable pour les tables < 16, sinon ça décale
+	my $node_id_hex = substr $id_hex, 3, 2; # 3 because table code < 16
 	my $node_id = sprintf hex $node_id_hex;
 	if ($node_id == 0 || $node_id == 1)
 	{
@@ -38,11 +38,11 @@ while (my $ids = $sth->fetchrow_hashref())
 	}
 }
 $sth->finish();
-print "On a trouvé $num_id_to_change connection_places à changer\n";
-print "Le plus grand id respectant le node 50 existant est $last_id_of_this_node\n";
+print "We found $num_id_to_change physical_stops to change\n";
+print "The highest id with node $node_id_cible is $last_id_of_this_node\n";
 sleep(5);
 
-# Création du tableau des nouveaux id
+# New id table
 my $cpt=0;
 my @tab_new_id = ();
 for ($cpt;$cpt<$num_id_to_change;$cpt++)
@@ -51,9 +51,9 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 	$tab_new_id[$cpt] = $last_id_of_this_node;
 }
 
-# Requêtes de mise à jour de la base écrites dans un fichier car
-# - c'est pas plus mal pour envoyer juste le SQL si on veut
-# - le driver sqlite de perl ne gère pas les tables avec géométrie
+# Requests to update the database written in a file because
+# - we will be able to check what is really done in our database
+# - sqlite perl driver does not manage with spatial tables
 
 open(FILE,">replace_id_t007_connection_places.sql") or die"open: $!";
 $cpt=0;
@@ -68,11 +68,11 @@ my %t071_drt_areas_stops = ();
 my %t027_profiles_rights = ();
 for ($cpt;$cpt<$num_id_to_change;$cpt++)
 {
-	print "Mise à jour $cpt de $num_id_to_change (".$tab_id_to_change[$cpt]." => ".$tab_new_id[$cpt].")\n";
-	#0.  Colonne id de t007_connection_places
+	print "Update $cpt on $num_id_to_change (".$tab_id_to_change[$cpt]." => ".$tab_new_id[$cpt].")\n";
+	#0.  Column id of t007_connection_places
 	my $sql = "UPDATE t007_connection_places SET id = $tab_new_id[$cpt] WHERE id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un id !!";
-	#1.  Colonne optional_reservation_places de t042_commercial_lines (à splitter)
+	print FILE $sql.";\n";
+	#1.  Column optional_reservation_places of t042_commercial_lines (to split)
 	$sth = $dbh->prepare("SELECT id, optional_reservation_places FROM t042_commercial_lines;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
@@ -86,15 +86,9 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		}
 		$optional_reservation_places_copy =~ s/$tab_id_to_change[$cpt]/$tab_new_id[$cpt]/g;
 		$t042_commercial_lines_optional_reservation_places{$id_commercial_line}=$optional_reservation_places_copy;
-		# if ($optional_reservation_places_copy ne $optional_reservation_places)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t042_commercial_lines SET optional_reservation_places = '$optional_reservation_places_copy' WHERE id = $id_commercial_line";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un optional_reservation_places de t042_commercial_lines !!";
-		# }
 	}
 	$sth->finish();
-	#2.  Colonne stop_areas de t082_free_drt_areas (à splitter)
+	#2.  Column stop_areas of t082_free_drt_areas (to split)
 	$sth = $dbh->prepare("SELECT id, stop_areas FROM t082_free_drt_areas;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
@@ -108,30 +102,24 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		}
 		$stop_areas_copy =~ s/$tab_id_to_change[$cpt]/$tab_new_id[$cpt]/g;
 		$t082_free_drt_areas_stop_areas{$id_free_drt_area}=$stop_areas_copy;
-		# if ($stop_areas_copy ne $stop_areas)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t082_free_drt_areas SET stop_areas = '$stop_areas_copy' WHERE id = $id_free_drt_area";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un stop_areas de t082_free_drt_areas !!";
-		# }
 	}
 	$sth->finish();
-	#3.  Colonne place_id de t012_physical_stops
+	#3.  Column place_id of t012_physical_stops
 	my $sql = "UPDATE t012_physical_stops SET place_id = $tab_new_id[$cpt] WHERE place_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un place_id !!";
-	#4.  Colonne departure_place_id de t044_reservations
+	print FILE $sql.";\n";
+	#4.  Column departure_place_id of t044_reservations
 	my $sql = "UPDATE t044_reservations SET departure_place_id = $tab_new_id[$cpt] WHERE departure_place_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un departure_place_id !!";
-	#5.  Colonne arrival_place_id de t044_reservations
+	print FILE $sql.";\n";
+	#5.  Column arrival_place_id of t044_reservations
 	my $sql = "UPDATE t044_reservations SET arrival_place_id = $tab_new_id[$cpt] WHERE arrival_place_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un arrival_place_id !!";
-	#6.  Colonne broadcast_point_id de t041_display_screens
+	print FILE $sql.";\n";
+	#6.  Column broadcast_point_id of t041_display_screens
 	my $sql = "UPDATE t041_display_screens SET broadcast_point_id = $tab_new_id[$cpt] WHERE broadcast_point_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un broadcast_point_id !!";
-	#7.  Colonne forbidden_arrival_places_ids de t041_display_screens (à splitter)
-	#8.  Colonne displayed_places_ids de t041_display_screens (à splitter)
-	#9.  Colonne forced_destinations_ids de t041_display_screens (à splitter)
-	#10. Colonne transfer_destinations de t041_display_screens (à splitter)
+	print FILE $sql.";\n";
+	#7.  Column forbidden_arrival_places_ids of t041_display_screens (to split)
+	#8.  Column displayed_places_ids of t041_display_screens (to split)
+	#9.  Column forced_destinations_ids of t041_display_screens (to split)
+	#10. Column transfer_destinations of t041_display_screens (to split)
 	$sth = $dbh->prepare("SELECT id, forbidden_arrival_places_ids, displayed_places_ids, forced_destinations_ids, transfer_destinations FROM t041_display_screens;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
@@ -169,36 +157,12 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		$t041_display_screens_displayed_places_ids{$id_display_screen}=$displayed_places_ids_copy;
 		$t041_display_screens_forced_destinations_ids{$id_display_screen}=$forced_destinations_ids_copy;
 		$t041_display_screens_transfer_destinations{$id_display_screen}=$transfer_destinations_copy;
-		# if ($forbidden_arrival_places_ids_copy != $forbidden_arrival_places_ids)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t041_display_screens SET forbidden_arrival_places_ids = '$forbidden_arrival_places_ids_copy' WHERE id = $id_display_screen";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un forbidden_arrival_places_ids de t041_display_screens !!";
-		# }
-		# if ($displayed_places_ids_copy ne $displayed_places_ids)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t041_display_screens SET displayed_places_ids = '$displayed_places_ids_copy' WHERE id = $id_display_screen";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un displayed_places_ids de t041_display_screens !!";
-		# }
-		# if ($forced_destinations_ids_copy ne $forced_destinations_ids)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t041_display_screens SET forced_destinations_ids = '$forced_destinations_ids_copy' WHERE id = $id_display_screen";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un forced_destinations_ids de t041_display_screens !!";
-		# }
-		# if ($transfer_destinations_copy ne $transfer_destinations)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t041_display_screens SET transfer_destinations = '$transfer_destinations_copy' WHERE id = $id_display_screen";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un transfer_destinations de t041_display_screens !!";
-		# }
 	}
 	$sth->finish();
-	#11. Colonne place_id de t053_timetable_rows
+	#11. Column place_id of t053_timetable_rows
 	my $sql = "UPDATE t053_timetable_rows SET place_id = $tab_new_id[$cpt] WHERE place_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un place_id !!";
-	#12. Colonne stops de t064_hiking_trails (à splitter)
+	print FILE $sql.";\n";
+	#12. Column stops of t064_hiking_trails (to split)
 	$sth = $dbh->prepare("SELECT id, stops FROM t064_hiking_trails;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
@@ -212,21 +176,15 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		}
 		$stops_copy =~ s/$tab_id_to_change[$cpt]/$tab_new_id[$cpt]/g;
 		$t064_hiking_trails_stops{$id_hiking_trail}=$stops_copy;
-		# if ($stops_copy ne $stops)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t064_hiking_trails SET stops = '$stops_copy' WHERE id = $id_hiking_trail";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un stops de t064_hiking_trails !!";
-		# }
 	}
 	$sth->finish();
-	#13. Colonne stop_area_id de t091_timetable_rowgroup_items
+	#13. Column stop_area_id of t091_timetable_rowgroup_items
 	my $sql = "UPDATE t091_timetable_rowgroup_items SET stop_area_id = $tab_new_id[$cpt] WHERE stop_area_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un stop_area_id !!";
-	#14. Colonne stop_area_id de t098_vdv_server_subscriptions
+	print FILE $sql.";\n";
+	#14. Column stop_area_id of t098_vdv_server_subscriptions
 	my $sql = "UPDATE t098_vdv_server_subscriptions SET stop_area_id = $tab_new_id[$cpt] WHERE stop_area_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un stop_area_id !!";
-	#15. Colonne stops de t071_drt_areas (à splitter)
+	print FILE $sql.";\n";
+	#15. Column stops of t071_drt_areas (to split)
 	$sth = $dbh->prepare("SELECT id, stops FROM t071_drt_areas;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
@@ -240,15 +198,9 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		}
 		$stops_copy =~ s/$tab_id_to_change[$cpt]/$tab_new_id[$cpt]/g;
 		$t071_drt_areas_stops{$id_drt_area}=$stops_copy;
-		# if ($stops_copy ne $stops)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t071_drt_areas SET stops = '$stops_copy' WHERE id = $id_drt_area";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un stops de t071_drt_areas !!";
-		# }
 	}
 	$sth->finish();
-	#16. Colonne rights de t027_profiles (à splitter)
+	#16. Column rights of t027_profiles (to split)
 	$sth = $dbh->prepare("SELECT id, rights FROM t027_profiles;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
@@ -262,29 +214,23 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		}
 		$rights_copy =~ s/$tab_id_to_change[$cpt]/$tab_new_id[$cpt]/g;
 		$t027_profiles_rights{$id_profile}=$rights_copy;
-		# if ($rights_copy ne $rights)
-		# {
-			# # Update à faire
-			# $sql = "UPDATE t027_profiles SET rights = '$rights_copy' WHERE id = $id_profile";
-			# print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un rights de t027_profiles !!";
-		# }
 	}
 	$sth->finish();
-	#17. Colonne object_id de t040_alarm_object_links
+	#17. Column object_id of t040_alarm_object_links
 	my $sql = "UPDATE t040_alarm_object_links SET object_id = $tab_new_id[$cpt] WHERE object_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un object_id !!";
-	#18. Colonne aliased_place_id de t011_place_aliases ?
+	print FILE $sql.";\n";
+	#18. Column aliased_place_id of t011_place_aliases ?
 	my $sql = "UPDATE t011_place_aliases SET aliased_place_id = $tab_new_id[$cpt] WHERE aliased_place_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un aliased_place_id !!";
-	#19. Colonne object_id de t045_log_entries ?
+	print FILE $sql.";\n";
+	#19. Column object_id of t045_log_entries ?
 	my $sql = "UPDATE t045_log_entries SET object_id = $tab_new_id[$cpt] WHERE object_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un object_id !!";
-	#20. Colonne object2_id de t045_log_entries ?
+	print FILE $sql.";\n";
+	#20. Column object2_id of t045_log_entries ?
 	my $sql = "UPDATE t045_log_entries SET object2_id = $tab_new_id[$cpt] WHERE object2_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un object2_id !!";
-	#21. Colonne place_id de t058_display_screen_cpu ?
+	print FILE $sql.";\n";
+	#21. Column place_id of t058_display_screen_cpu ?
 	my $sql = "UPDATE t058_display_screen_cpu SET place_id = $tab_new_id[$cpt] WHERE place_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";#$dbh->do($sql) or die "Impossible de mettre à jour un place_id !!";
+	print FILE $sql.";\n";
 }
 
 foreach my $id_t042_commercial_lines ( keys %t042_commercial_lines_optional_reservation_places ) {

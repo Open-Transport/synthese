@@ -12,10 +12,10 @@ my $dbh = DBI->connect(
     { RaiseError => 1 },         
 ) or die $DBI::errstr;
 
-my $sth = $dbh->prepare("SELECT id FROM t006_cities ORDER BY id;");
+my $sth = $dbh->prepare("SELECT id FROM t054_calendar_templates ORDER BY id;");
 $sth->execute();
 
-# Run on id of t006_cities looking for those with node_id 0 or 1
+# Run on id of t071_drt_areas looking for those with node_id 0 or 1
 # In the same time we look for the highest id with node_id of our database
 # it is the last with node_id because of ORDER BY in the request
 my @tab_id_to_change = ();
@@ -25,7 +25,7 @@ while (my $ids = $sth->fetchrow_hashref())
 {
 	my $id=$$ids{'id'};
 	my $id_hex = sprintf("%x", $id);
-	my $node_id_hex = substr $id_hex, 3, 2; # 3 because table code < 16
+	my $node_id_hex = substr $id_hex, 4, 2; # 4 because table code > 16
 	my $node_id = sprintf hex $node_id_hex;
 	if ($node_id == 0 || $node_id == 1)
 	{
@@ -55,51 +55,40 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 # - we will be able to check what is really done in our database
 # - sqlite perl driver does not manage with spatial tables
 
-open(FILE,">replace_id_t006_cities.sql") or die"open: $!";
+open(FILE,">replace_id_t054_calendar_templates.sql") or die"open: $!";
 $cpt=0;
-my %t082_free_drt_areas_cities = ();
 my %t105_imports_parameters = ();
 for ($cpt;$cpt<$num_id_to_change;$cpt++)
 {
 	print "Update $cpt on $num_id_to_change (".$tab_id_to_change[$cpt]." => ".$tab_new_id[$cpt].")\n";
-	#0.  Column id of t006_cities
-	my $sql = "UPDATE t006_cities SET id = $tab_new_id[$cpt] WHERE id = $tab_id_to_change[$cpt]";
+	#0.  Column id of t054_calendar_templates
+	my $sql = "UPDATE t054_calendar_templates SET id = $tab_new_id[$cpt] WHERE id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
-	#1. Column aliased_city_id of t065_city_aliases
-	my $sql = "UPDATE t065_city_aliases SET aliased_city_id = $tab_new_id[$cpt] WHERE aliased_city_id = $tab_id_to_change[$cpt]";
+	#1. Column calendar_id of t076_service_calendar_links
+	my $sql = "UPDATE t076_service_calendar_links SET calendar_id = $tab_new_id[$cpt] WHERE calendar_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
-	#2. Column city_id of t011_place_aliases
-	my $sql = "UPDATE t011_place_aliases SET city_id = $tab_new_id[$cpt] WHERE city_id = $tab_id_to_change[$cpt]";
+	#2. Column calendar2_id of t076_service_calendar_links
+	my $sql = "UPDATE t076_service_calendar_links SET calendar2_id = $tab_new_id[$cpt] WHERE calendar2_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
-	#3. Column city_id of t013_public_places
-	my $sql = "UPDATE t013_public_places SET city_id = $tab_new_id[$cpt] WHERE city_id = $tab_id_to_change[$cpt]";
+	#3. Column calendar_id of t055_calendar_template_elements
+	my $sql = "UPDATE t055_calendar_template_elements SET calendar_id = $tab_new_id[$cpt] WHERE calendar_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
-	#4. Column city_id of t060_road_places
-	my $sql = "UPDATE t060_road_places SET city_id = $tab_new_id[$cpt] WHERE city_id = $tab_id_to_change[$cpt]";
+	#4. Column include_id of t055_calendar_template_elements
+	my $sql = "UPDATE t055_calendar_template_elements SET include_id = $tab_new_id[$cpt] WHERE include_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
-	#5. Column cities of t082_free_drt_areas (to split)
-	$sth = $dbh->prepare("SELECT id, cities FROM t082_free_drt_areas;");
-	$sth->execute();
-	while (my $result = $sth->fetchrow_hashref())
-	{
-		my $id_free_drt_area=$$result{'id'};
-		my $cities=$$result{'cities'};
-		my $cities_copy = $cities;
-		if( exists( $t082_free_drt_areas_cities{$id_free_drt_area} ) )
-		{
-			$cities_copy = $t082_free_drt_areas_cities{$id_free_drt_area};
-		}
-		$cities_copy =~ s/$tab_id_to_change[$cpt]/$tab_new_id[$cpt]/g;
-		$t082_free_drt_areas_cities{$id_free_drt_area}=$cities_copy;
-	}
-	$sth->finish();
-	#6. Column city_id of t007_connection_places
-	my $sql = "UPDATE t007_connection_places SET city_id = $tab_new_id[$cpt] WHERE city_id = $tab_id_to_change[$cpt]";
+	#5. Column calendar_template_id of t042_commercial_lines
+	my $sql = "UPDATE t042_commercial_lines SET calendar_template_id = $tab_new_id[$cpt] WHERE calendar_template_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
-	#7. Column object_id of t001_object_site_links
-	my $sql = "UPDATE t001_object_site_links SET object_id = $tab_new_id[$cpt] WHERE object_id = $tab_id_to_change[$cpt]";
+	#6. Column days_calendars_parent_id of t022_transport_networks
+	my $sql = "UPDATE t022_transport_networks SET days_calendars_parent_id = $tab_new_id[$cpt] WHERE days_calendars_parent_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
-	#8. Column parameters de t105_imports (to split)
+	#7. Column periods_calendars_parent_id of t022_transport_networks
+	my $sql = "UPDATE t022_transport_networks SET periods_calendars_parent_id = $tab_new_id[$cpt] WHERE periods_calendars_parent_id = $tab_id_to_change[$cpt]";
+	print FILE $sql.";\n";
+	#8. Column calendar_id of t052_timetables
+	my $sql = "UPDATE t052_timetables SET calendar_id = $tab_new_id[$cpt] WHERE calendar_id = $tab_id_to_change[$cpt]";
+	print FILE $sql.";\n";
+	#9. Column parameters of t105_imports (to split)
 	$sth = $dbh->prepare("SELECT id, parameters FROM t105_imports;");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
@@ -115,15 +104,8 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		$t105_imports_parameters{$id_import}=$parameters_copy;
 	}
 	$sth->finish();
-	#9. Column object_id of t040_alarm_object_links
-	my $sql = "UPDATE t040_alarm_object_links SET object_id = $tab_new_id[$cpt] WHERE object_id = $tab_id_to_change[$cpt]";
-	print FILE $sql.";\n";
 }
 
-foreach my $id_t082_free_drt_areas ( keys %t082_free_drt_areas_cities ) {
-	my $sql = "UPDATE t082_free_drt_areas SET cities = '$t082_free_drt_areas_cities{$id_t082_free_drt_areas}' WHERE id = $id_t082_free_drt_areas";
-	print FILE $sql.";\n";
-}
 foreach my $id_t105_imports_parameters ( keys %t105_imports_parameters ) {
 	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$t105_imports_parameters}' WHERE id = $t105_imports_parameters";
 	print FILE $sql.";\n";
