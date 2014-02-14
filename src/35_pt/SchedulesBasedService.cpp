@@ -881,10 +881,6 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
 			ptime baseTime(ptime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath())));
 
-			// Shift to the service time if it's after the current time
-			if(time < baseTime)
-				time = baseTime;
-
 			_NonConcurrencyCache::const_iterator it(
 				_nonConcurrencyCache.find(
 					_NonConcurrencyCache::key_type(
@@ -895,7 +891,7 @@ namespace synthese
 			)	)	);
 			if(it != _nonConcurrencyCache.end())
 			{
-				return !isInTimeRange(time, range, it->second);
+				return !isInTimeRange((time < baseTime ? baseTime : time), range, it->second);
 			}
 			recursive_mutex::scoped_lock lineLock(line->getNonConcurrencyRulesMutex());
 
@@ -1031,7 +1027,7 @@ namespace synthese
 						date
 					), excludeRanges
 			)	);
-			return !isInTimeRange(time, range, excludeRanges);
+			return !isInTimeRange((time < baseTime ? baseTime : time), range, excludeRanges);
 		}
 
 
