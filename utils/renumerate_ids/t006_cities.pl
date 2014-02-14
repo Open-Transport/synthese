@@ -125,7 +125,7 @@ foreach my $id_t082_free_drt_areas ( keys %t082_free_drt_areas_cities ) {
 	print FILE $sql.";\n";
 }
 foreach my $id_t105_imports_parameters ( keys %t105_imports_parameters ) {
-	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$t105_imports_parameters}' WHERE id = $t105_imports_parameters";
+	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$id_t105_imports_parameters}' WHERE id = $id_t105_imports_parameters";
 	print FILE $sql.";\n";
 }
 
