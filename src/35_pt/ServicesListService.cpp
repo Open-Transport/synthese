@@ -80,6 +80,8 @@ namespace synthese
 		const string ServicesListService::ATTR_STOP_NAME = "stop_name";
 		const string ServicesListService::ATTR_DEPARTURE_TIME = "departure_time";
 		const string ServicesListService::ATTR_ARRIVAL_TIME = "arrival_time";
+		const string ServicesListService::ATTR_SCHEDULE_INPUT = "schedule_input";
+		const string ServicesListService::ATTR_WITH_RESERVATION = "with_reservation";
 		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
 		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
 		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
@@ -340,8 +342,16 @@ namespace synthese
 						stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
 						stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
 						stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
-						stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, edge->getRankInPath()));
-						stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, edge->getRankInPath()));
+						if(edge->isDeparture())
+						{
+							stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, edge->getRankInPath()));
+						}
+						if(edge->isArrival())
+						{
+							stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, edge->getRankInPath()));
+						}
+						stopPM->insert(ATTR_SCHEDULE_INPUT, edge->getScheduleInput());
+						stopPM->insert(ATTR_WITH_RESERVATION, edge->getReservationNeeded());
 
 						serviceMap->insert(TAG_STOP, stopPM);
 					}

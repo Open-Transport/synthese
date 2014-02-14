@@ -78,6 +78,8 @@ namespace synthese
 			static const std::string ATTR_STOP_NAME;
 			static const std::string ATTR_DEPARTURE_TIME;
 			static const std::string ATTR_ARRIVAL_TIME;
+			static const std::string ATTR_SCHEDULE_INPUT;
+			static const std::string ATTR_WITH_RESERVATION;
 
 		protected:
 			//! \name Page parameters
