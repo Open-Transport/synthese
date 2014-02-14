@@ -44,7 +44,9 @@ def run(env, args):
     distro_name = env.platform
     if env.platform == 'lin':
         try:
-            distro_name = subprocess.check_output("lsb_release -cs", shell=True)
+            # TODO: use subprocess.check_output once we require Python 2.7
+            distro_name = subprocess.Popen(
+                ["lsb_release", "-cs"], stdout=subprocess.PIPE).communicate()[0]
             distro_name = distro_name.rstrip()
         except:
             raise Exception('Failed to run lsb_release. '
