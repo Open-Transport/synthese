@@ -61,6 +61,11 @@ namespace synthese
 
 		Road::~Road()
 		{
+			BOOST_FOREACH(Edges::value_type edge, getEdges())
+			{
+				edge->setParentPath(NULL);
+			}
+
 			BOOST_FOREACH(ServiceSet::value_type service, getAllServices())
 			{
 				delete service;
