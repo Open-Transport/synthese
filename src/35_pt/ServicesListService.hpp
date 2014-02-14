@@ -80,6 +80,9 @@ namespace synthese
 			static const std::string ATTR_ARRIVAL_TIME;
 			static const std::string ATTR_SCHEDULE_INPUT;
 			static const std::string ATTR_WITH_RESERVATION;
+			static const std::string ATTR_FIRST_IN_AREA;
+			static const std::string ATTR_LAST_IN_AREA;
+			static const std::string ATTR_IS_AREA;
 
 		protected:
 			//! \name Page parameters

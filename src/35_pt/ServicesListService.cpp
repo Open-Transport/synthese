@@ -29,6 +29,7 @@
 #include "City.h"
 #include "CommercialLineTableSync.h"
 #include "DRTArea.hpp"
+#include "LineStop.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "ScheduledServiceTableSync.h"
@@ -82,6 +83,9 @@ namespace synthese
 		const string ServicesListService::ATTR_ARRIVAL_TIME = "arrival_time";
 		const string ServicesListService::ATTR_SCHEDULE_INPUT = "schedule_input";
 		const string ServicesListService::ATTR_WITH_RESERVATION = "with_reservation";
+		const string ServicesListService::ATTR_FIRST_IN_AREA = "first_in_area";
+		const string ServicesListService::ATTR_LAST_IN_AREA = "last_in_area";
+		const string ServicesListService::ATTR_IS_AREA = "is_area";
 		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
 		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
 		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
@@ -331,29 +335,64 @@ namespace synthese
 					}
 
 					// Stops
-					BOOST_FOREACH(const Path::Edges::value_type& edge, service->getPath()->getEdges())
+					BOOST_FOREACH(const JourneyPattern::LineStops::value_type& lineStop, static_cast<const JourneyPattern*>(sservice.getPath())->getLineStops())
 					{
-						boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
-
-						const StopArea* stopArea(
-							dynamic_cast<const StopPoint*>(edge->getFromVertex())->getConnectionPlace()
-						);
-
-						stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
-						stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
-						stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
-						if(edge->isDeparture())
+						if(dynamic_cast<const StopPoint*>(&*lineStop->get<LineNode>()))
 						{
-							stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, edge->getRankInPath()));
-						}
-						if(edge->isArrival())
-						{
-							stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, edge->getRankInPath()));
-						}
-						stopPM->insert(ATTR_SCHEDULE_INPUT, edge->getScheduleInput());
-						stopPM->insert(ATTR_WITH_RESERVATION, edge->getReservationNeeded());
+							boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
+							const StopArea* stopArea(
+								dynamic_cast<const StopPoint*>(&*lineStop->get<LineNode>())->getConnectionPlace()
+							);
 
-						serviceMap->insert(TAG_STOP, stopPM);
+							stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
+							stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
+							stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
+							if(lineStop->get<IsDeparture>())
+							{
+								stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, lineStop->get<RankInPath>()));
+							}
+							if(lineStop->get<IsArrival>())
+							{
+								stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop->get<RankInPath>()));
+							}
+							stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop->get<ScheduleInput>());
+							stopPM->insert(ATTR_WITH_RESERVATION, lineStop->get<ReservationNeeded>());
+
+							serviceMap->insert(TAG_STOP, stopPM);
+						}
+						else if(dynamic_cast<const DRTArea*>(&*lineStop->get<LineNode>()))
+						{
+							const DRTArea& area(dynamic_cast<const DRTArea&>(*lineStop->get<LineNode>()));
+							for(Stops::Type::const_iterator it(area.get<Stops>().begin());
+								it != area.get<Stops>().end();
+								++it
+							){
+								const StopArea* stopArea(*it);
+
+								boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
+								
+								stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
+								stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
+								stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
+								if(lineStop->get<IsDeparture>())
+								{
+									stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, lineStop->get<RankInPath>()));
+								}
+								if(lineStop->get<IsArrival>())
+								{
+									stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop->get<RankInPath>()));
+								}
+								stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop->get<ScheduleInput>());
+								stopPM->insert(ATTR_WITH_RESERVATION, true);
+								stopPM->insert(ATTR_FIRST_IN_AREA, it == area.get<Stops>().begin());
+								Stops::Type::const_iterator it2(it);
+								++it2;
+								stopPM->insert(ATTR_LAST_IN_AREA, it2 == area.get<Stops>().end());
+								stopPM->insert(ATTR_IS_AREA, true);
+
+								serviceMap->insert(TAG_STOP, stopPM);
+							}
+						}
 					}
 				}
 
