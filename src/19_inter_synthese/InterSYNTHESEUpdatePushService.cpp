@@ -133,7 +133,7 @@ namespace synthese
 				InterSYNTHESEPacket packet(_content);
 
 				// Load of the data contained in the packet
-				packet.load(NULL);
+				packet.load();
 
 				// Output the loaded range to clean the queue in the master
 				stream << packet.getIdRange().first << RANGE_SEPARATOR << packet.getIdRange().second;

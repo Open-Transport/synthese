@@ -24,7 +24,6 @@
 
 #include "BasicClient.h"
 #include "Import.hpp"
-#include "InterSYNTHESEIdFilter.hpp"
 #include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESEUpdateAckService.hpp"
@@ -47,7 +46,6 @@ namespace synthese
 	namespace inter_synthese
 	{
 		const string InterSYNTHESEFileFormat::Importer_::PARAMETER_SLAVE_ID = "slave_id";
-		const string InterSYNTHESEFileFormat::Importer_::PARAMETER_ID_FILTER = "id_filter";
 
 
 
@@ -105,7 +103,7 @@ namespace synthese
 				);
 				if(result2 == InterSYNTHESEUpdateAckService::VALUE_OK)
 				{
-					packet.load(_idFilter.get());
+					packet.load();
 					_logDebug(
 						"Inter-SYNTHESE : "+ _address +":"+ _port + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
 					);
@@ -134,18 +132,6 @@ namespace synthese
 		{
 			// Slave ID
 			_slaveId = map.get<RegistryKeyType>(PARAMETER_SLAVE_ID);
-
-			// ID Filter
-			string idFilter(map.getDefault<string>(PARAMETER_ID_FILTER));
-			trim(idFilter);
-			if(!idFilter.empty())
-			{
-				_idFilter.reset(Factory<InterSYNTHESEIdFilter>::create(idFilter));
-				if(_import.get<DataSource>())
-				{
-					_idFilter->setDataSource(&*_import.get<DataSource>());
-				}
-			}
 		}
 
 
@@ -154,10 +140,6 @@ namespace synthese
 		{
 			ParametersMap pm;
 			pm.insert(PARAMETER_SLAVE_ID, _slaveId);
-			if(_idFilter.get())
-			{
-				pm.insert(PARAMETER_ID_FILTER, _idFilter->getFactoryKey());
-			}
 			return pm;
 		}
 

@@ -38,7 +38,6 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
-		class InterSYNTHESEIdFilter;
 
 
 
@@ -57,15 +56,11 @@ namespace synthese
 			{
 			public:
 				static const std::string PARAMETER_SLAVE_ID;
-				static const std::string PARAMETER_ID_FILTER;
 
 			private:
 				util::RegistryKeyType _slaveId;
-				boost::shared_ptr<InterSYNTHESEIdFilter> _idFilter;
 
 			protected:
-
-
 				virtual bool _read() const;
 
 

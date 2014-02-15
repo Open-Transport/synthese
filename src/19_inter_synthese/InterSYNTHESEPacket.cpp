@@ -132,7 +132,6 @@ namespace synthese
 
 
 		void InterSYNTHESEPacket::load(
-			InterSYNTHESEIdFilter* idFilter
 		) const	{
 			// Local variables
 			auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;
@@ -158,8 +157,7 @@ namespace synthese
 					}
 
 					interSYNTHESE->sync(
-						item.second.second,
-						idFilter
+						item.second.second
 					);
 				}
 				catch(...)

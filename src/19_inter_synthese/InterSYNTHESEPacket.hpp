@@ -33,10 +33,6 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
-		class InterSYNTHESEIdFilter;
-
-
-
 		/** InterSYNTHESEPacket class.
 			@ingroup m19
 		*/
@@ -72,7 +68,7 @@ namespace synthese
 			size_t size() const;
 			IdRange getIdRange() const;
 
-			void load(InterSYNTHESEIdFilter* idFilter) const;
+			void load() const;
 		};
 	}
 }

@@ -67,8 +67,7 @@ namespace synthese
 
 
 		bool DBInterSYNTHESE::sync(
-			const string& parameter,
-			const InterSYNTHESEIdFilter* idFilter
+			const string& parameter
 		) const	{
 			DB& db(*DBModule::GetDB());
 
