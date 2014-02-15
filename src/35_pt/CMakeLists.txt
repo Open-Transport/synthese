@@ -223,8 +223,6 @@ StopPointAdmin.cpp
 StopPointAdmin.hpp
 StopPointsListFunction.cpp
 StopPointsListFunction.hpp
-StopsInterSYNTHESEIdFilter.cpp
-StopsInterSYNTHESEIdFilter.hpp
 StopPointTableSync.cpp
 StopPointTableSync.hpp
 StopPointUpdateAction.cpp

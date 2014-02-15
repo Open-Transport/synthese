@@ -15,8 +15,6 @@ InterSYNTHESEContent.cpp
 InterSYNTHESEContent.hpp
 InterSYNTHESEFileFormat.cpp
 InterSYNTHESEFileFormat.hpp
-InterSYNTHESEIdFilter.cpp
-InterSYNTHESEIdFilter.hpp
 InterSYNTHESEModule.cpp
 InterSYNTHESEModule.hpp
 InterSYNTHESEModule.gen.cpp
