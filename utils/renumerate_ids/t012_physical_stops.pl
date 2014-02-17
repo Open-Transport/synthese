@@ -77,7 +77,7 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 	my $sql = "UPDATE t010_line_stops SET physical_stop_id = $tab_new_id[$cpt] WHERE physical_stop_id = $tab_id_to_change[$cpt]";
 	print FILE $sql.";\n";
 	#4. Column stops of t016_scheduled_services (to split)
-	$sth = $dbh->prepare("SELECT id, stops FROM t016_scheduled_services;");
+	$sth = $dbh->prepare("SELECT id, stops FROM t016_scheduled_services WHERE stops LIKE '%".$tab_id_to_change[$cpt]."%';");
 	$sth->execute();
 	while (my $result = $sth->fetchrow_hashref())
 	{
@@ -159,7 +159,7 @@ foreach my $id_t016_scheduled_services ( keys %t016_scheduled_services_stops ) {
 	print FILE $sql.";\n";
 }
 foreach my $id_t070_compositions ( keys %t070_compositions_served_vertices ) {
-	my $sql = "UPDATE t070_compositions SET stops = '$t070_compositions_served_vertices{$id_t070_compositions}' WHERE id = $id_t070_compositions";
+	my $sql = "UPDATE t070_compositions SET served_vertices = '$t070_compositions_served_vertices{$id_t070_compositions}' WHERE id = $id_t070_compositions";
 	print FILE $sql.";\n";
 }
 foreach my $id_t041_display_screens ( keys %t041_display_screens_physical_stops_ids ) {

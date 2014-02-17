@@ -38,7 +38,7 @@ while (my $ids = $sth->fetchrow_hashref())
 	}
 }
 $sth->finish();
-print "We found $num_id_to_change physical_stops to change\n";
+print "We found $num_id_to_change connection_places to change\n";
 print "The highest id with node $node_id_cible is $last_id_of_this_node\n";
 sleep(5);
 
