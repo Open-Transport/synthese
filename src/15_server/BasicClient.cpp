@@ -5,6 +5,7 @@
 //
 //
 //
+#ifndef WIN32
 
 #include "BasicClient.h"
 #include "Exception.h"
@@ -112,3 +113,5 @@ namespace synthese
 			return c.get(path);
 		}
 }	}
+
+#endif
