@@ -38,6 +38,18 @@ while (my $ids = $sth->fetchrow_hashref())
 	}
 }
 $sth->finish();
+
+if ($last_id_of_this_node == 0)
+{
+	# There is no id with node_id in this table !
+	my $table_id_hex = sprintf("%x", 54);
+	$table_id_hex .= "00";
+	my $node_id_hex = sprintf("%x", $node_id_cible);
+	$node_id_hex .= "00";
+	my $last_id_of_this_node_hex = $table_id_hex.$node_id_hex."000000";
+	$last_id_of_this_node = sprintf hex $last_id_of_this_node_hex;
+}
+
 print "We found $num_id_to_change physical_stops to change\n";
 print "The highest id with node $node_id_cible is $last_id_of_this_node\n";
 sleep(5);
@@ -104,10 +116,13 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 		$t105_imports_parameters{$id_import}=$parameters_copy;
 	}
 	$sth->finish();
+	#10. Column parent_id of t054_calendar_templates
+	my $sql = "UPDATE t054_calendar_templates SET parent_id = $tab_new_id[$cpt] WHERE parent_id = $tab_id_to_change[$cpt]";
+	print FILE $sql.";\n";
 }
 
 foreach my $id_t105_imports_parameters ( keys %t105_imports_parameters ) {
-	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$t105_imports_parameters}' WHERE id = $t105_imports_parameters";
+	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$id_t105_imports_parameters}' WHERE id = $id_t105_imports_parameters";
 	print FILE $sql.";\n";
 }
 

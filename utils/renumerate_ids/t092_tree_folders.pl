@@ -38,6 +38,18 @@ while (my $ids = $sth->fetchrow_hashref())
 	}
 }
 $sth->finish();
+
+if ($last_id_of_this_node == 0)
+{
+	# There is no id with node_id in this table !
+	my $table_id_hex = sprintf("%x", 92);
+	$table_id_hex .= "00";
+	my $node_id_hex = sprintf("%x", $node_id_cible);
+	$node_id_hex .= "00";
+	my $last_id_of_this_node_hex = $table_id_hex.$node_id_hex."000000";
+	$last_id_of_this_node = sprintf hex $last_id_of_this_node_hex;
+}
+
 print "We found $num_id_to_change tree_folders to change\n";
 print "The highest id with node $node_id_cible is $last_id_of_this_node\n";
 sleep(5);
@@ -89,7 +101,7 @@ for ($cpt;$cpt<$num_id_to_change;$cpt++)
 }
 
 foreach my $id_t105_imports_parameters ( keys %t105_imports_parameters ) {
-	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$t105_imports_parameters}' WHERE id = $t105_imports_parameters";
+	my $sql = "UPDATE t105_imports SET parameters = '$t105_imports_parameters{$id_t105_imports_parameters}' WHERE id = $id_t105_imports_parameters";
 	print FILE $sql.";\n";
 }
 

@@ -38,6 +38,18 @@ while (my $ids = $sth->fetchrow_hashref())
 	}
 }
 $sth->finish();
+
+if ($last_id_of_this_node == 16)
+{
+	# There is no id with node_id in this table !
+	my $table_id_hex = sprintf("%x", 6);
+	$table_id_hex .= "00";
+	my $node_id_hex = sprintf("%x", $node_id_cible);
+	$node_id_hex .= "00";
+	my $last_id_of_this_node_hex = $table_id_hex.$node_id_hex."000000";
+	$last_id_of_this_node = sprintf hex $last_id_of_this_node_hex;
+}
+
 print "We found $num_id_to_change scheduled_services to change\n";
 print "The highest id with node $node_id_cible is $last_id_of_this_node\n";
 sleep(5);
