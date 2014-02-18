@@ -33,6 +33,7 @@
 #include "PTUseRule.h"
 #include "RequestException.h"
 #include "Request.h"
+#include "ResaModule.h"
 #include "ScheduledServiceTableSync.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
@@ -50,6 +51,8 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace util;
+	using namespace resa;
+	
 	using namespace server;
 	using namespace security;
 
@@ -87,9 +90,12 @@ namespace synthese
 		const string ServicesListService::ATTR_FIRST_IN_AREA = "first_in_area";
 		const string ServicesListService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServicesListService::ATTR_IS_AREA = "is_area";
+		const string ServicesListService::ATTR_RESERVATION_AT_DEPARTURE = "reservation_at_departure";
+		const string ServicesListService::ATTR_RESERVATION_AT_ARRIVAL = "reservation_at_arrival";
 		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
 		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
 		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
+		const string ServicesListService::PARAMETER_READ_RESERVATIONS_FROM_DAY = "read_reservations_from_day";
 
 
 		ParametersMap ServicesListService::_getParametersMap() const
@@ -186,6 +192,13 @@ namespace synthese
 			if(departurePlaceId)
 			{
 				_departurePlaceId = departurePlaceId;
+			}
+
+			// Read reservations from day
+			string rrfdtext(map.getDefault<string>(PARAMETER_READ_RESERVATIONS_FROM_DAY));
+			if(!rrfdtext.empty())
+			{
+				_readReservationsFromDay = from_string(rrfdtext);
 			}
 		}
 
@@ -335,14 +348,61 @@ namespace synthese
 						serviceMap->insert(TAG_CALENDAR, calendarPM);
 					}
 
-					// Stops
+					// Reservation rule
 					const UseRule& useRule(service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
 					bool serviceIsReservable(
 						dynamic_cast<const PTUseRule*>(&useRule) &&
 						static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 					);
 
+					// Reservations
+					Resas resas;
+					if(	serviceIsReservable &&
+						!_readReservationsFromDay.is_not_a_date()
+					){
+						// Use cache if for today
+						if(_readReservationsFromDay == day_clock::local_day())
+						{
+							const ResaModule::ReservationsByService::mapped_type& reservationsEnv(
+								ResaModule::GetReservationsByService(
+									*service
+							)	);
+							BOOST_FOREACH(const ResaModule::ReservationsByService::mapped_type::value_type& resa, reservationsEnv)
+							{
+								resas.push_back(resa);
+							}
+						}
+						else // Read in database (slower)
+						{
+							// Reservations reading
+							date date2(_readReservationsFromDay);
+							date2 += days(1);
+							ReservationTableSync::SearchResult reservationsTable(
+								ReservationTableSync::Search(
+									*_env,
+									static_cast<const JourneyPattern*>(sservice.getPath())->getCommercialLine()->getKey(),
+									_readReservationsFromDay,
+									date2,
+									boost::none,
+									false,
+									true,
+									true,
+									0,
+									boost::none,
+									UP_LINKS_LOAD_LEVEL,
+									_service->getKey()
+							)	);
+							BOOST_FOREACH(const ReservationTableSync::SearchResult::value_type& resa, reservationsTable)
+							{
+								resas.push_back(resa.get());
+							}
+						}
+					}
+
+
 					const JourneyPattern::LineStops& lineStops(static_cast<const JourneyPattern*>(sservice.getPath())->getLineStops());
+
+					// Stops loop
 					for(JourneyPattern::LineStops::const_iterator itLineStop(lineStops.begin());
 						itLineStop != lineStops.end();
 						++itLineStop
@@ -369,7 +429,16 @@ namespace synthese
 								stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop.get<RankInPath>()));
 							}
 							stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
-							stopPM->insert(ATTR_WITH_RESERVATION, serviceIsReservable && lineStop.get<ReservationNeeded>());
+
+							if(serviceIsReservable && lineStop.get<ReservationNeeded>())
+							{
+								stopPM->insert(ATTR_WITH_RESERVATION, true);
+								StopInstructions instructions(
+									_hasToStop(*stopArea, lineStop.get<RankInPath>(), resas)
+								);
+								stopPM->insert(ATTR_RESERVATION_AT_DEPARTURE, instructions.first);
+								stopPM->insert(ATTR_RESERVATION_AT_ARRIVAL, instructions.second);
+							}
 
 							serviceMap->insert(TAG_STOP, stopPM);
 						}
@@ -443,4 +512,41 @@ namespace synthese
 		ServicesListService::ServicesListService():
 			_displayDate(day_clock::local_day())
 		{}
+
+
+
+		ServicesListService::StopInstructions ServicesListService::_hasToStop(
+			const StopArea& stopArea,
+			size_t rank,
+			const Resas& resas
+		) const	{
+			
+			ServicesListService::StopInstructions result(make_pair(false, false));
+			ptime departureTime(
+				_readReservationsFromDay,
+				_service->getDepartureSchedule(false, rank)
+			);
+			ptime arrivalTime(
+				_readReservationsFromDay,
+				_service->getArrivalSchedule(false, rank)
+			);
+			BOOST_FOREACH(const Resas::value_type& resa, resas)
+			{
+				if(	resa->getDeparturePlaceId() == stopArea.getKey() &&
+					resa->getDepartureTime() == departureTime
+				){
+					result.first = true;
+				}
+				if(	resa->getArrivalPlaceId() == stopArea.getKey() &&
+					resa->getArrivalTime() == arrivalTime
+				){
+					result.second = true;
+				}
+				if(	result.first && result.second)
+				{
+					break;
+				}
+			}
+			return result;
+		}
 }	}
