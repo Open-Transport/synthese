@@ -26,6 +26,7 @@
 #include <hpdf.h>
 #include <map>
 #include <ostream>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -116,7 +117,8 @@ namespace synthese
 				const std::string& text,
 				HPDF_REAL x,
 				HPDF_REAL y,
-				float angle = 0
+				float angle = 0,
+				boost::optional<HPDF_REAL> maxWidth = boost::none
 			);
 
 			void drawImage(

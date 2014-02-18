@@ -125,11 +125,29 @@ namespace synthese
 			const std::string& text,
 			HPDF_REAL x,
 			HPDF_REAL y,
-			float angle
+			float angle,
+			boost::optional<HPDF_REAL> maxWidth
 		){
 			HPDF_Page_SetTextRenderingMode (_curPage, HPDF_FILL);
 			HPDF_Page_BeginText(_curPage);
 			HPDF_Page_SetFontAndSize(_curPage, _curFont, _curTextSize);
+			optional<string> copy;
+			if(maxWidth)
+			{
+				HPDF_UINT len(
+					HPDF_Page_MeasureText(
+						_curPage,
+						text.c_str(),
+						*maxWidth,
+						false,
+						NULL
+				)	);
+				if(len < text.size())
+				{
+					copy = text.substr(0, len);
+				}
+			}
+			const char* buf((copy ? *copy : text).c_str());
 			if(angle)
 			{
 				float rad1(
@@ -140,11 +158,11 @@ namespace synthese
 					cos(rad1), sin(rad1), -sin(rad1), cos(rad1),
 					x, y
 				);
-				HPDF_Page_ShowText(_curPage, text.c_str());
+				HPDF_Page_ShowText(_curPage, buf);
 			}
 			else
 			{
-				HPDF_Page_TextOut(_curPage, x, y, text.c_str());
+				HPDF_Page_TextOut(_curPage, x, y, buf);
 			}
 			HPDF_Page_EndText(_curPage);
 		}

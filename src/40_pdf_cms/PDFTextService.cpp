@@ -50,6 +50,7 @@ namespace synthese
 		const string PDFTextService::PARAMETER_SIZE = "size";
 		const string PDFTextService::PARAMETER_COLOR = "color";
 		const string PDFTextService::PARAMETER_ANGLE = "angle";
+		const string PDFTextService::PARAMETER_MAX_WIDTH = "max_width";
 		
 
 
@@ -85,6 +86,9 @@ namespace synthese
 
 			// Angle
 			_angle = map.getDefault<float>(PARAMETER_ANGLE, 0);
+
+			// Max width
+			_maxWidth = map.getOptional<float>(PARAMETER_MAX_WIDTH);
 		}
 
 
@@ -124,7 +128,8 @@ namespace synthese
 				IConv("UTF-8", "CP1252").convert(_text),
 				PDF::GetPixelsFromMM(_x),
 				PDF::GetPixelsFromMM(_y),
-				_angle
+				_angle,
+				_maxWidth
 			);
 
 			// Return informations about the text

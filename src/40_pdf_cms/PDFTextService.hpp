@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string PARAMETER_SIZE;
 			static const std::string PARAMETER_COLOR;
 			static const std::string PARAMETER_ANGLE;
+			static const std::string PARAMETER_MAX_WIDTH;
 
 
 
@@ -66,6 +67,7 @@ namespace synthese
 				boost::optional<float> _size;
 				boost::optional<util::RGBColor> _color;
 				float _angle;
+				boost::optional<float> _maxWidth;
 			//@}
 			
 			
