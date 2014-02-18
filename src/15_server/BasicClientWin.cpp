@@ -6,7 +6,7 @@
 // proper fix we revert here the old BasicClient.
 
 #include "Log.h"
-#include "BasicClient.h"
+#include "BasicClientWin.h"
 
 #include "Exception.h"
 #include "ServerModule.h"

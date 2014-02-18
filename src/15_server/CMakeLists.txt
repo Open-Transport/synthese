@@ -6,6 +6,7 @@ ActionException.h
 ActionService.cpp
 ActionService.hpp
 BasicClientWin.cpp
+BasicClientWin.h
 BasicClient.cpp
 BasicClient.h
 CleanerThreadExec.cpp
