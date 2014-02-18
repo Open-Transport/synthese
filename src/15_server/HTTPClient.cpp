@@ -207,6 +207,15 @@ namespace synthese
 			}
 		}
 
+		/* Append the reception buffer to the payload buffer */
+		void HTTPClient::payloadAppend()
+		{
+			size_t size(input_buffer_.size());
+			const char* header = boost::asio::buffer_cast<const char*>(input_buffer_.data());
+			_payload += string(header, size);
+			input_buffer_.consume(size);
+		}
+
 		void HTTPClient::startRead()
 		{
 			// Set a deadline for the read operation.
@@ -225,12 +234,12 @@ namespace synthese
 
 			if (!ec)
 			{
-				// Extract the newline-delimited message from the buffer.
-				std::string line;
 				std::istream is(&input_buffer_);
 
 				if(!_gotHeader)
 				{
+					// Extract the newline-delimited message from the buffer.
+					std::string line;
 					std::getline(is, line);
 					// Create a map of each http header received
 					line.erase(line.find_last_not_of("\n\r")+1);
@@ -270,9 +279,7 @@ namespace synthese
 				}
 				else
 				{
-					const char* header = boost::asio::buffer_cast<const char*>(input_buffer_.data());
-					_payload += string(header, input_buffer_.size());
-					input_buffer_.consume(input_buffer_.size());
+					payloadAppend();
 				}
 
 				startRead();
@@ -282,6 +289,9 @@ namespace synthese
 
 				if(ec == boost::asio::error::eof)
 				{
+					// Save the last chunk of received data
+					payloadAppend();
+
 					// Check the announced length matches with what we got
 					if(_payload.size() != _announcedContentLength)
 					{

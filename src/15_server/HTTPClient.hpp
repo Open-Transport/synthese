@@ -68,6 +68,8 @@ namespace synthese
 			void startWrite();
 			void handleWrite(const boost::system::error_code& ec);
 			void checkDeadline();
+			void payloadAppend();
+
 		};
 }	}
 
