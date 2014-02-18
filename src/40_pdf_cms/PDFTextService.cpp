@@ -30,6 +30,7 @@
 #include "RequestException.h"
 #include "Request.h"
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -129,7 +130,7 @@ namespace synthese
 				PDF::GetPixelsFromMM(_x),
 				PDF::GetPixelsFromMM(_y),
 				_angle,
-				_maxWidth
+				_maxWidth ? PDF::GetPixelsFromMM(*_maxWidth) : optional<HPDF_REAL>()
 			);
 
 			// Return informations about the text
