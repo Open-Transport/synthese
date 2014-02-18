@@ -283,6 +283,17 @@ namespace synthese
 			{
 				stopsAndRoadsVector.push_back(place);
 			}
+			
+			// Text points to a public place
+			City::PlacesMatcher::MatchResult public_places = cityResult.value->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
+				placeName,
+				resultsNumber
+			);
+			
+			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, public_places)
+			{
+				stopsAndRoadsVector.push_back(place);
+			}
 
 			City::PlacesMatcher::MatchHitSort hitSort;
 			std::sort(stopsAndRoadsVector.begin(), stopsAndRoadsVector.end(), hitSort);
