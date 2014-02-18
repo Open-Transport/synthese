@@ -20,12 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RoadModule.h"
 #include "GeographyModule.h"
-#include "MainRoadChunk.hpp"
-#include "StopArea.hpp"
 #include "House.hpp"
+#include "MainRoadChunk.hpp"
+#include "PublicPlace.h"
+#include "RoadModule.h"
 #include "RoadPlace.h"
+#include "StopArea.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
