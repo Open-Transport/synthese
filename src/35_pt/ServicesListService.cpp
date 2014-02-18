@@ -368,6 +368,7 @@ namespace synthese
 							{
 								stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop.get<RankInPath>()));
 							}
+							stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
 							stopPM->insert(ATTR_WITH_RESERVATION, serviceIsReservable && lineStop.get<ReservationNeeded>());
 
 							serviceMap->insert(TAG_STOP, stopPM);
