@@ -175,21 +175,16 @@ namespace synthese
 
 		const Edge* Path::getEdge(size_t index) const
 		{
-			if(_edges.empty())
+			BOOST_FOREACH(const Edges::value_type& edge, _edges)
 			{
-				throw Exception("Edge not found");
-			}
-
-			size_t rank(index);
-			if(rank >= _edges.size())
-			{
-				rank = _edges.size() - 1;
-			}
-			for(;rank > 0 && _edges[rank]->getRankInPath() > index; --rank) ;
-
-			if(_edges[rank]->getRankInPath() == index)
-			{
-				return _edges[rank];
+				if(edge->getRankInPath() == index)
+				{
+					return edge;
+				}
+				if(edge->getRankInPath() > index)
+				{
+					break;
+				}
 			}
 
 			throw Exception("Edge not found");
