@@ -358,13 +358,13 @@ namespace synthese
 							stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
 							stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
 							stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
-							if(lineStop.get<IsDeparture>() && itLineStop != lineStops.begin())
+							JourneyPattern::LineStops::const_iterator itLineStop2(itLineStop);
+							++itLineStop2;
+							if(lineStop.get<IsDeparture>() && itLineStop2 != lineStops.end())
 							{
 								stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, lineStop.get<RankInPath>()));
 							}
-							JourneyPattern::LineStops::const_iterator itLineStop2(itLineStop);
-							++itLineStop2;
-							if(lineStop.get<IsArrival>() && itLineStop2 != lineStops.end())
+							if(lineStop.get<IsArrival>() && itLineStop != lineStops.begin())
 							{
 								stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop.get<RankInPath>()));
 							}
