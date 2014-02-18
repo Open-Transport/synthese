@@ -29,6 +29,7 @@
 #include "City.h"
 #include "CommercialLineTableSync.h"
 #include "DRTArea.hpp"
+#include "Language.hpp"
 #include "LineStop.h"
 #include "PTUseRule.h"
 #include "RequestException.h"
@@ -90,8 +91,8 @@ namespace synthese
 		const string ServicesListService::ATTR_FIRST_IN_AREA = "first_in_area";
 		const string ServicesListService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServicesListService::ATTR_IS_AREA = "is_area";
-		const string ServicesListService::ATTR_RESERVATION_AT_DEPARTURE = "reservation_at_departure";
-		const string ServicesListService::ATTR_RESERVATION_AT_ARRIVAL = "reservation_at_arrival";
+		const string ServicesListService::TAG_RESERVATION_AT_DEPARTURE = "reservation_at_departure";
+		const string ServicesListService::TAG_RESERVATION_AT_ARRIVAL = "reservation_at_arrival";
 		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
 		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
 		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
@@ -433,11 +434,14 @@ namespace synthese
 							if(serviceIsReservable && lineStop.get<ReservationNeeded>())
 							{
 								stopPM->insert(ATTR_WITH_RESERVATION, true);
+
+								// Get the reservations
 								StopInstructions instructions(
 									_hasToStop(*stopArea, lineStop.get<RankInPath>(), resas)
 								);
-								stopPM->insert(ATTR_RESERVATION_AT_DEPARTURE, instructions.first);
-								stopPM->insert(ATTR_RESERVATION_AT_ARRIVAL, instructions.second);
+
+								// Export the reservations into the stop parameters map
+								_exportReservations(*stopPM, instructions);
 							}
 
 							serviceMap->insert(TAG_STOP, stopPM);
@@ -466,6 +470,15 @@ namespace synthese
 								}
 								stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
 								stopPM->insert(ATTR_WITH_RESERVATION, true);
+
+								// Get the reservations
+								StopInstructions instructions(
+									_hasToStop(*stopArea, lineStop.get<RankInPath>(), resas)
+								);
+
+								// Export the reservations into the stop parameters map
+								_exportReservations(*stopPM, instructions);
+
 								stopPM->insert(ATTR_FIRST_IN_AREA, it == area.get<Stops>().begin());
 								Stops::Type::const_iterator it2(it);
 								++it2;
@@ -521,7 +534,7 @@ namespace synthese
 			const Resas& resas
 		) const	{
 			
-			ServicesListService::StopInstructions result(make_pair(false, false));
+			ServicesListService::StopInstructions result(make_pair(StopInstructions::first_type(), StopInstructions::second_type()));
 			ptime departureTime(
 				_readReservationsFromDay,
 				_service->getDepartureSchedule(false, rank)
@@ -535,18 +548,33 @@ namespace synthese
 				if(	resa->getDeparturePlaceId() == stopArea.getKey() &&
 					resa->getDepartureTime() == departureTime
 				){
-					result.first = true;
+					result.first.insert(resa);
 				}
 				if(	resa->getArrivalPlaceId() == stopArea.getKey() &&
 					resa->getArrivalTime() == arrivalTime
 				){
-					result.second = true;
-				}
-				if(	result.first && result.second)
-				{
-					break;
+					result.second.insert(resa);
 				}
 			}
 			return result;
+		}
+
+		void ServicesListService::_exportReservations( util::ParametersMap& pm, const StopInstructions resas )
+		{
+			// Reservations at departure
+			BOOST_FOREACH(const StopInstructions::first_type::value_type& resa, resas.first)
+			{
+				boost::shared_ptr<ParametersMap> resaPM(new ParametersMap);
+				resa->toParametersMap(*resaPM, boost::none);
+				pm.insert(TAG_RESERVATION_AT_DEPARTURE, resaPM);
+			}
+
+			// Reservations at arrival
+			BOOST_FOREACH(const StopInstructions::second_type::value_type& resa, resas.second)
+			{
+				boost::shared_ptr<ParametersMap> resaPM(new ParametersMap);
+				resa->toParametersMap(*resaPM, boost::none);
+				pm.insert(TAG_RESERVATION_AT_ARRIVAL, resaPM);
+			}
 		}
 }	}

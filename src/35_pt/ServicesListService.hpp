@@ -92,8 +92,8 @@ namespace synthese
 			static const std::string ATTR_FIRST_IN_AREA;
 			static const std::string ATTR_LAST_IN_AREA;
 			static const std::string ATTR_IS_AREA;
-			static const std::string ATTR_RESERVATION_AT_DEPARTURE;
-			static const std::string ATTR_RESERVATION_AT_ARRIVAL;
+			static const std::string TAG_RESERVATION_AT_DEPARTURE;
+			static const std::string TAG_RESERVATION_AT_ARRIVAL;
 
 		protected:
 			//! \name Page parameters
@@ -134,7 +134,10 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-			typedef std::pair<bool, bool> StopInstructions;
+			typedef std::pair<
+				std::set<const resa::Reservation*>,
+				std::set<const resa::Reservation*>
+			> StopInstructions;
 			typedef std::vector<const resa::Reservation*> Resas;
 			StopInstructions _hasToStop(
 				const StopArea& stopArea,
@@ -142,6 +145,10 @@ namespace synthese
 				const Resas& resas
 			) const;
 
+			static void _exportReservations(
+				util::ParametersMap& pm,
+				const StopInstructions resas
+			);
 
 		public:
 			ServicesListService();
