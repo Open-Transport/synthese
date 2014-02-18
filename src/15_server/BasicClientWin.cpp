@@ -4,8 +4,6 @@
 // Despite the fact that BasicClient is based on asio and thus portable
 // we found that it crashes on Windows deep inside asio. Until we find a
 // proper fix we revert here the old BasicClient.
-
-#include "Log.h"
 #include "BasicClientWin.h"
 
 #include "Exception.h"
@@ -15,22 +13,17 @@
 #include <istream>
 #include <ostream>
 #include <string>
+#include <boost/asio.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/bind.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
-#include <boost/lambda/lambda.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
 using namespace boost::iostreams;
-using namespace boost::asio;
-using namespace boost::asio::ip;
-
-// Timeout in seconds after which we cancel the HTTP request
-#define CLIENT_TIMEOUT_S 15
+using boost::asio::ip::tcp;
 
 namespace synthese
 {
@@ -69,40 +62,7 @@ namespace synthese
 			return _send(url, data, contentType);
 		}
 
-		void BasicClient::set_result(
-			optional<boost::system::error_code>* a,
-			const boost::system::error_code b) const
-		{
-			a->reset(b);
-		}
 
-		void BasicClient::read_until_with_timeout(tcp::socket& sock,
-			boost::asio::streambuf& buffer,
-			const std::string& delim,
-			const posix_time::time_duration &expiry_time) const
-		{
-		   optional<boost::system::error_code> timer_result;
-		   deadline_timer timer(sock.io_service());
-		   timer.expires_from_now(expiry_time);
-		   timer.async_wait(boost::bind(&BasicClient::set_result, this, &timer_result, _1));
-
-		   boost::system::error_code read_result;
-		   async_read_until(sock, buffer, delim, boost::lambda::var(read_result) = boost::lambda::_1);
-
-		   sock.io_service().reset();
-		   while (sock.io_service().run_one())
-		   {
-			 if (read_result)
-			   timer.cancel();
-			 else if (timer_result)
-			   sock.cancel();
-		   }
-
-		   if (read_result)
-			   util::Log::GetInstance().error(
-				   "BasicClient network read error: " + string(boost::system::system_error(read_result).what())
-			   );
-		 }
 
 		string BasicClient::_send(
 			const std::string& url,
@@ -170,8 +130,7 @@ namespace synthese
 
 				// Read the response status line.
 				boost::asio::streambuf response;
-				read_until_with_timeout(socket, response, "\r\n",
-										boost::posix_time::seconds(CLIENT_TIMEOUT_S));
+				boost::asio::read_until(socket, response, "\r\n");
 
 				// Check that response is OK.
 				std::istream response_stream(&response);
@@ -191,8 +150,7 @@ namespace synthese
 				}
 
 				// Read the response headers, which are terminated by a blank line.
-				read_until_with_timeout(socket, response, "\r\n\r\n",
-										boost::posix_time::seconds(CLIENT_TIMEOUT_S));
+				boost::asio::read_until(socket, response, "\r\n\r\n");
 
 				stringstream tmp;
 
@@ -325,5 +283,4 @@ namespace synthese
 			return c.get(path);
 		}
 }	}
-
-#endif // WIN32
+#endif
