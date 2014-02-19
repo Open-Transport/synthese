@@ -313,7 +313,7 @@ class Builder(object):
             return
 
         for filename, hash in LIBSPATIALITE_DLLS:
-            url = 'http://www.gaia-gis.it/%s.zip' % filename
+            url = 'https://www.gaia-gis.it/%s.zip' % filename
             self._download(url, hash)
             self._extract(url, self.env.c.thirdparty_dir)
 
