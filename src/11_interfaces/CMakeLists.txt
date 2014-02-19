@@ -52,8 +52,6 @@ LibraryInterfaceElement.cpp
 LibraryInterfaceElement.h
 LineLabelInterfaceElement.cpp
 LineLabelInterfaceElement.h
-LineMarkerInterfacePage.cpp
-LineMarkerInterfacePage.h
 LogicalAndInterfaceElement.cpp
 LogicalAndInterfaceElement.h
 LowerCaseInterfaceElement.cpp
@@ -68,8 +66,6 @@ PrintInterfaceElement.cpp
 PrintInterfaceElement.h
 RequestWithInterface.cpp
 RequestWithInterface.h
-ReservationRuleInterfacePage.cpp
-ReservationRuleInterfacePage.h
 SetInterfaceElement.cpp
 SetInterfaceElement.h
 StaticValueInterfaceElement.cpp

@@ -27,8 +27,6 @@
 
 #include "FactorableTemplate.h"
 #include "FunctionWithSite.h"
-#include "JourneyPattern.hpp"
-#include "ReservationTableSync.h"
 
 namespace synthese
 {
@@ -37,16 +35,10 @@ namespace synthese
 		class CalendarTemplate;
 	}
 
-	namespace resa
-	{
-		class Reservation;
-	}
-
 	namespace pt
 	{
 		class CommercialLine;
 		class ScheduledService;
-		class StopArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : ServicesListService.
@@ -66,7 +58,6 @@ namespace synthese
 			static const std::string PARAMETER_MIN_DEPARTURE_TIME;
 			static const std::string PARAMETER_MAX_DEPARTURE_TIME;
 			static const std::string PARAMETER_DEPARTURE_PLACE;
-			static const std::string PARAMETER_READ_RESERVATIONS_FROM_DAY;
 
 			static const std::string DATA_ID;
 			static const std::string DATA_DEPARTURE_SCHEDULE;
@@ -92,8 +83,6 @@ namespace synthese
 			static const std::string ATTR_FIRST_IN_AREA;
 			static const std::string ATTR_LAST_IN_AREA;
 			static const std::string ATTR_IS_AREA;
-			static const std::string TAG_RESERVATION_AT_DEPARTURE;
-			static const std::string TAG_RESERVATION_AT_ARRIVAL;
 
 		protected:
 			//! \name Page parameters
@@ -106,7 +95,6 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> _minDepartureTime;
 				boost::optional<boost::posix_time::time_duration> _maxDepartureTime;
 				boost::optional<util::RegistryKeyType> _departurePlaceId;
-				boost::gregorian::date _readReservationsFromDay;
 			//@}
 
 
@@ -134,21 +122,6 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-			typedef std::pair<
-				std::set<const resa::Reservation*>,
-				std::set<const resa::Reservation*>
-			> StopInstructions;
-			typedef std::vector<const resa::Reservation*> Resas;
-			StopInstructions _hasToStop(
-				const StopArea& stopArea,
-				size_t rank,
-				const Resas& resas
-			) const;
-
-			static void _exportReservations(
-				util::ParametersMap& pm,
-				const StopInstructions resas
-			);
 
 		public:
 			ServicesListService();

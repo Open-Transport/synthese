@@ -89,6 +89,8 @@ JunctionUpdateAction.cpp
 JunctionUpdateAction.hpp
 LineAlarmRecipient.cpp
 LineAlarmRecipient.hpp
+LineMarkerInterfacePage.cpp
+LineMarkerInterfacePage.h
 LinePhysicalStop.cpp
 LinePhysicalStop.hpp
 LinesListFunction.cpp
@@ -161,6 +163,8 @@ ReservationContact.cpp
 ReservationContact.h
 ReservationContactTableSync.cpp
 ReservationContactTableSync.h
+ReservationRuleInterfacePage.cpp
+ReservationRuleInterfacePage.h
 ScheduledService.cpp
 ScheduledService.h
 ScheduledServiceTableSync.cpp
