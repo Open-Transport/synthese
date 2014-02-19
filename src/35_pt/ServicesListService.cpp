@@ -233,6 +233,11 @@ namespace synthese
 					}
 
 					// Gets all services
+					optional<Calendar> baseCalendar(
+						_baseCalendar ?
+						optional<Calendar>(_baseCalendar->getResult()) :
+						optional<Calendar>()
+					);
 					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 								*journeyPattern.sharedServicesMutex
 					);
@@ -251,6 +256,15 @@ namespace synthese
 						){
 							continue;
 						}
+
+						// Base calendar filter
+						if(	baseCalendar &&
+							dynamic_cast<NonPermanentService*>(service) &&
+							(*baseCalendar & *static_cast<NonPermanentService*>(service)).empty()
+						){
+							continue;
+						}
+						
 
 						result.insert(service);
 					}
@@ -372,6 +386,11 @@ namespace synthese
 								stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop.get<RankInPath>()));
 							}
 							stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
+
+							if(serviceIsReservable && lineStop.get<ReservationNeeded>())
+							{
+								stopPM->insert(ATTR_WITH_RESERVATION, true);
+							}
 
 							serviceMap->insert(TAG_STOP, stopPM);
 						}
