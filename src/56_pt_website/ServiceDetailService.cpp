@@ -58,6 +58,7 @@ namespace synthese
 	namespace pt_website
 	{
 		const string ServiceDetailService::PARAMETER_READ_RESERVATIONS_FROM_DAY = "read_reservations_from_day";
+		const string ServiceDetailService::PARAMETER_BASE_CALENDAR_ID = "base_calendar_id";
 
 		const string ServiceDetailService::TAG_STOP = "stop";
 		const string ServiceDetailService::ATTR_CITY_ID = "city_id";
@@ -71,6 +72,8 @@ namespace synthese
 		const string ServiceDetailService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServiceDetailService::ATTR_IS_AREA = "is_area";
 		
+		const string ServiceDetailService::TAG_CALENDAR = "calendar";
+
 		const string ServiceDetailService::ATTR_DEPARTURE_SCHEDULE = "departure_schedule";
 		const string ServiceDetailService::ATTR_DEPARTURE_PLACE_NAME = "departure_place_name";
 		const string ServiceDetailService::ATTR_ARRIVAL_SCHEDULE = "arrival_schedule";
