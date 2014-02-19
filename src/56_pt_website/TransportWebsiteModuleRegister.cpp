@@ -10,6 +10,7 @@
 #include "CityListFunction.h"
 #include "PlacesListFunction.h"
 #include "PlacesListService.hpp"
+#include "ServiceDetailService.hpp"
 #include "ServiceInformationsFunction.hpp"
 #include "UserBookmarksService.hpp"
 
@@ -50,6 +51,7 @@ void synthese::pt_website::moduleRegister()
 	synthese::pt_website::CityListFunction::integrate();
 	synthese::pt_website::PlacesListFunction::integrate();
 	synthese::pt_website::PlacesListService::integrate();
+	synthese::pt_website::ServiceDetailService::integrate();
 	synthese::pt_website::ServiceInformationsFunction::integrate();
 	synthese::pt_website::UserBookmarksService::integrate();
 

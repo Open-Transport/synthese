@@ -21,6 +21,8 @@ RollingStockFilter.cpp
 RollingStockFilter.h
 RollingStockFilterTableSync.cpp
 RollingStockFilterTableSync.h
+ServiceDetailService.cpp
+ServiceDetailService.hpp
 ServiceInformationsFunction.cpp
 ServiceInformationsFunction.hpp
 SiteCityAddAction.cpp
