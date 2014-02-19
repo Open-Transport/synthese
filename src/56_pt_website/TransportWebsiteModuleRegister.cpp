@@ -37,7 +37,6 @@
 
 void synthese::pt_website::moduleRegister()
 {
-
 	synthese::pt_website::TransportSiteAdmin::integrate();
 
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt_website::PTServiceConfigTableSync>::integrate();
