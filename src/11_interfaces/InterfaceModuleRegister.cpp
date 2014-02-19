@@ -36,6 +36,8 @@
 #include "11_interfaces/PlainCharFilterValueInterfaceElement.h"
 #include "11_interfaces/NonPredefinedInterfacePage.h"
 
+#include "LineMarkerInterfacePage.h"
+
 // Registries
 #include "Interface.h"
 #include "InterfacePage.h"
@@ -81,6 +83,7 @@ void synthese::interfaces::moduleRegister()
 	synthese::interfaces::InterfacePageTableSync::integrate();
 
 	synthese::interfaces::NonPredefinedInterfacePage::integrate();
+	synthese::pt::LineMarkerInterfacePage::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::interfaces::Interface>();

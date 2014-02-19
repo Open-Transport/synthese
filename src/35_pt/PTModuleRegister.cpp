@@ -59,8 +59,6 @@
 #include "DRTAreaAdmin.hpp"
 #include "DRTAreasAdmin.hpp"
 
-#include "LineMarkerInterfacePage.h"
-
 #include "CleanAllStopPointProjectionsAction.hpp"
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
 #include "CommercialLineUpdateAction.h"
@@ -193,8 +191,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PTObjectInformationFunction::integrate();
 	synthese::pt::ServicesListService::integrate();
 	synthese::pt::ServiceQuotasListService::integrate();
-
-	synthese::pt::LineMarkerInterfacePage::integrate();
 
 	synthese::pt::CleanAllStopPointProjectionsAction::integrate();
 	synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
