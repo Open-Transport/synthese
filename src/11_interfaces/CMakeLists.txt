@@ -52,8 +52,6 @@ LibraryInterfaceElement.cpp
 LibraryInterfaceElement.h
 LineLabelInterfaceElement.cpp
 LineLabelInterfaceElement.h
-LineMarkerInterfacePage.cpp
-LineMarkerInterfacePage.h
 LogicalAndInterfaceElement.cpp
 LogicalAndInterfaceElement.h
 LowerCaseInterfaceElement.cpp
@@ -68,8 +66,6 @@ PrintInterfaceElement.cpp
 PrintInterfaceElement.h
 RequestWithInterface.cpp
 RequestWithInterface.h
-ReservationRuleInterfacePage.cpp
-ReservationRuleInterfacePage.h
 SetInterfaceElement.cpp
 SetInterfaceElement.h
 StaticValueInterfaceElement.cpp
@@ -92,7 +88,6 @@ add_library(11_interfaces ${interfaces_SRCS})
 target_link_libraries(11_interfaces
   05_html
   10_db
-  35_pt
   # Forward dependencies:
   #15_server
 )

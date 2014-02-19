@@ -5,6 +5,8 @@
 
 #include "PTModule.h"
 
+#include "LineMarkerInterfacePage.h"
+
 #include "LinesListFunction.h"
 #include "LineStopGetService.hpp"
 #include "StopAreasListFunction.hpp"
@@ -225,6 +227,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ProjectAllStopPointsAction::integrate();
 	synthese::pt::StopAreaTransferAddAction::integrate();
 	synthese::pt::ServiceQuotaUpdateAction::integrate();
+
+	synthese::pt::LineMarkerInterfacePage::integrate();
 
 	synthese::pt::TransportNetworkRight::integrate();
 
