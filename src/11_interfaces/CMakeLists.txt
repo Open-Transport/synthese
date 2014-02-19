@@ -92,6 +92,7 @@ add_library(11_interfaces ${interfaces_SRCS})
 target_link_libraries(11_interfaces
   05_html
   10_db
+  35_pt
   # Forward dependencies:
   #15_server
 )
