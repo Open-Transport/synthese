@@ -271,7 +271,7 @@ namespace synthese
 				page->setRoot(site.get());
 				page->setRank(rank++);
 				page->setParent(parent);
-				page->set<SmartURLPath>(relPath.string());
+				page->set<SmartURLPath>(string("/") + relPath.string());
 				site->addPage(*page);
 				if( is_directory(*dir))
 				{
