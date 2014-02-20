@@ -398,7 +398,6 @@ namespace synthese
 						}
 
 						// Default direction
-						stream << t.col();
 						lineStopUpdateAction.getAction()->setReverseDRTArea(optional<bool>(!lineStop->get<ReverseDRTArea>()));
 						stream <<
 							t.col() <<
