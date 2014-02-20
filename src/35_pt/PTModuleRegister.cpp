@@ -16,7 +16,6 @@
 #include "PTRoutesListFunction.hpp"
 #include "PTRouteDetailFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
-#include "ServicesListService.hpp"
 #include "ServiceQuotasListService.hpp"
 
 #include "DestinationTableSync.hpp"
@@ -191,7 +190,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PTRoutesListFunction::integrate();
 	synthese::pt::PTRouteDetailFunction::integrate();
 	synthese::pt::PTObjectInformationFunction::integrate();
-	synthese::pt::ServicesListService::integrate();
 	synthese::pt::ServiceQuotasListService::integrate();
 
 	synthese::pt::CleanAllStopPointProjectionsAction::integrate();

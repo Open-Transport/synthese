@@ -41,7 +41,10 @@ namespace synthese
 		class CommercialLine;
 		class ScheduledService;
 		class StopArea;
+	}
 
+	namespace pt_website
+	{
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : ServicesListService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services_List
@@ -90,8 +93,8 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::logic::tribool _wayBack;
-				boost::shared_ptr<const ScheduledService> _service;
-				boost::shared_ptr<const CommercialLine> _line;
+				boost::shared_ptr<const pt::ScheduledService> _service;
+				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::gregorian::date _displayDate;
 				boost::shared_ptr<const calendar::CalendarTemplate> _baseCalendar;
 				boost::optional<boost::posix_time::time_duration> _minDepartureTime;
@@ -123,6 +126,12 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
+
+
+			void _addServices(
+				graph::ServiceSet& result,
+				const pt::CommercialLine& line
+			) const;
 
 		public:
 			ServicesListService();

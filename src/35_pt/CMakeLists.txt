@@ -195,8 +195,6 @@ ServiceVertexUpdateAction.cpp
 ServiceVertexUpdateAction.hpp
 ServiceVertexRealTimeUpdateAction.cpp
 ServiceVertexRealTimeUpdateAction.h
-ServicesListService.cpp
-ServicesListService.hpp
 StopArea.cpp
 StopArea.hpp
 StopAreaAddAction.cpp

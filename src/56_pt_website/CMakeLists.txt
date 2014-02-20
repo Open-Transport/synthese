@@ -25,6 +25,8 @@ ServiceDetailService.cpp
 ServiceDetailService.hpp
 ServiceInformationsFunction.cpp
 ServiceInformationsFunction.hpp
+ServicesListService.cpp
+ServicesListService.hpp
 SiteCityAddAction.cpp
 SiteCityAddAction.hpp
 SiteCommercialLineLink.cpp

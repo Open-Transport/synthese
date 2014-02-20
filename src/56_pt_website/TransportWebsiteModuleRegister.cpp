@@ -12,6 +12,7 @@
 #include "PlacesListService.hpp"
 #include "ServiceDetailService.hpp"
 #include "ServiceInformationsFunction.hpp"
+#include "ServicesListService.hpp"
 #include "UserBookmarksService.hpp"
 
 #include "PTServiceConfigTableSync.hpp"
@@ -52,6 +53,7 @@ void synthese::pt_website::moduleRegister()
 	synthese::pt_website::PlacesListService::integrate();
 	synthese::pt_website::ServiceDetailService::integrate();
 	synthese::pt_website::ServiceInformationsFunction::integrate();
+	synthese::pt_website::ServicesListService::integrate();
 	synthese::pt_website::UserBookmarksService::integrate();
 
 	synthese::pt_website::SiteUpdateAction::integrate();

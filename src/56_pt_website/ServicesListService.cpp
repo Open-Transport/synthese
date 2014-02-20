@@ -49,15 +49,16 @@ namespace synthese
 	using namespace cms;
 	using namespace geography;
 	using namespace graph;
+	using namespace pt;
 	using namespace util;
 	
 	using namespace server;
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<Function, pt::ServicesListService>::FACTORY_KEY = "services_list";
+	const string FactorableTemplate<Function, pt_website::ServicesListService>::FACTORY_KEY = "services_list";
 
-	namespace pt
+	namespace pt_website
 	{
 		const string ServicesListService::PARAMETER_WAYBACK = "wayback";
 		const string ServicesListService::PARAMETER_DISPLAY_DATE = "display_date";
@@ -199,75 +200,19 @@ namespace synthese
 			ParametersMap map;
 			ServiceSet result;
 
-			if(_service.get())
+			if(_service)
 			{
 				result.insert(const_cast<ScheduledService*>(_service.get()));
 			}
-
-			// Loop on routes
-			if(_line.get())
+			else if(_line) // Loop on routes
 			{
-				BOOST_FOREACH(Path* path, _line->getPaths())
+				_addServices(result, *_line);
+			}
+			else
+			{
+				BOOST_FOREACH(const CommercialLine::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<CommercialLine>())
 				{
-					// Jump over non regular paths
-					if(!dynamic_cast<JourneyPattern*>(path))
-					{
-						continue;
-					}
-					const JourneyPattern& journeyPattern(
-						static_cast<JourneyPattern&>(
-							*path
-					)	);
-
-					// Applies wayback filter
-					if(!indeterminate(_wayBack) && journeyPattern.getWayBack() != _wayBack)
-					{
-						continue;
-					}
-
-					// Departure place filter
-					if(	_departurePlaceId &&
-						dynamic_cast<const NamedPlace*>(journeyPattern.getEdge(0)->getFromVertex()->getHub())->getKey() != *_departurePlaceId
-					){
-						continue;
-					}
-
-					// Gets all services
-					optional<Calendar> baseCalendar(
-						_baseCalendar ?
-						optional<Calendar>(_baseCalendar->getResult()) :
-						optional<Calendar>()
-					);
-					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*journeyPattern.sharedServicesMutex
-					);
-					BOOST_FOREACH(Service* service, journeyPattern.getAllServices())
-					{
-						// Min departure time filter
-						if(	_minDepartureTime &&
-							static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) < *_minDepartureTime
-						){
-							continue;
-						}
-
-						// Max departure time filter
-						if(	_maxDepartureTime &&
-							static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) > *_maxDepartureTime
-						){
-							continue;
-						}
-
-						// Base calendar filter
-						if(	baseCalendar &&
-							dynamic_cast<NonPermanentService*>(service) &&
-							(*baseCalendar & *static_cast<NonPermanentService*>(service)).empty()
-						){
-							continue;
-						}
-						
-
-						result.insert(service);
-					}
+					_addServices(result, *it.second);
 				}
 			}
 
@@ -465,4 +410,73 @@ namespace synthese
 		ServicesListService::ServicesListService():
 			_displayDate(day_clock::local_day())
 		{}
+
+
+
+		void ServicesListService::_addServices( graph::ServiceSet& result, const pt::CommercialLine& line ) const
+		{
+			BOOST_FOREACH(Path* path, line.getPaths())
+			{
+				// Jump over non regular paths
+				if(!dynamic_cast<JourneyPattern*>(path))
+				{
+					continue;
+				}
+				const JourneyPattern& journeyPattern(
+					static_cast<JourneyPattern&>(
+						*path
+				)	);
+
+				// Applies wayback filter
+				if(!indeterminate(_wayBack) && journeyPattern.getWayBack() != _wayBack)
+				{
+					continue;
+				}
+
+				// Departure place filter
+				if(	_departurePlaceId &&
+					dynamic_cast<const NamedPlace*>(journeyPattern.getEdge(0)->getFromVertex()->getHub())->getKey() != *_departurePlaceId
+				){
+					continue;
+				}
+
+				// Gets all services
+				optional<Calendar> baseCalendar(
+					_baseCalendar ?
+					optional<Calendar>(_baseCalendar->getResult()) :
+					optional<Calendar>()
+				);
+				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+					*journeyPattern.sharedServicesMutex
+				);
+				BOOST_FOREACH(Service* service, journeyPattern.getAllServices())
+				{
+					// Min departure time filter
+					if(	_minDepartureTime &&
+						static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) < *_minDepartureTime
+					){
+						continue;
+					}
+
+					// Max departure time filter
+					if(	_maxDepartureTime &&
+						static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) > *_maxDepartureTime
+					){
+						continue;
+					}
+
+					// Base calendar filter
+					if(	baseCalendar &&
+						dynamic_cast<NonPermanentService*>(service) &&
+						(*baseCalendar & *static_cast<NonPermanentService*>(service)).empty()
+					){
+						continue;
+					}
+					
+
+					result.insert(service);
+				}
+			}
+
+		}
 }	}
