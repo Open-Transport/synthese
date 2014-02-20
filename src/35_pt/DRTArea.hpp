@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	FIELD_POINTERS_SET(Stops, pt::StopArea)
+	FIELD_POINTERS_VECTOR(Stops, pt::StopArea)
 
 	typedef boost::fusion::map<
 		FIELD(Key),

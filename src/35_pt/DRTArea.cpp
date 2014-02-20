@@ -67,7 +67,14 @@ namespace synthese
 
 		bool DRTArea::contains( const StopArea& stopArea ) const
 		{
-			return get<Stops>().find(&const_cast<StopArea&>(stopArea)) != get<Stops>().end();
+			BOOST_FOREACH(StopArea* stop, get<Stops>())
+			{
+				if(stop == &stopArea)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 
