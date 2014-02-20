@@ -7,6 +7,7 @@
 
 #include "LineMarkerInterfacePage.h"
 
+#include "DRTAreasListService.hpp"
 #include "LinesListFunction.h"
 #include "LineStopGetService.hpp"
 #include "StopAreasListFunction.hpp"
@@ -181,6 +182,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DRTAreaAdmin::integrate();
 	synthese::pt::DRTAreasAdmin::integrate();
 
+	synthese::pt::DRTAreasListService::integrate();
 	synthese::pt::LineStopGetService::integrate();
 	synthese::pt::RealTimeUpdateFunction::integrate();
 	synthese::pt::LinesListFunction::integrate();

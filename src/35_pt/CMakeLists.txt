@@ -47,6 +47,8 @@ DRTAreaAdmin.cpp
 DRTAreaAdmin.hpp
 DRTAreasAdmin.cpp
 DRTAreasAdmin.hpp
+DRTAreasListService.cpp
+DRTAreasListService.hpp
 DRTAreaTableSync.cpp
 DRTAreaTableSync.hpp
 EnvironmentSyncException.cpp
