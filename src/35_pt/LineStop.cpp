@@ -50,6 +50,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ScheduleInput, "schedule_input", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(InternalService, "internal_service", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(ReservationNeeded, "reservation_needed", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(ReverseDRTArea, "reverse_drt_area", SQL_BOOLEAN)
 
 	namespace pt
 	{
@@ -74,6 +75,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(ScheduleInput, true),
 					FIELD_VALUE_CONSTRUCTOR(InternalService, true),
 					FIELD_VALUE_CONSTRUCTOR(ReservationNeeded, true),
+					FIELD_VALUE_CONSTRUCTOR(ReverseDRTArea, false),
 					FIELD_DEFAULT_CONSTRUCTOR(LineStringGeometry)
 			)	)
 		{}

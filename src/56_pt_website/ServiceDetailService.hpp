@@ -134,6 +134,20 @@ namespace synthese
 				util::ParametersMap& pm,
 				const StopInstructions resas
 			);
+
+			void _exportStop(
+				util::ParametersMap& pm,
+				const pt::StopArea& stopArea,
+				bool isDeparture,
+				bool isArrival,
+				size_t rank,
+				bool scheduleInput,
+				bool withReservation,
+				const Resas& resas,
+				bool isArea,
+				bool firstInArea,
+				bool lastInArea
+			) const;
 			
 		public:
 			ServiceDetailService();

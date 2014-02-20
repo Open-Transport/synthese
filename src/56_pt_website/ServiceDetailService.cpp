@@ -264,81 +264,73 @@ namespace synthese
 				const LineStop& lineStop(**itLineStop);
 				if(dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>()))
 				{
-					boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
-					const StopArea* stopArea(
-						dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>())->getConnectionPlace()
-					);
-
-					stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
-					stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
-					stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
 					JourneyPattern::LineStops::const_iterator itLineStop2(itLineStop);
 					++itLineStop2;
-					if(lineStop.get<IsDeparture>() && itLineStop2 != lineStops.end())
-					{
-						stopPM->insert(ATTR_DEPARTURE_TIME, _service->getDepartureSchedule(false, lineStop.get<RankInPath>()));
-					}
-					if(lineStop.get<IsArrival>() && itLineStop != lineStops.begin())
-					{
-						stopPM->insert(ATTR_ARRIVAL_TIME, _service->getArrivalSchedule(false, lineStop.get<RankInPath>()));
-					}
-					stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
 
-					if(serviceIsReservable && lineStop.get<ReservationNeeded>())
-					{
-						stopPM->insert(ATTR_WITH_RESERVATION, true);
-
-						// Get the reservations
-						StopInstructions instructions(
-							_hasToStop(*stopArea, lineStop.get<RankInPath>(), resas)
-						);
-
-						// Export the reservations into the stop parameters map
-						_exportReservations(*stopPM, instructions);
-					}
-
-					map.insert(TAG_STOP, stopPM);
+					_exportStop(
+						map,
+						*dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>())->getConnectionPlace(),
+						lineStop.get<IsDeparture>() && itLineStop2 != lineStops.end(),
+						lineStop.get<IsArrival>() && itLineStop != lineStops.begin(),
+						lineStop.get<RankInPath>(),
+						lineStop.get<ScheduleInput>(),
+						serviceIsReservable && lineStop.get<ReservationNeeded>(),
+						resas,
+						false,
+						false,
+						false
+					);
 				}
 				else if(dynamic_cast<const DRTArea*>(&*lineStop.get<LineNode>()))
 				{
 					const DRTArea& area(dynamic_cast<const DRTArea&>(*lineStop.get<LineNode>()));
-					for(Stops::Type::const_iterator it(area.get<Stops>().begin());
-						it != area.get<Stops>().end();
-						++it
-					){
-						const StopArea* stopArea(*it);
-
-						boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
-						
-						stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
-						stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
-						stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
-						if(lineStop.get<IsDeparture>())
-						{
-							stopPM->insert(ATTR_DEPARTURE_TIME, _service->getDepartureSchedule(false, lineStop.get<RankInPath>()));
+					if(lineStop.get<ReverseDRTArea>())
+					{
+						for(Stops::Type::const_reverse_iterator it(area.get<Stops>().rbegin());
+							it != area.get<Stops>().rend();
+							++it
+						){
+							Stops::Type::const_reverse_iterator it2(it);
+							++it2;
+							
+							_exportStop(
+								map,
+								**it,
+								lineStop.get<IsDeparture>(),
+								lineStop.get<IsArrival>(),
+								lineStop.get<RankInPath>(),
+								lineStop.get<ScheduleInput>(),
+								true,
+								resas,
+								true,
+								it == area.get<Stops>().rbegin(),
+								it2 == area.get<Stops>().rend()
+							);
 						}
-						if(lineStop.get<IsArrival>())
-						{
-							stopPM->insert(ATTR_ARRIVAL_TIME, _service->getArrivalSchedule(false, lineStop.get<RankInPath>()));
+					}
+					else
+					{
+						for(Stops::Type::const_iterator it(area.get<Stops>().begin());
+							it != area.get<Stops>().end();
+							++it
+						){
+							Stops::Type::const_iterator it2(it);
+							++it2;
+							
+							_exportStop(
+								map,
+								**it,
+								lineStop.get<IsDeparture>(),
+								lineStop.get<IsArrival>(),
+								lineStop.get<RankInPath>(),
+								lineStop.get<ScheduleInput>(),
+								true,
+								resas,
+								true,
+								it == area.get<Stops>().begin(),
+								it2 == area.get<Stops>().end()
+							);
 						}
-						stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
-						stopPM->insert(ATTR_WITH_RESERVATION, true);
-
-						// Get the reservations
-						StopInstructions instructions(
-							_hasToStop(*stopArea, lineStop.get<RankInPath>(), resas)
-						);
-
-						// Export the reservations into the stop parameters map
-						_exportReservations(*stopPM, instructions);
-
-						stopPM->insert(ATTR_FIRST_IN_AREA, it == area.get<Stops>().begin());
-						Stops::Type::const_iterator it2(it);
-						++it2;
-						stopPM->insert(ATTR_LAST_IN_AREA, it2 == area.get<Stops>().end());
-						stopPM->insert(ATTR_IS_AREA, true);
-
-						map.insert(TAG_STOP, stopPM);
 					}
 				}
 			}
@@ -368,6 +360,56 @@ namespace synthese
 		{
 		}
 
+
+
+		void ServiceDetailService::_exportStop(
+			util::ParametersMap& pm,
+			const StopArea& stopArea,
+			bool isDeparture,
+			bool isArrival,
+			size_t rank,
+			bool scheduleInput,
+			bool withReservation,
+			const Resas& resas,
+			bool isArea,
+			bool firstInArea,
+			bool lastInArea
+		) const {
+			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
+
+			stopPM->insert(ATTR_CITY_ID, stopArea.getCity()->getKey());
+			stopPM->insert(ATTR_CITY_NAME, stopArea.getCity()->getName());
+			stopPM->insert(ATTR_STOP_NAME, stopArea.getName());
+			if(isDeparture)
+			{
+				stopPM->insert(ATTR_DEPARTURE_TIME, _service->getDepartureSchedule(false, rank));
+			}
+			if(isArrival)
+			{
+				stopPM->insert(ATTR_ARRIVAL_TIME, _service->getArrivalSchedule(false, rank));
+			}
+			stopPM->insert(ATTR_SCHEDULE_INPUT, scheduleInput);
+
+			if(withReservation)
+			{
+				stopPM->insert(ATTR_WITH_RESERVATION, true);
+
+				// Get the reservations
+				StopInstructions instructions(
+					_hasToStop(stopArea, rank, resas)
+				);
+
+				// Export the reservations into the stop parameters map
+				_exportReservations(*stopPM, instructions);
+			}
+
+			pm.insert(ATTR_IS_AREA, isArea);
+			pm.insert(ATTR_FIRST_IN_AREA, firstInArea);
+			pm.insert(ATTR_LAST_IN_AREA, lastInArea);
+
+			pm.insert(TAG_STOP, stopPM);
+
+		}
 
 			
 		ServiceDetailService::StopInstructions ServiceDetailService::_hasToStop(
