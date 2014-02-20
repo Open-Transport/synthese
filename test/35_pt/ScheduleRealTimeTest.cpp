@@ -30,7 +30,6 @@
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "GeographyModule.h"
-#include "DRTArea.hpp"
 #include "AreaGeneratedLineStop.hpp"
 #include "CommercialLine.h"
 #include "ScheduledService.h"

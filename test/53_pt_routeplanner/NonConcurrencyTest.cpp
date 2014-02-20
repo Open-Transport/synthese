@@ -25,7 +25,6 @@
 #include "AreaGeneratedLineStop.hpp"
 #include "CommercialLine.h"
 #include "ContinuousService.h"
-#include "DRTArea.hpp"
 #include "DynamicRequest.h"
 #include "FreeDRTArea.hpp"
 #include "GeographyModule.h"
