@@ -272,6 +272,7 @@ namespace synthese
 				page->setRank(rank++);
 				page->setParent(parent);
 				page->set<SmartURLPath>(string("/") + relPath.string());
+				page->set<RawEditor>(true);
 				site->addPage(*page);
 				if( is_directory(*dir))
 				{
