@@ -398,14 +398,14 @@ namespace synthese
 						}
 
 						// Default direction
-						lineStopUpdateAction.getAction()->setReverseDRTArea(optional<bool>(!lineStop->get<ReverseDRTArea>()));
+						lineStopUpdateAction.getAction()->setReverseDRTArea(!lineStop->get<ReverseDRTArea>());
 						stream <<
 							t.col() <<
 							HTMLModule::getHTMLLink(
 								lineStopUpdateAction.getHTMLForm().getURL(),
 								(lineStop->get<ReverseDRTArea>() ? HTMLModule::getHTMLImage("/admin/img/arrow_up.png","Trajet inversé") : HTMLModule::getHTMLImage("/admin/img/arrow_down.png", "Trajet non inversé"))
 							);
-						lineStopUpdateAction.getAction()->setReverseDRTArea(optional<bool>());
+						lineStopUpdateAction.getAction()->setReverseDRTArea(lineStop->get<ReverseDRTArea>());
 
 					}
 
