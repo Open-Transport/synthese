@@ -30,12 +30,14 @@
 #include "CommercialLineTableSync.h"
 #include "DRTArea.hpp"
 #include "LineStop.h"
+#include "OperationUnit.hpp"
 #include "PTUseRule.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "ScheduledServiceTableSync.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
+#include "VehicleService.hpp"
 
 using namespace boost;
 using namespace boost::gregorian;
@@ -50,6 +52,7 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace pt;
+	using namespace pt_operation;
 	using namespace util;
 	
 	using namespace server;
@@ -63,7 +66,8 @@ namespace synthese
 		const string ServicesListService::PARAMETER_WAYBACK = "wayback";
 		const string ServicesListService::PARAMETER_DISPLAY_DATE = "display_date";
 		const string ServicesListService::PARAMETER_BASE_CALENDAR_ID = "base_calendar_id";
-		
+		const string ServicesListService::PARAMETER_DATE_FILTER = "date_filter";
+
 		const string ServicesListService::DATA_ID = "id";
 		const string ServicesListService::DATA_DEPARTURE_SCHEDULE = "departure_schedule";
 		const string ServicesListService::DATA_DEPARTURE_PLACE_NAME = "departure_place_name";
@@ -118,8 +122,7 @@ namespace synthese
 					throw RequestException("No such line");
 				}
 			}
-
-			if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == ScheduledServiceTableSync::TABLE.ID)
+			else if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == ScheduledServiceTableSync::TABLE.ID)
 			{
 				try
 				{
@@ -132,27 +135,48 @@ namespace synthese
 					throw RequestException("No such service");
 				}
 			}
+			else if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == OperationUnit::CLASS_NUMBER)
+			{
+				try
+				{
+					_operationUnit = Env::GetOfficialEnv().get<OperationUnit>(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+					);
+				}
+				catch(ObjectNotFoundException<OperationUnit>&)
+				{
+					throw RequestException("No such operation unit");
+				}
+			}
 
 
 			// Base calendar
-			if(map.isDefined(PARAMETER_BASE_CALENDAR_ID))
+			if(map.isDefined(PARAMETER_DATE_FILTER))
+			{
+				date day(from_string(map.get<string>(PARAMETER_DATE_FILTER)));
+				_baseCalendar = Calendar(day, day, days(1));
+			}
+			else if(map.isDefined(PARAMETER_BASE_CALENDAR_ID))
 			{
 				// Load
 				try
 				{
-					_baseCalendar = Env::GetOfficialEnv().get<CalendarTemplate>(
-						map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID)
-					);
+					shared_ptr<const CalendarTemplate> baseCalendar(
+						Env::GetOfficialEnv().get<CalendarTemplate>(
+							map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID)
+					)	);
+
+					// Check if the calendar is usable
+					if(!baseCalendar->isLimited())
+					{
+						throw RequestException("This calendar is not usable as a base calendar");
+					}
+
+					_baseCalendar = baseCalendar->getResult();
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>&)
 				{
 					throw RequestException("No such calendar");
-				}
-
-				// Check if the calendar is usable
-				if(!_baseCalendar->isLimited())
-				{
-					throw RequestException("This calendar is not usable as a base calendar");
 				}
 			}
 
@@ -207,6 +231,23 @@ namespace synthese
 			else if(_line) // Loop on routes
 			{
 				_addServices(result, *_line);
+			}
+			else if(_operationUnit)
+			{
+				BOOST_FOREACH(const VehicleService::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<VehicleService>())
+				{
+					// Apply unit filter
+					if(!it.second->getOperationUnit() || &*it.second->getOperationUnit() != _operationUnit.get())
+					{
+						continue;
+					}
+
+					// Get all services of the service
+					BOOST_FOREACH(const VehicleService::Services::value_type& service, it.second->getServices())
+					{
+						_addServiceIfCompliant(result, *service);
+					}
+				}
 			}
 			else
 			{
@@ -275,11 +316,11 @@ namespace synthese
 					);
 
 					// Calendar
-					if(_baseCalendar.get())
+					if(_baseCalendar)
 					{
 						// Calendar analysis
 						CalendarModule::BaseCalendar baseCalendar(
-							CalendarModule::GetBestCalendarTitle(sservice, _baseCalendar->getResult())
+							CalendarModule::GetBestCalendarTitle(sservice, *_baseCalendar)
 						);
 
 						// Output
@@ -441,42 +482,45 @@ namespace synthese
 				}
 
 				// Gets all services
-				optional<Calendar> baseCalendar(
-					_baseCalendar ?
-					optional<Calendar>(_baseCalendar->getResult()) :
-					optional<Calendar>()
-				);
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 					*journeyPattern.sharedServicesMutex
 				);
 				BOOST_FOREACH(Service* service, journeyPattern.getAllServices())
 				{
-					// Min departure time filter
-					if(	_minDepartureTime &&
-						static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) < *_minDepartureTime
-					){
-						continue;
-					}
-
-					// Max departure time filter
-					if(	_maxDepartureTime &&
-						static_cast<SchedulesBasedService*>(service)->getDataFirstDepartureSchedule(0) > *_maxDepartureTime
-					){
-						continue;
-					}
-
-					// Base calendar filter
-					if(	baseCalendar &&
-						dynamic_cast<NonPermanentService*>(service) &&
-						(*baseCalendar & *static_cast<NonPermanentService*>(service)).empty()
-					){
-						continue;
-					}
-					
-
-					result.insert(service);
+					_addServiceIfCompliant(result, static_cast<SchedulesBasedService&>(*service));
 				}
 			}
 
+		}
+
+
+
+		void ServicesListService::_addServiceIfCompliant(
+			graph::ServiceSet& result,
+			const pt::SchedulesBasedService& service
+		) const	{
+			// Min departure time filter
+			if(	_minDepartureTime &&
+				service.getDataFirstDepartureSchedule(0) < *_minDepartureTime
+			){
+				return;
+			}
+
+			// Max departure time filter
+			if(	_maxDepartureTime &&
+				service.getDataFirstDepartureSchedule(0) > *_maxDepartureTime
+			){
+				return;
+			}
+
+			// Base calendar filter
+			if(	_baseCalendar &&
+				dynamic_cast<const NonPermanentService*>(&service) &&
+				(*_baseCalendar & static_cast<const NonPermanentService&>(service)).empty()
+			){
+				return;
+			}
+			
+			result.insert(const_cast<Service*>(static_cast<const Service*>(&service)));
 		}
 }	}

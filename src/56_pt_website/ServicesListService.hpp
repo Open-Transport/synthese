@@ -40,7 +40,13 @@ namespace synthese
 	{
 		class CommercialLine;
 		class ScheduledService;
+		class SchedulesBasedService;
 		class StopArea;
+	}
+
+	namespace pt_operation
+	{
+		class OperationUnit;
 	}
 
 	namespace pt_website
@@ -60,6 +66,7 @@ namespace synthese
 			static const std::string PARAMETER_WAYBACK;
 			static const std::string PARAMETER_DISPLAY_DATE;
 			static const std::string PARAMETER_BASE_CALENDAR_ID;
+			static const std::string PARAMETER_DATE_FILTER;
 			static const std::string PARAMETER_MIN_DEPARTURE_TIME;
 			static const std::string PARAMETER_MAX_DEPARTURE_TIME;
 			static const std::string PARAMETER_DEPARTURE_PLACE;
@@ -95,8 +102,9 @@ namespace synthese
 				boost::logic::tribool _wayBack;
 				boost::shared_ptr<const pt::ScheduledService> _service;
 				boost::shared_ptr<const pt::CommercialLine> _line;
+				boost::shared_ptr<const pt_operation::OperationUnit> _operationUnit;
 				boost::gregorian::date _displayDate;
-				boost::shared_ptr<const calendar::CalendarTemplate> _baseCalendar;
+				boost::optional<calendar::Calendar> _baseCalendar;
 				boost::optional<boost::posix_time::time_duration> _minDepartureTime;
 				boost::optional<boost::posix_time::time_duration> _maxDepartureTime;
 				boost::optional<util::RegistryKeyType> _departurePlaceId;
@@ -126,6 +134,11 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
+
+			void _addServiceIfCompliant(
+				graph::ServiceSet& result,
+				const pt::SchedulesBasedService& service
+			) const;
 
 
 			void _addServices(
