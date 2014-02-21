@@ -241,6 +241,7 @@ namespace synthese
 
 				// Try to find this page in the metadata
 				Webpage *page;
+				MimeType mimeType;
 				string fullPagePath;
 				_getPageFullPath(parent, fullPagePath);
 				if(fullPagePath.empty())
@@ -260,6 +261,7 @@ namespace synthese
 					_metadataPages.erase(fullPagePath);
 
 					_logLoad("Reusing page from metadata: " + pageName + " " + lexical_cast<string>(page->getKey()));
+					mimeType = page->getMimeType();
 				}
 				else
 				{
@@ -270,6 +272,15 @@ namespace synthese
 					page->set<SmartURLPath>(string("/") + relPath.string());
 					page->set<RawEditor>(true);
 					page->set<MaxAge>(_maxAge);
+					// Calc a mime type base on the extension
+					string extension(dir->path().extension());
+					if(!extension.empty())
+					{
+						// boost path includes the . in the extension but
+						// MimeTypes does not require it
+						extension = extension.substr(1);
+					}
+					mimeType = MimeTypes::GetMimeTypeByExtension(extension);
 				}
 				page->setRoot(site.get());
 				page->setRank(rank++);
@@ -283,15 +294,6 @@ namespace synthese
 				else
 				{
 					// It's a file, load its content
-					string extension(dir->path().extension());
-					if(!extension.empty())
-					{
-						// boost path includes the . in the extension but
-						// MimeTypes does not require it
-						extension = extension.substr(1);
-					}
-					MimeType mimeType(MimeTypes::GetMimeTypeByExtension(extension));
-
 					string content;
 					try
 					{
