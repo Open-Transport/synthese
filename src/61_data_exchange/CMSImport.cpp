@@ -266,13 +266,14 @@ namespace synthese
 					page = new Webpage(WebPageTableSync::getId());
 					_env.getEditableRegistry<Webpage>().add(boost::shared_ptr<Webpage>(page));
 					_logLoad("Creation of new page: " + pageName + " " + lexical_cast<string>(page->getKey()));
+					page->set<Title>(pageName);
+					page->set<SmartURLPath>(string("/") + relPath.string());
+					page->set<RawEditor>(true);
+					page->set<MaxAge>(_maxAge);
 				}
-				page->set<Title>(pageName);
 				page->setRoot(site.get());
 				page->setRank(rank++);
 				page->setParent(parent);
-				page->set<SmartURLPath>(string("/") + relPath.string());
-				page->set<RawEditor>(true);
 				site->addPage(*page);
 				if( is_directory(*dir))
 				{
@@ -282,7 +283,6 @@ namespace synthese
 				else
 				{
 					// It's a file, load its content
-					page->set<MaxAge>(_maxAge);
 					string extension(dir->path().extension());
 					if(!extension.empty())
 					{
