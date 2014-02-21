@@ -109,7 +109,8 @@ namespace synthese
 		void ServicesListService::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Commercial line
-			if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == CommercialLineTableSync::TABLE.ID)
+			RegistryKeyType roid(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0));
+			if(decodeTableId(roid) == CommercialLineTableSync::TABLE.ID)
 			{
 				try
 				{
@@ -122,7 +123,7 @@ namespace synthese
 					throw RequestException("No such line");
 				}
 			}
-			else if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == ScheduledServiceTableSync::TABLE.ID)
+			else if(decodeTableId(roid) == ScheduledServiceTableSync::TABLE.ID)
 			{
 				try
 				{
@@ -135,7 +136,7 @@ namespace synthese
 					throw RequestException("No such service");
 				}
 			}
-			else if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == OperationUnit::CLASS_NUMBER)
+			else if(decodeTableId(roid) == OperationUnit::CLASS_NUMBER)
 			{
 				try
 				{
