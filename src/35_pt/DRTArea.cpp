@@ -21,7 +21,11 @@
 */
 
 #include "DRTArea.hpp"
+
 #include "PTModule.h"
+#include "StopArea.hpp"
+
+using namespace std;
 
 namespace synthese
 {
@@ -36,6 +40,10 @@ namespace synthese
 
 	namespace pt
 	{
+		const string DRTArea::TAG_STOP = "stop";
+
+
+
 		DRTArea::DRTArea(
 			const util::RegistryKeyType id,
 			std::string name,
@@ -102,5 +110,22 @@ namespace synthese
 		DRTArea::~DRTArea()
 		{
 			unlink();
+		}
+
+
+
+		void DRTArea::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix /* = std::string */
+		) const	{
+
+			// Stops as sub map
+			BOOST_FOREACH(const Stops::Type::value_type& stop, get<Stops>())
+			{
+				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
+				stop->toParametersMap(*stopPM, true);
+				map.insert(prefix + TAG_STOP, stopPM);
+			}
+
 		}
 }	}
