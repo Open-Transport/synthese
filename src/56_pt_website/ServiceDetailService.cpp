@@ -403,9 +403,9 @@ namespace synthese
 				_exportReservations(*stopPM, instructions);
 			}
 
-			pm.insert(ATTR_IS_AREA, isArea);
-			pm.insert(ATTR_FIRST_IN_AREA, firstInArea);
-			pm.insert(ATTR_LAST_IN_AREA, lastInArea);
+			stopPM->insert(ATTR_IS_AREA, isArea);
+			stopPM->insert(ATTR_FIRST_IN_AREA, firstInArea);
+			stopPM->insert(ATTR_LAST_IN_AREA, lastInArea);
 
 			pm.insert(TAG_STOP, stopPM);
 
