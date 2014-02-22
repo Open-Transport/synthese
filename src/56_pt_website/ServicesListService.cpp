@@ -67,6 +67,9 @@ namespace synthese
 		const string ServicesListService::PARAMETER_DISPLAY_DATE = "display_date";
 		const string ServicesListService::PARAMETER_BASE_CALENDAR_ID = "base_calendar_id";
 		const string ServicesListService::PARAMETER_DATE_FILTER = "date_filter";
+		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
+		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
+		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
 
 		const string ServicesListService::DATA_ID = "id";
 		const string ServicesListService::DATA_DEPARTURE_SCHEDULE = "departure_schedule";
@@ -82,20 +85,6 @@ namespace synthese
 		
 		const string ServicesListService::TAG_CALENDAR = "calendar";
 
-		const string ServicesListService::TAG_STOP = "stop";
-		const string ServicesListService::ATTR_CITY_ID = "city_id";
-		const string ServicesListService::ATTR_CITY_NAME = "city_name";
-		const string ServicesListService::ATTR_STOP_NAME = "stop_name";
-		const string ServicesListService::ATTR_DEPARTURE_TIME = "departure_time";
-		const string ServicesListService::ATTR_ARRIVAL_TIME = "arrival_time";
-		const string ServicesListService::ATTR_SCHEDULE_INPUT = "schedule_input";
-		const string ServicesListService::ATTR_WITH_RESERVATION = "with_reservation";
-		const string ServicesListService::ATTR_FIRST_IN_AREA = "first_in_area";
-		const string ServicesListService::ATTR_LAST_IN_AREA = "last_in_area";
-		const string ServicesListService::ATTR_IS_AREA = "is_area";
-		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
-		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
-		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
 
 
 		ParametersMap ServicesListService::_getParametersMap() const
@@ -335,86 +324,6 @@ namespace synthese
 							calendarPM->insert(CalendarTemplate::ATTR_NAME, baseCalendar.second);
 						}
 						serviceMap->insert(TAG_CALENDAR, calendarPM);
-					}
-
-					// Reservation rule
-					const UseRule& useRule(service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
-					bool serviceIsReservable(
-						dynamic_cast<const PTUseRule*>(&useRule) &&
-						static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
-					);
-
-					const JourneyPattern::LineStops& lineStops(static_cast<const JourneyPattern*>(sservice.getPath())->getLineStops());
-
-					// Stops loop
-					for(JourneyPattern::LineStops::const_iterator itLineStop(lineStops.begin());
-						itLineStop != lineStops.end();
-						++itLineStop
-					){
-						const LineStop& lineStop(**itLineStop);
-						if(dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>()))
-						{
-							boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
-							const StopArea* stopArea(
-								dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>())->getConnectionPlace()
-							);
-
-							stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
-							stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
-							stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
-							JourneyPattern::LineStops::const_iterator itLineStop2(itLineStop);
-							++itLineStop2;
-							if(lineStop.get<IsDeparture>() && itLineStop2 != lineStops.end())
-							{
-								stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, lineStop.get<RankInPath>()));
-							}
-							if(lineStop.get<IsArrival>() && itLineStop != lineStops.begin())
-							{
-								stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop.get<RankInPath>()));
-							}
-							stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
-
-							if(serviceIsReservable && lineStop.get<ReservationNeeded>())
-							{
-								stopPM->insert(ATTR_WITH_RESERVATION, true);
-							}
-
-							serviceMap->insert(TAG_STOP, stopPM);
-						}
-						else if(dynamic_cast<const DRTArea*>(&*lineStop.get<LineNode>()))
-						{
-							const DRTArea& area(dynamic_cast<const DRTArea&>(*lineStop.get<LineNode>()));
-							for(Stops::Type::const_iterator it(area.get<Stops>().begin());
-								it != area.get<Stops>().end();
-								++it
-							){
-								const StopArea* stopArea(*it);
-
-								boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
-								
-								stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
-								stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
-								stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
-								if(lineStop.get<IsDeparture>())
-								{
-									stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, lineStop.get<RankInPath>()));
-								}
-								if(lineStop.get<IsArrival>())
-								{
-									stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, lineStop.get<RankInPath>()));
-								}
-								stopPM->insert(ATTR_SCHEDULE_INPUT, lineStop.get<ScheduleInput>());
-								stopPM->insert(ATTR_WITH_RESERVATION, true);
-
-								stopPM->insert(ATTR_FIRST_IN_AREA, it == area.get<Stops>().begin());
-								Stops::Type::const_iterator it2(it);
-								++it2;
-								stopPM->insert(ATTR_LAST_IN_AREA, it2 == area.get<Stops>().end());
-								stopPM->insert(ATTR_IS_AREA, true);
-
-								serviceMap->insert(TAG_STOP, stopPM);
-							}
-						}
 					}
 				}
 

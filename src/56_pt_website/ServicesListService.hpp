@@ -84,18 +84,6 @@ namespace synthese
 
 			static const std::string TAG_CALENDAR;
 
-			static const std::string TAG_STOP;
-			static const std::string ATTR_CITY_ID;
-			static const std::string ATTR_CITY_NAME;
-			static const std::string ATTR_STOP_NAME;
-			static const std::string ATTR_DEPARTURE_TIME;
-			static const std::string ATTR_ARRIVAL_TIME;
-			static const std::string ATTR_SCHEDULE_INPUT;
-			static const std::string ATTR_WITH_RESERVATION;
-			static const std::string ATTR_FIRST_IN_AREA;
-			static const std::string ATTR_LAST_IN_AREA;
-			static const std::string ATTR_IS_AREA;
-
 		protected:
 			//! \name Page parameters
 			//@{
