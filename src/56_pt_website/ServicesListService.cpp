@@ -306,7 +306,7 @@ namespace synthese
 					);
 
 					// Calendar
-					if(_baseCalendar)
+					if(_baseCalendar && _baseCalendar->size() > 1)
 					{
 						// Calendar analysis
 						CalendarModule::BaseCalendar baseCalendar(
