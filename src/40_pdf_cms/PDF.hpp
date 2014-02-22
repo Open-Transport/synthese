@@ -25,6 +25,7 @@
 
 #include <hpdf.h>
 #include <map>
+#include <set>
 #include <ostream>
 #include <boost/optional.hpp>
 
@@ -65,6 +66,9 @@ namespace synthese
 			typedef std::map<std::string, HPDF_Image> Images;
 			Images _images;
 
+			typedef std::set<std::string> FontKeys;
+			FontKeys _fontKeys;
+
 			static void _errorHandler(
 				HPDF_STATUS   error_no,
 				HPDF_STATUS   detail_no,
@@ -81,7 +85,8 @@ namespace synthese
 			);
 
 			void embedTTFFont(
-				const std::string& content
+				const std::string& content,
+				const std::string& key
 			);
 
 			HPDF_Image embedPNGImage(

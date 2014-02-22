@@ -190,9 +190,18 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Embeds a True Type font into the PDF.
 		/// @param content the content of the font file
+		/// @param key id of the font (is used to avoid to embed a same font twice)
 		void PDF::embedTTFFont(
-			const std::string& content
+			const string& content,
+			const string& key
 		){
+			// Check if the font is already loaded
+			if(_fontKeys.find(key) != _fontKeys.end())
+			{
+				return;
+			}
+			_fontKeys.insert(key);
+
 			HPDF_Stream font_data;
 
 			/* create file stream */
