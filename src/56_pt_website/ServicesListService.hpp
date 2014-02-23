@@ -70,7 +70,7 @@ namespace synthese
 			static const std::string PARAMETER_MIN_DEPARTURE_TIME;
 			static const std::string PARAMETER_MAX_DEPARTURE_TIME;
 			static const std::string PARAMETER_DEPARTURE_PLACE;
-
+			
 			static const std::string DATA_ID;
 			static const std::string DATA_DEPARTURE_SCHEDULE;
 			static const std::string DATA_DEPARTURE_PLACE_NAME;
@@ -81,6 +81,7 @@ namespace synthese
 			static const std::string ATTR_NUMBER;
 			static const std::string ATTR_PATH_ID;
 			static const std::string TAG_SERVICES;
+			static const std::string ATTR_IS_RESERVABLE;
 
 			static const std::string TAG_CALENDAR;
 

@@ -71,6 +71,8 @@ namespace synthese
 		const string ServiceDetailService::ATTR_FIRST_IN_AREA = "first_in_area";
 		const string ServiceDetailService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServiceDetailService::ATTR_IS_AREA = "is_area";
+		const string ServiceDetailService::ATTR_IS_RESERVABLE = "is_reservable";
+		const string ServiceDetailService::TAG_RESERVATION_WITH_ARRIVAL_BEFORE_DEPARTURE = "reservation_with_arrival_before_departure";
 		
 		const string ServiceDetailService::TAG_CALENDAR = "calendar";
 
@@ -142,6 +144,8 @@ namespace synthese
 			}
 		}
 
+
+
 		ParametersMap ServiceDetailService::run(
 			std::ostream& stream,
 			const Request& request
@@ -208,6 +212,7 @@ namespace synthese
 				dynamic_cast<const PTUseRule*>(&useRule) &&
 				static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 			);
+			map.insert(ATTR_IS_RESERVABLE, serviceIsReservable);
 
 			// Reservations
 			Resas resas;
@@ -223,7 +228,9 @@ namespace synthese
 					)	);
 					BOOST_FOREACH(const ResaModule::ReservationsByService::mapped_type::value_type& resa, reservationsEnv)
 					{
-						resas.push_back(resa);
+						resas.push_back(
+							make_pair(resa, false)
+						);
 					}
 				}
 				else // Read in database (slower)
@@ -248,7 +255,11 @@ namespace synthese
 					)	);
 					BOOST_FOREACH(const ReservationTableSync::SearchResult::value_type& resa, reservationsTable)
 					{
-						resas.push_back(resa.get());
+						resas.push_back(
+							make_pair(
+								resa.get(),
+								false
+						)	);
 					}
 				}
 			}
@@ -370,7 +381,7 @@ namespace synthese
 			size_t rank,
 			bool scheduleInput,
 			bool withReservation,
-			const Resas& resas,
+			Resas& resas,
 			bool isArea,
 			bool firstInArea,
 			bool lastInArea
@@ -415,14 +426,10 @@ namespace synthese
 		ServiceDetailService::StopInstructions ServiceDetailService::_hasToStop(
 			const StopArea& stopArea,
 			size_t rank,
-			const Resas& resas
+			Resas& resas
 		) const	{
 			
-			StopInstructions result(
-				make_pair(
-					StopInstructions::first_type(),
-					StopInstructions::second_type()
-			)	);
+			StopInstructions result;
 			ptime departureTime(
 				_readReservationsFromDay,
 				_service->getDepartureSchedule(false, rank)
@@ -431,17 +438,22 @@ namespace synthese
 				_readReservationsFromDay,
 				_service->getArrivalSchedule(false, rank)
 			);
-			BOOST_FOREACH(const Resas::value_type& resa, resas)
+			BOOST_FOREACH(Resas::value_type& resa, resas)
 			{
-				if(	resa->getDeparturePlaceId() == stopArea.getKey() &&
-					resa->getDepartureTime() == departureTime
+				if(	resa.first->getDeparturePlaceId() == stopArea.getKey() &&
+					resa.first->getDepartureTime() == departureTime
 				){
-					result.first.insert(resa);
+					result.get<0>().insert(resa.first);
+					resa.second = true;
 				}
-				if(	resa->getArrivalPlaceId() == stopArea.getKey() &&
-					resa->getArrivalTime() == arrivalTime
+				if(	resa.first->getArrivalPlaceId() == stopArea.getKey() &&
+					resa.first->getArrivalTime() == arrivalTime
 				){
-					result.second.insert(resa);
+					result.get<1>().insert(resa.first);
+					if(!resa.second)
+					{
+						result.get<2>().insert(resa.first);
+					}
 				}
 			}
 			return result;
@@ -452,7 +464,7 @@ namespace synthese
 		void ServiceDetailService::_exportReservations( util::ParametersMap& pm, const StopInstructions resas )
 		{
 			// Reservations at departure
-			BOOST_FOREACH(const StopInstructions::first_type::value_type& resa, resas.first)
+			BOOST_FOREACH(const Reservation* resa, resas.get<0>())
 			{
 				boost::shared_ptr<ParametersMap> resaPM(new ParametersMap);
 				resa->toParametersMap(*resaPM, boost::none);
@@ -460,11 +472,19 @@ namespace synthese
 			}
 
 			// Reservations at arrival
-			BOOST_FOREACH(const StopInstructions::second_type::value_type& resa, resas.second)
+			BOOST_FOREACH(const Reservation* resa, resas.get<1>())
 			{
 				boost::shared_ptr<ParametersMap> resaPM(new ParametersMap);
 				resa->toParametersMap(*resaPM, boost::none);
 				pm.insert(TAG_RESERVATION_AT_ARRIVAL, resaPM);
+			}
+
+			// Alert on arrival before departure
+			BOOST_FOREACH(const Reservation* resa, resas.get<2>())
+			{
+				boost::shared_ptr<ParametersMap> resaPM(new ParametersMap);
+				resa->toParametersMap(*resaPM, boost::none);
+				pm.insert(TAG_RESERVATION_WITH_ARRIVAL_BEFORE_DEPARTURE, resaPM);
 			}
 		}
 }	}

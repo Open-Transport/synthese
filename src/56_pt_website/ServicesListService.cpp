@@ -82,6 +82,7 @@ namespace synthese
 
 		const string ServicesListService::ATTR_NUMBER = "number";
 		const string ServicesListService::ATTR_PATH_ID = "path_id";
+		const string ServicesListService::ATTR_IS_RESERVABLE = "is_reservable";
 		
 		const string ServicesListService::TAG_CALENDAR = "calendar";
 
@@ -325,6 +326,14 @@ namespace synthese
 						}
 						serviceMap->insert(TAG_CALENDAR, calendarPM);
 					}
+
+					// Reservation rule
+					const UseRule& useRule(_service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+					bool serviceIsReservable(
+						dynamic_cast<const PTUseRule*>(&useRule) &&
+						static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					);
+					map.insert(ATTR_IS_RESERVABLE, serviceIsReservable);
 				}
 
 

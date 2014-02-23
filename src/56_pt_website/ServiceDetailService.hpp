@@ -29,6 +29,8 @@
 #include "Function.h"
 #include "ReservationTableSync.h"
 
+#include <boost/tuple/tuple.hpp>
+
 namespace synthese
 {
 	namespace calendar
@@ -68,6 +70,7 @@ namespace synthese
 			static const std::string ATTR_DEPARTURE_PLACE_NAME;
 			static const std::string ATTR_ARRIVAL_SCHEDULE;
 			static const std::string ATTR_ARRIVAL_PLACE_NAME;
+			static const std::string ATTR_IS_RESERVABLE;
 
 			static const std::string TAG_CALENDAR;
 
@@ -84,6 +87,7 @@ namespace synthese
 			static const std::string ATTR_IS_AREA;
 			static const std::string TAG_RESERVATION_AT_DEPARTURE;
 			static const std::string TAG_RESERVATION_AT_ARRIVAL;
+			static const std::string TAG_RESERVATION_WITH_ARRIVAL_BEFORE_DEPARTURE;
 			
 		protected:
 			//! \name parameters
@@ -119,15 +123,20 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 			
-			typedef std::pair<
-				std::set<const resa::Reservation*>,
-				std::set<const resa::Reservation*>
+			typedef boost::tuple<
+				std::set<const resa::Reservation*>, // Departures
+				std::set<const resa::Reservation*>, // Arrivals
+				std::set<const resa::Reservation*> // At least one arrival is displayed before its departure
 			> StopInstructions;
-			typedef std::vector<const resa::Reservation*> Resas;
+			typedef std::vector<
+				std::pair<
+					const resa::Reservation*,
+					bool	// True if the departure has been already read
+			>	> Resas;
 			StopInstructions _hasToStop(
 				const pt::StopArea& stopArea,
 				size_t rank,
-				const Resas& resas
+				Resas& resas
 			) const;
 
 			static void _exportReservations(
@@ -143,7 +152,7 @@ namespace synthese
 				size_t rank,
 				bool scheduleInput,
 				bool withReservation,
-				const Resas& resas,
+				Resas& resas,
 				bool isArea,
 				bool firstInArea,
 				bool lastInArea
