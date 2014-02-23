@@ -22,13 +22,9 @@
 
 #include "WebsiteTableSync.hpp"
 
-#include "ObjectSiteLinkTableSync.h"
-#include "RollingStockFilterTableSync.h"
-#include "RollingStockFilter.h"
-#include "WebPageTableSync.h"
-
 #include "DBResult.hpp"
 #include "SelectQuery.hpp"
+#include "WebPageTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -39,7 +35,6 @@ namespace synthese
 {
 	using namespace cms;
 	using namespace db;
-	using namespace pt_website;
 	using namespace util;
 
 	namespace util
