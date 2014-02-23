@@ -16,6 +16,8 @@ set(DEPS
   54_departure_boards
   61_data_exchange
   37_pt_operation
+  38_vehicle
+  56_pt_website
 )
 
 boost_test(Road "${DEPS}")
