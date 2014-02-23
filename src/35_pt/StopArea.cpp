@@ -39,7 +39,7 @@
 #include "PTModule.h"
 #include "PTUseRuleTableSync.h"
 #include "Registry.h"
-#include "ReverseRoadChunk.hpp"
+#include "RoadChunkEdge.hpp"
 #include "RoadModule.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPoint.hpp"
@@ -288,14 +288,17 @@ namespace synthese
 					/*
 					 * If next edge exist try add next crossing to vam (see issue #23315)
 					 */
-					if(it.second->getProjectedPoint().getRoadChunk()->getNext())
+					if(it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getNext())
 					{
 						result.insert(
-                            				it.second->getProjectedPoint().getRoadChunk()->getNext()->getFromVertex(),
-                            				VertexAccess(
-                                				minutes(static_cast<long>(ceil(((it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50.0)))),
-                                				it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
-							)	);
+							it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getNext()->getFromVertex(),
+                            VertexAccess(
+                            	minutes(
+									static_cast<long>(
+										ceil(((it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50.0))
+								)	),
+                            	it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
+						)	);
 					}
 				}
 			}

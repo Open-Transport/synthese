@@ -22,7 +22,7 @@
 
 #include "RoadModule.h"
 #include "GeographyModule.h"
-#include "MainRoadChunk.hpp"
+#include "RoadChunk.h"
 #include "StopArea.hpp"
 #include "House.hpp"
 #include "RoadPlace.h"
@@ -212,17 +212,17 @@ namespace synthese
 			if(words.size() > 1)
 			{	// Text points to an address
 				bool numberAtBeginning(true);
-				MainRoadChunk::HouseNumber number(0);
+				HouseNumber number(0);
 				try
 				{
-					number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+					number = lexical_cast<HouseNumber>(words[0]);
 				}
 				catch(bad_lexical_cast)
 				{
 					/* Trying to get an House number is a bad idea, because it breaks selection of stop whit a name like "terroir 3"
 					try
 					{
-						number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size()-1]);
+						number = lexical_cast<HouseNumber>(words[words.size()-1]);
 						numberAtBeginning = false;
 					}
 					catch(bad_lexical_cast)

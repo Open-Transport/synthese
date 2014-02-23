@@ -214,7 +214,7 @@ namespace synthese
 						string cityCode;
 						string cityName;
 						string roadName;
-						MainRoadChunk::HouseNumber number;
+						HouseNumber number;
 						double x;
 						double y;
 
@@ -307,7 +307,7 @@ namespace synthese
 						}
 
 						RoadTableSync::SearchResult paths(RoadTableSync::Search(_env, roadPlace->getKey()));
-						BOOST_FOREACH(const boost::shared_ptr<Path>& path, paths)
+						BOOST_FOREACH(const boost::shared_ptr<Road>& path, paths)
 						{
 							RoadChunkTableSync::Search(_env, path->getKey());
 						}

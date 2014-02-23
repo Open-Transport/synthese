@@ -130,17 +130,18 @@ rp40.setName("40");
 rp40.setCity(&city54);
 SAVE(RoadPlace, rp40);
 
-MainRoadPart ro40(4222124650659840ULL);
-ro40.setRoadPlace(rp40);
-
-MainRoadChunk rc86_40(3940649673949187ULL, &c86, 0, &ro40, 0);
-SAVE(RoadChunk, rc86_40);
-ro40.addRoadChunk(rc86_40);
-
-MainRoadChunk rc89(3940649673949188ULL, &c89, 1, &ro40, 200);
-SAVE(RoadChunk, rc89);
-ro40.addRoadChunk(rc89);
+Road ro40(4222124650659840ULL);
+ro40.set<RoadPlace>(rp40);
 SAVE(Road, ro40);
+ro40.link(env);
+
+RoadChunk rc86_40(3940649673949187ULL, &c86, 0, &ro40, 0);
+SAVE(RoadChunk, rc86_40);
+rc86_40.link(env);
+
+RoadChunk rc89(3940649673949188ULL, &c89, 1, &ro40, 200);
+SAVE(RoadChunk, rc89);
+rc89.link(env);
 
 // Road 41
 
@@ -149,25 +150,26 @@ rp41.setName("41");
 rp41.setCity(&city54);
 SAVE(RoadPlace, rp41);
 
-MainRoadPart ro41(4222124650659841ULL);
-ro41.setRoadPlace(rp41);
-
-MainRoadChunk rc88_41(3940649673949288ULL, &c88, 0, &ro41, 0);
-SAVE(RoadChunk, rc88_41);
-ro41.addRoadChunk(rc88_41);
-
-MainRoadChunk rc86_41(3940649673949186ULL, &c86, 1, &ro41, 300);
-SAVE(RoadChunk, rc86_41);
-ro41.addRoadChunk(rc86_41);
-
-MainRoadChunk rc74(3940649673949174ULL, &c74, 2, &ro41, 750);
-SAVE(RoadChunk, rc74);
-ro41.addRoadChunk(rc74);
-
-MainRoadChunk rc93_41(3940649673949293ULL, &c93, 3, &ro41, 1700);
-SAVE(RoadChunk, rc93_41);
-ro41.addRoadChunk(rc93_41);
+Road ro41(4222124650659841ULL);
+ro41.set<RoadPlace>(rp41);
 SAVE(Road, ro41);
+ro41.link(env);
+
+RoadChunk rc88_41(3940649673949288ULL, &c88, 0, &ro41, 0);
+SAVE(RoadChunk, rc88_41);
+rc88_41.link(env);
+
+RoadChunk rc86_41(3940649673949186ULL, &c86, 1, &ro41, 300);
+SAVE(RoadChunk, rc86_41);
+rc86_41.link(env);
+
+RoadChunk rc74(3940649673949174ULL, &c74, 2, &ro41, 750);
+SAVE(RoadChunk, rc74);
+rc74.link(env);
+
+RoadChunk rc93_41(3940649673949293ULL, &c93, 3, &ro41, 1700);
+SAVE(RoadChunk, rc93_41);
+rc93_41.link(env);
 
 // Road 42
 
@@ -176,33 +178,35 @@ rp42.setName("42");
 rp42.setCity(&city38);
 SAVE(RoadPlace, rp42);
 
-MainRoadPart ro42(4222124650659842ULL);
-ro42.setRoadPlace(rp42);
-
-MainRoadChunk rc98_42(3940649673949298ULL, &c98, 0, &ro42, 0);
-SAVE(RoadChunk, rc98_42);
-ro42.addRoadChunk(rc98_42);
-
-MainRoadChunk rc97(3940649673949197ULL, &c97, 1, &ro42, 200);
-SAVE(RoadChunk, rc97);
-ro42.addRoadChunk(rc97);
+Road ro42(4222124650659842ULL);
+ro42.set<RoadPlace>(rp42);
 SAVE(Road, ro42);
+ro42.link(env);
 
-MainRoadPart ro44(4222124650659844ULL);
-ro44.setRoadPlace(rp42);
+RoadChunk rc98_42(3940649673949298ULL, &c98, 0, &ro42, 0);
+SAVE(RoadChunk, rc98_42);
+rc98_42.link(env);
 
-MainRoadChunk rc98_44(3940649673949498ULL, &c98, 0, &ro44, 0);
-SAVE(RoadChunk, rc98_44);
-ro44.addRoadChunk(rc98_44);
+RoadChunk rc97(3940649673949197ULL, &c97, 1, &ro42, 200);
+SAVE(RoadChunk, rc97);
+rc97.link(env);
 
-MainRoadChunk rc93(3940649673949193ULL, &c93, 1, &ro44, 800);
-SAVE(RoadChunk, rc93);
-ro44.addRoadChunk(rc93);
-
-MainRoadChunk rc94(3940649673949194ULL, &c94, 2, &ro44, 1600);
-SAVE(RoadChunk, rc94);
-ro44.addRoadChunk(rc94);
+Road ro44(4222124650659844ULL);
 SAVE(Road, ro44);
+ro44.set<RoadPlace>(rp42);
+ro44.link(env);
+
+RoadChunk rc98_44(3940649673949498ULL, &c98, 0, &ro44, 0);
+SAVE(RoadChunk, rc98_44);
+rc98_44.link(env);
+
+RoadChunk rc93(3940649673949193ULL, &c93, 1, &ro44, 800);
+SAVE(RoadChunk, rc93);
+rc93.link(env);
+
+RoadChunk rc94(3940649673949194ULL, &c94, 2, &ro44, 1600);
+SAVE(RoadChunk, rc94);
+rc94.link(env);
 
 
 // Road 43
@@ -212,21 +216,22 @@ rp43.setName("43");
 rp43.setCity(&city38);
 SAVE(RoadPlace, rp43);
 
-MainRoadPart ro43(4222124650659843ULL);
-ro43.setRoadPlace(rp43);
-
-MainRoadChunk rc93_43(3940649673949393ULL, &c93, 0, &ro43, 0);
-SAVE(RoadChunk, rc93_43);
-ro43.addRoadChunk(rc93_43);
-
-MainRoadChunk rc96(3940649673949396ULL, &c96, 1, &ro43, 100);
-SAVE(RoadChunk, rc96);
-ro43.addRoadChunk(rc96);
-
-MainRoadChunk rc99(3940649673949199ULL, &c99, 2, &ro43, 150);
-SAVE(RoadChunk, rc99);
-ro43.addRoadChunk(rc99);
+Road ro43(4222124650659843ULL);
+ro43.set<RoadPlace>(rp43);
 SAVE(Road, ro43);
+ro43.link(env);
+
+RoadChunk rc93_43(3940649673949393ULL, &c93, 0, &ro43, 0);
+SAVE(RoadChunk, rc93_43);
+rc93_43.link(env);
+
+RoadChunk rc96(3940649673949396ULL, &c96, 1, &ro43, 100);
+SAVE(RoadChunk, rc96);
+rc96.link(env);
+
+RoadChunk rc99(3940649673949199ULL, &c99, 2, &ro43, 150);
+SAVE(RoadChunk, rc99);
+rc99.link(env);
 
 // Road 45
 
@@ -235,17 +240,18 @@ rp45.setName("45");
 rp45.setCity(&city54);
 SAVE(RoadPlace, rp45);
 
-MainRoadPart ro45(4222124650659845ULL);
-ro45.setRoadPlace(rp45);
-
-MainRoadChunk rc86_45(3940649673949546ULL, &c86, 0, &ro45, 0);
-SAVE(RoadChunk, rc86_45);
-ro45.addRoadChunk(rc86_45);
-
-MainRoadChunk rc10(3940649673949410ULL, &c10, 1, &ro45, 400);
-SAVE(RoadChunk, rc10);
-ro45.addRoadChunk(rc10);
+Road ro45(4222124650659845ULL);
+ro45.set<RoadPlace>(rp45);
 SAVE(Road, ro45);
+ro45.link(env);
+
+RoadChunk rc86_45(3940649673949546ULL, &c86, 0, &ro45, 0);
+SAVE(RoadChunk, rc86_45);
+rc86_45.link(env);
+
+RoadChunk rc10(3940649673949410ULL, &c10, 1, &ro45, 400);
+SAVE(RoadChunk, rc10);
+rc10.link(env);
 
 // Road 46
 
@@ -254,21 +260,22 @@ rp46.setName("46");
 rp46.setCity(&city38);
 SAVE(RoadPlace, rp46);
 
-MainRoadPart ro46(4222124650659846ULL);
-ro46.setRoadPlace(rp46);
-
-MainRoadChunk rc93_46(3940649673949693ULL, &c93, 0, &ro46, 0);
-SAVE(RoadChunk, rc93_46);
-ro46.addRoadChunk(rc93_46);
-
-MainRoadChunk rc91(3940649673949189ULL, &c91, 1, &ro46, 400);
-SAVE(RoadChunk, rc91);
-ro46.addRoadChunk(rc91);
-
-MainRoadChunk rc90(3940649673949190ULL, &c90, 2, &ro46, 2000);
-SAVE(RoadChunk, rc90);
-ro46.addRoadChunk(rc90);
+Road ro46(4222124650659846ULL);
+ro46.set<RoadPlace>(rp46);
 SAVE(Road, ro46);
+ro46.link(env);
+
+RoadChunk rc93_46(3940649673949693ULL, &c93, 0, &ro46, 0);
+SAVE(RoadChunk, rc93_46);
+rc93_46.link(env);
+
+RoadChunk rc91(3940649673949189ULL, &c91, 1, &ro46, 400);
+SAVE(RoadChunk, rc91);
+rc91.link(env);
+
+RoadChunk rc90(3940649673949190ULL, &c90, 2, &ro46, 2000);
+SAVE(RoadChunk, rc90);
+rc90.link(env);
 
 // Road 47
 
@@ -277,17 +284,18 @@ rp47.setName("47");
 rp47.setCity(&city54);
 SAVE(RoadPlace, rp47);
 
-MainRoadPart ro47(4222124650659847ULL);
-ro47.setRoadPlace(rp47);
-
-MainRoadChunk rc88_47(3940649673949788ULL, &c88, 0, &ro47, 0);
-SAVE(RoadChunk, rc88_47);
-ro47.addRoadChunk(rc88_47);
-
-MainRoadChunk rc92(3940649673949292ULL, &c92, 1, &ro47, 200);
-SAVE(RoadChunk, rc92);
-ro47.addRoadChunk(rc92);
+Road ro47(4222124650659847ULL);
+ro47.set<RoadPlace>(rp47);
 SAVE(Road, ro47);
+ro47.link(env);
+
+RoadChunk rc88_47(3940649673949788ULL, &c88, 0, &ro47, 0);
+SAVE(RoadChunk, rc88_47);
+rc88_47.link(env);
+
+RoadChunk rc92(3940649673949292ULL, &c92, 1, &ro47, 200);
+SAVE(RoadChunk, rc92);
+rc92.link(env);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,7 @@
 */
 
 #include "City.h"
+#include "Road.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "Address.h"
@@ -44,8 +45,6 @@
 #include "NonConcurrencyRule.h"
 #include "GeographyModule.h"
 #include "CoordinatesSystem.hpp"
-#include "MainRoadChunk.hpp"
-#include "MainRoadPart.hpp"
 #include "10_db/101_sqlite/SQLiteDB.h"
 #include "DBModule.h"
 

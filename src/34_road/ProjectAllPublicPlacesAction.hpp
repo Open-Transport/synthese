@@ -35,6 +35,8 @@ namespace synthese
 
 	namespace road
 	{
+		class RoadChunk;
+
 		/** 
 		 	34.15 Action : ProjectAllPublicPlacesAction.
 		   	@ingroup m34Actions refActions
@@ -54,7 +56,7 @@ namespace synthese
 
 		private:
 			double _maxDistance;
-			algorithm::EdgeProjector<boost::shared_ptr<road::MainRoadChunk> >::CompatibleUserClassesRequired _requiredUserClasses;
+			algorithm::EdgeProjector<boost::shared_ptr<road::RoadChunk> >::CompatibleUserClassesRequired _requiredUserClasses;
 
 		protected:
 			/** Generates a generic parameters map from the action parameters.

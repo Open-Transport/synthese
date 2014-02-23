@@ -116,7 +116,10 @@ namespace synthese
 		void Vertex::removeArrivalEdge( Edge* edge )
 		{
 			assert(edge);
-			assert(edge->getParentPath());
+			if(!edge->getParentPath())
+			{
+				return;
+			}
 
 			pair<Edges::iterator, Edges::iterator> range(_arrivalEdges.equal_range(edge->getParentPath()));
 			//assert(range.first != _arrivalEdges.end() && range.first->first == edge->getParentPath());
@@ -145,7 +148,10 @@ namespace synthese
 		void Vertex::removeDepartureEdge( Edge* edge )
 		{
 			assert(edge);
-			assert(edge->getParentPath());
+			if(!edge->getParentPath())
+			{
+				return;
+			}
 
 			pair<Edges::iterator, Edges::iterator> range(_departureEdges.equal_range(edge->getParentPath()));
 			//assert(range.first != _departureEdges.end() && range.first->first == edge->getParentPath());

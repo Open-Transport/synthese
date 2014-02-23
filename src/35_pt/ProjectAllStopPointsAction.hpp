@@ -31,8 +31,9 @@
 
 namespace synthese
 {
-	namespace algorithm
+	namespace road
 	{
+		class RoadChunk;
 	}
 
 	namespace pt
@@ -59,7 +60,7 @@ namespace synthese
 
 		private:
 			double _maxDistance;
-			algorithm::EdgeProjector<boost::shared_ptr<road::MainRoadChunk> >::CompatibleUserClassesRequired _requiredUserClasses;
+			algorithm::EdgeProjector<boost::shared_ptr<road::RoadChunk> >::CompatibleUserClassesRequired _requiredUserClasses;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

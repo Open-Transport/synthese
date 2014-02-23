@@ -19,16 +19,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "RoadTableSync.h"
-#include "RoadPlaceTableSync.h"
-#include "CityTableSync.h"
-#include "RoadChunkTableSync.h"
-#include "DBModule.h"
-#include "DBResult.hpp"
-#include "DBException.hpp"
-#include "ReplaceQuery.h"
+
+#include "RoadPlace.h"
 
 using namespace std;
 using namespace boost;
@@ -46,15 +39,6 @@ namespace synthese
 		);
 	}
 
-	namespace road
-	{
-		const string RoadTableSync::COL_ROADTYPE ("road_type");
-		const string RoadTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const string RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const string RoadTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string RoadTableSync::COL_ROAD_PLACE_ID("road_place_id");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<RoadTableSync>::TABLE(
@@ -65,12 +49,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<RoadTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
-			Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -80,54 +58,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<RoadTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadTableSync,MainRoadPart>::Load(
-			MainRoadPart* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Type
-			Road::RoadType roadType = (Road::RoadType) rows->getInt (RoadTableSync::COL_ROADTYPE);
-			object->setType(roadType);
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				RegistryKeyType roadPlaceId(rows->getLongLong(RoadTableSync::COL_ROAD_PLACE_ID));
-				RoadPlace* roadPlace(RoadPlaceTableSync::GetEditable(roadPlaceId, env, linkLevel).get());
-				object->setRoadPlace(*roadPlace);
-
-// 				object->setBikeCompliance (BikeComplianceTableSync::Get (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID), env, linkLevel));
-
-// 				object->setHandicappedCompliance(HandicappedComplianceTableSync::Get(rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID), env, linkLevel));
-
-// 				object->setPedestrianCompliance(PedestrianComplianceTableSync::Get(rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID), env, linkLevel));
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadTableSync,MainRoadPart>::Unlink(
-			MainRoadPart* obj
-		){
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RoadTableSync,MainRoadPart>::Save(
-			MainRoadPart* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<RoadTableSync> query(*object);
-			query.addField(static_cast<int>(object->getType()));
-			query.addField(0);
-			query.addField(0);
-			query.addField(0);
-			query.addField(object->getRoadPlace() ? object->getRoadPlace()->getKey() : RegistryKeyType(0));
-			query.execute(transaction);
 		}
 
 
@@ -185,7 +115,7 @@ namespace synthese
 				<< " WHERE 1 ";
 			if(roadPlaceId)
 			{
-				query << " AND " << COL_ROAD_PLACE_ID << "=" << *roadPlaceId;
+				query << " AND " << RoadPlace::FIELD.name << "=" << *roadPlaceId;
 			} /// @todo implementation
 /*			if(startingNodeId)
 			{

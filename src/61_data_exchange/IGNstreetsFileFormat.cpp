@@ -144,7 +144,7 @@ namespace synthese
 					DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 					while(rows->next())
 					{
-						MainRoadChunk::HouseNumber numero(rows->getInt(IGNstreetsFileFormat::_FIELD_NUMERO));
+						HouseNumber numero(rows->getInt(IGNstreetsFileFormat::_FIELD_NUMERO));
 						string nomRue(rows->getText(IGNstreetsFileFormat::_FIELD_NOM_VOIE));
 						boost::algorithm::trim(nomRue);
 						nomRue = FrenchPhoneticString::to_plain_lower_copy(nomRue);
@@ -186,7 +186,7 @@ namespace synthese
 						}
 
 						RoadTableSync::SearchResult paths(RoadTableSync::Search(_env, roadPlace->getKey()));
-						BOOST_FOREACH(const boost::shared_ptr<Path>& path, paths)
+						BOOST_FOREACH(const boost::shared_ptr<Road>& path, paths)
 						{
 							RoadChunkTableSync::Search(_env, path->getKey());
 						}

@@ -297,29 +297,29 @@ namespace synthese
 					);
 
 					// House numbers
-					MainRoadChunk::HouseNumberBounds leftHouseNumbers;
-					MainRoadChunk::HouseNumberBounds rightHouseNumbers;
-					MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy(MainRoadChunk::ALL);
-					MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy(MainRoadChunk::ALL);
+					HouseNumberBounds leftHouseNumbers;
+					HouseNumberBounds rightHouseNumbers;
+					HouseNumberingPolicy leftHouseNumberingPolicy(ALL_NUMBERS);
+					HouseNumberingPolicy rightHouseNumberingPolicy(ALL_NUMBERS);
 					if(withHouseNumbers)
 					{
 						// Left
 						if(!rows->getText(_roadChunksFromLeftField).empty() && !rows->getText(_roadChunksToLeftField).empty())
 						{
 							leftHouseNumbers = make_pair(
-								lexical_cast<MainRoadChunk::HouseNumber>(
+								lexical_cast<HouseNumber>(
 									trim_copy(rows->getText(_roadChunksFromLeftField))
 								),
-								lexical_cast<MainRoadChunk::HouseNumber>(
+								lexical_cast<HouseNumber>(
 									trim_copy(rows->getText(_roadChunksToLeftField))
 							)	);
 							if(leftHouseNumbers->first % 2 && leftHouseNumbers->second % 2)
 							{
-								leftHouseNumberingPolicy = MainRoadChunk::ODD;
+								leftHouseNumberingPolicy = ODD_NUMBERS;
 							}
 							else if(!(leftHouseNumbers->first % 2) && !(leftHouseNumbers->second % 2))
 							{
-								leftHouseNumberingPolicy = MainRoadChunk::EVEN;
+								leftHouseNumberingPolicy = EVEN_NUMBERS;
 							}
 						}
 
@@ -327,19 +327,19 @@ namespace synthese
 						if(!rows->getText(_roadChunksFromRightField).empty() && !rows->getText(_roadChunksToRightField).empty())
 						{
 							rightHouseNumbers = make_pair(
-								lexical_cast<MainRoadChunk::HouseNumber>(
+								lexical_cast<HouseNumber>(
 									trim_copy(rows->getText(_roadChunksFromRightField))
 								),
-								lexical_cast<MainRoadChunk::HouseNumber>(
+								lexical_cast<HouseNumber>(
 									trim_copy(rows->getText(_roadChunksToRightField))
 							)	);
 							if(rightHouseNumbers->first % 2 && rightHouseNumbers->second % 2)
 							{
-								rightHouseNumberingPolicy = MainRoadChunk::ODD;
+								rightHouseNumberingPolicy = ODD_NUMBERS;
 							}
 							else if(!(rightHouseNumbers->first % 2) && !(rightHouseNumbers->second % 2))
 							{
-								rightHouseNumberingPolicy = MainRoadChunk::EVEN;
+								rightHouseNumberingPolicy = EVEN_NUMBERS;
 							}
 						}
 					}
@@ -445,7 +445,7 @@ namespace synthese
 					// Public place entrance
 
 					// House number
-					optional<MainRoadChunk::HouseNumber> houseNumber;
+					optional<HouseNumber> houseNumber;
 					if(rows->getInt(_publicPlacesNumberField) > 0)
 					{
 						houseNumber = rows->getInt(_publicPlacesNumberField);
@@ -453,20 +453,20 @@ namespace synthese
 
 					// Road chunk
 					string roadChunkId(rows->getText(_publicPlacesRoadChunkField));
-					map<string, MainRoadChunk*>::iterator itRoadChunk(_roadChunks.find(roadChunkId));
+					map<string, RoadChunk*>::iterator itRoadChunk(_roadChunks.find(roadChunkId));
 					if(itRoadChunk == _roadChunks.end())
 					{
 						_logWarning("Unknown road chunk "+ roadChunkId +" in public place "+ code +". Public place entrance is ignored.");
 						continue;
 					}
-					MainRoadChunk* roadChunk = itRoadChunk->second;
+					RoadChunk* roadChunk = itRoadChunk->second;
 
-					EdgeProjector<MainRoadChunk*>::From paths;
+					EdgeProjector<RoadChunk*>::From paths;
 					paths.push_back(roadChunk);
-					EdgeProjector<MainRoadChunk*> projector(paths, 10000);
+					EdgeProjector<RoadChunk*> projector(paths, 10000);
 					try
 					{
-						EdgeProjector<MainRoadChunk*>::PathNearby projection(
+						EdgeProjector<RoadChunk*>::PathNearby projection(
 							projector.projectEdge(*geometry->getCoordinate())
 						);
 
@@ -485,7 +485,7 @@ namespace synthese
 							*publicPlace
 						);
 					}
-					catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
+					catch(EdgeProjector<boost::shared_ptr<RoadChunk> >::NotFoundException)
 					{
 					}
 				}
@@ -509,11 +509,11 @@ namespace synthese
 			{
 				RoadPlaceTableSync::Save(roadplace.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<MainRoadPart>::value_type& road, _env.getEditableRegistry<MainRoadPart>())
+			BOOST_FOREACH(const Registry<Road>::value_type& road, _env.getEditableRegistry<Road>())
 			{
 				RoadTableSync::Save(road.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<MainRoadChunk>::value_type& roadChunk, _env.getEditableRegistry<MainRoadChunk>())
+			BOOST_FOREACH(const Registry<RoadChunk>::value_type& roadChunk, _env.getEditableRegistry<RoadChunk>())
 			{
 				RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
 			}

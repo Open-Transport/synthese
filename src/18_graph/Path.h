@@ -116,6 +116,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
+				void setPathGroup(PathGroup* value){ _pathGroup = value; }
 			//@}
 
 			//! @name Services.
@@ -348,21 +349,6 @@ namespace synthese
 
 
 				ServiceSet getAllServices() const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Merges two paths.
-				/// @param other the path to add at the end of the current object
-				/// Actions :
-				///  - verify if the two paths can be merged (the second one must begin
-				///    where the current one ends, and the two paths must belong to the
-				///    same PathGroup)
-				///  - shift the metric offset in the second path
-				///  - change the pointers
-				///  - delete the second path in the PathGroup
-				/// @author Hugues Romain
-				void merge(Path& other);
 
 
 

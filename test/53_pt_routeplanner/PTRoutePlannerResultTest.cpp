@@ -30,8 +30,10 @@
 #include "JourneyPattern.hpp"
 #include "PermanentService.h"
 #include "JourneyPattern.hpp"
-#include "MainRoadPart.hpp"
-#include "MainRoadChunk.hpp"
+#include "Road.h"
+#include "RoadPath.hpp"
+#include "RoadChunk.h"
+#include "RoadChunkEdge.hpp"
 #include "Crossing.h"
 #include "Address.h"
 #include "GeographyModule.h"
@@ -428,28 +430,32 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	F.set<RankInPath>(5);
 	F.link(env);
 	
-	MainRoadPart R;
-	PermanentService Sr(0, &R, boost::posix_time::minutes(5));
+	Road R;
+	R.link(env);
+	PermanentService Sr(0, &R.getForwardPath(), boost::posix_time::minutes(5));
 
 	Crossing Cr0;
 	Crossing Cr1;
 	Crossing Cr2;
 
-	MainRoadChunk Ch0(0, &Cr0, 0, &R);
-	MainRoadChunk Ch1(0, &Cr1, 1, &R);
-	MainRoadChunk Ch2(0, &Cr2, 2, &R);
+	RoadChunk Ch0(0, &Cr0, 0, &R);
+	Ch0.link(env);
+	RoadChunk Ch1(0, &Cr1, 1, &R);
+	Ch1.link(env);
+	RoadChunk Ch2(0, &Cr2, 2, &R);
+	Ch2.link(env);
 
 	Journey j0;
 	ServicePointer s0_0(true, false, USER_PEDESTRIAN, Sr, now);
 	s0_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
-	s0_0.setArrivalInformations(Ch0, now, now, Cr0);
+	s0_0.setArrivalInformations(Ch0.getForwardEdge(), now, now, Cr0);
 	j0.append(s0_0);
 	ServicePointer s0_1(true, false, USER_PEDESTRIAN, Sr, now);
-	s0_1.setDepartureInformations(Ch0, now, now, Cr0);
-	s0_1.setArrivalInformations(Ch1, now, now, Cr1);
+	s0_1.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
+	s0_1.setArrivalInformations(Ch1.getForwardEdge(), now, now, Cr1);
 	j0.append(s0_1);
 	ServicePointer s0_2(true, false, USER_PEDESTRIAN, Sr, now);
-	s0_2.setDepartureInformations(Ch1, now, now, Cr1);
+	s0_2.setDepartureInformations(Ch1.getForwardEdge(), now, now, Cr1);
 	s0_2.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 	j0.append(s0_2);
 	ServicePointer s0_3(true, false, USER_PEDESTRIAN, S, now);
@@ -489,10 +495,10 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	j1.append(s1_0);
 	ServicePointer s1_1(true, false, USER_PEDESTRIAN, Sr, now);
 	s1_1.setDepartureInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
-	s1_1.setArrivalInformations(Ch2, now, now, Cr2);
+	s1_1.setArrivalInformations(Ch2.getForwardEdge(), now, now, Cr2);
 	j1.append(s1_1);
 	ServicePointer s1_2(true, false, USER_PEDESTRIAN, Sr, now);
-	s1_2.setDepartureInformations(Ch2, now, now, Cr2);
+	s1_2.setDepartureInformations(Ch2.getForwardEdge(), now, now, Cr2);
 	s1_2.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j1.append(s1_2);
 
@@ -527,7 +533,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j2;
 	ServicePointer s2_0(true, false, USER_PEDESTRIAN, Sr, now);
-	s2_0.setDepartureInformations(Ch0, now, now, Cr0);
+	s2_0.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
 	s2_0.setArrivalInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
 	j2.append(s2_0);
 	ServicePointer s2_1(true, false, USER_PEDESTRIAN, S, now);
@@ -576,7 +582,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	j3.append(s3_0);
 	ServicePointer s3_1(true, false, USER_PEDESTRIAN, Sr, now);
 	s3_1.setDepartureInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
-	s3_1.setArrivalInformations(Ch2, now, now, Cr2);
+	s3_1.setArrivalInformations(Ch2.getForwardEdge(), now, now, Cr2);
 	j3.append(s3_1);
 
 	j.push_back(j3);
@@ -620,12 +626,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j4;
 	ServicePointer s4_0(true, false, USER_PEDESTRIAN, Sr, now);
-	s4_0.setDepartureInformations(Ch0, now, now, Cr0);
+	s4_0.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
 	s4_0.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 	j4.append(s4_0);
 	ServicePointer s4_1(true, false, USER_PEDESTRIAN, Sr, now);
 	s4_1.setDepartureInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
-	s4_1.setArrivalInformations(Ch2, now, now, Cr2);
+	s4_1.setArrivalInformations(Ch2.getForwardEdge(), now, now, Cr2);
 	j4.append(s4_1);
 
 	j.push_back(j4);
@@ -669,8 +675,8 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j5;
 	ServicePointer s5_0(true, false, USER_PEDESTRIAN, Sr, now);
-	s5_0.setDepartureInformations(Ch0, now, now, Cr0);
-	s5_0.setArrivalInformations(Ch1, now, now, Cr1);
+	s5_0.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
+	s5_0.setArrivalInformations(Ch1.getForwardEdge(), now, now, Cr1);
 	j5.append(s5_0);
 
 	j.push_back(j5);

@@ -26,7 +26,6 @@
 #include "ImportableTableSync.hpp"
 #include "Importer.hpp"
 
-#include "MainRoadChunk.hpp"
 #include "Road.h"
 
 namespace synthese
@@ -42,6 +41,7 @@ namespace synthese
 		class PublicPlaceEntrance;
 		class PublicPlaceEntranceTableSync;
 		class PublicPlaceTableSync;
+		class RoadChunk;
 		class RoadPlace;
 		class RoadPlaceTableSync;
 		class Crossing;
@@ -49,7 +49,7 @@ namespace synthese
 	}
 
 	namespace data_exchange
-	{		
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Helpers library for road import.
 		///	@ingroup m34
@@ -120,32 +120,32 @@ namespace synthese
 				const std::string& code,
 				boost::optional<const std::string&> name,
 				graph::MetricOffset metricOffset,
-				boost::optional<road::MainRoadChunk::HouseNumber> number,
-				road::MainRoadChunk& roadChunk,
+				boost::optional<road::HouseNumber> number,
+				road::RoadChunk& roadChunk,
 				road::PublicPlace& publicPlace
 			) const;
 
 		private:
 			static void _setGeometryAndHouses(
-				road::MainRoadChunk& chunk,
+				road::RoadChunk& chunk,
 				boost::shared_ptr<geos::geom::LineString> geometry,
-				road::MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-				road::MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-				road::MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
-				road::MainRoadChunk::HouseNumberBounds leftHouseNumberBounds
+				road::HouseNumberingPolicy rightHouseNumberingPolicy,
+				road::HouseNumberingPolicy leftHouseNumberingPolicy,
+				road::HouseNumberBounds rightHouseNumberBounds,
+				road::HouseNumberBounds leftHouseNumberBounds
 			);
 
 		public:
-			road::MainRoadChunk* _addRoadChunk(
+			road::RoadChunk* _addRoadChunk(
 				road::RoadPlace& roadPlace,
 				road::Crossing& startNode,
 				road::Crossing& endNode,
 				boost::shared_ptr<geos::geom::LineString> geometry,
-				road::MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-				road::MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-				road::MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
-				road::MainRoadChunk::HouseNumberBounds leftHouseNumberBounds,
-				road::Road::RoadType roadType = road::Road::ROAD_TYPE_UNKNOWN
+				road::HouseNumberingPolicy rightHouseNumberingPolicy,
+				road::HouseNumberingPolicy leftHouseNumberingPolicy,
+				road::HouseNumberBounds rightHouseNumberBounds,
+				road::HouseNumberBounds leftHouseNumberBounds,
+				road::RoadType roadType = road::ROAD_TYPE_UNKNOWN
 			) const;
 		};
 }	}

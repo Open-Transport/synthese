@@ -33,7 +33,6 @@
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "CommercialLineTableSync.h"
-#include "ReverseRoadChunk.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 
@@ -118,14 +117,9 @@ namespace synthese
 			{
 				if(_projectedPoint.getRoadChunk()->getFromCrossing() == &crossing)
 				{
-					return VertexAccess(minutes(static_cast<long>(_projectedPoint.getMetricOffset() / 50)), _projectedPoint.getMetricOffset());
-				}
-				if(	_projectedPoint.getRoadChunk()->getReverseRoadChunk() &&
-					_projectedPoint.getRoadChunk()->getReverseRoadChunk()->getFromCrossing() == &crossing
-				){
 					return VertexAccess(
-						minutes(static_cast<long>((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()) / 50)),
-						_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()
+						minutes(static_cast<long>(_projectedPoint.getMetricOffset() / 50)),
+						_projectedPoint.getMetricOffset()
 					);
 				}
 			}
@@ -537,7 +531,7 @@ namespace synthese
 			){
 				RegistryKeyType chunkId(
 					record.getDefault<RegistryKeyType>(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,0));
-				MainRoadChunk* chunk(NULL);
+				RoadChunk* chunk(NULL);
 				MetricOffset metricOffset(0);
 				if(chunkId > 0)
 				{
@@ -546,7 +540,7 @@ namespace synthese
 						chunk = RoadChunkTableSync::GetEditable(chunkId, env).get();
 						metricOffset = record.getDefault<double>(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, 0);
 					}
-					catch (ObjectNotFoundException<MainRoadChunk>&)
+					catch (ObjectNotFoundException<RoadChunk>&)
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(getKey()));
 					}

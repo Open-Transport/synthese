@@ -35,11 +35,10 @@
 #include "FrenchPhoneticString.h"
 #include "Import.hpp"
 #include "PropertiesHTMLTable.h"
-#include "ReverseRoadChunk.hpp"
-#include "RoadPlace.h"
+#include "RoadPath.hpp"
 #include "RoadPlaceTableSync.h"
 #include "RoadTableSync.h"
-#include "RoadChunk.h"
+#include "RoadChunkEdge.hpp"
 #include "RoadChunkTableSync.h"
 #include "StopAreaTableSync.hpp"
 
@@ -219,7 +218,7 @@ namespace synthese
 				BOOST_FOREACH(const WayType& w, boundary_ways.second.second)
 				{
 					WayPtr way = w.second;
-					Road::RoadType wayType = way->getAssociatedRoadType();
+					RoadType wayType = way->getAssociatedRoadType();
 
 					bool nonWalkableWay(!way->isWalkable());
 					bool nonDrivableWay(!way->isDrivable());
@@ -228,11 +227,11 @@ namespace synthese
 					boost::shared_ptr<RoadPlace> roadPlace = _getOrCreateRoadPlace(way, city);
 
 					// Create Road
-					boost::shared_ptr<MainRoadPart> road(new MainRoadPart(0, wayType));
+					boost::shared_ptr<Road> road(new Road(0, wayType));
 
-					road->setRoadPlace(*roadPlace);
-					road->setKey(RoadTableSync::getId());
-					_env.getEditableRegistry<MainRoadPart>().add(road);
+					road->set<RoadPlace>(*roadPlace);
+					road->set<Key>(RoadTableSync::getId());
+					_env.getEditableRegistry<Road>().add(road);
 					_recentlyCreatedRoadParts[way->getId()] = road;
 
 					double maxSpeed = way->getAssociatedSpeed();
@@ -356,17 +355,14 @@ namespace synthese
 					{
 						boost::shared_ptr<RoadPlace> refRoadPlace;
 						refRoadPlace = it->second;
-						std::vector<MainRoadChunk*> refRoadChunks;
+						std::vector<RoadChunk*> refRoadChunks;
 
 						// Get every road chunk of the RoadPlace
-						BOOST_FOREACH(Path* path, refRoadPlace->getPaths())
+						BOOST_FOREACH(Road* path, refRoadPlace->getRoads())
 						{
-							if(!dynamic_cast<MainRoadPart*>(path))
-								continue;
-
-							BOOST_FOREACH(Edge* edge, path->getEdges())
+							BOOST_FOREACH(Edge* edge, path->getForwardPath().getEdges())
 							{
-								refRoadChunks.push_back(static_cast<MainRoadChunk*>(edge));
+								refRoadChunks.push_back(static_cast<RoadChunkEdge*>(edge)->getRoadChunk());
 							}
 						}
 
@@ -380,7 +376,7 @@ namespace synthese
 
 					if(centralRoad != _recentlyCreatedRoadParts.end())
 					{
-						city->addIncludedPlace(*static_cast<NamedPlace*>(centralRoad->second->getRoadPlace()));
+						city->addIncludedPlace(static_cast<NamedPlace&>(*centralRoad->second->get<RoadPlace>()));
 					}
 				}
 			}
@@ -472,17 +468,14 @@ namespace synthese
 
 							if(refRoadPlace.get())
 							{
-								std::vector<MainRoadChunk*> refRoadChunks;
+								std::vector<RoadChunk*> refRoadChunks;
 
 								// Get every road chunk of the RoadPlace
-								BOOST_FOREACH(Path* path, refRoadPlace->getPaths())
+								BOOST_FOREACH(Road* path, refRoadPlace->getRoads())
 								{
-									if(!dynamic_cast<MainRoadPart*>(path))
-										continue;
-
-									BOOST_FOREACH(Edge* edge, path->getEdges())
+									BOOST_FOREACH(Edge* edge, path->getForwardPath().getEdges())
 									{
-										refRoadChunks.push_back(static_cast<MainRoadChunk*>(edge));
+										refRoadChunks.push_back(static_cast<RoadChunkEdge*>(edge)->getRoadChunk());
 									}
 								}
 
@@ -495,7 +488,7 @@ namespace synthese
 									}
 								}
 
-								BOOST_FOREACH(MainRoadChunk* chunk, refRoadChunks)
+								BOOST_FOREACH(RoadChunk* chunk, refRoadChunks)
 								{
 									_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(chunk);
 								}
@@ -541,9 +534,9 @@ namespace synthese
 
 			_logDebug("finished parsing relation");
 
-			BOOST_FOREACH(const Registry<MainRoadPart>::value_type& road, _env.getEditableRegistry<MainRoadPart>())
+			BOOST_FOREACH(const Registry<Road>::value_type& road, _env.getEditableRegistry<Road>())
 			{
-				road.second->validateGeometry();
+				road.second->getForwardPath().validateGeometry();
 			}
 
 			_logDebug("finished validating road geometries");
@@ -598,11 +591,11 @@ namespace synthese
 			{
 				RoadPlaceTableSync::Save(roadplace.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<MainRoadPart>::value_type& road, _env.getEditableRegistry<MainRoadPart>())
+			BOOST_FOREACH(const Registry<Road>::value_type& road, _env.getEditableRegistry<Road>())
 			{
 				RoadTableSync::Save(road.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<MainRoadChunk>::value_type& roadChunk, _env.getEditableRegistry<MainRoadChunk>())
+			BOOST_FOREACH(const Registry<RoadChunk>::value_type& roadChunk, _env.getEditableRegistry<RoadChunk>())
 			{
 				RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
 			}
@@ -677,7 +670,7 @@ namespace synthese
 
 
 		void OSMFileFormat::Importer_::_createRoadChunk(
-			const boost::shared_ptr<MainRoadPart> road,
+			const boost::shared_ptr<Road> road,
 			const boost::shared_ptr<Crossing> crossing,
 			const optional<boost::shared_ptr<LineString> > geometry,
 			size_t rank,
@@ -688,7 +681,7 @@ namespace synthese
 			bool isNonDrivable,
 			bool isNonBikable
 		) const {
-			boost::shared_ptr<MainRoadChunk> roadChunk(new MainRoadChunk);
+			boost::shared_ptr<RoadChunk> roadChunk(new RoadChunk);
 			roadChunk->setRoad(road.get());
 			roadChunk->setFromCrossing(crossing.get());
 			roadChunk->setRankInPath(rank);
@@ -699,62 +692,33 @@ namespace synthese
 				roadChunk->setGeometry(*geometry);
 			}
 
-			road->addRoadChunk(*roadChunk);
-
-			RuleUser::Rules rules(RuleUser::GetEmptyRules());
-			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-			rules[USER_CAR - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-
-			if(isNonWalkable)
+			roadChunk->setNonWalkable(isNonWalkable);
+			roadChunk->setNonBikable(isNonBikable);
+			roadChunk->setNonDrivable(isNonDrivable);
+			if(traficDirection == ONE_WAY)
 			{
-				rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-			}
-
-			if(isNonBikable)
-			{
-				rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-			}
-
-			if(isNonDrivable)
-			{
-				rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-				roadChunk->getReverseRoadChunk()->setRules(rules);
-				roadChunk->setRules(rules);
-			}
-			else if(traficDirection == ONE_WAY)
-			{
-				roadChunk->setRules(rules);
-				rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-				roadChunk->getReverseRoadChunk()->setRules(rules);
+				roadChunk->setCarOneWay(1);
 			}
 			else if(traficDirection == REVERSED_ONE_WAY)
 			{
-				roadChunk->getReverseRoadChunk()->setRules(rules);
-				rules[USER_CAR - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
-				roadChunk->setRules(rules);
-			}
-			else
-			{
-				roadChunk->getReverseRoadChunk()->setRules(rules);
-				roadChunk->setRules(rules);
+				roadChunk->setCarOneWay(-1);
 			}
 
 			roadChunk->setCarSpeed(maxSpeed);
-			roadChunk->getReverseRoadChunk()->setCarSpeed(maxSpeed);
-			_env.getEditableRegistry<MainRoadChunk>().add(roadChunk);
+			roadChunk->link(_env);
+			_env.getEditableRegistry<RoadChunk>().add(roadChunk);
 		}
+
+
 
 		void OSMFileFormat::Importer_::_projectHouseAndUpdateChunkHouseNumberBounds(
 			const NodePtr& house,
-			vector<MainRoadChunk*>& refRoadChunks,
+			vector<RoadChunk*>& refRoadChunks,
 			const bool autoUpdatePolicy
 		) const {
 			try
 			{
-				MainRoadChunk::HouseNumber num = lexical_cast<MainRoadChunk::HouseNumber>(house->getTag("addr:housenumber"));
+				HouseNumber num = lexical_cast<HouseNumber>(house->getTag("addr:housenumber"));
 				// Compute the house geometry
 				boost::shared_ptr<Point> houseCoord(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
 					*_import.get<DataSource>()->getActualCoordinateSystem().createPoint(
@@ -766,18 +730,18 @@ namespace synthese
 				try
 				{
 					// Use Projector to get the closest road chunk according to the geometry 
-					EdgeProjector<MainRoadChunk*> projector(refRoadChunks, 200);
-					EdgeProjector<MainRoadChunk*>::PathNearby projection(projector.projectEdge(*houseCoord->getCoordinate()));
-					MainRoadChunk* linkedRoadChunk(projection.get<1>());
+					EdgeProjector<RoadChunk*> projector(refRoadChunks, 200);
+					EdgeProjector<RoadChunk*>::PathNearby projection(projector.projectEdge(*houseCoord->getCoordinate()));
+					RoadChunk* linkedRoadChunk(projection.get<1>());
 
 					_chunkHouseNumberList[linkedRoadChunk->getKey()].push_back(num);
 
-					MainRoadChunk::HouseNumberBounds leftBounds = linkedRoadChunk->getLeftHouseNumberBounds();
+					HouseNumberBounds leftBounds = linkedRoadChunk->getLeftHouseNumberBounds();
 
 					// If we haven't set any bounds, we set a default one
 					if(!leftBounds)
 					{
-						MainRoadChunk::HouseNumberBounds bounds(make_pair(num, num));
+						HouseNumberBounds bounds(make_pair(num, num));
 						linkedRoadChunk->setLeftHouseNumberBounds(bounds);
 						linkedRoadChunk->setRightHouseNumberBounds(bounds);
 					}
@@ -786,14 +750,14 @@ namespace synthese
 						// If there is one and the lower bounds is higher than the current house number, update
 						if(num < leftBounds->first)
 						{
-							MainRoadChunk::HouseNumberBounds bounds(make_pair(num, leftBounds->second));
+							HouseNumberBounds bounds(make_pair(num, leftBounds->second));
 							linkedRoadChunk->setLeftHouseNumberBounds(bounds);
 							linkedRoadChunk->setRightHouseNumberBounds(bounds);
 						}
 						// Or the upper bounds is lower than the current house number, update
 						else if(num > leftBounds->second)
 						{
-							MainRoadChunk::HouseNumberBounds bounds(make_pair(leftBounds->first, num));
+							HouseNumberBounds bounds(make_pair(leftBounds->first, num));
 							linkedRoadChunk->setLeftHouseNumberBounds(bounds);
 							linkedRoadChunk->setRightHouseNumberBounds(bounds);
 						}
@@ -804,7 +768,7 @@ namespace synthese
 						_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(linkedRoadChunk);
 					}
 				}
-				catch(EdgeProjector<MainRoadChunk*>::NotFoundException)
+				catch(EdgeProjector<RoadChunk*>::NotFoundException)
 				{
 				}
 			}
@@ -813,21 +777,23 @@ namespace synthese
 			}
 		}
 
+
+
 		void OSMFileFormat::Importer_::_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
-			MainRoadChunk* chunk
+			RoadChunk* chunk
 		) const {
 			ChunkHouseNumberList::iterator itChunk = _chunkHouseNumberList.find(chunk->getKey());
 
 			if(itChunk != _chunkHouseNumberList.end())
 			{
-				MainRoadChunk::HouseNumberingPolicy policy(MainRoadChunk::ALL);
+				HouseNumberingPolicy policy(ALL_NUMBERS);
 
 				if(itChunk->second.size() > 2)
 				{
 					unsigned int curMod((*itChunk->second.begin()) % 2);
 					bool multipleMod(false);
 
-					BOOST_FOREACH(MainRoadChunk::HouseNumber n, itChunk->second)
+					BOOST_FOREACH(HouseNumber n, itChunk->second)
 					{
 						if(curMod != (n % 2))
 						{
@@ -837,9 +803,13 @@ namespace synthese
 					}
 
 					if(!multipleMod && curMod)
-						policy = MainRoadChunk::ODD;
+					{
+						policy = ODD_NUMBERS;
+					}
 					else if(!multipleMod)
-						policy = MainRoadChunk::EVEN;
+					{
+						policy = EVEN_NUMBERS;
+					}
 				}
 
 				chunk->setLeftHouseNumberingPolicy(policy);

@@ -22,7 +22,7 @@
 
 #include "HouseTableSync.hpp"
 #include "House.hpp"
-#include "MainRoadChunk.hpp"
+#include "RoadChunk.h"
 #include "DBModule.h"
 #include "LinkException.h"
 #include "DataSource.h"
@@ -108,7 +108,7 @@ namespace synthese
 			)	);
 
 			// House number
-			MainRoadChunk::HouseNumber houseNumber = rows->getInt(HouseTableSync::COL_NUMBER);
+			HouseNumber houseNumber = rows->getInt(HouseTableSync::COL_NUMBER);
 			object->setHouseNumber(houseNumber);
 
 			// Road Place
@@ -134,7 +134,7 @@ namespace synthese
 				DataSourceLinks::Serialize(
 					object->getDataSourceLinks()
 			)	);
-			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getRoad()->getRoadPlace()->getKey() : RegistryKeyType(0));
+			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey() : RegistryKeyType(0));
 			query.addField(object->getHouseNumber() ? static_cast<int>(*(object->getHouseNumber())) : 0);
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);

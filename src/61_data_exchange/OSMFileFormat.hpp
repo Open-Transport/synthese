@@ -27,7 +27,8 @@
 #include "OneFileTypeImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "OSMElements.h"
-#include "MainRoadChunk.hpp"
+
+#include "GraphTypes.h"
 
 #include <iostream>
 #include <map>
@@ -44,7 +45,9 @@ namespace synthese
 	namespace road
 	{
 		class Crossing;
-		class MainRoadPart;
+		class Road;
+		class RoadChunk;
+		class RoadPlace;
 	}
 
 	namespace data_exchange
@@ -66,12 +69,12 @@ namespace synthese
 
 				static const std::string PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE;
 
-				typedef std::map<util::RegistryKeyType, std::vector<road::MainRoadChunk::HouseNumber> > ChunkHouseNumberList;
+				typedef std::map<util::RegistryKeyType, std::vector<road::HouseNumber> > ChunkHouseNumberList;
 				typedef std::map<unsigned long long int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
 				typedef std::map<unsigned long long int, boost::shared_ptr<geography::City> > _CitiesMap;
 				typedef std::map<std::string, boost::shared_ptr<road::RoadPlace> > _RecentlyCreatedRoadPlaces;
 				typedef std::map<unsigned long long int, boost::shared_ptr<road::RoadPlace> > _LinkBetweenWayAndRoadPlaces;
-				typedef std::map<unsigned long long int, boost::shared_ptr<road::MainRoadPart> > _RecentlyCreatedRoadParts;
+				typedef std::map<unsigned long long int, boost::shared_ptr<road::Road> > _RecentlyCreatedRoadParts;
 
 				mutable _CrossingsMap _crossingsMap;
 				mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;
@@ -147,7 +150,7 @@ namespace synthese
 				) const;
 
 				void _createRoadChunk(
-					const boost::shared_ptr<road::MainRoadPart> road,
+					const boost::shared_ptr<road::Road> road,
 					const boost::shared_ptr<road::Crossing> crossing,
 					const boost::optional<boost::shared_ptr<geos::geom::LineString> > geometry,
 					std::size_t rank,
@@ -161,12 +164,12 @@ namespace synthese
 
 				void _projectHouseAndUpdateChunkHouseNumberBounds(
 					const osm::NodePtr& house,
-					std::vector<road::MainRoadChunk*>& refRoadChunks,
+					std::vector<road::RoadChunk*>& refRoadChunks,
 					const bool autoUpdatePolicy = false
 				) const;
 
 				void _updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
-					road::MainRoadChunk* chunk
+					road::RoadChunk* chunk
 				) const;
 
 				std::string _toAlphanumericString(

@@ -55,6 +55,7 @@
 #include "ReservationTransaction.h"
 #include "ReservationTransactionTableSync.h"
 #include "Road.h"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "RoutePlannerFunction.h"
 #include "ScheduledService.h"
@@ -649,7 +650,7 @@ namespace synthese
 							else if(dynamic_cast<const House*>(_departurePlace.get()))
 							{
 								r->setDeparturePlaceId(
-									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->getRoadPlace()->getKey()
+									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
 								);
 							}
 
@@ -698,7 +699,7 @@ namespace synthese
 							else if(dynamic_cast<const House*>(_arrivalPlace.get()))
 							{
 								r->setDeparturePlaceId(
-									dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->getRoadPlace()->getKey()
+									dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
 								);
 							}
 						}
@@ -742,11 +743,11 @@ namespace synthese
 							r->setLineCode(line->getCommercialLine()->getShortName());
 							r->setLineId(line->getCommercialLine()->getKey());
 						}
-						const Road* road(dynamic_cast<const Road*>(su.getService()->getPath()));
+						const RoadPath* road(dynamic_cast<const RoadPath*>(su.getService()->getPath()));
 						if (road)
 						{
-							r->setLineCode(road->getRoadPlace()->getName());
-							r->setLineId(road->getKey());
+							r->setLineCode(road->getRoad()->get<RoadPlace>()->getName());
+							r->setLineId(road->getRoad()->getKey());
 						}
 
 						r->setReservationPossible(false);

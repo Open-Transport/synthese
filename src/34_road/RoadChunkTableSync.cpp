@@ -35,7 +35,7 @@
 #include "AllowedUseRule.h"
 #include "ForbiddenUseRule.h"
 #include "AccessParameters.h"
-#include "ReverseRoadChunk.hpp"
+#include "RoadChunkEdge.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -120,8 +120,8 @@ namespace synthese
 			return r;
 		};
 
-		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Load(
-			MainRoadChunk* object,
+		template<> void OldLoadSavePolicy<RoadChunkTableSync,RoadChunk>::Load(
+			RoadChunk* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -136,45 +136,34 @@ namespace synthese
 
 
 
-		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Unlink(
-			MainRoadChunk* obj
+		template<> void OldLoadSavePolicy<RoadChunkTableSync,RoadChunk>::Unlink(
+			RoadChunk* obj
 		){
 			obj->unlink();
 		}
 
 
 
-		template<> void OldLoadSavePolicy<RoadChunkTableSync,MainRoadChunk>::Save(
-			MainRoadChunk* object,
+		template<> void OldLoadSavePolicy<RoadChunkTableSync,RoadChunk>::Save(
+			RoadChunk* object,
 			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<RoadChunkTableSync> query(*object);
 			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRankInPath());
-			query.addField(object->getMainRoadPart() ? object->getMainRoadPart()->getKey() : RegistryKeyType(0));
+			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMetricOffset());
 			query.addField(object->getLeftHouseNumberBounds() ? lexical_cast<string>(object->getLeftHouseNumberBounds()->first) : string());
 			query.addField(object->getLeftHouseNumberBounds() ? lexical_cast<string>(object->getLeftHouseNumberBounds()->second) : string());
 			query.addField(object->getRightHouseNumberBounds() ? lexical_cast<string>(object->getRightHouseNumberBounds()->first) : string());
 			query.addField(object->getRightHouseNumberBounds() ? lexical_cast<string>(object->getRightHouseNumberBounds()->second) : string());
-			query.addField(static_cast<int>(object->getLeftHouseNumberBounds() ? object->getLeftHouseNumberingPolicy() : MainRoadChunk::ALL));
-			query.addField(static_cast<int>(object->getRightHouseNumberBounds() ? object->getRightHouseNumberingPolicy() : MainRoadChunk::ALL));
-
-			AccessParameters ac(USER_CAR);
-			int oneWay = 0;
-			bool mainCarAllowance = object->getUseRule(USER_CAR - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac);
-			bool reverseCarAllowance = object->getReverseRoadChunk()->getUseRule(USER_CAR - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac);
-			if(!mainCarAllowance && reverseCarAllowance)
-				oneWay = -1;
-			else if(mainCarAllowance && !reverseCarAllowance)
-				oneWay = 1;
-			query.addField(oneWay);
+			query.addField(static_cast<int>(object->getLeftHouseNumberBounds() ? object->getLeftHouseNumberingPolicy() : road::ALL_NUMBERS));
+			query.addField(static_cast<int>(object->getRightHouseNumberBounds() ? object->getRightHouseNumberingPolicy() : road::ALL_NUMBERS));
+			query.addField(object->getCarOneWay());
 			query.addField(object->getCarSpeed(true));
-			ac = AccessParameters(USER_PEDESTRIAN);
-			query.addField(!object->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac));
-			query.addField(!mainCarAllowance && !reverseCarAllowance);
-			ac = AccessParameters(USER_BIKE);
-			query.addField(!object->getUseRule(USER_BIKE - USER_CLASS_CODE_OFFSET).isCompatibleWith(ac));
+			query.addField(object->getNonWalkable());
+			query.addField(object->getNonDrivable());
+			query.addField(object->getNonBikable());
 			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
 			query.execute(transaction);
 		}
@@ -245,9 +234,9 @@ namespace synthese
 			const Point& point,
 			double maxDistance,
 			Address& address,
-			EdgeProjector<boost::shared_ptr<MainRoadChunk> >::CompatibleUserClassesRequired requiredUserClasses
+			EdgeProjector<boost::shared_ptr<RoadChunk> >::CompatibleUserClassesRequired requiredUserClasses
 		){
-			EdgeProjector<boost::shared_ptr<MainRoadChunk> >::From paths(
+			EdgeProjector<boost::shared_ptr<RoadChunk> >::From paths(
 				SearchByMaxDistance(
 					point,
 					maxDistance,
@@ -257,11 +246,11 @@ namespace synthese
 
 			if(!paths.empty())
 			{
-				EdgeProjector<boost::shared_ptr<MainRoadChunk> > projector(paths, maxDistance, requiredUserClasses);
+				EdgeProjector<boost::shared_ptr<RoadChunk> > projector(paths, maxDistance, requiredUserClasses);
 
 				try
 				{
-					EdgeProjector<boost::shared_ptr<MainRoadChunk> >::PathNearby projection(
+					EdgeProjector<boost::shared_ptr<RoadChunk> >::PathNearby projection(
 						projector.projectEdge(
 							*point.getCoordinate()
 					)	);
@@ -274,7 +263,7 @@ namespace synthese
 					address.setRoadChunk(projection.get<1>().get());
 					address.setMetricOffset(projection.get<2>());
 				}
-				catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
+				catch(EdgeProjector<boost::shared_ptr<RoadChunk> >::NotFoundException)
 				{
 				}
 			}

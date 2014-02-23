@@ -69,7 +69,8 @@ namespace synthese
 		*/
 		class Vehicle:
 			public virtual util::Registrable,
-			public Object<Vehicle, VehicleRecord>
+			public Object<Vehicle, VehicleRecord>,
+			public impex::ImportableTemplate<Vehicle>
 		{
 		public:
 			static const std::string TAG_SEAT;

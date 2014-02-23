@@ -25,6 +25,7 @@
 #include "BestVertexReachesMap.h"
 #include "JourneysResult.h"
 #include "Junction.hpp"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "VertexAccessMap.h"
 #include "Vertex.h"
@@ -38,8 +39,6 @@
 #include "Service.h"
 #include "Log.h"
 #include "Crossing.h"
-#include "ReverseRoadPart.hpp"
-#include "ReverseRoadChunk.hpp"
 #include "Junction.hpp"
 #include "StopPoint.hpp"
 
@@ -311,20 +310,14 @@ namespace synthese
 								const Crossing* originCrossing = static_cast<const Crossing*>(origin);
 								if(originCrossing && !currentJourney.getServiceUses().empty())
 								{
-									const Road* from = static_cast<const Road*>(currentJourney.getEndEdge().getParentPath());
-									const Road* to = static_cast<const Road*>(&path);
+									const RoadPath* from = static_cast<const RoadPath*>(currentJourney.getEndEdge().getParentPath());
+									const RoadPath* to = static_cast<const RoadPath*>(&path);
 
-									if(from->isReversed())
-										from = static_cast<const ReverseRoadPart*>(from)->getMainRoad();
-
-									if(to->isReversed())
-										to = static_cast<const ReverseRoadPart*>(to)->getMainRoad();
-
-									if((_accessDirection == DEPARTURE_TO_ARRIVAL) && originCrossing->isNonReachableRoad(from, to))
+									if((_accessDirection == DEPARTURE_TO_ARRIVAL) && originCrossing->isNonReachableRoad(from->getRoad(), to->getRoad()))
 									{
 										continue;
 									}
-									else if((_accessDirection == ARRIVAL_TO_DEPARTURE) && originCrossing->isNonReachableRoad(to, from))
+									else if((_accessDirection == ARRIVAL_TO_DEPARTURE) && originCrossing->isNonReachableRoad(to->getRoad(), from->getRoad()))
 									{
 										continue;
 									}
@@ -388,7 +381,7 @@ namespace synthese
 								continue;
 							// Junction should not follow a road path (it may exist a road approach to do the same, junction should always follow PT path)
 							if (!currentJourney.empty() &&
-								dynamic_cast<const Road*>(currentJourney.getEndEdge().getParentPath()))
+								dynamic_cast<const RoadPath*>(currentJourney.getEndEdge().getParentPath()))
 								continue;
 						}
 						if(!currentJourney.empty())
@@ -398,7 +391,7 @@ namespace synthese
 								(((_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey()) != origin->getKey()))
 								continue;
 						}
-						const Road* roadApproach(dynamic_cast<const Road*> (&path));
+						const RoadPath* roadApproach(dynamic_cast<const RoadPath*> (&path));
 						if (roadApproach != NULL && !currentJourney.empty())
 						{
 							// Junction should not follow a road path (it may exist a road approach to do the same, junction should always follow PT path)

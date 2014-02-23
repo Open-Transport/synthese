@@ -23,12 +23,14 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTRoadAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
+#include "RoadPath.hpp"
 #include "TransportNetworkRight.h"
 #include "User.h"
-#include "MainRoadPart.hpp"
+#include "Road.h"
 #include "RoadPlace.h"
 #include "ResultHTMLTable.h"
 #include "Crossing.h"
@@ -87,9 +89,9 @@ namespace synthese
 		){
 			try
 			{
-				_road = Env::GetOfficialEnv().get<MainRoadPart>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				_road = Env::GetOfficialEnv().get<Road>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
-			catch(ObjectNotFoundException<MainRoadPart> e)
+			catch(ObjectNotFoundException<Road> e)
 			{
 				throw AdminParametersException("No such road");
 			}
@@ -147,7 +149,7 @@ namespace synthese
 				c.push_back("Liens");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-				BOOST_FOREACH(const Edge* edge, _road->getEdges())
+				BOOST_FOREACH(const Edge* edge, _road->getForwardPath().getEdges())
 				{
 					const Crossing& crossing(static_cast<const Crossing&>(*edge->getFromVertex()->getHub()));
 
@@ -160,28 +162,20 @@ namespace synthese
 					stream << "Intersection de routes";
 
 					stream << t.col();
-					set<const MainRoadPart*> roads;
+					set<const Road*> roads;
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, crossing.getDepartureEdges())
 					{
-						if(!dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()))
-						{
-							continue;
-						}
-						roads.insert(dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()));
+						roads.insert(dynamic_cast<const RoadPath*>(edge.second->getParentPath())->getRoad());
 					}
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, crossing.getArrivalEdges())
 					{
-						if(!dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()))
-						{
-							continue;
-						}
-						roads.insert(dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()));
+						roads.insert(dynamic_cast<const RoadPath*>(edge.second->getParentPath())->getRoad());
 					}
-					BOOST_FOREACH(const MainRoadPart* road, roads)
+					BOOST_FOREACH(const Road* road, roads)
 					{
 						if(road->getKey() <= 0 || road == _road.get()) continue;
 						openRoadRequest.getPage()->setRoad(Env::GetOfficialEnv().getSPtr(road));
-						stream << HTMLModule::getHTMLLink(openRoadRequest.getURL(), road->getRoadPlace()->getName()) << " ";
+						stream << HTMLModule::getHTMLLink(openRoadRequest.getURL(), road->get<RoadPlace>()->getName()) << " ";
 					}
 				}
 				stream << t.close();
@@ -202,7 +196,7 @@ namespace synthese
 
 		std::string PTRoadAdmin::getTitle() const
 		{
-			return _road.get() ? _road->getRoadPlace()->getFullName() : DEFAULT_TITLE;
+			return _road.get() ? _road->get<RoadPlace>()->getFullName() : DEFAULT_TITLE;
 		}
 
 
@@ -239,7 +233,7 @@ namespace synthese
 
 			boost::shared_ptr<PTRoadsAdmin> p(getNewPage<PTRoadsAdmin>());
 			p->setRoadPlace(Env::GetOfficialEnv().getSPtr(
-				_road->getRoadPlace()
+				&*_road->get<RoadPlace>()
 			)	);
 			links = p->_getCurrentTreeBranch();
 			links.push_back(getNewCopiedPage());

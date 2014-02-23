@@ -24,6 +24,7 @@
 
 #include "Journey.h"
 #include "LinePhysicalStop.hpp"
+#include "RoadPath.hpp"
 #include "Edge.h"
 #include "Crossing.h"
 #include "ResultHTMLTable.h"
@@ -223,8 +224,8 @@ namespace synthese
 				}
 				else
 				{
-					const Road* road(static_cast<const Road*>(its->getService()->getPath()));
-					stream << road->getRoadPlace()->getName();
+					const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
+					stream << road->get<RoadPlace>()->getName();
 				}
 
 				// Transfers
@@ -269,8 +270,8 @@ namespace synthese
 						}
 						else
 						{
-							const Road* road(static_cast<const Road*>(its->getService()->getPath()));
-							stream << road->getRoadPlace()->getName();
+							const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
+							stream << road->get<RoadPlace>()->getName();
 						}
 
 						// Exit if last service use

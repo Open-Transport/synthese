@@ -22,6 +22,7 @@
 
 #include "PTJourneyPlannerService.hpp"
 
+#include "RoadPath.hpp"
 #include "SentScenario.h"
 #include "AccessParameters.h"
 #include "AlgorithmLogger.hpp"
@@ -1640,7 +1641,7 @@ namespace synthese
 				const ServicePointer& leg(*it);
 				bool legWritten = false;
 
-				const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath()));
+				const RoadPath* road(dynamic_cast<const RoadPath*> (leg.getService()->getPath()));
 				const Junction* junction(dynamic_cast<const Junction*> (leg.getService()->getPath()));
 				if(	road == NULL &&
 					junction == NULL &&
@@ -1718,7 +1719,7 @@ namespace synthese
 						__Couleur,
 						it->getDistance(),
 						multiLineString.get(),
-						dynamic_cast<const Road*>(leg.getService()->getPath()),
+						static_cast<const RoadPath*>(leg.getService()->getPath())->getRoad(),
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
@@ -1768,7 +1769,7 @@ namespace synthese
 						__Couleur,
 						distance,
 						multiLineString.get(),
-						dynamic_cast<const Road*>((*contiguousFootLegs.begin())->getService()->getPath()),
+						static_cast<const RoadPath*>((*contiguousFootLegs.begin())->getService()->getPath())->getRoad(),
 						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
@@ -1872,7 +1873,7 @@ namespace synthese
 						__Couleur,
 						distance,
 						multiLineString.get(),
-						dynamic_cast<const Road*>((*contiguousFootLegs.begin())->getService()->getPath()),
+						static_cast<const RoadPath*>((*contiguousFootLegs.begin())->getService()->getPath())->getRoad(),
 						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
@@ -1926,7 +1927,7 @@ namespace synthese
 						__Couleur,
 						it->getDistance(),
 						multiLineString.get(),
-						dynamic_cast<const Road*>(leg.getService()->getPath()),
+						static_cast<const RoadPath*>(leg.getService()->getPath())->getRoad(),
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
@@ -1949,10 +1950,14 @@ namespace synthese
 					if (road && it + 1 != services.end())
 					{
 						const ServicePointer& nextLeg(*(it+1));
-						const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
+						const Road* nextRoad(dynamic_cast<const RoadPath*>(nextLeg.getService()->getPath())->getRoad());
 
-						if (nextRoad && (nextRoad->getRoadPlace() == road->getRoadPlace() || nextRoad->getRoadPlace()->getName() == road->getRoadPlace()->getName()))
+						if(	nextRoad &&
+							(	&*nextRoad->get<RoadPlace>() == &*road->getRoad()->get<RoadPlace>() ||
+								nextRoad->get<RoadPlace>()->getName() == road->getRoad()->get<RoadPlace>()->getName()
+						)	){
 							continue;
+						}
 					}
 
 					// Distance and geometry
@@ -1984,7 +1989,7 @@ namespace synthese
 						__Couleur,
 						distance,
 						multiLineString.get(),
-						dynamic_cast<const Road*>(leg.getService()->getPath()),
+						static_cast<const RoadPath*>(leg.getService()->getPath())->getRoad(),
 						*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
 						*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
@@ -2038,7 +2043,7 @@ namespace synthese
 					__Couleur,
 					distance,
 					multiLineString.get(),
-					dynamic_cast<const Road*>((*contiguousFootLegs.begin())->getService()->getPath()),
+					static_cast<const RoadPath*>((*contiguousFootLegs.begin())->getService()->getPath())->getRoad(),
 					*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 					*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 					isFirstFoot,
@@ -2180,9 +2185,9 @@ namespace synthese
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
-			if(road && road->getRoadPlace() && !concatenatedFootLegs)
+			if(road && road->get<RoadPlace>() && !concatenatedFootLegs)
 			{
-				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
+				pm.insert(DATA_ROAD_NAME, road->get<RoadPlace>()->getName());
 			}
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);

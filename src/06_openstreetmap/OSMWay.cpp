@@ -19,31 +19,31 @@ namespace synthese
 	{
 		using namespace road;
 
-		std::map<std::string,Road::RoadType> Way::highwayTypes = boost::assign::map_list_of
-			("motorway", Road::ROAD_TYPE_MOTORWAY)
-			("motorway_link", Road::ROAD_TYPE_ACCESSROAD)
-			("trunk", Road::ROAD_TYPE_PRINCIPLEAXIS)
-			("trunk_link", Road::ROAD_TYPE_ACCESSROAD)
-			("primary", Road::ROAD_TYPE_PRINCIPLEAXIS)
-			("secondary", Road::ROAD_TYPE_SECONDARYAXIS)
-			("tertiary", Road::ROAD_TYPE_HIGHWAY)
-			("primary_link", Road::ROAD_TYPE_ACCESSROAD)
-			("secondary_link", Road::ROAD_TYPE_ACCESSROAD)
-			("tertiary_link", Road::ROAD_TYPE_ACCESSROAD)
-			("unclassified", Road::ROAD_TYPE_STREET)
-			("road", Road::ROAD_TYPE_STREET)
-			("residential", Road::ROAD_TYPE_STREET)
-			("living_street", Road::ROAD_TYPE_STREET)
-			("service", Road::ROAD_TYPE_SERVICE)
-			("track", Road::ROAD_TYPE_PEDESTRIANPATH)
-			("pedestrian", Road::ROAD_TYPE_PEDESTRIANSTREET)
-			("path", Road::ROAD_TYPE_PEDESTRIANPATH)
-			("cycleway", Road::ROAD_TYPE_PEDESTRIANPATH)
-			("footway", Road::ROAD_TYPE_PEDESTRIANPATH)
-			("bridleway", Road::ROAD_TYPE_PEDESTRIANPATH)
-			("byway", Road::ROAD_TYPE_UNKNOWN)
-			("steps", Road::ROAD_TYPE_STEPS)
-			("unclassified", Road::ROAD_TYPE_UNKNOWN);
+		std::map<std::string,RoadType> Way::highwayTypes = boost::assign::map_list_of
+			("motorway", ROAD_TYPE_MOTORWAY)
+			("motorway_link", ROAD_TYPE_ACCESSROAD)
+			("trunk", ROAD_TYPE_PRINCIPLEAXIS)
+			("trunk_link", ROAD_TYPE_ACCESSROAD)
+			("primary", ROAD_TYPE_PRINCIPLEAXIS)
+			("secondary", ROAD_TYPE_SECONDARYAXIS)
+			("tertiary", ROAD_TYPE_HIGHWAY)
+			("primary_link", ROAD_TYPE_ACCESSROAD)
+			("secondary_link", ROAD_TYPE_ACCESSROAD)
+			("tertiary_link", ROAD_TYPE_ACCESSROAD)
+			("unclassified", ROAD_TYPE_STREET)
+			("road", ROAD_TYPE_STREET)
+			("residential", ROAD_TYPE_STREET)
+			("living_street", ROAD_TYPE_STREET)
+			("service", ROAD_TYPE_SERVICE)
+			("track", ROAD_TYPE_PEDESTRIANPATH)
+			("pedestrian", ROAD_TYPE_PEDESTRIANSTREET)
+			("path", ROAD_TYPE_PEDESTRIANPATH)
+			("cycleway", ROAD_TYPE_PEDESTRIANPATH)
+			("footway", ROAD_TYPE_PEDESTRIANPATH)
+			("bridleway", ROAD_TYPE_PEDESTRIANPATH)
+			("byway", ROAD_TYPE_UNKNOWN)
+			("steps", ROAD_TYPE_STEPS)
+			("unclassified", ROAD_TYPE_UNKNOWN);
 
 		std::map<std::string, std::string> Way::defaultName = boost::assign::map_list_of
 			("service", "Voie sans nom")
@@ -54,19 +54,19 @@ namespace synthese
 			("steps", "Escaliers")
 			("unclassified", "Voie sans nom");
 
-		std::map<Road::RoadType, double> Way::defaultSpeed = boost::assign::map_list_of
-			(Road::ROAD_TYPE_MOTORWAY, 110 / 3.6)
-			(Road::ROAD_TYPE_ACCESSROAD, 50 / 3.6)
-			(Road::ROAD_TYPE_PRINCIPLEAXIS, 90 / 3.6)
-			(Road::ROAD_TYPE_SECONDARYAXIS, 50 / 3.6)
-			(Road::ROAD_TYPE_PRIVATEWAY, 30 / 3.6)
-			(Road::ROAD_TYPE_PEDESTRIANPATH, 30 / 3.6)
-			(Road::ROAD_TYPE_PEDESTRIANSTREET, 30 / 3.6)
-			(Road::ROAD_TYPE_UNKNOWN, 50 / 3.6)
-			(Road::ROAD_TYPE_STEPS, 10 / 3.6)
-			(Road::ROAD_TYPE_STREET, 50 / 3.6)
-			(Road::ROAD_TYPE_HIGHWAY, 50 / 3.6)
-			(Road::ROAD_TYPE_SERVICE, 50 / 3.6);
+		std::map<RoadType, double> Way::defaultSpeed = boost::assign::map_list_of
+			(ROAD_TYPE_MOTORWAY, 110 / 3.6)
+			(ROAD_TYPE_ACCESSROAD, 50 / 3.6)
+			(ROAD_TYPE_PRINCIPLEAXIS, 90 / 3.6)
+			(ROAD_TYPE_SECONDARYAXIS, 50 / 3.6)
+			(ROAD_TYPE_PRIVATEWAY, 30 / 3.6)
+			(ROAD_TYPE_PEDESTRIANPATH, 30 / 3.6)
+			(ROAD_TYPE_PEDESTRIANSTREET, 30 / 3.6)
+			(ROAD_TYPE_UNKNOWN, 50 / 3.6)
+			(ROAD_TYPE_STEPS, 10 / 3.6)
+			(ROAD_TYPE_STREET, 50 / 3.6)
+			(ROAD_TYPE_HIGHWAY, 50 / 3.6)
+			(ROAD_TYPE_SERVICE, 50 / 3.6);
 
 		std::map<std::string, double> Way::implicitSpeed = boost::assign::map_list_of
 			("FR:walk", 6 / 3.6)
@@ -238,22 +238,22 @@ namespace synthese
 			return isBikable;
 		}
 
-		Road::RoadType Way::getRoadType()
+		RoadType Way::getRoadType()
 		{
-			Road::RoadType type = Road::ROAD_TYPE_UNKNOWN;
+			RoadType type = ROAD_TYPE_UNKNOWN;
 			if(!isWalkable())
 				return type;
 
 			try 
 			{
 				if(isOfType(TAG_BRIDGE))
-					type = Road::ROAD_TYPE_BRIDGE;
+					type = ROAD_TYPE_BRIDGE;
 				else if(isOfType(TAG_TUNNEL))
-					type = Road::ROAD_TYPE_TUNNEL;
+					type = ROAD_TYPE_TUNNEL;
 				else
 				{
 					std::string highway = getTag(TAG_HIGHWAY);
-					std::map<std::string,Road::RoadType>::iterator it = highwayTypes.find(highway);
+					std::map<std::string,RoadType>::iterator it = highwayTypes.find(highway);
 					if(it != highwayTypes.end())
 						type = it->second;
 				}
@@ -263,14 +263,14 @@ namespace synthese
 			return type;
 		}
 
-		Road::RoadType Way::getAssociatedRoadType()
+		RoadType Way::getAssociatedRoadType()
 		{
-			Road::RoadType type = Road::ROAD_TYPE_UNKNOWN;
+			RoadType type = ROAD_TYPE_UNKNOWN;
 
 			if(hasTag(TAG_HIGHWAY))
 			{
 				std::string highway = getTag(TAG_HIGHWAY);
-				std::map<std::string, Road::RoadType>::iterator it = highwayTypes.find(highway);
+				std::map<std::string, RoadType>::iterator it = highwayTypes.find(highway);
 
 				if(it != highwayTypes.end())
 					type = it->second;
@@ -303,8 +303,8 @@ namespace synthese
 
 			if(!maxSpeed)
 			{
-				Road::RoadType type = getAssociatedRoadType();
-				std::map<Road::RoadType, double>::iterator it = defaultSpeed.find(type);
+				RoadType type = getAssociatedRoadType();
+				std::map<RoadType, double>::iterator it = defaultSpeed.find(type);
 
 				if(it != defaultSpeed.end())
 					maxSpeed = it->second;

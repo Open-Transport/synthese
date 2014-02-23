@@ -342,16 +342,15 @@ namespace synthese
 
 
 
-				virtual const RuleUser* _getParentRuleUser() const { return NULL; }
+			virtual const RuleUser* _getParentRuleUser() const { return NULL; }
 
+			virtual std::string getRuleUserName() const { return "edge"; }
 
+			virtual bool getReservationNeeded() const { return false; }
 
-				virtual std::string getRuleUserName() const { return "edge"; }
-
-				virtual bool getReservationNeeded() const { return false; }
+			virtual double getCarSpeed() const { return 0; }
 		};
-	}
-}
+}	}
 
 #endif
 

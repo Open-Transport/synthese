@@ -30,12 +30,11 @@
 #include "AccessParameters.h"
 #include "Crossing.h"
 #include "Journey.h"
-#include "MainRoadChunk.hpp"
+#include "RoadChunkEdge.hpp"
+#include "RoadPath.hpp"
 #include "NamedPlace.h"
 #include "Place.h"
 #include "PTModule.h"
-#include "ReverseRoadChunk.hpp"
-#include "ReverseRoadPart.hpp"
 #include "Road.h"
 #include "RoadModule.h"
 #include "ServicePointer.h"
@@ -192,7 +191,7 @@ namespace synthese
 					BOOST_FOREACH(const Vertex::Edges::value_type& itEdges, edges)
 					{
 						const Path* path(itEdges.first);
-						const RoadChunk* chunk = static_cast<const RoadChunk*>(itEdges.second);
+						const RoadChunkEdge* chunk = static_cast<const RoadChunkEdge*>(itEdges.second);
 
 						// Check if the edge exists and is authorized for the user class
 						if(!chunk || !chunk->isCompatibleWith(_accessParameters))
@@ -201,35 +200,29 @@ namespace synthese
 						// Specific car user class verification (turn restriction)
 						if(_accessParameters.getUserClass() == USER_CAR && curNode->getLink())
 						{
-							const Road* from = static_cast<const Road*>(curNode->getLink()->getParentPath());
-							const Road* to = static_cast<const Road*>(path);
+							const RoadPath* from = static_cast<const RoadPath*>(curNode->getLink()->getParentPath());
+							const RoadPath* to = static_cast<const RoadPath*>(path);
 
-							if(from->isReversed())
-								from = static_cast<const ReverseRoadPart*>(from)->getMainRoad();
-
-							if(to->isReversed())
-								to = static_cast<const ReverseRoadPart*>(to)->getMainRoad();
-
-							if((_direction == algorithm::DEPARTURE_TO_ARRIVAL) && curNode->getCrossing()->isNonReachableRoad(from, to))
+							if((_direction == algorithm::DEPARTURE_TO_ARRIVAL) && curNode->getCrossing()->isNonReachableRoad(from->getRoad(), to->getRoad()))
 								continue;
-							else if((_direction == algorithm::ARRIVAL_TO_DEPARTURE) && curNode->getCrossing()->isNonReachableRoad(to, from))
+							else if((_direction == algorithm::ARRIVAL_TO_DEPARTURE) && curNode->getCrossing()->isNonReachableRoad(to->getRoad(), from->getRoad()))
 								continue;
 						}
 
 						// Retrieving the next or the previous chunk in the path, if there is one
-						RoadChunk* nextChunkInPath = static_cast<RoadChunk*>(_direction == algorithm::ARRIVAL_TO_DEPARTURE ? chunk->getPrevious() : chunk->getNext());
+						RoadChunkEdge* nextChunkInPath = static_cast<RoadChunkEdge*>(_direction == algorithm::ARRIVAL_TO_DEPARTURE ? chunk->getPrevious() : chunk->getNext());
 						if(!nextChunkInPath)
 							continue;
 
 						// Retrieving the associated crossing
-						Crossing* nextCrossing = nextChunkInPath->getFromCrossing();
+						Crossing* nextCrossing = static_cast<Crossing*>(nextChunkInPath->getFromVertex());
 
 						// Check if it is already visited
 						NodeMap::iterator nextNode = nodeMap.find(nextCrossing->getKey());
 						if(nextNode != nodeMap.end() && nextNode->second->isVisited())
 							continue;
 
-						const RoadChunk* linkChunk;
+						const RoadChunkEdge* linkChunk;
 						double distance(0);
 
 						if(_direction == algorithm::DEPARTURE_TO_ARRIVAL)
@@ -388,7 +381,7 @@ namespace synthese
 				optional<Edge::DepartureServiceIndex::Value> departureIndex;
 				optional<Edge::ArrivalServiceIndex::Value> arrivalIndex;
 				
-				const RoadChunk* startChunk = *it;
+				const RoadChunkEdge* startChunk = *it;
 
 				// A road is supposed to have one and only one service collection
 				const ChronologicalServicesCollection& collection(**startChunk->getParentPath()->getServiceCollections().begin());
@@ -406,7 +399,9 @@ namespace synthese
 					And the end crossing will be the crossing of the next edge in the vector.
 				*/
 				if(_direction == algorithm::ARRIVAL_TO_DEPARTURE) // Here, we want the last edge
-					startChunk = static_cast<const RoadChunk*>(startChunk->getNext());
+				{
+					startChunk = static_cast<const RoadChunkEdge*>(startChunk->getNext());
+				}
 
 				ServicePointer service(
 					(_direction == algorithm::DEPARTURE_TO_ARRIVAL) ?
@@ -446,9 +441,11 @@ namespace synthese
 				it--;
 
 				// Retrieving the last edge of the path if we are on the common direction
-				const RoadChunk* endChunk = *it;
+				const RoadChunkEdge* endChunk = *it;
 				if(_direction == algorithm::DEPARTURE_TO_ARRIVAL)
-					endChunk = static_cast<const RoadChunk*>(endChunk->getNext());
+				{
+					endChunk = static_cast<const RoadChunkEdge*>(endChunk->getNext());
+				}
 
 				ServicePointer completeService(
 					service,

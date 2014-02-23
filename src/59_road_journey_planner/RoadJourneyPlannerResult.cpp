@@ -26,6 +26,7 @@
 #include "Crossing.h"
 #include "ResultHTMLTable.h"
 #include "Road.h"
+#include "RoadPath.hpp"
 #include "City.h"
 #include "RoadPlace.h"
 #include "Service.h"
@@ -112,21 +113,23 @@ namespace synthese
 				double totalDistance(0);
 				while(true)
 				{
-				   const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+				   const Road* road(dynamic_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
 				   double dst = its->getDistance();
 
-				   std::string roadName = road->getRoadPlace()->getName();
+				   std::string roadName = road->get<RoadPlace>()->getName();
 				   if(roadName.empty()) {
-					  if(road->getType() == Road::ROAD_TYPE_PEDESTRIANPATH || road->getType() == Road::ROAD_TYPE_PEDESTRIANSTREET) {
+					  if(	road->get<RoadTypeField>() == ROAD_TYPE_PEDESTRIANPATH ||
+							road->get<RoadTypeField>() == ROAD_TYPE_PEDESTRIANSTREET
+					  ){
 						 roadName="Chemin Pi&eacute;ton";
 					  }
-					  else if(road->getType() == Road::ROAD_TYPE_STEPS) {
+					  else if(road->get<RoadTypeField>() == ROAD_TYPE_STEPS) {
 						 roadName="Escaliers";
 					  }
-					  else if(road->getType() == Road::ROAD_TYPE_BRIDGE) {
+					  else if(road->get<RoadTypeField>() == ROAD_TYPE_BRIDGE) {
 						 roadName="Pont / Passerelle";
 					  }
-					  else if(road->getType() == Road::ROAD_TYPE_TUNNEL) {
+					  else if(road->get<RoadTypeField>() == ROAD_TYPE_TUNNEL) {
 						 roadName="Tunnel";
 					  }
 					  else {
@@ -134,9 +137,13 @@ namespace synthese
 					  }
 				   }
 				   Journey::ServiceUses::const_iterator next = its+1;
-				   if(next != it->getServiceUses().end()) {
-					  std::string nextRoadName = dynamic_cast<const Road*>(next->getService()->getPath())->getRoadPlace()->getName();
-					  if(!roadName.compare(nextRoadName)) {
+				   if(next != it->getServiceUses().end())
+				   {
+					  string nextRoadName(
+						  dynamic_cast<const RoadPath*>(next->getService()->getPath())->getRoad()->get<RoadPlace>()->getName()
+					  );
+					  if(!roadName.compare(nextRoadName))
+					  {
 						 accumDistance += dst;
 						 ++its;
 						 continue;
@@ -181,42 +188,18 @@ namespace synthese
 				for (RoadJourneyPlannerResult::Journeys::const_iterator it(_journeys.begin()); it != _journeys.end(); ++it) {
 					geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create(0,2));
 
-					BOOST_FOREACH(const graph::ServicePointer& su,it->getServiceUses()) {
-						const graph::Edge *e = su.getDepartureEdge();
-						while(true)
+					BOOST_FOREACH(const graph::ServicePointer& su,it->getServiceUses())
+					{
+						for(const graph::Edge*e(su.getDepartureEdge()); e != su.getArrivalEdge(); e = e->getFollowingArrivalForFineSteppingOnly())
 						{
-							geos::geom::Coordinate c;
-							const road::Road *road = dynamic_cast<const road::Road*>(e->getParentPath());
-							if(!road->isReversed()) {
-								c.x = e->getFromVertex()->getGeometry()->getX();
-								c.y = e->getFromVertex()->getGeometry()->getY();
-								coords->add(c,0);
-							}
-							bool addViaPoints = true;
-							if(e == su.getArrivalEdge() && !road->isReversed())
-								addViaPoints = false;
-							if(e == su.getDepartureEdge() && road->isReversed())
-								addViaPoints = false;
-							if(addViaPoints)
+							boost::shared_ptr<LineString> geometry(e->getRealGeometry());
+							if(geometry.get())
 							{
-								boost::shared_ptr<LineString> geometry(e->getGeometry());
-								if(geometry.get())
+								for(size_t i(0); i<geometry->getCoordinatesRO()->getSize(); ++i)
 								{
-									for(size_t i(0); i<geometry->getCoordinatesRO()->getSize(); ++i)
-									{
-										coords->add(geometry->getCoordinatesRO()->getAt(i), false);
-									}
+									coords->add(geometry->getCoordinatesRO()->getAt(i), false);
 								}
 							}
-							if(road->isReversed())
-							{
-								c.x = e->getFromVertex()->getGeometry()->getX();
-								c.y = e->getFromVertex()->getGeometry()->getY();
-								coords->add(c, false);
-							}
-							if(e == su.getArrivalEdge())
-								break;
-							e = e->getFollowingArrivalForFineSteppingOnly();
 						}
 					}
 					geoms.push_back(static_cast<geos::geom::Geometry*>(gf.createLineString(coords)));
