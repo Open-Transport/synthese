@@ -21,7 +21,6 @@ set(DEPS
   00_framework
   37_pt_operation
   54_departure_boards
-  61_data_exchange
 )
 
 boost_test(Object "${DEPS}")
