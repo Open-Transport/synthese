@@ -18,6 +18,7 @@ set(DEPS
   37_pt_operation
   38_vehicle
   56_pt_website
+  59_road_journey_planner
 )
 
 boost_test(Road "${DEPS}")
