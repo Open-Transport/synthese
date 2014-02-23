@@ -352,13 +352,12 @@ namespace synthese
 						drtAreaSequence = false;
 					}
 				}
-				if(edge->getGeometry().get())
-					hasGeometry = true;
 				boost::shared_ptr<LineString> geometry(edge->getRealGeometry());
-				if(!geometry.get())
+				if(!geometry.get() || geometry->isEmpty())
 				{
 					continue;
 				}
+				hasGeometry = true;
 				for(size_t i(0); i<geometry->getNumPoints(); ++i)
 				{
 					cs->add(geometry->getCoordinateN(i));

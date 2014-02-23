@@ -28,7 +28,6 @@
 #include "Registrable.h"
 #include "GraphTypes.h"
 #include "Path.h"
-#include "WithGeometry.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -77,7 +76,6 @@ namespace synthese
 		*/
 		class Edge:
 			public virtual util::Registrable,
-			public WithGeometry<geos::geom::LineString>,
 			public RuleUser
 		{
 		public:

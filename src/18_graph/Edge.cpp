@@ -524,10 +524,6 @@ namespace synthese
 
 		boost::shared_ptr<LineString> Edge::getRealGeometry(
 		) const	{
-			if(getGeometry().get())
-			{
-				return getGeometry();
-			}
 
 			assert(getFromVertex());
 			const GeometryFactory& geometryFactory(

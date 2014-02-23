@@ -1950,11 +1950,11 @@ namespace synthese
 					if (road && it + 1 != services.end())
 					{
 						const ServicePointer& nextLeg(*(it+1));
-						const Road* nextRoad(dynamic_cast<const RoadPath*>(nextLeg.getService()->getPath())->getRoad());
+						const RoadPath* nextRoad(dynamic_cast<const RoadPath*>(nextLeg.getService()->getPath()));
 
 						if(	nextRoad &&
-							(	&*nextRoad->get<RoadPlace>() == &*road->getRoad()->get<RoadPlace>() ||
-								nextRoad->get<RoadPlace>()->getName() == road->getRoad()->get<RoadPlace>()->getName()
+							(	&*nextRoad->getRoad()->get<RoadPlace>() == &*road->getRoad()->get<RoadPlace>() ||
+								nextRoad->getRoad()->get<RoadPlace>()->getName() == road->getRoad()->get<RoadPlace>()->getName()
 						)	){
 							continue;
 						}

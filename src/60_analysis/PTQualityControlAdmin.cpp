@@ -1047,16 +1047,20 @@ namespace synthese
 						// Scan of each edge starting at the stop
 						BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, it.second->getDepartureEdges())
 						{
-							const Edge* edge(itEdge.second);
+							const DesignatedLinePhysicalStop* edge(dynamic_cast<DesignatedLinePhysicalStop*>(itEdge.second));
 							if(edge)
 							{
 								const Edge* nextEdge(itEdge.second->getNext());
+								
 								// If the edge is a path termination/junction/noId, ignore it
-								if((!nextEdge ||
-									edge->getGeometry()) 
-									|| ((itEdge.second->getParentPath()) && (!itEdge.second->getParentPath()->getKey())) 
-									|| dynamic_cast<Junction*>(edge->getParentPath()))
-								{
+								if(	(	!nextEdge ||
+										edge->getLineStop()->get<LineStringGeometry>()
+									) ||
+									(	itEdge.second->getParentPath() &&
+										!itEdge.second->getParentPath()->getKey()
+									) || 
+									dynamic_cast<Junction*>(edge->getParentPath())
+								){
 									continue;
 								}
 								else
@@ -1627,11 +1631,12 @@ namespace synthese
 						// Scan of each edge starting at the stop
 						BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, it.second->getDepartureEdges())
 						{
-							const Edge* edge(itEdge.second);
+							const DesignatedLinePhysicalStop* edge(dynamic_cast<DesignatedLinePhysicalStop*>(itEdge.second));
 							const Edge* nextEdge(edge->getNext());
 
 							// If the edge is a path termination, ignore it
-							if(	!nextEdge ||
+							if(	!edge ||
+								!nextEdge ||
 								dynamic_cast<Junction*>(edge->getParentPath()))
 							{
 								continue;
@@ -1659,7 +1664,7 @@ namespace synthese
 							if(itGeom == resultMap.end())
 							{
 								set<LineString*> geoms;
-								geoms.insert(edge->getGeometry().get());
+								geoms.insert(edge->getLineStop()->get<LineStringGeometry>().get());
 								resultMap.insert(
 									make_pair(
 										make_pair(vertex, nextVertex),
@@ -1669,12 +1674,12 @@ namespace synthese
 							else
 							{
 								bool toInsert(true);
-								if(edge->getGeometry().get())
+								if(edge->getLineStop()->get<LineStringGeometry>().get())
 								{
 									// If a similar edge has the same geometry then ignore the current edge
 									BOOST_FOREACH(const GeometriesMap::mapped_type::value_type& itg, itGeom->second)
 									{
-										if(itg && *edge->getGeometry()->getCoordinatesRO() == *itg->getCoordinatesRO())
+										if(itg && *edge->getLineStop()->get<LineStringGeometry>()->getCoordinatesRO() == *itg->getCoordinatesRO())
 										{
 											toInsert = false;
 											break;
@@ -1695,7 +1700,7 @@ namespace synthese
 								}
 								if(toInsert)
 								{
-									itGeom->second.insert(edge->getGeometry().get());
+									itGeom->second.insert(edge->getLineStop()->get<LineStringGeometry>().get());
 								}
 							}
 						}	
