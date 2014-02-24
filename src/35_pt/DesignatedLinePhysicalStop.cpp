@@ -79,7 +79,7 @@ namespace synthese
 				_lineStop->get<LineStringGeometry>()
 			);
 
-			if(!tmpGeom->isEmpty())
+			if(tmpGeom && !tmpGeom->isEmpty())
 			{
 				return tmpGeom;
 			}
