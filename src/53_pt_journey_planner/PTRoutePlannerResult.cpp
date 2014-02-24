@@ -217,6 +217,10 @@ namespace synthese
 				if(ls)
 				{
 					stream << ls->getJourneyPattern()->getCommercialLine()->getShortName();
+					if(!ls->getJourneyPattern()->getDirection().empty())
+					{
+						stream << " / " << ls->getJourneyPattern()->getDirection();
+					}
 				}
 				else if(js)
 				{
