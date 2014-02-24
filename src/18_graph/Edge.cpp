@@ -525,20 +525,18 @@ namespace synthese
 		boost::shared_ptr<LineString> Edge::getRealGeometry(
 		) const	{
 
-			assert(getFromVertex());
+			assert(_fromVertex);
 			const GeometryFactory& geometryFactory(
 				CoordinatesSystem::GetDefaultGeometryFactory()
 			);
 
-			if(	getParentPath() &&
-				getParentPath()->getEdge(getRankInPath()) == this &&
-				getParentPath()->getEdges().size() > getRankInPath()+1 &&
-				getFromVertex()->hasGeometry() &&
-				getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->hasGeometry()
+			if(	_next &&
+				_fromVertex->hasGeometry() &&
+				_next->_fromVertex->hasGeometry()
 			){
 				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
-				cs->add(*getFromVertex()->getGeometry()->getCoordinate(), false);
-				cs->add(*getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->getGeometry()->getCoordinate(), false);
+				cs->add(*_fromVertex->getGeometry()->getCoordinate(), false);
+				cs->add(*_next->_fromVertex->getGeometry()->getCoordinate(), false);
 				if(cs->size() != 2)
 				{
 					return boost::shared_ptr<LineString>();
