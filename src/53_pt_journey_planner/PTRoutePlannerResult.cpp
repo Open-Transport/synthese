@@ -267,9 +267,9 @@ namespace synthese
 						if(ls)
 						{
 							stream << ls->getCommercialLine()->getShortName();
-							if(!ls->getJourneyPattern()->getDirection().empty())
+							if(!ls->getDirection().empty())
 							{
-								stream << " / " << ls->getJourneyPattern()->getDirection();
+								stream << " / " << ls->getDirection();
 							}
 						}
 						else if(js)
