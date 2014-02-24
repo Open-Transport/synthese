@@ -333,7 +333,7 @@ namespace synthese
 						dynamic_cast<const PTUseRule*>(&useRule) &&
 						static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 					);
-					map.insert(ATTR_IS_RESERVABLE, serviceIsReservable);
+					serviceMap->insert(ATTR_IS_RESERVABLE, serviceIsReservable);
 				}
 
 
