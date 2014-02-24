@@ -328,7 +328,7 @@ namespace synthese
 					}
 
 					// Reservation rule
-					const UseRule& useRule(_service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+					const UseRule& useRule(service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
 					bool serviceIsReservable(
 						dynamic_cast<const PTUseRule*>(&useRule) &&
 						static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
