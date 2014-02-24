@@ -146,7 +146,7 @@ namespace synthese
 				stringstream os;
 				os << request.getClientURL() + Request::PARAMETER_STARTER;
 				withoutClientPM.outputURI(os);
-				stream << HTMLModule::getLinkButton(os.str(), "Réinitialiser client");
+				stream << HTMLModule::getLinkButton(os.str(), "Autre client");
 			}
 			else
 			{
