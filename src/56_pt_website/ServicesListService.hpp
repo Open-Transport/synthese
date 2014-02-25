@@ -70,6 +70,7 @@ namespace synthese
 			static const std::string PARAMETER_MIN_DEPARTURE_TIME;
 			static const std::string PARAMETER_MAX_DEPARTURE_TIME;
 			static const std::string PARAMETER_DEPARTURE_PLACE;
+			static const std::string PARAMETER_MIN_DELAY_BETWEEN_DEPARTURE_AND_CALL; // TODO replace it by a per-line value
 			
 			static const std::string DATA_ID;
 			static const std::string DATA_DEPARTURE_SCHEDULE;
@@ -84,6 +85,8 @@ namespace synthese
 			static const std::string ATTR_IS_RESERVABLE;
 
 			static const std::string TAG_CALENDAR;
+			static const std::string TAG_RESERVATION_DELIVERY_TIME;
+			static const std::string ATTR_TIME;
 
 		protected:
 			//! \name Page parameters
@@ -97,6 +100,7 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> _minDepartureTime;
 				boost::optional<boost::posix_time::time_duration> _maxDepartureTime;
 				boost::optional<util::RegistryKeyType> _departurePlaceId;
+				boost::posix_time::time_duration _minDelayBetweenDepartureAndCall;
 			//@}
 
 

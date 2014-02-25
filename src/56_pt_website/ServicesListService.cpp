@@ -29,6 +29,7 @@
 #include "City.h"
 #include "CommercialLineTableSync.h"
 #include "DRTArea.hpp"
+#include "LinePhysicalStop.hpp"
 #include "LineStop.h"
 #include "OperationUnit.hpp"
 #include "PTUseRule.h"
@@ -70,6 +71,7 @@ namespace synthese
 		const string ServicesListService::PARAMETER_MIN_DEPARTURE_TIME = "min_departure_time";
 		const string ServicesListService::PARAMETER_MAX_DEPARTURE_TIME = "max_departure_time";
 		const string ServicesListService::PARAMETER_DEPARTURE_PLACE = "departure_place";
+		const string ServicesListService::PARAMETER_MIN_DELAY_BETWEEN_DEPARTURE_AND_CALL = "min_delay_between_departure_and_call";
 
 		const string ServicesListService::DATA_ID = "id";
 		const string ServicesListService::DATA_DEPARTURE_SCHEDULE = "departure_schedule";
@@ -85,6 +87,8 @@ namespace synthese
 		const string ServicesListService::ATTR_IS_RESERVABLE = "is_reservable";
 		
 		const string ServicesListService::TAG_CALENDAR = "calendar";
+		const string ServicesListService::TAG_RESERVATION_DELIVERY_TIME = "reservation_delivery_time";
+		const string ServicesListService::ATTR_TIME = "time";
 
 
 
@@ -197,6 +201,10 @@ namespace synthese
 			{
 				_maxDepartureTime = duration_from_string(maxDepartureTimeStr);
 			}
+
+			// minDelayBetweenDepartureAndCall
+			long minDelayBetweenDepartureAndCallStr(map.getDefault<long>(PARAMETER_MIN_DELAY_BETWEEN_DEPARTURE_AND_CALL, 1));
+			_minDelayBetweenDepartureAndCall = minutes(minDelayBetweenDepartureAndCallStr);
 
 			// Departure place id
 			RegistryKeyType departurePlaceId(map.getDefault<RegistryKeyType>(PARAMETER_DEPARTURE_PLACE, 0));
@@ -334,6 +342,47 @@ namespace synthese
 						static_cast<const PTUseRule&>(useRule).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 					);
 					serviceMap->insert(ATTR_IS_RESERVABLE, serviceIsReservable);
+
+					// Reservations delivery points
+					if(serviceIsReservable)
+					{
+						const PTUseRule& ptUseRule(static_cast<const PTUseRule&>(useRule));
+						if(!ptUseRule.getMinDelayMinutes().is_not_a_date_time())
+						{
+							optional<time_duration> lastPoint;
+							set<time_duration> points;
+							BOOST_REVERSE_FOREACH(const Path::Edges::value_type& edge, dynamic_cast<JourneyPattern*>(sservice.getPath())->getEdges())
+							{
+								// Jump over arrival only stops
+								if(!edge->isDepartureAllowed())
+								{
+									continue;
+								}
+
+								// Jump on stops without reservation
+								const LineStop& lineStop(*static_cast<LinePhysicalStop*>(edge)->getLineStop());
+								if(	!(	dynamic_cast<DRTArea*>(&*lineStop.get<LineNode>()) ||
+										lineStop.get<ReservationNeeded>()
+								)	){
+									continue;
+								}
+
+								time_duration schedule(sservice.getDepartureSchedule(false, edge->getRankInPath()));
+								if(	!lastPoint ||
+									*lastPoint + _minDelayBetweenDepartureAndCall >= schedule
+								){
+									lastPoint = schedule - ptUseRule.getMinDelayMinutes();
+									points.insert(*lastPoint);
+								}
+							}
+							BOOST_FOREACH(const time_duration& point, points)
+							{
+								boost::shared_ptr<ParametersMap> deliveryPM(new ParametersMap);
+								deliveryPM->insert(ATTR_TIME, to_simple_string(point));
+								serviceMap->insert(TAG_RESERVATION_DELIVERY_TIME, deliveryPM);
+							}
+						}
+					}
 				}
 
 
