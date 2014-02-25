@@ -156,7 +156,7 @@ namespace synthese
 					"Parent",
 					pt.getForm().getSelectInput(
 						CalendarTemplatePropertiesUpdateAction::PARAMETER_PARENT_ID,
-						CalendarTemplateTableSync::GetCalendarTemplatesList(CalendarTemplatesAdmin::DEFAULT_TITLE),
+						CalendarTemplateTableSync::GetCalendarTemplatesList(CalendarTemplatesAdmin::DEFAULT_TITLE, boost::optional<util::RegistryKeyType>(_calendar->getKey())),
 						optional<RegistryKeyType>(_calendar->getParent(true) ? _calendar->getParent()->getKey() : RegistryKeyType(0))
 				)	);
 				stream << pt.close();
