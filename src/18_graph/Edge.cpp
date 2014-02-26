@@ -159,7 +159,8 @@ namespace synthese
 			bool allowCanceled,
 			bool enableTheoretical,
 			bool enableRealTime,
-			UseRule::ReservationDelayType reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType,
+			bool maxDepartureMomentConcernsTheorical
 		) const	{
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 						*getParentPath()->sharedServicesMutex
@@ -216,7 +217,8 @@ namespace synthese
 							continue;
 
 						// Check of validity of departure date time
-						if (servicePointer.getDepartureDateTime() > maxDepartureMoment )
+						if ((!maxDepartureMomentConcernsTheorical && servicePointer.getDepartureDateTime() > maxDepartureMoment ) ||
+							(maxDepartureMomentConcernsTheorical && servicePointer.getTheoreticalDepartureDateTime() > maxDepartureMoment))
 						{
 							return ServicePointer();
 						}

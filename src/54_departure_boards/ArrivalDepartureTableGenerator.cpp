@@ -57,7 +57,8 @@ namespace synthese
 			const ptime& startDateTime,
 			const ptime& endDateTime,
 			bool allowCanceled,
-			optional<size_t> maxSize
+			optional<size_t> maxSize,
+			bool endDateTimeConcernsTheorical
 		) : _displayedPlaces(displayedPlacesList),
 			_physicalStops(physicalStops),
 			_direction(direction),
@@ -67,7 +68,8 @@ namespace synthese
 			_startDateTime(startDateTime),
 			_endDateTime(endDateTime),
 			_allowCanceled(allowCanceled),
-			_maxSize(maxSize)
+			_maxSize(maxSize),
+			_endDateTimeConcernsTheorical(endDateTimeConcernsTheorical)
 		{}
 
 

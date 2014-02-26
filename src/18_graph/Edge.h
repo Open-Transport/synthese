@@ -297,7 +297,8 @@ namespace synthese
 					bool allowCanceledService = false,
 					bool enableTheoretical = true,
 					bool enableRealTime = true,
-					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
+					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY,
+					bool maxDepartureMomentConcernsTheorical = false
 				) const;
 
 
