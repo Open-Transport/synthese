@@ -113,6 +113,7 @@ namespace synthese
 									_allowCanceled,
 									true,
 									true,
+									UseRule::RESERVATION_INTERNAL_DELAY,
 									_endDateTimeConcernsTheorical
 							)	);
 
