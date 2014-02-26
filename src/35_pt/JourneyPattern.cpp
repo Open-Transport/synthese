@@ -777,9 +777,9 @@ namespace synthese
 		synthese::SubObjects JourneyPattern::getSubObjects() const
 		{
 			SubObjects r;
-			BOOST_FOREACH(Edge* edge, getEdges())
+			BOOST_FOREACH(LineStop* lineStop, getLineStops())
 			{
-				r.push_back(edge);
+				r.push_back(lineStop);
 			}
 			BOOST_FOREACH(Service* service, getAllServices())
 			{
