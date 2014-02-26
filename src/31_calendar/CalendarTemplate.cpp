@@ -24,6 +24,7 @@
 
 #include "CalendarTemplateElement.h"
 #include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateElementTableSync.h"
 #include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 
@@ -310,19 +311,19 @@ namespace synthese
 //			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Elements
- /*				CalendarTemplateElementTableSync::SearchResult elements(
+ 				CalendarTemplateElementTableSync::SearchResult elements(
  					CalendarTemplateElementTableSync::Search(
  						env,
- 						object->getKey(),
+ 						getKey(),
 						optional<RegistryKeyType>(),
  						0, optional<size_t>(),
  						UP_LINKS_LOAD_LEVEL
  				)	);
  				BOOST_FOREACH(const boost::shared_ptr<CalendarTemplateElement>& e, elements)
  				{
- 					object->addElement(*e);
+ 					addElement(*e);
  				}
-*/
+
 				// Data source links
 				if(record.isDefined(CalendarTemplateTableSync::COL_DATASOURCE_LINKS))
 				{
