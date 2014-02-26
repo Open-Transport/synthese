@@ -879,6 +879,7 @@ namespace synthese
 			if(line->getNonConcurrencyRules().empty()) return true;
 
 			boost::recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
+			ptime baseTime(ptime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath())));
 
 			_NonConcurrencyCache::const_iterator it(
 				_nonConcurrencyCache.find(
@@ -890,7 +891,7 @@ namespace synthese
 			)	)	);
 			if(it != _nonConcurrencyCache.end())
 			{
-				return !isInTimeRange(time, range, it->second);
+				return !isInTimeRange((time < baseTime ? baseTime : time), range, it->second);
 			}
 			recursive_mutex::scoped_lock lineLock(line->getNonConcurrencyRulesMutex());
 
@@ -921,10 +922,6 @@ namespace synthese
 
 				CommercialLine& priorityLine(*rule->get<PriorityLine>());
 				const CommercialLine::Paths& paths(priorityLine.getPaths());
-				ptime minStartTime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath()));
-				minStartTime -= rule->get<Delay>();
-				ptime maxStartTime(date, getDepartureEndScheduleToIndex(false, departureEdge.getRankInPath()));
-				maxStartTime += rule->get<Delay>();
 
 				// Loop on all vertices of the starting place
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStartStop, startStops)
@@ -947,7 +944,12 @@ namespace synthese
 							// Search a service at the time of the possible
 							AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
 							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
-					
+
+							ptime minStartTime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath()));
+							minStartTime -= rule->get<Delay>();
+							ptime maxStartTime(date, getDepartureEndScheduleToIndex(false, departureEdge.getRankInPath()));
+							maxStartTime += rule->get<Delay>();
+
 							while(true)
 							{
 								ServicePointer serviceInstance(
@@ -1025,7 +1027,7 @@ namespace synthese
 						date
 					), excludeRanges
 			)	);
-			return !isInTimeRange(time, range, excludeRanges);
+			return !isInTimeRange((time < baseTime ? baseTime : time), range, excludeRanges);
 		}
 
 

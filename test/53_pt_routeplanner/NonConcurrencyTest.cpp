@@ -185,14 +185,17 @@ public:
 	{
 		for(size_t i=0; i< _numberOfStops; ++i)
 		{
-			_designatedLinePhysicalStops.push_back(
-				boost::shared_ptr<DesignatedLinePhysicalStop>(
+			boost::shared_ptr<DesignatedLinePhysicalStop> dps(
 				new DesignatedLinePhysicalStop(i, &jp, i,
 				(i < _numberOfStops - 1 ? true : false), // Departure
 				(i > 0 ? true : false),  // Arrival
-				0, &*_stopPoints[i]))
-			);
+				0, &*_stopPoints[i]
+			)	);
+
+			_designatedLinePhysicalStops.push_back(dps);
 			jp.addEdge(*(_designatedLinePhysicalStops[i].get()));
+			dps->getPhysicalStop()->addDepartureEdge((Edge*) dps.get());
+			dps->getPhysicalStop()->addArrivalEdge((Edge*) dps.get());
 		}
 	}
 
@@ -229,7 +232,7 @@ void checkJourneyEquals(size_t i, PTRoutePlannerResult::Journeys& journeys,
 	BOOST_CHECK_EQUAL(jl.size(), 1);
 	BOOST_CHECK(leg.getServiceRange() == expectedDuration);
 	BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getKey(), 0);
-	
+
 	/// @FIXME In continuous case the ArrivalEdge is correct but not its key
 	//cout << "leg.getArrivalEdge()->getKey() = " << leg.getArrivalEdge()->getKey() << endl;
 	//BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getKey(), NB_STOP-1);
@@ -242,6 +245,7 @@ void checkJourneyEquals(size_t i, PTRoutePlannerResult::Journeys& journeys,
 BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
 {
 	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<DRTArea> scopedDRTAreaRegistrable;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	
@@ -328,6 +332,7 @@ BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
 BOOST_AUTO_TEST_CASE (scheduledVScontinuous)
 {
 	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<DRTArea> scopedDRTAreaRegistrable;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	
@@ -421,6 +426,7 @@ BOOST_AUTO_TEST_CASE (scheduledVScontinuous)
 BOOST_AUTO_TEST_CASE (continuousVSscheduled)
 {
 	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<DRTArea> scopedDRTAreaRegistrable;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	
@@ -506,6 +512,7 @@ BOOST_AUTO_TEST_CASE (continuousVSscheduled)
 BOOST_AUTO_TEST_CASE (continuousVScontinuous)
 {
 	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
+	ScopedRegistrable<DRTArea> scopedDRTAreaRegistrable;
 
 	TestAreaMap testAreaMap(NB_STOP);
 	
