@@ -1,3 +1,5 @@
 3rd/dev/haru/include/hpdf_config.h
 build
 build_cmake
+CMakeLists.txt.user
+*.pyc
