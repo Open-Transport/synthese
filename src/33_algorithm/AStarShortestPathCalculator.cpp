@@ -148,7 +148,8 @@ namespace synthese
 				nodeMap,
 				openSet,
 				endingVertices,
-				heuristicReference
+				heuristicReference,
+				false
 			);
 
 			if(lastNode.get())
@@ -165,9 +166,11 @@ namespace synthese
 			NodeMap& nodeMap,
 			priority_queue<boost::shared_ptr<AStarNode> >& openSet,
 			const VertexAccessMap& endingVertices,
-			const boost::shared_ptr<Point> heuristicReference
+			const boost::shared_ptr<Point> heuristicReference,
+			const bool findAllAccessibleVertices
 		) const {
 			boost::shared_ptr<AStarNode> resultNode;
+			AccessParameters ap = _accessParameters;
 			
 			if(openSet.empty())
 			{
@@ -181,7 +184,11 @@ namespace synthese
 
 				if(endingVertices.contains(curNode->getCrossing()))
 				{
-					resultNode = curNode;
+					// Approach mode, don't search any further than the shortest path to the node
+					if(findAllAccessibleVertices)
+						ap.setMaxApproachDistance(curNode->getDistance());
+					else
+						resultNode = curNode;
 				}
 				else
 				{
@@ -194,11 +201,11 @@ namespace synthese
 						const RoadChunkEdge* chunk = static_cast<const RoadChunkEdge*>(itEdges.second);
 
 						// Check if the edge exists and is authorized for the user class
-						if(!chunk || !chunk->isCompatibleWith(_accessParameters))
+						if(!chunk || !chunk->isCompatibleWith(ap))
 							continue;
 
 						// Specific car user class verification (turn restriction)
-						if(_accessParameters.getUserClass() == USER_CAR && curNode->getLink())
+						if(ap.getUserClass() == USER_CAR && curNode->getLink())
 						{
 							const RoadPath* from = static_cast<const RoadPath*>(curNode->getLink()->getParentPath());
 							const RoadPath* to = static_cast<const RoadPath*>(path);
@@ -239,8 +246,8 @@ namespace synthese
 							delete coordinates;
 						}
 
-						double speed(_accessParameters.getApproachSpeed());
-						if(_accessParameters.getUserClass() == USER_CAR && linkChunk->getCarSpeed() > 0)
+						double speed(ap.getApproachSpeed());
+						if(ap.getUserClass() == USER_CAR && linkChunk->getCarSpeed() > 0)
 						{
 							speed = linkChunk->getCarSpeed();
 						}
@@ -250,7 +257,7 @@ namespace synthese
 						double newDistance = curNode->getDistance() + distance;
 
 						// Check if compatible with max approach distance and max approach time (especially usefull to find close physical stops)
-						if(!_accessParameters.isCompatibleWithApproach(newDistance, boost::posix_time::seconds(newScore)))
+						if(!ap.isCompatibleWithApproach(newDistance, boost::posix_time::seconds(newScore)))
 							continue;
 
 						// If we haven't discovered the crossing yet, we're adding it to the open set, if we have, we're updating its score if ours is better
@@ -325,7 +332,8 @@ namespace synthese
 				nodeMap,
 				openSet,
 				destinationVAM,
-				heuristicReference
+				heuristicReference,
+				true
 			);
 
 			BOOST_FOREACH(const NodeMap::value_type& node, nodeMap)
