@@ -112,7 +112,8 @@ namespace synthese
 				NodeMap& nodeMap,
 				std::priority_queue<boost::shared_ptr<AStarNode> >& openSet,
 				const graph::VertexAccessMap& endingVertices,
-				const boost::shared_ptr<geos::geom::Point> heuristicReference
+				const boost::shared_ptr<geos::geom::Point> heuristicReference,
+				const bool findAllAccessibleVertices = false
 			) const;
 
 
