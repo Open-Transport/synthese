@@ -128,6 +128,10 @@ namespace synthese
 				{
 					stream << _line->getStyle();
 				}
+                else if(_info == "foreground_color")
+                {
+                    stream << _line->getFgColor()->toString();
+                }
 				else if(_info == "image")
 				{
 					stream << _line->getImage();
