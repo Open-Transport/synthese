@@ -274,8 +274,8 @@ namespace synthese
 			return
 				startOffset + (endOffset - startOffset) * (
 					(bounds->first < bounds->second) ?
-					((houseNumber - bounds->first) / (bounds->second - bounds->first)) :
-					((bounds->first - houseNumber) / (bounds->first - bounds->second))
+					((double)(houseNumber - bounds->first) / (double)(bounds->second - bounds->first)) :
+					((double)(bounds->first - houseNumber) / (double)(bounds->first - bounds->second))
 				)
 			;
 		}
