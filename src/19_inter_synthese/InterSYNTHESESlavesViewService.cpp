@@ -43,6 +43,8 @@ namespace synthese
 	
 	namespace inter_synthese
 	{
+		const string InterSYNTHESESlavesViewService::PARAMETER_WITH_QUEUES = "with_queues";
+
 		const string InterSYNTHESESlavesViewService::TAG_SLAVE = "slave";
 
 
@@ -57,6 +59,8 @@ namespace synthese
 
 		void InterSYNTHESESlavesViewService::_setFromParametersMap(const ParametersMap& map)
 		{
+			// With queues
+			_withQueues = map.getDefault<bool>(PARAMETER_WITH_QUEUES, false);
 		}
 
 
@@ -74,7 +78,7 @@ namespace synthese
 
 				boost::shared_ptr<ParametersMap> slavePM(new ParametersMap);
 
-				it.second->toParametersMap(*slavePM, true);
+				it.second->toParametersMap(*slavePM, _withQueues);
 
 				map.insert(TAG_SLAVE, slavePM);
 			}
@@ -96,4 +100,10 @@ namespace synthese
 		{
 			return "text/html";
 		}
+
+
+
+		InterSYNTHESESlavesViewService::InterSYNTHESESlavesViewService():
+			_withQueues(false)
+		{}
 }	}
