@@ -32,6 +32,11 @@
 
 namespace synthese
 {
+	namespace pt
+	{
+		class ScheduledService;
+	}
+
 	namespace pt_operation
 	{
 		class OperationUnit;
@@ -51,6 +56,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_WITH_DETAIL;
+			static const std::string PARAMETER_SERVICE; // id of a scheduled service
 
 			static const std::string TAG_VEHICLE_SERVICE;
 			static const std::string TAG_VEHICLE_SERVICES;
@@ -63,6 +69,7 @@ namespace synthese
 				const cms::Webpage* _page;
 				boost::optional<const OperationUnit&> _operationUnit;
 				boost::shared_ptr<const VehicleService> _service;
+				const pt::ScheduledService* _scheduledService;
 				bool _withDetail;
 			//@}
 
