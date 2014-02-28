@@ -253,7 +253,7 @@ namespace synthese
 						boost::split(strs, line, boost::is_any_of(": "),
 							boost::algorithm::token_compress_on
 						);
-						if(strs.size())
+						if(strs.size() >= 2)
 						{
 							_headers[strs[0]] = strs[1];
 							util::Log::GetInstance().trace("HTTPClient: received header: " +
@@ -262,6 +262,7 @@ namespace synthese
 
 							if(strs[0].substr(0, 5) == "HTTP/" && strs[1] != "200")
 							{
+								stop();
 								throw Exception("Response returned with status code " + strs[1]);
 							}
 							else if(strs[0] == "Content-Length")
@@ -388,11 +389,10 @@ namespace synthese
 			// server will close the socket after transmitting the response. This will
 			// allow us to treat all data up until the EOF as the content.
 
-			boost::asio::streambuf request;
-			initRequest(request);
+			initRequest(_request);
 
 			// Start an asynchronous operation to send a heartbeat message.
-			boost::asio::async_write(socket_, request,
+			boost::asio::async_write(socket_, _request,
 				boost::bind(&HTTPClient::handleWrite, this, _1)
 			);
 		}

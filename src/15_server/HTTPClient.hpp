@@ -35,6 +35,8 @@ namespace synthese
 			std::string &_payload;
 			size_t _announcedContentLength;
 
+			boost::asio::streambuf _request;
+
 		public:
 			HTTPClient(boost::asio::io_service& io_service,
 				std::string serverHost,
