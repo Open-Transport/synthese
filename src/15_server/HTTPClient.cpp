@@ -199,6 +199,9 @@ namespace synthese
 				   boost::lexical_cast<string>(endpoint_iter->endpoint())
 				);
 
+				// Form the request
+				initRequest(_request);
+
 				// Start the input actor.
 				startRead();
 
@@ -219,7 +222,8 @@ namespace synthese
 		void HTTPClient::startRead()
 		{
 			// Set a deadline for the read operation.
-			deadline_.expires_from_now(boost::posix_time::seconds(CLIENT_READ_TIMEOUT_S));
+			deadline_.expires_from_now(boost::posix_time::seconds(CLIENT_READ_TIMEOUT_S +
+																  _request.size() / 10000));
 
 			// Start an asynchronous operation to read a newline-delimited message.
 			boost::asio::async_read_until(socket_, input_buffer_, '\n',
@@ -385,13 +389,7 @@ namespace synthese
 			if (stopped_)
 				return;
 
-			// Form the request. We specify the "Connection: close" header so that the
-			// server will close the socket after transmitting the response. This will
-			// allow us to treat all data up until the EOF as the content.
-
-			initRequest(_request);
-
-			// Start an asynchronous operation to send a heartbeat message.
+			// Start an asynchronous operation to send the http request
 			boost::asio::async_write(socket_, _request,
 				boost::bind(&HTTPClient::handleWrite, this, _1)
 			);
