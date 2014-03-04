@@ -105,6 +105,10 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				virtual bool isActive(
+					const boost::gregorian::date& date
+				) const;
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Service extractor.
 				/// @param rank the rank of the service in the vehicle service

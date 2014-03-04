@@ -322,6 +322,19 @@ namespace synthese
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Return true if no date is defined
+		bool VehicleService::isActive( const boost::gregorian::date& date ) const
+		{
+			if(empty())
+			{
+				return true;
+			}
+			return Calendar::isActive(date);
+		}
+
+
+
 		bool VehicleService::DriverServiceChunkCompare::operator()(
 			const DriverService::Chunk* ds1,
 			const DriverService::Chunk* ds2
