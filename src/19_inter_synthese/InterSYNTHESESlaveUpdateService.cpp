@@ -119,7 +119,7 @@ namespace synthese
 				if (_askIdRange)
 				{
 					bool first(true);
-					for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _queue.end(); ++it)
+					for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _slave->getQueue().end(); ++it)
 					{
 						if (first)
 						{
