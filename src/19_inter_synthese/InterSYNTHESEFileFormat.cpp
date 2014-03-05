@@ -110,13 +110,13 @@ namespace synthese
 					{
 						// Search for end id
 						l=i;
-						for(; i < content.size() && content[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-						if(i == content.size())
+						for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
+						if(i == contentStr.size())
 						{
 							ok = false;
 							break;
 						}
-						RegistryKeyType idEnd(lexical_cast<RegistryKeyType>(content.substr(l, i-l)));
+						RegistryKeyType idEnd(lexical_cast<RegistryKeyType>(contentStr.substr(l, i-l)));
 						++i;
 						i += InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
 						readingIdRange = false;
