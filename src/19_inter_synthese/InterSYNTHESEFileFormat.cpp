@@ -110,7 +110,7 @@ namespace synthese
 					{
 						// Search for end id
 						l=i;
-						for(; i < content.size() && content[i] != FIELDS_SEPARATOR[0]; ++i) ;
+						for(; i < content.size() && content[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
 						if(i == content.size())
 						{
 							ok = false;
@@ -118,7 +118,7 @@ namespace synthese
 						}
 						RegistryKeyType idEnd(lexical_cast<RegistryKeyType>(content.substr(l, i-l)));
 						++i;
-						i += SYNCS_SEPARATOR.size();
+						i += InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
 						readingIdRange = false;
 						beginId = id;
 						endId = idEnd;
