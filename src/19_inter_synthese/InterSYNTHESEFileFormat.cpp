@@ -61,6 +61,7 @@ namespace synthese
 				
 				StaticFunctionRequest<InterSYNTHESESlaveUpdateService> r;
 				r.getFunction()->setSlaveId(_slaveId);
+				r.getFunction()->setAskIdRange(true);
 				BasicClient c(
 					_address,
 					_port
@@ -87,6 +88,9 @@ namespace synthese
 				ContentMap content;
 	
 				size_t i(0);
+				bool readingIdRange(true);
+				RegistryKeyType beginId;
+				RegistryKeyType endId;
 				while(i < contentStr.size())
 				{
 					ContentMap::mapped_type item;
@@ -101,45 +105,73 @@ namespace synthese
 					}
 					RegistryKeyType id(lexical_cast<RegistryKeyType>(contentStr.substr(l, i-l)));
 					++i;
-
-					// Synchronizer + Search for next :
-					l=i;
-					for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-					if(i == contentStr.size())
+					
+					if (readingIdRange)
 					{
-						ok = false;
-						break;
+						// Search for end id
+						l=i;
+						for(; i < content.size() && content[i] != FIELDS_SEPARATOR[0]; ++i) ;
+						if(i == content.size())
+						{
+							ok = false;
+							break;
+						}
+						RegistryKeyType idEnd(lexical_cast<RegistryKeyType>(content.substr(l, i-l)));
+						++i;
+						i += SYNCS_SEPARATOR.size();
+						readingIdRange = false;
+						beginId = id;
+						endId = idEnd;
 					}
-					item.first = contentStr.substr(l, i-l);
-					++i;
-
-					// Size + Search for next :
-					l=i;
-					for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-					if(i == contentStr.size())
+					else
 					{
-						ok = false;
-						break;
-					}
-					size_t contentSize = lexical_cast<size_t>(contentStr.substr(l, i-l));
-					++i;
+						// Synchronizer + Search for next :
+						l=i;
+						for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
+						if(i == contentStr.size())
+						{
+							ok = false;
+							break;
+						}
+						item.first = contentStr.substr(l, i-l);
+						++i;
 
-					// Content
-					if(i+contentSize > contentStr.size())
-					{
-						ok = false;
-						break;
-					}
-					item.second = contentStr.substr(i, contentSize);
-					i += contentSize + InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
+						// Size + Search for next :
+						l=i;
+						for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
+						if(i == contentStr.size())
+						{
+							ok = false;
+							break;
+						}
+						size_t contentSize = lexical_cast<size_t>(contentStr.substr(l, i-l));
+						++i;
 
-					content.insert(
-						make_pair(
-							id,
-							item
-					)	);
+						// Content
+						if(i+contentSize > contentStr.size())
+						{
+							ok = false;
+							break;
+						}
+						item.second = contentStr.substr(i, contentSize);
+						i += contentSize + InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
+
+						content.insert(
+							make_pair(
+								id,
+								item
+						)	);
+					}
 				}
 
+				if(!ok)
+				{
+					return false;
+				}
+				
+				ok = (beginId == content.begin()->first &&
+					endId == content.rbegin()->first);
+				
 				if(!ok)
 				{
 					return false;
@@ -148,6 +180,46 @@ namespace synthese
 					"Inter-SYNTHESE : "+ _address +":"+ _port + " has sent "+ lexical_cast<string>(content.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
 				);
 
+				// Load the data
+				// Local variables
+				auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;
+				string lastFactoryKey;
+
+				// Reading the content
+				BOOST_FOREACH(const ContentMap::value_type& item, content)
+				{
+					try
+					{
+						const string& factoryKey(item.second.first);
+						if(factoryKey != lastFactoryKey)
+						{
+							if(interSYNTHESE.get())
+							{
+								interSYNTHESE->closeSync();
+							}
+							interSYNTHESE.reset(
+								Factory<InterSYNTHESESyncTypeFactory>::create(factoryKey)
+							);
+							lastFactoryKey = factoryKey;
+							interSYNTHESE->initSync();
+						}
+
+						interSYNTHESE->sync(
+							item.second.second,
+							_idFilter.get()
+						);
+					}
+					catch(...)
+					{
+						// Log
+					}
+				}
+				if(interSYNTHESE.get())
+				{
+					interSYNTHESE->closeSync();
+				}
+
+				// Send ACK if load did not throw exception
 				StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
 				ackRequest.getFunction()->setSlaveId(_slaveId);
 				if(!content.empty())
@@ -168,46 +240,9 @@ namespace synthese
 				);
 				if(result2 == InterSYNTHESEUpdateAckService::VALUE_OK)
 				{
-					// Local variables
-					auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;
-					string lastFactoryKey;
-
-					// Reading the content
-					BOOST_FOREACH(const ContentMap::value_type& item, content)
-					{
-						try
-						{
-							const string& factoryKey(item.second.first);
-							if(factoryKey != lastFactoryKey)
-							{
-								if(interSYNTHESE.get())
-								{
-									interSYNTHESE->closeSync();
-								}
-								interSYNTHESE.reset(
-									Factory<InterSYNTHESESyncTypeFactory>::create(factoryKey)
-								);
-								lastFactoryKey = factoryKey;
-								interSYNTHESE->initSync();
-							}
-
-							interSYNTHESE->sync(
-								item.second.second,
-								_idFilter.get()
-							);
-						}
-						catch(...)
-						{
-							// Log
-						}
-					}
-					if(interSYNTHESE.get())
-					{
-						interSYNTHESE->closeSync();
-						_logDebug(
-							"Inter-SYNTHESE : "+ _address +":"+ _port + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
-						);
-					}
+					_logDebug(
+						"Inter-SYNTHESE : "+ _address +":"+ _port + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
+					);
 				}
 			}
 			catch(std::exception& e)
