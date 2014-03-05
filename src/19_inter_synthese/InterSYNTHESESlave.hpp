@@ -154,7 +154,8 @@ namespace synthese
 				void clearUselessQueueEntries(db::DBTransaction& transaction) const;
 				void sendToSlave(
 					std::ostream& stream,
-					const QueueRange& range
+					const QueueRange& range,
+					bool askIdRange = false
 				) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);

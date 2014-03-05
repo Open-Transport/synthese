@@ -54,9 +54,11 @@ namespace synthese
 			
 			
 		InterSYNTHESEPacket::InterSYNTHESEPacket(
-			const std::string& content
+			const std::string& content,
+			bool readIdRange
 		){
 			size_t i(0);
+			bool readingIdRange(readIdRange);
 			while(i < content.size())
 			{
 				Data::mapped_type item;
@@ -71,39 +73,58 @@ namespace synthese
 				RegistryKeyType id(lexical_cast<RegistryKeyType>(content.substr(l, i-l)));
 				++i;
 
-				// Synchronizer + Search for next :
-				l=i;
-				for(; i < content.size() && content[i] != FIELDS_SEPARATOR[0]; ++i) ;
-				if(i == content.size())
+				if (readingIdRange)
 				{
-					throw BadPacketException();
+					// Search for end id
+					l=i;
+					for(; i < content.size() && content[i] != FIELDS_SEPARATOR[0]; ++i) ;
+					if(i == content.size())
+					{
+						throw BadPacketException();
+					}
+					RegistryKeyType idEnd(lexical_cast<RegistryKeyType>(content.substr(l, i-l)));
+					++i;
+					i += SYNCS_SEPARATOR.size();
+					readingIdRange = false;
+					_beginId = id;
+					_endId = idEnd;
 				}
-				item.first = content.substr(l, i-l);
-				++i;
-
-				// Size + Search for next :
-				l=i;
-				for(; i < content.size() && content[i] != FIELDS_SEPARATOR[0]; ++i) ;
-				if(i == content.size())
+				else
 				{
-					throw BadPacketException();
-				}
-				size_t contentSize = lexical_cast<size_t>(content.substr(l, i-l));
-				++i;
+					// Synchronizer + Search for next :
+					l=i;
+					for(; i < content.size() && content[i] != FIELDS_SEPARATOR[0]; ++i) ;
+					if(i == content.size())
+					{
+						throw BadPacketException();
+					}
+					item.first = content.substr(l, i-l);
+					++i;
 
-				// Content
-				if(i+contentSize > content.size())
-				{
-					throw BadPacketException();
-				}
-				item.second = content.substr(i, contentSize);
-				i += contentSize + SYNCS_SEPARATOR.size();
+					// Size + Search for next :
+					l=i;
+					for(; i < content.size() && content[i] != FIELDS_SEPARATOR[0]; ++i) ;
+					if(i == content.size())
+					{
+						throw BadPacketException();
+					}
+					size_t contentSize = lexical_cast<size_t>(content.substr(l, i-l));
+					++i;
 
-				_data.insert(
-					make_pair(
-						id,
-						item
-				)	);
+					// Content
+					if(i+contentSize > content.size())
+					{
+						throw BadPacketException();
+					}
+					item.second = content.substr(i, contentSize);
+					i += contentSize + SYNCS_SEPARATOR.size();
+
+					_data.insert(
+						make_pair(
+							id,
+							item
+					)	);
+				}
 			}
 		}
 
@@ -170,5 +191,11 @@ namespace synthese
 				interSYNTHESE->closeSync();
 			}
 
+		}
+
+		bool InterSYNTHESEPacket::checkConsistence() const
+		{
+			return _beginId == getIdRange().first &&
+				_endId == getIdRange().second;
 		}
 }	}

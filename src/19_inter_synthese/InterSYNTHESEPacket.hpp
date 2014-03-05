@@ -58,15 +58,18 @@ namespace synthese
 
 		private:
 			Data _data;
+			util::RegistryKeyType _beginId;
+			util::RegistryKeyType _endId;
 
 		public:
 			InterSYNTHESEPacket();
-			InterSYNTHESEPacket(const std::string& content);
+			InterSYNTHESEPacket(const std::string& content, bool readIdRange = false);
 
 			typedef std::pair<util::RegistryKeyType, util::RegistryKeyType> IdRange;
 			bool empty() const;
 			size_t size() const;
 			IdRange getIdRange() const;
+			bool checkConsistence() const;
 
 			void load() const;
 		};

@@ -59,6 +59,7 @@ namespace synthese
 				
 				StaticFunctionRequest<InterSYNTHESESlaveUpdateService> r;
 				r.getFunction()->setSlaveId(_slaveId);
+				r.getFunction()->setAskIdRange(true);
 				BasicClient c(
 					_address,
 					_port
@@ -77,12 +78,25 @@ namespace synthese
 				}
 
 				// Case content to sync
-				InterSYNTHESEPacket packet(contentStr);
+				InterSYNTHESEPacket packet(contentStr, true);
+
+				// Verify that the package is consistent
+				if (!packet.checkConsistence())
+				{
+					_logError(
+						"Inter-SYNTHESE : Synchronization with "+ _address +":"+ _port + " as slave id #"+ lexical_cast<string>(_slaveId) +" has failed : malformed packet"
+					);
+					return false;
+				}
 
 				_logDebug(
 					"Inter-SYNTHESE : "+ _address +":"+ _port + " has sent "+ lexical_cast<string>(packet.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
 				);
 
+				// Load the data
+				packet.load();
+
+				// Send ACK if load did not throw exception
 				StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
 				ackRequest.getFunction()->setSlaveId(_slaveId);
 				if(!packet.empty())
@@ -103,7 +117,6 @@ namespace synthese
 				);
 				if(result2 == InterSYNTHESEUpdateAckService::VALUE_OK)
 				{
-					packet.load();
 					_logDebug(
 						"Inter-SYNTHESE : "+ _address +":"+ _port + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
 					);

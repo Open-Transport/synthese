@@ -471,9 +471,30 @@ namespace synthese
 
 		void InterSYNTHESESlave::sendToSlave(
 			std::ostream& stream,
-			const QueueRange& range
+			const QueueRange& range,
+			bool askIdRange
 		) const	{
 			recursive_mutex::scoped_lock lock(_queueMutex);
+
+			if (askIdRange)
+			{
+				bool first(true);
+				for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _queue.end(); ++it)
+				{
+					if (first)
+					{
+						stream << it->second->get<Key>() << InterSYNTHESEPacket::FIELDS_SEPARATOR;
+						first = false;
+					}
+					// Exit on last item
+					if(it == range.second)
+					{
+						stream << it->second->get<Key>() << InterSYNTHESEPacket::FIELDS_SEPARATOR <<
+							InterSYNTHESEPacket::SYNCS_SEPARATOR;
+						break;
+					}
+				}
+			}
 
 			for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _queue.end(); ++it)
 			{
