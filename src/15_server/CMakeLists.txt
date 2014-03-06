@@ -5,6 +5,8 @@ ActionException.cpp
 ActionException.h
 ActionService.cpp
 ActionService.hpp
+BasicClientWin.cpp
+BasicClientWin.h
 BasicClient.cpp
 BasicClient.h
 CleanerThreadExec.cpp
@@ -38,6 +40,8 @@ HtmlFormInterfaceElement.cpp
 HtmlFormInterfaceElement.h
 HTTPConnection.cpp
 HTTPConnection.hpp
+HTTPClient.cpp
+HTTPClient.hpp
 HTTPReply.cpp
 HTTPReply.hpp
 HTTPRequest.hpp

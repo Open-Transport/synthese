@@ -1,29 +1,22 @@
-#include "Log.h"
+// Copyright (c) 2003-2010 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+//
+//
+#ifndef WIN32
+
 #include "BasicClient.h"
-
 #include "Exception.h"
-#include "ServerModule.h"
+#include "HTTPClient.hpp"
 
-#include <iostream>
-#include <istream>
-#include <ostream>
-#include <string>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/bind.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/lambda/lambda.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
-using namespace std;
-using namespace boost;
-using namespace boost::algorithm;
-using namespace boost::iostreams;
+using boost::asio::ip::tcp;
 using namespace boost::asio;
-using namespace boost::asio::ip;
-
-// Timeout in seconds after which we cancel the HTTP request
-#define CLIENT_TIMEOUT_S 15
+using namespace std;
 
 namespace synthese
 {
@@ -62,229 +55,31 @@ namespace synthese
 			return _send(url, data, contentType);
 		}
 
-		void BasicClient::set_result(
-			optional<boost::system::error_code>* a,
-			const boost::system::error_code b) const
-		{
-			a->reset(b);
-		}
-
-		void BasicClient::read_until_with_timeout(tcp::socket& sock,
-			boost::asio::streambuf& buffer,
-			const std::string& delim,
-			const posix_time::time_duration &expiry_time) const
-		{
-		   optional<boost::system::error_code> timer_result;
-		   deadline_timer timer(sock.io_service());
-		   timer.expires_from_now(expiry_time);
-		   timer.async_wait(boost::bind(&BasicClient::set_result, this, &timer_result, _1));
-
-		   boost::system::error_code read_result;
-		   async_read_until(sock, buffer, delim, boost::lambda::var(read_result) = boost::lambda::_1);
-
-		   sock.io_service().reset();
-		   while (sock.io_service().run_one())
-		   {
-			 if (read_result)
-			   timer.cancel();
-			 else if (timer_result)
-			   sock.cancel();
-		   }
-
-		   if (read_result)
-			   util::Log::GetInstance().error(
-				   "BasicClient network read error: " + string(boost::system::system_error(read_result).what())
-			   );
-		 }
-
 		string BasicClient::_send(
 			const std::string& url,
 			const std::string& postData,
 			const string& contentType
 		) const	{
-			try
+			string result;
+			boost::asio::io_service io_service;
+			tcp::resolver r(io_service);
+
+			HTTPClient client(io_service, _serverHost, _serverPort,
+				url, postData, contentType, _acceptGzip,
+				result /* out value */
+			);
+
+			client.start(r.resolve(tcp::resolver::query(_serverHost, _serverPort)));
+
+			io_service.run();
+
+			if(client.getErrorCode())
 			{
-				boost::asio::io_service io_service;
-
-				// Get a list of endpoints corresponding to the server name.
-				tcp::resolver resolver(io_service);
-				tcp::resolver::query query(_serverHost, _serverPort);
-				tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-				tcp::resolver::iterator end;
-
-				// Try each endpoint until we successfully establish a connection.
-				tcp::socket socket(io_service);
-				boost::system::error_code error = boost::asio::error::host_not_found;
-				while (error && endpoint_iterator != end)
-				{
-					socket.close();
-					socket.connect(*endpoint_iterator++, error);
-				}
-				if (error)
-					throw boost::system::system_error(error);
-
-				// Form the request. We specify the "Connection: close" header so that the
-				// server will close the socket after transmitting the response. This will
-				// allow us to treat all data up until the EOF as the content.
-				boost::asio::streambuf request;
-				std::ostream request_stream(&request);
-				if(postData.empty())
-				{
-					request_stream << "GET";
-				}
-				else
-				{
-					request_stream << "POST";
-				}
-				request_stream << " " << url << " HTTP/1.0\r\n"; // TODO : upgrade to 1.1 by handling Transfer-Encoding: chunked
-				request_stream << "Host: " << _serverHost << ":" << _serverPort << "\r\n";
-				request_stream << "User-Agent: SYNTHESE/" << ServerModule::VERSION << "\r\n";
-				request_stream << "Accept: */*\r\n";
-				if(_acceptGzip)
-				{
-					request_stream << "Accept-Encoding: gzip\r\n";
-				}
-				if(!postData.empty())
-				{
-					request_stream << "Content-Length: " << postData.size() << "\r\n";
-				}
-				if(!contentType.empty())
-				{
-					request_stream << "Content-Type: " << contentType << "\r\n";
-				}
-				request_stream << "Connection: keep-alive\r\n\r\n";
-				if(!postData.empty())
-				{
-					request_stream << postData;
-				}
-
-				// Send the request.
-				boost::asio::write(socket, request);
-
-				// Read the response status line.
-				boost::asio::streambuf response;
-				read_until_with_timeout(socket, response, "\r\n",
-										boost::posix_time::seconds(CLIENT_TIMEOUT_S));
-
-				// Check that response is OK.
-				std::istream response_stream(&response);
-				std::string http_version;
-				response_stream >> http_version;
-				unsigned int status_code;
-				response_stream >> status_code;
-				std::string status_message;
-				std::getline(response_stream, status_message);
-				if (!response_stream || http_version.substr(0, 5) != "HTTP/")
-				{
-					throw Exception("Invalid response");
-				}
-				if (status_code != 200)
-				{
-					throw Exception("Response returned with status code " + status_code);
-				}
-
-				// Read the response headers, which are terminated by a blank line.
-				read_until_with_timeout(socket, response, "\r\n\r\n",
-										boost::posix_time::seconds(CLIENT_TIMEOUT_S));
-
-				stringstream tmp;
-
-				// Process the response headers.
-				std::string header;
-				typedef map<string, string> Headers;
-				Headers headers;
-				while (std::getline(response_stream, header) && header != "\r")
-				{
-					if(header[header.size()-1] == '\r')
-					{
-						header = header.substr(0, header.size()-1);
-					}
-
-					if(!header.empty())
-					{
-						size_t p(1);
-						for(; p<header.size() && header[p] != ':'; ++p) ; 
-						if(p != header.size())
-						{
-							headers.insert(
-								make_pair(
-									trim_copy(header.substr(0, p)),
-									trim_copy(header.substr(p+2))
-							)	);
-						}
-					}
-				}
-
-				// Output HTTP Headers
-				if(_outputHTTPHeaders)
-				{
-					BOOST_FOREACH(const Headers::value_type& it, headers)
-					{
-						tmp << it.first << ": " << it.second << "\r\n";
-					}
-				}
-
-				// Obtaining size to transfer
-				size_t size(0);
-				size_t transferred(0);
-				Headers::const_iterator itSize(headers.find("Content-Length"));
-				if(itSize != headers.end())
-				{
-					size = lexical_cast<size_t>(itSize->second);
-				}
-
-				// Write whatever content we already have to output.
-				if (response.size() > 0)
-				{
-					transferred += response.size();
-					tmp << &response;
-				}
-
-				// Read until EOF, writing data to output as we go.
-				while(
-					asio::read(socket, response, asio::transfer_at_least(1), error)
-				){
-					transferred += response.size();
-					tmp << &response;
-
-					// Quit if the bytes to transfer are all present in the stream
-					if(size && transferred >= size)
-					{
-						error = asio::error::eof;
-						break;
-					}
-				}
-				if (error != asio::error::eof)
-				{
-					throw system::system_error(error);
-				}
-
-				// Output with or without gzip compression
-				Headers::const_iterator it(
-					headers.find("Content-Encoding")
-				);
-				if(	it != headers.end() &&
-					it->second == "gzip" &&
-					!tmp.str().empty()
-				){
-					stringstream os;
-					filtering_stream<input> fs;
-					fs.push(gzip_decompressor());
-					fs.push(tmp);
-					boost::iostreams::copy(fs, os);
-					return os.str();
-				}
-				else
-				{
-					return tmp.str();
-				}
+				throw boost::system::system_error(client.getErrorCode());
 			}
-			catch (std::exception& e)
-			{
-				throw Exception(e.what());
-			}
+
+			return result;
 		}
-
 
 
 		std::string BasicClient::Get( const std::string url )
@@ -318,3 +113,5 @@ namespace synthese
 			return c.get(path);
 		}
 }	}
+
+#endif
