@@ -148,17 +148,19 @@ namespace synthese
 			MetricOffset metricOffset
 		) const	{
 			boost::shared_ptr<LineString> geometry(getRealGeometry());
+			double offset = metricOffset - this->getMetricOffset();
 			if(!geometry.get() || geometry->isEmpty())
 			{
 				return getFromVertex()->getGeometry();
 			}
-			if(metricOffset > geometry->getLength())
+			if(offset > geometry->getLength())
 			{
 				return boost::shared_ptr<Point>(geometry->getEndPoint());
 			}
+
 			return boost::shared_ptr<Point>(
 				geometry->getFactory()->createPoint(
-					LengthIndexedLine(geometry.get()).extractPoint(metricOffset)
+					LengthIndexedLine(geometry.get()).extractPoint(offset)
 			)	);
 		}
 }	}

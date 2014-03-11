@@ -541,6 +541,11 @@ namespace synthese
 
 			_logDebug("finished parsing relation");
 
+			BOOST_FOREACH(const Registry<MainRoadChunk>::value_type& chunk, _env.getEditableRegistry<MainRoadChunk>())
+			{
+				_reorderHouseNumberingBounds(chunk.second);
+			}
+
 			BOOST_FOREACH(const Registry<MainRoadPart>::value_type& road, _env.getEditableRegistry<MainRoadPart>())
 			{
 				road.second->validateGeometry();
@@ -770,7 +775,7 @@ namespace synthese
 					EdgeProjector<MainRoadChunk*>::PathNearby projection(projector.projectEdge(*houseCoord->getCoordinate()));
 					MainRoadChunk* linkedRoadChunk(projection.get<1>());
 
-					_chunkHouseNumberList[linkedRoadChunk->getKey()].push_back(num);
+					_chunksAssociatedHousesList[linkedRoadChunk->getKey()].push_back(house);
 
 					MainRoadChunk::HouseNumberBounds leftBounds = linkedRoadChunk->getLeftHouseNumberBounds();
 
@@ -816,20 +821,20 @@ namespace synthese
 		void OSMFileFormat::Importer_::_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
 			MainRoadChunk* chunk
 		) const {
-			ChunkHouseNumberList::iterator itChunk = _chunkHouseNumberList.find(chunk->getKey());
+			ChunksAssociatedHousesList::iterator itChunk = _chunksAssociatedHousesList.find(chunk->getKey());
 
-			if(itChunk != _chunkHouseNumberList.end())
+			if(itChunk != _chunksAssociatedHousesList.end())
 			{
 				MainRoadChunk::HouseNumberingPolicy policy(MainRoadChunk::ALL);
 
 				if(itChunk->second.size() > 2)
 				{
-					unsigned int curMod((*itChunk->second.begin()) % 2);
+					unsigned int curMod(lexical_cast<MainRoadChunk::HouseNumber>((*(itChunk->second.begin()))->getTag("addr:housenumber")) % 2);
 					bool multipleMod(false);
 
-					BOOST_FOREACH(MainRoadChunk::HouseNumber n, itChunk->second)
+					BOOST_FOREACH(NodePtr n, itChunk->second)
 					{
-						if(curMod != (n % 2))
+						if(curMod != (lexical_cast<MainRoadChunk::HouseNumber>(n->getTag("addr:housenumber")) % 2))
 						{
 							multipleMod = true;
 							break;
@@ -846,6 +851,71 @@ namespace synthese
 				chunk->setRightHouseNumberingPolicy(policy);
 			}
 		}
+
+
+
+		void OSMFileFormat::Importer_::_reorderHouseNumberingBounds(
+			boost::shared_ptr<MainRoadChunk> chunk
+		) const {
+			const MainRoadChunk::HouseNumberBounds& leftBounds = chunk->getLeftHouseNumberBounds();
+			DataSource& dataSource(*_import.get<DataSource>());
+
+			// Continue if bounds are defined and different, and the chunk has a next chunk
+			if(leftBounds && leftBounds->first != leftBounds->second && chunk->getNext())
+			{
+				MainRoadChunk::HouseNumber startBound = leftBounds->first, endBound = leftBounds->second;
+				NodePtr startHouse, endHouse;
+
+				// Check if we have found the house number, we should always find it according to the code above
+				ChunksAssociatedHousesList::iterator housesVector = _chunksAssociatedHousesList.find(chunk->getKey());
+				if(housesVector != _chunksAssociatedHousesList.end())
+				{
+					BOOST_FOREACH(ChunksAssociatedHousesList::mapped_type::value_type& house, housesVector->second)
+					{
+						if(lexical_cast<MainRoadChunk::HouseNumber>(house->getTag("addr:housenumber")) == startBound)
+						{
+							startHouse = house;
+						}
+						if(lexical_cast<MainRoadChunk::HouseNumber>(house->getTag("addr:housenumber")) == endBound)
+						{
+							endHouse = house;
+						}
+					}
+
+					// If we have found our 2 houses and their geometries
+					if(startHouse && endHouse)
+					{
+						boost::shared_ptr<const Geometry> startGeom = chunk->getFromVertex()->getGeometry();
+						boost::shared_ptr<const Geometry> endGeom = chunk->getNext()->getFromVertex()->getGeometry();
+						boost::shared_ptr<Point> startHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+							*dataSource.getActualCoordinateSystem().createPoint(startHouse->getLon(), startHouse->getLat())
+						)	);
+						boost::shared_ptr<Point> endHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+							*dataSource.getActualCoordinateSystem().createPoint(endHouse->getLon(), endHouse->getLat())
+						)	);
+
+						if(startGeom && endGeom && startHouseGeom && endHouseGeom)
+						{
+							double distanceStartToStartCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *startGeom));
+							double distanceEndToStartCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *startGeom));
+							double distanceStartToEndCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *endGeom));
+							double distanceEndToEndCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *endGeom));
+
+							// If the first house is further away from the start than the last one and the last house is further away from the end than the first one
+							if(distanceStartToStartCrossing > distanceEndToStartCrossing && distanceStartToEndCrossing < distanceEndToEndCrossing)
+							{
+								// Switch bounds order
+								MainRoadChunk::HouseNumberBounds newBounds(make_pair(leftBounds->second, leftBounds->first));
+								chunk->setLeftHouseNumberBounds(newBounds);
+								chunk->setRightHouseNumberBounds(newBounds);
+							}
+						}
+					}
+				}
+			}
+		}
+
+
 
 		std::string OSMFileFormat::Importer_::_toAlphanumericString(
 			const std::string& input
