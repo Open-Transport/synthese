@@ -39,6 +39,7 @@
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
 #include <geos/geom/LineString.h>
+#include <geos/linearref/LengthIndexedLine.h>
 
 #ifndef UNIX
 #include <geos/util/math.h>
@@ -48,6 +49,7 @@ using namespace std;
 using namespace boost;
 using namespace geos::geom;
 using namespace geos::util;
+using namespace geos::linearref;
 
 namespace synthese
 {
@@ -368,16 +370,14 @@ namespace synthese
 						continue;
 					}
 
-					if(chunk.getLeftHouseNumberBounds() && chunk.getLeftHouseNumberBounds()->first != 0)
+					if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
 					{
-						houseNumber = chunk.getLeftHouseNumberBounds()->first;
-					}
-					else if (chunk.getRightHouseNumberBounds() && chunk.getRightHouseNumberBounds()->first != 0)
-					{
-						houseNumber = chunk.getRightHouseNumberBounds()->first;
-					}
-					else if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
 						continue;
+					}
+
+
+					LengthIndexedLine indexedLine(chunk.getRealGeometry().get());
+					houseNumber = chunk.getHouseNumberFromOffset(indexedLine.project(*(originPoint->getCoordinate())) + chunk.getMetricOffset());
 
 					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
 
@@ -387,7 +387,8 @@ namespace synthese
 					else
 						name = (house.get())->getName();
 
-					if(name == "")continue;
+					if(name == "")
+						continue;
 
 					addHouse(_houseMap, house, name);
 				}

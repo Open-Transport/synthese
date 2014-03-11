@@ -140,6 +140,34 @@ namespace synthese
 			return getMetricOffset();
 		}
 
+		MainRoadChunk::HouseNumber MainRoadChunk::getHouseNumberFromOffset(
+			double metricOffset
+		) const {
+			double relativePosition = (metricOffset - this->getMetricOffset()) / (this->getEndMetricOffset() - this->getMetricOffset());
+			HouseNumberBounds bounds = this->getLeftHouseNumberBounds();
+
+			if(!bounds)
+			{
+				return 0;
+			}
+			if(relativePosition > 1)
+			{
+				return bounds->second;
+			}
+			else if(relativePosition < 0)
+			{
+				return bounds->first;
+			}
+			else
+			{
+				return HouseNumber(
+						   (bounds->first < bounds->second) ?
+						   ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1)) :
+						   floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
+					   );
+			}
+		}
+
 
 
 		MainRoadPart* MainRoadChunk::getMainRoadPart() const

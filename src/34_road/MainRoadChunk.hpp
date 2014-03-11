@@ -150,6 +150,15 @@ namespace synthese
 				graph::MetricOffset getHouseNumberMetricOffset(
 					HouseNumber houseNumber
 				) const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Computes house number for a metric offset
+				/// @param metricOffset the metric offset
+				/// @return the house number closest to this metric offset
+				HouseNumber getHouseNumberFromOffset(
+						double metricOffset
+				) const;
 			//@}
 		};
 }	}
