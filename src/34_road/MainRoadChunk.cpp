@@ -111,15 +111,10 @@ namespace synthese
 			assert(bounds);
 			assert(startOffset <= endOffset);
 
-			if(startOffset == endOffset || bounds->first == bounds->second)
-			{
-				return startOffset;
-			}
-
 			return startOffset + (endOffset - startOffset) * (
 					   (bounds->first < bounds->second) ?
-					   ((double)(houseNumber - bounds->first) / (double)(bounds->second - bounds->first)) :
-					   ((double)(bounds->first - houseNumber) / (double)(bounds->first - bounds->second))
+					   ((double)(houseNumber - (bounds->first - 1)) / (double)((bounds->second + 1) - (bounds->first - 1))) :
+					   ((double)((bounds->first + 1) - houseNumber) / (double)((bounds->first + 1) - (bounds->second - 1)))
 				   )
 			;
 		}
