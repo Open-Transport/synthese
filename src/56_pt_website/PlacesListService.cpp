@@ -380,12 +380,11 @@ namespace synthese
 
 
 					LengthIndexedLine indexedLine(chunk.getRealGeometry().get());
-					houseNumber = chunk.getHouseNumberFromOffset(indexedLine.project(*(originPoint->getCoordinate())) + chunk.getMetricOffset());
-
-					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
+					double metricOffset = indexedLine.project(*(originPoint->getCoordinate())) + chunk.getMetricOffset();
+					boost::shared_ptr<House> house(new House(*roadChunk, metricOffset, true));
 
 					string name;
-					if(houseNumber == 0)
+					if(house->getHouseNumber() == 0)
 						name = chunk.getRoad()->getRoadPlace()->getName();
 					else
 						name = (house.get())->getName();

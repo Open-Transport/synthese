@@ -78,6 +78,15 @@ namespace synthese
 			);
 
 
+
+			House(
+				MainRoadChunk& chunk,
+				double metricOffset,
+				bool numberAtBeginning = true,
+				std::string separator = std::string(" ")
+			);
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			/// @param key identifier (default=0)
