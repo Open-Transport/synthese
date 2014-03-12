@@ -92,9 +92,9 @@ namespace synthese
 		{
 			setName(
 				string(
-					(numberAtBeginning ? lexical_cast<string>(this->getHouseNumber()) : chunk.getRoad()->getRoadPlace()->getName()) +
+					(numberAtBeginning ? lexical_cast<string>(*(this->getHouseNumber())) : chunk.getRoad()->getRoadPlace()->getName()) +
 					separator +
-					(numberAtBeginning ? chunk.getRoad()->getRoadPlace()->getName() : lexical_cast<string>(this->getHouseNumber()))
+					(numberAtBeginning ? chunk.getRoad()->getRoadPlace()->getName() : lexical_cast<string>(*(this->getHouseNumber())))
 			)	);
 			setCity(chunk.getRoad()->getRoadPlace()->getCity());
 		}

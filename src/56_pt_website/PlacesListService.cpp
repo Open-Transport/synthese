@@ -382,7 +382,7 @@ namespace synthese
 					boost::shared_ptr<House> house(new House(*roadChunk, metricOffset, true));
 
 					string name;
-					if(house->getHouseNumber() == 0)
+					if(!house->getHouseNumber() || *(house->getHouseNumber()) == 0)
 						name = chunk.getRoad()->getRoadPlace()->getName();
 					else
 						name = (house.get())->getName();
