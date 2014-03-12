@@ -136,7 +136,9 @@ namespace synthese
 					getLowestDepartureTime(),
 					getHighestDepartureTime(),
 					getLowestArrivalTime(),
-					getHighestArrivalTime()
+					getHighestArrivalTime(),
+					_departurePlace,
+					_arrivalPlace
 				);
 
 				if(_originVAMSpecificAccessParameter)
@@ -149,7 +151,9 @@ namespace synthese
 						getLowestDepartureTime(),
 						getHighestDepartureTime(),
 						getLowestArrivalTime(),
-						getHighestArrivalTime()
+						getHighestArrivalTime(),
+						_departurePlace,
+						_arrivalPlace
 					);
 					ovam = originExtenderToPhysicalStops.run(
 						_originVam,
@@ -291,7 +295,7 @@ namespace synthese
 		) const	{
 #if 0
 			// TODO Work in progress...
-			
+
 			// Loop on each stop
 			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
 			{

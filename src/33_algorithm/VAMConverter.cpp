@@ -47,7 +47,9 @@ namespace synthese
 			const boost::posix_time::ptime& lowestDepartureTime,
 			const boost::posix_time::ptime& highestDepartureTime,
 			const boost::posix_time::ptime& lowestArrivalTime,
-			const boost::posix_time::ptime& highestArrivalTime
+			const boost::posix_time::ptime& highestArrivalTime,
+			const geography::Place* origin,
+			const geography::Place* destination
 		):	_accessParameters(accessParameters),
 			_logger(logger),
 			_whatToSearch(whatToSearch),
@@ -55,7 +57,9 @@ namespace synthese
 			_lowestDepartureTime(lowestDepartureTime),
 			_highestDepartureTime(highestArrivalTime),
 			_lowestArrivalTime(lowestArrivalTime),
-			_highestArrivalTime(highestArrivalTime)
+			_highestArrivalTime(highestArrivalTime),
+			_origin(origin),
+			_destination(destination)
 		{}
 
 
@@ -71,6 +75,8 @@ namespace synthese
 			if(AlgorithmModule::GetUseAStarForPhysicalStopsExtender())
 			{
 				AStarShortestPathCalculator asspc(
+					_origin,
+					_destination,
 					(direction == DEPARTURE_TO_ARRIVAL ? _lowestDepartureTime : _highestArrivalTime),
 					_accessParameters,
 					direction
@@ -140,19 +146,19 @@ namespace synthese
 						result.insert(
 							it.first,
 							VertexAccess(
-		                        itps.second.approachTime +
+								itps.second.approachTime +
 								(	direction == DEPARTURE_TO_ARRIVAL ?
 									vertex->getHub()->getTransferDelay(*vertex, *it.first) :
 									vertex->getHub()->getTransferDelay(*it.first, *vertex)
 								),
-		                        itps.second.approachDistance,
-		                        itps.second.approachJourney
+								itps.second.approachDistance,
+								itps.second.approachJourney
 						)	);
 					}
 				}
 
 
-				Journey candidate;
+
 				BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, resultJourneys.getJourneys())
 				{
 					JourneysResult::ResultSet::key_type oj(it.first);

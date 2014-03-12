@@ -188,6 +188,11 @@ namespace synthese
 						);
 						originApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
 						finalResult.append(originApproachJourney);
+						// Report customGeometries added in AStar to display correctly foot steps near departure
+						if (originApproachJourney.hasToDrawDeparture())
+						{
+							finalResult.setDepartureGeometry(originApproachJourney.getDepartureGeometry());
+						}
 					}
 				}
 
@@ -205,8 +210,14 @@ namespace synthese
 						);
 						goalApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
 						finalResult.append(goalApproachJourney);
+						// Report customGeometries added in AStar to display correctly foot steps near arrival place
+						if (goalApproachJourney.hasToDrawArrival())
+						{
+							finalResult.setArrivalGeometry(goalApproachJourney.getArrivalGeometry());
+						}
 					}
 				}
+
 				return finalResult;
 			}// If no result with no duration filter at first run then try with duration filter at first run
 			else if(ignoreDurationFilterFirstRun && (_maxDuration || _maxTransferDuration))
