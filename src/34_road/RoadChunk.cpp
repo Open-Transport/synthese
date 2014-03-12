@@ -198,17 +198,18 @@ namespace synthese
 			MetricOffset metricOffset
 		) const	{
 			boost::shared_ptr<LineString> geometry(_forwardEdge->getRealGeometry());
+			double offset = metricOffset - _forwardEdge->getMetricOffset();
 			if(!geometry.get() || geometry->isEmpty())
 			{
 				return _crossing->getGeometry();
 			}
-			if(metricOffset > geometry->getLength())
+			if(offset > geometry->getLength())
 			{
 				return boost::shared_ptr<Point>(geometry->getEndPoint());
 			}
 			return boost::shared_ptr<Point>(
 				geometry->getFactory()->createPoint(
-					LengthIndexedLine(geometry.get()).extractPoint(metricOffset)
+					LengthIndexedLine(geometry.get()).extractPoint(offset)
 			)	);
 		}
 
@@ -266,16 +267,11 @@ namespace synthese
 			assert(bounds);
 			assert(startOffset <= endOffset);
 
-			if(startOffset == endOffset || bounds->first == bounds->second)
-			{
-				return startOffset;
-			}
-
 			return
 				startOffset + (endOffset - startOffset) * (
 					(bounds->first < bounds->second) ?
-					((double)(houseNumber - bounds->first) / (double)(bounds->second - bounds->first)) :
-					((double)(bounds->first - houseNumber) / (double)(bounds->first - bounds->second))
+					((double)(houseNumber - (bounds->first - 1)) / (double)((bounds->second + 1) - (bounds->first - 1))) :
+					((double)((bounds->first + 1) - houseNumber) / (double)((bounds->first + 1) - (bounds->second - 1)))
 				)
 			;
 		}
