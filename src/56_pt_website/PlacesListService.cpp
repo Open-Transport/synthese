@@ -353,7 +353,6 @@ namespace synthese
 				BOOST_FOREACH(const RoadChunkTableSync::SearchResult::value_type& roadChunk, roadChunks)
 				{
 					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
-					MainRoadChunk::HouseNumber houseNumber(0);
 
 					bool compatibleWithUserClasses(true);
 					BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
@@ -374,7 +373,6 @@ namespace synthese
 					{
 						continue;
 					}
-
 
 					LengthIndexedLine indexedLine(chunk.getRealGeometry().get());
 					double metricOffset = indexedLine.project(*(originPoint->getCoordinate())) + chunk.getMetricOffset();
