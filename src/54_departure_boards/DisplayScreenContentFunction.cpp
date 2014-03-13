@@ -103,6 +103,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA("timetable_grouped_by_area");
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
 		const string DisplayScreenContentFunction::PARAMETER_SPLIT_CONTINUOUS_SERVICES("split_continuous_services");
+		const string DisplayScreenContentFunction::PARAMETER_MAX_DAYS_NEXT_DEPARTURES("max_days_next_departures");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -668,6 +669,8 @@ namespace synthese
 						_useSAEDirectConnection = false;
 				}
 
+				_maxDaysNextDepartures = map.getDefault<int>(PARAMETER_MAX_DAYS_NEXT_DEPARTURES, 1);
+
 				// Type control
 				if(!_screen->getType())
 				{
@@ -1138,6 +1141,8 @@ namespace synthese
 				typedef map<LineDestinationKey, OrderedServices, LineDestinationKey_comparator> DeparturesByDestination;
 				typedef map<const StopArea*, DeparturesByDestination> DestinationsServicesByArea;
 
+				set<RegistryKeyType> linesWithRealTime;
+
 				DestinationsServicesByArea serviceMap;
 
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
@@ -1305,6 +1310,8 @@ namespace synthese
 								if(!realTimeService.commercialLine)
 									continue;
 
+								linesWithRealTime.insert(realTimeService.commercialLine->getKey());
+
 								if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
 								{
 									bool displayDeparture(false);
@@ -1382,16 +1389,18 @@ namespace synthese
 					{
 						endDateTime = (_date ? *_date : now);
 						startDateTime = endDateTime.time_of_day().hours() < 3 ?
-							endDateTime - endDateTime.time_of_day() - hours(21) :
-							endDateTime - endDateTime.time_of_day() + hours(3);
+							endDateTime - endDateTime.time_of_day() - hours(_maxDaysNextDepartures * 24) + hours(3) :
+							endDateTime - endDateTime.time_of_day() - hours((_maxDaysNextDepartures * 24) - 1) + hours(3);
 					}
 					else
 					{
 						startDateTime = (_date ? *_date : now);
 						endDateTime = startDateTime.time_of_day().hours() < 3 ?
-							startDateTime - startDateTime.time_of_day() + hours(3) :
-							startDateTime - startDateTime.time_of_day() + hours(27);
+							startDateTime - startDateTime.time_of_day() + hours((_maxDaysNextDepartures - 1) * 24) + hours(3) :
+							startDateTime - startDateTime.time_of_day() + hours(_maxDaysNextDepartures * 24) + hours(3);
 					}
+
+					cerr << startDateTime << " " << endDateTime << endl;
 
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
@@ -1529,10 +1538,6 @@ namespace synthese
 						const CommercialLine* commercialLine(destinationMap.first.first);
 						const StopArea* destination(destinationMap.first.second);
 
-						string curShortName = boost::algorithm::to_lower_copy(
-							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-						);
-
 						boost::shared_ptr<ParametersMap> schedulePM(new ParametersMap());
 
 						boost::shared_ptr<ParametersMap> linePM(new ParametersMap());
@@ -1545,7 +1550,7 @@ namespace synthese
 
 						const StopPoint* stop(NULL);
 
-						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+						if(noRealTime || linesWithRealTime.find(commercialLine->getKey()) == linesWithRealTime.end())
 						{
 							for(OrderedServices::second_type::const_iterator it = destinationMap.second.second.begin() ; it != destinationMap.second.second.end() ; it++)
 							{

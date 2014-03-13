@@ -84,6 +84,7 @@ namespace synthese
 			static const std::string PARAMETER_TIMETABLE_GROUPED_BY_AREA;
 			static const std::string PARAMETER_DATA_SOURCE_FILTER;
 			static const std::string PARAMETER_SPLIT_CONTINUOUS_SERVICES;
+			static const std::string PARAMETER_MAX_DAYS_NEXT_DEPARTURES;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -181,6 +182,7 @@ namespace synthese
 				bool _splitContinuousServices;
 				LineDestinationFilter _lineDestinationFilter;
 				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
+				int _maxDaysNextDepartures;
 
 				typedef std::map<std::string, std::set<util::RegistryKeyType> > SAELine;
 				static SAELine _SAELine;
