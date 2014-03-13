@@ -498,12 +498,7 @@ namespace synthese
 									continue;
 							}
 
-							lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit newHit;
-							newHit.score.phoneticScore = score;
-							newHit.score.levenshtein = item.score.levenshtein;
-							newHit.key = item.key;
-							newHit.value = item.value;
-							newStopResult.push_back(newHit);
+							newStopResult.push_back(item);
 
 							if(_number && (newStopResult.size() >= (*_number)))
 							{
@@ -655,12 +650,7 @@ namespace synthese
 									continue;
 							}
 
-							lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHit newHit;
-							newHit.score.phoneticScore = score;
-							newHit.score.levenshtein = item.score.levenshtein;
-							newHit.key = item.key;
-							newHit.value = item.value;
-							newStopResult.push_back(newHit);
+							newStopResult.push_back(item);
 
 							if(_number && (newStopResult.size() >= (*_number)))
 							{
