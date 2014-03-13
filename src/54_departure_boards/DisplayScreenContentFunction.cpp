@@ -1400,8 +1400,6 @@ namespace synthese
 							startDateTime - startDateTime.time_of_day() + hours(_maxDaysNextDepartures * 24) + hours(3);
 					}
 
-					cerr << startDateTime << " " << endDateTime << endl;
-
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
 						// Jump over junctions
