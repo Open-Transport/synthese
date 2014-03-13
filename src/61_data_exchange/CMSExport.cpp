@@ -190,8 +190,8 @@ namespace synthese
 			{
 				path currentFile(directoryPath / currentDir / pageNameWithExt);
 				_logLoad("Creation of page: " + currentFile.string());
-				ofstream file( currentFile.string().c_str() );
-				file << content.getCMSScript().getCode().c_str();
+				ofstream file( currentFile.string().c_str(), ios::out | ios::binary );
+				file << content.getCMSScript().getCode();
 				file.close();
 				// If there are subpages we need to differentiate the file and the dir
 				pageName += ".dir";
