@@ -567,19 +567,23 @@ namespace synthese
 					if(it != path.end() && customizeGeometries && (*it)->getParentPath() == currentPath)
 					{
 						boost::shared_ptr<LineString> currentGeometry((*it)->getRealGeometry());
-						CoordinateSequence* cs;
+						boost::shared_ptr<CoordinateSequence> cs;
+						CoordinateSequence* tempCs;
 
 						if (_direction == DEPARTURE_TO_ARRIVAL)
 						{
-							cs = newGeometry->getCoordinates();
-							cs->add(currentGeometry->getCoordinates(),false,true);
+							cs = boost::shared_ptr<CoordinateSequence>(newGeometry->getCoordinates());
+							tempCs = currentGeometry->getCoordinates();
+							cs->add(tempCs,false,true);
 						}
 						else
 						{
-							cs = currentGeometry->getCoordinates();
-							cs->add(newGeometry->getCoordinates(),false,true);
+							cs = boost::shared_ptr<CoordinateSequence>(currentGeometry->getCoordinates());
+							tempCs = newGeometry->getCoordinates();
+							cs->add(tempCs,false,true);
 						}
 						newGeometry = boost::shared_ptr<LineString>(CoordinatesSystem::GetDefaultGeometryFactory().createLineString(cs->clone()));
+						delete tempCs;
 					}
 				}
 				while(it != path.end() && currentPath == (*it)->getParentPath() && (_direction == algorithm::DEPARTURE_TO_ARRIVAL ? startMetricOffset < (*it)->getMetricOffset() : startMetricOffset > (*it)->getMetricOffset()));
