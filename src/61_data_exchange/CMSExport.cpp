@@ -231,7 +231,6 @@ namespace synthese
 
 			if(_withMetadata)
 			{
-				// TODO Generate metadata file
 				auto_ptr<InterSYNTHESEPackage> package(new InterSYNTHESEPackage);
 				package->set<Objects>( objectToSave );
 				ofstream metadataStream;
