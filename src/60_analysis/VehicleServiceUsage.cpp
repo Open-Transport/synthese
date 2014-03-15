@@ -99,7 +99,7 @@ namespace synthese
 				return;
 			}
 
-			time_duration lastArrival;
+			time_duration lastArrival(not_a_date_time);
 			time_duration commercialDuration(minutes(0));
 			time_duration deadRunDuration(minutes(0));
 			time_duration waitingDuration(minutes(0));
