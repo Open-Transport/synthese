@@ -68,8 +68,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
 					FIELD_DEFAULT_CONSTRUCTOR(Dates),
 					FIELD_DEFAULT_CONSTRUCTOR(OperationUnit),
-					FIELD_DEFAULT_CONSTRUCTOR(OpeningDuration),
-					FIELD_DEFAULT_CONSTRUCTOR(ClosingDuration)
+					FIELD_VALUE_CONSTRUCTOR(OpeningDuration, minutes(0)),
+					FIELD_VALUE_CONSTRUCTOR(ClosingDuration, minutes(0))
 			)	)
 		{}
 
