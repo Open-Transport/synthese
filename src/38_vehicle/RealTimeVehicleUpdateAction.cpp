@@ -145,7 +145,7 @@ namespace synthese
 						size_t rank(map.get<size_t>(PARAMETER_VEHICLE_SERVICE_SERVICE_RANK));
 
 						size_t curRank(0);
-						BOOST_FOREACH(SchedulesBasedService* service, vehicleService->getServices())
+						BOOST_FOREACH(SchedulesBasedService* service, vehicleService->get<Services>())
 						{
 							if(service->isActive(now.date()))
 							{

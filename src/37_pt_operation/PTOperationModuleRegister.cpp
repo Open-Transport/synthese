@@ -29,7 +29,6 @@
 
 #include "DepotUpdateAction.hpp"
 #include "DriverServiceUpdateAction.hpp"
-#include "VehicleServiceUpdateAction.hpp"
 
 #include "Depot.hpp"
 #include "DeadRun.hpp"
@@ -67,7 +66,6 @@ void synthese::pt_operation::moduleRegister()
 
 	synthese::pt_operation::DepotUpdateAction::integrate();
 	synthese::pt_operation::DriverServiceUpdateAction::integrate();
-	synthese::pt_operation::VehicleServiceUpdateAction::integrate();
 
 	synthese::pt_operation::DepotAdmin::integrate();
 	synthese::pt_operation::DepotsAdmin::integrate();

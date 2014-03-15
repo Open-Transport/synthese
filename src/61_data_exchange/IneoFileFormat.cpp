@@ -955,7 +955,7 @@ namespace synthese
 							sb + "/" + lexical_cast<string>(ph) + (_vehicleServiceSuffix.empty() ? string() : ("/"+ _vehicleServiceSuffix)),
 							optional<optional<OperationUnit&> >()
 						);
-						vehicleService->setName(sb);
+						vehicleService->set<Name>(sb);
 
 						// Schedules initialization
 						departureSchedules.clear();

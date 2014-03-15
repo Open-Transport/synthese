@@ -184,7 +184,7 @@ namespace synthese
 					}
 
 					// Operation unit filter
-					if(_operationUnit && (!vs.getOperationUnit() || &*vs.getOperationUnit() != &*_operationUnit))
+					if(_operationUnit && (!vs.get<OperationUnit>() || &*vs.get<OperationUnit>() != &*_operationUnit))
 					{
 						continue;
 					}
@@ -192,8 +192,8 @@ namespace synthese
 					// Name filter
 					if(!_name.empty())
 					{
-						if(	vs.getName().size() < _name.size() ||
-							vs.getName().substr(0, _name.size()) != _name
+						if(	vs.get<Name>().size() < _name.size() ||
+							vs.get<Name>().substr(0, _name.size()) != _name
 						){
 							continue;
 						}
@@ -203,7 +203,7 @@ namespace synthese
 					if(_scheduledService)
 					{
 						bool result(false);
-						BOOST_FOREACH(const VehicleService::Services::value_type service, vs.getServices())
+						BOOST_FOREACH(const Services::Type::value_type& service, vs.get<Services>())
 						{
 							if(!dynamic_cast<const ScheduledService*>(service))
 							{

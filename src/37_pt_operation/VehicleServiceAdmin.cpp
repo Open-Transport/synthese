@@ -47,7 +47,7 @@
 #include "DriverServiceAdmin.hpp"
 #include "ImportableAdmin.hpp"
 #include "StaticActionRequest.h"
-#include "VehicleServiceUpdateAction.hpp"
+#include "ObjectUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -56,6 +56,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
+	using namespace db;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -172,7 +173,7 @@ namespace synthese
 				stream << t.open();
 				size_t rank(0);
 				const Hub* lastHub(NULL);
-				BOOST_FOREACH(SchedulesBasedService* service, _vehicleService->getServices())
+				BOOST_FOREACH(SchedulesBasedService* service, _vehicleService->get<Services>())
 				{
 					if(!_date.is_not_a_date() && !service->isActive(_date))
 					{
@@ -319,8 +320,8 @@ namespace synthese
 			// OPERATOR CODES TAB
 			if (openTabContent(stream, ImportableAdmin::TAB_DATA_SOURCES))
 			{
-				StaticActionRequest<VehicleServiceUpdateAction> updateOnlyRequest(request);
-				updateOnlyRequest.getAction()->setVehicleService(const_pointer_cast<VehicleService>(_vehicleService));
+				StaticActionRequest<ObjectUpdateAction> updateOnlyRequest(request);
+				updateOnlyRequest.getAction()->setObject(*_vehicleService);
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_vehicleService, updateOnlyRequest);
 			}
 

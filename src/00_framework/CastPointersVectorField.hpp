@@ -1,6 +1,6 @@
 
-/** SimpleObjectField_Date class header.
-	@file SimpleObjectField_Date.hpp
+/** CastPointerVectorField class header.
+	@file CastPointersVectorField.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE__VectorField_hpp__
-#define SYNTHESE__VectorField_hpp__
+#ifndef SYNTHESE__CastPointersVectorField_hpp__
+#define SYNTHESE__CastPointersVectorField_hpp__
 
 #include "SimpleObjectFieldDefinition.hpp"
+
+#include "DBModule.h" // Temporary modules dependencies rule violation : will be useless when Env::getEditable will be able to chose a registry dynamically.
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -32,10 +34,10 @@
 namespace synthese
 {
 	//////////////////////////////////////////////////////////////////////////
-	/// Pointers vector field.
+	/// Cast Pointers vector field.
 	/// @ingroup m00
 	template<class C, class T>
-	class PointersVectorField:
+	class CastPointersVectorField:
 		public SimpleObjectFieldDefinition<C>
 	{
 	public:
@@ -46,7 +48,7 @@ namespace synthese
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string ToString(const typename PointersVectorField<C, T>::Type& p)
+		static std::string ToString(const typename CastPointersVectorField<C, T>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
@@ -72,7 +74,7 @@ namespace synthese
 
 	public:
 		static bool LoadFromRecord(
-			typename PointersVectorField<C, T>::Type& fieldObject,
+			typename CastPointersVectorField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -82,7 +84,7 @@ namespace synthese
 				return false;
 			}
 
-			typename PointersVectorField<C, T>::Type value;
+			typename CastPointersVectorField<C, T>::Type value;
 			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
 			if(!text.empty())
 			{
@@ -92,8 +94,24 @@ namespace synthese
 				{
 					try
 					{
+						T* lObject(
+							dynamic_cast<T*>(
+								db::DBModule::GetEditableObject( // Temporary modules dependencies rule violation : will be useless when Env::getEditable will be able to chose a registry dynamically.
+									boost::lexical_cast<util::RegistryKeyType>(item),
+									const_cast<util::Env&>(env)
+								).get()
+						) );
+						if(!lObject)
+						{
+							util::Log::GetInstance().warn(
+								"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+								object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
+								item + " was not convertible into the specified type."
+							);
+							continue;
+						}
 						value.push_back(
-							env.getEditable<T>(boost::lexical_cast<util::RegistryKeyType>(item)).get()
+							lObject
 						);
 					}
 					catch(boost::bad_lexical_cast&)
@@ -104,7 +122,7 @@ namespace synthese
 							item + " is not a valid id."
 						);
 					}
-					catch(util::ObjectNotFoundException<T>&)
+					catch(util::ObjectNotFoundException<util::Registrable>&)
 					{
 						util::Log::GetInstance().warn(
 							"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
@@ -129,7 +147,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename PointersVectorField<C, T>::Type& fieldObject,
+			const typename CastPointersVectorField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -143,7 +161,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename PointersVectorField<C, T>::Type& fieldObject,
+			const typename CastPointersVectorField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
@@ -161,7 +179,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename PointersVectorField<C, T>::Type& fieldObject,
+			const typename CastPointersVectorField<C, T>::Type& fieldObject,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
@@ -179,7 +197,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename PointersVectorField<C, T>::Type& fieldObject,
+			const typename CastPointersVectorField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
@@ -218,7 +236,7 @@ namespace synthese
 		}	}
 	};
 
-	#define FIELD_POINTERS_VECTOR(N, T) struct N : public PointersVectorField<N, T> {};
+	#define FIELD_CAST_POINTERS_VECTOR(N, T) struct N : public CastPointersVectorField<N, T> {};
 }
 
 #endif

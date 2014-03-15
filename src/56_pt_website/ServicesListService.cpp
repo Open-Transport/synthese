@@ -236,13 +236,13 @@ namespace synthese
 				BOOST_FOREACH(const VehicleService::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<VehicleService>())
 				{
 					// Apply unit filter
-					if(!it.second->getOperationUnit() || &*it.second->getOperationUnit() != _operationUnit.get())
+					if(!it.second->get<OperationUnit>() || &*it.second->get<OperationUnit>() != _operationUnit.get())
 					{
 						continue;
 					}
 
 					// Get all services of the service
-					BOOST_FOREACH(const VehicleService::Services::value_type& service, it.second->getServices())
+					BOOST_FOREACH(const Services::Type::value_type& service, it.second->get<Services>())
 					{
 						_addServiceIfCompliant(result, *service);
 					}

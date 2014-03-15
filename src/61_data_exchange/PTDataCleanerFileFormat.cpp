@@ -150,7 +150,7 @@ namespace synthese
 			// Vehicle services
 			ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(dataSource, _env);
 			VehicleService::DriverServiceChunks emptyVSChunks;
-			VehicleService::Services emptyVSServices;
+			Services::Type emptyVSServices;
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::value_type& itVSSet, vehicleServices.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::mapped_type::value_type& itVS, itVSSet.second)
@@ -161,8 +161,8 @@ namespace synthese
 					}
 
 					*itVS -= _calendar;
-					itVS->setServices(emptyVSServices);
-					itVS->setDriverServices(emptyVSChunks);
+					itVS->set<Services>(emptyVSServices);
+					itVS->setDriverServiceChunks(emptyVSChunks);
 			}	}
 		}
 
@@ -233,7 +233,7 @@ namespace synthese
 			BOOST_FOREACH(const Registry<VehicleService>::value_type& itVehicleService, _env.getRegistry<VehicleService>())
 			{
 				if(	itVehicleService.second->hasLinkWithSource(dataSource) &&
-					(	itVehicleService.second->getServices().empty() ||
+					(	itVehicleService.second->get<Services>().empty() ||
 						itVehicleService.second->empty()
 				)	){
 					_vehicleServicesToRemove.insert(itVehicleService.second);

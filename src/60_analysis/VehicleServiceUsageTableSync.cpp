@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-///	VehicleServiceTableSync class implementation.
-///	@file VehicleServiceTableSync.cpp
+///	VehicleServiceUsageTableSync class implementation.
+///	@file VehicleServiceUsageTableSync.cpp
 ///	@author Hugues Romain
 ///	@date 2011
 ///
@@ -22,7 +22,7 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "VehicleServiceTableSync.hpp"
+#include "VehicleServiceUsageTableSync.hpp"
 
 #include "DataSourceLinksField.hpp"
 #include "OperationUnit.hpp"
@@ -43,6 +43,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace analysis;
 	using namespace db;
 	using namespace util;
 	using namespace pt_operation;
@@ -51,18 +52,18 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,VehicleServiceTableSync>::FACTORY_KEY("37.05 Vehicle services");
+		template<> const string FactorableTemplate<DBTableSync,VehicleServiceUsageTableSync>::FACTORY_KEY("60.01 Vehicle service usages");
 	}
 
 	namespace db
 	{
-		template<> const DBTableSync::Format DBTableSyncTemplate<VehicleServiceTableSync>::TABLE(
-			"t077_vehicle_services"
+		template<> const DBTableSync::Format DBTableSyncTemplate<VehicleServiceUsageTableSync>::TABLE(
+			"t117_vehicle_service_usages"
 		);
 
 
 
-		template<> const Field DBTableSyncTemplate<VehicleServiceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<VehicleServiceUsageTableSync>::_FIELDS[]=
 		{
 			Field()
 		};
@@ -70,16 +71,21 @@ namespace synthese
 
 
 		template<>
-		DBTableSync::Indexes DBTableSyncTemplate<VehicleServiceTableSync>::GetIndexes()
+		DBTableSync::Indexes DBTableSyncTemplate<VehicleServiceUsageTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(OperationUnit::FIELD.name.c_str(), ""));
+			r.push_back(
+				DBTableSync::Index(
+					Dates::FIELD.name.c_str(),
+					VehicleService::FIELD.name.c_str(),
+					""
+			)	);
 			return r;
 		}
 
 
 
-		template<> bool DBTableSyncTemplate<VehicleServiceTableSync>::CanDelete(
+		template<> bool DBTableSyncTemplate<VehicleServiceUsageTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
@@ -89,7 +95,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<VehicleServiceTableSync>::BeforeDelete(
+		template<> void DBTableSyncTemplate<VehicleServiceUsageTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -97,7 +103,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<VehicleServiceTableSync>::AfterDelete(
+		template<> void DBTableSyncTemplate<VehicleServiceUsageTableSync>::AfterDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -105,7 +111,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<VehicleServiceTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<VehicleServiceUsageTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
@@ -115,30 +121,30 @@ namespace synthese
 
 
 
-	namespace pt_operation
+	namespace analysis
 	{
-		VehicleServiceTableSync::SearchResult VehicleServiceTableSync::Search(
+		VehicleServiceUsageTableSync::SearchResult VehicleServiceUsageTableSync::Search(
 			util::Env& env,
-			boost::optional<std::string> name,
-			boost::optional<util::RegistryKeyType> searchUnit,
+			boost::gregorian::date day,
+			boost::optional<pt_operation::VehicleService&> vehicleService,
 			size_t first /*= 0*/,
-			optional<size_t> number /*= boost::optional<std::size_t>()*/,
-			bool orderByName,
+			bool orderByDay,
 			bool raisingOrder,
+			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			util::LinkLevel linkLevel
 		){
-			SelectQuery<VehicleServiceTableSync> query;
-			if(name)
+			SelectQuery<VehicleServiceUsageTableSync> query;
+			if(!day.is_not_a_date())
 			{
-				query.addWhereField(Name::FIELD.name, "%"+ *name +"%", ComposedExpression::OP_LIKE);
+				query.addWhereField(Date::FIELD.name, to_simple_string(day));
 			}
-			if(searchUnit)
+			if(vehicleService)
 			{
-				query.addWhereField(OperationUnit::FIELD.name, *searchUnit);
+				query.addWhereField(VehicleService::FIELD.name, vehicleService->get<Key>());
 			}
-			if(orderByName)
+			if(orderByDay)
 			{
-				query.addOrderField(Name::FIELD.name, raisingOrder);
+				query.addOrderField(Date::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
