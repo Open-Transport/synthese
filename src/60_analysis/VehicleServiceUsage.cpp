@@ -22,11 +22,14 @@
 
 #include "VehicleServiceUsage.hpp"
 
+#include "DeadRun.hpp"
+
 using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace analysis;
+	using namespace pt;
 	using namespace pt_operation;
 	using namespace util;
 
@@ -97,6 +100,11 @@ namespace synthese
 			}
 
 			time_duration lastArrival;
+			time_duration commercialDuration(minutes(0));
+			time_duration deadRunDuration(minutes(0));
+			time_duration waitingDuration(minutes(0));
+			double commercialKM(0);
+			double deadRunKM(0);
 
 			// Loop on services contained in the vehicle service
 			BOOST_FOREACH(const Services::Type::value_type& service, get<VehicleService>()->get<Services>())
@@ -107,10 +115,43 @@ namespace synthese
 					continue;
 				}
 
+				// Get the data from the service
+				time_duration startTime(*service->getDataDepartureSchedules().begin());
+				time_duration endTime(*service->getDataArrivalSchedules().rbegin());
 
+				// Waiting duration between last arrival and departure
+				if(!lastArrival.is_not_a_date_time())
+				{
+					waitingDuration += startTime - lastArrival;
+				}
+
+				// Trip duration and distance
+				if(dynamic_cast<DeadRun*>(service))
+				{
+					deadRunDuration += (endTime - startTime);
+					deadRunKM += double(dynamic_cast<DeadRun*>(service)->length()) / 1000;
+				}
+				else
+				{
+					commercialDuration += (endTime - startTime);
+					JourneyPattern& jp(dynamic_cast<JourneyPattern&>(*service->getPath()));
+					commercialKM += double(jp.getPlannedLength() ? jp.getPlannedLength() : jp.length()) / 1000;
+				}
+
+				// Save the last arrival time
+				lastArrival = endTime;
 			}
 
+			// Save data from last loop
+			set<PlannedCommercialHours>(double(commercialDuration.total_seconds()) / 3600);
+			set<PlannedDeadRunHours>(double(deadRunDuration.total_seconds()) / 3600);
+			set<PlannedWaitingHours>(double(waitingDuration.total_seconds()) / 3600);
+			set<PlannedCommercialKM>(commercialKM);
+			set<PlannedDeadRunKM>(deadRunKM);
 
+			// Add opening and closing hours
+			set<PlannedOpeningHours>(double(get<VehicleService>()->get<OpeningDuration>().total_seconds()) / 3600);
+			set<PlannedClosingHours>(double(get<VehicleService>()->get<ClosingDuration>().total_seconds()) / 3600);
 		}
 
 
