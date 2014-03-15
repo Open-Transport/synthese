@@ -69,7 +69,7 @@ namespace synthese
 				throw ActionException("Start and end dates are not defined");
 			}
 
-			if(_startDate < _endDate)
+			if(_startDate > _endDate)
 			{
 				date swap(_startDate);
 				_startDate = _endDate;
@@ -82,6 +82,7 @@ namespace synthese
 		void GenerateVehicleServiceUsagesAction::run(
 			Request& request
 		){
+			Env env;
 			DBTransaction transaction;
 			BOOST_FOREACH(const VehicleService::Registry::value_type& itService, Env::GetOfficialEnv().getRegistry<VehicleService>())
 			{
@@ -99,13 +100,36 @@ namespace synthese
 						continue;
 					}
 
-					VehicleServiceUsage usage(
-						VehicleServiceUsageTableSync::getId(),
-						vehicleService,
-						itDate
-					);
-					usage.generate();
-					VehicleServiceUsageTableSync::Save(&usage, transaction);
+					boost::shared_ptr<VehicleServiceUsage> usage;
+
+					// Search for existing object
+					VehicleServiceUsageTableSync::SearchResult existingUsages(
+						VehicleServiceUsageTableSync::Search(
+							env,
+							itDate,
+							vehicleService
+					)	);
+
+					// If exists, get the object
+					if(existingUsages.size() >= 1)
+					{
+						usage = *existingUsages.begin();
+					}
+					else // else create one
+					{
+						usage.reset(
+							new VehicleServiceUsage(
+								VehicleServiceUsageTableSync::getId(),
+								vehicleService,
+								itDate
+						)	);
+					}
+
+					// Generate the usage from the data present in the database
+					usage->generate();
+
+					// Save
+					VehicleServiceUsageTableSync::Save(usage.get(), transaction);
 			}	}
 
 			transaction.run();
