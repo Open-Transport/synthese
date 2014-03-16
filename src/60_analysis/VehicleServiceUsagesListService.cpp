@@ -74,7 +74,7 @@ namespace synthese
 				throw ActionException("Start and end dates are not defined");
 			}
 
-			if(_startDate < _endDate)
+			if(_startDate > _endDate)
 			{
 				date swap(_startDate);
 				_startDate = _endDate;
@@ -145,7 +145,7 @@ namespace synthese
 						{
 							boost::shared_ptr<ParametersMap> dayPM(new ParametersMap);
 							usage->toParametersMap(*dayPM, true);
-							map.insert(TAG_USAGE, dayPM);
+							servicePM->insert(TAG_USAGE, dayPM);
 						}
 					}
 				}
