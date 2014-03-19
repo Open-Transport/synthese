@@ -390,6 +390,9 @@ namespace synthese
 							if (!currentJourney.empty() &&
 								dynamic_cast<const Road*>(currentJourney.getEndEdge().getParentPath()))
 								continue;
+							// Junction should not start or end a journey
+							if (currentJourney.empty())
+								continue;
 						}
 						if(!currentJourney.empty())
 						{
