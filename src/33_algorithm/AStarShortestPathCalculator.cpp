@@ -583,18 +583,22 @@ namespace synthese
 
 					if(_direction == DEPARTURE_TO_ARRIVAL)
 					{
+						CoordinateSequence* cs;
 						if(startGeometry && it == path.begin())
 						{
-							customSequence->add(startGeometry->getCoordinates(), false, true);
+							cs = startGeometry->getCoordinates();
 						}
 						else if(endGeometry && (it + 1) == path.end())
 						{
-							customSequence->add(endGeometry->getCoordinates(), false, true);
+							cs = endGeometry->getCoordinates();
 						}
 						else
 						{
-							customSequence->add(currentGeometry->getCoordinates(), false, true);
+							cs = currentGeometry->getCoordinates();
 						}
+						customSequence->add(cs, false, true);
+
+						delete cs;
 					}
 					else
 					{
@@ -611,7 +615,7 @@ namespace synthese
 						{
 							cs = currentGeometry->getCoordinates();
 						}
-						cs->add(customSequence->clone(), false, true);
+						cs->add(customSequence, false, true);
 
 						delete customSequence;
 						customSequence = cs;
