@@ -354,8 +354,9 @@ namespace synthese
 				}
 				if(edge->getGeometry().get())
 					hasGeometry = true;
-				boost::shared_ptr<LineString> geometry;
 				
+				boost::shared_ptr<LineString> geometry;
+				try
 				{
 					geometry = edge->getRealGeometry();
 				}
