@@ -603,6 +603,10 @@ namespace synthese
 			if(getProjectedPoint().getRoadChunk())
 			{
 				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
+				if(getProjectedPoint().getRoadChunk()->getNext())
+				{
+					static_cast<Crossing*>(getProjectedPoint().getRoadChunk()->getNext()->getFromVertex())->addReachableVertex(this);
+				}
 			}
 		}
 }	}
