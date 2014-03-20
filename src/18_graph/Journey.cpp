@@ -35,9 +35,6 @@
 
 #include <limits>
 #include <boost/foreach.hpp>
-#include <geos/geom/LineString.h>
-#include <geos/geom/GeometryFactory.h>
-#include <geos/geom/CoordinateSequence.h>
 
 #undef max
 
@@ -48,7 +45,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace pt;
-
+	
 	namespace graph
 	{
 		Journey::Journey(
@@ -323,25 +320,5 @@ namespace synthese
 			{
 				service.setServiceRange(duration);
 			}
-		}
-
-		void Journey::setDepartureGeometry(boost::shared_ptr<geos::geom::LineString> geometry)
-		{
-			_departureGeometry = boost::shared_ptr<geos::geom::LineString>(CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createLineString(*geometry));
-		}
-
-		void Journey::setArrivalGeometry(boost::shared_ptr<geos::geom::LineString> geometry)
-		{
-			_arrivalGeometry = boost::shared_ptr<geos::geom::LineString>(CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createLineString(*geometry));
-		}
-
-		bool Journey::hasToDrawDeparture() const
-		{
-			return _departureGeometry;
-		}
-
-		bool Journey::hasToDrawArrival() const
-		{
-			return _arrivalGeometry;
 		}
 }	}

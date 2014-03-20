@@ -86,6 +86,7 @@ namespace synthese
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::time_duration	_range;
 				bool			_canceled;
+				boost::shared_ptr<geos::geom::LineString> _customGeometry;
 			//@}
 
 		public:
@@ -186,6 +187,8 @@ namespace synthese
 				);
 
 				void shift(boost::posix_time::time_duration duration);
+
+				void setCustomGeometry(boost::shared_ptr<geos::geom::LineString> geometry);
 			//@}
 
 			//! @name Queries

@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_AStarShortestPathCalculator_H__
 #define SYNTHESE_AStarShortestPathCalculator_H__
 
-#include <queue>
-
 #include "AccessParameters.h"
 #include "AlgorithmTypes.h"
+
+#include <queue>
+
+#include <geos/geom/LineString.h>
 
 namespace geos
 {
@@ -57,6 +59,7 @@ namespace synthese
 
 	namespace road
 	{
+		class Address;
 		class Crossing;
 		class RoadChunk;
 	}
@@ -136,6 +139,16 @@ namespace synthese
 				const pt::StopPoint* arrival,
 				const boost::shared_ptr<AStarNode> lastNode
 			) const;
+
+
+
+			boost::shared_ptr<geos::geom::LineString> _computeGeometryExtremity(
+				const road::Address* place,
+				const road::RoadChunk* chunk,
+				bool chunkIsForward,
+				ResultPath::iterator insertPosition,
+				ResultPath& path
+			) const;
 		};
 
 		class AStarNode 
@@ -171,6 +184,27 @@ namespace synthese
 			void setRealCost(int realCost){ _realCost = realCost; }
 			void setDistance(double distance){ _distance = distance; }
 			void markAsVisited(){ _visited = true; }
+		};
+
+		struct AStarNodeComparator {
+			bool operator()(const boost::shared_ptr<AStarNode> n1, const boost::shared_ptr<AStarNode> n2)
+			{
+				if(n1->getRealCost() == n2->getRealCost())
+				{
+					if(n1->getHeuristicCost() == n2->getHeuristicCost())
+					{
+						return &n1 < &n2;
+					}
+					else
+					{
+						return n1->getHeuristicCost() < n2->getHeuristicCost();
+					}
+				}
+				else
+				{
+					return n1->getRealCost() < n2->getRealCost();
+				}
+			}
 		};
 	}
 }

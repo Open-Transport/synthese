@@ -528,7 +528,7 @@ namespace synthese
 			try
 			{
 				if(!rsStr.empty())
-				{
+                        	{
 					vector<string> rsVect;
 					split(rsVect, rsStr, is_any_of(",; "));
 					allowedPathClasses.insert(0);
@@ -548,7 +548,7 @@ namespace synthese
 			try
 			{
 				if(!nwlStr.empty())
-				{
+                        	{
 					vector<string> nwVect;
 					split(nwVect, nwlStr, is_any_of(",; "));
 					allowedNetworks.insert(0);
@@ -1379,9 +1379,9 @@ namespace synthese
 						_period->getCaption() << "\" />"
 					;
 				}
-
+	
 				stream << "<places";
-
+ 
 				if(_departure_place.cityResult.value.get())
 				{
 					stream << " departureCity=\"" << _departure_place.placeResult.key.getSource() << "\" departureCityNameTrust=\"" << _departure_place.cityResult.score.phoneticScore << "\"";
@@ -2616,7 +2616,7 @@ namespace synthese
 								specificPricing = 1;
 						}
 					}
-
+ 
 					_displayJourney(
 						boards,
 						_boardPage,
@@ -3587,22 +3587,8 @@ namespace synthese
 						vector<boost::shared_ptr<Geometry> > geometriesSPtr;
 						BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
 						{
-							boost::shared_ptr<LineString> geometry;
-							if (itLeg == services.begin() && journey.hasToDrawDeparture())
-							{
-								geometry = journey.getDepartureGeometry();
-								distance += journey.getDepartureGeometry()->getLength();
-							}
-							else if (itLeg+1 == services.end() && journey.hasToDrawArrival())
-							{
-								geometry = journey.getArrivalGeometry();
-								distance += journey.getArrivalGeometry()->getLength();
-							}
-							else
-							{
-								geometry = itLeg->getGeometry();
-								distance += itLeg->getDistance();
-							}
+							distance += itLeg->getDistance();
+							boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
 							if(geometry.get())
 							{
 								boost::shared_ptr<Geometry> geometryProjected(
@@ -3910,19 +3896,19 @@ namespace synthese
 				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
 				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
 			}
-
+			
 			pm.insert(DATA_ODD_ROW, color);
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
-
+			
 			pm.insert(DATA_DEPARTURE_TIME, departureTime.time_of_day());
 			pm.insert(DATA_ARRIVAL_TIME, arrivalTime.time_of_day());
 			pm.insert(DATA_DURATION, arrivalTime - departureTime);
 			pm.insert(DATA_USER_CLASS_CODE, USER_CLASS_CODE_OFFSET + userClassRank);
-
+			
 			pm.insert(DATA_START_STOP_NAME, startStopName);
 			pm.insert(DATA_END_STOP_NAME, endStopName);
-
+			
 			// WKT
 			if(geometry)
 			{

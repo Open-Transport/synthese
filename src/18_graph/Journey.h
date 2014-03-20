@@ -59,11 +59,9 @@ namespace synthese
 
 			//! @name Internal data
 			//@{
-				boost::posix_time::time_duration			_effectiveDuration;
-				std::size_t									_transportConnectionCount;
-				double										_distance;
-				boost::shared_ptr<geos::geom::LineString>	_departureGeometry;
-				boost::shared_ptr<geos::geom::LineString>	_arrivalGeometry;
+				boost::posix_time::time_duration	_effectiveDuration;
+				std::size_t _transportConnectionCount;
+				double			_distance;
 
 				void _updateInternalData(
 					const ServicePointer& leg
@@ -97,12 +95,6 @@ namespace synthese
 				*/
 				boost::posix_time::time_duration getEffectiveDuration () const { return _effectiveDuration; }
 
-				/** Returns missing geometries to reach departure Place */
-				boost::shared_ptr<geos::geom::LineString> getDepartureGeometry () const { return _departureGeometry; }
-
-				/** Returns missing geometries to reach arrival Place */
-				boost::shared_ptr<geos::geom::LineString> getArrivalGeometry () const { return _arrivalGeometry; }
-
 
 
 				double getDistance () const { return _distance; }
@@ -111,8 +103,6 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setDepartureGeometry(boost::shared_ptr<geos::geom::LineString> geometry);
-				void setArrivalGeometry(boost::shared_ptr<geos::geom::LineString> geometry);
 			//@}
 
 
@@ -135,8 +125,7 @@ namespace synthese
 				const Edge* getOrigin() const;
 				const Edge* getDestination() const;
 
-				bool hasToDrawDeparture () const;
-				bool hasToDrawArrival () const;
+
 
 				/** Continuous service range of this journey.
 					@return Range duration in minutes, or 0 if unique service.
