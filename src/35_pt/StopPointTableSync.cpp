@@ -134,6 +134,10 @@ namespace synthese
 			if(obj->getProjectedPoint().getRoadChunk())
 			{
 				obj->getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(obj);
+				if(obj->getProjectedPoint().getRoadChunk()->getNext())
+				{
+					static_cast<Crossing*>(obj->getProjectedPoint().getRoadChunk()->getNext()->getFromVertex())->removeReachableVertex(obj);
+				}
 			}
 		}
 
