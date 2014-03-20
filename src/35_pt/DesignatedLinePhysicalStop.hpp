@@ -46,6 +46,8 @@ namespace synthese
 
 			virtual bool isDepartureAllowed() const;
 			virtual bool isArrivalAllowed() const;
+			
+			virtual boost::shared_ptr<geos::geom::LineString> getRealGeometry() const;
 		};
 }	}
 
