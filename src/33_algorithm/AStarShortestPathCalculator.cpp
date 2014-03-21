@@ -409,7 +409,11 @@ namespace synthese
 				customOffset = startAddress->getMetricOffset();
 			}
 
-			if(customChunk && (!chunk || chunk->getKey() != customChunk->getKey()))
+			if(customChunk &&
+				(!chunk ||
+					(chunk->getKey() != customChunk->getKey() &&
+					(!chunk->isReversed() || static_cast<const ReverseRoadChunk*>(chunk->getNext())->getMainRoadChunk()->getKey() != customChunk->getKey())
+			)))
 			{
 				LengthIndexedLine customChunkGeometry(
 					static_cast<Geometry*>(customChunk->getGeometry().get())
