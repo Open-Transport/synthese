@@ -144,7 +144,7 @@ namespace synthese
 			double metricOffset
 		) const {
 			double relativePosition = (metricOffset - this->getMetricOffset()) / (this->getEndMetricOffset() - this->getMetricOffset());
-			HouseNumberBounds bounds = this->getLeftHouseNumberBounds();
+			HouseNumberBounds bounds = getLeftHouseNumberBounds();
 
 			if(!bounds)
 			{
@@ -160,11 +160,22 @@ namespace synthese
 			}
 			else
 			{
-				return HouseNumber(
-						   (bounds->first < bounds->second) ?
-						   ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1)) :
-						   floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
-					   );
+				HouseNumber closestHouseNumber(
+					(bounds->first < bounds->second) ?
+						ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1)) :
+						floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
+				);
+
+				switch(getLeftHouseNumberingPolicy())
+				{
+					case ODD:
+						return closestHouseNumber - (closestHouseNumber % 2) + 1;
+					case EVEN:
+						return closestHouseNumber - (closestHouseNumber % 2);
+					case ALL:
+					default:
+						return closestHouseNumber;
+				}
 			}
 		}
 
