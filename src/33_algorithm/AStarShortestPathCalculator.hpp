@@ -141,9 +141,9 @@ namespace synthese
 			) const;
 
 
-
 			boost::shared_ptr<geos::geom::LineString> _computeGeometryExtremity(
-				const road::Address* place,
+				const road::Address* startAddress,
+				const road::Address* endAddress,
 				const road::RoadChunk* chunk,
 				bool chunkIsForward,
 				ResultPath::iterator insertPosition,

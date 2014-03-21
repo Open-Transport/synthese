@@ -42,6 +42,7 @@
 #include "Road.h"
 #include "RoadModule.h"
 #include "ServicePointer.h"
+#include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "Vertex.h"
 #include "VertexAccessMap.h"
@@ -391,7 +392,8 @@ namespace synthese
 
 
 		boost::shared_ptr<geos::geom::LineString> AStarShortestPathCalculator::_computeGeometryExtremity(
-			const Address* address,
+			const Address* startAddress,
+			const Address* endAddress,
 			const RoadChunk* chunk,
 			bool forwardMode,
 			ResultPath::iterator insertPosition,
@@ -402,13 +404,13 @@ namespace synthese
 			boost::shared_ptr<LineString> resultGeometry;
 			bool useReverseChunk(false);
 
-			if(address)
+			if(startAddress)
 			{
-				customChunk = address->getRoadChunk();
-				customOffset = address->getMetricOffset();
+				customChunk = startAddress->getRoadChunk();
+				customOffset = startAddress->getMetricOffset();
 			}
 
-			if(customChunk)
+			if(customChunk && (!chunk || chunk->getKey() != customChunk->getKey()))
 			{
 				LengthIndexedLine customChunkGeometry(
 					static_cast<Geometry*>(customChunk->getGeometry().get())
@@ -418,40 +420,61 @@ namespace synthese
 
 				if(chunkLength > 0)
 				{
-					if(forwardMode)
+					if(!chunk && endAddress)
 					{
-						// <----proj----o----first----->
-						if(customChunk->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
+						chunk = endAddress->getRoadChunk();
+						double chunkOffset = endAddress->getMetricOffset();
+
+						if(chunk->getKey() == customChunk->getKey())
 						{
 							resultGeometry = boost::shared_ptr<LineString>(
-								static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, 0)
+								static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkOffset - chunk->getMetricOffset())
 							));
-							useReverseChunk = true;
-						}
-						// o----proj---->o----first----->
-						else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
-						{
-							resultGeometry = boost::shared_ptr<LineString>(
-								static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkLength)
-							));
+
+							if(customOffset > chunkOffset)
+							{
+								useReverseChunk = true;
+							}
 						}
 					}
-					else
+
+					if(!resultGeometry)
 					{
-						// o----first----->o-----proj---->
-						if(customChunk->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
+						if(forwardMode)
 						{
-							resultGeometry = boost::shared_ptr<LineString>(
-								static_cast<LineString*>(customChunkGeometry.extractLine(0, geometryOffset)
-							));
+							// <----proj----o----first----->
+							if(customChunk->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
+							{
+								resultGeometry = boost::shared_ptr<LineString>(
+									static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, 0)
+								));
+								useReverseChunk = true;
+							}
+							// o----proj---->o----first----->
+							else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
+							{
+								resultGeometry = boost::shared_ptr<LineString>(
+									static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkLength)
+								));
+							}
 						}
-						// o----first-----><-----proj----o
-						else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
+						else
 						{
-							resultGeometry = boost::shared_ptr<LineString>(
-								static_cast<LineString*>(customChunkGeometry.extractLine(chunkLength, geometryOffset)
-							));
-							useReverseChunk = true;
+							// o----first----->o-----proj---->
+							if(customChunk->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
+							{
+								resultGeometry = boost::shared_ptr<LineString>(
+									static_cast<LineString*>(customChunkGeometry.extractLine(0, geometryOffset)
+								));
+							}
+							// o----first-----><-----proj----o
+							else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
+							{
+								resultGeometry = boost::shared_ptr<LineString>(
+									static_cast<LineString*>(customChunkGeometry.extractLine(chunkLength, geometryOffset)
+								));
+								useReverseChunk = true;
+							}
 						}
 					}
 
@@ -505,24 +528,23 @@ namespace synthese
 			const Place* startPlace = (_direction == DEPARTURE_TO_ARRIVAL ? _departurePlace : _arrivalPlace);
 			boost::shared_ptr<LineString> startGeometry, endGeometry;
 
-			if(path.size() > 0)
-			{
-				startGeometry = _computeGeometryExtremity(
-					dynamic_cast<const Address*>(startPlace),
-					*(path.begin()),
-					_direction == algorithm::DEPARTURE_TO_ARRIVAL,
-					path.begin(),
-					path
-				);
+			startGeometry = _computeGeometryExtremity(
+				dynamic_cast<const Address*>(startPlace),
+				&arrival->getProjectedPoint(),
+				(path.size() == 0 ? NULL : *(path.begin())),
+				_direction == algorithm::DEPARTURE_TO_ARRIVAL,
+				path.begin(),
+				path
+			);
 
-				endGeometry = _computeGeometryExtremity(
-					&arrival->getProjectedPoint(),
-					*(path.rbegin()),
-					!(_direction == algorithm::DEPARTURE_TO_ARRIVAL),
-					path.end(),
-					path
-				);
-			}
+			endGeometry = _computeGeometryExtremity(
+				&arrival->getProjectedPoint(),
+				dynamic_cast<const Address*>(startPlace),
+				(path.size() == 0 ? NULL : *(path.rbegin())),
+				!(_direction == algorithm::DEPARTURE_TO_ARRIVAL),
+				path.end(),
+				path
+			);
 
 			posix_time::ptime departure(_departureTime);
 
