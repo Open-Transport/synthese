@@ -42,7 +42,6 @@
 #include "Road.h"
 #include "RoadModule.h"
 #include "ServicePointer.h"
-#include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "Vertex.h"
 #include "VertexAccessMap.h"
