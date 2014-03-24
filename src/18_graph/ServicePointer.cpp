@@ -342,21 +342,6 @@ namespace synthese
 			);
 
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
-
-			// Ugly temporary patch
-			bool directLine = false;
-			if (dynamic_cast<const pt::JourneyPattern*>(this->getService()->getPath()))
-			{
-				boost::shared_ptr<const pt::JourneyPattern> line =
-					util::Env::GetOfficialEnv().get<pt::JourneyPattern>(this->getService()->getPath()->getKey());
-				if (line)
-				{
-					string lineNumber(lexical_cast<string>(line->getCommercialLine()->getShortName()));
-					if (lineNumber == "118" || lineNumber == "120")
-						directLine = true;
-				}
-			}
-
 			bool drtAreaSequence = false;
 			bool hasDRTArea = false;
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
@@ -400,7 +385,7 @@ namespace synthese
 			{
 				return boost::shared_ptr<LineString>();
 			}
-			else if (hasDRTArea || directLine)
+			else if (hasDRTArea)
 			{
 				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 				csTwoPoints->add(cs->getAt(0));
