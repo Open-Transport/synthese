@@ -150,7 +150,7 @@ namespace synthese
 			{
 				return 0;
 			}
-			if(relativePosition > 1)
+			else if(relativePosition > 1)
 			{
 				return bounds->second;
 			}
@@ -162,8 +162,14 @@ namespace synthese
 			{
 				HouseNumber closestHouseNumber(
 					(bounds->first <= bounds->second) ?
-						ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1)) :
-						floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
+						min(
+							(double)bounds->second,
+							ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1))
+						) :
+						max(
+							(double)bounds->first,
+							floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
+						)
 				);
 
 				switch(getLeftHouseNumberingPolicy())
