@@ -161,7 +161,7 @@ namespace synthese
 			else
 			{
 				HouseNumber closestHouseNumber(
-					(bounds->first < bounds->second) ?
+					(bounds->first <= bounds->second) ?
 						ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1)) :
 						floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
 				);

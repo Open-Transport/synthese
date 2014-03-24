@@ -1267,7 +1267,11 @@ namespace synthese
 								House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID
 					)	)	);
 					MainRoadChunk::HouseNumber houseNumber = itemMap->get<MainRoadChunk::HouseNumber>(House::DATA_NUMBER);
-					if(houseNumber != 0)
+					if (!_houseMap.empty())
+					{
+						placeResult.value = _houseMap.begin()->second;
+					}
+					else if(houseNumber != 0)
 					{
 						placeResult.value = static_pointer_cast<Place, House>(
 							roadPlace->getHouse(houseNumber)
@@ -1275,15 +1279,8 @@ namespace synthese
 					}
 					else
 					{
-						if (_houseMap.empty())
-						{
-							// _houseMap is empty so give back the road
-							placeResult.value = roadPlace;
-						}
-						else
-						{
-							placeResult.value = _houseMap.begin()->second;	
-						}
+						// _houseMap is empty so give back the road
+						placeResult.value = roadPlace;
 					}
 				}
 			}
