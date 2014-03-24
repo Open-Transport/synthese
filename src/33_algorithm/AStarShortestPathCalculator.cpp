@@ -439,6 +439,10 @@ namespace synthese
 								useReverseChunk = true;
 							}
 						}
+						else if(chunk->getFromVertex()->getKey() == customChunk->getFromVertex()->getKey() && _direction == ARRIVAL_TO_DEPARTURE)
+						{
+							chunk = static_cast<const MainRoadChunk*>(chunk->getNext())->getReverseRoadChunk();
+						}
 					}
 
 					if(!resultGeometry)
