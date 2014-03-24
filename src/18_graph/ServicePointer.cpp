@@ -27,6 +27,8 @@
 #include "AccessParameters.h"
 #include "Vertex.h"
 #include "AreaGeneratedLineStop.hpp"
+#include "JourneyPattern.hpp"
+#include "CommercialLine.h"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
@@ -35,6 +37,7 @@
 using namespace boost;
 using namespace boost::posix_time;
 using namespace geos::geom;
+using namespace std;
 
 namespace synthese
 {
@@ -253,7 +256,14 @@ namespace synthese
 		{
 			assert(_arrivalEdge && _departureEdge);
 
-			return _arrivalEdge->getMetricOffset() - _departureEdge->getMetricOffset();
+			if(_customGeometry)
+			{
+				return _customGeometry->getLength();
+			}
+			else
+			{
+				return _arrivalEdge->getMetricOffset() - _departureEdge->getMetricOffset();
+			}
 		}
 
 
@@ -308,16 +318,45 @@ namespace synthese
 
 
 
+		void ServicePointer::setCustomGeometry(boost::shared_ptr<geos::geom::LineString> geometry)
+		{
+			_customGeometry = boost::shared_ptr<geos::geom::LineString>(
+				CoordinatesSystem::GetDefaultGeometryFactory().createLineString(*geometry)
+			);
+		}
+
+
+
 		boost::shared_ptr<geos::geom::LineString> ServicePointer::getGeometry() const
 		{
 			assert(_departureEdge);
 			assert(_arrivalEdge);
+
+			if(_customGeometry)
+			{
+				return _customGeometry;
+			}
 
 			const GeometryFactory& geometryFactory(
 				CoordinatesSystem::GetDefaultGeometryFactory()
 			);
 
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+
+			// Ugly temporary patch
+			bool directLine = false;
+			if (dynamic_cast<const pt::JourneyPattern*>(this->getService()->getPath()))
+			{
+				boost::shared_ptr<const pt::JourneyPattern> line =
+					util::Env::GetOfficialEnv().get<pt::JourneyPattern>(this->getService()->getPath()->getKey());
+				if (line)
+				{
+					string lineNumber(lexical_cast<string>(line->getCommercialLine()->getShortName()));
+					if (lineNumber == "118" || lineNumber == "120")
+						directLine = true;
+				}
+			}
+
 			bool drtAreaSequence = false;
 			bool hasDRTArea = false;
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
@@ -361,7 +400,7 @@ namespace synthese
 			{
 				return boost::shared_ptr<LineString>();
 			}
-			else if (hasDRTArea)
+			else if (hasDRTArea || directLine)
 			{
 				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 				csTwoPoints->add(cs->getAt(0));
