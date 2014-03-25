@@ -445,7 +445,7 @@ namespace synthese
 						}
 					}
 
-					if(!resultGeometry)
+					if(!resultGeometry && chunk)
 					{
 						if(forwardMode)
 						{
