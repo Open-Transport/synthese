@@ -33,10 +33,13 @@
 #include "House.hpp"
 
 #include <geos/geom/Envelope.h>
+#include <geos/geom/LineString.h>
+#include <geos/linearref/LengthIndexedLine.h>
 
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
+using namespace geos::linearref;
 
 namespace synthese
 {
@@ -79,6 +82,7 @@ namespace synthese
 		){
 			addPath(static_cast<Path*>(&road));
 			_isoBarycentre.reset();
+			_centerAddress.reset();
 		}
 
 
@@ -88,6 +92,7 @@ namespace synthese
 		){
 			removePath(static_cast<Path*>(&road));
 			_isoBarycentre.reset();
+			_centerAddress.reset();
 		}
 
 
@@ -99,16 +104,26 @@ namespace synthese
 		) const	{
 			if(whatToSearch.find(RoadModule::GRAPH_ID) == whatToSearch.end()) return;
 
-			BOOST_FOREACH(const Path* road, _paths)
+			if(getCenterAddress())
 			{
-				BOOST_FOREACH(const Edge* edge, road->getEdges())
-				{
-					result.insert(
-						edge->getFromVertex(),
-						VertexAccess()
-					);
-				}
+				getCenterAddress()->getVertexAccessMap(
+					result,
+					accessParameters,
+					whatToSearch
+				);
 			}
+		}
+
+
+
+		const boost::shared_ptr<Address> RoadPlace::getCenterAddress() const
+		{
+			if(!_centerAddress.get())
+			{
+				getPoint();
+			}
+
+			return _centerAddress;
 		}
 
 
@@ -117,34 +132,42 @@ namespace synthese
 		{		
 			if (!_isoBarycentre.get())
 			{
-				int nbPoint = 0;
+				int nbChunks = 0;
 				BOOST_FOREACH(const Path* road, _paths)
 				{
 					BOOST_FOREACH(const Edge* edge, road->getEdges())
 					{
-						if(edge->getFromVertex()->hasGeometry())
+						if(!static_cast<const RoadChunk*>(edge)->isReversed() && edge->getNext())
 						{
-							nbPoint++;
+							nbChunks++;
 						}
 					}
 				}
-				nbPoint = (nbPoint + 1 ) / 2; // We stop at the point in the middle
-				int nbCurPoint = 0;
+				nbChunks = (nbChunks + 1 ) / 2; // We stop at the point in the middle
+				int nbCurChunks = 0;
 				BOOST_FOREACH(const Path* road, _paths)
 				{
-					BOOST_FOREACH(const Edge* edge, road->getEdges())
+					BOOST_FOREACH(Edge* edge, road->getEdges())
 					{
-						if(edge->getFromVertex()->hasGeometry())
+						if(!static_cast<RoadChunk*>(edge)->isReversed() && edge->getNext())
 						{
-							nbCurPoint++;
-							if(nbCurPoint == nbPoint)
+							nbCurChunks++;
+							if(nbCurChunks == nbChunks)
 							{
-								_isoBarycentre = edge->getFromVertex()->getGeometry();
+								LengthIndexedLine chunkGeometry(
+									static_cast<Geometry*>(edge->getRealGeometry().get())
+								);
+								double middleOffset = (edge->getEndMetricOffset() - edge->getMetricOffset()) / 2;
+								_isoBarycentre.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(chunkGeometry.extractPoint(middleOffset)));
+								_centerAddress.reset(new Address(*(static_cast<MainRoadChunk*>(edge)), edge->getMetricOffset() + middleOffset));
 								break;
 							}
 						}
 					}
-					if(nbCurPoint == nbPoint)break;
+					if(nbCurChunks == nbChunks)
+					{
+						break;
+					}
 				}
 				if(!_isoBarycentre.get())
 				{
@@ -152,8 +175,8 @@ namespace synthese
 					_isoBarycentre.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(c));
 				}
 			}
-			return _isoBarycentre;
 
+			return _isoBarycentre;
 		}
 
 

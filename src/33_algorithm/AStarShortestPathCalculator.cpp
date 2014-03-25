@@ -403,12 +403,16 @@ namespace synthese
 			boost::shared_ptr<LineString> resultGeometry;
 			bool useReverseChunk(false);
 
+			// Retrieve chunk and offset of the departure
 			if(startAddress)
 			{
 				customChunk = startAddress->getRoadChunk();
 				customOffset = startAddress->getMetricOffset();
 			}
 
+			// If we have a start chunk and if we have :
+			//  - No first chunk of a path returned by A* (empty path, only chunks from the VAM, 1 or 2)
+			//	- Or the first chunk of the path isn't the start chunk nor the reverse chunk of the start chunk (don't generate start geometry two times in case of one chunk geometry)
 			if(customChunk &&
 				(!chunk ||
 					(chunk->getKey() != customChunk->getKey() &&
@@ -421,34 +425,75 @@ namespace synthese
 				double chunkLength = customChunk->getGeometry()->getLength();
 				double geometryOffset = customOffset - customChunk->getMetricOffset();
 
+				// If the start chunk length is not null (otherwise don't need to insert anything)
 				if(chunkLength > 0)
 				{
+					// If we don't have any chunk from A* and there is an arrival address
 					if(!chunk && endAddress)
 					{
+						// Get the end address chunk as the first chunk of the path (it will be the last too but it's not important)
 						chunk = endAddress->getRoadChunk();
 						double chunkOffset = endAddress->getMetricOffset();
 
+						// If the two chunks are the same : case of an address and a stop projected on the same chunk
 						if(chunk->getKey() == customChunk->getKey())
 						{
+							// Build a custom geometry according to their offsets
 							resultGeometry = boost::shared_ptr<LineString>(
 								static_cast<LineString*>(customChunkGeometry.extractLine(geometryOffset, chunkOffset - chunk->getMetricOffset())
 							));
 
+							// If the offset of the start is bigger than the one from the end, use the reverse chunk
 							if(customOffset > chunkOffset)
 							{
 								useReverseChunk = true;
 							}
 						}
-						else if(chunk->getFromVertex()->getKey() == customChunk->getFromVertex()->getKey() && _direction == ARRIVAL_TO_DEPARTURE)
+						/*
+						 * Otherwise there is only 2 chunks in the approach. WE NEED TO BE SURE THAT THE SECOND CHUNK TO THE ARRIVAL IS THE RIGHT ONE (reverse / main)
+						 * to ensure that the code below will work as intended.
+						 * There is multiple cases, we have start (s) and end (e) :
+						 *		1) <----(s)---o----(e)--->
+						 *		2) o---(s)--->o----(e)--->
+						 *		3) <----(s)---o<---(e)---o
+						 *		4) o----(s)---><---(e)---o
+						 *
+						 * In DEPARTURE_TO_ARRIVAL direction we are going from the start to the end. As we can see, 1 and 2 are correct, the chunk (e) is in the right way.
+						 * For 3 and 4, we need to take the reverse chunk of (e).
+						 * In ARRIVAL_TO_DEPARTURE 3 and 4 are correct and 1 and 2 are not.
+						 */
+						else if(_direction == DEPARTURE_TO_ARRIVAL)
 						{
-							chunk = static_cast<const MainRoadChunk*>(chunk->getNext())->getReverseRoadChunk();
+							// If the next chunk of (e) has the same vertex as the chunk (s) (case 3) or the next chunk of (s) (case 4)
+							if(chunk->getNext()->getFromVertex()->getKey() == customChunk->getFromVertex()->getKey() ||
+							   chunk->getNext()->getFromVertex()->getKey() == customChunk->getNext()->getFromVertex()->getKey()
+							)
+							{
+								chunk = static_cast<const MainRoadChunk*>(chunk->getNext())->getReverseRoadChunk();
+							}
+						}
+						else if(_direction == ARRIVAL_TO_DEPARTURE)
+						{
+							// If the chunk (e) has the same vertex as the chunk (s) (case 1) or the next chunk of (s) (case 2)
+							if(chunk->getFromVertex()->getKey() == customChunk->getFromVertex()->getKey() ||
+							   chunk->getFromVertex()->getKey() == customChunk->getNext()->getFromVertex()->getKey()
+							)
+							{
+								chunk = static_cast<const MainRoadChunk*>(chunk->getNext())->getReverseRoadChunk();
+							}
 						}
 					}
 
+					// If we don't have a geometry (we build it ourselve if customChunk and chunk are the same) and we have a first chunk in the path
+					// We know that chunk is in the right direction, A* create a path in the right order and in case of a two chunks geometry the code above did the job.
+					// We build the correct geometry for customChunk and reverse it if necessary.
 					if(!resultGeometry && chunk)
 					{
+						// In forwardMode -> DEPARTURE_TO_ARRIVAL approach from the start_place to the first crossing
+						//				  -> ARRIVAL_TO_DEPARTURE approach to the stop from the last crossing
 						if(forwardMode)
 						{
+							// proj share the same vertex than first, use the reverse chunk and build geometry from our offset to the start
 							// <----proj----o----first----->
 							if(customChunk->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
 							{
@@ -457,6 +502,7 @@ namespace synthese
 								));
 								useReverseChunk = true;
 							}
+							// proj and first are already in place, build the geometry from our offset to the end
 							// o----proj---->o----first----->
 							else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getFromVertex()->getKey())
 							{
@@ -465,8 +511,11 @@ namespace synthese
 								));
 							}
 						}
+						// In backwardMode -> DEPARTURE_TO_ARRIVAL approach to the stop from the last crossing
+						//				   -> ARRIVAL_TO_DEPARTURE approach from the start_place to the first crossing
 						else
 						{
+							// proj and first are already in place, build the geometry from the start to our offset
 							// o----first----->o-----proj---->
 							if(customChunk->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
 							{
@@ -474,6 +523,7 @@ namespace synthese
 									static_cast<LineString*>(customChunkGeometry.extractLine(0, geometryOffset)
 								));
 							}
+							// next chunk of proj share the same vertex than the next chunk of first, use the reverse chunk and build geometry from the end to our offset
 							// o----first-----><-----proj----o
 							else if(customChunk->getNext()->getFromVertex()->getKey() == chunk->getNext()->getFromVertex()->getKey())
 							{
@@ -522,21 +572,23 @@ namespace synthese
 
 				Geometries are build based on offsets of places and the right chunk is added by looking at
 				the first vertex of the path, places and stops are indeed always projected on a MainRoadChunk,
-				but we something want the reverse one. There is 4 cases :
-				- For the departure :
-					- If we want the main road chunk,
-					- If we want the reverse one,
-				- For the arrival :
-					- If we want the main road chunk,
-					- If we want the reverse one
-				In ARRIVAL_TO_DEPARTURE mode, departure and arrival cases are reversed. The code is pretty self
-				explanatory above in _computeGeometryExtremity.
+				but we something want the reverse one
 			*/
 			const Place* startPlace = (_direction == DEPARTURE_TO_ARRIVAL ? _departurePlace : _arrivalPlace);
 			boost::shared_ptr<LineString> startGeometry, endGeometry;
+			const Address* startAddress = NULL;
+
+			if(dynamic_cast<const Address*>(startPlace))
+			{
+				startAddress = dynamic_cast<const Address*>(startPlace);
+			}
+			else if(dynamic_cast<const RoadPlace*>(startPlace))
+			{
+				startAddress = dynamic_cast<const RoadPlace*>(startPlace)->getCenterAddress().get();
+			}
 
 			startGeometry = _computeGeometryExtremity(
-				dynamic_cast<const Address*>(startPlace),
+				startAddress,
 				&arrival->getProjectedPoint(),
 				(path.size() == 0 ? NULL : *(path.begin())),
 				_direction == algorithm::DEPARTURE_TO_ARRIVAL,
@@ -546,7 +598,7 @@ namespace synthese
 
 			endGeometry = _computeGeometryExtremity(
 				&arrival->getProjectedPoint(),
-				dynamic_cast<const Address*>(startPlace),
+				startAddress,
 				(path.size() == 0 ? NULL : *(path.rbegin())),
 				!(_direction == algorithm::DEPARTURE_TO_ARRIVAL),
 				path.end(),
@@ -608,15 +660,19 @@ namespace synthese
 				CoordinateSequence* customSequence(CoordinatesSystem::GetDefaultGeometryFactory().getCoordinateSequenceFactory()->create(0, 2));
 
 				do {
+					// Build custom geometry for the service
 					boost::shared_ptr<LineString> currentGeometry((*it)->getRealGeometry());
 
+					// In DEPARTURE_TO_ARRIVAL push new geometry at the back of the coordinate sequence
 					if(_direction == DEPARTURE_TO_ARRIVAL)
 					{
 						CoordinateSequence* cs;
+						// use startGeometry if it exists and we are at the beginning of the path
 						if(startGeometry && it == path.begin())
 						{
 							cs = startGeometry->getCoordinates();
 						}
+						// use endGeometry if it exists and we are at the end of the path
 						else if(endGeometry && (it + 1) == path.end())
 						{
 							cs = endGeometry->getCoordinates();
@@ -629,6 +685,7 @@ namespace synthese
 
 						delete cs;
 					}
+					// In ARRIVAL_TO_DEPARTURE push new geometry at the front of the coordinate sequence
 					else
 					{
 						CoordinateSequence* cs;
@@ -659,6 +716,7 @@ namespace synthese
 				);
 				it--;
 
+				// Create custom LineString if necessary
 				boost::shared_ptr<LineString> customGeometry;
 				if(customSequence->size() > 1)
 				{
@@ -681,14 +739,17 @@ namespace synthese
 					_accessParameters
 				);
 
+				// If we have a custom geometry and it's different from the original geometry
 				boost::shared_ptr<LineString> originGeometry = completeService.getGeometry();
 				if(customGeometry && customGeometry->getLength() != originGeometry->getLength())
 				{
+					// Set geometry and compute the time difference between the two length
 					completeService.setCustomGeometry(customGeometry);
 					posix_time::time_duration durationDifference = posix_time::seconds(
 						ceil((originGeometry->getLength() - customGeometry->getLength()) / _accessParameters.getApproachSpeed())
 					);
 
+					// Set departure / arrival times according to that difference
 					if(_direction == DEPARTURE_TO_ARRIVAL)
 					{
 						completeService.setArrivalInformations(
