@@ -488,7 +488,7 @@ namespace synthese
 
 						stopResult = _city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
 								_text,
-								_number ? *_number : 0,
+								0,
 								_minScore
 						);
 
@@ -533,6 +533,11 @@ namespace synthese
 							newHit.key = item.key;
 							newHit.value = item.value;
 							newStopResult.push_back(newHit);
+
+							if(_number && (newStopResult.size() >= (*_number)))
+							{
+								break;
+							}
 						}
 
 						lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHitSort hitSort;
@@ -669,7 +674,7 @@ namespace synthese
 
 						stopResult = PTModule::GetGeneralStopsMatcher().bestMatches(
 								_text,
-								_number ? *_number : 0,
+								0,
 								_minScore
 						);
 
@@ -714,6 +719,11 @@ namespace synthese
 							newHit.key = item.key;
 							newHit.value = item.value;
 							newStopResult.push_back(newHit);
+
+							if(_number && (newStopResult.size() >= (*_number)))
+							{
+								break;
+							}
 						}
 
 						lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHitSort hitSort;
