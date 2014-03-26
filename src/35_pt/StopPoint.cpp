@@ -114,8 +114,8 @@ namespace synthese
 					_projectedPoint.getRoadChunk()->getReverseRoadChunk()->getFromCrossing() == &crossing
 				){
 					return VertexAccess(
-						minutes(static_cast<long>((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()) / 50)),
-						_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()
+						minutes(static_cast<long>((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getMetricOffset()) / 50)),
+						_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getMetricOffset()
 					);
 				}
 			}
