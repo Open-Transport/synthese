@@ -258,7 +258,7 @@ namespace synthese
 
 			if(_customGeometry)
 			{
-				return _customGeometry->getLength();
+				return max(_customGeometry->getLength(), 1.0);
 			}
 			else
 			{
