@@ -390,8 +390,12 @@ DistanceOp::computeFacetDistance()
 	 */
 	LineString::ConstVect lines0;
 	LineString::ConstVect lines1;
-	LinearComponentExtracter::getLines(*(geom[0]), lines0);
-	LinearComponentExtracter::getLines(*(geom[1]), lines1);
+
+	LinearComponentExtracter lce0(lines0);
+	geom[0]->apply_ro(&lce0);
+
+	LinearComponentExtracter lce1(lines1);
+	geom[1]->apply_ro(&lce1);
 
 #if GEOS_DEBUG
 	std::cerr << "LinearComponentExtracter found "
