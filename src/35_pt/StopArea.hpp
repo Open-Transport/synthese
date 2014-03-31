@@ -207,6 +207,7 @@ namespace synthese
 				bool					_allowedConnection;
 				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
 				boost::posix_time::time_duration	_defaultTransferDelay;
+				bool                    _isRelayPark;
 			//@}
 
 			//! @name Caching
@@ -239,6 +240,7 @@ namespace synthese
 				const std::string& getTimetableName() const { return _timetableName; }
 				const boost::shared_ptr<geos::geom::Point>& getLocation() const { return _location; }
 				const DRTAreas& getDRTAreas() const { return _drtAreas; }
+				bool getIsRelayPark() const { return _isRelayPark; }
 			//@}
 
 			//! @name Setters
@@ -250,6 +252,7 @@ namespace synthese
 				void setAllowedConnection(bool value) { _allowedConnection = value; }
 				void setLocation(const boost::shared_ptr<geos::geom::Point>& value){ _location = value; }
 				void setTransferDelaysMatrix(const TransferDelaysMap& value);
+				void setIsRelayPark(bool value) { _isRelayPark = value; }
 			//@}
 
 			//! @name Update methods.
