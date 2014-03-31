@@ -20,16 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "Env.h"
+#include "LineStop.h"
 #include "PTRoutePlannerResult.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
+#include "LinePhysicalStop.hpp"
 #include "Journey.h"
 #include "JourneyPattern.hpp"
 #include "PermanentService.h"
 #include "JourneyPattern.hpp"
-#include "MainRoadPart.hpp"
-#include "MainRoadChunk.hpp"
+#include "Road.h"
+#include "RoadPath.hpp"
+#include "RoadChunk.h"
+#include "RoadChunkEdge.hpp"
 #include "Crossing.h"
 #include "Address.h"
 #include "GeographyModule.h"
@@ -38,15 +42,17 @@
 
 using namespace boost::posix_time;
 
+using namespace synthese;
 using namespace synthese::pt;
 using namespace synthese::road;
 using namespace synthese::graph;
 using namespace synthese::geography;
 using namespace synthese::pt_journey_planner;
-
+using namespace synthese::util;
 
 BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 {
+	Env env;
 	GeographyModule::PreInit();
 
 	ptime now(second_clock::local_time());
@@ -58,48 +64,54 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	CA.setName("A");
 	StopPoint PA;
 	PA.setHub(&CA);
-	DesignatedLinePhysicalStop A(0, &L, 0);
-	A.setPhysicalStop(PA);
+	LineStop A(0, &L, 0);
+	A.set<LineNode>(PA);
+	A.link(env);
 
 	StopArea CB;
 	CB.setName("B");
 	StopPoint PB;
 	PB.setHub(&CB);
-	DesignatedLinePhysicalStop B(0, &L, 1);
-	B.setPhysicalStop(PB);
+	LineStop B(0, &L, 1);
+	B.set<LineNode>(PB);
+	B.link(env);
 
 	StopArea CC;
 	CC.setName("C");
 	StopPoint PC;
 	PC.setHub(&CC);
-	DesignatedLinePhysicalStop C(0, &L, 2);
-	C.setPhysicalStop(PC);
+	LineStop C(0, &L, 2);
+	C.set<LineNode>(PC);
+	C.link(env);
 
 	StopArea CD;
 	CD.setName("D");
 	StopPoint PD;
 	PD.setHub(&CD);
-	DesignatedLinePhysicalStop D(0, &L, 3);
-	D.setPhysicalStop(PD);
+	LineStop D(0, &L, 3);
+	D.set<LineNode>(PD);
+	D.link(env);
 
 	StopArea CE;
 	CE.setName("E");
 	StopPoint PE;
 	PE.setHub(&CE);
-	DesignatedLinePhysicalStop E(0, &L, 4);
-	E.setPhysicalStop(PE);
+	LineStop E(0, &L, 4);
+	E.set<LineNode>(PE);
+	E.link(env);
 
 	StopArea CF;
 	CF.setName("F");
 	StopPoint PF;
 	PF.setHub(&CF);
-	DesignatedLinePhysicalStop F(0, &L, 5);
-	F.setPhysicalStop(PF);
+	LineStop F(0, &L, 5);
+	F.set<LineNode>(PF);
+	F.link(env);
 
 	Journey j0;
 	ServicePointer sp0_0(true, false, USER_PEDESTRIAN, S, now);
-	sp0_0.setDepartureInformations(A, now, now, PA);
-	sp0_0.setArrivalInformations(B, now, now, PB);
+	sp0_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	sp0_0.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j0.append(sp0_0);
 
 	PTRoutePlannerResult::Journeys j;
@@ -124,12 +136,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 
 	Journey j1;
 	ServicePointer sp1_0(true, false, USER_PEDESTRIAN, S, now);
-	sp1_0.setDepartureInformations(A, now, now, PA);
-	sp1_0.setArrivalInformations(C, now, now, PC);
+	sp1_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	sp1_0.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 	j1.append(sp1_0);
 	ServicePointer sp1_1(true, false, USER_PEDESTRIAN, S, now);
-	sp1_1.setDepartureInformations(C, now, now, PC);
-	sp1_1.setArrivalInformations(B, now, now, PB);
+	sp1_1.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+	sp1_1.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j1.append(sp1_1);
 	j.push_back(j1);
 
@@ -157,12 +169,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 
 	Journey j2;
 	ServicePointer s2_0(true, false, USER_PEDESTRIAN, S, now);
-	s2_0.setDepartureInformations(A, now, now, PA);
-	s2_0.setArrivalInformations(D, now, now, PD);
+	s2_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s2_0.setArrivalInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
 	j2.append(s2_0);
 	ServicePointer s2_1(true, false, USER_PEDESTRIAN, S, now);
-	s2_1.setDepartureInformations(D, now, now, PD);
-	s2_1.setArrivalInformations(B, now, now, PB);
+	s2_1.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+	s2_1.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j2.append(s2_1);
 	j.push_back(j2);
 
@@ -187,15 +199,15 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 
 	Journey j3;
 	ServicePointer s3_0(true, false, USER_PEDESTRIAN, S, now);
-	s3_0.setDepartureInformations(A, now, now, PA);
-	s3_0.setArrivalInformations(C, now, now, PC);
+	s3_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s3_0.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 	ServicePointer s3_1(true, false, USER_PEDESTRIAN, S, now);
-	s3_1.setDepartureInformations(C, now, now, PC);
-	s3_1.setArrivalInformations(D, now, now, PD);
+	s3_1.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+	s3_1.setArrivalInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
 	j3.append(s3_1);
 	ServicePointer s3_2(true, false, USER_PEDESTRIAN, S, now);
-	s3_2.setDepartureInformations(D, now, now, PD);
-	s3_2.setArrivalInformations(B, now, now, PB);
+	s3_2.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+	s3_2.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j3.append(s3_2);
 	j.push_back(j3);
 
@@ -220,16 +232,16 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 
 	Journey j4;
 	ServicePointer s4_0(true, false, USER_PEDESTRIAN, S, now);
-	s4_0.setDepartureInformations(A, now, now, PA);
-	s4_0.setArrivalInformations(E, now, now, PE);
+	s4_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s4_0.setArrivalInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
 	j4.append(s4_0);
 	ServicePointer s4_1(true, false, USER_PEDESTRIAN, S, now);
-	s4_1.setDepartureInformations(E, now, now, PE);
-	s4_1.setArrivalInformations(F, now, now, PF);
+	s4_1.setDepartureInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
+	s4_1.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 	j4.append(s4_1);
 	ServicePointer s4_2(true, false, USER_PEDESTRIAN, S, now);
-	s4_2.setDepartureInformations(F, now, now, PF);
-	s4_2.setArrivalInformations(B, now, now, PB);
+	s4_2.setDepartureInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
+	s4_2.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j4.append(s4_2);
 	j.push_back(j4);
 
@@ -260,24 +272,24 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 
 	Journey j5;
 	ServicePointer s5_0(true, false, USER_PEDESTRIAN, S, now);
-	s5_0.setDepartureInformations(A, now, now, PA);
-	s5_0.setArrivalInformations(C, now, now, PC);
+	s5_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s5_0.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 	j5.append(s5_0);
 	ServicePointer s5_1(true, false, USER_PEDESTRIAN, S, now);
-	s5_1.setDepartureInformations(C, now, now, PC);
-	s5_1.setArrivalInformations(D, now, now, PD);
+	s5_1.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+	s5_1.setArrivalInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
 	j5.append(s5_1);
 	ServicePointer s5_2(true, false, USER_PEDESTRIAN, S, now);
-	s5_2.setDepartureInformations(D, now, now, PD);
-	s5_2.setArrivalInformations(E, now, now, PE);
+	s5_2.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+	s5_2.setArrivalInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
 	j5.append(s5_2);
 	ServicePointer s5_3(true, false, USER_PEDESTRIAN, S, now);
-	s5_3.setDepartureInformations(E, now, now, PE);
-	s5_3.setArrivalInformations(F, now, now, PF);
+	s5_3.setDepartureInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
+	s5_3.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 	j5.append(s5_3);
 	ServicePointer s5_4(true, false, USER_PEDESTRIAN, S, now);
-	s5_4.setDepartureInformations(F, now, now, PF);
-	s5_4.setArrivalInformations(B, now, now, PB);
+	s5_4.setDepartureInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
+	s5_4.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j5.append(s5_4);
 	j.push_back(j5);
 
@@ -308,16 +320,16 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 
 	Journey j6;
 	ServicePointer s6_0(true, false, USER_PEDESTRIAN, S, now);
-	s6_0.setDepartureInformations(A, now, now, PA);
-	s6_0.setArrivalInformations(D, now, now, PD);
+	s6_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s6_0.setArrivalInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
 	j6.append(s6_0);
 	ServicePointer s6_1(true, false, USER_PEDESTRIAN, S, now);
-	s6_1.setDepartureInformations(D, now, now, PD);
-	s6_1.setArrivalInformations(C, now, now, PC);
+	s6_1.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+	s6_1.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 	j6.append(s6_1);
 	ServicePointer s6_2(true, false, USER_PEDESTRIAN, S, now);
-	s6_2.setDepartureInformations(C, now, now, PC);
-	s6_2.setArrivalInformations(B, now, now, PB);
+	s6_2.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+	s6_2.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j6.append(s6_2);
 	j.push_back(j6);
 
@@ -352,6 +364,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 
 BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 {
+	Env env;
 	ptime now(second_clock::local_time());
 
 	JourneyPattern L;
@@ -361,83 +374,93 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	CA.setName("A");
 	StopPoint PA;
 	PA.setHub(&CA);
-	DesignatedLinePhysicalStop A;
-	A.setLine(&L);
-	A.setPhysicalStop(PA);
-	A.setRankInPath(0);
+	LineStop A;
+	A.set<Line>(L);
+	A.set<LineNode>(PA);
+	A.set<RankInPath>(0);
+	A.link(env);
 
 	StopArea CB;
 	CB.setName("B");
 	StopPoint PB;
 	PB.setHub(&CB);
-	DesignatedLinePhysicalStop B;
-	B.setLine(&L);
-	B.setPhysicalStop(PB);
-	B.setRankInPath(1);
+	LineStop B;
+	B.set<Line>(L);
+	B.set<LineNode>(PB);
+	B.set<RankInPath>(1);
+	B.link(env);
 
 	StopArea CC;
 	CC.setName("C");
 	StopPoint PC;
 	PC.setHub(&CC);
-	DesignatedLinePhysicalStop C;
-	C.setLine(&L);
-	C.setPhysicalStop(PC);
-	C.setRankInPath(2);
+	LineStop C;
+	C.set<Line>(L);
+	C.set<LineNode>(PC);
+	C.set<RankInPath>(2);
+	C.link(env);
 
 	StopArea CD;
 	CD.setName("D");
 	StopPoint PD;
 	PD.setHub(&CD);
-	DesignatedLinePhysicalStop D;
-	D.setLine(&L);
-	D.setPhysicalStop(PD);
-	D.setRankInPath(3);
+	LineStop D;
+	D.set<Line>(L);
+	D.set<LineNode>(PD);
+	D.set<RankInPath>(3);
+	D.link(env);
 
 	StopArea CE;
 	CE.setName("E");
 	StopPoint PE;
 	PE.setHub(&CE);
-	DesignatedLinePhysicalStop E;
-	E.setLine(&L);
-	E.setPhysicalStop(PE);
-	E.setRankInPath(4);
+	LineStop E;
+	E.set<Line>(L);
+	E.set<LineNode>(PE);
+	E.set<RankInPath>(4);
+	E.link(env);
 
 	StopArea CF;
 	CF.setName("F");
 	StopPoint PF;
 	PF.setHub(&CF);
-	DesignatedLinePhysicalStop F;
-	F.setLine(&L);
-	F.setPhysicalStop(PF);
-	F.setRankInPath(5);
-
-	MainRoadPart R;
-	PermanentService Sr(0, &R, boost::posix_time::minutes(5));
+	LineStop F;
+	F.set<Line>(L);
+	F.set<LineNode>(PF);
+	F.set<RankInPath>(5);
+	F.link(env);
+	
+	Road R;
+	R.link(env);
+	PermanentService Sr(0, &R.getForwardPath(), boost::posix_time::minutes(5));
 
 	Crossing Cr0;
 	Crossing Cr1;
 	Crossing Cr2;
 
-	MainRoadChunk Ch0(0, &Cr0, 0, &R);
-	MainRoadChunk Ch1(0, &Cr1, 1, &R);
-	MainRoadChunk Ch2(0, &Cr2, 2, &R);
+	RoadChunk Ch0(0, &Cr0, 0, &R);
+	Ch0.link(env);
+	RoadChunk Ch1(0, &Cr1, 1, &R);
+	Ch1.link(env);
+	RoadChunk Ch2(0, &Cr2, 2, &R);
+	Ch2.link(env);
 
 	Journey j0;
 	ServicePointer s0_0(true, false, USER_PEDESTRIAN, Sr, now);
-	s0_0.setDepartureInformations(A, now, now, PA);
-	s0_0.setArrivalInformations(Ch0, now, now, Cr0);
+	s0_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s0_0.setArrivalInformations(Ch0.getForwardEdge(), now, now, Cr0);
 	j0.append(s0_0);
 	ServicePointer s0_1(true, false, USER_PEDESTRIAN, Sr, now);
-	s0_1.setDepartureInformations(Ch0, now, now, Cr0);
-	s0_1.setArrivalInformations(Ch1, now, now, Cr1);
+	s0_1.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
+	s0_1.setArrivalInformations(Ch1.getForwardEdge(), now, now, Cr1);
 	j0.append(s0_1);
 	ServicePointer s0_2(true, false, USER_PEDESTRIAN, Sr, now);
-	s0_2.setDepartureInformations(Ch1, now, now, Cr1);
-	s0_2.setArrivalInformations(C, now, now, PC);
+	s0_2.setDepartureInformations(Ch1.getForwardEdge(), now, now, Cr1);
+	s0_2.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 	j0.append(s0_2);
 	ServicePointer s0_3(true, false, USER_PEDESTRIAN, S, now);
-	s0_3.setDepartureInformations(C, now, now, PC);
-	s0_3.setArrivalInformations(B, now, now, PB);
+	s0_3.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+	s0_3.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j0.append(s0_3);
 
 	PTRoutePlannerResult::Journeys j;
@@ -467,16 +490,16 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j1;
 	ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
-	s1_0.setDepartureInformations(A, now, now, PA);
-	s1_0.setArrivalInformations(E, now, now, PE);
+	s1_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s1_0.setArrivalInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
 	j1.append(s1_0);
 	ServicePointer s1_1(true, false, USER_PEDESTRIAN, Sr, now);
-	s1_1.setDepartureInformations(E, now, now, PE);
-	s1_1.setArrivalInformations(Ch2, now, now, Cr2);
+	s1_1.setDepartureInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
+	s1_1.setArrivalInformations(Ch2.getForwardEdge(), now, now, Cr2);
 	j1.append(s1_1);
 	ServicePointer s1_2(true, false, USER_PEDESTRIAN, Sr, now);
-	s1_2.setDepartureInformations(Ch2, now, now, Cr2);
-	s1_2.setArrivalInformations(B, now, now, PB);
+	s1_2.setDepartureInformations(Ch2.getForwardEdge(), now, now, Cr2);
+	s1_2.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j1.append(s1_2);
 
 	j.push_back(j1);
@@ -510,12 +533,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j2;
 	ServicePointer s2_0(true, false, USER_PEDESTRIAN, Sr, now);
-	s2_0.setDepartureInformations(Ch0, now, now, Cr0);
-	s2_0.setArrivalInformations(D, now, now, PD);
+	s2_0.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
+	s2_0.setArrivalInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
 	j2.append(s2_0);
 	ServicePointer s2_1(true, false, USER_PEDESTRIAN, S, now);
-	s2_1.setDepartureInformations(D, now, now, PD);
-	s2_1.setArrivalInformations(B, now, now, PB);
+	s2_1.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+	s2_1.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 	j2.append(s2_1);
 
 	j.push_back(j2);
@@ -554,12 +577,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j3;
 	ServicePointer s3_0(true, false, USER_PEDESTRIAN, S, now);
-	s3_0.setDepartureInformations(A, now, now, PA);
-	s3_0.setArrivalInformations(F, now, now, PF);
+	s3_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+	s3_0.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 	j3.append(s3_0);
 	ServicePointer s3_1(true, false, USER_PEDESTRIAN, Sr, now);
-	s3_1.setDepartureInformations(F, now, now, PF);
-	s3_1.setArrivalInformations(Ch2, now, now, Cr2);
+	s3_1.setDepartureInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
+	s3_1.setArrivalInformations(Ch2.getForwardEdge(), now, now, Cr2);
 	j3.append(s3_1);
 
 	j.push_back(j3);
@@ -603,12 +626,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j4;
 	ServicePointer s4_0(true, false, USER_PEDESTRIAN, Sr, now);
-	s4_0.setDepartureInformations(Ch0, now, now, Cr0);
-	s4_0.setArrivalInformations(F, now, now, PF);
+	s4_0.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
+	s4_0.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 	j4.append(s4_0);
 	ServicePointer s4_1(true, false, USER_PEDESTRIAN, Sr, now);
-	s4_1.setDepartureInformations(F, now, now, PF);
-	s4_1.setArrivalInformations(Ch2, now, now, Cr2);
+	s4_1.setDepartureInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
+	s4_1.setArrivalInformations(Ch2.getForwardEdge(), now, now, Cr2);
 	j4.append(s4_1);
 
 	j.push_back(j4);
@@ -652,8 +675,8 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j5;
 	ServicePointer s5_0(true, false, USER_PEDESTRIAN, Sr, now);
-	s5_0.setDepartureInformations(Ch0, now, now, Cr0);
-	s5_0.setArrivalInformations(Ch1, now, now, Cr1);
+	s5_0.setDepartureInformations(Ch0.getForwardEdge(), now, now, Cr0);
+	s5_0.setArrivalInformations(Ch1.getForwardEdge(), now, now, Cr1);
 	j5.append(s5_0);
 
 	j.push_back(j5);
@@ -698,6 +721,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 {
+	Env env;
 	ptime now(second_clock::local_time());
 
 	JourneyPattern L;
@@ -707,75 +731,81 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 	CA.setName("A");
 	StopPoint PA;
 	PA.setHub(&CA);
-	DesignatedLinePhysicalStop A;
-	A.setLine(&L);
-	A.setPhysicalStop(PA);
-	A.setRankInPath(0);
+	LineStop A;
+	A.set<Line>(L);
+	A.set<LineNode>(PA);
+	A.set<RankInPath>(0);
+	A.link(env);
 
 	StopArea CB;
 	CB.setName("B");
 	StopPoint PB;
 	PB.setHub(&CB);
-	DesignatedLinePhysicalStop B;
-	B.setLine(&L);
-	B.setPhysicalStop(PB);
-	B.setRankInPath(1);
+	LineStop B;
+	B.set<Line>(L);
+	B.set<LineNode>(PB);
+	B.set<RankInPath>(1);
+	B.link(env);
 
 	StopArea CC;
 	CC.setName("C");
 	StopPoint PC;
 	PC.setHub(&CC);
-	DesignatedLinePhysicalStop C;
-	C.setLine(&L);
-	C.setPhysicalStop(PC);
-	C.setRankInPath(2);
+	LineStop C;
+	C.set<Line>(L);
+	C.set<LineNode>(PC);
+	C.set<RankInPath>(2);
+	C.link(env);
 
 	StopArea CD;
 	CD.setName("D");
 	StopPoint PD;
 	PD.setHub(&CD);
-	DesignatedLinePhysicalStop D;
-	D.setLine(&L);
-	D.setPhysicalStop(PD);
-	D.setRankInPath(3);
+	LineStop D;
+	D.set<Line>(L);
+	D.set<LineNode>(PD);
+	D.set<RankInPath>(3);
+	D.link(env);
 
 	StopArea CE;
 	CE.setName("E");
 	StopPoint PE;
 	PE.setHub(&CE);
-	DesignatedLinePhysicalStop E;
-	E.setLine(&L);
-	E.setPhysicalStop(PE);
-	E.setRankInPath(4);
+	LineStop E;
+	E.set<Line>(L);
+	E.set<LineNode>(PE);
+	E.set<RankInPath>(4);
+	E.link(env);
 
 	StopArea CF;
 	CF.setName("F");
 	StopPoint PF;
 	PF.setHub(&CF);
-	DesignatedLinePhysicalStop F;
-	F.setLine(&L);
-	F.setPhysicalStop(PF);
-	F.setRankInPath(5);
+	LineStop F;
+	F.set<Line>(L);
+	F.set<LineNode>(PF);
+	F.set<RankInPath>(5);
+	F.link(env);
 
 	{
 		Journey j0;
 		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
-		s0_0.setDepartureInformations(D, now, now, PD);
-		s0_0.setArrivalInformations(C, now, now, PC);
+		s0_0.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+		s0_0.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 		j0.append(s0_0);
 		ServicePointer s0_1(true, false, USER_PEDESTRIAN, S, now);
-		s0_1.setDepartureInformations(C, now, now, PC);
-		s0_1.setArrivalInformations(B, now, now, PB);
+		s0_1.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+		s0_1.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 		j0.append(s0_1);
 
 		Journey j1;
 		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
-		s1_0.setDepartureInformations(E, now, now, PE);
-		s1_0.setArrivalInformations(C, now, now, PC);
+		s1_0.setDepartureInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
+		s1_0.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 		j1.append(s1_0);
 		ServicePointer s1_1(true, false, USER_PEDESTRIAN, S, now);
-		s1_1.setDepartureInformations(C, now, now, PC);
-		s1_1.setArrivalInformations(B, now, now, PB);
+		s1_1.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+		s1_1.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 		j1.append(s1_1);
 
 		PTRoutePlannerResult::Journeys j;
@@ -810,22 +840,22 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 	{
 		Journey j0;
 		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
-		s0_0.setDepartureInformations(A, now, now, PA);
-		s0_0.setArrivalInformations(C, now, now, PC);
+		s0_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+		s0_0.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 		j0.append(s0_0);
 		ServicePointer s0_1(true, false, USER_PEDESTRIAN, S, now);
-		s0_1.setDepartureInformations(C, now, now, PC);
-		s0_1.setArrivalInformations(D, now, now, PD);
+		s0_1.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+		s0_1.setArrivalInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
 		j0.append(s0_1);
 
 		Journey j1;
 		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
-		s1_0.setDepartureInformations(A, now, now, PA);
-		s1_0.setArrivalInformations(C, now, now, PC);
+		s1_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+		s1_0.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
 		j1.append(s1_0);
 		ServicePointer s1_1(true, false, USER_PEDESTRIAN, S, now);
-		s1_1.setDepartureInformations(A, now, now, PA);
-		s1_1.setArrivalInformations(E, now, now, PE);
+		s1_1.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+		s1_1.setArrivalInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
 		j1.append(s1_1);
 
 		PTRoutePlannerResult::Journeys j;
@@ -860,14 +890,14 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 	{
 		Journey j0;
 		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
-		s0_0.setDepartureInformations(D, now, now, PD);
-		s0_0.setArrivalInformations(E, now, now, PE);
+		s0_0.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+		s0_0.setArrivalInformations(**E.getGeneratedLineStops().begin(), now, now, PE);
 		j0.append(s0_0);
 
 		Journey j1;
 		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
-		s1_0.setDepartureInformations(C, now, now, PC);
-		s1_0.setArrivalInformations(F, now, now, PF);
+		s1_0.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+		s1_0.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 		j1.append(s1_0);
 
 		PTRoutePlannerResult::Journeys j;
@@ -902,14 +932,14 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 	{ // 7798 The actual destination must always be at the end of the table
 		Journey j0;
 		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
-		s0_0.setDepartureInformations(A, now, now, PA);
-		s0_0.setArrivalInformations(B, now, now, PB);
+		s0_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+		s0_0.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 		j0.append(s0_0);
 
 		Journey j1;
 		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
-		s1_0.setDepartureInformations(C, now, now, PC);
-		s1_0.setArrivalInformations(F, now, now, PF);
+		s1_0.setDepartureInformations(**C.getGeneratedLineStops().begin(), now, now, PC);
+		s1_0.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 		j1.append(s1_0);
 
 		PTRoutePlannerResult::Journeys j;
@@ -944,14 +974,14 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 	{ // 7798 The actual destination must always be at the end of the table
 		Journey j0;
 		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
-		s0_0.setDepartureInformations(D, now, now, PD);
-		s0_0.setArrivalInformations(F, now, now, PF);
+		s0_0.setDepartureInformations(**D.getGeneratedLineStops().begin(), now, now, PD);
+		s0_0.setArrivalInformations(**F.getGeneratedLineStops().begin(), now, now, PF);
 		j0.append(s0_0);
 
 		Journey j1;
 		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
-		s1_0.setDepartureInformations(A, now, now, PA);
-		s1_0.setArrivalInformations(B, now, now, PB);
+		s1_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+		s1_0.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 		j1.append(s1_0);
 
 		PTRoutePlannerResult::Journeys j;
@@ -986,18 +1016,18 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 	{ // 13407 Crash if a destination stop is used for transfer too
 		Journey j0;
 		ServicePointer s0_0(true, false, USER_PEDESTRIAN, S, now);
-		s0_0.setDepartureInformations(A, now, now, PD);
-		s0_0.setArrivalInformations(B, now, now, PF);
+		s0_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PD);
+		s0_0.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PF);
 		j0.append(s0_0);
 
 		Journey j1;
 		ServicePointer s1_0(true, false, USER_PEDESTRIAN, S, now);
-		s1_0.setDepartureInformations(A, now, now, PA);
-		s1_0.setArrivalInformations(B, now, now, PB);
+		s1_0.setDepartureInformations(**A.getGeneratedLineStops().begin(), now, now, PA);
+		s1_0.setArrivalInformations(**B.getGeneratedLineStops().begin(), now, now, PB);
 		j1.append(s1_0);
 		ServicePointer s1_1(true, false, USER_PEDESTRIAN, S, now);
-		s1_1.setDepartureInformations(B, now, now, PA);
-		s1_1.setArrivalInformations(C, now, now, PB);
+		s1_1.setDepartureInformations(**B.getGeneratedLineStops().begin(), now, now, PA);
+		s1_1.setArrivalInformations(**C.getGeneratedLineStops().begin(), now, now, PB);
 		j1.append(s1_1);
 
 		PTRoutePlannerResult::Journeys j;

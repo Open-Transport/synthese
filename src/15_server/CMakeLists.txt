@@ -15,11 +15,6 @@ ClientException.cpp
 ClientException.h
 DbModuleConfigTableSync.cpp
 DbModuleConfigTableSync.h
-DeviceTemplate.h
-Device.h
-Device.cpp
-DevicesService.hpp
-DevicesService.cpp
 DynamicRequest.cpp
 DynamicRequest.h
 Function.cpp
@@ -51,6 +46,8 @@ LoginAction.cpp
 LoginAction.h
 LoginInterfacePage.cpp
 LoginInterfacePage.h
+LoginToken.cpp
+LoginToken.hpp
 LogoutAction.cpp
 LogoutAction.h
 MemoryStatisticsAdmin.cpp
@@ -59,14 +56,6 @@ ModuleClass.cpp
 ModuleClass.h
 ModuleClassTemplate.hpp
 ModuleException.h
-PermanentThread.hpp
-PermanentThread.cpp
-PermanentThreadsService.hpp
-PermanentThreadsService.cpp
-PermanentThreadTableSync.hpp
-PermanentThreadTableSync.cpp
-Poller.hpp
-Poller.cpp
 QuitAction.cpp
 QuitAction.hpp
 RedirectService.cpp
@@ -101,6 +90,8 @@ SetSessionVariableAction.hpp
 StaticActionFunctionRequest.h
 StaticActionRequest.h
 StaticFunctionRequest.h
+SuicidalAction.cpp
+SuicidalAction.hpp
 SYNTHESEInformationService.cpp
 SYNTHESEInformationService.hpp
 ThreadKillAction.cpp

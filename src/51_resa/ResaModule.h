@@ -178,11 +178,14 @@ namespace synthese
 			static const std::string DATA_CURRENT_CALL_ID;
 			static const std::string DATA_CURRENT_CALL_TIMESTAMP;
 
+			static const std::string MODULE_PARAMETER_MAX_SEATS_ALLOWED;
+
 			static boost::shared_ptr<security::Profile>	_basicProfile;
 			static boost::shared_ptr<security::Profile>	_autoresaProfile;
 			static boost::shared_ptr<security::Profile>	_adminProfile;
 			static boost::shared_ptr<OnlineReservationRule> _reservationContact;
 			static boost::shared_ptr<pt_website::PTServiceConfig> _journeyPlannerConfig;
+			static size_t _maxSeats;
 
 		public:
 			typedef std::map<const graph::Service*, std::set<const Reservation*> > ReservationsByService;
@@ -240,6 +243,7 @@ namespace synthese
 
 			static OnlineReservationRule* GetReservationContact();
 			static pt_website::PTServiceConfig* GetJourneyPlannerWebsite();
+			static size_t GetMaxSeats();
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds parameters to send to the display template for admin pages.

@@ -33,7 +33,7 @@ namespace synthese
 	namespace pt
 	{
 		class StopPoint;
-		class DesignatedLinePhysicalStop;
+		class LineStop;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : CopyGeometriesAction.
@@ -59,7 +59,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<const StopPoint> _startingStop;
 			boost::shared_ptr<const StopPoint> _endingStop;
-			boost::shared_ptr<const DesignatedLinePhysicalStop> _edgeTemplate;
+			boost::shared_ptr<const LineStop> _edgeTemplate;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ namespace synthese
 			//@{
 				void setStartingStop(boost::shared_ptr<const StopPoint> value) { _startingStop = value; }
 				void setEndingStop(boost::shared_ptr<const StopPoint> value) { _endingStop = value; }
-				void setEdgeTemplate(boost::shared_ptr<const DesignatedLinePhysicalStop> value) { _edgeTemplate= value; }
+				void setEdgeTemplate(boost::shared_ptr<const LineStop> value) { _edgeTemplate= value; }
 			//@}
 		};
 	}

@@ -21,8 +21,12 @@
 */
 
 #include "LinePhysicalStop.hpp"
+
+#include "DRTArea.hpp"
+#include "Hub.h"
+#include "LineStop.h"
+#include "PTModule.h"
 #include "StopPoint.hpp"
-#include "JourneyPatternCopy.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -35,15 +39,14 @@ namespace synthese
 	namespace pt
 	{
 		LinePhysicalStop::LinePhysicalStop(
-			util::RegistryKeyType id,
 			JourneyPattern* line,
 			std::size_t rankInPath,
-			bool isDeparture,
-			bool isArrival,
 			double metricOffset,
-			StopPoint* stop
-		):	Registrable(id),
-			LineStop(id, line, rankInPath, isDeparture, isArrival, metricOffset, stop)
+			StopPoint* stop,
+			LineStop* lineStop
+		):	Registrable(0),
+			Edge(line, rankInPath, stop, metricOffset),
+			_lineStop(lineStop)
 		{
 			if(stop)
 			{
@@ -68,48 +71,81 @@ namespace synthese
 
 
 
-		void LinePhysicalStop::clearPhysicalStopLinks()
+		LinePhysicalStop::~LinePhysicalStop()
 		{
-			StopPoint* stop(getPhysicalStop());
-			if(stop == NULL)
-			{
-				return;
-			}
+		}
 
-			// Collecting all line stops to unlink including journey pattern copies
-			typedef vector<pair<JourneyPattern*, LinePhysicalStop*> > ToClean;
-			ToClean toClean;
-			toClean.push_back(make_pair(getLine(), this));
-			BOOST_FOREACH(JourneyPatternCopy* copy, getLine()->getSubLines())
-			{
-				toClean.push_back(
-					make_pair(
-						copy,
-						const_cast<LinePhysicalStop*>(static_cast<const LinePhysicalStop*>(
-							copy->getEdge(getRankInPath()))
-						)
-				)	);
-			}
 
-			BOOST_FOREACH(const ToClean::value_type& it, toClean)
-			{
-				// Removing edge from journey pattern
-				it.first->removeEdge(*it.second);
 
-				// Removing edge from stop point
-				if(it.second->getIsArrival())
+		bool LinePhysicalStop::getReservationNeeded() const
+		{
+			return
+				_lineStop->get<ReservationNeeded>() ||
+				dynamic_cast<DRTArea*>(&*_lineStop->get<LineNode>())
+			;
+		}
+
+
+
+		void LinePhysicalStop::link()
+		{
+			// Link on stop
+			if(_fromVertex)
+			{
+				if(isArrivalAllowed())
 				{
-					stop->removeArrivalEdge(it.second);
+					_fromVertex->addArrivalEdge(this);
 				}
-				if(it.second->getIsDeparture())
+				if(isDepartureAllowed())
 				{
-					stop->removeDepartureEdge(it.second);
+					_fromVertex->addDepartureEdge(this);
 				}
 
-				if(it.second != this)
+				if(_fromVertex->getHub())
 				{
-					delete it.second;
+					_fromVertex->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
 				}
 			}
+			
+			// Link on path
+			if(_parentPath)
+			{
+				_parentPath->addEdge(*this);
+			}
+		}
+
+
+
+		void LinePhysicalStop::unlink()
+		{
+			if(_parentPath)
+			{
+				_parentPath->removeEdge(*this);
+			}
+
+			if(_fromVertex)
+			{
+				_fromVertex->removeArrivalEdge(this);
+				_fromVertex->removeDepartureEdge(this);
+
+				if(_fromVertex->getHub())
+				{
+					_fromVertex->getHub()->clearAndPropagateUsefulTransfer(PTModule::GRAPH_ID);
+				}
+			}
+		}
+
+
+
+		bool LinePhysicalStop::getScheduleInput() const
+		{
+			return _lineStop->get<ScheduleInput>();
+		}
+
+
+
+		JourneyPattern* LinePhysicalStop::getJourneyPattern() const
+		{
+			return _lineStop->get<Line>() ? &*_lineStop->get<Line>() : NULL;
 		}
 }	}

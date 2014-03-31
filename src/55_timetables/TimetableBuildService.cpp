@@ -29,7 +29,6 @@
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "JourneyPattern.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LinePhysicalStop.hpp"
 #include "PTUseRule.h"
@@ -835,17 +834,6 @@ namespace synthese
 					bool result(jp->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()));
 					if(!result)
 					{
-						BOOST_FOREACH(JourneyPatternCopy* subline, jp->getSubLines())
-						{
-							if(subline->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()))
-							{
-								result = true;
-								break;
-							}
-						}
-					}
-					if(!result)
-					{
 						continue;
 					}
 				}
@@ -853,7 +841,7 @@ namespace synthese
 				PlacesListConfiguration::List jlist;
 
 				// Build of the places list of the route
-				BOOST_FOREACH(Edge* edge, jp->getAllEdges())
+				BOOST_FOREACH(Edge* edge, jp->getEdges())
 				{
 					const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(edge));
 

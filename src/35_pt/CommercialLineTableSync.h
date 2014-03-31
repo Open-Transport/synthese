@@ -61,6 +61,7 @@ namespace synthese
 			static const std::string COL_SHORT_NAME;
 			static const std::string COL_LONG_NAME;
 			static const std::string COL_COLOR;
+			static const std::string COL_FOREGROUND_COLOR;
 			static const std::string COL_STYLE;
 			static const std::string COL_IMAGE;
 			static const std::string COL_OPTIONAL_RESERVATION_PLACES;
@@ -74,6 +75,7 @@ namespace synthese
 			static const std::string COL_DOC_URL;
 			static const std::string COL_TIMETABLE_ID;
 			static const std::string COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
+			static const std::string COL_WEIGHT_FOR_SORTING;
 
 
 

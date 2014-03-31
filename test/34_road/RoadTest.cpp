@@ -20,227 +20,343 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MainRoadPart.hpp"
+#include "Env.h"
+#include "Road.h"
+#include "RoadPath.hpp"
 #include "Crossing.h"
 #include "RoadPlace.h"
-#include "MainRoadChunk.hpp"
-#include "ReverseRoadPart.hpp"
+#include "RoadChunk.h"
+#include "RoadChunkEdge.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::road;
+using namespace synthese::util;
 using namespace boost;
+using namespace std;
 
 
 BOOST_AUTO_TEST_CASE (Edges)
 {
-	{ // Regular order insertion 0 1 2
+	Env env;
+
+	{	// Regular order insertion 0 1 2
 		RoadPlace p;
 
-		MainRoadPart r;
-		r.setRoadPlace(p);
+		Road r;
+		r.set<RoadPlace>(p);
+		r.link(env);
 
-		BOOST_REQUIRE(r.getReverseRoad());
-		BOOST_REQUIRE_EQUAL(r.getRoadPlace()->getPaths().size(), 2);
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getRoad(), &r);
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getRoad(), &r);
+
+		BOOST_REQUIRE_EQUAL(r.get<RoadPlace>()->getPaths().size(), 2);
+		BOOST_CHECK(p.getPaths().find(&r.getForwardPath()) != p.getPaths().end());
+		BOOST_CHECK(p.getPaths().find(&r.getReversePath()) != p.getPaths().end());
+
+		BOOST_REQUIRE_EQUAL(p.getRoads().size(), 1);
+		BOOST_CHECK(p.getRoads().find(&r) != p.getRoads().end());
 
 		Crossing cr1;
-		MainRoadChunk c1(0, &cr1, 0, &r, 0);
-		r.addRoadChunk(c1);
+		RoadChunk c1(0, &cr1, 0, &r, 0);
+		c1.link(env);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c1);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getMetricOffset(), 0);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRankInPath(), c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getMetricOffset(), c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRoadChunk(), &c1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getMetricOffset(), -c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRoadChunk(), &c1);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 1);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c1.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 1);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c1.getReverseEdge());
 
 		Crossing cr2;
-		MainRoadChunk c2(0, &cr2, 1, &r, 10);
-		r.addRoadChunk(c2);
+		RoadChunk c2(0, &cr2, 1, &r, 10);
+		c2.link(env);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c2);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getMetricOffset(), -10);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getMetricOffset(), 0);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRankInPath(), c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getMetricOffset(), c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRoadChunk(), &c1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getMetricOffset(), -c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRoadChunk(), &c1);
+
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRankInPath(), c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getMetricOffset(), c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRoadChunk(), &c2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getMetricOffset(), -c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRoadChunk(), &c2);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 2);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c1.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(1), &c2.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 2);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c2.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(1), &c1.getReverseEdge());
+
 
 		Crossing cr3;
-		MainRoadChunk c3(0, &cr3, 2, &r, 20);
-		r.addRoadChunk(c3);
+		RoadChunk c3(0, &cr3, 2, &r, 20);
+		c3.link(env);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(2), &c3);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr3);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getMetricOffset(), -20);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getMetricOffset(), -10);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getRankInPath(), 2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getMetricOffset(), 0);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRankInPath(), c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getMetricOffset(), c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRoadChunk(), &c1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getMetricOffset(), -c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRoadChunk(), &c1);
+
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRankInPath(), c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getMetricOffset(), c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRoadChunk(), &c2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getMetricOffset(), -c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRoadChunk(), &c2);
+
+		BOOST_CHECK_EQUAL(c3.getForwardEdge().getFromVertex(), &cr3);
+		BOOST_CHECK_EQUAL(c3.getForwardEdge().getRankInPath(), c3.getRankInPath());
+		BOOST_CHECK_EQUAL(c3.getForwardEdge().getMetricOffset(), c3.getMetricOffset());
+		BOOST_CHECK_EQUAL(c3.getForwardEdge().getRoadChunk(), &c3);
+		BOOST_CHECK_EQUAL(c3.getReverseEdge().getFromVertex(), &cr3);
+		BOOST_CHECK_EQUAL(c3.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c3.getRankInPath());
+		BOOST_CHECK_EQUAL(c3.getReverseEdge().getMetricOffset(), -c3.getMetricOffset());
+		BOOST_CHECK_EQUAL(c3.getReverseEdge().getRoadChunk(), &c3);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c1.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(1), &c2.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(2), &c3.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c3.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(1), &c2.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(2), &c1.getReverseEdge());
 	}
 
 	{ // Reverse order insertion 2 1 0
 		RoadPlace p;
 
-		MainRoadPart r;
-		r.setRoadPlace(p);
-
-		BOOST_REQUIRE(r.getReverseRoad());
-		BOOST_REQUIRE_EQUAL(r.getRoadPlace()->getPaths().size(), 2);
+		Road r;
+		r.set<RoadPlace>(p);
+		r.link(env);
 
 		Crossing cr2;
-		MainRoadChunk c2(0, &cr2, 2, &r, 20);
-		r.addRoadChunk(c2);
+		RoadChunk c2(0, &cr2, 2, &r, 20);
+		c2.link(env);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c2);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getRankInPath(), 2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getMetricOffset(), -20);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRankInPath(), c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getMetricOffset(), c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRoadChunk(), &c2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getMetricOffset(), -c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRoadChunk(), &c2);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 1);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c2.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 1);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c2.getReverseEdge());
 
 		Crossing cr1;
-		MainRoadChunk c1(0, &cr1, 1, &r, 10);
-		r.addRoadChunk(c1);
+		RoadChunk c1(0, &cr1, 1, &r, 10);
+		c1.link(env);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1)->getRankInPath(), 2);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRankInPath(), c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getMetricOffset(), c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRoadChunk(), &c1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getMetricOffset(), -c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRoadChunk(), &c1);
+
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRankInPath(), c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getMetricOffset(), c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRoadChunk(), &c2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getMetricOffset(), -c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRoadChunk(), &c2);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 2);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c1.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(1), &c2.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 2);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c2.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(1), &c1.getReverseEdge());
 
 		Crossing cr0;
-		MainRoadChunk c0(0, &cr0, 0, &r, 0);
-		r.addRoadChunk(c0);
+		RoadChunk c0(0, &cr0, 0, &r, 0);
+		c0.link(env);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c0);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(2), &c2);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getFromVertex(), &cr0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getRankInPath(), 2);
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getFromVertex(), &cr0);
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getRankInPath(), c0.getRankInPath());
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getMetricOffset(), c0.getMetricOffset());
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getRoadChunk(), &c0);
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getFromVertex(), &cr0);
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c0.getRankInPath());
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getMetricOffset(), -c0.getMetricOffset());
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getRoadChunk(), &c0);
+
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRankInPath(), c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getMetricOffset(), c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRoadChunk(), &c1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getMetricOffset(), -c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRoadChunk(), &c1);
+
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRankInPath(), c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getMetricOffset(), c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRoadChunk(), &c2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getMetricOffset(), -c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRoadChunk(), &c2);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c0.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(1), &c1.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(2), &c2.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c2.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(1), &c1.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(2), &c0.getReverseEdge());
 	}
 
 	{ // Random order insertion 2 0 1
 		RoadPlace p;
 
-		MainRoadPart r;
-		r.setRoadPlace(p);
+		Road r;
+		r.set<RoadPlace>(p);
+		r.link(env);
 
 		Crossing cr1;
-		MainRoadChunk c1(0, &cr1, 2, &r, 10);
-		r.addRoadChunk(c1);
+		RoadChunk c1(0, &cr1, 2, &r, 10);
+		c1.link(env);
 
 		Crossing cr2;
-		MainRoadChunk c2(0, &cr2, 0, &r, 0);
-		r.addRoadChunk(c2);
-
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c1);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 2);
+		RoadChunk c2(0, &cr2, 0, &r, 0);
+		c2.link(env);
 
 		Crossing cr3;
-		MainRoadChunk c3(0, &cr3, 1, &r, 5);
-		r.addRoadChunk(c3);
+		RoadChunk c3(0, &cr3, 1, &r, 5);
+		c3.link(env);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c3);
-		BOOST_CHECK_EQUAL(r.getEdges().at(2), &c1);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr3);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getRankInPath(), 2);
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c2.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(1), &c3.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(2), &c1.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c1.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(1), &c3.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(2), &c2.getReverseEdge());
 	}
 
 	{ // Insertions 0 1 2
 		RoadPlace p;
 
-		MainRoadPart r;
-		r.setRoadPlace(p);
+		Road r;
+		r.set<RoadPlace>(p);
+		r.link(env);
 
 		Crossing cr2;
-		MainRoadChunk c2(0, &cr2, 0, &r, 0);
-		r.addRoadChunk(c2);
-
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getMetricOffset(), 0);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 1);
-		BOOST_CHECK_EQUAL(static_cast<MainRoadChunk*>(r.getReverseRoad()->getEdges().at(0))->getFromCrossing(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getMetricOffset(), 0);
+		RoadChunk c2(0, &cr2, 0, &r, 0);
+		c2.link(env);
 
 		Crossing cr1;
-		MainRoadChunk c1(0, &cr1, 0, &r, 0);
+		RoadChunk c1(0, &cr1, 0, &r, 0);
 		r.insertRoadChunk(c1, 10, 1);
+		
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRankInPath(), c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getMetricOffset(), c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRoadChunk(), &c1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getMetricOffset(), -c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRoadChunk(), &c1);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getMetricOffset(), 0);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1)->getMetricOffset(), 10);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getMetricOffset(), -10);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getMetricOffset(), 0);
+		BOOST_CHECK_EQUAL(c2.getRankInPath(), 1);
+		BOOST_CHECK_EQUAL(c2.getMetricOffset(), 10);
+
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRankInPath(), c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getMetricOffset(), c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRoadChunk(), &c2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getMetricOffset(), -c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRoadChunk(), &c2);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 2);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c1.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(1), &c2.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 2);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c2.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(1), &c1.getReverseEdge());
 
 		Crossing cr0;
-		MainRoadChunk c0(0, &cr0, 0, &r, 0);
+		RoadChunk c0(0, &cr0, 0, &r, 0);
 		r.insertRoadChunk(c0, 20, 1);
+		
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getFromVertex(), &cr0);
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getRankInPath(), c0.getRankInPath());
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getMetricOffset(), c0.getMetricOffset());
+		BOOST_CHECK_EQUAL(c0.getForwardEdge().getRoadChunk(), &c0);
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getFromVertex(), &cr0);
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c0.getRankInPath());
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getMetricOffset(), -c0.getMetricOffset());
+		BOOST_CHECK_EQUAL(c0.getReverseEdge().getRoadChunk(), &c0);
 
-		BOOST_REQUIRE_EQUAL(r.getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0), &c0);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getEdges().at(0)->getMetricOffset(), 0);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1), &c1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getEdges().at(1)->getMetricOffset(), 20);
-		BOOST_CHECK_EQUAL(r.getEdges().at(2), &c2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(2)->getRankInPath(), 2);
-		BOOST_CHECK_EQUAL(r.getEdges().at(2)->getMetricOffset(), 30);
-		BOOST_REQUIRE_EQUAL(r.getReverseRoad()->getEdges().size(), 3);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getFromVertex(), &cr2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getRankInPath(), 0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(0)->getMetricOffset(), -30);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getFromVertex(), &cr1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getRankInPath(), 1);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(1)->getMetricOffset(), -20);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getFromVertex(), &cr0);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getRankInPath(), 2);
-		BOOST_CHECK_EQUAL(r.getReverseRoad()->getEdges().at(2)->getMetricOffset(), 0);
+		BOOST_CHECK_EQUAL(c1.getRankInPath(), 1);
+		BOOST_CHECK_EQUAL(c1.getMetricOffset(), 20);
+
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRankInPath(), c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getMetricOffset(), c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getForwardEdge().getRoadChunk(), &c1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getFromVertex(), &cr1);
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c1.getRankInPath());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getMetricOffset(), -c1.getMetricOffset());
+		BOOST_CHECK_EQUAL(c1.getReverseEdge().getRoadChunk(), &c1);
+
+		BOOST_CHECK_EQUAL(c2.getRankInPath(), 2);
+		BOOST_CHECK_EQUAL(c2.getMetricOffset(), 30);
+
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRankInPath(), c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getMetricOffset(), c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getForwardEdge().getRoadChunk(), &c2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getFromVertex(), &cr2);
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRankInPath(), numeric_limits<size_t>::max() - c2.getRankInPath());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getMetricOffset(), -c2.getMetricOffset());
+		BOOST_CHECK_EQUAL(c2.getReverseEdge().getRoadChunk(), &c2);
+
+		BOOST_REQUIRE_EQUAL(r.getForwardPath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(0), &c0.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(1), &c1.getForwardEdge());
+		BOOST_CHECK_EQUAL(r.getForwardPath().getEdges().at(2), &c2.getForwardEdge());
+		BOOST_REQUIRE_EQUAL(r.getReversePath().getEdges().size(), 3);
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(0), &c2.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(1), &c1.getReverseEdge());
+		BOOST_CHECK_EQUAL(r.getReversePath().getEdges().at(2), &c0.getReverseEdge());
 	}
 }

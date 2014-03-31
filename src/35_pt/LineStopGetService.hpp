@@ -37,7 +37,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class DesignatedLinePhysicalStop;
+		class LineStop;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : LineStopGetService.
@@ -64,7 +64,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const DesignatedLinePhysicalStop> _lineStop;
+				boost::shared_ptr<const LineStop> _lineStop;
 				boost::shared_ptr<const cms::Webpage> _page;
 			//@}
 
@@ -97,7 +97,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-				void setLineStop(boost::shared_ptr<const DesignatedLinePhysicalStop> value) { _lineStop = value; }
+				void setLineStop(boost::shared_ptr<const LineStop> value) { _lineStop = value; }
 				void setPage(boost::shared_ptr<const cms::Webpage> value){ _page = value; }
 			//@}
 

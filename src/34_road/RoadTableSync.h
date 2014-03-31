@@ -23,14 +23,8 @@
 #ifndef SYNTHESE_RoadTableSync_H__
 #define SYNTHESE_RoadTableSync_H__
 
-
-#include <vector>
-#include <string>
-#include <iostream>
-
-#include "MainRoadPart.hpp"
+#include "Road.h"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -49,20 +43,9 @@ namespace synthese
 		///		- right_side : (1|0) : true = the main Road object is on right side,
 		///			false = the main Road object is on left side
 		class RoadTableSync:
-			public db::DBDirectTableSyncTemplate<
-				RoadTableSync,
-				MainRoadPart,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
-			>
+			public db::DBDirectTableSyncTemplate<RoadTableSync, Road>
 		{
 		public:
-
-			static const std::string COL_ROADTYPE;
-			static const std::string COL_BIKECOMPLIANCEID;
-			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
-			static const std::string COL_PEDESTRIANCOMPLIANCEID;
-			static const std::string COL_ROAD_PLACE_ID;
 
 
 

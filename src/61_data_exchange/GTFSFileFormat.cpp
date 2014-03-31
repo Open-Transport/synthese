@@ -323,19 +323,16 @@ namespace synthese
 							make_pair(id, isp)
 						);
 					}
-					else
-					{
-						// Creation or update
-						_createOrUpdateStop(
-							_stopPoints,
-							id,
-							name,
-							optional<const RuleUser::Rules&>(),
-							stopArea,
-							point.get(),
-							dataSource
-						);
-					}
+					// Creation or update
+					_createOrUpdateStop(
+						_stopPoints,
+						id,
+						name,
+						optional<const RuleUser::Rules&>(),
+						stopArea,
+						point.get(),
+						dataSource
+					);
 				}
 
 				_exportStopPoints(
@@ -346,11 +343,6 @@ namespace synthese
 					_exportStopPoints(
 						linkedStopPoints
 					);
-				}
-
-				if(!nonLinkedStopPoints.empty())
-				{
-					return false;
 				}
 			}
 			else if(key == FILE_TRANSFERS)
@@ -614,6 +606,8 @@ namespace synthese
 								stops,
 								dataSource,
 								true,
+								true,
+								true,
 								true
 						)	);
 
@@ -635,7 +629,11 @@ namespace synthese
 								departures,
 								arrivals,
 								lastTripCode,
-								dataSource
+								dataSource,
+								optional<const string&>(),
+								optional<const RuleUser::Rules&>(),
+								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
+								lastTripCode
 						)	);
 						if(service)
 						{
@@ -989,7 +987,7 @@ namespace synthese
 			double lastx = 0.0;
 			double lasty = 0.0;
 
-			BOOST_FOREACH(Edge* edge, path->getAllEdges())
+			BOOST_FOREACH(Edge* edge, path->getEdges())
 			{
 				if( ! edge->getNext())
 					break;
@@ -1136,8 +1134,6 @@ namespace synthese
 			bool isReservationMandandatory
 		) const
 		{
-			bool passMidnight = false;
-
 			BOOST_FOREACH(const boost::shared_ptr<LineStop>& ls, linestops)
 			{
 				boost::shared_ptr<geos::geom::Point> gp;
@@ -1146,34 +1142,22 @@ namespace synthese
 				boost::posix_time::time_duration arrival;
 				boost::posix_time::time_duration departure;
 
-				if (ls->getRankInPath() > 0 && ls->isArrival())
+				if (ls->get<RankInPath>() > 0 && ls->get<IsArrival>())
 				{
-					arrival = Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()));
+					arrival = service->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 				else
 				{
-					arrival = Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+					arrival = service->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 
-				if (ls->getRankInPath()+1 != linestops.size() && ls->isDeparture())
+				if (ls->get<RankInPath>()+1 != linestops.size() && ls->get<IsDeparture>())
 				{
-					departure = Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+					departure = service->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 				else
 				{
-					departure = Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()));
-				}
-
-				// Correct trips over midnight
-				if(arrival.hours() >= 22 || departure.hours() >= 22)
-				passMidnight = true;
-
-				if(passMidnight)
-				{
-					if(arrival.hours() < 12)
-						arrival = arrival + hours(24);
-					if(departure.hours() < 12)
-						departure = departure + hours(24);
+					departure = service->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>());
 				}
 
 				boost::posix_time::time_duration diff = arrival - departure;
@@ -1185,7 +1169,7 @@ namespace synthese
 
 				arrivalTimeStr = to_simple_string(arrival);
 				departureTimeStr = to_simple_string(departure);
-				const StopPoint * stopPoint(static_cast<const StopPoint *>(ls->getFromVertex()));
+				const StopPoint * stopPoint(dynamic_cast<const StopPoint *>(&*ls->get<LineNode>()));
 
 				if(stopPoint->hasGeometry())
 				{
@@ -1196,13 +1180,13 @@ namespace synthese
 				{
 					stopTimes <<_key(service->getKey(), 1) << ","
 						<< _key(stopPoint->getKey()) << ","
-						<< ls->getRankInPath() << ","
+						<< ls->get<RankInPath>() << ","
 						<< arrivalTimeStr.substr(0, 8) << ","
 						<< departureTimeStr.substr(0, 8) << ","
 						<< ","
 
-						<< (isReservationMandandatory ? "2," : "0,") // pickup_type
-						<< (isReservationMandandatory ? "2," : "0,") // drop_off_type
+						<< (ls->get<IsDeparture>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
+						<< (ls->get<IsArrival>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
 						<< endl;
 					stopTimesExist = true;
 				}
@@ -1402,7 +1386,12 @@ namespace synthese
 				Env::GetOfficialEnv().getRegistry<StopPoint>()
 			){
 				const StopPoint& stopPoint(*itps.second);
-				if (stopPoint.getDepartureEdges().empty() && stopPoint.getArrivalEdges().empty()) continue;
+				if (stopPoint.getDepartureEdges().empty() && stopPoint.getArrivalEdges().empty()) 
+				{
+					LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, boost::optional<RegistryKeyType>(), stopPoint.getKey()));	
+					if (lineStops.empty())
+						continue;
+				}
 
 				boost::shared_ptr<geos::geom::Point> gp;
 				if(stopPoint.hasGeometry())
@@ -1412,8 +1401,12 @@ namespace synthese
 
 				if(gp.get())
 				{
+					/* GTFS Format will match commas in operatorCode field as delimiter */
+					std::string operatorCodes = stopPoint.getCodeBySources();
+					std::replace(operatorCodes.begin(), operatorCodes.end(), ',', '|');
+					
 					stopsTxt << _key(stopPoint.getKey()) << "," // stop_id
-						<< stopPoint.getCodeBySources() << "," // stop_code
+						<< operatorCodes << "," // stop_code
 						<< _Str(((stopPoint.getName()) == "" ? stopPoint.getConnectionPlace()->getName():stopPoint.getName())) << "," // stop_name
 						<< gp->getY() << "," // stop_lat
 						<< gp->getX() << "," // stop_lon
@@ -1470,7 +1463,7 @@ namespace synthese
 				bool mustBeExported = true;
 				for (multimap<const DataSource*, string>::const_iterator it= myLine.second->getDataSourceLinks().begin(); it != myLine.second->getDataSourceLinks().end(); ++it) 
 				{
-					if(it->first->getName() == LABEL_NO_EXPORT_GTFS)
+					if(it->first->get<Name>() == LABEL_NO_EXPORT_GTFS)
 					{
 						mustBeExported = false;
 						break;
@@ -1529,16 +1522,16 @@ namespace synthese
 
 					bool mustBeExported = true;
 					const multimap<const DataSource*, string>& dataSourcesMap = static_cast<const JourneyPattern *>(sdService->getPath())->getCommercialLine()->getDataSourceLinks();
-                                	for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
+					for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
 					{
-                                        	if(it->first->getName() == LABEL_NO_EXPORT_GTFS)
-                                        	{
-                                               	 	mustBeExported = false;
-                                                	break;
-                                        	}
-                                	}
-                                	if(!mustBeExported)
-                                        	continue;
+						if(it->first->get<Name>() == LABEL_NO_EXPORT_GTFS)
+						{
+							mustBeExported = false;
+							break;
+						}
+					}
+					if(!mustBeExported)
+						continue;
 
 					if(rs != NULL)
 					{
@@ -1623,5 +1616,11 @@ namespace synthese
 
 			os << flush;
 		}
-	}
-}
+
+
+
+		GTFSFileFormat::Exporter_::Exporter_(
+			const impex::Export& export_
+		):	OneFileExporter<GTFSFileFormat>(export_)
+		{}
+}	}

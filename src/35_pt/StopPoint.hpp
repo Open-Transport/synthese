@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_ENV_PHYSICALSTOP_H
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
+#include "CommercialLine.h"
 #include "UtilConstants.h"
 #include "Vertex.h"
 #include "ImportableTemplate.hpp"
@@ -42,7 +43,6 @@ namespace synthese
 	{
 		class LineStop;
 		class StopArea;
-		class CommercialLine;
 		class JourneyPattern;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -62,8 +62,6 @@ namespace synthese
 			typedef util::Registry<StopPoint>	Registry;
 
 		private:
-			static const std::string DATA_ID;
-			static const std::string DATA_NAME;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
 			static const std::string DATA_OPERATOR_CODE;
@@ -109,7 +107,7 @@ namespace synthese
 
 
 
-				typedef std::set<const CommercialLine*> LinesSet;
+				typedef std::set<const CommercialLine*, CommercialLine::PointerComparator> LinesSet;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// List of lines calling at the stop.
@@ -148,7 +146,7 @@ namespace synthese
 				/// @author Hugues Romain
 				void toParametersMap(
 					util::ParametersMap& pm,
-					bool withStopAreaData,
+					bool withAdditionalParameters,
 					const CoordinatesSystem& coordinatesSystem,
 					std::string prefix = std::string()
 				) const;
@@ -166,6 +164,7 @@ namespace synthese
 				);
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 
 				virtual LinkedObjectsIds getLinkedObjectsIds(
 					const Record& record

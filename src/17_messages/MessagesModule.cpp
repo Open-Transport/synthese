@@ -32,6 +32,8 @@
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
 #include "TextTemplate.h"
+#include "CommercialLine.h"
+#include "AlarmObjectLink.h"
 
 #include <boost/foreach.hpp>
 
@@ -252,13 +254,35 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Updates the activated messages cache
-		void MessagesModule::UpdateActivatedMessages()
+		bool MessagesModule::_selectMessagesToActivate( const Alarm& object )
 		{
 			// Now
 			ptime now(second_clock::local_time());
 
+			// Avoid library messages
+			const SentAlarm* sentMessage(
+				dynamic_cast<const SentAlarm*>(&object)
+			);
+			if(!sentMessage)
+			{
+				return false;
+			}
+
+			// Record active message
+			if(!sentMessage->isApplicable(now))
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Updates the activated messages cache
+		void MessagesModule::UpdateActivatedMessages()
+		{
 			// Wait for the availability of the cache
 			mutex::scoped_lock(_activatedMessagesMutex);
 
@@ -266,38 +290,33 @@ namespace synthese
 			ActivatedMessages decativatedMessages(_activatedMessages);
 
 			// Loop on all messages
+			Alarm::Registry::Vector messagesToUpdate(
+				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectMessagesToActivate)
+			);
+
 			BOOST_FOREACH(
-				const Registry<Alarm>::value_type& message,
-				Env::GetOfficialEnv().getRegistry<Alarm>()
+				const Alarm::Registry::Vector::value_type& message,
+				messagesToUpdate
 			){
-				// Avoid library messages
 				boost::shared_ptr<SentAlarm> sentMessage(
-					dynamic_pointer_cast<SentAlarm, Alarm>(message.second)
+					dynamic_pointer_cast<SentAlarm, Alarm>(message)
 				);
-				if(!sentMessage)
+
+				// Remove the message as deactivated one
+				decativatedMessages.erase(sentMessage);
+
+				// Check if the message was already activated
+				if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
 				{
-					continue;
-				}
+					// Record the message as activated
+					_activatedMessages.insert(sentMessage);
 
-				// Record active message
-				if(sentMessage->isApplicable(now))
-				{
-					// Remove the message as deactivated one
-					decativatedMessages.erase(sentMessage);
-
-					// Check if the message was already activated
-					if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
-					{
-						// Record the message as activated
-						_activatedMessages.insert(sentMessage);
-
-						// Run the display start trigger on each broadcast point
-						BOOST_FOREACH(
-							const BroadcastPoint::BroadcastPoints::value_type& bp,
-							BroadcastPoint::GetBroadcastPoints()
-						){
-							bp->onDisplayStart(*sentMessage);
-						}
+					// Run the display start trigger on each broadcast point
+					BOOST_FOREACH(
+						const BroadcastPoint::BroadcastPoints::value_type& bp,
+						BroadcastPoint::GetBroadcastPoints()
+					){
+						bp->onDisplayStart(*sentMessage);
 					}
 				}
 			}
@@ -353,37 +372,112 @@ namespace synthese
 
 
 
+		bool MessagesModule::_selectSentAlarm( const Alarm& object )
+		{
+			if(!dynamic_cast<const SentAlarm*>(&object))
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+
+
+		void MessagesModule::ClearAllBroadcastCaches()
+		{
+			Alarm::Registry::Vector sentAlarms(
+				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectSentAlarm)
+			);
+			BOOST_FOREACH(const Alarm::Registry::Vector::value_type& alarm, sentAlarms)
+			{
+				// Jump over scenarios
+				SentAlarm& sentAlarm(static_cast<SentAlarm&>(*alarm));
+				
+				// Clear the cache
+				sentAlarm.clearBroadcastPointsCache();
+			}
+		}
+
+
+
 		bool MessagesModule::SentAlarmLess::operator()(
-			SentAlarm* left,
-			SentAlarm* right
+			shared_ptr<SentAlarm> left,
+			shared_ptr<SentAlarm> right
 		) const {
-			assert(left && right);
+			assert(left.get() && right.get());
 
 			if(left->getLevel() != right->getLevel())
 			{
 				return left->getLevel() > right->getLevel();
 			}
 
-			if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
+			
+			if(left->getScenario() && right->getScenario())
 			{
-				if(right->getScenario()->getPeriodStart().is_not_a_date_time())
+				if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
 				{
-					return true;
+					if(right->getScenario()->getPeriodStart().is_not_a_date_time())
+					{
+						return true;
+					}
+					if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
+					{
+						return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
+					}
 				}
-				if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
+				else
 				{
-					return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
-				}
-			}
-			else
-			{
-				if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
-				{
-					return false;
+					if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
+					{
+						return false;
+					}
 				}
 			}
 
-			return left < right;
+			// Sort by commercial line if both alarm are linked to
+			{
+				shared_ptr<const pt::CommercialLine> firstLineLeft, firstLineRight;
+				BOOST_FOREACH(Alarm::LinkedObjects::value_type& leftId, left->getLinkedObjects())
+				{
+					if(leftId.first != "line")continue;
+					BOOST_FOREACH(const AlarmObjectLink* link, leftId.second)
+					{
+						shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
+						if(line.get())
+						{
+							firstLineLeft = line;
+							break;
+						}
+					}
+					break;
+				}
+				BOOST_FOREACH(Alarm::LinkedObjects::value_type& rightId, right->getLinkedObjects())
+				{
+					if(rightId.first != "line")continue;
+					BOOST_FOREACH(const AlarmObjectLink* link, rightId.second)
+					{
+						shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
+						if(line.get())
+						{
+							firstLineRight = line;
+							break;
+						}
+					}
+					break;
+				}
+				if(firstLineLeft.get() && firstLineRight.get())
+				{
+					return *firstLineLeft.get() < *firstLineRight.get();
+				}
+				else
+				{
+					if(firstLineLeft.get())return true; // Only left is associated to a line
+					if(firstLineRight.get())return false; // Only right is associated to a line
+				}
+			}
+
+			return left.get() < right.get();
 		}
 	}
 }

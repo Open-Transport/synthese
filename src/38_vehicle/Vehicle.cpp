@@ -23,46 +23,77 @@
 #include "Vehicle.hpp"
 
 #include "ParametersMap.h"
+#include "VehicleModule.hpp"
 
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace vehicle;
 
-	namespace util
-	{
-		template<>
-		const std::string Registry<vehicle::Vehicle>::KEY("Vehicle");
-	}
+	CLASS_DEFINITION(Vehicle, "t069_vehicles", 69)
+	FIELD_DEFINITION_OF_TYPE(Number, "number", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(AllowedLines, "allowed_lines", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Seats, "seats", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Picture, "picture", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Available, "available", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(URL, "url", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(RegistrationNumber, "registration_numbers", SQL_TEXT)
+
 
 	namespace vehicle
 	{
-		const string Vehicle::DATA_NAME = "name";
-		const string Vehicle::DATA_NUMBER = "number";
-		const string Vehicle::DATA_PICTURE = "picture";
-		const string Vehicle::DATA_SEATS = "seats";
-		const string Vehicle::DATA_VEHICLE_ID = "vehicle_id";
+		const string Vehicle::TAG_SEAT = "seat";
 
 
 
-		Vehicle::Vehicle(RegistryKeyType id):
-			Registrable(id),
-			_available(true)
+		Vehicle::Vehicle(
+			RegistryKeyType id
+		):	Registrable(id),
+			Object<Vehicle, VehicleRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(Number),
+					FIELD_DEFAULT_CONSTRUCTOR(AllowedLines),
+					FIELD_DEFAULT_CONSTRUCTOR(Seats),
+					FIELD_DEFAULT_CONSTRUCTOR(Picture),
+					FIELD_VALUE_CONSTRUCTOR(Available, true),
+					FIELD_DEFAULT_CONSTRUCTOR(URL),
+					FIELD_DEFAULT_CONSTRUCTOR(RegistrationNumber),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(inter_synthese::InterSYNTHESESlave)
+			)	)
 		{}
 
 
 
-		void Vehicle::toParametersMap(
-			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
-			std::string prefix
-		) const	{
-			pm.insert(DATA_NAME, getName());
-			pm.insert(DATA_NUMBER, getNumber());
-			pm.insert(DATA_PICTURE, getPicture());
-			pm.insert(DATA_SEATS, getSeats().size());
-			pm.insert(DATA_VEHICLE_ID, getKey());
+		void Vehicle::unlink()
+		{
+			VehicleModule::UnregisterVehicle(*this);
+		}
+
+
+
+		void Vehicle::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(&env == &Env::GetOfficialEnv())
+			{
+				VehicleModule::RegisterVehicle(*this);
+			}
+		}
+
+
+
+		void Vehicle::addAdditionalParameters( util::ParametersMap& pm, std::string prefix /*= std::string() */ ) const
+		{
+			// Seats
+			BOOST_FOREACH(const string& seat, get<Seats>())
+			{
+				boost::shared_ptr<ParametersMap> seatPM(new ParametersMap);
+				seatPM->insert(TAG_SEAT, seat);
+				pm.insert(prefix + TAG_SEAT, seatPM);
+			}
 		}
 }	}

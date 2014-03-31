@@ -143,7 +143,8 @@ namespace synthese
 
 		bool Junction::isValid() const
 		{
-			return _edges.size() == 2 && _services.size() == 1 && static_cast<PermanentService*>(*_services.begin())->getDuration();
+			ServiceSet services(getAllServices());
+			return _edges.size() == 2 && services.size() == 1 && static_cast<PermanentService*>(*services.begin())->getDuration();
 		}
 
 
@@ -159,7 +160,8 @@ namespace synthese
 		boost::posix_time::time_duration Junction::getDuration() const
 		{
 			assert(isValid());
-			return *static_cast<PermanentService*>(*_services.begin())->getDuration();
+			ServiceSet services(getAllServices());
+			return *static_cast<PermanentService*>(*services.begin())->getDuration();
 		}
 
 
@@ -213,7 +215,8 @@ namespace synthese
 			}
 
 			// Services
-			for (ServiceSet::iterator it(_services.begin()); it != _services.end(); ++it)
+			ServiceSet services(getAllServices());
+			for (ServiceSet::iterator it(services.begin()); it != services.end(); ++it)
 			{
 				delete *it;
 			}

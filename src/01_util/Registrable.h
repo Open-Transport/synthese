@@ -28,6 +28,7 @@
 
 #include "UtilTypes.h"
 #include "Field.hpp"
+#include "FrameworkTypes.hpp"
 #include "UtilConstants.h"
 
 #include <boost/logic/tribool.hpp>
@@ -110,6 +111,14 @@ namespace synthese
 
 			/// @name Importers/Exporters
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Builds the list of object to get in the environment for current
+				/// object loading, according to the content of the record to load.
+				/// @param record the record to load
+				virtual LinkedObjectsIds getLinkedObjectsIds(
+					const Record& record
+				) const { return LinkedObjectsIds(); }
+
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false) {}
 				virtual void unlink() {}
 

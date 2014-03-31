@@ -125,6 +125,7 @@ namespace synthese
 			Request& request
 		){
 			size_t rank(static_cast<JourneyPattern*>(_service->getPath())->getRankInDefinedSchedulesVector(_rank));
+			_service->regenerateDataSchedules(); // Useful in case of corrupted data
 			SchedulesBasedService::Schedules departureSchedules(_service->getDataDepartureSchedules());
 			SchedulesBasedService::Schedules arrivalSchedules(_service->getDataArrivalSchedules());
 

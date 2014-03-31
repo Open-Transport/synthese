@@ -135,12 +135,14 @@ namespace synthese
 			static const std::string VERSION;
 			static const std::string REVISION;
 			static const std::string BUILD_DATE;
+			static const std::string SYNTHESE_URL;
 
 			// SYNTHESE is not lock protected against changing the base content
 			// while reading or writing it. Take this mutex if you change the base
 			// in a service.
 			// @FIXME This should be used by all services appropriately.
 			static boost::shared_mutex baseWriterMutex;
+			//static boost::shared_mutex interSyntheseVersusRTMutex;
 
 		private:
 
@@ -190,6 +192,8 @@ namespace synthese
 
 			static boost::posix_time::time_duration GetSessionMaxDuration();
 
+			static const std::string GetBranch();
+
 			/** Called whenever a parameter registered by this module is changed
 			 */
 			static void ParameterCallback(
@@ -218,9 +222,6 @@ namespace synthese
 				HTTPReply& httpReply,
 				const CookiesMap& cookiesMap
 			);
-
-			// Launch the permanent threads
-			static void _LaunchPermanentThreads();
 		};
 
 

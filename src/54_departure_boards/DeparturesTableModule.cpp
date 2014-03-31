@@ -47,12 +47,35 @@ namespace synthese
 		template<> const std::string util::FactorableTemplate<ModuleClass, departure_boards::DeparturesTableModule>::FACTORY_KEY("54_departures_table");
 	}
 
+	namespace departure_boards
+	{
+		const string DeparturesTableModule::PARAMETER_INEO_SERVER_IP = "ineo_server_ip";
+		const string DeparturesTableModule::PARAMETER_INEO_SERVER_PORT = "ineo_server_port";
+		const string DeparturesTableModule::PARAMETER_INEO_SERVER_DB_LOGIN = "ineo_server_db_login";
+		const string DeparturesTableModule::PARAMETER_INEO_SERVER_DB_PASSWORD = "ineo_server_db_password";
+		const string DeparturesTableModule::PARAMETER_INEO_SERVER_DB_NAME = "ineo_server_db_name";
+		const string DeparturesTableModule::PARAMETER_INEO_STOPS_DATASOURCE_ID = "ineo_stops_datasource_id";
+
+		string DeparturesTableModule::_ineoServerIP;
+		string DeparturesTableModule::_ineoServerDBLogin;
+		string DeparturesTableModule::_ineoServerDBPassword;
+		string DeparturesTableModule::_ineoServerDBName;
+		util::RegistryKeyType DeparturesTableModule::_stopsDataSourceId;
+		int DeparturesTableModule::_ineoServerPort = 0;
+	}
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<DeparturesTableModule>::NAME("SAI Tableaux de départs");
 
 		template<> void ModuleClassTemplate<DeparturesTableModule>::PreInit()
 		{
+			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_IP, "", &DeparturesTableModule::ParameterCallback);
+			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_PORT, "", &DeparturesTableModule::ParameterCallback);
+			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_LOGIN, "", &DeparturesTableModule::ParameterCallback);
+			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_PASSWORD, "", &DeparturesTableModule::ParameterCallback);
+			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_NAME, "", &DeparturesTableModule::ParameterCallback);
+			RegisterParameter(DeparturesTableModule::PARAMETER_INEO_STOPS_DATASOURCE_ID, "", &DeparturesTableModule::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<DeparturesTableModule>::Init()
@@ -65,6 +88,12 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DeparturesTableModule>::End()
 		{
+			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_IP);
+			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_PORT);
+			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_LOGIN);
+			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_PASSWORD);
+			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_SERVER_DB_NAME);
+			UnregisterParameter(DeparturesTableModule::PARAMETER_INEO_STOPS_DATASOURCE_ID);
 		}
 
 
@@ -143,6 +172,8 @@ namespace synthese
 				m.push_back(make_pair(optional<RegistryKeyType>(), "(toutes)"));
 			}
 			vector<boost::shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints(env);
+			std::sort(c.begin(), c.end(), CommercialLine::PointerComparator());
+
 			BOOST_FOREACH(const boost::shared_ptr<const CommercialLine>& line, c)
 			{
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
@@ -194,5 +225,52 @@ namespace synthese
 				env.getEditableRegistry<PlaceWithDisplayBoards>()
 			);
 			registry.remove(place->getKey());
+		}
+
+		void DeparturesTableModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			if(name == PARAMETER_INEO_SERVER_IP)
+			{
+				_ineoServerIP = value;
+			}
+			else if(name == PARAMETER_INEO_SERVER_PORT)
+			{
+				int port(3306);
+
+				try
+				{
+					port = lexical_cast<int>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
+
+				_ineoServerPort = port;
+			}
+			else if(name == PARAMETER_INEO_SERVER_DB_LOGIN)
+			{
+				_ineoServerDBLogin = value;
+			}
+			else if(name == PARAMETER_INEO_SERVER_DB_PASSWORD)
+			{
+				_ineoServerDBPassword = value;
+			}
+			else if(name == PARAMETER_INEO_SERVER_DB_NAME)
+			{
+				_ineoServerDBName = value;
+			}
+			else if(name == PARAMETER_INEO_STOPS_DATASOURCE_ID)
+			{
+				_stopsDataSourceId = util::RegistryKeyType(0);
+				try
+				{
+					_stopsDataSourceId = lexical_cast<util::RegistryKeyType>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
+			}
 		}
 }	}

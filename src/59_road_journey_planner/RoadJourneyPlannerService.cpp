@@ -30,9 +30,9 @@
 #include "PlacesListService.hpp"
 #include "RequestException.h"
 #include "Request.h"
-#include "ReverseRoadChunk.hpp"
 #include "Road.h"
 #include "RoadChunk.h"
+#include "RoadChunkEdge.hpp"
 #include "VertexAccessMap.h"
 #include "Webpage.h"
 
@@ -372,9 +372,9 @@ namespace synthese
 				vector<Geometry*> geometries;
 				vector<Geometry*> curGeom;
 
-				BOOST_FOREACH(const RoadChunk* chunk, path)
+				BOOST_FOREACH(const RoadChunkEdge* chunk, path)
 				{
-					const Road* road = chunk->getRoad();
+					const Road* road(chunk->getRoadChunk()->getRoad());
 
 					boost::shared_ptr<geos::geom::LineString> geometry = chunk->getRealGeometry();
 					boost::shared_ptr<geos::geom::Geometry> geometryProjected(_coordinatesSystem->convertGeometry(*geometry));
@@ -395,12 +395,12 @@ namespace synthese
 					{
 						curDistance = static_cast<int>(distance);
 						arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
-						curRoadPlace = road->getRoadPlace();
+						curRoadPlace = &*road->get<RoadPlace>();
 						curGeom.push_back(geometryProjected.get()->clone());
 						rank++;
 						first = false;
 					}
-					else if(curRoadPlace->getName() == road->getRoadPlace()->getName())
+					else if(curRoadPlace->getName() == road->get<RoadPlace>()->getName())
 					{
 						curDistance += static_cast<int>(distance);
 						arrivalTime = arrivalTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
@@ -428,7 +428,7 @@ namespace synthese
 						curDistance = static_cast<int>(distance);
 						departureTime = arrivalTime;
 						arrivalTime = departureTime + boost::posix_time::seconds(static_cast<int>(distance / speed));
-						curRoadPlace = road->getRoadPlace();
+						curRoadPlace = &*road->get<RoadPlace>();
 
 						BOOST_FOREACH(Geometry* geomToDelete, curGeom)
 						{

@@ -30,14 +30,15 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	namespace db
 	{
 		DBReplaceInterSYNTHESEContent::DBReplaceInterSYNTHESEContent( const DBRecord& r ):
-			_record(r),
-			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY),
+			_record(r)
 		{}
 
 
@@ -55,6 +56,13 @@ namespace synthese
 		std::string DBReplaceInterSYNTHESEContent::getPerimeter() const
 		{
 			return lexical_cast<string>(_record.getTable()->getFormat().ID);
+		}
+
+
+
+		boost::posix_time::ptime DBReplaceInterSYNTHESEContent::getExpirationTime() const
+		{
+			return ptime(not_a_date_time);
 		}
 }	}
 

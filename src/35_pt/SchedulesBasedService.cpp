@@ -26,7 +26,6 @@
 #include "CommercialLine.h"
 #include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
-#include "LineStop.h"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
 #include "RealTimePTDataInterSYNTHESE.hpp"
@@ -59,6 +58,7 @@ namespace synthese
 		const string SchedulesBasedService::STOP_SEPARATOR = ",";
 
 
+
 		SchedulesBasedService::SchedulesBasedService(
 			std::string serviceNumber,
 			graph::Path* path
@@ -73,6 +73,9 @@ namespace synthese
 
 		void SchedulesBasedService::_computeNextRTUpdate()
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(!_dataArrivalSchedules.empty())
 			{
 				const time_duration& lastThSchedule(*_dataArrivalSchedules.rbegin());
@@ -81,7 +84,7 @@ namespace synthese
 
 				boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
 				_nextRTUpdate = boost::posix_time::ptime(now.date(), GetTimeOfDay(lastSchedule));
-				if(now.time_of_day() > GetTimeOfDay(lastSchedule))
+				if(now.time_of_day() > GetTimeOfDay(lastSchedule) + minutes(1))
 				{
 					_nextRTUpdate += boost::gregorian::days(1);
 				}
@@ -94,12 +97,15 @@ namespace synthese
 			const Schedules& departureSchedules,
 			const Schedules& arrivalSchedules
 		){
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			_dataDepartureSchedules = departureSchedules;
 			_dataArrivalSchedules = arrivalSchedules;
 			
 			if(_path)
 			{
-				_path->markScheduleIndexesUpdateNeeded(false);
+				_path->markAllScheduleIndexesUpdateNeeded(false);
 			}
 			_clearGeneratedSchedules();
 			clearRTData();
@@ -119,6 +125,9 @@ namespace synthese
 
 		void SchedulesBasedService::setRealTimeVertex( std::size_t rank, const graph::Vertex* value )
 		{
+			// Lock the vertices
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
 			_RTVertices[rank] = value;
 		}
@@ -127,6 +136,9 @@ namespace synthese
 
 		const graph::Vertex* SchedulesBasedService::getRealTimeVertex( std::size_t rank ) const
 		{
+			// Lock the vertices
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			return _RTVertices[rank];
 		}
 
@@ -135,6 +147,9 @@ namespace synthese
 		const graph::Vertex* SchedulesBasedService::getVertex(
 			std::size_t rank
 		) const	{
+			// Lock the vertices
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			return _vertices[rank];
 		}
 
@@ -142,20 +157,34 @@ namespace synthese
 
 		boost::posix_time::time_duration SchedulesBasedService::getDepartureSchedule( bool RTData, std::size_t rank ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(!RTData && rank == 0)
 			{
 				return *getDataDepartureSchedules().begin();
 			}
+
 			return getDepartureSchedules(true, RTData).at(rank);
 		}
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Last departure schedule getter (returned by reference).
+		/// It is recommended to lock the _schedulesMutex before calling this method :
+		/// recursive_mutex::scoped_lock lock(getSchedulesMutex());
 		const boost::posix_time::time_duration& SchedulesBasedService::getLastDepartureSchedule( bool RTData ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			for (Path::Edges::const_reverse_iterator it(getPath()->getEdges().rbegin()); it != getPath()->getEdges().rend(); ++it)
+			{
 				if ((*it)->isDeparture())
+				{
 					return getDepartureSchedules(true, RTData).at((*it)->getRankInPath());
+			}	}
 			assert(false);
 			return getDepartureSchedules(true, RTData).at(0);
 		}
@@ -164,24 +193,42 @@ namespace synthese
 
 		boost::posix_time::time_duration SchedulesBasedService::getArrivalSchedule( bool RTData, std::size_t rank ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			return getArrivalSchedules(true, RTData).at(rank);
 		}
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Last arrival schedule getter (returned by reference).
+		/// It is recommended to lock the _schedulesMutex before calling this method :
+		/// recursive_mutex::scoped_lock lock(getSchedulesMutex());
 		const boost::posix_time::time_duration& SchedulesBasedService::getLastArrivalSchedule( bool RTData ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(!RTData)
 			{
 				return *getDataArrivalSchedules().rbegin();
 			}
+
 			return *getArrivalSchedules(true, RTData).rbegin();
 		}
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Departure schedules getter.
+		/// It is recommended to lock the _schedulesMutex before calling this method :
+		/// recursive_mutex::scoped_lock lock(getSchedulesMutex());
 		const SchedulesBasedService::Schedules& SchedulesBasedService::getDepartureSchedules( bool THData, bool RTData ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(RTData && !_RTDepartureSchedules.empty())
 			{
 				return _RTDepartureSchedules;
@@ -189,7 +236,6 @@ namespace synthese
 
 			if(THData)
 			{
-				recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
 				if(_generatedDepartureSchedules.empty())
 				{
 					_generateSchedules();
@@ -202,8 +248,15 @@ namespace synthese
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Arrival schedules getter.
+		/// It is recommended to lock the _generatedSchedulesMutex before calling this method :
+		/// recursive_mutex::scoped_lock lock(getGeneratedSchedulesMutex());
 		const SchedulesBasedService::Schedules& SchedulesBasedService::getArrivalSchedules( bool THData, bool RTData ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(RTData && !_RTArrivalSchedules.empty())
 			{
 				return _RTArrivalSchedules;
@@ -211,7 +264,6 @@ namespace synthese
 
 			if(THData)
 			{
-				recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
 				if(_generatedArrivalSchedules.empty())
 				{
 					_generateSchedules();
@@ -226,7 +278,9 @@ namespace synthese
 
 		void SchedulesBasedService::_initRTSchedulesFromPlanned()
 		{
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(_generatedArrivalSchedules.empty())
 			{
 				_generateSchedules();
@@ -246,7 +300,9 @@ namespace synthese
 			boost::posix_time::time_duration departureShift,
 			bool updateFollowingSchedules
 		){
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			_initRTSchedulesFromPlanned();
 
 			// TODO Use a constant or a param for the accepted delay
@@ -297,7 +353,8 @@ namespace synthese
 			bool updateFollowingSchedules,
 			bool recordTimeStamp
 		){
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
 			// Clear the time stamp in all cases
 			// If we had a timestamp here, we assume that the
@@ -336,13 +393,18 @@ namespace synthese
 		{
 			// Real time schedules
 			{
-				recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+				// Lock the schedules
+				recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 				_RTArrivalSchedules.clear();
 				_RTDepartureSchedules.clear();
 			}
 		
 			if(getPath())
 			{
+				// Lock the vertices
+				recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 				_RTTimestamps.assign(getPath()->getEdges().size(), boost::posix_time::ptime());
 				_RTVertices.clear();
 				size_t i(0);
@@ -406,6 +468,9 @@ namespace synthese
 		std::string SchedulesBasedService::encodeSchedules(
 			boost::posix_time::time_duration shiftArrivals
 		) const {
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			stringstream str;
 			for(size_t i(0); i<_dataArrivalSchedules.size() && i<_dataDepartureSchedules.size(); ++i)
 			{
@@ -490,6 +555,9 @@ namespace synthese
 			Schedules departureSchedules;
 			Schedules arrivalSchedules;
 
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(other.getSchedulesMutex());
+
 			for(size_t i(0); i<other._dataDepartureSchedules.size() && i<other._dataArrivalSchedules.size(); ++i)
 			{
 				departureSchedules.push_back(
@@ -536,6 +604,9 @@ namespace synthese
 
 		bool SchedulesBasedService::comparePlannedSchedules( const Schedules& departure, const Schedules& arrival ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			return	(_dataDepartureSchedules == departure) &&
 					(_dataArrivalSchedules == arrival);
 		}
@@ -548,7 +619,9 @@ namespace synthese
 			bool departure
 		) const {
 
-			Path::Edges edges(_path->getAllEdges());
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+			Path::Edges edges(_path->getEdges());
 
 			const Schedules& departureSchedules(getDepartureSchedules(true, false));
 			const Schedules& arrivalSchedules(getArrivalSchedules(true, false));
@@ -572,7 +645,9 @@ namespace synthese
 			boost::posix_time::time_duration departureSchedule,
 			boost::posix_time::time_duration arrivalSchedule
 		){
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			_initRTSchedulesFromPlanned();
 
 			if(!departureSchedule.is_not_a_date_time())
@@ -587,7 +662,7 @@ namespace synthese
 					_computeNextRTUpdate();
 				}
 			}
-			_path->markScheduleIndexesUpdateNeeded(true);
+			_path->markAllScheduleIndexesUpdateNeeded(true);
 
 
 			// Inter-SYNTHESE sync
@@ -607,11 +682,13 @@ namespace synthese
 			const Schedules& departureSchedules, 
 			const Schedules& arrivalSchedules
 		){
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			_RTDepartureSchedules = departureSchedules;
 			_RTArrivalSchedules = arrivalSchedules;
 			_computeNextRTUpdate();
-			_path->markScheduleIndexesUpdateNeeded(true);
+			_path->markAllScheduleIndexesUpdateNeeded(true);
 
 
 			// Inter-SYNTHESE sync
@@ -631,6 +708,9 @@ namespace synthese
 		{
 			if(getPath())
 			{
+				// Lock the vertices
+				recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 				_vertices.clear();
 				_vertices.assign(getPath()->getEdges().size(), NULL);
 			}
@@ -640,6 +720,9 @@ namespace synthese
 
 		void SchedulesBasedService::setPath( Path* path )
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			NonPermanentService::setPath(path);
 			_clearGeneratedSchedules();
 			clearStops();
@@ -651,6 +734,9 @@ namespace synthese
 
 		string SchedulesBasedService::encodeStops() const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			stringstream s;
 			bool first(true);
 			BOOST_FOREACH(const SchedulesBasedService::ServedVertices::value_type& stop, _vertices)
@@ -745,6 +831,9 @@ namespace synthese
 			size_t rank,
 			const graph::Vertex* value
 		){
+			// Lock the vertices
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
 			if(value != _path->getEdge(rank)->getFromVertex())
 			{
@@ -760,6 +849,9 @@ namespace synthese
 
 		void SchedulesBasedService::setRealTimeVertices( const ServedVertices& value )
 		{
+			// Lock the vertices
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			_RTVertices = value;
 
 			// Inter-SYNTHESE sync
@@ -775,6 +867,10 @@ namespace synthese
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Vertices getter (returned by reference).
+		/// It is recommended to lock the _verticesMutex before calling this method :
+		/// recursive_mutex::scoped_lock lock(getVerticesMutex());
 		const SchedulesBasedService::ServedVertices& SchedulesBasedService::getVertices(
 			bool RTData
 		) const	{
@@ -793,6 +889,9 @@ namespace synthese
 		bool SchedulesBasedService::comparePlannedStops(
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedVertices
 		) const	{
+			// Lock the vertices
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			for(size_t i(0); i<_vertices.size(); ++i)
 			{
 				if(	_vertices[i] &&
@@ -808,6 +907,9 @@ namespace synthese
 
 		void SchedulesBasedService::setVertices( const ServedVertices& vertices )
 		{
+			// Lock the vertices
+			recursive_mutex::scoped_lock lock(getVerticesMutex());
+
 			if(_vertices.size() != vertices.size())
 			{
 				_vertices = vertices;
@@ -832,10 +934,10 @@ namespace synthese
 		 * @return true if time is in one of the ranges
 		 */
 		bool SchedulesBasedService::isInTimeRange(
-				ptime &time,
-				time_duration &range,
-				const vector<time_period> &excludeRanges) const
-		{
+			ptime &time,
+			time_duration &range,
+			const vector<time_period> &excludeRanges
+		){
 			BOOST_FOREACH(const time_period& period, excludeRanges)
 			{
 				if(period.contains(time))
@@ -910,6 +1012,7 @@ namespace synthese
 				: (&Edge::getFollowingArrivalForFineSteppingOnly)
 			);
 
+			AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
 
 			BOOST_FOREACH(const NonConcurrencyRule* rule, rules)
 			{
@@ -944,14 +1047,18 @@ namespace synthese
 						for(Vertex::Edges::const_iterator its(range.first); its != range.second; ++its)
 						{
 							const Edge& startEdge(*its->second);
+
+							// Loop on services collections
+							BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path->getServiceCollections())
+							{
 							// Search a service at the time of the possible
-							AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
 							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
 					
 							while(true)
 							{
 								ServicePointer serviceInstance(
 									startEdge.getNextService(
+											*itCollection,
 										ap,
 										minStartTime,
 										maxStartTime,
@@ -974,10 +1081,10 @@ namespace synthese
 									if(endEdge->getHub() == arrivalHub)
 									{
 										time_period timePeriod(
-													serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
-													serviceInstance.getDepartureDateTime() +
-													serviceInstance.getServiceRange() + rule->get<Delay>()
-													);
+											serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
+											serviceInstance.getDepartureDateTime() +
+											serviceInstance.getServiceRange() + rule->get<Delay>()
+										);
 										if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
 										{
 											// Merge the last period and the new one. We assume we are always called
@@ -998,14 +1105,14 @@ namespace synthese
 										{
 											// No need to search further for non continuous services
 											_nonConcurrencyCache.insert(
-														make_pair(
-															_NonConcurrencyCache::key_type(
-																&departureEdge,
-																&arrivalEdge,
-																userClassRank,
-																date
-																), excludeRanges
-															)	);
+												make_pair(
+													_NonConcurrencyCache::key_type(
+														&departureEdge,
+														&arrivalEdge,
+														userClassRank,
+														date
+													), excludeRanges
+											)	);
 											return false;
 										}
 									}
@@ -1014,6 +1121,7 @@ namespace synthese
 						}
 					}
 				}
+			}
 			}
 
 			_nonConcurrencyCache.insert(
@@ -1040,7 +1148,7 @@ namespace synthese
 
 		void SchedulesBasedService::_clearGeneratedSchedules() const
 		{
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			_generatedArrivalSchedules.clear();
 			_generatedDepartureSchedules.clear();
 		}
@@ -1049,8 +1157,8 @@ namespace synthese
 
 		void SchedulesBasedService::_generateSchedules() const
 		{
-			// Lock the cache
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
 			// Clear existing data
 			_generatedArrivalSchedules.clear();
@@ -1065,12 +1173,21 @@ namespace synthese
 			Path::Edges::const_iterator lastDepartureScheduledEdge(_path->getEdges().end());
 			time_duration lastDefinedDepartureSchedule;
 			bool atLeastOneDepartureUnscheduledEdge(false);
+			optional<size_t> lastRankInPath;
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
-				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-				if(	!lineStop ||
-					(	lineStop->getScheduleInput() &&
-						(lineStop->getIsDeparture() || (itEdge+1) == _path->getEdges().end())
+				const Edge& edge(**itEdge);
+
+				// Stop over DRT generated stops
+				if(	(lastRankInPath && edge.getRankInPath() == *lastRankInPath)
+				){
+					continue;
+				}
+
+				if(	edge.getScheduleInput() &&
+					(	(itDeparture != _dataDepartureSchedules.end() && !itDeparture->is_not_a_date_time()) ||
+						(itEdge+1) == _path->getEdges().end() ||
+						itEdge == _path->getEdges().begin()
 				)	){
 					// In case of insufficient defined schedules number
 					time_duration departureSchedule;
@@ -1096,8 +1213,10 @@ namespace synthese
 					){
 						arrivalSchedule = *itArrival;
 					}
-
-					const Edge& edge(**itEdge);
+					else
+					{
+						arrivalSchedule = departureSchedule;
+					}
 
 					// Interpolation of preceding departure schedules
 					if(atLeastOneDepartureUnscheduledEdge)
@@ -1110,15 +1229,23 @@ namespace synthese
 						MetricOffset totalDistance(edge.getMetricOffset() - (*lastDepartureScheduledEdge)->getMetricOffset());
 						size_t totalRankDiff(edge.getRankInPath() - (*lastDepartureScheduledEdge)->getRankInPath());
 						time_duration totalTime(
-							(	(	!edge.isDeparture() ||
-									(edge.isArrival() && !arrivalSchedule.is_not_a_date_time() && arrivalSchedule < departureSchedule)
+							(	(	!edge.isDepartureAllowed() ||
+									(edge.isArrivalAllowed() && !arrivalSchedule.is_not_a_date_time() && arrivalSchedule < departureSchedule)
 								) ?
 								arrivalSchedule :
 								departureSchedule
 							) - lastDefinedDepartureSchedule
 						);
+						size_t lastRankInPath2((*lastDepartureScheduledEdge)->getRankInPath());
 						for(Path::Edges::const_iterator it(lastDepartureScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
+							// Stop over DRT generated stops
+							if(	(*it)->getRankInPath() == lastRankInPath2
+							){
+								continue;
+							}
+							lastRankInPath2 = (*it)->getRankInPath();
+
 							double minutesToAdd(0);
 							if(totalDistance != 0)
 							{
@@ -1143,21 +1270,38 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedDepartureSchedules.push_back(edge.isDeparture() ? *itDeparture : *itArrival);
+					_generatedDepartureSchedules.push_back(departureSchedule.is_not_a_date_time() ? arrivalSchedule : departureSchedule);
 					lastDepartureScheduledEdge = itEdge;
 					lastDefinedDepartureSchedule = departureSchedule;
+
+					// Incrementation of schedules iterators
+					if(itDeparture != _dataDepartureSchedules.end())
+					{
+						++itDeparture;
+				}
+					if(itArrival != _dataArrivalSchedules.end())
+					{
+						++itArrival;
+					}
 				}
 				else
 				{
 					atLeastOneDepartureUnscheduledEdge = true;
-				}
 
-				if(	lineStop && lineStop->getScheduleInput())
+					// A schedule was ignored : we must jump over it
+					if(edge.getScheduleInput())
 				{
-					// Increment iterators
-					++itDeparture;
-					++itArrival;
+						if(itDeparture != _dataDepartureSchedules.end() && itDeparture->is_not_a_date_time())
+					{
+						++itDeparture;
+					if(itArrival != _dataArrivalSchedules.end())
+					{
+						++itArrival;
+					}
 				}
+			}
+				}
+				lastRankInPath = edge.getRankInPath();
 			}
 			if(atLeastOneDepartureUnscheduledEdge)
 			{
@@ -1187,12 +1331,20 @@ namespace synthese
 			bool atLeastOneArrivalUnscheduledEdge(false);
 			Schedules::const_iterator itGeneratedDepartureSchedules(_generatedDepartureSchedules.begin());
 			bool neverSeenAScheduledEdge(true);
+			lastRankInPath = boost::none;
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
-				const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
-				if(	!lineStop ||
-					(	lineStop->getScheduleInput() &&
-						(lineStop->isArrival() || lastArrivalScheduledEdge == _path->getEdges().begin())
+				const Edge& edge(**itEdge);
+
+				if(	lastRankInPath && edge.getRankInPath() == *lastRankInPath
+				){
+					continue;
+				}
+
+				if(	edge.getScheduleInput() &&
+					(	(itArrival != _dataArrivalSchedules.end() && !itArrival->is_not_a_date_time()) ||
+						(itEdge+1) == _path->getEdges().end() ||
+						itEdge == _path->getEdges().begin()
 				)	){
 					neverSeenAScheduledEdge = false;
 
@@ -1221,8 +1373,10 @@ namespace synthese
 					){
 						departureSchedule = *itDeparture;
 					}
-
-					const Edge& edge(**itEdge);
+					else
+					{
+						departureSchedule = arrivalSchedule;
+					}
 
 					// Interpolation of preceding schedules
 					if(atLeastOneArrivalUnscheduledEdge)
@@ -1234,9 +1388,17 @@ namespace synthese
 
 						MetricOffset totalDistance(edge.getMetricOffset() - (*lastArrivalScheduledEdge)->getMetricOffset());
 						size_t totalRankDiff(edge.getRankInPath() - (*lastArrivalScheduledEdge)->getRankInPath());
-						time_duration totalTime(*itArrival - lastDefinedArrivalSchedule);
+						time_duration totalTime(arrivalSchedule - lastDefinedArrivalSchedule);
+						size_t lastRankInPath2((*lastArrivalScheduledEdge)->getRankInPath());
 						for(Path::Edges::const_iterator it(lastArrivalScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
+							// Stop over DRT generated stops
+							if(	(*it)->getRankInPath() == lastRankInPath2
+							){
+								continue;
+							}
+							lastRankInPath2 = (*it)->getRankInPath();
+
 							double minutesToAdd(0);
 							if(totalDistance != 0)
 							{
@@ -1261,13 +1423,23 @@ namespace synthese
 					}
 
 					// Store the schedules
-					_generatedArrivalSchedules.push_back(edge.isArrival() ? *itArrival : *itDeparture);
+					_generatedArrivalSchedules.push_back(arrivalSchedule.is_not_a_date_time() ? departureSchedule : arrivalSchedule);
 					lastArrivalScheduledEdge = itEdge;
 					lastDefinedArrivalSchedule = 
-						(edge.isDeparture() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
+						(edge.isDepartureAllowed() && !departureSchedule.is_not_a_date_time() && departureSchedule > arrivalSchedule) ?
 						departureSchedule :
 						arrivalSchedule
 					;
+
+					// Increment iterators
+					if(itDeparture != _dataDepartureSchedules.end())
+					{
+						++itDeparture;
+				}
+					if(itArrival != _dataArrivalSchedules.end())
+					{
+						++itArrival;
+					}
 				}
 				else
 				{
@@ -1287,14 +1459,22 @@ namespace synthese
 					{
 						atLeastOneArrivalUnscheduledEdge = true;
 					}
-				}
 
-				if(	!lineStop || lineStop->getScheduleInput())
+					// A schedule was ignored : we must jump over it
+					if(edge.getScheduleInput())
 				{
-					// Increment iterators
-					++itDeparture;
-					++itArrival;
+						if(itArrival != _dataArrivalSchedules.end() && itArrival->is_not_a_date_time())
+						{
+							++itArrival;
+					if(itDeparture != _dataDepartureSchedules.end())
+					{
+						++itDeparture;
+					}
+					}
 				}
+			}
+
+				lastRankInPath = edge.getRankInPath();
 			}
 			if(atLeastOneArrivalUnscheduledEdge)
 			{
@@ -1314,10 +1494,6 @@ namespace synthese
 			{
 				Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()) +" (too much schedules)");
 			}
-
-			// Check if the method did the job properly in debug mode
-			assert(_generatedDepartureSchedules.size() == _path->getEdges().size());
-			assert(_generatedArrivalSchedules.size() == _path->getEdges().size());
 		}
 
 
@@ -1331,11 +1507,17 @@ namespace synthese
 
 		bool SchedulesBasedService::respectsLineTheoryWith( const Service& other ) const
 		{
+			// Read the other service as schedules based service
 			if(!dynamic_cast<const SchedulesBasedService*>(&other))
 			{
 				return true;
 			}
 			const SchedulesBasedService& sother(static_cast<const SchedulesBasedService&>(other));
+
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock1(getSchedulesMutex());
+			recursive_mutex::scoped_lock lock2(sother.getSchedulesMutex());
+
 			if(	_dataDepartureSchedules.size() != sother._dataDepartureSchedules.size() ||
 				_dataArrivalSchedules.size() != sother._dataArrivalSchedules.size() ||
 				_dataDepartureSchedules.size() != _dataArrivalSchedules.size()
@@ -1352,13 +1534,15 @@ namespace synthese
 			const Path::Edges& edges(getPath()->getEdges());
 			for(Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
 			{
+				const Edge& edge(**it);
+
 				// Jump over stops with interpolated schedules
-				if(!static_cast<LineStop*>(*it)->getScheduleInput())
+				if(!edge.getScheduleInput())
 				{
 					continue;
 				}
 
-				if((*it)->isDeparture())
+				if(edge.isDeparture())
 				{
 					/// - Test 1 : Conflict between continuous service range or identical schedule
 					if(	getDataFirstDepartureSchedule(i) <= sother.getDataLastDepartureSchedule(i) &&
@@ -1381,7 +1565,7 @@ namespace synthese
 						}
 					}
 				}
-				if ((*it)->isArrival())
+				if (edge.isArrival())
 				{
 					/// - Test 1 : Conflict between continuous service range or identical schedule
 					if(	getDataFirstArrivalSchedule(i) <= sother.getDataLastArrivalSchedule(i) &&
@@ -1413,8 +1597,11 @@ namespace synthese
 
 
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
+		const boost::posix_time::time_duration SchedulesBasedService::getDataFirstDepartureSchedule( size_t i ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(i >= _dataDepartureSchedules.size())
 			{
 				return *_dataDepartureSchedules.rbegin();
@@ -1422,8 +1609,13 @@ namespace synthese
 			return _dataDepartureSchedules.at(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
+
+
+		const boost::posix_time::time_duration SchedulesBasedService::getDataFirstArrivalSchedule( size_t i ) const
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(i >= _dataArrivalSchedules.size())
 			{
 				return *_dataArrivalSchedules.rbegin();
@@ -1431,12 +1623,16 @@ namespace synthese
 			return _dataArrivalSchedules.at(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastDepartureSchedule( size_t i ) const
+
+
+		const boost::posix_time::time_duration SchedulesBasedService::getDataLastDepartureSchedule( size_t i ) const
 		{
 			return getDataFirstDepartureSchedule(i);
 		}
 
-		const boost::posix_time::time_duration& SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
+
+
+		const boost::posix_time::time_duration SchedulesBasedService::getDataLastArrivalSchedule( size_t i ) const
 		{
 			return getDataFirstArrivalSchedule(i);
 		}
@@ -1450,8 +1646,8 @@ namespace synthese
 				throw Exception("A path is needed");
 			}
 
-			// Lock the cache
-			recursive_mutex::scoped_lock lock(_generatedSchedulesMutex);
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
 			Schedules newDepartureSchedules;
 			Schedules newArrivalSchedules;
@@ -1460,7 +1656,7 @@ namespace synthese
 			BOOST_FOREACH(const Path::Edges::value_type& itEdge, _path->getEdges())
 			{
 				// Jump over stops with interpolated schedules
-				if(!static_cast<LineStop*>(itEdge)->getScheduleInput())
+				if(!itEdge->getScheduleInput())
 				{
 					++rank;
 					continue;
@@ -1479,14 +1675,15 @@ namespace synthese
 
 		bool operator==(const SchedulesBasedService& first, const SchedulesBasedService& second)
 		{
+			// Lock the schedules
+			recursive_mutex::scoped_lock lock1(first.getSchedulesMutex());
+			recursive_mutex::scoped_lock lock2(second.getSchedulesMutex());
+
 			return
 				first.getPath() == second.getPath() &&
 				first.getServiceNumber() == second.getServiceNumber() &&
 				first.getDepartureSchedules(true, false) == second.getDepartureSchedules(true, false) &&
 				first.getArrivalSchedules(true, false) == second.getArrivalSchedules(true, false)
-
 			;
 		}
-
-
 }	}

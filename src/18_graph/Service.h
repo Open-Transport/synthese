@@ -195,7 +195,8 @@ namespace synthese
 					bool checkIfTheServiceIsReachable,
 					bool inverted,
 					bool ignoreReservation,
-					bool allowCanceled
+					bool allowCanceled,
+					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
 				) const = 0;
 
 

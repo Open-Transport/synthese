@@ -24,7 +24,6 @@
 #include "CompositionVehicleRemoveAction.hpp"
 #include "RealTimeVehicleUpdateAction.hpp"
 #include "RollingStockUpdateAction.hpp"
-#include "VehicleUpdateAction.hpp"
 #include "VehiclePositionUpdateAction.hpp"
 
 // Registries
@@ -58,7 +57,6 @@ void synthese::vehicle::moduleRegister()
 	synthese::vehicle::CompositionUpdateAction::integrate();
 	synthese::vehicle::RealTimeVehicleUpdateAction::integrate();
 	synthese::vehicle::RollingStockUpdateAction::integrate();
-	synthese::vehicle::VehicleUpdateAction::integrate();
 	synthese::vehicle::VehiclePositionUpdateAction::integrate();
 
 	synthese::vehicle::GetCompositionsService::integrate();

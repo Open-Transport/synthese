@@ -26,6 +26,7 @@
 #include "PTTimeSlotRoutePlanner.h"
 #include "RoutePlanner.h"
 #include "Road.h"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "PTModule.h"
 #include "FreeDRTArea.hpp"
@@ -113,12 +114,12 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 				_xmlDisplayPhysicalStop(stream, "   start at stop :", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()));
 				_xmlDisplayPhysicalStop(stream, "   end as stop :", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()));
 			}
-			const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
+			const RoadPath* road(dynamic_cast<const RoadPath*>(leg.getService()->getPath ()));
 			if(road != NULL)
 			{
 				stream << "   take a street :" <<
-					" name = " << road->getRoadPlace()->getName() <<
-					" city = " << road->getRoadPlace()->getCity()->getName() <<
+					" name = " << road->getRoad()->get<RoadPlace>()->getName() <<
+					" city = " << road->getRoad()->get<RoadPlace>()->getCity()->getName() <<
 					" length = " << ceil(leg.getDistance()) <<
 					" departureTime = " << leg.getDepartureDateTime() <<
 					" arrivalTime = " << leg.getArrivalDateTime() ;
@@ -153,7 +154,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 	AccessParameters a(
 		USER_PEDESTRIAN, false, false, 1000, boost::posix_time::minutes(23), 1.11, 10, pc
 	);
-	ptime tomorrow(day_clock::local_day(), minutes(0));
+	ptime tomorrow(day_clock::local_day(), hours(3));
 	tomorrow += days(1);
 	ptime next_day(tomorrow);
 	next_day += days(1);

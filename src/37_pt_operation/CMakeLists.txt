@@ -49,6 +49,12 @@ DriverServiceTableSync.cpp
 DriverServiceTableSync.hpp
 DriverServiceUpdateAction.cpp
 DriverServiceUpdateAction.hpp
+OperationUnit.cpp
+OperationUnit.hpp
+OperationUnitTableSync.cpp
+OperationUnitTableSync.hpp
+OperationUnitsService.cpp
+OperationUnitsService.hpp
 PTOperationModule.cpp
 PTOperationModule.gen.cpp
 PTOperationModuleRegister.cpp
@@ -66,8 +72,6 @@ VehicleServiceComposition.cpp
 VehicleServiceComposition.hpp
 VehicleServiceTableSync.cpp
 VehicleServiceTableSync.hpp
-VehicleServiceUpdateAction.cpp
-VehicleServiceUpdateAction.hpp
 VehicleServicesAdmin.cpp
 VehicleServicesAdmin.hpp
 VehicleServicesListService.cpp

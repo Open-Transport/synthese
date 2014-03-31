@@ -144,6 +144,16 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				boost::optional<util::RegistryKeyType> serviceId = boost::optional<util::RegistryKeyType>()
 			);
+
+
+
+			static SearchResult SearchByService(
+				util::Env& env,
+				util::RegistryKeyType serviceId,
+				boost::optional<boost::posix_time::ptime> departureTime = boost::optional<boost::posix_time::ptime>(),
+				boost::optional<boost::posix_time::ptime> arrivalTime = boost::optional<boost::posix_time::ptime>(),
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
 		};
 	}
 }

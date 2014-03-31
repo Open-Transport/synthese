@@ -22,7 +22,6 @@
 
 #include "PublicPlaceEntrance.hpp"
 
-#include "ReverseRoadChunk.hpp"
 #include "RoadModule.h"
 
 using namespace boost;

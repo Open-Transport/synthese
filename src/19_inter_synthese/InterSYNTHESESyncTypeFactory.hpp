@@ -31,7 +31,6 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
-		class InterSYNTHESEIdFilter;
 		class InterSYNTHESESlave;
 		class InterSYNTHESEConfigItem;
 
@@ -50,8 +49,7 @@ namespace synthese
 			) const = 0;
 
 			virtual bool sync(
-				const std::string& parameter,
-				const InterSYNTHESEIdFilter* idFilter
+				const std::string& parameter
 			) const = 0;
 
 			virtual void closeSync(

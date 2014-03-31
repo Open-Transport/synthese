@@ -71,6 +71,8 @@ namespace synthese
 		const string UserTableSync::TABLE_COL_COUNTRY = "country";
 		const string UserTableSync::TABLE_COL_EMAIL = "email";
 		const string UserTableSync::TABLE_COL_PHONE = "phone";
+		const string UserTableSync::TABLE_COL_CREATION_DATE = "creation_date";
+		const string UserTableSync::TABLE_COL_CREATOR_ID = "creator_id";
 		const string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
 		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
 		const string UserTableSync::COL_LANGUAGE = "language";
@@ -100,6 +102,8 @@ namespace synthese
 			Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
 			Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
 			Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_CREATION_DATE, SQL_DATETIME),
+			Field(UserTableSync::TABLE_COL_CREATOR_ID, SQL_INTEGER),
 			Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_BOOLEAN),
 			Field(UserTableSync::COL_BIRTH_DATE, SQL_DATETIME),
 			Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
@@ -137,6 +141,8 @@ namespace synthese
 			user->setCountry(rows->getText ( UserTableSync::TABLE_COL_COUNTRY));
 			user->setEMail(rows->getText ( UserTableSync::TABLE_COL_EMAIL));
 			user->setPhone(rows->getText ( UserTableSync::TABLE_COL_PHONE));
+			user->setCreationDate(rows->getDate ( UserTableSync::TABLE_COL_CREATION_DATE));
+			user->setCreatorId(rows->getLongLong ( UserTableSync::TABLE_COL_CREATOR_ID));
 			user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
 			user->setBirthDate(rows->getDate(UserTableSync::COL_BIRTH_DATE));
 
@@ -227,6 +233,8 @@ namespace synthese
 			query.addField(user->getCountry());
 			query.addField(user->getEMail());
 			query.addField(user->getPhone());
+			query.addFrameworkField<DateField>(user->getCreationDate());
+			query.addField(user->getCreatorId());
 			query.addField(user->getConnectionAllowed());
 			query.addFrameworkField<DateField>(user->getBirthDate());
 			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
@@ -308,6 +316,33 @@ namespace synthese
 				db::DBResultSPtr rows = db->execQuery(query.str());
 				if (rows->next () == false)
 					throw Exception("User "+ login + " not found in database.");
+
+				boost::shared_ptr<User> user (new User(rows->getKey()));
+				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);
+				return user;
+			}
+			catch (DBException e)
+			{
+				throw Exception(e.getMessage());
+			}
+		}
+
+
+
+		boost::shared_ptr<User> UserTableSync::getUserFromMail(const string& mail)
+		{
+			Env& env(Env::GetOfficialEnv());
+			DB* db = DBModule::GetDB();
+			stringstream query;
+			query
+				<< "SELECT *"
+				<< " FROM " << TABLE.NAME
+				<< " WHERE " << TABLE_COL_EMAIL << "=" << Conversion::ToDBString(mail);
+			try
+			{
+				db::DBResultSPtr rows = db->execQuery(query.str());
+				if (rows->next () == false)
+					throw Exception("Mail "+ mail + " not found in database.");
 
 				boost::shared_ptr<User> user (new User(rows->getKey()));
 				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);

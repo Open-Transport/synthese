@@ -80,6 +80,7 @@ namespace synthese
 	namespace data_exchange
 	{
 		const string HafasFileFormat::Importer_::FILE_KOORD = "koord";
+		const string HafasFileFormat::Importer_::FILE_BAHNOF = "bahnof";
 		const string HafasFileFormat::Importer_::FILE_BITFELD = "bitfeld";
 		const string HafasFileFormat::Importer_::FILE_ECKDATEN = "eckdaten";
 		const string HafasFileFormat::Importer_::FILE_ZUGDAT = "zugdat";
@@ -93,12 +94,18 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_FULL_SERVICES = "import_full_services";
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_STOPS = "import_stops";
 		const string HafasFileFormat::Importer_::PARAMETER_LINES_FILTER = "lines_filter";
+		const string HafasFileFormat::Importer_::PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE = "gleis_has_one_stop_per_line";
+		const string HafasFileFormat::Importer_::PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME = "complete_empty_stop_area_name";
+		const string HafasFileFormat::Importer_::PARAMETER_NO_GLEIS_FILE = "no_gleis_file";
+		const string HafasFileFormat::Importer_::PARAMETER_TRY_TO_READ_LINE_SHORT_NAME = "try_to_read_line_short_name";
+		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
 	}
 
 	namespace impex
 	{
 		template<> const MultipleFileTypesImporter<HafasFileFormat>::Files MultipleFileTypesImporter<HafasFileFormat>::FILES(
 			HafasFileFormat::Importer_::FILE_KOORD.c_str(),
+			HafasFileFormat::Importer_::FILE_BAHNOF.c_str(),
 			HafasFileFormat::Importer_::FILE_GLEIS.c_str(),
 			HafasFileFormat::Importer_::FILE_UMSTEIGB.c_str(),
 			HafasFileFormat::Importer_::FILE_UMSTEIGZ.c_str(),
@@ -312,7 +319,10 @@ namespace synthese
 		) const {
 			if(!_openFile(filePath))
 			{
-				throw Exception("Could no open the file " + filePath.file_string());
+				// It is possible to have no GLEIS file, but it will lead to a different parsing
+				// File bahnof is optional
+				if (key != FILE_BAHNOF && (!(key == FILE_GLEIS && _noGleisFile)))
+					throw Exception("Could no open the file " + filePath.file_string());
 			}
 
 			DataSource& dataSource(*_import.get<DataSource>());
@@ -329,8 +339,10 @@ namespace synthese
 					bahnhof.operatorCode = _getField(0, 7);
 
 					// Point
-					double x(1000 * lexical_cast<double>(_getField(11, 10)));
-					double y(1000 * lexical_cast<double>(_getField(22, 10)));
+					std::string strX = _getField(10, 7);
+					std::string strY = _getField(20, 7); 
+					double x(1000 * lexical_cast<double>(strX));
+					double y(1000 * lexical_cast<double>(strY));
 					if(x && y)
 					{
 						bahnhof.point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
@@ -341,11 +353,15 @@ namespace synthese
 					// Names
 					vector<string> cols;
 					std::string nameStr(_getField(34));
+					if (nameStr.substr(0,2) == "% ")
+						nameStr = nameStr.substr(2,nameStr.size()-2);
 					boost::algorithm::split(cols, nameStr, boost::algorithm::is_any_of(","));
 					bahnhof.cityName = cols[0];
 					if(cols.size() == 1)
 					{
 						bahnhof.main = true;
+						if (!_complete_empty_stop_area_name.empty())
+							bahnhof.name = cols[0] + _complete_empty_stop_area_name;
 					}
 					else
 					{
@@ -360,38 +376,105 @@ namespace synthese
 					)	);
 				}
 			}
-			else if(key == FILE_GLEIS)
+			else if (key == FILE_BAHNOF)
+			{
+				while(_loadLine())
+				{
+					// operator code
+					string operatorCode = _getField(0, 7);
+					// Search of the bahnhof
+					Bahnhofs::iterator itBahnhof(_bahnhofs.find(operatorCode));
+					if(itBahnhof == _bahnhofs.end())
+					{
+						continue;
+					}
+					
+					// Names
+					vector<string> cols;
+					std::string nameStr(_getField(12));
+					boost::algorithm::split(cols, nameStr, boost::algorithm::is_any_of(","));
+					itBahnhof->second.cityName = cols[0];
+					if(cols.size() == 1)
+					{
+						itBahnhof->second.main = true;
+						if (!_complete_empty_stop_area_name.empty())
+							itBahnhof->second.name = cols[0] + _complete_empty_stop_area_name;
+					}
+					else
+					{
+						itBahnhof->second.name = cols[1];
+					}
+				}
+			}
+			else if(key == FILE_GLEIS && !_noGleisFile)
 			{
 				GleisMap::iterator itService(_gleisMap.end());
 
 				while(_loadLine())
 				{
-					// New service
-					if(_getField(0,1) == "@")
+					if (!_gleisHasOneStopPerLine)
 					{
-						itService = _gleisMap.insert(
-							make_pair(
-								boost::make_tuple(
-									_getField(3, 5),
-									_getField(9, 6),
-									lexical_cast<size_t>(_getField(16, 2))
-								),
-								GleisMap::mapped_type()
-						)	).first;
-					}
-					else if(itService != _gleisMap.end())
-					{
-						// Fields
-						string stopCode(_getField(0, 7));
-						string gleisCode(_getField(10, 6));
+						// New service
+						if(_getField(0,1) == "@")
+						{
+							itService = _gleisMap.insert(
+								make_pair(
+									boost::make_tuple(
+										_getField(3, 5),
+										_getField(9, 6),
+										lexical_cast<size_t>(_getField(16, 2))
+									),
+									GleisMap::mapped_type()
+							)	).first;
+						}
+						else if(itService != _gleisMap.end())
+						{
+							// Fields
+							string stopCode(_getField(0, 7));
+							string gleisCode(_getField(10, 6));
 
+							// Search of the bahnhof
+							Bahnhofs::iterator itBahnhof(_bahnhofs.find(stopCode));
+							if(itBahnhof == _bahnhofs.end())
+							{
+								continue;
+							}
+
+							// Record of the gleis in the bahnhof
+							itBahnhof->second.gleisSet.insert(gleisCode);
+
+							// Record of the gleis in the service
+							itService->second.insert(
+								make_pair(
+									stopCode,
+									gleisCode
+							)	);
+						}
+					}
+					else
+					{
+						string serviceCode(_getField(8, 5));
+						string lineNumber(_getField(14, 6));
+						string stopCode(_getField(0, 7));
+						string gleisCode(_getField(21, 6));
+						itService = _gleisMap.find(boost::make_tuple(serviceCode, lineNumber, 0));
+						if (itService == _gleisMap.end())
+						{
+							// We create the service
+							itService = _gleisMap.insert(
+								make_pair(
+									boost::make_tuple(serviceCode, lineNumber, 0),
+									GleisMap::mapped_type()
+							)	).first;
+						}
+						
 						// Search of the bahnhof
 						Bahnhofs::iterator itBahnhof(_bahnhofs.find(stopCode));
 						if(itBahnhof == _bahnhofs.end())
 						{
 							continue;
 						}
-
+						
 						// Record of the gleis in the bahnhof
 						itBahnhof->second.gleisSet.insert(gleisCode);
 
@@ -623,7 +706,14 @@ namespace synthese
 						itZug = _zugs.insert(_zugs.end(), Zug());
 						itZug->lineFilter = lineFilter;
 						itZug->number = _getField(3,5);
-						itZug->version = lexical_cast<size_t>(_getField(16, 2));
+						try {
+							itZug->version = lexical_cast<size_t>(_getField(16, 2));
+						}
+						catch (bad_lexical_cast&)
+						{
+							itZug->version = 0;
+						}
+
 						zugNumber = itZug->number +"/"+ lineNumber;
 						if(lineFilter->lineNumberStart && lineFilter->lineNumberEnd)
 						{
@@ -653,7 +743,13 @@ namespace synthese
 						if(itZug != _zugs.end())
 						{
 							Zug::CalendarUse calendarUse;
-							calendarUse.calendarNumber = lexical_cast<size_t>(_getField(22, 6));
+							try {
+								calendarUse.calendarNumber = lexical_cast<size_t>(_getField(22, 6));
+							}
+							catch (bad_lexical_cast&)
+							{
+								calendarUse.calendarNumber = _defaultCalendarCode;
+							}
 							calendarUse.startStopCode = _getField(6, 7);
 							calendarUse.endStopCode = _getField(14, 7);
 							itZug->calendars.push_back(calendarUse);
@@ -664,6 +760,13 @@ namespace synthese
 						if(itZug != _zugs.end())
 						{
 							itZug->transportModeCode = _getField(3, 3);
+						}
+					}
+					else if(_getField(0, 2) == "*L" && _tryToReadShortName) // Short name of the line
+					{
+						if(itZug != _zugs.end())
+						{
+							itZug->lineShortName = _getField(3, 8);
 						}
 					}
 					else if(_getField(0, 1) != "*") // Stop
@@ -695,6 +798,18 @@ namespace synthese
 						// Departure times
 						string departureTimeStr(_getField(34, 4));
 						string arrivalTimeStr(_getField(29, 4));
+						if (_gleisHasOneStopPerLine)
+						{
+							// Format is different when gleis file has one stop per line
+							// If it is found a set of file where gleis file is by section
+							// and departure time is on #38 and arrival on 31
+							// OR a set of file where gleis file has one stop per line and
+							// and departure time is on #34 and arrival on 29
+							// then it will be needed another parameter to manage it independantly
+							departureTimeStr = _getField(38, 4);
+							arrivalTimeStr = _getField(31, 4);
+						}
+						
 						bool isDeparture(departureTimeStr != "9999" && !departureTimeStr.empty());
 						bool isArrival(arrivalTimeStr != "9999" && !arrivalTimeStr.empty());
 						if(!isArrival && !isDeparture)
@@ -706,17 +821,29 @@ namespace synthese
 						itStop->stopCode = stopCode;
 						if(isDeparture)
 						{
-							itStop->departureTime =
-								hours(lexical_cast<int>(departureTimeStr.substr(0,2))) +
-								minutes(lexical_cast<int>(departureTimeStr.substr(2,2)))
-							;
+							try {
+								itStop->departureTime =
+									hours(lexical_cast<int>(departureTimeStr.substr(0,2))) +
+									minutes(lexical_cast<int>(departureTimeStr.substr(2,2)))
+								;
+							}
+							catch (bad_lexical_cast&)
+							{
+								itStop->departureTime = time_duration(0,0,0);
+							}
 						}
 						if(isArrival)
 						{
-							itStop->arrivalTime =
-								hours(lexical_cast<int>(arrivalTimeStr.substr(0,2))) +
-								minutes(lexical_cast<int>(arrivalTimeStr.substr(2,2)))
-							;
+							try {
+								itStop->arrivalTime =
+									hours(lexical_cast<int>(arrivalTimeStr.substr(0,2))) +
+									minutes(lexical_cast<int>(arrivalTimeStr.substr(2,2)))
+								;
+							}
+							catch (bad_lexical_cast&)
+							{
+								itStop->departureTime = time_duration(0,0,0);
+							}
 						}
 
 						// Gleis
@@ -740,6 +867,19 @@ namespace synthese
 							{
 								itStop->gleisCode = itStopArea->second;
 							}
+						}
+						else if (_noGleisFile)
+						{
+							// Creation of the _gleis here
+							_gleisMap.insert(
+								make_pair(
+									boost::make_tuple(
+										itZug->number,
+										itZug->lineNumber,
+										0
+									),
+									GleisMap::mapped_type()
+							)	);
 						}
 					}
 				}
@@ -776,6 +916,21 @@ namespace synthese
 
 			// Lines filter
 			pm.insert(PARAMETER_LINES_FILTER, LinesFilterToString(_linesFilter));
+
+			// Gleis file format
+			pm.insert(PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE, _gleisHasOneStopPerLine);
+
+			// String to complete empty stop area name
+			pm.insert(PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME, _complete_empty_stop_area_name);
+
+			// No gleis file
+			pm.insert(PARAMETER_NO_GLEIS_FILE, _noGleisFile);
+
+			// No gleis file
+			pm.insert(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, _tryToReadShortName);
+
+			// Calendar default code
+			pm.insert(PARAMETER_CALENDAR_DEFAULT_CODE, _defaultCalendarCode);
 
 			return pm;
 		}
@@ -840,6 +995,21 @@ namespace synthese
 
 			// Lines filter
 			_linesFilter = getLinesFilter(pm.getDefault<string>(PARAMETER_LINES_FILTER));
+
+			// Gleis file format
+			_gleisHasOneStopPerLine = pm.getDefault<bool>(PARAMETER_GLEIS_HAS_ONE_STOP_PER_LINE, false);
+
+			// String to complete empty stop area name
+			_complete_empty_stop_area_name = pm.getDefault<string>(PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME);
+
+			// No gleis file
+			_noGleisFile = pm.getDefault<bool>(PARAMETER_NO_GLEIS_FILE, false);
+			
+			// Line short name
+			_tryToReadShortName = pm.getDefault<bool>(PARAMETER_TRY_TO_READ_LINE_SHORT_NAME, false);
+
+			// Calendar default code
+			_defaultCalendarCode = pm.getDefault<size_t>(PARAMETER_CALENDAR_DEFAULT_CODE, 0);
 		}
 
 
@@ -1264,6 +1434,10 @@ namespace synthese
 					}
 				}
 
+				// Update the short name if possible
+				if (_tryToReadShortName && !zug.lineShortName.empty())
+					line->setShortName(zug.lineShortName);
+
 				// Wayback
 				int numericServiceNumber(0);
 				try
@@ -1310,7 +1484,7 @@ namespace synthese
 						mergedCalendar &= _calendar;
 
 						// Jump over useless combinations
-						if(mergedCalendar.empty())
+						if(mergedCalendar.empty() && !_importEvenIfNoDate)
 						{
 							continue;
 						}
@@ -1416,7 +1590,8 @@ namespace synthese
 								dataSource,
 								optional<const string&>(),
 								optional<const RuleUser::Rules&>(),
-								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops)
+								optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
+								zug.number
 							);
 						}
 						else

@@ -6,32 +6,42 @@
 #include "VIX-CIntSurvMsg.hpp"
 #include "VIX-BSC-defines.hpp"
 
+#include <boost/lexical_cast.hpp>
+
+#include <boost/format.hpp>
+// cool info at http://ckp.made-it.com/bisync.html
+
 namespace synthese
 {
+	using namespace boost::posix_time;
 
 	CIntSurvMsg::CIntSurvMsg(void)
 	{
 		type		= INT_SURV;
-		//TODO(JD): set those values to 0 by default when debug done
-		year		= 113;
-		month		= 8;
-		day		= 19;
-		hour		= 12;
-		min		= 10;
-		sec		= 50;
-		num_driver	= 4320;
-		num_park	= 104;
-		etat_expl	= 1;
-		num_line	= 6;//3;
-		num_service	= 4024;	// No service agent
-		num_journey	= 21;	// course NOT USED in VIX code.
-		num_stop	= 2045;//2050;
+		ptime now(second_clock::local_time());
+		year	= now.date().year()-2000;
+		month	= now.date().month();
+		day		= now.date().day();
+		hour	= now.time_of_day().hours();
+		min		= now.time_of_day().minutes();
+		sec		= now.time_of_day().seconds();
+		num_driver	= 1;
+		num_park	= 798;
+		etat_expl	= 0;
+		num_line	= 9998;
+		num_service	= 1;
+		num_journey	= 998;
+		num_stop	= 9998;
 		direction	= 0;
 	}
+
+
 
 	CIntSurvMsg::~CIntSurvMsg(void)
 	{
 	}
+
+
 
 	void CIntSurvMsg::IntLigneToString(char *p, unsigned int i)
 	{
@@ -87,20 +97,17 @@ namespace synthese
 
 	}
 
+
+
 	int CIntSurvMsg::StreamToBuffer(unsigned char *buf, int bufSize)
 	{
-		// Vehicle info planned be update in the gps poller. => VehiclePosition setGeometry 
-		//TODO:	UpdateVariablesFromEnv();
-
 		if(bufSize<INT_SURV_BUF_SIZE){
 			// buf size Must be at least equal to INT_SURV_BUF_SIZE
 			util::Log::GetInstance().error("CIntSurv::StreamToBuffer INVALID buffer size");
 			return 0;
 		}
 
-		int o = 0;
-		buf[o] = INT_SURV_DATA_SIZE;
-		o+=1;
+		int o = 1;
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, type);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, year);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, month);
@@ -134,6 +141,12 @@ namespace synthese
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, (num_stop>>8) & 0xFF);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, num_stop & 0xFF);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, direction);
+		buf[0] = o - 1;
+
+		/*DEBUG(JD)*/
+		util::Log::GetInstance().debug(boost::str(boost::format("VixV6000FileFormat: num_driver=%d, num_park=%d, num_service=%d, num_journey=%d, num_stop=%d, num_line=%d, direction=%d")
+									 % num_driver % num_park % num_service % num_journey % num_stop % num_line % direction));
+		/*DEBUG(JD)*/
 
 		return o;
 	}

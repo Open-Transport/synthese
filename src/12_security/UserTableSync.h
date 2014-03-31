@@ -61,6 +61,8 @@ namespace synthese
 			static const std::string TABLE_COL_COUNTRY;
 			static const std::string TABLE_COL_EMAIL;
 			static const std::string TABLE_COL_PHONE;
+			static const std::string TABLE_COL_CREATION_DATE;
+			static const std::string TABLE_COL_CREATOR_ID;
 			static const std::string COL_LOGIN_AUTHORIZED;
 			static const std::string COL_BIRTH_DATE;
 			static const std::string COL_LANGUAGE;
@@ -77,6 +79,17 @@ namespace synthese
 				@date 2007
 			*/
 			static boost::shared_ptr<User> getUserFromLogin(const std::string& login);
+
+
+
+			/** Gets a user in the database, founded by his mail address.
+				@param mail mail to search
+				@return boost::shared_ptr<User> Shared pointer to a new user linked-object.
+				@date 2013
+			*/
+			static boost::shared_ptr<User> getUserFromMail(const std::string& mail);
+
+
 
 			static bool loginExists(const std::string& login);
 

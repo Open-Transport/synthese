@@ -30,7 +30,6 @@
 #include "RoadFileFormat.hpp"
 
 #include "ImportableTableSync.hpp"
-#include "MainRoadChunk.hpp"
 #include "RoadPlaceTableSync.h"
 
 #include <map>
@@ -190,10 +189,10 @@ namespace synthese
 
 				mutable impex::ImportableTableSync::ObjectBySource<road::RoadPlaceTableSync> _roadPlaces;
 
-				static road::MainRoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
+				static road::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
 					const std::string& addressSchema
 				);
-				static road::MainRoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
+				static road::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
 					const std::string& minAddress,
 					const std::string& maxAddress
 				);

@@ -67,6 +67,7 @@ namespace synthese
 		):	Registrable(id),
 			_profile(NULL),
 			_cityId(0),
+			_creatorId(0),
 			_isConnectionAllowed(true),
 			_birthDate(not_a_date_time),
 			_language(NULL)
@@ -97,6 +98,11 @@ namespace synthese
 			string hash = salt + md5Hash;
 
 			setPasswordHash(hash);
+		}
+
+		void User::resetTempPassword()
+		{
+			_password = "";
 		}
 
 		void User::setPasswordHash( const std::string& passwordHash )
@@ -194,6 +200,11 @@ namespace synthese
 			_phone = phone;
 		}
 
+		void User::setCreationDate( const boost::gregorian::date& creationDate )
+		{
+			_creationDate = creationDate;
+		}
+
 		const std::string& User::getAddress() const
 		{
 			return _address;
@@ -222,6 +233,11 @@ namespace synthese
 		const std::string& User::getPhone() const
 		{
 			return _phone;
+		}
+
+		const boost::gregorian::date& User::getCreationDate() const
+		{
+			return _creationDate;
 		}
 
 		void User::setConnectionAllowed( bool value )
@@ -282,6 +298,11 @@ namespace synthese
 			if(_profile)
 			{
 				pm.insert("profile_id", _profile->getKey());
+			}
+			pm.insert("creation_date", _creationDate);
+			if(_creatorId)
+			{
+				pm.insert("creator_id", _creatorId);
 			}
 		}
 	}

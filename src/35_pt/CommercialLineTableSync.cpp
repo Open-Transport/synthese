@@ -91,6 +91,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_SHORT_NAME ("short_name");
 		const string CommercialLineTableSync::COL_LONG_NAME ("long_name");
 		const string CommercialLineTableSync::COL_COLOR ("color");
+		const string CommercialLineTableSync::COL_FOREGROUND_COLOR ("foreground_color");
 		const string CommercialLineTableSync::COL_STYLE ("style");
 		const string CommercialLineTableSync::COL_IMAGE ("image");
 		const string CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES("optional_reservation_places");
@@ -104,6 +105,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_DOC_URL("doc_url");
 		const string CommercialLineTableSync::COL_TIMETABLE_ID("timetable_id");
 		const string CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE = "display_duration_before_first_departure";
+		const string CommercialLineTableSync::COL_WEIGHT_FOR_SORTING = "weight_for_sorting";
 	}
 
 	namespace db
@@ -121,6 +123,7 @@ namespace synthese
 			Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_FOREGROUND_COLOR, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
@@ -134,6 +137,7 @@ namespace synthese
 			Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
 			Field(CommercialLineTableSync::COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_WEIGHT_FOR_SORTING, SQL_INTEGER),
 			Field()
 		};
 
@@ -218,6 +222,7 @@ namespace synthese
 			query.addField(object->getShortName());
 			query.addField(object->getLongName());
 			query.addField(object->getColor() ? object->getColor()->toXMLColor() : string());
+			query.addField(object->getFgColor() ? object->getFgColor()->toXMLColor() : string());
 			query.addField(object->getStyle());
 			query.addField(object->getImage());
 			query.addField(optionalReservationPlaces.str());
@@ -254,6 +259,7 @@ namespace synthese
 				string() :
 				lexical_cast<string>(object->getDisplayDurationBeforeFirstDeparture().total_seconds() / 60)
 			);
+			query.addField(object->getWeightForSorting());
 			query.execute(transaction);
 		}
 

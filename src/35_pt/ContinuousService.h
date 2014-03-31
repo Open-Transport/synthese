@@ -104,7 +104,8 @@ namespace synthese
 					bool checkIfTheServiceIsReachable,
 					bool inverted,
 					bool ignoreReservation,
-					bool allowCanceled
+					bool allowCanceled,
+					graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 				) const;
 
 				virtual void completeServicePointer(
@@ -134,8 +135,8 @@ namespace synthese
 					std::size_t rankInPath
 				) const;
 
-				virtual const boost::posix_time::time_duration& getDataLastDepartureSchedule(size_t i) const;
-				virtual const boost::posix_time::time_duration& getDataLastArrivalSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration getDataLastDepartureSchedule(size_t i) const;
+				virtual const boost::posix_time::time_duration getDataLastArrivalSchedule(size_t i) const;
 
 				virtual void toParametersMap(
 					util::ParametersMap& map,
@@ -156,6 +157,7 @@ namespace synthese
 				) const;
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
 
 		};

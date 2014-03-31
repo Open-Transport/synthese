@@ -63,6 +63,7 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_SHORT_NAME = Action_PARAMETER_PREFIX + "sn";
 		const string CommercialLineUpdateAction::PARAMETER_LONG_NAME = Action_PARAMETER_PREFIX + "ln";
 		const string CommercialLineUpdateAction::PARAMETER_COLOR = Action_PARAMETER_PREFIX + "co";
+		const string CommercialLineUpdateAction::PARAMETER_FOREGROUND_COLOR = Action_PARAMETER_PREFIX + "foreground_color";
 		const string CommercialLineUpdateAction::PARAMETER_STYLE = Action_PARAMETER_PREFIX + "st";
 		const string CommercialLineUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
 		const string CommercialLineUpdateAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
@@ -71,6 +72,7 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_DOC_URL = Action_PARAMETER_PREFIX + "doc_url";
 		const string CommercialLineUpdateAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "timetable_id";
 		const string CommercialLineUpdateAction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE = Action_PARAMETER_PREFIX + "_display_duration_before_first_departure";
+		const string CommercialLineUpdateAction::PARAMETER_WEIGHT_FOR_SORTING = Action_PARAMETER_PREFIX + "weight_for_sorting";
 
 
 
@@ -84,6 +86,10 @@ namespace synthese
 			if(_color)
 			{
 				map.insert(PARAMETER_COLOR, *_color ? (*_color)->toXMLColor() : string());
+			}
+			if(_fgColor)
+			{
+				map.insert(PARAMETER_FOREGROUND_COLOR, *_fgColor ? (*_fgColor)->toXMLColor() : string());
 			}
 			if(_image)
 			{
@@ -132,6 +138,10 @@ namespace synthese
 			if(_displayDurationBeforeFirstDeparture)
 			{
 				map.insert(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE, _displayDurationBeforeFirstDeparture->total_seconds() / 60);
+			}
+			if(_weightForSorting)
+			{
+				map.insert(PARAMETER_WEIGHT_FOR_SORTING, _weightForSorting);
 			}
 
 			// Importable
@@ -186,6 +196,13 @@ namespace synthese
 			{
 				string color(map.getDefault<string>(PARAMETER_COLOR));
 				_color = color.empty() ? optional<RGBColor>() : RGBColor::FromXMLColor(color);
+			}
+
+			// Foreground Color
+			if(map.isDefined(PARAMETER_FOREGROUND_COLOR))
+			{
+				string color(map.getDefault<string>(PARAMETER_FOREGROUND_COLOR));
+				_fgColor = color.empty() ? optional<RGBColor>() : RGBColor::FromXMLColor(color);
 			}
 
 			// Importable
@@ -264,6 +281,11 @@ namespace synthese
 					minutes(map.get<long>(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE))
 				;
 			}
+
+			if(map.isDefined(PARAMETER_WEIGHT_FOR_SORTING))
+			{
+				_weightForSorting = map.get<int>(PARAMETER_WEIGHT_FOR_SORTING);
+			}
 		}
 
 
@@ -282,6 +304,11 @@ namespace synthese
 			if(_color)
 			{
 				_line->setColor(*_color);
+			}
+
+			if(_fgColor)
+			{
+				_line->setFgColor(*_fgColor);
 			}
 
 			// Importable
@@ -334,6 +361,10 @@ namespace synthese
 			if(_displayDurationBeforeFirstDeparture)
 			{
 				_line->setDisplayDurationBeforeFirstDeparture(*_displayDurationBeforeFirstDeparture);
+			}
+			if(_weightForSorting)
+			{
+				_line->setWeightForSorting(*_weightForSorting);
 			}
 
 			CommercialLineTableSync::Save(_line.get());

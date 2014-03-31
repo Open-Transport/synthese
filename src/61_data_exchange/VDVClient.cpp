@@ -58,6 +58,7 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(ReplyAddress, "reply_address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ReplyPort, "reply_port", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(TransportNetworkID, "transport_network_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(DefaultDirection, "default_direction", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(SBBMode, "sbb_mode", SQL_BOOLEAN)
 	

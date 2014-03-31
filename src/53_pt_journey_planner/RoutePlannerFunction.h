@@ -57,6 +57,11 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace messages
+	{
+		class CustomBroadcastPoint;
+	}
+
 	namespace pt_website
 	{
 		class HourPeriod;
@@ -142,6 +147,7 @@ namespace synthese
 			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 			static const std::string PARAMETER_FARE_CALCULATION;
+			static const std::string PARAMETER_BROADCAST_POINT_ID;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
@@ -172,6 +178,7 @@ namespace synthese
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_RESULT_ROW_PAGE;
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
+			static const std::string PARAMETER_RESERVATION_DELAY_TYPE;
 
 		private:
 			static const std::string DATA_LINES;
@@ -220,10 +227,14 @@ namespace synthese
 			static const std::string DATA_ORIGIN_CITY_TEXT;
 			static const std::string DATA_HANDICAPPED_FILTER;
 			static const std::string DATA_ORIGIN_PLACE_TEXT;
+			static const std::string DATA_ORIGIN_PLACE_LONGITUDE;
+			static const std::string DATA_ORIGIN_PLACE_LATITUDE;
 			static const std::string DATA_BIKE_FILTER;
 			static const std::string DATA_DESTINATION_CITY_TEXT;
 			static const std::string DATA_DESTINATION_PLACE_ID;
 			static const std::string DATA_DESTINATION_PLACE_TEXT;
+			static const std::string DATA_DESTINATION_PLACE_LONGITUDE;
+			static const std::string DATA_DESTINATION_PLACE_LATITUDE;
 			static const std::string DATA_PERIOD_ID;
 			static const std::string DATA_DATE;
 			static const std::string DATA_PERIOD;
@@ -237,6 +248,7 @@ namespace synthese
 				static const std::string DATA_DEPARTURE_TIME;
 				static const std::string DATA_DEPARTURE_PLACE_NAME;
 				static const std::string DATA_ARRIVAL_TIME;
+				static const std::string DATA_ARRIVAL_DATE;
 				static const std::string DATA_ARRIVAL_PLACE_NAME;
 				static const std::string DATA_DURATION;
 				static const std::string DATA_DEPARTURE_DATE;
@@ -250,6 +262,8 @@ namespace synthese
 				static const std::string DATA_IS_THE_LAST_JOURNEY_BOARD;
 				static const std::string DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME;
 				static const std::string DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME;
+				static const std::string DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_DATE;
+				static const std::string DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_DATE;
 				static const std::string DATA_DEPARTURE_PLACE_LONGITUDE;
 				static const std::string DATA_DEPARTURE_PLACE_LATITUDE;
 				static const std::string DATA_ARRIVAL_PLACE_LONGITUDE;
@@ -354,6 +368,7 @@ namespace synthese
 				bool _showResTab;
 				bool _showCoords;
 				bool _ignoreReservationRules;
+				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
 				const CoordinatesSystem* _coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
@@ -362,6 +377,7 @@ namespace synthese
 				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
 				std::string									_outputFormat;
 				const pt_website::PTServiceConfig*				_config;
+				const messages::CustomBroadcastPoint* _broadcastPoint;
 			//@}
 
 			//! @name Pages
@@ -419,13 +435,16 @@ namespace synthese
 			//@{
 				void setMaxSolutions(boost::optional<std::size_t> value){ _maxSolutionsNumber = value; }
 				void setOutputFormat(const std::string& value){ _outputFormat = value; }
+				void setStartDepartureDate(const boost::posix_time::ptime& value){ _startDate = value; }
 				void setStartArrivalDate(const boost::posix_time::ptime& value){ _startArrivalDate = value; }
 				void setEndDepartureDate(const boost::posix_time::ptime& value){ _endDate = value; }
+				void setEndArrivalDate(const boost::posix_time::ptime& value){ _endArrivalDate = value; }
 				void setOriginCityText(const std::string& value){ _originCityText = value; }
 				void setOriginPlaceText(const std::string& value){ _originPlaceText = value; }
 				void setDestinationCityText(const std::string& value){ _destinationCityText = value; }
 				void setDestinationPlaceText(const std::string& value){ _destinationPlaceText = value; }
 				void setCoordinatesSystem(const CoordinatesSystem* coordinatesSystem ){ _coordinatesSystem = coordinatesSystem; }
+				void setReservationRulesDelayType(const graph::UseRule::ReservationDelayType reservationRulesDelayType ){ _reservationRulesDelayType = reservationRulesDelayType; }
 			//@}
 
 			/// @name Modifiers
@@ -492,7 +511,8 @@ namespace synthese
 				const geography::Place* originPlace,
 				const geography::Place* destinationPlace,
 				const pt_website::HourPeriod* period,
-				const graph::AccessParameters& accessParameters
+				const graph::AccessParameters& accessParameters,
+				util::ParametersMap& messagesOnBroadCastPoint
 			) const;
 
 
@@ -701,7 +721,8 @@ namespace synthese
 				const geography::Place& arrivalPlace,
 				boost::logic::tribool handicappedFilter,
 				boost::logic::tribool bikeFilter,
-				bool isTheLast
+				bool isTheLast,
+				util::ParametersMap messagesOnBroadCastPoint
 			) const;
 
 
@@ -815,7 +836,8 @@ namespace synthese
 				boost::logic::tribool bikeFilterStatus,
 				bool color,
 				bool isLastLeg,
-				bool isFirstLeg
+				bool isFirstLeg,
+				util::ParametersMap& messagesOnBroadCastPoint
 			) const;
 		};
 }	}

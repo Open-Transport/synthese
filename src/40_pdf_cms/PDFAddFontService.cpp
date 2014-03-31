@@ -102,7 +102,10 @@ namespace synthese
 			string fontContent(_font->get<WebpageContent>().getCMSScript().eval());
 			
 			// Add the font to the pdf
-			pdf.embedTTFFont(fontContent);
+			pdf.embedTTFFont(
+				fontContent,
+				lexical_cast<string>(_font->getKey())
+			);
 
 			// Return nothing
 			ParametersMap map;

@@ -204,6 +204,7 @@ namespace synthese
 			{
 			private:
 				boost::shared_ptr<const pt::TransportNetwork> _network;
+				mutable util::Env _env;
 
 				util::RegistryKeyType _key(util::RegistryKeyType key,
 					util::RegistryKeyType suffix = 0
@@ -268,7 +269,7 @@ namespace synthese
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
 
-				Exporter_(){}
+				Exporter_(const impex::Export& export_);
 
 				virtual util::ParametersMap getParametersMap() const;
 
@@ -281,7 +282,6 @@ namespace synthese
 
 			};
 		};
-	}
-}
+}	}
 
 #endif

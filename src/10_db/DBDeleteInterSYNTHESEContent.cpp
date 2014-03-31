@@ -28,6 +28,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -36,8 +37,8 @@ namespace synthese
 	namespace db
 	{
 		DBDeleteInterSYNTHESEContent::DBDeleteInterSYNTHESEContent( util::RegistryKeyType id ):
-			_id(id),
-			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY)
+			InterSYNTHESEContent(DBInterSYNTHESE::FACTORY_KEY),
+			_id(id)
 		{
 		}
 	
@@ -56,5 +57,12 @@ namespace synthese
 			DBInterSYNTHESE::RequestEnqueue visitor(content);
 			visitor(_id);
 			return content.str();
+		}
+
+
+
+		boost::posix_time::ptime DBDeleteInterSYNTHESEContent::getExpirationTime() const
+		{
+			return ptime(not_a_date_time);
 		}
 }	}

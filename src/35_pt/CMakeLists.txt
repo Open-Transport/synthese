@@ -5,8 +5,6 @@ AdvancedSelectTableSync.cpp
 AdvancedSelectTableSync.h
 AreaGeneratedLineStop.cpp
 AreaGeneratedLineStop.hpp
-CheckLineCalendarFunction.cpp
-CheckLineCalendarFunction.hpp
 CleanAllStopPointProjectionsAction.cpp
 CleanAllStopPointProjectionsAction.hpp
 CommercialLine.cpp
@@ -49,6 +47,8 @@ DRTAreaAdmin.cpp
 DRTAreaAdmin.hpp
 DRTAreasAdmin.cpp
 DRTAreasAdmin.hpp
+DRTAreasListService.cpp
+DRTAreasListService.hpp
 DRTAreaTableSync.cpp
 DRTAreaTableSync.hpp
 EnvironmentSyncException.cpp
@@ -75,8 +75,6 @@ JourneyPatternAddAction.cpp
 JourneyPatternAddAction.hpp
 JourneyPatternAdmin.cpp
 JourneyPatternAdmin.hpp
-JourneyPatternCopy.cpp
-JourneyPatternCopy.hpp
 JourneyPatternRankContinuityRestoreAction.cpp
 JourneyPatternRankContinuityRestoreAction.hpp
 JourneyPatternTableSync.cpp
@@ -93,8 +91,6 @@ JunctionUpdateAction.cpp
 JunctionUpdateAction.hpp
 LineAlarmRecipient.cpp
 LineAlarmRecipient.hpp
-LineArea.cpp
-LineArea.hpp
 LineMarkerInterfacePage.cpp
 LineMarkerInterfacePage.h
 LinePhysicalStop.cpp
@@ -119,8 +115,6 @@ NonConcurrencyRuleTableSync.cpp
 NonConcurrencyRuleTableSync.h
 NonPermanentService.cpp
 NonPermanentService.h
-PhysicalStopsCSVExportFunction.cpp
-PhysicalStopsCSVExportFunction.h
 PlaceAliasUpdateAction.cpp
 PlaceAliasUpdateAction.hpp
 ProjectAllStopPointsAction.cpp
@@ -143,8 +137,6 @@ PTPlaceAdmin.cpp
 PTPlaceAdmin.h
 PTPlacesAdmin.cpp
 PTPlacesAdmin.h
-PTQualityControlAdmin.cpp
-PTQualityControlAdmin.hpp
 PTRoadAdmin.cpp
 PTRoadAdmin.h
 PTRoadsAdmin.cpp
@@ -205,8 +197,6 @@ ServiceVertexUpdateAction.cpp
 ServiceVertexUpdateAction.hpp
 ServiceVertexRealTimeUpdateAction.cpp
 ServiceVertexRealTimeUpdateAction.h
-ServicesListService.cpp
-ServicesListService.hpp
 StopArea.cpp
 StopArea.hpp
 StopAreaAddAction.cpp
@@ -223,6 +213,8 @@ StopAreaTransferRemoveAction.cpp
 StopAreaTransferRemoveAction.hpp
 StopAreaUpdateAction.cpp
 StopAreaUpdateAction.h
+StopAreaMergeAction.cpp
+StopAreaMergeAction.hpp
 StopPoint.cpp
 StopPoint.hpp
 StopPointAddAction.cpp
@@ -231,10 +223,6 @@ StopPointAdmin.cpp
 StopPointAdmin.hpp
 StopPointsListFunction.cpp
 StopPointsListFunction.hpp
-StopsInterSYNTHESEIdFilter.cpp
-StopsInterSYNTHESEIdFilter.hpp
-ServiceDensityService.cpp
-ServiceDensityService.hpp
 StopPointTableSync.cpp
 StopPointTableSync.hpp
 StopPointUpdateAction.cpp
@@ -251,8 +239,6 @@ TransportNetworkTableSync.cpp
 TransportNetworkTableSync.h
 TransportNetworkUpdateAction.cpp
 TransportNetworkUpdateAction.hpp
-XmlBuilder.cpp
-XmlBuilder.h
 )
 
 

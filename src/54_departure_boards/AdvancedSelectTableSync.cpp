@@ -79,8 +79,8 @@ namespace synthese
 					<< StopAreaTableSync::TABLE.NAME << " AS p"
 					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << StopAreaTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << StopPointTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID
-					<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
+					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineNode::FIELD.name
+					<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << Line::FIELD.name;
 			// Where
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
@@ -91,16 +91,29 @@ namespace synthese
 				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(cityName, false) << "%'";
 			if (!placeName.empty())
 				query << " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(placeName, false) << "%'";
-			if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
+
+			if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT && DBModule::GetDB()->isBackend(DB::MYSQL_BACKEND))
 			{
-				query << " AND bc+cc ";
+				// In mysql, HAVING clause should be after GROUP clause
+				// Grouping
+				query << " GROUP BY p." << TABLE_COL_ID;
+				query << " HAVING bc+cc ";
 				if (bpPresence == AT_LEAST_ONE_BROADCASTPOINT)
 					query << ">0";
 				if (bpPresence == NO_BROADCASTPOINT)
 					query << "=0";
 			}
-			// Grouping
-			query << " GROUP BY p." << TABLE_COL_ID;
+			else if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
+			{
+				// In sqlite, WHERE clause works on result of SELECT COUNT AS
+				query << " AND bc+cc ";
+				if (bpPresence == AT_LEAST_ONE_BROADCASTPOINT)
+					query << ">0";
+				if (bpPresence == NO_BROADCASTPOINT)
+					query << "=0";
+				// Grouping
+				query << " GROUP BY p." << TABLE_COL_ID;
+			}
 			// Order
 			if (orderByCity)
 			{
@@ -166,8 +179,8 @@ namespace synthese
 				<< "c." << TABLE_COL_ID << " AS " << TABLE_COL_ID
 				<< " FROM " << CommercialLineTableSync::TABLE.NAME << " AS c "
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
-				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << LineStopTableSync::COL_LINEID << "=l." << TABLE_COL_ID
-				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineStopTableSync::COL_PHYSICALSTOPID
+				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << Line::FIELD.name << "=l." << TABLE_COL_ID
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineNode::FIELD.name
 				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << StopPointTableSync::COL_PLACEID
 				<< " GROUP BY c." << TABLE_COL_ID
 				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;

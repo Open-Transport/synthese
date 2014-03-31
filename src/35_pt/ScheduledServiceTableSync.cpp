@@ -134,11 +134,7 @@ namespace synthese
 		template<> void OldLoadSavePolicy<ScheduledServiceTableSync,ScheduledService>::Unlink(
 			ScheduledService* ss
 		){
-			ss->getPath()->removeService(*ss);
-			ss->cleanDataSourceLinks(true);
-
-			// Unregister from the line
-			ss->getRoute()->getCommercialLine()->unregisterService(*ss);
+			ss->unlink();
 		}
 
 

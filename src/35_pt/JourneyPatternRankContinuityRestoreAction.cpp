@@ -106,10 +106,10 @@ namespace synthese
 			DBTransaction transaction;
 			BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStops)
 			{
-				if(lineStop->getRankInPath() != rank)
+				if(lineStop->get<RankInPath>() != rank)
 				{
 					UpdateQuery<LineStopTableSync> query;
-					query.addUpdateField(LineStopTableSync::COL_RANKINPATH, rank);
+					query.addUpdateField(RankInPath::FIELD.name, rank);
 					query.addWhereField(TABLE_COL_ID, lineStop->getKey());
 					query.execute(transaction);
 				}

@@ -25,6 +25,8 @@
 
 #include "PathGroup.h"
 
+#include "Path.h"
+
 namespace synthese
 {
 	using namespace util;
@@ -62,5 +64,14 @@ namespace synthese
 
 			_paths.erase(it);
 		}
-	}
-}
+
+
+
+		PathGroup::~PathGroup()
+		{
+			BOOST_FOREACH(Path* path, _paths)
+			{
+				path->setPathGroup(NULL);
+			}
+		}
+}	}

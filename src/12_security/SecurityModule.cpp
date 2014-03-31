@@ -53,6 +53,8 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<SecurityModule>::PreInit()
 		{
+			RegisterParameter(SecurityModule::MODULE_PARAMETER_SENDER_EMAIL, "", &SecurityModule::ParameterCallback);
+			RegisterParameter(SecurityModule::MODULE_PARAMETER_SENDER_NAME, "", &SecurityModule::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<SecurityModule>::Init()
@@ -128,8 +130,13 @@ namespace synthese
 		const std::string SecurityModule::ROOT_RIGHTS = "*,*,100,100";
 		const std::string SecurityModule::ROOT_USER = "root";
 
+		const std::string SecurityModule::MODULE_PARAMETER_SENDER_EMAIL("sender_email");
+		const std::string SecurityModule::MODULE_PARAMETER_SENDER_NAME("sender_name");
+
 		boost::shared_ptr<User> SecurityModule::_rootUser;
 		boost::shared_ptr<Profile> SecurityModule::_rootProfile;
+		std::string SecurityModule::_senderEMail;
+		std::string SecurityModule::_senderName;
 
 		boost::shared_ptr<Profile>	_rootProfile;
 
@@ -227,6 +234,55 @@ namespace synthese
 				 v.push_back(cprofile);
 			}
 			return v;
+		}
+
+
+
+		std::string SecurityModule::getSenderEMail()
+		{
+			return _senderEMail;
+		}
+
+
+
+		std::string SecurityModule::getSenderName()
+		{
+			return _senderName;
+		}
+
+		
+		void SecurityModule::ParameterCallback( const std::string& name, const std::string& value )
+		{
+			if (name == MODULE_PARAMETER_SENDER_EMAIL)
+			{
+				try
+				{
+					std::string mail(lexical_cast<std::string>(value));
+
+					if(!mail.empty())
+					{
+						_senderEMail = mail;
+					}
+				}
+				catch(bad_lexical_cast)
+				{
+				}
+			}
+			if (name == MODULE_PARAMETER_SENDER_NAME)
+			{
+				try
+				{
+					std::string senderName(lexical_cast<std::string>(value));
+
+					if (!senderName.empty())
+					{
+						_senderName = senderName;
+					}
+				}
+				catch(bad_lexical_cast)
+				{
+				}
+			}
 		}
 	}
 }

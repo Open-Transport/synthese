@@ -24,9 +24,8 @@
 
 #include "BasicClient.h"
 #include "Import.hpp"
-#include "InterSYNTHESEIdFilter.hpp"
+#include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
-#include "InterSYNTHESESyncTypeFactory.hpp"
 #include "InterSYNTHESEUpdateAckService.hpp"
 #include "StaticFunctionRequest.h"
 
@@ -47,7 +46,6 @@ namespace synthese
 	namespace inter_synthese
 	{
 		const string InterSYNTHESEFileFormat::Importer_::PARAMETER_SLAVE_ID = "slave_id";
-		const string InterSYNTHESEFileFormat::Importer_::PARAMETER_ID_FILTER = "id_filter";
 
 
 
@@ -70,6 +68,7 @@ namespace synthese
 					c.get(r.getURL())
 				);
 
+				// Case no content to sync
 				if(contentStr == InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC)
 				{
 					_logDebug(
@@ -78,157 +77,35 @@ namespace synthese
 					return true;
 				}
 
-				bool ok(true);
-				typedef std::map<
-					util::RegistryKeyType,	// id of the update
-					std::pair<
-						std::string,		// synchronizer
-						std::string			// message
-				>	> ContentMap;
-				ContentMap content;
-	
-				size_t i(0);
-				bool readingIdRange(true);
-				RegistryKeyType beginId;
-				RegistryKeyType endId;
-				while(i < contentStr.size())
+				// Case content to sync
+				InterSYNTHESEPacket packet(contentStr, true);
+
+				// Verify that the package is consistent
+				if (!packet.checkConsistence())
 				{
-					ContentMap::mapped_type item;
-
-					// ID + Search for next :
-					size_t l=i;
-					for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-					if(i == contentStr.size())
-					{
-						ok = false;
-						break;
-					}
-					RegistryKeyType id(lexical_cast<RegistryKeyType>(contentStr.substr(l, i-l)));
-					++i;
-					
-					if (readingIdRange)
-					{
-						// Search for end id
-						l=i;
-						for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-						if(i == contentStr.size())
-						{
-							ok = false;
-							break;
-						}
-						RegistryKeyType idEnd(lexical_cast<RegistryKeyType>(contentStr.substr(l, i-l)));
-						++i;
-						i += InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
-						readingIdRange = false;
-						beginId = id;
-						endId = idEnd;
-					}
-					else
-					{
-						// Synchronizer + Search for next :
-						l=i;
-						for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-						if(i == contentStr.size())
-						{
-							ok = false;
-							break;
-						}
-						item.first = contentStr.substr(l, i-l);
-						++i;
-
-						// Size + Search for next :
-						l=i;
-						for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
-						if(i == contentStr.size())
-						{
-							ok = false;
-							break;
-						}
-						size_t contentSize = lexical_cast<size_t>(contentStr.substr(l, i-l));
-						++i;
-
-						// Content
-						if(i+contentSize > contentStr.size())
-						{
-							ok = false;
-							break;
-						}
-						item.second = contentStr.substr(i, contentSize);
-						i += contentSize + InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
-
-						content.insert(
-							make_pair(
-								id,
-								item
-						)	);
-					}
-				}
-
-				if(!ok)
-				{
+					_logError(
+						"Inter-SYNTHESE : Synchronization with "+ _address +":"+ _port + " as slave id #"+ lexical_cast<string>(_slaveId) +" has failed : malformed packet"
+					);
 					return false;
 				}
-				
-				ok = (beginId == content.begin()->first &&
-					endId == content.rbegin()->first);
-				
-				if(!ok)
-				{
-					return false;
-				}
+
 				_logDebug(
-					"Inter-SYNTHESE : "+ _address +":"+ _port + " has sent "+ lexical_cast<string>(content.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
+					"Inter-SYNTHESE : "+ _address +":"+ _port + " has sent "+ lexical_cast<string>(packet.size()) +" elements to sync in "+ lexical_cast<string>(contentStr.size()) +" bytes for slave id #"+ lexical_cast<string>(_slaveId)
 				);
 
 				// Load the data
-				// Local variables
-				auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;
-				string lastFactoryKey;
-
-				// Reading the content
-				BOOST_FOREACH(const ContentMap::value_type& item, content)
-				{
-					try
-					{
-						const string& factoryKey(item.second.first);
-						if(factoryKey != lastFactoryKey)
-						{
-							if(interSYNTHESE.get())
-							{
-								interSYNTHESE->closeSync();
-							}
-							interSYNTHESE.reset(
-								Factory<InterSYNTHESESyncTypeFactory>::create(factoryKey)
-							);
-							lastFactoryKey = factoryKey;
-							interSYNTHESE->initSync();
-						}
-
-						interSYNTHESE->sync(
-							item.second.second,
-							_idFilter.get()
-						);
-					}
-					catch(...)
-					{
-						// Log
-					}
-				}
-				if(interSYNTHESE.get())
-				{
-					interSYNTHESE->closeSync();
-				}
+				packet.load();
 
 				// Send ACK if load did not throw exception
 				StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
 				ackRequest.getFunction()->setSlaveId(_slaveId);
-				if(!content.empty())
+				if(!packet.empty())
 				{
 					ackRequest.getFunction()->setRangeBegin(
-						content.begin()->first
+						packet.getIdRange().first
 					);
 					ackRequest.getFunction()->setRangeEnd(
-						content.rbegin()->first
+						packet.getIdRange().second
 					);
 				}
 				BasicClient c2(
@@ -244,6 +121,13 @@ namespace synthese
 						"Inter-SYNTHESE : "+ _address +":"+ _port + " has been synchronized with current instance as slave id #"+ lexical_cast<string>(_slaveId)
 					);
 				}
+			}
+			catch(InterSYNTHESEPacket::BadPacketException&)
+			{
+				_logError(
+					"Inter-SYNTHESE : Synchronization with "+ _address +":"+ _port + " as slave id #"+ lexical_cast<string>(_slaveId) +" has failed : malformed packet"
+				);
+				return false;
 			}
 			catch(std::exception& e)
 			{
@@ -261,18 +145,6 @@ namespace synthese
 		{
 			// Slave ID
 			_slaveId = map.get<RegistryKeyType>(PARAMETER_SLAVE_ID);
-
-			// ID Filter
-			string idFilter(map.getDefault<string>(PARAMETER_ID_FILTER));
-			trim(idFilter);
-			if(!idFilter.empty())
-			{
-				_idFilter.reset(Factory<InterSYNTHESEIdFilter>::create(idFilter));
-				if(_import.get<DataSource>())
-				{
-					_idFilter->setDataSource(&*_import.get<DataSource>());
-				}
-			}
 		}
 
 
@@ -281,10 +153,6 @@ namespace synthese
 		{
 			ParametersMap pm;
 			pm.insert(PARAMETER_SLAVE_ID, _slaveId);
-			if(_idFilter.get())
-			{
-				pm.insert(PARAMETER_ID_FILTER, _idFilter->getFactoryKey());
-			}
 			return pm;
 		}
 

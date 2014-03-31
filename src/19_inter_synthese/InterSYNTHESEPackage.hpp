@@ -34,6 +34,7 @@
 #include "TablesOrObjectsVectorField.hpp"
 #include "User.h"
 
+#include <boost/optional.hpp>
 #include <boost/thread/mutex.hpp>
 
 namespace synthese
@@ -112,12 +113,11 @@ namespace synthese
 			{
 			private:
 				util::ParametersMap& _pm;
-				std::stringstream& _binaryStream;
+				boost::optional<std::stringstream &> _binaryStream;
 
 			public:
-				ItemDumper(
-					util::ParametersMap& pm,
-					std::stringstream& binaryStream
+				ItemDumper(util::ParametersMap& pm,
+					boost::optional<std::stringstream &> binaryStream = boost::optional<std::stringstream &>()
 				);
 
 				void operator()(boost::shared_ptr<db::DBTableSync> value) const;
@@ -128,9 +128,9 @@ namespace synthese
 			static void _dumpItem(
 				const db::TableOrObject& item,
 				util::ParametersMap& pm,
-				std::stringstream& binaryStream
+				boost::optional<std::stringstream &> binaryStream = boost::optional<std::stringstream &>()
 			);
-		
+
 			boost::mutex _lockMutex;
 
 			std::string _buildDump(
@@ -157,6 +157,9 @@ namespace synthese
 				bool isWritable() const;
 
 				std::string buildDump(
+				) const;
+
+				std::string getNonBinaryDump(
 				) const;
 
 				std::string lockAndBuildDump(

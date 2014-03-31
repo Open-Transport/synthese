@@ -57,7 +57,8 @@ namespace synthese
 			const ptime& startDateTime,
 			const ptime& endDateTime,
 			bool allowCanceled,
-			optional<size_t> maxSize
+			optional<size_t> maxSize,
+			bool endDateTimeConcernsTheorical
 		) : _displayedPlaces(displayedPlacesList),
 			_physicalStops(physicalStops),
 			_direction(direction),
@@ -67,7 +68,8 @@ namespace synthese
 			_startDateTime(startDateTime),
 			_endDateTime(endDateTime),
 			_allowCanceled(allowCanceled),
-			_maxSize(maxSize)
+			_maxSize(maxSize),
+			_endDateTimeConcernsTheorical(endDateTimeConcernsTheorical)
 		{}
 
 
@@ -93,7 +95,7 @@ namespace synthese
 				}
 
 			// Tests if the line is forbidden in departure boards according to tue uUse rule
-			const UseRule& useRule(linestop.getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+			const UseRule& useRule(linestop.getJourneyPattern()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
 			if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
 			{
 				return false;
@@ -102,7 +104,7 @@ namespace synthese
 			// Line filter : if non empty, select only lines present in the filter
 			if(!_lineFilter.empty())
 			{
-				LineFilter::const_iterator it(_lineFilter.find(linestop.getLine()->getCommercialLine()));
+				LineFilter::const_iterator it(_lineFilter.find(linestop.getJourneyPattern()->getCommercialLine()));
 
 				// Line was not found
 				if(it == _lineFilter.end())
@@ -111,7 +113,7 @@ namespace synthese
 				}
 
 				// Way back filter
-				if(it->second && *it->second != linestop.getLine()->getWayBack())
+				if(it->second && *it->second != linestop.getJourneyPattern()->getWayBack())
 				{
 					return false;
 				}

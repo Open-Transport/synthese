@@ -21,6 +21,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+import getpass
 import logging
 import multiprocessing
 import os
@@ -138,8 +139,8 @@ DEFAULTS = {
     'test_daemon_only': False,
 
     # package
-    'packages_save_path': None,
-    'packages_access_url': None,
+    'packages_save_path': os.path.expanduser('~/public_html/synthese/'),
+    'packages_access_url': 'http://ci.rcsmobility.com/~%s/synthese/' % getpass.getuser(),
     'no_package_overwrite': False,
 
     # continuous_integration
@@ -147,6 +148,7 @@ DEFAULTS = {
     'suites': None,
     'should_build_package': lambda env: False,
     'force_create_package': False,
+    'prefix_with_svnrelease': False,
     'no_tests': False,
     'do_not_build_python': False,
 

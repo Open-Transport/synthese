@@ -42,6 +42,8 @@ GeographyModule::PreInit();
 #define SAVE(_class, object) do {} while(0)
 #endif
 
+Env env;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Cities
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,17 +130,18 @@ rp40.setName("40");
 rp40.setCity(&city54);
 SAVE(RoadPlace, rp40);
 
-MainRoadPart ro40(4222124650659840ULL);
-ro40.setRoadPlace(rp40);
-
-MainRoadChunk rc86_40(3940649673949187ULL, &c86, 0, &ro40, 0);
-SAVE(RoadChunk, rc86_40);
-ro40.addRoadChunk(rc86_40);
-
-MainRoadChunk rc89(3940649673949188ULL, &c89, 1, &ro40, 200);
-SAVE(RoadChunk, rc89);
-ro40.addRoadChunk(rc89);
+Road ro40(4222124650659840ULL);
+ro40.set<RoadPlace>(rp40);
 SAVE(Road, ro40);
+ro40.link(env);
+
+RoadChunk rc86_40(3940649673949187ULL, &c86, 0, &ro40, 0);
+SAVE(RoadChunk, rc86_40);
+rc86_40.link(env);
+
+RoadChunk rc89(3940649673949188ULL, &c89, 1, &ro40, 200);
+SAVE(RoadChunk, rc89);
+rc89.link(env);
 
 // Road 41
 
@@ -147,25 +150,26 @@ rp41.setName("41");
 rp41.setCity(&city54);
 SAVE(RoadPlace, rp41);
 
-MainRoadPart ro41(4222124650659841ULL);
-ro41.setRoadPlace(rp41);
-
-MainRoadChunk rc88_41(3940649673949288ULL, &c88, 0, &ro41, 0);
-SAVE(RoadChunk, rc88_41);
-ro41.addRoadChunk(rc88_41);
-
-MainRoadChunk rc86_41(3940649673949186ULL, &c86, 1, &ro41, 300);
-SAVE(RoadChunk, rc86_41);
-ro41.addRoadChunk(rc86_41);
-
-MainRoadChunk rc74(3940649673949174ULL, &c74, 2, &ro41, 750);
-SAVE(RoadChunk, rc74);
-ro41.addRoadChunk(rc74);
-
-MainRoadChunk rc93_41(3940649673949293ULL, &c93, 3, &ro41, 1700);
-SAVE(RoadChunk, rc93_41);
-ro41.addRoadChunk(rc93_41);
+Road ro41(4222124650659841ULL);
+ro41.set<RoadPlace>(rp41);
 SAVE(Road, ro41);
+ro41.link(env);
+
+RoadChunk rc88_41(3940649673949288ULL, &c88, 0, &ro41, 0);
+SAVE(RoadChunk, rc88_41);
+rc88_41.link(env);
+
+RoadChunk rc86_41(3940649673949186ULL, &c86, 1, &ro41, 300);
+SAVE(RoadChunk, rc86_41);
+rc86_41.link(env);
+
+RoadChunk rc74(3940649673949174ULL, &c74, 2, &ro41, 750);
+SAVE(RoadChunk, rc74);
+rc74.link(env);
+
+RoadChunk rc93_41(3940649673949293ULL, &c93, 3, &ro41, 1700);
+SAVE(RoadChunk, rc93_41);
+rc93_41.link(env);
 
 // Road 42
 
@@ -174,33 +178,35 @@ rp42.setName("42");
 rp42.setCity(&city38);
 SAVE(RoadPlace, rp42);
 
-MainRoadPart ro42(4222124650659842ULL);
-ro42.setRoadPlace(rp42);
-
-MainRoadChunk rc98_42(3940649673949298ULL, &c98, 0, &ro42, 0);
-SAVE(RoadChunk, rc98_42);
-ro42.addRoadChunk(rc98_42);
-
-MainRoadChunk rc97(3940649673949197ULL, &c97, 1, &ro42, 200);
-SAVE(RoadChunk, rc97);
-ro42.addRoadChunk(rc97);
+Road ro42(4222124650659842ULL);
+ro42.set<RoadPlace>(rp42);
 SAVE(Road, ro42);
+ro42.link(env);
 
-MainRoadPart ro44(4222124650659844ULL);
-ro44.setRoadPlace(rp42);
+RoadChunk rc98_42(3940649673949298ULL, &c98, 0, &ro42, 0);
+SAVE(RoadChunk, rc98_42);
+rc98_42.link(env);
 
-MainRoadChunk rc98_44(3940649673949498ULL, &c98, 0, &ro44, 0);
-SAVE(RoadChunk, rc98_44);
-ro44.addRoadChunk(rc98_44);
+RoadChunk rc97(3940649673949197ULL, &c97, 1, &ro42, 200);
+SAVE(RoadChunk, rc97);
+rc97.link(env);
 
-MainRoadChunk rc93(3940649673949193ULL, &c93, 1, &ro44, 800);
-SAVE(RoadChunk, rc93);
-ro44.addRoadChunk(rc93);
-
-MainRoadChunk rc94(3940649673949194ULL, &c94, 2, &ro44, 1600);
-SAVE(RoadChunk, rc94);
-ro44.addRoadChunk(rc94);
+Road ro44(4222124650659844ULL);
 SAVE(Road, ro44);
+ro44.set<RoadPlace>(rp42);
+ro44.link(env);
+
+RoadChunk rc98_44(3940649673949498ULL, &c98, 0, &ro44, 0);
+SAVE(RoadChunk, rc98_44);
+rc98_44.link(env);
+
+RoadChunk rc93(3940649673949193ULL, &c93, 1, &ro44, 800);
+SAVE(RoadChunk, rc93);
+rc93.link(env);
+
+RoadChunk rc94(3940649673949194ULL, &c94, 2, &ro44, 1600);
+SAVE(RoadChunk, rc94);
+rc94.link(env);
 
 
 // Road 43
@@ -210,21 +216,22 @@ rp43.setName("43");
 rp43.setCity(&city38);
 SAVE(RoadPlace, rp43);
 
-MainRoadPart ro43(4222124650659843ULL);
-ro43.setRoadPlace(rp43);
-
-MainRoadChunk rc93_43(3940649673949393ULL, &c93, 0, &ro43, 0);
-SAVE(RoadChunk, rc93_43);
-ro43.addRoadChunk(rc93_43);
-
-MainRoadChunk rc96(3940649673949396ULL, &c96, 1, &ro43, 100);
-SAVE(RoadChunk, rc96);
-ro43.addRoadChunk(rc96);
-
-MainRoadChunk rc99(3940649673949199ULL, &c99, 2, &ro43, 150);
-SAVE(RoadChunk, rc99);
-ro43.addRoadChunk(rc99);
+Road ro43(4222124650659843ULL);
+ro43.set<RoadPlace>(rp43);
 SAVE(Road, ro43);
+ro43.link(env);
+
+RoadChunk rc93_43(3940649673949393ULL, &c93, 0, &ro43, 0);
+SAVE(RoadChunk, rc93_43);
+rc93_43.link(env);
+
+RoadChunk rc96(3940649673949396ULL, &c96, 1, &ro43, 100);
+SAVE(RoadChunk, rc96);
+rc96.link(env);
+
+RoadChunk rc99(3940649673949199ULL, &c99, 2, &ro43, 150);
+SAVE(RoadChunk, rc99);
+rc99.link(env);
 
 // Road 45
 
@@ -233,17 +240,18 @@ rp45.setName("45");
 rp45.setCity(&city54);
 SAVE(RoadPlace, rp45);
 
-MainRoadPart ro45(4222124650659845ULL);
-ro45.setRoadPlace(rp45);
-
-MainRoadChunk rc86_45(3940649673949546ULL, &c86, 0, &ro45, 0);
-SAVE(RoadChunk, rc86_45);
-ro45.addRoadChunk(rc86_45);
-
-MainRoadChunk rc10(3940649673949410ULL, &c10, 1, &ro45, 400);
-SAVE(RoadChunk, rc10);
-ro45.addRoadChunk(rc10);
+Road ro45(4222124650659845ULL);
+ro45.set<RoadPlace>(rp45);
 SAVE(Road, ro45);
+ro45.link(env);
+
+RoadChunk rc86_45(3940649673949546ULL, &c86, 0, &ro45, 0);
+SAVE(RoadChunk, rc86_45);
+rc86_45.link(env);
+
+RoadChunk rc10(3940649673949410ULL, &c10, 1, &ro45, 400);
+SAVE(RoadChunk, rc10);
+rc10.link(env);
 
 // Road 46
 
@@ -252,21 +260,22 @@ rp46.setName("46");
 rp46.setCity(&city38);
 SAVE(RoadPlace, rp46);
 
-MainRoadPart ro46(4222124650659846ULL);
-ro46.setRoadPlace(rp46);
-
-MainRoadChunk rc93_46(3940649673949693ULL, &c93, 0, &ro46, 0);
-SAVE(RoadChunk, rc93_46);
-ro46.addRoadChunk(rc93_46);
-
-MainRoadChunk rc91(3940649673949189ULL, &c91, 1, &ro46, 400);
-SAVE(RoadChunk, rc91);
-ro46.addRoadChunk(rc91);
-
-MainRoadChunk rc90(3940649673949190ULL, &c90, 2, &ro46, 2000);
-SAVE(RoadChunk, rc90);
-ro46.addRoadChunk(rc90);
+Road ro46(4222124650659846ULL);
+ro46.set<RoadPlace>(rp46);
 SAVE(Road, ro46);
+ro46.link(env);
+
+RoadChunk rc93_46(3940649673949693ULL, &c93, 0, &ro46, 0);
+SAVE(RoadChunk, rc93_46);
+rc93_46.link(env);
+
+RoadChunk rc91(3940649673949189ULL, &c91, 1, &ro46, 400);
+SAVE(RoadChunk, rc91);
+rc91.link(env);
+
+RoadChunk rc90(3940649673949190ULL, &c90, 2, &ro46, 2000);
+SAVE(RoadChunk, rc90);
+rc90.link(env);
 
 // Road 47
 
@@ -275,17 +284,18 @@ rp47.setName("47");
 rp47.setCity(&city54);
 SAVE(RoadPlace, rp47);
 
-MainRoadPart ro47(4222124650659847ULL);
-ro47.setRoadPlace(rp47);
-
-MainRoadChunk rc88_47(3940649673949788ULL, &c88, 0, &ro47, 0);
-SAVE(RoadChunk, rc88_47);
-ro47.addRoadChunk(rc88_47);
-
-MainRoadChunk rc92(3940649673949292ULL, &c92, 1, &ro47, 200);
-SAVE(RoadChunk, rc92);
-ro47.addRoadChunk(rc92);
+Road ro47(4222124650659847ULL);
+ro47.set<RoadPlace>(rp47);
 SAVE(Road, ro47);
+ro47.link(env);
+
+RoadChunk rc88_47(3940649673949788ULL, &c88, 0, &ro47, 0);
+SAVE(RoadChunk, rc88_47);
+rc88_47.link(env);
+
+RoadChunk rc92(3940649673949292ULL, &c92, 1, &ro47, 200);
+SAVE(RoadChunk, rc92);
+rc92.link(env);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -589,25 +599,25 @@ li92.setTimetableName("92.1");
 li92.setRollingStock(&rs57);
 li92.setCommercialLine(&cl92);
 
-DesignatedLinePhysicalStop ls86(2814749767106586ULL, &li92, 0, true, false, 0, &ps86);
+LineStop ls86(2814749767106586ULL, &li92, 0, true, false, 0, ps86);
 SAVE(LineStop, ls86);
-li92.addEdge(ls86);
+ls86.link(env);
 
-DesignatedLinePhysicalStop ls63(2814749767106563ULL, &li92, 1, true, true, 100, &ps73);
+LineStop ls63(2814749767106563ULL, &li92, 1, true, true, 100, ps73);
 SAVE(LineStop, ls63);
-li92.addEdge(ls63);
+ls63.link(env);
 
-DesignatedLinePhysicalStop ls61(2814749767106561ULL, &li92, 2, true, true, 5500, &ps75);
+LineStop ls61(2814749767106561ULL, &li92, 2, true, true, 5500, ps75);
 SAVE(LineStop, ls61);
-li92.addEdge(ls61);
+ls61.link(env);
 
-DesignatedLinePhysicalStop ls62(2814749767106562ULL, &li92, 3, true, true, 6400, &ps79);
+LineStop ls62(2814749767106562ULL, &li92, 3, true, true, 6400, ps79);
 SAVE(LineStop, ls62);
-li92.addEdge(ls62);
+ls62.link(env);
 
-DesignatedLinePhysicalStop ls60(2814749767106560ULL, &li92, 4, false, true, 6500, &ps85);
+LineStop ls60(2814749767106560ULL, &li92, 4, false, true, 6500, ps85);
 SAVE(LineStop, ls60);
-li92.addEdge(ls60);
+ls60.link(env);
 
 ScheduledService ss01(4503599627370501ULL, "1", &li92);
 {
@@ -707,23 +717,23 @@ li93.setTimetableName("93.2");
 li93.setRollingStock(&rs57);
 li93.setCommercialLine(&cl93);
 
-DesignatedLinePhysicalStop ls64(2814749767106564ULL, &li93, 0, true, false, 6500, &ps73);
+LineStop ls64(2814749767106564ULL, &li93, 0, true, false, 6500, ps73);
 SAVE(LineStop, ls64);
-li93.addEdge(ls64);
+ls64.link(env);
 
-DesignatedLinePhysicalStop ls65(2814749767106565ULL, &li93, 1, true, true, 12141, &ps81);
+LineStop ls65(2814749767106565ULL, &li93, 1, true, true, 12141, ps81);
 SAVE(LineStop, ls65);
 {
-//	DesignatedLinePhysicalStop::ViaPoints v;
+//	LineStop::ViaPoints v;
 //	v.push_back(new Coordinate(523000,1843000));
 //	v.push_back(new Coordinate(525000,1843000));
 //	ls65.setViaPoints(v);
 }
-li93.addEdge(ls65);
+ls65.link(env);
 
-DesignatedLinePhysicalStop ls66(2814749767106566ULL, &li93, 2, false, true, 12141, &ps75);
+LineStop ls66(2814749767106566ULL, &li93, 2, false, true, 12141, ps75);
 SAVE(LineStop, ls66);
-li93.addEdge(ls66);
+ls66.link(env);
 
 ScheduledService ss18(4503599627370518ULL, "18", &li93);
 {
@@ -804,29 +814,29 @@ li94.setTimetableName("94.3");
 li94.setRollingStock(&rs57);
 li94.setCommercialLine(&cl94);
 
-DesignatedLinePhysicalStop ls67(2814749767106567ULL, &li94, 0, true, false, 14141, &ps83);
+LineStop ls67(2814749767106567ULL, &li94, 0, true, false, 14141, ps83);
 SAVE(LineStop, ls67);
-li94.addEdge(ls67);
+ls67.link(env);
 
-DesignatedLinePhysicalStop ls69(2814749767106569ULL, &li94, 1, true, true, 15141, &ps85);
+LineStop ls69(2814749767106569ULL, &li94, 1, true, true, 15141, ps85);
 SAVE(LineStop, ls69);
-li94.addEdge(ls69);
+ls69.link(env);
 
-DesignatedLinePhysicalStop ls71(2814749767106571ULL, &li94, 2, true, true, 16141, &ps80);
+LineStop ls71(2814749767106571ULL, &li94, 2, true, true, 16141, ps80);
 SAVE(LineStop, ls71);
-li94.addEdge(ls71);
+ls71.link(env);
 
-DesignatedLinePhysicalStop ls70(2814749767106570ULL, &li94, 3, true, true, 17141, &ps76);
+LineStop ls70(2814749767106570ULL, &li94, 3, true, true, 17141, ps76);
 SAVE(LineStop, ls70);
-li94.addEdge(ls70);
+ls70.link(env);
 
-DesignatedLinePhysicalStop ls68(2814749767106568ULL, &li94, 4, true, true, 17641, &ps73);
+LineStop ls68(2814749767106568ULL, &li94, 4, true, true, 17641, ps73);
 SAVE(LineStop, ls68);
-li94.addEdge(ls68);
+ls68.link(env);
 
-DesignatedLinePhysicalStop ls9407(2814749767109407ULL, &li94, 5, false, true, 18641, &ps07);
+LineStop ls9407(2814749767109407ULL, &li94, 5, false, true, 18641, ps07);
 SAVE(LineStop, ls9407);
-li94.addEdge(ls9407);
+ls9407.link(env);
 
 ScheduledService ss11(4503599627370511ULL, "11", &li94);
 {
@@ -905,13 +915,13 @@ li95.setTimetableName("95.1");
 li95.setRollingStock(&rs57);
 li95.setCommercialLine(&cl95);
 
-DesignatedLinePhysicalStop ls72(2814749767106572ULL, &li95, 0, true, false, 17641, &ps75);
+LineStop ls72(2814749767106572ULL, &li95, 0, true, false, 17641, ps75);
 SAVE(LineStop, ls72);
-li95.addEdge(ls72);
+ls72.link(env);
 
-DesignatedLinePhysicalStop ls73(2814749767106573ULL, &li95, 1, false, true, 17641, &ps84);
+LineStop ls73(2814749767106573ULL, &li95, 1, false, true, 17641, ps84);
 SAVE(LineStop, ls73);
-li95.addEdge(ls73);
+ls73.link(env);
 
 ScheduledService ss09(4503599627370509ULL, "09", &li95);
 {
@@ -966,13 +976,13 @@ li96.setTimetableName("96.1");
 li96.setRollingStock(&rs57);
 li96.setCommercialLine(&cl96);
 
-DesignatedLinePhysicalStop ls74(2814749767106574ULL, &li96, 0, true, false, 17641, &ps79);
+LineStop ls74(2814749767106574ULL, &li96, 0, true, false, 17641, ps79);
 SAVE(LineStop, ls74);
-li96.addEdge(ls74);
+ls74.link(env);
 
-DesignatedLinePhysicalStop ls75(2814749767106575ULL, &li96, 1, false, true, 17641, &ps85);
+LineStop ls75(2814749767106575ULL, &li96, 1, false, true, 17641, ps85);
 SAVE(LineStop, ls75);
-li96.addEdge(ls75);
+ls75.link(env);
 
 ScheduledService ss13(4503599627370513ULL, "13", &li96);
 {
@@ -1027,13 +1037,13 @@ li97.setTimetableName("97");
 li97.setRollingStock(&rs57);
 li97.setCommercialLine(&cl97);
 
-DesignatedLinePhysicalStop ls9773(2814749767109773ULL, &li97, 0, true, false, 0, &ps73);
+LineStop ls9773(2814749767109773ULL, &li97, 0, true, false, 0, ps73);
 SAVE(LineStop, ls9773);
-li97.addEdge(ls9773);
+ls9773.link(env);
 
-DesignatedLinePhysicalStop ls9706(2814749767109706ULL, &li97, 1, false, true, 2000, &ps06);
+LineStop ls9706(2814749767109706ULL, &li97, 1, false, true, 2000, ps06);
 SAVE(LineStop, ls9706);
-li97.addEdge(ls9706);
+ls9706.link(env);
 
 ContinuousService cs9701(4503599627379701ULL, "9701", &li97);
 {
@@ -1073,13 +1083,13 @@ li98.setTimetableName("98");
 li98.setRollingStock(&rs57);
 li98.setCommercialLine(&cl98);
 
-DesignatedLinePhysicalStop ls9806(2814749767109806ULL, &li98, 0, true, false, 0, &ps06);
+LineStop ls9806(2814749767109806ULL, &li98, 0, true, false, 0, ps06);
 SAVE(LineStop, ls9806);
-li98.addEdge(ls9806);
+ls9806.link(env);
 
-DesignatedLinePhysicalStop ls9807(2814749767109807ULL, &li98, 1, false, true, 2000, &ps07);
+LineStop ls9807(2814749767109807ULL, &li98, 1, false, true, 2000, ps07);
 SAVE(LineStop, ls9807);
-li98.addEdge(ls9807);
+ls9807.link(env);
 
 ContinuousService cs9801(4503599627379801ULL, "9801", &li98);
 {

@@ -42,6 +42,11 @@
 
 namespace synthese
 {
+	namespace tree
+	{
+		class TreeFolderUpNode;
+	}
+
 	namespace calendar
 	{
 		class CalendarTemplate;
@@ -75,6 +80,7 @@ namespace synthese
 	{
 		class Depot;
 		class DeadRun;
+		class OperationUnit;
 		class VehicleService;
 	}
 
@@ -114,6 +120,7 @@ namespace synthese
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_DAY7_CALENDAR_ID;
 				static const std::string PARAMETER_STOPS_DATASOURCE_ID;
+				static const std::string PARAMETER_OPERATION_UNIT_ID;
 
 			private:
 
@@ -121,6 +128,7 @@ namespace synthese
 				boost::shared_ptr<pt::TransportNetwork> _network;
 				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
 				boost::shared_ptr<const impex::DataSource> _stopsDataSource;
+				boost::optional<pt_operation::OperationUnit&> _operationUnit;
 
 				mutable ImportableStopPoints _linkedStopPoints;
 				mutable ImportableStopPoints _nonLinkedStopPoints;
@@ -158,6 +166,11 @@ namespace synthese
 					pt_operation::Depot* depot;
 					pt::StopPoint* stop;
 					graph::MetricOffset length;
+
+					DeadRunRoute() :
+						depot(NULL),
+						stop(NULL)
+					{}
 				};
 
 				typedef std::map<
@@ -223,14 +236,26 @@ namespace synthese
 			{
 			private:
 				boost::shared_ptr<const pt::TransportNetwork> _network;
-				boost::shared_ptr<tree::TreeFolder> _folder;
+				boost::shared_ptr<const tree::TreeFolder> _folder;
 				boost::shared_ptr<const impex::DataSource> _dataSource;
+				bool _generateRouteCode;
+				typedef std::map<const pt::JourneyPattern*, size_t> RouteCodes;
+				mutable RouteCodes _routeCodes;
+				size_t _serviceNumberPosition;
+				mutable util::Env _env;
+
+				static void _addLines(
+					std::vector<const pt::CommercialLine*>& lines,
+					const tree::TreeFolderUpNode& node
+				);
 
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_DATASOURCE_ID;
+				static const std::string PARAMETER_GENERATE_ROUTE_CODE;
+				static const std::string PARAMETER_SERVICE_NUMBER_POSITION;
 
-				Exporter_(){}
+				Exporter_(const impex::Export& export_);
 
 				virtual util::ParametersMap getParametersMap() const;
 

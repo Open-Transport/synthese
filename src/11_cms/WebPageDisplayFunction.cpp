@@ -182,6 +182,7 @@ namespace synthese
 					_templateParameters.insert(_page->get<SmartURLDefaultParameterName>(), paths[1]);
 				}
 				_templateParameters.insert(PARAMETER_PAGE_ID, _page->getKey());
+				_templateParameters.remove(Request::PARAMETER_ERROR_MESSAGE);
 			}
 
 			// Use template around the page

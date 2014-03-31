@@ -257,7 +257,17 @@ namespace synthese
 			{
 				if(*_parent)
 				{
-					(*_parent)->_children.erase(OrderingPolicy::getTreeOrderingKey());
+					std::pair<typename ChildrenType::iterator, typename ChildrenType::iterator> eqr(
+						(*_parent)->_children.equal_range(OrderingPolicy::getTreeOrderingKey())
+					);
+					for(typename ChildrenType::iterator it(eqr.first); it!=eqr.second; ++it)
+					{
+						if(it->second == this)
+						{
+							(*_parent)->_children.erase(it);
+							break;
+						}
+					}
 				}
 				else
 				{

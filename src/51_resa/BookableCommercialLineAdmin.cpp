@@ -27,6 +27,7 @@
 #include "FreeDRTAreaTableSync.hpp"
 #include "FreeDRTBookingAdmin.hpp"
 #include "FreeDRTTimeSlotTableSync.hpp"
+#include "StopPoint.hpp"
 #include "UserTableSync.h"
 #include "ResaModule.h"
 #include "ServiceReservations.h"
@@ -435,9 +436,12 @@ namespace synthese
 				HTMLTable t(c,"adminresults");
 				stream << t.open();
 
+				int serviceIdNumber = 0;
+
 				// Display of services
 				BOOST_FOREACH(const boost::shared_ptr<ReservableService>& service, sortedServices)
 				{
+					serviceIdNumber++;
 					const string& serviceNumber(
 						dynamic_cast<Service*>(service.get())->getServiceNumber()
 					);
@@ -451,7 +455,7 @@ namespace synthese
 					// Display
 					if(!_serviceNumber)
 					{
-						stream << t.row();
+						stream << t.row(string(), "service" + lexical_cast<string>(serviceIdNumber));
 
 						stream << t.col(1, string(), true);
 
@@ -529,16 +533,16 @@ namespace synthese
 						if(dynamic_cast<ScheduledService*>(service.get()))
 						{
 							stream << "Service " << serviceNumber << " - départ de ";
-							const Edge* edge(
-								dynamic_cast<Service*>(service.get())->getPath()->getEdge(0)
+							const LineStop* edge(
+								*static_cast<JourneyPattern*>(dynamic_cast<Service*>(service.get())->getPath())->getLineStops().begin()
 							);
-							if(dynamic_cast<const NamedPlace*>(edge->getHub()))
+							if(dynamic_cast<const StopPoint*>(&*edge->get<LineNode>()))
 							{
-								stream << dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName();
+								stream << dynamic_cast<const StopPoint*>(&*edge->get<LineNode>())->getConnectionPlace()->getFullName();
 							}
-							else if(dynamic_cast<const DRTArea*>(edge->getFromVertex()))
+							else if(dynamic_cast<const DRTArea*>(&*edge->get<LineNode>()))
 							{
-								stream << static_cast<const DRTArea*>(edge->getFromVertex())->getName();
+								stream << dynamic_cast<const DRTArea*>(&*edge->get<LineNode>())->getName();
 							}
 							stream << " à " <<
 								Service::GetTimeOfDay(dynamic_cast<ScheduledService*>(service.get())->getDepartureSchedule(false, 0))
@@ -590,7 +594,7 @@ namespace synthese
 							stream << t.row();
 							stream <<
 								t.col(1, string(), false, string(), reservation->getTransaction()->getComment().empty() ? 1 : 2) <<
-								HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
+								HTMLModule::getHTMLImage("/admin/img/" + ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
 							stream <<
 								t.col() <<
 								(	reservation->getDepartureTime().date() != _date ?
@@ -633,16 +637,16 @@ namespace synthese
 									{
 									case OPTION:
 									case ACKNOWLEDGED_OPTION:
-										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", ResaModule::GetStatusIcon(CANCELLED));
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", "/admin/img/" + ResaModule::GetStatusIcon(CANCELLED));
 										break;
 
 									case TO_BE_DONE:
 									case ACKNOWLEDGED:
-										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", "/admin/img/" + ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
 										break;
 
 									case SHOULD_BE_AT_WORK:
-										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1", "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1#service" + lexical_cast<string>(serviceIdNumber), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "/admin/img/" + ResaModule::GetStatusIcon(NO_SHOW));
 										break;
 									default:
 										break;
@@ -656,7 +660,7 @@ namespace synthese
 									case DONE:
 									case SHOULD_BE_DONE:
 									case SHOULD_BE_AT_WORK:
-										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1", "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL() + "&absence=1#service" + lexical_cast<string>(serviceIdNumber), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", "/admin/img/" + ResaModule::GetStatusIcon(NO_SHOW));
 										break;
 									default:
 									break;

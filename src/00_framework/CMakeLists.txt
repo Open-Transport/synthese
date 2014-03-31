@@ -2,6 +2,7 @@ set_source_groups()
 
 set(framework_SRCS
 CallableByThread.hpp
+CastPointersVectorField.hpp
 ComplexObjectFieldDefinition.hpp
 CoordinatesSystem.cpp
 CoordinatesSystem.hpp
@@ -18,6 +19,8 @@ FilesMap.hpp
 FrameworkTypes.hpp
 GeometryField.cpp
 GeometryField.hpp
+KillProcessException.h
+KillProcessException.cpp
 Language.cpp
 Language.hpp
 MinutesField.hpp
@@ -43,6 +46,7 @@ SimpleMapField.hpp
 SimpleObjectFieldDefinition.hpp
 StringField.cpp
 StringField.hpp
+StringVectorField.hpp
 TimeField.cpp
 TimeField.hpp
 WithGeometry.hpp

@@ -659,6 +659,17 @@ namespace synthese
 
 
 
+				/** Improved Check box item generator (input type=checkbox).
+					@param name name of the field in the form
+					@param value value to transmit at the submit if the field is checked
+					@param checked indicates if the field must be checked at the page load
+					@return std::string the HTML generated code
+					@date 2013
+				*/
+				std::string getCheckBox2(const std::string& name, const std::string& value, bool checked);
+
+
+
 				/** Options list containing numbers.
 					@param name Name of the field
 					@param mini Minimal number of the suite

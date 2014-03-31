@@ -25,6 +25,7 @@
 #ifndef SYNTHESE_PTPhysicalStopsListFunction_H__
 #define SYNTHESE_PTPhysicalStopsListFunction_H__
 
+#include "CommercialLine.h"
 #include "UtilTypes.h"
 #include "FactorableTemplate.h"
 #include "Function.h"
@@ -52,7 +53,6 @@ namespace synthese
 	{
 		class StopArea;
 		class StopPoint;
-		class CommercialLine;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Physical Stops Search.
@@ -78,6 +78,9 @@ namespace synthese
 			static const std::string PARAMETER_OMIT_SAME_AREA_DESTINATIONS;
 			static const std::string PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER; 
+			static const std::string PARAMETER_DATA_SOURCE_FILTER;
+			static const std::string PARAMETER_DAYS_CHECK_IF_STOP_SERVED;
+			static const std::string PARAMETER_OUTPUT_ONLY_ARRIVAL_STOPS;
 
 		protected:
 			static const std::string TAG_PHYSICAL_STOP;
@@ -107,6 +110,9 @@ namespace synthese
 				bool _sortByLineName;
 				bool _omitSameAreaDestinations;
 				boost::optional<std::size_t> _maxSolutionsNumber;
+				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
+				boost::gregorian::date_duration _daysCheckIfStopServed;
+				bool _outputOnlyArrivalStops;
 			//@}
 
 
@@ -175,19 +181,6 @@ namespace synthese
 		private:
 			bool _isSortByDistanceToBboxCenter;
 
-			class SortableLineKey
-			{
-			private:
-				util::RegistryKeyType _key;
-				std::string _lineShortName;
-
-			public:
-				SortableLineKey(util::RegistryKeyType key, std::string lineShortName);
-				bool operator<(SortableLineKey const &otherLineKey) const;
-				bool operator!=(SortableLineKey const &otherLineKey) const;
-				std::string getShortName() const;
-			};
-
 			class SortableStopPoint
 			{
 			private:
@@ -220,8 +213,8 @@ namespace synthese
 			/// Value is another map containing StopArea Destination deserved from this StopPoint
 			/// For each destination, there is a map containing all lines
 			/// (several lines could reach the same destination from the same stopPoint)
-			typedef std::map<const SortableLineKey, const CommercialLine *> CommercialLineMapType;
-			typedef std::map<const SortableStopArea, std::pair<const StopArea *, CommercialLineMapType > > StopAreaDestinationMapType;
+			typedef std::set<const CommercialLine *, CommercialLine::PointerComparator> CommercialLineSetType;
+			typedef std::map<const SortableStopArea, std::pair<const StopArea *, CommercialLineSetType > > StopAreaDestinationMapType;
 			typedef std::map<const SortableStopPoint, StopAreaDestinationMapType > StopPointMapType;
 
 			//////////////////////////////////////////////////////////////////////////

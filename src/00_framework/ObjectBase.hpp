@@ -138,16 +138,6 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Builds the list of object to get in the environment for current
-			/// object loading, according to the content of the record to load.
-			/// @param record the record to load
-			virtual LinkedObjectsIds getLinkedObjectsIds(
-				const Record& record
-			) const = 0;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
 			/// Constructs a new copy of the current object.
 			/// @warning only the record is copied : the created object will probably
 			/// be not usable as is. Use standard = operator for real object copy.

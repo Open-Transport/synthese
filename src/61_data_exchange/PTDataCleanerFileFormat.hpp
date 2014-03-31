@@ -71,6 +71,7 @@ namespace synthese
 			static const std::string PARAMETER_CLEAN_OLD_DATA;
 			static const std::string PARAMETER_CLEAN_UNUSED_STOPS;
 			static const std::string PARAMETER_AUTO_PURGE;
+			static const std::string PARAMETER_IMPORT_EVEN_IF_NO_DATE;
 
 			PTDataCleanerFileFormat(
 				util::Env& env,
@@ -91,6 +92,7 @@ namespace synthese
 			bool _cleanOldData;
 			bool _cleanUnusedStops;
 			bool _autoPurge;
+			bool _importEvenIfNoDate;
 
 		private:
 			mutable std::set<boost::shared_ptr<pt::JourneyPattern> > _journeyPatternsToRemove;

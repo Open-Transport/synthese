@@ -36,36 +36,19 @@ namespace synthese
 			public LinePhysicalStop
 		{
 		private:
-			bool	_scheduleInput;
-			bool	_reservationNeeded;
 
 		public:
 			DesignatedLinePhysicalStop(
-				util::RegistryKeyType id = 0,
-				JourneyPattern* line = NULL,
-				std::size_t rankInPath = 0,
-				bool isDeparture = true,
-				bool isArrival = true,
-				double metricOffset = 0,
-				StopPoint* stop = NULL,
-				bool scheduleInput = true,
-				bool reservationNeeded = true
+				LineStop& lineStop
 			);
 
-			virtual bool getScheduleInput()	const { return _scheduleInput; }
-			virtual bool getReservationNeeded() const { return _reservationNeeded; }
+			~DesignatedLinePhysicalStop();
 
-			void setScheduleInput(bool value) { _scheduleInput = value; }
-			void setReservationNeeded(bool value) { _reservationNeeded = value; }
+			virtual bool isDepartureAllowed() const;
+			virtual bool isArrivalAllowed() const;
 
-			virtual void toParametersMap(
-				util::ParametersMap& pm,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles = boost::logic::indeterminate,
-				std::string prefix = std::string()
-			) const;
+			virtual boost::shared_ptr<geos::geom::LineString> getRealGeometry() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_DesignatedLinePhysicalStop_hpp__

@@ -69,6 +69,7 @@ namespace synthese
 	{
 		class BroadcastPoint;
 		class SentAlarm;
+		class Alarm;
 
 		/** 17 Messages module class.
 		*/
@@ -76,12 +77,21 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
-			typedef std::set<boost::shared_ptr<SentAlarm> > ActivatedMessages;
+			struct SentAlarmLess : public std::binary_function<boost::shared_ptr<SentAlarm>, boost::shared_ptr<SentAlarm>, bool>
+			{
+				//////////////////////////////////////////////////////////////////////////
+				/// Order by decreasing priority level, then by line number, then by start date, then by address
+				bool operator()(boost::shared_ptr<SentAlarm> left, boost::shared_ptr<SentAlarm> right) const;
+			};
+			typedef std::set<boost::shared_ptr<SentAlarm>, SentAlarmLess> ActivatedMessages;
 
 		private:
 			static ActivatedMessages _activatedMessages;
 			static boost::mutex _activatedMessagesMutex;
 			static long _lastMinute;
+
+			static bool _selectMessagesToActivate(const Alarm& object);
+			static bool _selectSentAlarm(const Alarm& object);
 
 		public:
 			static void UpdateActivatedMessages();
@@ -90,17 +100,6 @@ namespace synthese
 				const BroadcastPoint& broadcastPoint,
 				const util::ParametersMap& parameters
 			);
-
-			struct SentAlarmLess : public std::binary_function<SentAlarm*, SentAlarm*, bool>
-			{
-				//////////////////////////////////////////////////////////////////////////
-				/// Order by decreasing priority level, then by start date, then by address
-				/// NULL addresses are forbidden
-				bool operator()(SentAlarm* left, SentAlarm* right) const;
-			};
-
-
-
 
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
@@ -149,6 +148,8 @@ namespace synthese
 			static std::string							getLevelLabel(const AlarmLevel& level);
 
 			static void MessagesActivationThread();
+
+			static void ClearAllBroadcastCaches();
 		};
 	}
 	/** @} */

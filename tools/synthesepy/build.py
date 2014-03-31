@@ -313,7 +313,7 @@ class Builder(object):
             return
 
         for filename, hash in LIBSPATIALITE_DLLS:
-            url = 'http://www.gaia-gis.it/%s.zip' % filename
+            url = 'https://www.gaia-gis.it/%s.zip' % filename
             self._download(url, hash)
             self._extract(url, self.env.c.thirdparty_dir)
 
@@ -374,6 +374,13 @@ class Builder(object):
 
         # TODO: maybe change optimization flags in debug mode:
         # -DCMAKE_CXX_FLAGS=-O0
+
+        # Add a suffix to the install dir to allow
+        # different SYNTHESE to run on the same server
+        if self.env.config.prefix_with_svnrelease:
+            svn_info = utils.SVNInfo(self.env.source_path)
+            revision_path = '-r{0}'.format(svn_info.version)
+            self.config.prefix += revision_path
 
         if self.config.prefix:
             args.append('-DCMAKE_INSTALL_PREFIX=' + self.config.prefix)

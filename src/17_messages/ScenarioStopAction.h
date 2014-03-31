@@ -28,6 +28,11 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace messages
 	{
 		class SentScenario;
@@ -40,10 +45,14 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_SCENARIO_ID;
+			static const std::string PARAMETER_DATASOURCE_ID;
+			static const std::string PARAMETER_REMOVE;
 
 		private:
-			boost::shared_ptr<SentScenario>	_scenario;
+			SentScenario*	_scenario;
+			const impex::DataSource* _dataSource;
 			const boost::posix_time::ptime	_stopDateTime;
+			bool _remove;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -65,7 +74,7 @@ namespace synthese
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			void setScenario(boost::shared_ptr<SentScenario> value);
+			void setScenario(SentScenario* value){ _scenario = value; }
 		};
 	}
 }

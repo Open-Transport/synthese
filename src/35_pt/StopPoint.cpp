@@ -24,6 +24,7 @@
 
 #include "Crossing.h"
 #include "DataSourceLinksField.hpp"
+#include "DRTArea.hpp"
 #include "ImportableTableSync.hpp"
 #include "Registry.h"
 #include "PTModule.h"
@@ -31,7 +32,7 @@
 #include "RoadChunkTableSync.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
-#include "ReverseRoadChunk.hpp"
+#include "CommercialLineTableSync.h"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 
@@ -60,8 +61,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string StopPoint::DATA_ID = "id";
-		const string StopPoint::DATA_NAME = "name";
 		const string StopPoint::DATA_OPERATOR_CODE = "operatorCode";
 		const string StopPoint::DATA_X = "x";
 		const string StopPoint::DATA_Y = "y";
@@ -84,7 +83,16 @@ namespace synthese
 
 		StopPoint::~StopPoint()
 		{
+			unlink();
 
+			BOOST_FOREACH(const Vertex::Edges::value_type& it, getDepartureEdges())
+			{
+				it.second->setFromVertex(NULL);
+			}
+			BOOST_FOREACH(const Vertex::Edges::value_type& it, getArrivalEdges())
+			{
+				it.second->setFromVertex(NULL);
+			}
 		}
 
 
@@ -109,14 +117,9 @@ namespace synthese
 			{
 				if(_projectedPoint.getRoadChunk()->getFromCrossing() == &crossing)
 				{
-					return VertexAccess(minutes(static_cast<long>(_projectedPoint.getMetricOffset() / 50)), _projectedPoint.getMetricOffset());
-				}
-				if(	_projectedPoint.getRoadChunk()->getReverseRoadChunk() &&
-					_projectedPoint.getRoadChunk()->getReverseRoadChunk()->getFromCrossing() == &crossing
-				){
 					return VertexAccess(
-						minutes(static_cast<long>((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()) / 50)),
-						_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()
+						minutes(static_cast<long>(_projectedPoint.getMetricOffset() / 50)),
+						_projectedPoint.getMetricOffset()
 					);
 				}
 			}
@@ -145,12 +148,12 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					if(!dynamic_cast<JourneyPattern*>(edge.second->getParentPath()))
 					{
 						continue;
 					}
 					lines.insert(
-						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+						dynamic_cast<JourneyPattern*>(edge.second->getParentPath())->getCommercialLine()
 					);
 			}	}
 
@@ -159,12 +162,12 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					if(!dynamic_cast<JourneyPattern*>(edge.second->getParentPath()))
 					{
 						continue;
 					}
 					lines.insert(
-						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+						dynamic_cast<JourneyPattern*>(edge.second->getParentPath())->getCommercialLine()
 					);
 			}	}
 
@@ -187,13 +190,14 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+					if(!jp)
 					{
 						continue;
 					}
 					journeyPatterns.insert(
 						make_pair(
-							static_cast<const LineStop*>(edge.second)->getLine(),
+							jp,
 							make_pair(false, true)
 					)	);
 			}	}
@@ -203,16 +207,17 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 				{
-					if(!dynamic_cast<const LineStop*>(edge.second))
+					JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+					if(!jp)
 					{
 						continue;
 					}
-					JourneyPatternsMap::iterator it(journeyPatterns.find(static_cast<const LineStop*>(edge.second)->getLine()));
+					JourneyPatternsMap::iterator it(journeyPatterns.find(jp));
 					if(it == journeyPatterns.end())
 					{
 						journeyPatterns.insert(
 							make_pair(
-								static_cast<const LineStop*>(edge.second)->getLine(),
+								jp,
 								make_pair(true, false)
 						)	);
 					}
@@ -230,7 +235,7 @@ namespace synthese
 
 		void StopPoint::toParametersMap(
 			util::ParametersMap& pm,
-			bool withStopAreaData /*= true*/,
+			bool withAdditionalParameters /*= true*/,
 			const CoordinatesSystem& coordinatesSystem /*= CoordinatesSystem::GetInstanceCoordinatesSystem()*/,
 			std::string prefix /*= std::string() */
 		) const	{
@@ -245,6 +250,35 @@ namespace synthese
 					dynamic_cast<const StopArea*>(getHub())->getKey() :
 					RegistryKeyType(0)
 			)	);
+
+			// Commercial lines
+			set<string> linesSet;
+			boost::shared_ptr<ParametersMap> linesPm(new ParametersMap);
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
+			{
+				JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+				if(!jp)
+				{
+					continue;
+				}
+				linesSet.insert(jp->getCommercialLine()->getShortName());
+			}
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
+			{
+				JourneyPattern* jp(dynamic_cast<JourneyPattern*>(edge.second->getParentPath()));
+				if(!jp)
+				{
+					continue;
+				}
+				linesSet.insert(jp->getCommercialLine()->getShortName());
+			}
+			BOOST_FOREACH(string line, linesSet)
+			{
+				boost::shared_ptr<ParametersMap> linePm(new ParametersMap);
+				linePm->insert(prefix + CommercialLineTableSync::COL_SHORT_NAME,line);
+				linesPm->insert(prefix + "line",linePm);
+			}
+			pm.insert(prefix + "lines", linesPm);
 
 			// X Y (deprecated)
 			if(hasGeometry())
@@ -269,12 +303,6 @@ namespace synthese
 					string()
 				);
 			}
-
-			// Data source links
-			pm.insert(
-				prefix + StopPointTableSync::COL_OPERATOR_CODE,
-				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
-			);
 
 			// Projected point
 			if(getProjectedPoint().getRoadChunk())
@@ -324,8 +352,6 @@ namespace synthese
 				);
 			}
 
-			pm.insert(prefix + DATA_ID, getKey());
-			pm.insert(prefix + DATA_NAME, getName());
 			pm.insert(
 				prefix + StopPointTableSync::COL_PLACEID,
 				(	dynamic_cast<const StopArea*>(getHub()) ?
@@ -404,11 +430,14 @@ namespace synthese
 			}
 
 			// Stop area data
-			if(withStopAreaData)
+			if(withAdditionalParameters)
 			{
 				boost::shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
 				getConnectionPlace()->toParametersMap(*stopAreaPM, &coordinatesSystem);
 				pm.insert(TAG_STOP_AREA, stopAreaPM);
+
+				// Extended data source links export
+				dataSourceLinksToParametersMap(pm);
 			}
 		}
 
@@ -502,7 +531,7 @@ namespace synthese
 			){
 				RegistryKeyType chunkId(
 					record.getDefault<RegistryKeyType>(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID,0));
-				MainRoadChunk* chunk(NULL);
+				RoadChunk* chunk(NULL);
 				MetricOffset metricOffset(0);
 				if(chunkId > 0)
 				{
@@ -511,7 +540,7 @@ namespace synthese
 						chunk = RoadChunkTableSync::GetEditable(chunkId, env).get();
 						metricOffset = record.getDefault<double>(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, 0);
 					}
-					catch (ObjectNotFoundException<MainRoadChunk>&)
+					catch (ObjectNotFoundException<RoadChunk>&)
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(getKey()));
 					}
@@ -588,6 +617,21 @@ namespace synthese
 			if(getProjectedPoint().getRoadChunk())
 			{
 				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
+			}
+		}
+
+
+
+		void StopPoint::unlink()
+		{
+			if(getConnectionPlace())
+			{
+				const_cast<StopArea*>(getConnectionPlace())->removePhysicalStop(*this);
+			}
+			if(	getProjectedPoint().getRoadChunk() &&
+				getProjectedPoint().getRoadChunk()->getFromCrossing()
+			){
+				getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(this);
 			}
 		}
 }	}

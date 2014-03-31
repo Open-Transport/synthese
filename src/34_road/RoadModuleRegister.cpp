@@ -13,6 +13,9 @@
 
 #include "ProjectAddressAction.hpp"
 #include "PublicPlaceEntranceCreationAction.hpp"
+#include "ProjectAllPublicPlacesAction.hpp"
+
+#include "PublicPlacesListService.hpp"
 
 #include "PublicPlaceAdmin.hpp"
 
@@ -22,8 +25,8 @@
 
 #include "Crossing.h"
 #include "House.hpp"
-#include "MainRoadChunk.hpp"
-#include "MainRoadPart.hpp"
+#include "RoadChunk.h"
+#include "Road.h"
 #include "PublicPlace.h"
 #include "PublicPlaceEntrance.hpp"
 #include "RoadPlace.h"
@@ -52,6 +55,9 @@ void synthese::road::moduleRegister()
 
 	synthese::road::ProjectAddressAction::integrate();
 	synthese::road::PublicPlaceEntranceCreationAction::integrate();
+	synthese::road::ProjectAllPublicPlacesAction::integrate();
+
+	synthese::road::PublicPlacesListService::integrate();
 
 	synthese::road::PublicPlaceAdmin::integrate();
 
@@ -59,8 +65,8 @@ void synthese::road::moduleRegister()
 
 	synthese::util::Env::Integrate<synthese::road::Crossing>();
 	synthese::util::Env::Integrate<synthese::road::House>();
-	synthese::util::Env::Integrate<synthese::road::MainRoadChunk>();
-	synthese::util::Env::Integrate<synthese::road::MainRoadPart>();
+	synthese::util::Env::Integrate<synthese::road::RoadChunk>();
+	synthese::util::Env::Integrate<synthese::road::Road>();
 	synthese::util::Env::Integrate<synthese::road::PublicPlace>();
 	synthese::util::Env::Integrate<synthese::road::PublicPlaceEntrance>();
 	synthese::util::Env::Integrate<synthese::road::RoadPlace>();

@@ -49,8 +49,6 @@ namespace synthese
 	
 	namespace inter_synthese
 	{
-		const string InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR = ":";
-		const string InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR = "\r\n";
 		const string InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC = "no_content_to_sync!";
 		const string InterSYNTHESESlaveUpdateService::PARAMETER_SLAVE_ID = "slave_id";
 		const string InterSYNTHESESlaveUpdateService::PARAMETER_ASK_ID_RANGE = "ask_id_range";
@@ -116,43 +114,8 @@ namespace synthese
 			}
 			else
 			{
-				if (_askIdRange)
-				{
-					bool first(true);
-					for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _slave->getQueue().end(); ++it)
-					{
-						if (first)
-						{
-							stream << it->second->get<Key>() << FIELDS_SEPARATOR;
-							first = false;
-						}
-						// Exit on last item
-						if(it == range.second)
-						{
-							stream << it->second->get<Key>() << FIELDS_SEPARATOR <<
-								InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR;
-							break;
-						}
-					}
-				}
-				for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _slave->getQueue().end(); ++it)
-				{
-					stream <<
-						it->second->get<Key>() << FIELDS_SEPARATOR <<
-						it->second->get<SyncType>() << FIELDS_SEPARATOR <<
-						it->second->get<SyncContent>().size() << FIELDS_SEPARATOR <<
-						it->second->get<SyncContent>() <<
-						InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR;
-					;
-
-					// Exit on last item
-					if(it == range.second)
-					{
-						break;
-					}
-				}
+				_slave->sendToSlave(stream, range, _askIdRange);
 			}
-			_slave->setLastSentRange(range);
 
 			// Record the request as slave activity
 			// Even if the slave crashed and don't get the results,
@@ -193,7 +156,6 @@ namespace synthese
 
 		void InterSYNTHESESlaveUpdateService::RunBackgroundUpdater()
 		{
-			bool fakeBool(true);
 			bgUpdaterDone = false;
 			boost::shared_ptr<InterSYNTHESESlave> slave;
 

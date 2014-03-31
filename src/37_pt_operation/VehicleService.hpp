@@ -24,10 +24,17 @@
 #define SYNTHESE_pt_operations_VehicleService_hpp__
 
 #include "Calendar.h"
+#include "CalendarField.hpp"
+#include "CastPointersVectorField.hpp"
+#include "DataSourceLinksField.hpp"
+#include "MinutesField.hpp"
 #include "ImportableTemplate.hpp"
+#include "OperationUnit.hpp"
+#include "PointersVectorField.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 #include "DriverService.hpp"
+#include "SchedulesBasedService.h"
 
 #include "FrameworkTypes.hpp"
 
@@ -36,22 +43,31 @@
 
 namespace synthese
 {
-	namespace pt
-	{
-		class SchedulesBasedService;
-	}
+	FIELD_CAST_POINTERS_VECTOR(Services, pt::SchedulesBasedService)
+	FIELD_DATASOURCE_LINKS(DataSourceLinksWithoutUnderscore)
+	FIELD_MINUTES(OpeningDuration)
+	FIELD_MINUTES(ClosingDuration)
+
+	typedef boost::fusion::map<
+		FIELD(Key),
+		FIELD(Name),
+		FIELD(Services),
+		FIELD(DataSourceLinksWithoutUnderscore),
+		FIELD(Dates),
+		FIELD(pt_operation::OperationUnit),
+		FIELD(OpeningDuration),
+		FIELD(ClosingDuration)
+	> VehicleServiceSchema;
 
 	namespace pt_operation
 	{
-		class DriverService;
-
 		/** Vehicle service class.
 			@ingroup m37
 		*/
 		class VehicleService:
+			public Object<VehicleService, VehicleServiceSchema>,
 			public calendar::Calendar,
-			public impex::ImportableTemplate<VehicleService>,
-			public virtual util::Registrable
+			public impex::ImportableTemplate<VehicleService>
 		{
 		public:
 			static const std::string TAG_SERVICE;
@@ -59,37 +75,26 @@ namespace synthese
 			static const std::string VALUE_DEAD_RUN;
 			static const std::string VALUE_COMMERCIAL;
 
+			struct Vector:
+				public PointersVectorField<Vector, VehicleService>
+			{
+
+			};
+
 			class DriverServiceChunkCompare
 			{
 			public:
 				bool operator()(const DriverService::Chunk* ds1, const DriverService::Chunk* ds2) const;
 			};
 
-			typedef util::Registry<VehicleService> Registry;
-			typedef std::vector<pt::SchedulesBasedService*> Services;
 			typedef std::set<const DriverService::Chunk*, DriverServiceChunkCompare> DriverServiceChunks;
 
 		private:
-			Services _services;
-			DriverServiceChunks _driverServiceChunks;
-			std::string _name;
+			mutable DriverServiceChunks _driverServiceChunks;
 
 		public:
 			VehicleService(util::RegistryKeyType id=0);
-
-			//! @name Setters
-			//@{
-				void setServices(const Services& value){ _services = value; }
-				void setName(const std::string& value){ _name = value; }
-				void setDriverServices(const DriverServiceChunks& value){ _driverServiceChunks = value; }
-			//@}
-
-			//! @name Getters
-			//@{
-				const Services& getServices() const { return _services; }
-				virtual std::string getName() const { return _name; }
-				const DriverServiceChunks& getDriverServiceChunks() const { return _driverServiceChunks; }
-			//@}
+			~VehicleService();
 
 			//! @name Updaters
 			//@{
@@ -97,33 +102,29 @@ namespace synthese
 				void removeDriverServiceChunk(const DriverService::Chunk& value);
 				void insert(pt::SchedulesBasedService& value);
 				void clearServices();
+				void setDriverServiceChunks(const DriverServiceChunks& value) const { _driverServiceChunks = value; }
 			//@}
 
 			//! @name Services
 			//@{
+				const DriverServiceChunks& getDriverServiceChunks() const { return _driverServiceChunks; }
+
+				virtual bool isActive(
+					const boost::gregorian::date& date
+				) const;
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Service extractor.
 				/// @param rank the rank of the service in the vehicle service
 				/// @return the nth service of the vehicle service, NULL if non existent
 				pt::SchedulesBasedService* getService(std::size_t rank) const;
 
-				virtual void toParametersMap(
-					util::ParametersMap& pm,
-					bool withAdditionalParameters,
-					boost::logic::tribool withFiles = boost::logic::indeterminate,
-					std::string prefix = std::string()
-				) const;
-
-				
-				virtual bool loadFromRecord(
-					const Record& record,
-					util::Env& env
-				);
-
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 
-				virtual LinkedObjectsIds getLinkedObjectsIds(
-					const Record& record
+				virtual void addAdditionalParameters(
+					util::ParametersMap& map,
+					std::string prefix = std::string()
 				) const;
 			//@}
 		};

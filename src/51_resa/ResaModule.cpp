@@ -42,7 +42,6 @@
 #include "CancelReservationAction.h"
 #include "ResaEditLogEntryAdmin.h"
 #include "CommercialLine.h"
-#include "CommercialLineTableSync.h"
 #include "CallBeginAction.h"
 #include "CallEndAction.h"
 #include "ReservationRoutePlannerAdmin.h"
@@ -87,6 +86,8 @@ namespace synthese
 		const std::string ResaModule::DATA_CURRENT_CALL_ID("current_call_id");
 		const std::string ResaModule::DATA_CURRENT_CALL_TIMESTAMP("current_call_timestamp");
 
+		const std::string ResaModule::MODULE_PARAMETER_MAX_SEATS_ALLOWED("max_seats_number_allowed");
+
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		boost::shared_ptr<Profile> ResaModule::_basicProfile;
 		boost::shared_ptr<Profile> ResaModule::_autoresaProfile;
@@ -96,6 +97,7 @@ namespace synthese
 		boost::shared_ptr<PTServiceConfig> ResaModule::_journeyPlannerConfig;
 		ResaModule::ReservationsByService ResaModule::_reservationsByService;
 		boost::recursive_mutex ResaModule::_reservationsByServiceMutex;
+		size_t ResaModule::_maxSeats;
 	}
 
 	namespace server
@@ -108,6 +110,7 @@ namespace synthese
 		{
 			RegisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER, "0", &ResaModule::ParameterCallback);
 			RegisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE, "0", &ResaModule::ParameterCallback);
+			RegisterParameter(ResaModule::MODULE_PARAMETER_MAX_SEATS_ALLOWED, "0", &ResaModule::ParameterCallback);
 		}
 
 
@@ -168,6 +171,7 @@ namespace synthese
 		{
 			UnregisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER);
 			UnregisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE);
+			UnregisterParameter(ResaModule::MODULE_PARAMETER_MAX_SEATS_ALLOWED);
 		}
 
 
@@ -197,12 +201,23 @@ namespace synthese
 			ReservationTransaction::Reservations rs(tr.getReservations());
 			for (ReservationTransaction::Reservations::const_iterator itrs(rs.begin()); itrs != rs.end(); ++itrs)
 			{
+				const Reservation& resa(**itrs);
 				stream << "<li>";
 				try
 				{
-					Env env;
-					boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get((*itrs)->getLineId(), env));
-					stream << "<span class=\"" << line->getStyle() << "\"><span class=\"linesmall\">" << line->getShortName() << "</span></span> ";
+					boost::shared_ptr<const ScheduledService> service(
+						Env::GetOfficialEnv().get<ScheduledService>(resa.getServiceId())
+					);
+					if(!dynamic_cast<const JourneyPattern*>(service->getPath()))
+					{
+						continue;
+					}
+					const JourneyPattern& jp(static_cast<const JourneyPattern&>(*service->getPath()));
+					stream << "<span class=\"" << jp.getCommercialLine()->getStyle() << "\"><span class=\"linesmall\">" << jp.getCommercialLine()->getShortName() << "</span></span> ";
+					if(!jp.getDirection().empty())
+					{
+						stream << " / " << jp.getDirection();
+					}
 				}
 				catch (...)
 				{
@@ -364,6 +379,21 @@ namespace synthese
 					_journeyPlannerConfig.reset();
 				}
 			}
+			else if(name == MODULE_PARAMETER_MAX_SEATS_ALLOWED)
+			{
+				try
+				{
+					size_t number(lexical_cast<size_t>(value));
+
+					if(number > 0)
+					{
+						_maxSeats = number;
+					}
+				}
+				catch(bad_lexical_cast)
+				{
+				}
+			}
 		}
 
 
@@ -389,7 +419,12 @@ namespace synthese
 					AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(
 						request
 					);
-					map.insert(DATA_SWITCH_CALL_URL, callRequest.getURL());
+					stringstream os;
+					os << callRequest.getClientURL() << Request::PARAMETER_STARTER;
+					ParametersMap pm(callRequest.getParametersMap());
+					pm.remove(BaseReservationActionAdmin::PARAMETER_CUSTOMER_ID);
+					pm.outputURI(os);
+					map.insert(DATA_SWITCH_CALL_URL, os.str());
 				}
 				else
 				{
@@ -417,6 +452,13 @@ namespace synthese
 		pt_website::PTServiceConfig* ResaModule::GetJourneyPlannerWebsite()
 		{
 			return _journeyPlannerConfig.get();
+		}
+
+
+
+		size_t ResaModule::GetMaxSeats()
+		{
+			return _maxSeats;
 		}
 
 

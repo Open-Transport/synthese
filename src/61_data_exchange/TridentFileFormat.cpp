@@ -31,9 +31,11 @@
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
+#include "DRTArea.hpp"
 #include "CityTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
 #include "ReservationContactTableSync.h"
+#include "PTModule.h"
 #include "PTUseRule.h"
 #include "PTConstants.h"
 #include "CoordinatesSystem.hpp"
@@ -266,6 +268,17 @@ namespace synthese
 					true, true,
 					UP_LINKS_LOAD_LEVEL
 				);
+			}
+
+			// Link DRTAreas physical stops
+			BOOST_FOREACH(const LineStop::Registry::value_type& itls, _env.getRegistry<LineStop>())
+			{
+				itls.second->link(_env); // Todo : useful ?
+			}
+
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env.getRegistry<JourneyPattern>())
+			{
+				const JourneyPattern& line(*itline.second);
 				ScheduledServiceTableSync::Search(
 					_env,
 					line.getKey(),
@@ -340,7 +353,13 @@ namespace synthese
 			BOOST_FOREACH(Registry<StopPoint>::value_type itps, _env.getRegistry<StopPoint>())
 			{
 				const StopPoint* ps(itps.second.get());
-				if (ps->getDepartureEdges().empty() && ps->getArrivalEdges().empty()) continue;
+				util::Env fakeEnv;
+				LineStopTableSync::SearchResult lineStops(
+					LineStopTableSync::Search(fakeEnv, boost::optional<RegistryKeyType>(), ps->getKey())
+				);
+
+				if (lineStops.empty())
+					continue;
 
 				os << "<StopArea>" << "\n";
 
@@ -354,16 +373,7 @@ namespace synthese
 					os << ps->getName ();
 				os << "</name>" << "\n";
 
-				set<const Edge*> edges;
-				BOOST_FOREACH(const Vertex::Edges::value_type& cEdge, ps->getDepartureEdges())
-				{
-					edges.insert(cEdge.second);
-				}
-				BOOST_FOREACH(const Vertex::Edges::value_type& cEdge, ps->getArrivalEdges())
-				{
-					edges.insert(cEdge.second);
-				}
-				BOOST_FOREACH(const Edge* ls, edges)
+				BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& ls, lineStops)
 				{
 					os << "<contains>" << TridentId(peerid, "StopPoint", *ls)  << "</contains>" << "\n";
 				}
@@ -385,25 +395,33 @@ namespace synthese
 				_env.getRegistry<StopArea>()
 			){
 				const StopArea* cp(itcp.second.get());
-				os << "<StopArea>" << "\n";
-				os << "<objectId>" << TridentId (peerid, "StopArea", *cp) << "</objectId>" << "\n";
-				os << "<name>" << cp->getName () << "</name>" << "\n";
-
-				// Contained physical stops
 				const StopArea::PhysicalStops& stops(cp->getPhysicalStops());
-				for(StopArea::PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
+
+				// Don't export empty StopArea, not valid.
+				// When NonConcurrency rules are loaded above, StopAreas are added to the environnement without any StopPoints associated.
+				// It breaks the XML file validation.
+				if(stops.size() > 0)
 				{
-					os << "<contains>" << TridentId (peerid, "StopArea", *it->second)  << "</contains>" << "\n";
+					os << "<StopArea>" << "\n";
+					os << "<objectId>" << TridentId (peerid, "StopArea", *cp) << "</objectId>" << "\n";
+					os << "<name>" << cp->getName () << "</name>" << "\n";
+
+					// Contained physical stops
+
+					for(StopArea::PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
+					{
+						os << "<contains>" << TridentId (peerid, "StopArea", *it->second)  << "</contains>" << "\n";
+					}
+
+					// Decide what to take for centroidOfArea of a connectionPlace. Only regarding physical stops coordinates
+					// or also regarding addresses coordinates, or fixed manually ?
+					// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << "\n";
+
+					os << "<StopAreaExtension>" << "\n";
+					os << "<areaType>" << "CommercialStopPoint" << "</areaType>" << "\n";
+					os << "</StopAreaExtension>" << "\n";
+					os << "</StopArea>" << "\n";
 				}
-
-				// Decide what to take for centroidOfArea of a connectionPlace. Only regarding physical stops coordinates
-				// or also regarding addresses coordinates, or fixed manually ?
-				// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << "\n";
-
-				os << "<StopAreaExtension>" << "\n";
-				os << "<areaType>" << "CommercialStopPoint" << "</areaType>" << "\n";
-				os << "</StopAreaExtension>" << "\n";
-				os << "</StopArea>" << "\n";
 			}
 
 
@@ -578,13 +596,13 @@ namespace synthese
 
 				os << "<publishedName>";
 				{
-					const StopPoint* ps(line->getOrigin());
+					const StopPoint* ps(static_cast<const StopPoint*>(line->getOrigin()));
 					if (ps && ps->getConnectionPlace () && ps->getConnectionPlace ()->getCity ())
 						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
 				os << " -&gt; ";
 				{
-					const StopPoint* ps(line->getDestination());
+					const StopPoint* ps(static_cast<const StopPoint*>(line->getDestination()));
 					if (ps && ps->getConnectionPlace () && ps->getConnectionPlace ()->getCity ())
 						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
@@ -620,12 +638,14 @@ namespace synthese
 			// --------------------------------------------------- StopPoint
 			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 			{
-				if(!dynamic_cast<DesignatedLinePhysicalStop*>(lineStop.second.get()))
+				StopPoint* ps(
+					dynamic_cast<StopPoint*>(
+						&*lineStop.second->get<LineNode>()
+				)	);
+				if(!ps)
 				{
 					continue;
 				}
-				const DesignatedLinePhysicalStop& ls(static_cast<DesignatedLinePhysicalStop&>(*lineStop.second));
-				const StopPoint* ps = static_cast<const StopPoint*>(ls.getFromVertex());
 
 				boost::shared_ptr<Point> wgs84ps;
 				if(ps->hasGeometry())
@@ -635,7 +655,7 @@ namespace synthese
 
 				os << fixed;
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
-				os << "<objectId>" << TridentId (peerid, "StopPoint", ls) << "</objectId>" << "\n";
+				os << "<objectId>" << TridentId (peerid, "StopPoint", *lineStop.second) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySources() << "</creatorId>" << "\n";
 				os << "<longitude>" << (ps->hasGeometry() ? wgs84ps->getX() :0) << "</longitude>" << "\n";
 				os << "<latitude>" << (ps->hasGeometry() ? wgs84ps->getY() : 0) << "</latitude>" << "\n";
@@ -765,20 +785,33 @@ namespace synthese
 					os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
 					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
-					if (ls->getRankInPath() > 0 && ls->isArrival())
-						os << "<arrivalTime>" << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath())))
+					if (ls->get<RankInPath>() > 0 && ls->get<IsArrival>())
+						os << "<arrivalTime>" << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>())))
 						<< "</arrivalTime>" << "\n";
 
 					os	<< "<departureTime>";
-					if (ls->getRankInPath()+1 != linestops.size() && ls->isDeparture())
+					if (ls->get<RankInPath>()+1 != linestops.size() && ls->get<IsDeparture>())
 					{
-						os << ToXsdTime (Service::GetTimeOfDay(srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath())));
+						os << ToXsdTime (Service::GetTimeOfDay(srv->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>())));
 					}
 					else
 					{
-						os << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath())));
+						os << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>())));
 					}
 					os	<< "</departureTime>" << "\n";
+
+					if(!ls->get<IsDeparture>() && !ls->get<IsArrival>())
+					{
+						os << "<boardingAlightingPossibility>NeitherBoardOrAlight</boardingAlightingPossibility>\n";
+					}
+					else if(!ls->get<IsDeparture>())
+					{
+						os << "<boardingAlightingPossibility>AlightOnly</boardingAlightingPossibility>\n";
+					}
+					else if(!ls->get<IsArrival>())
+					{
+						os << "<boardingAlightingPossibility>BoardOnly</boardingAlightingPossibility>\n";
+					}
 
 					os << "</vehicleJourneyAtStop>" << "\n";
 				}
@@ -875,7 +908,7 @@ namespace synthese
 						os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
 						os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
-						const time_duration& schedule((ls->getRankInPath() > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()) : srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+						const time_duration& schedule((ls->get<RankInPath>() > 0 && ls->get<IsArrival>()) ? srv->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>()) : srv->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>()));
 						os << "<elapseDuration>" << ToXsdDuration(schedule - srv->getDepartureBeginScheduleToIndex(false, 0)) << "</elapseDuration>" << "\n";
 						os << "<headwayFrequency>" << ToXsdDuration(srv->getMaxWaitingTime()) << "</headwayFrequency>" << "\n";
 
@@ -1696,7 +1729,7 @@ namespace synthese
 				XMLNode keyNode(serviceNode.getChildNode("objectId"));
 				XMLNode jpKeyNode(serviceNode.getChildNode("journeyPatternId"));
 				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
-				string serviceNumber(numberNode.isEmpty() ? string() : charset_converter.convert(numberNode.getText()));
+				string serviceNumber((numberNode.getText() == NULL) ? string() : charset_converter.convert(numberNode.getText()));
 
 				// Creation of the service
 
@@ -1744,12 +1777,12 @@ namespace synthese
 						stopRank + 1 < stopsNumber
 					){
 						string bap(vjsNode.getChildNode("boardingAlightingPossibility").getText());
-						if(bap == "BoardOnly")
+						if(bap == "BoardOnly" || bap == "NeitherBoardOrAlight")
 						{
 							route.stops[stopRank - ignoredStops]._arrival = false;
 							updatedRoute = true;
 						}
-						else if(bap == "AlightOnly")
+						else if(bap == "AlightOnly" || bap == "NeitherBoardOrAlight")
 						{
 							route.stops[stopRank - ignoredStops]._departure = false;
 							updatedRoute = true;
@@ -1786,6 +1819,8 @@ namespace synthese
 						rollingStock.get(),
 						route.stops,
 						dataSource,
+						true,
+						true,
 						true,
 						true
 					);
@@ -1969,7 +2004,7 @@ namespace synthese
 					{
 						Calendar periodMask(
 							period.begin(),
-							period.last()
+							period.end()
 						);
 
 						BOOST_FOREACH(CalendarTemplate* calendarTemplate, calendarTemplates)
@@ -2200,6 +2235,16 @@ namespace synthese
 			ss << peer << ":" << clazz << ":" << obj.getKey();
 			return ss.str ();
 		}
+
+
+
+		TridentFileFormat::Exporter_::Exporter_(
+			const impex::Export& export_
+		):	OneFileExporter<TridentFileFormat>(export_),
+			_withTisseoExtension(false)
+		{}
+
+
 
 		string ToXsdDaysDuration (date_duration daysDelay)
 		{

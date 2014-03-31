@@ -172,6 +172,9 @@ namespace synthese
 			ResultHTMLTable t(h,sortedForm,_requestParameters, lines);
 			stream << t.open();
 
+			if(_requestParameters.orderField.empty())
+				std::sort(lines.begin(), lines.end(), CommercialLine::PointerComparator());
+
 			// Rows
 			BOOST_FOREACH(const boost::shared_ptr<CommercialLine>& line, lines)
 			{
@@ -325,6 +328,8 @@ namespace synthese
 
 				// Lines
 				vector<CommercialLine*> lines(node->getChildren<CommercialLine>());
+				std::sort(lines.begin(), lines.end(), CommercialLine::PointerComparator());
+
 				BOOST_FOREACH(CommercialLine* line, lines)
 				{
 					boost::shared_ptr<CommercialLineAdmin> p(

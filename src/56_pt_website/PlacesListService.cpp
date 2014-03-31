@@ -33,6 +33,8 @@
 #include "PublicPlace.h"
 #include "Request.h"
 #include "RequestException.h"
+#include "Road.h"
+#include "RoadChunkEdge.hpp"
 #include "RoadPlace.h"
 #include "StopArea.hpp"
 #include "PTServiceConfigTableSync.hpp"
@@ -80,6 +82,7 @@ namespace synthese
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
 		const string PlacesListService::PARAMETER_COMPATIBLE_USER_CLASSES_LIST = "acList";
+		const string PlacesListService::PARAMETER_DATA_SOURCE_FILTER = "data_source_filter";
 
 		const string PlacesListService::DATA_ADDRESS = "address";
 		const string PlacesListService::DATA_ADDRESSES = "addresses";
@@ -113,34 +116,7 @@ namespace synthese
 			_coordinatesSystem(NULL),
 			_maxDistance(300),
 			_requiredUserClasses()
-		{
-			 _houseMap = new HouseMapType();
-		}
-
-
-
-		PlacesListService::~PlacesListService()
-		{
-			/*
-				The delete below is needed to fix a leak on _houseMap, which is never destroy.
-				However, having this delete cause a "double free or corruption" crash when loading the admin interface.
-
-				*** glibc detected *** ./s3-server: double free or corruption (fasttop): 0x00007f500c00c560 ***
-				======= Backtrace: =========
-				/lib64/libc.so.6[0x34a4675916]
-				(...)/lib56_pt_website.so(_ZN8synthese10pt_website17PlacesListServiceD2Ev+0x37)[0x7f5021dbc5d7]
-				(...)/lib35_pt.so(_ZN8synthese2pt13PTCitiesAdminD0Ev+0x22)[0x7f5024619102]
-
-				PTCitiesAdmin has a PlacesListService attribute which is allocated by his constructor, PTCitiesAdmin also
-				inherits from AdminInterfaceElementTemplate<PTCitiesAdmin>.
-				PTCitiesAdmin destructor call PlacesListService destructor, which will delete _houseMap. In this case
-				_houseMap has never been allocated, causing this crash.
-
-				This mean that the "PTCitiesAdmin" object we have has never been trully allocated, we have possibly did
-				a static pointer cast like static_cast<PTCitiesAdmin*>(PointerOnInheritedClass), causing this issue.
-			*/
-			//delete _houseMap;
-		}
+		{}
 
 		ParametersMap PlacesListService::_getParametersMap() const
 		{
@@ -218,6 +194,12 @@ namespace synthese
 			if(_maxDistance>0)
 			{
 				map.insert(PARAMETER_MAX_DISTANCE, _maxDistance);
+			}
+			
+			// dataSourceFilter
+			if(_dataSourceFilter)
+			{
+				map.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
 
 			return map;
@@ -336,6 +318,15 @@ namespace synthese
 			{
 				throw RequestException("Bad user class code in acList parameter.");
 			}
+
+			if(map.getOptional<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER)) try
+			{
+				_dataSourceFilter = Env::GetOfficialEnv().get<impex::DataSource>(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER));
+			}
+			catch (ObjectNotFoundException<impex::DataSource>&)
+			{
+				throw RequestException("No such data source");
+			}
 		}
 
 
@@ -361,14 +352,15 @@ namespace synthese
 
 				BOOST_FOREACH(const RoadChunkTableSync::SearchResult::value_type& roadChunk, roadChunks)
 				{
-					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
-					MainRoadChunk::HouseNumber houseNumber(0);
+					RoadChunk& chunk(static_cast<RoadChunk&>(*roadChunk));
+					HouseNumber houseNumber(0);
 
 					bool compatibleWithUserClasses(true);
 					BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
 					{
-						if(!chunk.isCompatibleWith(graph::AccessParameters(userClassCode)) && !chunk.getReverseRoadChunk()->isCompatibleWith(graph::AccessParameters(userClassCode)))
-						{
+						if(	!chunk.getForwardEdge().isCompatibleWith(graph::AccessParameters(userClassCode)) &&
+							!chunk.getReverseEdge().isCompatibleWith(graph::AccessParameters(userClassCode))
+						){
 							compatibleWithUserClasses = false;
 							break;
 						}
@@ -387,31 +379,37 @@ namespace synthese
 					{
 						houseNumber = chunk.getRightHouseNumberBounds()->first;
 					}
-					else if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
+					else if(!chunk.getRoad() || !chunk.getRoad()->get<RoadPlace>() || chunk.getRoad()->get<RoadPlace>()->getName() == "")
+					{
 						continue;
+					}
 
 					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
 
 					string name;
 					if(houseNumber == 0)
-						name = chunk.getRoad()->getRoadPlace()->getName();
+					{
+						name = chunk.getRoad()->get<RoadPlace>()->getName();
+					}
 					else
+					{
 						name = (house.get())->getName();
+					}
 
 					if(name == "")continue;
 
-					addHouse(&_houseMap,house, name);
+					addHouse(_houseMap, house, name);
 				}
 
 				// Best place
-				if(!_houseMap->empty())
+				if(!_houseMap.empty())
 				{
 					size_t nbResult = 0;
 					vector<lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit > houseList, roadList;
 					vector<int> distanceHouseList;
 					set<string> insertedRoadName;
 
-					BOOST_FOREACH(const HouseMapType::value_type& it, (*_houseMap))
+					BOOST_FOREACH(const HouseMapType::value_type& it, _houseMap)
 					{
 						boost::shared_ptr<House> house = it.second;
 
@@ -421,7 +419,7 @@ namespace synthese
 							if(*(house.get())->getHouseNumber() == 0)
 							{
 								//Don't insert same road twice
-								string roadName = (house.get())->getRoadChunk()->getRoad()->getRoadPlace()->getName();
+								string roadName = (house.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getName();
 								set<string>::iterator frenchIt = insertedRoadName.find(roadName);
 								if(frenchIt == insertedRoadName.end())
 								{
@@ -492,13 +490,33 @@ namespace synthese
 					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
 						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
-						_registerItems<NamedPlace>(
-							*pm,
-							_city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
+
+						LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchResult stopResult;
+						LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchResult newStopResult;
+
+						stopResult = _city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
 								_text,
 								_number ? *_number : 0,
 								_minScore
-						)	);
+						);
+
+						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> >::MatchHit& item, stopResult)
+						{
+							const pt::StopArea* stop(dynamic_cast<const pt::StopArea*>(&(*item.value)));
+							if(stop)
+							{
+								if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
+									continue;
+							}
+
+							newStopResult.push_back(item);
+						}
+
+						_registerItems<NamedPlace>(
+							*pm,
+							newStopResult
+						);
+
 						result.insert(DATA_STOPS, pm);
 					}
 
@@ -509,11 +527,11 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
-							MainRoadChunk::HouseNumber number;
+							HouseNumber number(0);
 							string roadName;
 							try
 							{
-								number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+								number = lexical_cast<HouseNumber>(words[0]);
 								roadName = _text.substr(words[0].size() + 1);
 							}
 							catch (bad_lexical_cast)
@@ -521,7 +539,7 @@ namespace synthese
 								// Try number at the end
 								try
 								{
-									number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size() - 1]);
+									number = lexical_cast<HouseNumber>(words[words.size() - 1]);
 									roadName = _text.substr(0, _text.size() - words[words.size() - 1].size() - 1);
 								}
 								catch (bad_lexical_cast)
@@ -619,13 +637,33 @@ namespace synthese
 					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
 						boost::shared_ptr<ParametersMap> pm(new ParametersMap);
-						_registerItems<StopArea>(
-							*pm,
-							PTModule::GetGeneralStopsMatcher().bestMatches(
+
+						LexicalMatcher<boost::shared_ptr<StopArea> >::MatchResult stopResult;
+						LexicalMatcher<boost::shared_ptr<StopArea> >::MatchResult newStopResult;
+
+						stopResult = PTModule::GetGeneralStopsMatcher().bestMatches(
 								_text,
 								_number ? *_number : 0,
 								_minScore
-						)	);
+						);
+
+						BOOST_FOREACH(const lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> >::MatchHit& item, stopResult)
+						{
+							const pt::StopArea* stop(dynamic_cast<const pt::StopArea*>(&(*item.value)));
+							if(stop)
+							{
+								if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
+									continue;
+							}
+
+							newStopResult.push_back(item);
+						}
+
+						_registerItems<StopArea>(
+							*pm,
+							newStopResult
+						);
+
 						result.insert(DATA_STOPS, pm);
 					}
 
@@ -637,11 +675,11 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
-							MainRoadChunk::HouseNumber number;
+							HouseNumber number(0);
 							string roadName;
 							try
 							{
-								number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+								number = lexical_cast<HouseNumber>(words[0]);
 								roadName = _text.substr(words[0].size() + 1);
 							}
 							catch (bad_lexical_cast)
@@ -649,7 +687,7 @@ namespace synthese
 								// Try number at the end
 								try
 								{
-									number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size() - 1]);
+									number = lexical_cast<HouseNumber>(words[words.size() - 1]);
 									roadName = _text.substr(0, _text.size() - words[words.size() - 1].size() - 1);
 								}
 								catch (bad_lexical_cast)
@@ -1239,7 +1277,7 @@ namespace synthese
 							itemMap->get<RegistryKeyType>(
 								House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID
 					)	)	);
-					MainRoadChunk::HouseNumber houseNumber = itemMap->get<MainRoadChunk::HouseNumber>(House::DATA_NUMBER);
+					HouseNumber houseNumber = itemMap->get<HouseNumber>(House::DATA_NUMBER);
 					if(houseNumber != 0)
 					{
 						placeResult.value = static_pointer_cast<Place, House>(
@@ -1248,14 +1286,14 @@ namespace synthese
 					}
 					else
 					{
-						if (_houseMap->empty())
+						if (_houseMap.empty())
 						{
 							// _houseMap is empty so give back the road
 							placeResult.value = roadPlace;
 						}
 						else
 						{
-							placeResult.value = _houseMap->begin()->second;	
+							placeResult.value = _houseMap.begin()->second;	
 						}
 					}
 				}
@@ -1308,14 +1346,14 @@ namespace synthese
 		}
 
 		void PlacesListService::addHouse(
-				HouseMapType* const* houseMap,
+				HouseMapType& houseMap,
 				const boost::shared_ptr<House> house,
 				string name
 			) const {
 
 			int distanceToOriginPoint = CalcDistanceToOriginPoint(house);
 			SortHouseByDistanceToOriginPoint keyHouse(house, distanceToOriginPoint, name);
-			(*houseMap)->insert(pair<const SortHouseByDistanceToOriginPoint,const boost::shared_ptr<House> >(keyHouse,house));
+			houseMap.insert(pair<const SortHouseByDistanceToOriginPoint,const boost::shared_ptr<House> >(keyHouse,house));
 		}
 
 		void PlacesListService::_parseCoordinates(bool invertXY) {

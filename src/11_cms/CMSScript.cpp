@@ -174,13 +174,15 @@ namespace synthese
 		){
 			_nodes.clear();
 
+			std::string::const_iterator beginning(it);
+			bool terminationFound(false);
 			string currentText;
 
 			while(it != end)
 			{
 				// Ignore white chars
 				if(	_ignoreWhiteChars &&
-					(*it == ' ' || *it == '\r' || *it == '\n')
+					(*it == ' ' || *it == '\r' || *it == '\n' || *it == '\t')
 				){
 					++it;
 					continue;
@@ -210,7 +212,7 @@ namespace synthese
 
 					// Parsing service node
 					boost::shared_ptr<ServiceExpression> node(
-						new ServiceExpression(it, end)
+						new ServiceExpression(it, end, _ignoreWhiteChars)
 					);
 
 					if(node->getFunctionCreator())
@@ -519,6 +521,7 @@ namespace synthese
 					}
 					if(terminated)
 					{
+						terminationFound = true;
 						break;
 					}
 
@@ -535,6 +538,17 @@ namespace synthese
 						new ConstantExpression(currentText)
 				)	);
 				currentText.clear();
+			}
+
+			if(!termination.empty() && !terminationFound)
+			{
+				string message("CMS parsing error : a block beginning by ");
+				for(size_t i(0); i<20 && beginning != end; ++i, ++beginning)
+				{
+					message.push_back(*beginning);
+				}
+				message += " was never terminated by "+ *termination.begin();
+				Log::GetInstance().warn(message);
 			}
 		}
 

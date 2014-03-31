@@ -25,10 +25,11 @@
 #include "CityTableSync.h"
 #include "CrossingTableSync.hpp"
 #include "Import.hpp"
-#include "MainRoadPart.hpp"
 #include "PublicPlaceEntranceTableSync.hpp"
 #include "PublicPlaceTableSync.h"
+#include "RoadChunkEdge.hpp"
 #include "RoadChunkTableSync.h"
+#include "RoadPath.hpp"
 #include "RoadPlaceTableSync.h"
 #include "RoadTableSync.h"
 
@@ -231,44 +232,40 @@ namespace synthese
 
 
 
-		MainRoadChunk* RoadFileFormat::_addRoadChunk(
+		RoadChunk* RoadFileFormat::_addRoadChunk(
 			RoadPlace& roadPlace,
 			Crossing& startNode,
 			Crossing& endNode,
 			boost::shared_ptr<geos::geom::LineString> geometry,
-			MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-			MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
-			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds,
-			Road::RoadType roadType
+			HouseNumberingPolicy rightHouseNumberingPolicy,
+			HouseNumberingPolicy leftHouseNumberingPolicy,
+			HouseNumberBounds rightHouseNumberBounds,
+			HouseNumberBounds leftHouseNumberBounds,
+			RoadType roadType
 		) const {
 			// Declarations
-			MainRoadChunk* result(NULL);
+			RoadChunk* result(NULL);
 
 			// Length
 			double length(geometry->getLength());
 
 			// Search for an existing road which ends at the left node
-			MainRoadPart* road(NULL);
+			Road* road(NULL);
 			double startMetricOffset(0);
-			BOOST_FOREACH(Path* croad, roadPlace.getPaths())
+			BOOST_FOREACH(Road* croad, roadPlace.getRoads())
 			{
-				if(!dynamic_cast<MainRoadPart*>(croad))
+				if(croad->getForwardPath().getLastEdge()->getFromVertex() == &startNode)
 				{
-					continue;
-				}
-				if(croad->getLastEdge()->getFromVertex() == &startNode)
-				{
-					road = static_cast<MainRoadPart*>(croad);
-					startMetricOffset = croad->getLastEdge()->getMetricOffset();
+					road = croad;
+					startMetricOffset = croad->getForwardPath().getLastEdge()->getMetricOffset();
 					break;
 				}
 			}
 			if(road)
 			{
-				result = static_cast<MainRoadChunk*>(
-					road->getLastEdge()
-				);
+				result = static_cast<RoadChunkEdge*>(
+					road->getForwardPath().getLastEdge()
+				)->getRoadChunk();
 
 				// Adding geometry to the last chunk
 				_setGeometryAndHouses(
@@ -281,51 +278,43 @@ namespace synthese
 				);
 
 				// Second road chunk creation
-				boost::shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
+				boost::shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
 				secondRoadChunk->setRoad(road);
 				secondRoadChunk->setFromCrossing(&endNode);
-				secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
+				secondRoadChunk->setRankInPath((*(road->getForwardPath().getEdges().end()-1))->getRankInPath() + 1);
 				secondRoadChunk->setMetricOffset(startMetricOffset + length);
 				secondRoadChunk->setKey(RoadChunkTableSync::getId());
-				road->addRoadChunk(*secondRoadChunk);
-				_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
+				secondRoadChunk->link(_env);
+				_env.getEditableRegistry<RoadChunk>().add(secondRoadChunk);
 
 				// Search for a second existing road which starts at the right node
-				MainRoadPart* road2 = NULL;
-				BOOST_FOREACH(Path* croad, roadPlace.getPaths())
+				Road* road2 = NULL;
+				BOOST_FOREACH(Road* croad, roadPlace.getRoads())
 				{
-					if(!dynamic_cast<MainRoadPart*>(croad))
-					{
-						continue;
-					}
-					if(	croad->getEdge(0)->getFromVertex() == &endNode &&
+					if(	croad->getForwardPath().getEdge(0)->getFromVertex() == &endNode &&
 						croad != road
 					){
-						road2 = static_cast<MainRoadPart*>(croad);
+						road2 = croad;
 						break;
 					}
 				}
 				// If found, merge the two roads
 				if(road2)
 				{
-					RegistryKeyType lastEdgeId(road->getLastEdge()->getKey());
+					RegistryKeyType lastEdgeId(road->getForwardPath().getLastEdge()->getKey());
 					road->merge(*road2);
-					_env.getEditableRegistry<MainRoadChunk>().remove(lastEdgeId);
-					_env.getEditableRegistry<MainRoadPart>().remove(road2->getKey());
+					_env.getEditableRegistry<RoadChunk>().remove(lastEdgeId);
+					_env.getEditableRegistry<Road>().remove(road2->getKey());
 				}
 			}
 			else
 			{
 				// If not found search for an existing road which begins at the right node
-				BOOST_FOREACH(Path* croad, roadPlace.getPaths())
+				BOOST_FOREACH(Road* croad, roadPlace.getRoads())
 				{
-					if(!dynamic_cast<MainRoadPart*>(croad))
+					if(croad->getForwardPath().getEdge(0)->getFromVertex() == &endNode)
 					{
-						continue;
-					}
-					if(croad->getEdge(0)->getFromVertex() == &endNode)
-					{
-						road = static_cast<MainRoadPart*>(croad);
+						road = croad;
 						break;
 					}
 				}
@@ -333,7 +322,7 @@ namespace synthese
 				if(road)
 				{
 					// First road chunk creation
-					boost::shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
+					boost::shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
 					firstRoadChunk->setRoad(road);
 					firstRoadChunk->setFromCrossing(&startNode);
 					firstRoadChunk->setRankInPath(0);
@@ -350,23 +339,23 @@ namespace synthese
 					);
 					result = firstRoadChunk.get();
 
-					_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
+					_env.getEditableRegistry<RoadChunk>().add(firstRoadChunk);
 				}
 				else
 				{
-					boost::shared_ptr<MainRoadPart> road(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
-					road->setRoadPlace(roadPlace);
-					road->setKey(RoadTableSync::getId());
-					_env.getEditableRegistry<MainRoadPart>().add(road);
+					boost::shared_ptr<Road> roadsp(new Road(0, ROAD_TYPE_UNKNOWN));
+					roadsp->set<RoadPlace>(roadPlace);
+					roadsp->set<Key>(RoadTableSync::getId());
+					_env.getEditableRegistry<Road>().add(roadsp);
 
 					// First road chunk
-					boost::shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
-					firstRoadChunk->setRoad(road.get());
+					boost::shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
+					firstRoadChunk->setRoad(roadsp.get());
 					firstRoadChunk->setFromCrossing(&startNode);
 					firstRoadChunk->setRankInPath(0);
 					firstRoadChunk->setMetricOffset(0);
 					firstRoadChunk->setKey(RoadChunkTableSync::getId());
-					road->addRoadChunk(*firstRoadChunk);
+					firstRoadChunk->link(_env);
 					_setGeometryAndHouses(
 						*firstRoadChunk,
 						geometry,
@@ -377,17 +366,17 @@ namespace synthese
 					);
 					result = firstRoadChunk.get();
 
-					_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
+					_env.getEditableRegistry<RoadChunk>().add(firstRoadChunk);
 
 					// Second road chunk
-					boost::shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
-					secondRoadChunk->setRoad(road.get());
+					boost::shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
+					secondRoadChunk->setRoad(roadsp.get());
 					secondRoadChunk->setFromCrossing(&endNode);
 					secondRoadChunk->setRankInPath(1);
 					secondRoadChunk->setMetricOffset(length);
 					secondRoadChunk->setKey(RoadChunkTableSync::getId());
-					road->addRoadChunk(*secondRoadChunk);
-					_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
+					secondRoadChunk->link(_env);
+					_env.getEditableRegistry<RoadChunk>().add(secondRoadChunk);
 				}
 			}
 
@@ -397,12 +386,12 @@ namespace synthese
 
 
 		void RoadFileFormat::_setGeometryAndHouses(
-			MainRoadChunk& chunk,
+			RoadChunk& chunk,
 			boost::shared_ptr<geos::geom::LineString> geometry,
-			MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-			MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
-			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds
+			HouseNumberingPolicy rightHouseNumberingPolicy,
+			HouseNumberingPolicy leftHouseNumberingPolicy,
+			HouseNumberBounds rightHouseNumberBounds,
+			HouseNumberBounds leftHouseNumberBounds
 		){
 			chunk.setGeometry(geometry);
 			chunk.setRightHouseNumberBounds(rightHouseNumberBounds);
@@ -418,8 +407,8 @@ namespace synthese
 			const std::string& code,
 			boost::optional<const std::string&> name,
 			MetricOffset metricOffset,
-			boost::optional<MainRoadChunk::HouseNumber> number,
-			MainRoadChunk& roadChunk,
+			boost::optional<HouseNumber> number,
+			RoadChunk& roadChunk,
 			PublicPlace& publicPlace
 		) const {
 			PublicPlaceEntrance* publicPlaceEntrance(NULL);

@@ -48,7 +48,8 @@ namespace synthese
 				const boost::posix_time::ptime& startDateTime,
 				const boost::posix_time::ptime& endDateTime,
 				bool allowCanceled,
-				boost::optional<std::size_t> maxSize = boost::optional<std::size_t>()
+				boost::optional<std::size_t> maxSize = boost::optional<std::size_t>(),
+				bool endDateTimeConcernsTheorical = false
 			);
 
 			const ArrivalDepartureList& generate();

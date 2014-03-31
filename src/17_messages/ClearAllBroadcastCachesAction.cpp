@@ -25,6 +25,7 @@
 #include "ClearAllBroadcastCachesAction.hpp"
 
 #include "ActionException.h"
+#include "MessagesModule.h"
 #include "ParametersMap.h"
 #include "Request.h"
 #include "SentAlarm.h"
@@ -59,18 +60,7 @@ namespace synthese
 		void ClearAllBroadcastCachesAction::run(
 			Request& request
 		){
-			BOOST_FOREACH(const Alarm::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<Alarm>())
-			{
-				// Jump over scenarios
-				SentAlarm* alarm(dynamic_cast<SentAlarm*>(it.second.get()));
-				if(!alarm)
-				{
-					continue;
-				}
-
-				// Clear the cache
-				alarm->clearBroadcastPointsCache();
-			}
+			MessagesModule::ClearAllBroadcastCaches();
 		}
 		
 		

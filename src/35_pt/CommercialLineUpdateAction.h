@@ -73,6 +73,7 @@ namespace synthese
 			static const std::string PARAMETER_SHORT_NAME;
 			static const std::string PARAMETER_LONG_NAME;
 			static const std::string PARAMETER_COLOR;
+			static const std::string PARAMETER_FOREGROUND_COLOR;
 			static const std::string PARAMETER_STYLE;
 			static const std::string PARAMETER_IMAGE;
 			static const std::string PARAMETER_NETWORK_ID;
@@ -81,13 +82,15 @@ namespace synthese
 			static const std::string PARAMETER_DOC_URL;
 			static const std::string PARAMETER_TIMETABLE_ID;
 			static const std::string PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
+			static const std::string PARAMETER_WEIGHT_FOR_SORTING;
 
 		private:
 			boost::shared_ptr<pt::CommercialLine> _line;
 			boost::optional<std::string>	_name;		//!< Name (code)
 			boost::optional<std::string>	_shortName;	//!< Name (cartouche)
 			boost::optional<std::string>	_longName;	//!< Name for schedule card
-			boost::optional<boost::optional<util::RGBColor> >		_color;		//!< JourneyPattern color
+			boost::optional<boost::optional<util::RGBColor> >		_color;		//!< CommercialLine color
+			boost::optional<boost::optional<util::RGBColor> >		_fgColor;		//!< CommercialLine foreground color
 			boost::optional<std::string>			_style;		//!< CSS style (cartouche)
 			boost::optional<std::string>			_image;		//!< Display image (cartouche)
 			boost::optional<boost::shared_ptr<TransportNetwork> >	_network;	//!< Network
@@ -97,6 +100,7 @@ namespace synthese
 			boost::optional<std::string> _docURL;
 			boost::optional<util::RegistryKeyType> _timetableId;
 			boost::optional<boost::posix_time::time_duration> _displayDurationBeforeFirstDeparture;
+			boost::optional<int> _weightForSorting;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

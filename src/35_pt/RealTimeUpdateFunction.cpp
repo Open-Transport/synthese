@@ -27,7 +27,7 @@
 #include "TransportNetworkRight.h"
 #include "RealTimeUpdateFunction.h"
 #include "StopArea.hpp"
-#include "LinePhysicalStop.hpp"
+#include "LineStop.h"
 #include "ScheduledService.h"
 #include "Interface.h"
 #include "JourneyPattern.hpp"
@@ -186,9 +186,9 @@ namespace synthese
 			ParametersMap pm(getTemplateParameters());
 
 			// Current location
-			if(dynamic_cast<const LinePhysicalStop*>(&lineStop))
+			if(lineStop.get<LineNode>() && dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>()))
 			{
-				dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace()->toParametersMap(
+				dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>())->getConnectionPlace()->toParametersMap(
 					pm,
 					NULL,
 					DATA_LOCATION_
@@ -196,51 +196,51 @@ namespace synthese
 			}
 
 			// Destination
-			lineStop.getLine()->getDestination()->getConnectionPlace()->toParametersMap(
+			lineStop.get<Line>()->getDestination()->getConnectionPlace()->toParametersMap(
 				pm,
 				NULL,
 				DATA_DESTINATION_
 			);
 
 			// Line
-			lineStop.getLine()->getCommercialLine()->toParametersMap(pm, true);
+			lineStop.get<Line>()->getCommercialLine()->toParametersMap(pm, true);
 
 			// service_number
 			pm.insert(DATA_SERVICE_NUMBER, service.getServiceNumber());
 
 			// realtime_quay_name
-			pm.insert(DATA_REALTIME_QUAY, static_cast<const StopPoint*>(service.getRealTimeVertex(lineStop.getRankInPath()))->getName());
+			pm.insert(DATA_REALTIME_QUAY, static_cast<const StopPoint*>(service.getRealTimeVertex(lineStop.get<RankInPath>()))->getName());
 
 			// transport_mode_id
-			if(lineStop.getLine()->getRollingStock())
+			if(lineStop.get<Line>()->getRollingStock())
 			{
-				pm.insert(DATA_TRANSPORT_MODE_ID, lineStop.getLine()->getRollingStock()->getKey());
+				pm.insert(DATA_TRANSPORT_MODE_ID, lineStop.get<Line>()->getRollingStock()->getKey());
 			}
 
 			// planned_schedule
 			{
 				stringstream s;
-				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())).minutes();
+				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.get<RankInPath>())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.get<RankInPath>())).minutes();
 				pm.insert(DATA_PLANNED_SCHEDULE, s.str());
 			}
 
 			// realtime_schedule
 			{
 				stringstream s;
-				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())).minutes();
+				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.get<RankInPath>())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.get<RankInPath>())).minutes();
 				pm.insert(DATA_REALTIME_SCHEDULE, s.str());
 			}
 
 			// delay
 			pm.insert(
 				DATA_DELAY,
-				(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath())).total_seconds() / 60
+				(service.getDepartureSchedule(true, lineStop.get<RankInPath>()) - service.getDepartureSchedule(false, lineStop.get<RankInPath>())).total_seconds() / 60
 			);
 
 			// delay_update_url
 			StaticActionFunctionRequest<ScheduleRealTimeUpdateAction,WebPageDisplayFunction> scheduleUpdateRequest(request, true);
 			scheduleUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
-			scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+			scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.get<RankInPath>());
 			scheduleUpdateRequest.getAction()->setAtArrival(false);
 			scheduleUpdateRequest.getAction()->setAtDeparture(true);
 			scheduleUpdateRequest.getAction()->setPropagateConstantly(true);
@@ -253,7 +253,7 @@ namespace synthese
 			// quay_update_url
 			StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,WebPageDisplayFunction> vertexUpdateRequest(request, true);
 			vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getEditableSPtr(const_cast<ScheduledService*>(&service)));
-			vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+			vertexUpdateRequest.getAction()->setLineStopRank(lineStop.get<RankInPath>());
 			pm.insert(
 				DATA_QUAY_UPDATE_URL,
 				vertexUpdateRequest.getURL() + URI::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + URI::PARAMETER_ASSIGNMENT

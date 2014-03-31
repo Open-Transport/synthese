@@ -305,7 +305,7 @@ namespace synthese
 			}
 		};
 	
-		#define FIELD_DATASOURCE_LINKS(N) struct N : public DataSourceLinksField<N> {};
+		#define FIELD_DATASOURCE_LINKS(N) struct N : public impex::DataSourceLinksField<N> {};
 	
 		FIELD_DATASOURCE_LINKS(DataSourceLinks)
 }	}

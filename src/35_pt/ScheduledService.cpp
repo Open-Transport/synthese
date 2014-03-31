@@ -74,7 +74,9 @@ namespace synthese
 
 
 		ScheduledService::~ScheduledService ()
-		{}
+		{
+			unlink();
+		}
 
 
 
@@ -95,7 +97,8 @@ namespace synthese
 			bool checkIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation,
-			bool allowCanceled
+			bool allowCanceled,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		) const {
 
 			// Check of access parameters
@@ -119,20 +122,27 @@ namespace synthese
 				return ServicePointer();
 			}
 
+			// Force the use of theorical schedule if date is after today
+			//  - RT data is only available today !
+			//  - day finishes at (day+1,03:00)
+			bool forceTheorical(presenceDateTime.date() > day_clock::local_day());
+			forceTheorical &= presenceDateTime.time_of_day().hours() > 3;
+			forceTheorical |= presenceDateTime.date() > day_clock::local_day() + days(1);
+
 			// Actual time
 			const time_duration& thSchedule(getDeparture ? getDepartureSchedule(false, edgeIndex) : getArrivalSchedule(false, edgeIndex));
 			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
-			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
+			const time_duration& schedule((RTData && !forceTheorical) ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
-			if(	(getDeparture && presenceDateTime.time_of_day() > timeOfDay) ||
-				(!getDeparture && presenceDateTime.time_of_day() < timeOfDay)
+			if(	(getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) > schedule)) ||
+				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) < schedule))
 			){
 				return ServicePointer();
 			}
 
 			// Initializations
 			const time_duration& departureSchedule(getDepartureSchedule(RTData, 0));
-			ptime actualTime(presenceDateTime.date(), timeOfDay);
+			ptime actualTime(presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), schedule);
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
 
@@ -157,7 +167,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule))
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
 					);
 				}
 				else
@@ -165,7 +175,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
@@ -177,7 +187,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule))
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
 					);
 				}
 				else
@@ -185,7 +195,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
@@ -193,7 +203,7 @@ namespace synthese
 
 			// Reservation check
 			if(	checkIfTheServiceIsReachable &&
-				ptr.isUseRuleCompliant(ignoreReservation) == UseRule::RUN_NOT_POSSIBLE
+				ptr.isUseRuleCompliant(ignoreReservation, reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE
 			){
 				return ServicePointer();
 			}
@@ -208,6 +218,10 @@ namespace synthese
 			const Edge& edge,
 			const AccessParameters&
 		) const	{
+
+			// Lock the vertices and the schedules
+			recursive_mutex::scoped_lock lock1(getVerticesMutex());
+			recursive_mutex::scoped_lock lock2(getSchedulesMutex());
 
 			size_t edgeIndex(edge.getRankInPath());
 			if(servicePointer.getArrivalEdge() == NULL)
@@ -248,15 +262,21 @@ namespace synthese
 
 		time_duration ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(rankInPath == 0 && !RTData)
 			{
 				return getDataDepartureSchedules()[0];
 			}
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
+
+
 
 		time_duration ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+
 			if(rankInPath == 0 && !RTData)
 			{
 				return getDataDepartureSchedules()[0];
@@ -264,13 +284,19 @@ namespace synthese
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
+
+
 		time_duration ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
+
+
 		time_duration ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
@@ -280,6 +306,8 @@ namespace synthese
 		{
 			_team = team;
 		}
+
+
 
 		std::string ScheduledService::getTeam() const
 		{
@@ -637,14 +665,7 @@ namespace synthese
 				)	);
 				if(dsl != getDataSourceLinks())	
 				{
-					if(&env == &Env::GetOfficialEnv())
-					{
 						setDataSourceLinksWithRegistration(dsl);
-					}
-					else
-					{
-						setDataSourceLinksWithoutRegistration(dsl);
-					}
 					result = true;
 				}
 			}
@@ -763,12 +784,11 @@ namespace synthese
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Registration in path
-			if( getPath() &&
-				getPath()->getPathGroup())
+			if( getPath())
 			{
 				getPath()->addService(
 					*this,
-					&env == &Env::GetOfficialEnv()
+					true
 				);
 				updatePathCalendar();
 			}
@@ -782,13 +802,23 @@ namespace synthese
 					getRoute()->getCommercialLine()->registerService(*this);
 			}	}
 
-			if(&env == &Env::GetOfficialEnv())
-			{
-				setDataSourceLinksWithRegistration(getDataSourceLinks());
-			}
-
 			// Clear cache in case of non detected change in external objects (like path edges number)
 			_clearGeneratedSchedules();
 		}
-	}
-}
+
+
+
+		void ScheduledService::unlink()
+		{
+			if(getPath())
+			{
+				getPath()->removeService(*this);
+			}
+
+			// Unregister from the line
+			if(getRoute() && getRoute()->getCommercialLine())
+			{
+				getRoute()->getCommercialLine()->unregisterService(*this);
+			}
+		}
+}	}

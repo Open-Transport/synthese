@@ -47,6 +47,7 @@ namespace synthese
 			static const std::string ATTR_VERSION;
 			static const std::string ATTR_REVISION;
 			static const std::string ATTR_BUILD_DATE;
+			static const std::string ATTR_BRANCH;
 			
 		protected:
 			//! \name Page parameters

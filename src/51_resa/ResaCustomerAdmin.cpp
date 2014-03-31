@@ -43,6 +43,7 @@
 
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
+#include "DBLogHTMLView.h"
 
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -51,6 +52,7 @@
 #include "UserTableSync.h"
 #include "ReservationUserUpdateAction.h"
 #include "SendPasswordAction.h"
+#include "ResaCustomerMergeAdmin.hpp"
 #include "SecurityModule.h"
 
 #include <boost/foreach.hpp>
@@ -84,6 +86,12 @@ namespace synthese
 		const string ResaCustomerAdmin::TAB_PROPERTIES("properties");
 		const string ResaCustomerAdmin::TAB_PARAMETERS("parameters");
 		const string ResaCustomerAdmin::TAB_LOG("log");
+		const string ResaCustomerAdmin::TAB_RESERVATIONS("reservations");
+		const string ResaCustomerAdmin::TAB_CANCELS("cancels");
+		const string ResaCustomerAdmin::TAB_CANCELS_DEADLINE("cancels_deadline");
+		const string ResaCustomerAdmin::TAB_ABSENCES("absences");
+
+
 
 		ResaCustomerAdmin::ResaCustomerAdmin(
 		): AdminInterfaceElementTemplate<ResaCustomerAdmin>(),
@@ -123,13 +131,14 @@ namespace synthese
 		}
 
 
+
 		void ResaCustomerAdmin::display(
 			ostream& stream,
 			const server::Request& _request
-		) const	{
+		) const {
 
 			////////////////////////////////////////////////////////////////////
-			// LOG TAB
+			// PROPERTIES TAB
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
 
@@ -150,12 +159,17 @@ namespace synthese
 					_request
 				);
 				routeplannerRequest.getPage()->setCustomer(_user);
-
+				
+				AdminFunctionRequest<ResaCustomerMergeAdmin> mergeRequest(
+					_request
+				);
+				
 				// Display
 				stream << "<h1>Liens</h1>";
 				stream << "<p>";
 				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", "/admin/img/" + ReservationRoutePlannerAdmin::ICON);
 				stream << "</p>";
+				stream << "<p>" << HTMLModule::getLinkButton(mergeRequest.getURL(), "Fusionner l'utilisateur", string(), "/admin/img/user.png") << "</p>";
 
 				stream << "<h1>Coordonnées</h1>";
 
@@ -176,7 +190,16 @@ namespace synthese
 				stream << t.cell("Ville", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_CITY, _user->getCityText()));
 				stream << t.cell("Téléphone",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
+				
+				if (_user->getCreatorId() != 0)
+				{
+					boost::shared_ptr<const User> creator = UserTableSync::Get(_user->getCreatorId(), Env::GetOfficialEnv());
+					stream << t.cell("Créateur", creator != NULL ? creator->getLogin() : "Inconnu");
+				}
+				else
+					stream << t.cell("Créateur", "Inconnu");
 
+				stream << t.cell("Date de création", to_iso_extended_string(_user->getCreationDate()) != "not-a-date-time" ? to_iso_extended_string(_user->getCreationDate()) : "Inconnue");
 				stream << t.title("Droits");
 				stream << t.cell("Accès site web",t.getForm().getOuiNonRadioInput(ReservationUserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
 
@@ -199,7 +222,7 @@ namespace synthese
 
 
 			////////////////////////////////////////////////////////////////////
-			// LOG TAB
+			// PARAMETERS TAB
 			if (openTabContent(stream, TAB_PARAMETERS))
 			{
 				stream << "<h1>Trajets favoris</h1>";
@@ -216,7 +239,68 @@ namespace synthese
 					stream,
 					_request,
 					true,
-					true
+					true,
+					DBLogHTMLView::FILTER_ALL
+				);
+			}
+
+			/* RESERVATIONS TAB */
+			if (openTabContent(stream, TAB_RESERVATIONS))
+			{
+				stream << "<h1>Réservations</h1>";
+
+				// Results
+				_log.display(
+					stream,
+					_request,
+					true,
+					true,
+					DBLogHTMLView::FILTER_RESA
+				);
+			}
+
+			/* CANCELS TAB */
+			if (openTabContent(stream, TAB_CANCELS))
+			{
+				stream << "<h1>Annulations</h1>";
+
+				// Results
+				_log.display(
+					stream,
+					_request,
+					true,
+					true,
+					DBLogHTMLView::FILTER_CANCEL
+				);
+			}
+
+			/* CANCELS DEADLINE TAB */
+			if (openTabContent(stream, TAB_CANCELS_DEADLINE))
+			{
+				stream << "<h1>Annulations (hors délai)</h1>";
+				
+				// Results
+				_log.display(
+					stream,
+					_request,
+					true,
+					true,
+					DBLogHTMLView::FILTER_CANC_D
+				);
+			}
+
+			/* ABSENCES TAB */
+			if (openTabContent(stream, TAB_ABSENCES))
+			{
+				stream << "<h1>Absences</h1>";
+
+				// Results
+				_log.display(
+					stream,
+					_request,
+					true,
+					true,
+					DBLogHTMLView::FILTER_ABS
 				);
 			}
 
@@ -246,9 +330,51 @@ namespace synthese
 			_tabs.clear();
 			bool writeRight(profile.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "/admin/img/user.png"));
-			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "/admin/img/cog.png"));
-			_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "/admin/img/book.png"));
+			/* Count each entry type occurrence in database in order to print them in tab names */
+			DBLogEntryTableSync::SearchResult entries = DBLogEntryTableSync::SearchByUser(
+				*_env, _user->getKey() 
+			);
+
+			int resa = 0, abs = 0, cancel = 0, cancel_d = 0;
+
+			BOOST_FOREACH(const boost::shared_ptr<DBLogEntry>& dbe, entries)
+			{
+				try {
+					const DBLogEntry::Content& content(dbe->getContent());
+					const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
+					const string entryText(lexical_cast<string>(content[1]));
+
+					switch(entryType)
+					{
+						case ResaDBLog::RESERVATION_ENTRY:
+							if (!entryText.empty())
+								resa++;
+							break;
+						case ResaDBLog::CANCELLATION_ENTRY:
+							cancel++;
+							break;
+						case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
+							cancel_d++;
+							break;
+						case ResaDBLog::NO_SHOW_ENTRY:
+							abs++;
+							break;
+						default:
+							continue;
+					}
+				}
+				catch(bad_lexical_cast)
+				{
+				}
+			}
+
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "user.png"));
+			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "cog.png"));
+			_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
+			_tabs.push_back(Tab("Réservations ("+lexical_cast<string>(resa)+")", TAB_RESERVATIONS, writeRight, "resa_compulsory.png"));
+			_tabs.push_back(Tab("Annulations ("+lexical_cast<string>(cancel)+")", TAB_CANCELS, writeRight, "cross.png"));
+			_tabs.push_back(Tab("Annulations (hors délai) ("+lexical_cast<string>(cancel_d)+")", TAB_CANCELS_DEADLINE, writeRight, "asterisk_red.png"));
+			_tabs.push_back(Tab("Absences ("+lexical_cast<string>(abs)+")", TAB_ABSENCES, writeRight, "user_cross.png"));
 
 			_tabBuilded = true;
 		}

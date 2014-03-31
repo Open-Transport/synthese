@@ -25,6 +25,7 @@
 #include "BestVertexReachesMap.h"
 #include "JourneysResult.h"
 #include "Junction.hpp"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "VertexAccessMap.h"
 #include "Vertex.h"
@@ -38,8 +39,6 @@
 #include "Service.h"
 #include "Log.h"
 #include "Crossing.h"
-#include "ReverseRoadPart.hpp"
-#include "ReverseRoadChunk.hpp"
 #include "Junction.hpp"
 #include "StopPoint.hpp"
 
@@ -86,7 +85,8 @@ namespace synthese
 			int totalDistance,
 			boost::optional<const JourneyTemplates&> journeyTemplates,
 			bool enableTheoretical,
-			bool enableRealTime
+			bool enableRealTime,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	_accessParameters(accessParameters),
 			_accessDirection(accessDirection),
 			_whatToSearch(whatToSearch),
@@ -105,6 +105,7 @@ namespace synthese
 			_ignoreReservation(ignoreReservation),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
+			_reservationRulesDelayType(reservationRulesDelayType),
 			_destinationVam(destinationVam),
 			_totalDistance(totalDistance),
 			_journeyTemplates(journeyTemplates)
@@ -309,20 +310,14 @@ namespace synthese
 								const Crossing* originCrossing = static_cast<const Crossing*>(origin);
 								if(originCrossing && !currentJourney.getServiceUses().empty())
 								{
-									const Road* from = static_cast<const Road*>(currentJourney.getEndEdge().getParentPath());
-									const Road* to = static_cast<const Road*>(&path);
+									const RoadPath* from = static_cast<const RoadPath*>(currentJourney.getEndEdge().getParentPath());
+									const RoadPath* to = static_cast<const RoadPath*>(&path);
 
-									if(from->isReversed())
-										from = static_cast<const ReverseRoadPart*>(from)->getMainRoad();
-
-									if(to->isReversed())
-										to = static_cast<const ReverseRoadPart*>(to)->getMainRoad();
-
-									if((_accessDirection == DEPARTURE_TO_ARRIVAL) && originCrossing->isNonReachableRoad(from, to))
+									if((_accessDirection == DEPARTURE_TO_ARRIVAL) && originCrossing->isNonReachableRoad(from->getRoad(), to->getRoad()))
 									{
 										continue;
 									}
-									else if((_accessDirection == ARRIVAL_TO_DEPARTURE) && originCrossing->isNonReachableRoad(to, from))
+									else if((_accessDirection == ARRIVAL_TO_DEPARTURE) && originCrossing->isNonReachableRoad(to->getRoad(), from->getRoad()))
 									{
 										continue;
 									}
@@ -377,11 +372,6 @@ namespace synthese
 								(&Edge::getPreviousConnectionDeparture)
 						)	);
 
-						// Loop on services
-						optional<Edge::DepartureServiceIndex::Value> departureServiceNumber;
-						optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
-						set<const Edge*> nonServedEdges;
-						ptime departureMoment(correctedDesiredTime);
 						// If path is a junction, we verify that the origin vertex is the same
 						const Junction* junction(dynamic_cast<const Junction*> (&path));
 						if (junction != NULL)
@@ -389,14 +379,36 @@ namespace synthese
 							if (!currentJourney.empty() &&
 								origin->getKey() != currentJourney.getEndEdge().getFromVertex()->getKey())
 								continue;
+							// Junction should not follow a road path (it may exist a road approach to do the same, junction should always follow PT path)
+							if (!currentJourney.empty() &&
+								dynamic_cast<const RoadPath*>(currentJourney.getEndEdge().getParentPath()))
+								continue;
 						}
 						if(!currentJourney.empty())
 						{
 							const Junction* currentJunction(dynamic_cast<const Junction*>(currentJourney.getEndEdge().getParentPath()));
 							if(currentJunction != NULL &&
-								((_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey() != origin->getKey()))
+								(((_accessDirection == DEPARTURE_TO_ARRIVAL) ? currentJunction->getEnd()->getKey() : currentJunction->getStart()->getKey()) != origin->getKey()))
 								continue;
 						}
+						const RoadPath* roadApproach(dynamic_cast<const RoadPath*> (&path));
+						if (roadApproach != NULL && !currentJourney.empty())
+						{
+							// Junction should not follow a road path (it may exist a road approach to do the same, junction should always follow PT path)
+							const Junction* currentJunction(dynamic_cast<const Junction*>(currentJourney.getEndEdge().getParentPath()));
+							if(currentJunction != NULL)
+								continue;
+						}
+
+						// Loop on services collections
+						BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path.getServiceCollections())
+						{
+							set<const Edge*> nonServedEdges;
+							optional<Edge::DepartureServiceIndex::Value> departureServiceNumber;
+							optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
+							ptime departureMoment(correctedDesiredTime);
+
+							// Loop on services
 						while(true)
 						{
 							this_thread::interruption_point();
@@ -405,6 +417,7 @@ namespace synthese
 							ServicePointer serviceInstance(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
 								edge.getNextService(
+										*itCollection,
 									_accessParameters,
 									departureMoment,
 									correctedMinMaxDateTimeAtOrigin,
@@ -414,9 +427,11 @@ namespace synthese
 									_ignoreReservation,
 									false, // allowCanceledService
 									_enableTheoretical,
-									_enableRealTime
+									_enableRealTime,
+									_reservationRulesDelayType
 								):
 								edge.getPreviousService(
+										*itCollection,
 									_accessParameters,
 									departureMoment,
 									correctedMinMaxDateTimeAtOrigin,
@@ -426,7 +441,8 @@ namespace synthese
 									_ignoreReservation,
 									false, // allowCanceledService
 									_enableTheoretical,
-									_enableRealTime
+									_enableRealTime,
+									_reservationRulesDelayType
 							)	);
 
 							// If no service, advance to the next edge
@@ -519,7 +535,7 @@ namespace synthese
 
 								// Storage of the useful solution
 								ServicePointer serviceUse(serviceInstance, *curEdge, _accessParameters);
-								if (serviceUse.isUseRuleCompliant(_ignoreReservation) == UseRule::RUN_NOT_POSSIBLE)
+								if (serviceUse.isUseRuleCompliant(_ignoreReservation, _reservationRulesDelayType) == UseRule::RUN_NOT_POSSIBLE)
 								{
 									nonServedEdges.insert(curEdge);
 									continue;
@@ -628,6 +644,7 @@ sqrt(
 							if(nonServedEdges.empty())
 								break;
 						} // next service
+						} // next service collection
 					} // next departure edge
 				} // next vertex in vam
 			} // Next place to explore (todo)

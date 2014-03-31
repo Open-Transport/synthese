@@ -52,7 +52,8 @@ namespace synthese
 			static const MimeType TEXT;
 			static const MimeType XML;
 			static const MimeType TTF;
-			
+			static const MimeType NONE;
+
 			static const MimeType& GetMimeTypeByExtension(
 				const std::string& extension
 			); 

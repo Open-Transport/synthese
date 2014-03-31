@@ -29,6 +29,7 @@
 #include "CommercialLine.h"
 #include "VehicleTableSync.hpp"
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -49,6 +50,7 @@ namespace synthese
 		const string GetVehiclesService::PARAMETER_LINE_ID("li");
 
 		const string GetVehiclesService::DATA_RANK = "rank";
+		const string GetVehiclesService::TAG_VEHICLE = "vehicle";
 
 		ParametersMap GetVehiclesService::_getParametersMap() const
 		{
@@ -109,35 +111,46 @@ namespace synthese
 
 
 
+		bool GetVehiclesService::_selectVehicle( const Vehicle& object ) const
+		{
+			// Line filter
+			if(_line.get())
+			{
+				AllowedLines::Type::const_iterator it(
+					object.get<AllowedLines>().find(
+						const_cast<CommercialLine*>(_line.get())
+				)	);
+				if(it == object.get<AllowedLines>().end())
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
+
 		util::ParametersMap GetVehiclesService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 
-			vector<const Vehicle*> vehicles;
+			Vehicle::Registry::ConstVector vehicles;
 
 			if(_vehicle.get())
 			{
-				vehicles.push_back(_vehicle.get());
+				vehicles.push_back(_vehicle);
 			}
 			else
 			{
-				BOOST_FOREACH(const Vehicle::Registry::value_type& vehicle, Env::GetOfficialEnv().getRegistry<Vehicle>())
-				{
-					if(_line.get())
-					{
-						Vehicle::AllowedLines::const_iterator it(vehicle.second->getAllowedLines().find(_line.get()));
-						if(it == vehicle.second->getAllowedLines().end())
-						{
-							continue;
-						}
-					}
-					vehicles.push_back(vehicle.second.get());
-				}
+				const Vehicle::Registry& registry(Env::GetOfficialEnv().getRegistry<Vehicle>());
+				vehicles = registry.getConstVector(bind(&GetVehiclesService::_selectVehicle, this, _1));
 			}
 
 			size_t rank(0);
-			BOOST_FOREACH(const Vehicle* vehicle, vehicles)
+			ParametersMap pm;
+			BOOST_FOREACH(const Vehicle::Registry::ConstVector::value_type& vehicle, vehicles)
 			{
 				if(_vehiclePage.get())
 				{
@@ -148,9 +161,15 @@ namespace synthese
 						rank++
 					);
 				}
+				else
+				{
+					boost::shared_ptr<ParametersMap> vPM(new ParametersMap);
+					vehicle->toParametersMap(*vPM, true);
+					pm.insert(TAG_VEHICLE, vPM);
+				}
 			}
 
-			return util::ParametersMap();
+			return pm;
 		}
 
 

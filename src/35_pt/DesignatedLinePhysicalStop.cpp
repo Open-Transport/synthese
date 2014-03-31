@@ -22,11 +22,8 @@
 
 #include "DesignatedLinePhysicalStop.hpp"
 
-#include "JourneyPattern.hpp"
-#include "LineStopTableSync.h"
+#include "LineStop.h"
 #include "StopPoint.hpp"
-
-#include <geos/geom/LineString.h>
 
 using namespace boost;
 using namespace std;
@@ -37,85 +34,58 @@ namespace synthese
 	
 	namespace pt
 	{
+		//////////////////////////////////////////////////////////////////////////
+		/// Constructor.
+		/// @param lineStop object of the database generating this object
+		/// @pre lineStop.get<LineNode>() is a StopPoint
 		DesignatedLinePhysicalStop::DesignatedLinePhysicalStop(
-			util::RegistryKeyType id,
-			JourneyPattern* line,
-			std::size_t rankInPath,
-			bool isDeparture,
-			bool isArrival,
-			double metricOffset,
-			StopPoint* stop,
-			bool scheduleInput,
-			bool reservationNeeded
-		):	Registrable(id),
-			LinePhysicalStop(id, line, rankInPath, isDeparture, isArrival, metricOffset, stop),
-			_scheduleInput(scheduleInput),
-			_reservationNeeded(reservationNeeded)
+			LineStop& lineStop
+		):	Registrable(0),
+			LinePhysicalStop(
+				lineStop.get<Line>() ? &*lineStop.get<Line>() : NULL,
+				lineStop.get<RankInPath>(),
+				lineStop.get<MetricOffsetField>(),
+				lineStop.get<LineNode>() ? dynamic_cast<StopPoint*>(&*lineStop.get<LineNode>()) : NULL,
+				&lineStop
+			)
 		{}
 
 
 
-		void DesignatedLinePhysicalStop::toParametersMap( util::ParametersMap& pm, bool withAdditionalParameters, boost::logic::tribool withFiles /*= boost::logic::indeterminate*/, std::string prefix /*= std::string() */ ) const
+		DesignatedLinePhysicalStop::~DesignatedLinePhysicalStop()
 		{
-			if(!getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
-			if(!getLine()) throw Exception("Linestop Save error. Missing line");
+			unlink();
+		}
 
-			pm.insert(prefix + TABLE_COL_ID, getKey());
-			pm.insert(
-				prefix + LineStopTableSync::COL_PHYSICALSTOPID,
-				getPhysicalStop()->getKey()
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_LINEID,
-				getLine()->getKey()
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_RANKINPATH,
-				getRankInPath()
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_ISDEPARTURE,
-				isDepartureAllowed()
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_ISARRIVAL,
-				isArrivalAllowed()
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_METRICOFFSET,
-				getMetricOffset()
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_SCHEDULEINPUT,
-				getScheduleInput()
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_INTERNAL_SERVICE,
-				false
-			);
-			pm.insert(
-				prefix + LineStopTableSync::COL_RESERVATION_NEEDED,
-				getReservationNeeded()
+
+
+		bool DesignatedLinePhysicalStop::isDepartureAllowed() const
+		{
+			return _lineStop->get<IsDeparture>();
+		}
+
+
+
+		bool DesignatedLinePhysicalStop::isArrivalAllowed() const
+		{
+			return _lineStop->get<IsArrival>();
+		}
+
+
+
+		boost::shared_ptr<geos::geom::LineString> DesignatedLinePhysicalStop::getRealGeometry() const
+		{
+			boost::shared_ptr<geos::geom::LineString> tmpGeom(
+				_lineStop->get<LineStringGeometry>()
 			);
 
-			if(hasGeometry())
+			if(tmpGeom && !tmpGeom->isEmpty())
 			{
-				boost::shared_ptr<geos::geom::Geometry> projected(getGeometry());
-				if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
-					static_cast<CoordinatesSystem::SRID>(getGeometry()->getSRID())
-				){
-					projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*getGeometry());
-				}
-
-				geos::io::WKTWriter writer;
-				pm.insert(
-					prefix + TABLE_COL_GEOMETRY,
-					writer.write(projected.get())
-				);
+				return tmpGeom;
 			}
 			else
 			{
-				pm.insert(prefix + TABLE_COL_GEOMETRY, string());
+				return graph::Edge::getRealGeometry();
 			}
 		}
 }	}

@@ -24,6 +24,7 @@
 
 #include "CommercialLineAdmin.h"
 
+#include "LineStop.h"
 #include "TransportNetworkAdmin.h"
 #include "PTModule.h"
 #include "User.h"
@@ -50,7 +51,6 @@
 #include "PropertiesHTMLTable.h"
 #include "ReservationContact.h"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "LineArea.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "PTRuleUserAdmin.hpp"
@@ -59,11 +59,10 @@
 #include "DataSource.h"
 #include "DataSourceAdmin.h"
 #include "RemoveObjectAction.hpp"
-// #include "TridentFileFormat.h"
+#include "TridentFileFormat.h"
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
 #include "DRTArea.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "FreeDRTAreaTableSync.hpp"
 #include "FreeDRTAreaUpdateAction.hpp"
 #include "FreeDRTAreaAdmin.hpp"
@@ -75,7 +74,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-//	using namespace data_exchange;
+	using namespace data_exchange;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -394,7 +393,7 @@ namespace synthese
 
 					stream <<
 						"<p class=\"info\">Les contrôle de dates sont désactivées par défaut.<br /><br />" <<
-						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), ICON) <<
+						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), "/admin/img/" + ICON) <<
 						"</p>"
 					;
 				}
@@ -443,7 +442,7 @@ namespace synthese
 							removeRequest.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer la règle de non concurrence avec la ligne " + rule->get<PriorityLine>()->getShortName() + " ?",
-							"lock_delete.png"
+							"/admin/img/lock_delete.png"
 						)
 					;
 				}
@@ -493,6 +492,7 @@ namespace synthese
 						_cline->getNetwork()->getSubFoldersLabels(),
 						boost::optional<util::RegistryKeyType>(_cline->_getParent()->getKey())
 				)	);
+				stream << t.cell("Poids (tri)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_WEIGHT_FOR_SORTING, boost::lexical_cast<string>(_cline->getWeightForSorting())));
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
 				stream << t.cell("Nom long (feuille de route)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_LONG_NAME, _cline->getLongName()));
@@ -501,6 +501,7 @@ namespace synthese
 				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
 				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
 				stream << t.cell("Couleur (format XML #rrggbb)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toXMLColor() : string()));
+				stream << t.cell("Couleur de police (format XML #rrggbb)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_FOREGROUND_COLOR, _cline->getFgColor() ? _cline->getFgColor()->toXMLColor() : string()));
 				stream << t.cell(
 					"Affichage avant premier départ (minutes)",
 					t.getForm().getTextInput(
@@ -544,20 +545,22 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-/*				boost::shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
-				exporter->setLine(_cline);
-
 				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
-				tridentExportFunction.getFunction()->setExporter(static_pointer_cast<Exporter, TridentFileFormat::Exporter_>(exporter));
-
+				ParametersMap pm;
+				pm.insert(Request::PARAMETER_OBJECT_ID, _cline->getKey());
+				pm.insert(ExportFunction::PARAMETER_FILE_FORMAT, TridentFileFormat::FACTORY_KEY);
+				tridentExportFunction.getFunction()->setParametersMap(pm);
+				
 				stream << "<h1>Formats Trident</h1>";
 				stream << "<p>";
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident standard", string(), "/admin/img/page_white_go.png");
 				stream << " ";
-				exporter->setWithTisseoExtension(true);
+
+				pm.insert(TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION, true);
+				tridentExportFunction.getFunction()->setParametersMap(pm);
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "/admin/img/page_white_go.png");
 				stream << "</p>";
-*/			}
+			}
 
 			////////////////////////////////////////////////////////////////////
 			// END TABS
@@ -706,6 +709,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "Arrêts"));
 			h.push_back(make_pair(string(), "Long."));
 			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/car.png", "Services")));
+			h.push_back(make_pair(string(), "Date"));
 			h.push_back(make_pair(string(), "Source"));
 			h.push_back(make_pair(string(), "Actions"));
 
@@ -744,41 +748,43 @@ namespace synthese
 				{
 					{
 						stream << t.col();
-						const DesignatedLinePhysicalStop* lineStop(
-							dynamic_cast<const DesignatedLinePhysicalStop*>(
-								*line->getEdges().begin()
-						)	);
-						if(lineStop)
+						const LineStop& lineStop(
+							**line->getLineStops().begin()
+						);
+						StopPoint* stopPoint(
+							dynamic_cast<StopPoint*>(&*lineStop.get<LineNode>())
+						);
+						DRTArea* area(
+							dynamic_cast<DRTArea*>(&*lineStop.get<LineNode>())
+						);
+						if(stopPoint)
 						{
-							stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							stream << stopPoint->getConnectionPlace()->getFullName();
 						}
-						const LineArea* lineArea(
-							dynamic_cast<const LineArea*>(
-								*line->getEdges().begin()
-						)	);
-						if(lineArea)
+						if(area)
 						{
-							stream << lineArea->getArea()->getName();
+							stream << area->getName();
 						}
 					}
 
 					{
 						stream << t.col();
-						const DesignatedLinePhysicalStop* lineStop(
-							dynamic_cast<const DesignatedLinePhysicalStop*>(
-								*line->getEdges().rbegin()
-						)	);
-						if(lineStop)
+						const LineStop& lineStop(
+							**line->getLineStops().rbegin()
+						);
+						StopPoint* stopPoint(
+							dynamic_cast<StopPoint*>(&*lineStop.get<LineNode>())
+						);
+						DRTArea* area(
+							dynamic_cast<DRTArea*>(&*lineStop.get<LineNode>())
+						);
+						if(stopPoint)
 						{
-							stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							stream << stopPoint->getConnectionPlace()->getFullName();
 						}
-						const LineArea* lineArea(
-							dynamic_cast<const LineArea*>(
-								*line->getEdges().rbegin()
-						)	);
-						if(lineArea)
+						if(area)
 						{
-							stream << lineArea->getArea()->getName();
+							stream << area->getName();
 						}
 					}
 
@@ -793,12 +799,12 @@ namespace synthese
 
 				// Services number
 				stream << t.col();
-				size_t servicesNumber(line->getServices().size());
-				BOOST_FOREACH(JourneyPatternCopy* subline, line->getSubLines())
-				{
-					servicesNumber += subline->getServices().size();
-				}
+				size_t servicesNumber(line->getAllServices().size());
 				stream << servicesNumber;
+
+				// Date
+				stream << t.col();
+				stream << to_iso_extended_string(line->getCalendarCache().getLastActiveDate());
 
 				// Datasource
 				stream << t.col();
