@@ -12,6 +12,8 @@ set(data_exchange_SRCS
   GTFSFileFormat.hpp
   GPSdFileFormat.cpp
   GPSdFileFormat.hpp
+  GPSSimuFileFormat.cpp
+  GPSSimuFileFormat.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
   HastusCSVFileFormat.cpp
