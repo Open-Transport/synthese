@@ -94,7 +94,7 @@ namespace synthese
 				);
 
 				// Load the data
-				packet.load();
+				packet.load(_idFilter.get());
 
 				// Send ACK if load did not throw exception
 				StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;

@@ -120,9 +120,9 @@ namespace synthese
 		{
 			if(canImport())
 			{
-			// Compute the time of the next auto import
-			_computeNextAutoImport();
-		}
+				// Compute the time of the next auto import
+				_computeNextAutoImport();
+			}
 			else if(isPermanentThread())
 			{
 				if(get<Active>() && (&env == &Env::GetOfficialEnv()))
@@ -199,6 +199,11 @@ namespace synthese
 		void Import::runAutoImport() const
 		{
 			ptime startTime(second_clock::local_time());
+
+			if(!_autoImporterEnv)
+			{
+				_getAutoImporter();
+			}
 
 			_autoImporterEnv->clear();
 			_autoImporter->openLogFile();

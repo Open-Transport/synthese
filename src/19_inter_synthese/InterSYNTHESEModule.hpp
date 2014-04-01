@@ -97,7 +97,6 @@ namespace synthese
 			static std::string _masterPort;
 			static bool _slaveActive;
 			static util::RegistryKeyType _slaveId;
-			static void _generateFakeImport();
 			static PackagesBySmartURL _packagesBySmartURL;
 			static bool _passiveSlaveUpdaterSelector(const InterSYNTHESESlave& object);
 
@@ -127,6 +126,7 @@ namespace synthese
 			static void QueueCleaner();
 
 			static void PassiveSlavesUpdater();
+			static void GenerateFakeImport();
 		};
 
 		/** @} */

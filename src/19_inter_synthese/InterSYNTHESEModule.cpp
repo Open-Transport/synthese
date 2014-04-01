@@ -88,6 +88,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Init()
 		{
+			InterSYNTHESEModule::GenerateFakeImport();
 		}
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
@@ -184,12 +185,11 @@ namespace synthese
 					// Log
 				}
 			}
-			_generateFakeImport();
 		}
 
 
 
-		void InterSYNTHESEModule::_generateFakeImport()
+		void InterSYNTHESEModule::GenerateFakeImport()
 		{
 			if(!_slaveActive)
 			{
@@ -225,8 +225,8 @@ namespace synthese
 				pm.insert(ConnectionImporter<InterSYNTHESEFileFormat>::PARAMETER_PORT, _masterPort);
 				pm.insert(InterSYNTHESEFileFormat::Importer_::PARAMETER_SLAVE_ID, _slaveId);
 				import->set<synthese::Parameters>(pm);
-
 				import->set<AutoImportDelay>(_syncWaitingTime);
+
 				import->link(Env::GetOfficialEnv(), true);
 				if(created)
 				{
