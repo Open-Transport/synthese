@@ -60,24 +60,6 @@ namespace synthese
 			return _send(url, data, contentType);
 		}
 
-		   boost::system::error_code read_result;
-		   async_read_until(sock, buffer, delim, boost::lambda::var(read_result) = boost::lambda::_1);
-
-		   sock.io_service().reset();
-		   while (sock.io_service().run_one())
-		   {
-			 if (read_result)
-			   timer.cancel();
-			 else if (timer_result)
-			   sock.cancel();
-		   }
-
-		   if (read_result)
-			   util::Log::GetInstance().error(
-				   "BasicClient network read error: " + string(boost::system::system_error(read_result).what())
-			   );
-		 }
-
 		string BasicClient::_send(
 			const std::string& url,
 			const std::string& postData,
