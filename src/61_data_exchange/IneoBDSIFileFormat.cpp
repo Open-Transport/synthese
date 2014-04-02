@@ -252,16 +252,6 @@ namespace synthese
 			}
 
 
-			// Scenarios
-			DataSource::LinkedObjects existingScenarios(
-				_import.get<DataSource>()->getLinkedObjects<Scenario>()
-			);
-			BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
-			{
-				_scenariosToRemove.insert(existingScenario.second->getKey());
-			}
-
-
 			//////////////////////////////////////////////////////////////////////////
 			// Pre-loading objects from BDSI
 
