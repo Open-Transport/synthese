@@ -25,7 +25,6 @@
 #include "Env.h"
 #include "FileFormat.h"
 #include "Importer.hpp"
-#include "ServerModule.h"
 
 using namespace boost;
 using namespace boost::posix_time;

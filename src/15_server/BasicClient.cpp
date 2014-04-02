@@ -13,10 +13,15 @@
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/lambda/lambda.hpp>
 
-using boost::asio::ip::tcp;
+using namespace boost::asio;
+using namespace boost::asio::ip;
 using namespace boost::asio;
 using namespace std;
+
+// Timeout in seconds after which we cancel the HTTP request
+#define CLIENT_TIMEOUT_S 15
 
 namespace synthese
 {
@@ -54,6 +59,24 @@ namespace synthese
 		) const	{
 			return _send(url, data, contentType);
 		}
+
+		   boost::system::error_code read_result;
+		   async_read_until(sock, buffer, delim, boost::lambda::var(read_result) = boost::lambda::_1);
+
+		   sock.io_service().reset();
+		   while (sock.io_service().run_one())
+		   {
+			 if (read_result)
+			   timer.cancel();
+			 else if (timer_result)
+			   sock.cancel();
+		   }
+
+		   if (read_result)
+			   util::Log::GetInstance().error(
+				   "BasicClient network read error: " + string(boost::system::system_error(read_result).what())
+			   );
+		 }
 
 		string BasicClient::_send(
 			const std::string& url,
