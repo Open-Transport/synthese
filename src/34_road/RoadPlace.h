@@ -68,6 +68,7 @@ namespace synthese
 
 
 		private:
+			mutable boost::shared_ptr<Address> _centerAddress;
 
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -83,6 +84,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
+				const boost::shared_ptr<Address> getCenterAddress() const;
 			//@}
 
 			//! @name Setters
