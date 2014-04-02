@@ -140,7 +140,7 @@ namespace synthese
 				tmpGeom = _roadChunk->getGeometry();
 			}
 
-			if(!tmpGeom->isEmpty())
+			if(tmpGeom && !tmpGeom->isEmpty())
 			{
 				return tmpGeom;
 			}
