@@ -177,7 +177,7 @@ namespace synthese
 
 		double RoadChunk::getCarSpeed(bool nominalSpeed) const
 		{
-			if(nominalSpeed)
+			if(nominalSpeed || !this->getRoad())
 			{
 				return _carSpeed;
 			}
@@ -504,10 +504,10 @@ namespace synthese
 
 			// Max speed
 			{
-				double maxSpeed = record.getDefault<double>(RoadChunkTableSync::COL_CAR_SPEED, 0);
-				if(maxSpeed != getCarSpeed())
+				double carSpeed = record.getDefault<double>(RoadChunkTableSync::COL_CAR_SPEED, 0);
+				if(carSpeed != getCarSpeed(true))
 				{
-					setCarSpeed(maxSpeed);
+					setCarSpeed(carSpeed);
 					result = true;
 				}
 			}
