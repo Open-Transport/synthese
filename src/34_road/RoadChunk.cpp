@@ -201,7 +201,14 @@ namespace synthese
 			double offset = metricOffset - _forwardEdge->getMetricOffset();
 			if(!geometry.get() || geometry->isEmpty())
 			{
-				return _crossing->getGeometry();
+				if (_crossing)
+				{
+					return _crossing->getGeometry();
+				}
+				else
+				{
+					return boost::shared_ptr<geos::geom::Point>();
+				}
 			}
 			if(offset > geometry->getLength())
 			{

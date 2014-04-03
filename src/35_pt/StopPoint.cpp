@@ -614,7 +614,8 @@ namespace synthese
 			{
 				const_cast<StopArea*>(getConnectionPlace())->addPhysicalStop(*this);
 			}
-			if(getProjectedPoint().getRoadChunk())
+			if(getProjectedPoint().getRoadChunk() &&
+				getProjectedPoint().getRoadChunk()->getFromCrossing())
 			{
 				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
 			}

@@ -198,6 +198,7 @@ namespace synthese
 		void Import::runAutoImport() const
 		{
 			ptime startTime(second_clock::local_time());
+			recursive_mutex::scoped_lock lock(_autoImportMutex);
 
 			if(!_autoImporterEnv)
 			{
@@ -205,8 +206,8 @@ namespace synthese
 			}
 
 			_autoImporterEnv->clear();
-			_autoImporter->openLogFile();
-			bool result(_autoImporter->parseFiles());
+			_getAutoImporter()->openLogFile();
+			bool result(_getAutoImporter()->parseFiles());
 			if(result)
 			{
 				DBTransaction transaction(_getAutoImporter()->save());

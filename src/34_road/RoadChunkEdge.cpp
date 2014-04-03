@@ -144,9 +144,13 @@ namespace synthese
 			{
 				return tmpGeom;
 			}
-			else
+			else if (getFromVertex())
 			{
 				return graph::Edge::getRealGeometry();
+			}
+			else
+			{
+				return boost::shared_ptr<geos::geom::LineString>();
 			}
 		}
 
