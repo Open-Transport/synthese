@@ -143,6 +143,19 @@ namespace synthese
 					throw RequestException("No such operation unit");
 				}
 			}
+			else if(decodeTableId(roid) == VehicleService::CLASS_NUMBER)
+			{
+				try
+				{
+					_vehicleService = Env::GetOfficialEnv().get<VehicleService>(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+					);
+				}
+				catch(ObjectNotFoundException<VehicleService>&)
+				{
+					throw RequestException("No such vehicle service");
+				}
+			}
 
 
 			// Base calendar
@@ -246,6 +259,14 @@ namespace synthese
 					{
 						_addServiceIfCompliant(result, *service);
 					}
+				}
+			}
+			else if (_vehicleService)
+			{
+				// Get all services of the service
+				BOOST_FOREACH(const Services::Type::value_type& service, _vehicleService->get<Services>())
+				{
+					_addServiceIfCompliant(result, *service);
 				}
 			}
 			else
