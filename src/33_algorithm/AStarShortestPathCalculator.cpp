@@ -535,12 +535,15 @@ namespace synthese
 						}
 					}
 
-					path.insert(
-						insertPosition,
-						(useReverseChunk ?
-							static_cast<RoadChunk*>(static_cast<const MainRoadChunk*>(customChunk->getNext())->getReverseRoadChunk()) :
-							static_cast<RoadChunk*>(customChunk))
-					);
+					if(resultGeometry->getLength())
+					{
+						path.insert(
+							insertPosition,
+							(useReverseChunk ?
+								static_cast<RoadChunk*>(static_cast<const MainRoadChunk*>(customChunk->getNext())->getReverseRoadChunk()) :
+								static_cast<RoadChunk*>(customChunk))
+						);
+					}
 				}
 			}
 
