@@ -43,7 +43,7 @@ namespace synthese
 			static const std::string SYNCS_SEPARATOR;
 
 			typedef std::map<
-				util::RegistryKeyType,	// id of the content
+				std::string,	// id of the content
 					std::pair<
 						std::string,		// synchronizer
 						std::string			// message
