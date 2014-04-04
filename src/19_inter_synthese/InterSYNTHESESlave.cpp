@@ -407,8 +407,8 @@ namespace synthese
 					it2++;
 					try
 					{
-						boost::shared_ptr<InterSYNTHESEQueue> q(
-							Env::GetOfficialEnv().getEditable<InterSYNTHESEQueue>(it->first)
+						InterSYNTHESEQueue* q(
+							it->second
 						);
 						if(q->getNonPersistent())
 						{
