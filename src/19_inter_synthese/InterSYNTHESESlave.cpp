@@ -146,6 +146,7 @@ namespace synthese
 				return;
 			}*/
 
+			recursive_mutex::scoped_lock lock(_queueMutex);
 			boost::shared_ptr<InterSYNTHESEQueue> q(new InterSYNTHESEQueue);
 			q->set<InterSYNTHESESlave>(*const_cast<InterSYNTHESESlave*>(this));
 			q->set<RequestTime>(now);
@@ -404,6 +405,7 @@ namespace synthese
 					}
 					// Save the next iterator because we may suppress current it from _queue (by ->unlink)
 					Queue::iterator it2(it);
+					RegistryKeyType idToRemove = it->first;
 					it2++;
 					try
 					{
@@ -416,12 +418,12 @@ namespace synthese
 							q->unlink();
 
 							// The shared pointer will be destroyed just quiting the local scope since it was only linked in the environment
-							Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(it->first);
+							Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(idToRemove);
 						}
 						else
 						{
 							// The item was stored in the database : simply remove it, the standard unload process will run
-							DBModule::GetDB()->deleteStmt(it->first, transaction);
+							DBModule::GetDB()->deleteStmt(idToRemove, transaction);
 						}
 					}
 					catch(ObjectNotFoundException<InterSYNTHESEQueue>&)
@@ -457,6 +459,7 @@ namespace synthese
             {
                 // Save the next iterator because we may suppress the current iterator from _queue (by ->unlink)
                 Queue::iterator it2 = it;
+				RegistryKeyType idToRemove = it->first;
                 it2++;
 
                 if(	isObsolete() || (!it->second->get<ExpirationTime>().is_not_a_date_time() && it->second->get<ExpirationTime>() < now))
@@ -470,12 +473,12 @@ namespace synthese
                         q->unlink();
 
                         // The shared pointer will be destroyed just quiting the local scope since it was only linked in the environment
-                        Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(it->first);
+                        Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(idToRemove);
                     }
                     else
                     {
                         // The item was stored in the database : simply remove it, the standard unload process will run
-                        DBModule::GetDB()->deleteStmt(it->first, transaction);
+                        DBModule::GetDB()->deleteStmt(idToRemove, transaction);
                     }
                 }
 
