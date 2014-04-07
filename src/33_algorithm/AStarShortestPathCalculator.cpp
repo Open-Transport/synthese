@@ -535,7 +535,7 @@ namespace synthese
 						}
 					}
 
-					if(!resultGeometry->isEmpty())
+					if(resultGeometry && !resultGeometry->isEmpty())
 					{
 						path.insert(
 							insertPosition,
