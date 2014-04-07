@@ -346,7 +346,7 @@ namespace synthese
 			{
 				//Best place, which is near the originPoint
 				boost::shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
-				RoadChunkTableSync::SearchResult  roadChunks = RoadChunkTableSync::SearchByMaxDistance(
+				RoadChunkTableSync::SearchResult roadChunks = RoadChunkTableSync::SearchByMaxDistance(
 					*originPoint.get(),
 					_maxDistance,//distance  to originPoint
 					Env::GetOfficialEnv(),
@@ -356,6 +356,12 @@ namespace synthese
 				BOOST_FOREACH(const RoadChunkTableSync::SearchResult::value_type& roadChunk, roadChunks)
 				{
 					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
+
+					boost::shared_ptr<LineString> chunkGeometry = chunk.getRealGeometry();
+					if(!chunkGeometry || chunkGeometry->isEmpty())
+					{
+						continue;
+					}
 
 					bool compatibleWithUserClasses(true);
 					BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
@@ -377,7 +383,7 @@ namespace synthese
 						continue;
 					}
 
-					LengthIndexedLine indexedLine(chunk.getRealGeometry().get());
+					LengthIndexedLine indexedLine(chunkGeometry.get());
 					double metricOffset = indexedLine.project(*(originPoint->getCoordinate())) + chunk.getMetricOffset();
 					boost::shared_ptr<House> house(new House(*roadChunk, metricOffset, true));
 
