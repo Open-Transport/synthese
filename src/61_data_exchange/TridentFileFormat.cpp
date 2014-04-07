@@ -1931,7 +1931,11 @@ namespace synthese
 							deps,
 							arrs,
 							serviceNumber,
-							dataSource
+							dataSource,
+							boost::optional<const std::string&>(),
+							boost::optional<const graph::RuleUser::Rules&>(),
+							boost::optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(),
+							boost::optional<const std::string&>(keyNode.getText())
 					)	);
 					if(service)
 					{
