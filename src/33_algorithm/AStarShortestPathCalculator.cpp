@@ -535,7 +535,7 @@ namespace synthese
 						}
 					}
 
-					if(resultGeometry->getLength())
+					if(!resultGeometry->isEmpty())
 					{
 						path.insert(
 							insertPosition,
@@ -671,12 +671,12 @@ namespace synthese
 					{
 						CoordinateSequence* cs;
 						// use startGeometry if it exists and we are at the beginning of the path
-						if(startGeometry && it == path.begin())
+						if(startGeometry && !startGeometry->isEmpty() && it == path.begin())
 						{
 							cs = startGeometry->getCoordinates();
 						}
 						// use endGeometry if it exists and we are at the end of the path
-						else if(endGeometry && (it + 1) == path.end())
+						else if(endGeometry && !endGeometry->isEmpty() && (it + 1) == path.end())
 						{
 							cs = endGeometry->getCoordinates();
 						}
@@ -692,11 +692,11 @@ namespace synthese
 					else
 					{
 						CoordinateSequence* cs;
-						if(startGeometry && it == path.begin())
+						if(startGeometry && !startGeometry->isEmpty() && it == path.begin())
 						{
 							cs = startGeometry->getCoordinates();
 						}
-						else if(endGeometry && (it + 1) == path.end())
+						else if(endGeometry && !endGeometry->isEmpty() && (it + 1) == path.end())
 						{
 							cs = endGeometry->getCoordinates();
 						}
