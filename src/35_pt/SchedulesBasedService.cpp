@@ -159,6 +159,11 @@ namespace synthese
 		{
 			// Lock the schedules
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
+			
+			if (getDataDepartureSchedules().size() == 0)
+			{
+				return time_duration(not_a_date_time);
+			}
 
 			if(!RTData && rank == 0)
 			{
