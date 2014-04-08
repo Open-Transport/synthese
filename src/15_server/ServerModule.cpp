@@ -107,7 +107,7 @@ namespace synthese
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
 		boost::shared_mutex ServerModule::baseWriterMutex;
-		//boost::shared_mutex ServerModule::interSyntheseVersusRTMutex;
+		boost::shared_mutex ServerModule::InterSYNTHESEAgainstRequestsMutex;
 
 		template<> void ModuleClassTemplate<ServerModule>::PreInit()
 		{
@@ -322,7 +322,11 @@ namespace synthese
 
 				// Request run
 				stringstream ros;
-				request.run(ros);
+				{
+					// Don't request if interSYNTHESE is writing
+					boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
+					request.run(ros);
+				}
 				
 				// Output
 				if(	_forceGZip ||
