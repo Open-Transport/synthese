@@ -138,13 +138,17 @@ namespace synthese
 			// Enqueue in all slaves
 			BOOST_FOREACH(const Slaves::value_type& slave, _slaves)
 			{
-				slave->enqueue(
-					content.getType().getFactoryKey(),
-					content.getContent(),
-					content.getExpirationTime(),
-					transaction,
-					nonPersistent
-				);
+				if (slave->get<Active>())
+				{
+					// enqueue only if slave is active
+					slave->enqueue(
+						content.getType().getFactoryKey(),
+						content.getContent(),
+						content.getExpirationTime(),
+						transaction,
+						nonPersistent
+					);
+				}
 			}
 		}
 }	}
