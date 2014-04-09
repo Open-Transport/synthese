@@ -44,8 +44,8 @@ namespace synthese
 				roadChunk.getFromCrossing(),
 				0
 			),
-			_roadChunk(&roadChunk),
-			_reverse(reverse)
+			_reverse(reverse),
+			_roadChunk(&roadChunk)
 		{}
 
 

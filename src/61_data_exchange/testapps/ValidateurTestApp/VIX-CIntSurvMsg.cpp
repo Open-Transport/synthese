@@ -124,9 +124,6 @@ namespace synthese
 			}
 			
 			year	= now.date().year()-2000;
-			if(year<0){
-				year=0;
-			}
 			month	= now.date().month();
 			day	= now.date().day();
 			hour	= now.time_of_day().hours();

@@ -139,7 +139,7 @@ namespace synthese
 
 			boost::shared_ptr<geos::geom::LineString> bestEdgeGeom;
 			T bestEdge;
-			double bestDistance;
+			double bestDistance(_distanceLimit + 1);
 
 			BOOST_FOREACH(T edge, _from)
 			{

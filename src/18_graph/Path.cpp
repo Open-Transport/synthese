@@ -399,7 +399,7 @@ namespace synthese
 			double offset
 		) const {
 			Edges::const_iterator edgeIt;
-			Edge* previous;
+			Edge* previous = NULL;
 			if(offset == 0)
 				return _edges.front();
 			if(offset == _edges.back()->getMetricOffset())

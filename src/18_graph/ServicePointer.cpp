@@ -321,7 +321,7 @@ namespace synthese
 			bool drtAreaSequence = false;
 			bool hasGeometry = false;
 			bool hasDRTArea = false;
-			Coordinate previousCoordinates = NULL;
+			Coordinate previousCoordinates;
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
 				if(dynamic_cast<const pt::AreaGeneratedLineStop*>(edge))

@@ -65,8 +65,8 @@ namespace synthese
 
 		VehicleServicesListService::VehicleServicesListService():
 			_page(NULL),
-			_withDetail(true),
-			_scheduledService(NULL)
+			_scheduledService(NULL),
+			_withDetail(true)
 		{}
 
 
