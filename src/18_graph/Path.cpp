@@ -248,7 +248,7 @@ namespace synthese
 				{
 					edge.setFollowingArrivalForFineSteppingOnly(nextEdge->getFollowingArrivalForFineSteppingOnly());
 				}
-				if(nextEdge->isArrivalAllowed() && nextEdge->getFromVertex() && nextEdge.getFromVertex()->getHub() && nextEdge->isConnectingEdge())
+				if(nextEdge->isArrivalAllowed() && nextEdge->getFromVertex() && nextEdge->getFromVertex()->getHub() && nextEdge->isConnectingEdge())
 				{
 					edge.setFollowingConnectionArrival(nextEdge);
 				}
@@ -304,7 +304,7 @@ namespace synthese
 				{
 					edge.setPreviousDepartureForFineSteppingOnly(previousEdge->getPreviousDepartureForFineSteppingOnly());
 				}
-				if(previousEdge->isDepartureAllowed() && previousEdge->getFromVertex() && previousEdge.getFromVertex()->getHub() && previousEdge->isConnectingEdge())
+				if(previousEdge->isDepartureAllowed() && previousEdge->getFromVertex() && previousEdge->getFromVertex()->getHub() && previousEdge->isConnectingEdge())
 				{
 					edge.setPreviousConnectionDeparture(previousEdge);
 				}
