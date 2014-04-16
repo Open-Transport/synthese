@@ -5,8 +5,9 @@
 
 #include "PTModule.h"
 
-#include "StopsInterSYNTHESEIdFilter.hpp"
+#include "LineMarkerInterfacePage.h"
 
+#include "DRTAreasListService.hpp"
 #include "LinesListFunction.h"
 #include "LineStopGetService.hpp"
 #include "StopAreasListFunction.hpp"
@@ -16,7 +17,6 @@
 #include "PTRoutesListFunction.hpp"
 #include "PTRouteDetailFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
-#include "ServicesListService.hpp"
 #include "ServiceQuotasListService.hpp"
 
 #include "DestinationTableSync.hpp"
@@ -60,8 +60,6 @@
 #include "StopPointAdmin.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "DRTAreasAdmin.hpp"
-
-#include "LineMarkerInterfacePage.h"
 
 #include "CleanAllStopPointProjectionsAction.hpp"
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
@@ -134,8 +132,6 @@ void synthese::pt::moduleRegister()
 	// PT MODULE 35
 
 	// Factories
-	synthese::pt::StopsInterSYNTHESEIdFilter::integrate();
-
 	synthese::pt::TransportNetworkTableSync::integrate();
 
 	synthese::pt::DestinationTableSync::integrate();
@@ -186,6 +182,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DRTAreaAdmin::integrate();
 	synthese::pt::DRTAreasAdmin::integrate();
 
+	synthese::pt::DRTAreasListService::integrate();
 	synthese::pt::LineStopGetService::integrate();
 	synthese::pt::RealTimeUpdateFunction::integrate();
 	synthese::pt::LinesListFunction::integrate();
@@ -195,10 +192,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PTRoutesListFunction::integrate();
 	synthese::pt::PTRouteDetailFunction::integrate();
 	synthese::pt::PTObjectInformationFunction::integrate();
-	synthese::pt::ServicesListService::integrate();
 	synthese::pt::ServiceQuotasListService::integrate();
-
-	synthese::pt::LineMarkerInterfacePage::integrate();
 
 	synthese::pt::CleanAllStopPointProjectionsAction::integrate();
 	synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
@@ -233,6 +227,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ProjectAllStopPointsAction::integrate();
 	synthese::pt::StopAreaTransferAddAction::integrate();
 	synthese::pt::ServiceQuotaUpdateAction::integrate();
+
+	synthese::pt::LineMarkerInterfacePage::integrate();
 
 	synthese::pt::TransportNetworkRight::integrate();
 

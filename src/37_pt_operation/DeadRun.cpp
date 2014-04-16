@@ -42,7 +42,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace impex;
-	
+
 
 	namespace util
 	{
@@ -156,6 +156,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
@@ -163,6 +164,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getDepartureSchedules(true, RTData)[rankInPath];
 		}
 
@@ -170,6 +172,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 
@@ -177,6 +180,7 @@ namespace synthese
 
 		boost::posix_time::time_duration DeadRun::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
+			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 			return getArrivalSchedules(true, RTData)[rankInPath];
 		}
 

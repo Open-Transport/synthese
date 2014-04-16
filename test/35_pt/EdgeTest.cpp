@@ -1001,17 +1001,17 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 		p8.addPhysicalStop(s8);
 
 		Stops::Type ds1;
-		ds1.insert(&p3);
-		ds1.insert(&p4);
-		ds1.insert(&p5);
-		ds1.insert(&p6);
+		ds1.push_back(&p3);
+		ds1.push_back(&p4);
+		ds1.push_back(&p5);
+		ds1.push_back(&p6);
 		DRTArea d1(0, "DRT1", ds1);
 
 		BOOST_CHECK_EQUAL (d1.get<Stops>().size(), 4);
 
 		Stops::Type ds2;
-		ds2.insert(&p7);
-		ds2.insert(&p8);
+		ds2.push_back(&p7);
+		ds2.push_back(&p8);
 		DRTArea d2(0, "DRT2", ds2);
 
 		LineStop ls1D(0, &l, 0, true, false,0,s1);
@@ -1195,9 +1195,9 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 		{
 			DRTArea a345;
 			Stops::Type stops;
-			stops.insert(&p3);
-			stops.insert(&p4);
-			stops.insert(&p5);
+			stops.push_back(&p3);
+			stops.push_back(&p4);
+			stops.push_back(&p5);
 			a345.set<Stops>(stops);
 			a345.link(env, true);
 
@@ -1251,9 +1251,9 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 		{
 			DRTArea a345;
 			Stops::Type stops;
-			stops.insert(&p3);
-			stops.insert(&p4);
-			stops.insert(&p5);
+			stops.push_back(&p3);
+			stops.push_back(&p4);
+			stops.push_back(&p5);
 			a345.set<Stops>(stops);
 			a345.link(env, true);
 

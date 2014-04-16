@@ -48,6 +48,7 @@ namespace synthese
 	FIELD_BOOL(ScheduleInput)
 	FIELD_BOOL(InternalService)
 	FIELD_BOOL(ReservationNeeded)
+	FIELD_BOOL(ReverseDRTArea)
 
 	typedef boost::fusion::map<
 		FIELD(Key),
@@ -60,6 +61,7 @@ namespace synthese
 		FIELD(ScheduleInput),
 		FIELD(InternalService),
 		FIELD(ReservationNeeded),
+		FIELD(ReverseDRTArea),
 		FIELD(LineStringGeometry)
 	> LineStopSchema;
 

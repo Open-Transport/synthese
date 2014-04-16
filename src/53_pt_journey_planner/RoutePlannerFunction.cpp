@@ -41,6 +41,7 @@
 #include "UserFavoriteJourney.h"
 #include "UserFavoriteJourneyTableSync.h"
 #include "Road.h"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "Hub.h"
 #include "Service.h"
@@ -1637,7 +1638,7 @@ namespace synthese
 									{
 										if(itl != jl.begin())
 										{
-											const Road* road(dynamic_cast<const Road*> (jl.begin()->getService()->getPath ()));
+											const RoadPath* road(dynamic_cast<const RoadPath*> (jl.begin()->getService()->getPath()));
 											const ptime& departureTime(jl.begin()->getDepartureDateTime());
 											const ptime& arrivalTime((itl-1)->getArrivalDateTime());
 											stream <<
@@ -1680,7 +1681,7 @@ namespace synthese
 													_xmlDisplayAddress(
 														stream,
 														*dynamic_cast<const Crossing*>(jl.begin()->getDepartureEdge()->getFromVertex()),
-														*road->getRoadPlace(),
+														*road->getRoad()->get<RoadPlace>(),
 														_showCoords
 													);
 												}
@@ -1697,7 +1698,7 @@ namespace synthese
 												_xmlDisplayAddress(
 													stream,
 													*dynamic_cast<const Crossing*>((itl-1)->getArrivalEdge()->getFromVertex()),
-													*road->getRoadPlace(),
+													*road->getRoad()->get<RoadPlace>(),
 													_showCoords
 												);
 											}
@@ -1836,7 +1837,7 @@ namespace synthese
 							stream << "</junction>";
 						}
 
-						const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
+						const RoadPath* road(dynamic_cast<const RoadPath*> (leg.getService()->getPath ()));
 						if(road != NULL)
 						{
 							if(_outputRoadApproachDetail)
@@ -1844,8 +1845,8 @@ namespace synthese
 								stream <<
 									"<street" <<
 									" length=\"" << ceil(leg.getDistance()) << "\"" <<
-									" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
-									" name=\"" << road->getRoadPlace()->getName() << "\"" <<
+									" city=\"" << road->getRoad()->get<RoadPlace>()->getCity()->getName() << "\"" <<
+									" name=\"" << road->getRoad()->get<RoadPlace>()->getName() << "\"" <<
 									" departureTime=\"" << posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"" <<
 									" arrivalTime=\"" << posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
@@ -1880,7 +1881,7 @@ namespace synthese
 										_xmlDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(leg.getDepartureEdge()->getFromVertex()),
-											*road->getRoadPlace(),
+											*road->getRoad()->get<RoadPlace>(),
 											_showCoords
 											);
 									}
@@ -1907,7 +1908,7 @@ namespace synthese
 										_xmlDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getFromVertex()),
-											*road->getRoadPlace(),
+											*road->getRoad()->get<RoadPlace>(),
 											_showCoords
 										);
 									}
@@ -1943,7 +1944,7 @@ namespace synthese
 
 					if(!_outputRoadApproachDetail && lastApproachBeginning != jl.end() && lastTransportEnding != jl.end())
 					{
-						const Road* road(dynamic_cast<const Road*> ((jl.end()-1)->getService()->getPath ()));
+						const RoadPath* road(dynamic_cast<const RoadPath*> ((jl.end()-1)->getService()->getPath ()));
 						const ptime& departureTime(lastApproachBeginning->getDepartureDateTime());
 						const ptime& arrivalTime((jl.end()-1)->getArrivalDateTime());
 						stream <<
@@ -1974,7 +1975,7 @@ namespace synthese
 							_xmlDisplayAddress(
 								stream,
 								*dynamic_cast<const Crossing*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()),
-								*road->getRoadPlace(),
+								*road->getRoad()->get<RoadPlace>(),
 								_showCoords
 							);
 						}
@@ -2001,7 +2002,7 @@ namespace synthese
 								_xmlDisplayAddress(
 									stream,
 									*dynamic_cast<const Crossing*>((jl.end()-1)->getArrivalEdge()->getFromVertex()),
-									*road->getRoadPlace(),
+									*road->getRoad()->get<RoadPlace>(),
 									_showCoords
 								);
 							}
@@ -3441,7 +3442,7 @@ namespace synthese
 				{
 					const ServicePointer& leg(*it);
 
-					const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath()));
+					const RoadPath* road(dynamic_cast<const RoadPath*> (leg.getService()->getPath()));
 					const Junction* junction(dynamic_cast<const Junction*> (leg.getService()->getPath()));
 					if(	road == NULL &&
 						junction == NULL
@@ -3512,10 +3513,14 @@ namespace synthese
 						if (road && it + 1 != services.end())
 						{
 							const ServicePointer& nextLeg(*(it+1));
-							const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
+							const RoadPath* nextRoad(dynamic_cast<const RoadPath*>(nextLeg.getService()->getPath()));
 
-							if (nextRoad && (nextRoad->getRoadPlace() == road->getRoadPlace() || nextRoad->getRoadPlace()->getName() == road->getRoadPlace()->getName()))
+							if(	nextRoad &&
+								(	&*nextRoad->getRoad()->get<RoadPlace>() == &*road->getRoad()->get<RoadPlace>() ||
+									nextRoad->getRoad()->get<RoadPlace>()->getName() == road->getRoad()->get<RoadPlace>()->getName()
+							)	){
 								continue;
+							}
 						}
 
 						// Distance and geometry
@@ -3542,7 +3547,7 @@ namespace synthese
 								geometries
 						)	);
 
-						if(dynamic_cast<const Road*>(leg.getService()->getPath()))
+						if(dynamic_cast<const RoadPath*>(leg.getService()->getPath()))
 						{
 							_displayRoadCell(
 								content,
@@ -3551,7 +3556,7 @@ namespace synthese
 								__Couleur,
 								distance,
 								multiLineString.get(),
-								dynamic_cast<const Road*>(leg.getService()->getPath()),
+								dynamic_cast<const RoadPath*>(leg.getService()->getPath())->getRoad(),
 								*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
 								*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
 								it+1 == services.end(),
@@ -3758,9 +3763,9 @@ namespace synthese
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
-			if(road && road->getRoadPlace())
+			if(road && road->get<RoadPlace>())
 			{
-				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
+				pm.insert(DATA_ROAD_NAME, road->get<RoadPlace>()->getName());
 			}
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);

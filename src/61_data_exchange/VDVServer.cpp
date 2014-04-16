@@ -526,7 +526,7 @@ namespace synthese
 						// Service code is on 5 characters in the planned datasource
 						while (vectServiceCode[1].size() < 5)
 							vectServiceCode[1] = "0" + vectServiceCode[1];
-
+						
 						ScheduledService* service(
 							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
 						);

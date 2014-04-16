@@ -77,10 +77,8 @@ namespace synthese
 		class Import:
 			public Object<Import, ImportRecord>
 		{
-		public:
-
-
 		private:
+			mutable boost::recursive_mutex _autoImportMutex;
 			mutable boost::posix_time::ptime _nextAutoImport;
 			mutable util::ParametersMap _autoImporterPM;
 			mutable boost::shared_ptr<Importer> _autoImporter;

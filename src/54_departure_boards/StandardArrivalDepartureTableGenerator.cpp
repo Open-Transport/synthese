@@ -53,10 +53,11 @@ namespace synthese
 			const ptime& startTime,
 			const ptime& endDateTime,
 			bool allowCanceled,
-			optional<size_t> maxSize
+			optional<size_t> maxSize,
+			bool endDateTimeConcernsTheorical
 		):	ArrivalDepartureTableGenerator(
 			physicalStops, direction, endfilter, lineFilter,
-			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, allowCanceled, maxSize
+			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, allowCanceled, maxSize, endDateTimeConcernsTheorical
 		){
 		}
 
@@ -109,7 +110,11 @@ namespace synthese
 									index,
 									false,
 									false,
-									_allowCanceled
+									_allowCanceled,
+									true,
+									true,
+									UseRule::RESERVATION_INTERNAL_DELAY,
+									_endDateTimeConcernsTheorical
 							)	);
 
 							// If no next service was found, then abort the search in the current journey pattern

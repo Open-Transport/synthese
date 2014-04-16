@@ -293,9 +293,11 @@ namespace synthese
 		{
 			if(_vehicleService)
 			{
-				const VehicleService::Services& services(_vehicleService->getServices());
-				BOOST_FOREACH(const VehicleService::Services::value_type& service, services)
+				const Services::Type& services(_vehicleService->get<Services>());
+				BOOST_FOREACH(const Services::Type::value_type& service, services)
 				{
+					recursive_mutex::scoped_lock lock(service->getSchedulesMutex());
+
 					if(	!service->isActive(date) ||
 						service->getLastArrivalSchedule(false) < startTime
 					){

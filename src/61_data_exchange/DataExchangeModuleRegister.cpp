@@ -5,8 +5,9 @@
 
 #include "DataExchangeModule.hpp"
 
+#include "CMSExport.hpp"
+#include "CMSImport.hpp"
 #include "GPSdFileFormat.hpp"
-#include "GPSSimuFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
@@ -78,7 +79,6 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
 
 	synthese::data_exchange::GPSdFileFormat::integrate();
-	synthese::data_exchange::GPSSimuFileFormat::integrate();
 	synthese::data_exchange::GTFSFileFormat::integrate();
 	synthese::data_exchange::HafasFileFormat::integrate();
 	synthese::data_exchange::HastusCSVFileFormat::integrate();
@@ -102,6 +102,8 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
+	synthese::data_exchange::CMSExport::integrate();
+	synthese::data_exchange::CMSImport::integrate();
 
 	synthese::data_exchange::VixV6000FileFormat::integrate();
 

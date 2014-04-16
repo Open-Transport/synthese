@@ -134,6 +134,11 @@ namespace synthese
 				if (senderEMail.empty())
 					throw ActionException("There is no mail address for sender");
 
+				/* senderName must be filled in loading parameters */
+				std::string senderName(SecurityModule::getSenderName());
+				if (senderName.empty())
+					throw ActionException("There is no sender name");
+
 				/* Disallow deactivated users and users without profile */
 				if (user->getConnectionAllowed() && user->getProfile())
 				{
@@ -141,7 +146,7 @@ namespace synthese
 					user->setPassword(_new_password);
 
 					/* Before saving new password, check mail is sent */
-					if (!sendPasswordChangeEMail(*user,senderEMail))
+					if (!sendPasswordChangeEMail(*user,senderEMail,senderName))
 					{
 						user->resetTempPassword();
 						throw ActionException("Mail not sent");
@@ -186,8 +191,11 @@ namespace synthese
 
 
 
-		bool UserPasswordChangeAction::sendPasswordChangeEMail(const User& user, const std::string sender) const 
-		{
+		bool UserPasswordChangeAction::sendPasswordChangeEMail(
+		    const User& user,
+		    const std::string senderEMail,
+		    const std::string senderName
+		) const {
 			/* Need a CMS in order to send a mail */
 			if(!_cmsPasswordChangeEMail.get())
 			{
@@ -210,8 +218,8 @@ namespace synthese
 				}
 
 				/* Build header */
-				email.setSender(sender);
-				email.setSenderName(sender);
+				email.setSender(senderEMail);
+				email.setSenderName(senderName);
 
 				stringstream subject;
 				ParametersMap subjectMap;

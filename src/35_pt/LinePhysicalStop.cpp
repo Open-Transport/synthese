@@ -22,6 +22,7 @@
 
 #include "LinePhysicalStop.hpp"
 
+#include "DRTArea.hpp"
 #include "Hub.h"
 #include "LineStop.h"
 #include "PTModule.h"
@@ -78,7 +79,10 @@ namespace synthese
 
 		bool LinePhysicalStop::getReservationNeeded() const
 		{
-			return _lineStop->get<ReservationNeeded>();
+			return
+				_lineStop->get<ReservationNeeded>() ||
+				dynamic_cast<DRTArea*>(&*_lineStop->get<LineNode>())
+			;
 		}
 
 

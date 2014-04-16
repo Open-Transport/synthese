@@ -64,7 +64,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(VehicleService* vs, loadedVehicleServices)
 					{
-						vs->setOperationUnit(*operationUnit);
+						vs->set<OperationUnit>(*operationUnit);
 					}
 				}
 
@@ -91,7 +91,7 @@ namespace synthese
 				// Operation unit
 				if(operationUnit)
 				{
-					vs->setOperationUnit(*operationUnit);
+					vs->set<OperationUnit>(*operationUnit);
 				}
 
 				// Registration

@@ -66,6 +66,7 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
+			static const std::string DATA_CLIENT_ID;
 			static const std::string DATA_NAME;
 			static const std::string DATA_PHONE;
 			static const std::string DATA_EMAIL;

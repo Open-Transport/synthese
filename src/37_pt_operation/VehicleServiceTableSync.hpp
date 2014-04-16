@@ -40,23 +40,9 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class VehicleServiceTableSync:
-			public db::DBDirectTableSyncTemplate<
-				VehicleServiceTableSync,
-				VehicleService,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
-			>
+			public db::DBDirectTableSyncTemplate<VehicleServiceTableSync, VehicleService>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_NAME;
-				static const std::string COL_SERVICES;
-				static const std::string COL_DATASOURCE_LINKS;
-				static const std::string COL_DATES;
-				static const std::string COL_OPERATION_UNIT_ID;
-			//@}
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -80,19 +66,6 @@ namespace synthese
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,
 					bool raisingOrder = true,
-					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
-				);
-
-
-				static std::string SerializeServices(
-					const VehicleService::Services& services
-				);
-
-
-
-				static VehicleService::Services UnserializeServices(
-					const std::string& value,
-					util::Env& env,
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 			//@}

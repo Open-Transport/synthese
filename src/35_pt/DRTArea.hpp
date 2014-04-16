@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	FIELD_POINTERS_SET(Stops, pt::StopArea)
+	FIELD_POINTERS_VECTOR(Stops, pt::StopArea)
 
 	typedef boost::fusion::map<
 		FIELD(Key),
@@ -50,6 +50,8 @@ namespace synthese
 			virtual public util::Registrable
 		{
 		public:
+			static const std::string TAG_STOP;
+
 			DRTArea(
 				const util::RegistryKeyType id = 0,
 				std::string name = std::string(),
@@ -67,6 +69,8 @@ namespace synthese
 
 			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 			virtual void unlink();
+
+			virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix /* = std::string */) const;
 		};
 }	}
 

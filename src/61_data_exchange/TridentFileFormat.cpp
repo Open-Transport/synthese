@@ -1729,7 +1729,7 @@ namespace synthese
 				XMLNode keyNode(serviceNode.getChildNode("objectId"));
 				XMLNode jpKeyNode(serviceNode.getChildNode("journeyPatternId"));
 				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
-				string serviceNumber(numberNode.isEmpty() ? string() : charset_converter.convert(numberNode.getText()));
+				string serviceNumber((numberNode.getText() == NULL) ? string() : charset_converter.convert(numberNode.getText()));
 
 				// Creation of the service
 
@@ -2004,7 +2004,7 @@ namespace synthese
 					{
 						Calendar periodMask(
 							period.begin(),
-							period.last()
+							period.end()
 						);
 
 						BOOST_FOREACH(CalendarTemplate* calendarTemplate, calendarTemplates)

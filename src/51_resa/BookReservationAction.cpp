@@ -22,7 +22,7 @@
 
 #include "BookReservationAction.h"
 
-#include "ActionException.h"
+#include "RequestException.h"
 #include "ClientException.h"
 #include "AlgorithmLogger.hpp"
 #include "City.h"
@@ -55,6 +55,7 @@
 #include "ReservationTransaction.h"
 #include "ReservationTransactionTableSync.h"
 #include "Road.h"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "RoutePlannerFunction.h"
 #include "ScheduledService.h"
@@ -209,19 +210,19 @@ namespace synthese
 					_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
 					if (_customer->getName().empty())
 					{
-						throw ActionException("Le nom du client doit être rempli");
+						throw RequestException("Le nom du client doit être rempli");
 					}
 
 					_customer->setSurname(map.getDefault<string>(PARAMETER_CUSTOMER_SURNAME));
 					if (_customer->getSurname().empty() && !map.getDefault<bool>(PARAMETER_CUSTOMER_ALLOW_EMPTY_SURNAME, false))
 					{
-						throw ActionException("Le prénom du client doit être rempli");
+						throw RequestException("Le prénom du client doit être rempli");
 					}
 
 					_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
 					if (_customer->getPhone().empty())
 					{
-						throw ActionException("Le numéro de téléphone doit être rempli");
+						throw RequestException("Le numéro de téléphone doit être rempli");
 					}
 
 					// Integrity test : the key is name + surname + phone
@@ -240,7 +241,7 @@ namespace synthese
 					);
 					if (!env.getRegistry<User>().empty())
 					{
-						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+						throw RequestException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
 					}
 
 					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
@@ -258,7 +259,7 @@ namespace synthese
 						}
 						catch(Language::LanguageNotFoundException&)
 						{
-							throw ActionException("Langue incorrecte");
+							throw RequestException("Langue incorrecte");
 						}
 					}
 				}
@@ -275,18 +276,18 @@ namespace synthese
 
 			if(!_customer.get())
 			{
-				throw ActionException("Undefined customer.");
+				throw RequestException("Undefined customer.");
 			}
 
 			// Deduce naming fields from the customer if already recognized
 			if (_customer->getName().empty())
 			{
-				throw ActionException("Client sans nom. Réservation impossible");
+				throw RequestException("Client sans nom. Réservation impossible");
 			}
 
 			if (_customer->getPhone().empty())
 			{
-				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
+				throw RequestException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
 			}
 
 			// Seats number
@@ -294,14 +295,13 @@ namespace synthese
 			/// TODO check seats number in UseRule ?
 			if (_seatsNumber < 1 || _seatsNumber > 499)
 			{
-				throw ActionException("Invalid seats number");
+				throw RequestException("Invalid seats number");
 			}
 
 			// Journey planner initialization
 			ParametersMap jpMap(map.getExtract(Action_PARAMETER_PREFIX));
 			_journeyPlanner._setFromParametersMap(jpMap);
 			_journeyPlanner.setMaxSolutions(1);
-			_journeyPlanner.setEndDepartureDate(_journeyPlanner.getStartDepartureDate());
 			_journeyPlanner.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
 			_journeyPlanner.setReservationRulesDelayType(_reservationRulesDelayType);
 
@@ -310,17 +310,17 @@ namespace synthese
 			_arrivalPlace = _journeyPlanner.getArrivalPlace().placeResult.value;
 			_departureDateTime = _journeyPlanner.getStartDepartureDate();
 			_userClassCode = _journeyPlanner.getAccessParameters().getUserClassRank();
-		
+
 			// Check extra reservations number and dates
 			_reservationsNumber = map.getDefault<size_t>(PARAMETER_MULTI_RESERVATIONS_NUMBER, 1);
 
 			if (_reservationsNumber > 6)
 			{
-				throw ActionException("Invalid reservations number (too high)");
-			} 
-			
+				throw RequestException("Invalid reservations number (too high)");
+			}
+
 			_multiReservationsMode = map.getDefault<bool>(PARAMETER_MULTI_RESERVATIONS_MODE, false);
-			
+
 			if (_reservationsNumber > 1 && !_multiReservationsMode)
 				_multiReservationsMode = true;
 
@@ -344,13 +344,13 @@ namespace synthese
 					}
 					catch (Exception e)
 					{
-						throw ActionException("Reservations dates are malformed here : " + date);
+						throw RequestException("Reservations dates are malformed here : " + date);
 					}
 				}
 			}
 			else if (!tempDates.empty() && _reservationsNumber == 1)
 			{
-				throw ActionException("The reservations number doesn't correspond to the reservations dates");
+				throw RequestException("The reservations number doesn't correspond to the reservations dates");
 			}
 
 			// Reservation on a service
@@ -367,7 +367,7 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<ScheduledService>&)
 					{
-						throw ActionException("No such service");
+						throw RequestException("No such service");
 					}
 
 					gregorian::date date = from_string(map.get<string>(
@@ -378,12 +378,12 @@ namespace synthese
 					size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
 					if(departureRank >= _service->getPath()->getEdges().size())
 					{
-						throw ActionException("Invalid departure rank");
+						throw RequestException("Invalid departure rank");
 					}
 					if(	arrivalRank >= _service->getPath()->getEdges().size() ||
 						arrivalRank <= departureRank
 					){
-						throw ActionException("Invalid arrival rank");
+						throw RequestException("Invalid arrival rank");
 					}
 
 					ServicePointer sp(
@@ -408,7 +408,7 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<FreeDRTTimeSlot>&)
 					{
-						throw ActionException("No such service");
+						throw RequestException("No such service");
 					}
 
 					/// TODO check if the user class code is allowed on this service
@@ -420,7 +420,7 @@ namespace synthese
 					if(	!_departurePlace.get() ||
 						!_departurePlace->getPoint().get()
 					){
-						throw ActionException("The origin place must be located");
+						throw RequestException("The origin place must be located");
 					}
 
 					/// TODO check if the destinations belong to the area
@@ -429,7 +429,7 @@ namespace synthese
 					if(	!_arrivalPlace.get() ||
 						!_arrivalPlace->getPoint().get()
 					){
-						throw ActionException("The destination place must be located");
+						throw RequestException("The destination place must be located");
 					}
 
 					/// TODO check the availability according to existing reservations
@@ -451,11 +451,11 @@ namespace synthese
 			{
 				if(!_departurePlace.get())
 				{
-					throw ActionException("Invalid destination place");
+					throw RequestException("Invalid destination place");
 				}
 				if(!_arrivalPlace.get())
 				{
-					throw ActionException("Invalid origin place");
+					throw RequestException("Invalid origin place");
 				}
 
 				// Check same services/hours journeys exist for all extra dates
@@ -466,12 +466,11 @@ namespace synthese
 					BOOST_FOREACH(const boost::posix_time::ptime& date, _reservationsDates)
 					{
 						_journeyPlanner.setStartDepartureDate(date);
-						_journeyPlanner.setEndDepartureDate(date);
 						_journeyPlanner.runWithoutOutput();
 
 						if (!_journeyPlanner.getResult().get() || _journeyPlanner.getResult()->getJourneys().empty())
 						{
-							throw ActionException("The route planning does not find a journey to book");
+							throw RequestException("The route planning does not find a journey to book");
 						}
 
 						_journey = _journeyPlanner.getResult()->getJourneys().front();
@@ -484,17 +483,17 @@ namespace synthese
 						}
 						else
 						{
-							if (referenceArrivalTime.time_of_day() != 
+							if (referenceArrivalTime.time_of_day() !=
 									_journeyPlanner.getResult()->getJourneys().front().getLastArrivalTime().time_of_day()
 							){
-								throw ActionException("The route planning has found a different journey for multiple reservations");
+								throw RequestException("The route planning has found a different journey for multiple reservations");
 							}
 						}
 					}
 				}
 				else
 				{
-					throw ActionException("The reservations number doesn't correspond to the reservations dates");
+					throw RequestException("The reservations number doesn't correspond to the reservations dates");
 				}
 			}
 		}
@@ -516,7 +515,7 @@ namespace synthese
 			 * check the seat number is correct
 			 * check the same reservation wasn't alerady sent
 			 */
-			if ( _customer && request.getSession()->hasProfile() && 
+			if ( _customer && request.getSession()->hasProfile() &&
 				_customer->getKey() == request.getSession()->getUser()->getKey() &&
 				request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE) &&
 				!request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE))
@@ -530,7 +529,7 @@ namespace synthese
 
 				if (check.size() > 0)
 					throw ClientException("Reservation already sent");
-				
+
 				if (ResaModule::GetMaxSeats() > 0 && _seatsNumber > ResaModule::GetMaxSeats())
 				{
 					throw ClientException("Maximum number of seats reached");
@@ -557,22 +556,22 @@ namespace synthese
 								Env::GetOfficialEnv(), su.getService()->getKey(),
 								boost::optional<boost::posix_time::ptime>(su.getDepartureDateTime()),
 								boost::optional<boost::posix_time::ptime>(su.getArrivalDateTime()), UP_LINKS_LOAD_LEVEL));
-			
+
 							BOOST_FOREACH(ReservationTableSync::SearchResult::value_type& reservation, reservations)
 							{
 								if (reservation->getReservationPossible())
 								{
-									User* customer = UserTableSync::GetEditable(reservation->getTransaction()->getCustomerUserId(), 
+									User* customer = UserTableSync::GetEditable(reservation->getTransaction()->getCustomerUserId(),
 										Env::GetOfficialEnv()).get();
 
 									if ((reservation->getServiceId() == su.getService()->getKey()) &&
 										(customer->getKey() == _customer->getKey()) &&
 										(reservation->getDepartureTime() == su.getDepartureDateTime() &&
-								 		reservation->getArrivalTime() == su.getArrivalDateTime())
+										reservation->getArrivalTime() == su.getArrivalDateTime())
 									){
 										const ReservationStatus& status(reservation->getStatus());
 
-										if (status != CANCELLED && status != CANCELLATION_TO_ACK && 
+										if (status != CANCELLED && status != CANCELLATION_TO_ACK &&
 											status != CANCELLED_AFTER_DELAY && status != ACKNOWLEDGED_CANCELLED_AFTER_DELAY &&
 											status != DONE && status != NO_RESERVATION
 										){
@@ -651,9 +650,10 @@ namespace synthese
 							else if(dynamic_cast<const House*>(_departurePlace.get()))
 							{
 								r->setDeparturePlaceId(
-									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->getRoadPlace()->getKey()
+									dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
 								);
 							}
+
 						}
 						if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
 						{
@@ -665,6 +665,18 @@ namespace synthese
 							);
 							r->setDeparturePlaceName(
 								dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getFullName()
+							);
+						}
+						else if (dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup()))
+						{
+							r->setDepartureCityName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getCity()->getName()
+							);
+							r->setDeparturePlaceNameNoCity(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getName()
+							);
+							r->setDeparturePlaceName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getFullName()
 							);
 						}
 						r->setDepartureTime(su.getDepartureDateTime());
@@ -687,7 +699,7 @@ namespace synthese
 							else if(dynamic_cast<const House*>(_arrivalPlace.get()))
 							{
 								r->setDeparturePlaceId(
-									dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->getRoadPlace()->getKey()
+									dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getKey()
 								);
 							}
 						}
@@ -709,6 +721,18 @@ namespace synthese
 								)->getFullName()
 							);
 						}
+						else if (dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup()))
+						{
+							r->setArrivalCityName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getCity()->getName()
+							);
+							r->setArrivalPlaceNameNoCity(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getName()
+							);
+							r->setArrivalPlaceName(
+								dynamic_cast<const RoadPlace*>(su.getService()->getPath()->getPathGroup())->getFullName()
+							);
+						}
 						r->setArrivalTime(su.getArrivalDateTime());
 
 						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
@@ -719,14 +743,14 @@ namespace synthese
 							r->setLineCode(line->getCommercialLine()->getShortName());
 							r->setLineId(line->getCommercialLine()->getKey());
 						}
-						const Road* road(dynamic_cast<const Road*>(su.getService()->getPath()));
+						const RoadPath* road(dynamic_cast<const RoadPath*>(su.getService()->getPath()));
 						if (road)
 						{
-							r->setLineCode(road->getRoadPlace()->getName());
-							r->setLineId(road->getKey());
+							r->setLineCode(road->getRoad()->get<RoadPlace>()->getName());
+							r->setLineId(road->getRoad()->getKey());
 						}
 
-                    	r->setReservationPossible(false);
+						r->setReservationPossible(false);
 						if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation, _reservationRulesDelayType))
 						){
 							if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
@@ -750,7 +774,7 @@ namespace synthese
 									su.getDepartureDateTime(),
 									_reservationRulesDelayType
 							)	);
-                        	r->setReservationPossible(true);
+							r->setReservationPossible(true);
 						}
 						r->setServiceId(su.getService()->getKey());
 						r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
@@ -805,7 +829,7 @@ namespace synthese
 
 				r->setLineCode(_freeDRTTimeSlot->getArea()->getLine()->getShortName());
 				r->setLineId(_freeDRTTimeSlot->getArea()->getLine()->getKey());
-                r->setReservationPossible(false);
+				r->setReservationPossible(false);
 
 				reservationContact = OnlineReservationRule::GetOnlineReservationRule(
 					_freeDRTTimeSlot->getArea()->getLine()->getReservationContact()
@@ -817,7 +841,7 @@ namespace synthese
 						static_cast<const PTUseRule&>(
 							_freeDRTTimeSlot->getUseRule(_userClassCode)
 						).getKey()
-                    );
+					);
 				}
 				r->setReservationDeadLine(
 					_freeDRTTimeSlot->getUseRule(_userClassCode).getReservationDeadLine(
@@ -831,7 +855,7 @@ namespace synthese
 
 				ReservationTableSync::Save(r.get());
 			}
-			
+
 			// Log
 			BOOST_FOREACH(ReservationTransaction& rt, transactions)
 			{
@@ -840,7 +864,7 @@ namespace synthese
 
 			// Mail
 			if(!_ignoreReservation && !_customer->getEMail().empty() && reservationContact)
- 			{
+			{
 				if (_multiReservationsMode)
 				{
 					reservationContact->sendCustomerEMail(transactions);
@@ -851,7 +875,7 @@ namespace synthese
 				}
 
 				ResaDBLog::AddEMailEntry(*request.getSession(), *_customer, "Récapitulatif de réservation");
- 			}
+			}
 
 			// Redirect
 			if(request.getActionWillCreateObject())

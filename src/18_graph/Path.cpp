@@ -175,21 +175,16 @@ namespace synthese
 
 		const Edge* Path::getEdge(size_t index) const
 		{
-			if(_edges.empty())
+			BOOST_FOREACH(const Edges::value_type& edge, _edges)
 			{
-				throw Exception("Edge not found");
-			}
-
-			size_t rank(index);
-			if(rank >= _edges.size())
-			{
-				rank = _edges.size() - 1;
-			}
-			for(;rank > 0 && _edges[rank]->getRankInPath() > index; --rank) ;
-
-			if(_edges[rank]->getRankInPath() == index)
-			{
-				return _edges[rank];
+				if(edge->getRankInPath() == index)
+				{
+					return edge;
+				}
+				if(edge->getRankInPath() > index)
+				{
+					break;
+				}
 			}
 
 			throw Exception("Edge not found");
@@ -224,7 +219,9 @@ namespace synthese
 						it->setFollowingArrivalForFineSteppingOnly(&edge);
 					}
 
-					if(edge.isConnectingEdge())
+					if(edge.getFromVertex() &&
+						edge.getFromVertex()->getHub() &&
+						edge.isConnectingEdge())
 					{
 						for(Edge* it(previousEdge);
 							it && it->getFollowingConnectionArrival() == nextConnectingArrival;
@@ -251,7 +248,7 @@ namespace synthese
 				{
 					edge.setFollowingArrivalForFineSteppingOnly(nextEdge->getFollowingArrivalForFineSteppingOnly());
 				}
-				if(nextEdge->isArrivalAllowed() && nextEdge->isConnectingEdge())
+				if(nextEdge->isArrivalAllowed() && nextEdge->getFromVertex() && nextEdge->getFromVertex()->getHub() && nextEdge->isConnectingEdge())
 				{
 					edge.setFollowingConnectionArrival(nextEdge);
 				}
@@ -278,7 +275,9 @@ namespace synthese
 						it->setPreviousDepartureForFineSteppingOnly(&edge);
 					}
 
-					if(edge.isConnectingEdge())
+					if(edge.getFromVertex() &&
+						edge.getFromVertex()->getHub() &&
+						edge.isConnectingEdge())
 					{
 						for(Edge* it(nextEdge);
 							it && it->getPreviousConnectionDeparture() == previousConnectingDeparture;
@@ -305,7 +304,7 @@ namespace synthese
 				{
 					edge.setPreviousDepartureForFineSteppingOnly(previousEdge->getPreviousDepartureForFineSteppingOnly());
 				}
-				if(previousEdge->isDepartureAllowed() && previousEdge->isConnectingEdge())
+				if(previousEdge->isDepartureAllowed() && previousEdge->getFromVertex() && previousEdge->getFromVertex()->getHub() && previousEdge->isConnectingEdge())
 				{
 					edge.setPreviousConnectionDeparture(previousEdge);
 				}
@@ -389,97 +388,6 @@ namespace synthese
 			{
 				edge->markServiceIndexUpdateNeeded(collection, RTDataOnly);
 			}
-		}
-
-
-
-		void Path::merge(Path& other )
-		{
-			if(	other._pathGroup != _pathGroup ||
-				other._edges.empty() ||
-				_edges.empty() ||
-				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex() ||
-				&other == this
-			){
-				throw Exception("The two roads cannot be merged");
-			}
-
-			Edge* lastEdge(getLastEdge());
-			Vertex* vertex(const_cast<Vertex*>(lastEdge->getFromVertex()));
-			double metricOffset(lastEdge->getMetricOffset());
-			size_t rankInPath(lastEdge->getRankInPath());
-
-			_edges.pop_back();
-			vertex->removeArrivalEdge(lastEdge);
-
-			lastEdge->getPrevious()->setNext(other._edges[0]);
-			other._edges[0]->setPrevious(lastEdge->getPrevious());
-
-			BOOST_FOREACH(Edge* edge, other._edges)
-			{
-				if(edge->getPreviousConnectionDeparture() == NULL)
-				{
-					edge->setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
-				}
-				if(edge->getPreviousDepartureForFineSteppingOnly() == NULL)
-				{
-					edge->setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
-				}
-			}
-
-			BOOST_FOREACH(Edge* edge, _edges)
-			{
-				if(edge->getFollowingConnectionArrival() == lastEdge)
-				{
-					edge->setFollowingConnectionArrival(other._edges[0]);
-				}
-				if(edge->getFollowingConnectionArrival() == NULL)
-				{
-					edge->setFollowingConnectionArrival(other._edges[0]->getFollowingConnectionArrival());
-				}
-				if(edge->getFollowingArrivalForFineSteppingOnly() == lastEdge)
-				{
-					edge->setFollowingArrivalForFineSteppingOnly(other._edges[0]);
-				}
-				if(edge->getFollowingArrivalForFineSteppingOnly() == NULL)
-				{
-					edge->setFollowingArrivalForFineSteppingOnly(other._edges[0]->getFollowingArrivalForFineSteppingOnly());
-				}
-			}
-
-			BOOST_FOREACH(Edge* edge, other._edges)
-			{
-				Vertex* vertex(const_cast<Vertex*>(edge->getFromVertex()));
-				if(edge->isArrivalAllowed())
-				{
-					vertex->removeArrivalEdge(edge);
-				}
-				if(edge->isDepartureAllowed())
-				{
-					vertex->removeDepartureEdge(edge);
-				}
-				edge->setRankInPath(edge->getRankInPath()+rankInPath);
-				edge->setMetricOffset(edge->getMetricOffset()+metricOffset);
-				_edges.push_back(edge);
-				edge->setParentPath(this);
-				if(edge->isArrivalAllowed())
-				{
-					vertex->addArrivalEdge(edge);
-				}
-				if(edge->isDepartureAllowed())
-				{
-					vertex->addDepartureEdge(edge);
-				}
-
-				// Update of the rank map
-				_rankMap[edge->getMetricOffset()] = edge->getRankInPath();
-			}
-
-			// Cleaning the other path
-			other._edges.clear();
-			other._rankMap.clear();
-
-			_pathGroup->removePath(&other);
 		}
 
 

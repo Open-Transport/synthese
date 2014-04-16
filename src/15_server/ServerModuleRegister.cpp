@@ -7,6 +7,7 @@
 #include "LogoutAction.h"
 #include "QuitAction.hpp"
 #include "SetSessionVariableAction.hpp"
+#include "SuicidalAction.hpp"
 #include "ThreadKillAction.h"
 #include "LoginToken.hpp"
 
@@ -50,6 +51,7 @@ void synthese::server::moduleRegister()
 	synthese::server::LogoutAction::integrate();
 	synthese::server::QuitAction::integrate();
 	synthese::server::SetSessionVariableAction::integrate();
+	synthese::server::SuicidalAction::integrate();
 	synthese::server::ThreadKillAction::integrate();
 
 	synthese::server::HtmlFormInterfaceElement::integrate();

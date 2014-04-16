@@ -1281,8 +1281,8 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 	DRTArea a23;
 	{
 		Stops::Type stops;
-		stops.insert(&p2);
-		stops.insert(&p3);
+		stops.push_back(&p2);
+		stops.push_back(&p3);
 		a23.set<Stops>(stops);
 	}
 
@@ -1471,8 +1471,8 @@ BOOST_AUTO_TEST_CASE (testDRTWithInsufficientSchedulesNumber)
 	DRTArea a23;
 	{
 		Stops::Type stops;
-		stops.insert(&p2);
-		stops.insert(&p3);
+		stops.push_back(&p2);
+		stops.push_back(&p3);
 		a23.set<Stops>(stops);
 	}
 

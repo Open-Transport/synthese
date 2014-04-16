@@ -3,6 +3,10 @@ set_source_groups()
 set(data_exchange_SRCS
   CalendarFileFormat.cpp
   CalendarFileFormat.hpp
+  CMSExport.cpp
+  CMSExport.hpp
+  CMSImport.cpp
+  CMSImport.hpp
   DataExchangeModule.cpp
   DataExchangeModule.gen.cpp
   DataExchangeModule.inc.cpp
@@ -12,8 +16,6 @@ set(data_exchange_SRCS
   GTFSFileFormat.hpp
   GPSdFileFormat.cpp
   GPSdFileFormat.hpp
-  GPSSimuFileFormat.cpp
-  GPSSimuFileFormat.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
   HastusCSVFileFormat.cpp

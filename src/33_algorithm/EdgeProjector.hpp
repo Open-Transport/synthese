@@ -26,7 +26,7 @@
 #include "Exception.h"
 #include "DBModule.h"
 #include "AccessParameters.h"
-#include "ReverseRoadChunk.hpp"
+#include "RoadChunkEdge.hpp"
 
 #include <map>
 #include <vector>
@@ -152,7 +152,8 @@ namespace synthese
 				bool compatibleWithUserClasses(true);
 				BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
 				{
-					if(!edge->isCompatibleWith(graph::AccessParameters(userClassCode)) && !edge->getReverseRoadChunk()->isCompatibleWith(graph::AccessParameters(userClassCode)))
+					if(	!edge->getForwardEdge().isCompatibleWith(graph::AccessParameters(userClassCode)) &&
+						!edge->getReverseEdge().isCompatibleWith(graph::AccessParameters(userClassCode)))
 					{
 						compatibleWithUserClasses = false;
 						break;

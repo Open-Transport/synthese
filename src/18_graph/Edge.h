@@ -28,7 +28,6 @@
 #include "Registrable.h"
 #include "GraphTypes.h"
 #include "Path.h"
-#include "WithGeometry.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -77,7 +76,6 @@ namespace synthese
 		*/
 		class Edge:
 			public virtual util::Registrable,
-			public WithGeometry<geos::geom::LineString>,
 			public RuleUser
 		{
 		public:
@@ -299,7 +297,8 @@ namespace synthese
 					bool allowCanceledService = false,
 					bool enableTheoretical = true,
 					bool enableRealTime = true,
-					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY
+					UseRule::ReservationDelayType reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY,
+					bool maxDepartureMomentConcernsTheorical = false
 				) const;
 
 
@@ -342,16 +341,15 @@ namespace synthese
 
 
 
-				virtual const RuleUser* _getParentRuleUser() const { return NULL; }
+			virtual const RuleUser* _getParentRuleUser() const { return NULL; }
 
+			virtual std::string getRuleUserName() const { return "edge"; }
 
+			virtual bool getReservationNeeded() const { return false; }
 
-				virtual std::string getRuleUserName() const { return "edge"; }
-
-				virtual bool getReservationNeeded() const { return false; }
+			virtual double getCarSpeed() const { return 0; }
 		};
-	}
-}
+}	}
 
 #endif
 

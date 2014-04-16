@@ -585,7 +585,7 @@ namespace synthese
 						_logInfo(
 							"Stop "+ code +" ("+ stop->getName() +") moved from " + exGeom->toString() + " to " + (newGeom ? newGeom->toString() : "POINT(0 0)")
 						);
-					}
+				}
 				}
 
 				if(rules)

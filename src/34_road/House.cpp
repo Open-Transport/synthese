@@ -23,8 +23,9 @@
 #include "House.hpp"
 #include "Road.h"
 #include "Path.h"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
-#include "MainRoadPart.hpp"
+#include "RoadChunkEdge.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include "EdgeProjector.hpp"
@@ -54,8 +55,8 @@ namespace synthese
 
 
 		House::House(
-			MainRoadChunk& chunk,
-			MainRoadChunk::HouseNumber houseNumber,
+			RoadChunk& chunk,
+			HouseNumber houseNumber,
 			bool numberAtBeginning,
 			std::string separator
 		):	Registrable(0),
@@ -68,11 +69,11 @@ namespace synthese
 		{
 			setName(
 				string(
-					(numberAtBeginning ? lexical_cast<string>(houseNumber) : chunk.getRoad()->getRoadPlace()->getName()) +
+					(numberAtBeginning ? lexical_cast<string>(houseNumber) : chunk.getRoad()->get<RoadPlace>()->getName()) +
 					separator +
-					(numberAtBeginning ? chunk.getRoad()->getRoadPlace()->getName() : lexical_cast<string>(houseNumber))
+					(numberAtBeginning ? chunk.getRoad()->get<RoadPlace>()->getName() : lexical_cast<string>(houseNumber))
 			)	);
-			setCity(chunk.getRoad()->getRoadPlace()->getCity());
+			setCity(chunk.getRoad()->get<RoadPlace>()->getCity());
 		}
 
 
@@ -98,25 +99,21 @@ namespace synthese
 			double maxDistance
 		){
 			// ToDo : Chercher le RoadChunk le plus proche de la géométrie de l'objet House
-			std::vector<MainRoadChunk*> roads;
-			std::set<Path*> paths(roadPlace->getPaths());
+			std::vector<RoadChunk*> roads;
+			RoadPlace::Roads paths(roadPlace->getRoads());
 
-			BOOST_FOREACH(Path* path,paths)
+			BOOST_FOREACH(Road* path, paths)
 			{
-				if(!dynamic_cast<MainRoadPart*>(path))
-				{
-					continue;
-				}
-				std::vector<Edge*> edges(path->getEdges());
+				std::vector<Edge*> edges(path->getForwardPath().getEdges());
 				BOOST_FOREACH(Edge* edge,edges)
 				{
-					roads.push_back(dynamic_cast<MainRoadChunk*>(edge));
+					roads.push_back(dynamic_cast<RoadChunkEdge*>(edge)->getRoadChunk());
 				}
 			}
 
-			EdgeProjector<MainRoadChunk*> projector(roads, maxDistance);
+			EdgeProjector<RoadChunk*> projector(roads, maxDistance);
 
-			EdgeProjector<MainRoadChunk*>::PathNearby projection(projector.projectEdge(*(this->getGeometry()->getCoordinate())));
+			EdgeProjector<RoadChunk*>::PathNearby projection(projector.projectEdge(*(this->getGeometry()->getCoordinate())));
 			this->setRoadChunk(projection.get<1>());
 			if(projection.get<1>())
 			{
@@ -150,7 +147,7 @@ namespace synthese
 		) const	{
 
 			// Road place informations
-			getRoadChunk()->getRoad()->getRoadPlace()->toParametersMap(pm, coordinatesSystem, DATA_ROAD_PREFIX);
+			getRoadChunk()->getRoad()->get<RoadPlace>()->toParametersMap(pm, coordinatesSystem, DATA_ROAD_PREFIX);
 
 			// Number
 			if(getHouseNumber())

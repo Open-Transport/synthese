@@ -364,7 +364,7 @@ namespace synthese
 					bool isAreaOfTerminus= false;
 					if(_terminusId)
 					{
-						const StopArea* stopAreaTerminus = journey->getDestination()->getConnectionPlace();
+						const StopArea * stopAreaTerminus = journey->getDestination()->getConnectionPlace();
 
 						if (stopAreaTerminus->getKey() == *_terminusId)
 						{

@@ -657,7 +657,7 @@ namespace synthese
 						AccessParameters ap(USER_PEDESTRIAN);
 						ServicePointer servicePointer(
 							ls->getNextService(
-								*itCollection,
+									*itCollection,
 								ap,
 								departureDateTime,
 								endDateTime,

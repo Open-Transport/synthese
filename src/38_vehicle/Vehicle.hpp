@@ -24,6 +24,7 @@
 #define SYNTHESE_vehicle_Vehicle_hpp__
 
 #include "DataSourceLinksField.hpp"
+#include "InterSYNTHESESlave.hpp"
 #include "NumericField.hpp"
 #include "Object.hpp"
 #include "PointersSetField.hpp"
@@ -61,7 +62,8 @@ namespace synthese
 			FIELD(Available),
 			FIELD(URL),
 			FIELD(RegistrationNumber),
-			FIELD(impex::DataSourceLinks)
+			FIELD(impex::DataSourceLinks),
+			FIELD(inter_synthese::InterSYNTHESESlave)
 		> VehicleRecord;
 
 		/** Vehicle class.
@@ -69,7 +71,8 @@ namespace synthese
 		*/
 		class Vehicle:
 			public virtual util::Registrable,
-			public Object<Vehicle, VehicleRecord>
+			public Object<Vehicle, VehicleRecord>,
+			public impex::ImportableTemplate<Vehicle>
 		{
 		public:
 			static const std::string TAG_SEAT;

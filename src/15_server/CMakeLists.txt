@@ -5,6 +5,8 @@ ActionException.cpp
 ActionException.h
 ActionService.cpp
 ActionService.hpp
+BasicClientWin.cpp
+BasicClientWin.h
 BasicClient.cpp
 BasicClient.h
 CleanerThreadExec.cpp
@@ -31,6 +33,8 @@ HtmlFormFieldInterfaceElement.cpp
 HtmlFormFieldInterfaceElement.h
 HtmlFormInterfaceElement.cpp
 HtmlFormInterfaceElement.h
+HTTPClient.cpp
+HTTPClient.hpp
 HTTPConnection.cpp
 HTTPConnection.hpp
 HTTPClient.cpp
@@ -88,6 +92,8 @@ SetSessionVariableAction.hpp
 StaticActionFunctionRequest.h
 StaticActionRequest.h
 StaticFunctionRequest.h
+SuicidalAction.cpp
+SuicidalAction.hpp
 SYNTHESEInformationService.cpp
 SYNTHESEInformationService.hpp
 ThreadKillAction.cpp

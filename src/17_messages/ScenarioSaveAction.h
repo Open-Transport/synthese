@@ -99,6 +99,7 @@ namespace synthese
 				static const std::string PARAMETER_RECIPIENT_DATASOURCE_ID;
 				static const std::string PARAMETER_RECIPIENT_TYPE;
 				static const std::string PARAMETER_ENCODING;
+				static const std::string PARAMETER_RECIPIENTS_;
 			//@}
 
 			static const std::string VALUES_SEPARATOR;
@@ -143,8 +144,10 @@ namespace synthese
 				typedef 
 				boost::optional<
 					std::vector<
-					std::pair<util::RegistryKeyType, boost::optional<std::string> >
-				>	>	Recipients;
+						std::pair<
+							std::string,
+							std::pair<util::RegistryKeyType, boost::optional<std::string> >
+				>	>	> Recipients;
 				Recipients _recipients;
 				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;

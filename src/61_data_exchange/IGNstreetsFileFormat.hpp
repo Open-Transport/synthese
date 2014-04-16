@@ -27,7 +27,6 @@
 #include "FileFormatTemplate.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
-#include "MainRoadChunk.hpp"
 
 #include <map>
 #include <ostream>

@@ -199,6 +199,9 @@ namespace synthese
 				   boost::lexical_cast<string>(endpoint_iter->endpoint())
 				);
 
+				// Form the request
+				initRequest(_request);
+
 				// Start the input actor.
 				startRead();
 
@@ -207,10 +210,20 @@ namespace synthese
 			}
 		}
 
+		/* Append the reception buffer to the payload buffer */
+		void HTTPClient::payloadAppend()
+		{
+			size_t size(input_buffer_.size());
+			const char* header = boost::asio::buffer_cast<const char*>(input_buffer_.data());
+			_payload += string(header, size);
+			input_buffer_.consume(size);
+		}
+
 		void HTTPClient::startRead()
 		{
 			// Set a deadline for the read operation.
-			deadline_.expires_from_now(boost::posix_time::seconds(CLIENT_READ_TIMEOUT_S));
+			deadline_.expires_from_now(boost::posix_time::seconds(CLIENT_READ_TIMEOUT_S +
+																  _request.size() / 10000));
 
 			// Start an asynchronous operation to read a newline-delimited message.
 			boost::asio::async_read_until(socket_, input_buffer_, '\n',
@@ -225,12 +238,12 @@ namespace synthese
 
 			if (!ec)
 			{
-				// Extract the newline-delimited message from the buffer.
-				std::string line;
 				std::istream is(&input_buffer_);
 
 				if(!_gotHeader)
 				{
+					// Extract the newline-delimited message from the buffer.
+					std::string line;
 					std::getline(is, line);
 					// Create a map of each http header received
 					line.erase(line.find_last_not_of("\n\r")+1);
@@ -244,7 +257,7 @@ namespace synthese
 						boost::split(strs, line, boost::is_any_of(": "),
 							boost::algorithm::token_compress_on
 						);
-						if(strs.size())
+						if(strs.size() >= 2)
 						{
 							_headers[strs[0]] = strs[1];
 							util::Log::GetInstance().trace("HTTPClient: received header: " +
@@ -253,6 +266,7 @@ namespace synthese
 
 							if(strs[0].substr(0, 5) == "HTTP/" && strs[1] != "200")
 							{
+								stop();
 								throw Exception("Response returned with status code " + strs[1]);
 							}
 							else if(strs[0] == "Content-Length")
@@ -270,9 +284,7 @@ namespace synthese
 				}
 				else
 				{
-					const char* header = boost::asio::buffer_cast<const char*>(input_buffer_.data());
-					_payload += string(header, input_buffer_.size());
-					input_buffer_.consume(input_buffer_.size());
+					payloadAppend();
 				}
 
 				startRead();
@@ -282,6 +294,9 @@ namespace synthese
 
 				if(ec == boost::asio::error::eof)
 				{
+					// Save the last chunk of received data
+					payloadAppend();
+
 					// Check the announced length matches with what we got
 					if(_payload.size() != _announcedContentLength)
 					{
@@ -374,15 +389,8 @@ namespace synthese
 			if (stopped_)
 				return;
 
-			// Form the request. We specify the "Connection: close" header so that the
-			// server will close the socket after transmitting the response. This will
-			// allow us to treat all data up until the EOF as the content.
-
-			boost::asio::streambuf request;
-			initRequest(request);
-
-			// Start an asynchronous operation to send a heartbeat message.
-			boost::asio::async_write(socket_, request,
+			// Start an asynchronous operation to send the http request
+			boost::asio::async_write(socket_, _request,
 				boost::bind(&HTTPClient::handleWrite, this, _1)
 			);
 		}

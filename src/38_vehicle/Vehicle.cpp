@@ -62,7 +62,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Available, true),
 					FIELD_DEFAULT_CONSTRUCTOR(URL),
 					FIELD_DEFAULT_CONSTRUCTOR(RegistrationNumber),
-					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks)
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(inter_synthese::InterSYNTHESESlave)
 			)	)
 		{}
 

@@ -33,6 +33,8 @@
 #include "PublicPlace.h"
 #include "Request.h"
 #include "RequestException.h"
+#include "Road.h"
+#include "RoadChunkEdge.hpp"
 #include "RoadPlace.h"
 #include "StopArea.hpp"
 #include "PTServiceConfigTableSync.hpp"
@@ -350,14 +352,15 @@ namespace synthese
 
 				BOOST_FOREACH(const RoadChunkTableSync::SearchResult::value_type& roadChunk, roadChunks)
 				{
-					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
-					MainRoadChunk::HouseNumber houseNumber(0);
+					RoadChunk& chunk(static_cast<RoadChunk&>(*roadChunk));
+					HouseNumber houseNumber(0);
 
 					bool compatibleWithUserClasses(true);
 					BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
 					{
-						if(!chunk.isCompatibleWith(graph::AccessParameters(userClassCode)) && !chunk.getReverseRoadChunk()->isCompatibleWith(graph::AccessParameters(userClassCode)))
-						{
+						if(	!chunk.getForwardEdge().isCompatibleWith(graph::AccessParameters(userClassCode)) &&
+							!chunk.getReverseEdge().isCompatibleWith(graph::AccessParameters(userClassCode))
+						){
 							compatibleWithUserClasses = false;
 							break;
 						}
@@ -376,16 +379,22 @@ namespace synthese
 					{
 						houseNumber = chunk.getRightHouseNumberBounds()->first;
 					}
-					else if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
+					else if(!chunk.getRoad() || !chunk.getRoad()->get<RoadPlace>() || chunk.getRoad()->get<RoadPlace>()->getName() == "")
+					{
 						continue;
+					}
 
 					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
 
 					string name;
 					if(houseNumber == 0)
-						name = chunk.getRoad()->getRoadPlace()->getName();
+					{
+						name = chunk.getRoad()->get<RoadPlace>()->getName();
+					}
 					else
+					{
 						name = (house.get())->getName();
+					}
 
 					if(name == "")continue;
 
@@ -410,7 +419,7 @@ namespace synthese
 							if(*(house.get())->getHouseNumber() == 0)
 							{
 								//Don't insert same road twice
-								string roadName = (house.get())->getRoadChunk()->getRoad()->getRoadPlace()->getName();
+								string roadName = (house.get())->getRoadChunk()->getRoad()->get<RoadPlace>()->getName();
 								set<string>::iterator frenchIt = insertedRoadName.find(roadName);
 								if(frenchIt == insertedRoadName.end())
 								{
@@ -518,11 +527,11 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
-							MainRoadChunk::HouseNumber number(0);
+							HouseNumber number(0);
 							string roadName;
 							try
 							{
-								number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+								number = lexical_cast<HouseNumber>(words[0]);
 								roadName = _text.substr(words[0].size() + 1);
 							}
 							catch (bad_lexical_cast)
@@ -530,7 +539,7 @@ namespace synthese
 								// Try number at the end
 								try
 								{
-									number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size() - 1]);
+									number = lexical_cast<HouseNumber>(words[words.size() - 1]);
 									roadName = _text.substr(0, _text.size() - words[words.size() - 1].size() - 1);
 								}
 								catch (bad_lexical_cast)
@@ -666,11 +675,11 @@ namespace synthese
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
 						{	// Text points to an address
-							MainRoadChunk::HouseNumber number(0);
+							HouseNumber number(0);
 							string roadName;
 							try
 							{
-								number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+								number = lexical_cast<HouseNumber>(words[0]);
 								roadName = _text.substr(words[0].size() + 1);
 							}
 							catch (bad_lexical_cast)
@@ -678,7 +687,7 @@ namespace synthese
 								// Try number at the end
 								try
 								{
-									number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size() - 1]);
+									number = lexical_cast<HouseNumber>(words[words.size() - 1]);
 									roadName = _text.substr(0, _text.size() - words[words.size() - 1].size() - 1);
 								}
 								catch (bad_lexical_cast)
@@ -1268,7 +1277,7 @@ namespace synthese
 							itemMap->get<RegistryKeyType>(
 								House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID
 					)	)	);
-					MainRoadChunk::HouseNumber houseNumber = itemMap->get<MainRoadChunk::HouseNumber>(House::DATA_NUMBER);
+					HouseNumber houseNumber = itemMap->get<HouseNumber>(House::DATA_NUMBER);
 					if(houseNumber != 0)
 					{
 						placeResult.value = static_pointer_cast<Place, House>(

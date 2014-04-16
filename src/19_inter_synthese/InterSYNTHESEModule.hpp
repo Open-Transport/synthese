@@ -46,6 +46,7 @@ namespace synthese
 	{
 		class InterSYNTHESEContent;
 		class InterSYNTHESEPackage;
+		class InterSYNTHESESlave;
 
 		/**	@defgroup m19Actions 19.15 Actions
 			@ingroup m19
@@ -96,8 +97,8 @@ namespace synthese
 			static std::string _masterPort;
 			static bool _slaveActive;
 			static util::RegistryKeyType _slaveId;
-			static void _generateFakeImport();
 			static PackagesBySmartURL _packagesBySmartURL;
+			static bool _passiveSlaveUpdaterSelector(const InterSYNTHESESlave& object);
 
 		public:
 			static void Enqueue(
@@ -121,6 +122,11 @@ namespace synthese
 			static void RemovePackage(
 				const std::string& smartURL
 			);
+
+			static void QueueCleaner();
+
+			static void PassiveSlavesUpdater();
+			static void GenerateFakeImport();
 		};
 
 		/** @} */

@@ -341,33 +341,34 @@ namespace synthese
 							}
 							stream << "</span> ";
 						}
-					}
+					
 
-					// Metric offset
-					stream << t.col();
-					stream << lineStop->get<MetricOffsetField>();
-					JourneyPattern::LineStops::const_iterator it2(it);
-					++it2;
-					if(	it2 != _line->getLineStops().end() &&
-						lineStop->get<LineStringGeometry>() &&
-						(*it2)->get<MetricOffsetField>() - lineStop->get<MetricOffsetField>() != floor(lineStop->get<LineStringGeometry>()->getLength())
-					){
-						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(true);
+						// Metric offset
+						stream << t.col();
+						stream << lineStop->get<MetricOffsetField>();
+						JourneyPattern::LineStops::const_iterator it2(it);
+						++it2;
+						if(	it2 != _line->getLineStops().end() &&
+							lineStop->get<LineStringGeometry>() &&
+							(*it2)->get<MetricOffsetField>() - lineStop->get<MetricOffsetField>() != floor(lineStop->get<LineStringGeometry>()->getLength())
+						){
+							lineStopUpdateAction.getAction()->setReadLengthFromGeometry(true);
+							stream <<
+								HTMLModule::getHTMLLink(
+									lineStopUpdateAction.getHTMLForm().getURL(),
+									HTMLModule::getHTMLImage("/admin/img/cog.png", "Générer distance depuis géométrie")
+								);
+							lineStopUpdateAction.getAction()->setReadLengthFromGeometry(false);
+						}
+						lineStopUpdateAction.getAction()->setClearGeom(true);
 						stream <<
 							HTMLModule::getHTMLLink(
 								lineStopUpdateAction.getHTMLForm().getURL(),
-								HTMLModule::getHTMLImage("/admin/img/cog.png", "Générer distance depuis géométrie")
+								HTMLModule::getHTMLImage("/admin/img/cross.png", "Supprimer géométrie"),
+								"Etes-vous sûr de vouloir supprimer la géométrie ?"
 							);
-						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(false);
+						lineStopUpdateAction.getAction()->setClearGeom(false);
 					}
-					lineStopUpdateAction.getAction()->setClearGeom(true);
-					stream <<
-						HTMLModule::getHTMLLink(
-							lineStopUpdateAction.getHTMLForm().getURL(),
-							HTMLModule::getHTMLImage("/admin/img/cross.png", "Supprimer géométrie"),
-							"Etes-vous sûr de vouloir supprimer la géométrie ?"
-						);
-					lineStopUpdateAction.getAction()->setClearGeom(false);
 
 					// DRT area
 					if(area)
@@ -395,6 +396,17 @@ namespace synthese
 							internalUpdateRequest.getAction()->setAllowedInternal(true);
 							stream << HTMLModule::getHTMLLink(internalUpdateRequest.getURL(), "OUI") << " [NON]";
 						}
+
+						// Default direction
+						lineStopUpdateAction.getAction()->setReverseDRTArea(!lineStop->get<ReverseDRTArea>());
+						stream <<
+							t.col() <<
+							HTMLModule::getHTMLLink(
+								lineStopUpdateAction.getHTMLForm().getURL(),
+								(lineStop->get<ReverseDRTArea>() ? HTMLModule::getHTMLImage("/admin/img/arrow_up.png","Trajet inversé") : HTMLModule::getHTMLImage("/admin/img/arrow_down.png", "Trajet non inversé"))
+							);
+						lineStopUpdateAction.getAction()->setReverseDRTArea(lineStop->get<ReverseDRTArea>());
+
 					}
 
 					// Allowed arrival
@@ -680,6 +692,7 @@ namespace synthese
 					string number("S"+ lexical_cast<string>(i++));
 					services[service.get()] = number;
 
+					recursive_mutex::scoped_lock lock(service->getSchedulesMutex());
 					time_duration ds(service->getDepartureSchedule(false, 0));
 					time_duration as(service->getLastArrivalSchedule(false));
 

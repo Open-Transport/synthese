@@ -26,7 +26,6 @@
 #include "Crossing.h"
 #include "ParametersMap.h"
 #include "PublicPlaceEntrance.hpp"
-#include "ReverseRoadChunk.hpp"
 #include "RoadModule.h"
 #include "VertexAccessMap.h"
 

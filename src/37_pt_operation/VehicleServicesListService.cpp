@@ -29,7 +29,7 @@
 #include "OperationUnit.hpp"
 #include "RequestException.h"
 #include "Request.h"
-#include "SchedulesBasedService.h"
+#include "ScheduledService.h"
 #include "StringField.hpp"
 #include "VehicleService.hpp"
 
@@ -44,6 +44,7 @@ namespace synthese
 {
 	using namespace cms;
 	using namespace util;
+	using namespace pt;
 	using namespace pt_operation;
 	using namespace server;
 	using namespace security;
@@ -55,6 +56,7 @@ namespace synthese
 	{
 		const string VehicleServicesListService::PARAMETER_PAGE = "p";
 		const string VehicleServicesListService::PARAMETER_WITH_DETAIL = "with_detail";
+		const string VehicleServicesListService::PARAMETER_SERVICE = "service";
 
 		const string VehicleServicesListService::TAG_VEHICLE_SERVICE = "vehicleService";
 		const string VehicleServicesListService::TAG_VEHICLE_SERVICES = "vehicleServices";
@@ -63,6 +65,7 @@ namespace synthese
 
 		VehicleServicesListService::VehicleServicesListService():
 			_page(NULL),
+			_scheduledService(NULL),
 			_withDetail(true)
 		{}
 
@@ -141,6 +144,17 @@ namespace synthese
 			{
 				throw RequestException("No such operation unit");
 			}
+
+			// Scheduled service filter
+			RegistryKeyType serviceId(map.getDefault<RegistryKeyType>(PARAMETER_SERVICE, 0));
+			if(serviceId) try
+			{
+				_scheduledService = Env::GetOfficialEnv().get<ScheduledService>(serviceId).get();
+			}
+			catch(ObjectNotFoundException<ScheduledService>&)
+			{
+				throw RequestException("No such service");
+			}
 		}
 
 
@@ -170,7 +184,7 @@ namespace synthese
 					}
 
 					// Operation unit filter
-					if(_operationUnit && (!vs.getOperationUnit() || &*vs.getOperationUnit() != &*_operationUnit))
+					if(_operationUnit && (!vs.get<OperationUnit>() || &*vs.get<OperationUnit>() != &*_operationUnit))
 					{
 						continue;
 					}
@@ -178,9 +192,31 @@ namespace synthese
 					// Name filter
 					if(!_name.empty())
 					{
-						if(	vs.getName().size() < _name.size() ||
-							vs.getName().substr(0, _name.size()) != _name
+						if(	vs.get<Name>().size() < _name.size() ||
+							vs.get<Name>().substr(0, _name.size()) != _name
 						){
+							continue;
+						}
+					}
+
+					// Service filter
+					if(_scheduledService)
+					{
+						bool result(false);
+						BOOST_FOREACH(const Services::Type::value_type& service, vs.get<Services>())
+						{
+							if(!dynamic_cast<const ScheduledService*>(service))
+							{
+								continue;
+							}
+							if(static_cast<const ScheduledService*>(service) == _scheduledService)
+							{
+								result = true;
+								break;
+							}
+						}
+						if(!result)
+						{
 							continue;
 						}
 					}

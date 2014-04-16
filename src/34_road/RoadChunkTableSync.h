@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_RoadChunkTableSync_H__
 #define SYNTHESE_RoadChunkTableSync_H__
 
-#include "MainRoadChunk.hpp"
+#include "RoadChunk.h"
 
 #include "DBDirectTableSyncTemplate.hpp"
 #include "OldLoadSavePolicy.hpp"
@@ -81,7 +81,7 @@ namespace synthese
 		class RoadChunkTableSync:
 			public db::DBDirectTableSyncTemplate<
 				RoadChunkTableSync,
-				MainRoadChunk,
+				RoadChunk,
 				db::FullSynchronizationPolicy,
 				db::OldLoadSavePolicy
 			>
@@ -141,7 +141,7 @@ namespace synthese
 				const geos::geom::Point& point,
 				double maxDistance,
 				Address& address,
-				algorithm::EdgeProjector<boost::shared_ptr<road::MainRoadChunk> >::CompatibleUserClassesRequired requiredUserClasses = algorithm::EdgeProjector<boost::shared_ptr<road::MainRoadChunk> >::CompatibleUserClassesRequired()
+				algorithm::EdgeProjector<boost::shared_ptr<road::RoadChunk> >::CompatibleUserClassesRequired requiredUserClasses = algorithm::EdgeProjector<boost::shared_ptr<road::RoadChunk> >::CompatibleUserClassesRequired()
 			);
 		};
 }	}

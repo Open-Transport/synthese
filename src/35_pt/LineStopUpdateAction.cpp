@@ -76,6 +76,7 @@ namespace synthese
 		const string LineStopUpdateAction::PARAMETER_READ_LENGTH_FROM_GEOMETRY = Action_PARAMETER_PREFIX + "read_length_from_geometry";
 		const string LineStopUpdateAction::PARAMETER_RESERVATION_NEEDED = Action_PARAMETER_PREFIX + "_reservation_needed";
 		const string LineStopUpdateAction::PARAMETER_CLEAR_GEOM = Action_PARAMETER_PREFIX + "_clear_geom";
+		const string LineStopUpdateAction::PARAMETER_REVERSE_DRT_AREA = Action_PARAMETER_PREFIX + "_reverse_drt_area";
 
 
 
@@ -118,6 +119,10 @@ namespace synthese
 			if(_reservationNeeded)
 			{
 				map.insert(PARAMETER_RESERVATION_NEEDED, *_reservationNeeded);
+			}
+			if(_reverseDRTArea)
+			{
+				map.insert(PARAMETER_REVERSE_DRT_AREA, *_reverseDRTArea);
 			}
 			if(_geometry)
 			{
@@ -212,6 +217,12 @@ namespace synthese
 			if(map.isDefined(PARAMETER_RESERVATION_NEEDED))
 			{
 				_reservationNeeded = map.get<bool>(PARAMETER_RESERVATION_NEEDED);
+			}
+
+			// Reservation needed
+			if(map.isDefined(PARAMETER_REVERSE_DRT_AREA))
+			{
+				_reverseDRTArea = map.get<bool>(PARAMETER_REVERSE_DRT_AREA);
 			}
 
 			// Clear geom
@@ -330,6 +341,12 @@ namespace synthese
 			if(_reservationNeeded)
 			{
 				_lineStop->set<ReservationNeeded>(*_reservationNeeded);
+			}
+
+			// Reverse DRT Area
+			if(_reverseDRTArea)
+			{
+				_lineStop->set<ReverseDRTArea>(*_reverseDRTArea);
 			}
 
 			// Geometry

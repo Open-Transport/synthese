@@ -23,17 +23,28 @@
 #ifndef SYNTHESE_ENV_ROAD_H
 #define SYNTHESE_ENV_ROAD_H
 
-#include <string>
+#include "Object.hpp"
 
-#include "Path.h"
+#include "EnumObjectField.hpp"
+#include "NumericField.hpp"
+#include "RoadPlace.h"
+#include "RoadTypes.hpp"
+#include "SchemaMacros.hpp"
 
 namespace synthese
 {
+	FIELD_ENUM(RoadTypeField, road::RoadType)
+
+	typedef boost::fusion::map<
+		FIELD(Key),
+		FIELD(RoadTypeField),
+		FIELD(road::RoadPlace)
+	> RoadSchema;
+
 	namespace road
 	{
-		class RoadPlace;
 		class RoadChunk;
-		class Address;
+		class RoadPart;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Contiguous part of a named road.
@@ -58,66 +69,71 @@ namespace synthese
 		/// By default, the side of the road is right, and its reversed road is on
 		/// left.
 		class Road:
-			public graph::Path
+			public Object<Road, RoadSchema>,
+			virtual public util::Registrable
 		{
 		public:
 
-		  typedef enum {
-			ROAD_TYPE_UNKNOWN,
-			ROAD_TYPE_MOTORWAY, /* autoroute */
-			ROAD_TYPE_MEDIANSTRIPPEDROAD,  /* route a chaussees separees (terre plein) */
-			ROAD_TYPE_PRINCIPLEAXIS, /* axe principal (au sens rue) */
-			ROAD_TYPE_SECONDARYAXIS, /* axe principal (au sens rue) */
-			ROAD_TYPE_BRIDGE, /* pont */
-			ROAD_TYPE_STREET, /* rue */
-			ROAD_TYPE_PEDESTRIANSTREET, /* rue pietonne */
-			ROAD_TYPE_ACCESSROAD, /* bretelle */
-			ROAD_TYPE_PRIVATEWAY, /* voie privee */
-			ROAD_TYPE_PEDESTRIANPATH, /* chemin pieton */
-			ROAD_TYPE_TUNNEL, /* tunnel */
-			ROAD_TYPE_HIGHWAY, /* route secondaire */
-			ROAD_TYPE_STEPS, /* steps */
-			ROAD_TYPE_SERVICE
-		} RoadType;
 
+		private:
+			boost::shared_ptr<RoadPath> _forwardPath;
+			boost::shared_ptr<RoadPath> _reversePath;
 
-		protected:
-			RoadType _type;
+		public:
 
 			Road(
 				util::RegistryKeyType key = 0,
 				RoadType type = ROAD_TYPE_UNKNOWN
 			);
-
 			virtual ~Road();
 
-			void _setRoadPlace( RoadPlace& value );
 
-			void _insertRoadChunk(
-				RoadChunk& chunk,
-				double length,
-				std::size_t rankShift
-			);
-
-		public:
 		//! @name Getters
 		//@{
-			const RoadType& getType () const { return _type; }
+			RoadPath& getForwardPath() const { return *_forwardPath; }
+			RoadPath& getReversePath() const { return *_reversePath; }
 		//@}
 
 		//! @name Setters
 		//@{
-			void setType (const RoadType& type);
 		//@}
 
 		//! @name Services
 		//@{
-			RoadPlace* getRoadPlace() const;
-			virtual bool isPedestrianMode() const;
-			virtual bool isRoad() const;
-			virtual std::string getRuleUserName() const;
-			virtual bool isActive(const boost::gregorian::date& date) const;
-			virtual bool isReversed() const = 0;
+		//@}
+
+		//! @name Update methods.
+		//@{
+			//////////////////////////////////////////////////////////////////////////
+			/// Inserts a road chunk at the beginning of the road
+			/// @param chunk the chunk to add
+			/// @param length length of the chunk
+			/// @param rankShift
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.18
+			/// @pre the road must contain at least one chunk
+			/// @pre the rank and the metric offset of the chunk to insert must be less
+			/// than the rank of the first edge raised by the rankShift.
+			/// @pre same condition on the metric offset
+			/// @post do not use the generated graph directly : only for saving purpose
+			void insertRoadChunk(
+				RoadChunk& chunk,
+				double length,
+				size_t rankShift
+			);
+
+
+
+			void merge(
+				Road& other
+			);
+		//@}
+
+		//! @name Modifiers
+		//@{
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
 		//@}
 		};
 	}

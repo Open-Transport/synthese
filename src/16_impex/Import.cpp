@@ -143,9 +143,10 @@ namespace synthese
 					_autoImporter->killPermanentThread();
 				}
 
-				// Delete the auto importer cache in case of parameter update
-				_autoImporter.reset();
-			}
+			// Delete the auto importer cache in case of parameter update
+			recursive_mutex::scoped_lock lock(_autoImportMutex);
+			_autoImporter.reset();
+		}
 		}
 
 
@@ -173,6 +174,8 @@ namespace synthese
 
 		boost::shared_ptr<Importer> Import::_getAutoImporter() const
 		{
+
+			recursive_mutex::scoped_lock lock(_autoImportMutex);
 			if(!_autoImporter.get())
 			{
 				boost::shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(get<FileFormatKey>()));
@@ -195,8 +198,15 @@ namespace synthese
 		void Import::runAutoImport() const
 		{
 			ptime startTime(second_clock::local_time());
+			recursive_mutex::scoped_lock lock(_autoImportMutex);
+
+			if(!_autoImporterEnv)
+			{
+				_getAutoImporter();
+			}
 
 			_autoImporterEnv->clear();
+			_getAutoImporter()->openLogFile();
 			bool result(_getAutoImporter()->parseFiles());
 			if(result)
 			{
@@ -204,8 +214,8 @@ namespace synthese
 				DBModule::DeactivateConditionalTablesUpdate();
 				try
 				{
-					transaction.run();
-				}
+				transaction.run();
+			}
 				catch(...)
 				{
 

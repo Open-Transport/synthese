@@ -58,7 +58,7 @@ namespace synthese
 	namespace road
 	{
 		class Crossing;
-		class RoadChunk;
+		class RoadChunkEdge;
 	}
 
 	namespace algorithm
@@ -68,7 +68,7 @@ namespace synthese
 		class AStarShortestPathCalculator
 		{
 		public:
-			typedef std::vector<const road::RoadChunk*> ResultPath;
+			typedef std::vector<const road::RoadChunkEdge*> ResultPath;
 			typedef std::map<util::RegistryKeyType, boost::shared_ptr<AStarNode> > NodeMap;
 			typedef std::set<const pt::StopPoint*> FoundStops;
 
@@ -112,7 +112,8 @@ namespace synthese
 				NodeMap& nodeMap,
 				std::priority_queue<boost::shared_ptr<AStarNode> >& openSet,
 				const graph::VertexAccessMap& endingVertices,
-				const boost::shared_ptr<geos::geom::Point> heuristicReference
+				const boost::shared_ptr<geos::geom::Point> heuristicReference,
+				const bool findAllAccessibleVertices = false
 			) const;
 
 
@@ -142,7 +143,7 @@ namespace synthese
 		private:
 			const road::Crossing* _node;
 			boost::shared_ptr<AStarNode> _parent;
-			const road::RoadChunk* _link;
+			const road::RoadChunkEdge* _link;
 			int _heuristicCost;
 			int _realCost;
 			double _distance;
@@ -158,14 +159,14 @@ namespace synthese
 
 			const road::Crossing* getCrossing(){ return _node; }
 			boost::shared_ptr<AStarNode> getParent(){ return _parent; }
-			const road::RoadChunk* getLink(){ return _link; }
+			const road::RoadChunkEdge* getLink(){ return _link; }
 			int getHeuristicCost(){ return _heuristicCost; }
 			int getRealCost(){ return _realCost; }
 			double getDistance(){ return _distance; }
 			bool isVisited(){ return _visited; }
 
 			void setParent(boost::shared_ptr<AStarNode> parent){ _parent = parent; }
-			void setLink(const road::RoadChunk* link){ _link = link; }
+			void setLink(const road::RoadChunkEdge* link){ _link = link; }
 			void setHeuristicCost(int heuristicCost){ _heuristicCost = heuristicCost; }
 			void setRealCost(int realCost){ _realCost = realCost; }
 			void setDistance(double distance){ _distance = distance; }

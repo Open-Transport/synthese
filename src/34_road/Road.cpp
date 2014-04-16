@@ -21,13 +21,10 @@
 */
 
 #include "Road.h"
-#include "RoadPlace.h"
-#include "Address.h"
-#include "RoadChunk.h"
-#include "PermanentService.h"
-#include "Registry.h"
 
-#include <geos/geom/LineString.h>
+#include "RoadChunk.h"
+#include "RoadChunkEdge.hpp"
+#include "RoadPath.hpp"
 
 using namespace std;
 using namespace boost;
@@ -35,13 +32,14 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace road;
 	using namespace util;
 	using namespace graph;
 
-	namespace util
-	{
-		template<> const string Registry<road::Road>::KEY("Road");
-	}
+	CLASS_DEFINITION(Road, "t015_roads", 15)
+	FIELD_DEFINITION_OF_OBJECT(Road, "road_id", "road_ids")
+
+	FIELD_DEFINITION_OF_TYPE(RoadTypeField, "road_type", SQL_INTEGER)
 
 	namespace road
 	{
@@ -49,99 +47,152 @@ namespace synthese
 			RegistryKeyType id,
 			RoadType type
 		):	Registrable(id),
-			_type (type)
-		{
-			// Creation of the permanent service
-			PermanentService* service(new PermanentService(id, this));
-			addService(*service, false);
-			service->setPath(this);
-		}
+			Object<Road, RoadSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_VALUE_CONSTRUCTOR(RoadTypeField, type),
+					FIELD_DEFAULT_CONSTRUCTOR(RoadPlace)
+			)	),
+			_forwardPath(new RoadPath(*this)),
+			_reversePath(new RoadPath(*this))
+		{}
 
 
 
 		Road::~Road()
 		{
-			BOOST_FOREACH(ServiceSet::value_type service, getAllServices())
+			// Edges null pointer
+			BOOST_FOREACH(Edge* edge, getForwardPath().getEdges())
 			{
-				delete service;
+				edge->setParentPath(NULL);
+			}
+			BOOST_FOREACH(Edge* edge, getReversePath().getEdges())
+			{
+				edge->setParentPath(NULL);
+			}
+
+			unlink();
+		}
+
+
+
+		void Road::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			// Roadplace registration
+			if(get<RoadPlace>())
+			{
+				_forwardPath->_pathGroup = &*get<RoadPlace>();
+				get<RoadPlace>()->addRoad(*_forwardPath);
+				_reversePath->_pathGroup = &*get<RoadPlace>();
+				get<RoadPlace>()->addRoad(*_reversePath);
+				get<RoadPlace>()->addRoad(*this);
+			}
+			else
+			{
+				_forwardPath->_pathGroup = NULL;
+				_reversePath->_pathGroup = NULL;
 			}
 		}
 
 
 
-		void Road::setType(
-			const RoadType& type
-		){
-			_type = type;
-		}
-
-
-
-		bool Road::isPedestrianMode() const
+		void Road::unlink()
 		{
-			return true;
-		}
-
-
-
-		RoadPlace* Road::getRoadPlace(
-		) const {
-			return static_cast<RoadPlace*>(_pathGroup);
-		}
-
-
-
-		bool Road::isRoad() const
-		{
-			return true;
-		}
-
-
-
-		std::string Road::getRuleUserName() const
-		{
-			return "Route " + getRoadPlace()->getFullName();
-		}
-
-
-
-		bool Road::isActive( const boost::gregorian::date& date ) const
-		{
-			return true;
-		}
-
-
-
-		void Road::_setRoadPlace( RoadPlace& value )
-		{
-			// Break of existing link if exists
-			if(_pathGroup)
+			// Roadplace registration
+			if(get<RoadPlace>())
 			{
-				value.removeRoad(*this);
+				get<RoadPlace>()->removeRoad(*_forwardPath);
+				get<RoadPlace>()->removeRoad(*_reversePath);
+				get<RoadPlace>()->removeRoad(*this);
 			}
-
-			// New links
-			_pathGroup = &value;
-			value.addRoad(*this);
 		}
 
 
 
-		void Road::_insertRoadChunk(
-			RoadChunk& chunk, double length, std::size_t rankShift
-		){
-			assert(!_edges.empty());
-			assert(chunk.getMetricOffset() <= (*_edges.begin())->getMetricOffset() + length);
-			assert(chunk.getMetricOffset() <= (*_edges.begin())->getRankInPath() + rankShift);
+		void Road::insertRoadChunk( RoadChunk& chunk, double length, size_t rankShift )
+		{
+			assert(!getForwardPath()._edges.empty());
+			assert(chunk.getMetricOffset() <= (*getForwardPath()._edges.begin())->getMetricOffset() + length);
+			assert(chunk.getMetricOffset() <= (*getForwardPath()._edges.begin())->getRankInPath() + rankShift);
 
 			// Shifting the whole road to right
-			for(Edges::const_iterator it(_edges.begin()); it != _edges.end(); ++it)
+			std::vector<RoadChunk*> roadChunks;
+			BOOST_FOREACH(Edge* edge, getForwardPath()._edges)
 			{
-				(*it)->setRankInPath((*it)->getRankInPath() + rankShift);
-				(*it)->setMetricOffset((*it)->getMetricOffset() + length);
+				roadChunks.push_back(static_cast<RoadChunkEdge*>(edge)->getRoadChunk());
 			}
 
-			// Insertion of the chunk
-			addEdge(chunk);
+			BOOST_FOREACH(RoadChunk* roadChunk, roadChunks)
+			{
+				roadChunk->unlink();
+				roadChunk->setRankInPath(roadChunk->getRankInPath() + rankShift);
+				roadChunk->setMetricOffset(roadChunk->getMetricOffset() + length);
+			}
+
+			Env fakeEnv;
+			BOOST_FOREACH(RoadChunk* roadChunk, roadChunks)
+			{
+				roadChunk->link(fakeEnv);
+			}
+			chunk.link(fakeEnv);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Merges two roads.
+		/// @param other the road to add at the end of the current object
+		/// Actions :
+		///  - verify if the two roads can be merged (the second one must begin
+		///    where the current one ends, and the two roads must belong to the
+		///    same RoadPlace)
+		///  - shift the metric offset in the second road
+		///  - change the pointers
+		///  - delete the second road in the road place
+		/// The other road must be removed from the registry externally
+		void Road::merge( Road& other )
+		{
+			if(	!other.get<RoadPlace>() ||
+				!get<RoadPlace>() ||
+				&*get<RoadPlace>() != &*other.get<RoadPlace>() ||
+				other.getForwardPath()._edges.empty() ||
+				getForwardPath()._edges.empty() ||
+				other.getForwardPath().getEdge(0)->getFromVertex() != getForwardPath().getLastEdge()->getFromVertex() ||
+				&other == this
+			){
+				throw Exception("The two roads cannot be merged");
+			}
+
+			Env fakeEnv; // for the link method (will not be used)
+			RoadChunk* lastChunkOfFirstPart(static_cast<RoadChunkEdge*>(getForwardPath().getLastEdge())->getRoadChunk());
+			RoadChunk* firstChunkOfSecondPart(static_cast<const RoadChunkEdge*>(other.getForwardPath().getEdge(0))->getRoadChunk());
+			double length(lastChunkOfFirstPart->getMetricOffset() - firstChunkOfSecondPart->getMetricOffset());
+			size_t rankShift(lastChunkOfFirstPart->getRankInPath() - firstChunkOfSecondPart->getRankInPath());
+
+			// Remove the last road chunk
+			lastChunkOfFirstPart->unlink();
+			lastChunkOfFirstPart->setRoad(NULL);
+
+			// Shift the ranks and metric offsets of the second part and attach to the first one
+			std::vector<RoadChunk*> secondPartChunks;
+			BOOST_FOREACH(Edge* edge, other.getForwardPath()._edges)
+			{
+				secondPartChunks.push_back(static_cast<RoadChunkEdge*>(edge)->getRoadChunk());
+			}
+			BOOST_FOREACH(RoadChunk* roadChunk, secondPartChunks)
+			{
+				roadChunk->unlink();
+				roadChunk->setRankInPath(roadChunk->getRankInPath() + rankShift);
+				roadChunk->setMetricOffset(roadChunk->getMetricOffset() + length);
+				roadChunk->setRoad(this);
+			}
+			BOOST_FOREACH(RoadChunk* roadChunk, secondPartChunks)
+			{
+				roadChunk->link(fakeEnv);
+			}
+
+			// Detach the second road part from the road place
+			other.unlink();
+			other.set<RoadPlace>(boost::none);
 		}
 }	}

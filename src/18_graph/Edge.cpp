@@ -159,7 +159,8 @@ namespace synthese
 			bool allowCanceled,
 			bool enableTheoretical,
 			bool enableRealTime,
-			UseRule::ReservationDelayType reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType,
+			bool maxDepartureMomentConcernsTheorical
 		) const	{
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 						*getParentPath()->sharedServicesMutex
@@ -216,7 +217,8 @@ namespace synthese
 							continue;
 
 						// Check of validity of departure date time
-						if (servicePointer.getDepartureDateTime() > maxDepartureMoment )
+						if ((!maxDepartureMomentConcernsTheorical && servicePointer.getDepartureDateTime() > maxDepartureMoment ) ||
+							(maxDepartureMomentConcernsTheorical && servicePointer.getTheoreticalDepartureDateTime() > maxDepartureMoment))
 						{
 							return ServicePointer();
 						}
@@ -354,7 +356,7 @@ namespace synthese
 
 			boost::recursive_mutex::scoped_lock lock(_indexMutex);
 			boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-				*getParentPath()->sharedServicesMutex
+						*getParentPath()->sharedServicesMutex
 			);
 
 			// Get the indices
@@ -453,7 +455,7 @@ namespace synthese
 		void Edge::markServiceIndexUpdateNeeded(
 			const ChronologicalServicesCollection& collection,
 			bool RTDataOnly
-		) const	{
+		) const {
 			if(!RTDataOnly)
 			{
 				_serviceIndexUpdateNeeded[&collection] = true;
@@ -499,13 +501,13 @@ namespace synthese
 			bool RTData
 		) const	{
 			if(RTData)
-			{
+		{
 				ServicesIndexUpdateNeeded::const_iterator it(_RTserviceIndexUpdateNeeded.find(&collection));
 				if(it == _RTserviceIndexUpdateNeeded.end())
 				{
 					_RTserviceIndexUpdateNeeded.insert(make_pair(&collection, true));
 					return true;
-				}
+		}
 				return it->second;
 			}
 			else
@@ -524,25 +526,19 @@ namespace synthese
 
 		boost::shared_ptr<LineString> Edge::getRealGeometry(
 		) const	{
-			if(getGeometry().get())
-			{
-				return getGeometry();
-			}
 
-			assert(getFromVertex());
+			assert(_fromVertex);
 			const GeometryFactory& geometryFactory(
 				CoordinatesSystem::GetDefaultGeometryFactory()
 			);
 
-			if(	getParentPath() &&
-				getParentPath()->getEdge(getRankInPath()) == this &&
-				getParentPath()->getEdges().size() > getRankInPath()+1 &&
-				getFromVertex()->hasGeometry() &&
-				getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->hasGeometry()
+			if(	_next &&
+				_fromVertex->hasGeometry() &&
+				_next->_fromVertex->hasGeometry()
 			){
 				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
-				cs->add(*getFromVertex()->getGeometry()->getCoordinate(), false);
-				cs->add(*getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->getGeometry()->getCoordinate(), false);
+				cs->add(*_fromVertex->getGeometry()->getCoordinate(), false);
+				cs->add(*_next->_fromVertex->getGeometry()->getCoordinate(), false);
 				if(cs->size() != 2)
 				{
 					return boost::shared_ptr<LineString>();
@@ -571,13 +567,13 @@ namespace synthese
 		) const	{
 			DepartureServiceIndices::iterator it(_departureIndex.find(&collection));
 			if(it == _departureIndex.end())
-			{
+		{
 				it = _departureIndex.insert(
 					make_pair(
 						&collection,
 						DepartureServiceIndices::mapped_type(INDICES_NUMBER)
 				)	).first;
-			}
+		}
 			return it->second;
 		}
 

@@ -668,14 +668,14 @@ namespace synthese
 			if(getPath())
 			{
 				getPath()->removeService(*this);
-			}
+	}
 
 			// Unregister from the line
 			if(	getRoute() &&
 				getRoute()->getCommercialLine()
 			){
 				getRoute()->getCommercialLine()->unregisterService(*this);
-			}
+}
 		}
 	}
 }

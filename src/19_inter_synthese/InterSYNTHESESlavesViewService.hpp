@@ -44,9 +44,12 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,InterSYNTHESESlavesViewService>
 		{
 		public:
+			static const std::string PARAMETER_WITH_QUEUES;
 			
 		protected:
 			static const std::string TAG_SLAVE;
+
+			bool _withQueues;
 			
 			
 			//////////////////////////////////////////////////////////////////////////
@@ -75,10 +78,7 @@ namespace synthese
 			
 			
 		public:
-			//! @name Setters
-			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
-			//@}
+			InterSYNTHESESlavesViewService();
 
 
 

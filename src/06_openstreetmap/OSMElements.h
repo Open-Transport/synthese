@@ -14,7 +14,7 @@
 #include <geos/geom/Geometry.h>
 #include <geos/geom/prep/PreparedPolygon.h>
 #include <proj_api.h>
-#include "Road.h"
+#include "RoadTypes.hpp"
 #include "OSMException.h"
 
 namespace synthese {
@@ -186,8 +186,8 @@ private:
 class Way: public Element {
 public:
 
-   static std::map<std::string, road::Road::RoadType> highwayTypes;
-   static std::map<road::Road::RoadType, double> defaultSpeed;
+   static std::map<std::string, road::RoadType> highwayTypes;
+   static std::map<road::RoadType, double> defaultSpeed;
    static std::map<std::string, double> implicitSpeed;
    static std::map<std::string, std::string> defaultName;
 
@@ -234,9 +234,9 @@ public:
     */
    void referenceWithNodes();
 
-   road::Road::RoadType getRoadType();
+   road::RoadType getRoadType();
 
-   road::Road::RoadType getAssociatedRoadType();
+   road::RoadType getAssociatedRoadType();
 
    double getAssociatedSpeed();
 

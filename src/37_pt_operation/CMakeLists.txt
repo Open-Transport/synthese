@@ -72,8 +72,6 @@ VehicleServiceComposition.cpp
 VehicleServiceComposition.hpp
 VehicleServiceTableSync.cpp
 VehicleServiceTableSync.hpp
-VehicleServiceUpdateAction.cpp
-VehicleServiceUpdateAction.hpp
 VehicleServicesAdmin.cpp
 VehicleServicesAdmin.hpp
 VehicleServicesListService.cpp

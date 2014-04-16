@@ -55,6 +55,7 @@ namespace synthese
 			PathGroup(
 				util::RegistryKeyType id = 0
 			);
+			virtual ~PathGroup();
 
 		public:
 			//! @name Getters

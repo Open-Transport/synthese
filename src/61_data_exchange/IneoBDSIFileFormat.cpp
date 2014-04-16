@@ -251,18 +251,6 @@ namespace synthese
 				throw RequestException("IneoBDSIFileFormat: Already running");
 			}
 
-			//////////////////////////////////////////////////////////////////////////
-			// Preparation of list of objects to remove
-
-			// Scenarios
-			DataSource::LinkedObjects existingScenarios(
-				_import.get<DataSource>()->getLinkedObjects<Scenario>()
-			);
-			BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
-			{
-				_scenariosToRemove.insert(existingScenario.second->getKey());
-			}
-
 
 			//////////////////////////////////////////////////////////////////////////
 			// Pre-loading objects from BDSI
@@ -731,6 +719,14 @@ namespace synthese
 			);
 
 			{ // Scenarios and messages
+				// Scenarios
+				DataSource::LinkedObjects existingScenarios(
+					dataSourceOnSharedEnv->getLinkedObjects<Scenario>()
+				);
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
+				{
+					_scenariosToRemove.insert(existingScenario.second->getKey());
+				}
 
 				// Loop on objects present in the database (search for creations and updates)
 				BOOST_FOREACH(const Programmations::value_type& itProg, programmations)
@@ -1365,10 +1361,13 @@ namespace synthese
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
 
-			// Output of SQL queries in debug mode
-			BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+			// Output of SQL queries in trace mode
+			if (_minLogLevel < IMPORT_LOG_DEBG)
 			{
-				_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+				{
+					_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				}
 			}
 
 			return transaction;

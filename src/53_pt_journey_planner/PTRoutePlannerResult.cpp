@@ -24,6 +24,7 @@
 
 #include "Journey.h"
 #include "LinePhysicalStop.hpp"
+#include "RoadPath.hpp"
 #include "Edge.h"
 #include "Crossing.h"
 #include "ResultHTMLTable.h"
@@ -216,6 +217,10 @@ namespace synthese
 				if(ls)
 				{
 					stream << ls->getJourneyPattern()->getCommercialLine()->getShortName();
+					if(!ls->getJourneyPattern()->getDirection().empty())
+					{
+						stream << " / " << ls->getJourneyPattern()->getDirection();
+					}
 				}
 				else if(js)
 				{
@@ -223,8 +228,8 @@ namespace synthese
 				}
 				else
 				{
-					const Road* road(static_cast<const Road*>(its->getService()->getPath()));
-					stream << road->getRoadPlace()->getName();
+					const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
+					stream << road->get<RoadPlace>()->getName();
 				}
 
 				// Transfers
@@ -262,6 +267,10 @@ namespace synthese
 						if(ls)
 						{
 							stream << ls->getCommercialLine()->getShortName();
+							if(!ls->getDirection().empty())
+							{
+								stream << " / " << ls->getDirection();
+							}
 						}
 						else if(js)
 						{
@@ -269,8 +278,8 @@ namespace synthese
 						}
 						else
 						{
-							const Road* road(static_cast<const Road*>(its->getService()->getPath()));
-							stream << road->getRoadPlace()->getName();
+							const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
+							stream << road->get<RoadPlace>()->getName();
 						}
 
 						// Exit if last service use

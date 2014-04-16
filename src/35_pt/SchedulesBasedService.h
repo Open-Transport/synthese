@@ -78,10 +78,10 @@ namespace synthese
 			mutable _NonConcurrencyCache _nonConcurrencyCache;
 			mutable boost::recursive_mutex _nonConcurrencyCacheMutex;
 
-			bool isInTimeRange(boost::posix_time::ptime &time,
+			static bool isInTimeRange(boost::posix_time::ptime &time,
 					boost::posix_time::time_duration &range, 
 					const std::vector<boost::posix_time::time_period> &excludeRanges
-			) const;
+			);
 
 		private:
 			//! @name Theoretical data
@@ -90,9 +90,11 @@ namespace synthese
 				Schedules _dataArrivalSchedules;
 				mutable Schedules	_generatedDepartureSchedules;	//!< Departure schedules
 				mutable Schedules	_generatedArrivalSchedules;		//!< Arrival schedules
-				mutable boost::recursive_mutex _generatedSchedulesMutex;
+				mutable boost::recursive_mutex _schedulesMutex; //!< Covers the generated schedules, the RT schedules, the empty schedules, and the data schedules
+				
 		protected:
 				ServedVertices	_vertices;			//!< Edges
+				mutable boost::recursive_mutex _verticesMutex; //!< Covers the vertices, the RT vertices
 			//@}
 
 			//! @name Real time data
@@ -134,6 +136,8 @@ namespace synthese
 				const boost::posix_time::time_duration getDataFirstArrivalSchedule(size_t i) const;
 				virtual const boost::posix_time::time_duration getDataLastDepartureSchedule(size_t i) const;
 				virtual const boost::posix_time::time_duration getDataLastArrivalSchedule(size_t i) const;
+				boost::recursive_mutex& getSchedulesMutex() const { return _schedulesMutex; }
+				boost::recursive_mutex& getVerticesMutex() const { return _verticesMutex; }
 			//@}
 
 			//! @name Setters

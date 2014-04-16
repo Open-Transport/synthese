@@ -49,17 +49,17 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,InterSYNTHESESlaveUpdateService>
 		{
 		public:
-			static const std::string FIELDS_SEPARATOR;
-			static const std::string SYNCS_SEPARATOR;
 			static const std::string NO_CONTENT_TO_SYNC;
 			
 			static const std::string PARAMETER_SLAVE_ID;
+			static const std::string PARAMETER_ASK_ID_RANGE;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::optional<util::RegistryKeyType> _slaveId;
 				boost::shared_ptr<InterSYNTHESESlave> _slave;
+				bool _askIdRange;
 			//@}
 			
 			
@@ -95,6 +95,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setSlaveId(util::RegistryKeyType value){ _slaveId = value; }
+				void setAskIdRange(util::RegistryKeyType value){ _askIdRange = value; }
 			//@}
 
 

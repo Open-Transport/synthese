@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE (testPathsMerge)
 
 	// MERGE
 
-	l1.merge(l2);
+//	l1.merge(l2);
 
 	const FakePath::Edges& edges3 = l1.getEdges();
 

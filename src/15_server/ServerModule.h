@@ -142,6 +142,7 @@ namespace synthese
 			// in a service.
 			// @FIXME This should be used by all services appropriately.
 			static boost::shared_mutex baseWriterMutex;
+			static boost::shared_mutex InterSYNTHESEAgainstRequestsMutex;
 
 		private:
 

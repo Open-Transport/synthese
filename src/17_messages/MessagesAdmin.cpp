@@ -317,7 +317,7 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Ouvrir");
 				if (message.isApplicable(now))
 				{
-					scenarioStopRequest.getAction()->setScenario(static_pointer_cast<SentScenario,Scenario>(it));
+					scenarioStopRequest.getAction()->setScenario(static_pointer_cast<SentScenario,Scenario>(it).get());
 					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "/admin/img/stop.png");
 				}
 			}

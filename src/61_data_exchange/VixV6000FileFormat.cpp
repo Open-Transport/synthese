@@ -64,8 +64,8 @@ namespace synthese
 
 		VixV6000FileFormat::Exporter_::Exporter_(
 			const Export& export_
-		):	PermanentThreadExporterTemplate<VixV6000FileFormat>(export_),
-			Exporter(export_),
+		):	Exporter(export_),
+			PermanentThreadExporterTemplate<VixV6000FileFormat>(export_),
 			_status(OFFLINE),
 			_timeNextMessage(0)
 		{}

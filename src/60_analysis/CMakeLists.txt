@@ -10,6 +10,8 @@ AnalysisRight.cpp
 AnalysisRight.hpp
 CheckLineCalendarFunction.cpp
 CheckLineCalendarFunction.hpp
+GenerateVehicleServiceUsagesAction.cpp
+GenerateVehicleServiceUsagesAction.hpp
 IsochronAdmin.cpp
 IsochronAdmin.hpp
 IsochronService.cpp
@@ -20,6 +22,12 @@ ServiceLengthService.cpp
 ServiceLengthService.hpp
 ServiceDensityService.cpp
 ServiceDensityService.hpp
+VehicleServiceUsage.cpp
+VehicleServiceUsage.hpp
+VehicleServiceUsagesListService.cpp
+VehicleServiceUsagesListService.hpp
+VehicleServiceUsageTableSync.cpp
+VehicleServiceUsageTableSync.hpp
 )
 
 #OpeningTime.cpp

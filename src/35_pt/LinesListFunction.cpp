@@ -977,7 +977,9 @@ namespace synthese
 							parameters
 						);
 						linePM->merge(
-							f.run(stream, request)
+							f.run(stream, request),
+							string(),
+							true
 						);
 					}
 

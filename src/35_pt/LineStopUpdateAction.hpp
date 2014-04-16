@@ -74,6 +74,7 @@ namespace synthese
 			static const std::string PARAMETER_READ_LENGTH_FROM_GEOMETRY;
 			static const std::string PARAMETER_RESERVATION_NEEDED;
 			static const std::string PARAMETER_CLEAR_GEOM;
+			static const std::string PARAMETER_REVERSE_DRT_AREA;
 
 		private:
 			boost::shared_ptr<LineStop> _lineStop;
@@ -88,6 +89,7 @@ namespace synthese
 			bool _readLengthFromGeometry;
 			boost::optional<bool> _reservationNeeded;
 			bool _clearGeom;
+			boost::optional<bool> _reverseDRTArea;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -131,6 +133,7 @@ namespace synthese
 				void setReservationNeeded(boost::optional<bool>(value)){ _reservationNeeded = value; }
 				void setPhysicalStop(boost::shared_ptr<StopPoint> value){ _physicalStop = value; }
 				void setReadLengthFromGeometry(bool value){ _readLengthFromGeometry = value; }
+				void setReverseDRTArea(bool value){ _reverseDRTArea = value; }
 				void setClearGeom(bool value){ _clearGeom = value; }
 			//@}
 		};

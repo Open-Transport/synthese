@@ -22,13 +22,16 @@
 
 #include "InterSYNTHESEModule.hpp"
 
+#include "BasicClient.h"
 #include "Import.hpp"
 #include "InterSYNTHESEFileFormat.hpp"
 #include "InterSYNTHESEPackage.hpp"
+#include "InterSYNTHESEUpdatePushService.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlave.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "ServerModule.h"
+#include "StaticFunctionRequest.h"
 #include "URI.hpp"
 #include "User.h"
 
@@ -42,6 +45,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace impex;
 	using namespace inter_synthese;
 	using namespace server;
@@ -84,11 +88,15 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Init()
 		{
+			InterSYNTHESEModule::GenerateFakeImport();
 		}
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
 		{
 			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "Inter-SYNTHESE slave full updater");
+
+			// Expired queue entries cleaner
+			ServerModule::AddThread(&InterSYNTHESEModule::QueueCleaner, "Inter-SYNTHESE queue cleaner");
 		}
 
 
@@ -177,12 +185,11 @@ namespace synthese
 					// Log
 				}
 			}
-			_generateFakeImport();
 		}
 
 
 
-		void InterSYNTHESEModule::_generateFakeImport()
+		void InterSYNTHESEModule::GenerateFakeImport()
 		{
 			if(!_slaveActive)
 			{
@@ -218,8 +225,8 @@ namespace synthese
 				pm.insert(ConnectionImporter<InterSYNTHESEFileFormat>::PARAMETER_PORT, _masterPort);
 				pm.insert(InterSYNTHESEFileFormat::Importer_::PARAMETER_SLAVE_ID, _slaveId);
 				import->set<synthese::Parameters>(pm);
-
 				import->set<AutoImportDelay>(_syncWaitingTime);
+
 				import->link(Env::GetOfficialEnv(), true);
 				if(created)
 				{
@@ -252,6 +259,141 @@ namespace synthese
 				return NULL;
 			}
 			return it->second;
+		}
+
+
+
+		void InterSYNTHESEModule::QueueCleaner()
+		{
+			while(true)
+			{
+				// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
+				/*boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
+				int tries = 10;
+				while (!lock.owns_lock() && tries > 0)
+				{
+					lock.try_lock();
+					this_thread::sleep((seconds(1)));
+					Log::GetInstance().debug("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
+					tries--;
+				}
+				if(!lock.owns_lock())
+				{
+					Log::GetInstance().error("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (max tries reached)");
+					return;
+				}*/
+				
+				ServerModule::SetCurrentThreadRunningAction();
+
+				DBTransaction transaction;
+
+				// Loop on slaves
+				{
+					// Copy of the list of slaves to avoid to keep the lock on the registry during the clear action
+					const InterSYNTHESESlave::Registry& registry(Env::GetOfficialEnv().getRegistry<InterSYNTHESESlave>());
+					InterSYNTHESESlave::Registry::Vector slaves(registry.getVector());
+					BOOST_FOREACH(const InterSYNTHESESlave::Registry::Vector::value_type& slave, slaves)
+					{
+						slave->clearUselessQueueEntries(transaction);
+					}
+				}
+
+				if(!transaction.getQueries().empty())
+				{
+					// Log in debug mode
+					Log::GetInstance().debug("Cleaned "+ lexical_cast<string>(transaction.getQueries().size()) + " useless Inter-SYNTHESE queue items.");
+
+					transaction.run();
+				}
+	
+				ServerModule::SetCurrentThreadWaiting();
+				boost::this_thread::sleep(boost::posix_time::minutes(1));
+			}
+		}
+
+
+
+		bool InterSYNTHESEModule::_passiveSlaveUpdaterSelector( const InterSYNTHESESlave& object )
+		{
+			// Handle only slaves in passive mode
+			if(!object.get<PassiveModeImportId>())
+			{
+				return false;
+			}
+
+			// Jump over empty queues
+			if(object.getQueue().empty())
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+
+
+		void InterSYNTHESEModule::PassiveSlavesUpdater()
+		{
+			while(true)
+			{
+				ServerModule::SetCurrentThreadRunningAction();
+
+				// Loop on slaves
+				{
+					const InterSYNTHESESlave::Registry& registry(Env::GetOfficialEnv().getRegistry<InterSYNTHESESlave>());
+					InterSYNTHESESlave::Registry::Vector slaves(
+						registry.getVector(&_passiveSlaveUpdaterSelector)
+					);
+
+					// Loop on the selected slaves
+					BOOST_FOREACH(const boost::shared_ptr<InterSYNTHESESlave>& slave, slaves)
+					{
+						try
+						{
+							recursive_mutex::scoped_lock lock(slave->getQueueMutex());
+							InterSYNTHESESlave::QueueRange range(slave->getQueueRange());
+							stringstream data;
+							slave->sendToSlave(
+								data,
+								range
+							);
+
+							StaticFunctionRequest<InterSYNTHESEUpdatePushService> r;
+
+							r.getFunction()->setImportId(slave->get<PassiveModeImportId>());
+							r.getFunction()->setSlaveId(slave->getKey());
+							r.getFunction()->setContent(data.str());
+
+							BasicClient c(
+								slave->get<ServerAddress>(),
+								slave->get<ServerPort>()
+							);
+							string responseStr(
+								c.post(
+									r.getClientURL(),
+									r.getURI(),
+									"application/x-www-form-urlencoded"
+							)	);
+
+							vector<string> rangeStr;
+							split(rangeStr, responseStr, is_any_of(InterSYNTHESEUpdatePushService::RANGE_SEPARATOR));
+							if(	rangeStr.size() == 2 &&
+								lexical_cast<RegistryKeyType>(rangeStr[0]) == slave->getLastSentRange().first->first &&
+								lexical_cast<RegistryKeyType>(rangeStr[1]) == slave->getLastSentRange().second->first
+							){
+								slave->clearLastSentRange();
+							}
+						}
+						catch(...)
+						{
+
+						}
+					}
+				}
+
+				ServerModule::SetCurrentThreadWaiting();
+				boost::this_thread::sleep(boost::posix_time::seconds(10));
+			}
 		}
 }	}
 

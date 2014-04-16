@@ -1,4 +1,3 @@
-
 /** Export class implementation.
 	@file Export.cpp
 
