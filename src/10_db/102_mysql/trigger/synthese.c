@@ -96,7 +96,7 @@ longlong notify_synthese_http(
 	CURL *curl;
 	CURLcode res;
 	char url[512];
-	char postfields[512];
+	char postfields[2048];
 
 	if (!args->args[0] || !args->lengths[0] || !args->args[1] || !args->lengths[1])
 	{
