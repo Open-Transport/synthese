@@ -391,7 +391,7 @@ namespace synthese
 				// Route planning
 				AccessParameters ap(
 					_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-					false, false, 1000, posix_time::minutes(23), 1.111)
+					false, false, 2000, posix_time::minutes(30), 1.111)
 				;
 				if(ResaModule::GetJourneyPlannerWebsite())
 				{
