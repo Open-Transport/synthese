@@ -262,7 +262,7 @@ namespace synthese
 			ptime now(second_clock::local_time());
 			time_duration elapsedTime(now - _startTime);
 
-			size_t elapsedSeconds = elapsedTime.seconds() % _journeyDuration;
+			size_t elapsedSeconds = elapsedTime.total_seconds() % _journeyDuration;
 
 			double currentDistance = (totalDistance / _journeyDuration) * (double)(elapsedSeconds);
 
