@@ -582,7 +582,14 @@ namespace synthese
 							stream << t.row();
 							stream << t.col() << startStop->getCodeBySources() << " / " << startStop->getName();
 							stream << t.col() << endStop->getCodeBySources() << " / " << endStop->getName();
-							stream << t.col() << (it.second.total_seconds() / 60) << " min";
+							if(it.second.is_not_a_date_time())
+							{
+								stream << t.col() << "Interdit";
+							}
+							else
+							{
+								stream << t.col() << (it.second.total_seconds() / 60) << " min";
+							}
 							stream << t.col() << HTMLModule::getLinkButton(removeTransferRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le délai de correspondance ?");
 						}
 						catch(ObjectNotFoundException<StopPoint>&)
@@ -593,7 +600,7 @@ namespace synthese
 					stream << t.row();
 					stream << t.col() << f.getSelectInput(StopAreaTransferAddAction::PARAMETER_FROM_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
 					stream << t.col() << f.getSelectInput(StopAreaTransferAddAction::PARAMETER_TO_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
-					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_DURATION,string(),"(minutes ou F)");
+					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_DURATION,string(),"(minutes ou F [ = interdit])");
 					stream << t.col() << f.getSubmitButton("Ajouter");
 
 					stream << t.close();
