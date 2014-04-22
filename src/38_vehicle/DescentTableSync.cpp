@@ -119,6 +119,7 @@ namespace synthese
 			boost::optional<util::RegistryKeyType> serviceId,
 			const date& minDate,
 			const date& maxDate,
+			bool displayCancelled,
 			size_t first /*= 0*/,
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			util::LinkLevel linkLevel
@@ -131,6 +132,25 @@ namespace synthese
 			
 			query.addWhereField(Date::FIELD.name, to_iso_extended_string(minDate), ComposedExpression::OP_SUPEQ);
 			query.addWhereField(Date::FIELD.name, to_iso_extended_string(maxDate), ComposedExpression::OP_INF);
+			
+			if (displayCancelled)
+			{
+				std::stringstream subQuery;
+				subQuery << CancellationTime::FIELD.name << " IS NOT NULL";
+				
+				query.addWhere(
+					SubQueryExpression::Get(subQuery.str())
+				);
+			}
+			else
+			{
+				std::stringstream subQuery;
+				subQuery << CancellationTime::FIELD.name << " IS NULL";
+				
+				query.addWhere(
+					SubQueryExpression::Get(subQuery.str())
+				);
+			}
 			
 			if (number)
 			{

@@ -64,6 +64,7 @@ namespace synthese
 					boost::optional<util::RegistryKeyType> serviceId,
 					const boost::gregorian::date& minDate,
 					const boost::gregorian::date& maxDate,
+					bool displayCancelled = false,
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
