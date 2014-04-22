@@ -73,6 +73,7 @@ namespace synthese
 		const string ServiceDetailService::ATTR_SCHEDULE_INPUT = "schedule_input";
 		const string ServiceDetailService::ATTR_WITH_RESERVATION = "with_reservation";
 		const string ServiceDetailService::ATTR_WITH_DESCENT = "with_descent";
+		const string ServiceDetailService::ATTR_DESCENT_ID = "descent_id";
 		const string ServiceDetailService::ATTR_FIRST_IN_AREA = "first_in_area";
 		const string ServiceDetailService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServiceDetailService::ATTR_IS_AREA = "is_area";
@@ -455,6 +456,7 @@ namespace synthese
 			}
 			
 			bool withDescent(false);
+			RegistryKeyType descentId(0);
 			BOOST_FOREACH(Descents::value_type& descent, descents)
 			{
 				BOOST_FOREACH(const graph::Vertex *vertex, stopArea.getVertices(PTModule::GRAPH_ID))
@@ -462,6 +464,7 @@ namespace synthese
 					if (descent.first->get<Stop>()->getKey() == vertex->getKey())
 					{
 						withDescent = true;
+						descentId = descent.first->get<Key>();
 						break;
 					}
 				}
@@ -473,6 +476,7 @@ namespace synthese
 			if (withDescent)
 			{
 				stopPM->insert(ATTR_WITH_DESCENT, true);
+				stopPM->insert(ATTR_DESCENT_ID, descentId);
 			}
 			else
 			{

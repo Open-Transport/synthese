@@ -89,6 +89,7 @@ namespace synthese
 			static const std::string ATTR_SCHEDULE_INPUT;
 			static const std::string ATTR_WITH_RESERVATION;
 			static const std::string ATTR_WITH_DESCENT;
+			static const std::string ATTR_DESCENT_ID;
 			static const std::string ATTR_FIRST_IN_AREA;
 			static const std::string ATTR_LAST_IN_AREA;
 			static const std::string ATTR_IS_AREA;
