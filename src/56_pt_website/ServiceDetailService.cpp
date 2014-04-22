@@ -72,6 +72,7 @@ namespace synthese
 		const string ServiceDetailService::ATTR_ARRIVAL_TIME = "arrival_time";
 		const string ServiceDetailService::ATTR_SCHEDULE_INPUT = "schedule_input";
 		const string ServiceDetailService::ATTR_WITH_RESERVATION = "with_reservation";
+		const string ServiceDetailService::ATTR_WITH_DESCENT = "with_descent";
 		const string ServiceDetailService::ATTR_FIRST_IN_AREA = "first_in_area";
 		const string ServiceDetailService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServiceDetailService::ATTR_IS_AREA = "is_area";
