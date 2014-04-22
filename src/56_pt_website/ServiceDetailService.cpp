@@ -27,9 +27,11 @@
 #include "CalendarModule.h"
 #include "CalendarTemplate.h"
 #include "City.h"
+#include "DescentTableSync.hpp"
 #include "DRTArea.hpp"
 #include "Language.hpp"
 #include "LineStop.h"
+#include "PTModule.h"
 #include "PTUseRule.h"
 #include "RequestException.h"
 #include "Request.h"
@@ -51,6 +53,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace resa;
+	using namespace vehicle;
 
 	template<>
 	const string FactorableTemplate<Function,pt_website::ServiceDetailService>::FACTORY_KEY = "service_detail";
@@ -58,6 +61,7 @@ namespace synthese
 	namespace pt_website
 	{
 		const string ServiceDetailService::PARAMETER_READ_RESERVATIONS_FROM_DAY = "read_reservations_from_day";
+		const string ServiceDetailService::PARAMETER_READ_DESCENTS_FROM_DAY = "read_descents_from_day";
 		const string ServiceDetailService::PARAMETER_BASE_CALENDAR_ID = "base_calendar_id";
 
 		const string ServiceDetailService::TAG_STOP = "stop";
@@ -141,6 +145,13 @@ namespace synthese
 			if(!rrfdtext.empty())
 			{
 				_readReservationsFromDay = from_string(rrfdtext);
+			}
+			
+			// Read descents from day
+			string rdfdtext(map.getDefault<string>(PARAMETER_READ_DESCENTS_FROM_DAY));
+			if(!rdfdtext.empty())
+			{
+				_readDescentsFromDay = from_string(rdfdtext);
 			}
 		}
 
@@ -263,6 +274,30 @@ namespace synthese
 					}
 				}
 			}
+			
+			// Descents
+			Descents descents;
+			if(	!_readDescentsFromDay.is_not_a_date() )
+			{
+				date date2(_readDescentsFromDay);
+				date2 += days(1);
+				DescentTableSync::SearchResult descentsTable(
+					DescentTableSync::Search(
+						*_env,
+						_service->getKey(),
+						_readDescentsFromDay,
+						date2
+				)	);
+				
+				BOOST_FOREACH(const DescentTableSync::SearchResult::value_type& descent, descentsTable)
+				{
+					descents.push_back(
+						make_pair(
+							descent.get(),
+							false
+					)	);
+				}
+			}
 
 
 			const JourneyPattern::LineStops& lineStops(static_cast<const JourneyPattern*>(_service->getPath())->getLineStops());
@@ -289,7 +324,8 @@ namespace synthese
 						resas,
 						false,
 						false,
-						false
+						false,
+						descents
 					);
 				}
 				else if(dynamic_cast<const DRTArea*>(&*lineStop.get<LineNode>()))
@@ -315,7 +351,8 @@ namespace synthese
 								resas,
 								true,
 								it == area.get<Stops>().rbegin(),
-								it2 == area.get<Stops>().rend()
+								it2 == area.get<Stops>().rend(),
+								descents
 							);
 						}
 					}
@@ -339,7 +376,8 @@ namespace synthese
 								resas,
 								true,
 								it == area.get<Stops>().begin(),
-								it2 == area.get<Stops>().end()
+								it2 == area.get<Stops>().end(),
+								descents
 							);
 						}
 					}
@@ -384,7 +422,8 @@ namespace synthese
 			Resas& resas,
 			bool isArea,
 			bool firstInArea,
-			bool lastInArea
+			bool lastInArea,
+			Descents& descents
 		) const {
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 
@@ -412,6 +451,31 @@ namespace synthese
 
 				// Export the reservations into the stop parameters map
 				_exportReservations(*stopPM, instructions);
+			}
+			
+			bool withDescent(false);
+			BOOST_FOREACH(Descents::value_type& descent, descents)
+			{
+				BOOST_FOREACH(const graph::Vertex *vertex, stopArea.getVertices(PTModule::GRAPH_ID))
+				{
+					if (descent.first->get<Stop>()->getKey() == vertex->getKey())
+					{
+						withDescent = true;
+						break;
+					}
+				}
+				if (withDescent)
+				{
+					break;
+				}
+			}
+			if (withDescent)
+			{
+				stopPM->insert(ATTR_WITH_DESCENT, true);
+			}
+			else
+			{
+				stopPM->insert(ATTR_WITH_DESCENT, false);
 			}
 
 			stopPM->insert(ATTR_IS_AREA, isArea);
