@@ -523,7 +523,9 @@ namespace synthese
 								//		also belong to a connection place)
 								//  - if the vertex belongs to a connection place
 								bool isGoalReached(
-									_destinationVam.contains(reachedVertex)
+									_destinationVam.contains(reachedVertex) &&
+										(!_accessParameters.getMaxtransportConnectionsCount() ||
+										 fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount())
 								);
 								bool isReturnedVertex(
 									(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
