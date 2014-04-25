@@ -37,6 +37,11 @@ namespace synthese
 	{
 		class DBTransaction;
 	}
+	
+	namespace util
+	{
+		class Registrable;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	/// 19 Inter-SYNTHESE Module namespace.
@@ -103,7 +108,8 @@ namespace synthese
 		public:
 			static void Enqueue(
 				const InterSYNTHESEContent& content,
-				boost::optional<db::DBTransaction&> transaction
+				boost::optional<db::DBTransaction&> transaction,
+				util::Registrable* objectToRemember = NULL
 			);
 
 			static void ParameterCallback(

@@ -120,7 +120,8 @@ namespace synthese
 			const boost::posix_time::ptime& expirationTime,
 			boost::optional<db::DBTransaction&> transaction,
 			bool nonPersistent,
-			bool force
+			bool force,
+			Registrable* objectToRemember
 		) const	{
 
 			ptime now(microsec_clock::local_time());
@@ -130,22 +131,6 @@ namespace synthese
 				return;
 			}
 
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			/*boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lock.owns_lock() && tries > 0)
-			{
-				lock.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::enqueue locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lock.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::enqueue locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}*/
-
 			recursive_mutex::scoped_lock lock(_queueMutex);
 			boost::shared_ptr<InterSYNTHESEQueue> q(new InterSYNTHESEQueue);
 			q->set<InterSYNTHESESlave>(*const_cast<InterSYNTHESESlave*>(this));
@@ -154,13 +139,52 @@ namespace synthese
 			q->set<SyncContent>(parameter);
 			q->set<ExpirationTime>(expirationTime);
 
-			if(nonPersistent)
+			if(nonPersistent && !objectToRemember)
 			{
 				// In non persistent mode, the object is only handled by the environment after explicit link method call
 				q->setKey(InterSYNTHESEQueueTableSync::getId());
 				q->setNonPersistent();
 				Env::GetOfficialEnv().add(q);
 				q->link(Env::GetOfficialEnv());
+			}
+			else if (nonPersistent && objectToRemember)
+			{
+				// In non persistent mode, some queue elements are remembered in a cache to be able to update them
+				if (_cacheQueue.find(objectToRemember) != _cacheQueue.end())
+				{
+					// Object is not present in the cache, we check that it is not sent by looking in lastSentRange
+					// if not sent, we update the queue element
+					// if sent, we create a new queue element and we update the cache
+					RegistryKeyType queueIdToCheck = _cacheQueue.at(objectToRemember);
+					if (queueIdToCheck >= _lastSentRange.first->first &&
+						queueIdToCheck <= _lastSentRange.second->first)
+					{
+						// queue element has been sent but is still in queue because we have not received slave ACK
+						// we create a new queue element and we update the cache
+						q->setKey(InterSYNTHESEQueueTableSync::getId());
+						q->setNonPersistent();
+						Env::GetOfficialEnv().add(q);
+						q->link(Env::GetOfficialEnv());
+						_cacheQueue.erase(objectToRemember);
+						_cacheQueue.insert(make_pair(objectToRemember,q->getKey()));
+					}
+					else
+					{
+						// update the cache
+						q->setNonPersistent();
+						_queue.erase(_cacheQueue.at(objectToRemember));
+						_queue.insert(make_pair(_cacheQueue.at(objectToRemember),q.get()));
+					}
+				}
+				else
+				{
+					// Object is not present in the cache, so we create it
+					q->setKey(InterSYNTHESEQueueTableSync::getId());
+					q->setNonPersistent();
+					Env::GetOfficialEnv().add(q);
+					q->link(Env::GetOfficialEnv());
+					_cacheQueue.insert(make_pair(objectToRemember,q->getKey()));
+				}
 			}
 			else
 			{
@@ -183,6 +207,19 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(_queueMutex);
 			_queue.erase(id);
+			// We look in the cache to remove corresponding item (if exists)
+			CacheQueue::iterator it = _cacheQueue.begin();
+			while(it != _cacheQueue.end())
+			{
+				if (it->second == id)
+				{
+					break;
+				}
+			}
+			if (it != _cacheQueue.end())
+			{
+				_cacheQueue.erase(it);
+			}
 		}
 
 
@@ -327,22 +364,6 @@ namespace synthese
 		// rewritten by the DB stack.
 		void InterSYNTHESESlave::markAsUpToDate()
 		{
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			/*boost::unique_lock<shared_mutex> lockBase(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lockBase.owns_lock() && tries > 0)
-			{
-				lockBase.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::markAsUpToDate locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lockBase.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::markAsUpToDate locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}*/
-
 			ptime now(second_clock::local_time());
 			set<LastActivityReport>(now);
 			InterSYNTHESESlaveTableSync::Save(this);
@@ -373,22 +394,6 @@ namespace synthese
 
 		void InterSYNTHESESlave::clearLastSentRange() const
 		{
-			// Protect this section with the interSyntheseVersusRTMutex to avoid deadlock
-			/*boost::unique_lock<shared_mutex> lock(ServerModule::interSyntheseVersusRTMutex, boost::try_to_lock);
-			int tries = 10;
-			while (!lock.owns_lock() && tries > 0)
-			{
-				lock.try_lock();
-				this_thread::sleep((seconds(1)));
-				Log::GetInstance().debug("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (try " + lexical_cast<string>(tries) + "/10)");
-				tries--;
-			}
-			if(!lock.owns_lock())
-			{
-				Log::GetInstance().error("InterSYNTHESESlave::clearLastSentRange locked by interSyntheseVersusRTMutex (max tries reached)");
-				return;
-			}*/
-
 			DBTransaction transaction;
 			{
 				// Do no run transaction with the lock or we will deadlock if

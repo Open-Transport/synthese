@@ -122,7 +122,8 @@ namespace synthese
 	{
 		void InterSYNTHESEModule::Enqueue(
 			const InterSYNTHESEContent& content,
-			boost::optional<db::DBTransaction&> transaction
+			boost::optional<db::DBTransaction&> transaction,
+			Registrable* objectToRemember
 		){
 			BOOST_FOREACH(
 				InterSYNTHESEConfig::Registry::value_type& config,
@@ -130,7 +131,8 @@ namespace synthese
 			){
 				config.second->enqueueIfInPerimeter(
 					content,
-					transaction
+					transaction,
+					objectToRemember
 				);
 			}
 		}

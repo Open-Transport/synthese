@@ -104,7 +104,8 @@ namespace synthese
 
 		void InterSYNTHESEConfig::enqueueIfInPerimeter(
 			const InterSYNTHESEContent& content,
-			boost::optional<db::DBTransaction&> transaction
+			boost::optional<db::DBTransaction&> transaction,
+			Registrable* objectToRemember
 		) const {
 
 			// Avoid useless check if no slave
@@ -146,7 +147,9 @@ namespace synthese
 						content.getContent(),
 						content.getExpirationTime(),
 						transaction,
-						nonPersistent
+						nonPersistent,
+						false,
+						objectToRemember
 					);
 				}
 			}

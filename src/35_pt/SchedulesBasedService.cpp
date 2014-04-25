@@ -387,7 +387,8 @@ namespace synthese
 				);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
-					boost::optional<db::DBTransaction&>()
+					boost::optional<db::DBTransaction&>(),
+					this
 				);
 			}
 		}
@@ -676,7 +677,8 @@ namespace synthese
 				RealTimePTDataInterSYNTHESE::Content content(*this);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
-					boost::optional<db::DBTransaction&>()
+					boost::optional<db::DBTransaction&>(),
+					this
 				);
 			}
 		}
@@ -702,7 +704,8 @@ namespace synthese
 				RealTimePTDataInterSYNTHESE::Content content(*this);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
-					boost::optional<db::DBTransaction&>()
+					boost::optional<db::DBTransaction&>(),
+					this
 				);
 			}
 		}
@@ -865,7 +868,8 @@ namespace synthese
 				RealTimePTDataInterSYNTHESE::Content content(*this);
 				inter_synthese::InterSYNTHESEModule::Enqueue(
 					content,
-					boost::optional<db::DBTransaction&>()
+					boost::optional<db::DBTransaction&>(),
+					this
 				);
 			}
 		}
