@@ -200,6 +200,14 @@ namespace synthese
 					}
 				}
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
+				// FIXME: Distance should be configurable
+				if(lastDistance < 20)
+				{
+					VehicleModule::GetCurrentVehiclePosition().setInStopArea(true);
+				} else
+				{
+					VehicleModule::GetCurrentVehiclePosition().setInStopArea(false);
+				}
 				if(nearestStopPoint)
 				{
 					util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
