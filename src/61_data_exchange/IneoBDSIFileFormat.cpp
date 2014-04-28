@@ -980,6 +980,7 @@ namespace synthese
 					}
 
 					// Search for a service with the same planned schedules
+					ScheduledService* inactiveService(NULL); // to remember an inactive service available for this course (if no other)
 					BOOST_FOREACH(
 						const JourneyPattern* route,
 						course.chainage->getSYNTHESEJourneyPatterns(
@@ -1015,6 +1016,10 @@ namespace synthese
 								servicesToLink.push_back(&course);
 								break;
 							}
+							else if ( course == *service )
+							{
+								inactiveService = service;
+							}
 						}
 						if(course.syntheseService)
 						{
@@ -1024,6 +1029,22 @@ namespace synthese
 					if(course.syntheseService)
 					{
 						continue;
+					}
+					
+					// Maybe an inactive service has been found and can be activated
+					if (inactiveService)
+					{
+						inactiveService->setActive(today);
+						course.syntheseService = inactiveService;
+						
+						// The service must be updated
+						servicesToUpdate.push_back(&course);
+						
+						// The service must not be removed
+						servicesToRemove.erase(inactiveService);
+						
+						// The service must be linked
+						servicesToLink.push_back(&course);
 					}
 
 					// No existing service has been found : creation of a new service
