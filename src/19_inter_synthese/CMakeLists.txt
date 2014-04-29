@@ -15,6 +15,8 @@ InterSYNTHESEContent.cpp
 InterSYNTHESEContent.hpp
 InterSYNTHESEFileFormat.cpp
 InterSYNTHESEFileFormat.hpp
+InterSYNTHESEIsSynchronisingService.cpp
+InterSYNTHESEIsSynchronisingService.hpp
 InterSYNTHESEModule.cpp
 InterSYNTHESEModule.hpp
 InterSYNTHESEModule.gen.cpp
