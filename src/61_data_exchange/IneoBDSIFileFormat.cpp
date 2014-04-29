@@ -1165,6 +1165,7 @@ namespace synthese
 						
 						// The service must be linked
 						servicesToLink.push_back(&course);
+						continue;
 					}
 
 					// No existing service has been found : creation of a new service
