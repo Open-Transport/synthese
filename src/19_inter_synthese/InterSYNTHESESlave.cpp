@@ -215,6 +215,7 @@ namespace synthese
 				{
 					break;
 				}
+				it++;
 			}
 			if (it != _cacheQueue.end())
 			{
