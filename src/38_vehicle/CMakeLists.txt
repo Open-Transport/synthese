@@ -43,6 +43,10 @@ VehicleAdmin.cpp
 VehicleAdmin.hpp
 VehiclesAdmin.cpp
 VehiclesAdmin.hpp
+VehicleCall.cpp
+VehicleCall.hpp
+VehicleCallTableSync.cpp
+VehicleCallTableSync.hpp
 VehicleInformationsService.cpp
 VehicleInformationsService.hpp
 VehicleModule.cpp
