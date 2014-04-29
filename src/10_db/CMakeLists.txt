@@ -47,6 +47,8 @@ RankUpdateQuery.hpp
 NoSynchronizationPolicy.hpp
 ObjectCreateAction.cpp
 ObjectCreateAction.hpp
+ObjectCreateService.cpp
+ObjectCreateService.hpp
 ObjectUpdateAction.cpp
 ObjectUpdateAction.hpp
 ObjectViewService.cpp
