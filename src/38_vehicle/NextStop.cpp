@@ -40,6 +40,7 @@ namespace synthese
 		const string NextStop::ATTR_ARRIVAL_TIME = "arrival_time";
 		const string NextStop::ATTR_ARRIVAL_DURATION = "arrival_duration";
 		const string NextStop::ATTR_IN_STOP_AREA = "in_stop_area";
+		const string NextStop::ATTR_RANK = "rank";
 
 
 
@@ -81,5 +82,8 @@ namespace synthese
 					duration.total_seconds() < 0 ? 0 : ceil(duration.total_seconds() / 60.0)
 				);
 			}
+			
+			// Rank
+			pm.insert(ATTR_RANK, _rank);
 		}
 }	}

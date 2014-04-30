@@ -270,6 +270,7 @@ namespace synthese
 									{
 										NextStop nextStop;
 										nextStop.setStop(static_cast<StopPoint*>(edge->getFromVertex()));
+										nextStop.setRank(edge->getRankInPath());
 										nextStops.push_back(nextStop);
 									}
 								}
