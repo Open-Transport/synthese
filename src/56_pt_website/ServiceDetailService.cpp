@@ -78,6 +78,7 @@ namespace synthese
 		const string ServiceDetailService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServiceDetailService::ATTR_IS_AREA = "is_area";
 		const string ServiceDetailService::ATTR_IS_RESERVABLE = "is_reservable";
+		const string ServiceDetailService::ATTR_RANK = "rank";
 		const string ServiceDetailService::ATTR_STOP_POINT_ID = "stop_point_id";
 		const string ServiceDetailService::ATTR_STOP_AREA_ID = "stop_area_id";
 		const string ServiceDetailService::TAG_RESERVATION_WITH_ARRIVAL_BEFORE_DEPARTURE = "reservation_with_arrival_before_departure";
@@ -496,7 +497,8 @@ namespace synthese
 			stopPM->insert(ATTR_IS_AREA, isArea);
 			stopPM->insert(ATTR_FIRST_IN_AREA, firstInArea);
 			stopPM->insert(ATTR_LAST_IN_AREA, lastInArea);
-			
+
+			stopPM->insert(ATTR_RANK, rank);
 			stopPM->insert(ATTR_STOP_POINT_ID, stopPointId);
 			stopPM->insert(ATTR_STOP_AREA_ID, stopAreaId);
 
