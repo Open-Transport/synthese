@@ -93,6 +93,8 @@ namespace synthese
 			static const std::string ATTR_FIRST_IN_AREA;
 			static const std::string ATTR_LAST_IN_AREA;
 			static const std::string ATTR_IS_AREA;
+			static const std::string ATTR_STOP_POINT_ID;
+			static const std::string ATTR_STOP_AREA_ID;
 			static const std::string TAG_RESERVATION_AT_DEPARTURE;
 			static const std::string TAG_RESERVATION_AT_ARRIVAL;
 			static const std::string TAG_RESERVATION_WITH_ARRIVAL_BEFORE_DEPARTURE;
@@ -171,7 +173,9 @@ namespace synthese
 				bool isArea,
 				bool firstInArea,
 				bool lastInArea,
-				Descents& descents
+				Descents& descents,
+				util::RegistryKeyType stopPointId,
+				util::RegistryKeyType stopAreaId
 			) const;
 			
 		public:

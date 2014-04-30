@@ -78,6 +78,8 @@ namespace synthese
 		const string ServiceDetailService::ATTR_LAST_IN_AREA = "last_in_area";
 		const string ServiceDetailService::ATTR_IS_AREA = "is_area";
 		const string ServiceDetailService::ATTR_IS_RESERVABLE = "is_reservable";
+		const string ServiceDetailService::ATTR_STOP_POINT_ID = "stop_point_id";
+		const string ServiceDetailService::ATTR_STOP_AREA_ID = "stop_area_id";
 		const string ServiceDetailService::TAG_RESERVATION_WITH_ARRIVAL_BEFORE_DEPARTURE = "reservation_with_arrival_before_departure";
 		
 		const string ServiceDetailService::TAG_CALENDAR = "calendar";
@@ -327,7 +329,9 @@ namespace synthese
 						false,
 						false,
 						false,
-						descents
+						descents,
+						lineStop.get<LineNode>()->getKey(),
+						dynamic_cast<const StopPoint*>(&*lineStop.get<LineNode>())->getConnectionPlace()->getKey()
 					);
 				}
 				else if(dynamic_cast<const DRTArea*>(&*lineStop.get<LineNode>()))
@@ -354,7 +358,9 @@ namespace synthese
 								true,
 								it == area.get<Stops>().rbegin(),
 								it2 == area.get<Stops>().rend(),
-								descents
+								descents,
+								0,
+								(**it).getKey()
 							);
 						}
 					}
@@ -379,7 +385,9 @@ namespace synthese
 								true,
 								it == area.get<Stops>().begin(),
 								it2 == area.get<Stops>().end(),
-								descents
+								descents,
+								0,
+								(**it).getKey()
 							);
 						}
 					}
@@ -425,7 +433,9 @@ namespace synthese
 			bool isArea,
 			bool firstInArea,
 			bool lastInArea,
-			Descents& descents
+			Descents& descents,
+			RegistryKeyType stopPointId,
+			RegistryKeyType stopAreaId
 		) const {
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 
@@ -486,6 +496,9 @@ namespace synthese
 			stopPM->insert(ATTR_IS_AREA, isArea);
 			stopPM->insert(ATTR_FIRST_IN_AREA, firstInArea);
 			stopPM->insert(ATTR_LAST_IN_AREA, lastInArea);
+			
+			stopPM->insert(ATTR_STOP_POINT_ID, stopPointId);
+			stopPM->insert(ATTR_STOP_AREA_ID, stopAreaId);
 
 			pm.insert(TAG_STOP, stopPM);
 
