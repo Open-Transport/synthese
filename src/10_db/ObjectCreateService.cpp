@@ -24,7 +24,7 @@
 
 #include "ObjectCreateService.hpp"
 
-#include "RequestException.h"
+#include "Exception.h"
 #include "DBDirectTableSync.hpp"
 #include "DBModule.h"
 #include "DBTransaction.hpp"
@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace util
 	{
-        template<> const string FactorableTemplate<Function, db::ObjectCreateService>::FACTORY_KEY("objectcreateandviewid");
+        template<> const string FactorableTemplate<Function, db::ObjectCreateService>::FACTORY_KEY("objectcreate");
 	}
 
 	namespace db
@@ -101,7 +101,7 @@ namespace synthese
 			}
 			catch(ObjectBase::IntegrityException& e)
 			{
-                throw Exception(e.getMessage());
+				throw Exception(e.getMessage());
 			}
 		}
 
@@ -112,25 +112,11 @@ namespace synthese
             const Request& request
         ) const {
 			ParametersMap map;
-			stringstream logText;
-			{
-//				Log Object creation
-			}
 
-			DBTransaction transaction;
-			_value->beforeCreate(transaction);
-			_tableSync->saveRegistrable(*_value, transaction);
-			_value->afterCreate(transaction);
-			transaction.run();
+            DBModule::CreateObject(_value.get(), _tableSync.get());
 
-//			::AddUpdateEntry(*_value, text.str(), request.getUser().get());
-
-//			if(request.getActionWillCreateObject())
-//			{
-//				request.setActionCreatedId(_value->getKey());
-//			}
 			map.insert(ATTR_ID, _value->getKey());
-            return map;
+			return map;
 		}
 
 
@@ -151,23 +137,21 @@ namespace synthese
 			);
 			if(!_tableSync.get())
 			{
-//				throw ActionException("Incompatible table");
-                throw Exception("Incompatible table");
+				throw Exception("Incompatible table");
 			}
 
 			// New value
 			_value = dynamic_pointer_cast<ObjectBase, Registrable>(_tableSync->newObject());
 			if(!_value.get())
 			{
-//				throw ActionException("Incompatible table");
-                throw Exception("Incompatible table");
+				throw Exception("Incompatible table");
 			}
 		}
 
 
 
-        std::string ObjectCreateService::getOutputMimeType() const
-        {
-            return "text/html";
-        }
+		std::string ObjectCreateService::getOutputMimeType() const
+		{
+			return "text/html";
+		}
 }	}
