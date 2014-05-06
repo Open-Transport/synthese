@@ -1082,6 +1082,7 @@ namespace synthese
 							oldCode = service->getACodeBySource(*dataSourceOnSharedEnv);
 						}
 						Importable::DataSourceLinks links(service->getDataSourceLinks());
+						service->removeSourceLinks(*dataSourceOnSharedEnv, true);
 						links.erase(dataSourceOnSharedEnv);
 						service->setDataSourceLinksWithoutRegistration(links);
 						_servicesToSave.insert(service);
