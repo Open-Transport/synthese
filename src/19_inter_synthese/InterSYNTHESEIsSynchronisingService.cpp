@@ -25,60 +25,70 @@
 #include "InterSYNTHESEIsSynchronisingService.hpp"
 
 #include "InterSYNTHESEQueue.hpp"
-#include "InterSYNTHESESlave.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
-#include "RequestException.h"
-#include "Request.h"
-#include "ServerConstants.h"
-#include "ServerModule.h"
+//#include "RequestException.h"
+#include "Function.h"
+#include "Log.h"
 
 #include <boost/algorithm/string.hpp>
 
 using namespace boost;
-using namespace boost::posix_time;
 using namespace std;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace server;
-	using namespace security;
+    using namespace server;
 
 	template<>
-	const string FactorableTemplate<Function,inter_synthese::InterSYNTHESEIsSynchronisingService>::FACTORY_KEY = "is_synchronising";
+    const string FactorableTemplate<server::Function,inter_synthese::InterSYNTHESEIsSynchronisingService>::FACTORY_KEY = "is_synchronising";
 	
 	namespace inter_synthese
 	{
-		int InterSYNTHESEIsSynchronisingService::COMPTEUR = 0;
-		const string InterSYNTHESEIsSynchronisingService::TAG_SLAVEQUEUEID = "id_in_each_queue";
-		const string InterSYNTHESEIsSynchronisingService::ATTR_COMPTEUR = "compteur";
 		const string InterSYNTHESEIsSynchronisingService::ATTR_IS_SYNCHRONISING = "is_synchronising";
-		const string InterSYNTHESEIsSynchronisingService::PARAMETER_SLAVE_ID = "slave_id";
-		const string InterSYNTHESEIsSynchronisingService::PARAMETER_QUEUEID = "queue_id";
-		/*
-		bool InterSYNTHESEIsSynchronisingService::bgUpdaterDone(false);
-		boost::mutex InterSYNTHESEIsSynchronisingService::bgMutex;
-		boost::shared_ptr<InterSYNTHESESlave> InterSYNTHESEIsSynchronisingService::bgNextSlave;*/
+		const string InterSYNTHESEIsSynchronisingService::PARAMETER_QUEUEIDS = "queue_ids";
+
+        const string InterSYNTHESEIsSynchronisingService::QUEUE_IDS_SEPARATOR = ",";
+
+
 
 		ParametersMap InterSYNTHESEIsSynchronisingService::_getParametersMap() const
 		{
-//			ParametersMap map(_mapSlvIdQueueId);
-			return ParametersMap();
-		}
+            ParametersMap map;
+            if (!_queueIds.empty())
+            {
+                stringstream idsStream;
+                unsigned int i = 1;
+                BOOST_FOREACH(
+                            const QueueIds::value_type& qId,
+                            _queueIds)
+                {
+                    if (i == _queueIds.size())
+                    {
+                        idsStream << qId;
+                    }
+                    else
+                    {
+                        idsStream << qId << QUEUE_IDS_SEPARATOR;
+                    }
+                }
+                map.insert(PARAMETER_QUEUEIDS, idsStream.str());
+            }
+            return map;
+        }
 
 
 
 		void InterSYNTHESEIsSynchronisingService::_setFromParametersMap(const ParametersMap& map)
 		{
-/*			try
-			{
-				_slave = Env::GetOfficialEnv().getEditable<InterSYNTHESESlave>(map.get<RegistryKeyType>(PARAMETER_SLAVE_ID));
-			}
-			catch (ObjectNotFoundException<InterSYNTHESESlave>&)
-			{
-				throw RequestException("No such slave");
-			}
-*/
+            string queueIdsStr = map.getDefault<string>(PARAMETER_QUEUEIDS, "");
+            // Split of the queueIdStr variable
+            vector<string> queueIdVect;
+            split(queueIdVect, queueIdsStr, is_any_of(","), token_compress_on);
+            BOOST_FOREACH(string idstr, queueIdVect)
+            {
+                _queueIds.insert(static_cast<RegistryKeyType>(atoll(idstr.c_str())));
+            }
 		}
 
 
@@ -88,48 +98,22 @@ namespace synthese
 			const Request& request
 		) const {
 			ParametersMap map;
-			if (COMPTEUR >= 3) {
-				map.insert(ATTR_IS_SYNCHRONISING, false);
-				map.insert(ATTR_COMPTEUR, COMPTEUR);
-				COMPTEUR = 0;
-			}
-			else {
-				map.insert(ATTR_IS_SYNCHRONISING, true);
-				COMPTEUR++;
-				map.insert(ATTR_COMPTEUR, COMPTEUR);
-			}
-
-/*			if(_slave->fullUpdateNeeded())
-			{
-				if(bgProcessSlave(_slave))
-				{
-					stream << "we are processing your initial dump. come back soon!";
-				}
-				else
-				{
-					stream << "sorry another initial dump is running, come back soon";
-				}
-				return ParametersMap();
-			}
-
-			recursive_mutex::scoped_lock queueLock(_slave->getQueueMutex());
-			InterSYNTHESESlave::QueueRange range(_slave->getQueueRange());
-			if(range.first == _slave->getQueue().end())
-			{
-				// Send to the slave that there is nothing to sync
-				stream << NO_CONTENT_TO_SYNC;
-			}
-			else
-			{
-				_slave->sendToSlave(stream, range, _askIdRange);
-			}
-
-			// Record the request as slave activity
-			// Even if the slave crashed and don't get the results,
-			// we won't rebuild the full database on the new slave_update
-			_slave->markAsUpToDate();
-*/
-
+            bool is_one_slave_synchronising = false;
+            if (!_queueIds.empty())
+            {
+                BOOST_FOREACH(
+                            const QueueIds::value_type& qId,
+                            _queueIds
+                            )
+                {
+                    bool queueIdExists(Env::GetOfficialEnv().getRegistry<InterSYNTHESEQueue>().contains(qId));
+                    if (queueIdExists)
+                    {
+                        is_one_slave_synchronising = true;
+                    }
+                }
+            }
+            map.insert(ATTR_IS_SYNCHRONISING, _queueIds.empty() ? false : is_one_slave_synchronising);
 			return map;
 		}
 		

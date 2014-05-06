@@ -25,10 +25,10 @@
 #ifndef SYNTHESE_InterSYNTHESEIsSynchronisingService_H__
 #define SYNTHESE_InterSYNTHESEIsSynchronisingService_H__
 
-#include <boost/thread/thread.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
+//#include <boost/thread/thread.hpp>
 #include "FactorableTemplate.h"
 #include "Function.h"
+#include "Request.h"
 
 namespace synthese
 {
@@ -45,22 +45,16 @@ namespace synthese
 		class InterSYNTHESEIsSynchronisingService:
 			public util::FactorableTemplate<server::Function,InterSYNTHESEIsSynchronisingService>
 		{
+			typedef std::set<util::RegistryKeyType> QueueIds;
 		public:
-			static int COMPTEUR;
-			
-			static const std::string TAG_SLAVEQUEUEID;
-			static const std::string PARAMETER_SLAVE_ID;
-			static const std::string PARAMETER_QUEUEID;
-
-			static const std::string ATTR_IS_SYNCHRONISING;
-			static const std::string ATTR_COMPTEUR;
+            static const std::string ATTR_IS_SYNCHRONISING;
+            static const std::string PARAMETER_QUEUEIDS;
+            static const std::string QUEUE_IDS_SEPARATOR;
 
 		protected:
 			//! \name Page parameters
 			//@{
-/*				boost::optional<util::RegistryKeyType> _slaveId;
-				boost::shared_ptr<InterSYNTHESESlave> _slave;*/
-				util::ParametersMap _mapSlvIdQueueId;
+            QueueIds _queueIds;
 			//@}
 			
 			
@@ -79,22 +73,16 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
-			/// @author Hugues Romain
+            /// @author Thomas Puigt
 			/// @date 2014
 			/// @since 3.8.0
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
-			
-/*			static bool bgUpdaterDone;
-			static boost::mutex bgMutex;
-			static boost::shared_ptr<InterSYNTHESESlave> bgNextSlave;*/
 
 		public:
 			//! @name Setters
 			//@{
-/*				void setSlaveId(util::RegistryKeyType value){ _slaveId = value; }
-				void setAskIdRange(util::RegistryKeyType value){ _askIdRange = value; }*/
 			//@}
 
 
@@ -126,8 +114,6 @@ namespace synthese
 			/// @date 2014
 			virtual std::string getOutputMimeType() const;
 
-
-/*			bool bgProcessSlave(const boost::shared_ptr<InterSYNTHESESlave> &slave) const;*/
 
 
 		};
