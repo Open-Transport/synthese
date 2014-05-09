@@ -554,7 +554,7 @@ namespace synthese
 									boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 										*jp->sharedServicesMutex
 									);
-									BOOST_FOREACH(Service* tservice, jp->getServices())
+									BOOST_FOREACH(Service* tservice, jp->getAllServices())
 									{
 										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
 										if(!curService) continue;
