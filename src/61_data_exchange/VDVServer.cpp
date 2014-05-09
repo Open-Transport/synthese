@@ -534,32 +534,43 @@ namespace synthese
 							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
 						);
 
-						const CommercialLine& line(
-							*static_cast<CommercialLine*>(service->getPath()->getPathGroup())
-						);
+						// TODO : it can exist more than one service with this service code
+						// we should get all of them and select :
+						// - one already activated for today (theorical calendar OK)
 						vector<ScheduledService*> services;
-						BOOST_FOREACH(Path* route, line.getPaths())
+						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
+						BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::value_type& itLine, lines.getMap())
 						{
-							// Avoid junctions
-							if(!dynamic_cast<JourneyPattern*>(route))
+							BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::mapped_type::value_type& line, itLine.second)
 							{
-								continue;
-							}
-							JourneyPattern* jp(static_cast<JourneyPattern*>(route));
-							boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*jp->sharedServicesMutex
-							);
-							BOOST_FOREACH(Service* tservice, jp->getServices())
-							{
-								ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
-								if(!curService) continue;
-								if (curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
+								BOOST_FOREACH(Path* route, line->getPaths())
 								{
-									// Add the service to vect
-									services.push_back(curService);
+									// Avoid junctions
+									if(!dynamic_cast<JourneyPattern*>(route))
+									{
+										continue;
+									}
+									JourneyPattern* jp(static_cast<JourneyPattern*>(route));
+									boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+										*jp->sharedServicesMutex
+									);
+									BOOST_FOREACH(Service* tservice, jp->getServices())
+									{
+										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
+										if(!curService) continue;
+										if (curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
+										{
+											// Add the service to vect
+											services.push_back(curService);
+										}
+									}
 								}
 							}
 						}
+
+						//const CommercialLine& line(
+						//    *static_cast<CommercialLine*>(service->getPath()->getPathGroup())
+						//);
 						
 						Log::GetInstance().debug("On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
 						int numTheoricalActivatedServices(0);
