@@ -122,19 +122,7 @@ namespace synthese
 		template<> void OldLoadSavePolicy<StopPointTableSync,StopPoint>::Unlink(
 			StopPoint* obj
 		){
-			// Hub
-			StopArea* place = const_cast<StopArea*>(obj->getConnectionPlace());
-			place->removePhysicalStop(*obj);
-			obj->setHub(NULL);
-
-			// Handicapped compliance
-			obj->setRules(RuleUser::GetEmptyRules());
-
-			// Projected point
-			if(obj->getProjectedPoint().getRoadChunk())
-			{
-				obj->getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(obj);
-			}
+			obj->unlink();
 		}
 
 
@@ -306,6 +294,7 @@ namespace synthese
 			Env& env,
 			bool insideSameStopArea,
 			double const& distance,
+			bool maxDistance,
 			LinkLevel linkLevel
 		){
 			SelectQuery<StopPointTableSync> query;
@@ -313,7 +302,7 @@ namespace synthese
 
 			subQuery << "Glength(GeomFromText('LINESTRING(" << lexical_cast<string>(point.getGeometry()->getX()) << " " 
 				<< lexical_cast<string>(point.getGeometry()->getY()) << ", '||" << "t012_physical_stops.x" 
-				<< "||' '||" << "t012_physical_stops.y" << "||')'))>" << distance 
+				<< "||' '||" << "t012_physical_stops.y" << "||')'))" << (maxDistance ? ">" : "<=") << distance 
 				<< " AND " << point.getKey() <<"!=" << "t012_physical_stops.id ";
 			if(insideSameStopArea)
 				subQuery << "AND " << point.getConnectionPlace()->getKey() << "=" << "t012_physical_stops.place_id";
@@ -323,6 +312,29 @@ namespace synthese
 			);
 			
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
+		bool StopPointTableSync::SearchDistance(
+			StopPoint const& point1,
+			StopPoint const& point2,
+			double const& distance,
+			bool maxDistance
+		){
+			std::stringstream query;
+			DB* db = DBModule::GetDB();
+
+			query << "SELECT Glength(GeomFromText('LINESTRING(" << lexical_cast<string>(point1.getGeometry()->getX()) << " " 
+				<< lexical_cast<string>(point1.getGeometry()->getY()) << ", " << lexical_cast<string>(point2.getGeometry()->getX()) << " "
+				<< lexical_cast<string>(point2.getGeometry()->getY()) << ")'))" << (maxDistance ? ">" : "<=") << distance << " AS distance";
+			
+			DBResultSPtr rows = db->execQuery(query.str());
+			
+			if (rows->next())
+				return rows->getBool("distance");
+			else
+				return false;
 		}
 
 

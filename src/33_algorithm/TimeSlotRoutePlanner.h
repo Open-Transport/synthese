@@ -72,7 +72,8 @@ namespace synthese
 				boost::optional<double> _minMaxDurationRatioFilter;
 				bool								_enableTheoretical;
 				bool								_enableRealTime;
-				
+				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
+			
 			//@}
 
 			//! @name Logging
@@ -110,7 +111,8 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
-				bool enableRealTime = true
+				bool enableRealTime = true,
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
 
@@ -141,7 +143,8 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
-				bool enableRealTime = true
+				bool enableRealTime = true,
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
 			//! @name Getters

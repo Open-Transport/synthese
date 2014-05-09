@@ -61,6 +61,7 @@ namespace synthese
 		const string PTUseRuleTableSync::COL_CAPACITY("capacity");
 		const string PTUseRuleTableSync::COL_ORIGINISREFERENCE ("origin_is_reference");
 		const string PTUseRuleTableSync::COL_MINDELAYMINUTES ("min_delay_minutes");
+		const string PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL ("min_delay_minutes_external");
 		const string PTUseRuleTableSync::COL_MINDELAYDAYS ("min_delay_days");
 		const string PTUseRuleTableSync::COL_MAXDELAYDAYS ("max_delay_days");
 		const string PTUseRuleTableSync::COL_HOURDEADLINE ("hour_deadline");
@@ -87,6 +88,7 @@ namespace synthese
 			Field(PTUseRuleTableSync::COL_RESERVATION_TYPE, SQL_INTEGER),
 			Field(PTUseRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
 			Field(PTUseRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
+			Field(PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL, SQL_INTEGER),
 			Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
 			Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
 			Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
@@ -133,6 +135,7 @@ namespace synthese
 			query.addField(static_cast<int>(object->getReservationType()));
 			query.addField(object->getOriginIsReference());
 			query.addFrameworkField<MinutesField>(object->getMinDelayMinutes());
+			query.addFrameworkField<MinutesField>(object->getMinDelayMinutesExternal());
 			query.addFrameworkField<DaysField>(object->getMinDelayDays());
 			query.addField(object->getMaxDelayDays() ? static_cast<int>(object->getMaxDelayDays()->days()) : int(0));
 			query.addFrameworkField<TimeField>(object->getHourDeadLine());

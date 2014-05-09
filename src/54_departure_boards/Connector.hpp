@@ -61,7 +61,6 @@ typedef struct
 	bool queryIsOver;
 	const char * requestStr;
 	int connectionIndex;
-	bool serverIsGone;
 } queryArgs;
 
 
@@ -362,9 +361,7 @@ void* MySQLconnector::launchQuery(void *argPtr)
 		if(_connections[args->connectionIndex] == NULL)  
 		{
 			synthese::util::Log::GetInstance().warn("MySQLconnector::launchQuery connexion " + indexStr.str() + " is NULL, (re)connecting in progress");
-			args->serverIsGone = true;
 			_initConnection(args->connectionIndex);
-			args->serverIsGone = false;
 		}
 		else
 		{
@@ -375,10 +372,6 @@ void* MySQLconnector::launchQuery(void *argPtr)
 				errnoStr << myErrno;
 				args->queryIsOK = false;
 
-				// Server gone, informe the SYNTHESE thread to give more time to the thread to complete
-				if(myErrno == 2006)
-					args->serverIsGone = true;
-
 				synthese::util::Log::GetInstance().warn("MySQLconnector::launchQuery error during mysql_query() with code " + errnoStr.str());
 #ifdef DEBUG_RT
 				synthese::util::Log::GetInstance().warn(mysql_error(_connections[args->connectionIndex]));
@@ -387,7 +380,6 @@ void* MySQLconnector::launchQuery(void *argPtr)
 				if(myErrno >= 2000)
 				{
 					_initConnection(args->connectionIndex);
-					args->serverIsGone = false;
 				}
 				// Server side error, do not worth a retry
 				else
@@ -516,7 +508,6 @@ shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synth
 	args->queryIsOver = false;
 	args->requestStr = sql.c_str();
 	args->connectionIndex = _connectionIndex;
-	args->serverIsGone = false;
 
 	bool queryTimedout = true;
 
@@ -556,41 +547,29 @@ shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synth
 	}
 
 	unsigned int cpt = 0;
-	bool reconnecting = false;
 
-	// Total wait 500ms, except if MySQL server was gone
-	while((cpt < 250) || reconnecting)
+	// Total wait 1000ms, except if MySQL server was gone
+	while(cpt < 200)
 	{
-		// Wait 2000 usec = 2 msec
-		usleep(2000);
+		// Wait 5000 usec = 5 msec
+		usleep(5000);
 		cpt++;
 
 		if(args->queryIsOver)
 		{
 #ifdef DEBUG_RT
 			stringstream durationMsg;
-			durationMsg << "MySQLconnector::execQuery ended, duration = " << cpt*2 << " ms";
+			durationMsg << "MySQLconnector::execQuery ended, duration = " << cpt*5 << " ms";
 			synthese::util::Log::GetInstance().info(durationMsg.str());
 #endif
 			queryTimedout = false;
 			break;
 		}
-		else if(!reconnecting && args->serverIsGone)
-		{
-			// Give it time to reconnect
-			reconnecting = true;
-		}
-		else if(reconnecting && !args->serverIsGone)
-		{
-			// Reconnected, reset the counter to 0
-			reconnecting = false;
-			cpt = 0;
-		}
 	}
 
 	if(queryTimedout)
 	{
-		synthese::util::Log::GetInstance().warn("MySQLconnector::execQuery MySQL too long (more than 500 ms)");
+		synthese::util::Log::GetInstance().warn("MySQLconnector::execQuery MySQL too long (more than 1000 ms)");
 		// Don't forget to kill thread
 		pthread_cancel(thread_handle);
 		freeUsedConnection();

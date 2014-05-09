@@ -26,12 +26,10 @@
 #include "CalendarTemplateElementTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "DBTransaction.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
 #include "DRTAreaTableSync.hpp"
 #include "Import.hpp"
 #include "ImportableTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
-#include "LineArea.hpp"
 #include "LineStopTableSync.h"
 #include "RequestException.h"
 #include "ScheduledServiceTableSync.h"
@@ -105,7 +103,7 @@ namespace synthese
 						*itPath->sharedServicesMutex
 					);
 
-					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getServices())
+					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getAllServices())
 					{
 						if(!dynamic_cast<NonPermanentService*>(itService))
 						{
@@ -152,7 +150,7 @@ namespace synthese
 			// Vehicle services
 			ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(dataSource, _env);
 			VehicleService::DriverServiceChunks emptyVSChunks;
-			VehicleService::Services emptyVSServices;
+			Services::Type emptyVSServices;
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::value_type& itVSSet, vehicleServices.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::mapped_type::value_type& itVS, itVSSet.second)
@@ -163,8 +161,8 @@ namespace synthese
 					}
 
 					*itVS -= _calendar;
-					itVS->setServices(emptyVSServices);
-					itVS->setDriverServices(emptyVSChunks);
+					itVS->set<Services>(emptyVSServices);
+					itVS->setDriverServiceChunks(emptyVSChunks);
 			}	}
 		}
 
@@ -200,7 +198,7 @@ namespace synthese
 			// Journey patterns without any service
 			BOOST_FOREACH(const Registry<JourneyPattern>::value_type& itJourneyPattern, _env.getRegistry<JourneyPattern>())
 			{
-				if(itJourneyPattern.second->hasLinkWithSource(dataSource) && itJourneyPattern.second->getServices().empty())
+				if(itJourneyPattern.second->hasLinkWithSource(dataSource) && itJourneyPattern.second->getAllServices().empty())
 				{
 					_journeyPatternsToRemove.insert(itJourneyPattern.second);
 				}
@@ -221,22 +219,12 @@ namespace synthese
 			// Journey patterns to delete are removed from the environment to avoid useless saving
 			BOOST_FOREACH(const boost::shared_ptr<JourneyPattern>& journeyPattern, _journeyPatternsToRemove)
 			{
-				BOOST_FOREACH(const Edge* edge, journeyPattern->getEdges())
+				BOOST_FOREACH(const LineStop* edge, journeyPattern->getLineStops())
 				{
-					if(dynamic_cast<const DesignatedLinePhysicalStop*>(edge))
-					{
-						_edgesToRemove.insert(
-							_env.getSPtr(dynamic_cast<const LineStop*>(edge))
-						);
-						_env.getEditableRegistry<LineStop>().remove(edge->getKey());
-					}
-					else if(dynamic_cast<const LineArea*>(edge))
-					{
-						_edgesToRemove.insert(
-							_env.getSPtr(dynamic_cast<const LineStop*>(edge))
-						);
-						_env.getEditableRegistry<LineStop>().remove(edge->getKey());
-					}
+					_edgesToRemove.insert(
+						_env.getSPtr(edge)
+					);
+					_env.getEditableRegistry<LineStop>().remove(edge->getKey());
 				}
 				_env.getEditableRegistry<JourneyPattern>().remove(journeyPattern->getKey());
 			}
@@ -245,7 +233,7 @@ namespace synthese
 			BOOST_FOREACH(const Registry<VehicleService>::value_type& itVehicleService, _env.getRegistry<VehicleService>())
 			{
 				if(	itVehicleService.second->hasLinkWithSource(dataSource) &&
-					(	itVehicleService.second->getServices().empty() ||
+					(	itVehicleService.second->get<Services>().empty() ||
 						itVehicleService.second->empty()
 				)	){
 					_vehicleServicesToRemove.insert(itVehicleService.second);
@@ -287,8 +275,8 @@ namespace synthese
 					)	);
 					BOOST_FOREACH(const boost::shared_ptr<LineStop>& lineStop, lineStops)
 					{
-						if(	dynamic_cast<const JourneyPattern*>(lineStop->getParentPath()) &&
-							!static_cast<const JourneyPattern*>(lineStop->getParentPath())->hasLinkWithSource(*dataSourceInCheckEnv)
+						if(	lineStop->get<Line>() &&
+							!lineStop->get<Line>()->hasLinkWithSource(*dataSourceInCheckEnv)
 						){
 							theStopCanBeRemoved = false;
 							break;
@@ -526,10 +514,10 @@ namespace synthese
 					ScheduledServiceTableSync::Search(_env, itPath->getKey());
 					ContinuousServiceTableSync::Search(_env, itPath->getKey());
 					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*itPath->sharedServicesMutex
+						*itPath->sharedServicesMutex
 					);
 
-					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getServices())
+					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getAllServices())
 					{
 						if(!dynamic_cast<NonPermanentService*>(itService))
 						{
@@ -568,7 +556,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::mapped_type::value_type& itPath, itPathSet.second)
 				{
-					if(itPath->getServices().empty())
+					if(itPath->getAllServices().empty())
 					{
 						journeyPatternsToRemove.insert(itPath);
 					}

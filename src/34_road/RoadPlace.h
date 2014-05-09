@@ -27,12 +27,13 @@
 #define SYNTHESE_RoadPlace_h__
 
 #include "Place.h"
+#include "RoadTypes.hpp"
 #include "NamedPlaceTemplate.h"
 #include "PathGroup.h"
 #include "Registrable.h"
 #include "Registry.h"
-#include "MainRoadChunk.hpp"
 #include "ImportableTemplate.hpp"
+#include "PointerField.hpp"
 
 namespace synthese
 {
@@ -44,6 +45,7 @@ namespace synthese
 	namespace road
 	{
 		class Road;
+		class RoadPath;
 		class House;
 
 		////////////////////////////////////////////////////////////////////////
@@ -55,7 +57,8 @@ namespace synthese
 			public virtual geography::Place,
 			public graph::PathGroup,
 			public geography::NamedPlaceTemplate<RoadPlace>,
-			public impex::ImportableTemplate<RoadPlace>
+			public impex::ImportableTemplate<RoadPlace>,
+			public PointerField<RoadPlace, RoadPlace>
 		{
 		public:
 			static const std::string DATA_ID;
@@ -66,8 +69,10 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<RoadPlace> Registry;
 
+			typedef std::set<Road*> Roads;
 
 		private:
+			mutable Roads _roads;
 
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -80,9 +85,11 @@ namespace synthese
 			RoadPlace(
 				util::RegistryKeyType id = 0
 			);
+			virtual ~RoadPlace();
 
 			//! @name Getters
 			//@{
+			const Roads& getRoads() const { return _roads; }				
 			//@}
 
 			//! @name Setters
@@ -91,8 +98,10 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void addRoad(Road& road);
-				void removeRoad(Road& road);
+				void addRoad(RoadPath& road);
+				void removeRoad(RoadPath& road);
+				void addRoad(Road& road) const;
+				void removeRoad(Road& road) const;
 			//@}
 
 			//! @name Services
@@ -138,7 +147,7 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.2.0
 				boost::shared_ptr<House> getHouse(
-					MainRoadChunk::HouseNumber houseNumber,
+					HouseNumber houseNumber,
 					bool numberAtBeginning = true
 				) const;
 			//@}

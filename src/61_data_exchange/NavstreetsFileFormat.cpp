@@ -103,12 +103,12 @@ namespace synthese
 		const string NavstreetsFileFormat::_FIELD_POI_ST_NUM("POI_ST_NUM");
 		const string NavstreetsFileFormat::_FIELD_POI_ST_NAME("ST_NAME");
 
-		const std::map<int,Road::RoadType> highwayTypes = boost::assign::map_list_of
-			(1, Road::ROAD_TYPE_PRINCIPLEAXIS)
-			(2, Road::ROAD_TYPE_PRINCIPLEAXIS)
-			(3, Road::ROAD_TYPE_SECONDARYAXIS)
-			(4, Road::ROAD_TYPE_SECONDARYAXIS)
-			(5, Road::ROAD_TYPE_ACCESSROAD);
+		const std::map<int, RoadType> highwayTypes = boost::assign::map_list_of
+			(1, ROAD_TYPE_PRINCIPLEAXIS)
+			(2, ROAD_TYPE_PRINCIPLEAXIS)
+			(3, ROAD_TYPE_SECONDARYAXIS)
+			(4, ROAD_TYPE_SECONDARYAXIS)
+			(5, ROAD_TYPE_ACCESSROAD);
 	}
 
 	namespace impex
@@ -410,12 +410,12 @@ namespace synthese
 						roadCode += string(" ") + roadName;
 
 						// House number bounds
-						MainRoadChunk::HouseNumberBounds rightHouseNumberBounds(_getHouseNumberBoundsFromAddresses(rightRefHouseNumber, rightNRefHouseNumber));
-						MainRoadChunk::HouseNumberBounds leftHouseNumberBounds(_getHouseNumberBoundsFromAddresses(leftRefHouseNumber, leftNRefHouseNumber));
+						HouseNumberBounds rightHouseNumberBounds(_getHouseNumberBoundsFromAddresses(rightRefHouseNumber, rightNRefHouseNumber));
+						HouseNumberBounds leftHouseNumberBounds(_getHouseNumberBoundsFromAddresses(leftRefHouseNumber, leftNRefHouseNumber));
 
 						// House numbering policy
-						MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(rightAddressSchema));
-						MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(leftAddressSchema));
+						HouseNumberingPolicy rightHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(rightAddressSchema));
+						HouseNumberingPolicy leftHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(leftAddressSchema));
 
 						// Left node
 						_CrossingsMap::const_iterator ita1(_navteqCrossings.find(leftId));
@@ -477,7 +477,7 @@ namespace synthese
 							leftHouseNumberingPolicy,
 							rightHouseNumberBounds,
 							leftHouseNumberBounds,
-							Road::ROAD_TYPE_UNKNOWN
+							ROAD_TYPE_UNKNOWN
 						);
 					}
 //				}
@@ -509,7 +509,7 @@ namespace synthese
 					string poiName(rows->getText(NavstreetsFileFormat::_FIELD_POI_NAME));
 
 					// House number
-					optional<MainRoadChunk::HouseNumber> houseNumber;
+					optional<HouseNumber> houseNumber;
 					if(rows->getInt(NavstreetsFileFormat::_FIELD_POI_ST_NUM) > 0)
 					{
 						houseNumber = rows->getInt(NavstreetsFileFormat::_FIELD_POI_ST_NUM);
@@ -529,7 +529,7 @@ namespace synthese
 						continue;
 					}
 
-					EdgeProjector<boost::shared_ptr<MainRoadChunk> >::From paths(
+					EdgeProjector<boost::shared_ptr<RoadChunk> >::From paths(
 						RoadChunkTableSync::SearchByMaxDistance(
 							*geometry.get(), _maxDistance,
 							Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL
@@ -537,17 +537,17 @@ namespace synthese
 
 					if(!paths.empty())
 					{
-						EdgeProjector<boost::shared_ptr<MainRoadChunk> > projector(paths, _maxDistance);
+						EdgeProjector<boost::shared_ptr<RoadChunk> > projector(paths, _maxDistance);
 						try
 						{
-							EdgeProjector<boost::shared_ptr<MainRoadChunk> >::PathNearby projection(projector.projectEdge(*geometry.get()->getCoordinate()));
+							EdgeProjector<boost::shared_ptr<RoadChunk> >::PathNearby projection(projector.projectEdge(*geometry.get()->getCoordinate()));
 
 							Address projectedAddress(
 								*(projection.get<1>().get()),
 								projection.get<2>()
 							);
 
-							const City* city = projectedAddress.getRoadChunk()->getRoad()->getRoadPlace()->getCity();
+							const City* city = projectedAddress.getRoadChunk()->getRoad()->get<RoadPlace>()->getCity();
 
 							// PublicPlace
 							PublicPlace* publicPlace(
@@ -560,7 +560,7 @@ namespace synthese
 							)	);
 
 							// PublicPlaceEntrance
-							MainRoadChunk* roadChunk = projectedAddress.getRoadChunk();
+							RoadChunk* roadChunk = projectedAddress.getRoadChunk();
 
 							// Metric offset + check of house number consistency
 							MetricOffset metricOffset(
@@ -579,7 +579,7 @@ namespace synthese
 								*publicPlace
 							);
 						}
-						catch(EdgeProjector<boost::shared_ptr<MainRoadChunk> >::NotFoundException)
+						catch(EdgeProjector<boost::shared_ptr<RoadChunk> >::NotFoundException)
 						{
 						}
 					}
@@ -608,11 +608,11 @@ namespace synthese
 			{
 				RoadPlaceTableSync::Save(roadplace.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<MainRoadPart>::value_type& road, _env.getEditableRegistry<MainRoadPart>())
+			BOOST_FOREACH(const Registry<Road>::value_type& road, _env.getEditableRegistry<Road>())
 			{
 				RoadTableSync::Save(road.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<MainRoadChunk>::value_type& roadChunk, _env.getEditableRegistry<MainRoadChunk>())
+			BOOST_FOREACH(const Registry<RoadChunk>::value_type& roadChunk, _env.getEditableRegistry<RoadChunk>())
 			{
 				RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
 			}
@@ -629,17 +629,17 @@ namespace synthese
 
 
 
-		MainRoadChunk::HouseNumberingPolicy NavstreetsFileFormat::Importer_::_getHouseNumberingPolicyFromAddressSchema(
+		HouseNumberingPolicy NavstreetsFileFormat::Importer_::_getHouseNumberingPolicyFromAddressSchema(
 			const std::string& addressSchema
 		){
-			if(addressSchema == "E") return MainRoadChunk::EVEN;
-			if(addressSchema == "O") return MainRoadChunk::ODD;
-			return MainRoadChunk::ALL;
+			if(addressSchema == "E") return EVEN_NUMBERS;
+			if(addressSchema == "O") return ODD_NUMBERS;
+			return ALL_NUMBERS;
 		}
 
 
 
-		MainRoadChunk::HouseNumberBounds NavstreetsFileFormat::Importer_::_getHouseNumberBoundsFromAddresses(
+		HouseNumberBounds NavstreetsFileFormat::Importer_::_getHouseNumberBoundsFromAddresses(
 			const std::string& minAddressConst,
 			const std::string& maxAddressConst
 		){
@@ -662,17 +662,17 @@ namespace synthese
 						maxAddress.erase(k, 1);
 					}
 
-					return MainRoadChunk::HouseNumberBounds(
-						pair<MainRoadChunk::HouseNumber, MainRoadChunk::HouseNumber>(
-							lexical_cast<MainRoadChunk::HouseNumber>(minAddress),
-							lexical_cast<MainRoadChunk::HouseNumber>(maxAddress)
+					return HouseNumberBounds(
+						pair<HouseNumber, HouseNumber>(
+							lexical_cast<HouseNumber>(minAddress),
+							lexical_cast<HouseNumber>(maxAddress)
 					)	);
 				}
 				catch(bad_lexical_cast)
 				{
  				}
 			}
-			return MainRoadChunk::HouseNumberBounds();
+			return HouseNumberBounds();
 		}
 
 

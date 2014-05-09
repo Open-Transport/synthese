@@ -27,6 +27,7 @@
 #include "FreeDRTAreaTableSync.hpp"
 #include "FreeDRTBookingAdmin.hpp"
 #include "FreeDRTTimeSlotTableSync.hpp"
+#include "StopPoint.hpp"
 #include "UserTableSync.h"
 #include "ResaModule.h"
 #include "ServiceReservations.h"
@@ -532,16 +533,16 @@ namespace synthese
 						if(dynamic_cast<ScheduledService*>(service.get()))
 						{
 							stream << "Service " << serviceNumber << " - départ de ";
-							const Edge* edge(
-								dynamic_cast<Service*>(service.get())->getPath()->getEdge(0)
+							const LineStop* edge(
+								*static_cast<JourneyPattern*>(dynamic_cast<Service*>(service.get())->getPath())->getLineStops().begin()
 							);
-							if(dynamic_cast<const NamedPlace*>(edge->getHub()))
+							if(dynamic_cast<const StopPoint*>(&*edge->get<LineNode>()))
 							{
-								stream << dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName();
+								stream << dynamic_cast<const StopPoint*>(&*edge->get<LineNode>())->getConnectionPlace()->getFullName();
 							}
-							else if(dynamic_cast<const DRTArea*>(edge->getFromVertex()))
+							else if(dynamic_cast<const DRTArea*>(&*edge->get<LineNode>()))
 							{
-								stream << static_cast<const DRTArea*>(edge->getFromVertex())->getName();
+								stream << dynamic_cast<const DRTArea*>(&*edge->get<LineNode>())->getName();
 							}
 							stream << " à " <<
 								Service::GetTimeOfDay(dynamic_cast<ScheduledService*>(service.get())->getDepartureSchedule(false, 0))

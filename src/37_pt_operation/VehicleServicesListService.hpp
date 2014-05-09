@@ -32,8 +32,16 @@
 
 namespace synthese
 {
+	namespace pt
+	{
+		class ScheduledService;
+	}
+
 	namespace pt_operation
 	{
+		class OperationUnit;
+		class VehicleService;
+
 		//////////////////////////////////////////////////////////////////////////
 		///	37.15 Function : VehicleServicesListService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Vehicle services list
@@ -47,6 +55,9 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_PAGE;
+			static const std::string PARAMETER_WITH_DETAIL;
+			static const std::string PARAMETER_SERVICE; // id of a scheduled service
+
 			static const std::string TAG_VEHICLE_SERVICE;
 			static const std::string TAG_VEHICLE_SERVICES;
 
@@ -56,6 +67,10 @@ namespace synthese
 				Date::Type _date;
 				Name::Type _name;
 				const cms::Webpage* _page;
+				boost::optional<const OperationUnit&> _operationUnit;
+				boost::shared_ptr<const VehicleService> _service;
+				const pt::ScheduledService* _scheduledService;
+				bool _withDetail;
 			//@}
 
 
@@ -83,6 +98,12 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
+
+			void _exportService(
+				const VehicleService& vs,
+				util::ParametersMap& map
+			) const;
+				
 
 		public:
 			VehicleServicesListService();

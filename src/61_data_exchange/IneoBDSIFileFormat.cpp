@@ -35,7 +35,6 @@
 #include "DBModule.h"
 #include "DBTransaction.hpp"
 #include "Import.hpp"
-#include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "ParametersMap.h"
@@ -141,18 +140,6 @@ namespace synthese
 			const time_duration& nowDuration
 		) const {
 
-			// Select only services with at least a stop after now
-			const Horaire& lastHoraire(*horaires.rbegin());
-			time_duration timeToCompare(
-				lastHoraire.hra > lastHoraire.hta ?
-				lastHoraire.hra :
-				lastHoraire.hta
-			);
-			if(	timeToCompare < nowDuration)
-			{
-				return;
-			}
-
 			// Jump over courses with incomplete chainages
 			if(horaires.size() != chainage.arretChns.size())
 			{
@@ -250,18 +237,6 @@ namespace synthese
 			if(!lock.owns_lock())
 			{
 				throw RequestException("IneoBDSIFileFormat: Already running");
-			}
-
-			//////////////////////////////////////////////////////////////////////////
-			// Preparation of list of objects to remove
-
-			// Scenarios
-			DataSource::LinkedObjects existingScenarios(
-				_import.get<DataSource>()->getLinkedObjects<Scenario>()
-			);
-			BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
-			{
-				_scenariosToRemove.insert(existingScenario.second->getKey());
 			}
 
 
@@ -732,6 +707,14 @@ namespace synthese
 			);
 
 			{ // Scenarios and messages
+				// Scenarios
+				DataSource::LinkedObjects existingScenarios(
+					dataSourceOnSharedEnv->getLinkedObjects<Scenario>()
+				);
+				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingScenario, existingScenarios)
+				{
+					_scenariosToRemove.insert(existingScenario.second->getKey());
+				}
 
 				// Loop on objects present in the database (search for creations and updates)
 				BOOST_FOREACH(const Programmations::value_type& itProg, programmations)
@@ -888,7 +871,7 @@ namespace synthese
 				{
 					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
 
-					BOOST_FOREACH(const ServiceSet::value_type& existingService, journeyPattern.getServices())
+					BOOST_FOREACH(const ServiceSet::value_type& existingService, journeyPattern.getAllServices())
 					{
 						// Jump over continuous services
 						ScheduledService* service(dynamic_cast<ScheduledService*>(existingService));
@@ -910,33 +893,6 @@ namespace synthese
 						}
 
 						servicesToRemove.insert(service);
-					}
-
-					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, journeyPattern.getSubLines())
-					{
-						BOOST_FOREACH(const ServiceSet::value_type& existingService, subline->getServices())
-						{
-							// Jump over continuous services
-							ScheduledService* service(dynamic_cast<ScheduledService*>(existingService));
-							if(!service)
-							{
-								continue;
-							}
-
-							// Jump over non active services
-							if(!service->isActive(today))
-							{
-								continue;
-							}
-
-							// Jump over non imported services
-							if(service->getNextRTUpdate() > nextDayBreak)
-							{
-								continue;
-							}
-
-							servicesToRemove.insert(service);
-						}
 					}
 				}
 
@@ -1012,6 +968,7 @@ namespace synthese
 					}
 
 					// Search for a service with the same planned schedules
+					ScheduledService* inactiveService(NULL); // to remember an inactive service available for this course (if no other)
 					BOOST_FOREACH(
 						const JourneyPattern* route,
 						course.chainage->getSYNTHESEJourneyPatterns(
@@ -1023,7 +980,7 @@ namespace synthese
 						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 							*route->sharedServicesMutex
 						);
-						BOOST_FOREACH(Service* sservice, route->getServices())
+						BOOST_FOREACH(Service* sservice, route->getAllServices())
 						{
 							ScheduledService* service(
 								dynamic_cast<ScheduledService*>(sservice)
@@ -1047,6 +1004,10 @@ namespace synthese
 								servicesToLink.push_back(&course);
 								break;
 							}
+							else if ( course == *service )
+							{
+								inactiveService = service;
+							}
 						}
 						if(course.syntheseService)
 						{
@@ -1055,6 +1016,23 @@ namespace synthese
 					}
 					if(course.syntheseService)
 					{
+						continue;
+					}
+					
+					// Maybe an inactive service has been found and can be activated
+					if (inactiveService)
+					{
+						inactiveService->setActive(today);
+						course.syntheseService = inactiveService;
+						
+						// The service must be updated
+						servicesToUpdate.push_back(&course);
+						
+						// The service must not be removed
+						servicesToRemove.erase(inactiveService);
+						
+						// The service must be linked
+						servicesToLink.push_back(&course);
 						continue;
 					}
 
@@ -1092,6 +1070,7 @@ namespace synthese
 							oldCode = service->getACodeBySource(*dataSourceOnSharedEnv);
 						}
 						Importable::DataSourceLinks links(service->getDataSourceLinks());
+						service->removeSourceLinks(*dataSourceOnSharedEnv, true);
 						links.erase(dataSourceOnSharedEnv);
 						service->setDataSourceLinksWithoutRegistration(links);
 						_servicesToSave.insert(service);
@@ -1151,7 +1130,7 @@ namespace synthese
 					{
 						Importable::DataSourceLinks links(course->syntheseService->getDataSourceLinks());
 						links.insert(make_pair(dataSourceOnSharedEnv, course->ref));
-						course->syntheseService->setDataSourceLinksWithoutRegistration(links);
+						course->syntheseService->setDataSourceLinksWithRegistration(links);
 						_servicesToSave.insert(course->syntheseService);
 
 						_logDebugDetail(
@@ -1393,10 +1372,13 @@ namespace synthese
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
 
-			// Output of SQL queries in debug mode
-			BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+			// Output of SQL queries in trace mode
+			if (_minLogLevel < IMPORT_LOG_DEBG)
 			{
-				_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+				{
+					_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				}
 			}
 
 			return transaction;
@@ -1500,6 +1482,14 @@ namespace synthese
 				}
 			}
 			if(!updated)
+			{
+				return UpdateDeltas();
+			}
+			
+			// if course is ended, don't update it because it may have been cleaned by RTDataCleaner
+			// and we do not want update the course for tomorrow
+			boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
+			if(now.time_of_day() > syntheseService->GetTimeOfDay(horaires[horaires.size()-1].hrd) + minutes(1))
 			{
 				return UpdateDeltas();
 			}
@@ -1619,10 +1609,6 @@ namespace synthese
 
 					// Register the journey pattern
 					syntheseJourneyPatterns.push_back(&jp);
-					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, jp.getSubLines())
-					{
-						syntheseJourneyPatterns.push_back(subline);
-					}
 				}
 			}
 
@@ -1645,20 +1631,20 @@ namespace synthese
 				BOOST_FOREACH(const ArretChns::value_type& arretChn, arretChns)
 				{
 					// Line stop creation
-					boost::shared_ptr<DesignatedLinePhysicalStop> ls(
-						new DesignatedLinePhysicalStop(
+					boost::shared_ptr<LineStop> ls(
+						new LineStop(
 							LineStopTableSync::getId(),
 							jp.get(),
 							rank,
 							rank+1 < arretChns.size(),
 							rank > 0,
 							0,
-							arretChn.arret->syntheseStop,
-							arretChn.type != "N"
+							*arretChn.arret->syntheseStop
 					)	);
+					ls->set<ScheduleInput>(arretChn.type != "N");
 
 					// registration of the line stop into the journey pattern
-					jp->addEdge(*ls);
+					ls->link(temporaryEnvironment, true);
 
 					// Add the edge to the vertex
 /*						if (rank+1 < course.chainage->arretChns.size())

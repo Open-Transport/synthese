@@ -55,7 +55,7 @@ namespace synthese
 
 		void StrReplaceFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_text = map.getDefault<string>(PARAMETER_TEXT);
+			_text = map.getDefault<string>(PARAMETER_TEXT, string());
 			_search = map.getDefault<string>(PARAMETER_SEARCH, string());
 			_replace = map.getDefault<string>(PARAMETER_REPLACE, string());
 		}
@@ -71,11 +71,7 @@ namespace synthese
 				boost::regex reg_search(_search);
 				stream << boost::regex_replace(_text, reg_search, _replace);
 			}
-			else
-			{
-				stream << "invalid parameters";
-			}
-				
+
 			return util::ParametersMap();
 		}
 

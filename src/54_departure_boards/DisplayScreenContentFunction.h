@@ -80,9 +80,10 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_GENERATION_METHOD;
 			static const std::string PARAMETER_USE_SAE_DIRECT_CONNECTION;
-			static const std::string PARAMETER_DATA_SOURCE_NAME_FILTER;
 			static const std::string PARAMETER_STOPS_LIST;
 			static const std::string PARAMETER_TIMETABLE_GROUPED_BY_AREA;
+			static const std::string PARAMETER_DATA_SOURCE_FILTER;
+			static const std::string PARAMETER_SPLIT_CONTINUOUS_SERVICES;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -119,7 +120,7 @@ namespace synthese
 			static const boost::posix_time::time_duration endOfService;
 
 			typedef std::pair<const pt::CommercialLine*, const pt::StopArea*> LineDestinationKey;
-			typedef std::map<const pt::StopPoint*, LineDestinationKey> LineDestinationFilter;
+			typedef std::multimap<const pt::StopPoint*, LineDestinationKey> LineDestinationFilter;
 
 			// Direct connection SAE structures :
 			struct RealTimeService
@@ -139,12 +140,18 @@ namespace synthese
 			struct Spointer_comparator {
 				bool operator()(const graph::ServicePointer& s1, const graph::ServicePointer& s2)
 				{
-					return s1.getDepartureDateTime() < s2.getDepartureDateTime();
+					if(s1.getDepartureDateTime() == s2.getDepartureDateTime())
+						return &s1 < &s2;
+					else
+						return s1.getDepartureDateTime() < s2.getDepartureDateTime();
 				}
 
 				bool operator()(const RealTimeService& s1, const RealTimeService& s2)
 				{
-					return s1.datetime < s2.datetime;
+					if(s1.datetime == s2.datetime)
+						return &s1 < &s2;
+					else
+						return s1.datetime < s2.datetime;
 				}
 			};
 
@@ -169,12 +176,13 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> _lineToDisplay;
 				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
 				bool _wayIsBackward;
-				boost::optional<std::string> _dataSourceName;
 				bool _useSAEDirectConnection;
 				bool _timetableGroupedByArea;
+				bool _splitContinuousServices;
 				LineDestinationFilter _lineDestinationFilter;
+				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
 
-				typedef std::map<std::string, util::RegistryKeyType> SAELine;
+				typedef std::map<std::string, std::set<util::RegistryKeyType> > SAELine;
 				static SAELine _SAELine;
 				static boost::posix_time::ptime _nextUpdateLine;
 

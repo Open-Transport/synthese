@@ -5,6 +5,8 @@ ActionException.cpp
 ActionException.h
 ActionService.cpp
 ActionService.hpp
+BasicClientWin.cpp
+BasicClientWin.h
 BasicClient.cpp
 BasicClient.h
 CleanerThreadExec.cpp
@@ -13,11 +15,6 @@ ClientException.cpp
 ClientException.h
 DbModuleConfigTableSync.cpp
 DbModuleConfigTableSync.h
-DeviceTemplate.h
-Device.h
-Device.cpp
-DevicesService.hpp
-DevicesService.cpp
 DynamicRequest.cpp
 DynamicRequest.h
 Function.cpp
@@ -36,8 +33,12 @@ HtmlFormFieldInterfaceElement.cpp
 HtmlFormFieldInterfaceElement.h
 HtmlFormInterfaceElement.cpp
 HtmlFormInterfaceElement.h
+HTTPClient.cpp
+HTTPClient.hpp
 HTTPConnection.cpp
 HTTPConnection.hpp
+HTTPClient.cpp
+HTTPClient.hpp
 HTTPReply.cpp
 HTTPReply.hpp
 HTTPRequest.hpp
@@ -47,6 +48,8 @@ LoginAction.cpp
 LoginAction.h
 LoginInterfacePage.cpp
 LoginInterfacePage.h
+LoginToken.cpp
+LoginToken.hpp
 LogoutAction.cpp
 LogoutAction.h
 MemoryStatisticsAdmin.cpp
@@ -55,14 +58,6 @@ ModuleClass.cpp
 ModuleClass.h
 ModuleClassTemplate.hpp
 ModuleException.h
-PermanentThread.hpp
-PermanentThread.cpp
-PermanentThreadsService.hpp
-PermanentThreadsService.cpp
-PermanentThreadTableSync.hpp
-PermanentThreadTableSync.cpp
-Poller.hpp
-Poller.cpp
 QuitAction.cpp
 QuitAction.hpp
 RedirectService.cpp
@@ -97,6 +92,8 @@ SetSessionVariableAction.hpp
 StaticActionFunctionRequest.h
 StaticActionRequest.h
 StaticFunctionRequest.h
+SuicidalAction.cpp
+SuicidalAction.hpp
 SYNTHESEInformationService.cpp
 SYNTHESEInformationService.hpp
 ThreadKillAction.cpp

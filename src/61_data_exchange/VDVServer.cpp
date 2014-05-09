@@ -177,7 +177,7 @@ namespace synthese
 			bool updateFromServer(false);
 			try
 			{
-				Log::GetInstance().warn("Envoie d'une requÃªte de statut Ã  " + _getURL("status"));
+				Log::GetInstance().warn("Envoie d'une requête de statut à " + _getURL("status"));
 				string statusAntwortStr(
 					c.post(_getURL("status"), statusAnfrage.str(), contentType)
 				);
@@ -529,8 +529,7 @@ namespace synthese
 						// Service code is on 5 characters in the planned datasource
 						while (vectServiceCode[1].size() < 5)
 							vectServiceCode[1] = "0" + vectServiceCode[1];
-
-						Log::GetInstance().debug("On reçoit des infos pour le service " + vectServiceCode[1]);
+						
 
 						ScheduledService* service(
 							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
@@ -560,7 +559,7 @@ namespace synthese
 									boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 										*jp->sharedServicesMutex
 									);
-									BOOST_FOREACH(Service* tservice, jp->getServices())
+									BOOST_FOREACH(Service* tservice, jp->getAllServices())
 									{
 										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
 										if(!curService) continue;
@@ -600,7 +599,6 @@ namespace synthese
 						
 						if (service)
 						{
-							Log::GetInstance().debug("On a trouve le service correspondant : " + lexical_cast<string>(service->getKey()));
 							// UPDATE RT OF THE SERVICE
 							SchedulesBasedService::Schedules departureSchedules(
 								service->getDepartureSchedules(true, true)
@@ -613,7 +611,9 @@ namespace synthese
 							JourneyPattern* route(static_cast<JourneyPattern*>(service->getPath()));
 							for (size_t cptRank(0);cptRank<route->getScheduledStopsNumber();cptRank++)
 							{
-								const StopArea* lineStopArea = dynamic_cast<const StopArea*>(route->getLineStop(cptRank, true)->getHub());
+								const StopArea* lineStopArea(
+									dynamic_cast<const StopPoint*>(&*route->getLineStop(cptRank, true)->get<LineNode>())->getConnectionPlace()
+								);
 								if (lineStopArea &&
 									lineStopArea->getKey() == currentSubscription->get<StopArea>()->getKey())
 								{
@@ -621,7 +621,6 @@ namespace synthese
 									break;
 								}
 							}
-							Log::GetInstance().debug("Rang de l'arret courant dans le service' : " + lexical_cast<string>(rank));
 							ptime rtArrivalDate(not_a_date_time);
 							int numAnkunftszeitAZBPrognose = AZBFahrplanlageNode.nChildNode("AnkunftszeitAZBPrognose");
 							if (numAnkunftszeitAZBPrognose > 0)
@@ -661,7 +660,6 @@ namespace synthese
 							service->setActive(today);
 
 							// Update RT
-							Log::GetInstance().debug("Mise à jour avec un départ à : " + to_simple_string(departureSchedules[rank]));
 							service->setRealTimeSchedules(departureSchedules, arrivalSchedules);
 							
 							// Save the updated service

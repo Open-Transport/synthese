@@ -25,6 +25,8 @@
 #include "UseRule.h"
 #include "Edge.h"
 #include "AccessParameters.h"
+#include "Vertex.h"
+#include "AreaGeneratedLineStop.hpp"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
@@ -147,7 +149,8 @@ namespace synthese
 
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
-			bool ignoreReservation
+			bool ignoreReservation,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		)	{
 			ptime originDateTimeRef(_originDateTime);
 
@@ -175,7 +178,7 @@ namespace synthese
 			}
 
 			// Check of use rule
-			if(getUseRule().isRunPossible(*this, ignoreReservation) != UseRule::RUN_POSSIBLE)
+			if(getUseRule().isRunPossible(*this, ignoreReservation, reservationRulesDelayType) != UseRule::RUN_POSSIBLE)
 			{
 				return UseRule::RUN_NOT_POSSIBLE;
 			}
@@ -284,7 +287,9 @@ namespace synthese
 
 
 
-		boost::posix_time::ptime ServicePointer::getReservationDeadLine() const
+		boost::posix_time::ptime ServicePointer::getReservationDeadLine(
+			UseRule::ReservationDelayType reservationRulesDelayType
+		) const
 		{
 			assert(_departureEdge);
 
@@ -294,7 +299,8 @@ namespace synthese
 			){
 				return getUseRule().getReservationDeadLine(
 					_originDateTime,
-					getDepartureDateTime()
+					getDepartureDateTime(),
+					reservationRulesDelayType
 				);
 			}
 			return ptime(not_a_date_time);
@@ -312,17 +318,62 @@ namespace synthese
 			);
 
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+			bool drtAreaSequence = false;
+			bool hasGeometry = false;
+			bool hasDRTArea = false;
+			Coordinate previousCoordinates;
+			previousCoordinates.setNull();
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
+				if(dynamic_cast<const pt::AreaGeneratedLineStop*>(edge))
+				{
+					hasDRTArea = true;	
+					if(!drtAreaSequence) // True only for first DRTArea visited
+					{
+						drtAreaSequence = true;
+						if(edge->getFromVertex()->getGeometry())
+						{
+							cs->add(*edge->getFromVertex()->getGeometry()->getCoordinate(),false);
+						}
+					}
+					else
+					{
+						if(edge->getFromVertex()->getGeometry())
+						{
+							previousCoordinates = *edge->getFromVertex()->getGeometry()->getCoordinate();
+						}
+					}
+					continue;
+				}
+				else
+				{
+					if(drtAreaSequence) // True if a DRTArea sequence is followed by a stop sequence
+					{
+						cs->add(previousCoordinates,false);
+						drtAreaSequence = false;
+					}
+				}
 				boost::shared_ptr<LineString> geometry(edge->getRealGeometry());
-				if(!geometry.get())
+				if(!geometry.get() || geometry->isEmpty())
 				{
 					continue;
 				}
+				hasGeometry = true;
 				for(size_t i(0); i<geometry->getNumPoints(); ++i)
 				{
 					cs->add(geometry->getCoordinateN(i));
 				}
+			}
+			if(drtAreaSequence) // Service end by DRTAreas
+			{
+				cs->add(previousCoordinates,false);
+			}
+			if(!hasGeometry && hasDRTArea) // Service is virtual TAD without mixed regular stops
+			{
+				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+				csTwoPoints->add(cs->getAt(0));
+				csTwoPoints->add(cs->getAt(cs->getSize()-1));
+				return boost::shared_ptr<LineString>(geometryFactory.createLineString(csTwoPoints));
 			}
 			if(cs->size() < 2)
 			{

@@ -40,7 +40,6 @@
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
 #include "NonPermanentService.h"
-#include "JourneyPatternCopy.hpp"
 #include "ImportableTableSync.hpp"
 #include "ParametersMap.h"
 #include "TransportNetworkTableSync.h"
@@ -75,6 +74,7 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_LONG_NAME("line_long_name");
 		const string CommercialLine::DATA_LINE_NAME("lineName");
 		const string CommercialLine::DATA_LINE_COLOR("line_color");
+		const string CommercialLine::DATA_LINE_FOREGROUND_COLOR("line_foreground_color");
 		const string CommercialLine::DATA_LINE_STYLE("line_style");
 		const string CommercialLine::DATA_LINE_IMAGE("line_image");
 		const string CommercialLine::DATA_LINE_ID("line_id");
@@ -124,9 +124,9 @@ namespace synthese
 			BOOST_FOREACH(const Path* path, _paths)
 			{
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*path->sharedServicesMutex
+					*path->sharedServicesMutex
 				);
-				BOOST_FOREACH(const Service* service, path->getServices())
+				BOOST_FOREACH(const Service* service, path->getAllServices())
 				{
 					service->clearNonConcurrencyCache();
 				}
@@ -147,9 +147,9 @@ namespace synthese
 			BOOST_FOREACH(const Path* path, _paths)
 			{
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*path->sharedServicesMutex
+					*path->sharedServicesMutex
 				);
-				BOOST_FOREACH(const Service* service, path->getServices())
+				BOOST_FOREACH(const Service* service, path->getAllServices())
 				{
 					service->clearNonConcurrencyCache();
 				}
@@ -167,20 +167,38 @@ namespace synthese
 				{
 					// Handle empty short names
 					if(getShortName().empty() && cl.getShortName().empty())
+					{
 						return getKey() < cl.getKey();
+					}
 					else
 					{
 						if(PTModule::getSortLettersBeforeNumbers())
+						{
 							return (alphanum_text_first_comp<string>(getShortName(), cl.getShortName()) < 0);
+						}
 						else
+						{
 							return (alphanum_comp<string>(getShortName(), cl.getShortName()) < 0);
+						}
 					}
 				}
 				else
+				{
 					return (getWeightForSorting() > cl.getWeightForSorting());
+				}
+			}
+			else if(!getNetwork())
+			{
+				return false;
+			}
+			else if(!cl.getNetwork())
+			{
+				return true;
 			}
 			else
+			{
 				return (getNetwork()->getKey() < cl.getNetwork()->getKey());
+			}
 		}
 
 
@@ -210,9 +228,9 @@ namespace synthese
 			BOOST_FOREACH(const Path* path, _paths)
 			{
 				boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*path->sharedServicesMutex
+					*path->sharedServicesMutex
 				);
-				BOOST_FOREACH(const Service* service, path->getServices())
+				BOOST_FOREACH(const Service* service, path->getAllServices())
 				{
 					if(dynamic_cast<const NonPermanentService*>(service))
 					{
@@ -221,24 +239,6 @@ namespace synthese
 					else
 					{
 						return mask;
-					}
-				}
-
-				BOOST_FOREACH(const JourneyPatternCopy* subline, static_cast<const JourneyPattern*>(path)->getSubLines())
-				{
-					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-								*subline->sharedServicesMutex
-					);
-					BOOST_FOREACH(const Service* service, subline->getServices())
-					{
-						if(dynamic_cast<const NonPermanentService*>(service))
-						{
-							result |= (*dynamic_cast<const NonPermanentService*>(service) & mask);
-						}
-						else
-						{
-							return mask;
-						}
 					}
 				}
 			}
@@ -372,7 +372,12 @@ namespace synthese
 			if(getColor())
 			{
 				pm.insert(prefix + DATA_LINE_COLOR, getColor()->toString());
-				pm.insert(prefix + "color", getColor()->toString()); // For LinesListFunction compatibility
+				pm.insert(prefix + CommercialLineTableSync::COL_COLOR, getColor()->toXMLColor()); // Maybe break CMS views ! but needed for load in inter_synthese_package
+			}
+			if(getFgColor())
+			{
+				pm.insert(prefix + DATA_LINE_FOREGROUND_COLOR, getFgColor()->toString());
+				pm.insert(prefix + CommercialLineTableSync::COL_FOREGROUND_COLOR, getFgColor()->toXMLColor()); // Maybe break CMS views ! but needed for load in inter_synthese_package
 			}
 			if(getNetwork())
 			{
@@ -383,8 +388,13 @@ namespace synthese
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
 			BOOST_FOREACH(const Path* path, _paths)
 			{
-				if (static_cast<const JourneyPattern*>(path)->getRollingStock())
-					pm.insert(prefix + "transportMode", static_cast<const JourneyPattern*>(path)->getRollingStock()->getName());
+				// Jump over paths with non defined transport mode
+				if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
+				{
+					continue;
+				}
+
+				pm.insert(prefix + "transportMode", static_cast<const JourneyPattern*>(path)->getRollingStock()->getName());
 			}
 			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());
 			if(!_displayDurationBeforeFirstDeparture.is_not_a_date_time())
@@ -527,24 +537,12 @@ namespace synthese
 				}
 
 				const Edge& edge(**path->getEdges().begin());
-				ServicePointer nextService(
-					edge.getNextService(
-						ap,
-						now,
-						maxTime,
-						false,
-						fakeIndex
-				)	);
-				if(nextService.getService())
-				{
-					return true;
-				}
 
-				BOOST_FOREACH(JourneyPatternCopy* subline, static_cast<JourneyPattern*>(path)->getSubLines())
+				BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path->getServiceCollections())
 				{
-					const Edge& edge(**subline->getEdges().begin());
 					ServicePointer nextService(
 						edge.getNextService(
+							*itCollection,
 							ap,
 							now,
 							maxTime,
@@ -691,6 +689,29 @@ namespace synthese
 				if(value != _color)
 				{
 					_color = value;
+					result = true;
+				}
+			}
+
+			// Foreground Color
+			if(record.isDefined(CommercialLineTableSync::COL_FOREGROUND_COLOR))
+			{
+				optional<RGBColor> value;
+				string color(record.get<string>(CommercialLineTableSync::COL_FOREGROUND_COLOR));
+				if(!color.empty())
+				{
+					try
+					{
+						value = RGBColor::FromXMLColor(color);
+					}
+					catch(RGBColor::Exception&)
+					{
+						Log::GetInstance().warn("No such foreground color "+ color +" in commercial line "+ lexical_cast<string>(getKey()));
+					}
+				}
+				if(value != _fgColor)
+				{
+					_fgColor = value;
 					result = true;
 				}
 			}
@@ -938,12 +959,6 @@ namespace synthese
 			SubObjects r;
 			BOOST_FOREACH(Path* path, getPaths())
 			{
-				// Avoid sublines
-				if(dynamic_cast<JourneyPatternCopy*>(path))
-				{
-					continue;
-				}
-
 				r.push_back(path);
 			}
 			return r;

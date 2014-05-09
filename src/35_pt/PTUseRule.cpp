@@ -54,6 +54,7 @@ namespace synthese
 		const std::string PTUseRule::DATA_RESERVATION_POSSIBLE("reservation_possible");
 		const std::string PTUseRule::DATA_RESERVATION_COMPULSORY("reservation_compulsory");
 		const std::string PTUseRule::DATA_RESERVATION_MIN_DELAY_MINUTES("reservation_min_delay_minutes");
+		const std::string PTUseRule::DATA_RESERVATION_MIN_DELAY_MINUTES_EXTERNAL("reservation_min_delay_minutes_external");
 
 
 
@@ -71,7 +72,8 @@ namespace synthese
 			_reservationMinDepartureTime(not_a_date_time),
 			_forbiddenInDepartureBoards(false),
 			_forbiddenInTimetables(false),
-			_forbiddenInJourneyPlanning(false)
+			_forbiddenInJourneyPlanning(false),
+			_minDelayMinutesExternal(minutes(0))
 		{}
 
 
@@ -94,7 +96,8 @@ namespace synthese
 
 		ptime PTUseRule::getReservationDeadLine (
 			const ptime& originDateTime,
-			const ptime& departureTime
+			const ptime& departureTime,
+			const ReservationDelayType reservationRulesDelayType
 		) const {
 
 			const ptime& referenceTime(
@@ -105,6 +108,17 @@ namespace synthese
 
 			// Minutes delay
 			ptime minutesMoment(referenceTime);
+			time_duration minDelayMinutes(minutes(0));
+
+			if (reservationRulesDelayType == RESERVATION_INTERNAL_DELAY)
+			{
+				minDelayMinutes = _minDelayMinutes;
+			}
+			else if (reservationRulesDelayType == RESERVATION_EXTERNAL_DELAY)
+			{
+				minDelayMinutes = _minDelayMinutesExternal;
+			}
+
 			if(	!_reservationMinDepartureTime.is_not_a_date_time() &&
 				referenceTime.time_of_day() < _reservationMinDepartureTime
 			){
@@ -114,9 +128,9 @@ namespace synthese
 					minutesMoment = ptime(minutesMoment.date(), _hourDeadLine);
 				}
 			}
-			else if(_minDelayMinutes.total_seconds()
-			){
-				minutesMoment -= _minDelayMinutes;
+			else if (minDelayMinutes.total_seconds())
+			{
+				minutesMoment -= minDelayMinutes;
 			}
 
 			// Days delay
@@ -162,7 +176,8 @@ namespace synthese
 
 		UseRule::RunPossibilityType PTUseRule::isRunPossible(
 			const graph::ServicePointer& servicePointer,
-			bool ignoreReservation
+			bool ignoreReservation,
+			ReservationDelayType reservationRulesDelayType
 		) const {
 
 			if(_accessCapacity && *_accessCapacity == 0)
@@ -206,9 +221,9 @@ namespace synthese
 
 			case RESERVATION_RULE_COMPULSORY:
 				return
-					(	!dynamic_cast<const LineStop*>(servicePointer.getDepartureEdge()) ||
-						!static_cast<const LineStop*>(servicePointer.getDepartureEdge())->getReservationNeeded() ||
-						IsReservationPossible(getReservationAvailability(servicePointer, ignoreReservation))
+					(	!servicePointer.getDepartureEdge() ||
+						!servicePointer.getDepartureEdge()->getReservationNeeded() ||
+						IsReservationPossible(getReservationAvailability(servicePointer, ignoreReservation, reservationRulesDelayType))
 					) ?
 					RUN_POSSIBLE :
 					RUN_NOT_POSSIBLE
@@ -222,11 +237,18 @@ namespace synthese
 
 		UseRule::ReservationAvailabilityType PTUseRule::getReservationAvailability(
 			const ServicePointer& servicePointer,
-			bool ignoreReservationDeadline
+			bool ignoreReservationDeadline,
+			ReservationDelayType reservationRulesDelayType
 		) const	{
 			if(!servicePointer.getDepartureEdge() && !servicePointer.getArrivalEdge())
 			{
 				return RESERVATION_FORBIDDEN;
+			}
+
+			ReservationDelayType reservationDelayType = RESERVATION_INTERNAL_DELAY;
+			if (reservationRulesDelayType == 1)
+			{
+				reservationDelayType = RESERVATION_EXTERNAL_DELAY;
 			}
 
 			switch(_reservationType)
@@ -247,7 +269,8 @@ namespace synthese
 					}
 					if(	servicePointer.getDepartureEdge())
 					{
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_OPTIONAL_TOO_LATE;
 						}
@@ -255,12 +278,14 @@ namespace synthese
 					}
 					else
 					{
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getArrivalDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getArrivalDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_OPTIONAL_TOO_LATE;
 						}
-						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getOriginDateTime()))
-						{
+						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getOriginDateTime(), reservationRulesDelayType)
+						){
 							return RESERVATION_OPTIONAL_POSSIBLE;
 						}
 						return RESERVATION_DEPENDING_ON_DEPARTURE_PLACE;
@@ -283,7 +308,8 @@ namespace synthese
 						){
 							return RESERVATION_OPTIONAL_TOO_EARLY;
 						}
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_OPTIONAL_TOO_LATE;
 						}
@@ -293,7 +319,8 @@ namespace synthese
 						){
 							return RESERVATION_COMPULSORY_TOO_EARLY;
 						}
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
 						}
@@ -308,14 +335,17 @@ namespace synthese
 					{
 						return RESERVATION_COMPULSORY_POSSIBLE;
 					}
+					
 					ptime reservationTime(second_clock::local_time());
 					if(	reservationTime < getReservationOpeningTime(servicePointer)
 					){
 						return RESERVATION_COMPULSORY_TOO_EARLY;
 					}
+
 					if(servicePointer.getDepartureEdge())
 					{
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getDepartureDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
 						}
@@ -323,11 +353,13 @@ namespace synthese
 					}
 					else
 					{
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getArrivalDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getArrivalDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
 						}
-						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getOriginDateTime())
+						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(),
+												servicePointer.getOriginDateTime(), reservationRulesDelayType)
 						){
 							return RESERVATION_COMPULSORY_POSSIBLE;
 						}
@@ -411,6 +443,7 @@ namespace synthese
 			if(_reservationType != RESERVATION_RULE_FORBIDDEN)
 			{
 				pm.insert(prefix + DATA_RESERVATION_MIN_DELAY_MINUTES, _minDelayMinutes.minutes());
+				pm.insert(prefix + DATA_RESERVATION_MIN_DELAY_MINUTES_EXTERNAL, _minDelayMinutesExternal.minutes());
 			}
 
 			pm.insert(prefix + TABLE_COL_ID, getKey());
@@ -430,6 +463,10 @@ namespace synthese
 			pm.insert(
 				prefix + PTUseRuleTableSync::COL_MINDELAYMINUTES,
 				boost::lexical_cast<std::string>(getMinDelayMinutes().total_seconds() / 60)
+			);
+			pm.insert(
+				prefix + PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL,
+				boost::lexical_cast<std::string>(getMinDelayMinutesExternal().total_seconds() / 60)
 			);
 			pm.insert(
 				prefix + PTUseRuleTableSync::COL_MINDELAYDAYS,
@@ -519,6 +556,25 @@ namespace synthese
 				{
 					result = true;
 					setMinDelayMinutes(minDelayMinutes);
+				}
+			}
+			
+			if(record.isDefined(PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL))
+			{
+				time_duration minDelayMinutes(minutes(0));
+				try
+				{
+					minDelayMinutes = minutes(
+						record.get<long>(PTUseRuleTableSync::COL_MINDELAYMINUTESEXTERNAL)
+					);
+				}
+				catch(...)
+				{
+				}
+				if(minDelayMinutes != getMinDelayMinutesExternal())
+				{
+					result = true;
+					setMinDelayMinutesExternal(minDelayMinutes);
 				}
 			}
 

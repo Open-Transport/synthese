@@ -75,6 +75,7 @@ namespace synthese
 			static const std::string ATTR_IN_STOP_AREA;
 			static const std::string ATTR_VEHICLE_NUMBER;
 			static const std::string TAG_STOP;
+			static const std::string TAG_SERVICE;
 
 		public:
 			typedef util::Registry<VehiclePosition> Registry;

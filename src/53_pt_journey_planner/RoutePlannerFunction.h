@@ -178,6 +178,7 @@ namespace synthese
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_RESULT_ROW_PAGE;
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
+			static const std::string PARAMETER_RESERVATION_DELAY_TYPE;
 
 		private:
 			static const std::string DATA_LINES;
@@ -226,10 +227,14 @@ namespace synthese
 			static const std::string DATA_ORIGIN_CITY_TEXT;
 			static const std::string DATA_HANDICAPPED_FILTER;
 			static const std::string DATA_ORIGIN_PLACE_TEXT;
+			static const std::string DATA_ORIGIN_PLACE_LONGITUDE;
+			static const std::string DATA_ORIGIN_PLACE_LATITUDE;
 			static const std::string DATA_BIKE_FILTER;
 			static const std::string DATA_DESTINATION_CITY_TEXT;
 			static const std::string DATA_DESTINATION_PLACE_ID;
 			static const std::string DATA_DESTINATION_PLACE_TEXT;
+			static const std::string DATA_DESTINATION_PLACE_LONGITUDE;
+			static const std::string DATA_DESTINATION_PLACE_LATITUDE;
 			static const std::string DATA_PERIOD_ID;
 			static const std::string DATA_DATE;
 			static const std::string DATA_PERIOD;
@@ -243,6 +248,7 @@ namespace synthese
 				static const std::string DATA_DEPARTURE_TIME;
 				static const std::string DATA_DEPARTURE_PLACE_NAME;
 				static const std::string DATA_ARRIVAL_TIME;
+				static const std::string DATA_ARRIVAL_DATE;
 				static const std::string DATA_ARRIVAL_PLACE_NAME;
 				static const std::string DATA_DURATION;
 				static const std::string DATA_DEPARTURE_DATE;
@@ -256,6 +262,8 @@ namespace synthese
 				static const std::string DATA_IS_THE_LAST_JOURNEY_BOARD;
 				static const std::string DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME;
 				static const std::string DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME;
+				static const std::string DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_DATE;
+				static const std::string DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_DATE;
 				static const std::string DATA_DEPARTURE_PLACE_LONGITUDE;
 				static const std::string DATA_DEPARTURE_PLACE_LATITUDE;
 				static const std::string DATA_ARRIVAL_PLACE_LONGITUDE;
@@ -360,6 +368,7 @@ namespace synthese
 				bool _showResTab;
 				bool _showCoords;
 				bool _ignoreReservationRules;
+				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
 				const CoordinatesSystem* _coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
@@ -426,13 +435,16 @@ namespace synthese
 			//@{
 				void setMaxSolutions(boost::optional<std::size_t> value){ _maxSolutionsNumber = value; }
 				void setOutputFormat(const std::string& value){ _outputFormat = value; }
+				void setStartDepartureDate(const boost::posix_time::ptime& value){ _startDate = value; }
 				void setStartArrivalDate(const boost::posix_time::ptime& value){ _startArrivalDate = value; }
 				void setEndDepartureDate(const boost::posix_time::ptime& value){ _endDate = value; }
+				void setEndArrivalDate(const boost::posix_time::ptime& value){ _endArrivalDate = value; }
 				void setOriginCityText(const std::string& value){ _originCityText = value; }
 				void setOriginPlaceText(const std::string& value){ _originPlaceText = value; }
 				void setDestinationCityText(const std::string& value){ _destinationCityText = value; }
 				void setDestinationPlaceText(const std::string& value){ _destinationPlaceText = value; }
 				void setCoordinatesSystem(const CoordinatesSystem* coordinatesSystem ){ _coordinatesSystem = coordinatesSystem; }
+				void setReservationRulesDelayType(const graph::UseRule::ReservationDelayType reservationRulesDelayType ){ _reservationRulesDelayType = reservationRulesDelayType; }
 			//@}
 
 			/// @name Modifiers

@@ -22,6 +22,7 @@
 #include "VehiclePosition.hpp"
 
 #include "ParametersMap.h"
+#include "ScheduledService.h"
 #include "StopPoint.hpp"
 
 #include <geos/geom/Point.h>
@@ -50,6 +51,7 @@ namespace synthese
 		const string VehiclePosition::ATTR_VEHICLE_NUMBER = "vehicle_number";
 		const string VehiclePosition::TAG_STOP = "stop";
 		const string VehiclePosition::ATTR_IN_STOP_AREA = "in_stop_area";
+		const string VehiclePosition::TAG_SERVICE = "service";
 
 
 
@@ -121,6 +123,12 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 				_stopPoint->toParametersMap(*stopPM, false);
 				pm.insert(TAG_STOP, stopPM);
+			}
+			if(_service)
+			{
+				boost::shared_ptr<ParametersMap> servicePM(new ParametersMap);
+				_service->toParametersMap(*servicePM, false);
+				pm.insert(TAG_SERVICE, servicePM);
 			}
 		}
 }	}

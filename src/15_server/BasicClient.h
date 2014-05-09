@@ -2,8 +2,11 @@
 #define SYNTHESE_SERVER_BASIC_CLIENT_h__
 
 #include <string>
-#include <map>
-
+#include <boost/noncopyable.hpp>
+#include <boost/asio.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -14,22 +17,30 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Simple HTTP client.
 		/// @param m15
-		class BasicClient
+		class BasicClient:
+			private boost::noncopyable
 		{
 		private:
 
 		    const std::string _serverHost;      //!< Server host.
-			const std::string _serverPort;              //!< Server port.
+			const std::string _serverPort;		//!< Server port.
 		    const int _timeOut;                 //!< TCP time out in milliseconds. 0 means no timeout.
 			const bool _outputHTTPHeaders;
 			const bool _acceptGzip;
-
 
 			std::string _send(
 				const std::string& url,
 				const std::string& postData,
 				const std::string& contentType
 			) const;
+			void set_result(boost::optional<boost::system::error_code>* a,
+				const boost::system::error_code b
+			) const;
+			void read_until_with_timeout(boost::asio::ip::tcp::socket& sock,
+				boost::asio::streambuf &buffer,
+				const std::string &delim,
+				const boost::posix_time::time_duration &expiry_time) const;
+			void checkDeadline();
 
 		public:
 
@@ -47,17 +58,6 @@ namespace synthese
 		     * @param request : Request string to send to server (ex : fonction=rp&si=1&da=A)
 		     * @param clientIp : Client IP (only relevant in a CGI context)
 		     * @param clientURL : Client URL for link generation (only relevant in a CGI context)
-
-
-
-			 // Copyright (c) 2003-2008 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-			 //
-			 // Distributed under the Boost Software License, Version 1.0. (See accompanying
-			 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-			 //
-
-
-
 		     */
 			std::string get(
 				const std::string& url

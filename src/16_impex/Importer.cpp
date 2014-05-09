@@ -78,7 +78,7 @@ namespace synthese
 				// File stream
 				if(_fileStream.get())
 				{
-					*_fileStream << levelStr << " " << content << "<br />";
+					*_fileStream << levelStr << " " << content << "<br />" << endl;
 				}
 
 				// Parameters map
@@ -106,32 +106,15 @@ namespace synthese
 			_import(import),
 			_minLogLevel(minLogLevel),
 			_outputStream(outputStream),
-			_pm(pm)
+			_pm(pm),
+			_logPath(logPath)
+		{}
+
+
+
+		void Importer::openLogFile() const
 		{
 			ptime now(second_clock::local_time());
-
-			// File stream
-			if(!logPath.empty())
-			{
-				stringstream dateDirName;
-				dateDirName <<
-					now.date().year() << "-" <<
-					setw(2) << setfill('0') << int(now.date().month()) << "-" <<
-					setw(2) << setfill('0') << now.date().day()
-					;
-				stringstream fileName;
-				fileName <<
-					setw(2) << setfill('0') << now.time_of_day().hours() << "-" <<
-					setw(2) << setfill('0') << now.time_of_day().minutes() << "-" <<
-					setw(2) << setfill('0') << now.time_of_day().seconds() <<
-					".log"
-					;
-				path p(logPath);
-				p = p / dateDirName.str();
-				create_directories(p);
-				p = p / fileName.str();
-				_fileStream.reset(new ofstream(p.file_string().c_str()));
-			}
 
 			// Parameters map
 			stringstream dateStr;
@@ -143,6 +126,29 @@ namespace synthese
 				setw(2) << setfill('0') << now.time_of_day().minutes() << ":" <<
 				setw(2) << setfill('0') << now.time_of_day().seconds();
 			_pm.insert(ATTR_IMPORT_START_TIME, dateStr.str());
+
+			// File stream
+			if(!_logPath.empty())
+			{
+				stringstream dateDirName;
+				dateDirName <<
+					now.date().year() << "-" <<
+					setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+					setw(2) << setfill('0') << now.date().day()
+				;
+				stringstream fileName;
+				fileName <<
+					setw(2) << setfill('0') << now.time_of_day().hours() << "-" <<
+					setw(2) << setfill('0') << now.time_of_day().minutes() << "-" <<
+					setw(2) << setfill('0') << now.time_of_day().seconds() <<
+					".log"
+					;
+				path p(_logPath);
+				p = p / dateDirName.str();
+				create_directories(p);
+				p = p / fileName.str();
+				_fileStream.reset(new ofstream(p.file_string().c_str()));
+			}
 		}
 
 

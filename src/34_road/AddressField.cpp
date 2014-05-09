@@ -70,8 +70,8 @@ namespace synthese
 					// Road chunk
 					try
 					{
-						MainRoadChunk* value(
-							env.getEditable<MainRoadChunk>(chunkId).get()
+						RoadChunk* value(
+							env.getEditable<RoadChunk>(chunkId).get()
 						);
 						if(value != address.getRoadChunk())
 						{
@@ -79,7 +79,7 @@ namespace synthese
 							result = true;
 						}
 					}
-					catch (ObjectNotFoundException<MainRoadChunk>&)
+					catch (ObjectNotFoundException<RoadChunk>&)
 					{
 						Log::GetInstance().warn(
 							"Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(object.getKey())
@@ -114,14 +114,14 @@ namespace synthese
 				!record.getValue(FIELDS[2].name).empty()
 			){
 				// House number
-				MainRoadChunk::HouseNumber houseNumber(
-					record.get<MainRoadChunk::HouseNumber>(
+				HouseNumber houseNumber(
+					record.get<HouseNumber>(
 						FIELDS[2].name
 				)	);
 				address.setHouseNumber(
 					houseNumber ?
-					optional<MainRoadChunk::HouseNumber>(houseNumber) :
-					optional<MainRoadChunk::HouseNumber>()
+					optional<HouseNumber>(houseNumber) :
+					optional<HouseNumber>()
 				);
 			}
 

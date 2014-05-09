@@ -71,8 +71,8 @@ namespace synthese
 			boost::optional<const JourneyTemplates&> journeyTemplates,
 			const optional<time_duration>	maxTransferDuration,
 			bool enableTheoretical,
-			bool enableRealTime
-				
+			bool enableRealTime,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_planningOrder(planningOrder),
@@ -89,6 +89,7 @@ namespace synthese
 			_maxTransferDuration(maxTransferDuration),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
+			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
 			_totalDistance(
 				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
@@ -130,6 +131,19 @@ namespace synthese
 
 			ptime beginBound(result2.getBeginTime());
 			ptime endBound(result2.getEndTime());
+			
+			// Solution should not start after _maxBeginTime even if better than a solution
+			// which starts before _maxBeginTime
+			if (_planningOrder == DEPARTURE_FIRST &&
+				beginBound > _maxBeginTime)
+			{
+				beginBound = _maxBeginTime;
+			}
+			else if (_planningOrder != DEPARTURE_FIRST &&
+				endBound > _maxBeginTime)
+			{
+				endBound = _maxBeginTime;
+			}
 
 			// Check if the found result is compliant with the duration filters
 			if(ignoreDurationFilterFirstRun)
@@ -279,7 +293,8 @@ namespace synthese
 				_totalDistance,
 				_journeyTemplates,
 				_enableTheoretical,
-				_enableRealTime
+				_enableRealTime,
+				_reservationRulesDelayType
 			);
 
 			is.integralSearch(

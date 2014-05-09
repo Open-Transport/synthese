@@ -21,7 +21,10 @@
 */
 
 #include "PTRoutePlannerResult.h"
+
 #include "Journey.h"
+#include "LinePhysicalStop.hpp"
+#include "RoadPath.hpp"
 #include "Edge.h"
 #include "Crossing.h"
 #include "ResultHTMLTable.h"
@@ -208,12 +211,16 @@ namespace synthese
 				stream << t.col() << "<b>" << its->getDepartureDateTime() << "</b>";
 
 				// JourneyPattern
-				const LineStop* ls(dynamic_cast<const LineStop*>(its->getDepartureEdge()));
+				const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(its->getDepartureEdge()));
 				const JunctionStop* js(dynamic_cast<const JunctionStop*>(its->getDepartureEdge()));
-				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
+				stream << t.col(1, ls ? ls->getJourneyPattern()->getCommercialLine()->getStyle() : string());
 				if(ls)
 				{
-					stream << ls->getLine()->getCommercialLine()->getShortName();
+					stream << ls->getJourneyPattern()->getCommercialLine()->getShortName();
+					if(!ls->getJourneyPattern()->getDirection().empty())
+					{
+						stream << " / " << ls->getJourneyPattern()->getDirection();
+					}
 				}
 				else if(js)
 				{
@@ -221,8 +228,8 @@ namespace synthese
 				}
 				else
 				{
-					const Road* road(static_cast<const Road*>(its->getService()->getPath()));
-					stream << road->getRoadPlace()->getName();
+					const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
+					stream << road->get<RoadPlace>()->getName();
 				}
 
 				// Transfers
@@ -260,6 +267,10 @@ namespace synthese
 						if(ls)
 						{
 							stream << ls->getCommercialLine()->getShortName();
+							if(!ls->getDirection().empty())
+							{
+								stream << " / " << ls->getDirection();
+							}
 						}
 						else if(js)
 						{
@@ -267,8 +278,8 @@ namespace synthese
 						}
 						else
 						{
-							const Road* road(static_cast<const Road*>(its->getService()->getPath()));
-							stream << road->getRoadPlace()->getName();
+							const Road* road(static_cast<const RoadPath*>(its->getService()->getPath())->getRoad());
+							stream << road->get<RoadPlace>()->getName();
 						}
 
 						// Exit if last service use

@@ -59,6 +59,7 @@ namespace synthese
 				static const std::string COL_SERVICE_NUMBER;
 				static const std::string COL_LENGTH;
 				static const std::string COL_DATASOURCE_LINKS;
+				static const std::string COL_OPERATION_UNIT_ID;
 			//@}
 
 			//! @name Services

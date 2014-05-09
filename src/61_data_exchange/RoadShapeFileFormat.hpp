@@ -29,7 +29,7 @@
 #include "NoExportPolicy.hpp"
 #include "RoadFileFormat.hpp"
 
-#include "MainRoadChunk.hpp"
+#include "Road.h"
 #include "ImportableTableSync.hpp"
 #include "RoadPlaceTableSync.h"
 
@@ -128,7 +128,7 @@ namespace synthese
 				std::string _publicPlacesCityCodeField;
 
 				mutable impex::ImportableTableSync::ObjectBySource<road::RoadPlaceTableSync> _roadPlaces;
-				mutable std::map<std::string, road::MainRoadChunk*> _roadChunks;
+				mutable std::map<std::string, road::RoadChunk*> _roadChunks;
 
 
 

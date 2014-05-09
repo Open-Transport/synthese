@@ -55,6 +55,7 @@ namespace synthese
 			static const std::string PARAMETER_MAX_DELAY_DAYS;
 			static const std::string PARAMETER_MIN_DELAY_DAYS;
 			static const std::string PARAMETER_MIN_DELAY_MINUTES;
+			static const std::string PARAMETER_MIN_DELAY_MINUTES_EXTERNAL;
 			static const std::string PARAMETER_HOUR_DEADLINE;
 			static const std::string PARAMETER_RESERVATION_MIN_DEPARTURE_TIME;
 			static const std::string PARAMETER_RESERVATION_FORBIDDEN_DAYS;
@@ -71,6 +72,7 @@ namespace synthese
 			boost::optional<boost::shared_ptr<const fare::Fare> > _fare;
 			boost::optional<PTUseRule::ReservationRuleType> _type;
 			boost::optional<boost::posix_time::time_duration> _minDelayMinutes;
+			boost::optional<boost::posix_time::time_duration> _minDelayMinutesExternal;
 			boost::optional<boost::gregorian::date_duration> _minDelayDays;
 			boost::optional<boost::optional<boost::gregorian::date_duration> > _maxDelayDays;
 			boost::optional<boost::posix_time::time_duration> _hourDeadLine;

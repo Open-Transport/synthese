@@ -20,11 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <boost/foreach.hpp>
-
 #include "RoadPlace.h"
-#include "MainRoadPart.hpp"
+
+#include "Road.h"
+#include "RoadChunkEdge.hpp"
 #include "RoadModule.h"
+#include "RoadPath.hpp"
 #include "RoadChunk.h"
 #include "VertexAccessMap.h"
 #include "AllowedUseRule.h"
@@ -32,6 +33,7 @@
 #include "Vertex.h"
 #include "House.hpp"
 
+#include <boost/foreach.hpp>
 #include <geos/geom/Envelope.h>
 
 using namespace std;
@@ -43,6 +45,8 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace geography;
+
+	template<> const Field SimpleObjectFieldDefinition<road::RoadPlace>::FIELD = Field("road_place_id", SQL_INTEGER);
 
 	namespace util
 	{
@@ -74,8 +78,20 @@ namespace synthese
 
 
 
+		RoadPlace::~RoadPlace()
+		{
+			BOOST_FOREACH(Road* road, _roads)
+			{
+				road->set<RoadPlace>(boost::none);
+				road->getForwardPath().setPathGroup(NULL);
+				road->getReversePath().setPathGroup(NULL);
+			}
+		}
+
+
+
 		void RoadPlace::addRoad(
-			Road& road
+			RoadPath& road
 		){
 			addPath(static_cast<Path*>(&road));
 			_isoBarycentre.reset();
@@ -83,11 +99,25 @@ namespace synthese
 
 
 
+		void RoadPlace::addRoad( Road& road ) const
+		{
+			_roads.insert(&road);
+		}
+
+
+
 		void RoadPlace::removeRoad(
-			Road& road
+			RoadPath& road
 		){
 			removePath(static_cast<Path*>(&road));
 			_isoBarycentre.reset();
+		}
+
+
+
+		void RoadPlace::removeRoad( Road& road ) const
+		{
+			_roads.erase(&road);
 		}
 
 
@@ -174,15 +204,15 @@ namespace synthese
 
 
 		boost::shared_ptr<House> RoadPlace::getHouse(
-			MainRoadChunk::HouseNumber houseNumber,
+			HouseNumber houseNumber,
 			bool numberAtBeginning
 		) const	{
-			MainRoadChunk* nearestChunk(NULL);
-			MainRoadChunk::HouseNumber difference(MainRoadChunk::HouseNumber_MAX);
-			MainRoadChunk::HouseNumber bestNumber(0);
+			RoadChunk* nearestChunk(NULL);
+			HouseNumber difference(numeric_limits<HouseNumber>::max());
+			HouseNumber bestNumber(0);
 			BOOST_FOREACH(Path* path, getPaths())
 			{
-				MainRoadPart* roadPart(dynamic_cast<MainRoadPart*>(path));
+				RoadPath* roadPart(dynamic_cast<RoadPath*>(path));
 				if(!roadPart)
 				{
 					continue;
@@ -190,7 +220,7 @@ namespace synthese
 
 				BOOST_FOREACH(Edge* edge, path->getEdges())
 				{
-					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*edge));
+					RoadChunk& chunk(*static_cast<RoadChunkEdge&>(*edge).getRoadChunk());
 					if(!chunk.getLeftHouseNumberBounds() && !chunk.getRightHouseNumberBounds())
 					{
 						continue;
@@ -206,20 +236,17 @@ namespace synthese
 					}
 					else
 					{
-						MainRoadChunk::HouseNumber currentDifference(MainRoadChunk::HouseNumber_MAX);
-						MainRoadChunk::HouseNumber currentBestNumber(0);
-
-						bool closestIsFirst = true;
+						HouseNumber currentDifference(numeric_limits<HouseNumber>::max());
+						HouseNumber currentBestNumber(0);
 
 						if(chunk.getLeftHouseNumberBounds())
 						{
-							if( (  (   chunk.getLeftHouseNumberingPolicy() == MainRoadChunk::ODD)  && (houseNumber % 2)    )
-									||
-								(  (   chunk.getLeftHouseNumberingPolicy() == MainRoadChunk::EVEN) && (!(houseNumber % 2)) )
-									||
-								(  chunk.getLeftHouseNumberingPolicy() == MainRoadChunk::ALL )
-							  )
-							{
+							if( (	chunk.getLeftHouseNumberingPolicy() == ODD_NUMBERS  && houseNumber % 2
+								) ||
+								(	chunk.getLeftHouseNumberingPolicy() == EVEN_NUMBERS && !(houseNumber % 2)
+								) ||
+								(	chunk.getLeftHouseNumberingPolicy() == ALL_NUMBERS
+							)	){
 								//Left distance calculation
 								if( chunk.getLeftHouseNumberBounds()->first < houseNumber )
 								{
@@ -238,7 +265,6 @@ namespace synthese
 									{
 										currentDifference = houseNumber - chunk.getLeftHouseNumberBounds()->second;
 										currentBestNumber = chunk.getLeftHouseNumberBounds()->second;
-										closestIsFirst = false;
 									}
 								}
 								else
@@ -247,7 +273,6 @@ namespace synthese
 									{
 										currentDifference = chunk.getLeftHouseNumberBounds()->second - houseNumber;
 										currentBestNumber = chunk.getLeftHouseNumberBounds()->second;
-										closestIsFirst = false;
 									}
 								}
 							}
@@ -255,13 +280,13 @@ namespace synthese
 
 						if(chunk.getRightHouseNumberBounds())
 						{
-							if( (  (   chunk.getRightHouseNumberingPolicy() == MainRoadChunk::ODD)  && (houseNumber % 2)    )
-									||
-								(  (   chunk.getRightHouseNumberingPolicy() == MainRoadChunk::EVEN) && (!(houseNumber % 2)) )
-									||
-								(  chunk.getRightHouseNumberingPolicy() == MainRoadChunk::ALL )
-							  )
-							{
+							if( (	chunk.getRightHouseNumberingPolicy() == ODD_NUMBERS  && houseNumber % 2
+								) ||
+								(	chunk.getRightHouseNumberingPolicy() == EVEN_NUMBERS && !(houseNumber % 2)
+								) ||
+								(	chunk.getRightHouseNumberingPolicy() == ALL_NUMBERS
+							)	){
+
 								//Right distance calculation
 								if( chunk.getRightHouseNumberBounds()->first < houseNumber )
 								{
@@ -269,7 +294,6 @@ namespace synthese
 									{
 										currentDifference = houseNumber - chunk.getRightHouseNumberBounds()->first;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->first;
-										closestIsFirst = true;
 									}
 								}
 								else
@@ -278,7 +302,6 @@ namespace synthese
 									{
 										currentDifference = chunk.getRightHouseNumberBounds()->first - houseNumber;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->first;
-										closestIsFirst = true;
 									}
 								}
 
@@ -288,7 +311,6 @@ namespace synthese
 									{
 										currentDifference = houseNumber - chunk.getRightHouseNumberBounds()->second;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->second;
-										closestIsFirst = false;
 									}
 								}
 								else
@@ -297,7 +319,6 @@ namespace synthese
 									{
 										currentDifference = chunk.getRightHouseNumberBounds()->second - houseNumber;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->second;
-										closestIsFirst = false;
 									}
 								}
 							}
@@ -307,10 +328,7 @@ namespace synthese
 						{
 							difference = currentDifference;
 							bestNumber = currentBestNumber;
-							if(closestIsFirst)
-								nearestChunk = &chunk;
-							else
-								nearestChunk = static_cast<MainRoadChunk*>(chunk.getNext());
+							nearestChunk = &chunk;
 						}
 					}
 				}

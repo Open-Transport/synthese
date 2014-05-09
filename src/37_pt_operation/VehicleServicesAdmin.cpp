@@ -40,7 +40,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "ActionResultHTMLTable.h"
 #include "VehicleServiceAdmin.hpp"
-#include "VehicleServiceUpdateAction.hpp"
+#include "ObjectCreateAction.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -123,8 +123,9 @@ namespace synthese
 
 			AdminFunctionRequest<VehicleServicesAdmin> searchRequest(request, *this);
 
-			AdminActionFunctionRequest<VehicleServiceUpdateAction, VehicleServiceAdmin> createRequest(request);
+			AdminActionFunctionRequest<ObjectCreateAction, VehicleServiceAdmin> createRequest(request);
 			createRequest.setActionFailedPage<VehicleServicesAdmin>();
+			createRequest.getAction()->setTable<VehicleService>();
 			createRequest.setActionWillCreateObject();
 
 			AdminActionFunctionRequest<RemoveObjectAction, VehicleServicesAdmin> removeRequest(request, *this);
@@ -134,6 +135,7 @@ namespace synthese
 				VehicleServiceTableSync::Search(
 					Env::GetOfficialEnv(),
 					_searchName,
+					optional<RegistryKeyType>(),
 					_requestParameters.first,
 					_requestParameters.maxSize,
 					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
@@ -172,7 +174,7 @@ namespace synthese
 				// Lines
 				stream << t.col();
 				set<CommercialLine*> lines;
-				BOOST_FOREACH(SchedulesBasedService* service, vehicleService->getServices())
+				BOOST_FOREACH(SchedulesBasedService* service, vehicleService->get<Services>())
 				{
 					if(!dynamic_cast<ScheduledService*>(service))
 					{
@@ -195,7 +197,7 @@ namespace synthese
 			}
 
 			stream << t.row(string());
-			stream << t.col() << t.getActionForm().getTextInput(VehicleServiceUpdateAction::PARAMETER_NAME, "", "Entrez le nom du service véhicule ici");
+			stream << t.col() << t.getActionForm().getTextInput(ObjectCreateAction::GetInputName<Name>(), "", "Entrez le nom du service véhicule ici");
 			stream << t.col();
 			stream << t.col();
 			stream << t.col();

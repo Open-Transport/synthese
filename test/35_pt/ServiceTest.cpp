@@ -24,14 +24,13 @@
 #include "CommercialLine.h"
 #include "ContinuousService.h"
 #include "DRTArea.hpp"
-#include "JourneyPatternCopy.hpp"
-#include "LineArea.hpp"
+#include "LinePhysicalStop.hpp"
 #include "PermanentService.h"
 #include "ScheduledService.h"
 #include "GeographyModule.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
+#include "LineStop.h"
 #include "PermanentService.h"
 #include "ServicePointer.h"
 
@@ -50,6 +49,7 @@ using namespace synthese::graph;
 
 BOOST_AUTO_TEST_CASE (testScheduledService)
 {
+	Env env;
 	GeographyModule::PreInit();
 
 	date today(day_clock::local_day());
@@ -79,26 +79,35 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	StopPoint s7(0, "s1", &p7);
 	StopPoint s8(0, "s1", &p8);
 
-	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
-	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&s2, false);
-	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true,160,&s3, false);
-	DesignatedLinePhysicalStop l4A(0, &l, 3, true, true,200,&s4, true);
-	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,250,&s5, false);
-	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,450,&s6, false);
-	DesignatedLinePhysicalStop l7AD(0, &l, 6, false, true,500,&s7, true);
-	DesignatedLinePhysicalStop l71A(0, &l, 7, false, true,500,&s7, false);
-	DesignatedLinePhysicalStop l8A(0, &l, 8, false, true,500,&s8, true);
-	DesignatedLinePhysicalStop* lNULL(NULL);
+	LineStop l1D(0, &l, 0, true, false,0,s1);
+	l1D.set<ScheduleInput>(true);
+	LineStop l2D(0, &l, 1, true, false,50,s2);
+	l2D.set<ScheduleInput>(false);
+	LineStop l3AD(0, &l, 2, true, true,160,s3);
+	l3AD.set<ScheduleInput>(false);
+	LineStop l4A(0, &l, 3, true, true,200,s4);
+	l4A.set<ScheduleInput>(true);
+	LineStop l5D(0, &l, 4, true, false,250,s5);
+	l5D.set<ScheduleInput>(false);
+	LineStop l6AD(0, &l, 5, true, true,450,s6);
+	l6AD.set<ScheduleInput>(false);
+	LineStop l7AD(0, &l, 6, false, true,500,s7);
+	l7AD.set<ScheduleInput>(true);
+	LineStop l71A(0, &l, 7, false, true,500,s7);
+	l71A.set<ScheduleInput>(false);
+	LineStop l8A(0, &l, 8, false, true,500,s8);
+	l8A.set<ScheduleInput>(true);
+	Edge* lNULL(NULL);
 
-	l.addEdge(l1D);
-	l.addEdge(l2D);
-	l.addEdge(l3AD);
-	l.addEdge(l4A);
-	l.addEdge(l5D);
-	l.addEdge(l6AD);
-	l.addEdge(l7AD);
-	l.addEdge(l71A);
-	l.addEdge(l8A);
+	l1D.link(env);
+	l2D.link(env);
+	l3AD.link(env);
+	l4A.link(env);
+	l5D.link(env);
+	l6AD.link(env);
+	l7AD.link(env);
+	l71A.link(env);
+	l8A.link(env);
 
 	ScheduledService s(1234, "1234AB", &l);
 
@@ -128,6 +137,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, false));
 	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(true, false));
 	BOOST_CHECK_EQUAL(id.size(), l.getEdges().size());
+	BOOST_CHECK_EQUAL(ia.size(), l.getEdges().size());
 	BOOST_CHECK_EQUAL(ia[0], time_duration(2,0, 0)); // Scheduled
 	BOOST_CHECK_EQUAL(id[0], time_duration(2,0, 0)); // Scheduled
 	BOOST_CHECK_EQUAL(ia[1], time_duration(2,6, 0));
@@ -141,7 +151,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	BOOST_CHECK_EQUAL(ia[5], time_duration(2,34, 0));
 	BOOST_CHECK_EQUAL(id[5], time_duration(3,3, 0));
 	BOOST_CHECK_EQUAL(ia[6], time_duration(2,34, 0)); // Scheduled
-	BOOST_CHECK_EQUAL(id[6], time_duration(3,10, 0)); // Scheduled, but should be generated identically as arrival time
+	BOOST_CHECK_EQUAL(id[6], time_duration(3,10, 0)); // Scheduled, but undefined -> interpolated between 2:30 and 3:10
 	BOOST_CHECK_EQUAL(ia[7], time_duration(2,52, 0));
 	BOOST_CHECK_EQUAL(id[7], time_duration(3,10, 0));
 	BOOST_CHECK_EQUAL(ia[8], time_duration(3,10, 0)); // Scheduled
@@ -159,16 +169,16 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time1,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp1.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp1.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, id[2]));
@@ -179,11 +189,11 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	BOOST_CHECK_EQUAL(sp1.getServiceRange(), minutes(0));
 	BOOST_CHECK(sp1.getDuration().is_not_a_date_time());
 
-	s.completeServicePointer(sp1, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp1, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, id[2]));
 	BOOST_CHECK_EQUAL(sp1.getArrivalDateTime(), ptime(today, ia[6]));
@@ -201,16 +211,16 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time2,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp2.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp2.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp2.getService(), &s);
 	BOOST_CHECK_EQUAL(sp2.getDepartureDateTime(), ptime(today, id[2]));
@@ -220,11 +230,11 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	BOOST_CHECK_EQUAL(sp2.getOriginDateTime(), ptime(today, id[0]));
 	BOOST_CHECK_EQUAL(sp2.getServiceRange(), minutes(0));
 
-	s.completeServicePointer(sp2, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp2.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp2.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp2, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp2.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp2.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp2.getService(), &s);
 	BOOST_CHECK_EQUAL(sp2.getDepartureDateTime(), ptime(today, id[2]));
 	BOOST_CHECK_EQUAL(sp2.getArrivalDateTime(), ptime(today, ia[6]));
@@ -242,7 +252,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time3,
 			false,
 			false,
@@ -260,7 +270,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true,
 			false,
 			false,
-			l7AD,
+			**l7AD.getGeneratedLineStops().begin(),
 			time4,
 			false,
 			false,
@@ -268,9 +278,9 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true
 	)	);
 	BOOST_CHECK(sp4.getDepartureEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp4.getArrivalEdge(),&l7AD);
+	BOOST_CHECK_EQUAL(sp4.getArrivalEdge(),l7AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp4.getRealTimeDepartureVertex() == NULL);
-	BOOST_CHECK_EQUAL(sp4.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp4.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp4.getService(), &s);
 	BOOST_CHECK(sp4.getDepartureDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp4.getArrivalDateTime(), ptime(today, ia[6]));
@@ -279,11 +289,11 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	BOOST_CHECK_EQUAL(sp4.getOriginDateTime(), ptime(today, id[0]));
 	BOOST_CHECK_EQUAL(sp4.getServiceRange(), minutes(0));
 
-	s.completeServicePointer(sp4, l3AD, ap);
-	BOOST_CHECK_EQUAL(sp4.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp4.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp4.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp4.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp4, **l3AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp4.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp4.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp4.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp4.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp4.getService(), &s);
 	BOOST_CHECK_EQUAL(sp4.getDepartureDateTime(), ptime(today, id[2]));
 	BOOST_CHECK_EQUAL(sp4.getArrivalDateTime(), ptime(today, ia[6]));
@@ -301,7 +311,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true,
 			false,
 			false,
-			l7AD,
+			**l7AD.getGeneratedLineStops().begin(),
 			time5,
 			false,
 			false,
@@ -309,9 +319,9 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true
 	)	);
 	BOOST_CHECK(sp5.getDepartureEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp5.getArrivalEdge(),&l7AD);
+	BOOST_CHECK_EQUAL(sp5.getArrivalEdge(),l7AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp5.getRealTimeDepartureVertex() == NULL);
-	BOOST_CHECK_EQUAL(sp5.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp5.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp5.getService(), &s);
 	BOOST_CHECK(sp5.getDepartureDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp5.getArrivalDateTime(), ptime(today, ia[6]));
@@ -320,11 +330,11 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 	BOOST_CHECK_EQUAL(sp5.getOriginDateTime(), ptime(today, id[0]));
 	BOOST_CHECK_EQUAL(sp5.getServiceRange(), minutes(0));
 
-	s.completeServicePointer(sp5, l3AD, ap);
-	BOOST_CHECK_EQUAL(sp5.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp5.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp5.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp5.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp5, **l3AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp5.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp5.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp5.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp5.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp5.getService(), &s);
 	BOOST_CHECK_EQUAL(sp5.getDepartureDateTime(), ptime(today, id[2]));
 	BOOST_CHECK_EQUAL(sp5.getArrivalDateTime(), ptime(today, ia[6]));
@@ -343,7 +353,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 			true,
 			false,
 			false,
-			l7AD,
+			**l7AD.getGeneratedLineStops().begin(),
 			time6,
 			false,
 			false,
@@ -355,6 +365,7 @@ BOOST_AUTO_TEST_CASE (testScheduledService)
 
 BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 {
+	Env env;
 	GeographyModule::PreInit();
 
 	date today(day_clock::local_day());
@@ -384,24 +395,32 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 	StopPoint s7(0, "s1", &p7);
 	StopPoint s8(0, "s1", &p8);
 
-	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
-	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&s2, false);
-	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true,160,&s3, false);
-	DesignatedLinePhysicalStop l4A(0, &l, 3, true, true,200,&s4, true);
-	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,250,&s5, false);
-	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,450,&s6, false);
-	DesignatedLinePhysicalStop l7AD(0, &l, 6, true, true,500,&s7, true);
-	DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,600,&s8, true);
-	DesignatedLinePhysicalStop* lNULL(NULL);
+	LineStop l1D(0, &l, 0, true, false,0,s1);
+	l1D.set<ScheduleInput>(true);
+	LineStop l2D(0, &l, 1, true, false,50,s2);
+	l2D.set<ScheduleInput>(false);
+	LineStop l3AD(0, &l, 2, true, true,160,s3);
+	l3AD.set<ScheduleInput>(false);
+	LineStop l4A(0, &l, 3, true, true,200,s4);
+	l4A.set<ScheduleInput>(true);
+	LineStop l5D(0, &l, 4, true, false,250,s5);
+	l5D.set<ScheduleInput>(false);
+	LineStop l6AD(0, &l, 5, true, true,450,s6);
+	l6AD.set<ScheduleInput>(false);
+	LineStop l7AD(0, &l, 6, true, true,500,s7);
+	l7AD.set<ScheduleInput>(true);
+	LineStop l8A(0, &l, 7, false, true,600,s8);
+	l8A.set<ScheduleInput>(true);
+	Edge* lNULL(NULL);
 
-	l.addEdge(l1D);
-	l.addEdge(l2D);
-	l.addEdge(l3AD);
-	l.addEdge(l4A);
-	l.addEdge(l5D);
-	l.addEdge(l6AD);
-	l.addEdge(l7AD);
-	l.addEdge(l8A);
+	l1D.link(env);
+	l2D.link(env);
+	l3AD.link(env);
+	l4A.link(env);
+	l5D.link(env);
+	l6AD.link(env);
+	l7AD.link(env);
+	l8A.link(env);
 
 	ScheduledService s(1234, "1234AB", &l);
 
@@ -463,7 +482,7 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 			true,
 			true,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time1,
 			false,
 			false,
@@ -478,16 +497,16 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 			true,
 			true,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time2,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp1.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp1.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(2,29,0)));
@@ -499,11 +518,11 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 	BOOST_CHECK_EQUAL(sp1.getServiceRange(), minutes(0));
 	BOOST_CHECK(sp1.getDuration().is_not_a_date_time());
 
-	s.completeServicePointer(sp1, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp1, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(2,29,0)));
 	BOOST_CHECK_EQUAL(sp1.getArrivalDateTime(), ptime(today, time_duration(2,41,0)));
@@ -517,6 +536,7 @@ BOOST_AUTO_TEST_CASE (testScheduledServiceRealTime)
 
 BOOST_AUTO_TEST_CASE (testContinuousService)
 {
+	Env env;
 	GeographyModule::PreInit();
 
 	date today(day_clock::local_day());
@@ -546,24 +566,33 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	StopPoint s7(0, "s1", &p7);
 	StopPoint s8(0, "s1", &p8);
 
-	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
-	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&s2, false);
-	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true,160,&s3, false);
-	DesignatedLinePhysicalStop l4A(0, &l, 3, true, true,200,&s4, true);
-	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,250,&s5, false);
-	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,450,&s6, false);
-	DesignatedLinePhysicalStop l7AD(0, &l, 6, true, true,500,&s7, true);
-	DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,600,&s8, true);
-	DesignatedLinePhysicalStop* lNULL(NULL);
+	
+	LineStop l1D(0, &l, 0, true, false,0,s1);
+	l1D.set<ScheduleInput>(true);
+	LineStop l2D(0, &l, 1, true, false,50,s2);
+	l2D.set<ScheduleInput>(false);
+	LineStop l3AD(0, &l, 2, true, true,160,s3);
+	l3AD.set<ScheduleInput>(false);
+	LineStop l4A(0, &l, 3, true, true,200,s4);
+	l4A.set<ScheduleInput>(true);
+	LineStop l5D(0, &l, 4, true, false,250,s5);
+	l5D.set<ScheduleInput>(false);
+	LineStop l6AD(0, &l, 5, true, true,450,s6);
+	l6AD.set<ScheduleInput>(false);
+	LineStop l7AD(0, &l, 6, true, true,500,s7);
+	l7AD.set<ScheduleInput>(true);
+	LineStop l8A(0, &l, 7, false, true,600,s8);
+	l8A.set<ScheduleInput>(true);
+	Edge* lNULL(NULL);
 
-	l.addEdge(l1D);
-	l.addEdge(l2D);
-	l.addEdge(l3AD);
-	l.addEdge(l4A);
-	l.addEdge(l5D);
-	l.addEdge(l6AD);
-	l.addEdge(l7AD);
-	l.addEdge(l8A);
+	l1D.link(env);
+	l2D.link(env);
+	l3AD.link(env);
+	l4A.link(env);
+	l5D.link(env);
+	l6AD.link(env);
+	l7AD.link(env);
+	l8A.link(env);
 
 	ContinuousService s(1234, "1234AB", &l, hours(1), minutes(5));
 
@@ -623,16 +652,16 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time1,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp1.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp1.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
@@ -642,11 +671,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp1.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp1.getServiceRange(), hours(1));
 
-	s.completeServicePointer(sp1, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp1, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp1.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -663,16 +692,16 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time2,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp2.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp2.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp2.getService(), &s);
 	BOOST_CHECK_EQUAL(sp2.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
@@ -682,11 +711,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp2.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp2.getServiceRange(), hours(1));
 
-	s.completeServicePointer(sp2, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp2.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp2.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp2, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp2.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp2.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp2.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp2.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp2.getService(), &s);
 	BOOST_CHECK_EQUAL(sp2.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp2.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -702,16 +731,16 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time2,
 			false,
 			true, // Inverted
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp2i.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp2i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp2i.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp2i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp2i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp2i.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp2i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp2i.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
@@ -721,11 +750,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp2i.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp2i.getServiceRange(), hours(0));
 
-	s.completeServicePointer(sp2i, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp2i.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp2i.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp2i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp2i.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp2i, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp2i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp2i.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp2i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp2i.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp2i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp2i.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp2i.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -743,16 +772,16 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time3,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp3.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp3.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp3.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp3.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp3.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp3.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp3.getService(), &s);
 	BOOST_CHECK_EQUAL(sp3.getDepartureDateTime(), ptime(today, time_duration(2,20,0)));
@@ -762,11 +791,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp3.getOriginDateTime(), ptime(today, time_duration(2,1,0)));
 	BOOST_CHECK_EQUAL(sp3.getServiceRange(), minutes(59));
 
-	s.completeServicePointer(sp3, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp3.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp3.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp3.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp3.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp3, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp3.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp3.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp3.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp3.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp3.getService(), &s);
 	BOOST_CHECK_EQUAL(sp3.getDepartureDateTime(), ptime(today, time_duration(2,20,0)));
 	BOOST_CHECK_EQUAL(sp3.getArrivalDateTime(), ptime(today, time_duration(2,37,0)));
@@ -783,16 +812,16 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time3,
 			false,
 			true, // Inverted
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp3i.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp3i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp3i.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp3i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp3i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp3i.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp3i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp3i.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
@@ -802,11 +831,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp3i.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp3i.getServiceRange(), minutes(1));
 
-	s.completeServicePointer(sp3i, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp3i.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp3i.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp3i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp3i.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp3i, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp3i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp3i.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp3i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp3i.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp3i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp3i.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp3i.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -824,16 +853,16 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time4,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp4.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp4.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp4.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp4.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp4.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp4.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp4.getService(), &s);
 	BOOST_CHECK_EQUAL(sp4.getDepartureDateTime(), ptime(today, time_duration(3,19,0)));
@@ -843,11 +872,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp4.getOriginDateTime(), ptime(today, time_duration(3,0,0)));
 	BOOST_CHECK_EQUAL(sp4.getServiceRange(), minutes(0));
 
-	s.completeServicePointer(sp4, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp4.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp4.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp4.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp4.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp4, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp4.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp4.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp4.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp4.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp4.getService(), &s);
 	BOOST_CHECK_EQUAL(sp4.getDepartureDateTime(), ptime(today, time_duration(3,19,0)));
 	BOOST_CHECK_EQUAL(sp4.getArrivalDateTime(), ptime(today, time_duration(3,36,0)));
@@ -863,16 +892,16 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time4,
 			false,
 			true,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp4i.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp4i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp4i.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp4i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp4i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp4i.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp4i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp4i.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
@@ -882,11 +911,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp4i.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp4i.getServiceRange(), minutes(60));
 
-	s.completeServicePointer(sp4i, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp4i.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp4i.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp4i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp4i.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp4i, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp4i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp4i.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp4i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp4i.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp4i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp4i.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp4i.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -904,7 +933,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time5,
 			false,
 			false,
@@ -922,7 +951,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			false,
-			l7AD,
+			**l7AD.getGeneratedLineStops().begin(),
 			time6,
 			false,
 			false,
@@ -930,9 +959,9 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true
 	)	);
 	BOOST_CHECK(sp6.getDepartureEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp6.getArrivalEdge(),&l7AD);
+	BOOST_CHECK_EQUAL(sp6.getArrivalEdge(),l7AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp6.getRealTimeDepartureVertex() == NULL);
-	BOOST_CHECK_EQUAL(sp6.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp6.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp6.getService(), &s);
 	BOOST_CHECK(sp6.getDepartureDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp6.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -941,11 +970,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp6.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp6.getServiceRange(), minutes(60));
 
-	s.completeServicePointer(sp6, l3AD, ap);
-	BOOST_CHECK_EQUAL(sp6.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp6.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp6.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp6.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp6, **l3AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp6.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp6.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp6.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp6.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp6.getService(), &s);
 	BOOST_CHECK_EQUAL(sp6.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp6.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -963,7 +992,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			false,
-			l7AD,
+			**l7AD.getGeneratedLineStops().begin(),
 			time7,
 			false,
 			false,
@@ -971,9 +1000,9 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true
 	)	);
 	BOOST_CHECK(sp7.getDepartureEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(),&l7AD);
+	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(),l7AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp7.getRealTimeDepartureVertex() == NULL);
-	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp7.getService(), &s);
 	BOOST_CHECK(sp7.getDepartureDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp7.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -982,11 +1011,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp7.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp7.getServiceRange(), minutes(60));
 
-	s.completeServicePointer(sp7, l3AD, ap);
-	BOOST_CHECK_EQUAL(sp7.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp7.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp7, **l3AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp7.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp7.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp7.getService(), &s);
 	BOOST_CHECK_EQUAL(sp7.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp7.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -1006,7 +1035,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true,
 			false,
 			false,
-			l7AD,
+			**l7AD.getGeneratedLineStops().begin(),
 			time8,
 			false,
 			false,
@@ -1014,9 +1043,9 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 			true
 	)	);
 	BOOST_CHECK(sp8.getDepartureEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp8.getArrivalEdge(),&l7AD);
+	BOOST_CHECK_EQUAL(sp8.getArrivalEdge(),l7AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp8.getRealTimeDepartureVertex() == NULL);
-	BOOST_CHECK_EQUAL(sp8.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp8.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp8.getService(), &s);
 	BOOST_CHECK(sp8.getDepartureDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp8.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -1025,11 +1054,11 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 	BOOST_CHECK_EQUAL(sp8.getOriginDateTime(), ptime(today, time_duration(2,0,0)));
 	BOOST_CHECK_EQUAL(sp8.getServiceRange(), minutes(14));
 
-	s.completeServicePointer(sp8, l3AD, ap);
-	BOOST_CHECK_EQUAL(sp8.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp8.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp8.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp8.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp8, **l3AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp8.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp8.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp8.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp8.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp8.getService(), &s);
 	BOOST_CHECK_EQUAL(sp8.getDepartureDateTime(), ptime(today, time_duration(2,19,0)));
 	BOOST_CHECK_EQUAL(sp8.getArrivalDateTime(), ptime(today, time_duration(2,36,0)));
@@ -1042,6 +1071,7 @@ BOOST_AUTO_TEST_CASE (testContinuousService)
 
 BOOST_AUTO_TEST_CASE (testPermanentService)
 {
+	Env env;
 	GeographyModule::PreInit();
 
 	date today(day_clock::local_day());
@@ -1071,24 +1101,33 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	StopPoint s7(0, "s1", &p7);
 	StopPoint s8(0, "s1", &p8);
 
-	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
-	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&s2, false);
-	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true,160,&s3, false);
-	DesignatedLinePhysicalStop l4A(0, &l, 3, false, true,200,&s4, true);
-	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,250,&s5, false);
-	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,450,&s6, false);
-	DesignatedLinePhysicalStop l7AD(0, &l, 6, true, true,500,&s7, true);
-	DesignatedLinePhysicalStop l8A(0, &l, 7, false, true,600,&s8, true);
-	DesignatedLinePhysicalStop* lNULL(NULL);
+	
+	LineStop l1D(0, &l, 0, true, false,0,s1);
+	l1D.set<ScheduleInput>(true);
+	LineStop l2D(0, &l, 1, true, false,50,s2);
+	l2D.set<ScheduleInput>(false);
+	LineStop l3AD(0, &l, 2, true, true,160,s3);
+	l3AD.set<ScheduleInput>(false);
+	LineStop l4A(0, &l, 3, true, true,200,s4);
+	l4A.set<ScheduleInput>(true);
+	LineStop l5D(0, &l, 4, true, false,250,s5);
+	l5D.set<ScheduleInput>(false);
+	LineStop l6AD(0, &l, 5, true, true,450,s6);
+	l6AD.set<ScheduleInput>(false);
+	LineStop l7AD(0, &l, 6, true, true,500,s7);
+	l7AD.set<ScheduleInput>(true);
+	LineStop l8A(0, &l, 7, false, true,600,s8);
+	l8A.set<ScheduleInput>(true);
+	Edge* lNULL(NULL);
 
-	l.addEdge(l1D);
-	l.addEdge(l2D);
-	l.addEdge(l3AD);
-	l.addEdge(l4A);
-	l.addEdge(l5D);
-	l.addEdge(l6AD);
-	l.addEdge(l7AD);
-	l.addEdge(l8A);
+	l1D.link(env);
+	l2D.link(env);
+	l3AD.link(env);
+	l4A.link(env);
+	l5D.link(env);
+	l6AD.link(env);
+	l7AD.link(env);
+	l8A.link(env);
 
 	PermanentService s(1234, &l, minutes(15));
 
@@ -1106,16 +1145,16 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time1,
 			false,
 			false,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp1.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp1.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(1,50,0)));
@@ -1125,11 +1164,11 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	BOOST_CHECK_EQUAL(sp1.getOriginDateTime(), ptime(today, time_duration(1,50,0)));
 	BOOST_CHECK_EQUAL(sp1.getServiceRange(), hours(24));
 
-	s.completeServicePointer(sp1, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp1, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp1.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp1.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp1.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1.getDepartureDateTime(), ptime(today, time_duration(1,50,0)));
 	BOOST_CHECK_EQUAL(sp1.getArrivalDateTime(), ptime(today, time_duration(2,5,0)));
@@ -1145,16 +1184,16 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 			true,
 			false,
 			true,
-			l3AD,
+			**l3AD.getGeneratedLineStops().begin(),
 			time1,
 			false,
 			true,
 			true,
 			true
 	)	);
-	BOOST_CHECK_EQUAL(sp1i.getDepartureEdge(), &l3AD);
+	BOOST_CHECK_EQUAL(sp1i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp1i.getArrivalEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp1i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp1i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
 	BOOST_CHECK(sp1i.getRealTimeArrivalVertex() == NULL);
 	BOOST_CHECK_EQUAL(sp1i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1i.getDepartureDateTime(), ptime(today - days(1), time_duration(1,50,0)));
@@ -1164,11 +1203,11 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	BOOST_CHECK_EQUAL(sp1i.getOriginDateTime(), ptime(today - days(1), time_duration(1,50,0)));
 	BOOST_CHECK_EQUAL(sp1i.getServiceRange(), hours(24));
 
-	s.completeServicePointer(sp1i, l7AD, ap);
-	BOOST_CHECK_EQUAL(sp1i.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp1i.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp1i.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp1i.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp1i, **l7AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp1i.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1i.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp1i.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp1i.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp1i.getService(), &s);
 	BOOST_CHECK_EQUAL(sp1i.getDepartureDateTime(), ptime(today - days(1), time_duration(1,50,0)));
 	BOOST_CHECK_EQUAL(sp1i.getArrivalDateTime(), ptime(today - days(1), time_duration(2,5,0)));
@@ -1185,7 +1224,7 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 			true,
 			false,
 			false,
-			l7AD,
+			**l7AD.getGeneratedLineStops().begin(),
 			time7,
 			false,
 			false,
@@ -1193,9 +1232,9 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 			true
 	)	);
 	BOOST_CHECK(sp7.getDepartureEdge() == NULL);
-	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(),&l7AD);
+	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(),l7AD.getGeneratedLineStops().begin()->get());
 	BOOST_CHECK(sp7.getRealTimeDepartureVertex() == NULL);
-	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp7.getService(), &s);
 	BOOST_CHECK(sp7.getDepartureDateTime().is_not_a_date_time());
 	BOOST_CHECK_EQUAL(sp7.getArrivalDateTime(), ptime(today - days(1), time_duration(3,36,0)));
@@ -1204,11 +1243,11 @@ BOOST_AUTO_TEST_CASE (testPermanentService)
 	BOOST_CHECK_EQUAL(sp7.getOriginDateTime(), ptime(today - days(1), time_duration(3,21,0)));
 	BOOST_CHECK_EQUAL(sp7.getServiceRange(), hours(24));
 
-	s.completeServicePointer(sp7, l3AD, ap);
-	BOOST_CHECK_EQUAL(sp7.getDepartureEdge(), &l3AD);
-	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(), &l7AD);
-	BOOST_CHECK_EQUAL(sp7.getRealTimeDepartureVertex(), l3AD.getFromVertex());
-	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), l7AD.getFromVertex());
+	s.completeServicePointer(sp7, **l3AD.getGeneratedLineStops().begin(), ap);
+	BOOST_CHECK_EQUAL(sp7.getDepartureEdge(), l3AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp7.getArrivalEdge(), l7AD.getGeneratedLineStops().begin()->get());
+	BOOST_CHECK_EQUAL(sp7.getRealTimeDepartureVertex(), &*l3AD.get<LineNode>());
+	BOOST_CHECK_EQUAL(sp7.getRealTimeArrivalVertex(), &*l7AD.get<LineNode>());
 	BOOST_CHECK_EQUAL(sp7.getService(), &s);
 	BOOST_CHECK_EQUAL(sp7.getDepartureDateTime(), ptime(today - days(1), time_duration(3,21,0)));
 	BOOST_CHECK_EQUAL(sp7.getArrivalDateTime(), ptime(today - days(1), time_duration(3,36,0)));
@@ -1242,8 +1281,8 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 	DRTArea a23;
 	{
 		Stops::Type stops;
-		stops.insert(&p2);
-		stops.insert(&p3);
+		stops.push_back(&p2);
+		stops.push_back(&p3);
 		a23.set<Stops>(stops);
 	}
 
@@ -1256,16 +1295,22 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 	StopPoint s4(0, "s1", &p4);
 	s4.link(env, true);
 
-	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
+	LineStop l1D(0, &l, 0, true, false,0,s1);
+	l1D.set<ScheduleInput>(true);
 	l1D.link(env, true);
 
-	LineArea l23AD(0, &l, 1, true, true,50,&a23, false);
+	LineStop l23AD(0, &l, 1, true, true,50,a23);
+	l23AD.set<ScheduleInput>(true);
+	l23AD.set<InternalService>(false);
 	l23AD.link(env, true);
 
-	DesignatedLinePhysicalStop l4A(0, &l, 2, false, true,200,&s4, true);
+	LineStop l4A(0, &l, 2, false, true,200,s4);
+	l4A.set<ScheduleInput>(true);
 	l4A.link(env, true);
 
-	DesignatedLinePhysicalStop* lNULL(NULL);
+	BOOST_CHECK_EQUAL(l.getEdges().size(), 6);
+
+	Edge* lNULL(NULL);
 
 	SchedulesBasedService::Schedules d;
 	SchedulesBasedService::Schedules a;
@@ -1291,27 +1336,44 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 
 	s.link(env, true);
 
-	BOOST_CHECK_EQUAL(l.getServices().size(), 1);
-	if(l.getServices().size() == 1)
+	
+	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, false));
+	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(true, false));
+	BOOST_CHECK_EQUAL(id.size(), l.getLineStops().size());
+	BOOST_CHECK_EQUAL(ia[0], time_duration(2,0, 0)); // Stop
+	BOOST_CHECK_EQUAL(id[0], time_duration(2,0, 0)); // Stop
+	BOOST_CHECK_EQUAL(ia[1], time_duration(2,30, 0)); // DRT
+	BOOST_CHECK_EQUAL(id[1], time_duration(2,25, 0)); // DRT
+	BOOST_CHECK_EQUAL(ia[2], time_duration(2,35, 0)); // Stop
+	BOOST_CHECK_EQUAL(id[2], time_duration(2,35, 0)); // Stop
+
+
+	BOOST_CHECK_EQUAL(l.getAllServices().size(), 1);
+	if(l.getAllServices().size() == 1)
 	{
-		BOOST_CHECK_EQUAL(*l.getServices().begin(), &s);
+		BOOST_CHECK_EQUAL(*l.getAllServices().begin(), &s);
 	}
 
-	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+	{
+		BOOST_CHECK((*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		LineStop::GeneratedLineStops::const_iterator it(l23AD.getGeneratedLineStops().begin());
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		++it;
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+	}
 
 	AccessParameters ap;
 	ptime time7(today, time_duration(1,36,0));
 	ptime tomorrow(time7 + days(1));
 	boost::optional<Edge::DepartureServiceIndex::Value> lastIndex;
 	ServicePointer sp7(
-		l1D.getNextService(
+		(*l1D.getGeneratedLineStops().begin())->getNextService(
+			**l.getServiceCollections().begin(),
 			ap,
 			time7,
 			tomorrow,
@@ -1319,19 +1381,24 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 			lastIndex
 	)	);
 	
-	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(true)); // Only RT because the search was for today
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+	{
+		BOOST_CHECK((*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK(!(*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		LineStop::GeneratedLineStops::const_iterator it(l23AD.getGeneratedLineStops().begin());
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		++it;
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+	}
 
 	tomorrow += days(1);
 	ptime after_tomorrow(time7 + days(3));
 	ServicePointer sp8(
-		l1D.getNextService(
+		(*l1D.getGeneratedLineStops().begin())->getNextService(
+			**l.getServiceCollections().begin(),
 			ap,
 			tomorrow,
 			after_tomorrow,
@@ -1339,17 +1406,22 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 			lastIndex
 	)	);
 
-	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(false)); // Now planned index too, because the second search was for tomorrow
-	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+	{
+		BOOST_CHECK(!(*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK(!(*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		LineStop::GeneratedLineStops::const_iterator it(l23AD.getGeneratedLineStops().begin());
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		++it;
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+	}
 
 	ServicePointer sp7b(
-		l23AD.getSubEdges().at(0)->getNextService(
+		(*l23AD.getGeneratedLineStops().begin())->getNextService(
+			**l.getServiceCollections().begin(),
 			ap,
 			time7,
 			tomorrow,
@@ -1357,29 +1429,125 @@ BOOST_AUTO_TEST_CASE (testServcesIndices)
 			lastIndex
 	)	);
 
-	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(!l1D._getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(!l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true)); // Because of last call
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+	{
+		BOOST_CHECK(!(*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK(!(*l1D.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		LineStop::GeneratedLineStops::const_iterator it(l23AD.getGeneratedLineStops().begin());
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK(!(*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		++it;
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*it)->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), false));
+		BOOST_CHECK((*l4A.getGeneratedLineStops().begin())->_getServiceIndexUpdateNeeded(**l.getServiceCollections().begin(), true));
+	}
 
 	s.unlink();
 
-	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l1D._getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(0)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l23AD.getSubEdges().at(1)->_getServiceIndexUpdateNeeded(true));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(false));
-	BOOST_CHECK(l4A._getServiceIndexUpdateNeeded(true));
+	BOOST_CHECK(l.getServiceCollections().empty());
+}
+
+BOOST_AUTO_TEST_CASE (testDRTWithInsufficientSchedulesNumber)
+{
+	Env env;
+	GeographyModule::PreInit();
+
+	date today(day_clock::local_day());
+
+	RuleUser::Rules r;
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	r.push_back(AllowedUseRule::INSTANCE.get());
+	CommercialLine line;
+	JourneyPattern l(5678);
+	l.setCommercialLine(&line);
+	l.setRules(r);
+
+	StopArea p1(0, true);
+	StopArea p2(0, false);
+	StopArea p3(0, false);
+	StopArea p4(0, false);
+	
+	DRTArea a23;
+	{
+		Stops::Type stops;
+		stops.push_back(&p2);
+		stops.push_back(&p3);
+		a23.set<Stops>(stops);
+	}
+
+	StopPoint s1(0, "s1", &p1);
+	s1.link(env, true);
+	StopPoint s2(0, "s1", &p2);
+	s2.link(env, true);
+	StopPoint s3(0, "s1", &p3);
+	s3.link(env, true);
+	StopPoint s4(0, "s1", &p4);
+	s4.link(env, true);
+
+	LineStop l1D(0, &l, 0, true, false,0,s1);
+	l1D.set<ScheduleInput>(true);
+	l1D.link(env, true);
+
+	LineStop l23AD(0, &l, 1, true, true,50,a23);
+	l23AD.set<ScheduleInput>(true);
+	l23AD.set<InternalService>(false);
+	l23AD.link(env, true);
+
+	LineStop l23AD2(0, &l, 2, true, true,100,a23);
+	l23AD2.set<ScheduleInput>(true);
+	l23AD2.set<InternalService>(false);
+	l23AD2.link(env, true);
+
+	LineStop l4A(0, &l, 3, false, true,200,s4);
+	l4A.set<ScheduleInput>(true);
+	l4A.link(env, true);
+
+	BOOST_CHECK_EQUAL(l.getEdges().size(), 10);
+
+	Edge* lNULL(NULL);
+
+	SchedulesBasedService::Schedules d;
+	SchedulesBasedService::Schedules a;
+
+	a.push_back(time_duration(2, 0, 0));
+	d.push_back(time_duration(2, 0, 0));
+
+	a.push_back(time_duration(2, 5, 0));
+	d.push_back(time_duration(2, 5, 0));
+
+	ScheduledService s(1234, "1234AB", &l);
+
+	BOOST_CHECK_EQUAL(s.getKey(), 1234);
+	BOOST_CHECK_EQUAL(s.getServiceNumber(), "1234AB");
+	BOOST_CHECK_EQUAL(s.getPath(), &l);
+	BOOST_CHECK_EQUAL(s.isContinuous(), false);
+
+	s.setDataSchedules(d, a);
+	s.setActive(today);
+
+	s.link(env, true);
+
+	
+	SchedulesBasedService::Schedules id(s.getDepartureSchedules(true, false));
+	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(true, false));
+	BOOST_CHECK_EQUAL(id.size(), l.getLineStops().size());
+	BOOST_CHECK_EQUAL(ia[0], time_duration(2,0, 0)); // Stop
+	BOOST_CHECK_EQUAL(id[0], time_duration(2,0, 0)); // Stop
+	BOOST_CHECK_EQUAL(ia[1], time_duration(2,5, 0)); // DRT
+	BOOST_CHECK_EQUAL(id[1], time_duration(2,5, 0)); // DRT
+	BOOST_CHECK_EQUAL(ia[2], time_duration(2,5, 0)); // DRT
+	BOOST_CHECK_EQUAL(id[2], time_duration(2,5, 0)); // DRT
+	BOOST_CHECK_EQUAL(ia[3], time_duration(2,5, 0)); // Stop
+	BOOST_CHECK_EQUAL(id[3], time_duration(2,5, 0)); // Stop
+	s.unlink();
+
+	BOOST_CHECK(l.getServiceCollections().empty());
 }
 
 BOOST_AUTO_TEST_CASE (testSubline)
 {
+	Env env;
 	GeographyModule::PreInit();
 
 	date today(day_clock::local_day());
@@ -1427,26 +1595,35 @@ BOOST_AUTO_TEST_CASE (testSubline)
 	StopPoint sp8(0, "s1", &p8);
 	sp8.link(Env::GetOfficialEnv(), true);
 
-	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&sp1, true);
-	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&sp2, false);
-	DesignatedLinePhysicalStop l3AD(0, &l, 2, true, true,160,&sp3, false);
-	DesignatedLinePhysicalStop l4A(0, &l, 3, true, true,200,&sp4, true);
-	DesignatedLinePhysicalStop l5D(0, &l, 4, true, false,250,&sp5, false);
-	DesignatedLinePhysicalStop l6AD(0, &l, 5, true, true,450,&sp6, false);
-	DesignatedLinePhysicalStop l7AD(0, &l, 6, false, true,500,&sp7, true);
-	DesignatedLinePhysicalStop l71A(0, &l, 7, false, true,500,&sp7, false);
-	DesignatedLinePhysicalStop l8A(0, &l, 8, false, true,500,&sp8, true);
-	DesignatedLinePhysicalStop* lNULL(NULL);
+	LineStop l1D(0, &l, 0, true, false,0,sp1);
+	l1D.set<ScheduleInput>(true);
+	LineStop l2D(0, &l, 1, true, false,50,sp2);
+	l2D.set<ScheduleInput>(false);
+	LineStop l3AD(0, &l, 2, true, true,160,sp3);
+	l3AD.set<ScheduleInput>(false);
+	LineStop l4A(0, &l, 3, true, true,200,sp4);
+	l4A.set<ScheduleInput>(true);
+	LineStop l5D(0, &l, 4, true, false,250,sp5);
+	l5D.set<ScheduleInput>(false);
+	LineStop l6AD(0, &l, 5, true, true,450,sp6);
+	l6AD.set<ScheduleInput>(false);
+	LineStop l7AD(0, &l, 6, false, true,500,sp7);
+	l7AD.set<ScheduleInput>(true);
+	LineStop l71A(0, &l, 7, false, true,500,sp7);
+	l71A.set<ScheduleInput>(false);
+	LineStop l8A(0, &l, 8, false, true,500,sp8);
+	l8A.set<ScheduleInput>(true);
+	Edge* lNULL(NULL);
 
-	l1D.link(Env::GetOfficialEnv(), true);
-	l2D.link(Env::GetOfficialEnv(), true);
-	l3AD.link(Env::GetOfficialEnv(), true);
-	l4A.link(Env::GetOfficialEnv(), true);
-	l5D.link(Env::GetOfficialEnv(), true);
-	l6AD.link(Env::GetOfficialEnv(), true);
-	l7AD.link(Env::GetOfficialEnv(), true);
-	l71A.link(Env::GetOfficialEnv(), true);
-	l8A.link(Env::GetOfficialEnv(), true);
+	l1D.link(env);
+	l2D.link(env);
+	l3AD.link(env);
+	l4A.link(env);
+	l5D.link(env);
+	l6AD.link(env);
+	l7AD.link(env);
+	l71A.link(env);
+	l8A.link(env);
 
 	ScheduledService s1(1234, "1234AB", &l);
 	ScheduledService s2(1235, "1235AB", &l);
@@ -1480,17 +1657,17 @@ BOOST_AUTO_TEST_CASE (testSubline)
 	s1.link(Env::GetOfficialEnv(), true);
 
 	// The path has no subline
-	BOOST_CHECK(l.getSubLines().empty());
+	BOOST_CHECK_EQUAL(l.getServiceCollections().size(), 1);
 
 	// Path of s1 has not changed
 	BOOST_CHECK_EQUAL(s1.getPath(), &l);
 	BOOST_CHECK_EQUAL(s2.getPath(), &l);
 
 	// The service is registered in the path
-	BOOST_CHECK_EQUAL(l.getServices().size(), 1);
-	if(l.getServices().size() == 1)
+	BOOST_CHECK_EQUAL(l.getAllServices().size(), 1);
+	if(l.getAllServices().size() == 1)
 	{
-		BOOST_CHECK_EQUAL(*l.getServices().begin(), &s1);
+		BOOST_CHECK_EQUAL(*l.getAllServices().begin(), &s1);
 	}
 	BOOST_CHECK(l.isActive(today));
 
@@ -1512,30 +1689,17 @@ BOOST_AUTO_TEST_CASE (testSubline)
 	s2.link(Env::GetOfficialEnv(), true);
 
 	// The path has a subline
-	BOOST_CHECK_EQUAL(l.getSubLines().size(), 1);
-	JourneyPatternCopy* sl(*l.getSubLines().begin());
-	BOOST_CHECK_EQUAL(sl->getCommercialLine(), l.getCommercialLine());
-	BOOST_CHECK_EQUAL(sl->getEdges().size(), l.getEdges().size());
-	BOOST_CHECK_EQUAL(cl.getPaths().size(), 2);
-	BOOST_CHECK(cl.getPaths().find(sl) != cl.getPaths().end());
-
-	// Path of s2 is the new subline
-	BOOST_CHECK_EQUAL(s1.getPath(), &l);
-	BOOST_CHECK_EQUAL(s2.getPath(), sl);
-
+	BOOST_CHECK_EQUAL(l.getServiceCollections().size(), 2);
+	
 	// The service is registered in the path
-	BOOST_CHECK_EQUAL(l.getServices().size(), 1);
-	BOOST_CHECK_EQUAL(sl->getServices().size(), 1);
-	if(l.getServices().size() == 1)
+	BOOST_CHECK_EQUAL((*l.getServiceCollections().begin())->getServices().size(), 1);
+	BOOST_CHECK_EQUAL((*l.getServiceCollections().rbegin())->getServices().size(), 1);
+	if(l.getAllServices().size() == 2)
 	{
-		BOOST_CHECK_EQUAL(*l.getServices().begin(), &s1);
-	}
-	if(sl->getServices().size() == 1)
-	{
-		BOOST_CHECK_EQUAL(*sl->getServices().begin(), &s2);
+		BOOST_CHECK_EQUAL(*l.getAllServices().begin(), &s1);
+		BOOST_CHECK_EQUAL(*l.getAllServices().rbegin(), &s2);
 	}
 	BOOST_CHECK(l.isActive(today));
-	BOOST_CHECK(sl->isActive(today));
 
 	// The service is registered in the line
 	BOOST_CHECK_EQUAL(l.getCommercialLine()->getServices().size(), 2);

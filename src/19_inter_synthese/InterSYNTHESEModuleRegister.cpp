@@ -17,6 +17,7 @@
 #include "InterSYNTHESEUpdateAckService.hpp"
 #include "InterSYNTHESEPackageGetContentService.hpp"
 #include "InterSYNTHESEPackagesService.hpp"
+#include "InterSYNTHESEUpdatePushService.hpp"
 
 #include "InterSYNTHESEPackageAutoLockAction.hpp"
 #include "InterSYNTHESEPackageCommitAction.hpp"
@@ -52,6 +53,7 @@ void synthese::inter_synthese::moduleRegister()
 	synthese::inter_synthese::InterSYNTHESEUpdateAckService::integrate();
 	synthese::inter_synthese::InterSYNTHESEPackageGetContentService::integrate();
 	synthese::inter_synthese::InterSYNTHESEPackagesService::integrate();
+	synthese::inter_synthese::InterSYNTHESEUpdatePushService::integrate();
 
 	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfig>();
 	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfigItem>();

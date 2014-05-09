@@ -108,6 +108,7 @@ namespace synthese
 			static const std::string PARAMETER_INEO_SERVER_DB_LOGIN;
 			static const std::string PARAMETER_INEO_SERVER_DB_PASSWORD;
 			static const std::string PARAMETER_INEO_SERVER_DB_NAME;
+			static const std::string PARAMETER_INEO_STOPS_DATASOURCE_ID;
 
 		private:
 			static std::string _ineoServerIP;
@@ -115,6 +116,7 @@ namespace synthese
 			static std::string _ineoServerDBLogin;
 			static std::string _ineoServerDBPassword;
 			static std::string _ineoServerDBName;
+			static util::RegistryKeyType _stopsDataSourceId;
 
 		public:
 			static std::string GetIneoServerIP(){ return _ineoServerIP; }
@@ -122,6 +124,7 @@ namespace synthese
 			static std::string GetIneoServerDBLogin(){ return _ineoServerDBLogin; }
 			static std::string GetIneoServerDBPassword(){ return _ineoServerDBPassword; }
 			static std::string GetIneoServerDBName(){ return _ineoServerDBName; }
+			static util::RegistryKeyType GetIneoStopsDataSourceId(){ return _stopsDataSourceId; }
 
 			static PlaceWithDisplayBoards* GetPlaceWithDisplayBoards(
 				const geography::NamedPlace* place,

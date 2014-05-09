@@ -24,7 +24,6 @@
 
 #include "CommercialLine.h"
 #include "ContinuousServiceTableSync.h"
-#include "InterSYNTHESEIdFilter.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "StopPoint.hpp"
 #include "TransportNetwork.h"
@@ -87,8 +86,7 @@ namespace synthese
 
 
 		bool RealTimePTDataInterSYNTHESE::sync(
-			const string& parameter,
-			const InterSYNTHESEIdFilter* idFilter
+			const string& parameter
 		) const	{
 
 			if(parameter.empty())
@@ -150,16 +148,26 @@ namespace synthese
 					if(	i+3 < fields.size() &&
 						!fields[i+3].empty()
 					){
-						string vertexIdStr = idFilter->convertId(0, string(), fields[i+3]);
-						vertex = Env::GetOfficialEnv().getEditable<StopPoint>(
-							lexical_cast<RegistryKeyType>(vertexIdStr)
-						).get();
+						RegistryKeyType vertexId(
+							lexical_cast<RegistryKeyType>(
+								fields[i+3]
+						)	);
+						vertex = Env::GetOfficialEnv().getEditable<StopPoint>(vertexId).get();
 					}
 
 					// Saving
-					departureSchedules[rank] = dep;
-					arrivalSchedules[rank] = arr;
-					vertices[rank] = vertex;
+					if (departureSchedules.size() > rank)
+					{
+						departureSchedules[rank] = dep;
+					}
+					if (arrivalSchedules.size() > rank)
+					{
+						arrivalSchedules[rank] = arr;
+					}
+					if (vertices.size() > rank)
+					{
+						vertices[rank] = vertex;
+					}
 				}
 				catch(...)
 				{
@@ -206,9 +214,9 @@ namespace synthese
 		RealTimePTDataInterSYNTHESE::Content::Content(
 			const SchedulesBasedService& service,
 			boost::optional<const RanksToSync&> ranksToSync /*= boost::optional<const RanksToSync&>() */
-		):	_service(service),
-			_ranksToSync(ranksToSync),
-			InterSYNTHESEContent(RealTimePTDataInterSYNTHESE::FACTORY_KEY)
+		):	InterSYNTHESEContent(RealTimePTDataInterSYNTHESE::FACTORY_KEY),
+			_service(service),
+			_ranksToSync(ranksToSync)
 		{
 		}
 
@@ -246,5 +254,12 @@ namespace synthese
 				}
 			}
 			return result.str();
+		}
+
+
+
+		ptime RealTimePTDataInterSYNTHESE::Content::getExpirationTime() const
+		{
+			return _service.getNextRTUpdate();
 		}
 }	}

@@ -29,6 +29,7 @@
 #include "Registry.h"
 #include "GraphTypes.h"
 #include "GraphConstants.h"
+#include "UseRule.h"
 
 #include <vector>
 #include <boost/utility.hpp>

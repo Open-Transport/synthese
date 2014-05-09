@@ -39,6 +39,7 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		class OperationUnit;
 		class VehicleService;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -65,6 +66,7 @@ namespace synthese
 			//@{
 				boost::gregorian::date _date;
 				const cms::Webpage* _page;
+				boost::optional<const OperationUnit&> _operationUnit;
 				const VehicleService* _vehicleService;
 				util::RegistryKeyType _key;
 			//@}

@@ -33,7 +33,7 @@
 #include "ReservationContact.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
+#include "LineStop.h"
 #include "ScheduledService.h"
 #include "ContinuousService.h"
 #include "RoadPlace.h"
@@ -44,8 +44,6 @@
 #include "NonConcurrencyRule.h"
 #include "GeographyModule.h"
 #include "CoordinatesSystem.hpp"
-#include "MainRoadChunk.hpp"
-#include "MainRoadPart.hpp"
 #include "10_db/101_sqlite/SQLiteDB.h"
 #include "DBModule.h"
 

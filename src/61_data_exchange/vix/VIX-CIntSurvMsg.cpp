@@ -6,45 +6,42 @@
 #include "VIX-CIntSurvMsg.hpp"
 #include "VIX-BSC-defines.hpp"
 
-#include "Vehicle.hpp"
-#include "VehicleModule.hpp"
-#include "StopPoint.hpp"
-#include "ScheduledService.h"
-#include "DataSource.h"
-#include "UtilTypes.h"
-#include "CommercialLine.h"
-
 #include <boost/lexical_cast.hpp>
+
+#include <boost/format.hpp>
+// cool info at http://ckp.made-it.com/bisync.html
 
 namespace synthese
 {
 	using namespace boost::posix_time;
-	using namespace vehicle;
-	using namespace pt;
 
 	CIntSurvMsg::CIntSurvMsg(void)
 	{
 		type		= INT_SURV;
-		//TODO(JD): set those values to 0 by default when debug done
-		year		= 113;
-		month		= 8;
-		day			= 19;
-		hour		= 12;
-		min			= 10;
-		sec			= 50;
-		num_driver	= 4320;
-		num_park	= 104;
-		etat_expl	= 1;
-		num_line	= 6;    // 3; //6; //3;
-		num_service	= 4024;	// No service agent
-		num_journey	= 0;	// course NOT USED in VIX code.
-		num_stop	= 2045; // 1949; //2045; //2050;
+		ptime now(second_clock::local_time());
+		year	= now.date().year()-2000;
+		month	= now.date().month();
+		day		= now.date().day();
+		hour	= now.time_of_day().hours();
+		min		= now.time_of_day().minutes();
+		sec		= now.time_of_day().seconds();
+		num_driver	= 1;
+		num_park	= 798;
+		etat_expl	= 0;
+		num_line	= 9998;
+		num_service	= 1;
+		num_journey	= 998;
+		num_stop	= 9998;
 		direction	= 0;
 	}
+
+
 
 	CIntSurvMsg::~CIntSurvMsg(void)
 	{
 	}
+
+
 
 	void CIntSurvMsg::IntLigneToString(char *p, unsigned int i)
 	{
@@ -100,100 +97,17 @@ namespace synthese
 
 	}
 
-	// Update the variables from the Synthese Environment.
-	// Return true if anything has changed.
-	bool CIntSurvMsg::UpdateVariablesFromEnv(boost::shared_ptr<const impex::DataSource> &dataSource)
+
+
+	int CIntSurvMsg::StreamToBuffer(unsigned char *buf, int bufSize)
 	{
-		bool bUpdated = false;
-
-		//TODO: add NULL pointer 
-		//TODO?: add timer not to update too often
-		{
-			// add time and date.
-			ptime now(second_clock::local_time());	
-			year	= now.date().year()-2000;
-			if(year<0)
-				year=0;
-			month	= now.date().month();
-			day		= now.date().day();
-			hour	= now.time_of_day().hours();
-			min		= now.time_of_day().minutes();
-			sec		= now.time_of_day().seconds();
-
-			// Get stop number, direction and line.
-			VehiclePosition &vp = VehicleModule::GetCurrentVehiclePosition();
-			// TODO: clue: in Synthese all services are unique and there is one service number per bus path. (service = Time+AtoZ)
-
-			pt::ScheduledService *pService = vp.getService(); 
-			if(pService)
-			{
-				const std::string &servicenumber = pService->getServiceNumber();
-				num_service	= boost::lexical_cast<short>(servicenumber);
-
-				if(pService->getRoute()->getWayBack())
-				{
-					direction = 1;
-				}
-				else
-				{
-					direction = 0;
-				}
-
-				pt::CommercialLine* line(pService->getRoute()->getCommercialLine());
-				const std::vector<std::string> &result = line->getCodesBySource(*dataSource);
-				
-				if(result.size()>0)
- 				{
- 					num_line = boost::lexical_cast<unsigned int>(*result.begin());
- 				}
-			}
-			else
-			{
-				//TODO: unknown service
-			}
-
-			pt::StopPoint* pStoppoint = vp.getStopPoint();
-			if(pStoppoint)
-			{
-				const std::vector<std::string> &result = pStoppoint->getCodesBySource(*dataSource);
-
-				if(result.size()>0)
- 				{
- 					num_stop = boost::lexical_cast<unsigned int>(*result.begin());
- 				}
-			}
-			else
-			{
-				//TODO: unknown position. use non located
-			}
-
-			//TODO: lower priority, but we need to get those too
-			num_driver	= 1;	// TODO: low priority
-			num_park	= 1;	// TODO: low priority
-			etat_expl	= 1;	// TODO: low priority
-			num_journey	= 1;	// Don't care: course NOT USED in VIX code.
-
-			bUpdated=true;
-		}
-
-		return bUpdated;
-
-	}
-
-	int CIntSurvMsg::StreamToBuffer(unsigned char *buf, int bufSize, boost::shared_ptr<const impex::DataSource> &datasource)
-	{
-		// Vehicle position is update in the gps poller
-		UpdateVariablesFromEnv(datasource);
-
 		if(bufSize<INT_SURV_BUF_SIZE){
 			// buf size Must be at least equal to INT_SURV_BUF_SIZE
 			util::Log::GetInstance().error("CIntSurv::StreamToBuffer INVALID buffer size");
 			return 0;
 		}
 
-		int o = 0;
-		buf[o] = INT_SURV_DATA_SIZE;
-		o+=1;
+		int o = 1;
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, type);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, year);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, month);
@@ -227,9 +141,11 @@ namespace synthese
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, (num_stop>>8) & 0xFF);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, num_stop & 0xFF);
 		o+=insertCharToBufferTransparentMode(&buf[o], bufSize-o, direction);
+		buf[0] = o - 1;
 
 		/*DEBUG(JD)*/
-		printf("num_driver=%d, num_park=%d, num_service=%d, num_journey=%d, num_stop=%d, direction=%d\n", num_driver, num_park, num_service, num_journey, num_stop, direction);
+		util::Log::GetInstance().debug(boost::str(boost::format("VixV6000FileFormat: num_driver=%d, num_park=%d, num_service=%d, num_journey=%d, num_stop=%d, num_line=%d, direction=%d")
+									 % num_driver % num_park % num_service % num_journey % num_stop % num_line % direction));
 		/*DEBUG(JD)*/
 
 		return o;

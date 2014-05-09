@@ -24,7 +24,7 @@
 #define SYNTHESE_ENV_ADDRESS_H
 
 #include "UtilConstants.h"
-#include "MainRoadChunk.hpp"
+#include "RoadChunk.h"
 #include "Place.h"
 
 #include <vector>
@@ -53,9 +53,9 @@ namespace synthese
 
 
 		private:
-			MainRoadChunk* _roadChunk;
+			RoadChunk* _roadChunk;
 			double _metricOffset;
-			boost::optional<MainRoadChunk::HouseNumber> _houseNumber;
+			boost::optional<HouseNumber> _houseNumber;
 
 
 		public:
@@ -71,9 +71,9 @@ namespace synthese
 			/// @param metricOffset offset after the beginning of the chunk (and not the road)
 			/// @param houseNumber registered number of the point in the street
 			Address(
-				MainRoadChunk& roadChunk,
+				RoadChunk& roadChunk,
 				graph::MetricOffset metricOffset,
-				boost::optional<MainRoadChunk::HouseNumber> houseNumber = boost::optional<MainRoadChunk::HouseNumber>()
+				boost::optional<HouseNumber> houseNumber = boost::none
 			);
 
 
@@ -83,15 +83,15 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				MainRoadChunk* getRoadChunk() const { return _roadChunk; }
+				RoadChunk* getRoadChunk() const { return _roadChunk; }
 				graph::MetricOffset getMetricOffset() const { return _metricOffset; }
-				boost::optional<MainRoadChunk::HouseNumber> getHouseNumber() const { return _houseNumber; }
+				boost::optional<HouseNumber> getHouseNumber() const { return _houseNumber; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setHouseNumber(boost::optional<MainRoadChunk::HouseNumber> value){ _houseNumber = value; }
-				void setRoadChunk(MainRoadChunk* value){ _roadChunk = value; }
+				void setHouseNumber(boost::optional<HouseNumber> value){ _houseNumber = value; }
+				void setRoadChunk(RoadChunk* value){ _roadChunk = value; }
 				void setMetricOffset(graph::MetricOffset value){ _metricOffset = value; }
 			//@}
 

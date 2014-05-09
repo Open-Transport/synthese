@@ -55,7 +55,6 @@
 #include "Function.h"
 #include "RequestException.h"
 #include "ActionException.h"
-#include "PermanentThread.hpp"
 
 using namespace boost;
 using namespace std;
@@ -108,6 +107,7 @@ namespace synthese
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
 		boost::shared_mutex ServerModule::baseWriterMutex;
+		boost::shared_mutex ServerModule::InterSYNTHESEAgainstRequestsMutex;
 
 		template<> void ModuleClassTemplate<ServerModule>::PreInit()
 		{
@@ -159,10 +159,6 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<ServerModule>::Start()
 		{
-			// FIXME: Should move the RunHTTPServer in the Start
-
-			// Launch the permanent threads
-			ServerModule::_LaunchPermanentThreads();
 		}
 
 		void ServerModule::RunHTTPServer()
@@ -326,7 +322,11 @@ namespace synthese
 
 				// Request run
 				stringstream ros;
-				request.run(ros);
+				{
+					// Don't request if interSYNTHESE is writing
+					boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
+					request.run(ros);
+				}
 				
 				// Output
 				if(	_forceGZip ||
@@ -672,22 +672,22 @@ namespace synthese
 			return _serverStartingTime;
 		}
 
-
-		void ServerModule::_LaunchPermanentThreads()
+		const string ServerModule::GetBranch()
 		{
-			// Loop on permanent threads
-			BOOST_FOREACH(const Registry<PermanentThread>::value_type& it, Env::GetOfficialEnv().getRegistry<PermanentThread>())
+			string branch = "";
+			std::vector<std::string> urlVector;
+			boost::algorithm::split(urlVector, ServerModule::SYNTHESE_URL, boost::is_any_of("/"));
+			if (urlVector.size() > 0)
 			{
-				PermanentThread& permanentThread(*it.second);
-
-				// Run activated pollers to do
-				if(	!permanentThread.get<Active>())
+				if (urlVector.at(urlVector.size()-1) == "trunk")
 				{
-					continue;
+					branch = urlVector.at(urlVector.size()-1);
 				}
-
-				permanentThread.launch();
+				else if (urlVector.size() > 1)
+				{
+					branch = urlVector.at(urlVector.size()-2) + "/" + urlVector.at(urlVector.size()-1);
 			}
 		}
-
+			return branch;
+		}
 }	}

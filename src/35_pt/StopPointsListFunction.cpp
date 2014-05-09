@@ -33,8 +33,7 @@
 #include "StopPoint.hpp"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
-#include "Edge.h"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
 #include "City.h"
@@ -80,6 +79,9 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_OMIT_SAME_AREA_DESTINATIONS = "omitSameAreaDestinations";
 		const string StopPointsListFunction::PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER = "sortByDistance";
 		const string StopPointsListFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
+		const string StopPointsListFunction::PARAMETER_DATA_SOURCE_FILTER = "data_source_filter";
+		const string StopPointsListFunction::PARAMETER_DAYS_CHECK_IF_STOP_SERVED = "days_check_if_stop_served";
+		const string StopPointsListFunction::PARAMETER_OUTPUT_ONLY_ARRIVAL_STOPS = "output_only_arrival_stops";
 
 		const string StopPointsListFunction::TAG_PHYSICAL_STOPS = "physicalStops";
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
@@ -158,6 +160,12 @@ namespace synthese
 			if(_maxSolutionsNumber)
 			{
 				map.insert(PARAMETER_MAX_SOLUTIONS_NUMBER, *_maxSolutionsNumber);
+			}
+			
+			// dataSourceFilter
+			if(_dataSourceFilter)
+			{
+				map.insert(PARAMETER_DATA_SOURCE_FILTER, _dataSourceFilter->getKey());
 			}
 
 			return map;
@@ -285,7 +293,19 @@ namespace synthese
 			{
 				_isSortByDistanceToBboxCenter = true;
 			}
-		
+
+			if(map.getOptional<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER)) try
+			{
+				_dataSourceFilter = Env::GetOfficialEnv().get<impex::DataSource>(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE_FILTER));
+			}
+			catch (ObjectNotFoundException<impex::DataSource>&)
+			{
+				throw RequestException("No such data source");
+			}
+
+			_daysCheckIfStopServed = boost::gregorian::date_duration(map.getDefault<int>(PARAMETER_DAYS_CHECK_IF_STOP_SERVED, 0));
+
+			_outputOnlyArrivalStops = map.isTrue(PARAMETER_OUTPUT_ONLY_ARRIVAL_STOPS);
 		}
 
 
@@ -302,7 +322,7 @@ namespace synthese
 			// and startDateTime is begin of the day (a day begin at 3:00):
 			startDateTime = date - date.time_of_day() + hours(3);
 			// and endDateTime is end of the day (a day end at 27:00):
-			endDateTime = date - date.time_of_day() + hours(27);
+			endDateTime = date - date.time_of_day() + _daysCheckIfStopServed + hours(27);
 
 			// Search for stopPoints
 			StopPointMapType stopPointMap;
@@ -312,6 +332,9 @@ namespace synthese
 				const StopArea::PhysicalStops& stops(_stopArea->get()->getPhysicalStops());
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stopPoint, stops)
 				{
+					if(_dataSourceFilter && !stopPoint.second->hasLinkWithSource(*_dataSourceFilter))
+						continue;
+
 					addStop(stopPointMap, *stopPoint.second, startDateTime, endDateTime);
 				}
 			}
@@ -319,12 +342,14 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Registry<StopPoint>::value_type& stopPoint, Env::GetOfficialEnv().getRegistry<StopPoint>())
 				{
-					if(_bbox &&
+					if((_bbox &&
 						(!stopPoint.second->getGeometry() ||
-						!_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate())))
-					{
+						!_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))) ||
+						(_dataSourceFilter && !stopPoint.second->hasLinkWithSource(*_dataSourceFilter))
+					){
 						continue;
 					}
+
 					addStop(stopPointMap, *stopPoint.second, startDateTime, endDateTime);
 				}
 			}
@@ -361,39 +386,36 @@ namespace synthese
 					destinationPM->insert("cityName", destination.second.first->getCity()->getName());
 
 					// Lines
-					if(!_commercialLineID)
+					BOOST_FOREACH(const CommercialLineSetType::value_type& line, destination.second.second)
 					{
-						BOOST_FOREACH(const CommercialLineSetType::value_type& line, destination.second.second)
+						// Declaration
+						boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+
+						// Main parameters
+						line->toParametersMap(*linePM, true);
+
+						// Rolling stock
+						set<RollingStock *> rollingStocks;
+						BOOST_FOREACH(Path* path, line->getPaths())
 						{
-							// Declaration
-							boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+							if(!dynamic_cast<const JourneyPattern*>(path))
+								continue;
 
-							// Main parameters
-							line->toParametersMap(*linePM, true);
+							if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
+								continue;
 
-							// Rolling stock
-							set<RollingStock *> rollingStocks;
-							BOOST_FOREACH(Path* path, line->getPaths())
-							{
-								if(!dynamic_cast<const JourneyPattern*>(path))
-									continue;
-
-								if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
-									continue;
-
-								rollingStocks.insert(
-									static_cast<const JourneyPattern*>(path)->getRollingStock()
-								);
-							}
-							BOOST_FOREACH(RollingStock * rs, rollingStocks)
-							{
-								boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
-								rs->toParametersMap(*transportModePM, true);
-								linePM->insert("transportMode", transportModePM);
-							}
-
-							destinationPM->insert(TAG_LINE, linePM);
+							rollingStocks.insert(
+								static_cast<const JourneyPattern*>(path)->getRollingStock()
+							);
 						}
+						BOOST_FOREACH(RollingStock * rs, rollingStocks)
+						{
+							boost::shared_ptr<ParametersMap> transportModePM(new ParametersMap);
+							rs->toParametersMap(*transportModePM, true);
+							linePM->insert("transportMode", transportModePM);
+						}
+
+						destinationPM->insert(TAG_LINE, linePM);
 					}
 
 					stopPM->insert(TAG_DESTINATION, destinationPM);
@@ -450,14 +472,12 @@ namespace synthese
 											newDestination->merge(*destination);
 											newDestination->insert(TAG_LINE, line);
 											sortedMap.insert(make_pair(line->get<string>("line_short_name"), newDestination));
-											std::cout << line->get<string>("line_short_name") << std::endl;
 										}
 									}
 								}
 
 								BOOST_FOREACH(sortedMapType::value_type it, sortedMap)
 								{
-									std::cout << it.first << std::endl;
 									sortedDestinationVect.push_back(it.second);
 								}
 							}
@@ -595,103 +615,129 @@ namespace synthese
 			ptime & endDateTime
 		) const {
 			bool spHaveZeroDestination = true;
-			BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getDepartureEdges())
+			Vertex::Edges::const_iterator itDep(sp.getDepartureEdges().begin());
+			Vertex::Edges::const_iterator itArr(sp.getArrivalEdges().begin());
+			const Edge* edge;
+			while(true)
 			{
+				if(itDep != sp.getDepartureEdges().end())
+				{
+					edge = itDep->second;
+					itDep++;
+				}
+				else
+				{
+					if(_outputOnlyArrivalStops && itArr != sp.getArrivalEdges().end())
+					{
+						edge = itArr->second;
+						itArr++;
+					}
+					else
+					{
+						break;
+					}
+				}
+
 				// Jump over junctions
-				if(!dynamic_cast<const LineStop*>(edge.second))
+				if(!dynamic_cast<const LinePhysicalStop*>(edge))
 				{
 					continue;
 				}
 
-				const LineStop* ls = static_cast<const LineStop*>(edge.second);
+				const LinePhysicalStop* ls = static_cast<const LinePhysicalStop*>(edge);
 
-				ptime departureDateTime = startDateTime;
-				// Loop on services
-				optional<Edge::DepartureServiceIndex::Value> index;
-				while(true)
+				BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls->getParentPath()->getServiceCollections())
 				{
-					AccessParameters ap(USER_PEDESTRIAN);
-					ServicePointer servicePointer(
-						ls->getNextService(
-							ap,
-							departureDateTime,
-							endDateTime,
-							false,
-							index,
-							false,
-							false
-					)	);
-					if (!servicePointer.getService())
-						break;
-					++*index;
-					departureDateTime = servicePointer.getDepartureDateTime();
-					if(sp.getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+
+					ptime departureDateTime = startDateTime;
+					// Loop on services
+					optional<Edge::DepartureServiceIndex::Value> index;
+					while(true)
 					{
-						if (!dynamic_cast<const DRTArea*>(servicePointer.getRealTimeDepartureVertex()))
-							continue;
-					}
-
-					const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-					if(journeyPattern == NULL) // Could be a junction
-						continue;
-
-					const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-					if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
-						continue;
-
-					// Filter by Rolling stock id
-					if(_rollingStockFilter.get())
-					{
-						// Set the boolean to true or false depending on whether filter is inclusive or exclusive
-						bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
-						set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
-						BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+						AccessParameters ap(USER_PEDESTRIAN);
+						ServicePointer servicePointer(
+							ls->getNextService(
+									*itCollection,
+								ap,
+								departureDateTime,
+								endDateTime,
+								false,
+								index,
+								false,
+								false
+						)	);
+						if (!servicePointer.getService())
+							break;
+						++*index;
+						departureDateTime = servicePointer.getDepartureDateTime();
+						if(sp.getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 						{
-							if(commercialLine->usesTransportMode(*rollingStock))
+							if (!dynamic_cast<const DRTArea*>(servicePointer.getRealTimeDepartureVertex()))
+								continue;
+						}
+
+						const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+						if(journeyPattern == NULL) // Could be a junction
+							continue;
+
+						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+						if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
+							continue;
+
+						// Filter by Rolling stock id
+						if(_rollingStockFilter.get())
+						{
+							// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+							bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+							set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+							BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
 							{
-								atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
-								break;
+								if(commercialLine->usesTransportMode(*rollingStock))
+								{
+									atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+									break;
+								}
+							}
+
+							// If the line doesn't respect the filter, skip it
+							if(!atLeastOneMode)
+							{
+								continue;
 							}
 						}
 
-						// If the line doesn't respect the filter, skip it
-						if(!atLeastOneMode)
+						const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
+
+						if(_omitSameAreaDestinations && _stopArea)
 						{
-							continue;
+							//Ignore if destination is the _stopArea himself
+							if(destination->getKey() == _stopArea->get()->getKey())
+							{
+								continue;
+							}
 						}
-					}
 
-					const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
-
-					if(_omitSameAreaDestinations && _stopArea)
-					{
-						//Ignore if destination is the _stopArea himself
-						if(destination->getKey() == _stopArea->get()->getKey())
+						int distanceToBboxCenter = CalcDistanceToBboxCenter(sp);
+						SortableStopPoint keySP(&sp,distanceToBboxCenter,_isSortByDistanceToBboxCenter);
+						SortableStopArea keySA(destination->getKey(), destination->getName());
+						if(spHaveZeroDestination)
 						{
-							continue;
+							StopAreaDestinationMapType stopAreaMap;
+							stopPointMap[keySP] = stopAreaMap;
+							spHaveZeroDestination = false;
 						}
-					}
 
-					int distanceToBboxCenter = CalcDistanceToBboxCenter(sp);
-					SortableStopPoint keySP(&sp,distanceToBboxCenter,_isSortByDistanceToBboxCenter);
-					SortableStopArea keySA(destination->getKey(), destination->getName());
-					if(spHaveZeroDestination)
-					{
-						StopAreaDestinationMapType stopAreaMap;
-						stopPointMap[keySP] = stopAreaMap;
-						spHaveZeroDestination = false;
-					}
-
-					StopAreaDestinationMapType::iterator it = stopPointMap[keySP].find(keySA);
-					if(it == stopPointMap[keySP].end()) // test if destination stop already in the map
-					{
-						CommercialLineSetType lineSet;
-						lineSet.insert(commercialLine);
-						stopPointMap[keySP][keySA] = make_pair(destination, lineSet);
-					}
-					else // destination stop is already in the map
-					{
-						stopPointMap[keySP][keySA].second.insert(commercialLine);
+						StopAreaDestinationMapType::iterator it = stopPointMap[keySP].find(keySA);
+						if(it == stopPointMap[keySP].end()) // test if destination stop already in the map
+						{
+							CommercialLineSetType lineSet;
+							lineSet.insert(commercialLine);
+							stopPointMap[keySP][keySA] = make_pair(destination, lineSet);
+						}
+						else // destination stop is already in the map
+						{
+							stopPointMap[keySP][keySA].second.insert(commercialLine);
+						}
 					}
 				}
 			}

@@ -23,8 +23,9 @@
 #include "Address.h"
 
 #include "AccessParameters.h"
-#include "ReverseRoadChunk.hpp"
+#include "Crossing.h"
 #include "Road.h"
+#include "RoadChunkEdge.hpp"
 #include "RoadModule.h"
 #include "VertexAccessMap.h"
 
@@ -43,9 +44,9 @@ namespace synthese
 	namespace road
 	{
 		Address::Address (
-			MainRoadChunk& roadChunk,
+			RoadChunk& roadChunk,
 			double metricOffset,
-			optional<MainRoadChunk::HouseNumber> houseNumber
+			optional<HouseNumber> houseNumber
 		):	WithGeometry<Point>(
 				roadChunk.getGeometry().get() ?
 				roadChunk.getPointFromOffset(metricOffset) :
@@ -83,7 +84,7 @@ namespace synthese
 				{
 					double distance(_metricOffset - _roadChunk->getMetricOffset());
 					result.insert(
-						_roadChunk->getFromVertex(),
+						_roadChunk->getFromCrossing(),
 						VertexAccess(
 							seconds(static_cast<long>(distance / accessParameters.getApproachSpeed())),
 							distance
@@ -91,13 +92,13 @@ namespace synthese
 				}
 
 				// Reverse chunk
-				if(_roadChunk->getNext())
+				if(_roadChunk->getForwardEdge().getNext())
 				{
-					assert(static_cast<MainRoadChunk*>(_roadChunk->getNext())->getReverseRoadChunk());
+					assert(static_cast<RoadChunkEdge*>(_roadChunk->getForwardEdge().getNext()));
 
-					double distance(_roadChunk->getEndMetricOffset() - _metricOffset);
+					double distance(_roadChunk->getForwardEdge().getEndMetricOffset() - _metricOffset);
 					result.insert(
-						static_cast<MainRoadChunk*>(_roadChunk->getNext())->getReverseRoadChunk()->getFromVertex(),
+						_roadChunk->getForwardEdge().getNext()->getFromVertex(),
 						VertexAccess(
 							seconds(static_cast<long>(distance / accessParameters.getApproachSpeed())),
 							distance

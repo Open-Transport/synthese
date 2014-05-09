@@ -21,7 +21,11 @@
 */
 
 #include "DRTArea.hpp"
+
 #include "PTModule.h"
+#include "StopArea.hpp"
+
+using namespace std;
 
 namespace synthese
 {
@@ -36,6 +40,10 @@ namespace synthese
 
 	namespace pt
 	{
+		const string DRTArea::TAG_STOP = "stop";
+
+
+
 		DRTArea::DRTArea(
 			const util::RegistryKeyType id,
 			std::string name,
@@ -46,8 +54,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_VALUE_CONSTRUCTOR(Name, name),
 					FIELD_VALUE_CONSTRUCTOR(Stops, stops)
-			)	),
-			Vertex(NULL, boost::shared_ptr<geos::geom::Point>())
+			)	)
 		{}
 
 
@@ -68,6 +75,57 @@ namespace synthese
 
 		bool DRTArea::contains( const StopArea& stopArea ) const
 		{
-			return get<Stops>().find(&const_cast<StopArea&>(stopArea)) != get<Stops>().end();
+			BOOST_FOREACH(StopArea* stop, get<Stops>())
+			{
+				if(stop == &stopArea)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+
+		void DRTArea::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			BOOST_FOREACH(StopArea* stop, get<Stops>())
+			{
+				stop->addDRTArea(*this);
+			}
+		}
+
+
+
+		void DRTArea::unlink()
+		{
+			BOOST_FOREACH(StopArea* stop, get<Stops>())
+			{
+				stop->removeDRTArea(*this);
+			}
+		}
+
+
+
+		DRTArea::~DRTArea()
+		{
+			unlink();
+		}
+
+
+
+		void DRTArea::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix /* = std::string */
+		) const	{
+
+			// Stops as sub map
+			BOOST_FOREACH(const Stops::Type::value_type& stop, get<Stops>())
+			{
+				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
+				stop->toParametersMap(*stopPM, true);
+				map.insert(prefix + TAG_STOP, stopPM);
+			}
+
 		}
 }	}

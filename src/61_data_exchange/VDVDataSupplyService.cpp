@@ -205,8 +205,6 @@ namespace synthese
 					}
 
 					result << "<AZBNachricht AboID=\"" << it.second->getId() << "\">";
-					
-					Log::GetInstance().debug("VDVDataSupply : starting addings of AboID " + it.second->getId());
 
 					// Addings
 					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getAddings())
@@ -231,7 +229,6 @@ namespace synthese
 						{
 							continue;
 						}
-						Log::GetInstance().debug("VDVDataSupply : Network is OK");
 						ptime departureDateTime(sp.getDepartureDateTime());
 						if (!departureDateTime.is_not_a_date_time())
 							departureDateTime -= diff_from_utc;
@@ -281,7 +278,6 @@ namespace synthese
 							serviceNumber += sp.getService()->getServiceNumber();
 						}
 						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
-						Log::GetInstance().debug("VDVDataSupply : Service number " + serviceNumber);
 						string direction;
 						if(jp.getDirectionObj())
 						{
@@ -301,7 +297,6 @@ namespace synthese
 							direction = jp.getDestination()->getConnectionPlace()->getName();
 						}
 						direction = iconv.convert(direction);
-						Log::GetInstance().debug("VDVDataSupply : Direction " + direction);
 
 						//Provenance
 						string provenance = jp.getOrigin()->getConnectionPlace()->getName26();
@@ -310,7 +305,6 @@ namespace synthese
 							provenance = jp.getOrigin()->getConnectionPlace()->getName();
 						}
 						provenance = iconv.convert(provenance);
-						Log::GetInstance().debug("VDVDataSupply : Provenance " + provenance);
 
 						// Expiration time
 						ptime expirationTime(
@@ -332,11 +326,6 @@ namespace synthese
 							const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
 							haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
 						}
-						Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
-						Log::GetInstance().debug("VDVDataSupply : Betriebstag " + to_iso_extended_string(sp.getOriginDateTime().date()));
-						Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
-						Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
-						Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
 						result <<
 							"\">" <<
 							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
@@ -381,8 +370,6 @@ namespace synthese
 						result << "<HaltID>" << haltID << "</HaltID>";
 						result << "</AZBFahrplanlage>";
 					}
-					
-					Log::GetInstance().debug("VDVDataSupply : starting deletions of AboID " + it.second->getId());
 
 					// Deletions
 					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getDeletions())
@@ -403,7 +390,6 @@ namespace synthese
 						{
 							continue;
 						}
-						Log::GetInstance().debug("VDVDataSupply : Network is OK");
 						string networkId(
 							network.getACodeBySource(
 								*_vdvClient->get<DataSource>()
@@ -422,7 +408,6 @@ namespace synthese
 							serviceNumber += sp.getService()->getServiceNumber();
 						}
 						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
-						Log::GetInstance().debug("VDVDataSupply : Service number " + serviceNumber);
 						string direction;
 						if(jp.getDirectionObj())
 						{
@@ -442,7 +427,6 @@ namespace synthese
 							direction = jp.getDestination()->getConnectionPlace()->getName();
 						}
 						direction = iconv.convert(direction);
-						Log::GetInstance().debug("VDVDataSupply : Direction " + direction);
 
 						// Provenance
 						string provenance = jp.getOrigin()->getConnectionPlace()->getName26();
@@ -451,16 +435,11 @@ namespace synthese
 							provenance = jp.getOrigin()->getConnectionPlace()->getName();
 						}
 						provenance = iconv.convert(provenance);
-						Log::GetInstance().debug("VDVDataSupply : Provenance " + provenance);
 					
 						// XML generation
 						result <<
 							"<AZBFahrtLoeschen Zst=\"";
 						ToXsdDateTime(result, now);
-						Log::GetInstance().debug("VDVDataSupply : Betriebstag " + to_iso_extended_string(sp.getOriginDateTime().date()));
-						Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
-						Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
-						Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
 						result <<
 							"\">" <<
 							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
@@ -479,9 +458,7 @@ namespace synthese
 						;
 					}
 					result << "</AZBNachricht>";
-					
-					Log::GetInstance().debug("VDVDataSupply : finished deletions of AboID " + it.second->getId());
-					
+
 					it.second->declareSending();
 			}	}
 			result << "</DatenAbrufenAntwort>";

@@ -13,10 +13,6 @@ House.cpp
 House.hpp
 HouseTableSync.cpp
 HouseTableSync.hpp
-MainRoadChunk.cpp
-MainRoadChunk.hpp
-MainRoadPart.cpp
-MainRoadPart.hpp
 ProjectAddressAction.cpp
 ProjectAddressAction.hpp
 PublicPlace.cpp
@@ -36,14 +32,12 @@ PublicPlaceTableSync.h
 ProjectAllPublicPlacesAction.cpp
 ProjectAllPublicPlacesAction.hpp
 ReachableFromCrossing.hpp
-ReverseRoadChunk.cpp
-ReverseRoadChunk.hpp
-ReverseRoadPart.cpp
-ReverseRoadPart.hpp
 Road.cpp
 Road.h
 RoadChunk.cpp
 RoadChunk.h
+RoadChunkEdge.cpp
+RoadChunkEdge.hpp
 RoadChunkTableSync.cpp
 RoadChunkTableSync.h
 RoadModule.cpp
@@ -51,12 +45,15 @@ RoadModule.gen.cpp
 RoadModuleRegister.cpp
 RoadModule.h
 RoadModule.inc.cpp
+RoadPath.cpp
+RoadPath.cpp
 RoadPlace.cpp
 RoadPlace.h
 RoadPlaceTableSync.cpp
 RoadPlaceTableSync.h
 RoadTableSync.cpp
 RoadTableSync.h
+RoadTypes.hpp
 )
 
 set_source_files_properties(RoadModule.gen.cpp RoadModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

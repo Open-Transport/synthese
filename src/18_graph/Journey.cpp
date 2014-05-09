@@ -22,7 +22,6 @@
 
 #include "Journey.h"
 
-#include "LineStop.h"
 #include "UseRule.h"
 #include "Path.h"
 #include "Service.h"
@@ -44,8 +43,6 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace pt;
-	
 	namespace graph
 	{
 		Journey::Journey(
@@ -219,18 +216,20 @@ namespace synthese
 
 
 
-		boost::logic::tribool Journey::getReservationCompliance(bool ignoreReservationDeadline) const
+		boost::logic::tribool Journey::getReservationCompliance(
+			bool ignoreReservationDeadline,
+			UseRule::ReservationDelayType reservationRulesDelayType
+		) const
 		{
 			boost::logic::tribool result(false);
 			BOOST_FOREACH(const ServicePointer& su, _journeyLegs)
 			{
-				const LineStop* ls(dynamic_cast<const LineStop*>(su.getDepartureEdge()));
-				if(ls && !ls->getReservationNeeded())
+				if(!su.getDepartureEdge()->getReservationNeeded())
 				{
 					continue;
 				}
 				const UseRule::ReservationAvailabilityType& resa(
-					su.getUseRule().getReservationAvailability(su, ignoreReservationDeadline)
+					su.getUseRule().getReservationAvailability(su, ignoreReservationDeadline, reservationRulesDelayType)
 				);
 				if(resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE)
 				{
@@ -246,21 +245,23 @@ namespace synthese
 
 
 
-		ptime Journey::getReservationDeadLine() const
+		ptime Journey::getReservationDeadLine(
+			UseRule::ReservationDelayType reservationRulesDelayType
+		) const
 		{
 			ptime result(not_a_date_time);
 			boost::logic::tribool compliance(getReservationCompliance(true));
 			BOOST_FOREACH(const ServicePointer& su, _journeyLegs)
 			{
 				const UseRule::ReservationAvailabilityType& resa(
-					su.getUseRule().getReservationAvailability(su, true)
+					su.getUseRule().getReservationAvailability(su, true, reservationRulesDelayType)
 				);
 				if(	(	boost::logic::indeterminate(compliance) &&
 						resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE
 					)||(compliance == true &&
 						resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE
 				)	){
-					ptime deadLine(su.getReservationDeadLine());
+					ptime deadLine(su.getReservationDeadLine(reservationRulesDelayType));
 					if (result.is_not_a_date_time() || deadLine < result)
 						result = deadLine;
 				}

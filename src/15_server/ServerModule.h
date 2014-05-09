@@ -142,6 +142,7 @@ namespace synthese
 			// in a service.
 			// @FIXME This should be used by all services appropriately.
 			static boost::shared_mutex baseWriterMutex;
+			static boost::shared_mutex InterSYNTHESEAgainstRequestsMutex;
 
 		private:
 
@@ -191,6 +192,8 @@ namespace synthese
 
 			static boost::posix_time::time_duration GetSessionMaxDuration();
 
+			static const std::string GetBranch();
+
 			/** Called whenever a parameter registered by this module is changed
 			 */
 			static void ParameterCallback(
@@ -219,9 +222,6 @@ namespace synthese
 				HTTPReply& httpReply,
 				const CookiesMap& cookiesMap
 			);
-
-			// Launch the permanent threads
-			static void _LaunchPermanentThreads();
 		};
 
 

@@ -22,9 +22,12 @@
 
 #include "VehicleService.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 #include "NumericField.hpp"
+#include "OperationUnitTableSync.hpp"
 #include "ScheduledService.h"
+#include "SchemaMacros.hpp"
 #include "StringField.hpp"
 #include "VehicleServiceTableSync.hpp"
 
@@ -36,13 +39,16 @@ namespace synthese
 {
 	using namespace impex;
 	using namespace pt;
+	using namespace pt_operation;
 	using namespace util;
 
-	namespace util
-	{
-		template<>
-		const std::string Registry<pt_operation::VehicleService>::KEY("VehicleService");
-	}
+	CLASS_DEFINITION(VehicleService, "t077_vehicle_services", 77)
+	FIELD_DEFINITION_OF_OBJECT(VehicleService, "vehicle_service_id", "vehicle_service_ids")
+
+	FIELD_DEFINITION_OF_TYPE(OpeningDuration, "opening_duration", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ClosingDuration, "closing_duration", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DataSourceLinksWithoutUnderscore, "datasource_links", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Services, "services", SQL_TEXT)
 
 	namespace pt_operation
 	{
@@ -51,27 +57,39 @@ namespace synthese
 		const string VehicleService::VALUE_COMMERCIAL = "commercial";
 		const string VehicleService::VALUE_DEAD_RUN = "deadRun";
 
-		VehicleService::VehicleService(RegistryKeyType id):
-			Registrable(id)
+		VehicleService::VehicleService(
+			RegistryKeyType id
+		):	Registrable(id),
+			Object<VehicleService, VehicleServiceSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(Services),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourceLinksWithoutUnderscore),
+					FIELD_DEFAULT_CONSTRUCTOR(Dates),
+					FIELD_DEFAULT_CONSTRUCTOR(OperationUnit),
+					FIELD_VALUE_CONSTRUCTOR(OpeningDuration, minutes(0)),
+					FIELD_VALUE_CONSTRUCTOR(ClosingDuration, minutes(0))
+			)	)
 		{}
 
 
 
 		SchedulesBasedService* VehicleService::getService(std::size_t rank) const
 		{
-			if(rank >= _services.size())
+			if(rank >= get<Services>().size())
 			{
 				return NULL;
 			}
-			return _services[rank];
+			return get<Services>().operator[](rank);
 		}
 
 
 
 		void VehicleService::insert(pt::SchedulesBasedService& value)
 		{
-			Services::iterator it(_services.begin());
-			for(; it != _services.end(); ++it)
+			Services::Type::iterator it(get<Services>().begin());
+			for(; it != get<Services>().end(); ++it)
 			{
 				if(*it == &value)
 				{
@@ -82,13 +100,13 @@ namespace synthese
 					break;
 				}
 			}
-			if(it == _services.end())
+			if(it == get<Services>().end())
 			{
-				_services.push_back(&value);
+				get<Services>().push_back(&value);
 			}
 			else
 			{
-				_services.insert(it, &value);
+				get<Services>().insert(it, &value);
 			}
 		}
 
@@ -96,7 +114,7 @@ namespace synthese
 
 		void VehicleService::clearServices()
 		{
-			_services.clear();
+			get<Services>().clear();
 		}
 
 
@@ -117,120 +135,71 @@ namespace synthese
 
 
 
-		void VehicleService::toParametersMap(
+		void VehicleService::addAdditionalParameters(
 			util::ParametersMap& map,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles /*= boost::logic::indeterminate*/,
 			std::string prefix /*= std::string() */
 		) const	{
-			map.insert(Key::FIELD.name, getKey());
-			map.insert(Name::FIELD.name, getName());
 
-			// Services
-			BOOST_FOREACH(const Services::value_type& service, _services)
+			// Services detail
+			BOOST_FOREACH(const Services::Type::value_type& service, get<Services>())
 			{
 				boost::shared_ptr<ParametersMap> serviceMap(new ParametersMap);
 
 				serviceMap->insert(ATTR_CLASS, dynamic_cast<ScheduledService*>(service) ? VALUE_COMMERCIAL : VALUE_DEAD_RUN);
 				service->toParametersMap(*serviceMap, false);
 
-				map.insert(TAG_SERVICE, serviceMap);
+				map.insert(prefix + TAG_SERVICE, serviceMap);
 			}
-		}
-
-
-
-		bool VehicleService::loadFromRecord( const Record& record, util::Env& env )
-		{
-			bool result(false);
-
-			// Name
-			if(record.isDefined(VehicleServiceTableSync::COL_NAME))
-			{
-				string value(record.get<string>(VehicleServiceTableSync::COL_NAME));
-				if(value != getName())
-				{
-					result = true;
-					setName(value);
-				}
-			}
-
-//			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				// Services
-				if(record.isDefined(VehicleServiceTableSync::COL_SERVICES))
-				{
-					VehicleService::Services value(
-						VehicleServiceTableSync::UnserializeServices(
-							record.get<string>(VehicleServiceTableSync::COL_SERVICES),
-							env
-					)	);
-					if(value != getServices())
-					{
-						result = true;
-						setServices(value);
-					}
-				}
-			}
-
-			// Dates
-			if(record.isDefined(VehicleServiceTableSync::COL_DATES))
-			{
-				Calendar value;
-				value.setFromSerializedString(
-					record.get<string>(VehicleServiceTableSync::COL_DATES)
-				);
-				if(value != *this)
-				{
-					result = true;
-					setFromSerializedString(record.get<string>(VehicleServiceTableSync::COL_DATES));
-				}
-			}
-
-			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
-			if(record.isDefined(VehicleServiceTableSync::COL_DATASOURCE_LINKS))
-			{
-				Importable::DataSourceLinks value(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						record.get<string>(VehicleServiceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				if(value != getDataSourceLinks())
-				{
-					result = true;
-					setDataSourceLinksWithRegistration(value);
-				}
-			}
-
-			return result;
 		}
 
 
 
 		void VehicleService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-
 		}
 
 
 
-		synthese::LinkedObjectsIds VehicleService::getLinkedObjectsIds( const Record& record ) const
+		void VehicleService::unlink()
 		{
-			LinkedObjectsIds result;
-			if(record.isDefined(VehicleServiceTableSync::COL_DATASOURCE_LINKS))
+		}
+
+
+
+		VehicleService::~VehicleService()
+		{
+			unlink();
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Return true if no date is defined
+		bool VehicleService::isActive( const boost::gregorian::date& date ) const
+		{
+			// Non defined calendar : check of the services
+			if(empty())
 			{
-				Env env;
-				Importable::DataSourceLinks value(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						record.get<string>(VehicleServiceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				BOOST_FOREACH(const Importable::DataSourceLinks::value_type& item, value)
+				// Empty vehicle services is active every day
+				if(get<Services>().empty())
 				{
-					result.push_back(item.first->getKey());
+					return true;
 				}
+
+				// Check if at least one service is active
+				BOOST_FOREACH(const Services::Type::value_type& service, get<Services>())
+				{
+					if(service->isActive(date))
+					{
+						return true;
+					}
+				}
+
+				return false;
 			}
-			return result;
+
+			// Check the calendar
+			return Calendar::isActive(date);
 		}
 
 
@@ -262,6 +231,9 @@ namespace synthese
 			{
 				return t1 < t2;
 			}
+
+			recursive_mutex::scoped_lock lock1(s1.getSchedulesMutex());
+			recursive_mutex::scoped_lock lock2(s2.getSchedulesMutex());
 
 			const time_duration& at1(s1.getLastArrivalSchedule(false));
 			const time_duration& at2(s2.getLastArrivalSchedule(false));

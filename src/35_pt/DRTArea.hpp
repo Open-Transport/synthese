@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	FIELD_POINTERS_SET(Stops, pt::StopArea)
+	FIELD_POINTERS_VECTOR(Stops, pt::StopArea)
 
 	typedef boost::fusion::map<
 		FIELD(Key),
@@ -47,15 +47,17 @@ namespace synthese
 		*/
 		class DRTArea:
 			public Object<DRTArea, DRTAreaSchema>,
-			virtual public util::Registrable,
-			public graph::Vertex
+			virtual public util::Registrable
 		{
 		public:
+			static const std::string TAG_STOP;
+
 			DRTArea(
 				const util::RegistryKeyType id = 0,
 				std::string name = std::string(),
 				Stops::Type stops = Stops::Type()
 			);
+			virtual ~DRTArea();
 
 			virtual graph::GraphIdType getGraphType() const;
 
@@ -64,6 +66,11 @@ namespace synthese
 			bool contains(const StopArea& stopArea) const;
 
 			virtual std::string getName() const { return get<Name>(); }
+
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
+
+			virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix /* = std::string */) const;
 		};
 }	}
 

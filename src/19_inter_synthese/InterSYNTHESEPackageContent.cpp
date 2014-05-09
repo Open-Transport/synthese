@@ -110,7 +110,19 @@ namespace synthese
 				}
 			}
 			istringstream ss(s.substr(i+1, jsonSize));
-			read_json(ss, _objects);
+
+			try
+			{
+				read_json(ss, _objects);
+			}
+			catch(boost::property_tree::json_parser::json_parser_error &e)
+			{
+				if(importer)
+				{
+					importer->_logError(string("Failed to parse json data: ") + e.message());
+				}
+			}
+
 
 			// Getting the content
 			for(i = i+2+jsonSize; i<s.size(); ++i)
@@ -160,13 +172,13 @@ namespace synthese
 
 			// The package
 			_package->set<Key>(
-				_objects.get<RegistryKeyType>(Key::FIELD.name)
+				_objects.get<RegistryKeyType>(Key::FIELD.name, 0)
 			);
 			_package->set<Name>(
-				_objects.get<string>(Name::FIELD.name)
+				_objects.get<string>(Name::FIELD.name, "unknown")
 			);
 			_package->set<Code>(
-				_objects.get<string>(Code::FIELD.name)
+				_objects.get<string>(Code::FIELD.name, "")
 			);
 			if(_objects.count(LockTime::FIELD.name))
 			{
@@ -177,7 +189,7 @@ namespace synthese
 				_package->set<LastJSON>(s);
 			}
 			_package->set<Public>(
-				_objects.get<bool>(Public::FIELD.name)
+				_objects.get<bool>(Public::FIELD.name, false)
 			);
 			if (!noSuppressTopLevel)
 			{
@@ -200,9 +212,9 @@ namespace synthese
 					importer->_logDebug("Save "+ lexical_cast<string>(object->getKey()) +" ("+ tableSync->getFormat().NAME +" / "+  object->getName() + ")"  );
 				}
 			}
-			_objectsToSave.push_back(_package.get());
-			if(importer)
+			if(_package->getKey() && importer)
 			{
+				_objectsToSave.push_back(_package.get());
 				importer->_logDebug("Save "+ lexical_cast<string>(_package->getKey()) + " (t111_inter_synthese_packages / "+  _package->getName() + ")");
 			}
 		}
@@ -328,6 +340,7 @@ namespace synthese
 							_env.addRegistrable(rObject);
 						}
 					}
+					_loadedObjects.push_back(rObject);
 					result.push_back(TableOrObject(rObject));
 			}	}
 
@@ -381,6 +394,14 @@ namespace synthese
 		}
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Return the list of objects loaded
+		//////////////////////////////////////////////////////////////////////////
+		InterSYNTHESEPackageContent::LoadedObjects &InterSYNTHESEPackageContent::getLoadedObjects()
+		{
+			return _loadedObjects;
+		}
+
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Saves the content of the package through a transaction.
@@ -390,8 +411,9 @@ namespace synthese
 		void InterSYNTHESEPackageContent::save(
 			DBTransaction& transaction
 		) const	{
+
 			// Deletions
-			BOOST_FOREACH(RegistryKeyType id, _objectsToRemove)
+			BOOST_FOREACH(RegistryKeyType id, _orderedObjectsToRemove)
 			{
 				DBModule::GetDB()->deleteStmt(id, transaction); // Not the Remove function because the cascaded updates are already done by the object comparisons
 			}

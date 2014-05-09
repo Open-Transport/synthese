@@ -256,7 +256,7 @@ int main( int argc, char **argv )
 			{
 				std::cout << "SYNTHESE " << ServerModule::VERSION << " " <<
 					ServerModule::REVISION <<
-					" (" << ServerModule::BUILD_DATE << ")" << std::endl;
+					" (" << ServerModule::GetBranch() << " - " << ServerModule::BUILD_DATE << ")" << std::endl;
 				return 1;
 			}
 
@@ -401,4 +401,5 @@ int main( int argc, char **argv )
 	{
 		Log::GetInstance ().fatal ("Unexpected exception.");
 	}
+	exit(1);
 }

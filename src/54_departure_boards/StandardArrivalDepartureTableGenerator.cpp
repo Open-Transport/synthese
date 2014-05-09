@@ -91,54 +91,59 @@ namespace synthese
 						continue;
 					}
 
-					// Loop on services
-					ptime departureDateTime = _startDateTime;
-					optional<Edge::DepartureServiceIndex::Value> index;
-					size_t insertedServices(0);
-					while(true)
+					BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls.getParentPath()->getServiceCollections())
 					{
-						// Tells to the journey pattern for a next service
-						ServicePointer servicePointer(
-							ls.getNextService(
-								ap,
-								departureDateTime,
-								_endDateTime,
-								false,
-								index,
-								false,
-								false,
-								_allowCanceled,
-								true,
-								true,
-								_endDateTimeConcernsTheorical
-						)	);
-
-						// If no next service was found, then abort the search in the current journey pattern
-						if(	!servicePointer.getService())
+						// Loop on services
+						ptime departureDateTime = _startDateTime;
+						optional<Edge::DepartureServiceIndex::Value> index;
+						size_t insertedServices(0);
+						while(true)
 						{
-							break;
+							// Tells to the journey pattern for a next service
+							ServicePointer servicePointer(
+								ls.getNextService(
+									*itCollection,
+									ap,
+									departureDateTime,
+									_endDateTime,
+									false,
+									index,
+									false,
+									false,
+									_allowCanceled,
+									true,
+									true,
+									UseRule::RESERVATION_INTERNAL_DELAY,
+									_endDateTimeConcernsTheorical
+							)	);
+
+							// If no next service was found, then abort the search in the current journey pattern
+							if(	!servicePointer.getService())
+							{
+								break;
+							}
+
+							// Saves local variables
+							++*index;
+							departureDateTime = servicePointer.getDepartureDateTime();
+
+							// Checks if the stop area is really served and if the served stop is allowed
+							if(	_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end()
+							){
+								continue;
+							}
+
+							// The departure is kept in the results
+							_insert(servicePointer);
+
+							// Checks if the maximal number of results is reached
+							++insertedServices;
+							if(	_maxSize && insertedServices >= *_maxSize)
+							{
+								break;
+							}
 						}
-
-						// Saves local variables
-						++*index;
-						departureDateTime = servicePointer.getDepartureDateTime();
-
-						// Checks if the stop area is really served and if the served stop is allowed
-						if(	_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end()
-						){
-							continue;
-						}
-
-						// The departure is kept in the results
-						_insert(servicePointer);
-
-						// Checks if the maximal number of results is reached
-						++insertedServices;
-						if(	_maxSize && insertedServices >= *_maxSize)
-						{
-							break;
-						}
-					}
+					}						
 				}
 			}
 			return _result;

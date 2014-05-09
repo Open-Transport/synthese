@@ -407,21 +407,24 @@ namespace synthese
 
 			if (_schemaUpdated == false) return;
 
-			recursive_mutex::scoped_lock lock(_tableSynchronizersMutex);
-			const DBModule::TablesByNameMap& tm(DBModule::GetTablesByName());
-
-			Log::GetInstance().trace(
-				"Dispatching event: table: " + modifEvent.table + " type: " +
-				lexical_cast<string>(modifEvent.type) + " id: " + lexical_cast<string>(modifEvent.id)
-			);
-
-			DBModule::TablesByNameMap::const_iterator it(tm.find(modifEvent.table));
-			if(it == tm.end())
+			DBTableSync* tableSync = NULL;
 			{
-				// This is not fatal, some backends can fire events on tables we're not interested in (SQLite fires events on index tables for instance).
-				return;
+				recursive_mutex::scoped_lock lock(_tableSynchronizersMutex);
+				const DBModule::TablesByNameMap& tm(DBModule::GetTablesByName());
+
+				Log::GetInstance().trace(
+					"Dispatching event: table: " + modifEvent.table + " type: " +
+					lexical_cast<string>(modifEvent.type) + " id: " + lexical_cast<string>(modifEvent.id)
+				);
+
+				DBModule::TablesByNameMap::const_iterator it(tm.find(modifEvent.table));
+				if(it == tm.end())
+				{
+					// This is not fatal, some backends can fire events on tables we're not interested in (SQLite fires events on index tables for instance).
+					return;
+				}
+				tableSync = it->second.get();
 			}
-			DBTableSync* tableSync = it->second.get();
 
 			if (modifEvent.type == MODIF_INSERT)
 			{

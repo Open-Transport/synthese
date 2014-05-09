@@ -86,23 +86,62 @@ namespace synthese
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Insertion of a service in the path.
+		/// @pre the service is not already present in the path (check with ::contains)
 		void Path::addService(
 			Service& service,
 			bool ensureLineTheory
 		){
 			boost::unique_lock<shared_recursive_mutex> lock(*sharedServicesMutex);
-			if (_services.find(&service) != _services.end())
-				throw Exception("The service already exists.");
 
-			std::pair<ServiceSet::iterator, bool> result = _services.insert(&service);
-			if (result.second == false)
+			// Try to insert the service in an existing service collection
+			boost::shared_ptr<ChronologicalServicesCollection> insertionCollection;
+			if(ensureLineTheory)
 			{
-				throw Exception(
-					"Service number " + service.getServiceNumber() +
-					" is already defined in path " + lexical_cast<string>(getKey())
-				);
+				BOOST_FOREACH(ServiceCollections::value_type collection, _serviceCollections)
+				{
+					if(collection->isCompatible(service))
+					{
+						insertionCollection = collection;
+						break;
+					}
+				}
 			}
-			markScheduleIndexesUpdateNeeded(false);
+			else
+			{
+				if(!_serviceCollections.empty())
+				{
+					insertionCollection = *_serviceCollections.begin();
+				}
+			}
+
+			// If no service collection can host the service, creation of a new collection
+			if(!insertionCollection)
+			{
+				insertionCollection.reset(new ChronologicalServicesCollection);
+				_serviceCollections.push_back(insertionCollection);
+			}
+
+			insertionCollection->getServices().insert(&service);
+
+			// Reset schedules index
+			markScheduleIndexesUpdateNeeded(*insertionCollection, false);
+		}
+
+
+
+		bool Path::contains( const Service& service ) const
+		{
+			boost::unique_lock<shared_recursive_mutex> lock(*sharedServicesMutex);
+			BOOST_FOREACH(ServiceCollections::value_type collection, _serviceCollections)
+			{
+				if(collection->getServices().find(const_cast<Service*>(&service)) != collection->getServices().end())
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 
@@ -110,30 +149,42 @@ namespace synthese
 		void Path::removeService(Service& service)
 		{
 			boost::unique_lock<shared_recursive_mutex> lock(*sharedServicesMutex);
-			_services.erase(&service);
+			for(ServiceCollections::iterator itCollection(_serviceCollections.begin()); itCollection != _serviceCollections.end(); ++itCollection)
+			{
+				ChronologicalServicesCollection& collection(**itCollection);
+				ServiceSet::iterator it(
+					collection.getServices().find(&service)
+				);
+				if(it != collection.getServices().end())
+				{
+					// Reset schedules index
+					markScheduleIndexesUpdateNeeded(collection, false);
 
-			markScheduleIndexesUpdateNeeded(false);
+					// Service removal
+					collection.getServices().erase(it);
+					if(collection.getServices().empty())
+					{
+						_serviceCollections.erase(itCollection);
+					}
+					break;
+				}
+			}
 		}
 
 
 
 		const Edge* Path::getEdge(size_t index) const
 		{
-			if(_edges.empty())
+			BOOST_FOREACH(const Edges::value_type& edge, _edges)
 			{
-				throw Exception("Edge not found");
-			}
-
-			size_t rank(index);
-			if(rank >= _edges.size())
-			{
-				rank = _edges.size() - 1;
-			}
-			for(;rank > 0 && _edges[rank]->getRankInPath() > index; --rank) ;
-
-			if(_edges[rank]->getRankInPath() == index)
-			{
-				return _edges[rank];
+				if(edge->getRankInPath() == index)
+				{
+					return edge;
+				}
+				if(edge->getRankInPath() > index)
+				{
+					break;
+				}
 			}
 
 			throw Exception("Edge not found");
@@ -168,7 +219,9 @@ namespace synthese
 						it->setFollowingArrivalForFineSteppingOnly(&edge);
 					}
 
-					if(edge.isConnectingEdge())
+					if(edge.getFromVertex() &&
+						edge.getFromVertex()->getHub() &&
+						edge.isConnectingEdge())
 					{
 						for(Edge* it(previousEdge);
 							it && it->getFollowingConnectionArrival() == nextConnectingArrival;
@@ -195,7 +248,7 @@ namespace synthese
 				{
 					edge.setFollowingArrivalForFineSteppingOnly(nextEdge->getFollowingArrivalForFineSteppingOnly());
 				}
-				if(nextEdge->isArrivalAllowed() && nextEdge->isConnectingEdge())
+				if(nextEdge->isArrivalAllowed() && nextEdge->getFromVertex() && nextEdge->getFromVertex()->getHub() && nextEdge->isConnectingEdge())
 				{
 					edge.setFollowingConnectionArrival(nextEdge);
 				}
@@ -222,7 +275,9 @@ namespace synthese
 						it->setPreviousDepartureForFineSteppingOnly(&edge);
 					}
 
-					if(edge.isConnectingEdge())
+					if(edge.getFromVertex() &&
+						edge.getFromVertex()->getHub() &&
+						edge.isConnectingEdge())
 					{
 						for(Edge* it(nextEdge);
 							it && it->getPreviousConnectionDeparture() == previousConnectingDeparture;
@@ -249,7 +304,7 @@ namespace synthese
 				{
 					edge.setPreviousDepartureForFineSteppingOnly(previousEdge->getPreviousDepartureForFineSteppingOnly());
 				}
-				if(previousEdge->isDepartureAllowed() && previousEdge->isConnectingEdge())
+				if(previousEdge->isDepartureAllowed() && previousEdge->getFromVertex() && previousEdge->getFromVertex()->getHub() && previousEdge->isConnectingEdge())
 				{
 					edge.setPreviousConnectionDeparture(previousEdge);
 				}
@@ -268,12 +323,7 @@ namespace synthese
 			// Empty path : just put the edge in the vector
 			if (_edges.empty())
 			{
-				Edge* previousEdge(NULL);
-				BOOST_FOREACH(Edge* subEdge, edge.getSubEdges())
-				{
-					_linkEdge(previousEdge, NULL, *subEdge);
-					previousEdge = subEdge;
-				}
+				_linkEdge(NULL, NULL, edge);
 				_edges.push_back(&edge);
 				_rankMap.insert(make_pair(edge.getMetricOffset(), edge.getRankInPath()));
 				return;
@@ -282,50 +332,25 @@ namespace synthese
 			// Non empty path : determinate the good position of the edge
 			Edges::iterator insertionPosition;
 			for(insertionPosition = _edges.begin();
-				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() < edge.getRankInPath();
+				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() <= edge.getRankInPath();
 				++insertionPosition) ;
-
-			// If an edge with the same rank exists, then throw an exception
-			if(insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() == edge.getRankInPath())
-			{
-				// If the edge is the same, do nothing
-				if((*insertionPosition) == &edge) return;
-
-				throw Exception(
-					"An edge with the rank "+ lexical_cast<string>(edge.getRankInPath()) + " already exists in the path " + lexical_cast<string>(getKey())
-				);
-			}
 
 			// Builds the links between edges
 			Edge* previousEdge(NULL);
 			if(insertionPosition != _edges.begin())
 			{
-				Edge::SubEdges subEdges(
+				previousEdge = 
 					insertionPosition != _edges.end() ?
-					(*(insertionPosition - 1))->getSubEdges() :
-					(*_edges.rbegin())->getSubEdges()
-				);
-				if(!subEdges.empty())
-				{
-					previousEdge = *subEdges.rbegin();
-				}
+					*(insertionPosition - 1) :
+					*_edges.rbegin()
+				;
 			}
 			Edge* nextEdge(NULL);
 			if(insertionPosition != _edges.end())
 			{
-				Edge::SubEdges subEdges(
-					(*insertionPosition)->getSubEdges()
-				);
-				if(!subEdges.empty())
-				{
-					nextEdge = *subEdges.begin();
-				}
+				nextEdge = *insertionPosition;
 			}
-			BOOST_FOREACH(Edge* subEdge, edge.getSubEdges())
-			{
-				_linkEdge(previousEdge, nextEdge, *subEdge);
-				previousEdge = subEdge;
-			}
+			_linkEdge(previousEdge, nextEdge, edge);
 
 			// Insertion of the new edges
 			_edges.insert(insertionPosition, &edge);
@@ -355,107 +380,14 @@ namespace synthese
 
 
 
-		void Path::markScheduleIndexesUpdateNeeded(bool RTDataOnly)
-		{
+		void Path::markScheduleIndexesUpdateNeeded(
+			const ChronologicalServicesCollection& collection,
+			bool RTDataOnly
+		) const	{
 			BOOST_FOREACH(const Edges::value_type& edge, _edges)
 			{
-				Edge::SubEdges subEdges(edge->getSubEdges());
-				BOOST_FOREACH(Edge::SubEdges::value_type& subEdge, subEdges)
-				{
-					subEdge->markServiceIndexUpdateNeeded(RTDataOnly);
-				}
+				edge->markServiceIndexUpdateNeeded(collection, RTDataOnly);
 			}
-		}
-
-
-
-		void Path::merge(Path& other )
-		{
-			if(	other._pathGroup != _pathGroup ||
-				other._edges.empty() ||
-				_edges.empty() ||
-				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex() ||
-				&other == this
-			){
-				throw Exception("The two roads cannot be merged");
-			}
-
-			Edge* lastEdge(*getLastEdge()->getSubEdges().rbegin());
-			Vertex* vertex(const_cast<Vertex*>(lastEdge->getFromVertex()));
-			double metricOffset(lastEdge->getMetricOffset());
-			size_t rankInPath(lastEdge->getRankInPath());
-
-			_edges.pop_back();
-			vertex->removeArrivalEdge(lastEdge);
-
-			lastEdge->getPrevious()->setNext(other._edges[0]);
-			other._edges[0]->setPrevious(lastEdge->getPrevious());
-
-			BOOST_FOREACH(Edge* edge, other._edges)
-			{
-				if(edge->getPreviousConnectionDeparture() == NULL)
-				{
-					edge->setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
-				}
-				if(edge->getPreviousDepartureForFineSteppingOnly() == NULL)
-				{
-					edge->setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
-				}
-			}
-
-			BOOST_FOREACH(Edge* edge, _edges)
-			{
-				if(edge->getFollowingConnectionArrival() == lastEdge)
-				{
-					edge->setFollowingConnectionArrival(other._edges[0]);
-				}
-				if(edge->getFollowingConnectionArrival() == NULL)
-				{
-					edge->setFollowingConnectionArrival(other._edges[0]->getFollowingConnectionArrival());
-				}
-				if(edge->getFollowingArrivalForFineSteppingOnly() == lastEdge)
-				{
-					edge->setFollowingArrivalForFineSteppingOnly(other._edges[0]);
-				}
-				if(edge->getFollowingArrivalForFineSteppingOnly() == NULL)
-				{
-					edge->setFollowingArrivalForFineSteppingOnly(other._edges[0]->getFollowingArrivalForFineSteppingOnly());
-				}
-			}
-
-			BOOST_FOREACH(Edge* edge, other._edges)
-			{
-				Vertex* vertex(const_cast<Vertex*>(edge->getFromVertex()));
-				if(edge->isArrivalAllowed())
-				{
-					vertex->removeArrivalEdge(edge);
-				}
-				if(edge->isDepartureAllowed())
-				{
-					vertex->removeDepartureEdge(edge);
-				}
-				edge->setRankInPath(edge->getRankInPath()+rankInPath);
-				edge->setMetricOffset(edge->getMetricOffset()+metricOffset);
-				_edges.push_back(edge);
-				edge->setParentPath(this);
-				if(edge->isArrivalAllowed())
-				{
-					vertex->addArrivalEdge(edge);
-				}
-				if(edge->isDepartureAllowed())
-				{
-					vertex->addDepartureEdge(edge);
-				}
-
-				// Update of the rank map
-				_rankMap[edge->getMetricOffset()] = edge->getRankInPath();
-			}
-
-			// Cleaning the other path
-			other._edges.clear();
-			other._rankMap.clear();
-
-			_pathGroup->removePath(&other);
 		}
 
 
@@ -567,78 +499,73 @@ namespace synthese
 				return;
 			}
 
-			if(!edge.getSubEdges().empty())
+			Edge* lastRealEdge(edge.getPrevious());
+			Edge* firstRealEdge(edge.getNext());
+
+			// Next arrival pointers
+			if(removalPosition != _edges.begin() && edge.isArrivalAllowed() && lastRealEdge)
 			{
-				const Edge& lastEdge(**edge.getSubEdges().rbegin());
-				const Edge& firstEdge(**edge.getSubEdges().begin());
-				Edge* lastRealEdge(firstEdge.getPrevious());
-				Edge* firstRealEdge(lastEdge.getNext());
+				Edge* nextArrival(edge.getFollowingArrivalForFineSteppingOnly());
+				Edge* nextConnectingArrival(edge.getFollowingConnectionArrival());
 
-				// Next arrival pointers
-				if(removalPosition != _edges.begin() && edge.isArrivalAllowed() && lastRealEdge)
 				{
-					Edge* nextArrival(lastEdge.getFollowingArrivalForFineSteppingOnly());
-					Edge* nextConnectingArrival(lastEdge.getFollowingConnectionArrival());
+					Edge* oldNextArrival(lastRealEdge->getFollowingArrivalForFineSteppingOnly());
 
-					{
-						Edge* oldNextArrival(lastRealEdge->getFollowingArrivalForFineSteppingOnly());
+					for(Edge* it(lastRealEdge);
+						it && it->getFollowingArrivalForFineSteppingOnly() == oldNextArrival;
+						it = it->getPrevious()
+					){
+						it->setFollowingArrivalForFineSteppingOnly(nextArrival);
+				}	}
 
-						for(Edge* it(lastRealEdge);
-							it && it->getFollowingArrivalForFineSteppingOnly() == oldNextArrival;
-							it = it->getPrevious()
-						){
-							it->setFollowingArrivalForFineSteppingOnly(nextArrival);
-					}	}
-
-					{
-						Edge* oldNextConnectionArrival(lastRealEdge->getFollowingConnectionArrival());
-
-						for(Edge* it(lastRealEdge);
-							it && it->getFollowingConnectionArrival() == oldNextConnectionArrival;
-							it = it->getPrevious()
-						){
-							it->setFollowingConnectionArrival(nextConnectingArrival);
-					}	}
-				}
-
-				// Next in path of the previous
-				if(lastRealEdge)
 				{
-					lastRealEdge->setNext(firstRealEdge);
-				}
+					Edge* oldNextConnectionArrival(lastRealEdge->getFollowingConnectionArrival());
 
-				// Previous departure pointers
-				if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed() && firstRealEdge)
+					for(Edge* it(lastRealEdge);
+						it && it->getFollowingConnectionArrival() == oldNextConnectionArrival;
+						it = it->getPrevious()
+					){
+						it->setFollowingConnectionArrival(nextConnectingArrival);
+				}	}
+			}
+
+			// Next in path of the previous
+			if(lastRealEdge)
+			{
+				lastRealEdge->setNext(firstRealEdge);
+			}
+
+			// Previous departure pointers
+			if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed() && firstRealEdge)
+			{
+				Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
+				Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
+
 				{
-					Edge* previousDeparture(firstEdge.getPreviousDepartureForFineSteppingOnly());
-					Edge* previousConnectingDeparture(firstEdge.getPreviousConnectionDeparture());
+					Edge* oldPreviousDeparture(firstRealEdge->getPreviousDepartureForFineSteppingOnly());
 
-					{
-						Edge* oldPreviousDeparture(firstRealEdge->getPreviousDepartureForFineSteppingOnly());
+					for(Edge* it(firstRealEdge);
+						it && it->getPreviousDepartureForFineSteppingOnly() == oldPreviousDeparture;
+						it = it->getNext()
+					){
+						it->setPreviousDepartureForFineSteppingOnly(previousDeparture);
+				}	}
 
-						for(Edge* it(firstRealEdge);
-							it && it->getPreviousDepartureForFineSteppingOnly() == oldPreviousDeparture;
-							it = it->getNext()
-						){
-							it->setPreviousDepartureForFineSteppingOnly(previousDeparture);
-					}	}
-
-					{
-						Edge* oldPreviousConnectionDeparture(firstRealEdge->getPreviousConnectionDeparture());
-
-						for(Edge* it(firstRealEdge);
-							it && it->getPreviousConnectionDeparture() == oldPreviousConnectionDeparture;
-							it = it->getNext()
-						){
-							it->setPreviousConnectionDeparture(previousConnectingDeparture);
-					}	}
-				}
-
-				// Previous in path of the next
-				if(firstRealEdge)
 				{
-					firstRealEdge->setPrevious(lastRealEdge);
-				}
+					Edge* oldPreviousConnectionDeparture(firstRealEdge->getPreviousConnectionDeparture());
+
+					for(Edge* it(firstRealEdge);
+						it && it->getPreviousConnectionDeparture() == oldPreviousConnectionDeparture;
+						it = it->getNext()
+					){
+						it->setPreviousConnectionDeparture(previousConnectingDeparture);
+				}	}
+			}
+
+			// Previous in path of the next
+			if(firstRealEdge)
+			{
+				firstRealEdge->setPrevious(lastRealEdge);
 			}
 
 			// Update of the rank map
@@ -664,60 +591,6 @@ namespace synthese
 					break;
 				}
 			}
-		}
-
-
-
-		bool cmpService::operator ()(const Service *s1, const Service *s2) const
-		{
-			// Same objects
-			if(s1 == s2)
-			{
-				return false;
-			}
-
-			// NULL after all
-			if(!s1)
-			{
-				assert(false); // This should not happen
-				return false;
-			}
-
-			// All before NULL
-			if(!s2)
-			{
-				assert(false); // This should not happen
-				return true;
-			}
-
-			// Services are not null : now comparison on schedule
-			const time_duration departureSchedule1(
-				s1->getDepartureSchedule(false, 0)
-			);
-			const time_duration departureSchedule2(
-				s2->getDepartureSchedule(false, 0)
-			);
-
-			// Identical schedule objects : comparison on address
-			if(departureSchedule1 == departureSchedule2)
-			{
-				return s1 < s2;
-			}
-
-			// Undefined departure schedule after all
-			if(	departureSchedule1.is_not_a_date_time()
-			){
-				return false;
-			}
-
-			// All before undefined departure schedule
-			if(	departureSchedule2.is_not_a_date_time()
-			){
-				return true;
-			}
-
-			// Comparison on valid departure schedules
-			return departureSchedule1 < departureSchedule2;
 		}
 
 
@@ -799,21 +672,6 @@ namespace synthese
 
 
 
-		Path::Edges Path::getAllEdges() const
-		{
-			Edges result;
-			BOOST_FOREACH(const Edges::value_type& edge, _edges)
-			{
-				BOOST_FOREACH(Edge* subEdge, edge->getSubEdges())
-				{
-					result.push_back(subEdge);
-				}
-			}
-			return result;
-		}
-
-
-
 		std::size_t Path::getEdgeRankAtOffset( MetricOffset offset ) const
 		{
 			RankMap::const_iterator it(_rankMap.find(offset));
@@ -839,6 +697,50 @@ namespace synthese
 				return *it2->second;
 			}
 			throw VertexNotFoundException();
+		}
+
+
+
+		void Path::markAllScheduleIndexesUpdateNeeded( bool RTDataOnly ) const
+		{
+			BOOST_FOREACH(const ServiceCollections::value_type& itCollection, _serviceCollections)
+			{
+				markScheduleIndexesUpdateNeeded(*itCollection, RTDataOnly);
+			}
+		}
+
+
+
+		synthese::graph::ServiceSet Path::getAllServices() const
+		{
+			ServiceSet result;
+			BOOST_FOREACH(const ServiceCollections::value_type& itCollection, _serviceCollections)
+			{
+				result.insert(itCollection->getServices().begin(), itCollection->getServices().end());
+			}
+			return result;
+		}
+
+
+
+		const Vertex* Path::getDestination() const
+		{
+			if(_edges.empty())
+			{
+				return NULL;
+			}
+			return (*_edges.rbegin())->getFromVertex();
+		}
+
+
+
+		const Vertex* Path::getOrigin() const
+		{
+			if (_edges.empty())
+			{
+				return NULL;
+			}
+			return (*_edges.begin())->getFromVertex();
 		}
 
 

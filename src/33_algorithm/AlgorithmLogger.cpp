@@ -24,9 +24,10 @@
 
 #include "CommercialLine.h" // TODO remove it
 #include "JourneyPattern.hpp" // TODO remove it
-#include "LineStop.h" // TODO remove it
+#include "LinePhysicalStop.hpp" // TODO remove it
 #include "ResultHTMLTable.h"
 #include "Road.h" // TODO remove it
+#include "RoadPath.hpp"
 #include "RoadModule.h" // TODO remove it
 #include "RoadPlace.h" // TODO remove it
 #include "RoutePlanningIntermediateJourney.hpp"
@@ -161,21 +162,21 @@ namespace synthese
 				*_integralSearchFile << "</td>";
 
 				// JourneyPattern
-				const LineStop* ls(
-					dynamic_cast<const LineStop*>(
+				const LinePhysicalStop* ls(
+					dynamic_cast<const LinePhysicalStop*>(
 						_integralSearchPlanningPhase == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()
 				)	);
-				const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+				const RoadPath* road(dynamic_cast<const RoadPath*>(its->getService()->getPath()));
 				*_integralSearchFile << "<td";
 				if (ls)
 				{
-					*_integralSearchFile << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
+					*_integralSearchFile << " class=\"" + static_cast<JourneyPattern*>(ls->getParentPath())->getCommercialLine()->getStyle() << "\"";
 				}
 				*_integralSearchFile << ">";
 				*_integralSearchFile << (
 						ls ?
-						ls->getLine()->getCommercialLine()->getShortName() :
-						road->getRoadPlace()->getName()
+						static_cast<JourneyPattern*>(ls->getParentPath())->getCommercialLine()->getShortName() :
+						road->getRoad()->get<RoadPlace>()->getName()
 					) <<
 					"</td>"
 				;
@@ -209,19 +210,19 @@ namespace synthese
 						*_integralSearchFile << "<td>" << its->getDepartureDateTime() << "</td>";
 
 						// JourneyPattern
-						const LineStop* ls(
-							dynamic_cast<const LineStop*>(
+						const LinePhysicalStop* ls(
+							dynamic_cast<const LinePhysicalStop*>(
 								_integralSearchPlanningPhase == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()
 						)	);
-						const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+						const RoadPath* road(dynamic_cast<const RoadPath*>(its->getService()->getPath()));
 						*_integralSearchFile << "<td";
 						if (ls)
-							*_integralSearchFile << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
+							*_integralSearchFile << " class=\"" << static_cast<JourneyPattern*>(ls->getParentPath())->getCommercialLine()->getStyle() << "\"";
 						*_integralSearchFile << ">";
 						*_integralSearchFile <<
 							(	ls ?
-								ls->getLine()->getCommercialLine()->getShortName() :
-								road->getRoadPlace()->getName()
+								static_cast<JourneyPattern*>(ls->getParentPath())->getCommercialLine()->getShortName() :
+								road->getRoad()->get<RoadPlace>()->getName()
 							) <<
 							"</td>"
 						;
@@ -432,7 +433,7 @@ namespace synthese
 
 							// JourneyPattern
 							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-							const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+							const RoadPath* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
 							stream << "<td";
 							if (ls)
 								stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
@@ -466,7 +467,7 @@ namespace synthese
 
 									// JourneyPattern
 									const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-									const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+									const RoadPath* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
 									stream << "<td";
 									if (ls)
 										stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";

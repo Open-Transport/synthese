@@ -25,7 +25,9 @@
 #include "PTRoadsAdmin.h"
 
 #include "AdminParametersException.h"
-#include "MainRoadChunk.hpp"
+#include "Road.h"
+#include "RoadChunkEdge.hpp"
+#include "RoadPath.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PTModule.h"
@@ -33,7 +35,6 @@
 #include "User.h"
 #include "RoadPlace.h"
 #include "ResultHTMLTable.h"
-#include "MainRoadPart.hpp"
 #include "PTRoadAdmin.h"
 #include "AdminFunctionRequest.hpp"
 #include "PTCitiesAdmin.h"
@@ -127,70 +128,63 @@ namespace synthese
 			c.push_back(string());
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 			stream << t.open();
-			BOOST_FOREACH(Path* road, _roadPlace->getPaths())
+			BOOST_FOREACH(Road* road, _roadPlace->getRoads())
 			{
-				// Avoid auto generated objects
-				MainRoadPart* mainRoad(dynamic_cast<MainRoadPart*>(road));
-				if(!mainRoad)
-				{
-					continue;
-				}
-
 				// New row
 				stream << t.row();
 
 				// Open button
 				stream << t.col();
 				openRoadRequest.getPage()->setRoad(
-					Env::GetOfficialEnv().getSPtr(mainRoad)
+					Env::GetOfficialEnv().getSPtr(road)
 				);
 				stream << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTRoadAdmin::ICON);
 
 				// Left first number
 				stream << t.col();
-				if( !mainRoad->getEdges().empty() &&
-					static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()
+				if( !road->getForwardPath().getEdges().empty() &&
+					static_cast<const RoadChunkEdge*>(road->getForwardPath().getEdge(0))->getRoadChunk()->getLeftHouseNumberBounds()
 				){
 					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()->first
+						static_cast<const RoadChunkEdge*>(road->getForwardPath().getEdge(0))->getRoadChunk()->getLeftHouseNumberBounds()->first
 					;
 				}
 
 				// Left last number
 				stream << t.col();
-				if( mainRoad->getEdges().size() > 1 &&
-					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()
+				if( road->getForwardPath().getEdges().size() > 1 &&
+					static_cast<const RoadChunkEdge*>(road->getForwardPath().getLastEdge()->getPrevious())->getRoadChunk()->getLeftHouseNumberBounds()
 				){
 					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()->second
+						static_cast<const RoadChunkEdge*>(road->getForwardPath().getLastEdge()->getPrevious())->getRoadChunk()->getLeftHouseNumberBounds()->second
 					;
 				}
 
 				// Right first number
 				stream << t.col();
-				if( !mainRoad->getEdges().empty() &&
-					static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()
+				if( !road->getForwardPath().getEdges().empty() &&
+					static_cast<const RoadChunkEdge*>(road->getForwardPath().getEdge(0))->getRoadChunk()->getRightHouseNumberBounds()
 				){
 					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()->first
+						static_cast<const RoadChunkEdge*>(road->getForwardPath().getEdge(0))->getRoadChunk()->getRightHouseNumberBounds()->first
 					;
 				}
 
 				// Left last number
 				stream << t.col();
-				if( mainRoad->getEdges().size() > 1 &&
-					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()
+				if( road->getForwardPath().getEdges().size() > 1 &&
+					static_cast<const RoadChunkEdge*>(road->getForwardPath().getLastEdge()->getPrevious())->getRoadChunk()->getRightHouseNumberBounds()
 				){
 					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()->second
+						static_cast<const RoadChunkEdge*>(road->getForwardPath().getLastEdge()->getPrevious())->getRoadChunk()->getRightHouseNumberBounds()->second
 					;
 				}
 
 				// Length
 				stream << t.col();
-				if( !mainRoad->getEdges().empty())
+				if( !road->getForwardPath().getEdges().empty())
 				{
-					stream << mainRoad->getLastEdge()->getMetricOffset() - mainRoad->getEdge(0)->getMetricOffset();
+					stream << road->getForwardPath().getLastEdge()->getMetricOffset() - road->getForwardPath().getEdge(0)->getMetricOffset();
 				}
 
 				// Delete
@@ -212,15 +206,10 @@ namespace synthese
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
-				BOOST_FOREACH(Path* road, _roadPlace->getPaths())
+				BOOST_FOREACH(Road* road, _roadPlace->getRoads())
 				{
-					if(!dynamic_cast<MainRoadPart*>(road))
-					{
-						continue;
-					}
-
 					boost::shared_ptr<PTRoadAdmin> p(getNewPage<PTRoadAdmin>());
-					p->setRoad(Env::GetOfficialEnv().getSPtr(static_cast<MainRoadPart*>(road)));
+					p->setRoad(Env::GetOfficialEnv().getSPtr(road));
 					links.push_back(p);
 				}
 			}

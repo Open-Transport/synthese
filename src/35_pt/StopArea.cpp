@@ -39,7 +39,7 @@
 #include "PTModule.h"
 #include "PTUseRuleTableSync.h"
 #include "Registry.h"
-#include "ReverseRoadChunk.hpp"
+#include "RoadChunkEdge.hpp"
 #include "RoadModule.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPoint.hpp"
@@ -181,11 +181,11 @@ namespace synthese
 							);
 							if (itl == scores.end())
 							{
-								scores.insert(make_pair(route->getCommercialLine(), route->getServices().size()));
+								scores.insert(make_pair(route->getCommercialLine(), route->getAllServices().size()));
 							}
 							else
 							{
-								itl->second += route->getServices().size();
+								itl->second += route->getAllServices().size();
 							}
 						}
 					}
@@ -271,7 +271,7 @@ namespace synthese
 			 * If StopArea isn't in a DRTArea, then attempt to use crossings arround stop.
 			 * Else AVOID IT : if user want to start from a stopArea (to make a reservation) we musn't change the starting stopArea without notification !!
 			 */
-			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end() && !isInDRT())
+			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end()) // && !isInDRT()) !!!!!
 			{
 				BOOST_FOREACH(
 					const PhysicalStops::value_type& it,
@@ -288,14 +288,17 @@ namespace synthese
 					/*
 					 * If next edge exist try add next crossing to vam (see issue #23315)
 					 */
-					if(it.second->getProjectedPoint().getRoadChunk()->getNext())
+					if(it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getNext())
 					{
 						result.insert(
-                            				it.second->getProjectedPoint().getRoadChunk()->getNext()->getFromVertex(),
-                            				VertexAccess(
-                                				minutes(static_cast<long>(ceil(((it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50.0)))),
-                                				it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
-							)	);
+							it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getNext()->getFromVertex(),
+                            VertexAccess(
+                            	minutes(
+									static_cast<long>(
+										ceil(((it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50.0))
+								)	),
+                            	it.second->getProjectedPoint().getRoadChunk()->getForwardEdge().getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
+						)	);
 					}
 				}
 			}
@@ -640,15 +643,14 @@ namespace synthese
 			return result;
 		}
 
+
+
 		bool StopArea::isInDRT() const
 		{
-			BOOST_FOREACH(const DRTArea::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<DRTArea>())
-			{
-				if(item.second->contains(*this))
-					return true;
-			}
-			return false;
+			return !_drtAreas.empty();
 		}
+
+
 
 		Hub::Vertices StopArea::getVertices(
 			GraphIdType graphId
@@ -1022,5 +1024,19 @@ namespace synthese
 		{
 			_transferDelays = value;
 			_minTransferDelay = posix_time::time_duration(not_a_date_time);
+		}
+
+
+
+		void StopArea::addDRTArea( const DRTArea& area )
+		{
+			_drtAreas.insert(const_cast<DRTArea*>(&area));
+		}
+
+
+
+		void StopArea::removeDRTArea( const DRTArea& area )
+		{
+			_drtAreas.erase(const_cast<DRTArea*>(&area));
 		}
 }	}

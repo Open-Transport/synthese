@@ -83,6 +83,8 @@ StripTagsFunction.cpp
 StripTagsFunction.hpp
 StrReplaceFunction.cpp
 StrReplaceFunction.hpp
+StrStrFunction.cpp
+StrStrFunction.hpp
 SubstractFunction.cpp
 SubstractFunction.hpp
 SubStrFunction.cpp
@@ -165,8 +167,6 @@ target_link_libraries(
   12_security
   15_server
   20_tree
-  # Forward dependencies:
-  #56_pt_website
 )
 
 install(TARGETS 11_cms DESTINATION lib)

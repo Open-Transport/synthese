@@ -78,6 +78,9 @@ namespace synthese
 			static const std::string PARAMETER_OMIT_SAME_AREA_DESTINATIONS;
 			static const std::string PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER; 
+			static const std::string PARAMETER_DATA_SOURCE_FILTER;
+			static const std::string PARAMETER_DAYS_CHECK_IF_STOP_SERVED;
+			static const std::string PARAMETER_OUTPUT_ONLY_ARRIVAL_STOPS;
 
 		protected:
 			static const std::string TAG_PHYSICAL_STOP;
@@ -107,6 +110,9 @@ namespace synthese
 				bool _sortByLineName;
 				bool _omitSameAreaDestinations;
 				boost::optional<std::size_t> _maxSolutionsNumber;
+				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
+				boost::gregorian::date_duration _daysCheckIfStopServed;
+				bool _outputOnlyArrivalStops;
 			//@}
 
 

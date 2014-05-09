@@ -112,7 +112,7 @@ namespace synthese
 							"s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +
 						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
 				if(step == VEHICLE_STEP)
-					return "(SELECT v."+ VehicleTableSync::COL_NAME +" FROM "+ VehicleTableSync::TABLE.NAME +" AS v "+
+					return "(SELECT v."+ Name::FIELD.name +" FROM "+ VehicleTableSync::TABLE.NAME +" AS v "+
 						"WHERE v."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_VEHICLE_ID +")";
 			}
 			else

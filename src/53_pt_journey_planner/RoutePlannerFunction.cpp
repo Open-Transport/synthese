@@ -41,6 +41,7 @@
 #include "UserFavoriteJourney.h"
 #include "UserFavoriteJourneyTableSync.h"
 #include "Road.h"
+#include "RoadPath.hpp"
 #include "RoadPlace.h"
 #include "Hub.h"
 #include "Service.h"
@@ -180,6 +181,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_external_junction_page");
 		const string RoutePlannerFunction::PARAMETER_RESULT_ROW_PAGE("result_row_page");
 		const string RoutePlannerFunction::PARAMETER_IGNORE_RESERVATION_RULES("irr");
+		const string RoutePlannerFunction::PARAMETER_RESERVATION_DELAY_TYPE("delay_type");
 
 		//XML output only:
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
@@ -204,10 +206,14 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_ORIGIN_CITY_TEXT("origin_city_text");
 		const string RoutePlannerFunction::DATA_HANDICAPPED_FILTER("handicapped_filter");
 		const string RoutePlannerFunction::DATA_ORIGIN_PLACE_TEXT("origin_place_text");
+		const string RoutePlannerFunction::DATA_ORIGIN_PLACE_LONGITUDE("origin_place_longitude");
+		const string RoutePlannerFunction::DATA_ORIGIN_PLACE_LATITUDE("origin_place_latitude");
 		const string RoutePlannerFunction::DATA_BIKE_FILTER("bike_filter");
 		const string RoutePlannerFunction::DATA_DESTINATION_CITY_TEXT("destination_city_text");
 		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_ID("destination_place_id");
 		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_TEXT("destination_place_text");
+		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_LONGITUDE("destination_place_longitude");
+		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_LATITUDE("destination_place_latitude");
 		const string RoutePlannerFunction::DATA_PERIOD_ID("period_id");
 		const string RoutePlannerFunction::DATA_DATE("date");
 		const string RoutePlannerFunction::DATA_PERIOD("period");
@@ -249,11 +255,14 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_DEPARTURE_DATE("departure_date");
 		const string RoutePlannerFunction::DATA_DEPARTURE_TIME_INTERNAL_FORMAT("internal_departure_time");
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME("continuous_service_last_departure_time");
+		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_DATE("continuous_service_last_departure_date");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LONGITUDE("departure_longitude");
 		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LATITUDE("departure_latitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_TIME("arrival_time");
+		const string RoutePlannerFunction::DATA_ARRIVAL_DATE("arrival_date");
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME("continuous_service_last_arrival_time");
+		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_DATE("continuous_service_last_arrival_date");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LONGITUDE("arrival_longitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LATITUDE("arrival_latitude");
@@ -795,6 +804,16 @@ namespace synthese
 			// Ignore Reservation Rules
 			_ignoreReservationRules = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
 
+			// Reservation Rules Delay type
+			if(map.getDefault<int>(PARAMETER_RESERVATION_DELAY_TYPE, 0))
+			{
+				_reservationRulesDelayType = UseRule::RESERVATION_EXTERNAL_DELAY;
+			}
+			else
+			{
+				_reservationRulesDelayType = UseRule::RESERVATION_INTERNAL_DELAY;
+			}
+
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
 				return;
@@ -1254,7 +1273,8 @@ namespace synthese
 				_maxTransferDuration,
 				_minMaxDurationRatioFilter,
 				PTModule::isTheoreticalAllowed(),
-				PTModule::isRealTimeAllowed()
+				PTModule::isRealTimeAllowed(),
+				_reservationRulesDelayType
 			);
 
 			// Computing
@@ -1467,7 +1487,7 @@ namespace synthese
 					stream << " " << DATA_DISTANCE << "=\"" << totalDistance << "\"";
 					stream << ">";
 
-					if(journey.getReservationCompliance(false) != false)
+					if(journey.getReservationCompliance(false, _reservationRulesDelayType) != false)
 					{
 						set<const ReservationContact*> resaRules;
 						BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
@@ -1476,7 +1496,7 @@ namespace synthese
 							if(line == NULL) continue;
 
 							if(	line->getCommercialLine()->getReservationContact() &&
-								UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false))
+								UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false, _reservationRulesDelayType))
 							){
 								resaRules.insert(line->getCommercialLine()->getReservationContact());
 							}
@@ -1496,7 +1516,7 @@ namespace synthese
 
 						stream << "<reservation" <<
 							" online=\"" << (onlineBooking ? "true" : "false") << "\"" <<
-							" type=\"" << (journey.getReservationCompliance(false) == true ? "compulsory" : "optional") << "\""
+							" type=\"" << (journey.getReservationCompliance(false, _reservationRulesDelayType) == true ? "compulsory" : "optional") << "\""
 						;
 						if(!sOpeningHours.str().empty())
 						{
@@ -1506,7 +1526,7 @@ namespace synthese
 						{
 							stream << " phoneNumber=\"" << sPhones.str() << "\"";
 						}
-						stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine()) << "\" />";
+						stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine(_reservationRulesDelayType)) << "\" />";
 					}
 					stream << "<chunks>";
 
@@ -1618,7 +1638,7 @@ namespace synthese
 									{
 										if(itl != jl.begin())
 										{
-											const Road* road(dynamic_cast<const Road*> (jl.begin()->getService()->getPath ()));
+											const RoadPath* road(dynamic_cast<const RoadPath*> (jl.begin()->getService()->getPath()));
 											const ptime& departureTime(jl.begin()->getDepartureDateTime());
 											const ptime& arrivalTime((itl-1)->getArrivalDateTime());
 											stream <<
@@ -1661,7 +1681,7 @@ namespace synthese
 													_xmlDisplayAddress(
 														stream,
 														*dynamic_cast<const Crossing*>(jl.begin()->getDepartureEdge()->getFromVertex()),
-														*road->getRoadPlace(),
+														*road->getRoad()->get<RoadPlace>(),
 														_showCoords
 													);
 												}
@@ -1678,7 +1698,7 @@ namespace synthese
 												_xmlDisplayAddress(
 													stream,
 													*dynamic_cast<const Crossing*>((itl-1)->getArrivalEdge()->getFromVertex()),
-													*road->getRoadPlace(),
+													*road->getRoad()->get<RoadPlace>(),
 													_showCoords
 												);
 											}
@@ -1730,7 +1750,7 @@ namespace synthese
 								">";
 							_xmlDisplayPhysicalStop(stream, DATA_START_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
 							_xmlDisplayPhysicalStop(stream, DATA_END_STOP_NAME, dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
-							_xmlDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*(*line->getAllEdges().rbegin())->getFromVertex()),_showCoords);
+							_xmlDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*(*line->getEdges().rbegin())->getFromVertex()),_showCoords);
 							if(!line->isPedestrianMode())
 							{
 								stream <<
@@ -1817,7 +1837,7 @@ namespace synthese
 							stream << "</junction>";
 						}
 
-						const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
+						const RoadPath* road(dynamic_cast<const RoadPath*> (leg.getService()->getPath ()));
 						if(road != NULL)
 						{
 							if(_outputRoadApproachDetail)
@@ -1825,8 +1845,8 @@ namespace synthese
 								stream <<
 									"<street" <<
 									" length=\"" << ceil(leg.getDistance()) << "\"" <<
-									" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
-									" name=\"" << road->getRoadPlace()->getName() << "\"" <<
+									" city=\"" << road->getRoad()->get<RoadPlace>()->getCity()->getName() << "\"" <<
+									" name=\"" << road->getRoad()->get<RoadPlace>()->getName() << "\"" <<
 									" departureTime=\"" << posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"" <<
 									" arrivalTime=\"" << posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
@@ -1861,7 +1881,7 @@ namespace synthese
 										_xmlDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(leg.getDepartureEdge()->getFromVertex()),
-											*road->getRoadPlace(),
+											*road->getRoad()->get<RoadPlace>(),
 											_showCoords
 											);
 									}
@@ -1888,7 +1908,7 @@ namespace synthese
 										_xmlDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getFromVertex()),
-											*road->getRoadPlace(),
+											*road->getRoad()->get<RoadPlace>(),
 											_showCoords
 										);
 									}
@@ -1924,7 +1944,7 @@ namespace synthese
 
 					if(!_outputRoadApproachDetail && lastApproachBeginning != jl.end() && lastTransportEnding != jl.end())
 					{
-						const Road* road(dynamic_cast<const Road*> ((jl.end()-1)->getService()->getPath ()));
+						const RoadPath* road(dynamic_cast<const RoadPath*> ((jl.end()-1)->getService()->getPath ()));
 						const ptime& departureTime(lastApproachBeginning->getDepartureDateTime());
 						const ptime& arrivalTime((jl.end()-1)->getArrivalDateTime());
 						stream <<
@@ -1955,7 +1975,7 @@ namespace synthese
 							_xmlDisplayAddress(
 								stream,
 								*dynamic_cast<const Crossing*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()),
-								*road->getRoadPlace(),
+								*road->getRoad()->get<RoadPlace>(),
 								_showCoords
 							);
 						}
@@ -1982,7 +2002,7 @@ namespace synthese
 								_xmlDisplayAddress(
 									stream,
 									*dynamic_cast<const Crossing*>((jl.end()-1)->getArrivalEdge()->getFromVertex()),
-									*road->getRoadPlace(),
+									*road->getRoad()->get<RoadPlace>(),
 									_showCoords
 								);
 							}
@@ -2315,14 +2335,27 @@ namespace synthese
 				destinationPlaceName = dynamic_cast<const NamedPlace*>(destinationPlace)->getName();
 			}
 
+			boost::shared_ptr<Point> originPoint(_coordinatesSystem->convertPoint(*(originPlace->getPoint())));
+			boost::shared_ptr<Point> destinationPoint(_coordinatesSystem->convertPoint(*(destinationPlace->getPoint())));
+
 			pm.insert(DATA_INTERNAL_DATE, to_iso_extended_string(date));
 			pm.insert(DATA_ORIGIN_CITY_TEXT, originCity->getName());
 			pm.insert(DATA_HANDICAPPED_FILTER, accessParameters.getUserClass() == USER_HANDICAPPED);
 			pm.insert(DATA_ORIGIN_PLACE_TEXT, originPlaceName);
+			if(originPoint)
+			{
+				pm.insert(DATA_ORIGIN_PLACE_LONGITUDE, originPoint->getX());
+				pm.insert(DATA_ORIGIN_PLACE_LATITUDE, originPoint->getY());
+			}
 			pm.insert(DATA_BIKE_FILTER, accessParameters.getUserClass() == USER_BIKE);
 			pm.insert(DATA_DESTINATION_CITY_TEXT, destinationCity->getName());
 			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
+			if(destinationPoint)
+			{
+				pm.insert(DATA_DESTINATION_PLACE_LONGITUDE, destinationPoint->getX());
+				pm.insert(DATA_DESTINATION_PLACE_LATITUDE, destinationPoint->getY());
+			}
 			pm.insert(DATA_FILTERED_JOURNEYS, object.getFiltered());
 
 			// Text formatted date
@@ -2669,7 +2702,7 @@ namespace synthese
 				}
 
 				// Register the reservation availability
-				hasReservation |= bool(journey.getReservationCompliance(false) != false);
+				hasReservation |= bool(journey.getReservationCompliance(false, _reservationRulesDelayType) != false);
 			}
 			pm.insert(DATA_RESERVATIONS, reservations.str());
 			pm.insert(DATA_HAS_RESERVATION, hasReservation);
@@ -2955,7 +2988,7 @@ namespace synthese
 			pm.insert(DATA_ROW_NUMBER, rowNumber);
 
 			// Register the reservation availability
-			bool hasReservation = bool(journey.getReservationCompliance(false) != false);
+			bool hasReservation = bool(journey.getReservationCompliance(false, _reservationRulesDelayType) != false);
 			pm.insert(DATA_HAS_RESERVATION, hasReservation);
 
 			// Insert HOURS and MINUTES duration
@@ -3240,6 +3273,16 @@ namespace synthese
 
 			if(journey.getContinuousServiceRange().total_seconds())
 			{
+				BOOST_FOREACH(const Journey::ServiceUses::value_type& service, journey.getServiceUses())
+				{
+					if(dynamic_cast<const ContinuousService*>(service.getService()))
+					{
+						pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, static_cast<const ContinuousService*>(service.getService())->getMaxWaitingTime().total_seconds() / 60);
+						break;
+					}
+				}
+
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_DATE, to_simple_string(journey.getLastDepartureTime()));
 				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME, to_simple_string(journey.getLastDepartureTime().time_of_day()));
 			}
 
@@ -3276,9 +3319,20 @@ namespace synthese
 				s << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().minutes();
 				pm.insert(DATA_ARRIVAL_TIME, s.str());
 			}
+			if(_dateTimePage.get())
+			{
+				stringstream sDate;
+				DateTimeInterfacePage::Display(sDate, _dateTimePage, request, journey.getFirstArrivalTime());
+				pm.insert(DATA_ARRIVAL_DATE, sDate.str());
+			}
+			else
+			{
+				pm.insert(DATA_ARRIVAL_DATE, journey.getFirstArrivalTime());
+			}
 
 			if(journey.getContinuousServiceRange().total_seconds())
 			{
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_DATE, to_simple_string(journey.getLastArrivalTime()));
 				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME, to_simple_string(journey.getLastArrivalTime().time_of_day()));
 			}
 
@@ -3322,23 +3376,23 @@ namespace synthese
 
 			// Reservation
 			ptime now(second_clock::local_time());
-			ptime resaDeadLine(journey.getReservationDeadLine());
-			logic::tribool resaCompliance(journey.getReservationCompliance(false));
+			ptime resaDeadLine(journey.getReservationDeadLine(_reservationRulesDelayType));
+			logic::tribool resaCompliance(journey.getReservationCompliance(false, _reservationRulesDelayType));
 			pm.insert(DATA_RESERVATION_AVAILABLE, resaCompliance && resaDeadLine > now);
 			pm.insert(DATA_RESERVATION_COMPULSORY, resaCompliance == true);
 			pm.insert(DATA_RESERVATION_DELAY, resaDeadLine.is_not_a_date_time() ? 0 : (resaDeadLine - now).total_seconds() / 60);
 
-			if(!journey.getReservationDeadLine().is_not_a_date_time())
+			if(!journey.getReservationDeadLine(_reservationRulesDelayType).is_not_a_date_time())
 			{
 				if(_dateTimePage.get())
 				{
 					stringstream sResa;
-					DateTimeInterfacePage::Display(sResa, _dateTimePage, request, journey.getReservationDeadLine());
+					DateTimeInterfacePage::Display(sResa, _dateTimePage, request, journey.getReservationDeadLine(_reservationRulesDelayType));
 					pm.insert(DATA_RESERVATION_DEADLINE, sResa.str());
 				}
 				else
 				{
-					pm.insert(DATA_RESERVATION_DEADLINE, journey.getReservationDeadLine());
+					pm.insert(DATA_RESERVATION_DEADLINE, journey.getReservationDeadLine(_reservationRulesDelayType));
 				}
 			}
 
@@ -3350,7 +3404,7 @@ namespace synthese
 				if(line == NULL) continue;
 
 				if(	line->getCommercialLine()->getReservationContact() &&
-					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false))
+					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false, _reservationRulesDelayType))
 				){
 					resaRules.insert(line->getCommercialLine()->getReservationContact());
 				}
@@ -3388,7 +3442,7 @@ namespace synthese
 				{
 					const ServicePointer& leg(*it);
 
-					const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath()));
+					const RoadPath* road(dynamic_cast<const RoadPath*> (leg.getService()->getPath()));
 					const Junction* junction(dynamic_cast<const Junction*> (leg.getService()->getPath()));
 					if(	road == NULL &&
 						junction == NULL
@@ -3459,10 +3513,14 @@ namespace synthese
 						if (road && it + 1 != services.end())
 						{
 							const ServicePointer& nextLeg(*(it+1));
-							const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
+							const RoadPath* nextRoad(dynamic_cast<const RoadPath*>(nextLeg.getService()->getPath()));
 
-							if (nextRoad && (nextRoad->getRoadPlace() == road->getRoadPlace() || nextRoad->getRoadPlace()->getName() == road->getRoadPlace()->getName()))
+							if(	nextRoad &&
+								(	&*nextRoad->getRoad()->get<RoadPlace>() == &*road->getRoad()->get<RoadPlace>() ||
+									nextRoad->getRoad()->get<RoadPlace>()->getName() == road->getRoad()->get<RoadPlace>()->getName()
+							)	){
 								continue;
+							}
 						}
 
 						// Distance and geometry
@@ -3489,7 +3547,7 @@ namespace synthese
 								geometries
 						)	);
 
-						if(dynamic_cast<const Road*>(leg.getService()->getPath()))
+						if(dynamic_cast<const RoadPath*>(leg.getService()->getPath()))
 						{
 							_displayRoadCell(
 								content,
@@ -3498,7 +3556,7 @@ namespace synthese
 								__Couleur,
 								distance,
 								multiLineString.get(),
-								dynamic_cast<const Road*>(leg.getService()->getPath()),
+								dynamic_cast<const RoadPath*>(leg.getService()->getPath())->getRoad(),
 								*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
 								*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
 								it+1 == services.end(),
@@ -3705,9 +3763,9 @@ namespace synthese
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
-			if(road && road->getRoadPlace())
+			if(road && road->get<RoadPlace>())
 			{
-				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
+				pm.insert(DATA_ROAD_NAME, road->get<RoadPlace>()->getName());
 			}
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);

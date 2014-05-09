@@ -260,14 +260,14 @@ namespace synthese
 					stream << t.col();
 					if(	it->getRoadChunk() &&
 						it->getRoadChunk()->getRoad() &&
-						it->getRoadChunk()->getRoad()->getRoadPlace()
+						it->getRoadChunk()->getRoad()->get<RoadPlace>()
 					){
-						RoadPlace* roadPlace(it->getRoadChunk()->getRoad()->getRoadPlace());
-						openRoadRequest.getPage()->setRoadPlace(Env::GetOfficialEnv().getSPtr(roadPlace));
+						RoadPlace& roadPlace(*it->getRoadChunk()->getRoad()->get<RoadPlace>());
+						openRoadRequest.getPage()->setRoadPlace(Env::GetOfficialEnv().getSPtr(&roadPlace));
 						stream <<
 							HTMLModule::getHTMLLink(
 								openRoadRequest.getURL(),
-								roadPlace->getName()
+								roadPlace.getName()
 							)
 						;
 					}

@@ -70,7 +70,8 @@ namespace synthese
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration,
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
-			bool enableRealTime
+			bool enableRealTime,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
@@ -92,7 +93,8 @@ namespace synthese
 				maxTransferDuration,
 				minMaxDurationRatioFilter,
 				enableTheoretical,
-				enableRealTime
+				enableRealTime,
+				reservationRulesDelayType
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination)
@@ -215,7 +217,8 @@ namespace synthese
 					_maxTransferDuration,
 					_minMaxDurationRatioFilter,
 					_enableTheoretical,
-					_enableRealTime
+					_enableRealTime,
+					_reservationRulesDelayType
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,
@@ -242,7 +245,8 @@ namespace synthese
 					_maxTransferDuration,
 					_minMaxDurationRatioFilter,
 					_enableTheoretical,
-					_enableRealTime
+					_enableRealTime,
+					_reservationRulesDelayType
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,

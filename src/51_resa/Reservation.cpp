@@ -48,6 +48,7 @@ namespace synthese
 	namespace resa
 	{
 		const string Reservation::DATA_COMMENT = "comment";
+		const string Reservation::DATA_CLIENT_ID = "client_id";
         const string Reservation::DATA_ARRIVAL_CITY_NAME("arrival_city_name");
         const string Reservation::DATA_ARRIVAL_PLACE_NAME_NO_CITY("arrival_place_name_no_city");
 		const string Reservation::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
@@ -290,6 +291,7 @@ namespace synthese
 			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
 			pm.insert(DATA_PHONE, getTransaction()->getCustomerPhone());
 			security::User* customer = UserTableSync::GetEditable(getTransaction()->getCustomerUserId(), Env::GetOfficialEnv()).get();
+			pm.insert(DATA_CLIENT_ID, customer->getKey());
 			pm.insert(DATA_EMAIL, customer->getEMail());
 			pm.insert(DATA_ADDRESS, customer->getAddress());
 			pm.insert(DATA_POSTCODE, customer->getPostCode());

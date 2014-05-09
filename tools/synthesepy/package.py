@@ -39,8 +39,22 @@ def run(env, args):
     svn_info = utils.SVNInfo(env.source_path)
     revision_path = 'r{0}'.format(svn_info.version)
 
+    # On Linux, lets pick a more precise name for the platform
+    # through lsb_release (this package must be installed)
+    distro_name = env.platform
+    if env.platform == 'lin':
+        try:
+            # TODO: use subprocess.check_output once we require Python 2.7
+            distro_name = subprocess.Popen(
+                ["lsb_release", "-cs"], stdout=subprocess.PIPE).communicate()[0]
+            distro_name = distro_name.rstrip()
+        except:
+            raise Exception('Failed to run lsb_release. '
+                            'Please install it (apt-get install lsb-release)')
+
+
     package_relative_dir = os.sep.join([
-        env.platform, env.mode, svn_info.branch, revision_path])
+        distro_name, env.mode, svn_info.branch, revision_path])
 
     package_dir = join(config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):
@@ -48,10 +62,10 @@ def run(env, args):
             log.info('Package directory already exists (%r) not building.',
                 package_dir)
             return
-        utils.RemoveDirectory(package_dir)
 
     try:
-        os.makedirs(package_dir)
+        if not os.path.isdir(package_dir):
+            os.makedirs(package_dir)
     except:
         raise Exception('Failed to create the '
             'directory in %r, cannot continue' % package_dir)
@@ -72,8 +86,9 @@ def run(env, args):
             f.write('Environment sealed\n')
 
     # Archive
-
     ARCHIVE_NAME = 'synthese.tar.bz2'
+    if config.prefix_with_svnrelease:
+        ARCHIVE_NAME = 'synthese-relative-' +  revision_path + '.tar.bz2'
     archive_path = join(package_dir, ARCHIVE_NAME)
 
     log.info('Creating archive %r', archive_path)

@@ -24,7 +24,6 @@
 #include "Edge.h"
 #include "Path.h"
 #include "AccessParameters.h"
-#include "RoadChunk.h"
 
 #include <math.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -49,7 +48,8 @@ namespace synthese
 			bool controlIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation,
-			bool canceled
+			bool canceled,
+			UseRule::ReservationDelayType reservationRulesDelayType
 		) const	{
 
 			// Access parameters check
@@ -70,7 +70,7 @@ namespace synthese
 			else
 			{
 				double distance(
-					edge.getMetricOffset() - edge.getParentPath()->getEdge(0)->getMetricOffset()
+					edge.getMetricOffset() - (*edge.getParentPath()->getEdges().begin())->getMetricOffset()
 				);
 				if(distance < 0)
 				{
@@ -80,7 +80,7 @@ namespace synthese
 				double speed(accessParameters.getApproachSpeed());
 				if(accessParameters.getUserClass() == USER_CAR)
 				{
-					speed = static_cast<road::RoadChunk*>(const_cast<Edge*>(&edge))->getCarSpeed();
+					speed = edge.getCarSpeed();
 					if(speed <= 0)
 					{
 						speed = accessParameters.getApproachSpeed();
@@ -149,7 +149,7 @@ namespace synthese
 			double speed(accessParameters.getApproachSpeed());
 			if(accessParameters.getUserClass() == USER_CAR)
 			{
-				speed = static_cast<road::RoadChunk*>(const_cast<Edge*>(&edge))->getCarSpeed();
+				speed = edge.getCarSpeed();
 				if(speed <= 0)
 				{
 					speed = accessParameters.getApproachSpeed();
