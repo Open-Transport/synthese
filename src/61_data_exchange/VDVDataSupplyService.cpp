@@ -327,6 +327,11 @@ namespace synthese
 
 						// Halt ID
 						string haltID = "";
+						Log::GetInstance().debug("VDVDataSupply : Searching HaltID ");
+						if (sp.getDepartureEdge()->getFromVertex())
+						{
+							Log::GetInstance().debug("On a un fromVertex");
+						}
 						if (sp.getDepartureEdge()->getFromVertex() &&
 							dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
 						{
