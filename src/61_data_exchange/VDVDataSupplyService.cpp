@@ -326,13 +326,11 @@ namespace synthese
 						ToXsdDateTime(result, expirationTime);
 
 						// Halt ID
-						Log::GetInstance().debug("VDVDataSupply : 0 searching HaltID for " + sp.getDepartureEdge()->getKey());
 						string haltID = "";
-						Log::GetInstance().debug("VDVDataSupply : 1 searching HaltID for " + sp.getDepartureEdge()->getFromVertex()->getKey());
-						if (dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
+						if (sp.getDepartureEdge()->getFromVertex() &&
+							dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
 						{
 							const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
-							Log::GetInstance().debug("VDVDataSupply : searching HaltID for " + ps_test->getKey());
 							haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
 						}
 						Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
