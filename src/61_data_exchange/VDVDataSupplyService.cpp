@@ -266,6 +266,7 @@ namespace synthese
 							network.getACodeBySource(
 								*_vdvClient->get<DataSource>()
 						)	);
+						Log::GetInstance().debug("VDVDataSupply : Network id " + networkId);
 						string serviceNumber;
 						if(!networkId.empty())
 						{
