@@ -330,6 +330,7 @@ namespace synthese
 						if (dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
 						{
 							const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
+							Log::GetInstance().debug("VDVDataSupply : searching HaltID for " + ps_test->getKey());
 							haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
 						}
 						Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
