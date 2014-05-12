@@ -25,6 +25,7 @@
 
 #include "ImportableTemplate.hpp"
 #include "PtimeField.hpp"
+#include "EnumObjectField.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 #include "Vehicle.hpp"
@@ -40,16 +41,30 @@ namespace synthese
 	{
 		class VehicleCall;
 
+
+        enum ReasonEnum
+        {
+            UNKNOWN_REASON = 0,
+            CALL_REQUEST = 1,
+            OVERLOAD = 2
+        };
+
+
+
 		FIELD_PTIME(CallTime)
 		FIELD_BOOL(Priority)
 		FIELD_PTIME(ClosureTime)
+        FIELD_ENUM(Reason, ReasonEnum)
+
+
 
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Vehicle),
 			FIELD(CallTime),
 			FIELD(Priority),
-			FIELD(ClosureTime)
+            FIELD(ClosureTime),
+            FIELD(Reason)
 		> VehicleCallSchema;
 
 		/** VehicleCall class.
