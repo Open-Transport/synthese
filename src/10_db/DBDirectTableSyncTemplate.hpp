@@ -514,7 +514,7 @@ namespace synthese
 							K::GetNewObject(*rows)
 						);
 						registry.add(object);
-						Load(object.get(), rows, env, linkLevel);
+						this->Load(object.get(), rows, env, linkLevel);
 						result.push_back(
 							boost::static_pointer_cast<util::Registrable, T>(
 								object
