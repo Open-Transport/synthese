@@ -25,6 +25,7 @@
 #include "Env.h"
 #include "FileFormat.h"
 #include "Importer.hpp"
+#include "InterSYNTHESEPackage.hpp"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -35,6 +36,7 @@ namespace synthese
 	using namespace db;
 	using namespace server;
 	using namespace util;
+	using namespace inter_synthese;
 
 	CLASS_DEFINITION(impex::Import, "t105_imports", 105)
 	FIELD_DEFINITION_OF_OBJECT(impex::Import, "import_id", "import_ids")
@@ -143,10 +145,27 @@ namespace synthese
 					_autoImporter->killPermanentThread();
 				}
 
-			// Delete the auto importer cache in case of parameter update
-			recursive_mutex::scoped_lock lock(_autoImportMutex);
-			_autoImporter.reset();
-		}
+				// Delete the auto importer cache in case of parameter update
+				recursive_mutex::scoped_lock lock(_autoImportMutex);
+				_autoImporter.reset();
+			}
+			
+			// Delete interSYNTHESEPackage corresponding to this import (if exists)
+			BOOST_FOREACH(const InterSYNTHESEPackage::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<InterSYNTHESEPackage>())
+			{
+				// Variable
+				const InterSYNTHESEPackage& package(*it.second);
+				if (package.get<Import>() &&
+					package.get<Import>()->getKey() == getKey())
+				{
+					DBTransaction transaction;
+					boost::shared_ptr<DBTableSync> tableSync(
+						DBModule::GetTableSync(decodeTableId(package.getKey()))
+					);
+					tableSync->deleteRecord(NULL, package.getKey(), transaction);
+					transaction.run();
+				}
+			}
 		}
 
 
