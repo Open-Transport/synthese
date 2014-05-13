@@ -327,17 +327,10 @@ namespace synthese
 
 						// Halt ID
 						string haltID = "";
-						Log::GetInstance().debug("VDVDataSupply : Searching HaltID ");
-						if (sp.getDepartureEdge()->getFromVertex())
-						{
-							Log::GetInstance().debug("On a un fromVertex");
-						}
 						if (sp.getDepartureEdge()->getFromVertex() &&
 							dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
 						{
-							Log::GetInstance().debug("On a un fromVertex caste en StopPoint");
 							const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
-							Log::GetInstance().debug("et meme static_cast");
 							haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
 						}
 						Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
@@ -392,6 +385,7 @@ namespace synthese
 					}
 
 					// Deletions
+					Log::GetInstance().debug("VDVDataSupply : finshed addings, starting deletions of AboID " + it.second->getId());
 					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getDeletions())
 					{
 						// Local variables
@@ -477,6 +471,7 @@ namespace synthese
 							"</AZBFahrtLoeschen>"
 						;
 					}
+					Log::GetInstance().debug("VDVDataSupply : finshed deletions of AboID " + it.second->getId());
 					result << "</AZBNachricht>";
 
 					it.second->declareSending();
