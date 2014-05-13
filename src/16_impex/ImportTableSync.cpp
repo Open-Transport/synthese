@@ -28,6 +28,7 @@
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
 #include "CoordinatesSystem.hpp"
+#include "InterSYNTHESEPackage.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -39,6 +40,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace impex;
+	using namespace inter_synthese;
 
 	template<> const string util::FactorableTemplate<DBTableSync,ImportTableSync>::FACTORY_KEY(
 		"16.01 Import"
@@ -76,6 +78,22 @@ namespace synthese
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
+			// Delete interSYNTHESEPackage corresponding to this import (if exists)
+			BOOST_FOREACH(const InterSYNTHESEPackage::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<InterSYNTHESEPackage>())
+			{
+				// Variable
+				const InterSYNTHESEPackage& package(*it.second);
+				if (package.get<Import>() &&
+					package.get<Import>()->getKey() == getKey())
+				{
+					DBTransaction transaction;
+					boost::shared_ptr<DBTableSync> tableSync(
+						DBModule::GetTableSync(decodeTableId(package.getKey()))
+					);
+					tableSync->deleteRecord(NULL, package.getKey(), transaction);
+					transaction.run();
+				}
+			}
 		}
 
 
