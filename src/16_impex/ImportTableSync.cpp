@@ -84,7 +84,7 @@ namespace synthese
 				// Variable
 				const InterSYNTHESEPackage& package(*it.second);
 				if (package.get<Import>() &&
-					package.get<Import>()->getKey() == getKey())
+					package.get<Import>()->getKey() == id)
 				{
 					DBTransaction transaction;
 					boost::shared_ptr<DBTableSync> tableSync(
