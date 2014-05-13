@@ -172,8 +172,11 @@ namespace synthese
 					{
 						// update the cache
 						q->setNonPersistent();
+						q->setKey(_cacheQueue.at(objectToRemember));
+						Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(_cacheQueue.at(objectToRemember));
+						Env::GetOfficialEnv().add(q);
 						_queue.erase(_cacheQueue.at(objectToRemember));
-						_queue.insert(make_pair(_cacheQueue.at(objectToRemember),q.get()));
+						q->link(Env::GetOfficialEnv());
 					}
 				}
 				else
