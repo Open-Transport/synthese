@@ -237,7 +237,9 @@ namespace synthese
 						ptime plannedDepartureDateTime(sp.getTheoreticalDepartureDateTime());
 						if (!plannedDepartureDateTime.is_not_a_date_time())
 							plannedDepartureDateTime -= diff_from_utc;
-						
+
+						bool isRealTime(sp.getRTData());
+
 						ptime arrivalDateTime(
 							(sp.getDepartureEdge() && sp.getDepartureEdge()->isArrival() && sp.getDepartureEdge()->getRankInPath()) ?
 							ptime(
@@ -353,7 +355,7 @@ namespace synthese
 							"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 							"<ZielHst>" << direction << "</ZielHst>" <<
 							"<AufAZB>false</AufAZB>" <<
-							"<FahrtStatus>Ist</FahrtStatus>"
+							"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
 						;
 						if(!plannedArrivalDateTime.is_not_a_date_time())
 						{
