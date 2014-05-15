@@ -223,6 +223,16 @@ namespace synthese
 						nearestStopPoint = sp.get();
 					}
 				}
+                // if nearestStopPoint differs from previous one, register the time of change of nearestStopPoint
+                // This time is used to compute the onboard advance/delay of the vehicle
+                ptime stopPointFoundTime(second_clock::local_time());
+                if (!VehicleModule::GetCurrentVehiclePosition().getStopPoint()
+                        || (VehicleModule::GetCurrentVehiclePosition().getStopPoint()
+                            && (VehicleModule::GetCurrentVehiclePosition().getStopPoint()->getKey() != nearestStopPoint->getKey())
+                            )
+                ) {
+                    VehicleModule::GetCurrentVehiclePosition().setNextStopFoundTime(stopPointFoundTime);
+                }
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
 				// FIXME: Distance should be configurable
 				if(lastDistance < 20)
@@ -232,7 +242,6 @@ namespace synthese
 				{
 					VehicleModule::GetCurrentVehiclePosition().setInStopArea(false);
 				}
-
 				if(nearestStopPoint)
 				{
 					util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
@@ -240,7 +249,6 @@ namespace synthese
 					util::Log::GetInstance().debug("GPSdFileFormat : No nearest stop found for " +
 												   string("lat=") + boost::lexical_cast<std::string>(lat) +
 												   string("lon=") + boost::lexical_cast<std::string>(lon));
-
 				}
 
 				// update Vehicle position.
