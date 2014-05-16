@@ -657,6 +657,12 @@ namespace synthese
 					)
 				);
 
+				// If we don't find a service, shouldn't happen on road journey planning but it occurs sometimes causing some crashes
+				if(!service.getService())
+				{
+					continue;
+				}
+
 				// Standing on the current path as long as we can (the path don't change and we aren't at the end of the vector yet)
 				Path* currentPath = startChunk->getParentPath();
 				MetricOffset startMetricOffset = startChunk->getMetricOffset();

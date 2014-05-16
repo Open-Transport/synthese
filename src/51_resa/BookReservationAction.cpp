@@ -558,7 +558,7 @@ namespace synthese
 
 							BOOST_FOREACH(ReservationTableSync::SearchResult::value_type& reservation, reservations)
 							{
-								if (reservation->getReservationPossible())
+								if (reservation->getReservationPossible() && reservation->getTransaction())
 								{
 									User* customer = UserTableSync::GetEditable(reservation->getTransaction()->getCustomerUserId(),
 										Env::GetOfficialEnv()).get();
