@@ -241,7 +241,8 @@ namespace synthese
 
 		public:
 			DisplayScreenContentFunction():
-				_wayIsBackward(false)
+				_wayIsBackward(false),
+				_timetableGroupedByArea(false)
 			{}
 
 
