@@ -242,6 +242,7 @@ namespace synthese
 		public:
 			DisplayScreenContentFunction():
 				_wayIsBackward(false),
+				_useSAEDirectConnection(false),
 				_timetableGroupedByArea(false)
 			{}
 
