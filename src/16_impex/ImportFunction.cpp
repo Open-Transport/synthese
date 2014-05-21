@@ -126,6 +126,7 @@ namespace synthese
 						_output,
 						_result
 					);
+                    _importer->openLogFile();
 				}
 				else
 				{
