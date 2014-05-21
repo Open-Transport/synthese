@@ -99,10 +99,18 @@ namespace synthese
 				}
 
 				// Log path
-				bool outputLogs(map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false));
+				ImportLogLevel minLogLevel(import->get<MinLogLevel>());
+				bool outputLogs(false);
+				if (minLogLevel < IMPORT_LOG_NOLOG)
+				{
+					outputLogs = true;
+				}
+				if(map.isDefined(PARAMETER_OUTPUT_LOGS))
+				{
+					outputLogs = map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false);
+				}
 
 				// Min log force
-				ImportLogLevel minLogLevel(import->get<MinLogLevel>());
 				if(map.isDefined(PARAMETER_MIN_LOG_LEVEL))
 				{
 					minLogLevel = static_cast<ImportLogLevel>(map.get<int>(PARAMETER_MIN_LOG_LEVEL));
