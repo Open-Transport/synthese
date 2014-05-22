@@ -231,7 +231,7 @@ namespace synthese
 							bool networkOK(false);
 							BOOST_FOREACH(const TransportNetworks::Type::value_type& transportNetwork, _vdvClient->get<TransportNetworks>())
 							{
-								if (network.getKey() != transportNetwork->getKey())
+								if (network.getKey() == transportNetwork->getKey())
 								{
 									networkOK = true;
 									break;
@@ -417,7 +417,7 @@ namespace synthese
 							bool networkOK(false);
 							BOOST_FOREACH(const TransportNetworks::Type::value_type& transportNetwork, _vdvClient->get<TransportNetworks>())
 							{
-								if (network.getKey() != transportNetwork->getKey())
+								if (network.getKey() == transportNetwork->getKey())
 								{
 									networkOK = true;
 									break;
