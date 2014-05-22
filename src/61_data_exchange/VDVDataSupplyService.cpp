@@ -275,6 +275,7 @@ namespace synthese
 							);
 							if (!plannedArrivalDateTime.is_not_a_date_time())
 								plannedArrivalDateTime -= diff_from_utc;
+							Log::GetInstance().debug("VDVDataSupply : Network " + network.getKey());
 							string networkId(
 								network.getACodeBySource(
 									*_vdvClient->get<DataSource>()
