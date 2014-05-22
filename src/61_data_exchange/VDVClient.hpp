@@ -30,6 +30,7 @@
 #include "PointerField.hpp"
 #include "SchemaMacros.hpp"
 #include "StringField.hpp"
+#include "TransportNetwork.h"
 
 
 #include "VDVServer.hpp" // For DataSourcePointer (remove after refactoring)
@@ -42,6 +43,7 @@ namespace synthese
 	namespace pt
 	{
 		class JourneyPattern;
+		class TransportNetwork;
 	}
 
 	namespace data_exchange
@@ -50,7 +52,7 @@ namespace synthese
 
 		FIELD_STRING(ReplyAddress)
 		FIELD_STRING(ReplyPort)
-		FIELD_ID(TransportNetworkID)
+		FIELD_POINTERS_VECTOR(TransportNetworks, pt::TransportNetwork)
 		FIELD_STRING(DefaultDirection)
 		FIELD_BOOL(SBBMode)
 
@@ -64,7 +66,7 @@ namespace synthese
 			FIELD(ServiceUrl),
 			FIELD(ServiceCode),
 			FIELD(impex::DataSource),
-			FIELD(TransportNetworkID),
+			FIELD(TransportNetworks),
 			FIELD(DefaultDirection),
 			FIELD(Active),
 			FIELD(TracePath),
@@ -79,6 +81,7 @@ namespace synthese
 		{
 		private:
 			static const std::string TAG_SUBSCRIPTION;
+			static const std::string TAG_TRANSPORT_NETWORK;
 
 		public:
 			/// Chosen registry class.

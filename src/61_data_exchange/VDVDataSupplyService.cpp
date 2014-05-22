@@ -228,7 +228,16 @@ namespace synthese
 								*line.getNetwork()
 							);
 							// Check that network is OK
-							if (network.getKey() != _vdvClient->get<TransportNetworkID>())
+							bool networkOK(false);
+							BOOST_FOREACH(const TransportNetworks::Type::value_type& transportNetwork, _vdvClient->get<TransportNetworks>())
+							{
+								if (network.getKey() != transportNetwork->getKey())
+								{
+									networkOK = true;
+									break;
+								}
+							}
+							if (!networkOK)
 							{
 								continue;
 							}
@@ -404,7 +413,16 @@ namespace synthese
 								*line.getNetwork()
 							);
 							// Check that network is OK
-							if (network.getKey() != _vdvClient->get<TransportNetworkID>())
+							bool networkOK(false);
+							BOOST_FOREACH(const TransportNetworks::Type::value_type& transportNetwork, _vdvClient->get<TransportNetworks>())
+							{
+								if (network.getKey() != transportNetwork->getKey())
+								{
+									networkOK = true;
+									break;
+								}
+							}
+							if (!networkOK)
 							{
 								continue;
 							}
