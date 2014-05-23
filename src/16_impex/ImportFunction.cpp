@@ -149,7 +149,12 @@ namespace synthese
 				}
 
 				// Use the parameters of the impor, except if they are overridden by request
-				ParametersMap fullMap(map);
+				ParametersMap fullMap;
+				BOOST_FOREACH(const ParametersMap::Map::value_type& element, map.getMap())
+				{
+					fullMap.insert(element.first, map.get<string>(element.first));
+				}
+
 				BOOST_FOREACH(const ParametersMap::Map::value_type& element, (import->get<Parameters>()).getMap())
 				{
 					if (!fullMap.isDefined(element.first))
