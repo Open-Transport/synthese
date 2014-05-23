@@ -352,6 +352,7 @@ namespace synthese
 							Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
 							Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
 							Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
+							Log::GetInstance().debug("VDVDataSupply : Betreiber " + network.getName());
 							result <<
 								"\">" <<
 								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
