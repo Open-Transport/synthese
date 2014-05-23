@@ -364,7 +364,9 @@ namespace synthese
 								"<HstSeqZaehler>1</HstSeqZaehler>" <<
 								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
 								"<LinienText>" << line.getShortName() << "</LinienText>" <<
-								"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
+								"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>"
+							;
+							result <<
 								"<RichtungsText>" << direction << "</RichtungsText>" <<
 								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 								"<ZielHst>" << direction << "</ZielHst>" <<
