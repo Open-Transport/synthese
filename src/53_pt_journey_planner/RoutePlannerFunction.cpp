@@ -2589,24 +2589,39 @@ namespace synthese
 			}
 
 			// Warnings row
-			if(_warningPage.get())
+            bool gotWarningOnLine(false);
+            bool gotWarningOnStop(false);
+            if(_warningPage.get())
 			{
 				stringstream warnings;
-
-				size_t n(1);
+                bool warningOnLine(false);
+                bool warningOnStop(false);
+                size_t n(1);
 				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
 				{
 					_displayWarningCell(
 						warnings,
 						request,
 						n,
-						journey
+                        journey,
+                        warningOnLine,
+                        warningOnStop
 					);
 					++n;
 				}
-
-				pm.insert(DATA_WARNINGS, warnings.str());
-			}
+                if(warningOnLine)
+                {
+                    gotWarningOnLine = true;
+                }
+                if(warningOnStop)
+                {
+                    gotWarningOnStop = true;
+                }
+                pm.insert(DATA_WARNINGS, warnings.str());
+            }
+            // Warning levels
+            pm.insert(DATA_MAX_WARNING_LEVEL_ON_LINE, gotWarningOnLine);
+            pm.insert(DATA_MAX_WARNING_LEVEL_ON_STOP, gotWarningOnStop);
 
 			// Route Planner fisrt arrival is the arrival of the first service
 			if(!object.getJourneys().empty() && !object.getJourneys().begin()->getServiceUses().empty())
@@ -2655,11 +2670,6 @@ namespace synthese
 
 				pm.insert(DATA_RESULT_ROWS, resultRows.str());
 			}
-
-			// Warning levels
-			PTRoutePlannerResult::MaxAlarmLevels alarmLevels(object.getMaxAlarmLevels());
-			pm.insert(DATA_MAX_WARNING_LEVEL_ON_LINE, alarmLevels.lineLevel);
-			pm.insert(DATA_MAX_WARNING_LEVEL_ON_STOP, alarmLevels.stopLevel);
 
 			// Durations row
 			if(_durationPage.get())
@@ -3003,8 +3013,10 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			std::size_t columnNumber,
-			const graph::Journey& journey
-		) const	{
+            const graph::Journey& journey,
+            bool &warningOnLine,
+            bool &warningOnStop
+        ) const	{
 
 			// Precondition check
 			assert(_warningPage.get());
@@ -3099,7 +3111,18 @@ namespace synthese
 					_warningCheckPage->display(content, request, pm2);
 				}
 
-				pm.insert(DATA_CONTENT, content.str());
+                /* Warning, uggly hack to get CMS feedback on wether or not it
+                 * got a warning. The information must be enterred in HTML comment
+                 * in the output stream of the cms page */
+                if(content.str().find("$$GOTWARNINGONLINE$$"))
+                {
+                    warningOnLine = true;
+                }
+                if(content.str().find("$$GOTWARNINGONSTOP$$"))
+                {
+                    warningOnStop = true;
+                }
+                pm.insert(DATA_CONTENT, content.str());
 			}
 
 			_warningPage->display(stream ,request, pm);

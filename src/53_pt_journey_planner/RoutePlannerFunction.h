@@ -664,12 +664,12 @@ namespace synthese
 			///	@param columnNumber Column rank from left to right
 			///	@param journey The journey to describe
 			/// @pre _warningPage is not null
-			void _displayWarningCell(
-				std::ostream& stream,
-				const server::Request& request,
-				std::size_t columnNumber,
-				const graph::Journey& journey
-			) const;
+            void _displayWarningCell(std::ostream& stream,
+                const server::Request& request,
+                std::size_t columnNumber,
+                const graph::Journey& journey,
+                bool &warningOnLine,
+                bool &warningOnStop) const;
 
 
 
