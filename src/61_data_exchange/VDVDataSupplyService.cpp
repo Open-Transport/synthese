@@ -367,6 +367,7 @@ namespace synthese
 								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 								"<ZielHst>" << direction << "</ZielHst>" <<
 								"<AufAZB>false</AufAZB>" <<
+								"<Betreiber>" << network.getName() << "</Betreiber>" <<
 								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
 							;
 							if(!plannedArrivalDateTime.is_not_a_date_time())
