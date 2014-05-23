@@ -365,14 +365,11 @@ namespace synthese
 								"<HstSeqZaehler>1</HstSeqZaehler>" <<
 								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
 								"<LinienText>" << line.getShortName() << "</LinienText>" <<
-								"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>"
-							;
-							result <<
+								"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
 								"<RichtungsText>" << direction << "</RichtungsText>" <<
 								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 								"<ZielHst>" << direction << "</ZielHst>" <<
 								"<AufAZB>false</AufAZB>" <<
-								"<Betreiber>" << networkName << "</Betreiber>" <<
 								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
 							;
 							if(!plannedArrivalDateTime.is_not_a_date_time())
