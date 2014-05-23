@@ -352,7 +352,8 @@ namespace synthese
 							Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
 							Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
 							Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
-							Log::GetInstance().debug("VDVDataSupply : Betreiber " + network.getName());
+							string networkName = network.getName();
+							Log::GetInstance().debug("VDVDataSupply : Betreiber " + networkName);
 							result <<
 								"\">" <<
 								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
@@ -368,7 +369,7 @@ namespace synthese
 								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 								"<ZielHst>" << direction << "</ZielHst>" <<
 								"<AufAZB>false</AufAZB>" <<
-								"<Betreiber>" << network.getName() << "</Betreiber>" <<
+								"<Betreiber>" << networkName << "</Betreiber>" <<
 								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
 							;
 							if(!plannedArrivalDateTime.is_not_a_date_time())
