@@ -353,6 +353,7 @@ namespace synthese
 							Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
 							Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
 							string networkName = network.getName();
+							trim(networkName);
 							Log::GetInstance().debug("VDVDataSupply : Betreiber " + networkName);
 							result <<
 								"\">" <<
