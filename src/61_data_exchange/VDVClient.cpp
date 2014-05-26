@@ -314,6 +314,7 @@ namespace synthese
 				p = p / fileName.str();
 				ofstream logFile(p.file_string().c_str());
 				logFile << content;
+				logFile.close();
 			}
 		}
 }	}
