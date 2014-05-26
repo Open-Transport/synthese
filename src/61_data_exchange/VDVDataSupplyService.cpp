@@ -372,9 +372,9 @@ namespace synthese
 								"<AufAZB>false</AufAZB>" <<
 								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
 							;
-							/*Log::GetInstance().debug("VDVDataSupply : 1. Ecriture du networkname");
-							result << "<Betreiber>tl</Betreiber>";
-							Log::GetInstance().debug("VDVDataSupply : 2. Ecriture du networkname");*/
+							Log::GetInstance().debug("VDVDataSupply : 1. Ecriture du networkname");
+							result << "<FahrtInfo><Betreiber>tl</Betreiber></FahrtInfo>";
+							Log::GetInstance().debug("VDVDataSupply : 2. Ecriture du networkname");
 							if(!plannedArrivalDateTime.is_not_a_date_time())
 							{
 								result << "<AnkunftszeitAZBPlan>";
