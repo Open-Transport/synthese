@@ -513,6 +513,7 @@ namespace synthese
 			result << "</DatenAbrufenAntwort>";
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
+			Log::GetInstance().debug("VDVDataSupply : Ecriture dans la map de " + result.str());
 			map.insert(DATA_RESULT, result.str());
 			stream << result.str();
 
