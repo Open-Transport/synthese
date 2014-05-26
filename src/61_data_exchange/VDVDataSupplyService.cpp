@@ -370,11 +370,9 @@ namespace synthese
 								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 								"<ZielHst>" << direction << "</ZielHst>" <<
 								"<AufAZB>false</AufAZB>" <<
-								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
+								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>" <<
+								"<FahrtInfo><Betreiber>" << networkName << "</Betreiber></FahrtInfo>"
 							;
-							Log::GetInstance().debug("VDVDataSupply : 1. Ecriture du networkname");
-							result << "<FahrtInfo><Betreiber>tl</Betreiber></FahrtInfo>";
-							Log::GetInstance().debug("VDVDataSupply : 2. Ecriture du networkname");
 							if(!plannedArrivalDateTime.is_not_a_date_time())
 							{
 								result << "<AnkunftszeitAZBPlan>";
@@ -513,12 +511,12 @@ namespace synthese
 			result << "</DatenAbrufenAntwort>";
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
-			Log::GetInstance().debug("VDVDataSupply : Ecriture dans la map de " + result.str());
-			map.insert(DATA_RESULT, result.str());
-			stream << result.str();
+			string strResult(result.str());
+			map.insert(DATA_RESULT, strResult);
+			stream << strResult;
 
 			// Trace
-			_vdvClient->trace("DatenAbrufenAntwort", result.str());
+			_vdvClient->trace("DatenAbrufenAntwort", strResult);
 
 			// Map return
 			return map;
