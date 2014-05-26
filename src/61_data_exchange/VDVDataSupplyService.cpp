@@ -513,10 +513,11 @@ namespace synthese
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			string strResult(result.str());
 			map.insert(DATA_RESULT, strResult);
-			stream << strResult;
-
+			
 			// Trace
 			_vdvClient->trace("DatenAbrufenAntwort", strResult);
+			
+			stream << strResult;
 
 			// Map return
 			return map;
