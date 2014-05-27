@@ -370,8 +370,7 @@ namespace synthese
 								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 								"<ZielHst>" << direction << "</ZielHst>" <<
 								"<AufAZB>false</AufAZB>" <<
-								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>" <<
-								"<FahrtInfo><Betreiber>" << networkName << "</Betreiber></FahrtInfo>"
+								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
 							;
 							if(!plannedArrivalDateTime.is_not_a_date_time())
 							{
@@ -398,6 +397,7 @@ namespace synthese
 								result << "</AbfahrtszeitAZBPrognose>";
 							}
 							result << "<HaltID>" << haltID << "</HaltID>";
+							result << "<FahrtInfo><Betreiber>" << networkName << "</Betreiber></FahrtInfo>";
 							result << "</AZBFahrplanlage>";
 							Log::GetInstance().debug("VDVDataSupply : End of AZBFahrplanlage");
 						}
