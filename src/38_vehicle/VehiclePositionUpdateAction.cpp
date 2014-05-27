@@ -257,6 +257,12 @@ namespace synthese
                 _nextStopFoundTime = time_from_string(map.get<string>(PARAMETER_STOP_FOUND_TIME));
             }
 			
+			// In stop area
+			if(map.isDefined(PARAMETER_IN_STOP_AREA))
+			{
+				_inStopArea = map.get<bool>(PARAMETER_IN_STOP_AREA);
+			}
+			
 			// Set next stops
 			if(map.isDefined(PARAMETER_SET_NEXT_STOPS))
 			{
