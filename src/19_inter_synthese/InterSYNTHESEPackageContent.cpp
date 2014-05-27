@@ -54,12 +54,13 @@ namespace synthese
 			util::Env& env,
 			const std::string& s,
 			impex::Import& import,
-			boost::optional<const impex::Importer&> importer
+			boost::optional<const impex::Importer&> importer,
+			bool noSuppressTopLevel
 		):	_env(env),
 			_package(new InterSYNTHESEPackage)
 		{
 			_package->set<Import>(import);
-			_parseAndLoad(s, importer);
+			_parseAndLoad(s, importer, noSuppressTopLevel);
 			_env.add(_package);
 		}
 
@@ -75,11 +76,12 @@ namespace synthese
 			Env& env,
 			const std::string& s,
 			const boost::shared_ptr<InterSYNTHESEPackage>& package,
-			boost::optional<const impex::Importer&> importer
+			boost::optional<const impex::Importer&> importer,
+			bool noSuppressTopLevel
 		):	_env(env),
 			_package(package)
 		{
-			_parseAndLoad(s, importer);
+			_parseAndLoad(s, importer, noSuppressTopLevel);
 		}
 
 
@@ -91,7 +93,8 @@ namespace synthese
 		/// @param s the serialized string to parse to populate the object
 		void InterSYNTHESEPackageContent::_parseAndLoad(
 			const string& s,
-			boost::optional<const impex::Importer&> importer
+			boost::optional<const impex::Importer&> importer,
+			bool noSuppressTopLevel
 		){
 			ContentMap contentMap;
 
@@ -188,8 +191,14 @@ namespace synthese
 			_package->set<Public>(
 				_objects.get<bool>(Public::FIELD.name, false)
 			);
-
-			_prepareObjectsToRemove(_objects);
+			if (!noSuppressTopLevel)
+			{
+				_prepareObjectsToRemove(_objects);
+			}
+			else
+			{
+				_prepareObjectsToRemovenoTopLevel(_objects);
+			}
 			_package->set<Objects>(
 				_loadObjects(_objects, contentMap, _objectsToSave, importer)
 			);
@@ -475,6 +484,82 @@ namespace synthese
 					BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
 					{
 						_prepareObjectsToRemoveRecursion(*item);
+					}
+				}
+			}
+		}
+		
+		void InterSYNTHESEPackageContent::_prepareObjectsToRemovenoTopLevel( const boost::property_tree::ptree& node )
+		{
+			// Empty content : exit
+			if(!node.count(TableOrObject::TAG_OBJECT))
+			{
+				return;
+			}
+			
+			// Loop for Loading or creating objects
+			BOOST_FOREACH(const ptree::value_type& it, node.get_child(TableOrObject::TAG_OBJECT))
+			{
+				// The object key
+				RegistryKeyType key(it.second.get<RegistryKeyType>(Key::FIELD.name));
+				RegistryTableType classId(decodeTableId(key));
+				
+				if(classId > 0)
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(classId));
+					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+					{
+						continue;
+					}
+					DBDirectTableSync& directTableSync(dynamic_cast<DBDirectTableSync&>(*tableSync));
+					const RegistryBase& registry(directTableSync.getRegistry(Env::GetOfficialEnv()));
+					if( registry.contains(key))
+					{
+						_prepareObjectsToRemoveRecursion(*registry.getEditableObject(key));
+						_objectsToRemove.erase(key);
+					}
+				}
+				else
+				{
+					boost::shared_ptr<DBTableSync> tableSync(DBModule::GetTableSync(static_cast<RegistryTableType>(key)));
+					DBDirectTableSync* directTableSync(dynamic_cast<DBDirectTableSync*>(tableSync.get()));
+					if(!directTableSync)
+					{
+						continue;
+					}
+					
+					DBDirectTableSync::RegistrableSearchResult objects(
+						directTableSync->search(
+							string(),
+							Env::GetOfficialEnv()
+					)	);
+					BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& item, objects)
+					{
+						// Call only if item is in sent data
+						bool isSent(false);
+						BOOST_FOREACH(const ptree::value_type& it2, it.second.get_child(TableOrObject::TAG_OBJECT))
+						{
+							// The object key
+							RegistryKeyType key(it2.second.get<RegistryKeyType>(Key::FIELD.name));
+							RegistryTableType tableId(decodeTableId(key));
+							
+							if(tableId == 0) // Case full table
+							{
+							}
+							else // Case unique object
+							{
+								if (item->getKey() == key)
+								{
+									isSent = true;
+									break;
+								}
+							}
+						}
+						if (isSent)
+						{
+							_prepareObjectsToRemoveRecursion(*item);
+							_objectsToRemove.erase(item->getKey());
+						}
 					}
 				}
 			}
