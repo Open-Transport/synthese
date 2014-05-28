@@ -658,7 +658,7 @@ namespace synthese
 					);
 				}
 			}			
-
+#if 0
 			// Programmations
 			{
 				string query(
@@ -733,7 +733,7 @@ namespace synthese
 					} while(destResult->next());
 				}
 			}
-
+#endif
 
 			//////////////////////////////////////////////////////////////////////////
 			// Import content analyzing
