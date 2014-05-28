@@ -517,8 +517,10 @@ namespace synthese
 						_database +".HORAIRE.hrd,"+
 						_database +".HORAIRE.hta,"+
 						_database +".HORAIRE.htd,"+
+			#if 0 /* T2C BDSI DOES NOT HAVE THIS FIELD */
 						_database +".HORAIRE.etat_harr,"+
 						_database +".HORAIRE.etat_hdep,"+
+			#endif
 						_database +".HORAIRE.course,"+
 						_database +".ARRETCHN.chainage "+
 					"FROM "+
@@ -617,6 +619,7 @@ namespace synthese
 					}
 
 					// Patch for bad schedules when the bus is at stop
+#if 0
 					if(	(	(	horaireResult->getText("etat_harr") == "R" &&
 								horaireResult->getText("etat_hdep") == "E"
 							) || (
@@ -627,7 +630,7 @@ namespace synthese
 					){
 						horaire.hrd = nowPlusDelay;
 					}
-
+#endif
 					// Trace
 					_logTraceDetail(
 						"SCHEDULE_HTD",courseRef,courseRef,0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
