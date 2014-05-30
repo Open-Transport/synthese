@@ -540,7 +540,7 @@ namespace synthese
 						// - one already activated for today (theorical calendar OK)
 						if (service)
 						{
-							Log::GetInstance().debug("Service par défaut : " + lexical_cast<string>(service->getKey()));
+							Log::GetInstance().debug("VDVServer : Service par défaut : " + lexical_cast<string>(service->getKey()));
 						}
 						vector<ScheduledService*> services;
 						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
@@ -577,7 +577,7 @@ namespace synthese
 						//    *static_cast<CommercialLine*>(service->getPath()->getPathGroup())
 						//);
 						
-						Log::GetInstance().debug("On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
+						Log::GetInstance().debug("VDVServer : On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
 						int numTheoricalActivatedServices(0);
 						BOOST_FOREACH(ScheduledService* sservice, services)
 						{
@@ -590,11 +590,11 @@ namespace synthese
 						
 						if (numTheoricalActivatedServices != 1)
 						{
-							Log::GetInstance().debug(lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont théoriquement activés aujourd'hui");
+							Log::GetInstance().debug("VDVServer : " + lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont théoriquement activés aujourd'hui");
 						}
 						else
 						{
-							Log::GetInstance().debug("un seul service candidat est théoriquement activé aujourd'hui");
+							Log::GetInstance().debug("VDVServer : un seul service candidat est théoriquement activé aujourd'hui");
 						}
 						
 						if (service)
@@ -669,7 +669,7 @@ namespace synthese
 						}
 						
 						// The service is not found in the theorical data, it has to be created
-						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service non connu (" + vectServiceCode[1] + "), création du service non codée");
+						Log::GetInstance().warn("VDVServer : Réception d'un DatenAbrufenAntwort contenant un service non connu (" + vectServiceCode[1] + "), création du service non codée");
 						// TO-DO ? : code the creation of the service (why not in a different network to easily detect errors in HAFAS or special events received ?)
 					}
 				}
