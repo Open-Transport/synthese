@@ -689,10 +689,7 @@ namespace synthese
 
 			// Dates preparation
 			stringstream datesStr;
-			if(getCalendarLinks().empty())
-			{
-				serialize(datesStr);
-			}
+			serialize(datesStr);
 
 			map.insert(TABLE_COL_ID, getKey());
 			map.insert(ScheduledServiceTableSync::COL_SERVICENUMBER, getServiceNumber());
