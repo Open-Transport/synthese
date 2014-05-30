@@ -177,7 +177,7 @@ namespace synthese
 			bool updateFromServer(false);
 			try
 			{
-				Log::GetInstance().warn("Envoie d'une requête de statut à " + _getURL("status"));
+				Log::GetInstance().warn("VDVServer : Envoie d'une requête de statut à " + _getURL("status"));
 				string statusAntwortStr(
 					c.post(_getURL("status"), statusAnfrage.str(), contentType)
 				);
@@ -238,7 +238,7 @@ namespace synthese
 			}
 			catch(...)
 			{
-				Log::GetInstance().warn("Error while reading StatusAntwort");
+				Log::GetInstance().warn("VDVServer : Error while reading StatusAntwort");
 				_online = false;
 				return;
 			}
@@ -313,6 +313,8 @@ namespace synthese
 
 			// Send subscription request
 			now = second_clock::local_time() - diff_from_utc;
+			
+			Log::GetInstance().warn("VDVServer : Ecriture d'abonnement");
 
 			stringstream aboAnfrage;
 			aboAnfrage <<
@@ -340,6 +342,8 @@ namespace synthese
 					"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
 				ToXsdDateTime(aboAnfrage, expirationTime);
 				aboAnfrage << "\">";
+				
+				Log::GetInstance().warn("VDVServer : Ecriture d'abonnement pour l'arret " + lexical_cast<string>(subscription->get<StopArea>()->getKey()));
 
 				aboAnfrage << 
 					"<AZBID>" << (
