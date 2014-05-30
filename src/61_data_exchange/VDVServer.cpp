@@ -650,6 +650,8 @@ namespace synthese
 								arrivalSchedules[rank] = rtArrivalTime;
 							}
 							
+							Log::GetInstance().debug("VDVServer : Mise à jour TR du service");
+							
 							// Link the service to the RT datasource
 							Importable::DataSourceLinks links(service->getDataSourceLinks());
 							links.erase(&*(get<DataSource>()));
