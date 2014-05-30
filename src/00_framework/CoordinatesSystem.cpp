@@ -133,7 +133,7 @@ namespace synthese
 		_name(name),
 		_projSequence(projSequence),
 		_projObject(pj_init_plus(projSequence.c_str())),
-		_geometryFactory(new geos::geom::PrecisionModel(geos::geom::PrecisionModel::FLOATING_SINGLE), srid),
+		_geometryFactory(new geos::geom::PrecisionModel(), srid),
 		_degrees(contains(projSequence,"+proj=longlat"))
 	{}
 
