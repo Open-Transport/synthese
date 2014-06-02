@@ -75,6 +75,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = "mr_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_STOP_CODE_PREFIX = "stop_code_prefix";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
@@ -98,6 +99,7 @@ namespace synthese
 				_plannedDataSource = Env::GetOfficialEnv().get<DataSource>(
 					map.get<RegistryKeyType>(PARAMETER_PLANNED_DATASOURCE_ID)
 				);
+				_stopCodePrefix = map.getOptional<string>(PARAMETER_STOP_CODE_PREFIX);
 			}
 			catch(ObjectNotFoundException<DataSource>&)
 			{
@@ -299,7 +301,7 @@ namespace synthese
 
 					// SYNTHESE stop point
 					StopPoint* stopPoint(
-						_plannedDataSource->getObjectByCode<StopPoint>(mnemol)
+						_plannedDataSource->getObjectByCode<StopPoint>(*_stopCodePrefix + mnemol)
 					);
 					Depot* depot(NULL);
 					if(stopPoint)
