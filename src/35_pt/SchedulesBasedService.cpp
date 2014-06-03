@@ -799,7 +799,13 @@ namespace synthese
 				// Size check
 				if(rank < _path->getEdges().size())
 				{
-					Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
+					const JourneyPattern* line(
+						static_cast<const JourneyPattern*>(_path)
+					);
+					if (rank < line->getLineStops().size())
+					{
+						Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
+					}
 					for(; rank<_path->getEdges().size(); ++rank)
 					{
 						result.push_back(NULL);
