@@ -409,7 +409,12 @@ namespace synthese
 					AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(
 						request
 					);
-					map.insert(DATA_SWITCH_CALL_URL, callRequest.getURL());
+                    stringstream os;
+                    os << callRequest.getClientURL() << Request::PARAMETER_STARTER;
+                    ParametersMap pm(callRequest.getParametersMap());
+                    pm.remove(BaseReservationActionAdmin::PARAMETER_CUSTOMER_ID);
+                    pm.outputURI(os);
+                    map.insert(DATA_SWITCH_CALL_URL, os.str());
 				}
 				else
 				{
