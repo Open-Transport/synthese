@@ -42,7 +42,6 @@
 #include "CancelReservationAction.h"
 #include "ResaEditLogEntryAdmin.h"
 #include "CommercialLine.h"
-#include "CommercialLineTableSync.h"
 #include "CallBeginAction.h"
 #include "CallEndAction.h"
 #include "ReservationRoutePlannerAdmin.h"
@@ -202,13 +201,24 @@ namespace synthese
 			ReservationTransaction::Reservations rs(tr.getReservations());
 			for (ReservationTransaction::Reservations::const_iterator itrs(rs.begin()); itrs != rs.end(); ++itrs)
 			{
+                const Reservation& resa(**itrs);
 				stream << "<li>";
 				try
 				{
-					Env env;
-					boost::shared_ptr<const CommercialLine> line(CommercialLineTableSync::Get((*itrs)->getLineId(), env));
-					stream << "<span class=\"" << line->getStyle() << "\"><span class=\"linesmall\">" << line->getShortName() << "</span></span> ";
-				}
+                    boost::shared_ptr<const ScheduledService> service(
+                        Env::GetOfficialEnv().get<ScheduledService>(resa.getServiceId())
+                    );
+                    if(!dynamic_cast<const JourneyPattern*>(service->getPath()))
+                    {
+                        continue;
+                    }
+                    const JourneyPattern& jp(static_cast<const JourneyPattern&>(*service->getPath()));
+                    stream << "<span class=\"" << jp.getCommercialLine()->getStyle() << "\"><span class=\"linesmall\">" << jp.getCommercialLine()->getShortName() << "</span></span> ";
+                    if(!jp.getDirection().empty())
+                    {
+                        stream << " / " << jp.getDirection();
+                    }
+                }
 				catch (...)
 				{
 					stream << "Ligne " << (*itrs)->getLineCode();
