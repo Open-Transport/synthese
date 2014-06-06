@@ -109,7 +109,7 @@ namespace synthese
 		{
 			if (_outputFormat == MimeTypes::JSON)
 			{
-				map.outputJSON(stream,DATA_OBJECT);
+				return "application/json";
 			}
 			return "text/html";
 		}
