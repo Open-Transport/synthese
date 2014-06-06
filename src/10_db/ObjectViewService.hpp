@@ -50,6 +50,7 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_ADDITIONAL_PARAMETERS;
+			static const std::string DATA_OBJECT;
 			
 		protected:
 			//! \name Page parameters

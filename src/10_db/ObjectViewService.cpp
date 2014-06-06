@@ -45,6 +45,8 @@ namespace synthese
 	{
 		const string ObjectViewService::PARAMETER_ADDITIONAL_PARAMETERS = "additional_parameters";
 		
+		const string ObjectViewService::DATA_OBJECT("object");
+		
 
 
 		ParametersMap ObjectViewService::_getParametersMap() const
@@ -57,6 +59,8 @@ namespace synthese
 
 		void ObjectViewService::_setFromParametersMap(const ParametersMap& map)
 		{
+			Function::setOutputFormatFromMap(map, string());
+			
 			// Object
 			try
 			{
@@ -82,6 +86,12 @@ namespace synthese
 		) const {
 			ParametersMap map;
 			_object->toParametersMap(map, _additionalParameters);
+			
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, DATA_OBJECT);
+			}
+			
 			return map;
 		}
 		
