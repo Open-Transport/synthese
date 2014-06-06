@@ -107,6 +107,10 @@ namespace synthese
 
 		std::string ObjectViewService::getOutputMimeType() const
 		{
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream,DATA_OBJECT);
+			}
 			return "text/html";
 		}
 
