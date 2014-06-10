@@ -132,6 +132,7 @@ namespace synthese
 			choices.push_back(make_pair(ResaDBLog::OUTGOING_CALL, ResaDBLog::GetIcon(ResaDBLog::OUTGOING_CALL) +" "+ ResaDBLog::GetText(ResaDBLog::OUTGOING_CALL)));
 			choices.push_back(make_pair(ResaDBLog::FAKE_CALL,ResaDBLog::GetIcon(ResaDBLog::FAKE_CALL) +" "+ ResaDBLog::GetText(ResaDBLog::FAKE_CALL)));
 			choices.push_back(make_pair(ResaDBLog::RADIO_CALL,ResaDBLog::GetIcon(ResaDBLog::RADIO_CALL) +" "+ResaDBLog::GetText(ResaDBLog::RADIO_CALL)));
+			choices.push_back(make_pair(ResaDBLog::REDIRECT_CALL,ResaDBLog::GetIcon(ResaDBLog::REDIRECT_CALL) +" "+ResaDBLog::GetText(ResaDBLog::REDIRECT_CALL)));
 
 			vector<pair<optional<ResaDBLog::_EntryType>,string> > addChoices;
 			addChoices.push_back(make_pair(ResaDBLog::CUSTOMER_COMMENT_ENTRY,ResaDBLog::GetIcon(ResaDBLog::CUSTOMER_COMMENT_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::CUSTOMER_COMMENT_ENTRY)));

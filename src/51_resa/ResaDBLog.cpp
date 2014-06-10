@@ -290,6 +290,7 @@ namespace synthese
 				case CALL_ENTRY:
 				case OUTGOING_CALL:
 				case RADIO_CALL:
+				case REDIRECT_CALL:
 					{
 						try
 						{
@@ -344,7 +345,7 @@ namespace synthese
 					// Cancel request
 					AdminActionFunctionRequest<CancelReservationAction, ResaLogAdmin> cancelRequest(searchRequest);
 					cancelRequest.getAction()->setTransaction(tr);
-					
+
 					switch(status)
 					{
 					case OPTION:
@@ -373,7 +374,7 @@ namespace synthese
 							ResaModule::GetStatusIcon(NO_SHOW)
 						);
 						break;
-						
+
 					default:
 						break;
 					}
@@ -383,6 +384,7 @@ namespace synthese
 				if(	entryType == CALL_ENTRY ||
 					entryType == FAKE_CALL ||
 					entryType == RADIO_CALL ||
+					entryType == REDIRECT_CALL ||
 					entryType == OUTGOING_CALL ||
 					entry.getObjectId2() > 0
 				) try {
@@ -471,6 +473,9 @@ namespace synthese
 			case ResaDBLog::FAKE_CALL:
 				return "keyboard.png";
 
+			case ResaDBLog::REDIRECT_CALL:
+				return "user_comment.png";
+
 			case ResaDBLog::EMAIL:
 				return "email.png";
 
@@ -545,6 +550,9 @@ namespace synthese
 
 			case ResaDBLog::FAKE_CALL:
 				return "Saisie";
+
+			case ResaDBLog::REDIRECT_CALL:
+				return "Redirection d'appel ou de la demande vers Allô Tisséo";
 
 			case ResaDBLog::EMAIL:
 				return "E-mail";
