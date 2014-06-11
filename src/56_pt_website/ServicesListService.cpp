@@ -212,6 +212,8 @@ namespace synthese
 			{
 				_departurePlaceId = departurePlaceId;
 			}
+			
+			Function::setOutputFormatFromMap(map,string());
 		}
 
 
@@ -388,13 +390,20 @@ namespace synthese
 
 				map.insert(DATA_SERVICE, serviceMap);
 			}
-
-			outputParametersMap(
-				map,
-				stream,
-				TAG_SERVICES,
-				"https://extranet.rcsmobility.com/attachments/download/14018/ServicesListService.xsd"
-			);
+			
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, TAG_SERVICES);
+			}
+			else if (_outputFormat == MimeTypes::XML)
+			{
+				outputParametersMap(
+					map,
+					stream,
+					TAG_SERVICES,
+					"https://extranet.rcsmobility.com/attachments/download/14018/ServicesListService.xsd"
+				);
+			}
 
 			return map;
 		}
