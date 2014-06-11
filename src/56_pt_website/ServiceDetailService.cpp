@@ -60,6 +60,7 @@ namespace synthese
 	
 	namespace pt_website
 	{
+		const string ServiceDetailService::TAG_SERVICE_DETAIL = "service_detail";
 		const string ServiceDetailService::PARAMETER_READ_RESERVATIONS_FROM_DAY = "read_reservations_from_day";
 		const string ServiceDetailService::PARAMETER_READ_DESCENTS_FROM_DAY = "read_descents_from_day";
 		const string ServiceDetailService::PARAMETER_BASE_CALENDAR_ID = "base_calendar_id";
@@ -158,6 +159,8 @@ namespace synthese
 			{
 				_readDescentsFromDay = from_string(rdfdtext);
 			}
+			
+			Function::setOutputFormatFromMap(map,string());
 		}
 
 
@@ -394,6 +397,11 @@ namespace synthese
 					}
 				}
 			}
+			
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, TAG_SERVICE_DETAIL);
+			}
 
 			return map;
 		}
@@ -410,7 +418,7 @@ namespace synthese
 
 		std::string ServiceDetailService::getOutputMimeType() const
 		{
-			return "text/html";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 
 

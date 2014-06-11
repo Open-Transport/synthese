@@ -68,6 +68,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,ServiceDetailService>
 		{
 		public:
+			static const std::string TAG_SERVICE_DETAIL;
 			static const std::string PARAMETER_BASE_CALENDAR_ID;
 			static const std::string PARAMETER_READ_RESERVATIONS_FROM_DAY;
 			static const std::string PARAMETER_READ_DESCENTS_FROM_DAY;
