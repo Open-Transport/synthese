@@ -44,7 +44,9 @@ namespace synthese
 		Scenario::Scenario(
 			const std::string name /*= std::string()*/
 		)
-		{}
+        {
+            _name = name;
+        }
 
 
 
