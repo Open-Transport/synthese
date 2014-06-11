@@ -19,7 +19,7 @@ namespace synthese
 	{
 		type		= INT_SURV;
 		ptime now(second_clock::local_time());
-		year	= now.date().year()-2000;
+		year	= now.date().year()-1900;
 		month	= now.date().month();
 		day		= now.date().day();
 		hour	= now.time_of_day().hours();
