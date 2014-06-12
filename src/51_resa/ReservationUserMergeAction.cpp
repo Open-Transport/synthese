@@ -48,7 +48,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace dblog;
-    using namespace db;
+	using namespace db;
 
 	namespace util
 	{
@@ -68,42 +68,42 @@ namespace synthese
 		const string ReservationUserMergeAction::PARAMETER_EMAIL = Action_PARAMETER_PREFIX + "email";
 		const string ReservationUserMergeAction::PARAMETER_AUTHORIZED_LOGIN(Action_PARAMETER_PREFIX + "al");
 		const string ReservationUserMergeAction::PARAMETER_AUTORESA_ACTIVATED = Action_PARAMETER_PREFIX + "aa";
-        const string ReservationUserMergeAction::PARAMETER_USER_TO_DELETE(Action_PARAMETER_PREFIX + "utd");
+		const string ReservationUserMergeAction::PARAMETER_USER_TO_DELETE(Action_PARAMETER_PREFIX + "utd");
 
-		
+
 		ParametersMap ReservationUserMergeAction::getParametersMap() const
-        {
-            ParametersMap map;
+		{
+			ParametersMap map;
 
-            if (_userToDelete.get())
-            {
-                map.insert(PARAMETER_USER_TO_DELETE, _userToDelete->getKey());
-            }
+			if (_userToDelete.get())
+			{
+				map.insert(PARAMETER_USER_TO_DELETE, _userToDelete->getKey());
+			}
 
-            return map;
+			return map;
 		}
 
-		
-		
+
+
 		void ReservationUserMergeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-                if (map.getDefault<RegistryKeyType>(PARAMETER_USER_TO_DELETE,0) != 0)
-                {
-                    _userToDelete = UserTableSync::GetEditable(
-                        map.get<RegistryKeyType>(PARAMETER_USER_TO_DELETE),
-                        *_env
-                    );
-                }
+				if (map.getDefault<RegistryKeyType>(PARAMETER_USER_TO_DELETE,0) != 0)
+				{
+					_userToDelete = UserTableSync::GetEditable(
+						map.get<RegistryKeyType>(PARAMETER_USER_TO_DELETE),
+						*_env
+					);
+				}
 
-                if (map.getDefault<RegistryKeyType>(PARAMETER_USER_ID,0) != 0)
-                {
-                    _userToMerge = UserTableSync::GetEditable(
-                        map.get<RegistryKeyType>(PARAMETER_USER_ID),
-                        *_env
-                    );
-                }
+				if (map.getDefault<RegistryKeyType>(PARAMETER_USER_ID,0) != 0)
+				{
+					_userToMerge = UserTableSync::GetEditable(
+						map.get<RegistryKeyType>(PARAMETER_USER_ID),
+						*_env
+					);
+				}
 
 				_login = map.getDefault<string>(PARAMETER_LOGIN);
 				_surname = map.getDefault<string>(PARAMETER_SURNAME);
@@ -138,15 +138,15 @@ namespace synthese
 
 		void ReservationUserMergeAction::run(Request& request)
 		{
-            bool forceUpdate = false;
+			bool forceUpdate = false;
 
-            // Check updates
-            if ((_userToMerge->getName() != _name && !_name.empty()) ||
-                (_userToMerge->getSurname() != _surname && !_surname.empty()) ||
-                (_userToMerge->getEMail() != _email && !_email.empty())
-            ){
-                forceUpdate = true;
-            }
+			// Check updates
+			if ((_userToMerge->getName() != _name && !_name.empty()) ||
+				(_userToMerge->getSurname() != _surname && !_surname.empty()) ||
+				(_userToMerge->getEMail() != _email && !_email.empty())
+			){
+				forceUpdate = true;
+			}
 
 			// Merge user values to userToMerge
 			_userToMerge->setLogin(_login);
@@ -170,30 +170,30 @@ namespace synthese
 				);
 			}
 
-            if (forceUpdate)
-            {
-                // Update reservation transactions values for userToMerge with new ones
-                ReservationTransactionTableSync::SearchResult transactions(ReservationTransactionTableSync::SearchByUser(
-                    *_env,
-                    _userToMerge->getKey(),
-                    boost::posix_time::ptime(boost::posix_time::not_a_date_time),
-                    boost::posix_time::ptime(boost::posix_time::not_a_date_time),
-                    true
-                ));
-                BOOST_FOREACH(const ReservationTransactionTableSync::SearchResult::value_type& transaction, transactions)
-                {
-                    transaction->setCustomerName(_userToMerge->getSurname()+" "+_userToMerge->getName());
-                    transaction->setCustomerEMail(_userToMerge->getEMail());
-                    ReservationTransactionTableSync::Save(transaction.get());
-                }
-            }
+			if (forceUpdate)
+			{
+				// Update reservation transactions values for userToMerge with new ones
+				ReservationTransactionTableSync::SearchResult transactions(ReservationTransactionTableSync::SearchByUser(
+					*_env,
+					_userToMerge->getKey(),
+					boost::posix_time::ptime(boost::posix_time::not_a_date_time),
+					boost::posix_time::ptime(boost::posix_time::not_a_date_time),
+					true
+				));
+				BOOST_FOREACH(const ReservationTransactionTableSync::SearchResult::value_type& transaction, transactions)
+				{
+					transaction->setCustomerName(_userToMerge->getSurname()+" "+_userToMerge->getName());
+					transaction->setCustomerEMail(_userToMerge->getEMail());
+					ReservationTransactionTableSync::Save(transaction.get());
+				}
+			}
 
 			// Merge related logs
-			DBLogEntryTableSync::SearchResult logs(DBLogEntryTableSync::SearchByUser(*_env, _userToDelete->getKey(), UP_LINKS_LOAD_LEVEL));
+			DBLogEntryTableSync::SearchResult logs(DBLogEntryTableSync::SearchByUser(*_env, _userToDelete->getKey()));
 			BOOST_FOREACH(const DBLogEntryTableSync::SearchResult::value_type& log, logs)
-            {
+			{
 				ResaDBLog::UpdateCallEntryCustomer(log->getKey(), _userToMerge->getKey());
-            }
+			}
 
 			// Merge related ReservationTransaction
 			ReservationTransactionTableSync::SearchResult transactions(ReservationTransactionTableSync::SearchByUser(
@@ -233,9 +233,9 @@ namespace synthese
 			UserTableSync::Save(_userToMerge.get());
 
 			// Remove user which must be deleted
-            RemoveObjectAction deleteUserAction;
-            deleteUserAction.setObjectId(_userToDelete->getKey());
-            deleteUserAction.run(request);
+			RemoveObjectAction deleteUserAction;
+			deleteUserAction.setObjectId(_userToDelete->getKey());
+			deleteUserAction.run(request);
 
 			// Log user merging in SecurityLog
 			SecurityLog::addUserAdmin(

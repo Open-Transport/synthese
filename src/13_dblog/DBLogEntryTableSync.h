@@ -104,6 +104,10 @@ namespace synthese
 			static SearchResult SearchByUser(
 				util::Env& env,
 				util::RegistryKeyType objectId,
+				const std::string& logKey = std::string(),
+				const int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				const std::string& entryType = std::string(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 

@@ -302,12 +302,28 @@ namespace synthese
 		DBLogEntryTableSync::SearchResult DBLogEntryTableSync::SearchByUser(
 			Env& env,
 			util::RegistryKeyType objectId,
+			const string& logKey,
+			int first,
+			boost::optional<std::size_t> number,
+			const string& entryType,
 			LinkLevel linkLevel
 		){
 			SelectQuery<DBLogEntryTableSync> query;
 
 			if (objectId)
 				query.addWhereField(COL_OBJECT_ID, objectId);
+			if (!logKey.empty())
+				query.addWhereField(COL_LOG_KEY, logKey);
+			if (!entryType.empty())
+			{
+				query.addWhereField(COL_CONTENT, "%|%|" + entryType + "|%", ComposedExpression::OP_LIKE);
+			}
+			if (number)
+			{
+				query.setNumber(*number);
+				query.setFirst(first);
+			}
+			query.addOrderField(COL_DATE, false);
 			return LoadFromQuery(query, env, linkLevel);
 		}
 

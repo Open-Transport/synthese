@@ -26,6 +26,7 @@
 #include "ReservationEditFunction.h"
 #include "CSVResaStatisticsFunction.h"
 #include "ReservationsListService.hpp"
+#include "DBLogDynamicViewFunction.hpp"
 
 #include "ReservationItemInterfacePage.h"
 #include "ReservationConfirmationEMailInterfacePage.h"
@@ -83,6 +84,7 @@ void synthese::resa::moduleRegister()
 	synthese::resa::ReservationEditFunction::integrate();
 	synthese::resa::CSVResaStatisticsFunction::integrate();
 	synthese::resa::ReservationsListService::integrate();
+	synthese::resa::DBLogDynamicViewFunction::integrate();
 
 	synthese::resa::ReservationItemInterfacePage::integrate();
 	synthese::resa::ReservationConfirmationEMailInterfacePage::integrate();

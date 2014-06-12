@@ -61,7 +61,7 @@ namespace synthese
 		const string DBLogHTMLView::PARAMETER_SEARCH_TEXT = "dlvsx";
 		const string DBLogHTMLView::PARAMETER_OBJECT_ID = "dlvoi";
 		const string DBLogHTMLView::PARAMETER_OBJECT_ID2 = "dlvo2";
-		
+
 		const string DBLogHTMLView::FILTER_ALL = "All";
 		const string DBLogHTMLView::FILTER_RESA = "Réservation";
 		const string DBLogHTMLView::FILTER_ABS = "Absence";
@@ -206,7 +206,7 @@ namespace synthese
 			bool withLinkToAdminPage,
 			const std::string& type
 		) const {
-
+			std::cerr << searchRequest.getURL() << std::endl;
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("searchlog"+ _code));
 			if(withForm)
 			{
@@ -290,49 +290,34 @@ namespace synthese
 			}
 
 			DBLogEntryTableSync::SearchResult entries;
-
+			std::string requestType;
 			if (type == FILTER_ALL)
 			{
-				// Search all entries for one user
-				entries = DBLogEntryTableSync::Search(
-						_env,
-						_dbLog->getFactoryKey()
-						, _searchStartDate
-						, _searchEndDate
-						, _searchUserId
-						, _searchLevel
-						, _searchObjectId
-						, _searchObjectId2
-						, _searchText
-						, _requestParameters.first
-						, _requestParameters.maxSize
-						, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
-						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
-						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
-						, _requestParameters.raisingOrder
-				);
+				requestType = _searchText;
 			}
 			else
 			{
-				// Search specific level entries for one user
-				entries = DBLogEntryTableSync::Search(
-						_env,
-						_dbLog->getFactoryKey()
-						, _searchStartDate
-						, _searchEndDate
-						, _searchUserId
-						, _searchLevel
-						, _searchObjectId
-						, _searchObjectId2
-						, type
-						, _requestParameters.first
-						, _requestParameters.maxSize
-						, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
-						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
-						, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
-						, _requestParameters.raisingOrder
-				);
+				requestType = type;
 			}
+
+			// Search all entries for one user
+			entries = DBLogEntryTableSync::Search(
+					_env,
+					_dbLog->getFactoryKey()
+					, _searchStartDate
+					, _searchEndDate
+					, _searchUserId
+					, _searchLevel
+					, _searchObjectId
+					, _searchObjectId2
+					, requestType
+					, _requestParameters.first
+					, _requestParameters.maxSize
+					, _requestParameters.orderField == _getParameterName(PARAMETER_START_DATE)
+					, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_USER)
+					, _requestParameters.orderField == _getParameterName(PARAMETER_SEARCH_TYPE)
+					, _requestParameters.raisingOrder
+			);
 
 			ResultHTMLTable t(
 				v,
@@ -355,7 +340,7 @@ namespace synthese
 
 						if (
 							(type == FILTER_RESA && (entryType == ResaDBLog::RESERVATION_ENTRY || entryType == ResaDBLog::RESERVATION_UPDATE)) ||
-							(type == FILTER_CANCEL && entryType == ResaDBLog::CANCELLATION_ENTRY) || 
+							(type == FILTER_CANCEL && entryType == ResaDBLog::CANCELLATION_ENTRY) ||
 							(type == FILTER_CANC_D && entryType == ResaDBLog::DELAYED_CANCELLATION_ENTRY) ||
 							(type == FILTER_ABS && entryType == ResaDBLog::NO_SHOW_ENTRY)
 						){

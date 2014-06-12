@@ -136,6 +136,9 @@ namespace synthese
 			ostream& stream,
 			const server::Request& _request
 		) const {
+			// This part allows the admin interface to display data using AJAX requests when display splitted entryType tabs
+			stream << "<script type=\"text/javascript\" src=\"/lib/synthese/js/logEntries.js\"></script>";
+			stream << "<input type='hidden' value='" << _user->getKey() << "' id='logEntries-user'/>";
 
 			////////////////////////////////////////////////////////////////////
 			// PROPERTIES TAB
@@ -163,7 +166,7 @@ namespace synthese
 				AdminFunctionRequest<ResaCustomerMergeAdmin> mergeRequest(
 					_request
 				);
-				
+
 				// Display
 				stream << "<h1>Liens</h1>";
 				stream << "<p>";
@@ -190,7 +193,7 @@ namespace synthese
 				stream << t.cell("Ville", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_CITY, _user->getCityText()));
 				stream << t.cell("Téléphone",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
-				
+
 				if (_user->getCreatorId() != 0)
 				{
 					boost::shared_ptr<const User> creator = UserTableSync::Get(_user->getCreatorId(), Env::GetOfficialEnv());
@@ -244,70 +247,38 @@ namespace synthese
 				);
 			}
 
+			// These tabs are filled by ajax requests and no longer use DBLogHtmlView
+
 			/* RESERVATIONS TAB */
 			if (openTabContent(stream, TAB_RESERVATIONS))
 			{
 				stream << "<h1>Réservations</h1>";
-
-				// Results
-				_log.display(
-					stream,
-					_request,
-					true,
-					true,
-					DBLogHTMLView::FILTER_RESA
-				);
 			}
 
 			/* CANCELS TAB */
 			if (openTabContent(stream, TAB_CANCELS))
 			{
 				stream << "<h1>Annulations</h1>";
-
-				// Results
-				_log.display(
-					stream,
-					_request,
-					true,
-					true,
-					DBLogHTMLView::FILTER_CANCEL
-				);
 			}
 
 			/* CANCELS DEADLINE TAB */
 			if (openTabContent(stream, TAB_CANCELS_DEADLINE))
 			{
 				stream << "<h1>Annulations (hors délai)</h1>";
-				
-				// Results
-				_log.display(
-					stream,
-					_request,
-					true,
-					true,
-					DBLogHTMLView::FILTER_CANC_D
-				);
 			}
 
 			/* ABSENCES TAB */
 			if (openTabContent(stream, TAB_ABSENCES))
 			{
 				stream << "<h1>Absences</h1>";
-
-				// Results
-				_log.display(
-					stream,
-					_request,
-					true,
-					true,
-					DBLogHTMLView::FILTER_ABS
-				);
 			}
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
 		}
+
+
 
 		bool ResaCustomerAdmin::isAuthorized(
 			const security::User& user
@@ -330,51 +301,13 @@ namespace synthese
 			_tabs.clear();
 			bool writeRight(profile.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
 
-			/* Count each entry type occurrence in database in order to print them in tab names */
-			DBLogEntryTableSync::SearchResult entries = DBLogEntryTableSync::SearchByUser(
-				*_env, _user->getKey() 
-			);
-
-			int resa = 0, abs = 0, cancel = 0, cancel_d = 0;
-
-			BOOST_FOREACH(const boost::shared_ptr<DBLogEntry>& dbe, entries)
-			{
-				try {
-					const DBLogEntry::Content& content(dbe->getContent());
-					const resa::ResaDBLog::_EntryType entryType(static_cast<resa::ResaDBLog::_EntryType>(lexical_cast<int>(content[0])));
-					const string entryText(lexical_cast<string>(content[1]));
-
-					switch(entryType)
-					{
-						case ResaDBLog::RESERVATION_ENTRY:
-							if (!entryText.empty())
-								resa++;
-							break;
-						case ResaDBLog::CANCELLATION_ENTRY:
-							cancel++;
-							break;
-						case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-							cancel_d++;
-							break;
-						case ResaDBLog::NO_SHOW_ENTRY:
-							abs++;
-							break;
-						default:
-							continue;
-					}
-				}
-				catch(bad_lexical_cast)
-				{
-				}
-			}
-
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "user.png"));
 			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "cog.png"));
 			_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
-			_tabs.push_back(Tab("Réservations ("+lexical_cast<string>(resa)+")", TAB_RESERVATIONS, writeRight, "resa_compulsory.png"));
-			_tabs.push_back(Tab("Annulations ("+lexical_cast<string>(cancel)+")", TAB_CANCELS, writeRight, "cross.png"));
-			_tabs.push_back(Tab("Annulations (hors délai) ("+lexical_cast<string>(cancel_d)+")", TAB_CANCELS_DEADLINE, writeRight, "asterisk_red.png"));
-			_tabs.push_back(Tab("Absences ("+lexical_cast<string>(abs)+")", TAB_ABSENCES, writeRight, "user_cross.png"));
+			_tabs.push_back(Tab("Réservations", TAB_RESERVATIONS, writeRight, "resa_compulsory.png"));
+			_tabs.push_back(Tab("Annulations", TAB_CANCELS, writeRight, "cross.png"));
+			_tabs.push_back(Tab("Annulations hors délai", TAB_CANCELS_DEADLINE, writeRight, "asterisk_red.png"));
+			_tabs.push_back(Tab("Absences", TAB_ABSENCES, writeRight, "user_cross.png"));
 
 			_tabBuilded = true;
 		}
@@ -387,16 +320,20 @@ namespace synthese
 		}
 
 
+
 		void ResaCustomerAdmin::setUser(boost::shared_ptr<const User> value)
 		{
 			_user = value;
 		}
 
 
+
 		bool ResaCustomerAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _user == static_cast<const ResaCustomerAdmin&>(other)._user;
 		}
+
+
 
 		boost::shared_ptr<const security::User> ResaCustomerAdmin::getUser() const
 		{

@@ -25,6 +25,8 @@ CustomerPasswordEMailContentInterfacePage.cpp
 CustomerPasswordEMailContentInterfacePage.h
 CustomerPasswordEMailSubjectInterfacePage.cpp
 CustomerPasswordEMailSubjectInterfacePage.h
+DBLogDynamicViewFunction.cpp
+DBLogDynamicViewFunction.hpp
 FreeDRTAvailableSlotsService.cpp
 FreeDRTAvailableSlotsService.hpp
 FreeDRTBookingAdmin.cpp
