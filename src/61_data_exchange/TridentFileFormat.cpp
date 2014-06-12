@@ -378,11 +378,20 @@ namespace synthese
 			{
 				const StopPoint* ps(itps.second.get());
 				util::Env fakeEnv;
-				LineStopTableSync::SearchResult lineStops(
+				LineStopTableSync::SearchResult lineStopsAtPhysicalStop(
 					LineStopTableSync::Search(fakeEnv, boost::optional<RegistryKeyType>(), ps->getKey())
 				);
 
-				if (lineStops.empty())
+				LineStopTableSync::SearchResult lineStopsToExport;
+				BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& ls, lineStopsAtPhysicalStop)
+				{
+					if(ls->getLine()->getCommercialLine()->getKey() == _line->getKey())
+					{
+						lineStopsToExport.push_back(ls);
+					}
+				}
+
+				if (lineStopsToExport.empty())
 					continue;
 
 				os << "<StopArea>" << "\n";
@@ -397,7 +406,7 @@ namespace synthese
 					os << ps->getName ();
 				os << "</name>" << "\n";
 
-				BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& ls, lineStops)
+				BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& ls, lineStopsToExport)
 				{
 					os << "<contains>" << TridentId(peerid, "StopPoint", *ls)  << "</contains>" << "\n";
 				}
