@@ -396,6 +396,7 @@ namespace synthese
 			{
 				cs->add(*_arrivalEdge->getFromVertex()->getGeometry()->getCoordinate(),false);
 			}
+			cs->removeRepeatedPoints();
 			if(cs->size() < 2)
 			{
 				return boost::shared_ptr<LineString>();
@@ -409,7 +410,6 @@ namespace synthese
 			}
 			else
 			{
-				cs->removeRepeatedPoints();
 				return boost::shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 		}

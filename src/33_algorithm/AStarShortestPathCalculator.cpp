@@ -750,7 +750,7 @@ namespace synthese
 
 				// If we have a custom geometry and it's different from the original geometry
 				boost::shared_ptr<LineString> originGeometry = completeService.getGeometry();
-				if(customGeometry && customGeometry->getLength() != originGeometry->getLength())
+				if(originGeometry && customGeometry && customGeometry->getLength() != originGeometry->getLength())
 				{
 					// Set geometry and compute the time difference between the two length
 					completeService.setCustomGeometry(customGeometry);
