@@ -480,7 +480,8 @@ namespace synthese
 			{
 				BOOST_FOREACH(const graph::Vertex *vertex, stopArea.getVertices(PTModule::GRAPH_ID))
 				{
-					if (descent.first->get<Stop>()->getKey() == vertex->getKey())
+					if (descent.first->get<Stop>() &&
+						descent.first->get<Stop>()->getKey() == vertex->getKey())
 					{
 						withDescent = true;
 						descentId = descent.first->get<Key>();
