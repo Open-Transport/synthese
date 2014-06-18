@@ -275,7 +275,7 @@ namespace synthese
 					{
 						throw InconsistentTreeException();
 					}
-					unregisterChildFromRoot(static_cast<ObjectType_&>(*this));
+					this->unregisterChildFromRoot(static_cast<ObjectType_&>(*this));
 				}
 			}
 		}
