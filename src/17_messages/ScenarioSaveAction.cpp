@@ -510,7 +510,7 @@ namespace synthese
 						{
 							_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
 						}
-						*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
+                        //*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
 					}
 				}
 
