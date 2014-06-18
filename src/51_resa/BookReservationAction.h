@@ -86,6 +86,7 @@ namespace synthese
 			static const std::string PARAMETER_CUSTOMER_CITYTEXT;
 			static const std::string PARAMETER_CUSTOMER_COUNTRY;
 			static const std::string PARAMETER_CUSTOMER_LANGUAGE;
+			static const std::string PARAMETER_CUSTOMER_PRM;
 
 			// Requester information
 			static const std::string PARAMETER_PASSWORD;
@@ -124,6 +125,7 @@ namespace synthese
 			std::vector<boost::posix_time::ptime>	_reservationsDates;
 			bool									_multiReservationsMode;
 			graph::UseRule::ReservationDelayType 	_reservationRulesDelayType;
+			bool									_prm;
 
 			//! @name Reservation on a scheduled service
 			//@{
@@ -194,6 +196,7 @@ namespace synthese
 				void setArrivalPlace(boost::shared_ptr<const geography::Place> value){ _arrivalPlace = value; }
 				void setReservationsNumber(size_t value){ _reservationsNumber = value; }
 				void setReservationsDates(const std::vector<boost::posix_time::ptime>& reservationsDates){ _reservationsDates = reservationsDates; }
+				void setPRM(bool value){ _prm = value; }
 			//@}
 
 			/// @name Getters

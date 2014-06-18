@@ -108,6 +108,7 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_CUSTOMER_CITYTEXT = Action_PARAMETER_PREFIX + "cupc";
 		const string BookReservationAction::PARAMETER_CUSTOMER_COUNTRY = Action_PARAMETER_PREFIX + "cupco";
 		const string BookReservationAction::PARAMETER_CUSTOMER_LANGUAGE = Action_PARAMETER_PREFIX + "cl";
+		const string BookReservationAction::PARAMETER_CUSTOMER_PRM = Action_PARAMETER_PREFIX + "prm";
 
 		const string BookReservationAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pass";
 
@@ -181,6 +182,13 @@ namespace synthese
 			_ignoreReservation = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
 			_approachSpeed = map.getDefault<double>(PARAMETER_APPROACH_SPEED, 1.111);
 			_comment = map.getDefault<string>(PARAMETER_COMMENT);
+			_prm = map.getDefault<bool>(PARAMETER_CUSTOMER_PRM, false);
+
+			// Special comment when reservation is for PRM
+			if (_prm)
+			{
+				_comment += "\n PMR : nécessite un véhicule accessible";
+			}
 
 			// Reservation Rules Delay type
 			if(map.getDefault<int>(PARAMETER_RESERVATION_DELAY_TYPE, 0))
@@ -598,6 +606,7 @@ namespace synthese
 				rt.setCustomerUserId(_customer->getKey());
 				rt.setSeats(_seatsNumber);
 				rt.setComment(_comment);
+				rt.setPRM(_prm);
 				rt.setCustomer(
 					UserTableSync::GetEditable(_customer->getKey(), *_env, UP_LINKS_LOAD_LEVEL).get()
 				);

@@ -80,7 +80,7 @@ namespace synthese
 			static const std::string DATA_ARRIVAL_CITY_NAME;
 			static const std::string DATA_ARRIVAL_PLACE_NAME;
 			static const std::string DATA_DEPARTURE_TIME;
-            static const std::string DATA_IS_RESERVATION_POSSIBLE;
+			static const std::string DATA_IS_RESERVATION_POSSIBLE;
 			static const std::string DATA_ARRIVAL_TIME;
 			static const std::string DATA_LINE_CODE;
 			static const std::string DATA_SEATS_NUMBER;
@@ -105,6 +105,7 @@ namespace synthese
 			static const std::string DATA_RESERVATIONS;
 			static const std::string DATA_TRANSACTION_RESERVATION;
 			static const std::string DATA_TOKEN_CANCELLATION;
+			static const std::string DATA_IS_RESERVATION_PRM;
 
 
 			static const std::string TYPE_SUBJECT;

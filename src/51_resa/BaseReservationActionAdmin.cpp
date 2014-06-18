@@ -140,12 +140,12 @@ namespace synthese
 					lexical_cast<string>(_customer->getKey())
 				);
 
-                ParametersMap withoutClientPM(request.getParametersMap());
-                withoutClientPM.remove(PARAMETER_CUSTOMER_ID);
-                stringstream os;
-                os << request.getClientURL() + Request::PARAMETER_STARTER;
-                withoutClientPM.outputURI(os);
-                stream << HTMLModule::getLinkButton(os.str(), "Réinitialiser client");
+				ParametersMap withoutClientPM(request.getParametersMap());
+				withoutClientPM.remove(PARAMETER_CUSTOMER_ID);
+				stringstream os;
+				os << request.getClientURL() + Request::PARAMETER_STARTER;
+				withoutClientPM.outputURI(os);
+				stream << HTMLModule::getLinkButton(os.str(), "Réinitialiser client");
 			}
 			else
 			{
@@ -237,6 +237,7 @@ namespace synthese
 			stream << rt.col() << rf.getTextInput(BookReservationAction::PARAMETER_COMMENT, string());
 
 			stream << rt.row();
+
 			stream << rt.col(2, string(), true) << rf.getSubmitButton("Réserver");
 
 			stream << rt.close();

@@ -65,36 +65,37 @@ namespace synthese
 
 			//!	\name Reservation attributes
 			//@{
-				Reservations		_reservations;
-				util::RegistryKeyType		_lastReservation;		//!< Code de la réservation annulée en cas de modification
-				size_t					_seats;			//!< Nombre de places
-				boost::posix_time::ptime		_bookingTime;		//!< Date de la réservation
-				boost::posix_time::ptime	_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
-				std::string _comment;
+				Reservations				_reservations;
+				util::RegistryKeyType		_lastReservation;	//!< Code de la réservation annulée en cas de modification
+				size_t						_seats;				//!< Nombre de places
+				boost::posix_time::ptime	_bookingTime;		//!< Date de la réservation
+				boost::posix_time::ptime	_cancellationTime;	//!< Date de l'annulation (unknown = not cancelled)
+				std::string					_comment;
+				bool						_prm;
 			//@}
 
 			//!	\name Customer
 			//@{
-				util::RegistryKeyType	_customerUserId;
-				security::User*			_customer;
-				std::string			_customerName;
-				std::string			_customerPhone;
-				std::string			_customerEMail;
+				util::RegistryKeyType		_customerUserId;
+				security::User*				_customer;
+				std::string					_customerName;
+				std::string					_customerPhone;
+				std::string					_customerEMail;
 				util::RegistryKeyType		_bookingUserId;
-				util::RegistryKeyType	_cancelUserId;
+				util::RegistryKeyType		_cancelUserId;
 			//@}
 
 			//! \name Journey
 			//@{
-				util::RegistryKeyType	_originPlaceId;
-				std::string			_originCityText;
-				std::string			_originPlaceTextNoCity;
-				std::string			_originPlaceText; // This concatenates place and city
-				util::RegistryKeyType	_destinationPlaceId;
-				std::string			_destinationPlaceText;
-				boost::posix_time::ptime		_originDateTime;
-				boost::posix_time::ptime		_destinationDateTime;
-				std::string			_htmlJourneyBoard;
+				util::RegistryKeyType		_originPlaceId;
+				std::string					_originCityText;
+				std::string					_originPlaceTextNoCity;
+				std::string					_originPlaceText; // This concatenates place and city
+				util::RegistryKeyType		_destinationPlaceId;
+				std::string					_destinationPlaceText;
+				boost::posix_time::ptime	_originDateTime;
+				boost::posix_time::ptime	_destinationDateTime;
+				std::string					_htmlJourneyBoard;
 			//@}
 
 		public:
@@ -111,10 +112,11 @@ namespace synthese
 			void setBookingUserId	(util::RegistryKeyType id) { _bookingUserId = id; }
 			void setCancelUserId	(util::RegistryKeyType id) { _cancelUserId = id; }
 			void setCustomerEMail	(const std::string& email);
-			void setComment(const std::string& value){ _comment = value; }
+			void setComment			(const std::string& value){ _comment = value; }
+			void setPRM				(const bool value){ _prm = value; }
 
-			util::RegistryKeyType					getLastReservation()	const { return _lastReservation; }
-			size_t						getSeats()				const { return _seats; }
+			util::RegistryKeyType	getLastReservation()	const { return _lastReservation; }
+			size_t					getSeats()				const { return _seats; }
 			const boost::posix_time::ptime&	getBookingTime()		const;
 			const boost::posix_time::ptime&	getCancellationTime()	const;
 			util::RegistryKeyType	getCustomerUserId()		const { return _customerUserId; }
@@ -125,7 +127,8 @@ namespace synthese
 			util::RegistryKeyType	getCancelUserId()		const { return _cancelUserId; }
 			const std::string&		getCustomerEMail()		const;
 			const Reservations&		getReservations()		const;
-			const std::string& getComment() const { return _comment; }
+			const std::string&		getComment()			const { return _comment; }
+			const bool				getPRM()				const { return _prm; }
 
 
 

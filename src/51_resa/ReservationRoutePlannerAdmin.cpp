@@ -529,6 +529,7 @@ namespace synthese
 					rf,
 					_request
 				);
+				rf.addHiddenField(BookReservationAction::PARAMETER_CUSTOMER_PRM, lexical_cast<string>(_disabledPassenger));
 				stream << rf.close();
 			}
 		}

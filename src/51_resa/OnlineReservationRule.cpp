@@ -97,6 +97,7 @@ namespace synthese
 		const std::string OnlineReservationRule::DATA_RESERVATIONS("reservations");
 		const std::string OnlineReservationRule::DATA_TRANSACTION_RESERVATION("reservation_transaction");
 		const std::string OnlineReservationRule::DATA_TOKEN_CANCELLATION("token_cancel");
+		const std::string OnlineReservationRule::DATA_IS_RESERVATION_PRM("prm");
 
 		const std::string OnlineReservationRule::TYPE_SUBJECT("subject");
 		const std::string OnlineReservationRule::TYPE_CONTENT("content");
@@ -340,6 +341,7 @@ namespace synthese
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
 					contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
+					contentMap.insert(DATA_IS_RESERVATION_PRM, resa.getPRM());
 					contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
 
 					if (resa.getCustomer())
@@ -377,7 +379,7 @@ namespace synthese
 			){
 				return false;
 			}
-			
+
 			try
 			{
 				EMail email(ServerModule::GetEMailSender());
@@ -417,7 +419,7 @@ namespace synthese
 				ParametersMap contentMap;
 
 				contentMap.insert(DATA_SUBJECT_OR_CONTENT, TYPE_CONTENT);
-	
+
 				int servicesNumber = 0;
 				boost::shared_ptr<ParametersMap> resasMap(new ParametersMap);
 				BOOST_FOREACH(const ReservationTransaction resa, resas)
@@ -436,7 +438,7 @@ namespace synthese
 						resaMap->insert(DATA_ARRIVAL_CITY_NAME, r->getArrivalCityName());
 						resaMap->insert(DATA_ARRIVAL_PLACE_NAME, r->getArrivalPlaceNameNoCity());
 						resaMap->insert(DATA_LINE_CODE, r->getLineCode());
-                   		resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
+						resaMap->insert(DATA_IS_RESERVATION_POSSIBLE, r->getReservationPossible());
 						resaRoadMap->insert(DATA_ROAD_RESA, resaMap);
 
 						if (r->getReservationPossible())
@@ -454,7 +456,7 @@ namespace synthese
 
 					resasMap->insert(DATA_TRANSACTION_RESERVATION, resaTransactionMap);
 				}
-			
+
 				contentMap.insert(DATA_RESERVATIONS, resasMap);
 				contentMap.insert(DATA_RESERVATIONS_NUMBER, resas.size());
 				contentMap.insert(DATA_CUSTOMER_ID, lexical_cast<string>(resas.front().getCustomerUserId()));
@@ -465,7 +467,8 @@ namespace synthese
 				contentMap.insert(DATA_ARRIVAL_CITY_NAME, (*resas.front().getReservations().rbegin())->getArrivalCityName());
 				contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resas.front().getReservations().rbegin())->getArrivalPlaceNameNoCity());
 				contentMap.insert(DATA_CUSTOMER_PHONE, resas.front().getCustomerPhone());
-				
+				contentMap.insert(DATA_IS_RESERVATION_PRM, resas.front().getPRM());
+
 				if (resas.front().getCustomer())
 				{
 					contentMap.insert(DATA_CUSTOMER_NAME, resas.front().getCustomer()->getName());
@@ -596,6 +599,7 @@ namespace synthese
 		}
 
 
+
 		void OnlineReservationRule::setSenderEMail( const std::string& value )
 		{
 			_senderEMail = value;
@@ -662,7 +666,7 @@ namespace synthese
 			const ReservationTransaction& resa,
 			bool isBecauseOfAbsence
 		) const	{
-			if((	_eMailInterface == NULL ||
+			if((_eMailInterface == NULL ||
 				_eMailInterface->getPage<ReservationCancellationEMailSubjectInterfacePage>() == NULL ||
 				_eMailInterface->getPage<ReservationCancellationEMailContentInterfacePage>() == NULL) &&
 				(!_cmsCancellationEMail.get())
@@ -735,7 +739,7 @@ namespace synthese
 					subjectMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
 					_cmsCancellationEMail.get()->display(subject, subjectMap);
-					
+
 					email.setSubject(subject.str());
 					email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
 

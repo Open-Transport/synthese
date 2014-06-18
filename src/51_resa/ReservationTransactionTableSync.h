@@ -72,6 +72,7 @@ namespace synthese
 			static const std::string COL_CANCEL_USER_ID;
 			static const std::string COL_CUSTOMER_EMAIL;
 			static const std::string COL_COMMENT;
+			static const std::string COL_PRM;
 
 
 
