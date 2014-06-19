@@ -30,6 +30,8 @@
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveTableSync.hpp"
 
+#include "SpecificPostInstall.hpp"
+
 #include "InterSYNTHESEModule.inc.cpp"
 
 void synthese::inter_synthese::moduleRegister()
@@ -58,6 +60,8 @@ void synthese::inter_synthese::moduleRegister()
 	synthese::inter_synthese::InterSYNTHESEPackageGetContentService::integrate();
 	synthese::inter_synthese::InterSYNTHESEPackagesService::integrate();
 	synthese::inter_synthese::InterSYNTHESEUpdatePushService::integrate();
+
+	synthese::inter_synthese::SpecificPostInstall::integrate();
 
 	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfig>();
 	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfigItem>();

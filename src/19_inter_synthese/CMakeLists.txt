@@ -62,6 +62,8 @@ InterSYNTHESEUpdateAckService.cpp
 InterSYNTHESEUpdateAckService.hpp
 InterSYNTHESEUpdatePushService.cpp
 InterSYNTHESEUpdatePushService.hpp
+SpecificPostInstall.cpp
+SpecificPostInstall.hpp
 )
 
 set_source_files_properties(InterSYNTHESEModule.gen.cpp InterSYNTHESEModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

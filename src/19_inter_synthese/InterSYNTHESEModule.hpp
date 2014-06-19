@@ -86,8 +86,9 @@ namespace synthese
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_MASTER_PORT;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE;
-			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID;
-			static const util::RegistryKeyType FAKE_IMPORT_ID;
+            static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID;
+            static const std::string MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL;
+            static const util::RegistryKeyType FAKE_IMPORT_ID;
 
 			typedef std::map<std::string, InterSYNTHESEPackage*> PackagesBySmartURL;
 
@@ -95,8 +96,9 @@ namespace synthese
 			static boost::posix_time::time_duration _syncWaitingTime;
 			static std::string _masterHost;
 			static std::string _masterPort;
-			static bool _slaveActive;
-			static util::RegistryKeyType _slaveId;
+            static bool _slaveActive;
+            static bool _postInstall;
+            static util::RegistryKeyType _slaveId;
 			static PackagesBySmartURL _packagesBySmartURL;
 			static bool _passiveSlaveUpdaterSelector(const InterSYNTHESESlave& object);
 
@@ -126,8 +128,9 @@ namespace synthese
 			static void QueueCleaner();
 
 			static void PassiveSlavesUpdater();
-			static void GenerateFakeImport();
-		};
+            static void GenerateFakeImport();
+            static void PostInstall();
+        };
 
 		/** @} */
 	}
