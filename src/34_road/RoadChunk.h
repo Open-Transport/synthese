@@ -205,6 +205,14 @@ namespace synthese
 					HouseNumber houseNumber
 				) const;
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Computes house number for a metric offset
+				/// @param metricOffset the metric offset
+				/// @return the house number closest to this metric offset
+				HouseNumber getHouseNumberFromOffset(
+					double metricOffset
+				) const;
+
 				virtual bool loadFromRecord(
 					const Record& record,
 					util::Env& env

@@ -301,6 +301,53 @@ namespace synthese
 
 
 
+		HouseNumber RoadChunk::getHouseNumberFromOffset(
+			double metricOffset
+		) const {
+			double relativePosition = (metricOffset - this->getMetricOffset()) / (this->getForwardEdge().getEndMetricOffset() - this->getMetricOffset());
+			HouseNumberBounds bounds = getLeftHouseNumberBounds();
+
+			if(!bounds)
+			{
+				return 0;
+			}
+			else if(relativePosition > 1)
+			{
+				return bounds->second;
+			}
+			else if(relativePosition < 0)
+			{
+				return bounds->first;
+			}
+			else
+			{
+				HouseNumber closestHouseNumber(
+					(bounds->first <= bounds->second) ?
+						min(
+							(double)bounds->second,
+							ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1))
+						) :
+						max(
+							(double)bounds->first,
+							floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
+						)
+				);
+
+				switch(getLeftHouseNumberingPolicy())
+				{
+					case ODD_NUMBERS:
+						return closestHouseNumber - (closestHouseNumber % 2) + 1;
+					case EVEN_NUMBERS:
+						return closestHouseNumber - (closestHouseNumber % 2);
+					case ALL_NUMBERS:
+					default:
+						return closestHouseNumber;
+				}
+			}
+		}
+
+
+
 		void RoadChunk::addHouse(House& house)
 		{
 			if(house.getHouseNumber())

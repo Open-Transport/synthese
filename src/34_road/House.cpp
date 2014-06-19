@@ -79,6 +79,30 @@ namespace synthese
 
 
 		House::House(
+			RoadChunk& chunk,
+			double metricOffset,
+			bool numberAtBeginning,
+			std::string separator
+		):	Registrable(0),
+			Address(
+				chunk,
+				metricOffset,
+				chunk.getHouseNumberFromOffset(metricOffset)
+			),
+			_numberAtBeginning(numberAtBeginning)
+		{
+			setName(
+				string(
+					(numberAtBeginning ? lexical_cast<string>(*(this->getHouseNumber())) : chunk.getRoad()->get<RoadPlace>()->getName()) +
+					separator +
+					(numberAtBeginning ? chunk.getRoad()->get<RoadPlace>()->getName() : lexical_cast<string>(*(this->getHouseNumber())))
+			)	);
+			setCity(chunk.getRoad()->get<RoadPlace>()->getCity());
+		}
+
+
+
+		House::House(
 			util::RegistryKeyType key
 		):	Registrable(key),
 			_numberAtBeginning(true)
