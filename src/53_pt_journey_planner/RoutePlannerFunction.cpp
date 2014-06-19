@@ -3739,8 +3739,18 @@ namespace synthese
 			ParametersMap pm(getTemplateParameters());
 
 			// Departure point
-			if(	departureVertex.getGeometry().get() &&
-				!departureVertex.getGeometry()->isEmpty()
+			if(isFirstLeg)
+			{
+				Place* place = _departure_place.placeResult.value.get();
+				boost::shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(*(place->getPoint()))
+				);
+
+				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
+				pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
+			}
+			else if(departureVertex.getGeometry().get() &&
+					!departureVertex.getGeometry()->isEmpty()
 			){
 				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
@@ -3749,9 +3759,20 @@ namespace synthese
 				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
 				pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
 			}
+
 			// Arrival point
-			if(	arrivalVertex.getGeometry().get() &&
-				!arrivalVertex.getGeometry()->isEmpty()
+			if(isLastLeg)
+			{
+				Place* place = _arrival_place.placeResult.value.get();
+				boost::shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(*(place->getPoint()))
+				);
+
+				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
+				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
+			}
+			else if(arrivalVertex.getGeometry().get() &&
+					!arrivalVertex.getGeometry()->isEmpty()
 			){
 				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
@@ -3760,6 +3781,7 @@ namespace synthese
 				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
 				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
 			}
+
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
