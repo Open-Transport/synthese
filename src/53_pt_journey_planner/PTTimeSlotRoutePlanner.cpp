@@ -134,7 +134,9 @@ namespace synthese
 					getLowestDepartureTime(),
 					getHighestDepartureTime(),
 					getLowestArrivalTime(),
-					getHighestArrivalTime()
+					getHighestArrivalTime(),
+					_departurePlace,
+					_arrivalPlace
 				);
 				ovam = extenderToPhysicalStops.run(
 					_originVam,

@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_AStarShortestPathCalculator_H__
 #define SYNTHESE_AStarShortestPathCalculator_H__
 
-#include <queue>
-
 #include "AccessParameters.h"
 #include "AlgorithmTypes.h"
+
+#include <queue>
+
+#include <geos/geom/LineString.h>
 
 namespace geos
 {
@@ -57,6 +59,7 @@ namespace synthese
 
 	namespace road
 	{
+		class Address;
 		class Crossing;
 		class RoadChunkEdge;
 	}
@@ -135,6 +138,16 @@ namespace synthese
 			graph::Journey _generateJourneyFromNode(
 				const pt::StopPoint* arrival,
 				const boost::shared_ptr<AStarNode> lastNode
+			) const;
+
+
+			boost::shared_ptr<geos::geom::LineString> _computeGeometryExtremity(
+				const road::Address* startAddress,
+				const road::Address* endAddress,
+				const road::RoadChunkEdge* chunk,
+				bool chunkIsForward,
+				ResultPath::iterator insertPosition,
+				ResultPath& path
 			) const;
 		};
 
