@@ -63,6 +63,8 @@ namespace synthese
 			double metricOffset,
 			double carSpeed
 		):	util::Registrable(id),
+			_leftHouseNumberingPolicy(ALL_NUMBERS),
+			_rightHouseNumberingPolicy(ALL_NUMBERS),
 			_carOneWay(0),
 			_carSpeed(carSpeed),
 			_road(street),
