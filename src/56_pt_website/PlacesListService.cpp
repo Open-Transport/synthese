@@ -355,6 +355,12 @@ namespace synthese
 					RoadChunk& chunk(static_cast<RoadChunk&>(*roadChunk));
 					HouseNumber houseNumber(0);
 
+					boost::shared_ptr<LineString> chunkGeometry = chunk.getRealGeometry();
+					if(!chunkGeometry || chunkGeometry->isEmpty())
+					{
+						continue;
+					}
+
 					bool compatibleWithUserClasses(true);
 					BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
 					{
