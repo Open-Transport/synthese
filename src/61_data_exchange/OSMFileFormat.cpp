@@ -232,6 +232,7 @@ namespace synthese
 					road->set<RoadPlace>(*roadPlace);
 					road->set<Key>(RoadTableSync::getId());
 					_env.getEditableRegistry<Road>().add(road);
+					road->link(_env);
 					_recentlyCreatedRoadParts[way->getId()] = road;
 
 					double maxSpeed = way->getAssociatedSpeed();
