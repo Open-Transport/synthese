@@ -797,7 +797,7 @@ namespace synthese
 				}
 
 				// Size check
-				if(rank < _path->getEdges().size())
+				if(rank < (*(_path->getEdges().rbegin()))->getRankInPath())
 				{
 					Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
 					for(; rank<_path->getEdges().size(); ++rank)
