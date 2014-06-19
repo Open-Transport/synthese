@@ -96,10 +96,11 @@ namespace synthese
                 InterSYNTHESEConfigTableSync::Save(&newConfig);
 
                 InterSYNTHESESlave slave;
-                slave.set<Name>("SAE");
+                slave.set<Name>("__SAE__");
                 slave.set<ServerAddress>("assurancetourix3.rcsmobility.com");
                 slave.set<ServerPort>("8083");
                 slave.set<InterSYNTHESEConfig>(newConfig);
+                slave.set<Active>(true);
                 InterSYNTHESESlaveTableSync::Save(&slave);
 
                 addTable(newConfig, "44");
