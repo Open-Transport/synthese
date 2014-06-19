@@ -336,10 +336,18 @@ namespace synthese
 				true
 			);
 
+			typedef std::set<boost::shared_ptr<AStarNode>, AStarNodeComparator> OrderedNodes;
+			OrderedNodes nodes;
+
 			BOOST_FOREACH(const NodeMap::value_type& node, nodeMap)
 			{
+				nodes.insert(node.second);
+			}
+
+			BOOST_FOREACH(const OrderedNodes::value_type& node, nodes)
+			{
 				VertexAccessMap crossingVAM;
-				node.second->getCrossing()->getVertexAccessMap(crossingVAM, pt::PTModule::GRAPH_ID, *node.second->getCrossing(), false);
+				node->getCrossing()->getVertexAccessMap(crossingVAM, pt::PTModule::GRAPH_ID, *node->getCrossing(), false);
 
 				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& currentVertex, crossingVAM.getMap())
 				{
@@ -347,7 +355,7 @@ namespace synthese
 					if(foundStops.find(stop) == foundStops.end())
 					{
 						foundStops.insert(stop);
-						Journey approachJourney = _generateJourneyFromNode(stop, node.second);
+						Journey approachJourney = _generateJourneyFromNode(stop, node);
 						result.insert(stop, VertexAccess(approachJourney.getEffectiveDuration(), approachJourney.getDistance(), approachJourney));
 					}
 				}

@@ -172,6 +172,27 @@ namespace synthese
 			void setDistance(double distance){ _distance = distance; }
 			void markAsVisited(){ _visited = true; }
 		};
+
+		struct AStarNodeComparator {
+			bool operator()(const boost::shared_ptr<AStarNode> n1, const boost::shared_ptr<AStarNode> n2)
+			{
+				if(n1->getRealCost() == n2->getRealCost())
+				{
+					if(n1->getHeuristicCost() == n2->getHeuristicCost())
+					{
+						return &n1 < &n2;
+					}
+					else
+					{
+						return n1->getHeuristicCost() < n2->getHeuristicCost();
+					}
+				}
+				else
+				{
+					return n1->getRealCost() < n2->getRealCost();
+				}
+			}
+		};
 	}
 }
 
