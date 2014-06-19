@@ -61,9 +61,12 @@ std::vector<geos::geom::Polygon*>* GeomUtil::polygonize(std::list<WayPtr> &ways)
       BOOST_FOREACH(geos::geom::LineString *ls, *lss) {
          if(ls->getNumPoints()>3 && ls->isClosed()) {
             geos::geom::Polygon *p = gf->createPolygon(gf->createLinearRing(ls->getCoordinates()),0);
-            ret->push_back(p);
+			ret->push_back(p);
          }
+		 delete ls;
       }
+	  lss->clear();
+	  delete lss;
    } else if(ways.size() == 1){
       WayPtr w = ways.front();
       const std::list<std::pair<unsigned long long int,NodePtr> > *nodes = w->getNodes();

@@ -380,6 +380,8 @@ namespace synthese
 						city->addIncludedPlace(static_cast<NamedPlace&>(*centralRoad->second->get<RoadPlace>()));
 					}
 				}
+
+				delete centroid;
 			}
 
 			_logDebug("finished inserting road network");
@@ -541,6 +543,13 @@ namespace synthese
 			}
 
 			_logDebug("finished validating road geometries");
+
+			BOOST_FOREACH(HousesNodesWithGeom::value_type& nodePair, housesNodesWithGeom)
+			{
+				delete nodePair.second;
+			}
+			housesNodesWithGeom.clear();
+
 			return true;
 		}
 
