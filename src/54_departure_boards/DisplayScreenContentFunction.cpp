@@ -1141,6 +1141,7 @@ namespace synthese
 				typedef map<LineDestinationKey, OrderedServices, LineDestinationKey_comparator> DeparturesByDestination;
 				typedef map<const StopArea*, DeparturesByDestination> DestinationsServicesByArea;
 
+				set<RegistryKeyType> linesWithRealTime;
 				DestinationsServicesByArea serviceMap;
 
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
@@ -1307,6 +1308,7 @@ namespace synthese
 							if(!realTimeService.commercialLine)
 								continue;
 
+							linesWithRealTime.insert(realTimeService.commercialLine->getKey());
 							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
 							{
 								bool displayDeparture(false);
@@ -1535,10 +1537,6 @@ namespace synthese
 						const CommercialLine* commercialLine(destinationMap.first.first);
 						const StopArea* destination(destinationMap.first.second);
 
-						string curShortName = boost::algorithm::to_lower_copy(
-							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-						);
-
 						boost::shared_ptr<ParametersMap> schedulePM(new ParametersMap());
 
 						boost::shared_ptr<ParametersMap> linePM(new ParametersMap());
@@ -1551,7 +1549,7 @@ namespace synthese
 
 						const StopPoint* stop(NULL);
 
-						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+						if(noRealTime || linesWithRealTime.find(commercialLine->getKey()) == linesWithRealTime.end())
 						{
 							for(OrderedServices::second_type::const_iterator it = destinationMap.second.second.begin() ; it != destinationMap.second.second.end() ; it++)
 							{
