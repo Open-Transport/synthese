@@ -65,6 +65,7 @@ namespace synthese
 			static const std::string DATA_SCENARIO_NAME;
 			static const std::string DATA_TITLE;
 			static const std::string DATA_DONE;
+            static const std::string DATA_DISPLAY_DURATION;
 
 			static const std::string TAG_MESSAGE_ALTERNATIVE;
 			static const std::string TAG_RECIPIENTS;
@@ -93,6 +94,7 @@ namespace synthese
 			bool				_done;
 			const MessagesSection* _section;
 			const ScenarioCalendar* _calendar;
+            std::size_t         _displayDuration;
 
 			// Links
 			//@{
@@ -131,6 +133,7 @@ namespace synthese
 				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
 				const MessagesSection* getSection() const { return _section; }
 				const ScenarioCalendar* getCalendar() const { return _calendar; }
+                std::size_t             getDisplayDuration() const { return _displayDuration;}
 			//@}
 
 			//! @name Setters
@@ -146,6 +149,7 @@ namespace synthese
 				void removeLinkedObject(const AlarmObjectLink& link) const;
 				void setSection(const MessagesSection* value){ _section = value; }
 				void setCalendar(const ScenarioCalendar* value){ _calendar = value; }
+                void setDisplayDuration(std::size_t value){ _displayDuration = value; }
 			//@}
 
 			//! @name Services
