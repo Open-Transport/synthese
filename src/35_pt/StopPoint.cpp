@@ -122,6 +122,15 @@ namespace synthese
 						_projectedPoint.getMetricOffset()
 					);
 				}
+
+				if(_projectedPoint.getRoadChunk()->getForwardEdge().getNext() &&
+					static_cast<const Crossing*>(_projectedPoint.getRoadChunk()->getForwardEdge().getNext()->getFromVertex()) == &crossing
+				){
+					return VertexAccess(
+						minutes(static_cast<long>((_projectedPoint.getRoadChunk()->getForwardEdge().getEndMetricOffset() - _projectedPoint.getMetricOffset()) / 50)),
+						_projectedPoint.getRoadChunk()->getForwardEdge().getEndMetricOffset() - _projectedPoint.getMetricOffset()
+					);
+				}
 			}
 			return VertexAccess();
 		}
@@ -617,6 +626,10 @@ namespace synthese
 			if(getProjectedPoint().getRoadChunk())
 			{
 				getProjectedPoint().getRoadChunk()->getFromCrossing()->addReachableVertex(this);
+				if(getProjectedPoint().getRoadChunk()->getForwardEdge().getNext())
+				{
+					static_cast<Crossing*>(getProjectedPoint().getRoadChunk()->getForwardEdge().getNext()->getFromVertex())->addReachableVertex(this);
+				}
 			}
 		}
 
@@ -632,6 +645,11 @@ namespace synthese
 				getProjectedPoint().getRoadChunk()->getFromCrossing()
 			){
 				getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(this);
+			}
+			else if(getProjectedPoint().getRoadChunk() &&
+					getProjectedPoint().getRoadChunk()->getForwardEdge().getFromVertex()
+			){
+				static_cast<Crossing*>(getProjectedPoint().getRoadChunk()->getForwardEdge().getFromVertex())->removeReachableVertex(this);
 			}
 		}
 }	}
