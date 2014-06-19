@@ -502,7 +502,7 @@ namespace synthese
 
 						stopResult = _city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
 								_text,
-								_number ? *_number : 0,
+								0,
 								_minScore
 						);
 
@@ -516,6 +516,11 @@ namespace synthese
 							}
 
 							newStopResult.push_back(item);
+
+							if(_number && (newStopResult.size() >= (*_number)))
+							{
+								break;
+							}
 						}
 
 						_registerItems<NamedPlace>(
@@ -649,7 +654,7 @@ namespace synthese
 
 						stopResult = PTModule::GetGeneralStopsMatcher().bestMatches(
 								_text,
-								_number ? *_number : 0,
+								0,
 								_minScore
 						);
 
@@ -663,6 +668,11 @@ namespace synthese
 							}
 
 							newStopResult.push_back(item);
+
+							if(_number && (newStopResult.size() >= (*_number)))
+							{
+								break;
+							}
 						}
 
 						_registerItems<StopArea>(
