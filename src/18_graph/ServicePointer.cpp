@@ -319,9 +319,7 @@ namespace synthese
 
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 			bool drtAreaSequence = false;
-			bool hasGeometry = false;
 			bool hasDRTArea = false;
-			Coordinate previousCoordinates;
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
 				if(dynamic_cast<const pt::AreaGeneratedLineStop*>(edge))
@@ -335,20 +333,13 @@ namespace synthese
 							cs->add(*edge->getFromVertex()->getGeometry()->getCoordinate(),false);
 						}
 					}
-					else
-					{
-						if(edge->getFromVertex()->getGeometry())
-						{
-							previousCoordinates = *edge->getFromVertex()->getGeometry()->getCoordinate();
-						}
-					}
 					continue;
 				}
 				else
 				{
 					if(drtAreaSequence) // True if a DRTArea sequence is followed by a stop sequence
 					{
-						cs->add(previousCoordinates,false);
+						cs->add(*edge->getFromVertex()->getGeometry()->getCoordinate(),false);
 						drtAreaSequence = false;
 					}
 				}
@@ -357,7 +348,6 @@ namespace synthese
 				{
 					continue;
 				}
-				hasGeometry = true;
 				for(size_t i(0); i<geometry->getNumPoints(); ++i)
 				{
 					cs->add(geometry->getCoordinateN(i));
@@ -365,22 +355,22 @@ namespace synthese
 			}
 			if(drtAreaSequence) // Service end by DRTAreas
 			{
-				cs->add(previousCoordinates,false);
+				cs->add(*_arrivalEdge->getFromVertex()->getGeometry()->getCoordinate(),false);
 			}
-			if(!hasGeometry && hasDRTArea) // Service is virtual TAD without mixed regular stops
+			cs->removeRepeatedPoints();
+			if(cs->size() < 2)
+			{
+				return boost::shared_ptr<LineString>();
+			}
+			else if (hasDRTArea)
 			{
 				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 				csTwoPoints->add(cs->getAt(0));
 				csTwoPoints->add(cs->getAt(cs->getSize()-1));
 				return boost::shared_ptr<LineString>(geometryFactory.createLineString(csTwoPoints));
 			}
-			if(cs->size() < 2)
-			{
-				return boost::shared_ptr<LineString>();
-			}
 			else
 			{
-				cs->removeRepeatedPoints();
 				return boost::shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 		}
