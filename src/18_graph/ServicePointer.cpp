@@ -253,7 +253,14 @@ namespace synthese
 		{
 			assert(_arrivalEdge && _departureEdge);
 
-			return _arrivalEdge->getMetricOffset() - _departureEdge->getMetricOffset();
+			if(_customGeometry)
+			{
+				return std::max(_customGeometry->getLength(), 1.0);
+			}
+			else
+			{
+				return _arrivalEdge->getMetricOffset() - _departureEdge->getMetricOffset();
+			}
 		}
 
 
@@ -308,10 +315,24 @@ namespace synthese
 
 
 
+		void ServicePointer::setCustomGeometry(boost::shared_ptr<geos::geom::LineString> geometry)
+		{
+			_customGeometry = boost::shared_ptr<geos::geom::LineString>(
+				CoordinatesSystem::GetDefaultGeometryFactory().createLineString(*geometry)
+			);
+		}
+
+
+
 		boost::shared_ptr<geos::geom::LineString> ServicePointer::getGeometry() const
 		{
 			assert(_departureEdge);
 			assert(_arrivalEdge);
+
+			if(_customGeometry)
+			{
+				return _customGeometry;
+			}
 
 			const GeometryFactory& geometryFactory(
 				CoordinatesSystem::GetDefaultGeometryFactory()
