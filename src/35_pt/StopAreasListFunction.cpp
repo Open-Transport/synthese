@@ -601,6 +601,11 @@ namespace synthese
 				{
 					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(_outputArrivalLines))
 					{
+						if(_dataSourceFilter && !itLine->hasLinkWithSource(*_dataSourceFilter))
+						{
+							continue;
+						}
+
 						// For CMS output
 						boost::shared_ptr<ParametersMap> pmLine(new ParametersMap);
 
