@@ -103,8 +103,8 @@ namespace synthese
                 slave.set<Active>(true);
                 InterSYNTHESESlaveTableSync::Save(&slave);
 
-                addTable(newConfig, "44");
-                addTable(newConfig, "46");
+                //addTable(newConfig, "44");
+                //addTable(newConfig, "46");
                 addTable(newConfig, "118");
                 addTable(newConfig, "119");
                 Log::GetInstance().info("InterSYNTHESEConfig post install created");
