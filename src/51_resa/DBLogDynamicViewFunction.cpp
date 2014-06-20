@@ -32,7 +32,7 @@
 #include "DBLog.h"
 #include "DBLogModule.h"
 #include "DBLogEntryTableSync.h"
-#include "DBLogRight.h"
+#include "ResaRight.h"
 #include "ResaDBLog.h"
 #include "Request.h"
 #include "Profile.h"
@@ -256,7 +256,7 @@ namespace synthese
 
 		bool DBLogDynamicViewFunction::isAuthorized(const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DBLogRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 	}
 }
