@@ -98,6 +98,7 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::SEP(",");
 
 		const std::string GTFSFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_AUTO_CREATE_STOP_AREA("auto_create_stop_area");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
@@ -163,6 +164,7 @@ namespace synthese
 			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_importStopArea(false),
+			_autoCreateStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
 			_networks(*import.get<DataSource>(), env),
@@ -263,7 +265,7 @@ namespace synthese
 				while(getline(inFile, line))
 				{
 					_loadLine(line);
-					if(_getValue("location_type") != "0")
+					if(_getValue("location_type") != "0" && !_autoCreateStopArea)
 					{
 						continue;
 					}
@@ -286,7 +288,7 @@ namespace synthese
 					{
 						stopArea = (*_stopPoints.get(id).begin())->getConnectionPlace();
 					}
-					else
+					else if (!_autoCreateStopArea)
 					{
 						_logWarning(
 							"inconsistent stop area id "+ stopAreaId +" in the stop point "+ id
@@ -324,15 +326,31 @@ namespace synthese
 						);
 					}
 					// Creation or update
-					_createOrUpdateStop(
-						_stopPoints,
-						id,
-						name,
-						optional<const RuleUser::Rules&>(),
-						stopArea,
-						point.get(),
-						dataSource
-					);
+					if (_autoCreateStopArea)
+					{
+						_createOrUpdateStopWithStopAreaAutocreation(
+							_stopPoints,
+							id,
+							name,
+							point.get(),
+							*_defaultCity.get(),
+							_stopAreaDefaultTransferDuration,
+							dataSource,
+							optional<const RuleUser::Rules&>()
+						);
+					}
+					else
+					{
+						_createOrUpdateStop(
+							_stopPoints,
+							id,
+							name,
+							optional<const RuleUser::Rules&>(),
+							stopArea,
+							point.get(),
+							dataSource
+						);
+					}
 				}
 
 				_exportStopPoints(
@@ -547,7 +565,14 @@ namespace synthese
 					trip.destination = _getValue("trip_headsign");
 
 					// Direction
-					trip.direction = lexical_cast<bool>(_getValue("direction_id"));
+					if (_fieldsMap.find("direction_id") != _fieldsMap.end())
+					{
+						trip.direction = lexical_cast<bool>(_getValue("direction_id"));
+					}
+					else
+					{
+						trip.direction = false;
+					}
 
 					_trips.insert(make_pair(id, trip));
 				}
@@ -644,7 +669,8 @@ namespace synthese
 					}
 
 					TripDetail tripDetail;
-					if(_getValue("shape_dist_traveled") != "")
+					if(_fieldsMap.find("shape_dist_traveled") != _fieldsMap.end() &&
+						_getValue("shape_dist_traveled") != "")
 					{
 						tripDetail.offsetFromLast = lexical_cast<MetricOffset>(_getValue("shape_dist_traveled"));
 					}
@@ -834,6 +860,7 @@ namespace synthese
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
+			_autoCreateStopArea = map.getDefault<bool>(PARAMETER_AUTO_CREATE_STOP_AREA, false);
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 
