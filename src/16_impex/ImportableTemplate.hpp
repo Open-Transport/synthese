@@ -45,7 +45,10 @@ namespace synthese
 				{
 					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
 					{
-						link.first->removeLinks(static_cast<T&>(*this));
+						if (link.first)
+						{
+							link.first->removeLinks(static_cast<T&>(*this));
+						}
 				}	}
 				_dataSourceLinks.clear();
 			}
