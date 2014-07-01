@@ -76,7 +76,7 @@ namespace synthese
 	{
 		ResaEditLogEntryAdmin::ResaEditLogEntryAdmin()
 			: AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>(),
-			_log("log")
+			_log("resa")
 		{ }
 
 		void ResaEditLogEntryAdmin::setFromParametersMap(
