@@ -83,7 +83,8 @@ namespace synthese
 			void _parseAndLoad(
 				const std::string& s,
 				boost::optional<const impex::Importer&> importer,
-				bool noSuppressTopLevel
+				bool noSuppressTopLevel,
+				bool noSuppressAnything
 			);
 
 			void _deleteObjectsToRemove(
@@ -102,7 +103,8 @@ namespace synthese
 				const std::string& s,
 				impex::Import& import,
 				boost::optional<const impex::Importer&> importer,
-				bool noSuppressTopLevel = false
+				bool noSuppressTopLevel = false,
+				bool noSuppressAnything = false
 			);
 
 			InterSYNTHESEPackageContent(
@@ -110,7 +112,8 @@ namespace synthese
 				const std::string& s,
 				const boost::shared_ptr<InterSYNTHESEPackage>& pacakge,
 				boost::optional<const impex::Importer&> importer,
-				bool noSuppressTopLevel = false
+				bool noSuppressTopLevel = false,
+				bool noSuppressAnything = false
 			);
 
 			LoadedObjects& getLoadedObjects();

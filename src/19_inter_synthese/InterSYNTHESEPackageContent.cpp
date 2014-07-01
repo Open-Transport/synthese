@@ -55,12 +55,13 @@ namespace synthese
 			const std::string& s,
 			impex::Import& import,
 			boost::optional<const impex::Importer&> importer,
-			bool noSuppressTopLevel
+			bool noSuppressTopLevel,
+			bool noSuppressAnything
 		):	_env(env),
 			_package(new InterSYNTHESEPackage)
 		{
 			_package->set<Import>(import);
-			_parseAndLoad(s, importer, noSuppressTopLevel);
+			_parseAndLoad(s, importer, noSuppressTopLevel, noSuppressAnything);
 			_env.add(_package);
 		}
 
@@ -77,11 +78,12 @@ namespace synthese
 			const std::string& s,
 			const boost::shared_ptr<InterSYNTHESEPackage>& package,
 			boost::optional<const impex::Importer&> importer,
-			bool noSuppressTopLevel
+			bool noSuppressTopLevel,
+			bool noSuppressAnything
 		):	_env(env),
 			_package(package)
 		{
-			_parseAndLoad(s, importer, noSuppressTopLevel);
+			_parseAndLoad(s, importer, noSuppressTopLevel, noSuppressAnything);
 		}
 
 
@@ -94,7 +96,8 @@ namespace synthese
 		void InterSYNTHESEPackageContent::_parseAndLoad(
 			const string& s,
 			boost::optional<const impex::Importer&> importer,
-			bool noSuppressTopLevel
+			bool noSuppressTopLevel,
+			bool noSuppressAnything
 		){
 			ContentMap contentMap;
 
@@ -191,11 +194,11 @@ namespace synthese
 			_package->set<Public>(
 				_objects.get<bool>(Public::FIELD.name, false)
 			);
-			if (!noSuppressTopLevel)
+			if (!noSuppressTopLevel && !noSuppressAnything)
 			{
 				_prepareObjectsToRemove(_objects);
 			}
-			else
+			else if (!noSuppressAnything)
 			{
 				_prepareObjectsToRemovenoTopLevel(_objects);
 			}
