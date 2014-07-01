@@ -749,7 +749,7 @@ namespace synthese
 			PTDataCleanerFileFormat::_addRemoveQueries(transaction);
 
 			// Saving of each created or altered objects
-			if(_importStopArea)
+			if(_importStopArea || _autoCreateStopArea)
 			{
 				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
 				{
