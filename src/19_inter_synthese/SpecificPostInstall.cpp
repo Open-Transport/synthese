@@ -97,8 +97,8 @@ namespace synthese
 
                 InterSYNTHESESlave slave;
                 slave.set<Name>("__SAE__");
-                slave.set<ServerAddress>("assurancetourix3.rcsmobility.com");
-                slave.set<ServerPort>("8083");
+                slave.set<ServerAddress>("optymo-sae.rcsmobility.com");
+                slave.set<ServerPort>("80");
                 slave.set<InterSYNTHESEConfig>(newConfig);
                 slave.set<Active>(true);
                 InterSYNTHESESlaveTableSync::Save(&slave);
