@@ -58,6 +58,7 @@ namespace synthese
 				static const std::string PARAMETER_LOCK;
 				static const std::string PARAMETER_LOCK_SERVER_NAME;
 				static const std::string PARAMETER_NO_SUPPRESS_TOP_LEVEL;
+				static const std::string PARAMETER_NO_SUPPRESS_ANYTHING;
 
 			private:
 				std::string _smartURL;
@@ -67,6 +68,7 @@ namespace synthese
 				std::string _lockServerName;
 				mutable std::auto_ptr<InterSYNTHESEPackageContent> _content;
 				bool _noSuppressTopLevel;
+				bool _noSuppressAnything;
 
 			protected:
 

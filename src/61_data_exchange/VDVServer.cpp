@@ -177,7 +177,7 @@ namespace synthese
 			bool updateFromServer(false);
 			try
 			{
-				Log::GetInstance().warn("VDVServer : Envoie d'une requête de statut à " + _getURL("status"));
+				Log::GetInstance().warn("VDVServer : Envoie d'une requête de statut pour " + get<Name>() + " à " + _getURL("status"));
 				string statusAntwortStr(
 					c.post(_getURL("status"), statusAnfrage.str(), contentType)
 				);
