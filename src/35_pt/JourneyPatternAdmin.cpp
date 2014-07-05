@@ -40,6 +40,7 @@
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JourneyPatternUpdateAction.hpp"
 #include "LineStopTableSync.h"
+#include "MalformedSchedulesException.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "Profile.h"
 #include "PTModule.h"
@@ -692,20 +693,27 @@ namespace synthese
 					string number("S"+ lexical_cast<string>(i++));
 					services[service.get()] = number;
 
-					recursive_mutex::scoped_lock lock(service->getSchedulesMutex());
-					time_duration ds(service->getDepartureSchedule(false, 0));
-					time_duration as(service->getLastArrivalSchedule(false));
-
 					stream << ts.row(lexical_cast<string>(service->getKey()));
 
 					stream << ts.col() << number;
 
 					stream << ts.col() << service->getServiceNumber();
 
-					stream << ts.col() << ds;
-					stream << ts.col() << as;
+					try
+					{
+						recursive_mutex::scoped_lock lock(service->getSchedulesMutex());
+						time_duration ds(service->getDepartureSchedule(false, 0));
+						time_duration as(service->getLastArrivalSchedule(false));
 
-					stream << ts.col() << (as - ds);
+						stream << ts.col() << ds;
+						stream << ts.col() << as;
+
+						stream << ts.col() << (as - ds);
+					}
+					catch(MalformedSchedulesException&)
+					{
+						stream << ts.col(3) << "Horaires corrompus";
+					}
 
 					serviceRequest.getPage()->setActiveTab(ServiceAdmin::TAB_CALENDAR);
 					stream << ts.col() << HTMLModule::getHTMLLink(serviceRequest.getURL(), to_iso_extended_string(service->getLastActiveDate()));

@@ -26,6 +26,7 @@
 #include "CommercialLine.h"
 #include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
+#include "MalformedSchedulesException.hpp"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
 #include "RealTimePTDataInterSYNTHESE.hpp"
@@ -215,12 +216,18 @@ namespace synthese
 			// Lock the schedules
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(!RTData)
+			const Schedules& schedules(
+				RTData ?
+				getArrivalSchedules(true, RTData) :
+				getDataArrivalSchedules()
+			);
+
+			if(schedules.empty())
 			{
-				return *getDataArrivalSchedules().rbegin();
+				throw MalformedSchedulesException();
 			}
 
-			return *getArrivalSchedules(true, RTData).rbegin();
+			return *schedules.rbegin();
 		}
 
 
