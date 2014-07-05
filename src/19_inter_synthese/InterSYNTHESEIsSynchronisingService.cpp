@@ -87,7 +87,7 @@ namespace synthese
             split(queueIdVect, queueIdsStr, is_any_of(","), token_compress_on);
             BOOST_FOREACH(string idstr, queueIdVect)
             {
-                _queueIds.insert(static_cast<RegistryKeyType>(atoll(idstr.c_str())));
+                _queueIds.insert(lexical_cast<RegistryKeyType>(idstr));
             }
 		}
 
