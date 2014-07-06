@@ -89,7 +89,7 @@ namespace synthese
 				_service = dynamic_pointer_cast<SchedulesBasedService, Registrable>(
 					DBModule::GetEditableObject(
 						map.get<RegistryKeyType>(PARAMETER_SERVICE_ID),
-						*_env
+						Env::GetOfficialEnv()
 				)	);
 			}
 			catch(Exception&)

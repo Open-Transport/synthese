@@ -501,7 +501,7 @@ namespace synthese
 					setPath(path);
 					if(path->getEdges().empty())
 					{
-						LineStopTableSync::Search(env, pathId);
+						LineStopTableSync::Search(env, pathId, optional<RegistryKeyType>(), 0, optional<size_t>(), true, true, UP_DOWN_LINKS_LOAD_LEVEL);
 					}
 					result = true;
 				}
