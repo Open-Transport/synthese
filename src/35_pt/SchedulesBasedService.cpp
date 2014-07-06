@@ -252,7 +252,10 @@ namespace synthese
 				{
 					_generateSchedules();
 				}
-				return _generatedDepartureSchedules;
+				if(!_generatedDepartureSchedules.empty())
+				{
+					return _generatedDepartureSchedules;
+				}
 			}
 
 			return _emptySchedules;
@@ -280,7 +283,10 @@ namespace synthese
 				{
 					_generateSchedules();
 				}
-				return _generatedArrivalSchedules;
+				if(!_generatedArrivalSchedules.empty())
+				{
+					return _generatedArrivalSchedules;
+				}
 			}
 
 			return _emptySchedules;
@@ -1178,6 +1184,14 @@ namespace synthese
 
 			// Avoid multiple useless logs
 			bool badSchedulesLogged(false);
+
+			// Check if the data is not empty
+			if(	_dataDepartureSchedules.empty() ||
+				_dataArrivalSchedules.empty() ||
+				_path->getEdges().empty()
+			){
+				return;
+			}
 
 			// Departure loop
 			Schedules::const_iterator itDeparture(_dataDepartureSchedules.begin());

@@ -264,7 +264,7 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(rankInPath == 0 && !RTData)
+			if(rankInPath == 0 && !RTData && !getDataDepartureSchedules().empty())
 			{
 				return getDataDepartureSchedules()[0];
 			}
@@ -277,7 +277,7 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(rankInPath == 0 && !RTData)
+			if(rankInPath == 0 && !RTData && !getDataDepartureSchedules().empty())
 			{
 				return getDataDepartureSchedules()[0];
 			}
