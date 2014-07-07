@@ -763,9 +763,10 @@ namespace synthese
 									itS->second.arrival.push_back(time_duration(not_a_date_time));
 								}
 
-								// Register the vehicle service
-								itS->second.vehicleServices.push_back(vehicleService);
 							}
+
+							// Register the vehicle service
+							itS->second.vehicleServices.push_back(vehicleService);
 
 							tronconElement.service = NULL;
 							tronconElement.startRank = 0;
