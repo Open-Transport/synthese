@@ -100,7 +100,8 @@ namespace synthese
 				loadedVehicleServices.insert(vs.get());
 
 				// Log
-				_logCreation("Creation of the vehicle service with key "+ id);
+				_logCreation("Creation of the vehicle service " +
+							 lexical_cast<string>(vs->getKey()) + " with key "+ id);
 			}
 
 			return *loadedVehicleServices.begin();

@@ -236,6 +236,8 @@ namespace synthese
 					(	itVehicleService.second->get<Services>().empty() ||
 						itVehicleService.second->empty()
 				)	){
+					shared_ptr<VehicleService> vehicleService(itVehicleService.second);
+					_logWarning("removing vehicle service: " + lexical_cast<string>(vehicleService->getKey()));
 					_vehicleServicesToRemove.insert(itVehicleService.second);
 				}
 			}
