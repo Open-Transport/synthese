@@ -63,9 +63,9 @@ endif()
 
 include_directories(${Boost_INCLUDE_DIRS})
 
-# MySQL
+# MYSQL
 
-macro_optional_find_package(MySQL)
+macro_optional_find_package(MYSQL)
 if(WITH_MYSQL AND NOT MYSQL_FOUND)
   message(FATAL_ERROR "MySQL not found")
 endif()
