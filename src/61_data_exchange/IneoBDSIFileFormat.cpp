@@ -1038,7 +1038,10 @@ namespace synthese
 								servicesToRemove.erase(service);
 
 								// The service must be linked
-								servicesToLink.push_back(&course);
+								if(!service->hasCodeBySource(*dataSourceOnSharedEnv, course.ref))
+								{
+									servicesToLink.push_back(&course);
+								}
 								break;
 							}
 						}
