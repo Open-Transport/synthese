@@ -46,9 +46,13 @@ namespace synthese
 					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
 					{
 						if (link.first)
+						{
 							link.first->removeLinks(static_cast<T&>(*this));
+						}
 						else
-                                                    util::Log::GetInstance().debug("Null datasource for " + this->getName() + " (" + boost::lexical_cast<std::string>(this->getKey()) + ")");
+						{
+							util::Log::GetInstance().debug("Null datasource for " + this->getName() + " (" + boost::lexical_cast<std::string>(this->getKey()) + ")");
+						}
 				}	}
 				_dataSourceLinks.clear();
 			}
