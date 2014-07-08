@@ -3882,6 +3882,10 @@ namespace synthese
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
 				}
 			}
+			
+			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
+			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
+			
 			page->display(stream, request, pm);
 		}
 
