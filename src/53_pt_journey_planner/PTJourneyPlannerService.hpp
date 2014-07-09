@@ -164,6 +164,7 @@ namespace synthese
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_STOP;
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_LINE;
 			static const std::string DATA_HAS_RESERVATION;
+            static const std::string DATA_SERVICE_NUMBER;
 
 			//! @name Cells
 			//@{
@@ -269,6 +270,8 @@ namespace synthese
 				static const std::string DATA_IS_LAST_LEG;
 				static const std::string DATA_IS_FIRST_LEG;
                 static const std::string DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE;
+                static const std::string DATA_IS_ENTERING_PARKING;
+                static const std::string DATA_IS_LEAVING_PARKING;
 			//@}
 
 			//! @name Junction cells
@@ -490,7 +493,9 @@ namespace synthese
 				bool isLastWriting,
 				bool isFirstFoot,
 				bool isOriginRow,
-				bool isDestinationRow
+                bool isDestinationRow,
+                bool isEnteringParking,
+                bool isLeavingParking
 			) const;
 
 
@@ -550,7 +555,9 @@ namespace synthese
 				bool isSameThanLastArrivalStop,
 				bool color,
 				const boost::posix_time::ptime& time,
-				boost::posix_time::time_duration continuousServiceRange
+                boost::posix_time::time_duration continuousServiceRange,
+                bool isEnteringParking,
+                bool isLeavingParking
 			) const;
 
 
