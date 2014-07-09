@@ -76,6 +76,7 @@ namespace synthese
 		const string AlarmTableSync::COL_MESSAGES_SECTION_ID = "messages_section_id";
 		const string AlarmTableSync::COL_CALENDAR_ID = "calendar_id";
 		const string AlarmTableSync::COL_DATASOURCE_LINKS = "datasource_links";
+        const string AlarmTableSync::COL_DISPLAY_DURATION = "display_duration";
 	}
 
 	namespace db
@@ -98,7 +99,8 @@ namespace synthese
 			Field(AlarmTableSync::COL_MESSAGES_SECTION_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_CALENDAR_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field()
+            Field(AlarmTableSync::COL_DISPLAY_DURATION, SQL_INTEGER),
+            Field()
 		};
 
 		template<>
@@ -137,7 +139,7 @@ namespace synthese
 			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
 			alarm->setRawEditor(rows->getBool(AlarmTableSync::COL_RAW_EDITOR));
 			alarm->setDone(rows->getBool(AlarmTableSync::COL_DONE));
-
+            alarm->setDisplayDuration(rows->getInt (AlarmTableSync::COL_DISPLAY_DURATION));
 			// Section
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -291,6 +293,7 @@ namespace synthese
 				DataSourceLinks::Serialize(
 					object->getDataSourceLinks()
 			)	);
+            query.addField(object->getDisplayDuration());
 			query.execute(transaction);
 		}
 
@@ -387,11 +390,11 @@ namespace synthese
 			boost::shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env));
 			if (dynamic_cast<const SentAlarm*>(alarm.get()))
 			{
-				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(alarm.get()), session->getUser().get());
+				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(alarm.get()), (session ? session->getUser().get() : NULL));
 			}
 			else
 			{
-				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(alarm.get()), session->getUser().get());
+				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(alarm.get()), (session ? session->getUser().get() : NULL));
 			}
 		}
 	}
