@@ -117,6 +117,7 @@ namespace synthese
 		const string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
 		const string IneoFileFormat::Importer_::PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD = "journey_pattern_line_overload_field";
 		const string IneoFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
+		const string IneoFileFormat::Importer_::PARAMETER_FORBIDDEN_SERVICE_USE_RULE = "forbidden_service_use_rule";
 		const string IneoFileFormat::Importer_::PARAMETER_VEHICLE_SERVICE_SUFFIX = "vehicle_service_suffix";
 	}
 
@@ -808,12 +809,27 @@ namespace synthese
 						if(	route &&
 							(tcou == TCOU_Commercial || tcou == TCOU_HLP)
 						){
+							RuleUser::Rules forbiddenServiceRules;
+							if (tcou == TCOU_HLP) {
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+							} else {
+								forbiddenServiceRules.push_back(NULL);
+								forbiddenServiceRules.push_back(NULL);
+								forbiddenServiceRules.push_back(NULL);
+								forbiddenServiceRules.push_back(NULL);
+							}
+							
 							service = _createOrUpdateService(
 								*route,
 								departureSchedules,
 								arrivalSchedules,
 								string(),
-								dataSource
+								dataSource,
+								NULL,
+								forbiddenServiceRules
 							);
 						}
 						else if(
@@ -1212,6 +1228,12 @@ namespace synthese
 			{
 				map.insert(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE, _handicappedAllowedUseRule->getKey());
 			}
+			
+			// Forbidden service use rule
+			if(_forbiddenServiceUseRule.get())
+			{
+				map.insert(PARAMETER_FORBIDDEN_SERVICE_USE_RULE, _forbiddenServiceUseRule->getKey());
+			}
 
 			// Journey pattern line overload field
 			if(!_journeyPatternLineOverloadField.empty())
@@ -1291,6 +1313,19 @@ namespace synthese
 			catch(ObjectNotFoundException<PTUseRule>&)
 			{
 				throw Exception("No such handicapped use rule");
+			}
+			
+			// Forbidden Service use rule
+			RegistryKeyType forbiddenServiceUseRuleId(
+				map.getDefault<RegistryKeyType>(PARAMETER_FORBIDDEN_SERVICE_USE_RULE)
+			);
+			if(forbiddenServiceUseRuleId) try
+			{
+				_forbiddenServiceUseRule = PTUseRuleTableSync::GetEditable(forbiddenServiceUseRuleId, _env);
+			}
+			catch(ObjectNotFoundException<PTUseRule>&)
+			{
+				throw Exception("No such forbidden service use rule");
 			}
 
 			// Calendar dates
