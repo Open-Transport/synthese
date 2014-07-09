@@ -108,6 +108,7 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_CREATE = Action_PARAMETER_PREFIX + "me";
 		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 		const string ScenarioSaveAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "le";
+        const string ScenarioSaveAction::PARAMETER_DISPLAY_DURATION = Action_PARAMETER_PREFIX + "ddur";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
@@ -255,7 +256,6 @@ namespace synthese
 				}
 				else
 				{	// Sent scenario creation
-
 					// Copy an other sent scenario (action E)
 					if(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY, 0))
 					{
@@ -460,7 +460,7 @@ namespace synthese
 				// Event Start date
 				if(map.isDefined(PARAMETER_EVENT_START_DATE))
 				{
-					if(map.get<string>(PARAMETER_EVENT_START_DATE).empty())
+                    if(map.get<string>(PARAMETER_EVENT_START_DATE).empty())
 					{
 						_eventStartDate = ptime();
 					}
@@ -510,7 +510,7 @@ namespace synthese
 						{
 							_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
 						}
-						*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
+                        //*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
 					}
 				}
 
@@ -591,7 +591,7 @@ namespace synthese
 						_messageToCreateTitle = iconv.convert(map.get<string>(PARAMETER_CREATED_MESSAGE_TITLE));
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
-
+                    _display_duration = static_cast<size_t>(map.getDefault<int>(PARAMETER_DISPLAY_DURATION));
 
 					_recipients = Recipients::value_type();
 
@@ -1036,6 +1036,7 @@ namespace synthese
 						message->setShortMessage(messageNode.second.get("title", string()));
 						message->setLevel(static_cast<AlarmLevel>(messageNode.second.get("level", 0)));
 						message->setLongMessage(messageNode.second.get("content", string()));
+                        message->setDisplayDuration(messageNode.second.get("displayDuration", 0));
 
 						// Save
 						AlarmTableSync::Save(message.get(), transaction);
@@ -1191,6 +1192,7 @@ namespace synthese
 				message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
+                if (_display_duration) message->setDisplayDuration(*_display_duration);
 
 				AlarmTableSync::Save(message.get(), transaction);
 
