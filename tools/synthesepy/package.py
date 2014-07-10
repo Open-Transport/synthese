@@ -39,7 +39,6 @@ def run(env, args):
     svn_info = utils.SVNInfo(env.source_path)
     revision_path = 'r{0}'.format(svn_info.version)
 
-<<<<<<< .courant
     # On Linux, lets pick a more precise name for the platform
     # through lsb_release (this package must be installed)
     distro_name = env.platform
