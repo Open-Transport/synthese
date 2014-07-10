@@ -54,7 +54,7 @@ def run(env, args):
 
 
     package_relative_dir = os.sep.join([
-        env.platform, env.mode, svn_info.branch, revision_path])
+        distro_name, env.mode, svn_info.branch, revision_path])
 
     package_dir = join(config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):
@@ -62,10 +62,10 @@ def run(env, args):
             log.info('Package directory already exists (%r) not building.',
                 package_dir)
             return
-        utils.RemoveDirectory(package_dir)
 
     try:
-        os.makedirs(package_dir)
+        if not os.path.isdir(package_dir):
+            os.makedirs(package_dir)
     except:
         raise Exception('Failed to create the '
             'directory in %r, cannot continue' % package_dir)
@@ -86,8 +86,9 @@ def run(env, args):
             f.write('Environment sealed\n')
 
     # Archive
-
     ARCHIVE_NAME = 'synthese.tar.bz2'
+    if config.prefix_with_svnrelease:
+        ARCHIVE_NAME = 'synthese-relative-' +  revision_path + '.tar.bz2'
     archive_path = join(package_dir, ARCHIVE_NAME)
 
     log.info('Creating archive %r', archive_path)
