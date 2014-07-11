@@ -1390,10 +1390,13 @@ namespace synthese
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
 
-			// Output of SQL queries in debug mode
-			BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+			// Output of SQL queries in trace mode
+			if (_minLogLevel < IMPORT_LOG_DEBG)
 			{
-				_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+				{
+					_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				}
 			}
 
 			return transaction;
