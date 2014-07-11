@@ -896,6 +896,10 @@ namespace synthese
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingJourneyPattern, existingJourneyPatterns)
 				{
 					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
+					
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*(journeyPattern.sharedServicesMutex)
+					);
 
 					BOOST_FOREACH(const ServiceSet::value_type& existingService, journeyPattern.getAllServices())
 					{
