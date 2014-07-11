@@ -1514,6 +1514,14 @@ namespace synthese
 			{
 				return UpdateDeltas();
 			}
+			
+			// if course is ended, don't update it because it may have been cleaned by RTDataCleaner
+			// and we do not want update the course for tomorrow
+			boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
+			if(now.time_of_day() > syntheseService->GetTimeOfDay(horaires[horaires.size()-1].hrd) + minutes(1))
+			{
+				return UpdateDeltas();
+			}
 
 			for(size_t i(0); i<horaires.size(); ++i)
 			{
