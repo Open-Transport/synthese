@@ -144,18 +144,6 @@ namespace synthese
 			const time_duration& nowDuration
 		) const {
 
-			// Select only services with at least a stop after now
-			const Horaire& lastHoraire(*horaires.rbegin());
-			time_duration timeToCompare(
-				lastHoraire.hra > lastHoraire.hta ?
-				lastHoraire.hra :
-				lastHoraire.hta
-			);
-			if(	timeToCompare < nowDuration)
-			{
-				return;
-			}
-
 			// Jump over courses with incomplete chainages
 			if(horaires.size() != chainage.arretChns.size())
 			{
