@@ -1159,7 +1159,7 @@ namespace synthese
 					{
 						Importable::DataSourceLinks links(course->syntheseService->getDataSourceLinks());
 						links.insert(make_pair(dataSourceOnSharedEnv, course->ref));
-						course->syntheseService->setDataSourceLinksWithoutRegistration(links);
+						course->syntheseService->setDataSourceLinksWithRegistration(links);
 						_servicesToSave.insert(course->syntheseService);
 
 						_logDebugDetail(
