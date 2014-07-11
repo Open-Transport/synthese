@@ -33,6 +33,7 @@
 #include "TransportNetwork.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
+#include "ReservationContact.h"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -60,6 +61,10 @@ namespace synthese
 		const string TransportNetworkTableSync::COL_CREATOR_ID("creator_id");
 		const string TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID("days_calendars_parent_id");
 		const string TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID("periods_calendars_parent_id");
+		const string TransportNetworkTableSync::COL_TIMEZONE("timezone");
+		const string TransportNetworkTableSync::COL_LANG("lang");
+		const string TransportNetworkTableSync::COL_CONTACT_ID("contact_id");
+		const string TransportNetworkTableSync::COL_FARE_CONTACT_ID("fare_contact_id");
 	}
 
 	namespace db
@@ -77,6 +82,10 @@ namespace synthese
 			Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
 			Field(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, SQL_INTEGER),
 			Field(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, SQL_INTEGER),
+			Field(TransportNetworkTableSync::COL_TIMEZONE, SQL_TEXT),
+			Field(TransportNetworkTableSync::COL_LANG, SQL_TEXT),
+			Field(TransportNetworkTableSync::COL_CONTACT_ID, SQL_INTEGER),
+			Field(TransportNetworkTableSync::COL_FARE_CONTACT_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -122,6 +131,10 @@ namespace synthese
 			)	);
 			query.addField(object->getDaysCalendarsParent() ? object->getDaysCalendarsParent()->getKey() : RegistryKeyType(0));
 			query.addField(object->getPeriodsCalendarsParent() ? object->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0));
+			query.addField(object->getTimezone());
+			query.addField(object->getLang());
+			query.addField(object->getContact() ? object->getContact()->getKey() : RegistryKeyType(0));
+			query.addField(object->getFareContact() ? object->getFareContact()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 

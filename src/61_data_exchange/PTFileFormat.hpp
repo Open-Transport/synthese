@@ -113,7 +113,12 @@ namespace synthese
 				impex::ImportableTableSync::ObjectBySource<pt::TransportNetworkTableSync>& networks,
 				const std::string& id,
 				const std::string& name,
-				const impex::DataSource& source
+				const impex::DataSource& source,
+				const std::string& url = std::string(),
+				const std::string& timezone = std::string(),
+				const std::string& phone = std::string(),
+				const std::string& lang = std::string(),
+				const std::string& fareUrl = std::string()
 			) const;
 
 

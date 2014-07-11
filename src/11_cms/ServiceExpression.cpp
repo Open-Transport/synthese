@@ -180,6 +180,10 @@ namespace synthese
 			{
 				throw e;
 			}
+			catch(const std::exception &e)
+			{
+				_addExceptionToVariable(variables, e.what(), function->getFactoryKey());
+			}
 			catch(...) // Output error message for non specified exception
 			{
 				_addExceptionToVariable(variables, "Unhandled exception", function->getFactoryKey());
