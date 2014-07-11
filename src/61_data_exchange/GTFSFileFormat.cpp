@@ -43,6 +43,8 @@
 #include "ContinuousService.h"
 #include "ZipWriter.hpp"
 #include "Path.h"
+#include "ReservationContact.h"
+#include "ReservationContactTableSync.h"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -209,7 +211,11 @@ namespace synthese
 					while(getline(inFile, line))
 					{
 						_loadLine(line);
-						if(_getValue("location_type") != "1")
+
+						// A stop area must be created for each stop that :
+						// - is a stop area (location_type == 1)
+						// - has no parent id (GTFS allows a stop to have no stop area, Synthese does not)
+						if(_getValue("location_type") != "1" && ! _getValue("parent_station").empty())
 						{
 							continue;
 						}
@@ -263,7 +269,7 @@ namespace synthese
 				while(getline(inFile, line))
 				{
 					_loadLine(line);
-					if(_getValue("location_type") != "0")
+					if(_getValue("location_type") != "0" && ! _getValue("location_type").empty())
 					{
 						continue;
 					}
@@ -274,8 +280,11 @@ namespace synthese
 					string stopAreaId;
 
 					// Stop area
+					// If the stop has no parent station, use its own ID as parent station (because it has been added as such)
 					if(_fieldsMap.find("parent_station") != _fieldsMap.end())
 						stopAreaId = _getValue("parent_station");
+					else
+						stopAreaId = id;
 
 					const StopArea* stopArea(NULL);
 					if(stopAreas.contains(stopAreaId))
@@ -359,7 +368,12 @@ namespace synthese
 						_networks,
 						_getValue("agency_id"),
 						_getValue("agency_name"),
-						dataSource
+						dataSource,
+						_getValue("agency_url"),
+						_getValue("agency_timezone"),
+						_getValue("agency_phone"),
+						_getValue("agency_lang"),
+						_getValue("agency_fare_url")
 					);
 				}
 			}
@@ -546,8 +560,10 @@ namespace synthese
 					// Destination
 					trip.destination = _getValue("trip_headsign");
 
-					// Direction
-					trip.direction = lexical_cast<bool>(_getValue("direction_id"));
+					// Direction (if any)
+					std::string direction = _getValue("direction_id");
+					if (!direction.empty())
+						trip.direction = lexical_cast<bool>(direction);
 
 					_trips.insert(make_pair(id, trip));
 				}
@@ -758,6 +774,10 @@ namespace synthese
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
 			}
+			BOOST_FOREACH(const Registry<ReservationContact>::value_type& contact, _env.getRegistry<ReservationContact>())
+			{
+				ReservationContactTableSync::Save(contact.second.get(), transaction);
+			}
 			return transaction;
 		}
 
@@ -784,7 +804,25 @@ namespace synthese
 
 		std::string GTFSFileFormat::Importer_::_getValue( const std::string& field ) const
 		{
-			return trim_copy(_line[_fieldsMap[field]]);
+			// Check if the field exists, as some fields are not mandatory in GTFS
+			if(_fieldsMap.count(field))
+			{
+				std::size_t pos = _fieldsMap[field];
+
+				// If the field exists in the header but not in the line, just return an empty string
+				if(pos >= _line.size())
+				{
+					return "";
+				}
+				else
+				{
+					return trim_copy(_line[pos]);
+				}
+			}
+			else
+			{
+				return "";
+			}
 		}
 
 
@@ -805,6 +843,11 @@ namespace synthese
 				for(tokenizer<escaped_list_separator<char> >::iterator beg=tok.begin(); beg!=tok.end(); ++beg)
 				{
 					_line.push_back(*beg);
+				}
+
+				if(_line.size() != _fieldsMap.size())
+				{
+					_logWarning("Number of fields does not corresponds to header for line '"+line+"'");
 				}
 			}
 		}

@@ -43,6 +43,8 @@ namespace synthese
 
 	namespace pt
 	{
+		class ReservationContact;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Transport network class.
 		/// TRIDENT OK
@@ -66,6 +68,10 @@ namespace synthese
 			calendar::CalendarTemplate* _daysCalendarsParent;
 			calendar::CalendarTemplate* _periodsCalendarsParent;
 			std::string _name;
+			std::string _timezone;
+			std::string _lang;
+			pt::ReservationContact* _contact;
+			pt::ReservationContact* _fareContact;
 
 		public:
 
@@ -80,6 +86,10 @@ namespace synthese
 				calendar::CalendarTemplate* getDaysCalendarsParent() const { return _daysCalendarsParent; }
 				calendar::CalendarTemplate* getPeriodsCalendarsParent() const { return _periodsCalendarsParent; }
 				virtual std::string getName() const { return _name; }
+				std::string getTimezone() const { return _timezone; }
+				std::string getLang() const { return _lang; }
+				pt::ReservationContact* getContact() const { return _contact; }
+				pt::ReservationContact* getFareContact() const { return _fareContact; }
 			//@}
 
 			//! @name Setters
@@ -87,6 +97,10 @@ namespace synthese
 				void setDaysCalendarsParent(calendar::CalendarTemplate* value){ _daysCalendarsParent = value; }
 				void setPeriodsCalendarsParent(calendar::CalendarTemplate* value){ _periodsCalendarsParent = value; }
 				void setName(const std::string& value){ _name = value; }
+				void setTimezone(const std::string& value){ _timezone = value; }
+				void setLang(const std::string& value){ _lang = value; }
+				void setContact(pt::ReservationContact* value){ _contact = value; }
+				void setFareContact(pt::ReservationContact* value){ _fareContact = value; }
 			//@}
 
 			/// @name Modifiers

@@ -34,6 +34,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "DestinationTableSync.hpp"
 #include "RollingStockTableSync.hpp"
+#include "ReservationContactTableSync.h"
 
 #include <geos/operation/distance/DistanceOp.h>
 
@@ -131,7 +132,12 @@ namespace synthese
 			impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync>& networks,
 			const std::string& id,
 			const std::string& name,
-			const impex::DataSource& source
+			const impex::DataSource& source,
+			const std::string& url,
+			const std::string& timezone,
+			const std::string& phone,
+			const std::string& lang,
+			const std::string& fareUrl
 		) const {
 			TransportNetwork* network;
 			if(networks.contains(id))
@@ -161,6 +167,107 @@ namespace synthese
 				);
 			}
 			network->setName(name);
+
+			// Optional values
+
+			// Timezone and language
+			if (!timezone.empty())
+				network->setTimezone(timezone);
+			if (!lang.empty())
+				network->setLang(lang);
+
+			// URL and phone
+			// These are placed in a contact, so we check if a compatible one exists or create a new one
+			// Compatible means it has the same phone and URL
+			if ( ! url.empty() || ! phone.empty() )
+			{
+				pt::ReservationContact* contact(NULL);
+
+				// Search for a contact with this phone and website
+				BOOST_FOREACH(
+					Registry<ReservationContact>::value_type crtContact,
+					Env::GetOfficialEnv().getRegistry<ReservationContact>()
+				){
+					// If a contact has the same url and the phone is empty in the import, use it
+					if (	(crtContact.second->get<PhoneExchangeNumber>() == phone || phone.empty() ) &&
+							(crtContact.second->get<WebsiteURL>() == url || url.empty())
+						)
+					{
+						contact = crtContact.second.get();
+						_logInfo(
+								"Using contact with key "+ boost::lexical_cast<std::string>(contact->getKey()) +" ("+ contact->get<Name>() +") for network "+ id +" ("+ name +")"
+						);
+						break;
+					}
+				}
+
+				// Not found, creating a new one
+				if (!contact)
+				{
+					contact = new ReservationContact(
+							pt::ReservationContactTableSync::getId()
+					);
+					contact->set<Name>(network->getName());
+					contact->set<PhoneExchangeNumber>(phone);
+					contact->set<WebsiteURL>(url);
+
+					Importable::DataSourceLinks links;
+					std::string contactId = boost::lexical_cast<std::string>(contact->getKey());
+					links.insert(make_pair(&source, contactId));
+					contact->setDataSourceLinksWithoutRegistration(links);
+					_env.getEditableRegistry<ReservationContact>().add(boost::shared_ptr<ReservationContact>(contact));
+					_logCreation(
+						"Creation of a contact with key "+ contactId +" ("+ contact->getName() +") for network "+ id +" ("+ name +")"
+					);
+				}
+
+				network->setContact(contact);
+			}
+
+			// Fare URL (to buy tickets)
+			// Also in a contact.
+			// If a contact has this same URL, use it. Else, create a new one.
+			if ( ! fareUrl.empty() )
+			{
+				pt::ReservationContact* fareContact(NULL);
+
+				// Search for a contact with this same URL
+				BOOST_FOREACH(
+					Registry<ReservationContact>::value_type crtContact,
+					Env::GetOfficialEnv().getRegistry<ReservationContact>()
+				){
+					if (crtContact.second->get<WebsiteURL>() == fareUrl)
+					{
+						fareContact = crtContact.second.get();
+						_logInfo(
+								"Using fare contact with key "+ boost::lexical_cast<std::string>(fareContact->getKey()) +" ("+ fareContact->get<Name>() +") for network "+ id +" ("+ name +")"
+						);
+						break;
+					}
+				}
+
+				// Not found, creating a new one
+				if (!fareContact)
+				{
+					fareContact = new ReservationContact(
+							pt::ReservationContactTableSync::getId()
+					);
+					fareContact->set<Name>(network->getName() + " Fare");
+					fareContact->set<WebsiteURL>(fareUrl);
+
+					Importable::DataSourceLinks links;
+					std::string contactId = boost::lexical_cast<std::string>(fareContact->getKey());
+					links.insert(make_pair(&source, contactId));
+					fareContact->setDataSourceLinksWithoutRegistration(links);
+					_env.getEditableRegistry<ReservationContact>().add(boost::shared_ptr<ReservationContact>(fareContact));
+					_logCreation(
+						"Creation of a fare contact with key "+ contactId +" ("+ fareContact->get<Name>() +") for network "+ id +" ("+ name +")"
+					);
+				}
+
+				network->setFareContact(fareContact);
+			}
+
 			return network;
 		}
 
