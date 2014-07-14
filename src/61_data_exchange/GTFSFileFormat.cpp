@@ -1030,6 +1030,9 @@ namespace synthese
 			double lastx = 0.0;
 			double lasty = 0.0;
 
+			// Test if at least one point has been added for this shape
+			bool hasAtLeastOnePoint = false;
+
 			BOOST_FOREACH(Edge* edge, path->getEdges())
 			{
 				if( ! edge->getNext())
@@ -1058,10 +1061,18 @@ namespace synthese
 						<< pt.x << ","
 						<< cpt_seq++
 						<< endl;
+
+					hasAtLeastOnePoint = true;
 				}
 			}
-			shapeId[tripName]=shapeIdKey;
-			tripTxt << shapeIdKey;
+
+			if (hasAtLeastOnePoint)
+			{
+				shapeId[tripName]=shapeIdKey;
+				tripTxt << shapeIdKey;
+			} else {
+				Log::GetInstance().debug("Missing shape for trip " + tripName);
+			}
 		}
 
 		void GTFSFileFormat::Exporter_::_addTrips(stringstream& trips,
@@ -1214,24 +1225,33 @@ namespace synthese
 				departureTimeStr = to_simple_string(departure);
 				const StopPoint * stopPoint(dynamic_cast<const StopPoint *>(&*ls->get<LineNode>()));
 
-				if(stopPoint->hasGeometry())
+				if (stopPoint)
 				{
-					gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*stopPoint->getGeometry());
+
+					if(stopPoint->hasGeometry())
+					{
+						gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*stopPoint->getGeometry());
+					}
+
+					if(gp.get())
+					{
+						stopTimes <<_key(service->getKey(), 1) << ","
+							<< _key(stopPoint->getKey()) << ","
+							<< ls->get<RankInPath>() << ","
+							<< arrivalTimeStr.substr(0, 8) << ","
+							<< departureTimeStr.substr(0, 8) << ","
+							<< ","
+
+							<< (ls->get<IsDeparture>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
+							<< (ls->get<IsArrival>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
+							<< endl;
+						stopTimesExist = true;
+					}
 				}
-
-				if(gp.get())
+				else
 				{
-					stopTimes <<_key(service->getKey(), 1) << ","
-						<< _key(stopPoint->getKey()) << ","
-						<< ls->get<RankInPath>() << ","
-						<< arrivalTimeStr.substr(0, 8) << ","
-						<< departureTimeStr.substr(0, 8) << ","
-						<< ","
-
-						<< (ls->get<IsDeparture>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
-						<< (ls->get<IsArrival>() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
-						<< endl;
-					stopTimesExist = true;
+					Log::GetInstance().debug("No stop point at rank " + boost::lexical_cast<std::string>(ls->get<RankInPath>()) +
+											 " for line stop " + boost::lexical_cast<std::string>(ls->getKey()));
 				}
 			}
 		}
@@ -1400,7 +1420,7 @@ namespace synthese
 			stringstream transfersTxt;
 
 			// Add header line to each file
-			agencyTxt << "agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang" << endl;
+			agencyTxt << "agency_id,agency_name,agency_url,agency_fare_url,agency_timezone,agency_phone,agency_lang" << endl;
 			stopsTxt << "stop_id,stop_code,stop_name,stop_lat,stop_lon,location_type,parent_station" << endl;
 			routesTxt << "route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color" << endl;
 			tripsTxt << "trip_id,service_id,route_id,trip_headsign,direction_id,shape_id" << endl;
@@ -1411,15 +1431,25 @@ namespace synthese
 			frequenciesTxt << "trip_id,start_time,end_time,headway_secs" << endl;
 			transfersTxt << ".::. NOT YET .::." <<endl;
 
+			// Clear the path ids
+			shapeId.clear();
+
 			// BEGIN AGENCY.TXT
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type myAgency, Env::GetOfficialEnv().getRegistry<TransportNetwork>())
 			{
+				// If a fare contact and/or a contact exists, use them
+				std::string url = myAgency.second->getContact() ? myAgency.second->getContact()->get<WebsiteURL>() : "";
+				std::string phone = myAgency.second->getContact() ? myAgency.second->getContact()->get<PhoneExchangeNumber>() : "";
+				std::string fareUrl = myAgency.second->getFareContact() ? myAgency.second->getFareContact()->get<WebsiteURL>() : "";
+
 				agencyTxt << _key(myAgency.first) << "," // agency_id
 					<< _Str(myAgency.second->getName()) << "," // agency_name
-					<< "," // agency_url
-					<< "," // agency_timezone
-					<< "," // agency_phone
-					<< endl; // agency_lang
+					<< url << "," // agency_url
+					<< fareUrl << "," // agency_fare_url
+					<< myAgency.second->getTimezone() <<"," // agency_timezone
+					<< phone <<"," // agency_phone
+					<< myAgency.second->getLang() // agency_lang
+					<< endl;
 				}
 				// END AGENCY.TXT
 
@@ -1432,8 +1462,10 @@ namespace synthese
 				if (stopPoint.getDepartureEdges().empty() && stopPoint.getArrivalEdges().empty()) 
 				{
 					LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, boost::optional<RegistryKeyType>(), stopPoint.getKey()));	
-					if (lineStops.empty())
+					if (lineStops.empty()) {
+						Log::GetInstance().debug("Stop point has no departure/arrival egdes and is not on a trip : " + boost::lexical_cast<std::string>(stopPoint.getKey()));
 						continue;
+					}
 				}
 
 				boost::shared_ptr<geos::geom::Point> gp;
@@ -1456,6 +1488,8 @@ namespace synthese
 						<< "0," // location_type
 						<< _key(stopPoint.getConnectionPlace()->getKey(),2) // parent_station
 						<< endl;
+				} else {
+					Log::GetInstance().debug("Stop point has no geometry : " + boost::lexical_cast<std::string>(stopPoint.getKey()) + " (" + stopPoint.getName() + ")");
 				}
 			}
 
@@ -1491,6 +1525,8 @@ namespace synthese
 						<< gp->getX() << "," //stop_lon
 						<< "1," //location_type
 						<< endl; //StopArea does not have parentStation !
+				} else {
+					Log::GetInstance().debug("Stop area and its first stop point have no geometry : " + boost::lexical_cast<std::string>(connPlace->getKey()) + " (" + connPlace->getName() + ")");
 				}
 			}
 			// END STOPS.TXT
@@ -1506,17 +1542,23 @@ namespace synthese
 				bool mustBeExported = true;
 				for (multimap<const DataSource*, string>::const_iterator it= myLine.second->getDataSourceLinks().begin(); it != myLine.second->getDataSourceLinks().end(); ++it) 
 				{
-					if(it->first->get<Name>() == LABEL_NO_EXPORT_GTFS)
+					std::string exp_name = it->first->get<Name>();
+					Log::GetInstance().debug("Commercial line " + myLine.second->getShortName() + " has datasource " + exp_name + " - " + it->second);
+					if(exp_name == LABEL_NO_EXPORT_GTFS)
 					{
 						mustBeExported = false;
 						break;
 					}
 				}
-				if(!mustBeExported)
+				if(!mustBeExported) {
+					Log::GetInstance().debug("Commercial line has the no export label : " + myLine.second->getShortName() + " (" + boost::lexical_cast<std::string>(myLine.first) + ")");
 					continue;
+				}
 
 				if((myLine.second->getPaths().begin()) != (myLine.second->getPaths().end()))
 				{
+					// Take the rolling stock (vehicle type) of the first line in the current commercial line
+					// All of the lines of a commercial line does not seems to have a rolling stock. This will create random errors.
 					rs = static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock();
 					if(rs != NULL)
 					{
@@ -1545,7 +1587,11 @@ namespace synthese
 							<< (color != "" ? color : "000000") << "," //route_color
 							<< "FFFFFF" //route_text_color
 							<< endl;
+					} else {
+						Log::GetInstance().debug("No rolling stock for commercial line " + boost::lexical_cast<std::string>(myLine.first) + " (" + myLine.second->getShortName() + ")");
 					}
+				} else {
+					Log::GetInstance().debug("Path have the same beginning and end for commercial line " + boost::lexical_cast<std::string>(myLine.first) + " (" + myLine.second->getShortName() + ")");
 				}
 			}
 
@@ -1561,32 +1607,54 @@ namespace synthese
 
 				if(sdService)
 				{
-					rs = static_cast<const JourneyPattern *>(sdService->getPath())->getRollingStock();
-
-					bool mustBeExported = true;
-					const multimap<const DataSource*, string>& dataSourcesMap = static_cast<const JourneyPattern *>(sdService->getPath())->getCommercialLine()->getDataSourceLinks();
-					for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
+					const JourneyPattern *sdJourney = static_cast<const JourneyPattern *>(sdService->getPath());
+					if (sdJourney)
 					{
-						if(it->first->get<Name>() == LABEL_NO_EXPORT_GTFS)
+						rs = sdJourney->getRollingStock();
+
+						// Check if one of the datasources has LABEL_NO_EXPORT_GTFS for name, in which case the schedule is not to be exported
+						bool mustBeExported = true;
+						const CommercialLine* sdCommercial = sdJourney->getCommercialLine();
+						const multimap<const DataSource*, string>& dataSourcesMap = sdCommercial->getDataSourceLinks();
+						for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
 						{
-							mustBeExported = false;
-							break;
+							const DataSource* ds = it->first;
+							std::string name = ds->get<Name>();
+							if(name == LABEL_NO_EXPORT_GTFS)
+							{
+								mustBeExported = false;
+								break;
+							}
 						}
-					}
-					if(!mustBeExported)
-						continue;
+						if(!mustBeExported) {
+							Log::GetInstance().debug(
+									"Scheduled service has the no export label : " +
+									boost::lexical_cast<std::string>(itsdsrv.first) +
+									" (line " + sdJourney->getCommercialLine()->getName() + ")"
+							);
+							continue;
+						}
 
-					if(rs != NULL)
-					{
-						_filesProvider(sdService,
-							stopTimesTxt,
-							tripsTxt,
-							shapesTxt,
-							calendarTxt,
-							calendarDatesTxt,
-							frequenciesTxt,
-							calendarMap,
-							false);
+						if(rs != NULL)
+						{
+							_filesProvider(sdService,
+								stopTimesTxt,
+								tripsTxt,
+								shapesTxt,
+								calendarTxt,
+								calendarDatesTxt,
+								frequenciesTxt,
+								calendarMap,
+								false);
+						} else {
+							Log::GetInstance().debug(
+									"Scheduled service has no rolling stock : " +
+									boost::lexical_cast<std::string>(itsdsrv.first) +
+									" (line " + sdJourney->getCommercialLine()->getName() + ")"
+							);
+						}
+					} else {
+						Log::GetInstance().debug("Scheduled service has no path : " + boost::lexical_cast<std::string>(itsdsrv.first));
 					}
 				}
 				else
@@ -1617,8 +1685,10 @@ namespace synthese
 						}
 				}
 
-				if(!mustBeExported)
+				if(!mustBeExported) {
+					Log::GetInstance().debug("Continuous service has the no export label : " + boost::lexical_cast<std::string>(itcssrv.first));
 					continue;
+				}
 
 					rs = static_cast<const JourneyPattern *>(csService->getPath())->getRollingStock();
 					if(rs != NULL)
@@ -1632,6 +1702,8 @@ namespace synthese
 							frequenciesTxt,
 							calendarMap,
 							true);
+					} else {
+						Log::GetInstance().debug("Continuous service has no rolling stock : " + boost::lexical_cast<std::string>(itcssrv.first));
 					}
 				}
 				else
