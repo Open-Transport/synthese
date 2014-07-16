@@ -130,6 +130,8 @@ namespace synthese
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 				static const std::string PARAMETER_FORBIDDEN_SERVICE_USE_RULE;
 				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
+				static const std::string PARAMETER_DEPOT_TO_STOP_IS_HLP;
+				static const std::string PARAMETER_STOP_TO_DEPOT_IS_HLP;
 
 			private:
 				//! @name Parameters
@@ -180,6 +182,8 @@ namespace synthese
 					boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
 					boost::shared_ptr<pt::PTUseRule> _forbiddenServiceUseRule;
 					std::string _vehicleServiceSuffix;
+					bool _depotToStopIsHLP;
+					bool _stopToDepotIsHLP;
 				//@}
 
 				static const std::string SEP;
