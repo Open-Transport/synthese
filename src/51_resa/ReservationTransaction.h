@@ -128,7 +128,7 @@ namespace synthese
 			const std::string&		getCustomerEMail()		const;
 			const Reservations&		getReservations()		const;
 			const std::string&		getComment()			const { return _comment; }
-			const bool				getPRM()				const { return _prm; }
+			bool				getPRM()				const { return _prm; }
 
 
 
