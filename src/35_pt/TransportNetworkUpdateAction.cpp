@@ -34,6 +34,8 @@
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
 #include "CalendarTemplateTableSync.h"
+#include "ReservationContactTableSync.h"
+#include "Record.hpp"
 
 using namespace std;
 using namespace boost;
@@ -57,7 +59,10 @@ namespace synthese
 		const string TransportNetworkUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string TransportNetworkUpdateAction::PARAMETER_DAYS_CALENDARS_PARENT_ID = Action_PARAMETER_PREFIX + "days_calendars_parent_id";
 		const string TransportNetworkUpdateAction::PARAMETER_PERIODS_CALENDARS_PARENT_ID = Action_PARAMETER_PREFIX + "periods_calendars_parent_id";
-
+		const string TransportNetworkUpdateAction::PARAMETER_TIMEZONE = Action_PARAMETER_PREFIX + "timezone";
+		const string TransportNetworkUpdateAction::PARAMETER_LANG = Action_PARAMETER_PREFIX + "lang";
+		const string TransportNetworkUpdateAction::PARAMETER_CONTACT_ID = Action_PARAMETER_PREFIX + "contact_id";
+		const string TransportNetworkUpdateAction::PARAMETER_FARE_CONTACT_ID = Action_PARAMETER_PREFIX + "fare_contact_id";
 
 
 		ParametersMap TransportNetworkUpdateAction::getParametersMap() const
@@ -156,6 +161,69 @@ namespace synthese
 				{
 					_periodsCalendarsParent = boost::shared_ptr<CalendarTemplate>();
 			}	}
+
+			// Language
+			if(map.isDefined(PARAMETER_LANG))
+			{
+				_lang = map.getValue(PARAMETER_LANG,false);
+			}
+
+			// Timezone
+			if(map.isDefined(PARAMETER_TIMEZONE))
+			{
+				_timezone = map.getValue(PARAMETER_TIMEZONE,false);
+			}
+
+			// Contact (Optional)
+			if(map.isDefined(PARAMETER_CONTACT_ID))
+			{
+				RegistryKeyType id(0);
+				std::string str = map.getValue(PARAMETER_CONTACT_ID, false);
+				if ( ! str.empty() )
+				{
+					id = boost::lexical_cast<RegistryKeyType>(str);
+				}
+
+				if(id > 0) try
+				{
+					_contact = ReservationContactTableSync::GetEditable(
+						id, *_env, UP_LINKS_LOAD_LEVEL
+					);
+				}
+				catch(ObjectNotFoundException<ReservationContact>&)
+				{
+					throw ActionException("No such contact id");
+				}
+				else
+				{
+					_contact = boost::shared_ptr<ReservationContact>();
+				}
+			}
+
+			// Fare contact (Optional)
+			if(map.isDefined(PARAMETER_FARE_CONTACT_ID))
+			{
+				RegistryKeyType id(0);
+				std::string str = map.getValue(PARAMETER_FARE_CONTACT_ID, false);
+				if ( ! str.empty() )
+				{
+					id = boost::lexical_cast<RegistryKeyType>(str);
+				}
+
+				if(id > 0) try
+				{
+					_fareContact = ReservationContactTableSync::GetEditable(
+						id, *_env, UP_LINKS_LOAD_LEVEL
+					);
+				}
+				catch(ObjectNotFoundException<ReservationContact>&)
+				{
+					throw ActionException("No such fare contact id");
+				}
+				else
+				{
+					_fareContact = boost::shared_ptr<ReservationContact>();
+			}	}
 		}
 
 
@@ -185,6 +253,34 @@ namespace synthese
 			{
 				_network->setPeriodsCalendarsParent(
 					_periodsCalendarsParent->get()
+				);
+			}
+
+			// Language
+			if (_lang)
+			{
+				_network->setLang(*_lang);
+			}
+
+			// Timezone
+			if (_timezone)
+			{
+				_network->setTimezone(*_timezone);
+			}
+
+			// Contact
+			if (_contact)
+			{
+				_network->setContact(
+					_contact->get()
+				);
+			}
+
+			// Fare contact
+			if (_fareContact)
+			{
+				_network->setFareContact(
+					_fareContact->get()
 				);
 			}
 
