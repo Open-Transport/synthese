@@ -48,6 +48,7 @@
 #include "TransportNetworkUpdateAction.hpp"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
+#include "ReservationContactTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -247,6 +248,24 @@ namespace synthese
 							network.getPeriodsCalendarsParent() ? network.getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0)
 						)
 				)	);
+				stream << p.cell("Langue principale<br /><a href='http://www.loc.gov/standards/iso639-2/php/code_list.php'>Format : ISO 639</a>",
+								 p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_LANG, network.getLang()));
+				stream << p.cell("Timezone<br /><a href='http://en.wikipedia.org/wiki/List_of_tz_zones'>Format : TZ</a>",
+								 p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_TIMEZONE, network.getTimezone()));
+				stream << p.cell(
+					"ID Contact",
+					p.getForm().getTextInput(
+						TransportNetworkUpdateAction::PARAMETER_CONTACT_ID,
+						network.getContact() ? boost::lexical_cast<std::string>(network.getContact()->getKey()) : ""
+					)
+				);
+				stream << p.cell(
+					"ID Contact pour l'achat de billets",
+					p.getForm().getTextInput(
+						TransportNetworkUpdateAction::PARAMETER_FARE_CONTACT_ID,
+						network.getFareContact() ? boost::lexical_cast<std::string>(network.getFareContact()->getKey()) : ""
+					)
+				);
 
 				stream << p.close();
 
