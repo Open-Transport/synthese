@@ -612,48 +612,58 @@ namespace synthese
 
         void PTTimeSlotRoutePlanner::_printJourneys(const TimeSlotRoutePlanner::Result& journeys) const
         {
-            std::cout << "Found " << journeys.size() << " journeys" << std::endl;
-            int journeyCount = 0;
-
-            BOOST_FOREACH(Journey journey, journeys)
+#ifdef DEBUG
+            // this method displays the details of a journey on the standard output
+            if(Log::LEVEL_DEBUG >= Log::GetInstance().getLevel())
             {
-                std::deque<ServicePointer>& servicePtrs = journey.getServiceUses();
-                int serviceCount = 0;
-                journeyCount += 1;
+                std::stringstream oStream;
+                oStream << "Found " << journeys.size() << " journeys" << std::endl;
+                int journeyCount = 0;
 
-                std::cout << "---------------" << std::endl;
-                std::cout << "Journey #" << journeyCount << ": distance=" << journey.getDistance()
-                          << ", duration=" << journey.getEffectiveDuration()
-                          << ", services=" << servicePtrs.size() << std::endl;
-
-                const ServicePointer& servicePtr1 = journey.getFirstJourneyLeg();
-                const Service* service1 = servicePtr1.getService();
-                std::cout << " * service #1: departure=" << servicePtr1.getDepartureDateTime()
-                           << ", arrival=" << servicePtr1.getArrivalDateTime()
-                           << ", name=" << service1->getServiceNumber() << std::endl;
-
-                if(2 < servicePtrs.size())
+                BOOST_FOREACH(Journey journey, journeys)
                 {
-                    std::cout << " * services ..." << std::endl;
+                    std::deque<ServicePointer>& servicePtrs = journey.getServiceUses();
+                    journeyCount += 1;
+
+                    oStream << "---------------" << std::endl;
+                    oStream << "Journey #" << journeyCount << ": distance=" << journey.getDistance()
+                            << ", duration=" << journey.getEffectiveDuration()
+                            << ", services=" << servicePtrs.size() << std::endl;
+
+                    const ServicePointer& servicePtr1 = journey.getFirstJourneyLeg();
+                    const Service* service1 = servicePtr1.getService();
+                    oStream << " * service #1: departure=" << servicePtr1.getDepartureDateTime()
+                            << ", arrival=" << servicePtr1.getArrivalDateTime()
+                            << ", name=" << service1->getServiceNumber() << std::endl;
+
+                    if(2 < servicePtrs.size())
+                    {
+                        oStream << " * services ..." << std::endl;
+                    }
+
+                    const ServicePointer& servicePtrN = journey.getLastJourneyLeg();
+                    const Service* serviceN = servicePtrN.getService();
+                    oStream << " * service #" << servicePtrs.size() << ": departure=" << servicePtrN.getDepartureDateTime()
+                            << ", arrival=" << servicePtrN.getArrivalDateTime()
+                            << ", name=" << serviceN->getServiceNumber() << std::endl;
+
+                    /*
+                    // this version prints all the services used by the journey
+                    int serviceCount = 0;
+                    BOOST_FOREACH(ServicePointer servicePtr, servicePtrs)
+                    {
+                        serviceCount += 1;
+                        const Service* service = servicePtr.getService();
+                        oStream << " * service #" << serviceCount << ": departure=" << servicePtr.getDepartureDateTime()
+                                   << ", arrival=" << servicePtr.getArrivalDateTime()
+                                   << ", name=" << service->getServiceNumber() << std::endl;
+                    }
+                    */
                 }
 
-                const ServicePointer& servicePtrN = journey.getLastJourneyLeg();
-                const Service* serviceN = servicePtrN.getService();
-                std::cout << " * service #" << servicePtrs.size() << ": departure=" << servicePtrN.getDepartureDateTime()
-                           << ", arrival=" << servicePtrN.getArrivalDateTime()
-                           << ", name=" << serviceN->getServiceNumber() << std::endl;
-
-                /*
-                BOOST_FOREACH(ServicePointer servicePtr, servicePtrs)
-                {
-                    serviceCount += 1;
-                    const Service* service = servicePtr.getService();
-                    std::cout << " * service #" << serviceCount << ": departure=" << servicePtr.getDepartureDateTime()
-                               << ", arrival=" << servicePtr.getArrivalDateTime()
-                               << ", name=" << service->getServiceNumber() << std::endl;
-                }
-                */
+                util::Log::GetInstance().debug(oStream.str());
             }
+#endif
         }
 
 }	}

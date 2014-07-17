@@ -90,7 +90,6 @@ namespace synthese
 			bool _showFullRoadJourney;
 
 
-
 			//////////////////////////////////////////////////////////////////////////
 			/// Search of stops reachable from the departure or the
 			/// arrival place by free DRT.
@@ -108,8 +107,15 @@ namespace synthese
 				algorithm::PlanningPhase direction
 			) const;
 
+            //////////////////////////////////////////////////////////////////////////
+            /// Compute journeys using both personal car and public transportation
+            /// @author Olivier Vernhet
             PTRoutePlannerResult _computeMixedModeJourney() const;
 
+            //////////////////////////////////////////////////////////////////////////
+            /// Prints journeys as debug logs
+            /// @param journeys the list of journeys to print
+            /// @author Olivier Vernhet
             void _printJourneys(const TimeSlotRoutePlanner::Result& journeys) const;
 
 
