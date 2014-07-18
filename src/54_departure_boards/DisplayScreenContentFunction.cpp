@@ -882,6 +882,7 @@ namespace synthese
 			{
 				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 				commercialLine->toParametersMap(*linePM, true);
+				linePM->insert("wayback",journeyPattern->getWayBack());
 				journeyPm->insert("line", linePM);
 			}
 
