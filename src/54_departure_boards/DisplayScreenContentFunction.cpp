@@ -754,6 +754,7 @@ namespace synthese
 						journeyPattern->getDirectionObj()->getDisplayedText() :
 						journeyPattern->getDirection()
 					) <<
+					"\" wayback=\"" << (journeyPattern->getWayBack() ? "1" : "0") <<
 					"\" />";
 			}
 
