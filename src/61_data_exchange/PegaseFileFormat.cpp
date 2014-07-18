@@ -454,6 +454,10 @@ namespace synthese
 					(jpName[len - 3] == 'A' || jpName[len - 3] == 'R'))
 				{
 					lineInfo.lineName = jpName.substr(0, len - 3);
+					if (lineInfo.lineName[lineInfo.lineName.size()-1] == '-')
+					{
+						lineInfo.lineName = lineInfo.lineName.substr(0, lineInfo.lineName.size()-1);
+					}
 					lineInfo.routeName = jpName.substr(len - 2, 2);
 					return;
 				}
