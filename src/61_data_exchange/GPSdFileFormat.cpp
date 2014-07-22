@@ -277,6 +277,41 @@ namespace synthese
 					_lastStorage = now;
 					_lastPosition = projectedPoint;
 					_lastStopPoint = nearestStopPoint;
+					
+					// Update the next stops if service is defined
+					if(VehicleModule::GetCurrentVehiclePosition().getService())
+					{
+						bool found(false);
+						size_t rank(0);
+						BOOST_FOREACH(const Path::Edges::value_type& edge, allEdges)
+						{
+							if(edge->getFromVertex() == _lastStopPoint)
+							{
+								found = true;
+								rank = edge->getRankInPath();
+								break;
+							}
+						}
+						if(found)
+						{
+							// Update the next stops
+							CurrentJourney::NextStops nextStops;
+							{
+								BOOST_FOREACH(const Path::Edges::value_type& edge, allEdges)
+								{
+									if(edge->getRankInPath() > rank &&
+										dynamic_cast<StopPoint*>(edge->getFromVertex()))
+									{
+										NextStop nextStop;
+										nextStop.setStop(static_cast<StopPoint*>(edge->getFromVertex()));
+										nextStop.setRank(edge->getRankInPath());
+										nextStops.push_back(nextStop);
+									}
+								}
+							}
+							VehicleModule::GetCurrentJourney().setNextStops(nextStops);
+						}
+					}
 				}
 			}
 			catch(bad_lexical_cast&)
