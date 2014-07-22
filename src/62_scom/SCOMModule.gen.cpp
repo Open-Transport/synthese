@@ -1,0 +1,2 @@
+synthese::scom::moduleRegister();
+

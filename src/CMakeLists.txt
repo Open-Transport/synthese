@@ -71,6 +71,10 @@ if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)
 endif()
 
+if(WITH_SCOM)
+  list(APPEND MODULES 62_scom)
+endif()
+
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
 
