@@ -355,6 +355,45 @@ namespace synthese
 							string networkName = network.getName();
 							trim(networkName);
 							Log::GetInstance().debug("VDVDataSupply : Betreiber " + networkName);
+							bool inStopArea = false;
+							if(arrivalDateTime.is_not_a_date_time())
+							{
+								if(!plannedArrivalDateTime.is_not_a_date_time())
+								{
+									time_duration timeToStop = plannedArrivalDateTime - now;
+									if (timeToStop < time_duration(0,0,30))
+									{
+										inStopArea = true;
+										if(!plannedDepartureDateTime.is_not_a_date_time())
+										{
+											time_duration timeToLeave = plannedDepartureDateTime - now;
+											if (timeToLeave > time_duration(0,0,-30))
+											{
+												inStopArea = false;
+											}
+										}
+									}
+								}
+							}
+							else
+							{
+								if(!arrivalDateTime.is_not_a_date_time())
+								{
+									time_duration timeToStop = arrivalDateTime - now;
+									if (timeToStop < time_duration(0,0,30))
+									{
+										inStopArea = true;
+										if(!departureDateTime.is_not_a_date_time())
+										{
+											time_duration timeToLeave = departureDateTime - now;
+											if (timeToLeave > time_duration(0,0,-30))
+											{
+												inStopArea = false;
+											}
+										}
+									}
+								}
+							}
 							result <<
 								"\">" <<
 								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
@@ -369,7 +408,7 @@ namespace synthese
 								"<RichtungsText>" << direction << "</RichtungsText>" <<
 								"<VonRichtungsText>" << provenance << "</VonRichtungsText>" <<
 								"<ZielHst>" << direction << "</ZielHst>" <<
-								"<AufAZB>false</AufAZB>" <<
+								"<AufAZB>" << (inStopArea ? "true" : "false") << "</AufAZB>" <<
 								"<FahrtStatus>" << (isRealTime ? "Ist" : "Soll") << "</FahrtStatus>"
 							;
 							if(!plannedArrivalDateTime.is_not_a_date_time())
