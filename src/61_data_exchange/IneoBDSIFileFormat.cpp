@@ -932,7 +932,11 @@ namespace synthese
 				);
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingService, existingServices)
 				{
-					ScheduledService* service(static_cast<ScheduledService*>(existingService.second));
+					ScheduledService* service(dynamic_cast<ScheduledService*>(existingService.second));
+					if(!service)
+					{
+						continue;
+					}
 
 					servicesToUnlink.insert(service);
 
