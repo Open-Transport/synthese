@@ -292,7 +292,7 @@ namespace synthese
 		) const {
 			boost::shared_ptr<Point> originPoint = origin->getGeometry();
 
-			if(originPoint.get())
+			if(originPoint.get() && destination.get())
 				return static_cast<int>(geos::operation::distance::DistanceOp::distance(*originPoint, *destination) / _accessParameters.getApproachSpeed());
 			else
 				return 0;
