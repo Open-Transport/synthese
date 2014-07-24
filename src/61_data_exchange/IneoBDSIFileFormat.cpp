@@ -189,6 +189,7 @@ namespace synthese
 			const Ligne& ligne,
 			const std::string& nom,
 			bool sens,
+			const std::string& destsms,
 			const std::string& ref
 		) const	{
 
@@ -212,6 +213,7 @@ namespace synthese
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
 			chainage.sens = sens;
+			chainage.destsms = destsms;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
@@ -377,6 +379,48 @@ namespace synthese
 				}
 			}
 
+			// Extra line overload
+			// TODO, pass the hard coded values as a service parameter
+			{
+				vector<string> overloadLines;
+				overloadLines.push_back("S.SCOL");
+				overloadLines.push_back("S.USINES");
+				BOOST_FOREACH(string overload, overloadLines)
+				{
+					CommercialLine* line(
+						_plannedDataSource->getObjectByCode<CommercialLine>(overload)
+					);
+					if(line)
+					{
+						_logLoadDetail(
+							"LINE",overload,overload,line->getKey(),line->getName(),string(), string(), "OK"
+						);
+					}
+					else
+					{
+						Log::GetInstance().warn("No such line : " + overload);
+						_logWarningDetail(
+							"LINE",overload,overload,0,string(), string(),string(), "NOT FOUND"
+						);
+						continue;
+					}
+
+					// Registration
+					Ligne& ligne(
+						lignes.insert(
+							make_pair(
+								overload,
+								Ligne()
+						)	).first->second
+					);
+
+					// Copy of values
+					ligne.ref = overload;
+					ligne.syntheseLine = line;
+					_logLoad("OVERLOAD BY DESTSMS " + overload + " => " + line->getName());
+				}
+			}
+
 			// Chainages
 			{
 				string chainageQuery(
@@ -388,22 +432,26 @@ namespace synthese
 						_database +".ARRETCHN.chainage,"+
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
-						_database +".CHAINAGE.ligne "+
+						_database +".CHAINAGE.ligne,"+
+						_database +".DEST.destsms "+
 					" FROM "+
+						_database +".DEST, "+
 						_database +".ARRETCHN "+
 						" INNER JOIN "+ _database +".CHAINAGE ON "+
-							_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
+								_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
-						_database +".CHAINAGE.jour="+ todayStr +
+						_database +".CHAINAGE.jour="+ todayStr +" AND "+ _database +".CHAINAGE.dest="+ _database +".DEST.ref "+"AND "+ _database +".CHAINAGE.jour="+ _database +".DEST.jour "
 					" ORDER BY "+
 						_database +".ARRETCHN.chainage, "+
 						_database +".ARRETCHN.pos"
-				);			
+				);
+
 				DBResultSPtr chainageResult(db->execQuery(chainageQuery));
 				string lastRef;
 				const Ligne* ligne(NULL);
 				Chainage::ArretChns arretChns;
 				bool sens(false);
+				string destsms;
 				string nom;
 				while(chainageResult->next())
 				{
@@ -420,6 +468,7 @@ namespace synthese
 							*ligne,
 							nom,
 							sens,
+							destsms,
 							lastRef
 						);
 					}
@@ -429,22 +478,31 @@ namespace synthese
 					{
 						string ligneRef(chainageResult->get<string>("ligne"));
 						nom = chainageResult->getText("nom");
+						destsms = chainageResult->getText("destsms");
+						sens = (chainageResult->getText("sens") == "R");
 
-						// Check of the ligne
-						Lignes::const_iterator it(
-							lignes.find(ligneRef)
-						);
-						if(it == lignes.end())
+						// Try to get the line by it's destsms
+						// TODO, pass the hard coded values as a service parameter
+						if(destsms == "S.USINES" || destsms == "S.SCOL")
 						{
-							ligne = NULL;
-							_logWarningDetail(
-								"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"LINE NOT FOUND"
-							);
+							ligneRef = destsms;
+							_logLoad("OVERLOAD LOAD FOR " + destsms);
 						}
-						else
+
 						{
-							ligne = &it->second;
-							sens = (chainageResult->getText("sens") == "R");
+							// Line loading
+							Lignes::const_iterator it(lignes.find(ligneRef));
+							if(it == lignes.end())
+							{
+								ligne = NULL;
+								_logWarningDetail(
+											"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"LINE NOT FOUND"
+											);
+							}
+							else
+							{
+								ligne = &it->second;
+							}
 						}
 
 						// Beginning load of the next ref
@@ -494,6 +552,7 @@ namespace synthese
 						*ligne,
 						nom,
 						sens,
+						destsms,
 						lastRef
 					);
 				}

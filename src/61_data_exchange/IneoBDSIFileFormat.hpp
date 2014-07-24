@@ -135,6 +135,7 @@ namespace synthese
 					std::string nom;
 					const Ligne* ligne;
 					bool sens;
+                    std::string destsms;
 					typedef std::vector<ArretChn> ArretChns;
 					ArretChns arretChns;
 
@@ -154,6 +155,7 @@ namespace synthese
 					const Ligne& ligne,
 					const std::string& nom,
 					bool sens,
+                    const std::string& destsms,
 					const std::string& chainageRef
 				) const;
 
