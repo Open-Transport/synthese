@@ -57,7 +57,7 @@ namespace synthese
 		const string TransportNetworkUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string TransportNetworkUpdateAction::PARAMETER_DAYS_CALENDARS_PARENT_ID = Action_PARAMETER_PREFIX + "days_calendars_parent_id";
 		const string TransportNetworkUpdateAction::PARAMETER_PERIODS_CALENDARS_PARENT_ID = Action_PARAMETER_PREFIX + "periods_calendars_parent_id";
-		const string TransportNetworkUpdateAction::PARAMETER_LOGO = Action_PARAMETER_PREFIX + "lo";
+		const string TransportNetworkUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
 
 
 
@@ -72,9 +72,9 @@ namespace synthese
 			{
 				map.insert(PARAMETER_NAME, *_name);
 			}
-			if(_logo)
+			if(_image)
 			{
-				map.insert(PARAMETER_LOGO, *_logo);
+				map.insert(PARAMETER_IMAGE, *_image);
 			}
 
 			// Importable
@@ -121,10 +121,10 @@ namespace synthese
 				}	}
 			}
 
-			// Logo
-			if (map.isDefined(PARAMETER_LOGO))
+			// Image
+			if (map.isDefined(PARAMETER_IMAGE))
 			{
-				_logo = map.get<string>(PARAMETER_LOGO);
+				_image = map.get<string>(PARAMETER_IMAGE);
 			}
 
 			// Data source links
@@ -180,10 +180,10 @@ namespace synthese
 				_network->setName(*_name);
 			}
 
-			// Logo
-			if(_logo)
+			// Image
+			if(_image)
 			{
-				_network->setLogo(*_logo);
+				_network->setImage(*_image);
 			}
 
 			// Data source links
