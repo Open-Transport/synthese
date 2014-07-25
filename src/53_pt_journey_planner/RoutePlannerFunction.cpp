@@ -2334,15 +2334,13 @@ namespace synthese
 				destinationPlaceName = dynamic_cast<const NamedPlace*>(destinationPlace)->getName();
 			}
 
-			boost::shared_ptr<Point> originPoint(_coordinatesSystem->convertPoint(*(originPlace->getPoint())));
-			boost::shared_ptr<Point> destinationPoint(_coordinatesSystem->convertPoint(*(destinationPlace->getPoint())));
-
 			pm.insert(DATA_INTERNAL_DATE, to_iso_extended_string(date));
 			pm.insert(DATA_ORIGIN_CITY_TEXT, originCity->getName());
 			pm.insert(DATA_HANDICAPPED_FILTER, accessParameters.getUserClass() == USER_HANDICAPPED);
 			pm.insert(DATA_ORIGIN_PLACE_TEXT, originPlaceName);
-			if(originPoint)
+			if(originPlace->getPoint())
 			{
+				boost::shared_ptr<Point> originPoint(_coordinatesSystem->convertPoint(*(originPlace->getPoint())));
 				pm.insert(DATA_ORIGIN_PLACE_LONGITUDE, originPoint->getX());
 				pm.insert(DATA_ORIGIN_PLACE_LATITUDE, originPoint->getY());
 			}
@@ -2350,8 +2348,9 @@ namespace synthese
 			pm.insert(DATA_DESTINATION_CITY_TEXT, destinationCity->getName());
 			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
-			if(destinationPoint)
+			if(destinationPlace->getPoint())
 			{
+				boost::shared_ptr<Point> destinationPoint(_coordinatesSystem->convertPoint(*(destinationPlace->getPoint())));
 				pm.insert(DATA_DESTINATION_PLACE_LONGITUDE, destinationPoint->getX());
 				pm.insert(DATA_DESTINATION_PLACE_LATITUDE, destinationPoint->getY());
 			}
