@@ -54,6 +54,7 @@ namespace synthese
 			static const std::string COL_CREATOR_ID;
 			static const std::string COL_DAYS_CALENDARS_PARENT_ID;
 			static const std::string COL_PERIODS_CALENDARS_PARENT_ID;
+			static const std::string COL_LOGO;
 
 
 

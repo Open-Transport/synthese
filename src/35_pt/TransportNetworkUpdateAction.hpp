@@ -52,12 +52,14 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_DAYS_CALENDARS_PARENT_ID;
 			static const std::string PARAMETER_PERIODS_CALENDARS_PARENT_ID;
+			static const std::string PARAMETER_LOGO;
 
 		private:
 			boost::shared_ptr<TransportNetwork> _network;
 			boost::optional<std::string> _name;
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _daysCalendarsParent;
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _periodsCalendarsParent;
+			boost::optional<std::string> _logo;
 
 
 		protected:

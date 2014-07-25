@@ -51,12 +51,14 @@ namespace synthese
 	{
 		const string TransportNetwork::DATA_NETWORK_ID("network_id");
 		const string TransportNetwork::DATA_NAME("name");
+        const string TransportNetwork::DATA_LOGO("logo");
 
 
 
 		TransportNetwork::TransportNetwork(
 			util::RegistryKeyType id,
-			std::string name
+            std::string name,
+            std::string logo
 		):	util::Registrable(id),
 			graph::PathClass(),
 			_daysCalendarsParent(NULL),
@@ -101,6 +103,7 @@ namespace synthese
 
 			pm.insert(prefix + DATA_NETWORK_ID, getKey());
 			pm.insert(prefix + DATA_NAME, getName());
+            pm.insert(prefix + DATA_LOGO, getLogo());
 		}
 
 
@@ -123,6 +126,19 @@ namespace synthese
 					_name = name;
 				}
 			}
+
+            // Logo
+            if (record.isDefined(TransportNetworkTableSync::COL_LOGO))
+            {
+                std::string logo(
+                    record.get<string>(TransportNetworkTableSync::COL_LOGO)
+                );
+                if (logo != _logo)
+                {
+                    result = true;
+                    _logo = logo;
+                }
+            }
 
 			// Data source links
 			if(record.isDefined(TransportNetworkTableSync::COL_CREATOR_ID))
