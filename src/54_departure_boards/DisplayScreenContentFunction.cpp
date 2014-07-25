@@ -755,7 +755,12 @@ namespace synthese
 						journeyPattern->getDirection()
 					) <<
 					"\" wayback=\"" << (journeyPattern->getWayBack() ? "1" : "0") <<
+					"\" >";
+				stream <<"<network id=\""<< commercialLine->getNetwork()->getKey() <<
+					"\" name=\""      << commercialLine->getNetwork()->getName() <<
+					"\" image=\""      << commercialLine->getNetwork()->getImage() <<
 					"\" />";
+				stream << "</line>";
 			}
 
 			const StopArea& origin(
@@ -821,7 +826,12 @@ namespace synthese
 					"\" xmlColor=\""  << (serviceReal.commercialLine->getColor() ? serviceReal.commercialLine->getColor()->toXMLColor() : "") <<
 					"\" style=\""     << serviceReal.commercialLine->getStyle() <<
 					"\" image=\""     << serviceReal.commercialLine->getImage() <<
+					"\" >";
+				stream <<"<network id=\""<< serviceReal.commercialLine->getNetwork()->getKey() <<
+					"\" name=\""      << serviceReal.commercialLine->getNetwork()->getName() <<
+					"\" image=\""      << serviceReal.commercialLine->getNetwork()->getImage() <<
 					"\" />";
+				stream << "</line>";
 			}
 
 			stream << "<destination id=\"" << serviceReal.destination->getKey() <<
