@@ -103,6 +103,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA("timetable_grouped_by_area");
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
 		const string DisplayScreenContentFunction::PARAMETER_SPLIT_CONTINUOUS_SERVICES("split_continuous_services");
+		const string DisplayScreenContentFunction::PARAMETER_MAX_DAYS_NEXT_DEPARTURES("max_days_next_departures");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -667,6 +668,8 @@ namespace synthese
 					if(!period.contains(*_date))
 						_useSAEDirectConnection = false;
 				}
+
+				_maxDaysNextDepartures = map.getDefault<int>(PARAMETER_MAX_DAYS_NEXT_DEPARTURES, 1);
 
 				// Type control
 				if(!_screen->getType())
@@ -1394,15 +1397,15 @@ namespace synthese
 					{
 						endDateTime = (_date ? *_date : now);
 						startDateTime = endDateTime.time_of_day().hours() < 3 ?
-							endDateTime - endDateTime.time_of_day() - hours(21) :
-							endDateTime - endDateTime.time_of_day() + hours(3);
+							endDateTime - endDateTime.time_of_day() - hours(_maxDaysNextDepartures * 24) + hours(3) :
+							endDateTime - endDateTime.time_of_day() - hours((_maxDaysNextDepartures * 24) - 1) + hours(3);
 					}
 					else
 					{
 						startDateTime = (_date ? *_date : now);
 						endDateTime = startDateTime.time_of_day().hours() < 3 ?
-							startDateTime - startDateTime.time_of_day() + hours(3) :
-							startDateTime - startDateTime.time_of_day() + hours(27);
+							startDateTime - startDateTime.time_of_day() + hours((_maxDaysNextDepartures - 1) * 24) + hours(3) :
+							startDateTime - startDateTime.time_of_day() + hours(_maxDaysNextDepartures * 24) + hours(3);
 					}
 
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
