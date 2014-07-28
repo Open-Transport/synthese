@@ -452,63 +452,78 @@ namespace synthese
 
 								BOOST_FOREACH(string& stopItem, stopsVect)
 								{
-									vector<string> tripletVect;
-									split(tripletVect, stopItem, is_any_of("|"));
-									const CommercialLine* lineFilter = NULL;
-									const StopArea* destinationFilter = NULL;
-
-									if(tripletVect.size() > 1)
+									try
 									{
-										RegistryKeyType lineId = lexical_cast<RegistryKeyType>(tripletVect[1]);
-										if(decodeTableId(lineId) == CommercialLineTableSync::TABLE.ID)
+										vector<string> tripletVect;
+										split(tripletVect, stopItem, is_any_of("|"));
+										const CommercialLine* lineFilter = NULL;
+										const StopArea* destinationFilter = NULL;
+
+										if(tripletVect.size() > 1)
 										{
-											boost::shared_ptr<const CommercialLine> commercialLine(
-												Env::GetOfficialEnv().get<CommercialLine>(lineId)
-											);
-											lineFilter = commercialLine.get();
+											RegistryKeyType lineId = lexical_cast<RegistryKeyType>(tripletVect[1]);
+											if(decodeTableId(lineId) == CommercialLineTableSync::TABLE.ID)
+											{
+												boost::shared_ptr<const CommercialLine> commercialLine(
+													Env::GetOfficialEnv().get<CommercialLine>(lineId)
+												);
+												lineFilter = commercialLine.get();
+											}
 										}
-									}
-									if(tripletVect.size() > 2)
-									{
-										RegistryKeyType destId = lexical_cast<RegistryKeyType>(tripletVect[2]);
-										if(decodeTableId(destId) == StopAreaTableSync::TABLE.ID)
+										if(tripletVect.size() > 2)
 										{
-											boost::shared_ptr<const StopArea> stopArea(
-												Env::GetOfficialEnv().get<StopArea>(destId)
-											);
-											destinationFilter = stopArea.get();
+											RegistryKeyType destId = lexical_cast<RegistryKeyType>(tripletVect[2]);
+											if(decodeTableId(destId) == StopAreaTableSync::TABLE.ID)
+											{
+												boost::shared_ptr<const StopArea> stopArea(
+													Env::GetOfficialEnv().get<StopArea>(destId)
+												);
+												destinationFilter = stopArea.get();
+											}
 										}
-									}
 
-									RegistryKeyType stopId = lexical_cast<RegistryKeyType>(tripletVect[0]);
-									if(decodeTableId(stopId) == StopPointTableSync::TABLE.ID)
-									{
-										boost::shared_ptr<const StopPoint> stop(
-											Env::GetOfficialEnv().get<StopPoint>(stopId)
-										);
-
-										if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
-											continue;
-
-										screen->setDisplayedPlace(stop->getConnectionPlace());
-										stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
-										_lineDestinationFilter.insert(LineDestinationFilter::value_type(stop.get(), make_pair(lineFilter, destinationFilter)));
-									}
-									else if (decodeTableId(stopId) == StopAreaTableSync::TABLE.ID)
-									{
-										boost::shared_ptr<const StopArea> stop(
-											Env::GetOfficialEnv().get<StopArea>(stopId)
-										);
-										BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stop->getPhysicalStops())
+										RegistryKeyType stopId = lexical_cast<RegistryKeyType>(tripletVect[0]);
+										if(decodeTableId(stopId) == StopPointTableSync::TABLE.ID)
 										{
-											const StopPoint& stop(*itStop.second);
-											if(_dataSourceFilter && !stop.hasLinkWithSource(*_dataSourceFilter))
+											boost::shared_ptr<const StopPoint> stop(
+												Env::GetOfficialEnv().get<StopPoint>(stopId)
+											);
+
+											if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
 												continue;
 
-											screen->setDisplayedPlace(stop.getConnectionPlace());
-											stopsFilter.insert(make_pair(stop.getKey(), &stop));
-											_lineDestinationFilter.insert(LineDestinationFilter::value_type(&stop, make_pair(lineFilter, destinationFilter)));
+											screen->setDisplayedPlace(stop->getConnectionPlace());
+											stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
+											_lineDestinationFilter.insert(LineDestinationFilter::value_type(stop.get(), make_pair(lineFilter, destinationFilter)));
 										}
+										else if (decodeTableId(stopId) == StopAreaTableSync::TABLE.ID)
+										{
+											boost::shared_ptr<const StopArea> stop(
+												Env::GetOfficialEnv().get<StopArea>(stopId)
+											);
+											BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stop->getPhysicalStops())
+											{
+												const StopPoint& stop(*itStop.second);
+												if(_dataSourceFilter && !stop.hasLinkWithSource(*_dataSourceFilter))
+													continue;
+
+												screen->setDisplayedPlace(stop.getConnectionPlace());
+												stopsFilter.insert(make_pair(stop.getKey(), &stop));
+												_lineDestinationFilter.insert(LineDestinationFilter::value_type(&stop, make_pair(lineFilter, destinationFilter)));
+											}
+										}
+									}
+									catch(ObjectNotFoundException<CommercialLine>&)
+									{
+										continue;
+									}
+									catch(ObjectNotFoundException<StopArea>&)
+									{
+										continue;
+									}
+									catch(ObjectNotFoundException<StopPoint>&)
+									{
+										continue;
 									}
 								}
 								screen->setStops(stopsFilter);
