@@ -31,6 +31,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 #define MASTER_NAME "__PCCAR_TO_SAE__"
 
@@ -45,6 +46,9 @@ namespace synthese
 
     namespace inter_synthese
     {
+	
+		const string SpecificPostInstall::PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID = "post_install_passive_import_id";
+		const string SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_ID = "post_install_slave_id";
 
         ParametersMap SpecificPostInstall::getParametersMap() const
         {
@@ -56,6 +60,8 @@ namespace synthese
 
         void SpecificPostInstall::_setFromParametersMap(const ParametersMap& map)
         {
+			_passiveImportId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID);
+			_slaveId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_SLAVE_ID);
         }
 
 
@@ -97,11 +103,15 @@ namespace synthese
 
                 InterSYNTHESESlave slave;
                 slave.set<Name>("__SAE__");
-                slave.set<ServerAddress>("optymo-sae.rcsmobility.com");
+                slave.set<ServerAddress>("37.187.26.148");
                 slave.set<ServerPort>("80");
                 slave.set<InterSYNTHESEConfig>(newConfig);
                 slave.set<Active>(true);
-                InterSYNTHESESlaveTableSync::Save(&slave);
+				slave.set<PassiveModeImportId>(_passiveImportId);
+				slave.setKey(_slaveId);
+				ptime now(second_clock::local_time());
+				slave.set<LastActivityReport>(now);
+				InterSYNTHESESlaveTableSync::Save(&slave);
 
                 //addTable(newConfig, "44");
                 //addTable(newConfig, "46");

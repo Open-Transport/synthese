@@ -37,10 +37,17 @@ namespace synthese
         class SpecificPostInstall:
             public util::FactorableTemplate<server::Action, SpecificPostInstall>
         {
+		public:
+			static const std::string PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID;
+			static const std::string PARAMETER_POST_INSTALL_SLAVE_ID;
+
         private:
             const boost::shared_ptr<InterSYNTHESEConfig> getMyConfig();
             void addTable(InterSYNTHESEConfig &config,
                           const std::string tableCode);
+
+			util::RegistryKeyType _passiveImportId;
+			util::RegistryKeyType _slaveId;
 
         protected:
             //////////////////////////////////////////////////////////////////////////
