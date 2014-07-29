@@ -733,8 +733,8 @@ namespace synthese
 					scheduleInfo.departureTime += minutes(waitingMinutes);
 				}
 
-				scheduleInfo.departure = parser.getCellInt("AS_MONT_INTERDIT") == 0;
-				scheduleInfo.arrival = parser.getCellInt("AS_DESC_INTERDIT") == 0;
+				scheduleInfo.departure = parser.getCellInt("AS_MONT_INTERDIT") == 0 || parser.getCellInt("AS_MONT_INTERDIT") == -1; // NULL will return -1
+				scheduleInfo.arrival = parser.getCellInt("AS_DESC_INTERDIT") == 0 || parser.getCellInt("AS_DESC_INTERDIT") == -1;
 
 				serviceInfo[rank] = scheduleInfo;
 			}
