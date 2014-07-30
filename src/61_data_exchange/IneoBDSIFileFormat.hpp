@@ -300,6 +300,7 @@ namespace synthese
 				);
 
 
+				db::DBTransaction saveNow() const;
 				virtual db::DBTransaction _save() const;
 
 
