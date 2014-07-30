@@ -1724,17 +1724,17 @@ namespace synthese
 						startDateTime = ptime(endDateTime.date() - boost::gregorian::days(1), endOfService);
 					}
 				}
-				else 
+				else
 				{
 					startDateTime = (_date ? *_date : now);
 					if(startDateTime.time_of_day() > endOfService)
 					{
-						if(_screen.get())
+						if(_screen.get() && _screen->getMaxDelay() != 0)
 						{
 							endDateTime = ptime(startDateTime);
 							endDateTime += minutes(_screen->getMaxDelay());
 							time_period period(startDateTime, endDateTime);
-							// Limit the endDateTime to the date of the next day, at 3 a.m.
+							// Limit the endDateTime to the date of the next day, at time 'endOfService'.
 							if (period.contains(ptime(startDateTime.date() + boost::gregorian::days(1), endOfService)))
 							{
 								endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
