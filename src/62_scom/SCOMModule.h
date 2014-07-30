@@ -27,21 +27,32 @@
 namespace synthese
 {
 
-	/**	Here comes a one-line definition of the module.
+	/**	SCOM real time XML fetcher
 
-		Here, a full documentation about de module abilities and how to use it should be written.
-		Please, do it.
+	  This module reads a TCP socket from an SCOM server (Ineo SAE) and stores
+	  its data internally.
 
+	  The data is stored only for a certain amount of time, after what this data will be destroyed.
+	  There is no persistent storage as this data is real time only.
+
+	  TODO : SCOM infos
+
+	  TODO : Format infos
+
+	  TODO : Use
 	@{
 	*/
 
 	//////////////////////////////////////////////////////////////////////////
 	/// 62 SCOM Module namespace.
-	///	@author Exemple
+	///	@author Bastien Noverraz (TL)
 	///	@date 2014
 	//////////////////////////////////////////////////////////////////////////
 	namespace scom
 	{
+		class SCOMSocketReader;
+		class SCOMData;
+
 		/** 62 SCOM module class.
 		*/
 		class SCOMModule:
@@ -51,39 +62,29 @@ namespace synthese
 
 		public:
 
-			/** First step of initialization of the module.
-				This method is launched when the server starts.
-				Must be implemented for each instantiation.
-			*/
-			static void PreInit();
-
-			/** Second step of initialization of the module.
-				This method is launched after PreInit is launched for each module.
-				Must be implemented for each instantiation.
-			*/
-			static void Init();
-
-			/** Third step of initialization of the module.
-				This method is launched after Init is launched for each module.
-				Must be provided by each instance if needed. Default does nothing.
-			*/
+			//! Connect to the SCOM server and fetch its data
 			static void Start();
 
-			/** Ending of the module.
-				This method is launched when the server stops.
-				Must be implemented for each instantiation.
-			*/
+			//! Close the socket connection
 			static void End();
 
-			/** Operations to do at thread creation.
-				@param thread the created thread
-			*/
-			static void InitThread();
+			// TEST
+			static std::string Test ();
 
-			/** Operations to do at thread deletion.
-				@param the deleted thread
+			/** Does nothing
+			@{
 			*/
+			static void PreInit();
+			static void Init();
+			static void InitThread();
 			static void CloseThread();
+			/** @} */
+
+		private:
+			// The socket listener
+			static SCOMSocketReader* _sr;
+			// The data gatherer
+			static SCOMData* _sd;
 		};
 	}
 	/** @} */

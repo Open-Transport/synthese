@@ -60,6 +60,9 @@
 #include "InterfacePageException.h"
 #include "MimeTypes.hpp"
 #include "TransportNetwork.h"
+#ifdef WITH_SCOM
+	#include "SCOMModule.h"
+#endif
 
 #include <sstream>
 
@@ -614,6 +617,11 @@ namespace synthese
 						throw RequestException("SAE Direct Connection works only on Linux platforms and build with MySQL enabled");
 					#endif
 					}
+
+					// TEST
+					#ifdef WITH_SCOM
+					Log::GetInstance().debug("TDG : SCOM says : " + scom::SCOMModule::Test());
+					#endif
 
 					_timetableGroupedByArea = map.getDefault<bool>(PARAMETER_TIMETABLE_GROUPED_BY_AREA, false);
 					_splitContinuousServices = map.getDefault<bool>(PARAMETER_SPLIT_CONTINUOUS_SERVICES, false);

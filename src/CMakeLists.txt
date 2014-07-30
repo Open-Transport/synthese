@@ -73,6 +73,7 @@ endif()
 
 if(WITH_SCOM)
   list(APPEND MODULES 62_scom)
+  add_definitions(-DWITH_SCOM)
 endif()
 
 include_directories(${PROJ_INCLUDE_DIRS})

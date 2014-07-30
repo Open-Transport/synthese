@@ -21,8 +21,12 @@
 
 #include "SCOMModule.h"
 
+#include "SCOMSocketReader.h"
+#include "SCOMData.h"
+
 #include "ModuleClass.h"
 #include "FactorableTemplate.h"
+
 
 namespace synthese
 {
@@ -35,44 +39,44 @@ namespace synthese
 
 	namespace scom
 	{
-		// Here comes the variables, class and constants specific to the module
+		SCOMSocketReader* SCOMModule::_sr;
+		SCOMData* SCOMModule::_sd;
+
+		std::string SCOMModule::Test ()
+		{
+			return "Hello world!";
+		}
 	}
 
 	namespace server
 	{
-		// Here comes a readable name for the module, in French
+
 		template<> const std::string ModuleClassTemplate<SCOMModule>::NAME("Temps rel SCOM et bornes IP");
 
-		// The next function are to be implemented in each module.
-
-		template<> void ModuleClassTemplate<SCOMModule>::PreInit()
-		{
-			Log::GetInstance().debug("SCOM : Preinit");
-		}
-
-		template<> void ModuleClassTemplate<SCOMModule>::Init()
-		{
-			Log::GetInstance().debug("SCOM : Init");
-		}
-
+		// Start the listener and affect it a SCOMData object
 		template<> void ModuleClassTemplate<SCOMModule>::Start()
 		{
 			Log::GetInstance().debug("SCOM : Start");
+
+			scom::SCOMModule::_sd = new scom::SCOMData();
+			scom::SCOMModule::_sr = new scom::SCOMSocketReader(scom::SCOMModule::_sd);
+			scom::SCOMModule::_sr->Start();
 		}
 
 		template<> void ModuleClassTemplate<SCOMModule>::End()
 		{
 			Log::GetInstance().debug("SCOM : End");
+
+			scom::SCOMModule::_sr->Stop();
+
+			delete scom::SCOMModule::_sr;
+			delete scom::SCOMModule::_sd;
 		}
 
-		template<> void ModuleClassTemplate<SCOMModule>::InitThread()
-		{
-			Log::GetInstance().debug("SCOM : Init thread");
-		}
-
-		template<> void ModuleClassTemplate<SCOMModule>::CloseThread()
-		{
-			Log::GetInstance().debug("SCOM : Close thread");
-		}
+		// Empty functions
+		template<> void ModuleClassTemplate<SCOMModule>::PreInit() { }
+		template<> void ModuleClassTemplate<SCOMModule>::Init() { }
+		template<> void ModuleClassTemplate<SCOMModule>::InitThread() { }
+		template<> void ModuleClassTemplate<SCOMModule>::CloseThread() { }
 	}
 }

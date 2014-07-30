@@ -7,6 +7,10 @@ set(scom_SRCS
 	SCOMModule.gen.cpp
 	SCOMModule.inc.cpp
 	SCOMModuleRegister.cpp
+	SCOMSocketReader.h
+	SCOMSocketReader.cpp
+	SCOMData.h
+	SCOMData.cpp
 )
 
 # We define here the .gen file used to include and load the module into Synthese
