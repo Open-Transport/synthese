@@ -27,6 +27,8 @@
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminParametersException.h"
+#include "CalendarTemplateAdmin.h"
+#include "CalendarTemplateTableSync.h"
 #include "CommercialLine.h"
 #include "CommercialLineAdmin.h"
 #include "DRTArea.hpp"
@@ -39,6 +41,7 @@
 #include "JourneyPatternCopy.hpp"
 #include "LineStop.h"
 #include "MapSource.hpp"
+#include "ObjectCreateAction.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
@@ -47,8 +50,11 @@
 #include "PTPlaceAdmin.h"
 #include "PTRuleUserAdmin.hpp"
 #include "RoadPlaceTableSync.h"
+#include "RemoveObjectAction.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
+#include "StopPointInaccessibilityCalendar.hpp"
+#include "StopPointInaccessibilityCalendarAdmin.hpp"
 #include "StopPointUpdateAction.hpp"
 #include "TransportNetworkRight.h"
 #include "User.h"
@@ -90,6 +96,7 @@ namespace synthese
 		const string StopPointAdmin::TAB_LINKS("li");
 		const string StopPointAdmin::TAB_PROPERTIES("pr");
 		const string StopPointAdmin::TAB_ROUTES("tab_routes");
+		const string StopPointAdmin::TAB_INACCESSIBILITY("tab_inaccessibility");
 
 
 
@@ -465,6 +472,144 @@ namespace synthese
 				stream << t.close();
 			}
 
+			if (openTabContent(stream, TAB_INACCESSIBILITY))
+			{
+				AdminActionFunctionRequest<ObjectCreateAction, StopPointAdmin> addRequest(request, *this);
+				addRequest.getAction()->setTable<StopPointInaccessibilityCalendar>();
+				addRequest.getAction()->set<StopPointer>(const_cast<StopPoint&>(*_stop));
+				addRequest.setActionFailedPage<StopPointAdmin>();
+
+				AdminFunctionRequest<StopPointInaccessibilityCalendarAdmin> modifyRequest(request);
+
+				AdminActionFunctionRequest<RemoveObjectAction, StopPointAdmin> deleteRequest(request, *this);
+
+				AdminFunctionRequest<calendar::CalendarTemplateAdmin> openRequest(request);
+
+				HTMLForm addForm(addRequest.getHTMLForm("add"));
+
+				map<boost::optional<graph::UserClassCode>, string> userClassMap;
+				userClassMap.insert(make_pair(0, "Toutes"));
+				userClassMap.insert(make_pair(USER_PEDESTRIAN, "Piétons"));
+				userClassMap.insert(make_pair(USER_HANDICAPPED, "PMR"));
+				userClassMap.insert(make_pair(USER_BIKE, "Vélos"));
+				userClassMap.insert(make_pair(USER_CAR, "Voitures"));
+
+				map<boost::optional<string>, string> timeMap;
+				timeMap.insert(make_pair(string(), string("-")));
+				for(int i = 0 ; i < 1440 ; i+=30)
+				{
+					stringstream timeString;
+					timeString << std::setw(2) << std::setfill('0') << int(i / 60) << ":";
+					timeString << std::setw(2) << std::setfill('0') << int(i % 60);
+					timeMap.insert(make_pair(timeString.str(), timeString.str()));
+				}
+
+				HTMLTable::ColsVector columns;
+				columns.push_back("Calendrier");
+				columns.push_back("Classes d'utilisateur");
+				columns.push_back("Heure de début");
+				columns.push_back("Heure de fin");
+				columns.push_back("Filtre horaire quotidien");
+				columns.push_back(string());
+				HTMLTable tableAddDisplay(columns, ResultHTMLTable::CSS_CLASS);
+
+				stream << "<h1>Périodes d'inaccessibilité</h1>";
+				stream << addForm.open();
+				stream << tableAddDisplay.open();
+
+				BOOST_FOREACH(const StopPoint::AccessibilityMask::value_type& mask, _stop->getAccessibilityMask())
+				{
+					stream << tableAddDisplay.row();
+
+					stream << tableAddDisplay.col();
+					openRequest.getPage()->setCalendar(
+						Env::GetOfficialEnv().getSPtr(&(*mask->get<CalendarTemplatePointer>()))
+					);
+					stream << HTMLModule::getLinkButton(
+						openRequest.getURL(),
+						mask->get<CalendarTemplatePointer>()->getName(),
+						string(),
+						"/admin/img/" + calendar::CalendarTemplateAdmin::ICON
+					);
+
+					stream << tableAddDisplay.col();
+					if(userClassMap.find(mask->get<UserClass>()) != userClassMap.end())
+					{
+						stream << userClassMap[mask->get<UserClass>()];
+					}
+					else
+					{
+						stream << mask->get<UserClass>();
+					}
+
+					stream << tableAddDisplay.col();
+					if(!mask->get<StartHour>().is_not_a_date_time())
+					{
+						stream << mask->get<StartHour>();
+					}
+					else
+					{
+						stream << "-";
+					}
+
+					stream << tableAddDisplay.col();
+					if(!mask->get<EndHour>().is_not_a_date_time())
+					{
+						stream << mask->get<EndHour>();
+					}
+					else
+					{
+						stream << "-";
+					}
+
+					stream << tableAddDisplay.col();
+					stream << (mask->get<DailyTimeFilter>() ? "Oui" : "Non");
+
+					stream << tableAddDisplay.col();
+					modifyRequest.getPage()->setStopPointInaccessibilityCalendar(
+						Env::GetOfficialEnv().getSPtr(mask)
+					);
+					deleteRequest.getAction()->setObjectId(mask->getKey());
+					stream << HTMLModule::getLinkButton(modifyRequest.getURL(), "Modifier", "", "/admin/img/cog_edit.png");
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer cette période d'inaccessibilité ?", "/admin/img/delete.png");
+				}
+
+				// New row for object creation
+				stream << tableAddDisplay.row();
+
+				stream << tableAddDisplay.col() << addForm.getSelectInput(
+					ObjectCreateAction::GetInputName<CalendarTemplatePointer>(),
+					calendar::CalendarTemplateTableSync::GetCalendarTemplatesList(),
+					optional<RegistryKeyType>(0)
+				);
+
+				stream << tableAddDisplay.col() << addForm.getSelectInput(
+					ObjectCreateAction::GetInputName<UserClass>(),
+					userClassMap,
+					boost::optional<graph::UserClassCode>(0)
+				);
+
+				stream << tableAddDisplay.col() << addForm.getSelectInput(
+					ObjectCreateAction::GetInputName<StartHour>(),
+					timeMap,
+					boost::optional<string>()
+				);
+
+				stream << tableAddDisplay.col() << addForm.getSelectInput(
+					ObjectCreateAction::GetInputName<EndHour>(),
+					timeMap,
+					boost::optional<string>()
+				);
+
+				stream << tableAddDisplay.col() << addForm.getOuiNonRadioInput(
+					ObjectCreateAction::GetInputName<DailyTimeFilter>(),
+					false
+				);
+				stream << tableAddDisplay.col() << addForm.getSubmitButton("Ajouter");
+
+				stream << tableAddDisplay.close();
+				stream << addForm.close();
+			}
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
@@ -501,6 +646,7 @@ namespace synthese
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 			_tabs.push_back(Tab("Sources de données", ImportableAdmin::TAB_DATA_SOURCES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 			_tabs.push_back(Tab("Lignes", TAB_ROUTES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			_tabs.push_back(Tab("Périodes d'inaccessibilité", TAB_INACCESSIBILITY, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}

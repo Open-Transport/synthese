@@ -35,6 +35,7 @@
 #include "ReverseRoadChunk.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
+#include "StopPointInaccessibilityCalendar.hpp"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -131,6 +132,25 @@ namespace synthese
 
 
 
+		bool StopPoint::isCompatibleWith(
+			const AccessParameters& accessParameters,
+			const boost::optional<boost::posix_time::ptime> atTime
+		) const	{
+			bool isCompatible = RuleUser::isCompatibleWith(accessParameters);
+			// If a time is specified check the accessibility masks
+			if(atTime)
+			{
+				BOOST_FOREACH(const AccessibilityMask::value_type& mask, getAccessibilityMask())
+				{
+					isCompatible &= mask->isAccessibleAtTime(accessParameters, *atTime);
+				}
+			}
+
+			return isCompatible;
+		}
+
+
+
 		StopPoint::LinesSet StopPoint::getCommercialLines(
 			bool withDepartures,
 			bool withArrivals
@@ -223,6 +243,22 @@ namespace synthese
 
 			// Exit
 			return journeyPatterns;
+		}
+
+
+
+		void StopPoint::addAccessibilityMaskEntry(
+			StopPointInaccessibilityCalendar* entry
+		){
+			_accessibilityMask.insert(entry);
+		}
+
+
+
+		void StopPoint::removeAccessibilityMaskEntry(
+			StopPointInaccessibilityCalendar* entry
+		){
+			_accessibilityMask.erase(entry);
 		}
 
 

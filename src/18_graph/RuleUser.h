@@ -124,8 +124,9 @@ namespace synthese
 				/// @param accessParameters access parameters
 				/// @return true if the rule user is compatible with the specified parameters
 				/// @author Hugues Romain
-				bool isCompatibleWith(
-					const AccessParameters& accessParameters
+				virtual bool isCompatibleWith(
+					const AccessParameters& accessParameters,
+					const boost::optional<boost::posix_time::ptime> atTime = boost::optional<boost::posix_time::ptime>()
 				) const;
 
 

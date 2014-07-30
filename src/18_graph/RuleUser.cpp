@@ -57,7 +57,8 @@ namespace synthese
 
 
 		bool RuleUser::isCompatibleWith(
-			const AccessParameters& accessParameters
+			const AccessParameters& accessParameters,
+			const boost::optional<boost::posix_time::ptime> atTime
 		) const	{
 			const UseRule& rule(getUseRule(accessParameters.getUserClassRank()));
 			return rule.isCompatibleWith(accessParameters);
