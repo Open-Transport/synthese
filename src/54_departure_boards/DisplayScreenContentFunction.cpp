@@ -1452,9 +1452,11 @@ namespace synthese
 
 								++*index;
 
-							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
+								departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+								{
 									continue;
+								}
 
 								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
 								const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
@@ -1714,17 +1716,39 @@ namespace synthese
 				{
 					endDateTime = (_date ? *_date : now);
 					if(endDateTime.time_of_day() > endOfService)
+					{
 						startDateTime = ptime(endDateTime.date(), endOfService);
+					}
 					else
+					{
 						startDateTime = ptime(endDateTime.date() - boost::gregorian::days(1), endOfService);
+					}
 				}
 				else 
 				{
 					startDateTime = (_date ? *_date : now);
 					if(startDateTime.time_of_day() > endOfService)
-						endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+					{
+						if(_screen.get())
+						{
+							endDateTime = ptime(startDateTime);
+							endDateTime += minutes(_screen->getMaxDelay());
+							time_period period(startDateTime, endDateTime);
+							// Limit the endDateTime to the date of the next day, at 3 a.m.
+							if (period.contains(ptime(startDateTime.date() + boost::gregorian::days(1), endOfService)))
+							{
+								endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+							}
+						}
+						else
+						{
+							endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+						}
+					}
 					else
+					{
 						endDateTime = ptime(startDateTime.date(), endOfService);
+					}
 				}
 
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
@@ -1989,7 +2013,7 @@ namespace synthese
 									break;
 								++*index;
 
-							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
+								departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 									continue;
 
@@ -2048,10 +2072,12 @@ namespace synthese
 									}
 								}
 
-							time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
+								time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
 								int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
-							if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
+								if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
+								{
 									mapKeyMinutes += 86400;
+								}
 
 								OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
 								//Check if a service is already inserted for this date
