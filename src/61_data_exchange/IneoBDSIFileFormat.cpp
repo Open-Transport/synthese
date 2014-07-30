@@ -1280,6 +1280,8 @@ namespace synthese
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
 			}
 
+			saveNow().run();
+
 			return true;
 		}
 		
@@ -1408,6 +1410,11 @@ namespace synthese
 
 
 		DBTransaction IneoBDSIFileFormat::Importer_::_save() const
+		{
+			return DBTransaction();
+		}
+
+		DBTransaction IneoBDSIFileFormat::Importer_::saveNow() const
 		{
 			DBTransaction transaction;
 
