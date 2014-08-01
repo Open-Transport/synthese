@@ -50,9 +50,12 @@ namespace synthese
 		const string InterSYNTHESEObjectCreateService::QUEUE_IDS_SEPARATOR = ",";
 		const string InterSYNTHESEObjectCreateService::NO_ITEM_IN_QUEUE = "item_created_not_found_in_queues";
 
+        const string InterSYNTHESEObjectCreateService::FORMAT_JSON("json");
+
 		const string InterSYNTHESEObjectCreateService::PARAMETER_GETQUEUEID = "getqueueid";
 
 		const string InterSYNTHESEObjectCreateService::ATTR_QUEUEIDS = "queue_ids";
+        const string InterSYNTHESEObjectCreateService::TAG_OBJECT_AND_INTERSYNTHESE_KEYS = "object_and_intersynthese_keys";
 
 
 
@@ -65,6 +68,11 @@ namespace synthese
             {
                 map.insert(PARAMETER_GETQUEUEID, _queueIdsRequested);
             }
+            // Output format
+            if(!_outputFormat.empty())
+            {
+                map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+            }
             return map;
 		}
 
@@ -74,6 +82,8 @@ namespace synthese
 		{
             // First, call of the mother class method
             db::ObjectCreateService::_setFromParametersMap(map);
+            // Output format
+            _outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
             // Then, check if the queue ids are requested
             _queueIdsRequested = map.getDefault<bool>(PARAMETER_GETQUEUEID, false);
 		}
@@ -144,6 +154,10 @@ namespace synthese
                     map.insert(ATTR_QUEUEIDS, queueIdsStr.str());
                 }
             }
+            if (_outputFormat == FORMAT_JSON)
+            {
+                map.outputJSON(stream, TAG_OBJECT_AND_INTERSYNTHESE_KEYS);
+            }
             return map;
         }
 		
@@ -160,6 +174,22 @@ namespace synthese
 		InterSYNTHESEObjectCreateService::InterSYNTHESEObjectCreateService():
 			_queueIdsRequested(false)
         {}
+
+
+
+        std::string InterSYNTHESEObjectCreateService::getOutputMimeType() const
+        {
+            std::string mimeType;
+            if(_outputFormat == FORMAT_JSON)
+            {
+                mimeType = "application/json";
+            }
+            else // For empty result
+            {
+                mimeType = "text/html";
+            }
+            return mimeType;
+        }
 
 
 
