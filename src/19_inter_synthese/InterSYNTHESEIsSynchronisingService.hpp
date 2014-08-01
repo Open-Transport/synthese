@@ -50,6 +50,8 @@ namespace synthese
             static const std::string ATTR_IS_SYNCHRONISING;
             static const std::string PARAMETER_QUEUEIDS;
             static const std::string QUEUE_IDS_SEPARATOR;
+            static const std::string TAG_INTERSYNTHESE_SYNCHRONISATION;
+            static const std::string FORMAT_JSON;
 
 		protected:
 			//! \name Page parameters

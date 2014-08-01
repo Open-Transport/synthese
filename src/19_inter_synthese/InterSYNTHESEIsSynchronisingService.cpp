@@ -47,7 +47,9 @@ namespace synthese
 	{
 		const string InterSYNTHESEIsSynchronisingService::ATTR_IS_SYNCHRONISING = "is_synchronising";
 		const string InterSYNTHESEIsSynchronisingService::PARAMETER_QUEUEIDS = "queue_ids";
+        const string InterSYNTHESEIsSynchronisingService::TAG_INTERSYNTHESE_SYNCHRONISATION = "inter_synthese_synchronisation";
 
+        const string InterSYNTHESEIsSynchronisingService::FORMAT_JSON("json");
         const string InterSYNTHESEIsSynchronisingService::QUEUE_IDS_SEPARATOR = ",";
 
 
@@ -55,6 +57,11 @@ namespace synthese
 		ParametersMap InterSYNTHESEIsSynchronisingService::_getParametersMap() const
 		{
             ParametersMap map;
+            // Output format
+            if(!_outputFormat.empty())
+            {
+                map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+            }
             if (!_queueIds.empty())
             {
                 stringstream idsStream;
@@ -81,6 +88,8 @@ namespace synthese
 
 		void InterSYNTHESEIsSynchronisingService::_setFromParametersMap(const ParametersMap& map)
 		{
+            // Output format
+            _outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
             string queueIdsStr = map.getDefault<string>(PARAMETER_QUEUEIDS, "");
             // Split of the queueIdStr variable
             vector<string> queueIdVect;
@@ -114,6 +123,10 @@ namespace synthese
                 }
             }
             map.insert(ATTR_IS_SYNCHRONISING, _queueIds.empty() ? false : is_one_slave_synchronising);
+            if (_outputFormat == FORMAT_JSON)
+            {
+                map.outputJSON(stream, TAG_INTERSYNTHESE_SYNCHRONISATION);
+            }
 			return map;
 		}
 		
@@ -129,7 +142,16 @@ namespace synthese
 
 		std::string InterSYNTHESEIsSynchronisingService::getOutputMimeType() const
 		{
-			return "text/html";
+            std::string mimeType;
+            if(_outputFormat == FORMAT_JSON)
+            {
+                mimeType = "application/json";
+            }
+            else // For empty result
+            {
+                mimeType = "text/html";
+            }
+            return mimeType;
 		}
 
 }	}
