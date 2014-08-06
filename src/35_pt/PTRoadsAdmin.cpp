@@ -27,11 +27,17 @@
 #include "AdminParametersException.h"
 #include "MainRoadChunk.hpp"
 #include "ParametersMap.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "RoadPlaceUpdateAction.h"
+#include "PropertiesHTMLTable.h"
+#include "ImportableAdmin.hpp"
+#include "CityListFunction.h"
 #include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
 #include "User.h"
 #include "RoadPlace.h"
+#include "RoadPlaceTableSync.h"
 #include "ResultHTMLTable.h"
 #include "MainRoadPart.hpp"
 #include "PTRoadAdmin.h"
@@ -53,6 +59,8 @@ namespace synthese
 	using namespace road;
 	using namespace html;
 	using namespace graph;
+	using namespace db;
+	using namespace impex;
 
 	namespace util
 	{
@@ -67,6 +75,9 @@ namespace synthese
 
 	namespace pt
 	{
+		const string PTRoadsAdmin::TAB_PROPERTIES("tab_properties");
+		const string PTRoadsAdmin::TAB_DETAILS("tab_details");
+
 		PTRoadsAdmin::PTRoadsAdmin()
 			: AdminInterfaceElementTemplate<PTRoadsAdmin>()
 		{ }
@@ -114,90 +125,155 @@ namespace synthese
 			ostream& stream,
 			const Request& request
 		) const	{
-
-			AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
-
-			HTMLTable::ColsVector c;
-			c.push_back(string());
-			c.push_back("Gauche");
-			c.push_back("Gauche");
-			c.push_back("Droite");
-			c.push_back("Droite");
-			c.push_back("Longueur");
-			c.push_back(string());
-			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-			stream << t.open();
-			BOOST_FOREACH(Path* road, _roadPlace->getPaths())
+			////////////////////////////////////////////////////////////////////
+			// DETAILS TAB
+			if (openTabContent(stream, TAB_DETAILS))
 			{
-				// Avoid auto generated objects
-				MainRoadPart* mainRoad(dynamic_cast<MainRoadPart*>(road));
-				if(!mainRoad)
+				AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
+
+				HTMLTable::ColsVector c;
+				c.push_back(string());
+				c.push_back("Gauche");
+				c.push_back("Gauche");
+				c.push_back("Droite");
+				c.push_back("Droite");
+				c.push_back("Longueur");
+				c.push_back(string());
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+				BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 				{
-					continue;
+					// Avoid auto generated objects
+					MainRoadPart* mainRoad(dynamic_cast<MainRoadPart*>(road));
+					if(!mainRoad)
+					{
+						continue;
+					}
+
+					// New row
+					stream << t.row();
+
+					// Open button
+					stream << t.col();
+					openRoadRequest.getPage()->setRoad(
+								Env::GetOfficialEnv().getSPtr(mainRoad)
+								);
+					stream << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTRoadAdmin::ICON);
+
+					// Left first number
+					stream << t.col();
+					if( !mainRoad->getEdges().empty() &&
+						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()
+						){
+						stream <<
+								  static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()->first
+								  ;
+					}
+
+					// Left last number
+					stream << t.col();
+					if( mainRoad->getEdges().size() > 1 &&
+						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()
+						){
+						stream <<
+								  static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()->second
+								  ;
+					}
+
+					// Right first number
+					stream << t.col();
+					if( !mainRoad->getEdges().empty() &&
+						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()
+						){
+						stream <<
+								  static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()->first
+								  ;
+					}
+
+					// Left last number
+					stream << t.col();
+					if( mainRoad->getEdges().size() > 1 &&
+						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()
+						){
+						stream <<
+								  static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()->second
+								  ;
+					}
+
+					// Length
+					stream << t.col();
+					if( !mainRoad->getEdges().empty())
+					{
+						stream << mainRoad->getLastEdge()->getMetricOffset() - mainRoad->getEdge(0)->getMetricOffset();
+					}
+
+					// Delete
+					stream << t.col();
+					/// TODO
 				}
-
-				// New row
-				stream << t.row();
-
-				// Open button
-				stream << t.col();
-				openRoadRequest.getPage()->setRoad(
-					Env::GetOfficialEnv().getSPtr(mainRoad)
-				);
-				stream << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTRoadAdmin::ICON);
-
-				// Left first number
-				stream << t.col();
-				if( !mainRoad->getEdges().empty() &&
-					static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()
-				){
-					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()->first
-					;
-				}
-
-				// Left last number
-				stream << t.col();
-				if( mainRoad->getEdges().size() > 1 &&
-					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()
-				){
-					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()->second
-					;
-				}
-
-				// Right first number
-				stream << t.col();
-				if( !mainRoad->getEdges().empty() &&
-					static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()
-				){
-					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()->first
-					;
-				}
-
-				// Left last number
-				stream << t.col();
-				if( mainRoad->getEdges().size() > 1 &&
-					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()
-				){
-					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()->second
-					;
-				}
-
-				// Length
-				stream << t.col();
-				if( !mainRoad->getEdges().empty())
-				{
-					stream << mainRoad->getLastEdge()->getMetricOffset() - mainRoad->getEdge(0)->getMetricOffset();
-				}
-
-				// Delete
-				stream << t.col();
-				/// TODO
+				stream << t.close();
 			}
-			stream << t.close();
+
+
+			////////////////////////////////////////////////////////////////////
+			// PROPERTIES TAB
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				stream << "<h1>Propriétés</h1>";
+
+				AdminActionFunctionRequest<RoadPlaceUpdateAction, PTRoadsAdmin> updateRequest(request, *this);
+				updateRequest.getAction()->setPlace(const_pointer_cast<RoadPlace>(_roadPlace));
+
+				// General properties
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
+				stream << t.open();
+				stream << t.cell("ID", lexical_cast<string>(_roadPlace->getKey()));
+				if(_roadPlace->getCity())
+				{
+					stream << t.cell("Localité", _roadPlace->getCity()->getName());
+				}
+				stream << t.cell(
+					"Localité",
+					t.getForm().getTextInputAutoCompleteFromService(
+						RoadPlaceUpdateAction::PARAMETER_CITY_ID,
+						lexical_cast<string>(
+							  _roadPlace->getCity() ?
+							  _roadPlace->getCity()->getKey() :
+							  RegistryKeyType(0)
+						),
+						_roadPlace->getCity() ? _roadPlace->getCity()->getName() : string(),
+						pt_website::CityListFunction::FACTORY_KEY,
+						pt_website::CityListFunction::DATA_CITIES,
+						pt_website::CityListFunction::DATA_CITY,
+						string(), string(),
+						false, true, true, true
+				)	);
+				stream << t.cell(
+					"Nom",
+					t.getForm().GetTextInput(
+						RoadPlaceUpdateAction::PARAMETER_NAME,
+						_roadPlace->getName()
+				)	);
+				stream << t.cell(
+					"Rue principale",
+					t.getForm().getOuiNonRadioInput(
+					RoadPlaceUpdateAction::PARAMETER_IS_MAIN,
+					_roadPlace->getCity() ?
+						  _roadPlace->getCity()->includes(*_roadPlace) :
+						  false
+				)	);
+				stream << t.close();
+
+				// Importable admin
+				StaticActionRequest<RoadPlaceUpdateAction> updateOnlyRequest(request);
+				updateOnlyRequest.getAction()->setPlace(const_pointer_cast<RoadPlace>(_roadPlace));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_roadPlace, updateOnlyRequest);
+			}
+
+
+			////////////////////////////////////////////////////////////////////
+			/// END TABS
+			closeTabContent(stream);
 		}
 
 
@@ -254,6 +330,18 @@ namespace synthese
 		std::string PTRoadsAdmin::getTitle() const
 		{
 			return _roadPlace.get() ? _roadPlace->getName() : DEFAULT_TITLE;
+		}
+
+
+		void PTRoadsAdmin::_buildTabs(
+			const security::Profile& profile
+		) const	{
+			_tabs.clear();
+
+			_tabs.push_back(Tab("Détails", TAB_DETAILS, true));
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+
+			_tabBuilded = true;
 		}
 	}
 }
