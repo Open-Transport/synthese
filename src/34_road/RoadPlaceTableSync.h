@@ -81,7 +81,9 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,
 				bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				boost::logic::tribool mainRoad = boost::logic::indeterminate,
+				bool isDifferentFromExactName = false
 			);
 
 
