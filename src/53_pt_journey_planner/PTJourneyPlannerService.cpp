@@ -76,6 +76,8 @@
 #include "PTUseRule.h"
 #include "GetMessagesFunction.hpp"
 #include "CustomBroadcastPoint.hpp"
+#include "RoadPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -527,13 +529,24 @@ namespace synthese
 							if(!results.empty())
 							{
 								_departure_place = *results.begin();
-						}	}
+							}
+
+						}
 						else
 						{
 							_departure_place = _configuration.get() ?
                                 _configuration->extendedFetchPlace(_originCityText, _originPlaceText) :
 								RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
 							;
+							if((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) ||
+								map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) ||
+								map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) ||
+								map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)) &&
+								_originPlaceText.empty() && dynamic_pointer_cast<City, Place>(_departure_place.placeResult.value))
+							{
+								const City* originCity(_departure_place.cityResult.value.get());
+								computeDeparturePlace(originCity);
+							}
                         }
                     }
 				}
@@ -586,6 +599,15 @@ namespace synthese
                                 _configuration->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
 								RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
 							;
+							if((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) ||
+								map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) ||
+								map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) ||
+								map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)) &&
+								_destinationPlaceText.empty() && dynamic_pointer_cast<City, Place>(_arrival_place.placeResult.value))
+							{
+								const City* destinationCity(_arrival_place.cityResult.value.get());
+								computeArrivalPlace(destinationCity);
+							}
 						}
 					}
 				}
@@ -2621,4 +2643,142 @@ namespace synthese
 			}
 			_arrival_place = item;
 		}
+
+		void PTJourneyPlannerService::computeDeparturePlace(
+			const City* originCity
+		){
+			RoadPlaceTableSync::SearchResult roadPlaces(
+						RoadPlaceTableSync::Search(
+							Env::GetOfficialEnv(),
+							originCity ? originCity->getKey() : optional<RegistryKeyType>(),
+							optional<string>(), /* exactName */
+							optional<string>(), /* likeName */
+							0, /* first */
+							boost::optional<std::size_t>(0), /* number */
+							true, /* orderByName */
+							true, /* raisingOrder */
+							util::UP_LINKS_LOAD_LEVEL,
+							boost::tribool(true), /*mainRoad*/
+							false /* isDifferentFromExactName*/
+							)	);
+			if(!roadPlaces.empty())
+			{
+				RoadPlaceTableSync::SearchResult::const_iterator it = roadPlaces.begin();
+				setDeparturePlace(const_pointer_cast<Place, const Place>(*it));
+			}
+			else
+			{
+				StopAreaTableSync::SearchResult stopAreas(
+							StopAreaTableSync::Search(
+								Env::GetOfficialEnv(),
+								originCity ? originCity->getKey() : optional<RegistryKeyType>(),
+								true,
+								optional<string>(),
+								optional<string>(),
+								optional<string>(),
+								true,
+								true,
+								0,
+								1
+								)	);
+				if(!stopAreas.empty())
+				{
+					StopAreaTableSync::SearchResult::const_iterator it = stopAreas.begin();
+					setDeparturePlace(const_pointer_cast<Place, const Place>(*it));
+				}
+				else
+				{
+					// Get the first road of the city which name is not empty
+					RoadPlaceTableSync::SearchResult roadPlaces(
+								RoadPlaceTableSync::Search(
+									Env::GetOfficialEnv(),
+									originCity ? originCity->getKey() : optional<RegistryKeyType>(),
+									optional<string>(""), /* exactName */
+									optional<string>(), /* likeName */
+									0, /* first */
+									boost::optional<std::size_t>(0), /* number */
+									true, /* orderByName */
+									true, /* raisingOrder */
+									util::UP_LINKS_LOAD_LEVEL,
+									boost::tribool(false), /*mainRoad*/
+									true /* isDifferentFromExactName*/
+									)	);
+					if (!roadPlaces.empty())
+					{
+						RoadPlaceTableSync::SearchResult::const_iterator it = roadPlaces.begin();
+						setDeparturePlace(const_pointer_cast<Place, const Place>(*it));
+					}
+				}
+			}
+		}
+
+
+		void PTJourneyPlannerService::computeArrivalPlace(
+			const City* destinationCity
+		){
+			RoadPlaceTableSync::SearchResult roadPlaces(
+						RoadPlaceTableSync::Search(
+							Env::GetOfficialEnv(),
+							destinationCity ? destinationCity->getKey() : optional<RegistryKeyType>(),
+							optional<string>(), /* exactName */
+							optional<string>(), /* likeName */
+							0, /* first */
+							boost::optional<std::size_t>(0), /* number */
+							true, /* orderByName */
+							true, /* raisingOrder */
+							util::UP_LINKS_LOAD_LEVEL,
+							boost::tribool(true), /*mainRoad*/
+							false /* isDifferentFromExactName*/
+							)	);
+			if(!roadPlaces.empty())
+			{
+				RoadPlaceTableSync::SearchResult::const_iterator it = roadPlaces.begin();
+				setDeparturePlace(const_pointer_cast<Place, const Place>(*it));
+			}
+			else
+			{
+				StopAreaTableSync::SearchResult stopAreas(
+							StopAreaTableSync::Search(
+								Env::GetOfficialEnv(),
+								destinationCity ? destinationCity->getKey() : optional<RegistryKeyType>(),
+								true,
+								optional<string>(),
+								optional<string>(),
+								optional<string>(),
+								true,
+								true,
+								0,
+								1
+								)	);
+				if(!stopAreas.empty())
+				{
+					StopAreaTableSync::SearchResult::const_iterator it = stopAreas.begin();
+					setArrivalPlace(const_pointer_cast<Place, const Place>(*it));
+				}
+				// Recuperation de la premiere rue au nom non vide
+				else
+				{
+					RoadPlaceTableSync::SearchResult roadPlaces(
+								RoadPlaceTableSync::Search(
+									Env::GetOfficialEnv(),
+									destinationCity ? destinationCity->getKey() : optional<RegistryKeyType>(),
+									optional<string>(""), /* exactName */
+									optional<string>(), /* likeName */
+									0, /* first */
+									boost::optional<std::size_t>(0), /* number */
+									true, /* orderByName */
+									true, /* raisingOrder */
+									util::UP_LINKS_LOAD_LEVEL,
+									boost::tribool(false), /*mainRoad*/
+									true /* isDifferentFromExactName*/
+									)	);
+					if (!roadPlaces.empty())
+					{
+						RoadPlaceTableSync::SearchResult::const_iterator it = roadPlaces.begin();
+						setArrivalPlace(const_pointer_cast<Place, const Place>(*it));
+					}
+				}
+			}
+		}
+
 }	}

@@ -73,6 +73,7 @@ namespace synthese
 	{
 		class Place;
 		class NamedPlace;
+		class City;
 	}
 
 	namespace pt
@@ -437,6 +438,28 @@ namespace synthese
 
 
 			virtual std::string getOutputMimeType() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute the departure place when no departure_place_text is given
+			/// and the city has no main place (stop area or road place)
+			//////////////////////////////////////////////////////////////////////////
+			/// @param originCity (0) Is the city with no main place included
+			void computeDeparturePlace(
+				const geography::City* originCity
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute the arrival place when no arrival_place_text is given
+			/// and the city has no main place (stop area or road place)
+			//////////////////////////////////////////////////////////////////////////
+			/// @param destinationCity (0) Is the city with no main place included
+			void computeArrivalPlace(
+				const geography::City* destinationCity
+			);
 
 
 
