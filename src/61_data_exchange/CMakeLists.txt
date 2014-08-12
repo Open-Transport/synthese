@@ -58,6 +58,8 @@ set(data_exchange_SRCS
   PegaseFileFormat.hpp
   PhysicalStopsCSVExportFunction.cpp
   PhysicalStopsCSVExportFunction.h
+  POICSVFileFormat.cpp
+  POICSVFileFormat.hpp
   PTDataCleanerFileFormat.cpp
   PTDataCleanerFileFormat.hpp
   PTFileFormat.cpp
