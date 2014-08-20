@@ -42,19 +42,10 @@ namespace synthese
 		class VehicleCall;
 
 
-        enum ReasonEnum
-        {
-            UNKNOWN_REASON = 0,
-            CALL_REQUEST = 1,
-            OVERLOAD = 2
-        };
-
-
 
 		FIELD_PTIME(CallTime)
 		FIELD_BOOL(Priority)
 		FIELD_PTIME(ClosureTime)
-        FIELD_ENUM(Reason, ReasonEnum)
 
 
 
@@ -63,8 +54,7 @@ namespace synthese
 			FIELD(Vehicle),
 			FIELD(CallTime),
 			FIELD(Priority),
-            FIELD(ClosureTime),
-            FIELD(Reason)
+            FIELD(ClosureTime)
 		> VehicleCallSchema;
 
 		/** VehicleCall class.

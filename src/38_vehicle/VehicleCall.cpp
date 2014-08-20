@@ -38,7 +38,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(CallTime, "call_time", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(Priority, "priority", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(ClosureTime, "closure_time", SQL_DATETIME)
-    FIELD_DEFINITION_OF_TYPE(Reason, "reason", SQL_INTEGER)
+
 
 
 	namespace vehicle
@@ -52,8 +52,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Vehicle),
 					FIELD_DEFAULT_CONSTRUCTOR(CallTime),
 					FIELD_DEFAULT_CONSTRUCTOR(Priority),
-                    FIELD_DEFAULT_CONSTRUCTOR(ClosureTime),
-                    FIELD_VALUE_CONSTRUCTOR(Reason, UNKNOWN_REASON)
+                    FIELD_DEFAULT_CONSTRUCTOR(ClosureTime)
 			)	)
 		{}
 
