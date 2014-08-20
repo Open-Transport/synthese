@@ -13,6 +13,7 @@
 #include "InterSYNTHESEConfigsViewService.hpp"
 #include "InterSYNTHESEIsSynchronisingService.hpp"
 #include "InterSYNTHESEObjectCreateService.hpp"
+#include "InterSYNTHESEObjectUpdateService.hpp"
 #include "InterSYNTHESEPackageCommitService.hpp"
 #include "InterSYNTHESESlavesViewService.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
@@ -53,6 +54,7 @@ void synthese::inter_synthese::moduleRegister()
 	synthese::inter_synthese::InterSYNTHESEConfigsViewService::integrate();
 	synthese::inter_synthese::InterSYNTHESEIsSynchronisingService::integrate();
 	synthese::inter_synthese::InterSYNTHESEObjectCreateService::integrate();
+    synthese::inter_synthese::InterSYNTHESEObjectUpdateService::integrate();
 	synthese::inter_synthese::InterSYNTHESEPackageCommitService::integrate();
 	synthese::inter_synthese::InterSYNTHESESlavesViewService::integrate();
 	synthese::inter_synthese::InterSYNTHESESlaveUpdateService::integrate();

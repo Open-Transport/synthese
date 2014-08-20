@@ -24,6 +24,8 @@ InterSYNTHESEModule.inc.cpp
 InterSYNTHESEModuleRegister.cpp
 InterSYNTHESEObjectCreateService.cpp
 InterSYNTHESEObjectCreateService.hpp
+InterSYNTHESEObjectUpdateService.cpp
+InterSYNTHESEObjectUpdateService.hpp
 InterSYNTHESEPackage.cpp
 InterSYNTHESEPackage.hpp
 InterSYNTHESEPackageAutoLockAction.cpp
