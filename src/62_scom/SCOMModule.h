@@ -69,14 +69,10 @@ namespace synthese
 			//! Close the socket connection
 			static void End();
 
-			//! Fetch the waiting time from the SCOMData object
+			//! Return the SCOM Data object
+			//! The object is handled by SCOMModule and must not be deleted
 			//! \sa SCOMData
-			static boost::posix_time::ptime GetWaitingTime (
-					const std::string& borne,
-					const std::string& line,
-					const std::string& destination,
-					boost::posix_time::ptime originalWaitingTime
-					);
+			static SCOMData * GetSCOMData();
 
 			/** Does nothing
 			@{

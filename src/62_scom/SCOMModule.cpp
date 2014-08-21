@@ -43,22 +43,10 @@ namespace synthese
 		SCOMSocketReader* SCOMModule::_sr = NULL;
 		SCOMData* SCOMModule::_sd = NULL;
 
-		// Call the same function from the SCOMData object
-		boost::posix_time::ptime SCOMModule::GetWaitingTime(
-				const std::string &borne,
-				const std::string &line,
-				const std::string &destination,
-				boost::posix_time::ptime originalWaitingTime)
+		// Simple getter
+		SCOMData * SCOMModule::GetSCOMData ()
 		{
-			if (_sd)
-			{
-				return _sd->GetWaitingTime(borne,line,destination,originalWaitingTime);
-			}
-			else
-			{
-				Log::GetInstance().warn("Invalid call GetWaitingTime when SCOM Module has not been initialized");
-				return boost::posix_time::ptime();
-			}
+			return _sd;
 		}
 	}
 

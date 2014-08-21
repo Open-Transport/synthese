@@ -21,7 +21,8 @@ add_library(62_scom ${scom_SRCS})
 
 # Here goes the list of the other modules our module needs to work properly
 target_link_libraries(62_scom
-  11_cms
+  01_util
+  15_server
 )
 
 # Our library will be installed with the others

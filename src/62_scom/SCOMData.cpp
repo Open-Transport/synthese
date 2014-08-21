@@ -225,14 +225,16 @@ namespace synthese
 				msg = " found, replaced with " + boost::posix_time::to_simple_string(time);
 			}
 
-			// Logging
+			// Logging (only on found data, else there is too much messages)
 			if (found)
-			Log::GetInstance().debug("SCOMData : Corresponding waiting time for line " + line
-									 + ", on borne " + borne
-									 + " for destination " + destination
-									 + " with a waiting time of " + boost::posix_time::to_simple_string(originalWaitingTime)
-									 + msg
-									 );
+			{
+				Log::GetInstance().debug("SCOMData : Corresponding waiting time for line " + line
+										 + ", on borne " + borne
+										 + " for destination " + destination
+										 + " with a waiting time of " + boost::posix_time::to_simple_string(originalWaitingTime)
+										 + msg
+										 );
+			}
 
 			_mutex.unlock();
 

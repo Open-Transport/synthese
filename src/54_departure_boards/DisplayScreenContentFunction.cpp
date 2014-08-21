@@ -62,6 +62,7 @@
 #include "TransportNetwork.h"
 #ifdef WITH_SCOM
 	#include "SCOMModule.h"
+	#include "SCOMData.h"
 #endif
 
 #include <sstream>
@@ -272,8 +273,9 @@ namespace synthese
 						  false);
 			api.addParams(DisplayScreenContentFunction::PARAMETER_USE_SCOM,
 						  "Specify if the data from Ineo's SCOM server should be used."
-						  "Synthese must have been built with SCOM support and the SCOM listener setup for this to work."
-						  "See the SCOM documentation for more information."
+						  "Synthese must have been built with SCOM support and the SCOM listener setup for this to work.\n"
+						  "For now, only the call using _displayDepartureBoardRow will be impacted."
+						  "See the SCOM documentation for more information.\n"
 						  "By default, SCOM is disabled."
 						  "Possible values : true or false",
 						  false);
@@ -989,9 +991,11 @@ namespace synthese
 
 				try
 				{
-					// End time
+					// Start time
 					ptime realStartDateTime(date);
 					realStartDateTime -= minutes(_screen->getClearingDelay());
+
+					// End time
 					ptime endDateTime(realStartDateTime);
 					endDateTime += minutes(_screen->getMaxDelay());
 
@@ -1028,13 +1032,13 @@ namespace synthese
 					}
 					else
 					{
-						ArrivalDepartureList displayedObject(
-							_screen->generateStandardScreen(realStartDateTime, endDateTime)
-						);
-
 						if(_screen->getType()->getDisplayInterface() &&
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
 						){
+							ArrivalDepartureList displayedObject(
+								_screen->generateStandardScreen(realStartDateTime, endDateTime)
+							);
+
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->display(
 								stream,
 								variables,
@@ -1053,6 +1057,21 @@ namespace synthese
 						}
 						else
 						{
+							// If scom exists and is used, substract the maximum matching delay
+							// Why? To enable past service to be selected that might be delayed and so adapted by SCOM
+							// See the SCOM module documentation
+							ptime veryRealStartDateTime(realStartDateTime);
+							#ifdef WITH_SCOM
+							if (_scom)
+							{
+								veryRealStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff());
+							}
+							#endif
+
+							ArrivalDepartureList displayedObject(
+								_screen->generateStandardScreen(veryRealStartDateTime, endDateTime)
+							);
+
 							assert(_screen->getType()->getDisplayMainPage());
 
 							_displayDepartureBoard(
@@ -1062,7 +1081,7 @@ namespace synthese
 								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayRowPage()),
 								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayDestinationPage()),
 								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayTransferDestinationPage()),
-								realStartDateTime,
+								realStartDateTime, // Giving this time and not veryRealStartDateTime because of the post-filtering
 								displayedObject,
 								*_screen
 							);
@@ -2502,6 +2521,27 @@ namespace synthese
 			const ArrivalDepartureRow& row,
 			const DisplayScreen& screen
 		) const {
+
+			// We try to adapt the time using SCOM if enabled
+			// If the adapted time is before the request time, we ignore this row
+			ptime waitingTime;
+			if(row.first.getService())
+			{
+				const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(row.first.getService()->getPath());
+
+				waitingTime = _waitingTime(
+										_screen.get()->getCodeBySources(),
+										journeyPattern->getCommercialLine()->getShortName(),
+										journeyPattern->getDirectionObj()->getDisplayedText(),
+										row.first.getDepartureDateTime()
+								);
+
+				if (waitingTime < requestTime)
+				{
+					return;
+				}
+			}
+
 			ParametersMap pm(getTemplateParameters());
 			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
 			pm.insert(DATA_ROW_RANK, rowRank);
@@ -2518,16 +2558,7 @@ namespace synthese
 			{
 				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);
 
-				const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(row.first.getService()->getPath());
-
 				// Waiting time (use of data from SCOM if available)
-				// NOBA TODO
-				ptime waitingTime = _waitingTime(
-											_screen.get()->getCodeBySources(),
-											journeyPattern->getCommercialLine()->getShortName(),
-											journeyPattern->getDirectionObj()->getDisplayedText(),
-											row.first.getDepartureDateTime()
-									);
 				pm.insert(DATA_WAITING_TIME,to_simple_string(waitingTime - requestTime));
 
 				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));
@@ -3073,7 +3104,7 @@ namespace synthese
 			#ifdef WITH_SCOM
 			if (_scom)
 			{
-				return scom::SCOMModule::GetWaitingTime(borne,line,destination,theoricalWaitingTime);
+				return scom::SCOMModule::GetSCOMData()->GetWaitingTime(borne,line,destination,theoricalWaitingTime);
 			}
 			#else
 			if (_scom)
