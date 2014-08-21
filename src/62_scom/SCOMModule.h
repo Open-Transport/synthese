@@ -53,6 +53,7 @@ namespace synthese
 		class SCOMSocketReader;
 		class SCOMData;
 
+
 		/** 62 SCOM module class.
 		*/
 		class SCOMModule:
@@ -68,8 +69,14 @@ namespace synthese
 			//! Close the socket connection
 			static void End();
 
-			// TEST
-			static std::string Test ();
+			//! Fetch the waiting time from the SCOMData object
+			//! \sa SCOMData
+			static boost::posix_time::ptime GetWaitingTime (
+					const std::string& borne,
+					const std::string& line,
+					const std::string& destination,
+					boost::posix_time::ptime originalWaitingTime
+					);
 
 			/** Does nothing
 			@{

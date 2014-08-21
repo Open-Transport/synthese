@@ -27,6 +27,7 @@
 #include "ModuleClass.h"
 #include "FactorableTemplate.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace synthese
 {
@@ -39,19 +40,32 @@ namespace synthese
 
 	namespace scom
 	{
-		SCOMSocketReader* SCOMModule::_sr;
-		SCOMData* SCOMModule::_sd;
+		SCOMSocketReader* SCOMModule::_sr = NULL;
+		SCOMData* SCOMModule::_sd = NULL;
 
-		std::string SCOMModule::Test ()
+		// Call the same function from the SCOMData object
+		boost::posix_time::ptime SCOMModule::GetWaitingTime(
+				const std::string &borne,
+				const std::string &line,
+				const std::string &destination,
+				boost::posix_time::ptime originalWaitingTime)
 		{
-			return "Hello world!";
+			if (_sd)
+			{
+				return _sd->GetWaitingTime(borne,line,destination,originalWaitingTime);
+			}
+			else
+			{
+				Log::GetInstance().warn("Invalid call GetWaitingTime when SCOM Module has not been initialized");
+				return boost::posix_time::ptime();
+			}
 		}
 	}
 
 	namespace server
 	{
 
-		template<> const std::string ModuleClassTemplate<SCOMModule>::NAME("Temps rel SCOM et bornes IP");
+		template<> const std::string ModuleClassTemplate<SCOMModule>::NAME("Temps reel SCOM et bornes IP");
 
 		// Start the listener and affect it a SCOMData object
 		template<> void ModuleClassTemplate<SCOMModule>::Start()

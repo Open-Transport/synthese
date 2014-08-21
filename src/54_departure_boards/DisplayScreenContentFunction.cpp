@@ -107,6 +107,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
 		const string DisplayScreenContentFunction::PARAMETER_SPLIT_CONTINUOUS_SERVICES("split_continuous_services");
 		const string DisplayScreenContentFunction::PARAMETER_MAX_DAYS_NEXT_DEPARTURES("max_days_next_departures");
+		const string DisplayScreenContentFunction::PARAMETER_USE_SCOM("use_scom");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -268,6 +269,13 @@ namespace synthese
 			api.addParams(DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA,
 						  "Group the results by StopArea, displaying next departures for each <Line, Destination> pair."
 						  "Pairs are ordered by default Commercial Line order and destination order (alphanumeric).",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_USE_SCOM,
+						  "Specify if the data from Ineo's SCOM server should be used."
+						  "Synthese must have been built with SCOM support and the SCOM listener setup for this to work."
+						  "See the SCOM documentation for more information."
+						  "By default, SCOM is disabled."
+						  "Possible values : true or false",
 						  false);
 			return api;
 		}
@@ -618,11 +626,6 @@ namespace synthese
 					#endif
 					}
 
-					// TEST
-					#ifdef WITH_SCOM
-					Log::GetInstance().debug("TDG : SCOM says : " + scom::SCOMModule::Test());
-					#endif
-
 					_timetableGroupedByArea = map.getDefault<bool>(PARAMETER_TIMETABLE_GROUPED_BY_AREA, false);
 					_splitContinuousServices = map.getDefault<bool>(PARAMETER_SPLIT_CONTINUOUS_SERVICES, false);
 					
@@ -684,6 +687,9 @@ namespace synthese
 				{
 					throw RequestException("The screen "+ lexical_cast<string>(id) +" has no type.");
 				}
+
+				// Enable SCOM
+				_scom = map.isDefined(PARAMETER_USE_SCOM) && map.get<string>(PARAMETER_USE_SCOM) == "true";
 			}
 			catch (ObjectNotFoundException<DisplayScreen> e)
 			{
@@ -2512,25 +2518,33 @@ namespace synthese
 			{
 				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);
 
-				// Waiting time
-				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
-				pm.insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
+				const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(row.first.getService()->getPath());
+
+				// Waiting time (use of data from SCOM if available)
+				// NOBA TODO
+				ptime waitingTime = _waitingTime(
+											_screen.get()->getCodeBySources(),
+											journeyPattern->getCommercialLine()->getShortName(),
+											journeyPattern->getDirectionObj()->getDisplayedText(),
+											row.first.getDepartureDateTime()
+									);
+				pm.insert(DATA_WAITING_TIME,to_simple_string(waitingTime - requestTime));
 
 				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));
 				if(	blinkingDelay.total_seconds() > 0 &&
-					waitingTime <= blinkingDelay
+					(waitingTime - requestTime) <= blinkingDelay
 				){
 					pm.insert(DATA_BLINKS, true);
 				}
 
 				// Time
-				pm.insert(DATA_TIME, to_iso_extended_string(row.first.getDepartureDateTime().date()) + " " + to_simple_string(row.first.getDepartureDateTime().time_of_day()));
+				pm.insert(DATA_TIME, to_iso_extended_string(waitingTime.date()) + " " + to_simple_string(waitingTime.time_of_day()));
 				pm.insert(DATA_PLANNED_TIME, to_iso_extended_string(row.first.getTheoreticalDepartureDateTime().date()) + " " + to_simple_string(row.first.getTheoreticalDepartureDateTime().time_of_day()));
 
 				// Delay
 				pm.insert(
 					DATA_DELAY,
-					(row.first.getDepartureDateTime() - row.first.getTheoreticalDepartureDateTime()).total_seconds() / 60
+					(waitingTime - row.first.getTheoreticalDepartureDateTime()).total_seconds() / 60
 				);
 
 				// Service
@@ -3047,5 +3061,27 @@ namespace synthese
 			s << to_iso_extended_string(time.date()) << ' ';
 			s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
 			pm.insert(datafieldName, s.str());
+		}
+
+		// If SCOM exists and is enabled, use it. Else, return the difference of time from now
+		boost::posix_time::ptime DisplayScreenContentFunction::_waitingTime(
+			const std::string &borne,
+			const std::string &line,
+			const std::string &destination,
+			const boost::posix_time::ptime &theoricalWaitingTime
+		) const {
+			#ifdef WITH_SCOM
+			if (_scom)
+			{
+				return scom::SCOMModule::GetWaitingTime(borne,line,destination,theoricalWaitingTime);
+			}
+			#else
+			if (_scom)
+			{
+				Log::GetInstance().debug("SCOMData : SCOM disabled in compilation (no -DWITH_SCOM) but asked : using original time")
+			}
+			#endif
+
+			return theoricalWaitingTime;
 		}
 }	}

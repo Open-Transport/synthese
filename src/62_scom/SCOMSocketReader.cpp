@@ -47,17 +47,36 @@ namespace synthese
 		// (At least I hope... noba)
 		SCOMSocketReader::SCOMSocketReader (SCOMData *dataHandler) :
 			_dataHandler(dataHandler),
-			_connectTimeout(5),
 			_resolveRetry(10),
 			_connectRetry(10),
 			_socket(NULL),
-			_timer(NULL)
+			_timer(NULL),
+			_state(RESOLVE),
+			_next(RESOLVE)
 		{
-			_server = "127.0.0.1"; //10.4.20.23"; // saetr.t-l.ch
+			_server = "10.4.20.23"; //"127.0.0.1"; //10.4.20.23"; // saetr.t-l.ch
 			_port = 3106;
 			_id = "1";
+
+			// Bornes to use
 			_bornes.push_back("517");
 			_bornes.push_back("518");
+			_bornes.push_back("516");
+
+			// State names, used for errors
+			_stateName[RESOLVE] = "resolving";
+			_stateName[CONNECT] = "connecting";
+			_stateName[AUTHENTICATE] = "authenticating";
+			_stateName[READ] = "reading";
+			_stateName[CLOSE] = "closing";
+
+			// Timeouts
+			// Needs to be set for each state
+			_timeouts[RESOLVE] = 0;
+			_timeouts[CONNECT] = 5;
+			_timeouts[AUTHENTICATE] = 0;
+			_timeouts[READ] = 600;
+			_timeouts[CLOSE] = 0;
 
 			// Boost's input/output service
 			_ios = new io_service();
@@ -69,10 +88,11 @@ namespace synthese
 			_ios->reset();
 
 			// Launch the first async event before the loop (or it will quit directly)
-			// The timer to 0 makes the _resolv() called from the _ios loop, not the
+			// The timer to 0 makes the _mainLoop() called from the _ios loop, not the
 			// main thread
+			_next = RESOLVE;
 			deadline_timer timer(*_ios,boost::posix_time::seconds(0));
-			timer.async_wait( boost::bind(&synthese::scom::SCOMSocketReader::_resolv, this, true));
+			timer.async_wait( boost::bind(&synthese::scom::SCOMSocketReader::_mainLoop, this, "", boost::system::error_code()));
 
 			// If the io_service is out-of-work, it will stops.
 			// We need it to continue so we add this object in its queue
@@ -85,25 +105,22 @@ namespace synthese
 			);
 		}
 
+		// Close the socket, stop the main loop and stop the background thread
 		void SCOMSocketReader::Stop ()
 		{
-
+			_next = STOP;
+			_close();
+			_ios->stop();
+			_thread->join();
+			_thread->interrupt();
+			// Isn't there a function from server::ServerModule to remove the thread?
 		}
 
-		/* Will try to resolv the server address
-		   Loop until a resolution is made and then call _connect()
-		   */
-		void SCOMSocketReader::_resolv(bool first)
+		// Will try to resolv the server address
+		// Should work with IP adresses too
+		bool SCOMSocketReader::_resolv()
 		{
 			boost::system::error_code error;
-
-			// If it is not the first time, it means a resolv have failed, and we wait a certain time before
-			// trying again
-			if (!first)
-			{
-				deadline_timer timer(*_ios,boost::posix_time::seconds(_resolveRetry));
-				timer.wait(error);
-			}
 
 			// Resolve the server address (in case of a FQDN)
 			Log::GetInstance().debug("SCOM : Resolving " + _server);
@@ -112,7 +129,7 @@ namespace synthese
 			ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query, error);
 			ip::tcp::resolver::iterator end;
 
-			// If nothing is found, print an error and call ourselves (try again)
+			// If nothing is found, print an error and return an invalid endpoint (empty)
 			if (endpoint_iterator == end || error)
 			{
 				Log::GetInstance().warn("SCOM : Error while connecting to the server : invalid server : " + _server);
@@ -122,95 +139,46 @@ namespace synthese
 					Log::GetInstance().warn("SCOM : Specific error : " + error.message());
 				}
 
-				_resolv(false);
-				return;
+				return false;
 			}
 
 			// Build the IP address from the first ipv4 endpoint
 			// Use the first point by default if no IPV4 entry is found
-			ip::tcp::endpoint endpoint = *endpoint_iterator;
+			_endpoint = *endpoint_iterator;
 			while (endpoint_iterator != end)
 			{
 				if ( endpoint_iterator->endpoint().address().is_v4() )
 				{
-					endpoint = *endpoint_iterator;
+					_endpoint = *endpoint_iterator;
 					break;
 				}
 				endpoint_iterator++;
 			}
 
 			// Set the port
-			endpoint.port(_port);
+			_endpoint.port(_port);
 
-			// Phase 2 : connection
-			_connect(endpoint);
+			return true;
 		}
 
-		/*	Setup an async connection to the SCOM server and start a timeout handler
-			If the timeout is reached, _connectionFailed is called
-		*/
-		void SCOMSocketReader::_connect(const ip::tcp::endpoint& endpoint)
+		// Setup an async connection to the SCOM server
+		void SCOMSocketReader::_connect()
 		{
 			// Async connection to _connectionComplete
-			Log::GetInstance().debug("SCOM : Attempt to connect to " + endpoint.address().to_string() +
-									 " port " + boost::lexical_cast<std::string>(endpoint.port()));
+			Log::GetInstance().debug("SCOM : Attempt to connect to " + _endpoint.address().to_string() +
+									 " port " + boost::lexical_cast<std::string>(_endpoint.port()));
 			_socket = new ip::tcp::socket(*_ios);
 			_socket->async_connect(
-				endpoint,
-				boost::bind(&synthese::scom::SCOMSocketReader::_connectionComplete,
+				_endpoint,
+				boost::bind(&synthese::scom::SCOMSocketReader::_mainLoop,
 							this,
 							"", // No error
 							boost::asio::placeholders::error)
 			);
-
-			// Timeout to _connectionFailed
-			_timer = new deadline_timer(*_ios);
-			_timer->expires_from_now(boost::posix_time::seconds(_connectTimeout));
-			_timer->async_wait( boost::bind(&synthese::scom::SCOMSocketReader::_connectionComplete,
-										  this,
-										  "Timeout",
-										  boost::asio::placeholders::error)
-							);
-		}
-
-		// If an error occured, restart the connection
-		// If it worked, go to phase 3 : authenticate
-		void SCOMSocketReader::_connectionComplete(const std::string& error, const boost::system::error_code& ec)
-		{
-			if ( ec == boost::asio::error::operation_aborted )
-				Log::GetInstance().warn("Abort");
-			if (ec)
-				Log::GetInstance().warn("Error");
-
-			// First, stop the timer
-			if (_timer)
-			{
-				_timer->cancel();
-				delete _timer;
-				_timer = NULL;
-				_ios->run_one();
-			}
-
-			// If there is an error, print it
-			// If the error is a cancelled timer, ignore
-			if ( ( ! error.empty() || ec ) && ec != boost::asio::error::operation_aborted )
-			{
-				Log::GetInstance().warn("SCOM : Error while authenticating to SCOM : " + error);
-				if (ec)
-				{
-					Log::GetInstance().warn("SCOM : Specific error : " + ec.message());
-				}
-				_close(true); // Will restart the process
-				return;
-			}
-
-			// Connected, on to phase 3
-			Log::GetInstance().debug("SCOM : Connected");
-			_authenticate();
 		}
 
 		// Close and delete the socket
-		void SCOMSocketReader::_close(bool restart)
+		void SCOMSocketReader::_close()
 		{
 			boost::system::error_code error;
 
@@ -226,20 +194,11 @@ namespace synthese
 				delete _socket;
 				_socket = NULL;
 			}
-
-			// Restart the connection procedure if asked
-			if (restart)
-			{
-				// Wait a moment
-				boost::system::error_code ec2;
-				deadline_timer timer(*_ios,boost::posix_time::seconds(_connectRetry));
-				timer.wait(ec2);
-				_resolv();
-			}
 		}
 
-		// Send the authentication XML to SCOM
-		// Redirect to _authicationComplete
+		// Send the authentication XML to the SCOM server
+		// The protocol specifies no return message, so we're happy as long
+		// as the authentification has been send and the socket is not closed.
 		void SCOMSocketReader::_authenticate()
 		{
 			Log::GetInstance().debug("SCOM : Sending authentication with ID " + _id);
@@ -269,73 +228,20 @@ namespace synthese
 			async_write(
 				*_socket,
 				buffer(msg.str()),
-				boost::bind(&synthese::scom::SCOMSocketReader::_authenticationComplete,
+				boost::bind(&synthese::scom::SCOMSocketReader::_mainLoop,
 							this,
 							"",
 							boost::asio::placeholders::error)
 			);
-
-			// Timer on timeout
-			_timer = new deadline_timer(*_ios);
-			_timer->expires_from_now(boost::posix_time::seconds(_connectTimeout)); // Same as connect
-			_timer->async_wait( boost::bind(&synthese::scom::SCOMSocketReader::_authenticationComplete,
-										  this,
-										  "Timeout",
-										  boost::asio::placeholders::error)
-							);
-		}
-
-		// An authentification is complete
-		// The protocol specifies no return message, so we're happy as long
-		// as the authentification has been send and the socket is not closed.
-		// If an error occurs, we print it and launch the resolving again.
-		void SCOMSocketReader::_authenticationComplete(const std::string& error, const boost::system::error_code& ec)
-		{
-			// Stop the timer
-			if (_timer)
-			{
-				_timer->cancel();
-				delete _timer;
-				_timer = NULL;
-				_ios->run_one();
-			}
-
-			// If there is an error, print it
-			// If the error is a cancelled timer, ignore
-			if ( ( ! error.empty() || ec ) && ec != boost::asio::error::operation_aborted )
-			{
-				Log::GetInstance().warn("SCOM : Error while authenticating to SCOM : " + error);
-				if (ec)
-				{
-					Log::GetInstance().warn("SCOM : Specific error : " + ec.message());
-				}
-				_close(true); // Will restart the process
-				return;
-			}
-
-			// Everything is OK, continue with phase 4 : listening
-			Log::GetInstance().info("SCOM : Succesfully authenticated");
-			_dataReceived(boost::system::error_code(), 0);
-
-			// IDEA (noba) : A watchdog to restart the connection in case of prolonged inactivity might be a good idea
 		}
 
 		// Reads the data fetched from the socket and stores it in the SCOMData
-		// On error, restarts the connection
-		// On each read a timeout is created that will
+		// On error, call the main loop with the error in parameter
 		// Call itselfs with async_read
 		void SCOMSocketReader::_dataReceived (const boost::system::error_code& error, std::size_t size)
 		{
-			// On error, display it and restart the connection
-			if (error)
-			{
-				Log::GetInstance().warn("SCOM : Error while reading : " + error.message());
-				_close(true);
-				return;
-			}
-
-			// If the size is bigger than 0, read the message
-			if (size > 0)
+			// If the size is bigger than 0 and there is no error, read the message
+			if (size > 0 && ! error)
 			{
 				// Copy to string
 				std::string chunk(_buffer.begin(), _buffer.begin()+size);
@@ -355,13 +261,138 @@ namespace synthese
 				_xml = chunk.substr(lastpos,std::string::npos);
 			}
 
-			// Start an async read on ourselves
-			_socket->async_receive(buffer(_buffer),
-								   boost::bind(&synthese::scom::SCOMSocketReader::_dataReceived,
-											   this,
-											   _1,
-											   _2)
-								   );
+			// Call the main loop
+			_mainLoop("",error);
+		}
+
+		// Main loop for the state machine
+		// For each state, execute some action then go to the next step and start again
+		void SCOMSocketReader::_mainLoop(const std::string& error, const boost::system::error_code& ec)
+		{
+			// If the error is an operation aborted, ignore and quit
+			if (ec && ec == boost::asio::error::operation_aborted)
+			{
+				//Log::GetInstance().debug("Aborted timeout for " + _stateName[_state]);
+				return;
+			}
+
+			// If an error occured, log it and go to the closing state
+			if ( ! error.empty() || ec )
+			{
+				Log::GetInstance().warn("SCOM : Error while in " + _stateName[_state] + " state : " + error + " " + ec.message());
+				_next = CLOSE;
+			}
+
+			// Go to next step
+			_state = _next;
+
+			//Log::GetInstance().debug("Entering the " + _stateName[_state] + " state");
+
+			// Remove the timer (if any)
+			if (_timer)
+			{
+				_timer->cancel();
+				delete _timer;
+				_timer = NULL;
+			}
+
+			// Timeout for this specific operation
+			int timeout = _timeouts[_state];
+
+			// If the timeout is bigger than 0, setup a timer
+			if (timeout > 0)
+			{
+				//Log::GetInstance().debug("New timeout for " + _stateName[_state]);
+				_timer = new deadline_timer(*_ios);
+				_timer->expires_from_now(boost::posix_time::seconds(timeout));
+				_timer->async_wait( boost::bind(&synthese::scom::SCOMSocketReader::_mainLoop,
+												this,
+												"Timeout",
+												boost::asio::placeholders::error)
+									);
+			}
+
+			// State machine
+			switch (_state)
+			{
+				// Try to resolve the SCOM server IP or FQDN
+				// On fail, start again
+				// On success, go to CONNECT state
+				case RESOLVE :
+				{
+					// If the address is invalid, wait a moment and try again (no state change)
+					if ( ! _resolv() )
+					{
+						deadline_timer timer(*_ios,boost::posix_time::seconds(_resolveRetry));
+						timer.wait();
+						_next = RESOLVE;
+					}
+					else // Go to the connected state
+					{
+						_next = CONNECT;
+					}
+
+					_mainLoop("",boost::system::error_code());
+
+					return;
+				}
+
+				// Connect to the socket
+				// Go to AUTHENTICATE state in any case.
+				// If an error or timeout occurs, it will be handled at the beginning of the main loop
+				case CONNECT :
+				{
+					_connect();
+					_next = AUTHENTICATE;
+					break;
+				}
+
+				// Authenticate to the server
+				// Go to READ state in any case, except for a socket error, nothing is waited in return
+				case AUTHENTICATE :
+				{
+					_authenticate();
+					_next = READ;
+					break;
+				}
+
+				// Start an async read of the socket
+				// If an error occurs, it will be handled at the beginning of the main loop
+				// The _dataReceived function calls itself the main loop with the error (if any)
+				case READ :
+				{
+					_socket->async_receive(buffer(_buffer),
+						boost::bind(&synthese::scom::SCOMSocketReader::_dataReceived,
+									this,
+									_1,
+									_2)
+					);
+					break;
+				}
+
+				// Close the socket and start the connection again
+				case CLOSE :
+				{
+					_close();
+					deadline_timer timerClose(*_ios,boost::posix_time::seconds(_connectRetry));
+					timerClose.wait();
+					_next = RESOLVE;
+					_mainLoop("", boost::system::error_code());
+					break;
+				}
+
+				// Do nothing
+				case STOP :
+				{
+					_next = STOP;
+					return;
+				}
+
+				default :
+				{
+					return;
+				}
+			}
 		}
 	}
 }

@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 #include <boost/system/error_code.hpp>
 #include <boost/thread/thread.hpp>
@@ -44,12 +45,22 @@ namespace synthese
 		   Once this object is started using the start() fonction, it reads the TCP socket and insert
 		   all the values in the SCOMData object given on creation.
 
-		   A call on start() launches a new thread and return immediately.
+		   A call on Start() launches a new thread and return immediately.
+		   To stop listening, use the Stop() function.
 
-		   TODO : Process
+		   This object uses the boost ASIO library to connect to the socket.
 
-		   This object uses the boost ASIO library to connect to the socket and the
-		   boost thread library for the thread.
+		   This object uses a simple state machine to go through the connection stages :
+		   \li Resolve the server adress
+		   \li Connect to the socket
+		   \li Authenticate
+		   \li Read
+		   \li Close
+
+		   On error, the socket is closed and the state machine restart at the first step.
+
+		   On some of the states, a timeout can be set to be sure that the server will not hang.
+
 		  */
 		class SCOMSocketReader
 		{
@@ -95,8 +106,7 @@ namespace synthese
 			boost::array<char,4096> _buffer;
 			std::string _xml;
 
-			// Timeouts (in seconds)
-			int _connectTimeout;
+			// Retry delays (in seconds)
 			int _resolveRetry;
 			int _connectRetry;
 
@@ -104,6 +114,7 @@ namespace synthese
 			boost::asio::io_service* _ios;
 			boost::asio::io_service::work* _work;
 			boost::asio::ip::tcp::socket* _socket;
+			boost::asio::ip::tcp::endpoint _endpoint;
 
 			// Generic timer used for async operations
 			// Note for the use of this timer :
@@ -111,29 +122,45 @@ namespace synthese
 			// (the one not called by the timer) to stop and delete the timer.
 			boost::asio::deadline_timer* _timer;
 
+			// Enumeration of possible states
+			enum States {
+				RESOLVE,
+				CONNECT,
+				AUTHENTICATE,
+				READ,
+				CLOSE,
+				STOP,
+				STATE_NUMBER
+			};
+
+			// Name of each state
+			std::string _stateName[STATE_NUMBER];
+
+			// Current and next state of the state machine
+			States _state, _next;
+
+			// Timeouts for each state (in seconds)
+			int _timeouts[STATE_NUMBER];
+
+
+			// Main loop for the state machine
+			void _mainLoop (const std::string& error, const boost::system::error_code& ec);
+
 			// Resolv the server address
-			void _resolv (bool first = true);
+			bool _resolv ();
 
 			// Connect to the SCOM TCP socket
-			void _connect (const boost::asio::ip::tcp::endpoint& endpoint);
-
-			// Close the socket
-			// If restart is at true, the connection will be started again
-			// after a wait of _connectRetry
-			void _close (bool restart = false);
-
-			// A connection is completed
-			void _connectionComplete (const std::string& error, const boost::system::error_code& ec);
+			void _connect ();
 
 			// Authenticate on the SCOM server using the client ID
 			void _authenticate ();
 
-			// Authentication complete
-			// If the error parameters isn't empty,
-			void _authenticationComplete (const std::string& error, const boost::system::error_code& ec);
-
 			// Data received
+			// This function calls the main loop again on error
 			void _dataReceived (const boost::system::error_code& error, std::size_t size);
+
+			// Close the socket
+			void _close ();
 		};
 
 	}

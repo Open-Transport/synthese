@@ -85,6 +85,7 @@ namespace synthese
 			static const std::string PARAMETER_DATA_SOURCE_FILTER;
 			static const std::string PARAMETER_SPLIT_CONTINUOUS_SERVICES;
 			static const std::string PARAMETER_MAX_DAYS_NEXT_DEPARTURES;
+			static const std::string PARAMETER_USE_SCOM;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -479,6 +480,26 @@ namespace synthese
 					const pt::StopArea& place
 				) const;
 			//@}
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Return the waiting time for this service
+				/// @author Bastien Noverraz (TL)
+				///
+				/// This function uses the SCOM module when available to return the best waiting time available.
+				/// For what "best" means, see the SCOMData object documentation.
+				///
+				/// TODO param
+				/// @return The waiting time (absolute)
+				boost::posix_time::ptime _waitingTime(
+						const std::string &borne,
+						const std::string &line,
+						const std::string &destination,
+						const boost::posix_time::ptime& theoricalWaitingTime
+				) const;
+
+				/// Use scom for this service
+				/// False by default, set to true if "use_scom" is in the parameters
+				bool _scom;
 
 			server::FunctionAPI getAPI() const;
 
