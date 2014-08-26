@@ -223,18 +223,21 @@ namespace synthese
             {
                 BOOST_FOREACH(const Registry<PublicPlace>::value_type& publicPlace, _env.getEditableRegistry<PublicPlace>())
                 {
-                    PublicPlaceEntrance entrance;
-                    entrance.set<PublicPlace>(*publicPlace.second.get());
+					if (publicPlace.second.get()->getPoint())
+					{
+						PublicPlaceEntrance entrance;
+						entrance.set<PublicPlace>(*publicPlace.second.get());
 
-                    RoadChunkTableSync::ProjectAddress(
-                        *publicPlace.second.get()->getPoint(),
-                        100,
-                        entrance,
-                        requiredUserClasses
-                    );
+						RoadChunkTableSync::ProjectAddress(
+							*publicPlace.second.get()->getPoint(),
+							100,
+							entrance,
+							requiredUserClasses
+						);
 
-                    // Saving
-                    PublicPlaceEntranceTableSync::Save(&entrance);
+						// Saving
+						PublicPlaceEntranceTableSync::Save(&entrance);
+					}
                 }
             }
 
