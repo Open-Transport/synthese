@@ -22,6 +22,8 @@
 #ifndef SYNTHESE_SCOMSocketReader_h__
 #define SYNTHESE_SCOMSocketReader_h__
 
+#include "Settable.h"
+
 #include <string>
 #include <vector>
 #include <list>
@@ -62,7 +64,8 @@ namespace synthese
 		   On some of the states, a timeout can be set to be sure that the server will not hang.
 
 		  */
-		class SCOMSocketReader
+		class SCOMSocketReader :
+			settings::Settable
 		{
 		public:
 
@@ -73,6 +76,9 @@ namespace synthese
 			  @param dataHandler The SCOMData object in which the data will be fed.
 			*/
 			SCOMSocketReader (SCOMData* dataHandler);
+
+			// Unregister our settings
+			~SCOMSocketReader ();
 
 			/** Start the socket listener
 
@@ -86,6 +92,14 @@ namespace synthese
 			 It can then be started again.
 			*/
 			void Stop ();
+
+			//! Settings value updated, see Settable::ValueUpdated()
+			virtual void ValueUpdated (
+				const std::string& module,
+				const std::string& name,
+				const std::string& value,
+				bool notify
+			);
 
 		private:
 			// SCOM data handler to use
@@ -142,6 +156,19 @@ namespace synthese
 			// Timeouts for each state (in seconds)
 			int _timeouts[STATE_NUMBER];
 
+			// Internal settings
+			static const std::string SETTING_RESOLVERETRY;
+			static const std::string SETTING_CONNECTRETRY;
+			static const std::string SETTING_SERVER;
+			static const std::string SETTING_PORT;
+			static const std::string SETTING_ID;
+			static const std::string SETTING_BORNES;
+			static const std::string SETTING_CONNECTTIMEOUT;
+			static const std::string SETTING_READTIMEOUT;
+
+			// Our module name for the settings
+			static const std::string SETTINGS_MODULE;
+
 
 			// Main loop for the state machine
 			void _mainLoop (const std::string& error, const boost::system::error_code& ec);
@@ -161,6 +188,7 @@ namespace synthese
 
 			// Close the socket
 			void _close ();
+
 		};
 
 	}

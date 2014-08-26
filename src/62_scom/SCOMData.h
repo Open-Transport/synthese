@@ -22,6 +22,8 @@
 #ifndef SYNTHESE_SCOMData_h__
 #define SYNTHESE_SCOMData_h__
 
+#include "Settable.h"
+
 #include <string>
 #include <vector>
 
@@ -81,12 +83,13 @@ namespace synthese
 </RAFFIND>
 		  </pre>
 		*/
-		class SCOMData
+		class SCOMData :
+			settings::Settable
 		{
 		public:
 
-			// Setup the XML object
 			SCOMData();
+			~SCOMData ();
 
 			/** Add an SCOM formatted XML data
 			  The data will be stored until it gets too old.
@@ -136,12 +139,26 @@ namespace synthese
 			int MaxTimeDiff () const;
 
 
-			/// Constant defining the code for a bus currently at the stop
+			//! Constant defining the code for a bus currently at the stop
 			static const int BUSATSTOP = 67;
-			/// Constant defining the code for a bus that left the stop
-			static const int BUSGONE = -1;
+
+
+			//! Settings value updated, see Settable::ValueUpdated()
+			virtual void ValueUpdated (
+				const std::string& module,
+				const std::string& name,
+				const std::string& value,
+				bool notify
+			);
 
 		private:
+
+			// Internal parameters
+			static const std::string SETTING_MAXTIMEDIFF;
+			static const std::string SETTING_MAXAGE;
+
+			// Our module name for the settings
+			static const std::string SETTINGS_MODULE;
 
 			// Structure used internally to store the XML data
 			// It corresponds to one waiting value (not an XML LINE)

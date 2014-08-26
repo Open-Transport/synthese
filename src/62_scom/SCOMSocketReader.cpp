@@ -25,12 +25,15 @@
 
 #include "Log.h"
 #include "ServerModule.h"
+#include "Settings.h"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #include <sstream>
 
@@ -41,27 +44,59 @@ namespace synthese
 
 		using namespace boost::asio;
 		using namespace synthese::util;
+		using namespace synthese::settings;
+
+		// Settings names
+		const std::string SCOMSocketReader::SETTING_RESOLVERETRY = "resolveretry";
+		const std::string SCOMSocketReader::SETTING_CONNECTRETRY = "connectretry";
+		const std::string SCOMSocketReader::SETTING_SERVER = "serverip";
+		const std::string SCOMSocketReader::SETTING_PORT = "serverport";
+		const std::string SCOMSocketReader::SETTING_ID = "serverid";
+		const std::string SCOMSocketReader::SETTING_BORNES = "bornes";
+		const std::string SCOMSocketReader::SETTING_CONNECTTIMEOUT = "connecttimeout";
+		const std::string SCOMSocketReader::SETTING_READTIMEOUT = "readtimeout";
+
+		// Module name for the settings
+		const std::string SCOMSocketReader::SETTINGS_MODULE = "SCOMSocketReader";
 
 		// Setup some settings
 		// Every setting setup in hard here will be parameters in the end
 		// (At least I hope... noba)
 		SCOMSocketReader::SCOMSocketReader (SCOMData *dataHandler) :
 			_dataHandler(dataHandler),
-			_resolveRetry(10),
-			_connectRetry(10),
 			_socket(NULL),
 			_timer(NULL),
 			_state(RESOLVE),
 			_next(RESOLVE)
 		{
-			_server = "10.4.20.23"; //"127.0.0.1"; //10.4.20.23"; // saetr.t-l.ch
-			_port = 3106;
-			_id = "1";
-
+			// Fetch the settings
+			_resolveRetry = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_RESOLVERETRY,20);
+			_connectRetry = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_CONNECTRETRY,10);
+			_server = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_SERVER,"127.0.0.1");
+			_port = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_PORT,3106);
+			_id = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_ID,"1");
+			
+			// Timeouts
+			// Needs to be set for each state
+			_timeouts[RESOLVE] = 0;
+			_timeouts[CONNECT] = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_CONNECTTIMEOUT,5);
+			_timeouts[AUTHENTICATE] = 0;
+			_timeouts[READ] = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_READTIMEOUT,600);
+			_timeouts[CLOSE] = 0;
+			
 			// Bornes to use
-			_bornes.push_back("517");
-			_bornes.push_back("518");
-			_bornes.push_back("516");
+			std::string bornes = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_BORNES);
+			boost::algorithm::split(_bornes,bornes,boost::algorithm::is_any_of(","));
+			
+			// Register for the settings changes
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_RESOLVERETRY, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_CONNECTRETRY, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_SERVER, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_PORT, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_ID, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_BORNES, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_CONNECTTIMEOUT, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_READTIMEOUT, this);
 
 			// State names, used for errors
 			_stateName[RESOLVE] = "resolving";
@@ -70,17 +105,24 @@ namespace synthese
 			_stateName[READ] = "reading";
 			_stateName[CLOSE] = "closing";
 
-			// Timeouts
-			// Needs to be set for each state
-			_timeouts[RESOLVE] = 0;
-			_timeouts[CONNECT] = 5;
-			_timeouts[AUTHENTICATE] = 0;
-			_timeouts[READ] = 600;
-			_timeouts[CLOSE] = 0;
-
 			// Boost's input/output service
 			_ios = new io_service();
 		}
+
+
+		SCOMSocketReader::~SCOMSocketReader ()
+		{
+			// Unregister us from the settings
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_RESOLVERETRY);
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_CONNECTRETRY);
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_SERVER);
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_PORT);
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_ID);
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_BORNES);
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_CONNECTTIMEOUT);
+			Settings::GetInstance().Unregister(this,SETTINGS_MODULE, SETTING_READTIMEOUT);
+		}
+
 
 		// Start the thread
 		void SCOMSocketReader::Start ()
@@ -391,6 +433,77 @@ namespace synthese
 				default :
 				{
 					return;
+				}
+			}
+		}
+
+
+		// For some of the settings (server, port, id, bornes) we must restart
+		// For the rest, just save them
+		void SCOMSocketReader::ValueUpdated (
+			const std::string& module,
+			const std::string& name,
+			const std::string& value,
+			bool notify
+		)
+		{
+			// If not from us, goodbye
+			if (module == SETTINGS_MODULE)
+			{
+				// Save the values
+				if (name == SETTING_SERVER)
+				{
+					_server = Settings::GetInstance().Get<std::string>(SETTINGS_MODULE, SETTING_SERVER,_server);
+				}
+				else if (name == SETTING_BORNES)
+				{
+					_bornes.clear();
+					std::string bornes = Settings::GetInstance().Get<std::string>(SETTINGS_MODULE, SETTING_BORNES,"");
+					boost::algorithm::split(_bornes,bornes,boost::algorithm::is_any_of(","));
+				}
+				else if (name == SETTING_CONNECTRETRY)
+				{
+					_connectRetry = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_CONNECTRETRY,_connectRetry);
+				}
+				else if (name == SETTING_CONNECTTIMEOUT)
+				{
+					_timeouts[CONNECT] = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_CONNECTTIMEOUT,_timeouts[CONNECT]);
+				}
+				else if (name == SETTING_ID)
+				{
+					_id = Settings::GetInstance().Get<std::string>(SETTINGS_MODULE, SETTING_ID,_id);
+				}
+				else if (name == SETTING_PORT)
+				{
+					_port = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_PORT,_port);
+				}
+				else if (name == SETTING_READTIMEOUT)
+				{
+					_timeouts[READ] = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_READTIMEOUT,_timeouts[READ]);
+				}
+				else if (name == SETTING_RESOLVERETRY)
+				{
+					_resolveRetry = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_RESOLVERETRY,_resolveRetry);
+				}
+				else
+				{
+					Log::GetInstance().error("SCOMListener : invalid setting : " + name);
+					return;
+				}
+
+				Log::GetInstance().debug("SCOMSocketReader : setting " + name + " to " + value);
+
+				// If the value changed is one of these and the notify flag is true, restart the server
+				if (
+					(name == SETTING_SERVER ||
+					 name == SETTING_PORT ||
+					 name == SETTING_ID ||
+					 name == SETTING_BORNES ) &&
+					notify
+				)
+				{
+					Log::GetInstance().debug("SCOMSocketReader : reloading the service");
+					_next = CLOSE;
 				}
 			}
 		}

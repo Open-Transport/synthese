@@ -22,6 +22,7 @@
 #include "SCOMData.h"
 
 #include "IConv.hpp"
+#include "Settings.h"
 
 #include "Log.h"
 
@@ -35,15 +36,38 @@ namespace synthese
 	namespace scom
 	{
 		using namespace synthese::util;
+		using namespace synthese::settings;
 		using boost::property_tree::ptree;
+
+		// Settings names
+		const std::string SCOMData::SETTING_MAXTIMEDIFF = "maxtimediff";
+		const std::string SCOMData::SETTING_MAXAGE = "maxage";
+
+		// Module name for the settings
+		const std::string SCOMData::SETTINGS_MODULE = "SCOMData";
 
 		//------------------------------------- PUBLIC ------------------------------
 
-		SCOMData::SCOMData () :
-				_maxAge(60),
-				_maxTimeDiff(boost::posix_time::seconds(120))
+		// Fetch the settings and register for them
+		SCOMData::SCOMData ()
 		{
+			// Fetch the settings
+			_maxAge = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_MAXAGE,60);
+			_maxTimeDiff = boost::posix_time::seconds(
+				Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_MAXTIMEDIFF,120)
+			);
 
+			// Register for their update
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_MAXAGE, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_MAXTIMEDIFF, this);
+		}
+
+
+		SCOMData::~SCOMData ()
+		{
+			// Unregister us from the settings
+			Settings::GetInstance().Unregister(this, SETTINGS_MODULE, SETTING_MAXAGE);
+			Settings::GetInstance().Unregister(this, SETTINGS_MODULE, SETTING_MAXTIMEDIFF);
 		}
 
 		// Parse the XML and store its values
@@ -347,6 +371,37 @@ namespace synthese
 
 
 			_mutex.unlock();
+		}
+
+
+		// Not much to do beside saving them
+		void SCOMData::ValueUpdated (
+			const std::string& module,
+			const std::string& name,
+			const std::string& value,
+			bool
+		)
+		{
+			// If not from us, goodbye
+			if (module == SETTINGS_MODULE)
+			{
+				if (name == SETTING_MAXAGE)
+				{
+					_maxAge = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_MAXAGE,60);
+					Log::GetInstance().debug("SCOMData : max age set to " + value);
+				}
+				else if (name == SETTING_MAXTIMEDIFF)
+				{
+					_maxTimeDiff = boost::posix_time::seconds(
+						Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_MAXTIMEDIFF,120)
+					);
+					Log::GetInstance().debug("SCOMData : max time diff set to " + value);
+				}
+				else
+				{
+					Log::GetInstance().error("SCOMData : invalid setting : " + name);
+				}
+			}
 		}
 	}
 }

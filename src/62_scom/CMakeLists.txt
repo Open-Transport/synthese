@@ -23,6 +23,7 @@ add_library(62_scom ${scom_SRCS})
 target_link_libraries(62_scom
   01_util
   15_server
+  63_settings
 )
 
 # Our library will be installed with the others
