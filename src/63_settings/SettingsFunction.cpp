@@ -46,6 +46,7 @@ namespace synthese
 		const string SettingsFunction::PARAMETER_NAME("name");
 		const string SettingsFunction::PARAMETER_MODULE("module");
 		const string SettingsFunction::PARAMETER_VALUE("value");
+		const string SettingsFunction::PARAMETER_NOTIFY("notify");
 
 
 		ParametersMap SettingsFunction::_getParametersMap() const
@@ -55,6 +56,7 @@ namespace synthese
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_MODULE, _module);
 			map.insert(PARAMETER_VALUE, _value);
+			map.insert(PARAMETER_NOTIFY, _value);
 			return map;
 		}
 
@@ -65,6 +67,21 @@ namespace synthese
 			_name	= _getOrDie(map, PARAMETER_NAME,	"No setting name given, please specify name=xxx");
 			_module	= _getOrDie(map, PARAMETER_MODULE,	"No setting module given, please specify module=xxx");
 			_value	= _getOrDie(map, PARAMETER_VALUE,	"No value or default value given, please provide a value= parameter. In case of a 'get' action, this setting will be used as the default value to return if the setting doesn't exists.");
+
+			// Notify, by default at true
+			_notify = true;
+			if (map.isDefined(PARAMETER_NOTIFY))
+			{
+				std::string notify = map.get<std::string>(PARAMETER_NOTIFY);
+				if ( notify != "false" && notify != "true" )
+				{
+					Log::GetInstance().warn("Invalid value for the notify parameter : " + notify + ". Should be 'true' or 'false'. Using true by default.");
+				}
+				else
+				{
+					_notify = ( notify == "true" );
+				}
+			}
 		}
 
 
@@ -79,7 +96,7 @@ namespace synthese
 			}
 			else if (_action == "set" )
 			{
-				settings::Settings::GetInstance().Set(_module,_name,_value);
+				settings::Settings::GetInstance().Set(_module,_name,_value,_notify);
 			}
 			else
 			{

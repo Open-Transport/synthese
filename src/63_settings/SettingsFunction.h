@@ -40,6 +40,7 @@ namespace synthese
 		  * name : The setting name
 		  * module : The setting module (see the Settings documentation)
 		  * value : If the action is "set", the value to set. If the action is "get", the default value to return if the setting doesn't exists
+		  * notify : Define if the object registered as listener should receive their notify flag at true or false. By default, true.
 
 		  <h2>Output</h2>
 		  If the action is "get", the asked value is returned.
@@ -56,6 +57,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_MODULE;
 			static const std::string PARAMETER_VALUE;
+			static const std::string PARAMETER_NOTIFY;
 
 		protected:
 			//! \name parameters
@@ -64,6 +66,7 @@ namespace synthese
 				std::string _name;
 				std::string _module;
 				std::string _value;
+				bool _notify;
 			//@}
 
 

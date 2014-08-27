@@ -355,6 +355,7 @@ namespace synthese
 			}
 
 			// State machine
+			_mutex.lock();
 			switch (_state)
 			{
 				// Try to resolve the SCOM server IP or FQDN
@@ -374,9 +375,10 @@ namespace synthese
 						_next = CONNECT;
 					}
 
+					_mutex.unlock();
 					_mainLoop("",boost::system::error_code());
 
-					return;
+					break;
 				}
 
 				// Connect to the socket
@@ -419,6 +421,7 @@ namespace synthese
 					deadline_timer timerClose(*_ios,boost::posix_time::seconds(_connectRetry));
 					timerClose.wait();
 					_next = RESOLVE;
+					_mutex.unlock();
 					_mainLoop("", boost::system::error_code());
 					break;
 				}
@@ -427,14 +430,15 @@ namespace synthese
 				case STOP :
 				{
 					_next = STOP;
-					return;
+					break;
 				}
 
 				default :
 				{
-					return;
+					break;
 				}
 			}
+			_mutex.unlock();
 		}
 
 
@@ -503,7 +507,9 @@ namespace synthese
 				)
 				{
 					Log::GetInstance().debug("SCOMSocketReader : reloading the service");
+					_mutex.lock();
 					_next = CLOSE;
+					_mutex.unlock();
 				}
 			}
 		}

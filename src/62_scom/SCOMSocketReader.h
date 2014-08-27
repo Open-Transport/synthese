@@ -35,6 +35,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2/mutex.hpp>
 
 namespace synthese
 {
@@ -136,6 +137,10 @@ namespace synthese
 			// (the one not called by the timer) to stop and delete the timer.
 			boost::asio::deadline_timer* _timer;
 
+			// Mutex for the _next operation
+			// Avoids an external thread to set the next state before the main loop overwrite it
+			boost::signals2::mutex _mutex;
+
 			// Enumeration of possible states
 			enum States {
 				RESOLVE,
@@ -151,6 +156,7 @@ namespace synthese
 			std::string _stateName[STATE_NUMBER];
 
 			// Current and next state of the state machine
+			// Any write operation on _next should be protected using _mutex
 			States _state, _next;
 
 			// Timeouts for each state (in seconds)
