@@ -236,7 +236,7 @@ namespace synthese
 						);
 
 						// Saving
-						PublicPlaceEntranceTableSync::Save(&entrance);
+						PublicPlaceEntranceTableSync::Save(&entrance, transaction);
 					}
                 }
             }
