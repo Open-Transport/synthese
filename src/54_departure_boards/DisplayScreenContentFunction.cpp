@@ -3109,7 +3109,7 @@ namespace synthese
 			#else
 			if (_scom)
 			{
-				Log::GetInstance().debug("SCOMData : SCOM disabled in compilation (no -DWITH_SCOM) but asked : using original time")
+				Log::GetInstance().debug("SCOMData : SCOM disabled in compilation (no -DWITH_SCOM) but asked : using original time");
 			}
 			#endif
 
