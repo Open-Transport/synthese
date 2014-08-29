@@ -31,9 +31,6 @@
 
 #include <boost/thread.hpp>
 
-using namespace std;
-using namespace boost;
-
 namespace synthese
 {
 	namespace data_exchange
