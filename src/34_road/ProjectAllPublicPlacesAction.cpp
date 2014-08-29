@@ -112,23 +112,26 @@ namespace synthese
 
 			BOOST_FOREACH(const boost::shared_ptr<PublicPlace>& publicPlace, publicPlaces)
 			{
-				PublicPlaceEntrance entrance;
-				entrance.set<PublicPlace>(*publicPlace);
-
-				RoadChunkTableSync::ProjectAddress(
-					*publicPlace->getPoint(),
-					_maxDistance,
-					entrance,
-					_requiredUserClasses
-				);
-
-				// Saving
-				PublicPlaceEntranceTableSync::Save(&entrance);
-
-				// Object creation id
-				if(request.getActionWillCreateObject())
+				if (publicPlace->getPoint())
 				{
-					request.setActionCreatedId(entrance.get<Key>());
+					PublicPlaceEntrance entrance;
+					entrance.set<PublicPlace>(*publicPlace);
+
+					RoadChunkTableSync::ProjectAddress(
+						*publicPlace->getPoint(),
+						_maxDistance,
+						entrance,
+						_requiredUserClasses
+					);
+
+					// Saving
+					PublicPlaceEntranceTableSync::Save(&entrance);
+
+					// Object creation id
+					if(request.getActionWillCreateObject())
+					{
+						request.setActionCreatedId(entrance.get<Key>());
+					}
 				}
 			}
 
