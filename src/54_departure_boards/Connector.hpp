@@ -137,12 +137,6 @@ bool * MySQLconnector::_availableConnections(NULL);
 int MySQLconnector::_usedConnectionNb(0);
 
 
-
-using namespace std;
-using namespace boost;
-
-
-
 MySQLResult::MySQLResult(MYSQL_RES* result) :
 	_result(result),
 	_row(NULL),
@@ -193,7 +187,7 @@ T MySQLResult::_getValue(int column) const
 	if (!_row)
 		return DEFAULT_VALUE;
 
-	return lexical_cast<T>(_row[column]);
+    return boost::lexical_cast<T>(_row[column]);
 }
 
 
@@ -300,7 +294,7 @@ void MySQLconnector::_initConnection(int index)
 	_connInfo.db = synthese::departure_boards::DeparturesTableModule::GetIneoServerDBName();
 	_connInfo.port = synthese::departure_boards::DeparturesTableModule::GetIneoServerPort();
 
-	stringstream indexStr;
+    std::stringstream indexStr;
 	indexStr << index;
 #ifdef DEBUG_RT_FULL
 	synthese::util::Log::GetInstance().info("MySQLconnector::_initConnection MySQL initConnexion start, connection index = " + indexStr.str());
@@ -347,7 +341,7 @@ void MySQLconnector::_initConnection(int index)
 void* MySQLconnector::launchQuery(void *argPtr)
 {
 	queryArgs *args = (queryArgs*)argPtr;
-	stringstream indexStr;
+    std::stringstream indexStr;
 	indexStr << args->connectionIndex;
 
 #ifdef DEBUG_RT_FULL
@@ -368,7 +362,7 @@ void* MySQLconnector::launchQuery(void *argPtr)
 			if(mysql_query(_connections[args->connectionIndex],args->requestStr))
 			{
 				unsigned int myErrno = mysql_errno(_connections[args->connectionIndex]);
-				stringstream errnoStr;
+                std::stringstream errnoStr;
 				errnoStr << myErrno;
 				args->queryIsOK = false;
 
@@ -497,7 +491,7 @@ void MySQLconnector::waitForAConnection()
 	}
 }
 
-shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synthese::Exception)
+boost::shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synthese::Exception)
 {
 	// Check available connections
 	waitForAConnection();
@@ -525,11 +519,11 @@ shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synth
 
 	if (ret)
 	{
-		stringstream errnoCreate;
+        std::stringstream errnoCreate;
 		errnoCreate << "MySQLconnector::execQuery failed thread creation : errno = " << ret;
 		synthese::util::Log::GetInstance().warn(errnoCreate.str());
 		
-		stringstream err1,err2,err3,err4;
+        std::stringstream err1,err2,err3,err4;
 		err1 << "\tMySQLconnector::execQuery EAGAIN = " << EAGAIN;
 		err2 << "\tMySQLconnector::execQuery EINVAL = " << EINVAL;
 		err3 << "\tMySQLconnector::execQuery EPERM  = " << EPERM;
@@ -558,7 +552,7 @@ shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synth
 		if(args->queryIsOver)
 		{
 #ifdef DEBUG_RT
-			stringstream durationMsg;
+            std::stringstream durationMsg;
 			durationMsg << "MySQLconnector::execQuery ended, duration = " << cpt*5 << " ms";
 			synthese::util::Log::GetInstance().info(durationMsg.str());
 #endif
@@ -589,5 +583,5 @@ shared_ptr<MySQLResult> MySQLconnector::execQuery(const string sql) throw (synth
 	free(args);
 	freeUsedConnection();
 
-	return shared_ptr<MySQLResult>(new MySQLResult(result));
+    return boost::shared_ptr<MySQLResult>(new MySQLResult(result));
 }
