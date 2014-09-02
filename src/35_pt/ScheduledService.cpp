@@ -220,8 +220,8 @@ namespace synthese
 		) const	{
 
 			// Lock the vertices and the schedules
-			recursive_mutex::scoped_lock lock1(getVerticesMutex());
 			recursive_mutex::scoped_lock lock2(getSchedulesMutex());
+			recursive_mutex::scoped_lock lock1(getVerticesMutex());
 
 			size_t edgeIndex(edge.getRankInPath());
 			if(servicePointer.getArrivalEdge() == NULL)
