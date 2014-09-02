@@ -200,6 +200,10 @@ namespace synthese
 		{
 			ptime startTime(second_clock::local_time());
 
+			if(!_autoImporterEnv)
+			{
+				_getAutoImporter();
+			}
 			_autoImporterEnv->clear();
 			_autoImporter->openLogFile();
 			bool result(_autoImporter->parseFiles());
