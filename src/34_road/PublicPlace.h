@@ -81,6 +81,7 @@ namespace synthese
 			static const std::string DATA_DETAILS;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
+			static const std::string DATA_GEOMETRY;
 
 			typedef std::set<PublicPlaceEntrance*> Entrances;
 
