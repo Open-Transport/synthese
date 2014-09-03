@@ -199,13 +199,14 @@ namespace synthese
 				const std::string &borne,
 				const std::string &line,
 				const std::string &destination,
-				boost::posix_time::ptime originalWaitingTime)
+				boost::posix_time::ptime originalWaitingTime,
+				const boost::posix_time::ptime& requestTime)
 		{
 			// Note : do not forget to unlock
 			_mutex.lock();
 
 			// By default, use the given time
-			// If a better on is found it will be replaced
+			// If a better one is found it will be replaced
 			boost::posix_time::ptime time = originalWaitingTime;
 
 			// Loop through the data received from SCOM
@@ -216,11 +217,14 @@ namespace synthese
 				// Check if the borne, line and destination are found in our data
 				if ( borne == it->borne && line == it->line && destination == it->destination)
 				{
+					// Calculate the waiting from the one given in SCOM (minutes to wait + request time)
+					boost::posix_time::ptime wt = requestTime + boost::posix_time::minutes(it->tps);
+
 					// The original time and the time received from SCOM must not differ too much
-					boost::posix_time::time_duration diff = originalWaitingTime - it->busTime;
+					boost::posix_time::time_duration diff = originalWaitingTime - wt;
 					if ( abs(diff.total_seconds()) < _maxTimeDiff.total_seconds() )
 					{
-						time = it->busTime;
+						time = wt;
 						found = true;
 						break;
 					}
@@ -262,7 +266,7 @@ namespace synthese
 
 			_mutex.unlock();
 
-			// In any case, return the time, be it the originalWaitingTime or a better on found in our data
+			// In any case, return the time, be it the originalWaitingTime or a better one found in our data
 			return time;
 		}
 

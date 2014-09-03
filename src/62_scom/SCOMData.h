@@ -112,16 +112,25 @@ namespace synthese
 				The match is done with the given parameters.
 				See the class documentation for a full description.
 
+				An adaptation of the waiting time is made using the requestTime.
+				Example : if a waiting time of 2 minutes is given at 18h40 for a service at 18h42 (theorical),
+				and at 18h45 a call is made to adapt the time concerned, the returned time will be 18h47.
+				This is because no new update has been given in between. In this case the bus is still considered
+				2 minutes away.
+
 				@param borne The borne for which to give the waiting time
 				@param line The bus line
 				@param destination The bus destination
 				@param originalWaitingTime The waiting time currently used (from Synthese)
+				@param requestTime The time to use for relative time calculation
+				@return The adapted time, in absolute, or the originalWaitingTime if no match has been found
 			*/
 			boost::posix_time::ptime GetWaitingTime (
 					const std::string& borne,
 					const std::string& line,
 					const std::string& destination,
-					boost::posix_time::ptime originalWaitingTime);
+					boost::posix_time::ptime originalWaitingTime,
+					const boost::posix_time::ptime& requestTime);
 
 			/** Maximum age of a data
 			  Any data older than that will be removed on the next AddXML() call.

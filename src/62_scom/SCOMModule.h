@@ -35,11 +35,13 @@ namespace synthese
 	  The data is stored only for a certain amount of time, after what this data will be destroyed.
 	  There is no persistent storage as this data is real time only.
 
-	  TODO : SCOM infos
+	  <h2>Usage<h2>
 
-	  TODO : Format infos
+	  The SCOM socket reader is launched at the module Start function.
+	  To retrieve the data, one can use the GetSCOMData() function, that will
+	  return a SCOMData object.
 
-	  TODO : Use
+	  \sa SCOMData
 	@{
 	*/
 

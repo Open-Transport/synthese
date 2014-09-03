@@ -230,14 +230,15 @@ namespace synthese
 		ArrivalDepartureList DisplayScreen::generateStandardScreen(
 			const boost::posix_time::ptime& startTime,
 			const boost::posix_time::ptime& endTime,
-			bool rootCall
+			bool rootCall,
+			bool scom
 		) const	{
 			boost::shared_ptr<ArrivalDepartureTableGenerator> generator;
 			switch (_generationMethod)
 			{
 			case STANDARD_METHOD:
-				generator.reset(
-					static_cast<ArrivalDepartureTableGenerator*>(
+				{
+					StandardArrivalDepartureTableGenerator* standardGenerator(
 						new StandardArrivalDepartureTableGenerator(
 							getPhysicalStops(),
 							_direction,
@@ -249,8 +250,20 @@ namespace synthese
 							endTime,
 							_allowCanceled,
 							rootCall ? _displayType->getRowNumber() : 1
-				)	)	);
-				break;
+						)
+					);
+
+					// If SCOM is available and enabled, setup the generator to use it
+					#ifdef WITH_SCOM
+					if (scom)
+					{
+						standardGenerator->setClient(scom,this->getCodeBySources());
+					}
+					#endif
+
+					generator.reset(static_cast<ArrivalDepartureTableGenerator*>( standardGenerator ));
+					break;
+				}
 
 			case WITH_FORCED_DESTINATIONS_METHOD:
 				generator.reset(
