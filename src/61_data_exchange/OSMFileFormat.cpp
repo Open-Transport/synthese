@@ -671,10 +671,11 @@ namespace synthese
 			boost::shared_ptr<Crossing> crossing(
 				new Crossing(
 					CrossingTableSync::getId(),
-					position,
-					lexical_cast<string>(node->getId()),
-					&(*_import.get<DataSource>())
+					position
 			)	);
+			Importable::DataSourceLinks links;
+			links.insert(make_pair(&(*_import.get<DataSource>()), lexical_cast<string>(node->getId())));
+			crossing->setDataSourceLinksWithoutRegistration(links);
 
 			_crossingsMap[node->getId()] = crossing;
 			_env.getEditableRegistry<Crossing>().add(crossing);

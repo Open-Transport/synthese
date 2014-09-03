@@ -425,10 +425,11 @@ namespace synthese
 							leftNode.reset(
 								new Crossing(
 									CrossingTableSync::getId(),
-									boost::shared_ptr<Point>(geometry->getStartPoint()),
-									leftId,
-									&dataSource
+									boost::shared_ptr<Point>(geometry->getStartPoint())
 							)	);
+							Importable::DataSourceLinks links;
+							links.insert(make_pair(&dataSource, leftId));
+							leftNode->setDataSourceLinksWithoutRegistration(links);
 
 							_navteqCrossings.insert(make_pair(leftId, leftNode));
 							_env.getEditableRegistry<Crossing>().add(leftNode);
@@ -446,10 +447,11 @@ namespace synthese
 							rightNode.reset(
 								new Crossing(
 									CrossingTableSync::getId(),
-									boost::shared_ptr<Point>(geometry->getEndPoint()),
-									rightId,
-									&dataSource
+									boost::shared_ptr<Point>(geometry->getEndPoint())
 							)	);
+							Importable::DataSourceLinks links;
+							links.insert(make_pair(&dataSource, rightId));
+							rightNode->setDataSourceLinksWithoutRegistration(links);
 
 							_navteqCrossings.insert(make_pair(rightId, rightNode));
 							_env.getEditableRegistry<Crossing>().add(rightNode);
