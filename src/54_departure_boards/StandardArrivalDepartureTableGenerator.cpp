@@ -184,7 +184,7 @@ namespace synthese
 								// Checks if the new time is after the _startDateTime, if not ignore this line
 								if (adaptedTime < _startDateTime)
 								{
-									continue;
+									break;
 								}
 							}
 							#endif
