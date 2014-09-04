@@ -394,10 +394,17 @@ namespace synthese
 				// a transaction triggers a real time update
 				recursive_mutex::scoped_lock lock(_queueMutex);
 
-				for(Queue::iterator it(_lastSentRange.first);
-					it != _queue.end();
-					++it
-				){
+				Queue::iterator it(_lastSentRange.first);
+				while (it != _queue.end())
+				{
+					bool willBreak(false);
+					if(it == _lastSentRange.second)
+					{
+						willBreak = true;
+					}
+					// Save the next iterator because we may suppress current it from _queue (by ->unlink)
+					Queue::iterator it2(it);
+					it2++;
 					try
 					{
 						boost::shared_ptr<InterSYNTHESEQueue> q(
@@ -422,10 +429,12 @@ namespace synthese
 					}
 
 					// Exit on last item
-					if(it == _lastSentRange.second)
+					if(willBreak)
 					{
 						break;
 					}
+					
+					it = it2;
 				}
 
 				_lastSentRange = make_pair(_queue.end(), _queue.end());
