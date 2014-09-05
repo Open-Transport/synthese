@@ -51,14 +51,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,DestinationTableSync>::FACTORY_KEY("35.26 Destinations");
 	}
 
-	namespace pt
-	{
-		const string DestinationTableSync::COL_COMMENT("comment");
-		const string DestinationTableSync::COL_DISPLAYED_TEXT("displayed_text");
-		const string DestinationTableSync::COL_TTS_TEXT("tts_text");
-		const string DestinationTableSync::COL_DATA_SOURCE_LINKS("data_source_links");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DestinationTableSync>::TABLE(
@@ -69,11 +61,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DestinationTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(DestinationTableSync::COL_DISPLAYED_TEXT, SQL_TEXT),
-			Field(DestinationTableSync::COL_TTS_TEXT, SQL_TEXT),
-			Field(DestinationTableSync::COL_COMMENT, SQL_TEXT),
-			Field(DestinationTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
 			Field()
 		};
 
@@ -83,49 +70,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<DestinationTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DestinationTableSync,Destination>::Load(
-			Destination* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			object->setDisplayedText(rows->getText(DestinationTableSync::COL_DISPLAYED_TEXT));
-			object->setTTSText(rows->getText(DestinationTableSync::COL_TTS_TEXT));
-			object->setComment(rows->getText(DestinationTableSync::COL_COMMENT));
-
-			object->setDataSourceLinksWithoutRegistration(
-				ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					rows->getText(DestinationTableSync::COL_DATA_SOURCE_LINKS),
-					env
-			)	);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DestinationTableSync,Destination>::Save(
-			Destination* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<DestinationTableSync> query(*object);
-			query.addField(object->getDisplayedText());
-			query.addField(object->getTTSText());
-			query.addField(object->getComment());
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<DestinationTableSync,Destination>::Unlink(
-			Destination* obj
-		){
 		}
 
 
@@ -208,7 +152,7 @@ namespace synthese
 
 			SelectQuery<DestinationTableSync> query;
 			Env env;
-			if(prefix) query.addWhereField(DestinationTableSync::COL_DISPLAYED_TEXT, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+			if(prefix) query.addWhereField(SimpleObjectFieldDefinition<DisplayedText>::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 			if(limit) query.setNumber(*limit);
 			DestinationTableSync::SearchResult destinations(DestinationTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 			BOOST_FOREACH(const boost::shared_ptr<Destination>& destination, destinations)

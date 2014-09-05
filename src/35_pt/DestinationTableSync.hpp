@@ -27,7 +27,6 @@
 
 #include "Destination.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 namespace synthese
 {
@@ -42,21 +41,10 @@ namespace synthese
 		class DestinationTableSync:
 			public db::DBDirectTableSyncTemplate<
 				DestinationTableSync,
-				Destination,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				Destination
 			>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_DISPLAYED_TEXT;
-				static const std::string COL_TTS_TEXT;
-				static const std::string COL_COMMENT;
-				static const std::string COL_DATA_SOURCE_LINKS;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
