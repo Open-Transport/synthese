@@ -26,6 +26,7 @@
 #include "CommercialLine.h"
 #include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
+#include "MalformedSchedulesException.hpp"
 #include "LineStop.h"
 #include "NonConcurrencyRule.h"
 #include "Path.h"
@@ -216,12 +217,18 @@ namespace synthese
 			// Lock the schedules
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(!RTData)
+			const Schedules& schedules(
+				RTData ?
+				getArrivalSchedules(true, RTData) :
+				getDataArrivalSchedules()
+			);
+
+			if(schedules.empty())
 			{
-				return *getDataArrivalSchedules().rbegin();
+				throw MalformedSchedulesException();
 			}
 
-			return *getArrivalSchedules(true, RTData).rbegin();
+			return *schedules.rbegin();
 		}
 
 
@@ -246,7 +253,10 @@ namespace synthese
 				{
 					_generateSchedules();
 				}
-				return _generatedDepartureSchedules;
+				if(!_generatedDepartureSchedules.empty())
+				{
+					return _generatedDepartureSchedules;
+				}
 			}
 
 			return _emptySchedules;
@@ -274,7 +284,10 @@ namespace synthese
 				{
 					_generateSchedules();
 				}
-				return _generatedArrivalSchedules;
+				if(!_generatedArrivalSchedules.empty())
+				{
+					return _generatedArrivalSchedules;
+				}
 			}
 
 			return _emptySchedules;
@@ -1191,6 +1204,14 @@ namespace synthese
 			// Avoid multiple useless logs
 			bool badSchedulesLogged(false);
 
+			// Check if the data is not empty
+			if(	_dataDepartureSchedules.empty() ||
+				_dataArrivalSchedules.empty() ||
+				_path->getEdges().empty()
+			){
+				return;
+			}
+
 			// Departure loop
 			Schedules::const_iterator itDeparture(_dataDepartureSchedules.begin());
 			Schedules::const_iterator itArrival(_dataArrivalSchedules.begin());
@@ -2017,6 +2038,7 @@ namespace synthese
 			Schedules newArrivalSchedules;
 			
 			size_t rank(0);
+			optional<size_t> lastRank;
 			if(dynamic_cast<JourneyPattern*>(_path))
 			{
 				static_cast<JourneyPattern*>(getPath())->clearCalendarCache();
