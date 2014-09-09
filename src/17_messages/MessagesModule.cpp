@@ -293,6 +293,7 @@ namespace synthese
 			Alarm::Registry::Vector messagesToUpdate(
 				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectMessagesToActivate)
 			);
+			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
 
 			BOOST_FOREACH(
 				const Alarm::Registry::Vector::value_type& message,
@@ -372,6 +373,7 @@ namespace synthese
 
 
 
+<<<<<<< .working
 		bool MessagesModule::_selectSentAlarm( const Alarm& object )
 		{
 			if(!dynamic_cast<const SentAlarm*>(&object))
@@ -386,6 +388,7 @@ namespace synthese
 
 		void MessagesModule::ClearAllBroadcastCaches()
 		{
+			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
 			Alarm::Registry::Vector sentAlarms(
 				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectSentAlarm)
 			);
