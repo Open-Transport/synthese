@@ -142,10 +142,6 @@ namespace synthese
 		DBTransaction InterSYNTHESEPackageFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			// get upgradable access
-			boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
-			// get exclusive access
-			boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 			_content->save(transaction);
 			return transaction;
 		}
