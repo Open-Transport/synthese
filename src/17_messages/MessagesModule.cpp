@@ -373,7 +373,6 @@ namespace synthese
 
 
 
-<<<<<<< .working
 		bool MessagesModule::_selectSentAlarm( const Alarm& object )
 		{
 			if(!dynamic_cast<const SentAlarm*>(&object))

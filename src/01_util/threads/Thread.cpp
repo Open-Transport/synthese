@@ -173,7 +173,7 @@ namespace synthese
 		Thread::Sleep (long ms)
 		{
 			boost::xtime xt;
-			boost::xtime_get(&xt, boost::TIME_UTC);
+			boost::xtime_get(&xt, boost::TIME_UTC_);
 
 			xt.sec += ms / 1000;
 			unsigned long ns = ((long) xt.nsec) + (ms % 1000000L) * 1000000L;

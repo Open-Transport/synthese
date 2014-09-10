@@ -128,7 +128,7 @@ namespace synthese
 				Log::GetInstance().warn("No such road place "+ lexical_cast<string>(roadId) +" in house "+ lexical_cast<string>(object->getKey()));
 				throw;
 			}
-			catch(EdgeProjector<MainRoadChunk*>::NotFoundException&)
+			catch(EdgeProjector<RoadChunk*>::NotFoundException&)
 			{
 				Log::GetInstance().warn("No chunk was found near the house "+ lexical_cast<string>(object->getKey()) +" in the road place "+ lexical_cast<string>(roadId));
 				throw;

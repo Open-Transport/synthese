@@ -25,6 +25,7 @@
 #include "BasicClient.h"
 #include "Import.hpp"
 #include "InterSYNTHESEPacket.hpp"
+#include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESEUpdateAckService.hpp"
 #include "StaticFunctionRequest.h"

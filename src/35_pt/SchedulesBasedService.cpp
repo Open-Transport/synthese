@@ -1086,6 +1086,13 @@ namespace synthese
 												serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
 												serviceInstance.getDepartureDateTime() +
 												serviceInstance.getServiceRange() + rule->get<Delay>()
+										);
+										if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
+										{
+											time_period timePeriod(
+												serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
+												serviceInstance.getDepartureDateTime() +
+												serviceInstance.getServiceRange() + rule->get<Delay>()
 											);
 											if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
 											{
@@ -1124,6 +1131,7 @@ namespace synthese
 						}
 					}
 				}
+			}
 			}
 
 			_nonConcurrencyCache.insert(
@@ -1689,4 +1697,3 @@ namespace synthese
 			;
 		}
 }	}
-
