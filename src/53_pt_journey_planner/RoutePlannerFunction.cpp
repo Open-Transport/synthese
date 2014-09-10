@@ -293,9 +293,11 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_LONGITUDE("longitude");
 		const string RoutePlannerFunction::DATA_LATITUDE("latitude");
 		const string RoutePlannerFunction::DATA_DEPARTURE_STOP_NAME("departure_stop_name");
+		const string RoutePlannerFunction::DATA_DEPARTURE_STOP_ID("departure_stop_id");
 		const string RoutePlannerFunction::DATA_DEPARTURE_LONGITUDE("departure_longitude");
 		const string RoutePlannerFunction::DATA_DEPARTURE_LATITUDE("departure_latitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_STOP_NAME("arrival_stop_name");
+		const string RoutePlannerFunction::DATA_ARRIVAL_STOP_ID("arrival_stop_id");
 		const string RoutePlannerFunction::DATA_ARRIVAL_LONGITUDE("arrival_longitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_LATITUDE("arrival_latitude");
 		const string RoutePlannerFunction::DATA_IS_LAST_LEG("is_last_leg");
@@ -3721,6 +3723,7 @@ namespace synthese
 			if(arrivalPhysicalStop)
 			{
 				pm.insert(DATA_ARRIVAL_STOP_NAME, arrivalPhysicalStop->getName());
+				pm.insert(DATA_ARRIVAL_STOP_ID, arrivalPhysicalStop->getKey());
 				// Point
 				if(	arrivalPhysicalStop->getGeometry().get() &&
 					!arrivalPhysicalStop->getGeometry()->isEmpty()
@@ -3738,6 +3741,7 @@ namespace synthese
 			if(departurePhysicalStop)
 			{
 				pm.insert(DATA_DEPARTURE_STOP_NAME, departurePhysicalStop->getName());
+				pm.insert(DATA_DEPARTURE_STOP_ID, departurePhysicalStop->getKey());
 				// Point
 				if(	departurePhysicalStop->getGeometry().get() &&
 					!departurePhysicalStop->getGeometry()->isEmpty()

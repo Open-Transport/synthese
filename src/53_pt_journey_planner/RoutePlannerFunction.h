@@ -294,9 +294,11 @@ namespace synthese
 				static const std::string DATA_IS_TERMINUS;
 				static const std::string DATA_STOP_AREA_NAME;
 				static const std::string DATA_DEPARTURE_STOP_NAME;
+				static const std::string DATA_DEPARTURE_STOP_ID;
 				static const std::string DATA_DEPARTURE_LONGITUDE;
 				static const std::string DATA_DEPARTURE_LATITUDE;
 				static const std::string DATA_ARRIVAL_STOP_NAME;
+				static const std::string DATA_ARRIVAL_STOP_ID;
 				static const std::string DATA_ARRIVAL_LONGITUDE;
 				static const std::string DATA_ARRIVAL_LATITUDE;
 				static const std::string DATA_IS_LAST_LEG;
