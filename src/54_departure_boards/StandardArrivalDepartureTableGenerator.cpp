@@ -166,7 +166,7 @@ namespace synthese
 								continue;
 							}
 
-							// Adapt the departure time using SCOM (if enabled)
+							// Eliminate too soon departure time using SCOM (if enabled)
 							#ifdef WITH_SCOM
 							if (_scom)
 							{
@@ -174,20 +174,21 @@ namespace synthese
 
 								// Fetch the time from SCOM
 								ptime adaptedTime = scom::SCOMModule::GetSCOMData()->GetWaitingTime(
-										_borne,
-										journeyPattern->getCommercialLine()->getShortName(),
-										journeyPattern->getDirectionObj()->getDisplayedText(),
-										servicePointer.getDepartureDateTime(),
-										_startDateTime
+									_borne,
+									journeyPattern->getCommercialLine()->getShortName(),
+									journeyPattern->getDirectionObj()->getDisplayedText(),
+									servicePointer.getDepartureDateTime(),
+									_startDateTime
 								);
 
-								// Checks if the new time is after the _startDateTime, if not ignore this line
+								// Checks if the new time is after the _startDateTime, if not ignore this service
 								if (adaptedTime < _startDateTime)
 								{
-									break;
+									continue;
 								}
 							}
 							#endif
+
 
 							// The departure is kept in the results
 							_insert(servicePointer);
