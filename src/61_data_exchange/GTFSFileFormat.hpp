@@ -104,6 +104,7 @@ namespace synthese
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_USE_RULE_BLOCK_ID_MASK;
+				static const std::string PARAMETER_USE_LINE_SHORT_NAME_AS_ID;
 
 			private:
 				static const std::string SEP;
@@ -114,6 +115,7 @@ namespace synthese
 				bool _displayLinkedStops;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
+				bool _useLineShortNameAsId;
 
 				typedef std::map<std::string, std::size_t> FieldsMap;
 				mutable FieldsMap _fieldsMap;
