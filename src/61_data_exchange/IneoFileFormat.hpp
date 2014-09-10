@@ -128,6 +128,7 @@ namespace synthese
 				static const std::string PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD;
 				static const std::string VALUE_UFR;
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
+				static const std::string PARAMETER_FORBIDDEN_SERVICE_USE_RULE;
 				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
 
 			private:
@@ -177,6 +178,7 @@ namespace synthese
 					std::string _stopHandicappedAccessibilityField;
 					std::string _mnlp_prefix;
 					boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
+					boost::shared_ptr<pt::PTUseRule> _forbiddenServiceUseRule;
 					std::string _vehicleServiceSuffix;
 				//@}
 
