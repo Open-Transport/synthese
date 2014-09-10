@@ -104,6 +104,7 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 		const string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_USE_LINE_SHORT_NAME_AS_ID("use_line_short_name_as_id");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_SERVICE_NUMBER("ignore_service_number");
 
 		const std::string GTFSFileFormat::Exporter_::PARAMETER_NETWORK_ID("ni");
 		const std::string GTFSFileFormat::Exporter_::LABEL_TAD("tad");
@@ -169,6 +170,7 @@ namespace synthese
 			_interactive(false),
 			_displayLinkedStops(false),
 			_useLineShortNameAsId(false),
+			_ignoreServiceNumber(false),
 			_networks(*import.get<DataSource>(), env),
 			_stopPoints(*import.get<DataSource>(), env),
 			_lines(*import.get<DataSource>(), env)
@@ -665,7 +667,7 @@ namespace synthese
 								*route,
 								departures,
 								arrivals,
-								lastTripCode,
+								_ignoreServiceNumber ? string() : lastTripCode,
 								dataSource,
 								optional<const string&>(),
 								optional<const RuleUser::Rules&>(),
@@ -864,6 +866,7 @@ namespace synthese
 			}
 			map.insert(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks));
 			map.insert(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, _useLineShortNameAsId);
+			map.insert(PARAMETER_IGNORE_SERVICE_NUMBER, _ignoreServiceNumber);
 			return map;
 		}
 
@@ -913,6 +916,7 @@ namespace synthese
 			}
 			
 			_useLineShortNameAsId = map.getDefault<bool>(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, false);
+			_ignoreServiceNumber = map.getDefault<bool>(PARAMETER_IGNORE_SERVICE_NUMBER, false);
 		}
 
 
