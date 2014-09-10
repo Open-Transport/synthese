@@ -110,6 +110,26 @@ namespace synthese
 			}
 		}
 
+		void VehicleService::remove(pt::SchedulesBasedService& value)
+		{
+			Services::Type::iterator it(get<Services>().begin());
+			for(; it != get<Services>().end(); ++it)
+			{
+				if(*it == &value)
+				{
+					break;
+				}
+			}
+			if(it == get<Services>().end())
+			{
+				return;
+			}
+			else
+			{
+				get<Services>().erase(it);
+			}
+		}
+
 
 
 		void VehicleService::clearServices()
