@@ -27,7 +27,6 @@
 #include "ImportTableSync.hpp"
 #include "FileFormat.h"
 #include "DBTransaction.hpp"
-#include "ServerModule.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -193,10 +192,6 @@ namespace synthese
 				DBModule::DeactivateConditionalTablesUpdate();
 				try
 				{
-					// get upgradable access
-					boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
-					// get exclusive access
-					boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 					_importer->save().run();
 				}
 				catch(...)
