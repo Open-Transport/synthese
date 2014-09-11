@@ -264,7 +264,7 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(rankInPath == 0 && !RTData)
+			if(rankInPath == 0 && !RTData && !getDataDepartureSchedules().empty())
 			{
 				return getDataDepartureSchedules()[0];
 			}
@@ -277,7 +277,7 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(rankInPath == 0 && !RTData)
+			if(rankInPath == 0 && !RTData && !getDataDepartureSchedules().empty())
 			{
 				return getDataDepartureSchedules()[0];
 			}
@@ -501,7 +501,7 @@ namespace synthese
 					setPath(path);
 					if(path->getEdges().empty())
 					{
-						LineStopTableSync::Search(env, pathId);
+						LineStopTableSync::Search(env, pathId, optional<RegistryKeyType>(), 0, optional<size_t>(), true, true, UP_DOWN_LINKS_LOAD_LEVEL);
 					}
 					result = true;
 				}
@@ -784,7 +784,8 @@ namespace synthese
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Registration in path
-			if( getPath())
+			if( getPath()&&
+				!getPath()->contains(*this))
 			{
 				getPath()->addService(
 					*this,

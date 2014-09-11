@@ -107,6 +107,8 @@ LineStopTableSync.cpp
 LineStopTableSync.h
 LineStopUpdateAction.cpp
 LineStopUpdateAction.hpp
+MalformedSchedulesException.cpp
+MalformedSchedulesException.hpp
 NetworkLineBasedRight.cpp
 NetworkLineBasedRight.h
 NonConcurrencyRule.cpp
