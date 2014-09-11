@@ -781,7 +781,8 @@ namespace synthese
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Registration in path
-			if( getPath())
+			if( getPath()&&
+				!getPath()->contains(*this))
 			{
 				getPath()->addService(
 					*this,
