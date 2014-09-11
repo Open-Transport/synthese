@@ -257,7 +257,7 @@ int main( int argc, char **argv )
 				std::cout << "SYNTHESE " << ServerModule::VERSION << " " <<
 					ServerModule::REVISION << " " <<
 					ServerModule::BRANCH <<
-					" (" << ServerModule::GetBranch() << " - " << ServerModule::BUILD_DATE << ")" << std::endl;
+					" (" << ServerModule::BUILD_DATE << ")" << std::endl;
 				return 1;
 			}
 
