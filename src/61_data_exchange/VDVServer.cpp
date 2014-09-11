@@ -406,6 +406,8 @@ namespace synthese
 		{
 			this_thread::sleep(boost::posix_time::seconds(5));
 
+			date today(day_clock::local_day());
+
 			// Local variables
 			ptime now(second_clock::local_time());
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
@@ -449,7 +451,7 @@ namespace synthese
 				if (!plannedDataSource.get())
 				{
 					// The planned does not exist : log so that the user knows he has to configure it
-					Log::GetInstance().warn("La source des donnÈes plannifiÈes associÈe ‡ la connexion VDV n'a pas ÈtÈ trouvÈe");
+					Log::GetInstance().warn("La source des donn√©es plannifi√©es associ√©e √† la connexion VDV n'a pas √©t√© trouv√©e");
 					return;
 				}
 
@@ -472,7 +474,7 @@ namespace synthese
 				if (datenAbrufenAntwortResults.error != eXMLErrorNone ||
 					datenAbrufenAntwortNode.isEmpty()
 				){
-					Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort vide ou mal formÈ");
+					Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort vide ou mal form√©");
 					return;
 				}
 				
@@ -496,7 +498,7 @@ namespace synthese
 					// If no corresponding subscription, log it and continue
 					if (!currentSubscription)
 					{
-						Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant ‡ aucun abonnement");
+						Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant √† aucun abonnement");
 						continue;
 					}
 					
@@ -510,7 +512,7 @@ namespace synthese
 						string readAZBID = AZBFahrplanlageNode.getChildNode("AZBID").getText();
 						if (readAZBID != currentSubscription->get<StopArea>()->getACodeBySource(*get<DataSource>()))
 						{
-							Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant ‡ l'abonnement");
+							Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant √† l'abonnement");
 							break;
 						}
 						
@@ -520,16 +522,75 @@ namespace synthese
 						split(vectServiceCode, serviceCode, is_any_of("-"));
 						if (vectServiceCode.size() != 3)
 						{
-							Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un service avec un code diffÈrentde XXX-XXXX-XXXX");
+							Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un service avec un code diff√©rentde XXX-XXXX-XXXX");
 							continue;
 						}
 						// Service code is on 5 characters in the planned datasource
 						while (vectServiceCode[1].size() < 5)
 							vectServiceCode[1] = "0" + vectServiceCode[1];
 						
+
 						ScheduledService* service(
 							plannedDataSource->getObjectByCode<ScheduledService>(vectServiceCode[1])
 						);
+
+						// TODO : it can exist more than one service with this service code
+						// we should get all of them and select :
+						// - one already activated for today (theorical calendar OK)
+						vector<ScheduledService*> services;
+						ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*plannedDataSource, Env::GetOfficialEnv());
+						BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::value_type& itLine, lines.getMap())
+						{
+							BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::mapped_type::value_type& line, itLine.second)
+							{
+								BOOST_FOREACH(Path* route, line->getPaths())
+								{
+									// Avoid junctions
+									if(!dynamic_cast<JourneyPattern*>(route))
+									{
+										continue;
+									}
+									JourneyPattern* jp(static_cast<JourneyPattern*>(route));
+									boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+										*jp->sharedServicesMutex
+									);
+									BOOST_FOREACH(Service* tservice, jp->getAllServices())
+									{
+										ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
+										if(!curService) continue;
+										if (curService->getACodeBySource(*plannedDataSource) == vectServiceCode[1])
+										{
+											// Add the service to vect
+											services.push_back(curService);
+										}
+									}
+								}
+							}
+						}
+
+						//const CommercialLine& line(
+						//    *static_cast<CommercialLine*>(service->getPath()->getPathGroup())
+						//);
+						
+						Log::GetInstance().debug("On a trouve : " + lexical_cast<string>(services.size()) + " services candidats");
+						int numTheoricalActivatedServices(0);
+						BOOST_FOREACH(ScheduledService* sservice, services)
+						{
+							if (sservice->isActive(today))
+							{
+								numTheoricalActivatedServices++;
+								service = sservice;
+							}
+						}
+						
+						if (numTheoricalActivatedServices != 1)
+						{
+							Log::GetInstance().debug(lexical_cast<string>(numTheoricalActivatedServices) + " services candidats sont th√©oriquement activ√©s aujourd'hui");
+						}
+						else
+						{
+							Log::GetInstance().debug("un seul service candidat est th√©oriquement activ√© aujourd'hui");
+						}
 						
 						if (service)
 						{
@@ -589,6 +650,12 @@ namespace synthese
 							links.erase(&*(get<DataSource>()));
 							links.insert(make_pair(&*(get<DataSource>()), serviceCode));
 							service->setDataSourceLinksWithoutRegistration(links);
+
+							// Set the service active
+							service->setActive(today);
+
+							// Update RT
+							service->setRealTimeSchedules(departureSchedules, arrivalSchedules);
 							
 							// Save the updated service
 							ScheduledServiceTableSync::Save(service, transaction);
@@ -597,7 +664,7 @@ namespace synthese
 						}
 						
 						// The service is not found in the theorical data, it has to be created
-						Log::GetInstance().warn("RÈception d'un DatenAbrufenAntwort contenant un service non connu (" + vectServiceCode[1] + "), crÈation du service non codÈe");
+						Log::GetInstance().warn("R√©ception d'un DatenAbrufenAntwort contenant un service non connu (" + vectServiceCode[1] + "), cr√©ation du service non cod√©e");
 						// TO-DO ? : code the creation of the service (why not in a different network to easily detect errors in HAFAS or special events received ?)
 					}
 				}

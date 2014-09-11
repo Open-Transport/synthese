@@ -138,6 +138,7 @@ namespace synthese
 				static const std::string PARAMETER_COMPLETE_EMPTY_STOP_AREA_NAME;
 				static const std::string PARAMETER_NO_GLEIS_FILE;
 				static const std::string PARAMETER_TRY_TO_READ_LINE_SHORT_NAME;
+				static const std::string PARAMETER_READ_WAYBACK;
 				static const std::string PARAMETER_CALENDAR_DEFAULT_CODE;
 
 			private:
@@ -173,6 +174,7 @@ namespace synthese
 					std::string _complete_empty_stop_area_name;
 					bool _noGleisFile;
 					bool _tryToReadShortName;
+					bool _readWayback;
 					size_t _defaultCalendarCode;
 				//@}
 
@@ -211,6 +213,7 @@ namespace synthese
 					std::string number;
 					std::string lineNumber;
 					std::string lineShortName;
+					bool readWayback;
 					size_t version;
 					std::vector<CalendarUse> calendars;
 					std::string transportModeCode;

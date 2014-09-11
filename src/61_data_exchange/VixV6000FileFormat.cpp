@@ -59,6 +59,7 @@ namespace synthese
 		const std::string VixV6000FileFormat::Exporter_::PARAMETER_COM_PORT_NUMBER = "com_port_number";
 		const std::string VixV6000FileFormat::Exporter_::PARAMETER_COM_PORT_RATE = "com_port_rate";
 		const std::string VixV6000FileFormat::Exporter_::PARAMETER_DATASOURCE_ID = "data_source_id";
+		const std::string VixV6000FileFormat::Exporter_::PARAMETER_PATCH_DIRECTION_BELFORT = "patch_direction_belfort";
 
 
 
@@ -66,6 +67,7 @@ namespace synthese
 			const Export& export_
 		):	Exporter(export_),
 			PermanentThreadExporterTemplate<VixV6000FileFormat>(export_),
+			_patchDirectionBelfort(false),
 			_status(OFFLINE),
 			_timeNextMessage(0)
 		{}
@@ -82,6 +84,8 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DATASOURCE_ID, _dataSource->getKey());
 			}
+			
+			map.insert(PARAMETER_PATCH_DIRECTION_BELFORT, _patchDirectionBelfort);
 
 			return map;
 		}
@@ -104,6 +108,8 @@ namespace synthese
 			catch(ObjectNotFoundException<DataSource>&)
 			{
 			}
+			
+			_patchDirectionBelfort = map.getDefault<bool>(PARAMETER_PATCH_DIRECTION_BELFORT, false);
 		}
 
 
@@ -238,11 +244,25 @@ namespace synthese
 				// Direction
 				if(pService->getRoute()->getWayBack())
 				{
-					result.direction = 1;
+					if (_patchDirectionBelfort)
+					{
+						result.direction = 3;
+					}
+					else
+					{
+						result.direction = 1;
+					}
 				}
 				else
 				{
-					result.direction = 0;
+					if (_patchDirectionBelfort)
+					{
+						result.direction = 2;
+					}
+					else
+					{
+						result.direction = 0;
+					}
 				}
 
 				// Line

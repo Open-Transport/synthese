@@ -99,6 +99,7 @@ namespace synthese
 				static const std::string FILE_FREQUENCIES;
 
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
+				static const std::string PARAMETER_AUTO_CREATE_STOP_AREA;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
@@ -108,6 +109,7 @@ namespace synthese
 				static const std::string SEP;
 
 				bool _importStopArea;
+				bool _autoCreateStopArea;
 				bool _interactive;
 				bool _displayLinkedStops;
 				boost::shared_ptr<const geography::City> _defaultCity;

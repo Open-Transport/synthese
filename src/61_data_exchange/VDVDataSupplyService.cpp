@@ -223,7 +223,9 @@ namespace synthese
 						);
 						// Check that network is OK
 						if (network.getKey() != _vdvClient->get<TransportNetworkID>())
+						{
 							continue;
+						}
 						ptime departureDateTime(sp.getDepartureDateTime());
 						if (!departureDateTime.is_not_a_date_time())
 							departureDateTime -= diff_from_utc;
@@ -382,7 +384,9 @@ namespace synthese
 						);
 						// Check that network is OK
 						if (network.getKey() != _vdvClient->get<TransportNetworkID>())
+						{
 							continue;
+						}
 						string networkId(
 							network.getACodeBySource(
 								*_vdvClient->get<DataSource>()
@@ -451,7 +455,7 @@ namespace synthese
 						;
 					}
 					result << "</AZBNachricht>";
-					
+
 					it.second->declareSending();
 			}	}
 			result << "</DatenAbrufenAntwort>";

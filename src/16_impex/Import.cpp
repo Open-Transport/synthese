@@ -25,7 +25,6 @@
 #include "Env.h"
 #include "FileFormat.h"
 #include "Importer.hpp"
-#include "ServerModule.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -120,9 +119,9 @@ namespace synthese
 		{
 			if(canImport())
 			{
-			// Compute the time of the next auto import
-			_computeNextAutoImport();
-		}
+				// Compute the time of the next auto import
+				_computeNextAutoImport();
+			}
 			else if(isPermanentThread())
 			{
 				if(get<Active>() && (&env == &Env::GetOfficialEnv()))
@@ -144,10 +143,10 @@ namespace synthese
 					_autoImporter->killPermanentThread();
 				}
 
-			// Delete the auto importer cache in case of parameter update
-			recursive_mutex::scoped_lock lock(_autoImportMutex);
-			_autoImporter.reset();
-		}
+				// Delete the auto importer cache in case of parameter update
+				recursive_mutex::scoped_lock lock(_autoImportMutex);
+				_autoImporter.reset();
+			}
 		}
 
 
@@ -199,10 +198,16 @@ namespace synthese
 		void Import::runAutoImport() const
 		{
 			ptime startTime(second_clock::local_time());
+			recursive_mutex::scoped_lock lock(_autoImportMutex);
+
+			if(!_autoImporterEnv)
+			{
+				_getAutoImporter();
+			}
 
 			_autoImporterEnv->clear();
-			_autoImporter->openLogFile();
-			bool result(_autoImporter->parseFiles());
+			_getAutoImporter()->openLogFile();
+			bool result(_getAutoImporter()->parseFiles());
 			if(result)
 			{
 				DBTransaction transaction(_getAutoImporter()->save());

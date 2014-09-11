@@ -156,9 +156,18 @@ namespace synthese
 					}
 
 					// Saving
-					departureSchedules[rank] = dep;
-					arrivalSchedules[rank] = arr;
-					vertices[rank] = vertex;
+					if (departureSchedules.size() > rank)
+					{
+						departureSchedules[rank] = dep;
+					}
+					if (arrivalSchedules.size() > rank)
+					{
+						arrivalSchedules[rank] = arr;
+					}
+					if (vertices.size() > rank)
+					{
+						vertices[rank] = vertex;
+					}
 				}
 				catch(...)
 				{

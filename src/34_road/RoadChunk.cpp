@@ -179,7 +179,7 @@ namespace synthese
 
 		double RoadChunk::getCarSpeed(bool nominalSpeed) const
 		{
-			if(nominalSpeed)
+			if(nominalSpeed || !this->getRoad())
 			{
 				return _carSpeed;
 			}
@@ -203,7 +203,14 @@ namespace synthese
 			double offset = metricOffset - _forwardEdge->getMetricOffset();
 			if(!geometry.get() || geometry->isEmpty())
 			{
-				return _crossing->getGeometry();
+				if (_crossing)
+				{
+					return _crossing->getGeometry();
+				}
+				else
+				{
+					return boost::shared_ptr<geos::geom::Point>();
+				}
 			}
 			if(offset > geometry->getLength())
 			{
@@ -553,10 +560,10 @@ namespace synthese
 
 			// Max speed
 			{
-				double maxSpeed = record.getDefault<double>(RoadChunkTableSync::COL_CAR_SPEED, 0);
-				if(maxSpeed != getCarSpeed())
+				double carSpeed = record.getDefault<double>(RoadChunkTableSync::COL_CAR_SPEED, 0);
+				if(carSpeed != getCarSpeed(true))
 				{
-					setCarSpeed(maxSpeed);
+					setCarSpeed(carSpeed);
 					result = true;
 				}
 			}

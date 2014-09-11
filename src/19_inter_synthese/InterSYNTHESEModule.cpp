@@ -88,6 +88,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Init()
 		{
+			InterSYNTHESEModule::GenerateFakeImport();
 		}
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
@@ -121,7 +122,8 @@ namespace synthese
 	{
 		void InterSYNTHESEModule::Enqueue(
 			const InterSYNTHESEContent& content,
-			boost::optional<db::DBTransaction&> transaction
+			boost::optional<db::DBTransaction&> transaction,
+			Registrable* objectToRemember
 		){
 			BOOST_FOREACH(
 				InterSYNTHESEConfig::Registry::value_type& config,
@@ -129,7 +131,8 @@ namespace synthese
 			){
 				config.second->enqueueIfInPerimeter(
 					content,
-					transaction
+					transaction,
+					objectToRemember
 				);
 			}
 		}
@@ -184,12 +187,11 @@ namespace synthese
 					// Log
 				}
 			}
-			_generateFakeImport();
 		}
 
 
 
-		void InterSYNTHESEModule::_generateFakeImport()
+		void InterSYNTHESEModule::GenerateFakeImport()
 		{
 			if(!_slaveActive)
 			{
@@ -225,8 +227,8 @@ namespace synthese
 				pm.insert(ConnectionImporter<InterSYNTHESEFileFormat>::PARAMETER_PORT, _masterPort);
 				pm.insert(InterSYNTHESEFileFormat::Importer_::PARAMETER_SLAVE_ID, _slaveId);
 				import->set<synthese::Parameters>(pm);
-
 				import->set<AutoImportDelay>(_syncWaitingTime);
+
 				import->link(Env::GetOfficialEnv(), true);
 				if(created)
 				{

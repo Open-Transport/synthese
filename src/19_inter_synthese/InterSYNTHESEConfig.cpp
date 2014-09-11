@@ -104,7 +104,8 @@ namespace synthese
 
 		void InterSYNTHESEConfig::enqueueIfInPerimeter(
 			const InterSYNTHESEContent& content,
-			boost::optional<db::DBTransaction&> transaction
+			boost::optional<db::DBTransaction&> transaction,
+			Registrable* objectToRemember
 		) const {
 
 			// Avoid useless check if no slave
@@ -138,13 +139,19 @@ namespace synthese
 			// Enqueue in all slaves
 			BOOST_FOREACH(const Slaves::value_type& slave, _slaves)
 			{
-				slave->enqueue(
-					content.getType().getFactoryKey(),
-					content.getContent(),
-					content.getExpirationTime(),
-					transaction,
-					nonPersistent
-				);
+				if (slave->get<Active>())
+				{
+					// enqueue only if slave is active
+					slave->enqueue(
+						content.getType().getFactoryKey(),
+						content.getContent(),
+						content.getExpirationTime(),
+						transaction,
+						nonPersistent,
+						false,
+						objectToRemember
+					);
+				}
 			}
 		}
 }	}

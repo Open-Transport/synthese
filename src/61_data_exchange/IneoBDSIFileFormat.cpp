@@ -140,18 +140,6 @@ namespace synthese
 			const time_duration& nowDuration
 		) const {
 
-			// Select only services with at least a stop after now
-			const Horaire& lastHoraire(*horaires.rbegin());
-			time_duration timeToCompare(
-				lastHoraire.hra > lastHoraire.hta ?
-				lastHoraire.hra :
-				lastHoraire.hta
-			);
-			if(	timeToCompare < nowDuration)
-			{
-				return;
-			}
-
 			// Jump over courses with incomplete chainages
 			if(horaires.size() != chainage.arretChns.size())
 			{
@@ -882,6 +870,10 @@ namespace synthese
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingJourneyPattern, existingJourneyPatterns)
 				{
 					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
+					
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*(journeyPattern.sharedServicesMutex)
+					);
 
 					BOOST_FOREACH(const ServiceSet::value_type& existingService, journeyPattern.getAllServices())
 					{
@@ -980,6 +972,7 @@ namespace synthese
 					}
 
 					// Search for a service with the same planned schedules
+					ScheduledService* inactiveService(NULL); // to remember an inactive service available for this course (if no other)
 					BOOST_FOREACH(
 						const JourneyPattern* route,
 						course.chainage->getSYNTHESEJourneyPatterns(
@@ -1015,6 +1008,10 @@ namespace synthese
 								servicesToLink.push_back(&course);
 								break;
 							}
+							else if ( course == *service )
+							{
+								inactiveService = service;
+							}
 						}
 						if(course.syntheseService)
 						{
@@ -1023,6 +1020,23 @@ namespace synthese
 					}
 					if(course.syntheseService)
 					{
+						continue;
+					}
+					
+					// Maybe an inactive service has been found and can be activated
+					if (inactiveService)
+					{
+						inactiveService->setActive(today);
+						course.syntheseService = inactiveService;
+						
+						// The service must be updated
+						servicesToUpdate.push_back(&course);
+						
+						// The service must not be removed
+						servicesToRemove.erase(inactiveService);
+						
+						// The service must be linked
+						servicesToLink.push_back(&course);
 						continue;
 					}
 
@@ -1060,6 +1074,7 @@ namespace synthese
 							oldCode = service->getACodeBySource(*dataSourceOnSharedEnv);
 						}
 						Importable::DataSourceLinks links(service->getDataSourceLinks());
+						service->removeSourceLinks(*dataSourceOnSharedEnv, true);
 						links.erase(dataSourceOnSharedEnv);
 						service->setDataSourceLinksWithoutRegistration(links);
 						_servicesToSave.insert(service);
@@ -1119,7 +1134,7 @@ namespace synthese
 					{
 						Importable::DataSourceLinks links(course->syntheseService->getDataSourceLinks());
 						links.insert(make_pair(dataSourceOnSharedEnv, course->ref));
-						course->syntheseService->setDataSourceLinksWithoutRegistration(links);
+						course->syntheseService->setDataSourceLinksWithRegistration(links);
 						_servicesToSave.insert(course->syntheseService);
 
 						_logDebugDetail(
@@ -1361,10 +1376,13 @@ namespace synthese
 				DBTableSyncTemplate<AlarmTableSync>::Remove(NULL, id, transaction, false);
 			}
 
-			// Output of SQL queries in debug mode
-			BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+			// Output of SQL queries in trace mode
+			if (_minLogLevel < IMPORT_LOG_DEBG)
 			{
-				_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				BOOST_FOREACH(const DBTransaction::ModifiedRows::value_type& query, transaction.getUpdatedRows())
+				{
+					_logTrace(query.first +" "+ lexical_cast<string>(query.second));
+				}
 			}
 
 			return transaction;
@@ -1468,6 +1486,14 @@ namespace synthese
 				}
 			}
 			if(!updated)
+			{
+				return UpdateDeltas();
+			}
+			
+			// if course is ended, don't update it because it may have been cleaned by RTDataCleaner
+			// and we do not want update the course for tomorrow
+			boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
+			if(now.time_of_day() > syntheseService->GetTimeOfDay(horaires[horaires.size()-1].hrd) + minutes(1))
 			{
 				return UpdateDeltas();
 			}

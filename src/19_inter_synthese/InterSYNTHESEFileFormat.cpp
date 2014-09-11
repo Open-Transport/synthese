@@ -28,6 +28,7 @@
 #include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESEUpdateAckService.hpp"
+#include "ServerModule.h"
 #include "StaticFunctionRequest.h"
 
 using namespace boost;
@@ -95,7 +96,21 @@ namespace synthese
 				);
 
 				// Load the data
-				packet.load();
+				posix_time::ptime now(posix_time::second_clock::local_time());
+				// Test if import is auto
+				if(	getImport().get<Active>() )
+				{
+					// get upgradable access
+					boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
+					// get exclusive access
+					boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
+					packet.load();
+				}
+				else
+				{
+					// Manually loaded, avoid to use lock
+					packet.load();
+				}
 
 				// Send ACK if load did not throw exception
 				StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;

@@ -57,6 +57,10 @@ namespace synthese
 			const std::string& content,
 			bool readIdRange
 		){
+			if (content.size() == 0)
+			{
+				throw BadPacketException();
+			}
 			size_t i(0);
 			bool readingIdRange(readIdRange);
 			while(i < content.size())
@@ -71,6 +75,7 @@ namespace synthese
 					throw BadPacketException();
 				}
 				RegistryKeyType id(lexical_cast<RegistryKeyType>(content.substr(l, i-l)));
+				string strId(content.substr(l, i-l));
 				++i;
 
 				if (readingIdRange)
@@ -121,7 +126,7 @@ namespace synthese
 
 					_data.insert(
 						make_pair(
-							id,
+							strId,
 							item
 					)	);
 				}
@@ -133,7 +138,7 @@ namespace synthese
 		/// @pre !this.empty()
 		InterSYNTHESEPacket::IdRange InterSYNTHESEPacket::getIdRange() const
 		{
-			return make_pair(_data.begin()->first, _data.rbegin()->first);
+			return make_pair(lexical_cast<RegistryKeyType>(_data.begin()->first), lexical_cast<RegistryKeyType>(_data.rbegin()->first));
 		}
 
 
