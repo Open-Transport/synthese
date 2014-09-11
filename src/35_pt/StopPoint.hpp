@@ -44,6 +44,7 @@ namespace synthese
 		class LineStop;
 		class StopArea;
 		class JourneyPattern;
+		class StopPointInaccessibilityCalendar;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Physical stop (bus stop, etc.).
@@ -60,6 +61,7 @@ namespace synthese
 
 			/// Chosen registry class.
 			typedef util::Registry<StopPoint>	Registry;
+			typedef std::set<StopPointInaccessibilityCalendar*> AccessibilityMask;
 
 		private:
 			static const std::string DATA_X;
@@ -72,6 +74,7 @@ namespace synthese
 		private:
 			road::Address _projectedPoint;
 			std::string _name;
+			AccessibilityMask _accessibilityMask;
 
 		public:
 
@@ -90,12 +93,15 @@ namespace synthese
 			//@{
 				const road::Address& getProjectedPoint() const { return _projectedPoint; }
 				virtual std::string getName() const { return _name; }
+				const AccessibilityMask& getAccessibilityMask() const { return _accessibilityMask; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setProjectedPoint(const road::Address& value){ _projectedPoint = value; }
 				void setName(const std::string& value){ _name = value; }
+				void addAccessibilityMaskEntry(StopPointInaccessibilityCalendar* entry);
+				void removeAccessibilityMaskEntry(StopPointInaccessibilityCalendar* entry);
 			//@}
 
 			//! @name Services
@@ -137,6 +143,17 @@ namespace synthese
 				JourneyPatternsMap getJourneyPatterns(
 					bool withDepartures = true,
 					bool withArrivals = true
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the rule user is compatible with access parameters.
+				/// @param accessParameters access parameters
+				/// @return true if the rule user is compatible with the specified parameters
+				bool isCompatibleWith(
+					const graph::AccessParameters& accessParameters,
+					const boost::optional<boost::posix_time::ptime> atTime = boost::optional<boost::posix_time::ptime>()
 				) const;
 
 

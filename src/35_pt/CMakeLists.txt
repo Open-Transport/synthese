@@ -227,6 +227,14 @@ StopAreaMergeAction.cpp
 StopAreaMergeAction.hpp
 StopPoint.cpp
 StopPoint.hpp
+StopPointInaccessibilityCalendar.cpp
+StopPointInaccessibilityCalendar.hpp
+StopPointInaccessibilityCalendarUpdateAction.cpp
+StopPointInaccessibilityCalendarUpdateAction.hpp
+StopPointInaccessibilityCalendarAdmin.cpp
+StopPointInaccessibilityCalendarAdmin.hpp
+StopPointInaccessibilityCalendarTableSync.cpp
+StopPointInaccessibilityCalendarTableSync.hpp
 StopPointAddAction.cpp
 StopPointAddAction.hpp
 StopPointAdmin.cpp

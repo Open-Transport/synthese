@@ -38,6 +38,7 @@
 #include "JourneyPatternTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
 #include "ServiceQuotaTableSync.hpp"
+#include "StopPointInaccessibilityCalendarTableSync.hpp"
 
 #include "ContactCenterAdmin.hpp"
 #include "ContactCentersAdmin.hpp"
@@ -62,6 +63,7 @@
 #include "PTUseRulesAdmin.h"
 #include "PTUseRuleAdmin.h"
 #include "StopPointAdmin.hpp"
+#include "StopPointInaccessibilityCalendarAdmin.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "DRTAreasAdmin.hpp"
 
@@ -94,6 +96,7 @@
 #include "JourneyPatternUpdateAction.hpp"
 #include "LineStopAddAction.h"
 #include "StopPointUpdateAction.hpp"
+#include "StopPointInaccessibilityCalendarUpdateAction.hpp"
 #include "StopPointAddAction.hpp"
 #include "StopAreaAddAction.h"
 #include "LineStopUpdateAction.hpp"
@@ -129,6 +132,7 @@
 #include "NonConcurrencyRule.h"
 #include "DRTArea.hpp"
 #include "ServiceQuota.hpp"
+#include "StopPointInaccessibilityCalendar.hpp"
 
 #include "PTModule.inc.cpp"
 
@@ -165,6 +169,7 @@ void synthese::pt::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::pt::StopAreaTableSync>::integrate();
 	synthese::pt::LineStopTableSync::integrate();
 	synthese::pt::ServiceQuotaTableSync::integrate();
+	synthese::pt::StopPointInaccessibilityCalendarTableSync::integrate();
 
 	synthese::pt::PTModule::integrate();
 
@@ -188,6 +193,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PTUseRuleAdmin::integrate();
 	synthese::pt::PTUseRulesAdmin::integrate();
 	synthese::pt::StopPointAdmin::integrate();
+	synthese::pt::StopPointInaccessibilityCalendarAdmin::integrate();
 	synthese::pt::DRTAreaAdmin::integrate();
 	synthese::pt::DRTAreasAdmin::integrate();
 
@@ -235,6 +241,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::JourneyPatternUpdateAction::integrate();
 	synthese::pt::LineStopAddAction::integrate();
 	synthese::pt::StopPointUpdateAction::integrate();
+	synthese::pt::StopPointInaccessibilityCalendarUpdateAction::integrate();
 	synthese::pt::StopPointAddAction::integrate();
 	synthese::pt::StopAreaAddAction::integrate();
 	synthese::pt::LineStopUpdateAction::integrate();
@@ -271,4 +278,5 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
 	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
 	synthese::util::Env::Integrate<synthese::pt::ServiceQuota>();
+	synthese::util::Env::Integrate<synthese::pt::StopPointInaccessibilityCalendar>();
 }

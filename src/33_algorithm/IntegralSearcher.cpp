@@ -251,9 +251,8 @@ namespace synthese
 					if(origin->getGraphType() != _graphToUse)
 						continue;
 
-					// Checks if the vertex use rules are compliant with current user profile
-					const UseRule& vertexUseRule(origin->getUseRule(_accessParameters.getUserClassRank()));
-					if(	!vertexUseRule.isCompatibleWith(_accessParameters)
+					// Checks if the vertex use rules are compliant with current user profile at given time
+					if(!origin->isCompatibleWith(_accessParameters, minMaxDateTimeAtOrigin)
 					){
 						continue;
 					}
@@ -497,11 +496,8 @@ namespace synthese
 
 								const Vertex* reachedVertex(curEdge->getFromVertex());
 
-								// Checks if the vertex use rules are compliant with current user profile
-								const UseRule& vertexUseRule(
-									reachedVertex->getUseRule(_accessParameters.getUserClassRank())
-								);
-								if(	!vertexUseRule.isCompatibleWith(_accessParameters)
+								// Checks if the vertex use rules are compliant with current user profile at given time
+								if(!reachedVertex->isCompatibleWith(_accessParameters, departureMoment)
 								){
 									continue;
 								}
