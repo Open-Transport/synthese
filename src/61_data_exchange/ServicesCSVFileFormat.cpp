@@ -327,8 +327,12 @@ namespace synthese
 						{
 							if(serviceDetail.serviceNumber != "-1")
 							{
-								// creation of the service
-								serviceDetailVector.push_back(serviceDetail);
+								// creation of the service if we have more than one
+								// stop in it.
+								if(serviceDetail.stops.size() > 1)
+								{
+									serviceDetailVector.push_back(serviceDetail);
+								}
 								serviceDetail.arrivalSchedules.clear();
 								serviceDetail.departureSchedules.clear();
 								serviceDetail.stops.clear();

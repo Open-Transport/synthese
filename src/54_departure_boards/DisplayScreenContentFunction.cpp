@@ -757,7 +757,13 @@ namespace synthese
 						journeyPattern->getDirectionObj()->getDisplayedText() :
 						journeyPattern->getDirection()
 					) <<
+					"\" wayback=\"" << (journeyPattern->getWayBack() ? "1" : "0") <<
+					"\" >";
+				stream <<"<network id=\""<< commercialLine->getNetwork()->getKey() <<
+					"\" name=\""      << commercialLine->getNetwork()->getName() <<
+					"\" image=\""      << commercialLine->getNetwork()->getImage() <<
 					"\" />";
+				stream << "</line>";
 			}
 
 			const StopArea& origin(
@@ -823,7 +829,12 @@ namespace synthese
 					"\" xmlColor=\""  << (serviceReal.commercialLine->getColor() ? serviceReal.commercialLine->getColor()->toXMLColor() : "") <<
 					"\" style=\""     << serviceReal.commercialLine->getStyle() <<
 					"\" image=\""     << serviceReal.commercialLine->getImage() <<
+					"\" >";
+				stream <<"<network id=\""<< serviceReal.commercialLine->getNetwork()->getKey() <<
+					"\" name=\""      << serviceReal.commercialLine->getNetwork()->getName() <<
+					"\" image=\""      << serviceReal.commercialLine->getNetwork()->getImage() <<
 					"\" />";
+				stream << "</line>";
 			}
 
 			stream << "<destination id=\"" << serviceReal.destination->getKey() <<
@@ -885,6 +896,7 @@ namespace synthese
 			{
 				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 				commercialLine->toParametersMap(*linePM, true);
+				linePM->insert("wayback",journeyPattern->getWayBack());
 				journeyPm->insert("line", linePM);
 			}
 
@@ -1441,9 +1453,11 @@ namespace synthese
 
 								++*index;
 
-							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
+								departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+								{
 									continue;
+								}
 
 								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
 								const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
@@ -1699,17 +1713,39 @@ namespace synthese
 				{
 					endDateTime = (_date ? *_date : now);
 					if(endDateTime.time_of_day() > endOfService)
+					{
 						startDateTime = ptime(endDateTime.date(), endOfService);
+					}
 					else
+					{
 						startDateTime = ptime(endDateTime.date() - boost::gregorian::days(1), endOfService);
+					}
 				}
-				else 
+				else
 				{
 					startDateTime = (_date ? *_date : now);
 					if(startDateTime.time_of_day() > endOfService)
-						endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+					{
+						if(_screen.get() && _screen->getMaxDelay() != 0)
+						{
+							endDateTime = ptime(startDateTime);
+							endDateTime += minutes(_screen->getMaxDelay());
+							time_period period(startDateTime, endDateTime);
+							// Limit the endDateTime to the date of the next day, at time 'endOfService'.
+							if (period.contains(ptime(startDateTime.date() + boost::gregorian::days(1), endOfService)))
+							{
+								endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+							}
+						}
+						else
+						{
+							endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+						}
+					}
 					else
+					{
 						endDateTime = ptime(startDateTime.date(), endOfService);
+					}
 				}
 
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
@@ -1974,7 +2010,7 @@ namespace synthese
 									break;
 								++*index;
 
-							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
+								departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 									continue;
 
@@ -2033,10 +2069,12 @@ namespace synthese
 									}
 								}
 
-							time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
+								time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
 								int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
-							if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
+								if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
+								{
 									mapKeyMinutes += 86400;
+								}
 
 								OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
 								//Check if a service is already inserted for this date

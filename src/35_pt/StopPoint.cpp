@@ -35,6 +35,7 @@
 #include "CommercialLineTableSync.h"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
+#include "TransportNetwork.h"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -61,6 +62,10 @@ namespace synthese
 
 	namespace pt
 	{
+        typedef tuple<RegistryKeyType, RegistryKeyType> LineTuple;
+        typedef map<string, LineTuple> LinesMap;
+
+
 		const string StopPoint::DATA_OPERATOR_CODE = "operatorCode";
 		const string StopPoint::DATA_X = "x";
 		const string StopPoint::DATA_Y = "y";
@@ -261,7 +266,7 @@ namespace synthese
 			)	);
 
 			// Commercial lines
-			set<string> linesSet;
+            LinesMap linesMap;
 			boost::shared_ptr<ParametersMap> linesPm(new ParametersMap);
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
 			{
@@ -270,7 +275,9 @@ namespace synthese
 				{
 					continue;
 				}
-				linesSet.insert(jp->getCommercialLine()->getShortName());
+                linesMap.insert(pair<string, LineTuple>(jp->getCommercialLine()->getShortName(),
+                                                     LineTuple(jp->getCommercialLine()->getKey(),
+                                                               jp->getCommercialLine()->getNetwork()->getKey())));
 			}
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
 			{
@@ -278,15 +285,19 @@ namespace synthese
 				if(!jp)
 				{
 					continue;
-				}
-				linesSet.insert(jp->getCommercialLine()->getShortName());
+                }
+                linesMap.insert(pair<string, LineTuple>(jp->getCommercialLine()->getShortName(),
+                                                     LineTuple(jp->getCommercialLine()->getKey(),
+                                                               jp->getCommercialLine()->getNetwork()->getKey())));
 			}
-			BOOST_FOREACH(string line, linesSet)
-			{
-				boost::shared_ptr<ParametersMap> linePm(new ParametersMap);
-				linePm->insert(prefix + CommercialLineTableSync::COL_SHORT_NAME,line);
-				linesPm->insert(prefix + "line",linePm);
-			}
+            BOOST_FOREACH(const LinesMap::value_type& item, linesMap)
+            {
+                boost::shared_ptr<ParametersMap> linePm(new ParametersMap);
+                linePm->insert(prefix + "line_id", item.second.get<0>());
+                linePm->insert(prefix + CommercialLineTableSync::COL_SHORT_NAME,item.first);
+                linePm->insert(prefix + CommercialLineTableSync::COL_NETWORK_ID,item.second.get<1>());
+                linesPm->insert(prefix + "line",linePm);
+            }
 			pm.insert(prefix + "lines", linesPm);
 
 			// X Y (deprecated)

@@ -119,6 +119,8 @@ namespace synthese
 		const string IneoFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 		const string IneoFileFormat::Importer_::PARAMETER_FORBIDDEN_SERVICE_USE_RULE = "forbidden_service_use_rule";
 		const string IneoFileFormat::Importer_::PARAMETER_VEHICLE_SERVICE_SUFFIX = "vehicle_service_suffix";
+		const string IneoFileFormat::Importer_::PARAMETER_DEPOT_TO_STOP_IS_HLP = "depot_to_stop_is_hlp";
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_TO_DEPOT_IS_HLP = "stop_to_depot_is_hlp";
 	}
 
 	namespace impex
@@ -173,6 +175,8 @@ namespace synthese
 			PTOperationFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_autoImportStops(false),
 			_displayLinkedStops(false),
+			_depotToStopIsHLP(false),
+			_stopToDepotIsHLP(false),
 			_interactive(false),
 			_addWaybackToJourneyPatternCode(false),
 			_destinations(*import.get<DataSource>(), _env),
@@ -807,10 +811,15 @@ namespace synthese
 					){
 						SchedulesBasedService* service(NULL);
 						if(	route &&
-							(tcou == TCOU_Commercial || tcou == TCOU_HLP)
+							(tcou == TCOU_Commercial || tcou == TCOU_HLP ||
+							 (tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+							 (tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
 						){
 							RuleUser::Rules forbiddenServiceRules;
-							if (tcou == TCOU_HLP) {
+							if (tcou == TCOU_HLP ||
+								(tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+								(tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
+							{
 								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
 								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
 								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
@@ -940,7 +949,9 @@ namespace synthese
 						route = NULL;
 
 						// Line
-						if(tcou == TCOU_Commercial || tcou == TCOU_HLP)
+						if(tcou == TCOU_Commercial || tcou == TCOU_HLP ||
+						   (tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+						   (tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
 						{
 							if(_lineReadMethod == VALUE_CIDX)
 							{
@@ -1236,11 +1247,20 @@ namespace synthese
 				map.insert(PARAMETER_FORBIDDEN_SERVICE_USE_RULE, _forbiddenServiceUseRule->getKey());
 			}
 
+			// Forbidden service use rule
+			if(_forbiddenServiceUseRule.get())
+			{
+				map.insert(PARAMETER_FORBIDDEN_SERVICE_USE_RULE, _forbiddenServiceUseRule->getKey());
+			}
+
 			// Journey pattern line overload field
 			if(!_journeyPatternLineOverloadField.empty())
 			{
 				map.insert(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField);
 			}
+
+			map.insert(PARAMETER_DEPOT_TO_STOP_IS_HLP, _depotToStopIsHLP);
+			map.insert(PARAMETER_STOP_TO_DEPOT_IS_HLP, _stopToDepotIsHLP);
 
 			return map;
 		}
@@ -1328,6 +1348,9 @@ namespace synthese
 			{
 				throw Exception("No such forbidden service use rule");
 			}
+
+			_depotToStopIsHLP = map.getDefault<bool>(PARAMETER_DEPOT_TO_STOP_IS_HLP, false);
+			_stopToDepotIsHLP = map.getDefault<bool>(PARAMETER_STOP_TO_DEPOT_IS_HLP, false);
 
 			// Calendar dates
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_CAL));

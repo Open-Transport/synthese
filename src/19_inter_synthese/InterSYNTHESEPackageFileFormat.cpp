@@ -54,6 +54,7 @@ namespace synthese
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_URL = "url";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_USER = "user";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_NO_SUPPRESS_TOP_LEVEL = "no_suppress_top_level";
+		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_NO_SUPPRESS_ANYTHING = "no_suppress_anything";
 
 
 
@@ -86,7 +87,8 @@ namespace synthese
 						result,
 						const_cast<Import&>(this->getImport()),
 						*this,
-						_noSuppressTopLevel
+						_noSuppressTopLevel,
+						_noSuppressAnything
 				)	);
 			}
 			catch(std::exception& e)
@@ -127,6 +129,9 @@ namespace synthese
 			
 			// No Suppress top level objects
 			_noSuppressTopLevel = map.getDefault<bool>(PARAMETER_NO_SUPPRESS_TOP_LEVEL, false);
+			
+			// No Suppress anything
+			_noSuppressAnything = map.getDefault<bool>(PARAMETER_NO_SUPPRESS_ANYTHING, false);
 		}
 
 
@@ -158,7 +163,8 @@ namespace synthese
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			ConnectionImporter<InterSYNTHESEPackageFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			_lock(false),
-			_noSuppressTopLevel(false)
+			_noSuppressTopLevel(false),
+			_noSuppressAnything(false)
 		{}
 }	}
 

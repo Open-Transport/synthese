@@ -454,6 +454,10 @@ namespace synthese
 					(jpName[len - 3] == 'A' || jpName[len - 3] == 'R'))
 				{
 					lineInfo.lineName = jpName.substr(0, len - 3);
+					if (lineInfo.lineName[lineInfo.lineName.size()-1] == '-')
+					{
+						lineInfo.lineName = lineInfo.lineName.substr(0, lineInfo.lineName.size()-1);
+					}
 					lineInfo.routeName = jpName.substr(len - 2, 2);
 					return;
 				}
@@ -729,8 +733,8 @@ namespace synthese
 					scheduleInfo.departureTime += minutes(waitingMinutes);
 				}
 
-				scheduleInfo.departure = parser.getCellInt("AS_MONT_INTERDIT") == 0;
-				scheduleInfo.arrival = parser.getCellInt("AS_DESC_INTERDIT") == 0;
+				scheduleInfo.departure = parser.getCellInt("AS_MONT_INTERDIT") == 0 || parser.getCellInt("AS_MONT_INTERDIT") == -1; // NULL will return -1
+				scheduleInfo.arrival = parser.getCellInt("AS_DESC_INTERDIT") == 0 || parser.getCellInt("AS_DESC_INTERDIT") == -1;
 
 				serviceInfo[rank] = scheduleInfo;
 			}

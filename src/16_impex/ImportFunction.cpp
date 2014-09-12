@@ -134,7 +134,15 @@ namespace synthese
 						_output,
 						_result
 					);
-                    _importer->openLogFile();
+					try
+					{
+						_importer->openLogFile();
+					}
+					catch(const boost::filesystem::filesystem_error& e)
+					{
+						throw RequestException("Failed to access log directory '" +
+											   logPath + "': " + e.code().message());
+					}
 				}
 				else
 				{

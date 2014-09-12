@@ -60,6 +60,7 @@ namespace synthese
 		const string TransportNetworkTableSync::COL_CREATOR_ID("creator_id");
 		const string TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID("days_calendars_parent_id");
 		const string TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID("periods_calendars_parent_id");
+		const string TransportNetworkTableSync::COL_IMAGE("image");
 	}
 
 	namespace db
@@ -77,6 +78,7 @@ namespace synthese
 			Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
 			Field(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, SQL_INTEGER),
 			Field(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, SQL_INTEGER),
+			Field(TransportNetworkTableSync::COL_IMAGE, SQL_TEXT),
 			Field()
 		};
 
@@ -122,6 +124,7 @@ namespace synthese
 			)	);
 			query.addField(object->getDaysCalendarsParent() ? object->getDaysCalendarsParent()->getKey() : RegistryKeyType(0));
 			query.addField(object->getPeriodsCalendarsParent() ? object->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0));
+			query.addField(object->getImage());
 			query.execute(transaction);
 		}
 

@@ -91,7 +91,8 @@ namespace synthese
 			NamedPlaceTemplate<StopArea>(),
 			_isMainPlaceOfCity(false),
 			_allowedConnection(allowedConnection),
-			_defaultTransferDelay(defaultTransferDelay)
+			_defaultTransferDelay(defaultTransferDelay),
+			_isRelayPark(false)
 		{
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
@@ -537,6 +538,10 @@ namespace synthese
 				getDefaultTransferDelay().total_seconds() / 60
 			);
 			pm.insert(
+				prefix + StopAreaTableSync::TABLE_COL_ISRELAYPARK,
+				_isRelayPark
+			);
+			pm.insert(
 				prefix + StopAreaTableSync::TABLE_COL_TRANSFERDELAYS,
 				StopArea::SerializeTransferDelaysMatrix(getTransferDelays())
 			);
@@ -739,6 +744,21 @@ namespace synthese
 				if(defaultTransferDelay != getDefaultTransferDelay())
 				{
 					setDefaultTransferDelay(defaultTransferDelay);
+					result = true;
+				}
+			}
+			
+			// Is relay park
+			if (record.isDefined(StopAreaTableSync::TABLE_COL_ISRELAYPARK))
+			{
+				bool isRelayPark(
+					record.getDefault<bool>(
+						StopAreaTableSync::TABLE_COL_ISRELAYPARK,
+						false
+				)   );
+				if (isRelayPark != getIsRelayPark())
+				{
+					setIsRelayPark(isRelayPark);
 					result = true;
 				}
 			}

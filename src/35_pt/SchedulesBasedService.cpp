@@ -821,7 +821,14 @@ namespace synthese
 				// Size check
 				if (dynamic_cast<JourneyPattern*>(_path))
 				{
-					if(rank < static_cast<JourneyPattern*>(_path)->getLineStops().size())
+					const JourneyPattern* line(
+						static_cast<const JourneyPattern*>(_path)
+					);
+					if (rank < line->getLineStops().size())
+					{
+						Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
+					}
+					for(; rank<_path->getEdges().size(); ++rank)
 					{
 						Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
 						for(; rank<static_cast<JourneyPattern*>(_path)->getLineStops().size(); ++rank)

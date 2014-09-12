@@ -258,7 +258,9 @@ namespace synthese
 			boost::optional<std::size_t> number, /*= 0*/
 			bool orderByName,
 			bool raisingOrder,
-			LinkLevel linkLevel
+			LinkLevel linkLevel,
+			boost::logic::tribool mainRoad,
+			bool isDifferentFromExactName
 		){
 			stringstream query;
 			query
@@ -266,11 +268,13 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (exactName)
-			 	query << " AND " << COL_NAME << "=" << Conversion::ToDBString(*exactName);
+				query << " AND " << COL_NAME << (isDifferentFromExactName ? "!=" : "=") << Conversion::ToDBString(*exactName);
 			if (likeName)
 				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*likeName);
 			if (cityId)
 				query << " AND " << COL_CITYID << "=" <<*cityId;
+			if (!logic::indeterminate(mainRoad))
+				query << " AND " << COL_ISCITYMAINROAD << "=" << (mainRoad ? "1" : "0");
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number)

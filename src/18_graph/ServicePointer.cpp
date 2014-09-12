@@ -366,7 +366,16 @@ namespace synthese
 						drtAreaSequence = false;
 					}
 				}
-				boost::shared_ptr<LineString> geometry(edge->getRealGeometry());
+				
+				boost::shared_ptr<LineString> geometry;
+				try
+				{
+					geometry = edge->getRealGeometry();
+				}
+				catch (...)
+				{
+					continue;
+				}
 				if(!geometry.get() || geometry->isEmpty())
 				{
 					continue;

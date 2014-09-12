@@ -49,6 +49,8 @@ namespace synthese
 		public:
 			/// @name Parameter identifiers
 			//@{
+			static const std::string TAB_DETAILS;
+			static const std::string TAB_PROPERTIES;
 			//@}
 
 		private:
@@ -125,6 +127,17 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const server::Request& request
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds the tabs of the page.
+			/// @param profile The profile of the current user
+			/// @author Thomas Puigt
+			/// @date 2014
+			virtual void _buildTabs(
+				const security::Profile& profile
 			) const;
 
 

@@ -30,9 +30,6 @@
 #include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-using namespace std;
-using namespace boost;
-
 namespace synthese
 {
 	namespace pt

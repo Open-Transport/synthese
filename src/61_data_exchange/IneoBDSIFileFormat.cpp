@@ -72,6 +72,7 @@ namespace synthese
 
 	namespace data_exchange
 	{
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = "mr_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
@@ -90,6 +91,7 @@ namespace synthese
 		
 		void IneoBDSIFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
+			_dbConnString = map.getOptional<string>(PARAMETER_DB_CONN_STRING);
 			// Planned datasource
 			try
 			{
@@ -220,6 +222,16 @@ namespace synthese
 		bool IneoBDSIFileFormat::Importer_::_read(
 		) const {
 
+			boost::shared_ptr<DB> db;
+			if(_dbConnString)
+			{
+				db = DBModule::GetDBForStandaloneUse(*_dbConnString);
+			}
+			else
+			{
+				db = DBModule::GetDBSPtr();
+			}
+
 			const time_duration dayBreakTime(hours(3));
 			date today(day_clock::local_day());
 			ptime now(second_clock::local_time());
@@ -248,7 +260,6 @@ namespace synthese
 			Arrets arrets;
 			Chainages chainages;
 			Programmations programmations;
-			DB& db(*DBModule::GetDB());
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
 			
 			// Arrets
@@ -256,7 +267,7 @@ namespace synthese
 				string query(
 					"SELECT ref, mnemol, nom FROM "+ _database +".ARRET GROUP BY ref ORDER BY ref"
 				);
-				DBResultSPtr result(db.execQuery(query));
+				DBResultSPtr result(db->execQuery(query));
 				while(result->next())
 				{
 					// Fields load
@@ -313,7 +324,7 @@ namespace synthese
 				string query(
 					"SELECT ref, mnemo FROM "+ _database +".LIGNE WHERE jour="+ todayStr
 				);
-				DBResultSPtr result(db.execQuery(query));
+				DBResultSPtr result(db->execQuery(query));
 				while(result->next())
 				{
 					// Fields load
@@ -376,7 +387,7 @@ namespace synthese
 						_database +".ARRETCHN.chainage, "+
 						_database +".ARRETCHN.pos"
 				);			
-				DBResultSPtr chainageResult(db.execQuery(chainageQuery));
+				DBResultSPtr chainageResult(db->execQuery(chainageQuery));
 				string lastRef;
 				const Ligne* ligne(NULL);
 				Chainage::ArretChns arretChns;
@@ -498,7 +509,7 @@ namespace synthese
 						_database +".HORAIRE.course, "+
 						_database +".ARRETCHN.pos"
 				);
-				DBResultSPtr horaireResult(db.execQuery(horaireQuery));
+				DBResultSPtr horaireResult(db->execQuery(horaireQuery));
 				time_duration nowDuration(now.time_of_day() < _dayBreakTime ? now.time_of_day() + hours(24) : now.time_of_day());
 				time_duration nowPlusDelay(nowDuration + _delay_bus_stop);
 				string lastCourseRef;
@@ -632,8 +643,8 @@ namespace synthese
 					"SELECT * FROM "+ _database +".DESTINATAIRE WHERE ref_prog IN (SELECT "+
 					_database +".PROGRAMMATION.ref FROM "+ _database +".PROGRAMMATION WHERE nature_dst LIKE 'BORNE%') ORDER BY ref_prog"
 				);
-				DBResultSPtr result(db.execQuery(query));
-				DBResultSPtr destResult(db.execQuery(destQuery));
+				DBResultSPtr result(db->execQuery(query));
+				DBResultSPtr destResult(db->execQuery(destQuery));
 				destResult->next();
 				while(result->next())
 				{
@@ -906,7 +917,11 @@ namespace synthese
 				);
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingService, existingServices)
 				{
-					ScheduledService* service(static_cast<ScheduledService*>(existingService.second));
+					ScheduledService* service(dynamic_cast<ScheduledService*>(existingService.second));
+					if(!service)
+					{
+						continue;
+					}
 
 					servicesToUnlink.insert(service);
 
@@ -1005,7 +1020,10 @@ namespace synthese
 								servicesToRemove.erase(service);
 
 								// The service must be linked
-								servicesToLink.push_back(&course);
+								if(!service->hasCodeBySource(*dataSourceOnSharedEnv, course.ref))
+								{
+									servicesToLink.push_back(&course);
+								}
 								break;
 							}
 							else if ( course == *service )
@@ -1188,6 +1206,8 @@ namespace synthese
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
 			}
 
+			saveNow().run();
+
 			return true;
 		}
 		
@@ -1316,6 +1336,11 @@ namespace synthese
 
 
 		DBTransaction IneoBDSIFileFormat::Importer_::_save() const
+		{
+			return DBTransaction();
+		}
+
+		DBTransaction IneoBDSIFileFormat::Importer_::saveNow() const
 		{
 			DBTransaction transaction;
 

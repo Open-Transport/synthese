@@ -743,11 +743,13 @@ namespace synthese
 			if(!result)
 			{
 				creation = true;
-				_logCreation(
-					"Creation of route "+ (name ? *name : string()) +" for "+ (id ? *id : string("unknown"))
-				);
 				result = new JourneyPattern(
 					JourneyPatternTableSync::getId()
+				);
+				_logCreation(
+					"Creation of route " + lexical_cast<string>(result->getKey()) +
+							" " + (name ? *name : string()) +
+							" for "+ (id ? *id : string("unknown"))
 				);
 
 				// Line link
