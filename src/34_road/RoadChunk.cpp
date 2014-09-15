@@ -560,10 +560,28 @@ namespace synthese
 
 			if(hasGeometry())
 			{
-				pm.insert(
-					prefix + TABLE_COL_GEOMETRY,
-					static_pointer_cast<geos::geom::Geometry, LineString>(getGeometry())
-				);
+				if(!getGeometry().get() || getGeometry()->isEmpty())
+				{
+					pm.insert(
+						prefix + TABLE_COL_GEOMETRY,
+						string()
+					);
+				}
+				else
+				{
+					boost::shared_ptr<geos::geom::Geometry> projected(getGeometry());
+					if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+						static_cast<CoordinatesSystem::SRID>(getGeometry()->getSRID())
+					){
+						projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*getGeometry());
+					}
+					
+					geos::io::WKTWriter writer;
+					pm.insert(
+						prefix + TABLE_COL_GEOMETRY,
+						writer.write(projected.get())
+					);
+                }
 			}
 			else
 			{
