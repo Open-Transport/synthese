@@ -89,6 +89,7 @@ namespace synthese
 				static const std::string PARAMETER_DB_CONN_STRING;
 				static const std::string PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID;
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
+				static const std::string PARAMETER_STOP_CODE_PREFIX;
 				static const std::string PARAMETER_HYSTERESIS;
 				static const std::string PARAMETER_DELAY_BUS_STOP;
 				static const std::string PARAMETER_DAY_BREAK_TIME;
@@ -98,6 +99,7 @@ namespace synthese
 			private:
 				boost::optional<std::string> _dbConnString;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
+				boost::optional<std::string> _stopCodePrefix;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 				boost::shared_ptr<const messages::MessagesSection> _messagesSection;
 				boost::posix_time::time_duration _hysteresis;
@@ -142,6 +144,7 @@ namespace synthese
 					std::string nom;
 					const Ligne* ligne;
 					bool sens;
+                    std::string destsms;
 					typedef std::vector<ArretChn> ArretChns;
 					ArretChns arretChns;
 
@@ -161,6 +164,7 @@ namespace synthese
 					const Ligne& ligne,
 					const std::string& nom,
 					bool sens,
+                    const std::string& destsms,
 					const std::string& chainageRef
 				) const;
 
