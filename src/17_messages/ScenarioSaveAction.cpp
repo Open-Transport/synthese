@@ -30,6 +30,9 @@
 #include "MessageTypeTableSync.hpp"
 #include "MessagesModule.h"
 #include "MessagesSection.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
@@ -70,6 +73,7 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 	using namespace impex;
+    using namespace messages;
 
 	template<> const string util::FactorableTemplate<Action,messages::ScenarioSaveAction>::FACTORY_KEY("scenario_save");
 
@@ -1300,9 +1304,38 @@ namespace synthese
 
 		bool ScenarioSaveAction::isAuthorized(
 			const Session* session
-		) const {
-			return true;
-//			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
+        ) const {
+            bool result = session && session->hasProfile();
+            // Making some checks about Messages section rights
+            if (!_sections)
+            {
+                if (_scenario)
+                {
+                    if (!_scenario->getSections().empty())
+                    {
+                        BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
+                        {
+                            result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+                                        WRITE,
+                                        UNKNOWN_RIGHT_LEVEL,
+                                        MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+                                        );
+                        }
+                    }
+                }
+            }
+            else
+            {
+                BOOST_FOREACH(const Scenario::Sections::value_type& section, *_sections)
+                {
+                    result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+                        WRITE,
+                        UNKNOWN_RIGHT_LEVEL,
+                        MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+                        );
+                }
+            }
+            return result;
 		}
 
 

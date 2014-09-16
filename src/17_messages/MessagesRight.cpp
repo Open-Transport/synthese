@@ -46,10 +46,10 @@ namespace synthese
 		template<> const std::string FactorableTemplate<Right, MessagesRight>::FACTORY_KEY("Messages");
 	}
 
-    	namespace messages
-    	{
-    		const string MessagesRight::MESSAGES_SECTION_FACTORY_KEY = "messagessection";
-    	}
+    namespace messages
+    {
+        const string MessagesRight::MESSAGES_SECTION_FACTORY_KEY = "messagessection";
+    }
 
 	namespace security
 	{
@@ -136,20 +136,39 @@ namespace synthese
 			vector<string> parts;
 			split(parts, _parameter, is_any_of("/"));
 
+            vector<string> perimeterparts;
+            split(perimeterparts, perimeter, is_any_of("/"));
+
 			if(parts.size() == 2)
 			{
                 if (parts[0] == MESSAGES_SECTION_FACTORY_KEY)
                 {
                     if (parts[1] == GLOBAL_PERIMETER)
                         return true;
-                    else
+                    else if (perimeterparts.size() == 2)
                     {
-                        return false;
+                        if (parts[1] == perimeterparts[1])
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
+                    else if (parts[1] == perimeter)
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
                 }
-				boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
-				boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
-				return subright->perimeterIncludes(perimeter, env);
+                else
+                {
+                    boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
+                    boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
+                    return subright->perimeterIncludes(perimeter, env);
+                }
 			}
 			else
 			{
