@@ -75,6 +75,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = "mr_ds";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID = "th_ds";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_STOP_CODE_PREFIX = "stop_code_prefix";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
@@ -98,6 +99,7 @@ namespace synthese
 				_plannedDataSource = Env::GetOfficialEnv().get<DataSource>(
 					map.get<RegistryKeyType>(PARAMETER_PLANNED_DATASOURCE_ID)
 				);
+				_stopCodePrefix = map.getOptional<string>(PARAMETER_STOP_CODE_PREFIX);
 			}
 			catch(ObjectNotFoundException<DataSource>&)
 			{
@@ -187,6 +189,7 @@ namespace synthese
 			const Ligne& ligne,
 			const std::string& nom,
 			bool sens,
+			const std::string& destsms,
 			const std::string& ref
 		) const	{
 
@@ -210,6 +213,7 @@ namespace synthese
 			chainage.ligne = &ligne;
 			chainage.nom = nom;
 			chainage.sens = sens;
+			chainage.destsms = destsms;
 			chainage.arretChns = arretchns;
 			_logLoadDetail(
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
@@ -277,7 +281,7 @@ namespace synthese
 
 					// SYNTHESE stop point
 					StopPoint* stopPoint(
-						_plannedDataSource->getObjectByCode<StopPoint>(mnemol)
+						_plannedDataSource->getObjectByCode<StopPoint>(*_stopCodePrefix + mnemol)
 					);
 					Depot* depot(NULL);
 					if(stopPoint)
@@ -365,6 +369,48 @@ namespace synthese
 				}
 			}
 
+			// Extra line overload
+			// TODO, pass the hard coded values as a service parameter
+			{
+				vector<string> overloadLines;
+				overloadLines.push_back("S.SCOL");
+				overloadLines.push_back("S.USINES");
+				BOOST_FOREACH(string overload, overloadLines)
+				{
+					CommercialLine* line(
+						_plannedDataSource->getObjectByCode<CommercialLine>(overload)
+					);
+					if(line)
+					{
+						_logLoadDetail(
+							"LINE",overload,overload,line->getKey(),line->getName(),string(), string(), "OK"
+						);
+					}
+					else
+					{
+						Log::GetInstance().warn("No such line : " + overload);
+						_logWarningDetail(
+							"LINE",overload,overload,0,string(), string(),string(), "NOT FOUND"
+						);
+						continue;
+					}
+
+					// Registration
+					Ligne& ligne(
+						lignes.insert(
+							make_pair(
+								overload,
+								Ligne()
+						)	).first->second
+					);
+
+					// Copy of values
+					ligne.ref = overload;
+					ligne.syntheseLine = line;
+					_logLoad("OVERLOAD BY DESTSMS " + overload + " => " + line->getName());
+				}
+			}
+
 			// Chainages
 			{
 				string chainageQuery(
@@ -376,22 +422,26 @@ namespace synthese
 						_database +".ARRETCHN.chainage,"+
 						_database +".CHAINAGE.nom,"+
 						_database +".CHAINAGE.sens,"+
-						_database +".CHAINAGE.ligne "+
+						_database +".CHAINAGE.ligne,"+
+						_database +".DEST.destsms "+
 					" FROM "+
+						_database +".DEST, "+
 						_database +".ARRETCHN "+
 						" INNER JOIN "+ _database +".CHAINAGE ON "+
-							_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
+								_database +".CHAINAGE.ref="+ _database +".ARRETCHN.chainage AND "+ _database +".CHAINAGE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
-						_database +".CHAINAGE.jour="+ todayStr +
+						_database +".CHAINAGE.jour="+ todayStr +" AND "+ _database +".CHAINAGE.dest="+ _database +".DEST.ref "+"AND "+ _database +".CHAINAGE.jour="+ _database +".DEST.jour "
 					" ORDER BY "+
 						_database +".ARRETCHN.chainage, "+
 						_database +".ARRETCHN.pos"
-				);			
+				);
+
 				DBResultSPtr chainageResult(db->execQuery(chainageQuery));
 				string lastRef;
 				const Ligne* ligne(NULL);
 				Chainage::ArretChns arretChns;
 				bool sens(false);
+				string destsms;
 				string nom;
 				while(chainageResult->next())
 				{
@@ -408,6 +458,7 @@ namespace synthese
 							*ligne,
 							nom,
 							sens,
+							destsms,
 							lastRef
 						);
 					}
@@ -417,22 +468,31 @@ namespace synthese
 					{
 						string ligneRef(chainageResult->get<string>("ligne"));
 						nom = chainageResult->getText("nom");
+						destsms = chainageResult->getText("destsms");
+						sens = (chainageResult->getText("sens") == "R");
 
-						// Check of the ligne
-						Lignes::const_iterator it(
-							lignes.find(ligneRef)
-						);
-						if(it == lignes.end())
+						// Try to get the line by it's destsms
+						// TODO, pass the hard coded values as a service parameter
+						if(destsms == "S.USINES" || destsms == "S.SCOL")
 						{
-							ligne = NULL;
-							_logWarningDetail(
-								"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"LINE NOT FOUND"
-							);
+							ligneRef = destsms;
+							_logLoad("OVERLOAD LOAD FOR " + destsms);
 						}
-						else
+
 						{
-							ligne = &it->second;
-							sens = (chainageResult->getText("sens") == "R");
+							// Line loading
+							Lignes::const_iterator it(lignes.find(ligneRef));
+							if(it == lignes.end())
+							{
+								ligne = NULL;
+								_logWarningDetail(
+											"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"LINE NOT FOUND"
+											);
+							}
+							else
+							{
+								ligne = &it->second;
+							}
 						}
 
 						// Beginning load of the next ref
@@ -482,6 +542,7 @@ namespace synthese
 						*ligne,
 						nom,
 						sens,
+						destsms,
 						lastRef
 					);
 				}
@@ -495,8 +556,10 @@ namespace synthese
 						_database +".HORAIRE.hrd,"+
 						_database +".HORAIRE.hta,"+
 						_database +".HORAIRE.htd,"+
+			#if 0 /* T2C BDSI DOES NOT HAVE THIS FIELD */
 						_database +".HORAIRE.etat_harr,"+
 						_database +".HORAIRE.etat_hdep,"+
+			#endif
 						_database +".HORAIRE.course,"+
 						_database +".ARRETCHN.chainage "+
 					"FROM "+
@@ -595,6 +658,7 @@ namespace synthese
 					}
 
 					// Patch for bad schedules when the bus is at stop
+#if 0
 					if(	(	(	horaireResult->getText("etat_harr") == "R" &&
 								horaireResult->getText("etat_hdep") == "E"
 							) || (
@@ -605,7 +669,7 @@ namespace synthese
 					){
 						horaire.hrd = nowPlusDelay;
 					}
-
+#endif
 					// Trace
 					_logTraceDetail(
 						"SCHEDULE_HTD",courseRef,courseRef,0,string(),horaireResult->getText("htd"),to_simple_string(horaire.htd),"OK"
@@ -633,7 +697,7 @@ namespace synthese
 					);
 				}
 			}			
-
+#if 0
 			// Programmations
 			{
 				string query(
@@ -708,7 +772,7 @@ namespace synthese
 					} while(destResult->next());
 				}
 			}
-
+#endif
 
 			//////////////////////////////////////////////////////////////////////////
 			// Import content analyzing
