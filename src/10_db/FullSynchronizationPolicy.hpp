@@ -25,6 +25,8 @@
 
 #include "Env.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace synthese
 {
 	namespace db
@@ -167,7 +169,9 @@ namespace synthese
 					{
 						registry.remove(key);
 					}
-					util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
+					util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : " +
+						boost::lexical_cast<string>(key) + " : ", e
+					);
 				}
 			}
 		}

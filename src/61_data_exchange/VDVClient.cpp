@@ -58,13 +58,14 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(ReplyAddress, "reply_address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ReplyPort, "reply_port", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(TransportNetworkID, "transport_network_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TransportNetworks, "transport_network_ids", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DefaultDirection, "default_direction", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(SBBMode, "sbb_mode", SQL_BOOLEAN)
 	
 	namespace data_exchange
 	{
 		const string VDVClient::TAG_SUBSCRIPTION = "subscription";
+		const string VDVClient::TAG_TRANSPORT_NETWORK = "transport_network";
 
 
 
@@ -82,7 +83,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceUrl),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
-					FIELD_DEFAULT_CONSTRUCTOR(TransportNetworkID),
+					FIELD_DEFAULT_CONSTRUCTOR(TransportNetworks),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
 					FIELD_VALUE_CONSTRUCTOR(Active, true),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath),
@@ -230,6 +231,14 @@ namespace synthese
 				subscription.second->toParametersMap(*subscriptionMap);
 				map.insert(prefix + TAG_SUBSCRIPTION, subscriptionMap);
 			}
+			
+			// Networks
+			BOOST_FOREACH(const TransportNetworks::Type::value_type& transportNetwork, get<TransportNetworks>())
+			{
+				boost::shared_ptr<ParametersMap> transportNetworkPM(new ParametersMap);
+				transportNetwork->toParametersMap(*transportNetworkPM, true);
+				map.insert(prefix + TAG_TRANSPORT_NETWORK, transportNetworkPM);
+			}
 
 		}
 
@@ -305,6 +314,7 @@ namespace synthese
 				p = p / fileName.str();
 				ofstream logFile(p.file_string().c_str());
 				logFile << content;
+				logFile.close();
 			}
 		}
 }	}

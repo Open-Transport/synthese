@@ -103,6 +103,8 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 		const string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_USE_LINE_SHORT_NAME_AS_ID("use_line_short_name_as_id");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_SERVICE_NUMBER("ignore_service_number");
 
 		const std::string GTFSFileFormat::Exporter_::PARAMETER_NETWORK_ID("ni");
 		const std::string GTFSFileFormat::Exporter_::LABEL_TAD("tad");
@@ -167,6 +169,8 @@ namespace synthese
 			_autoCreateStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
+			_useLineShortNameAsId(false),
+			_ignoreServiceNumber(false),
 			_networks(*import.get<DataSource>(), env),
 			_stopPoints(*import.get<DataSource>(), env),
 			_lines(*import.get<DataSource>(), env)
@@ -391,6 +395,10 @@ namespace synthese
 					// Network
 					string networkId(_getValue("agency_id"));
 					string id(_getValue("route_id"));
+					if (_useLineShortNameAsId)
+					{
+						id = _getValue("route_short_name");
+					}
 					TransportNetwork* network(NULL);
 					if(_networks.contains(networkId))
 					{
@@ -528,6 +536,12 @@ namespace synthese
 					// Line
 					string id(_getValue("trip_id"));
 					string lineCode(_getValue("route_id"));
+					if (_useLineShortNameAsId)
+					{
+						vector<string> splitRouteId;
+						split(splitRouteId,lineCode,is_any_of("-"));
+						lineCode = splitRouteId[0];
+					}
 					if(!_lines.contains(lineCode))
 					{
 						_logWarning(
@@ -653,7 +667,7 @@ namespace synthese
 								*route,
 								departures,
 								arrivals,
-								lastTripCode,
+								_ignoreServiceNumber ? string() : lastTripCode,
 								dataSource,
 								optional<const string&>(),
 								optional<const RuleUser::Rules&>(),
@@ -851,6 +865,8 @@ namespace synthese
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
 			}
 			map.insert(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks));
+			map.insert(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, _useLineShortNameAsId);
+			map.insert(PARAMETER_IGNORE_SERVICE_NUMBER, _ignoreServiceNumber);
 			return map;
 		}
 
@@ -898,6 +914,9 @@ namespace synthese
 					}
 				}
 			}
+			
+			_useLineShortNameAsId = map.getDefault<bool>(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, false);
+			_ignoreServiceNumber = map.getDefault<bool>(PARAMETER_IGNORE_SERVICE_NUMBER, false);
 		}
 
 

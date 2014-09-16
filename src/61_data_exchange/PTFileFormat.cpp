@@ -792,7 +792,7 @@ namespace synthese
 							rank,
 							rank+1 < servedStops.size() && stop._departure,
 							rank > 0 && stop._arrival,
-							0,
+							stop._metricOffset ? *stop._metricOffset : 0,
 							**stop._stop.begin()
 					)	);
 					ls->set<ScheduleInput>(stop._withTimes ? *stop._withTimes : true);

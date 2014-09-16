@@ -158,7 +158,7 @@ namespace synthese
 			}
 
 			// Saving dates
-			ServicePointer ptr(THData, RTData, accessParameters.getUserClassRank(), *this, originDateTime);
+			ServicePointer ptr(THData, hasRealTimeData(), accessParameters.getUserClassRank(), *this, originDateTime);
 
 			if(getDeparture)
 			{
