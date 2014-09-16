@@ -26,9 +26,7 @@
 #include "MessagesRight.h"
 #include "AlarmRecipient.h"
 
-// DEB AJOUT TPU
 #include "MessagesSectionTableSync.hpp"
-// FIN AJOUT TPU
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -48,10 +46,10 @@ namespace synthese
 		template<> const std::string FactorableTemplate<Right, MessagesRight>::FACTORY_KEY("Messages");
 	}
 
-    namespace messages
-    {
-    const string MessagesRight::MESSAGES_SECTION_FACTORY_KEY = "messagessection";
-    }
+    	namespace messages
+    	{
+    		const string MessagesRight::MESSAGES_SECTION_FACTORY_KEY = "messagessection";
+    	}
 
 	namespace security
 	{
