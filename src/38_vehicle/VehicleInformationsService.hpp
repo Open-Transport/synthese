@@ -46,6 +46,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,VehicleInformationsService>
 		{
 		private:
+			static const std::string TAG_VEHICLE_INFORMATIONS;
 			static const std::string TAG_VEHICLE;
 			static const std::string TAG_POSITION;
 			static const std::string TAG_JOURNEY;

@@ -209,10 +209,7 @@ namespace synthese
 			{
 				crossing = new Crossing(
 					CrossingTableSync::getId(),
-					boost::shared_ptr<Point>(),
-					string(),
-					NULL,
-					false
+					boost::shared_ptr<Point>()
 				);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&*_import.get<DataSource>(), code));

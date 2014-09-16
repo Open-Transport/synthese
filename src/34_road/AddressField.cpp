@@ -81,9 +81,23 @@ namespace synthese
 					}
 					catch (ObjectNotFoundException<RoadChunk>&)
 					{
-						Log::GetInstance().warn(
-							"Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(object.getKey())
-						);
+						try
+						{
+							RoadChunk* value(
+								Env::GetOfficialEnv().getEditable<RoadChunk>(chunkId).get()
+							);
+							if(value != address.getRoadChunk())
+							{
+								address.setRoadChunk(value);
+								result = true;
+							}
+						}
+						catch (ObjectNotFoundException<RoadChunk>&)
+						{
+							Log::GetInstance().warn(
+								"Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(object.getKey())
+							);
+						}
 					}
 
 					// Metric offset

@@ -15,11 +15,17 @@ InterSYNTHESEContent.cpp
 InterSYNTHESEContent.hpp
 InterSYNTHESEFileFormat.cpp
 InterSYNTHESEFileFormat.hpp
+InterSYNTHESEIsSynchronisingService.cpp
+InterSYNTHESEIsSynchronisingService.hpp
 InterSYNTHESEModule.cpp
 InterSYNTHESEModule.hpp
 InterSYNTHESEModule.gen.cpp
 InterSYNTHESEModule.inc.cpp
 InterSYNTHESEModuleRegister.cpp
+InterSYNTHESEObjectCreateService.cpp
+InterSYNTHESEObjectCreateService.hpp
+InterSYNTHESEObjectUpdateService.cpp
+InterSYNTHESEObjectUpdateService.hpp
 InterSYNTHESEPackage.cpp
 InterSYNTHESEPackage.hpp
 InterSYNTHESEPackageAutoLockAction.cpp
@@ -58,6 +64,8 @@ InterSYNTHESEUpdateAckService.cpp
 InterSYNTHESEUpdateAckService.hpp
 InterSYNTHESEUpdatePushService.cpp
 InterSYNTHESEUpdatePushService.hpp
+SpecificPostInstall.cpp
+SpecificPostInstall.hpp
 )
 
 set_source_files_properties(InterSYNTHESEModule.gen.cpp InterSYNTHESEModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

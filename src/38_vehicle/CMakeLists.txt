@@ -13,6 +13,10 @@ CompositionVehicleRemoveAction.cpp
 CompositionVehicleRemoveAction.hpp
 CurrentJourney.cpp
 CurrentJourney.hpp
+Descent.hpp
+Descent.cpp
+DescentTableSync.hpp
+DescentTableSync.cpp
 GetCompositionsService.cpp
 GetCompositionsService.hpp
 GetVehiclesService.cpp
@@ -39,6 +43,10 @@ VehicleAdmin.cpp
 VehicleAdmin.hpp
 VehiclesAdmin.cpp
 VehiclesAdmin.hpp
+VehicleCall.cpp
+VehicleCall.hpp
+VehicleCallTableSync.cpp
+VehicleCallTableSync.hpp
 VehicleInformationsService.cpp
 VehicleInformationsService.hpp
 VehicleModule.cpp

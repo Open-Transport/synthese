@@ -274,8 +274,8 @@ namespace synthese
 
 			// Physical stop change
 			if(	_physicalStop.get() &&
-				dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()) &&
-				_physicalStop.get() != dynamic_cast<DesignatedLinePhysicalStop&>(*_lineStop).getPhysicalStop()
+				dynamic_cast<StopPoint*>(&*_lineStop->get<LineNode>()) &&
+				_physicalStop.get() != dynamic_cast<StopPoint*>(&*_lineStop->get<LineNode>())
 			){
 				// Automated update of geometry of preceding line stop if possible
 				if(_prevLineStop && _prevLineStop->get<LineNode>() && dynamic_cast<StopPoint*>(&*_prevLineStop->get<LineNode>()))

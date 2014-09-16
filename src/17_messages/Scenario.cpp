@@ -59,6 +59,9 @@ namespace synthese
 
 		void Scenario::removeMessage( const Alarm& message ) const
 		{
-			_messages.erase(&message);
+			if (_messages.find(&message) != _messages.end())
+            {
+				_messages.erase(&message);
+			}
 		}
 }	}

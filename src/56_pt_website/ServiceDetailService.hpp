@@ -48,6 +48,11 @@ namespace synthese
 		class ScheduledService;
 		class StopArea;
 	}
+	
+	namespace vehicle
+	{
+		class Descent;
+	}
 
 	namespace pt_website
 	{
@@ -63,8 +68,10 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,ServiceDetailService>
 		{
 		public:
+			static const std::string TAG_SERVICE_DETAIL;
 			static const std::string PARAMETER_BASE_CALENDAR_ID;
 			static const std::string PARAMETER_READ_RESERVATIONS_FROM_DAY;
+			static const std::string PARAMETER_READ_DESCENTS_FROM_DAY;
 
 			static const std::string ATTR_DEPARTURE_SCHEDULE;
 			static const std::string ATTR_DEPARTURE_PLACE_NAME;
@@ -82,9 +89,14 @@ namespace synthese
 			static const std::string ATTR_ARRIVAL_TIME;
 			static const std::string ATTR_SCHEDULE_INPUT;
 			static const std::string ATTR_WITH_RESERVATION;
+			static const std::string ATTR_WITH_DESCENT;
+			static const std::string ATTR_DESCENT_ID;
 			static const std::string ATTR_FIRST_IN_AREA;
 			static const std::string ATTR_LAST_IN_AREA;
 			static const std::string ATTR_IS_AREA;
+			static const std::string ATTR_RANK;
+			static const std::string ATTR_STOP_POINT_ID;
+			static const std::string ATTR_STOP_AREA_ID;
 			static const std::string TAG_RESERVATION_AT_DEPARTURE;
 			static const std::string TAG_RESERVATION_AT_ARRIVAL;
 			static const std::string TAG_RESERVATION_WITH_ARRIVAL_BEFORE_DEPARTURE;
@@ -95,6 +107,7 @@ namespace synthese
 				const pt::ScheduledService* _service;
 				boost::shared_ptr<const calendar::CalendarTemplate> _baseCalendar;
 				boost::gregorian::date _readReservationsFromDay;
+				boost::gregorian::date _readDescentsFromDay;
 			//@}
 
 		
@@ -138,6 +151,12 @@ namespace synthese
 				size_t rank,
 				Resas& resas
 			) const;
+			
+			typedef std::vector<
+				std::pair<
+					const vehicle::Descent*,
+					bool	// True if the departure has been already read
+			>	> Descents;
 
 			static void _exportReservations(
 				util::ParametersMap& pm,
@@ -155,7 +174,10 @@ namespace synthese
 				Resas& resas,
 				bool isArea,
 				bool firstInArea,
-				bool lastInArea
+				bool lastInArea,
+				Descents& descents,
+				util::RegistryKeyType stopPointId,
+				util::RegistryKeyType stopAreaId
 			) const;
 			
 		public:

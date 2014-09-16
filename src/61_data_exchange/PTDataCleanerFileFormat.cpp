@@ -445,7 +445,7 @@ namespace synthese
 			{
 				if(_calendarTemplate.get())
 				{
-					if(!startDate.is_not_a_date() && endDate.is_not_a_date())
+					if(!startDate.is_not_a_date() && !endDate.is_not_a_date())
 					{
 						_calendar = _calendarTemplate->getResult(Calendar(startDate, endDate));
 					}

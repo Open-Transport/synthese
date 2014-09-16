@@ -43,6 +43,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		const string OperationUnitsService::TAG_OPERATION_UNIT = "operation_unit";
+		const string OperationUnitsService::TAG_OPERATION_UNITS = "operation_units";
 		
 
 
@@ -56,6 +57,7 @@ namespace synthese
 
 		void OperationUnitsService::_setFromParametersMap(const ParametersMap& map)
 		{
+			Function::setOutputFormatFromMap(map,string());
 		}
 
 
@@ -72,6 +74,11 @@ namespace synthese
 				boost::shared_ptr<ParametersMap> ouPM(new ParametersMap);
 				it.second->toParametersMap(*ouPM, true);
 				map.insert(TAG_OPERATION_UNIT, ouPM);
+			}
+			
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, TAG_OPERATION_UNITS);
 			}
 
 			return map;
@@ -90,6 +97,10 @@ namespace synthese
 
 		std::string OperationUnitsService::getOutputMimeType() const
 		{
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				return "application/json";
+			}
 			return "text/html";
 		}
 }	}

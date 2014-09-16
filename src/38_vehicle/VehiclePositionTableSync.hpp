@@ -61,6 +61,7 @@ namespace synthese
 				static const std::string COL_RANK_IN_PATH;
 				static const std::string COL_PASSENGERS;
 				static const std::string COL_IN_STOP_AREA;
+                static const std::string COL_STOP_FOUND_TIME;
 			//@}
 
 

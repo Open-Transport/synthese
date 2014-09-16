@@ -2435,22 +2435,25 @@ namespace synthese
 							pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
 
 							// Saving of the columns on each lines
-							_displayScheduleCell(
-								**itSheetRow,
-								request,
-								i,
-								pedestrianMode,
-								leg.getDepartureDateTime().time_of_day(),
-								lastDateTime.time_of_day(),
-								it->getContinuousServiceRange().total_seconds() > 0,
-								itPlaces->isOrigin && itl == jl.begin(),
-								true,
-								pedestrianMode && !lastPedestrianMode,
-								itPlaces->isOrigin,
-								itPlaces->isDestination,
-								leg.getService()->getServiceNumber()
-							);
-							++itPlaces; ++itSheetRow;
+							if (itPlaces != placesList.end())
+							{
+								_displayScheduleCell(
+									**itSheetRow,
+									request,
+									i,
+									pedestrianMode,
+									leg.getDepartureDateTime().time_of_day(),
+									lastDateTime.time_of_day(),
+									it->getContinuousServiceRange().total_seconds() > 0,
+									itPlaces->isOrigin && itl == jl.begin(),
+									true,
+									pedestrianMode && !lastPedestrianMode,
+									itPlaces->isOrigin,
+									itPlaces->isDestination,
+									leg.getService()->getServiceNumber()
+								);
+								++itPlaces; ++itSheetRow;
+							}
 							lastPedestrianMode = pedestrianMode;
 						}
 
@@ -2469,41 +2472,47 @@ namespace synthese
 							ptime lastDateTime(leg.getArrivalDateTime());
 							lastDateTime += it->getContinuousServiceRange();
 
-							_displayScheduleCell(
-								**itSheetRow,
-								request,
-								i,
-								pedestrianMode,
-								leg.getArrivalDateTime().time_of_day(),
-								lastDateTime.time_of_day(),
-								it->getContinuousServiceRange().total_seconds() > 0,
-								true,
-								itPlaces->isDestination && itl+1 == jl.end(),
-								false,
-								itPlaces->isOrigin,
-								itPlaces->isDestination,
-								leg.getService()->getServiceNumber()
-							);
+							if (itPlaces != placesList.end())
+							{
+								_displayScheduleCell(
+									**itSheetRow,
+									request,
+									i,
+									pedestrianMode,
+									leg.getArrivalDateTime().time_of_day(),
+									lastDateTime.time_of_day(),
+									it->getContinuousServiceRange().total_seconds() > 0,
+									true,
+									itPlaces->isDestination && itl+1 == jl.end(),
+									false,
+									itPlaces->isOrigin,
+									itPlaces->isDestination,
+									leg.getService()->getServiceNumber()
+								);
+							}
 						}
 					}
 
 					// Fill in the last cells
-					for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
+					if (itPlaces != placesList.end())
 					{
-						_displayScheduleCell(
-							**itSheetRow,
-							request,
-							i,
-							false,
-							time_duration(not_a_date_time),
-							time_duration(not_a_date_time),
-							false,
-							true,
-							true,
-							false,
-							itPlaces->isOrigin,
-							itPlaces->isDestination
-						);
+						for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
+						{
+							_displayScheduleCell(
+								**itSheetRow,
+								request,
+								i,
+								false,
+								time_duration(not_a_date_time),
+								time_duration(not_a_date_time),
+								false,
+								true,
+								true,
+								false,
+								itPlaces->isOrigin,
+								itPlaces->isDestination
+							);
+						}
 					}
 				}
 

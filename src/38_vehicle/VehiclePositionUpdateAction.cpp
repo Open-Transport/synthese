@@ -39,6 +39,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace graph;
 	using namespace pt;
 	using namespace pt_operation;
 	using namespace security;
@@ -66,11 +67,14 @@ namespace synthese
 		const string VehiclePositionUpdateAction::PARAMETER_VEHICLE_POSITION_ID = Action_PARAMETER_PREFIX + "vi";
 		const string VehiclePositionUpdateAction::PARAMETER_SET_AS_CURRENT_POSITION = Action_PARAMETER_PREFIX + "_set_as_current_position";
 		const string VehiclePositionUpdateAction::PARAMETER_IN_STOP_AREA = Action_PARAMETER_PREFIX + "_in_stop_area";
+        const string VehiclePositionUpdateAction::PARAMETER_STOP_FOUND_TIME = Action_PARAMETER_PREFIX + "_next_stop_found_time";
+		const string VehiclePositionUpdateAction::PARAMETER_SET_NEXT_STOPS = Action_PARAMETER_PREFIX + "_set_next_stops";
 
 
 
 		VehiclePositionUpdateAction::VehiclePositionUpdateAction() :
-			_setAsCurrentPosition(false)
+			_setAsCurrentPosition(false),
+			_setNextStops(false)
 		{}
 
 
@@ -90,6 +94,11 @@ namespace synthese
 			if(_setAsCurrentPosition)
 			{
 				map.insert(PARAMETER_SET_AS_CURRENT_POSITION, _setAsCurrentPosition);
+			}
+			
+			if(_setNextStops)
+			{
+				map.insert(PARAMETER_SET_NEXT_STOPS, _setNextStops);
 			}
 
 			// Warning : Export other parameters if setters are implemented
@@ -243,6 +252,22 @@ namespace synthese
 			{
 				_time = time_from_string(map.get<string>(PARAMETER_TIME));
 			}
+            if(map.isDefined(PARAMETER_STOP_FOUND_TIME))
+            {
+                _nextStopFoundTime = time_from_string(map.get<string>(PARAMETER_STOP_FOUND_TIME));
+            }
+			
+			// In stop area
+			if(map.isDefined(PARAMETER_IN_STOP_AREA))
+			{
+				_inStopArea = map.get<bool>(PARAMETER_IN_STOP_AREA);
+			}
+			
+			// Set next stops
+			if(map.isDefined(PARAMETER_SET_NEXT_STOPS))
+			{
+				_setNextStops = map.get<bool>(PARAMETER_SET_NEXT_STOPS);
+			}
 		}
 
 
@@ -338,6 +363,40 @@ namespace synthese
 				{
 					vp.setInStopArea(_vehiclePosition->getInStopArea());
 				}
+			}
+            if(_nextStopFoundTime)
+            {
+                _vehiclePosition->setNextStopFoundTime(*_nextStopFoundTime);
+                if(_setAsCurrentPosition)
+                {
+                    vp.setNextStopFoundTime(_vehiclePosition->getNextStopFoundTime());
+                }
+            }
+			
+			if (_setNextStops && _rankInPath)
+			{
+				Path::Edges allEdges;
+				if(VehicleModule::GetCurrentVehiclePosition().getService())
+				{
+					allEdges = VehicleModule::GetCurrentVehiclePosition().getService()->getPath()->getEdges();
+				}
+				
+				// Update the next stops
+				CurrentJourney::NextStops nextStops;
+				{
+					BOOST_FOREACH(const Path::Edges::value_type& edge, allEdges)
+					{
+						if(edge->getRankInPath() > *_rankInPath &&
+							dynamic_cast<StopPoint*>(edge->getFromVertex()))
+						{
+							NextStop nextStop;
+							nextStop.setStop(static_cast<StopPoint*>(edge->getFromVertex()));
+							nextStop.setRank(edge->getRankInPath());
+							nextStops.push_back(nextStop);
+						}
+					}
+				}
+				VehicleModule::GetCurrentJourney().setNextStops(nextStops);
 			}
 
 			VehiclePositionTableSync::Save(_vehiclePosition.get());

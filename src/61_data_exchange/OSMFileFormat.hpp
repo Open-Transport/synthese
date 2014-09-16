@@ -69,7 +69,7 @@ namespace synthese
 
 				static const std::string PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE;
 
-				typedef std::map<util::RegistryKeyType, std::vector<osm::NodePtr> > ChunksAssociatedHousesList;
+                typedef std::map<util::RegistryKeyType, std::vector<osm::NodePtr> > ChunksAssociatedHousesList;
 				typedef std::map<unsigned long long int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
 				typedef std::map<unsigned long long int, boost::shared_ptr<geography::City> > _CitiesMap;
 				typedef std::map<std::string, boost::shared_ptr<road::RoadPlace> > _RecentlyCreatedRoadPlaces;
@@ -80,7 +80,7 @@ namespace synthese
 				mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;
 				mutable _RecentlyCreatedRoadParts _recentlyCreatedRoadParts;
 				mutable _LinkBetweenWayAndRoadPlaces _linkBetweenWayAndRoadPlaces;
-				mutable ChunksAssociatedHousesList _chunksAssociatedHousesList;
+                mutable ChunksAssociatedHousesList _chunksAssociatedHousesList;
 
 				bool _addCentralChunkReference;
 
@@ -172,9 +172,9 @@ namespace synthese
 					road::RoadChunk* chunk
 				) const;
 
-				void _reorderHouseNumberingBounds(
-					boost::shared_ptr<road::RoadChunk> chunk
-				) const;
+                void _reorderHouseNumberingBounds(
+                        boost::shared_ptr<road::RoadChunk> chunk
+                ) const;
 
 				std::string _toAlphanumericString(
 					const std::string& input

@@ -114,11 +114,7 @@ namespace synthese
 //				Log Object creation
 			}
 
-			DBTransaction transaction;
-			_value->beforeCreate(transaction);
-			_tableSync->saveRegistrable(*_value, transaction);
-			_value->afterCreate(transaction);
-			transaction.run();
+            DBModule::CreateObject(_value.get(), _tableSync.get());
 
 //			::AddUpdateEntry(*_value, text.str(), request.getUser().get());
 

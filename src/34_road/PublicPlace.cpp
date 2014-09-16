@@ -64,6 +64,7 @@ namespace synthese
 		const string PublicPlace::DATA_DETAILS = "details";
 		const string PublicPlace::DATA_X = "x";
 		const string PublicPlace::DATA_Y = "y";
+		const string PublicPlace::DATA_GEOMETRY = "geometry";
 
 
 
@@ -173,6 +174,27 @@ namespace synthese
 					s << std::fixed << pg->getY();
 					pm.insert(prefix + DATA_Y, s.str());
 				}
+			}
+			
+			// Geometry
+			if(getPoint())
+			{
+				boost::shared_ptr<geos::geom::Geometry> projected(getPoint());
+				if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+					static_cast<CoordinatesSystem::SRID>(getPoint()->getSRID())
+				){
+					projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*getPoint());
+				}
+				
+				geos::io::WKTWriter writer;
+				pm.insert(
+					prefix + DATA_GEOMETRY,
+					writer.write(projected.get())
+				);
+			}
+			else
+			{
+				pm.insert(prefix + DATA_GEOMETRY, string());
 			}
 		}
 

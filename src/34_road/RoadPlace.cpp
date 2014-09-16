@@ -22,11 +22,14 @@
 
 #include "RoadPlace.h"
 
+#include "CityTableSync.h"
+#include "ImportableTableSync.hpp"
 #include "Road.h"
 #include "RoadChunkEdge.hpp"
 #include "RoadModule.h"
 #include "RoadPath.hpp"
 #include "RoadChunk.h"
+#include "RoadPlaceTableSync.h"
 #include "VertexAccessMap.h"
 #include "AllowedUseRule.h"
 #include "GraphConstants.h"
@@ -42,6 +45,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace impex;
 	using namespace util;
 	using namespace graph;
 	using namespace geography;
@@ -400,5 +404,88 @@ namespace synthese
 				&CoordinatesSystem::GetInstanceCoordinatesSystem(),
 				prefix
 			);
+		}
+		
+		bool RoadPlace::loadFromRecord( const Record& record, util::Env& env )
+		{
+			bool result(false);
+			
+			// Name
+			if(record.isDefined(RoadPlaceTableSync::COL_NAME))
+			{
+				string value(
+					record.get<string>(RoadPlaceTableSync::COL_NAME)
+				);
+				if(value != getName())
+				{
+					setName(value);
+					result = true;
+				}
+			}
+			
+			// City
+			if(record.isDefined(RoadPlaceTableSync::COL_CITYID))
+			{
+				City* value(NULL);
+				RegistryKeyType cityId(
+					record.getDefault<RegistryKeyType>(RoadPlaceTableSync::COL_CITYID, 0)
+				);
+				if(cityId > 0) try
+				{
+					value = CityTableSync::GetEditable(cityId, env).get();
+				}
+				catch(ObjectNotFoundException<City>&)
+				{
+					Log::GetInstance().warn("Bad value " + lexical_cast<string>(cityId) + " for city in road place " + lexical_cast<string>(getKey()));
+				}
+				if(value != getCity())
+				{
+					setCity(value);
+					// Registration to city matcher
+					if(!getName().empty())
+					{
+						value->addPlaceToMatcher(env.getEditableSPtr(this));
+					}
+					result = true;
+				}
+			}
+			
+			// City main road
+			if(record.isDefined(RoadPlaceTableSync::COL_ISCITYMAINROAD))
+			{
+				bool value(record.getDefault<bool>(RoadPlaceTableSync::COL_ISCITYMAINROAD, false));
+				if(value && getCity())
+				{
+					getCity()->addIncludedPlace(*this);
+				}
+				if (!value && getCity())
+				{
+					getCity()->removeIncludedPlace(*this);
+				}
+			}
+			
+			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
+			if(record.isDefined(RoadPlaceTableSync::COL_DATASOURCE_LINKS))
+			{
+				Importable::DataSourceLinks value(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						record.get<string>(RoadPlaceTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				if(value != getDataSourceLinks())
+				{
+					if(&env == &Env::GetOfficialEnv())
+					{
+						setDataSourceLinksWithRegistration(value);
+					}
+					else
+					{
+						setDataSourceLinksWithoutRegistration(value);
+					}
+					result = true;
+				}
+			}
+			
+			return result;
 		}
 }	}

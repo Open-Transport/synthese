@@ -290,13 +290,18 @@ namespace synthese
 			pm.insert(DATA_COMMENT, getTransaction()->getComment());
 			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
 			pm.insert(DATA_PHONE, getTransaction()->getCustomerPhone());
-			security::User* customer = UserTableSync::GetEditable(getTransaction()->getCustomerUserId(), Env::GetOfficialEnv()).get();
-			pm.insert(DATA_CLIENT_ID, customer->getKey());
-			pm.insert(DATA_EMAIL, customer->getEMail());
-			pm.insert(DATA_ADDRESS, customer->getAddress());
-			pm.insert(DATA_POSTCODE, customer->getPostCode());
-			pm.insert(DATA_CITYTEXT, customer->getCityText());
-			pm.insert(DATA_COUNTRY, customer->getCountry());
+			try {
+				security::User* customer = UserTableSync::GetEditable(getTransaction()->getCustomerUserId(), Env::GetOfficialEnv()).get();
+				pm.insert(DATA_CLIENT_ID, customer->getKey());
+				pm.insert(DATA_EMAIL, customer->getEMail());
+				pm.insert(DATA_ADDRESS, customer->getAddress());
+				pm.insert(DATA_POSTCODE, customer->getPostCode());
+				pm.insert(DATA_CITYTEXT, customer->getCityText());
+				pm.insert(DATA_COUNTRY, customer->getCountry());
+			}
+			catch(ObjectNotFoundException<User>&)
+			{
+			}
 
 			// Transaction
 			pm.insert(DATA_TRANSACTION_ID, getTransaction()->getKey());

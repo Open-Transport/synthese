@@ -45,6 +45,7 @@ namespace synthese
 		{
 		public:
 			static const std::string TAG_OPERATION_UNIT;
+			static const std::string TAG_OPERATION_UNITS;
 			
 		protected:
 			//! \name Page parameters

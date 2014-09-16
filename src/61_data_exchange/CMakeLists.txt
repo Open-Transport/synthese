@@ -16,6 +16,8 @@ set(data_exchange_SRCS
   GTFSFileFormat.hpp
   GPSdFileFormat.cpp
   GPSdFileFormat.hpp
+  GPSSimuFileFormat.cpp
+  GPSSimuFileFormat.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
   HastusCSVFileFormat.cpp
@@ -56,6 +58,8 @@ set(data_exchange_SRCS
   PegaseFileFormat.hpp
   PhysicalStopsCSVExportFunction.cpp
   PhysicalStopsCSVExportFunction.h
+  POICSVFileFormat.cpp
+  POICSVFileFormat.hpp
   PTDataCleanerFileFormat.cpp
   PTDataCleanerFileFormat.hpp
   PTFileFormat.cpp
