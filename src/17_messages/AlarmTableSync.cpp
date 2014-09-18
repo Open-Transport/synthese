@@ -283,7 +283,11 @@ namespace synthese
 			);
 			query.addField(object->getRawEditor());
 			query.addField(object->getDone());
-			query.addField(object->getSection());
+			query.addField(
+						object->getSection() ?
+						object->getSection()->getKey() :
+						RegistryKeyType(0)
+			);
 			query.addField(
 				object->getCalendar() ?
 				object->getCalendar()->getKey() :
