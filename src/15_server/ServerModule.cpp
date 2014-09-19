@@ -324,7 +324,7 @@ namespace synthese
 				stringstream ros;
 				{
 					// Don't request if interSYNTHESE is writing
-					boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
+					boost::shared_lock<boost::shared_mutex> lock(ServerModule::InterSYNTHESEAgainstRequestsMutex);
 					request.run(ros);
 				}
 				
