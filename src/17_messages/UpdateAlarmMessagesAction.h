@@ -66,6 +66,7 @@ namespace synthese
 			static const std::string PARAMETER_DONE;
 			static const std::string PARAMETER_SCENARIO_ID;
 			static const std::string PARAMETER_ALARM_DATASOURCE_ID;
+			static const std::string PARAMETER_DIGITIZED_VERSION;
 
 		private:
 			boost::shared_ptr<Alarm>		_alarm;
@@ -76,6 +77,7 @@ namespace synthese
 			boost::optional<std::string> _longMessage;
 			boost::optional<bool> _rawEditor;
 			boost::optional<bool> _done;
+			boost::optional<std::string> _digitizedVersion;
 
 			std::string _dataSourceLinkId;
 
