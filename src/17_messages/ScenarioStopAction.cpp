@@ -162,7 +162,7 @@ namespace synthese
                     BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
                     {
                         result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
-                                    WRITE,
+									DELETE_RIGHT,
                                     UNKNOWN_RIGHT_LEVEL,
                                     MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
                                     );
