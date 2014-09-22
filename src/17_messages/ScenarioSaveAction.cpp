@@ -29,7 +29,7 @@
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "MessagesModule.h"
-#include "MessagesSection.hpp"
+#include "MessagesSectionTableSync.hpp"
 #include "Profile.h"
 #include "Session.h"
 #include "User.h"
@@ -113,10 +113,12 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 		const string ScenarioSaveAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "le";
         const string ScenarioSaveAction::PARAMETER_DISPLAY_DURATION = Action_PARAMETER_PREFIX + "ddur";
+		const string ScenarioSaveAction::PARAMETER_DIGITIZED_VERSION = Action_PARAMETER_PREFIX + "dv";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_recipients_";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_SECTION = Action_PARAMETER_PREFIX + "msection";
 		
 		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
 		const string ScenarioSaveAction::VALUES_PARAMETERS_SEPARATOR = "|";
@@ -596,6 +598,15 @@ namespace synthese
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
                     _display_duration = static_cast<size_t>(map.getDefault<int>(PARAMETER_DISPLAY_DURATION));
+					if (!map.getDefault<string>(PARAMETER_DIGITIZED_VERSION).empty())
+					{
+						_digitizedVersion = map.get<string>(PARAMETER_DIGITIZED_VERSION);
+					}
+					if (map.isDefined(PARAMETER_MESSAGE_SECTION))
+					{
+						RegistryKeyType id = map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_SECTION);
+						_messageSection = MessagesSectionTableSync::Get(id, *_env);
+					}
 
 					_recipients = Recipients::value_type();
 
@@ -1041,6 +1052,20 @@ namespace synthese
 						message->setLevel(static_cast<AlarmLevel>(messageNode.second.get("level", 0)));
 						message->setLongMessage(messageNode.second.get("content", string()));
                         message->setDisplayDuration(messageNode.second.get("displayDuration", 0));
+						if (!messageNode.second.get("digitized_version",string()).empty())
+						{
+							message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
+						}
+						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
+						{
+							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));
+							boost::shared_ptr<const MessagesSection> section;
+							section = MessagesSectionTableSync::Get(sectionId, *_env);
+							if (section)
+							{
+								message->setSection(section.get());
+							}
+						}
 
 						// Save
 						AlarmTableSync::Save(message.get(), transaction);
@@ -1197,6 +1222,7 @@ namespace synthese
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
                 if (_display_duration) message->setDisplayDuration(*_display_duration);
+				if (!_digitizedVersion.empty())	message->setDigitizedVersion(_digitizedVersion);
 
 				AlarmTableSync::Save(message.get(), transaction);
 
