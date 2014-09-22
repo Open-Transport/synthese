@@ -598,10 +598,7 @@ namespace synthese
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
                     _display_duration = static_cast<size_t>(map.getDefault<int>(PARAMETER_DISPLAY_DURATION));
-					if (!map.getDefault<string>(PARAMETER_DIGITIZED_VERSION).empty())
-					{
-						_digitizedVersion = map.get<string>(PARAMETER_DIGITIZED_VERSION);
-					}
+					_digitizedVersion = map.get<string>(PARAMETER_DIGITIZED_VERSION);
 					if (map.isDefined(PARAMETER_MESSAGE_SECTION))
 					{
 						RegistryKeyType id = map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_SECTION);
@@ -1052,10 +1049,7 @@ namespace synthese
 						message->setLevel(static_cast<AlarmLevel>(messageNode.second.get("level", 0)));
 						message->setLongMessage(messageNode.second.get("content", string()));
                         message->setDisplayDuration(messageNode.second.get("displayDuration", 0));
-						if (!messageNode.second.get("digitized_version",string()).empty())
-						{
-							message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
-						}
+						message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
 						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
 						{
 							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));
