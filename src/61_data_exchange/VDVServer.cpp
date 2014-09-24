@@ -310,6 +310,7 @@ namespace synthese
 			}
 			catch(...)
 			{
+				Log::GetInstance().warn("VDVServer : la demande de nettoyage des abonnements a échoué");
 			}
 
 
