@@ -514,8 +514,15 @@ namespace synthese
 						_database +".HORAIRE "+
 						"INNER JOIN "+ _database +".ARRETCHN ON "+
 							_database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+ _database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
+						"LEFT JOIN "+ _database +".COURSE ON "+
+							_database +".COURSE.ref="+ _database +".HORAIRE.course AND "+ _database +".COURSE.jour="+ _database +".ARRETCHN.jour "+
+						"LEFT JOIN "+ _database +".VEHICULE ON "+
+							_database +".VEHICULE.Course="+ _database +".COURSE.ref AND "+
+							_database +".VEHICULE.ligne="+ _database +".COURSE.ligne AND "+
+							_database +".VEHICULE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
 						_database +".HORAIRE.jour="+ todayStr +
+						" AND ( " + _database +".VEHICULE.Neutralise != 'O' OR "+ _database +".VEHICULE.Neutralise IS NULL )"+
 					" ORDER BY "+
 						_database +".HORAIRE.course, "+
 						_database +".ARRETCHN.pos"
