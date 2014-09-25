@@ -1216,7 +1216,8 @@ namespace synthese
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
                 if (_display_duration) message->setDisplayDuration(*_display_duration);
-				if (!_digitizedVersion.empty())	message->setDigitizedVersion(_digitizedVersion);
+				message->setDigitizedVersion(_digitizedVersion);
+				message->setSection(_messageSection.get());
 
 				AlarmTableSync::Save(message.get(), transaction);
 
@@ -1325,8 +1326,10 @@ namespace synthese
 		bool ScenarioSaveAction::isAuthorized(
 			const Session* session
         ) const {
-            bool result = session && session->hasProfile();
-            // Making some checks about Messages section rights
+			// Making some checks about Messages section rights
+			bool result = session && session->hasProfile();
+			bool atLeastOneSectionWithRights = false;
+
             if (!_sections)
             {
                 if (_scenario)
@@ -1335,7 +1338,7 @@ namespace synthese
                     {
                         BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
                         {
-                            result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+							atLeastOneSectionWithRights = atLeastOneSectionWithRights || session->getUser()->getProfile()->isAuthorized<MessagesRight>(
                                         WRITE,
                                         UNKNOWN_RIGHT_LEVEL,
                                         MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
@@ -1344,17 +1347,37 @@ namespace synthese
                     }
                 }
             }
-            else
+			else
             {
                 BOOST_FOREACH(const Scenario::Sections::value_type& section, *_sections)
                 {
-                    result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
-                        WRITE,
-                        UNKNOWN_RIGHT_LEVEL,
-                        MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
-                        );
+					bool sectionToCheck = true;
+					if (_scenario)
+					{
+						BOOST_FOREACH(const Scenario::Sections::value_type& ssect, _scenario->getSections())
+						{
+							sectionToCheck = sectionToCheck && (section->getKey() != ssect->getKey());
+						}
+						if (sectionToCheck)
+						{
+							atLeastOneSectionWithRights = atLeastOneSectionWithRights || session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+										WRITE,
+										UNKNOWN_RIGHT_LEVEL,
+										MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+										);
+						}
+					}
+					else
+					{
+						atLeastOneSectionWithRights = atLeastOneSectionWithRights || session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+									WRITE,
+									UNKNOWN_RIGHT_LEVEL,
+									MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+									);
+					}
                 }
             }
+			result = result && atLeastOneSectionWithRights;
             return result;
 		}
 
