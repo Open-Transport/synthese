@@ -218,14 +218,23 @@ namespace synthese
 					_online = false;
 					return;
 				}
-				ptime startServiceTime(
-					XmlToolkit::GetXsdDateTime(
-						startServiceNode.getText()
-				) + diff_from_utc); //We are supposed to receive the UTC time
-				if(startServiceTime != _startServiceTimeStamp)
+				try
 				{
-					reloadNeeded = true;
-					_startServiceTimeStamp = startServiceTime;
+					ptime startServiceTime(
+						XmlToolkit::GetXsdDateTime(
+							startServiceNode.getText()
+					) + diff_from_utc); //We are supposed to receive the UTC time
+					if(startServiceTime != _startServiceTimeStamp)
+					{
+						reloadNeeded = true;
+						_startServiceTimeStamp = startServiceTime;
+					}
+				}
+				catch (...)
+				{
+					Log::GetInstance().warn("VDVServer : Error while reading startServiceTime in StatusAntwort");
+					_online = false;
+					return;
 				}
 
 				// Check if new data available (DatenBereit)
