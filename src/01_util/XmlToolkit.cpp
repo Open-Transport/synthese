@@ -292,7 +292,8 @@ namespace synthese
 				from_string(parts[0] + "-" + parts[1] + "-" + parts[2]),
 				duration_from_string(parts[3])
 			);
-			if (parts.size() > 4)
+			if (parts.size() > 4&&
+				!parts[4].empty())
 			{
 				// DateTime has to be corrected 
 				try {
