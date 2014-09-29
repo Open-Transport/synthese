@@ -230,9 +230,9 @@ namespace synthese
 						_startServiceTimeStamp = startServiceTime;
 					}
 				}
-				catch (...)
+				catch (std::exception& e)
 				{
-					Log::GetInstance().warn("VDVServer : Error while reading startServiceTime in StatusAntwort");
+					Log::GetInstance().warn("VDVServer : Error while reading startServiceTime in StatusAntwort " + e.what());
 					_online = false;
 					return;
 				}
