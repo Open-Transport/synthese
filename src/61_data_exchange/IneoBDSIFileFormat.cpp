@@ -118,11 +118,10 @@ namespace synthese
 			}
 
 			// Messages section
-			try
+			RegistryKeyType sectionId(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGES_SECTION, 0));
+			if(sectionId) try
 			{
-				_messagesSection = Env::GetOfficialEnv().get<MessagesSection>(
-							map.get<RegistryKeyType>(PARAMETER_MESSAGES_SECTION)
-							);
+				_messagesSection = Env::GetOfficialEnv().get<MessagesSection>(sectionId);
 			}
 			catch(ObjectNotFoundException<MessagesSection>&)
 			{
