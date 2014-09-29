@@ -308,7 +308,7 @@ namespace synthese
 					}
 				}
 				catch (...){
-					throw Exception("Malformed XSD date time (undefined fifth part)");
+					throw Exception("Malformed XSD date time (undefined fifth part : " + parts[4] + ")");
 				}
 			}
 			return result;
