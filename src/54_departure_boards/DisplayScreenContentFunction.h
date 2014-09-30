@@ -79,6 +79,7 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_GENERATION_METHOD;
 			static const std::string PARAMETER_USE_SAE_DIRECT_CONNECTION;
+			static const std::string PARAMETER_USE_SCOM;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -429,6 +430,10 @@ namespace synthese
 					const pt::StopArea& place
 				) const;
 			//@}
+
+			/// Use scom for this service
+			/// False by default, set to true if "use_scom" is in the parameters
+			bool _scom;
 
 			server::FunctionAPI getAPI() const;
 

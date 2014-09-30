@@ -208,13 +208,15 @@ namespace synthese
 				/// @param startTime start time
 				/// @param endTime end time
 				/// @param rootCall true if the call of this method is not recursive
+				/// @param scom enable the use of SCOM for the results, false by default
 				/// @result the result of generation
 				/// @author Hugues Romain
 				/// @since 3.2.0
 				ArrivalDepartureList generateStandardScreen(
 					const boost::posix_time::ptime& startTime,
 					const boost::posix_time::ptime& endTime,
-					bool rootCall = true
+					bool rootCall = true,
+					bool scom = false
 				) const;
 
 

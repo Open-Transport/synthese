@@ -175,4 +175,8 @@ target_link_libraries(54_departure_boards
 )
 endif(WITH_MYSQL)
 
+if(WITH_SCOM)
+  target_link_libraries(54_departure_boards 62_scom)
+endif(WITH_SCOM)
+
 install(TARGETS 54_departure_boards DESTINATION lib)

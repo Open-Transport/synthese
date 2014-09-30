@@ -27,6 +27,16 @@
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "GraphConstants.h"
+#include "CommercialLine.h"
+#include "JourneyPattern.hpp"
+#include "Destination.hpp"
+#include "Service.h"
+#include "Log.h"
+
+#ifdef WITH_SCOM
+	#include "SCOMModule.h"
+	#include "SCOMData.h"
+#endif
 
 #include <boost/foreach.hpp>
 
@@ -58,6 +68,18 @@ namespace synthese
 			physicalStops, direction, endfilter, lineFilter,
 			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, allowCanceled, maxSize
 		){
+			_scom = false;
+		}
+
+
+		// Save them
+		void StandardArrivalDepartureTableGenerator::setClient (
+			bool useScom,
+			const std::string& borne
+		)
+		{
+			_scom = useScom;
+			_borne = borne;
 		}
 
 
@@ -69,6 +91,17 @@ namespace synthese
 			{
 				return _result;
 			}
+
+			// If scom exists and is used, substract the maximum matching delay
+			// Why? To enable past service to be selected that might be delayed and so adapted by SCOM
+			// See the SCOM module documentation
+			ptime realStartDateTime(_startDateTime);
+			#ifdef WITH_SCOM
+			if (_scom)
+			{
+				realStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff());
+			}
+			#endif
 
 			AccessParameters ap;
 
@@ -125,6 +158,35 @@ namespace synthese
 						){
 							continue;
 						}
+
+						// Eliminate too soon departure time using SCOM (if enabled)
+						#ifdef WITH_SCOM
+						if (_scom)
+						{
+							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+
+							std::string dest =
+										journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
+										journeyPattern->getDirectionObj()->getDisplayedText() :
+										journeyPattern->getDirection();
+
+							// Fetch the time from SCOM
+							ptime adaptedTime = scom::SCOMModule::GetSCOMData()->GetWaitingTime(
+								_borne,
+								journeyPattern->getCommercialLine()->getShortName(),
+								dest,
+								servicePointer.getDepartureDateTime(),
+								_startDateTime
+							);
+
+							// Checks if the new time is after the _startDateTime, if not ignore this service
+							if (adaptedTime < _startDateTime)
+							{
+								continue;
+							}
+						}
+						#endif
+
 
 						// The departure is kept in the results
 						_insert(servicePointer);

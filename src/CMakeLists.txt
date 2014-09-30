@@ -66,10 +66,16 @@ set(MODULES
 58_hiking
 59_road_journey_planner
 60_analysis
-61_data_exchange)
+61_data_exchange
+63_settings)
 
 if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)
+endif()
+
+if(WITH_SCOM)
+  list(APPEND MODULES 62_scom)
+  add_definitions(-DWITH_SCOM)
 endif()
 
 include_directories(${PROJ_INCLUDE_DIRS})

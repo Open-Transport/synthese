@@ -59,6 +59,10 @@
 #include "InterfacePageException.h"
 #include "MimeTypes.hpp"
 #include "TransportNetwork.h"
+#ifdef WITH_SCOM
+	#include "SCOMModule.h"
+	#include "SCOMData.h"
+#endif
 
 #include <sstream>
 
@@ -97,6 +101,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
 		const string DisplayScreenContentFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string DisplayScreenContentFunction::PARAMETER_GENERATION_METHOD = "generation_method";
+		const string DisplayScreenContentFunction::PARAMETER_USE_SCOM("use_scom");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -244,6 +249,14 @@ namespace synthese
 						  "Specify if SAE Direct Connection is needed for RealTime, "
 						  "this will open unix sockets to a MySQL BDSI INEO server. \n"
 						  "Works only on Linux",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_USE_SCOM,
+						  "Specify if the data from Ineo's SCOM server should be used."
+						  "Synthese must have been built with SCOM support and the SCOM listener setup for this to work.\n"
+						  "For now, only the call using _displayDepartureBoardRow will be impacted."
+						  "See the SCOM documentation for more information.\n"
+						  "By default, SCOM is disabled."
+						  "Possible values : true or false",
 						  false);
 			return api;
 		}
@@ -579,6 +592,17 @@ namespace synthese
 				{
 					throw RequestException("The screen "+ lexical_cast<string>(id) +" has no type.");
 				}
+
+				// Enable SCOM if available
+				_scom = map.isDefined(PARAMETER_USE_SCOM) && map.get<string>(PARAMETER_USE_SCOM) == "true";
+				#ifndef WITH_SCOM
+				if (_scom)
+				{
+					Log::GetInstance().debug("SCOM disabled in compilation (no -DWITH_SCOM), it will not be used");
+					_scom = false;
+				}
+				#endif
+
 			}
 			catch (ObjectNotFoundException<DisplayScreen> e)
 			{
@@ -937,9 +961,11 @@ namespace synthese
 
 				try
 				{
-					// End time
+					// Start time
 					ptime realStartDateTime(date);
 					realStartDateTime -= minutes(_screen->getClearingDelay());
+
+					// End time
 					ptime endDateTime(realStartDateTime);
 					endDateTime += minutes(_screen->getMaxDelay());
 
@@ -977,7 +1003,7 @@ namespace synthese
 					else
 					{
 						ArrivalDepartureList displayedObject(
-							_screen->generateStandardScreen(realStartDateTime, endDateTime)
+							_screen->generateStandardScreen(realStartDateTime, endDateTime, true, _scom)
 						);
 
 						if(_screen->getType()->getDisplayInterface() &&
@@ -1475,8 +1501,32 @@ namespace synthese
 			{
 				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);
 
+				ptime adaptedTime = row.first.getDepartureDateTime();
+
+				// Fetch the time from SCOM if enabled
+				#ifdef WITH_SCOM
+				if (_scom)
+				{
+					const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(row.first.getService()->getPath());
+
+					std::string dest =
+								journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
+								journeyPattern->getDirectionObj()->getDisplayedText() :
+								journeyPattern->getDirection();
+
+					// Check object before calling them
+					adaptedTime = scom::SCOMModule::GetSCOMData()->GetWaitingTime(
+							_screen.get()->getCodeBySources(),
+							journeyPattern->getCommercialLine()->getShortName(),
+							dest,
+							row.first.getDepartureDateTime(),
+							requestTime
+					);
+				}
+				#endif
+
 				// Waiting time
-				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
+				time_duration waitingTime(adaptedTime - requestTime);
 				pm.insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
 
 				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));

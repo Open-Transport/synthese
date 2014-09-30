@@ -36,6 +36,9 @@ namespace synthese
 			public ArrivalDepartureTableGenerator
 		{
 		private:
+			// Clients informations
+			bool _scom;
+			std::string _borne;
 
 		public:
 			StandardArrivalDepartureTableGenerator(
@@ -50,6 +53,19 @@ namespace synthese
 				bool allowCanceled,
 				boost::optional<std::size_t> maxSize = boost::optional<std::size_t>()
 			);
+
+			/** SCOM informations
+
+			  This setters enables the use of SCOM time adaptation when generating the services.
+
+			  @param useScom If at true, SCOM will be used
+			  @param borne The borne for which to give the waiting time
+			  **/
+			void setClient (
+				bool useScom,
+				const std::string& borne
+			);
+
 
 			const ArrivalDepartureList& generate();
 		};
