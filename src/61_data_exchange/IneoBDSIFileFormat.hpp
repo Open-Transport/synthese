@@ -57,6 +57,11 @@ namespace synthese
 		class ScheduledService;
 	}
 
+	namespace messages
+	{
+		class MessagesSection;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -87,11 +92,13 @@ namespace synthese
 				static const std::string PARAMETER_HYSTERESIS;
 				static const std::string PARAMETER_DELAY_BUS_STOP;
 				static const std::string PARAMETER_DAY_BREAK_TIME;
+				static const std::string PARAMETER_MESSAGES_SECTION;
 		
 			private:
 				boost::optional<std::string> _dbConnString;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
+				boost::shared_ptr<const messages::MessagesSection> _messagesSection;
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
 				boost::posix_time::time_duration _dayBreakTime;

@@ -64,4 +64,11 @@ namespace synthese
 				_messages.erase(&message);
 			}
 		}
+
+
+
+		void Scenario::addSection( const MessagesSection& section ) const
+		{
+			_sections.insert(&section);
+		}
 }	}

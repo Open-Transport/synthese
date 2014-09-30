@@ -97,10 +97,12 @@ namespace synthese
 				static const std::string PARAMETER_RECIPIENT_ID;
 				static const std::string PARAMETER_LEVEL;
                 static const std::string PARAMETER_DISPLAY_DURATION;
+				static const std::string PARAMETER_DIGITIZED_VERSION;
 				static const std::string PARAMETER_RECIPIENT_DATASOURCE_ID;
 				static const std::string PARAMETER_RECIPIENT_TYPE;
 				static const std::string PARAMETER_ENCODING;
 				static const std::string PARAMETER_RECIPIENTS_;
+				static const std::string PARAMETER_MESSAGE_SECTION;
 			//@}
 
 			static const std::string VALUES_SEPARATOR;
@@ -153,6 +155,8 @@ namespace synthese
 				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;
                 boost::optional<std::size_t>                        _display_duration;
+				std::string                                         _digitizedVersion;
+				boost::shared_ptr<const MessagesSection>             _messageSection;
 				std::string											_dataSourceLinkId;
 				boost::shared_ptr<SentAlarm>						_message;
 			//@}
