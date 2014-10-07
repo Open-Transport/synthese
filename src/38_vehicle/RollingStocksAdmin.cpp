@@ -35,6 +35,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "HTMLModule.h"
 #include "RemoveObjectAction.hpp"
+#include "TransportNetworkRight.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "RollingStockUpdateAction.hpp"
 
@@ -88,8 +89,8 @@ namespace synthese
 		bool RollingStocksAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return true; // TODO create a vehicle right
-			// return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
+			// return true; // TODO create a vehicle right
+			return user.getProfile()->isAuthorized<pt::TransportNetworkRight>(READ);
 		}
 
 

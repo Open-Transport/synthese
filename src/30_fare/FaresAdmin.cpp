@@ -35,6 +35,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "HTMLModule.h"
 #include "RemoveObjectAction.hpp"
+#include "TransportNetworkRight.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "FareUpdateAction.hpp"
 
@@ -91,7 +92,8 @@ namespace synthese
 		bool FaresAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return true; // TODO create fare right
+			// return true; // TODO create fare right
+			return user.getProfile()->isAuthorized<pt::TransportNetworkRight>(READ);
 		}
 
 
