@@ -252,7 +252,7 @@ namespace synthese
 						continue;
 
 					// Checks if the vertex use rules are compliant with current user profile at given time
-					if(!origin->isCompatibleWith(_accessParameters, minMaxDateTimeAtOrigin)
+					if(!origin->isCompatibleWith(_accessParameters, desiredTime)
 					){
 						continue;
 					}
