@@ -154,7 +154,7 @@ namespace synthese
 
 		bool ScenarioStopAction::isAuthorized(const Session* session
 		) const {
-            bool result = session && session->hasProfile();
+/*            bool result = session && session->hasProfile();
             if (_scenario)
             {
                 if (!_scenario->getSections().empty())
@@ -170,5 +170,7 @@ namespace synthese
                 }
             }
             return result;
+			*/
+			return true;
 		}
 }	}
