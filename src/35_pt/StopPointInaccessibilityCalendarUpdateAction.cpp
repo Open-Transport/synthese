@@ -422,7 +422,7 @@ namespace synthese
 						boost::gregorian::date start = boost::gregorian::from_string(bounds[0]);
 						boost::gregorian::date end = boost::gregorian::from_string(bounds[1]);
 
-						if(!start.is_not_a_date() && !end.is_not_a_date())
+						if(!start.is_not_a_date() && !end.is_not_a_date() && start <= end)
 						{
 							result.push_back(boost::gregorian::date_period(start, end));
 						}
