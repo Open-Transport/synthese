@@ -78,6 +78,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_CONVERT_STOP_CODE_TO_LOWER = "convert_stop_code_to_lower";
 		
 		
 		
@@ -130,6 +131,9 @@ namespace synthese
 			_dayBreakTime = duration_from_string(
 				map.getDefault<string>(PARAMETER_DAY_BREAK_TIME, "03:00:00")
 			);
+
+			// Convert stop code to lower ?
+			_stopCodeToLower = map.getDefault<bool>(PARAMETER_CONVERT_STOP_CODE_TO_LOWER, false);
 		}
 
 
@@ -272,6 +276,10 @@ namespace synthese
 				{
 					// Fields load
 					string mnemol(result->get<string>("mnemol"));
+					if (_stopCodeToLower)
+					{
+						boost::algorithm::to_lower(mnemol);
+					}
 					string name(result->get<string>("nom"));
 					string ref(result->get<string>("ref"));
 
@@ -1213,7 +1221,8 @@ namespace synthese
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			DatabaseReadImporter<IneoBDSIFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-			_hysteresis(seconds(0))
+			_hysteresis(seconds(0)),
+			_stopCodeToLower(false)
 		{}
 
 
