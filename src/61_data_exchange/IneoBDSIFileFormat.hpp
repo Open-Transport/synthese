@@ -81,6 +81,7 @@ namespace synthese
 				public impex::DatabaseReadImporter<IneoBDSIFileFormat>
 			{
 			public:
+				static const std::string PARAMETER_DB_CONN_STRING;
 				static const std::string PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID;
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 				static const std::string PARAMETER_HYSTERESIS;
@@ -88,6 +89,7 @@ namespace synthese
 				static const std::string PARAMETER_DAY_BREAK_TIME;
 		
 			private:
+				boost::optional<std::string> _dbConnString;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 				boost::posix_time::time_duration _hysteresis;
