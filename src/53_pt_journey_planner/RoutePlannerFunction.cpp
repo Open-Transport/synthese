@@ -3028,10 +3028,16 @@ namespace synthese
 				pm.insert(DATA_LINE_MARKERS, lineMarkers.str());
 			}
 
-			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>((*journey.getServiceUses().begin()).getService()));
-			if(continuousService)
+			if(rangeDuration.total_seconds())
 			{
-				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
+				BOOST_FOREACH(const Journey::ServiceUses::value_type& service, journey.getServiceUses())
+				{
+					if(dynamic_cast<const ContinuousService*>(service.getService()))
+					{
+						pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, static_cast<const ContinuousService*>(service.getService())->getMaxWaitingTime().total_seconds() / 60);
+						break;
+					}
+				}
 			}
 
 			fillTimeParameters(
