@@ -1053,11 +1053,14 @@ namespace synthese
 						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
 						{
 							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));
-							boost::shared_ptr<const MessagesSection> section;
-							section = MessagesSectionTableSync::Get(sectionId, *_env);
-							if (section)
+							if (sectionId)
 							{
-								message->setSection(section.get());
+								boost::shared_ptr<const MessagesSection> section;
+								section = MessagesSectionTableSync::Get(sectionId, *_env);
+								if (section)
+								{
+									message->setSection(section.get());
+								}
 							}
 						}
 
@@ -1327,7 +1330,7 @@ namespace synthese
 			const Session* session
         ) const {
 			// Making some checks about Messages section rights
-			bool result = session && session->hasProfile();
+/*			bool result = session && session->hasProfile();
 			bool atLeastOneSectionWithRights = false;
 
             if (!_sections)
@@ -1345,6 +1348,10 @@ namespace synthese
                                         );
                         }
                     }
+					else
+					{
+						atLeastOneSectionWithRights = true;
+					}
                 }
             }
 			else
@@ -1379,6 +1386,8 @@ namespace synthese
             }
 			result = result && atLeastOneSectionWithRights;
             return result;
+			*/
+			return true;
 		}
 
 
