@@ -79,6 +79,7 @@ namespace synthese
 		const std::string PTRoutesListFunction::DATA_RANK_IS_ODD("rank_is_odd");
 		const std::string PTRoutesListFunction::DATA_IS_MAIN("is_main");
 		const std::string PTRoutesListFunction::DATA_ROUTES("routes");
+		const std::string PTRoutesListFunction::DATA_WAYBACK("wayback");
 
 
 
@@ -344,6 +345,7 @@ namespace synthese
 					pm->insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0));
 					pm->insert(DATA_STOPS_NUMBER, route->getEdges().size());
 					pm->insert(DATA_IS_MAIN, route->getMain());
+					pm->insert(DATA_WAYBACK, route->getWayBack());
 					pm->insert(DATA_DIRECTION,
 						route->getDirection().empty() && route->getDirectionObj() ?
 						route->getDirectionObj()->getDisplayedText() :
@@ -386,6 +388,7 @@ namespace synthese
 					stream << "<direction id=\""<< route->getKey() <<
 						"\" name=\""            << route->getName() <<
 						"\" " << DATA_IS_MAIN << "=\"" << route->getMain() <<
+						"\" " << DATA_WAYBACK << "=\"" << route->getWayBack() <<
 						"\" directionText=\""   << (
 							route->getDirection().empty() && route->getDirectionObj() ?
 							route->getDirectionObj()->getDisplayedText() :

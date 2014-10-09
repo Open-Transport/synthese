@@ -80,6 +80,7 @@ namespace synthese
 			static const std::string DATA_RANK_IS_ODD;
 			static const std::string DATA_IS_MAIN;
 			static const std::string DATA_ROUTES;
+			static const std::string DATA_WAYBACK;
 
 
 		protected:
