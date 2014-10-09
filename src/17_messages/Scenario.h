@@ -89,6 +89,8 @@ namespace synthese
 				const Sections& getSections() const { return _sections; }
 				virtual std::string getName() const { return _name; }
 			//@}
+
+			virtual SubObjects getSubObjects() const;
 		};
 	}
 }

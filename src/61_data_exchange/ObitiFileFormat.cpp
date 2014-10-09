@@ -630,6 +630,8 @@ namespace synthese
 										stops,
 										dataSource,
 										true,
+										true,
+										true,
 										true
 								)	);
 								if(route == NULL)

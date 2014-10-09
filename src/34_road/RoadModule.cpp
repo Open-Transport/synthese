@@ -20,12 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RoadModule.h"
 #include "GeographyModule.h"
 #include "RoadChunk.h"
-#include "StopArea.hpp"
 #include "House.hpp"
+#include "RoadModule.h"
 #include "RoadPlace.h"
+#include "StopArea.hpp"
 #include "PublicPlace.h"
 
 #include <boost/algorithm/string.hpp>
@@ -284,12 +284,18 @@ namespace synthese
 			{
 				stopsAndRoadsVector.push_back(place);
 			}
+			
+			// Text points to a public place
+			City::PlacesMatcher::MatchResult public_places = cityResult.value->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
+				placeName,
+				resultsNumber
+			);
 
-            // Text points to a public place
-            City::PlacesMatcher::MatchResult public_places = cityResult.value->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
-                placeName,
-                resultsNumber
-            );
+			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, places)
+			{
+				stopsAndRoadsVector.push_back(place);
+			}
+
 
             BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, public_places)
             {

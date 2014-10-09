@@ -167,11 +167,11 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @since 3.3.0
 				/// @date 2011
-				virtual void toParametersMap(
+				void toParametersMapAlarm(
 					util::ParametersMap& pm,
 					bool withScenario,
-					std::string prefix = std::string(),
-					bool withRecipients = false
+					boost::logic::tribool withRecipients,
+					std::string prefix
 				) const;
 
 
@@ -196,6 +196,8 @@ namespace synthese
 				{
 					return _linkedObjects;
 				}			
+
+				virtual SubObjects getSubObjects() const;
 			//@}
 		};
 }	}
