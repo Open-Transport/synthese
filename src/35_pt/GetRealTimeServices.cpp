@@ -132,6 +132,10 @@ namespace synthese
 							"THEORICAL_START_TIME",
 							departuresTH[0]
 						);
+				subMap->insert(
+							"NEXT_REAL_TIME_UPDATE",
+							servicePtr->getNextRTUpdate()
+						);
 
 				ostringstream osArrivalsShift;
 				for(size_t i(0); i < arrivalsRT.size(); ++i)
