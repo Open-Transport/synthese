@@ -68,6 +68,7 @@
 #include "DestinationUpdateAction.hpp"
 #include "FreeDRTAreaUpdateAction.hpp"
 #include "FreeDRTTimeSlotUpdateAction.hpp"
+#include "GetRealTimeServices.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JunctionUpdateAction.hpp"
@@ -166,6 +167,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DestinationsAdmin::integrate();
 	synthese::pt::FreeDRTAreaAdmin::integrate();
 	synthese::pt::FreeDRTTimeSlotAdmin::integrate();
+	synthese::pt::GetRealTimeServices::integrate();
 	synthese::pt::ServiceAdmin::integrate();
 	synthese::pt::TransportNetworkAdmin::integrate();
 	synthese::pt::CommercialLineAdmin::integrate();
