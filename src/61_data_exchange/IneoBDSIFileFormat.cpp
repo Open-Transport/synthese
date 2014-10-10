@@ -1441,14 +1441,14 @@ namespace synthese
 				}
 				
 				boost::posix_time::time_duration htaToCompare = horaires[i].hta;
-				if (htaToCompare.seconds() > 30)
+				if (htaToCompare.seconds())
 				{
-					htaToCompare += minutes(1);
+					htaToCompare += seconds(60 - htaToCompare.seconds());
 				}
 				boost::posix_time::time_duration htdToCompare = horaires[i].hta;
-				if (htdToCompare.seconds() > 30)
+				if (htdToCompare.seconds())
 				{
-					htdToCompare += minutes(1);
+					htdToCompare -= seconds(htdToCompare.seconds());
 				}
 
 				if(	(	edge.isArrivalAllowed() &&
