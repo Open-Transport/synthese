@@ -1584,6 +1584,9 @@ namespace synthese
 
 			// Registration of the service in the temporary environment
 			temporaryEnvironment.getEditableRegistry<ScheduledService>().add(service);
+			// ...and in the official because there is link with dataSource in the official env
+			// and service should not be deleted with temporaryEnvironment
+			Env::GetOfficialEnv().getEditableRegistry<ScheduledService>().add(service);
 
 			// Registration of the service in the course
 			syntheseService = service.get();
