@@ -1439,14 +1439,25 @@ namespace synthese
 				{
 					continue;
 				}
+				
+				boost::posix_time::time_duration htaToCompare = horaires[i].hta;
+				if (htaToCompare.seconds() > 30)
+				{
+					htaToCompare += minutes(1);
+				}
+				boost::posix_time::time_duration htdToCompare = horaires[i].hta;
+				if (htdToCompare.seconds() > 30)
+				{
+					htdToCompare += minutes(1);
+				}
 
 				if(	(	edge.isArrivalAllowed() &&
-					(	horaires[i].hta.hours() != service.getArrivalSchedule(false, i).hours() ||
-						horaires[i].hta.minutes() != service.getArrivalSchedule(false, i).minutes()
+					(	htaToCompare.hours() != service.getArrivalSchedule(false, i).hours() ||
+						htaToCompare.minutes() != service.getArrivalSchedule(false, i).minutes()
 				)	) || (
 					edge.isDepartureAllowed() &&
-					(	horaires[i].htd.hours() != service.getDepartureSchedule(false, i).hours() ||
-						horaires[i].htd.minutes() != service.getDepartureSchedule(false, i).minutes()
+					(	htdToCompare.hours() != service.getDepartureSchedule(false, i).hours() ||
+						htdToCompare.minutes() != service.getDepartureSchedule(false, i).minutes()
 				)	)	){
 						return false;
 				}
