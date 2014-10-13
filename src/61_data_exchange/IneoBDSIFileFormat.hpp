@@ -57,6 +57,11 @@ namespace synthese
 		class ScheduledService;
 	}
 
+	namespace graph
+	{
+		class RuleUser;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -86,6 +91,8 @@ namespace synthese
 				static const std::string PARAMETER_HYSTERESIS;
 				static const std::string PARAMETER_DELAY_BUS_STOP;
 				static const std::string PARAMETER_DAY_BREAK_TIME;
+				static const std::string PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE;
+				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 		
 			private:
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
@@ -93,6 +100,8 @@ namespace synthese
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
 				boost::posix_time::time_duration _dayBreakTime;
+				boost::shared_ptr<pt::PTUseRule> _handicappedForbiddenUseRule;
+				boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
@@ -171,6 +180,7 @@ namespace synthese
 					std::string ref;
 					const Chainage* chainage;
 					Horaires horaires;
+					const pt::PTUseRule* handicapped;
 
 					mutable pt::ScheduledService* syntheseService;
 
@@ -194,7 +204,8 @@ namespace synthese
 					const Course::Horaires& horaires,
 					const Chainage& chainage,
 					const std::string& courseRef,
-					const boost::posix_time::time_duration& nowDuration
+					const boost::posix_time::time_duration& nowDuration,
+					const pt::PTUseRule *handicapped
 				) const;
 
 
