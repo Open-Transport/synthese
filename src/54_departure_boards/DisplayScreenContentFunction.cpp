@@ -2056,7 +2056,7 @@ namespace synthese
 				}
 
 				OrderedDeparturesMap::iterator it;
-				int maxRow(_screen->getType()->get<RowsNumber>());
+				int maxRow(_screen->get<DisplayTypePtr>()->get<RowsNumber>());
 				int displayedResults(0);
 
 				if(_wayIsBackward)
