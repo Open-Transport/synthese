@@ -133,7 +133,7 @@ namespace synthese
 			ptime now(second_clock::local_time());
 			ptime d(now);
 
-			for (size_t i(0); i<_type->getRowNumber(); ++i)
+			for (size_t i(0); i<_type->get<RowsNumber>(); ++i)
 			{
 				ServicePointer sp(true, false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
 				sp.setDepartureInformations(**lineStop.getGeneratedLineStops().begin(), d, d, ps);
@@ -162,16 +162,16 @@ namespace synthese
 			Env::GetOfficialEnv().getEditableRegistry<Alarm>().add(alarm);
 			MessagesModule::UpdateActivatedMessages();
 
-			if(_type->getDisplayMainPage())
+			if(&*_type->get<DisplayMainPage>())
 			{
 				DisplayScreenContentFunction f;
 				f._displayDepartureBoard(
 					stream,
 					request,
-					Env::GetOfficialEnv().getSPtr(_type->getDisplayMainPage()),
-					Env::GetOfficialEnv().getSPtr(_type->getDisplayRowPage()),
-					Env::GetOfficialEnv().getSPtr(_type->getDisplayDestinationPage()),
-					Env::GetOfficialEnv().getSPtr(_type->getDisplayTransferDestinationPage()),
+					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayMainPage>()),
+					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayRowPage>()),
+					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayDestinationPage>()),
+					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayTransferDestinationPage>()),
 					now,
 					displayedObject,
 					fakeScreen
@@ -208,7 +208,7 @@ namespace synthese
 		std::string AlarmTestOnDisplayScreenFunction::getOutputMimeType() const
 		{
 			const Webpage* page(
-				_type->getDisplayMainPage()
+				&*_type->get<DisplayMainPage>()
 			);
 			return (page == NULL) ? "text/plain" : page->getMimeType();
 		}

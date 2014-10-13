@@ -28,13 +28,19 @@
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
+#include "Conversion.h"
+#include "DBModule.h"
 #include "DeparturesTableInterfacePage.h"
+#include "DeparturesTableModule.h"
 #include "DisplayMaintenanceLog.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayScreenContentFunction.h"
 #include "DisplayScreenCPU.h"
+#include "DisplayScreenCPUTableSync.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
+#include "ImportableTableSync.hpp"
 #include "Interface.h"
 #include "InterfacePageException.h"
 #include "JourneyPattern.hpp"
@@ -65,6 +71,7 @@ namespace synthese
 {
 	using namespace algorithm;
 	using namespace dblog;
+	using namespace departure_boards;
 	using namespace geography;
 	using namespace graph;
 	using namespace interfaces;
@@ -75,10 +82,48 @@ namespace synthese
 	using namespace tree;
 	using namespace util;
 
+	CLASS_DEFINITION(DisplayScreen, "t041_display_screens", 41)
+	FIELD_DEFINITION_OF_OBJECT(DisplayScreen, "display_screen_id", "display_screen_ids")
+	
+	FIELD_DEFINITION_OF_TYPE(BroadCastPoint, "broadcast_point_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(BroadCastPointComment, "broadcast_point_comment", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DisplayTypePtr, "type_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(WiringCode, "wiring_code", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(BlinkingDelay, "blinking_delay", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TrackNumberDisplay, "track_number_display", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(ServiceNumberDisplay, "service_number_display", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(DisplayTeam, "display_team", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(PhysicalStops, "physical_stops_ids", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(AllPhysicalDisplayed, "all_physicals", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(ForbiddenArrivalPlaces, "forbidden_arrival_places_ids", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(AllowedLines, "allowed_lines_ids", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Direction, "direction", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(OriginsOnly, "origins_only", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DisplayedPlaces, "displayed_places_ids", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(MaxDelay, "max_delay", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ClearingDelay, "clearing_delay", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(FirstRow, "first_row", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(GenerationMethodCode, "generation_method", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ForcedDestinations, "forced_destinations_ids", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DestinationForceDelay, "destination_force_delay", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaintenanceChecksPerDay, "maintenance_checks", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaintenanceIsOnline, "is_online", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(MaintenanceMessage, "maintenance_message", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DisplayClock, "display_clock", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(ComPort, "com_port", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(CpuHostId, "cpu_host_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MacAddress, "mac_address", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(RoutePlanningWithTransfer, "route_planning_with_transfer", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(TransferDestinations, "transfer_destinations", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(UpId, "up_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(SubScreenTypeCode, "sub_screen_type", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(AllowCanceled, "allow_canceled", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(StopPointLocation, "stop_point_location", SQL_INTEGER)
+	
 	namespace util
 	{
-		template<> const string Registry<departure_boards::DisplayScreen>::KEY("DisplayScreen");
-		template<> const string util::FactorableTemplate<messages::BroadcastPoint, departure_boards::DisplayScreen>::FACTORY_KEY = "DisplayScreen";
+		template<>
+		const string FactorableTemplate<BroadcastPoint, DisplayScreen>::FACTORY_KEY = "DisplayScreen";
 	}
 
 	namespace departure_boards
@@ -99,40 +144,50 @@ namespace synthese
 		DisplayScreen::DisplayScreen(
 			RegistryKeyType key
 		):	Registrable(key),
-			_displayType(NULL),
-			_wiringCode(0),
-			_comPort(0),
-			_stopPointLocation(NULL),
-			_blinkingDelay(1),
-			_trackNumberDisplay(false),
-			_serviceNumberDisplay(false),
-			_displayTeam(false),
-			_displayClock(true),
-			_displayedPlace(NULL),
-			_allPhysicalStopsDisplayed(true),
+			Object<DisplayScreen, DisplayScreenSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(BroadCastPoint),
+					FIELD_DEFAULT_CONSTRUCTOR(BroadCastPointComment),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayTypePtr),
+					FIELD_VALUE_CONSTRUCTOR(WiringCode, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(Title),
+					FIELD_VALUE_CONSTRUCTOR(BlinkingDelay, 1),
+					FIELD_VALUE_CONSTRUCTOR(TrackNumberDisplay, false),
+					FIELD_VALUE_CONSTRUCTOR(ServiceNumberDisplay, false),
+					FIELD_VALUE_CONSTRUCTOR(DisplayTeam, false),
+					FIELD_DEFAULT_CONSTRUCTOR(PhysicalStops),
+					FIELD_VALUE_CONSTRUCTOR(AllPhysicalDisplayed, true),
+					FIELD_DEFAULT_CONSTRUCTOR(ForbiddenArrivalPlaces),
+					FIELD_DEFAULT_CONSTRUCTOR(AllowedLines),
+					FIELD_DEFAULT_CONSTRUCTOR(Direction),
+					FIELD_DEFAULT_CONSTRUCTOR(OriginsOnly),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayedPlaces),
+					FIELD_VALUE_CONSTRUCTOR(MaxDelay, 12 * 60),// default = 24 hours
+					FIELD_VALUE_CONSTRUCTOR(ClearingDelay, 0),
+					FIELD_VALUE_CONSTRUCTOR(FirstRow, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(GenerationMethodCode),
+					FIELD_DEFAULT_CONSTRUCTOR(ForcedDestinations),
+					FIELD_VALUE_CONSTRUCTOR(DestinationForceDelay, 120),// default = 2 hours
+					FIELD_DEFAULT_CONSTRUCTOR(MaintenanceChecksPerDay),
+					FIELD_VALUE_CONSTRUCTOR(MaintenanceIsOnline, true),
+					FIELD_DEFAULT_CONSTRUCTOR(MaintenanceMessage),
+					FIELD_VALUE_CONSTRUCTOR(DisplayClock, true),
+					FIELD_VALUE_CONSTRUCTOR(ComPort, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(CpuHostId),
+					FIELD_DEFAULT_CONSTRUCTOR(MacAddress),
+					FIELD_VALUE_CONSTRUCTOR(RoutePlanningWithTransfer, false),
+					FIELD_DEFAULT_CONSTRUCTOR(TransferDestinations),
+					FIELD_DEFAULT_CONSTRUCTOR(UpId),
+					FIELD_DEFAULT_CONSTRUCTOR(SubScreenTypeCode),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_VALUE_CONSTRUCTOR(AllowCanceled, false),
+					FIELD_DEFAULT_CONSTRUCTOR(StopPointLocation)
+			)	),
 			_direction(DISPLAY_DEPARTURES),
 			_originsOnly(WITH_PASSING),
-			_maxDelay(12 * 60),			// default = 24 hours
-			_clearingDelay(0),
-			_firstRow(0),
-			_routePlanningWithTransfer(false),
-			_allowCanceled(false),
-			_generationMethod(STANDARD_METHOD),
-			_destinationForceDelay(120),	// default = 2 hours
-			_maintenanceIsOnline(true)
+			_generationMethod(STANDARD_METHOD)
 		{}
-
-
-
-		void DisplayScreen::setDestinationForceDelay(int delay)
-		{
-			_destinationForceDelay = delay;
-		}
-
-		void DisplayScreen::setMaxDelay(int maxDelay)
-		{
-			_maxDelay = maxDelay;
-		}
 
 		void DisplayScreen::addForbiddenPlace(const pt::StopArea* place)
 		{
@@ -155,40 +210,6 @@ namespace synthese
 
 
 
-		void DisplayScreen::setType(const DisplayType* displayType)
-		{
-			_displayType = displayType;
-		}
-
-		void DisplayScreen::setWiringCode( int code)
-		{
-			_wiringCode = code;
-		}
-
-		void DisplayScreen::setTitle( const std::string& title)
-		{
-			_title = title;
-		}
-
-		const std::string& DisplayScreen::getTitle() const
-		{
-			return _title;
-		}
-
-
-
-		void DisplayScreen::setTrackNumberDisplay( bool value )
-		{
-			_trackNumberDisplay = value;
-		}
-
-		void DisplayScreen::setServiceNumberDisplay( bool value )
-		{
-			_serviceNumberDisplay = value;
-		}
-
-
-
 		void DisplayScreen::setDirection( DeparturesTableDirection direction )
 		{
 			_direction = direction;
@@ -199,30 +220,9 @@ namespace synthese
 			_originsOnly = value;
 		}
 
-		void DisplayScreen::setClearingDelay( int delay )
-		{
-			_clearingDelay = delay;
-		}
-
-		void DisplayScreen::setFirstRow( int row )
-		{
-			_firstRow = row;
-		}
-
 		void DisplayScreen::setGenerationMethod( GenerationMethod method )
 		{
 			_generationMethod = method;
-		}
-
-
-		void DisplayScreen::setMaintenanceIsOnline( bool value )
-		{
-			_maintenanceIsOnline = value;
-		}
-
-		void DisplayScreen::setMaintenanceMessage( const std::string& message )
-		{
-			_maintenanceMessage = message;
 		}
 
 
@@ -247,8 +247,8 @@ namespace synthese
 							_forbiddenArrivalPlaces,
 							startTime,
 							endTime,
-							_allowCanceled,
-							rootCall ? _displayType->getRowNumber() : 1
+							get<AllowCanceled>(),
+							rootCall ? get<DisplayTypePtr>()->get<RowsNumber>() : 1
 				)	)	);
 				break;
 
@@ -264,10 +264,10 @@ namespace synthese
 							_forbiddenArrivalPlaces,
 							startTime,
 							endTime,
-							rootCall ? _displayType->getRowNumber() : 1,
+							rootCall ? get<DisplayTypePtr>()->get<RowsNumber>() : 1,
 							_forcedDestinations,
-							minutes(_destinationForceDelay),
-							_allowCanceled
+							minutes(get<DestinationForceDelay>()),
+							get<AllowCanceled>()
 				)	)	);
 				break;
 
@@ -306,10 +306,10 @@ namespace synthese
 					if(continuationScreen)
 					{
 						ptime transferStartTime(
-							itDest->serviceUse.getArrivalDateTime() - minutes(continuationScreen->getClearingDelay())
+							itDest->serviceUse.getArrivalDateTime() - minutes(continuationScreen->get<ClearingDelay>())
 						);
 						ptime transferEndTime(
-							itDest->serviceUse.getArrivalDateTime() + minutes(continuationScreen->getMaxDelay())
+							itDest->serviceUse.getArrivalDateTime() + minutes(continuationScreen->get<MaxDelay>())
 						);
 						ArrivalDepartureList subResult(
 							continuationScreen->generateStandardScreen(transferStartTime, transferEndTime, false)
@@ -365,7 +365,7 @@ namespace synthese
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(
-						_displayedPlace,
+						&*get<BroadCastPoint>(),
 						it2,
 						approachJourney.getFirstDepartureTime(),
 						approachJourney.getFirstDepartureTime(),
@@ -416,28 +416,6 @@ namespace synthese
 			return result;
 		}
 
-
-
-		int DisplayScreen::getWiringCode() const
-		{
-			return _wiringCode;
-		}
-
-		int DisplayScreen::getClearingDelay() const
-		{
-			return _clearingDelay;
-		}
-
-		bool DisplayScreen::getServiceNumberDisplay() const
-		{
-			return _serviceNumberDisplay;
-		}
-
-		bool DisplayScreen::getTrackNumberDisplay() const
-		{
-			return _trackNumberDisplay;
-		}
-
 		synthese::DeparturesTableDirection DisplayScreen::getDirection() const
 		{
 			return _direction;
@@ -448,21 +426,11 @@ namespace synthese
 			return _originsOnly;
 		}
 
-		int DisplayScreen::getMaxDelay() const
-		{
-			return _maxDelay;
-		}
-
-		int DisplayScreen::getBlinkingDelay() const
-		{
-			return _blinkingDelay;
-		}
-
 		const ArrivalDepartureTableGenerator::PhysicalStops& DisplayScreen::getPhysicalStops(bool result) const
 		{
 			return
-				(_allPhysicalStopsDisplayed && _displayedPlace && result) ?
-				_displayedPlace->getPhysicalStops() :
+				(get<AllPhysicalDisplayed>() && &*get<BroadCastPoint>() && result) ?
+				get<BroadCastPoint>()->getPhysicalStops() :
 				_physicalStops
 			;
 		}
@@ -477,11 +445,6 @@ namespace synthese
 			return _displayedPlaces;
 		}
 
-		int DisplayScreen::getFirstRow() const
-		{
-			return _firstRow;
-		}
-
 		DisplayScreen::GenerationMethod DisplayScreen::getGenerationMethod() const
 		{
 			return _generationMethod;
@@ -492,30 +455,6 @@ namespace synthese
 			return _forcedDestinations;
 		}
 
-		int DisplayScreen::getForceDestinationDelay() const
-		{
-			return _destinationForceDelay;
-		}
-
-
-
-		bool DisplayScreen::getIsOnline() const
-		{
-			return _maintenanceIsOnline;
-		}
-
-		const std::string& DisplayScreen::getMaintenanceMessage() const
-		{
-			return _maintenanceMessage;
-		}
-
-
-
-		bool DisplayScreen::getAllPhysicalStopsDisplayed() const
-		{
-			return _allPhysicalStopsDisplayed;
-		}
-
 
 
 		std::string DisplayScreen::getFullName() const
@@ -524,13 +463,13 @@ namespace synthese
 			{
 				stringstream s;
 				s << getLocation()->getFullName();
-				if (!getName().empty())
-					s << "/" << getName();
+				if (!get<BroadCastPointComment>().empty())
+					s << "/" << get<BroadCastPointComment>();
 				return s.str();
 			}
 			else
 			{
-				return getName() + " (not located)";
+				return get<BroadCastPointComment>() + " (not located)";
 			}
 		}
 
@@ -539,7 +478,7 @@ namespace synthese
 		DisplayScreen::Labels DisplayScreen::getSortedAvailableDestinationsLabels(
 			const DisplayedPlacesList& placesToAvoid
 		) const {
-			set<const DisplayScreen*> screens;
+			std::set<const DisplayScreen*> screens;
 			screens.insert(this);
 			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, getChildren())
 			{
@@ -620,22 +559,22 @@ namespace synthese
 
 		void DisplayScreen::copy(const DisplayScreen& other )
 		{
-			setAllPhysicalStopsDisplayed(other.getAllPhysicalStopsDisplayed());
-			setBlinkingDelay(other.getBlinkingDelay());
-			setClearingDelay(other.getClearingDelay());
-			setDestinationForceDelay(other.getForceDestinationDelay());
+			set<AllPhysicalDisplayed>(other.get<AllPhysicalDisplayed>());
+			set<BlinkingDelay>(other.get<BlinkingDelay>());
+			set<ClearingDelay>(other.get<ClearingDelay>());
+			set<DestinationForceDelay>(other.get<DestinationForceDelay>());
 			setDirection(other.getDirection());
-			setFirstRow(other.getFirstRow());
+			set<FirstRow>(other.get<FirstRow>());
 			setGenerationMethod(other.getGenerationMethod());
-			setDisplayedPlace(other.getDisplayedPlace());
+			set<BroadCastPoint>(other.get<BroadCastPoint>());
 			setSameRoot(other);
-			setMaxDelay(other.getMaxDelay());
+			set<MaxDelay>(other.get<MaxDelay>());
 			setOriginsOnly(other.getEndFilter());
-			setServiceNumberDisplay(other.getServiceNumberDisplay());
-			setTitle(other.getTitle());
-			setTrackNumberDisplay(other.getTrackNumberDisplay());
-			setType(other.getType());
-			setWiringCode(other.getWiringCode());
+			set<ServiceNumberDisplay>(other.get<ServiceNumberDisplay>());
+			set<Title>(other.get<Title>());
+			set<TrackNumberDisplay>(other.get<TrackNumberDisplay>());
+			set<DisplayTypePtr>(other.get<DisplayTypePtr>());
+			set<WiringCode>(other.get<WiringCode>());
 			setStops(other.getPhysicalStops(false));
 			setAllowedLines(other.getAllowedLines());
 			for (DisplayedPlacesList::const_iterator it = other.getDisplayedPlaces().begin(); it != other.getDisplayedPlaces().end(); ++it)
@@ -653,52 +592,9 @@ namespace synthese
 		}
 
 
-		void DisplayScreen::setDisplayTeam( bool value )
-		{
-			_displayTeam = value;
-		}
-
-		bool DisplayScreen::getDisplayTeam() const
-		{
-			return _displayTeam;
-		}
-
-
 
 		DisplayScreen::~DisplayScreen(
-		){
-			_displayType = NULL;
-		}
-
-
-
-		void DisplayScreen::setDisplayClock(
-			bool value
-		){
-			_displayClock = value;
-		}
-
-
-
-		void DisplayScreen::setComPort(
-			int value
-		) {
-			_comPort = value;
-		}
-
-
-
-		int DisplayScreen::getComPort(
-		) const {
-			return _comPort;
-		}
-
-
-
-		bool DisplayScreen::getDisplayClock(
-		) const {
-			return _displayClock;
-		}
+		){}
 
 
 		bool DisplayScreen::isDown(
@@ -710,7 +606,7 @@ namespace synthese
 			}
 
 			ptime now(second_clock::local_time());
-			if(now - status.getTime() <= getType()->getTimeBetweenChecks())
+			if(now - status.getTime() <= get<DisplayTypePtr>()->get<TimeBetweenChecks>())
 			{
 				return false;
 			}
@@ -720,26 +616,13 @@ namespace synthese
 
 		bool DisplayScreen::isMonitored(
 		) const {
-			return getIsOnline() &&
-				getType() != NULL &&
-				getType()->getMonitoringInterface() != NULL &&
-				getType()->getTimeBetweenChecks().minutes() > 0
+			return get<MaintenanceIsOnline>() &&
+				get<DisplayTypePtr>() &&
+				&*get<DisplayTypePtr>() != NULL &&
+				get<DisplayTypePtr>()->get<MonitoringInterface>() &&
+				&*(get<DisplayTypePtr>()->get<MonitoringInterface>()) != NULL &&
+				get<DisplayTypePtr>()->get<TimeBetweenChecks>().minutes() > 0
 			;
-		}
-
-		void DisplayScreen::setMacAddress( const std::string& value )
-		{
-			_macAddress = value;
-		}
-
-		std::string DisplayScreen::getMacAddress() const
-		{
-			return _macAddress;
-		}
-
-		void DisplayScreen::setRoutePlanningWithTransfer( bool value )
-		{
-			_routePlanningWithTransfer = value;
 		}
 
 
@@ -796,7 +679,7 @@ namespace synthese
 			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, getChildren())
 			{
 				if(	it.second->getSubScreenType() == CONTINUATION_TRANSFER &&
-					it.second->getDisplayedPlace() == &stop
+					&*it.second->get<BroadCastPoint>() == &stop
 				){
 					return it.second;
 				}
@@ -818,37 +701,11 @@ namespace synthese
 
 
 
-		void DisplayScreen::toParametersMap(
-			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
-			std::string prefix
-		) const {
-
-			pm.insert(prefix + DATA_IS_ONLINE, _maintenanceIsOnline);
-			if(getRoot<PlaceWithDisplayBoards>() && getRoot<PlaceWithDisplayBoards>()->getPlace())
-			{
-				pm.insert(prefix + DATA_LOCATION_ID, getRoot<PlaceWithDisplayBoards>()->getPlace()->getKey());
-			}
-			if(getRoot<DisplayScreenCPU>())
-			{
-				pm.insert(prefix + DATA_CPU_ID, getRoot<DisplayScreenCPU>()->getKey());
-			}
-			pm.insert(prefix + DATA_MAC_ADDRESS, _macAddress);
-			pm.insert(prefix + DATA_MAINTENANCE_MESSAGE, _maintenanceMessage);
-			pm.insert(prefix + DATA_NAME, getName());
-			pm.insert(prefix + DATA_SCREEN_ID, getKey());
-			pm.insert(prefix + DATA_TITLE, _title);
-			pm.insert(prefix + DATA_TYPE_ID, _displayType ? _displayType->getKey() : 0);
-		}
-
-
-
-		MessageType* DisplayScreen::getMessageType() const
+		messages::MessageType* DisplayScreen::getMessageType() const
 		{
 			return
-				_displayType ?
-				_displayType->getMessageType() :
+				get<DisplayTypePtr>() ?
+				&*(get<DisplayTypePtr>()->get<MessageType>()) :
 				NULL;
 		}
 
@@ -871,8 +728,8 @@ namespace synthese
 		) const	{
 
 			// If no customized rule, use the Jump over undefined type or rule page
-			if(	!_displayType ||
-				!_displayType->getMessageIsDisplayedPage()
+			if(	!get<DisplayTypePtr>() ||
+				!get<DisplayTypePtr>()->get<IsDisplayedMessagePage>()
 			){
 				// in broad cast points recipients
 				Alarm::LinkedObjects::const_iterator it(
@@ -1030,7 +887,7 @@ namespace synthese
 						}
 						else if(decodeTableId(link->getObjectId()) == StopPointTableSync::TABLE.ID)
 						{
-							result = (_stopPointLocation && _stopPointLocation->getKey() == link->getObjectId());
+							result = (get<StopPointLocation>() && get<StopPointLocation>()->getKey() == link->getObjectId());
 						}
 
 						if(result)
@@ -1061,7 +918,7 @@ namespace synthese
 			Alarm::LinkedObjectsToParametersMap(linkedObjects, *recipientsPM);
 			pm.insert("recipients", recipientsPM);
 
-			_displayType->getMessageIsDisplayedPage()->display(s, pm);
+			get<DisplayTypePtr>()->get<IsDisplayedMessagePage>()->display(s, pm);
 			string str(s.str());
 			trim(str);
 			return !str.empty();
@@ -1074,10 +931,10 @@ namespace synthese
 			boost::optional<bool> direction
 		) const	{
 
-			if(_stopPointLocation)
+			if(get<StopPointLocation>())
 			{
 				// Search on departure edges
-				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getDepartureEdges())
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, get<StopPointLocation>()->getDepartureEdges())
 				{
 					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
 					{
@@ -1093,7 +950,7 @@ namespace synthese
 				}
 
 				// Search on arrival edges
-				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getArrivalEdges())
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, get<StopPointLocation>()->getArrivalEdges())
 				{
 					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
 					{
@@ -1167,10 +1024,10 @@ namespace synthese
 			const pt::TransportNetwork& network
 		) const	{
 
-			if(_stopPointLocation)
+			if(get<StopPointLocation>())
 			{
 				// Search on departure edges
-				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getDepartureEdges())
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, get<StopPointLocation>()->getDepartureEdges())
 				{
 					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
 					{
@@ -1184,7 +1041,7 @@ namespace synthese
 				}
 
 				// Search on arrival edges
-				BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stopPointLocation->getArrivalEdges())
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, get<StopPointLocation>()->getArrivalEdges())
 				{
 					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
 					{
@@ -1248,5 +1105,184 @@ namespace synthese
 
 			// Nothing was found
 			return false;
+		}
+		
+		void DisplayScreen::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			setDirection(static_cast<DeparturesTableDirection>(get<Direction>()));
+			setOriginsOnly(static_cast<EndFilter>(get<OriginsOnly>()));
+			setGenerationMethod(static_cast<GenerationMethod>(get<GenerationMethodCode>()));
+			setSubScreenType(static_cast<SubScreenType>(get<SubScreenTypeCode>()));
+			setNullRoot();
+			clearForbiddenPlaces();
+			clearDisplayedPlaces();
+			clearForcedDestinations();
+			clearTransferDestinations();
+			
+			// Line filter
+			LineFilter lineFilter(
+				DisplayScreenTableSync::UnserializeLineFilter(
+					get<AllowedLines>(),
+					env,
+					util::UP_LINKS_LOAD_LEVEL
+			)	);
+			setAllowedLines(lineFilter);
+			
+			// Up & root
+			RegistryKeyType upId(get<UpId>());
+			if(upId > 0) try
+			{
+				setParent(DisplayScreenTableSync::GetEditable(upId, env).get());
+			}
+			catch(ObjectNotFoundException<DisplayScreen>&)
+			{
+				Log::GetInstance().warn(
+					"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : up display screen " +
+					lexical_cast<string>(upId) + " not found"
+				);
+			}
+			else
+			{
+				// CPU
+				RegistryKeyType cpuId(get<CpuHostId>());
+				if (cpuId > 0) try
+				{
+					setRoot(DisplayScreenCPUTableSync::GetEditable(cpuId, env).get());
+					setParent(NULL);
+				}
+				catch(ObjectNotFoundException<StopArea>&)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : cpu host " +
+						lexical_cast<string>(cpuId) + " not found"
+					);
+				}
+				else
+				{
+					if (get<BroadCastPoint>())
+					{
+						setRoot(
+							DeparturesTableModule::GetPlaceWithDisplayBoards(
+								&*get<BroadCastPoint>(),
+								env
+						)	);
+					}
+					setParent(NULL);
+				}
+			}
+			
+			registerInParentOrRoot();
+			
+			// Physical stops
+			vector<string> stops = Conversion::ToStringVector(get<PhysicalStops>());
+			ArrivalDepartureTableGenerator::PhysicalStops pstops;
+			BOOST_FOREACH(const string& stop, stops)
+			{
+				try
+				{
+					RegistryKeyType id(lexical_cast<RegistryKeyType>(stop));
+					pstops.insert(
+						make_pair(
+							id,
+							StopPointTableSync::Get(id, env).get()
+					)	);
+				}
+				catch (ObjectNotFoundException<StopPoint>&)
+				{
+					Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + PhysicalStops::FIELD.name);
+				}
+			}
+			setStops(pstops);
+			
+			// Forbidden places
+			stops = Conversion::ToStringVector (get<ForbiddenArrivalPlaces>());
+			BOOST_FOREACH(const string& stop, stops)
+			{
+				try
+				{
+					addForbiddenPlace(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop), env).get());
+				}
+				catch (ObjectNotFoundException<StopArea>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + ForbiddenArrivalPlaces::FIELD.name, e);
+				}
+			}
+			
+			// Displayed places
+			stops = Conversion::ToStringVector (get<DisplayedPlaces>());
+			BOOST_FOREACH(const string& stop, stops)
+			{
+				try
+				{
+					addDisplayedPlace(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop), env).get());
+				}
+				catch (ObjectNotFoundException<StopArea>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + DisplayedPlaces::FIELD.name, e);
+				}
+			}
+			
+			// Forced destinations
+			stops = Conversion::ToStringVector (get<ForcedDestinations>());
+			BOOST_FOREACH(const string& stop, stops)
+			{
+				try
+				{
+					addForcedDestination(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop), env).get());
+				}
+				catch (ObjectNotFoundException<StopArea>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + ForcedDestinations::FIELD.name, e);
+			}	}
+			
+			// Transfers
+			stops = Conversion::ToStringVector(get<TransferDestinations>());
+			BOOST_FOREACH(const string& stop, stops)
+			{
+				typedef tokenizer<char_separator<char> > tokenizer;
+				tokenizer tokens (stop, char_separator<char>(":"));
+				tokenizer::iterator it(tokens.begin());
+				string id1(*it);
+				++it;
+				string id2(*it);
+				
+				try
+				{
+					addTransferDestination(
+						StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(id1), env).get(),
+						StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(id2), env).get()
+					);
+				}
+				catch (ObjectNotFoundException<StopArea>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + DisplayScreenTableSync::TABLE.NAME + "/" + TransferDestinations::FIELD.name, e);
+				}
+			}
+		}
+		
+		void DisplayScreen::unlink()
+		{
+			setParent(NULL);
+		}
+		
+		void DisplayScreen::addAdditionalParameters(
+			util::ParametersMap& pm,
+			std::string prefix
+		) const {
+			pm.insert(prefix + DATA_IS_ONLINE, get<MaintenanceIsOnline>());
+			if(getRoot<PlaceWithDisplayBoards>() && getRoot<PlaceWithDisplayBoards>()->getPlace())
+			{
+				pm.insert(prefix + DATA_LOCATION_ID, getRoot<PlaceWithDisplayBoards>()->getPlace()->getKey());
+			}
+			if(getRoot<DisplayScreenCPU>())
+			{
+				pm.insert(prefix + DATA_CPU_ID, getRoot<DisplayScreenCPU>()->getKey());
+			}
+			pm.insert(prefix + DATA_MAC_ADDRESS, get<MacAddress>());
+			pm.insert(prefix + DATA_MAINTENANCE_MESSAGE, get<MaintenanceMessage>());
+			pm.insert(prefix + DATA_NAME, get<BroadCastPointComment>());
+			pm.insert(prefix + DATA_SCREEN_ID, getKey());
+			pm.insert(prefix + DATA_TITLE, get<Title>());
+			pm.insert(prefix + DATA_TYPE_ID, &*get<DisplayTypePtr>() ? get<DisplayTypePtr>()->getKey() : 0);
 		}
 }	}

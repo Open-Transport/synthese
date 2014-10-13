@@ -219,7 +219,7 @@ namespace synthese
 						)	)
 					;
 				}
-				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getName()));
+				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->get<BroadCastPointComment>()));
 
 				stream << t.title("Données techniques");
 				stream << t.cell("UID", lexical_cast<string>(_displayScreen->getKey()));
@@ -228,11 +228,11 @@ namespace synthese
 						"Type d'afficheur",
 						t.getForm().getSelectInput(
 							UpdateDisplayScreenAction::PARAMETER_TYPE,
-							DeparturesTableModule::getDisplayTypeLabels(false, _displayScreen->getType() == NULL),
-							_displayScreen->getType() ? _displayScreen->getType()->getKey() : optional<RegistryKeyType>()
+							DeparturesTableModule::getDisplayTypeLabels(false, &*_displayScreen->get<DisplayTypePtr>() == NULL),
+							_displayScreen->get<DisplayTypePtr>() ? _displayScreen->get<DisplayTypePtr>()->getKey() : optional<RegistryKeyType>()
 					)	)
 				;
-				stream << t.cell("Adresse MAC", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS, _displayScreen->getMacAddress()));
+				stream << t.cell("Adresse MAC", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS, _displayScreen->get<MacAddress>()));
 
 				stream << t.title("Connexion");
 
@@ -283,12 +283,12 @@ namespace synthese
 						t.getForm().getSelectNumberInput(
 							UpdateDisplayScreenAction::PARAMETER_COM_PORT,
 							0, 99,
-							_displayScreen->getComPort(),
+							_displayScreen->get<ComPort>(),
 							1,
 							"(inutilisé)"
 					)	)
 				;
-				stream << t.cell("Code de branchement bus RS485", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
+				stream << t.cell("Code de branchement bus RS485", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->get<WiringCode>()));
 
 				stream << t.close();
 
@@ -314,7 +314,7 @@ namespace synthese
 				// View the display type
 				AdminFunctionRequest<DisplayTypeAdmin> displayTypeRequest(_request);
 				displayTypeRequest.getPage()->setType(
-					Env::GetOfficialEnv().getSPtr(_displayScreen->getType())
+					Env::GetOfficialEnv().getSPtr(&*_displayScreen->get<DisplayTypePtr>())
 				);
 
 				// Log search
@@ -331,7 +331,7 @@ namespace synthese
 						"Afficheur déclaré en service",
 						t.getForm().getOuiNonRadioInput(
 							UpdateDisplayMaintenanceAction::PARAMETER_ONLINE,
-							_displayScreen->getIsOnline()
+							_displayScreen->get<MaintenanceIsOnline>()
 					)	)
 				;
 				stream <<
@@ -339,7 +339,7 @@ namespace synthese
 						"Message de maintenance",
 						t.getForm().getTextAreaInput(
 							UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE,
-							_displayScreen->getMaintenanceMessage(),
+							_displayScreen->get<MaintenanceMessage>(),
 							3, 60, false
 					)	)
 				;
@@ -354,7 +354,7 @@ namespace synthese
 
 
 				stream << l.element();
-				if(_displayScreen->getType() == NULL)
+				if(&*_displayScreen->get<DisplayTypePtr>() == NULL)
 				{
 					stream <<
 						HTMLModule::getHTMLImage("/admin/img/error.png", "Erreur") <<
@@ -367,7 +367,7 @@ namespace synthese
 						"Type d'afficheur : " <<
 						HTMLModule::getHTMLLink(
 							displayTypeRequest.getURL(),
-							_displayScreen->getType()->getName()
+							_displayScreen->get<DisplayTypePtr>()->get<Name>()
 						)
 					;
 				}
@@ -385,7 +385,7 @@ namespace synthese
 					stream <<
 						l.element() <<
 						"Durée théorique entre les contacts de supervision : " <<
-						_displayScreen->getType()->getTimeBetweenChecks() << " min"
+						_displayScreen->get<DisplayTypePtr>()->get<TimeBetweenChecks>() << " min"
 					;
 
 					if(_status.get() == NULL)
@@ -508,17 +508,17 @@ namespace synthese
 						optional<EndFilter>(_displayScreen->getEndFilter()),
 						true
 						)	);
-					stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, lexical_cast<string>(_displayScreen->getMaxDelay())) + " minutes");
+					stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, lexical_cast<string>(_displayScreen->get<MaxDelay>())) + " minutes");
 					stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
 						UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
-						optional<int>(_displayScreen->getClearingDelay())
+						optional<int>(_displayScreen->get<ClearingDelay>())
 						)	);
 
 					// Allow canceled
 					stream << t.cell(
 						"Afficher services supprimés",
-						t.getForm().getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ALLOW_CANCELED, _displayScreen->getAllowCanceled())
+						t.getForm().getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ALLOW_CANCELED, _displayScreen->get<AllowCanceled>())
 					);
 
 					if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
@@ -529,7 +529,7 @@ namespace synthese
 								"Délai maximum présélection",
 								t.getForm().getTextInput(
 									UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
-									lexical_cast<string>(_displayScreen->getForceDestinationDelay())
+									lexical_cast<string>(_displayScreen->get<DestinationForceDelay>())
 								) + " minutes"
 							)
 						;
@@ -543,8 +543,8 @@ namespace synthese
 					PropertiesHTMLTable t(updateDisplayedPlaceRequest.getHTMLForm("stopareachange"));
 					t.getForm().setUpdateRight(tabHasWritePermissions());
 					stream << t.open();
-					stream << t.cell("Localité", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_CITY_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getCity()->getName() : string()));
-					stream << t.cell("Arrêt", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getName() : string()));
+					stream << t.cell("Localité", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_CITY_NAME, &*_displayScreen->get<BroadCastPoint>() ? _displayScreen->get<BroadCastPoint>()->getCity()->getName() : string()));
+					stream << t.cell("Arrêt", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME, &*_displayScreen->get<BroadCastPoint>() ? _displayScreen->get<BroadCastPoint>()->getName() : string()));
 					stream << t.close();
 				}
 
@@ -554,7 +554,7 @@ namespace synthese
 				{
 					stream << "<h1>Arrêts de destination</h1>";
 
-					if(_displayScreen->getDisplayedPlace() == NULL)
+					if(&*_displayScreen->get<BroadCastPoint>() == NULL)
 					{
 						stream << "Arrêt de départ non spécifié, aucune destination ne peut être sélectionnée.";
 					}
@@ -597,15 +597,15 @@ namespace synthese
 					stream << "<h1>Arrêts de desserte</h1>";
 
 					HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
-					uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, lexical_cast<string>(!_displayScreen->getAllPhysicalStopsDisplayed()));
-					stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
-					stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
+					uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, lexical_cast<string>(!_displayScreen->get<AllPhysicalDisplayed>()));
+					stream << "<p>Mode : "	<< (_displayScreen->get<AllPhysicalDisplayed>() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
+					stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->get<AllPhysicalDisplayed>() ? "Sélection d'arrêts" : "Tous arrêts"));
 					stream << "</p>";
 					HTMLList l;
 
-					if (!_displayScreen->getAllPhysicalStopsDisplayed())
+					if (!_displayScreen->get<AllPhysicalDisplayed>())
 					{
-						if(_displayScreen->getDisplayedPlace() == NULL)
+						if(&*_displayScreen->get<BroadCastPoint>() == NULL)
 						{
 							stream << "Arrêt de départ non spécifié, aucun arrêt à sélectionner.";
 						}
@@ -620,7 +620,7 @@ namespace synthese
 							stream << t.col(1, string(), true) << "Affiché";
 							BOOST_FOREACH(
 								const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
-								_displayScreen->getDisplayedPlace()->getPhysicalStops()
+								_displayScreen->get<BroadCastPoint>()->getPhysicalStops()
 							){
 								stream << t.row();
 								stream << t.col() << it.second->getName();
@@ -802,19 +802,19 @@ namespace synthese
 					removeDisplayRequest.getAction()->setObjectId(screen.getKey());
 
 					stream << td.row();
-					stream << td.col() << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.getName());
+					stream << td.col() << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.get<BroadCastPointComment>());
 					stream << td.col() << DisplayScreen::GetSubScreenTypeLabel(screen.getSubScreenType());
 
 					// Displayed place
 					stream << td.col();
-					if(screen.getDisplayedPlace())
+					if(&*(screen.get<BroadCastPoint>()))
 					{
-						displayPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(screen.getDisplayedPlace()));
-						stream << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.getDisplayedPlace()->getFullName());
+						displayPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(&*(screen.get<BroadCastPoint>())));
+						stream << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.get<BroadCastPoint>()->getFullName());
 					}
 					stream << td.col() << screen.getKey();
 					stream << td.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "/admin/img/monitor.png");
-					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le contenu "+ screen.getName() + " ?", "/admin/img/monitor_delete.png");
+					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le contenu "+ screen.get<BroadCastPointComment>() + " ?", "/admin/img/monitor_delete.png");
 				}
 
 				// Creation form
@@ -853,23 +853,23 @@ namespace synthese
 				t.getForm().setUpdateRight(tabHasWritePermissions());
 
 				stream << t.open();
-				stream << t.cell("Titre", t.getForm().getTextInput(DisplayScreenAppearanceUpdateAction::PARAMETER_TITLE, _displayScreen->getTitle()));
+				stream << t.cell("Titre", t.getForm().getTextInput(DisplayScreenAppearanceUpdateAction::PARAMETER_TITLE, _displayScreen->get<Title>()));
 				stream << t.cell(
 					"Clignotement",
 					t.getForm().getSelectInput(
 						DisplayScreenAppearanceUpdateAction::PARAMETER_BLINKING_DELAY,
 						blinkingDelaysMap,
-						optional<int>(_displayScreen->getBlinkingDelay())
+						optional<int>(_displayScreen->get<BlinkingDelay>())
 				)	);
-				stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
-				stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
-				stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
+				stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->get<TrackNumberDisplay>()));
+				stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->get<ServiceNumberDisplay>()));
+				stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->get<DisplayTeam>()));
 				stream <<
 					t.cell(
 						"Affichage horloge",
 						t.getForm().getOuiNonRadioInput(
 							DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_CLOCK,
-							_displayScreen->getDisplayClock()
+							_displayScreen->get<DisplayClock>()
 					)	)
 				;
 
@@ -992,11 +992,11 @@ namespace synthese
 				// Requests
 				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request, true);
 				viewRequest.getFunction()->setScreen(_displayScreen);
-				if(	_displayScreen->getType() &&
-					_displayScreen->getType()->getDisplayInterface() &&
-					!_displayScreen->getType()->getDisplayInterface()->getDefaultClientURL().empty()
+				if(	_displayScreen->get<DisplayTypePtr>() &&
+					_displayScreen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
+					!_displayScreen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL().empty()
 				){
-					viewRequest.setClientURL(_displayScreen->getType()->getDisplayInterface()->getDefaultClientURL());
+					viewRequest.setClientURL(_displayScreen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL());
 				}
 
 				// Output
@@ -1012,7 +1012,7 @@ namespace synthese
 				HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
 
-				if (!_displayScreen->getIsOnline())
+				if (!_displayScreen->get<MaintenanceIsOnline>())
 				{
 					stream << t.row();
 					stream << t.col() << priority++;
@@ -1050,7 +1050,7 @@ namespace synthese
 					stream << t.col();
 					if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 					{
-						stream << "Calcul d'itinéraires " << (_displayScreen->getRoutePlanningWithTransfer() ? "avec" : "sans") << " correspondances";
+						stream << "Calcul d'itinéraires " << (_displayScreen->get<RoutePlanningWithTransfer>() ? "avec" : "sans") << " correspondances";
 					}
 					else
 					{
@@ -1151,7 +1151,7 @@ namespace synthese
 
 		std::string DisplayAdmin::getTitle() const
 		{
-			return _displayScreen.get() ? _displayScreen->getName() : DEFAULT_TITLE;
+			return _displayScreen.get() ? _displayScreen->get<BroadCastPointComment>() : DEFAULT_TITLE;
 		}
 
 

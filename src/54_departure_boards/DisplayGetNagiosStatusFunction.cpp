@@ -77,7 +77,7 @@ namespace synthese
 
 		ParametersMap DisplayGetNagiosStatusFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			if(	!_screen->getIsOnline()
+			if(	!_screen->get<MaintenanceIsOnline>()
 			){
 				stream << "3\nCheck deactivated.|temp=-1\n";
 			} else if(	!_screen->isMonitored()

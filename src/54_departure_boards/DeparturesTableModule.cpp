@@ -131,7 +131,7 @@ namespace synthese
 			);
 			BOOST_FOREACH(const boost::shared_ptr<DisplayType>& displayType, types)
 			{
-				m.push_back(make_pair(displayType->getKey(), displayType->getName()));
+				m.push_back(make_pair(displayType->getKey(), displayType->get<Name>()));
 			}
 			return m;
 		}

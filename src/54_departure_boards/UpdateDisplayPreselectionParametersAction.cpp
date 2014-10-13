@@ -142,11 +142,11 @@ namespace synthese
 			switch (_function)
 			{
 			case ROUTE_PLANNING_WITHOUT_TRANSFER:
-				_screen->setRoutePlanningWithTransfer(false);
+				_screen->set<RoutePlanningWithTransfer>(false);
 				break;
 
 			case ROUTE_PLANNING_WITH_TRANSFER:
-				_screen->setRoutePlanningWithTransfer(true);
+				_screen->set<RoutePlanningWithTransfer>(true);
 				break;
 				
 			default:
@@ -159,10 +159,10 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					t,
 					"Délai de préselection",
-					_screen->getForceDestinationDelay(),
+					_screen->get<DestinationForceDelay>(),
 					*_preselectionDelay
 				);
-				_screen->setDestinationForceDelay(*_preselectionDelay);
+				_screen->set<DestinationForceDelay>(*_preselectionDelay);
 			}
 
 			// Terminus
@@ -173,19 +173,19 @@ namespace synthese
 
 			// Cleaning delay
 			DBLogModule::appendToLogIfChange(
-				t, "Délai d'effacement", _screen->getClearingDelay(), _cleaningDelay
+				t, "Délai d'effacement", _screen->get<ClearingDelay>(), _cleaningDelay
 			);
-			_screen->setClearingDelay(_cleaningDelay);
+			_screen->set<ClearingDelay>(_cleaningDelay);
 
 			// Max delay
-			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
-			_screen->setMaxDelay(_maxDelay);
+			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->get<MaxDelay>(), _maxDelay);
+			_screen->set<MaxDelay>(_maxDelay);
 
 			// Allow canceled
 			if(_allowCanceled)
 			{
-				DBLogModule::appendToLogIfChange(t, "Afficher les services supprmés", _screen->getAllowCanceled(), *_allowCanceled);
-				_screen->setAllowCanceled(*_allowCanceled);
+				DBLogModule::appendToLogIfChange(t, "Afficher les services supprmés", _screen->get<AllowCanceled>(), *_allowCanceled);
+				_screen->set<AllowCanceled>(*_allowCanceled);
 			}
 
 			// Saving
@@ -234,7 +234,7 @@ namespace synthese
 		){
 			if(screen.getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 			{
-				return screen.getRoutePlanningWithTransfer() ? UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING_WITH_TRANSFER : UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING_WITHOUT_TRANSFER;
+				return screen.get<RoutePlanningWithTransfer>() ? UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING_WITH_TRANSFER : UpdateDisplayPreselectionParametersAction::ROUTE_PLANNING_WITHOUT_TRANSFER;
 			}
 			if(screen.getGenerationMethod() == DisplayScreen::STANDARD_METHOD)
 			{

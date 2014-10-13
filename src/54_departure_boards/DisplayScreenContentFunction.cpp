@@ -414,7 +414,7 @@ namespace synthese
 					//Generation Method of the pannel is "STANDARD_METHOD"
 					screen->setGenerationMethod(generationMethod);
 					_type.reset(new DisplayType);
-					_type->setRowNumber(map.getDefault<size_t>(PARAMETER_ROWS_NUMBER, 10));
+					_type->set<RowsNumber>(map.getDefault<size_t>(PARAMETER_ROWS_NUMBER, 10));
 
 
 					// Way 3 : physical stop
@@ -428,8 +428,8 @@ namespace synthese
 
 						if(!_dataSourceFilter || stop->hasLinkWithSource(*_dataSourceFilter))
 						{
-							screen->setDisplayedPlace(stop->getConnectionPlace());
-							screen->setAllPhysicalStopsDisplayed(false);
+							screen->set<BroadCastPoint>(*(const_cast<StopArea*>(stop->getConnectionPlace())));
+							screen->set<AllPhysicalDisplayed>(false);
 							ArrivalDepartureTableGenerator::PhysicalStops stopsFilter;
 							stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
 							screen->setStops(stopsFilter);
@@ -446,7 +446,7 @@ namespace synthese
 								vector<string> stopsVect;
 								split(stopsVect, stopsStr, is_any_of(",; "));
 
-								screen->setAllPhysicalStopsDisplayed(false);
+								screen->set<AllPhysicalDisplayed>(false);
 								ArrivalDepartureTableGenerator::PhysicalStops stopsFilter;
 
 								BOOST_FOREACH(string& stopItem, stopsVect)
@@ -489,7 +489,7 @@ namespace synthese
 										if(_dataSourceFilter && !stop->hasLinkWithSource(*_dataSourceFilter))
 											continue;
 
-										screen->setDisplayedPlace(stop->getConnectionPlace());
+										screen->set<BroadCastPoint>(*(const_cast<StopArea*>(stop->getConnectionPlace())));
 										stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
 										_lineDestinationFilter.insert(LineDestinationFilter::value_type(stop.get(), make_pair(lineFilter, destinationFilter)));
 									}
@@ -504,7 +504,7 @@ namespace synthese
 											if(_dataSourceFilter && !stop.hasLinkWithSource(*_dataSourceFilter))
 												continue;
 
-											screen->setDisplayedPlace(stop.getConnectionPlace());
+											screen->set<BroadCastPoint>(*(const_cast<StopArea*>(stop.getConnectionPlace())));
 											stopsFilter.insert(make_pair(stop.getKey(), &stop));
 											_lineDestinationFilter.insert(LineDestinationFilter::value_type(&stop, make_pair(lineFilter, destinationFilter)));
 										}
@@ -544,14 +544,14 @@ namespace synthese
 
 										stopsSet.erase(code);
 										pstops.insert(make_pair(myStop.second->getKey(), myStop.second.get()));
-										screen->setDisplayedPlace(myStop.second->getConnectionPlace());
+										screen->set<BroadCastPoint>(*(const_cast<StopArea*>(myStop.second->getConnectionPlace())));
 										break;
 									}
 								}
 							}
 						}
 
-						screen->setAllPhysicalStopsDisplayed(false);
+						screen->set<AllPhysicalDisplayed>(false);
 						screen->setStops(pstops);
 					}
 
@@ -560,8 +560,8 @@ namespace synthese
 					// 2.1 by id
 					else if(decodeTableId(id) == StopAreaTableSync::TABLE.ID)
 					{
-						screen->setDisplayedPlace(Env::GetOfficialEnv().getRegistry<StopArea>().get(id).get());
-						screen->setAllPhysicalStopsDisplayed(true);
+						screen->set<BroadCastPoint>(*(const_cast<StopArea*>(Env::GetOfficialEnv().getRegistry<StopArea>().get(id).get())));
+						screen->set<AllPhysicalDisplayed>(true);
 					}
 
 					// 2.2 by name
@@ -572,8 +572,8 @@ namespace synthese
 						{
 							throw RequestException("This place is not a stop area");
 						}
-						screen->setDisplayedPlace(dynamic_cast<StopArea*>(place.get()));
-						screen->setAllPhysicalStopsDisplayed(true);
+						screen->set<BroadCastPoint>(*(const_cast<StopArea*>(dynamic_cast<StopArea*>(place.get()))));
+						screen->set<AllPhysicalDisplayed>(true);
 					}
 					else // Failure
 					{
@@ -617,14 +617,14 @@ namespace synthese
 					_timetableGroupedByArea = map.getDefault<bool>(PARAMETER_TIMETABLE_GROUPED_BY_AREA, false);
 					_splitContinuousServices = map.getDefault<bool>(PARAMETER_SPLIT_CONTINUOUS_SERVICES, false);
 					
-					screen->setType(_type.get());
+					screen->set<DisplayTypePtr>(*(_type.get()));
 					//If request contains an interface : build a screen, else prepare custom xml answer
 					optional<RegistryKeyType> idReg(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
 					if(idReg)
 					{
 						try
 						{
-							_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(*idReg).get());
+							_type->set<DisplayInterface>(*(const_cast<Interface*>(Env::GetOfficialEnv().getRegistry<Interface>().get(*idReg).get())));
 						}
 						catch (ObjectNotFoundException<Interface>&)
 						{
@@ -633,10 +633,10 @@ namespace synthese
 					}
 					else if(_mainPage.get() && !_useSAEDirectConnection && !_timetableGroupedByArea)
 					{
-						_type->setDisplayMainPage(_mainPage.get());
-						_type->setDisplayRowPage(_rowPage.get());
-						_type->setDisplayDestinationPage(_destinationPage.get());
-						_type->setDisplayTransferDestinationPage(_transferDestinationPage.get());
+						_type->set<DisplayMainPage>(*(const_cast<Webpage*>(_mainPage.get())));
+						_type->set<DisplayRowPage>(*(const_cast<Webpage*>(_rowPage.get())));
+						_type->set<DisplayDestinationPage>(*(const_cast<Webpage*>(_destinationPage.get())));
+						_type->set<DisplayTransferDestinationPage>(*(const_cast<Webpage*>(_transferDestinationPage.get())));
 
 						if(_lineToDisplay)
 						{
@@ -669,7 +669,7 @@ namespace synthese
 				}
 
 				// Type control
-				if(!_screen->getType())
+				if(!_screen->get<DisplayTypePtr>())
 				{
 					throw RequestException("The screen "+ lexical_cast<string>(id) +" has no type.");
 				}
@@ -957,15 +957,15 @@ namespace synthese
 
 		util::ParametersMap DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			if(!_screen->getType())
+			if(!_screen->get<DisplayTypePtr>())
 			{
 				return ParametersMap();
 			}
-			if(_screen->getType()->getDisplayInterface() || _screen->getType()->getDisplayMainPage()
+			if(_screen->get<DisplayTypePtr>()->get<DisplayInterface>() || _screen->get<DisplayTypePtr>()->get<DisplayMainPage>()
 			){
 				ptime date(_date ? *_date : second_clock::local_time());
-				if(!_screen->getIsOnline() ||
-					!_screen->getDisplayedPlace()
+				if(!_screen->get<MaintenanceIsOnline>() ||
+					!(&*(_screen->get<BroadCastPoint>()))
 				){
 					return ParametersMap();
 				}
@@ -974,31 +974,31 @@ namespace synthese
 				{
 					// End time
 					ptime realStartDateTime(date);
-					realStartDateTime -= minutes(_screen->getClearingDelay());
+					realStartDateTime -= minutes(_screen->get<ClearingDelay>());
 					ptime endDateTime(realStartDateTime);
-					endDateTime += minutes(_screen->getMaxDelay());
+					endDateTime += minutes(_screen->get<MaxDelay>());
 
 					VariablesMap variables;
 
 					if(_screen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 					{
 						RoutePlanningTableGenerator generator(
-							*_screen->getDisplayedPlace(),
+							*_screen->get<BroadCastPoint>(),
 							_screen->getDisplayedPlaces(),
 							realStartDateTime,
 							endDateTime,
-							_screen->getRoutePlanningWithTransfer()
+							_screen->get<RoutePlanningWithTransfer>()
 						);
 
 						RoutePlanningList displayedObject(generator.run());
-						if(_screen->getType()->getDisplayMainPage())
+						if(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())
 						{
 							_displayRoutePlanningBoard(
 								stream,
 								request,
-								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayMainPage()),
-								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayRowPage()),
-								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayDestinationPage()),
+								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())),
+								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>())),
+								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>())),
 								realStartDateTime,
 								displayedObject,
 								*_screen
@@ -1015,36 +1015,36 @@ namespace synthese
 							_screen->generateStandardScreen(realStartDateTime, endDateTime)
 						);
 
-						if(_screen->getType()->getDisplayInterface() &&
-							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
+						if(_screen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
+							_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getPage<DeparturesTableInterfacePage>()
 						){
-							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->display(
+							_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getPage<DeparturesTableInterfacePage>()->display(
 								stream,
 								variables,
-								_screen->getTitle(),
-								_screen->getWiringCode(),
-								_screen->getServiceNumberDisplay(),
-								_screen->getTrackNumberDisplay(),
-								_screen->getDisplayTeam(),
-								_screen->getType()->getMaxStopsNumber(),
-								_screen->getBlinkingDelay(),
-								_screen->getDisplayClock(),
-								_screen->getDisplayedPlace(),
+								_screen->get<Title>(),
+								_screen->get<WiringCode>(),
+								_screen->get<ServiceNumberDisplay>(),
+								_screen->get<TrackNumberDisplay>(),
+								_screen->get<DisplayTeam>(),
+								_screen->get<DisplayTypePtr>()->get<MaxStopsNumber>(),
+								_screen->get<BlinkingDelay>(),
+								_screen->get<DisplayClock>(),
+								&*_screen->get<BroadCastPoint>(),
 								displayedObject,
 								&request
 							);
 						}
 						else
 						{
-							assert(_screen->getType()->getDisplayMainPage());
+							assert(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>());
 
 							_displayDepartureBoard(
 								stream,
 								request,
-								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayMainPage()),
-								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayRowPage()),
-								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayDestinationPage()),
-								Env::GetOfficialEnv().getSPtr(_screen->getType()->getDisplayTransferDestinationPage()),
+								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())),
+								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>())),
+								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>())),
+								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayTransferDestinationPage>())),
 								realStartDateTime,
 								displayedObject,
 								*_screen
@@ -1064,7 +1064,7 @@ namespace synthese
 
 		#ifdef MYSQL_CONNECTOR_AVAILABLE
 			string SAEDateString, SAEHourString;
-			string SAELimit = boost::lexical_cast<string>(_screen->getType()->getRowNumber());
+			string SAELimit = boost::lexical_cast<string>(_screen->get<DisplayTypePtr>()->get<RowsNumber>());
 			ptime SAEDate;
 
 			boost::shared_ptr<const impex::DataSource> SAEDataSource;
@@ -1167,7 +1167,7 @@ namespace synthese
 						shared_ptr<MySQLconnector> connector(new MySQLconnector());
 
 					// Limit the research to X hour after date, X is 1 hour times the number of result we wish for
-					time_duration searchDepth(hours(1) * _screen->getType()->getRowNumber());
+					time_duration searchDepth(hours(1) * _screen->get<DisplayTypePtr>()->get<RowsNumber>());
 
 					filters << "((h.hrd > '" << SAEHourString << "' AND h.hrd <= ADDTIME('" << SAEHourString << "', '" << to_simple_string(searchDepth) << "')) ";
 					// If after midnight, check if we do not cross over end of service
@@ -1553,7 +1553,7 @@ namespace synthese
 						{
 							for(OrderedServices::second_type::const_iterator it = destinationMap.second.second.begin() ; it != destinationMap.second.second.end() ; it++)
 							{
-								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->get<DisplayTypePtr>()->get<RowsNumber>())
 								{
 									break;
 								}
@@ -1581,7 +1581,7 @@ namespace synthese
 
 									for(boost::posix_time::ptime departureTime = firstDeparture ; departureTime < lastDeparture ; departureTime += continuousService->getMaxWaitingTime())
 									{
-										if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+										if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->get<DisplayTypePtr>()->get<RowsNumber>())
 										{
 											break;
 										}
@@ -1623,7 +1623,7 @@ namespace synthese
 						{
 							BOOST_FOREACH(const OrderedServices::first_type::value_type& realTimeService, destinationMap.second.first)
 							{
-								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->getType()->getRowNumber())
+								if(journeysPM->getSubMaps(DATA_JOURNEY).size() >= _screen->get<DisplayTypePtr>()->get<RowsNumber>())
 								{
 									break;
 								}
@@ -2056,7 +2056,7 @@ namespace synthese
 				}
 
 				OrderedDeparturesMap::iterator it;
-				int maxRow(_screen->getType()->getRowNumber());
+				int maxRow(_screen->getType()->get<RowsNumber>());
 				int displayedResults(0);
 
 				if(_wayIsBackward)
@@ -2278,22 +2278,22 @@ namespace synthese
 
 		std::string DisplayScreenContentFunction::getOutputMimeType() const
 		{
-			if(_screen->getType()->getDisplayInterface())
+			if(_screen->get<DisplayTypePtr>()->get<DisplayInterface>())
 			{
 				return
 					(   _screen.get() &&
-						_screen->getType() &&
-						_screen->getType()->getDisplayInterface() &&
+						_screen->get<DisplayTypePtr>() &&
+						_screen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
 						_screen->getGenerationMethod() != DisplayScreen::ROUTE_PLANNING &&
-						_screen->getType()->getDisplayInterface()->hasPage<DeparturesTableInterfacePage>()
+						_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->hasPage<DeparturesTableInterfacePage>()
 					) ?
-						_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->getMimeType() :
+						_screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getPage<DeparturesTableInterfacePage>()->getMimeType() :
 					"text/plain"
 				;
 			}
-			if(_screen->getType()->getDisplayMainPage())
+			if(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())
 			{
-				return _screen->getType()->getDisplayMainPage()->getMimeType();
+				return _screen->get<DisplayTypePtr>()->get<DisplayMainPage>()->getMimeType();
 			}
 			else if(_mainPage.get())
 			{
@@ -2326,22 +2326,22 @@ namespace synthese
 		) const {
 			ParametersMap pm(getTemplateParameters());
 			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
-			pm.insert(DATA_MAC, screen.getMacAddress());
+			pm.insert(DATA_MAC, screen.get<MacAddress>());
 			pm.insert(DATA_DATE, to_iso_extended_string(date.date()) + " " + to_simple_string(date.time_of_day()));
-			pm.insert(DATA_TITLE, screen.getTitle());
-			pm.insert(DATA_WIRING_CODE, screen.getWiringCode());
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
-			if(screen.getType())
+			pm.insert(DATA_TITLE, screen.get<Title>());
+			pm.insert(DATA_WIRING_CODE, screen.get<WiringCode>());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.get<ServiceNumberDisplay>());
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.get<TrackNumberDisplay>());
+			if(screen.get<DisplayTypePtr>())
 			{
-				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
+				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.get<DisplayTypePtr>()->get<MaxStopsNumber>());
 			}
-			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
-			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
-			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
+			pm.insert(DATA_DISPLAY_TEAM, screen.get<DisplayTeam>());
+			pm.insert(DATA_STOP_NAME, &*screen.get<BroadCastPoint>() ? screen.get<BroadCastPoint>()->getFullName() : string());
+			pm.insert(DATA_DISPLAY_CLOCK, screen.get<DisplayClock>());
 
 			// Stop Point
-			if(!screen.getAllPhysicalStopsDisplayed() && (screen.getPhysicalStops().size() == 1))
+			if(!screen.get<AllPhysicalDisplayed>() && (screen.getPhysicalStops().size() == 1))
 			{
 				const ArrivalDepartureTableGenerator::PhysicalStops::const_iterator it = screen.getPhysicalStops().begin();
 				const StopPoint * stop = it->second;
@@ -2352,9 +2352,9 @@ namespace synthese
 			}
 
 			// StopArea
-			if(screen.getDisplayedPlace())
+			if(&*screen.get<BroadCastPoint>())
 			{
-				const StopArea* connPlace(screen.getDisplayedPlace());
+				const StopArea* connPlace(&*screen.get<BroadCastPoint>());
 
 				pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
 				pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
@@ -2482,14 +2482,14 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
 			pm.insert(DATA_ROW_RANK, rowRank);
 			pm.insert(DATA_PAGE_NUMBER, pageNumber);
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.get<TrackNumberDisplay>());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.get<ServiceNumberDisplay>());
 
-			if(screen.getType())
+			if(screen.get<DisplayTypePtr>())
 			{
-				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
+				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.get<DisplayTypePtr>()->get<MaxStopsNumber>());
 			}
-			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
+			pm.insert(DATA_DISPLAY_TEAM, screen.get<DisplayTeam>());
 			if(row.first.getService())
 			{
 				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);
@@ -2498,7 +2498,7 @@ namespace synthese
 				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
 				pm.insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
 
-				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));
+				time_duration blinkingDelay(minutes(screen.get<BlinkingDelay>()));
 				if(	blinkingDelay.total_seconds() > 0 &&
 					waitingTime <= blinkingDelay
 				){
@@ -2811,21 +2811,21 @@ namespace synthese
 			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
-			pm.insert(DATA_MAC, screen.getMacAddress());
+			pm.insert(DATA_MAC, screen.get<MacAddress>());
 			pm.insert(DATA_DATE, to_iso_extended_string(date.date()) + " " + to_simple_string(date.time_of_day()));
-			pm.insert(DATA_TITLE, screen.getTitle());
-			pm.insert(DATA_WIRING_CODE, screen.getWiringCode());
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
-			if(screen.getType())
+			pm.insert(DATA_TITLE, screen.get<Title>());
+			pm.insert(DATA_WIRING_CODE, screen.get<WiringCode>());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.get<ServiceNumberDisplay>());
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.get<TrackNumberDisplay>());
+			if(screen.get<DisplayTypePtr>())
 			{
-				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
+				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.get<DisplayTypePtr>()->get<MaxStopsNumber>());
 			}
-			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
-			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
-			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
-			pm.insert(DATA_WITH_TRANSFER, screen.getRoutePlanningWithTransfer());
-			screen.getDisplayedPlace()->toParametersMap(pm, true);
+			pm.insert(DATA_DISPLAY_TEAM, screen.get<DisplayTeam>());
+			pm.insert(DATA_STOP_NAME, &*screen.get<BroadCastPoint>() ? screen.get<BroadCastPoint>()->getFullName() : string());
+			pm.insert(DATA_DISPLAY_CLOCK, screen.get<DisplayClock>());
+			pm.insert(DATA_WITH_TRANSFER, screen.get<RoutePlanningWithTransfer>());
+			screen.get<BroadCastPoint>()->toParametersMap(pm, true);
 
 			// Rows
 			if(rowPage.get())
@@ -2901,9 +2901,9 @@ namespace synthese
 			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_ROW_RANK, rowId);
-			pm.insert(DATA_WITH_TRANSFER, screen.getRoutePlanningWithTransfer());
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
+			pm.insert(DATA_WITH_TRANSFER, screen.get<RoutePlanningWithTransfer>());
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.get<TrackNumberDisplay>());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.get<ServiceNumberDisplay>());
 
 			{ // Destination
 				stringstream str;
@@ -2927,7 +2927,7 @@ namespace synthese
 			{
 				const ServicePointer& s(row.second.getFirstJourneyLeg());
 
-				pm.insert(DATA_BLINKS, s.getDepartureDateTime() - second_clock::local_time() <= minutes(screen.getBlinkingDelay()));
+				pm.insert(DATA_BLINKS, s.getDepartureDateTime() - second_clock::local_time() <= minutes(screen.get<BlinkingDelay>()));
 				pm.insert(DATA_TRACK, static_cast<const StopPoint*>(s.getRealTimeDepartureVertex())->getName());
 				pm.insert(DATA_SERVICE_NUMBER, s.getService()->getServiceNumber());
 

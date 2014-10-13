@@ -124,7 +124,7 @@ namespace synthese
 			stream << "<h1>Modification du type d'affichage</h1>";
 			stream << t.open();
 			stream << t.title("Propriétés");
-			stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, _type->getName()));
+			stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, _type->get<Name>()));
 			stream << t.title("Paramètres d'affichage");
 			stream <<
 				t.cell(
@@ -132,7 +132,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(_type->getDisplayInterface() ? _type->getDisplayInterface()->getKey() : 0)
+						optional<RegistryKeyType>(&*_type->get<DisplayInterface>() ? _type->get<DisplayInterface>()->getKey() : 0)
 				)	)
 			;
 			stream <<
@@ -140,8 +140,8 @@ namespace synthese
 					"Page CMS principale",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_MAIN_PAGE_ID,
-						_type->getDisplayMainPage() ? lexical_cast<string>(_type->getDisplayMainPage()->getKey()) : string(),
-						_type->getDisplayMainPage() ? lexical_cast<string>(_type->getDisplayMainPage()->getName()) : string(),
+						&*_type->get<DisplayMainPage>() ? lexical_cast<string>(_type->get<DisplayMainPage>()->getKey()) : string(),
+						&*_type->get<DisplayMainPage>() ? lexical_cast<string>(_type->get<DisplayMainPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -152,8 +152,8 @@ namespace synthese
 					"Page CMS pour rangée",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_ROW_PAGE_ID,
-						_type->getDisplayRowPage() ? lexical_cast<string>(_type->getDisplayRowPage()->getKey()) : string(),
-						_type->getDisplayRowPage() ? lexical_cast<string>(_type->getDisplayRowPage()->getName()) : string(),
+						&*_type->get<DisplayRowPage>() ? lexical_cast<string>(_type->get<DisplayRowPage>()->getKey()) : string(),
+						&*_type->get<DisplayRowPage>() ? lexical_cast<string>(_type->get<DisplayRowPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -164,8 +164,8 @@ namespace synthese
 					"Page CMS pour destination",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID,
-						_type->getDisplayDestinationPage() ? lexical_cast<string>(_type->getDisplayDestinationPage()->getKey()) : string(),
-						_type->getDisplayDestinationPage() ? lexical_cast<string>(_type->getDisplayDestinationPage()->getName()) : string(),
+						&*_type->get<DisplayDestinationPage>() ? lexical_cast<string>(_type->get<DisplayDestinationPage>()->getKey()) : string(),
+						&*_type->get<DisplayDestinationPage>() ? lexical_cast<string>(_type->get<DisplayDestinationPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -176,8 +176,8 @@ namespace synthese
 					"Page CMS pour destination en correspondance",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID,
-						_type->getDisplayTransferDestinationPage() ? lexical_cast<string>(_type->getDisplayTransferDestinationPage()->getKey()) : string(),
-						_type->getDisplayTransferDestinationPage() ? lexical_cast<string>(_type->getDisplayTransferDestinationPage()->getName()) : string(),
+						&*_type->get<DisplayTransferDestinationPage>() ? lexical_cast<string>(_type->get<DisplayTransferDestinationPage>()->getKey()) : string(),
+						&*_type->get<DisplayTransferDestinationPage>() ? lexical_cast<string>(_type->get<DisplayTransferDestinationPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -188,8 +188,8 @@ namespace synthese
 					"Page CMS pour parser les résultats de monitoring",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID,
-						_type->getMonitoringParserPage() ? lexical_cast<string>(_type->getMonitoringParserPage()->getKey()) : string(),
-						_type->getMonitoringParserPage() ? lexical_cast<string>(_type->getMonitoringParserPage()->getName()) : string(),
+						&*_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getKey()) : string(),
+						&*_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -201,7 +201,7 @@ namespace synthese
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER,
 						1, 99,
-						optional<size_t>(_type->getRowNumber())
+						optional<size_t>(_type->get<RowsNumber>())
 				)	)
 			;
 			stream << t.cell(
@@ -209,7 +209,7 @@ namespace synthese
 				t.getForm().getSelectNumberInput(
 					UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER,
 					0, 99,
-					_type->getMaxStopsNumber(),
+					_type->get<MaxStopsNumber>(),
 					1,
 					"(pas de limite)"
 			)	);
@@ -217,7 +217,7 @@ namespace synthese
 			stream << t.cell("Interface vocale", t.getForm().getSelectInput(
 					UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID,
 					InterfaceTableSync::_GetInterfaceLabels(optional<string>(), string("(aucune)"), string("undefined")),
-					optional<RegistryKeyType>(_type->getAudioInterface() ? _type->getAudioInterface()->getKey() : 0)
+					optional<RegistryKeyType>(&*_type->getAudioInterface() ? _type->get<AudioInterface>()->getKey() : 0)
 			)	);
 			stream << t.title("Paramètres de supervision");
 			stream <<
@@ -226,7 +226,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<ParseDisplayReturnInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(_type->getMonitoringInterface() ? _type->getMonitoringInterface()->getKey() : 0)
+						optional<RegistryKeyType>(&*_type->getMonitoringInterface() ? _type->get<MonitoringInterface>()->getKey() : 0)
 				)	)
 			;
 			stream <<
@@ -235,7 +235,7 @@ namespace synthese
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS,
 						1, 120,
-						optional<size_t>(_type->getTimeBetweenChecks().total_seconds() / 60),
+						optional<size_t>(_type->get<TimeBetweenChecks>().total_seconds() / 60),
 						1
 					)+ " minutes"
 				);
@@ -253,7 +253,7 @@ namespace synthese
 
 		std::string DisplayTypeAdmin::getTitle() const
 		{
-			return _type.get() ? _type->getName() : DEFAULT_TITLE;
+			return _type.get() ? _type->get<Name>() : DEFAULT_TITLE;
 		}
 
 

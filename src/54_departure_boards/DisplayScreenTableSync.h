@@ -29,7 +29,6 @@
 #include "DisplayScreen.h"
 #include "DBDirectTableSyncTemplate.hpp"
 #include "SecurityTypes.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include <boost/optional.hpp>
 
@@ -48,51 +47,10 @@ namespace synthese
 		class DisplayScreenTableSync:
 			public db::DBDirectTableSyncTemplate<
 				DisplayScreenTableSync,
-				DisplayScreen,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				DisplayScreen
 			>
 		{
 		public:
-			//! \name Columns
-			//@{
-				static const std::string COL_PLACE_ID;
-				static const std::string COL_NAME;
-				static const std::string COL_TYPE_ID;
-				static const std::string COL_WIRING_CODE;
-				static const std::string COL_TITLE;
-				static const std::string COL_BLINKING_DELAY;
-				static const std::string COL_TRACK_NUMBER_DISPLAY;
-				static const std::string COL_SERVICE_NUMBER_DISPLAY;
-				static const std::string COL_PHYSICAL_STOPS_IDS;	//!< List of physical stops uids, separated by comas
-				static const std::string COL_ALL_PHYSICAL_DISPLAYED;
-				static const std::string COL_FORBIDDEN_ARRIVAL_PLACES_IDS;	//!< List of forbidden connection places uids, separated by comas
-				static const std::string COL_ALLOWED_LINES_IDS;
-				static const std::string COL_DIRECTION;
-				static const std::string COL_ORIGINS_ONLY;
-				static const std::string COL_DISPLAYED_PLACES_IDS;	//!< List of displayed places uids, separated by comas
-				static const std::string COL_MAX_DELAY;
-				static const std::string COL_CLEARING_DELAY;
-				static const std::string COL_FIRST_ROW;
-				static const std::string COL_GENERATION_METHOD;
-				static const std::string COL_FORCED_DESTINATIONS_IDS;	//!< List of forced destination uids in preselection, separated by comas
-				static const std::string COL_DESTINATION_FORCE_DELAY;
-				static const std::string COL_MAINTENANCE_CHECKS_PER_DAY;
-				static const std::string COL_MAINTENANCE_IS_ONLINE;
-				static const std::string COL_MAINTENANCE_MESSAGE;
-				static const std::string COL_DISPLAY_TEAM;
-				static const std::string COL_DISPLAY_CLOCK;
-				static const std::string COL_COM_PORT;
-				static const std::string COL_CPU_HOST_ID;
-				static const std::string COL_MAC_ADDRESS;
-				static const std::string COL_ROUTE_PLANNING_WITH_TRANSFER;
-				static const std::string COL_TRANSFER_DESTINATIONS;
-				static const std::string COL_UP_ID;
-				static const std::string COL_SUB_SCREEN_TYPE;
-				static const std::string COL_DATASOURCE_LINKS;
-				static const std::string COL_ALLOW_CANCELED;
-				static const std::string COL_STOP_POINT_LOCATION;
-			//@}
 
 
 

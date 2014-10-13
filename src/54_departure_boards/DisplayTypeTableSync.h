@@ -46,26 +46,10 @@ namespace synthese
 		class DisplayTypeTableSync:
 			public db::DBDirectTableSyncTemplate<
 				DisplayTypeTableSync,
-				DisplayType,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				DisplayType
 			>
 		{
 		public:
-			static const std::string COL_NAME;
-			static const std::string COL_DISPLAY_INTERFACE_ID;
-			static const std::string COL_AUDIO_INTERFACE_ID;
-			static const std::string COL_MONITORING_INTERFACE_ID;
-			static const std::string COL_ROWS_NUMBER;
-			static const std::string COL_MAX_STOPS_NUMBER;
-			static const std::string COL_TIME_BETWEEN_CHECKS;
-			static const std::string COL_DISPLAY_MAIN_PAGE_ID;
-			static const std::string COL_DISPLAY_ROW_PAGE_ID;
-			static const std::string COL_DISPLAY_DESTINATION_PAGE_ID;
-			static const std::string COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID;
-			static const std::string COL_MONITORING_PARSER_PAGE_ID;
-			static const std::string COL_IS_DISPLAYED_MESSAGE_PAGE_ID;
-			static const std::string COL_MESSAGE_TYPE;
 
 
 			////////////////////////////////////////////////////////////////////

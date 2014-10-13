@@ -26,6 +26,7 @@
 #include "Request.h"
 #include "GetDepartureBoardsService.hpp"
 #include "StopArea.hpp"
+#include "StopPoint.hpp"
 #include "Webpage.h"
 #include "DisplayScreenTableSync.h"
 
