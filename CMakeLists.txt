@@ -40,8 +40,8 @@ else()
   add_definitions(-DPNG_NO_MMX_CODE)
 endif()
 
-add_definitions(-DFUSION_MAX_VECTOR_SIZE=30)
-add_definitions(-DFUSION_MAX_MAP_SIZE=30)
+add_definitions(-DFUSION_MAX_VECTOR_SIZE=40)
+add_definitions(-DFUSION_MAX_MAP_SIZE=40)
 
 if(NOT DEFINED BOOST_VERSION)
   set(BOOST_VERSION 1.39)
