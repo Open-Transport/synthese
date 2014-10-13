@@ -53,7 +53,7 @@ namespace synthese
         const string InterSYNTHESEObjectUpdateService::PARAMETER_FIELD_PREFIX = "field_";
 
         const string InterSYNTHESEObjectUpdateService::QUEUE_IDS_SEPARATOR = ",";
-        const string InterSYNTHESEObjectUpdateService::NO_ITEM_IN_QUEUE = "item_created_not_found_in_queues";
+        const string InterSYNTHESEObjectUpdateService::NO_ITEM_IN_QUEUE = "item_updated_not_found_in_queues";
 
         const string InterSYNTHESEObjectUpdateService::FORMAT_JSON("json");
 
