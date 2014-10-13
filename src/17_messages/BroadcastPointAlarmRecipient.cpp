@@ -238,7 +238,7 @@ namespace synthese
 
 				stream << t1.row();
 				stream << t1.col() << screen->getFullName();
-				stream << t1.col() << (screen->getType() ? screen->get<DisplayTypePtr>()->get<Name>() : "inconnu");
+				stream << t1.col() << (screen->get<DisplayTypePtr>() ? screen->get<DisplayTypePtr>()->get<Name>() : "inconnu");
 				stream << t1.col();
 				stream << t1.col();
 				stream << t1.col() << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
