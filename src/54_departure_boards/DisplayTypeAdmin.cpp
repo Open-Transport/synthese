@@ -132,7 +132,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(&*_type->get<DisplayInterface>() ? _type->get<DisplayInterface>()->getKey() : 0)
+						optional<RegistryKeyType>(_type->get<DisplayInterface>() ? _type->get<DisplayInterface>()->getKey() : 0)
 				)	)
 			;
 			stream <<
@@ -140,8 +140,8 @@ namespace synthese
 					"Page CMS principale",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_MAIN_PAGE_ID,
-						&*_type->get<DisplayMainPage>() ? lexical_cast<string>(_type->get<DisplayMainPage>()->getKey()) : string(),
-						&*_type->get<DisplayMainPage>() ? lexical_cast<string>(_type->get<DisplayMainPage>()->getName()) : string(),
+						_type->get<DisplayMainPage>() ? lexical_cast<string>(_type->get<DisplayMainPage>()->getKey()) : string(),
+						_type->get<DisplayMainPage>() ? lexical_cast<string>(_type->get<DisplayMainPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -152,8 +152,8 @@ namespace synthese
 					"Page CMS pour rangée",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_ROW_PAGE_ID,
-						&*_type->get<DisplayRowPage>() ? lexical_cast<string>(_type->get<DisplayRowPage>()->getKey()) : string(),
-						&*_type->get<DisplayRowPage>() ? lexical_cast<string>(_type->get<DisplayRowPage>()->getName()) : string(),
+						_type->get<DisplayRowPage>() ? lexical_cast<string>(_type->get<DisplayRowPage>()->getKey()) : string(),
+						_type->get<DisplayRowPage>() ? lexical_cast<string>(_type->get<DisplayRowPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -164,8 +164,8 @@ namespace synthese
 					"Page CMS pour destination",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID,
-						&*_type->get<DisplayDestinationPage>() ? lexical_cast<string>(_type->get<DisplayDestinationPage>()->getKey()) : string(),
-						&*_type->get<DisplayDestinationPage>() ? lexical_cast<string>(_type->get<DisplayDestinationPage>()->getName()) : string(),
+						_type->get<DisplayDestinationPage>() ? lexical_cast<string>(_type->get<DisplayDestinationPage>()->getKey()) : string(),
+						_type->get<DisplayDestinationPage>() ? lexical_cast<string>(_type->get<DisplayDestinationPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -176,8 +176,8 @@ namespace synthese
 					"Page CMS pour destination en correspondance",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID,
-						&*_type->get<DisplayTransferDestinationPage>() ? lexical_cast<string>(_type->get<DisplayTransferDestinationPage>()->getKey()) : string(),
-						&*_type->get<DisplayTransferDestinationPage>() ? lexical_cast<string>(_type->get<DisplayTransferDestinationPage>()->getName()) : string(),
+						_type->get<DisplayTransferDestinationPage>() ? lexical_cast<string>(_type->get<DisplayTransferDestinationPage>()->getKey()) : string(),
+						_type->get<DisplayTransferDestinationPage>() ? lexical_cast<string>(_type->get<DisplayTransferDestinationPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true
@@ -188,8 +188,8 @@ namespace synthese
 					"Page CMS pour parser les résultats de monitoring",
 					t.getForm().getTextInputAutoCompleteFromTableSync(
 						UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID,
-						&*_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getKey()) : string(),
-						&*_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getName()) : string(),
+						_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getKey()) : string(),
+						_type->get<MonitoringParserPage>() ? lexical_cast<string>(_type->get<MonitoringParserPage>()->getName()) : string(),
 						lexical_cast<string>(WebPageTableSync::TABLE.ID),
 						string(),string(),
 						true, true, true, true

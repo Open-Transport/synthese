@@ -185,11 +185,11 @@ namespace synthese
 
 				stream << t.row();
 				stream << t.col() << dt->get<Name>();
-				stream << t.col() << ((&*dt->get<DisplayInterface>() == NULL) ? "(aucune)" : dt->get<DisplayInterface>()->getName());
+				stream << t.col() << (!(dt->get<DisplayInterface>()) ? "(aucune)" : dt->get<DisplayInterface>()->getName());
 				stream << t.col() << dt->get<RowsNumber>();
 
 				stream << t.col();
-				if(	&*dt->get<MonitoringInterface>() != NULL &&
+				if(	dt->get<MonitoringInterface>() &&
 					dt->get<TimeBetweenChecks>().minutes() > 0
 				){
 					stream << dt->get<MonitoringInterface>()->getName();
