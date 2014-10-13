@@ -217,7 +217,7 @@ namespace synthese
 			stream << t.cell("Interface vocale", t.getForm().getSelectInput(
 					UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID,
 					InterfaceTableSync::_GetInterfaceLabels(optional<string>(), string("(aucune)"), string("undefined")),
-					optional<RegistryKeyType>(&*_type->getAudioInterface() ? _type->get<AudioInterface>()->getKey() : 0)
+					optional<RegistryKeyType>(&*_type->get<AudioInterface>() ? _type->get<AudioInterface>()->getKey() : 0)
 			)	);
 			stream << t.title("Paramètres de supervision");
 			stream <<
@@ -226,7 +226,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						UpdateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<ParseDisplayReturnInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(&*_type->getMonitoringInterface() ? _type->get<MonitoringInterface>()->getKey() : 0)
+						optional<RegistryKeyType>(&*_type->get<MonitoringInterface>() ? _type->get<MonitoringInterface>()->getKey() : 0)
 				)	)
 			;
 			stream <<
