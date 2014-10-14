@@ -25,8 +25,15 @@
 #ifndef SYNTHESE_DisplayType_H__
 #define SYNTHESE_DisplayType_H__
 
+#include "Object.hpp"
+
+#include "Interface.h"
+#include "MessageType.hpp"
+#include "MinutesField.hpp"
 #include "Registrable.h"
 #include "Registry.h"
+#include "StringField.hpp"
+#include "Webpage.h"
 
 #include <string>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -34,6 +41,41 @@
 
 namespace synthese
 {
+	namespace departure_boards
+	{
+		FIELD_POINTER(DisplayInterface, interfaces::Interface)
+		FIELD_POINTER(AudioInterface, interfaces::Interface)
+		FIELD_POINTER(MonitoringInterface, interfaces::Interface)
+		FIELD_SIZE_T(RowsNumber)
+		FIELD_SIZE_T(MaxStopsNumber)
+		FIELD_MINUTES(TimeBetweenChecks)
+		FIELD_POINTER(DisplayMainPage, cms::Webpage)
+		FIELD_POINTER(DisplayRowPage, cms::Webpage)
+		FIELD_POINTER(DisplayDestinationPage, cms::Webpage)
+		FIELD_POINTER(DisplayTransferDestinationPage, cms::Webpage)
+		FIELD_POINTER(MonitoringParserPage, cms::Webpage)
+		FIELD_POINTER(IsDisplayedMessagePage, cms::Webpage)
+		FIELD_POINTER(MessageType, messages::MessageType)
+		
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(DisplayInterface),
+			FIELD(AudioInterface),
+			FIELD(MonitoringInterface),
+			FIELD(RowsNumber),
+			FIELD(MaxStopsNumber),
+			FIELD(TimeBetweenChecks),//!< Time between monitoring checks (0 = no value)
+			FIELD(DisplayMainPage),
+			FIELD(DisplayRowPage),
+			FIELD(DisplayDestinationPage),
+			FIELD(DisplayTransferDestinationPage),
+			FIELD(MonitoringParserPage),
+			FIELD(IsDisplayedMessagePage),
+			FIELD(MessageType)
+		> DisplayTypeSchema;
+	}
+
 	namespace cms
 	{
 		class Webpage;
@@ -62,6 +104,7 @@ namespace synthese
 		///		- monitoring : The display type cannot be monitored
 		////////////////////////////////////////////////////////////////////
 		class DisplayType:
+			public virtual Object<DisplayType, DisplayTypeSchema>,
 			public virtual util::Registrable
 		{
 		public:
@@ -77,23 +120,6 @@ namespace synthese
 			typedef util::Registry<DisplayType>	Registry;
 
 		private:
-			const interfaces::Interface*	_displayInterface; // DEPRECATED				//!< On screen display Interface
-			const interfaces::Interface*	_audioInterface; // DEPRECATED		//!< Interface providing exchange with a vocal reading system
-			const interfaces::Interface*	_monitoringInterface; // DEPRECATED	//!< Interface used to parse monitoring outputs (see DisplayMonitoringStatus)
-			size_t								_rowNumber;
-			boost::optional<size_t>				_maxStopsNumber;
-			boost::posix_time::time_duration	_timeBetweenChecks;		//!< Time between monitoring checks (0 = no value)
-
-			const cms::Webpage*	_displayMainPage;
-			const cms::Webpage* _displayRowPage; // DEPRECATED
-			const cms::Webpage* _displayDestinationPage; // DEPRECATED
-			const cms::Webpage* _displayTransferDestinationPage; // DEPRECATED
-			const cms::Webpage* _monitoringParserPage;
-			const cms::Webpage* _messageIsDisplayedPage;
-
-			messages::MessageType* _messageType;
-
-			std::string _name;
 
 		public:
 
@@ -107,52 +133,6 @@ namespace synthese
 			/// Initializes all interface pointers to NULL
 			////////////////////////////////////////////////////////////////////
 			DisplayType(util::RegistryKeyType key = 0);
-
-			//! @name Getters
-			//@{
-				const interfaces::Interface*	getDisplayInterface()		const;
-				const interfaces::Interface*	getAudioInterface()			const;
-				const interfaces::Interface*	getMonitoringInterface()	const;
-				size_t								getRowNumber()				const { return _rowNumber; }
-				const boost::optional<size_t>&			getMaxStopsNumber()			const { return _maxStopsNumber; }
-				const boost::posix_time::time_duration&	getTimeBetweenChecks()		const;
-				const cms::Webpage*	getDisplayMainPage() const { return _displayMainPage; }
-				const cms::Webpage* getDisplayRowPage() const { return _displayRowPage; }
-				const cms::Webpage* getDisplayDestinationPage() const { return _displayDestinationPage; }
-				const cms::Webpage* getDisplayTransferDestinationPage() const { return _displayTransferDestinationPage; }
-				const cms::Webpage* getMonitoringParserPage() const { return _monitoringParserPage; }
-				const cms::Webpage* getMessageIsDisplayedPage() const { return _messageIsDisplayedPage; }
-				messages::MessageType* getMessageType() const { return _messageType; }
-				virtual std::string getName() const { return _name; }
-			//@}
-
-			//! @name Setters
-			//@{
-				void setDisplayInterface(const interfaces::Interface* interf);
-				void setAudioInterface(const interfaces::Interface* value);
-				void setMonitoringInterface(const interfaces::Interface* value);
-				void setRowNumber(size_t number){ _rowNumber = number; }
-				void setMaxStopsNumber(const boost::optional<size_t>& number){ _maxStopsNumber = number; }
-				void setTimeBetweenChecks(const boost::posix_time::time_duration& value);
-				void setDisplayMainPage(const cms::Webpage* value){ _displayMainPage = value; }
-				void setDisplayRowPage(const cms::Webpage* value){ _displayRowPage = value; }
-				void setDisplayDestinationPage(const cms::Webpage* value){ _displayDestinationPage = value; }
-				void setDisplayTransferDestinationPage(const cms::Webpage* value){ _displayTransferDestinationPage = value; }
-				void setMonitoringParserPage(const cms::Webpage* value){ _monitoringParserPage = value; }
-				void setMessageIsDisplayedPage(const cms::Webpage* value){ _messageIsDisplayedPage = value; }
-				void setMessageType(messages::MessageType* value){ _messageType = value; }
-				void setName(const std::string& value){ _name = value; }
-			//@}
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Exports the object to a parameters map.
-			/// @param pm the parameters map to populate
-			virtual void toParametersMap(
-				util::ParametersMap& pm,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles = boost::logic::indeterminate,
-				std::string prefix = std::string()
-			) const;
 		};
 	}
 }

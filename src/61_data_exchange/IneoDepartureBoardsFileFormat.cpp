@@ -84,7 +84,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DisplayScreenTableSync>::Map::mapped_type::value_type& obj, itScreen.second)
 				{
-					obj->setMaintenanceIsOnline(false);
+					obj->set<MaintenanceIsOnline>(false);
 				}
 			}
 
@@ -105,9 +105,9 @@ namespace synthese
 				if(screenSet.empty())
 				{
 					screen = new DisplayScreen(DisplayScreenTableSync::getId());
-					screen->setType(_defaultDisplayType.get());
+					screen->set<DisplayTypePtr>(*(const_cast<DisplayType*>(_defaultDisplayType.get())));
 					screen->addCodeBySource(dataSource, borneRef);
-					screen->setAllPhysicalStopsDisplayed(false);
+					screen->set<AllPhysicalDisplayed>(false);
 					_env.getEditableRegistry<DisplayScreen>().add(boost::shared_ptr<DisplayScreen>(screen));
 				}
 				else
@@ -122,12 +122,12 @@ namespace synthese
 				}
 
 				// Update of properties
-				screen->setName(nom);
+				screen->set<BroadCastPointComment>(nom);
 				if(!nom.empty())
 				{
 					vector<string> nomParts;
 					split(nomParts, nom, is_any_of(" "));
-					screen->setMacAddress(nomParts[0]);
+					screen->set<MacAddress>(nomParts[0]);
 				}
 
 				// Allowed lines
@@ -193,7 +193,7 @@ namespace synthese
 				{
 					const StopPoint* stop(pstops.begin()->second);
 
-					screen->setDisplayedPlace(stop->getConnectionPlace());
+					screen->set<BroadCastPoint>(*(const_cast<StopArea*>(stop->getConnectionPlace())));
 					screen->setRoot(
 						DeparturesTableModule::GetPlaceWithDisplayBoards(
 							stop->getConnectionPlace(),
@@ -203,7 +203,7 @@ namespace synthese
 				}
 
 				// Screen activation
-				screen->setMaintenanceIsOnline(true);
+				screen->set<MaintenanceIsOnline>(true);
 			}
 
 			return true;

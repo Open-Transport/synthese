@@ -73,7 +73,7 @@ namespace synthese
 				<< " SELECT "
 					<< "p.*"
 					<< ",c." << CityTableSync::TABLE_COL_NAME << " AS city_name"
-					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE.NAME << " AS b WHERE b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
+					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE.NAME << " AS b WHERE b." << BroadCastPoint::FIELD.name << "=p." << TABLE_COL_ID << ") AS bc"
 					<< ",(SELECT COUNT(s." << TABLE_COL_ID << ") FROM " << DisplayScreenCPUTableSync::TABLE.NAME << " AS s WHERE s." << DisplayScreenCPUTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS cc"
 				<< " FROM " // Tables
 					<< StopAreaTableSync::TABLE.NAME << " AS p"
@@ -181,7 +181,7 @@ namespace synthese
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
 				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << Line::FIELD.name << "=l." << TABLE_COL_ID
 				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineNode::FIELD.name
-				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << StopPointTableSync::COL_PLACEID
+				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << BroadCastPoint::FIELD.name << "=p." << StopPointTableSync::COL_PLACEID
 				<< " GROUP BY c." << TABLE_COL_ID
 				<< " ORDER BY c." << CommercialLineTableSync::COL_SHORT_NAME;
 			if (number)

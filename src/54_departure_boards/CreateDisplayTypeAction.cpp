@@ -118,10 +118,10 @@ namespace synthese
 		void CreateDisplayTypeAction::run(Request& request)
 		{
 			DisplayType dt;
-			dt.setName(_name);
-			dt.setDisplayInterface(_interface.get());
-			dt.setMonitoringInterface(_monitoringInterface.get());
-			dt.setRowNumber(_rows_number);
+			dt.set<Name>(_name);
+			dt.set<DisplayInterface>(*(const_cast<Interface*>(_interface.get())));
+			dt.set<MonitoringInterface>(*(const_cast<Interface*>(_monitoringInterface.get())));
+			dt.set<RowsNumber>(_rows_number);
 			DisplayTypeTableSync::Save(&dt);
 
 			// Request update

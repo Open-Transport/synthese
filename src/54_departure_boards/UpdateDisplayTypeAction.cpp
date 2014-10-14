@@ -162,7 +162,7 @@ namespace synthese
 				if(map.isDefined(PARAMETER_NAME))
 				{
 					_name = map.get<string>(PARAMETER_NAME);
-					if(	*_name != _dt->getName())
+					if(	*_name != _dt->get<Name>())
 					{
 						if (_name->empty())
 							throw ActionException("Le nom ne peut être vide.");
@@ -378,7 +378,7 @@ namespace synthese
 					}
 					else
 					{
-						_messageType = boost::shared_ptr<MessageType>();
+						_messageType = boost::shared_ptr<messages::MessageType>();
 					}
 				}
 			}
@@ -398,149 +398,149 @@ namespace synthese
 
 			if(_name)
 			{
-				_dt->setName(*_name);
-				DBLogModule::appendToLogIfChange(log, "Nom", _dt->getName(), *_name);
+				_dt->set<Name>(*_name);
+				DBLogModule::appendToLogIfChange(log, "Nom", _dt->get<Name>(), *_name);
 			}
 
 			if(_interface)
 			{
-				_dt->setDisplayInterface(_interface->get());
+				_dt->set<DisplayInterface>(*(const_cast<Interface*>(_interface->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Interface d'affichage",
-					(_dt->getDisplayInterface() != NULL) ? _dt->getDisplayInterface()->getName() : "(aucune)",
+					(_dt->get<DisplayInterface>().get_ptr() != NULL) ? _dt->get<DisplayInterface>()->getName() : "(aucune)",
 					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
 				);
 			}
 
 			if(_monitoringInterface)
 			{
-				_dt->setMonitoringInterface(_monitoringInterface->get());
+				_dt->set<MonitoringInterface>(*(const_cast<Interface*>(_monitoringInterface->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Interface de supervision",
-					(_dt->getMonitoringInterface() != NULL) ? _dt->getMonitoringInterface()->getName() : "(aucune)",
+					(_dt->get<MonitoringInterface>().get_ptr() != NULL) ? _dt->get<MonitoringInterface>()->getName() : "(aucune)",
 					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
 				);
 			}
 
 			if(_audioInterface)
 			{
-				_dt->setAudioInterface(_audioInterface->get());
+				_dt->set<AudioInterface>(*(const_cast<Interface*>(_audioInterface->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Interface audio",
-					(_dt->getAudioInterface() != NULL) ? _dt->getAudioInterface()->getName() : "(aucune)",
+					(_dt->get<AudioInterface>().get_ptr() != NULL) ? _dt->get<AudioInterface>()->getName() : "(aucune)",
 					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
 				);
 			}
 
 			if(_rows_number)
 			{
-				_dt->setRowNumber(*_rows_number);
+				_dt->set<RowsNumber>(*_rows_number);
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Nombre de lignes",
-					lexical_cast<string>(_dt->getRowNumber()),
+					lexical_cast<string>(_dt->get<RowsNumber>()),
 					lexical_cast<string>(*_rows_number)
 				);
 			}
 
 			if(_max_stops_number)
 			{
-				_dt->setMaxStopsNumber(*_max_stops_number);
+				_dt->set<MaxStopsNumber>(**_max_stops_number);
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Nombre d'arrêts intermédiaires",
-					_dt->getMaxStopsNumber() ? lexical_cast<string>(*_dt->getMaxStopsNumber()) : string(),
+					_dt->get<MaxStopsNumber>() ? lexical_cast<string>(_dt->get<MaxStopsNumber>()) : string(),
 					*_max_stops_number ? lexical_cast<string>(**_max_stops_number) : string()
 				);
 			}
 
 			if(_timeBetweenChecks)
 			{
-				_dt->setTimeBetweenChecks(*_timeBetweenChecks);
+				_dt->set<TimeBetweenChecks>(*_timeBetweenChecks);
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Temps entre les contrôles de supervision",
-					to_simple_string(_dt->getTimeBetweenChecks()),
+					to_simple_string(_dt->get<TimeBetweenChecks>()),
 					to_simple_string(*_timeBetweenChecks)
 				);
 			}
 
 			if(_displayMainPage)
 			{
-				_dt->setDisplayMainPage(_displayMainPage->get());
+				_dt->set<DisplayMainPage>(*(const_cast<Webpage*>(_displayMainPage->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS principale",
-					(_dt->getDisplayMainPage() != NULL) ? _dt->getDisplayMainPage()->getFullName() : "(aucune)",
+					(_dt->get<DisplayMainPage>().get_ptr() != NULL) ? _dt->get<DisplayMainPage>()->getFullName() : "(aucune)",
 					(_displayMainPage->get() != NULL) ? (*_displayMainPage)->getFullName() : "(aucune)"
 				);
 			}
 
 			if(_displayRowPage)
 			{
-				_dt->setDisplayRowPage(_displayRowPage->get());
+				_dt->set<DisplayRowPage>(*(const_cast<Webpage*>(_displayRowPage->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour rangée",
-					(_dt->getDisplayRowPage() != NULL) ? _dt->getDisplayRowPage()->getFullName() : "(aucune)",
+					(_dt->get<DisplayRowPage>().get_ptr() != NULL) ? _dt->get<DisplayRowPage>()->getFullName() : "(aucune)",
 					(_displayRowPage->get() != NULL) ? (*_displayRowPage)->getFullName() : "(aucune)"
 				);
 			}
 
 			if(_displayDestinationPage)
 			{
-				_dt->setDisplayDestinationPage(_displayDestinationPage->get());
+				_dt->set<DisplayDestinationPage>(*(const_cast<Webpage*>(_displayDestinationPage->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour destination",
-					(_dt->getDisplayDestinationPage() != NULL) ? _dt->getDisplayDestinationPage()->getFullName() : "(aucune)",
+					(_dt->get<DisplayDestinationPage>().get_ptr() != NULL) ? _dt->get<DisplayDestinationPage>()->getFullName() : "(aucune)",
 					(_displayDestinationPage->get() != NULL) ? (*_displayDestinationPage)->getFullName() : "(aucune)"
 				);
 			}
 
 			if(_displayTransferDestinationPage)
 			{
-				_dt->setDisplayTransferDestinationPage(_displayTransferDestinationPage->get());
+				_dt->set<DisplayTransferDestinationPage>(*(const_cast<Webpage*>(_displayTransferDestinationPage->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour destination en correspondance",
-					(_dt->getDisplayTransferDestinationPage() != NULL) ? _dt->getDisplayTransferDestinationPage()->getFullName() : "(aucune)",
+					(_dt->get<DisplayTransferDestinationPage>().get_ptr() != NULL) ? _dt->get<DisplayTransferDestinationPage>()->getFullName() : "(aucune)",
 					(_displayTransferDestinationPage->get() != NULL) ? (*_displayTransferDestinationPage)->getFullName() : "(aucune)"
 				);
 			}
 
 			if(_monitoringParserPage)
 			{
-				_dt->setMonitoringParserPage(_monitoringParserPage->get());
+				_dt->set<MonitoringParserPage>(*(const_cast<Webpage*>(_monitoringParserPage->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour parser les résultats de supervision",
-					(_dt->getMonitoringParserPage() != NULL) ? _dt->getMonitoringParserPage()->getFullName() : "(aucune)",
+					(_dt->get<MonitoringParserPage>().get_ptr() != NULL) ? _dt->get<MonitoringParserPage>()->getFullName() : "(aucune)",
 					(_monitoringParserPage->get() != NULL) ? (*_monitoringParserPage)->getFullName() : "(aucune)"
 				);
 			}
 
 			if(_messageIsDisplayedPage)
 			{
-				_dt->setMessageIsDisplayedPage(_messageIsDisplayedPage->get());
+				_dt->set<IsDisplayedMessagePage>(*(const_cast<Webpage*>(_messageIsDisplayedPage->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS définissant la règle d'affichage d'un message",
-					(_dt->getMessageIsDisplayedPage() != NULL) ? _dt->getMessageIsDisplayedPage()->getFullName() : "(aucune)",
+					(_dt->get<IsDisplayedMessagePage>().get_ptr() != NULL) ? _dt->get<IsDisplayedMessagePage>()->getFullName() : "(aucune)",
 					(_messageIsDisplayedPage->get() != NULL) ? (*_messageIsDisplayedPage)->getFullName() : "(aucune)"
 				);
 			}
 
 			if(_messageType)
 			{
-				_dt->setMessageType(_messageType->get());
+				_dt->set<MessageType>(*(const_cast<messages::MessageType*>(_messageType->get())));
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Type de message",
-					(_dt->getMessageType() != NULL) ? _dt->getMessageType()->getName() : "(aucun)",
+					(_dt->get<MessageType>().get_ptr() != NULL) ? _dt->get<MessageType>()->getName() : "(aucun)",
 					(_messageType->get() != NULL) ? (*_messageType)->getName() : "(aucun)"
 				);
 			}

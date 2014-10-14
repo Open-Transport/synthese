@@ -189,7 +189,7 @@ namespace synthese
 				UniqueStringsSet hostgroups;
 				BOOST_FOREACH(const boost::shared_ptr<const DisplayType>& type, types)
 				{
-					const string& hostgroup(hostgroups.getUniqueString(_ConvertToNagiosName(type->getName())));
+					const string& hostgroup(hostgroups.getUniqueString(_ConvertToNagiosName(type->get<Name>())));
 					stream <<
 						"INSERT INTO hostgroup(hg_id,hg_name,hg_alias,hg_comment,hg_activate) VALUES(" <<
 							decodeObjectId(type->getKey()) << "," <<
@@ -278,7 +278,7 @@ namespace synthese
 
 						"INSERT INTO hostgroup_relation(hgr_id,hostgroup_hg_id,host_host_id) VALUES(" <<
 							decodeObjectId(screen->getKey()) << "," <<
-							decodeObjectId(screen->getType()->getKey()) << "," <<
+							decodeObjectId(screen->get<DisplayTypePtr>()->getKey()) << "," <<
 							decodeObjectId(screen->getKey()) <<
 						");" << endl <<
 

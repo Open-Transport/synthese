@@ -103,20 +103,20 @@ namespace synthese
 		{
 			// Log
 			stringstream log;
-			DBLogModule::appendToLogIfChange(log, "Délai de clignotement", _screen->getBlinkingDelay(), _blinkingDelay);
-			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de quai", _screen->getTrackNumberDisplay(), _displayPlatform);
-			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de service", _screen->getServiceNumberDisplay(), _displayServiceNumber);
-			DBLogModule::appendToLogIfChange(log, "Affichage du numéro d'équipe", _screen->getDisplayTeam(), _displayTeam);
-			DBLogModule::appendToLogIfChange(log, "Affichage de l'horloge", _screen->getDisplayClock(), _displayClock);
-			DBLogModule::appendToLogIfChange(log, "Titre", _screen->getTitle(), _title);
+			DBLogModule::appendToLogIfChange(log, "Délai de clignotement", _screen->get<BlinkingDelay>(), _blinkingDelay);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de quai", _screen->get<TrackNumberDisplay>(), _displayPlatform);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de service", _screen->get<ServiceNumberDisplay>(), _displayServiceNumber);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numéro d'équipe", _screen->get<DisplayTeam>(), _displayTeam);
+			DBLogModule::appendToLogIfChange(log, "Affichage de l'horloge", _screen->get<DisplayClock>(), _displayClock);
+			DBLogModule::appendToLogIfChange(log, "Titre", _screen->get<Title>(), _title);
 
 			// Preparation
-			_screen->setTitle(_title);
-			_screen->setDisplayTeam(_displayTeam);
-			_screen->setBlinkingDelay(_blinkingDelay);
-			_screen->setTrackNumberDisplay(_displayPlatform);
-			_screen->setServiceNumberDisplay(_displayServiceNumber);
-			_screen->setDisplayClock(_displayClock);
+			_screen->set<Title>(_title);
+			_screen->set<DisplayTeam>(_displayTeam);
+			_screen->set<BlinkingDelay>(_blinkingDelay);
+			_screen->set<TrackNumberDisplay>(_displayPlatform);
+			_screen->set<ServiceNumberDisplay>(_displayServiceNumber);
+			_screen->set<DisplayClock>(_displayClock);
 
 			// The action
 			DisplayScreenTableSync::Save(_screen.get());

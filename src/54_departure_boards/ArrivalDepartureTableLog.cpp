@@ -90,7 +90,7 @@ namespace synthese
 					);
 					boost::shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					openRequest.getPage()->setType(dt);
-					return HTMLModule::getHTMLLink(openRequest.getURL(), dt->getName());
+					return HTMLModule::getHTMLLink(openRequest.getURL(), dt->get<Name>());
 				}
 				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
 				{
@@ -157,21 +157,21 @@ namespace synthese
 		void ArrivalDepartureTableLog::addUpdateTypeEntry(const DisplayType* type , const security::User* user , const std::string& text )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Mise à jour type d'afficheur " + type->getName() + text);
+			content.push_back("Mise à jour type d'afficheur " + type->get<Name>() + text);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
 		}
 
 		void ArrivalDepartureTableLog::addCreateEntry(const DisplayType& type , const security::User& user )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Création type d'afficheur " + type.getName());
+			content.push_back("Création type d'afficheur " + type.get<Name>());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, type.getKey());
 		}
 
 		void ArrivalDepartureTableLog::addDeleteTypeEntry(const DisplayType* type , const security::User* user )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Suppression type d'afficheur " + type->getName());
+			content.push_back("Suppression type d'afficheur " + type->get<Name>());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
 		}
 
