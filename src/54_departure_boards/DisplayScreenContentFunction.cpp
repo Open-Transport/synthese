@@ -965,7 +965,7 @@ namespace synthese
 			){
 				ptime date(_date ? *_date : second_clock::local_time());
 				if(!_screen->get<MaintenanceIsOnline>() ||
-					!(&*(_screen->get<BroadCastPoint>()))
+					!(_screen->get<BroadCastPoint>())
 				){
 					return ParametersMap();
 				}
@@ -996,9 +996,9 @@ namespace synthese
 							_displayRoutePlanningBoard(
 								stream,
 								request,
-								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())),
-								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>())),
-								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>())),
+								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>().get_ptr()),
+								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>().get_ptr()),
+								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>().get_ptr()),
 								realStartDateTime,
 								displayedObject,
 								*_screen
@@ -1029,7 +1029,7 @@ namespace synthese
 								_screen->get<DisplayTypePtr>()->get<MaxStopsNumber>(),
 								_screen->get<BlinkingDelay>(),
 								_screen->get<DisplayClock>(),
-								&*_screen->get<BroadCastPoint>(),
+								_screen->get<BroadCastPoint>().get_ptr(),
 								displayedObject,
 								&request
 							);
@@ -1041,10 +1041,10 @@ namespace synthese
 							_displayDepartureBoard(
 								stream,
 								request,
-								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>())),
-								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>())),
-								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>())),
-								Env::GetOfficialEnv().getSPtr(&*(_screen->get<DisplayTypePtr>()->get<DisplayTransferDestinationPage>())),
+								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayMainPage>().get_ptr()),
+								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayRowPage>().get_ptr()),
+								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayDestinationPage>().get_ptr()),
+								Env::GetOfficialEnv().getSPtr(_screen->get<DisplayTypePtr>()->get<DisplayTransferDestinationPage>().get_ptr()),
 								realStartDateTime,
 								displayedObject,
 								*_screen
@@ -2337,7 +2337,7 @@ namespace synthese
 				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.get<DisplayTypePtr>()->get<MaxStopsNumber>());
 			}
 			pm.insert(DATA_DISPLAY_TEAM, screen.get<DisplayTeam>());
-			pm.insert(DATA_STOP_NAME, &*screen.get<BroadCastPoint>() ? screen.get<BroadCastPoint>()->getFullName() : string());
+			pm.insert(DATA_STOP_NAME, screen.get<BroadCastPoint>() ? screen.get<BroadCastPoint>()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.get<DisplayClock>());
 
 			// Stop Point
@@ -2352,9 +2352,9 @@ namespace synthese
 			}
 
 			// StopArea
-			if(&*screen.get<BroadCastPoint>())
+			if(screen.get<BroadCastPoint>())
 			{
-				const StopArea* connPlace(&*screen.get<BroadCastPoint>());
+				const StopArea* connPlace(screen.get<BroadCastPoint>().get_ptr());
 
 				pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
 				pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
@@ -2822,7 +2822,7 @@ namespace synthese
 				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.get<DisplayTypePtr>()->get<MaxStopsNumber>());
 			}
 			pm.insert(DATA_DISPLAY_TEAM, screen.get<DisplayTeam>());
-			pm.insert(DATA_STOP_NAME, &*screen.get<BroadCastPoint>() ? screen.get<BroadCastPoint>()->getFullName() : string());
+			pm.insert(DATA_STOP_NAME, screen.get<BroadCastPoint>() ? screen.get<BroadCastPoint>()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.get<DisplayClock>());
 			pm.insert(DATA_WITH_TRANSFER, screen.get<RoutePlanningWithTransfer>());
 			screen.get<BroadCastPoint>()->toParametersMap(pm, true);
