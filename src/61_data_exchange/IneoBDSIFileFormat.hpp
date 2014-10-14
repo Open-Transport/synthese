@@ -90,6 +90,10 @@ namespace synthese
 				static const std::string PARAMETER_CONVERT_STOP_CODE_TO_LOWER;
 		
 			private:
+				// Vector to avoid reentrance and mutex to protect this vector
+				static boost::recursive_mutex _tabRunningBdsiMutex;
+				static std::set<util::RegistryKeyType> _runningBdsi;
+
 				boost::optional<std::string> _dbConnString;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;

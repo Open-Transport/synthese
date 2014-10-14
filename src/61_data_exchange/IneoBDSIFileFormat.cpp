@@ -80,6 +80,9 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_CONVERT_STOP_CODE_TO_LOWER = "convert_stop_code_to_lower";
 		
+		recursive_mutex IneoBDSIFileFormat::Importer_::_tabRunningBdsiMutex;
+		set<RegistryKeyType> IneoBDSIFileFormat::Importer_::_runningBdsi;
+		
 		
 		
 		ParametersMap IneoBDSIFileFormat::Importer_::getParametersMap() const
@@ -252,7 +255,39 @@ namespace synthese
 			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
 			if(!lock.owns_lock())
 			{
-				throw RequestException("IneoBDSIFileFormat: Already running");
+				// If another BDSI import running, we can do this one if it is really another
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				if (_runningBdsi.empty())
+				{
+					// No BDSI import is running, another thread owns the baseWriterMutex so
+					// we don't make import
+					throw RequestException("IneoBDSIFileFormat: Another action forbids to run IneoBDSIFileFormat");
+				}
+				
+				if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
+				{
+					// Another BDSI import is running and it is the same
+					throw RequestException("IneoBDSIFileFormat: Already running");
+				}
+				
+				// Another BDSI import is running but it is not the same
+				_runningBdsi.insert(getImport().getKey());
+			}
+			else
+			{
+				// We check that import is not running (it could be in the save method)
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				if (!_runningBdsi.empty())
+				{
+					if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
+					{
+						// Another BDSI import is running and it is the same
+						throw RequestException("IneoBDSIFileFormat: Already running");
+					}
+				}
+				
+				// Another BDSI import may be running but it is not the same
+				_runningBdsi.insert(getImport().getKey());
 			}
 
 
@@ -1206,6 +1241,14 @@ namespace synthese
 				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
 			}
+			
+			// Release lock
+			{
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				
+				// Release lock
+				_runningBdsi.erase(getImport().getKey());
+			}
 
 			return true;
 		}
@@ -1338,6 +1381,21 @@ namespace synthese
 		DBTransaction IneoBDSIFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
+			// We check that import is not running
+			{
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				if (!_runningBdsi.empty())
+				{
+					if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
+					{
+						// Another BDSI import is running and it is the same
+						throw RequestException("IneoBDSIFileFormat: Already running");
+					}
+				}
+				
+				// Another BDSI import may be running but it is not the same
+				_runningBdsi.insert(getImport().getKey());
+			}
 
 			// Created journey patterns
 			BOOST_FOREACH(const JourneyPattern::Registry::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
@@ -1403,6 +1461,14 @@ namespace synthese
 				{
 					_logTrace(query.first +" "+ lexical_cast<string>(query.second));
 				}
+			}
+			
+			// Release lock
+			{
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				
+				// Another BDSI import is running but it is not the same
+				_runningBdsi.erase(getImport().getKey());
 			}
 
 			return transaction;
