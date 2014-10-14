@@ -1726,10 +1726,10 @@ namespace synthese
 					startDateTime = (_date ? *_date : now);
 					if(startDateTime.time_of_day() > endOfService)
 					{
-						if(_screen.get() && _screen->getMaxDelay() != 0)
+						if(_screen.get() && _screen->get<MaxDelay>() != 0)
 						{
 							endDateTime = ptime(startDateTime);
-							endDateTime += minutes(_screen->getMaxDelay());
+							endDateTime += minutes(_screen->get<MaxDelay>());
 							time_period period(startDateTime, endDateTime);
 							// Limit the endDateTime to the date of the next day, at time 'endOfService'.
 							if (period.contains(ptime(startDateTime.date() + boost::gregorian::days(1), endOfService)))
