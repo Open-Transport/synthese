@@ -126,7 +126,7 @@ namespace synthese
 			stringstream log;
 			DBLogModule::appendToLogIfChange(log, "Nom", _screen->get<BroadCastPointComment>(), _name);
 			DBLogModule::appendToLogIfChange(log, "Code de branchement bus RS485", _screen->get<WiringCode>(), _wiringCode);
-			DBLogModule::appendToLogIfChange(log, "Type de panneau", ((&*_screen->get<DisplayTypePtr>() != NULL) ? _screen->get<DisplayTypePtr>()->get<Name>() : string()), ((_type.get() != NULL) ? _type->get<Name>() : string()));
+			DBLogModule::appendToLogIfChange(log, "Type de panneau", ((_screen->get<DisplayTypePtr>().get_ptr() != NULL) ? _screen->get<DisplayTypePtr>()->get<Name>() : string()), ((_type.get() != NULL) ? _type->get<Name>() : string()));
 			DBLogModule::appendToLogIfChange(log, "Port COM", _screen->get<ComPort>(), _comPort);
 			DBLogModule::appendToLogIfChange(log, "Unité centrale hôte", ((_screen->getRoot<DisplayScreenCPU>() != NULL) ? _screen->getRoot<DisplayScreenCPU>()->getName() : string()), ((_cpu.get() != NULL) ? _cpu->getName() : string()));
 			DBLogModule::appendToLogIfChange(log, "Adresse MAC", _screen->get<MacAddress>(), _macAddress);

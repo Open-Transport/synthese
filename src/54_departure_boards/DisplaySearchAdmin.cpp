@@ -301,7 +301,7 @@ namespace synthese
 					stream <<
 						t.col();
 
-					if(&*screen->get<DisplayTypePtr>() == NULL)
+					if(screen->get<DisplayTypePtr>().get_ptr() == NULL)
 					{
 						stream <<
 							HTMLModule::getHTMLImage(

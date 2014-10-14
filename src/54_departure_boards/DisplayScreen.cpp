@@ -365,7 +365,7 @@ namespace synthese
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(
-						&*get<BroadCastPoint>(),
+						get<BroadCastPoint>().get_ptr(),
 						it2,
 						approachJourney.getFirstDepartureTime(),
 						approachJourney.getFirstDepartureTime(),
@@ -429,7 +429,7 @@ namespace synthese
 		const ArrivalDepartureTableGenerator::PhysicalStops& DisplayScreen::getPhysicalStops(bool result) const
 		{
 			return
-				(get<AllPhysicalDisplayed>() && &*get<BroadCastPoint>() && result) ?
+				(get<AllPhysicalDisplayed>() && get<BroadCastPoint>().get_ptr() && result) ?
 				get<BroadCastPoint>()->getPhysicalStops() :
 				_physicalStops
 			;
@@ -618,9 +618,9 @@ namespace synthese
 		) const {
 			return get<MaintenanceIsOnline>() &&
 				get<DisplayTypePtr>() &&
-				&*get<DisplayTypePtr>() != NULL &&
+				get<DisplayTypePtr>().get_ptr() != NULL &&
 				get<DisplayTypePtr>()->get<MonitoringInterface>() &&
-				&*(get<DisplayTypePtr>()->get<MonitoringInterface>()) != NULL &&
+				get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() != NULL &&
 				get<DisplayTypePtr>()->get<TimeBetweenChecks>().minutes() > 0
 			;
 		}
@@ -679,7 +679,7 @@ namespace synthese
 			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, getChildren())
 			{
 				if(	it.second->getSubScreenType() == CONTINUATION_TRANSFER &&
-					&*it.second->get<BroadCastPoint>() == &stop
+					it.second->get<BroadCastPoint>().get_ptr() == &stop
 				){
 					return it.second;
 				}
@@ -705,7 +705,7 @@ namespace synthese
 		{
 			return
 				get<DisplayTypePtr>() ?
-				&*(get<DisplayTypePtr>()->get<MessageType>()) :
+				get<DisplayTypePtr>()->get<MessageType>().get_ptr() :
 				NULL;
 		}
 
@@ -1163,7 +1163,7 @@ namespace synthese
 					{
 						setRoot(
 							DeparturesTableModule::GetPlaceWithDisplayBoards(
-								&*get<BroadCastPoint>(),
+								get<BroadCastPoint>().get_ptr(),
 								env
 						)	);
 					}
@@ -1283,6 +1283,6 @@ namespace synthese
 			pm.insert(prefix + DATA_NAME, get<BroadCastPointComment>());
 			pm.insert(prefix + DATA_SCREEN_ID, getKey());
 			pm.insert(prefix + DATA_TITLE, get<Title>());
-			pm.insert(prefix + DATA_TYPE_ID, &*get<DisplayTypePtr>() ? get<DisplayTypePtr>()->getKey() : 0);
+			pm.insert(prefix + DATA_TYPE_ID, get<DisplayTypePtr>().get_ptr() ? get<DisplayTypePtr>()->getKey() : 0);
 		}
 }	}

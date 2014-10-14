@@ -228,7 +228,7 @@ namespace synthese
 						"Type d'afficheur",
 						t.getForm().getSelectInput(
 							UpdateDisplayScreenAction::PARAMETER_TYPE,
-							DeparturesTableModule::getDisplayTypeLabels(false, &*_displayScreen->get<DisplayTypePtr>() == NULL),
+							DeparturesTableModule::getDisplayTypeLabels(false, _displayScreen->get<DisplayTypePtr>().get_ptr() == NULL),
 							_displayScreen->get<DisplayTypePtr>() ? _displayScreen->get<DisplayTypePtr>()->getKey() : optional<RegistryKeyType>()
 					)	)
 				;
@@ -314,7 +314,7 @@ namespace synthese
 				// View the display type
 				AdminFunctionRequest<DisplayTypeAdmin> displayTypeRequest(_request);
 				displayTypeRequest.getPage()->setType(
-					Env::GetOfficialEnv().getSPtr(&*_displayScreen->get<DisplayTypePtr>())
+					Env::GetOfficialEnv().getSPtr(_displayScreen->get<DisplayTypePtr>().get_ptr())
 				);
 
 				// Log search
@@ -354,7 +354,7 @@ namespace synthese
 
 
 				stream << l.element();
-				if(&*_displayScreen->get<DisplayTypePtr>() == NULL)
+				if(_displayScreen->get<DisplayTypePtr>().get_ptr() == NULL)
 				{
 					stream <<
 						HTMLModule::getHTMLImage("/admin/img/error.png", "Erreur") <<
@@ -543,8 +543,8 @@ namespace synthese
 					PropertiesHTMLTable t(updateDisplayedPlaceRequest.getHTMLForm("stopareachange"));
 					t.getForm().setUpdateRight(tabHasWritePermissions());
 					stream << t.open();
-					stream << t.cell("Localité", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_CITY_NAME, &*_displayScreen->get<BroadCastPoint>() ? _displayScreen->get<BroadCastPoint>()->getCity()->getName() : string()));
-					stream << t.cell("Arrêt", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME, &*_displayScreen->get<BroadCastPoint>() ? _displayScreen->get<BroadCastPoint>()->getName() : string()));
+					stream << t.cell("Localité", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_CITY_NAME, _displayScreen->get<BroadCastPoint>().get_ptr() ? _displayScreen->get<BroadCastPoint>()->getCity()->getName() : string()));
+					stream << t.cell("Arrêt", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME, _displayScreen->get<BroadCastPoint>().get_ptr() ? _displayScreen->get<BroadCastPoint>()->getName() : string()));
 					stream << t.close();
 				}
 
@@ -554,7 +554,7 @@ namespace synthese
 				{
 					stream << "<h1>Arrêts de destination</h1>";
 
-					if(&*_displayScreen->get<BroadCastPoint>() == NULL)
+					if(_displayScreen->get<BroadCastPoint>().get_ptr() == NULL)
 					{
 						stream << "Arrêt de départ non spécifié, aucune destination ne peut être sélectionnée.";
 					}
@@ -605,7 +605,7 @@ namespace synthese
 
 					if (!_displayScreen->get<AllPhysicalDisplayed>())
 					{
-						if(&*_displayScreen->get<BroadCastPoint>() == NULL)
+						if(_displayScreen->get<BroadCastPoint>().get_ptr() == NULL)
 						{
 							stream << "Arrêt de départ non spécifié, aucun arrêt à sélectionner.";
 						}
@@ -807,9 +807,9 @@ namespace synthese
 
 					// Displayed place
 					stream << td.col();
-					if(&*(screen.get<BroadCastPoint>()))
+					if(screen.get<BroadCastPoint>().get_ptr())
 					{
-						displayPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(&*(screen.get<BroadCastPoint>())));
+						displayPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(screen.get<BroadCastPoint>().get_ptr()));
 						stream << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.get<BroadCastPoint>()->getFullName());
 					}
 					stream << td.col() << screen.getKey();

@@ -89,7 +89,7 @@ namespace synthese
 				throw RequestException("Unknown error");
 			}
 
-			if (&*(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()) == NULL)
+			if (_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() == NULL)
 			{
 				throw RequestException("This screen cannot be monitored because its type do not have monitoring interface");
 			}
@@ -105,8 +105,8 @@ namespace synthese
 		{
 			// Assertions
 			assert(_displayScreen.get() != NULL);
-			assert(&*_displayScreen->get<DisplayTypePtr>() != NULL);
-			assert(&*(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()) != NULL);
+			assert(_displayScreen->get<DisplayTypePtr>().get_ptr() != NULL);
+			assert(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() != NULL);
 			assert(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()->getPage<ParseDisplayReturnInterfacePage>() != NULL);
 
 

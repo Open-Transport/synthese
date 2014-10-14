@@ -408,7 +408,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Interface d'affichage",
-					(&*_dt->get<DisplayInterface>() != NULL) ? _dt->get<DisplayInterface>()->getName() : "(aucune)",
+					(_dt->get<DisplayInterface>().get_ptr() != NULL) ? _dt->get<DisplayInterface>()->getName() : "(aucune)",
 					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
 				);
 			}
@@ -419,7 +419,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Interface de supervision",
-					(&*_dt->get<MonitoringInterface>() != NULL) ? _dt->get<MonitoringInterface>()->getName() : "(aucune)",
+					(_dt->get<MonitoringInterface>().get_ptr() != NULL) ? _dt->get<MonitoringInterface>()->getName() : "(aucune)",
 					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
 				);
 			}
@@ -430,7 +430,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Interface audio",
-					(&*_dt->get<AudioInterface>() != NULL) ? _dt->get<AudioInterface>()->getName() : "(aucune)",
+					(_dt->get<AudioInterface>().get_ptr() != NULL) ? _dt->get<AudioInterface>()->getName() : "(aucune)",
 					(_interface->get() != NULL) ? (*_interface)->getName() : "(aucune)"
 				);
 			}
@@ -474,7 +474,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS principale",
-					(&*_dt->get<DisplayMainPage>() != NULL) ? _dt->get<DisplayMainPage>()->getFullName() : "(aucune)",
+					(_dt->get<DisplayMainPage>().get_ptr() != NULL) ? _dt->get<DisplayMainPage>()->getFullName() : "(aucune)",
 					(_displayMainPage->get() != NULL) ? (*_displayMainPage)->getFullName() : "(aucune)"
 				);
 			}
@@ -485,7 +485,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour rangée",
-					(&*_dt->get<DisplayRowPage>() != NULL) ? _dt->get<DisplayRowPage>()->getFullName() : "(aucune)",
+					(_dt->get<DisplayRowPage>().get_ptr() != NULL) ? _dt->get<DisplayRowPage>()->getFullName() : "(aucune)",
 					(_displayRowPage->get() != NULL) ? (*_displayRowPage)->getFullName() : "(aucune)"
 				);
 			}
@@ -496,7 +496,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour destination",
-					(&*_dt->get<DisplayDestinationPage>() != NULL) ? _dt->get<DisplayDestinationPage>()->getFullName() : "(aucune)",
+					(_dt->get<DisplayDestinationPage>().get_ptr() != NULL) ? _dt->get<DisplayDestinationPage>()->getFullName() : "(aucune)",
 					(_displayDestinationPage->get() != NULL) ? (*_displayDestinationPage)->getFullName() : "(aucune)"
 				);
 			}
@@ -507,7 +507,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour destination en correspondance",
-					(&*_dt->get<DisplayTransferDestinationPage>() != NULL) ? _dt->get<DisplayTransferDestinationPage>()->getFullName() : "(aucune)",
+					(_dt->get<DisplayTransferDestinationPage>().get_ptr() != NULL) ? _dt->get<DisplayTransferDestinationPage>()->getFullName() : "(aucune)",
 					(_displayTransferDestinationPage->get() != NULL) ? (*_displayTransferDestinationPage)->getFullName() : "(aucune)"
 				);
 			}
@@ -518,7 +518,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS pour parser les résultats de supervision",
-					(&*_dt->get<MonitoringParserPage>() != NULL) ? _dt->get<MonitoringParserPage>()->getFullName() : "(aucune)",
+					(_dt->get<MonitoringParserPage>().get_ptr() != NULL) ? _dt->get<MonitoringParserPage>()->getFullName() : "(aucune)",
 					(_monitoringParserPage->get() != NULL) ? (*_monitoringParserPage)->getFullName() : "(aucune)"
 				);
 			}
@@ -529,7 +529,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Page CMS définissant la règle d'affichage d'un message",
-					(&*_dt->get<IsDisplayedMessagePage>() != NULL) ? _dt->get<IsDisplayedMessagePage>()->getFullName() : "(aucune)",
+					(_dt->get<IsDisplayedMessagePage>().get_ptr() != NULL) ? _dt->get<IsDisplayedMessagePage>()->getFullName() : "(aucune)",
 					(_messageIsDisplayedPage->get() != NULL) ? (*_messageIsDisplayedPage)->getFullName() : "(aucune)"
 				);
 			}
@@ -540,7 +540,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(
 					log,
 					"Type de message",
-					(&*_dt->get<MessageType>() != NULL) ? _dt->get<MessageType>()->getName() : "(aucun)",
+					(_dt->get<MessageType>().get_ptr() != NULL) ? _dt->get<MessageType>()->getName() : "(aucun)",
 					(_messageType->get() != NULL) ? (*_messageType)->getName() : "(aucun)"
 				);
 			}

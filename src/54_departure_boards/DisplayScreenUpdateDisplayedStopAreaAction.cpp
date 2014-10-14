@@ -138,8 +138,8 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(
 				log,
 				"Zone d'arrêt affichée",
-				&*_screen->get<BroadCastPoint>() ? _screen->get<BroadCastPoint>()->getFullName() : "(non défini)",
-				&*_place.get() ? _place->getFullName() : "(non défini)"
+				_screen->get<BroadCastPoint>().get_ptr() ? _screen->get<BroadCastPoint>()->getFullName() : "(non défini)",
+				_place.get() ? _place->getFullName() : "(non défini)"
 			);
 
 			// Preparation of the action

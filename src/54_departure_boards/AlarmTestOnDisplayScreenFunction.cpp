@@ -162,16 +162,16 @@ namespace synthese
 			Env::GetOfficialEnv().getEditableRegistry<Alarm>().add(alarm);
 			MessagesModule::UpdateActivatedMessages();
 
-			if(&*_type->get<DisplayMainPage>())
+			if(_type->get<DisplayMainPage>())
 			{
 				DisplayScreenContentFunction f;
 				f._displayDepartureBoard(
 					stream,
 					request,
-					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayMainPage>()),
-					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayRowPage>()),
-					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayDestinationPage>()),
-					Env::GetOfficialEnv().getSPtr(&*_type->get<DisplayTransferDestinationPage>()),
+					Env::GetOfficialEnv().getSPtr(_type->get<DisplayMainPage>().get_ptr()),
+					Env::GetOfficialEnv().getSPtr(_type->get<DisplayRowPage>().get_ptr()),
+					Env::GetOfficialEnv().getSPtr(_type->get<DisplayDestinationPage>().get_ptr()),
+					Env::GetOfficialEnv().getSPtr(_type->get<DisplayTransferDestinationPage>().get_ptr()),
 					now,
 					displayedObject,
 					fakeScreen
@@ -208,7 +208,7 @@ namespace synthese
 		std::string AlarmTestOnDisplayScreenFunction::getOutputMimeType() const
 		{
 			const Webpage* page(
-				&*_type->get<DisplayMainPage>()
+				_type->get<DisplayMainPage>().get_ptr()
 			);
 			return (page == NULL) ? "text/plain" : page->getMimeType();
 		}
