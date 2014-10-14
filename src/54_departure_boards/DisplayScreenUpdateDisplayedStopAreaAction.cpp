@@ -138,13 +138,13 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(
 				log,
 				"Zone d'arrêt affichée",
-				_screen->getDisplayedPlace() ? _screen->getDisplayedPlace()->getFullName() : "(non défini)",
+				_screen->get<BroadCastPoint>().get_ptr() ? _screen->get<BroadCastPoint>()->getFullName() : "(non défini)",
 				_place.get() ? _place->getFullName() : "(non défini)"
 			);
 
 			// Preparation of the action
 			_screen->clearDisplayedPlaces();
-			_screen->setDisplayedPlace(_place.get());
+			_screen->set<BroadCastPoint>(*(const_cast<StopArea*>(dynamic_cast<const StopArea*>(_place.get()))));
 
 			// The action
 			DisplayScreenTableSync::Save(_screen.get());

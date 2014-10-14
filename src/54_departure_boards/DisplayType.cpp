@@ -31,13 +31,26 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace departure_boards;
 	using namespace interfaces;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const std::string Registry<departure_boards::DisplayType>::KEY("DisplayType");
-	}
+	CLASS_DEFINITION(DisplayType, "t036_display_types", 36)
+	FIELD_DEFINITION_OF_OBJECT(DisplayType, "display_type_id", "display_type_ids")
+	
+	FIELD_DEFINITION_OF_TYPE(DisplayInterface, "interface_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(AudioInterface, "audio_interface_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MonitoringInterface, "monitoring_interface_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(RowsNumber, "rows_number", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaxStopsNumber, "max_stops_number", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TimeBetweenChecks, "time_between_checks", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DisplayMainPage, "display_main_page_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DisplayRowPage, "display_row_page_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DisplayDestinationPage, "display_destination_page_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(DisplayTransferDestinationPage, "display_transfer_destination_page_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MonitoringParserPage, "monitoring_parser_page_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(IsDisplayedMessagePage, "is_displayed_message_page_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MessageType, "message_type_id", SQL_INTEGER)
 
 
 	namespace departure_boards
@@ -51,100 +64,25 @@ namespace synthese
 
 
 
-		const Interface* DisplayType::getDisplayInterface() const
-		{
-			return _displayInterface;
-		}
-
-
-
 		DisplayType::DisplayType(util::RegistryKeyType id)
 		:	Registrable(id),
-			_displayInterface(NULL),
-			_audioInterface(NULL),
-			_monitoringInterface(NULL),
-			_rowNumber(1),
-			_timeBetweenChecks(minutes(1)),
-			_displayMainPage(NULL),
-			_displayRowPage(NULL),
-			_displayDestinationPage(NULL),
-			_displayTransferDestinationPage(NULL),
-			_monitoringParserPage(NULL),
-			_messageIsDisplayedPage(NULL),
-			_messageType(NULL)
+			Object<DisplayType, DisplayTypeSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayInterface),
+					FIELD_DEFAULT_CONSTRUCTOR(AudioInterface),
+					FIELD_DEFAULT_CONSTRUCTOR(MonitoringInterface),
+					FIELD_VALUE_CONSTRUCTOR(RowsNumber, 1),
+					FIELD_VALUE_CONSTRUCTOR(MaxStopsNumber, 0),
+					FIELD_VALUE_CONSTRUCTOR(TimeBetweenChecks, minutes(0)),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayMainPage),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayRowPage),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayDestinationPage),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayTransferDestinationPage),
+					FIELD_DEFAULT_CONSTRUCTOR(MonitoringParserPage),
+					FIELD_DEFAULT_CONSTRUCTOR(IsDisplayedMessagePage),
+					FIELD_DEFAULT_CONSTRUCTOR(MessageType)
+			)	)
 		{}
-
-
-
-		void DisplayType::setDisplayInterface(const Interface* interf )
-		{
-			_displayInterface = interf;
-		}
-
-
-
-		void DisplayType::setMonitoringInterface(
-			const interfaces::Interface* value
-		) {
-			_monitoringInterface = value;
-		}
-
-
-
-		void DisplayType::setAudioInterface(
-			const interfaces::Interface* value
-		) {
-			_audioInterface = value;
-		}
-
-
-
-		const interfaces::Interface* DisplayType::getMonitoringInterface(
-		) const {
-			return _monitoringInterface;
-		}
-
-
-
-		const interfaces::Interface* DisplayType::getAudioInterface(
-		) const {
-			return _audioInterface;
-		}
-
-
-
-		void DisplayType::setTimeBetweenChecks(
-			const time_duration& value
-		){
-			_timeBetweenChecks = value;
-		}
-
-
-
-		const time_duration& DisplayType::getTimeBetweenChecks(
-		) const {
-			return _timeBetweenChecks;
-		}
-
-
-
-		void DisplayType::toParametersMap(
-			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
-			std::string prefix
-		) const	{
-			pm.insert(ATTR_ID, getKey());
-			pm.insert(ATTR_NAME, getName());
-			pm.insert(ATTR_MESSAGE_TYPE_ID, _messageType ? _messageType->getKey() : RegistryKeyType(0));
-			pm.insert(ATTR_ROWS_NUMBER, _rowNumber);
-			pm.insert(
-				ATTR_MONITORING_PAGE_ID,
-				_monitoringParserPage ? _monitoringParserPage->getKey() : RegistryKeyType(0)
-			);
-			pm.insert(
-				ATTR_MESSAGE_IS_DISPLAYED_PAGE_ID,
-				_messageIsDisplayedPage ? _messageIsDisplayedPage->getKey() : RegistryKeyType(0)
-			);
-		}
 }	}

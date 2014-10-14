@@ -288,9 +288,9 @@ namespace synthese
 				{
 					displayRequest.getPage()->setScreen(screen);
 					stream << t.row();
-					stream << t.col() << screen->getName();
-					stream << t.col() << screen->getComPort();
-					stream << t.col() << screen->getWiringCode();
+					stream << t.col() << screen->get<BroadCastPointComment>();
+					stream << t.col() << screen->get<ComPort>();
+					stream << t.col() << screen->get<WiringCode>();
 					stream << t.col() << screen->getKey();
 					stream << t.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "/admin/img/monitor.png");
 				}

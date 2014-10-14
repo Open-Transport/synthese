@@ -257,11 +257,11 @@ namespace synthese
 					}
 					updateRequest.getPage()->setScreen(screen);
 					viewRequest.getFunction()->setScreen(screen);
-					if(	screen->getType() &&
-						screen->getType()->getDisplayInterface() &&
-						!screen->getType()->getDisplayInterface()->getDefaultClientURL().empty()
+					if(	screen->get<DisplayTypePtr>() &&
+						screen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
+						!screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL().empty()
 					){
-						viewRequest.setClientURL(screen->getType()->getDisplayInterface()->getDefaultClientURL());
+						viewRequest.setClientURL(screen->get<DisplayTypePtr>()->get<DisplayInterface>()->getDefaultClientURL());
 					}
 
 					vector<boost::shared_ptr<SentAlarm> > alarms(
@@ -287,11 +287,11 @@ namespace synthese
 							)
 						;
 					}
-					stream << t.col() << screen->getName();
+					stream << t.col() << screen->get<BroadCastPointComment>();
 					stream <<
 						t.col() <<
-						(	screen->getType() ?
-							screen->getType()->getName() :
+						(	screen->get<DisplayTypePtr>() ?
+							screen->get<DisplayTypePtr>()->get<Name>() :
 							HTMLModule::getHTMLImage("/admin/img/error.png", "Type non défini")
 						)
 					;
@@ -301,7 +301,7 @@ namespace synthese
 					stream <<
 						t.col();
 
-					if(screen->getType() == NULL)
+					if(screen->get<DisplayTypePtr>().get_ptr() == NULL)
 					{
 						stream <<
 							HTMLModule::getHTMLImage(
@@ -310,12 +310,12 @@ namespace synthese
 							)
 						;
 					}
-					else if(!screen->getIsOnline())
+					else if(!screen->get<MaintenanceIsOnline>())
 					{
 						stream <<
 							HTMLModule::getHTMLImage(
 								"/admin/img/cross.png",
-								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
+								"Désactivé par la maintenance : "+ screen->get<MaintenanceMessage>()
 							)
 						;
 					}
@@ -358,12 +358,12 @@ namespace synthese
 
 					// Content
 					stream << t.col();
-					if (!screen->getIsOnline())
+					if (!screen->get<MaintenanceIsOnline>())
 					{
 						stream <<
 							HTMLModule::getHTMLImage(
 								"/admin/img/cross.png",
-								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
+								"Désactivé par la maintenance : "+ screen->get<MaintenanceMessage>()
 							)
 						;
 					}

@@ -84,11 +84,11 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(
 				log,
 				"Affichage tous arrêts",
-				_screen->getAllPhysicalStopsDisplayed() ? "OUI" : "NON",
+				_screen->get<AllPhysicalDisplayed>() ? "OUI" : "NON",
 				_value ? "OUI" : "NON"
 			);
 
-			_screen->setAllPhysicalStopsDisplayed(_value);
+			_screen->set<AllPhysicalDisplayed>(_value);
 			DisplayScreenTableSync::Save(_screen.get());
 
 			ArrivalDepartureTableLog::addUpdateEntry(

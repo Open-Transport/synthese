@@ -93,7 +93,7 @@ namespace synthese
 					_template = DisplayScreenTableSync::Get(id, *_env);
 					if(_name.empty())
 					{
-						_name = "Copie de "+ _template->getName();
+						_name = "Copie de "+ _template->get<BroadCastPointComment>();
 					}
 				}
 			}
@@ -110,7 +110,7 @@ namespace synthese
 				{
 					_up = DisplayScreenTableSync::Get(id, *_env);
 					_subScreenType = static_cast<DisplayScreen::SubScreenType>(map.getDefault<int>(PARAMETER_SUB_SCREEN_TYPE));
-					setPlace(_up->getDisplayedPlace());
+					setPlace(dynamic_cast<StopArea*>(_up->get<BroadCastPoint>().get_ptr()));
 				}
 				else
 				{
@@ -172,10 +172,10 @@ namespace synthese
 
 			if(dynamic_cast<const StopArea*>(screen.getLocation()))
 			{
-				screen.setDisplayedPlace(static_cast<StopArea*>(const_cast<NamedPlace*>(screen.getLocation())));
+				screen.set<BroadCastPoint>(*(static_cast<StopArea*>(const_cast<NamedPlace*>(screen.getLocation()))));
 			}
-			screen.setName(_name);
-			screen.setMaintenanceIsOnline(true);
+			screen.set<BroadCastPointComment>(_name);
+			screen.set<MaintenanceIsOnline>(true);
 
 			// Action
 			DisplayScreenTableSync::Save(&screen);

@@ -82,11 +82,11 @@ namespace synthese
 				*_displayScreen,
 				*request.getUser(),
 				"Etat en ligne de l'afficheur",
-				lexical_cast<string>(_displayScreen->getIsOnline()),
+				lexical_cast<string>(_displayScreen->get<MaintenanceIsOnline>()),
 				lexical_cast<string>(_online),
 				_online ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING
 			);
-			_displayScreen->setMaintenanceIsOnline(_online);
+			_displayScreen->set<MaintenanceIsOnline>(_online);
 
 			// Message
 			DisplayMaintenanceLog::AddAdminEntry(
@@ -96,7 +96,7 @@ namespace synthese
 				string(),
 				_message
 			);
-			_displayScreen->setMaintenanceMessage(_message);
+			_displayScreen->set<MaintenanceMessage>(_message);
 
 			// Saving
 			DisplayScreenTableSync::Save(_displayScreen.get());
