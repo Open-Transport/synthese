@@ -34,6 +34,7 @@
 #include "RequestException.h"
 #include "ScheduledService.h"
 #include "ServerConstants.h"
+#include "ServerModule.h"
 #include "Service.h"
 #include "StopPoint.hpp"
 #include "TransportNetwork.h"
