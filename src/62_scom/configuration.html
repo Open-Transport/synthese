@@ -156,13 +156,15 @@
 				</div>
 				
 				<div class="control-group">
-					<label class="control-label">ID SCOM</label>
+                                        <label class="control-label">IDs SCOM</label>
 					<div class="controls">
 						<input class="input-small" name="SCOMSocketReader.serverid" type="text">
 					</div>
 					<div class="description">
-						Identifiant numérique à utiliser pour s'identifier sur le serveur
-						SCOM. Cet identifiant doit être définit sur le serveur.
+                                                Liste des identifiants numériques à utiliser pour s'identifier sur le serveur
+                                                SCOM. Ces identifiants doit être définit sur le serveur. Chaque identifiant
+                                                est séparé par une virgule. Ils seront utilisés à tour de rôle, et lors d'un
+                                                échec de connexion un autre sera utilisé à chaque fois.
 					</div>
 				</div>
 				

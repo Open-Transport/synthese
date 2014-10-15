@@ -67,14 +67,14 @@ namespace synthese
 			_socket(NULL),
 			_timer(NULL),
 			_state(RESOLVE),
-			_next(RESOLVE)
+			_next(RESOLVE),
+			_idpos(0)
 		{
 			// Fetch the settings
 			_resolveRetry = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_RESOLVERETRY,20);
 			_connectRetry = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_CONNECTRETRY,10);
 			_server = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_SERVER,"127.0.0.1");
 			_port = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_PORT,3106);
-			_id = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_ID,"1");
 			
 			// Timeouts
 			// Needs to be set for each state
@@ -84,9 +84,13 @@ namespace synthese
 			_timeouts[READ] = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_READTIMEOUT,600);
 			_timeouts[CLOSE] = 0;
 			
-			// Bornes to use
+			// Bornes
 			std::string bornes = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_BORNES);
 			boost::algorithm::split(_bornes,bornes,boost::algorithm::is_any_of(","));
+
+			// IDs
+			std::string ids = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_ID,"1");
+			boost::algorithm::split(_ids,ids,boost::algorithm::is_any_of(","));
 			
 			// Register for the settings changes
 			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_RESOLVERETRY, this);
@@ -241,9 +245,14 @@ namespace synthese
 		// Send the authentication XML to the SCOM server
 		// The protocol specifies no return message, so we're happy as long
 		// as the authentification has been send and the socket is not closed.
+		// The id used will loop through the possibilities offered by _ids (each call use a new one)
 		void SCOMSocketReader::_authenticate()
 		{
-			Log::GetInstance().debug("SCOM : Sending authentication with ID " + _id);
+			// Fetch the ID to use, and skip to the next one (loop)
+			std::string id = _ids.at(_idpos);
+			_idpos = (_idpos + 1) % _ids.size();
+
+			Log::GetInstance().debug("SCOM : Sending authentication with ID " + id);
 
 			// Generate the XML identification message
 			// (Note : lf seems to be deleted by msg, so do not delete it yourself)
@@ -253,7 +262,7 @@ namespace synthese
 			msg.imbue(std::locale(msg.getloc(),lf));
 			msg << "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" << std::endl;
 			msg << "<IDENT>" << std::endl;
-			msg << "   <CLIENT ID=\"" << _id << "\" " << now << "/>" << std::endl;
+			msg << "   <CLIENT ID=\"" << id << "\" " << now << "/>" << std::endl;
 			msg << "   <LISTE_BORNE>" << std::endl;
 
 			// Add each borne
@@ -475,7 +484,9 @@ namespace synthese
 				}
 				else if (name == SETTING_ID)
 				{
-					_id = Settings::GetInstance().Get<std::string>(SETTINGS_MODULE, SETTING_ID,_id);
+					_ids.clear();
+					std::string ids = Settings::GetInstance().Get<std::string>(SETTINGS_MODULE, SETTING_ID,"");
+					boost::algorithm::split(_ids,ids,boost::algorithm::is_any_of(","));
 				}
 				else if (name == SETTING_PORT)
 				{

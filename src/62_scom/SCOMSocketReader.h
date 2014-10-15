@@ -114,8 +114,11 @@ namespace synthese
 			unsigned short _port;
 
 			// ID and bornes to listen to
-			std::string _id;
+			std::vector<std::string> _ids;
 			std::vector<std::string> _bornes;
+
+			// Current position in _ids of the used ID
+			std::size_t _idpos;
 
 			// Buffer and internal XML file (as a string)
 			boost::array<char,4096> _buffer;
