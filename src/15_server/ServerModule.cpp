@@ -108,6 +108,7 @@ namespace synthese
 
 		boost::shared_mutex ServerModule::baseWriterMutex;
 		boost::shared_mutex ServerModule::InterSYNTHESEAgainstRequestsMutex;
+		boost::shared_mutex ServerModule::IneoBDSIAgainstVDVDataSupplyMutex;
 
 		template<> void ModuleClassTemplate<ServerModule>::PreInit()
 		{

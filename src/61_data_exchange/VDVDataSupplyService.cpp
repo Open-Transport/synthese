@@ -153,6 +153,10 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
+			// get upgradable access
+			boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::IneoBDSIAgainstVDVDataSupplyMutex);
+			// get exclusive access
+			boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 
 			// Client update
 			Log::GetInstance().debug("VDVDataSupply : starting run");

@@ -289,6 +289,8 @@ namespace synthese
 				// Another BDSI import may be running but it is not the same
 				_runningBdsi.insert(getImport().getKey());
 			}
+			
+			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVDataSupplyMutex);
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -1396,6 +1398,8 @@ namespace synthese
 				// Another BDSI import may be running but it is not the same
 				_runningBdsi.insert(getImport().getKey());
 			}
+			
+			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVDataSupplyMutex);
 
 			// Created journey patterns
 			BOOST_FOREACH(const JourneyPattern::Registry::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
