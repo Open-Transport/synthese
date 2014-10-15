@@ -232,10 +232,12 @@ namespace synthese
 			boost::shared_ptr<DB> db;
 			if(_dbConnString)
 			{
+				Log::GetInstance().debug("IneoBDSIFileFormat : Connexion avec : " + *_dbConnString);
 				db = DBModule::GetDBForStandaloneUse(*_dbConnString);
 			}
 			else
 			{
+				Log::GetInstance().debug("IneoBDSIFileFormat : Connexion locale");
 				db = DBModule::GetDBSPtr();
 			}
 
