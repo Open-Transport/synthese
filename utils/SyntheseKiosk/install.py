@@ -34,9 +34,20 @@ def main():
     env_dir = os.path.join(thisdir, 'env')
 
     if 'clean' in sys.argv:
-        shutil.rmtree(env_dir)
-        shutil.rmtree(os.path.join(thisdir, 'dist'))
-        shutil.rmtree(os.path.join(thisdir, 'build'))
+        try:
+            shutil.rmtree(env_dir)
+        except:
+            pass
+
+        try:
+            shutil.rmtree(os.path.join(thisdir, 'dist'))
+        except:
+            pass
+
+        try:
+            shutil.rmtree(os.path.join(thisdir, 'build'))
+        except:
+            pass
         return
 
     if not os.path.isdir(env_dir):
