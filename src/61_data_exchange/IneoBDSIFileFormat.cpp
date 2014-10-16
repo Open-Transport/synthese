@@ -1021,6 +1021,7 @@ namespace synthese
 
 				// Search for existing services
 				size_t createdServices(0);
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a matché : "+ lexical_cast<string>(servicesToUpdate.size()));
 				Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle 2 sur les courses lues dans la BDSI");
 				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
 				{
@@ -1125,7 +1126,9 @@ namespace synthese
 				}
 
 				// Loop on services to unlink
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a matché : "+ lexical_cast<string>(servicesToUpdate.size()));
 				Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle les course à unlink");
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(servicesToUnlink.size()));
 				BOOST_FOREACH(ScheduledService* service, servicesToUnlink)
 				{
 					string oldCode;
@@ -1161,6 +1164,7 @@ namespace synthese
 				// Loop on services to update
 				size_t updated(0);
 				Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle les course à update");
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(servicesToUpdate.size()));
 				BOOST_FOREACH(const Course* course, servicesToUpdate)
 				{
 					try
@@ -1192,6 +1196,7 @@ namespace synthese
 
 				// Loop on services to link
 				Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle les course à link");
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(servicesToLink.size()));
 				BOOST_FOREACH(const Course* course, servicesToLink)
 				{
 					try
@@ -1220,6 +1225,7 @@ namespace synthese
 
 				// Remove services from today
 				Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle les courses à désactiver");
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(servicesToRemove.size()));
 				BOOST_FOREACH(ScheduledService* service, servicesToRemove)
 				{
 					try
