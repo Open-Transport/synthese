@@ -122,7 +122,7 @@ namespace synthese
 		template<> void ModuleClassTemplate<DBModule>::Start()
 		{
 			// Conditional tables load maintainer thread
-			ServerModule::AddThread(&DBModule::UpdateConditionalTableSyncEnv, "Conditional tables load maintainer");
+			ServerModule::AddThread(&DBModule::UpdateConditionalTableSyncEnv, "DBCondTableLoad");
 		}
 
 		template<> void ModuleClassTemplate<DBModule>::End()

@@ -42,7 +42,9 @@
 #include "ModuleClassTemplate.hpp"
 #include "HTTPConnection.hpp"
 #include "ServerTypes.h"
-
+#ifdef __gnu_linux__
+#include <pthread.h> // For pthread_setname_np
+#endif
 namespace synthese
 {
 	namespace util
@@ -250,7 +252,9 @@ namespace synthese
 			_threads.insert(
 				std::make_pair(boost::lexical_cast<std::string>(theThread->get_id()), info)
 			);
-
+#ifdef __gnu_linux__
+			pthread_setname_np(theThread->native_handle(), description.substr(0, 15).c_str());
+#endif
 			return theThread;
 		}
 	}

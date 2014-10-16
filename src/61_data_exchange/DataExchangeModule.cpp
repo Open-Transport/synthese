@@ -98,19 +98,19 @@ namespace synthese
 		template<> void ModuleClassTemplate<DataExchangeModule>::Start()
 		{
 			// VDV Server poller
-			ServerModule::AddThread(&DataExchangeModule::ClientsPoller, "VDV clients poller");
+			ServerModule::AddThread(&DataExchangeModule::ClientsPoller, "VDVClientsPoller");
 
 			// VDV Client connector
-			ServerModule::AddThread(&DataExchangeModule::ServersConnector, "VDV servers connector");
+			ServerModule::AddThread(&DataExchangeModule::ServersConnector, "VDVServerConnector");
 
 			// Ineo NCE connector
-			ServerModule::AddThread(&IneoNCEConnection::RunThread, "Ineo NCE connector");
+			ServerModule::AddThread(&IneoNCEConnection::RunThread, "IneoNCEConnector");
 
 			// MG Screen connector
-			ServerModule::AddThread(&MGScreenConnection::RunThread, "MG Screen connector");
+			ServerModule::AddThread(&MGScreenConnection::RunThread, "MGScreenConnector");
 
 			// Stop Button File Poller
-			ServerModule::AddThread(&StopButtonFilePoller::RunThread, "Stop Button File Poller");
+			ServerModule::AddThread(&StopButtonFilePoller::RunThread, "StopButtonPoller");
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()

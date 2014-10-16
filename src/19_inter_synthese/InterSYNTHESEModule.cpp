@@ -93,10 +93,10 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
 		{
-			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "Inter-SYNTHESE slave full updater");
+			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "IS-FullUpdater");
 
 			// Expired queue entries cleaner
-			ServerModule::AddThread(&InterSYNTHESEModule::QueueCleaner, "Inter-SYNTHESE queue cleaner");
+			ServerModule::AddThread(&InterSYNTHESEModule::QueueCleaner, "IS-QueueCleaner");
 		}
 
 
