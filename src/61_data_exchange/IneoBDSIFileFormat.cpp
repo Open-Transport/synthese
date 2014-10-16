@@ -986,6 +986,7 @@ namespace synthese
 
 				// Search for existing service with same key
 				Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle 1 sur les courses lues dans la BDSI");
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(courses.size()));
 				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
 				{
 					const Course& course(itCourse.second);
