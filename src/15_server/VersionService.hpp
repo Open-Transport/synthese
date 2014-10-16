@@ -117,6 +117,8 @@ namespace synthese
 			/// @author hromain
 			/// @date 2013
 			virtual std::string getOutputMimeType() const;
+
+			virtual server::FunctionAPI getAPI() const;
 		};
 }	}
 
