@@ -290,10 +290,6 @@ namespace synthese
 							catch (...) {
 								Log::GetInstance().debug("VDVDataSupply : Exception reading network code of " + lexical_cast<string>(network.getKey()));
 							}
-							string networkId(
-								network.getACodeBySource(
-									*_vdvClient->get<DataSource>()
-							)	);
 							Log::GetInstance().debug("VDVDataSupply : Network id " + networkId);
 							string serviceNumber;
 							if(!networkId.empty())
