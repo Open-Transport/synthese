@@ -51,12 +51,15 @@ def main():
         return
 
     if not os.path.isdir(env_dir):
-        subprocess.check_call([
-            sys.executable,
-            os.path.join(thisdir, 'third_party', 'virtualenv.py'),
-            '--distribute',
-            '--never-download',
-            env_dir])
+        try:
+            subprocess.check_call("virtualenv %s" % env_dir, shell=True)
+        except:
+            print "---"
+            print "ERROR: Could not run virtualenv. Check it is installed, if not run:"
+            print "       sudo apt-get install python-virtualenv"
+            print "   OR with pip:"
+            print "       sudo pip install --upgrade virtualenv"
+            sys.exit(1)
 
     def _get_env_executable(executable):
         if sys.platform == 'win32':
