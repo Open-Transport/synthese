@@ -539,10 +539,10 @@ namespace synthese
 								_configuration->extendedFetchPlace(_originCityText, _originPlaceText) :
 								RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
 							;
-							if((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) ||
-								map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) ||
-								map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) ||
-								map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)) &&
+							if(((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT)).empty()) ||
+								(map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY)).empty()) ||
+								(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT)).empty()) ||
+								(map.isDefined(PARAMETER_ARRIVAL_PARKING_XY) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY)).empty())) &&
 								_originPlaceText.empty() && dynamic_pointer_cast<City, Place>(_departure_place.placeResult.value))
 							{
 								const City* originCity(_departure_place.cityResult.value.get());
@@ -600,10 +600,10 @@ namespace synthese
 								_configuration->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
 								RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
 							;
-							if((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) ||
-								map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) ||
-								map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) ||
-								map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)) &&
+							if(((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT)).empty()) ||
+								(map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY)).empty()) ||
+								(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT)).empty()) ||
+								(map.isDefined(PARAMETER_ARRIVAL_PARKING_XY) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY)).empty())) &&
 								_destinationPlaceText.empty() && dynamic_pointer_cast<City, Place>(_arrival_place.placeResult.value))
 							{
 								const City* destinationCity(_arrival_place.cityResult.value.get());
