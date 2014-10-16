@@ -45,6 +45,7 @@
 #include "SentScenario.h"
 #include "ServerModule.h"
 #include "StopPoint.hpp"
+#include "MessagesSection.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -79,6 +80,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_SECTION = "ms";
 		
 		
 		
@@ -116,6 +118,17 @@ namespace synthese
 			catch(ObjectNotFoundException<DataSource>&)
 			{
 				throw RequestException("No such messages recipients data source");
+			}
+
+			// Messages section
+			RegistryKeyType sectionId(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGES_SECTION, 0));
+			if(sectionId) try
+			{
+				_messagesSection = Env::GetOfficialEnv().get<MessagesSection>(sectionId);
+			}
+			catch(ObjectNotFoundException<MessagesSection>&)
+			{
+				throw RequestException("No such messages section");
 			}
 
 			// Hysteresis
@@ -818,6 +831,11 @@ namespace synthese
 						updatedScenario->setIsEnabled(true);
 						_env.getEditableRegistry<Scenario>().add(updatedScenario);
 
+						if (_messagesSection.get())
+						{
+							updatedScenario->addSection(*_messagesSection.get());
+						}
+
 						// Creation of the message
 						updatedMessage.reset(
 							new SentAlarm(
@@ -876,6 +894,10 @@ namespace synthese
 						updatedMessage->setLongMessage(programmation.content);
 						updatedMessage->setShortMessage(programmation.messageTitle);
 						updatedMessage->setLevel(programmation.priority ? ALARM_LEVEL_WARNING : ALARM_LEVEL_INFO);
+						if (_messagesSection)
+						{
+							updatedMessage->setSection(_messagesSection.get());
+						}
 					}
 					if(updatedScenario.get())
 					{
@@ -883,6 +905,10 @@ namespace synthese
 						updatedScenario->setPeriodStart(programmation.startTime);
 						updatedScenario->setPeriodEnd(programmation.endTime);
 						updatedScenario->setIsEnabled(programmation.active);
+						if (_messagesSection.get())
+						{
+							updatedScenario->addSection(*_messagesSection.get());
+						}
 					}
 
 
