@@ -121,11 +121,11 @@ namespace synthese
 				void					setTemplate(const AlarmTemplate* value);
 			//@}
 
-			void toParametersMap(
+			virtual void toParametersMap(
 				util::ParametersMap& pm,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles,
-				std::string prefix
+				bool withScenario,
+				std::string prefix = std::string(),
+				bool withRecipients = false
 			) const;
 
 
@@ -139,11 +139,6 @@ namespace synthese
 			) const;
 
 			void clearBroadcastPointsCache() const;
-
-			bool loadFromRecord(
-				const Record& record,
-				util::Env& env
-			);
 		};
 }	}
 

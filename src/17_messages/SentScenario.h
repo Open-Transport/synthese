@@ -165,18 +165,6 @@ namespace synthese
 			void toParametersMap(
 				util::ParametersMap& pm
 			) const;
-
-			void toParametersMap(
-				util::ParametersMap& pm,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles,
-				std::string prefix
-			) const;
-
-			bool loadFromRecord(
-				const Record& record,
-				util::Env& env
-			);
 		};
 }	}
 

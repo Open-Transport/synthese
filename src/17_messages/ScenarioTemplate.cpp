@@ -24,32 +24,24 @@
 
 #include "ScenarioTemplate.h"
 
+#include "SentAlarm.h"
 #include "AlarmTemplate.h"
-#include "DataSourceLinksField.hpp"
-#include "ImportableTableSync.hpp"
 #include "MessagesSection.hpp"
-#include "MessagesSectionTableSync.hpp"
 #include "ParametersMap.h"
 #include "Registry.h"
 #include "Request.h"
 #include "ScenarioFolder.h"
-#include "ScenarioFolderTableSync.h"
-#include "ScenarioTableSync.h"
-#include "SentAlarm.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
-using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace db;
 	using namespace server;
 	using namespace util;
-	using namespace impex;
 
 	namespace messages
 	{
@@ -304,76 +296,6 @@ namespace synthese
 			boost::logic::tribool withFiles,
 			std::string prefix
 		) const	{
-			// Inter synthese package
-			pm.insert(prefix + TABLE_COL_ID, getKey());
-			pm.insert(
-				prefix + ScenarioTableSync::COL_IS_TEMPLATE,
-				true
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_ENABLED,
-				false
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_NAME,
-				getName()
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_PERIODSTART,
-				ptime(not_a_date_time)
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_PERIODEND,
-				ptime(not_a_date_time)
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_FOLDER_ID,
-				getFolder() ? getFolder()->getKey() : RegistryKeyType(0)
-			);
-			stringstream vars;
-			pm.insert(
-				prefix + ScenarioTableSync::COL_VARIABLES,
-				vars.str()
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_TEMPLATE,
-				RegistryKeyType(0)
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_DATASOURCE_LINKS,
-				synthese::DataSourceLinks::Serialize(getDataSourceLinks())
-			);
-			bool first(true);
-			stringstream sectionsStr;
-			BOOST_FOREACH(const MessagesSection* section, this->getSections())
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					sectionsStr << ScenarioTableSync::SECTIONS_SEPARATOR;
-				}
-				sectionsStr << section->getKey();
-			}
-			pm.insert(
-				prefix + ScenarioTableSync::COL_SECTIONS,
-				sectionsStr.str()
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_EVENT_START,
-				ptime(not_a_date_time)
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_EVENT_END,
-				ptime(not_a_date_time)
-			);
-			pm.insert(
-				prefix + ScenarioTableSync::COL_ARCHIVED,
-				false
-			);
-
 			// roid
 			pm.insert(DATA_SCENARIO_ID, getKey());
 			pm.insert(Request::PARAMETER_OBJECT_ID, getKey()); // Deprecated
@@ -407,7 +329,7 @@ namespace synthese
 			{
 				// Calendar export
 				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
-				calendar->toParametersMap(*calendarPM, withAdditionalParameters, withFiles, prefix);
+				calendar->toParametersMap(*calendarPM);
 				pm.insert(TAG_CALENDAR, calendarPM);
 
 				// Messages loop
@@ -428,7 +350,7 @@ namespace synthese
 
 					// Message export
 					shared_ptr<ParametersMap> messagePM(new ParametersMap);
-					alarm->toParametersMap(*messagePM, false, true, string());
+					alarm->toParametersMap(*messagePM, false, string(), true);
 					calendarPM->insert(TAG_MESSAGE, messagePM);
 				}
 			}
@@ -455,7 +377,7 @@ namespace synthese
 
 					// Message export
 					shared_ptr<ParametersMap> messagePM(new ParametersMap);
-					alarm->toParametersMap(*messagePM, false, true, string());
+					alarm->toParametersMap(*messagePM, false, string(), true);
 					calendarPM->insert(TAG_MESSAGE, messagePM);
 				}
 			}
@@ -477,104 +399,5 @@ namespace synthese
 				// folder_name
 				pm.insert(DATA_FOLDER_NAME, getFolder()->getName());
 			}
-		}
-
-		bool ScenarioTemplate::loadFromRecord(
-			const Record& record,
-			util::Env& env
-		){
-			bool result(false);
-
-			// Name
-			if(record.isDefined(ScenarioTableSync::COL_NAME))
-			{
-				string value(
-					record.get<string>(ScenarioTableSync::COL_NAME)
-				);
-				if(value != getName())
-				{
-					setName(value);
-					result = true;
-				}
-			}
-
-			// Sections
-			const string txtSections(record.get<string>(ScenarioTableSync::COL_SECTIONS));
-			Scenario::Sections sections;
-			if(!txtSections.empty())
-			{
-				vector<string> tokens;
-				split(tokens, txtSections, is_any_of(ScenarioTableSync::SECTIONS_SEPARATOR));
-				BOOST_FOREACH(const string& token, tokens)
-				{
-					try
-					{
-						sections.insert(
-							MessagesSectionTableSync::Get(
-								lexical_cast<RegistryKeyType>(token),
-								env
-							).get()
-						);
-					}
-					catch (bad_lexical_cast&)
-					{
-					}
-					catch(ObjectNotFoundException<MessagesSection>&)
-					{
-					}
-				}
-			}
-			setSections(sections);
-
-			//Folder
-			if(record.isDefined(ScenarioTableSync::COL_FOLDER_ID))
-			{
-				ScenarioFolder* value(NULL);
-				RegistryKeyType id(
-					record.getDefault<RegistryKeyType>(
-						ScenarioTableSync::COL_FOLDER_ID,
-						0
-				)	);
-				if(id > 0)
-				{
-					try
-					{
-						value = ScenarioFolderTableSync::GetEditable(id, env).get();
-					}
-					catch(ObjectNotFoundException<ScenarioFolder>&)
-					{
-						Log::GetInstance().warn("No such scenario folder in scenario template "+ lexical_cast<string>(getKey()));
-					}
-				}
-				if(value != getFolder())
-				{
-					setFolder(value);
-					result = true;
-				}
-			}
-
-			// Data source links (at the end of the load to avoid registration of objects which are removed later by an exception)
-			if(record.isDefined(ScenarioTableSync::COL_DATASOURCE_LINKS))
-			{
-				Importable::DataSourceLinks value(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						record.get<string>(ScenarioTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				if(value != getDataSourceLinks())
-				{
-					if(&env == &Env::GetOfficialEnv())
-					{
-						setDataSourceLinksWithRegistration(value);
-					}
-					else
-					{
-						setDataSourceLinksWithoutRegistration(value);
-					}
-					result = true;
-				}
-			}
-
-			return result;
 		}
 }	}

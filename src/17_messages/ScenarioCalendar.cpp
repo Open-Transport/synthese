@@ -24,8 +24,6 @@
 
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "ParametersMap.h"
-#include "ScenarioCalendarTableSync.hpp"
-#include "ScenarioTableSync.h"
 #include "SentScenario.h"
 
 using namespace boost;
@@ -38,7 +36,6 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ScenarioPointer, "scenario_id", SQL_INTEGER)
 
 	using namespace util;
-	using namespace db;
 
 	namespace messages
 	{
@@ -92,7 +89,7 @@ namespace synthese
 			BOOST_FOREACH(const ApplicationPeriods::value_type& ap, _applicationPeriods)
 			{
 				shared_ptr<ParametersMap> apPM(new ParametersMap);
-				ap->toParametersMap(*apPM, false, false, prefix);
+				ap->toParametersMap(*apPM);
 				map.insert(TAG_APPLICATION_PERIOD, apPM);
 			}
 		}
@@ -108,83 +105,6 @@ namespace synthese
 			{
 				MessageApplicationPeriodTableSync::Remove(NULL, period->getKey(), *transaction, false);
 			}
-		}
-
-		synthese::SubObjects ScenarioCalendar::getSubObjects() const
-		{
-			SubObjects r;
-			BOOST_FOREACH(const ApplicationPeriods::value_type& applicationPeriod, getApplicationPeriods())
-			{
-				r.push_back(const_cast<MessageApplicationPeriod*>(applicationPeriod));
-			}
-			return r;
-		}
-
-		void ScenarioCalendar::toParametersMap(
-			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
-			std::string prefix /*= std::string() */
-		) const	{
-			// Inter synthese package
-			pm.insert(prefix + TABLE_COL_ID, getKey());
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<Name>::FIELD.name,
-				get<Name>()
-			);
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<ScenarioPointer>::FIELD.name,
-				get<ScenarioPointer>() ? get<ScenarioPointer>()->getKey() : RegistryKeyType(0)
-			);
-		}
-
-		bool ScenarioCalendar::loadFromRecord(
-			const Record& record,
-			util::Env& env
-		){
-			bool result(false);
-
-			// Name
-			if(record.isDefined(SimpleObjectFieldDefinition<Name>::FIELD.name))
-			{
-				string value(
-					record.get<string>(SimpleObjectFieldDefinition<Name>::FIELD.name)
-				);
-				if(value != get<Name>())
-				{
-					set<Name>(value);
-					result = true;
-				}
-			}
-
-			// Scenario
-			if(record.isDefined(SimpleObjectFieldDefinition<ScenarioPointer>::FIELD.name))
-			{
-				Scenario* value(NULL);
-				RegistryKeyType id(
-					record.getDefault<RegistryKeyType>(
-						SimpleObjectFieldDefinition<ScenarioPointer>::FIELD.name,
-						0
-				)	);
-				if(id > 0)
-				{
-					try
-					{
-						value = ScenarioTableSync::GetEditable(id, env).get();
-					}
-					catch(ObjectNotFoundException<Scenario>&)
-					{
-						Log::GetInstance().warn("No such scenario in scenario calendar "+ lexical_cast<string>(getKey()));
-					}
-				}
-				if(value != get<ScenarioPointer>().get_ptr())
-				{
-					set<ScenarioPointer>(*value);
-					result = true;
-				}
-			}
-
-			return result;
 		}
 }	}
 

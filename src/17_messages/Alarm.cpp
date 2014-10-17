@@ -122,11 +122,11 @@ namespace synthese
 
 
 
-		void Alarm::toParametersMapAlarm(
+		void Alarm::toParametersMap(
 			util::ParametersMap& pm,
 			bool withScenario,
-			boost::logic::tribool withRecipients,
-			std::string prefix /*= std::string() */
+			std::string prefix /*= std::string() */,
+			bool withRecipients
 		) const	{
 			pm.insert(prefix + "roid", getKey()); // Backward compatibility, deprecated
 			pm.insert(prefix + DATA_MESSAGE_ID, getKey());
@@ -154,7 +154,7 @@ namespace synthese
 			BOOST_FOREACH(const MessageAlternatives::value_type& it, _messageAlternatives)
 			{
 				boost::shared_ptr<ParametersMap> altPM(new ParametersMap);
-				it.second->toParametersMap(*altPM, withScenario, withRecipients, prefix);
+				it.second->toParametersMap(*altPM);
 				pm.insert(TAG_MESSAGE_ALTERNATIVE, altPM);
 			}
 
@@ -297,27 +297,6 @@ namespace synthese
 			}
 
 			return it->second;
-		}
-
-		synthese::SubObjects Alarm::getSubObjects() const
-		{
-			SubObjects r;
-			BOOST_FOREACH(const MessageAlternatives::value_type& it, getMessageAlternatives())
-			{
-				r.push_back(it.second);
-			}
-
-			// Locks the linked objects
-			mutex::scoped_lock(_linkedObjectsMutex);
-
-			BOOST_FOREACH(const LinkedObjects::value_type& ar, _linkedObjects)
-			{
-				BOOST_FOREACH(const LinkedObjects::mapped_type::value_type& it, ar.second)
-				{
-					r.push_back(const_cast<AlarmObjectLink*>(it));
-				}
-			}
-			return r;
 		}
 
 

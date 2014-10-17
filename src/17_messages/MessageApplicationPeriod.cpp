@@ -22,20 +22,17 @@
 
 #include "MessageApplicationPeriod.hpp"
 
-#include "ScenarioCalendarTableSync.hpp"
 #include "SentAlarm.h"
 #include "SentScenario.h"
 
 using namespace boost;
 using namespace std;
 using namespace boost::gregorian;
-using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace messages;
 	using namespace util;
-	using namespace db;
 
 	CLASS_DEFINITION(MessageApplicationPeriod, "t104_message_application_periods", 104)
 
@@ -142,161 +139,5 @@ namespace synthese
 				datePM->insert(TAG_DATE, to_iso_extended_string(d));
 				map.insert(TAG_DATE, datePM);
 			}
-		}
-
-		synthese::SubObjects MessageApplicationPeriod::getSubObjects() const
-		{
-			SubObjects r;
-			return r;
-		}
-
-		void MessageApplicationPeriod::toParametersMap(
-			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
-			std::string prefix /*= std::string() */
-		) const	{
-			// Inter synthese package
-			pm.insert(prefix + TABLE_COL_ID, getKey());
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<ScenarioCalendar>::FIELD.name,
-				get<ScenarioCalendar>() ? get<ScenarioCalendar>()->getKey() : RegistryKeyType(0)
-			);
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<StartHour>::FIELD.name,
-				get<StartHour>()
-			);
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<EndHour>::FIELD.name,
-				get<EndHour>()
-			);
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<StartTime>::FIELD.name,
-				get<StartTime>()
-			);
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<EndTime>::FIELD.name,
-				get<EndTime>()
-			);
-			pm.insert(
-				prefix + SimpleObjectFieldDefinition<Dates>::FIELD.name,
-				get<Dates>()
-			);
-		}
-
-		bool MessageApplicationPeriod::loadFromRecord(
-			const Record& record,
-			util::Env& env
-		){
-			bool result(false);
-
-			// Scenario calendar
-			if(record.isDefined(SimpleObjectFieldDefinition<ScenarioCalendar>::FIELD.name))
-			{
-				ScenarioCalendar* value(NULL);
-				RegistryKeyType id(
-					record.getDefault<RegistryKeyType>(
-						SimpleObjectFieldDefinition<ScenarioCalendar>::FIELD.name,
-						0
-				)	);
-				if(id > 0)
-				{
-					try
-					{
-						value = ScenarioCalendarTableSync::GetEditable(id, env).get();
-					}
-					catch(ObjectNotFoundException<ScenarioCalendar>&)
-					{
-						Log::GetInstance().warn("No such scenario calendar in message application period "+ lexical_cast<string>(getKey()));
-					}
-				}
-				if(value != get<ScenarioCalendar>().get_ptr())
-				{
-					set<ScenarioCalendar>(*value);
-					result = true;
-				}
-			}
-
-			// Start hour
-			if(record.isDefined(SimpleObjectFieldDefinition<StartHour>::FIELD.name))
-			{
-				string strValue(
-					record.get<string>(SimpleObjectFieldDefinition<StartHour>::FIELD.name)
-				);
-				if (!strValue.empty())
-				{
-					time_duration value = duration_from_string(strValue);
-					if(value != get<StartHour>())
-					{
-						set<StartHour>(value);
-						result = true;
-					}
-				}
-			}
-
-			// End hour
-			if(record.isDefined(SimpleObjectFieldDefinition<EndHour>::FIELD.name))
-			{
-				string strValue(
-					record.get<string>(SimpleObjectFieldDefinition<EndHour>::FIELD.name)
-				);
-				if (!strValue.empty())
-				{
-					time_duration value = duration_from_string(strValue);
-					if(value != get<EndHour>())
-					{
-						set<EndHour>(value);
-						result = true;
-					}
-				}
-			}
-
-			// Start time
-			if(record.isDefined(SimpleObjectFieldDefinition<StartTime>::FIELD.name))
-			{
-				string strValue(
-					record.get<string>(SimpleObjectFieldDefinition<StartTime>::FIELD.name)
-				);
-				if (!strValue.empty())
-				{
-					ptime value = time_from_string(strValue);
-					if(value != get<StartTime>())
-					{
-						set<StartTime>(value);
-						result = true;
-					}
-				}
-			}
-
-			// End time
-			if(record.isDefined(SimpleObjectFieldDefinition<EndTime>::FIELD.name))
-			{
-				string strValue(
-					record.get<string>(SimpleObjectFieldDefinition<EndTime>::FIELD.name)
-				);
-				if (!strValue.empty())
-				{
-					ptime value = time_from_string(strValue);
-					if(value != get<EndTime>())
-					{
-						set<EndTime>(value);
-						result = true;
-					}
-				}
-			}
-
-			// Dates
-			if(record.isDefined(SimpleObjectFieldDefinition<Dates>::FIELD.name))
-			{
-				Calendar* value;
-				value->setFromSerializedString(record.get<string>(SimpleObjectFieldDefinition<Dates>::FIELD.name));
-				if(value != get<Dates>())
-				{
-					set<Dates>(value);
-					return true;
-				}
-			}
-
-			return result;
 		}
 }	}

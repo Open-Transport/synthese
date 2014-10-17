@@ -61,18 +61,6 @@ namespace synthese
 			void setAlarm(Alarm* value){ _alarm = value; }
 			void setRecipient(const std::string& key);
 			void setParameter(const std::string& value){ _parameter = value; }
-
-			void toParametersMap(
-				util::ParametersMap& pm,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles,
-				std::string prefix
-			) const;
-
-			bool loadFromRecord(
-				const Record& record,
-				util::Env& env
-			);
 		};
 }	}
 

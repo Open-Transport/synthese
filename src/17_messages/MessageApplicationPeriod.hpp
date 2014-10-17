@@ -86,20 +86,6 @@ namespace synthese
 					std::string prefix = std::string()
 				) const;
 			//@}
-
-			virtual SubObjects getSubObjects() const;
-
-			void toParametersMap(
-				util::ParametersMap& pm,
-				bool withAdditionalParameters,
-				boost::logic::tribool withFiles,
-				std::string prefix
-			) const;
-
-			bool loadFromRecord(
-				const Record& record,
-				util::Env& env
-			);
 		};
 }	}
 
