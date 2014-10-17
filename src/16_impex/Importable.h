@@ -68,8 +68,9 @@ namespace synthese
 			static const std::string ATTR_ID;
 
 		public:
-			static const std::string SOURCES_SEPARATOR;
-			static const std::string FIELDS_SEPARATOR;
+			static const char SOURCES_SEPARATOR;
+			static const char FIELDS_SEPARATOR;
+			static const char SEPARATOR_ESCAPE;
 
 			typedef std::multimap<const DataSource*, std::string> DataSourceLinks;
 
