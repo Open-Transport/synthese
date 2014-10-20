@@ -306,6 +306,10 @@ namespace synthese
 			string todayStr("'"+ to_iso_extended_string(today) +"'");
 			
 			// Arrets
+			if(_dbConnString)
+			{
+				Log::GetInstance().debug("IneoBDSIFileFormat : Lecture des arrêts dans la BDSI");
+			}
 			{
 				string query(
 					"SELECT ref, mnemol, nom FROM "+ _database +".ARRET GROUP BY ref ORDER BY ref"
@@ -1143,7 +1147,7 @@ namespace synthese
 						course.syntheseService->getKey(),
 						course.syntheseService->getServiceNumber(),
 						string(),
-						string(),
+						to_simple_string(course.horaires.at(0).htd),
 						string()
 					);
 
@@ -1839,6 +1843,8 @@ namespace synthese
 
 				// Registration of the created journey pattern in the cache
 				syntheseJourneyPatterns.push_back(jp.get());
+				
+				util::Log::GetInstance().debug("IneoBDSIFileFormat : JOURNEY PATTERN CREATION;"+ref+";"+nom+";"+lexical_cast<string>(jp->getKey()));
 			}
 
 			return syntheseJourneyPatterns;
