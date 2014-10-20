@@ -167,9 +167,11 @@ namespace synthese
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}
+
+			const DataSource& dataSource(*_import.get<DataSource>());
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
 			{
-				if(service.second->empty())
+				if(service.second->empty() && service.second->hasLinkWithSource(dataSource))
 				{
 					DBModule::GetDB()->deleteStmt(service.second->getKey(), transaction);
 				}
@@ -753,10 +755,10 @@ namespace synthese
 									itS->second.departure.push_back(time_duration(not_a_date_time));
 									itS->second.arrival.push_back(time_duration(not_a_date_time));
 								}
-
-								// Register the vehicle service
-								itS->second.vehicleServices.push_back(vehicleService);
 							}
+
+							// Register the vehicle service
+							itS->second.vehicleServices.push_back(vehicleService);
 
 							tronconElement.service = NULL;
 							tronconElement.startRank = 0;
