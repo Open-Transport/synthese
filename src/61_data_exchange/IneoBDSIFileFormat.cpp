@@ -83,6 +83,8 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_SECTION = "ms";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE = "handicapped_forbidden_use_rule";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_NEUTRALIZED = "neutralized";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_NON_COMMERCIAL = "non_commercial";
 		
 
 
@@ -175,6 +177,12 @@ namespace synthese
 			{
 				throw Exception("No such handicapped allowed use rule");
 			}
+
+			// Eliminate neutralized services
+			_neutralized = map.getDefault<bool>(PARAMETER_NEUTRALIZED, false);
+
+			// Eliminate non-commercial services
+			_nonCommercial = map.getDefault<bool>(PARAMETER_NON_COMMERCIAL, false);
 		}
 
 
@@ -564,8 +572,10 @@ namespace synthese
 							_database +".VEHICULE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
 						_database +".HORAIRE.jour="+ todayStr +
-						" AND ( "+ _database +".VEHICULE.Neutralise != 'O' OR "+ _database +".VEHICULE.Neutralise IS NULL )"+
-						" AND "+ _database +".COURSE.type != 'H'"
+						// Eliminate neutralized courses if asked
+						( _neutralized ? " AND ( "+ _database +".VEHICULE.Neutralise != 'O' OR "+ _database +".VEHICULE.Neutralise IS NULL )" : "" ) +
+						// Eliminate non-commercial courses if asked
+						( _nonCommercial ? " AND "+ _database +".COURSE.type != 'H'" : "" ) +
 					" ORDER BY "+
 						_database +".HORAIRE.course, "+
 						_database +".ARRETCHN.pos"

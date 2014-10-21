@@ -99,6 +99,8 @@ namespace synthese
 				static const std::string PARAMETER_MESSAGES_SECTION;
 				static const std::string PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE;
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
+				static const std::string PARAMETER_NEUTRALIZED;
+				static const std::string PARAMETER_NON_COMMERCIAL;
 		
 			private:
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
@@ -109,6 +111,8 @@ namespace synthese
 				boost::posix_time::time_duration _dayBreakTime;
 				boost::shared_ptr<pt::PTUseRule> _handicappedForbiddenUseRule;
 				boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
+				bool _neutralized;
+				bool _nonCommercial;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
