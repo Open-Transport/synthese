@@ -1137,6 +1137,32 @@ namespace synthese
 
 					// No existing service has been found : creation of a new service
 					course.createService(today, _env);
+					
+					util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION;");
+					BOOST_FOREACH(
+						const JourneyPattern* route,
+						course.chainage->getSYNTHESEJourneyPatterns(
+							*_plannedDataSource,
+							*dataSourceOnSharedEnv,
+							_env
+						)
+					){
+						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+							*route->sharedServicesMutex
+						);
+						BOOST_FOREACH(Service* sservice, route->getAllServices())
+						{
+							util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION loop sur le service " + lexical_cast<string>(sservice->getKey()));
+							if ( course == *service )
+							{
+								util::Log::GetInstance().debug("IneoBDSIFileFormat : ... qui est identique");
+							}
+							else
+							{
+								util::Log::GetInstance().debug("IneoBDSIFileFormat : ... qui est différent");
+							}
+						}
+					}
 
 					// Log
 					++createdServices;
