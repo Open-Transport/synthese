@@ -1152,6 +1152,13 @@ namespace synthese
 						);
 						BOOST_FOREACH(Service* sservice, route->getAllServices())
 						{
+							ScheduledService* service(
+								dynamic_cast<ScheduledService*>(sservice)
+							);
+							if(!service)
+							{
+								continue;
+							}
 							util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION loop sur le service " + lexical_cast<string>(sservice->getKey()));
 							if ( course == *service )
 							{
