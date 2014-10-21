@@ -1138,7 +1138,7 @@ namespace synthese
 					// No existing service has been found : creation of a new service
 					course.createService(today, _env);
 					
-					util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION;");
+					util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION;" + to_simple_string(course.syntheseService->getDepartureSchedule(false, 0)));
 					BOOST_FOREACH(
 						const JourneyPattern* route,
 						course.chainage->getSYNTHESEJourneyPatterns(
