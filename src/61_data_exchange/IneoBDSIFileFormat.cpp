@@ -1147,6 +1147,7 @@ namespace synthese
 							_env
 						)
 					){
+						util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION étude du parcours " + lexical_cast<string>(route->getKey()));
 						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
 							*route->sharedServicesMutex
 						);
@@ -1159,14 +1160,13 @@ namespace synthese
 							{
 								continue;
 							}
-							util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION loop sur le service " + lexical_cast<string>(sservice->getKey()));
 							if ( course == *service )
 							{
-								util::Log::GetInstance().debug("IneoBDSIFileFormat : ... qui est identique");
+								util::Log::GetInstance().debug("IneoBDSIFileFormat : Service identique : " + to_simple_string(service->getDepartureSchedule(false, 0)));
 							}
 							else
 							{
-								util::Log::GetInstance().debug("IneoBDSIFileFormat : ... qui est différent");
+								util::Log::GetInstance().debug("IneoBDSIFileFormat : Service différent : " + to_simple_string(service->getDepartureSchedule(false, 0)));
 							}
 						}
 					}
