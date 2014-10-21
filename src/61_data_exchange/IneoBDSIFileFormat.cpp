@@ -1589,6 +1589,7 @@ namespace synthese
 			if(	jp.getCommercialLine()->getKey() != chainage->ligne->syntheseLine->getKey() ||
 				jp.getEdges().size() != chainage->arretChns.size()
 			){
+				Log::GetInstance().debug("IneoBDSIFileFormat : false 1");
 				return false;
 			}
 
@@ -1599,6 +1600,7 @@ namespace synthese
 				if(	!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ||
 					chainage->arretChns[i].arret->syntheseStop->getKey() != jp.getEdge(i)->getFromVertex()->getKey())
 				{
+					Log::GetInstance().debug("IneoBDSIFileFormat : false 2");
 					return false;
 				}
 			}
@@ -1631,7 +1633,8 @@ namespace synthese
 					(	htdToCompare.hours() != service.getDepartureSchedule(false, i).hours() ||
 						htdToCompare.minutes() != service.getDepartureSchedule(false, i).minutes()
 				)	)	){
-						return false;
+					Log::GetInstance().debug("IneoBDSIFileFormat : false 3");
+					return false;
 				}
 			}
 
