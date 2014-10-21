@@ -1729,6 +1729,8 @@ namespace synthese
 
 			// Registration of the service in the course
 			syntheseService = service.get();
+			
+			const_cast<JourneyPattern*>(route)->addService(*service.get(), false);
 		}
 
 
