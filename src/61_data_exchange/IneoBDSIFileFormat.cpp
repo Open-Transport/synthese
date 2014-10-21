@@ -1716,8 +1716,8 @@ namespace synthese
 					continue;
 				}
 
-				departureSchedules.push_back(horaires[i].htd);
-				arrivalSchedules.push_back(horaires[i].hta);
+				departureSchedules.push_back(horaires[i].htd - seconds(horaires[i].htd.seconds()));
+				arrivalSchedules.push_back(horaires[i].hta + seconds(60 - horaires[i].hta.seconds()));
 			}
 			service->setDataSchedules(departureSchedules, arrivalSchedules);
 
