@@ -1137,36 +1137,38 @@ namespace synthese
 
 					// No existing service has been found : creation of a new service
 					course.createService(today, _env);
-					
-					util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION;" + to_simple_string(course.syntheseService->getDepartureSchedule(false, 0)));
-					BOOST_FOREACH(
-						const JourneyPattern* route,
-						course.chainage->getSYNTHESEJourneyPatterns(
-							*_plannedDataSource,
-							*dataSourceOnSharedEnv,
-							_env
-						)
-					){
-						util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION étude du parcours " + lexical_cast<string>(route->getKey()));
-						boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
-							*route->sharedServicesMutex
-						);
-						BOOST_FOREACH(Service* sservice, route->getAllServices())
-						{
-							ScheduledService* service(
-								dynamic_cast<ScheduledService*>(sservice)
+					if(_dbConnString)
+					{
+						util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION;" + to_simple_string(course.syntheseService->getDepartureSchedule(false, 0)));
+						BOOST_FOREACH(
+							const JourneyPattern* route,
+							course.chainage->getSYNTHESEJourneyPatterns(
+								*_plannedDataSource,
+								*dataSourceOnSharedEnv,
+								_env
+							)
+						){
+							util::Log::GetInstance().debug("IneoBDSIFileFormat : SERVICE CREATION étude du parcours " + lexical_cast<string>(route->getKey()));
+							boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+								*route->sharedServicesMutex
 							);
-							if(!service)
+							BOOST_FOREACH(Service* sservice, route->getAllServices())
 							{
-								continue;
-							}
-							if ( course == *service )
-							{
-								util::Log::GetInstance().debug("IneoBDSIFileFormat : Service identique : " + to_simple_string(service->getDepartureSchedule(false, 0)));
-							}
-							else
-							{
-								util::Log::GetInstance().debug("IneoBDSIFileFormat : Service différent : " + to_simple_string(service->getDepartureSchedule(false, 0)));
+								ScheduledService* service(
+									dynamic_cast<ScheduledService*>(sservice)
+								);
+								if(!service)
+								{
+									continue;
+								}
+								if ( course == *service )
+								{
+									util::Log::GetInstance().debug("IneoBDSIFileFormat : Service identique : " + to_simple_string(service->getDepartureSchedule(false, 0)));
+								}
+								else
+								{
+									util::Log::GetInstance().debug("IneoBDSIFileFormat : Service différent : " + to_simple_string(service->getDepartureSchedule(false, 0)));
+								}
 							}
 						}
 					}
@@ -1619,7 +1621,7 @@ namespace synthese
 				{
 					htaToCompare += seconds(60 - htaToCompare.seconds());
 				}
-				boost::posix_time::time_duration htdToCompare = horaires[i].hta;
+				boost::posix_time::time_duration htdToCompare = horaires[i].htd;
 				if (htdToCompare.seconds())
 				{
 					htdToCompare -= seconds(htdToCompare.seconds());
