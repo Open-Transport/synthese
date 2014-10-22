@@ -26,7 +26,9 @@
 
 #include <boost/thread/xtime.hpp>
 #include <boost/lexical_cast.hpp>
-
+#ifdef __gnu_linux__
+#include <sys/prctl.h>
+#endif
 using namespace std;
 using namespace boost;
 
@@ -211,6 +213,10 @@ namespace synthese
 		void
 		Thread::execInitialize ()
 		{
+#ifdef __gnu_linux__
+			// Name the thread at system level to ease debugging
+			prctl(PR_SET_NAME, _name.c_str(), 0, 0, 0);
+#endif
 			setState (INIT);
 			Log::GetInstance ().info ("Initializing thread " + _name +  "...");
 
