@@ -53,6 +53,8 @@
 #include "DestinationTableSync.hpp"
 #include "ZipWriter.hpp"
 
+#include "Log.h"
+
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <map>
@@ -210,9 +212,11 @@ namespace synthese
 			if(!inFile)
 			{
 				_logError(
-					"Could no open the file " + filePath.file_string()
+					"Could not open the file " + filePath.file_string()
 				);
-				throw Exception("Could no open the file " + filePath.file_string());
+				Log::GetInstance().debug("Log for debug : Could not open file before exception");
+				throw Exception("Could not open the file " + filePath.file_string());
+				Log::GetInstance().debug("Log for debug : Could not open file after exception");
 			}
 
 			if(_calendar.empty())
@@ -224,6 +228,7 @@ namespace synthese
 
 			if(key == FILE_POINTSARRETS)
 			{
+				Log::GetInstance().debug("Log for debug : FILE_POINTSARRETS");
 				// Declarations
 				string line;
 				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : dataSource);
@@ -326,6 +331,7 @@ namespace synthese
 			}
 			if(key == FILE_ITINERAI) // 1 : Routes
 			{
+				Log::GetInstance().debug("Log for debug : FILE_ITINERAI");
 				bool atLeastAnIgnoredRoute(false);
 				if(!_network.get())
 				{
@@ -562,6 +568,7 @@ namespace synthese
 			} // 2 : Nodes
 			else if(key == FILE_TRONCONS)
 			{
+				Log::GetInstance().debug("Log for debug : FILE_TRONCONS");
 				string line;
 				typedef map<
 					pair<JourneyPattern*, string>, // string is service number
@@ -869,6 +876,7 @@ namespace synthese
 			} // 3 : Services
 			else if (key == FILE_SERVICES)
 			{
+				Log::GetInstance().debug("Log for debug : FILE_SERVICES");
 				if(_calendar.empty())
 				{
 					_logError("Start date or end date not defined");
