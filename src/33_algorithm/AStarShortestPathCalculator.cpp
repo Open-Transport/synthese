@@ -230,7 +230,8 @@ namespace synthese
 
 						// Check if it is already visited
 						NodeMap::iterator nextNode = nodeMap.find(nextCrossing->getKey());
-						if(nextNode != nodeMap.end() && nextNode->second->isVisited())
+						if(nextNode != nodeMap.end() && nextNode->second->isVisited() &&
+							nextNode->second->getLink())
 							continue;
 
 						const RoadChunkEdge* linkChunk;
@@ -273,9 +274,15 @@ namespace synthese
 							nodeMap.insert(NodeMap::value_type(nextCrossing->getKey(), newNode));
 							openSet.push(newNode);
 						}
-						else if(nextNode->second->getRealCost() > newScore)
+						else if(nextNode->second->getRealCost() > newScore ||
+							!nextNode->second->getLink()
+						)
 						{
-							nextNode->second->setParent(curNode);
+							if (!curNode->getParent() ||
+								curNode->getParent() != nextNode->second)
+							{
+								nextNode->second->setParent(curNode);
+							}
 							nextNode->second->setLink(linkChunk);
 							nextNode->second->setHeuristicCost(newScore + heuristic);
 							nextNode->second->setRealCost(newScore);
