@@ -102,7 +102,7 @@ namespace synthese
 		template<> void ModuleClassTemplate<PTModule>::Start()
 		{
 			// Data cleaner
-			ServerModule::AddThread(&PTModule::RTDataCleaner, "Real time data cleaner");
+			ServerModule::AddThread(&PTModule::RTDataCleaner, "DataCleaner");
 		}
 
 		template<> void ModuleClassTemplate<PTModule>::End()

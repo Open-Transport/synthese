@@ -64,7 +64,7 @@ namespace synthese
 		{
 			ServerModule::AddThread(
 				&MessagesModule::MessagesActivationThread,
-				"Messages activations"
+				"MessageActivation"
 			);
 		}
 

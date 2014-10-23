@@ -69,6 +69,8 @@ FreeDRTTimeSlotTableSync.cpp
 FreeDRTTimeSlotTableSync.hpp
 FreeDRTTimeSlotUpdateAction.cpp
 FreeDRTTimeSlotUpdateAction.hpp
+GetRealTimeServices.cpp
+GetRealTimeServices.hpp
 JourneyPattern.cpp
 JourneyPattern.hpp
 JourneyPatternAddAction.cpp
