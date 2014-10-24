@@ -44,6 +44,7 @@
 #include "ServerTypes.h"
 #ifdef __gnu_linux__
 #include <pthread.h> // For pthread_setname_np
+#include <features.h>
 #endif
 namespace synthese
 {
@@ -252,7 +253,7 @@ namespace synthese
 			_threads.insert(
 				std::make_pair(boost::lexical_cast<std::string>(theThread->get_id()), info)
 			);
-#ifdef __gnu_linux__
+#if defined __gnu_linux__ && __GNU_LIBRARY__ >= 6 && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 13
 			pthread_setname_np(theThread->native_handle(), description.substr(0, 15).c_str());
 #endif
 			return theThread;
