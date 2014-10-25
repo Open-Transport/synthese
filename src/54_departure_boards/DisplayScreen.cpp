@@ -111,11 +111,11 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(MaintenanceMessage, "maintenance_message", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DisplayClock, "display_clock", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(ComPort, "com_port", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(CpuHostId, "cpu_host_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(CpuHost, "cpu_host_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(MacAddress, "mac_address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(RoutePlanningWithTransfer, "route_planning_with_transfer", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(TransferDestinations, "transfer_destinations", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(UpId, "up_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Up, "up_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(SubScreenTypeCode, "sub_screen_type", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(AllowCanceled, "allow_canceled", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(StopPointLocation, "stop_point_location", SQL_INTEGER)
@@ -174,11 +174,11 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(MaintenanceMessage),
 					FIELD_VALUE_CONSTRUCTOR(DisplayClock, true),
 					FIELD_VALUE_CONSTRUCTOR(ComPort, 0),
-					FIELD_DEFAULT_CONSTRUCTOR(CpuHostId),
+					FIELD_DEFAULT_CONSTRUCTOR(CpuHost),
 					FIELD_DEFAULT_CONSTRUCTOR(MacAddress),
 					FIELD_VALUE_CONSTRUCTOR(RoutePlanningWithTransfer, false),
 					FIELD_DEFAULT_CONSTRUCTOR(TransferDestinations),
-					FIELD_DEFAULT_CONSTRUCTOR(UpId),
+					FIELD_DEFAULT_CONSTRUCTOR(Up),
 					FIELD_DEFAULT_CONSTRUCTOR(SubScreenTypeCode),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
 					FIELD_VALUE_CONSTRUCTOR(AllowCanceled, false),
@@ -1128,49 +1128,21 @@ namespace synthese
 			)	);
 			setAllowedLines(lineFilter);
 			
-			// Up & root
-			RegistryKeyType upId(get<UpId>());
-			if(upId > 0) try
+			// root
+			// CPU
+			if (get<BroadCastPoint>())
 			{
-				setParent(DisplayScreenTableSync::GetEditable(upId, env).get());
+				setRoot(
+					DeparturesTableModule::GetPlaceWithDisplayBoards(
+						get<BroadCastPoint>().get_ptr(),
+						env
+				)	);
 			}
-			catch(ObjectNotFoundException<DisplayScreen>&)
-			{
-				Log::GetInstance().warn(
-					"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : up display screen " +
-					lexical_cast<string>(upId) + " not found"
-				);
-			}
-			else
-			{
-				// CPU
-				RegistryKeyType cpuId(get<CpuHostId>());
-				if (cpuId > 0) try
-				{
-					setRoot(DisplayScreenCPUTableSync::GetEditable(cpuId, env).get());
-					setParent(NULL);
-				}
-				catch(ObjectNotFoundException<StopArea>&)
-				{
-					Log::GetInstance().warn(
-						"Data corrupted in "+ DisplayScreenTableSync::TABLE.NAME + " on display screen : cpu host " +
-						lexical_cast<string>(cpuId) + " not found"
-					);
-				}
-				else
-				{
-					if (get<BroadCastPoint>())
-					{
-						setRoot(
-							DeparturesTableModule::GetPlaceWithDisplayBoards(
-								get<BroadCastPoint>().get_ptr(),
-								env
-						)	);
-					}
-					setParent(NULL);
-				}
-			}
+			setParent(NULL);
 			
+			if (get<Up>()) {
+				setParent(&*get<Up>());
+			}
 			registerInParentOrRoot();
 			
 			// Physical stops

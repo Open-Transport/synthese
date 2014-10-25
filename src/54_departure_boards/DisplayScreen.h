@@ -78,12 +78,12 @@ namespace synthese
 		FIELD_BOOL(MaintenanceIsOnline)
 		FIELD_STRING(MaintenanceMessage)
 		FIELD_BOOL(DisplayClock)
-		FIELD_INT(CpuHostId)
+		FIELD_POINTER(CpuHost, departure_boards::DisplayScreenCPU)
 		FIELD_INT(ComPort)
 		FIELD_STRING(MacAddress)
 		FIELD_BOOL(RoutePlanningWithTransfer)
 		FIELD_STRING(TransferDestinations)
-		FIELD_INT(UpId)
+		FIELD_POINTER(Up, departure_boards::DisplayScreen)
 		FIELD_INT(SubScreenTypeCode)
 		FIELD_BOOL(AllowCanceled)
 		FIELD_POINTER(StopPointLocation, pt::StopPoint)
@@ -117,11 +117,11 @@ namespace synthese
 			FIELD(MaintenanceMessage),
 			FIELD(DisplayClock),
 			FIELD(ComPort),
-			FIELD(CpuHostId),
+			FIELD(CpuHost),
 			FIELD(MacAddress),
 			FIELD(RoutePlanningWithTransfer),
 			FIELD(TransferDestinations),
-			FIELD(UpId),
+			FIELD(Up),
 			FIELD(SubScreenTypeCode),
 			FIELD(impex::DataSourceLinks),
 			FIELD(AllowCanceled),
