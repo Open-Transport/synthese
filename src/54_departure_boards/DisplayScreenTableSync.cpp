@@ -317,7 +317,7 @@ namespace synthese
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
 			SelectQuery<DisplayScreenTableSync> query;
-			query.addWhereField(CpuHostId::FIELD.name, cpuId);
+			query.addWhereField(CpuHost::FIELD.name, cpuId);
 			query.addOrderField(ComPort::FIELD.name, true);
 			query.addOrderField(WiringCode::FIELD.name, true);
 			return LoadFromQuery(query, env, linkLevel);
