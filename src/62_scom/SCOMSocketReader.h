@@ -108,10 +108,19 @@ namespace synthese
 
 			// Internal thread used for the async loop
 			boost::shared_ptr<boost::thread> _thread;
+			boost::shared_ptr<boost::thread> _followThread;
 
 			// The server IP/FQDN and port
 			std::string _server;
 			unsigned short _port;
+
+			// Follow port and ASIO objects
+			unsigned short _followPort;
+			boost::asio::ip::tcp::socket* _followSocket;
+			boost::asio::ip::tcp::acceptor* _followAcceptor;
+			boost::asio::io_service* _followIos;
+			boost::asio::io_service::work* _followWork;
+			bool _followHasClient;
 
 			// ID and bornes to listen to
 			std::vector<std::string> _ids;
@@ -174,6 +183,7 @@ namespace synthese
 			static const std::string SETTING_BORNES;
 			static const std::string SETTING_CONNECTTIMEOUT;
 			static const std::string SETTING_READTIMEOUT;
+			static const std::string SETTING_FOLLOWPORT;
 
 			// Our module name for the settings
 			static const std::string SETTINGS_MODULE;
@@ -197,6 +207,12 @@ namespace synthese
 
 			// Close the socket
 			void _close ();
+
+			// Follow socket : data sent
+			void _followDataSent(const boost::system::error_code& code, std::size_t);
+
+			// Follow socket : client accepted
+			void _followAccept(const boost::system::error_code& code);
 
 		};
 

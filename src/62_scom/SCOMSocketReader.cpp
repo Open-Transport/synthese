@@ -55,6 +55,7 @@ namespace synthese
 		const std::string SCOMSocketReader::SETTING_BORNES = "bornes";
 		const std::string SCOMSocketReader::SETTING_CONNECTTIMEOUT = "connecttimeout";
 		const std::string SCOMSocketReader::SETTING_READTIMEOUT = "readtimeout";
+		const std::string SCOMSocketReader::SETTING_FOLLOWPORT = "followport";
 
 		// Module name for the settings
 		const std::string SCOMSocketReader::SETTINGS_MODULE = "SCOMSocketReader";
@@ -64,6 +65,9 @@ namespace synthese
 		// (At least I hope... noba)
 		SCOMSocketReader::SCOMSocketReader (SCOMData *dataHandler) :
 			_dataHandler(dataHandler),
+			_followSocket(NULL),
+			_followAcceptor(NULL),
+			_followHasClient(false),
 			_socket(NULL),
 			_timer(NULL),
 			_state(RESOLVE),
@@ -75,6 +79,7 @@ namespace synthese
 			_connectRetry = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_CONNECTRETRY,10);
 			_server = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_SERVER,"127.0.0.1");
 			_port = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_PORT,3106);
+			_followPort = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_FOLLOWPORT,5555);
 			
 			// Timeouts
 			// Needs to be set for each state
@@ -101,6 +106,7 @@ namespace synthese
 			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_BORNES, this);
 			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_CONNECTTIMEOUT, this);
 			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_READTIMEOUT, this);
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_FOLLOWPORT, this);
 
 			// State names, used for errors
 			_stateName[RESOLVE] = "resolving";
@@ -111,6 +117,7 @@ namespace synthese
 
 			// Boost's input/output service
 			_ios = new io_service();
+			_followIos = new io_service();
 		}
 
 
@@ -132,6 +139,7 @@ namespace synthese
 		void SCOMSocketReader::Start ()
 		{
 			_ios->reset();
+			_followIos->reset();
 
 			// Launch the first async event before the loop (or it will quit directly)
 			// The timer to 0 makes the _mainLoop() called from the _ios loop, not the
@@ -143,11 +151,18 @@ namespace synthese
 			// If the io_service is out-of-work, it will stops.
 			// We need it to continue so we add this object in its queue
 			_work = new boost::asio::io_service::work(*_ios);
+			_followWork = new boost::asio::io_service::work(*_followIos);
 
 			// Run the boost ASIO main loop (for async events)
 			_thread = server::ServerModule::AddThread(
 				boost::bind(&io_service::run,_ios),
 				"SCOM Listener thread"
+			);
+
+			// Run the boost ASIO main loop for the follow socket (for async events)
+			_followThread = server::ServerModule::AddThread(
+				boost::bind(&io_service::run,_followIos),
+				"SCOM Follower thread"
 			);
 		}
 
@@ -157,8 +172,11 @@ namespace synthese
 			_next = STOP;
 			_close();
 			_ios->stop();
+			_followIos->stop();
 			_thread->join();
+			_followThread->join();
 			_thread->interrupt();
+			_followThread->interrupt();
 			// Isn't there a function from server::ServerModule to remove the thread?
 		}
 
@@ -221,6 +239,20 @@ namespace synthese
 							"", // No error
 							boost::asio::placeholders::error)
 			);
+
+			// If the follow socket port is specified, we open it
+			if (_followPort)
+			{
+				Log::GetInstance().debug("SCOM : Opening the follow socket on port " + boost::lexical_cast<std::string>(_followPort));
+				_followSocket = new ip::tcp::socket(*_followIos);
+				_followAcceptor = new ip::tcp::acceptor(*_followIos, ip::tcp::endpoint(ip::tcp::v4(), _followPort));
+				_followAcceptor->async_accept(
+					*_followSocket,
+					boost::bind(&synthese::scom::SCOMSocketReader::_followAccept,
+								this,
+								boost::asio::placeholders::error)
+				);
+			}
 		}
 
 		// Close and delete the socket
@@ -228,6 +260,7 @@ namespace synthese
 		{
 			boost::system::error_code error;
 
+			// SCOM socket
 			Log::GetInstance().debug("SCOM : Closing the SCOM socket");
 			_socket->close(error);
 			if (error)
@@ -239,6 +272,25 @@ namespace synthese
 			{
 				delete _socket;
 				_socket = NULL;
+			}
+
+			// Follow socket
+			if (_followSocket)
+			{
+				Log::GetInstance().debug("SCOM : Closing the follow socket");
+				_followSocket->close(error);
+				_followAcceptor->close();
+				_followIos->reset();
+				if (error)
+				{
+					Log::GetInstance().warn("SCOM : Error while closing the follow socket : " + error.message());
+				}
+
+				delete _followAcceptor;
+				_followAcceptor = NULL;
+
+				delete _followSocket;
+				_followSocket = NULL;
 			}
 		}
 
@@ -287,8 +339,7 @@ namespace synthese
 		}
 
 		// Reads the data fetched from the socket and stores it in the SCOMData
-		// On error, call the main loop with the error in parameter
-		// Call itselfs with async_read
+		// Call the main loop with the error in parameter
 		void SCOMSocketReader::_dataReceived (const boost::system::error_code& error, std::size_t size)
 		{
 			// If the size is bigger than 0 and there is no error, read the message
@@ -296,6 +347,19 @@ namespace synthese
 			{
 				// Copy to string
 				std::string chunk(_buffer.begin(), _buffer.begin()+size);
+
+				// If the follow socket is open, forward the data
+				if (_followSocket && _followHasClient)
+				{
+					async_write(
+						*_followSocket,
+						buffer(chunk),
+						boost::bind(&synthese::scom::SCOMSocketReader::_followDataSent,
+									this,
+									_1,
+									_2)
+					);
+				}
 
 				// Search for one or multiple end of file flags (\0)
 				size_t pos = 0, lastpos = 0;
@@ -500,9 +564,13 @@ namespace synthese
 				{
 					_resolveRetry = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_RESOLVERETRY,_resolveRetry);
 				}
+				else if (name == SETTING_FOLLOWPORT)
+				{
+					_followPort = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_FOLLOWPORT,_followPort);
+				}
 				else
 				{
-					Log::GetInstance().error("SCOMListener : invalid setting : " + name);
+					Log::GetInstance().error("SCOMSocketReader : invalid setting : " + name);
 					return;
 				}
 
@@ -513,7 +581,8 @@ namespace synthese
 					(name == SETTING_SERVER ||
 					 name == SETTING_PORT ||
 					 name == SETTING_ID ||
-					 name == SETTING_BORNES ) &&
+					 name == SETTING_BORNES ||
+					 name == SETTING_FOLLOWPORT ) &&
 					notify
 				)
 				{
@@ -522,6 +591,71 @@ namespace synthese
 					_next = CLOSE;
 					_mutex.unlock();
 				}
+			}
+		}
+
+
+		// If an error occurs, print it and start accepting again
+		void SCOMSocketReader::_followAccept(const boost::system::error_code& code)
+		{
+			if (code)
+			{
+				_followHasClient = false;
+
+				// If the code is "operation canceled", we ignore it
+				if (code != boost::asio::error::operation_aborted)
+				{
+					Log::GetInstance().debug("SCOM : follow socket error on accept : " + code.message());
+
+					_followSocket->close();
+
+					_followAcceptor->async_accept(
+						*_followSocket,
+						boost::bind(&synthese::scom::SCOMSocketReader::_followAccept,
+									this,
+									boost::asio::placeholders::error)
+					);
+				}
+			}
+			else
+			{
+				Log::GetInstance().debug("SCOM : accepted client " + _followSocket->remote_endpoint().address().to_string() + " on follow socket");
+
+				_followHasClient = true;
+			}
+		}
+
+
+		// If an error has occured, print it and reset the follow socket
+		void SCOMSocketReader::_followDataSent(const boost::system::error_code& code, std::size_t)
+		{
+			if (code)
+			{
+				_followHasClient = false;
+
+				// If the code is "operation canceled", we ignore it
+				if (code != boost::asio::error::operation_aborted)
+				{
+					Log::GetInstance().debug("SCOM : follow socket error on send : " + code.message());
+
+					// Close the socket
+					_followSocket->close();
+
+					// Reset the queue
+					_followIos->reset();
+
+					// Accept a new client
+					_followAcceptor->async_accept(
+						*_followSocket,
+						boost::bind(&synthese::scom::SCOMSocketReader::_followAccept,
+									this,
+									boost::asio::placeholders::error)
+					);
+				}
+			}
+			else
+			{
+				Log::GetInstance().debug("SCOM : follow sent");
 			}
 		}
 	}

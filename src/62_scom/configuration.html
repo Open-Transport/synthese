@@ -6,8 +6,10 @@
 	<title>Configuration SCOM</title>
 	<script src="/lib/jquery/jquery-1.7.1.min.js"></script>
 	<script src="/lib/jquery-ui/jquery-ui-1.10.3.min.js"></script>
-	<link href="/lib/bootstrap_datepicker/css/datepicker.css" rel="stylesheet">
-	<script src="/lib/bootstrap_datepicker/js/bootstrap-datepicker-fr.js"></script>
+	<link href="/lib/bootstrap_datepicker/css/datepicker.css" 
+rel="stylesheet">
+	<script 
+src="/lib/bootstrap_datepicker/js/bootstrap-datepicker-fr.js"></script>
 
 	<style type="text/css">
 
@@ -87,23 +89,28 @@
 	<body>
 
 		<div class="navbar navbar-inverse navbar-fixed-top">
-			<div class="navbar-inner" style="border-radius:0 !important;">
+			<div class="navbar-inner" style="border-radius:0 
+!important;">
 				<div class="container-fluid">
 					<h3>Configuration de SCOM<h3>
 				</div>
 
 				<div class="control-group">
 					<div class="controls">
-						<button class="btn-large btn-warning" onclick="save()" >Enregistrer</button>
-						<button class="btn-large btn-danger" data-toggle="modal" data-target="#cancelModal" >Annuler</button>
+						<button class="btn-large 
+btn-warning" onclick="save()" >Enregistrer</button>
+						<button class="btn-large 
+btn-danger" data-toggle="modal" data-target="#cancelModal" >Annuler</button>
 					</div>
 				</div>
 			</div>
 		</div>
 		
 		<div class="container-fluid front">
-		<p>Le module SCOM permet de récupérer via un flux TCP les données temps réel
-		venant du SAE Ineo sans avoir à attendre les 20 secondes du rafraichissement
+		<p>Le module SCOM permet de récupérer via un flux TCP les 
+données temps réel
+		venant du SAE Ineo sans avoir à attendre les 20 secondes du 
+rafraichissement
 		de la BDSI.</p>
 		</div>
 
@@ -118,25 +125,34 @@
 		  		<h3>Données</h3>
 		  
 				<div class="control-group">
-					<label class="control-label">Différence maximale de temps</label>
+					<label 
+class="control-label">Différence maximale de temps</label>
 					<div class="controls">
-						<input class="input-small" name="SCOMData.maxtimediff" type="text">
-						<span class="input-group-addon">secondes</span>
+						<input class="input-small" 
+name="SCOMData.maxtimediff" type="text">
+						<span 
+class="input-group-addon">secondes</span>
 					</div>
 					<div class="description">
-						Temps maximum entre la valeur théorique et celle de SCOM pour 
-						qu'elle puisse être considérée comme la même et donc adaptée.
+						Temps maximum entre la valeur 
+théorique et celle de SCOM pour 
+						qu'elle puisse être 
+considérée comme la même et donc adaptée.
 					</div>
 				</div>
 				
 				<div class="control-group">
-					<label class="control-label">Temps de validité d'une valeur</label>
+					<label class="control-label">Temps de 
+validité d'une valeur</label>
 					<div class="controls">
-						<input class="input-small" name="SCOMData.maxage" type="text">
-						<span class="input-group-addon">secondes</span>
+						<input class="input-small" 
+name="SCOMData.maxage" type="text">
+						<span 
+class="input-group-addon">secondes</span>
 					</div>
 					<div class="description">
-						Toutes les données qui sont plus vieilles que ce temps seront
+						Toutes les données qui sont 
+plus vieilles que ce temps seront
 						éliminée.
 					</div>
 				</div>
@@ -144,84 +160,135 @@
 				<h3>Socket</h3>
 				
 				<div class="control-group">
-					<label class="control-label">Serveur </label>
+					<label class="control-label">Serveur 
+</label>
 					<div class="controls">
-						<input class="input-medium" name="SCOMSocketReader.serverip" type="text">
+						<input class="input-medium" 
+name="SCOMSocketReader.serverip" type="text">
 						:
-						<input class="input-small" name="SCOMSocketReader.serverport" type="text">
+						<input class="input-small" 
+name="SCOMSocketReader.serverport" type="text">
 					</div>
 					<div class="description">
-						Adresse IP et port du serveur SCOM.
+						Adresse IP et port du serveur 
+SCOM.
 					</div>
 				</div>
 				
 				<div class="control-group">
-                                        <label class="control-label">IDs SCOM</label>
+					<label class="control-label">ID 
+SCOM</label>
 					<div class="controls">
-						<input class="input-small" name="SCOMSocketReader.serverid" type="text">
+						<input class="input-small" 
+name="SCOMSocketReader.serverid" type="text">
 					</div>
 					<div class="description">
-                                                Liste des identifiants numériques à utiliser pour s'identifier sur le serveur
-                                                SCOM. Ces identifiants doit être définit sur le serveur. Chaque identifiant
-                                                est séparé par une virgule. Ils seront utilisés à tour de rôle, et lors d'un
-                                                échec de connexion un autre sera utilisé à chaque fois.
+						Identifiant numérique à 
+utiliser pour s'identifier sur le serveur
+						SCOM. Cet identifiant doit 
+être définit sur le serveur.
 					</div>
 				</div>
 				
 				<div class="control-group">
-					<label class="control-label">Liste des bornes</label>
+					<label class="control-label">Liste des 
+bornes</label>
 					<div class="controls">
-						<input class="input-large" name="SCOMSocketReader.bornes" type="text">
+						<input class="input-large" 
+name="SCOMSocketReader.bornes" type="text">
 					</div>
 					<div class="description">
-						Liste des bornes (séparée par une virgule, sans espace) pour
-						lesquelles les informations sont à écouter.
+						Liste des bornes (séparée par 
+une virgule, sans espace) pour
+						lesquelles les informations 
+sont à écouter.
 					</div>
 				</div>
 				
 				<div class="control-group">
-					<label class="control-label">Timeout de connexion</label>
+					<label class="control-label">Timeout de 
+connexion</label>
 					<div class="controls">
-						<input class="input-small" name="SCOMSocketReader.connecttimeout" type="text">
-						<span class="input-group-addon">secondes</span>
+						<input class="input-small" 
+name="SCOMSocketReader.connecttimeout" type="text">
+						<span 
+class="input-group-addon">secondes</span>
 					</div>
 					<div class="description">
-						Temps maximal d'attente lors de la connection au serveur.
+						Temps maximal d'attente lors de 
+la connection au serveur.
 					</div>
 				</div>
 				
 				<div class="control-group">
-					<label class="control-label">Timeout de lecture</label>
+					<label class="control-label">Timeout de 
+lecture</label>
 					<div class="controls">
-						<input class="input-small" name="SCOMSocketReader.readtimeout" type="text">
-						<span class="input-group-addon">secondes</span>
+						<input class="input-small" 
+name="SCOMSocketReader.readtimeout" type="text">
+						<span 
+class="input-group-addon">secondes</span>
 					</div>
 					<div class="description">
-						Temps maximal d'attente lors de l'attente de données du serveur.
+						Temps maximal d'attente lors de 
+l'attente de données du serveur.
 					</div>
 				</div>
 				
 				<div class="control-group">
-					<label class="control-label">Délai entre les résolution DNS</label>
+					<label class="control-label">Délai 
+entre les résolution DNS</label>
 					<div class="controls">
-						<input class="input-small" name="SCOMSocketReader.resolveretry" type="text">
-						<span class="input-group-addon">secondes</span>
+						<input class="input-small" 
+name="SCOMSocketReader.resolveretry" type="text">
+						<span 
+class="input-group-addon">secondes</span>
 					</div>
 					<div class="description">
-						Temps à attendre avant de réessayer une résolution DNS du FQDN
+						Temps à attendre avant de 
+réessayer une résolution DNS du FQDN
 						du serveur.
 					</div>
 				</div>
 				
 				<div class="control-group">
-					<label class="control-label">Délai entre les connexions</label>
+					<label class="control-label">Délai 
+entre les connexions</label>
 					<div class="controls">
-						<input class="input-small" name="SCOMSocketReader.connectretry" type="text">
-						<span class="input-group-addon">secondes</span>
+						<input class="input-small" 
+name="SCOMSocketReader.connectretry" type="text">
+						<span 
+class="input-group-addon">secondes</span>
 					</div>
 					<div class="description">
-						Temps à attendre avant de réessayer une connexion au serveur 
-						en cas d'erreur lors de la connection.
+						Temps à attendre avant de 
+réessayer une connexion au serveur 
+						en cas d'erreur lors de la 
+connection.
+					</div>
+				</div>
+				
+				<h3>Follow Socket</h3>
+				
+				<p>Le Follow Socket permet de renvoyer tout le 
+contenu reçu du serveur SCOM sur un socket dans Synthese.</p>
+				<p>Ceci permet de rediriger les données d'un 
+serveur à l'autre</p>
+				<p>Ce socket a été mis en place afin de 
+contourner une limitation du serveur SCOM qui ne permet la lecture 
+d'informations d'une borne qu'a un seul client</p>
+				
+				<div class="control-group">
+					<label 
+class="control-label">Port</label>
+					<div class="controls">
+						<input class="input-small" 
+name="SCOMSocketReader.followport" type="text">
+					</div>
+					<div class="description">
+						Port du socket. Si aucune 
+valeur ou une valeur de 0 est spécifiée ici, le Follow Socket sera 
+désactivé.
 					</div>
 				</div>
 		  </form>
@@ -234,12 +301,16 @@
 				     a=login&
 				     class=form-horizontal well
 				   ?>
-				    <label>Veuillez remplir le formulaire suivant pour vous connecter :</label>
-				    <input name="actionParamlogin" type="text" class="span3" placeholder="Login">
+				    <label>Veuillez remplir le formulaire 
+suivant pour vous connecter :</label>
+				    <input name="actionParamlogin" type="text" 
+class="span3" placeholder="Login">
 				    <label></label>
-				    <input name="actionParampwd" type="password" class="span3" placeholder="Mot de passe">
+				    <input name="actionParampwd" 
+type="password" class="span3" placeholder="Mot de passe">
 				    <label></label>
-				    <button type="submit" class="btn btn-primary">Connexion</button>
+				    <button type="submit" class="btn 
+btn-primary">Connexion</button>
 				   </form>
 			</div>
 		?>
@@ -247,19 +318,26 @@
 		
 
 		<!-- Cancel -->
-		<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelLabel" aria-hidden="true">
+		<div class="modal fade" id="cancelModal" tabindex="-1" 
+role="dialog" aria-labelledby="cancelLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only"></span></button>
-						<h4 class="modal-title" id="cancelLabel">Annulation des modifications</h4>
+						<button type="button" 
+class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span 
+class="sr-only"></span></button>
+						<h4 class="modal-title" 
+id="cancelLabel">Annulation des modifications</h4>
 					</div>
 					<div class="modal-body">
-						Etes vous sûr de vouloir annuler les modifications?
+						Etes vous sûr de vouloir 
+annuler les modifications?
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-						<button type="button" class="btn btn-primary" onclick="loadValues()">Confirmer</button>
+						<button type="button" 
+class="btn btn-default" data-dismiss="modal">Fermer</button>
+						<button type="button" 
+class="btn btn-primary" onclick="loadValues()">Confirmer</button>
 					</div>
 				</div>
 			</div>
@@ -279,11 +357,14 @@
 			$( "#settings input" ).each( function( key, value ) {
 				
 				// Separate the module form the setting
-				var setting = $( this ).attr("name").split(".");
+				var setting = $( this 
+).attr("name").split(".");
 				
 				// Load its value using its name and module
 				$.ajax({
-					url: "/?SERVICE=settings&action=get&module=" + setting[0] + "&name=" + setting[1] + "&value=error",
+					url: 
+"/?SERVICE=settings&action=get&module=" + setting[0] + "&name=" + setting[1] + 
+"&value=error",
 					cache: false
 				})
 				.done( $.proxy(
@@ -302,19 +383,25 @@
 			$( "#settings input" ).each( function( key, value ) {
 				
 				// Separate the module form the setting
-				var setting = $( this ).attr("name").split(".");
+				var setting = $( this 
+).attr("name").split(".");
 				currentSetting = this;
 				
 				// Save its value using its name and module
 				$.ajax({
-					url: "/?SERVICE=settings&action=set&module=" + setting[0] + "&name=" + setting[1] + "&value=" + $( this ).val() + "&notify=false",
+					url: 
+"/?SERVICE=settings&action=set&module=" + setting[0] + "&name=" + setting[1] + 
+"&value=" + $( this ).val() + "&notify=false",
 					cache: false,
 					async: false
 				});
 			});
 			
-			// This last save is done to notify the server to reload the service
-			$.get("/?SERVICE=settings&action=set&module=SCOMSocketReader&name=serverip&value=" + $( "input[name='SCOMSocketReader.serverip']" ).val() + "&notify=true");
+			// This last save is done to notify the server to 
+reload the service
+			
+$.get("/?SERVICE=settings&action=set&module=SCOMSocketReader&name=serverip&value=" 
++ $( "input[name='SCOMSocketReader.serverip']" ).val() + "&notify=true");
 			
 			alert("Enregistrement effectué");
 		}
