@@ -67,6 +67,7 @@ namespace synthese
 	{
 		const string CancelReservationAction::PARAMETER_RESERVATION_TRANSACTION_ID = Action_PARAMETER_PREFIX + "rt";
 		const string CancelReservationAction::PARAMETER_IS_BECAUSE_OF_ABSENCE = "absence";
+		const string CancelReservationAction::PARAMETER_CANCELATION_MADE_ONBOARD = "cancel_onboard";
 
 
 
@@ -102,6 +103,15 @@ namespace synthese
 			else
 			{
 				_absence = false;
+			}
+
+			if(map.isDefined(PARAMETER_CANCELATION_MADE_ONBOARD))
+			{
+				_cancelMadeOnboard = map.get<bool>(PARAMETER_CANCELATION_MADE_ONBOARD);
+			}
+			else
+			{
+				_cancelMadeOnboard = false;
 			}
 
 			// Tests if the reservation is already cancelled
@@ -153,6 +163,12 @@ namespace synthese
 
 			// Store old parameters
 			ReservationStatus oldStatus(_transaction->getStatus());
+			// In case of onboard cancel reservation, force the cancellation to
+			// be an absence of customer, not a cancelation
+			if (_cancelMadeOnboard)
+			{
+				oldStatus = AT_WORK;
+			}
 
 			// Write the cancellation
 			_transaction->setCancellationTime(now);
