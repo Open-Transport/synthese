@@ -1609,6 +1609,14 @@ namespace synthese
 			{
 				return UpdateDeltas();
 			}
+			
+			// if course is ended, don't update it because it may have been cleaned by RTDataCleaner
+			// and we do not want update the course for tomorrow
+			boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
+			if(now.time_of_day() > syntheseService->GetTimeOfDay(horaires[horaires.size()-1].hrd) + minutes(1))
+			{
+				return UpdateDeltas();
+			}
 
 			for(size_t i(0); i<horaires.size(); ++i)
 			{
@@ -1673,6 +1681,9 @@ namespace synthese
 
 			// Registration of the service in the temporary environment
 			temporaryEnvironment.getEditableRegistry<ScheduledService>().add(service);
+			// ...and in the official because there is link with dataSource in the official env
+			// and service should not be deleted with temporaryEnvironment
+			Env::GetOfficialEnv().getEditableRegistry<ScheduledService>().add(service);
 
 			// Registration of the service in the course
 			syntheseService = service.get();
