@@ -140,6 +140,7 @@ namespace synthese
 				static const std::string PARAMETER_TRY_TO_READ_LINE_SHORT_NAME;
 				static const std::string PARAMETER_READ_WAYBACK;
 				static const std::string PARAMETER_CALENDAR_DEFAULT_CODE;
+				static const std::string PARAMETER_2015_CARPOSTAL_FORMAT;
 
 			private:
 				struct LineFilter
@@ -176,6 +177,7 @@ namespace synthese
 					bool _tryToReadShortName;
 					bool _readWayback;
 					size_t _defaultCalendarCode;
+					bool _formatCarpostal2015;
 				//@}
 
 				const LineFilter* _lineIsIncluded(const std::string& lineNumber) const;
