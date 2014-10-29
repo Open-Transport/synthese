@@ -106,6 +106,7 @@ namespace synthese
 		void RoadPlace::addRoad( Road& road ) const
 		{
 			_roads.insert(&road);
+			_isoBarycentre.reset();
 		}
 
 
@@ -122,6 +123,7 @@ namespace synthese
 		void RoadPlace::removeRoad( Road& road ) const
 		{
 			_roads.erase(&road);
+			_isoBarycentre.reset();
 		}
 
 

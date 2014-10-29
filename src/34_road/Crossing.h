@@ -221,6 +221,12 @@ namespace synthese
 
 				virtual std::string getRuleUserName() const;
 			//@}
+			
+			//! @name Modifiers
+			//@{
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+			//@}
 		};
 	}
 }

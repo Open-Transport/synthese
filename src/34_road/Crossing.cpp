@@ -231,4 +231,16 @@ namespace synthese
 			}
 
 		}
+		
+		void Crossing::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(get<PointGeometry>())
+			{
+				setGeometry(get<PointGeometry>());
+			}
+		}
+		
+		void Crossing::unlink()
+		{
+		}
 }	}

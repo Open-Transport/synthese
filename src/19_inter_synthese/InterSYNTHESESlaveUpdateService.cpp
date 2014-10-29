@@ -91,6 +91,12 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
+		
+			if (!_slave->get<Active>())
+			{
+				stream << "Slave is declared inactive on master. Check master config!";
+				return ParametersMap();
+			}
 
 			if(_slave->fullUpdateNeeded())
 			{
