@@ -109,8 +109,8 @@ namespace synthese
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
 				boost::posix_time::time_duration _dayBreakTime;
-				boost::shared_ptr<pt::PTUseRule> _handicappedForbiddenUseRule;
-				boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
+				util::RegistryKeyType _handicappedForbiddenPTUseRuleId;
+				util::RegistryKeyType _handicappedPTAllowedUseRuleId;
 				bool _neutralized;
 				bool _nonCommercial;
 
@@ -191,7 +191,7 @@ namespace synthese
 					std::string ref;
 					const Chainage* chainage;
 					Horaires horaires;
-					const pt::PTUseRule* handicapped;
+					util::RegistryKeyType handicapped;
 
 					mutable pt::ScheduledService* syntheseService;
 
@@ -210,13 +210,12 @@ namespace synthese
 					) const;
 				};
 				typedef std::map<std::string, Course> Courses;
-				void _selectAndLoadCourse(
-					Courses& courses,
+				void _selectAndLoadCourse(Courses& courses,
 					const Course::Horaires& horaires,
 					const Chainage& chainage,
 					const std::string& courseRef,
 					const boost::posix_time::time_duration& nowDuration,
-					const pt::PTUseRule *handicapped
+					const util::RegistryKeyType &handicapped
 				) const;
 
 

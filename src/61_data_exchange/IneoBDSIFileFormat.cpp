@@ -148,17 +148,11 @@ namespace synthese
 				map.getDefault<string>(PARAMETER_DAY_BREAK_TIME, "03:00:00")
 			);
 
-			// Default handicaped rules : none
-			_handicappedForbiddenUseRule = boost::shared_ptr<pt::PTUseRule>();
-			_handicappedAllowedUseRule = boost::shared_ptr<pt::PTUseRule>();
-
 			// Handicapped PT forbidden use rule
-			RegistryKeyType handicappedForbiddenPTUseRuleId(
-				map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE)
-			);
-			if(handicappedForbiddenPTUseRuleId) try
+			_handicappedForbiddenPTUseRuleId = map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE);
+			if(_handicappedForbiddenPTUseRuleId) try
 			{
-				_handicappedForbiddenUseRule = PTUseRuleTableSync::GetEditable(handicappedForbiddenPTUseRuleId, _env);
+				PTUseRuleTableSync::GetEditable(_handicappedForbiddenPTUseRuleId, _env);
 			}
 			catch(ObjectNotFoundException<PTUseRule>&)
 			{
@@ -166,12 +160,10 @@ namespace synthese
 			}
 
 			// Handicapped PT allowed use rule
-			RegistryKeyType handicappedPTAllowedUseRuleId(
-				map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE)
-			);
-			if(handicappedPTAllowedUseRuleId) try
+			_handicappedPTAllowedUseRuleId = map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE);
+			if(_handicappedPTAllowedUseRuleId) try
 			{
-				_handicappedAllowedUseRule = PTUseRuleTableSync::GetEditable(handicappedPTAllowedUseRuleId, _env);
+				PTUseRuleTableSync::GetEditable(_handicappedPTAllowedUseRuleId, _env);
 			}
 			catch(ObjectNotFoundException<PTUseRule>&)
 			{
@@ -193,7 +185,7 @@ namespace synthese
 			const Chainage& chainage,
 			const std::string& courseRef,
 			const time_duration& nowDuration,
-			const PTUseRule *handicapped
+			const RegistryKeyType& handicapped
 		) const {
 
 			// Select only services with at least a stop after now
@@ -586,7 +578,7 @@ namespace synthese
 				string lastCourseRef;
 				Course::Horaires horaires;
 				const Chainage* chainage(NULL);
-				const pt::PTUseRule* handicapped;
+				RegistryKeyType handicapped;
 				while(horaireResult->next())
 				{
 					string courseRef(horaireResult->get<string>("course"));
@@ -636,12 +628,12 @@ namespace synthese
 						{
 							handicapped =
 								(hstr == ">H" || hstr == "¸")
-								? _handicappedAllowedUseRule.get()
-								: _handicappedForbiddenUseRule.get();
+								? _handicappedPTAllowedUseRuleId
+								: _handicappedForbiddenPTUseRuleId;
 						}
 						else
 						{
-							handicapped = NULL;
+							handicapped = 0;
 						}
 					}
 
@@ -1560,7 +1552,7 @@ namespace synthese
 			if (handicapped)
 			{
 				RuleUser::Rules rules = syntheseService->getRules();
-				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = handicapped;
+				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::GetEditable(handicapped, Env::GetOfficialEnv()).get();
 				syntheseService->setRules(rules);
 			}
 
@@ -1675,7 +1667,7 @@ namespace synthese
 			if ( handicapped )
 			{
 				RuleUser::Rules rules = service->getRules();
-				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = handicapped;
+				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::GetEditable(handicapped, Env::GetOfficialEnv()).get();
 				service->setRules(rules);
 			}
 
