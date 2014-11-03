@@ -154,6 +154,9 @@ namespace synthese
 				boost::optional<boost::posix_time::ptime> arrivalTime = boost::optional<boost::posix_time::ptime>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+			
+			virtual std::string whereClauseDefault(
+			) const;
 		};
 	}
 }

@@ -121,6 +121,10 @@ namespace synthese
 			virtual DBResultSPtr searchRecords(
 				const std::string& whereClause
 			) const = 0;
+			
+			
+			virtual std::string whereClauseDefault(
+			) const { return std::string(); }
 
 
 

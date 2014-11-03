@@ -340,7 +340,7 @@ namespace synthese
 						env,
 						FIELDS_ONLY_LOAD_LEVEL
 				)	); */
-				DBResultSPtr rows(directTableSync->searchRecords(string()));
+				DBResultSPtr rows(directTableSync->searchRecords(directTableSync->whereClauseDefault()));
 
 				DBTransaction transaction(false);
 
