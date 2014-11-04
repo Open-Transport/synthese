@@ -100,6 +100,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_TRY_TO_READ_LINE_SHORT_NAME = "try_to_read_line_short_name";
 		const string HafasFileFormat::Importer_::PARAMETER_READ_WAYBACK = "read_way_back";
 		const string HafasFileFormat::Importer_::PARAMETER_CALENDAR_DEFAULT_CODE = "calendar_default_code";
+		const string HafasFileFormat::Importer_::PARAMETER_2015_CARPOSTAL_FORMAT = "format_carpostal_2015";
 	}
 
 	namespace impex
@@ -693,10 +694,13 @@ namespace synthese
 
 						// Line number filter
 						string lineNumber(_getField(9,6));
+						if (_formatCarpostal2015) {
+							lineNumber = _getField(14,3) + _getField(4,3);
+						}
 						const LineFilter* lineFilter(
 							_lineIsIncluded(lineNumber)
 						);
-						if(	!lineFilter
+						if(	!lineFilter && !_formatCarpostal2015
 						){
 							loadCurrentZug = false;
 							continue;
@@ -707,6 +711,9 @@ namespace synthese
 						itZug = _zugs.insert(_zugs.end(), Zug());
 						itZug->lineFilter = lineFilter;
 						itZug->number = _getField(3,5);
+						if (_formatCarpostal2015) {
+							itZug->number = _getField(7,6);
+						}
 						try {
 							itZug->version = lexical_cast<size_t>(_getField(16, 2));
 						}
@@ -731,7 +738,7 @@ namespace synthese
 						itZug->readWayback = false;
 
 						// Continuous service
-						if(!_getField(21,4).empty())
+						if(!_getField(21,4).empty() && !_formatCarpostal2015)
 						{
 							itZug->continuousServiceRange = minutes(lexical_cast<long>(_getField(21, 4)));
 							itZug->continuousServiceWaitingTime = minutes(lexical_cast<long>(_getField(26, 3)));
@@ -808,7 +815,7 @@ namespace synthese
 						// Departure times
 						string departureTimeStr(_getField(34, 4));
 						string arrivalTimeStr(_getField(29, 4));
-						if (_gleisHasOneStopPerLine)
+						if (_gleisHasOneStopPerLine || _formatCarpostal2015)
 						{
 							// Format is different when gleis file has one stop per line
 							// If it is found a set of file where gleis file is by section
@@ -944,6 +951,9 @@ namespace synthese
 
 			// Calendar default code
 			pm.insert(PARAMETER_CALENDAR_DEFAULT_CODE, _defaultCalendarCode);
+			
+			// Carpostal 2015 format
+			pm.insert(PARAMETER_2015_CARPOSTAL_FORMAT, _formatCarpostal2015);
 
 			return pm;
 		}
@@ -1026,6 +1036,9 @@ namespace synthese
 
 			// Calendar default code
 			_defaultCalendarCode = pm.getDefault<size_t>(PARAMETER_CALENDAR_DEFAULT_CODE, 0);
+			
+			// Carpostal format 2015
+			_formatCarpostal2015 = pm.getDefault<bool>(PARAMETER_2015_CARPOSTAL_FORMAT, false);
 		}
 
 
