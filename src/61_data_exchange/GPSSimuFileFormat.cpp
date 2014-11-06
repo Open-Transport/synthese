@@ -64,8 +64,8 @@ namespace synthese
 
 	namespace data_exchange
 	{
-		const std::string GPSSimuFileFormat::Importer_::PARAMETER_ROUTE_ID = "route_id";
-		const std::string GPSSimuFileFormat::Importer_::PARAMETER_TIME_FOR_ROUTE = "time_for_route";
+		const std::string GPSSimuFileFormat::Importer_::PARAMETER_LONG = "longitude";
+		const std::string GPSSimuFileFormat::Importer_::PARAMETER_LAT = "latitude";
 
 
 		GPSSimuFileFormat::Importer_::Importer_(
@@ -77,7 +77,8 @@ namespace synthese
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			PermanentThreadImporterTemplate<GPSSimuFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-			_journeyDuration(0),
+			_longitude(6.0),
+			_latitude(45.0),
 			_lastStopPoint(NULL),
 			_lastStorage(not_a_date_time),
 			_startTime(not_a_date_time)
@@ -89,9 +90,8 @@ namespace synthese
 		{
 			ParametersMap map;
 
-			map.insert(PARAMETER_ROUTE_ID, _journeyPattern->getKey());
-			map.insert(PARAMETER_TIME_FOR_ROUTE, _journeyDuration);
-
+			map.insert(PARAMETER_LONG, _longitude);
+			map.insert(PARAMETER_LAT, _latitude);
 			return map;
 		}
 
@@ -101,17 +101,8 @@ namespace synthese
 			const util::ParametersMap& map,
 			bool doImport
 		){
-			if(map.isDefined(PARAMETER_ROUTE_ID)) try
-			{
-				_journeyPattern = JourneyPatternTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROUTE_ID), _env);
-				LineStopTableSync::Search(_env, _journeyPattern->getKey());
-			}
-			catch (ObjectNotFoundException<JourneyPattern>&)
-			{
-				_logError("Route not found");
-			}
-
-			_journeyDuration = map.getDefault<long>(PARAMETER_TIME_FOR_ROUTE, 600);
+			_longitude = map.getDefault<double>(PARAMETER_LONG, 6.0);
+			_latitude = map.getDefault<double>(PARAMETER_LAT, 45.0);
 		}
 
 		boost::posix_time::time_duration GPSSimuFileFormat::Importer_::_getWaitingTime() const
@@ -137,20 +128,11 @@ namespace synthese
 				_startTime = now;
 			}
 
-			// Simulate GPS
-			double lat;
-			double lon;
-			if(!_simuGps(lat, lon))
-			{
-				_logError("Error while simulating GPS");
-				return;
-			}
-
 			try
 			{
 				// Create the coordinate point
 				boost::shared_ptr<Point> point(
-					CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(lon,lat)
+					CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).createPoint(_longitude,_latitude)
 				);
 				boost::shared_ptr<Point> projectedPoint(
 					CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*point)
@@ -202,14 +184,17 @@ namespace synthese
 				}
                 // if nearestStopPoint differs from previous one, register the time of change of nearestStopPoint
                 // This time is used to compute the onboard advance/delay of the vehicle
-                ptime stopPointFoundTime(second_clock::local_time());
-                if (!VehicleModule::GetCurrentVehiclePosition().getStopPoint()
-                        || (VehicleModule::GetCurrentVehiclePosition().getStopPoint()
-                            && (VehicleModule::GetCurrentVehiclePosition().getStopPoint()->getKey() != nearestStopPoint->getKey())
-                            )
-                ) {
-                    VehicleModule::GetCurrentVehiclePosition().setNextStopFoundTime(stopPointFoundTime);
-                }
+				if (nearestStopPoint)
+				{
+					ptime stopPointFoundTime(second_clock::local_time());
+					if (!VehicleModule::GetCurrentVehiclePosition().getStopPoint()
+							|| (VehicleModule::GetCurrentVehiclePosition().getStopPoint()
+								&& (VehicleModule::GetCurrentVehiclePosition().getStopPoint()->getKey() != nearestStopPoint->getKey())
+								)
+					) {
+						VehicleModule::GetCurrentVehiclePosition().setNextStopFoundTime(stopPointFoundTime);
+					}
+				}
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
 				// FIXME: Distance should be configurable
 				if(lastDistance < 20)
@@ -224,8 +209,8 @@ namespace synthese
 					util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
 				} else {
 					util::Log::GetInstance().debug("GPSdFileFormat : No nearest stop found for " +
-						string("lat=") + boost::lexical_cast<std::string>(lat) +
-						string("lon=") + boost::lexical_cast<std::string>(lon));
+						string("lat=") + boost::lexical_cast<std::string>(_latitude) +
+						string("lon=") + boost::lexical_cast<std::string>(_longitude));
 				}
 
 				// update Vehicle position.
@@ -296,67 +281,5 @@ namespace synthese
 				_logWarning("Bad cast in GPS Simulator");
 				return;
 			}
-		}
-
-		bool GPSSimuFileFormat::Importer_::_simuGps(
-			double &lat,
-			double &lon
-		) const {
-			// Simulate GPS position by
-			// ((length of route / scheduled time) * ((now - startTime)%scheduled time)) = position on the route
-
-			if (!_journeyPattern)
-			{
-				return false;
-			}
-
-			boost::shared_ptr<LineString> lineString(_journeyPattern->getGeometry());
-			double totalDistance(lineString->getLength());
-
-			ptime now(second_clock::local_time());
-			time_duration elapsedTime(now - _startTime);
-
-			size_t elapsedSeconds = elapsedTime.total_seconds() % _journeyDuration;
-
-			double currentDistance = (totalDistance / _journeyDuration) * (double)(elapsedSeconds);
-
-			// Détermination du point sur la course
-			CoordinateSequence *coords = lineString->getCoordinates();
-			int nbPoints = coords->getSize();
-            size_t numStartPoint = (size_t)((currentDistance / totalDistance) * (double)(nbPoints));
-
-			double x1 = coords->getX(numStartPoint);
-			double y1 = coords->getY(numStartPoint);
-			double x2 = 0.0;
-			double y2 = 0.0;
-			if (numStartPoint == (nbPoints - 1))
-			{
-				x2 = coords->getX(numStartPoint - 1);
-				y2 = coords->getY(numStartPoint - 1);
-			}
-			else
-			{
-				x2 = coords->getX(numStartPoint + 1);
-				y2 = coords->getY(numStartPoint + 1);
-			}
-
-			double distanceBetweenPoints = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-			double smallDistance = distanceBetweenPoints * (double)(elapsedSeconds - (_journeyDuration / (double)(nbPoints - 1)) * numStartPoint) / (_journeyDuration / (double)(nbPoints - 1));
-
-			double x3 = ((smallDistance < 0.0 ? 0.0 : smallDistance) / distanceBetweenPoints) * (x2 - x1) + x1;
-			double y3 = ((smallDistance < 0.0 ? 0.0 : smallDistance) / distanceBetweenPoints) * (y2 - y1) + y1;
-
-			// Create the coordinate point
-            boost::shared_ptr<Point> point(
-				CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(x3,y3)
-            );
-			boost::shared_ptr<Point> projectedPoint(
-				CoordinatesSystem::GetCoordinatesSystem(4326/*TODO: found const*/).convertPoint(*point)
-			);
-			lon = projectedPoint->getX();
-			lat = projectedPoint->getY();
-
-			return true;
-
 		}
 }	}
