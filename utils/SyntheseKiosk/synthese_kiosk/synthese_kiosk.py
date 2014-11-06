@@ -53,6 +53,103 @@ thisdir = os.path.abspath(os.path.dirname(__file__))
 
 log = logging.getLogger(__name__)
 
+class Screen(object):
+    '''
+    Represent a single screen geometry
+    '''
+    def __init__(self, name, x, y, w, h):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+
+    def __str__(self):
+        return '<Screen %s>' % self.__dict__
+
+class ScreenDetector(object):
+    '''
+    Parse system information to get the local screens on this computer
+    as returned by xrandr (Linux specific)
+    '''
+    def __init__(self):
+        self._screens = {}
+        cmd = subprocess.Popen('xrandr -q', shell=True, stdout=subprocess.PIPE)
+        exitcode = cmd.wait()
+
+        if(exitcode):
+            print "ERROR: Failed to call xrandr"
+
+        for line in cmd.stdout:
+            sline = line.split()
+            if len(sline) > 4 and sline[1] == "connected":
+                # Extract the geometry
+                resolution = sline[3] if sline[2] == 'primary' else sline[2]
+                resolution = resolution.replace('x', '+')
+                res = resolution.split('+')
+                self._screens[sline[0]] = Screen(sline[0], res[2], res[3], res[0], res[1])
+
+    def get(self, name):
+        try:
+            return self._screens[name]
+        except:
+            return None
+
+    def __str__(self):
+        return '<ScreenDetector %s>' % self.__dict__
+
+class XApplications(object):
+    '''
+    Return the list of windows displayed on this X server
+    This is Linux specific
+    '''
+    def __init__(self):
+        pass
+
+    def getIdByPid(self, pid):
+        '''
+        Search for the process pid in wmctrl and return the windows id
+        '''
+        cmd = subprocess.Popen('wmctrl -Glp', shell=True, stdout=subprocess.PIPE)
+        exitcode = cmd.wait()
+        if(exitcode):
+            log.error("ERROR: Failed to call wmctrl")
+
+        for line in cmd.stdout:
+            sline = line.split()
+            if(int(sline[2]) == pid):
+                return sline[0]
+
+    def setWindowPropertyById(self, id, cmd, prop):
+        cmd = subprocess.Popen('wmctrl -i -r ' + id + " -b %s,%s" %(cmd, prop),
+                               shell=True, stdout=subprocess.PIPE)
+        exitcode = cmd.wait()
+        if(exitcode):
+            log.error("ERROR: Failed to call wmctrl")
+
+    def setFullscreenById(self, id):
+        self.setWindowPropertyById(id, "add", "fullscreen")
+
+    def unsetFullscreenById(self, id):
+        self.setWindowPropertyById(id, "remove", "fullscreen")
+        
+    def setMaximizeById(self, id):
+        self.setWindowPropertyById(id, "add", "maximized_vert")
+        self.setWindowPropertyById(id, "add", "maximized_horz")
+
+    def unsetMaximizeById(self, id):
+        self.setWindowPropertyById(id, "remove", "maximized_vert")
+        self.setWindowPropertyById(id, "remove", "maximized_horz")
+
+    def setGeometryById(self, id, scr):
+        cmd = subprocess.Popen('wmctrl -i -r ' + id + " -e 0," \
+                               +  scr.x + "," + scr.y + "," + scr.w + "," + scr.h,
+                               shell=True, stdout=subprocess.PIPE)
+        exitcode = cmd.wait()
+        if(exitcode):
+            log.error("ERROR: Failed to call wmctrl")
+
+
 def get_thirdparty_binary(dir_name, fatal=True):
     suffix = ''
     if sys.platform == 'win32':
@@ -113,7 +210,7 @@ class CustomBrowser(object):
 
 
 class Display(object):
-    def __init__(self, kiosk, index, name, url):
+    def __init__(self, kiosk, index, name, url, screen):
         config = kiosk.config
         self._kiosk = kiosk
         self._synthese_url = url
@@ -124,6 +221,7 @@ class Display(object):
         self._browser_path = config['browser_path']
         self._browser_args = config['browser_args']
         self._debug = config['debug']
+        self._screen = screen
         self._browser = None
         self._url = None
         log.debug('Creating display ' + name + ' ' + self._synthese_url);
@@ -137,6 +235,32 @@ class Display(object):
             return self._browser
         self._browser = self._create_browser()
         return self._browser
+
+    def _position_browser(self):
+        sd = ScreenDetector()
+        screen = sd.get(self._screen)
+        if(not screen):
+            log.error("Failed to find screen '%s'", self._screen)
+            return
+
+        # The process maybe slow to have its window mapped, let's try until
+        # it does with a max count limit
+        id = None
+        count = 5
+        while(not id and count):
+            count -= 1
+            id = XApplications().getIdByPid(self._browser._proc.pid)
+            if(not id):
+                time.sleep(1)
+        
+        if(id):
+            XApplications().unsetFullscreenById(id)
+            XApplications().unsetMaximizeById(id)
+            XApplications().setGeometryById(id, screen)
+            XApplications().setFullscreenById(id)
+            XApplications().setMaximizeById(id)
+        else:
+            log.error("ERROR: Window to move not found")
 
     def _create_chrome_browser(self):
         if self._browser_path:
@@ -207,6 +331,9 @@ class Display(object):
             return
         log.debug('Showing url: %s', self._url)
         self.browser.get(self._url)
+        if(self._screen):
+            log.info('moving browser to screen ' + self._screen)
+            self._position_browser()
         log.info('refreshing browser ' + self._url)
         self.browser.refresh()
 
@@ -428,7 +555,8 @@ class SyntheseKiosk(object):
                                                   self._kiosk_config.getFallBackUrl())
         return Display(self, index, name, 
                        self._config['synthese_url'] +
-                       self._kiosk_config.getDisplayUrl(name))
+                       self._kiosk_config.getDisplayUrl(name),
+                       self._kiosk_config.getDisplayScreen(name))
 
     def _init_displays(self):
         self._displays = []
@@ -768,5 +896,11 @@ class KioskConfig(object):
         log.debug('getDisplayUrl ' + display + ":" + self._config['displays'][display]['url'])
         try:
             return self._config['displays'][display]['url']
+        except:
+            return None
+
+    def getDisplayScreen(self, display):
+        try:
+            return self._config['displays'][display]['screen']
         except:
             return None
