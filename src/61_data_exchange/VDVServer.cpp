@@ -78,6 +78,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ServiceCode, "service_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(TracePath, "trace_path", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(PlannedDataSourceID, "planned_datasource_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(CutAboId, "cut_abo_id", SQL_BOOLEAN)
 	
 	namespace data_exchange
 	{
@@ -100,7 +101,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(PlannedDataSourceID),
-					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
+					FIELD_DEFAULT_CONSTRUCTOR(TracePath),
+					FIELD_VALUE_CONSTRUCTOR(CutAboId, false)
 			)	),
 			_startServiceTimeStamp(not_a_date_time),
 			_online(false)
@@ -352,8 +354,19 @@ namespace synthese
 				);
 				subscription->setExpiration(expirationTime);
 				expirationTime -= diff_from_utc;
-				aboAnfrage << 
-					"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
+				if (get<CutAboId>())
+				{
+					// Some systems do not support unsigned long long int but only int so we exchange the final
+					// part of the AboID
+					int smallAboId = (int)(subscription->get<Key>());
+					aboAnfrage <<
+						"<AboAZB AboID=\"" << smallAboId << "\" VerfallZst=\"";
+				}
+				else
+				{
+					aboAnfrage <<
+						"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
+				}
 				ToXsdDateTime(aboAnfrage, expirationTime);
 				aboAnfrage << "\">";
 				
@@ -507,10 +520,24 @@ namespace synthese
 					VDVServerSubscription* currentSubscription = NULL;
 					BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
 					{
-						if (lexical_cast<string>(subscription->getKey()) == aboId)
+						if (get<CutAboId>())
 						{
-							currentSubscription = subscription;
-							break;
+							// Some systems do not support unsigned long long int but only int so we exchange the final
+							// part of the AboID
+							int smallAboId = (int)(subscription->get<Key>());
+							if (lexical_cast<string>(smallAboId) == aboId)
+							{
+								currentSubscription = subscription;
+								break;
+							}
+						}
+						else
+						{
+							if (lexical_cast<string>(subscription->getKey()) == aboId)
+							{
+								currentSubscription = subscription;
+								break;
+							}
 						}
 					}
 					

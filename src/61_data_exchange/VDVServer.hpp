@@ -52,6 +52,7 @@ namespace synthese
 		FIELD_STRING(ServiceCode)
 		FIELD_STRING(TracePath)
 		FIELD_ID(PlannedDataSourceID)
+		FIELD_BOOL(CutAboId)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -64,7 +65,8 @@ namespace synthese
 			FIELD(ServiceCode),
 			FIELD(impex::DataSource),
 			FIELD(PlannedDataSourceID),
-			FIELD(TracePath)
+			FIELD(TracePath),
+			FIELD(CutAboId)
 		> VDVServerRecord;
 
 
