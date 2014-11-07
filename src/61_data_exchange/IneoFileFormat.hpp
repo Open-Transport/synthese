@@ -132,6 +132,7 @@ namespace synthese
 				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
 				static const std::string PARAMETER_DEPOT_TO_STOP_IS_HLP;
 				static const std::string PARAMETER_STOP_TO_DEPOT_IS_HLP;
+				static const std::string PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA;
 
 			private:
 				//! @name Parameters
@@ -184,6 +185,7 @@ namespace synthese
 					std::string _vehicleServiceSuffix;
 					bool _depotToStopIsHLP;
 					bool _stopToDepotIsHLP;
+					bool _allowDifferentStopPointsInSameStopArea;
 				//@}
 
 				static const std::string SEP;
