@@ -1589,8 +1589,8 @@ namespace synthese
 				}
 				if(distance > 0)
 				{
-					co2Emissions += distance * line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
-					energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+					co2Emissions += distance * line->getRollingStock()->get<CO2Emissions>() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
+					energyConsumption += distance * line->getRollingStock()->get<EnergyConsumption>() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
 					totalDistance += distance;
 				}
 			}
@@ -2538,7 +2538,7 @@ namespace synthese
 			{
 				pm.insert(DATA_ROLLINGSTOCK_ID, line->getRollingStock()->getKey()); // 4
 				pm.insert(DATA_ROLLINGSTOCK_NAME, line->getRollingStock()->getName()); // 5
-				pm.insert(DATA_ROLLINGSTOCK_ARTICLE, line->getRollingStock()->getArticle()); // 6
+				pm.insert(DATA_ROLLINGSTOCK_ARTICLE, line->getRollingStock()->get<Article>()); // 6
 			}
 			string lineDirection(
 				line->getDirection().empty() && line->getDirectionObj() ?

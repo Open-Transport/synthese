@@ -722,7 +722,7 @@ namespace synthese
 			{
 				stream <<"<transportMode id=\""<< rs->getKey() <<
 					"\" name=\""               << rs->getName() <<
-					"\" article=\""            << rs->getArticle()<<
+					"\" article=\""            << rs->get<Article>()<<
 					"\" />";
 			}
 

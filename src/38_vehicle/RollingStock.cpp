@@ -30,30 +30,37 @@ namespace synthese
 {
 	using namespace graph;
 	using namespace util;
+	using namespace vehicle;
 
-	namespace util
-	{
-		template<> const string Registry<vehicle::RollingStock>::KEY("RollingStock");
-	}
+	CLASS_DEFINITION(RollingStock, "t049_rolling_stock", 49)
+	FIELD_DEFINITION_OF_TYPE(Article, "article", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(IndicatorLabel, "indicator_label", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(TridentKey, "trident_key", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(IsTridentReference, "is_trident_reference", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(CO2Emissions, "CO2_emissions", SQL_DOUBLE)
+	FIELD_DEFINITION_OF_TYPE(EnergyConsumption, "energy_consumption", SQL_DOUBLE)
 
 	namespace vehicle
 	{
-		const string RollingStock::DATA_ID("id");
-		const string RollingStock::DATA_NAME("name");
-		const string RollingStock::DATA_ARTICLE("article");
-		const string RollingStock::DATA_CO2_EMISSIONS("co2_emissions");
-		const string RollingStock::DATA_ENERGY_CONSUMPTION("energy_consumption");
-
 		const unsigned int RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS = 1000; // 1km
 		const unsigned int RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS = 100000;  // 100km
 
 		RollingStock::RollingStock(
 			util::RegistryKeyType key
 		):	util::Registrable(key),
-			graph::PathClass(),
-			_CO2Emissions(0),
-			_energyConsumption(0),
-			_isTridentKeyReference(false)
+			Object<RollingStock, RollingStockSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(Article),
+					FIELD_DEFAULT_CONSTRUCTOR(IndicatorLabel),
+					FIELD_DEFAULT_CONSTRUCTOR(TridentKey),
+					FIELD_VALUE_CONSTRUCTOR(IsTridentReference, false),
+					FIELD_VALUE_CONSTRUCTOR(CO2Emissions, 0),
+					FIELD_VALUE_CONSTRUCTOR(EnergyConsumption, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks)
+			)	),
+			graph::PathClass()
 		{}
 
 
@@ -80,11 +87,11 @@ namespace synthese
 
 			string gtfsRollStock = "3"; // default is BUS
 
-			if(_tridentKey == "Metro")
+			if(get<TridentKey>() == "Metro")
 			{
 				gtfsRollStock = "1";
 			}
-			else if(_tridentKey == "Tramway")
+			else if(get<TridentKey>() == "Tramway")
 			{
 				gtfsRollStock = "0";
 			}
@@ -95,21 +102,5 @@ namespace synthese
 		PathClass::Identifier RollingStock::getIdentifier() const
 		{
 			return getKey();
-		}
-
-
-
-		void RollingStock::toParametersMap(
-			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
-			std::string prefix
-		) const {
-
-			pm.insert(DATA_ID, getKey());
-			pm.insert(DATA_NAME, getName());
-			pm.insert(DATA_ARTICLE, getArticle());
-			pm.insert(DATA_CO2_EMISSIONS, getCO2Emissions());
-			pm.insert(DATA_ENERGY_CONSUMPTION, getEnergyConsumption());
 		}
 }	}

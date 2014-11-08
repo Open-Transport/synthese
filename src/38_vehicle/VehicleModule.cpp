@@ -94,9 +94,9 @@ namespace synthese
 				if(rollingStocks.empty())
 				{
 					RollingStock s;
-					s.setName(tridentKey);
-					s.setTridentKey(tridentKey);
-					s.setIsTridentKeyReference(true);
+					s.set<Name>(tridentKey);
+					s.set<TridentKey>(tridentKey);
+					s.set<IsTridentReference>(true);
 					RollingStockTableSync::Save(&s);
 				}
 			}
