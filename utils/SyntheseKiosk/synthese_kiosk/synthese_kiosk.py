@@ -496,6 +496,9 @@ class SyntheseKiosk(object):
         self._init_logging()
         log.debug('Config path: %s', self._config_path)
 
+        if self.config.has_key('webapp_port'):
+            self.WEBAPP_PORT = self.config['webapp_port']
+
         if not self.config['offline_cache_dir']:
             print "ERROR: Missing parameter 'offline_cache_dir' in your json config"
             sys.exit(1)
