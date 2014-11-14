@@ -88,7 +88,7 @@ namespace synthese
 			ParametersMap pm;
 
 			TransportNetworkTableSync::SearchResult networks(
-				TransportNetworkTableSync::Search(*_env)
+				TransportNetworkTableSync::Search(Env::GetOfficialEnv())
 			);
 			BOOST_FOREACH(const TransportNetworkTableSync::SearchResult::value_type& it, networks)
 			{
