@@ -1221,9 +1221,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField);
 			}
-
-			map.insert(PARAMETER_DEPOT_TO_STOP_IS_HLP, _depotToStopIsHLP);
-			map.insert(PARAMETER_STOP_TO_DEPOT_IS_HLP, _stopToDepotIsHLP);
+			
 			map.insert(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, _allowDifferentStopPointsInSameStopArea);
 
 			return map;
@@ -1300,8 +1298,6 @@ namespace synthese
 				throw Exception("No such handicapped use rule");
 			}
 
-			_depotToStopIsHLP = map.getDefault<bool>(PARAMETER_DEPOT_TO_STOP_IS_HLP, false);
-			_stopToDepotIsHLP = map.getDefault<bool>(PARAMETER_STOP_TO_DEPOT_IS_HLP, false);
 			_allowDifferentStopPointsInSameStopArea = map.getDefault<bool>(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, true);
 
 			// Calendar dates
