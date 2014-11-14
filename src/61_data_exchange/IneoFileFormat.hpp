@@ -129,6 +129,7 @@ namespace synthese
 				static const std::string VALUE_UFR;
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
+				static const std::string PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA;
 
 			private:
 				//! @name Parameters
@@ -178,6 +179,7 @@ namespace synthese
 					std::string _mnlp_prefix;
 					boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
 					std::string _vehicleServiceSuffix;
+					bool _allowDifferentStopPointsInSameStopArea;
 				//@}
 
 				static const std::string SEP;
