@@ -594,7 +594,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(JourneyPattern* journeyPatterns, journeyPatternsToRemove)
 			{
-				BOOST_FOREACH(const Edge* edge, journeyPatterns->getEdges())
+				BOOST_FOREACH(const LineStop* edge, journeyPatterns->getLineStops())
 				{
 					db.deleteStmt(edge->getKey(), t);
 				}
