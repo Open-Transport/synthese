@@ -163,11 +163,13 @@ namespace synthese
 				{
 					mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 				}
+				std::string editFieldName(ObjectUpdateAction::GetInputName<PointGeometry>());
+				std::string addFieldName(ObjectUpdateAction::GetInputName<PointGeometry>());
 				HTMLMap map(
 					*mapCenter,
 					200,
-					ObjectUpdateAction::GetInputName<PointGeometry>(),
-					ObjectUpdateAction::GetInputName<PointGeometry>(),
+					editFieldName,
+					addFieldName,
 					true,
 					true
 				);

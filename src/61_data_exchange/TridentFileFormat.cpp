@@ -1097,11 +1097,11 @@ namespace synthese
 			if(encoding.empty())
 			{
 				ifstream inFile;
-				inFile.open(filePath.file_string().c_str());
+				inFile.open(filePath.string().c_str());
 				if(!inFile)
 				{
-					_logError("Could no open the file " + filePath.file_string());
-					throw Exception("Could no open the file " + filePath.file_string());
+					_logError("Could no open the file " + filePath.string());
+					throw Exception("Could no open the file " + filePath.string());
 				}
 				string line;
 				if(!getline(inFile, line))
@@ -1131,12 +1131,12 @@ namespace synthese
 			IConv charset_converter(encoding, "UTF-8");
 
 			XMLResults pResults;
-			XMLNode allNode = XMLNode::parseFile(filePath.file_string().c_str(), "ChouettePTNetwork", &pResults);
+			XMLNode allNode = XMLNode::parseFile(filePath.string().c_str(), "ChouettePTNetwork", &pResults);
 			if (pResults.error != eXMLErrorNone)
 			{
 				_logError(
 					"XML Parsing error "+ lexical_cast<string>(XMLNode::getError(pResults.error)) +
-					" inside file "+ filePath.file_string() +
+					" inside file "+ filePath.string() +
 					" at line "+ lexical_cast<string>(pResults.nLine) +", column "+
 					lexical_cast<string>(pResults.nColumn)
 				);
@@ -1145,7 +1145,7 @@ namespace synthese
 			if(allNode.isEmpty())
 			{
 				_logError(
-					"File "+ filePath.file_string() +" is empty."
+					"File "+ filePath.string() +" is empty."
 				);
 				return false;
 			}
@@ -1171,6 +1171,9 @@ namespace synthese
 					dataSource
 			)	);
 
+			std::string longName(charset_converter.convert(clineNameNode.getText()));
+			std::string shortName(charset_converter.convert(clineShortNameNode.getText()));
+
 			// Commercial lines
 			CommercialLine* cline(
 				_createOrUpdateLine(
@@ -1178,10 +1181,10 @@ namespace synthese
 					lineKeyNode.getText(),
 					clineNameNode.isEmpty() || !clineNameNode.nText() ?
 						optional<const string&>() :
-						optional<const string&>(charset_converter.convert(clineNameNode.getText())),
+						longName,
 					clineShortNameNode.isEmpty() || !clineShortNameNode.nText() ?
 						optional<const string&>() :
-						optional<const string&>(charset_converter.convert(clineShortNameNode.getText())),
+						shortName,
 					optional<RGBColor>(),
 					*network,
 					dataSource

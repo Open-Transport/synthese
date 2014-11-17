@@ -30,6 +30,7 @@
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace boost;
 using namespace std;

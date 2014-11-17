@@ -111,7 +111,7 @@ namespace synthese
 						stop._metricOffset ? *stop._metricOffset : 0,
 						**stop._stop.begin()
 				)	);
-				ls->set<ScheduleInput>(stop._withTimes);
+				ls->set<ScheduleInput>((bool) stop._withTimes);
 				ls->link(_env, true);
 				_env.getEditableRegistry<LineStop>().add(ls);
 

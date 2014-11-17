@@ -113,14 +113,14 @@ namespace synthese
             const string& key
         ) const {
             ifstream inFile;
-            inFile.open(filePath.file_string().c_str());
+            inFile.open(filePath.string().c_str());
             if(!inFile)
             {
-                throw Exception("Could no open the file " + filePath.file_string());
+                throw Exception("Could no open the file " + filePath.string());
             }
             string line;
             _logDebug(
-                "Loading file "+ filePath.file_string() +" as "+ key
+                "Loading file "+ filePath.string() +" as "+ key
             );
 
             DataSource& dataSource(*_import.get<DataSource>());
@@ -140,7 +140,7 @@ namespace synthese
                     string code(_getValue(4));
 
                     // City
-                    shared_ptr<City> cityForPublicPlace;
+                    boost::shared_ptr<City> cityForPublicPlace;
                     RegistryKeyType cityId;
                     try
                     {

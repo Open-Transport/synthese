@@ -78,7 +78,7 @@ namespace synthese
 			WebPageTableSync::SearchResult pages(
 				WebPageTableSync::Search(env, id)
 			);
-			BOOST_FOREACH(const shared_ptr<Webpage>& webpage, pages)
+			BOOST_FOREACH(const boost::shared_ptr<Webpage>& webpage, pages)
 			{
 				WebPageTableSync::Remove(NULL, webpage->getKey(), transaction, false);
 			}

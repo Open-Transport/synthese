@@ -372,7 +372,7 @@ namespace synthese
 			// Log path
 			if(_logger && !_logger->getDirectory().empty())
 			{
-				map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().file_string());
+			  map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().string());
 			}
 
 			// Departure place
@@ -3850,7 +3850,7 @@ namespace synthese
 			if(	departureVertex.getGeometry().get() &&
 				!departureVertex.getGeometry()->isEmpty()
 			){
-				shared_ptr<Point> point(
+				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
 						*departureVertex.getGeometry()
 				)	);
@@ -3861,7 +3861,7 @@ namespace synthese
 			if(	arrivalVertex.getGeometry().get() &&
 				!arrivalVertex.getGeometry()->isEmpty()
 			){
-				shared_ptr<Point> point(
+				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
 						*arrivalVertex.getGeometry()
 				)	);
@@ -3884,11 +3884,11 @@ namespace synthese
 			// WKT
 			if(geometry)
 			{
-				shared_ptr<Geometry> geometryProjected(
+				boost::shared_ptr<Geometry> geometryProjected(
 					_coordinatesSystem->convertGeometry(
 						*geometry
 				)	);
-				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				boost::shared_ptr<WKTWriter> wktWriter(new WKTWriter);
 				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));

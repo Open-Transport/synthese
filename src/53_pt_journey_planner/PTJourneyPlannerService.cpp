@@ -339,7 +339,7 @@ namespace synthese
 			// Log path
 			if(_logger && !_logger->getDirectory().empty())
 			{
-				map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().file_string());
+			  map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().filename().string());
 			}
 
 			// Departure place

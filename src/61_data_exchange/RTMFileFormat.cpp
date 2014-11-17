@@ -172,15 +172,15 @@ namespace synthese
 			const std::string& key
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.file_string().c_str());
+			inFile.open(filePath.string().c_str());
 			if(!inFile)
 			{
-				_logError("Could not open the file " + filePath.file_string());
-				throw Exception("Could not open the file " + filePath.file_string());
+				_logError("Could not open the file " + filePath.string());
+				throw Exception("Could not open the file " + filePath.string());
 			}
 			string line;
 			_logDebug(
-				"Loading file "+ filePath.file_string() +" as "+ key
+				"Loading file "+ filePath.string() +" as "+ key
 			);
 
 			DataSource& dataSource(*_import.get<DataSource>());

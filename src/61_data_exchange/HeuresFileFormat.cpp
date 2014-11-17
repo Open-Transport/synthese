@@ -204,13 +204,13 @@ namespace synthese
 			const std::string& key
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.file_string().c_str());
+			inFile.open(filePath.string().c_str());
 			if(!inFile)
 			{
 				_logError(
-					"Could no open the file " + filePath.file_string()
+					"Could no open the file " + filePath.string()
 				);
-				throw Exception("Could no open the file " + filePath.file_string());
+				throw Exception("Could no open the file " + filePath.string());
 			}
 
 			if(_calendar.empty())
@@ -367,11 +367,13 @@ namespace synthese
 						// Commercial line number
 						int commercialLineNumber(lexical_cast<int>(trim_copy(line.substr(0, 4))));
 
+						std::string shortName;
+						std::string longName(lexical_cast<string>(commercialLineNumber));
 						cline = _createOrUpdateLine(
 							lines,
 							lexical_cast<string>(commercialLineNumber),
-							string(),
-							lexical_cast<string>(commercialLineNumber),
+							longName,
+							shortName,
 							optional<RGBColor>(),
 							*_network,
 							dataSource

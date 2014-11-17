@@ -565,10 +565,11 @@ namespace synthese
 				if(center.get())
 				{
 					stream << "<h1>Carte</h1>";
+					std::string editFieldName(ObjectUpdateAction::GetInputName<LineStringGeometry>());
 					HTMLMap map(
 						*center,
 						12,
-						ObjectUpdateAction::GetInputName<LineStringGeometry>(),
+						editFieldName,
 						false,
 						false,
 						false

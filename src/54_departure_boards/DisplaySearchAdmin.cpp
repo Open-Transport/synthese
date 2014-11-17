@@ -132,19 +132,19 @@ namespace synthese
 				m.insert(PARAMETER_SEARCH_CITY, _searchCity);
 				m.insert(PARAMETER_SEARCH_STOP, _searchStop);
 				m.insert(PARAMETER_SEARCH_NAME, _searchName);
-				m.insert(PARAMETER_SEARCH_LINE_ID, _searchLineId);
+				m.insert(PARAMETER_SEARCH_LINE_ID, _searchLineId.get());
 			}
 			if(_searchTypeId)
 			{
-				m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId);
+				m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId.get());
 			}
 			if(_searchState)
 			{
-				m.insert(PARAMETER_SEARCH_STATE, _searchState);
+				m.insert(PARAMETER_SEARCH_STATE, _searchState.get());
 			}
 			if(_searchMessage)
 			{
-				m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage);
+				m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage.get());
 			}
 			return m;
 		}
@@ -155,10 +155,12 @@ namespace synthese
 			const server::Request& _request
 		) const	{
 
+			RightsOfSameClassMap rights(_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>());
+
 			DisplayScreenTableSync::SearchResult screens(
 				DisplayScreenTableSync::Search(
 					Env::GetOfficialEnv(),
-					_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
+					rights
 					, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 					, READ
 					, optional<RegistryKeyType>()
@@ -615,10 +617,11 @@ namespace synthese
 					p->setCPU(cpu);
 					links.push_back(p);
 				}
+				RightsOfSameClassMap rights(request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>());
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::Search(
 						Env::GetOfficialEnv(),
-						request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
+						rights,
 						request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ,
 						READ,
 						optional<RegistryKeyType>(),

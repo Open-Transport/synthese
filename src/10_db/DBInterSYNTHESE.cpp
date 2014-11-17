@@ -471,8 +471,8 @@ namespace synthese
 		}
 
 		
-#ifndef _WINDOWS
-		void DBInterSYNTHESE::ContentGetter::operator()( const size_t& i ) const
+#ifndef _WIN32
+		void DBInterSYNTHESE::ContentGetter::operator()(const size_t& i) const
 		{
 			string s(lexical_cast<string>(i));
 			_result <<
@@ -482,7 +482,6 @@ namespace synthese
 			;
 		}
 #endif
-
 
 		void DBInterSYNTHESE::ContentGetter::operator()( const double& d ) const
 		{

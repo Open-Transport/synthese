@@ -193,14 +193,16 @@ namespace synthese
 				, searchMessage
 			);
 
+			security::RightsOfSameClassMap rights = searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>();
+			//boost::optional<const security::RightsOfSameClassMap&> bor(borv);
 			DisplayScreenTableSync::SearchResult screens(
 				DisplayScreenTableSync::Search(
 					env,
-					searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>()
+					boost::optional<const security::RightsOfSameClassMap&>(rights) //bor //boost::optional<const security::RightsOfSameClassMap&>(searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>())
 					, searchRequest.getUser()->getProfile()->getGlobalPublicRight<MessagesRight>() >= READ
 					, WRITE
-					, optional<RegistryKeyType>()
-					, optional<RegistryKeyType>()
+					, boost::optional<RegistryKeyType>()
+					, boost::optional<RegistryKeyType>()
 					, searchLine
 					, searchType
 					, searchCity

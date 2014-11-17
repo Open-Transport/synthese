@@ -194,13 +194,13 @@ namespace synthese
 			const string& key
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.file_string().c_str());
+			inFile.open(filePath.string().c_str());
 			if(!inFile)
 			{
 				_logError(
-					"Could not open the file " + filePath.file_string()
+					"Could not open the file " + filePath.string()
 				);
-				throw Exception("Could not open the file " + filePath.file_string());
+				throw Exception("Could not open the file " + filePath.string());
 			}
 			_clearFieldsMap();
 			date now(day_clock::local_day());
@@ -641,11 +641,13 @@ namespace synthese
 						// ID
 						lineId = _getValue("MNLG");
 
+						std::string longName(_getValue("LIBLG"));
+						std::string shortName(_getValue(_lineShortNameField));
 						line = _createOrUpdateLine(
 							lines,
 							lineId,
-							_getValue("LIBLG"),
-							_getValue(_lineShortNameField),
+							longName,
+							shortName,
 							optional<RGBColor>(),
 							*_network,
 							dataSource
@@ -1361,7 +1363,7 @@ namespace synthese
 			if(it != _pathsMap.end())
 			{
 				ifstream inFile;
-				inFile.open(it->second.file_string().c_str());
+				inFile.open(it->second.string().c_str());
 				if(!inFile)
 				{
 					throw Exception("Could no open the calendar file.");

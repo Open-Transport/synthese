@@ -665,7 +665,7 @@ namespace synthese
 			for(size_t i(0); i<fieldsNumber; ++i)
 			{
 				DBRecordCellBindConvertor visitor(*stmt, i+1);
-				apply_visitor(visitor, record.getContent().at(i));
+				boost::apply_visitor(visitor, record.getContent().at(i));
 			}
 
 			int retc = sqlite3_step(stmt);
@@ -746,12 +746,10 @@ namespace synthese
 
 
 		
-#ifndef _WINDOWS		
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
 		{
 			sqlite3_bind_int(&_stmt, static_cast<int>(_i), static_cast<int>(s));
 		}
-#endif
 
 
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const double& d ) const
@@ -760,12 +758,12 @@ namespace synthese
 		}
 
 
-
-		void SQLiteDB::DBRecordCellBindConvertor::operator()( const util::RegistryKeyType& id ) const
+#ifndef _WIN32
+		void SQLiteDB::DBRecordCellBindConvertor::operator()(const util::RegistryKeyType& id) const
 		{
 			sqlite3_bind_int64(&_stmt, static_cast<int>(_i), id);
 		}
-
+#endif
 
 
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const boost::optional<std::string>& str ) const

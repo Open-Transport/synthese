@@ -247,13 +247,15 @@ namespace synthese
 						if(	(position->getMeterOffset() < lastMeters && _requestParameters.raisingOrder) ||
 							(position->getMeterOffset() > lastMeters && !_requestParameters.raisingOrder)
 						){
-							stream << HTMLModule::getHTMLImage("/admin/img/exclamation.png", "!", string("Inversion d'ordre des mètres"));
+							std::string title("Inversion d'ordre des mètres");
+							stream << HTMLModule::getHTMLImage("/admin/img/exclamation.png", "!", title);
 						}
 						if(	((position->getMeterOffset() != lastMeters &&
 							  (	position->getDepot() && position->getDepot() == lastDepot)) ||
 								(position->getStopPoint() && position->getStopPoint() == lastStopPoint)
 						)	){
-							stream << HTMLModule::getHTMLImage("/admin/img/error.png", "!", string("Mouvement probablement manquant"));
+							std::string title("Mouvement probablement manquant");
+							stream << HTMLModule::getHTMLImage("/admin/img/error.png", "!", title);
 						}
 					}
 

@@ -593,13 +593,13 @@ namespace synthese
 			const boost::filesystem::path& filePath
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.file_string().c_str());
+			inFile.open(filePath.string().c_str());
 			if(!inFile)
 			{
 				_logError(
-					"Could not open the file " + filePath.file_string()
+					"Could not open the file " + filePath.string()
 				);
-				throw Exception("Could not open the file " + filePath.file_string());
+				throw Exception("Could not open the file " + filePath.string());
 			}
 
 			DataSource& dataSource(*_import.get<DataSource>());
@@ -1007,12 +1007,13 @@ namespace synthese
 					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = _reservationUseRule.get();
 				}
 
+				std::string routeName(lineInfo.routeName + ":" + (lineInfo.needReservation ? "resa:" : "") +
+					journeyPatternInfo.longName);
 				JourneyPattern* journeyPattern(
 					_createOrUpdateRoute(
 						*commercialLine,
 						optional<const string&>(), // id
-						lineInfo.routeName + ":" + (lineInfo.needReservation ? "resa:" : "") +
-							journeyPatternInfo.longName, // name
+						routeName,
 						optional<const string&>(), // destination
 						optional<Destination*>(),
 						rules,

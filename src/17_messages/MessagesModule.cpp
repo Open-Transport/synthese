@@ -404,8 +404,8 @@ namespace synthese
 
 
 		bool MessagesModule::SentAlarmLess::operator()(
-			shared_ptr<SentAlarm> left,
-			shared_ptr<SentAlarm> right
+			boost::shared_ptr<SentAlarm> left,
+			boost::shared_ptr<SentAlarm> right
 		) const {
 			assert(left.get() && right.get());
 
@@ -439,13 +439,13 @@ namespace synthese
 
 			// Sort by commercial line if both alarm are linked to
 			{
-				shared_ptr<const pt::CommercialLine> firstLineLeft, firstLineRight;
+				boost::shared_ptr<const pt::CommercialLine> firstLineLeft, firstLineRight;
 				BOOST_FOREACH(Alarm::LinkedObjects::value_type& leftId, left->getLinkedObjects())
 				{
 					if(leftId.first != "line")continue;
 					BOOST_FOREACH(const AlarmObjectLink* link, leftId.second)
 					{
-						shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
+						boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
 						if(line.get())
 						{
 							firstLineLeft = line;
@@ -459,7 +459,7 @@ namespace synthese
 					if(rightId.first != "line")continue;
 					BOOST_FOREACH(const AlarmObjectLink* link, rightId.second)
 					{
-						shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
+						boost::shared_ptr<const pt::CommercialLine> line = Env::GetOfficialEnv().get<pt::CommercialLine>(link->getObjectId());
 						if(line.get())
 						{
 							firstLineRight = line;

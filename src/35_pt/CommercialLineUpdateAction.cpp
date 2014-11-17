@@ -141,7 +141,7 @@ namespace synthese
 			}
 			if(_weightForSorting)
 			{
-				map.insert(PARAMETER_WEIGHT_FOR_SORTING, _weightForSorting);
+				map.insert(PARAMETER_WEIGHT_FOR_SORTING, _weightForSorting.get());
 			}
 
 			// Importable

@@ -160,7 +160,7 @@ namespace synthese
 				site->set<ClientURL>(_directory.substr(found));
 			}
 
-			string siteName(path(_directory).filename());
+			string siteName(path(_directory).filename().string());
 			site->set<Name>(siteName);
 			_logLoad("Creation of site: " + siteName);
 
@@ -206,7 +206,7 @@ namespace synthese
 		/// Import recursively the files in directory @currentDir under
 		/// the page @parent
 		void CMSImport::Importer_::_importDir(const path &directoryPath,
-			shared_ptr<cms::Website> &site,
+			boost::shared_ptr<cms::Website> &site,
 			cms::Webpage *parent,
 			path currentDir
 		) const
@@ -215,7 +215,7 @@ namespace synthese
 			for ( boost::filesystem::directory_iterator end, dir(directoryPath / currentDir);
 				   dir != end; ++dir )
 			{
-				string pageName(dir->path().filename());
+			  string pageName(dir->path().filename().string());
 				string absPath(dir->path().string());
 				path relPath(currentDir / pageName);
 
@@ -273,7 +273,7 @@ namespace synthese
 					page->set<RawEditor>(true);
 					page->set<MaxAge>(_maxAge);
 					// Calc a mime type base on the extension
-					string extension(dir->path().extension());
+					string extension(dir->path().extension().string());
 					if(!extension.empty())
 					{
 						// boost path includes the . in the extension but

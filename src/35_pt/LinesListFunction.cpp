@@ -724,7 +724,8 @@ namespace synthese
 			// Rights caching
 			if((!_rightClass.empty() || !_rightLevel) && request.getUser())
 			{
-				_rights = request.getUser()->getProfile()->getRights(_rightClass);
+				synthese::security::RightsOfSameClassMap rights(request.getUser()->getProfile()->getRights(_rightClass));
+				_rights = rights;
 			}
 
 			typedef set<boost::shared_ptr<const CommercialLine>, CommercialLine::PointerComparator> SortedItems;

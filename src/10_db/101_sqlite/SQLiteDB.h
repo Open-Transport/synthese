@@ -84,7 +84,7 @@ namespace synthese
 				void operator()(const int& i) const;
 				void operator()(const bool& i) const;
 				void operator()(const double& d) const;
-#ifndef _WINDOWS
+#ifndef _WIN32
 				void operator()(const size_t& s) const;
 #endif
 				void operator()(const util::RegistryKeyType& id) const;

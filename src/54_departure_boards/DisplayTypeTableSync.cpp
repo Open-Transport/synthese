@@ -84,9 +84,10 @@ namespace synthese
 			util::RegistryKeyType object_id
 		){
 			Env env;
+			RightsOfSameClassMap rights;
 			DisplayScreenTableSync::Search(
 				env,
-				RightsOfSameClassMap(),
+				rights,
 				true,
 				UNKNOWN_RIGHT_LEVEL,
 				optional<RegistryKeyType>(),

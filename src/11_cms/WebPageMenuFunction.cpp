@@ -250,7 +250,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Website::ChildrenType::value_type& it, _rootSite->getChildren())
 				{
-					shared_ptr<ParametersMap> pagePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> pagePM(new ParametersMap);
 					_getMenuContentRecursive(
 						stream,
 						request,

@@ -111,7 +111,7 @@ namespace synthese
 		){
 			if (name == PARAM_HTTP_TEMP_DIR)
 			{
-				boost::filesystem::path path (value, boost::filesystem::native);
+				boost::filesystem::path path (value);
 
 				if (boost::filesystem::exists (path) == false)
 				{
@@ -123,7 +123,7 @@ namespace synthese
 			}
 			else if (name == PARAM_BACKGROUNDS_DIR)
 			{
-				boost::filesystem::path path (value, boost::filesystem::native);
+				boost::filesystem::path path (value);
 				MapBackgroundManager::Initialize (path);
 			}
 		}

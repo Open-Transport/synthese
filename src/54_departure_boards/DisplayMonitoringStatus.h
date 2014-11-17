@@ -29,6 +29,7 @@
 #include <string>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 
 #include "Registrable.h"
 #include "Registry.h"

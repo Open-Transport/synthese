@@ -308,7 +308,7 @@ namespace synthese
 				void insert(const std::string& parameterName, const std::string& value);
 				void insert(const std::string& parameterName, int value);
 				void insert(const std::string& parameterName, double value);
-#ifndef _WIN64
+#ifndef _WIN32
 				void insert(const std::string& parameterName, size_t value);
 #endif
 				void insert(const std::string& parameterName, util::RegistryKeyType value);

@@ -147,7 +147,7 @@ namespace synthese
 				){
 					InterSYNTHESEPackage::PackageAddress address(*_packageToInstall);
 					// Search for existing import based on this package
-					shared_ptr<Import> import;
+					boost::shared_ptr<Import> import;
 					Env env;
 					BOOST_FOREACH(const Import::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<Import>())
 					{
@@ -156,7 +156,7 @@ namespace synthese
 						{
 							continue;
 						}
-						shared_ptr<InterSYNTHESEPackageFileFormat::Importer_> importer(
+						boost::shared_ptr<InterSYNTHESEPackageFileFormat::Importer_> importer(
 							dynamic_pointer_cast<InterSYNTHESEPackageFileFormat::Importer_, Importer>(
 								it.second->getImporter(env, IMPORT_LOG_NOLOG, string(), optional<ostream&>(), it.second->get<Parameters>())
 						)	);
@@ -195,7 +195,7 @@ namespace synthese
 						ImportTableSync::Save(import.get());
 					}
 
-					shared_ptr<Importer> importer(
+					boost::shared_ptr<Importer> importer(
 						import->getImporter(env, IMPORT_LOG_NOLOG, string(), optional<ostream&>(), import->get<Parameters>())
 					);
 					bool success(true);
