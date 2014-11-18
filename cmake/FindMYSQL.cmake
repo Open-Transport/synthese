@@ -48,7 +48,7 @@ if(WIN32)
       set(build_dist Debug)
    else(CMAKE_BUILD_TYPE_TOLOWER MATCHES "debug")
       ADD_DEFINITIONS(-DDBUG_OFF)
-      set(binary_dist opt)
+      set(binary_dist "")
       set(build_dist Release)
    endif(CMAKE_BUILD_TYPE_TOLOWER MATCHES "debug")
 
@@ -76,9 +76,10 @@ else(WIN32)
 endif(WIN32)
 
 if(WIN32)
+
    set(MYSQL_LIB_PATHS
       # added this path to find the library on Windows:
-      $ENV{MYSQL_DIR}/lib
+      $ENV{MYSQL_DIR}/lib/${binary_dist}
       $ENV{MYSQL_DIR}/lib/opt
       $ENV{MYSQL_DIR}/client/release
       $ENV{ProgramFiles}/MySQL/*/lib/opt
