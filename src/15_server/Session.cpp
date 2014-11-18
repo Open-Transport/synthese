@@ -180,7 +180,7 @@ namespace synthese
 					recursive_mutex::scoped_lock lock(session->_mutex);
 					if (ip != session->_ip)
 					{
-						throw SessionException("IP has changed during the session.");
+						Log::GetInstance().debug("IP has changed during the session.");
 					}
 					
 					if( (now - session->_lastUse) > ServerModule::GetSessionMaxDuration())
