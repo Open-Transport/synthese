@@ -1357,7 +1357,7 @@ namespace synthese
 											addressNode.getChildNode("countryCode", 0).getText();
 										if(!cityCode.empty())
 										{
-											_logWarning(
+											_logDebug(
 												"Got the cityCode '" + cityCode + "' for '" + stopAreaKey +
 												" ('" + name + ") ' in " + "'" + spKeyNode + "'"
 											);
@@ -1666,8 +1666,8 @@ namespace synthese
 				if(linkableStops.empty())
 				{
 					_logError(
-						"Stop "+ string(containedNode.getText()) +" not found by stop point "+ 
-						string(spKeyNode.getText()) +")"
+						"StopArea "+ string(containedNode.getText()) +" not found. (Referenced by StopPoint '"+
+						string(spKeyNode.getText()) + "')3377704015501487"
 					);
 					failure = true;
 					continue;
