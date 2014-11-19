@@ -75,6 +75,8 @@ namespace synthese
 			static const std::string PARAMETER_MIN_SCORE;
 			static const std::string PARAMETER_CLASS_FILTER;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_BBOX;
+			static const std::string PARAMETER_PUBLIC_PLACE_FILTER;
 
 			static const std::string PARAMETER_COORDINATES_XY;
 			static const std::string PARAMETER_MAX_DISTANCE;
@@ -120,6 +122,8 @@ namespace synthese
 				double _minScore;
 				std::string _classFilter;
 				const CoordinatesSystem* _coordinatesSystem;
+				boost::optional<geos::geom::Envelope> _bbox;
+				std::vector<std::string> _publicPlaceFilterVect;
 				std::string _coordinatesXY;
 				double _maxDistance;
 				boost::shared_ptr<geos::geom::Point> _originPoint;

@@ -44,7 +44,7 @@ add_definitions(-DFUSION_MAX_VECTOR_SIZE=30)
 add_definitions(-DFUSION_MAX_MAP_SIZE=30)
 
 if(NOT DEFINED BOOST_VERSION)
-  set(BOOST_VERSION 1.39)
+  set(BOOST_VERSION 1.42)
 endif()
 
 set(BOOST_LIBS program_options filesystem system regex thread date_time iostreams unit_test_framework)

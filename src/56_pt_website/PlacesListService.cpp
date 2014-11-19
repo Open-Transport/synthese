@@ -81,6 +81,8 @@ namespace synthese
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
 		const string PlacesListService::PARAMETER_SRID = "srid";
+		const string PlacesListService::PARAMETER_BBOX = "bbox";
+		const string PlacesListService::PARAMETER_PUBLIC_PLACE_FILTER = "public_place_filter";
 
 		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
 		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
@@ -257,6 +259,38 @@ namespace synthese
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+			// BBox filter
+			string bbox(map.getDefault<string>(PARAMETER_BBOX));
+			if(!bbox.empty())
+			{
+				vector< string > parsed_bbox;
+				split(parsed_bbox, bbox, is_any_of(",; ") );
+
+				if(parsed_bbox.size() != 4)
+				{
+					throw RequestException("Malformed bbox.");
+				}
+
+				boost::shared_ptr<Point> pt1(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[0]),
+													lexical_cast<double>(parsed_bbox[1]))
+				);
+				boost::shared_ptr<Point> pt2(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[2]),
+													lexical_cast<double>(parsed_bbox[3]))
+				);
+				pt1 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt1);
+				pt2 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt2);
+
+				_bbox = Envelope( pt1->getX(), pt2->getX(), pt1->getY(), pt2->getY());
+			}
+
+			if(!map.getDefault<string>(PARAMETER_PUBLIC_PLACE_FILTER).empty()) {
+				string publicPlaceFilterStr(map.getDefault<string>(PARAMETER_PUBLIC_PLACE_FILTER));
+				split(_publicPlaceFilterVect, publicPlaceFilterStr, is_any_of("|,; "));
+			}
+
 
 			// Build originPoint
 			_coordinatesXY = map.getDefault<string>(PARAMETER_COORDINATES_XY);
@@ -478,6 +512,75 @@ namespace synthese
 						result.insert(DATA_ADDRESSES, pm);
 					}
 
+				}
+			} else if(_bbox) {
+
+				//StopArea
+				if(_classFilter.empty() || _classFilter == DATA_STOP)
+				{
+					boost::shared_ptr<ParametersMap> pMStops(new ParametersMap);
+					BOOST_FOREACH(const Registry<StopArea>::value_type& stopArea,
+								  Env::GetOfficialEnv().getRegistry<StopArea>()) {
+						if(	!stopArea.second->getPoint().get() ||
+							( !_bbox->contains(*stopArea.second->getPoint()->getCoordinate()) ) ) {
+							continue;
+						}
+						boost::shared_ptr<ParametersMap> pMItem(new ParametersMap);
+
+						stopArea.second->toParametersMap(*pMItem, _coordinatesSystem);
+						pMStops->insert(DATA_STOP, pMItem);
+
+					}
+					result.insert(DATA_STOPS, pMStops);
+				}
+
+				//RoadPlace
+				if(_classFilter.empty() || _classFilter == DATA_ROAD)
+				{
+					boost::shared_ptr<ParametersMap> pMRoads(new ParametersMap);
+					BOOST_FOREACH(const Registry<RoadPlace>::value_type& roadPlace,
+								  Env::GetOfficialEnv().getRegistry<RoadPlace>()) {
+						if(	!roadPlace.second->getPoint().get() ||
+							( !_bbox->contains(*roadPlace.second->getPoint()->getCoordinate()) ) ) {
+							continue;
+						}
+						boost::shared_ptr<ParametersMap> pMItem(new ParametersMap);
+
+						roadPlace.second->toParametersMap(*pMItem, _coordinatesSystem);
+						pMRoads->insert(DATA_ROAD, pMItem);
+					}
+					result.insert(DATA_ROADS, pMRoads);
+				}
+
+				//PublicPlace
+				if(_classFilter.empty() || _classFilter == DATA_PUBLIC_PLACE)
+				{
+					boost::shared_ptr<ParametersMap> pMPublicPlaces(new ParametersMap);
+					BOOST_FOREACH(const Registry<PublicPlace>::value_type& publicPlace,
+								  Env::GetOfficialEnv().getRegistry<PublicPlace>()) {
+						if(	!publicPlace.second->getPoint().get() ||
+							( !_bbox->contains(*publicPlace.second->getPoint()->getCoordinate()) )  ) {
+							continue;
+						}
+
+						if(_publicPlaceFilterVect.size() > 0) {
+							bool bTypeOK = false;
+							BOOST_FOREACH( string publicPlaceFilterItem,_publicPlaceFilterVect ) {
+								string publicPlaceCategory = publicPlace.second->get<Category>();
+								if( publicPlaceCategory.find(publicPlaceFilterItem) != string::npos ) {
+									bTypeOK = true;
+									break;
+								}
+							}
+							if(!bTypeOK) continue;
+						}
+
+						boost::shared_ptr<ParametersMap> pMItem(new ParametersMap);
+
+						publicPlace.second->toParametersMap(*pMItem, _coordinatesSystem);
+						pMPublicPlaces->insert(DATA_PUBLIC_PLACE, pMItem);
+					}
+					result.insert(DATA_PUBLIC_PLACES, pMPublicPlaces);
 				}
 			}
 			else if(_sorted || !_classFilter.empty())
@@ -890,7 +993,7 @@ namespace synthese
 			// Best place
 			boost::shared_ptr<ParametersMap> bestMap;
 			string className;
-			if(_sorted)
+			if(_sorted && !_bbox)
 			{
 				boost::shared_ptr<ParametersMap> bestPlace(new ParametersMap);
 
