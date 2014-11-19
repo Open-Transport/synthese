@@ -1244,7 +1244,7 @@ namespace synthese
 
 					// Stop area key
 					XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
-					string stopKey(keyNode.getText());
+					string stopAreaKey(keyNode.getText());
 
 					// Stop area name
 					string name;
@@ -1266,7 +1266,7 @@ namespace synthese
 						{
 							_logWarning(
 								"Area centroid "+ string(areaNode.getText()) +" not found in CommercialStopPoint "+
-								lexical_cast<string>(stopKey) +" ("+ name +")"
+								lexical_cast<string>(stopAreaKey) +" ("+ name +")"
 							);
 							failure = true;
 							continue;
@@ -1310,7 +1310,7 @@ namespace synthese
 								if(itPlace == areaCentroids.end())
 								{
 									_logWarning(
-										"Area centroid "+ string(areaNode.getText()) +" not found in CommercialStopPoint "+ stopKey +" ("+ name +")"
+										"Area centroid "+ string(areaNode.getText()) +" not found in CommercialStopPoint "+ stopAreaKey +" ("+ name +")"
 									);
 									failure = true;
 									continue;
@@ -1358,7 +1358,7 @@ namespace synthese
 										if(!cityCode.empty())
 										{
 											_logWarning(
-												"Got the cityCode '" + cityCode + "' for '" + stopKey +
+												"Got the cityCode '" + cityCode + "' for '" + stopAreaKey +
 												" ('" + name + ") ' in " + "'" + spKeyNode + "'"
 											);
 											break;
@@ -1380,14 +1380,14 @@ namespace synthese
 					set<StopArea*> cstops(
 						_getStopAreas(
 							_stopAreas,
-							stopKey,
+							stopAreaKey,
 							optional<const string&>(),
 							false
 					)	);
 					if(cstops.size() > 1)
 					{
 						_logWarning(
-							"More than one stop with key"+ stopKey
+							"More than one stop with key"+ stopAreaKey
 						);
 					}
 					if(!cstops.empty())
@@ -1422,7 +1422,7 @@ namespace synthese
 
 							if(cityAliasResult.empty())
 							{
-								_logError("Commercial stop point "+ stopKey +" does not link to a valid city ("+ cityCode +")");
+								_logError("Commercial stop point "+ stopAreaKey +" does not link to a valid city ("+ cityCode +")");
 								failure = true;
 								continue;
 							}
@@ -1433,7 +1433,7 @@ namespace synthese
 						// Stop area creation
 						curStop = _createStopArea(
 							_stopAreas,
-							stopKey,
+							stopAreaKey,
 							name,
 							*city,
 							_defaultTransferDuration,
@@ -1444,7 +1444,7 @@ namespace synthese
 					else
 					{
 						string logText(
-							"Commercial stop point "+ stopKey +" cannot be created due to undefined city."
+							"Commercial stop point "+ stopAreaKey +" cannot be created due to undefined city."
 						);
 						if(_autoGenerateStopAreas)
 						{
