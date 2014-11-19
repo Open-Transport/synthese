@@ -137,7 +137,7 @@ namespace synthese
 			_throwWarnInCaseScheduleUp24(false),
 			_calendarTemplates(*import.get<DataSource>(), env),
 			_stopAreas(*import.get<DataSource>(), env),
-			_stops(*import.get<DataSource>(), env),
+			_stopPoints(*import.get<DataSource>(), env),
 			_networks(*import.get<DataSource>(), env),
 			_lines(*import.get<DataSource>(), env)
 		{}
@@ -1333,6 +1333,46 @@ namespace synthese
 								break;
 							}
 						}
+						// Another chance to get a city code from the StopPoint
+						if(cityCode.empty())
+						{
+							int containsNumber(stopAreaNode.nChildNode("contains"));
+							for(int i(0); i<containsNumber; ++i)
+							{
+								string stopPointId(
+									stopAreaNode.getChildNode("contains", i).getText()
+								);
+
+								int stopPointsNumber(chouetteLineDescriptionNode.nChildNode("StopPoint"));
+								for(int stopPointRank(0); stopPointRank < stopPointsNumber; ++stopPointRank)
+								{
+									XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
+									string spKeyNode(stopPointNode.getChildNode("objectId").getText());
+									if(spKeyNode == stopPointId)
+									{
+										XMLNode addressNode(stopPointNode.getChildNode("address", 0));
+										cityCode =
+											(addressNode.isEmpty() || !addressNode.getChildNode("countryCode", 0).getText()) ?
+											string() :
+											addressNode.getChildNode("countryCode", 0).getText();
+										if(!cityCode.empty())
+										{
+											_logWarning(
+												"Got the cityCode '" + cityCode + "' for '" + stopKey +
+												" ('" + name + ") ' in " + "'" + spKeyNode + "'"
+											);
+											break;
+										}
+									}
+								}
+
+								if(!cityCode.empty())
+								{
+									break;
+								}
+
+							}
+						}
 					}
 
 					// Search of an existing connection place with the same code
@@ -1560,7 +1600,7 @@ namespace synthese
 					if(curStop)
 					{
 						stopPoints = _createOrUpdateStop(
-							_stops,
+							_stopPoints,
 							stopKey,
 							name,
 							optional<const RuleUser::Rules&>(),
@@ -1572,7 +1612,7 @@ namespace synthese
 					else if(_autoGenerateStopAreas && city)
 					{
 						stopPoints = _createOrUpdateStopWithStopAreaAutocreation(
-							_stops,
+							_stopPoints,
 							stopKey,
 							name,
 							geometry.get(),
@@ -1594,7 +1634,7 @@ namespace synthese
 				else
 				{
 					if(	_getStopPoints(
-							_stops,
+							_stopPoints,
 							stopKey,
 							name
 						).empty()
@@ -1622,7 +1662,7 @@ namespace synthese
 				XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
 				XMLNode spKeyNode(stopPointNode.getChildNode("objectId"));
 				XMLNode containedNode(stopPointNode.getChildNode("containedIn"));
-				set<StopPoint*> linkableStops(_stops.get(containedNode.getText()));
+				set<StopPoint*> linkableStops(_stopPoints.get(containedNode.getText()));
 				if(linkableStops.empty())
 				{
 					_logError(

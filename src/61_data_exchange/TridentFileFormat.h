@@ -166,7 +166,7 @@ namespace synthese
 				mutable std::set<boost::shared_ptr<calendar::CalendarTemplateElement> > _calendarElementsToRemove;
 				mutable impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync> _calendarTemplates;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync> _stopAreas;
-				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stops;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::TransportNetworkTableSync> _networks;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
 
