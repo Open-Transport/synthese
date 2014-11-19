@@ -1486,10 +1486,11 @@ namespace synthese
 				XMLNode areaCentroidNode(stopAreaNode.getChildNode("centroidOfArea", 0));
 
 				// ID
-				string stopKey(stopAreaNode.getChildNode("objectId", 0).getText());
+				string stopAreaKey(stopAreaNode.getChildNode("objectId", 0).getText());
 
 				// Name
 				string name(charset_converter.convert(stopAreaNode.getChildNode("name", 0).getText()));
+				string cityCode;
 
 				if(_importStops)
 				{
@@ -1499,8 +1500,39 @@ namespace synthese
 					if(areaCentroidNode.isEmpty())
 					{
 						_logWarning(
-							"Physical stop "+ stopKey +" does not have any area centroid ("+ name +")"
+							"Physical stop "+ stopAreaKey +" does not have any area centroid ("+ name +")"
 						);
+						// Get the city code
+						int containsNumber(stopAreaNode.nChildNode("contains"));
+						for(int i(0); i<containsNumber; ++i)
+						{
+							string stopPointId(
+										stopAreaNode.getChildNode("contains", i).getText()
+										);
+
+							int stopPointsNumber(chouetteLineDescriptionNode.nChildNode("StopPoint"));
+							for(int stopPointRank(0); stopPointRank < stopPointsNumber; ++stopPointRank)
+							{
+								XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
+								string spKeyNode(stopPointNode.getChildNode("objectId").getText());
+								if(spKeyNode == stopPointId)
+								{
+									XMLNode addressNode(stopPointNode.getChildNode("address", 0));
+									cityCode =
+											(addressNode.isEmpty() || !addressNode.getChildNode("countryCode", 0).getText()) ?
+												string() :
+												addressNode.getChildNode("countryCode", 0).getText();
+									if(!cityCode.empty())
+									{
+										_logDebug(
+													"Got the cityCode '" + cityCode + "' for '" + stopAreaKey +
+													" ('" + name + ") ' in " + "'" + spKeyNode + "'"
+													);
+										break;
+									}
+								}
+							}
+						}
 					}
 					else
 					{
@@ -1508,7 +1540,7 @@ namespace synthese
 						if(itPlace == areaCentroids.end())
 						{
 							_logWarning(
-								"Physical stop with key "+ stopKey +" links to a not found area centroid "+ areaCentroidNode.getText() +" ("+ name +")"
+								"Physical stop with key "+ stopAreaKey +" links to a not found area centroid "+ areaCentroidNode.getText() +" ("+ name +")"
 							);
 						}
 						else
@@ -1544,51 +1576,51 @@ namespace synthese
 							catch(UnknkownSRIDException&)
 							{
 								_logWarning(
-									"Physical stop with key "+ stopKey +" uses an unknown SRID"
+									"Physical stop with key "+ stopAreaKey +" uses an unknown SRID"
 								);
 							}
 
 							XMLNode addressNode(areaCentroid.getChildNode("address", 0));
-							string cityCode(
+							cityCode =
 								(addressNode.isEmpty() || !addressNode.getChildNode("countryCode", 0).getText()) ?
 								string() :
-								addressNode.getChildNode("countryCode", 0).getText()
-							);
+								addressNode.getChildNode("countryCode", 0).getText();
 
-							// Search of the city
-							if(!cityCode.empty())
-							{
-								CityTableSync::SearchResult cityResult(
-									CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
-								);
-								if(!cityResult.empty())
-								{
-									city = cityResult.front();
-								}
-								else
-								{
-									// If no city was found, attempting to find an alias with the right code
-									CityAliasTableSync::SearchResult cityAliasResult(
-										CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
-									);
-
-									if(cityAliasResult.empty())
-									{
-										_logError(
-											"Stop point "+ stopKey +" with area centroid "+ areaCentroid.getChildNode("name").getText() +" does not link to a valid city ("+ addressNode.getChildNode("countryCode").getText() +")"
-										);
-										failure = true;
-										continue;
-									}
-
-									city = _env.getSPtr(cityAliasResult.front()->getCity());
-								}
-							}
 						}
 					}
 
+						// Search of the city
+						if(!cityCode.empty())
+						{
+							CityTableSync::SearchResult cityResult(
+										CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
+										);
+							if(!cityResult.empty())
+							{
+								city = cityResult.front();
+							}
+							else
+							{
+								// If no city was found, attempting to find an alias with the right code
+								CityAliasTableSync::SearchResult cityAliasResult(
+											CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
+											);
+
+								if(cityAliasResult.empty())
+								{
+									_logError(
+												"Stop point "+ stopAreaKey + " does not link to a valid city ('"+ cityCode +"')"
+												);
+									failure = true;
+									continue;
+								}
+
+								city = _env.getSPtr(cityAliasResult.front()->getCity());
+							}
+						}
+
 					// Stop area
-					map<string,StopArea*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
+					map<string,StopArea*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopAreaKey));
 					StopArea* curStop(NULL);
 					if(itcstop != commercialStopsByPhysicalStop.end())
 					{
@@ -1601,7 +1633,7 @@ namespace synthese
 					{
 						stopPoints = _createOrUpdateStop(
 							_stopPoints,
-							stopKey,
+							stopAreaKey,
 							name,
 							optional<const RuleUser::Rules&>(),
 							curStop,
@@ -1613,7 +1645,7 @@ namespace synthese
 					{
 						stopPoints = _createOrUpdateStopWithStopAreaAutocreation(
 							_stopPoints,
-							stopKey,
+							stopAreaKey,
 							name,
 							geometry.get(),
 							*city,
@@ -1625,7 +1657,7 @@ namespace synthese
 					if(stopPoints.empty())
 					{
 						_logError(
-							"Stop "+ stopKey +" not found and cannot be created in any commercial stop ("+ name +")"
+							"Stop "+ stopAreaKey +" not found and cannot be created in any commercial stop ("+ name +")"
 						);
 						failure = true;
 						continue;
@@ -1635,7 +1667,7 @@ namespace synthese
 				{
 					if(	_getStopPoints(
 							_stopPoints,
-							stopKey,
+							stopAreaKey,
 							name
 						).empty()
 					){
