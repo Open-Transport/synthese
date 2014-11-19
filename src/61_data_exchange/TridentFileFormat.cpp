@@ -1667,7 +1667,7 @@ namespace synthese
 				{
 					_logError(
 						"StopArea "+ string(containedNode.getText()) +" not found. (Referenced by StopPoint '"+
-						string(spKeyNode.getText()) + "')3377704015501487"
+						string(spKeyNode.getText()) + "')"
 					);
 					failure = true;
 					continue;
