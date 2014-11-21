@@ -387,10 +387,13 @@ namespace synthese
 			}
 
 			ptime now(second_clock::local_time());
+			// If LinkBreakMinutes is set to 0, it means full dump should only be done manually
+			// (resetting LastActivityReport)
 			return
 				get<LastActivityReport>().is_not_a_date_time() ||
 				!config ||
-				now - get<LastActivityReport>() >= config->get<LinkBreakMinutes>()
+				(config->get<LinkBreakMinutes>() != minutes(0) &&
+					now - get<LastActivityReport>() >= config->get<LinkBreakMinutes>())
 			;
 		}
 
