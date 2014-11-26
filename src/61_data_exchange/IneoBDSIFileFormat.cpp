@@ -29,12 +29,14 @@
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "CommercialLine.h"
 #include "DataSourceTableSync.h"
+#include "DeactivationPTDataInterSYNTHESE.hpp"
 #include "Depot.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DisplayScreen.h"
 #include "DBModule.h"
 #include "DBTransaction.hpp"
 #include "Import.hpp"
+#include "InterSYNTHESEModule.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "ParametersMap.h"
@@ -61,6 +63,7 @@ namespace synthese
 	using namespace departure_boards;
 	using namespace graph;
 	using namespace impex;
+	using namespace inter_synthese;
 	using namespace messages;
 	using namespace pt;
 	using namespace pt_operation;
@@ -81,6 +84,7 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_SECTION = "ms";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE = "send_deactivations_by_inter_synthese";
 		
 		
 		
@@ -145,6 +149,9 @@ namespace synthese
 			_dayBreakTime = duration_from_string(
 				map.getDefault<string>(PARAMETER_DAY_BREAK_TIME, "03:00:00")
 			);
+			
+			// Send service deactivations by inter_synthese
+			_sendDeactivationsByInterSYNTHESE = map.getDefault<bool>(PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE, false);
 		}
 
 
@@ -1280,6 +1287,17 @@ namespace synthese
 							string(),
 							string()
 						);
+						
+						// Deactivation Inter-SYNTHESE sync
+						if(_sendDeactivationsByInterSYNTHESE)
+						{
+							DeactivationPTDataInterSYNTHESE::Content content(*service);
+							inter_synthese::InterSYNTHESEModule::Enqueue(
+								content,
+								boost::optional<db::DBTransaction&>(),
+								service
+							);
+						}
 					}
 					catch (...)
 					{
