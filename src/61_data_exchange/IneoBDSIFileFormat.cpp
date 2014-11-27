@@ -537,6 +537,11 @@ namespace synthese
 					);
 				}
 			}
+			if(_dbConnString)
+			{
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a lu " + lexical_cast<string>(chainages.size()));
+				Log::GetInstance().debug("IneoBDSIFileFormat : On lit les courses dans la BDSI");
+			}
 
 			// Courses
 			{
@@ -688,7 +693,7 @@ namespace synthese
 			if(_dbConnString)
 			{
 				Log::GetInstance().debug("IneoBDSIFileFormat : courses on en a lu " + lexical_cast<string>(courses.size()));
-			}				
+			}
 
 			// Programmations
 			{
