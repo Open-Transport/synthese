@@ -72,7 +72,6 @@ namespace synthese
 			scom::SCOMModule::_sr->Stop();
 
 			delete scom::SCOMModule::_sr;
-			delete scom::SCOMModule::_sd;
 		}
 
 		// Empty functions

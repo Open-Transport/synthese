@@ -110,6 +110,9 @@ namespace synthese
 			boost::shared_ptr<boost::thread> _thread;
 			boost::shared_ptr<boost::thread> _followThread;
 
+			// Enable/disable the module
+			bool _enabled;
+
 			// The server IP/FQDN and port
 			std::string _server;
 			unsigned short _port;
@@ -153,6 +156,10 @@ namespace synthese
 			// Avoids an external thread to set the next state before the main loop overwrite it
 			boost::signals2::mutex _mutex;
 
+			// Mutex for enabling the service
+			// Used when the service is disabled, for the main loop to wait on re-enable
+			boost::signals2::mutex _mutexDisable;
+
 			// Enumeration of possible states
 			enum States {
 				RESOLVE,
@@ -175,6 +182,7 @@ namespace synthese
 			int _timeouts[STATE_NUMBER];
 
 			// Internal settings
+			static const std::string SETTING_ENABLED;
 			static const std::string SETTING_RESOLVERETRY;
 			static const std::string SETTING_CONNECTRETRY;
 			static const std::string SETTING_SERVER;

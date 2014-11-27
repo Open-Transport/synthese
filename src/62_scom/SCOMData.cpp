@@ -332,16 +332,21 @@ namespace synthese
 				{
 					if ( data.borne == it->borne && data.line == it->line && data.destination == it->destination)
 					{
-						// Replace the old value if the received on is more recent
-						if (it->sentAt < data.sentAt)
+						// The new time must be close to the old one, else it is considered as another course
+						// The maximum difference is the same one that is used in the GetWaitingTime function
+						if ( abs( data.tps - it->tps ) < _maxTimeDiff.minutes() )
 						{
-							_datas.erase(it);
+							// Replace the old value if the received on is more recent
+							if (it->sentAt < data.sentAt)
+							{
+								_datas.erase(it);
+							}
+							else // This means that we received a data older than the one we have. Odd, but with the network between, might happen.
+							{
+								toInsert = false;
+							}
+							break; // As this is applied every time something is added, no need to search in all the data, the first found is enough
 						}
-						else // This means that we received a data older than the one we have. Odd, but with the network between, might happen.
-						{
-							toInsert = false;
-						}
-						break; // As this is applied every time something is added, no need to search in all the data, the first found is enough
 					}
 				}
 

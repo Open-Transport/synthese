@@ -47,6 +47,7 @@ namespace synthese
 		using namespace synthese::settings;
 
 		// Settings names
+		const std::string SCOMSocketReader::SETTING_ENABLED = "enabled";
 		const std::string SCOMSocketReader::SETTING_RESOLVERETRY = "resolveretry";
 		const std::string SCOMSocketReader::SETTING_CONNECTRETRY = "connectretry";
 		const std::string SCOMSocketReader::SETTING_SERVER = "serverip";
@@ -65,6 +66,7 @@ namespace synthese
 		// (At least I hope... noba)
 		SCOMSocketReader::SCOMSocketReader (SCOMData *dataHandler) :
 			_dataHandler(dataHandler),
+			_enabled(false),
 			_followSocket(NULL),
 			_followAcceptor(NULL),
 			_followHasClient(false),
@@ -75,6 +77,7 @@ namespace synthese
 			_idpos(0)
 		{
 			// Fetch the settings
+			_enabled = Settings::GetInstance().Init<bool>(SETTINGS_MODULE, SETTING_ENABLED,false);
 			_resolveRetry = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_RESOLVERETRY,20);
 			_connectRetry = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_CONNECTRETRY,10);
 			_server = Settings::GetInstance().Init<std::string>(SETTINGS_MODULE, SETTING_SERVER,"127.0.0.1");
@@ -98,6 +101,7 @@ namespace synthese
 			boost::algorithm::split(_ids,ids,boost::algorithm::is_any_of(","));
 			
 			// Register for the settings changes
+			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_ENABLED, this);
 			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_RESOLVERETRY, this);
 			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_CONNECTRETRY, this);
 			Settings::GetInstance().Register(SETTINGS_MODULE, SETTING_SERVER, this);
@@ -118,6 +122,9 @@ namespace synthese
 			// Boost's input/output service
 			_ios = new io_service();
 			_followIos = new io_service();
+
+			// By default this one should be locked
+			_mutexDisable.lock();
 		}
 
 
@@ -261,15 +268,15 @@ namespace synthese
 			boost::system::error_code error;
 
 			// SCOM socket
-			Log::GetInstance().debug("SCOM : Closing the SCOM socket");
-			_socket->close(error);
-			if (error)
-			{
-				Log::GetInstance().warn("SCOM : Error while closing socket : " + error.message());
-			}
-
 			if (_socket)
 			{
+				Log::GetInstance().debug("SCOM : Closing the SCOM socket");
+				_socket->close(error);
+				if (error)
+				{
+					Log::GetInstance().warn("SCOM : Error while closing socket : " + error.message());
+				}
+
 				delete _socket;
 				_socket = NULL;
 			}
@@ -401,8 +408,6 @@ namespace synthese
 			// Go to next step
 			_state = _next;
 
-			//Log::GetInstance().debug("Entering the " + _stateName[_state] + " state");
-
 			// Remove the timer (if any)
 			if (_timer)
 			{
@@ -414,8 +419,8 @@ namespace synthese
 			// Timeout for this specific operation
 			int timeout = _timeouts[_state];
 
-			// If the timeout is bigger than 0, setup a timer
-			if (timeout > 0)
+			// If the timeout is bigger than 0 and we are enabled, setup a timer
+			if (timeout > 0 && _enabled)
 			{
 				//Log::GetInstance().debug("New timeout for " + _stateName[_state]);
 				_timer = new deadline_timer(*_ios);
@@ -488,6 +493,7 @@ namespace synthese
 				}
 
 				// Close the socket and start the connection again
+				// If we are disabled, wait for us to be re-enabled
 				case CLOSE :
 				{
 					_close();
@@ -495,7 +501,17 @@ namespace synthese
 					timerClose.wait();
 					_next = RESOLVE;
 					_mutex.unlock();
+
+					// If we are disabled, wait on re-enabling
+					if ( ! _enabled )
+					{
+						Log::GetInstance().info("SCOM : Service disabled");
+						_mutexDisable.lock();
+						Log::GetInstance().info("SCOM : Service enabled");
+					}
+
 					_mainLoop("", boost::system::error_code());
+
 					break;
 				}
 
@@ -568,6 +584,16 @@ namespace synthese
 				{
 					_followPort = Settings::GetInstance().Get<int>(SETTINGS_MODULE, SETTING_FOLLOWPORT,_followPort);
 				}
+				else if (name == SETTING_ENABLED)
+				{
+					_enabled = Settings::GetInstance().Get<bool>(SETTINGS_MODULE, SETTING_ENABLED,_enabled);
+
+					// If enabled, unlock the main loop
+					if (_enabled)
+					{
+						_mutexDisable.unlock();
+					}
+				}
 				else
 				{
 					Log::GetInstance().error("SCOMSocketReader : invalid setting : " + name);
@@ -582,13 +608,17 @@ namespace synthese
 					 name == SETTING_PORT ||
 					 name == SETTING_ID ||
 					 name == SETTING_BORNES ||
-					 name == SETTING_FOLLOWPORT ) &&
+					 name == SETTING_FOLLOWPORT ||
+					 name == SETTING_ENABLED ) &&
 					notify
 				)
 				{
 					Log::GetInstance().debug("SCOMSocketReader : reloading the service");
+
 					_mutex.lock();
+
 					_next = CLOSE;
+
 					_mutex.unlock();
 				}
 			}
