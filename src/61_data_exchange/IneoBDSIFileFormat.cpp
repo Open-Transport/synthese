@@ -1291,6 +1291,7 @@ namespace synthese
 						// Deactivation Inter-SYNTHESE sync
 						if(_sendDeactivationsByInterSYNTHESE)
 						{
+							util::Log::GetInstance().debug("Désactivation de la course " + lexical_cast<string>(service->getKey()));
 							DeactivationPTDataInterSYNTHESE::Content content(*service);
 							inter_synthese::InterSYNTHESEModule::Enqueue(
 								content,
