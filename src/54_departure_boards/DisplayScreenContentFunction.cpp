@@ -178,6 +178,9 @@ namespace synthese
 
 		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
 
+		const string DisplayScreenContentFunction::DATA_HANDICAPPED_ACCESS("service_handicapped_compliance_id");
+
+
 		const string PIPO_KEY("00");
 		vector<string> DisplayScreenContentFunction::_SAELine;
 
@@ -1535,6 +1538,12 @@ namespace synthese
 				){
 					pm.insert(DATA_BLINKS, true);
 				}
+
+				// Handicapped access
+				const PTUseRule* handicappedUserRule = dynamic_cast<const PTUseRule*>(
+					&(row.first.getService())->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
+				);
+				pm.insert(DATA_HANDICAPPED_ACCESS, handicappedUserRule ? handicappedUserRule->getKey() : 0);
 
 				// Time
 				pm.insert(DATA_TIME, to_iso_extended_string(row.first.getDepartureDateTime().date()) + " " + to_simple_string(row.first.getDepartureDateTime().time_of_day()));
