@@ -125,7 +125,7 @@ namespace synthese
 					}
 
 					// Loop on services
-					ptime departureDateTime = _startDateTime;
+					ptime departureDateTime = realStartDateTime;
 					optional<Edge::DepartureServiceIndex::Value> index;
 					size_t insertedServices(0);
 					while(true)
