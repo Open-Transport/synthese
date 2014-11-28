@@ -247,6 +247,8 @@ namespace synthese
 						Log::GetInstance().warn("Exception in Inter-SYNTHESE full Real Time update process", e);
 					}
 					
+					slave->markAsUpToDate();
+					
 					slave.reset();
 				}
 
