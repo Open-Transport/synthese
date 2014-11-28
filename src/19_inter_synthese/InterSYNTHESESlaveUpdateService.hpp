@@ -53,6 +53,7 @@ namespace synthese
 			
 			static const std::string PARAMETER_SLAVE_ID;
 			static const std::string PARAMETER_ASK_ID_RANGE;
+			static const std::string PARAMETER_STARTING_TIME;
 
 		protected:
 			//! \name Page parameters
@@ -60,6 +61,7 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> _slaveId;
 				boost::shared_ptr<InterSYNTHESESlave> _slave;
 				bool _askIdRange;
+				boost::posix_time::ptime _slaveStartingDate;
 			//@}
 			
 			
@@ -89,13 +91,16 @@ namespace synthese
 			
 			static bool bgUpdaterDone;
 			static boost::mutex bgMutex;
+			static boost::mutex bgRTMutex;
 			static boost::shared_ptr<InterSYNTHESESlave> bgNextSlave;
+			static boost::shared_ptr<InterSYNTHESESlave> bgRTNextSlave;
 
 		public:
 			//! @name Setters
 			//@{
 				void setSlaveId(util::RegistryKeyType value){ _slaveId = value; }
 				void setAskIdRange(util::RegistryKeyType value){ _askIdRange = value; }
+				void setSlaveStartingTime(boost::posix_time::ptime value){ _slaveStartingDate = value; }
 			//@}
 
 
@@ -129,6 +134,7 @@ namespace synthese
 
 
 			bool bgProcessSlave(const boost::shared_ptr<InterSYNTHESESlave> &slave) const;
+			bool bgRTProcessSlave(const boost::shared_ptr<InterSYNTHESESlave> &slave) const;
 			static void RunBackgroundUpdater();
 
 

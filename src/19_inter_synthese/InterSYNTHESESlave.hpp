@@ -116,6 +116,7 @@ namespace synthese
 
 				bool fullUpdateNeeded() const;
 				void processFullUpdate() const;
+				void processFullRTUpdate() const;
 				QueueRange getQueueRange() const;
 
 				boost::recursive_mutex& getQueueMutex() const { return _queueMutex; }
