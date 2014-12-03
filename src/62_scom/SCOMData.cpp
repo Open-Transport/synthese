@@ -98,8 +98,7 @@ namespace synthese
 				return;
 			}
 
-			// Too much debug for prod, so commented
-			//Log::GetInstance().debug("SCOM Data : New data "+data);
+			_mutex.lock();
 
 			try
 			{
@@ -126,6 +125,9 @@ namespace synthese
 					std::istringstream ssd(date + " " + time);
 					ssd.imbue(std::locale(ssd.getloc(), new boost::posix_time::time_input_facet("%d/%m/%Y %H:%M:%S")));
 					ssd >> d.sentAt;
+
+					// Clean the old data for this borne
+					_preCleanup(d.borne);
 
 					// Fetch the lines
 					BOOST_FOREACH( ptree::value_type & l, m.second.get_child("LISTE_LIGNE_ECRAN") )
@@ -193,6 +195,8 @@ namespace synthese
 			{
 				Log::GetInstance().warn("SCOM Data : Failed to parse xml message with unknown error");
 			}
+
+			_mutex.unlock();
 		}
 
 		// Return the waiting time as specified by SCOMData documentation
@@ -309,8 +313,37 @@ namespace synthese
 			for(std::vector<Data>::iterator it = _datas.begin(); it != _datas.end(); ++it) {
 				if ( it->receivedAt < maxDate )
 				{
+					// Remove everything between here and the end
+					Log::GetInstance().debug("SCOM Data : Too old, removed : " + it->borne + " at " + boost::posix_time::to_simple_string(it->receivedAt));
 					_datas.erase(it,_datas.end());
 					break;
+				}
+			}
+		}
+
+		// Remove the data corresponding to this borne prior to add the new ones
+		// If a waiting time of 0 is found, it will be changed to -1
+		// Why? When a bus is not at the stop anymore, the only sign of it will be
+		// its absence from the new data. To ensure the bus disapears from the borne,
+		// its new waiting time is set to -1
+		void SCOMData::_preCleanup(const std::string& borne)
+		{
+			// Remove data for this borne
+			for (size_t i = 0; i < _datas.size(); i++) {
+				if ( _datas.at(i).borne == borne )
+				{
+					// If its time is 0, change it to -1
+					if ( _datas.at(i).tps == 0 )
+					{
+						_datas[i].tps = -1;
+						Log::GetInstance().debug("SCOM Data : Set at -1 : " + _datas.at(i).borne + " at " + boost::posix_time::to_simple_string(_datas.at(i).sentAt) + " for " + _datas.at(i).line + " " + _datas.at(i).destination + " (" + boost::lexical_cast<std::string>(_datas.at(i).tps) + ")");
+					}
+					else if ( _datas.at(i).tps != -1 ) // Keep the -1 values : should be cleaned up after a while
+					{
+						Log::GetInstance().debug("SCOM Data : Cleaned : " + _datas.at(i).borne + " at " + boost::posix_time::to_simple_string(_datas.at(i).sentAt) + " for " + _datas.at(i).line + " " + _datas.at(i).destination + " (" + boost::lexical_cast<std::string>(_datas.at(i).tps) + ")");
+						_datas.erase(_datas.begin()+i);
+						i--;
+					}
 				}
 			}
 		}
@@ -318,7 +351,6 @@ namespace synthese
 		// Loop through the datas and insert when the time is in order
 		void SCOMData::_append(const Data &data)
 		{
-			_mutex.lock();
 
 			// If the vector is empty, just add it
 			if (_datas.empty())
@@ -327,60 +359,49 @@ namespace synthese
 			}
 			else
 			{
-				// Try to find a data for the same borne/line/direction and remove it if it is older
-				bool toInsert = true;
-				for (std::vector<Data>::iterator it = _datas.begin(); it != _datas.end(); ++it)
+				// If the time is 0, we will check the current data for any value at -1 for
+				// this same borne/line/destination. If there is one, we replace it.
+				if (data.tps == 0)
 				{
-					if ( data.borne == it->borne && data.line == it->line && data.destination == it->destination)
-					{
-						// The new time must be close to the old one, else it is considered as another course
-						// The maximum difference is the same one that is used in the GetWaitingTime function
-						if ( abs( data.tps - it->tps ) < _maxTimeDiff.minutes() )
-						{
-							// Replace the old value if the received on is more recent
-							if (it->sentAt < data.sentAt)
-							{
-								_datas.erase(it);
-							}
-							else // This means that we received a data older than the one we have. Odd, but with the network between, might happen.
-							{
-								toInsert = false;
-							}
-							break; // As this is applied every time something is added, no need to search in all the data, the first found is enough
-						}
-					}
-				}
-
-				// Insert sorted by received time (if needed)
-				if ( toInsert )
-				{
-					bool inserted = false;
 					for (std::vector<Data>::iterator it = _datas.begin(); it != _datas.end(); ++it)
 					{
-						// Sorted with receivedAt, why?
-						// Because this data is cleaned using the local time, not the SCOM time.
-						// So it is the arrival order that is used, not the message time
-						if (it->receivedAt < data.receivedAt)
+						if ( it->borne == data.borne &&
+							 it->line == data.line &&
+							 it->destination == data.destination &&
+							 it->tps == -1 )
 						{
-							_datas.insert(it,data);
-							inserted = true;
-							break;
+							Log::GetInstance().debug("SCOM Data : Remove -1 value : " + it->borne + " at " + boost::posix_time::to_simple_string(it->sentAt) + " for " + it->line + " " + it->destination + " (" + boost::lexical_cast<std::string>(it->tps) + ")");
+							_datas.erase(it);
+							break; // There cannot be more than one value
 						}
 					}
-
-					// If not inserted now, insert at the bottom
-					if ( ! inserted )
-					{
-						_datas.insert(_datas.end(),data);
-					}
-
-					// Cleanup the old stuff
-					_cleanup();
 				}
+
+				bool inserted = false;
+
+				for (std::vector<Data>::iterator it = _datas.begin(); it != _datas.end(); ++it)
+				{
+					// Sorted with receivedAt, why?
+					// Because this data is cleaned using the local time, not the SCOM time.
+					// So it is the arrival order that is used, not the message time
+					if (it->receivedAt < data.receivedAt)
+					{
+						_datas.insert(it,data);
+						inserted = true;
+						break;
+					}
+				}
+
+				// If not inserted now, insert at the bottom
+				if ( ! inserted )
+				{
+					_datas.insert(_datas.end(),data);
+				}
+
+				// Cleanup the old stuff
+				_cleanup();
 			}
 
-
-			_mutex.unlock();
 		}
 
 

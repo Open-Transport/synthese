@@ -212,6 +212,10 @@ namespace synthese
 			// Cleanup any old data around here
 			void _cleanup ();
 
+			// Remove data for a specific borne
+			// Each value at tps = 0 will be kept but changed to -1
+			void _preCleanup (const std::string& borne);
+
 			// Add the data to the vector in the right order
 			// Is protected by a mutex
 			void _append (const Data& data);
