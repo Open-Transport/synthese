@@ -124,6 +124,7 @@ namespace synthese
 			if (!_slaveStartingDate.is_not_a_date_time() &&
 				_slaveStartingDate > _slave->get<LastActivityReport>())
 			{
+				util::Log::GetInstance().debug("InterSYNTHESESlaveUpdateService : doing RT full dump");
 				if(bgRTProcessSlave(_slave))
 				{
 					stream << "we are processing your initial Real Time dump. come back soon!";
