@@ -30,6 +30,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace synthese
 {
@@ -131,7 +132,7 @@ namespace synthese
 					{
 						// One data for each line, so a copy is made
 						Data dl = d;
-						dl.line = l.second.get<std::string>("<xmlattr>.LIGNE");
+						dl.line = boost::algorithm::trim_copy(l.second.get<std::string>("<xmlattr>.LIGNE"));
 
 						// Separate each values (DEST1, DEST2, etc... very weird XML from my point of view)
 						for (int i = 1; i < 3; i++)
@@ -175,7 +176,7 @@ namespace synthese
 							// Append the line
 							_append(dls);
 
-							Log::GetInstance().debug("SCOM Data : Received data for borne " + d.borne + " at " + boost::posix_time::to_simple_string(d.sentAt));
+							Log::GetInstance().debug("SCOM Data : Received data for borne " + d.borne + " at " + boost::posix_time::to_simple_string(d.sentAt) + " for " + dls.line + " " + dls.destination + " (" + boost::lexical_cast<std::string>(dls.tps) + ")");
 						}
 					}
 				}
