@@ -241,6 +241,7 @@ namespace synthese
 				{
 					try
 					{
+						util::Log::GetInstance().debug("InterSYNTHESESlaveUpdateService : BG Updater doing RT full dump");
 						slave->processFullRTUpdate();
 					}
 					catch(synthese::Exception& e)
