@@ -358,7 +358,6 @@ namespace synthese
 					){
 						if (item->get<NonPersistent>())
 						{
-							util::Log::GetInstance().debug("InterSYNTHESESlave : Item found");
 							interSYNTHESE->initQueue(
 								*this,
 								item->get<SyncPerimeter>()

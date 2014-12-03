@@ -120,15 +120,12 @@ namespace synthese
 			}
 			
 			// Full RT dump if LastActivityreport < SlaveStartingDate
-			util::Log::GetInstance().debug("InterSYNTHESESlaveUpdateService : test RT full dump");
 			if (!_slaveStartingDate.is_not_a_date_time() &&
 				_slaveStartingDate > _slave->get<LastActivityReport>())
 			{
-				util::Log::GetInstance().debug("InterSYNTHESESlaveUpdateService : doing RT full dump");
 				if(bgRTProcessSlave(_slave))
 				{
 					stream << "we are processing your initial Real Time dump. come back soon!";
-					util::Log::GetInstance().debug("InterSYNTHESESlaveUpdateService : we are processing your initial Real Time dump. come back soon!");
 				}
 				else
 				{
@@ -136,7 +133,6 @@ namespace synthese
 				}
 				return ParametersMap();
 			}
-			util::Log::GetInstance().debug("InterSYNTHESESlaveUpdateService : after test RT full dump");
 
 			recursive_mutex::scoped_lock queueLock(_slave->getQueueMutex());
 			InterSYNTHESESlave::QueueRange range(_slave->getQueueRange());
@@ -241,7 +237,6 @@ namespace synthese
 				{
 					try
 					{
-						util::Log::GetInstance().debug("InterSYNTHESESlaveUpdateService : BG Updater doing RT full dump");
 						slave->processFullRTUpdate();
 					}
 					catch(synthese::Exception& e)
