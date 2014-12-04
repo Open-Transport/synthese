@@ -101,7 +101,7 @@ namespace synthese
 			}
 
 			// Load of the service
-			boost::shared_ptr<SchedulesBasedService> service;
+			ScheduledService* service(NULL);
 			try
 			{
 				RegistryKeyType serviceId(
@@ -109,11 +109,7 @@ namespace synthese
 				);
 				if(decodeTableId(serviceId) == ScheduledServiceTableSync::TABLE.ID)
 				{
-					service = Env::GetOfficialEnv().getCastEditable<SchedulesBasedService, ScheduledService>(serviceId);
-				}
-				else if(decodeTableId(serviceId) == ContinuousServiceTableSync::TABLE.ID)
-				{
-					service = Env::GetOfficialEnv().getCastEditable<SchedulesBasedService, ContinuousService>(serviceId);
+					service = Env::GetOfficialEnv().getEditable<ScheduledService>(serviceId).get();
 				}
 			}
 			catch (bad_lexical_cast&)
@@ -126,8 +122,13 @@ namespace synthese
 			}
 
 			// Deactivation of the service
-			boost::gregorian::date today(boost::gregorian::day_clock::local_day());
-			service->setInactive(today);
+			if (service)
+			{
+				boost::gregorian::date today(boost::gregorian::day_clock::local_day());
+				service->setInactive(today);
+				
+				ScheduledServiceTableSync::Save(service);
+			}
 
 			return true;
 		}
