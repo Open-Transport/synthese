@@ -45,6 +45,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(AutoImportTime, "auto_import_time", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(LogPath, "log_path", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(MinLogLevel, "min_log_level", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Forbidden, "forbidden", SQL_BOOLEAN)
 
 	namespace impex
 	{
@@ -63,7 +64,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Active, true),
 					FIELD_DEFAULT_CONSTRUCTOR(LogPath),
 					FIELD_VALUE_CONSTRUCTOR(MinLogLevel, IMPORT_LOG_WARN),
-					FIELD_DEFAULT_CONSTRUCTOR(Documentation)
+					FIELD_DEFAULT_CONSTRUCTOR(Documentation),
+					FIELD_VALUE_CONSTRUCTOR(Forbidden, false)
 			)	),
 			_nextAutoImport(not_a_date_time)
 		{}
