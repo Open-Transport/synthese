@@ -1,0 +1,10 @@
+*** Settings ***
+Documentation     Bla bla bla
+Resource          sae.txt
+
+*** Variables ***
+
+*** Keywords ***
+Le bus transmet une demande de rappel normale à la régulation
+    [Documentation]    FAKE : this will directly create input object in synthese
+    Create Vehicle Call    vehicleId\=19421777688002561    priority\=false

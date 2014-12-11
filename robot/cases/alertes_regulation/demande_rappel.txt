@@ -1,0 +1,12 @@
+*** Settings ***
+Documentation     Tests fonctionnels de la remontée d'alertes de régulation
+Test Setup        Démarrer SAE
+Test Teardown     Arrêter SAE
+Resource          ../../resources/onboard.txt
+Resource          ../../resources/ops.txt
+
+*** Test Cases ***
+Demande de rappel normal
+    [Tags]    regulation
+    Le bus transmet une demande de rappel normale à la régulation
+    La régulation reçoit une demande de rappel normal provenant du bus

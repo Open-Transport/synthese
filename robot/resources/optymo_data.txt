@@ -1,0 +1,8 @@
+*** Settings ***
+Documentation     Bla bla bla
+
+*** Variables ***
+${TEST_DB3}       ${CURDIR}/optymo.db3
+${TEST_VEHICLE_ID}    19421777688002561
+
+*** Keywords ***

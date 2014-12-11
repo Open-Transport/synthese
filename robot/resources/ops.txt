@@ -1,0 +1,10 @@
+*** Settings ***
+Documentation     Bla bla bla
+Resource          sae.txt
+
+*** Variables ***
+
+*** Keywords ***
+La régulation reçoit une demande de rappel normal provenant du bus
+    [Documentation]    FAKE : this will directly check for existence of alert on SAE
+    Log Many    toto

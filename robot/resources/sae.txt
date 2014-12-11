@@ -1,0 +1,25 @@
+*** Settings ***
+Documentation     Bla bla bla
+Library           Process
+Library           Telnet
+Library           OperatingSystem
+Resource          synthese.txt
+Resource          optymo_data.txt
+
+*** Variables ***
+
+*** Keywords ***
+Démarrer SAE
+    Utiliser données réseau    ${TEST_DB3}
+    Start Synthese
+
+Arrêter SAE
+    Stop Synthese
+
+Utiliser données réseau
+    [Arguments]    ${testData}
+    Copy File    ${testData}    ${S3_SERVER_DB}
+
+Create Vehicle Call
+    [Arguments]    ${vehicleId}    ${priority}
+    Create Synthese Object    119    field_vehicle_id\=${vehicleId}    priority\=${priority}
