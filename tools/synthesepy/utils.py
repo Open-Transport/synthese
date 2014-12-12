@@ -484,6 +484,49 @@ class SVNInfo(object):
         return self._last_msg
 
 
+        self._branch = _get_branch_from_env()
+        self._version = None
+        self._last_msg = None
+
+    # Jenkins publishes the git branch in the GIT_BRANCH env variable
+    def _get_branch_from_env():
+        try:
+            return os.environ['GIT_BRANCH'].split("/")[-1]
+        except:
+            return None
+
+    @property
+    def branch(self):
+        if not self._branch:
+            self._branch = subprocess.Popen(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                cwd=self.repo_path,
+                stdout=subprocess.PIPE).communicate()[0].strip('\n')
+        return self._branch
+
+    @property
+    def version(self):
+        if not self._version:
+            self._version = subprocess.Popen(
+                ['git', 'log', '-1', '--format=%h'],
+                cwd=self.repo_path,
+                stdout=subprocess.PIPE).communicate()[0].strip('\n')
+        return self._version
+
+    def _fetch_svn_log(self):
+        if not self._last_msg:
+            self._version = subprocess.Popen(
+                ['git', 'log', '-1', '--format=%s'],
+                cwd=self.repo_path,
+                stdout=subprocess.PIPE).communicate()[0].strip('\n')
+        return self._last_msg
+
+    @property
+    def last_msg(self):
+        if not self._last_msg:
+            self._fetch_svn_log()
+        return self._last_msg
+
 class DirObjectLoader(object):
     '''
     Mixin for loading creating and loading objects corresponding to directories
