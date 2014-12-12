@@ -488,9 +488,16 @@ class GITInfo(object):
     def __init__(self, repo_path):
         self.repo_path = repo_path
 
-        self._branch = None
+        self._branch = self._get_branch_from_env()
         self._version = None
         self._last_msg = None
+
+    # Jenkins publishes the git branch in the GIT_BRANCH env variable
+    def _get_branch_from_env(self):
+        try:
+            return os.environ['GIT_BRANCH'].split("/")[-1]
+        except:
+            return None
 
     @property
     def branch(self):
@@ -510,7 +517,7 @@ class GITInfo(object):
                 stdout=subprocess.PIPE).communicate()[0].strip('\n')
         return self._version
 
-    def _fetch_svn_log(self):
+    def _fetch_log(self):
         if not self._last_msg:
             self._version = subprocess.Popen(
                 ['git', 'log', '-1', '--format=%s'],
@@ -521,7 +528,7 @@ class GITInfo(object):
     @property
     def last_msg(self):
         if not self._last_msg:
-            self._fetch_svn_log()
+            self._fetch_log()
         return self._last_msg
 
 class DirObjectLoader(object):
