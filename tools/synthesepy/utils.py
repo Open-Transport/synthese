@@ -489,7 +489,7 @@ class SVNInfo(object):
         self._last_msg = None
 
     # Jenkins publishes the git branch in the GIT_BRANCH env variable
-    def _get_branch_from_env():
+    def _get_branch_from_env(self):
         try:
             return os.environ['GIT_BRANCH'].split("/")[-1]
         except:
