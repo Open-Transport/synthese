@@ -488,9 +488,16 @@ class GITInfo(object):
     def __init__(self, repo_path):
         self.repo_path = repo_path
 
-        self._branch = None
+        self._branch = _get_branch_from_env()
         self._version = None
         self._last_msg = None
+
+    # Jenkins publishes the git branch in the GIT_BRANCH env variable
+    def _get_branch_from_env():
+        try:
+            return os.environ['GIT_BRANCH'].split("/")[-1]
+        except:
+            return None
 
     @property
     def branch(self):
