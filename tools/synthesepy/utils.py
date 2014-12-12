@@ -517,7 +517,7 @@ class GITInfo(object):
                 stdout=subprocess.PIPE).communicate()[0].strip('\n')
         return self._version
 
-    def _fetch_svn_log(self):
+    def _fetch_log(self):
         if not self._last_msg:
             self._version = subprocess.Popen(
                 ['git', 'log', '-1', '--format=%s'],
@@ -528,7 +528,7 @@ class GITInfo(object):
     @property
     def last_msg(self):
         if not self._last_msg:
-            self._fetch_svn_log()
+            self._fetch_log()
         return self._last_msg
 
 class DirObjectLoader(object):
