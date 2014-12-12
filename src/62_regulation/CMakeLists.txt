@@ -19,6 +19,7 @@ CallbackRequestAlertProcessor.cpp
 Alert.hpp
 Alert.cpp
 AlertTableSync.hpp
+AlertTableSync.cpp
 
 #CheckLineCalendarFunction.cpp
 #CheckLineCalendarFunction.hpp

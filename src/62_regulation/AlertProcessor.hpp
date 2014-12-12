@@ -44,7 +44,7 @@ namespace synthese
 
 		public:
 
-			AlertProcessor();
+			AlertProcessor() {}
 			virtual ~AlertProcessor() {}
             
             virtual void processAlerts() = 0;

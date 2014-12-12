@@ -30,10 +30,12 @@ namespace synthese
     {
 
         CallbackRequestAlertProcessor::CallbackRequestAlertProcessor()
+            : AlertProcessor()
         {
         }
 
-        void processAlerts()
+        void
+        CallbackRequestAlertProcessor::processAlerts()
         {
         }
 

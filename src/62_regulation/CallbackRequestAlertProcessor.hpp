@@ -36,15 +36,12 @@ namespace synthese
         
 		class CallbackRequestAlertProcessor : public AlertProcessor
 		{
-            
         private:
-
-
-		protected:
-
+            
 		public:
 
 			CallbackRequestAlertProcessor();
+            ~CallbackRequestAlertProcessor() {}
             
             void processAlerts();
             
