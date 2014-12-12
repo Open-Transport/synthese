@@ -488,7 +488,7 @@ class GITInfo(object):
     def __init__(self, repo_path):
         self.repo_path = repo_path
 
-        self._branch = _get_branch_from_env()
+        self._branch = self._get_branch_from_env()
         self._version = None
         self._last_msg = None
 
