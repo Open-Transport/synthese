@@ -24,6 +24,7 @@ import logging
 import os
 from os.path import join
 import subprocess
+import datetime
 
 import synthesepy.build
 from synthesepy import utils
@@ -37,7 +38,8 @@ def run(env, args):
         raise Exception('Prefix is required.')
 
     git_info = utils.GITInfo(env.source_path)
-    revision_path = 'r{0}'.format(git_info.version)
+    revision_path = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    revision_path += '-{0}'.format(git_info.version)
 
     # On Linux, lets pick a more precise name for the platform
     # through lsb_release (this package must be installed)
