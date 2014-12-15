@@ -378,7 +378,7 @@ class Builder(object):
         # Add a suffix to the install dir to allow
         # different SYNTHESE to run on the same server
         if self.env.config.prefix_with_svnrelease:
-            git_info = utils.GITInfo(self.env.source_path)
+            git_info = utils.GITInfo(self.env.source_path, None)
             revision_path = '-r{0}'.format(git_info.version)
             self.config.prefix += revision_path
 
