@@ -355,7 +355,7 @@ def add_default_subparsers(subparsers):
     parser_continuous_integration.add_argument(
         '--prefix-with-svnrelease', action='store_true',
         help='Append the svn release number to the install prefix')
-    parser_build.add_argument(
+    parser_continuous_integration.add_argument(
         '--branch',
         help='The built branch')
 
