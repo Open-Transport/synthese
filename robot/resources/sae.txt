@@ -23,3 +23,8 @@ Utiliser données réseau
 Create Vehicle Call
     [Arguments]    ${vehicleId}    ${priority}
     Create Synthese Object    119    field_vehicle_id\=${vehicleId}    priority\=${priority}
+
+Update Vehicle Position
+    [Arguments]    ${vehicleId}    ${priority}
+    Create Synthese Object    72    
+

@@ -48,6 +48,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
+
 				//////////////////////////////////////////////////////////////////////////
 				///	Descent search.
 				///	@param env Environment to populate

@@ -33,14 +33,9 @@ namespace synthese
 	using namespace util;
 
 	CLASS_DEFINITION(Alert, "t120_alerts", 120)
-    /*
+    FIELD_DEFINITION_OF_TYPE(Kind, "kind", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Line, "line_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(Service, "service_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(Stop, "stop_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(ActivationTime, "activation_time", SQL_DATETIME)
-	FIELD_DEFINITION_OF_TYPE(ActivationUser, "activation_user_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(CancellationTime, "cancellation_time", SQL_DATETIME)
-	FIELD_DEFINITION_OF_TYPE(CancellationUser, "cancellation_user_id", SQL_INTEGER)
-    */
 
 	namespace regulation
 	{
@@ -50,15 +45,11 @@ namespace synthese
 		):	Registrable(id),
 			Object<Alert, AlertSchema>(
 				Schema(
-					FIELD_VALUE_CONSTRUCTOR(Key, id)
-/*					FIELD_DEFAULT_CONSTRUCTOR(Service),
-					FIELD_DEFAULT_CONSTRUCTOR(Stop),
-					FIELD_DEFAULT_CONSTRUCTOR(Date),
-					FIELD_DEFAULT_CONSTRUCTOR(ActivationTime),
-					FIELD_DEFAULT_CONSTRUCTOR(CancellationTime),
-					FIELD_DEFAULT_CONSTRUCTOR(ActivationUser),
-					FIELD_DEFAULT_CONSTRUCTOR(CancellationUser)
-*/
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Kind),
+					FIELD_DEFAULT_CONSTRUCTOR(Line),
+					FIELD_DEFAULT_CONSTRUCTOR(Service)
+
                     )
                 )
 		{}

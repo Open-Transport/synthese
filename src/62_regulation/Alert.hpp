@@ -23,17 +23,20 @@
 #ifndef SYNTHESE_regulation_Alert_hpp__
 #define SYNTHESE_regulation_Alert_hpp__
 
-#include "DateField.hpp"
-#include "ImportableTemplate.hpp"
-#include "PointerField.hpp"
-#include "PtimeField.hpp"
-#include "Registrable.h"
-#include "Registry.h"
+#include "Object.hpp"
+//#include "DateField.hpp"
+//#include "Registrable.h"
+//#include "Registry.h"
+#include "CommercialLine.h"
 #include "ScheduledService.h"
-#include "StopPoint.hpp"
-#include "User.h"
 
-#include "FrameworkTypes.hpp"
+//#include "FrameworkTypes.hpp"
+#include "PointerField.hpp"
+#include "EnumObjectField.hpp"
+
+#include "AlertTypes.hpp"
+
+#include "SchemaMacros.hpp"
 
 #include <set>
 #include <vector>
@@ -44,25 +47,16 @@ namespace synthese
 	{
 		class Alert;
 
-        /*
+        FIELD_ENUM(Kind, regulation::AlertType)
+		FIELD_POINTER(Line, pt::CommercialLine)
 		FIELD_POINTER(Service, pt::ScheduledService)
-		FIELD_POINTER(Stop, pt::StopPoint)
-		FIELD_POINTER(ActivationUser, security::User)
-		FIELD_POINTER(CancellationUser, security::User)
-		FIELD_PTIME(ActivationTime)
-		FIELD_PTIME(CancellationTime)
-        */
+
 
 		typedef boost::fusion::map<
-			FIELD(Key)
-/*			FIELD(Service),
-			FIELD(Stop),
-			FIELD(Date),
-			FIELD(ActivationTime),
-			FIELD(CancellationTime),
-			FIELD(ActivationUser),
-			FIELD(CancellationUser)
-            */
+			FIELD(Key),
+            FIELD(Kind),
+			FIELD(Line),
+			FIELD(Service)
 		> AlertSchema;
 
 		/** Alert class.
