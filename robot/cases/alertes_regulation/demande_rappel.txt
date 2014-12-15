@@ -8,6 +8,6 @@ Resource          ../../resources/ops.txt
 *** Test Cases ***
 Demande de rappel normal
     [Tags]    regulation
-    Le bus demarre son service à l'heure
+    Le bus prend son service
     Le bus transmet une demande de rappel normale à la régulation
     La régulation reçoit une demande de rappel normal provenant du bus

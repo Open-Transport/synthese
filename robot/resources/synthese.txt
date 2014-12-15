@@ -26,3 +26,10 @@ Call Synthese Service
     ${serviceParameters}=    Catenate    SEPARATOR=&    @{varargs}
     ${httpResponse}=    Get Request    synthese    ?SERVICE=${serviceName}&${serviceParameters}
     Should Be Equal As Strings    ${httpResponse.status_code}    200
+
+Call Synthese Action
+    [Arguments]    ${actionName}    @{varargs}
+    Create Session    synthese    ${S3_SERVER_URL}
+    ${actionParameters}=    Catenate    SEPARATOR=&    @{varargs}
+    ${httpResponse}=    Get Request    synthese    ?SERVICE=version&a=${actionName}&${actionParameters}
+    Should Be Equal As Strings    ${httpResponse.status_code}    200
