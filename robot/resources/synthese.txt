@@ -3,7 +3,7 @@ Documentation     Bla bla bla
 Library           RequestsLibrary
 
 *** Variables ***
-${S3_SERVER}      /home/mjambert/Workspace/rcs/synthese3/trunk_rcs_sae2/build/src/bin/server/s3-server
+${S3_SERVER}      /home/mjambert/Workspace/rcs/git/synthese3/build/src/bin/server/s3-server
 ${S3_SERVER_DB}    config.db3
 ${S3_SERVER_PORT}    8080
 ${S3_SERVER_URL}    http://localhost:${S3_SERVER_PORT}/

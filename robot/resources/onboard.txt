@@ -7,4 +7,4 @@ Resource          sae.txt
 *** Keywords ***
 Le bus transmet une demande de rappel normale à la régulation
     [Documentation]    FAKE : this will directly create input object in synthese
-    Create Vehicle Call    vehicleId\=19421777688002561    priority\=false
+    Create Vehicle Call    vehicleId=19421777688002561    priority=false
