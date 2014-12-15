@@ -485,10 +485,13 @@ class SVNInfo(object):
 
 class GITInfo(object):
     '''Class to retrieve metadata from a git repository'''
-    def __init__(self, repo_path):
+    def __init__(self, repo_path, branch):
         self.repo_path = repo_path
 
-        self._branch = None
+        if(branch):
+            self._branch = branch.split("/")[-1]
+        else:
+            self._branch = self._get_branch_from_env()
         self._version = None
         self._last_msg = None
 
