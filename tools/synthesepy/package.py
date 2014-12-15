@@ -40,6 +40,10 @@ def run(env, args):
     git_info = utils.GITInfo(env.source_path)
     revision_path = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     revision_path += '-{0}'.format(git_info.version)
+    # Override the branch from the command line, useful in Jenkins
+    # where we get HEAD instead of the branch
+    if config.branch:
+        git_info.branch = config.branch
 
     # On Linux, lets pick a more precise name for the platform
     # through lsb_release (this package must be installed)
