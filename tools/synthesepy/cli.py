@@ -44,7 +44,6 @@ import synthesepy.sqlite_to_mysql
 import synthesepy.system_install
 import synthesepy.test
 import synthesepy.utils
-import synthesepy.env
 from synthesepy import project_manager
 
 
@@ -356,6 +355,9 @@ def add_default_subparsers(subparsers):
     parser_continuous_integration.add_argument(
         '--prefix-with-svnrelease', action='store_true',
         help='Append the svn release number to the install prefix')
+    parser_continuous_integration.add_argument(
+        '--branch',
+        help='The built branch')
 
     parser_continuous_integration = subparsers.add_parser(
         'system_install',
