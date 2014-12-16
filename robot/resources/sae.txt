@@ -10,7 +10,7 @@ Resource          optymo_data.txt
 
 *** Keywords ***
 Démarrer SAE
-    Utiliser données réseau    ${TEST_DB3}
+    Utiliser données réseau    ${DB}
     Start Synthese
 
 Arrêter SAE

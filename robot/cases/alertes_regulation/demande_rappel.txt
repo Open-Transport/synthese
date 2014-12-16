@@ -4,10 +4,11 @@ Test Setup        Démarrer SAE
 Test Teardown     Arrêter SAE
 Resource          ../../resources/onboard.txt
 Resource          ../../resources/ops.txt
+Resource          ../../resources/optymo_data.txt
 
 *** Test Cases ***
 Demande de rappel normal
     [Tags]    regulation
-    Le bus 19421777688002561 prend son service
+    Le bus ${BUS1} prend son service ${SERVICE1}
     Le bus transmet une demande de rappel normale à la régulation
     La régulation voit une demande de rappel normal provenant du bus

@@ -2,7 +2,8 @@
 Documentation     Bla bla bla
 
 *** Variables ***
-${TEST_DB3}       ${CURDIR}/optymo.db3
-${TEST_VEHICLE_ID}    19421777688002561
+${DB}             ${CURDIR}/optymo.db3
+${BUS1}           19421777688002561
+${SERVICE1}       4504033419093583
 
 *** Keywords ***
