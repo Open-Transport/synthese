@@ -9,3 +9,5 @@ La régulation reçoit une demande de rappel normal provenant du bus
     [Documentation]    FAKE : this will directly check for existence of alert on SAE
     Sleep       3s
     Log Many    toto
+    TODO : call SAE alert list service => json and check there is one
+    alert of type callbackrequest

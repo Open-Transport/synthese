@@ -20,6 +20,8 @@ Alert.hpp
 Alert.cpp
 AlertTableSync.hpp
 AlertTableSync.cpp
+AlertListService.hpp
+AlertListService.cpp
 
 #CheckLineCalendarFunction.cpp
 #CheckLineCalendarFunction.hpp
