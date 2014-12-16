@@ -18,18 +18,19 @@ Stop Synthese
 
 Create Synthese Object
     [Arguments]    ${tableId}    @{varargs}
-    Call Synthese Service    objectcreate    table_id\=${tableId}    @{varargs}
+    ${httpResponse}    Call Synthese Service    objectcreate    table_id\=${tableId}    @{varargs}
+    [Return]    ${httpResponse}
 
 Call Synthese Service
     [Arguments]    ${serviceName}    @{varargs}
     Create Session    synthese    ${S3_SERVER_URL}
     ${serviceParameters}=    Catenate    SEPARATOR=&    @{varargs}
     ${httpResponse}=    Get Request    synthese    ?SERVICE=${serviceName}&${serviceParameters}
-    Should Be Equal As Strings    ${httpResponse.status_code}    200
+    [Return]    ${httpResponse}
 
 Call Synthese Action
     [Arguments]    ${actionName}    @{varargs}
     Create Session    synthese    ${S3_SERVER_URL}
     ${actionParameters}=    Catenate    SEPARATOR=&    @{varargs}
     ${httpResponse}=    Get Request    synthese    ?SERVICE=version&a=${actionName}&${actionParameters}
-    Should Be Equal As Strings    ${httpResponse.status_code}    200
+    [Return]    ${httpResponse}
