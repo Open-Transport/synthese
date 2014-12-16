@@ -22,6 +22,7 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "CallbackRequestAlertProcessor.hpp"
 
+#include "AlertTableSync.hpp"
 #include "VehicleCallTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "DB.hpp"
@@ -71,36 +72,35 @@ namespace synthese
             while(result->next())
             {
                 util::RegistryKeyType serviceId(result->get<util::RegistryKeyType>("service_id"));
-                std::cerr << "service id " << serviceId << std::endl;
-                boost::shared_ptr<const pt::ScheduledService> scheduledService(util::Env::GetOfficialEnv().get<pt::ScheduledService>(serviceId));
-                std::cerr << "TOTO1" << std::endl;
+                //std::cerr << "service id " << serviceId << std::endl;
+                boost::shared_ptr<pt::ScheduledService> scheduledService(
+                    util::Env::GetOfficialEnv().getEditable<pt::ScheduledService>(serviceId));
+
                 const pt::JourneyPattern* journeyPattern(scheduledService->getRoute());
-                /*
-                DBModule::LoadObjects(journeyPattern->getLinkedObjectsIds(*result), env, linkLevel);
-                obj->loadFromRecord(*rows, env);
-                */
-                
-                std::cerr << "TOTO2" << journeyPattern << " " << std::endl;
-				const pt::CommercialLine* commercialLine(journeyPattern->getCommercialLine());
-                std::cerr << "TOTO3" << journeyPattern->getKey() << std::endl;
-                
-                std::cerr << "Found vehicle call for service id = " << serviceId << " journey pattern id = " << journeyPattern->getKey() << " ; commercial line id  = " << commercialLine << std::endl;
+				pt::CommercialLine* commercialLine(journeyPattern->getCommercialLine());
 
-
-
+                //std::cerr << "TOTO2" << journeyPattern << " " << std::endl;
+                //std::cerr << "TOTO3" << journeyPattern->getKey() << std::endl;
                 
-/*
-			DBModule::LoadObjects(obj->getLinkedObjectsIds(*rows), env, linkLevel);
-			obj->loadFromRecord(*rows, env);
-			if(linkLevel > util::FIELDS_ONLY_LOAD_LEVEL)
-			{
-				obj->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
-			}
-*/  
+                std::cerr << "Found vehicle call for service id = " << serviceId
+                          << " journey pattern id = " << journeyPattern->getKey() << " ; commercial line id  = "
+                          << commercialLine->getKey() << std::endl;
 
-                
+                util::RegistryKeyType commercialLineId(commercialLine->getKey());
+
+                Alert callbackRequestAlert;
+                callbackRequestAlert.set<Kind>(ALERT_TYPE_CALLBACKREQUEST);
+//                callbackRequestAlert.set<Service>(*((pt::ScheduledService*)(scheduledService.get())));
+                callbackRequestAlert.set<Service>(*scheduledService);
+                callbackRequestAlert.set<Line>(*commercialLine);
+                AlertTableSync::Save(&callbackRequestAlert);
             }
             
+
+
+
+
+
 /*
 			SelectQuery<AlarmObjectLinkTableSync> query;
 			query.addTableField(AlarmObjectLinkTableSync::COL_ALARM_ID);

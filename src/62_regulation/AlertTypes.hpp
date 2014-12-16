@@ -30,7 +30,7 @@ namespace synthese
 	{
 
 		typedef enum {
-			ALERT_TYPE_UNKNOWN,
+			ALERT_TYPE_UNKNOWN = -1,
 			ALERT_TYPE_CALLBACKREQUEST
 		} AlertType;
 
