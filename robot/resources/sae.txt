@@ -22,14 +22,14 @@ Utiliser données réseau
 
 Create Vehicle Call
     [Arguments]    ${vehicleId}    ${priority}
-    ${httpResponse}=              Create Synthese Object    119    field_vehicle_id\=${vehicleId}    field_priority\=${priority}
+    ${httpResponse}=    Create Synthese Object    119    field_vehicle_id\=${vehicleId}    field_priority\=${priority}
     Should Be Equal As Strings    ${httpResponse.status_code}    200
 
 Update Vehicle Position
-    [Arguments]          ${vehicleId}    ${serviceId}
-    ${httpResponse}=     Call Synthese Action         VehiclePositionUpdateAction  actionParamve\=${vehicleId}     actionParamsi\=${serviceId}
+    [Arguments]    ${vehicleId}    ${serviceId}
+    ${httpResponse}=    Call Synthese Action    VehiclePositionUpdateAction    actionParamve\=${vehicleId}    actionParamsi\=${serviceId}
     Should Be Equal As Strings    ${httpResponse.status_code}    200
 
 List Regulation Alerts
-    Log Many    toto
-    
+    ${alertList}=    Call Synthese Service    alert_list
+    [Return]    ${alertList}

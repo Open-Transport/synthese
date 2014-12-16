@@ -18,7 +18,7 @@ Stop Synthese
 
 Create Synthese Object
     [Arguments]    ${tableId}    @{varargs}
-    ${httpResponse}    Call Synthese Service    objectcreate    table_id\=${tableId}    @{varargs}
+    ${httpResponse}=    Call Synthese Service    objectcreate    table_id\=${tableId}    @{varargs}
     [Return]    ${httpResponse}
 
 Call Synthese Service
