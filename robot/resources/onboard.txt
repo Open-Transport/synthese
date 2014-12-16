@@ -5,10 +5,10 @@ Resource          sae.txt
 *** Variables ***
 
 *** Keywords ***
-Le bus ${vehicleId} prend son service ${serviceId}
+Le bus ${vehicleId} prend son service ${serviceId} sur la ligne ${commercialLineId}
     [Documentation]    FAKE
     Update Vehicle Position    vehicleId=${vehicleId}    serviceId=${serviceId}
 
-Le bus transmet une demande de rappel normale à la régulation
-    [Documentation]    FAKE : this will directly create input object in synthese
-    Create Vehicle Call    vehicleId=19421777688002561    priority=false
+Le bus ${vehicleId} transmet une demande de rappel normale à la régulation
+    [Documentation]    FAKE
+    Create Vehicle Call    vehicleId=${vehicleId}    priority=false
