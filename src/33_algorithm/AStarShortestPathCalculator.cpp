@@ -381,12 +381,10 @@ namespace synthese
 			ResultPath& result,
 			boost::shared_ptr<AStarNode> curNode
 		) const {
-			boost::shared_ptr<AStarNode> lastNode = curNode;
-			while(curNode->getParent() && lastNode != curNode->getParent())
+			while(curNode->getParent() && curNode != curNode->getParent())
 			{
 				result.insert(result.begin(), curNode->getLink());
 				curNode = curNode->getParent();
-				lastNode = curNode;
 			}
 		}
 
