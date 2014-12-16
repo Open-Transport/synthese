@@ -24,10 +24,16 @@
 
 #include "AlertListService.hpp"
 
+
+#include "AlertTableSync.hpp"
+#include "Request.h"
+#include "RequestException.h"
 #include "DBModule.h"
-#include "ObjectBase.hpp"
+
+/*#include "ObjectBase.hpp"
 #include "RequestException.h"
 #include "Request.h"
+*/
 
 using namespace boost;
 using namespace std;
@@ -39,15 +45,13 @@ namespace synthese
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<Function,db::AlertListService>::FACTORY_KEY = "object";
+	const string FactorableTemplate<Function,regulation::AlertListService>::FACTORY_KEY = "alert_list";
 	
-	namespace db
+	namespace regulation
 	{
+		const string AlertListService::PARAMETER_ALERT_TYPE = "alert_type";
 		const string AlertListService::PARAMETER_ADDITIONAL_PARAMETERS = "additional_parameters";
 		
-		const string AlertListService::DATA_OBJECT("object");
-		
-
 
 		ParametersMap AlertListService::_getParametersMap() const
 		{
@@ -59,22 +63,15 @@ namespace synthese
 
 		void AlertListService::_setFromParametersMap(const ParametersMap& map)
 		{
-			Function::setOutputFormatFromMap(map, string());
-			
-			// Object
+            _alertType = optional<AlertType>();
 			try
 			{
-				_object = DBModule::GetObject(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					Env::GetOfficialEnv()
-				);
+				_alertType = (AlertType) map.get<int>(PARAMETER_ALERT_TYPE);
 			}
-			catch(ObjectNotFoundException<ObjectBase>& e)
+			catch(Record::MissingParameterException& mpe)
 			{
-				throw RequestException("No such object : "+ e.getMessage());
 			}
-
-			// Additional parameters
+            
 			_additionalParameters = map.getDefault<bool>(PARAMETER_ADDITIONAL_PARAMETERS, false);
 		}
 
@@ -84,15 +81,25 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			ParametersMap map;
-			_object->toParametersMap(map, _additionalParameters);
+
+			ParametersMap alertsPM;
+			AlertTableSync::SearchResult alerts(
+				AlertTableSync::Search(
+					Env::GetOfficialEnv(),
+                    _alertType
+                    ));
+            
+			BOOST_FOREACH(const boost::shared_ptr<Alert>& alert, alerts)
+            {
+                boost::shared_ptr<ParametersMap> alertPM(new ParametersMap);
+                alert->toParametersMap(*alertPM);
+                //alertPM->insert("kind", alert->get<Kind>());
+                alertsPM.insert("alert", alertPM);                
+            }
 			
-			if (_outputFormat == MimeTypes::JSON)
-			{
-				map.outputJSON(stream, DATA_OBJECT);
-			}
+            alertsPM.outputJSON(stream, "alerts");
 			
-			return map;
+			return alertsPM;
 		}
 		
 		
@@ -104,14 +111,9 @@ namespace synthese
 		}
 
 
-
 		std::string AlertListService::getOutputMimeType() const
 		{
-			if (_outputFormat == MimeTypes::JSON)
-			{
-				return "application/json";
-			}
-			return "text/html";
+            return "application/json";
 		}
 
 

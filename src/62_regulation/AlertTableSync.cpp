@@ -116,6 +116,16 @@ namespace synthese
 
 	namespace regulation
 	{
+		AlertTableSync::SearchResult AlertTableSync::Search(util::Env& env,
+                                                            boost::optional<AlertType> alertType = boost::optional<AlertType>())
+        {
+			SelectQuery<AlertTableSync> query;
+			if ((bool) alertType)
+			{
+				query.addWhereField(Kind::FIELD.name, alertType);
+			}
+			return LoadFromQuery(query, env, util::UP_LINKS_LOAD_LEVEL);
+		}
 
     }
 }

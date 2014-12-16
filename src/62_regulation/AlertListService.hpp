@@ -26,6 +26,7 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
+#include "AlertTypes.hpp"
 
 namespace synthese
 {
@@ -34,7 +35,7 @@ namespace synthese
 		class Registrable;
 	}
 
-	namespace db
+	namespace regulation
 	{
 
 		//////////////////////////////////////////////////////////////////////////
@@ -48,14 +49,15 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,AlertListService>
 		{
 		public:
+			static const std::string PARAMETER_ALERT_TYPE;
 			static const std::string PARAMETER_ADDITIONAL_PARAMETERS;
-			static const std::string DATA_OBJECT;
 			
 		protected:
+
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const util::Registrable> _object;
-				bool _additionalParameters;
+            boost::optional<AlertType> _alertType;
+            bool _additionalParameters;
 			//@}
 			
 			

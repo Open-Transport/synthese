@@ -48,30 +48,11 @@ namespace synthese
 
 			//! @name Services
 			//@{
-
-				//////////////////////////////////////////////////////////////////////////
-				///	Descent search.
-				///	@param env Environment to populate
-				///	@param serviceId optional ID of a foreign key to filter on (deactivated if undefined)
-				///	@param first First  object to answer
-				///	@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number.
-				///	@param linkLevel Level of links to build when reading foreign keys
-				///	@return Found objects.
-				///	@author Camille Hue
-				///	@date 2014
-				/// @since 3.8.0
-            /*
 				static SearchResult Search(
 					util::Env& env,
-					boost::optional<util::RegistryKeyType> serviceId,
-					const boost::gregorian::date& minDate,
-					const boost::gregorian::date& maxDate,
-					bool displayCancelled = false,
-					std::size_t first = 0,
-					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
-					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+					boost::optional<AlertType> alertType
 				);
-            */
+
 			//@}
 		};
 	}
