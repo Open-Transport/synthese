@@ -8,7 +8,7 @@ Resource          sae.txt
 
 Le bus prend son service
     [Documentation]    FAKE : this will directly create input object in synthese
-    Update Vehicle Position    vehicleId=19421777688002561    serviceId=4503603922347771
+    Update Vehicle Position    vehicleId=19421777688002561    serviceId=4504033419093583
 
 Le bus transmet une demande de rappel normale à la régulation
     [Documentation]    FAKE : this will directly create input object in synthese
