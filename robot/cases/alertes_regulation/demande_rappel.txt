@@ -8,8 +8,6 @@ Resource          ../../resources/ops.txt
 *** Test Cases ***
 Demande de rappel normal
     [Tags]    regulation
-    Le bus prend son service
+    Le bus 19421777688002561 prend son service
     Le bus transmet une demande de rappel normale à la régulation
     La régulation voit une demande de rappel normal provenant du bus
-
-
