@@ -598,7 +598,7 @@ namespace synthese
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
                     _display_duration = static_cast<size_t>(map.getDefault<int>(PARAMETER_DISPLAY_DURATION));
-					_digitizedVersion = map.get<string>(PARAMETER_DIGITIZED_VERSION);
+					_digitizedVersion = map.getDefault<string>(PARAMETER_DIGITIZED_VERSION);
 					if (map.isDefined(PARAMETER_MESSAGE_SECTION))
 					{
 						RegistryKeyType id = map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_SECTION);
