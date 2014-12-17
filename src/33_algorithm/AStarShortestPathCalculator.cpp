@@ -381,10 +381,21 @@ namespace synthese
 			ResultPath& result,
 			boost::shared_ptr<AStarNode> curNode
 		) const {
+			std::vector<util::RegistryKeyType> vectKey;
+			bool alreadyVisited(false);
 			while(curNode->getParent() && curNode != curNode->getParent())
 			{
 				result.insert(result.begin(), curNode->getLink());
+				vectKey.push_back(curNode->getCrossing()->getKey());
 				curNode = curNode->getParent();
+				BOOST_FOREACH(const util::RegistryKeyType key, vectKey)
+				{
+					if (key == curNode->getCrossing()->getKey())
+					{
+						alreadyVisited = true;
+						break;
+					}
+				}
 			}
 		}
 
