@@ -110,6 +110,17 @@ namespace synthese
 					}
 				}
 			}
+			BOOST_FOREACH(const AlarmObjectLink* link, it->second)
+			{
+				// Search for general broadcast on all custombroadcastpoints
+				// OR on all kind of displayscreen recipients
+				if (link->getObjectId() == CLASS_NUMBER || link->getObjectId() == 0)
+				{
+					ok = true;
+					break;
+				}
+			}
+
 			if(!ok)
 			{
 				return false;

@@ -34,7 +34,7 @@
 #include "DisplayScreenContentFunction.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenTableSync.h"
-#include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
 #include "Interface.h"
 #include "InterfacePageException.h"
 #include "JourneyPattern.hpp"
@@ -915,6 +915,14 @@ namespace synthese
 					if(	link->getObjectId() == DisplayScreenTableSync::TABLE.ID ||
 						link->getObjectId() == 0
 					){
+						result = true;
+					}
+
+					// Search for general broadcast on a precise display screens type equal to
+					// the display type of the current display screen
+					if( link->getObjectId() == DisplayTypeTableSync::TABLE.ID &&
+						link->getObjectId() == _displayType->getKey())
+					{
 						result = true;
 					}
 
