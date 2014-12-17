@@ -329,7 +329,8 @@ namespace synthese
 		void SCOMData::_preCleanup(const std::string& borne)
 		{
 			// Remove data for this borne
-			for (size_t i = 0; i < _datas.size(); i++) {
+			for (size_t i = 0; i < _datas.size(); i++)
+			{
 				if ( _datas.at(i).borne == borne )
 				{
 					// If its time is 0, change it to -1

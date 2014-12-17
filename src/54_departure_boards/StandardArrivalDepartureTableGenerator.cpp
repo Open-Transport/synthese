@@ -92,15 +92,14 @@ namespace synthese
 				return _result;
 			}
 
-			// If scom exists and is used, substract the maximum matching delay
+			// If scom exists and is used, substract the maximum matching delay times 2
 			// Why? To enable past service to be selected that might be delayed and so adapted by SCOM
 			// See the SCOM module documentation
 			ptime realStartDateTime(_startDateTime);
 			#ifdef WITH_SCOM
 			if (_scom)
 			{
-				realStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff());
-			}
+				realStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff() * 2);			}
 			#endif
 
 			AccessParameters ap;
