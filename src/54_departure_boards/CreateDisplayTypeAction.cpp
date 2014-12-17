@@ -119,8 +119,14 @@ namespace synthese
 		{
 			DisplayType dt;
 			dt.set<Name>(_name);
-			dt.set<DisplayInterface>(*(const_cast<Interface*>(_interface.get())));
-			dt.set<MonitoringInterface>(*(const_cast<Interface*>(_monitoringInterface.get())));
+			if (_interface)
+			{
+				dt.set<DisplayInterface>(*(const_cast<Interface*>(_interface.get())));
+			}
+			if (_monitoringInterface)
+			{
+				dt.set<MonitoringInterface>(*(const_cast<Interface*>(_monitoringInterface.get())));
+			}
 			dt.set<RowsNumber>(_rows_number);
 			DisplayTypeTableSync::Save(&dt);
 
