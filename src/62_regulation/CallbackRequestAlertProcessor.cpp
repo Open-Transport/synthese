@@ -26,6 +26,7 @@
 #include "VehicleCallTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "DB.hpp"
+#include "DBModule.h"
 #include "Env.h"
 #include "ScheduledService.h"
 #include "SelectQuery.hpp"
@@ -88,7 +89,19 @@ namespace synthese
 
                 util::RegistryKeyType commercialLineId(commercialLine->getKey());
 
-                Alert callbackRequestAlert;
+
+                util::RegistryKeyType hashCode(23);
+                hashCode = hashCode * 31 + commercialLineId;
+                hashCode = hashCode * 31 + serviceId;
+                
+                util::RegistryKeyType alertId(util::encodeUId(
+                                                  AlertTableSync::TABLE.ID,
+                                                  db::DBModule::GetNodeId(),
+                                                  hashCode));
+
+                std::cerr << "alertid = " << alertId << std::endl;
+                
+                Alert callbackRequestAlert(alertId);
                 callbackRequestAlert.set<Kind>(ALERT_TYPE_CALLBACKREQUEST);
 //                callbackRequestAlert.set<Service>(*((pt::ScheduledService*)(scheduledService.get())));
                 callbackRequestAlert.set<Service>(*scheduledService);
