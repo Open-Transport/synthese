@@ -6,9 +6,11 @@ Library           Collections
 *** Variables ***
 
 *** Keywords ***
+${sleepTime} plus tard
+    Sleep    ${sleepTime}
+
 La régulation voit une demande de rappel normale provenant du service ${serviceId} de la ligne ${commercialLineId}
     [Documentation]    FAKE
-    Sleep    3s
     ${alertList}=    List Regulation Alerts
     ${expectedJSON}=    Evaluate    { u'alerts': { u'alert': [{u'line_id': u'${commercialLineId}', u'kind': u'0', u'id': u'33777001500246017', u'service_id': u'${serviceId}'}]}}
     Should Be Equal    ${alertList.json()}    ${expectedJSON}

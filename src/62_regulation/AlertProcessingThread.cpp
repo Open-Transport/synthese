@@ -52,7 +52,7 @@ namespace synthese
 				{
                     alertProcessor->processAlerts();
                 }
-                boost::this_thread::sleep(boost::posix_time::seconds(3));
+                boost::this_thread::sleep(boost::posix_time::seconds(2));
             }
         }
 

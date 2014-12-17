@@ -11,4 +11,5 @@ Demande de rappel normal
     [Tags]    regulation
     Le bus ${BUS1} prend son service ${SERVICE1} sur la ligne ${LINE1}
     Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    5 seconds plus tard
     La régulation voit une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1}
