@@ -55,7 +55,7 @@ namespace synthese
 			// Fetch the settings
 			_maxAge = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_MAXAGE,60);
 			_maxTimeDiff = boost::posix_time::seconds(
-				Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_MAXTIMEDIFF,120)
+				Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_MAXTIMEDIFF,80)
 			);
 
 			// Register for their update
@@ -209,6 +209,9 @@ namespace synthese
 		{
 			// Note : do not forget to unlock
 			_mutex.lock();
+
+			// Cleanup the old stuff
+			_cleanup();
 
 			// By default, use the given time
 			// If a better one is found it will be replaced
