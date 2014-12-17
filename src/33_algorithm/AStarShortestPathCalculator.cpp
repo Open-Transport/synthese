@@ -383,7 +383,7 @@ namespace synthese
 		) const {
 			std::vector<util::RegistryKeyType> vectKey;
 			bool alreadyVisited(false);
-			while(curNode->getParent() && curNode != curNode->getParent())
+			while(curNode->getParent() && curNode != curNode->getParent() && !alreadyVisited)
 			{
 				result.insert(result.begin(), curNode->getLink());
 				vectKey.push_back(curNode->getCrossing()->getKey());
