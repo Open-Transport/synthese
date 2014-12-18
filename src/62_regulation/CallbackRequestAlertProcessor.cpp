@@ -30,6 +30,7 @@
 #include "Env.h"
 #include "ScheduledService.h"
 #include "SelectQuery.hpp"
+#include "ParametersMap.h"
 
 using namespace std;
 
@@ -89,6 +90,7 @@ namespace synthese
 
                 util::RegistryKeyType commercialLineId(commercialLine->getKey());
 
+                bool priority(result->get<bool>("priority"));
 
                 util::RegistryKeyType hashCode(23);
                 hashCode = hashCode * 31 + commercialLineId;
@@ -106,6 +108,16 @@ namespace synthese
 //                callbackRequestAlert.set<Service>(*((pt::ScheduledService*)(scheduledService.get())));
                 callbackRequestAlert.set<Service>(*scheduledService);
                 callbackRequestAlert.set<Line>(*commercialLine);
+
+                util::ParametersMap extraDataPM;
+                extraDataPM.insert("priority", priority);
+
+                std::stringstream extraDataStream;
+                extraDataPM.outputJSON(extraDataStream, "extraData");
+
+                callbackRequestAlert.set<Line>(*commercialLine);
+                callbackRequestAlert.set<ExtraData>(extraDataStream.str());
+
                 AlertTableSync::Save(&callbackRequestAlert);
             }
             
