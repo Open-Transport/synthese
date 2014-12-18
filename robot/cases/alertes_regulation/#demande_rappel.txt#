@@ -1,0 +1,31 @@
+    *** Settings ***
+Documentation     Tests fonctionnels de la remontée d'alertes de régulation
+Test Setup        Démarrer SAE
+Test Teardown     Arrêter SAE
+Resource          ../../resources/onboard.txt
+Resource          ../../resources/ops.txt
+Resource          ../../resources/optymo_data.txt
+
+*** Test Cases ***
+Demande de rappel normale
+    [Tags]    regulation
+    Le bus ${BUS1} prend son service ${SERVICE1} sur la ligne ${LINE1}
+    Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    5 seconds plus tard
+    La régulation voit une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1}
+
+Demande de rappel normale répétée
+    [Tags]    regulation
+    Le bus ${BUS1} prend son service ${SERVICE1} sur la ligne ${LINE1}
+    Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    5 seconds plus tard
+    La régulation voit une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1}
+
+Demande de rappel urgente
+    [Tags]    regulation
+    Le bus ${BUS1} prend son service ${SERVICE1} sur la ligne ${LINE1}
+    Le bus ${BUS1} transmet une demande de rappel urgente à la régulation
+    5 seconds plus tard
+    La régulation voit une demande de rappel urgente provenant du service ${SERVICE1} de la ligne ${LINE1}
+

@@ -12,11 +12,14 @@ ${sleepTime} plus tard
 La régulation voit une demande de rappel normale provenant du service ${serviceId} de la ligne ${commercialLineId}
     [Documentation]    FAKE
     ${alertList}=    List Regulation Alerts
-    ${expectedJSON}=    Evaluate    { u'alerts': { u'alert': [{u'line_id': u'${commercialLineId}', u'kind': u'0', u'id': u'395767702884499373', u'service_id': u'${serviceId}'}]}}
+    ${expectedJSON}=    Evaluate    { u'alerts': { u'alert': [{u'line_id': u'${commercialLineId}', u'kind': u'0', u'extra_data': u'{"extraData":{"priority":"0"}}', u'id': u'11527956521868015091', u'service_id': u'${serviceId}'}]}}
     Should Be Equal    ${alertList.json()}    ${expectedJSON}
 
 
 La régulation voit une demande de rappel urgente provenant du service ${serviceId} de la ligne ${commercialLineId}
     [Documentation]    FAKE
-    Fail
+    ${alertList}=    List Regulation Alerts
+    ${expectedJSON}=    Evaluate    { u'alerts': { u'alert': [{u'line_id': u'${commercialLineId}', u'kind': u'0', u'extra_data': u'{"extraData":{"priority":"1"}}', u'id': u'11527956521868015091', u'service_id': u'${serviceId}'}]}}
+    Should Be Equal    ${alertList.json()}    ${expectedJSON}
+
 

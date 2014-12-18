@@ -11,8 +11,8 @@ Le bus ${vehicleId} prend son service ${serviceId} sur la ligne ${commercialLine
 
 Le bus ${vehicleId} transmet une demande de rappel normale à la régulation
     [Documentation]    FAKE
-    Create Vehicle Call    vehicleId=${vehicleId}    priority=false
+    Create Vehicle Call    vehicleId=${vehicleId}    priority=0
 
 Le bus ${vehicleId} transmet une demande de rappel urgente à la régulation
     [Documentation]    FAKE
-    Create Vehicle Call    vehicleId=${vehicleId}    priority=true
+    Create Vehicle Call    vehicleId=${vehicleId}    priority=1
