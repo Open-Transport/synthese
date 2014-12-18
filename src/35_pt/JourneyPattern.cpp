@@ -84,6 +84,11 @@ namespace synthese
 
 		JourneyPattern::~JourneyPattern ()
 		{
+			boost::unique_lock<shared_recursive_mutex> lock(*sharedServicesMutex);
+			BOOST_FOREACH(Service* service, getAllServices())
+			{
+				service->setPath(NULL);
+			}
 		}
 
 
