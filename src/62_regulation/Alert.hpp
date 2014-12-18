@@ -50,13 +50,15 @@ namespace synthese
         FIELD_ENUM(Kind, regulation::AlertType)
 		FIELD_POINTER(Line, pt::CommercialLine)
 		FIELD_POINTER(Service, pt::ScheduledService)
+		FIELD_STRING(ExtraData)
 
 
 		typedef boost::fusion::map<
 			FIELD(Key),
             FIELD(Kind),
 			FIELD(Line),
-			FIELD(Service)
+			FIELD(Service),
+			FIELD(ExtraData)
 		> AlertSchema;
 
 		/** Alert class.

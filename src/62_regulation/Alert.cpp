@@ -36,6 +36,7 @@ namespace synthese
     FIELD_DEFINITION_OF_TYPE(Kind, "kind", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(Line, "line_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(Service, "service_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(ExtraData, "extra_data", SQL_TEXT)
 
 	namespace regulation
 	{
@@ -48,8 +49,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Kind),
 					FIELD_DEFAULT_CONSTRUCTOR(Line),
-					FIELD_DEFAULT_CONSTRUCTOR(Service)
-
+					FIELD_DEFAULT_CONSTRUCTOR(Service),
+					FIELD_DEFAULT_CONSTRUCTOR(ExtraData)
                     )
                 )
 		{}
