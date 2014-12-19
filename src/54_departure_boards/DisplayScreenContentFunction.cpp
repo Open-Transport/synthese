@@ -1392,6 +1392,55 @@ namespace synthese
 					);
 				}
 
+				// Link between an adapted time and a service
+				std::multimap<ptime,ArrivalDepartureList::const_iterator> times;
+
+				// Adapting the time using SCOM if activated
+				#ifdef WITH_SCOM
+				if (_scom)
+				{
+					for (ArrivalDepartureList::const_iterator it = rows.begin(); it != rows.end(); ++it)
+					{
+						// Fetch the time from SCOM
+						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(it->first.getService()->getPath());
+
+						std::string dest =
+							journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
+							journeyPattern->getDirectionObj()->getDisplayedText() :
+							journeyPattern->getDirection();
+
+						ptime adaptedTime = it->first.getDepartureDateTime();
+
+						// Check object before calling them
+						adaptedTime = scom::SCOMModule::GetSCOMData()->GetWaitingTime(
+							_screen.get()->getCodeBySources(),
+							journeyPattern->getCommercialLine()->getShortName(),
+							dest,
+							adaptedTime,
+							date
+						);
+
+						// Save the adapted time
+						times.insert(make_pair(adaptedTime,it));
+					}
+
+				}
+				#endif
+
+				// No SCOM, just use the service time
+				if (
+					!_scom
+				#ifndef WITH_SCOM
+					|| true
+				#endif
+				)
+				{
+					for (ArrivalDepartureList::const_iterator it = rows.begin(); it != rows.end(); ++it)
+					{
+						times.insert(make_pair(it->first.getDepartureDateTime(),it));
+					}
+				}
+
 				/// @todo replace by parameters or something else
 				int __Pages(0);
 				int departuresToHide(0);
@@ -1429,9 +1478,9 @@ namespace synthese
 					// Boucle sur les rangees
 					int __Rangee = __MultiplicateurRangee;
 					int departuresNumber = rows.size() - departuresToHide;
-					for (ArrivalDepartureList::const_iterator it = rows.begin(); departuresNumber && (it != rows.end()); ++it, --departuresNumber)
+					for (std::multimap<ptime,ArrivalDepartureList::const_iterator>::const_iterator it = times.begin(); departuresNumber && (it != times.end()); ++it, --departuresNumber)
 					{
-						const ArrivalDepartureRow& row(*it);
+						const ArrivalDepartureRow& row(*it->second);
 
 						int __NombrePagesRangee = row.second.size () - 2;
 						int pageNumber = ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
@@ -1504,32 +1553,8 @@ namespace synthese
 			{
 				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm, true);
 
-				ptime adaptedTime = row.first.getDepartureDateTime();
-
-				// Fetch the time from SCOM if enabled
-				#ifdef WITH_SCOM
-				if (_scom)
-				{
-					const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(row.first.getService()->getPath());
-
-					std::string dest =
-								journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
-								journeyPattern->getDirectionObj()->getDisplayedText() :
-								journeyPattern->getDirection();
-
-					// Check object before calling them
-					adaptedTime = scom::SCOMModule::GetSCOMData()->GetWaitingTime(
-							_screen.get()->getCodeBySources(),
-							journeyPattern->getCommercialLine()->getShortName(),
-							dest,
-							row.first.getDepartureDateTime(),
-							requestTime
-					);
-				}
-				#endif
-
 				// Waiting time
-				time_duration waitingTime(adaptedTime - requestTime);
+				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
 				pm.insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
 
 				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));

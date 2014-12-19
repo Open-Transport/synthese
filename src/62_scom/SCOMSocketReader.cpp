@@ -89,7 +89,7 @@ namespace synthese
 			_timeouts[RESOLVE] = 0;
 			_timeouts[CONNECT] = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_CONNECTTIMEOUT,5);
 			_timeouts[AUTHENTICATE] = 0;
-			_timeouts[READ] = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_READTIMEOUT,600);
+			_timeouts[READ] = Settings::GetInstance().Init<int>(SETTINGS_MODULE, SETTING_READTIMEOUT,120);
 			_timeouts[CLOSE] = 0;
 			
 			// Bornes
