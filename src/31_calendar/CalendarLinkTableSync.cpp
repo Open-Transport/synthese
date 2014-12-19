@@ -171,12 +171,69 @@ namespace synthese
 			boost::optional<std::size_t> number,
 			bool orderByService,
 			bool raisingOrder,
-			util::LinkLevel linkLevel
+			util::LinkLevel linkLevel,
+			boost::optional<util::RegistryKeyType> calendarTemplateId,
+			boost::optional<util::RegistryKeyType> calendarTemplateId2,
+			bool calendarsOrConditionSet
 		){
 			SelectQuery<CalendarLinkTableSync> query;
 			if (serviceId)
 			{
 				query.addWhereField(COL_SERVICE_ID, *serviceId);
+			}
+			// Case when a CalendarLink is searched by the id of a CalendarTemplate
+			if(!calendarsOrConditionSet)
+			{
+				if (calendarTemplateId)
+				{
+					query.addWhereField(COL_CALENDAR_TEMPLATE_ID, *calendarTemplateId);
+				}
+				if (calendarTemplateId2)
+				{
+					query.addWhereField(COL_CALENDAR_TEMPLATE_ID2, *calendarTemplateId2);
+				}
+			}
+			// Case when a CalendarTemplate is known but the user does not know which
+			// CalendarLink it is associated to
+			else
+			{
+				if(calendarTemplateId)
+				{
+					if(calendarTemplateId2)
+					{
+						query.addWhere(
+							ComposedExpression::Get(
+								ComposedExpression::Get(
+									FieldExpression::Get(TABLE.NAME, COL_CALENDAR_TEMPLATE_ID),
+									ComposedExpression::OP_EQ,
+									ValueExpression<RegistryKeyType>::Get(*calendarTemplateId)
+								),
+								ComposedExpression::OP_OR,
+								ComposedExpression::Get(
+									FieldExpression::Get(TABLE.NAME, COL_CALENDAR_TEMPLATE_ID2),
+									ComposedExpression::OP_EQ,
+									ValueExpression<RegistryKeyType>::Get(*calendarTemplateId2)
+								)
+						)	);
+					}
+					else
+					{
+						query.addWhere(
+							ComposedExpression::Get(
+								ComposedExpression::Get(
+									FieldExpression::Get(TABLE.NAME, COL_CALENDAR_TEMPLATE_ID),
+									ComposedExpression::OP_EQ,
+									ValueExpression<RegistryKeyType>::Get(*calendarTemplateId)
+								),
+								ComposedExpression::OP_OR,
+								ComposedExpression::Get(
+									FieldExpression::Get(TABLE.NAME, COL_CALENDAR_TEMPLATE_ID2),
+									ComposedExpression::OP_EQ,
+									ValueExpression<RegistryKeyType>::Get(*calendarTemplateId)
+								)
+						)	);
+					}
+				}
 			}
 			if (orderByService)
 			{

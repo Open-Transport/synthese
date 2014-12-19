@@ -37,7 +37,9 @@ def run(env, args):
     if not config.prefix:
         raise Exception('Prefix is required.')
 
-    git_info = utils.GITInfo(env.source_path)
+    # Pass the branch from the command line, useful in Jenkins
+    # where we get HEAD instead of the branch
+    git_info = utils.GITInfo(env.source_path, config.branch)
     revision_path = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     revision_path += '-{0}'.format(git_info.version)
 

@@ -29,6 +29,8 @@ ContinuousServiceUpdateAction.cpp
 ContinuousServiceUpdateAction.h
 CopyGeometriesAction.cpp
 CopyGeometriesAction.hpp
+DeactivationPTDataInterSYNTHESE.cpp
+DeactivationPTDataInterSYNTHESE.hpp
 DesignatedLinePhysicalStop.cpp
 DesignatedLinePhysicalStop.hpp
 Destination.cpp
