@@ -96,7 +96,9 @@ namespace synthese
                 //alertPM->insert("kind", alert->get<Kind>());
                 alertsPM.insert("alert", alertPM);                
             }
-			
+
+            // TODO : ne pas utiliser output! c gere tout seul qq soit
+            // le type mime output (ou rien dans le contact CMS)
             alertsPM.outputJSON(stream, "alerts");
 			
 			return alertsPM;

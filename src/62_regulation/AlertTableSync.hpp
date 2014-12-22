@@ -39,6 +39,7 @@ namespace synthese
 		///	@date 2013
 		/// @since 3.8.0
 		class AlertTableSync:
+            // TODO : ne pas tout monter en RAM : ConditionalTableSync 
 			public db::DBDirectTableSyncTemplate<
 				AlertTableSync,
 				Alert

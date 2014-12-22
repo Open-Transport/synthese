@@ -7,25 +7,69 @@ Resource          ../../resources/ops.txt
 Resource          ../../resources/optymo_data.txt
 
 *** Test Cases ***
-Demande de rappel normale
+Une demande de rappel normale est remontée
     [Tags]    regulation
-    Le bus ${BUS1} prend son service ${SERVICE1} sur la ligne ${LINE1}
     Le bus ${BUS1} transmet une demande de rappel normale à la régulation
-    5 seconds plus tard
     La régulation voit une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1}
 
-Demande de rappel normale répétée
+Une demande de rappel normale est réitérée
     [Tags]    regulation
-    Le bus ${BUS1} prend son service ${SERVICE1} sur la ligne ${LINE1}
     Le bus ${BUS1} transmet une demande de rappel normale à la régulation
-    Le bus ${BUS1} transmet une demande de rappel normale à la régulation
-    5 seconds plus tard
+    Le bus ${BUS1} transmet encore une demande de rappel normale à la régulation
     La régulation voit une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1}
 
-Demande de rappel urgente
+Une demande de rappel urgente est remontée
     [Tags]    regulation
-    Le bus ${BUS1} prend son service ${SERVICE1} sur la ligne ${LINE1}
     Le bus ${BUS1} transmet une demande de rappel urgente à la régulation
-    5 seconds plus tard
     La régulation voit une demande de rappel urgente provenant du service ${SERVICE1} de la ligne ${LINE1}
+
+Une demande de rappel normale est remontée, puis devient urgente
+    [Tags]    regulation
+    Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    Le bus ${BUS1} transmet une demande de rappel urgente à la régulation
+    La régulation voit une demande de rappel urgente provenant du service ${SERVICE1} de la ligne ${LINE1}
+
+
+
+
+#rappel normal puis rappel urgent => seulement rappel urgent
+#rappel urgent puis rappel normal => seulement rappel normal
+
+#rappel normal => puis annulation
+
+
+#demande de rappel
+#la regul rappelle le bus
+#la regul redige un CR de l'appel
+#la regul indique que c resolu
+#l'alerte a disparu de la liste
+
+#demande de rappel
+#la regul rappelle le bus
+#la regul redige un CR de l'appel
+#la regul indique que c pas resolu
+#l'alerte a disparu de la liste
+
+#demande de rappel
+#la regul rappelle le bus
+#la regul redige un CR de l'appel
+#la regul ferme la boite d'alerte
+#l'alerte est toujours dans la liste
+
+#si reouverture de la boite d'alerte
+#il voit dans son historique sa premiere action de rappel
+#ainsi de suite
+
+#faire appraitre le conducteur! prevoir le cas ou le conducteur est non
+#renseigné
+
+
+
+
+
+
+
+
+
+
 

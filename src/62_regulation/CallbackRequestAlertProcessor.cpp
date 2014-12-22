@@ -49,6 +49,9 @@ namespace synthese
         CallbackRequestAlertProcessor::processAlerts()
         {
             util::Log::GetInstance().debug("Processing callback requests alerts");
+
+            // TODO : parcours de la registry des vehicle call plutot
+            // que le select!
 			stringstream query;
 			query <<
 				" SELECT * FROM " << vehicle::VehicleCallTableSync::TABLE.NAME << " vc " <<
