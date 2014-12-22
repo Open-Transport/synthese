@@ -120,6 +120,7 @@ namespace synthese
 
 		const string DisplayScreenContentFunction::DATA_STOP_ID("stop_id");
 		const string DisplayScreenContentFunction::DATA_OPERATOR_CODE("operatorCode");
+		const string DisplayScreenContentFunction::DATA_NETWORK_ID("networkId");
 		const string DisplayScreenContentFunction::DATA_NETWORK_NAME("networkName");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_ID("stop_area_id");
 		const string DisplayScreenContentFunction::DATA_STOP_AREA_NAME("stop_area_name");
@@ -902,6 +903,22 @@ namespace synthese
 			boost::shared_ptr<ParametersMap> journeyPm(new ParametersMap());
 			journeyPm->insert("route_id", journeyPattern->getKey());
 			journeyPm->insert("date_time", servicePointer.getDepartureDateTime());
+
+			journeyPm->insert(DATA_PLANNED_TIME, servicePointer.getTheoreticalDepartureDateTime());
+
+			if(servicePointer.getRealTimeDepartureVertex())
+			{
+				journeyPm->insert(
+					DATA_TRACK,
+					static_cast<const StopPoint*>(servicePointer.getRealTimeDepartureVertex())->getName()
+				);
+			}
+
+			if(journeyPattern && journeyPattern->getNetwork())
+			{
+				journeyPm->insert(DATA_NETWORK_ID, journeyPattern->getNetwork()->getKey());
+				journeyPm->insert(DATA_NETWORK_NAME, journeyPattern->getNetwork()->getName());
+			}
 
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 			stop->toParametersMap(*stopPM, false);

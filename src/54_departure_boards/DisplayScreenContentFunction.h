@@ -94,6 +94,7 @@ namespace synthese
 
 			static const std::string DATA_STOP_ID;
 			static const std::string DATA_OPERATOR_CODE;
+			static const std::string DATA_NETWORK_ID;
 			static const std::string DATA_NETWORK_NAME;
 
 			static const std::string DATA_STOP_AREA_ID;
