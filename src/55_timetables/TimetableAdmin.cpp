@@ -688,7 +688,10 @@ namespace synthese
 
 								// Place
 								stream << t2.col();
-								stream << item->get<StopArea>()->getFullName();
+								if(item->get<StopArea>())
+								{
+									stream << item->get<StopArea>()->getFullName();
+								}
 
 								// Sorting
 								stream << t2.col();
