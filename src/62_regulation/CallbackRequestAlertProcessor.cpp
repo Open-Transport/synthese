@@ -23,6 +23,7 @@
 #include "CallbackRequestAlertProcessor.hpp"
 
 #include "AlertTableSync.hpp"
+#include "VehicleCall.hpp"
 #include "VehicleCallTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "DB.hpp"
@@ -36,6 +37,9 @@ using namespace std;
 
 namespace synthese
 {
+    using namespace util;
+    using namespace vehicle;
+    
     namespace regulation
     {
 
@@ -50,8 +54,18 @@ namespace synthese
         {
             util::Log::GetInstance().debug("Processing callback requests alerts");
 
-            // TODO : parcours de la registry des vehicle call plutot
-            // que le select!
+
+            //const VehicleCall::Registry& registry = Env::GetOfficialEnv().getRegistry<VehicleCall>();
+
+			BOOST_FOREACH(const VehicleCall::Registry::value_type& itVehicleCall, //registry)
+                          Env::GetOfficialEnv().getRegistry<VehicleCall>())
+            {
+                
+                boost::shared_ptr<const VehiclePosition> vehiclePosition =
+                    Env::GetOfficialEnv().getRegistry<VehiclePosition>().get(itVehicleCall.second->get<synthese::Vehicle>());
+
+            }
+                
 			stringstream query;
 			query <<
 				" SELECT * FROM " << vehicle::VehicleCallTableSync::TABLE.NAME << " vc " <<
