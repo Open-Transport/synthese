@@ -60,15 +60,15 @@ namespace synthese
 
                 boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall.second;
                 boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
+
+                // TODO check exists
                 if (!vehicle) continue;
                 
                 VehiclePositionTableSync::SearchResult vehiclePositions(
                     VehiclePositionTableSync::Search(Env::GetOfficialEnv(), vehicle->getKey()));
-            
-                boost::shared_ptr<const VehiclePosition> vehiclePosition = *vehiclePositions.begin();
 
-                //boost::shared_ptr<const VehiclePosition> vehiclePosition =  
-                //    Env::GetOfficialEnv().getRegistry<VehiclePosition>().get(vehicle->getKey());
+                // TODO check size
+                boost::shared_ptr<const VehiclePosition> vehiclePosition = *vehiclePositions.begin();
 
                 pt::ScheduledService* scheduledService = vehiclePosition->getService();
                 const pt::JourneyPattern* journeyPattern(scheduledService->getRoute());
@@ -102,57 +102,6 @@ namespace synthese
                 
             }
 
-            
-			// stringstream query;
-			// query <<
-			// 	" SELECT * FROM " << vehicle::VehicleCallTableSync::TABLE.NAME << " vc " <<
-			// 	" INNER JOIN " << vehicle::VehiclePositionTableSync::TABLE.NAME << " vp " <<
-            //     " ON vc.vehicle_id" /*<< vehicle::VehicleCall<Vehicle>::FIELD.name*/ << " = vp." << vehicle::VehiclePositionTableSync::COL_VEHICLE_ID;
-
-            // db::DBResultSPtr result(db::DBModule::GetDB()->execQuery(query.str()));
-            // while(result->next())
-            // {
-            //     util::RegistryKeyType serviceId(result->get<util::RegistryKeyType>("service_id"));
-
-            //     boost::shared_ptr<pt::ScheduledService> scheduledService(
-            //         util::Env::GetOfficialEnv().getEditable<pt::ScheduledService>(serviceId));
-
-            //     const pt::JourneyPattern* journeyPattern(scheduledService->getRoute());
-			// 	pt::CommercialLine* commercialLine(journeyPattern->getCommercialLine());
-
-            //     /*std::cerr << "Found vehicle call for service id = " << serviceId
-            //               << " journey pattern id = " << journeyPattern->getKey() << " ; commercial line id  = "
-            //               << commercialLine->getKey() << std::endl;*/
-
-            //     util::RegistryKeyType commercialLineId(commercialLine->getKey());
-
-            //     util::RegistryKeyType hashCode(23);
-            //     hashCode = hashCode * 31 + commercialLineId;
-            //     hashCode = hashCode * 31 + serviceId;
-            //     hashCode = hashCode * 31 + ALERT_TYPE_CALLBACKREQUEST;
-                
-
-            //     util::RegistryKeyType alertId(util::encodeUId(
-            //                                       AlertTableSync::TABLE.ID,
-            //                                       db::DBModule::GetNodeId(),
-            //                                       hashCode));
-
-                
-            //     Alert callbackRequestAlert(alertId);
-            //     callbackRequestAlert.set<Kind>(ALERT_TYPE_CALLBACKREQUEST);
-            //     callbackRequestAlert.set<Service>(*scheduledService);
-            //     callbackRequestAlert.set<Line>(*commercialLine);
-
-            //     util::ParametersMap extraDataPM;
-            //     extraDataPM.insert("priority", result->get<bool>("priority"));
-            //     std::stringstream extraDataStream;
-            //     extraDataPM.outputJSON(extraDataStream, "extraData");
-
-            //     callbackRequestAlert.set<ExtraData>(extraDataStream.str());
-
-            //     AlertTableSync::Save(&callbackRequestAlert);
-            // }
-            
             util::Log::GetInstance().debug("Processed callback requests alerts");
             
         }

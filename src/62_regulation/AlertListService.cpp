@@ -73,6 +73,7 @@ namespace synthese
 			}
             
 			_additionalParameters = map.getDefault<bool>(PARAMETER_ADDITIONAL_PARAMETERS, false);
+            Function::setOutputFormatFromMap(map, string());
 		}
 
 
@@ -97,9 +98,10 @@ namespace synthese
                 alertsPM.insert("alert", alertPM);                
             }
 
-            // TODO : ne pas utiliser output! c gere tout seul qq soit
-            // le type mime output (ou rien dans le contact CMS)
-            alertsPM.outputJSON(stream, "alerts");
+			if (_outputFormat == MimeTypes::JSON)
+			{
+                alertsPM.outputJSON(stream, "alerts");
+            }
 			
 			return alertsPM;
 		}
@@ -115,7 +117,7 @@ namespace synthese
 
 		std::string AlertListService::getOutputMimeType() const
 		{
-            return "application/json";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 
 
