@@ -102,6 +102,10 @@ namespace synthese
 			{
                 alertsPM.outputJSON(stream, "alerts");
             }
+			else if (_outputFormat == MimeTypes::XML)
+			{
+                alertsPM.outputXML(stream, "alerts");
+            }
 			
 			return alertsPM;
 		}
