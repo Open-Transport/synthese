@@ -166,7 +166,7 @@ target_link_libraries(
   103_db_svn
   12_security
   15_server
-  20_tree
+#  20_tree
 )
 
 install(TARGETS 11_cms DESTINATION lib)
