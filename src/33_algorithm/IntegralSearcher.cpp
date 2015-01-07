@@ -518,14 +518,14 @@ namespace synthese
 								bool isGoalReached(
 									_destinationVam.contains(reachedVertex) &&
 										(!_accessParameters.getMaxtransportConnectionsCount() ||
-										 fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount())
+										 fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1)
 								);
 								bool isReturnedVertex(
 									(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
 										(	!_searchOnlyNodes ||
 											(	reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
 												(	!_accessParameters.getMaxtransportConnectionsCount() ||
-													fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount()
+													fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1
 								)	)	)	)	);
 								bool isARecursionNode(
 									reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
