@@ -31,5 +31,5 @@ Update Vehicle Position
     Should Be Equal As Strings    ${httpResponse.status_code}    200
 
 List Regulation Alerts
-    ${alertList}=    Call Synthese Service    alert_list    of\=json
+    ${alertList}=   Call Synthese Service    alert_list    of\=xml
     [Return]    ${alertList}
