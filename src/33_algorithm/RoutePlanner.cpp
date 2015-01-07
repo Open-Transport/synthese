@@ -166,7 +166,16 @@ namespace synthese
 				}
 				if(!ok)
 				{
-					result2.clear();
+					// Continue searching further recursively
+					if(_planningOrder == DEPARTURE_FIRST)
+					{
+						_minBeginTime = result2.getServiceUses().begin()->getDepartureDateTime() + minutes(1);
+					}
+					else
+					{
+						_minBeginTime = result2.getServiceUses().rbegin()->getArrivalDateTime() - minutes(1);
+					}
+					return run(ignoreDurationFilterFirstRun);
 				}
 			}
 
