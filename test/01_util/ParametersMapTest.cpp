@@ -167,5 +167,28 @@ BOOST_AUTO_TEST_CASE (testParametersMap)
 			BOOST_CHECK_EQUAL(s.str(), "<e a=\"23\" b=\"toto\"><d c=\"test1\" d=\"test1d\" /><d c=\"test2\" d=\"test2d\" /></e>");
 		}
 	}
+    
 }
+
+
+BOOST_AUTO_TEST_CASE (testFromJsonWithTwoChildren)
+{
+    stringstream s;
+    s << "{ \"a\": 1, \"b\": 2 }";
+    boost::shared_ptr<ParametersMap> pm(ParametersMap::FromJson(s.str()));
+    BOOST_CHECK_EQUAL("1", pm->getValue("a"));
+    BOOST_CHECK_EQUAL("2", pm->getValue("b"));    
+    
+}
+
+BOOST_AUTO_TEST_CASE (testFromJsonWithOneChildAndSubChild)
+{
+    stringstream s;
+    s << "{ \"a\": { \"b\": 2 }}";
+    boost::shared_ptr<ParametersMap> pm(ParametersMap::FromJson(s.str()));
+    BOOST_CHECK_EQUAL("2", pm->getSubMaps("a").at(0)->getValue("b"));
+    
+}
+
+
 
