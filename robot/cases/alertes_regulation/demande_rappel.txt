@@ -10,29 +10,34 @@ Resource          ../../resources/optymo_data.txt
 Une demande de rappel normale est remontée
     [Tags]    regulation
     Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    Sur l'écran de régulation
     Une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1} est affichée
 
 Une demande de rappel normale est réitérée
     [Tags]    regulation
     Le bus ${BUS1} transmet une demande de rappel normale à la régulation
     Le bus ${BUS1} transmet encore une demande de rappel normale à la régulation
+    Sur l'écran de régulation
     Une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1} est affichée
 
 Une demande de rappel urgente est remontée
     [Tags]    regulation
     Le bus ${BUS1} transmet une demande de rappel urgente à la régulation
+    Sur l'écran de régulation
     Une demande de rappel urgente provenant du service ${SERVICE1} de la ligne ${LINE1} est affichée
 
 Une demande de rappel normale est remontée, puis devient urgente
     [Tags]    regulation
     Le bus ${BUS1} transmet une demande de rappel normale à la régulation
     Le bus ${BUS1} transmet une demande de rappel urgente à la régulation
+    Sur l'écran de régulation
     Une demande de rappel urgente provenant du service ${SERVICE1} de la ligne ${LINE1} est affichée
 
 Une demande de rappel urgente est remontée, puis devient normale
     [Tags]    regulation
     Le bus ${BUS1} transmet une demande de rappel urgente à la régulation
     Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    Sur l'écran de régulation
     Une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1} est affichée
 
 
