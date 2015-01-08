@@ -18,7 +18,9 @@ Une demande de rappel normale provenant du service ${serviceId} de la ligne ${co
     Une demande de rappel est affichée   ${serviceId}   ${commercialLineId}   0
 
 
-# TODO positional check!
+
+# one launch of synthese!
+    
 Une demande de rappel urgente provenant du service ${serviceId} de la ligne ${commercialLineId} est affichée
     [Documentation]    FAKE
     Une demande de rappel est affichée   ${serviceId}   ${commercialLineId}   1
@@ -28,15 +30,16 @@ Une demande de rappel urgente provenant du service ${serviceId} de la ligne ${co
 Sur l'écran de régulation
     Un peu plus tard
     ${response}=          List Regulation Alerts
+    Set Test Variable   ${alertIndex}   1
     Set Test Variable   ${alerts}   ${response.content}
 
 Une demande de rappel est affichée
     [Arguments]    ${serviceId}   ${commercialLineId}   ${priority}
     Un peu plus tard
     Log Many         ${alerts}    
-    Element Attribute Should Be	${alerts}	service_id	${serviceId}	xpath=alert
-    Element Attribute Should Be	${alerts}	line_id	${commercialLineId}	  xpath=alert
-    Element Attribute Should Be	${alerts}	kind	0	xpath=alert
-    Element Attribute Should Be	${alerts}	priority	${priority}	xpath=alert/extraData    
+    Element Attribute Should Be	${alerts}	service_id	${serviceId}	xpath=alert[${alertIndex}]
+    Element Attribute Should Be	${alerts}	line_id	${commercialLineId}	  xpath=alert[${alertIndex}]
+    Element Attribute Should Be	${alerts}	kind	0	xpath=alert[${alertIndex}]
+    Element Attribute Should Be	${alerts}	priority	${priority}	xpath=alert[${alertIndex}]/extraData    
 
 
