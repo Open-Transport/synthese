@@ -13,7 +13,7 @@ ${sleepTime} plus tard
 Un peu plus tard
     5 seconds plus tard
 
-La régulation voit une demande de rappel normale provenant du service ${serviceId} de la ligne ${commercialLineId}
+Une demande de rappel normale provenant du service ${serviceId} de la ligne ${commercialLineId} est affichée
     [Documentation]    FAKE
     Un peu plus tard
     ${alerts}=          List Regulation Alerts
@@ -21,7 +21,7 @@ La régulation voit une demande de rappel normale provenant du service ${service
     Element Attribute Should Be	${alerts.content}	priority	0	xpath=alert/extraData    
 
 
-La régulation voit une demande de rappel urgente provenant du service ${serviceId} de la ligne ${commercialLineId}
+Une demande de rappel urgente provenant du service ${serviceId} de la ligne ${commercialLineId} est affichée
     [Documentation]    FAKE
     Un peu plus tard
     ${alerts}=          List Regulation Alerts
