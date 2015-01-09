@@ -93,6 +93,7 @@ namespace synthese
 				static const std::string PARAMETER_DELAY_BUS_STOP;
 				static const std::string PARAMETER_DAY_BREAK_TIME;
 				static const std::string PARAMETER_MESSAGES_SECTION;
+				static const std::string PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE;
 		
 			private:
 				boost::optional<std::string> _dbConnString;
@@ -102,6 +103,7 @@ namespace synthese
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
 				boost::posix_time::time_duration _dayBreakTime;
+				bool _sendDeactivationsByInterSYNTHESE;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
