@@ -4,6 +4,7 @@ Library           Process
 Library           Telnet
 Library           OperatingSystem
 Library           DatabaseLibrary
+Library           DateTime
 Resource          synthese.txt
 Resource          optymo_data.txt
 
@@ -24,18 +25,11 @@ Utiliser données réseau
 Supprimer données SAE
     Delete Synthese Objects    t119_vehicle_calls
     Delete Synthese Objects    t120_alerts
-    # Connect To Database Using Custom Params    sqlite3   database="./config.db3"
-    # @{queryResults}=   Query    SELECT id FROM t119_vehicle_calls;
-    # :FOR   ${id}   in    @{queryResults}    
-    # \   Delete Synthese Object   ${id[0]}
-    # @{queryResults}=   Query    SELECT id FROM t120_alerts;
-    # :FOR   ${id}   in    @{queryResults}    
-    # \   Delete Synthese Object   ${id[0]}
-    # Disconnect From Database
 
 Create Vehicle Call
     [Arguments]    ${vehicleId}    ${priority}
-    ${httpResponse}=    Create Synthese Object    119    field_vehicle_id\=${vehicleId}    field_priority\=${priority}
+    ${callTime}=   Get Current Date    
+    ${httpResponse}=    Create Synthese Object    119    field_vehicle_id\=${vehicleId}    field_priority\=${priority}    field_call_time\=${callTime}
     Should Be Equal As Strings    ${httpResponse.status_code}    200
 
 Update Vehicle Position

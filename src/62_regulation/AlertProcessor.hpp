@@ -24,8 +24,6 @@
 #define SYNTHESE_AlertProcessor_H__
 
 
-#include "RegulationModule.hpp"
-
 
 namespace synthese
 {

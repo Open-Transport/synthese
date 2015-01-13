@@ -5,6 +5,7 @@
 #include "RegulationRight.hpp"
 #include "AlertTableSync.hpp"
 #include "AlertListService.hpp"
+#include "ProcessAlertsAction.hpp"
 
 // Registries
 #include "RegulationModule.inc.cpp"
@@ -21,6 +22,8 @@ void synthese::regulation::moduleRegister()
 	synthese::regulation::RegulationRight::integrate();
 
 	synthese::util::Env::Integrate<synthese::regulation::Alert>();
+
+	synthese::regulation::ProcessAlertsAction::integrate();
 
     synthese::regulation::AlertListService::integrate();
     

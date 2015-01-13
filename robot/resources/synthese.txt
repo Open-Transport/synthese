@@ -34,6 +34,9 @@ Delete Synthese Objects
     \   Delete Synthese Object   ${id[0]}
     Disconnect From Database
     
+Process Alerts
+    ${httpResponse}=    Call Synthese Action    ProcessAlertsAction
+    Should Be Equal As Strings    ${httpResponse.status_code}    200
 
 Call Synthese Service
     [Arguments]    ${serviceName}    @{varargs}

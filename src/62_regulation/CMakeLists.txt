@@ -11,8 +11,8 @@ RegulationModule.inc.cpp
 RegulationRight.cpp
 RegulationRight.hpp
 
-AlertProcessingThread.hpp
-AlertProcessingThread.cpp
+AlertProcessingThreadExec.hpp
+AlertProcessingThreadExec.cpp
 AlertProcessor.hpp
 CallbackRequestAlertProcessor.hpp
 CallbackRequestAlertProcessor.cpp
@@ -22,6 +22,8 @@ AlertTableSync.hpp
 AlertTableSync.cpp
 AlertListService.hpp
 AlertListService.cpp
+ProcessAlertsAction.hpp
+ProcessAlertsAction.cpp
 
 #CheckLineCalendarFunction.cpp
 #CheckLineCalendarFunction.hpp

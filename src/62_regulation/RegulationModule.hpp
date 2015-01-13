@@ -25,6 +25,7 @@
 #define SYNTHESE_RegulationModule_H__
 
 #include "ModuleClassTemplate.hpp"
+#include "AlertProcessingThreadExec.hpp"
 
 namespace synthese
 {
@@ -80,11 +81,14 @@ namespace synthese
 		private:
 
 		public:
+            static AlertProcessingThreadExec ALERT_PROCESSING;
+
 			/** Initialization of the 62 Regulation module after the automatic database loads.
 				@author Marc Jambert
 				@date 2014
 			*/
 			void initialize();
+
 		};
 	}
 	/** @} */

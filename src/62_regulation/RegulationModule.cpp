@@ -22,7 +22,8 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "RegulationModule.hpp"
-#include "AlertProcessingThread.hpp"
+
+#include "01_util/threads/Thread.h"
 
 using namespace std;
 
@@ -52,9 +53,8 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<RegulationModule>::Start()
 		{
-            util::Log::GetInstance().info("************************* pouetStart");
-            static AlertProcessingThread thread;
-            thread.start();
+            static util::Thread alertProcessingThread(&regulation::RegulationModule::ALERT_PROCESSING, std::string("AlertProcessingThread"), 2000);
+            alertProcessingThread.start();
 		}
 
 		template<> void ModuleClassTemplate<RegulationModule>::End()
@@ -78,12 +78,17 @@ namespace synthese
 
 	namespace regulation
 	{
+
+        AlertProcessingThreadExec RegulationModule::ALERT_PROCESSING;
+        
 		void RegulationModule::initialize()
 		{
+            // supposed useless now...
+            /*
             util::Log::GetInstance().info("************************* pouet");
-            static AlertProcessingThread thread;
-            thread.start();
-            
+            static util::Thread alertProcessingThread(&_alertProcessing, "AlertProcessingThread", 2000);
+            alertProcessingThread.start();
+            */
 		}
 	}
 }

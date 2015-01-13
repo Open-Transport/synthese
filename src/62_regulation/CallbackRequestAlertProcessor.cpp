@@ -30,7 +30,6 @@
 #include "DBModule.h"
 #include "Env.h"
 #include "ScheduledService.h"
-#include "SelectQuery.hpp"
 #include "ParametersMap.h"
 
 using namespace std;
@@ -54,16 +53,33 @@ namespace synthese
         {
             util::Log::GetInstance().debug("Processing callback requests alerts");
             AlertTableSync::SearchResult callbackRequestAlerts(AlertTableSync::Search(Env::GetOfficialEnv(), ALERT_TYPE_CALLBACKREQUEST));
-            
-			BOOST_FOREACH(const VehicleCall::Registry::value_type& itVehicleCall, //registry)
+
+            std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> > latestVehicleCalls;
+			BOOST_FOREACH(const VehicleCall::Registry::value_type& itVehicleCall,
                           Env::GetOfficialEnv().getRegistry<VehicleCall>())
             {
-
+                
                 boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall.second;
                 boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
 
                 if (!vehicle) continue;
-                
+            
+                std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> >::const_iterator latestVehicleCallIt(
+                    latestVehicleCalls.find(vehicle->getKey()));
+                if ((latestVehicleCallIt == latestVehicleCalls.end()) ||
+                    (vehicleCall->get<CallTime>() > latestVehicleCallIt->second->get<CallTime>()))
+                {
+                    latestVehicleCalls[vehicle->getKey()] = vehicleCall;
+                }
+            }
+
+            for (std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> >::iterator itVehicleCall = latestVehicleCalls.begin();
+                 itVehicleCall != latestVehicleCalls.end();
+                 ++itVehicleCall)
+            {
+                boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall->second;
+                boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
+
                 VehiclePositionTableSync::SearchResult vehiclePositions(
                     VehiclePositionTableSync::Search(Env::GetOfficialEnv(), vehicle->getKey()));
 
@@ -80,7 +96,7 @@ namespace synthese
                 {
                     if (commercialLineId != callbackRequestAlert->get<Line>().get().getKey()) continue;
                     if (scheduledService->getKey() != callbackRequestAlert->get<Service>().get().getKey()) continue;
-
+                
                     wasExisting = true;
 
                     // check if need update
@@ -90,15 +106,15 @@ namespace synthese
                     extraDataPM.outputJSON(extraDataStream, "extraData");
                     if (extraDataStream.str() != callbackRequestAlert->get<ExtraData>())
                     {
-                        std::cerr << " old JSON : " << callbackRequestAlert->get<ExtraData>() << std::endl;
-                        std::cerr << " new JSON : " << extraDataStream.str() << std::endl;
-                        std::cerr << " Need update !!!!" << std::endl;
+                        //std::cerr << " old JSON : " << callbackRequestAlert->get<ExtraData>() << std::endl;
+                        //std::cerr << " new JSON : " << extraDataStream.str() << std::endl;
+                        //std::cerr << " Need update !!!!" << std::endl;
                         callbackRequestAlert->set<ExtraData>(extraDataStream.str());
                         AlertTableSync::Save(callbackRequestAlert.get());
                     }
                     break;
                 }
-
+                    
                 if (!wasExisting)
                 {
                     Alert callbackRequestAlert;
@@ -117,7 +133,7 @@ namespace synthese
             }
 
             util::Log::GetInstance().debug("Processed callback requests alerts");
-            
+
         }
 
     }

@@ -1,6 +1,6 @@
 
-/** PermanentThreadExporter template header.
-	@file PermanentThreadExporter.hpp
+/** AlertProcessingThreadExec class implementation.
+	@file AlertProcessingThreadExec.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,48 +20,44 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AlertProcessingThread_H__
-#define SYNTHESE_AlertProcessingThread_H__
+#include "AlertProcessingThreadExec.hpp"
 
+#include "01_util/Log.h"
 
-#include "RegulationModule.hpp"
-#include <boost/thread.hpp>
-#include "AlertProcessor.hpp"
+#include <boost/foreach.hpp>
+#include "CallbackRequestAlertProcessor.hpp"
+
+using synthese::util::Log;
+
 
 namespace synthese
 {
-	namespace regulation
-	{
-		/** 
-			@ingroup m16
-		*/
-		class AlertProcessingThread			
-		{
+namespace regulation
+{
 
-        private:
+AlertProcessingThreadExec::AlertProcessingThreadExec()
+: ThreadExec()
+{
+    _alertProcessors.push_back(boost::shared_ptr<AlertProcessor>(
+                                   new CallbackRequestAlertProcessor()));
 
-            
-			bool _hasToStop;
-            mutable boost::mutex _mutex;
-            boost::shared_ptr<boost::thread> _thread;
-
-            std::vector<boost::shared_ptr<AlertProcessor> > _alertProcessors;
-            
-		protected:
-
-		public:
-
-			AlertProcessingThread();
-            
-            void start();
-            bool hasToStop() const;
-            void stop();
-
-            void operator()();
-            
-		};
+}
 
 
-}	}
+void
+AlertProcessingThreadExec::loop()
+{
+    _processingMutex.lock();
+    BOOST_FOREACH(boost::shared_ptr<AlertProcessor>& alertProcessor, _alertProcessors)
+    {
+        alertProcessor->processAlerts();
+    }
+    _processingMutex.unlock();
+}
 
-#endif // SYNTHESE_AlertProcessingThread_H__
+
+
+}
+}
+
+
