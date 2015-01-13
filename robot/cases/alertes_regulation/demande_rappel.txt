@@ -40,6 +40,13 @@ Une demande de rappel urgente est remontée, puis devient normale
     Sur l'écran de régulation
     Une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1} est affichée
 
+Une demande de rappel normale est remontée, puis est annulée
+    [Tags]    regulation
+    Le bus ${BUS1} transmet une demande de rappel normale à la régulation
+    Le bus ${BUS1} annule sa demande de rappel
+    Sur l'écran de régulation
+    Aucune demande de rappel n'est affichée
+
     
         #rappel normal => puis annulation
     # au niveau vehicle_call cela signifie : le closure time est positionné
