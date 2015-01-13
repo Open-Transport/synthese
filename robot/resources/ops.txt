@@ -18,14 +18,9 @@ Une demande de rappel normale provenant du service ${serviceId} de la ligne ${co
     Une demande de rappel est affichée   ${serviceId}   ${commercialLineId}   0
 
 
-
-# one launch of synthese!
-    
 Une demande de rappel urgente provenant du service ${serviceId} de la ligne ${commercialLineId} est affichée
     [Documentation]    FAKE
     Une demande de rappel est affichée   ${serviceId}   ${commercialLineId}   1
-
-
 
 Sur l'écran de régulation
     Un peu plus tard

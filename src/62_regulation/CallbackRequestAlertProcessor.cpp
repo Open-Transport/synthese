@@ -53,7 +53,8 @@ namespace synthese
         CallbackRequestAlertProcessor::processAlerts()
         {
             util::Log::GetInstance().debug("Processing callback requests alerts");
-
+            AlertTableSync::SearchResult callbackRequestAlerts(AlertTableSync::Search(Env::GetOfficialEnv(), ALERT_TYPE_CALLBACKREQUEST));
+            
 			BOOST_FOREACH(const VehicleCall::Registry::value_type& itVehicleCall, //registry)
                           Env::GetOfficialEnv().getRegistry<VehicleCall>())
             {
@@ -61,13 +62,12 @@ namespace synthese
                 boost::shared_ptr<VehicleCall> vehicleCall = itVehicleCall.second;
                 boost::optional<Vehicle&> vehicle = vehicleCall->get<Vehicle>();
 
-                // TODO check exists
                 if (!vehicle) continue;
                 
                 VehiclePositionTableSync::SearchResult vehiclePositions(
                     VehiclePositionTableSync::Search(Env::GetOfficialEnv(), vehicle->getKey()));
 
-                // TODO check size
+                if (vehiclePositions.empty()) continue;
                 boost::shared_ptr<const VehiclePosition> vehiclePosition = *vehiclePositions.begin();
 
                 pt::ScheduledService* scheduledService = vehiclePosition->getService();
@@ -75,31 +75,45 @@ namespace synthese
 				pt::CommercialLine* commercialLine(journeyPattern->getCommercialLine());
                 
                 util::RegistryKeyType commercialLineId(commercialLine->getKey());
-                
-                util::RegistryKeyType hashCode(23);
-                hashCode = hashCode * 31 + commercialLineId;
-                hashCode = hashCode * 31 + scheduledService->getKey();
-                hashCode = hashCode * 31 + ALERT_TYPE_CALLBACKREQUEST;
+                bool wasExisting(false);
+                BOOST_FOREACH(const boost::shared_ptr<Alert>& callbackRequestAlert, callbackRequestAlerts)
+                {
+                    if (commercialLineId != callbackRequestAlert->get<Line>().get().getKey()) continue;
+                    if (scheduledService->getKey() != callbackRequestAlert->get<Service>().get().getKey()) continue;
 
-                util::RegistryKeyType alertId(util::encodeUId(
-                                                  AlertTableSync::TABLE.ID,
-                                                  db::DBModule::GetNodeId(),
-                                                  hashCode));
-                
-                Alert callbackRequestAlert(alertId);
-                callbackRequestAlert.set<Kind>(ALERT_TYPE_CALLBACKREQUEST);
-                callbackRequestAlert.set<Service>(*scheduledService);
-                callbackRequestAlert.set<Line>(*commercialLine);
+                    wasExisting = true;
 
-                util::ParametersMap extraDataPM;
-                extraDataPM.insert("priority", vehicleCall->get<Priority>());
-                std::stringstream extraDataStream;
-                extraDataPM.outputJSON(extraDataStream, "extraData");
+                    // check if need update
+                    util::ParametersMap extraDataPM;
+                    extraDataPM.insert("priority", vehicleCall->get<Priority>());
+                    std::stringstream extraDataStream;
+                    extraDataPM.outputJSON(extraDataStream, "extraData");
+                    if (extraDataStream.str() != callbackRequestAlert->get<ExtraData>())
+                    {
+                        std::cerr << " old JSON : " << callbackRequestAlert->get<ExtraData>() << std::endl;
+                        std::cerr << " new JSON : " << extraDataStream.str() << std::endl;
+                        std::cerr << " Need update !!!!" << std::endl;
+                        callbackRequestAlert->set<ExtraData>(extraDataStream.str());
+                        AlertTableSync::Save(callbackRequestAlert.get());
+                    }
+                    break;
+                }
 
-                callbackRequestAlert.set<ExtraData>(extraDataStream.str());
+                if (!wasExisting)
+                {
+                    Alert callbackRequestAlert;
+                    callbackRequestAlert.set<Kind>(ALERT_TYPE_CALLBACKREQUEST);
+                    callbackRequestAlert.set<Service>(*scheduledService);
+                    callbackRequestAlert.set<Line>(*commercialLine);
+                    
+                    util::ParametersMap extraDataPM;
+                    extraDataPM.insert("priority", vehicleCall->get<Priority>());
+                    std::stringstream extraDataStream;
+                    extraDataPM.outputJSON(extraDataStream, "extraData");
+                    callbackRequestAlert.set<ExtraData>(extraDataStream.str());
 
-                AlertTableSync::Save(&callbackRequestAlert);
-                
+                    AlertTableSync::Save(&callbackRequestAlert);
+                }
             }
 
             util::Log::GetInstance().debug("Processed callback requests alerts");

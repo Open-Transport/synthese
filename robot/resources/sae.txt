@@ -3,6 +3,7 @@ Documentation     Bla bla bla
 Library           Process
 Library           Telnet
 Library           OperatingSystem
+Library           DatabaseLibrary
 Resource          synthese.txt
 Resource          optymo_data.txt
 
@@ -19,6 +20,18 @@ Arrêter SAE
 Utiliser données réseau
     [Arguments]    ${testData}
     Copy File    ${testData}    ${S3_SERVER_DB}
+
+Supprimer données SAE
+    Delete Synthese Objects    t119_vehicle_calls
+    Delete Synthese Objects    t120_alerts
+    # Connect To Database Using Custom Params    sqlite3   database="./config.db3"
+    # @{queryResults}=   Query    SELECT id FROM t119_vehicle_calls;
+    # :FOR   ${id}   in    @{queryResults}    
+    # \   Delete Synthese Object   ${id[0]}
+    # @{queryResults}=   Query    SELECT id FROM t120_alerts;
+    # :FOR   ${id}   in    @{queryResults}    
+    # \   Delete Synthese Object   ${id[0]}
+    # Disconnect From Database
 
 Create Vehicle Call
     [Arguments]    ${vehicleId}    ${priority}

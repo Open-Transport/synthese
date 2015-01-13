@@ -95,6 +95,8 @@ namespace synthese
                 boost::shared_ptr<ParametersMap> alertPM(new ParametersMap);
                 alert->toParametersMap(*alertPM);
                 alertPM->remove("extra_data");
+
+                std::cerr << "*** " << alert->get<ExtraData>() << std::endl;
                 boost::shared_ptr<ParametersMap> extraDataParametersMap(ParametersMap::FromJson(alert->get<ExtraData>()));
                 
                 alertPM->insert("extraData", extraDataParametersMap->getSubMaps("extraData").at(0));

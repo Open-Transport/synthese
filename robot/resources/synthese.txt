@@ -10,7 +10,7 @@ ${S3_SERVER_URL}    http://localhost:${S3_SERVER_PORT}/
 
 *** Keywords ***
 Start Synthese
-    Start Process    ${S3_SERVER}    '--param port\=8084'   stderr=${TEST NAME}_s3.err    stdout=${TEST NAME}_s3.out
+    Start Process    ${S3_SERVER}    '--param port\=8084'   stderr=${SUITE NAME}_s3.err    stdout=${SUITE NAME}_s3.out
     Wait Until Keyword Succeeds    2 min    5 sec    Open Connection    localhost    ${None}    ${S3_SERVER_PORT}
 
 Stop Synthese
@@ -20,6 +20,20 @@ Create Synthese Object
     [Arguments]    ${tableId}    @{varargs}
     ${httpResponse}=    Call Synthese Service    objectcreate    table_id\=${tableId}    @{varargs}
     [Return]    ${httpResponse}
+
+Delete Synthese Object
+    [Arguments]    ${objectId}
+    ${httpResponse}=    Call Synthese Action    RemoveObjectAction    actionParam_object_id\=${objectId}
+    Should Be Equal As Strings    ${httpResponse.status_code}    200
+
+Delete Synthese Objects
+    [Arguments]    ${tableName}
+    Connect To Database Using Custom Params    sqlite3   database="./config.db3"
+    @{queryResults}=   Query    SELECT id FROM ${tableName};
+    :FOR   ${id}   in    @{queryResults}    
+    \   Delete Synthese Object   ${id[0]}
+    Disconnect From Database
+    
 
 Call Synthese Service
     [Arguments]    ${serviceName}    @{varargs}

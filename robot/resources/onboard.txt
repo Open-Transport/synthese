@@ -5,6 +5,7 @@ Resource          sae.txt
 *** Variables ***
 
 *** Keywords ***
+
 Le bus ${vehicleId} prend son service ${serviceId} sur la ligne ${commercialLineId}
     [Documentation]    FAKE
     Update Vehicle Position    vehicleId=${vehicleId}    serviceId=${serviceId}

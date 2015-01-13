@@ -1,10 +1,10 @@
 *** Settings ***
 Documentation     Tests fonctionnels de la remontée d'alertes de régulation
-Test Setup        Démarrer SAE
-Test Teardown     Arrêter SAE
-Resource          ../../resources/onboard.txt
+Resource          ../../resources/onboard.txt    
 Resource          ../../resources/ops.txt
-Resource          ../../resources/optymo_data.txt
+Suite Setup       Démarrer SAE
+Test Setup        Supprimer données SAE
+Suite Teardown    Arrêter SAE
 
 *** Test Cases ***
 Une demande de rappel normale est remontée
@@ -40,42 +40,26 @@ Une demande de rappel urgente est remontée, puis devient normale
     Sur l'écran de régulation
     Une demande de rappel normale provenant du service ${SERVICE1} de la ligne ${LINE1} est affichée
 
-
-#rappel normal => puis annulation
-# au niveau vehicle_call cela signifie : le closure time est positionné
-
-#demande de rappel
-#la regul rappelle le bus
-#la regul redige un CR de l'appel
-#la regul indique que c resolu
-#l'alerte a disparu de la liste
-
-#demande de rappel
-#la regul rappelle le bus
-#la regul redige un CR de l'appel
-#la regul indique que c pas resolu
-#l'alerte a disparu de la liste
-
-#demande de rappel
-#la regul rappelle le bus
-#la regul redige un CR de l'appel
-#la regul ferme la boite d'alerte
-#l'alerte est toujours dans la liste
-
-#si reouverture de la boite d'alerte
-#il voit dans son historique sa premiere action de rappel
-#ainsi de suite
-
-#faire appraitre le conducteur! prevoir le cas ou le conducteur est non
-#renseigné
-
-
-
-
-
-
-
-
-
-
-
+    
+        #rappel normal => puis annulation
+    # au niveau vehicle_call cela signifie : le closure time est positionné
+    #demande de rappel
+    #la regul rappelle le bus
+    #la regul redige un CR de l'appel
+    #la regul indique que c resolu
+    #l'alerte a disparu de la liste
+    #demande de rappel
+    #la regul rappelle le bus
+    #la regul redige un CR de l'appel
+    #la regul indique que c pas resolu
+    #l'alerte a disparu de la liste
+    #demande de rappel
+    #la regul rappelle le bus
+    #la regul redige un CR de l'appel
+    #la regul ferme la boite d'alerte
+    #l'alerte est toujours dans la liste
+    #si reouverture de la boite d'alerte
+    #il voit dans son historique sa premiere action de rappel
+    #ainsi de suite
+    #faire appraitre le conducteur! prevoir le cas ou le conducteur est non
+    #renseigné

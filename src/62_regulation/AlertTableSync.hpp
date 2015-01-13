@@ -32,12 +32,7 @@ namespace synthese
 {
 	namespace regulation
 	{
-		//////////////////////////////////////////////////////////////////////////
-		///	Descent table synchronizer.
-		///	@ingroup m38LS refLS
-		///	@author Camille Hue
-		///	@date 2013
-		/// @since 3.8.0
+
 		class AlertTableSync:
             // TODO : ne pas tout monter en RAM : ConditionalTableSync 
 			public db::DBDirectTableSyncTemplate<
