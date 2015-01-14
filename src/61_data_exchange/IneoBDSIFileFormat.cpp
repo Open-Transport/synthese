@@ -1718,7 +1718,12 @@ namespace synthese
 					break;
 				}
 			}
-			if(!updated)
+			if(!updated && !syntheseService->hasRealTimeData())
+			{
+				// No update is needed but we do it anyway so that RT schedule will be set
+				syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
+			}
+			else if(!updated)
 			{
 				return UpdateDeltas();
 			}
