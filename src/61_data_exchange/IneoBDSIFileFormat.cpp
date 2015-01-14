@@ -151,7 +151,7 @@ namespace synthese
 		) const {
 
 			// Jump over courses with incomplete chainages
-			if(horaires.size() >= chainage.arretChns.size())
+			if(horaires.size() > chainage.arretChns.size())
 			{
 				_logWarningDetail(
 					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"Bad horaire number compared to chainage arretchn number "
