@@ -99,7 +99,8 @@ namespace synthese
 			#ifdef WITH_SCOM
 			if (_scom)
 			{
-				realStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff() * 2);			}
+				realStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff() * 2);
+			}
 			#endif
 
 			AccessParameters ap;

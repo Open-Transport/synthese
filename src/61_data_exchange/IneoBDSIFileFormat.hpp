@@ -172,6 +172,14 @@ namespace synthese
 					bool sens,
 					const std::string& chainageRef
 				) const;
+				Chainage* _createAndReturnChainage(
+					Chainages& chainages,
+					const Chainage::ArretChns& arretchns,
+					const Ligne& ligne,
+					const std::string& nom,
+					bool sens,
+					const std::string& chainageRef
+				) const;
 
 
 
@@ -215,7 +223,8 @@ namespace synthese
 					const Chainage& chainage,
 					const std::string& courseRef,
 					const boost::posix_time::time_duration& nowDuration,
-					const util::RegistryKeyType &handicapped
+					const util::RegistryKeyType &handicapped,
+					Chainages& chainages
 				) const;
 
 
