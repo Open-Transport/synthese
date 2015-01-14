@@ -17,6 +17,7 @@ Le bus ${vehicleId} transmet une demande de rappel normale à la régulation
 
 Le bus ${vehicleId} annule sa demande de rappel
     [Documentation]    FAKE
+    Cancel Vehicle Call    vehicleId=${vehicleId}
     No Operation
 
 Le bus ${vehicleId} transmet encore une demande de rappel normale à la régulation

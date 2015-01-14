@@ -10,7 +10,7 @@ ${S3_SERVER_URL}    http://localhost:${S3_SERVER_PORT}/
 
 *** Keywords ***
 Start Synthese
-    Start Process    ${S3_SERVER}    '--param port\=8084'   stderr=${SUITE NAME}_s3.err    stdout=${SUITE NAME}_s3.out
+    Start Process    ${S3_SERVER}    '--param port\=8084 --param log_level=0'    stderr=${SUITE NAME}_s3.err    stdout=${SUITE NAME}_s3.out
     Wait Until Keyword Succeeds    2 min    5 sec    Open Connection    localhost    ${None}    ${S3_SERVER_PORT}
 
 Stop Synthese
@@ -24,6 +24,11 @@ Create Synthese Object
 Delete Synthese Object
     [Arguments]    ${objectId}
     ${httpResponse}=    Call Synthese Action    RemoveObjectAction    actionParam_object_id\=${objectId}
+    Should Be Equal As Strings    ${httpResponse.status_code}    200
+
+Update Synthese Object
+    [Arguments]    ${objectId}   @{varargs}
+    ${httpResponse}=    Call Synthese Action    ObjectUpdate    actionParam_object_id\=${objectId}    @{varargs}
     Should Be Equal As Strings    ${httpResponse.status_code}    200
 
 Delete Synthese Objects

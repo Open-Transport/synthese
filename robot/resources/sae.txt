@@ -32,6 +32,19 @@ Create Vehicle Call
     ${httpResponse}=    Create Synthese Object    119    field_vehicle_id\=${vehicleId}    field_priority\=${priority}    field_call_time\=${callTime}
     Should Be Equal As Strings    ${httpResponse.status_code}    200
 
+
+# TODO Question de comportement onboard => ops, à eclaircir avec hugues  :
+# les boutons alerte normale et alerte urgente sont des boutons à poussoir à etat (restent enfoncés) exclusifs
+# precisions
+# si on fait demande de rappel normal puis annulation puis demande de rappel normal => 2 entrées vehicle call (1ere annulée avec closure time)
+# si on fait demande de rappel normal puis annulation puis demande de rappel urgente => 2 entrées vehicle call ou maj de la premiere ? si maj de la premiere sans maj du calltume, probleme car on a l'impression que le vehicle call a toujours été urgent!! A CONFIRMER
+Cancel Vehicle Call
+    [Arguments]    ${vehicleId}
+    ${closureTime}=   Get Current Date    
+    # TODO proper object id !!${httpResponse}=    Update Synthese Object    119    field_vehicle_id\=${vehicleId}    field_closure_time\=${closureTime}
+    #Should Be Equal As Strings    ${httpResponse.status_code}    200
+    
+    
 Update Vehicle Position
     [Arguments]    ${vehicleId}    ${serviceId}
     ${httpResponse}=    Call Synthese Action    VehiclePositionUpdateAction    actionParamve\=${vehicleId}    actionParamsi\=${serviceId}
