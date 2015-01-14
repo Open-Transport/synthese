@@ -146,44 +146,101 @@ namespace synthese
 			const Course::Horaires& horaires,
 			const Chainage& chainage,
 			const std::string& courseRef,
-			const time_duration& nowDuration
+			const time_duration& nowDuration,
+			Chainages& chainages
 		) const {
 
 			// Jump over courses with incomplete chainages
-			if(horaires.size() != chainage.arretChns.size())
+			if(horaires.size() >= chainage.arretChns.size())
 			{
 				_logWarningDetail(
 					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"Bad horaire number compared to chainage arretchn number "
 				);
 				return;
 			}
-
-			// Jump over dead runs
-			BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
+			else if (horaires.size() < chainage.arretChns.size())
 			{
-				if(!it.arret->syntheseStop)
+				// There is less horaire than arretchn so we create a new Chainage
+				Chainage* newChainage;
+				Chainage::ArretChns arretChns;
+				// Loop on horaires to create arretChns
+				std::size_t horaireCount(0);
+				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
 				{
-					return;
+					ArretChn& arretChn(
+						*arretChns.insert(
+							arretChns.end(),
+							ArretChn()
+					)	);
+					arretChn.ref = it.ref;
+					arretChn.arret = it.arret;
+					arretChn.pos = it.pos;
+					arretChn.type = it.type;
+					horaireCount++;
+					if (horaireCount >= horaires.size())
+					{
+						break;
+					}
 				}
+				
+				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
+				
+				// Jump over dead runs
+				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)
+				{
+					if(!it.arret->syntheseStop)
+					{
+						return;
+					}
+				}
+				
+				// OK let's store the service
+				Course& course(
+					courses.insert(
+						make_pair(
+							courseRef,
+							Course()
+					)	).first->second
+				);
+				course.ref = courseRef;
+				course.horaires = horaires;
+				course.chainage = newChainage;
+				course.syntheseService = NULL;
+				
+				// Trace
+				_logLoadDetail(
+					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
+				);
 			}
-	
-			// OK let's store the service
-			Course& course(
-				courses.insert(
-					make_pair(
-						courseRef,
-						Course()
-				)	).first->second
-			);
-			course.ref = courseRef;
-			course.horaires = horaires;
-			course.chainage = &chainage;
-			course.syntheseService = NULL;
+			else
+			{
+				// Jump over dead runs
+				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
+				{
+					if(!it.arret->syntheseStop)
+					{
+						return;
+					}
+				}
+		
+				// OK let's store the service
+				Course& course(
+					courses.insert(
+						make_pair(
+							courseRef,
+							Course()
+					)	).first->second
+				);
+				course.ref = courseRef;
+				course.horaires = horaires;
+				course.chainage = &chainage;
+				course.syntheseService = NULL;
 
-			// Trace
-			_logLoadDetail(
-				"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
-			);
+				// Trace
+				_logLoadDetail(
+					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
+				);
+			}
 		}
 
 
@@ -222,6 +279,44 @@ namespace synthese
 				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
 			);
 
+		}
+		
+		IneoBDSIFileFormat::Importer_::Chainage* IneoBDSIFileFormat::Importer_::_createAndReturnChainage(
+			Chainages& chainages,
+			const Chainage::ArretChns& arretchns,
+			const Ligne& ligne,
+			const std::string& nom,
+			bool sens,
+			const std::string& ref
+		) const	{
+		
+			// Check if arretchns is long enough
+			if(arretchns.size() < 2)
+			{
+				_logWarningDetail(
+					"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),arretchns.empty() ? "JOURNEYPATTERN HAS NO STOPS" : "JOURNEYPATTERN HAS ONLY ONE STOP"
+				);
+				return NULL;
+			}
+			
+			Chainage& chainage(
+				chainages.insert(
+					make_pair(
+						ref,
+						Chainage()
+				)	).first->second
+			);
+			chainage.ref = ref;
+			chainage.ligne = &ligne;
+			chainage.nom = nom;
+			chainage.sens = sens;
+			chainage.arretChns = arretchns;
+			_logLoadDetail(
+				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
+			);
+			
+			return &chainage;
+		
 		}
 		
 		
@@ -584,7 +679,8 @@ namespace synthese
 							horaires,
 							*chainage,
 							lastCourseRef,
-							nowDuration
+							nowDuration,
+							chainages
 						);
 					}
 
@@ -685,7 +781,8 @@ namespace synthese
 						horaires,
 						*chainage,
 						lastCourseRef,
-						nowDuration
+						nowDuration,
+						chainages
 					);
 				}
 			}
