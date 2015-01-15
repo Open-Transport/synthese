@@ -540,7 +540,7 @@ namespace synthese
 			// Courses
 			{
 				string horaireQuery(
-					"SELECT "+
+					"SELECT DISTINCT "+
 						_database +".HORAIRE.hra,"+
 						_database +".HORAIRE.hrd,"+
 						_database +".HORAIRE.hta,"+
