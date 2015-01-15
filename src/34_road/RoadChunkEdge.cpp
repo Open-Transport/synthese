@@ -133,7 +133,10 @@ namespace synthese
 				}
 
 				tmpGeom = static_cast<const RoadChunkEdge*>(this->getNext())->_roadChunk->getGeometry();
-				tmpGeom.reset(static_cast<geos::geom::LineString*>(tmpGeom->reverse()));
+				if (tmpGeom)
+				{
+					tmpGeom.reset(static_cast<geos::geom::LineString*>(tmpGeom->reverse()));
+				}
 			}
 			else
 			{
