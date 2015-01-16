@@ -277,6 +277,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_BIKE_PLACES_NUMBER("bike_places_number");
 		const string PTJourneyPlannerService::DATA_WKT("wkt");
 		const string PTJourneyPlannerService::DATA_LINE_MARKERS("line_markers");
+		const string PTJourneyPlannerService::DATA_IS_REAL_TIME("realTime");
 
 		PTJourneyPlannerService::PTJourneyPlannerService(
 		):	_startDate(not_a_date_time),
@@ -2227,6 +2228,7 @@ namespace synthese
 			const JourneyPattern* line(static_cast<const JourneyPattern*>(serviceUse.getService()->getPath()));
 			const CommercialLine* commercialLine(line->getCommercialLine());
 			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(serviceUse.getService()));
+			const SchedulesBasedService* schedulesBasedService(dynamic_cast<const SchedulesBasedService*>(serviceUse.getService()));
 
 			// Build of the parameters vector
 			{
@@ -2284,11 +2286,16 @@ namespace synthese
 					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
 				"9999"
 			); // 11
-			commercialLine->toParametersMap(pm, false);
-			serviceUse.getService()->toParametersMap(pm, false);
+
+			if (schedulesBasedService)
+			{
+				pm.insert(DATA_IS_REAL_TIME, schedulesBasedService->hasRealTimeData());
+			}
+
 			if(continuousService)
 			{
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
+				pm.insert(DATA_IS_REAL_TIME, continuousService->hasRealTimeData());
 			}
 
 			pm.insert(DATA_ODD_ROW, color);

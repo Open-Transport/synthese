@@ -38,6 +38,7 @@
 #include "LineStop.h"
 #include "PTModule.h"
 #include "SchedulesBasedService.h"
+#include "ContinuousService.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
@@ -179,7 +180,7 @@ namespace synthese
 
 		const string DisplayScreenContentFunction::DATA_IS_REAL_TIME("realTime");
 
-		const string DisplayScreenContentFunction::DATA_HANDICAPPED_ACCESS("service_handicapped_compliance_id");
+		const string DisplayScreenContentFunction::DATA_HANDICAPPED_ACCESS("handicapped_access");
 
 
 		const string PIPO_KEY("00");
@@ -634,12 +635,10 @@ namespace synthese
 			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
 
 			//Here we got our service !
-			//TODO: check if service schedules are realtime in the !_useSAEDirectConnection case
-			//(Instead of saying "yes" every time)
 			stream <<"<journey routeId=\""<< journeyPattern->getKey() <<
 				"\" dateTime=\""    << servicePointer.getDepartureDateTime() <<
 				"\" blink=\"" << "0" <<
-				"\" "<< DATA_IS_REAL_TIME <<"=\"" << (_useSAEDirectConnection ? "no" : "yes") <<
+					 "\" "<< DATA_IS_REAL_TIME <<"=\"" << (service->hasRealTimeData() ? "yes":"no") <<
 				"\">";
 
 			stream << "<stop id=\"" << stop->getKey() <<
@@ -919,6 +918,15 @@ namespace synthese
 				journeyPm->insert(DATA_NETWORK_ID, journeyPattern->getNetwork()->getKey());
 				journeyPm->insert(DATA_NETWORK_NAME, journeyPattern->getNetwork()->getName());
 			}
+
+			// Handicapped access
+			const PTUseRule* handicappedUserRule = dynamic_cast<const PTUseRule*>(
+				&(service)->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
+			);
+			journeyPm->insert(DATA_HANDICAPPED_ACCESS, handicappedUserRule ? handicappedUserRule->getAccessCapacity().get_value_or(9999) != 0 : true);
+
+			// Is realtime
+			journeyPm->insert(DATA_IS_REAL_TIME, service->hasRealTimeData());
 
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 			stop->toParametersMap(*stopPM, false);
@@ -1581,11 +1589,11 @@ namespace synthese
 					pm.insert(DATA_BLINKS, true);
 				}
 
-				// Handicapped access
+				// Handicapped access (true by default)
 				const PTUseRule* handicappedUserRule = dynamic_cast<const PTUseRule*>(
 					&(row.first.getService())->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
 				);
-				pm.insert(DATA_HANDICAPPED_ACCESS, handicappedUserRule ? handicappedUserRule->getKey() : 0);
+				pm.insert(DATA_HANDICAPPED_ACCESS, handicappedUserRule ? handicappedUserRule->getAccessCapacity().get_value_or(9999) != 0 : true);
 
 				// Time
 				pm.insert(DATA_TIME, to_iso_extended_string(row.first.getDepartureDateTime().date()) + " " + to_simple_string(row.first.getDepartureDateTime().time_of_day()));
@@ -1603,6 +1611,21 @@ namespace synthese
 
 				// Is canceled
 				pm.insert(DATA_IS_CANCELED, row.first.getCanceled());
+
+				// Is realtime
+				const SchedulesBasedService* schedulesBasedService(dynamic_cast<const SchedulesBasedService*>(row.first.getService()));
+				if (schedulesBasedService)
+				{
+					pm.insert(DATA_IS_REAL_TIME, schedulesBasedService->hasRealTimeData());
+				}
+				else
+				{
+					const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(row.first.getService()));
+					if(continuousService)
+					{
+						pm.insert(DATA_IS_REAL_TIME, continuousService->hasRealTimeData());
+					}
+				}
 
 				// Direction
 				const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath()));
