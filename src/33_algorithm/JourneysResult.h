@@ -57,7 +57,12 @@ namespace synthese
 			> ResultSet;
 
 		private:
-			typedef std::map<const graph::Vertex*, ResultSet::iterator> IndexMap;
+			typedef std::map<
+				std::pair<
+					const graph::Vertex*, 
+					boost::posix_time::ptime
+				>, ResultSet::iterator
+			> IndexMap;
 
 			boost::posix_time::ptime _originDateTime;
 			const PlanningPhase _accessDirection;
@@ -102,7 +107,7 @@ namespace synthese
 
 
 
-				void remove(const graph::Vertex* vertex);
+				void remove(const graph::Vertex* vertex, boost::posix_time::ptime arrivalDateTime);
 
 
 
@@ -155,10 +160,11 @@ namespace synthese
 			//@{
 				/** Gets the result journey that reaches the specified vertex.
 					@param vertex Vertex to be reached by the returned result journey
+					@param arrivalDateTime Arrival date to be reached by the returned result journey
 					@return const pt::Journey* const The result journey that reaches the specified vertex
 					@author Hugues Romain
 				*/
-				boost::shared_ptr<RoutePlanningIntermediateJourney> get(const graph::Vertex* vertex) const;
+				boost::shared_ptr<RoutePlanningIntermediateJourney> get(const graph::Vertex* vertex, boost::posix_time::ptime arrivalDateTime) const;
 
 
 

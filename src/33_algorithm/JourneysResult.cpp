@@ -44,7 +44,10 @@ namespace synthese
 			{
 				_index.insert(
 					std::make_pair(
-						it->first->getEndEdge().getFromVertex(),
+						std::make_pair(
+							it->first->getEndEdge().getFromVertex(),
+							it->first->getEndTime()
+						),
 						it
 				)	);
 			}
@@ -63,14 +66,15 @@ namespace synthese
 			const RoutePlanningIntermediateJourney& journey
 		){
 			const graph::Vertex* vertex(journey.getEndEdge().getFromVertex());
-			remove(vertex);
+			boost::posix_time::ptime arrivalDateTime = journey.getEndTime();
+			remove(vertex, arrivalDateTime);
 		}
 
 
 
-		void JourneysResult::remove(const graph::Vertex* vertex)
+		void JourneysResult::remove(const graph::Vertex* vertex, boost::posix_time::ptime arrivalDateTime)
 		{
-			IndexMap::iterator it(_index.find(vertex));
+			IndexMap::iterator it(_index.find(std::make_pair(vertex, arrivalDateTime)));
 			if (it != _index.end())
 			{
 				ResultSet::iterator its(it->second);
@@ -90,10 +94,13 @@ namespace synthese
 				journey->getEndTime() - _originDateTime :
 				_originDateTime - journey->getEndTime()
 			);
-			remove(vertex);
+			remove(vertex, journey->getEndTime());
 			_index.insert(
 				std::make_pair(
-					vertex,
+					std::make_pair(
+						vertex,
+						journey->getEndTime()
+					),
 					_result.insert(
 						std::make_pair(journey, duration)
 					).first
@@ -107,7 +114,10 @@ namespace synthese
 			graph::Vertex* nullVertex(NULL);
 			_index.insert(
 				std::make_pair(
-					nullVertex,
+					std::make_pair(
+						nullVertex,
+						boost::gregorian::not_a_date_time
+					),
 					_result.insert(
 						std::make_pair(
 							boost::shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(_accessDirection)),
@@ -123,7 +133,7 @@ namespace synthese
 			assert(!empty());
 
 			boost::shared_ptr<RoutePlanningIntermediateJourney> ptr(_result.begin()->first);
-			_index.erase(ptr->empty() ? NULL : ptr->getEndEdge().getFromVertex());
+			_index.erase(std::make_pair(ptr->empty() ? NULL : ptr->getEndEdge().getFromVertex(), ptr->empty() ? boost::gregorian::not_a_date_time : ptr->getEndTime()));
 			_result.erase(_result.begin());
 			return ptr;
 		}
@@ -217,9 +227,9 @@ namespace synthese
 
 
 
-		boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::get(const graph::Vertex* vertex) const
+		boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::get(const graph::Vertex* vertex, boost::posix_time::ptime arrivalDateTime) const
 		{
-			IndexMap::const_iterator it(_index.find(vertex));
+			IndexMap::const_iterator it(_index.find(std::make_pair(vertex, arrivalDateTime)));
 			if (it != _index.end())
 			{
 				ResultSet::const_iterator its(it->second);
