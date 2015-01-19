@@ -517,7 +517,7 @@ namespace synthese
 					continue;
 				}
 
-				bool cleaned(!todo.get(vertex, journey->getEndTime()).get()).get());
+				bool cleaned(!todo.get(vertex, journey->getEndTime()).get().get());
 				Map::const_iterator it2(_lastTodo.find(vertex));
 
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << r++;
