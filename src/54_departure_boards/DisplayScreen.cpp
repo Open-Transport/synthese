@@ -759,15 +759,15 @@ namespace synthese
 					if(	link->getObjectId() == DisplayScreenTableSync::TABLE.ID ||
 						link->getObjectId() == 0
 					){
-						result = true;
+						return true;
 					}
 
 					// Search for general broadcast on a precise display screens type equal to
 					// the display type of the current display screen
-					if( link->getObjectId() == DisplayTypeTableSync::TABLE.ID &&
+					if( decodeTableId(link->getObjectId()) == DisplayTypeTableSync::TABLE.ID &&
 						link->getObjectId() == get<DisplayTypePtr>()->getKey())
 					{
-						result = true;
+						return true;
 					}
 
 					if(result)
