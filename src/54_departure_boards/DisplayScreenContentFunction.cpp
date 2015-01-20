@@ -919,6 +919,10 @@ namespace synthese
 				journeyPm->insert(DATA_NETWORK_NAME, journeyPattern->getNetwork()->getName());
 			}
 
+			// Waiting time
+			time_duration waitingTime(servicePointer.getDepartureDateTime() - second_clock::local_time());
+			journeyPm->insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
+
 			// Handicapped access
 			const PTUseRule* handicappedUserRule = dynamic_cast<const PTUseRule*>(
 				&(service)->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
