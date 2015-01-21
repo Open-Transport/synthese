@@ -2237,7 +2237,7 @@ namespace synthese
 					)	);
 
                     const ServicePointer& firstLeg(*roadServiceUses.front());
-                    const Road* actualRoad(dynamic_cast<const Road*> (firstLeg.getService()->getPath()));
+                    const RoadPath* actualRoadPath(dynamic_cast<const RoadPath*> (firstLeg.getService()->getPath()));
 
 					const Vertex* departureVertex = (*roadServiceUses.begin())->getDepartureEdge()->getFromVertex();
 					const Vertex* arrivalVertex = (*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex();
@@ -2247,7 +2247,7 @@ namespace synthese
 						__Couleur,
 						distance,
 						multiLineString.get(),
-						actualRoad,
+						actualRoadPath->getRoad(),
 						*departureVertex,
 						*arrivalVertex,
 						isFirstFoot,
