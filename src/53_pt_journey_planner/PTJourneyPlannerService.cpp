@@ -2286,6 +2286,8 @@ namespace synthese
 					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
 				"9999"
 			); // 11
+			commercialLine->toParametersMap(pm, false);
+			serviceUse.getService()->toParametersMap(pm, false);
 
 			if (schedulesBasedService)
 			{
