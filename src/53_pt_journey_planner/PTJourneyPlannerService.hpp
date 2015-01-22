@@ -150,6 +150,8 @@ namespace synthese
             static const std::string PARAMETER_ARRIVAL_PARKING_TEXT;
             static const std::string PARAMETER_DEPARTURE_PARKING_XY;
             static const std::string PARAMETER_ARRIVAL_PARKING_XY;
+            static const std::string PARAMETER_START_WITH_CAR;
+            static const std::string PARAMETER_END_WITH_CAR;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
@@ -340,19 +342,21 @@ namespace synthese
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 				bool										_outputRoadApproachDetail;
-				bool _showResTab;
-				bool _showCoords;
-				const CoordinatesSystem* _coordinatesSystem;
+                bool                                        _showResTab;
+                bool                                        _showCoords;
+                const CoordinatesSystem*                    _coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
 				boost::optional<boost::posix_time::time_duration> _minWaitingTimeFilter;
-				bool _fareCalculation;
+                bool                                        _fareCalculation;
 				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
 				std::string									_outputFormat;
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
-				bool _concatenateContiguousFootLegs;
-				vector<string> _vectMad;
-				const messages::CustomBroadcastPoint* _broadcastPoint;
+                bool                                        _concatenateContiguousFootLegs;
+                vector<string>                              _vectMad;
+                const messages::CustomBroadcastPoint*       _broadcastPoint;
+                bool                                        _startWithCar;
+                bool                                        _endWithCar;
 			//@}
 
 			//! @name Pages

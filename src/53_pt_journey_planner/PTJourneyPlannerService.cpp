@@ -153,6 +153,8 @@ namespace synthese
         const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_TEXT = "arrival_parking_text";
         const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PARKING_XY = "departure_parking_xy";
         const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_XY = "arrival_parking_xy";
+        const string PTJourneyPlannerService::PARAMETER_START_WITH_CAR = "start_with_car";
+        const string PTJourneyPlannerService::PARAMETER_END_WITH_CAR = "end_with_car";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -303,7 +305,9 @@ namespace synthese
 			_period(NULL),
 			_logger(new AlgorithmLogger()),
 			_broadcastPoint(NULL),
-			_page(NULL)
+            _page(NULL),
+            _startWithCar(false),
+            _endWithCar(false)
 		{}
 
 
@@ -379,6 +383,18 @@ namespace synthese
 					);
 				}
 			}
+
+            // Start journey using car
+            if(_startWithCar)
+            {
+                map.insert(PARAMETER_START_WITH_CAR, _startWithCar);
+            }
+
+            // End journey using car
+            if(_endWithCar)
+            {
+                map.insert(PARAMETER_END_WITH_CAR, _endWithCar);
+            }
 
             // Departure parking
             if(_departure_parking.placeResult.value.get())
@@ -640,6 +656,11 @@ namespace synthese
 					);
 				}
 
+                // OVE!!!
+                // Mixed mode behaviour : start OR end journey using car
+                _startWithCar = map.getDefault<bool>(PARAMETER_START_WITH_CAR, false);
+                _endWithCar = map.getDefault<bool>(PARAMETER_END_WITH_CAR, false);
+
                 // Departure parking
                 // One field input
                 if(map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT))
@@ -657,6 +678,9 @@ namespace synthese
                         _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
                             placesListService.runWithoutOutput()
                         );
+
+                        // The journey is mixed mode and starts with car
+                        _startWithCar = true;
                     }
                 }
                 // XY input
@@ -671,6 +695,9 @@ namespace synthese
                     _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
                         placesListService.runWithoutOutput()
                     );
+
+                    // The journey is mixed mode and starts with car
+                    _startWithCar = true;
                 }
 
                 // Destination parking
@@ -690,6 +717,9 @@ namespace synthese
                         _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
                             placesListService.runWithoutOutput()
                         );
+
+                        // The journey is mixed mode and ends with car
+                        _endWithCar = true;
                     }
                 }
                 // XY input
@@ -704,8 +734,17 @@ namespace synthese
                     _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
                         placesListService.runWithoutOutput()
                     );
+
+                    // The journey is mixed mode and ends with car
+                    _endWithCar = true;
                 }
 			}
+
+            if(_startWithCar && _endWithCar)
+            {
+                // This configuration is not supported by the algorithm: throw an exception
+                throw RequestException("Cannot both start AND end a journey using car");
+            }
 
 			// Date parameters
 			try
@@ -1013,6 +1052,8 @@ namespace synthese
 						_arrival_place.placeResult.value.get(),
                         _departure_parking.placeResult.value.get(),
                         _arrival_parking.placeResult.value.get(),
+                        _startWithCar,
+                        _endWithCar,
 						startDate,
 						endDate,
 						startArrivalDate,
@@ -1023,7 +1064,7 @@ namespace synthese
 						false,
 						*_logger,
 						_maxTransferDuration,
-						_minMaxDurationRatioFilter
+                        _minMaxDurationRatioFilter
 					);
 					_result.reset(new PTRoutePlannerResult(r.run()));
 					if (_result->getJourneys().size() > 0)
@@ -1038,7 +1079,9 @@ namespace synthese
 					_arrival_place.placeResult.value.get(),
                     _departure_parking.placeResult.value.get(),
                     _arrival_parking.placeResult.value.get(),
-					startDate,
+                    _startWithCar,
+                    _endWithCar,
+                    startDate,
 					endDate,
 					startArrivalDate,
 					endArrivalDate,
@@ -1048,7 +1091,7 @@ namespace synthese
 					false,
 					*_logger,
 					_maxTransferDuration,
-					_minMaxDurationRatioFilter
+                    _minMaxDurationRatioFilter
 				);
 				// Computing
 				_result.reset(new PTRoutePlannerResult(r.run()));

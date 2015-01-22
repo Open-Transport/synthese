@@ -53,7 +53,7 @@ namespace synthese
 
 		graph::VertexAccessMap Place::getVertexAccessMap(
 			const AccessParameters& accessParameters,
-			GraphTypes::value_type whatToSearch,
+            const GraphTypes::value_type whatToSearch,
 			...
 		) const {
 			VertexAccessMap result;
