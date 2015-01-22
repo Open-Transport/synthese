@@ -32,7 +32,7 @@
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
-#include "Calendar.h"
+#include "StopAreaTableSync.hpp"
 #include "PTDataCleanerFileFormat.hpp"
 #include "LineStopTableSync.h"
 #include "Path.h"
@@ -88,38 +88,30 @@ namespace synthese
 				static const std::string FILE_STOP_AREAS;
 				static const std::string FILE_STOPS;
 				static const std::string FILE_STOPPING_POINTS;
-				static const std::string FILE_TRANSFERS;
-				static const std::string FILE_AGENCY;
-				static const std::string FILE_ROUTES;
+				static const std::string FILE_BRANCH;
+				static const std::string FILE_LINES;
+				static const std::string FILE_STOP_TIMES;
+				static const std::string FILE_JOURNEY;
+				static const std::string FILE_SERVICE_RESTRICTION;
+				static const std::string FILE_DAY_TYPE_TO_ATTRIBUTE;
 				static const std::string FILE_CALENDAR;
 				static const std::string FILE_CALENDAR_DATES;
 				static const std::string FILE_TRIPS;
-				static const std::string FILE_STOP_TIMES;
-				static const std::string FILE_FARE_ATTRIBUTES;
-				static const std::string FILE_FARE_RULES;
-				static const std::string FILE_SHAPES;
-				static const std::string FILE_FREQUENCIES;
 
-				static const std::string PARAMETER_IMPORT_STOP_AREA;
-				static const std::string PARAMETER_AUTO_CREATE_STOP_AREA;
-				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
+				static const std::string PARAMETER_IMPORT_TRANSPORT_NETWORK;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_USE_RULE_BLOCK_ID_MASK;
-				static const std::string PARAMETER_USE_LINE_SHORT_NAME_AS_ID;
 				static const std::string PARAMETER_IGNORE_SERVICE_NUMBER;
 
 			private:
 				static const std::string SEP;
 
-				bool _importStopArea;
-				bool _autoCreateStopArea;
 				bool _interactive;
 				bool _displayLinkedStops;
-				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
-				bool _useLineShortNameAsId;
 				bool _ignoreServiceNumber;
+				bool _createNetworks;
 
 				typedef std::map<std::string, std::size_t> FieldsMap;
 				mutable FieldsMap _fieldsMap;
@@ -140,27 +132,133 @@ namespace synthese
 				mutable impex::ImportableTableSync::ObjectBySource<pt::TransportNetworkTableSync> _networks;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync> _stopAreas;
+
+				typedef std::map<std::string, boost::shared_ptr<geography::City> > DinoCitiesMap; /* <city code, city> */
+				mutable DinoCitiesMap _cities;
+
+				typedef std::map<std::string, pt::TransportNetwork*> _NetworksMap;
+				typedef std::map<std::string, std::string> _MissingNetworksMap;
+
+				mutable _NetworksMap _networksMap;
+				mutable _MissingNetworksMap _missingNetworks;
+
+
+
+				struct StoppingPoint
+				{
+					std::string code;
+					pt::StopPoint* stoppoint;
+					int pos;
+					graph::MetricOffset offsetFromPreviousStop;
+					std::string getStopPointName() const;
+				};
+
+				struct DinoSchedule
+				{
+					boost::posix_time::time_duration art; /* arrival time */
+					boost::posix_time::time_duration wt; /* waiting time before departure */
+				};
+				typedef std::vector<DinoSchedule> DinoSchedules;
+				typedef std::map<std::string /* journeyCode */, DinoSchedules> DinoSchedulesMap;
+				mutable DinoSchedulesMap _dinoSchedules;
+
+				void _selectAndLoadDinoSchedules(
+						DinoSchedulesMap& dinoSchedules,
+						const DinoSchedules& schedules,
+						const std::string& journeyCode
+				) const;
+
+				struct Journey
+				{
+					std::string code;
+					std::string name;
+					pt::CommercialLine* line;
+					bool direction;
+					typedef std::vector<StoppingPoint> StoppingPoints;
+					StoppingPoints stoppingPoints;
+				};
+
+				typedef std::map<std::string, Journey> JourneysMap;
+				mutable JourneysMap _journeys;
+
+				void _selectAndLoadJourney(
+					JourneysMap& journeys,
+					const Journey::StoppingPoints& stoppingPoints,
+					pt::CommercialLine* line,
+					const std::string& name,
+					bool direction,
+					const std::string& journeyCode
+				) const;
+
+				struct DinoCalendar
+				{
+					std::string code;
+//					std::string name;
+					calendar::Calendar calendar;
+				};
+				typedef std::map<std::string, DinoCalendar> DinoCalendars;
+				mutable DinoCalendars _restrictions;  /* RESTRICTION code as key */
+				mutable DinoCalendars _dayAttributes; /* DAY ATTRIBUTE NR as key */
+				typedef std::map<int, std::set<int> > DayTypes;
+				mutable DayTypes _dayTypes;
 
 				struct Trip
 				{
-					const pt::PTUseRule* useRule;
-					pt::CommercialLine* line;
+					std::string code;
+					Journey* journey;
+					boost::posix_time::time_duration startTime;
 					calendar::Calendar calendar;
-					std::string destination;
-					bool direction;
+					const DinoSchedules* schedules;
 				};
 				typedef std::map<std::string, Trip> TripsMap;
 				mutable TripsMap _trips;
 
-				struct TripDetail
-				{
-					boost::posix_time::time_duration arrivalTime;
-					boost::posix_time::time_duration departureTime;
-					std::set<pt::StopPoint*> stop;
-					graph::MetricOffset offsetFromLast;
-				};
-				typedef std::vector<TripDetail> TripDetailVector;
+				void _selectAndLoadTrip(TripsMap& trips,
+					Journey &journey,
+					const std::string& tripCode,
+					const calendar::Calendar& calendar,
+					const boost::posix_time::time_duration& startTime,
+					const DinoSchedules& schedules
+				) const;
 
+
+				std::string _hexToBinString(const std::string& s) const;
+				void _fillCalendar(calendar::Calendar& c, const std::string& bitsetMonthStr, int year, int month) const;
+
+
+				void _logLoadDetail(
+					const std::string& table,
+					const std::string& localId,
+					const std::string& locaName,
+					const util::RegistryKeyType syntheseId,
+					const std::string& syntheseName,
+					const std::string& oldValue,
+					const std::string& newValue,
+					const std::string& remarks
+				) const;
+
+				void _logWarningDetail(
+					const std::string& table,
+					const std::string& localId,
+					const std::string& locaName,
+					const util::RegistryKeyType syntheseId,
+					const std::string& syntheseName,
+					const std::string& oldValue,
+					const std::string& newValue,
+					const std::string& remarks
+				) const;
+
+				void _logDebugDetail(
+					const std::string& table,
+					const std::string& localId,
+					const std::string& locaName,
+					const util::RegistryKeyType syntheseId,
+					const std::string& syntheseName,
+					const std::string& oldValue,
+					const std::string& newValue,
+					const std::string& remarks
+				) const;
 
 			protected:
 
@@ -211,7 +309,6 @@ namespace synthese
 				public impex::OneFileExporter<DinoFileFormat>
 			{
 			private:
-				boost::shared_ptr<const pt::TransportNetwork> _network;
 				mutable util::Env _env;
 
 				util::RegistryKeyType _key(util::RegistryKeyType key,
@@ -222,52 +319,6 @@ namespace synthese
 
 				std::string _SubLine(std::string str) const;
 
-				void _addShapes(const graph::Path* path,
-					util::RegistryKeyType shapeIdKey,
-					std::stringstream& shapesTxt,
-					std::stringstream& tripTxt,
-					std::string tripName
-				) const;
-
-				void _addTrips(std::stringstream& trip_txt,
-					util::RegistryKeyType trip,
-					util::RegistryKeyType service,
-					util::RegistryKeyType route,
-					std::string tripHeadSign,
-					bool tripDirection
-				) const;
-
-				void _addFrequencies(std::stringstream& frequencies,
-					util::RegistryKeyType tripId,
-					const pt::ContinuousService* service
-				) const;
-
-				void _filesProvider(const pt::SchedulesBasedService* service,
-					std::stringstream& stopTimesTxt,
-					std::stringstream& tripsTxt,
-					std::stringstream& shapesTxt,
-					std::stringstream& calendarTxt,
-					std::stringstream& calendarDatesTxt,
-					std::stringstream& frequenciesTxt,
-					std::list< std::pair< const calendar::Calendar * , util::RegistryKeyType > > & calendarMap,
-					bool isContinious
-				) const;
-
-				void _addStopTimes(std::stringstream& stopTimes,
-					const pt::LineStopTableSync::SearchResult linestops,
-					const pt::SchedulesBasedService* service,
-					bool& stopTimesExist,
-					bool isContinious,
-					bool isReservationMandandatory
-				) const;
-
-				void _addCalendars(std::stringstream& calendar,
-					std::stringstream& calendarDates,
-					const pt::SchedulesBasedService* service,
-					util::RegistryKeyType serviceId,
-					bool isContinious
-				) const;
-
 				static const std::string LABEL_TAD;
 				static const std::string LABEL_NO_EXPORT_DINO;
 				static const int WGS84_SRID;
@@ -275,8 +326,6 @@ namespace synthese
 				static std::map<std::string,util::RegistryKeyType> shapeId;
 
 			public:
-				static const std::string PARAMETER_NETWORK_ID;
-
 				Exporter_(const impex::Export& export_);
 
 				virtual util::ParametersMap getParametersMap() const;
@@ -286,7 +335,7 @@ namespace synthese
 				virtual void build(std::ostream& os) const;
 
 				virtual std::string getOutputMimeType() const { return "application/zip"; }
-				virtual std::string getFileName() const { return "GTFS.zip"; }
+				virtual std::string getFileName() const { return "DINO.zip"; }
 
 			};
 		};
