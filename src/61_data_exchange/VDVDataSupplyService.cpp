@@ -202,6 +202,7 @@ namespace synthese
 				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
 				{
 					// Run an update
+					Log::GetInstance().debug("VDVDataSupply : check update of AboID " + it.second->getId());
 					it.second->checkUpdate();
 
 					if(it.second->getDeletions().empty() && it.second->getAddings().empty())
