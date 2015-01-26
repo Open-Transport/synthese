@@ -652,11 +652,6 @@ namespace synthese
 					);
 				}
 			}
-			if(_dbConnString)
-			{
-				Log::GetInstance().debug("IneoBDSIFileFormat : on en a lu " + lexical_cast<string>(chainages.size()));
-				Log::GetInstance().debug("IneoBDSIFileFormat : On lit les courses dans la BDSI");
-			}
 
 			// Courses
 			{
@@ -805,11 +800,6 @@ namespace synthese
 						chainages
 					);
 				}
-			}
-
-			if(_dbConnString)
-			{
-				Log::GetInstance().debug("IneoBDSIFileFormat : courses on en a lu " + lexical_cast<string>(courses.size()));
 			}
 
 			// Programmations
@@ -1069,11 +1059,6 @@ namespace synthese
 				DataSource::LinkedObjects existingJourneyPatterns(
 					_plannedDataSource->getLinkedObjects<JourneyPattern>()
 				);
-				if(_dbConnString)
-				{
-					Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle sur les parcours théoriques");
-					Log::GetInstance().debug("IneoBDSIFileFormat : on en a " + lexical_cast<string>(existingJourneyPatterns.size()));
-				}
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingJourneyPattern, existingJourneyPatterns)
 				{
 					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
@@ -1172,11 +1157,6 @@ namespace synthese
 
 				// Search for existing services
 				size_t createdServices(0);
-				if(_dbConnString)
-				{
-					Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle 1 sur les courses lues dans la BDSI");
-					Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(courses.size()));
-				}
 				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
 				{
 					const Course& course(itCourse.second);
@@ -1417,15 +1397,6 @@ namespace synthese
 				_logInfo("Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
 				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
-				if(_dbConnString)
-				{
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses attachées : "+ lexical_cast<string>(servicesToLink.size()));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses détachées : "+ lexical_cast<string>(servicesToUnlink.size()));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses avec mise à jour des horaires temps réel : "+ lexical_cast<string>(updated));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses créées : "+ lexical_cast<string>(createdServices));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
-				}
 			}
 			
 			// Release lock
