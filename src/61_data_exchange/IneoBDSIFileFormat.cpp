@@ -1301,11 +1301,7 @@ namespace synthese
 					}
 					catch (...)
 					{
-						//assert(false);
-						util::Log::GetInstance().debug("IneoBdsiFileFormat : exception while updating course ref " + course->ref);
-						_logError(
-							"Exception while updating course ref " + course->ref
-						);
+						assert(false);
 					}
 				}
 
@@ -1902,7 +1898,7 @@ namespace synthese
 							0,
 							*arretChn.arret->syntheseStop
 					)	);
-					ls->set<ScheduleInput>(arretChn.type != "N");
+					ls->set<ScheduleInput>(arretChn.type != "N" || rank == 0); // Rank 0 should always be a scheduled stop
 
 					// registration of the line stop into the journey pattern
 					ls->link(temporaryEnvironment, true);
