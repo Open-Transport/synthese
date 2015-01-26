@@ -1301,7 +1301,11 @@ namespace synthese
 					}
 					catch (...)
 					{
-						assert(false);
+						//assert(false);
+						util::Log::GetInstance().debug("IneoBdsiFileFormat : exception while updating course ref " + course->ref);
+						_logError(
+							"Exception while updating course ref " + course->ref
+						);
 					}
 				}
 
