@@ -176,7 +176,6 @@ namespace synthese
 			PTOperationFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_autoImportStops(false),
 			_displayLinkedStops(false),
-			_allowDifferentStopPointsInSameStopArea(true),
 			_depotToStopIsHLP(false),
 			_stopToDepotIsHLP(false),
 			_allowDifferentStopPointsInSameStopArea(true),
