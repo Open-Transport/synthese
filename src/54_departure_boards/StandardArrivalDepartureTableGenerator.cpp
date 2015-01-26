@@ -147,6 +147,21 @@ namespace synthese
 								{
 									continue;
 								}
+								
+								if (journeyPattern->getEdges().size() >= 2 &&
+									(journeyPattern->getEdge(0))->getFromVertex() && (journeyPattern->getEdge(0))->getFromVertex()->getHub() &&
+									it.second->getKey() == (journeyPattern->getEdge(0))->getFromVertex()->getKey() &&
+									(journeyPattern->getEdge(1))->getFromVertex() && (journeyPattern->getEdge(1))->getFromVertex()->getHub() &&
+									(journeyPattern->getEdge(0))->getFromVertex()->getHub() == (journeyPattern->getEdge(1))->getFromVertex()->getHub())
+								{
+									continue;
+								}
+								
+								if (servicePointer.getDepartureEdge()->getRankInPath() < journeyPattern->getEdges().size() - 2 &&
+									servicePointer.getDepartureEdge()->getFromVertex()->getKey() == journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getKey())
+								{
+									continue;
+								}
 							}
 
 							// The departure is kept in the results

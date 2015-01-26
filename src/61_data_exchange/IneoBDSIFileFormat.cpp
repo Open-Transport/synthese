@@ -82,8 +82,12 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_HYSTERESIS = "hysteresis";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_CONVERT_STOP_CODE_TO_LOWER = "convert_stop_code_to_lower";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_SECTION = "ms";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE = "send_deactivations_by_inter_synthese";
+		
+		recursive_mutex IneoBDSIFileFormat::Importer_::_tabRunningBdsiMutex;
+		set<RegistryKeyType> IneoBDSIFileFormat::Importer_::_runningBdsi;
 		
 		
 		
@@ -147,6 +151,9 @@ namespace synthese
 			_dayBreakTime = duration_from_string(
 				map.getDefault<string>(PARAMETER_DAY_BREAK_TIME, "03:00:00")
 			);
+
+			// Convert stop code to lower ?
+			_stopCodeToLower = map.getDefault<bool>(PARAMETER_CONVERT_STOP_CODE_TO_LOWER, false);
 			
 			// Send service deactivations by inter_synthese
 			_sendDeactivationsByInterSYNTHESE = map.getDefault<bool>(PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE, false);
@@ -159,44 +166,101 @@ namespace synthese
 			const Course::Horaires& horaires,
 			const Chainage& chainage,
 			const std::string& courseRef,
-			const time_duration& nowDuration
+			const time_duration& nowDuration,
+			Chainages& chainages
 		) const {
 
 			// Jump over courses with incomplete chainages
-			if(horaires.size() != chainage.arretChns.size())
+			if(horaires.size() > chainage.arretChns.size())
 			{
 				_logWarningDetail(
 					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"Bad horaire number compared to chainage arretchn number "
 				);
 				return;
 			}
-
-			// Jump over dead runs
-			BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
+			else if (horaires.size() < chainage.arretChns.size())
 			{
-				if(!it.arret->syntheseStop)
+				// There is less horaire than arretchn so we create a new Chainage
+				Chainage* newChainage;
+				Chainage::ArretChns arretChns;
+				// Loop on horaires to create arretChns
+				std::size_t horaireCount(0);
+				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
 				{
-					return;
+					ArretChn& arretChn(
+						*arretChns.insert(
+							arretChns.end(),
+							ArretChn()
+					)	);
+					arretChn.ref = it.ref;
+					arretChn.arret = it.arret;
+					arretChn.pos = it.pos;
+					arretChn.type = it.type;
+					horaireCount++;
+					if (horaireCount >= horaires.size())
+					{
+						break;
+					}
 				}
+				
+				newChainage = _createAndReturnChainage(chainages,arretChns,*(chainage.ligne),chainage.nom,chainage.sens,chainage.ref + "-" + lexical_cast<string>(horaires.size()));
+				
+				// Jump over dead runs
+				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, arretChns)
+				{
+					if(!it.arret->syntheseStop)
+					{
+						return;
+					}
+				}
+				
+				// OK let's store the service
+				Course& course(
+					courses.insert(
+						make_pair(
+							courseRef,
+							Course()
+					)	).first->second
+				);
+				course.ref = courseRef;
+				course.horaires = horaires;
+				course.chainage = newChainage;
+				course.syntheseService = NULL;
+				
+				// Trace
+				_logLoadDetail(
+					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
+				);
 			}
-	
-			// OK let's store the service
-			Course& course(
-				courses.insert(
-					make_pair(
-						courseRef,
-						Course()
-				)	).first->second
-			);
-			course.ref = courseRef;
-			course.horaires = horaires;
-			course.chainage = &chainage;
-			course.syntheseService = NULL;
+			else
+			{
+				// Jump over dead runs
+				BOOST_FOREACH(const Chainage::ArretChns::value_type& it, chainage.arretChns)
+				{
+					if(!it.arret->syntheseStop)
+					{
+						return;
+					}
+				}
+		
+				// OK let's store the service
+				Course& course(
+					courses.insert(
+						make_pair(
+							courseRef,
+							Course()
+					)	).first->second
+				);
+				course.ref = courseRef;
+				course.horaires = horaires;
+				course.chainage = &chainage;
+				course.syntheseService = NULL;
 
-			// Trace
-			_logLoadDetail(
-				"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
-			);
+				// Trace
+				_logLoadDetail(
+					"SERVICE",courseRef,courseRef,0,string(),string(), string(),"OK"
+				);
+			}
 		}
 
 
@@ -237,6 +301,44 @@ namespace synthese
 
 		}
 		
+		IneoBDSIFileFormat::Importer_::Chainage* IneoBDSIFileFormat::Importer_::_createAndReturnChainage(
+			Chainages& chainages,
+			const Chainage::ArretChns& arretchns,
+			const Ligne& ligne,
+			const std::string& nom,
+			bool sens,
+			const std::string& ref
+		) const	{
+		
+			// Check if arretchns is long enough
+			if(arretchns.size() < 2)
+			{
+				_logWarningDetail(
+					"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),arretchns.empty() ? "JOURNEYPATTERN HAS NO STOPS" : "JOURNEYPATTERN HAS ONLY ONE STOP"
+				);
+				return NULL;
+			}
+			
+			Chainage& chainage(
+				chainages.insert(
+					make_pair(
+						ref,
+						Chainage()
+				)	).first->second
+			);
+			chainage.ref = ref;
+			chainage.ligne = &ligne;
+			chainage.nom = nom;
+			chainage.sens = sens;
+			chainage.arretChns = arretchns;
+			_logLoadDetail(
+				"JOURNEYPATTERN",ref,nom,0,string(),string(), string(),"OK"
+			);
+			
+			return &chainage;
+		
+		}
+		
 		
 		
 		bool IneoBDSIFileFormat::Importer_::_read(
@@ -268,8 +370,42 @@ namespace synthese
 			boost::unique_lock<shared_mutex> lock(ServerModule::baseWriterMutex, boost::try_to_lock);
 			if(!lock.owns_lock())
 			{
-				throw RequestException("IneoBDSIFileFormat: Already running");
+				// If another BDSI import running, we can do this one if it is really another
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				if (_runningBdsi.empty())
+				{
+					// No BDSI import is running, another thread owns the baseWriterMutex so
+					// we don't make import
+					throw RequestException("IneoBDSIFileFormat: Another action forbids to run IneoBDSIFileFormat");
+				}
+				
+				if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
+				{
+					// Another BDSI import is running and it is the same
+					throw RequestException("IneoBDSIFileFormat: Already running");
+				}
+				
+				// Another BDSI import is running but it is not the same
+				_runningBdsi.insert(getImport().getKey());
 			}
+			else
+			{
+				// We check that import is not running (it could be in the save method)
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				if (!_runningBdsi.empty())
+				{
+					if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
+					{
+						// Another BDSI import is running and it is the same
+						throw RequestException("IneoBDSIFileFormat: Already running");
+					}
+				}
+				
+				// Another BDSI import may be running but it is not the same
+				_runningBdsi.insert(getImport().getKey());
+			}
+			
+			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVDataSupplyMutex);
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -292,6 +428,10 @@ namespace synthese
 				{
 					// Fields load
 					string mnemol(result->get<string>("mnemol"));
+					if (_stopCodeToLower)
+					{
+						boost::algorithm::to_lower(mnemol);
+					}
 					string name(result->get<string>("nom"));
 					string ref(result->get<string>("ref"));
 
@@ -383,6 +523,12 @@ namespace synthese
 					ligne.ref = ref;
 					ligne.syntheseLine = line;
 				}
+			}
+			
+			if(_dbConnString)
+			{
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a lu " + lexical_cast<string>(lignes.size()));
+				Log::GetInstance().debug("IneoBDSIFileFormat : On lit les chainages dans la BDSI");
 			}
 
 			// Chainages
@@ -506,6 +652,11 @@ namespace synthese
 					);
 				}
 			}
+			if(_dbConnString)
+			{
+				Log::GetInstance().debug("IneoBDSIFileFormat : on en a lu " + lexical_cast<string>(chainages.size()));
+				Log::GetInstance().debug("IneoBDSIFileFormat : On lit les courses dans la BDSI");
+			}
 
 			// Courses
 			{
@@ -548,7 +699,8 @@ namespace synthese
 							horaires,
 							*chainage,
 							lastCourseRef,
-							nowDuration
+							nowDuration,
+							chainages
 						);
 					}
 
@@ -649,10 +801,16 @@ namespace synthese
 						horaires,
 						*chainage,
 						lastCourseRef,
-						nowDuration
+						nowDuration,
+						chainages
 					);
 				}
-			}			
+			}
+
+			if(_dbConnString)
+			{
+				Log::GetInstance().debug("IneoBDSIFileFormat : courses on en a lu " + lexical_cast<string>(courses.size()));
+			}
 
 			// Programmations
 			{
@@ -911,6 +1069,11 @@ namespace synthese
 				DataSource::LinkedObjects existingJourneyPatterns(
 					_plannedDataSource->getLinkedObjects<JourneyPattern>()
 				);
+				if(_dbConnString)
+				{
+					Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle sur les parcours théoriques");
+					Log::GetInstance().debug("IneoBDSIFileFormat : on en a " + lexical_cast<string>(existingJourneyPatterns.size()));
+				}
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingJourneyPattern, existingJourneyPatterns)
 				{
 					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
@@ -1009,6 +1172,11 @@ namespace synthese
 
 				// Search for existing services
 				size_t createdServices(0);
+				if(_dbConnString)
+				{
+					Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle 1 sur les courses lues dans la BDSI");
+					Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(courses.size()));
+				}
 				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
 				{
 					const Course& course(itCourse.second);
@@ -1103,7 +1271,7 @@ namespace synthese
 						course.syntheseService->getKey(),
 						course.syntheseService->getServiceNumber(),
 						string(),
-						string(),
+						to_simple_string(course.horaires.at(0).htd),
 						string()
 					);
 
@@ -1249,6 +1417,23 @@ namespace synthese
 				_logInfo("Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
 				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
+				if(_dbConnString)
+				{
+					Log::GetInstance().debug("IneoBDSIFileFormat : Courses attachées : "+ lexical_cast<string>(servicesToLink.size()));
+					Log::GetInstance().debug("IneoBDSIFileFormat : Courses détachées : "+ lexical_cast<string>(servicesToUnlink.size()));
+					Log::GetInstance().debug("IneoBDSIFileFormat : Courses avec mise à jour des horaires temps réel : "+ lexical_cast<string>(updated));
+					Log::GetInstance().debug("IneoBDSIFileFormat : Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
+					Log::GetInstance().debug("IneoBDSIFileFormat : Courses créées : "+ lexical_cast<string>(createdServices));
+					Log::GetInstance().debug("IneoBDSIFileFormat : Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
+				}
+			}
+			
+			// Release lock
+			{
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				
+				// Release lock
+				_runningBdsi.erase(getImport().getKey());
 			}
 
 			saveNow().run();
@@ -1267,7 +1452,8 @@ namespace synthese
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			DatabaseReadImporter<IneoBDSIFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-			_hysteresis(seconds(0))
+			_hysteresis(seconds(0)),
+			_stopCodeToLower(false)
 		{}
 
 
@@ -1388,6 +1574,23 @@ namespace synthese
 		DBTransaction IneoBDSIFileFormat::Importer_::saveNow() const
 		{
 			DBTransaction transaction;
+			// We check that import is not running
+			{
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				if (!_runningBdsi.empty())
+				{
+					if (_runningBdsi.find(getImport().getKey()) != _runningBdsi.end())
+					{
+						// Another BDSI import is running and it is the same
+						throw RequestException("IneoBDSIFileFormat: Already running");
+					}
+				}
+				
+				// Another BDSI import may be running but it is not the same
+				_runningBdsi.insert(getImport().getKey());
+			}
+			
+			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVDataSupplyMutex);
 
 			// Created journey patterns
 			BOOST_FOREACH(const JourneyPattern::Registry::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
@@ -1454,6 +1657,14 @@ namespace synthese
 					_logTrace(query.first +" "+ lexical_cast<string>(query.second));
 				}
 			}
+			
+			// Release lock
+			{
+				recursive_mutex::scoped_lock scoped_lock(_tabRunningBdsiMutex);
+				
+				// Another BDSI import is running but it is not the same
+				_runningBdsi.erase(getImport().getKey());
+			}
 
 			return transaction;
 		}
@@ -1489,16 +1700,27 @@ namespace synthese
 				{
 					continue;
 				}
+				
+				boost::posix_time::time_duration htaToCompare = horaires[i].hta;
+				if (htaToCompare.seconds())
+				{
+					htaToCompare += seconds(60 - htaToCompare.seconds());
+				}
+				boost::posix_time::time_duration htdToCompare = horaires[i].htd;
+				if (htdToCompare.seconds())
+				{
+					htdToCompare -= seconds(htdToCompare.seconds());
+				}
 
 				if(	(	edge.isArrivalAllowed() &&
-					(	horaires[i].hta.hours() != service.getArrivalSchedule(false, i).hours() ||
-						horaires[i].hta.minutes() != service.getArrivalSchedule(false, i).minutes()
+					(	htaToCompare.hours() != service.getArrivalSchedule(false, i).hours() ||
+						htaToCompare.minutes() != service.getArrivalSchedule(false, i).minutes()
 				)	) || (
 					edge.isDepartureAllowed() &&
-					(	horaires[i].htd.hours() != service.getDepartureSchedule(false, i).hours() ||
-						horaires[i].htd.minutes() != service.getDepartureSchedule(false, i).minutes()
+					(	htdToCompare.hours() != service.getDepartureSchedule(false, i).hours() ||
+						htdToCompare.minutes() != service.getDepartureSchedule(false, i).minutes()
 				)	)	){
-						return false;
+					return false;
 				}
 			}
 
@@ -1555,7 +1777,12 @@ namespace synthese
 					break;
 				}
 			}
-			if(!updated)
+			if(!updated && !syntheseService->hasRealTimeData())
+			{
+				// No update is needed but we do it anyway so that RT schedule will be set
+				syntheseService->setRealTimeSchedules(departureSchedules, arrivalSchedules);
+			}
+			else if(!updated)
 			{
 				return UpdateDeltas();
 			}
@@ -1616,8 +1843,18 @@ namespace synthese
 					continue;
 				}
 
-				departureSchedules.push_back(horaires[i].htd);
-				arrivalSchedules.push_back(horaires[i].hta);
+				if (horaires[i].htd.seconds()) {
+					departureSchedules.push_back(horaires[i].htd - seconds(horaires[i].htd.seconds()));
+				}
+				else {
+					departureSchedules.push_back(horaires[i].htd);
+				}
+				if (horaires[i].hta.seconds()) {
+					arrivalSchedules.push_back(horaires[i].hta + seconds(60 - horaires[i].hta.seconds()));
+				}
+				else {
+					arrivalSchedules.push_back(horaires[i].hta);
+				}
 			}
 			service->setDataSchedules(departureSchedules, arrivalSchedules);
 
@@ -1629,6 +1866,8 @@ namespace synthese
 
 			// Registration of the service in the course
 			syntheseService = service.get();
+			
+			const_cast<JourneyPattern*>(route)->addService(*service.get(), false);
 		}
 
 
@@ -1718,7 +1957,7 @@ namespace synthese
 							0,
 							*arretChn.arret->syntheseStop
 					)	);
-					ls->set<ScheduleInput>(arretChn.type != "N");
+					ls->set<ScheduleInput>(arretChn.type != "N" || rank == 0); // Rank 0 should always be a scheduled stop
 
 					// registration of the line stop into the journey pattern
 					ls->link(temporaryEnvironment, true);

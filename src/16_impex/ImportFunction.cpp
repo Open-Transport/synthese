@@ -97,6 +97,11 @@ namespace synthese
 				{
 					throw RequestException("The id system of the specified import is not defined.");
 				}
+				
+				if (import->get<Forbidden>())
+				{
+					throw RequestException("The selected import is forbidden right now !");
+				}
 
 				// Log path
 				ImportLogLevel minLogLevel(import->get<MinLogLevel>());

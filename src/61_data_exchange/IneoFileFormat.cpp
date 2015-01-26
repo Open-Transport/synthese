@@ -176,6 +176,7 @@ namespace synthese
 			PTOperationFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_autoImportStops(false),
 			_displayLinkedStops(false),
+			_allowDifferentStopPointsInSameStopArea(true),
 			_depotToStopIsHLP(false),
 			_stopToDepotIsHLP(false),
 			_allowDifferentStopPointsInSameStopArea(true),
@@ -1260,6 +1261,8 @@ namespace synthese
 			{
 				map.insert(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField);
 			}
+			
+			map.insert(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, _allowDifferentStopPointsInSameStopArea);
 
 			map.insert(PARAMETER_DEPOT_TO_STOP_IS_HLP, _depotToStopIsHLP);
 			map.insert(PARAMETER_STOP_TO_DEPOT_IS_HLP, _stopToDepotIsHLP);

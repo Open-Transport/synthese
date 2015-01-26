@@ -27,6 +27,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace db
@@ -169,9 +171,7 @@ namespace synthese
 					{
 						registry.remove(key);
 					}
-					util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : " +
-						boost::lexical_cast<string>(key) + " : ", e
-					);
+					util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : " + lexical_cast<string>(key) + " : ", e);
 				}
 			}
 		}
