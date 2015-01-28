@@ -37,97 +37,97 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-    using namespace util;
-    using namespace server;
-    using namespace security;
+	using namespace util;
+	using namespace server;
+	using namespace security;
 
-    template<>
-    const string FactorableTemplate<Action, inter_synthese::SpecificPostInstall>::FACTORY_KEY = "SpecificPostInstall";
+	template<>
+	const string FactorableTemplate<Action, inter_synthese::SpecificPostInstall>::FACTORY_KEY = "SpecificPostInstall";
 
-    namespace inter_synthese
-    {
+	namespace inter_synthese
+	{
 	
 		const string SpecificPostInstall::PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID = "post_install_passive_import_id";
 		const string SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_ID = "post_install_slave_id";
 
-        ParametersMap SpecificPostInstall::getParametersMap() const
-        {
-            ParametersMap map;
-            return map;
-        }
+		ParametersMap SpecificPostInstall::getParametersMap() const
+		{
+			ParametersMap map;
+			return map;
+		}
 
 
 
-        void SpecificPostInstall::_setFromParametersMap(const ParametersMap& map)
-        {
+		void SpecificPostInstall::_setFromParametersMap(const ParametersMap& map)
+		{
 			_passiveImportId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID);
 			_slaveId = map.get<RegistryKeyType>(PARAMETER_POST_INSTALL_SLAVE_ID);
-        }
+		}
 
 
-        const shared_ptr<InterSYNTHESEConfig> SpecificPostInstall::getMyConfig() {
-            BOOST_FOREACH(const InterSYNTHESEConfig::Registry::value_type& item,
-                          Env::GetOfficialEnv().getRegistry<InterSYNTHESEConfig>())
-            {
-                const shared_ptr<InterSYNTHESEConfig> config(item.second);
-                Log::GetInstance().info("InterSYNTHESEConfig=" + config->get<Name>());
-                if(config->get<Name>() == MASTER_NAME)
-                {
-                    Log::GetInstance().info("InterSYNTHESEPackage PCCAR_TO_SAE Already created");
-                    return config;
-                }
-            }
-            return shared_ptr<InterSYNTHESEConfig>();
-        }
+		const shared_ptr<InterSYNTHESEConfig> SpecificPostInstall::getMyConfig() {
+			BOOST_FOREACH(const InterSYNTHESEConfig::Registry::value_type& item,
+			Env::GetOfficialEnv().getRegistry<InterSYNTHESEConfig>())
+			{
+				const shared_ptr<InterSYNTHESEConfig> config(item.second);
+				Log::GetInstance().info("InterSYNTHESEConfig=" + config->get<Name>());
+				if(config->get<Name>() == MASTER_NAME)
+				{
+					Log::GetInstance().info("InterSYNTHESEPackage PCCAR_TO_SAE Already created");
+					return config;
+				}
+			}
+			return shared_ptr<InterSYNTHESEConfig>();
+		}
 
-        void SpecificPostInstall::addTable(InterSYNTHESEConfig &config,
-                                           const string tableCode)
-        {
-            InterSYNTHESEConfigItem vehicleCalls;
-            vehicleCalls.set<InterSYNTHESEConfig>(config);
-            vehicleCalls.set<SyncType>("db");
-            vehicleCalls.set<SyncPerimeter>(tableCode);
-            InterSYNTHESEConfigItemTableSync::Save(&vehicleCalls);
-        }
+		void SpecificPostInstall::addTable(InterSYNTHESEConfig &config,
+			const string tableCode)
+		{
+			InterSYNTHESEConfigItem vehicleCalls;
+			vehicleCalls.set<InterSYNTHESEConfig>(config);
+			vehicleCalls.set<SyncType>("db");
+			vehicleCalls.set<SyncPerimeter>(tableCode);
+			InterSYNTHESEConfigItemTableSync::Save(&vehicleCalls);
+		}
 
-        void SpecificPostInstall::run(
-            Request& request
-        ) {
+		void SpecificPostInstall::run(
+			Request& request
+		) {
 
-            if(!getMyConfig())
-            {
-                InterSYNTHESEConfig newConfig;
-                newConfig.set<Name>(MASTER_NAME);
-                newConfig.set<Multimaster>(true);
-                InterSYNTHESEConfigTableSync::Save(&newConfig);
+			if(!getMyConfig())
+			{
+				InterSYNTHESEConfig newConfig;
+				newConfig.set<Name>(MASTER_NAME);
+				newConfig.set<Multimaster>(true);
+				InterSYNTHESEConfigTableSync::Save(&newConfig);
 
-                InterSYNTHESESlave slave;
-                slave.set<Name>("__SAE__");
-                slave.set<ServerAddress>("37.187.26.148");
-                slave.set<ServerPort>("80");
-                slave.set<InterSYNTHESEConfig>(newConfig);
-                slave.set<Active>(true);
+				InterSYNTHESESlave slave;
+				slave.set<Name>("__SAE__");
+				slave.set<ServerAddress>("37.187.26.148");
+				slave.set<ServerPort>("80");
+				slave.set<InterSYNTHESEConfig>(newConfig);
+				slave.set<Active>(true);
 				slave.set<PassiveModeImportId>(_passiveImportId);
 				slave.setKey(_slaveId);
 				ptime now(second_clock::local_time());
 				slave.set<LastActivityReport>(now);
 				InterSYNTHESESlaveTableSync::Save(&slave);
 
-                //addTable(newConfig, "44");
-                //addTable(newConfig, "46");
-                addTable(newConfig, "118");
-                addTable(newConfig, "119");
-                Log::GetInstance().info("InterSYNTHESEConfig post install created");
-            }
-        }
+				//addTable(newConfig, "44");
+				//addTable(newConfig, "46");
+				addTable(newConfig, "118");
+				addTable(newConfig, "119");
+				Log::GetInstance().info("InterSYNTHESEConfig post install created");
+			}
+		}
 
 
 
-        bool SpecificPostInstall::isAuthorized(
-            const Session* session
-        ) const {
-            return true;
-        }
+		bool SpecificPostInstall::isAuthorized(
+			const Session* session
+		) const {
+			return true;
+		}
 
 }	}
 

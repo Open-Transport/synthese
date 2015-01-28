@@ -44,9 +44,9 @@ namespace synthese
 		Scenario::Scenario(
 			const std::string name /*= std::string()*/
 		)
-        {
-            _name = name;
-        }
+		{
+			_name = name;
+		}
 
 
 
@@ -60,7 +60,7 @@ namespace synthese
 		void Scenario::removeMessage( const Alarm& message ) const
 		{
 			if (_messages.find(&message) != _messages.end())
-            {
+			{
 				_messages.erase(&message);
 			}
 		}

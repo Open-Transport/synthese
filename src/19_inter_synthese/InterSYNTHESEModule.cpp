@@ -62,8 +62,8 @@ namespace synthese
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_MASTER_PORT = "inter_synthese_master_port";
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME = "inter_synthese_waiting_time";
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE = "inter_synthese_slave_active";
-        const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID = "inter_synthese_slave_id";
-        const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL = "post_install";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID = "inter_synthese_slave_id";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL = "post_install";
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID = "post_install_passive_import_id";
 		const RegistryKeyType InterSYNTHESEModule::FAKE_IMPORT_ID = 1;
 
@@ -90,14 +90,14 @@ namespace synthese
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME, "5", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL, "0", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID, "0", &InterSYNTHESEModule::ParameterCallback);
-        }
+		}
 
 
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Init()
 		{
-            InterSYNTHESEModule::GenerateFakeImport();
-            InterSYNTHESEModule::PostInstall();
+			InterSYNTHESEModule::GenerateFakeImport();
+			InterSYNTHESEModule::PostInstall();
 		}
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
@@ -199,17 +199,17 @@ namespace synthese
 					// Log
 				}
 			}
-            else if(name == MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL)
-            {
-                if(value == "1")
-                {
-                    _postInstall = true;
-                }
-                else
-                {
-                    _postInstall = false;
-                }
-            }
+			else if(name == MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL)
+			{
+				if(value == "1")
+				{
+					_postInstall = true;
+				}
+				else
+				{
+					_postInstall = false;
+				}
+			}
 			else if(name == MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID)
 			{
 				try
@@ -221,7 +221,7 @@ namespace synthese
 					// Log
 				}
 			}
-        }
+		}
 
 
 
@@ -432,19 +432,19 @@ namespace synthese
 			}
 		}
 
-        void InterSYNTHESEModule::PostInstall()
-        {
-            if(_postInstall)
-            {
-                boost::shared_ptr<Action>
-                        action(boost::shared_ptr<Action>(util::Factory<Action>::create("SpecificPostInstall")));
-                Request request;
+		void InterSYNTHESEModule::PostInstall()
+		{
+			if(_postInstall)
+			{
+				boost::shared_ptr<Action>
+					action(boost::shared_ptr<Action>(util::Factory<Action>::create("SpecificPostInstall")));
+				Request request;
 				ParametersMap pm;
 				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID, _postInstallPassiveImportId);
 				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_ID, _slaveId);
 				action->_setFromParametersMap(pm);
 				action->run(request);
-            }
-        }
+			}
+		}
 }	}
 

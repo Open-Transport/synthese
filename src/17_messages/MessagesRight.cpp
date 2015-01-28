@@ -46,10 +46,10 @@ namespace synthese
 		template<> const std::string FactorableTemplate<Right, MessagesRight>::FACTORY_KEY("Messages");
 	}
 
-    namespace messages
-    {
-        const string MessagesRight::MESSAGES_SECTION_FACTORY_KEY = "messagessection";
-    }
+	namespace messages
+	{
+		const string MessagesRight::MESSAGES_SECTION_FACTORY_KEY = "messagessection";
+	}
 
 	namespace security
 	{
@@ -68,14 +68,14 @@ namespace synthese
 				m.push_back(make_pair(string(), "=== " + recipient->getTitle() + " ==="));
 				recipient->getParametersLabels(m);
 			}
-            m.push_back(make_pair(string(), "=== Sections ==="));
-            m.push_back(make_pair(MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + GLOBAL_PERIMETER,"(toutes les sections)"));
-            MessagesSectionTableSync::SearchResult sections(
-                        MessagesSectionTableSync::Search(Env::GetOfficialEnv()));
-            BOOST_FOREACH(const boost::shared_ptr<MessagesSection>& section, sections)
-            {
-                m.push_back(make_pair(MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->get<Key>()), section->get<Name>()));
-            }
+			m.push_back(make_pair(string(), "=== Sections ==="));
+			m.push_back(make_pair(MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + GLOBAL_PERIMETER,"(toutes les sections)"));
+			MessagesSectionTableSync::SearchResult sections(
+				MessagesSectionTableSync::Search(Env::GetOfficialEnv()));
+			BOOST_FOREACH(const boost::shared_ptr<MessagesSection>& section, sections)
+			{
+				m.push_back(make_pair(MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->get<Key>()), section->get<Name>()));
+			}
 
 			return m;
 		}
@@ -92,36 +92,36 @@ namespace synthese
 
 			if(parts.size() == 2)
 			{
-                if (parts[0] == MESSAGES_SECTION_FACTORY_KEY)
-                {
-                    if (parts[1] != GLOBAL_PERIMETER)
-                    {
-                        util::RegistryKeyType id(boost::lexical_cast<util::RegistryKeyType>(parts[1]));
-                        util::RegistryTableType tableId(util::decodeTableId(id));
+				if (parts[0] == MESSAGES_SECTION_FACTORY_KEY)
+				{
+					if (parts[1] != GLOBAL_PERIMETER)
+					{
+						util::RegistryKeyType id(boost::lexical_cast<util::RegistryKeyType>(parts[1]));
+						util::RegistryTableType tableId(util::decodeTableId(id));
 
-                        if (tableId == MessagesSectionTableSync::TABLE.ID)
-                        {
-                            boost::shared_ptr<const MessagesSection> ms(
-                                        MessagesSectionTableSync::Get(id, env)
-                                        );
-                            return parts[0] + ":" + ms->get<Name>();
-                        }
-                        else
-                        {
-                            return _parameter;
-                        }
-                    }
-                    else
-                    {
-                        return parts[0] + ":all";
-                    }
-                }
-                else
-                {
-                    boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
-                    boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
-                    return parts[0] + ":" + subright->displayParameter();
-                }
+						if (tableId == MessagesSectionTableSync::TABLE.ID)
+						{
+							boost::shared_ptr<const MessagesSection> ms(
+								MessagesSectionTableSync::Get(id, env)
+							);
+							return parts[0] + ":" + ms->get<Name>();
+						}
+						else
+						{
+							return _parameter;
+						}
+					}
+					else
+					{
+						return parts[0] + ":all";
+					}
+				}
+				else
+				{
+					boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
+					boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
+					return parts[0] + ":" + subright->displayParameter();
+				}
 			}
 			else
 			{
@@ -136,39 +136,39 @@ namespace synthese
 			vector<string> parts;
 			split(parts, _parameter, is_any_of("/"));
 
-            vector<string> perimeterparts;
-            split(perimeterparts, perimeter, is_any_of("/"));
+			vector<string> perimeterparts;
+			split(perimeterparts, perimeter, is_any_of("/"));
 
 			if(parts.size() == 2)
 			{
-                if (parts[0] == MESSAGES_SECTION_FACTORY_KEY)
-                {
-                    if (parts[1] == GLOBAL_PERIMETER)
-                        return true;
-                    else if (perimeterparts.size() == 2)
-                    {
-                        if (parts[1] == perimeterparts[1])
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else if (parts[1] == perimeter)
-                    {
-                        return true;
-                    }
-                    else
-                        return false;
-                }
-                else
-                {
-                    boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
-                    boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
-                    return subright->perimeterIncludes(perimeter, env);
-                }
+				if (parts[0] == MESSAGES_SECTION_FACTORY_KEY)
+				{
+					if (parts[1] == GLOBAL_PERIMETER)
+						return true;
+					else if (perimeterparts.size() == 2)
+					{
+						if (parts[1] == perimeterparts[1])
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+					}
+					else if (parts[1] == perimeter)
+					{
+						return true;
+					}
+					else
+						return false;
+				}
+				else
+				{
+					boost::shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
+					boost::shared_ptr<Right> subright(recipient->getRight(parts[1]));
+					return subright->perimeterIncludes(perimeter, env);
+				}
 			}
 			else
 			{
