@@ -63,6 +63,8 @@ namespace synthese
 			double metricOffset,
 			double carSpeed
 		):	util::Registrable(id),
+			_leftHouseNumberingPolicy(ALL_NUMBERS),
+			_rightHouseNumberingPolicy(ALL_NUMBERS),
 			_carOneWay(0),
 			_carSpeed(carSpeed),
 			_road(street),
@@ -302,6 +304,53 @@ namespace synthese
 			}
 
 			return getMetricOffset();
+		}
+
+
+
+		HouseNumber RoadChunk::getHouseNumberFromOffset(
+			double metricOffset
+		) const {
+			double relativePosition = (metricOffset - this->getMetricOffset()) / (this->getForwardEdge().getEndMetricOffset() - this->getMetricOffset());
+			HouseNumberBounds bounds = getLeftHouseNumberBounds();
+
+			if(!bounds)
+			{
+				return 0;
+			}
+			else if(relativePosition > 1)
+			{
+				return bounds->second;
+			}
+			else if(relativePosition < 0)
+			{
+				return bounds->first;
+			}
+			else
+			{
+				HouseNumber closestHouseNumber(
+					(bounds->first <= bounds->second) ?
+						min(
+							(double)bounds->second,
+							ceil((relativePosition * ((bounds->second + 1) - (bounds->first - 1))) + (bounds->first - 1))
+						) :
+						max(
+							(double)bounds->first,
+							floor((bounds->first + 1) - (relativePosition * ((bounds->first + 1) - (bounds->second - 1))))
+						)
+				);
+
+				switch(getLeftHouseNumberingPolicy())
+				{
+					case ODD_NUMBERS:
+						return closestHouseNumber - (closestHouseNumber % 2) + 1;
+					case EVEN_NUMBERS:
+						return closestHouseNumber - (closestHouseNumber % 2);
+					case ALL_NUMBERS:
+					default:
+						return closestHouseNumber;
+				}
+			}
 		}
 
 
@@ -560,10 +609,28 @@ namespace synthese
 
 			if(hasGeometry())
 			{
-				pm.insert(
-					prefix + TABLE_COL_GEOMETRY,
-					static_pointer_cast<geos::geom::Geometry, LineString>(getGeometry())
-				);
+				if(!getGeometry().get() || getGeometry()->isEmpty())
+				{
+					pm.insert(
+						prefix + TABLE_COL_GEOMETRY,
+						string()
+					);
+				}
+				else
+				{
+					boost::shared_ptr<geos::geom::Geometry> projected(getGeometry());
+					if(	CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+						static_cast<CoordinatesSystem::SRID>(getGeometry()->getSRID())
+					){
+						projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*getGeometry());
+					}
+					
+					geos::io::WKTWriter writer;
+					pm.insert(
+						prefix + TABLE_COL_GEOMETRY,
+						writer.write(projected.get())
+					);
+                }
 			}
 			else
 			{

@@ -52,6 +52,7 @@ namespace synthese
 			);
 
 			RoadChunk* getRoadChunk() const { return _roadChunk; }
+			bool isReversed() const { return _reverse; }
 
 			virtual bool isDepartureAllowed() const;
 			virtual bool isArrivalAllowed() const;

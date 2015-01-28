@@ -72,6 +72,7 @@ namespace synthese
 		const string StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
 		const string StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
 		const string StopAreaTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
+		const string StopAreaTableSync::TABLE_COL_ISRELAYPARK = "is_relay_park";
 		const string StopAreaTableSync::COL_NAME13 = "short_display_name";
 		const string StopAreaTableSync::COL_NAME26 = "long_display_name";
 		const string StopAreaTableSync::COL_CODE_BY_SOURCE = "code_by_source";
@@ -98,6 +99,7 @@ namespace synthese
 			Field(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
 			Field(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
 			Field(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
+			Field(StopAreaTableSync::TABLE_COL_ISRELAYPARK, SQL_BOOLEAN),
 			Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
 			Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
 			Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
@@ -158,6 +160,9 @@ namespace synthese
 
 			// Transfer delay matrix
 			query.addField(StopArea::SerializeTransferDelaysMatrix(object->getTransferDelays()));
+			
+			// Is relay park
+			query.addField(object->getIsRelayPark());
 
 			// Name 13
 			query.addField(object->getName13());

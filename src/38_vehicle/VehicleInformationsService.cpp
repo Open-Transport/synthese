@@ -43,6 +43,7 @@ namespace synthese
 	
 	namespace vehicle
 	{
+		const string VehicleInformationsService::TAG_VEHICLE_INFORMATIONS = "vehicle_informations";
 		const string VehicleInformationsService::TAG_VEHICLE = "vehicle";
 		const string VehicleInformationsService::TAG_POSITION = "position";
 		const string VehicleInformationsService::TAG_JOURNEY = "journey";
@@ -88,6 +89,8 @@ namespace synthese
 					throw RequestException("No such vehicle");
 				}
 			}
+			
+			Function::setOutputFormatFromMap(map,string());
 		}
 
 
@@ -140,6 +143,11 @@ namespace synthese
 				}
 				map.insert(TAG_EXTRA_PARAMETERS, extraParamMap);
 			}
+			
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, TAG_VEHICLE_INFORMATIONS);
+			}
 
 			return map;
 		}
@@ -156,6 +164,6 @@ namespace synthese
 
 		std::string VehicleInformationsService::getOutputMimeType() const
 		{
-			return "text/html";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 }	}

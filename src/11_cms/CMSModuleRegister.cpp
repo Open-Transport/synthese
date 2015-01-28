@@ -41,6 +41,7 @@
 #include "WebPageLinkFunction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageLinksFunction.hpp"
+#include "StrStrFunction.hpp"
 #include "WebPageMenuFunction.hpp"
 #include "WebPageMoveAction.hpp"
 #include "WebpageNextFunction.hpp"

@@ -25,6 +25,7 @@
 #include "BasicClient.h"
 #include "Import.hpp"
 #include "InterSYNTHESEPacket.hpp"
+#include "InterSYNTHESEPacket.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESEUpdateAckService.hpp"
 #include "ServerModule.h"
@@ -61,6 +62,7 @@ namespace synthese
 				StaticFunctionRequest<InterSYNTHESESlaveUpdateService> r;
 				r.getFunction()->setSlaveId(_slaveId);
 				r.getFunction()->setAskIdRange(true);
+				r.getFunction()->setSlaveStartingTime(ServerModule::GetStartingTime());
 				BasicClient c(
 					_address,
 					_port

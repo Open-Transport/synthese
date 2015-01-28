@@ -23,18 +23,34 @@
 #ifndef SYNTHESE_pt_Destination_hpp__
 #define SYNTHESE_pt_Destination_hpp__
 
+#include "Object.hpp"
+
+#include "DataSourceLinksField.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 #include "ImportableTemplate.hpp"
 
 namespace synthese
 {
+	FIELD_STRING(DisplayedText)
+	FIELD_STRING(TtsText)
+	FIELD_STRING(Comment)
+	
+	typedef boost::fusion::map<
+		FIELD(Key),
+		FIELD(DisplayedText),
+		FIELD(TtsText),
+		FIELD(Comment),
+		FIELD(impex::DataSourceLinks)
+	> DestinationSchema;
+
 	namespace pt
 	{
 		/** Destination class.
 			@ingroup m35
 		*/
 		class Destination:
+			public virtual Object<Destination, DestinationSchema>,
 			public virtual util::Registrable,
 			public impex::ImportableTemplate<Destination>
 		{

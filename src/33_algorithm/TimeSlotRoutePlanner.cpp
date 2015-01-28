@@ -61,7 +61,8 @@ namespace synthese
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime,
-			UseRule::ReservationDelayType reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType,
+			bool keepContinuousJourneys
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(lowerDepartureTime),
@@ -80,9 +81,10 @@ namespace synthese
 			_minMaxDurationRatioFilter(minMaxDurationRatioFilter),
 			_enableTheoretical(enableTheoretical),
 			_enableRealTime(enableRealTime),
+			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
 			_journeyTemplates(graphToUse),
-			_reservationRulesDelayType(reservationRulesDelayType)
+			_keepContinuousJourneys(keepContinuousJourneys)
 		{}
 
 
@@ -104,7 +106,8 @@ namespace synthese
 			boost::optional<double> minMaxDurationRatioFilter,
 			bool enableTheoretical,
 			bool enableRealTime,
-			UseRule::ReservationDelayType reservationRulesDelayType
+			UseRule::ReservationDelayType reservationRulesDelayType,
+			bool keepContinuousJourneys
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(continuousService.getFirstDepartureTime()),
@@ -130,7 +133,8 @@ namespace synthese
 			_enableRealTime(enableRealTime),
 			_reservationRulesDelayType(reservationRulesDelayType),
 			_logger(logger),
-			_journeyTemplates(graphToUse)
+			_journeyTemplates(graphToUse),
+			_keepContinuousJourneys(keepContinuousJourneys)
 		{}
 
 
@@ -199,7 +203,8 @@ namespace synthese
 				if(journey.empty()) break;
 
 				//! <li> If the journey is continuous, attempt to break it. </li>
-				if(	journey.getContinuousServiceRange ().total_seconds() > 60)
+				if(	journey.getContinuousServiceRange ().total_seconds() > 60 &&
+					!_keepContinuousJourneys)
 				{
 					time_duration maxDuration(
 						journey.getDuration() - minutes(1)

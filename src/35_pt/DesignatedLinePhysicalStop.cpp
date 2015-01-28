@@ -70,15 +70,13 @@ namespace synthese
 		{
 			return _lineStop->get<IsArrival>();
 		}
-
-
-
+		
 		boost::shared_ptr<geos::geom::LineString> DesignatedLinePhysicalStop::getRealGeometry() const
 		{
 			boost::shared_ptr<geos::geom::LineString> tmpGeom(
 				_lineStop->get<LineStringGeometry>()
 			);
-
+			
 			if(tmpGeom && !tmpGeom->isEmpty())
 			{
 				return tmpGeom;

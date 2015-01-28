@@ -119,6 +119,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(26, 0, 0));
 		schedules.push_back(time_duration(32, 0, 0));
+
 		s.setDataSchedules(schedules, schedules);
 		s.link(env);
 
@@ -126,15 +127,15 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		s.setActive(d);
 
 		BOOST_CHECK(!jp.isActive(d - days(1)));
-		BOOST_CHECK(!jp.isActive(d));
-		BOOST_CHECK(jp.isActive(d + days(1)));
+		BOOST_CHECK(jp.isActive(d));
+		BOOST_CHECK(!jp.isActive(d + days(1)));
 		BOOST_CHECK(!jp.isActive(d + days(2)));
 
 		s.updatePathCalendar();
 
 		BOOST_CHECK(!jp.isActive(d - days(1)));
-		BOOST_CHECK(!jp.isActive(d));
-		BOOST_CHECK(jp.isActive(d + days(1)));
+		BOOST_CHECK(jp.isActive(d));
+		BOOST_CHECK(!jp.isActive(d + days(1)));
 		BOOST_CHECK(!jp.isActive(d + days(2)));
 	}
 
@@ -159,17 +160,17 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		s.setActive(d);
 
 		BOOST_CHECK(!jp.isActive(d - days(1)));
-		BOOST_CHECK(!jp.isActive(d));
+		BOOST_CHECK(jp.isActive(d));
 		BOOST_CHECK(jp.isActive(d + days(1)));
-		BOOST_CHECK(jp.isActive(d + days(2)));
+		BOOST_CHECK(!jp.isActive(d + days(2)));
 		BOOST_CHECK(!jp.isActive(d + days(3)));
 
 		s.updatePathCalendar();
 
 		BOOST_CHECK(!jp.isActive(d - days(1)));
-		BOOST_CHECK(!jp.isActive(d));
+		BOOST_CHECK(jp.isActive(d));
 		BOOST_CHECK(jp.isActive(d + days(1)));
-		BOOST_CHECK(jp.isActive(d + days(2)));
+		BOOST_CHECK(!jp.isActive(d + days(2)));
 		BOOST_CHECK(!jp.isActive(d + days(3)));
 	}
 }

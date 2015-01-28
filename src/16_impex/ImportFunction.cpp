@@ -104,10 +104,18 @@ namespace synthese
 				}
 
 				// Log path
-				bool outputLogs(map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false));
+				ImportLogLevel minLogLevel(import->get<MinLogLevel>());
+				bool outputLogs(false);
+				if (minLogLevel < IMPORT_LOG_NOLOG)
+				{
+					outputLogs = true;
+				}
+				if(map.isDefined(PARAMETER_OUTPUT_LOGS))
+				{
+					outputLogs = map.getDefault<bool>(PARAMETER_OUTPUT_LOGS, false);
+				}
 
 				// Min log force
-				ImportLogLevel minLogLevel(import->get<MinLogLevel>());
 				if(map.isDefined(PARAMETER_MIN_LOG_LEVEL))
 				{
 					minLogLevel = static_cast<ImportLogLevel>(map.get<int>(PARAMETER_MIN_LOG_LEVEL));
@@ -131,6 +139,15 @@ namespace synthese
 						_output,
 						_result
 					);
+					try
+					{
+						_importer->openLogFile();
+					}
+					catch(const boost::filesystem::filesystem_error& e)
+					{
+						throw RequestException("Failed to access log directory '" +
+											   logPath + "': " + e.code().message());
+					}
 				}
 				else
 				{
@@ -144,7 +161,22 @@ namespace synthese
 					);
 				}
 
-				_importer->setFromParametersMap(map, true);
+				// Use the parameters of the impor, except if they are overridden by request
+				ParametersMap fullMap;
+				BOOST_FOREACH(const ParametersMap::Map::value_type& element, map.getMap())
+				{
+					fullMap.insert(element.first, map.get<string>(element.first));
+				}
+
+				BOOST_FOREACH(const ParametersMap::Map::value_type& element, (import->get<Parameters>()).getMap())
+				{
+					if (!fullMap.isDefined(element.first))
+					{
+						fullMap.insert(element.first, element.second);
+					}
+				}
+				
+				_importer->setFromParametersMap(fullMap, true);
 
 				_doImport = map.isTrue(PARAMETER_DO_IMPORT);
 				_importDone = _importer->beforeParsing();

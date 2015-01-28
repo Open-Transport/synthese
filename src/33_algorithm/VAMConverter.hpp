@@ -29,6 +29,10 @@
 
 namespace synthese
 {
+	namespace geography
+	{
+		class Place;
+	}
 	namespace algorithm
 	{
 		class AlgorithmLogger;
@@ -47,6 +51,8 @@ namespace synthese
 			const boost::posix_time::ptime& _highestDepartureTime;
 			const boost::posix_time::ptime& _lowestArrivalTime;
 			const boost::posix_time::ptime& _highestArrivalTime;
+			const geography::Place* _origin;
+			const geography::Place* _destination;
 
 		public:
 			VAMConverter(
@@ -57,7 +63,9 @@ namespace synthese
 				const boost::posix_time::ptime& lowestDepartureTime,
 				const boost::posix_time::ptime& highestDepartureTime,
 				const boost::posix_time::ptime& lowestArrivalTime,
-				const boost::posix_time::ptime& highestArrivalTime
+				const boost::posix_time::ptime& highestArrivalTime,
+				const geography::Place* origin,
+				const geography::Place* destination
 			);
 
 

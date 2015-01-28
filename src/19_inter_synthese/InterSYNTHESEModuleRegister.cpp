@@ -11,6 +11,9 @@
 #include "InterSYNTHESEPackageFileFormat.hpp"
 
 #include "InterSYNTHESEConfigsViewService.hpp"
+#include "InterSYNTHESEIsSynchronisingService.hpp"
+#include "InterSYNTHESEObjectCreateService.hpp"
+#include "InterSYNTHESEObjectUpdateService.hpp"
 #include "InterSYNTHESEPackageCommitService.hpp"
 #include "InterSYNTHESESlavesViewService.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
@@ -27,6 +30,8 @@
 #include "InterSYNTHESEPackageTableSync.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveTableSync.hpp"
+
+#include "SpecificPostInstall.hpp"
 
 #include "InterSYNTHESEModule.inc.cpp"
 
@@ -47,6 +52,9 @@ void synthese::inter_synthese::moduleRegister()
 	synthese::inter_synthese::InterSYNTHESEPackageCommitAction::integrate();
 
 	synthese::inter_synthese::InterSYNTHESEConfigsViewService::integrate();
+	synthese::inter_synthese::InterSYNTHESEIsSynchronisingService::integrate();
+	synthese::inter_synthese::InterSYNTHESEObjectCreateService::integrate();
+    synthese::inter_synthese::InterSYNTHESEObjectUpdateService::integrate();
 	synthese::inter_synthese::InterSYNTHESEPackageCommitService::integrate();
 	synthese::inter_synthese::InterSYNTHESESlavesViewService::integrate();
 	synthese::inter_synthese::InterSYNTHESESlaveUpdateService::integrate();
@@ -54,6 +62,8 @@ void synthese::inter_synthese::moduleRegister()
 	synthese::inter_synthese::InterSYNTHESEPackageGetContentService::integrate();
 	synthese::inter_synthese::InterSYNTHESEPackagesService::integrate();
 	synthese::inter_synthese::InterSYNTHESEUpdatePushService::integrate();
+
+	synthese::inter_synthese::SpecificPostInstall::integrate();
 
 	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfig>();
 	synthese::util::Env::Integrate<synthese::inter_synthese::InterSYNTHESEConfigItem>();

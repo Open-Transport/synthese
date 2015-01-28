@@ -29,12 +29,14 @@
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "CommercialLine.h"
 #include "DataSourceTableSync.h"
+#include "DeactivationPTDataInterSYNTHESE.hpp"
 #include "Depot.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DisplayScreen.h"
 #include "DBModule.h"
 #include "DBTransaction.hpp"
 #include "Import.hpp"
+#include "InterSYNTHESEModule.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "ParametersMap.h"
@@ -45,6 +47,7 @@
 #include "SentScenario.h"
 #include "ServerModule.h"
 #include "StopPoint.hpp"
+#include "MessagesSection.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -60,6 +63,7 @@ namespace synthese
 	using namespace departure_boards;
 	using namespace graph;
 	using namespace impex;
+	using namespace inter_synthese;
 	using namespace messages;
 	using namespace pt;
 	using namespace pt_operation;
@@ -79,6 +83,8 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DELAY_BUS_STOP = "delay_bus_stop";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_DAY_BREAK_TIME = "day_break_time";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_CONVERT_STOP_CODE_TO_LOWER = "convert_stop_code_to_lower";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_SECTION = "ms";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE = "send_deactivations_by_inter_synthese";
 		
 		recursive_mutex IneoBDSIFileFormat::Importer_::_tabRunningBdsiMutex;
 		set<RegistryKeyType> IneoBDSIFileFormat::Importer_::_runningBdsi;
@@ -120,6 +126,17 @@ namespace synthese
 				throw RequestException("No such messages recipients data source");
 			}
 
+			// Messages section
+			RegistryKeyType sectionId(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGES_SECTION, 0));
+			if(sectionId) try
+			{
+				_messagesSection = Env::GetOfficialEnv().get<MessagesSection>(sectionId);
+			}
+			catch(ObjectNotFoundException<MessagesSection>&)
+			{
+				throw RequestException("No such messages section");
+			}
+
 			// Hysteresis
 			_hysteresis = seconds(
 				map.getDefault<long>(PARAMETER_HYSTERESIS, 0)
@@ -137,6 +154,9 @@ namespace synthese
 
 			// Convert stop code to lower ?
 			_stopCodeToLower = map.getDefault<bool>(PARAMETER_CONVERT_STOP_CODE_TO_LOWER, false);
+			
+			// Send service deactivations by inter_synthese
+			_sendDeactivationsByInterSYNTHESE = map.getDefault<bool>(PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE, false);
 		}
 
 
@@ -632,11 +652,6 @@ namespace synthese
 					);
 				}
 			}
-			if(_dbConnString)
-			{
-				Log::GetInstance().debug("IneoBDSIFileFormat : on en a lu " + lexical_cast<string>(chainages.size()));
-				Log::GetInstance().debug("IneoBDSIFileFormat : On lit les courses dans la BDSI");
-			}
 
 			// Courses
 			{
@@ -787,11 +802,6 @@ namespace synthese
 				}
 			}
 
-			if(_dbConnString)
-			{
-				Log::GetInstance().debug("IneoBDSIFileFormat : courses on en a lu " + lexical_cast<string>(courses.size()));
-			}
-
 			// Programmations
 			{
 				string query(
@@ -912,6 +922,11 @@ namespace synthese
 						updatedScenario->setIsEnabled(true);
 						_env.getEditableRegistry<Scenario>().add(updatedScenario);
 
+						if (_messagesSection.get())
+						{
+							updatedScenario->addSection(*_messagesSection.get());
+						}
+
 						// Creation of the message
 						updatedMessage.reset(
 							new SentAlarm(
@@ -970,6 +985,10 @@ namespace synthese
 						updatedMessage->setLongMessage(programmation.content);
 						updatedMessage->setShortMessage(programmation.messageTitle);
 						updatedMessage->setLevel(programmation.priority ? ALARM_LEVEL_WARNING : ALARM_LEVEL_INFO);
+						if (_messagesSection)
+						{
+							updatedMessage->setSection(_messagesSection.get());
+						}
 					}
 					if(updatedScenario.get())
 					{
@@ -977,6 +996,10 @@ namespace synthese
 						updatedScenario->setPeriodStart(programmation.startTime);
 						updatedScenario->setPeriodEnd(programmation.endTime);
 						updatedScenario->setIsEnabled(programmation.active);
+						if (_messagesSection.get())
+						{
+							updatedScenario->addSection(*_messagesSection.get());
+						}
 					}
 
 
@@ -1036,11 +1059,6 @@ namespace synthese
 				DataSource::LinkedObjects existingJourneyPatterns(
 					_plannedDataSource->getLinkedObjects<JourneyPattern>()
 				);
-				if(_dbConnString)
-				{
-					Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle sur les parcours théoriques");
-					Log::GetInstance().debug("IneoBDSIFileFormat : on en a " + lexical_cast<string>(existingJourneyPatterns.size()));
-				}
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingJourneyPattern, existingJourneyPatterns)
 				{
 					JourneyPattern& journeyPattern(static_cast<JourneyPattern&>(*existingJourneyPattern.second));
@@ -1080,7 +1098,11 @@ namespace synthese
 				);
 				BOOST_FOREACH(const DataSource::LinkedObjects::value_type& existingService, existingServices)
 				{
-					ScheduledService* service(static_cast<ScheduledService*>(existingService.second));
+					ScheduledService* service(dynamic_cast<ScheduledService*>(existingService.second));
+					if(!service)
+					{
+						continue;
+					}
 
 					servicesToUnlink.insert(service);
 
@@ -1135,11 +1157,6 @@ namespace synthese
 
 				// Search for existing services
 				size_t createdServices(0);
-				if(_dbConnString)
-				{
-					Log::GetInstance().debug("IneoBDSIFileFormat : Début de la boucle 1 sur les courses lues dans la BDSI");
-					Log::GetInstance().debug("IneoBDSIFileFormat : on en a : "+ lexical_cast<string>(courses.size()));
-				}
 				BOOST_FOREACH(const Courses::value_type& itCourse, courses)
 				{
 					const Course& course(itCourse.second);
@@ -1184,7 +1201,10 @@ namespace synthese
 								servicesToRemove.erase(service);
 
 								// The service must be linked
-								servicesToLink.push_back(&course);
+								if(!service->hasCodeBySource(*dataSourceOnSharedEnv, course.ref))
+								{
+									servicesToLink.push_back(&course);
+								}
 								break;
 							}
 							else if ( course == *service )
@@ -1351,6 +1371,18 @@ namespace synthese
 							string(),
 							string()
 						);
+						
+						// Deactivation Inter-SYNTHESE sync
+						if(_sendDeactivationsByInterSYNTHESE)
+						{
+							util::Log::GetInstance().debug("Désactivation de la course " + lexical_cast<string>(service->getKey()));
+							DeactivationPTDataInterSYNTHESE::Content content(*service);
+							inter_synthese::InterSYNTHESEModule::Enqueue(
+								content,
+								boost::optional<db::DBTransaction&>(),
+								service
+							);
+						}
 					}
 					catch (...)
 					{
@@ -1365,15 +1397,6 @@ namespace synthese
 				_logInfo("Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
 				_logInfo("Courses créées : "+ lexical_cast<string>(createdServices));
 				_logInfo("Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
-				if(_dbConnString)
-				{
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses attachées : "+ lexical_cast<string>(servicesToLink.size()));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses détachées : "+ lexical_cast<string>(servicesToUnlink.size()));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses avec mise à jour des horaires temps réel : "+ lexical_cast<string>(updated));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses sans mise à jour des horaires temps réel : "+ lexical_cast<string>(servicesToUpdate.size() - updated));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses créées : "+ lexical_cast<string>(createdServices));
-					Log::GetInstance().debug("IneoBDSIFileFormat : Courses supprimées : "+ lexical_cast<string>(servicesToRemove.size()));
-				}
 			}
 			
 			// Release lock
@@ -1383,6 +1406,8 @@ namespace synthese
 				// Release lock
 				_runningBdsi.erase(getImport().getKey());
 			}
+
+			saveNow().run();
 
 			return true;
 		}
@@ -1513,6 +1538,11 @@ namespace synthese
 
 
 		DBTransaction IneoBDSIFileFormat::Importer_::_save() const
+		{
+			return DBTransaction();
+		}
+
+		DBTransaction IneoBDSIFileFormat::Importer_::saveNow() const
 		{
 			DBTransaction transaction;
 			// We check that import is not running

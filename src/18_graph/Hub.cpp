@@ -138,7 +138,7 @@ namespace synthese
 					)	);
 
 					for(Edge* edge(incomingEdge.getPrevious());
-						edge && edge->getFollowingArrivalForFineSteppingOnly() == &incomingEdge;
+						edge && edge->getFollowingArrivalForFineSteppingOnly() == &incomingEdge && edge != edge->getPrevious();
 						edge = edge->getPrevious()
 					){
 						if(transferUsefulness)

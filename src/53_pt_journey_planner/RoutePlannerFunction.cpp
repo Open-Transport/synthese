@@ -2335,15 +2335,13 @@ namespace synthese
 				destinationPlaceName = dynamic_cast<const NamedPlace*>(destinationPlace)->getName();
 			}
 
-			boost::shared_ptr<Point> originPoint(_coordinatesSystem->convertPoint(*(originPlace->getPoint())));
-			boost::shared_ptr<Point> destinationPoint(_coordinatesSystem->convertPoint(*(destinationPlace->getPoint())));
-
 			pm.insert(DATA_INTERNAL_DATE, to_iso_extended_string(date));
 			pm.insert(DATA_ORIGIN_CITY_TEXT, originCity->getName());
 			pm.insert(DATA_HANDICAPPED_FILTER, accessParameters.getUserClass() == USER_HANDICAPPED);
 			pm.insert(DATA_ORIGIN_PLACE_TEXT, originPlaceName);
-			if(originPoint)
+			if(originPlace->getPoint())
 			{
+				boost::shared_ptr<Point> originPoint(_coordinatesSystem->convertPoint(*(originPlace->getPoint())));
 				pm.insert(DATA_ORIGIN_PLACE_LONGITUDE, originPoint->getX());
 				pm.insert(DATA_ORIGIN_PLACE_LATITUDE, originPoint->getY());
 			}
@@ -2351,8 +2349,9 @@ namespace synthese
 			pm.insert(DATA_DESTINATION_CITY_TEXT, destinationCity->getName());
 			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
-			if(destinationPoint)
+			if(destinationPlace->getPoint())
 			{
+				boost::shared_ptr<Point> destinationPoint(_coordinatesSystem->convertPoint(*(destinationPlace->getPoint())));
 				pm.insert(DATA_DESTINATION_PLACE_LONGITUDE, destinationPoint->getX());
 				pm.insert(DATA_DESTINATION_PLACE_LATITUDE, destinationPoint->getY());
 			}
@@ -2436,22 +2435,25 @@ namespace synthese
 							pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
 
 							// Saving of the columns on each lines
-							_displayScheduleCell(
-								**itSheetRow,
-								request,
-								i,
-								pedestrianMode,
-								leg.getDepartureDateTime().time_of_day(),
-								lastDateTime.time_of_day(),
-								it->getContinuousServiceRange().total_seconds() > 0,
-								itPlaces->isOrigin && itl == jl.begin(),
-								true,
-								pedestrianMode && !lastPedestrianMode,
-								itPlaces->isOrigin,
-								itPlaces->isDestination,
-								leg.getService()->getServiceNumber()
-							);
-							++itPlaces; ++itSheetRow;
+							if (itPlaces != placesList.end())
+							{
+								_displayScheduleCell(
+									**itSheetRow,
+									request,
+									i,
+									pedestrianMode,
+									leg.getDepartureDateTime().time_of_day(),
+									lastDateTime.time_of_day(),
+									it->getContinuousServiceRange().total_seconds() > 0,
+									itPlaces->isOrigin && itl == jl.begin(),
+									true,
+									pedestrianMode && !lastPedestrianMode,
+									itPlaces->isOrigin,
+									itPlaces->isDestination,
+									leg.getService()->getServiceNumber()
+								);
+								++itPlaces; ++itSheetRow;
+							}
 							lastPedestrianMode = pedestrianMode;
 						}
 
@@ -2470,41 +2472,47 @@ namespace synthese
 							ptime lastDateTime(leg.getArrivalDateTime());
 							lastDateTime += it->getContinuousServiceRange();
 
-							_displayScheduleCell(
-								**itSheetRow,
-								request,
-								i,
-								pedestrianMode,
-								leg.getArrivalDateTime().time_of_day(),
-								lastDateTime.time_of_day(),
-								it->getContinuousServiceRange().total_seconds() > 0,
-								true,
-								itPlaces->isDestination && itl+1 == jl.end(),
-								false,
-								itPlaces->isOrigin,
-								itPlaces->isDestination,
-								leg.getService()->getServiceNumber()
-							);
+							if (itPlaces != placesList.end())
+							{
+								_displayScheduleCell(
+									**itSheetRow,
+									request,
+									i,
+									pedestrianMode,
+									leg.getArrivalDateTime().time_of_day(),
+									lastDateTime.time_of_day(),
+									it->getContinuousServiceRange().total_seconds() > 0,
+									true,
+									itPlaces->isDestination && itl+1 == jl.end(),
+									false,
+									itPlaces->isOrigin,
+									itPlaces->isDestination,
+									leg.getService()->getServiceNumber()
+								);
+							}
 						}
 					}
 
 					// Fill in the last cells
-					for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
+					if (itPlaces != placesList.end())
 					{
-						_displayScheduleCell(
-							**itSheetRow,
-							request,
-							i,
-							false,
-							time_duration(not_a_date_time),
-							time_duration(not_a_date_time),
-							false,
-							true,
-							true,
-							false,
-							itPlaces->isOrigin,
-							itPlaces->isDestination
-						);
+						for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
+						{
+							_displayScheduleCell(
+								**itSheetRow,
+								request,
+								i,
+								false,
+								time_duration(not_a_date_time),
+								time_duration(not_a_date_time),
+								false,
+								true,
+								true,
+								false,
+								itPlaces->isOrigin,
+								itPlaces->isDestination
+							);
+						}
 					}
 				}
 
@@ -3739,8 +3747,18 @@ namespace synthese
 			ParametersMap pm(getTemplateParameters());
 
 			// Departure point
-			if(	departureVertex.getGeometry().get() &&
-				!departureVertex.getGeometry()->isEmpty()
+			if(isFirstLeg)
+			{
+				Place* place = _departure_place.placeResult.value.get();
+				boost::shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(*(place->getPoint()))
+				);
+
+				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
+				pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
+			}
+			else if(departureVertex.getGeometry().get() &&
+					!departureVertex.getGeometry()->isEmpty()
 			){
 				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
@@ -3749,9 +3767,20 @@ namespace synthese
 				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
 				pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
 			}
+
 			// Arrival point
-			if(	arrivalVertex.getGeometry().get() &&
-				!arrivalVertex.getGeometry()->isEmpty()
+			if(isLastLeg)
+			{
+				Place* place = _arrival_place.placeResult.value.get();
+				boost::shared_ptr<Point> point(
+					_coordinatesSystem->convertPoint(*(place->getPoint()))
+				);
+
+				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
+				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
+			}
+			else if(arrivalVertex.getGeometry().get() &&
+					!arrivalVertex.getGeometry()->isEmpty()
 			){
 				boost::shared_ptr<Point> point(
 					_coordinatesSystem->convertPoint(
@@ -3760,6 +3789,7 @@ namespace synthese
 				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
 				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
 			}
+
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
 
 			pm.insert(DATA_ODD_ROW, color);
@@ -3864,6 +3894,10 @@ namespace synthese
 					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
 				}
 			}
+			
+			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
+			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
+			
 			page->display(stream, request, pm);
 		}
 

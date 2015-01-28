@@ -383,6 +383,9 @@ namespace synthese
 							if (!currentJourney.empty() &&
 								dynamic_cast<const RoadPath*>(currentJourney.getEndEdge().getParentPath()))
 								continue;
+							// Junction should not start or end a journey
+							if (currentJourney.empty())
+								continue;
 						}
 						if(!currentJourney.empty())
 						{
@@ -513,14 +516,16 @@ namespace synthese
 								//		also belong to a connection place)
 								//  - if the vertex belongs to a connection place
 								bool isGoalReached(
-									_destinationVam.contains(reachedVertex)
+									_destinationVam.contains(reachedVertex) &&
+										(!_accessParameters.getMaxtransportConnectionsCount() ||
+										 fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1)
 								);
 								bool isReturnedVertex(
 									(	reachedVertex->getHub()->containsAnyVertex(_whatToSearch) &&
 										(	!_searchOnlyNodes ||
 											(	reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&
 												(	!_accessParameters.getMaxtransportConnectionsCount() ||
-													fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount()
+													fullApproachJourney.size() < *_accessParameters.getMaxtransportConnectionsCount() + 1
 								)	)	)	)	);
 								bool isARecursionNode(
 									reachedVertex->getHub()->isUsefulTransfer(_graphToUse) &&

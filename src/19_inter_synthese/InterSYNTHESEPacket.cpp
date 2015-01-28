@@ -57,6 +57,10 @@ namespace synthese
 			const std::string& content,
 			bool readIdRange
 		){
+			if (content.size() == 0)
+			{
+				throw BadPacketException();
+			}
 			size_t i(0);
 			bool readingIdRange(readIdRange);
 			while(i < content.size())

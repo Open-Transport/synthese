@@ -47,6 +47,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		class OperationUnit;
+		class VehicleService;
 	}
 
 	namespace pt_website
@@ -95,6 +96,7 @@ namespace synthese
 				boost::shared_ptr<const pt::ScheduledService> _service;
 				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::shared_ptr<const pt_operation::OperationUnit> _operationUnit;
+				boost::shared_ptr<const pt_operation::VehicleService> _vehicleService;
 				boost::gregorian::date _displayDate;
 				boost::optional<calendar::Calendar> _baseCalendar;
 				boost::optional<boost::posix_time::time_duration> _minDepartureTime;

@@ -60,6 +60,7 @@ namespace synthese
 			static const std::string TABLE_COL_ISCITYMAINCONNECTION;
 			static const std::string TABLE_COL_DEFAULTTRANSFERDELAY;
 			static const std::string TABLE_COL_TRANSFERDELAYS;
+			static const std::string TABLE_COL_ISRELAYPARK;
 			static const std::string COL_NAME13;
 			static const std::string COL_NAME26;
 			static const std::string COL_CODE_BY_SOURCE;

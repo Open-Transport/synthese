@@ -117,7 +117,10 @@ namespace synthese
 		const string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
 		const string IneoFileFormat::Importer_::PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD = "journey_pattern_line_overload_field";
 		const string IneoFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
+		const string IneoFileFormat::Importer_::PARAMETER_FORBIDDEN_SERVICE_USE_RULE = "forbidden_service_use_rule";
 		const string IneoFileFormat::Importer_::PARAMETER_VEHICLE_SERVICE_SUFFIX = "vehicle_service_suffix";
+		const string IneoFileFormat::Importer_::PARAMETER_DEPOT_TO_STOP_IS_HLP = "depot_to_stop_is_hlp";
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_TO_DEPOT_IS_HLP = "stop_to_depot_is_hlp";
 		const string IneoFileFormat::Importer_::PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA = "allow_different_stop_points_in_same_stop_area";
 	}
 
@@ -173,6 +176,8 @@ namespace synthese
 			PTOperationFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_autoImportStops(false),
 			_displayLinkedStops(false),
+			_depotToStopIsHLP(false),
+			_stopToDepotIsHLP(false),
 			_allowDifferentStopPointsInSameStopArea(true),
 			_interactive(false),
 			_addWaybackToJourneyPatternCode(false),
@@ -808,14 +813,34 @@ namespace synthese
 					){
 						SchedulesBasedService* service(NULL);
 						if(	route &&
-							(tcou == TCOU_Commercial || tcou == TCOU_HLP)
+							(tcou == TCOU_Commercial || tcou == TCOU_HLP ||
+							 (tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+							 (tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
 						){
+							RuleUser::Rules forbiddenServiceRules;
+							if (tcou == TCOU_HLP ||
+								(tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+								(tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
+							{
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+								forbiddenServiceRules.push_back(_forbiddenServiceUseRule.get());
+							} else {
+								forbiddenServiceRules.push_back(NULL);
+								forbiddenServiceRules.push_back(NULL);
+								forbiddenServiceRules.push_back(NULL);
+								forbiddenServiceRules.push_back(NULL);
+							}
+							
 							service = _createOrUpdateService(
 								*route,
 								departureSchedules,
 								arrivalSchedules,
 								string(),
-								dataSource
+								dataSource,
+								NULL,
+								forbiddenServiceRules
 							);
 						}
 						else if(
@@ -926,7 +951,9 @@ namespace synthese
 						route = NULL;
 
 						// Line
-						if(tcou == TCOU_Commercial || tcou == TCOU_HLP)
+						if(tcou == TCOU_Commercial || tcou == TCOU_HLP ||
+						   (tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+						   (tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
 						{
 							if(_lineReadMethod == VALUE_CIDX)
 							{
@@ -1215,6 +1242,18 @@ namespace synthese
 			{
 				map.insert(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE, _handicappedAllowedUseRule->getKey());
 			}
+			
+			// Forbidden service use rule
+			if(_forbiddenServiceUseRule.get())
+			{
+				map.insert(PARAMETER_FORBIDDEN_SERVICE_USE_RULE, _forbiddenServiceUseRule->getKey());
+			}
+
+			// Forbidden service use rule
+			if(_forbiddenServiceUseRule.get())
+			{
+				map.insert(PARAMETER_FORBIDDEN_SERVICE_USE_RULE, _forbiddenServiceUseRule->getKey());
+			}
 
 			// Journey pattern line overload field
 			if(!_journeyPatternLineOverloadField.empty())
@@ -1222,6 +1261,10 @@ namespace synthese
 				map.insert(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField);
 			}
 			
+			map.insert(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, _allowDifferentStopPointsInSameStopArea);
+
+			map.insert(PARAMETER_DEPOT_TO_STOP_IS_HLP, _depotToStopIsHLP);
+			map.insert(PARAMETER_STOP_TO_DEPOT_IS_HLP, _stopToDepotIsHLP);
 			map.insert(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, _allowDifferentStopPointsInSameStopArea);
 
 			return map;
@@ -1297,7 +1340,22 @@ namespace synthese
 			{
 				throw Exception("No such handicapped use rule");
 			}
+			
+			// Forbidden Service use rule
+			RegistryKeyType forbiddenServiceUseRuleId(
+				map.getDefault<RegistryKeyType>(PARAMETER_FORBIDDEN_SERVICE_USE_RULE)
+			);
+			if(forbiddenServiceUseRuleId) try
+			{
+				_forbiddenServiceUseRule = PTUseRuleTableSync::GetEditable(forbiddenServiceUseRuleId, _env);
+			}
+			catch(ObjectNotFoundException<PTUseRule>&)
+			{
+				throw Exception("No such forbidden service use rule");
+			}
 
+			_depotToStopIsHLP = map.getDefault<bool>(PARAMETER_DEPOT_TO_STOP_IS_HLP, false);
+			_stopToDepotIsHLP = map.getDefault<bool>(PARAMETER_STOP_TO_DEPOT_IS_HLP, false);
 			_allowDifferentStopPointsInSameStopArea = map.getDefault<bool>(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, true);
 
 			// Calendar dates

@@ -245,12 +245,6 @@ namespace synthese
 				return RESERVATION_FORBIDDEN;
 			}
 
-			ReservationDelayType reservationDelayType = RESERVATION_INTERNAL_DELAY;
-			if (reservationRulesDelayType == 1)
-			{
-				reservationDelayType = RESERVATION_EXTERNAL_DELAY;
-			}
-
 			switch(_reservationType)
 			{
 			case RESERVATION_RULE_FORBIDDEN:

@@ -128,7 +128,10 @@ namespace synthese
 				static const std::string PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD;
 				static const std::string VALUE_UFR;
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
+				static const std::string PARAMETER_FORBIDDEN_SERVICE_USE_RULE;
 				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
+				static const std::string PARAMETER_DEPOT_TO_STOP_IS_HLP;
+				static const std::string PARAMETER_STOP_TO_DEPOT_IS_HLP;
 				static const std::string PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA;
 
 			private:
@@ -178,7 +181,10 @@ namespace synthese
 					std::string _stopHandicappedAccessibilityField;
 					std::string _mnlp_prefix;
 					boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
+					boost::shared_ptr<pt::PTUseRule> _forbiddenServiceUseRule;
 					std::string _vehicleServiceSuffix;
+					bool _depotToStopIsHLP;
+					bool _stopToDepotIsHLP;
 					bool _allowDifferentStopPointsInSameStopArea;
 				//@}
 

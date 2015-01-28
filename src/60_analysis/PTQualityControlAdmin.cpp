@@ -1623,7 +1623,6 @@ namespace synthese
 					typedef std::map<std::pair<Vertex*, Vertex*>, set<LineString*> > GeometriesMap;
 					GeometriesMap resultMap;
 					boost::shared_ptr<const JourneyPattern> itinerary;
-					bool path = false;
 
 					// Scan of each stop
 					BOOST_FOREACH(const StopPoint::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<StopPoint>())
@@ -1645,12 +1644,7 @@ namespace synthese
 							{
 								if(edge->getParentPath()->getKey() != 0)
 								{
-									path = true;
 									itinerary = Env::GetOfficialEnv().get<JourneyPattern>(edge->getParentPath()->getKey());
-								}
-								else
-								{
-									path = false;
 								}
 							}
 

@@ -21,6 +21,8 @@
 */
 
 #include "HouseTableSync.hpp"
+
+#include "EdgeProjector.hpp"
 #include "House.hpp"
 #include "RoadChunk.h"
 #include "DBModule.h"
@@ -44,6 +46,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace algorithm;
 	using namespace db;
 	using namespace util;
 	using namespace road;
@@ -112,8 +115,24 @@ namespace synthese
 			object->setHouseNumber(houseNumber);
 
 			// Road Place
-			boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(rows->getLongLong(HouseTableSync::COL_ROAD_PLACE_ID),env));
-			object->setRoadChunkFromRoadPlace(roadPlace);
+			RegistryKeyType roadId(
+				rows->getLongLong(HouseTableSync::COL_ROAD_PLACE_ID)
+			);
+			try
+			{
+				boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(roadId, env));
+				object->setRoadChunkFromRoadPlace(roadPlace);
+			}
+			catch(ObjectNotFoundException<RoadPlace>&)
+			{
+				Log::GetInstance().warn("No such road place "+ lexical_cast<string>(roadId) +" in house "+ lexical_cast<string>(object->getKey()));
+				throw;
+			}
+			catch(EdgeProjector<RoadChunk*>::NotFoundException&)
+			{
+				Log::GetInstance().warn("No chunk was found near the house "+ lexical_cast<string>(object->getKey()) +" in the road place "+ lexical_cast<string>(roadId));
+				throw;
+			}
 		}
 
 

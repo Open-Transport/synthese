@@ -52,6 +52,11 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		const string DeadRun::ATTR_DEP_PLACE_NAME = "departure_place_name";
+		const string DeadRun::ATTR_ARR_PLACE_NAME = "arrival_place_name";
+		const string DeadRun::ATTR_DEP_SCHEDULE   = "departure_schedule";
+		const string DeadRun::ATTR_ARR_SCHEDULE   = "arrival_schedule";
+
 		DeadRun::DeadRun(
 			RegistryKeyType id,
 			string number
@@ -315,6 +320,43 @@ namespace synthese
 				prefix + DeadRunTableSync::COL_OPERATION_UNIT_ID,
 				getOperationUnit() ? getOperationUnit()->getKey() : RegistryKeyType(0)
 			);
+
+			// Departure and Arrival place names
+			if (getFromDepotToStop()) {
+				pm.insert(
+					ATTR_DEP_PLACE_NAME,
+					depot ? depot->getName() : ""
+				);
+	                        pm.insert(
+	                                ATTR_ARR_PLACE_NAME,
+	                                stop ? stop->getName() : ""
+	                        );
+			}
+			else {
+        	                pm.insert(
+	                                ATTR_DEP_PLACE_NAME,
+	                                stop ? stop->getName() : ""
+	                        );
+	                        pm.insert(
+	                                ATTR_ARR_PLACE_NAME,
+	                                depot ? depot->getName() : ""
+	                        );
+			}
+
+			// Departure and Arrival schedules
+			stringstream departure_schedule;
+			stringstream arrival_schedule;
+			departure_schedule << EncodeSchedule(getDataDepartureSchedules()[0]);
+			arrival_schedule << EncodeSchedule(getDataArrivalSchedules()[1]);
+			
+                        pm.insert(
+                                ATTR_DEP_SCHEDULE,
+				departure_schedule.str()
+                        );
+                        pm.insert(
+                                ATTR_ARR_SCHEDULE,
+				arrival_schedule.str()
+                        );
 		}
 
 

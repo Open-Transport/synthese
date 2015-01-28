@@ -65,6 +65,7 @@ namespace synthese
 		const std::string VehiclePositionTableSync::COL_RANK_IN_PATH("rank_in_path");
 		const std::string VehiclePositionTableSync::COL_PASSENGERS("passengers");
 		const std::string VehiclePositionTableSync::COL_IN_STOP_AREA = "in_stop_area";
+        const std::string VehiclePositionTableSync::COL_STOP_FOUND_TIME = "stop_found_time";
 	}
 
 	namespace db
@@ -87,7 +88,8 @@ namespace synthese
 			Field(VehiclePositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
 			Field(VehiclePositionTableSync::COL_RANK_IN_PATH, SQL_INTEGER),
 			Field(VehiclePositionTableSync::COL_PASSENGERS, SQL_INTEGER),
-			Field(VehiclePositionTableSync::COL_IN_STOP_AREA, SQL_BOOLEAN),
+            Field(VehiclePositionTableSync::COL_IN_STOP_AREA, SQL_BOOLEAN),
+            Field(VehiclePositionTableSync::COL_STOP_FOUND_TIME, SQL_TEXT),
 			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
@@ -121,6 +123,7 @@ namespace synthese
 			object->setRankInPath(rows->getOptionalUnsignedInt(VehiclePositionTableSync::COL_RANK_IN_PATH));
 			object->setPassangers(rows->getInt(VehiclePositionTableSync::COL_PASSENGERS));
 			object->setInStopArea(rows->getBool(VehiclePositionTableSync::COL_IN_STOP_AREA));
+            object->setNextStopFoundTime(rows->getDateTime(VehiclePositionTableSync::COL_STOP_FOUND_TIME));
 
 
 			string pointsStr(rows->getText(TABLE_COL_GEOMETRY));
@@ -218,6 +221,7 @@ namespace synthese
 			query.addField(object->getRankInPath() ? lexical_cast<string>(*object->getRankInPath()) : string());
 			query.addField(object->getPassengers());
 			query.addField(object->getInStopArea());
+            query.addFrameworkField<PtimeField>(object->getNextStopFoundTime());
 			if(object->hasGeometry())
 			{
 				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));

@@ -321,7 +321,7 @@ Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines,
 {
     std::pair<const Coordinate*, int> curPointCpt	(0, -1);
 
-    DrawableLine* dbl;
+    DrawableLine* dbl = NULL;
 
     int maxPoints = 0;
 

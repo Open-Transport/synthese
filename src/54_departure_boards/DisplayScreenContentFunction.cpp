@@ -103,6 +103,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA("timetable_grouped_by_area");
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
 		const string DisplayScreenContentFunction::PARAMETER_SPLIT_CONTINUOUS_SERVICES("split_continuous_services");
+		const string DisplayScreenContentFunction::PARAMETER_MAX_DAYS_NEXT_DEPARTURES("max_days_next_departures");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -669,6 +670,8 @@ namespace synthese
 						_useSAEDirectConnection = false;
 				}
 
+				_maxDaysNextDepartures = map.getDefault<int>(PARAMETER_MAX_DAYS_NEXT_DEPARTURES, 1);
+
 				// Type control
 				if(!_screen->get<DisplayTypePtr>())
 				{
@@ -755,7 +758,13 @@ namespace synthese
 						journeyPattern->getDirectionObj()->getDisplayedText() :
 						journeyPattern->getDirection()
 					) <<
+					"\" wayback=\"" << (journeyPattern->getWayBack() ? "1" : "0") <<
+					"\" >";
+				stream <<"<network id=\""<< commercialLine->getNetwork()->getKey() <<
+					"\" name=\""      << commercialLine->getNetwork()->getName() <<
+					"\" image=\""      << commercialLine->getNetwork()->getImage() <<
 					"\" />";
+				stream << "</line>";
 			}
 
 			const StopArea& origin(
@@ -821,7 +830,12 @@ namespace synthese
 					"\" xmlColor=\""  << (serviceReal.commercialLine->getColor() ? serviceReal.commercialLine->getColor()->toXMLColor() : "") <<
 					"\" style=\""     << serviceReal.commercialLine->getStyle() <<
 					"\" image=\""     << serviceReal.commercialLine->getImage() <<
+					"\" >";
+				stream <<"<network id=\""<< serviceReal.commercialLine->getNetwork()->getKey() <<
+					"\" name=\""      << serviceReal.commercialLine->getNetwork()->getName() <<
+					"\" image=\""      << serviceReal.commercialLine->getNetwork()->getImage() <<
 					"\" />";
+				stream << "</line>";
 			}
 
 			stream << "<destination id=\"" << serviceReal.destination->getKey() <<
@@ -899,6 +913,7 @@ namespace synthese
 			{
 				boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 				commercialLine->toParametersMap(*linePM, true);
+				linePM->insert("wayback",journeyPattern->getWayBack());
 				journeyPm->insert("line", linePM);
 			}
 
@@ -1155,6 +1170,7 @@ namespace synthese
 				typedef map<LineDestinationKey, OrderedServices, LineDestinationKey_comparator> DeparturesByDestination;
 				typedef map<const StopArea*, DeparturesByDestination> DestinationsServicesByArea;
 
+				set<RegistryKeyType> linesWithRealTime;
 				DestinationsServicesByArea serviceMap;
 
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
@@ -1275,12 +1291,11 @@ namespace synthese
 								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
 
 							const StopArea* area = realTimeService.stop->getConnectionPlace();
+							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end() || !realTimeService.destination)
+								continue;
 
-								// Ignore when destination and stop are on the same stop area
-								if(area->getKey() == realTimeService.destination->getKey())
-									continue;
-
-							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+							// Ignore when destination and stop are on the same stop area
+							if(area->getKey() == realTimeService.destination->getKey())
 								continue;
 
 							BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
@@ -1322,6 +1337,7 @@ namespace synthese
 							if(!realTimeService.commercialLine)
 								continue;
 
+							linesWithRealTime.insert(realTimeService.commercialLine->getKey());
 							if(_lineDestinationFilter.find(realTimeService.stop.get()) != _lineDestinationFilter.end())
 							{
 								bool displayDeparture(false);
@@ -1399,15 +1415,15 @@ namespace synthese
 					{
 						endDateTime = (_date ? *_date : now);
 						startDateTime = endDateTime.time_of_day().hours() < 3 ?
-							endDateTime - endDateTime.time_of_day() - hours(21) :
-							endDateTime - endDateTime.time_of_day() + hours(3);
+							endDateTime - endDateTime.time_of_day() - hours(_maxDaysNextDepartures * 24) + hours(3) :
+							endDateTime - endDateTime.time_of_day() - hours((_maxDaysNextDepartures * 24) - 1) + hours(3);
 					}
 					else
 					{
 						startDateTime = (_date ? *_date : now);
 						endDateTime = startDateTime.time_of_day().hours() < 3 ?
-							startDateTime - startDateTime.time_of_day() + hours(3) :
-							startDateTime - startDateTime.time_of_day() + hours(27);
+							startDateTime - startDateTime.time_of_day() + hours((_maxDaysNextDepartures - 1) * 24) + hours(3) :
+							startDateTime - startDateTime.time_of_day() + hours(_maxDaysNextDepartures * 24) + hours(3);
 					}
 
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
@@ -1454,9 +1470,11 @@ namespace synthese
 
 								++*index;
 
-							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
+								departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+								{
 									continue;
+								}
 
 								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
 								const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
@@ -1550,10 +1568,6 @@ namespace synthese
 						const CommercialLine* commercialLine(destinationMap.first.first);
 						const StopArea* destination(destinationMap.first.second);
 
-						string curShortName = boost::algorithm::to_lower_copy(
-							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-						);
-
 						boost::shared_ptr<ParametersMap> schedulePM(new ParametersMap());
 
 						boost::shared_ptr<ParametersMap> linePM(new ParametersMap());
@@ -1566,7 +1580,7 @@ namespace synthese
 
 						const StopPoint* stop(NULL);
 
-						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+						if(noRealTime || linesWithRealTime.find(commercialLine->getKey()) == linesWithRealTime.end())
 						{
 							for(OrderedServices::second_type::const_iterator it = destinationMap.second.second.begin() ; it != destinationMap.second.second.end() ; it++)
 							{
@@ -1716,17 +1730,39 @@ namespace synthese
 				{
 					endDateTime = (_date ? *_date : now);
 					if(endDateTime.time_of_day() > endOfService)
+					{
 						startDateTime = ptime(endDateTime.date(), endOfService);
+					}
 					else
+					{
 						startDateTime = ptime(endDateTime.date() - boost::gregorian::days(1), endOfService);
+					}
 				}
-				else 
+				else
 				{
 					startDateTime = (_date ? *_date : now);
 					if(startDateTime.time_of_day() > endOfService)
-						endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+					{
+						if(_screen.get() && _screen->get<MaxDelay>() != 0)
+						{
+							endDateTime = ptime(startDateTime);
+							endDateTime += minutes(_screen->get<MaxDelay>());
+							time_period period(startDateTime, endDateTime);
+							// Limit the endDateTime to the date of the next day, at time 'endOfService'.
+							if (period.contains(ptime(startDateTime.date() + boost::gregorian::days(1), endOfService)))
+							{
+								endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+							}
+						}
+						else
+						{
+							endDateTime = ptime(startDateTime.date() + boost::gregorian::days(1), endOfService);
+						}
+					}
 					else
+					{
 						endDateTime = ptime(startDateTime.date(), endOfService);
+					}
 				}
 
 			#ifdef MYSQL_CONNECTOR_AVAILABLE
@@ -1761,7 +1797,7 @@ namespace synthese
 					if(_wayIsBackward)
 					{
 						filters << "(h.hrd < '" << SAEHourString << "' ";
-						filters << (SAEDate.time_of_day() < endOfService ? "AND" : "OR") <<  " h.hrd > '" << boost::posix_time::to_simple_string(endOfService) << "')";
+						filters << (SAEDate.time_of_day() < endOfService ? "OR" : "AND") <<  " h.hrd > '" << boost::posix_time::to_simple_string(endOfService) << "')";
 					}
 					else
 					{
@@ -1840,11 +1876,11 @@ namespace synthese
 							if(ocStops.find(result->getInfo("oc_arrivee"))->second)
 								realTimeService.destination = ocStops.find(result->getInfo("oc_arrivee"))->second->getConnectionPlace();
 
-								// Ignore when destination and stop are on the same stop area
-								if(realTimeService.stop->getConnectionPlace()->getKey() == realTimeService.destination->getKey())
-									continue;
+							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end() || !realTimeService.destination)
+								continue;
 
-							if(_SAELine.find(result->getInfo("ligne")) == _SAELine.end())
+							// Ignore when destination and stop are on the same stop area
+							if(realTimeService.stop->getConnectionPlace()->getKey() == realTimeService.destination->getKey())
 								continue;
 
 							BOOST_FOREACH(SAELine::mapped_type::value_type idLine, _SAELine.find(result->getInfo("ligne"))->second)
@@ -1991,7 +2027,7 @@ namespace synthese
 									break;
 								++*index;
 
-							departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
+								departureDateTime = servicePointer.getDepartureDateTime() + servicePointer.getServiceRange();
 								if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 									continue;
 
@@ -2050,10 +2086,12 @@ namespace synthese
 									}
 								}
 
-							time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
+								time_duration tod = servicePointer.getDepartureDateTime().time_of_day();
 								int mapKeyMinutes = tod.seconds() + tod.minutes() * 60 + tod.hours() * 3600;
-							if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
+								if(servicePointer.getDepartureDateTime().date() > startDateTime.date())
+								{
 									mapKeyMinutes += 86400;
+								}
 
 								OrderedDeparturesMap::iterator it(servicePointerAll.find(mapKeyMinutes));
 								//Check if a service is already inserted for this date
@@ -2072,27 +2110,34 @@ namespace synthese
 					}
 				}
 
-				OrderedDeparturesMap::iterator it;
+				OrderedDeparturesMap::iterator it = servicePointerAll.begin();
+				OrderedDeparturesMap::iterator itStartTheoretical;
 				int maxRow(_screen->get<DisplayTypePtr>()->get<RowsNumber>());
 				int displayedResults(0);
+				bool startDisplayTheoretical(false);
 
 				if(_wayIsBackward)
 				{
-					it = servicePointerAll.end();
-					for(; it != servicePointerAll.begin() ; it--)
+					// Realtime is already limited and ordered at maxRow results, theoretical is requested on the full day
+					int count(0);
+					for(itStartTheoretical = servicePointerAll.end() ; itStartTheoretical != servicePointerAll.begin() ; itStartTheoretical--)
 					{
-						if(distance(it, servicePointerAll.end()) >= maxRow)
+						// Only consider entry of servicePointerAll which have theoretical services
+						if(itStartTheoretical->second.second.size() && ++count >= maxRow)
 							break;
 					}
 				}
 				else
-					it = servicePointerAll.begin();
+					itStartTheoretical = servicePointerAll.begin();
 
 				typedef map<graph::ServicePointer, pair<int, int>, Spointer_comparator> ContinuousServicesToMerge;
 				ContinuousServicesToMerge continuousServicesToMerge;
 
 				for(; it != servicePointerAll.end() ; it++)
 				{
+					if(itStartTheoretical == it)
+						startDisplayTheoretical = true;
+
 					bool serviceDisplayed(false);
 					do
 					{
@@ -2167,45 +2212,48 @@ namespace synthese
 						displayedResults++;
 					}
 
-					BOOST_FOREACH(ServicePointer sp, it->second.second)
+					if(startDisplayTheoretical)
 					{
-						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
-						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-						const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(sp.getService());
-
-						if(_splitContinuousServices && continuousService)
+						BOOST_FOREACH(ServicePointer sp, it->second.second)
 						{
-							sp.setDepartureInformations(
-								*(sp.getDepartureEdge()),
-								sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
-								sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
-								*(sp.getRealTimeDepartureVertex())
+							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(sp.getService()->getPath());
+							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+							const ContinuousService* continuousService = dynamic_cast<const ContinuousService*>(sp.getService());
+
+							if(_splitContinuousServices && continuousService)
+							{
+								sp.setDepartureInformations(
+									*(sp.getDepartureEdge()),
+									sp.getDepartureDateTime() + continuousService->getMaxWaitingTime(),
+									sp.getTheoreticalDepartureDateTime() + continuousService->getMaxWaitingTime(),
+									*(sp.getRealTimeDepartureVertex())
+								);
+								continuousServicesToMerge.insert(
+									ContinuousServicesToMerge::value_type(
+										sp,
+										make_pair(
+											it->first + continuousService->getMaxWaitingTime().total_seconds(),
+											it->first + sp.getServiceRange().total_seconds()
+								)	)	);
+								continue;
+							}
+
+							string curShortName = boost::algorithm::to_lower_copy(
+								trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
 							);
-							continuousServicesToMerge.insert(
-								ContinuousServicesToMerge::value_type(
-									sp,
-									make_pair(
-										it->first + continuousService->getMaxWaitingTime().total_seconds(),
-										it->first + sp.getServiceRange().total_seconds()
-							)	)	);
-							continue;
-						}
 
-						string curShortName = boost::algorithm::to_lower_copy(
-							trim_left_copy_if(commercialLine->getShortName(), is_any_of("0"))
-						);
+							// If realTime request didn't output any results or line isn't in the SAE
+							if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
+							{
+								if(displayedResults >= maxRow)
+									break;
+								else if(isOutputXML)
+									concatXMLResult(stream,	sp);
+								else
+									addJourneyToParametersMap(result, sp);
 
-						// If realTime request didn't output any results or line isn't in the SAE
-						if(noRealTime || _SAELine.find(curShortName) == _SAELine.end())
-						{
-							if(displayedResults >= maxRow)
-								break;
-							else if(isOutputXML)
-								concatXMLResult(stream,	sp);
-							else
-								addJourneyToParametersMap(result, sp);
-
-							displayedResults++;
+								displayedResults++;
+							}
 						}
 					}
 

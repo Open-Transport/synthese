@@ -79,6 +79,7 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_LIST;
 			static const std::string PARAMETER_NETWORK_LIST;
 			static const std::string PARAMETER_DISPLAY_SERVICE_REACHED;
+			static const std::string PARAMETER_ONLY_RELAY_PARKS;
 		protected:
 			static const std::string MAX_DISTANCE_TO_CENTER_POINT;
 			static const std::string SERVICE_NUMBER_REACHED;
@@ -110,6 +111,7 @@ namespace synthese
 				std::size_t _serviceNumberToReach;
 				graph::AccessParameters _accessParameters;
 				bool _displayServices;
+				bool _onlyRelayParks;
 			//@}
 
 

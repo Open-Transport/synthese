@@ -57,6 +57,11 @@ namespace synthese
 		class ScheduledService;
 	}
 
+	namespace messages
+	{
+		class MessagesSection;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -88,6 +93,8 @@ namespace synthese
 				static const std::string PARAMETER_DELAY_BUS_STOP;
 				static const std::string PARAMETER_DAY_BREAK_TIME;
 				static const std::string PARAMETER_CONVERT_STOP_CODE_TO_LOWER;
+				static const std::string PARAMETER_MESSAGES_SECTION;
+				static const std::string PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE;
 		
 			private:
 				// Vector to avoid reentrance and mutex to protect this vector
@@ -97,10 +104,12 @@ namespace synthese
 				boost::optional<std::string> _dbConnString;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
+				boost::shared_ptr<const messages::MessagesSection> _messagesSection;
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
 				boost::posix_time::time_duration _dayBreakTime;
 				bool _stopCodeToLower;
+				bool _sendDeactivationsByInterSYNTHESE;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
@@ -311,6 +320,7 @@ namespace synthese
 				);
 
 
+				db::DBTransaction saveNow() const;
 				virtual db::DBTransaction _save() const;
 
 

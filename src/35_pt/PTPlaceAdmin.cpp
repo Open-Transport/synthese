@@ -346,6 +346,12 @@ namespace synthese
 								_connectionPlace->getCity()->includes(*_connectionPlace) :
 								false
 					)	);
+					stream << t.cell(
+						"Parc relais",
+						t.getForm().getOuiNonRadioInput(
+							StopAreaUpdateAction::PARAMETER_IS_RELAY_PARK,
+							_connectionPlace->getIsRelayPark()
+					)	);
 					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
 					stream << t.title("Destination sur afficheur");
 					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
@@ -582,7 +588,14 @@ namespace synthese
 							stream << t.row();
 							stream << t.col() << startStop->getCodeBySources() << " / " << startStop->getName();
 							stream << t.col() << endStop->getCodeBySources() << " / " << endStop->getName();
-							stream << t.col() << (it.second.total_seconds() / 60) << " min";
+							if(it.second.is_not_a_date_time())
+							{
+								stream << t.col() << "Interdit";
+							}
+							else
+							{
+								stream << t.col() << (it.second.total_seconds() / 60) << " min";
+							}
 							stream << t.col() << HTMLModule::getLinkButton(removeTransferRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le délai de correspondance ?");
 						}
 						catch(ObjectNotFoundException<StopPoint>&)
@@ -593,7 +606,7 @@ namespace synthese
 					stream << t.row();
 					stream << t.col() << f.getSelectInput(StopAreaTransferAddAction::PARAMETER_FROM_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
 					stream << t.col() << f.getSelectInput(StopAreaTransferAddAction::PARAMETER_TO_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
-					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_DURATION,string(),"(minutes ou F)");
+					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_DURATION,string(),"(minutes ou F [ = interdit])");
 					stream << t.col() << f.getSubmitButton("Ajouter");
 
 					stream << t.close();

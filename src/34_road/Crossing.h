@@ -23,15 +23,29 @@
 #ifndef SYNTHESE_ENV_CROSSING_H
 #define SYNTHESE_ENV_CROSSING_H
 
+#include "Object.hpp"
+
+#include "DataSourceLinksField.hpp"
 #include "Hub.h"
 #include "Vertex.h"
 #include "Registry.h"
 #include "Registrable.h"
 #include "ImportableTemplate.hpp"
+#include "Road.h"
 #include "RoadPlace.h"
+#include "GeometryField.hpp"
 
 namespace synthese
 {
+	FIELD_POINTERS_VECTOR(NonReachableRoads, road::Road)
+	
+	typedef boost::fusion::map<
+		FIELD(Key),
+		FIELD(impex::DataSourceLinks),
+		FIELD(NonReachableRoads),
+		FIELD(PointGeometry)
+	> CrossingSchema;
+	
 	namespace road
 	{
 		class ReachableFromCrossing;
@@ -51,10 +65,13 @@ namespace synthese
 		class Crossing:
 			public graph::Hub,
 			public graph::Vertex,
+			public Object<Crossing, CrossingSchema>,
 			public virtual util::Registrable,
 			public impex::ImportableTemplate<Crossing>
 		{
 		public:
+			static const std::string TAG_NON_REACHABLE_ROADS;
+			
 			/// Chosen registry class.
 			typedef util::Registry<Crossing> Registry;
 
@@ -76,8 +93,6 @@ namespace synthese
 			Crossing(
 				util::RegistryKeyType key = 0,
 				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>(),
-				std::string codeBySource = std::string(),
-				const impex::DataSource* source = NULL,
 				bool withIndexation = true
 			);
 
@@ -99,6 +114,8 @@ namespace synthese
 				void setNonReachableRoads(const NonReachableRoadFromRoad& value) { _nonReachableRoadFromRoad = value; }
 
 				bool isNonReachableRoad(const Road* from, const Road* to) const;
+				
+				virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix /* = std::string */) const;
 
 
 
@@ -203,6 +220,12 @@ namespace synthese
 				virtual graph::GraphIdType getGraphType() const;
 
 				virtual std::string getRuleUserName() const;
+			//@}
+			
+			//! @name Modifiers
+			//@{
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
 		};
 	}

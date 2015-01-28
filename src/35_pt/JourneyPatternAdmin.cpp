@@ -1055,7 +1055,7 @@ namespace synthese
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
 				ScheduledServiceTableSync::SearchResult services(
-					ScheduledServiceTableSync::Search(*_env, _line->getKey())
+					ScheduledServiceTableSync::Search(Env::GetOfficialEnv(), _line->getKey())
 				);
 				BOOST_FOREACH(const boost::shared_ptr<const ScheduledService>& service, services)
 				{
@@ -1066,7 +1066,7 @@ namespace synthese
 					links.push_back(p);
 				}
 				ContinuousServiceTableSync::SearchResult cservices(
-					ContinuousServiceTableSync::Search(*_env, _line->getKey())
+					ContinuousServiceTableSync::Search(Env::GetOfficialEnv(), _line->getKey())
 				);
 				BOOST_FOREACH(const boost::shared_ptr<const ContinuousService>& service, cservices)
 				{

@@ -53,6 +53,10 @@ namespace synthese
 			typedef util::Registry<DeadRun> Registry;
 
 		private:
+			static const std::string ATTR_DEP_PLACE_NAME;
+			static const std::string ATTR_ARR_PLACE_NAME;
+			static const std::string ATTR_DEP_SCHEDULE;
+			static const std::string ATTR_ARR_SCHEDULE;
 			pt::TransportNetwork* _network;
 			boost::optional<pt_operation::OperationUnit&> _operationUnit;
 

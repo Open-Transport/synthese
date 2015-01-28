@@ -54,6 +54,8 @@ RoadPlaceTableSync.h
 RoadTableSync.cpp
 RoadTableSync.h
 RoadTypes.hpp
+RoadPlaceUpdateAction.cpp
+RoadPlaceUpdateAction.h
 )
 
 set_source_files_properties(RoadModule.gen.cpp RoadModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

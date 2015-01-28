@@ -74,6 +74,8 @@ namespace synthese
 			static const std::string PARAMETER_PASSENGERS;
 			static const std::string PARAMETER_SET_AS_CURRENT_POSITION;
 			static const std::string PARAMETER_IN_STOP_AREA;
+            static const std::string PARAMETER_STOP_FOUND_TIME;
+			static const std::string PARAMETER_SET_NEXT_STOPS;
 
 		private:
 			boost::shared_ptr<VehiclePosition> _vehiclePosition;
@@ -89,6 +91,8 @@ namespace synthese
 			boost::optional<boost::optional<std::size_t> > _rankInPath;
 			boost::optional<std::size_t> _passengers;
 			boost::optional<bool> _inStopArea;
+            boost::optional<boost::posix_time::ptime> _nextStopFoundTime;
+			bool _setNextStops;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

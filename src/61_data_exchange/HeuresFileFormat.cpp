@@ -1274,11 +1274,13 @@ namespace synthese
 							lastSchedule = secondSchedule;
 
 							// A schedule per generated edge
-							for(size_t i(0); i<writings; ++i)
+							for(size_t ii(0); ii<writings; ++ii)
 							{
-								_writeHour(tronconsStream, (i>0 ? secondSchedule : firstSchedule));
+								_writeHour(tronconsStream, (ii>0 ? secondSchedule : firstSchedule));
 								_writeHour(tronconsStream, secondSchedule);
 							}
+							
+							i = i + writings - 1;
 						}
 						tronconsStream << ";" << endl;
 		

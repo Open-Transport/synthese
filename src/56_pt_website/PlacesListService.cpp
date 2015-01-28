@@ -41,6 +41,7 @@
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
 #include <geos/geom/LineString.h>
+#include <geos/linearref/LengthIndexedLine.h>
 
 #ifndef UNIX
 #include <geos/util/math.h>
@@ -50,6 +51,7 @@ using namespace std;
 using namespace boost;
 using namespace geos::geom;
 using namespace geos::util;
+using namespace geos::linearref;
 
 namespace synthese
 {
@@ -343,7 +345,7 @@ namespace synthese
 			{
 				//Best place, which is near the originPoint
 				boost::shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
-				RoadChunkTableSync::SearchResult  roadChunks = RoadChunkTableSync::SearchByMaxDistance(
+				RoadChunkTableSync::SearchResult roadChunks = RoadChunkTableSync::SearchByMaxDistance(
 					*originPoint.get(),
 					_maxDistance,//distance  to originPoint
 					Env::GetOfficialEnv(),
@@ -353,7 +355,12 @@ namespace synthese
 				BOOST_FOREACH(const RoadChunkTableSync::SearchResult::value_type& roadChunk, roadChunks)
 				{
 					RoadChunk& chunk(static_cast<RoadChunk&>(*roadChunk));
-					HouseNumber houseNumber(0);
+
+					boost::shared_ptr<LineString> chunkGeometry = chunk.getRealGeometry();
+					if(!chunkGeometry || chunkGeometry->isEmpty())
+					{
+						continue;
+					}
 
 					bool compatibleWithUserClasses(true);
 					BOOST_FOREACH(graph::UserClassCode userClassCode, _requiredUserClasses)
@@ -371,23 +378,17 @@ namespace synthese
 						continue;
 					}
 
-					if(chunk.getLeftHouseNumberBounds() && chunk.getLeftHouseNumberBounds()->first != 0)
-					{
-						houseNumber = chunk.getLeftHouseNumberBounds()->first;
-					}
-					else if (chunk.getRightHouseNumberBounds() && chunk.getRightHouseNumberBounds()->first != 0)
-					{
-						houseNumber = chunk.getRightHouseNumberBounds()->first;
-					}
-					else if(!chunk.getRoad() || !chunk.getRoad()->get<RoadPlace>() || chunk.getRoad()->get<RoadPlace>()->getName() == "")
+					if(!chunk.getRoad() || !chunk.getRoad()->get<RoadPlace>() || chunk.getRoad()->get<RoadPlace>()->getName().empty())
 					{
 						continue;
 					}
 
-					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
+					LengthIndexedLine indexedLine(chunkGeometry.get());
+					double metricOffset = indexedLine.project(*(originPoint->getCoordinate())) + chunk.getMetricOffset();
+					boost::shared_ptr<House> house(new House(*roadChunk, metricOffset, true));
 
 					string name;
-					if(houseNumber == 0)
+					if(!house->getHouseNumber() || *(house->getHouseNumber()) == 0)
 					{
 						name = chunk.getRoad()->get<RoadPlace>()->getName();
 					}
@@ -396,7 +397,10 @@ namespace synthese
 						name = (house.get())->getName();
 					}
 
-					if(name == "")continue;
+					if(name.empty())
+					{
+						continue;
+					}
 
 					addHouse(_houseMap, house, name);
 				}
@@ -496,7 +500,7 @@ namespace synthese
 
 						stopResult = _city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
 								_text,
-								_number ? *_number : 0,
+								0,
 								_minScore
 						);
 
@@ -510,6 +514,11 @@ namespace synthese
 							}
 
 							newStopResult.push_back(item);
+
+							if(_number && (newStopResult.size() >= (*_number)))
+							{
+								break;
+							}
 						}
 
 						_registerItems<NamedPlace>(
@@ -643,7 +652,7 @@ namespace synthese
 
 						stopResult = PTModule::GetGeneralStopsMatcher().bestMatches(
 								_text,
-								_number ? *_number : 0,
+								0,
 								_minScore
 						);
 
@@ -657,6 +666,11 @@ namespace synthese
 							}
 
 							newStopResult.push_back(item);
+
+							if(_number && (newStopResult.size() >= (*_number)))
+							{
+								break;
+							}
 						}
 
 						_registerItems<StopArea>(
@@ -1278,7 +1292,11 @@ namespace synthese
 								House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID
 					)	)	);
 					HouseNumber houseNumber = itemMap->get<HouseNumber>(House::DATA_NUMBER);
-					if(houseNumber != 0)
+					if (!_houseMap.empty())
+					{
+						placeResult.value = _houseMap.begin()->second;
+					}
+					else if(houseNumber != 0)
 					{
 						placeResult.value = static_pointer_cast<Place, House>(
 							roadPlace->getHouse(houseNumber)
@@ -1286,15 +1304,8 @@ namespace synthese
 					}
 					else
 					{
-						if (_houseMap.empty())
-						{
-							// _houseMap is empty so give back the road
-							placeResult.value = roadPlace;
-						}
-						else
-						{
-							placeResult.value = _houseMap.begin()->second;	
-						}
+						// _houseMap is empty so give back the road
+						placeResult.value = roadPlace;
 					}
 				}
 			}

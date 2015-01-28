@@ -29,7 +29,10 @@
 #include "MessageApplicationPeriodTableSync.hpp"
 #include "MessageTypeTableSync.hpp"
 #include "MessagesModule.h"
-#include "MessagesSection.hpp"
+#include "MessagesSectionTableSync.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "ScenarioCalendarTableSync.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
@@ -70,6 +73,7 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 	using namespace impex;
+    using namespace messages;
 
 	template<> const string util::FactorableTemplate<Action,messages::ScenarioSaveAction>::FACTORY_KEY("scenario_save");
 
@@ -108,10 +112,13 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_CREATE = Action_PARAMETER_PREFIX + "me";
 		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 		const string ScenarioSaveAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "le";
+        const string ScenarioSaveAction::PARAMETER_DISPLAY_DURATION = Action_PARAMETER_PREFIX + "ddur";
+		const string ScenarioSaveAction::PARAMETER_DIGITIZED_VERSION = Action_PARAMETER_PREFIX + "dv";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENTS_ = Action_PARAMETER_PREFIX + "_recipients_";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_SECTION = Action_PARAMETER_PREFIX + "msection";
 		
 		const string ScenarioSaveAction::VALUES_SEPARATOR = ",";
 		const string ScenarioSaveAction::VALUES_PARAMETERS_SEPARATOR = "|";
@@ -255,7 +262,6 @@ namespace synthese
 				}
 				else
 				{	// Sent scenario creation
-
 					// Copy an other sent scenario (action E)
 					if(map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_TO_COPY, 0))
 					{
@@ -460,7 +466,7 @@ namespace synthese
 				// Event Start date
 				if(map.isDefined(PARAMETER_EVENT_START_DATE))
 				{
-					if(map.get<string>(PARAMETER_EVENT_START_DATE).empty())
+                    if(map.get<string>(PARAMETER_EVENT_START_DATE).empty())
 					{
 						_eventStartDate = ptime();
 					}
@@ -510,7 +516,7 @@ namespace synthese
 						{
 							_eventEndDate = time_from_string(map.get<string>(PARAMETER_EVENT_END_DATE));
 						}
-						*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
+                        //*_eventEndDate -= seconds(_endDate->time_of_day().seconds());
 					}
 				}
 
@@ -591,7 +597,13 @@ namespace synthese
 						_messageToCreateTitle = iconv.convert(map.get<string>(PARAMETER_CREATED_MESSAGE_TITLE));
 					}
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
-
+                    _display_duration = static_cast<size_t>(map.getDefault<int>(PARAMETER_DISPLAY_DURATION));
+					_digitizedVersion = map.getDefault<string>(PARAMETER_DIGITIZED_VERSION);
+					if (map.isDefined(PARAMETER_MESSAGE_SECTION))
+					{
+						RegistryKeyType id = map.getDefault<RegistryKeyType>(PARAMETER_MESSAGE_SECTION);
+						_messageSection = MessagesSectionTableSync::Get(id, *_env);
+					}
 
 					_recipients = Recipients::value_type();
 
@@ -1036,6 +1048,21 @@ namespace synthese
 						message->setShortMessage(messageNode.second.get("title", string()));
 						message->setLevel(static_cast<AlarmLevel>(messageNode.second.get("level", 0)));
 						message->setLongMessage(messageNode.second.get("content", string()));
+                        message->setDisplayDuration(messageNode.second.get("displayDuration", 0));
+						message->setDigitizedVersion(messageNode.second.get("digitized_version", string()));
+						BOOST_FOREACH(const ptree::value_type& sectionNode, messageNode.second.get_child("section"))
+						{
+							RegistryKeyType sectionId(sectionNode.second.get("id", RegistryKeyType(0)));
+							if (sectionId)
+							{
+								boost::shared_ptr<const MessagesSection> section;
+								section = MessagesSectionTableSync::Get(sectionId, *_env);
+								if (section)
+								{
+									message->setSection(section.get());
+								}
+							}
+						}
 
 						// Save
 						AlarmTableSync::Save(message.get(), transaction);
@@ -1191,6 +1218,9 @@ namespace synthese
 				message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
+                if (_display_duration) message->setDisplayDuration(*_display_duration);
+				message->setDigitizedVersion(_digitizedVersion);
+				message->setSection(_messageSection.get());
 
 				AlarmTableSync::Save(message.get(), transaction);
 
@@ -1298,9 +1328,66 @@ namespace synthese
 
 		bool ScenarioSaveAction::isAuthorized(
 			const Session* session
-		) const {
+        ) const {
+			// Making some checks about Messages section rights
+/*			bool result = session && session->hasProfile();
+			bool atLeastOneSectionWithRights = false;
+
+            if (!_sections)
+            {
+                if (_scenario)
+                {
+                    if (!_scenario->getSections().empty())
+                    {
+                        BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
+                        {
+							atLeastOneSectionWithRights = atLeastOneSectionWithRights || session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+                                        WRITE,
+                                        UNKNOWN_RIGHT_LEVEL,
+                                        MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+                                        );
+                        }
+                    }
+					else
+					{
+						atLeastOneSectionWithRights = true;
+					}
+                }
+            }
+			else
+            {
+                BOOST_FOREACH(const Scenario::Sections::value_type& section, *_sections)
+                {
+					bool sectionToCheck = true;
+					if (_scenario)
+					{
+						BOOST_FOREACH(const Scenario::Sections::value_type& ssect, _scenario->getSections())
+						{
+							sectionToCheck = sectionToCheck && (section->getKey() != ssect->getKey());
+						}
+						if (sectionToCheck)
+						{
+							atLeastOneSectionWithRights = atLeastOneSectionWithRights || session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+										WRITE,
+										UNKNOWN_RIGHT_LEVEL,
+										MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+										);
+						}
+					}
+					else
+					{
+						atLeastOneSectionWithRights = atLeastOneSectionWithRights || session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+									WRITE,
+									UNKNOWN_RIGHT_LEVEL,
+									MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+									);
+					}
+                }
+            }
+			result = result && atLeastOneSectionWithRights;
+            return result;
+			*/
 			return true;
-//			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 		}
 
 

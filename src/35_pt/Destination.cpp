@@ -25,16 +25,26 @@
 namespace synthese
 {
 	using namespace util;
+	using namespace pt;
 
-	namespace util
-	{
-		template<> const std::string Registry<pt::Destination>::KEY("Destination");
-	}
+	CLASS_DEFINITION(Destination, "t074_destinations", 74)
+	FIELD_DEFINITION_OF_TYPE(DisplayedText, "displayed_text", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(TtsText, "tts_text", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Comment, "comment", SQL_TEXT)
+	FIELD_DEFINITION_OF_OBJECT(Destination, "destination_id", "destination_ids")
 
 	namespace pt
 	{
 		Destination::Destination( util::RegistryKeyType id /*= 0 */ ):
-			Registrable(id)
+			Registrable(id),
+			Object<Destination, DestinationSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(DisplayedText),
+					FIELD_DEFAULT_CONSTRUCTOR(TtsText),
+					FIELD_DEFAULT_CONSTRUCTOR(Comment),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks)
+			)	)
 		{
 		}
 }	}

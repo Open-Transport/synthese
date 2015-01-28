@@ -28,6 +28,7 @@
 #include "InterSYNTHESEPackage.hpp"
 #include "InterSYNTHESEPackageContent.hpp"
 #include "InterSYNTHESEPackageGetContentService.hpp"
+#include "ServerModule.h"
 #include "StaticFunctionRequest.h"
 #include "User.h"
 

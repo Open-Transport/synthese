@@ -56,7 +56,7 @@ namespace synthese
 
 		private:
 
-			Sections _sections;
+			mutable Sections _sections;
 			std::string _name;
 			mutable Messages _messages;
 			mutable ScenarioCalendars _calendars;
@@ -73,6 +73,7 @@ namespace synthese
 
 			void addMessage(const Alarm& message) const;
 			void removeMessage(const Alarm& message) const;
+			void addSection(const MessagesSection& section) const;
 
 			/// @name Setters
 			//@{

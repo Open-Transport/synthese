@@ -254,10 +254,15 @@ int main( int argc, char **argv )
 
 			if (vm.count("version"))
 			{
-				std::cout << "SYNTHESE " << ServerModule::VERSION << " " <<
-					ServerModule::REVISION << " " <<
-					ServerModule::BRANCH <<
-					" (" << ServerModule::GetBranch() << " - " << ServerModule::BUILD_DATE << ")" << std::endl;
+				std::cout << "SYNTHESE " << SYNTHESE_VERSION << " " <<
+					SYNTHESE_REVISION <<
+					" (" << SYNTHESE_BRANCH << " - " << SYNTHESE_BUILD_DATE << ")" <<
+#ifdef WITH_MYSQL
+					" With MYSQL" <<
+#else
+					" Without MYSQL" <<
+#endif
+					std::endl;
 				return 1;
 			}
 
@@ -386,6 +391,15 @@ int main( int argc, char **argv )
 			VLDEnable();
 #endif
 
+			// We pass the data to ServerModule to avoid having it being recompiled
+			// on each version.h change (which triggers many links behind it).
+			ServerModule::InitRevisionInfo(
+				SYNTHESE_VERSION,
+				SYNTHESE_REVISION,
+				SYNTHESE_BRANCH,
+				SYNTHESE_BUILD_DATE,
+				SYNTHESE_SVN_URL
+			);
 			ServerModule::RunHTTPServer();
 			ServerModule::Wait();
 

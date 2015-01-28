@@ -87,6 +87,7 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_IGNORE_UNSERVED_AREAS = "ignore_unserved_areas";
 		const string StopAreasListFunction::PARAMETER_DAYS_CHECK_IF_STOP_SERVED = "days_check_if_stop_served";
 		const string StopAreasListFunction::PARAMETER_OUTPUT_ARRIVAL_LINES = "output_arrival_lines";
+		const string StopAreasListFunction::PARAMETER_ONLY_RELAY_PARKS = "only_relay_parks";
 
 
 		const string StopAreasListFunction::TAG_DIRECTION = "direction";
@@ -169,6 +170,11 @@ namespace synthese
 			if(_outputLinesInStops)
 			{
 				result.insert(PARAMETER_OUTPUT_LINES_IN_STOPS, _outputLinesInStops);
+			}
+			
+			if (_onlyRelayParks)
+			{
+				result.insert(PARAMETER_ONLY_RELAY_PARKS, _onlyRelayParks);
 			}
 			return result;
 		}
@@ -305,6 +311,8 @@ namespace synthese
 			}
 
 			_daysCheckIfStopServed = boost::gregorian::date_duration(map.getDefault<int>(PARAMETER_DAYS_CHECK_IF_STOP_SERVED, 15));
+			
+			_onlyRelayParks = map.getDefault<bool>(PARAMETER_ONLY_RELAY_PARKS, false);
 		}
 
 
@@ -315,7 +323,8 @@ namespace synthese
 			_outputStops(false),
 			_outputLinesInStops(false),
 			_groupByCities(false),
-			_stopsDirections(0)
+			_stopsDirections(0),
+			_onlyRelayParks(false)
 		{}
 
 
@@ -453,7 +462,15 @@ namespace synthese
 			BOOST_FOREACH(StopSet::value_type it, stopSet)
 			{
 				if(_dataSourceFilter && !it->hasLinkWithSource(*_dataSourceFilter))
+				{
 					continue;
+				}
+				
+				// Filter on relay park
+				if (_onlyRelayParks && !it->getIsRelayPark())
+				{
+					continue;
+				}
 
 				// Group by cities
 				if(_groupByCities && it->getCity() != lastCity)
@@ -601,6 +618,11 @@ namespace synthese
 				{
 					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(_outputArrivalLines))
 					{
+						if(_dataSourceFilter && !itLine->hasLinkWithSource(*_dataSourceFilter))
+						{
+							continue;
+						}
+
 						// For CMS output
 						boost::shared_ptr<ParametersMap> pmLine(new ParametersMap);
 

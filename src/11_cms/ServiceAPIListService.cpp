@@ -65,7 +65,10 @@ namespace synthese
 		FunctionAPI api(
 			"Admin",
 			"Return the list all the SYNTHESE services",
-			"This example displays the list of all the services "
+			"Example 1:\n"
+			"?SERVICE=version&action_or_function=function&of=json> returns the version in json.\n"
+			"You can also get the value in xml or csv\n"
+			"Example 2: This CMS example displays the list of all the services "
 			"and their respective parameters:\n"
 			"<?ServiceAPIListService&\n"
 			"  action_or_function=function&\n"
@@ -90,6 +93,8 @@ namespace synthese
 
 		api.addParams(PARAMETER_ACTION_OR_FUNCTION,
 					  "Must be 'function' or 'action' to return the respective service set.", false);
+		api.addParams(Function::PARAMETER_OUTPUT_FORMAT, "One of json, xml, csv", true);
+		api.addParams(Function::PARAMETER_OUTPUT_FORMAT_COMPAT, "One of json, xml, csv", true);
 		return api;
 	}
 
@@ -105,6 +110,7 @@ namespace synthese
 		void ServiceAPIListService::_setFromParametersMap(const ParametersMap& map)
 		{
 			_actionOrfunction = map.getDefault<string>(PARAMETER_ACTION_OR_FUNCTION, string("function"));
+			setOutputFormatFromMap(map, "");
 		}
 
 
@@ -141,7 +147,14 @@ namespace synthese
 					groupedAPI[api.getGroup()][item->getFactoryKey()] = api;
 				}
 			}
-			return getParametersMap(groupedAPI);
+			ParametersMap map(getParametersMap(groupedAPI));
+			outputParametersMap(
+						map,
+						stream,
+						"SYNTHESE-API",
+						""
+						);
+			return map;
 		}
 
 		ParametersMap ServiceAPIListService::getParametersMap(const GroupedAPI& groupedAPI) const
@@ -203,7 +216,7 @@ namespace synthese
 
 		std::string ServiceAPIListService::getOutputMimeType() const
 		{
-			return "text/plain";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 
 }	}

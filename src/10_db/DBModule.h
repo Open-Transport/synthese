@@ -42,6 +42,8 @@
 
 namespace synthese
 {
+    class ObjectBase;
+
 	namespace util
 	{
 		class Env;
@@ -63,6 +65,7 @@ namespace synthese
 		class ConditionalSynchronizationPolicyBase;
 		class DBTableSync;
 		class DBTransaction;
+        class DBDirectTableSync;
 
 		//////////////////////////////////////////////////////////////
 		/// Database handling module class.
@@ -221,6 +224,20 @@ namespace synthese
 			static void UpdateConditionalTableSyncEnv();
 			static void ActivateConditionalTablesUpdate();
 			static void DeactivateConditionalTablesUpdate();
+
+
+
+            //////////////////////////////////////////////////////////////////////////
+            /// Creates an object into the database specifying which table sync to use.
+            /// @param object the object to create
+            /// @param tableSync the table sync to use
+            /// @author Thomas Puigt
+            /// @date 2014
+            /// @since 3.8.0
+            static void CreateObject(
+                ObjectBase* objectBase,
+                DBDirectTableSync* tableSync
+            );
 		};
 	}
 

@@ -145,10 +145,10 @@ namespace synthese
 					_autoImporter->killPermanentThread();
 				}
 
-			// Delete the auto importer cache in case of parameter update
-			recursive_mutex::scoped_lock lock(_autoImportMutex);
-			_autoImporter.reset();
-		}
+				// Delete the auto importer cache in case of parameter update
+				recursive_mutex::scoped_lock lock(_autoImportMutex);
+				_autoImporter.reset();
+			}
 		}
 
 

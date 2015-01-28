@@ -748,7 +748,7 @@ int XMLNode::ParseXMLElement(void *pa)
     int cbToken;
     TokenTypeTag type;
     NextToken token;
-    LPCTSTR lpszTemp;
+    LPCTSTR lpszTemp = NULL;
     int cbTemp;
     int nDeclaration;
     LPCTSTR lpszText = NULL;

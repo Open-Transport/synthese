@@ -143,6 +143,19 @@ namespace synthese
 					throw RequestException("No such operation unit");
 				}
 			}
+			else if(decodeTableId(roid) == VehicleService::CLASS_NUMBER)
+			{
+				try
+				{
+					_vehicleService = Env::GetOfficialEnv().get<VehicleService>(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+					);
+				}
+				catch(ObjectNotFoundException<VehicleService>&)
+				{
+					throw RequestException("No such vehicle service");
+				}
+			}
 
 
 			// Base calendar
@@ -212,6 +225,8 @@ namespace synthese
 			{
 				_departurePlaceId = departurePlaceId;
 			}
+			
+			Function::setOutputFormatFromMap(map,string());
 		}
 
 
@@ -246,6 +261,14 @@ namespace synthese
 					{
 						_addServiceIfCompliant(result, *service);
 					}
+				}
+			}
+			else if (_vehicleService)
+			{
+				// Get all services of the service
+				BOOST_FOREACH(const Services::Type::value_type& service, _vehicleService->get<Services>())
+				{
+					_addServiceIfCompliant(result, *service);
 				}
 			}
 			else
@@ -388,13 +411,20 @@ namespace synthese
 
 				map.insert(DATA_SERVICE, serviceMap);
 			}
-
-			outputParametersMap(
-				map,
-				stream,
-				TAG_SERVICES,
-				"https://extranet.rcsmobility.com/attachments/download/14018/ServicesListService.xsd"
-			);
+			
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, TAG_SERVICES);
+			}
+			else if (_outputFormat == MimeTypes::XML)
+			{
+				outputParametersMap(
+					map,
+					stream,
+					TAG_SERVICES,
+					"https://extranet.rcsmobility.com/attachments/download/14018/ServicesListService.xsd"
+				);
+			}
 
 			return map;
 		}

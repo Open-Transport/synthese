@@ -253,7 +253,14 @@ namespace synthese
 		{
 			assert(_arrivalEdge && _departureEdge);
 
-			return _arrivalEdge->getMetricOffset() - _departureEdge->getMetricOffset();
+			if(_customGeometry)
+			{
+				return std::max(_customGeometry->getLength(), 1.0);
+			}
+			else
+			{
+				return _arrivalEdge->getMetricOffset() - _departureEdge->getMetricOffset();
+			}
 		}
 
 
@@ -308,10 +315,24 @@ namespace synthese
 
 
 
+		void ServicePointer::setCustomGeometry(boost::shared_ptr<geos::geom::LineString> geometry)
+		{
+			_customGeometry = boost::shared_ptr<geos::geom::LineString>(
+				CoordinatesSystem::GetDefaultGeometryFactory().createLineString(*geometry)
+			);
+		}
+
+
+
 		boost::shared_ptr<geos::geom::LineString> ServicePointer::getGeometry() const
 		{
 			assert(_departureEdge);
 			assert(_arrivalEdge);
+
+			if(_customGeometry)
+			{
+				return _customGeometry;
+			}
 
 			const GeometryFactory& geometryFactory(
 				CoordinatesSystem::GetDefaultGeometryFactory()
@@ -319,7 +340,6 @@ namespace synthese
 
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 			bool drtAreaSequence = false;
-			bool hasGeometry = false;
 			bool hasDRTArea = false;
 			Coordinate previousCoordinates;
 			previousCoordinates.setNull();
@@ -336,29 +356,30 @@ namespace synthese
 							cs->add(*edge->getFromVertex()->getGeometry()->getCoordinate(),false);
 						}
 					}
-					else
-					{
-						if(edge->getFromVertex()->getGeometry())
-						{
-							previousCoordinates = *edge->getFromVertex()->getGeometry()->getCoordinate();
-						}
-					}
 					continue;
 				}
 				else
 				{
 					if(drtAreaSequence) // True if a DRTArea sequence is followed by a stop sequence
 					{
-						cs->add(previousCoordinates,false);
+						cs->add(*edge->getFromVertex()->getGeometry()->getCoordinate(),false);
 						drtAreaSequence = false;
 					}
 				}
-				boost::shared_ptr<LineString> geometry(edge->getRealGeometry());
+				
+				boost::shared_ptr<LineString> geometry;
+				try
+				{
+					geometry = edge->getRealGeometry();
+				}
+				catch (...)
+				{
+					continue;
+				}
 				if(!geometry.get() || geometry->isEmpty())
 				{
 					continue;
 				}
-				hasGeometry = true;
 				for(size_t i(0); i<geometry->getNumPoints(); ++i)
 				{
 					cs->add(geometry->getCoordinateN(i));
@@ -366,22 +387,22 @@ namespace synthese
 			}
 			if(drtAreaSequence) // Service end by DRTAreas
 			{
-				cs->add(previousCoordinates,false);
+				cs->add(*_arrivalEdge->getFromVertex()->getGeometry()->getCoordinate(),false);
 			}
-			if(!hasGeometry && hasDRTArea) // Service is virtual TAD without mixed regular stops
+			cs->removeRepeatedPoints();
+			if(cs->size() < 2)
+			{
+				return boost::shared_ptr<LineString>();
+			}
+			else if (hasDRTArea)
 			{
 				CoordinateSequence* csTwoPoints(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 				csTwoPoints->add(cs->getAt(0));
 				csTwoPoints->add(cs->getAt(cs->getSize()-1));
 				return boost::shared_ptr<LineString>(geometryFactory.createLineString(csTwoPoints));
 			}
-			if(cs->size() < 2)
-			{
-				return boost::shared_ptr<LineString>();
-			}
 			else
 			{
-				cs->removeRepeatedPoints();
 				return boost::shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 		}

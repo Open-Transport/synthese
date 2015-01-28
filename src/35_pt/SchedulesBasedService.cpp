@@ -749,7 +749,10 @@ namespace synthese
 			_clearGeneratedSchedules();
 			clearStops();
 			clearRTData();
-			_emptySchedules.assign(getPath()->getEdges().size(), not_a_date_time);
+			if (path)
+			{
+				_emptySchedules.assign(getPath()->getEdges().size(), not_a_date_time);
+			}
 		}
 
 
@@ -821,7 +824,14 @@ namespace synthese
 				// Size check
 				if (dynamic_cast<JourneyPattern*>(_path))
 				{
-					if(rank < static_cast<JourneyPattern*>(_path)->getLineStops().size())
+					const JourneyPattern* line(
+						static_cast<const JourneyPattern*>(_path)
+					);
+					if (rank < line->getLineStops().size())
+					{
+						Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
+					}
+					for(; rank<_path->getEdges().size(); ++rank)
 					{
 						Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
 						for(; rank<static_cast<JourneyPattern*>(_path)->getLineStops().size(); ++rank)
@@ -1018,6 +1028,7 @@ namespace synthese
 			if(line->getNonConcurrencyRules().empty()) return true;
 
 			boost::recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
+			ptime baseTime(ptime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath())));
 
 			_NonConcurrencyCache::const_iterator it(
 				_nonConcurrencyCache.find(
@@ -1029,7 +1040,7 @@ namespace synthese
 			)	)	);
 			if(it != _nonConcurrencyCache.end())
 			{
-				return !isInTimeRange(time, range, it->second);
+				return !isInTimeRange((time < baseTime ? baseTime : time), range, it->second);
 			}
 			recursive_mutex::scoped_lock lineLock(line->getNonConcurrencyRulesMutex());
 
@@ -1049,7 +1060,6 @@ namespace synthese
 				: (&Edge::getFollowingArrivalForFineSteppingOnly)
 			);
 
-			AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
 
 			BOOST_FOREACH(const NonConcurrencyRule* rule, rules)
 			{
@@ -1061,10 +1071,6 @@ namespace synthese
 
 				CommercialLine& priorityLine(*rule->get<PriorityLine>());
 				const CommercialLine::Paths& paths(priorityLine.getPaths());
-				ptime minStartTime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath()));
-				minStartTime -= rule->get<Delay>();
-				ptime maxStartTime(date, getDepartureEndScheduleToIndex(false, departureEdge.getRankInPath()));
-				maxStartTime += rule->get<Delay>();
 
 				// Loop on all vertices of the starting place
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStartStop, startStops)
@@ -1088,69 +1094,83 @@ namespace synthese
 							// Loop on services collections
 							BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, path->getServiceCollections())
 							{
-							// Search a service at the time of the possible
-							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
+								// Search a service at the time of the possible
+								AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
+								optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
 					
-							while(true)
-							{
-								ServicePointer serviceInstance(
-									startEdge.getNextService(
-											*itCollection,
-										ap,
-										minStartTime,
-										maxStartTime,
-										true,
-										minServiceIndex,
-										false,
-										true
-								)	);
-								// If no service, advance to the next path
-								if (!serviceInstance.getService()) break;
-								++*minServiceIndex;
-								// This is needed because getNextService is broken if we keep calling
-								// it with a minStartTime on a non active day (infinite loop)
-								minStartTime = serviceInstance.getDepartureDateTime();
-								// Path traversal
-								for (const Edge* endEdge = (startEdge.*step) ();
-									 endEdge != NULL; endEdge = (endEdge->*step) ())
+								ptime minStartTime(date, getDepartureBeginScheduleToIndex(false, departureEdge.getRankInPath()));
+								minStartTime -= rule->get<Delay>();
+								ptime maxStartTime(date, getDepartureEndScheduleToIndex(false, departureEdge.getRankInPath()));
+								maxStartTime += rule->get<Delay>();
+
+								while(true)
 								{
-									// Found eligible arrival place
-									if(endEdge->getHub() == arrivalHub)
+									ServicePointer serviceInstance(
+										startEdge.getNextService(
+												*itCollection,
+											ap,
+											minStartTime,
+											maxStartTime,
+											true,
+											minServiceIndex,
+											false,
+											true
+									)	);
+									// If no service, advance to the next path
+									if (!serviceInstance.getService()) break;
+									++*minServiceIndex;
+									// This is needed because getNextService is broken if we keep calling
+									// it with a minStartTime on a non active day (infinite loop)
+									minStartTime = serviceInstance.getDepartureDateTime();
+									// Path traversal
+									for (const Edge* endEdge = (startEdge.*step) ();
+										 endEdge != NULL; endEdge = (endEdge->*step) ())
 									{
-										time_period timePeriod(
-											serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
-											serviceInstance.getDepartureDateTime() +
-											serviceInstance.getServiceRange() + rule->get<Delay>()
+										// Found eligible arrival place
+										if(endEdge->getHub() == arrivalHub)
+										{
+											time_period timePeriod(
+												serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
+												serviceInstance.getDepartureDateTime() +
+												serviceInstance.getServiceRange() + rule->get<Delay>()
 										);
 										if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
 										{
-											// Merge the last period and the new one. We assume we are always called
-											// in incremental time so the time_periods are sorted
-											excludeRanges[excludeRanges.size()-1] =
-													timePeriod.merge(excludeRanges.back());
-										}
-										else
-										{
-											excludeRanges.push_back(timePeriod);
-										}
+											time_period timePeriod(
+												serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
+												serviceInstance.getDepartureDateTime() +
+												serviceInstance.getServiceRange() + rule->get<Delay>()
+											);
+											if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
+											{
+												// Merge the last period and the new one. We assume we are always called
+												// in incremental time so the time_periods are sorted
+												excludeRanges[excludeRanges.size()-1] =
+														timePeriod.merge(excludeRanges.back());
+											}
+											else
+											{
+												excludeRanges.push_back(timePeriod);
+											}
 
-										if ( isContinuous() )
-										{
-											// There maybe some more non concurrent services to record
-											break;
-										} else
-										{
-											// No need to search further for non continuous services
-											_nonConcurrencyCache.insert(
-												make_pair(
-													_NonConcurrencyCache::key_type(
-														&departureEdge,
-														&arrivalEdge,
-														userClassRank,
-														date
-													), excludeRanges
-											)	);
-											return false;
+											if ( isContinuous() )
+											{
+												// There maybe some more non concurrent services to record
+												break;
+											} else
+											{
+												// No need to search further for non continuous services
+												_nonConcurrencyCache.insert(
+													make_pair(
+														_NonConcurrencyCache::key_type(
+															&departureEdge,
+															&arrivalEdge,
+															userClassRank,
+															date
+														), excludeRanges
+												)	);
+												return false;
+											}
 										}
 									}
 								}
@@ -1170,7 +1190,7 @@ namespace synthese
 						date
 					), excludeRanges
 			)	);
-			return !isInTimeRange(time, range, excludeRanges);
+			return !isInTimeRange((time < baseTime ? baseTime : time), range, excludeRanges);
 		}
 
 
