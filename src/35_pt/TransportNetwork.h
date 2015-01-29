@@ -66,14 +66,14 @@ namespace synthese
 		protected:
 			calendar::CalendarTemplate* _daysCalendarsParent;
 			calendar::CalendarTemplate* _periodsCalendarsParent;
-            std::string _name;
+			std::string _name;
 			std::string _image;
 
 		public:
 
 			TransportNetwork (
 				util::RegistryKeyType id = 0,
-                std::string name = std::string(),
+				std::string name = std::string(),
 				std::string image = std::string()
 			);
 			~TransportNetwork ();

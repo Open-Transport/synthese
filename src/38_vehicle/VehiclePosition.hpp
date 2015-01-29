@@ -73,7 +73,7 @@ namespace synthese
 			static const std::string ATTR_METER_OFFSET;
 			static const std::string ATTR_STATUS;
 			static const std::string ATTR_IN_STOP_AREA;
-            static const std::string ATTR_STOP_FOUND_TIME;
+			static const std::string ATTR_STOP_FOUND_TIME;
 			static const std::string ATTR_VEHICLE_NUMBER;
 			static const std::string TAG_STOP;
 			static const std::string TAG_SERVICE;
@@ -114,7 +114,7 @@ namespace synthese
 			boost::optional<std::size_t> _rankInPath;
 			std::size_t _passengers;
 			bool _inStopArea;
-            boost::posix_time::ptime _nextStopFoundTime;
+			boost::posix_time::ptime _nextStopFoundTime;
 
 		public:
 			VehiclePosition(
@@ -133,7 +133,7 @@ namespace synthese
 			void setDepot(pt_operation::Depot* value){ _depot = value; }
 			void setInStopArea(bool value){ _inStopArea = value; }
 			void setVehicleNumber(const std::string& value){ _vehicleNumber = value; }
-            void setNextStopFoundTime(const boost::posix_time::ptime& value){ _nextStopFoundTime = value; }
+			void setNextStopFoundTime(const boost::posix_time::ptime& value){ _nextStopFoundTime = value; }
 
 			const Status& getStatus() const { return _status; }
 			Vehicle* getVehicle() const { return _vehicle; }
@@ -147,7 +147,7 @@ namespace synthese
 			pt_operation::Depot* getDepot() const { return _depot; }
 			bool getInStopArea() const { return _inStopArea; }
 			const std::string& getVehicleNumber() const { return _vehicleNumber; }
-            const boost::posix_time::ptime& getNextStopFoundTime() const { return _nextStopFoundTime; }
+			const boost::posix_time::ptime& getNextStopFoundTime() const { return _nextStopFoundTime; }
 
 			virtual void toParametersMap(
 				util::ParametersMap& pm,
