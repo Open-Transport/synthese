@@ -31,54 +31,54 @@
 
 namespace synthese
 {
-    namespace inter_synthese
-    {
+	namespace inter_synthese
+	{
 
-        class SpecificPostInstall:
-            public util::FactorableTemplate<server::Action, SpecificPostInstall>
-        {
+		class SpecificPostInstall:
+			public util::FactorableTemplate<server::Action, SpecificPostInstall>
+		{
 		public:
 			static const std::string PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID;
 			static const std::string PARAMETER_POST_INSTALL_SLAVE_ID;
 
-        private:
-            const boost::shared_ptr<InterSYNTHESEConfig> getMyConfig();
-            void addTable(InterSYNTHESEConfig &config,
-                          const std::string tableCode);
+		private:
+			const boost::shared_ptr<InterSYNTHESEConfig> getMyConfig();
+			void addTable(InterSYNTHESEConfig &config,
+				const std::string tableCode);
 
 			util::RegistryKeyType _passiveImportId;
 			util::RegistryKeyType _slaveId;
 
-        protected:
-            //////////////////////////////////////////////////////////////////////////
-            /// Generates a generic parameters map from the action parameters.
-            /// @return The generated parameters map
-            util::ParametersMap getParametersMap() const;
+		protected:
+			//////////////////////////////////////////////////////////////////////////
+			/// Generates a generic parameters map from the action parameters.
+			/// @return The generated parameters map
+			util::ParametersMap getParametersMap() const;
 
 
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Reads the parameters of the action on a generic parameters map.
-            /// @param map Parameters map to interpret
-            /// @exception ActionException Occurs when some parameters are missing or incorrect.
-            void _setFromParametersMap(const util::ParametersMap& map);
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads the parameters of the action on a generic parameters map.
+			/// @param map Parameters map to interpret
+			/// @exception ActionException Occurs when some parameters are missing or incorrect.
+			void _setFromParametersMap(const util::ParametersMap& map);
 
-        public:
-            //////////////////////////////////////////////////////////////////////////
-            /// The action execution code.
-            /// @param request the request which has launched the action
-            void run(server::Request& request);
+		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// The action execution code.
+			/// @param request the request which has launched the action
+			void run(server::Request& request);
 
 
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Tests if the action can be launched in the current session.
-            /// @param session the current session
-            /// @return true if the action can be launched in the current session
-            virtual bool isAuthorized(const server::Session* session) const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Tests if the action can be launched in the current session.
+			/// @param session the current session
+			/// @return true if the action can be launched in the current session
+			virtual bool isAuthorized(const server::Session* session) const;
 
-        };
-    }
+		};
+	}
 }
 
 #endif // SYNTHESE_SPECIFICPOSTINSTALL_HPP

@@ -51,7 +51,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
-    using namespace messages;
+	using namespace messages;
 
 	template<> const string util::FactorableTemplate<Action, messages::ScenarioStopAction>::FACTORY_KEY("scenariostop");
 
@@ -154,22 +154,22 @@ namespace synthese
 
 		bool ScenarioStopAction::isAuthorized(const Session* session
 		) const {
-/*            bool result = session && session->hasProfile();
-            if (_scenario)
-            {
-                if (!_scenario->getSections().empty())
-                {
-                    BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
-                    {
-                        result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
-									DELETE_RIGHT,
-                                    UNKNOWN_RIGHT_LEVEL,
-                                    MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
-                                    );
-                    }
-                }
-            }
-            return result;
+/*			bool result = session && session->hasProfile();
+			if (_scenario)
+			{
+				if (!_scenario->getSections().empty())
+				{
+					BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
+					{
+						result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+							DELETE_RIGHT,
+							UNKNOWN_RIGHT_LEVEL,
+							MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+						);
+					}
+				}
+			}
+			return result;
 			*/
 			return true;
 		}

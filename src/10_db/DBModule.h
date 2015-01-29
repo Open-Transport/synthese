@@ -65,7 +65,7 @@ namespace synthese
 		class ConditionalSynchronizationPolicyBase;
 		class DBTableSync;
 		class DBTransaction;
-        class DBDirectTableSync;
+		class DBDirectTableSync;
 
 		//////////////////////////////////////////////////////////////
 		/// Database handling module class.

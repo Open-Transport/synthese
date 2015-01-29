@@ -73,7 +73,7 @@ namespace synthese
 				bool								_enableTheoretical;
 				bool								_enableRealTime;
 				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
-				bool                                _keepContinuousJourneys; // To use for road approach, will not try to break continous journeys
+				bool								_keepContinuousJourneys; // To use for road approach, will not try to break continous journeys
 			
 			//@}
 

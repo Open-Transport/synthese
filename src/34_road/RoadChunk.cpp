@@ -630,7 +630,7 @@ namespace synthese
 						prefix + TABLE_COL_GEOMETRY,
 						writer.write(projected.get())
 					);
-                }
+				}
 			}
 			else
 			{

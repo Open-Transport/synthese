@@ -40,7 +40,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-    using namespace server;
+	using namespace server;
 
 	template<>
 	const string FactorableTemplate<ObjectCreateService,inter_synthese::InterSYNTHESEObjectCreateService>::FACTORY_KEY = "inter_synthese_object_create";
@@ -50,42 +50,42 @@ namespace synthese
 		const string InterSYNTHESEObjectCreateService::QUEUE_IDS_SEPARATOR = ",";
 		const string InterSYNTHESEObjectCreateService::NO_ITEM_IN_QUEUE = "item_created_not_found_in_queues";
 
-        const string InterSYNTHESEObjectCreateService::FORMAT_JSON("json");
+		const string InterSYNTHESEObjectCreateService::FORMAT_JSON("json");
 
 		const string InterSYNTHESEObjectCreateService::PARAMETER_GETQUEUEID = "getqueueid";
 
 		const string InterSYNTHESEObjectCreateService::ATTR_QUEUEIDS = "queue_ids";
-        const string InterSYNTHESEObjectCreateService::TAG_OBJECT_AND_INTERSYNTHESE_KEYS = "object_and_intersynthese_keys";
+		const string InterSYNTHESEObjectCreateService::TAG_OBJECT_AND_INTERSYNTHESE_KEYS = "object_and_intersynthese_keys";
 
 
 
 		ParametersMap InterSYNTHESEObjectCreateService::_getParametersMap() const
 		{
-            ParametersMap map;
-            map = db::ObjectCreateService::_getParametersMap();
+			ParametersMap map;
+			map = db::ObjectCreateService::_getParametersMap();
 
-            if (_queueIdsRequested)
-            {
-                map.insert(PARAMETER_GETQUEUEID, _queueIdsRequested);
-            }
-            // Output format
-            if(!_outputFormat.empty())
-            {
-                map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
-            }
-            return map;
+			if (_queueIdsRequested)
+			{
+				map.insert(PARAMETER_GETQUEUEID, _queueIdsRequested);
+			}
+			// Output format
+			if(!_outputFormat.empty())
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+			return map;
 		}
 
 
 
 		void InterSYNTHESEObjectCreateService::_setFromParametersMap(const ParametersMap& map)
 		{
-            // First, call of the mother class method
-            db::ObjectCreateService::_setFromParametersMap(map);
-            // Output format
-            _outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
-            // Then, check if the queue ids are requested
-            _queueIdsRequested = map.getDefault<bool>(PARAMETER_GETQUEUEID, false);
+			// First, call of the mother class method
+			db::ObjectCreateService::_setFromParametersMap(map);
+			// Output format
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+			// Then, check if the queue ids are requested
+			_queueIdsRequested = map.getDefault<bool>(PARAMETER_GETQUEUEID, false);
 		}
 
 
@@ -93,73 +93,73 @@ namespace synthese
 		ParametersMap InterSYNTHESEObjectCreateService::run(
 			std::ostream& stream,
 			const Request& request
-        ) const {
+		) const {
 			// First, call of the mother class method
-            ParametersMap map = ObjectCreateService::run(stream, request);
+			ParametersMap map = ObjectCreateService::run(stream, request);
 
 			// Using the id of the created object, find the matching queue id
 			// of this new entry in the queue of each slave
-            string content;
+			string content;
 
-            if (_queueIdsRequested)
-            {
-                QueueIds queueIds;
-                BOOST_FOREACH(
-                            const InterSYNTHESEQueue::Registry::value_type& it,
-                            Env::GetOfficialEnv().getRegistry<InterSYNTHESEQueue>()
-                            ){
-                    // Creating stringstream containing 'rstmt:table_id', id of the table of the new object
-                    stringstream tableIdStream;
-                    tableIdStream << "rstmt:";
-                    RegistryTableType tableId(decodeTableId(_value->getKey()));
-                    tableIdStream << tableId;
-                    // Filling the content string with the content field of the item in the queue
-                    content = it.second->get<SyncContent>();
-                    // Getting the id of the new object in its table
-                    stringstream keystream;
-                    keystream << _value->getKey();
-                    // Look for the string 'rstmt:table_id' in the content of the queue item
-                    // and Look for the id of the new object in the content of the queue item
-                    if ((string::npos != content.find(tableIdStream.str())) && (string::npos != content.find(keystream.str())))
-                    {
-                        // New object has been found in the queue, let's store its queue id
-                        queueIds.insert(it.second->get<Key>());
-                    }
-                }
+			if (_queueIdsRequested)
+			{
+				QueueIds queueIds;
+				BOOST_FOREACH(
+					const InterSYNTHESEQueue::Registry::value_type& it,
+					Env::GetOfficialEnv().getRegistry<InterSYNTHESEQueue>()
+				){
+					// Creating stringstream containing 'rstmt:table_id', id of the table of the new object
+					stringstream tableIdStream;
+					tableIdStream << "rstmt:";
+					RegistryTableType tableId(decodeTableId(_value->getKey()));
+					tableIdStream << tableId;
+					// Filling the content string with the content field of the item in the queue
+					content = it.second->get<SyncContent>();
+					// Getting the id of the new object in its table
+					stringstream keystream;
+					keystream << _value->getKey();
+					// Look for the string 'rstmt:table_id' in the content of the queue item
+					// and Look for the id of the new object in the content of the queue item
+					if ((string::npos != content.find(tableIdStream.str())) && (string::npos != content.find(keystream.str())))
+					{
+						// New object has been found in the queue, let's store its queue id
+						queueIds.insert(it.second->get<Key>());
+					}
+				}
 
-                // If the new object has not been found in the queue
-                if (queueIds.empty())
-                {
-                    stream << NO_ITEM_IN_QUEUE;
-                }
-                else
-                {
-                    // Serialize the _queueIds set and insert it in the map
-                    stringstream queueIdsStr;
-                    unsigned int i = 1;
-                    BOOST_FOREACH(
-                            const QueueIds::value_type& qId,
-                            queueIds
-                        ){
-                        if (i == queueIds.size())
-                        {
-                            queueIdsStr << qId;
-                        }
-                        else
-                        {
-                            queueIdsStr << qId << QUEUE_IDS_SEPARATOR;
-                        }
-                        i++;
-                    }
-                    map.insert(ATTR_QUEUEIDS, queueIdsStr.str());
-                }
-            }
-            if (_outputFormat == FORMAT_JSON)
-            {
-                map.outputJSON(stream, TAG_OBJECT_AND_INTERSYNTHESE_KEYS);
-            }
-            return map;
-        }
+				// If the new object has not been found in the queue
+				if (queueIds.empty())
+				{
+					stream << NO_ITEM_IN_QUEUE;
+				}
+				else
+				{
+					// Serialize the _queueIds set and insert it in the map
+					stringstream queueIdsStr;
+					unsigned int i = 1;
+					BOOST_FOREACH(
+						const QueueIds::value_type& qId,
+						queueIds
+					){
+						if (i == queueIds.size())
+						{
+							queueIdsStr << qId;
+						}
+						else
+						{
+							queueIdsStr << qId << QUEUE_IDS_SEPARATOR;
+						}
+						i++;
+					}
+					map.insert(ATTR_QUEUEIDS, queueIdsStr.str());
+				}
+			}
+			if (_outputFormat == FORMAT_JSON)
+			{
+				map.outputJSON(stream, TAG_OBJECT_AND_INTERSYNTHESE_KEYS);
+			}
+			return map;
+		}
 		
 		
 		
@@ -177,19 +177,19 @@ namespace synthese
 
 
 
-        std::string InterSYNTHESEObjectCreateService::getOutputMimeType() const
-        {
-            std::string mimeType;
-            if(_outputFormat == FORMAT_JSON)
-            {
-                mimeType = "application/json";
-            }
-            else // For empty result
-            {
-                mimeType = "text/html";
-            }
-            return mimeType;
-        }
+		std::string InterSYNTHESEObjectCreateService::getOutputMimeType() const
+		{
+			std::string mimeType;
+			if(_outputFormat == FORMAT_JSON)
+			{
+				mimeType = "application/json";
+			}
+			else // For empty result
+			{
+				mimeType = "text/html";
+			}
+			return mimeType;
+		}
 
 
 

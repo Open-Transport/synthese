@@ -51,7 +51,7 @@ namespace synthese
 		const string VehiclePosition::ATTR_VEHICLE_NUMBER = "vehicle_number";
 		const string VehiclePosition::TAG_STOP = "stop";
 		const string VehiclePosition::ATTR_IN_STOP_AREA = "in_stop_area";
-        const string VehiclePosition::ATTR_STOP_FOUND_TIME = "next_stop_found_time";
+		const string VehiclePosition::ATTR_STOP_FOUND_TIME = "next_stop_found_time";
 		const string VehiclePosition::TAG_SERVICE = "service";
 
 
@@ -67,8 +67,8 @@ namespace synthese
 			_depot(NULL),
 			_service(NULL),
 			_passengers(0),
-            _inStopArea(false),
-            _nextStopFoundTime(not_a_date_time)
+			_inStopArea(false),
+			_nextStopFoundTime(not_a_date_time)
 		{}
 
 
@@ -120,7 +120,7 @@ namespace synthese
 			pm.insert(ATTR_STATUS, _status);
 			pm.insert(ATTR_IN_STOP_AREA, _inStopArea);
 			pm.insert(ATTR_VEHICLE_NUMBER, _vehicleNumber);
-            pm.insert(ATTR_STOP_FOUND_TIME, _nextStopFoundTime);
+			pm.insert(ATTR_STOP_FOUND_TIME, _nextStopFoundTime);
 			if(_stopPoint)
 			{
 				boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);

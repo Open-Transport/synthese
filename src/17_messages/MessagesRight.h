@@ -42,7 +42,7 @@ namespace synthese
 
 
 			Définition du périmètre :
-                - MessagesSection : Autorisation portant sur les messages activés pour une section en particulier
+				- MessagesSection : Autorisation portant sur les messages activés pour une section en particulier
 				- TransportNetwork : Autorisation portant sur les messages diffusés sur un point de diffusion desservi par une ligne du réseau spécifié
 				- JourneyPattern : Autorisation portant sur les messages diffusés sur un arrêt desservi par la ligne spécifiée
 				- Place : Autorisation portant sur les messages diffusés sur un arrêt appartenant au lieu logique spécifié
@@ -60,7 +60,7 @@ namespace synthese
 		class MessagesRight : public security::RightTemplate<MessagesRight>
 		{
 		public:
-            static const std::string MESSAGES_SECTION_FACTORY_KEY;
+			static const std::string MESSAGES_SECTION_FACTORY_KEY;
 
 
 

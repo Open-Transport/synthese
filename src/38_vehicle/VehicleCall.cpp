@@ -52,7 +52,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Vehicle),
 					FIELD_DEFAULT_CONSTRUCTOR(CallTime),
 					FIELD_DEFAULT_CONSTRUCTOR(Priority),
-                    FIELD_DEFAULT_CONSTRUCTOR(ClosureTime)
+					FIELD_DEFAULT_CONSTRUCTOR(ClosureTime)
 			)	)
 		{}
 
@@ -80,6 +80,6 @@ namespace synthese
 
 		VehicleCall::~VehicleCall()
 		{
-            unlink();
+			unlink();
 		}
 }	}

@@ -54,7 +54,7 @@ namespace synthese
 			FIELD(Vehicle),
 			FIELD(CallTime),
 			FIELD(Priority),
-            FIELD(ClosureTime)
+			FIELD(ClosureTime)
 		> VehicleCallSchema;
 
 		/** VehicleCall class.
