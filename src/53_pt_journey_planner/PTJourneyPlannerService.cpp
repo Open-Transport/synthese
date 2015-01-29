@@ -656,7 +656,6 @@ namespace synthese
 					);
 				}
 
-                // OVE!!!
                 // Mixed mode behaviour : start OR end journey using car
                 _startWithCar = map.getDefault<bool>(PARAMETER_START_WITH_CAR, false);
                 _endWithCar = map.getDefault<bool>(PARAMETER_END_WITH_CAR, false);
@@ -1188,7 +1187,7 @@ namespace synthese
 			// Cells
 
 			// Set of commercial lines used by the journeys
-            set<const CommercialLine*> lines;
+			set<const CommercialLine*> lines;
 
 			// Parkings are cast as NamedPlace to compare them with the
 			// arrival/departure points of the journeys
@@ -1207,7 +1206,7 @@ namespace synthese
 			){
 				bool pedestrianMode = false;
 				bool lastPedestrianMode = false;
-                bool carMode = false;
+				bool carMode = false;
 
 				PlacesContentVector::iterator itSheetRow(sheetRows.begin());
 				PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator itPlaces(placesList.begin());
@@ -1218,10 +1217,10 @@ namespace synthese
 				{
 					const ServicePointer& leg(*itl);
 
-                    if(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()))
-                    {
-                        lines.insert(static_cast<const JourneyPattern*>(leg.getService()->getPath())->getCommercialLine());
-                    }
+					if(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()))
+					{
+					    lines.insert(static_cast<const JourneyPattern*>(leg.getService()->getPath())->getCommercialLine());
+					}
 
 					if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl, false)
 					){
@@ -1233,14 +1232,28 @@ namespace synthese
 								*placesList.begin()->place
 						)	);
 
-						bool isParking((NULL != placeToSearch) && (placeToSearch == arrivalParking));
+						bool isParking = false;
 						ptime lastDateTime(leg.getDepartureDateTime());
 						lastDateTime += it->getContinuousServiceRange();
 
-                        _displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
+						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
 
-                        pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
-                        carMode = pedestrianMode && (USER_CAR == (leg.getUserClassRank() + USER_CLASS_CODE_OFFSET));
+						pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
+						carMode = pedestrianMode && (USER_CAR == (leg.getUserClassRank() + USER_CLASS_CODE_OFFSET));
+
+						// this place is represented as a parking if :
+						// * it is a stop area equipped with a relay park
+						// * the leg pointed to it uses car
+						// * the leg is neither the first nor the last of the journey
+						bool isIntermediateLeg = (itl != jl.begin()) && (itl+1 != jl.end());
+						if(isIntermediateLeg && carMode && (NULL != placeToSearch))
+						{
+							const StopArea* stopArea = dynamic_cast<const StopArea*>(placeToSearch);
+							if((NULL != stopArea) && (true == stopArea->getIsRelayPark()))
+							{
+								isParking = true;
+							}
+						}
 
 						if(itSheetRow == sheetRows.end())
 						{
@@ -1254,7 +1267,7 @@ namespace synthese
 							*cellPM,
 							i,
 							pedestrianMode,
-                            carMode,
+							carMode,
 							leg.getDepartureDateTime().time_of_day(),
 							lastDateTime.time_of_day(),
 							it->getContinuousServiceRange().total_seconds() > 0,
@@ -1281,9 +1294,24 @@ namespace synthese
 								*placesList.rbegin()->place
 						)	);
 
-                        _displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
+						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
 
-						bool isParking((NULL != placeToSearch) && (placeToSearch == departureParking));
+						bool isParking = false;
+						bool isIntermediateLeg = (itl != jl.begin()) && (itl+1 != jl.end());
+
+						// this place is represented as a parking if :
+						// * it is a stop area equipped with a relay park
+						// * the leg pointed to it uses car
+						// * the leg is neither the first nor the last of the journey
+						if(isIntermediateLeg && carMode && (NULL != placeToSearch))
+						{
+							const StopArea* stopArea = dynamic_cast<const StopArea*>(placeToSearch);
+							if((NULL != stopArea) && (true == stopArea->getIsRelayPark()))
+							{
+								isParking = true;
+							}
+						}
+
 						ptime lastDateTime(leg.getArrivalDateTime());
 						lastDateTime += it->getContinuousServiceRange();
 
@@ -1298,7 +1326,7 @@ namespace synthese
 							*cellPM,
 							i,
 							pedestrianMode,
-                            carMode,
+							carMode,
 							leg.getArrivalDateTime().time_of_day(),
 							lastDateTime.time_of_day(),
 							it->getContinuousServiceRange().total_seconds() > 0,
@@ -1306,7 +1334,7 @@ namespace synthese
 							itPlaces->isDestination && itl+1 == jl.end(),
 							false,
 							itPlaces->isOrigin,
-                            itPlaces->isDestination,
+							itPlaces->isDestination,
 							/* isEnteringParking */ isParking,
 							/* isLeavingParking */ false
 						);
@@ -1328,7 +1356,7 @@ namespace synthese
 						*cellPM,
 						i,
 						false,
-                        false,
+						false,
 						time_duration(not_a_date_time),
 						time_duration(not_a_date_time),
 						false,
@@ -1409,14 +1437,14 @@ namespace synthese
 			}
 			pm.insert(DATA_HAS_RESERVATION, hasReservation);
 
-            // Display of each line
-            boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
-            BOOST_FOREACH(const CommercialLine* line, lines)
-            {
-                line->toParametersMap(*linePM, false);
-                pm.insert(ITEM_COMMERCIAL_LINE, linePM);
-                linePM.reset(new ParametersMap());
-            }
+			// Display of each line
+			boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+			BOOST_FOREACH(const CommercialLine* line, lines)
+			{
+				line->toParametersMap(*linePM, false);
+				pm.insert(ITEM_COMMERCIAL_LINE, linePM);
+				linePM.reset(new ParametersMap());
+			}
 
 			//////////////////////////////////////////////////////////////////////////
 			// Output
@@ -1492,13 +1520,13 @@ namespace synthese
 					*cellPM,
 					columnNumber,
 					displayFoot,
-                    displayCar,
+					displayCar,
 					time_duration(not_a_date_time),
 					time_duration(not_a_date_time),
 					false,
 					true,
 					true,
-                    false,
+					false,
 					itPlaces->isOrigin,
 					itPlaces->isDestination,
 					/* isEnteringParking */ false,
@@ -1535,7 +1563,7 @@ namespace synthese
 			util::ParametersMap& pm,
 			size_t columnNumber,
 			bool isItFootLine,
-            bool isItCarLine,
+			bool isItCarLine,
 			const boost::posix_time::time_duration& firstTime,
 			const boost::posix_time::time_duration& lastTime,
 			bool isItContinuousService,
@@ -1543,16 +1571,16 @@ namespace synthese
 			bool isLastWriting,
 			bool isFirstFoot,
 			bool isOriginRow,
-            bool isDestinationRow,
-            bool isEnteringParking,
-            bool isLeavingParking
+			bool isDestinationRow,
+			bool isEnteringParking,
+			bool isLeavingParking
 		) const {
 
 			pm.insert(DATA_IS_DESTINATION_ROW, isDestinationRow);
 			pm.insert(DATA_IS_ORIGIN_ROW, isOriginRow);
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
 			pm.insert(DATA_IS_FOOT, isItFootLine);
-            pm.insert(DATA_IS_CAR, isItCarLine);
+			pm.insert(DATA_IS_CAR, isItCarLine);
 			{
 				stringstream s;
 				if(!firstTime.is_not_a_date_time())
@@ -1885,14 +1913,6 @@ namespace synthese
 			// name or anonymous and concatenate them
 			string currentRoadName("");
 
-			// If parkings are hubs they can be compared with StopArea
-			const Hub* departureParkingHub(
-				dynamic_cast<const Hub*>(_departure_parking.placeResult.value.get())
-			);
-			const Hub* arrivalParkingHub(
-				dynamic_cast<const Hub*>(_arrival_parking.placeResult.value.get())
-			);
-
 			const Journey::ServiceUses& services(journey.getServiceUses());
 			for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)
 			{
@@ -1902,6 +1922,48 @@ namespace synthese
 
 				const RoadPath* road(dynamic_cast<const RoadPath*> (leg.getService()->getPath()));
 				const Junction* junction(dynamic_cast<const Junction*> (leg.getService()->getPath()));
+
+				bool isEnteringParking = false;
+				bool isLeavingParking  = false;
+				graph::UserClassCode userClass = leg.getUserClassRank() + USER_CLASS_CODE_OFFSET;
+
+				// if there is a transition from car to foot or public transportation and the stop area has a relay park
+				// then mark the stop as "entering parking"
+				if(services.begin() != it)
+				{
+					const ServicePointer& previousLeg(*(it - 1));
+					graph::UserClassCode previousUserClass = previousLeg.getUserClassRank() + USER_CLASS_CODE_OFFSET;
+
+					if((USER_CAR != userClass) && (USER_CAR == previousUserClass))
+					{
+						const StopArea* departureStopArea = dynamic_cast<const StopArea*>(leg.getDepartureEdge()->getHub());
+
+						if(departureStopArea && departureStopArea->getIsRelayPark())
+						{
+							isEnteringParking = true;
+						}
+					}
+				}
+
+				// if there is a transition from foot or public transportation to car and the stop area has a relay park
+				// then mark the stop as "leaving parking"
+				if(services.end() != (it + 1))
+				{
+					const ServicePointer& nextLeg(*(it + 1));
+					graph::UserClassCode nextUserClass = nextLeg.getUserClassRank() + USER_CLASS_CODE_OFFSET;
+
+					if((USER_CAR != userClass) && (USER_CAR == nextUserClass))
+					{
+						const StopArea* arrivalStopArea = dynamic_cast<const StopArea*>(leg.getArrivalEdge()->getHub());
+
+						if(arrivalStopArea && arrivalStopArea->getIsRelayPark())
+						{
+							isLeavingParking = true;
+						}
+					}
+				}
+
+
 				if(	road == NULL &&
 					junction == NULL &&
 					(!_concatenateContiguousFootLegs || !concatenatingFootLegs)
@@ -1909,19 +1971,12 @@ namespace synthese
 					isFirstFoot = true;
 					moreThanOneLeg = true;
 
-					// If the departure or arrival point hub matches a parking
-					// then this place is where the user retrieves or parks his car
-					const Hub* departureStopHub(leg.getDepartureEdge()->getHub());
-					const Hub* arrivalStopHub(leg.getArrivalEdge()->getHub());
-					bool isEnteringParking((NULL != departureParkingHub) && (departureParkingHub == departureStopHub));
-					bool isLeavingParking((NULL != arrivalParkingHub) && (arrivalParkingHub == arrivalStopHub));
-
 					// Departure stop
 					_displayStopCell(
 						*legPM,
 						false,
 						false,
-                        leg.getDepartureEdge()->getHub() == lastPlace,
+						leg.getDepartureEdge()->getHub() == lastPlace,
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
 						__Couleur,
@@ -1993,8 +2048,8 @@ namespace synthese
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        false,
-                        leg.getUserClassRank()
+						false,
+						leg.getUserClassRank()
 					);
 					
 					roadServiceUses.clear();
@@ -2015,6 +2070,7 @@ namespace synthese
 					double distance(0);
 					vector<Geometry*> geometries;
 					vector<boost::shared_ptr<Geometry> > geometriesSPtr;
+
 					BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, contiguousFootLegs)
 					{
 						distance += itLeg->getDistance();
@@ -2044,8 +2100,8 @@ namespace synthese
 						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        true,
-                        leg.getUserClassRank()
+						true,
+						leg.getUserClassRank()
 					);
 					
 					concatenatingFootLegs = false;
@@ -2066,13 +2122,13 @@ namespace synthese
 						*legPM,
 						false,
 						false,
-                        leg.getDepartureEdge()->getHub() == lastPlace,
+						leg.getDepartureEdge()->getHub() == lastPlace,
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
 						__Couleur,
 						leg.getDepartureDateTime(),
 						journey.getContinuousServiceRange(),
-						/* isEnteringParking */ false,
+						isEnteringParking,
 						/* isLeavingParking */ false
 						);
 					
@@ -2104,7 +2160,7 @@ namespace synthese
 						leg.getArrivalDateTime(),
 						journey.getContinuousServiceRange(),
 						/* isEnteringParking */ false,
-						/* isLeavingParking */ false
+						isLeavingParking
 					);
 					
 					lastPlace = leg.getArrivalEdge()->getHub();
@@ -2153,8 +2209,8 @@ namespace synthese
 						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        true,
-                        leg.getUserClassRank()
+						true,
+						leg.getUserClassRank()
 					);
 					
 					concatenatingFootLegs = false;
@@ -2175,7 +2231,7 @@ namespace synthese
 						*legPM,
 						false,
 						false,
-                        leg.getDepartureEdge()->getHub() == lastPlace,
+						leg.getDepartureEdge()->getHub() == lastPlace,
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
 						__Couleur,
@@ -2210,8 +2266,8 @@ namespace synthese
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        false,
-                        leg.getUserClassRank()
+						false,
+						leg.getUserClassRank()
 					);
 					__Couleur = !__Couleur;
 					isFirstFoot = false;
@@ -2279,8 +2335,8 @@ namespace synthese
 							geometries
 					)	);
 
-                    const ServicePointer& firstLeg(*roadServiceUses.front());
-                    const RoadPath* actualRoadPath(dynamic_cast<const RoadPath*> (firstLeg.getService()->getPath()));
+					const ServicePointer& firstLeg(*roadServiceUses.front());
+					const RoadPath* actualRoadPath(dynamic_cast<const RoadPath*> (firstLeg.getService()->getPath()));
 
 					const Vertex* departureVertex = (*roadServiceUses.begin())->getDepartureEdge()->getFromVertex();
 					const Vertex* arrivalVertex = (*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex();
@@ -2294,12 +2350,12 @@ namespace synthese
 						*departureVertex,
 						*arrivalVertex,
 						isFirstFoot,
-                        false,
-                        leg.getUserClassRank()
+						false,
+						leg.getUserClassRank()
 					);
 
 					roadServiceUses.clear();
-                    currentRoadName.clear();
+					currentRoadName.clear();
 					__Couleur = !__Couleur;
 					isFirstFoot = false;
 					legWritten = true;
@@ -2321,12 +2377,12 @@ namespace synthese
 				double distance(0);
 				vector<Geometry*> geometries;
 				vector<boost::shared_ptr<Geometry> > geometriesSPtr;
-                size_t userClassRank = USER_CLASS_CODE_OFFSET;
+				size_t userClassRank = USER_CLASS_CODE_OFFSET;
 
 				BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, contiguousFootLegs)
 				{
 					distance += itLeg->getDistance();
-                    userClassRank = itLeg->getUserClassRank();
+					userClassRank = itLeg->getUserClassRank();
 
 					boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
 					if(geometry.get())
@@ -2354,8 +2410,8 @@ namespace synthese
 					*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 					*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 					isFirstFoot,
-                    true,
-                    userClassRank
+					true,
+					userClassRank
 				);
 				
 				concatenatingFootLegs = false;
@@ -2379,14 +2435,14 @@ namespace synthese
 			bool isSameThanLastArrivalStop,
 			bool color,
 			const boost::posix_time::ptime& time,
-            boost::posix_time::time_duration continuousServiceRange,
-            bool isEnteringParking,
-            bool isLeavingParking
+			boost::posix_time::time_duration continuousServiceRange,
+			bool isEnteringParking,
+			bool isLeavingParking
 		) const {
 
 			string prefix(isItArrival ? PREFIX_ARRIVAL : PREFIX_DEPARTURE);
 
-            pm.insert(prefix + DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE, isSameThanLastArrivalPlace);
+			pm.insert(prefix + DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE, isSameThanLastArrivalPlace);
 
 			ptime endRangeTime(time);
 			if (continuousServiceRange.total_seconds() > 0)
@@ -2399,8 +2455,8 @@ namespace synthese
 				pm.insert(DATA_ARRIVAL_IS_TERMINUS, isItTerminus);
 			}
 
-            pm.insert(prefix + DATA_IS_ENTERING_PARKING, isEnteringParking);
-            pm.insert(prefix + DATA_IS_LEAVING_PARKING, isLeavingParking);
+			pm.insert(prefix + DATA_IS_ENTERING_PARKING, isEnteringParking);
+			pm.insert(prefix + DATA_IS_LEAVING_PARKING, isLeavingParking);
 
 			// Place
 			const NamedPlace& place(
@@ -2473,8 +2529,8 @@ namespace synthese
 			const graph::Vertex& departureVertex,
 			const graph::Vertex& arrivalVertex,
 			bool isFirstFoot,
-            bool concatenatedFootLegs,
-            std::size_t userClassRank
+			bool concatenatedFootLegs,
+			std::size_t userClassRank
 		) const {
 			// Departure point
 			if(	departureVertex.getGeometry().get() &&
@@ -2507,7 +2563,7 @@ namespace synthese
 			}
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
-            pm.insert(DATA_USER_CLASS_RANK, userClassRank);
+			pm.insert(DATA_USER_CLASS_RANK, userClassRank);
 
 			// WKT
 			if(geometry)

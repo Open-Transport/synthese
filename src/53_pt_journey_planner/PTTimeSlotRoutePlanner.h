@@ -43,10 +43,10 @@ namespace synthese
 		class Place;
 	}
 
-    namespace pt
-    {
-        class StopArea;
-    }
+	namespace pt
+	{
+		class StopArea;
+	}
 
 	namespace pt_journey_planner
 	{
@@ -90,31 +90,31 @@ namespace synthese
 		private:
 			const geography::Place* const _departurePlace;
 			const geography::Place* const _arrivalPlace;
-            const geography::Place* const _departureParking;
-            const geography::Place* const _arrivalParking;
+			const geography::Place* const _departureParking;
+			const geography::Place* const _arrivalParking;
 			bool _showFullRoadJourney;
-            bool _startWithCar;
-            bool _endWithCar;
+			bool _startWithCar;
+			bool _endWithCar;
 
 
-            // this internal class is used to sort the stop areas equipped with relay parks
-            // by their distance from a given point (a departure or arrival place)
-            class SortableStopArea
-            {
-            private:
-                const pt::StopArea* _stopArea;
-                int _distanceToCenter;
-                std::string _opCode;
+			// this internal class is used to sort the stop areas equipped with relay parks
+			// by their distance from a given point (a departure or arrival place)
+			class SortableStopArea
+			{
+			private:
+				const pt::StopArea* _stopArea;
+				int _distanceToCenter;
+				std::string _opCode;
 
-            public:
-                SortableStopArea(const pt::StopArea* stopArea, int distanceToCenter);
-                bool operator<(SortableStopArea const &otherStopArea) const;
-                const pt::StopArea* getStopArea() const;
-                int getDistanceToCenter() const;
-                std::string getOpCode() const;
-            };
+			public:
+				SortableStopArea(const pt::StopArea* stopArea, int distanceToCenter);
+				bool operator<(SortableStopArea const &otherStopArea) const;
+				const pt::StopArea* getStopArea() const;
+				int getDistanceToCenter() const;
+				std::string getOpCode() const;
+			};
 
-            typedef std::set<SortableStopArea> SortableStopAreaSet;
+			typedef std::set<SortableStopArea> SortableStopAreaSet;
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -134,37 +134,37 @@ namespace synthese
 				algorithm::PlanningPhase direction
 			) const;
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Compute journeys using both personal car and public transportation
-            /// @author Olivier Vernhet
-            PTRoutePlannerResult _computeCarPTJourney() const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute journeys using both personal car and public transportation
+			/// @author Olivier Vernhet
+			PTRoutePlannerResult _computeCarPTJourney() const;
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Compute journeys using both personal car and public transportation,
-            /// using a user chosen parking
-            /// @author Olivier Vernhet
-            PTRoutePlannerResult _computeCarPTJourneyWithChosenParking() const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute journeys using both personal car and public transportation,
+			/// using a user chosen parking
+			/// @author Olivier Vernhet
+			PTRoutePlannerResult _computeCarPTJourneyWithChosenParking() const;
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Compute journeys using both personal car and public transportation,
-            /// proposing the best parking to the user
-            /// @author Olivier Vernhet
-            PTRoutePlannerResult _computeCarPTJourneyWithBestParking() const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute journeys using both personal car and public transportation,
+			/// proposing the best parking to the user
+			/// @author Olivier Vernhet
+			PTRoutePlannerResult _computeCarPTJourneyWithBestParking() const;
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Prints journeys as debug logs
-            /// @param journeys the list of journeys to print
-            /// @author Olivier Vernhet
-            void _printJourneys(const TimeSlotRoutePlanner::Result& journeys) const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Prints journeys as debug logs
+			/// @param journeys the list of journeys to print
+			/// @author Olivier Vernhet
+			void _printJourneys(const TimeSlotRoutePlanner::Result& journeys) const;
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Finds all the stop areas with a relay park around a place and sorts
-            /// them by ascending distance
-            /// @param origin the place around which relay parks are searched
-            /// @param maxDistance the maximum search radius
-            /// @param relayParks the set in which the stop areas will be stored
-            /// @author Olivier Vernhet
-            void _findRelayParks(const geography::Place* origin, const int maxDistance, SortableStopAreaSet& relayParks) const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Finds all the stop areas with a relay park around a place and sorts
+			/// them by ascending distance
+			/// @param origin the place around which relay parks are searched
+			/// @param maxDistance the maximum search radius
+			/// @param relayParks the set in which the stop areas will be stored
+			/// @author Olivier Vernhet
+			void _findRelayParks(const geography::Place* origin, const int maxDistance, SortableStopAreaSet& relayParks) const;
 
 
 		public:
@@ -178,7 +178,7 @@ namespace synthese
 				const boost::optional<std::size_t>	maxSolutionsNumber,
 				const graph::AccessParameters		accessParameters,
 				const algorithm::PlanningOrder		planningOrder,
-				bool								ignoreReservation,
+				bool ignoreReservation,
 				const algorithm::AlgorithmLogger& algorithmLogger,
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
@@ -187,28 +187,28 @@ namespace synthese
 				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
 			);
 
-            PTTimeSlotRoutePlanner(
-                const geography::Place*             origin,
-                const geography::Place*             destination,
-                const geography::Place*             originParking,
-                const geography::Place*             destinationParking,
-                bool                                startWithCar,
-                bool                                endWithCar,
-                const boost::posix_time::ptime&     lowestDepartureTime,
-                const boost::posix_time::ptime&     highestDepartureTime,
-                const boost::posix_time::ptime&     lowestArrivalTime,
-                const boost::posix_time::ptime&     highestArrivalTime,
-                const boost::optional<std::size_t>	maxSolutionsNumber,
-                const graph::AccessParameters		accessParameters,
-                const algorithm::PlanningOrder		planningOrder,
-                bool								ignoreReservation,
-                const algorithm::AlgorithmLogger&   algorithmLogger,
-                boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
-                boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
-                bool enableTheoretical = true,
-                bool enableRealTime = true,
-                graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
-            );
+			PTTimeSlotRoutePlanner(
+				const geography::Place*             origin,
+				const geography::Place*             destination,
+				const geography::Place*             originParking,
+				const geography::Place*             destinationParking,
+				bool                                startWithCar,
+				bool                                endWithCar,
+				const boost::posix_time::ptime&     lowestDepartureTime,
+				const boost::posix_time::ptime&     highestDepartureTime,
+				const boost::posix_time::ptime&     lowestArrivalTime,
+				const boost::posix_time::ptime&     highestArrivalTime,
+				const boost::optional<std::size_t>  maxSolutionsNumber,
+				const graph::AccessParameters       accessParameters,
+				const algorithm::PlanningOrder      planningOrder,
+				bool                                ignoreReservation,
+				const algorithm::AlgorithmLogger&   algorithmLogger,
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
+				bool enableTheoretical = true,
+				bool enableRealTime = true,
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
+			);
 
 			PTRoutePlannerResult run() const;
 		};

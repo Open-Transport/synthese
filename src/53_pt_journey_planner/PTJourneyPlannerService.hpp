@@ -324,39 +324,39 @@ namespace synthese
 				road::RoadModule::ExtendedFetchPlaceResult	_arrival_place;
                 road::RoadModule::ExtendedFetchPlaceResult	_departure_parking;
                 road::RoadModule::ExtendedFetchPlaceResult	_arrival_parking;
-				std::string									_originCityText;
-				std::string									_destinationCityText;
-				std::string									_originPlaceText;
-				std::string									_destinationPlaceText;
-                std::string									_originParkingText;
-                std::string									_destinationParkingText;
-				boost::gregorian::date						_day;
-				std::size_t									_periodId;
-				boost::posix_time::ptime					_startDate;
-				boost::posix_time::ptime					_endDate;
-				boost::posix_time::ptime					_startArrivalDate;
-				boost::posix_time::ptime					_endArrivalDate;
-				graph::AccessParameters						_accessParameters;
-				boost::optional<std::size_t>				_maxSolutionsNumber;
-                const pt_website::HourPeriod*               _period;
-				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
+                std::string					_originCityText;
+                std::string					_destinationCityText;
+                std::string					_originPlaceText;
+                std::string					_destinationPlaceText;
+                std::string					_originParkingText;
+                std::string					_destinationParkingText;
+                boost::gregorian::date				_day;
+                std::size_t					_periodId;
+                boost::posix_time::ptime			_startDate;
+                boost::posix_time::ptime			_endDate;
+                boost::posix_time::ptime			_startArrivalDate;
+                boost::posix_time::ptime			_endArrivalDate;
+                graph::AccessParameters				_accessParameters;
+                boost::optional<std::size_t>			_maxSolutionsNumber;
+                const pt_website::HourPeriod*			_period;
+                boost::shared_ptr<const UserFavoriteJourney>	_favorite;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
-				bool										_outputRoadApproachDetail;
-                bool                                        _showResTab;
-                bool                                        _showCoords;
-                const CoordinatesSystem*                    _coordinatesSystem;
+                bool						_outputRoadApproachDetail;
+                bool						_showResTab;
+                bool						_showCoords;
+                const CoordinatesSystem*			_coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
-				boost::optional<double> _minMaxDurationRatioFilter;
+                boost::optional<double>				_minMaxDurationRatioFilter;
 				boost::optional<boost::posix_time::time_duration> _minWaitingTimeFilter;
-                bool                                        _fareCalculation;
-				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
-				std::string									_outputFormat;
+                bool						_fareCalculation;
+                boost::shared_ptr<algorithm::AlgorithmLogger>	_logger;
+                std::string		    			_outputFormat;
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
-                bool                                        _concatenateContiguousFootLegs;
-                vector<string>                              _vectMad;
-                const messages::CustomBroadcastPoint*       _broadcastPoint;
-                bool                                        _startWithCar;
-                bool                                        _endWithCar;
+                bool						_concatenateContiguousFootLegs;
+                vector<string>					_vectMad;
+                const messages::CustomBroadcastPoint*		_broadcastPoint;
+                bool						_startWithCar;
+                bool						_endWithCar;
 			//@}
 
 			//! @name Pages
@@ -503,11 +503,12 @@ namespace synthese
 			/// @param isItLastRow (1) Is the cell the last departure or arrival ?
 			/// @param columnNumber (2) Rank of the column from left to right
 			/// @param isItFootLine (3) Is the cell on a pedestrian junction ?
-			/// @param firstTime (4) Start of continuous service, Time else
-			/// @param lastTime (5) End of continuous service, Time else
-			/// @param isItContinuousService (6) Is the cell on a continuous service ?
-			/// @param isFirstWriting (7) Is it the first time that we write on the column ?
-			/// @param isLastWriting (8) Is it the last time that we write on the column ?
+            /// @param isItCarLine (4) Is the cell on a leg using car ?
+            /// @param firstTime (5) Start of continuous service, Time else
+            /// @param lastTime (6) End of continuous service, Time else
+            /// @param isItContinuousService (7) Is the cell on a continuous service ?
+            /// @param isFirstWriting (8) Is it the first time that we write on the column ?
+            /// @param isLastWriting (9) Is it the last time that we write on the column ?
 			void _displayScheduleCell(
 				util::ParametersMap& pm,
 				size_t columnNumber,

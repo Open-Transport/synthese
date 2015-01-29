@@ -85,7 +85,7 @@ namespace synthese
 
 				graph::VertexAccessMap getVertexAccessMap(
 					const graph::AccessParameters& accessParameters,
-                    const GraphTypes::value_type whatToSearch,
+					GraphTypes::value_type whatToSearch,
 					...
 				) const;
 
