@@ -1,4 +1,4 @@
-﻿
+
 /** Descent class header.
 	@file Descent.hpp
 
