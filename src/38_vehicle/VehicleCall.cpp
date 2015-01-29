@@ -1,4 +1,4 @@
-﻿
+
 /** VehicleCall class implementation.
 	@file VehicleCall.cpp
 
