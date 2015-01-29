@@ -232,7 +232,7 @@ namespace synthese
 					road->set<RoadPlace>(*roadPlace);
 					road->set<Key>(RoadTableSync::getId());
 					_env.getEditableRegistry<Road>().add(road);
-                    road->link(_env);
+					road->link(_env);
 					_recentlyCreatedRoadParts[way->getId()] = road;
 
 					double maxSpeed = way->getAssociatedSpeed();
@@ -380,7 +380,7 @@ namespace synthese
 						city->addIncludedPlace(static_cast<NamedPlace&>(*centralRoad->second->get<RoadPlace>()));
 					}
 				}
-                delete centroid;
+				delete centroid;
 			}
 
 			_logDebug("finished inserting road network");
@@ -536,10 +536,10 @@ namespace synthese
 
 			_logDebug("finished parsing relation");
 
-            BOOST_FOREACH(const Registry<RoadChunk>::value_type& chunk, _env.getEditableRegistry<RoadChunk>())
-            {
-                _reorderHouseNumberingBounds(chunk.second);
-            }
+			BOOST_FOREACH(const Registry<RoadChunk>::value_type& chunk, _env.getEditableRegistry<RoadChunk>())
+			{
+				_reorderHouseNumberingBounds(chunk.second);
+			}
 
 			BOOST_FOREACH(const Registry<Road>::value_type& road, _env.getEditableRegistry<Road>())
 			{
@@ -548,11 +548,11 @@ namespace synthese
 
 			_logDebug("finished validating road geometries");
 
-            BOOST_FOREACH(HousesNodesWithGeom::value_type& nodePair, housesNodesWithGeom)
-            {
-                delete nodePair.second;
-            }
-            housesNodesWithGeom.clear();
+			BOOST_FOREACH(HousesNodesWithGeom::value_type& nodePair, housesNodesWithGeom)
+			{
+				delete nodePair.second;
+			}
+			housesNodesWithGeom.clear();
 
 			return true;
 		}
@@ -749,7 +749,7 @@ namespace synthese
 					EdgeProjector<RoadChunk*>::PathNearby projection(projector.projectEdge(*houseCoord->getCoordinate()));
 					RoadChunk* linkedRoadChunk(projection.get<1>());
 
-                    _chunksAssociatedHousesList[linkedRoadChunk->getKey()].push_back(house);
+					_chunksAssociatedHousesList[linkedRoadChunk->getKey()].push_back(house);
 
 					HouseNumberBounds leftBounds = linkedRoadChunk->getLeftHouseNumberBounds();
 
@@ -797,20 +797,20 @@ namespace synthese
 		void OSMFileFormat::Importer_::_updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
 			RoadChunk* chunk
 		) const {
-            ChunksAssociatedHousesList::iterator itChunk = _chunksAssociatedHousesList.find(chunk->getKey());
+			ChunksAssociatedHousesList::iterator itChunk = _chunksAssociatedHousesList.find(chunk->getKey());
 
-            if(itChunk != _chunksAssociatedHousesList.end())
+			if(itChunk != _chunksAssociatedHousesList.end())
 			{
 				HouseNumberingPolicy policy(ALL_NUMBERS);
 
 				if(itChunk->second.size() > 2)
 				{
-                    unsigned int curMod(lexical_cast<HouseNumber>((*(itChunk->second.begin()))->getTag("addr:housenumber")) % 2);
+					unsigned int curMod(lexical_cast<HouseNumber>((*(itChunk->second.begin()))->getTag("addr:housenumber")) % 2);
 					bool multipleMod(false);
 
-                    BOOST_FOREACH(NodePtr n, itChunk->second)
+					BOOST_FOREACH(NodePtr n, itChunk->second)
 					{
-                        if(curMod != (lexical_cast<HouseNumber>(n->getTag("addr:housenumber")) % 2))
+						if(curMod != (lexical_cast<HouseNumber>(n->getTag("addr:housenumber")) % 2))
 						{
 							multipleMod = true;
 							break;
@@ -833,66 +833,66 @@ namespace synthese
 		}
 
 
-        void OSMFileFormat::Importer_::_reorderHouseNumberingBounds(
-                boost::shared_ptr<RoadChunk> chunk
-        ) const {
-            const HouseNumberBounds& leftBounds = chunk->getLeftHouseNumberBounds();
-            DataSource& dataSource(*_import.get<DataSource>());
+		void OSMFileFormat::Importer_::_reorderHouseNumberingBounds(
+			boost::shared_ptr<RoadChunk> chunk
+		) const {
+			const HouseNumberBounds& leftBounds = chunk->getLeftHouseNumberBounds();
+			DataSource& dataSource(*_import.get<DataSource>());
 
-            // Continue if bounds are defined and different, and the chunk has a next chunk
-            if(leftBounds && leftBounds->first != leftBounds->second && chunk->getForwardEdge().getNext())
-            {
-                    HouseNumber startBound = leftBounds->first, endBound = leftBounds->second;
-                    NodePtr startHouse, endHouse;
+			// Continue if bounds are defined and different, and the chunk has a next chunk
+			if(leftBounds && leftBounds->first != leftBounds->second && chunk->getForwardEdge().getNext())
+			{
+				HouseNumber startBound = leftBounds->first, endBound = leftBounds->second;
+				NodePtr startHouse, endHouse;
 
-                    // Check if we have found the house number, we should always find it according to the code above
-                    ChunksAssociatedHousesList::iterator housesVector = _chunksAssociatedHousesList.find(chunk->getKey());
-                    if(housesVector != _chunksAssociatedHousesList.end())
-                    {
-                            BOOST_FOREACH(ChunksAssociatedHousesList::mapped_type::value_type& house, housesVector->second)
-                            {
-                                    if(lexical_cast<HouseNumber>(house->getTag("addr:housenumber")) == startBound)
-                                    {
-                                            startHouse = house;
-                                    }
-                                    if(lexical_cast<HouseNumber>(house->getTag("addr:housenumber")) == endBound)
-                                    {
-                                            endHouse = house;
-                                    }
-                            }
+				// Check if we have found the house number, we should always find it according to the code above
+				ChunksAssociatedHousesList::iterator housesVector = _chunksAssociatedHousesList.find(chunk->getKey());
+				if(housesVector != _chunksAssociatedHousesList.end())
+				{
+					BOOST_FOREACH(ChunksAssociatedHousesList::mapped_type::value_type& house, housesVector->second)
+					{
+						if(lexical_cast<HouseNumber>(house->getTag("addr:housenumber")) == startBound)
+						{
+							startHouse = house;
+						}
+						if(lexical_cast<HouseNumber>(house->getTag("addr:housenumber")) == endBound)
+						{
+							endHouse = house;
+						}
+					}
 
-                            // If we have found our 2 houses and their geometries
-                            if(startHouse && endHouse)
-                            {
-                                    boost::shared_ptr<const Geometry> startGeom = chunk->getForwardEdge().getFromVertex()->getGeometry();
-                                    boost::shared_ptr<const Geometry> endGeom = chunk->getForwardEdge().getNext()->getFromVertex()->getGeometry();
-                                    boost::shared_ptr<Point> startHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-                                            *dataSource.getActualCoordinateSystem().createPoint(startHouse->getLon(), startHouse->getLat())
-                                    )       );
-                                    boost::shared_ptr<Point> endHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-                                            *dataSource.getActualCoordinateSystem().createPoint(endHouse->getLon(), endHouse->getLat())
-                                    )       );
+					// If we have found our 2 houses and their geometries
+					if(startHouse && endHouse)
+					{
+						boost::shared_ptr<const Geometry> startGeom = chunk->getForwardEdge().getFromVertex()->getGeometry();
+						boost::shared_ptr<const Geometry> endGeom = chunk->getForwardEdge().getNext()->getFromVertex()->getGeometry();
+						boost::shared_ptr<Point> startHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+								*dataSource.getActualCoordinateSystem().createPoint(startHouse->getLon(), startHouse->getLat())
+						)	);
+						boost::shared_ptr<Point> endHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+								*dataSource.getActualCoordinateSystem().createPoint(endHouse->getLon(), endHouse->getLat())
+						)	);
 
-                                    if(startGeom && endGeom && startHouseGeom && endHouseGeom)
-                                    {
-                                            double distanceStartToStartCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *startGeom));
-                                            double distanceEndToStartCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *startGeom));
-                                            double distanceStartToEndCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *endGeom));
-                                            double distanceEndToEndCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *endGeom));
+						if(startGeom && endGeom && startHouseGeom && endHouseGeom)
+						{
+							double distanceStartToStartCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *startGeom));
+							double distanceEndToStartCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *startGeom));
+							double distanceStartToEndCrossing = fabs(distance::DistanceOp::distance(*startHouseGeom, *endGeom));
+							double distanceEndToEndCrossing = fabs(distance::DistanceOp::distance(*endHouseGeom, *endGeom));
 
-                                            // If the first house is further away from the start than the last one and the last house is further away from the end than the first one
-                                            if(distanceStartToStartCrossing > distanceEndToStartCrossing && distanceStartToEndCrossing < distanceEndToEndCrossing)
-                                            {
-                                                    // Switch bounds order
-                                                    HouseNumberBounds newBounds(make_pair(leftBounds->second, leftBounds->first));
-                                                    chunk->setLeftHouseNumberBounds(newBounds);
-                                                    chunk->setRightHouseNumberBounds(newBounds);
-                                            }
-                                    }
-                            }
-                    }
-            }
-        }
+							// If the first house is further away from the start than the last one and the last house is further away from the end than the first one
+							if(distanceStartToStartCrossing > distanceEndToStartCrossing && distanceStartToEndCrossing < distanceEndToEndCrossing)
+							{
+								// Switch bounds order
+								HouseNumberBounds newBounds(make_pair(leftBounds->second, leftBounds->first));
+								chunk->setLeftHouseNumberBounds(newBounds);
+								chunk->setRightHouseNumberBounds(newBounds);
+							}
+						}
+					}
+				}
+			}
+		}
 
 
 		std::string OSMFileFormat::Importer_::_toAlphanumericString(

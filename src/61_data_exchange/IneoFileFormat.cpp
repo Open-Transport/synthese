@@ -952,8 +952,8 @@ namespace synthese
 
 						// Line
 						if(tcou == TCOU_Commercial || tcou == TCOU_HLP ||
-						   (tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
-						   (tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
+							(tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+							(tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
 						{
 							if(_lineReadMethod == VALUE_CIDX)
 							{
