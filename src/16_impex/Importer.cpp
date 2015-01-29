@@ -130,7 +130,7 @@ namespace synthese
 				p = p / dateDirName.str();
 				create_directories(p);
 				p = p / fileName.str();
-				_fileStream.reset(new ofstream(p.file_string().c_str()));
+				_fileStream.reset(new ofstream(p.string().c_str()));
 			}
 
 			// Parameters map

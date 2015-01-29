@@ -87,7 +87,7 @@ namespace synthese
 			++_fileNumber;
 			boost::shared_ptr<ofstream> result(
 				new ofstream(
-					_getCurrentFilePath().file_string().c_str()
+					_getCurrentFilePath().string().c_str()
 			)	);
 			return result;
 		}

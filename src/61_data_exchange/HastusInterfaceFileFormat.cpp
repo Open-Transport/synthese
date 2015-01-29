@@ -184,7 +184,7 @@ namespace synthese
 			optional<Calendar> fileMask;
 			if(_fileNameIsACalendar)
 			{
-				string fileName(filePath.filename());
+			  string fileName(filePath.filename().string());
 				CalendarTemplate* fileCalendar(
 					_getCalendarTemplate(
 						_calendars,
@@ -644,11 +644,11 @@ namespace synthese
 			const boost::filesystem::path& filePath
 		) const	{
 			_file.clear();
-			_file.open(filePath.file_string().c_str());
+			_file.open(filePath.filename().string().c_str());
 			_record.reset();
 			if(!_file)
 			{
-				throw Exception("Could no open the file " + filePath.file_string());
+				throw Exception("Could no open the file " + filePath.string());
 			}
 		}
 

@@ -143,7 +143,7 @@ namespace synthese
 				util::ParametersMap result(_getParametersMap());
 				BOOST_FOREACH(const FilePathsMap::value_type& it, _pathsMap)
 				{
-					result.insert(_getFileParameterName(it.first), it.second.file_string());
+				  result.insert(_getFileParameterName(it.first), it.second.string());
 				}
 				return result;
 			}
@@ -155,7 +155,7 @@ namespace synthese
 				BOOST_FOREACH(const std::string& key, FILES.getFiles())
 				{
 					FilePathsMap::const_iterator it(_pathsMap.find(key));
-					if(it == _pathsMap.end() || it->second.file_string().empty())
+					if(it == _pathsMap.end() || it->second.string().empty())
 					{
 						continue;
 					}

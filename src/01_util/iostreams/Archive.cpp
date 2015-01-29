@@ -117,7 +117,7 @@ namespace util
 		  dir_itr != end_iter;
 		  ++dir_itr )
 	    {
-		path p (relativePath / dir_itr->leaf ());
+	      path p (relativePath / dir_itr->path().filename());
 		Archive::Tar (baseDir, p, os, recursive);
 	    }
 	}

@@ -133,7 +133,7 @@ namespace synthese
 			_map->prepare ();
 
 			// Create a temporary file name based on system time
-			const filesystem::path tempDir(MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_DIR), filesystem::native);
+			const filesystem::path tempDir(MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_DIR));
 
 			RenderingConfig conf;
 
