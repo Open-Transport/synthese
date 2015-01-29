@@ -1,4 +1,4 @@
-﻿
+
 /** VehicleCall class header.
 	@file VehicleCall.hpp
 
