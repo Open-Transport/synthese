@@ -357,34 +357,33 @@ namespace synthese
 
 
 		PTRoutePlannerResult PTTimeSlotRoutePlanner::_computeCarPTJourney() const {
-			// OVE!!! : temporary change for debug
-			/*
 			if(true == _startWithCar)
 			{
-			if(NULL != _departureParking)
-			{
-			return _computeCarPTJourneyWithChosenParking();
-			}
+				if(NULL != _departureParking)
+				{
+					return _computeCarPTJourneyWithChosenParking();
+				}
 
-			else
-			{
-			return _computeCarPTJourneyWithBestParking();
-			}
+				else
+				{
+					return _computeCarPTJourneyWithBestParking();
+				}
 			}
 
 			if(true == _endWithCar)
 			{
-			if(NULL != _arrivalParking)
-			{
-			return _computeCarPTJourneyWithChosenParking();
+				if(NULL != _arrivalParking)
+				{
+					return _computeCarPTJourneyWithChosenParking();
+				}
+
+				else
+				{
+					return _computeCarPTJourneyWithBestParking();
+				}
 			}
 
-			else
-			{
-			return _computeCarPTJourneyWithBestParking();
-			}
-			}
-			*/
+			// should never be reached
 			return _computeCarPTJourneyWithBestParking();
 		}
 
@@ -653,11 +652,6 @@ namespace synthese
 			unsigned int NB_MAX_PARKINGS = 5;
 			unsigned int MAX_PARKING_DISTANCE = 20000;
 
-			const synthese::geography::NamedPlace* const namedDeparturePlace =
-				dynamic_cast<const synthese::geography::NamedPlace* const>(_departurePlace);
-			const synthese::geography::NamedPlace* const namedArrivalPlace =
-				dynamic_cast<const synthese::geography::NamedPlace* const>(_arrivalPlace);
-
 			TimeSlotRoutePlanner::Result ptJourneys;
 			VertexAccessMap departureVam;
 			VertexAccessMap arrivalVam;
@@ -674,6 +668,27 @@ namespace synthese
 			geography::Place::GraphTypes whatToSearch;
 			whatToSearch.insert(PTModule::GRAPH_ID);
 
+			string departurePlaceName = "unknown";
+			string arrivalPlaceName   = "unknown";
+			ostringstream debugStr;
+
+
+			if(NULL != dynamic_cast<const synthese::geography::NamedPlace* const>(_departurePlace)) {
+				departurePlaceName = dynamic_cast<const synthese::geography::NamedPlace* const>(_departurePlace)->getFullName();
+			}
+
+			else if(NULL != dynamic_cast<const synthese::geography::City* const>(_departurePlace)) {
+				departurePlaceName = dynamic_cast<const synthese::geography::City* const>(_departurePlace)->getName();
+			}
+
+			if(NULL != dynamic_cast<const synthese::geography::NamedPlace* const>(_arrivalPlace)) {
+				arrivalPlaceName = dynamic_cast<const synthese::geography::NamedPlace* const>(_arrivalPlace)->getFullName();
+			}
+
+			else if(NULL != dynamic_cast<const synthese::geography::City* const>(_arrivalPlace)) {
+				arrivalPlaceName = dynamic_cast<const synthese::geography::City* const>(_arrivalPlace)->getName();
+			}
+
 			// Explanations :
 			// D = departure place
 			// A = arrival place
@@ -685,14 +700,6 @@ namespace synthese
 
 			// 1) List all the stop areas with relay parks and order them by increasing distance from departure or arrival place
 			_findRelayParks((_startWithCar ? _departurePlace : _arrivalPlace), MAX_PARKING_DISTANCE, relayParks);
-
-			// OVE!!! : debug
-			BOOST_FOREACH(const SortableStopAreaSet::value_type& relayPark, relayParks)
-			{
-				std::cout << "+++ Parking " << relayPark.getStopArea()->getName() << " matches (distance="
-					  << relayPark.getDistanceToCenter() << ")" << std::endl;
-			}
-
 
 			// 2) Compute the vertex access map of C as the union of the C -> Pi or Pi -> C road journeys
 			VertexAccessMap& relayParksVam = (_startWithCar ? departureVam : arrivalVam);
@@ -738,18 +745,22 @@ namespace synthese
 						relayParksVam.insert(stopPoint.second, vertexAccess);
 					}
 
-					// OVE!!! : debug
-					std::cout << "Parking " << relayPark.getStopArea()->getName() << (_startWithCar ? " <- " : " -> ")
-						  << (_startWithCar ?
-							(namedDeparturePlace ? namedDeparturePlace->getName() : "NULL") :
-							(namedArrivalPlace ? namedArrivalPlace->getName() : "NULL"))
-						  << " : distance=" << carJourney.getDistance() << ", duration=" << duration << std::endl;
+					// log details on this car journey
+					debugStr.str("");
+					debugStr << "Parking " << relayPark.getStopArea()->getName() << (_startWithCar ? " <- " : " -> ")
+							 << (_startWithCar ? departurePlaceName : arrivalPlaceName) << " : distance="
+							 << carJourney.getDistance() << ", duration=" << duration;
+					Log::GetInstance().debug(debugStr.str());
+
 				}
 
 				else
 				{
-					// OVE!!! : debug
-					std::cerr << "!!! no route from/to parking " << relayPark.getStopArea()->getName() << std::endl;
+					// no route found from/to parking => log a warning
+					debugStr.str("");
+					debugStr << "No route for pParking " << relayPark.getStopArea()->getName() << (_startWithCar ? " <- " : " -> ")
+							 << (_startWithCar ? departurePlaceName : arrivalPlaceName);
+					Log::GetInstance().warn(debugStr.str());
 				}
 			}
 
@@ -820,10 +831,10 @@ namespace synthese
 
 			ptJourneys = r.run();
 
-			// OVE!!! : debug
-			std::cout << "Found " << ptJourneys.size() << " journey(s)" << " from : "
-				<< (namedDeparturePlace ? namedDeparturePlace->getName() : "NULL") << " to "
-				<< (namedArrivalPlace ? namedArrivalPlace->getName() : "NULL") << std::endl;
+			// log details on the results
+			debugStr.str("");
+			debugStr << ptJourneys.size() << " mixed-mode journey(s) from " << departurePlaceName << " to " << arrivalPlaceName;
+			Log::GetInstance().debug(debugStr.str());
 
 			return PTRoutePlannerResult(
 				_departurePlace,
@@ -896,8 +907,7 @@ namespace synthese
 
 			if(NULL == originLocation.get())
 			{
-				// OVE!!! : TODO log
-				std::cerr << "Origin has no position, cannot compute the list of relay parks" << std::endl;
+				Log::GetInstance().warn("Origin has no position, cannot compute the list of relay parks");
 				return;
 			}
 
@@ -921,8 +931,10 @@ namespace synthese
 
 					else
 					{
-						// OVE!!! : TODO log
-						std::cerr << "!!! Parking " << stopArea.second->getName() << " has no position" << std::endl;
+						// parking has no position, log a warning
+						ostringstream debugStr;
+						debugStr << "Parking " << stopArea.second->getName() << " has no position";
+						Log::GetInstance().warn(debugStr.str());
 					}
 				}
 			}
