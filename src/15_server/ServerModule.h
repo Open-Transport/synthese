@@ -135,11 +135,11 @@ namespace synthese
 			static const std::string MODULE_PARAM_HTTP_TRACE_PATH;
 			static const std::string MODULE_PARAM_HTTP_FORCE_GZIP;
 
-			static const std::string VERSION;
-			static const std::string REVISION;
-			static const std::string BRANCH;
-			static const std::string BUILD_DATE;
-			static const std::string SYNTHESE_URL;
+			static std::string VERSION;
+			static std::string REVISION;
+			static std::string BRANCH;
+			static std::string BUILD_DATE;
+			static std::string SYNTHESE_URL;
 
 			// SYNTHESE is not lock protected against changing the base content
 			// while reading or writing it. Take this mutex if you change the base
@@ -147,6 +147,7 @@ namespace synthese
 			// @FIXME This should be used by all services appropriately.
 			static boost::shared_mutex baseWriterMutex;
 			static boost::shared_mutex InterSYNTHESEAgainstRequestsMutex;
+			static boost::shared_mutex IneoBDSIAgainstVDVDataSupplyMutex;
 
 		private:
 
@@ -169,6 +170,13 @@ namespace synthese
 			static bool _forceGZip;
 
 		public:
+			static void InitRevisionInfo(const std::string &version,
+				const std::string &revision,
+				const std::string &branch,
+				const std::string &buildDate,
+				const std::string &gitURL
+			);
+
 			static boost::thread::id AddHTTPThread();
 			
 			template<class Callable>
@@ -195,8 +203,6 @@ namespace synthese
 			static const boost::posix_time::ptime& GetStartingTime();
 
 			static boost::posix_time::time_duration GetSessionMaxDuration();
-
-			static const std::string GetBranch();
 
 			/** Called whenever a parameter registered by this module is changed
 			 */

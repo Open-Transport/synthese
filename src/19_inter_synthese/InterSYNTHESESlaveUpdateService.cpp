@@ -52,10 +52,13 @@ namespace synthese
 		const string InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC = "no_content_to_sync!";
 		const string InterSYNTHESESlaveUpdateService::PARAMETER_SLAVE_ID = "slave_id";
 		const string InterSYNTHESESlaveUpdateService::PARAMETER_ASK_ID_RANGE = "ask_id_range";
+		const string InterSYNTHESESlaveUpdateService::PARAMETER_STARTING_TIME = "starting_date";
 		
 		bool InterSYNTHESESlaveUpdateService::bgUpdaterDone(false);
 		boost::mutex InterSYNTHESESlaveUpdateService::bgMutex;
 		boost::shared_ptr<InterSYNTHESESlave> InterSYNTHESESlaveUpdateService::bgNextSlave;
+		boost::mutex InterSYNTHESESlaveUpdateService::bgRTMutex;
+		boost::shared_ptr<InterSYNTHESESlave> InterSYNTHESESlaveUpdateService::bgRTNextSlave;
 
 		ParametersMap InterSYNTHESESlaveUpdateService::_getParametersMap() const
 		{
@@ -66,6 +69,11 @@ namespace synthese
 			}
 
 			map.insert(PARAMETER_ASK_ID_RANGE, _askIdRange);
+			
+			if (!_slaveStartingDate.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_STARTING_TIME, _slaveStartingDate);
+			}
 			return map;
 		}
 
@@ -83,6 +91,12 @@ namespace synthese
 			}
 
 			_askIdRange = map.getDefault<bool>(PARAMETER_ASK_ID_RANGE, false);
+			
+			_slaveStartingDate = not_a_date_time;
+			if (map.isDefined(PARAMETER_STARTING_TIME))
+			{
+				_slaveStartingDate = time_from_string(map.get<string>(PARAMETER_STARTING_TIME));
+			}
 		}
 
 
@@ -107,6 +121,21 @@ namespace synthese
 				else
 				{
 					stream << "sorry another initial dump is running, come back soon";
+				}
+				return ParametersMap();
+			}
+			
+			// Full RT dump if LastActivityreport < SlaveStartingDate
+			if (!_slaveStartingDate.is_not_a_date_time() &&
+				_slaveStartingDate > _slave->get<LastActivityReport>())
+			{
+				if(bgRTProcessSlave(_slave))
+				{
+					stream << "we are processing your initial Real Time dump. come back soon!";
+				}
+				else
+				{
+					stream << "sorry another initial Real Time dump is running, come back soon";
 				}
 				return ParametersMap();
 			}
@@ -159,6 +188,19 @@ namespace synthese
 			}
 			return false;
 		}
+		
+		bool InterSYNTHESESlaveUpdateService::bgRTProcessSlave(
+			const boost::shared_ptr<InterSYNTHESESlave> &slave
+		) const
+		{
+			boost::mutex::scoped_lock(bgRTMutex);
+			if(!bgRTNextSlave)
+			{
+				bgRTNextSlave = slave;
+				return true;
+			}
+			return false;
+		}
 
 		void InterSYNTHESESlaveUpdateService::RunBackgroundUpdater()
 		{
@@ -189,6 +231,27 @@ namespace synthese
 					// we won't rebuild the full database on the new slave_update
 					slave->markAsUpToDate();
 
+					slave.reset();
+				}
+				
+				{
+					boost::mutex::scoped_lock(bgRTMutex);
+					slave = bgRTNextSlave;
+					bgRTNextSlave.reset();
+				}
+				if(slave.get())
+				{
+					try
+					{
+						slave->processFullRTUpdate();
+					}
+					catch(synthese::Exception& e)
+					{
+						Log::GetInstance().warn("Exception in Inter-SYNTHESE full Real Time update process", e);
+					}
+					
+					slave->markAsUpToDate();
+					
 					slave.reset();
 				}
 

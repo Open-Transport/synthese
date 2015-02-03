@@ -138,13 +138,6 @@ include(FindGit)
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
-# TODO: Get the git revision
-file(WRITE ${PROJECT_BINARY_DIR}/src/15_server/svnversion.h
-  "#define SYNTHESE_REVISION \"\"\n"
-  "#define SYNTHESE_BUILD_DATE \"\"\n"
-  "#define SYNTHESE_SVN_URL \"\"\n"
-)
-
 # Note: this is using a .h file and not defines, otherwise everything gets
 # rebuilt each time CMake is invoked.
 configure_file(

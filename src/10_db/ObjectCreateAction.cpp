@@ -114,7 +114,7 @@ namespace synthese
 //				Log Object creation
 			}
 
-            DBModule::CreateObject(_value.get(), _tableSync.get());
+			DBModule::CreateObject(_value.get(), _tableSync.get());
 
 //			::AddUpdateEntry(*_value, text.str(), request.getUser().get());
 

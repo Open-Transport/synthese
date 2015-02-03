@@ -34,6 +34,7 @@
 #include "RequestException.h"
 #include "ScheduledService.h"
 #include "ServerConstants.h"
+#include "ServerModule.h"
 #include "Service.h"
 #include "StopPoint.hpp"
 #include "TransportNetwork.h"
@@ -153,6 +154,10 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
+			// get upgradable access
+			boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::IneoBDSIAgainstVDVDataSupplyMutex);
+			// get exclusive access
+			boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 
 			// Client update
 			Log::GetInstance().debug("VDVDataSupply : starting run");
@@ -197,6 +202,7 @@ namespace synthese
 				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
 				{
 					// Run an update
+					Log::GetInstance().debug("VDVDataSupply : check update of AboID " + it.second->getId());
 					it.second->checkUpdate();
 
 					if(it.second->getDeletions().empty() && it.second->getAddings().empty())
@@ -276,10 +282,15 @@ namespace synthese
 							if (!plannedArrivalDateTime.is_not_a_date_time())
 								plannedArrivalDateTime -= diff_from_utc;
 							Log::GetInstance().debug("VDVDataSupply : Network " + lexical_cast<string>(network.getKey()));
-							string networkId(
-								network.getACodeBySource(
+							string networkId = "";
+							try {
+								networkId = network.getACodeBySource(
 									*_vdvClient->get<DataSource>()
-							)	);
+								);
+							}
+							catch (...) {
+								Log::GetInstance().debug("VDVDataSupply : Exception reading network code of " + lexical_cast<string>(network.getKey()));
+							}
 							Log::GetInstance().debug("VDVDataSupply : Network id " + networkId);
 							string serviceNumber;
 							if(!networkId.empty())
@@ -345,11 +356,21 @@ namespace synthese
 								dynamic_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex()))
 							{
 								const StopPoint* ps_test = static_cast<const StopPoint*>(sp.getDepartureEdge()->getFromVertex());
-								haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
+								try {
+									haltID = ps_test->getACodeBySource(*_vdvClient->get<DataSource>());
+								}
+								catch (...) {
+									Log::GetInstance().debug("VDVDataSupply : Exception reading stop point code of " + lexical_cast<string>(ps_test->getKey()));
+								}
 							}
 							Log::GetInstance().debug("VDVDataSupply : HaltID " + haltID);
 							Log::GetInstance().debug("VDVDataSupply : Betriebstag " + to_iso_extended_string(sp.getOriginDateTime().date()));
-							Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
+							try {
+								Log::GetInstance().debug("VDVDataSupply : LinienID " + line.getACodeBySource(*_vdvClient->get<DataSource>()));
+							}
+							catch (...) {
+								Log::GetInstance().debug("VDVDataSupply : Exception reading line code of " + lexical_cast<string>(line.getKey()));
+							}
 							Log::GetInstance().debug("VDVDataSupply : LinienText " + line.getShortName());
 							Log::GetInstance().debug("VDVDataSupply : RichtungsID " + _vdvClient->getDirectionID(jp));
 							string networkName = network.getName();
@@ -470,10 +491,15 @@ namespace synthese
 							{
 								continue;
 							}
-							string networkId(
-								network.getACodeBySource(
+							string networkId = "";
+							try {
+								networkId = network.getACodeBySource(
 									*_vdvClient->get<DataSource>()
-							)	);
+								);
+							}
+							catch (...) {
+								Log::GetInstance().debug("VDVDataSupply : Exception reading network code of " + lexical_cast<string>(network.getKey()));
+							}
 							string serviceNumber;
 							if(!networkId.empty())
 							{

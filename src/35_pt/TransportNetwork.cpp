@@ -57,7 +57,7 @@ namespace synthese
 
 		TransportNetwork::TransportNetwork(
 			util::RegistryKeyType id,
-            std::string name,
+			std::string name,
 			std::string image
 		):	util::Registrable(id),
 			graph::PathClass(),
@@ -72,10 +72,10 @@ namespace synthese
 
 
 
-        PathClass::Identifier TransportNetwork::getIdentifier() const
-        {
+		PathClass::Identifier TransportNetwork::getIdentifier() const
+		{
 			return getKey();
-        }
+		}
 
 
 
@@ -129,16 +129,16 @@ namespace synthese
 
 			// Image
 			if (record.isDefined(TransportNetworkTableSync::COL_IMAGE))
-            {
+			{
 				std::string image(
 					record.get<string>(TransportNetworkTableSync::COL_IMAGE)
-                );
+				);
 				if (image != _image)
-                {
-                    result = true;
+				{
+					result = true;
 					_image = image;
-                }
-            }
+				}
+			}
 
 			// Data source links
 			if(record.isDefined(TransportNetworkTableSync::COL_CREATOR_ID))

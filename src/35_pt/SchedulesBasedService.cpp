@@ -749,7 +749,10 @@ namespace synthese
 			_clearGeneratedSchedules();
 			clearStops();
 			clearRTData();
-			_emptySchedules.assign(getPath()->getEdges().size(), not_a_date_time);
+			if (path)
+			{
+				_emptySchedules.assign(getPath()->getEdges().size(), not_a_date_time);
+			}
 		}
 
 

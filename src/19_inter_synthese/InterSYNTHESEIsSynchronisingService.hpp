@@ -47,16 +47,16 @@ namespace synthese
 		{
 			typedef std::set<util::RegistryKeyType> QueueIds;
 		public:
-            static const std::string ATTR_IS_SYNCHRONISING;
-            static const std::string PARAMETER_QUEUEIDS;
-            static const std::string QUEUE_IDS_SEPARATOR;
-            static const std::string TAG_INTERSYNTHESE_SYNCHRONISATION;
-            static const std::string FORMAT_JSON;
+			static const std::string ATTR_IS_SYNCHRONISING;
+			static const std::string PARAMETER_QUEUEIDS;
+			static const std::string QUEUE_IDS_SEPARATOR;
+			static const std::string TAG_INTERSYNTHESE_SYNCHRONISATION;
+			static const std::string FORMAT_JSON;
 
 		protected:
 			//! \name Page parameters
 			//@{
-            QueueIds _queueIds;
+			QueueIds _queueIds;
 			//@}
 			
 			
@@ -75,7 +75,7 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
-            /// @author Thomas Puigt
+			/// @author Thomas Puigt
 			/// @date 2014
 			/// @since 3.8.0
 			virtual void _setFromParametersMap(

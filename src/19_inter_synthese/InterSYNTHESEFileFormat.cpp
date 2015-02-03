@@ -62,6 +62,7 @@ namespace synthese
 				StaticFunctionRequest<InterSYNTHESESlaveUpdateService> r;
 				r.getFunction()->setSlaveId(_slaveId);
 				r.getFunction()->setAskIdRange(true);
+				r.getFunction()->setSlaveStartingTime(ServerModule::GetStartingTime());
 				BasicClient c(
 					_address,
 					_port

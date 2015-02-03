@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE (testPathsMerge)
 	// MERGE
 
 //	l1.merge(l2);
-
+/* What follows depends on the merge() method which is not available anymore
 	const FakePath::Edges& edges3 = l1.getEdges();
 
 	BOOST_CHECK_EQUAL (edges3[0], &e1D);
@@ -181,11 +181,13 @@ BOOST_AUTO_TEST_CASE (testPathsMerge)
 	BOOST_CHECK_EQUAL (edges3[2], &e3AD);
 	BOOST_CHECK_EQUAL (edges3[3], &e4A);
 	BOOST_CHECK_EQUAL (edges3[4], &e5D);
-	BOOST_CHECK_EQUAL (edges3[5], &e6bAD);
-	BOOST_CHECK_EQUAL (edges3[6], &e7AD);
-	BOOST_CHECK_EQUAL (edges3[7], &e8A);
+	BOOST_CHECK_EQUAL (edges3[5], &e6AD);
+//	BOOST_CHECK_EQUAL (edges3[5], &e6bAD);
+//	BOOST_CHECK_EQUAL (edges3[6], &e7AD);
+//	BOOST_CHECK_EQUAL (edges3[7], &e8A);
 
-	BOOST_CHECK_EQUAL (e1D.getFollowingConnectionArrival(), &e8A);
+//	BOOST_CHECK_EQUAL (e1D.getFollowingConnectionArrival(), &e8A);
+	BOOST_CHECK_EQUAL (e1D.getFollowingConnectionArrival(), eNULL);
 	BOOST_CHECK_EQUAL (e1D.getFollowingArrivalForFineSteppingOnly(), &e3AD);
 	BOOST_CHECK_EQUAL (e1D.getPreviousConnectionDeparture(), eNULL);
 	BOOST_CHECK_EQUAL (e1D.getPreviousDepartureForFineSteppingOnly(), eNULL);
@@ -194,7 +196,8 @@ BOOST_AUTO_TEST_CASE (testPathsMerge)
 	BOOST_CHECK_EQUAL (e1D.getParentPath(), &l1);
 	BOOST_CHECK_EQUAL (e1D.getRankInPath(), 0);
 
-	BOOST_CHECK_EQUAL (e2D.getFollowingConnectionArrival(), &e8A);
+//	BOOST_CHECK_EQUAL (e2D.getFollowingConnectionArrival(), &e8A);
+	BOOST_CHECK_EQUAL (e2D.getFollowingConnectionArrival(), eNULL);
 	BOOST_CHECK_EQUAL (e2D.getFollowingArrivalForFineSteppingOnly(), &e3AD);
 	BOOST_CHECK_EQUAL (e2D.getPreviousConnectionDeparture(), &e1D);
 	BOOST_CHECK_EQUAL (e2D.getPreviousDepartureForFineSteppingOnly(), &e1D);
@@ -203,7 +206,8 @@ BOOST_AUTO_TEST_CASE (testPathsMerge)
 	BOOST_CHECK_EQUAL (e2D.getParentPath(), &l1);
 	BOOST_CHECK_EQUAL (e2D.getRankInPath(), 1);
 
-	BOOST_CHECK_EQUAL (e3AD.getFollowingConnectionArrival(), &e8A);
+//	BOOST_CHECK_EQUAL (e3AD.getFollowingConnectionArrival(), &e8A);
+	BOOST_CHECK_EQUAL (e3AD.getFollowingConnectionArrival(), eNULL);
 	BOOST_CHECK_EQUAL (e3AD.getFollowingArrivalForFineSteppingOnly(), &e4A);
 	BOOST_CHECK_EQUAL (e3AD.getPreviousConnectionDeparture(), &e1D);
 	BOOST_CHECK_EQUAL (e3AD.getPreviousDepartureForFineSteppingOnly(), &e2D);
@@ -212,8 +216,10 @@ BOOST_AUTO_TEST_CASE (testPathsMerge)
 	BOOST_CHECK_EQUAL (e3AD.getParentPath(), &l1);
 	BOOST_CHECK_EQUAL (e3AD.getRankInPath(), 2);
 
-	BOOST_CHECK_EQUAL (e4A.getFollowingConnectionArrival(), &e8A);
-	BOOST_CHECK_EQUAL (e4A.getFollowingArrivalForFineSteppingOnly(), &e6bAD);
+//	BOOST_CHECK_EQUAL (e4A.getFollowingConnectionArrival(), &e8A);
+	BOOST_CHECK_EQUAL (e4A.getFollowingConnectionArrival(), eNULL);
+//	BOOST_CHECK_EQUAL (e4A.getFollowingArrivalForFineSteppingOnly(), &e6bAD);
+	BOOST_CHECK_EQUAL (e4A.getFollowingArrivalForFineSteppingOnly(), &e6AD);
 	BOOST_CHECK_EQUAL (e4A.getPreviousConnectionDeparture(), &e1D);
 	BOOST_CHECK_EQUAL (e4A.getPreviousDepartureForFineSteppingOnly(), &e3AD);
 	BOOST_CHECK_EQUAL (e4A.getPrevious(), &e3AD);
@@ -221,40 +227,48 @@ BOOST_AUTO_TEST_CASE (testPathsMerge)
 	BOOST_CHECK_EQUAL (e4A.getParentPath(), &l1);
 	BOOST_CHECK_EQUAL (e4A.getRankInPath(), 3);
 
-	BOOST_CHECK_EQUAL (e5D.getFollowingConnectionArrival(), &e8A);
-	BOOST_CHECK_EQUAL (e5D.getFollowingArrivalForFineSteppingOnly(), &e6bAD);
+//	BOOST_CHECK_EQUAL (e5D.getFollowingConnectionArrival(), &e8A);
+	BOOST_CHECK_EQUAL (e5D.getFollowingConnectionArrival(), eNULL);
+//	BOOST_CHECK_EQUAL (e5D.getFollowingArrivalForFineSteppingOnly(), &e6bAD);
+	BOOST_CHECK_EQUAL (e5D.getFollowingArrivalForFineSteppingOnly(), &e6AD);
 	BOOST_CHECK_EQUAL (e5D.getPreviousConnectionDeparture(), &e1D);
 	BOOST_CHECK_EQUAL (e5D.getPreviousDepartureForFineSteppingOnly(), &e3AD);
 	BOOST_CHECK_EQUAL (e5D.getPrevious(), &e4A);
-	BOOST_CHECK_EQUAL (e5D.getNext(), &e6bAD);
+//	BOOST_CHECK_EQUAL (e5D.getNext(), &e6bAD);
+	BOOST_CHECK_EQUAL (e5D.getNext(), &e6AD);
 	BOOST_CHECK_EQUAL (e5D.getParentPath(), &l1);
 	BOOST_CHECK_EQUAL (e5D.getRankInPath(), 4);
 
 	BOOST_CHECK_EQUAL (e6bAD.getFollowingConnectionArrival(), &e8A);
 	BOOST_CHECK_EQUAL (e6bAD.getFollowingArrivalForFineSteppingOnly(), &e7AD);
-	BOOST_CHECK_EQUAL (e6bAD.getPreviousConnectionDeparture(), &e5D);
-	BOOST_CHECK_EQUAL (e6bAD.getPreviousDepartureForFineSteppingOnly(), &e5D);
-	BOOST_CHECK_EQUAL (e6bAD.getPrevious(), &e5D);
+//	BOOST_CHECK_EQUAL (e6bAD.getPreviousConnectionDeparture(), &e5D);
+	BOOST_CHECK_EQUAL (e6bAD.getPreviousConnectionDeparture(), eNULL);
+//	BOOST_CHECK_EQUAL (e6bAD.getPreviousDepartureForFineSteppingOnly(), &e5D);
+	BOOST_CHECK_EQUAL (e6bAD.getPreviousDepartureForFineSteppingOnly(), eNULL);
+//	BOOST_CHECK_EQUAL (e6bAD.getPrevious(), &e5D);
+	BOOST_CHECK_EQUAL (e6bAD.getPrevious(), eNULL);
 	BOOST_CHECK_EQUAL (e6bAD.getNext(), &e7AD);
-	BOOST_CHECK_EQUAL (e6bAD.getParentPath(), &l1);
-	BOOST_CHECK_EQUAL (e6bAD.getRankInPath(), 5);
+//	BOOST_CHECK_EQUAL (e6bAD.getParentPath(), &l1);
+//	BOOST_CHECK_EQUAL (e6bAD.getRankInPath(), 5);
 
 	BOOST_CHECK_EQUAL (e7AD.getFollowingConnectionArrival(), &e8A);
 	BOOST_CHECK_EQUAL (e7AD.getFollowingArrivalForFineSteppingOnly(), &e8A);
-	BOOST_CHECK_EQUAL (e7AD.getPreviousConnectionDeparture(), &e5D);
+//	BOOST_CHECK_EQUAL (e7AD.getPreviousConnectionDeparture(), &e5D);
+	BOOST_CHECK_EQUAL (e7AD.getPreviousConnectionDeparture(), eNULL);
 	BOOST_CHECK_EQUAL (e7AD.getPreviousDepartureForFineSteppingOnly(), &e6bAD);
 	BOOST_CHECK_EQUAL (e7AD.getPrevious(), &e6bAD);
 	BOOST_CHECK_EQUAL (e7AD.getNext(), &e8A);
-	BOOST_CHECK_EQUAL (e7AD.getParentPath(), &l1);
-	BOOST_CHECK_EQUAL (e7AD.getRankInPath(), 6);
+//	BOOST_CHECK_EQUAL (e7AD.getParentPath(), &l1);
+//	BOOST_CHECK_EQUAL (e7AD.getRankInPath(), 6);
 
 	BOOST_CHECK_EQUAL (e8A.getFollowingConnectionArrival(), eNULL);
 	BOOST_CHECK_EQUAL (e8A.getFollowingArrivalForFineSteppingOnly(), eNULL);
-	BOOST_CHECK_EQUAL (e8A.getPreviousConnectionDeparture(), &e5D);
+//	BOOST_CHECK_EQUAL (e8A.getPreviousConnectionDeparture(), &e5D);
+	BOOST_CHECK_EQUAL (e8A.getPreviousConnectionDeparture(), eNULL);
 	BOOST_CHECK_EQUAL (e8A.getPreviousDepartureForFineSteppingOnly(), &e7AD);
 	BOOST_CHECK_EQUAL (e8A.getPrevious(), &e7AD);
 	BOOST_CHECK_EQUAL (e8A.getNext(), eNULL);
-	BOOST_CHECK_EQUAL (e8A.getParentPath(), &l1);
-	BOOST_CHECK_EQUAL (e8A.getRankInPath(), 7);
-
+//	BOOST_CHECK_EQUAL (e8A.getParentPath(), &l1);
+//	BOOST_CHECK_EQUAL (e8A.getRankInPath(), 7);
+*/
 }

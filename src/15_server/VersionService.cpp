@@ -84,7 +84,7 @@ namespace synthese
 			map.insert(ATTR_VERSION, ServerModule::VERSION);
 			map.insert(ATTR_REVISION, ServerModule::REVISION);
 			map.insert(ATTR_BUILD_DATE, ServerModule::BUILD_DATE);
-			map.insert(ATTR_BRANCH, ServerModule::GetBranch());
+			map.insert(ATTR_BRANCH, ServerModule::BRANCH);
 			outputParametersMap(
 				map,
 				stream,

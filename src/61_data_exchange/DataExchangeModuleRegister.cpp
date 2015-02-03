@@ -7,6 +7,7 @@
 
 #include "CMSExport.hpp"
 #include "CMSImport.hpp"
+#include "DinoFileFormat.hpp"
 #include "GPSdFileFormat.hpp"
 #include "GPSSimuFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
@@ -80,6 +81,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::VDVServerTableSync::integrate();
 	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
 
+	synthese::data_exchange::DinoFileFormat::integrate();
 	synthese::data_exchange::GPSdFileFormat::integrate();
 	synthese::data_exchange::GPSSimuFileFormat::integrate();
 	synthese::data_exchange::GTFSFileFormat::integrate();

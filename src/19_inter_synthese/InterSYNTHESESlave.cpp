@@ -326,6 +326,47 @@ namespace synthese
 				}
 			}
 		}
+		
+		void InterSYNTHESESlave::processFullRTUpdate() const
+		{
+			if(!get<InterSYNTHESEConfig>())
+			{
+				throw Exception("Invalid slave configuration");
+			}
+			
+			// Load new queue items
+			{
+				typedef map<string, InterSYNTHESESyncTypeFactory::RandomItems> RandomItems;
+				RandomItems randItems;
+				BOOST_FOREACH(
+					const InterSYNTHESEConfig::Items::value_type& it,
+					get<InterSYNTHESEConfig>()->getItems()
+				){
+					randItems[it->get<SyncType>()].push_back(it);
+				}
+				BOOST_FOREACH(const RandomItems::value_type& it, randItems)
+				{
+					boost::shared_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE(
+						Factory<InterSYNTHESESyncTypeFactory>::create(it.first)
+					);
+					InterSYNTHESESyncTypeFactory::SortedItems sortedItems(
+						interSYNTHESE->sort(it.second)
+					);
+					BOOST_FOREACH(
+						const InterSYNTHESESyncTypeFactory::SortedItems::value_type& item,
+						sortedItems
+					){
+						if (item->get<NonPersistent>())
+						{
+							interSYNTHESE->initQueue(
+								*this,
+								item->get<SyncPerimeter>()
+							);
+						}
+					}
+				}
+			}
+		}
 
 
 

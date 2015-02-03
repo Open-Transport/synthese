@@ -24,7 +24,6 @@
 #include "ServerModule.h"
 #include "EMail.h"
 #include "Log.h"
-#include "15_server/version.h"
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
@@ -90,16 +89,17 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_HTTP_TRACE_PATH = "http_trace_path";
 		const string ServerModule::MODULE_PARAM_HTTP_FORCE_GZIP = "http_force_gzip";
 
-		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
-		const std::string ServerModule::REVISION(SYNTHESE_REVISION);
-		const std::string ServerModule::BRANCH(SYNTHESE_BRANCH);
-		const std::string ServerModule::BUILD_DATE(SYNTHESE_BUILD_DATE);
-		const std::string ServerModule::SYNTHESE_URL(SYNTHESE_SVN_URL);
+		std::string ServerModule::VERSION;
+		std::string ServerModule::REVISION;
+		std::string ServerModule::BRANCH;
+		std::string ServerModule::BUILD_DATE;
+		std::string ServerModule::SYNTHESE_URL;
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 
 		boost::shared_mutex ServerModule::baseWriterMutex;
 		boost::shared_mutex ServerModule::InterSYNTHESEAgainstRequestsMutex;
+		boost::shared_mutex ServerModule::IneoBDSIAgainstVDVDataSupplyMutex;
 
 		template<> void ModuleClassTemplate<ServerModule>::PreInit()
 		{
@@ -193,6 +193,19 @@ namespace synthese
 		}
 
 
+		void ServerModule::InitRevisionInfo(
+				const std::string &version,
+				const std::string &revision,
+				const std::string &branch,
+				const std::string &buildDate,
+				const std::string &gitURL
+		) {
+			VERSION = version;
+			REVISION = revision;
+			BRANCH = branch;
+			BUILD_DATE = buildDate;
+			SYNTHESE_URL = gitURL;
+		}
 
 		void ServerModule::ParameterCallback(
 			const std::string& name,
@@ -664,22 +677,4 @@ namespace synthese
 			return _serverStartingTime;
 		}
 
-		const string ServerModule::GetBranch()
-		{
-			string branch = "";
-			std::vector<std::string> urlVector;
-			boost::algorithm::split(urlVector, ServerModule::SYNTHESE_URL, boost::is_any_of("/"));
-			if (urlVector.size() > 0)
-			{
-				if (urlVector.at(urlVector.size()-1) == "trunk")
-				{
-					branch = urlVector.at(urlVector.size()-1);
-				}
-				else if (urlVector.size() > 1)
-				{
-					branch = urlVector.at(urlVector.size()-2) + "/" + urlVector.at(urlVector.size()-1);
-			}
-		}
-			return branch;
-		}
 }	}

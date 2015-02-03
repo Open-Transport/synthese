@@ -632,13 +632,13 @@ namespace synthese
 
 							const DeadRunRoute& route(it->second);
 							time_duration departureSchedule(
-								lexical_cast<int>(line.substr(i+15, 2)),
-								lexical_cast<int>(line.substr(i+17, 2)),
+								lexical_cast<int>(line.substr(i+10, 2)),
+								lexical_cast<int>(line.substr(i+12, 2)),
 								0
 							);
 							time_duration arrivalSchedule(
-								lexical_cast<int>(line.substr(i+19, 2)),
-								lexical_cast<int>(line.substr(i+21, 2)),
+								lexical_cast<int>(line.substr(i+14, 2)),
+								lexical_cast<int>(line.substr(i+16, 2)),
 								0
 							);
 

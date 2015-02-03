@@ -404,7 +404,7 @@ namespace synthese
 				ap.setApproachSpeed(_effectiveApproachSpeed);
 
 				ap.setMaxtransportConnectionsCount(
-					_withoutTransfer ? 1 : optional<size_t>()
+					_withoutTransfer ? (size_t)(0) : optional<size_t>()
 				);
 				resaRequest.getAction()->setAccessParameters(ap);
 				stringstream trace;

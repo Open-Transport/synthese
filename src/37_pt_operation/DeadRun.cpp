@@ -327,20 +327,20 @@ namespace synthese
 					ATTR_DEP_PLACE_NAME,
 					depot ? depot->getName() : ""
 				);
-	                        pm.insert(
-	                                ATTR_ARR_PLACE_NAME,
-	                                stop ? stop->getName() : ""
-	                        );
+				pm.insert(
+					ATTR_ARR_PLACE_NAME,
+					stop ? stop->getName() : ""
+				);
 			}
 			else {
-        	                pm.insert(
-	                                ATTR_DEP_PLACE_NAME,
-	                                stop ? stop->getName() : ""
-	                        );
-	                        pm.insert(
-	                                ATTR_ARR_PLACE_NAME,
-	                                depot ? depot->getName() : ""
-	                        );
+				pm.insert(
+					ATTR_DEP_PLACE_NAME,
+					stop ? stop->getName() : ""
+				);
+				pm.insert(
+					ATTR_ARR_PLACE_NAME,
+					depot ? depot->getName() : ""
+				);
 			}
 
 			// Departure and Arrival schedules
@@ -349,14 +349,14 @@ namespace synthese
 			departure_schedule << EncodeSchedule(getDataDepartureSchedules()[0]);
 			arrival_schedule << EncodeSchedule(getDataArrivalSchedules()[1]);
 			
-                        pm.insert(
-                                ATTR_DEP_SCHEDULE,
+			pm.insert(
+				ATTR_DEP_SCHEDULE,
 				departure_schedule.str()
-                        );
-                        pm.insert(
-                                ATTR_ARR_SCHEDULE,
+			);
+			pm.insert(
+				ATTR_ARR_SCHEDULE,
 				arrival_schedule.str()
-                        );
+			);
 		}
 
 

@@ -32,101 +32,101 @@
 
 namespace geos
 {
-    namespace geom
-    {
-        class Point;
-    }
+	namespace geom
+	{
+		class Point;
+	}
 }
 
 namespace synthese
 {
-    namespace geography
-    {
-        class City;
-    }
+	namespace geography
+	{
+		class City;
+	}
 
-    class CoordinatesSystem;
+	class CoordinatesSystem;
 
-    namespace road
-    {
-        class RoadPlace;
+	namespace road
+	{
+		class RoadPlace;
 
-        //////////////////////////////////////////////////////////////////////////
-        /// Updates road place attributes.
-        /// @ingroup m35Actions refActions
-        /// @author Thomas Puigt
-        /// @date 2014
-        /// @since 3.8
-        ///
-        /// Note :The name attributes can be updated by NamedPlaceUpdateAction.
-        ///
-        /// Parameters :
-        ///	<ul>
-        ///		<li>actionParamid (compulsory) : the id of the road place to update</li>
-        ///		<li>actionParamna : name</li>
-        ///		<li>actionParamsn : name for display on 13 characters wide screens</li>
-        ///		<li>actionParamln : name for display on 26 characters wide screens</li>
-        ///		<li>actionParamci : city id</li>
-        ///		<li>actionParamma : wether the road is selected as default in the city when no road is specified</li>
-        ///	</ul>
-        class RoadPlaceUpdateAction:
-            public util::FactorableTemplate<server::Action, RoadPlaceUpdateAction>,
-            public impex::BaseImportableUpdateAction
-        {
-        public:
-            static const std::string PARAMETER_ROAD_PLACE_ID;
-            static const std::string PARAMETER_NAME;
-            static const std::string PARAMETER_SHORT_NAME;
-            static const std::string PARAMETER_LONG_NAME;
-            static const std::string PARAMETER_CITY_ID;
-            static const std::string PARAMETER_IS_MAIN;
-            static const std::string PARAMETER_SRID;
+		//////////////////////////////////////////////////////////////////////////
+		/// Updates road place attributes.
+		/// @ingroup m35Actions refActions
+		/// @author Thomas Puigt
+		/// @date 2014
+		/// @since 3.8
+		///
+		/// Note :The name attributes can be updated by NamedPlaceUpdateAction.
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamid (compulsory) : the id of the road place to update</li>
+		///		<li>actionParamna : name</li>
+		///		<li>actionParamsn : name for display on 13 characters wide screens</li>
+		///		<li>actionParamln : name for display on 26 characters wide screens</li>
+		///		<li>actionParamci : city id</li>
+		///		<li>actionParamma : wether the road is selected as default in the city when no road is specified</li>
+		///	</ul>
+		class RoadPlaceUpdateAction:
+			public util::FactorableTemplate<server::Action, RoadPlaceUpdateAction>,
+			public impex::BaseImportableUpdateAction
+		{
+		public:
+			static const std::string PARAMETER_ROAD_PLACE_ID;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_SHORT_NAME;
+			static const std::string PARAMETER_LONG_NAME;
+			static const std::string PARAMETER_CITY_ID;
+			static const std::string PARAMETER_IS_MAIN;
+			static const std::string PARAMETER_SRID;
 
-        private:
-            boost::shared_ptr<road::RoadPlace> _place;
-            boost::optional<std::string> _name;
-            boost::optional<std::string> _shortName;
-            boost::optional<std::string> _longName;
-            boost::shared_ptr<geography::City> _city;
-            boost::optional<bool> _isMain;
-
-
-        protected:
-            //////////////////////////////////////////////////////////////////////////
-            /// Generates a generic parameters map from the action parameters.
-            /// @return The generated parameters map
-            util::ParametersMap getParametersMap() const;
+		private:
+			boost::shared_ptr<road::RoadPlace> _place;
+			boost::optional<std::string> _name;
+			boost::optional<std::string> _shortName;
+			boost::optional<std::string> _longName;
+			boost::shared_ptr<geography::City> _city;
+			boost::optional<bool> _isMain;
 
 
-
-            //////////////////////////////////////////////////////////////////////////
-            /// Reads the parameters of the action on a generic parameters map.
-            /// @param map Parameters map to interpret
-            /// @exception ActionException Occurs when some parameters are missing or incorrect.
-            void _setFromParametersMap(const util::ParametersMap& map);
-
-
-        public:
-            //////////////////////////////////////////////////////////////////////////
-            /// The action execution code.
-            /// @param request the request which has launched the action
-            void run(server::Request& request);
+		protected:
+			//////////////////////////////////////////////////////////////////////////
+			/// Generates a generic parameters map from the action parameters.
+			/// @return The generated parameters map
+			util::ParametersMap getParametersMap() const;
 
 
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Tests if the action can be launched in the current session.
-            /// @param session the current session
-            /// @return true if the action can be launched in the current session
-            virtual bool isAuthorized(const server::Session* session) const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads the parameters of the action on a generic parameters map.
+			/// @param map Parameters map to interpret
+			/// @exception ActionException Occurs when some parameters are missing or incorrect.
+			void _setFromParametersMap(const util::ParametersMap& map);
+
+
+		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// The action execution code.
+			/// @param request the request which has launched the action
+			void run(server::Request& request);
 
 
 
-            //! @name Setters
-            //@{
-                void setPlace(boost::shared_ptr<road::RoadPlace> value) { _place = value; }
-            //@}
-        };
+			//////////////////////////////////////////////////////////////////////////
+			/// Tests if the action can be launched in the current session.
+			/// @param session the current session
+			/// @return true if the action can be launched in the current session
+			virtual bool isAuthorized(const server::Session* session) const;
+
+
+
+			//! @name Setters
+			//@{
+				void setPlace(boost::shared_ptr<road::RoadPlace> value) { _place = value; }
+			//@}
+		};
 }	}
 
 #endif // SYNTHESE_RoadPlaceUpdateAction_H__

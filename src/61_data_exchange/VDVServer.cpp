@@ -78,6 +78,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ServiceCode, "service_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(TracePath, "trace_path", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(PlannedDataSourceID, "planned_datasource_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(CutAboId, "cut_abo_id", SQL_BOOLEAN)
 	
 	namespace data_exchange
 	{
@@ -100,7 +101,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(PlannedDataSourceID),
-					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
+					FIELD_DEFAULT_CONSTRUCTOR(TracePath),
+					FIELD_VALUE_CONSTRUCTOR(CutAboId, false)
 			)	),
 			_startServiceTimeStamp(not_a_date_time),
 			_online(false)
@@ -111,6 +113,10 @@ namespace synthese
 
 		std::string VDVServer::_getURL( const std::string& request ) const
 		{
+			if (get<ServiceUrl>().empty())
+			{
+				return "/" + get<ClientControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
+			}
 			return "/" + get<ServiceUrl>() + "/" + get<ClientControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
 		}
 
@@ -214,14 +220,23 @@ namespace synthese
 					_online = false;
 					return;
 				}
-				ptime startServiceTime(
-					XmlToolkit::GetXsdDateTime(
-						startServiceNode.getText()
-				) + diff_from_utc); //We are supposed to receive the UTC time
-				if(startServiceTime != _startServiceTimeStamp)
+				try
 				{
-					reloadNeeded = true;
-					_startServiceTimeStamp = startServiceTime;
+					ptime startServiceTime(
+						XmlToolkit::GetXsdDateTime(
+							startServiceNode.getText()
+					) + diff_from_utc); //We are supposed to receive the UTC time
+					if(startServiceTime != _startServiceTimeStamp)
+					{
+						reloadNeeded = true;
+						_startServiceTimeStamp = startServiceTime;
+					}
+				}
+				catch (std::exception& e)
+				{
+					Log::GetInstance().warn("VDVServer : Error while reading startServiceTime in StatusAntwort " + string(e.what()));
+					_online = false;
+					return;
 				}
 
 				// Check if new data available (DatenBereit)
@@ -306,6 +321,7 @@ namespace synthese
 			}
 			catch(...)
 			{
+				Log::GetInstance().warn("VDVServer : la demande de nettoyage des abonnements a Ã©chouÃ©");
 			}
 
 
@@ -338,8 +354,19 @@ namespace synthese
 				);
 				subscription->setExpiration(expirationTime);
 				expirationTime -= diff_from_utc;
-				aboAnfrage << 
-					"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
+				if (get<CutAboId>())
+				{
+					// Some systems do not support unsigned long long int but only int so we exchange the final
+					// part of the AboID
+					int smallAboId = (int)(subscription->get<Key>());
+					aboAnfrage <<
+						"<AboAZB AboID=\"" << smallAboId << "\" VerfallZst=\"";
+				}
+				else
+				{
+					aboAnfrage <<
+						"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
+				}
 				ToXsdDateTime(aboAnfrage, expirationTime);
 				aboAnfrage << "\">";
 				
@@ -456,7 +483,7 @@ namespace synthese
 				if (!plannedDataSource.get())
 				{
 					// The planned does not exist : log so that the user knows he has to configure it
-					Log::GetInstance().warn("La source des données plannifiées associée à la connexion VDV n'a pas été trouvée");
+					Log::GetInstance().warn("La source des données plannifiées associée à la connexion VDV n'a pas Ã©tÃ© trouvÃ©e");
 					return;
 				}
 
@@ -479,7 +506,7 @@ namespace synthese
 				if (datenAbrufenAntwortResults.error != eXMLErrorNone ||
 					datenAbrufenAntwortNode.isEmpty()
 				){
-					Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort vide ou mal formé");
+					Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort vide ou mal formÃ©");
 					return;
 				}
 				
@@ -493,17 +520,31 @@ namespace synthese
 					VDVServerSubscription* currentSubscription = NULL;
 					BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
 					{
-						if (lexical_cast<string>(subscription->getKey()) == aboId)
+						if (get<CutAboId>())
 						{
-							currentSubscription = subscription;
-							break;
+							// Some systems do not support unsigned long long int but only int so we exchange the final
+							// part of the AboID
+							int smallAboId = (int)(subscription->get<Key>());
+							if (lexical_cast<string>(smallAboId) == aboId)
+							{
+								currentSubscription = subscription;
+								break;
+							}
+						}
+						else
+						{
+							if (lexical_cast<string>(subscription->getKey()) == aboId)
+							{
+								currentSubscription = subscription;
+								break;
+							}
 						}
 					}
 					
 					// If no corresponding subscription, log it and continue
 					if (!currentSubscription)
 					{
-						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant à aucun abonnement");
+						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant Ã  aucun abonnement");
 						continue;
 					}
 					
@@ -517,7 +558,7 @@ namespace synthese
 						string readAZBID = AZBFahrplanlageNode.getChildNode("AZBID").getText();
 						if (readAZBID != currentSubscription->get<StopArea>()->getACodeBySource(*get<DataSource>()))
 						{
-							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant à l'abonnement");
+							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant Ã  l'abonnement");
 							break;
 						}
 						
@@ -527,7 +568,7 @@ namespace synthese
 						split(vectServiceCode, serviceCode, is_any_of("-"));
 						if (vectServiceCode.size() != 3)
 						{
-							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service avec un code différentde XXX-XXXX-XXXX");
+							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service avec un code diffÃ©rent de XXX-XXXX-XXXX");
 							continue;
 						}
 						// Service code is on 5 characters in the planned datasource

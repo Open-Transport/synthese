@@ -207,7 +207,7 @@ namespace synthese
 				bool					_allowedConnection;
 				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
 				boost::posix_time::time_duration	_defaultTransferDelay;
-				bool                    _isRelayPark;
+				bool					_isRelayPark;
 			//@}
 
 			//! @name Caching

@@ -89,10 +89,10 @@ namespace synthese
 
 
 
-            /// @name Setters
-            //@{
-                void setMimeType(const util::MimeType& value) { _mimeType = value; }
-            //@}
+			/// @name Setters
+			//@{
+				void setMimeType(const util::MimeType& value) { _mimeType = value; }
+			//@}
 
 
 

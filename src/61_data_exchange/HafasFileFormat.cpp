@@ -332,6 +332,7 @@ namespace synthese
 			// 0 : Coordinates
 			if(key == FILE_KOORD)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier KOORD");
 				while(_loadLine())
 				{
 					// Declaration
@@ -380,6 +381,7 @@ namespace synthese
 			}
 			else if (key == FILE_BAHNOF)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier BAHNOF");
 				while(_loadLine())
 				{
 					// operator code
@@ -410,6 +412,7 @@ namespace synthese
 			}
 			else if(key == FILE_GLEIS && !_noGleisFile)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier GLEIS");
 				GleisMap::iterator itService(_gleisMap.end());
 
 				while(_loadLine())
@@ -491,6 +494,7 @@ namespace synthese
 			}
 			else if(key == FILE_UMSTEIGB)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier UMSTEIGB");
 				while(_loadLine())
 				{
 					// Fields
@@ -515,6 +519,7 @@ namespace synthese
 			}
 			else if(key == FILE_UMSTEIGZ)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier UMSTEIGZ");
 				while(_loadLine())
 				{
 					try
@@ -541,6 +546,7 @@ namespace synthese
 			}
 			else if(key == FILE_METABHF)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier METABHF");
 				while(_loadLine())
 				{
 					// Inter stop duration
@@ -588,6 +594,7 @@ namespace synthese
 			} // 2 : Nodes
 			else if(key == FILE_BITFELD)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier BITFELD");
 				while(_loadLine())
 				{
 					int id(lexical_cast<int>(_getField(0,6)));
@@ -635,6 +642,7 @@ namespace synthese
 			} // 3 : Services
 			else if (key == FILE_ZUGDAT)
 			{
+				util::Log::GetInstance().debug("HafasFileFormat : lecture du fichier ZUGDAT");
 				// Declarations
 				Zugs::iterator itZug(_zugs.end());
 				string zugNumber;

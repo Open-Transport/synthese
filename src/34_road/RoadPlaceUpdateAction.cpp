@@ -44,166 +44,166 @@ using namespace boost;
 
 namespace synthese
 {
-    using namespace server;
-    using namespace security;
-    using namespace util;
-    using namespace pt;
-//    using namespace impex;
-    using namespace geography;
-//    using namespace graph;
-    using namespace db;
+	using namespace server;
+	using namespace security;
+	using namespace util;
+	using namespace pt;
+//	using namespace impex;
+	using namespace geography;
+//	using namespace graph;
+	using namespace db;
 
-    namespace util
-    {
-        template<> const string FactorableTemplate<Action, road::RoadPlaceUpdateAction>::FACTORY_KEY("RoadPlaceUpdateAction");
-    }
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, road::RoadPlaceUpdateAction>::FACTORY_KEY("RoadPlaceUpdateAction");
+	}
 
-    namespace road
-    {
-        const string RoadPlaceUpdateAction::PARAMETER_ROAD_PLACE_ID = Action_PARAMETER_PREFIX + "id";
-        const string RoadPlaceUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-        const string RoadPlaceUpdateAction::PARAMETER_SHORT_NAME = Action_PARAMETER_PREFIX + "sn";
-        const string RoadPlaceUpdateAction::PARAMETER_LONG_NAME = Action_PARAMETER_PREFIX + "ln";
-        const string RoadPlaceUpdateAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
-        const string RoadPlaceUpdateAction::PARAMETER_IS_MAIN = Action_PARAMETER_PREFIX + "ma";
-        const string RoadPlaceUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "srid";
-
-
-
-        ParametersMap RoadPlaceUpdateAction::getParametersMap() const
-        {
-            ParametersMap map;
-            if(_place.get())
-            {
-                map.insert(PARAMETER_ROAD_PLACE_ID, _place->getKey());
-            }
-            if(_city.get())
-            {
-                map.insert(PARAMETER_CITY_ID, _city->getKey());
-            }
-            if(_longName)
-            {
-                map.insert(PARAMETER_LONG_NAME, *_longName);
-            }
-            if(_shortName)
-            {
-                map.insert(PARAMETER_SHORT_NAME, *_shortName);
-            }
-            if(_name)
-            {
-                map.insert(PARAMETER_NAME, *_name);
-            }
-            if(_isMain)
-            {
-                map.insert(PARAMETER_IS_MAIN, *_isMain);
-            }
-
-            // Importable
-            _getImportableUpdateParametersMap(map);
-
-            return map;
-        }
+	namespace road
+	{
+		const string RoadPlaceUpdateAction::PARAMETER_ROAD_PLACE_ID = Action_PARAMETER_PREFIX + "id";
+		const string RoadPlaceUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string RoadPlaceUpdateAction::PARAMETER_SHORT_NAME = Action_PARAMETER_PREFIX + "sn";
+		const string RoadPlaceUpdateAction::PARAMETER_LONG_NAME = Action_PARAMETER_PREFIX + "ln";
+		const string RoadPlaceUpdateAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
+		const string RoadPlaceUpdateAction::PARAMETER_IS_MAIN = Action_PARAMETER_PREFIX + "ma";
+		const string RoadPlaceUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "srid";
 
 
 
-        void RoadPlaceUpdateAction::_setFromParametersMap(const ParametersMap& map)
-        {
-            try
-            {
-                _place = RoadPlaceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROAD_PLACE_ID), *_env);
-            }
-            catch(ObjectNotFoundException<RoadPlace>&)
-            {
-                throw ActionException("No such place");
-            }
+		ParametersMap RoadPlaceUpdateAction::getParametersMap() const
+		{
+			ParametersMap map;
+			if(_place.get())
+			{
+				map.insert(PARAMETER_ROAD_PLACE_ID, _place->getKey());
+			}
+			if(_city.get())
+			{
+				map.insert(PARAMETER_CITY_ID, _city->getKey());
+			}
+			if(_longName)
+			{
+				map.insert(PARAMETER_LONG_NAME, *_longName);
+			}
+			if(_shortName)
+			{
+				map.insert(PARAMETER_SHORT_NAME, *_shortName);
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_isMain)
+			{
+				map.insert(PARAMETER_IS_MAIN, *_isMain);
+			}
 
-            if(map.getOptional<RegistryKeyType>(PARAMETER_CITY_ID)) try
-            {
-                _city = CityTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CITY_ID), *_env);
-            }
-            catch(ObjectNotFoundException<City>&)
-            {
-                throw ActionException("No such city");
-            }
+			// Importable
+			_getImportableUpdateParametersMap(map);
 
-            if(map.isDefined(PARAMETER_NAME))
-            {
-                _name = map.get<string>(PARAMETER_NAME);
-            }
-
-            if(map.isDefined(PARAMETER_SHORT_NAME))
-            {
-                _shortName = map.get<string>(PARAMETER_SHORT_NAME);
-            }
-
-            if(map.isDefined(PARAMETER_LONG_NAME))
-            {
-                _longName = map.get<string>(PARAMETER_LONG_NAME);
-            }
-
-            if(map.isDefined(PARAMETER_IS_MAIN))
-            {
-                _isMain = map.get<bool>(PARAMETER_IS_MAIN);
-            }
-
-            // Importable
-            _setImportableUpdateFromParametersMap(*_env, map);
-        }
+			return map;
+		}
 
 
 
-        void RoadPlaceUpdateAction::run(
-            Request& request
-        ){
-            //stringstream text;
-            //::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
+		void RoadPlaceUpdateAction::_setFromParametersMap(const ParametersMap& map)
+		{
+			try
+			{
+				_place = RoadPlaceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROAD_PLACE_ID), *_env);
+			}
+			catch(ObjectNotFoundException<RoadPlace>&)
+			{
+				throw ActionException("No such place");
+			}
 
-            if(_city.get())
-            {
-                _place->setCity(_city.get());
-                if(_isMain)
-                {
-                    if(*_isMain && !_city->includes(*_place))
-                    {
-                        _city->addIncludedPlace(*_place);
-                    }
-                    if(!*_isMain && _city->includes(*_place))
-                    {
-                        _city->removeIncludedPlace(*_place);
-                    }
-                }
-            }
+			if(map.getOptional<RegistryKeyType>(PARAMETER_CITY_ID)) try
+			{
+				_city = CityTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CITY_ID), *_env);
+			}
+			catch(ObjectNotFoundException<City>&)
+			{
+				throw ActionException("No such city");
+			}
 
-            if(_name)
-            {
-                _place->setName(*_name);
-            }
+			if(map.isDefined(PARAMETER_NAME))
+			{
+				_name = map.get<string>(PARAMETER_NAME);
+			}
 
-            if(_shortName)
-            {
-                _place->setName13(*_shortName);
-            }
+			if(map.isDefined(PARAMETER_SHORT_NAME))
+			{
+				_shortName = map.get<string>(PARAMETER_SHORT_NAME);
+			}
 
-            if(_longName)
-            {
-                _place->setName26(*_longName);
-            }
+			if(map.isDefined(PARAMETER_LONG_NAME))
+			{
+				_longName = map.get<string>(PARAMETER_LONG_NAME);
+			}
 
+			if(map.isDefined(PARAMETER_IS_MAIN))
+			{
+				_isMain = map.get<bool>(PARAMETER_IS_MAIN);
+			}
 
-            // Importable
-            _doImportableUpdate(*_place, request);
-
-            RoadPlaceTableSync::Save(_place.get());
-
-            //::AddUpdateEntry(*_object, text.str(), request.getUser().get());
-        }
+			// Importable
+			_setImportableUpdateFromParametersMap(*_env, map);
+		}
 
 
 
-        bool RoadPlaceUpdateAction::isAuthorized(
-            const Session* session
-        ) const {
-            return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
-        }
-    }
+		void RoadPlaceUpdateAction::run(
+			Request& request
+		){
+			//stringstream text;
+			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
+
+			if(_city.get())
+			{
+				_place->setCity(_city.get());
+				if(_isMain)
+				{
+					if(*_isMain && !_city->includes(*_place))
+					{
+						_city->addIncludedPlace(*_place);
+					}
+					if(!*_isMain && _city->includes(*_place))
+					{
+						_city->removeIncludedPlace(*_place);
+					}
+				}
+			}
+
+			if(_name)
+			{
+				_place->setName(*_name);
+			}
+
+			if(_shortName)
+			{
+				_place->setName13(*_shortName);
+			}
+
+			if(_longName)
+			{
+				_place->setName26(*_longName);
+			}
+
+
+			// Importable
+			_doImportableUpdate(*_place, request);
+
+			RoadPlaceTableSync::Save(_place.get());
+
+			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
+		}
+
+
+
+		bool RoadPlaceUpdateAction::isAuthorized(
+			const Session* session
+		) const {
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+		}
+	}
 }

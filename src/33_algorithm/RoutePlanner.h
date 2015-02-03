@@ -100,7 +100,7 @@ namespace synthese
 				const PlanningOrder					_planningOrder;  //!< Define planning sequence.
 				const graph::AccessParameters		_accessParameters;
 				const boost::optional<boost::posix_time::time_duration>	_maxDuration;
-				const boost::posix_time::ptime&				_minBeginTime;
+				boost::posix_time::ptime					_minBeginTime;
 				const boost::posix_time::ptime&				_maxBeginTime;
 				const boost::posix_time::ptime&				_maxEndTime;
 				const graph::GraphIdType			_whatToSearch;

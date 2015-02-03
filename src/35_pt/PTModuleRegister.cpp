@@ -103,6 +103,7 @@
 
 #include "StopPointWFSType.hpp"
 
+#include "DeactivationPTDataInterSYNTHESE.hpp"
 #include "RealTimePTDataInterSYNTHESE.hpp"
 
 // Registries
@@ -241,6 +242,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::LineAlarmRecipient::integrate();
 	synthese::pt::StopAreaAlarmRecipient::integrate();
 
+	synthese::pt::DeactivationPTDataInterSYNTHESE::integrate();
 	synthese::pt::RealTimePTDataInterSYNTHESE::integrate();
 
 	// Registries

@@ -121,6 +121,7 @@ namespace synthese
 		const string IneoFileFormat::Importer_::PARAMETER_VEHICLE_SERVICE_SUFFIX = "vehicle_service_suffix";
 		const string IneoFileFormat::Importer_::PARAMETER_DEPOT_TO_STOP_IS_HLP = "depot_to_stop_is_hlp";
 		const string IneoFileFormat::Importer_::PARAMETER_STOP_TO_DEPOT_IS_HLP = "stop_to_depot_is_hlp";
+		const string IneoFileFormat::Importer_::PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA = "allow_different_stop_points_in_same_stop_area";
 	}
 
 	namespace impex
@@ -177,6 +178,7 @@ namespace synthese
 			_displayLinkedStops(false),
 			_depotToStopIsHLP(false),
 			_stopToDepotIsHLP(false),
+			_allowDifferentStopPointsInSameStopArea(true),
 			_interactive(false),
 			_addWaybackToJourneyPatternCode(false),
 			_destinations(*import.get<DataSource>(), _env),
@@ -624,7 +626,7 @@ namespace synthese
 								true,
 								true,
                                 true,
-                                true
+								_allowDifferentStopPointsInSameStopArea
 						)	);
 						stops.clear();
 						atLeastAnInexistantStop = false;
@@ -950,8 +952,8 @@ namespace synthese
 
 						// Line
 						if(tcou == TCOU_Commercial || tcou == TCOU_HLP ||
-						   (tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
-						   (tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
+							(tcou == TCOU_DepotToStop && _depotToStopIsHLP) ||
+							(tcou == TCOU_StopToDepot && _stopToDepotIsHLP))
 						{
 							if(_lineReadMethod == VALUE_CIDX)
 							{
@@ -1258,9 +1260,12 @@ namespace synthese
 			{
 				map.insert(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField);
 			}
+			
+			map.insert(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, _allowDifferentStopPointsInSameStopArea);
 
 			map.insert(PARAMETER_DEPOT_TO_STOP_IS_HLP, _depotToStopIsHLP);
 			map.insert(PARAMETER_STOP_TO_DEPOT_IS_HLP, _stopToDepotIsHLP);
+			map.insert(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, _allowDifferentStopPointsInSameStopArea);
 
 			return map;
 		}
@@ -1351,6 +1356,7 @@ namespace synthese
 
 			_depotToStopIsHLP = map.getDefault<bool>(PARAMETER_DEPOT_TO_STOP_IS_HLP, false);
 			_stopToDepotIsHLP = map.getDefault<bool>(PARAMETER_STOP_TO_DEPOT_IS_HLP, false);
+			_allowDifferentStopPointsInSameStopArea = map.getDefault<bool>(PARAMETER_ALLOW_DIFFERENT_STOP_POINTS_IN_SAME_STOP_AREA, true);
 
 			// Calendar dates
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_CAL));

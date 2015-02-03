@@ -149,10 +149,10 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_INVERT_XY = "invert_XY";
 		const string PTJourneyPlannerService::PARAMETER_CONCATENATE_CONTIGUOUS_FOOT_LEGS = "concatenate_contiguous_foot_legs";
 		const string PTJourneyPlannerService::PARAMETER_BROADCAST_POINT_ID = "broadcast_point";
-        const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PARKING_TEXT = "departure_parking_text";
-        const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_TEXT = "arrival_parking_text";
-        const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PARKING_XY = "departure_parking_xy";
-        const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_XY = "arrival_parking_xy";
+		const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PARKING_TEXT = "departure_parking_text";
+		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_TEXT = "arrival_parking_text";
+		const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PARKING_XY = "departure_parking_xy";
+		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_XY = "arrival_parking_xy";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -199,7 +199,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_COLUMN_NUMBER("column_number");
 		const string PTJourneyPlannerService::DATA_ROW_NUMBER("row_number");
 		const string PTJourneyPlannerService::DATA_IS_FOOT("is_foot");
-        const string PTJourneyPlannerService::DATA_IS_CAR("is_car");
+		const string PTJourneyPlannerService::DATA_IS_CAR("is_car");
 		const string PTJourneyPlannerService::DATA_FIRST_TIME("first_time");
 		const string PTJourneyPlannerService::DATA_LAST_TIME("last_time");
 		const string PTJourneyPlannerService::DATA_IS_CONTINUOUS_SERVICE("is_continuous_service");
@@ -265,7 +265,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_ARRIVAL_LATITUDE("arrival_latitude");
 		const string PTJourneyPlannerService::DATA_IS_LAST_LEG("is_last_leg");
 		const string PTJourneyPlannerService::DATA_IS_FIRST_LEG("is_first_leg");
-        const string PTJourneyPlannerService::DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE("is_same_than_last_arrival_place");
+		const string PTJourneyPlannerService::DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE("is_same_than_last_arrival_place");
 		const string PTJourneyPlannerService::DATA_IS_ENTERING_PARKING("is_entering_parking");
 		const string PTJourneyPlannerService::DATA_IS_LEAVING_PARKING("is_leaving_parking");
 
@@ -273,7 +273,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_REACHED_PLACE_IS_NAMED("reached_place_is_named");
 		const string PTJourneyPlannerService::DATA_ROAD_NAME("road_name");
 		const string PTJourneyPlannerService::DATA_LENGTH("length");
-        const string PTJourneyPlannerService::DATA_USER_CLASS_RANK("user_class_rank");
+		const string PTJourneyPlannerService::DATA_USER_CLASS_RANK("user_class_rank");
 
 		// Service cells
 		const string PTJourneyPlannerService::DATA_FIRST_DEPARTURE_TIME("first_departure_time");
@@ -291,8 +291,8 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_WKT("wkt");
 		const string PTJourneyPlannerService::DATA_LINE_MARKERS("line_markers");
 
-        // Commercial lines
-        const string PTJourneyPlannerService::ITEM_COMMERCIAL_LINE("commercial_line");
+		// Commercial lines
+		const string PTJourneyPlannerService::ITEM_COMMERCIAL_LINE("commercial_line");
 
 
 		PTJourneyPlannerService::PTJourneyPlannerService(
@@ -380,43 +380,43 @@ namespace synthese
 				}
 			}
 
-            // Departure parking
-            if(_departure_parking.placeResult.value.get())
-            {
-                if(dynamic_cast<NamedPlace*>(_departure_parking.placeResult.value.get()))
-                {
-                    map.insert(
-                        PARAMETER_DEPARTURE_PARKING_TEXT,
-                        dynamic_cast<NamedPlace*>(_departure_parking.placeResult.value.get())->getFullName()
-                    );
-                }
-                else if(dynamic_cast<City*>(_departure_parking.placeResult.value.get()))
-                {
-                    map.insert(
-                        PARAMETER_DEPARTURE_PARKING_TEXT,
-                        dynamic_cast<City*>(_departure_parking.placeResult.value.get())->getName()
-                    );
-                }
-            }
+			// Departure parking
+			if(_departure_parking.placeResult.value.get())
+			{
+				if(dynamic_cast<NamedPlace*>(_departure_parking.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_DEPARTURE_PARKING_TEXT,
+						dynamic_cast<NamedPlace*>(_departure_parking.placeResult.value.get())->getFullName()
+					);
+				}
+				else if(dynamic_cast<City*>(_departure_parking.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_DEPARTURE_PARKING_TEXT,
+						dynamic_cast<City*>(_departure_parking.placeResult.value.get())->getName()
+					);
+				}
+			}
 
-            // Arrival parking
-            if(_arrival_parking.placeResult.value.get())
-            {
-                if(dynamic_cast<NamedPlace*>(_arrival_parking.placeResult.value.get()))
-                {
-                    map.insert(
-                        PARAMETER_ARRIVAL_PARKING_TEXT,
-                        dynamic_cast<NamedPlace*>(_arrival_parking.placeResult.value.get())->getFullName()
-                    );
-                }
-                else if(dynamic_cast<City*>(_arrival_parking.placeResult.value.get()))
-                {
-                    map.insert(
-                        PARAMETER_ARRIVAL_PARKING_TEXT,
-                        dynamic_cast<City*>(_arrival_parking.placeResult.value.get())->getName()
-                    );
-                }
-            }
+			// Arrival parking
+			if(_arrival_parking.placeResult.value.get())
+			{
+				if(dynamic_cast<NamedPlace*>(_arrival_parking.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_ARRIVAL_PARKING_TEXT,
+						dynamic_cast<NamedPlace*>(_arrival_parking.placeResult.value.get())->getFullName()
+					);
+				}
+				else if(dynamic_cast<City*>(_arrival_parking.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_ARRIVAL_PARKING_TEXT,
+						dynamic_cast<City*>(_arrival_parking.placeResult.value.get())->getName()
+					);
+				}
+			}
 
 			// Start Date
 			if(!_startDate.is_not_a_date_time())
@@ -467,7 +467,7 @@ namespace synthese
 			RegistryKeyType configurationId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIG_ID, 0));
 			if(configurationId) try
 			{
-                _configuration = PTServiceConfigTableSync::Get(configurationId, *_env);
+				_configuration = PTServiceConfigTableSync::Get(configurationId, *_env);
 			}
 			catch (ObjectNotFoundException<PTServiceConfig>&)
 			{
@@ -640,71 +640,71 @@ namespace synthese
 					);
 				}
 
-                // Departure parking
-                // One field input
-                if(map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT))
-                {
-                    _originParkingText = map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT);
+				// Departure parking
+				// One field input
+				if(map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT))
+				{
+					_originParkingText = map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT);
 
-                    if(!_originParkingText.empty())
-                    {
-                        PlacesListService placesListService;
-                        placesListService.setNumber(1);
-                        placesListService.setCoordinatesSystem(_coordinatesSystem);
+					if(!_originParkingText.empty())
+					{
+						PlacesListService placesListService;
+						placesListService.setNumber(1);
+						placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                        // Departure
-                        placesListService.setText(_originParkingText);
-                        _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
-                            placesListService.runWithoutOutput()
-                        );
-                    }
-                }
-                // XY input
-                else if(
-                    map.isDefined(PARAMETER_DEPARTURE_PARKING_XY)
-                ){
-                    PlacesListService placesListService;
-                    placesListService.setNumber(1);
-                    placesListService.setCoordinatesSystem(_coordinatesSystem);
+						// Departure
+						placesListService.setText(_originParkingText);
+						_departure_parking.placeResult = placesListService.getPlaceFromBestResult(
+							placesListService.runWithoutOutput()
+						);
+					}
+				}
+				// XY input
+				else if(
+					map.isDefined(PARAMETER_DEPARTURE_PARKING_XY)
+				){
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                    placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
-                    _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
-                        placesListService.runWithoutOutput()
-                    );
-                }
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
+					_departure_parking.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 
-                // Destination parking
-                // One field input
-                if(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT))
-                {
-                    _destinationParkingText = map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT);
+				// Destination parking
+				// One field input
+				if(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT))
+				{
+					_destinationParkingText = map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT);
 
-                    if(!_destinationParkingText.empty())
-                    {
-                        PlacesListService placesListService;
-                        placesListService.setNumber(1);
-                        placesListService.setCoordinatesSystem(_coordinatesSystem);
+					if(!_destinationParkingText.empty())
+					{
+						PlacesListService placesListService;
+						placesListService.setNumber(1);
+						placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                        // Arrival
-                        placesListService.setText(_destinationParkingText);
-                        _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
-                            placesListService.runWithoutOutput()
-                        );
-                    }
-                }
-                // XY input
-                else if(
-                    map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)
-                ){
-                    PlacesListService placesListService;
-                    placesListService.setNumber(1);
-                    placesListService.setCoordinatesSystem(_coordinatesSystem);
+						// Arrival
+						placesListService.setText(_destinationParkingText);
+						_arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
+							placesListService.runWithoutOutput()
+						);
+					}
+				}
+				// XY input
+				else if(
+					map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)
+				){
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                    placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
-                    _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
-                        placesListService.runWithoutOutput()
-                    );
-                }
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
+					_arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
+				}
 			}
 
 			// Date parameters
@@ -1011,8 +1011,8 @@ namespace synthese
 					PTTimeSlotRoutePlanner r(
 						_departure_place.placeResult.value.get(),
 						_arrival_place.placeResult.value.get(),
-                        _departure_parking.placeResult.value.get(),
-                        _arrival_parking.placeResult.value.get(),
+						_departure_parking.placeResult.value.get(),
+						_arrival_parking.placeResult.value.get(),
 						startDate,
 						endDate,
 						startArrivalDate,
@@ -1036,8 +1036,8 @@ namespace synthese
 				PTTimeSlotRoutePlanner r(
 					_departure_place.placeResult.value.get(),
 					_arrival_place.placeResult.value.get(),
-                    _departure_parking.placeResult.value.get(),
-                    _arrival_parking.placeResult.value.get(),
+					_departure_parking.placeResult.value.get(),
+					_arrival_parking.placeResult.value.get(),
 					startDate,
 					endDate,
 					startArrivalDate,
@@ -1145,7 +1145,7 @@ namespace synthese
 			// Cells
 
 			// Set of commercial lines used by the journeys
-            set<const CommercialLine*> lines;
+			set<const CommercialLine*> lines;
 
 			// Parkings are cast as NamedPlace to compare them with the
 			// arrival/departure points of the journeys
@@ -1164,7 +1164,7 @@ namespace synthese
 			){
 				bool pedestrianMode = false;
 				bool lastPedestrianMode = false;
-                bool carMode = false;
+				bool carMode = false;
 
 				PlacesContentVector::iterator itSheetRow(sheetRows.begin());
 				PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator itPlaces(placesList.begin());
@@ -1175,10 +1175,10 @@ namespace synthese
 				{
 					const ServicePointer& leg(*itl);
 
-                    if(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()))
-                    {
-                        lines.insert(static_cast<const JourneyPattern*>(leg.getService()->getPath())->getCommercialLine());
-                    }
+					if(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()))
+					{
+						lines.insert(static_cast<const JourneyPattern*>(leg.getService()->getPath())->getCommercialLine());
+					}
 
 					if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl, false)
 					){
@@ -1194,10 +1194,10 @@ namespace synthese
 						ptime lastDateTime(leg.getDepartureDateTime());
 						lastDateTime += it->getContinuousServiceRange();
 
-                        _displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
+						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
 
-                        pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
-                        carMode = pedestrianMode && (USER_CAR == (leg.getUserClassRank() + USER_CLASS_CODE_OFFSET));
+						pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
+						carMode = pedestrianMode && (USER_CAR == (leg.getUserClassRank() + USER_CLASS_CODE_OFFSET));
 
 						if(itSheetRow == sheetRows.end())
 						{
@@ -1211,7 +1211,7 @@ namespace synthese
 							*cellPM,
 							i,
 							pedestrianMode,
-                            carMode,
+							carMode,
 							leg.getDepartureDateTime().time_of_day(),
 							lastDateTime.time_of_day(),
 							it->getContinuousServiceRange().total_seconds() > 0,
@@ -1238,7 +1238,7 @@ namespace synthese
 								*placesList.rbegin()->place
 						)	);
 
-                        _displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
+						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
 
 						bool isParking((NULL != placeToSearch) && (placeToSearch == departureParking));
 						ptime lastDateTime(leg.getArrivalDateTime());
@@ -1255,7 +1255,7 @@ namespace synthese
 							*cellPM,
 							i,
 							pedestrianMode,
-                            carMode,
+							carMode,
 							leg.getArrivalDateTime().time_of_day(),
 							lastDateTime.time_of_day(),
 							it->getContinuousServiceRange().total_seconds() > 0,
@@ -1263,7 +1263,7 @@ namespace synthese
 							itPlaces->isDestination && itl+1 == jl.end(),
 							false,
 							itPlaces->isOrigin,
-                            itPlaces->isDestination,
+							itPlaces->isDestination,
 							/* isEnteringParking */ isParking,
 							/* isLeavingParking */ false
 						);
@@ -1285,7 +1285,7 @@ namespace synthese
 						*cellPM,
 						i,
 						false,
-                        false,
+						false,
 						time_duration(not_a_date_time),
 						time_duration(not_a_date_time),
 						false,
@@ -1366,14 +1366,14 @@ namespace synthese
 			}
 			pm.insert(DATA_HAS_RESERVATION, hasReservation);
 
-            // Display of each line
-            boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
-            BOOST_FOREACH(const CommercialLine* line, lines)
-            {
-                line->toParametersMap(*linePM, false);
-                pm.insert(ITEM_COMMERCIAL_LINE, linePM);
-                linePM.reset(new ParametersMap());
-            }
+			// Display of each line
+			boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
+			BOOST_FOREACH(const CommercialLine* line, lines)
+			{
+				line->toParametersMap(*linePM, false);
+				pm.insert(ITEM_COMMERCIAL_LINE, linePM);
+				linePM.reset(new ParametersMap());
+			}
 
 			//////////////////////////////////////////////////////////////////////////
 			// Output
@@ -1433,7 +1433,7 @@ namespace synthese
 			const NamedPlace& placeToSearch,
 			size_t columnNumber,
 			bool displayFoot,
-            bool displayCar,
+			bool displayCar,
 			PlacesContentVector::iterator itSheetRowEnd
 		) const {
 			for (; itPlaces != placesList.end() && itPlaces->place != &placeToSearch; ++itPlaces, ++itSheetRow)
@@ -1449,13 +1449,13 @@ namespace synthese
 					*cellPM,
 					columnNumber,
 					displayFoot,
-                    displayCar,
+					displayCar,
 					time_duration(not_a_date_time),
 					time_duration(not_a_date_time),
 					false,
 					true,
 					true,
-                    false,
+					false,
 					itPlaces->isOrigin,
 					itPlaces->isDestination,
 					/* isEnteringParking */ false,
@@ -1492,7 +1492,7 @@ namespace synthese
 			util::ParametersMap& pm,
 			size_t columnNumber,
 			bool isItFootLine,
-            bool isItCarLine,
+			bool isItCarLine,
 			const boost::posix_time::time_duration& firstTime,
 			const boost::posix_time::time_duration& lastTime,
 			bool isItContinuousService,
@@ -1500,16 +1500,16 @@ namespace synthese
 			bool isLastWriting,
 			bool isFirstFoot,
 			bool isOriginRow,
-            bool isDestinationRow,
-            bool isEnteringParking,
-            bool isLeavingParking
+			bool isDestinationRow,
+			bool isEnteringParking,
+			bool isLeavingParking
 		) const {
 
 			pm.insert(DATA_IS_DESTINATION_ROW, isDestinationRow);
 			pm.insert(DATA_IS_ORIGIN_ROW, isOriginRow);
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
 			pm.insert(DATA_IS_FOOT, isItFootLine);
-            pm.insert(DATA_IS_CAR, isItCarLine);
+			pm.insert(DATA_IS_CAR, isItCarLine);
 			{
 				stringstream s;
 				if(!firstTime.is_not_a_date_time())
@@ -1878,7 +1878,7 @@ namespace synthese
 						*legPM,
 						false,
 						false,
-                        leg.getDepartureEdge()->getHub() == lastPlace,
+						leg.getDepartureEdge()->getHub() == lastPlace,
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
 						__Couleur,
@@ -1950,8 +1950,8 @@ namespace synthese
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        false,
-                        leg.getUserClassRank()
+						false,
+						leg.getUserClassRank()
 					);
 					
 					roadServiceUses.clear();
@@ -2001,8 +2001,8 @@ namespace synthese
 						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        true,
-                        leg.getUserClassRank()
+						true,
+						leg.getUserClassRank()
 					);
 					
 					concatenatingFootLegs = false;
@@ -2023,7 +2023,7 @@ namespace synthese
 						*legPM,
 						false,
 						false,
-                        leg.getDepartureEdge()->getHub() == lastPlace,
+						leg.getDepartureEdge()->getHub() == lastPlace,
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
 						__Couleur,
@@ -2110,8 +2110,8 @@ namespace synthese
 						*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 						*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        true,
-                        leg.getUserClassRank()
+						true,
+						leg.getUserClassRank()
 					);
 					
 					concatenatingFootLegs = false;
@@ -2132,7 +2132,7 @@ namespace synthese
 						*legPM,
 						false,
 						false,
-                        leg.getDepartureEdge()->getHub() == lastPlace,
+						leg.getDepartureEdge()->getHub() == lastPlace,
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 						dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()) != lastStop,
 						__Couleur,
@@ -2167,8 +2167,8 @@ namespace synthese
 						*leg.getDepartureEdge()->getFromVertex(),
 						*leg.getArrivalEdge()->getFromVertex(),
 						isFirstFoot,
-                        false,
-                        leg.getUserClassRank()
+						false,
+						leg.getUserClassRank()
 					);
 					__Couleur = !__Couleur;
 					isFirstFoot = false;
@@ -2214,7 +2214,7 @@ namespace synthese
 					// Distance and geometry
 					double distance(0);
 					vector<Geometry*> geometries;
-					vector<boost::shared_ptr<Geometry> > geometriesSPtr;          
+					vector<boost::shared_ptr<Geometry> > geometriesSPtr;		  
 
 					BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
 					{
@@ -2236,8 +2236,8 @@ namespace synthese
 							geometries
 					)	);
 
-                    const ServicePointer& firstLeg(*roadServiceUses.front());
-                    const Road* actualRoad(dynamic_cast<const Road*> (firstLeg.getService()->getPath()));
+					const ServicePointer& firstLeg(*roadServiceUses.front());
+					const RoadPath* actualRoadPath(dynamic_cast<const RoadPath*> (firstLeg.getService()->getPath()));
 
 					const Vertex* departureVertex = (*roadServiceUses.begin())->getDepartureEdge()->getFromVertex();
 					const Vertex* arrivalVertex = (*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex();
@@ -2247,16 +2247,16 @@ namespace synthese
 						__Couleur,
 						distance,
 						multiLineString.get(),
-						actualRoad,
+						actualRoadPath->getRoad(),
 						*departureVertex,
 						*arrivalVertex,
 						isFirstFoot,
-                        false,
-                        leg.getUserClassRank()
+						false,
+						leg.getUserClassRank()
 					);
 
 					roadServiceUses.clear();
-                    currentRoadName.clear();
+					currentRoadName.clear();
 					__Couleur = !__Couleur;
 					isFirstFoot = false;
 					legWritten = true;
@@ -2278,12 +2278,12 @@ namespace synthese
 				double distance(0);
 				vector<Geometry*> geometries;
 				vector<boost::shared_ptr<Geometry> > geometriesSPtr;
-                size_t userClassRank = USER_CLASS_CODE_OFFSET;
+				size_t userClassRank = USER_CLASS_CODE_OFFSET;
 
 				BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, contiguousFootLegs)
 				{
 					distance += itLeg->getDistance();
-                    userClassRank = itLeg->getUserClassRank();
+					userClassRank = itLeg->getUserClassRank();
 
 					boost::shared_ptr<LineString> geometry(itLeg->getGeometry());
 					if(geometry.get())
@@ -2311,8 +2311,8 @@ namespace synthese
 					*(*contiguousFootLegs.begin())->getDepartureEdge()->getFromVertex(),
 					*(*contiguousFootLegs.rbegin())->getArrivalEdge()->getFromVertex(),
 					isFirstFoot,
-                    true,
-                    userClassRank
+					true,
+					userClassRank
 				);
 				
 				concatenatingFootLegs = false;
@@ -2336,14 +2336,14 @@ namespace synthese
 			bool isSameThanLastArrivalStop,
 			bool color,
 			const boost::posix_time::ptime& time,
-            boost::posix_time::time_duration continuousServiceRange,
-            bool isEnteringParking,
-            bool isLeavingParking
+			boost::posix_time::time_duration continuousServiceRange,
+			bool isEnteringParking,
+			bool isLeavingParking
 		) const {
 
 			string prefix(isItArrival ? PREFIX_ARRIVAL : PREFIX_DEPARTURE);
 
-            pm.insert(prefix + DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE, isSameThanLastArrivalPlace);
+			pm.insert(prefix + DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE, isSameThanLastArrivalPlace);
 
 			ptime endRangeTime(time);
 			if (continuousServiceRange.total_seconds() > 0)
@@ -2356,8 +2356,8 @@ namespace synthese
 				pm.insert(DATA_ARRIVAL_IS_TERMINUS, isItTerminus);
 			}
 
-            pm.insert(prefix + DATA_IS_ENTERING_PARKING, isEnteringParking);
-            pm.insert(prefix + DATA_IS_LEAVING_PARKING, isLeavingParking);
+			pm.insert(prefix + DATA_IS_ENTERING_PARKING, isEnteringParking);
+			pm.insert(prefix + DATA_IS_LEAVING_PARKING, isLeavingParking);
 
 			// Place
 			const NamedPlace& place(
@@ -2430,8 +2430,8 @@ namespace synthese
 			const graph::Vertex& departureVertex,
 			const graph::Vertex& arrivalVertex,
 			bool isFirstFoot,
-            bool concatenatedFootLegs,
-            std::size_t userClassRank
+			bool concatenatedFootLegs,
+			std::size_t userClassRank
 		) const {
 			// Departure point
 			if(	departureVertex.getGeometry().get() &&
@@ -2464,7 +2464,7 @@ namespace synthese
 			}
 			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
-            pm.insert(DATA_USER_CLASS_RANK, userClassRank);
+			pm.insert(DATA_USER_CLASS_RANK, userClassRank);
 
 			// WKT
 			if(geometry)
