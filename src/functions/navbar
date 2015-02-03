@@ -1,0 +1,56 @@
+<div class="navbar navbar-inverse <@top?"navbar-fixed-top":"navbar-fixed-bottom"@>" style="margin-bottom:0; padding-left:0 !important; padding-right:0 !important;">
+ <div class="navbar-inner" style="border-radius:0 !important; padding-left:0 !important; padding-right:0 !important;">
+  <div class="container-fluid">
+   <?link&
+     target=/&
+     class=brand&
+     text=Terminus&
+   ?>
+   
+   <@userid=<?session&template=<{session&template=<{user&template=<@id@>}>}>?>@>
+   <@allsectionreadlevelforuser=<?CheckRightService&
+   	user_id=<@userid@>&name=Messages&level=READ&type=public&perimeter=messagessection/*&
+	template=<@valid@>?>@>
+   
+   <?if&
+     cond=<@session_id@>&
+     then=<div class="nav-collapse">
+           <ul class="nav">
+            <li><?link&target=/lib?></li>
+            <?if&cond=<@<@~global("print_all_section_tab")@>!=0@>&then=
+            <li><?link&target=/all_sections&text=Toutes sections?></li>
+            ?>
+            <?messages_sections&
+              template=<{section&
+                                       empty=<li><?link&target=/events?></li>&
+
+                         template=<?if&cond=<@<?CheckRightService&user_id=<@userid@>&name=Messages&level=READ&type=public&perimeter=messagessection/<@id@>&
+				    	    template=<@valid@>?>||<@allsectionreadlevelforuser@>@>&
+				       then=                         
+                                    <li <@(section==id)?(" style=\"background-color:"+ color +" !important\""):""@>><?link&
+               	                        target=/events&
+                                        section=<@id@>&
+               	                        text=<@name@>&
+               	                      ?></li>&
+               	                   ?>
+              	       }>
+            ?>
+            <li><?link&target=/admin?></li>
+            <?if&cond=<@<@~global("website_media_id")@>!='none'@>&then=
+	      <?websites&template=<{website&template=<?if&cond=<@~global("website_media_id")==id@>&then=<li><?link&target=/mediatheque&text=Médiathèque?></li>?>}>?>
+	    ?>
+	   </ul>
+	   <ul class="nav pull-right">
+            <li><a href="#"><i class="icon-wrench icon-white"></i></a></li>
+            <li><?link&
+                  target=17732932122705941&
+                  a=logout&
+                  text=<i class="icon-off icon-white"></i>&
+                ?></li>
+            
+           </ul>
+          </div>&
+   ?>
+  </div>
+ </div>
+</div>

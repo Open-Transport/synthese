@@ -1,0 +1,1 @@
+<li<@(((tab=="")&&default)||(tab==id))?" class=\"active\"":""@> id="tab_<@id@>"><a href="#<@id@>" data-toggle="tab"><@title@></a></li>

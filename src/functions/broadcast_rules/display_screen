@@ -1,0 +1,15 @@
+<@screen_id=<{screen&template=<@screen_id@>}>@>
+<@screen_location_id=<{screen&template=<@location_id@>}>@>
+
+<{message&template=<{recipients&template=
+
+<{displayscreen&template=<?if&cond=<@(id==0)||(screen_id==id)@>&then=1?>}>
+<{stoparea&template=<?if&cond=<@(id==0)||(screen_location_id==id)@>&then=1?>}>
+<{line&template=<?if&cond=<@id==0@>&then=1?>
+	<?PTRoutesListFunction&roid=<@id@>&template=
+		<?PTRouteDetailFunction&roid=<@id@>&template=
+			<{stop&template=<?if&cond=<@screen_location_id==stop_id)@>&then=1?>}>
+		?>
+	?>
+}>
+}>

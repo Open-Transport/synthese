@@ -1,0 +1,10 @@
+<@userid=<?session&template=<{session&template=
+  <{user&template=<@id@>}>
+}>?>@>
+
+<?
+CheckRightService&
+user_id=<@userid@>&
+level=<@level@>&type=public&name=Messages&perimeter=messagessection/<@sectionid@>&
+template=<@<@valid@>||<?CheckRightService&user_id=<@userid@>&level=<@level@>&type=public&name=Messages&perimeter=messagessection/*&template=<@valid@>?>@>
+?>

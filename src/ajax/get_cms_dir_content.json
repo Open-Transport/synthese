@@ -1,0 +1,15 @@
+<@pages:=<?menu&root=<@roid@>&raw_data=1?>@>
+{
+"directories":[
+  <{pages.page&template=
+    <?if&cond=<@(smart_url_path!="")&&(mime_type=="text/html")@>&then=
+      { "id": "<@id@>", "name":"<@~escape_double_quotes(title)@>" },
+    ?>  
+  }>
+],"pictures":[
+  <{pages.page&template=
+    <?if&cond=<@(smart_url_path!="")&&((mime_type=="image/jpeg")||(mime_type=="image/png"))@>&then=
+      { "id": "<@id@>", "name":"<@~escape_double_quotes(title)@>", "url":"<@smart_url_path@>" },
+    ?>  
+  }>
+]}
