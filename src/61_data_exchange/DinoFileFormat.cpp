@@ -94,6 +94,7 @@ namespace synthese
 		const std::string DinoFileFormat::Importer_::FILE_CALENDAR("set_day_attribute");
 		const std::string DinoFileFormat::Importer_::FILE_CALENDAR_DATES("calendar_of_the_company");
 		const std::string DinoFileFormat::Importer_::FILE_TRIPS("rec_trip");
+		const std::string DinoFileFormat::Importer_::FILE_SERVICE_INTERDICTION("service_interdiction");
 		const std::string DinoFileFormat::Importer_::SEP(";");
 
 		const std::string DinoFileFormat::Importer_::PARAMETER_IMPORT_TRANSPORT_NETWORK("itn");
@@ -123,6 +124,7 @@ namespace synthese
 			DinoFileFormat::Importer_::FILE_DAY_TYPE_TO_ATTRIBUTE.c_str(),
 			DinoFileFormat::Importer_::FILE_CALENDAR.c_str(),
 			DinoFileFormat::Importer_::FILE_CALENDAR_DATES.c_str(),
+			DinoFileFormat::Importer_::FILE_SERVICE_INTERDICTION.c_str(),
 			DinoFileFormat::Importer_::FILE_TRIPS.c_str(),
 		"");
 	}
@@ -153,6 +155,8 @@ namespace synthese
 			it = _pathsMap.find(FILE_CALENDAR);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
 			it = _pathsMap.find(FILE_CALENDAR_DATES);
+			if(it == _pathsMap.end() || it->second.empty()) return false;
+			it = _pathsMap.find(FILE_SERVICE_INTERDICTION);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
 			it = _pathsMap.find(FILE_TRIPS);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
@@ -277,6 +281,7 @@ namespace synthese
 			trip.code = tripCode;
 			trip.journey = &journey;
 			trip.startTime = startTime;
+//			trip.interdictions = &interdictions;
 			trip.schedules = &schedules;
 			trip.calendar = calendar;
 			_logLoadDetail(
@@ -481,7 +486,10 @@ namespace synthese
 					{
 						vector<string> stopNameFields;
 						split(stopNameFields, name, is_any_of(","), token_compress_on);
-						name = trim_copy(stopNameFields[1]);
+						if(trim_copy(stopNameFields[0]) == cityName)
+						{
+							name = trim_copy(stopNameFields[1]);
+						}
 					}
 
 					_logDebug("Working on stop [" + name + "] id [" + id + "]");
@@ -626,7 +634,7 @@ namespace synthese
 					}
 					_networksMap.insert(make_pair(networkId, network));
 				} // end of while
-			}
+			} // end of FILE_BRANCH
 			// Commercial Lines
 			else if(key == FILE_LINES)
 			{
@@ -675,7 +683,7 @@ namespace synthese
 						dataSource
 					);
 				} // end of while
-			}
+			} // end of FILE_LINES
 			// Times of travel at every stop point for each service
 			else if(key == FILE_STOP_TIMES)
 			{
@@ -725,7 +733,7 @@ namespace synthese
 						schedules,
 						lastSchedulesCode
 				);
-			}
+			} // end of FILE_STOP_TIMES
 			// Initialization of Journey Patterns (code, name, direction, stop points list (metricoffset))
 			else if(key == FILE_JOURNEY)
 			{
@@ -815,7 +823,7 @@ namespace synthese
 						direction,
 						lastJourneyCode
 				);
-			}
+			} // end of FILE_JOURNEY
 			// Specific calendar definitions
 			else if(key == FILE_SERVICE_RESTRICTION)
 			{
@@ -838,17 +846,6 @@ namespace synthese
 					}
 
 					calendarStr += startDateStr.substr(0,4);
-
-//					date startDate(
-//						lexical_cast<int>(startDateStr.substr(0,4)),
-//						lexical_cast<int>(startDateStr.substr(4,2)),
-//						lexical_cast<int>(startDateStr.substr(6,2))
-//					);
-//					date endDate(
-//						lexical_cast<int>(endDateStr.substr(0,4)),
-//						lexical_cast<int>(endDateStr.substr(4,2)),
-//						lexical_cast<int>(endDateStr.substr(6,2))
-//					);
 
 					string days = trim_copy(_getValue("RESTRICTION_DAYS"));
 					int intervals = (int) (days.size() / 8);
@@ -894,7 +891,7 @@ namespace synthese
 					sr.calendar = c;
 					_restrictions.insert(make_pair(code, sr));
 				} // end of while
-			}
+			} // end of FILE_SERVICE_RESTRICTION
 			else if(key == FILE_DAY_TYPE_TO_ATTRIBUTE)
 			{
 				set<int> dayAttributes;
@@ -917,7 +914,7 @@ namespace synthese
 						_dayTypes.insert(make_pair(dayType, dayAttributes));
 					}
 				} // end of while
-			}
+			} // end of FILE_DAY_TYPE_TO_ATTRIBUTE
 			else if(key == FILE_CALENDAR)
 			{
 				string code;
@@ -972,12 +969,44 @@ namespace synthese
 
 					}
 				}
-			}
+			} // end of FILE_CALENDAR_DATES
+			// Line stops A/D exceptions bound with a precise service
+			else if(key==FILE_SERVICE_INTERDICTION)
+			{
+				string lastTripCode;
+				ServiceInterdictions serviceInterdictions;
+
+				while(getline(inFile, line))
+				{
+					_loadLine(line);
+					string tripCode(trim_copy(_getValue("TRIP_ID")));
+
+					// The trip code has changed : transform last collected data into an interdiction
+					if(tripCode != lastTripCode && lastTripCode != "")
+					{
+						_interdictions.insert(make_pair(lastTripCode, serviceInterdictions));
+
+						serviceInterdictions.clear();
+					}
+
+					// Getting the new informations for this trip
+					string interdictionCode = trim_copy(_getValue("SERVICE_INTERDICTION_CODE"));
+					int stopPointRank = lexical_cast<int>(trim_copy(_getValue("LINE_CONSEC_NR")));
+					serviceInterdictions.insert(make_pair(stopPointRank, interdictionCode));
+
+					// Now entering in the new trip
+					lastTripCode = tripCode;
+				} // end of while
+
+				// Load last service interdictions
+				_interdictions.insert(make_pair(lastTripCode, serviceInterdictions));
+
+			} // end of FILE_SERVICE_INTERDICTION
 			// Journey patterns update / Services initialization
 			else if(key == FILE_TRIPS)
 			{
 				string lastTripCode;
-				const DinoSchedules* schedules;
+				const DinoSchedules* schedules(NULL);
 				const Journey* journey(NULL);
 				Calendar calendar;
 				time_duration startTime(not_a_date_time);
@@ -997,6 +1026,7 @@ namespace synthese
 							lastTripCode,
 							calendar,
 							startTime,
+//							*interdictions,
 							*schedules
 						);
 					}
@@ -1101,6 +1131,7 @@ namespace synthese
 						lastTripCode,
 						calendar,
 						startTime,
+//						*interdictions,
 						*schedules
 					);
 				}
@@ -1112,17 +1143,43 @@ namespace synthese
 					MetricOffset offsetSum(0);
 					std::set<StopPoint*> sps;
 					size_t rank(0);
+					bool isJourneyWithInterdictions(false);
 					BOOST_FOREACH(const StoppingPoint& journeyStop, trip.second.journey->stoppingPoints)
 					{
-
+						bool isDeparture = rank+1 < trip.second.journey->stoppingPoints.size();
+						bool isArrival = rank > 0;
+						ServicesInterdictions::const_iterator itSI = _interdictions.find(trip.second.code);
+						if(itSI != _interdictions.end())
+						{
+							isJourneyWithInterdictions = true;
+							ServiceInterdictions::const_iterator itInterdiction = itSI->second.find(journeyStop.pos);
+							if(itInterdiction != itSI->second.end())
+							{
+								if(itInterdiction->second == "A")
+								{
+									isArrival = true;
+									isDeparture = false;
+								}
+								else if(itInterdiction->second == "E")
+								{
+									isArrival = false;
+									isDeparture = true;
+								}
+								else // "I"
+								{
+									isArrival = false;
+									isDeparture = false;
+								}
+							}
+						}
 						offsetSum += journeyStop.offsetFromPreviousStop;
 						sps.insert(journeyStop.stoppoint);
 						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
 							sps,
 							offsetSum,
-							rank+1 < trip.second.journey->stoppingPoints.size(),
-							rank > 0,
-							1
+							isDeparture,
+							isArrival,
+							1 /* with times */
 						);
 						stops.push_back(stop);
 						++rank;
@@ -1135,7 +1192,7 @@ namespace synthese
 					JourneyPattern* journeyPattern(
 						_createOrUpdateRoute(
 							*trip.second.journey->line,
-							trip.second.journey->code,
+							isJourneyWithInterdictions ? trip.second.journey->code + "-" + trip.second.code : trip.second.journey->code,
 							trip.second.journey->name,
 							optional<const string&>(),
 							optional<Destination*>(),
@@ -1180,7 +1237,7 @@ namespace synthese
 						*service |= trip.second.calendar;
 					}
 				} // end of registering data in ENV
-			} // end of FILE_TRIPS
+			} // end of FILE_TRIP
 
 			return true;
 		}
