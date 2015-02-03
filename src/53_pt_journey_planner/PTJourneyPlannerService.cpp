@@ -555,15 +555,6 @@ namespace synthese
 								_configuration->extendedFetchPlace(_originCityText, _originPlaceText) :
 								RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
 							;
-							if(((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_XY) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY)).empty())) &&
-								_originPlaceText.empty() && dynamic_pointer_cast<City, Place>(_departure_place.placeResult.value))
-							{
-								const City* originCity(_departure_place.cityResult.value.get());
-								computeDeparturePlace(originCity);
-							}
 						}
 					}
 				}
@@ -616,15 +607,6 @@ namespace synthese
 								_configuration->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
 								RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
 							;
-							if(((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_XY) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY)).empty())) &&
-								_destinationPlaceText.empty() && dynamic_pointer_cast<City, Place>(_arrival_place.placeResult.value))
-							{
-								const City* destinationCity(_arrival_place.cityResult.value.get());
-								computeArrivalPlace(destinationCity);
-							}
 						}
 					}
 				}
@@ -744,6 +726,26 @@ namespace synthese
                 // This configuration is not supported by the algorithm: throw an exception
                 throw RequestException("Cannot both start AND end a journey using car");
             }
+
+			// If the start/end of the journey uses the car and the departure/arrival place is empty
+			// the route planner may fail so we try to guess the most likely departure/arrival place
+			if(_startWithCar)
+			{
+				if(_originPlaceText.empty() && dynamic_pointer_cast<City, Place>(_departure_place.placeResult.value))
+				{
+					const City* originCity(_departure_place.cityResult.value.get());
+					computeDeparturePlace(originCity);
+				}
+			}
+
+			if(_endWithCar)
+			{
+				if(_destinationPlaceText.empty() && dynamic_pointer_cast<City, Place>(_arrival_place.placeResult.value))
+				{
+					const City* arrivalCity(_arrival_place.cityResult.value.get());
+					computeArrivalPlace(arrivalCity);
+				}
+			}
 
 			// Date parameters
 			try
