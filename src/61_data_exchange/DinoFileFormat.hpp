@@ -97,6 +97,7 @@ namespace synthese
 				static const std::string FILE_CALENDAR;
 				static const std::string FILE_CALENDAR_DATES;
 				static const std::string FILE_TRIPS;
+				static const std::string FILE_SERVICE_INTERDICTION;
 
 				static const std::string PARAMETER_IMPORT_TRANSPORT_NETWORK;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
@@ -202,6 +203,10 @@ namespace synthese
 				mutable DinoCalendars _dayAttributes; /* DAY ATTRIBUTE NR as key */
 				typedef std::map<int, std::set<int> > DayTypes;
 				mutable DayTypes _dayTypes;
+
+				typedef std::map<int /* sp rank */, std::string /* interdiction : A, E or I */> ServiceInterdictions;
+				typedef std::map<std::string /* trip code */, ServiceInterdictions> ServicesInterdictions;
+				mutable ServicesInterdictions _interdictions;
 
 				struct Trip
 				{
