@@ -1,0 +1,7 @@
+<?menu&raw_data=1&template=<{page&template=
+<div class="span4 well">
+<h1><@title@></h1>
+<p><@abstract@></p>
+<?link&target=<@id@>&text=Ouvrir&class=btn btn-primary?>
+</div>
+}>?>

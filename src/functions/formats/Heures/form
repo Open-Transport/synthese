@@ -1,0 +1,74 @@
+<#forms/yes_no_input&
+  label=Effacer données anciennes&
+  name=clean_old_data&
+#>
+
+<#forms/text_input&
+  label=Date de début&
+  name=start_date&
+#>
+
+<#forms/text_input&
+  label=Date de fin&
+  name=end_date&
+#>
+
+<#forms/text_input&
+  label=Fichier des arrêts&
+  name=papointsarrets&
+#>
+
+<#forms/text_input&
+  label=Fichier des itinéraires&
+  name=paitinerai&
+#>
+
+<#forms/text_input&
+  label=Fichier des tronçons&
+  name=patroncons&
+#>
+
+<#forms/text_input&
+  label=Fichier des services&
+  name=paservices&
+#>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<#forms/network_selector&
+  name=network_id&
+#>
+
+<#forms/datasource_selector&
+  label=Source de données des arrêts (si différente)&
+  name=stops_datasource_id&
+#>
+
+<#forms/calendar_selector&
+  label=Calendrier de base&
+  name=calendar_id&
+#>
+
+<#forms/calendar_selector&
+  label=Calendrier des jours fériés&
+  name=day7_calendar_id&
+#>
+
+<div class="control-group">
+ <label class="control-label">Unité d'exploitation</label>
+ <div class="controls">
+  <select name="operation_unit_id" is_parameter="true"><@input_value=<@~variable("import.operation_unit_id")@>@>
+   <option value="">(non défini)</option>
+   <?operation_units&template=<{operation_unit&template=
+   	<option value="<@id@>" <@(id==input_value)?"selected=\"true\"":""@>><@name@></option>
+   }>?>
+  </select>
+ </div>
+</div>
+
+<h3>Mode debug</h3>
+
+<#forms/yes_no_input&
+  name=display_linked_stops&
+  label=Affichage des arrêts&
+#>

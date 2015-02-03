@@ -1,0 +1,9 @@
+<#forms/text_input&
+  label=Adresse&
+  name=address&
+#>
+
+<#forms/text_input&
+  label=Port&
+  name=port&
+#>

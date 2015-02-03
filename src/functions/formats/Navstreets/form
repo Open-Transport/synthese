@@ -1,0 +1,23 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier rues (streets)&
+  name=pa2streets&
+#>
+
+<#forms/text_input&
+  label=Fichier zones administratives (mtdarea)&
+  name=pa1mtdarea&
+#>
+
+<#forms/text_input&
+  label=Fichier lieux publics (poi)&
+  name=pa3places&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Création automatique des communes&
+  name=cities_auto_creation&
+#>

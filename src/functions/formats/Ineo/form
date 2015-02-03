@@ -1,0 +1,197 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier arrêts (PNT)&
+  name=papnt&
+#>
+
+<#forms/text_input&
+  label=Fichier points de forme (PTF)&
+  name=paptf&
+#>
+
+<#forms/text_input&
+  label=Fichier des distances (DIS)&
+  name=padis&
+#>
+
+<#forms/text_input&
+  label=Fichier des destinations (DST)&
+  name=padst&
+#>
+
+<#forms/text_input&
+  label=Fichier des lignes (LIG)&
+  name=palig&
+#>
+
+<#forms/text_input&
+  label=Fichier des dates de calendriers (CJV)&
+  name=pacjv&
+#>
+
+<#forms/text_input&
+  label=Fichier des calendriers (CAL)&
+  name=pacal&
+#>
+
+<#forms/text_input&
+  label=Fichier des horaires (HOR)&
+  name=pahor&
+#>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<#forms/network_selector&
+  name=net&
+#>
+
+<#forms/text_input&
+  label=Règle d'utilisation représentant l'accessibilité handicapé&
+  name=handicapped_allowed_use_rule&
+#>
+
+<#forms/text_input&
+  label=Règle d'utilisation pour course interdite&
+  name=forbidden_service_use_rule&
+#>
+
+<h3>Choix des champs contenant les données</h3>
+
+<#forms/radio_inputs&
+  label=Lignes : identifiant&
+  name=line_read_method&
+  label1=CIDX&
+  value1=CIDX&
+  label2=SV&
+  value2=SV&
+#>
+
+<#forms/radio_inputs&
+  label=Lignes : identifiant prioritaire sur fichier des girouettes&
+  name=journey_pattern_line_overload_field&
+  label1=non utilisé&
+  value1=&
+  label2=DSTAS&
+  value2=DSTAS&
+  help=Si le champ spécifié est rempli, alors sa valeur est considérée comme identifiant de la ligne à la place du champ classique.&
+#>
+
+<#forms/radio_inputs&
+  label=Lignes : nom court&
+  name=line_short_name_field&
+  label1=NLGIV&
+  value1=NLGIV&
+  label2=MNLC&
+  value2=MNLC&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : identifiant&
+  name=stop_id_field&
+  label1=MNLP&
+  value1=MNLP&
+  label2=IdentSMS&
+  value2=IdentSMS&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : nom&
+  name=stop_name_field&
+  label1=LIBP&
+  value1=LIBP&
+  label2=LIBCOM&
+  value2=LIBCOM&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : identifiant arrêt commercial&
+  name=stop_area_id_field&
+  label1=MNCP&
+  value1=MNCP&
+  label2=LIBP&
+  value2=LIBP&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts : accessibilité handicapés&
+  name=stop_handicapped_accessibility_field&
+  label1=pas de champ accessibilité&
+  value1=&
+  label2=UFR&
+  value2=UFR&
+#>
+
+<#forms/radio_inputs&
+  label=Arrêts commerciaux : commune&
+  name=stop_city_code_field&
+  label1=pas de champ commune&
+  value1=&
+  label2=code_commune&
+  value2=code_commune&
+#>
+
+<?if&cond=<@stop_city_code_field==""@>&then=
+	<#forms/text_input&
+	  label=ID commune pour les nouveaux arrêts commerciaux&
+	  name=sadc&
+	#>
+?>
+
+<h3>Retraitements sur les données</h3>
+
+<#forms/text_input&
+  label=Nouveaux arrêts commerciaux : temps de correspondance&
+  name=sadt&
+  class=input-mini&
+  unit=min&
+#>
+
+<#forms/yes_no_input&
+  label=Ajouter le sens au code des itinéraires&
+  name=add_wayback_to_journeypattern_code&
+#>
+
+<#forms/text_input&
+  label=Suffixe à ajouter au code des services voitures&
+  name=vehicle_service_suffix&
+#>
+
+<h3>Rapport d'import</h3>
+
+<#forms/yes_no_input&
+  label=Affichage des arrêts liés&
+  name=display_linked_stops&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Effacer données existantes&
+  name=clean_old_data&
+#>
+
+<#forms/yes_no_input&
+  label=Effacer arrêts inutilisés&
+  name=clean_unused_stops&
+#>
+
+<#forms/yes_no_input&
+  label=Importer arrêts&
+  name=impstp&
+#>
+
+<#forms/yes_no_input&
+  label=Import automatique des arrêts commerciaux&
+  name=isa&
+#>
+
+<#forms/yes_no_input&
+  label=Ignorer données passées&
+  name=from_today&
+#>
+
+<#forms/yes_no_input&
+  label=Purge automatique des jours passés&
+  name=auto_purge&
+#>

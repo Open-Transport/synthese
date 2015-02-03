@@ -1,0 +1,22 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier d'adresses&
+  name=paaddress&
+#>
+
+<h3>Rapport d'import</h3>
+
+<#forms/yes_no_input&
+  label=Afficher statistiques&
+  name=display_stats&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/text_input&
+  label=Distance maximale adresse/rue&
+  name=max_house_distance&
+  class=input-mini&
+  unit=m&
+#>
