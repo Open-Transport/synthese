@@ -480,8 +480,9 @@ namespace synthese
 					}
 
 					string id(_getValue("STOP_NR"));
-					string name(_getValue("STOP_NAME"));
+					string name(trim_copy(_getValue("STOP_NAME")));
 					// case where "stop name" is "<city name>, <stop name>"
+					/*
 					if(!name.empty() && name.find(",")!=string::npos)
 					{
 						vector<string> stopNameFields;
@@ -491,6 +492,7 @@ namespace synthese
 							name = trim_copy(stopNameFields[1]);
 						}
 					}
+					*/
 
 					_logDebug("Working on stop [" + name + "] id [" + id + "]");
 
