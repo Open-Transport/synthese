@@ -421,12 +421,16 @@ namespace synthese
 								{
 									BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop.second->getDepartureEdges())
 									{
-										JourneyPattern* jp(dynamic_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
-										if(jp)
+										// Prevent from junctionstop cases
+										if(dynamic_cast<const LinePhysicalStop*>(edge.second))
 										{
-									 		lines.insert(
-												jp->getCommercialLine()
-											);
+											JourneyPattern* jp(dynamic_cast<const LinePhysicalStop*>(edge.second)->getJourneyPattern());
+											if(jp)
+											{
+												lines.insert(
+															jp->getCommercialLine()
+															);
+											}
 										}
 									}
 								}
