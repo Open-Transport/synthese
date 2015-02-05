@@ -1205,7 +1205,18 @@ namespace synthese
 					message = static_pointer_cast<SentAlarm,Alarm>(msgs.front());
 					if(_recipients)
 					{
-						AlarmObjectLinkTableSync::RemoveByMessage(message->getKey(), optional<RegistryKeyType>(), transaction);
+						// Links
+						BOOST_FOREACH(boost::shared_ptr<AlarmRecipient> linkType, Factory<AlarmRecipient>::GetNewCollection())
+						{
+							// Recipients
+							Alarm::LinkedObjects::mapped_type existingLinks(message->getLinkedObjects(linkType->getFactoryKey()));
+							
+							// Removals
+							BOOST_FOREACH(const AlarmObjectLink* link, existingLinks)
+							{
+								AlarmObjectLinkTableSync::Remove(request.getSession().get(), link->getKey(), transaction, false);
+							}
+						}
 					}
 				}
 				else
