@@ -119,7 +119,7 @@ namespace synthese
 			}
 			else
 			{
-				return _beforeTransfers->getBeforeTransferTimetable(depth - 1);
+				return _beforeTransfers == NULL ? *this : _beforeTransfers->getBeforeTransferTimetable(depth - 1);
 			}
 		}
 
@@ -144,7 +144,7 @@ namespace synthese
 			}
 			else
 			{
-				return _afterTransfers->getAfterTransferTimetable(depth - 1);
+				return _afterTransfers == NULL ? *this : _afterTransfers->getAfterTransferTimetable(depth - 1);
 			}
 		}
 
