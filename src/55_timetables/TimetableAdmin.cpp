@@ -660,7 +660,15 @@ namespace synthese
 								)
 							);
 							stream << f.open();
-							HTMLTable t2;
+
+							// Table header
+							HTMLTable::ColsVector ct2;
+							ct2.push_back(string());
+							ct2.push_back("Arrêt");
+							ct2.push_back("Rang");
+							ct2.push_back("Position d'insertion");
+							ct2.push_back("Action");
+							HTMLTable t2(ct2);
 							stream << t2.open();
 							BOOST_FOREACH(const TimetableRowGroup::Items::value_type& item, rowGroup->getItems())
 							{
@@ -833,7 +841,7 @@ namespace synthese
 						stream << t3.col() <<
 							HTMLModule::getHTMLLink(
 								setLineRequest.getURL(),
-								_timetable->getAuthorizedLines().find(line) == _timetable->getAuthorizedLines().end() ? HTMLModule::getHTMLImage("cross.png", "Non sélectionnée") :  HTMLModule::getHTMLImage("tick.png", "Sélectionnée")
+								_timetable->getAuthorizedLines().find(line) == _timetable->getAuthorizedLines().end() ? HTMLModule::getHTMLImage("/admin/img/cross.png", "Non sélectionnée") :  HTMLModule::getHTMLImage("/admin/img/tick.png", "Sélectionnée")
 							)
 						;
 
@@ -1082,23 +1090,45 @@ namespace synthese
 			{
 				timetable = isBefore ? timetable->getTransferTimetableBefore(depth) : timetable->getTransferTimetableAfter(depth);
 			}
-			BOOST_FOREACH(const Timetable::Rows::value_type& row, timetable->getRows())
+			if(!timetable->getRows().empty())
 			{
-				if(!row.getPlace())
+				BOOST_FOREACH(const Timetable::Rows::value_type& row, timetable->getRows())
 				{
-					continue;
-				}
-
-				stream << tf.row();
-				stream << tf.col(1, string(), true) << row.getPlace()->getFullName();
-				const TimetableResult::RowTimesVector cols(result.getRowSchedules(row.getRank()));
-				BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& col, cols)
-				{
-					stream << tf.col();
-					if (!col.second.is_not_a_date_time())
+					if(!row.getPlace())
 					{
-						stream << col.second.hours() << ":" << col.second.minutes();
+						continue;
 					}
+
+					stream << tf.row();
+					stream << tf.col(1, string(), true) << row.getPlace()->getFullName();
+					const TimetableResult::RowTimesVector cols(result.getRowSchedules(row.getRank()));
+					BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& col, cols)
+					{
+						stream << tf.col();
+						if (!col.second.is_not_a_date_time())
+						{
+							stream << col.second.hours() << ":" << col.second.minutes();
+						}
+					}
+				}
+			}
+			else // new method
+			{
+				size_t rk(0);
+				BOOST_FOREACH(const pt::StopArea* place, result.getStopAreas())
+				{
+					stream << tf.row();
+					stream << tf.col(1, string(), true) << place->getFullName();
+					const TimetableResult::RowTimesVector cols(result.getRowSchedules(rk));
+					BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& col, cols)
+					{
+						stream << tf.col();
+						if (!col.second.is_not_a_date_time())
+						{
+							stream << col.second.hours() << ":" << col.second.minutes();
+						}
+					}
+					rk++;
 				}
 			}
 

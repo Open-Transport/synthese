@@ -41,6 +41,7 @@ namespace synthese
 	{
 		class CommercialLine;
 		class SchedulesBasedService;
+		class StopArea;
 	}
 
 	namespace timetables
@@ -64,6 +65,7 @@ namespace synthese
 			typedef std::vector<const vehicle::RollingStock*> RowRollingStockVector;
 			typedef std::vector<TimetableColumn::Content::value_type> RowTimesVector;
 			typedef std::vector<TimetableColumn::tTypeOD>	RowTypeODVector;
+			typedef std::vector<const pt::StopArea*> RowStopAreasVector;
 
 
 		private:
@@ -71,6 +73,7 @@ namespace synthese
 			boost::shared_ptr<TimetableResult>	_afterTransfers;
 			Columns			_columns;
 			boost::shared_ptr<Warnings>		_warnings;
+			RowStopAreasVector				_stopAreas;
 
 		public:
 			TimetableResult(boost::shared_ptr<Warnings> warnings);
@@ -82,6 +85,8 @@ namespace synthese
 				Warnings&	getWarnings()	{ return *_warnings; }
 				const Columns&	getColumns()	const { return _columns; }
 				Columns&	getColumns()	{ return _columns; }
+				const RowStopAreasVector& getStopAreas() const { return _stopAreas; }
+				RowStopAreasVector& getStopAreas() { return _stopAreas; }
 			//@}
 
 			//! @name Modifiers
