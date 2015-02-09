@@ -723,7 +723,7 @@ namespace synthese
 								// Removal
 								stream << t2.col();
 								removeRequest.getAction()->setObjectId(item->get<Key>());
-								stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le groupe ?");
+								stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 							}
 
 							//////////////////////////////////////////////////////////////////////////
