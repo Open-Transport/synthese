@@ -254,6 +254,7 @@ namespace synthese
 		void DinoFileFormat::Importer_::_selectAndLoadTrip(TripsMap& trips,
 				Journey& journey,
 				const string& tripCode,
+				const string& trainNr,
 				const Calendar& calendar,
 				const time_duration& startTime,
 				const DinoSchedules& schedules
@@ -262,7 +263,7 @@ namespace synthese
 			if(schedules.size() > 0 && schedules.size() != journey.stoppingPoints.size())
 			{
 				_logWarningDetail(
-							"TRIP",tripCode,journey.code,0,string(),
+							"TRIP",tripCode,journey.code,0,trainNr,
 							lexical_cast<string>(schedules.size()),
 							lexical_cast<string>(journey.stoppingPoints.size()),
 							"Bad schedule number compared to stopping point list size"
@@ -279,13 +280,14 @@ namespace synthese
 			);
 
 			trip.code = tripCode;
+			trip.trainNr = trainNr;
 			trip.journey = &journey;
 			trip.startTime = startTime;
 //			trip.interdictions = &interdictions;
 			trip.schedules = &schedules;
 			trip.calendar = calendar;
 			_logLoadDetail(
-				"SERVICE",tripCode,journey.code,0,
+				"TRIP",tripCode,journey.code,0,
 				lexical_cast<string>(startTime.total_seconds()),
 				lexical_cast<string>(schedules.size()),
 				lexical_cast<string>(journey.stoppingPoints.size()),
@@ -984,7 +986,7 @@ namespace synthese
 					string tripCode(trim_copy(_getValue("TRIP_ID")));
 
 					// The trip code has changed : transform last collected data into an interdiction
-					if(tripCode != lastTripCode && lastTripCode != "")
+					if(tripCode != lastTripCode && !lastTripCode.empty())
 					{
 						_interdictions.insert(make_pair(lastTripCode, serviceInterdictions));
 
@@ -1012,6 +1014,7 @@ namespace synthese
 				const Journey* journey(NULL);
 				Calendar calendar;
 				time_duration startTime(not_a_date_time);
+				string trainNr;
 
 				while(getline(inFile, line))
 				{
@@ -1020,12 +1023,14 @@ namespace synthese
 
 					// The trip code has changed : transform last collected data into a course if selected
 					if(	journey &&
-						tripCode != lastTripCode
+						tripCode != lastTripCode &&
+						!lastTripCode.empty()
 					){
 						_selectAndLoadTrip(
 							_trips,
 							*const_cast<Journey*>(journey),
 							lastTripCode,
+							trainNr,
 							calendar,
 							startTime,
 //							*interdictions,
@@ -1040,6 +1045,7 @@ namespace synthese
 						string dinoSchedulesCode = journeyCode + "-" + _getValue("TIMING_GROUP_NR");
 						int startTimeSeconds = lexical_cast<int>(trim_copy(_getValue("DEPARTURE_TIME")));
 						startTime = seconds(startTimeSeconds);
+						trainNr = trim_copy(_getValue("TRAIN_NR"));
 						string restriction = _getValue("RESTRICTION");
 						if(!restriction.empty())
 						{
@@ -1131,6 +1137,7 @@ namespace synthese
 						_trips,
 						*const_cast<Journey*>(journey),
 						lastTripCode,
+						trainNr,
 						calendar,
 						startTime,
 //						*interdictions,
@@ -1194,7 +1201,7 @@ namespace synthese
 					JourneyPattern* journeyPattern(
 						_createOrUpdateRoute(
 							*trip.second.journey->line,
-							isJourneyWithInterdictions ? trip.second.journey->code + "-" + trip.second.code : trip.second.journey->code,
+							isJourneyWithInterdictions ? trip.second.journey->code + "-" + trip.second.trainNr : trip.second.journey->code,
 							trip.second.journey->name,
 							optional<const string&>(),
 							optional<Destination*>(),
@@ -1227,12 +1234,12 @@ namespace synthese
 							*journeyPattern,
 							departures,
 							arrivals,
-							_ignoreServiceNumber ? string() : trip.second.code,
+							_ignoreServiceNumber ? string() : trip.second.trainNr,
 							dataSource,
 							optional<const string&>(),
 							optional<const RuleUser::Rules&>(),
 							optional<const JourneyPattern::StopsWithDepartureArrivalAuthorization&>(stops),
-							trip.second.code
+							trip.second.trainNr
 					)	);
 					if(service)
 					{
@@ -1283,6 +1290,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getEditableRegistry<LineStop>())
 			{
+				lineStop.second->set<ReservationNeeded>(false);
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}
 			BOOST_FOREACH(const ScheduledService::Registry::value_type& service, _env.getRegistry<ScheduledService>())

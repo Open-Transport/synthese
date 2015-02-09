@@ -211,6 +211,7 @@ namespace synthese
 				struct Trip
 				{
 					std::string code;
+					std::string trainNr;
 					Journey* journey;
 					boost::posix_time::time_duration startTime;
 					calendar::Calendar calendar;
@@ -222,6 +223,7 @@ namespace synthese
 				void _selectAndLoadTrip(TripsMap& trips,
 					Journey &journey,
 					const std::string& tripCode,
+					const std::string& trainNr,
 					const calendar::Calendar& calendar,
 					const boost::posix_time::time_duration& startTime,
 					const DinoSchedules& schedules
