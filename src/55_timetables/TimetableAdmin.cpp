@@ -878,7 +878,7 @@ namespace synthese
 							stream << t4.col() <<
 								HTMLModule::getHTMLLink(
 									setStopRequest.getURL(),
-									_timetable->getAuthorizedPhysicalStops().find(stop.get()) == _timetable->getAuthorizedPhysicalStops().end() ? HTMLModule::getHTMLImage("cross.png", "Non sélectionné") :  HTMLModule::getHTMLImage("tick.png", "Sélectionné")
+									_timetable->getAuthorizedPhysicalStops().find(stop.get()) == _timetable->getAuthorizedPhysicalStops().end() ? HTMLModule::getHTMLImage("/admin/img/cross.png", "Non sélectionné") :  HTMLModule::getHTMLImage("/admin/img/tick.png", "Sélectionné")
 								)
 							;
 
