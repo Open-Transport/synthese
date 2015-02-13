@@ -172,6 +172,10 @@ namespace synthese
 			time_duration highestDuration(not_a_date_time);
 
 			// Time loop
+			// Note that actually the loop does not execute for each minute of the departure/arrival time interval
+			// because after each pass originDateTime is corrected with the result of the pass
+			// ex: if the search starts at H0 and the first pass returns a service S starting at H0+t then
+			// the second pass will start at H0+t+1 minute because the best solution from H0+1 to H0+t-1 would always be S
 			for(ptime originDateTime(_planningOrder == DEPARTURE_FIRST ? _lowestDepartureTime : _highestArrivalTime);
 				_planningOrder == DEPARTURE_FIRST ? originDateTime <= _highestDepartureTime : originDateTime >= _lowestArrivalTime;
 				_planningOrder == DEPARTURE_FIRST ? originDateTime += minutes(1) : originDateTime -= minutes(1)
@@ -200,6 +204,8 @@ namespace synthese
 				);
 				Journey journey(r.run());
 
+				// if RoutePlanner returns no solution then there is no solution for the time interval [originDateTime, highestDepartureTime]
+				// (or [lowestArrivalTime, originDateTime if the search is inverted) => break the time loop
 				if(journey.empty()) break;
 
 				//! <li> If the journey is continuous, attempt to break it. </li>

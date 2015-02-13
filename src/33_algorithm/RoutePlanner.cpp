@@ -166,16 +166,8 @@ namespace synthese
 				}
 				if(!ok)
 				{
-					// Continue searching further recursively
-					if(_planningOrder == DEPARTURE_FIRST)
-					{
-						_minBeginTime = result2.getServiceUses().begin()->getDepartureDateTime() + minutes(1);
-					}
-					else
-					{
-						_minBeginTime = result2.getServiceUses().rbegin()->getArrivalDateTime() - minutes(1);
-					}
-					return run(ignoreDurationFilterFirstRun);
+					// revert on fix #50521 because it can generate assertion failures
+					result2.clear();
 				}
 			}
 
