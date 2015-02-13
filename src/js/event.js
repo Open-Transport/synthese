@@ -853,11 +853,45 @@ function change_event_title() {
   activateForm();
 }
 
-function change_event_date() {
-  var ddmmyyyy = $(this).val();
-  $('#the_form').find('input[name=' + $(this).attr('name') + ']').val(ddmmyyyy);
-  activateForm();
+function pick_event_date() {
+    var dateInput = $(this).find("input")[0];
+    change_event_date.apply(dateInput);
 }
+
+
+function change_event_date() {
+    var timeInputName = $(this).attr('name').replace('_date', '_time');
+    var diffusionForm = $('#diffusion-properties');
+    var timeInput = diffusionForm.find('input[name=' + timeInputName + ']');
+
+    if ($(this).val().length != 10) {
+        $(this).val('');
+        timeInput.val('');
+    } else if (timeInput.val().length == 0) {
+        if (timeInputName.indexOf('start') != -1) {
+            timeInput.val('00:00');
+        } else {
+            timeInput.val('23:59');
+        }
+    }
+    activateForm();
+}
+
+function change_event_time() {
+    var dateInputName = $(this).attr('name').replace('_date', '_time');
+    var diffusionForm = $('#diffusion-properties');
+    var dateInput = diffusionForm.find('input[name=' + dateInputName + ']');
+
+    if ($(this).val().length != 5) {
+        if (dateInputName.indexOf('start') != -1) {
+            $(this).val('00:00');
+        } else {
+            $(this).val('23:59');
+        }
+    } 
+    activateForm();
+}
+
 
 function calendar_rename()
 {
@@ -1108,11 +1142,10 @@ $(function(){
   diffusionForm.find('input[name=actionParamnam]').bind('keyup', change_event_title);
   diffusionForm.find('input[name=actionParamnam]').bind('cut', change_event_title);
   diffusionForm.find('input[name=actionParamnam]').bind('paste', change_event_title);
-  diffusionForm.find('input[name=actionParam_event_start_date]').bind('keyup', change_event_date);
-  diffusionForm.find('input[name=actionParam_event_start_date]').bind('paste', change_event_date);
-  diffusionForm.find('input[name=actionParam_event_start_time]').bind('keyup', change_event_date);
-  diffusionForm.find('input[name=actionParam_event_end_date]').bind('keyup', change_event_date);
-  diffusionForm.find('input[name=actionParam_event_end_time]').bind('keyup', change_event_date);
-  diffusionForm.find('.date').datepicker({format: 'dd/mm/yyyy'}).on('changeDate',activateForm);;
+  diffusionForm.find('input[name=actionParam_event_start_date]').bind('focusout', change_event_date);
+  diffusionForm.find('input[name=actionParam_event_start_time]').bind('focusout', change_event_time);
+  diffusionForm.find('input[name=actionParam_event_end_date]').bind('focusout', change_event_date);
+  diffusionForm.find('input[name=actionParam_event_end_time]').bind('focusout', change_event_time);
+  diffusionForm.find('.date').datepicker({format: 'dd/mm/yyyy'}).on('changeDate', pick_event_date);;
 
 });
