@@ -40,6 +40,7 @@
 #include "TimetableRight.h"
 #include "TimetableRow.h"
 #include "TimetableRowTableSync.h"
+#include "TimetableRowGroupTableSync.hpp"
 #include "User.h"
 
 #include <sstream>
@@ -173,6 +174,14 @@ namespace synthese
 					BOOST_FOREACH(const boost::shared_ptr<TimetableRow>& row, rows)
 					{
 						object->addRow(*row);
+					}
+
+					TimetableRowGroupTableSync::SearchResult rowGroups(
+						TimetableRowGroupTableSync::Search(Env::GetOfficialEnv(), object->getKey())
+					);
+					BOOST_FOREACH(const boost::shared_ptr<TimetableRowGroup>& rowGroup, rowGroups)
+					{
+						object->addRowGroup(*rowGroup);
 					}
 				}
 

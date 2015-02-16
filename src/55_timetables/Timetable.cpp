@@ -77,6 +77,7 @@ namespace synthese
 		void Timetable::clearRows()
 		{
 			_rows.clear();
+			_rowGroups.clear();
 		}
 
 
