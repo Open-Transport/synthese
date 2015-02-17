@@ -109,7 +109,8 @@ namespace synthese
 		TimetableBuildService::TimetableBuildService():
 			FactorableTemplate<Function,TimetableBuildService>(),
 			_warnings(new TimetableResult::Warnings),
-			_timetableRank(0)
+			_timetableRank(0),
+			_withWarnings(true)
 		{}
 
 
@@ -553,7 +554,7 @@ namespace synthese
 				}
 
 				// Timetable build
-				TimetableResult result(generator->build(*_withWarnings, _warnings));
+				TimetableResult result(generator->build(_withWarnings, _warnings));
 
 				if(object.getContentType() == Timetable::TABLE_SERVICES_IN_COLS)
 				{

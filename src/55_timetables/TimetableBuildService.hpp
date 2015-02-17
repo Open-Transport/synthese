@@ -114,7 +114,7 @@ namespace synthese
 				std::vector<boost::shared_ptr<Timetable> > _containerContent;
 				std::size_t _timetableRank;
 				boost::optional<bool> _mergeColsWithSameSchedules;
-				boost::optional<bool> _withWarnings;
+				bool _withWarnings;
 			//@}
 
 			mutable std::vector<boost::shared_ptr<TimetableRowGroup> > _rowGroupsOwner;
