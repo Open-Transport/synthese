@@ -105,6 +105,7 @@ namespace synthese
 		const string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_USE_LINE_SHORT_NAME_AS_ID("use_line_short_name_as_id");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_SERVICE_NUMBER("ignore_service_number");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_DIRECTIONS("ignore_directions");
 
 		const std::string GTFSFileFormat::Exporter_::PARAMETER_NETWORK_ID("ni");
 		const std::string GTFSFileFormat::Exporter_::LABEL_TAD("tad");
@@ -171,6 +172,7 @@ namespace synthese
 			_displayLinkedStops(false),
 			_useLineShortNameAsId(false),
 			_ignoreServiceNumber(false),
+			_ignoreDirections(false),
 			_networks(*import.get<DataSource>(), env),
 			_stopPoints(*import.get<DataSource>(), env),
 			_lines(*import.get<DataSource>(), env)
@@ -576,7 +578,14 @@ namespace synthese
 					trip.calendar = it->second;
 
 					// Destination
-					trip.destination = _getValue("trip_headsign");
+					if (!_ignoreDirections)
+					{
+						trip.destination = _getValue("trip_headsign");
+					}
+					else
+					{
+						trip.destination = "";
+					}
 
 					// Direction
 					if (_fieldsMap.find("direction_id") != _fieldsMap.end())
@@ -867,6 +876,7 @@ namespace synthese
 			map.insert(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks));
 			map.insert(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, _useLineShortNameAsId);
 			map.insert(PARAMETER_IGNORE_SERVICE_NUMBER, _ignoreServiceNumber);
+			map.insert(PARAMETER_IGNORE_DIRECTIONS, _ignoreDirections);
 			return map;
 		}
 
@@ -917,6 +927,7 @@ namespace synthese
 			
 			_useLineShortNameAsId = map.getDefault<bool>(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, false);
 			_ignoreServiceNumber = map.getDefault<bool>(PARAMETER_IGNORE_SERVICE_NUMBER, false);
+			_ignoreDirections = map.getDefault<bool>(PARAMETER_IGNORE_DIRECTIONS, false);
 		}
 
 
