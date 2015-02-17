@@ -859,31 +859,35 @@ function pick_event_date() {
 }
 
 
+function is_start_input(inputElement) {
+    if ($(inputElement).is('[name]') && $(inputElement).attr('name').indexOf('start') != -1) return true;
+    if ($(inputElement).is('[field]') && $(inputElement).attr('field').indexOf('start') != -1) return true;
+    return false;
+}
+    
+
+
 function change_event_date() {
-    var timeInputName = $(this).attr('name').replace('_date', '_time');
-    var diffusionForm = $('#diffusion-properties');
-    var timeInput = diffusionForm.find('input[name=' + timeInputName + ']');
+    var timeInput = $(this).parents('div.controls').find('input')[1];
 
     if ($(this).val().length != 10) {
         $(this).val('');
-        timeInput.val('');
-    } else if (timeInput.val().length == 0) {
-        if (timeInputName.indexOf('start') != -1) {
-            timeInput.val('00:00');
+        $(timeInput).val('');
+    } else if ($(timeInput).val().length == 0) {
+        if (is_start_input(timeInput)) {
+            $(timeInput).val('00:00');
         } else {
-            timeInput.val('23:59');
+            $(timeInput).val('23:59');
         }
     }
     activateForm();
 }
 
 function change_event_time() {
-    var dateInputName = $(this).attr('name').replace('_date', '_time');
-    var diffusionForm = $('#diffusion-properties');
-    var dateInput = diffusionForm.find('input[name=' + dateInputName + ']');
+    var dateInput = $(this).parents('div.controls').find('input')[0];
 
     if ($(this).val().length != 5) {
-        if (dateInputName.indexOf('start') != -1) {
+        if (is_start_input(dateInput)) {
             $(this).val('00:00');
         } else {
             $(this).val('23:59');
@@ -995,7 +999,7 @@ function add_period(period)
        s +='" />' +
        '<span class="add-on"><i class="icon-th"></i></span>' +
       '</div> ' +
-      '<input type="text" class="input-mini" field="end_date_hour" placeholder="HH:MM"  onkeyup="activateForm()" onpaste="activateForm()" oncut="activateForm()" value="';
+      '<input type="text" class="input-mini" field="end_date_hour" placeholder="HH:MM" value="';
       if(end_date)
       {
         s += end_date.getHours() +':'+ end_date.getMinutes();
@@ -1012,9 +1016,17 @@ function add_period(period)
     '</div>' +
    '</div>';
   
+  
   $('#periods').append(s);
-  $('.date').datepicker().on('changeDate',activateForm);
+  $('.date').datepicker().on('changeDate', pick_event_date);
   $('#remove_period_'+ period.rank).click(remove_period_click);
+  
+  
+  $(function(){
+     $('#periods').find('div.controls').find("input[field $= 'date_day']").bind('focusout', change_event_date); 
+     $('#periods').find('div.controls').find("input[field $= 'date_hour']").bind('focusout', change_event_time); 
+  });
+
 }
 
 function remove_period_click()
@@ -1137,6 +1149,7 @@ $(function(){
   $('textarea[field=message_alternative]').keyup(update_chars_alternative);
   $('.modal').bind('shown', focus_on_input);
 
+
   // Diffusion page behaviors.
   var diffusionForm = $('#diffusion-properties');
   diffusionForm.find('input[name=actionParamnam]').bind('keyup', change_event_title);
@@ -1148,4 +1161,4 @@ $(function(){
   diffusionForm.find('input[name=actionParam_event_end_time]').bind('focusout', change_event_time);
   diffusionForm.find('.date').datepicker({format: 'dd/mm/yyyy'}).on('changeDate', pick_event_date);;
 
-});
+  });
