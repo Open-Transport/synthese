@@ -920,7 +920,7 @@ namespace synthese
 
 					// Search for general broadcast on a precise display screens type equal to
 					// the display type of the current display screen
-					if( link->getObjectId() == get<DisplayTypePtr>()->getKey())
+					if( link->getObjectId() == _displayType->getKey())
 					{
 						result = true;
 					}
