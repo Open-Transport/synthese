@@ -139,7 +139,8 @@ namespace synthese
 					boost::dynamic_pointer_cast<MessageApplicationPeriod, ObjectBase>(
 						period->copy()
 				)	);
-
+                newPeriod->setKey(0);
+                
 				// Link to the new calendar
 				period->set<ScenarioCalendar>(calendar);
 
