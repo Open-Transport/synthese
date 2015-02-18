@@ -158,7 +158,8 @@ namespace synthese
 								}
 								
 								if (servicePointer.getDepartureEdge()->getRankInPath() < journeyPattern->getEdges().size() - 2 &&
-									servicePointer.getDepartureEdge()->getFromVertex()->getKey() == journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getKey())
+									servicePointer.getDepartureEdge()->getFromVertex()->getHub() && journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getHub() &&
+									servicePointer.getDepartureEdge()->getFromVertex()->getHub() == journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getHub())
 								{
 									continue;
 								}

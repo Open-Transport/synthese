@@ -106,6 +106,7 @@ namespace synthese
 				static const std::string PARAMETER_USE_RULE_BLOCK_ID_MASK;
 				static const std::string PARAMETER_USE_LINE_SHORT_NAME_AS_ID;
 				static const std::string PARAMETER_IGNORE_SERVICE_NUMBER;
+				static const std::string PARAMETER_IGNORE_DIRECTIONS;
 
 			private:
 				static const std::string SEP;
@@ -118,6 +119,7 @@ namespace synthese
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 				bool _useLineShortNameAsId;
 				bool _ignoreServiceNumber;
+				bool _ignoreDirections;
 
 				typedef std::map<std::string, std::size_t> FieldsMap;
 				mutable FieldsMap _fieldsMap;
