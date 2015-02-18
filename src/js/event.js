@@ -942,6 +942,30 @@ function new_calendar_click()
   return false;
 }
 
+function format_date(date, month, year) {
+  var result = '';
+  if (date < 10) result += '0';
+  result += date.toString();
+  result += '/';
+  if (month < 10) result += '0';
+  result += month.toString();
+  result += '/';
+  result += year.toString();
+  return result;
+}
+
+function format_time(hours, minutes) {
+  var result = '';
+  if (hours < 10) result += '0';
+  result += hours.toString();
+  result += ':';
+  if (minutes < 10) result += '0';
+  result += minutes.toString();
+  return result;
+}
+
+
+
 function add_period(period)
 {
   var start_date = null;
@@ -963,13 +987,13 @@ function add_period(period)
       '<div class="input-append date" data-date="';
        if(start_date)
        {
-         s += start_date.getDate() +'/'+ (start_date.getMonth()+1) +'/'+ start_date.getFullYear();
+         s += format_date(start_date.getDate(), start_date.getMonth()+1, start_date.getFullYear());
        }
        s+='" data-date-format="dd/mm/yyyy">' +
        '<input class="input-small" placeholder="JJ/MM/AAAA" type="text" field="start_date_day" value="';
        if(start_date)
        {
-         s += start_date.getDate() +'/'+ (start_date.getMonth()+1) +'/'+ start_date.getFullYear();
+         s += format_date(start_date.getDate(), start_date.getMonth()+1, start_date.getFullYear());
        }
        s+= '"/>' +
        '<span class="add-on"><i class="icon-th"></i></span>' +
@@ -977,7 +1001,7 @@ function add_period(period)
       '<input type="text" class="input-mini" field="start_date_hour" placeholder="HH:MM" value="';
       if(start_date)
       {
-        s += start_date.getHours() +':'+ start_date.getMinutes();
+        s += format_time(start_date.getHours(), start_date.getMinutes());
       }
       s+='" />' +
      '</div>' +
@@ -988,13 +1012,13 @@ function add_period(period)
       '<div class="input-append date" data-date="';
        if(end_date)
        {
-         s += end_date.getDate() +'/'+ (end_date.getMonth()+1) +'/'+ end_date.getFullYear();
+         s += format_date(end_date.getDate(), end_date.getMonth()+1, end_date.getFullYear());
        }
        s += '" data-date-format="dd/mm/yyyy">' +
        '<input class="input-small" placeholder="JJ/MM/AAAA" type="text" field="end_date_day" value="';
        if(end_date)
        {
-         s += end_date.getDate() +'/'+ (end_date.getMonth()+1) +'/'+ end_date.getFullYear();
+         s += format_date(end_date.getDate(), end_date.getMonth()+1, end_date.getFullYear());
        }
        s +='" />' +
        '<span class="add-on"><i class="icon-th"></i></span>' +
@@ -1002,7 +1026,7 @@ function add_period(period)
       '<input type="text" class="input-mini" field="end_date_hour" placeholder="HH:MM" value="';
       if(end_date)
       {
-        s += end_date.getHours() +':'+ end_date.getMinutes();
+        s += format_time(end_date.getHours(), end_date.getMinutes());
       }
       s += '" />' +
      '</div>' +
