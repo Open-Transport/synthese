@@ -758,7 +758,7 @@ namespace synthese
 				{
 					// no route found from/to parking => log a warning
 					debugStr.str("");
-					debugStr << "No route for pParking " << relayPark.getStopArea()->getName() << (_startWithCar ? " <- " : " -> ")
+					debugStr << "No route for parking " << relayPark.getStopArea()->getName() << (_startWithCar ? " <- " : " -> ")
 							 << (_startWithCar ? departurePlaceName : arrivalPlaceName);
 					Log::GetInstance().warn(debugStr.str());
 				}
@@ -806,35 +806,53 @@ namespace synthese
 
 
 			// 4) Compute the public transportation journey D -> A using those VAMs
-			TimeSlotRoutePlanner r(
-				departureVam,
-				arrivalVam,
-				getLowestDepartureTime(),
-				getHighestDepartureTime(),
-				getLowestArrivalTime(),
-				getHighestArrivalTime(),
-				_whatToSearch,
-				_graphToUse,
-				_maxDuration,
-				_maxSolutionsNumber,
-				_accessParameters,
-				_planningOrder,
-				70, // 252 km/h TODO take it configurable
-				_ignoreReservation,
-				_logger,
-				_maxTransferDuration,
-				_minMaxDurationRatioFilter,
-				_enableTheoretical,
-				_enableRealTime,
-				_reservationRulesDelayType
-			);
 
-			ptJourneys = r.run();
+			// Check if departure and arrival VAMs has contains at least one vertex
+			if(departureVam.getMap().empty() ||	arrivalVam.getMap().empty())
+			{
+				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, false, ptJourneys);
+			}
 
-			// log details on the results
-			debugStr.str("");
-			debugStr << ptJourneys.size() << " mixed-mode journey(s) from " << departurePlaceName << " to " << arrivalPlaceName;
-			Log::GetInstance().debug(debugStr.str());
+			// Check if the departure and arrival places are the same
+			if(departureVam.intersercts(arrivalVam))
+			{
+				Log::GetInstance().debug("Departure VAM intersects arrival VAM => result journey is car only");
+				Journey directJourney = departureVam.getBestIntersection(arrivalVam);
+				ptJourneys.push_back(directJourney);
+			}
+
+			else
+			{
+				TimeSlotRoutePlanner r(
+					departureVam,
+					arrivalVam,
+					getLowestDepartureTime(),
+					getHighestDepartureTime(),
+					getLowestArrivalTime(),
+					getHighestArrivalTime(),
+					_whatToSearch,
+					_graphToUse,
+					_maxDuration,
+					_maxSolutionsNumber,
+					_accessParameters,
+					_planningOrder,
+					70, // 252 km/h TODO take it configurable
+					_ignoreReservation,
+					_logger,
+					_maxTransferDuration,
+					_minMaxDurationRatioFilter,
+					_enableTheoretical,
+					_enableRealTime,
+					_reservationRulesDelayType
+				);
+
+				ptJourneys = r.run();
+
+				// log details on the results
+				debugStr.str("");
+				debugStr << ptJourneys.size() << " mixed-mode journey(s) from " << departurePlaceName << " to " << arrivalPlaceName;
+				Log::GetInstance().debug(debugStr.str());
+			}
 
 			return PTRoutePlannerResult(
 				_departurePlace,
