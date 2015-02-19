@@ -102,7 +102,7 @@ Autre mot pour **évènement**, plutôt employé côté implémentation.
 
 ----------
 ### Section   
-Un regroupement logique d'**évènements** destiné à une unité
+Un regroupement logique de **messages** destiné à une unité
 d'exploitation specifique, et donc suivant une politique de droits
 d'accès appropriée.
 
