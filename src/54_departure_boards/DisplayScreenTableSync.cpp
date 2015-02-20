@@ -58,6 +58,7 @@
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string.hpp>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
@@ -166,6 +167,7 @@ namespace synthese
 			Field(DisplayScreenTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field(DisplayScreenTableSync::COL_ALLOW_CANCELED, SQL_BOOLEAN),
 			Field(DisplayScreenTableSync::COL_STOP_POINT_LOCATION, SQL_INTEGER),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
 
@@ -217,6 +219,16 @@ namespace synthese
 			object->clearDisplayedPlaces();
 			object->clearForcedDestinations();
 			object->clearTransferDestinations();
+
+			// Geometry
+			boost::shared_ptr<geos::geom::Point> point(
+				static_pointer_cast<geos::geom::Point, geos::geom::Geometry>(
+					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
+			)	);
+			if(point.get())
+			{
+				object->setGeometry(point);
+			}
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -539,6 +551,7 @@ namespace synthese
 			)	);
 			query.addField(object->getAllowCanceled());
 			query.addField(object->getStopPointLocation() ? object->getStopPointLocation()->getKey() : RegistryKeyType(0));
+			query.addField(static_pointer_cast<geos::geom::Geometry,geos::geom::Point>(object->getGeometry()));
 			query.execute(transaction);
 		}
 
