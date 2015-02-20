@@ -66,8 +66,8 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<Timetable> _timetable;
-			boost::shared_ptr<const Timetable> _container;
-			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
+			boost::shared_ptr<Timetable> _container;
+			boost::shared_ptr<calendar::CalendarTemplate> _calendarTemplate;
 			std::string _title;
 			Timetable::ContentType _format;
 			boost::optional<bool> _ignoreEmptyRows;

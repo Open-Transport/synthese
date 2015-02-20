@@ -129,30 +129,30 @@ namespace synthese
 					{
 						map.insert(PARAMETER_WAYBACK_FILTER, *_waybackFilter);
 					}
-					if(_timetable->getBaseCalendar())
+					if(_timetable->get<BaseCalendar>())
 					{
-						if(_timetable->getBaseCalendar()->getKey())
+						if(_timetable->get<BaseCalendar>()->getKey())
 						{
-							map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+							map.insert(PARAMETER_CALENDAR_ID, _timetable->get<BaseCalendar>()->getKey());
 						}
-						else if(_timetable->getBaseCalendar()->isLimited())
+						else if(_timetable->get<BaseCalendar>()->isLimited())
 						{
-							map.insert(PARAMETER_DAY, _timetable->getBaseCalendar()->getResult().getFirstActiveDate());
+							map.insert(PARAMETER_DAY, _timetable->get<BaseCalendar>()->getResult().getFirstActiveDate());
 						}
 					}
 				}
 				else if(_line.get())
 				{
 					map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
-					if(_timetable->getBaseCalendar())
+					if(_timetable->get<BaseCalendar>())
 					{
-						if(_timetable->getBaseCalendar()->getKey())
+						if(_timetable->get<BaseCalendar>()->getKey())
 						{
-							map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+							map.insert(PARAMETER_CALENDAR_ID, _timetable->get<BaseCalendar>()->getKey());
 						}
-						else if(_timetable->getBaseCalendar()->isLimited())
+						else if(_timetable->get<BaseCalendar>()->isLimited())
 						{
-							map.insert(PARAMETER_DAY, _timetable->getBaseCalendar()->getResult().getFirstActiveDate());
+							map.insert(PARAMETER_DAY, _timetable->get<BaseCalendar>()->getResult().getFirstActiveDate());
 						}
 					}
 				}
@@ -164,9 +164,9 @@ namespace synthese
 					}
 					else
 					{
-						if(_timetable->getBaseCalendar())
+						if(_timetable->get<BaseCalendar>())
 						{
-							map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+							map.insert(PARAMETER_CALENDAR_ID, _timetable->get<BaseCalendar>()->getKey());
 						}
 					}
 				}
@@ -230,20 +230,21 @@ namespace synthese
 				{
 					// The template is copied
 					boost::shared_ptr<Timetable> timetableCopy(new Timetable);
-					timetableCopy->setBaseCalendar(_timetable->getBaseCalendar());
+					timetableCopy->set<BaseCalendar>(_timetable->get<BaseCalendar>());
 					timetableCopy->setWaybackFilter(_timetable->getWaybackFilter());
-					timetableCopy->setTitle(_timetable->getTitle());
-					timetableCopy->setBookId(_timetable->getBookId());
+					timetableCopy->set<Title>(_timetable->get<Title>());
+					timetableCopy->set<Book>(_timetable->get<Book>());
+					timetableCopy->set<Format>(_timetable->get<Format>());
 					timetableCopy->setContentType(_timetable->getContentType());
-					timetableCopy->setRank(_timetable->getRank());
-					timetableCopy->setAuthorizedLines(_timetable->getAuthorizedLines());
-					timetableCopy->setAuthorizedPhysicalStops(_timetable->getAuthorizedPhysicalStops());
+					timetableCopy->set<Rank>(_timetable->get<Rank>());
+					timetableCopy->set<AuthorizedLines>(_timetable->get<AuthorizedLines>());
+					timetableCopy->set<AuthorizedPhysicalStops>(_timetable->get<AuthorizedPhysicalStops>());
 					
 					// Rows before
 					if(rowsBeforeStr.empty())
 					{
-						timetableCopy->setTransferTimetableBefore(
-							const_cast<Timetable&>(*_timetable).getTransferTimetableBefore(1)
+						timetableCopy->set<TransferTimetableBefore>(
+							const_cast<Timetable&>(*_timetable->getTransferTimetableBefore(1))
 						);
 					}
 					else
@@ -287,8 +288,8 @@ namespace synthese
 					// Rows after
 					if(rowsAfterStr.empty())
 					{
-						timetableCopy->setTransferTimetableAfter(
-							const_cast<Timetable&>(*_timetable).getTransferTimetableAfter(1)
+						timetableCopy->set<TransferTimetableAfter>(
+							const_cast<Timetable&>(*_timetable->getTransferTimetableAfter(1))
 						);
 					}
 					else
@@ -316,7 +317,7 @@ namespace synthese
 				{
 					throw RequestException("Calendar must be limited");
 				}
-				timetable->setBaseCalendar(_calendarTemplate.get());
+				timetable->set<BaseCalendar>(const_cast<CalendarTemplate&>(*_calendarTemplate.get()));
 
 				// Way 2 : line time table
 				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == JourneyPatternTableSync::TABLE.ID)
@@ -413,11 +414,11 @@ namespace synthese
 						timetable->setContentType(Timetable::CONTAINER);
 
 						boost::shared_ptr<Timetable> tt1(new Timetable);
-						tt1->setBaseCalendar(timetable->getBaseCalendar());
+						tt1->set<BaseCalendar>(timetable->get<BaseCalendar>());
 						AddLineDirectionToTimetable(*tt1, *_commercialLine, false);
 
 						boost::shared_ptr<Timetable> tt2(new Timetable);
-						tt2->setBaseCalendar(timetable->getBaseCalendar());
+						tt2->set<BaseCalendar>(timetable->get<BaseCalendar>());
 						AddLineDirectionToTimetable(*tt2, *_commercialLine, true);
 					}
 				}
@@ -569,7 +570,7 @@ namespace synthese
 							}
 
 							// Jump over empty rows if necessary
-							if(object.getIgnoreEmptyRows() && !result.getBeforeTransferTimetable(depth).hasSchedules(row.getRank()))
+							if(object.get<IgnoreEmptyRows>() && !result.getBeforeTransferTimetable(depth).hasSchedules(row.getRank()))
 							{
 								continue;
 							}
@@ -604,7 +605,7 @@ namespace synthese
 						}
 
 						// Jump over empty rows if necessary
-						if(object.getIgnoreEmptyRows() && !result.hasSchedules(row.getRank()))
+						if(object.get<IgnoreEmptyRows>() && !result.hasSchedules(row.getRank()))
 						{
 							continue;
 						}
@@ -640,7 +641,7 @@ namespace synthese
 							}
 
 							// Jump over empty rows if necessary
-							if(object.getIgnoreEmptyRows() && !result.getAfterTransferTimetable(depth).hasSchedules(row.getRank()))
+							if(object.get<IgnoreEmptyRows>() && !result.getAfterTransferTimetable(depth).hasSchedules(row.getRank()))
 							{
 								continue;
 							}
@@ -829,9 +830,9 @@ namespace synthese
 				}
 
 				// Calendar check
-				if(timetable.getBaseCalendar()->isLimited())
+				if(timetable.get<BaseCalendar>()->isLimited())
 				{
-					bool result(jp->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()));
+					bool result(jp->getCalendarCache().hasAtLeastOneCommonDateWith(timetable.get<BaseCalendar>()->getResult()));
 					if(!result)
 					{
 						continue;

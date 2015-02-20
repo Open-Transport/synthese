@@ -162,46 +162,54 @@ namespace synthese
 					"ID",
 					lexical_cast<string>(_timetable->getKey())
 				);
+
 				stream << pt.cell(
 					"Conteneur",
 					pt.getForm().getSelectInput(
 						TimetableUpdateAction::PARAMETER_CONTAINER_ID,
 						TimetableModule::GetTimetableContainersLabels(0, string(), _timetable->getKey()),
-						optional<RegistryKeyType>(_timetable->getBookId())
+						optional<RegistryKeyType>(_timetable->get<Book>() ? _timetable->get<Book>()->getKey() : 0)
 				)	);
+
 				stream << pt.cell(
 					"Calendrier",
 					pt.getForm().getSelectInput(
 						TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID,
 						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
-						optional<RegistryKeyType>(_timetable->getBaseCalendar() ? _timetable->getBaseCalendar()->getKey() : 0)
+						optional<RegistryKeyType>(_timetable->get<BaseCalendar>() ? _timetable->get<BaseCalendar>()->getKey() : 0)
 				)	);
+
 				stream << pt.cell(
 					"Titre",
 					pt.getForm().getTextInput(
 						TimetableUpdateAction::PARAMETER_TITLE,
-						_timetable->getTitle()
+						_timetable->get<Title>()
 				)	);
+
 				stream << pt.cell(
 					"Format",
 					pt.getForm().getRadioInputCollection(
 						TimetableUpdateAction::PARAMETER_FORMAT,
 						Timetable::GetFormatsList(),
 						optional<Timetable::ContentType>(_timetable->getContentType()),
+//						optional<Timetable::ContentType>(_timetable->get<Format>()),
 						true
 				)	);
+
 				stream << pt.cell(
 					"Ne pas afficher arrêts non desservis",
 					pt.getForm().getOuiNonRadioInput(
 						TimetableUpdateAction::PARAMETER_IGNORE_EMPTY_ROWS,
-						_timetable->getIgnoreEmptyRows()
+						_timetable->get<IgnoreEmptyRows>()
 				)	);
+
 				stream << pt.cell(
 					"Compression",
 					pt.getForm().getOuiNonRadioInput(
 						TimetableUpdateAction::PARAMETER_FIELD_COMPRESSION,
-						_timetable->getCompression()
+						_timetable->get<Compression>()
 				)	);
+
 
 				stream << pt.close();
 			}
@@ -267,7 +275,7 @@ namespace synthese
 						copyTimetableRequest.getAction()->setTemplate(const_pointer_cast<const Timetable>(tt));
 						removeRequest.getAction()->setObjectId(tt->getKey());
 
-						lastRank = tt->getRank();
+						lastRank = tt->get<Rank>();
 
 						stream << t3.row(lexical_cast<string>(*lastRank));
 						stream << t3.col() << *lastRank;
@@ -288,7 +296,7 @@ namespace synthese
 								Timetable::GetFormatName(tt->getContentType()
 							)
 						);
-						stream << t3.col() << tt->getTitle();
+						stream << t3.col() << tt->get<Title>();
 						stream <<
 							t3.col() <<
 							HTMLModule::getLinkButton(
@@ -310,7 +318,7 @@ namespace synthese
 							HTMLModule::getLinkButton(
 								removeRequest.getURL(),
 								"Supprimer",
-								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "/admin/img/table_delete.png"
+								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->get<Title>() +" ?", "/admin/img/table_delete.png"
 							);
 					}
 					lastRank = lastRank ? *lastRank + 1 : 0;
@@ -363,7 +371,7 @@ namespace synthese
 					)	);
 					if(_timetable->getTransferTimetableBefore(1))
 					{
-						stream << p1.cell("Libellé tableau :", _timetable->getTransferTimetableBefore(1)->getTitle());
+						stream << p1.cell("Libellé tableau :", _timetable->getTransferTimetableBefore(1)->get<Title>());
 					}
 					stream << p1.close();
 
@@ -812,7 +820,7 @@ namespace synthese
 					)	);
 					if(_timetable->getTransferTimetableAfter(1))
 					{
-						stream << p2.cell("Libellé tableau :", _timetable->getTransferTimetableAfter(1)->getTitle());
+						stream << p2.cell("Libellé tableau :", _timetable->getTransferTimetableAfter(1)->get<Title>());
 					}
 					stream << p2.close();
 
@@ -905,7 +913,7 @@ namespace synthese
 					auto_ptr<TimetableGenerator> g(
 						_timetable->getGenerator(
 							Env::GetOfficialEnv(),
-							_timetable->isGenerable() ? _timetable->getBaseCalendar()->getResult() : Calendar(date(now.year(), 1, 1), date(now.year(), 12, 31))
+							_timetable->isGenerable() ? _timetable->get<BaseCalendar>()->getResult() : Calendar(date(now.year(), 1, 1), date(now.year(), 12, 31))
 					)	);
 					const TimetableResult result(g->build(true, boost::shared_ptr<TimetableResult::Warnings>()));
 
@@ -962,7 +970,7 @@ namespace synthese
 
 		std::string TimetableAdmin::getTitle() const
 		{
-			return _timetable.get() ? _timetable->getTitle() : DEFAULT_TITLE;
+			return _timetable.get() ? _timetable->get<Title>() : DEFAULT_TITLE;
 		}
 
 		void TimetableAdmin::setTimetable(boost::shared_ptr<Timetable> timetable)

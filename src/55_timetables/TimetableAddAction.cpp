@@ -36,6 +36,7 @@
 #include "TimetableTableSync.h"
 #include "TimetableRowTableSync.h"
 #include "User.h"
+#include "CalendarTemplate.h"
 
 #include <boost/foreach.hpp>
 
@@ -99,21 +100,21 @@ namespace synthese
 			{
 				try
 				{
-					_template = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
+					_template = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
 				}
 				catch (...)
 				{
 					throw ActionException("No such template");
 				}
 				_reverse = map.getDefault<bool>(PARAMETER_REVERSE, false);
-				_rank = _template->getRank() + 1;
-				_title = _template->getTitle() + " (" + (_reverse ? "reversed " : "") + "copy)";
+				_rank = _template->get<Rank>() + 1;
+				_title = _template->get<Title>() + " (" + (_reverse ? "reversed " : "") + "copy)";
 				_isBook = (_template->getContentType() == Timetable::CONTAINER);
-				if(_template->getBookId() > 0)
+				if(_template->get<Book>().get_ptr() != NULL)
 				{
 					try
 					{
-						_book = TimetableTableSync::Get(_template->getBookId(), *_env);
+						_book = TimetableTableSync::GetEditable(_template->get<Book>()->getKey(), *_env);
 					}
 					catch (...)
 					{
@@ -127,7 +128,7 @@ namespace synthese
 				{
 					try
 					{
-						_book = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BOOK_ID), *_env);
+						_book = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_BOOK_ID), *_env);
 					}
 					catch (...)
 					{
@@ -159,19 +160,22 @@ namespace synthese
 			// timetable creation
 			Timetable t;
 			t.setContentType(_isBook ? Timetable::CONTAINER : Timetable::TABLE_SERVICES_IN_COLS);
-			t.setBookId(_book.get() ? _book->getKey() : 0);
-			t.setRank(_rank);
-			t.setTitle(_title);
+			if(_book.get())
+			{
+				t.set<Book>(const_cast<Timetable&>(*_book.get()));
+			}
+			t.set<Rank>(_rank);
+			t.set<Title>(_title);
 			if(_template.get())
 			{
-				t.setBaseCalendar(_template->getBaseCalendar());
+				t.set<BaseCalendar>(_template->get<BaseCalendar>());
 			}
 
 			// rank shifting
 			TimetableTableSync::Shift(_book.get() ? _book->getKey() : 0, _rank, 1);
 
 			// Saving
-			TimetableTableSync::Save(&t, transaction);
+			TimetableTableSync::Save(&t);
 
 			// ID update
 			request.setActionCreatedId(t.getKey());
