@@ -95,6 +95,10 @@ namespace synthese
 					{
 						continue;
 					}
+					
+					boost::shared_lock<util::shared_recursive_mutex> sharedServicesLock(
+						*(ls.getParentPath())->sharedServicesMutex
+					);
 
 					BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls.getParentPath()->getServiceCollections())
 					{
