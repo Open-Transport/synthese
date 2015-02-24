@@ -353,6 +353,11 @@ namespace synthese
 						linkedStopPoints
 					);
 				}
+
+				if(!nonLinkedStopPoints.empty())
+				{
+					return false;
+				}
 			}
 			else if(key == FILE_TRANSFERS)
 			{
@@ -1731,5 +1736,5 @@ namespace synthese
 
 			os << flush;
 		}
-
-}	}
+	}
+}

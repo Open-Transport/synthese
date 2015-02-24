@@ -341,4 +341,16 @@ namespace synthese
 		}
 }	}
 
+namespace boost
+{
+  namespace foreach
+  {
+    template<class T>
+      struct is_noncopyable<synthese::util::Registry<T> >
+      : mpl::true_
+      {
+      };
+  }
+}
+
 #endif

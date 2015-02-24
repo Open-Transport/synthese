@@ -38,6 +38,21 @@ list(APPEND geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/io/WKBReader.cpp
 list(REMOVE_ITEM geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/operation/distance/DistanceOp.cpp")
 list(APPEND geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/operation/distance/DistanceOp.cpp")
 
+list(REMOVE_ITEM geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/algorithm/LineIntersector.cpp")
+list(APPEND geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/algorithm/LineIntersector.cpp")
+
+list(REMOVE_ITEM geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/geom/LineSegment.cpp")
+list(APPEND geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/geom/LineSegment.cpp")
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/headers/geos/operation/overlay/OverlayNodeFactory.h"
+    "${PROJECT_BINARY_DIR}/3rd/dev/geos/src/headers/geos/operation/overlay/OverlayNodeFactory.h"
+    COPYONLY
+)
+
+list(REMOVE_ITEM geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/headers/geos/operation/overlay/OverlayNodeFactory.h")
+list(APPEND geos_SRCS "${PROJECT_BINARY_DIR}/3rd/dev/geos/src/headers/geos/operation/overlay/OverlayNodeFactory.h")
+
 include_directories(${GEOS_INCLUDE_DIRS})
 
 add_library(geos ${geos_SRCS})
