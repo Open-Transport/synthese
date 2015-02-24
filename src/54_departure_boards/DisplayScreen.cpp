@@ -28,6 +28,7 @@
 #include "BroadcastPointAlarmRecipient.hpp"
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
+#include "DBConstants.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DisplayMaintenanceLog.h"
 #include "DisplayMonitoringStatus.h"
@@ -64,6 +65,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace algorithm;
+	using namespace db;
 	using namespace dblog;
 	using namespace geography;
 	using namespace graph;
@@ -93,6 +95,8 @@ namespace synthese
 		const std::string DisplayScreen::DATA_LOCATION_ID("location_id");
 		const std::string DisplayScreen::DATA_CPU_ID("cpu_id");
 		const std::string DisplayScreen::VALUE_DISPLAY_SCREEN = "display_screen";
+		const std::string DisplayScreen::DATA_X("x");
+		const std::string DisplayScreen::DATA_Y("y");
 
 
 
@@ -663,6 +667,10 @@ namespace synthese
 			{
 				addForbiddenPlace(it3->second);
 			}
+			if (hasGeometry())
+			{
+				setGeometry(other.getGeometry());
+			}
 		}
 
 
@@ -853,6 +861,30 @@ namespace synthese
 			pm.insert(prefix + DATA_SCREEN_ID, getKey());
 			pm.insert(prefix + DATA_TITLE, _title);
 			pm.insert(prefix + DATA_TYPE_ID, _displayType ? _displayType->getKey() : 0);
+
+			// Geometry
+			if(hasGeometry()) {
+				geos::io::WKTWriter writer;
+				pm.insert(
+					prefix + TABLE_COL_GEOMETRY,
+					writer.write(static_pointer_cast<geos::geom::Geometry, geos::geom::Point>(getGeometry()).get())
+				);
+			}
+			else
+			{
+				pm.insert(prefix + TABLE_COL_GEOMETRY, string());
+			}
+
+			if(getGeometry().get())
+			{
+				boost::shared_ptr<geos::geom::Point> gp =
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*getGeometry());
+				if(gp.get())
+				{
+					pm.insert(prefix + DATA_X, gp->getX());
+					pm.insert(prefix + DATA_Y, gp->getY());
+				}
+			}
 		}
 
 

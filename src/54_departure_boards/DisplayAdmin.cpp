@@ -220,6 +220,17 @@ namespace synthese
 				}
 				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getName()));
 
+				stream << t.cell("X",
+					t.getForm().getTextInput(
+						UpdateDisplayScreenAction::PARAMETER_X,
+						_displayScreen->getGeometry().get() ? lexical_cast<string>(_displayScreen->getGeometry()->getX()) : string()
+					)	);
+				stream << t.cell("Y",
+					t.getForm().getTextInput(
+						UpdateDisplayScreenAction::PARAMETER_Y,
+						_displayScreen->getGeometry().get() ? lexical_cast<string>(_displayScreen->getGeometry()->getY()) : string()
+					)	);
+
 				stream << t.title("Données techniques");
 				stream << t.cell("UID", lexical_cast<string>(_displayScreen->getKey()));
 				stream <<

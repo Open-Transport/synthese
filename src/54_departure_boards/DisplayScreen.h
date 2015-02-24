@@ -33,6 +33,7 @@
 #include "TreeNode.hpp"
 #include "TreeAlphabeticalOrderingPolicy.hpp"
 #include "TreeMultiClassRootPolicy.hpp"
+#include "WithGeometry.hpp"
 
 #include "Registry.h"
 #include "DBLog.h"
@@ -102,6 +103,7 @@ namespace synthese
 					PlaceWithDisplayBoards,
 					DisplayScreenCPU
 			>	>,
+			public WithGeometry<geos::geom::Point>,
 			public impex::ImportableTemplate<DisplayScreen>,
 			public util::FactorableTemplate<messages::BroadcastPoint, DisplayScreen>
 		{
@@ -134,6 +136,8 @@ namespace synthese
 			static const std::string DATA_TYPE_ID;
 			static const std::string DATA_LOCATION_ID;
 			static const std::string DATA_CPU_ID;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
 
 			//! \name Technical data
 			//@{

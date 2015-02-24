@@ -43,6 +43,8 @@
 #include "DisplayScreen.h"
 #include "DBLogModule.h"
 #include "ArrivalDepartureTableRight.h"
+#include "GeometryField.hpp"
+#include "ObjectUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -71,12 +73,24 @@ namespace synthese
 		const string UpdateDisplayScreenAction::PARAMETER_CPU(Action_PARAMETER_PREFIX + "cu");
 		const string UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS(Action_PARAMETER_PREFIX + "ma");
 		const string UpdateDisplayScreenAction::PARAMETER_SUB_SCREEN_TYPE(Action_PARAMETER_PREFIX + "st");
+		const string UpdateDisplayScreenAction::PARAMETER_X(Action_PARAMETER_PREFIX + "x");
+		const string UpdateDisplayScreenAction::PARAMETER_Y(Action_PARAMETER_PREFIX + "y");
+		const string UpdateDisplayScreenAction::PARAMETER_SRID(Action_PARAMETER_PREFIX + "srid");
 
 
 		ParametersMap UpdateDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if (_screen.get() != NULL) map.insert(PARAMETER_DISPLAY_SCREEN, _screen->getKey());
+
+			// Geometry
+			if(_point.get() && !_point->isEmpty())
+			{
+				map.insert(PARAMETER_X, _point->getX());
+				map.insert(PARAMETER_Y, _point->getY());
+				map.insert(PARAMETER_SRID, _point->getSRID());
+			}
+
 			return map;
 		}
 
@@ -105,6 +119,33 @@ namespace synthese
 				{
 					_subScreenType = static_cast<DisplayScreen::SubScreenType>(map.get<int>(PARAMETER_SUB_SCREEN_TYPE));
 				}
+
+				// Geometry
+				if (!map.getDefault<string>(PARAMETER_X).empty() &&
+					!map.getDefault<string>(PARAMETER_Y).empty())
+				{
+					CoordinatesSystem::SRID srid(
+						map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+					);
+					_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+					_point = _coordinatesSystem->createPoint(
+						map.get<double>(PARAMETER_X),
+						map.get<double>(PARAMETER_Y)
+					);
+				}
+
+				if (map.isDefined(ObjectUpdateAction::GetInputName<PointGeometry>()))
+				{
+					geos::io::WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
+					_point.reset(
+						static_cast<geos::geom::Point*>(
+							reader.read(
+								map.get<string>(
+									ObjectUpdateAction::GetInputName<PointGeometry>()
+						)	)	)	);
+				}
+
 			}
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{
@@ -148,6 +189,11 @@ namespace synthese
 				_screen->setSubScreenType(_subScreenType);
 			}
 
+			if (_point)
+			{
+				_screen->setGeometry(_point);
+			}
+
 			// The action
 			DisplayScreenTableSync::Save(_screen.get());
 
@@ -168,6 +214,13 @@ namespace synthese
 			{
 				throw ActionException("display screen", e, *this);
 			}
+		}
+
+
+
+		void UpdateDisplayScreenAction::setPoint( boost::shared_ptr<geos::geom::Point> value )
+		{
+			_point = _point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*value);
 		}
 
 
