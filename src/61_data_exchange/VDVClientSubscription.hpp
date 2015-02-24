@@ -49,7 +49,7 @@ namespace synthese
 			static const std::string ATTR_HYSTERESIS;
 			static const std::string ATTR_DIRECTION_FILTER;
 
-			typedef std::map<const graph::Service*, graph::ServicePointer> ServicesList;
+			typedef std::map<util::RegistryKeyType, graph::ServicePointer> ServicesList;
 
 		private:
 			const std::string _id;
