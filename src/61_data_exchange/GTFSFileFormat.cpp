@@ -1196,22 +1196,22 @@ namespace synthese
 				boost::posix_time::time_duration arrival;
 				boost::posix_time::time_duration departure;
 
-				if (ls->get<RankInPath>() > 0 && ls->get<IsArrival>())
+				if (ls->getRankInPath() > 0 && ls->getIsArrival())
 				{
-					arrival = service->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>());
+					arrival = service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 				else
 				{
-					arrival = service->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>());
+					arrival = service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 
-				if (ls->get<RankInPath>()+1 != linestops.size() && ls->get<IsDeparture>())
+				if (ls->getRankInPath()+1 != linestops.size() && ls->getIsDeparture())
 				{
-					departure = service->getDepartureBeginScheduleToIndex(false, ls->get<RankInPath>());
+					departure = service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 				else
 				{
-					departure = service->getArrivalBeginScheduleToIndex(false, ls->get<RankInPath>());
+					departure = service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath());
 				}
 
 				boost::posix_time::time_duration diff = arrival - departure;
@@ -1223,7 +1223,7 @@ namespace synthese
 
 				arrivalTimeStr = to_simple_string(arrival);
 				departureTimeStr = to_simple_string(departure);
-				const StopPoint * stopPoint(dynamic_cast<const StopPoint *>(&*ls->get<LineNode>()));
+				const StopPoint * stopPoint(static_cast<const StopPoint *>(ls->getFromVertex()));
 
 				if (stopPoint)
 				{
@@ -1237,7 +1237,7 @@ namespace synthese
 					{
 						stopTimes <<_key(service->getKey(), 1) << ","
 							<< _key(stopPoint->getKey()) << ","
-							<< ls->get<RankInPath>() << ","
+							<< ls->getRankInPath() << ","
 							<< arrivalTimeStr.substr(0, 8) << ","
 							<< departureTimeStr.substr(0, 8) << ","
 							<< ","
@@ -1250,7 +1250,7 @@ namespace synthese
 				}
 				else
 				{
-					Log::GetInstance().debug("No stop point at rank " + boost::lexical_cast<std::string>(ls->get<RankInPath>()) +
+					Log::GetInstance().debug("No stop point at rank " + boost::lexical_cast<std::string>(ls->getRankInPath()) +
 											 " for line stop " + boost::lexical_cast<std::string>(ls->getKey()));
 				}
 			}
@@ -1732,10 +1732,4 @@ namespace synthese
 			os << flush;
 		}
 
-
-
-		GTFSFileFormat::Exporter_::Exporter_(
-			const impex::Export& export_
-		):	OneFileExporter<GTFSFileFormat>(export_)
-		{}
 }	}
