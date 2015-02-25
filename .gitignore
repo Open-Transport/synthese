@@ -2,7 +2,6 @@ build
 build_cmake
 CMakeLists.txt.user
 *.pyc
-*.cmake
 Makefile
 *.so
 CMakeFiles
