@@ -755,7 +755,7 @@ namespace synthese
 					"\" image=\""     << commercialLine->getImage() <<
 					"\" direction=\"" << (
 						journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
-						journeyPattern->getDirectionObj()->getDisplayedText() :
+						journeyPattern->getDirectionObj()->get<DisplayedText>() :
 						journeyPattern->getDirection()
 					) <<
 					"\" wayback=\"" << (journeyPattern->getWayBack() ? "1" : "0") <<
@@ -2591,7 +2591,7 @@ namespace synthese
 				const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath()));
 				string lineDirection(
 					jp->getDirection().empty() && jp->getDirectionObj() ?
-					jp->getDirectionObj()->getDisplayedText() :
+					jp->getDirectionObj()->get<DisplayedText>() :
 					jp->getDirection()
 				);
 				pm.insert(
@@ -2750,7 +2750,7 @@ namespace synthese
 			const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(object.getService()->getPath()));
 			string lineDirection(
 				line->getDirection().empty() && line->getDirectionObj() ?
-				line->getDirectionObj()->getDisplayedText() :
+				line->getDirectionObj()->get<DisplayedText>() :
 				line->getDirection()
 			);
 			pm.insert(
