@@ -864,7 +864,7 @@ namespace synthese
 					p.getForm().getTextInputAutoCompleteFromTableSync(
 						JourneyPatternUpdateAction::PARAMETER_DIRECTION_ID,
 						_line->getDirectionObj() ? lexical_cast<string>(_line->getDirectionObj()->getKey()) : string(),
-						_line->getDirectionObj() ? lexical_cast<string>(_line->getDirectionObj()->getDisplayedText()) : string(),
+						_line->getDirectionObj() ? lexical_cast<string>(_line->getDirectionObj()->get<DisplayedText>()) : string(),
 						lexical_cast<string>(DestinationTableSync::TABLE.ID),
 						string(),string(),
 						false, true, true, true

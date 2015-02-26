@@ -1744,7 +1744,7 @@ namespace synthese
 							}
 							else if(line->getDirectionObj())
 							{
-								stream << " destinationText=\"" << line->getDirectionObj()->getDisplayedText() << "\"";
+								stream << " destinationText=\"" << line->getDirectionObj()->get<DisplayedText>() << "\"";
 							}
 							stream <<
 								">";
@@ -3988,7 +3988,7 @@ namespace synthese
 			pm.insert(DATA_NETWORK, line->getNetwork()->getName());
 			string lineDirection(
 				line->getDirection().empty() && line->getDirectionObj() ?
-				line->getDirectionObj()->getDisplayedText() :
+				line->getDirectionObj()->get<DisplayedText>() :
 				line->getDirection()
 			);
 			pm.insert(

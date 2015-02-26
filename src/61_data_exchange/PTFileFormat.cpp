@@ -1298,7 +1298,7 @@ namespace synthese
 				}
 				destination = *loadedDestination.begin();
 				_logLoad(
-					"Use of existing destination "+ lexical_cast<string>(destination->getKey()) +" ("+ destination->getDisplayedText() +")"
+					"Use of existing destination "+ lexical_cast<string>(destination->getKey()) +" ("+ destination->get<DisplayedText>() +")"
 				);
 			}
 			else
@@ -1315,8 +1315,8 @@ namespace synthese
 					"Creation of the destination with key "+ id +" ("+ displayText +")"
 				);
 			}
-			destination->setDisplayedText(displayText);
-			destination->setTTSText(ttsText);
+			destination->set<DisplayedText>(displayText);
+			destination->set<TtsText>(ttsText);
 			return destination;
 		}
 

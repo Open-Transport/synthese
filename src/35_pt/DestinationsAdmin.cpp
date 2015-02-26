@@ -151,7 +151,7 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir");
 
 				// Displayed text
-				stream << t.col() << destination->getDisplayedText();
+				stream << t.col() << destination->get<DisplayedText>();
 
 				// Code
 				stream << t.col() << destination->getCodeBySources();
