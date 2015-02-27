@@ -158,6 +158,7 @@ namespace synthese
 					boost::posix_time::time_duration departureTime;
 					std::set<pt::StopPoint*> stop;
 					graph::MetricOffset offsetFromLast;
+					bool scheduledStop;
 				};
 				typedef std::vector<TripDetail> TripDetailVector;
 

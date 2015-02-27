@@ -26,7 +26,6 @@
 #define SYNTHESE_TimetableTableSync_H__
 
 #include "DBDirectTableSyncTemplate.hpp"
-#include "OldLoadSavePolicy.hpp"
 
 #include <vector>
 #include <string>
@@ -44,23 +43,12 @@ namespace synthese
 		class TimetableTableSync:
 			public db::DBDirectTableSyncTemplate<
 				TimetableTableSync,
-				Timetable,
-				db::FullSynchronizationPolicy,
-				db::OldLoadSavePolicy
+				Timetable
 			>
 		{
 		public:
-			static const std::string COL_BOOK_ID;
-			static const std::string COL_RANK;
-			static const std::string COL_TITLE;
-			static const std::string COL_CALENDAR_ID;
-			static const std::string COL_FORMAT;
-			static const std::string COL_AUTHORIZED_LINES;
-			static const std::string COL_AUTHORIZED_PHYSICAL_STOPS;
-			static const std::string COL_TRANSFER_TIMETABLE_BEFORE;
-			static const std::string COL_TRANSFER_TIMETABLE_AFTER;
-			static const std::string COL_IGNORE_EMPTY_ROWS;
-			static const std::string COL_COMPRESSION;
+
+
 
 			TimetableTableSync() {}
 

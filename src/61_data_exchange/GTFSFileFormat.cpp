@@ -632,7 +632,10 @@ namespace synthese
 							offsetSum += tripStop.offsetFromLast;
 							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
 								tripStop.stop,
-								offsetSum
+								offsetSum,
+								true,
+								true,
+								tripStop.scheduledStop
 							);
 							stops.push_back(stop);
 						}
@@ -663,12 +666,18 @@ namespace synthese
 						ScheduledService::Schedules departures;
 						BOOST_FOREACH(const TripDetail& tripStop, tripDetailVector)
 						{
-							departures.push_back(tripStop.departureTime);
+							if (tripStop.scheduledStop)
+							{
+								departures.push_back(tripStop.departureTime);
+							}
 						}
 						ScheduledService::Schedules arrivals;
 						BOOST_FOREACH(const TripDetail& tripStop, tripDetailVector)
 						{
-							arrivals.push_back(tripStop.arrivalTime);
+							if (tripStop.scheduledStop)
+							{
+								arrivals.push_back(tripStop.arrivalTime);
+							}
 						}
 
 						ScheduledService* service(
@@ -712,7 +721,7 @@ namespace synthese
 					}
 					else  // Invalid time duration
 					{
-						tripDetail.arrivalTime = previousArrivalTime; // Copy previous regulation stop
+						tripDetail.arrivalTime = not_a_date_time;
 					}
 
 					stringstream dep_stream(_getValue("departure_time"));
@@ -726,7 +735,17 @@ namespace synthese
 					}
 					else // Invalid time duration
 					{
-						tripDetail.departureTime = previousDepartureTime; // Copy previous regulation stop
+						tripDetail.departureTime = not_a_date_time;
+					}
+					
+					if (tripDetail.arrivalTime.is_not_a_date_time() &&
+						tripDetail.departureTime.is_not_a_date_time())
+					{
+						tripDetail.scheduledStop = false;
+					}
+					else
+					{
+						tripDetail.scheduledStop = true;
 					}
 
 					string stopCode(_getValue("stop_id"));
@@ -1275,7 +1294,7 @@ namespace synthese
 
 			string lineDirection(
 				line->getDirection().empty() && line->getDirectionObj() ?
-				line->getDirectionObj()->getDisplayedText() :
+				line->getDirectionObj()->get<DisplayedText>() :
 				line->getDirection()
 			);
 			tripHeadSign = _Str(lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection);

@@ -136,19 +136,19 @@ namespace synthese
 			// Comment
 			if(_comment)
 			{
-				_destination->setComment(*_comment);
+				_destination->set<Comment>(*_comment);
 			}
 
 			// Displayed text
 			if(_displayedText)
 			{
-				_destination->setDisplayedText(*_displayedText);
+				_destination->set<DisplayedText>(*_displayedText);
 			}
 
 			// TTS Text
 			if(_ttsText)
 			{
-				_destination->setTTSText(*_ttsText);
+				_destination->set<TtsText>(*_ttsText);
 			}
 
 			// Data source links

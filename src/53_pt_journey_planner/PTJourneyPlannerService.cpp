@@ -2542,7 +2542,7 @@ namespace synthese
 			}
 			string lineDirection(
 				line->getDirection().empty() && line->getDirectionObj() ?
-				line->getDirectionObj()->getDisplayedText() :
+				line->getDirectionObj()->get<DisplayedText>() :
 				line->getDirection()
 			);
 			pm.insert(

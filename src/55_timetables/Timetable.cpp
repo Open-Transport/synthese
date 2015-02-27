@@ -24,7 +24,11 @@
 
 #include "CalendarTemplate.h"
 #include "Request.h"
-#include "TimetableRow.h"
+#include "TimetableRowTableSync.h"
+#include "TimetableRowGroupTableSync.hpp"
+#include "Conversion.h"
+#include "StopPoint.hpp"
+#include "CommercialLine.h"
 
 using namespace std;
 using namespace boost;
@@ -37,12 +41,20 @@ namespace synthese
 	using namespace server;
 	using namespace timetables;
 
+	CLASS_DEFINITION(Timetable, "t052_timetables", 52)
 	FIELD_DEFINITION_OF_OBJECT(Timetable, "timetable_id", "timetable_ids")
 
-	namespace util
-	{
-		template<> const std::string Registry<timetables::Timetable>::KEY("Timetable");
-	}
+	FIELD_DEFINITION_OF_TYPE(Book, "book_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(BaseCalendar, "calendar_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Format, "format", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(AuthorizedLines, "authorized_lines", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(AuthorizedPhysicalStops, "authorized_physical_stops", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(TransferTimetableBefore, "transfer_timetable_before", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TransferTimetableAfter, "transfer_timetable_after", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(IgnoreEmptyRows, "ignore_empty_rows", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(Compression, "compression", SQL_BOOLEAN)
+
+
 
 	namespace timetables
 	{
@@ -55,14 +67,51 @@ namespace synthese
 		Timetable::Timetable(
 			RegistryKeyType id
 		):	Registrable(id),
-			_bookId(0),
-			_baseCalendar(NULL),
-			_transferTimetableBefore(NULL),
-			_transferTimetableAfter(NULL),
-			_ignoreEmptyRows(false),
-			_mergeColsWithSameTimetables(true),
-			_compression(false)
+			Object<Timetable, TimetableSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Book),
+					FIELD_VALUE_CONSTRUCTOR(Rank, 0),
+					FIELD_DEFAULT_CONSTRUCTOR(Title),
+					FIELD_DEFAULT_CONSTRUCTOR(BaseCalendar),
+					FIELD_DEFAULT_CONSTRUCTOR(Format),
+					FIELD_DEFAULT_CONSTRUCTOR(AuthorizedLines),
+					FIELD_DEFAULT_CONSTRUCTOR(AuthorizedPhysicalStops),
+					FIELD_DEFAULT_CONSTRUCTOR(TransferTimetableBefore),
+					FIELD_DEFAULT_CONSTRUCTOR(TransferTimetableAfter),
+					FIELD_VALUE_CONSTRUCTOR(IgnoreEmptyRows, false),
+					FIELD_VALUE_CONSTRUCTOR(Compression, false)
+			)	),
+			_mergeColsWithSameTimetables(true)
 		{}
+
+
+
+		void Timetable::computeStrAndSetAuthorizedLines()
+		{
+			string authorized_lines_str("");
+			int rank(0);
+			BOOST_FOREACH(const TimetableGenerator::AuthorizedLines::value_type& line, _authorizedLines)
+			{
+				authorized_lines_str += (rank > 0 ? ("," + lexical_cast<string>(line->getKey())) : lexical_cast<string>(line->getKey()));
+				rank++;
+			}
+			set<AuthorizedLines>(authorized_lines_str);
+		}
+
+
+
+		void Timetable::computeStrAndSetAuthorizedPhysicalStops()
+		{
+			string authorized_ps_str("");
+			int rank(0);
+			BOOST_FOREACH(const TimetableGenerator::AuthorizedPhysicalStops::value_type& stop, _authorizedPhysicalStops)
+			{
+				authorized_ps_str += (rank > 0 ? ("," + lexical_cast<string>(stop->getKey())) : lexical_cast<string>(stop->getKey()));
+				rank++;
+			}
+			set<AuthorizedPhysicalStops>(authorized_ps_str);
+		}
 
 
 
@@ -86,8 +135,8 @@ namespace synthese
 		{
 			return
 				_contentType == CONTAINER ||
-				(getBaseCalendar() != NULL &&
-				 getBaseCalendar()->isLimited())
+				(get<BaseCalendar>().get_ptr() != NULL &&
+				 get<BaseCalendar>()->isLimited())
 			;
 		}
 
@@ -114,19 +163,19 @@ namespace synthese
 				{
 					g->setRows(_rows);
 				}
-				g->setBaseCalendar(mask ? *mask : _baseCalendar->getResult());
+				g->setBaseCalendar(mask ? *mask : get<BaseCalendar>()->getResult());
 				g->setAuthorizedLines(_authorizedLines);
 				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
 				g->setWaybackFilter(_wayBackFilter);
 				g->setAutoIntermediateStops(_autoIntermediateStops);
-				g->setCompression(_compression);
-				if(_transferTimetableBefore)
+				g->setCompression(get<Compression>());
+				if(get<TransferTimetableBefore>())
 				{
-					g->setBeforeTransferTimetable(_transferTimetableBefore->getGenerator(env, mask));
+					g->setBeforeTransferTimetable(get<TransferTimetableBefore>()->getGenerator(env, mask));
 				}
-				if(_transferTimetableAfter)
+				if(get<TransferTimetableAfter>())
 				{
-					g->setAfterTransferTimetable(_transferTimetableAfter->getGenerator(env, mask));
+					g->setAfterTransferTimetable(get<TransferTimetableAfter>()->getGenerator(env, mask));
 				}
 				g->setMergeColsWithSameTimetables(_mergeColsWithSameTimetables);
 			}
@@ -200,6 +249,7 @@ namespace synthese
 		void Timetable::addAuthorizedLine( const CommercialLine* line )
 		{
 			_authorizedLines.insert(line);
+			computeStrAndSetAuthorizedLines();
 		}
 
 
@@ -207,6 +257,7 @@ namespace synthese
 		void Timetable::removeAuthorizedLine( const pt::CommercialLine* line )
 		{
 			_authorizedLines.erase(line);
+			computeStrAndSetAuthorizedLines();
 		}
 
 
@@ -214,6 +265,7 @@ namespace synthese
 		void Timetable::addAuthorizedPhysicalStop( const pt::StopPoint* stop )
 		{
 			_authorizedPhysicalStops.insert(stop);
+			computeStrAndSetAuthorizedPhysicalStops();
 		}
 
 
@@ -221,6 +273,7 @@ namespace synthese
 		void Timetable::removeAuthorizedPhysicalStop( const pt::StopPoint* stop )
 		{
 			_authorizedPhysicalStops.erase(stop);
+			computeStrAndSetAuthorizedPhysicalStops();
 		}
 
 
@@ -245,11 +298,11 @@ namespace synthese
 			{
 				return this;
 			}
-			if(_transferTimetableBefore == NULL)
+			if(get<TransferTimetableBefore>().get_ptr() == NULL)
 			{
 				return NULL;
 			}
-			return _transferTimetableBefore->getTransferTimetableBefore(depth - 1);
+			return get<TransferTimetableBefore>()->getTransferTimetableBefore(depth - 1);
 		}
 
 
@@ -260,11 +313,11 @@ namespace synthese
 			{
 				return this;
 			}
-			if(_transferTimetableAfter == NULL)
+			if(get<TransferTimetableAfter>().get_ptr() == NULL)
 			{
 				return NULL;
 			}
-			return _transferTimetableAfter->getTransferTimetableAfter(depth - 1);
+			return get<TransferTimetableAfter>()->getTransferTimetableAfter(depth - 1);
 		}
 
 
@@ -274,11 +327,11 @@ namespace synthese
 			{
 				return this;
 			}
-			if(_transferTimetableBefore == NULL)
+			if(get<TransferTimetableBefore>().get_ptr() == NULL)
 			{
 				return NULL;
 			}
-			return _transferTimetableBefore->getTransferTimetableBefore(depth - 1);
+			return get<TransferTimetableBefore>()->getTransferTimetableBefore(depth - 1);
 		}
 
 
@@ -289,24 +342,24 @@ namespace synthese
 			{
 				return this;
 			}
-			if(_transferTimetableAfter == NULL)
+			if(get<TransferTimetableAfter>().get_ptr() == NULL)
 			{
 				return NULL;
 			}
-			return _transferTimetableAfter->getTransferTimetableAfter(depth - 1);
+			return get<TransferTimetableAfter>()->getTransferTimetableAfter(depth - 1);
 		}
 
 
 		std::size_t Timetable::getBeforeTransferTimetablesNumber() const
 		{
-			return _transferTimetableBefore == NULL ? 0 : (_transferTimetableBefore->getBeforeTransferTimetablesNumber() + 1);
+			return get<TransferTimetableBefore>().get_ptr() == NULL ? 0 : (get<TransferTimetableBefore>()->getBeforeTransferTimetablesNumber() + 1);
 		}
 
 
 
 		std::size_t Timetable::getAfterTransferTimetablesNumber() const
 		{
-			return _transferTimetableAfter == NULL ? 0 : (_transferTimetableAfter->getAfterTransferTimetablesNumber() + 1);
+			return get<TransferTimetableAfter>().get_ptr() == NULL ? 0 : (get<TransferTimetableAfter>()->getAfterTransferTimetablesNumber() + 1);
 		}
 
 
@@ -333,21 +386,19 @@ namespace synthese
 
 
 
-		void Timetable::toParametersMap(
+		void Timetable::addAdditionalParameters(
 			util::ParametersMap& pm,
-			bool withAdditionalParameters,
-			boost::logic::tribool withFiles,
 			std::string prefix
 		) const	{
 			// Common parameters
 			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(getContentType()));
-			pm.insert(DATA_TITLE, getTitle());
+			pm.insert(DATA_TITLE, get<Title>());
 			pm.insert(Request::PARAMETER_OBJECT_ID, getKey());
 			
 			// Base calendar
-			if(getBaseCalendar())
+			if(get<BaseCalendar>())
 			{
-				pm.insert(DATA_CALENDAR_NAME, getBaseCalendar()->getName());
+				pm.insert(DATA_CALENDAR_NAME, get<BaseCalendar>()->getName());
 			}
 		}
 
@@ -368,5 +419,64 @@ namespace synthese
 			}
 			assert(false);
 			return string();
+		}
+
+
+		void Timetable::link(
+			util::Env& env,
+			bool withAlgorithmOptimizations /* false */
+		){
+			setContentType(static_cast<ContentType>(get<Format>()));
+			vector<string> lines = Conversion::ToStringVector(get<AuthorizedLines>());
+			clearAuthorizedLines();
+			BOOST_FOREACH(const string& line, lines)
+			{
+				try
+				{
+					RegistryKeyType id(lexical_cast<RegistryKeyType>(line));
+					addAuthorizedLine(Env::GetOfficialEnv().get<CommercialLine>(id).get());
+				}
+				catch (ObjectNotFoundException<CommercialLine>&)
+				{
+					Log::GetInstance().warn("Data corrupted in " + Timetable::TABLE_NAME + "/" + AuthorizedLines::FIELD.name);
+				}
+			}
+
+
+			vector<string> pstops = Conversion::ToStringVector(get<AuthorizedPhysicalStops>());
+			clearAuthorizedPhysicalStops();
+			BOOST_FOREACH(const string& pstop, pstops)
+			{
+				try
+				{
+					RegistryKeyType id(lexical_cast<RegistryKeyType>(pstop));
+					addAuthorizedPhysicalStop(Env::GetOfficialEnv().get<StopPoint>(id).get());
+				}
+				catch (ObjectNotFoundException<StopPoint>&)
+				{
+					Log::GetInstance().warn("Data corrupted in " + Timetable::TABLE_NAME + "/" + AuthorizedPhysicalStops::FIELD.name);
+				}
+			}
+
+			clearRows();
+			TimetableRowTableSync::SearchResult rows(
+						TimetableRowTableSync::Search(env, getKey())
+						);
+			BOOST_FOREACH(const boost::shared_ptr<TimetableRow>& row, rows)
+			{
+				addRow(*row);
+			}
+			TimetableRowGroupTableSync::SearchResult rowGroups(
+						TimetableRowGroupTableSync::Search(Env::GetOfficialEnv(), getKey())
+						);
+			BOOST_FOREACH(const boost::shared_ptr<TimetableRowGroup>& rowGroup, rowGroups)
+			{
+				addRowGroup(*rowGroup);
+			}
+		}
+
+
+		void Timetable::unlink()
+		{
 		}
 }	}

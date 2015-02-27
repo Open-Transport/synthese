@@ -115,11 +115,25 @@ namespace synthese
 
 			if(_before)
 			{
-				_timetable->setTransferTimetableBefore(_transferTimetable.get());
+				if(_transferTimetable.get())
+				{
+					_timetable->set<TransferTimetableBefore>(*_transferTimetable);
+				}
+				else
+				{
+					_timetable->set<TransferTimetableBefore>(TransferTimetableBefore::Type());
+				}
 			}
 			else
 			{
-				_timetable->setTransferTimetableAfter(_transferTimetable.get());
+				if(_transferTimetable.get())
+				{
+					_timetable->set<TransferTimetableAfter>(*_transferTimetable);
+				}
+				else
+				{
+					_timetable->set<TransferTimetableAfter>(TransferTimetableAfter::Type());
+				}
 			}
 
 			TimetableTableSync::Save(_timetable.get());
