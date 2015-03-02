@@ -80,6 +80,7 @@ namespace synthese
 		const string TimetableGenerateFunction::PARAMETER_WAYBACK_FILTER("wayback");
 		const string TimetableGenerateFunction::PARAMETER_IGNORE_PAST_DATES("ignore_past_dates");
 		const string TimetableGenerateFunction::PARAMETER_AUTO_INTERMEDIATE_STOPS = "auto_intermediate_stops";
+		const string TimetableGenerateFunction::PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES = "merge_cols_with_same_schedules";
 
 		const string TimetableGenerateFunction::PARAMETER_PAGE_ID("page_id");
 		const string TimetableGenerateFunction::PARAMETER_NOTE_PAGE_ID("note_page_id");
@@ -266,6 +267,9 @@ namespace synthese
 			}
 
 			_ignorePastDates = map.getOptional<bool>(PARAMETER_IGNORE_PAST_DATES);
+
+			// Merge cols with same schedules
+			_mergeColsWithSameSchedules = map.getOptional<bool>(PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES);
 
 			// Way 1 : pre-configured timetable
 			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
@@ -522,6 +526,10 @@ namespace synthese
 							) :
 							optional<Calendar>()
 				)	);
+				if(_mergeColsWithSameSchedules)
+				{
+					generator->setMergeColsWithSameTimetables(*_mergeColsWithSameSchedules);
+				}
 				TimetableResult result(generator->build(true, _warnings));
 				_display(
 					stream,
@@ -607,6 +615,10 @@ namespace synthese
 											) :
 											optional<Calendar>()
 								)	);
+								if(_mergeColsWithSameSchedules)
+								{
+									g->setMergeColsWithSameTimetables(*_mergeColsWithSameSchedules);
+								}
 								TimetableResult r(g->build(true, warnings));
 								size_t ttRank(0);
 								_display(
