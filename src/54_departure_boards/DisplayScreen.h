@@ -302,7 +302,7 @@ namespace synthese
 				void	setOriginsOnly(EndFilter);
 				void	setSubScreenType(SubScreenType value){ _subScreenType = value; }
 				void	setAllowedLines(const LineFilter& value){ _allowedLines = value; }
-				void	setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value){ _physicalStops = value; }
+				void	setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value);
 			//@}
 
 			//! \name Modifiers
@@ -317,6 +317,7 @@ namespace synthese
 				void	removeDisplayedPlace(const pt::StopArea*);
 				void	removeForbiddenPlace(const pt::StopArea*);
 				void	removeForcedDestination(const pt::StopArea*);
+				void	computeStrAndSetPhysicalStops();
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds a destination by transfer to display if necessary.
