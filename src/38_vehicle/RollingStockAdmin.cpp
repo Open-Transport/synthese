@@ -123,9 +123,9 @@ namespace synthese
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_rollingStock->getKey()));
 				stream << t.cell("Nom", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_NAME, _rollingStock->getName()));
-				stream << t.cell("Article", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_ARTICLE, _rollingStock->getArticle()));
-				stream << t.cell("Emission de CO2 en g/km/voyageur", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_CO2_EMISSIONS, lexical_cast<string>(_rollingStock->getCO2Emissions())));
-				stream << t.cell("Consommation énergétique en L/100km équivalent pétrole", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_ENERGY_CONSUMPTION, lexical_cast<string>(_rollingStock->getEnergyConsumption())));
+				stream << t.cell("Article", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_ARTICLE, _rollingStock->get<Article>()));
+				stream << t.cell("Emission de CO2 en g/km/voyageur", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_CO2_EMISSIONS, lexical_cast<string>(_rollingStock->get<CO2Emissions>())));
+				stream << t.cell("Consommation énergétique en L/100km équivalent pétrole", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_ENERGY_CONSUMPTION, lexical_cast<string>(_rollingStock->get<EnergyConsumption>())));
 				stream << t.close();
 
 				StaticActionRequest<RollingStockUpdateAction> updateOnlyRequest(request);

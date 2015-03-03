@@ -129,6 +129,9 @@ namespace synthese
 				bool withCancelled = false,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+			
+			virtual std::string whereClauseDefault(
+			) const;
 
 		};
 }	}

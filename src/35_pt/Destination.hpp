@@ -62,19 +62,6 @@ namespace synthese
 				util::RegistryKeyType id = 0
 			);
 
-		private:
-			std::string _displayedText;
-			std::string _ttsText;
-			std::string _comment;
-
-		public:
-			const std::string& getDisplayedText() const { return _displayedText; }
-			const std::string& getTTSText() const { return _ttsText; }
-			const std::string& getComment() const { return _comment; }
-
-			void setDisplayedText(const std::string& value){ _displayedText = value; }
-			void setTTSText(const std::string& value){ _ttsText = value; }
-			void setComment(const std::string& value){ _comment = value; }
 		};
 	}
 }

@@ -59,19 +59,17 @@ namespace synthese
 				public impex::PermanentThreadImporterTemplate<GPSSimuFileFormat>
 			{
 			public:
-				static const std::string PARAMETER_ROUTE_ID;
-				static const std::string PARAMETER_TIME_FOR_ROUTE;
+				static const std::string PARAMETER_LONG;
+				static const std::string PARAMETER_LAT;
 
 			private:
-				boost::shared_ptr<pt::JourneyPattern> _journeyPattern;
-				size_t _journeyDuration;
+				double _longitude;
+				double _latitude;
 
 				mutable boost::shared_ptr<geos::geom::Point> _lastPosition;
 				mutable pt::StopPoint* _lastStopPoint;
 				mutable boost::posix_time::ptime _lastStorage;
 				mutable boost::posix_time::ptime _startTime;
-
-				bool _simuGps(double &lat, double &lon) const;
 
 			protected:
 				virtual void _onStart() const;

@@ -119,9 +119,9 @@ namespace synthese
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_destination->getKey()));
-				stream << t.cell("Texte affiché", t.getForm().getTextInput(DestinationUpdateAction::PARAMETER_DISPLAYED_TEXT, _destination->getDisplayedText()));
-				stream << t.cell("Texte lu", t.getForm().getTextInput(DestinationUpdateAction::PARAMETER_TTS_TEXT, _destination->getTTSText()));
-				stream << t.cell("Commentaire", t.getForm().getTextInput(DestinationUpdateAction::PARAMETER_COMMENT, _destination->getComment()));
+				stream << t.cell("Texte affiché", t.getForm().getTextInput(DestinationUpdateAction::PARAMETER_DISPLAYED_TEXT, _destination->get<DisplayedText>()));
+				stream << t.cell("Texte lu", t.getForm().getTextInput(DestinationUpdateAction::PARAMETER_TTS_TEXT, _destination->get<TtsText>()));
+				stream << t.cell("Commentaire", t.getForm().getTextInput(DestinationUpdateAction::PARAMETER_COMMENT, _destination->get<Comment>()));
 				stream << t.close();
 			}
 
@@ -136,7 +136,7 @@ namespace synthese
 
 		std::string DestinationAdmin::getTitle() const
 		{
-			return _destination.get() ? _destination->getDisplayedText() : DEFAULT_TITLE;
+			return _destination.get() ? _destination->get<DisplayedText>() : DEFAULT_TITLE;
 		}
 
 

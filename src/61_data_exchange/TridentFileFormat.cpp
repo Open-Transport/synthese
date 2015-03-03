@@ -579,7 +579,7 @@ namespace synthese
 
 				os <<
 					"<transportModeName>" <<
-					((rollingStock == NULL || rollingStock->getTridentKey().empty()) ? "Other" : rollingStock->getTridentKey()) <<
+					((rollingStock == NULL || rollingStock->get<TridentKey>().empty()) ? "Other" : rollingStock->get<TridentKey>()) <<
 					"</transportModeName>" <<
 				"\n";
 

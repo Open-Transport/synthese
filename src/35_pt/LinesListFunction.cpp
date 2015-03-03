@@ -819,7 +819,7 @@ namespace synthese
 								string direction;
 								if(jp->getDirectionObj())
 								{
-									direction = jp->getDirectionObj()->getDisplayedText();
+									direction = jp->getDirectionObj()->get<DisplayedText>();
 								}
 								else if(!jp->getDirection().empty())
 								{

@@ -215,20 +215,23 @@ namespace synthese
 			m.insert(DATA_ID, _journeyPattern->getKey());
 			m.insert(DATA_NAME, _journeyPattern->getName());
 			m.insert(DATA_IS_MAIN, _journeyPattern->getMain());
-			m.insert(DATA_LINE_ID, commercialLine->getKey());
-			m.insert(DATA_LINE_NAME, commercialLine->getName());
-			m.insert(DATA_LINE_SHORT_NAME, commercialLine->getShortName());
-			m.insert(DATA_LINE_LONG_NAME, commercialLine->getLongName());
-			m.insert(DATA_LINE_IMAGE, commercialLine->getImage());
-			m.insert(DATA_LINE_STYLE, commercialLine->getStyle());
-			if(commercialLine->getColor())
+			if (commercialLine)
 			{
-				m.insert(DATA_LINE_COLOR, commercialLine->getColor()->toXMLColor());
+				m.insert(DATA_LINE_ID, commercialLine->getKey());
+				m.insert(DATA_LINE_NAME, commercialLine->getName());
+				m.insert(DATA_LINE_SHORT_NAME, commercialLine->getShortName());
+				m.insert(DATA_LINE_LONG_NAME, commercialLine->getLongName());
+				m.insert(DATA_LINE_IMAGE, commercialLine->getImage());
+				m.insert(DATA_LINE_STYLE, commercialLine->getStyle());
+				if(commercialLine->getColor())
+				{
+					m.insert(DATA_LINE_COLOR, commercialLine->getColor()->toXMLColor());
+				}
 			}
 			m.insert(
 				DATA_DIRECTION,
 				_journeyPattern->getDirection().empty() && _journeyPattern->getDirectionObj() ?
-					_journeyPattern->getDirectionObj()->getDisplayedText() :
+                _journeyPattern->getDirectionObj()->get<DisplayedText>() :
 					_journeyPattern->getDirection()
 			);
 

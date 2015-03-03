@@ -157,7 +157,7 @@ namespace synthese
 			DestinationTableSync::SearchResult destinations(DestinationTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 			BOOST_FOREACH(const boost::shared_ptr<Destination>& destination, destinations)
 			{
-				result.push_back(std::make_pair(destination->getKey(), destination->getDisplayedText()));
+				result.push_back(std::make_pair(destination->getKey(), destination->get<DisplayedText>()));
 			}
 			return result;
 		} ;

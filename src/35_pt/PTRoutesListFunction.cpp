@@ -334,7 +334,7 @@ namespace synthese
 					pm->insert(DATA_IS_MAIN, route->getMain());
 					pm->insert(DATA_DIRECTION,
 						route->getDirection().empty() && route->getDirectionObj() ?
-						route->getDirectionObj()->getDisplayedText() :
+						route->getDirectionObj()->get<DisplayedText>() :
 						route->getDirection()
 					);
 					{
@@ -376,7 +376,7 @@ namespace synthese
 						"\" " << DATA_IS_MAIN << "=\"" << route->getMain() <<
 						"\" directionText=\""   << (
 							route->getDirection().empty() && route->getDirectionObj() ?
-							route->getDirectionObj()->getDisplayedText() :
+							route->getDirectionObj()->get<DisplayedText>() :
 							route->getDirection()
 						) << "\" >";
 

@@ -50,18 +50,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,RollingStockTableSync>::FACTORY_KEY("35.10.07 Rolling Stock");
 	}
 
-	namespace vehicle
-	{
-		const string RollingStockTableSync::COL_NAME("name");
-		const string RollingStockTableSync::COL_ARTICLE("article");
-		const string RollingStockTableSync::COL_INDICATOR("indicator_label");
-		const string RollingStockTableSync::COL_TRIDENT("trident_key");
-		const string RollingStockTableSync::COL_IS_TRIDENT_REFERENCE("is_trident_reference");
-		const string RollingStockTableSync::COL_CO2_EMISSIONS("CO2_emissions");
-		const string RollingStockTableSync::COL_ENERGY_CONSUMPTION("energy_consumption");
-		const string RollingStockTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<RollingStockTableSync>::TABLE(
@@ -70,15 +58,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<RollingStockTableSync>::_FIELDS[]=
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(RollingStockTableSync::COL_NAME, SQL_TEXT),
-			Field(RollingStockTableSync::COL_ARTICLE, SQL_TEXT),
-			Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
-			Field(RollingStockTableSync::COL_TRIDENT, SQL_TEXT),
-			Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
-			Field(RollingStockTableSync::COL_CO2_EMISSIONS, SQL_DOUBLE),
-			Field(RollingStockTableSync::COL_ENERGY_CONSUMPTION, SQL_DOUBLE),
-			Field(RollingStockTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field()
 		};
 
@@ -86,72 +65,8 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<RollingStockTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(RollingStockTableSync::COL_TRIDENT.c_str(), RollingStockTableSync::COL_IS_TRIDENT_REFERENCE.c_str(), ""));
+			r.push_back(DBTableSync::Index(TridentKey::FIELD.name.c_str(), IsTridentReference::FIELD.name.c_str(), ""));
 			return r;
-		}
-
-
-		template<> void OldLoadSavePolicy<RollingStockTableSync,RollingStock>::Load(
-			RollingStock* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Properties
-			object->setName(rows->getText(RollingStockTableSync::COL_NAME));
-			object->setArticle(rows->getText(RollingStockTableSync::COL_ARTICLE));
-			object->setIndicator(rows->getText(RollingStockTableSync::COL_INDICATOR));
-			object->setTridentKey(rows->getText(RollingStockTableSync::COL_TRIDENT));
-			object->setIsTridentKeyReference(rows->getBool(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE));
-			object->setCO2Emissions(rows->getDouble(RollingStockTableSync::COL_CO2_EMISSIONS));
-			object->setEnergyConsumption(rows->getDouble(RollingStockTableSync::COL_ENERGY_CONSUMPTION));
-
-			// Data source links
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				Importable::DataSourceLinks dsl(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(RollingStockTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-				if(linkLevel > UP_LINKS_LOAD_LEVEL)
-				{
-					object->setDataSourceLinksWithRegistration(dsl);
-				}
-				else
-				{
-					object->setDataSourceLinksWithoutRegistration(dsl);
-				}
-			}
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RollingStockTableSync,RollingStock>::Save(
-			RollingStock* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<RollingStockTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getArticle());
-			query.addField(object->getIndicator());
-			query.addField(object->getTridentKey());
-			query.addField(object->getIsTridentKeyReference());
-			query.addField(object->getCO2Emissions());
-			query.addField(object->getEnergyConsumption());
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.execute(transaction);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<RollingStockTableSync,RollingStock>::Unlink(
-			RollingStock* obj
-		){
-			obj->cleanDataSourceLinks(true);
 		}
 
 
@@ -207,15 +122,15 @@ namespace synthese
 			SelectQuery<RollingStockTableSync> query;
 			if(tridentKey)
 			{
-				query.addWhereField(COL_TRIDENT, *tridentKey);
+				query.addWhereField(TridentKey::FIELD.name, *tridentKey);
 			}
 			if(tridentReference)
 			{
-				query.addWhereField(COL_IS_TRIDENT_REFERENCE, 1);
+				query.addWhereField(IsTridentReference::FIELD.name, 1);
 			}
 			if(orderByName)
 			{
-				query.addOrderField(COL_NAME, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			query.setNumber(number);
 			query.setFirst(first);
@@ -267,9 +182,9 @@ namespace synthese
 
 				SelectQuery<RollingStockTableSync> query;
 				Env env;
-				if(prefix) query.addWhereField(RollingStockTableSync::COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+				if(prefix) query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 				if(limit) query.setNumber(*limit);
-				query.addOrderField(COL_NAME,true);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name,true);
 				RollingStockTableSync::SearchResult elements(RollingStockTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 				BOOST_FOREACH(const boost::shared_ptr<RollingStock>& elem, elements)
 				{

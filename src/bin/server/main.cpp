@@ -262,7 +262,8 @@ int main( int argc, char **argv )
 #else
 					" Without MYSQL" <<
 #endif
-					std::endl;
+                    std::endl;
+                
 				return 1;
 			}
 
