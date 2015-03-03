@@ -111,7 +111,7 @@ namespace synthese
 
 				_result.insert(
 					make_pair(
-						it1.first.getService(),
+						it1.first.getService()->getKey(),
 						it1.first
 				)	);
 			}
@@ -137,7 +137,19 @@ namespace synthese
 				ServicesList::const_iterator it(_result.find(it2.first));
 				if(it == _result.end())
 				{
-					_deletions.insert(it2);
+					boost::shared_ptr<const pt::ScheduledService> existentService;
+					try
+					{
+						existentService = Env::GetOfficialEnv().get<ScheduledService>(it2.first);
+					}
+					catch (...)
+					{
+						util::Log::GetInstance().debug("VDVClientSubscription Exception : service has been deleted");
+					}
+					if (existentService.get() && it2.second.getService() == existentService.get())
+					{
+						_deletions.insert(it2);
+					}
 				}
 			}
 

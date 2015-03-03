@@ -206,6 +206,11 @@ namespace synthese
 				if(_vdvServerActive)
 				{
 					ServerModule::SetCurrentThreadRunningAction();
+					
+					// get upgradable access
+					boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::IneoBDSIAgainstVDVMutex);
+					// get exclusive access
+					boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 
 					BOOST_FOREACH(
 						VDVClient::Registry::value_type& client,

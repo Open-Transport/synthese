@@ -54,16 +54,19 @@ namespace synthese
 
 			static void UnSerialize(
 				Importable::DataSourceLinks& fieldObject,
-				const std::string& text,
+				const std::string& txt,
 				const util::Env& env
 			){
 				fieldObject.clear();
-				if(text.empty())
+
+				if(txt.empty())
 				{
 					return;
 				}
-				std::vector<std::string> sources;
-				boost::algorithm::split(sources, text, boost::is_any_of(Importable::SOURCES_SEPARATOR));
+
+				std::string text = preparse(txt);
+
+				std::vector<std::string> sources = split(text, Importable::SOURCES_SEPARATOR, Importable::SEPARATOR_ESCAPE);
 				BOOST_FOREACH(const std::string& source, sources)
 				{
 					try
@@ -71,7 +74,8 @@ namespace synthese
 						// Parsing of the string
 						util::RegistryKeyType sourceId(0);
 						std::string code;
-						if(!boost::algorithm::find_first(source, Importable::FIELDS_SEPARATOR))
+						std::vector<std::string> fields = split(source, Importable::FIELDS_SEPARATOR, Importable::SEPARATOR_ESCAPE);
+						if( fields.size() < 2 )
 						{ // Only datasource
 							try
 							{
@@ -89,8 +93,6 @@ namespace synthese
 						}
 						else
 						{
-							std::vector<std::string> fields;
-							boost::algorithm::split(fields, source, boost::is_any_of(Importable::FIELDS_SEPARATOR));
 							sourceId = boost::lexical_cast<util::RegistryKeyType>(fields[0]);
 							code = fields[1];
 						}
@@ -100,6 +102,15 @@ namespace synthese
 						if(sourceId)
 						{
 							source = env.getEditable<DataSource>(sourceId);
+						}
+
+						// Un-escape the code
+						for (size_t i = 0; i < code.length(); i++)
+						{
+							if (code.at(i) == Importable::SEPARATOR_ESCAPE)
+							{
+								code.erase(i,1);
+							}
 						}
 
 						// Storage
@@ -180,18 +191,34 @@ namespace synthese
 						s << Importable::SOURCES_SEPARATOR;
 					}
 
+					std::string code = it.second;
+
+					// Add escape to separators and escapes in the text
+					for (size_t i = 0; i < code.length(); i++)
+					{
+						char c = code.at(i);
+						if ( c == Importable::FIELDS_SEPARATOR ||
+							 c == Importable::SOURCES_SEPARATOR ||
+							 c == Importable::SEPARATOR_ESCAPE )
+						{
+							code.insert(i, 1, Importable::SEPARATOR_ESCAPE);
+							// Skip the inserted character
+							i++;
+						}
+					}
+
 					if(it.first)
 					{
 						s << it.first->getKey();
-						if(!it.second.empty())
+						if(!code.empty())
 						{
 							s << Importable::FIELDS_SEPARATOR;
-							s << it.second;
+							s << code;
 						}
 					}
 					else
 					{
-						s << it.second;
+						s << code;
 					}
 				}
 				return s.str();
@@ -233,22 +260,25 @@ namespace synthese
 
 
 
-			static void GetLinkedObjectsIdsFromText(LinkedObjectsIds& list, const std::string& text)
+			static void GetLinkedObjectsIdsFromText(LinkedObjectsIds& list, const std::string& txt)
 			{
-				if(text.empty())
+
+				if(txt.empty())
 				{
 					return;
 				}
 
-				std::vector<std::string> sources;
-				boost::algorithm::split(sources, text, boost::is_any_of(Importable::SOURCES_SEPARATOR));
+				std::string text = preparse(txt);
+
+				std::vector<std::string> sources = split(text, Importable::SOURCES_SEPARATOR, Importable::SEPARATOR_ESCAPE);
 				BOOST_FOREACH(const std::string& source, sources)
 				{
 					try
 					{
 						// Parsing of the string
 						util::RegistryKeyType sourceId(0);
-						if(!boost::algorithm::find_first(source, Importable::FIELDS_SEPARATOR))
+						std::vector<std::string> fields = split(source, Importable::FIELDS_SEPARATOR, Importable::SEPARATOR_ESCAPE);
+						if( fields.size() < 2 )
 						{ // Only datasource
 							try
 							{
@@ -264,8 +294,6 @@ namespace synthese
 						}
 						else
 						{
-							std::vector<std::string> fields;
-							boost::algorithm::split(fields, source, boost::is_any_of(Importable::FIELDS_SEPARATOR));
 							sourceId = boost::lexical_cast<util::RegistryKeyType>(fields[0]);
 						}
 
@@ -302,6 +330,150 @@ namespace synthese
 				const Importable& impObject(dynamic_cast<const Importable&>(object));
 				std::string s(DataSourceLinksField<C>::Serialize(impObject.getDataSourceLinks()));
 				content.push_back(Cell(s));
+			}
+
+
+
+			/** Pre-parse a string for datasource structure
+
+				This function will add escape characters where a separator
+				should not be a separator.
+
+				For ',', it means when the following character until the next '|' are not a number or empty.
+				For '|', it means when the last separator in the string also was an '|'.
+				For '\', it means when the next character is not a separator or another escape.
+
+				@param text Text to modify
+				@return Modified text
+			*/
+			static std::string preparse (const std::string & txt)
+			{
+				std::string text = txt;
+
+				// We go through the given text
+				char lastSep = ' ';
+				for (size_t i = 0; i < text.length(); i++)
+				{
+					char c = text.at(i);
+
+					// Escape (\)
+					if ( c == Importable::SEPARATOR_ESCAPE )
+					{
+						// If this is the last character, it should be escaped
+						if ( i + 1 == text.length() )
+						{
+							text.insert(i,1,Importable::SEPARATOR_ESCAPE);
+						}
+						else
+						{
+							// If the next character is a separator or an escape, everything is OK (if not awesome)
+							char c2 = text.at(i+1);
+							if ( c2 != Importable::FIELDS_SEPARATOR &&
+								 c2 != Importable::SOURCES_SEPARATOR &&
+								 c2 != Importable::SEPARATOR_ESCAPE )
+							{
+								text.insert(i,1,Importable::SEPARATOR_ESCAPE);
+							}
+						}
+
+						// Note : skips the next character in this case because it IS escaped
+						// and therefore should NOT be considered as a separator
+						i++;
+					}
+
+					// Source separator (,)
+					else if ( c == Importable::SOURCES_SEPARATOR )
+					{
+						lastSep = c;
+
+						// Find the next field separator '|'
+						size_t end = text.find_first_of(Importable::FIELDS_SEPARATOR,i);
+
+						// If the data until next separator is not empty and is not an int, add an escape character
+						if ( end != i + 1 )
+						{
+							try
+							{
+								boost::lexical_cast<util::RegistryKeyType>( text.substr(i + 1, end - i -1) );
+							}
+							catch(boost::bad_lexical_cast)
+							{
+								text.insert(i,1,Importable::SEPARATOR_ESCAPE);
+								i++;
+							}
+						}
+					}
+
+					// Field separator (|), escape it if the last separator was also a field separator
+					else if ( c == Importable::FIELDS_SEPARATOR )
+					{
+						if ( lastSep == Importable::FIELDS_SEPARATOR )
+						{
+							text.insert(i,1,Importable::SEPARATOR_ESCAPE);
+							i++;
+						}
+						else
+						{
+							lastSep = c;
+						}
+					}
+				}
+
+				return text;
+			}
+
+
+			/** Splits a string into a vector using a separator
+				 An escape character is used to enable the use of the separator in the text.
+
+				 For example, if a chain to split with ',' contains a legitimate (non-separator) comma,
+				 it can be escaped with '\' like this : 'hello\, world'
+				 This comma will then be ignored as a separator.
+
+				 @param text Text to split
+				 @param sep Separator
+				 @param escape Escape character
+			*/
+			static std::vector<std::string> split (const std::string & text, char sep, char escape)
+			{
+				std::vector<std::string> out;
+
+				// We go through the given text
+				size_t last = 0;
+				for (size_t i = 0; i < text.length(); i++)
+				{
+					// If the character is the separator
+					if (text.at(i) == sep)
+					{
+						// If the character preceding exists and is the escape on, ignore this separator
+						if ( i > 0 && text.at(i-1) == escape )
+						{
+							// Except if it is itself escaped
+							if ( ! (i > 1 && text.at(i-2) == escape) )
+							{
+								continue;
+							}
+						}
+
+						// If there has been text between this separator and the preceding one,
+						// add it to the output
+						if ( i != last )
+						{
+							out.push_back( text.substr(last, i-last) );
+						}
+
+						// Set the last to the character after the separator
+						last = i + 1;
+					}
+				}
+
+				// If there is some characters left, add them
+				if (last < text.length())
+				{
+					out.push_back( text.substr(last) );
+				}
+
+				return out;
 			}
 		};
 	

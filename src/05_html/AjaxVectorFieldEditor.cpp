@@ -230,7 +230,7 @@ namespace synthese
 		void AjaxVectorFieldEditor::TextInputField::outputValue( std::ostream& stream, const std::vector<std::string>& value ) const
 		{
 			if(!value.empty())
-				stream << "\"" << replace_all_copy(value.front(),"\"","'") << "\"";
+				stream << "\"" << replace_all_copy(replace_all_copy(value.front(),"\"","'"),"\\","\\\\") << "\"";
 		}
 
 

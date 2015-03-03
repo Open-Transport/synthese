@@ -48,8 +48,9 @@ namespace synthese
 		const string Importable::ATTR_DATA_SOURCE_NAME = "data_source_name";
 		const string Importable::ATTR_ID = "id";
 
-		const string Importable::SOURCES_SEPARATOR = ",";
-		const string Importable::FIELDS_SEPARATOR = "|";
+		const char Importable::SOURCES_SEPARATOR = ',';
+		const char Importable::FIELDS_SEPARATOR = '|';
+		const char Importable::SEPARATOR_ESCAPE = '\\';
 
 
 		Importable::Importable():

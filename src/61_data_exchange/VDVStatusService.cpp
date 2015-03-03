@@ -122,6 +122,11 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
+			
+			// get upgradable access
+			boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::IneoBDSIAgainstVDVMutex);
+			// get exclusive access
+			boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 
 			// Map creation
 			ParametersMap map;

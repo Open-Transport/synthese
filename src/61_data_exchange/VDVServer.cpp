@@ -437,6 +437,8 @@ namespace synthese
 		void VDVServer::updateSYNTHESEFromServer() const
 		{
 			this_thread::sleep(boost::posix_time::seconds(5));
+			
+			boost::shared_lock<boost::shared_mutex> lockVDV(ServerModule::IneoBDSIAgainstVDVMutex);
 
 			date today(day_clock::local_day());
 
@@ -544,7 +546,7 @@ namespace synthese
 					// If no corresponding subscription, log it and continue
 					if (!currentSubscription)
 					{
-						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant Ã  aucun abonnement");
+						Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht ne correspondant à aucun abonnement");
 						continue;
 					}
 					
@@ -558,7 +560,7 @@ namespace synthese
 						string readAZBID = AZBFahrplanlageNode.getChildNode("AZBID").getText();
 						if (readAZBID != currentSubscription->get<StopArea>()->getACodeBySource(*get<DataSource>()))
 						{
-							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant Ã  l'abonnement");
+							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un AZBNachtricht avec un AZBID ne correspondant à l'abonnement");
 							break;
 						}
 						
@@ -568,7 +570,7 @@ namespace synthese
 						split(vectServiceCode, serviceCode, is_any_of("-"));
 						if (vectServiceCode.size() != 3)
 						{
-							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service avec un code diffÃ©rent de XXX-XXXX-XXXX");
+							Log::GetInstance().warn("Réception d'un DatenAbrufenAntwort contenant un service avec un code différent de XXX-XXXX-XXXX");
 							continue;
 						}
 						// Service code is on 5 characters in the planned datasource

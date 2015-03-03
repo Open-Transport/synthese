@@ -155,7 +155,7 @@ namespace synthese
 			const Request& request
 		) const {
 			// get upgradable access
-			boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::IneoBDSIAgainstVDVDataSupplyMutex);
+			boost::upgrade_lock<boost::shared_mutex> lock(ServerModule::IneoBDSIAgainstVDVMutex);
 			// get exclusive access
 			boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 
