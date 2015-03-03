@@ -3,3 +3,9 @@ build
 build_cmake
 CMakeLists.txt.user
 *.pyc
+Makefile
+*.so
+CMakeFiles
+.project
+.cproject
+CMakeCache.txt

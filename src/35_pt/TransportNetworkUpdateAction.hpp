@@ -39,6 +39,7 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
+		class ReservationContact;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// TransportNetworkUpdateAction action class.
@@ -53,6 +54,10 @@ namespace synthese
 			static const std::string PARAMETER_DAYS_CALENDARS_PARENT_ID;
 			static const std::string PARAMETER_PERIODS_CALENDARS_PARENT_ID;
 			static const std::string PARAMETER_IMAGE;
+			static const std::string PARAMETER_TIMEZONE;
+			static const std::string PARAMETER_LANG;
+			static const std::string PARAMETER_CONTACT_ID;
+			static const std::string PARAMETER_FARE_CONTACT_ID;
 
 		private:
 			boost::shared_ptr<TransportNetwork> _network;
@@ -60,6 +65,10 @@ namespace synthese
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _daysCalendarsParent;
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _periodsCalendarsParent;
 			boost::optional<std::string> _image;
+			boost::optional<std::string> _timezone;
+			boost::optional<std::string> _lang;
+			boost::optional<boost::shared_ptr<pt::ReservationContact> > _contact;
+			boost::optional<boost::shared_ptr<pt::ReservationContact> > _fareContact;
 
 
 		protected:

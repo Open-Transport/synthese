@@ -65,6 +65,9 @@ namespace synthese
 			static const std::string PARAMETER_CPU;
 			static const std::string PARAMETER_MAC_ADDRESS;
 			static const std::string PARAMETER_SUB_SCREEN_TYPE;
+			static const std::string PARAMETER_X;
+			static const std::string PARAMETER_Y;
+			static const std::string PARAMETER_SRID;
 
 		private:
 			std::string									_name;
@@ -75,6 +78,8 @@ namespace synthese
 			int											_comPort;
 			std::string									_macAddress;
 			DisplayScreen::SubScreenType				_subScreenType;
+			boost::shared_ptr<geos::geom::Point>		_point;
+			const CoordinatesSystem*                    _coordinatesSystem;
 
 
 		protected:
@@ -94,6 +99,8 @@ namespace synthese
 			void run(server::Request& request);
 
 			void setScreenId(util::RegistryKeyType id);
+
+			void setPoint(boost::shared_ptr<geos::geom::Point> value);
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

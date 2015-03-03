@@ -40,6 +40,7 @@
 #include "PTModule.h"
 #include "ContinuousService.h"
 #include "SchedulesBasedService.h"
+#include "ContinuousService.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
@@ -60,6 +61,10 @@
 #include "InterfacePageException.h"
 #include "MimeTypes.hpp"
 #include "TransportNetwork.h"
+#ifdef WITH_SCOM
+	#include "SCOMModule.h"
+	#include "SCOMData.h"
+#endif
 
 #include <sstream>
 
@@ -104,6 +109,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_DATA_SOURCE_FILTER("data_source_filter");
 		const string DisplayScreenContentFunction::PARAMETER_SPLIT_CONTINUOUS_SERVICES("split_continuous_services");
 		const string DisplayScreenContentFunction::PARAMETER_MAX_DAYS_NEXT_DEPARTURES("max_days_next_departures");
+		const string DisplayScreenContentFunction::PARAMETER_USE_SCOM("use_scom");
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -190,6 +196,11 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_DUMMY_KEY("0");
 
 		const time_duration DisplayScreenContentFunction::endOfService = hours(3);
+		const string DisplayScreenContentFunction::DATA_HANDICAPPED_ACCESS("handicapped_access");
+
+
+		const string PIPO_KEY("00");
+		vector<string> DisplayScreenContentFunction::_SAELine;
 
 		DisplayScreenContentFunction::SAELine DisplayScreenContentFunction::_SAELine;
 		ptime DisplayScreenContentFunction::_nextUpdateLine = second_clock::local_time();
@@ -266,6 +277,14 @@ namespace synthese
 			api.addParams(DisplayScreenContentFunction::PARAMETER_TIMETABLE_GROUPED_BY_AREA,
 						  "Group the results by StopArea, displaying next departures for each <Line, Destination> pair."
 						  "Pairs are ordered by default Commercial Line order and destination order (alphanumeric).",
+						  false);
+			api.addParams(DisplayScreenContentFunction::PARAMETER_USE_SCOM,
+						  "Specify if the data from Ineo's SCOM server should be used."
+						  "Synthese must have been built with SCOM support and the SCOM listener setup for this to work.\n"
+						  "For now, only the call using _displayDepartureBoardRow will be impacted."
+						  "See the SCOM documentation for more information.\n"
+						  "By default, SCOM is disabled."
+						  "Possible values : true or false",
 						  false);
 			return api;
 		}
@@ -677,6 +696,17 @@ namespace synthese
 				{
 					throw RequestException("The screen "+ lexical_cast<string>(id) +" has no type.");
 				}
+
+				// Enable SCOM if available
+				_scom = map.isDefined(PARAMETER_USE_SCOM) && map.get<string>(PARAMETER_USE_SCOM) == "true";
+				#ifndef WITH_SCOM
+				if (_scom)
+				{
+					Log::GetInstance().debug("SCOM disabled in compilation (no -DWITH_SCOM), it will not be used");
+					_scom = false;
+				}
+				#endif
+
 			}
 			catch (ObjectNotFoundException<DisplayScreen> e)
 			{
@@ -704,12 +734,10 @@ namespace synthese
 			const StopArea* connPlace(stop->getConnectionPlace());
 
 			//Here we got our service !
-			//TODO: check if service schedules are realtime in the !_useSAEDirectConnection case
-			//(Instead of saying "yes" every time)
 			stream <<"<journey routeId=\""<< journeyPattern->getKey() <<
 				"\" dateTime=\""    << servicePointer.getDepartureDateTime() <<
 				"\" blink=\"" << "0" <<
-				"\" "<< DATA_IS_REAL_TIME <<"=\"" << (_useSAEDirectConnection ? "no" : "yes") <<
+					 "\" "<< DATA_IS_REAL_TIME <<"=\"" << (service->hasRealTimeData() ? "yes":"no") <<
 				"\" "<< DATA_WAITING_TIME <<"=\"" << to_simple_string(servicePointer.getDepartureDateTime() - second_clock::local_time()) <<
 				"\">";
 
@@ -895,6 +923,19 @@ namespace synthese
 				journeyPm->insert(DATA_NETWORK_NAME, journeyPattern->getNetwork()->getName());
 			}
 
+			// Waiting time
+			time_duration waitingTime(servicePointer.getDepartureDateTime() - second_clock::local_time());
+			journeyPm->insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
+
+			// Handicapped access
+			const PTUseRule* handicappedUserRule = dynamic_cast<const PTUseRule*>(
+				&(service)->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
+			);
+			journeyPm->insert(DATA_HANDICAPPED_ACCESS, handicappedUserRule ? handicappedUserRule->getAccessCapacity().get_value_or(9999) != 0 : true);
+
+			// Is realtime
+			journeyPm->insert(DATA_IS_REAL_TIME, service->hasRealTimeData());
+
 			boost::shared_ptr<ParametersMap> stopPM(new ParametersMap);
 			stop->toParametersMap(*stopPM, false);
 			journeyPm->insert("stop", stopPM);
@@ -1004,9 +1045,11 @@ namespace synthese
 
 				try
 				{
-					// End time
+					// Start time
 					ptime realStartDateTime(date);
 					realStartDateTime -= minutes(_screen->get<ClearingDelay>());
+
+					// End time
 					ptime endDateTime(realStartDateTime);
 					endDateTime += minutes(_screen->get<MaxDelay>());
 
@@ -1044,7 +1087,7 @@ namespace synthese
 					else
 					{
 						ArrivalDepartureList displayedObject(
-							_screen->generateStandardScreen(realStartDateTime, endDateTime)
+							_screen->generateStandardScreen(realStartDateTime, endDateTime, true, _scom)
 						);
 
 						if(_screen->get<DisplayTypePtr>()->get<DisplayInterface>() &&
@@ -2450,6 +2493,55 @@ namespace synthese
 					);
 				}
 
+				// Link between an adapted time and a service
+				std::multimap<ptime,ArrivalDepartureList::const_iterator> times;
+
+				// Adapting the time using SCOM if activated
+				#ifdef WITH_SCOM
+				if (_scom)
+				{
+					for (ArrivalDepartureList::const_iterator it = rows.begin(); it != rows.end(); ++it)
+					{
+						// Fetch the time from SCOM
+						const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(it->first.getService()->getPath());
+
+						std::string dest =
+							journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
+							journeyPattern->getDirectionObj()->getDisplayedText() :
+							journeyPattern->getDirection();
+
+						ptime adaptedTime = it->first.getDepartureDateTime();
+
+						// Check object before calling them
+						adaptedTime = scom::SCOMModule::GetSCOMData()->GetWaitingTime(
+							_screen.get()->getCodeBySources(),
+							journeyPattern->getCommercialLine()->getShortName(),
+							dest,
+							adaptedTime,
+							date
+						);
+
+						// Save the adapted time
+						times.insert(make_pair(adaptedTime,it));
+					}
+
+				}
+				#endif
+
+				// No SCOM, just use the service time
+				if (
+					!_scom
+				#ifndef WITH_SCOM
+					|| true
+				#endif
+				)
+				{
+					for (ArrivalDepartureList::const_iterator it = rows.begin(); it != rows.end(); ++it)
+					{
+						times.insert(make_pair(it->first.getDepartureDateTime(),it));
+					}
+				}
+
 				/// @todo replace by parameters or something else
 				int __Pages(0);
 				int departuresToHide(0);
@@ -2487,9 +2579,9 @@ namespace synthese
 					// Boucle sur les rangees
 					int __Rangee = __MultiplicateurRangee;
 					int departuresNumber = rows.size() - departuresToHide;
-					for (ArrivalDepartureList::const_iterator it = rows.begin(); departuresNumber && (it != rows.end()); ++it, --departuresNumber)
+					for (std::multimap<ptime,ArrivalDepartureList::const_iterator>::const_iterator it = times.begin(); departuresNumber && (it != times.end()); ++it, --departuresNumber)
 					{
-						const ArrivalDepartureRow& row(*it);
+						const ArrivalDepartureRow& row(*it->second);
 
 						int __NombrePagesRangee = row.second.size () - 2;
 						int pageNumber = ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
@@ -2573,6 +2665,12 @@ namespace synthese
 					pm.insert(DATA_BLINKS, true);
 				}
 
+				// Handicapped access (true by default)
+				const PTUseRule* handicappedUserRule = dynamic_cast<const PTUseRule*>(
+					&(row.first.getService())->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
+				);
+				pm.insert(DATA_HANDICAPPED_ACCESS, handicappedUserRule ? handicappedUserRule->getAccessCapacity().get_value_or(9999) != 0 : true);
+
 				// Time
 				pm.insert(DATA_TIME, to_iso_extended_string(row.first.getDepartureDateTime().date()) + " " + to_simple_string(row.first.getDepartureDateTime().time_of_day()));
 				pm.insert(DATA_PLANNED_TIME, to_iso_extended_string(row.first.getTheoreticalDepartureDateTime().date()) + " " + to_simple_string(row.first.getTheoreticalDepartureDateTime().time_of_day()));
@@ -2589,6 +2687,21 @@ namespace synthese
 
 				// Is canceled
 				pm.insert(DATA_IS_CANCELED, row.first.getCanceled());
+
+				// Is realtime
+				const SchedulesBasedService* schedulesBasedService(dynamic_cast<const SchedulesBasedService*>(row.first.getService()));
+				if (schedulesBasedService)
+				{
+					pm.insert(DATA_IS_REAL_TIME, schedulesBasedService->hasRealTimeData());
+				}
+				else
+				{
+					const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(row.first.getService()));
+					if(continuousService)
+					{
+						pm.insert(DATA_IS_REAL_TIME, continuousService->hasRealTimeData());
+					}
+				}
 
 				// Direction
 				const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath()));

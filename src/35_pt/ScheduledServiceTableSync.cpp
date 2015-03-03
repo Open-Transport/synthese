@@ -159,11 +159,16 @@ namespace synthese
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
 				RegistryKeyType(0)
 			);
-			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
-				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
-				RegistryKeyType(0)
-			);
+
+			if (object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)))
+			{
+				query.addField(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey());
+			}
+			else
+			{
+				query.addField(RegistryKeyType(0));
+			}
+
 			query.addField(
 				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :

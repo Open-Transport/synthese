@@ -292,6 +292,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_BIKE_PLACES_NUMBER("bike_places_number");
 		const string PTJourneyPlannerService::DATA_WKT("wkt");
 		const string PTJourneyPlannerService::DATA_LINE_MARKERS("line_markers");
+		const string PTJourneyPlannerService::DATA_IS_REAL_TIME("realTime");
 
 		// Commercial lines
 		const string PTJourneyPlannerService::ITEM_COMMERCIAL_LINE("commercial_line");
@@ -343,7 +344,7 @@ namespace synthese
 			// Log path
 			if(_logger && !_logger->getDirectory().empty())
 			{
-				map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().file_string());
+				map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().filename().string());
 			}
 
 			// Departure place
@@ -2607,6 +2608,7 @@ namespace synthese
 			const JourneyPattern* line(static_cast<const JourneyPattern*>(serviceUse.getService()->getPath()));
 			const CommercialLine* commercialLine(line->getCommercialLine());
 			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(serviceUse.getService()));
+			const SchedulesBasedService* schedulesBasedService(dynamic_cast<const SchedulesBasedService*>(serviceUse.getService()));
 
 			// Build of the parameters vector
 			{
@@ -2666,9 +2668,16 @@ namespace synthese
 			); // 11
 			commercialLine->toParametersMap(pm, false);
 			serviceUse.getService()->toParametersMap(pm, false);
+
+			if (schedulesBasedService)
+			{
+				pm.insert(DATA_IS_REAL_TIME, schedulesBasedService->hasRealTimeData());
+			}
+
 			if(continuousService)
 			{
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
+				pm.insert(DATA_IS_REAL_TIME, continuousService->hasRealTimeData());
 			}
 
 			pm.insert(DATA_ODD_ROW, color);

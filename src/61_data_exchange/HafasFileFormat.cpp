@@ -1060,7 +1060,7 @@ namespace synthese
 			_file.clear();
 
 			// Opening the new file
-			_file.open(filePath.file_string().c_str());
+			_file.open(filePath.string().c_str());
 
 			// Check of the file path
 			if(!_file)

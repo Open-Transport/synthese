@@ -30,6 +30,8 @@
 #include "ParametersMap.h"
 #include "TransportNetworkTableSync.h"
 #include "TreeFolder.hpp"
+#include "ReservationContact.h"
+#include "ReservationContactTableSync.h"
 
 using namespace std;
 
@@ -62,7 +64,11 @@ namespace synthese
 		):	util::Registrable(id),
 			graph::PathClass(),
 			_daysCalendarsParent(NULL),
-			_periodsCalendarsParent(NULL)
+			_periodsCalendarsParent(NULL),
+			_timezone(""),
+			_lang(""),
+			_contact(NULL),
+			_fareContact(NULL)
 		{}
 
 
@@ -100,7 +106,16 @@ namespace synthese
 				prefix + TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID,
 				getPeriodsCalendarsParent() ? getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0)
 			);
-
+			pm.insert(prefix + TransportNetworkTableSync::COL_TIMEZONE, getTimezone());
+			pm.insert(prefix + TransportNetworkTableSync::COL_LANG, getLang());
+			pm.insert(
+				prefix + TransportNetworkTableSync::COL_CONTACT_ID,
+				getContact() ? getContact()->getKey() : RegistryKeyType(0)
+			);
+			pm.insert(
+				prefix + TransportNetworkTableSync::COL_FARE_CONTACT_ID,
+				getFareContact() ? getFareContact()->getKey() : RegistryKeyType(0)
+			);
 			pm.insert(prefix + DATA_NETWORK_ID, getKey());
 			pm.insert(prefix + DATA_NAME, getName());
 			pm.insert(prefix + DATA_IMAGE, getImage());
@@ -211,6 +226,88 @@ namespace synthese
 				}
 			}
 
+			// Timezone
+			if(record.isDefined(TransportNetworkTableSync::COL_TIMEZONE))
+			{
+				std::string timezone(
+					record.get<string>(TransportNetworkTableSync::COL_TIMEZONE)
+				);
+				if(timezone != _timezone)
+				{
+					result = true;
+					_timezone = timezone;
+				}
+			}
+
+			// Lang
+			if(record.isDefined(TransportNetworkTableSync::COL_LANG))
+			{
+				std::string lang(
+					record.get<string>(TransportNetworkTableSync::COL_LANG)
+				);
+				if(lang != _lang)
+				{
+					result = true;
+					_lang = lang;
+				}
+			}
+
+			// Contact
+			if(record.isDefined(TransportNetworkTableSync::COL_CONTACT_ID))
+			{
+				ReservationContact* value(NULL);
+
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(
+						TransportNetworkTableSync::COL_CONTACT_ID,
+						0
+				)	);
+				if(id > 0) try
+				{
+					value = ReservationContactTableSync::GetEditable(
+						id, env
+					).get();
+				}
+				catch(ObjectNotFoundException<ReservationContact>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_CONTACT_ID, e);
+				}
+
+				if(value != _contact)
+				{
+					_contact = value;
+					result = true;
+				}
+			}
+
+			// Fare contact
+			if(record.isDefined(TransportNetworkTableSync::COL_FARE_CONTACT_ID))
+			{
+				ReservationContact* value(NULL);
+
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(
+						TransportNetworkTableSync::COL_FARE_CONTACT_ID,
+						0
+				)	);
+				if(id > 0) try
+				{
+					value = ReservationContactTableSync::GetEditable(
+						id, env
+					).get();
+				}
+				catch(ObjectNotFoundException<ReservationContact>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TransportNetworkTableSync::TABLE.NAME + "/" + TransportNetworkTableSync::COL_FARE_CONTACT_ID, e);
+				}
+
+				if(value != _fareContact)
+				{
+					_fareContact = value;
+					result = true;
+				}
+			}
+
 			return result;
 		}
 
@@ -231,6 +328,22 @@ namespace synthese
 				RegistryKeyType id(
 					record.getDefault<RegistryKeyType>(
 						TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID,
+						0
+				)	);
+				if(id) result.push_back(id);
+			}
+			{
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(
+						TransportNetworkTableSync::COL_CONTACT_ID,
+						0
+				)	);
+				if(id) result.push_back(id);
+			}
+			{
+				RegistryKeyType id(
+					record.getDefault<RegistryKeyType>(
+						TransportNetworkTableSync::COL_FARE_CONTACT_ID,
 						0
 				)	);
 				if(id) result.push_back(id);

@@ -27,6 +27,7 @@
 
 #include "NumericField.hpp"
 #include "StringField.hpp"
+#include "ImportableTemplate.hpp"
 
 namespace synthese
 {
@@ -44,7 +45,6 @@ namespace synthese
 		FIELD(WebsiteURL)
 	> ReservationContactSchema;
 
-
 	namespace pt
 	{
 		/** Reservation contact.
@@ -52,7 +52,8 @@ namespace synthese
 		*/
 		class ReservationContact:
 			public Object<ReservationContact, ReservationContactSchema>,
-			public virtual util::Registrable
+			public virtual util::Registrable,
+			public impex::ImportableTemplate<ReservationContact>
 		{
 		 public:
 			ReservationContact(

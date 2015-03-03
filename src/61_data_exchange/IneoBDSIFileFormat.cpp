@@ -40,6 +40,7 @@
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "ParametersMap.h"
+#include "PTUseRuleTableSync.h"
 #include "Request.h"
 #include "RequestException.h"
 #include "ScenarioTableSync.h"
@@ -85,6 +86,10 @@ namespace synthese
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_CONVERT_STOP_CODE_TO_LOWER = "convert_stop_code_to_lower";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_MESSAGES_SECTION = "ms";
 		const string IneoBDSIFileFormat::Importer_::PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE = "send_deactivations_by_inter_synthese";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE = "handicapped_forbidden_use_rule";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_NEUTRALIZED = "neutralized";
+		const string IneoBDSIFileFormat::Importer_::PARAMETER_NON_COMMERCIAL = "non_commercial";
 		
 		recursive_mutex IneoBDSIFileFormat::Importer_::_tabRunningBdsiMutex;
 		set<RegistryKeyType> IneoBDSIFileFormat::Importer_::_runningBdsi;
@@ -157,6 +162,34 @@ namespace synthese
 			
 			// Send service deactivations by inter_synthese
 			_sendDeactivationsByInterSYNTHESE = map.getDefault<bool>(PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE, false);
+
+			// Handicapped PT forbidden use rule
+			_handicappedForbiddenPTUseRuleId = map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE);
+			if(_handicappedForbiddenPTUseRuleId) try
+			{
+				PTUseRuleTableSync::GetEditable(_handicappedForbiddenPTUseRuleId, _env);
+			}
+			catch(ObjectNotFoundException<PTUseRule>&)
+			{
+				throw Exception("No such handicapped forbidden use rule");
+			}
+
+			// Handicapped PT allowed use rule
+			_handicappedPTAllowedUseRuleId = map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE);
+			if(_handicappedPTAllowedUseRuleId) try
+			{
+				PTUseRuleTableSync::GetEditable(_handicappedPTAllowedUseRuleId, _env);
+			}
+			catch(ObjectNotFoundException<PTUseRule>&)
+			{
+				throw Exception("No such handicapped allowed use rule");
+			}
+
+			// Eliminate neutralized services
+			_neutralized = map.getDefault<bool>(PARAMETER_NEUTRALIZED, false);
+
+			// Eliminate non-commercial services
+			_nonCommercial = map.getDefault<bool>(PARAMETER_NON_COMMERCIAL, false);
 		}
 
 
@@ -167,7 +200,8 @@ namespace synthese
 			const Chainage& chainage,
 			const std::string& courseRef,
 			const time_duration& nowDuration,
-			Chainages& chainages
+			Chainages& chainages,
+			const RegistryKeyType& handicapped
 		) const {
 
 			// Jump over courses with incomplete chainages
@@ -255,6 +289,7 @@ namespace synthese
 				course.horaires = horaires;
 				course.chainage = &chainage;
 				course.syntheseService = NULL;
+			course.handicapped = handicapped;
 
 				// Trace
 				_logLoadDetail(
@@ -656,7 +691,7 @@ namespace synthese
 			// Courses
 			{
 				string horaireQuery(
-					"SELECT "+
+					"SELECT DISTINCT "+
 						_database +".HORAIRE.hra,"+
 						_database +".HORAIRE.hrd,"+
 						_database +".HORAIRE.hta,"+
@@ -664,13 +699,26 @@ namespace synthese
 						_database +".HORAIRE.etat_harr,"+
 						_database +".HORAIRE.etat_hdep,"+
 						_database +".HORAIRE.course,"+
-						_database +".ARRETCHN.chainage "+
+						_database +".ARRETCHN.chainage, "+
+						// The if in the next line is here because it looks like there is no way in Synthese to do the difference
+						// between a empty string and a NULL value (resulting from the LEFT JOIN)
+						"IF("+ _database +".VEHICULE.Symb IS NULL, 'NULL', "+ _database +".VEHICULE.Symb) As Symb "+
 					"FROM "+
 						_database +".HORAIRE "+
 						"INNER JOIN "+ _database +".ARRETCHN ON "+
 							_database +".HORAIRE.arretchn="+ _database +".ARRETCHN.ref AND "+ _database +".HORAIRE.jour="+ _database +".ARRETCHN.jour "+
+						"LEFT JOIN "+ _database +".COURSE ON "+
+							_database +".COURSE.ref="+ _database +".HORAIRE.course AND "+ _database +".COURSE.jour="+ _database +".ARRETCHN.jour "+
+						"LEFT JOIN "+ _database +".VEHICULE ON "+
+							_database +".VEHICULE.Course="+ _database +".COURSE.ref AND "+
+							_database +".VEHICULE.ligne="+ _database +".COURSE.ligne AND "+
+							_database +".VEHICULE.jour="+ _database +".ARRETCHN.jour "+
 					"WHERE "+
 						_database +".HORAIRE.jour="+ todayStr +
+						// Eliminate neutralized courses if asked
+						( _neutralized ? " AND ( "+ _database +".VEHICULE.Neutralise != 'O' OR "+ _database +".VEHICULE.Neutralise IS NULL )" : "" ) +
+						// Eliminate non-commercial courses if asked
+						( _nonCommercial ? " AND "+ _database +".COURSE.type != 'H'" : "" ) +
 					" ORDER BY "+
 						_database +".HORAIRE.course, "+
 						_database +".ARRETCHN.pos"
@@ -681,6 +729,7 @@ namespace synthese
 				string lastCourseRef;
 				Course::Horaires horaires;
 				const Chainage* chainage(NULL);
+				RegistryKeyType handicapped;
 				while(horaireResult->next())
 				{
 					string courseRef(horaireResult->get<string>("course"));
@@ -695,7 +744,8 @@ namespace synthese
 							*chainage,
 							lastCourseRef,
 							nowDuration,
-							chainages
+							chainages,
+							handicapped
 						);
 					}
 
@@ -722,6 +772,21 @@ namespace synthese
 						// Now entering in the new course
 						lastCourseRef = courseRef;
 						horaires.clear();
+
+						// Handicaped flag (linked to the course)
+
+						std::string hstr = horaireResult->getText("Symb");
+						if( hstr != "NULL" )
+						{
+							handicapped =
+								(hstr == ">H" || hstr == "¸")
+								? _handicappedPTAllowedUseRuleId
+								: _handicappedForbiddenPTUseRuleId;
+						}
+						else
+						{
+							handicapped = 0;
+						}
 					}
 
 					// Avoid useless work
@@ -797,7 +862,8 @@ namespace synthese
 						*chainage,
 						lastCourseRef,
 						nowDuration,
-						chainages
+						chainages,
+						handicapped
 					);
 				}
 			}
@@ -1707,6 +1773,16 @@ namespace synthese
 			const boost::posix_time::time_duration& hysteresis
 		) const	{
 
+			bool updated(false);
+
+			// Update the handicapped rules (if any)
+			if (handicapped)
+			{
+				RuleUser::Rules rules = syntheseService->getRules();
+				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::GetEditable(handicapped, Env::GetOfficialEnv()).get();
+				syntheseService->setRules(rules);
+			}
+
 			// Update of the real time schedules
 			SchedulesBasedService::Schedules departureSchedules(
 				syntheseService->getDepartureSchedules(true, true)
@@ -1714,7 +1790,7 @@ namespace synthese
 			SchedulesBasedService::Schedules arrivalSchedules(
 				syntheseService->getArrivalSchedules(true, true)
 			);
-			bool updated(false);
+
 			time_duration maxDelta(seconds(0));
 			time_duration minDelta(seconds(0));
 			for(size_t i(0); i<horaires.size(); ++i)
@@ -1828,6 +1904,14 @@ namespace synthese
 				}
 			}
 			service->setDataSchedules(departureSchedules, arrivalSchedules);
+
+			// Setup the handicapped rules (if any)
+			if ( handicapped )
+			{
+				RuleUser::Rules rules = service->getRules();
+				rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::GetEditable(handicapped, Env::GetOfficialEnv()).get();
+				service->setRules(rules);
+			}
 
 			// Registration of the service in the temporary environment
 			temporaryEnvironment.getEditableRegistry<ScheduledService>().add(service);

@@ -111,22 +111,22 @@ namespace util
 
 	if (isDir)
 	{
-	    // recursively add directory entries
-	    directory_iterator end_iter;
-	    for ( directory_iterator dir_itr(entry);
-		  dir_itr != end_iter;
-		  ++dir_itr )
-	    {
-		path p (relativePath / dir_itr->leaf ());
-		Archive::Tar (baseDir, p, os, recursive);
-	    }
+		// recursively add directory entries
+		directory_iterator end_iter;
+		for ( directory_iterator dir_itr(entry);
+			dir_itr != end_iter;
+			++dir_itr )
+		{
+			path p (relativePath / dir_itr->path().filename());
+			Archive::Tar (baseDir, p, os, recursive);
+		}
 	}
 	else
 	{
-	    char buffer[512];
+		char buffer[512];
 		std::ifstream ifs (entry.string ().c_str (), std::ifstream::binary);
-	    while (!ifs.eof ())
-	    {
+		while (!ifs.eof ())
+		{
 			memset (buffer, '\0', 512);
 			ifs.read (buffer, 512);
 			if (ifs.gcount () > 0)

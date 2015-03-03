@@ -131,7 +131,10 @@ namespace synthese
 				mutable std::vector<std::string> _line;
 
 				void _loadFieldsMap(const std::string& line) const;
+
+				// Return the value for this field if it exists or an empty string if not
 				std::string _getValue(const std::string& field) const;
+
 				void _loadLine(const std::string& line) const;
 
 				typedef std::map<std::string, calendar::Calendar> Calendars;

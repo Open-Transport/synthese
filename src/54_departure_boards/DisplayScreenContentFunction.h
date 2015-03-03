@@ -85,6 +85,7 @@ namespace synthese
 			static const std::string PARAMETER_DATA_SOURCE_FILTER;
 			static const std::string PARAMETER_SPLIT_CONTINUOUS_SERVICES;
 			static const std::string PARAMETER_MAX_DAYS_NEXT_DEPARTURES;
+			static const std::string PARAMETER_USE_SCOM;
 
 			static const std::string DATA_FIRST_DEPARTURE_TIME;
 			static const std::string DATA_LAST_DEPARTURE_TIME;
@@ -120,6 +121,30 @@ namespace synthese
 			static const std::string DATA_DUMMY_KEY;
 
 			static const boost::posix_time::time_duration endOfService;
+			static const std::string DATA_HANDICAPPED_ACCESS;
+
+			//Direct connection SAE structures :
+                        struct ServiceRealTime
+                        {
+                                std::string date;
+                                std::string Realtime;
+                                std::string oc;
+                                std::string arret;
+                                std::string nom_ligne;
+                                std::string lineShortName;
+                                std::string LineStyle;
+                                std::string lineColor;
+                                std::string lineXmlColor;
+                                std::string depart;
+                                std::string cityName_begin;
+                                std::string arrivee;
+                                std::string cityName_end;
+                                std::string cityName_current;
+                                util::RegistryKeyType cityId_current;
+                                util::RegistryKeyType stopAreaId;
+                                util::RegistryKeyType stop_id;
+                                util::RegistryKeyType networkId;
+                        };
 
 			typedef std::pair<const pt::CommercialLine*, const pt::StopArea*> LineDestinationKey;
 			typedef std::multimap<const pt::StopPoint*, LineDestinationKey> LineDestinationFilter;
@@ -480,6 +505,10 @@ namespace synthese
 					const pt::StopArea& place
 				) const;
 			//@}
+
+			/// Use scom for this service
+			/// False by default, set to true if "use_scom" is in the parameters
+			bool _scom;
 
 			server::FunctionAPI getAPI() const;
 

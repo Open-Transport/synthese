@@ -38,7 +38,7 @@
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "DisplayScreenTableSync.h"
-#include "DisplayType.h"
+#include "DisplayTypeTableSync.h"
 #include "DisplayTypeTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "Interface.h"
@@ -70,6 +70,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace algorithm;
+	using namespace db;
 	using namespace dblog;
 	using namespace departure_boards;
 	using namespace geography;
@@ -138,6 +139,8 @@ namespace synthese
 		const std::string DisplayScreen::DATA_LOCATION_ID("location_id");
 		const std::string DisplayScreen::DATA_CPU_ID("cpu_id");
 		const std::string DisplayScreen::VALUE_DISPLAY_SCREEN = "display_screen";
+		const std::string DisplayScreen::DATA_X("x");
+		const std::string DisplayScreen::DATA_Y("y");
 
 
 
@@ -236,14 +239,15 @@ namespace synthese
 		ArrivalDepartureList DisplayScreen::generateStandardScreen(
 			const boost::posix_time::ptime& startTime,
 			const boost::posix_time::ptime& endTime,
-			bool rootCall
+			bool rootCall,
+			bool scom
 		) const	{
 			boost::shared_ptr<ArrivalDepartureTableGenerator> generator;
 			switch (_generationMethod)
 			{
 			case STANDARD_METHOD:
-				generator.reset(
-					static_cast<ArrivalDepartureTableGenerator*>(
+				{
+					StandardArrivalDepartureTableGenerator* standardGenerator(
 						new StandardArrivalDepartureTableGenerator(
 							getPhysicalStops(),
 							_direction,
@@ -255,8 +259,20 @@ namespace synthese
 							endTime,
 							get<AllowCanceled>(),
 							rootCall ? get<DisplayTypePtr>()->get<RowsNumber>() : 1
-				)	)	);
-				break;
+						)
+					);
+
+					// If SCOM is available and enabled, setup the generator to use it
+					#ifdef WITH_SCOM
+					if (scom)
+					{
+						standardGenerator->setClient(scom,this->getCodeBySources());
+					}
+					#endif
+
+					generator.reset(static_cast<ArrivalDepartureTableGenerator*>( standardGenerator ));
+					break;
+				}
 
 			case WITH_FORCED_DESTINATIONS_METHOD:
 				generator.reset(
@@ -608,6 +624,10 @@ namespace synthese
 			for (ForbiddenPlacesList::const_iterator it3 = other.getForbiddenPlaces().begin(); it3 != other.getForbiddenPlaces().end(); ++it3)
 			{
 				addForbiddenPlace(it3->second);
+			}
+			if (hasGeometry())
+			{
+				setGeometry(other.getGeometry());
 			}
 		}
 

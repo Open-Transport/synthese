@@ -62,6 +62,11 @@ namespace synthese
 		class MessagesSection;
 	}
 
+	namespace graph
+	{
+		class RuleUser;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -95,6 +100,10 @@ namespace synthese
 				static const std::string PARAMETER_CONVERT_STOP_CODE_TO_LOWER;
 				static const std::string PARAMETER_MESSAGES_SECTION;
 				static const std::string PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE;
+				static const std::string PARAMETER_HANDICAPPED_FORBIDDEN_USE_RULE;
+				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
+				static const std::string PARAMETER_NEUTRALIZED;
+				static const std::string PARAMETER_NON_COMMERCIAL;
 		
 			private:
 				// Vector to avoid reentrance and mutex to protect this vector
@@ -110,6 +119,10 @@ namespace synthese
 				boost::posix_time::time_duration _dayBreakTime;
 				bool _stopCodeToLower;
 				bool _sendDeactivationsByInterSYNTHESE;
+				util::RegistryKeyType _handicappedForbiddenPTUseRuleId;
+				util::RegistryKeyType _handicappedPTAllowedUseRuleId;
+				bool _neutralized;
+				bool _nonCommercial;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
@@ -196,6 +209,7 @@ namespace synthese
 					std::string ref;
 					const Chainage* chainage;
 					Horaires horaires;
+					util::RegistryKeyType handicapped;
 
 					mutable pt::ScheduledService* syntheseService;
 
@@ -214,13 +228,13 @@ namespace synthese
 					) const;
 				};
 				typedef std::map<std::string, Course> Courses;
-				void _selectAndLoadCourse(
-					Courses& courses,
+				void _selectAndLoadCourse(Courses& courses,
 					const Course::Horaires& horaires,
 					const Chainage& chainage,
 					const std::string& courseRef,
 					const boost::posix_time::time_duration& nowDuration,
-					Chainages& chainages
+					Chainages& chainages,
+					const util::RegistryKeyType &handicapped
 				) const;
 
 

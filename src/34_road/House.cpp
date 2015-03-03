@@ -137,16 +137,16 @@ namespace synthese
 
 			EdgeProjector<RoadChunk*> projector(roads, maxDistance);
 
-            const boost::shared_ptr<geos::geom::Point>& geometry = this->getGeometry();
-            if (geometry.get())
-            {
-                EdgeProjector<RoadChunk*>::PathNearby projection(projector.projectEdge(*(this->getGeometry()->getCoordinate())));
-                this->setRoadChunk(projection.get<1>());
-                if(projection.get<1>())
-                {
-                    projection.get<1>()->addHouse(*this);
-                }
-            }
+			const boost::shared_ptr<geos::geom::Point>& geometry = this->getGeometry();
+			if (geometry.get())
+			{
+				EdgeProjector<RoadChunk*>::PathNearby projection(projector.projectEdge(*(this->getGeometry()->getCoordinate())));
+				this->setRoadChunk(projection.get<1>());
+				if(projection.get<1>())
+				{
+					projection.get<1>()->addHouse(*this);
+				}
+			}
 		}
 
 

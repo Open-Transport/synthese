@@ -59,6 +59,7 @@ namespace synthese
 				-# <b>Emplacement</b>
 					-# <tt>Lieu logique</tt> : Liste déroulante constituée par l'ensemble des arrêts logiques triés par ordre alphabétique de commune puis par ordre alphabérique de nom. Champ obligatoire. En cas de changement de lieu logique, la page est rafraichie pour mettre à jour la liste des lieux physiques.
 					-# <tt>Lieu physique</tt> : Liste déroulante constituée par l'ensemble des lieux physiques présents dans le lieu logique sélectionné (arrêts physiques + autres lieux d'affichages gérés par la fonction @ref synthese::interfaces::DisplayLocationsAdmin. Ce champ est obligatoire.
+					-# <tt>Geometry</tt>: Géolocalisation de l'afficheur
 					-# <tt>Complément de précision</tt> : Champ texte libre permettant de préciser l'emplacement de l'afficheur, utile s'il se trouve dans un lieu physique déjà équipé d'un autre afficheur. Ce champ est obligatoire si au moins deux afficheurs sont présents dans le même lieu physique. Il est facultatif sinon.
 				-# <b>Données techniques</b>
 					-# <tt>Type d'afficheur</tt> : Liste déroulante constituée par l'ensemble des types d'afficheur disponibles (issus de l'écran @ref synthese::interface::DisplayTypesAdmin). Ce champ est obligatoire.

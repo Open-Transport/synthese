@@ -58,6 +58,7 @@
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string.hpp>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
@@ -89,6 +90,7 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
 		{
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
 
