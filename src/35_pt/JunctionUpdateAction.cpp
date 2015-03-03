@@ -162,7 +162,7 @@ namespace synthese
 				_to ? _to->get() : _junction->getEnd(),
 				_length ? *_length : _junction->getLength(),
 				_duration ? *_duration : _junction->getDuration(),
-				_bidirectional ? *_bidirectional : _junction->getBack()
+				_bidirectional ? *_bidirectional : (bool) _junction->getBack()
 			);
 
 			JunctionTableSync::Save(_junction.get());

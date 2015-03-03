@@ -70,7 +70,7 @@ namespace synthese
 		{
 			ParametersMap pm(FunctionWithSiteBase::_getParametersMap());
 			pm.insert(PARAMETER_INPUT, _input);
-			pm.insert(PARAMETER_NUMBER, _n);
+			pm.insert(PARAMETER_NUMBER, _n.get());
 			if(_page.get())
 			{
 				pm.insert(PARAMETER_PAGE, _page->getKey());

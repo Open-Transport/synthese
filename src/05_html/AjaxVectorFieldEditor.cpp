@@ -86,7 +86,7 @@ namespace synthese
 			stream << t.col();
 			stream << HTMLModule::getHTMLLink(
 				"add_new_row(this);",
-				HTMLModule::getHTMLImage("/admin/img/add.png", "+", string()),
+				HTMLModule::getHTMLImage("/admin/img/add.png", "+", none),
 				string(),
 				true,
 				"Ajouter l'élément"

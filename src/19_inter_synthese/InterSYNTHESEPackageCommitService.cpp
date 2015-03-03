@@ -100,7 +100,7 @@ namespace synthese
 			// Package
 			RegistryKeyType packageId(map.get<RegistryKeyType>(PARAMETER_PACKAGE_ID));
 			_createPackage = map.getDefault<bool>(PARAMETER_CREATE_PACKAGE, false);
-			shared_ptr<InterSYNTHESEPackage> package;
+			boost::shared_ptr<InterSYNTHESEPackage> package;
 			if(	InterSYNTHESEPackageTableSync::Contains(packageId))
 			{
 				package = InterSYNTHESEPackageTableSync::GetEditable(
@@ -206,6 +206,6 @@ namespace synthese
 			_releaseLock(false),
 			_createPackage(false)
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			setEnv(boost::shared_ptr<Env>(new Env));
 		}
 }	}

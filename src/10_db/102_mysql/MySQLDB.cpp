@@ -1003,16 +1003,15 @@ namespace synthese
 			_bnd.buffer = static_cast<void*>(const_cast<int*>(&i));
 		}
 
-		
-#ifndef _WINDOWS		
+#ifndef _WIN32
+
 		void MySQLDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
 		{
 			_bnd.buffer_type = MYSQL_TYPE_LONG;
 			_bnd.buffer = static_cast<void*>(const_cast<void*>(static_cast<const void*>(&s)));
 		}
+
 #endif
-
-
 
 		void MySQLDB::DBRecordCellBindConvertor::operator()( const bool& d ) const
 		{

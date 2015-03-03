@@ -1007,12 +1007,13 @@ namespace synthese
 					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = _reservationUseRule.get();
 				}
 
+				std::string routeName(lineInfo.routeName + ":" + (lineInfo.needReservation ? "resa:" : "") +
+					journeyPatternInfo.longName);
 				JourneyPattern* journeyPattern(
 					_createOrUpdateRoute(
 						*commercialLine,
 						optional<const string&>(), // id
-						lineInfo.routeName + ":" + (lineInfo.needReservation ? "resa:" : "") +
-							journeyPatternInfo.longName, // name
+						routeName,
 						optional<const string&>(), // destination
 						optional<Destination*>(),
 						rules,

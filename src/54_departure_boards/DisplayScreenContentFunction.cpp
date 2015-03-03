@@ -2316,7 +2316,7 @@ namespace synthese
 				{
 					if(result.hasSubMaps("journey") && _rowPage.get())
 					{
-						vector<shared_ptr<ParametersMap> > journeys = result.getSubMaps("journey");
+						vector<boost::shared_ptr<ParametersMap> > journeys = result.getSubMaps("journey");
 						if(!journeys.empty())
 						{
 							result.insert(DATA_FIRST_DEPARTURE_TIME, (*journeys.begin())->getValue("date_time"));
@@ -2326,12 +2326,12 @@ namespace synthese
 						size_t rank(0);
 						bool onlyRealTime = true;
 						stringstream rowStream;
-						BOOST_FOREACH(const shared_ptr<ParametersMap>& journey, journeys)
+						BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& journey, journeys)
 						{
 							if(journey->hasSubMaps("destination") && _destinationPage.get())
 							{
 								stringstream destinationStream;
-								BOOST_FOREACH(const shared_ptr<ParametersMap>& dest, journey->getSubMaps("destination"))
+								BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& dest, journey->getSubMaps("destination"))
 								{
 									dest->merge(getTemplateParameters());
 									_destinationPage->display(destinationStream, request, *dest);
@@ -2341,7 +2341,7 @@ namespace synthese
 							
 							if(journey->hasSubMaps("line"))
 							{
-								BOOST_FOREACH(const shared_ptr<ParametersMap>& linemerge, journey->getSubMaps("line"))
+								BOOST_FOREACH(const boost::shared_ptr<ParametersMap>& linemerge, journey->getSubMaps("line"))
 								{
 									journey->merge(*linemerge);
 								}

@@ -367,11 +367,13 @@ namespace synthese
 						// Commercial line number
 						int commercialLineNumber(lexical_cast<int>(trim_copy(line.substr(0, 4))));
 
+						std::string shortName;
+						std::string longName(lexical_cast<string>(commercialLineNumber));
 						cline = _createOrUpdateLine(
 							lines,
 							lexical_cast<string>(commercialLineNumber),
-							string(),
-							lexical_cast<string>(commercialLineNumber),
+							longName,
+							shortName,
 							optional<RGBColor>(),
 							*_network,
 							dataSource

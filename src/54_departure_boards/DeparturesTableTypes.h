@@ -33,6 +33,7 @@
 #include "ServicePointer.h"
 #include "Registry.h"
 #include "Journey.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 
 namespace synthese

@@ -560,7 +560,7 @@ namespace synthese
 							StopPoint::LinesSet lines(stop.getCommercialLines());
 							BOOST_FOREACH(const StopPoint::LinesSet::value_type& line, lines)
 							{
-								shared_ptr<ParametersMap> linePM(new ParametersMap);
+								boost::shared_ptr<ParametersMap> linePM(new ParametersMap);
 								line->toParametersMap(*linePM, true);
 								sPm->insert(DATA_LINE, linePM);
 							}

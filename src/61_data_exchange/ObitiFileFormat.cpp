@@ -828,7 +828,7 @@ namespace synthese
 				std::string line;
 				bool notTheEnd;
 				do {
-					notTheEnd = getline(inFile, line);
+					notTheEnd = (bool) getline(inFile, line);
 					if(notTheEnd) _loadLine(line);
 				} while(_line[0] != field && notTheEnd);
 				if((_line[0] != field) || !notTheEnd)

@@ -641,11 +641,13 @@ namespace synthese
 						// ID
 						lineId = _getValue("MNLG");
 
+						std::string longName(_getValue("LIBLG"));
+						std::string shortName(_getValue(_lineShortNameField));
 						line = _createOrUpdateLine(
 							lines,
 							lineId,
-							_getValue("LIBLG"),
-							_getValue(_lineShortNameField),
+							longName,
+							shortName,
 							optional<RGBColor>(),
 							*_network,
 							dataSource

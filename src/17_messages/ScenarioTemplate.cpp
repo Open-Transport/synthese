@@ -309,7 +309,7 @@ namespace synthese
 			// variables
 			BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, getVariables())
 			{
-				shared_ptr<ParametersMap> variablePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> variablePM(new ParametersMap);
 				// code
 				variablePM->insert(DATA_CODE, variable.first);
 
@@ -328,7 +328,7 @@ namespace synthese
 			BOOST_FOREACH(const ScenarioCalendar* calendar, getCalendars())
 			{
 				// Calendar export
-				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendar->toParametersMap(*calendarPM);
 				pm.insert(TAG_CALENDAR, calendarPM);
 
@@ -349,7 +349,7 @@ namespace synthese
 					}
 
 					// Message export
-					shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 					alarm->toParametersMap(*messagePM, false, string(), true);
 					calendarPM->insert(TAG_MESSAGE, messagePM);
 				}
@@ -360,7 +360,7 @@ namespace synthese
 				(getCalendars().empty() && !getMessages().empty())
 			){
 				// Fake calendar export
-				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> calendarPM(new ParametersMap);
 				calendarPM->insert(Key::FIELD.name, 0);
 				calendarPM->insert(Name::FIELD.name, string());
 				calendarPM->insert(ScenarioPointer::FIELD.name, getKey());
@@ -376,7 +376,7 @@ namespace synthese
 					}
 
 					// Message export
-					shared_ptr<ParametersMap> messagePM(new ParametersMap);
+					boost::shared_ptr<ParametersMap> messagePM(new ParametersMap);
 					alarm->toParametersMap(*messagePM, false, string(), true);
 					calendarPM->insert(TAG_MESSAGE, messagePM);
 				}
@@ -385,7 +385,7 @@ namespace synthese
 			// Sections
 			BOOST_FOREACH(const MessagesSection* section, getSections())
 			{
-				shared_ptr<ParametersMap> sectionPM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> sectionPM(new ParametersMap);
 				section->toParametersMap(*sectionPM, true);
 				pm.insert(TAG_SECTION, sectionPM);
 			}

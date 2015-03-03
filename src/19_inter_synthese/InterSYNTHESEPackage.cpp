@@ -97,7 +97,7 @@ namespace synthese
 		/// import is defined on it.
 		bool InterSYNTHESEPackage::isWorkingCopy() const
 		{
-			return get<Import>();
+			return (bool) get<Import>();
 		}
 
 

@@ -135,7 +135,7 @@ namespace synthese
 
 			BOOST_FOREACH(const date& d, getActiveDates())
 			{
-				shared_ptr<ParametersMap> datePM(new ParametersMap);
+				boost::shared_ptr<ParametersMap> datePM(new ParametersMap);
 				datePM->insert(TAG_DATE, to_iso_extended_string(d));
 				map.insert(TAG_DATE, datePM);
 			}

@@ -324,7 +324,7 @@ namespace synthese
 				// It is possible to have no GLEIS file, but it will lead to a different parsing
 				// File bahnof is optional
 				if (key != FILE_BAHNOF && (!(key == FILE_GLEIS && _noGleisFile)))
-					throw Exception("Could no open the file " + filePath.file_string());
+					throw Exception("Could no open the file " + filePath.string());
 			}
 
 			DataSource& dataSource(*_import.get<DataSource>());

@@ -444,11 +444,13 @@ namespace synthese
 						color = RGBColor::FromXMLColor(colorStr);
 					}
 
+					std::string longName(_getValue("route_long_name"));
+					std::string shortName(_getValue("route_short_name"));
 					_createOrUpdateLine(
 						_lines,
 						id,
-						_getValue("route_long_name"),
-						_getValue("route_short_name"),
+						longName,
+						shortName,
 						color,
 						*network,
 						dataSource

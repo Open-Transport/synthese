@@ -24,6 +24,7 @@
 #include "Geometry.h"
 
 #include <cmath>
+#include <algorithm>
 #include <geos/geom/Coordinate.h>
 
 using namespace geos::geom;

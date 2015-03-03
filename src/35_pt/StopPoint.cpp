@@ -361,9 +361,10 @@ namespace synthese
 			// Geometry
 			if(hasGeometry())
 			{
+				geos::io::WKTWriter writer;
 				pm.insert(
 					prefix + TABLE_COL_GEOMETRY,
-					static_pointer_cast<geos::geom::Geometry, Point>(getGeometry())
+					writer.write(static_pointer_cast<geos::geom::Geometry, Point>(getGeometry()).get())
 				);
 			}
 			else

@@ -159,7 +159,7 @@ namespace synthese
 				tTypeOD									getOriginType()			const { return _originType; }
 				tTypeOD									getDestinationType()	const { return _destinationType; }
 				boost::shared_ptr<TimetableWarning>		getWarning()			const { return _warning; }
-				bool isCompression() const { return _compressionRank; }
+				bool isCompression() const { return (bool) _compressionRank; }
 				size_t getCompressionRank() const { return *_compressionRank; }
 				size_t getCompressionRepeated() const { return *_compressionRepeated; }
 			//@}

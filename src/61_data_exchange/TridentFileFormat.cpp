@@ -1171,6 +1171,9 @@ namespace synthese
 					dataSource
 			)	);
 
+			std::string longName(charset_converter.convert(clineNameNode.getText()));
+			std::string shortName(charset_converter.convert(clineShortNameNode.getText()));
+
 			// Commercial lines
 			CommercialLine* cline(
 				_createOrUpdateLine(
@@ -1178,10 +1181,10 @@ namespace synthese
 					lineKeyNode.getText(),
 					clineNameNode.isEmpty() || !clineNameNode.nText() ?
 						optional<const string&>() :
-						optional<const string&>(charset_converter.convert(clineNameNode.getText())),
+						longName,
 					clineShortNameNode.isEmpty() || !clineShortNameNode.nText() ?
 						optional<const string&>() :
-						optional<const string&>(charset_converter.convert(clineShortNameNode.getText())),
+						shortName,
 					optional<RGBColor>(),
 					*network,
 					dataSource

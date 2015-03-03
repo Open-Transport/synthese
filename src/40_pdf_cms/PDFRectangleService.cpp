@@ -124,7 +124,7 @@ namespace synthese
 				PDF::GetPixelsFromMM(_x2),
 				PDF::GetPixelsFromMM(_y2),
 				_color || _width,
-				_backgroundColor
+				(bool) _backgroundColor
 			);
 
 

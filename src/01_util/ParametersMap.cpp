@@ -302,15 +302,14 @@ namespace synthese
 		}
 
 
+#ifndef _WIN32
 
-#ifndef _WIN64
 		void ParametersMap::insert( const std::string& parameterName, std::size_t value )
 		{
 			insert(parameterName, lexical_cast<string>(value));
 		}
+
 #endif
-
-
 
 		void ParametersMap::insert(
 			const std::string& parameterName,

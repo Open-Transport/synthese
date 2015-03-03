@@ -169,7 +169,7 @@ namespace synthese
 				// Load
 				try
 				{
-					shared_ptr<const CalendarTemplate> baseCalendar(
+					boost::shared_ptr<const CalendarTemplate> baseCalendar(
 						Env::GetOfficialEnv().get<CalendarTemplate>(
 							map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID)
 					)	);
