@@ -30,6 +30,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <sstream>
 #include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
@@ -41,6 +42,7 @@ using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace boost::algorithm;
+using namespace boost::property_tree;
 using namespace geos::geom;
 
 namespace synthese
@@ -781,4 +783,35 @@ namespace synthese
 			return _map == other._map;
 		}
 
+
+		boost::shared_ptr<ParametersMap>
+		ParametersMap::FromJson(const std::string& json)
+		{
+			boost::shared_ptr<ParametersMap> parametersMap(new ParametersMap());
+			stringstream jsonStream;
+			jsonStream << json;
+			basic_ptree<std::string, std::string> ptree;
+			json_parser::read_json(jsonStream, ptree);
+			parametersMap->importPropertyTree(ptree);
+			return parametersMap;
+		}
+
+
+		void
+		ParametersMap::importPropertyTree(const property_tree::basic_ptree<std::string, std::string>& ptree)
+		{
+			BOOST_FOREACH( boost::property_tree::ptree::value_type const& child, ptree)
+			{
+				if (!child.second.empty())
+				{
+					boost::shared_ptr<ParametersMap> childParametersMap(new ParametersMap());
+					childParametersMap->importPropertyTree(child.second);
+					insert(child.first, childParametersMap);
+				}
+				else
+				{
+					insert(child.first, child.second.data());
+				}
+			}
+		}
 }	}

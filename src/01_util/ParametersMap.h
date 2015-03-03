@@ -38,6 +38,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace geos
 {
@@ -378,6 +379,15 @@ namespace synthese
 				/// @date 2011
 				void clear();
 			//@}
+
+
+				/// Creates a parameter map from JSON string parsing 
+				static boost::shared_ptr<ParametersMap> FromJson(const std::string& json);
+
+			private:
+
+				/// Fills recursively a parameter map from a boost property tree
+				void importPropertyTree(const boost::property_tree::basic_ptree<std::string, std::string>& ptree);
 		};
 }	}
 

@@ -1,0 +1,1 @@
+synthese::regulation::moduleRegister();

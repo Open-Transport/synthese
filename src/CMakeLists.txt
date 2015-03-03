@@ -66,6 +66,7 @@ set(MODULES
 59_road_journey_planner
 60_analysis
 61_data_exchange
+62_regulation
 63_settings)
 
 if(WITH_MYSQL)
