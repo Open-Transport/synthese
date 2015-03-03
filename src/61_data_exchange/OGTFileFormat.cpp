@@ -72,6 +72,16 @@ namespace synthese
 
 
 
+		bool OGTFileFormat::Importer_::_parse(
+			const boost::filesystem::path& filePath,
+			std::auto_ptr<std::ofstream> fileStream
+		) const {
+			_fileStream.reset(fileStream.get());
+			return OGTFileFormat::Importer_::_parse(filePath);
+		}
+
+
+
 		db::DBTransaction OGTFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
