@@ -76,6 +76,7 @@ namespace synthese
 		const string TimetableBuildService::PARAMETER_ROWS_BEFORE = "rows_before";
 		const string TimetableBuildService::PARAMETER_ROWS_AFTER = "rows_after";
 		const string TimetableBuildService::PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES = "merge_cols_with_same_schedules";
+		const string TimetableBuildService::PARAMETER_WITH_WARNINGS = "with_warnings";
 
 		const string TimetableBuildService::TAG_TIMETABLE = "timetable";
 		const string TimetableBuildService::ATTR_TIMETABLE_RANK = "timetable_rank";
@@ -205,6 +206,9 @@ namespace synthese
 
 			// Merge cols with same schedules
 			_mergeColsWithSameSchedules = map.getOptional<bool>(PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES);
+
+			// Include warnings
+			_withWarnings = map.getDefault<bool>(PARAMETER_WITH_WARNINGS, true);
 
 			// Way 1 : pre-configured timetable
 			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
@@ -550,7 +554,7 @@ namespace synthese
 				}
 
 				// Timetable build
-				TimetableResult result(generator->build(true, _warnings));
+				TimetableResult result(generator->build(*_withWarnings, _warnings));
 
 				if(object.getContentType() == Timetable::TABLE_SERVICES_IN_COLS)
 				{

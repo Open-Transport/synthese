@@ -41,6 +41,7 @@
 #include "Journey.h"
 #include "ServicePointer.h"
 #include "Service.h"
+#include <geos/geom/Point.h>
 
 #include <sstream>
 
@@ -79,33 +80,35 @@ namespace synthese
 			bool enableRealTime,
 			graph::UseRule::ReservationDelayType reservationRulesDelayType
 		):  TimeSlotRoutePlanner(
-				origin->getVertexAccessMap(
-					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
-				),
-				destination->getVertexAccessMap(
-					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
-				),
-				lowerDepartureTime, higherDepartureTime,
-				lowerArrivalTime, higherArrivalTime,
-				PTModule::GRAPH_ID,
-				PTModule::GRAPH_ID,
-				optional<posix_time::time_duration>(),
-				maxSolutionsNumber,
-				accessParameters,
-				planningOrder,
-				100,
-				ignoreReservation,
-				logger,
-				maxTransferDuration,
-				minMaxDurationRatioFilter,
-				enableTheoretical,
-				enableRealTime,
-				reservationRulesDelayType
+			origin->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
+			destination->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
+			lowerDepartureTime, higherDepartureTime,
+			lowerArrivalTime, higherArrivalTime,
+			PTModule::GRAPH_ID,
+			PTModule::GRAPH_ID,
+			optional<posix_time::time_duration>(),
+			maxSolutionsNumber,
+			accessParameters,
+			planningOrder,
+			100,
+			ignoreReservation,
+			logger,
+			maxTransferDuration,
+			minMaxDurationRatioFilter,
+			enableTheoretical,
+			enableRealTime,
+			reservationRulesDelayType
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination),
 			_departureParking(NULL),
-			_arrivalParking(NULL)
+			_arrivalParking(NULL),
+			_startWithCar(false),
+			_endWithCar(false)
 		{
 		}
 
@@ -114,6 +117,8 @@ namespace synthese
 			const geography::Place* destination,
 			const geography::Place* originParking,
 			const geography::Place* destinationParking,
+			bool startWithCar,
+			bool endWithCar,
 			const ptime& lowerDepartureTime,
 			const ptime& higherDepartureTime,
 			const ptime& lowerArrivalTime,
@@ -128,34 +133,36 @@ namespace synthese
 			bool enableTheoretical,
 			bool enableRealTime,
 			UseRule::ReservationDelayType reservationRulesDelayType
-		):	TimeSlotRoutePlanner(
-				origin->getVertexAccessMap(
-					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
-				),
-				destination->getVertexAccessMap(
-					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
-				),
-				lowerDepartureTime, higherDepartureTime,
-				lowerArrivalTime, higherArrivalTime,
-				PTModule::GRAPH_ID,
-				PTModule::GRAPH_ID,
-				optional<posix_time::time_duration>(),
-				maxSolutionsNumber,
-				accessParameters,
-				planningOrder,
-				100,
-				ignoreReservation,
-				logger,
-				maxTransferDuration,
-				minMaxDurationRatioFilter,
-				enableTheoretical,
-				enableRealTime,
-				reservationRulesDelayType
+		): TimeSlotRoutePlanner(
+			origin->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
+			destination->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
+			lowerDepartureTime, higherDepartureTime,
+			lowerArrivalTime, higherArrivalTime,
+			PTModule::GRAPH_ID,
+			PTModule::GRAPH_ID,
+			optional<posix_time::time_duration>(),
+			maxSolutionsNumber,
+			accessParameters,
+			planningOrder,
+			100,
+			ignoreReservation,
+			logger,
+			maxTransferDuration,
+			minMaxDurationRatioFilter,
+			enableTheoretical,
+			enableRealTime,
+			reservationRulesDelayType
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination),
 			_departureParking(originParking),
-			_arrivalParking(destinationParking)
+			_arrivalParking(destinationParking),
+			_startWithCar(startWithCar),
+			_endWithCar(endWithCar)
 		{
 		}
 
@@ -257,7 +264,8 @@ namespace synthese
 
 			if(result.empty())
 			{
-				if((NULL == _departureParking) && (NULL == _arrivalParking))
+				// no car usage, perform a standard PT journey planning
+				if((false == _startWithCar) && (false == _endWithCar))
 				{
 					TimeSlotRoutePlanner r(
 						ovam,
@@ -281,6 +289,7 @@ namespace synthese
 						_enableRealTime,
 						_reservationRulesDelayType
 					);
+
 					return PTRoutePlannerResult(
 						_departurePlace,
 						_arrivalPlace,
@@ -291,7 +300,7 @@ namespace synthese
 				else
 				{
 					// mixed mode journey (car + public transportation)
-					return _computeMixedModeJourney();
+					return _computeCarPTJourney();
 				}
 			}
 			else
@@ -325,7 +334,6 @@ namespace synthese
 		}
 
 
-
 		void PTTimeSlotRoutePlanner::_extendByFreeDRT(
 			VertexAccessMap& vam,
 			const VertexAccessMap& destinationVam,
@@ -356,14 +364,45 @@ namespace synthese
 		}
 
 
+		PTRoutePlannerResult PTTimeSlotRoutePlanner::_computeCarPTJourney() const {
+			if(true == _startWithCar)
+			{
+				if(NULL != _departureParking)
+				{
+					return _computeCarPTJourneyWithChosenParking();
+				}
+				else
+				{
+					return _computeCarPTJourneyWithBestParking();
+				}
+			}
 
-		PTRoutePlannerResult PTTimeSlotRoutePlanner::_computeMixedModeJourney() const {
+			if(true == _endWithCar)
+			{
+				if(NULL != _arrivalParking)
+				{
+					return _computeCarPTJourneyWithChosenParking();
+				}
+				else
+				{
+					return _computeCarPTJourneyWithBestParking();
+				}
+			}
 
+			// should never be reached
+			return _computeCarPTJourneyWithBestParking();
+		}
+
+
+		PTRoutePlannerResult PTTimeSlotRoutePlanner::_computeCarPTJourneyWithChosenParking() const {
+			// Arbitrary delay modelling the transfer time between the relay park and its stop area (in minutes)
+			// for better accuracy it should be defined per StopArea in t007_connection_places
 			long PARKING_TIME = 5;
-			ptime ptLowestDepartureTime  = getLowestDepartureTime();
+
+			ptime ptLowestDepartureTime = getLowestDepartureTime();
 			ptime ptHighestDepartureTime = getHighestDepartureTime();
-			ptime ptLowestArrivalTime	= getLowestArrivalTime();
-			ptime ptHighestArrivalTime   = getHighestArrivalTime();
+			ptime ptLowestArrivalTime = getLowestArrivalTime();
+			ptime ptHighestArrivalTime = getHighestArrivalTime();
 
 			const Place* ptDeparturePlace = _departurePlace;
 			const Place* ptArrivalPlace   = _arrivalPlace;
@@ -372,16 +411,17 @@ namespace synthese
 			Journey carStartJourney;
 			Journey carEndJourney;
 
+			// route planning
+			AccessParameters carAccessParams(
+				USER_CAR,
+				false, false, 30000, posix_time::hours(5), 11.111, // max 30km at ~= 40km/h
+				1000
+			);
+
+
 			// 1) check if the first part of the journey shall use the car
 			if(NULL != _departureParking)
 			{
-				// route planning
-				AccessParameters ap(
-					USER_CAR,
-					false, false, 30000, posix_time::hours(5), 11.111, // ~= 40km/h
-					1000
-				);
-
 				// compute journey from departure place to departure parking, using car
 				RoadJourneyPlanner rjp(
 					_departurePlace,
@@ -391,7 +431,7 @@ namespace synthese
 					getLowestArrivalTime(),
 					getHighestArrivalTime(),
 					1,
-					ap,
+					carAccessParams,
 					_planningOrder,
 					_logger
 				);
@@ -400,15 +440,20 @@ namespace synthese
 
 				if(!results.getJourneys().empty())
 				{
-					// compute journey from departure to parking
+					// DEBUG : print the journey from departure place to departure parking
 					_printJourneys(results.getJourneys());
 
 					carStartJourney = results.getJourneys()[0];
+
+					// compute the duration of the car journey and add parking time
 					time_duration duration = carStartJourney.getDuration();
 					duration = duration + minutes(PARKING_TIME);
+
+					// add this duration to departure times
 					ptLowestDepartureTime += duration;
 					ptHighestDepartureTime += duration;
 
+					// for the PT journey the departure place is now the parking
 					ptDeparturePlace = _departureParking;
 				}
 
@@ -427,13 +472,6 @@ namespace synthese
 			// 2) check if the last part of the journey shall use the car
 			if(NULL != _arrivalParking)
 			{
-				// Route planning
-				AccessParameters ap(
-					USER_CAR,
-					false, false, 30000, posix_time::hours(5), 11.111, // ~= 40km/h
-					1000
-				);
-
 				// compute journey from arrival parking to arrival place, using car
 				RoadJourneyPlanner rjp(
 					_arrivalParking,
@@ -443,7 +481,7 @@ namespace synthese
 					getLowestArrivalTime(),
 					getHighestArrivalTime(),
 					1,
-					ap,
+					carAccessParams,
 					_planningOrder,
 					_logger
 				);
@@ -496,8 +534,8 @@ namespace synthese
 					ptHighestDepartureTime,
 					ptLowestArrivalTime,
 					ptHighestArrivalTime,
-					_departurePlace,
-					_arrivalPlace
+					ptDeparturePlace,
+					ptArrivalPlace
 				);
 				ptDepartureExtVam = extenderToPhysicalStops.run(
 					ptDepartureVam,
@@ -604,8 +642,6 @@ namespace synthese
 				}
 			}
 
-			//_printJourneys(ptJourneys);
-
 			return PTRoutePlannerResult(
 				_departurePlace,
 				_arrivalPlace,
@@ -613,6 +649,7 @@ namespace synthese
 				ptJourneys
 			);
 		}
+
 
 		void PTTimeSlotRoutePlanner::_printJourneys(const TimeSlotRoutePlanner::Result& journeys) const
 		{
@@ -631,14 +668,14 @@ namespace synthese
 
 					oStream << "---------------" << std::endl;
 					oStream << "Journey #" << journeyCount << ": distance=" << journey.getDistance()
-							<< ", duration=" << journey.getEffectiveDuration()
-							<< ", services=" << servicePtrs.size() << std::endl;
+						<< ", duration=" << journey.getEffectiveDuration()
+						<< ", services=" << servicePtrs.size() << std::endl;
 
 					const ServicePointer& servicePtr1 = journey.getFirstJourneyLeg();
 					const Service* service1 = servicePtr1.getService();
 					oStream << " * service #1: departure=" << servicePtr1.getDepartureDateTime()
-							<< ", arrival=" << servicePtr1.getArrivalDateTime()
-							<< ", name=" << service1->getServiceNumber() << std::endl;
+						<< ", arrival=" << servicePtr1.getArrivalDateTime()
+						<< ", name=" << service1->getServiceNumber() << std::endl;
 
 					if(2 < servicePtrs.size())
 					{
@@ -648,8 +685,8 @@ namespace synthese
 					const ServicePointer& servicePtrN = journey.getLastJourneyLeg();
 					const Service* serviceN = servicePtrN.getService();
 					oStream << " * service #" << servicePtrs.size() << ": departure=" << servicePtrN.getDepartureDateTime()
-							<< ", arrival=" << servicePtrN.getArrivalDateTime()
-							<< ", name=" << serviceN->getServiceNumber() << std::endl;
+						<< ", arrival=" << servicePtrN.getArrivalDateTime()
+						<< ", name=" << serviceN->getServiceNumber() << std::endl;
 
 					/*
 					// this version prints all the services used by the journey
@@ -659,8 +696,8 @@ namespace synthese
 						serviceCount += 1;
 						const Service* service = servicePtr.getService();
 						oStream << " * service #" << serviceCount << ": departure=" << servicePtr.getDepartureDateTime()
-								   << ", arrival=" << servicePtr.getArrivalDateTime()
-								   << ", name=" << service->getServiceNumber() << std::endl;
+							<< ", arrival=" << servicePtr.getArrivalDateTime()
+							<< ", name=" << service->getServiceNumber() << std::endl;
 					}
 					*/
 				}
@@ -670,4 +707,85 @@ namespace synthese
 #endif
 		}
 
-}	}
+
+		void PTTimeSlotRoutePlanner::_findRelayParks(const geography::Place* origin, const int maxDistance, SortableStopAreaSet& relayParks) const {
+			boost::shared_ptr<geos::geom::Point> originLocation = origin->getPoint();
+
+			if(NULL == originLocation.get())
+			{
+				Log::GetInstance().warn("Origin has no position, cannot compute the list of relay parks");
+				return;
+			}
+
+			BOOST_FOREACH(const Registry<StopArea>::value_type& stopArea, Env::GetOfficialEnv().getRegistry<StopArea>())
+			{
+				if(stopArea.second->getIsRelayPark())
+				{
+					boost::shared_ptr<geos::geom::Point> parkingLocation = stopArea.second->getPoint();
+
+					if(parkingLocation.get())
+					{
+						double deltaX = parkingLocation->getX() - originLocation->getX();
+						double deltaY = parkingLocation->getY() - originLocation->getY();
+						int    distance = round(sqrt(deltaX * deltaX + deltaY * deltaY));
+
+						if(maxDistance >= distance)
+						{
+							relayParks.insert(SortableStopArea(stopArea.second.get(), distance));
+						}
+					}
+
+					else
+					{
+						// parking has no position, log a warning
+						ostringstream debugStr;
+						debugStr << "Parking " << stopArea.second->getName() << " has no position";
+						Log::GetInstance().warn(debugStr.str());
+					}
+				}
+			}
+		}
+
+
+		PTTimeSlotRoutePlanner::SortableStopArea::SortableStopArea(const StopArea* stopArea, int distanceToCenter):
+			_stopArea(stopArea),
+			_distanceToCenter(distanceToCenter),
+			_opCode(_stopArea->getCodeBySources())
+		{
+		}
+
+
+		bool PTTimeSlotRoutePlanner::SortableStopArea::operator<(SortableStopArea const &otherStopArea) const
+		{
+			if(_distanceToCenter != otherStopArea.getDistanceToCenter())
+			{
+				return _distanceToCenter < otherStopArea.getDistanceToCenter();
+			}
+
+			if(_opCode != otherStopArea.getOpCode())
+			{
+				return _opCode < otherStopArea.getOpCode();
+			}
+
+			return _stopArea < otherStopArea.getStopArea();
+		}
+
+
+		std::string PTTimeSlotRoutePlanner::SortableStopArea::getOpCode() const
+		{
+			return _opCode;
+		}
+
+
+		int PTTimeSlotRoutePlanner::SortableStopArea::getDistanceToCenter() const
+		{
+			return _distanceToCenter;
+		}
+
+		const StopArea* PTTimeSlotRoutePlanner::SortableStopArea::getStopArea() const
+		{
+			return _stopArea;
+		}
+
+	}
+}
