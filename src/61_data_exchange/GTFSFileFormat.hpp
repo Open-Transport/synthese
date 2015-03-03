@@ -99,19 +99,27 @@ namespace synthese
 				static const std::string FILE_FREQUENCIES;
 
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
+				static const std::string PARAMETER_AUTO_CREATE_STOP_AREA;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_USE_RULE_BLOCK_ID_MASK;
+				static const std::string PARAMETER_USE_LINE_SHORT_NAME_AS_ID;
+				static const std::string PARAMETER_IGNORE_SERVICE_NUMBER;
+				static const std::string PARAMETER_IGNORE_DIRECTIONS;
 
 			private:
 				static const std::string SEP;
 
 				bool _importStopArea;
+				bool _autoCreateStopArea;
 				bool _interactive;
 				bool _displayLinkedStops;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
+				bool _useLineShortNameAsId;
+				bool _ignoreServiceNumber;
+				bool _ignoreDirections;
 
 				typedef std::map<std::string, std::size_t> FieldsMap;
 				mutable FieldsMap _fieldsMap;
@@ -150,6 +158,7 @@ namespace synthese
 					boost::posix_time::time_duration departureTime;
 					std::set<pt::StopPoint*> stop;
 					graph::MetricOffset offsetFromLast;
+					bool scheduledStop;
 				};
 				typedef std::vector<TripDetail> TripDetailVector;
 

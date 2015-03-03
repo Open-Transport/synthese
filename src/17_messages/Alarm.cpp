@@ -54,6 +54,8 @@ namespace synthese
 		const string Alarm::DATA_SCENARIO_NAME("scenario_name");
 		const string Alarm::DATA_TITLE("title");
 		const string Alarm::DATA_DONE = "done";
+		const string Alarm::DATA_DISPLAY_DURATION("display_duration");
+		const string Alarm::DATA_DIGITIZED_VERSION("digitized_version");
 
 		const string Alarm::TAG_MESSAGE_ALTERNATIVE = "message_alternative";
 		const string Alarm::TAG_RECIPIENTS = "recipients";
@@ -73,7 +75,8 @@ namespace synthese
 			_rawEditor(false),
 			_done(true),
 			_section(NULL),
-			_calendar(NULL)
+			_calendar(NULL),
+			_displayDuration(0)
 		{}
 
 
@@ -88,7 +91,9 @@ namespace synthese
 			_rawEditor(source._rawEditor),
 			_done(source._done),
 			_section(source._section),
-			_calendar(source._calendar)
+			_calendar(source._calendar),
+			_displayDuration(source._displayDuration),
+			_digitizedVersion(source._digitizedVersion)
 		{}
 
 
@@ -105,7 +110,9 @@ namespace synthese
 			_rawEditor(source._rawEditor),
 			_done(source._done),
 			_section(source._section),
-			_calendar(calendar)
+			_calendar(calendar),
+			_displayDuration(source._displayDuration),
+			_digitizedVersion(source._digitizedVersion)
 		{}
 
 
@@ -127,6 +134,8 @@ namespace synthese
 			pm.insert(prefix + DATA_CONTENT, getLongMessage());
 			pm.insert(prefix + DATA_DONE, getDone());
 			pm.insert(prefix + DATA_PRIORITY, static_cast<int>(getLevel()));
+			pm.insert(prefix + DATA_DISPLAY_DURATION, getDisplayDuration());
+			pm.insert(prefix + DATA_DIGITIZED_VERSION, getDigitizedVersion());
 			if(withScenario && getScenario())
 			{
 				pm.insert(prefix + DATA_SCENARIO_ID, getScenario()->getKey());

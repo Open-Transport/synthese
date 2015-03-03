@@ -76,6 +76,8 @@ namespace synthese
 		const string AlarmTableSync::COL_MESSAGES_SECTION_ID = "messages_section_id";
 		const string AlarmTableSync::COL_CALENDAR_ID = "calendar_id";
 		const string AlarmTableSync::COL_DATASOURCE_LINKS = "datasource_links";
+		const string AlarmTableSync::COL_DISPLAY_DURATION = "display_duration";
+		const string AlarmTableSync::COL_DIGITIZED_VERSION = "digitized_version";
 	}
 
 	namespace db
@@ -98,6 +100,8 @@ namespace synthese
 			Field(AlarmTableSync::COL_MESSAGES_SECTION_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_CALENDAR_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(AlarmTableSync::COL_DISPLAY_DURATION, SQL_INTEGER),
+			Field(AlarmTableSync::COL_DIGITIZED_VERSION, SQL_TEXT),
 			Field()
 		};
 
@@ -137,7 +141,8 @@ namespace synthese
 			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
 			alarm->setRawEditor(rows->getBool(AlarmTableSync::COL_RAW_EDITOR));
 			alarm->setDone(rows->getBool(AlarmTableSync::COL_DONE));
-
+			alarm->setDisplayDuration(rows->getInt (AlarmTableSync::COL_DISPLAY_DURATION));
+			alarm->setDigitizedVersion(rows->getText(AlarmTableSync::COL_DIGITIZED_VERSION));
 			// Section
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -281,7 +286,11 @@ namespace synthese
 			);
 			query.addField(object->getRawEditor());
 			query.addField(object->getDone());
-			query.addField(object->getSection());
+			query.addField(
+						object->getSection() ?
+						object->getSection()->getKey() :
+						RegistryKeyType(0)
+			);
 			query.addField(
 				object->getCalendar() ?
 				object->getCalendar()->getKey() :
@@ -291,6 +300,8 @@ namespace synthese
 				DataSourceLinks::Serialize(
 					object->getDataSourceLinks()
 			)	);
+			query.addField(object->getDisplayDuration());
+			query.addField(object->getDigitizedVersion());
 			query.execute(transaction);
 		}
 

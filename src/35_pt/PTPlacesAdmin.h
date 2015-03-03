@@ -196,6 +196,13 @@ namespace synthese
 				boost::optional<const std::string&> stopName
 			);
 
+			static void getHTMLRoadPlaceSearchForm(
+				std::ostream& stream,
+				const html::HTMLForm& form,
+				boost::optional<const std::string&> cityName,
+				boost::optional<const std::string&> roadPlaceName
+			);
+
 			void setCity(boost::shared_ptr<const geography::City> value);
 
 			virtual PageLinks _getCurrentTreeBranch() const;

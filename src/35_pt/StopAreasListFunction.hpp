@@ -80,6 +80,7 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_UNSERVED_AREAS;
 			static const std::string PARAMETER_DAYS_CHECK_IF_STOP_SERVED;
 			static const std::string PARAMETER_OUTPUT_ARRIVAL_LINES;
+			static const std::string PARAMETER_ONLY_RELAY_PARKS;
 
 		private:
 			static const std::string TAG_CITY;
@@ -112,6 +113,7 @@ namespace synthese
 				size_t _stopsDirections;
 				boost::shared_ptr<const impex::DataSource> _dataSourceFilter;
 				boost::gregorian::date_duration _daysCheckIfStopServed;
+				bool _onlyRelayParks;
 			//@}
 
 			//! @name Setters

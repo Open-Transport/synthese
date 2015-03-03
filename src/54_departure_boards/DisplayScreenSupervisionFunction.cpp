@@ -89,11 +89,11 @@ namespace synthese
 				throw RequestException("Unknown error");
 			}
 
-			if (_displayScreen->getType()->getMonitoringInterface() == NULL)
+			if (_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() == NULL)
 			{
 				throw RequestException("This screen cannot be monitored because its type do not have monitoring interface");
 			}
-			if (_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>() == NULL)
+			if (_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()->getPage<ParseDisplayReturnInterfacePage>() == NULL)
 			{
 				throw RequestException("This screen cannot be monitored because its monitoring interface does not contain the parsing rules");
 			}
@@ -105,9 +105,9 @@ namespace synthese
 		{
 			// Assertions
 			assert(_displayScreen.get() != NULL);
-			assert(_displayScreen->getType() != NULL);
-			assert(_displayScreen->getType()->getMonitoringInterface() != NULL);
-			assert(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>() != NULL);
+			assert(_displayScreen->get<DisplayTypePtr>().get_ptr() != NULL);
+			assert(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>().get_ptr() != NULL);
+			assert(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()->getPage<ParseDisplayReturnInterfacePage>() != NULL);
 
 
 			// Last monitoring status
@@ -117,7 +117,7 @@ namespace synthese
 
 			// Parsing
 			stringstream s;
-			const ParseDisplayReturnInterfacePage* page(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>());
+			const ParseDisplayReturnInterfacePage* page(_displayScreen->get<DisplayTypePtr>()->get<MonitoringInterface>()->getPage<ParseDisplayReturnInterfacePage>());
 			VariablesMap v;
 			page->display(s, _text, v, &request);
 
@@ -136,7 +136,7 @@ namespace synthese
 				status.setKey(lastStatus->getKey());
 
 				// Up contact?
-				if (status.getTime() - lastStatus->getTime() > _displayScreen->getType()->getTimeBetweenChecks())
+				if (status.getTime() - lastStatus->getTime() > _displayScreen->get<DisplayTypePtr>()->get<TimeBetweenChecks>())
 				{
 					DisplayMaintenanceLog::AddMonitoringUpEntry(*_displayScreen, lastStatus->getTime());
 				}

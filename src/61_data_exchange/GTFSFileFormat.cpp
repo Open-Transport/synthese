@@ -98,10 +98,14 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::SEP(",");
 
 		const std::string GTFSFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_AUTO_CREATE_STOP_AREA("auto_create_stop_area");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 		const string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_USE_LINE_SHORT_NAME_AS_ID("use_line_short_name_as_id");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_SERVICE_NUMBER("ignore_service_number");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_DIRECTIONS("ignore_directions");
 
 		const std::string GTFSFileFormat::Exporter_::PARAMETER_NETWORK_ID("ni");
 		const std::string GTFSFileFormat::Exporter_::LABEL_TAD("tad");
@@ -163,8 +167,12 @@ namespace synthese
 			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			PTFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_importStopArea(false),
+			_autoCreateStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
+			_useLineShortNameAsId(false),
+			_ignoreServiceNumber(false),
+			_ignoreDirections(false),
 			_networks(*import.get<DataSource>(), env),
 			_stopPoints(*import.get<DataSource>(), env),
 			_lines(*import.get<DataSource>(), env)
@@ -263,7 +271,7 @@ namespace synthese
 				while(getline(inFile, line))
 				{
 					_loadLine(line);
-					if(_getValue("location_type") != "0")
+					if(_getValue("location_type") != "0" && !_autoCreateStopArea)
 					{
 						continue;
 					}
@@ -286,7 +294,7 @@ namespace synthese
 					{
 						stopArea = (*_stopPoints.get(id).begin())->getConnectionPlace();
 					}
-					else
+					else if (!_autoCreateStopArea)
 					{
 						_logWarning(
 							"inconsistent stop area id "+ stopAreaId +" in the stop point "+ id
@@ -324,15 +332,31 @@ namespace synthese
 						);
 					}
 					// Creation or update
-					_createOrUpdateStop(
-						_stopPoints,
-						id,
-						name,
-						optional<const RuleUser::Rules&>(),
-						stopArea,
-						point.get(),
-						dataSource
-					);
+					if (_autoCreateStopArea)
+					{
+						_createOrUpdateStopWithStopAreaAutocreation(
+							_stopPoints,
+							id,
+							name,
+							point.get(),
+							*_defaultCity.get(),
+							_stopAreaDefaultTransferDuration,
+							dataSource,
+							optional<const RuleUser::Rules&>()
+						);
+					}
+					else
+					{
+						_createOrUpdateStop(
+							_stopPoints,
+							id,
+							name,
+							optional<const RuleUser::Rules&>(),
+							stopArea,
+							point.get(),
+							dataSource
+						);
+					}
 				}
 
 				_exportStopPoints(
@@ -373,6 +397,10 @@ namespace synthese
 					// Network
 					string networkId(_getValue("agency_id"));
 					string id(_getValue("route_id"));
+					if (_useLineShortNameAsId)
+					{
+						id = _getValue("route_short_name");
+					}
 					TransportNetwork* network(NULL);
 					if(_networks.contains(networkId))
 					{
@@ -510,6 +538,12 @@ namespace synthese
 					// Line
 					string id(_getValue("trip_id"));
 					string lineCode(_getValue("route_id"));
+					if (_useLineShortNameAsId)
+					{
+						vector<string> splitRouteId;
+						split(splitRouteId,lineCode,is_any_of("-"));
+						lineCode = splitRouteId[0];
+					}
 					if(!_lines.contains(lineCode))
 					{
 						_logWarning(
@@ -544,10 +578,24 @@ namespace synthese
 					trip.calendar = it->second;
 
 					// Destination
-					trip.destination = _getValue("trip_headsign");
+					if (!_ignoreDirections)
+					{
+						trip.destination = _getValue("trip_headsign");
+					}
+					else
+					{
+						trip.destination = "";
+					}
 
 					// Direction
-					trip.direction = lexical_cast<bool>(_getValue("direction_id"));
+					if (_fieldsMap.find("direction_id") != _fieldsMap.end())
+					{
+						trip.direction = lexical_cast<bool>(_getValue("direction_id"));
+					}
+					else
+					{
+						trip.direction = false;
+					}
 
 					_trips.insert(make_pair(id, trip));
 				}
@@ -584,7 +632,10 @@ namespace synthese
 							offsetSum += tripStop.offsetFromLast;
 							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
 								tripStop.stop,
-								offsetSum
+								offsetSum,
+								true,
+								true,
+								tripStop.scheduledStop
 							);
 							stops.push_back(stop);
 						}
@@ -615,12 +666,18 @@ namespace synthese
 						ScheduledService::Schedules departures;
 						BOOST_FOREACH(const TripDetail& tripStop, tripDetailVector)
 						{
-							departures.push_back(tripStop.departureTime);
+							if (tripStop.scheduledStop)
+							{
+								departures.push_back(tripStop.departureTime);
+							}
 						}
 						ScheduledService::Schedules arrivals;
 						BOOST_FOREACH(const TripDetail& tripStop, tripDetailVector)
 						{
-							arrivals.push_back(tripStop.arrivalTime);
+							if (tripStop.scheduledStop)
+							{
+								arrivals.push_back(tripStop.arrivalTime);
+							}
 						}
 
 						ScheduledService* service(
@@ -628,7 +685,7 @@ namespace synthese
 								*route,
 								departures,
 								arrivals,
-								lastTripCode,
+								_ignoreServiceNumber ? string() : lastTripCode,
 								dataSource,
 								optional<const string&>(),
 								optional<const RuleUser::Rules&>(),
@@ -644,7 +701,8 @@ namespace synthese
 					}
 
 					TripDetail tripDetail;
-					if(_getValue("shape_dist_traveled") != "")
+					if(_fieldsMap.find("shape_dist_traveled") != _fieldsMap.end() &&
+						_getValue("shape_dist_traveled") != "")
 					{
 						tripDetail.offsetFromLast = lexical_cast<MetricOffset>(_getValue("shape_dist_traveled"));
 					}
@@ -663,7 +721,7 @@ namespace synthese
 					}
 					else  // Invalid time duration
 					{
-						tripDetail.arrivalTime = previousArrivalTime; // Copy previous regulation stop
+						tripDetail.arrivalTime = not_a_date_time;
 					}
 
 					stringstream dep_stream(_getValue("departure_time"));
@@ -677,7 +735,17 @@ namespace synthese
 					}
 					else // Invalid time duration
 					{
-						tripDetail.departureTime = previousDepartureTime; // Copy previous regulation stop
+						tripDetail.departureTime = not_a_date_time;
+					}
+					
+					if (tripDetail.arrivalTime.is_not_a_date_time() &&
+						tripDetail.departureTime.is_not_a_date_time())
+					{
+						tripDetail.scheduledStop = false;
+					}
+					else
+					{
+						tripDetail.scheduledStop = true;
 					}
 
 					string stopCode(_getValue("stop_id"));
@@ -723,7 +791,7 @@ namespace synthese
 			PTDataCleanerFileFormat::_addRemoveQueries(transaction);
 
 			// Saving of each created or altered objects
-			if(_importStopArea)
+			if(_importStopArea || _autoCreateStopArea)
 			{
 				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
 				{
@@ -825,6 +893,9 @@ namespace synthese
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
 			}
 			map.insert(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks));
+			map.insert(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, _useLineShortNameAsId);
+			map.insert(PARAMETER_IGNORE_SERVICE_NUMBER, _ignoreServiceNumber);
+			map.insert(PARAMETER_IGNORE_DIRECTIONS, _ignoreDirections);
 			return map;
 		}
 
@@ -834,6 +905,7 @@ namespace synthese
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
+			_autoCreateStopArea = map.getDefault<bool>(PARAMETER_AUTO_CREATE_STOP_AREA, false);
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 
@@ -871,6 +943,10 @@ namespace synthese
 					}
 				}
 			}
+			
+			_useLineShortNameAsId = map.getDefault<bool>(PARAMETER_USE_LINE_SHORT_NAME_AS_ID, false);
+			_ignoreServiceNumber = map.getDefault<bool>(PARAMETER_IGNORE_SERVICE_NUMBER, false);
+			_ignoreDirections = map.getDefault<bool>(PARAMETER_IGNORE_DIRECTIONS, false);
 		}
 
 

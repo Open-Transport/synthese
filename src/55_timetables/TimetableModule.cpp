@@ -23,6 +23,7 @@
 #include "TimetableModule.h"
 #include "TimetableTableSync.h"
 #include "Timetable.h"
+#include "CalendarTemplate.h"
 #include "Env.h"
 
 using namespace std;
@@ -94,9 +95,9 @@ namespace synthese
 				if (folder->getKey() == forbiddenFolderId)
 					continue;
 
-				m.push_back(make_pair(folder->getKey(), prefix + folder->getTitle()));
+				m.push_back(make_pair(folder->getKey(), prefix + folder->get<Title>()));
 
-				TimetableContainersLabels r(GetTimetableContainersLabels(folder->getKey(), prefix + folder->getTitle() +"/", forbiddenFolderId));
+				TimetableContainersLabels r(GetTimetableContainersLabels(folder->getKey(), prefix + folder->get<Title>() +"/", forbiddenFolderId));
 				m.insert(m.end(),r.begin(), r.end());
 			}
 			return m;

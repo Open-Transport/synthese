@@ -124,12 +124,24 @@ namespace synthese
 				{
 					if(dynamic_cast<StopPoint*>(&*get<LineNode>()))
 					{
-						boost::shared_ptr<LinePhysicalStop> generatedLineStop(
-							new DesignatedLinePhysicalStop(
-								*this
-						)	);
-						generatedLineStop->link();
-						_generatedLineStops.push_back(generatedLineStop);
+						bool generatedLineStoptoCreate(true);
+						BOOST_FOREACH(GeneratedLineStops::value_type generatedLineStop, _generatedLineStops)
+						{
+							if (generatedLineStop->getLineStop() == this)
+							{
+								generatedLineStoptoCreate = false;
+							}
+						}
+						
+						if (generatedLineStoptoCreate)
+						{
+							boost::shared_ptr<LinePhysicalStop> generatedLineStop(
+								new DesignatedLinePhysicalStop(
+									*this
+							)	);
+							generatedLineStop->link();
+							_generatedLineStops.push_back(generatedLineStop);
+						}
 					}
 					else if(dynamic_cast<DRTArea*>(&*get<LineNode>()))
 					{
@@ -180,15 +192,30 @@ namespace synthese
 			{
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stopPoint, stopArea->getPhysicalStops())
 				{
-					boost::shared_ptr<AreaGeneratedLineStop> generatedLineStop(
-						new AreaGeneratedLineStop(
-							const_cast<LineStop&>(*this),
-							const_cast<StopPoint&>(*stopPoint.second),
-							!isForArrival,
-							isForArrival
-					)	);
-					generatedLineStop->link();
-					_generatedLineStops.push_back(generatedLineStop);
+					bool generatedLineStoptoCreate(true);
+					BOOST_FOREACH(GeneratedLineStops::value_type generatedLineStop, _generatedLineStops)
+					{
+						if (generatedLineStop->getLineStop() == this &&
+							generatedLineStop->getPhysicalStop() == stopPoint.second &&
+							generatedLineStop->isArrival() == isForArrival &&
+							generatedLineStop->isDeparture() == !isForArrival)
+						{
+							generatedLineStoptoCreate = false;
+						}
+					}
+					
+					if (generatedLineStoptoCreate)
+					{
+						boost::shared_ptr<AreaGeneratedLineStop> generatedLineStop(
+							new AreaGeneratedLineStop(
+								const_cast<LineStop&>(*this),
+								const_cast<StopPoint&>(*stopPoint.second),
+								!isForArrival,
+								isForArrival
+						)	);
+						generatedLineStop->link();
+						_generatedLineStops.push_back(generatedLineStop);
+					}
 				}
 			}
 		}

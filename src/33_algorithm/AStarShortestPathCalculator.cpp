@@ -230,7 +230,8 @@ namespace synthese
 
 						// Check if it is already visited
 						NodeMap::iterator nextNode = nodeMap.find(nextCrossing->getKey());
-						if(nextNode != nodeMap.end() && nextNode->second->isVisited())
+						if(nextNode != nodeMap.end() && nextNode->second->isVisited() &&
+							nextNode->second->getParent())
 							continue;
 
 						const RoadChunkEdge* linkChunk;
@@ -273,9 +274,15 @@ namespace synthese
 							nodeMap.insert(NodeMap::value_type(nextCrossing->getKey(), newNode));
 							openSet.push(newNode);
 						}
-						else if(nextNode->second->getRealCost() > newScore)
+						else if(nextNode->second->getRealCost() > newScore ||
+							!nextNode->second->getParent()
+						)
 						{
-							nextNode->second->setParent(curNode);
+							if (!curNode->getParent() ||
+								curNode->getParent() != nextNode->second)
+							{
+								nextNode->second->setParent(curNode);
+							}
 							nextNode->second->setLink(linkChunk);
 							nextNode->second->setHeuristicCost(newScore + heuristic);
 							nextNode->second->setRealCost(newScore);
@@ -296,7 +303,7 @@ namespace synthese
 		) const {
 			boost::shared_ptr<Point> originPoint = origin->getGeometry();
 
-			if(originPoint.get())
+			if(originPoint.get() && destination.get())
 				return static_cast<int>(geos::operation::distance::DistanceOp::distance(*originPoint, *destination) / _accessParameters.getApproachSpeed());
 			else
 				return 0;
@@ -374,10 +381,21 @@ namespace synthese
 			ResultPath& result,
 			boost::shared_ptr<AStarNode> curNode
 		) const {
-			while(curNode->getParent())
+			std::vector<util::RegistryKeyType> vectKey;
+			bool alreadyVisited(false);
+			while(curNode->getParent() && curNode != curNode->getParent() && !alreadyVisited)
 			{
 				result.insert(result.begin(), curNode->getLink());
-				curNode = curNode->getParent(); 
+				vectKey.push_back(curNode->getCrossing()->getKey());
+				curNode = curNode->getParent();
+				BOOST_FOREACH(const util::RegistryKeyType key, vectKey)
+				{
+					if (key == curNode->getCrossing()->getKey())
+					{
+						alreadyVisited = true;
+						break;
+					}
+				}
 			}
 		}
 

@@ -24,6 +24,8 @@
 
 #include "CommercialLine.h"
 #include "ContinuousServiceTableSync.h"
+#include "DBTransaction.hpp"
+#include "InterSYNTHESESlave.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "StopPoint.hpp"
 #include "TransportNetwork.h"
@@ -39,6 +41,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace graph;
 	using namespace inter_synthese;
 	using namespace util;
@@ -156,9 +159,18 @@ namespace synthese
 					}
 
 					// Saving
-					departureSchedules[rank] = dep;
-					arrivalSchedules[rank] = arr;
-					vertices[rank] = vertex;
+					if (departureSchedules.size() > rank)
+					{
+						departureSchedules[rank] = dep;
+					}
+					if (arrivalSchedules.size() > rank)
+					{
+						arrivalSchedules[rank] = arr;
+					}
+					if (vertices.size() > rank)
+					{
+						vertices[rank] = vertex;
+					}
 				}
 				catch(...)
 				{
@@ -190,7 +202,55 @@ namespace synthese
 			const inter_synthese::InterSYNTHESESlave& slave,
 			const std::string& perimeter
 		) const	{
-
+			RegistryKeyType networkId(lexical_cast<RegistryKeyType>(perimeter));
+			
+			DBTransaction saveTransaction;
+			BOOST_FOREACH(const ScheduledService::Registry::value_type& service,
+				Env::GetOfficialEnv().getRegistry<ScheduledService>())
+			{
+				boost::shared_ptr<ScheduledService> servicePtr(service.second);
+				
+				if (!servicePtr->hasRealTimeData())
+				{
+					continue;
+				}
+				
+				if (servicePtr->getRoute()->getCommercialLine()->getNetwork()->getKey() != networkId)
+				{
+					continue;
+				}
+				
+				stringstream result;
+				result << servicePtr->getKey();
+				size_t maxRank(servicePtr->getRoute()->getEdges().size());
+				for(size_t i(0); i<maxRank; ++i)
+				{
+					result <<
+						FIELD_SEPARATOR <<
+						i <<
+						FIELD_SEPARATOR <<
+						to_simple_string(servicePtr->getArrivalSchedule(true, i)) <<
+						FIELD_SEPARATOR <<
+						to_simple_string(servicePtr->getDepartureSchedule(true, i)) <<
+						FIELD_SEPARATOR
+					;
+					if(servicePtr->getRealTimeVertex(i))
+					{
+						result << servicePtr->getRealTimeVertex(i)->getKey();
+					}
+				}
+				
+				slave.enqueue(
+					RealTimePTDataInterSYNTHESE::FACTORY_KEY,
+					result.str(),
+					not_a_date_time,
+					saveTransaction,
+					true,
+					true,
+					servicePtr.get()
+				);
+			}
+			saveTransaction.run();
 		}
 
 

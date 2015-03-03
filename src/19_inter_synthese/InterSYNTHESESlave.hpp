@@ -86,11 +86,19 @@ namespace synthese
 				Queue::iterator,
 				Queue::iterator
 			> QueueRange;
+			
+			typedef std::map<
+				util::Registrable*,
+				util::RegistryKeyType
+			> CacheQueue;
 
 		private:
 			mutable Queue _queue;
 			mutable QueueRange _lastSentRange;
 			mutable boost::recursive_mutex _queueMutex;
+			
+			// Map to remember objects and queue position to update them
+			mutable CacheQueue _cacheQueue;
 
 			// Keep the previous config at unlink time and use it at link
 			// time only if it has changed. Don't forget to unlink it in
@@ -108,6 +116,7 @@ namespace synthese
 
 				bool fullUpdateNeeded() const;
 				void processFullUpdate() const;
+				void processFullRTUpdate() const;
 				QueueRange getQueueRange() const;
 
 				boost::recursive_mutex& getQueueMutex() const { return _queueMutex; }
@@ -118,7 +127,8 @@ namespace synthese
 					const boost::posix_time::ptime& expirationTime,
 					boost::optional<db::DBTransaction&> transaction,
 					bool nonPersistent,
-					bool force = false
+					bool force = false,
+					util::Registrable* objectToRemember = NULL
 				) const;
 				void queue(
 					InterSYNTHESEQueue& obj

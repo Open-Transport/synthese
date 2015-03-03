@@ -56,6 +56,7 @@ namespace synthese
 				static const std::string PARAMETER_COM_PORT_NUMBER;
 				static const std::string PARAMETER_COM_PORT_RATE;
 				static const std::string PARAMETER_DATASOURCE_ID;
+				static const std::string PARAMETER_PATCH_DIRECTION_BELFORT;
 
 			private:
 				typedef enum
@@ -69,6 +70,7 @@ namespace synthese
 				int _comPortNb;
 				int _comPortRate;
 				boost::shared_ptr<const impex::DataSource> _dataSource;
+				bool _patchDirectionBelfort;
 
 				mutable Status _status;
 				mutable std::auto_ptr<SerialReader> _srt;

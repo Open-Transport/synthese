@@ -113,7 +113,7 @@ namespace synthese
 			const Record& record,
 			const util::Env& env
 		){
-			return SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
+			return SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValueAndTolerance(
 				fieldObject,
 				record,
 				_stringToGeom,

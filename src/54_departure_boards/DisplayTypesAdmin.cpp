@@ -83,7 +83,7 @@ namespace synthese
 		void DisplayTypesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_requestParameters.setFromParametersMap(map, DisplayTypeTableSync::COL_NAME, 20);
+			_requestParameters.setFromParametersMap(map, Name::FIELD.name, 20);
 			if(!map.getDefault<string>(PARAMETER_NAME).empty())
 			{
 				_searchName = map.getOptional<string>(PARAMETER_NAME);
@@ -150,18 +150,18 @@ namespace synthese
 					_searchInterfaceId,
 					_requestParameters.first,
 					_requestParameters.maxSize,
-					_requestParameters.orderField == DisplayTypeTableSync::COL_NAME,
-					_requestParameters.orderField == DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID,
-					_requestParameters.orderField == DisplayTypeTableSync::COL_ROWS_NUMBER,
+					_requestParameters.orderField == Name::FIELD.name,
+					_requestParameters.orderField == DisplayInterface::FIELD.name,
+					_requestParameters.orderField == RowsNumber::FIELD.name,
 					_requestParameters.raisingOrder,
 					UP_LINKS_LOAD_LEVEL
 			)	);
 
 			ResultHTMLTable::HeaderVector v;
-			v.push_back(make_pair(DisplayTypeTableSync::COL_NAME, "Nom"));
-			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Interface d'affichage"));
-			v.push_back(make_pair(DisplayTypeTableSync::COL_ROWS_NUMBER, "Nombre de rangées"));
-			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Protocole supervision"));
+			v.push_back(make_pair(Name::FIELD.name, "Nom"));
+			v.push_back(make_pair(DisplayInterface::FIELD.name, "Interface d'affichage"));
+			v.push_back(make_pair(RowsNumber::FIELD.name, "Nombre de rangées"));
+			v.push_back(make_pair(DisplayInterface::FIELD.name, "Protocole supervision"));
 			v.push_back(make_pair(string(), "Actions"));
 			if (writeRight)
 			{
@@ -184,15 +184,15 @@ namespace synthese
 				openRequest.getPage()->setType(dt);
 
 				stream << t.row();
-				stream << t.col() << dt->getName();
-				stream << t.col() << ((dt->getDisplayInterface() == NULL) ? "(aucune)" : dt->getDisplayInterface()->getName());
-				stream << t.col() << dt->getRowNumber();
+				stream << t.col() << dt->get<Name>();
+				stream << t.col() << (!(dt->get<DisplayInterface>()) ? "(aucune)" : dt->get<DisplayInterface>()->getName());
+				stream << t.col() << dt->get<RowsNumber>();
 
 				stream << t.col();
-				if(	dt->getMonitoringInterface() != NULL &&
-					dt->getTimeBetweenChecks().minutes() > 0
+				if(	dt->get<MonitoringInterface>() &&
+					dt->get<TimeBetweenChecks>().minutes() > 0
 				){
-					stream << dt->getMonitoringInterface()->getName();
+					stream << dt->get<MonitoringInterface>()->getName();
 				} else {
 					stream << "(non supervisé)";
 				}
@@ -208,7 +208,7 @@ namespace synthese
 						HTMLModule::getLinkButton(
 							deleteRequest.getURL(),
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?",
+							"Etes-vous sûr de vouloir supprimer le type " + dt->get<Name>() + " ?",
 							"/admin/img/monitor_delete.png"
 						)
 					;

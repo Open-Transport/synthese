@@ -374,11 +374,13 @@ namespace synthese
 				pm.insert(prefix + DATA_LINE_COLOR, getColor()->toString());
 				pm.insert(prefix + CommercialLineTableSync::COL_COLOR, getColor()->toXMLColor()); // Maybe break CMS views ! but needed for load in inter_synthese_package
 			}
+
 			if(getFgColor())
 			{
 				pm.insert(prefix + DATA_LINE_FOREGROUND_COLOR, getFgColor()->toString());
 				pm.insert(prefix + CommercialLineTableSync::COL_FOREGROUND_COLOR, getFgColor()->toXMLColor()); // Maybe break CMS views ! but needed for load in inter_synthese_package
 			}
+
 			if(getNetwork())
 			{
 				getNetwork()->toParametersMap(pm, withAdditionalParameters, withFiles, "line_network_");

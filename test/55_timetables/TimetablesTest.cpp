@@ -314,10 +314,11 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	rows.push_back(row4);
 	tt1.setRows(rows);
 
-	BOOST_CHECK(!tt1.isGenerable());
-
-	tt1.setBaseCalendar(&baseCalendarAllDays);
 	BOOST_CHECK(tt1.isGenerable());
+
+	tt1.set<BaseCalendar>(baseCalendarAllDays);
+	BOOST_CHECK(tt1.isGenerable());
+	tt1.setContentType(Timetable::CALENDAR);
 
 	{
 		std::auto_ptr<TimetableGenerator> generator(
@@ -461,7 +462,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	}
 
 	{ // With compression : A x 4
-		tt1.setCompression(true);
+		tt1.set<Compression>(true);
 		std::auto_ptr<TimetableGenerator> generator(
 			tt1.getGenerator(
 				env

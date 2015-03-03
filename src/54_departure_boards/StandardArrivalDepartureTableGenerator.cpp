@@ -23,10 +23,12 @@
 #include "StandardArrivalDepartureTableGenerator.h"
 
 #include "AccessParameters.h"
+#include "GraphConstants.h"
+#include "JourneyPattern.hpp"
 #include "LinePhysicalStop.hpp"
+#include "SchedulesBasedService.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "GraphConstants.h"
 
 #include <boost/foreach.hpp>
 
@@ -54,11 +56,14 @@ namespace synthese
 			const ptime& endDateTime,
 			bool allowCanceled,
 			optional<size_t> maxSize,
-			bool endDateTimeConcernsTheorical
+			bool endDateTimeConcernsTheorical,
+			bool excludeStartingAreaIsDestination
 		):	ArrivalDepartureTableGenerator(
-			physicalStops, direction, endfilter, lineFilter,
-			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, allowCanceled, maxSize, endDateTimeConcernsTheorical
-		){
+				physicalStops, direction, endfilter, lineFilter,
+				displayedPlacesList, forbiddenPlaces, startTime, endDateTime, allowCanceled, maxSize, endDateTimeConcernsTheorical
+			),
+			_excludeStartingAreaIsDestination(excludeStartingAreaIsDestination)
+		{
 		}
 
 
@@ -131,6 +136,33 @@ namespace synthese
 							if(	_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end()
 							){
 								continue;
+							}
+							
+							// Checks if the destination might be filtered
+							if (_excludeStartingAreaIsDestination)
+							{
+								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+								const StopArea* destination = journeyPattern->getDestination()->getConnectionPlace();
+								if (destination->getKey() == it.second->getConnectionPlace()->getKey())
+								{
+									continue;
+								}
+								
+								if (journeyPattern->getEdges().size() >= 2 &&
+									(journeyPattern->getEdge(0))->getFromVertex() && (journeyPattern->getEdge(0))->getFromVertex()->getHub() &&
+									it.second->getKey() == (journeyPattern->getEdge(0))->getFromVertex()->getKey() &&
+									(journeyPattern->getEdge(1))->getFromVertex() && (journeyPattern->getEdge(1))->getFromVertex()->getHub() &&
+									(journeyPattern->getEdge(0))->getFromVertex()->getHub() == (journeyPattern->getEdge(1))->getFromVertex()->getHub())
+								{
+									continue;
+								}
+								
+								if (servicePointer.getDepartureEdge()->getRankInPath() < journeyPattern->getEdges().size() - 2 &&
+									servicePointer.getDepartureEdge()->getFromVertex()->getHub() && journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getHub() &&
+									servicePointer.getDepartureEdge()->getFromVertex()->getHub() == journeyPattern->getEdge(servicePointer.getDepartureEdge()->getRankInPath() + 1)->getFromVertex()->getHub())
+								{
+									continue;
+								}
 							}
 
 							// The departure is kept in the results

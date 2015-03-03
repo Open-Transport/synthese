@@ -85,8 +85,9 @@ namespace synthese
 		private:
 			const geography::Place* const _departurePlace;
 			const geography::Place* const _arrivalPlace;
+			const geography::Place* const _departureParking;
+			const geography::Place* const _arrivalParking;
 			bool _showFullRoadJourney;
-
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -106,11 +107,43 @@ namespace synthese
 				algorithm::PlanningPhase direction
 			) const;
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute journeys using both personal car and public transportation
+			/// @author Olivier Vernhet
+			PTRoutePlannerResult _computeMixedModeJourney() const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Prints journeys as debug logs
+			/// @param journeys the list of journeys to print
+			/// @author Olivier Vernhet
+			void _printJourneys(const TimeSlotRoutePlanner::Result& journeys) const;
+
 
 		public:
 			PTTimeSlotRoutePlanner(
 				const geography::Place* origin,
 				const geography::Place* destination,
+				const boost::posix_time::ptime& lowestDepartureTime,
+				const boost::posix_time::ptime& highestDepartureTime,
+				const boost::posix_time::ptime& lowestArrivalTime,
+				const boost::posix_time::ptime& highestArrivalTime,
+				const boost::optional<std::size_t>	maxSolutionsNumber,
+				const graph::AccessParameters		accessParameters,
+				const algorithm::PlanningOrder		planningOrder,
+				bool								ignoreReservation,
+				const algorithm::AlgorithmLogger& algorithmLogger,
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
+				bool enableTheoretical = true,
+				bool enableRealTime = true,
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
+			);
+
+			PTTimeSlotRoutePlanner(
+				const geography::Place* origin,
+				const geography::Place* destination,
+				const geography::Place* originParking,
+				const geography::Place* destinationParking,
 				const boost::posix_time::ptime& lowestDepartureTime,
 				const boost::posix_time::ptime& highestDepartureTime,
 				const boost::posix_time::ptime& lowestArrivalTime,

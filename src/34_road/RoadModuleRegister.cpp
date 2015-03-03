@@ -10,6 +10,7 @@
 #include "RoadChunkTableSync.h"
 #include "RoadPlaceTableSync.h"
 #include "RoadTableSync.h"
+#include "RoadPlaceUpdateAction.h"
 
 #include "ProjectAddressAction.hpp"
 #include "PublicPlaceEntranceCreationAction.hpp"
@@ -51,6 +52,7 @@ void synthese::road::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::road::PublicPlaceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::road::PublicPlaceTableSync>::integrate();
 	synthese::road::RoadPlace::integrate();
+	synthese::road::RoadPlaceUpdateAction::integrate();
 	synthese::road::PublicPlace::integrate();
 
 	synthese::road::ProjectAddressAction::integrate();

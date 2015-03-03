@@ -101,7 +101,8 @@ namespace synthese
 				/// @param parameter parameter of the message
 				void enqueueIfInPerimeter(
 					const InterSYNTHESEContent& content,
-					boost::optional<db::DBTransaction&> transaction
+					boost::optional<db::DBTransaction&> transaction,
+					util::Registrable* objectToRemember
 				) const;
 
 				//////////////////////////////////////////////////////////////////////////

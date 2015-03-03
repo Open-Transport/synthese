@@ -236,6 +236,8 @@ namespace synthese
 					(	itVehicleService.second->get<Services>().empty() ||
 						itVehicleService.second->empty()
 				)	){
+					shared_ptr<VehicleService> vehicleService(itVehicleService.second);
+					_logWarning("removing vehicle service: " + lexical_cast<string>(vehicleService->getKey()));
 					_vehicleServicesToRemove.insert(itVehicleService.second);
 				}
 			}
@@ -443,7 +445,7 @@ namespace synthese
 			{
 				if(_calendarTemplate.get())
 				{
-					if(!startDate.is_not_a_date() && endDate.is_not_a_date())
+					if(!startDate.is_not_a_date() && !endDate.is_not_a_date())
 					{
 						_calendar = _calendarTemplate->getResult(Calendar(startDate, endDate));
 					}
@@ -505,6 +507,10 @@ namespace synthese
 			set<ScheduledService*> scheduledServicesToRemove;
 			set<ContinuousService*> continuousServicesToRemove;
 			set<JourneyPattern*> journeyPatternsToRemove;
+			set<VehicleService*> vehicleServicesToRemove;
+
+			// Load vehicleServices in the env
+			VehicleServiceTableSync::Search(_env);
 
 			// Select obsolete services
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::value_type& itPathSet, journeyPatterns.getMap())
@@ -545,6 +551,12 @@ namespace synthese
 			BOOST_FOREACH(ScheduledService* scheduledService, scheduledServicesToRemove)
 			{
 				const_cast<JourneyPattern*>(scheduledService->getRoute())->removeService(*scheduledService);
+				// Loop on VehicleServices to remove (maybe) service
+				recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<VehicleService>().getMutex());
+				BOOST_FOREACH(const Registry<VehicleService>::value_type& vservice, _env.getRegistry<VehicleService>())
+				{
+					vservice.second->remove(*scheduledService);
+				}
 			}
 			BOOST_FOREACH(ContinuousService* continuousService, continuousServicesToRemove)
 			{
@@ -562,6 +574,15 @@ namespace synthese
 					}
 			}	}
 
+			// Select empty vehicleServices
+			BOOST_FOREACH(const Registry<VehicleService>::value_type& vservice, _env.getRegistry<VehicleService>())
+			{
+				if (vservice.second->get<Services>().empty())
+				{
+					vehicleServicesToRemove.insert(vservice.second.get());
+				}
+			}
+
 			// Remove services
 			DBTransaction t;
 			DB& db(*DBModule::GetDB());
@@ -575,11 +596,20 @@ namespace synthese
 			}
 			BOOST_FOREACH(JourneyPattern* journeyPatterns, journeyPatternsToRemove)
 			{
-				BOOST_FOREACH(const Edge* edge, journeyPatterns->getEdges())
+				BOOST_FOREACH(const LineStop* edge, journeyPatterns->getLineStops())
 				{
 					db.deleteStmt(edge->getKey(), t);
 				}
 				db.deleteStmt(journeyPatterns->getKey(), t);
+			}
+			BOOST_FOREACH(VehicleService* vehicleService, vehicleServicesToRemove)
+			{
+				db.deleteStmt(vehicleService->getKey(), t);
+			}
+			// Save of the VehicleServices because they may have been modified
+			BOOST_FOREACH(const Registry<VehicleService>::value_type& vservice, _env.getRegistry<VehicleService>())
+			{
+				VehicleServiceTableSync::Save(vservice.second.get(), t);
 			}
 			t.run();
 		}

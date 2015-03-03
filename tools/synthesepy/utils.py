@@ -498,17 +498,21 @@ class GITInfo(object):
     # Jenkins publishes the git branch in the GIT_BRANCH env variable
     def _get_branch_from_env(self):
         try:
+            print "_get_branch_from_env"
+            print "GIT_BRANCH=" + os.environ['GIT_BRANCH']
             return os.environ['GIT_BRANCH'].split("/")[-1]
         except:
             return None
 
     @property
     def branch(self):
+        print ">branch"
         if not self._branch:
             self._branch = subprocess.Popen(
                 ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
                 cwd=self.repo_path,
                 stdout=subprocess.PIPE).communicate()[0].strip('\n')
+        print "<branch " + self._branch
         return self._branch
 
     @property

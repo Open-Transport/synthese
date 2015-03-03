@@ -65,7 +65,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<ImpExModule>::Start()
 		{
-			ServerModule::AddThread(&ImpExModule::AutoImportsThread, "Auto imports");
+			ServerModule::AddThread(&ImpExModule::AutoImportsThread, "AutoImports");
 		}
 
 

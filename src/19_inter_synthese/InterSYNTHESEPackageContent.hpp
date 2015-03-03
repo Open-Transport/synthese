@@ -64,6 +64,10 @@ namespace synthese
 			void _prepareObjectsToRemove(
 				const boost::property_tree::ptree& node
 			);
+			
+			void _prepareObjectsToRemovenoTopLevel(
+				const boost::property_tree::ptree& node
+			);
 
 			void _prepareObjectsToRemoveRecursion(
 				const util::Registrable& object
@@ -78,7 +82,9 @@ namespace synthese
 
 			void _parseAndLoad(
 				const std::string& s,
-				boost::optional<const impex::Importer&> importer
+				boost::optional<const impex::Importer&> importer,
+				bool noSuppressTopLevel,
+				bool noSuppressAnything
 			);
 
 			void _deleteObjectsToRemove(
@@ -96,14 +102,18 @@ namespace synthese
 				util::Env& env,
 				const std::string& s,
 				impex::Import& import,
-				boost::optional<const impex::Importer&> importer
+				boost::optional<const impex::Importer&> importer,
+				bool noSuppressTopLevel = false,
+				bool noSuppressAnything = false
 			);
 
 			InterSYNTHESEPackageContent(
 				util::Env& env,
 				const std::string& s,
 				const boost::shared_ptr<InterSYNTHESEPackage>& pacakge,
-				boost::optional<const impex::Importer&> importer
+				boost::optional<const impex::Importer&> importer,
+				bool noSuppressTopLevel = false,
+				bool noSuppressAnything = false
 			);
 
 			LoadedObjects& getLoadedObjects();

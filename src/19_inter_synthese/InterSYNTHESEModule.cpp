@@ -22,6 +22,7 @@
 
 #include "InterSYNTHESEModule.hpp"
 
+#include "Action.h"
 #include "BasicClient.h"
 #include "Import.hpp"
 #include "InterSYNTHESEFileFormat.hpp"
@@ -31,6 +32,7 @@
 #include "InterSYNTHESESlave.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "ServerModule.h"
+#include "SpecificPostInstall.hpp"
 #include "StaticFunctionRequest.h"
 #include "URI.hpp"
 #include "User.h"
@@ -61,11 +63,15 @@ namespace synthese
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME = "inter_synthese_waiting_time";
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE = "inter_synthese_slave_active";
 		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID = "inter_synthese_slave_id";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL = "post_install";
+		const string InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID = "post_install_passive_import_id";
 		const RegistryKeyType InterSYNTHESEModule::FAKE_IMPORT_ID = 1;
 
 		string InterSYNTHESEModule::_masterHost;
 		string InterSYNTHESEModule::_masterPort;
 		bool InterSYNTHESEModule::_slaveActive(true);
+		bool InterSYNTHESEModule::_postInstall(false);
+		RegistryKeyType InterSYNTHESEModule::_postInstallPassiveImportId(0);
 		time_duration InterSYNTHESEModule::_syncWaitingTime(seconds(5));
 		RegistryKeyType InterSYNTHESEModule::_slaveId(0);
 		InterSYNTHESEModule::PackagesBySmartURL InterSYNTHESEModule::_packagesBySmartURL;
@@ -82,20 +88,27 @@ namespace synthese
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE, "0", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID, "0", &InterSYNTHESEModule::ParameterCallback);
 			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME, "5", &InterSYNTHESEModule::ParameterCallback);
+			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL, "0", &InterSYNTHESEModule::ParameterCallback);
+			RegisterParameter(InterSYNTHESEModule::MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID, "0", &InterSYNTHESEModule::ParameterCallback);
 		}
 
 
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Init()
 		{
+			InterSYNTHESEModule::GenerateFakeImport();
+			InterSYNTHESEModule::PostInstall();
 		}
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Start()
 		{
-			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "Inter-SYNTHESE slave full updater");
+			ServerModule::AddThread(&InterSYNTHESESlaveUpdateService::RunBackgroundUpdater, "IS-FullUpdater");
 
 			// Expired queue entries cleaner
-			ServerModule::AddThread(&InterSYNTHESEModule::QueueCleaner, "Inter-SYNTHESE queue cleaner");
+			ServerModule::AddThread(&InterSYNTHESEModule::QueueCleaner, "IS-QueueCleaner");
+			
+			// Passive slaves updater (for multimaster config)
+			ServerModule::AddThread(&InterSYNTHESEModule::PassiveSlavesUpdater, "Passive slaves updater");
 		}
 
 
@@ -121,7 +134,8 @@ namespace synthese
 	{
 		void InterSYNTHESEModule::Enqueue(
 			const InterSYNTHESEContent& content,
-			boost::optional<db::DBTransaction&> transaction
+			boost::optional<db::DBTransaction&> transaction,
+			Registrable* objectToRemember
 		){
 			BOOST_FOREACH(
 				InterSYNTHESEConfig::Registry::value_type& config,
@@ -129,7 +143,8 @@ namespace synthese
 			){
 				config.second->enqueueIfInPerimeter(
 					content,
-					transaction
+					transaction,
+					objectToRemember
 				);
 			}
 		}
@@ -184,12 +199,33 @@ namespace synthese
 					// Log
 				}
 			}
-			_generateFakeImport();
+			else if(name == MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL)
+			{
+				if(value == "1")
+				{
+					_postInstall = true;
+				}
+				else
+				{
+					_postInstall = false;
+				}
+			}
+			else if(name == MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID)
+			{
+				try
+				{
+					_postInstallPassiveImportId = lexical_cast<RegistryKeyType>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+					// Log
+				}
+			}
 		}
 
 
 
-		void InterSYNTHESEModule::_generateFakeImport()
+		void InterSYNTHESEModule::GenerateFakeImport()
 		{
 			if(!_slaveActive)
 			{
@@ -225,8 +261,8 @@ namespace synthese
 				pm.insert(ConnectionImporter<InterSYNTHESEFileFormat>::PARAMETER_PORT, _masterPort);
 				pm.insert(InterSYNTHESEFileFormat::Importer_::PARAMETER_SLAVE_ID, _slaveId);
 				import->set<synthese::Parameters>(pm);
-
 				import->set<AutoImportDelay>(_syncWaitingTime);
+
 				import->link(Env::GetOfficialEnv(), true);
 				if(created)
 				{
@@ -393,6 +429,21 @@ namespace synthese
 
 				ServerModule::SetCurrentThreadWaiting();
 				boost::this_thread::sleep(boost::posix_time::seconds(10));
+			}
+		}
+
+		void InterSYNTHESEModule::PostInstall()
+		{
+			if(_postInstall)
+			{
+				boost::shared_ptr<Action>
+					action(boost::shared_ptr<Action>(util::Factory<Action>::create("SpecificPostInstall")));
+				Request request;
+				ParametersMap pm;
+				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_PASSIVE_IMPORT_ID, _postInstallPassiveImportId);
+				pm.insert(SpecificPostInstall::PARAMETER_POST_INSTALL_SLAVE_ID, _slaveId);
+				action->_setFromParametersMap(pm);
+				action->run(request);
 			}
 		}
 }	}

@@ -40,8 +40,8 @@ else()
   add_definitions(-DPNG_NO_MMX_CODE)
 endif()
 
-add_definitions(-DFUSION_MAX_VECTOR_SIZE=30)
-add_definitions(-DFUSION_MAX_MAP_SIZE=30)
+add_definitions(-DFUSION_MAX_VECTOR_SIZE=40)
+add_definitions(-DFUSION_MAX_MAP_SIZE=40)
 
 if(NOT DEFINED BOOST_VERSION)
   set(BOOST_VERSION 1.39)
@@ -63,9 +63,9 @@ endif()
 
 include_directories(${Boost_INCLUDE_DIRS})
 
-# MySQL
+# MYSQL
 
-macro_optional_find_package(MySQL)
+macro_optional_find_package(MYSQL)
 if(WITH_MYSQL AND NOT MYSQL_FOUND)
   message(FATAL_ERROR "MySQL not found")
 endif()
@@ -137,13 +137,6 @@ endif()
 include(FindGit)
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
-
-# TODO: Get the git revision
-file(WRITE ${PROJECT_BINARY_DIR}/src/15_server/svnversion.h
-  "#define SYNTHESE_REVISION \"\"\n"
-  "#define SYNTHESE_BUILD_DATE \"\"\n"
-  "#define SYNTHESE_SVN_URL \"\"\n"
-)
 
 # Note: this is using a .h file and not defines, otherwise everything gets
 # rebuilt each time CMake is invoked.

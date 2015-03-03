@@ -23,9 +23,15 @@
 #include "Crossing.h"
 
 #include "AllowedUseRule.h"
+#include "CrossingTableSync.hpp"
+#include "DBModule.h"
+#include "ImportableTableSync.hpp"
 #include "ReachableFromCrossing.hpp"
 #include "RoadModule.h"
 #include "VertexAccessMap.h"
+
+#include <sstream>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
@@ -38,34 +44,32 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace impex;
-
-
-
-	namespace util
-	{
-		template<> const string Registry<road::Crossing>::KEY("Crossing");
-	}
+	using namespace road;
+	
+	CLASS_DEFINITION(Crossing, "t043_crossings", 43)
+	FIELD_DEFINITION_OF_OBJECT(Crossing, "crossing_id", "crossing_ids")
+	
+	FIELD_DEFINITION_OF_TYPE(NonReachableRoads, "non_reachable_roads", SQL_TEXT)
 
 	namespace road
 	{
+		const string Crossing::TAG_NON_REACHABLE_ROADS = "non_reachable_roads";
+
 		Crossing::Crossing(
 			util::RegistryKeyType key,
 			boost::shared_ptr<Point> geometry,
-			std::string codeBySource,
-			const impex::DataSource* source,
 			bool withIndexation
 		):	Registrable(key),
 			Hub(),
-			Vertex(this, geometry, withIndexation)
+			Vertex(this, geometry, withIndexation),
+			Object<Crossing, CrossingSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, key),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(NonReachableRoads),
+					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+			)	)
 		{
-			// Data source
-			if(source)
-			{
-				DataSourceLinks links;
-				links.insert(make_pair(source, codeBySource));
-				setDataSourceLinksWithoutRegistration(links);
-			}
-
 			// Default accessibility
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
@@ -211,5 +215,32 @@ namespace synthese
 				result.push_back(this);
 			}
 			return result;
+		}
+		
+		void Crossing::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix /* = std::string */
+		) const	{
+			
+			// Non reachable roads as sub map
+			BOOST_FOREACH(const NonReachableRoads::Type::value_type& road, get<NonReachableRoads>())
+			{
+				boost::shared_ptr<ParametersMap> roadPM(new ParametersMap);
+				road->toParametersMap(*roadPM, true);
+				map.insert(prefix + TAG_NON_REACHABLE_ROADS, roadPM);
+			}
+
+		}
+		
+		void Crossing::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			if(get<PointGeometry>())
+			{
+				setGeometry(get<PointGeometry>());
+			}
+		}
+		
+		void Crossing::unlink()
+		{
 		}
 }	}

@@ -286,13 +286,14 @@ namespace synthese
 			split(parts, str, is_any_of("TZ+-"));
 			if(parts.size() < 4)
 			{
-				throw Exception("Malformed XSD date time");
+				throw Exception("Malformed XSD date time (less than 4 parts)");
 			}
 			ptime result(
 				from_string(parts[0] + "-" + parts[1] + "-" + parts[2]),
 				duration_from_string(parts[3])
 			);
-			if (parts.size() > 4)
+			if (parts.size() > 4&&
+				!parts[4].empty())
 			{
 				// DateTime has to be corrected 
 				try {
@@ -307,7 +308,7 @@ namespace synthese
 					}
 				}
 				catch (...){
-					throw Exception("Malformed XSD date time");
+					throw Exception("Malformed XSD date time (undefined fifth part : " + parts[4] + ")");
 				}
 			}
 			return result;

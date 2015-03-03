@@ -7,7 +7,9 @@
 
 #include "CMSExport.hpp"
 #include "CMSImport.hpp"
+#include "DinoFileFormat.hpp"
 #include "GPSdFileFormat.hpp"
+#include "GPSSimuFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
@@ -22,6 +24,7 @@
 #include "OGTFileFormat.hpp"
 #include "ObitiFileFormat.hpp"
 #include "PegaseFileFormat.hpp"
+#include "POICSVFileFormat.hpp"
 #include "RSSFileFormat.hpp"
 #include "TridentFileFormat.h"
 #include "StopsShapeFileFormat.hpp"
@@ -78,7 +81,9 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::VDVServerTableSync::integrate();
 	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
 
+	synthese::data_exchange::DinoFileFormat::integrate();
 	synthese::data_exchange::GPSdFileFormat::integrate();
+	synthese::data_exchange::GPSSimuFileFormat::integrate();
 	synthese::data_exchange::GTFSFileFormat::integrate();
 	synthese::data_exchange::HafasFileFormat::integrate();
 	synthese::data_exchange::HastusCSVFileFormat::integrate();
@@ -93,6 +98,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OGTFileFormat::integrate();
 	synthese::data_exchange::ObitiFileFormat::integrate();
 	synthese::data_exchange::PegaseFileFormat::integrate();
+    synthese::data_exchange::POICSVFileFormat::integrate();
 	synthese::data_exchange::RSSFileFormat::integrate();
 	synthese::data_exchange::TridentFileFormat::integrate();
 	synthese::data_exchange::StopsShapeFileFormat::integrate();

@@ -28,6 +28,7 @@
 #include "InterSYNTHESEPackage.hpp"
 #include "InterSYNTHESEPackageContent.hpp"
 #include "InterSYNTHESEPackageGetContentService.hpp"
+#include "ServerModule.h"
 #include "StaticFunctionRequest.h"
 #include "User.h"
 
@@ -52,6 +53,8 @@ namespace synthese
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_PASSWORD = "password";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_URL = "url";
 		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_USER = "user";
+		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_NO_SUPPRESS_TOP_LEVEL = "no_suppress_top_level";
+		const string InterSYNTHESEPackageFileFormat::Importer_::PARAMETER_NO_SUPPRESS_ANYTHING = "no_suppress_anything";
 
 
 
@@ -83,7 +86,9 @@ namespace synthese
 						_env,
 						result,
 						const_cast<Import&>(this->getImport()),
-						*this
+						*this,
+						_noSuppressTopLevel,
+						_noSuppressAnything
 				)	);
 			}
 			catch(std::exception& e)
@@ -121,6 +126,12 @@ namespace synthese
 			{
 				_lockServerName = lexical_cast<string>(DBModule::GetNodeId());
 			}
+			
+			// No Suppress top level objects
+			_noSuppressTopLevel = map.getDefault<bool>(PARAMETER_NO_SUPPRESS_TOP_LEVEL, false);
+			
+			// No Suppress anything
+			_noSuppressAnything = map.getDefault<bool>(PARAMETER_NO_SUPPRESS_ANYTHING, false);
 		}
 
 
@@ -151,7 +162,9 @@ namespace synthese
 			util::ParametersMap& pm
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			ConnectionImporter<InterSYNTHESEPackageFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
-			_lock(false)
+			_lock(false),
+			_noSuppressTopLevel(false),
+			_noSuppressAnything(false)
 		{}
 }	}
 

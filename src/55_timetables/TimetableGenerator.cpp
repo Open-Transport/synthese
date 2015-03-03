@@ -456,6 +456,8 @@ namespace synthese
 
 			if(!_rows.empty())
 			{
+				_buildStopAreasRow(result);
+
 				// Loop on each line of the database
 				BOOST_FOREACH(const JourneyPattern* journeyPattern, journeyPatterns)
 				{
@@ -724,8 +726,10 @@ namespace synthese
 				// Calendar filter
 				if(	!(_baseCalendar.hasAtLeastOneCommonDateWith(*service))
 					|| (!_withContinuousServices && service->isContinuous())
-				)	continue;
-
+				)
+				{
+					continue;
+				}
 				// Column creation
 				TimetableColumn col(*this, *service);
 
@@ -734,6 +738,15 @@ namespace synthese
 			}
 		}
 
+
+		void TimetableGenerator::_buildStopAreasRow(
+			TimetableResult& result
+		) const	{
+			BOOST_FOREACH(TimetableRow row, _rows)
+			{
+				result.getStopAreas().push_back(row.getPlace());
+			}
+		}
 
 
 		void TimetableGenerator::_insert(

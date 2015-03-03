@@ -47,7 +47,7 @@ namespace synthese
 				- un libellé
 				- un code de jour de circulation
 
-			Le libellé est claculé en fonction du JC du renvoi, et de celui de la page d'indicateur (différence).
+			Le libellé est calculé en fonction du JC du renvoi, et de celui de la page d'indicateur (différence).
 			@author Hugues Romain
 			@date 2001
 			@ingroup m55

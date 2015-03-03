@@ -106,11 +106,11 @@ namespace synthese
 					throw RequestException("No such Inter-SYNTHESE import");
 				}
 
-				_slaveId = map.getDefault<RegistryKeyType>(PARAMETER_SLAVE_ID, 0);
+				/*_slaveId = map.getDefault<RegistryKeyType>(PARAMETER_SLAVE_ID, 0);
 				if( _slaveId !=	interSYNTHESEImporter->getSlaveId()
 				){
 					throw RequestException("Bad slave id");
-				}
+				}*/
 			}
 			catch(ObjectNotFoundException<Import>&)
 			{

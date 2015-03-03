@@ -346,6 +346,12 @@ namespace synthese
 								_connectionPlace->getCity()->includes(*_connectionPlace) :
 								false
 					)	);
+					stream << t.cell(
+						"Parc relais",
+						t.getForm().getOuiNonRadioInput(
+							StopAreaUpdateAction::PARAMETER_IS_RELAY_PARK,
+							_connectionPlace->getIsRelayPark()
+					)	);
 					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
 					stream << t.title("Destination sur afficheur");
 					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));

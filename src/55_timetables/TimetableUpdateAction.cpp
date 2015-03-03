@@ -98,7 +98,7 @@ namespace synthese
 			{
 				try
 				{
-					_container = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_CONTAINER_ID), *_env);
+					_container = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CONTAINER_ID), *_env);
 				}
 				catch (ObjectNotFoundException<CalendarTemplate>)
 				{
@@ -114,7 +114,7 @@ namespace synthese
 			{
 				try
 				{
-					_calendarTemplate = CalendarTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID), *_env);
+					_calendarTemplate = CalendarTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID), *_env);
 				}
 				catch (ObjectNotFoundException<CalendarTemplate>)
 				{
@@ -139,17 +139,31 @@ namespace synthese
 
 		void TimetableUpdateAction::run(Request& request)
 		{
-			_timetable->setBaseCalendar(_calendarTemplate.get());
-			_timetable->setTitle(_title);
+			if(_calendarTemplate.get())
+			{
+				_timetable->set<BaseCalendar>(*_calendarTemplate);
+			}
+			else
+			{
+				_timetable->set<BaseCalendar>(BaseCalendar::Type());
+			}
+			_timetable->set<Title>(_title);
 			_timetable->setContentType(_format);
-			_timetable->setBookId(_container.get() ? _container->getKey() : RegistryKeyType(0));
+			if(_container.get())
+			{
+				_timetable->set<Book>(*_container);
+			}
+			else
+			{
+				_timetable->set<Book>(Book::Type());
+			}
 			if(_ignoreEmptyRows)
 			{
-				_timetable->setIgnoreEmptyRows(*_ignoreEmptyRows);
+				_timetable->set<IgnoreEmptyRows>(*_ignoreEmptyRows);
 			}
 			if(_compression)
 			{
-				_timetable->setCompression(*_compression);
+				_timetable->set<Compression>(*_compression);
 			}
 
 			TimetableTableSync::Save(_timetable.get());

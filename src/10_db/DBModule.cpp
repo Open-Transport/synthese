@@ -25,6 +25,7 @@
 #include "CoordinatesSystem.hpp"
 #include "DB.hpp"
 #include "ConditionalSynchronizationPolicyBase.hpp"
+#include "ObjectBase.hpp"
 #include "DBDirectTableSync.hpp"
 #include "DBTableSync.hpp"
 #include "DBException.hpp"
@@ -122,7 +123,7 @@ namespace synthese
 		template<> void ModuleClassTemplate<DBModule>::Start()
 		{
 			// Conditional tables load maintainer thread
-			ServerModule::AddThread(&DBModule::UpdateConditionalTableSyncEnv, "Conditional tables load maintainer");
+			ServerModule::AddThread(&DBModule::UpdateConditionalTableSyncEnv, "DBCondTableLoad");
 		}
 
 		template<> void ModuleClassTemplate<DBModule>::End()
@@ -425,4 +426,17 @@ namespace synthese
 		{
 			_conditionalTablesUpdateActive = false;
 		}
+
+
+
+        void DBModule::CreateObject(
+            ObjectBase* objectBase,
+            DBDirectTableSync* tableSync
+        ) {
+            DBTransaction transaction;
+            objectBase->beforeCreate(transaction);
+            tableSync->saveRegistrable(*objectBase, transaction);
+            objectBase->afterCreate(transaction);
+            transaction.run();
+        }
 }	}

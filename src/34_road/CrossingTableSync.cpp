@@ -55,12 +55,6 @@ namespace synthese
 		template<> const string FactorableTemplate<Fetcher<Vertex>, CrossingTableSync>::FACTORY_KEY("43");
 	}
 
-	namespace road
-	{
-		const std::string CrossingTableSync::COL_CODE_BY_SOURCE ("code_by_source");
-		const std::string CrossingTableSync::COL_NON_REACHABLE_ROADS ("non_reachable_roads");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<CrossingTableSync>::TABLE(
@@ -69,10 +63,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<CrossingTableSync>::_FIELDS[] =
 		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			Field(CrossingTableSync::COL_NON_REACHABLE_ROADS, SQL_TEXT),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
 
@@ -80,64 +70,6 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<CrossingTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CrossingTableSync, Crossing>::Load(
-			Crossing* object,
-			const db::DBResultSPtr& rows,
-			Env& env,
-			LinkLevel linkLevel
-		){
-			// Geometry
-			boost::shared_ptr<Point> point(
-				static_pointer_cast<Point, Geometry>(
-					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
-			)	);
-			if(point.get())
-			{
-				object->setGeometry(point);
-			}
-
-			// Code by source
-			object->setDataSourceLinksWithoutRegistration(
-				ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					rows->getText(CrossingTableSync::COL_CODE_BY_SOURCE),
-					env
-			)	);
-
-			object->setNonReachableRoads(
-				CrossingTableSync::UnserializeNonReachableRoads(
-					rows->getText(CrossingTableSync::COL_NON_REACHABLE_ROADS),
-					env
-				)
-			);
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CrossingTableSync, Crossing>::Unlink(
-			Crossing* obj
-		){
-		}
-
-
-
-		template<> void OldLoadSavePolicy<CrossingTableSync, Crossing>::Save(
-			Crossing* object,
-			optional<DBTransaction&> transaction
-		){
-			ReplaceQuery<CrossingTableSync> query(*object);
-			query.addField(
-				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
-			)	);
-			query.addField(
-				CrossingTableSync::SerializeNonReachableRoads(object->getNonReachableRoads())
-			);
-			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
-			query.execute(transaction);
 		}
 
 

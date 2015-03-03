@@ -443,6 +443,10 @@ namespace synthese
 			ptime now(second_clock::local_time());
 
 			// Checking if all reservations are too old to be cached
+			if (!(reservation.getTransaction()))
+			{
+				return false;
+			}
 			if((*reservation.getTransaction()->getReservations().rbegin())->getArrivalTime() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
 			{
 				return false;

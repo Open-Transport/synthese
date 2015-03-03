@@ -89,6 +89,13 @@ namespace synthese
 
 
 
+			/// @name Setters
+			//@{
+				void setMimeType(const util::MimeType& value) { _mimeType = value; }
+			//@}
+
+
+
 			static bool LoadFromRecord(
 				Type& fieldObject,
 				ObjectBase& object,

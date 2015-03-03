@@ -56,6 +56,7 @@ namespace synthese
 		const string WebPageAddAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "si";
 		const string WebPageAddAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
 		const string WebPageAddAction::PARAMETER_PARENT_ID = Action_PARAMETER_PREFIX + "pi";
+		const string WebPageAddAction::PARAMETER_MIME_TYPE = Action_PARAMETER_PREFIX + "mt";
 
 
 
@@ -75,6 +76,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PARENT_ID, _parent->getKey());
 			}
+			if(_mimeType)
+			{
+				map.insert(PARAMETER_MIME_TYPE, string(*_mimeType));
+			}
 			return map;
 		}
 
@@ -83,6 +88,29 @@ namespace synthese
 		void WebPageAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_title = map.getDefault<string>(PARAMETER_TITLE);
+
+			// Mime type
+			if(map.isDefined(PARAMETER_MIME_TYPE))
+			{
+				string value(map.get<string>(PARAMETER_MIME_TYPE));
+				try
+				{
+					_mimeType = MimeTypes::GetMimeTypeByString(value);
+				}
+				catch(Exception&)
+				{
+					vector<string> parts;
+					split(parts, value, is_any_of("/"));
+					if(parts.size() >= 2)
+					{
+						_mimeType = MimeType(parts[0], parts[1], "");
+					}
+					else
+					{
+						throw ActionException("No such mime type");
+					}
+				}
+			}
 
 			if(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID, 0))
 			{
@@ -164,19 +192,30 @@ namespace synthese
 		void WebPageAddAction::run(
 			Request& request
 		){
+
 			DBTransaction transaction;
 
+			WebpageContent wpContent;
 			Webpage object;
 			object.set<Title>(_title);
 			object.setRoot(_site.get());
 			object.set<StartTime>(second_clock::local_time());
 			object.setRank(_rank);
+			if (_mimeType)
+			{
+				wpContent = WebpageContent();
+				wpContent.setMimeType(*_mimeType);
+				object.set<WebpageContent>(wpContent);
+			}
 
 			if(_template.get())
 			{
 				object.set<WebpageContent>(
 					WebpageContent(
-						_template->get<WebpageContent>().getCMSScript().getCode()
+						_template->get<WebpageContent>().getCMSScript().getCode(),
+						false,
+						_mimeType? *_mimeType : util::MimeTypes::HTML,
+						false
 				)	);
 				object.setParent(_template->getParent());
 			}

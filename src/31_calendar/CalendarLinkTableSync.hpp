@@ -70,7 +70,10 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByService = true,
 				bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				boost::optional<util::RegistryKeyType> calendarTemplateId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> calendarTemplateId2 = boost::optional<util::RegistryKeyType>(),
+				bool calendarsOrConditionSet = false
 			);
 		};
 }	}

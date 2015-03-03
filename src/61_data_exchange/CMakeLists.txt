@@ -12,10 +12,14 @@ set(data_exchange_SRCS
   DataExchangeModule.inc.cpp
   DataExchangeModule.hpp
   DataExchangeModuleRegister.cpp
+  DinoFileFormat.cpp
+  DinoFileFormat.hpp
   GTFSFileFormat.cpp
   GTFSFileFormat.hpp
   GPSdFileFormat.cpp
   GPSdFileFormat.hpp
+  GPSSimuFileFormat.cpp
+  GPSSimuFileFormat.hpp
   HafasFileFormat.cpp
   HafasFileFormat.hpp
   HastusCSVFileFormat.cpp
@@ -56,6 +60,8 @@ set(data_exchange_SRCS
   PegaseFileFormat.hpp
   PhysicalStopsCSVExportFunction.cpp
   PhysicalStopsCSVExportFunction.h
+  POICSVFileFormat.cpp
+  POICSVFileFormat.hpp
   PTDataCleanerFileFormat.cpp
   PTDataCleanerFileFormat.hpp
   PTFileFormat.cpp

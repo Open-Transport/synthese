@@ -25,8 +25,12 @@
 #ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
 #define SYNTHESE_CTABLEAUAFFICHAGE_H
 
+#include "Object.hpp"
+
 #include "BroadcastPoint.hpp"
+#include "DataSourceLinksField.hpp"
 #include "DisplayScreenCPU.h"
+#include "DisplayType.h"
 #include "ImportableTemplate.hpp"
 #include "PlaceWithDisplayBoards.hpp"
 #include "Registrable.h"
@@ -47,6 +51,84 @@
 
 namespace synthese
 {
+	namespace departure_boards
+	{
+		FIELD_POINTER(BroadCastPoint, pt::StopArea)
+		FIELD_STRING(BroadCastPointComment)
+		FIELD_POINTER(DisplayTypePtr, departure_boards::DisplayType)
+		FIELD_INT(WiringCode)
+		FIELD_INT(BlinkingDelay)
+		FIELD_BOOL(TrackNumberDisplay)
+		FIELD_BOOL(ServiceNumberDisplay)
+		FIELD_BOOL(DisplayTeam)
+		FIELD_STRING(PhysicalStops)
+		FIELD_BOOL(AllPhysicalDisplayed)
+		FIELD_STRING(ForbiddenArrivalPlaces)
+		FIELD_STRING(AllowedLines)
+		FIELD_INT(Direction)
+		FIELD_INT(OriginsOnly)
+		FIELD_STRING(DisplayedPlaces)
+		FIELD_INT(MaxDelay)
+		FIELD_INT(ClearingDelay)
+		FIELD_INT(FirstRow)
+		FIELD_INT(GenerationMethodCode)
+		FIELD_STRING(ForcedDestinations)
+		FIELD_INT(DestinationForceDelay)
+		FIELD_INT(MaintenanceChecksPerDay)
+		FIELD_BOOL(MaintenanceIsOnline)
+		FIELD_STRING(MaintenanceMessage)
+		FIELD_BOOL(DisplayClock)
+		FIELD_POINTER(CpuHost, departure_boards::DisplayScreenCPU)
+		FIELD_INT(ComPort)
+		FIELD_STRING(MacAddress)
+		FIELD_BOOL(RoutePlanningWithTransfer)
+		FIELD_STRING(TransferDestinations)
+		FIELD_POINTER(Up, departure_boards::DisplayScreen)
+		FIELD_INT(SubScreenTypeCode)
+		FIELD_BOOL(AllowCanceled)
+		FIELD_POINTER(StopPointLocation, pt::StopPoint)
+		
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(BroadCastPoint),//!< Place where the services must depart or arrive
+			FIELD(BroadCastPointComment),
+			FIELD(DisplayTypePtr),
+			FIELD(WiringCode),// Display ID in a bus
+			FIELD(Title),//!< Titre pour affichage
+			FIELD(BlinkingDelay),
+			FIELD(TrackNumberDisplay),
+			FIELD(ServiceNumberDisplay),
+			FIELD(DisplayTeam),
+			FIELD(PhysicalStops),
+			FIELD(AllPhysicalDisplayed),
+			FIELD(ForbiddenArrivalPlaces),
+			FIELD(AllowedLines),
+			FIELD(Direction),
+			FIELD(OriginsOnly),
+			FIELD(DisplayedPlaces),
+			FIELD(MaxDelay),//!< Max time length for the table
+			FIELD(ClearingDelay),
+			FIELD(FirstRow),
+			FIELD(GenerationMethodCode),
+			FIELD(ForcedDestinations),
+			FIELD(DestinationForceDelay),//!< Durée pendant laquelle une destination est forcée
+			FIELD(MaintenanceChecksPerDay),
+			FIELD(MaintenanceIsOnline),
+			FIELD(MaintenanceMessage),
+			FIELD(DisplayClock),
+			FIELD(ComPort),
+			FIELD(CpuHost),
+			FIELD(MacAddress),
+			FIELD(RoutePlanningWithTransfer),
+			FIELD(TransferDestinations),
+			FIELD(Up),
+			FIELD(SubScreenTypeCode),
+			FIELD(impex::DataSourceLinks),
+			FIELD(AllowCanceled),
+			FIELD(StopPointLocation)
+		> DisplayScreenSchema;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -94,6 +176,7 @@ namespace synthese
 
 		*/
 		class DisplayScreen:
+			public virtual Object<DisplayScreen, DisplayScreenSchema>,
 			public virtual util::Registrable,
 			public tree::TreeNode<
 				DisplayScreen,
@@ -135,24 +218,8 @@ namespace synthese
 			static const std::string DATA_LOCATION_ID;
 			static const std::string DATA_CPU_ID;
 
-			//! \name Technical data
-			//@{
-				const DisplayType*									_displayType;
-				int													_wiringCode;	// Display ID in a bus
-				int													_comPort;
-				std::string											_macAddress;
-				pt::StopPoint*										_stopPointLocation;
-				std::string _name;
-			//@}
-
 			//! \name Appearance
 			//@{
-				std::string			_title;				//!< Titre pour affichage
-				int					_blinkingDelay;
-				bool				_trackNumberDisplay;
-				bool				_serviceNumberDisplay;
-				bool				_displayTeam;
-				bool				_displayClock;
 				DisplayedPlacesList		_displayedPlaces;
 				TransferDestinationsList	_transfers;
 			//@}
@@ -160,32 +227,17 @@ namespace synthese
 			//! \name Content
 			//@{
 				SubScreenType				_subScreenType;
-				const pt::StopArea*			_displayedPlace;		//!< Place where the services must depart or arrive
 				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Filter on departure stop point
-				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_allowedLines;
 				DeparturesTableDirection	_direction;
 				EndFilter					_originsOnly;
-				int							_maxDelay;			//!< Max time length for the table
-				int							_clearingDelay;
-				int							_firstRow;
-				bool						_routePlanningWithTransfer;
-				bool						_allowCanceled;
 			//@}
 
 			//!	\name Preselection
 			//@{
 				GenerationMethod			_generationMethod;
 				DisplayedPlacesList			_forcedDestinations;	//!< Destinations to display absolutely
-				int							_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
-
-			//@}
-
-			//! \name Maintenance
-			//@{
-				bool						_maintenanceIsOnline;
-				std::string					_maintenanceMessage;
 			//@}
 
 
@@ -245,34 +297,12 @@ namespace synthese
 
 			//!	\name Setters
 			//@{
-				void	setAllPhysicalStopsDisplayed(bool value){ _allPhysicalStopsDisplayed = value; }
-				void	setBlinkingDelay(int value){ _blinkingDelay = value; }
-				void	setClearingDelay(int delay);
-				void	setDestinationForceDelay(int);
 				void	setDirection(DeparturesTableDirection direction);
-				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	setDisplayedPlace(const pt::StopArea* value){ _displayedPlace = value; }
-				void	setMaintenanceIsOnline(bool value);
-				void	setMaintenanceMessage(const std::string& message);
-				void	setMaxDelay(int);
 				void	setOriginsOnly(EndFilter);
-				void	setServiceNumberDisplay(bool value);
-				void	setTitle(const std::string&);
-				void	setTrackNumberDisplay(bool value);
-				void	setType(const DisplayType*);
-				void	setWiringCode(int);
-				void	setDisplayTeam(bool value);
-				void	setDisplayClock(bool value);
-				void	setComPort(int value);
-				void	setMacAddress(const std::string& value);
-				void	setRoutePlanningWithTransfer(bool value);
 				void	setSubScreenType(SubScreenType value){ _subScreenType = value; }
 				void	setAllowedLines(const LineFilter& value){ _allowedLines = value; }
 				void	setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value){ _physicalStops = value; }
-				void	setAllowCanceled(bool value){ _allowCanceled = value; }
-				void	setStopPointLocation(pt::StopPoint* value){ _stopPointLocation = value; }
-				void setName(const std::string& value){ _name = value; }
 			//@}
 
 			//! \name Modifiers
@@ -315,38 +345,16 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				const pt::StopArea*				getDisplayedPlace()				const { return _displayedPlace; }
-				const DisplayType*				getType()						const { return _displayType; }
-				int								getWiringCode()					const;
-				const std::string&				getTitle()						const;
-				int								getBlinkingDelay()				const;
-				bool							getTrackNumberDisplay()			const;
-				bool							getServiceNumberDisplay()		const;
-				bool							getAllPhysicalStopsDisplayed()	const;
 				const ForbiddenPlacesList&		getForbiddenPlaces()			const;
 				const LineFilter&				getForbiddenLines()				const;
 				DeparturesTableDirection		getDirection()					const;
 				EndFilter						getEndFilter()					const;
 				const DisplayedPlacesList&		getDisplayedPlaces()			const;
-				int								getMaxDelay()					const;
-				int								getClearingDelay()				const;
-				int								getFirstRow()					const;
 				GenerationMethod				getGenerationMethod()			const;
 				const DisplayedPlacesList&		getForcedDestinations()			const;
-				int								getForceDestinationDelay()		const;
-				bool							getIsOnline()					const;
-				const std::string&				getMaintenanceMessage()			const;
-				bool							getDisplayTeam()				const;
-				int								getComPort()					const;
-				bool							getDisplayClock()				const;
-				std::string						getMacAddress()					const;
-				bool							getRoutePlanningWithTransfer()	const { return _routePlanningWithTransfer; }
 				const TransferDestinationsList&	getTransferdestinations()		const { return _transfers; }
 				SubScreenType					getSubScreenType()				const { return _subScreenType; }
 				const LineFilter&				getAllowedLines()				const { return _allowedLines; }
-				bool							getAllowCanceled()				const { return _allowCanceled; }
-				pt::StopPoint*					getStopPointLocation()			const { return _stopPointLocation; }
-				virtual std::string getName() const { return _name; }
 			//@}
 
 			//! \name Services
@@ -392,23 +400,6 @@ namespace synthese
 						- the type defines a positive time between monitoring checks
 				*/
 				bool isMonitored() const;
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Exports the object into a parameters map.
-				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_in_CMS
-				//////////////////////////////////////////////////////////////////////////
-				/// @retval the parameters map to populate
-				/// @param prefix prefix to add to the field names
-				/// @author Hugues Romain
-				/// @since 3.3.0
-				/// @date 2011
-				virtual void toParametersMap(
-					util::ParametersMap& pm,
-					bool withAdditionalParameters,
-					boost::logic::tribool withFiles = boost::logic::indeterminate,
-					std::string prefix = std::string()
-				) const;
 			//@}
 
 			//! @name Static output methods
@@ -427,6 +418,13 @@ namespace synthese
 				) const;
 
 				virtual void getBrodcastPoints(BroadcastPoints& result) const;
+			//@}
+			
+			//! @name Modifiers
+			//@{
+				virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix) const;
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
 		};
 }	}

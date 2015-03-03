@@ -73,6 +73,7 @@ namespace synthese
 				bool								_enableTheoretical;
 				bool								_enableRealTime;
 				graph::UseRule::ReservationDelayType _reservationRulesDelayType;
+				bool								_keepContinuousJourneys; // To use for road approach, will not try to break continous journeys
 			
 			//@}
 
@@ -112,7 +113,8 @@ namespace synthese
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true,
-				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY,
+				bool keepContinuousJourneys = false
 			);
 
 
@@ -144,7 +146,8 @@ namespace synthese
 				boost::optional<double> minMaxDurationRatioFilter = boost::optional<double>(),
 				bool enableTheoretical = true,
 				bool enableRealTime = true,
-				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY
+				graph::UseRule::ReservationDelayType reservationRulesDelayType = graph::UseRule::RESERVATION_INTERNAL_DELAY,
+				bool keepContinuousJourneys = false
 			);
 
 			//! @name Getters

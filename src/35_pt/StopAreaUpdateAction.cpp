@@ -71,6 +71,7 @@ namespace synthese
 		const string StopAreaUpdateAction::PARAMETER_LONG_NAME = Action_PARAMETER_PREFIX + "ln";
 		const string StopAreaUpdateAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
 		const string StopAreaUpdateAction::PARAMETER_IS_MAIN = Action_PARAMETER_PREFIX + "ma";
+		const string StopAreaUpdateAction::PARAMETER_IS_RELAY_PARK = Action_PARAMETER_PREFIX + "is_relay_park";
 		const string StopAreaUpdateAction::PARAMETER_TIMETABLE_NAME = Action_PARAMETER_PREFIX + "tn";
 		const string StopAreaUpdateAction::PARAMETER_X = Action_PARAMETER_PREFIX + "x";
 		const string StopAreaUpdateAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
@@ -112,6 +113,10 @@ namespace synthese
 			if(_isMain)
 			{
 				map.insert(PARAMETER_IS_MAIN, *_isMain);
+			}
+			if (_isRelayPark)
+			{
+				map.insert(PARAMETER_IS_RELAY_PARK, *_isRelayPark);
 			}
 			if(_timetableName)
 			{
@@ -170,6 +175,11 @@ namespace synthese
 			if(map.isDefined(PARAMETER_IS_MAIN))
 			{
 				_isMain = map.get<bool>(PARAMETER_IS_MAIN);
+			}
+			
+			if (map.isDefined(PARAMETER_IS_RELAY_PARK))
+			{
+				_isRelayPark = map.get<bool>(PARAMETER_IS_RELAY_PARK);
 			}
 
 			if(map.isDefined(PARAMETER_TIMETABLE_NAME))
@@ -237,6 +247,11 @@ namespace synthese
 						_city->removeIncludedPlace(*_place);
 					}
 				}
+			}
+			
+			if (_isRelayPark)
+			{
+				_place->setIsRelayPark(*_isRelayPark);
 			}
 
 			if(_name)

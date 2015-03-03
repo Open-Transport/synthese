@@ -50,6 +50,7 @@ namespace synthese
 	FIELD_SECONDS(AutoImportDelay)
 	FIELD_TIME(AutoImportTime)
 	FIELD_ENUM(MinLogLevel, impex::ImportLogLevel)
+	FIELD_BOOL(Forbidden)
 		
 	namespace impex
 	{
@@ -64,7 +65,8 @@ namespace synthese
 			FIELD(Active),
 			FIELD(LogPath),
 			FIELD(MinLogLevel),
-			FIELD(Documentation)
+			FIELD(Documentation),
+			FIELD(Forbidden)
 		> ImportRecord;
 
 

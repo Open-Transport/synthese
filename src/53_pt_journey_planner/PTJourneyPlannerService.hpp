@@ -73,6 +73,7 @@ namespace synthese
 	{
 		class Place;
 		class NamedPlace;
+		class City;
 	}
 
 	namespace pt
@@ -145,6 +146,10 @@ namespace synthese
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 			static const std::string PARAMETER_FARE_CALCULATION;
 			static const std::string PARAMETER_BROADCAST_POINT_ID;
+			static const std::string PARAMETER_DEPARTURE_PARKING_TEXT;
+			static const std::string PARAMETER_ARRIVAL_PARKING_TEXT;
+			static const std::string PARAMETER_DEPARTURE_PARKING_XY;
+			static const std::string PARAMETER_ARRIVAL_PARKING_XY;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
@@ -160,6 +165,7 @@ namespace synthese
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_STOP;
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_LINE;
 			static const std::string DATA_HAS_RESERVATION;
+			static const std::string DATA_SERVICE_NUMBER;
 
 			//! @name Cells
 			//@{
@@ -169,6 +175,7 @@ namespace synthese
 			static const std::string DATA_IS_FIRST_ROW;
 			static const std::string DATA_IS_LAST_ROW;
 			static const std::string DATA_IS_FOOT;
+			static const std::string DATA_IS_CAR;
 			static const std::string DATA_FIRST_TIME;
 			static const std::string DATA_LAST_TIME;
 			static const std::string DATA_IS_CONTINUOUS_SERVICE;
@@ -263,6 +270,9 @@ namespace synthese
 				static const std::string DATA_ARRIVAL_LATITUDE;
 				static const std::string DATA_IS_LAST_LEG;
 				static const std::string DATA_IS_FIRST_LEG;
+				static const std::string DATA_IS_SAME_THAN_LAST_ARRIVAL_PLACE;
+				static const std::string DATA_IS_ENTERING_PARKING;
+				static const std::string DATA_IS_LEAVING_PARKING;
 			//@}
 
 			//! @name Junction cells
@@ -270,6 +280,7 @@ namespace synthese
 				static const std::string DATA_REACHED_PLACE_IS_NAMED;
 				static const std::string DATA_ROAD_NAME;
 				static const std::string DATA_LENGTH;
+				static const std::string DATA_USER_CLASS_RANK;
 			//@}
 
 			//! @name Service cells
@@ -297,6 +308,11 @@ namespace synthese
 				static const std::string DATA_ROW_NUMBER;
 			//@}
 
+			//! @name Commercial line
+			//@{
+				static const std::string ITEM_COMMERCIAL_LINE;
+			//@}
+
 				typedef std::vector<boost::shared_ptr<util::ParametersMap> > PlacesContentVector;
 
 		private:
@@ -304,10 +320,14 @@ namespace synthese
 			//@{
 				road::RoadModule::ExtendedFetchPlaceResult	_departure_place;
 				road::RoadModule::ExtendedFetchPlaceResult	_arrival_place;
+				road::RoadModule::ExtendedFetchPlaceResult	_departure_parking;
+				road::RoadModule::ExtendedFetchPlaceResult	_arrival_parking;
 				std::string									_originCityText;
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;
 				std::string									_destinationPlaceText;
+				std::string									_originParkingText;
+				std::string									_destinationParkingText;
 				boost::gregorian::date						_day;
 				std::size_t									_periodId;
 				boost::posix_time::ptime					_startDate;
@@ -316,7 +336,7 @@ namespace synthese
 				boost::posix_time::ptime					_endArrivalDate;
 				graph::AccessParameters						_accessParameters;
 				boost::optional<std::size_t>				_maxSolutionsNumber;
-				const pt_website::HourPeriod*			_period;
+				const pt_website::HourPeriod*				_period;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 				bool										_outputRoadApproachDetail;
@@ -421,6 +441,28 @@ namespace synthese
 
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute the departure place when no departure_place_text is given
+			/// and the city has no main place (stop area or road place)
+			//////////////////////////////////////////////////////////////////////////
+			/// @param originCity (0) Is the city with no main place included
+			void computeDeparturePlace(
+				const geography::City* originCity
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Compute the arrival place when no arrival_place_text is given
+			/// and the city has no main place (stop area or road place)
+			//////////////////////////////////////////////////////////////////////////
+			/// @param destinationCity (0) Is the city with no main place included
+			void computeArrivalPlace(
+				const geography::City* destinationCity
+			);
+
+
+
 		private:
 
 
@@ -466,6 +508,7 @@ namespace synthese
 				util::ParametersMap& pm,
 				size_t columnNumber,
 				bool isItFootLine,
+				bool isItCarLine,
 				const boost::posix_time::time_duration& firstTime,
 				const boost::posix_time::time_duration& lastTime,
 				bool isItContinuousService,
@@ -473,7 +516,9 @@ namespace synthese
 				bool isLastWriting,
 				bool isFirstFoot,
 				bool isOriginRow,
-				bool isDestinationRow
+				bool isDestinationRow,
+				bool isEnteringParking,
+				bool isLeavingParking
 			) const;
 
 
@@ -487,6 +532,7 @@ namespace synthese
 				const geography::NamedPlace& placeToSearch,
 				std::size_t columnNumber,
 				bool displayFoot,
+				bool displayCar,
 				PlacesContentVector::iterator itSheetRowEnd
 			) const;
 
@@ -532,7 +578,9 @@ namespace synthese
 				bool isSameThanLastArrivalStop,
 				bool color,
 				const boost::posix_time::ptime& time,
-				boost::posix_time::time_duration continuousServiceRange
+				boost::posix_time::time_duration continuousServiceRange,
+				bool isEnteringParking,
+				bool isLeavingParking
 			) const;
 
 
@@ -545,6 +593,7 @@ namespace synthese
 				@param alarm Alarm to display for the road use
 				@param color Odd or even row in the journey board
 				@param distance Length of the junction
+				@param userClassRank Class of the user (car, bike, pedestrian)
 			*/
 			void _displayJunctionCell(
 				util::ParametersMap& pm,
@@ -555,7 +604,8 @@ namespace synthese
 				const graph::Vertex& departureVertex,
 				const graph::Vertex& arrivalVertex,
 				bool isFirstFoot,
-				bool concatenatedFootLegs
+				bool concatenatedFootLegs,
+				std::size_t userClassRank
 			) const;
 
 

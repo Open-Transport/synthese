@@ -232,6 +232,7 @@ namespace synthese
 				stream << p.open();
 				stream << p.cell("ID", lexical_cast<string>(network.getKey()));
 				stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, network.getName()));
+				stream << p.cell("Image", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_IMAGE, network.getImage()));
 				stream << p.cell(
 					"Parent des calendriers de jours",
 					p.getForm().getSelectInput(

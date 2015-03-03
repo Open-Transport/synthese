@@ -48,6 +48,7 @@
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "CalendarTemplateElementTableSync.h"
+#include "CalendarLinkTableSync.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -96,6 +97,8 @@ namespace synthese
 		const string TridentFileFormat::Importer_::PARAMETER_AUTOGENERATE_STOP_AREAS("asa");
 		const string TridentFileFormat::Importer_::PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY("sasp");
 		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES("itt");
+		const string TridentFileFormat::Importer_::PARAMETER_USE_CALENDAR_LINKS("use_calendar_links");
+		const string TridentFileFormat::Importer_::PARAMETER_THROW_WARNING_SERVICE_ON_TWO_DAYS("throw_warning_in_case_service_on_two_days");
 		const string TridentFileFormat::Importer_::PARAMETER_MERGE_ROUTES("mr");
 		const string TridentFileFormat::Exporter_::PARAMETER_LINE_ID("li");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION("wt");
@@ -129,6 +132,8 @@ namespace synthese
 			_mergeRoutes(true),
 			_defaultTransferDuration(minutes(8)),
 			_importTimetablesAsTemplates(false),
+			_useCalendarLinks(false),
+			_throwWarnInCaseScheduleUp24(false),
 			_calendarTemplates(*import.get<DataSource>(), env),
 			_stopAreas(*import.get<DataSource>(), env),
 			_stops(*import.get<DataSource>(), env),
@@ -152,6 +157,8 @@ namespace synthese
 			}
 			result.insert(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay);
 			result.insert(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates);
+			result.insert(PARAMETER_USE_CALENDAR_LINKS, _useCalendarLinks);
+			result.insert(PARAMETER_THROW_WARNING_SERVICE_ON_TWO_DAYS, _throwWarnInCaseScheduleUp24);
 			result.insert(PARAMETER_MERGE_ROUTES, _mergeRoutes);
 			return result;
 		}
@@ -188,6 +195,8 @@ namespace synthese
 			}
 			_treatAllStopAreaAsQuay = map.getDefault<bool>(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, false);
 			_importTimetablesAsTemplates = map.getDefault<bool>(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, false);
+			_useCalendarLinks = map.getDefault<bool>(PARAMETER_USE_CALENDAR_LINKS, false);
+			_throwWarnInCaseScheduleUp24 = map.getDefault<bool>(PARAMETER_THROW_WARNING_SERVICE_ON_TWO_DAYS, false);
 			_mergeRoutes = map.getDefault<bool>(PARAMETER_MERGE_ROUTES, true);
 		}
 
@@ -1147,7 +1156,7 @@ namespace synthese
 			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
 			XMLNode clineNameNode = lineNode.getChildNode("publishedName");
-			_logDebug("<h2>Trident import of "+ charset_converter.convert(clineNameNode.getText()) +"</h2>");
+			_logDebug("<h2>Trident import of "+ charset_converter.convert(clineNameNode.isEmpty() ? lineKeyNode.getText() : clineNameNode.getText()) +"</h2>");
 
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
@@ -1794,6 +1803,13 @@ namespace synthese
 					time_duration arrHour(duration_from_string(arrNode.isEmpty() ? depNode.getText() : arrNode.getText()));
 					time_duration depSchedule(depHour + hours(24 * (lastDep.hours() / 24 + (depHour < Service::GetTimeOfDay(lastDep) ? 1 : 0))));
 					time_duration arrSchedule(arrHour + hours(24 * (lastArr.hours() / 24 + (arrHour < Service::GetTimeOfDay(lastArr) ? 1 : 0))));
+					if ((depHour < Service::GetTimeOfDay(lastDep) || arrHour < Service::GetTimeOfDay(lastArr)) &&
+						_throwWarnInCaseScheduleUp24)
+					{
+						_logWarning(
+							"Service "+ serviceNumber +" / "+ keyNode.getText() +" is detected on more than one day."
+						);
+					}
 					lastDep = depSchedule;
 					lastArr = arrSchedule;
 					deps.push_back(depSchedule);
@@ -1856,12 +1872,12 @@ namespace synthese
 				int periodsNumber(calendarNode.nChildNode("period"));
 				int dayTypesNumber(calendarNode.nChildNode("dayType"));
 				int servicesNumber(calendarNode.nChildNode("vehicleJourneyId"));
+				CalendarTemplate* ct(NULL);
 
 				if(_importTimetablesAsTemplates)
 				{
 					string calendarId(calendarNode.getChildNode("objectId").getText());
 					ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>::Set cts(_calendarTemplates.get(calendarId));
-					CalendarTemplate* ct(NULL);
 					bool calendarToImport(false);
 					if(cts.empty())
 					{
@@ -2015,14 +2031,71 @@ namespace synthese
 					calendarDates = dates.getActiveDates();
 				}
 
-				// Update of the calendar of the services
-				if(!calendarDates.empty())
+				if (!_useCalendarLinks)
 				{
-					BOOST_FOREACH(const date& d, calendarDates)
+					// Update of the calendar of the services
+					if(!calendarDates.empty())
 					{
-						BOOST_FOREACH(ScheduledService* service, calendarServices)
+						BOOST_FOREACH(const date& d, calendarDates)
 						{
-							service->setActive(d);
+							BOOST_FOREACH(ScheduledService* service, calendarServices)
+							{
+								service->setActive(d);
+							}
+						}
+					}
+				}
+				else
+				{
+					BOOST_FOREACH(ScheduledService* service, calendarServices)
+					{
+						boost::shared_ptr<CalendarLink> serviceCalendarLink;
+
+						// Search for existing CalendarLink
+						CalendarLinkTableSync::SearchResult serviceCalendarLinks(
+							CalendarLinkTableSync::Search(
+								_env,
+								service->getKey(),
+								0
+						)	);
+						if(!serviceCalendarLinks.empty())
+						{
+							BOOST_FOREACH(const boost::shared_ptr<CalendarLink>& scl, serviceCalendarLinks)
+							{
+								if(ct && scl->getCalendarTemplate() == ct)
+								{
+									serviceCalendarLink = scl;
+									_logLoad(
+										"Use of calendar_link "+ lexical_cast<string>(scl->getKey()) +" for service "+ lexical_cast<string>(service->getKey()) + " and calendar " + ct->getName()
+									);
+								}
+							}
+						}
+
+						if(!serviceCalendarLink)
+						{
+							serviceCalendarLink = boost::shared_ptr<CalendarLink>(new CalendarLink(CalendarLinkTableSync::getId()));
+
+							if(ct)
+							{
+								serviceCalendarLink->setCalendarTemplate(ct);
+							}
+							else
+							{
+								_logWarning(
+									"Calendar not found"
+								);
+							}
+
+							serviceCalendarLink->setCalendar(service);
+
+							service->addCalendarLink(*serviceCalendarLink,true);
+
+							_logCreation(
+								"Creation of calendar_link "+ lexical_cast<string>(serviceCalendarLink->getKey()) +" for service "+ lexical_cast<string>(service->getKey()) + " and calendar " + ct->getName()
+							);
+
+							_env.getEditableRegistry<CalendarLink>().add(boost::shared_ptr<CalendarLink>(serviceCalendarLink));
 						}
 					}
 				}
@@ -2194,6 +2267,13 @@ namespace synthese
 				BOOST_FOREACH(const Registry<CalendarTemplateElement>::value_type& calendarTemplateElement, _env.getRegistry<CalendarTemplateElement>())
 				{
 					CalendarTemplateElementTableSync::Save(calendarTemplateElement.second.get(), transaction);
+				}
+				if (_useCalendarLinks)
+				{
+					BOOST_FOREACH(Registry<CalendarLink>::value_type link, _env.getRegistry<CalendarLink>())
+					{
+						CalendarLinkTableSync::Save(link.second.get(), transaction);
+					}
 				}
 			}
 			return transaction;

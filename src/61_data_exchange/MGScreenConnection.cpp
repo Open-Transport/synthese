@@ -441,7 +441,7 @@ namespace synthese
 							{
 								BOOST_FOREACH(DisplayScreenCPU::ChildrenType::value_type& child, _cpu->getChildren())
 								{
-									if(child.second->getWiringCode() == wiringCode)
+									if(child.second->get<WiringCode>() == wiringCode)
 									{
 										screen.setScreen(child.second);
 										break;
@@ -453,9 +453,9 @@ namespace synthese
 							if(!screen.getScreen())
 							{
 								DisplayScreen child;
-								child.setWiringCode(wiringCode);
-								child.setName(_mgCPUName +" "+ wiringCodeStr);
-								child.setMaintenanceIsOnline(true);
+								child.set<WiringCode>(wiringCode);
+								child.set<BroadCastPointComment>(_mgCPUName +" "+ wiringCodeStr);
+								child.set<MaintenanceIsOnline>(true);
 								child.setRoot(_cpu);
 								child.setParent(NULL);
 								DisplayScreenTableSync::Save(&child);

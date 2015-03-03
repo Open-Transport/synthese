@@ -41,6 +41,7 @@
 #include "FrenchSentence.h"
 #include "PTPlaceAdmin.h"
 #include "PTRoadsAdmin.h"
+#include "RoadPlaceTableSync.h"
 #include "StopArea.hpp"
 #include "PublicPlace.h"
 #include "RoadPlace.h"
@@ -434,6 +435,46 @@ namespace synthese
 			// TAB ROAD PLACES
 			if (openTabContent(stream, TAB_ROAD_PLACES))
 			{
+				stream << "<h1>Recherche</h1>";
+				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request, *this);
+				searchRequest.getPage()->setCity(_city);
+				getHTMLRoadPlaceSearchForm(
+					stream,
+					searchRequest.getHTMLForm("roadplsearch"),
+					_city.get() ? optional<const string&>() : optional<const string&>(_searchCity),
+					_searchName
+				);
+
+				stream << "<h1>Résultats</h1>";
+
+				RoadPlaceTableSync::SearchResult roadPlaces(
+					RoadPlaceTableSync::Search(
+						Env::GetOfficialEnv(),
+						_city.get() ? _city->getKey() : optional<RegistryKeyType>(),
+						optional<string>(),
+						_searchName.empty() ? optional<string>() : ("%" + _searchName + "%")
+				)	);
+
+				AdminFunctionRequest<PTRoadsAdmin> openRequest(request);
+
+				HTMLTable::ColsVector c;
+				c.push_back("id");
+				c.push_back("Nom");
+				c.push_back("Actions");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				BOOST_FOREACH(const RoadPlaceTableSync::SearchResult::value_type& rdPlace, roadPlaces)
+				{
+					stream << t.row();
+					stream << t.col() << rdPlace->getKey();
+					stream << t.col() << rdPlace->getName();
+
+					openRequest.getPage()->setRoadPlace(const_pointer_cast<const RoadPlace>(rdPlace));
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), "/admin/img/" + PTRoadsAdmin::ICON);
+				}
+
+				stream << t.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -674,6 +715,26 @@ namespace synthese
 			if(stopName)
 			{
 				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, *stopName));
+			}
+			stream << st.close();
+		}
+
+
+		void PTPlacesAdmin::getHTMLRoadPlaceSearchForm(
+			std::ostream& stream,
+			const html::HTMLForm& form,
+			boost::optional<const std::string&> cityName,
+			boost::optional<const std::string&> roadPlaceName
+		){
+			SearchFormHTMLTable st(form);
+			stream << st.open();
+			if(cityName)
+			{
+				stream << st.cell("Localité", st.getForm().getTextInput(PARAM_SEARCH_CITY, *cityName));
+			}
+			if (roadPlaceName)
+			{
+				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, *roadPlaceName));
 			}
 			stream << st.close();
 		}

@@ -37,6 +37,11 @@ namespace synthese
 	{
 		class DBTransaction;
 	}
+	
+	namespace util
+	{
+		class Registrable;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	/// 19 Inter-SYNTHESE Module namespace.
@@ -87,6 +92,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE;
 			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_POST_INSTALL_PASSIVE_IMPORT_ID;
 			static const util::RegistryKeyType FAKE_IMPORT_ID;
 
 			typedef std::map<std::string, InterSYNTHESEPackage*> PackagesBySmartURL;
@@ -96,15 +103,17 @@ namespace synthese
 			static std::string _masterHost;
 			static std::string _masterPort;
 			static bool _slaveActive;
+			static bool _postInstall;
 			static util::RegistryKeyType _slaveId;
-			static void _generateFakeImport();
+			static util::RegistryKeyType _postInstallPassiveImportId;
 			static PackagesBySmartURL _packagesBySmartURL;
 			static bool _passiveSlaveUpdaterSelector(const InterSYNTHESESlave& object);
 
 		public:
 			static void Enqueue(
 				const InterSYNTHESEContent& content,
-				boost::optional<db::DBTransaction&> transaction
+				boost::optional<db::DBTransaction&> transaction,
+				util::Registrable* objectToRemember = NULL
 			);
 
 			static void ParameterCallback(
@@ -127,6 +136,8 @@ namespace synthese
 			static void QueueCleaner();
 
 			static void PassiveSlavesUpdater();
+			static void GenerateFakeImport();
+			static void PostInstall();
 		};
 
 		/** @} */

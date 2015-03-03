@@ -61,17 +61,20 @@ namespace synthese
 		private:
 			static const std::string DATA_NETWORK_ID;
 			static const std::string DATA_NAME;
+			static const std::string DATA_IMAGE;
 
 		protected:
 			calendar::CalendarTemplate* _daysCalendarsParent;
 			calendar::CalendarTemplate* _periodsCalendarsParent;
 			std::string _name;
+			std::string _image;
 
 		public:
 
 			TransportNetwork (
 				util::RegistryKeyType id = 0,
-				std::string name = std::string()
+				std::string name = std::string(),
+				std::string image = std::string()
 			);
 			~TransportNetwork ();
 
@@ -80,6 +83,7 @@ namespace synthese
 				calendar::CalendarTemplate* getDaysCalendarsParent() const { return _daysCalendarsParent; }
 				calendar::CalendarTemplate* getPeriodsCalendarsParent() const { return _periodsCalendarsParent; }
 				virtual std::string getName() const { return _name; }
+				virtual std::string getImage() const { return _image; }
 			//@}
 
 			//! @name Setters
@@ -87,6 +91,7 @@ namespace synthese
 				void setDaysCalendarsParent(calendar::CalendarTemplate* value){ _daysCalendarsParent = value; }
 				void setPeriodsCalendarsParent(calendar::CalendarTemplate* value){ _periodsCalendarsParent = value; }
 				void setName(const std::string& value){ _name = value; }
+				void setImage(const std::string& value){ _image = value; }
 			//@}
 
 			/// @name Modifiers

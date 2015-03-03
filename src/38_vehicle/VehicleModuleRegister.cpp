@@ -6,8 +6,10 @@
 #include "VehicleModule.hpp"
 
 #include "CompositionTableSync.hpp"
+#include "DescentTableSync.hpp"
 #include "RollingStockTableSync.hpp"
 #include "VehicleTableSync.hpp"
+#include "VehicleCallTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 
 #include "GetCompositionsService.hpp"
@@ -28,8 +30,10 @@
 
 // Registries
 #include "Composition.hpp"
+#include "Descent.hpp"
 #include "RollingStock.hpp"
 #include "Vehicle.hpp"
+#include "VehicleCall.hpp"
 #include "VehiclePosition.hpp"
 
 #include "VehicleModule.inc.cpp"
@@ -45,7 +49,9 @@ void synthese::vehicle::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::vehicle::CompositionTableSync>::integrate();
 	synthese::vehicle::RollingStockTableSync::integrate();
 	synthese::vehicle::VehicleTableSync::integrate();
+	synthese::vehicle::VehicleCallTableSync::integrate();
 	synthese::vehicle::VehiclePositionTableSync::integrate();
+	synthese::vehicle::DescentTableSync::integrate();
 
 	synthese::vehicle::RollingStockAdmin::integrate();
 	synthese::vehicle::RollingStocksAdmin::integrate();
@@ -67,7 +73,9 @@ void synthese::vehicle::moduleRegister()
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::vehicle::Composition>();
+	synthese::util::Env::Integrate<synthese::vehicle::Descent>();
 	synthese::util::Env::Integrate<synthese::vehicle::RollingStock>();
 	synthese::util::Env::Integrate<synthese::vehicle::Vehicle>();
+	synthese::util::Env::Integrate<synthese::vehicle::VehicleCall>();
 	synthese::util::Env::Integrate<synthese::vehicle::VehiclePosition>();
 }

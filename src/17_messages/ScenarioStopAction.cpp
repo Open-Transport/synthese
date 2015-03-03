@@ -32,6 +32,10 @@
 #include "AlarmTableSync.h"
 #include "MessagesLog.h"
 #include "MessagesRight.h"
+#include "MessagesSection.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
@@ -47,6 +51,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
+	using namespace messages;
 
 	template<> const string util::FactorableTemplate<Action, messages::ScenarioStopAction>::FACTORY_KEY("scenariostop");
 
@@ -149,7 +154,23 @@ namespace synthese
 
 		bool ScenarioStopAction::isAuthorized(const Session* session
 		) const {
+/*			bool result = session && session->hasProfile();
+			if (_scenario)
+			{
+				if (!_scenario->getSections().empty())
+				{
+					BOOST_FOREACH(const Scenario::Sections::value_type& section, _scenario->getSections())
+					{
+						result = result && session->getUser()->getProfile()->isAuthorized<MessagesRight>(
+							DELETE_RIGHT,
+							UNKNOWN_RIGHT_LEVEL,
+							MessagesRight::MESSAGES_SECTION_FACTORY_KEY + "/" + lexical_cast<string>(section->getKey())
+						);
+					}
+				}
+			}
+			return result;
+			*/
 			return true;
-			// return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 		}
 }	}

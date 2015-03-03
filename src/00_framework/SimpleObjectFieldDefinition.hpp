@@ -23,6 +23,8 @@
 #ifndef SYNTHESE__ObjectFieldDefinition_hpp__
 #define SYNTHESE__ObjectFieldDefinition_hpp__
 
+#define PRECISION_COMPARE_GEOM 0.001
+
 #include "Field.hpp"
 #include "FilesMap.hpp"
 #include "MimeTypes.hpp"
@@ -110,6 +112,89 @@ namespace synthese
 					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
 					T value(text.empty() ? default_value : reader(text));
 					if(fieldObject != value)
+					{
+						fieldObject = value;
+						result = true;
+					}
+				}
+				catch(...)
+				{
+					if(fieldObject != default_value)
+					{
+						fieldObject = default_value;
+						result = true;
+					}
+				}
+			}
+			return result;
+		}
+		
+		template<class T>
+		static bool _LoadFromStringWithDefaultValueAndTolerance(
+			T& fieldObject,
+			const Record& record,
+			T (*reader)(const std::string&),
+			const T& default_value
+		){
+			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
+			{
+				try
+				{
+					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					T value(text.empty() ? default_value : reader(text));
+					if (fieldObject && value &&
+						fieldObject->equalsExact(value.get(), PRECISION_COMPARE_GEOM))
+					{
+						return false;
+					}
+					else if (!fieldObject && !value)
+					{
+						return false;
+					}
+					else
+					{
+						fieldObject = value;
+						return true;
+					}
+				}
+				catch(...)
+				{
+					if(fieldObject == default_value)
+					{
+						return false;
+					}
+					else
+					{
+						fieldObject = default_value;
+						return true;
+					}
+				}
+			}
+			
+			return false;
+		}
+		
+		template<class T>
+		static bool _LoadFromStringWithDefaultValueAndTolerance(
+			T& fieldObject,
+			const Record& record,
+			T (*reader)(const std::string),
+			const T& default_value
+		){
+			bool result(false);
+			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
+			{
+				try
+				{
+					std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+					T value(text.empty() ? default_value : reader(text));
+					if (fieldObject && value &&
+						!fieldObject->equalsExact(value.get(), PRECISION_COMPARE_GEOM))
+					{
+						fieldObject = value;
+						result = true;
+					}
+					else if(fieldObject != value)
 					{
 						fieldObject = value;
 						result = true;

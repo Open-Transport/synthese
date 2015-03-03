@@ -111,6 +111,7 @@ namespace synthese
 				void	_insert(TimetableResult& result, const TimetableColumn& col) const;
 				void	_buildWarnings(TimetableResult& result) const;
 				void	_scanServices(TimetableResult& result, const pt::JourneyPattern& line) const;
+				void	_buildStopAreasRow(TimetableResult& result) const;
 			//@}
 
 		public:

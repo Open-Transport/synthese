@@ -37,6 +37,7 @@
 #include "CommercialLine.h"
 #include "City.h"
 #include "Webpage.h"
+#include "StopArea.hpp"
 
 #ifndef UNIX
 #include <geos/util/math.h>
@@ -76,6 +77,7 @@ namespace synthese
 		const string ServiceDensityService::PARAMETER_DISPLAY_SERVICE_REACHED = "ds";
 		const string ServiceDensityService::PARAMETER_DENSITY_AREA_CENTER_POINT = "center";
 		const string ServiceDensityService::PARAMETER_SERVICE_NUMBER = "snb";
+		const string ServiceDensityService::PARAMETER_ONLY_RELAY_PARKS = "only_relay_parks";
 
 		const string ServiceDensityService::MAX_DISTANCE_TO_CENTER_POINT = "distance_to_center";
 		const string ServiceDensityService::SERVICE_NUMBER_REACHED = "snbReached";
@@ -121,6 +123,8 @@ namespace synthese
 			}
 
 			map.insert(PARAMETER_SERVICE_NUMBER, _serviceNumberToReach);
+			
+			map.insert(PARAMETER_ONLY_RELAY_PARKS, _onlyRelayParks);
 
 			return map;
 		}
@@ -247,6 +251,8 @@ namespace synthese
 			_accessParameters = AccessParameters(
 				USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 1.111, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 			);
+			
+			_onlyRelayParks = map.getDefault<bool>(PARAMETER_ONLY_RELAY_PARKS, false);
 		}
 
 
@@ -261,6 +267,12 @@ namespace synthese
 
 			BOOST_FOREACH(const Registry<StopPoint>::value_type& stopPoint, Env::GetOfficialEnv().getRegistry<StopPoint>())
 			{
+				if (_onlyRelayParks &&
+					stopPoint.second->getConnectionPlace() &&
+					!(stopPoint.second->getConnectionPlace()->getIsRelayPark()))
+				{
+					continue;
+				}
 				if(stopPoint.second->getGeometry())
 				{
 					addStop(stopPointSet, *stopPoint.second, _startDate, _endDate);

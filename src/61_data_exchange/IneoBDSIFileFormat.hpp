@@ -57,6 +57,11 @@ namespace synthese
 		class ScheduledService;
 	}
 
+	namespace messages
+	{
+		class MessagesSection;
+	}
+
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -81,18 +86,30 @@ namespace synthese
 				public impex::DatabaseReadImporter<IneoBDSIFileFormat>
 			{
 			public:
+				static const std::string PARAMETER_DB_CONN_STRING;
 				static const std::string PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID;
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 				static const std::string PARAMETER_HYSTERESIS;
 				static const std::string PARAMETER_DELAY_BUS_STOP;
 				static const std::string PARAMETER_DAY_BREAK_TIME;
+				static const std::string PARAMETER_CONVERT_STOP_CODE_TO_LOWER;
+				static const std::string PARAMETER_MESSAGES_SECTION;
+				static const std::string PARAMETER_SEND_DEACTIVATIONS_BY_INTERSYNTHESE;
 		
 			private:
+				// Vector to avoid reentrance and mutex to protect this vector
+				static boost::recursive_mutex _tabRunningBdsiMutex;
+				static std::set<util::RegistryKeyType> _runningBdsi;
+
+				boost::optional<std::string> _dbConnString;
 				boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 				boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
+				boost::shared_ptr<const messages::MessagesSection> _messagesSection;
 				boost::posix_time::time_duration _hysteresis;
 				boost::posix_time::time_duration _delay_bus_stop;
 				boost::posix_time::time_duration _dayBreakTime;
+				bool _stopCodeToLower;
+				bool _sendDeactivationsByInterSYNTHESE;
 
 				mutable std::set<util::RegistryKeyType> _scenariosToRemove;
 				mutable std::set<util::RegistryKeyType> _alarmObjectLinksToRemove;
@@ -152,6 +169,14 @@ namespace synthese
 					bool sens,
 					const std::string& chainageRef
 				) const;
+				Chainage* _createAndReturnChainage(
+					Chainages& chainages,
+					const Chainage::ArretChns& arretchns,
+					const Ligne& ligne,
+					const std::string& nom,
+					bool sens,
+					const std::string& chainageRef
+				) const;
 
 
 
@@ -194,7 +219,8 @@ namespace synthese
 					const Course::Horaires& horaires,
 					const Chainage& chainage,
 					const std::string& courseRef,
-					const boost::posix_time::time_duration& nowDuration
+					const boost::posix_time::time_duration& nowDuration,
+					Chainages& chainages
 				) const;
 
 
@@ -294,6 +320,7 @@ namespace synthese
 				);
 
 
+				db::DBTransaction saveNow() const;
 				virtual db::DBTransaction _save() const;
 
 

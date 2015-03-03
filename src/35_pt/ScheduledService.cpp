@@ -133,7 +133,6 @@ namespace synthese
 			const time_duration& thSchedule(getDeparture ? getDepartureSchedule(false, edgeIndex) : getArrivalSchedule(false, edgeIndex));
 			const time_duration& rtSchedule(getDeparture ? getDepartureSchedule(true, edgeIndex) : getArrivalSchedule(true, edgeIndex));
 			const time_duration& schedule((RTData && !forceTheorical) ? rtSchedule : thSchedule);
-			const time_duration timeOfDay(GetTimeOfDay(schedule));
 			if(	(getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) > schedule)) ||
 				(!getDeparture && ((presenceDateTime.time_of_day().hours() < 3 && schedule.hours() > 3 ? presenceDateTime.time_of_day() + hours(24) : presenceDateTime.time_of_day()) < schedule))
 			){
@@ -158,7 +157,7 @@ namespace synthese
 			}
 
 			// Saving dates
-			ServicePointer ptr(THData, RTData, accessParameters.getUserClassRank(), *this, originDateTime);
+			ServicePointer ptr(THData, hasRealTimeData(), accessParameters.getUserClassRank(), *this, originDateTime);
 
 			if(getDeparture)
 			{
@@ -167,7 +166,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule)
 					);
 				}
 				else
@@ -175,7 +174,7 @@ namespace synthese
 					ptr.setDepartureInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
@@ -187,7 +186,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule))
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule)
 					);
 				}
 				else
@@ -195,7 +194,7 @@ namespace synthese
 					ptr.setArrivalInformations(
 						edge,
 						actualTime,
-						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						ptime(presenceDateTime.time_of_day().hours() < 3 && thSchedule.hours() > 3 ? presenceDateTime.date() - days(1) : presenceDateTime.date(), thSchedule),
 						*((RTData && edgeIndex < _RTVertices.size()) ? _RTVertices[edgeIndex] : edge.getFromVertex())
 					);
 				}
@@ -220,8 +219,8 @@ namespace synthese
 		) const	{
 
 			// Lock the vertices and the schedules
-			recursive_mutex::scoped_lock lock1(getVerticesMutex());
 			recursive_mutex::scoped_lock lock2(getSchedulesMutex());
+			recursive_mutex::scoped_lock lock1(getVerticesMutex());
 
 			size_t edgeIndex(edge.getRankInPath());
 			if(servicePointer.getArrivalEdge() == NULL)
@@ -264,7 +263,7 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(rankInPath == 0 && !RTData)
+			if(rankInPath == 0 && !RTData && !getDataDepartureSchedules().empty())
 			{
 				return getDataDepartureSchedules()[0];
 			}
@@ -277,7 +276,7 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(getSchedulesMutex());
 
-			if(rankInPath == 0 && !RTData)
+			if(rankInPath == 0 && !RTData && !getDataDepartureSchedules().empty())
 			{
 				return getDataDepartureSchedules()[0];
 			}
@@ -501,7 +500,7 @@ namespace synthese
 					setPath(path);
 					if(path->getEdges().empty())
 					{
-						LineStopTableSync::Search(env, pathId);
+						LineStopTableSync::Search(env, pathId, optional<RegistryKeyType>(), 0, optional<size_t>(), true, true, UP_DOWN_LINKS_LOAD_LEVEL);
 					}
 					result = true;
 				}
@@ -689,10 +688,7 @@ namespace synthese
 
 			// Dates preparation
 			stringstream datesStr;
-			if(getCalendarLinks().empty())
-			{
-				serialize(datesStr);
-			}
+			serialize(datesStr);
 
 			map.insert(TABLE_COL_ID, getKey());
 			map.insert(ScheduledServiceTableSync::COL_SERVICENUMBER, getServiceNumber());
@@ -784,7 +780,8 @@ namespace synthese
 		void ScheduledService::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Registration in path
-			if( getPath())
+			if( getPath()&&
+				!getPath()->contains(*this))
 			{
 				getPath()->addService(
 					*this,

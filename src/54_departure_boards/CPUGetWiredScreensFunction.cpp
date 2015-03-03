@@ -118,14 +118,14 @@ namespace synthese
 			{
 				const DisplayScreen& screen(*item.second);
 
-				if(!screen.getIsOnline())
+				if(!screen.get<MaintenanceIsOnline>())
 				{
 					continue;
 				}
 
 				boost::shared_ptr<util::ParametersMap> screenPM(new ParametersMap);
 				screenPM->insert(DISPLAY_SCREEN_ID_XML_FIELD, screen.getKey());
-				screenPM->insert(DISPLAY_SCREEN_COMPORT_XML_FIELD, screen.getComPort());
+				screenPM->insert(DISPLAY_SCREEN_COMPORT_XML_FIELD, screen.get<ComPort>());
 
 				pm.insert(DISPLAY_SCREEN_XML_TAG, screenPM);
 			}

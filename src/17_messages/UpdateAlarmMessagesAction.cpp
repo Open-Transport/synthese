@@ -70,6 +70,7 @@ namespace synthese
 		const string UpdateAlarmMessagesAction::PARAMETER_DONE = Action_PARAMETER_PREFIX + "done";
 		const string UpdateAlarmMessagesAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "_scenario_id";
 		const string UpdateAlarmMessagesAction::PARAMETER_ALARM_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_datasource_id";
+		const string UpdateAlarmMessagesAction::PARAMETER_DIGITIZED_VERSION = Action_PARAMETER_PREFIX + "_digitized_version";
 
 
 
@@ -95,6 +96,10 @@ namespace synthese
 			if(_rawEditor)
 			{
 				map.insert(PARAMETER_RAW_EDITOR, *_rawEditor);
+			}
+			if (_digitizedVersion)
+			{
+				map.insert(PARAMETER_DIGITIZED_VERSION, *_digitizedVersion);
 			}
 
 			_getImportableUpdateParametersMap(map);
@@ -197,6 +202,12 @@ namespace synthese
 				_done = map.get<bool>(PARAMETER_DONE);
 			}
 
+			// Digitized version
+			if(map.isDefined(PARAMETER_DIGITIZED_VERSION))
+			{
+				_digitizedVersion = map.get<string>(PARAMETER_DIGITIZED_VERSION);
+			}
+
 			_setImportableUpdateFromParametersMap(*_env, map);
 		}
 
@@ -259,6 +270,13 @@ namespace synthese
 			{
 				DBLogModule::appendToLogIfChange(s, "tâche", lexical_cast<string>(_alarm->getDone()), lexical_cast<string>(*_done));
 				_alarm->setDone(*_done);
+			}
+
+			// Digitized version
+			if(_digitizedVersion)
+			{
+				DBLogModule::appendToLogIfChange(s, "version digitalisée", _alarm->getDigitizedVersion(), *_digitizedVersion);
+				_alarm->setDigitizedVersion(*_digitizedVersion);
 			}
 
 			AlarmTableSync::Save(_alarm.get());

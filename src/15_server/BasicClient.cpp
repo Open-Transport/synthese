@@ -13,10 +13,15 @@
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/lambda/lambda.hpp>
 
-using boost::asio::ip::tcp;
+using namespace boost::asio;
+using namespace boost::asio::ip;
 using namespace boost::asio;
 using namespace std;
+
+// Timeout in seconds after which we cancel the HTTP request
+#define CLIENT_TIMEOUT_S 15
 
 namespace synthese
 {

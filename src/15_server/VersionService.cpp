@@ -48,6 +48,18 @@ namespace synthese
 		const string VersionService::ATTR_BRANCH = "branch";
 		
 
+		FunctionAPI VersionService::getAPI() const
+		{
+			FunctionAPI api(
+						"Admin",
+						"Return the version of SYNTHESE as a Parameter Map or a stream",
+						"Example:\n"
+						"?SERVICE=version&of=json> returns the version in json.\n"
+						"You can also get the value in xml or csv");
+			api.addParams(Function::PARAMETER_OUTPUT_FORMAT, "One of json, xml, csv", true);
+			api.addParams(Function::PARAMETER_OUTPUT_FORMAT_COMPAT, "One of json, xml, csv", true);
+			return api;
+		}
 
 		ParametersMap VersionService::_getParametersMap() const
 		{
@@ -59,6 +71,7 @@ namespace synthese
 
 		void VersionService::_setFromParametersMap(const ParametersMap& map)
 		{
+			setOutputFormatFromMap(map, "");
 		}
 
 
@@ -71,7 +84,13 @@ namespace synthese
 			map.insert(ATTR_VERSION, ServerModule::VERSION);
 			map.insert(ATTR_REVISION, ServerModule::REVISION);
 			map.insert(ATTR_BUILD_DATE, ServerModule::BUILD_DATE);
-			map.insert(ATTR_BRANCH, ServerModule::GetBranch());
+			map.insert(ATTR_BRANCH, ServerModule::BRANCH);
+			outputParametersMap(
+				map,
+				stream,
+				"SYNTHESE-VERSION",
+				""
+			);
 			return map;
 		}
 		
@@ -87,6 +106,6 @@ namespace synthese
 
 		std::string VersionService::getOutputMimeType() const
 		{
-			return "text/html";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 }	}

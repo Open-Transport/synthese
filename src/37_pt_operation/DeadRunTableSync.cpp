@@ -119,6 +119,23 @@ namespace synthese
 			{
 				object->link(env, linkLevel == util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
+
+			// Schedules
+			try
+			{
+				SchedulesBasedService::SchedulesPair value(
+					SchedulesBasedService::DecodeSchedules(
+						rows->get<string>(DeadRunTableSync::COL_SCHEDULES)
+				)	);
+				object->setDataSchedules(value.first, value.second);
+			}
+			catch(SchedulesBasedService::BadSchedulesException&)
+			{
+				Log::GetInstance().warn("Bad schedules in the dead run "+ lexical_cast<string>(object->getKey()));
+			}
+
+			// Dates
+			object->setFromSerializedString(rows->getText(DeadRunTableSync::COL_DATES));
 		}
 
 

@@ -192,7 +192,9 @@ namespace synthese
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
 				// Look in schedule for when the line is in service
-				if(	getParentPath()->isActive(departureMoment.date()))
+				if(	getParentPath()->isActive(departureMoment.date()) ||
+					(departureMoment.time_of_day() < hours(3) && getParentPath()->isActive(departureMoment.date() - days(1)))
+				)
 				{
 					for (; next != services.end(); ++next)  // boucle sur les services
 					{

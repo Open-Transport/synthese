@@ -27,7 +27,9 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "MimeType.hpp"
 
+#include <boost/optional.hpp>
 #include <string>
 
 namespace synthese
@@ -53,6 +55,7 @@ namespace synthese
 			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_TEMPLATE_ID;
 			static const std::string PARAMETER_PARENT_ID;
+			static const std::string PARAMETER_MIME_TYPE;
 
 		private:
 			std::string _title;
@@ -60,6 +63,7 @@ namespace synthese
 			boost::shared_ptr<Website> _site;
 			boost::shared_ptr<const Webpage> _template;
 			boost::shared_ptr<Webpage> _parent;
+			boost::optional<util::MimeType> _mimeType;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

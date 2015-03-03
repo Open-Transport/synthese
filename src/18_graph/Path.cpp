@@ -219,7 +219,9 @@ namespace synthese
 						it->setFollowingArrivalForFineSteppingOnly(&edge);
 					}
 
-					if(edge.isConnectingEdge())
+					if(edge.getFromVertex() &&
+						edge.getFromVertex()->getHub() &&
+						edge.isConnectingEdge())
 					{
 						for(Edge* it(previousEdge);
 							it && it->getFollowingConnectionArrival() == nextConnectingArrival;
@@ -246,7 +248,7 @@ namespace synthese
 				{
 					edge.setFollowingArrivalForFineSteppingOnly(nextEdge->getFollowingArrivalForFineSteppingOnly());
 				}
-				if(nextEdge->isArrivalAllowed() && nextEdge->isConnectingEdge())
+				if(nextEdge->isArrivalAllowed() && nextEdge->getFromVertex() && nextEdge->getFromVertex()->getHub() && nextEdge->isConnectingEdge())
 				{
 					edge.setFollowingConnectionArrival(nextEdge);
 				}
@@ -273,7 +275,9 @@ namespace synthese
 						it->setPreviousDepartureForFineSteppingOnly(&edge);
 					}
 
-					if(edge.isConnectingEdge())
+					if(edge.getFromVertex() &&
+						edge.getFromVertex()->getHub() &&
+						edge.isConnectingEdge())
 					{
 						for(Edge* it(nextEdge);
 							it && it->getPreviousConnectionDeparture() == previousConnectingDeparture;
@@ -300,7 +304,7 @@ namespace synthese
 				{
 					edge.setPreviousDepartureForFineSteppingOnly(previousEdge->getPreviousDepartureForFineSteppingOnly());
 				}
-				if(previousEdge->isDepartureAllowed() && previousEdge->isConnectingEdge())
+				if(previousEdge->isDepartureAllowed() && previousEdge->getFromVertex() && previousEdge->getFromVertex()->getHub() && previousEdge->isConnectingEdge())
 				{
 					edge.setPreviousConnectionDeparture(previousEdge);
 				}

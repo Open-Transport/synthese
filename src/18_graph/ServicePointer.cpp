@@ -341,6 +341,8 @@ namespace synthese
 			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 			bool drtAreaSequence = false;
 			bool hasDRTArea = false;
+			Coordinate previousCoordinates;
+			previousCoordinates.setNull();
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
 				if(dynamic_cast<const pt::AreaGeneratedLineStop*>(edge))
@@ -364,7 +366,16 @@ namespace synthese
 						drtAreaSequence = false;
 					}
 				}
-				boost::shared_ptr<LineString> geometry(edge->getRealGeometry());
+				
+				boost::shared_ptr<LineString> geometry;
+				try
+				{
+					geometry = edge->getRealGeometry();
+				}
+				catch (...)
+				{
+					continue;
+				}
 				if(!geometry.get() || geometry->isEmpty())
 				{
 					continue;

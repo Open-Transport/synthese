@@ -380,7 +380,6 @@ namespace synthese
 						city->addIncludedPlace(static_cast<NamedPlace&>(*centralRoad->second->get<RoadPlace>()));
 					}
 				}
-
 				delete centroid;
 			}
 
@@ -672,10 +671,11 @@ namespace synthese
 			boost::shared_ptr<Crossing> crossing(
 				new Crossing(
 					CrossingTableSync::getId(),
-					position,
-					lexical_cast<string>(node->getId()),
-					&(*_import.get<DataSource>())
+					position
 			)	);
+			Importable::DataSourceLinks links;
+			links.insert(make_pair(&(*_import.get<DataSource>()), lexical_cast<string>(node->getId())));
+			crossing->setDataSourceLinksWithoutRegistration(links);
 
 			_crossingsMap[node->getId()] = crossing;
 			_env.getEditableRegistry<Crossing>().add(crossing);
@@ -833,7 +833,6 @@ namespace synthese
 		}
 
 
-
 		void OSMFileFormat::Importer_::_reorderHouseNumberingBounds(
 			boost::shared_ptr<RoadChunk> chunk
 		) const {
@@ -868,10 +867,10 @@ namespace synthese
 						boost::shared_ptr<const Geometry> startGeom = chunk->getForwardEdge().getFromVertex()->getGeometry();
 						boost::shared_ptr<const Geometry> endGeom = chunk->getForwardEdge().getNext()->getFromVertex()->getGeometry();
 						boost::shared_ptr<Point> startHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-							*dataSource.getActualCoordinateSystem().createPoint(startHouse->getLon(), startHouse->getLat())
+								*dataSource.getActualCoordinateSystem().createPoint(startHouse->getLon(), startHouse->getLat())
 						)	);
 						boost::shared_ptr<Point> endHouseGeom(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-							*dataSource.getActualCoordinateSystem().createPoint(endHouse->getLon(), endHouse->getLat())
+								*dataSource.getActualCoordinateSystem().createPoint(endHouse->getLon(), endHouse->getLat())
 						)	);
 
 						if(startGeom && endGeom && startHouseGeom && endHouseGeom)
@@ -894,7 +893,6 @@ namespace synthese
 				}
 			}
 		}
-
 
 
 		std::string OSMFileFormat::Importer_::_toAlphanumericString(

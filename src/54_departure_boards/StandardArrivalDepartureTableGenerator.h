@@ -36,6 +36,7 @@ namespace synthese
 			public ArrivalDepartureTableGenerator
 		{
 		private:
+			bool _excludeStartingAreaIsDestination;
 
 		public:
 			StandardArrivalDepartureTableGenerator(
@@ -49,7 +50,8 @@ namespace synthese
 				const boost::posix_time::ptime& endDateTime,
 				bool allowCanceled,
 				boost::optional<std::size_t> maxSize = boost::optional<std::size_t>(),
-				bool endDateTimeConcernsTheorical = false
+				bool endDateTimeConcernsTheorical = false,
+				bool excludeStartingAreaIsDestination = false
 			);
 
 			const ArrivalDepartureList& generate();

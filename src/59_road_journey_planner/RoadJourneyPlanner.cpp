@@ -79,7 +79,13 @@ namespace synthese
 				planningOrder,
 				accessParameters.getApproachSpeed(),
 				true,
-				logger
+				logger,
+				boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double>(),
+				true,
+				true,
+				graph::UseRule::RESERVATION_INTERNAL_DELAY,
+				true
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination)
@@ -136,7 +142,13 @@ namespace synthese
 				_planningOrder,
 				_vmax,
 				true,
-				_logger
+				_logger,
+				boost::optional<boost::posix_time::time_duration>(),
+				boost::optional<double>(),
+				true,
+				true,
+				graph::UseRule::RESERVATION_INTERNAL_DELAY,
+				true
 			);
 			return RoadJourneyPlannerResult(
 				_departurePlace,

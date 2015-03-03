@@ -29,6 +29,8 @@ ContinuousServiceUpdateAction.cpp
 ContinuousServiceUpdateAction.h
 CopyGeometriesAction.cpp
 CopyGeometriesAction.hpp
+DeactivationPTDataInterSYNTHESE.cpp
+DeactivationPTDataInterSYNTHESE.hpp
 DesignatedLinePhysicalStop.cpp
 DesignatedLinePhysicalStop.hpp
 Destination.cpp
@@ -69,6 +71,8 @@ FreeDRTTimeSlotTableSync.cpp
 FreeDRTTimeSlotTableSync.hpp
 FreeDRTTimeSlotUpdateAction.cpp
 FreeDRTTimeSlotUpdateAction.hpp
+GetRealTimeServices.cpp
+GetRealTimeServices.hpp
 JourneyPattern.cpp
 JourneyPattern.hpp
 JourneyPatternAddAction.cpp
@@ -107,6 +111,8 @@ LineStopTableSync.cpp
 LineStopTableSync.h
 LineStopUpdateAction.cpp
 LineStopUpdateAction.hpp
+MalformedSchedulesException.cpp
+MalformedSchedulesException.hpp
 NetworkLineBasedRight.cpp
 NetworkLineBasedRight.h
 NonConcurrencyRule.cpp
