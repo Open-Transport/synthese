@@ -372,7 +372,7 @@ namespace synthese
 			// Log path
 			if(_logger && !_logger->getDirectory().empty())
 			{
-			  map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().string());
+				map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().string());
 			}
 
 			// Departure place

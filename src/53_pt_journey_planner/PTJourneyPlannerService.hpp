@@ -351,7 +351,7 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> _minWaitingTimeFilter;
 				bool										_fareCalculation;
 				boost::shared_ptr<algorithm::AlgorithmLogger>	_logger;
-				std::string		    						_outputFormat;
+				std::string									_outputFormat;
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
 				bool										_concatenateContiguousFootLegs;
 				vector<string>								_vectMad;
