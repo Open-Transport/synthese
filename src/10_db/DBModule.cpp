@@ -429,14 +429,14 @@ namespace synthese
 
 
 
-        void DBModule::CreateObject(
-            ObjectBase* objectBase,
-            DBDirectTableSync* tableSync
-        ) {
-            DBTransaction transaction;
-            objectBase->beforeCreate(transaction);
-            tableSync->saveRegistrable(*objectBase, transaction);
-            objectBase->afterCreate(transaction);
-            transaction.run();
-        }
+		void DBModule::CreateObject(
+			ObjectBase* objectBase,
+			DBDirectTableSync* tableSync
+		) {
+			DBTransaction transaction;
+			objectBase->beforeCreate(transaction);
+			tableSync->saveRegistrable(*objectBase, transaction);
+			objectBase->afterCreate(transaction);
+			transaction.run();
+		}
 }	}

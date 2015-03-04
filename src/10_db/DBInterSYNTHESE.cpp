@@ -375,7 +375,6 @@ namespace synthese
 					RequestEnqueue visitor(content);
 					if(apply_visitor(visitor, query))
 					{
-
 						slave.enqueue(
 							DBInterSYNTHESE::FACTORY_KEY,
 							content.str(),

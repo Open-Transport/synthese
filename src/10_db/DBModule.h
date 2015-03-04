@@ -42,7 +42,7 @@
 
 namespace synthese
 {
-    class ObjectBase;
+	class ObjectBase;
 
 	namespace util
 	{
@@ -227,17 +227,17 @@ namespace synthese
 
 
 
-            //////////////////////////////////////////////////////////////////////////
-            /// Creates an object into the database specifying which table sync to use.
-            /// @param object the object to create
-            /// @param tableSync the table sync to use
-            /// @author Thomas Puigt
-            /// @date 2014
-            /// @since 3.8.0
-            static void CreateObject(
-                ObjectBase* objectBase,
-                DBDirectTableSync* tableSync
-            );
+			//////////////////////////////////////////////////////////////////////////
+			/// Creates an object into the database specifying which table sync to use.
+			/// @param object the object to create
+			/// @param tableSync the table sync to use
+			/// @author Thomas Puigt
+			/// @date 2014
+			/// @since 3.8.0
+			static void CreateObject(
+				ObjectBase* objectBase,
+				DBDirectTableSync* tableSync
+			);
 		};
 	}
 
