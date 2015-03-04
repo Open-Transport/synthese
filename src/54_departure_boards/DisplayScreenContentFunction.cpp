@@ -66,6 +66,7 @@
 #endif
 
 #include <sstream>
+#include <boost/optional/optional_io.hpp>
 
 using namespace std;
 using namespace boost;
@@ -665,14 +666,19 @@ namespace synthese
 				{
 					stream << commercialLine->getDataSourceLinks().begin()->second;
 				}
+
 				stream <<
 					"\" name=\""      << commercialLine->getName() <<
 					"\" shortName=\"" << commercialLine->getShortName() <<
 					"\" longName=\""  << commercialLine->getLongName() <<
-					"\" color=\""     << commercialLine->getColor() <<
-					"\" xmlColor=\""  << (
+					"\" color=\""  << (
 						commercialLine->getColor() ?
 						commercialLine->getColor()->toString():
+						""
+					) <<
+					"\" xmlColor=\""  << (
+						commercialLine->getColor() ?
+						commercialLine->getColor()->toXMLColor():
 						""
 					) <<
 					"\" style=\""     << commercialLine->getStyle() <<
