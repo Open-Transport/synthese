@@ -147,7 +147,7 @@ namespace synthese
 					catch(const boost::filesystem::filesystem_error& e)
 					{
 						throw RequestException("Failed to access log directory '" +
-											   logPath + "': " + e.code().message());
+											logPath + "': " + e.code().message());
 					}
 				}
 				else
