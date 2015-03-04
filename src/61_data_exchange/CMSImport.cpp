@@ -215,7 +215,7 @@ namespace synthese
 			for ( boost::filesystem::directory_iterator end, dir(directoryPath / currentDir);
 				   dir != end; ++dir )
 			{
-			  string pageName(dir->path().filename().string());
+				string pageName(dir->path().filename().string());
 				string absPath(dir->path().string());
 				path relPath(currentDir / pageName);
 

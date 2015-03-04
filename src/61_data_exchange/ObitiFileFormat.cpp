@@ -329,7 +329,7 @@ namespace synthese
 				if(boost::filesystem::is_directory(path)) {
 					for(boost::filesystem::directory_iterator it(path), end; it != end; ++it) {
 						if(boost::filesystem::is_regular_file(it->status())) {
-						  schedulesFiles.insert(it->path().filename().string());
+							schedulesFiles.insert(it->path().filename().string());
 						}
 					}
 				}

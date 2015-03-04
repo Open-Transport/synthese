@@ -104,7 +104,7 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
-		const string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_USE_LINE_SHORT_NAME_AS_ID("use_line_short_name_as_id");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_SERVICE_NUMBER("ignore_service_number");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_IGNORE_DIRECTIONS("ignore_directions");

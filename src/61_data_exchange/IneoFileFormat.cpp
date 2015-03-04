@@ -625,7 +625,7 @@ namespace synthese
 								dataSource,
 								true,
 								true,
-                                true,
+								true,
 								_allowDifferentStopPointsInSameStopArea
 						)	);
 						stops.clear();
