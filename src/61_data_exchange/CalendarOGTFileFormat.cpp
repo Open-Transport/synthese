@@ -62,14 +62,14 @@ namespace synthese
 			_calendarElementsToRemove.clear();
 
 			ifstream inFile;
-			inFile.open(filePath.file_string().c_str());
+			inFile.open(filePath.string().c_str());
 			if(!inFile)
 			{
-				throw Exception("Could no open the file " + filePath.file_string());
+				throw Exception("Could no open the file " + filePath.string());
 			}
 			string line;
 			_logDebug(
-				"Loading file "+ filePath.file_string()
+				"Loading file "+ filePath.string()
 			);
 
 			// To use later DataSource& dataSource(*_import.get<DataSource>());
@@ -122,7 +122,7 @@ namespace synthese
 					filePath.parent_path() / ogtFileName;
 
 				_logDebug(
-					"Preparing import of " + ogtPath.file_string() + " into calendar "
+					"Preparing import of " + ogtPath.string() + " into calendar "
 					+ calendarName + " ID=" + boost::lexical_cast<std::string>(currentCalendar->getKey())
 				);
 
@@ -133,11 +133,11 @@ namespace synthese
 				// The parse method feeds _env registries
 
 				if(!parseResult) {
-					_logError("Failed to parse " + ogtPath.file_string());
+					_logError("Failed to parse " + ogtPath.string());
 				}
 				else
 				{
-					_logInfo("OGT file parsing succeeded: " + ogtPath.file_string());
+					_logInfo("OGT file parsing succeeded: " + ogtPath.string());
 				}
 			}
 			return true;
