@@ -95,8 +95,8 @@ namespace synthese
 			bool				_done;
 			const MessagesSection* _section;
 			const ScenarioCalendar* _calendar;
-			std::size_t         _displayDuration;
-			std::string         _digitizedVersion;
+			std::size_t			_displayDuration;
+			std::string			_digitizedVersion;
 
 			// Links
 			//@{
@@ -135,7 +135,7 @@ namespace synthese
 				const MessageAlternatives& getMessageAlternatives() const { return _messageAlternatives; }
 				const MessagesSection* getSection() const { return _section; }
 				const ScenarioCalendar* getCalendar() const { return _calendar; }
-				std::size_t             getDisplayDuration() const { return _displayDuration;}
+				std::size_t				getDisplayDuration() const { return _displayDuration;}
 				const std::string&		getDigitizedVersion()	const { return _digitizedVersion; }
 			//@}
 

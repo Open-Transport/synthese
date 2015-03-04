@@ -511,14 +511,12 @@ namespace synthese
 			ScenarioCalendarTableSync::SearchResult calendars(ScenarioCalendarTableSync::Search(env, sourceId));
 			BOOST_FOREACH(const boost::shared_ptr<ScenarioCalendar>& calendar, calendars)
 			{
-                
 				// Calendar creation
 				boost::shared_ptr<ScenarioCalendar> newCalendar(
 					boost::dynamic_pointer_cast<ScenarioCalendar, ObjectBase>(
 						calendar->copy()
 				)	);
-                newCalendar->setKey(0);
-
+				newCalendar->setKey(0);
 
 				// Link with the new scenario
 				newCalendar->set<ScenarioPointer>(dest);
