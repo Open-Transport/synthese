@@ -38,7 +38,7 @@ from synthesepy import utils
 
 log = logging.getLogger(__name__)
 
-BOOST_VER = '1.42'
+BOOST_VER = '1.57'
 REQUIRED_BOOST_MODULES = [
     'date_time', 'filesystem', 'iostreams', 'program_options',
     'regex', 'system', 'test', 'thread']

@@ -59,6 +59,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string.hpp>
 #include <geos/geom/Point.h>
+#include <boost/optional/optional_io.hpp>
 
 using namespace std;
 using namespace boost;

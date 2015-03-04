@@ -23,6 +23,7 @@
 */
 
 #include <sstream>
+#include <boost/optional/optional_io.hpp>
 
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioFolder.h"

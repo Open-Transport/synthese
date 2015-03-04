@@ -33,6 +33,7 @@
 #include "DisplayMonitoringStatusTableSync.h"
 
 #include <boost/shared_ptr.hpp>
+#include <boost/optional/optional_io.hpp>
 
 using namespace std;
 using namespace boost;
