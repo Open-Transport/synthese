@@ -113,14 +113,14 @@ namespace synthese
 				slave.set<LastActivityReport>(now);
 				InterSYNTHESESlaveTableSync::Save(&slave);
 
-                //addTable(newConfig, "44");
-                //addTable(newConfig, "46");
-                addTable(newConfig, "72");
-                addTable(newConfig, "118");
-                addTable(newConfig, "119");
-                Log::GetInstance().info("InterSYNTHESEConfig post install created");
-            }
-        }
+				//addTable(newConfig, "44");
+				//addTable(newConfig, "46");
+				addTable(newConfig, "72");
+				addTable(newConfig, "118");
+				addTable(newConfig, "119");
+				Log::GetInstance().info("InterSYNTHESEConfig post install created");
+			}
+		}
 
 
 

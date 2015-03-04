@@ -503,40 +503,40 @@ namespace synthese
 		{
 			ptime now(second_clock::local_time());
 
-            // Do no run transaction with the lock or we will deadlock if
+			// Do no run transaction with the lock or we will deadlock if
 			// a transaction triggers a real time update
 			recursive_mutex::scoped_lock lock(_queueMutex);
 
-            Queue::iterator it = _queue.begin();
-            while(it != _queue.end())
-            {
-                // Save the next iterator because we may suppress the current iterator from _queue (by ->unlink)
-                Queue::iterator it2 = it;
+			Queue::iterator it = _queue.begin();
+			while(it != _queue.end())
+			{
+				// Save the next iterator because we may suppress the current iterator from _queue (by ->unlink)
+				Queue::iterator it2 = it;
 				RegistryKeyType idToRemove = it->first;
-                it2++;
+				it2++;
 
-                if(	isObsolete() || (!it->second->get<ExpirationTime>().is_not_a_date_time() && it->second->get<ExpirationTime>() < now))
-                {
-                    InterSYNTHESEQueue* q(
-                        it->second
-                    );
-                    if(q->getNonPersistent())
-                    {
-                        // The item was only stored in the environment : do a manually unload
-                        q->unlink();
+				if(	isObsolete() || (!it->second->get<ExpirationTime>().is_not_a_date_time() && it->second->get<ExpirationTime>() < now))
+				{
+					InterSYNTHESEQueue* q(
+						it->second
+					);
+					if(q->getNonPersistent())
+					{
+						// The item was only stored in the environment : do a manually unload
+						q->unlink();
 
-                        // The shared pointer will be destroyed just quiting the local scope since it was only linked in the environment
-                        Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(idToRemove);
-                    }
-                    else
-                    {
-                        // The item was stored in the database : simply remove it, the standard unload process will run
-                        DBModule::GetDB()->deleteStmt(idToRemove, transaction);
-                    }
-                }
+						// The shared pointer will be destroyed just quiting the local scope since it was only linked in the environment
+						Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEQueue>().remove(idToRemove);
+					}
+					else
+					{
+						// The item was stored in the database : simply remove it, the standard unload process will run
+						DBModule::GetDB()->deleteStmt(idToRemove, transaction);
+					}
+				}
 
-                it = it2;
-            }
+				it = it2;
+			}
 		}
 
 
