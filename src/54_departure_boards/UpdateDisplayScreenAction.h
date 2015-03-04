@@ -79,7 +79,7 @@ namespace synthese
 			std::string									_macAddress;
 			DisplayScreen::SubScreenType				_subScreenType;
 			boost::shared_ptr<geos::geom::Point>		_point;
-			const CoordinatesSystem*                    _coordinatesSystem;
+			const CoordinatesSystem*					_coordinatesSystem;
 
 
 		protected:

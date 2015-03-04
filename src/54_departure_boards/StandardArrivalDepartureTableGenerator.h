@@ -59,11 +59,11 @@ namespace synthese
 
 			/** SCOM informations
 
-			  This setters enables the use of SCOM time adaptation when generating the services.
+				This setters enables the use of SCOM time adaptation when generating the services.
 
-			  @param useScom If at true, SCOM will be used
-			  @param borne The borne for which to give the waiting time
-			  **/
+				@param useScom If at true, SCOM will be used
+				@param borne The borne for which to give the waiting time
+			**/
 			void setClient (
 				bool useScom,
 				const std::string& borne

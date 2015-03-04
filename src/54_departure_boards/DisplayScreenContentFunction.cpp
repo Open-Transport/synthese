@@ -738,7 +738,7 @@ namespace synthese
 			stream <<"<journey routeId=\""<< journeyPattern->getKey() <<
 				"\" dateTime=\""    << servicePointer.getDepartureDateTime() <<
 				"\" blink=\"" << "0" <<
-					 "\" "<< DATA_IS_REAL_TIME <<"=\"" << (service->hasRealTimeData() ? "yes":"no") <<
+					"\" "<< DATA_IS_REAL_TIME <<"=\"" << (service->hasRealTimeData() ? "yes":"no") <<
 				"\" "<< DATA_WAITING_TIME <<"=\"" << to_simple_string(servicePointer.getDepartureDateTime() - second_clock::local_time()) <<
 				"\">";
 
