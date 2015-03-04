@@ -1133,43 +1133,44 @@ namespace synthese
 												serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
 												serviceInstance.getDepartureDateTime() +
 												serviceInstance.getServiceRange() + rule->get<Delay>()
-										);
-										if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
-										{
-											time_period timePeriod(
-												serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
-												serviceInstance.getDepartureDateTime() +
-												serviceInstance.getServiceRange() + rule->get<Delay>()
 											);
 											if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
 											{
-												// Merge the last period and the new one. We assume we are always called
-												// in incremental time so the time_periods are sorted
-												excludeRanges[excludeRanges.size()-1] =
+												time_period timePeriod(
+													serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
+													serviceInstance.getDepartureDateTime() +
+													serviceInstance.getServiceRange() + rule->get<Delay>()
+												);
+												if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
+												{
+													// Merge the last period and the new one. We assume we are always called
+													// in incremental time so the time_periods are sorted
+													excludeRanges[excludeRanges.size()-1] =
 														timePeriod.merge(excludeRanges.back());
-											}
-											else
-											{
-												excludeRanges.push_back(timePeriod);
-											}
+												}
+												else
+												{
+													excludeRanges.push_back(timePeriod);
+												}
 
-											if ( isContinuous() )
-											{
-												// There maybe some more non concurrent services to record
-												break;
-											} else
-											{
-												// No need to search further for non continuous services
-												_nonConcurrencyCache.insert(
-													make_pair(
-														_NonConcurrencyCache::key_type(
-															&departureEdge,
-															&arrivalEdge,
-															userClassRank,
-															date
-														), excludeRanges
-												)	);
-												return false;
+												if ( isContinuous() )
+												{
+													// There maybe some more non concurrent services to record
+													break;
+												} else
+												{
+													// No need to search further for non continuous services
+													_nonConcurrencyCache.insert(
+														make_pair(
+															_NonConcurrencyCache::key_type(
+																&departureEdge,
+																&arrivalEdge,
+																userClassRank,
+																date
+															), excludeRanges
+													)	);
+													return false;
+												}
 											}
 										}
 									}
@@ -1178,7 +1179,6 @@ namespace synthese
 						}
 					}
 				}
-			}
 			}
 
 			_nonConcurrencyCache.insert(
@@ -1261,7 +1261,7 @@ namespace synthese
 						// In case of insufficient defined schedules number
 						time_duration departureSchedule;
 						if(	itDeparture == _dataDepartureSchedules.end()
-                        ){
+						){
 							if(!badSchedulesLogged)
 							{
 								Log::GetInstance().warn("Inconsistent schedules size in service "+ lexical_cast<string>(getKey()) +" (missing schedules)");
@@ -1272,7 +1272,7 @@ namespace synthese
 									seconds(0) :
 									*_generatedDepartureSchedules.rbegin()
 							;
-                        }
+						}
 						else
 						{
 							departureSchedule = *itDeparture;
