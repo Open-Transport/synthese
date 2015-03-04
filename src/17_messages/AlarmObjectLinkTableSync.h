@@ -28,6 +28,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <boost/optional/optional_io.hpp>
 
 #include "Conversion.h"
 #include "Registrable.h"

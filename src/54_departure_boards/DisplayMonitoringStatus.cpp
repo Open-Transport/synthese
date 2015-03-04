@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/optional/optional_io.hpp>
 
 using namespace std;
 using namespace boost;

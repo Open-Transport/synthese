@@ -17,6 +17,7 @@
 #include "IneoOperationFileFormat.hpp"
 #include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
+#include "CalendarOGTFileFormat.hpp"
 #include "ObitiFileFormat.hpp"
 #include "PegaseFileFormat.hpp"
 #include "RSSFileFormat.hpp"
@@ -87,6 +88,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::IneoOperationFileFormat::integrate();
 	synthese::data_exchange::IneoRealTimeFileFormat::integrate();
 	synthese::data_exchange::OGTFileFormat::integrate();
+	synthese::data_exchange::CalendarOGTFileFormat::integrate();
 	synthese::data_exchange::ObitiFileFormat::integrate();
 	synthese::data_exchange::PegaseFileFormat::integrate();
 	synthese::data_exchange::RSSFileFormat::integrate();

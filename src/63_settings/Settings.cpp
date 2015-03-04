@@ -65,7 +65,7 @@ namespace synthese
 		}
 
 
-		// Remove the pointer to the multimap
+		// Remove the pointer in the multimap
 		void Settings::Unregister (
 			const Settable* listener,
 			const std::string& module,
@@ -118,10 +118,7 @@ namespace synthese
 			const std::string& name
 		) const
 		{
-			// This is why I would love to simply used the database.
-			// While I know this is possible, I also know that it's not "the way" of doing things.
-			// And so we loop through. Talk about not not optimized.
-			// Rant by Bastien Noverraz (TL)
+
 			BOOST_FOREACH(Registry<SettingsValue>::value_type it, util::Env::GetOfficialEnv().getRegistry<SettingsValue>())
 			{
 				// Check the module + name

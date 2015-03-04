@@ -44,6 +44,8 @@
 #include "Session.h"
 #include "User.h"
 
+#include <boost/optional/optional_io.hpp>
+
 using namespace std;
 using namespace boost;
 

@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <sstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/optional/optional_io.hpp>
 
 using namespace std;
 using namespace boost;

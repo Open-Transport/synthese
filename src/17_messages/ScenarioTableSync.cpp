@@ -46,6 +46,7 @@
 #include "User.h"
 
 #include <sstream>
+#include <boost/optional/optional_io.hpp>
 
 using namespace std;
 using namespace boost;
