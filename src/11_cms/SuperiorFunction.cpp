@@ -46,7 +46,6 @@ namespace synthese
 		const string SuperiorFunction::PARAMETER_R("r");
 
 
-
 		ParametersMap SuperiorFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -59,11 +58,26 @@ namespace synthese
 
 		void SuperiorFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Left
-			_left = map.getDefault<double>(PARAMETER_L, 0);
 
-			// Right
-			_right = map.getDefault<double>(PARAMETER_R, 0);
+            std::string leftValue(ParametersMap::Trim(map.getValue(PARAMETER_L)));
+            try
+            {
+                _left = boost::lexical_cast<double>(leftValue);
+            }
+            catch(boost::bad_lexical_cast&)
+            {
+                _leftString = leftValue;
+            }
+
+            std::string rightValue(ParametersMap::Trim(map.getValue(PARAMETER_R)));
+            try
+            {
+                _right = boost::lexical_cast<double>(rightValue);
+            }
+            catch(boost::bad_lexical_cast&)
+            {
+                _rightString = rightValue;
+            }
 		}
 
 
@@ -72,7 +86,15 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			stream << (_left > _right);
+            if (_leftString.empty() && _rightString.empty())
+            {
+                stream << (_left > _right);
+            }
+            else
+            {
+                stream << (_leftString > _rightString);
+            }
+                
 			return util::ParametersMap();
 		}
 
@@ -94,6 +116,6 @@ namespace synthese
 
 
 		SuperiorFunction::SuperiorFunction():
-		_left(0), _right(0)
+            _left(0), _right(0), _leftString(""), _rightString("")
 		{}
 }	}
