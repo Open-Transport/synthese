@@ -1316,21 +1316,10 @@ namespace synthese
 						<< arrivalTimeStr.substr(0, 8) << ","
 						<< departureTimeStr.substr(0, 8) << ","
 						<< ","
-
-					if(gp.get())
-					{
-						stopTimes <<_key(service->getKey(), 1) << ","
-							<< _key(stopPoint->getKey()) << ","
-							<< ls->getRankInPath() << ","
-							<< arrivalTimeStr.substr(0, 8) << ","
-							<< departureTimeStr.substr(0, 8) << ","
-							<< ","
-
-							<< (ls->isDepartureAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
-							<< (ls->isArrivalAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
-							<< endl;
-						stopTimesExist = true;
-					}
+						<< (ls->isDepartureAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // pickup_type
+						<< (ls->isArrivalAllowed() ? (isReservationMandandatory ? "2," : "0,") : "1,") // drop_off_type
+						<< endl;
+					stopTimesExist = true;
 				}
 				else
 				{
