@@ -105,7 +105,8 @@ namespace synthese
 			#ifdef WITH_SCOM
 			if (_scom)
 			{
-				realStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff() * 2);			}
+				realStartDateTime -= seconds(scom::SCOMModule::GetSCOMData()->MaxTimeDiff() * 2);
+			}
 			#endif
 
 			AccessParameters ap;
@@ -130,14 +131,12 @@ namespace synthese
 
 					BOOST_FOREACH(const Path::ServiceCollections::value_type& itCollection, ls.getParentPath()->getServiceCollections())
 					{
-							// Loop on services
-							ptime departureDateTime = _startDateTime;
-							optional<Edge::DepartureServiceIndex::Value> index;
-							size_t insertedServices(0);
-							while(true)
-							{
-								break;
-							}
+						// Loop on services
+						ptime departureDateTime = _startDateTime;
+						optional<Edge::DepartureServiceIndex::Value> index;
+						size_t insertedServices(0);
+						while(true)
+						{
 							// Tells to the journey pattern for a next service
 							ServicePointer servicePointer(
 								ls.getNextService(
@@ -181,7 +180,7 @@ namespace synthese
 							){
 								continue;
 							}
-							
+						
 							// Checks if the destination might be filtered
 							if (_excludeStartingAreaIsDestination)
 							{
@@ -256,7 +255,7 @@ namespace synthese
 								}
 							}
 						}
-					}						
+					}
 				}
 			}
 			return _result;
