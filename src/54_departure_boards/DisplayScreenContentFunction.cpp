@@ -201,7 +201,6 @@ namespace synthese
 
 
 		const string PIPO_KEY("00");
-		vector<string> DisplayScreenContentFunction::_SAELine;
 
 		DisplayScreenContentFunction::SAELine DisplayScreenContentFunction::_SAELine;
 		ptime DisplayScreenContentFunction::_nextUpdateLine = second_clock::local_time();
