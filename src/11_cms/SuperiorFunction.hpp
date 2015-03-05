@@ -33,7 +33,10 @@ namespace synthese
 	namespace cms
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///	36.15 Function : Tests if a numeric parameter is superior than another.
+		///	36.15 Function : Tests if a numeric parameter is superior
+		///	than another. In case a parameter is not a number, comparison
+        /// operates on string values (lexicographic comparison). 
+        ///
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
@@ -66,6 +69,8 @@ namespace synthese
 			//@{
 				double _left;
 				double _right;
+                std::string _leftString;
+                std::string _rightString;
 			//@}
 
 

@@ -231,7 +231,7 @@ namespace synthese
 			m.insert(
 				DATA_DIRECTION,
 				_journeyPattern->getDirection().empty() && _journeyPattern->getDirectionObj() ?
-				_journeyPattern->getDirectionObj()->get<DisplayedText>() :
+					_journeyPattern->getDirectionObj()->get<DisplayedText>() :
 					_journeyPattern->getDirection()
 			);
 

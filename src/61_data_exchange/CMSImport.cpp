@@ -218,6 +218,8 @@ namespace synthese
 				string pageName(dir->path().filename().string());
 				string absPath(dir->path().string());
 				path relPath(currentDir / pageName);
+				bool ignoreWhiteChars = false;
+				bool doNotEvaluate = true;
 
 				if(pageName == "metadata.json")
 				{
@@ -244,6 +246,7 @@ namespace synthese
 				MimeType mimeType;
 				string fullPagePath;
 				_getPageFullPath(parent, fullPagePath);
+
 				if(fullPagePath.empty())
 				{
 					fullPagePath = pageName;
@@ -252,6 +255,7 @@ namespace synthese
 				{
 					fullPagePath += "/" + pageName;
 				}
+
 				if(_metadataPages.find(fullPagePath) != _metadataPages.end())
 				{
 					page = _metadataPages[fullPagePath];
@@ -262,9 +266,13 @@ namespace synthese
 
 					_logLoad("Reusing page from metadata: " + pageName + " " + lexical_cast<string>(page->getKey()));
 					mimeType = page->getMimeType();
+					ignoreWhiteChars = page->get<WebpageContent>().getCMSScript().getIgnoreWhiteChars();
+					doNotEvaluate = page->get<WebpageContent>().getCMSScript().getDoNotEvaluate();
 				}
 				else
 				{
+					// OVE : the creation of new pages has not been tested recently, it may be broken
+					// in particular the management of ranks should be reworked
 					page = new Webpage(WebPageTableSync::getId());
 					_env.getEditableRegistry<Webpage>().add(boost::shared_ptr<Webpage>(page));
 					_logLoad("Creation of new page: " + pageName + " " + lexical_cast<string>(page->getKey()));
@@ -272,6 +280,10 @@ namespace synthese
 					page->set<SmartURLPath>(string("/") + relPath.string());
 					page->set<RawEditor>(true);
 					page->set<MaxAge>(_maxAge);
+					page->setRoot(site.get());
+					page->setRank(rank++);
+					page->setParent(parent);
+
 					// Calc a mime type base on the extension
 					string extension(dir->path().extension().string());
 					if(!extension.empty())
@@ -282,11 +294,7 @@ namespace synthese
 					}
 					mimeType = MimeTypes::GetMimeTypeByExtension(extension);
 				}
-				page->setRoot(site.get());
-				page->setRank(rank++);
-				page->setParent(parent);
-				page->set<SmartURLPath>(string("/") + relPath.string());
-				page->set<RawEditor>(true);
+
 				site->addPage(*page);
 				if( is_directory(*dir))
 				{
@@ -313,7 +321,7 @@ namespace synthese
 						_logWarning(string("Failed to load file '") + absPath + "': " + e.what());
 					}
 
-					WebpageContent c(content, false, mimeType, true);
+					WebpageContent c(content, ignoreWhiteChars, mimeType, doNotEvaluate);
 					page->set<WebpageContent>(c);
 
 					// Special case, if there is a file with .dir extension

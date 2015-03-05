@@ -71,6 +71,7 @@ namespace synthese
 			static const std::string PARAMETER_WAYBACK_FILTER;
 			static const std::string PARAMETER_IGNORE_PAST_DATES;
 			static const std::string PARAMETER_AUTO_INTERMEDIATE_STOPS;
+			static const std::string PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES;
 
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_NOTE_PAGE_ID;
@@ -160,6 +161,7 @@ namespace synthese
 				boost::optional<bool> _ignorePastDates;
 				std::vector<boost::shared_ptr<Timetable> > _containerContent;
 				std::size_t _timetableRank;
+				boost::optional<bool> _mergeColsWithSameSchedules;
 			//@}
 
 			typedef algorithm::PlacesList<const pt::StopArea*, const pt::JourneyPattern*> PlacesListConfiguration;

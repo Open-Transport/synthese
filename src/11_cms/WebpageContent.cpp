@@ -129,7 +129,7 @@ namespace synthese
 				fieldObject._mimeType
 			);
 
-			// Ignore white chars
+			// Do not Evaluate
 			map.insert(
 				prefix + FIELDS[3].name,
 				fieldObject.getCMSScript().getDoNotEvaluate()
