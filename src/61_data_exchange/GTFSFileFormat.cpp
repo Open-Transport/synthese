@@ -1324,7 +1324,7 @@ namespace synthese
 				}
 				else
 				{
-					Log::GetInstance().debug("No stop point at rank " + boost::lexical_cast<std::string>(ls->getRankInPath()) +
+					Log::GetInstance().debug("No stop point at rank " + boost::lexical_cast<std::string>(ls->get<RankInPath>()) +
 											 " for line stop " + boost::lexical_cast<std::string>(ls->getKey()));
 				}
 			}
@@ -1524,8 +1524,8 @@ namespace synthese
 					<< phone <<"," // agency_phone
 					<< myAgency.second->getLang() // agency_lang
 					<< endl;
-				}
-				// END AGENCY.TXT
+			}
+			// END AGENCY.TXT
 
 			// BEGIN STOPS.TXT
 			BOOST_FOREACH(
@@ -1681,20 +1681,10 @@ namespace synthese
 
 				if(sdService)
 				{
-					rs = static_cast<const JourneyPattern *>(sdService->getPath())->getRollingStock();
-
-					bool mustBeExported = true;
-					const multimap<const DataSource*, string>& dataSourcesMap = static_cast<const JourneyPattern *>(sdService->getPath())->getCommercialLine()->getDataSourceLinks();
-					for (multimap<const DataSource*, string>::const_iterator it = dataSourcesMap.begin(); it != dataSourcesMap.end(); ++it)
+					const JourneyPattern *sdJourney = static_cast<const JourneyPattern *>(sdService->getPath());
+					if (sdJourney)
 					{
-						if(it->first->get<Name>() == LABEL_NO_EXPORT_GTFS)
-						{
-							mustBeExported = false;
-							break;
-						}
-					}
-					if(!mustBeExported)
-						continue;
+						rs = sdJourney->getRollingStock()
 
 						// Check if one of the datasources has LABEL_NO_EXPORT_GTFS for name, in which case the schedule is not to be exported
 						bool mustBeExported = true;
@@ -1767,12 +1757,12 @@ namespace synthese
 							mustBeExported = false;
 							break;
 						}
-				}
+					}
 
-				if(!mustBeExported) {
-					Log::GetInstance().debug("Continuous service has the no export label : " + boost::lexical_cast<std::string>(itcssrv.first));
-					continue;
-				}
+					if(!mustBeExported) {
+						Log::GetInstance().debug("Continuous service has the no export label : " + boost::lexical_cast<std::string>(itcssrv.first));
+						continue;
+					}
 
 					rs = static_cast<const JourneyPattern *>(csService->getPath())->getRollingStock();
 					if(rs != NULL)
