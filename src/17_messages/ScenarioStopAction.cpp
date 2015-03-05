@@ -172,7 +172,5 @@ namespace synthese
 			return result;
 			*/
 			return true;
-			*/
-			return true;
 		}
 }	}
