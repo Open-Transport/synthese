@@ -1684,7 +1684,7 @@ namespace synthese
 					const JourneyPattern *sdJourney = static_cast<const JourneyPattern *>(sdService->getPath());
 					if (sdJourney)
 					{
-						rs = sdJourney->getRollingStock()
+						rs = sdJourney->getRollingStock();
 
 						// Check if one of the datasources has LABEL_NO_EXPORT_GTFS for name, in which case the schedule is not to be exported
 						bool mustBeExported = true;
