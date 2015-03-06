@@ -1696,8 +1696,10 @@ BOOST_AUTO_TEST_CASE (testSubline)
 	BOOST_CHECK_EQUAL((*l.getServiceCollections().rbegin())->getServices().size(), 1);
 	if(l.getAllServices().size() == 2)
 	{
-		BOOST_CHECK_EQUAL(*l.getAllServices().begin(), &s1);
-		BOOST_CHECK_EQUAL(*l.getAllServices().rbegin(), &s2);
+		BOOST_CHECK(
+			(*l.getAllServices().begin() == &s1 && *l.getAllServices().rbegin(), &s2) || 
+			(*l.getAllServices().begin() == &s2 && *l.getAllServices().rbegin(), &s1)
+		);
 	}
 	BOOST_CHECK(l.isActive(today));
 
