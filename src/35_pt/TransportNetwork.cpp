@@ -65,7 +65,7 @@ namespace synthese
 			graph::PathClass(),
 			_daysCalendarsParent(NULL),
 			_periodsCalendarsParent(NULL),
-			_timezone(""),
+			_timeZone(""),
 			_lang(""),
 			_contact(NULL),
 			_fareContact(NULL)
@@ -232,10 +232,10 @@ namespace synthese
 				std::string timezone(
 					record.get<string>(TransportNetworkTableSync::COL_TIMEZONE)
 				);
-				if(timezone != _timezone)
+				if(timezone != _timeZone)
 				{
 					result = true;
-					_timezone = timezone;
+					_timeZone = timezone;
 				}
 			}
 

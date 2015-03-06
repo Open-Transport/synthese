@@ -65,7 +65,7 @@ namespace synthese
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _daysCalendarsParent;
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _periodsCalendarsParent;
 			boost::optional<std::string> _image;
-			boost::optional<std::string> _timezone;
+			boost::optional<std::string> _timeZone;
 			boost::optional<std::string> _lang;
 			boost::optional<boost::shared_ptr<pt::ReservationContact> > _contact;
 			boost::optional<boost::shared_ptr<pt::ReservationContact> > _fareContact;

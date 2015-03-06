@@ -182,7 +182,7 @@ namespace synthese
 			// Timezone
 			if(map.isDefined(PARAMETER_TIMEZONE))
 			{
-				_timezone = map.getValue(PARAMETER_TIMEZONE,false);
+				_timeZone = map.getValue(PARAMETER_TIMEZONE,false);
 			}
 
 			// Contact (Optional)
@@ -280,9 +280,9 @@ namespace synthese
 			}
 
 			// Timezone
-			if (_timezone)
+			if (_timeZone)
 			{
-				_network->setTimezone(*_timezone);
+				_network->setTimezone(*_timeZone);
 			}
 
 			// Contact
