@@ -65,11 +65,11 @@ namespace synthese
 		}
 
 
-		const shared_ptr<InterSYNTHESEConfig> SpecificPostInstall::getMyConfig() {
+		const boost::shared_ptr<InterSYNTHESEConfig> SpecificPostInstall::getMyConfig() {
 			BOOST_FOREACH(const InterSYNTHESEConfig::Registry::value_type& item,
 			Env::GetOfficialEnv().getRegistry<InterSYNTHESEConfig>())
 			{
-				const shared_ptr<InterSYNTHESEConfig> config(item.second);
+				const boost::shared_ptr<InterSYNTHESEConfig> config(item.second);
 				Log::GetInstance().info("InterSYNTHESEConfig=" + config->get<Name>());
 				if(config->get<Name>() == MASTER_NAME)
 				{
@@ -77,7 +77,7 @@ namespace synthese
 					return config;
 				}
 			}
-			return shared_ptr<InterSYNTHESEConfig>();
+			return boost::shared_ptr<InterSYNTHESEConfig>();
 		}
 
 		void SpecificPostInstall::addTable(InterSYNTHESEConfig &config,
