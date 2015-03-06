@@ -145,7 +145,7 @@ namespace synthese
 			else
 			{
 				const Vehicle::Registry& registry(Env::GetOfficialEnv().getRegistry<Vehicle>());
-				vehicles = registry.getConstVector(bind(&GetVehiclesService::_selectVehicle, this, _1));
+				vehicles = registry.getConstVector(boost::bind(&GetVehiclesService::_selectVehicle, this, _1));
 			}
 
 			size_t rank(0);

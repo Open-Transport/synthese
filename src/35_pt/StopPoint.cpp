@@ -62,7 +62,7 @@ namespace synthese
 
 	namespace pt
 	{
-		typedef tuple<RegistryKeyType, RegistryKeyType> LineTuple;
+		typedef boost::tuple<RegistryKeyType, RegistryKeyType> LineTuple;
 		typedef map<string, LineTuple> LinesMap;
 
 
