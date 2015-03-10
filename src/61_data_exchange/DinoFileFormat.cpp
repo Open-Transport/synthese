@@ -484,17 +484,15 @@ namespace synthese
 					string id(_getValue("STOP_NR"));
 					string name(trim_copy(_getValue("STOP_NAME")));
 					// case where "stop name" is "<city name>, <stop name>"
-					/*
-					if(!name.empty() && name.find(",")!=string::npos)
-					{
-						vector<string> stopNameFields;
-						split(stopNameFields, name, is_any_of(","), token_compress_on);
-						if(trim_copy(stopNameFields[0]) == cityName)
-						{
-							name = trim_copy(stopNameFields[1]);
-						}
-					}
-					*/
+					//if(!name.empty() && name.find(",")!=string::npos)
+					//{
+					//	vector<string> stopNameFields;
+					//	split(stopNameFields, name, is_any_of(","), token_compress_on);
+					//	if(trim_copy(stopNameFields[0]) == cityName)
+					//	{
+					//		name = trim_copy(stopNameFields[1]);
+					//	}
+					//}
 
 					_logDebug("Working on stop [" + name + "] id [" + id + "]");
 
@@ -531,6 +529,7 @@ namespace synthese
 									);
 					}
 				}  // end of while
+				
 			}
 			else if(key == FILE_STOP_AREAS)
 			{
@@ -539,6 +538,7 @@ namespace synthese
 			// stop points
 			else if(key == FILE_STOPPING_POINTS)
 			{
+				
 				while(getline(inFile, line))
 				{
 					_loadLine(line);
@@ -584,10 +584,12 @@ namespace synthese
 								dataSource
 								);
 				} // end of while
+				
 			}
 			// Networks
 			else if(key == FILE_BRANCH)
 			{
+				
 				while(getline(inFile, line))
 				{
 					_loadLine(line);
@@ -638,6 +640,7 @@ namespace synthese
 					}
 					_networksMap.insert(make_pair(networkId, network));
 				} // end of while
+				
 			} // end of FILE_BRANCH
 			// Commercial Lines
 			else if(key == FILE_LINES)
@@ -677,11 +680,13 @@ namespace synthese
 						continue;
 					}
 
+					std::string lineName(_getValue("LINE_NAME"));
+					std::string lineNr(_getValue("LINE_NR"));
 					_createOrUpdateLine(
 						_lines,
 						id,
-						_getValue("LINE_NAME"),
-						_getValue("LINE_NR"),
+						lineName,
+						lineNr,
 						boost::optional<util::RGBColor>(),
 						*network,
 						dataSource
@@ -730,13 +735,13 @@ namespace synthese
 					schedule.art = seconds(lexical_cast<long int>(_getValue("TT_REL")));
 					schedule.wt = seconds(lexical_cast<long int>(_getValue("STOPPING_TIME")));
 				} // end of while
-
 				// Load the last journey
 				_selectAndLoadDinoSchedules(
 						_dinoSchedules,
 						schedules,
 						lastSchedulesCode
 				);
+				
 			} // end of FILE_STOP_TIMES
 			// Initialization of Journey Patterns (code, name, direction, stop points list (metricoffset))
 			else if(key == FILE_JOURNEY)
@@ -827,6 +832,7 @@ namespace synthese
 						direction,
 						lastJourneyCode
 				);
+				
 			} // end of FILE_JOURNEY
 			// Specific calendar definitions
 			else if(key == FILE_SERVICE_RESTRICTION)
@@ -835,7 +841,7 @@ namespace synthese
 				{
 					_loadLine(line);
 
-					string calendarStr; /* serialized calendar */
+					string calendarStr; // serialized calendar 
 					Calendar c;
 					string code = _getValue("RESTRICTION");
 //					string name = _getValue("RESTRICT_TEXT1");
@@ -1198,10 +1204,11 @@ namespace synthese
 					// Use rules
 					RuleUser::Rules rules(RuleUser::GetEmptyRules());
 
+					std::string routeId(isJourneyWithInterdictions ? trip.second.journey->code + "-" + trip.second.trainNr : trip.second.journey->code);
 					JourneyPattern* journeyPattern(
 						_createOrUpdateRoute(
 							*trip.second.journey->line,
-							isJourneyWithInterdictions ? trip.second.journey->code + "-" + trip.second.trainNr : trip.second.journey->code,
+							routeId,
 							trip.second.journey->name,
 							optional<const string&>(),
 							optional<Destination*>(),

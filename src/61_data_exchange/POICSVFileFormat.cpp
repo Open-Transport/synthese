@@ -140,7 +140,7 @@ namespace synthese
 					string code(_getValue(4));
 
 					// City
-					shared_ptr<City> cityForPublicPlace;
+					boost::shared_ptr<City> cityForPublicPlace;
 					RegistryKeyType cityId;
 					try
 					{

@@ -28,7 +28,7 @@ endif()
 
 # Boost
 
-#set(Boost_ADDITIONAL_VERSIONS "1.57")
+set(Boost_ADDITIONAL_VERSIONS "1.57")
 # Uncomment to enable debugging output when finding Boost.
 # set(Boost_DEBUG ON)
 
@@ -43,9 +43,9 @@ endif()
 add_definitions(-DFUSION_MAX_VECTOR_SIZE=40)
 add_definitions(-DFUSION_MAX_MAP_SIZE=40)
 
-#if(NOT DEFINED BOOST_VERSION)
-#  set(BOOST_VERSION 1.57)
-#endif()
+if(NOT DEFINED BOOST_VERSION)
+  set(BOOST_VERSION 1.57)
+endif()
 
 set(BOOST_LIBS program_options filesystem system random regex thread date_time iostreams unit_test_framework)
 if(WIN32)
