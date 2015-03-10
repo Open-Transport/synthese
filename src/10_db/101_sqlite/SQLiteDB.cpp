@@ -141,7 +141,6 @@ namespace synthese
 		}
 
 
-
 		void SQLiteDB::initForStandaloneUse()
 		{
 			if (_connInfo->path.empty())
@@ -184,9 +183,6 @@ namespace synthese
 #endif
 
 				tss->handle = handle;
-
-
-
 				_tss.reset(tss);
 			}
 			return _tss.get();
@@ -746,10 +742,12 @@ namespace synthese
 
 
 		
-		void SQLiteDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
+#ifndef _WIN32
+		void SQLiteDB::DBRecordCellBindConvertor::operator()(const size_t& s) const
 		{
 			sqlite3_bind_int(&_stmt, static_cast<int>(_i), static_cast<int>(s));
 		}
+#endif
 
 
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const double& d ) const
@@ -758,12 +756,10 @@ namespace synthese
 		}
 
 
-#ifndef _WIN32
 		void SQLiteDB::DBRecordCellBindConvertor::operator()(const util::RegistryKeyType& id) const
 		{
 			sqlite3_bind_int64(&_stmt, static_cast<int>(_i), id);
 		}
-#endif
 
 
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const boost::optional<std::string>& str ) const
