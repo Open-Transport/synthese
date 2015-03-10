@@ -634,13 +634,13 @@ namespace synthese
 
 							const DeadRunRoute& route(it->second);
 							time_duration departureSchedule(
-								lexical_cast<int>(line.substr(i+10, 2)),
-								lexical_cast<int>(line.substr(i+12, 2)),
+								lexical_cast<int>(line.substr(i+15, 2)),
+								lexical_cast<int>(line.substr(i+17, 2)),
 								0
 							);
 							time_duration arrivalSchedule(
-								lexical_cast<int>(line.substr(i+14, 2)),
-								lexical_cast<int>(line.substr(i+16, 2)),
+								lexical_cast<int>(line.substr(i+19, 2)),
+								lexical_cast<int>(line.substr(i+21, 2)),
 								0
 							);
 
@@ -738,7 +738,7 @@ namespace synthese
 							}
 							JourneyPattern* route(it->second);
 
-							string serviceNumber(trim_copy(line.substr(i+6,4)));
+							string serviceNumber(trim_copy(line.substr(i+8,3)));
 							SchedulesMap::iterator itS(services.find(make_pair(route, serviceNumber)));
 							if(itS != services.end())
 							{
@@ -780,7 +780,7 @@ namespace synthese
 							size_t rank(0);
 							bool alreadyNonNull(false);
 							bool alreadyNull(false);
-							for(i+=6; i<line.size() && line[i]!=';'; i+=8, ++rank)
+							for(i+=11; i<line.size() && line[i]!=';'; i+=8, ++rank)
 							{
 								string arrivalSchedule(line.substr(i, 4));
 								string departureSchedule(line.substr(i+4, 4));
@@ -824,7 +824,8 @@ namespace synthese
 									);
 								}
 							}
-							if(!alreadyNull)
+							if(!alreadyNull &&
+								route->getLineStop(rank - 1, true))
 							{
 								tronconElement.endRank = route->getLineStop(rank - 1, true)->get<RankInPath>();
 							}
