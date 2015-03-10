@@ -65,7 +65,7 @@ void testQuery(const TestBackend& testBackend)
 	// Check that the object is now in the registry.
 	BOOST_REQUIRE_EQUAL(registry.size(), 1);
 	util::Registry<TestObject>::value_type regValue(*registry.begin());
-	shared_ptr<TestObject> objFromReg = regValue.second;
+	boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
 	cout << " obj key " << objFromReg->getKey() << " name " << objFromReg->getName() << endl;
 	// Object from registry is newly allocated.
@@ -90,7 +90,7 @@ void testQuery(const TestBackend& testBackend)
 		CHECK_COUNTERS(1, 1, 0);
 		BOOST_REQUIRE_EQUAL(registry.size(), 1);
 		util::Registry<TestObject>::value_type regValue(*registry.begin());
-		shared_ptr<TestObject> objFromReg = regValue.second;
+		boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
 		cout << " obj key " << objFromReg->getKey() << " name " << objFromReg->getName() << endl;
 		// Object from registry is newly allocated.
@@ -129,7 +129,7 @@ void testQuery(const TestBackend& testBackend)
 		CHECK_COUNTERS(1, 1, 0);
 		BOOST_REQUIRE_EQUAL(registry.size(), 1);
 		util::Registry<TestObject>::value_type regValue(*registry.begin());
-		shared_ptr<TestObject> objFromReg = regValue.second;
+		boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
 		cout << " obj key " << objFromReg->getKey() << " name " << objFromReg->getName() << endl;
 		// Object from registry is newly allocated.
@@ -174,7 +174,7 @@ void testQuery(const TestBackend& testBackend)
 		BOOST_REQUIRE_EQUAL(registry.size(), 1);
 
 		util::Registry<TestObject>::value_type regValue(*registry.begin());
-		shared_ptr<TestObject> objFromReg = regValue.second;
+		boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
 		cout << " obj key " << objFromReg->getKey() << " name " << objFromReg->getName() << endl;
 		// Object from registry is newly allocated.

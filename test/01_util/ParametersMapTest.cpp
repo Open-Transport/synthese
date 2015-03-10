@@ -117,11 +117,11 @@ BOOST_AUTO_TEST_CASE (testParametersMap)
 		ParametersMap pm;
 		pm.insert("a", 23);
 		pm.insert("b", string("toto"));
-		shared_ptr<ParametersMap> subMap1(new ParametersMap);
+		boost::shared_ptr<ParametersMap> subMap1(new ParametersMap);
 		subMap1->insert("c", string("test1"));
 		subMap1->insert("d", string("test1d"));
 		pm.insert("d", subMap1);
-		shared_ptr<ParametersMap> subMap2(new ParametersMap);
+		boost::shared_ptr<ParametersMap> subMap2(new ParametersMap);
 		subMap2->insert("c", string("test2"));
 		subMap2->insert("d", string("test2d"));
 		pm.insert("d", subMap2);

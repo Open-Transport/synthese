@@ -485,10 +485,10 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	}
 
 	{ // Foreach
-		shared_ptr<ParametersMap> pm1(new ParametersMap);
+		boost::shared_ptr<ParametersMap> pm1(new ParametersMap);
 		pm1->insert("test", string("OK1"));
 		additionalParametersMap.insert("spm", pm1);
-		shared_ptr<ParametersMap> pm2(new ParametersMap);
+		boost::shared_ptr<ParametersMap> pm2(new ParametersMap);
 		pm2->insert("test", string("OK2"));
 		additionalParametersMap.insert("spm", pm2);
 		string code("test<{spm&template=<@test@>}>");
@@ -765,15 +765,15 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 
 	{ // Access to sub map
 		string code("test<{item&template=<@value@><{item&template=<@value@>}>}>");
-		shared_ptr<ParametersMap> subMap1(new ParametersMap);
+		boost::shared_ptr<ParametersMap> subMap1(new ParametersMap);
 		subMap1->insert("id", 24);
 		subMap1->insert("value", 21);
 		additionalParametersMap.insert("item", subMap1);
-		shared_ptr<ParametersMap> subMap2(new ParametersMap);
+		boost::shared_ptr<ParametersMap> subMap2(new ParametersMap);
 		subMap2->insert("id", 26);
 		subMap2->insert("value", 32);
 		subMap2->insert("other", 56);
-		shared_ptr<ParametersMap> subMap3(new ParametersMap);
+		boost::shared_ptr<ParametersMap> subMap3(new ParametersMap);
 		subMap3->insert("id", 21);
 		subMap3->insert("value", 33);
 		subMap3->insert("other", 57);

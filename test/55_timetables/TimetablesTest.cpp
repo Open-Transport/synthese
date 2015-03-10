@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 		3377699720880931ULL,
 		"93/1",
 		&place93,
-		shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops931))
+		boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops931))
 	);
 	SAVE(StopPoint, ps931);
 	place93.addPhysicalStop(ps931);
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	city54.addIncludedPlace(place94);
 
 	Coordinate cops941(523000.0,1845000.0);
-	StopPoint ps941(3377699720880941ULL,"94/1", &place94, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops931)));
+	StopPoint ps941(3377699720880941ULL, "94/1", &place94, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops931)));
 	SAVE(StopPoint, ps941);
 	place94.addPhysicalStop(ps941);
 	SAVE(StopArea, place94);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	city95.addIncludedPlace(place95);
 
 	Coordinate cops951(523266.0,1845339.0);
-	StopPoint ps951(3377699720880951ULL,"95/1", &place95, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops951)));
+	StopPoint ps951(3377699720880951ULL, "95/1", &place95, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops951)));
 	SAVE(StopPoint, ps951);
 	place95.addPhysicalStop(ps951);
 	SAVE(StopArea, place95);
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	city38.addIncludedPlace(place96);
 
 	Coordinate cops961(524000.0,1849500.0);
-	StopPoint ps961(3377699720880961ULL,"96/1", &place96, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops961)));
+	StopPoint ps961(3377699720880961ULL, "96/1", &place96, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops961)));
 	SAVE(StopPoint, ps961);
 	place96.addPhysicalStop(ps961);
 	SAVE(StopArea, place96);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE (TimetablesTest)
 	city38.addIncludedPlace(place97);
 
 	Coordinate cops971(526000,1845000);
-	StopPoint ps971(3377699720880971ULL,"97/1", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops971)));
+	StopPoint ps971(3377699720880971ULL, "97/1", &place97, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops971)));
 	SAVE(StopPoint, ps971);
 	place97.addPhysicalStop(ps971);
 

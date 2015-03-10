@@ -49,36 +49,36 @@ BOOST_AUTO_TEST_CASE (testFromLambertIIe)
 	ModuleClassTemplate<DBModule>::Init();
 
 	// Toulouse LambertIIe
-	shared_ptr<Point> gp1(
+	boost::shared_ptr<Point> gp1(
 		CoordinatesSystem::GetCoordinatesSystem(27572).createPoint(
 			527674.0,
 			1845128.0
 	)	);
-	shared_ptr<Point> gp1wgs(
+	boost::shared_ptr<Point> gp1wgs(
 		CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(*gp1)
 	);
 	BOOST_CHECK_CLOSE(1.44199101, gp1wgs->getX(), 0.00001);
 	BOOST_CHECK_CLOSE(43.60435799, gp1wgs->getY(), 0.00001);
 
 	// Brest
-	shared_ptr<Point> gp2(
+	boost::shared_ptr<Point> gp2(
 		CoordinatesSystem::GetCoordinatesSystem(27572).createPoint(
 			95151.0,
 			2398703.0
 	)	);
-	shared_ptr<Point> gp2wgs(
+	boost::shared_ptr<Point> gp2wgs(
 		CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(*gp2)
 	);
 	BOOST_CHECK_CLOSE(-4.48683053, gp2wgs->getX(), 0.00001);
 	BOOST_CHECK_CLOSE(48.38984464, gp2wgs->getY(), 0.00001);
 
 	// Strasbourg
-	shared_ptr<Point> gp3(
+	boost::shared_ptr<Point> gp3(
 		CoordinatesSystem::GetCoordinatesSystem(27572).createPoint(
 			999096.6,
 			2412064.0
 	)	);
-	shared_ptr<Point> gp3wgs(
+	boost::shared_ptr<Point> gp3wgs(
 		CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(*gp3)
 	);
 	BOOST_CHECK_CLOSE(7.74806, gp3wgs->getX(), 0.00001);
@@ -90,36 +90,36 @@ BOOST_AUTO_TEST_CASE (testToLambertIIe)
 	GeographyModule::PreInit();
 
 	// Toulouse LambertIIe
-	shared_ptr<Point> gp1(
+	boost::shared_ptr<Point> gp1(
 		CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
 			1.44199101,
 			43.60435799
 	)	);
-	shared_ptr<Point> gp1wgs(
+	boost::shared_ptr<Point> gp1wgs(
 		CoordinatesSystem::GetCoordinatesSystem(27572).convertPoint(*gp1)
 	);
 	BOOST_CHECK_CLOSE(527674.0, gp1wgs->getX(), 1.0);
 	BOOST_CHECK_CLOSE(1845128.0, gp1wgs->getY(), 1.0);
 
 	// Brest LambertIIe
-	shared_ptr<Point> gp2(
+	boost::shared_ptr<Point> gp2(
 		CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
 			-4.48683053,
 			48.38984464
 	)	);
-	shared_ptr<Point> gp2wgs(
+	boost::shared_ptr<Point> gp2wgs(
 		CoordinatesSystem::GetCoordinatesSystem(27572).convertPoint(*gp2)
 	);
 	BOOST_CHECK_CLOSE(95151.0, gp2wgs->getX(), 1.0);
 	BOOST_CHECK_CLOSE(2398703.0, gp2wgs->getY(), 1.0);
 
 	// Strasbourg
-	shared_ptr<Point> gp3(
+	boost::shared_ptr<Point> gp3(
 		CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
 			7.74806,
 			48.5836
 	)	);
-	shared_ptr<Point> gp3wgs(
+	boost::shared_ptr<Point> gp3wgs(
 		CoordinatesSystem::GetCoordinatesSystem(27572).convertPoint(*gp3)
 	);
 	BOOST_CHECK_CLOSE(999096.6, gp3wgs->getX(), 1.0);

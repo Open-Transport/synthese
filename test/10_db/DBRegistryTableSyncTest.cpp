@@ -72,7 +72,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 	// Check that the object is now in the registry.
 	BOOST_REQUIRE_EQUAL(registry.size(), 1);
 	util::Registry<TestObject>::value_type regValue(*registry.begin());
-	shared_ptr<TestObject> objFromReg = regValue.second;
+	boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
 	cout << " obj key " << objFromReg->getKey() << " name " << objFromReg->getName() << endl;
 	// Object from registry is newly allocated.
@@ -95,7 +95,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 
 	results = TestTableSync::Search(util::Env::GetOfficialEnv(), 22, std::string("sample name"));
 	BOOST_CHECK_EQUAL(results.size(), 1);
-	shared_ptr<TestObject> objFromResult = results[0];
+	boost::shared_ptr<TestObject> objFromResult = results[0];
 	BOOST_CHECK_EQUAL(objFromResult->getNetworkId(), obj.getNetworkId());
 	BOOST_CHECK_EQUAL(objFromResult->getName(), obj.getName());
 	BOOST_CHECK_EQUAL(objFromResult->getShortName(), obj.getShortName());

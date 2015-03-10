@@ -70,10 +70,10 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 	Env& env(Env::GetOfficialEnv());
 	std::cout << "TPU Env set with OfficialEnv" << endl;
 
-	shared_ptr<DataSource> ds(new DataSource(16607027920896001));
+	boost::shared_ptr<DataSource> ds(new DataSource(16607027920896001));
 	env.getEditableRegistry<DataSource>().add(ds);
 
-	shared_ptr<Import> import(new Import(1)); // TODO put real number
+	boost::shared_ptr<Import> import(new Import(1)); // TODO put real number
 	import->set<DataSource>(*ds);
 	std::cout << "TPU Datasource set to import" << endl;
 	import->set<synthese::FileFormatKey>("Ineo");
@@ -81,11 +81,11 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 
 
 	// STOP1
-	shared_ptr<StopPoint> sp1(new StopPoint);
+	boost::shared_ptr<StopPoint> sp1(new StopPoint);
 	std::cout << "TPU shared_ptr StopPoint 1 instanciated" << endl;
 	
 	// STOP2
-	shared_ptr<StopPoint> sp2(new StopPoint);
+	boost::shared_ptr<StopPoint> sp2(new StopPoint);
 	std::cout << "TPU shared_ptr StopPoint 2 instanciated" << endl;
 
 

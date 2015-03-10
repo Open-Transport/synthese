@@ -43,7 +43,7 @@ const string PORT = "4080";
 class MySQLWithHTTPServerTestBackend : public MySQLTestBackend
 {
 	// XXX plain object?
-	shared_ptr<ScopedModule<ServerModule> > _scopedServerModule;
+	boost::shared_ptr<ScopedModule<ServerModule> > _scopedServerModule;
 
 public:
 	MySQLWithHTTPServerTestBackend()
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(MySQLTrigger)
 	// Check that the object is now in the registry.
 	BOOST_REQUIRE_EQUAL(registry.size(), 1);
 	util::Registry<TestObject>::value_type regValue(*registry.begin());
-	shared_ptr<TestObject> objFromReg = regValue.second;
+	boost::shared_ptr<TestObject> objFromReg = regValue.second;
 
 	cout << " obj key " << objFromReg->getKey() << " name " << objFromReg->getName() << endl;
 	// Object from registry is newly allocated.

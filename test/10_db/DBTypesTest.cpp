@@ -303,7 +303,7 @@ void testTypes(const TestBackend& testBackend)
 			query.addFrameworkField<DateField>(date(2011, 03, 30));
 			query.addFrameworkField<PtimeField>(ptime(date(1995, 12, 07), time_duration(13, 25, 10)));
 
-			shared_ptr<Geometry> geom(CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(6, 10.3));
+			boost::shared_ptr<Geometry> geom(CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(6, 10.3));
 			query.addField(geom);
 
 			query.execute(boost::optional<DBTransaction&>());

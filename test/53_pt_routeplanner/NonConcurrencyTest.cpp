@@ -68,7 +68,7 @@ using namespace boost;
 class TestScheduledService
 {
 private:
-	shared_ptr<ScheduledService> _scheduledService;
+	boost::shared_ptr<ScheduledService> _scheduledService;
 public:
 	TestScheduledService(
 		RegistryKeyType id,
@@ -104,7 +104,7 @@ public:
 class TestContinuousService
 {
 private:
-	shared_ptr<ContinuousService> _continuousService;
+	boost::shared_ptr<ContinuousService> _continuousService;
 public:
 	TestContinuousService(
 		RegistryKeyType id,
@@ -269,10 +269,10 @@ BOOST_AUTO_TEST_CASE (scheduledVSscheduled)
 	//
 
 	// The schedules of the priority line CL1
-	vector<shared_ptr<TestScheduledService> > tssVector;
+	vector<boost::shared_ptr<TestScheduledService> > tssVector;
 	for(time_duration t(0,0,0); t < hours(8); t+=hours(1))
 	{
-		tssVector.push_back(shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
+		tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
 	}
 	// The schedules of the non priority line CL2
 	TestScheduledService tss2(0, "", jp2, time_duration(2,30,0));
@@ -354,12 +354,12 @@ BOOST_AUTO_TEST_CASE (scheduledVScontinuous)
 	cl2.setNonConcurrencyRules(ncrs2);
 	//
 
-	vector<shared_ptr<TestScheduledService> > tssVector;
+	vector<boost::shared_ptr<TestScheduledService> > tssVector;
 	for(time_duration t(0,0,0); t < hours(11); t+=hours(1))
 	{
-		tssVector.push_back(shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
+		tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
 	}
-	tssVector.push_back(shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, time_duration(8,15,0))));
+	tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, time_duration(8, 15, 0))));
 	// The schedules of the non priority continuous line CL2
 	TestContinuousService tcs2(0, "CONT1", jp2, time_duration(2,30,0), time_duration(1,0,0));
 	TestContinuousService tc32(1, "CONT2", jp2, time_duration(4,30,0), time_duration(2,0,0));
@@ -448,12 +448,12 @@ BOOST_AUTO_TEST_CASE (continuousVSscheduled)
 	//
 
 	// The schedules of the priority line SCHED1
-	vector<shared_ptr<TestScheduledService> > tssVector;
+	vector<boost::shared_ptr<TestScheduledService> > tssVector;
 	for(time_duration t(0,0,0); t < hours(11); t+=hours(1))
 	{
-		tssVector.push_back(shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
+		tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, t)));
 	}
-	tssVector.push_back(shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, time_duration(8,15,0))));
+	tssVector.push_back(boost::shared_ptr<TestScheduledService>(new TestScheduledService(0, "", jp1, time_duration(8, 15, 0))));
 	// The schedules of the priority continuous line CONTI1
 	TestContinuousService tcs2(0, "CONT1", jp2, time_duration(2,30,0), time_duration(1,0,0));
 	TestContinuousService tc32(1, "CONT2", jp2, time_duration(4,30,0), time_duration(2,0,0));

@@ -64,59 +64,59 @@ SAVE(City, city38);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Coordinate co10(520000.0,1844000.0);
-Crossing c10(12103423998558210ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co10)));
+Crossing c10(12103423998558210ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co10)));
 SAVE(Crossing, c10);
 
 Coordinate co74(523000.0,1844000.0);
-Crossing c74(12103423998558274ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co74)));
+Crossing c74(12103423998558274ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co74)));
 SAVE(Crossing, c74);
 
 Coordinate co86(523000.0,1845342.0);
-Crossing c86(12103423998558286ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co86)));
+Crossing c86(12103423998558286ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co86)));
 SAVE(Crossing, c86);
 
 Coordinate co88(523000.0,1845342.0);
-Crossing c88(12103423998558288ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co88)));
+Crossing c88(12103423998558288ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co88)));
 SAVE(Crossing, c88);
 
 Coordinate co89(521000.0,1845000.0);
-Crossing c89(12103423998558289ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co89)));
+Crossing c89(12103423998558289ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co89)));
 SAVE(Crossing, c89);
 
 Coordinate co90(528000.0,1844000.0);
-Crossing c90(12103423998558290ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co90)));
+Crossing c90(12103423998558290ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co90)));
 SAVE(Crossing, c90);
 
 Coordinate co91(525000.0,1844000.0);
-Crossing c91(12103423998558291ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co91)));
+Crossing c91(12103423998558291ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co91)));
 SAVE(Crossing, c91);
 
 Coordinate co92(523263.0,1845331.0);
-Crossing c92(12103423998558292ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co92)));
+Crossing c92(12103423998558292ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co92)));
 SAVE(Crossing, c92);
 
 Coordinate co93(523000.0,1845342.0);
-Crossing c93(12103423998558293ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co93)));
+Crossing c93(12103423998558293ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co93)));
 SAVE(Crossing, c93);
 
 Coordinate co94(523000.0,1845342.0);
-Crossing c94(12103423998558294ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co94)));
+Crossing c94(12103423998558294ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co94)));
 SAVE(Crossing, c94);
 
 Coordinate co96(526000.0,1847000.0);
-Crossing c96(12103423998558296ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co96)));
+Crossing c96(12103423998558296ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co96)));
 SAVE(Crossing, c96);
 
 Coordinate co97(523266.0,1845341.0);
-Crossing c97(12103423998558297ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co97)));
+Crossing c97(12103423998558297ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co97)));
 SAVE(Crossing, c97);
 
 Coordinate co98(523000.0,1845342.0);
-Crossing c98(12103423998558298ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co98)));
+Crossing c98(12103423998558298ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co98)));
 SAVE(Crossing, c98);
 
 Coordinate co99(526000.0,1845000.0);
-Crossing c99(12103423998558299ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co99)));
+Crossing c99(12103423998558299ULL, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co99)));
 SAVE(Crossing, c99);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +317,7 @@ StopPoint ps73(
 	3377699720880573ULL,
 	"93/73",
 	&place93,
-	shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops73))
+	boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops73))
 );
 SAVE(StopPoint, ps73);
 ps73.setProjectedPoint(Address(rc89,0));
@@ -342,7 +342,7 @@ StopArea::_addTransferDelay(delays94,562949953421374ULL,3377699720880575ULL,minu
 place94.setTransferDelaysMatrix(delays94);
 
 Coordinate cops75(523000.0,1845000.0);
-StopPoint ps75(3377699720880575ULL,"94/75", &place94, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops75)));
+StopPoint ps75(3377699720880575ULL, "94/75", &place94, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops75)));
 //ps75.setCodeBySource("CTP:StopArea:SPOCE87353573");
 ps75.setProjectedPoint(Address(rc74,0));
 rc74.getFromCrossing()->addReachableVertex(&ps75);
@@ -360,7 +360,7 @@ StopArea::_addTransferDelay(delays95,562949953421397ULL,377699720880576ULL,minut
 place95.setTransferDelaysMatrix(delays94);
 
 Coordinate cops76(523266.0,1845339.0);
-StopPoint ps76(3377699720880576ULL,"95/76", &place95, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops76)));
+StopPoint ps76(3377699720880576ULL, "95/76", &place95, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops76)));
 //ps76.setCodeBySource("CTP:StopArea:SPOCE87611939");
 ps76.setProjectedPoint(Address(rc97,0));
 rc97.getFromCrossing()->addReachableVertex(&ps76);
@@ -375,12 +375,12 @@ place96.setCity(&city38);
 place96.setAllowedConnection(false);
 
 Coordinate cops77(524000.0,1849500.0);
-StopPoint ps77(3377699720880577ULL,"96/77", &place96, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops77)));
+StopPoint ps77(3377699720880577ULL, "96/77", &place96, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops77)));
 SAVE(StopPoint, ps77);
 place96.addPhysicalStop(ps77);
 
 Coordinate cops78(524000.0,1849500.0);
-StopPoint ps78(3377699720880578ULL,"96/78", &place96, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops78)));
+StopPoint ps78(3377699720880578ULL, "96/78", &place96, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops78)));
 SAVE(StopPoint, ps78);
 place96.addPhysicalStop(ps78);
 SAVE(StopArea, place96);
@@ -399,7 +399,7 @@ StopArea::_addTransferDelay(delays97,3377699720880579ULL,562949953421399ULL,minu
 place97.setTransferDelaysMatrix(delays97);
 
 Coordinate cops79(526000,1845000);
-StopPoint ps79(3377699720880579ULL,"97/79", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops79)));
+StopPoint ps79(3377699720880579ULL, "97/79", &place97, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops79)));
 //ps79.setCodeBySource("CTP:StopArea:SPOCE87353599");
 ps79.setProjectedPoint(Address(rc99, 0));
 rc99.getFromCrossing()->addReachableVertex(&ps79);
@@ -407,7 +407,7 @@ SAVE(StopPoint, ps79);
 place97.addPhysicalStop(ps79);
 
 Coordinate cops80(526000.0,1847000.0);
-StopPoint ps80(3377699720880580ULL,"97/80", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops80)));
+StopPoint ps80(3377699720880580ULL, "97/80", &place97, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops80)));
 ps80.setProjectedPoint(Address(rc96,0));
 rc96.getFromCrossing()->addReachableVertex(&ps80);
 SAVE(StopPoint, ps80);
@@ -423,7 +423,7 @@ place98.setAllowedConnection(true);
 /*'562949953421391:3377699720880581:0,562949953421391:3377699720880582:0,3377699720880581:562949953421391:0,3377699720880582:562949953421391:0'*/
 
 Coordinate cops81(525000.0,1844000.0);
-StopPoint ps81(3377699720880581ULL,"98/81", &place98, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops81)));
+StopPoint ps81(3377699720880581ULL, "98/81", &place98, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops81)));
 //ps81.setCodeBySource("CTP:StopArea:SPOCE87353581");
 ps81.setProjectedPoint(Address(rc91,0));
 rc91.getFromCrossing()->addReachableVertex(&ps81);
@@ -431,7 +431,7 @@ SAVE(StopPoint, ps81);
 place98.addPhysicalStop(ps81);
 
 Coordinate cops82(525000.0,1844000.0);
-StopPoint ps82(3377699720880582ULL,"98/82", &place98,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops82)));
+StopPoint ps82(3377699720880582ULL, "98/82", &place98, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops82)));
 SAVE(StopPoint, ps82);
 place98.addPhysicalStop(ps82);
 SAVE(StopArea, place98);
@@ -449,7 +449,7 @@ StopArea::_addTransferDelay(delays99,562949953421390ULL,3377699720880585ULL,minu
 place99.setTransferDelaysMatrix(delays99);
 
 Coordinate cops83(528000.0,1849000.0);
-StopPoint ps83(3377699720880583ULL,"99/83", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops83)));
+StopPoint ps83(3377699720880583ULL, "99/83", &place99, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops83)));
 //ps83.setCodeBySource("CTP:StopArea:SPOCE87611467");
 ps83.setProjectedPoint(Address(rc94,0));
 rc94.getFromCrossing()->addReachableVertex(&ps83);
@@ -457,14 +457,14 @@ SAVE(StopPoint, ps83);
 place99.addPhysicalStop(ps83);
 
 Coordinate cops84(528000.0,1845000.0);
-StopPoint ps84(3377699720880584ULL,"99/84", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops84)));
+StopPoint ps84(3377699720880584ULL, "99/84", &place99, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops84)));
 ps84.setProjectedPoint(Address(rc90,0));
 rc90.getFromCrossing()->addReachableVertex(&ps84);
 SAVE(StopPoint, ps84);
 place99.addPhysicalStop(ps84);
 
 Coordinate cops85(528000.0,1847000.0);
-StopPoint ps85(3377699720880585ULL,"99/85", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops85)));
+StopPoint ps85(3377699720880585ULL, "99/85", &place99, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops85)));
 SAVE(StopPoint, ps85);
 place99.addPhysicalStop(ps85);
 SAVE(StopArea, place99);
@@ -480,7 +480,7 @@ StopArea::_addTransferDelay(delays05,562949953421410ULL,3377699720880586ULL,minu
 place05.setTransferDelaysMatrix(delays05);
 
 Coordinate cops86(520000,1845000.0);
-StopPoint ps86(3377699720880586ULL,"05/86", &place05,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops86)));
+StopPoint ps86(3377699720880586ULL, "05/86", &place05, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops86)));
 ps86.setProjectedPoint(Address(rc10,0));
 rc10.getFromCrossing()->addReachableVertex(&ps86);
 SAVE(StopPoint, ps86);
@@ -495,7 +495,7 @@ place06.setCity(&city54);
 place06.setAllowedConnection(true);
 
 Coordinate cops06(526000,1852000.0);
-StopPoint ps06(3377699720880606ULL,"06", &place06,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops06)));
+StopPoint ps06(3377699720880606ULL, "06", &place06, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops06)));
 SAVE(StopPoint, ps06);
 place06.addPhysicalStop(ps06);
 SAVE(StopArea, place06);
@@ -508,7 +508,7 @@ place07.setCity(&city54);
 place07.setAllowedConnection(true);
 
 Coordinate cops07(523000,1852000.0);
-StopPoint ps07(3377699720880607ULL,"07", &place07,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops07)));
+StopPoint ps07(3377699720880607ULL, "07", &place07, boost::shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops07)));
 SAVE(StopPoint, ps07);
 place07.addPhysicalStop(ps07);
 SAVE(StopArea, place07);

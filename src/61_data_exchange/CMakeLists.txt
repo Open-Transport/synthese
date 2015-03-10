@@ -155,5 +155,5 @@ target_link_libraries(61_data_exchange
 
 install(TARGETS 61_data_exchange DESTINATION lib)
 
-add_subdirectory(testapps/ValidateurTestApp)
+#add_subdirectory(testapps/ValidateurTestApp)
 
