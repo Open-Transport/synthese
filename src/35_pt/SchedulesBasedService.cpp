@@ -1134,43 +1134,36 @@ namespace synthese
 												serviceInstance.getDepartureDateTime() +
 												serviceInstance.getServiceRange() + rule->get<Delay>()
 											);
+
 											if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
 											{
-												time_period timePeriod(
-													serviceInstance.getDepartureDateTime() - rule->get<Delay>(),
-													serviceInstance.getDepartureDateTime() +
-													serviceInstance.getServiceRange() + rule->get<Delay>()
-												);
-												if(excludeRanges.size() && timePeriod.intersects(excludeRanges.back()))
-												{
-													// Merge the last period and the new one. We assume we are always called
-													// in incremental time so the time_periods are sorted
-													excludeRanges[excludeRanges.size()-1] =
-														timePeriod.merge(excludeRanges.back());
-												}
-												else
-												{
-													excludeRanges.push_back(timePeriod);
-												}
+												// Merge the last period and the new one. We assume we are always called
+												// in incremental time so the time_periods are sorted
+												excludeRanges[excludeRanges.size()-1] =
+													timePeriod.merge(excludeRanges.back());
+											}
+											else
+											{
+												excludeRanges.push_back(timePeriod);
+											}
 
-												if ( isContinuous() )
-												{
-													// There maybe some more non concurrent services to record
-													break;
-												} else
-												{
-													// No need to search further for non continuous services
-													_nonConcurrencyCache.insert(
-														make_pair(
-															_NonConcurrencyCache::key_type(
-																&departureEdge,
-																&arrivalEdge,
-																userClassRank,
-																date
-															), excludeRanges
-													)	);
-													return false;
-												}
+											if ( isContinuous() )
+											{
+												// There maybe some more non concurrent services to record
+												break;
+											} else
+											{
+												// No need to search further for non continuous services
+												_nonConcurrencyCache.insert(
+													make_pair(
+														_NonConcurrencyCache::key_type(
+															&departureEdge,
+															&arrivalEdge,
+															userClassRank,
+															date
+														), excludeRanges
+												)	);
+												return false;
 											}
 										}
 									}

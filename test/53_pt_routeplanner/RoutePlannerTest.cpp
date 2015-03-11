@@ -465,23 +465,29 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		PTRoutePlannerResult result(r.run());
 
 		BOOST_CHECK_EQUAL(result.getJourneys().size(), 5);
-std::cout << "TPU nombre de solutions = " << result.getJourneys().size() << std::endl;
+
 		if(result.getJourneys().size() >= 1)
 		{
+			// journey #1 : c88 -> ro41 -> c74 ; ps75 -> li92 -> ps85
 			const Journey& journey(result.getJourneys().at(0));
 			BOOST_CHECK_EQUAL(journey.size(), 2);
 			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+
 			if(journey.size() >= 1)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(0));
+				RoadPath* departureRoadPath = dynamic_cast<RoadPath*>(leg.getDepartureEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey());
 				/* Crossing 88 is the point of departure of the Journey leg. It has no parent path... */
-//				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(departureRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(4) + minutes(10) - minutes(12));
+
+				RoadPath* arrivalRoadPath = dynamic_cast<RoadPath*>(leg.getArrivalEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey());
-				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(arrivalRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(4) + minutes(10) - seconds(44));
 			}
+
 			if(journey.size() >= 2)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(1));
@@ -499,16 +505,21 @@ std::cout << "TPU nombre de solutions = " << result.getJourneys().size() << std:
 			const Journey& journey(result.getJourneys().at(1));
 			BOOST_CHECK_EQUAL(journey.size(), 2);
 			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+
 			if(journey.size() >= 1)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(0));
+				RoadPath* departureRoadPath = dynamic_cast<RoadPath*>(leg.getDepartureEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey());
-				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey());
-				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(5) - minutes(12));
+				BOOST_CHECK_EQUAL(departureRoadPath->getRoad()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(5) - minutes(12));				
+
+				RoadPath* arrivalRoadPath = dynamic_cast<RoadPath*>(leg.getArrivalEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey());
-				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(arrivalRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(5) - seconds(44));
 			}
+
 			if(journey.size() >= 2)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(1));
@@ -526,16 +537,21 @@ std::cout << "TPU nombre de solutions = " << result.getJourneys().size() << std:
 			const Journey& journey(result.getJourneys().at(2));
 			BOOST_CHECK_EQUAL(journey.size(), 2);
 			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+
 			if(journey.size() >= 1)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(0));
+				RoadPath* departureRoadPath = dynamic_cast<RoadPath*>(leg.getDepartureEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey());
-				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(departureRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(9) + minutes(5) - minutes(12));
+
+				RoadPath* arrivalRoadPath = dynamic_cast<RoadPath*>(leg.getArrivalEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey());
-				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(arrivalRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(9) + minutes(5) - seconds(44));
 			}
+
 			if(journey.size() >= 2)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(1));
@@ -553,16 +569,21 @@ std::cout << "TPU nombre de solutions = " << result.getJourneys().size() << std:
 			const Journey& journey(result.getJourneys().at(3));
 			BOOST_CHECK_EQUAL(journey.size(), 2);
 			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(60));
+
 			if(journey.size() >= 1)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(0));
+				RoadPath* departureRoadPath = dynamic_cast<RoadPath*>(leg.getDepartureEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey());
-				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(departureRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(16) + minutes(30) - minutes(12));
+
+				RoadPath* arrivalRoadPath = dynamic_cast<RoadPath*>(leg.getArrivalEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey());
-				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(arrivalRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(16) + minutes(30) - seconds(44));
 			}
+
 			if(journey.size() >= 2)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(1));
@@ -583,11 +604,14 @@ std::cout << "TPU nombre de solutions = " << result.getJourneys().size() << std:
 			if(journey.size() >= 1)
 			{
 				const ServicePointer& leg(journey.getJourneyLeg(0));
+				RoadPath* departureRoadPath = dynamic_cast<RoadPath*>(leg.getDepartureEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey());
-				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(departureRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(10) - minutes(12));
+
+				RoadPath* arrivalRoadPath = dynamic_cast<RoadPath*>(leg.getArrivalEdge()->getParentPath());
 				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey());
-				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey());
+				BOOST_CHECK_EQUAL(arrivalRoadPath->getRoad()->getKey(), ro41.getKey());
 				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(10) - seconds(44));
 			}
 			if(journey.size() >= 2)
@@ -624,7 +648,6 @@ std::cout << "TPU nombre de solutions = " << result.getJourneys().size() << std:
 	}
 
 	{ // 98 -> 99
-
 		PTTimeSlotRoutePlanner r(
 			&place98,
 			&place99,
