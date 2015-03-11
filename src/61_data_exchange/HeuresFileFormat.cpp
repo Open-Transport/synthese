@@ -580,6 +580,7 @@ namespace synthese
 				}
 
 				// Reading of the file
+				size_t fileLineNumber(1);
 				while(getline(inFile, line))
 				{
 					// Vehicle service
@@ -729,7 +730,8 @@ namespace synthese
 							if(it == _routes.end())
 							{
 								_logWarning(
-									"Route not found in service file "+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber)
+									"Route not found in service file "+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber) +
+									" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
 								);
 								for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 								continue;
@@ -743,7 +745,8 @@ namespace synthese
 								if(itS->first.first != route)
 								{
 									_logWarning(
-										"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber)
+										"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber) +
+										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
 									);
 									for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 									continue;
@@ -786,7 +789,8 @@ namespace synthese
 								if(rank >= itS->second.departure.size())
 								{
 									_logWarning(
-										"Inconsistent stops number in troncons file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber
+										"Inconsistent stops number in troncons file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber +
+										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
 									);
 									continue;
 								}
@@ -836,6 +840,8 @@ namespace synthese
 						}
 					}
 					_troncons.insert(make_pair(line.substr(0,6), troncon));
+					
+					fileLineNumber++;
 				}
 
 				// Storage as ScheduledService
