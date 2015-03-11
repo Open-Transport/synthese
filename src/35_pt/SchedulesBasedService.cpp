@@ -838,11 +838,7 @@ namespace synthese
 					}
 					for(; rank<_path->getEdges().size(); ++rank)
 					{
-						Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
-						for(; rank<static_cast<JourneyPattern*>(_path)->getLineStops().size(); ++rank)
-						{
-							result.push_back(NULL);
-						}
+						result.push_back(NULL);
 					}
 				}
 				else

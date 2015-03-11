@@ -633,4 +633,12 @@ namespace synthese
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+		
+		std::string ReservationTableSync::whereClauseDefault() const
+		{
+			stringstream where;
+			ptime now(second_clock::local_time());
+			where << COL_DEPARTURE_TIME << " >= '" << boost::gregorian::to_iso_extended_string(now.date()) << "'";
+			return where.str();
+		}
 }	}

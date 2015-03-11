@@ -231,6 +231,8 @@ namespace synthese
 				boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()
 			);
 
+			~StopArea();
+
 			//! @name Getters
 			//@{
 				const PhysicalStops& getPhysicalStops() const { return _physicalStops; }
@@ -437,6 +439,8 @@ namespace synthese
 				);
 
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+
+				virtual void unlink();
 
 				virtual SubObjects getSubObjects() const;
 

@@ -131,19 +131,19 @@ namespace synthese
 		){
 			if(_name)
 			{
-				_rollingStock->setName(*_name);
+				_rollingStock->set<Name>(*_name);
 			}
 			if(_article)
 			{
-				_rollingStock->setArticle(*_article);
+				_rollingStock->set<Article>(*_article);
 			}
 			if(_CO2Emissions)
 			{
-				_rollingStock->setCO2Emissions(*_CO2Emissions);
+				_rollingStock->set<CO2Emissions>(*_CO2Emissions);
 			}
 			if(_energyConsumption)
 			{
-				_rollingStock->setEnergyConsumption(*_energyConsumption);
+				_rollingStock->set<EnergyConsumption>(*_energyConsumption);
 			}
 
 			// Importable

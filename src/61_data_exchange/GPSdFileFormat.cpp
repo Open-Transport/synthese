@@ -223,15 +223,18 @@ namespace synthese
 						nearestStopPoint = sp.get();
 					}
 				}
-				// if nearestStopPoint differs from previous one, register the time of change of nearestStopPoint
-				// This time is used to compute the onboard advance/delay of the vehicle
-				ptime stopPointFoundTime(second_clock::local_time());
-				if (!VehicleModule::GetCurrentVehiclePosition().getStopPoint()
-					|| (VehicleModule::GetCurrentVehiclePosition().getStopPoint()
-						&& (VehicleModule::GetCurrentVehiclePosition().getStopPoint()->getKey() != nearestStopPoint->getKey())
-					)
-				) {
-					VehicleModule::GetCurrentVehiclePosition().setNextStopFoundTime(stopPointFoundTime);
+                // if nearestStopPoint differs from previous one, register the time of change of nearestStopPoint
+                // This time is used to compute the onboard advance/delay of the vehicle
+				if (nearestStopPoint)
+				{
+					ptime stopPointFoundTime(second_clock::local_time());
+					if (!VehicleModule::GetCurrentVehiclePosition().getStopPoint()
+							|| (VehicleModule::GetCurrentVehiclePosition().getStopPoint()
+								&& (VehicleModule::GetCurrentVehiclePosition().getStopPoint()->getKey() != nearestStopPoint->getKey())
+								)
+					) {
+						VehicleModule::GetCurrentVehiclePosition().setNextStopFoundTime(stopPointFoundTime);
+					}
 				}
 				VehicleModule::GetCurrentVehiclePosition().setStopPoint(nearestStopPoint);
 				// FIXME: Distance should be configurable

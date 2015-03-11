@@ -580,6 +580,7 @@ namespace synthese
 				}
 
 				// Reading of the file
+				size_t fileLineNumber(1);
 				while(getline(inFile, line))
 				{
 					// Vehicle service
@@ -632,13 +633,13 @@ namespace synthese
 
 							const DeadRunRoute& route(it->second);
 							time_duration departureSchedule(
-								lexical_cast<int>(line.substr(i+10, 2)),
-								lexical_cast<int>(line.substr(i+12, 2)),
+								lexical_cast<int>(line.substr(i+15, 2)),
+								lexical_cast<int>(line.substr(i+17, 2)),
 								0
 							);
 							time_duration arrivalSchedule(
-								lexical_cast<int>(line.substr(i+14, 2)),
-								lexical_cast<int>(line.substr(i+16, 2)),
+								lexical_cast<int>(line.substr(i+19, 2)),
+								lexical_cast<int>(line.substr(i+21, 2)),
 								0
 							);
 
@@ -729,21 +730,23 @@ namespace synthese
 							if(it == _routes.end())
 							{
 								_logWarning(
-									"Route not found in service file "+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber)
+									"Route not found in service file "+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber) +
+									" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
 								);
 								for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 								continue;
 							}
 							JourneyPattern* route(it->second);
 
-							string serviceNumber(trim_copy(line.substr(i+6,4)));
+							string serviceNumber(trim_copy(line.substr(i+8,3)));
 							SchedulesMap::iterator itS(services.find(make_pair(route, serviceNumber)));
 							if(itS != services.end())
 							{
 								if(itS->first.first != route)
 								{
 									_logWarning(
-										"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber)
+										"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber) +
+										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
 									);
 									for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 									continue;
@@ -778,7 +781,7 @@ namespace synthese
 							size_t rank(0);
 							bool alreadyNonNull(false);
 							bool alreadyNull(false);
-							for(i+=6; i<line.size() && line[i]!=';'; i+=8, ++rank)
+							for(i+=11; i<line.size() && line[i]!=';'; i+=8, ++rank)
 							{
 								string arrivalSchedule(line.substr(i, 4));
 								string departureSchedule(line.substr(i+4, 4));
@@ -786,7 +789,8 @@ namespace synthese
 								if(rank >= itS->second.departure.size())
 								{
 									_logWarning(
-										"Inconsistent stops number in troncons file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber
+										"Inconsistent stops number in troncons file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber +
+										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
 									);
 									continue;
 								}
@@ -822,7 +826,8 @@ namespace synthese
 									);
 								}
 							}
-							if(!alreadyNull)
+							if(!alreadyNull &&
+								route->getLineStop(rank - 1, true))
 							{
 								tronconElement.endRank = route->getLineStop(rank - 1, true)->get<RankInPath>();
 							}
@@ -835,6 +840,8 @@ namespace synthese
 						}
 					}
 					_troncons.insert(make_pair(line.substr(0,6), troncon));
+					
+					fileLineNumber++;
 				}
 
 				// Storage as ScheduledService

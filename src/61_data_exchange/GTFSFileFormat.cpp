@@ -1312,7 +1312,7 @@ namespace synthese
 
 			bool isReservationMandandatory = false;
 			RollingStock * rs = line->getRollingStock();
-			if ((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) != string::npos)
+			if ((rs != NULL) && (rs->get<IndicatorLabel>()).find(LABEL_TAD) != string::npos)
 				isReservationMandandatory = true;
 
 			_addStopTimes(stopTimesTxt,

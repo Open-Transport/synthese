@@ -370,5 +370,16 @@ namespace synthese
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
+		
+		std::string ReservationTransactionTableSync::whereClauseDefault() const
+		{
+			stringstream where;
+			ptime now(second_clock::local_time());
+			where << TABLE_COL_ID << " in (SELECT " << ReservationTableSync::COL_TRANSACTION_ID <<
+				" FROM " << ReservationTableSync::TABLE.NAME <<
+				" WHERE " << ReservationTableSync::COL_DEPARTURE_TIME << " >= '" << boost::gregorian::to_iso_extended_string(now.date()) <<
+				"'')";
+			return where.str();
+		}
 	}
 }

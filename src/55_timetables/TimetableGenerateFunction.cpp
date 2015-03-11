@@ -1243,7 +1243,7 @@ namespace synthese
 			if(object)
 			{
 				pm.insert(Request::PARAMETER_OBJECT_ID, object->getKey()); //3
-				pm.insert(DATA_ROLLING_STOCK_ALIAS, object->getIndicator()); //4
+				pm.insert(DATA_ROLLING_STOCK_ALIAS, object->get<IndicatorLabel>()); //4
 				pm.insert(DATA_ROLLING_STOCK_NAME, object->getName()); //5
 			}
 
