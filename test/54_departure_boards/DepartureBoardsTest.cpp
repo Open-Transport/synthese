@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	}
 
 	{	// Test case 4
-		// Stops : all stops
+		// Stops : all stops of a1
 		// Size : 2
 		// Algorithm : preselection
 
@@ -324,7 +324,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 		BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp1ser1.getServiceNumber());
 	}
 
-	// Real time update : stop s11 is not served by jp1ser2
+	// Real time update : stop s11 is not served by jp1ser1
 	jp1ser1.setRealTimeVertex(0, NULL);
 
 	{	// Test case 5

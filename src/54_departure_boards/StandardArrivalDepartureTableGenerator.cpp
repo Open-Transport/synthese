@@ -155,26 +155,16 @@ namespace synthese
 									_endDateTimeConcernsTheorical
 							)	);
 
-							// Saves local variables
-							++*index;
-							departureDateTime = servicePointer.getDepartureDateTime();
 							// If no next service was found, then abort the search in the current journey pattern
 							if(	!servicePointer.getService())
 							{
 								break;
 							}
 
-							// Checks if the stop area is really served and if the served stop is allowed
-							if(	_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end()
-							){
-								continue;
-							}
 							// Saves local variables
 							++*index;
 							departureDateTime = servicePointer.getDepartureDateTime();
 
-							// The departure is kept in the results
-							_insert(servicePointer);
 							// Checks if the stop area is really served and if the served stop is allowed
 							if(	_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end()
 							){
@@ -244,15 +234,6 @@ namespace synthese
 							if(	_maxSize && insertedServices >= *_maxSize)
 							{
 								break;
-								// The departure is kept in the results
-								_insert(servicePointer);
-
-								// Checks if the maximal number of results is reached
-								++insertedServices;
-								if(	_maxSize && insertedServices >= *_maxSize)
-								{
-									break;
-								}
 							}
 						}
 					}
