@@ -731,7 +731,8 @@ namespace synthese
 							{
 								_logWarning(
 									"Route not found in service file "+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber) +
-									" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
+									" (troncons line " + lexical_cast<string>(fileLineNumber) + ")" +
+									" in vehicle service " + vehicleServiceCode
 								);
 								for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 								continue;
@@ -746,7 +747,8 @@ namespace synthese
 								{
 									_logWarning(
 										"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber) +
-										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
+										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")" +
+										" in vehicle service " + vehicleServiceCode
 									);
 									for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 									continue;
@@ -790,7 +792,8 @@ namespace synthese
 								{
 									_logWarning(
 										"Inconsistent stops number in troncons file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber +
-										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")"
+										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")" +
+										" in vehicle service " + vehicleServiceCode
 									);
 									continue;
 								}
