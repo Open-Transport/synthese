@@ -26,6 +26,7 @@
 #include "CalendarTemplateElementTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "DBTransaction.hpp"
+#include "DriverServiceTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
 #include "Import.hpp"
 #include "ImportableTableSync.hpp"
@@ -247,6 +248,30 @@ namespace synthese
 			{
 				_env.getEditableRegistry<VehicleService>().remove(vehicleService->getKey());
 			}
+			
+			// Driver services
+			BOOST_FOREACH(const boost::shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
+			{
+				_env.getEditableRegistry<DriverService>().remove(driverService->getKey());
+			}
+			
+			// Driver services without services or without day
+			BOOST_FOREACH(const Registry<DriverService>::value_type& itDriverService, _env.getRegistry<DriverService>())
+			{
+				if(	itDriverService.second->hasLinkWithSource(dataSource) &&
+					(	itDriverService.second->getChunks().empty()
+				)	){
+					shared_ptr<DriverService> driverService(itDriverService.second);
+					_logWarning("removing driver service: " + lexical_cast<string>(driverService->getKey()));
+					_driverServicesToRemove.insert(itDriverService.second);
+				}
+			}
+			
+			// Driver services
+			BOOST_FOREACH(const boost::shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
+			{
+				_env.getEditableRegistry<DriverService>().remove(driverService->getKey());
+			}
 
 			if(_cleanUnusedStops)
 			{
@@ -333,6 +358,16 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_addRemoveQueries( db::DBTransaction& transaction ) const
 		{
+			// Driver services
+			BOOST_FOREACH(const boost::shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
+			{
+				DriverServiceTableSync::Remove(
+					NULL,
+					driverService->getKey(),
+					transaction,
+					false
+				);
+			}
 
 			// Vehicle services
 			BOOST_FOREACH(const boost::shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
