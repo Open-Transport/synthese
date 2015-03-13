@@ -110,6 +110,8 @@ set(data_exchange_SRCS
   VDVServerTableSync.hpp
   VDVStatusService.cpp
   VDVStatusService.hpp
+  VMCVFileFormat.cpp
+  VMCVFileFormat.hpp
   VixV6000FileFormat.cpp
   VixV6000FileFormat.hpp
   vix/VIX-BSC-defines.hpp

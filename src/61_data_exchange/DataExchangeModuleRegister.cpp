@@ -34,6 +34,7 @@
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
 #include "RoadShapeFileFormat.hpp"
+#include "VMCVFileFormat.hpp"
 
 #include "NCEStatusService.hpp"
 #include "PhysicalStopsCSVExportFunction.h"
@@ -108,6 +109,7 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::OSMFileFormat::integrate();
 	synthese::data_exchange::RoadShapeFileFormat::integrate();
 	synthese::data_exchange::IGNstreetsFileFormat::integrate();
+	synthese::data_exchange::VMCVFileFormat::integrate();
 	synthese::data_exchange::CMSExport::integrate();
 	synthese::data_exchange::CMSImport::integrate();
 
