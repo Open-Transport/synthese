@@ -38,6 +38,8 @@
 #include "LineStopTableSync.h"
 #include "PTModule.h"
 #include "PTUseRuleTableSync.h"
+#include "RollingStock.hpp"
+#include "RollingStockTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "StopAreaTableSync.hpp"
 #include "TransportNetwork.h"
@@ -71,6 +73,7 @@ namespace synthese
 	using namespace security;
 	using namespace server;
 	using namespace util;
+	using namespace vehicle;
 
 	namespace util
 	{
@@ -113,6 +116,7 @@ namespace synthese
 		const string IneoFileFormat::Importer_::PARAMETER_STOP_NAME_FIELD = "stop_name_field";
 		const string IneoFileFormat::Importer_::VALUE_LIBP = "LIBP";
 		const string IneoFileFormat::Importer_::VALUE_LIBCOM = "LIBCOM";
+		const string IneoFileFormat::Importer_::VALUE_NAME26 = "NAME26";
 		const string IneoFileFormat::Importer_::PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD = "stop_handicapped_accessibility_field";
 		const string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
 		const string IneoFileFormat::Importer_::PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD = "journey_pattern_line_overload_field";
@@ -588,6 +592,7 @@ namespace synthese
 			else if(key == FILE_LIG)
 			{
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(dataSource, _env);
+				ImportableTableSync::ObjectBySource<RollingStockTableSync> transportModes(dataSource, _env);
 				CommercialLine* line(NULL);
 				Destination* destination(NULL);
 				JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
@@ -595,6 +600,7 @@ namespace synthese
 				string jpName;
 				bool jpWayback(false);
 				string jpKey;
+				RollingStock* transportMode(NULL);
 				string lastStopCode;
 				MetricOffset dst(0);
 				bool atLeastAnInexistantStop(false);
@@ -614,7 +620,7 @@ namespace synthese
 								destination,
 								optional<const RuleUser::Rules&>(),
 								jpWayback,
-								NULL,
+								transportMode,
 								stops,
 								dataSource,
 								true,
@@ -635,6 +641,25 @@ namespace synthese
 						// ID
 						lineId = _getValue("MNLG");
 
+						// Transport mode (can be NULL)
+						string transportModeCode = _getValue("MODE");
+						if (!transportModeCode.empty())
+						{
+							transportMode = _getTransportMode(
+								transportModes,
+								transportModeCode);
+							if (transportMode == NULL)
+							{
+								// not found
+								_logError("The transport mode code " + transportModeCode + " is not registered in the table 49.");
+							}
+						}
+						else
+						{
+							// empty
+							_logError("The transport mode code is empty.");
+						}
+						
 						line = _createOrUpdateLine(
 							lines,
 							lineId,

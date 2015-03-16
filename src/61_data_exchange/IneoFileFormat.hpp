@@ -35,6 +35,7 @@
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "ImportableTableSync.hpp"
+#include "RollingStock.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 
@@ -125,6 +126,7 @@ namespace synthese
 				static const std::string PARAMETER_STOP_NAME_FIELD;
 				static const std::string VALUE_LIBP;
 				static const std::string VALUE_LIBCOM;
+				static const std::string VALUE_NAME26;
 				static const std::string PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD;
 				static const std::string VALUE_UFR;
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
