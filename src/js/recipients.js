@@ -325,10 +325,46 @@ function change_filter_recipient()
   $('#allSectionLaunchFilter').removeClass('disabled');
 }
 
+function filter()
+{
+
+  var text=$(this).val().toUpperCase();
+  var elements=$(this).parent().find('label');
+  if(text != '')
+  {
+    
+    elements.each(function(){
+      var txt = $(this).text().toUpperCase();
+      $(this).parent().removeClass('search-visible');
+      $(this).parent().removeClass('search-invisible');
+      if(txt.indexOf(text) !== -1)
+      {
+        $(this).parentsUntil('div.modal_body').addClass('search-visible');
+      }
+      else
+      {
+        $(this).parent().addClass('search-invisible');
+      }
+    });
+    
+  }
+  else
+  {
+    elements.each(function(){
+      var parent = $(this).parentsUntil('div.modal_body');
+      parent.removeClass('search-visible');
+      parent.removeClass('search-invisible');
+    });
+  }
+  
+}
+
+
 $(function(){
 // DEB AJOUT TERMINUS 2.2
   $('.openclose').click(openclose);
   $('[data-type=show_recipients]').click(print_recipients);
+  $('input[action=search]').keyup(filter);
   $('input[factory]').change(change_filter_recipient);
   $('#mFilters a[factory]').click(show_recipients_click);
 });
