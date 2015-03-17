@@ -432,6 +432,14 @@
 		   <input type="text" name="actionParam_field_color" value="<@color@>" />
 		  </div>
 		 </div><div class="control-group">
+		  <label class="control-label">Activation automatique des messages ?</label>
+		  <div class="controls">
+		   <select name="actionParam_field_auto_activation">
+		    <option value="0" <?if&cond=<@auto_activation@>&else=selected="true"?>>Non</option>
+		    <option value="1" <?if&cond=<@auto_activation@>&then=selected="true"?>>Oui</option>
+		   </select>
+		  </div>
+		 </div><div class="control-group">
 		  <div class="controls">
 		   <button type="submit" class="btn btn-warning">Enregistrer</button>
 		  </div>
