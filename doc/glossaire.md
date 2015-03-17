@@ -102,12 +102,15 @@ Autre mot pour **évènement**, plutôt employé côté implémentation.
 
 ----------
 ### Section   
-Un regroupement logique de **messages** destiné à une unité
+Un regroupement logique d'**evenements** destiné à une unité
 d'exploitation specifique, et donc suivant une politique de droits
 d'accès appropriée.
 
 Les sections sont organisées à plat, pas de niveau hiérarchique.
-Un **message** peut etre actif sur plusieurs sections à la fois.
+Un **evenement** peut etre actif sur plusieurs sections à la fois.
+
+A noter qu'un **message** a également un section (une seule) qui correspond 
+à la section depuis laquelle il a été créé.
 
 La politique de droits est definie via le mecanisme classique de
 Synthese (user/rights dans admin).
