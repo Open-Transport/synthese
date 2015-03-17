@@ -22,8 +22,11 @@
 
 #include "MessagesModule.h"
 
+#include "AlarmObjectLink.h"
 #include "BroadcastPoint.hpp"
+#include "CommercialLine.h"
 #include "Env.h"
+#include "MessagesSection.hpp"
 #include "SentScenario.h"
 #include "ServerModule.h"
 #include "ScenarioTemplate.h"
@@ -32,8 +35,6 @@
 #include "ScenarioFolderTableSync.h"
 #include "TextTemplateTableSync.h"
 #include "TextTemplate.h"
-#include "CommercialLine.h"
-#include "AlarmObjectLink.h"
 
 #include <boost/foreach.hpp>
 
@@ -66,6 +67,10 @@ namespace synthese
 				&MessagesModule::MessagesActivationThread,
 				"MessageActivation"
 			);
+			ServerModule::AddThread(
+				&MessagesModule::ScenariiActivationThread,
+				"ScenariiActivation"
+			);
 		}
 
 		template<> void ModuleClassTemplate<MessagesModule>::Start()
@@ -94,6 +99,7 @@ namespace synthese
 		MessagesModule::ActivatedMessages MessagesModule::_activatedMessages;
 		boost::mutex MessagesModule::_activatedMessagesMutex;
 		long MessagesModule::_lastMinute(60);
+		long MessagesModule::_lastMinuteScenario(60);
 
 		MessagesModule::Labels MessagesModule::GetScenarioTemplatesLabels(
 			string withAllLabel,
@@ -251,6 +257,34 @@ namespace synthese
 			}
 
 		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		/// This thread updates every minute the list of enabled scenarii.
+		void MessagesModule::ScenariiActivationThread()
+		{
+			while(true)
+			{
+				// Check if a new minute has begun
+				ptime now(second_clock::local_time());
+				if(now.time_of_day().minutes() != _lastMinuteScenario)
+				{
+					// Change the thread status
+					ServerModule::SetCurrentThreadRunningAction();
+
+					// Update the enabled scenarii
+					UpdateEnabledScenarii();
+
+					// Update the last seconds cache
+					_lastMinuteScenario = now.time_of_day().minutes();
+
+					// Change the thread status
+					ServerModule::SetCurrentThreadWaiting();
+				}
+
+				// Wait 500 ms
+				this_thread::sleep(milliseconds(500));
+			}
+		}
 
 
 
@@ -336,6 +370,75 @@ namespace synthese
 					bp->onDisplayEnd(*sentMessage);
 				}
 			}
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		/// Updates the enabled scenarii
+		void MessagesModule::UpdateEnabledScenarii()
+		{
+			// Loop on all sent scenarii
+			ScenarioTableSync::SearchResult scenarios;
+
+			scenarios = ScenarioTableSync::SearchSentScenarios(
+				Env::GetOfficialEnv(),
+				boost::optional<std::string>()
+			);
+			BOOST_FOREACH(const boost::shared_ptr<Scenario>& scenario, scenarios)
+			{
+				if(!dynamic_cast<const SentScenario*>(scenario.get()))
+				{
+					continue;
+				}
+				SentScenario* sscenario = static_cast<const SentScenario*>(scenario.get());
+				if (enableScenarioIfAutoActivation(sscenario))
+				{
+					ScenarioTableSync::Save(sscenario);
+				}
+			}
+		}
+		
+		bool MessagesModule::_enableScenarioIfAutoActivation( SentScenario* sscenario )
+		{
+			// Is the scenario associated to an auto_activation section ?
+			bool autoChange(false);
+			BOOST_FOREACH(const Scenario::Sections::value_type& section, sscenario->getSections())
+			{
+				if (section->get<AutoActivation>())
+				{
+					autoChange = true;
+					break;
+				}
+			}
+
+			if (autoChange)
+			{
+				ptime now(second_clock::local_time());
+				bool shouldBeEnabled(false);
+				BOOST_FOREACH(const ScenarioCalendar* calendar, sscenario->getCalendars())
+				{
+					BOOST_FOREACH( const ScenarioCalendar::ApplicationPeriods::value_type& period, calendar->getApplicationPeriods() )
+					{
+						if(period->getValue(now))
+						{
+							shouldBeEnabled = true;
+							break;
+						}
+					}
+				}
+
+				if (shouldBeEnabled && !sscenario->getIsEnabled())
+				{
+					sscenario->setIsEnabled(true);
+					return true;
+				}
+				if (!shouldBeEnabled && sscenario->getIsEnabled())
+				{
+					sscenario->setIsEnabled(false);
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 
