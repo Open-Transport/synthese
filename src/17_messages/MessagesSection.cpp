@@ -31,6 +31,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_OBJECT(messages::MessagesSection, "messages_section_id", "messages_section_ids")
 
 	FIELD_DEFINITION_OF_TYPE(Color, "color", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(AutoActivation, "auto_activation", SQL_BOOLEAN)
 
 	using namespace db;
 	
@@ -45,7 +46,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_VALUE_CONSTRUCTOR(Rank, 0),
 					FIELD_DEFAULT_CONSTRUCTOR(Code),
-					FIELD_DEFAULT_CONSTRUCTOR(Color)
+					FIELD_DEFAULT_CONSTRUCTOR(Color),
+					FIELD_VALUE_CONSTRUCTOR(AutoActivation, false)
 			)	)
 		{}
 

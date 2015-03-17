@@ -32,6 +32,7 @@
 namespace synthese
 {
 	FIELD_STRING(Color)
+	FIELD_BOOL(AutoActivation)
 
 	namespace messages
 	{
@@ -40,7 +41,8 @@ namespace synthese
 			FIELD(Name),
 			FIELD(Rank),
 			FIELD(Code),
-			FIELD(Color)
+			FIELD(Color),
+			FIELD(AutoActivation)
 		> MessagesSectionRecord;
 
 

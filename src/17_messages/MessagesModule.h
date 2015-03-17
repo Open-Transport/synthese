@@ -31,6 +31,7 @@
 #include <vector>
 #include <string>
 #include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <boost/thread/mutex.hpp>
 
 namespace synthese
@@ -69,6 +70,8 @@ namespace synthese
 	{
 		class BroadcastPoint;
 		class SentAlarm;
+		class Alarm;
+		class SentScenario;
 
 		/** 17 Messages module class.
 		*/
@@ -76,31 +79,32 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
-			typedef std::set<boost::shared_ptr<SentAlarm> > ActivatedMessages;
+			struct SentAlarmLess : public std::binary_function<boost::shared_ptr<SentAlarm>, boost::shared_ptr<SentAlarm>, bool>
+			{
+				//////////////////////////////////////////////////////////////////////////
+				/// Order by decreasing priority level, then by line number, then by start date, then by address
+				bool operator()(boost::shared_ptr<SentAlarm> left, boost::shared_ptr<SentAlarm> right) const;
+			};
+			typedef std::set<boost::shared_ptr<SentAlarm>, SentAlarmLess> ActivatedMessages;
 
 		private:
 			static ActivatedMessages _activatedMessages;
 			static boost::mutex _activatedMessagesMutex;
 			static long _lastMinute;
+			static long _lastMinuteScenario;
+
+			static bool _selectMessagesToActivate(const Alarm& object);
+			static bool _selectSentAlarm(const Alarm& object);
+			static bool _enableScenarioIfAutoActivation(SentScenario* sscenario);
 
 		public:
 			static void UpdateActivatedMessages();
+			static void UpdateEnabledScenarii();
 
 			static ActivatedMessages GetActivatedMessages(
 				const BroadcastPoint& broadcastPoint,
 				const util::ParametersMap& parameters
 			);
-
-			struct SentAlarmLess : public std::binary_function<SentAlarm*, SentAlarm*, bool>
-			{
-				//////////////////////////////////////////////////////////////////////////
-				/// Order by decreasing priority level, then by start date, then by address
-				/// NULL addresses are forbidden
-				bool operator()(SentAlarm* left, SentAlarm* right) const;
-			};
-
-
-
 
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
@@ -149,6 +153,8 @@ namespace synthese
 			static std::string							getLevelLabel(const AlarmLevel& level);
 
 			static void MessagesActivationThread();
+
+			static void ScenariiActivationThread();
 
 			static void ClearAllBroadcastCaches();
 		};
