@@ -17,7 +17,7 @@
   .active .close_tab { display:inline-block; }
   .openclose { cursor:pointer; }
   .search-invisible { display:none; }
-  .search-visible { display:block !important; }
+  .search-visible { display:block }
   label.checkbox { display:inline-block !important; }
 </style>
 <ul class="breadcrumb">
