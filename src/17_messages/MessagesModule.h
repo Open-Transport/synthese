@@ -70,6 +70,7 @@ namespace synthese
 		class BroadcastPoint;
 		class SentAlarm;
 		class Alarm;
+		class SentScenario;
 
 		/** 17 Messages module class.
 		*/
@@ -89,12 +90,15 @@ namespace synthese
 			static ActivatedMessages _activatedMessages;
 			static boost::mutex _activatedMessagesMutex;
 			static long _lastMinute;
+			static long _lastMinuteScenario;
 
 			static bool _selectMessagesToActivate(const Alarm& object);
 			static bool _selectSentAlarm(const Alarm& object);
+			static bool _enableScenarioIfAutoActivation(SentScenario* sscenario);
 
 		public:
 			static void UpdateActivatedMessages();
+			static void UpdateEnabledScenarii();
 
 			static ActivatedMessages GetActivatedMessages(
 				const BroadcastPoint& broadcastPoint,
@@ -148,6 +152,8 @@ namespace synthese
 			static std::string							getLevelLabel(const AlarmLevel& level);
 
 			static void MessagesActivationThread();
+
+			static void ScenariiActivationThread();
 
 			static void ClearAllBroadcastCaches();
 		};
