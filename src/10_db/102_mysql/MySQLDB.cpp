@@ -165,10 +165,21 @@ namespace synthese
 			initForStandaloneUse();
 
 			// TODO: is the thread deleted properly on module unload?
-			//server::ServerModule::AddThread(
-			//	bind(&MySQLDB::_modifEventsDispatcherThread, this),
-			//	"MySQL db modification events dispatcher"
-			//);
+			if (_modifEventsThread)
+			{
+				server::ServerModule::KillThread(
+					lexical_cast<string>(_modifEventsThread->get_id()),
+					false
+				);
+				// The modifEvents thread might throw an exception if it is killed after
+				// this object is destroyed. Sleeping here should help with that issue.
+				// FIXME: however it seems to still fail sometimes, a better solution is needed.
+				util::Thread::Sleep(200);
+			}
+			_modifEventsThread = server::ServerModule::AddThread(
+				bind(&MySQLDB::_modifEventsDispatcherThread, this),
+				"MySQL db modification events dispatcher"
+			);
 
 			DB::preInit();
 		}
