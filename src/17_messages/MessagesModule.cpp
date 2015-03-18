@@ -389,7 +389,7 @@ namespace synthese
 				{
 					continue;
 				}
-				SentScenario* sscenario = static_cast<const SentScenario*>(scenario.get());
+				SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
 				if (_enableScenarioIfAutoActivation(sscenario))
 				{
 					ScenarioTableSync::Save(sscenario);
