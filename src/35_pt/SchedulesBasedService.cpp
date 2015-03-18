@@ -1147,24 +1147,6 @@ namespace synthese
 												excludeRanges.push_back(timePeriod);
 											}
 
-											if ( isContinuous() )
-											{
-												// There maybe some more non concurrent services to record
-												break;
-											} else
-											{
-												// No need to search further for non continuous services
-												_nonConcurrencyCache.insert(
-													make_pair(
-														_NonConcurrencyCache::key_type(
-															&departureEdge,
-															&arrivalEdge,
-															userClassRank,
-															date
-														), excludeRanges
-												)	);
-												return false;
-											}
 										}
 									}
 								}
