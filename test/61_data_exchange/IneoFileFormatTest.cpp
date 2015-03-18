@@ -68,6 +68,9 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 	
 	Env& env(Env::GetOfficialEnv());
 
+    boost::shared_ptr<TransportNetwork> transportNetwork(new TransportNetwork(6192449487677434ULL,
+                                                                              "transportNetwork"));
+	env.getEditableRegistry<TransportNetwork>().add(transportNetwork);
 	boost::shared_ptr<DataSource> ds(new DataSource(16607027920896001));
 	env.getEditableRegistry<DataSource>().add(ds);
 
@@ -84,6 +87,7 @@ BOOST_AUTO_TEST_CASE (testIneoFileFormat)
 
 	ParametersMap map;
 	string ineoFilePattern(INEO_FILE_PATTERN);
+	map.insert(IneoFileFormat::Importer_::PARAMETER_NETWORK_ID, 6192449487677434ULL);
 	map.insert("pa" + IneoFileFormat::Importer_::FILE_PNT, ineoFilePattern + ".pnt");
 	map.insert("pa" + IneoFileFormat::Importer_::FILE_PTF, ineoFilePattern + ".ptf");
 	map.insert("pa" + IneoFileFormat::Importer_::FILE_DIS, ineoFilePattern + ".dis");
