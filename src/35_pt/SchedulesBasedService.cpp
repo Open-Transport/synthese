@@ -1904,6 +1904,7 @@ namespace synthese
 
 
 
+		// @FIXME: Should also return true if there is a RealTimeVertex change
 		bool SchedulesBasedService::hasRealTimeData() const
 		{
 			return !_RTArrivalSchedules.empty();
