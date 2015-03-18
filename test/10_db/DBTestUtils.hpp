@@ -116,7 +116,7 @@ public:
 
 	MySQLTestBackend()
 	{
-		std::string params = "host=localhost,user=synthese,passwd=synthese";
+		std::string params = "host=127.0.0.1,user=synthese,passwd=synthese";
 		if (getenv("SYNTHESE_MYSQL_PARAMS"))
 			params = getenv("SYNTHESE_MYSQL_PARAMS");
 
