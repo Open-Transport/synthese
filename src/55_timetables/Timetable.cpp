@@ -82,6 +82,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(IgnoreEmptyRows, false),
 					FIELD_VALUE_CONSTRUCTOR(Compression, false)
 			)	),
+            _contentType(CONTAINER),
 			_mergeColsWithSameTimetables(true)
 		{}
 
