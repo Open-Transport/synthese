@@ -706,6 +706,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "Arrêts"));
 			h.push_back(make_pair(string(), "Long."));
 			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("/admin/img/car.png", "Services")));
+			h.push_back(make_pair(string(), "Principal"));
 			h.push_back(make_pair(string(), "Source"));
 			h.push_back(make_pair(string(), "Actions"));
 
@@ -799,6 +800,10 @@ namespace synthese
 					servicesNumber += subline->getServices().size();
 				}
 				stream << servicesNumber;
+
+				// Is Main line
+				stream << t.col();
+				stream << (line->getMain() ? "OUI" : "NON");
 
 				// Datasource
 				stream << t.col();
