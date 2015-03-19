@@ -507,7 +507,7 @@ namespace synthese
 							}
 							else
 							{
-								_logWarning("Stop "+ stopNumber +" was not found.");
+								_logWarning("Route " + routeNumber + ": origin " + stopNumber + " is an unknown stop/depot.");
 								continue;
 							}
 						}
@@ -526,7 +526,7 @@ namespace synthese
 							}
 							else
 							{
-								_logWarning("Stop "+ stopNumber +" was not found.");
+								_logWarning("Route " + routeNumber + ": destination " + stopNumber + " is an unknown " + (route.depotToStop ? "stop." : "depot."));
 								continue;
 							}
 
@@ -746,9 +746,9 @@ namespace synthese
 								if(itS->first.first != route)
 								{
 									_logWarning(
-										"Inconsistent route in service file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ lexical_cast<string>(routeNumber) +
-										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")" +
-										" in vehicle service " + vehicleServiceCode
+										"Inconsistent route in troncons file at l" + lexical_cast<string>(fileLineNumber) + "c" + lexical_cast<string>(i) +
+										": service number=" + serviceNumber + ", line number=" + lexical_cast<string>(lineNumber) +
+										", route number="+ lexical_cast<string>(routeNumber) + ", vehicle service=" + vehicleServiceCode
 									);
 									for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 									continue;
@@ -791,10 +791,12 @@ namespace synthese
 								if(rank >= itS->second.departure.size())
 								{
 									_logWarning(
-										"Inconsistent stops number in troncons file "+ serviceNumber +"/"+ lexical_cast<string>(lineNumber) +"/"+ routeNumber +
-										" (troncons line " + lexical_cast<string>(fileLineNumber) + ")" +
-										" in vehicle service " + vehicleServiceCode
+										"Inconsistent stops number in troncons file at l" + lexical_cast<string>(fileLineNumber) + "c" + lexical_cast<string>(i) +
+										": service=" + serviceNumber + ", line=" + lexical_cast<string>(lineNumber) + ", route="+ lexical_cast<string>(routeNumber) +
+										", vehicle service " + vehicleServiceCode +
+										" => expected " + lexical_cast<string>(itS->second.departure.size()) + " schedules"
 									);
+
 									continue;
 								}
 
