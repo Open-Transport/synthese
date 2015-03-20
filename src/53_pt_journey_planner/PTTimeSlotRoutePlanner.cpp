@@ -80,8 +80,12 @@ namespace synthese
 			bool enableRealTime,
 			graph::UseRule::ReservationDelayType reservationRulesDelayType
 		):  TimeSlotRoutePlanner(
-			origin->getVertexAccessMap(accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0),
-			destination->getVertexAccessMap(accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0),
+			origin->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
+			destination->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
 			lowerDepartureTime, higherDepartureTime,
 			lowerArrivalTime, higherArrivalTime,
 			PTModule::GRAPH_ID,
@@ -130,8 +134,12 @@ namespace synthese
 			bool enableRealTime,
 			UseRule::ReservationDelayType reservationRulesDelayType
 		): TimeSlotRoutePlanner(
-			origin->getVertexAccessMap(accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0),
-			destination->getVertexAccessMap(accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0),
+			origin->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
+			destination->getVertexAccessMap(
+				accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+			),
 			lowerDepartureTime, higherDepartureTime,
 			lowerArrivalTime, higherArrivalTime,
 			PTModule::GRAPH_ID,
@@ -393,10 +401,10 @@ namespace synthese
 			// for better accuracy it should be defined per StopArea in t007_connection_places
 			long PARKING_TIME = 5;
 
-			ptime ptLowestDepartureTime  = getLowestDepartureTime();
+			ptime ptLowestDepartureTime = getLowestDepartureTime();
 			ptime ptHighestDepartureTime = getHighestDepartureTime();
-			ptime ptLowestArrivalTime    = getLowestArrivalTime();
-			ptime ptHighestArrivalTime   = getHighestArrivalTime();
+			ptime ptLowestArrivalTime = getLowestArrivalTime();
+			ptime ptHighestArrivalTime = getHighestArrivalTime();
 
 			const Place* ptDeparturePlace = _departurePlace;
 			const Place* ptArrivalPlace   = _arrivalPlace;

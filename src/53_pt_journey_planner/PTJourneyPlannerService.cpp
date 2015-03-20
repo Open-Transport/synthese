@@ -153,8 +153,8 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_TEXT = "arrival_parking_text";
 		const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PARKING_XY = "departure_parking_xy";
 		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_XY = "arrival_parking_xy";
-        const string PTJourneyPlannerService::PARAMETER_START_WITH_CAR = "start_with_car";
-        const string PTJourneyPlannerService::PARAMETER_END_WITH_CAR = "end_with_car";
+		const string PTJourneyPlannerService::PARAMETER_START_WITH_CAR = "start_with_car";
+		const string PTJourneyPlannerService::PARAMETER_END_WITH_CAR = "end_with_car";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -305,9 +305,9 @@ namespace synthese
 			_period(NULL),
 			_logger(new AlgorithmLogger()),
 			_broadcastPoint(NULL),
-            _page(NULL),
-            _startWithCar(false),
-            _endWithCar(false)
+			_page(NULL),
+			_startWithCar(false),
+			_endWithCar(false)
 		{}
 
 
@@ -654,32 +654,32 @@ namespace synthese
 						placesListService.setNumber(1);
 						placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                        // Departure
-                        placesListService.setText(_originParkingText);
-                        _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
-                            placesListService.runWithoutOutput()
-                        );
+						// Departure
+						placesListService.setText(_originParkingText);
+						_departure_parking.placeResult = placesListService.getPlaceFromBestResult(
+							placesListService.runWithoutOutput()
+						);
 
-                        // The journey is mixed mode and starts with car
-                        _startWithCar = true;
-                    }
-                }
-                // XY input
-                else if(
-                    map.isDefined(PARAMETER_DEPARTURE_PARKING_XY)
-                ){
-                    PlacesListService placesListService;
-                    placesListService.setNumber(1);
-                    placesListService.setCoordinatesSystem(_coordinatesSystem);
+						// The journey is mixed mode and starts with car
+						_startWithCar = true;
+					}
+				}
+				// XY input
+				else if(
+					map.isDefined(PARAMETER_DEPARTURE_PARKING_XY)
+				){
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                    placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
-                    _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
-                        placesListService.runWithoutOutput()
-                    );
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
+					_departure_parking.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
 
-                    // The journey is mixed mode and starts with car
-                    _startWithCar = true;
-                }
+					// The journey is mixed mode and starts with car
+					_startWithCar = true;
+				}
 
 				// Destination parking
 				// One field input
@@ -693,39 +693,39 @@ namespace synthese
 						placesListService.setNumber(1);
 						placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                        // Arrival
-                        placesListService.setText(_destinationParkingText);
-                        _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
-                            placesListService.runWithoutOutput()
-                        );
+						// Arrival
+						placesListService.setText(_destinationParkingText);
+						_arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
+							placesListService.runWithoutOutput()
+						);
 
-                        // The journey is mixed mode and ends with car
-                        _endWithCar = true;
-                    }
-                }
-                // XY input
-                else if(
-                    map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)
-                ){
-                    PlacesListService placesListService;
-                    placesListService.setNumber(1);
-                    placesListService.setCoordinatesSystem(_coordinatesSystem);
+						// The journey is mixed mode and ends with car
+						_endWithCar = true;
+					}
+				}
+				// XY input
+				else if(
+					map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)
+				){
+					PlacesListService placesListService;
+					placesListService.setNumber(1);
+					placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-                    placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
-                    _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
-                        placesListService.runWithoutOutput()
-                    );
+					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
+					_arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
+						placesListService.runWithoutOutput()
+					);
 
-                    // The journey is mixed mode and ends with car
-                    _endWithCar = true;
-                }
+					// The journey is mixed mode and ends with car
+					_endWithCar = true;
+				}
 			}
 
-            if(_startWithCar && _endWithCar)
-            {
-                // This configuration is not supported by the algorithm: throw an exception
-                throw RequestException("Cannot both start AND end a journey using car");
-            }
+			if(_startWithCar && _endWithCar)
+			{
+				// This configuration is not supported by the algorithm: throw an exception
+				throw RequestException("Cannot both start AND end a journey using car");
+			}
 
 			// If the start/end of the journey uses the car and the departure/arrival place is empty
 			// the route planner may fail so we try to guess the most likely departure/arrival place
@@ -1053,8 +1053,8 @@ namespace synthese
 						_arrival_place.placeResult.value.get(),
 						_departure_parking.placeResult.value.get(),
 						_arrival_parking.placeResult.value.get(),
-                        _startWithCar,
-                        _endWithCar,
+						_startWithCar,
+						_endWithCar,
 						startDate,
 						endDate,
 						startArrivalDate,
@@ -1065,7 +1065,7 @@ namespace synthese
 						false,
 						*_logger,
 						_maxTransferDuration,
-                        _minMaxDurationRatioFilter
+						_minMaxDurationRatioFilter
 					);
 					_result.reset(new PTRoutePlannerResult(r.run()));
 					if (_result->getJourneys().size() > 0)
@@ -1080,9 +1080,9 @@ namespace synthese
 					_arrival_place.placeResult.value.get(),
 					_departure_parking.placeResult.value.get(),
 					_arrival_parking.placeResult.value.get(),
-                    _startWithCar,
-                    _endWithCar,
-                    startDate,
+					_startWithCar,
+					_endWithCar,
+					startDate,
 					endDate,
 					startArrivalDate,
 					endArrivalDate,
@@ -1092,7 +1092,7 @@ namespace synthese
 					false,
 					*_logger,
 					_maxTransferDuration,
-                    _minMaxDurationRatioFilter
+					_minMaxDurationRatioFilter
 				);
 				// Computing
 				_result.reset(new PTRoutePlannerResult(r.run()));

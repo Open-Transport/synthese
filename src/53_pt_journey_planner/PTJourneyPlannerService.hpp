@@ -150,8 +150,8 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_PARKING_TEXT;
 			static const std::string PARAMETER_DEPARTURE_PARKING_XY;
 			static const std::string PARAMETER_ARRIVAL_PARKING_XY;
-            static const std::string PARAMETER_START_WITH_CAR;
-            static const std::string PARAMETER_END_WITH_CAR;
+			static const std::string PARAMETER_START_WITH_CAR;
+			static const std::string PARAMETER_END_WITH_CAR;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
@@ -341,22 +341,22 @@ namespace synthese
 				const pt_website::HourPeriod*				_period;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
-                bool						_outputRoadApproachDetail;
-                bool						_showResTab;
-                bool						_showCoords;
-                const CoordinatesSystem*			_coordinatesSystem;
+				bool										_outputRoadApproachDetail;
+				bool										_showResTab;
+				bool										_showCoords;
+				const CoordinatesSystem*					_coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
-                boost::optional<double>				_minMaxDurationRatioFilter;
+				boost::optional<double>						_minMaxDurationRatioFilter;
 				boost::optional<boost::posix_time::time_duration> _minWaitingTimeFilter;
-                bool						_fareCalculation;
-                boost::shared_ptr<algorithm::AlgorithmLogger>	_logger;
-                std::string		    			_outputFormat;
+				bool										_fareCalculation;
+				boost::shared_ptr<algorithm::AlgorithmLogger>	_logger;
+				std::string									_outputFormat;
 				boost::shared_ptr<const pt_website::PTServiceConfig>	_configuration;
-                bool						_concatenateContiguousFootLegs;
-                vector<string>					_vectMad;
-                const messages::CustomBroadcastPoint*		_broadcastPoint;
-                bool						_startWithCar;
-                bool						_endWithCar;
+				bool										_concatenateContiguousFootLegs;
+				vector<string>								_vectMad;
+				const messages::CustomBroadcastPoint*		_broadcastPoint;
+				bool										_startWithCar;
+				bool										_endWithCar;
 			//@}
 
 			//! @name Pages
@@ -503,12 +503,12 @@ namespace synthese
 			/// @param isItLastRow (1) Is the cell the last departure or arrival ?
 			/// @param columnNumber (2) Rank of the column from left to right
 			/// @param isItFootLine (3) Is the cell on a pedestrian junction ?
-            /// @param isItCarLine (4) Is the cell on a leg using car ?
-            /// @param firstTime (5) Start of continuous service, Time else
-            /// @param lastTime (6) End of continuous service, Time else
-            /// @param isItContinuousService (7) Is the cell on a continuous service ?
-            /// @param isFirstWriting (8) Is it the first time that we write on the column ?
-            /// @param isLastWriting (9) Is it the last time that we write on the column ?
+			/// @param isItCarLine (4) Is the cell on a leg using car ?
+			/// @param firstTime (5) Start of continuous service, Time else
+			/// @param lastTime (6) End of continuous service, Time else
+			/// @param isItContinuousService (7) Is the cell on a continuous service ?
+			/// @param isFirstWriting (8) Is it the first time that we write on the column ?
+			/// @param isLastWriting (9) Is it the last time that we write on the column ?
 			void _displayScheduleCell(
 				util::ParametersMap& pm,
 				size_t columnNumber,
