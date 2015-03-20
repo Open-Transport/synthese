@@ -153,6 +153,8 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_TEXT = "arrival_parking_text";
 		const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PARKING_XY = "departure_parking_xy";
 		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PARKING_XY = "arrival_parking_xy";
+        const string PTJourneyPlannerService::PARAMETER_START_WITH_CAR = "start_with_car";
+        const string PTJourneyPlannerService::PARAMETER_END_WITH_CAR = "end_with_car";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -303,7 +305,9 @@ namespace synthese
 			_period(NULL),
 			_logger(new AlgorithmLogger()),
 			_broadcastPoint(NULL),
-			_page(NULL)
+            _page(NULL),
+            _startWithCar(false),
+            _endWithCar(false)
 		{}
 
 
@@ -378,6 +382,18 @@ namespace synthese
 						dynamic_cast<City*>(_arrival_place.placeResult.value.get())->getName()
 					);
 				}
+			}
+
+			// Start journey using car
+			if(_startWithCar)
+			{
+				map.insert(PARAMETER_START_WITH_CAR, _startWithCar);
+			}
+
+			// End journey using car
+			if(_endWithCar)
+			{
+				map.insert(PARAMETER_END_WITH_CAR, _endWithCar);
 			}
 
 			// Departure parking
@@ -539,15 +555,6 @@ namespace synthese
 								_configuration->extendedFetchPlace(_originCityText, _originPlaceText) :
 								RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
 							;
-							if(((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_XY) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY)).empty())) &&
-								_originPlaceText.empty() && dynamic_pointer_cast<City, Place>(_departure_place.placeResult.value))
-							{
-								const City* originCity(_departure_place.cityResult.value.get());
-								computeDeparturePlace(originCity);
-							}
 						}
 					}
 				}
@@ -600,15 +607,6 @@ namespace synthese
 								_configuration->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
 								RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
 							;
-							if(((map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_DEPARTURE_PARKING_XY) && !(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_TEXT) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_TEXT)).empty()) ||
-								(map.isDefined(PARAMETER_ARRIVAL_PARKING_XY) && !(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY)).empty())) &&
-								_destinationPlaceText.empty() && dynamic_pointer_cast<City, Place>(_arrival_place.placeResult.value))
-							{
-								const City* destinationCity(_arrival_place.cityResult.value.get());
-								computeArrivalPlace(destinationCity);
-							}
 						}
 					}
 				}
@@ -640,6 +638,10 @@ namespace synthese
 					);
 				}
 
+				// Mixed mode behaviour : start OR end journey using car
+				_startWithCar = map.getDefault<bool>(PARAMETER_START_WITH_CAR, false);
+				_endWithCar = map.getDefault<bool>(PARAMETER_END_WITH_CAR, false);
+
 				// Departure parking
 				// One field input
 				if(map.isDefined(PARAMETER_DEPARTURE_PARKING_TEXT))
@@ -652,26 +654,32 @@ namespace synthese
 						placesListService.setNumber(1);
 						placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-						// Departure
-						placesListService.setText(_originParkingText);
-						_departure_parking.placeResult = placesListService.getPlaceFromBestResult(
-							placesListService.runWithoutOutput()
-						);
-					}
-				}
-				// XY input
-				else if(
-					map.isDefined(PARAMETER_DEPARTURE_PARKING_XY)
-				){
-					PlacesListService placesListService;
-					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem);
+                        // Departure
+                        placesListService.setText(_originParkingText);
+                        _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
+                            placesListService.runWithoutOutput()
+                        );
 
-					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
-					_departure_parking.placeResult = placesListService.getPlaceFromBestResult(
-						placesListService.runWithoutOutput()
-					);
-				}
+                        // The journey is mixed mode and starts with car
+                        _startWithCar = true;
+                    }
+                }
+                // XY input
+                else if(
+                    map.isDefined(PARAMETER_DEPARTURE_PARKING_XY)
+                ){
+                    PlacesListService placesListService;
+                    placesListService.setNumber(1);
+                    placesListService.setCoordinatesSystem(_coordinatesSystem);
+
+                    placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
+                    _departure_parking.placeResult = placesListService.getPlaceFromBestResult(
+                        placesListService.runWithoutOutput()
+                    );
+
+                    // The journey is mixed mode and starts with car
+                    _startWithCar = true;
+                }
 
 				// Destination parking
 				// One field input
@@ -685,25 +693,57 @@ namespace synthese
 						placesListService.setNumber(1);
 						placesListService.setCoordinatesSystem(_coordinatesSystem);
 
-						// Arrival
-						placesListService.setText(_destinationParkingText);
-						_arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
-							placesListService.runWithoutOutput()
-						);
-					}
-				}
-				// XY input
-				else if(
-					map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)
-				){
-					PlacesListService placesListService;
-					placesListService.setNumber(1);
-					placesListService.setCoordinatesSystem(_coordinatesSystem);
+                        // Arrival
+                        placesListService.setText(_destinationParkingText);
+                        _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
+                            placesListService.runWithoutOutput()
+                        );
 
-					placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
-					_arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
-						placesListService.runWithoutOutput()
-					);
+                        // The journey is mixed mode and ends with car
+                        _endWithCar = true;
+                    }
+                }
+                // XY input
+                else if(
+                    map.isDefined(PARAMETER_ARRIVAL_PARKING_XY)
+                ){
+                    PlacesListService placesListService;
+                    placesListService.setNumber(1);
+                    placesListService.setCoordinatesSystem(_coordinatesSystem);
+
+                    placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PARKING_XY), map.getDefault<bool>(PARAMETER_INVERT_XY));
+                    _arrival_parking.placeResult = placesListService.getPlaceFromBestResult(
+                        placesListService.runWithoutOutput()
+                    );
+
+                    // The journey is mixed mode and ends with car
+                    _endWithCar = true;
+                }
+			}
+
+            if(_startWithCar && _endWithCar)
+            {
+                // This configuration is not supported by the algorithm: throw an exception
+                throw RequestException("Cannot both start AND end a journey using car");
+            }
+
+			// If the start/end of the journey uses the car and the departure/arrival place is empty
+			// the route planner may fail so we try to guess the most likely departure/arrival place
+			if(_startWithCar)
+			{
+				if(_originPlaceText.empty() && dynamic_pointer_cast<City, Place>(_departure_place.placeResult.value))
+				{
+					const City* originCity(_departure_place.cityResult.value.get());
+					computeDeparturePlace(originCity);
+				}
+			}
+
+			if(_endWithCar)
+			{
+				if(_destinationPlaceText.empty() && dynamic_pointer_cast<City, Place>(_arrival_place.placeResult.value))
+				{
+					const City* arrivalCity(_arrival_place.cityResult.value.get());
+					computeArrivalPlace(arrivalCity);
 				}
 			}
 
@@ -1013,6 +1053,8 @@ namespace synthese
 						_arrival_place.placeResult.value.get(),
 						_departure_parking.placeResult.value.get(),
 						_arrival_parking.placeResult.value.get(),
+                        _startWithCar,
+                        _endWithCar,
 						startDate,
 						endDate,
 						startArrivalDate,
@@ -1023,7 +1065,7 @@ namespace synthese
 						false,
 						*_logger,
 						_maxTransferDuration,
-						_minMaxDurationRatioFilter
+                        _minMaxDurationRatioFilter
 					);
 					_result.reset(new PTRoutePlannerResult(r.run()));
 					if (_result->getJourneys().size() > 0)
@@ -1038,7 +1080,9 @@ namespace synthese
 					_arrival_place.placeResult.value.get(),
 					_departure_parking.placeResult.value.get(),
 					_arrival_parking.placeResult.value.get(),
-					startDate,
+                    _startWithCar,
+                    _endWithCar,
+                    startDate,
 					endDate,
 					startArrivalDate,
 					endArrivalDate,
@@ -1048,7 +1092,7 @@ namespace synthese
 					false,
 					*_logger,
 					_maxTransferDuration,
-					_minMaxDurationRatioFilter
+                    _minMaxDurationRatioFilter
 				);
 				// Computing
 				_result.reset(new PTRoutePlannerResult(r.run()));
@@ -1190,7 +1234,7 @@ namespace synthese
 								*placesList.begin()->place
 						)	);
 
-						bool isParking((NULL != placeToSearch) && (placeToSearch == arrivalParking));
+						bool isParking = false;
 						ptime lastDateTime(leg.getDepartureDateTime());
 						lastDateTime += it->getContinuousServiceRange();
 
@@ -1198,6 +1242,20 @@ namespace synthese
 
 						pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
 						carMode = pedestrianMode && (USER_CAR == (leg.getUserClassRank() + USER_CLASS_CODE_OFFSET));
+
+						// this place is represented as a parking if :
+						// * it is a stop area equipped with a relay park
+						// * the leg pointed to it uses car
+						// * the leg is neither the first nor the last of the journey
+						bool isIntermediateLeg = (itl != jl.begin()) && (itl+1 != jl.end());
+						if(isIntermediateLeg && carMode && (NULL != placeToSearch))
+						{
+							const StopArea* stopArea = dynamic_cast<const StopArea*>(placeToSearch);
+							if((NULL != stopArea) && (true == stopArea->getIsRelayPark()))
+							{
+								isParking = true;
+							}
+						}
 
 						if(itSheetRow == sheetRows.end())
 						{
@@ -1240,7 +1298,22 @@ namespace synthese
 
 						_displayEmptyCells(placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode, carMode, sheetRows.end());
 
-						bool isParking((NULL != placeToSearch) && (placeToSearch == departureParking));
+						bool isParking = false;
+						bool isIntermediateLeg = (itl != jl.begin()) && (itl+1 != jl.end());
+
+						// this place is represented as a parking if :
+						// * it is a stop area equipped with a relay park
+						// * the leg pointed to it uses car
+						// * the leg is neither the first nor the last of the journey
+						if(isIntermediateLeg && carMode && (NULL != placeToSearch))
+						{
+							const StopArea* stopArea = dynamic_cast<const StopArea*>(placeToSearch);
+							if((NULL != stopArea) && (true == stopArea->getIsRelayPark()))
+							{
+								isParking = true;
+							}
+						}
+
 						ptime lastDateTime(leg.getArrivalDateTime());
 						lastDateTime += it->getContinuousServiceRange();
 
@@ -1842,14 +1915,6 @@ namespace synthese
 			// name or anonymous and concatenate them
 			string currentRoadName("");
 
-			// If parkings are hubs they can be compared with StopArea
-			const Hub* departureParkingHub(
-				dynamic_cast<const Hub*>(_departure_parking.placeResult.value.get())
-			);
-			const Hub* arrivalParkingHub(
-				dynamic_cast<const Hub*>(_arrival_parking.placeResult.value.get())
-			);
-
 			const Journey::ServiceUses& services(journey.getServiceUses());
 			for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)
 			{
@@ -1859,19 +1924,54 @@ namespace synthese
 
 				const RoadPath* road(dynamic_cast<const RoadPath*> (leg.getService()->getPath()));
 				const Junction* junction(dynamic_cast<const Junction*> (leg.getService()->getPath()));
+
+				bool isEnteringParking = false;
+				bool isLeavingParking  = false;
+				graph::UserClassCode userClass = leg.getUserClassRank() + USER_CLASS_CODE_OFFSET;
+
+				// if there is a transition from car to foot or public transportation and the stop area has a relay park
+				// then mark the stop as "entering parking"
+				if(services.begin() != it)
+				{
+					const ServicePointer& previousLeg(*(it - 1));
+					graph::UserClassCode previousUserClass = previousLeg.getUserClassRank() + USER_CLASS_CODE_OFFSET;
+
+					if((USER_CAR != userClass) && (USER_CAR == previousUserClass))
+					{
+						const StopArea* departureStopArea = dynamic_cast<const StopArea*>(leg.getDepartureEdge()->getHub());
+
+						if(departureStopArea && departureStopArea->getIsRelayPark())
+						{
+							isEnteringParking = true;
+						}
+					}
+				}
+
+				// if there is a transition from foot or public transportation to car and the stop area has a relay park
+				// then mark the stop as "leaving parking"
+				if(services.end() != (it + 1))
+				{
+					const ServicePointer& nextLeg(*(it + 1));
+					graph::UserClassCode nextUserClass = nextLeg.getUserClassRank() + USER_CLASS_CODE_OFFSET;
+
+					if((USER_CAR != userClass) && (USER_CAR == nextUserClass))
+					{
+						const StopArea* arrivalStopArea = dynamic_cast<const StopArea*>(leg.getArrivalEdge()->getHub());
+
+						if(arrivalStopArea && arrivalStopArea->getIsRelayPark())
+						{
+							isLeavingParking = true;
+						}
+					}
+				}
+
+
 				if(	road == NULL &&
 					junction == NULL &&
 					(!_concatenateContiguousFootLegs || !concatenatingFootLegs)
 				){
 					isFirstFoot = true;
 					moreThanOneLeg = true;
-
-					// If the departure or arrival point hub matches a parking
-					// then this place is where the user retrieves or parks his car
-					const Hub* departureStopHub(leg.getDepartureEdge()->getHub());
-					const Hub* arrivalStopHub(leg.getArrivalEdge()->getHub());
-					bool isEnteringParking((NULL != departureParkingHub) && (departureParkingHub == departureStopHub));
-					bool isLeavingParking((NULL != arrivalParkingHub) && (arrivalParkingHub == arrivalStopHub));
 
 					// Departure stop
 					_displayStopCell(
@@ -1972,6 +2072,7 @@ namespace synthese
 					double distance(0);
 					vector<Geometry*> geometries;
 					vector<boost::shared_ptr<Geometry> > geometriesSPtr;
+
 					BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, contiguousFootLegs)
 					{
 						distance += itLeg->getDistance();
@@ -2029,7 +2130,7 @@ namespace synthese
 						__Couleur,
 						leg.getDepartureDateTime(),
 						journey.getContinuousServiceRange(),
-						/* isEnteringParking */ false,
+						isEnteringParking,
 						/* isLeavingParking */ false
 						);
 					
@@ -2061,7 +2162,7 @@ namespace synthese
 						leg.getArrivalDateTime(),
 						journey.getContinuousServiceRange(),
 						/* isEnteringParking */ false,
-						/* isLeavingParking */ false
+						isLeavingParking
 					);
 					
 					lastPlace = leg.getArrivalEdge()->getHub();

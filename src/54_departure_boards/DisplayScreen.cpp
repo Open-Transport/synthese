@@ -225,6 +225,12 @@ namespace synthese
 			_generationMethod = method;
 		}
 
+		void DisplayScreen::setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value)
+		{
+			_physicalStops = value;
+			computeStrAndSetPhysicalStops();
+		}
+
 
 
 		ArrivalDepartureList DisplayScreen::generateStandardScreen(
@@ -414,6 +420,20 @@ namespace synthese
 			}
 
 			return result;
+		}
+
+
+
+		void DisplayScreen::computeStrAndSetPhysicalStops()
+		{
+			string authorized_ps_str("");
+			int rank(0);
+			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& stop, _physicalStops)
+			{
+				authorized_ps_str += (rank > 0 ? ("," + lexical_cast<string>(stop.second->getKey())) : lexical_cast<string>(stop.second->getKey()));
+				rank++;
+			}
+			set<PhysicalStops>(authorized_ps_str);
 		}
 
 		synthese::DeparturesTableDirection DisplayScreen::getDirection() const
@@ -759,7 +779,7 @@ namespace synthese
 					if(	link->getObjectId() == DisplayScreenTableSync::TABLE.ID ||
 						link->getObjectId() == 0
 					){
-						result = true;
+						return true;
 					}
 
 					// Search for general broadcast on a precise display screens type equal to
@@ -767,7 +787,7 @@ namespace synthese
 					if( get<DisplayTypePtr>() &&
 						link->getObjectId() == get<DisplayTypePtr>()->getKey())
 					{
-						result = true;
+						return true;
 					}
 
 					// Search for general broadcast on all display screen types
