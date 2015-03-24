@@ -24,6 +24,7 @@
 #include "XMLReservationFunction.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 #include "ReservationEditFunction.h"
+#include "ReservationFunction.h"
 #include "CSVResaStatisticsFunction.h"
 #include "ReservationsListService.hpp"
 
@@ -81,6 +82,7 @@ void synthese::resa::moduleRegister()
 	synthese::resa::XMLReservationFunction::integrate();
 	synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 	synthese::resa::ReservationEditFunction::integrate();
+	synthese::resa::ReservationFunction::integrate();
 	synthese::resa::CSVResaStatisticsFunction::integrate();
 	synthese::resa::ReservationsListService::integrate();
 

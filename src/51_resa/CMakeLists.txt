@@ -81,6 +81,8 @@ ReservationEditFunction.cpp
 ReservationEditFunction.h
 ReservationEditInterfacePage.cpp
 ReservationEditInterfacePage.h
+ReservationFunction.cpp
+ReservationFunction.h
 ReservationItemInterfacePage.cpp
 ReservationItemInterfacePage.h
 ReservationRoutePlannerAdmin.cpp
