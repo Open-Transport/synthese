@@ -103,6 +103,8 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
+
+            Function::setOutputFormatFromMap(map, string());            
 		}
 
 
@@ -116,7 +118,17 @@ namespace synthese
 			DBModule::CreateObject(_value.get(), _tableSync.get());
 
 			map.insert(ATTR_ID, _value->getKey());
-			return map;
+
+			if (_outputFormat == MimeTypes::JSON)
+			{
+                map.outputJSON(stream, "object");
+            }
+			else if (_outputFormat == MimeTypes::XML)
+			{
+                map.outputXML(stream, "object");
+            }			
+
+            return map;
 		}
 
 
@@ -152,6 +164,6 @@ namespace synthese
 
 		std::string ObjectCreateService::getOutputMimeType() const
 		{
-			return "text/html";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 }	}
