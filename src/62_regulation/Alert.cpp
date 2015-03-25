@@ -32,7 +32,7 @@ namespace synthese
     using namespace regulation;
 	using namespace util;
 
-	CLASS_DEFINITION(Alert, "t120_alerts", 120)
+	CLASS_DEFINITION(Alert, "t121_alerts", 121)
     FIELD_DEFINITION_OF_TYPE(Kind, "kind", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(Line, "line_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(Service, "service_id", SQL_INTEGER)
