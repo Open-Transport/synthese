@@ -58,7 +58,7 @@ namespace synthese
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<AlertTableSync>::TABLE(
-			"t120_alerts"
+			"t121_alerts"
 		);
 
 
