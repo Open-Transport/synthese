@@ -91,6 +91,11 @@ namespace synthese
 			{
 				map.outputJSON(stream, DATA_OBJECT);
 			}
+			else if (_outputFormat == MimeTypes::XML)
+			{
+                map.outputXML(stream, DATA_OBJECT);
+            }			
+
 			
 			return map;
 		}
@@ -107,11 +112,7 @@ namespace synthese
 
 		std::string ObjectViewService::getOutputMimeType() const
 		{
-			if (_outputFormat == MimeTypes::JSON)
-			{
-				return "application/json";
-			}
-			return "text/html";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 
 
