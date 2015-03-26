@@ -136,7 +136,7 @@ endif()
 # Version info.
 include(FindGit)
 include(GetGitRevisionDescription)
-get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1 GIT_LAST_COMMIT_DATE)
 
 # Note: this is using a .h file and not defines, otherwise everything gets
 # rebuilt each time CMake is invoked.

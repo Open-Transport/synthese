@@ -1,5 +1,5 @@
 #define SYNTHESE_VERSION "@SYNTHESE_VERSION@"
 #define SYNTHESE_REVISION "@GIT_SHA1@"
 #define SYNTHESE_BRANCH "@GIT_REFSPEC@"
-#define SYNTHESE_BUILD_DATE ""
-#define SYNTHESE_SVN_URL "https://github.com/Open-Transport/synthese.git"
+#define SYNTHESE_BUILD_DATE "@GIT_LAST_COMMIT_DATE@"
+#define SYNTHESE_SVN_URL "https://projects.open-transport.org/git/synthese3"

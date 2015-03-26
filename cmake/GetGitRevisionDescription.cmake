@@ -3,7 +3,7 @@
 # These functions force a re-configure on each git commit so that you can
 # trust the values of the variables in your build system.
 #
-#  get_git_head_revision(<refspecvar> <hashvar> [<additional arguments to git describe> ...])
+#  get_git_head_revision(<refspecvar> <hashvar> <commitdatevar> [<additional arguments to git describe> ...])
 #
 # Returns the refspec and sha hash of the current head revision
 #
@@ -39,7 +39,7 @@ set(__get_git_revision_description YES)
 # to find the path to this module rather than the path to a calling list file
 get_filename_component(_gitdescmoddir ${CMAKE_CURRENT_LIST_FILE} PATH)
 
-function(get_git_head_revision _refspecvar _hashvar)
+function(get_git_head_revision _refspecvar _hashvar _lastcommitdate)
 	set(GIT_PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 	set(GIT_DIR "${GIT_PARENT_DIR}/.git")
 	while(NOT EXISTS "${GIT_DIR}")	# .git dir not found, search parent directories
@@ -78,6 +78,24 @@ function(get_git_head_revision _refspecvar _hashvar)
 
 	set(${_refspecvar} "${HEAD_REF}" PARENT_SCOPE)
 	set(${_hashvar} "${HEAD_HASH}" PARENT_SCOPE)
+
+        execute_process(COMMAND
+                "${GIT_EXECUTABLE}"
+                log -1 --format=%ci
+                WORKING_DIRECTORY
+                "${CMAKE_SOURCE_DIR}"
+                RESULT_VARIABLE
+                res
+                OUTPUT_VARIABLE
+                out
+                ERROR_QUIET
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if(NOT res EQUAL 0)
+                set(out "${out}-${res}-NOTFOUND")
+        endif()
+
+        set(${_lastcommitdate} "${out}" PARENT_SCOPE)
+
 endfunction()
 
 function(git_describe _var)
