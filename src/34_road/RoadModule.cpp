@@ -291,12 +291,6 @@ namespace synthese
 				resultsNumber
 			);
 
-			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, places)
-			{
-				stopsAndRoadsVector.push_back(place);
-			}
-
-
 			BOOST_FOREACH(City::PlacesMatcher::MatchResult::value_type& place, public_places)
 			{
 				stopsAndRoadsVector.push_back(place);

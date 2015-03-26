@@ -56,6 +56,13 @@ namespace synthese
 		void PublicPlaceEntrance::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
 			// Public place link
+			if(hasField<PublicPlace>())
+			{
+				get<PublicPlace>()->addEntrance(*this);
+			}
+
+			/*
+			// Public place link
 			optional<PublicPlace&> publicPlace(
 				get<PublicPlace>()
 			);
@@ -63,13 +70,20 @@ namespace synthese
 			{
 				publicPlace->addEntrance(*this);
 			}
+			*/
 		}
 
 
 
 		void PublicPlaceEntrance::unlink()
-		{
+		{			
 			// Public place link
+			if(hasField<PublicPlace>())
+			{
+				get<PublicPlace>()->removeEntrance(*this);
+			}
+
+			/*
 			optional<PublicPlace&> publicPlace(
 				get<PublicPlace>()
 			);
@@ -77,5 +91,6 @@ namespace synthese
 			{
 				publicPlace->removeEntrance(*this);
 			}
+			*/
 		}
 }	}
