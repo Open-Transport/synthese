@@ -55,42 +55,32 @@ namespace synthese
 
 		void PublicPlaceEntrance::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-			// Public place link
+			// if this public place entrance is linked to a public place, register to it
 			if(hasField<PublicPlace>())
 			{
 				get<PublicPlace>()->addEntrance(*this);
 			}
 
-			/*
-			// Public place link
-			optional<PublicPlace&> publicPlace(
-				get<PublicPlace>()
-			);
-			if(publicPlace)
+			// OVE!!! : temporary debug trace
+			else
 			{
-				publicPlace->addEntrance(*this);
+				optional<PublicPlace&> publicPlace(get<PublicPlace>());
+
+				if(publicPlace)
+				{
+					std::cout << "OVE!!! PublicPlaceEntrance(" << getKey() << ")::link() : hasField<PublicPlace>() => false / publicPlace => true" << std::endl;
+				}
 			}
-			*/
 		}
 
 
 
 		void PublicPlaceEntrance::unlink()
 		{			
-			// Public place link
+			// if this public place entrance is linked to a public place, unregister from it
 			if(hasField<PublicPlace>())
 			{
 				get<PublicPlace>()->removeEntrance(*this);
 			}
-
-			/*
-			optional<PublicPlace&> publicPlace(
-				get<PublicPlace>()
-			);
-			if(publicPlace)
-			{
-				publicPlace->removeEntrance(*this);
-			}
-			*/
 		}
 }	}
