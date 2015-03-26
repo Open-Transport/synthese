@@ -60,7 +60,7 @@ namespace synthese
 					typename EnumObjectField<C, P>::Type value(
 						static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name))
 					);
-					result = (value == fieldObject);
+					result = (value != fieldObject);
 					fieldObject = value;
 				}
 				catch(Record::MissingParameterException& e)
