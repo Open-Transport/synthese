@@ -60,17 +60,6 @@ namespace synthese
 			{
 				get<PublicPlace>()->addEntrance(*this);
 			}
-
-			// OVE!!! : temporary debug trace
-			else
-			{
-				optional<PublicPlace&> publicPlace(get<PublicPlace>());
-
-				if(publicPlace)
-				{
-					std::cout << "OVE!!! PublicPlaceEntrance(" << getKey() << ")::link() : hasField<PublicPlace>() => false / publicPlace => true" << std::endl;
-				}
-			}
 		}
 
 
