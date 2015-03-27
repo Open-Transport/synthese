@@ -171,7 +171,6 @@ namespace synthese
 			// Jump over courses with incomplete chainages
 			if(schedules.size() > route.links.size() + 1)
 			{
-				cout << "TPU, attention, plus de schedules que de stops points" << endl;
 				_logWarningDetail(
 					"RUN",
 					lexical_cast<string>(runId),
@@ -350,14 +349,14 @@ namespace synthese
 			// Stop areas
 			{
 				string query(
-					"SELECT SGR_Name, SGR_Short_Name, SGR_id FROM "+ _database +".stop_group"
+					"SELECT * FROM "+ _database +".v_rcs_stop_group"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				while(result->next())
 				{
 					// Fields load
-					string name(result->get<string>("SGR_Name"));
-					string ref(result->get<string>("SGR_Short_Name"));
+					string name(result->get<string>("sgr_name"));
+					string ref(result->get<string>("sgr_short_name"));
 
 					_createOrUpdateStopAreas(
 								_stopAreas,
@@ -374,17 +373,15 @@ namespace synthese
 			// Stop Areas and Physical Stops
 			{
 				string query(
-					"SELECT * FROM "+ _database +".bus_stop_server_view, "+ _database +".stop_group, "+ _database +".stop WHERE "
-					+ _database +".stop.STO_Id="+ _database +".bus_stop_server_view.STO_Id AND "
-					+ _database +".stop_group.SGR_Id="+ _database +".stop.SGR_Id"
+					"SELECT * FROM "+ _database +".v_rcs_stop"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				while(result->next())
 				{
 					// Fields load
-					string areaRef(result->get<string>("SGR_Short_Name"));
-					string name(result->get<string>("STO_Name_Int_Signs"));
-					string ref(result->get<string>("STO_Graph_Key"));
+					string areaRef(result->get<string>("sgr_short_name"));
+					string name(result->get<string>("sto_name"));
+					string ref(result->get<string>("sto_graph_key"));
 
 					const StopArea* stopArea(NULL);
 					if(_stopAreas.contains(areaRef))
@@ -407,8 +404,8 @@ namespace synthese
 					// Point
 					boost::shared_ptr<geos::geom::Point> geometry;
 					geometry = dataSource.getActualCoordinateSystem().createPoint(
-						lexical_cast<double>(result->get<string>("PNT_Longitude")) / static_cast<double>(3600000),
-						lexical_cast<double>(result->get<string>("PNT_latitude")) / static_cast<double>(3600000)
+						lexical_cast<double>(result->get<string>("pnt_longitude")) / static_cast<double>(3600000),
+						lexical_cast<double>(result->get<string>("pnt_latitude")) / static_cast<double>(3600000)
 					);
 					if(geometry->isEmpty())
 					{
@@ -430,17 +427,17 @@ namespace synthese
 			// Commercial Lines
 			{
 				string query(
-					"SELECT LIN_LineName, LIN_Number, LIN_Color_R, LIN_Color_G, LIN_Color_B FROM "+ _database +".line"
+					"SELECT * FROM "+ _database +".v_rcs_line"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				while(result->next())
 				{
 					// Fields load
-					string name(result->get<string>("LIN_LineName"));
-					string shortName(result->get<string>("LIN_Number"));
-					int colorR(result->get<int>("LIN_Color_R"));
-					int colorG(result->get<int>("LIN_Color_G"));
-					int colorB(result->get<int>("LIN_Color_B"));
+					string name(result->get<string>("lin_linename"));
+					string shortName(result->get<string>("lin_number"));
+					int colorR(result->get<int>("in_color_r"));
+					int colorG(result->get<int>("lin_color_g"));
+					int colorB(result->get<int>("lin_color_b"));
 					const RGBColor color(colorR,colorG, colorB);
 
 					_createOrUpdateLine(
@@ -458,11 +455,8 @@ namespace synthese
 			// Links and Points
 			{
 				string query(
-					"SELECT pl.LNK_Id AS LNK_Id, pl.PNT_Id AS PNT_Id, pl.PTL_Order AS PTL_Order, pl.PTL_Length AS PTL_Length, p.PNT_Longitude AS PNT_Longitude, p.PNT_Latitude AS PNT_Latitude, s.STO_Graph_Key AS STO_Graph_Key FROM (("
-							+ _database+".point_link AS pl JOIN "
-							+ _database+".point as p ON pl.PNT_Id=p.PNT_Id) LEFT JOIN "
-							+ _database+".stop AS s ON pl.PNT_Id=s.PNT_Id)"
-							+ " ORDER BY pl.LNK_Id ASC, pl.PTL_Order ASC"
+					"SELECT * FROM " + _database + ".v_rcs_link"
+							+ " ORDER BY lnk_id ASC, ptl_order ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				int lastLinkId(0);
@@ -471,7 +465,7 @@ namespace synthese
 				geos::geom::CoordinateSequence* sequence(NULL);
 				while(result->next())
 				{
-					int id(result->get<int>("LNK_Id"));
+					int id(result->get<int>("lnk_id"));
 					if(lastLinkId > 0 && id > lastLinkId)
 					{
 						// Register last built VMCV Link
@@ -490,13 +484,13 @@ namespace synthese
 						sequence = dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2);
 					}
 					lastLinkId = id;
-					string stopref(result->get<string>("STO_Graph_Key"));
-					int pntId(result->get<int>("LNK_Id"));
-					MetricOffset lg(result->get<MetricOffset>("PTL_Length"));
+					string stopref(result->get<string>("sto_graph_key"));
+					int pntId(result->get<int>("pnt_id"));
+					MetricOffset lg(result->get<MetricOffset>("ptl_length"));
 					boost::shared_ptr<geos::geom::Point> geometry;
 					geometry = dataSource.getActualCoordinateSystem().createPoint(
-								lexical_cast<double>(result->get<string>("PNT_Longitude")) / static_cast<double>(3600000),
-								lexical_cast<double>(result->get<string>("PNT_Latitude")) / static_cast<double>(3600000)
+								lexical_cast<double>(result->get<string>("pnt_longitude")) / static_cast<double>(3600000),
+								lexical_cast<double>(result->get<string>("pnt_latitude")) / static_cast<double>(3600000)
 								);
 					offsetSum += lg;
 
@@ -513,16 +507,16 @@ namespace synthese
 						vs.geometry = geometry;
 						vs.offsetFromPreviousStop = offsetSum;
 						sequence->add(geos::geom::Coordinate(
-										  result->get<double>("PNT_Longitude") / static_cast<double>(3600000),
-										  result->get<double>("PNT_Latitude") / static_cast<double>(3600000)
+										  result->get<double>("pnt_longitude") / static_cast<double>(3600000),
+										  result->get<double>("pnt_latitude") / static_cast<double>(3600000)
 								  ));
 					}
 					else
 					{
 						// Putting waypoints coordinates in the sequence
 						sequence->add(geos::geom::Coordinate(
-										  result->get<double>("PNT_Longitude"),
-										  result->get<double>("PNT_Latitude")
+										  result->get<double>("pnt_longitude"),
+										  result->get<double>("pnt_latitude")
 								  ));
 					}
 				}
@@ -539,15 +533,9 @@ namespace synthese
 			// Routes
 			{
 				string query(
-							string("SELECT r.ROU_Id AS ROU_Id, l.LIN_Number AS LIN_Number, ")
-							+ "rl.ROL_Order AS ROL_Order, rl.LNK_Id AS LNK_Id, "
-							+ "r.ROU_Destination_Name AS ROU_Destination_Name, "
-							+ "r.ROU_Destination_Code AS ROU_Destination_Code, "
-							+ "r.ROU_Direction AS ROU_Direction FROM ("
-							+ _database + ".route AS r JOIN "
-							+ _database + ".route_link AS rl ON r.ROU_Id=rl.ROU_Id) JOIN "
-							+ _database + ".line AS l ON r.LIN_Id=l.LIN_Id "
-							+ "ORDER BY r.ROU_Id ASC, rl.ROL_Order ASC"
+							string("SELECT * FROM ")
+							+ _database + ".v_rcs_route "
+							+ "ORDER BY rou_id ASC, rol_order ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				int lastRouteId(0);
@@ -559,7 +547,7 @@ namespace synthese
 				while(result->next())
 				{
 					// Fields load
-					int id(result->get<int>("ROU_Id"));
+					int id(result->get<int>("rou_id"));
 
 					// The route id has changed : transform last collected data into a route if selected
 					if( commercialLine &&
@@ -579,7 +567,7 @@ namespace synthese
 					// Entering new route
 					if(id != lastRouteId)
 					{
-						string commercialLineRef(result->get<string>("LIN_Number"));
+						string commercialLineRef(result->get<string>("lin_number"));
 
 						// Check of the commercial line
 						if(!_lines.contains(commercialLineRef))
@@ -597,9 +585,9 @@ namespace synthese
 					}
 
 					// Fields load
-					dest = result->get<string>("ROU_Destination_Name");
-					direction = (result->get<int>("ROU_Direction") == 6 ? false : true);
-					int linkId(result->get<int>("LNK_Id"));
+					dest = result->get<string>("rou_destination_name");
+					direction = (result->get<int>("rou_direction") == 6 ? false : true);
+					int linkId(result->get<int>("lnk_id"));
 
 					// Check of link associated
 					LinksMap::iterator itLink(_links.find(linkId));
@@ -652,7 +640,7 @@ namespace synthese
 			{
 				string query(
 							string("SELECT * FROM ")
-							+ _database + ".calendar_server_view"
+							+ _database + ".v_rcs_calendar"
 //							+ " WHERE CAL_Day>=" + todayStr
 							+ " ORDER BY HTY_Id"
 				);
@@ -662,7 +650,7 @@ namespace synthese
 
 				while(result->next())
 				{
-					int id(result->get<int>("HTY_Id"));
+					int id(result->get<int>("hty_id"));
 					if(id != lastHtyId &&
 					   lastHtyId > 0)
 					{
@@ -673,7 +661,7 @@ namespace synthese
 						lastHtyId = id;
 						c.clear();
 					}
-					date calDate(from_string(result->get<string>("CAL_Day")));
+					date calDate(from_string(result->get<string>("cal_day")));
 					c.setActive(calDate);
 				}
 				// Load last calendar
@@ -683,10 +671,10 @@ namespace synthese
 			// Services
 			{
 				string query(
-							string("SELECT RUN_Id, ROU_Id, HTY_Id, PTI_Rank, PTI_Scheduled, RUN_Number_ext FROM ")
-							+ _database +".passing_time_server_view "
-							+ "WHERE RUN_Number_ext NOT LIKE 'HLP%' "
-							+ "ORDER BY LIN_Id ASC, ROU_Id ASC, RUN_Id ASC, VAC_Id ASC, PTI_Rank ASC"
+							string("SELECT * FROM ")
+							+ _database +".v_rcs_passing_time "
+							+ "WHERE run_number_ext NOT LIKE 'HLP%' "
+							+ "ORDER BY rou_id ASC, run_id ASC, pti_rank ASC"
 				);
 				DBResultSPtr result(db->execQuery(query));
 				int lastRunId(0);
@@ -698,7 +686,7 @@ namespace synthese
 
 				while(result->next())
 				{
-					int id(result->get<int>("RUN_Id"));
+					int id(result->get<int>("run_id"));
 					if(route &&
 					   lastRunId != id &&
 					   lastRunId > 0)
@@ -717,8 +705,8 @@ namespace synthese
 					{
 						schedules.clear();
 						lastRunId = id;
-						int routeId(result->get<int>("ROU_Id"));
-						service_number = result->get<string>("RUN_Number_ext");
+						int routeId(result->get<int>("rou_id"));
+						service_number = result->get<string>("run_number_ext");
 
 						// Check of the journey
 						RoutesMap::const_iterator itRoute(
@@ -739,7 +727,6 @@ namespace synthese
 					}
 					if(!route)
 					{
-						cout << "ROUTE NON TROUVEE POUR LE SERVICE " << service_number << " [ID:" << id << "], ON PASSE" << endl;
 						continue;
 					}
 					// Getting the schedule
@@ -748,10 +735,10 @@ namespace synthese
 									schedules.end(),
 									VMCVSchedule()
 									)	);
-					schedule.dept = duration_from_string(result->get<string>("PTI_Scheduled"));
+					schedule.dept = duration_from_string(result->get<string>("pti_scheduled"));
 
 					// Getting calendar
-					htyId = result->get<int>("HTY_Id");
+					htyId = result->get<int>("hty_id");
 					Calendars::const_iterator it(_calendars.find(htyId));
 					if(it == _calendars.end())
 					{
