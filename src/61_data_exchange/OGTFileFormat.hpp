@@ -109,7 +109,7 @@ namespace synthese
 
 				friend class ExpatParser;
 
-			protected:
+			public:
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath
@@ -125,14 +125,6 @@ namespace synthese
 					boost::optional<std::ostream&> outputStream,
 					util::ParametersMap& pm
 				);
-
-
-
-				// Parse access for CalendarOGTFileFormat
-				bool _parse(
-					const boost::filesystem::path& filePath,
-					std::auto_ptr<std::ofstream> fileStream
-				) const;
 
 
 
