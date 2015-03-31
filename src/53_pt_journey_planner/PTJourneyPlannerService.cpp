@@ -2273,12 +2273,17 @@ namespace synthese
 				lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection
 			);
 			pm.insert(DATA_HANDICAPPED_FILTER_STATUS, handicappedFilterStatus);
+
+			const PTUseRule* handicappedUserRule = dynamic_cast<const PTUseRule*>(
+				&(serviceUse).getService()->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
+			);
 			pm.insert(
 				DATA_HANDICAPPED_PLACES_NUMBER,
-				serviceUse.getUseRule().getAccessCapacity () ?
-					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
+				handicappedUserRule ?
+					lexical_cast<string>(handicappedUserRule->getAccessCapacity().get_value_or(9999)) :
 					"9999"
 			);
+
 			pm.insert(DATA_BIKE_FILTER_STATUS, bikeFilterStatus);
 			pm.insert(
 				DATA_BIKE_PLACES_NUMBER,
