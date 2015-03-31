@@ -26,6 +26,9 @@
 #include "Importer.hpp"
 
 #include "ImportableTableSync.hpp"
+#include "CalendarTemplateTableSync.h"
+
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 namespace synthese
 {
@@ -54,12 +57,100 @@ namespace synthese
 				util::ParametersMap& pm
 			);
 
+			virtual ~CalendarFileFormat();
 
+		protected:
+			typedef std::vector<boost::gregorian::date> DatesVector;
 
+			mutable std::set<boost::shared_ptr<calendar::CalendarTemplateElement> > _calendarElementsToRemove;
+
+		protected:
+			//////////////////////////////////////////////////////////////////////////
+			/// Get CalendarTemplate with DataSource link support.
+			/// This pointer comes from Env/Registry. Do not copy it into a shared_ptr
+			/// or neither try to free it.
+			/// @param calendars CalendarTemplate from DataSource
+			/// @param code object code
+			/// @return CalendarTemplate with CalendarTemplateElement already loaded
 			calendar::CalendarTemplate* _getCalendarTemplate(
 				impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync>& calendars,
 				const std::string& code
 			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Create a new CalendarTemplateElement for a single date.
+			/// It is not required to maintain the returned shared pointer.
+			/// @param calendar related CalendarTemplate which element belongs to
+			/// @param name CalendarTemplate name
+			/// @param code object code
+			/// @param source related DataSource
+			/// @param day
+			/// @return generated CalendarTemplateElement already registered in calendar
+			boost::shared_ptr<calendar::CalendarTemplateElement> _createCalendarTemplateElement(
+				boost::shared_ptr<calendar::CalendarTemplate> calendar,
+				const size_t rank,
+				const boost::gregorian::date day
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Create a new CalendarTemplate with DataSource link support
+			/// It is not required to maintain the returned shared pointer.
+			/// @param calendars CalendarTemplate from DataSource
+			/// @param name CalendarTemplate name
+			/// @param code object code
+			/// @param source related DataSource
+			/// @param dateList list of dates to include in CalendarTemplate
+			/// @return generated CalendarTemplate with CalendarTemplateElement if provided
+			boost::shared_ptr<calendar::CalendarTemplate> _createCalendarTemplate(
+				impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync>& calendars,
+				const std::string& name,
+				const std::string& code,
+				const impex::DataSource& source,
+				boost::optional<DatesVector> dateList
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Remove a CalendarElementTemplate from a CalendarTemplate
+			/// @param calendar CalendarTemplate holding element
+			/// @param element CalendarTemplateElement to discard
+			void _removeCalendarTemplateElement(
+				boost::shared_ptr<calendar::CalendarTemplate> calendar,
+				boost::shared_ptr<calendar::CalendarTemplateElement> oldElement
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Create or update a new CalendarTemplate with DataSource link  support
+			/// It is not required to maintain the returned shared pointer.
+			/// @param calendars CalendarTemplate from DataSource
+			/// @param name CalendarTemplate name
+			/// @param code object code
+			/// @param source related DataSource
+			/// @param dateList list of dates to include in CalendarTemplate
+			/// @return new or updated CalendarTemplate with CalendarTemplateElement if provided.
+			/// If shared pointer unset, update aborted because of unhandled CalendarTemplateElement patterns
+			boost::shared_ptr<calendar::CalendarTemplate> _createOrUpdateCalendarTemplate(
+				impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync>& calendars,
+				const std::string& name,
+				const std::string& code,
+				const impex::DataSource& source,
+				boost::optional<DatesVector> dateList
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Save CalendarTemplate and CalendarTemplateElement in provided transaction
+			/// Also remove CalendarTemplateElement from _calendarElementsToRemove
+			/// @param transaction current database transaction
+			void _saveCalendarTemplates(db::DBTransaction& transaction) const;
 		};
 }	}
 

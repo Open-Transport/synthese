@@ -27,7 +27,7 @@
 #include "FileFormatTemplate.h"
 #include "NoExportPolicy.hpp"
 #include "OneFileTypeImporter.hpp"
-#include "PTDataCleanerFileFormat.hpp"
+#include "CalendarFileFormat.hpp"
 #include "OGTFileFormat.hpp"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateElement.h"
@@ -49,7 +49,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::OneFileTypeImporter<CalendarOGTFileFormat>,
-				public PTDataCleanerFileFormat
+				public CalendarFileFormat
 			{
 			private:
 				static const std::string SEP;
@@ -58,7 +58,7 @@ namespace synthese
 				typedef std::map<std::string, DayList> CalendarDatesMap;
 
 				mutable OGTFileFormat::Importer_ _ogtImporter;
-				mutable std::set<boost::shared_ptr<calendar::CalendarTemplateElement> > _calendarElementsToRemove;
+				mutable impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync> _calendarTemplates;
 
 			protected:
 				virtual bool _parse(
@@ -76,9 +76,6 @@ namespace synthese
 					util::ParametersMap& pm
 				);
 
-				virtual bool beforeParsing();
-				virtual bool afterParsing();
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from attributes to generic parameter maps.
 				/// @return Generated parameters map
@@ -94,14 +91,6 @@ namespace synthese
 
 
 				virtual db::DBTransaction _save() const;
-
-
-			private:
-				boost::shared_ptr<calendar::CalendarTemplate> _createOrUpdateCalendar(
-					const string& calendarName,
-					DayList datesList
-				) const;
-
 			};
 
 			typedef impex::NoExportPolicy<CalendarOGTFileFormat> Exporter_;
