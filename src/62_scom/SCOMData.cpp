@@ -89,12 +89,12 @@ namespace synthese
 			}
 			catch (boost::property_tree::xml_parser::xml_parser_error &e)
 			{
-				Log::GetInstance().warn("SCOM Data : Failed to read xml message : " + std::string(e.what()));
+				Log::GetInstance().warn("SCOMData : Failed to read xml message : " + std::string(e.what()));
 				return;
 			}
 			catch (...)
 			{
-				Log::GetInstance().warn("SCOM Data : Failed to read xml message with unknown error");
+				Log::GetInstance().warn("SCOMData : Failed to read xml message with unknown error");
 				return;
 			}
 
@@ -119,7 +119,7 @@ namespace synthese
 					d.receivedAt = boost::posix_time::second_clock::local_time();
 					d.borne = m.second.get<std::string>("BORNE.<xmlattr>.NUMERO");
 
-					// Integrate de sent date and time
+					// Integrate the sent date and time
 					std::string date = m.second.get<std::string>("BORNE.<xmlattr>.DATE");
 					std::string time = m.second.get<std::string>("BORNE.<xmlattr>.HEURE");
 					std::istringstream ssd(date + " " + time);
@@ -178,22 +178,22 @@ namespace synthese
 							// Append the line
 							_append(dls);
 
-							Log::GetInstance().debug("SCOM Data : Received data for borne " + d.borne + " at " + boost::posix_time::to_simple_string(d.sentAt) + " for " + dls.line + " " + dls.destination + " (" + boost::lexical_cast<std::string>(dls.tps) + ")");
+							Log::GetInstance().debug("SCOMData : Received data for borne " + d.borne + " at " + boost::posix_time::to_simple_string(d.sentAt) + " for " + dls.line + " " + dls.destination + " (" + boost::lexical_cast<std::string>(dls.tps) + ")");
 						}
 					}
 				}
 			}
 			catch (boost::property_tree::xml_parser::xml_parser_error &e)
 			{
-				Log::GetInstance().warn("SCOM Data : Failed to parse xml message : " + std::string(e.what()));
+				Log::GetInstance().warn("SCOMData : Failed to parse xml message : " + std::string(e.what()));
 			}
 			catch (std::exception &e)
 			{
-				Log::GetInstance().warn("SCOM Data : Failed to parse xml message : " + std::string(e.what()));
+				Log::GetInstance().warn("SCOMData : Failed to parse xml message : " + std::string(e.what()));
 			}
 			catch (...)
 			{
-				Log::GetInstance().warn("SCOM Data : Failed to parse xml message with unknown error");
+				Log::GetInstance().warn("SCOMData : Failed to parse xml message with unknown error");
 			}
 
 			_mutex.unlock();
@@ -317,7 +317,7 @@ namespace synthese
 				if ( it->receivedAt < maxDate )
 				{
 					// Remove everything between here and the end
-					Log::GetInstance().debug("SCOM Data : Too old, removed : " + it->borne + " at " + boost::posix_time::to_simple_string(it->receivedAt));
+					Log::GetInstance().debug("SCOMData : Too old, removed : " + it->borne + " at " + boost::posix_time::to_simple_string(it->receivedAt));
 					_datas.erase(it,_datas.end());
 					break;
 				}
@@ -340,11 +340,11 @@ namespace synthese
 					if ( _datas.at(i).tps == 0 )
 					{
 						_datas[i].tps = -1;
-						Log::GetInstance().debug("SCOM Data : Set at -1 : " + _datas.at(i).borne + " at " + boost::posix_time::to_simple_string(_datas.at(i).sentAt) + " for " + _datas.at(i).line + " " + _datas.at(i).destination + " (" + boost::lexical_cast<std::string>(_datas.at(i).tps) + ")");
+						Log::GetInstance().debug("SCOMData : Set at -1 : " + _datas.at(i).borne + " at " + boost::posix_time::to_simple_string(_datas.at(i).sentAt) + " for " + _datas.at(i).line + " " + _datas.at(i).destination + " (" + boost::lexical_cast<std::string>(_datas.at(i).tps) + ")");
 					}
 					else if ( _datas.at(i).tps != -1 ) // Keep the -1 values : should be cleaned up after a while
 					{
-						Log::GetInstance().debug("SCOM Data : Cleaned : " + _datas.at(i).borne + " at " + boost::posix_time::to_simple_string(_datas.at(i).sentAt) + " for " + _datas.at(i).line + " " + _datas.at(i).destination + " (" + boost::lexical_cast<std::string>(_datas.at(i).tps) + ")");
+						Log::GetInstance().debug("SCOMData : Cleaned : " + _datas.at(i).borne + " at " + boost::posix_time::to_simple_string(_datas.at(i).sentAt) + " for " + _datas.at(i).line + " " + _datas.at(i).destination + " (" + boost::lexical_cast<std::string>(_datas.at(i).tps) + ")");
 						_datas.erase(_datas.begin()+i);
 						i--;
 					}
@@ -374,7 +374,7 @@ namespace synthese
 							 it->destination == data.destination &&
 							 it->tps == -1 )
 						{
-							Log::GetInstance().debug("SCOM Data : Remove -1 value : " + it->borne + " at " + boost::posix_time::to_simple_string(it->sentAt) + " for " + it->line + " " + it->destination + " (" + boost::lexical_cast<std::string>(it->tps) + ")");
+							Log::GetInstance().debug("SCOMData : Remove -1 value : " + it->borne + " at " + boost::posix_time::to_simple_string(it->sentAt) + " for " + it->line + " " + it->destination + " (" + boost::lexical_cast<std::string>(it->tps) + ")");
 							_datas.erase(it);
 							break; // There cannot be more than one value
 						}

@@ -437,10 +437,19 @@ namespace synthese
 			switch (_state)
 			{
 				// Try to resolve the SCOM server IP or FQDN
+				// If we are disabled, wait for us to be re-enabled
 				// On fail, start again
 				// On success, go to CONNECT state
 				case RESOLVE :
 				{
+					// If we are disabled, wait on re-enabling
+					if ( ! _enabled )
+					{
+						Log::GetInstance().info("SCOM : Service disabled");
+						_mutexDisable.lock();
+						Log::GetInstance().info("SCOM : Service enabled");
+					}
+
 					// If the address is invalid, wait a moment and try again (no state change)
 					if ( ! _resolv() )
 					{
@@ -493,7 +502,6 @@ namespace synthese
 				}
 
 				// Close the socket and start the connection again
-				// If we are disabled, wait for us to be re-enabled
 				case CLOSE :
 				{
 					_close();
@@ -501,14 +509,6 @@ namespace synthese
 					timerClose.wait();
 					_next = RESOLVE;
 					_mutex.unlock();
-
-					// If we are disabled, wait on re-enabling
-					if ( ! _enabled )
-					{
-						Log::GetInstance().info("SCOM : Service disabled");
-						_mutexDisable.lock();
-						Log::GetInstance().info("SCOM : Service enabled");
-					}
 
 					_mainLoop("", boost::system::error_code());
 
