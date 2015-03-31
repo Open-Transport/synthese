@@ -344,13 +344,26 @@ namespace synthese
 
 					if (resa.getCustomer())
 					{
-						contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
-						contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
+						security::User* customer = resa.getCustomer();
 
-						boost::shared_ptr<const User> customer = UserTableSync::getUserFromLogin(resa.getCustomer()->getLogin());
-						LoginToken token(LoginToken(customer->getLogin(),customer->getPasswordHash(),resa.getKey()));
+						contentMap.insert(DATA_USER_NAME, customer->getName());
+						contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
+						contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
+						contentMap.insert(DATA_USER_PHONE, customer->getPhone());
+						contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
+						contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
+
+						if(!customer->getPassword().empty())
+						{
+							contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
+						}
+						else
+						{
+							contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
+						}
+
+						LoginToken token(LoginToken(customer->getLogin(), customer->getPasswordHash(), resa.getKey()));
 						contentMap.insert(DATA_TOKEN_CANCELLATION, token.toString());
-
 					}
 
 					_cmsConfirmationEMail.get()->display(content, contentMap);
@@ -468,8 +481,23 @@ namespace synthese
 				
 				if (resas.front().getCustomer())
 				{
-					contentMap.insert(DATA_CUSTOMER_NAME, resas.front().getCustomer()->getName());
-					contentMap.insert(DATA_USER_SURNAME, resas.front().getCustomer()->getSurname());
+					security::User* customer = resas.front().getCustomer();
+
+					contentMap.insert(DATA_USER_NAME, customer->getName());
+					contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
+					contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
+					contentMap.insert(DATA_USER_PHONE, customer->getPhone());
+					contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
+					contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
+
+					if(!customer->getPassword().empty())
+					{
+						contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
+					}
+					else
+					{
+						contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
+					}
 				}
 
 				_cmsMultiReservationsEMail.get()->display(content, contentMap);
