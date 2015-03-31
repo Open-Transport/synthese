@@ -47,6 +47,9 @@ namespace synthese
 		///	@ingroup m19
 		class InterSYNTHESEPackageContent
 		{
+		public:
+			typedef std::vector<boost::shared_ptr<util::Registrable> > LoadedObjects;
+
 		private:
 			util::Env& _env;
 			boost::shared_ptr<InterSYNTHESEPackage> _package;
@@ -55,6 +58,7 @@ namespace synthese
 			std::set<util::RegistryKeyType> _objectsToRemove;
 			typedef std::deque<const util::Registrable*> ObjectsToSave;
 			ObjectsToSave _objectsToSave;
+			LoadedObjects _loadedObjects;
 			std::vector<util::RegistryKeyType> _orderedObjectsToRemove;
 
 			void _prepareObjectsToRemove(
@@ -101,6 +105,8 @@ namespace synthese
 				const boost::shared_ptr<InterSYNTHESEPackage>& pacakge,
 				boost::optional<const impex::Importer&> importer
 			);
+
+			LoadedObjects& getLoadedObjects();
 
 			void save(
 				db::DBTransaction& transaction

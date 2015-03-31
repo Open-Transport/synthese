@@ -157,13 +157,13 @@ namespace synthese
 
 			// The package
 			_package->set<Key>(
-				_objects.get<RegistryKeyType>(Key::FIELD.name)
+				_objects.get<RegistryKeyType>(Key::FIELD.name, 0)
 			);
 			_package->set<Name>(
-				_objects.get<string>(Name::FIELD.name)
+				_objects.get<string>(Name::FIELD.name, "unknown")
 			);
 			_package->set<Code>(
-				_objects.get<string>(Code::FIELD.name)
+				_objects.get<string>(Code::FIELD.name, "")
 			);
 			if(_objects.count(LockTime::FIELD.name))
 			{
@@ -174,7 +174,7 @@ namespace synthese
 				_package->set<LastJSON>(s);
 			}
 			_package->set<Public>(
-				_objects.get<bool>(Public::FIELD.name)
+				_objects.get<bool>(Public::FIELD.name, false)
 			);
 			_prepareObjectsToRemove(_objects);
 			_package->set<Objects>(
@@ -318,6 +318,7 @@ namespace synthese
 							_env.addRegistrable(rObject);
 						}
 					}
+					_loadedObjects.push_back(rObject);
 					result.push_back(TableOrObject(rObject));
 			}	}
 
@@ -370,6 +371,14 @@ namespace synthese
 			return result;
 		}
 
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Return the list of objects loaded
+		//////////////////////////////////////////////////////////////////////////
+		InterSYNTHESEPackageContent::LoadedObjects &InterSYNTHESEPackageContent::getLoadedObjects()
+		{
+			return _loadedObjects;
+		}
 
 
 		//////////////////////////////////////////////////////////////////////////

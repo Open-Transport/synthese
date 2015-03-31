@@ -160,7 +160,7 @@ namespace synthese
 				site->set<ClientURL>(_directory.substr(found));
 			}
 
-			string siteName(path(_directory).filename());
+			string siteName(path(_directory).filename().string());
 			site->set<Name>(siteName);
 			_logLoad("Creation of site: " + siteName);
 
@@ -215,7 +215,7 @@ namespace synthese
 			for ( boost::filesystem::directory_iterator end, dir(directoryPath / currentDir);
 				   dir != end; ++dir )
 			{
-				string pageName(dir->path().filename());
+				string pageName(dir->path().filename().string());
 				string absPath(dir->path().string());
 				path relPath(currentDir / pageName);
 				bool ignoreWhiteChars = false;
@@ -285,7 +285,7 @@ namespace synthese
 					page->setParent(parent);
 
 					// Calc a mime type base on the extension
-					string extension(dir->path().extension());
+					string extension(dir->path().extension().string());
 					if(!extension.empty())
 					{
 						// boost path includes the . in the extension but
