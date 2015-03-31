@@ -245,7 +245,7 @@ namespace synthese
 			}
 			
 			vector<ParametersMap> pms;
-
+            set<RegistryKeyType> newObjectsKeys;
 			// Loop for Loading or creating objects
 			BOOST_FOREACH(const ptree::value_type& it, node.get_child(TableOrObject::TAG_OBJECT))
 			{
@@ -340,7 +340,8 @@ namespace synthese
 						const RegistryBase& registry(directTableSync.getRegistry(_env));
 						if( !registry.contains(rObject->getKey()))
 						{
-							_env.addRegistrable(rObject);
+                            newObjectsKeys.insert(rObject->getKey());
+                            _env.addRegistrable(rObject);
 						}
 					}
 					_loadedObjects.push_back(rObject);
@@ -376,8 +377,9 @@ namespace synthese
 				{
 					try
 					{
-//						DBModule::LoadObjects(rObject->getLinkedObjectsIds(map), _env, UP_LINKS_LOAD_LEVEL);
-						if(rObject->loadFromRecord(map, _env))
+                        bool isNewObject(newObjectsKeys.find(rObject->getKey()) != newObjectsKeys.end());
+                        bool isUpdatedObject(rObject->loadFromRecord(map, _env));
+						if(isNewObject || isUpdatedObject)
 						{
 							localObjectsToSave.push_front(rObject);
 						}
