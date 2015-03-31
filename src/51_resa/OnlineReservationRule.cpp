@@ -796,15 +796,28 @@ namespace synthese
 					contentMap.insert(DATA_ARRIVAL_PLACE_NAME, (*resa.getReservations().rbegin())->getArrivalPlaceNameNoCity());
 					contentMap.insert(DATA_DEPARTURE_DATE, to_simple_string((*resa.getReservations().begin())->getDepartureTime().date()));
 					contentMap.insert(DATA_SEATS_NUMBER, lexical_cast<string>(resa.getSeats()));
+
 					if (resa.getCustomer())
 					{
-						contentMap.insert(DATA_CUSTOMER_NAME, resa.getCustomer()->getName());
+						security::User* customer = resa.getCustomer();
+
+						contentMap.insert(DATA_USER_NAME, customer->getName());
+						contentMap.insert(DATA_USER_SURNAME, customer->getSurname());
+						contentMap.insert(DATA_USER_KEY, lexical_cast<string>(customer->getKey()));
+						contentMap.insert(DATA_USER_PHONE, customer->getPhone());
+						contentMap.insert(DATA_USER_EMAIL, customer->getEMail());
+						contentMap.insert(DATA_USER_LOGIN, customer->getLogin());
+
+						if(!customer->getPassword().empty())
+						{
+							contentMap.insert(DATA_USER_PASSWORD, customer->getPassword());
+						}
+						else
+						{
+							contentMap.insert(DATA_USER_PASSWORD, TYPE_UNCHANGED_PASSWORD);
+						}
 					}
-					contentMap.insert(DATA_CUSTOMER_PHONE, resa.getCustomerPhone());
-					if (resa.getCustomer())
-					{
-						contentMap.insert(DATA_USER_SURNAME, resa.getCustomer()->getSurname());
-					}
+
 					contentMap.insert(DATA_CANCELLATION_BECAUSE_OF_ABSENCE, isBecauseOfAbsence);
 
 					_cmsCancellationEMail.get()->display(content, contentMap);
