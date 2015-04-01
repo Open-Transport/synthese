@@ -51,7 +51,6 @@ namespace synthese
         void
         CallbackRequestAlertProcessor::processAlerts()
         {
-            util::Log::GetInstance().debug("Processing callback requests alerts");
             AlertTableSync::SearchResult callbackRequestAlerts(AlertTableSync::Search(Env::GetOfficialEnv(), ALERT_TYPE_CALLBACKREQUEST));
 
             std::map<util::RegistryKeyType, boost::shared_ptr<VehicleCall> > latestVehicleCalls;
@@ -131,8 +130,6 @@ namespace synthese
                     AlertTableSync::Save(&callbackRequestAlert);
                 }
             }
-
-            util::Log::GetInstance().debug("Processed callback requests alerts");
 
         }
 
