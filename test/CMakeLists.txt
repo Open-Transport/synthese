@@ -10,7 +10,7 @@ macro(boost_test name deps)
   add_executable(${target} ${name}Test.cpp ${ARGN})
   target_link_libraries(${target}
     ${Boost_LIBRARIES} ${deps})
-  add_test(${target} ${target})
+  add_test(NAME ${target} COMMAND ${target} --log_format=XML --log_sink=${target}-results.xml --log_level=all)
   if(DEFINED TESTS_ENV)
     set_tests_properties(${target} PROPERTIES ENVIRONMENT ${TESTS_ENV})
   endif()
