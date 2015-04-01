@@ -128,4 +128,22 @@ namespace synthese
 			}
 
 		}
+
+
+
+		void DRTArea::removeStopArea(StopArea* stopArea)
+		{
+			Stops::Type::iterator stopIter = get<Stops>().begin();
+
+			while(get<Stops>().end() != stopIter)
+			{
+				if(stopArea == *stopIter)
+				{
+					get<Stops>().erase(stopIter);
+					break;
+				}
+
+				++stopIter;
+			}
+		}
 }	}

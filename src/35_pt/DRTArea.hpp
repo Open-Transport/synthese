@@ -71,6 +71,8 @@ namespace synthese
 			virtual void unlink();
 
 			virtual void addAdditionalParameters(util::ParametersMap& map, std::string prefix /* = std::string */) const;
+
+			virtual void removeStopArea(pt::StopArea* stopArea);
 		};
 }	}
 

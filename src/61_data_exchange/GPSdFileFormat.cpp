@@ -247,7 +247,10 @@ namespace synthese
 				}
 				if(nearestStopPoint)
 				{
-					util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources());
+					util::Log::GetInstance().debug("GPSdFileFormat : Stop is "+ nearestStopPoint->getCodeBySources() +
+												   string(" name=") + nearestStopPoint->getName() +
+												   string(" lat=") + boost::lexical_cast<std::string>(lat) +
+												   string("lon=") + boost::lexical_cast<std::string>(lon));
 				} else {
 					util::Log::GetInstance().debug("GPSdFileFormat : No nearest stop found for " +
 												   string("lat=") + boost::lexical_cast<std::string>(lat) +
@@ -402,9 +405,18 @@ namespace synthese
 						// We assume there is a single answer in tpv[]
 						// In a multi device configuration we should find our one in the
 						// device property.
-						lat = pt.get_child("tpv").front().second.get<double>("lat");
-						lon = pt.get_child("tpv").front().second.get<double>("lon");
-						return true;
+						if(!pt.get_child("tpv").empty())
+						{
+							lat = pt.get_child("tpv").front().second.get<double>("lat");
+							lon = pt.get_child("tpv").front().second.get<double>("lon");
+							return true;
+						}
+						else
+						{
+							_logWarning("GPSdFileFormat got not tpv position");
+							return false;
+						}
+
 					}
 				}
 				catch (std::exception const& e)

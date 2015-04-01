@@ -103,6 +103,11 @@ namespace synthese
 		}
 
 
+		StopArea::~StopArea()
+		{
+			unlink();
+		}
+
 
 		void StopArea::addPhysicalStop(
 			const StopPoint& physicalStop
@@ -1035,6 +1040,17 @@ namespace synthese
 				{
 					const_cast<City*>(getCity())->removeIncludedPlace(*this);
 				}
+			}
+		}
+
+
+
+		void StopArea::unlink()
+		{
+			// unregister from each DRTArea
+			BOOST_FOREACH(DRTArea* drtArea, getDRTAreas())
+			{
+				drtArea->removeStopArea(this);
 			}
 		}
 
