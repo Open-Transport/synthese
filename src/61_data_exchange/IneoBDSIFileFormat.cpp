@@ -65,6 +65,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace departure_boards;
+	using namespace geography;
 	using namespace graph;
 	using namespace impex;
 	using namespace inter_synthese;
