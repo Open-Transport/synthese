@@ -238,48 +238,31 @@ namespace synthese
 			if(	serviceIsReservable &&
 				!_readReservationsFromDay.is_not_a_date()
 			){
-				// Use cache if for today
-				if(_readReservationsFromDay == day_clock::local_day())
+				// Reservations reading
+				date date2(_readReservationsFromDay);
+				date2 += days(1);
+				ReservationTableSync::SearchResult reservationsTable(
+					ReservationTableSync::Search(
+						*_env,
+						static_cast<const JourneyPattern*>(_service->getPath())->getCommercialLine()->getKey(),
+						_readReservationsFromDay,
+						date2,
+						boost::none,
+						false,
+						true,
+						true,
+						0,
+						boost::none,
+						UP_LINKS_LOAD_LEVEL,
+						_service->getKey()
+				)	);
+				BOOST_FOREACH(const ReservationTableSync::SearchResult::value_type& resa, reservationsTable)
 				{
-					const ResaModule::ReservationsByService::mapped_type& reservationsEnv(
-						ResaModule::GetReservationsByService(
-							*_service
+					resas.push_back(
+						make_pair(
+							resa.get(),
+							false
 					)	);
-					BOOST_FOREACH(const ResaModule::ReservationsByService::mapped_type::value_type& resa, reservationsEnv)
-					{
-						resas.push_back(
-							make_pair(resa, false)
-						);
-					}
-				}
-				else // Read in database (slower)
-				{
-					// Reservations reading
-					date date2(_readReservationsFromDay);
-					date2 += days(1);
-					ReservationTableSync::SearchResult reservationsTable(
-						ReservationTableSync::Search(
-							*_env,
-							static_cast<const JourneyPattern*>(_service->getPath())->getCommercialLine()->getKey(),
-							_readReservationsFromDay,
-							date2,
-							boost::none,
-							false,
-							true,
-							true,
-							0,
-							boost::none,
-							UP_LINKS_LOAD_LEVEL,
-							_service->getKey()
-					)	);
-					BOOST_FOREACH(const ReservationTableSync::SearchResult::value_type& resa, reservationsTable)
-					{
-						resas.push_back(
-							make_pair(
-								resa.get(),
-								false
-						)	);
-					}
 				}
 			}
 			
