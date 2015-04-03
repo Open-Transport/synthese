@@ -1824,14 +1824,14 @@ LPCTSTR XMLNode::getAttribute(LPCTSTR name, int j)
     return getAttribute(name,&i);
 }
 
-LPCTSTR XMLNode::getName(){ if (!d) return NULL; return d->lpszName;   }
+LPCTSTR XMLNode::getName(){ if (!d) return ""; return d->lpszName;   }
 int XMLNode::nText()      { if (!d) return 0; return d->nText;      }
 int XMLNode::nChildNode() { if (!d) return 0; return d->nChild;     }
 int XMLNode::nAttribute() { if (!d) return 0; return d->nAttribute; }
 int XMLNode::nClear()     { if (!d) return 0; return d->nClear;     }
 XMLClear     XMLNode::getClear     (int i) { if (!d) return emptyXMLClear;     if (i>=d->nClear    ) return emptyXMLClear;     return d->pClear[i];     }
 XMLAttribute XMLNode::getAttribute (int i) { if (!d) return emptyXMLAttribute; if (i>=d->nAttribute) return emptyXMLAttribute; return d->pAttribute[i]; }
-LPCTSTR      XMLNode::getText      (int i) { if (!d) return NULL;              if (i>=d->nText     ) return NULL;              return d->pText[i];      }
+LPCTSTR      XMLNode::getText      (int i) { if (!d) return "";              if (i>=d->nText     ) return "";              return d->pText[i];      }
 XMLNode      XMLNode::getChildNode (int i) { if (!d) return emptyXMLNode;      if (i>=d->nChild    ) return emptyXMLNode;      return d->pChild[i];     }
 char         XMLNode::isDeclaration(     ) { if (!d) return 0;                 return d->isDeclaration; }
 char         XMLNode::isEmpty      (     ) { return (d==NULL); }
