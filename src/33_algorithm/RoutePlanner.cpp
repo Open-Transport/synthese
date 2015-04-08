@@ -248,13 +248,23 @@ namespace synthese
 			if(accessDirection == DEPARTURE_TO_ARRIVAL &&
 				(originDateTime > minMaxDateTimeAtOrigin || originDateTime > minMaxDateTimeAtDestination || minMaxDateTimeAtOrigin > minMaxDateTimeAtDestination)
 			){
-				assert(false);
+				// CHU : This is to debug, it should not come in master
+				//assert(false);
+				VertexAccessMap::VamMap::const_iterator it1(startVam.getMap().begin());
+				VertexAccessMap::VamMap::const_iterator it2(endVam.getMap().begin());
+				util::Log::GetInstance().debug("RoutePlanner::_findBestJourney : should assert for a trip from " +
+					it1->first->getName() + " to " + it2->first->getName());
 				return;
 			}
 			if(accessDirection == ARRIVAL_TO_DEPARTURE &&
 				(originDateTime < minMaxDateTimeAtOrigin || originDateTime < minMaxDateTimeAtDestination || minMaxDateTimeAtOrigin < minMaxDateTimeAtDestination)
 			){
-				assert(false);
+				// CHU : This is to debug, it should not come in master
+				//assert(false);
+				VertexAccessMap::VamMap::const_iterator it1(startVam.getMap().begin());
+				VertexAccessMap::VamMap::const_iterator it2(endVam.getMap().begin());
+				util::Log::GetInstance().debug("RoutePlanner::_findBestJourney : should assert for a trip from " +
+					it1->first->getName() + " to " + it2->first->getName());
 				return;
 			}
 
