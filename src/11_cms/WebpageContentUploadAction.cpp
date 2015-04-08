@@ -51,8 +51,15 @@ namespace synthese
 		const string WebpageContentUploadAction::PARAMETER_CONTENT = Action_PARAMETER_PREFIX + "_content";
 		const string WebpageContentUploadAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "_site_id";
 		const string WebpageContentUploadAction::PARAMETER_UP_ID = Action_PARAMETER_PREFIX + "_up_id";
+		const string WebpageContentUploadAction::PARAMETER_SMART_URL_FROM_TREE = Action_PARAMETER_PREFIX + "_smart_url_from_tree";
 		
-		
+
+        WebpageContentUploadAction::WebpageContentUploadAction()
+            : _smartUrlFromTree(false)
+        {
+            
+        }
+
 		
 		ParametersMap WebpageContentUploadAction::getParametersMap() const
 		{
@@ -68,6 +75,10 @@ namespace synthese
 			if(_up.get())
 			{
 				map.insert(PARAMETER_UP_ID, _up->getKey());
+			}
+			if(_smartUrlFromTree)
+			{
+				map.insert(PARAMETER_SMART_URL_FROM_TREE, true);
 			}
 			return map;
 		}
@@ -110,6 +121,12 @@ namespace synthese
 					throw ActionException("Site not found");
 				}
 			}
+
+            if (map.getOptional<bool>(PARAMETER_SMART_URL_FROM_TREE))
+            {
+                _smartUrlFromTree = map.get<bool>(PARAMETER_SMART_URL_FROM_TREE);
+            }
+            
 			if(!_page.get())
 			{
 				if(!_site.get() && !_up.get())
@@ -168,12 +185,25 @@ namespace synthese
 			if(_page->get<SmartURLPath>().empty())
 			{
 				string smartURL;
-				if(_page->getParent() && !_page->getParent()->get<SmartURLPath>().empty())
-				{
-					smartURL = _page->getParent()->get<SmartURLPath>();
-				}
-				smartURL += "/" + _file.filename;
-				_page->set<SmartURLPath>(smartURL);
+                if (_smartUrlFromTree)
+                {
+                    smartURL += "/" + _file.filename;
+                    Webpage* webPage(_page->getParent());
+                    while (webPage)
+                    {
+                        smartURL = "/" + webPage->getName() + smartURL;
+                        webPage = webPage->getParent();
+                    }
+                }
+                else
+                {
+                    if(_page->getParent() && !_page->getParent()->get<SmartURLPath>().empty())
+                    {
+                        smartURL = _page->getParent()->get<SmartURLPath>();
+                    }
+                    smartURL += "/" + _file.filename;
+                }
+                _page->set<SmartURLPath>(smartURL);
 			}
 
 			// Update of the name if necessary

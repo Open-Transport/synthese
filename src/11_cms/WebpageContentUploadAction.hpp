@@ -58,11 +58,13 @@ namespace synthese
 			static const std::string PARAMETER_CONTENT;
 			static const std::string PARAMETER_UP_ID;
 			static const std::string PARAMETER_SITE_ID;
+   		    static const std::string PARAMETER_SMART_URL_FROM_TREE;
 
 		private:
 			boost::shared_ptr<Webpage> _page;
 			boost::shared_ptr<Webpage> _up;
 			boost::shared_ptr<Website> _site;
+			bool _smartUrlFromTree;
 			util::ParametersMap::File _file;
 
 		protected:
@@ -80,6 +82,9 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
+
+            WebpageContentUploadAction();
+            
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
