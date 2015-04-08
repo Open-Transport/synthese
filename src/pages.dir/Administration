@@ -492,6 +492,22 @@
 
  <div class="form-horizontal">
   <div class="control-group">
+   <label class="control-label">Nom du serveur (:port)</label>
+   <div class="controls">
+    <?form&
+      target=<@p@>&
+      tab=system&
+      a=global_variable_update&
+      actionParam_variable=server_name&
+      actionParam_persistent=1&
+      class=form-inline&
+    ?>
+     <input type="text" name="actionParam_value" value="<@~global("server_name")@>" />
+     <button type="submit" class="btn btn-danger">Modifier</button>
+    </form>
+   </div>
+  </div>
+ <div class="control-group">
    <label class="control-label">Adresse serveur SMTP</label>
    <div class="controls">
     <?form&
