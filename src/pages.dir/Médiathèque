@@ -197,6 +197,7 @@
 	a=WebpageContentUploadAction&
 	target=<@p@>&
 	actionParam_up_id=<@folder_id@>&
+    actionParam_smart_url_from_tree=1&
 	roid=<@folder_id@>
       ?>
       <div class="modal-body">
