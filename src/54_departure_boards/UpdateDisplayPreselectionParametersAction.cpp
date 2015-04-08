@@ -57,6 +57,7 @@ namespace synthese
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION(Action_PARAMETER_PREFIX + "fu");
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_END_FILTER = Action_PARAMETER_PREFIX + "ef";
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY = Action_PARAMETER_PREFIX + "md";
+		const string UpdateDisplayPreselectionParametersAction::PARAMETER_MAX_TRANSFER_DURATION = Action_PARAMETER_PREFIX + "max_transfer_duration";
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_ALLOW_CANCELED = Action_PARAMETER_PREFIX + "allow_canceled";
 
 
@@ -82,6 +83,7 @@ namespace synthese
 				setScreenId(map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN));
 				_cleaningDelay = map.get<int>(PARAMETER_CLEANING_DELAY);
 				_maxDelay = map.get<int>(PARAMETER_DISPLAY_MAX_DELAY);
+				_maxTransferDuration = map.get<int>(PARAMETER_MAX_TRANSFER_DURATION);
 				_function = static_cast<DisplayFunction>(map.get<int>(PARAMETER_DISPLAY_FUNCTION));
 				_preselectionDelay = map.getOptional<int>(PARAMETER_PRESELECTION_DELAY);
 				_endFilter = static_cast<EndFilter>(map.get<int>(PARAMETER_DISPLAY_END_FILTER));
@@ -180,6 +182,10 @@ namespace synthese
 			// Max delay
 			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->get<MaxDelay>(), _maxDelay);
 			_screen->set<MaxDelay>(_maxDelay);
+
+			// Max Transfer duration
+			DBLogModule::appendToLogIfChange(t, "Délai de correspondance", _screen->get<MaxTransferDuration>(), _maxTransferDuration);
+			_screen->set<MaxTransferDuration>(_maxTransferDuration);
 
 			// Allow canceled
 			if(_allowCanceled)

@@ -119,6 +119,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(SubScreenTypeCode, "sub_screen_type", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(AllowCanceled, "allow_canceled", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(StopPointLocation, "stop_point_location", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaxTransferDuration, "max_transfer_duration", SQL_INTEGER)
 	
 	namespace util
 	{
@@ -182,7 +183,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(SubScreenTypeCode),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
 					FIELD_VALUE_CONSTRUCTOR(AllowCanceled, false),
-					FIELD_DEFAULT_CONSTRUCTOR(StopPointLocation)
+					FIELD_DEFAULT_CONSTRUCTOR(StopPointLocation),
+					FIELD_VALUE_CONSTRUCTOR(MaxTransferDuration, 180)
 			)	),
 			_direction(DISPLAY_DEPARTURES),
 			_originsOnly(WITH_PASSING),
@@ -366,7 +368,7 @@ namespace synthese
 			if(it != _transfers.end())
 			{
 				ptime routePlanningEndTime(approachJourney.getFirstDepartureTime());
-				routePlanningEndTime += days(1);
+				routePlanningEndTime += minutes(get<MaxTransferDuration>());
 				AlgorithmLogger logger;
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{

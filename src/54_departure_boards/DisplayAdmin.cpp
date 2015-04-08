@@ -509,6 +509,7 @@ namespace synthese
 						true
 						)	);
 					stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, lexical_cast<string>(_displayScreen->get<MaxDelay>())) + " minutes");
+					stream << t.cell("Délai maximum de correspondance", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_MAX_TRANSFER_DURATION, lexical_cast<string>(_displayScreen->get<MaxTransferDuration>())) + " minutes");
 					stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
 						UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
