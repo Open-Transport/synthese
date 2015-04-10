@@ -46,6 +46,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,ActionService>
 		{
 		public:
+			static const std::string PARAMETER_ACTION_NAME;
 			static const std::string ATTR_ERROR_MESSAGE;
 			static const std::string ATTR_GENERATED_ID;
 

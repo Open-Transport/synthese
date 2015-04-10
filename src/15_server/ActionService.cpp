@@ -24,6 +24,7 @@
 
 #include "ActionService.hpp"
 
+#include "MimeTypes.hpp"
 #include "ActionException.h"
 #include "RequestException.h"
 #include "Request.h"
@@ -41,6 +42,7 @@ namespace synthese
 	
 	namespace server
 	{
+		const string ActionService::PARAMETER_ACTION_NAME = "action_name";
 		const string ActionService::ATTR_ERROR_MESSAGE = "error_message";
 		const string ActionService::ATTR_GENERATED_ID = "generated_id";
 
@@ -53,7 +55,7 @@ namespace synthese
 			// The action key
 			if(_action.get())
 			{
-				map.insert(Request::PARAMETER_ACTION, _action->getFactoryKey());
+				map.insert(ActionService::PARAMETER_ACTION_NAME, _action->getFactoryKey());
 			}
 
 			return map;
@@ -63,12 +65,14 @@ namespace synthese
 
 		void ActionService::_setFromParametersMap(const ParametersMap& map)
 		{
+			setOutputFormatFromMap(map, "html");
+
 			// The action
 			try
 			{
 				_action.reset(
 					Factory<Action>::create(
-						map.get<string>(Request::PARAMETER_ACTION)
+						map.get<string>(ActionService::PARAMETER_ACTION_NAME)
 				)	);
 			}
 			catch(FactoryException<Action>&)
@@ -112,10 +116,20 @@ namespace synthese
 					map.insert(ATTR_GENERATED_ID, *request.getActionCreatedId());
 				}
 			}
+
 			catch(ActionException& e)
 			{
 				map.insert(ATTR_ERROR_MESSAGE, e.getMessage());
 				Log::GetInstance().debug("Action error : " + e.getMessage());
+			}
+
+			if (_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, "result");
+			}
+			else if (_outputFormat == MimeTypes::XML)
+			{
+				map.outputXML(stream, "result");
 			}
 
 			return map;
@@ -133,6 +147,6 @@ namespace synthese
 
 		std::string ActionService::getOutputMimeType() const
 		{
-			return "text/html";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 }	}

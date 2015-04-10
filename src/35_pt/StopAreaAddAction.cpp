@@ -145,6 +145,7 @@ namespace synthese
 			transaction.run();
 
 //			::AddCreationEntry(object, request.getUser().get());
+			request.setActionWillCreateObject();
 			request.setActionCreatedId(stopArea.getKey());
 		}
 
