@@ -57,6 +57,7 @@ namespace synthese
 
 		void InterSYNTHESEConfigsViewService::_setFromParametersMap(const ParametersMap& map)
 		{
+			setOutputFormatFromMap(map, string());
 		}
 
 
@@ -77,6 +78,16 @@ namespace synthese
 				it.second->toParametersMap(*configPM, true);
 
 				map.insert(TAG_CONFIG, configPM);
+			}
+
+			// Output
+			if(_outputFormat == MimeTypes::XML)
+			{
+				map.outputXML(stream, TAG_CONFIG, true);
+			}
+			else if(_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, string());
 			}
 
 			return map;
