@@ -61,6 +61,8 @@ namespace synthese
 		{
 			// With queues
 			_withQueues = map.getDefault<bool>(PARAMETER_WITH_QUEUES, false);
+
+			setOutputFormatFromMap(map, string());
 		}
 
 
@@ -81,6 +83,16 @@ namespace synthese
 				it.second->toParametersMap(*slavePM, _withQueues);
 
 				map.insert(TAG_SLAVE, slavePM);
+			}
+
+			// Output
+			if(_outputFormat == MimeTypes::XML)
+			{
+				map.outputXML(stream, TAG_SLAVE, true);
+			}
+			else if(_outputFormat == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, string());
 			}
 
 			return map;
