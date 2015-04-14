@@ -35,6 +35,7 @@
 #include <boost/date_time/gregorian/greg_date.hpp>
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace boost;
@@ -107,7 +108,14 @@ namespace synthese
 
 			BOOST_FOREACH(CalendarDatesMap::value_type& aCalendarPair, calendarDates)
 			{
-				const string& calendarName(aCalendarPair.first);
+				// Calendar name : if the .xml extension exists, remove it
+				string calendarName(aCalendarPair.first);
+
+				if (boost::filesystem::extension(calendarName) == ".xml")
+				{
+					calendarName.erase(calendarName.length() - 4);
+				}
+
 				const DayList& daysList(aCalendarPair.second);
 
 				DatesVector datesList;
