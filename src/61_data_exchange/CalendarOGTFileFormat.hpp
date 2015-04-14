@@ -49,6 +49,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
 				public impex::OneFileTypeImporter<CalendarOGTFileFormat>,
+				public PTDataCleanerFileFormat,
 				public CalendarFileFormat
 			{
 			private:

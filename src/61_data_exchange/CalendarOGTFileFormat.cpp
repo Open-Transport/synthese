@@ -209,6 +209,7 @@ namespace synthese
 		):	Importer(env, import, minLogLevel, logPath, outputStream, pm),
 			OneFileTypeImporter<CalendarOGTFileFormat>(env, import, minLogLevel, logPath, outputStream, pm),
 			CalendarFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
+			PTDataCleanerFileFormat(env, import, minLogLevel, logPath, outputStream, pm),
 			_ogtImporter(env, import, minLogLevel, logPath, outputStream, pm),
 			_calendarTemplates(*import.get<DataSource>(), env)
 		{}
