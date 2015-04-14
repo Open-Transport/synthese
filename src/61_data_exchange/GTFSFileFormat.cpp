@@ -609,6 +609,7 @@ namespace synthese
 				while(getline(inFile, line))
 				{
 					_loadLine(line);
+					util::Log::GetInstance().debug("GTFS : load line : " + line);
 
 					string tripCode(_getValue("trip_id"));
 					if(tripCode != lastTripCode && !lastTripCode.empty() && !tripDetailVector.empty())
