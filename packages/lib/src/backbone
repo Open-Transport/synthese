@@ -1,0 +1,22 @@
+<tr>
+<td>Backbone</td>
+<td>0.5.1</td>
+<td>Javascript library</td>
+<td><a class="btn btn-primary btn-mini" href="http://documentcloud.github.com/backbone" target="_new">www</a></td>
+<td><a class="btn btn-primary btn-mini" href="http://documentcloud.github.com/backbone" target="_new">doc</a></td>
+<td>
+    <div id="backbone_code" class="modal hide fade">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Backbone code</h3>
+    </div>
+    <div class="modal-body">
+    <pre>&lt;script type="text/javascript" src="/lib/backbone/backbone-0.5.1.min.js">&lt;/script></pre>
+    </div>
+    <div class="modal-footer">
+    <button data-dismiss="modal" class="btn btn-primary">Close</button>
+    </div>
+    </div>
+    <a href="#backbone_code" class="btn btn-primary btn-mini" data-toggle="modal">code</a>
+</td>
+</tr>

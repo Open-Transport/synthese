@@ -1,0 +1,24 @@
+<tr>
+<td>Bootstrap</td>
+<td>2.3.1</td>
+<td>CSS library for advanced HMI</td>
+<td><a class="btn btn-primary btn-mini" href="http://twitter.github.com/bootstrap/" target="_new">www</a></td>
+<td><a class="btn btn-primary btn-mini" href="http://twitter.github.com/bootstrap/getting-started.html" target="_new">doc</a></td>
+<td>
+    <div id="bootstrap_code" class="modal hide fade">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Bootstrap code</h3>
+    </div>
+    <div class="modal-body">
+    <pre>&lt;link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+&lt;script src="/lib/jquery/jquery-1.7.1.min.js">&lt;/script>
+&lt;script src="/lib/bootstrap/js/bootstrap.min.js">&lt;/script></pre>
+    </div>
+    <div class="modal-footer">
+    <button data-dismiss="modal" class="btn btn-primary">Close</button>
+    </div>
+    </div>
+    <a href="#bootstrap_code" class="btn btn-primary btn-mini" data-toggle="modal">code</a>
+</td>
+</tr>

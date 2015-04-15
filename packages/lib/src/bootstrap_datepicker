@@ -1,0 +1,23 @@
+<tr>
+<td>Bootstrap Datepicker</td>
+<td>12/3/2013</td>
+<td>Calendar plug-in for Bootstrap</td>
+<td><a class="btn btn-primary btn-mini" href="http://www.eyecon.ro/bootstrap-datepicker/" target="_new">www</a></td>
+<td><a class="btn btn-primary btn-mini" href="http://www.eyecon.ro/bootstrap-datepicker/" target="_new">doc</a></td>
+<td>
+    <div id="bootstrap_datepicker_code" class="modal hide fade">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>DataTables code</h3>
+    </div>
+    <div class="modal-body">
+    <pre>&lt;link href="/lib/bootstrap_datepicker/css/datepicker.css" rel="stylesheet">
+&lt;script src="/lib/bootstrap_datepicker/js/bootstrap-datepicker.js">&lt;/script></pre>
+    </div>
+    <div class="modal-footer">
+    <button data-dismiss="modal" class="btn btn-primary">Close</button>
+    </div>
+    </div>
+    <a href="#bootstrap_datepicker_code" class="btn btn-primary btn-mini" data-toggle="modal">code</a>
+</td>
+</tr>

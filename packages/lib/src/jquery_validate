@@ -1,0 +1,22 @@
+<tr>
+<td>JQuery Validate</td>
+<td>1.1.2</td>
+<td>JQuery plugin for an easily and quickly form validation.</td>
+<td><a class="btn btn-primary btn-mini" href="https://github.com/DiegoLopesLima/Validate" target="_new">www</a></td>
+<td><a class="btn btn-primary btn-mini" href="https://github.com/DiegoLopesLima/Validate" target="_new">doc</a></td>
+<td>
+    <div id="jquery_validate_code" class="modal hide fade">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>JQuery Validate code</h3>
+    </div>
+    <div class="modal-body">
+    <pre>&lt;script src="/lib/jquery_validate/js/jquery-validate.min.js">&lt;/script></pre>
+    </div>
+    <div class="modal-footer">
+    <button data-dismiss="modal" class="btn btn-primary">Close</button>
+    </div>
+    </div>
+    <a href="#jquery_validate_code" class="btn btn-primary btn-mini" data-toggle="modal">code</a>
+</td>
+</tr>
