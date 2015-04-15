@@ -1,0 +1,183 @@
+/** Administration panel dedicated stylesheet.
+	@file admin.css
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+
+html { height:100%; }
+body {font-family:helvetica, arial;font-size:0.8em;font-style:normal; height:100%; margin:0; }
+h1 {color:#333333; font-size:0.9em; text-transform:uppercase; background-color:#dcdddd; padding:0.3em; margin:2em 0 0.6em 0em;} 
+h2 {color:#333333; font-size:0.9em; font-weight:bold; border-bottom:solid #dcdddd 1px; margin-left:30px; } 
+h3 {color:#333333; font-size:0.9em; font-weight:bold; margin-left:30px; } 
+a {color:#3586cc; }
+a:hover {color:#666666;} 
+img { vertical-align:middle; }
+form {display:inline;} 
+ul {margin:0 0 0 30px; padding:0;}
+td,th { border:solid #ffffff 1px; } 
+table {margin-bottom:1.5em;border-collapse:collapse;}
+#wrapall {width:100%; min-height: 100%; float:left; padding:0; margin:0;}
+
+#title {width:100%; float:left; background-color:#d1e76e; padding:0; margin:0; color:#666666; border-bottom:solid 1px #C0C0C0; height:51px;}
+#logo { padding:0.3em; width:22%; float:left; }
+#adminpos { width:65%; float:left; font-size:0.85em; line-height:16px;}
+#adminpos a { text-decoration:none; }
+#adminpos img { vertical-align:bottom;  margin-right:2px; border:none; }
+#pagename { float:left; font-size:28px;background:#d1e76e url(/admin/img/round.png) no-repeat; padding-bottom:1px; line-height:30px; padding-top:2px; margin-right:10%;}
+#pagename img {  margin:8px 10px 5px 20px; }
+#user { float:right; text-align:right; }
+#user img { vertical-align:middle; }
+#username { margin-right:0.5em; margin-bottom:0.4em; }
+#logout { margin-right:0.5em; margin-bottom:0.4em; }
+
+
+#content { float:left; width:100% }
+
+#admintree { vertical-align:top; text-align:left; width:24%; float:left; min-height:100%; border-right:solid 1px #C0C0C0; overflow-x:auto; padding:2px 0 2px 2px; }
+#admintree2 { width:274px; }
+.adminpos img, .adminpos a { vertical-align:middle; } 
+#admintree a { text-decoration:none;} 
+#title p, #admintree p { display:inline; margin:0; padding: 0; }
+
+.tree_icons { float:left; width:32px; height:20px; vertical-align:top;}
+.tree_icon { float:left; width:16px; height:20px;  vertical-align:top; }
+.tree_icons .icon {float:right; }
+.tree_icons img, .tree_icon img { border:none; margin:0; float:left; display:block;}
+
+#admintree .text { float:right; padding-left:2px; min-height:20px; }
+#admintree .subtree { float:right; }
+
+.node { cursor:pointer; }
+
+.lastblock { background-image:url(/admin/img/ftv2lastnode.png); background-repeat:no-repeat; background-position:0 0; float:left;}
+.notlastblock { background-image:url(/admin/img/ftv2vertline.png); background-repeat:repeat-y; background-position:0 0; float:left;}
+
+
+.level0 { width:256px; }
+.subtree1 { width:258px; }
+.level1 { width:240px; }
+.subtree2 { width:242px; }
+.level2 { width:224px; }
+.subtree3 { width:226px; }
+.level3 { width:208px; }
+.subtree4 { width:210px; }
+.level4 { width:192px; }
+.subtree5 { width:194px; }
+.level5 { width:176px; }
+.subtree6 { width:178px; }
+.level6 { width:160px; }
+.subtree7 { width:162px; }
+.level7 { width:144px; }
+.subtree8 { width:146px; }
+.level8 { width:128px; }
+.subtree9 { width:130px; }
+.level9 { width:112px; }
+.subtree10 { width:114px; }
+.level10 { width:96px; }
+
+
+
+#admincontent {float:left; text-align:left; width:75%; border-left:solid 1px #C0C0C0; margin-left:-1px; min-height:500px;}
+#admincontent2 { padding:0 1em 2em 1em; }
+
+#footer { width:100%; text-align:right; float:left; padding:8px 0; background-color:#d1e76e; border-top:solid 1px #C0C0C0;}
+#footer, #footer a {color:#666666; }
+
+
+.alarmdisabled { background-color:#C0C0C0;} 
+.alarmdisplayedwithoutenddate { background-color:#FF0080;} 
+.alarmwillbedisplayed { background-color:#0080FF;} 
+.alarmdisplayedwithenddate { background-color:#00FF80;} 
+
+input[type=submit], a.linkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer; display:inline-block; margin:0; } 
+a.activatedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#ffffff; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer; display:inline-block; margin:0;} 
+a.clickedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:0.15em; cursor:pointer; display:inline-block; margin:0.05em; } 
+a.linkbutton img, a.activatedlinkbutton img, a.clickedlinkbutton img { border:none; vertical-align:bottom; cursor:pointer; } 
+
+input[type=submit]:hover { color:#ffffff; cursor:pointer;} 
+input[type=radio] {vertical-align:middle;} 
+label { vertical-align:middle; }
+
+table.searchform  { width:300px; margin-left:30px; }
+table.searchform td { border:none; margin-right:2em; padding:0.3em 1.5em 0.3em 0; white-space: nowrap; } 
+table.searchform td.submitcell { text-align:right; cursor:pointer; } 
+
+
+.adminresults img { border:none; vertical-align:middle; } 
+table.adminresults th, table.propertysheet th, table.adminresults tfoot td, table.propertysheet tfoot td { background-color:#999999; color:#ffffff; border:solid #dcdddd 1px; }
+table.adminresults th, table.propertysheet th { background-color:#999999; vertical-align:middle; padding:0.2em 1em; color:#ffffff; border:solid #dcdddd 1px; }
+table.adminresults a { color:#333333; text-decoration:none; }
+table.adminresults a:hover { color:#ffffff; }  
+table.adminresults th img { background-color:#999999; padding:1px 0px 1px 0px; } 
+table.adminresults td, table.propertysheet td { padding:0.3em; margin:0.2em;}
+table.adminresults, table.propertysheet {margin-top:0.4em; margin-left:30px;  border:solid #dcdddd 1px;}
+.adminresults .r1, .propertysheet .r1 {background:#dcdddd; }
+.adminresults .r2, .propertysheet .r2 {background:#f0f1f1; }
+.propertysheet .r1 td, .propertysheet .r2 td, .adminresults .r1 td, .adminresults .r2 td { border-bottom:none; border-top:none; }
+
+
+#admincontent .info { background:url(/admin/img/information.png) 4px no-repeat; background-color:#bed8ff; padding:4px 4px 4px 22px; color:#333333; }
+#admincontent p, #admincontent #map  { margin-left:30px !important;}
+#admincontent #map { width:700px !important; height:400px !important; }
+#admincontent a img {border:none;}
+
+#admincontent ul { margin-left:50px; border-left:dotted 4px #D0D0D0; padding-left:4px; }
+#admincontent li { padding-left:18px; margin-top:1px; vertical-align:middle; list-style:none; background-repeat:no-repeat; background-position:left; }
+#admincontent li img { margin-right:2px; vertical-align:middle;}
+
+
+
+/* MODULE ICONS : TO BE MOVED INTO MODULE SPECIFIC STYLESHEETS */
+
+li.broadcastpoint { background-image:url(/admin/img/building.png); }  
+li.folder { background-image:url(/admin/img/folder.png);  }  
+li.display { background-image:url(/admin/img/monitor.png); }  
+li.log { background-image:url(/admin/img/book_open.png); }  
+
+#calls { text-align:right; padding-right:5px; }
+
+.linesmall { font-weight:bold;padding:0px 5px 0px 5px; line-height:1.3em; width:50px; text-align:center; }
+
+/* TABS */
+.tabdiv { display:none; }
+.active_tab_content { display:block; }
+#admin_tabs { border-bottom: solid 2px #999999; padding:3px 5px 0 5px; margin:15px 0 0 0; }
+#admin_tabs span { display:inline-block; background-color:#d1e76e; border-style:solid; border-width:1px 1px 0 1px; border-color:#999999; color:black; padding:2pt 5pt 2pt 5pt; margin:0 5px 0 5px; font-size:11pt;}
+#admin_tabs span img { vertical-align:text-bottom;}
+#admin_tabs span:hover { cursor:pointer; color:white; }
+#admin_tabs .active_tab { background-color:#999999; color:white; }
+#admin_tabs .active_tab:hover { cursor:default; }
+
+.up_down_button { width:16px; display:inline-block;}
+
+span.line { padding: 0 5px 0 5px; font-weight:bold; margin: 0 1px 0 1px; }
+
+.waiting textarea, .waiting input { opacity:0.3;  filter : alpha(opacity=30); }
+
+@media print
+{
+    #admintree, #logo, #logout, #admin_tabs, #call { display:none; }
+    #title, #adminpos, #pagename { background-color:transparent !important; background-image:none; }
+    h1 { background-color:transparent !important; border-bottom:solid 1px gray; }
+}
+
+/* INPUTS */
+input.time_input { width:50px; }
+input.two_digit_input { width: 20px; }
+.adminresults select { max-width:150px; }
