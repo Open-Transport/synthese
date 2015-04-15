@@ -36,6 +36,7 @@
 
 #include <map>
 #include <boost/foreach.hpp>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 namespace synthese
@@ -96,6 +97,8 @@ namespace synthese
 			typedef typename Map::value_type value_type;
 			typedef typename Map::reverse_iterator reverse_iterator;
 			typedef typename Map::const_reverse_iterator const_reverse_iterator;
+			typedef std::vector<boost::shared_ptr<T> > Vector;
+			typedef std::vector<boost::shared_ptr<const T> > ConstVector;
 
 		private:
 
@@ -163,6 +166,14 @@ namespace synthese
 				const_reverse_iterator rbegin() const { return _registry.rbegin(); }
 				reverse_iterator rend() { return _registry.rend(); }
 				const_reverse_iterator rend() const { return _registry.rend(); }
+
+				Vector getVector() const ;
+				ConstVector getConstVector() const ;
+
+				typedef boost::function<bool (const T&)> Selector;
+				Vector getVector(Selector selector) const ;
+				ConstVector getConstVector(Selector selector) const ;
+
 			//@}
 
 
@@ -237,6 +248,72 @@ namespace synthese
 				throw synthese::Exception("Bad registry");
 			}
 			add(boost::dynamic_pointer_cast<T, Registrable>(ptr));
+		}
+
+
+
+		template<class T>
+		typename Registry<T>::Vector Registry<T>::getVector() const
+		{
+			typename Registry<T>::Vector r;
+			boost::recursive_mutex::scoped_lock lock(_mutex);
+			BOOST_FOREACH(const typename Registry<T>::Map::value_type& item, _registry)
+			{
+				r.push_back(item.second);
+			}
+			return r;
+		}
+
+
+
+		template<class T>
+		typename Registry<T>::ConstVector Registry<T>::getConstVector() const
+		{
+			typename Registry<T>::ConstVector r;
+			boost::recursive_mutex::scoped_lock lock(_mutex);
+			BOOST_FOREACH(const typename Registry<T>::Map::value_type& item, _registry)
+			{
+				r.push_back(boost::const_pointer_cast<const T>(item.second));
+			}
+			return r;
+		}
+
+
+
+		template<class T>
+		typename Registry<T>::Vector Registry<T>::getVector( Selector selector ) const
+		{
+			typename Registry<T>::Vector r;
+			boost::recursive_mutex::scoped_lock lock(_mutex);
+			BOOST_FOREACH(const typename Registry<T>::Map::value_type& item, _registry)
+			{
+				if(!selector(*item.second))
+				{
+					continue;
+				}
+
+				r.push_back(item.second);
+			}
+			return r;
+		}
+
+
+
+		template<class T>
+		typename Registry<T>::ConstVector Registry<T>::getConstVector( Selector selector ) const
+		{
+			typename Registry<T>::ConstVector r;
+			boost::recursive_mutex::scoped_lock lock(_mutex);
+			BOOST_FOREACH(const typename Registry<T>::Map::value_type& item, _registry)
+			{
+				if(!selector(*item.second))
+				{
+					continue;
+				}
+
+				r.push_back(boost::const_pointer_cast<const T>(item.second));
+			}
+			return r;
 		}
 
 

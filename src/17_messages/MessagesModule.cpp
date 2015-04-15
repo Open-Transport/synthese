@@ -65,7 +65,7 @@ namespace synthese
 		{
 			ServerModule::AddThread(
 				&MessagesModule::MessagesActivationThread,
-				"Messages activations"
+				"MessageActivation"
 			);
 			ServerModule::AddThread(
 				&MessagesModule::ScenariiActivationThread,
@@ -288,13 +288,35 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Updates the activated messages cache
-		void MessagesModule::UpdateActivatedMessages()
+		bool MessagesModule::_selectMessagesToActivate( const Alarm& object )
 		{
 			// Now
 			ptime now(second_clock::local_time());
 
+			// Avoid library messages
+			const SentAlarm* sentMessage(
+				dynamic_cast<const SentAlarm*>(&object)
+			);
+			if(!sentMessage)
+			{
+				return false;
+			}
+
+			// Record active message
+			if(!sentMessage->isApplicable(now))
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Updates the activated messages cache
+		void MessagesModule::UpdateActivatedMessages()
+		{
 			// Wait for the availability of the cache
 			mutex::scoped_lock(_activatedMessagesMutex);
 
@@ -302,39 +324,34 @@ namespace synthese
 			ActivatedMessages decativatedMessages(_activatedMessages);
 
 			// Loop on all messages
+			Alarm::Registry::Vector messagesToUpdate(
+				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectMessagesToActivate)
+			);
 			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
+
 			BOOST_FOREACH(
-				const Registry<Alarm>::value_type& message,
-				Env::GetOfficialEnv().getRegistry<Alarm>()
+				const Alarm::Registry::Vector::value_type& message,
+				messagesToUpdate
 			){
-				// Avoid library messages
 				boost::shared_ptr<SentAlarm> sentMessage(
-					dynamic_pointer_cast<SentAlarm, Alarm>(message.second)
+					dynamic_pointer_cast<SentAlarm, Alarm>(message)
 				);
-				if(!sentMessage)
+
+				// Remove the message as deactivated one
+				decativatedMessages.erase(sentMessage);
+
+				// Check if the message was already activated
+				if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
 				{
-					continue;
-				}
+					// Record the message as activated
+					_activatedMessages.insert(sentMessage);
 
-				// Record active message
-				if(sentMessage->isApplicable(now))
-				{
-					// Remove the message as deactivated one
-					decativatedMessages.erase(sentMessage);
-
-					// Check if the message was already activated
-					if(_activatedMessages.find(sentMessage) == _activatedMessages.end())
-					{
-						// Record the message as activated
-						_activatedMessages.insert(sentMessage);
-
-						// Run the display start trigger on each broadcast point
-						BOOST_FOREACH(
-							const BroadcastPoint::BroadcastPoints::value_type& bp,
-							BroadcastPoint::GetBroadcastPoints()
-						){
-							bp->onDisplayStart(*sentMessage);
-						}
+					// Run the display start trigger on each broadcast point
+					BOOST_FOREACH(
+						const BroadcastPoint::BroadcastPoints::value_type& bp,
+						BroadcastPoint::GetBroadcastPoints()
+					){
+						bp->onDisplayStart(*sentMessage);
 					}
 				}
 			}
@@ -372,7 +389,7 @@ namespace synthese
 				{
 					continue;
 				}
-				SentScenario* sscenario = static_cast<const SentScenario*>(scenario.get());
+				SentScenario* sscenario = static_cast<SentScenario*>(scenario.get());
 				if (_enableScenarioIfAutoActivation(sscenario))
 				{
 					ScenarioTableSync::Save(sscenario);
@@ -459,56 +476,71 @@ namespace synthese
 
 
 
+		bool MessagesModule::_selectSentAlarm( const Alarm& object )
+		{
+			if(!dynamic_cast<const SentAlarm*>(&object))
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+
+
 		void MessagesModule::ClearAllBroadcastCaches()
 		{
 			recursive_mutex::scoped_lock registryLock(Env::GetOfficialEnv().getRegistry<Alarm>().getMutex());
-			BOOST_FOREACH(const Alarm::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<Alarm>())
+			Alarm::Registry::Vector sentAlarms(
+				Env::GetOfficialEnv().getRegistry<Alarm>().getVector(&_selectSentAlarm)
+			);
+			BOOST_FOREACH(const Alarm::Registry::Vector::value_type& alarm, sentAlarms)
 			{
 				// Jump over scenarios
-				SentAlarm* alarm(dynamic_cast<SentAlarm*>(it.second.get()));
-				if(!alarm)
-				{
-					continue;
-				}
-
+				SentAlarm& sentAlarm(static_cast<SentAlarm&>(*alarm));
+				
 				// Clear the cache
-				alarm->clearBroadcastPointsCache();
+				sentAlarm.clearBroadcastPointsCache();
 			}
 		}
 
 
 
 		bool MessagesModule::SentAlarmLess::operator()(
-			SentAlarm* left,
-			SentAlarm* right
+			shared_ptr<SentAlarm> left,
+			shared_ptr<SentAlarm> right
 		) const {
-			assert(left && right);
+			assert(left.get() && right.get());
 
 			if(left->getLevel() != right->getLevel())
 			{
 				return left->getLevel() > right->getLevel();
 			}
 
-			if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
+			
+			if(left->getScenario() && right->getScenario())
 			{
-				if(right->getScenario()->getPeriodStart().is_not_a_date_time())
+				if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
 				{
-					return true;
+					if(right->getScenario()->getPeriodStart().is_not_a_date_time())
+					{
+						return true;
+					}
+					if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
+					{
+						return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
+					}
 				}
-				if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
+				else
 				{
-					return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
-				}
-			}
-			else
-			{
-				if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
-				{
-					return false;
+					if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
+					{
+						return false;
+					}
 				}
 			}
 
-			return left < right;
+			return left.get() < right.get();
 		}
 	}
 }
