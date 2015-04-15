@@ -1,0 +1,130 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier quais (gleis)&
+  name=pagleis&
+#>
+
+<#forms/yes_no_input&
+  label=Pas de fichier quais&
+  name=no_gleis_file&
+#>
+
+<#forms/radio_inputs&
+  label=Format du fichier gleis&
+  name=gleis_has_one_stop_per_line&
+  label1=Quais déclarés par section (ancien format)&
+  value1=0&
+  label2=Un quai par ligne (format vu pour RIV)&
+  value2=1&
+#>
+
+<#forms/text_input&
+  label=Fichier coordonnées (koord)&
+  name=pakoord&
+#>
+
+<#forms/text_input&
+  label=Fichier noms d'arrêts (bahnof - optionnel)&
+  name=pabahnof&
+#>
+
+<#forms/text_input&
+  label=Fichier dates (eckdaten)&
+  name=paeckdaten&
+#>
+
+<#forms/text_input&
+  label=Fichier calendriers (bitfield)&
+  name=pabitfeld&
+#>
+
+<#forms/text_input&
+  label=Fichier horaires (zugdat)&
+  name=pazugdat&
+#>
+
+<#forms/yes_no_input&
+  label=Format CarPostal 2015&
+  name=format_carpostal_2015&
+#>
+
+<#forms/text_input&
+  label=Fichier correspondances (umsteigb)&
+  name=paumsteigb&
+#>
+
+<#forms/text_input&
+  label=Fichier correspondances (umsteigz)&
+  name=paumsteigz&
+#>
+
+<#forms/text_input&
+  label=Fichier jonctions (metabhf)&
+  name=pametabhf&
+#>
+
+<h3>Périmètre</h3>
+
+<div class="control-group">
+ <label class="control-label">Filtre des lignes à importer</label>
+ <div class="controls">
+  <textarea name="lines_filter" type="text" is_parameter="true"><@~variable("import.lines_filter")@></textarea>
+ </div>
+</div>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Effacer données existantes&
+  name=clean_old_data&
+#>
+
+<#forms/yes_no_input&
+  label=Ignorer données passées&
+  name=from_today&
+#>
+
+<#forms/yes_no_input&
+  label=Importer arrêts&
+  name=import_stops&
+#>
+
+<#forms/yes_no_input&
+  label=Importer les services complets&
+  name=import_full_services&
+#>
+
+<#forms/yes_no_input&
+  label=Importer les services même si aucune date n'est définie&
+  name=import_even_if_no_date&
+#>
+
+<#forms/yes_no_input&
+  label=Lire le nom court de la ligne&
+  name=try_to_read_line_short_name&
+#>
+
+<h3>Retraitement des données</h3>
+
+<#forms/text_input&
+  label=Position du chiffre aller retour&
+  name=wayback_bit_position&
+#>
+
+<#forms/text_input&
+  label=Reformater les noms de zones d'arrêts vides par le nom de la ville et&
+  name=complete_empty_stop_area_name&
+#>
+
+<#forms/text_input&
+  label=Code du calendrier par défaut&
+  name=calendar_default_code&
+#>
+
+<h3>Mode debug</h3>
+
+<#forms/yes_no_input&
+  label=Uniquement afficher liste d'arrêts&
+  name=show_stops_only&
+#>

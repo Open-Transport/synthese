@@ -1,0 +1,14 @@
+<#forms/text_input&
+  label=Numéro de port&
+  name=com_port_number&
+#>
+
+<#forms/text_input&
+  label=Vitesse de transmission&
+  name=com_port_rate&
+#>
+
+<#forms/datasource_selector&
+  label=Système d'identifiants&
+  name=data_source_id&
+#>

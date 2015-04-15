@@ -1,0 +1,27 @@
+<h3>Accès aux données</h3>
+
+<#forms/text_input&
+  label=Base de données SIV&
+  name=db&
+#>
+
+<h3>Liens avec la base SYNTHESE</h3>
+
+<#forms/datasource_selector&
+  label=Source de données transport liée&
+  name=ps&
+#>
+
+<h3>Retraitements de données</h3>
+
+<div class="control-group">
+ <label class="control-label">Nouvelles bornes : type d'afficheur</label>
+ <div class="controls">
+  <select name="<@dt@>" is_parameter="true">
+   <option value="">(non défini)</option>
+   <?display_types&template=<{display_type&template=
+   	<option value="<@id@>" <@(id==dt)?"selected=\"true\"":""@>><@name@></option>
+   }>?>
+  </select>
+ </div>
+</div>

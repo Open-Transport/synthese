@@ -1,0 +1,28 @@
+<h3>Répertoire à importer</h3>
+
+<#forms/text_input&
+  label=Répertoire&
+  name=directory&
+#>
+
+<#forms/text_input&
+  label=Parent ID&
+  name=parent_id&
+#>
+
+<#forms/text_input&
+  label=Site ID&
+  name=import_site_id&
+#>
+
+<#forms/text_input&
+  label=Max Age&
+  unit=minute&
+  class=input-mini&
+  name=import_max_age&
+#>
+
+<#forms/text_input&
+  label=Exclude List&
+  name=exclude_list&
+#>

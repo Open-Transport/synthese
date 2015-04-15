@@ -1,0 +1,13 @@
+<?if&
+  cond=<@table==12@>&
+  then=
+    <@stops:=<?StopPointsListFunction?>@>
+    <table class="table table-striped table-condensed">
+    <{stops.physicalStop&template=
+      <tr>
+       <td><{stopArea&template=<@city_name@> <@name@>}> <@name@></td>
+       <td><{data_source_link&template=<?if&cond=<@data_source_id==data_source@>&then=<@data_source_name@>?>}></td>
+       
+      </tr>
+    }></table>
+?>

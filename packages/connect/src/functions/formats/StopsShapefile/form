@@ -1,0 +1,92 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier ShapeFile (arrêts)&
+  name=pashape&
+#>
+
+<h3>Choix des champs contenant les données</h3>
+
+<#forms/text_input&
+  label=Arrêt commercial : nom principal&
+  name=stop_name1&
+#>
+
+<#forms/text_input&
+  label=Arrêt physique : sens&
+  name=stop_direction&
+#>
+
+<#forms/text_input&
+  label=Arrêt physique : code opérateur&
+  name=stop_operator_code&
+#>
+
+<#forms/text_input&
+  label=Commune : nom&
+  name=city_name&
+#>
+
+<#forms/text_input&
+  label=Commune : code&
+  name=city_code&
+#>
+
+<h3>Retraitements de données</h3>
+
+<#forms/text_input&
+  label=Nouveaux arrêts commerciaux : ID commune&
+  name=sadc&
+#>
+
+<#forms/text_input&
+  label=Nouveaux arrêts commerciaux : temps de correspondance&
+  name=sadt&
+  class=input-mini&
+  unit=min&
+#>
+
+<#forms/yes_no_input&
+  label=Génération de code opérateur personnalisé : utiliser le sens&
+  name=use_direction&
+#>
+
+<#forms/text_input&
+  label=Génération de code opérateur personnalisé : code aller&
+  name=value_forward_direction&
+#>
+
+<#forms/text_input&
+  label=Génération de code opérateur personnalisé : code retour&
+  name=value_backward_direction&
+#>
+
+<#forms/text_input&
+  label=Génération de code opérateur personnalisé : code aller/retour&
+  name=value_forward_backward_direction&
+#>
+
+<h3>Mode debug</h3>
+
+<#forms/yes_no_input&
+  label=Affichage des arrêts liés&
+  name=display_linked_stops&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  label=Effacer données existantes&
+  name=clean_old_data&
+#>
+
+<#forms/yes_no_input&
+  label=Effacer arrêts inutilisés&
+  name=clean_unused_stops&
+#>
+
+<#forms/yes_no_input&
+  label=Seulement mise à jour&
+  name=update_only&
+  help=Si cette option est activée, les arrêts présents dans le fichier et absents de la base SYNTHESE ne sont pas créés dans SYNTHESE. Ils sont alors ignorés.
+#>

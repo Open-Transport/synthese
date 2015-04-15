@@ -1,0 +1,107 @@
+<h3>Emplacement des fichiers de données</h3>
+
+<#forms/text_input&
+  label=Fichier villes et arrêts (stops)&
+  name=parec_stop&
+#>
+
+<#forms/text_input&
+  label=Fichier zone d'arrêts (stop area) &
+  name=parec_stop_area&
+#>
+
+<#forms/text_input&
+  label=Fichier points d'arrêts (stopping points)&
+  name=parec_stopping_points&
+#>
+
+<#forms/text_input&
+  label=Fichier des réseaux (branch)&
+  name=pabranch&
+#>
+
+<#forms/text_input&
+  label=Fichier des lignes commerciales (rec_lin_ber)&
+  name=parec_lin_ber&
+#>
+
+<#forms/text_input&
+  label=Fichier des horaires des services (lid_travel_time_type)&
+  name=palid_travel_time_type&
+#>
+
+<#forms/text_input&
+  label=Fichier d'initialisation des parcours (lid_course)&
+  name=palid_course&
+#>
+
+<#forms/text_input&
+  label=Fichier des restrictions (calendriers) de services (service_restriction)&
+  name=paservice_restriction&
+#>
+
+<#forms/text_input&
+  label=Fichier des types de jours (day_type_2_day_attribute)&
+  name=paday_type_2_day_attribute&
+#>
+
+<#forms/text_input&
+  label=Fichier des attributs de jours (set_day_attribute)&
+  name=paset_day_attribute&
+#>
+
+<#forms/text_input&
+  label=Fichier des calendriers du réseaux (calendar_of_the_company)&
+  name=pacalendar_of_the_company&
+#>
+
+<#forms/text_input&
+  label=Fichier des services (rec_trip)&
+  name=parec_trip&
+#>
+
+<h3>Retraitement des données</h3>
+
+<#forms/text_input&
+  name=sadt&
+  unit=min&
+  class=input-mini&
+  label=Temps de transfert par défaut&
+#>
+
+<#forms/text_input&
+  name=use_rule_block_id_mask&
+  label=Masque règles d'utilisation&
+#>
+
+<h3>Options d'import</h3>
+
+<#forms/yes_no_input&
+  name=from_today&
+  label=Ignorer données passées&
+#>
+
+<#forms/yes_no_input&
+  name=clean_old_data&
+  label=Effacer données actuelles&
+#>
+
+<#forms/yes_no_input&
+  name=clean_unused_stops&
+  label=Effacer arrêts non utilisés&
+#>
+
+<#forms/yes_no_input&
+  name=itn&
+  label=Import des réseaux de transport&
+#>
+
+<#forms/yes_no_input&
+  name=display_linked_stops&
+  label=Affichage arrêts liés&
+#>
+
+<#forms/yes_no_input&
+  name=use_line_short_name_as_id&
+  label=Utiliser le nom court de ligne comme identifiant&
+#>
