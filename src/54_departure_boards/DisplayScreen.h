@@ -88,6 +88,7 @@ namespace synthese
 		FIELD_INT(SubScreenTypeCode)
 		FIELD_BOOL(AllowCanceled)
 		FIELD_POINTER(StopPointLocation, pt::StopPoint)
+		FIELD_INT(MaxTransferDuration)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -126,7 +127,8 @@ namespace synthese
 			FIELD(SubScreenTypeCode),
 			FIELD(impex::DataSourceLinks),
 			FIELD(AllowCanceled),
-			FIELD(StopPointLocation)
+			FIELD(StopPointLocation),
+			FIELD(MaxTransferDuration)
 		> DisplayScreenSchema;
 	}
 

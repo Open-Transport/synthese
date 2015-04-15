@@ -59,7 +59,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<ScheduledService> _service;
 			boost::shared_ptr<impex::DataSource> _dataSource;
-			boost::shared_ptr<const pt::StopPoint> _physicalStop;
+			boost::shared_ptr<pt::StopPoint> _physicalStop;
 			std::size_t _lineStopRank;
 			bool _propagate;
 			bool _restorePlannedStop;
@@ -97,7 +97,7 @@ namespace synthese
 			//@{
 				void setService(boost::shared_ptr<ScheduledService> service){ _service = service; }
 				void setLineStopRank(std::size_t value);
-				void setPhysicalStop(boost::shared_ptr<const pt::StopPoint> value);
+				void setPhysicalStop(boost::shared_ptr<StopPoint> value);
 			//@}
 		};
 	}

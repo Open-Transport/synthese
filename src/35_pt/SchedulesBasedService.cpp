@@ -125,13 +125,18 @@ namespace synthese
 
 
 
-		void SchedulesBasedService::setRealTimeVertex( std::size_t rank, const graph::Vertex* value )
+		void SchedulesBasedService::setRealTimeVertex( std::size_t rank, graph::Vertex* value )
 		{
 			// Lock the vertices
 			recursive_mutex::scoped_lock lock(getVerticesMutex());
 
 			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
+			if(_RTVertices[rank])
+			{
+				_RTVertices[rank]->removeDepartureEdge(const_cast<Edge*>(_path->getEdge(rank)));
+			}
 			_RTVertices[rank] = value;
+			value->addDepartureEdge(const_cast<Edge*>(_path->getEdge(rank)));
 		}
 
 
@@ -871,7 +876,7 @@ namespace synthese
 
 		void SchedulesBasedService::setVertex(
 			size_t rank,
-			const graph::Vertex* value
+			graph::Vertex* value
 		){
 			// Lock the vertices
 			recursive_mutex::scoped_lock lock(getVerticesMutex());
@@ -1874,6 +1879,7 @@ namespace synthese
 
 
 
+		// @FIXME: Should also return true if there is a RealTimeVertex change
 		bool SchedulesBasedService::hasRealTimeData() const
 		{
 			return !_RTArrivalSchedules.empty();

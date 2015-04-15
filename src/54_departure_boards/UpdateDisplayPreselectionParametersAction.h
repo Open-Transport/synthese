@@ -63,6 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_CLEANING_DELAY;
 			static const std::string PARAMETER_DISPLAY_END_FILTER;
 			static const std::string PARAMETER_DISPLAY_MAX_DELAY;
+			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 			static const std::string PARAMETER_ALLOW_CANCELED;
 
 		private:
@@ -72,6 +73,7 @@ namespace synthese
 			int									_cleaningDelay;
 			EndFilter							_endFilter;
 			int									_maxDelay;
+			int									_maxTransferDuration;
 			boost::optional<bool>				_allowCanceled;
 
 		protected:

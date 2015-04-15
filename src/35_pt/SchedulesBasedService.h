@@ -60,7 +60,7 @@ namespace synthese
 				PathBeginsWithUnscheduledStopException(const graph::Path& path);
 			};
 
-			typedef std::vector<const graph::Vertex*> ServedVertices;
+			typedef std::vector<graph::Vertex*> ServedVertices;
 
 			static const std::string STOP_SEPARATOR;
 
@@ -242,9 +242,8 @@ namespace synthese
 				/// Update a served edge at real time.
 				/// @param rank Rank of the edge to update
 				/// @param value Served edge
-				void setRealTimeVertex(
-					std::size_t rank,
-					const graph::Vertex* value
+				void setRealTimeVertex(std::size_t rank,
+					graph::Vertex *value
 				);
 
 
@@ -307,9 +306,8 @@ namespace synthese
 				) const;
 
 
-				void setVertex(
-					size_t rank,
-					const graph::Vertex* value
+				void setVertex(size_t rank,
+					graph::Vertex *value
 				);
 
 
