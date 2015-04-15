@@ -1,0 +1,7 @@
+<div class="hero-unit center">
+  <h1>Page non trouvée <small><font face="Tahoma" color="red">Erreur 404</font></small></h1>
+  <br />
+  <p>La page que vous recherchez n'existe pas ou n'est pas disponible. Utilisez la fonction <b>page précédente</b> de votre navigateur.</p>
+  <p><b>Ou vous pouvez cliquer sur le lien suivant:</b></p>
+  <a href="/terminus" class="btn btn-large btn-info"><i class="icon-home icon-white"></i> Aller à l'accueil</a>
+</div>

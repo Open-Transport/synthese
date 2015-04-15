@@ -1,0 +1,3 @@
+<?if
+  &cond=<?strlen&t=<@value@>?>
+  &then=<?substr&t=<@value@>&f=8&n=2?>/<?substr&t=<@value@>&f=5&n=2?>/<?substr&t=<@value@>&f=0&n=4?> <?substr&t=<@value@>&f=11&n=5?>?>
