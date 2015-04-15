@@ -1,0 +1,6 @@
+<?if&
+  cond=<@name@>&
+  then=<@slave_name=<@name@>@><?inter_synthese_slaves_view&
+      template=<{slave&
+                 template=<?if&cond=<@name==slave_name@>&then=<@roid=<@id@>@>?>}>?>?>
+<?object&roid=<@roid@>&additional_parameters=1&template=<@last_activity_report@>?>

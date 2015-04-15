@@ -1,0 +1,2 @@
+<@result=<?vehicle_informations&template=<{vehicle&template=<@number@>}>?>@>
+<?if&cond=<@result==""@>&then=<?vehicle_informations&template=<@vehicle_number@>?>?>
