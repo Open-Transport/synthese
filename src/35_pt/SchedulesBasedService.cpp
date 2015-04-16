@@ -131,12 +131,11 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(getVerticesMutex());
 
 			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
-			if(_RTVertices[rank])
-			{
-				_RTVertices[rank]->removeDepartureEdge(const_cast<Edge*>(_path->getEdge(rank)));
-			}
 			_RTVertices[rank] = value;
-			value->addDepartureEdge(const_cast<Edge*>(_path->getEdge(rank)));
+			if (value)
+			{
+				value->addDepartureEdge(const_cast<Edge*>(_path->getEdge(rank)));
+			}
 		}
 
 
