@@ -1,0 +1,37 @@
+<h2 class="sub-title row-fluid">Choisir une commune</h2>
+<@currentStopArea=0@>
+<?vehicle_informations&
+  template=<{stop&template=
+    <@currentStopArea=<@place_id@>@>
+  }>
+?>
+<?if&
+  cond=<@debug@>&
+  then=DEBUG : On est au stop area <@currentStopArea@>
+?>
+<?PTRouteDetailFunction&
+  roid=<@sid@>&
+  template=
+    <@currentStopReached=0@>
+    <{stop&template=
+      <?if&
+        cond=<@currentStopArea==0@>&
+        then=<@tabCities[<@cityId@>]=<@cityName@>@>&
+        else=
+          <?if&
+            cond=<@currentStopReached==1@>&
+            then=<@tabCities[<@cityId@>]=<@cityName@>@>
+          ?>
+      ?>
+      <?if&
+        cond=<@currentStopArea==<@stopAreaId@>@>&
+        then=<@currentStopReached=1@>
+      ?>
+    }>
+?>
+  <div class="list-item equal-heights row-fluid" id="list-items">
+<{tabCities&sort_up=<@value@>&template=
+    <div class="item-span span6 <?if&cond=<@nb%2==0@>&then=alpha&else=omega?>"><a href="#" class="item btn btn-primary click-color" id="<@id@>"><@value@></a></div>
+    <@nb=<@nb+1@>@>
+}>
+  </div>

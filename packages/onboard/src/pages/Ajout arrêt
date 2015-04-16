@@ -1,0 +1,147 @@
+<h2 class="sub-title row-fluid">Choisir un arrêt</h2>
+<div class="list-item equal-heights row-fluid" id="list-items">
+<@currentStopArea=0@>
+<?vehicle_informations&
+  template=<{stop&template=
+    <@currentStopArea=<@place_id@>@>
+  }>
+?>
+<?if&
+  cond=<@debug@>&
+  then=DEBUG : On est au stop area <@currentStopArea@>
+?>
+<@rankMinToDisplay=0@>
+<?PTRouteDetailFunction&
+  roid=<@sid@>&
+  template=
+    <{stop&template=
+      <?if&
+        cond=<@currentStopArea==<@stopAreaId@>@>&
+        then=<@rankMinToDisplay=<@rank@>@>
+      ?>
+    }>
+?>
+<?if&
+  cond=<@debug@>&
+  then=<br />DEBUG : Rank min to display <@rankMinToDisplay@>
+?>
+<?PTRouteDetailFunction&
+  roid=<@sid@>&
+  template=
+    <@nb=0@>
+    <@lastStopAreaId=0@>
+    <{stop&
+      sort_up=<@stopAreaName@>&
+      template=
+        <?if&
+          cond=<@lastStopAreaId==stopAreaId@>&
+          else=
+            <?if&
+              cond=<@cityId==city_id@>&
+              then=
+                <?if&
+                  cond=<@arrivalIsAllowed==1@>&
+                  then=
+                    <?if&
+                      cond=<?>&l=<@rank@>&r=<@rankMinToDisplay@>?>&
+                      then=
+                        <@btn_class=item btn@>
+                        <@id_descent=0@>
+                        <@rank_to_search=<@rank@>@>
+                        <@stop_area_to_search=<@stopAreaId@>@>
+                        <@lastStopAreaId=<@stopAreaId@>@>
+                        <?service_detail&
+                          roid=<@sid@>&
+                          read_reservations_from_day=<?date?>&
+                          read_descents_from_day=<?date?>&
+                          template=
+                            <{stop&
+                              template=
+                                <?if&
+                                  cond=<@rank==<@rank_to_search@>@>&
+                                  then=
+                                    <?if&
+                                      cond=<@stop_point_id==0@>&
+                                      then=
+                                        <?if&
+                                          cond=<@stop_area_to_search==stop_area_id@>&
+                                          then=
+                                            <?if&
+                                              cond=<@with_reservation@>&
+                                              then=
+                                                <@btn_class=item btn btn-info@>
+                                                <?if&
+                                                  cond=<@with_descent@>&
+                                                  then=
+                                                    <@btn_class=item btn btn-success@>
+                                                    <@id_descent=<@descent_id@>@>
+                                                ?>
+                                            ?>
+                                        ?>&
+                                      else=
+                                        <?if&
+                                          cond=<@with_reservation@>&
+                                          then=
+                                            <@btn_class=item btn btn-info@>
+                                            <?if&
+                                              cond=<@with_descent@>&
+                                              then=
+                                                <@btn_class=item btn btn-success@>
+                                                <@id_descent=<@descent_id@>@>
+                                            ?>
+                                        ?>
+                                    ?>
+                                    <?if&
+                                      cond=<@arrival_time@>&
+                                      else=<@btn_class=item btn btn-danger@>
+                                    ?>
+                                ?>
+                            }>
+                        ?>
+                        <?if&
+                          cond=<@btn_class=="item btn btn-info"@>&
+                          then=
+                            <div class="item-span span6 <?if&cond=<@nb%2==0@>&then=alpha&else=omega?>">
+                              <a class="<@btn_class@> btn-info" data-stop_id="<@id@>"><@name?name:stopAreaName@></a>
+                            </div>
+                            <@nb=<@nb+1@>@>
+                        ?>
+                        <?if&
+                          cond=<@btn_class=="item btn btn-success"@>&
+                          then=
+                          	<div class="item-span span6 <?if&cond=<@nb%2==0@>&then=alpha&else=omega?>">
+                              <a data-descent_id="<@id_descent@>" data-stop_id="<@id@>" class="<@btn_class@> btn-cancel_descent"><@name?name:stopAreaName@><span class="descent-option">D</span></a>
+                            </div>
+                            <@nb=<@nb+1@>@>
+                        ?>
+                        <?if&
+                          cond=<@btn_class=="item btn"@>&
+                          then=
+                            <div class="item-span span6 <?if&cond=<@nb%2==0@>&then=alpha&else=omega?>">
+                              <a class="<@btn_class@> disabled"><@name?name:stopAreaName@></a>
+                            </div>
+                            <@nb=<@nb+1@>@>
+                        ?>
+                        <?if&
+                          cond=<@btn_class=="item btn btn-danger"@>&
+                          then=
+                             <div class="item-span span6 <?if&cond=<@nb%2==0@>&then=alpha&else=omega?>">
+                              <a class="<@btn_class@>"><@name?name:stopAreaName@></a>
+                            </div>
+                            <@nb=<@nb+1@>@>
+                        ?>
+                    ?>
+                ?>
+            ?>
+        ?>
+    }>
+?>
+  </div>
+<div id="cancelDescentModal" role="dialog" class="cancel-descent">
+  <h3>Confirmation d'annulation de demande de descente</h3>
+  <p>Etes-vous sûr de vouloir annuler la demande de descente ?</p>
+  <div class="cancel-descent-btns">
+    <button class="btn btn-primary" id="cancelDescent">Oui</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Non</button>
+  </div>
+</div>

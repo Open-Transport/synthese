@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Onboard v2.0</title>
+  <link type="text/css" href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link type="text/css" href="css/normalize.css" rel="stylesheet">
+  <link type="text/css" href="css/main.css" rel="stylesheet">
+</head>
+<body>
+<script type="text/javascript" src="/lib/jquery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/lib/jquery-ui/jquery-ui-1.10.3.min.js"></script>
+<div id="page" class="container-fluid">
+  <div id="header" class="header row-fluid">
+    <div class="span6"><a href="#" id="zoneBack" class="btn-back btn btn-primary btn-back2"><span class="icon-white icon-arrow-left icon-back"></span><span id="txtBack"></span></a></div>
+    <div class="span6"><h1 class="title" id="titleOfPage"></h1></div>
+  </div>
+  <p id="clock" class="clock"><?date&strftime_format=<span id="hours">%H</span><span id="colon-hour">:</span><span id="minutes">%M</span>?></p>
+  <div id="unitesExploitation" class="content-wrapper"><div class="content"></div></div>
+  <div id="servicesVoitures" class="content-wrapper"><div class="content"></div></div>
+  <div id="courses" class="content-wrapper"><div class="content">
+    <h1 class="sub-title">Choisir une course</h1>
+    <div id="shortcuts" class="shortcuts">
+      <div class="shortcuts-inner">
+      </div>
+    </div>
+    <div id="table-header" class="table-header-wrapper row-fluid">
+      <table class="table table-services table-striped table-bordered" id="services">
+        <thead>
+          <tr>
+            <th class="departure">Départ</th>
+            <th class="place">Lieu</th>
+            <th class="direction">Direction</th>
+            <th class="course">Course</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div id="scrollController" class="scroll-controller span12">
+        <a id="buttonUp" class="button-up"></a>
+        <a id="buttonDown" class="button-down"></a>
+      </div>
+    </div>
+  </div></div>
+  <div id="feuilleDeRoute" class="content-wrapper"><div class="content">
+    <div class="row-fluid subheader">
+      <div class="span12">
+        <div id="timeline-disable" class="timeline"><div class="arrow-widget"></div><div class="progress"></div></div>
+        <div id="timeline-three-widget" class="timeline" style="display:none;"></div>
+	<div id="timeline-two-widget" class="timeline" style="display:none;"></div>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div id="sidebar" class="span4 sidebar height-fixed">
+        <div class="sidebar-top">
+          <a id="wait" class="btn btn-action disabled" btn-type="waiting" href="#"><div class="text" data-text="Attendre">Attendre</div><span class="hour-text"></span></a>
+          <a id="addDescent" class="btn btn-action btn-primary btn-default" href="#">Ajout <span class="descent-option">D</span></a>
+          <a id="nextService" class="btn btn-action btn-primary disabled" href="#"><span id="nextServiceTxt">Course suivante</span><span class="service-infos"></span></a>
+        </div>
+        <div id="sidebarDown" class="sidebar-down">
+          <a id="call-regul" class="btn btn-action btn-primary" href="#" data-type="call" data-status="ready"><div class="text" data-text="Appel Regul">Appel Regul</div><span class="icon-refresh" style="display:none;"></span></a>
+          <a id="emergency-regul"class="btn btn-action btn-primary" href="#" data-type="emergency" data-status="ready"><div class="text" data-text="Urgence Regul">Urgence Regul</div><span class="icon-refresh" style="display:none;"></span></a>
+          <!--<a id="overcharge" class="btn btn-action btn-primary" href="#" data-type="overcharge" data-status="ready"><div class="text" data-text="Surcharge">Surcharge</div><span class="icon-refresh" style="display:none;"></span></a>-->
+        </div>
+      </div>
+      <div class="span8 main">
+        <table id="stopBus" class="table table-stops stop-bus table-striped table-bordered">
+          <thead>
+            <tr>
+              <th class="min">Min</th>
+              <th class="max">Max</th>
+              <th class="stop-name">Arrêt</th>
+              <th class="mounted">M</th>
+              <th class="descent">D</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <div id="scrollController" class="scroll-controller span8">
+          <a id="buttonUp" class="button-up"></a>
+          <a id="buttonDown" class="button-down"></a>
+        </div>
+      </div>
+    </div>
+    <div id="closeAllActions" class="modal hide fade" role="dialog" aria-hidden="false">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Arrêter les échanges</h3>
+      </div>
+      <div class="modal-body">
+        <p>Souhaitez-vous mettre fin aux échanges en cours ?</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="confirmActionModal" class="btn btn-primary btn-large">Oui</a>
+        <a href="#" data-dismiss="modal" class="btn btn-large">Non</a>
+      </div>
+    </div>
+    <div id="callInterSynthese" class="modal hide fade" role="dialog" aria-hidden="false">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Désactiver</h3>
+      </div>
+      <div class="modal-body">
+        <p>Souhaitez-vous désactiver la demande d'appel ?</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="confirmActionModal" class="btn btn-primary btn-large">Oui</a>
+        <a href="#" data-dismiss="modal" class="btn btn-large">Non</a>
+      </div>
+    </div>
+  </div></div>
+  <div id="ajoutCommune" class="content-wrapper"><div class="content"></div></div>
+  <div id="ajoutArret" class="content-wrapper"><div class="content"></div></div>
+  <div id="loader"><div class="loader-text">Chargement en cours</div></div>
+</div>
+<script src="/lib/requirejs/require.js"></script>
+<script data-version=f_17 src="/lib/synthese/js/init.js"></script>
+<script>
+require.config({
+	waitSeconds: 900
+});
+require([
+	"js/main.js"
+]);
+</script>
+<script>
+function ffalse()
+{
+	return false;
+}
+function ftrue()
+{
+	return true;
+}
+document.onselectstart = new Function ("return false");
+if(window.sidebar)
+{
+	document.onmousedown = ffalse;
+	document.onclick = ftrue;
+}
+</script>
+</body>
+</html>
