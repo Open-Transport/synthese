@@ -91,8 +91,8 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
     std::string midFilename (boost::replace_last_copy (_zipOutput.string (),
 						  ".zip", ".mid"));
 
-    const boost::filesystem::path mifFile (mifFilename);
-    const boost::filesystem::path midFile (midFilename);
+    const boost::filesystem::path mifFile (mifFilename, boost::filesystem::native);
+    const boost::filesystem::path midFile (midFilename, boost::filesystem::native);
 
     std::ofstream mifof (mifFile.string ().c_str ());
     std::ofstream midof (midFile.string ().c_str ());

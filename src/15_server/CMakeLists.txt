@@ -120,10 +120,6 @@ set_source_files_properties(ServerModule.gen.cpp ServerModule.inc.cpp PROPERTIES
 
 add_library(15_server ${server_SRCS})
 
-if(UNIX)
-  set(PTHREAD "pthread")
-endif()
-
 target_link_libraries(15_server
   01_util
   05_html
@@ -132,7 +128,6 @@ target_link_libraries(15_server
   12_security
   13_dblog
   14_admin
-  ${PTHREAD}
 )
 
 # Explicitly say that the executable depends on custom svn target

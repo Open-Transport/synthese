@@ -173,8 +173,8 @@ void ensureWritablePath (const boost::filesystem::path& path, bool removeOnSucce
 
 filesystem::path createCompletePath (const std::string& s)
 {
-	boost::filesystem::path path (s);
-	return boost::filesystem::absolute (path, boost::filesystem::initial_path());
+	boost::filesystem::path path (s, boost::filesystem::native);
+	return boost::filesystem::complete (path, boost::filesystem::initial_path());
 }
 
 
@@ -186,8 +186,8 @@ void quit(bool doExit)
 	ServerModule::KillAllThreads();
 
 	// Terminate all modules
-	vector<boost::shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
-	BOOST_REVERSE_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
+	vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
+	BOOST_REVERSE_FOREACH(const shared_ptr<ModuleClass> module, modules)
 	{
 		Log::GetInstance ().info ("Terminating module " + module->getFactoryKey() + "...");
 		module->end();
@@ -344,20 +344,20 @@ int main( int argc, char **argv )
 			//			throw std::exception("No registered module !");
 
 
-			vector<boost::shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
-			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
+			vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
 			{
 				Log::GetInstance ().info ("Pre-initializing module " + module->getFactoryKey() + "...");
 				module->preInit();
 			}
 
-			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
+			BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
 			{
 				Log::GetInstance ().info ("Initializing module " + module->getFactoryKey() + "...");
 				module->init();
 			}
 
-			BOOST_FOREACH(const boost::shared_ptr<ModuleClass> module, modules)
+			BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
 			{
 				Log::GetInstance ().info ("Starting module " + module->getFactoryKey() + "...");
 				module->start();

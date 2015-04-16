@@ -84,7 +84,7 @@ namespace synthese
 				{
 					// Local variables
 					path filePath(*it);
-					string fileName(filePath.filename().string());
+					string fileName(filePath.filename());
 
 					// Jump over ignored files
 					if(		is_directory(filePath) ||
@@ -106,7 +106,7 @@ namespace synthese
 					// Dump file parsing
 
 					ifstream inFile;
-					inFile.open(filePath.string().c_str());
+					inFile.open(filePath.file_string().c_str());
 					string line;
 					vector<string> fieldNames;
 					ParametersMap map;
@@ -177,7 +177,7 @@ namespace synthese
 					{
 						// Local variables
 						path filePath2(*it2);
-						string fileName2(filePath2.filename().string());
+						string fileName2(filePath2.filename());
 
 						// Jump over ignored files
 						if(	is_directory(filePath2) ||
@@ -190,11 +190,11 @@ namespace synthese
 						}
 
 						path filePath3(filePath2);
-						string fieldName(filePath3.replace_extension().filename().string().substr(idStr.size()+1));
+						string fieldName(filePath3.replace_extension().filename().substr(idStr.size()+1));
 
 						// File content
 						string fieldContent;
-						ifstream in(filePath2.string().c_str(), ios::in | ios::binary);
+						ifstream in(filePath2.file_string().c_str(), ios::in | ios::binary);
 						char ch;
 						while(in)
 						{
@@ -338,7 +338,7 @@ namespace synthese
 				ParametersMap attributesMap;
 				object.toParametersMap(attributesMap, false, false);
 				ofstream dumpStream(
-					dumpFilePath.string().c_str(),
+					dumpFilePath.file_string().c_str(),
 					std::ios_base::out | std::ios_base::binary
 				);
 				dumpStream << object.getTableName() << "(";
@@ -399,11 +399,11 @@ namespace synthese
 					for(directory_iterator it(dirPath); it != directory_iterator(); ++it)
 					{
 						if(	!is_directory(it->path()) &&
-							it->path().filename().string().size() >= fileNameMainPart.size() &&
-							it->path().filename().string().substr(0, fileNameMainPart.size()) == fileNameMainPart
+							it->path().filename().size() >= fileNameMainPart.size() &&
+							it->path().filename().substr(0, fileNameMainPart.size()) == fileNameMainPart
 						){
 							creation = false;
-							if(it->path().filename().string() != fileNameWithExtension && !noCommit)
+							if(it->path().filename() != fileNameWithExtension && !noCommit)
 							{
 								_svnMove(it->path(), filePath);
 							}
@@ -412,7 +412,7 @@ namespace synthese
 					}
 
 					// Dump value into file
-					ofstream fileStream(filePath.string().c_str(), std::ios_base::out | std::ios_base::binary);
+					ofstream fileStream(filePath.file_string().c_str(), std::ios_base::out | std::ios_base::binary);
 					fileStream << item.second.content;
 					fileStream.close();
 
@@ -450,7 +450,7 @@ namespace synthese
 						}
 
 						// Search for preceding name
-						string fileName(it->path().filename().string());
+						string fileName(it->path().filename());
 						if(	(fileName.size() >= commonFileName.size() + nameExtension.size()) &&
 							fileName.substr(0, commonFileName.size()) == commonFileName &&
 							fileName.substr(fileName.size() - nameExtension.size()) == nameExtension &&
@@ -465,7 +465,7 @@ namespace synthese
 					if(creation)
 					{
 						ofstream nameStream(
-							namePath.string().c_str(),
+							namePath.file_string().c_str(),
 							std::ios_base::out | std::ios_base::binary
 						);
 						nameStream << endl;
@@ -522,7 +522,7 @@ namespace synthese
 					vector<path> filesToRemove;
 					for(directory_iterator it(subdirPath); it != directory_iterator(); ++it)
 					{
-					  string fileName(it->path().filename().string());
+						string fileName(it->path().filename());
 
 						// Id part of the path
 						vector<string> nameParts;

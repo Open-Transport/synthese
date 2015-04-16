@@ -40,7 +40,7 @@ namespace synthese
 			const std::string& codePage
 		):	SQLiteVirtualTable(
 			GetTableName(path),
-			"VirtualDBF(\"" + replace_all_copy(path.string(), "\\", "\\\\") + "\"," + codePage + ")"
+			"VirtualDBF(\"" + replace_all_copy(path.file_string(), "\\", "\\\\") + "\"," + codePage + ")"
 		)
 		{}
 
@@ -48,7 +48,7 @@ namespace synthese
 
 		std::string VirtualDBFVirtualTable::GetTableName( const boost::filesystem::path& path )
 		{
-			string out(change_extension(path, string()).string());
+			string out(change_extension(path, string()).file_string());
 			replace_if(out.begin(), out.end(), is_any_of(" \\:/()-+"), '_');
 			return "DBFfile_" + out;
 		}

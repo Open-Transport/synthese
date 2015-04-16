@@ -61,7 +61,7 @@ namespace synthese
 				  dir_itr != end_iter;
 				  ++dir_itr )
 			{
-			  std::string dirpath = dir_itr->path().string();
+				std::string dirpath = dir_itr->string();
 
 				const MapBackground* background = new MapBackground (dirpath);
 				_backgrounds.push_back (background);
@@ -150,7 +150,7 @@ namespace synthese
 			  dir_itr != end_iter;
 			  ++dir_itr )
 			{
-			  std::string dirpath = dir_itr->path().filename().string();
+			std::string dirpath = dir_itr->leaf();
 
 			MapBackgroundManager* manager = new MapBackgroundManager (backgroundsDir / dirpath);
 			_managers.insert (std::make_pair (dirpath, manager));

@@ -139,7 +139,7 @@ namespace synthese
 			}
 
 			ifstream inFile;
-			inFile.open(it->second.string().c_str());
+			inFile.open(it->second.file_string().c_str());
 			if(!inFile)
 			{
 				throw Exception("Could no open the calendar file.");
@@ -233,11 +233,11 @@ namespace synthese
 			const string& key
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.string().c_str());
+			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
-				_logError("Could no open the file " + filePath.string());
-				throw Exception("Could no open the file " + filePath.string());
+				_logError("Could no open the file " + filePath.file_string());
+				throw Exception("Could no open the file " + filePath.file_string());
 			}
 			_clearFieldsMap();
 			date now(day_clock::local_day());

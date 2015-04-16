@@ -307,7 +307,7 @@ namespace synthese
 					"Trace",
 					st.getForm().getTextInput(
 						RoutePlannerFunction::PARAMETER_LOG_PATH,
-						_journeyPlanner.getLogger().getDirectory().string()
+						_journeyPlanner.getLogger().getDirectory().file_string()
 				)	);
 				if(!_config->getRollingStockFilters().empty())
 				{

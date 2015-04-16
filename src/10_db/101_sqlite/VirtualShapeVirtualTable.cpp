@@ -41,7 +41,7 @@ namespace synthese
 			CoordinatesSystem::SRID srid
 		):	SQLiteVirtualTable(
 			GetTableName(path),
-			"VirtualShape(\"" + replace_all_copy(change_extension(path, string()).string(), "\\", "\\\\") + "\"," + codePage + "," + lexical_cast<string>(srid) + ")"
+			"VirtualShape(\"" + replace_all_copy(change_extension(path, string()).file_string(), "\\", "\\\\") + "\"," + codePage + "," + lexical_cast<string>(srid) + ")"
 		)
 		{}
 
@@ -49,7 +49,7 @@ namespace synthese
 
 		std::string VirtualShapeVirtualTable::GetTableName( const boost::filesystem::path& path )
 		{
-			string out(change_extension(path, string()).string());
+			string out(change_extension(path, string()).file_string());
 			replace_if(out.begin(), out.end(), is_any_of(" \\:/()-+"), '_');
 			return "shapefile_" + out;
 		}

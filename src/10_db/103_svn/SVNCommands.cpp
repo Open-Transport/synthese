@@ -101,7 +101,7 @@ namespace synthese
 						string(),
 						string(),
 						"add",
-						"\"" + file.string() + "\""
+						"\"" + file.file_string() + "\""
 					);
 				}
 
@@ -114,7 +114,7 @@ namespace synthese
 						string(),
 						string(),
 						"delete",
-						"--force \""+ file.string() + "\""
+						"--force \""+ file.file_string() + "\""
 					);
 				}
 
@@ -128,7 +128,7 @@ namespace synthese
 						string(),
 						string(),
 						"move",
-						"\"" + oldFile.string() +"\" \""+ newFile.string() + "\""
+						"\"" + oldFile.file_string() +"\" \""+ newFile.file_string() + "\""
 					);
 				}
 
@@ -185,7 +185,7 @@ namespace synthese
 							user,
 							password,
 							"co",
-							url + " \"" + localPath.string() + "\""
+							url + " \"" + localPath.file_string() + "\""
 					)	);
 					if(result.first)
 					{
@@ -204,7 +204,7 @@ namespace synthese
 						user,
 						password,
 						"up",
-						"\"" + localPath.string() + "\""
+						"\"" + localPath.file_string() + "\""
 					);
 
 					return true;
@@ -223,7 +223,7 @@ namespace synthese
 							user,
 							password,
 							"ci",
-							" -m \""+ message +"\" \""+ localPath.string() + "\""
+							" -m \""+ message +"\" \""+ localPath.file_string() + "\""
 					)	);
 					
 					return true;

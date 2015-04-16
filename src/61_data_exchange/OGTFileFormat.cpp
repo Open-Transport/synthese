@@ -58,13 +58,13 @@ namespace synthese
 
 			ExpatParser parser(*_import.get<DataSource>(), *this);
 			// Open file to stream
-			ifstream inFile(filePath.string().c_str());
+			ifstream inFile(filePath.file_string().c_str());
 			if(!inFile)
 			{
 				_logError(
-					"Could not open the file " + filePath.string()
+					"Could not open the file " + filePath.file_string()
 				);
-				throw Exception("Could not open the file " + filePath.string());
+				throw Exception("Could not open the file " + filePath.file_string());
 			}
 			parser.parse(inFile);
 			return true;

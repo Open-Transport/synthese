@@ -300,7 +300,7 @@ namespace synthese
 					p = p / dateDirName.str();
 					create_directories(p);
 					p = p / fileName.str();
-					of.reset(new ofstream(p.string().c_str()));
+					of.reset(new ofstream(p.file_string().c_str()));
 					*of << "GET " << req.uri << "\n";
 					*of << "POST\n" << req.postData << "\n";
 				}

@@ -200,13 +200,13 @@ namespace synthese
 			const std::string& key
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.string().c_str());
+			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
 				_logError(
-					"Could no open the file " + filePath.string()
+					"Could no open the file " + filePath.file_string()
 				);
-				throw Exception("Could no open the file " + filePath.string());
+				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
 			if(_calendar.empty())

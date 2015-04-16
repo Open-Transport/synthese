@@ -11,14 +11,14 @@ include_directories("${PROJECT_SOURCE_DIR}/src/32_geography")
 include_directories("${PROJECT_SOURCE_DIR}/src/34_road")
 
 set(DEPS
+  59_road_journey_planner # from 56_pt_website
+  56_pt_website # from cms
+  54_departure_boards
   11_cms # from road > graph > server
   34_road
   54_departure_boards
   61_data_exchange
   37_pt_operation
-  38_vehicle
-  56_pt_website
-  59_road_journey_planner
 )
 
 boost_test(Road "${DEPS}")

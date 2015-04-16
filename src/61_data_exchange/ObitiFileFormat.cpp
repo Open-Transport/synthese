@@ -154,10 +154,10 @@ namespace synthese
 
 			if(key != PATH_HORAIRES)
 			{
-				inFile.open(filePath.string().c_str());
+				inFile.open(filePath.file_string().c_str());
 				if(!inFile)
 				{
-					throw Exception("Could no open the file " + filePath.string());
+					throw Exception("Could no open the file " + filePath.file_string());
 				}
 
 				if(!getline(inFile, line))
@@ -166,13 +166,13 @@ namespace synthese
 				}
 				_loadFieldsMap(line);
 				_logDebug(
-					"Loading file "+ filePath.string() +" as "+ key
+					"Loading file "+ filePath.file_string() +" as "+ key
 				);
 			}
 			else
 			{
 				_logDebug(
-					"Loading path "+ filePath.string() +" as "+ key
+					"Loading path "+ filePath.file_string() +" as "+ key
 				);
 			}
 
@@ -323,13 +323,13 @@ namespace synthese
 			// 4 : schedules path
 			if(key == PATH_HORAIRES)
 			{
-				boost::filesystem::path path(filePath.string().c_str());
+				boost::filesystem::path path(filePath.file_string().c_str());
 				std::set<std::string> schedulesFiles;
 
 				if(boost::filesystem::is_directory(path)) {
 					for(boost::filesystem::directory_iterator it(path), end; it != end; ++it) {
 						if(boost::filesystem::is_regular_file(it->status())) {
-						  schedulesFiles.insert(it->path().filename().string());
+							schedulesFiles.insert(it->path().filename());
 						}
 					}
 				}
@@ -365,7 +365,7 @@ namespace synthese
 				BOOST_FOREACH(const string& file, schedulesFiles)
 				{
 					ifstream inFile;
-					string fileWithPath = filePath.string() + file;
+					string fileWithPath = filePath.file_string() + file;
 					inFile.open(fileWithPath.c_str());
 					if(!inFile)
 					{

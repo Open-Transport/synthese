@@ -28,9 +28,9 @@ endif()
 
 # Boost
 
-#set(Boost_ADDITIONAL_VERSIONS "1.57")
+set(Boost_ADDITIONAL_VERSIONS "1.39" "1.42")
 # Uncomment to enable debugging output when finding Boost.
-# set(Boost_DEBUG ON)
+#set(Boost_DEBUG ON)
 
 if(WIN32)
   set(Boost_USE_STATIC_LIBS ON)
@@ -40,16 +40,15 @@ else()
   add_definitions(-DPNG_NO_MMX_CODE)
 endif()
 
-add_definitions(-DFUSION_MAX_VECTOR_SIZE=40)
-add_definitions(-DFUSION_MAX_MAP_SIZE=40)
+add_definitions(-DFUSION_MAX_VECTOR_SIZE=30)
+add_definitions(-DFUSION_MAX_MAP_SIZE=30)
 
-#if(NOT DEFINED BOOST_VERSION)
-#  set(BOOST_VERSION 1.57)
-#endif()
+if(NOT DEFINED BOOST_VERSION)
+  set(BOOST_VERSION 1.39)
+endif()
 
-set(BOOST_LIBS program_options filesystem system random regex thread date_time iostreams unit_test_framework)
+set(BOOST_LIBS program_options filesystem system regex thread date_time iostreams unit_test_framework)
 if(WIN32)
-  list(APPEND BOOST_LIBS chrono)
   list(APPEND BOOST_LIBS bzip2)
   list(APPEND BOOST_LIBS zlib)
 endif()
@@ -57,16 +56,16 @@ endif()
 if(NOT $ENV{BOOST_ROOT} STREQUAL "")
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
-find_package(Boost ${BOOST_VERSION} EXACT COMPONENTS ${BOOST_LIBS})
+find_package(Boost ${BOOST_VERSION} COMPONENTS ${BOOST_LIBS})
 if(NOT Boost_FOUND)
   message(FATAL_ERROR "Boost not found")
 endif()
 
 include_directories(${Boost_INCLUDE_DIRS})
 
-# MYSQL
+# MySQL
 
-macro_optional_find_package(MYSQL)
+macro_optional_find_package(MySQL)
 if(WITH_MYSQL AND NOT MYSQL_FOUND)
   message(FATAL_ERROR "MySQL not found")
 endif()
@@ -91,11 +90,7 @@ if(WIN32)
   # -D__WIN32__
   add_definitions(-DNOMINMAX)
 
-  # Min target is now Windows 7
-  add_definitions(-D_WIN32_WINNT=0x0601)
-  
-  # C++ exceptions are required by Boost
-  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+  add_definitions(-D_WIN32_WINNT=0x0501)
 
   # This is to avoid:
   # fatal error C1128: number of sections exceeded object file format limit : compile with /bigobj

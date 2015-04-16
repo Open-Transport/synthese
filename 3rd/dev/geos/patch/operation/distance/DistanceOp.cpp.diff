@@ -1,21 +1,6 @@
---- src/operation/distance/DistanceOp.cpp	2014-02-11 16:53:31.366630500 +0100
-+++ patch/operation/distance/DistanceOp.cpp	2014-03-28 18:07:50.645566865 +0100
-@@ -390,8 +390,12 @@
- 	 */
- 	LineString::ConstVect lines0;
- 	LineString::ConstVect lines1;
--	LinearComponentExtracter::getLines(*(geom[0]), lines0);
--	LinearComponentExtracter::getLines(*(geom[1]), lines1);
-+
-+	LinearComponentExtracter lce0(lines0);
-+	geom[0]->apply_ro(&lce0);
-+
-+	LinearComponentExtracter lce1(lines1);
-+	geom[1]->apply_ro(&lce1);
- 
- #if GEOS_DEBUG
- 	std::cerr << "LinearComponentExtracter found "
-@@ -402,8 +406,12 @@
+--- src/operation/distance/DistanceOp.cpp	2011-07-22 20:47:48.231958700 +0200
++++ patch/operation/distance/DistanceOp.cpp	2011-10-24 12:32:41.304282400 +0200
+@@ -402,8 +402,12 @@
  
  	Point::ConstVect pts0;
  	Point::ConstVect pts1;

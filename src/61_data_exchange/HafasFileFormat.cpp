@@ -313,7 +313,7 @@ namespace synthese
 		) const {
 			if(!_openFile(filePath))
 			{
-				throw Exception("Could no open the file " + filePath.string());
+				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
 			DataSource& dataSource(*_import.get<DataSource>());
@@ -936,7 +936,7 @@ namespace synthese
 			_file.clear();
 
 			// Opening the new file
-			_file.open(filePath.string().c_str());
+			_file.open(filePath.file_string().c_str());
 
 			// Check of the file path
 			if(!_file)

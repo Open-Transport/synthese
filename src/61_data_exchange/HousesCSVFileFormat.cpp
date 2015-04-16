@@ -160,11 +160,11 @@ namespace synthese
 					ifstream inFile;
 					string line;
 
-					_logDebug("Loading file "+ filePath.string());
-					inFile.open(filePath.string().c_str());
+					_logDebug("Loading file "+ filePath.file_string());
+					inFile.open(filePath.file_string().c_str());
 					if(!inFile)
 					{
-						_logError("Could not open the file "+ filePath.string());
+						_logError("Could not open the file "+ filePath.file_string());
 						return false;
 					}
 					// Ignore header lines

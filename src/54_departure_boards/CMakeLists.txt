@@ -150,10 +150,6 @@ endif(WITH_MYSQL)
 
 add_library(54_departure_boards ${departure_boards_SRCS})
 
-if(UNIX)
-  set(PTHREAD "pthread")
-endif()
-
 if(WITH_MYSQL)
 target_link_libraries(54_departure_boards
   07_lexical_matcher
@@ -165,7 +161,6 @@ target_link_libraries(54_departure_boards
   35_pt
   11_cms
   ${MYSQL_LIBRARIES}
-  ${PTHREAD}
 )
 else(WITH_MYSQL)
 target_link_libraries(54_departure_boards

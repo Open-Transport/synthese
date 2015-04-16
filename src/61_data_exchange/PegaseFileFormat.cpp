@@ -589,13 +589,13 @@ namespace synthese
 			const boost::filesystem::path& filePath
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.string().c_str());
+			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
 				_logError(
-					"Could not open the file " + filePath.string()
+					"Could not open the file " + filePath.file_string()
 				);
-				throw Exception("Could not open the file " + filePath.string());
+				throw Exception("Could not open the file " + filePath.file_string());
 			}
 
 			DataSource& dataSource(*_import.get<DataSource>());

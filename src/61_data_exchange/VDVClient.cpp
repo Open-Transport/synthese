@@ -303,7 +303,7 @@ namespace synthese
 				p = p / dateDirName.str() / "clients" / get<Name>();
 				create_directories(p);
 				p = p / fileName.str();
-				ofstream logFile(p.string().c_str());
+				ofstream logFile(p.file_string().c_str());
 				logFile << content;
 			}
 		}

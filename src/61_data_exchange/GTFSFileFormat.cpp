@@ -179,10 +179,10 @@ namespace synthese
 			const std::string& key
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.string().c_str());
+			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
-				throw Exception("Could no open the file " + filePath.string());
+				throw Exception("Could no open the file " + filePath.file_string());
 			}
 			string line;
 			if(!getline(inFile, line))
@@ -191,7 +191,7 @@ namespace synthese
 			}
 			_loadFieldsMap(line);
 
-			_logInfo("Loading file "+ filePath.string() +" as "+ key);
+			_logInfo("Loading file "+ filePath.file_string() +" as "+ key);
 
 			DataSource& dataSource(*_import.get<DataSource>());
 
