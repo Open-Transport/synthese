@@ -187,11 +187,6 @@ if(WITH_PROJECTS)
   add_subdirectory(projects)
 endif()
 
-OPTION(WITH_TOOLS "Build and install tools" OFF)
-if(WITH_TOOLS)
-  add_subdirectory(tools)
-endif()
-
 OPTION(WITH_UTILS "Build and install utils" OFF)
 if(WITH_UTILS)
   add_subdirectory(utils)
