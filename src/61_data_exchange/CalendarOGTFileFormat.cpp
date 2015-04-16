@@ -218,13 +218,14 @@ namespace synthese
 
 		util::ParametersMap CalendarOGTFileFormat::Importer_::_getParametersMap() const
 		{
-			return _ogtImporter._getParametersMap();
+			return _ogtImporter._getParametersMap(); // Already contains the PTDataCleanerFileFormat parameters map
 		}
 
 
 
 		void CalendarOGTFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
+			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_ogtImporter._setFromParametersMap(map);
 		}
 }	}
